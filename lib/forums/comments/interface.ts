@@ -1,8 +1,8 @@
-import type { PageComment } from '@prisma/client';
+import type { PostComment } from '@prisma/client';
 
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
-export type PostCommentWithVote = PageComment & {
+export type PostCommentWithVote = PostComment & {
   upvotes: number;
   downvotes: number;
   upvoted: null | boolean;
@@ -15,7 +15,7 @@ export type PostCommentWithVoteAndChildren = PostCommentWithVote & {
 export type CreatePostCommentInput = {
   content: PageContent;
   contentText: string;
-  parentId: string;
+  parentId?: string;
 };
 
 export type UpdatePostCommentInput = {

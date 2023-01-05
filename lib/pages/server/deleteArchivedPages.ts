@@ -20,9 +20,7 @@ export async function deleteArchivedPages(maxDay: number) {
   });
 
   const { count: deletedPostsCount } = await prisma.post.deleteMany({
-    where: {
-      page: whereQuery
-    }
+    where: whereQuery
   });
 
   const { count: deletedProposalsCount } = await prisma.proposal.deleteMany({

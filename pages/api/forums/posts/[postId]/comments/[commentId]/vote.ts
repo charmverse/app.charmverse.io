@@ -10,12 +10,12 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 handler.use(requireUser).put(commentUpDownVoteHandler);
 
 async function commentUpDownVoteHandler(req: NextApiRequest, res: NextApiResponse) {
-  const { pageId, commentId } = req.query as any as { pageId: string; commentId: string };
+  const { postId, commentId } = req.query as any as { postId: string; commentId: string };
   const userId = req.session.user.id;
   const { upvoted } = req.body;
 
   await voteForumComment({
-    pageId,
+    postId,
     userId,
     upvoted,
     commentId

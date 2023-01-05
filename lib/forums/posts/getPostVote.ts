@@ -1,7 +1,9 @@
 import { prisma } from 'db';
 
-export async function getPostVote({ pageId, userId }: { pageId: string; userId: string }) {
-  const pageWithVotes = await prisma.page.findUnique({
+import type { ForumVotes } from './interfaces';
+
+export async function getPostVote({ pageId, userId }: { pageId: string; userId: string }): Promise<ForumVotes | null> {
+  const pageWithVotes = await prisma.post.findUnique({
     where: {
       id: pageId
     },

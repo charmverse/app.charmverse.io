@@ -1,7 +1,8 @@
+import type { Post } from '@prisma/client';
 import { useEffect, useState } from 'react';
 
 import charmClient from 'charmClient';
-import type { ForumPostPage } from 'lib/forums/posts/interfaces';
+import type { PostWithVotes } from 'lib/forums/posts/interfaces';
 import log from 'lib/log';
 
 import { usePostDialog } from './hooks/usePostDialog';
@@ -9,7 +10,7 @@ import PostDialog from './PostDialog';
 
 // a wrapper of page dialog that uses usePageDialogHook
 export default function PostDialogGlobal() {
-  const [page, setPage] = useState<ForumPostPage | null>(null);
+  const [post, setPost] = useState<PostWithVotes | null>(null);
   const { props, hidePost } = usePostDialog();
   const { postId } = props;
 
@@ -21,16 +22,16 @@ export default function PostDialogGlobal() {
     if (postId) {
       charmClient.forum
         .getForumPost(postId)
-        .then((_page) => {
-          setPage(_page);
+        .then((_post) => {
+          setPost(_post);
         })
         .catch((error) => {
           log.error('Could not load page', error);
         });
     } else {
-      setPage(null);
+      setPost(null);
     }
   }, [postId]);
 
-  return page ? <PostDialog page={page} onClose={closeDialog} spaceId={page.spaceId} /> : null;
+  return post ? <PostDialog post={post} onClose={closeDialog} spaceId={post.spaceId} /> : null;
 }

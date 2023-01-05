@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 
+import { filterPropertyTemplates } from 'components/common/BoardEditor/utils/updateVisibilePropertyIds';
 import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
 import { createBoard } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
@@ -31,16 +32,10 @@ function CalculationRow(props: Props): JSX.Element {
     setShowOptions(newShowOptions);
   };
 
-  const titleTemplate: IPropertyTemplate = {
-    id: Constants.titleColumnId
-  } as IPropertyTemplate;
-
-  const templates: IPropertyTemplate[] = [
-    titleTemplate,
-    ...props.board.fields.cardProperties.filter((template) =>
-      props.activeView.fields.visiblePropertyIds.includes(template.id)
-    )
-  ];
+  const templates = filterPropertyTemplates(
+    props.activeView.fields.visiblePropertyIds,
+    props.board.fields.cardProperties
+  );
 
   const selectedCalculations = props.board.fields.columnCalculations || [];
 

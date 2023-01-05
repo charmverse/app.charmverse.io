@@ -17,7 +17,7 @@ import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useSWRConfig } from 'swr';
 
 import charmClient from 'charmClient';
-import CommentsSidebar from 'components/[pageId]/DocumentPage/components/CommentsSidebar';
+import { CommentsSidebar } from 'components/[pageId]/DocumentPage/components/CommentsSidebar';
 import { SuggestionsSidebar } from 'components/[pageId]/DocumentPage/components/SuggestionsSidebar';
 import * as codeBlock from 'components/common/CharmEditor/components/@bangle.dev/base-components/code-block';
 import { plugins as imagePlugins } from 'components/common/CharmEditor/components/@bangle.dev/base-components/image';

@@ -33,7 +33,8 @@ export async function updateUserProfile(userId: string, update: Partial<User>): 
         avatarChain: update.avatarChain,
         avatarContract: update.avatarContract,
         avatarTokenId: update.avatarTokenId,
-        path: update.path
+        path: update.path,
+        email: update.email
       }
     });
   }
