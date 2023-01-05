@@ -165,6 +165,7 @@
     "next-swagger-doc": "^0.3.6",
     "next-transpile-modules": "^9.0.0",
     "node-cron": "^3.0.0",
+    "node-fetch": "^3.3.0",
     "orderedmap": "^2.0.0",
     "papaparse": "^5.3.2",
     "patch-package": "^6.4.7",
