@@ -39,6 +39,13 @@ export type BountyEntity = {
   rewardAmount: number;
 };
 
+export enum WebhookNameSpaceNames {
+  Discussion = 'discussion',
+  Comment = 'comment',
+  Proposal = 'proposal',
+  Bounty = 'bounty'
+}
+
 export enum WebhookEventNames {
   DiscussionCreated = 'discussion.created',
   CommentCreated = 'comment.created',
@@ -53,52 +60,52 @@ export enum WebhookEventNames {
 
 // Utils to share common props among events
 type WebhookEventSharedProps<T = WebhookEventNames> = {
-  name: T;
+  scope: T;
 };
 
 // Strongly typed events, shared between API, serverless functions and possibly our end users
 export type WebhookEvent<T = WebhookEventNames> =
   | (WebhookEventSharedProps<T> & {
-      name: WebhookEventNames.DiscussionCreated;
+      scope: WebhookEventNames.DiscussionCreated;
       discussion: DiscussionEntity;
     })
   | (WebhookEventSharedProps<T> & {
-      name: WebhookEventNames.CommentCreated;
+      scope: WebhookEventNames.CommentCreated;
       comment: CommentEntity;
       discussion: DiscussionEntity;
     })
   | (WebhookEventSharedProps<T> & {
-      name: WebhookEventNames.CommentUpvoted;
-      comment: CommentEntity;
-      discussion: DiscussionEntity;
-      voter: UserEntity;
-    })
-  | (WebhookEventSharedProps<T> & {
-      name: WebhookEventNames.CommentDownvoted;
+      scope: WebhookEventNames.CommentUpvoted;
       comment: CommentEntity;
       discussion: DiscussionEntity;
       voter: UserEntity;
     })
   | (WebhookEventSharedProps<T> & {
-      name: WebhookEventNames.ProposalPassed;
+      scope: WebhookEventNames.CommentDownvoted;
+      comment: CommentEntity;
+      discussion: DiscussionEntity;
+      voter: UserEntity;
+    })
+  | (WebhookEventSharedProps<T> & {
+      scope: WebhookEventNames.ProposalPassed;
       proposal: ProposalEntity;
     })
   | (WebhookEventSharedProps<T> & {
-      name: WebhookEventNames.ProposalFailed;
+      scope: WebhookEventNames.ProposalFailed;
       proposal: ProposalEntity;
     })
   | (WebhookEventSharedProps<T> & {
-      name: WebhookEventNames.ProposalSuggestionApproved;
+      scope: WebhookEventNames.ProposalSuggestionApproved;
       proposal: ProposalEntity;
       user: UserEntity;
     })
   | (WebhookEventSharedProps<T> & {
-      name: WebhookEventNames.ProposalUserVote;
+      scope: WebhookEventNames.ProposalUserVote;
       proposal: ProposalEntity;
       user: UserEntity;
     })
   | (WebhookEventSharedProps<T> & {
-      name: WebhookEventNames.BountyCompleted;
+      scope: WebhookEventNames.BountyCompleted;
       bounty: BountyEntity;
       user: UserEntity;
     });
@@ -109,17 +116,13 @@ export type WebhookPayload<T = WebhookEventNames> = {
   event: WebhookEvent<T>;
   spaceId: Space['id'];
   webhookURL: string;
-  // resource: {
-  //   id: string;
-  //   type: T;
-  // };
 };
 
 // Payload example
 // const payload: WebhookPayload = {
 //   createdAt: new Date().toISOString(),
 //   event: {
-//     name: WebhookEventNames.BountyCompleted,
+//     scope: WebhookEventNames.BountyCompleted,
 //     bounty,
 //     user
 //   }
