@@ -15,7 +15,7 @@ export type PostCommentWithVoteAndChildren = PostCommentWithVote & {
 export type CreatePostCommentInput = {
   content: PageContent;
   contentText: string;
-  parentId: string;
+  parentId?: string;
 };
 
 export type UpdatePostCommentInput = {

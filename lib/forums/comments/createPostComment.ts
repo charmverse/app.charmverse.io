@@ -12,13 +12,21 @@ export async function createPostComment({
   postId: string;
   userId: string;
 }) {
-  return prisma.pageComment.create({
+  return prisma.postComment.create({
     data: {
       content,
       contentText: contentText.trim(),
-      createdBy: userId,
-      pageId: postId,
-      parentId
+      parentId,
+      user: {
+        connect: {
+          id: userId
+        }
+      },
+      post: {
+        connect: {
+          id: postId
+        }
+      }
     },
     include: {
       user: {

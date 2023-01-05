@@ -1,41 +1,44 @@
-import { prisma } from 'db';
-import { DataNotFoundError } from 'lib/utilities/errors';
+import type { PostCommentUpDownVote } from '@prisma/client';
 
-import { getComment } from '../comments/getComment';
+import { prisma } from 'db';
+
+import { getPostComment } from '../comments/getPostComment';
+
+type CommentVote = {
+  commentId: string;
+  postId: string;
+  userId: string;
+  upvoted: boolean | null;
+};
 
 export async function voteForumComment({
   upvoted,
   userId,
   commentId,
-  pageId
-}: {
-  commentId: string;
-  pageId: string;
-  userId: string;
-  upvoted: boolean | null;
-}) {
-  const comment = await getComment(commentId);
-
-  if (!comment) {
-    throw new DataNotFoundError(commentId);
-  }
-
+  postId
+}: CommentVote): Promise<PostCommentUpDownVote | null> {
   if (upvoted === null) {
-    await prisma.pageCommentUpDownVote.delete({
-      where: {
-        createdBy_commentId: {
-          createdBy: userId,
-          commentId
+    try {
+      await prisma.postCommentUpDownVote.delete({
+        where: {
+          createdBy_commentId: {
+            createdBy: userId,
+            commentId
+          }
         }
-      }
-    });
+      });
+    } catch (error) {
+      // Comment not found
+    }
+
+    return null;
   } else {
-    await prisma.pageCommentUpDownVote.upsert({
+    const commentVote = await prisma.postCommentUpDownVote.upsert({
       create: {
         createdBy: userId,
         upvoted,
         commentId,
-        pageId
+        postId
       },
       update: {
         upvoted
@@ -47,5 +50,7 @@ export async function voteForumComment({
         }
       }
     });
+
+    return commentVote;
   }
 }

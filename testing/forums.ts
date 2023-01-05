@@ -1,9 +1,7 @@
-import type { Prisma } from '@prisma/client';
+import type { Post, Prisma } from '@prisma/client';
 import { v4 } from 'uuid';
 
 import { prisma } from 'db';
-import { selectPageValues } from 'lib/forums/posts/getForumPost';
-import type { ForumPostPage } from 'lib/forums/posts/interfaces';
 
 import { generatePostCategory } from './utils/forums';
 
@@ -40,9 +38,9 @@ export async function generateForumPosts({
   contentText?: string;
   title?: string;
   withImageRatio?: number;
-}) {
+}): Promise<Post[]> {
   const postCreateInputs: Prisma.PostCreateManyInput[] = [];
-  const pageCreateInputs: Prisma.PageCreateManyInput[] = [];
+
   if (!categoryId) {
     const category = await prisma.postCategory.findFirst({
       where: {
@@ -61,31 +59,17 @@ export async function generateForumPosts({
   let createdAt = Date.now() - 1000 * 60 * 60 * 24 * 30;
 
   for (let i = 0; i < count; i++) {
-    const postInput: Prisma.PostCreateManyInput = {
-      categoryId,
-      spaceId,
-      id: v4()
-    };
-
-    postCreateInputs.push(postInput);
-
     const postDate = new Date(createdAt);
 
-    // eslint-disable-next-line prettier/prettier
-    const hasImage = (Math.random() * 100) < withImageRatio;
-
-    pageCreateInputs.push({
-      id: postInput.id,
+    postCreateInputs.push({
+      id: v4(),
       spaceId,
+      categoryId,
       contentText,
       content,
       title: `${title ?? 'Post'} ${i}`,
       createdBy,
-      updatedBy: createdBy,
-      type: 'post',
       path: `path-${v4()}`,
-      postId: postInput.id,
-      galleryImage: hasImage ? getRandomImage() : undefined,
       createdAt: postDate,
       updatedAt: postDate
     });
@@ -94,28 +78,14 @@ export async function generateForumPosts({
     createdAt += 1000 * 60 * 30;
   }
 
-  await prisma.$transaction([
-    prisma.post.createMany({ data: postCreateInputs }),
-    prisma.page.createMany({ data: pageCreateInputs })
-  ]);
+  await prisma.post.createMany({ data: postCreateInputs });
 
-  const pages = await prisma.page.findMany({
+  const posts = await prisma.post.findMany({
     where: {
-      spaceId,
-      type: 'post',
-      postId: {
+      id: {
         in: postCreateInputs.map((post) => post.id as string)
       }
-    },
-    include: {
-      post: true
     }
   });
-
-  const postPages: ForumPostPage[] = pages.map((page) => ({
-    ...selectPageValues(page),
-    post: page.post!
-  }));
-
-  return postPages;
+  return posts;
 }
