@@ -2,6 +2,7 @@
   Warnings:
 
   - The values [post] on the enum `PageType` will be removed. If these variants are still used in the database, this will fail.
+  - You are about to drop the column `postId` on the `Page` table. All the data in the column will be lost.
   - You are about to drop the `PageComment` table. If the table is not empty, all the data it contains will be lost.
   - You are about to drop the `PageCommentUpDownVote` table. If the table is not empty, all the data it contains will be lost.
   - You are about to drop the `PageUpDownVote` table. If the table is not empty, all the data it contains will be lost.
@@ -40,11 +41,21 @@ ALTER TABLE "PageCommentUpDownVote" DROP CONSTRAINT "PageCommentUpDownVote_pageI
 -- DropForeignKey
 ALTER TABLE "PageUpDownVote" DROP CONSTRAINT "PageUpDownVote_pageId_fkey";
 
+-- DropIndex
+DROP INDEX "Page_postId_idx";
+
+-- DropIndex
+DROP INDEX "Page_postId_key";
+
+-- AlterTable
+ALTER TABLE "Page" DROP COLUMN "postId";
+
 -- AlterTable
 ALTER TABLE "Post" ADD COLUMN     "content" JSONB NOT NULL,
 ADD COLUMN     "contentText" TEXT NOT NULL,
 ADD COLUMN     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 ADD COLUMN     "createdBy" UUID NOT NULL,
+ADD COLUMN     "deletedAt" TIMESTAMP(3),
 ADD COLUMN     "path" TEXT NOT NULL,
 ADD COLUMN     "title" TEXT NOT NULL,
 ADD COLUMN     "updatedAt" TIMESTAMP(3) NOT NULL;
@@ -75,7 +86,7 @@ CREATE TABLE "PostComment" (
     "contentText" TEXT NOT NULL,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "deletedAt" TIMESTAMP(3),
-    "parentId" TEXT NOT NULL,
+    "parentId" TEXT,
     "postId" UUID NOT NULL,
 
     CONSTRAINT "PostComment_pkey" PRIMARY KEY ("id")

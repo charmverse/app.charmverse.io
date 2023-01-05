@@ -443,7 +443,7 @@ model User {
   memberPropertyValues MemberPropertyValue[]
   userTokenGates       UserTokenGate[]
   unstoppableDomains   UnstoppableDomain[]
-  PostComment          PostComment[]
+  postComments         PostComment[]
   googleAccounts       GoogleAccount[]
 }
 
