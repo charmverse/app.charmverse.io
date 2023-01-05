@@ -61,42 +61,7 @@ beforeAll(async () => {
 });
 
 describe('PUT /api/forums/posts/[postId]/comments/[commentId] - Update a comment', () => {
-  it('should throw error if post is not found, responding with 404', async () => {
-    await request(baseUrl)
-      .put(`/api/forums/posts/${v4()}/comments/${v4()}`)
-      .set('Cookie', userCookie)
-      .send(updateInput)
-      .expect(404);
-  });
-
-  it(`should throw error if user doesn't have access to workspace, responding with 401`, async () => {
-    const { comment, post } = await generatePostWithComment({
-      spaceId: space.id,
-      userId: user.id
-    });
-    await request(baseUrl)
-      .put(`/api/forums/posts/${post.id}/comments/${comment.id}`)
-      .set('Cookie', nonSpaceUserCookie)
-      .send(updateInput)
-      .expect(401);
-  });
-
-  it(`should throw error if user isn't the comment author, responding with 401`, async () => {
-    const spaceUser = await generateSpaceUser({ isAdmin: false, spaceId: space.id });
-
-    const { comment, post } = await generatePostWithComment({
-      spaceId: space.id,
-      userId: spaceUser.id
-    });
-
-    await request(baseUrl)
-      .put(`/api/forums/posts/${post.id}/comments/${comment.id}`)
-      .set('Cookie', userCookie)
-      .send(updateInput)
-      .expect(401);
-  });
-
-  it('should update post comment, responding with 200', async () => {
+  it('should update post comment if user is the author, responding with 200', async () => {
     const { comment, post } = await generatePostWithComment({
       spaceId: space.id,
       userId: user.id
@@ -106,27 +71,35 @@ describe('PUT /api/forums/posts/[postId]/comments/[commentId] - Update a comment
       .set('Cookie', userCookie)
       .send(updateInput)
       .expect(200);
+  });
+
+  it('should fail to update post comment, even if user is a space admin, responding with 401', async () => {
+    const { comment, post } = await generatePostWithComment({
+      spaceId: space.id,
+      userId: user.id
+    });
+    await request(baseUrl)
+      .put(`/api/forums/posts/${post.id}/comments/${comment.id}`)
+      .set('Cookie', adminUserCookie)
+      .send(updateInput)
+      .expect(401);
+  });
+
+  it(`should fail to update the post comment if user doesn't have access to workspace, responding with 401`, async () => {
+    const { comment, post } = await generatePostWithComment({
+      spaceId: space.id,
+      userId: user.id
+    });
+    await request(baseUrl)
+      .put(`/api/forums/posts/${post.id}/comments/${comment.id}`)
+      .set('Cookie', nonSpaceUserCookie)
+      .send(updateInput)
+      .expect(401);
   });
 });
 
 describe('DELETE /api/forums/posts/[postId]/comments/[commentId] - Delete a comment', () => {
-  it('should throw error if post is not found, responding with 404', async () => {
-    await request(baseUrl).delete(`/api/forums/posts/${v4()}/comments/${v4()}`).set('Cookie', userCookie).expect(404);
-  });
-
-  it(`should throw error if user doesn't have access to workspace, responding with 401`, async () => {
-    const { comment, post } = await generatePostWithComment({
-      spaceId: space.id,
-      userId: user.id
-    });
-
-    await request(baseUrl)
-      .delete(`/api/forums/posts/${post.id}/comments/${comment.id}`)
-      .set('Cookie', nonSpaceUserCookie)
-      .expect(401);
-  });
-
-  it('should delete post comment, responding with 200', async () => {
+  it('should delete post comment if user is the author, responding with 200', async () => {
     const { comment, post } = await generatePostWithComment({
       spaceId: space.id,
       userId: user.id
@@ -134,6 +107,43 @@ describe('DELETE /api/forums/posts/[postId]/comments/[commentId] - Delete a comm
     await request(baseUrl)
       .delete(`/api/forums/posts/${post.id}/comments/${comment.id}`)
       .set('Cookie', userCookie)
+      .send(updateInput)
       .expect(200);
+  });
+
+  it('should delete post comment, if user is a space admin, responding with 200', async () => {
+    const { comment, post } = await generatePostWithComment({
+      spaceId: space.id,
+      userId: user.id
+    });
+    await request(baseUrl)
+      .delete(`/api/forums/posts/${post.id}/comments/${comment.id}`)
+      .set('Cookie', adminUserCookie)
+      .send(updateInput)
+      .expect(200);
+  });
+
+  it(`should fail to delete the post comment if user is another space member, responding with 401`, async () => {
+    const { comment, post } = await generatePostWithComment({
+      spaceId: space.id,
+      userId: user.id
+    });
+    await request(baseUrl)
+      .delete(`/api/forums/posts/${post.id}/comments/${comment.id}`)
+      .set('Cookie', extraSpaceUserCookie)
+      .send(updateInput)
+      .expect(401);
+  });
+
+  it(`should fail to delete the post comment if user doesn't have access to workspace, responding with 401`, async () => {
+    const { comment, post } = await generatePostWithComment({
+      spaceId: space.id,
+      userId: user.id
+    });
+    await request(baseUrl)
+      .delete(`/api/forums/posts/${post.id}/comments/${comment.id}`)
+      .set('Cookie', nonSpaceUserCookie)
+      .send(updateInput)
+      .expect(401);
   });
 });

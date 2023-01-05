@@ -89,7 +89,7 @@ describe('getForumPost', () => {
         votes: {
           downvotes: totalDownvotes,
           upvotes: totalUpvotes,
-          upvoted: true
+          upvoted: voteInputs[0].upvoted
         }
       })
     );
