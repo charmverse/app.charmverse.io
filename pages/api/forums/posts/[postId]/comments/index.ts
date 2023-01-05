@@ -1,11 +1,11 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
-import { PageNotFoundError } from 'next/dist/shared/lib/utils';
 
 import { prisma } from 'db';
 import { createPostComment } from 'lib/forums/comments/createPostComment';
 import type { CreatePostCommentInput, PostCommentWithVote } from 'lib/forums/comments/interface';
 import { listPostComments } from 'lib/forums/comments/listPostComments';
+import { PostNotFoundError } from 'lib/forums/posts/errors';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
@@ -34,7 +34,7 @@ async function createPostCommentHandler(req: NextApiRequest, res: NextApiRespons
   });
 
   if (!post) {
-    throw new PageNotFoundError(postId);
+    throw new PostNotFoundError(postId);
   }
 
   const { error } = await hasAccessToSpace({
