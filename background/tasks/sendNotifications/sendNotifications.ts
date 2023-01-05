@@ -38,6 +38,7 @@ export async function getNotifications(): Promise<(PendingTasksProps & { unmarke
 
   const usersWithSafes = await prisma.user.findMany({
     where: {
+      deletedAt: null,
       AND: [{ email: { not: null } }, { email: { not: '' } }]
     },
     // select only the fields that are needed
@@ -56,63 +57,66 @@ export async function getNotifications(): Promise<(PendingTasksProps & { unmarke
     return !snoozedUntil || snoozedUntil > new Date();
   });
 
-  const notifications = await Promise.all(
-    activeUsersWithSafes.map(async (user) => {
-      const gnosisSafeTasks = user.gnosisSafes.length > 0 ? await getPendingGnosisTasks(user.id) : [];
-      const discussionTasks = await getDiscussionTasks(user.id);
-      const voteTasks = await getVoteTasks(user.id);
-      const bountyTasks = await getBountyTasks(user.id);
+  // Because we have a large number of queries in parallel we need to avoid Promise.all and chain them one by one
+  const notifications = await activeUsersWithSafes.reduce(async (acc, user) => {
+    const accPromise = await acc;
+    const gnosisSafeTasks = user.gnosisSafes.length > 0 ? await getPendingGnosisTasks(user.id) : [];
+    const discussionTasks = await getDiscussionTasks(user.id);
+    const voteTasks = await getVoteTasks(user.id);
+    const bountyTasks = await getBountyTasks(user.id);
 
-      const sentTasks = await prisma.userNotification.findMany({
-        where: {
-          taskId: {
-            in: [
-              ...gnosisSafeTasks.map(getGnosisSafeTaskId),
-              ...voteTasks.map((voteTask) => voteTask.id),
-              ...workspaceEvents.map((workspaceEvent) => workspaceEvent.id)
-            ]
-          },
-          userId: user.id
+    const sentTasks = await prisma.userNotification.findMany({
+      where: {
+        taskId: {
+          in: [
+            ...gnosisSafeTasks.map(getGnosisSafeTaskId),
+            ...voteTasks.map((voteTask) => voteTask.id),
+            ...workspaceEvents.map((workspaceEvent) => workspaceEvent.id)
+          ]
         },
-        select: {
-          taskId: true
-        }
-      });
+        userId: user.id
+      },
+      select: {
+        taskId: true
+      }
+    });
 
-      const sentTaskIds = new Set(sentTasks.map((sentTask) => sentTask.taskId));
+    const sentTaskIds = new Set(sentTasks.map((sentTask) => sentTask.taskId));
 
-      const voteTasksNotSent = voteTasks.filter((voteTask) => !sentTaskIds.has(voteTask.id));
-      const gnosisSafeTasksNotSent = gnosisSafeTasks.filter(
-        (gnosisSafeTask) => !sentTaskIds.has(getGnosisSafeTaskId(gnosisSafeTask))
-      );
-      const myGnosisTasksNotSent = gnosisSafeTasksNotSent.filter((gnosisSafeTask) =>
-        Boolean(gnosisSafeTask.tasks[0].transactions[0].myAction)
-      );
-      const workspaceEventsNotSent = workspaceEvents.filter((workspaceEvent) => !sentTaskIds.has(workspaceEvent.id));
-      const { proposalTasks = [], unmarkedWorkspaceEvents = [] } =
-        workspaceEventsNotSent.length !== 0
-          ? await getProposalTasksFromWorkspaceEvents(user.id, workspaceEventsNotSent)
-          : {};
+    const voteTasksNotSent = voteTasks.filter((voteTask) => !sentTaskIds.has(voteTask.id));
+    const gnosisSafeTasksNotSent = gnosisSafeTasks.filter(
+      (gnosisSafeTask) => !sentTaskIds.has(getGnosisSafeTaskId(gnosisSafeTask))
+    );
+    const myGnosisTasksNotSent = gnosisSafeTasksNotSent.filter((gnosisSafeTask) =>
+      Boolean(gnosisSafeTask.tasks[0].transactions[0].myAction)
+    );
+    const workspaceEventsNotSent = workspaceEvents.filter((workspaceEvent) => !sentTaskIds.has(workspaceEvent.id));
+    const { proposalTasks = [], unmarkedWorkspaceEvents = [] } =
+      workspaceEventsNotSent.length !== 0
+        ? await getProposalTasksFromWorkspaceEvents(user.id, workspaceEventsNotSent)
+        : {};
 
-      const totalTasks =
+    const totalTasks =
+      myGnosisTasksNotSent.length +
+      discussionTasks.unmarked.length +
+      voteTasksNotSent.length +
+      proposalTasks.length +
+      bountyTasks.unmarked.length;
+
+    log.debug('Found tasks for notification', {
+      notSent:
         myGnosisTasksNotSent.length +
-        discussionTasks.unmarked.length +
         voteTasksNotSent.length +
+        discussionTasks.unmarked.length +
         proposalTasks.length +
-        bountyTasks.unmarked.length;
+        bountyTasks.unmarked.length,
+      gnosisSafeTasks: gnosisSafeTasks.length,
+      myGnosisTasks: myGnosisTasksNotSent.length
+    });
 
-      log.debug('Found tasks for notification', {
-        notSent:
-          myGnosisTasksNotSent.length +
-          voteTasksNotSent.length +
-          discussionTasks.unmarked.length +
-          proposalTasks.length +
-          bountyTasks.unmarked.length,
-        gnosisSafeTasks: gnosisSafeTasks.length,
-        myGnosisTasks: myGnosisTasksNotSent.length
-      });
-
-      return {
+    return [
+      ...accPromise,
+      {
         user: user as PendingTasksProps['user'],
         gnosisSafeTasks: myGnosisTasksNotSent,
         totalTasks,
@@ -122,9 +126,9 @@ export async function getNotifications(): Promise<(PendingTasksProps & { unmarke
         proposalTasks,
         unmarkedWorkspaceEvents,
         bountyTasks: bountyTasks.unmarked
-      };
-    })
-  );
+      }
+    ];
+  }, Promise.resolve([] as (PendingTasksProps & { unmarkedWorkspaceEvents: string[] })[]));
 
   return notifications.filter((notification) => notification.totalTasks > 0);
 }
