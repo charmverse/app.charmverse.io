@@ -62,21 +62,17 @@ function getCommentFromThreads(threads: (ThreadWithCommentsAndAuthors | undefine
   return null;
 }
 
-export default function CommentsSidebar({ inline }: BoxProps & { inline?: boolean }) {
+export function CommentsSidebar({ inline }: BoxProps & { inline?: boolean }) {
   const router = useRouter();
   const { threads } = useThreads();
   const { user } = useUser();
 
-  const allThreads = Object.values(threads);
-  const unResolvedThreads = allThreads.filter((thread) => thread && !thread.resolved) as ThreadWithCommentsAndAuthors[];
-  const resolvedThreads = allThreads.filter((thread) => thread && thread.resolved) as ThreadWithCommentsAndAuthors[];
+  const allThreads = Object.values(threads).filter(isTruthy);
+  const unResolvedThreads = allThreads.filter((thread) => thread && !thread.resolved);
+  const resolvedThreads = allThreads.filter((thread) => thread && thread.resolved);
   const [threadFilter, setThreadFilter] = useState<'resolved' | 'open' | 'all' | 'you'>('open');
-  const [threadSort, setThreadSort] = useState<'earliest' | 'latest' | 'position'>('position');
   const handleThreadClassChange: SelectProps['onChange'] = (event) => {
     setThreadFilter(event.target.value as any);
-  };
-  const handleThreadListSortChange: SelectProps['onChange'] = (event) => {
-    setThreadSort(event.target.value as any);
   };
 
   const { setCurrentPageActionDisplay } = usePageActionDisplay();
@@ -97,32 +93,18 @@ export default function CommentsSidebar({ inline }: BoxProps & { inline?: boolea
 
   const view = useEditorViewContext();
   // Making sure the position sort doesn't filter out comments that are not in the view
-  const inlineThreadsIds =
-    threadSort === 'position'
-      ? Array.from(
-          new Set([
-            ...findTotalInlineComments(view.state.schema, view.state.doc, threads, true).threadIds,
-            ...allThreads.map((thread) => thread?.id).filter(isTruthy)
-          ])
-        )
-      : [];
+  const inlineThreadsIds = Array.from(
+    new Set([
+      ...findTotalInlineComments(view.state.schema, view.state.doc, threads, true).threadIds,
+      ...allThreads.map((thread) => thread?.id)
+    ])
+  );
 
-  let sortedThreadList: ThreadWithCommentsAndAuthors[] = [];
-  if (threadSort === 'earliest') {
-    sortedThreadList = threadList.sort((threadA, threadB) =>
-      threadA && threadB ? new Date(threadA.createdAt).getTime() - new Date(threadB.createdAt).getTime() : 0
-    );
-  } else if (threadSort === 'latest') {
-    sortedThreadList = threadList.sort((threadA, threadB) =>
-      threadA && threadB ? new Date(threadB.createdAt).getTime() - new Date(threadA.createdAt).getTime() : 0
-    );
-  } else {
-    const threadListSet = new Set(threadList.map((thread) => thread.id));
-    const filteredThreadIds = inlineThreadsIds.filter((inlineThreadsId) => threadListSet.has(inlineThreadsId));
-    sortedThreadList = filteredThreadIds.map(
-      (filteredThreadId) => threads[filteredThreadId] as ThreadWithCommentsAndAuthors
-    );
-  }
+  const threadListSet = new Set(threadList.map((thread) => thread.id));
+  const sortedThreadList = inlineThreadsIds
+    .filter((inlineThreadsId) => threadListSet.has(inlineThreadsId))
+    .map((filteredThreadId) => threads[filteredThreadId])
+    .filter(isTruthy);
 
   useEffect(() => {
     // Highlight the comment id when navigation from nexus mentioned tasks list tab
@@ -156,12 +138,6 @@ export default function CommentsSidebar({ inline }: BoxProps & { inline?: boolea
   return (
     <>
       <Box display='flex' alignItems='center' gap={1}>
-        <InputLabel>Sort</InputLabel>
-        <Select variant='outlined' value={threadSort} onChange={handleThreadListSortChange}>
-          <MenuItem value='position'>Position</MenuItem>
-          <MenuItem value='latest'>Latest</MenuItem>
-          <MenuItem value='earliest'>Earliest</MenuItem>
-        </Select>
         <InputLabel>Filter</InputLabel>
         <Select variant='outlined' value={threadFilter} onChange={handleThreadClassChange}>
           <MenuItem value='open'>Open</MenuItem>

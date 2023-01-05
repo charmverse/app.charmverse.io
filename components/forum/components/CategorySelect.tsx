@@ -3,55 +3,43 @@ import Box from '@mui/material/Box';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import Typography from '@mui/material/Typography';
+import startCase from 'lodash/startCase';
 
 import { ViewOptions } from 'components/common/ViewOptions';
 import { useForumCategories } from 'hooks/useForumCategories';
+import { postSortOptions } from 'lib/forums/posts/constants';
+import type { PostOrder } from 'lib/forums/posts/listForumPosts';
 
-export type FilterProps = {
+type FilterProps = {
   selectedCategory?: string;
-  onSelect: (categoryId?: string) => void;
-  // Unused prop for now
-  // eslint-disable-next-line react/no-unused-prop-types
-  sort?: any;
+  handleCategory: (categoryId?: string) => void;
+  sort?: PostOrder;
+  handleSort: (sort?: PostOrder) => void;
 };
 
-export function CategorySelect({ onSelect, selectedCategory }: FilterProps) {
+export function CategorySelect({ handleCategory, selectedCategory, handleSort, sort }: FilterProps) {
   const { categories, error } = useForumCategories();
-  // Unused for now
-  // const sortValue = useMemo(() => {
-  //   const defaultValue = sortList[0];
-  //   if (querySort) {
-  //     if (Array.isArray(querySort)) {
-  //       return querySort[0] || defaultValue;
-  //     } else {
-  //       return querySort;
-  //     }
-  //   }
-  //   return defaultValue;
-  // }, [querySort]);
 
   if (error) {
     return <Alert severity='error'>An error occurred while loading the categories</Alert>;
   }
 
   return (
-    <Box justifyContent='flex-start' flexWrap='wrap'>
-      {/*
-      Re-enable when we allow sorting in the app
+    <Box display='flex' justifyContent='flex-start' flexWrap='wrap'>
       <ViewOptions label='Sort' sx={{ mr: '10px', pb: '20px' }}>
-        <Select disabled={disabled} value={sortValue} onChange={(e: SelectChangeEvent) => handleClick(e.target.value)}>
-          {sortList.map((sort) => (
-            <MenuItem key={sort} value={sort}>
-              <Typography>{sort}</Typography>
+        <Select value={sort ?? 'newest'} onChange={(e) => handleSort(e.target.value as PostOrder)}>
+          {postSortOptions.map((s) => (
+            <MenuItem key={s} value={s}>
+              <Typography>{startCase(s.replace('_', ' '))}</Typography>
             </MenuItem>
           ))}
         </Select>
-      </ViewOptions> */}
+      </ViewOptions>
       <ViewOptions label='Categories' sx={{ pb: '20px' }}>
         <Select
           value={selectedCategory ?? 'all-category'}
           onChange={(e) => {
-            onSelect(e.target.value);
+            handleCategory(e.target.value);
           }}
         >
           <MenuItem value='all-category'>

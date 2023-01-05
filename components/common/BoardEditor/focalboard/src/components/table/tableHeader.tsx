@@ -277,8 +277,14 @@ function TableHeader(props: Props): JSX.Element {
   return (
     <div
       className={className}
-      style={{ overflow: 'unset', width: columnWidth(templateId), opacity: isDragging ? 0.5 : 1 }}
-      ref={templateId === Constants.titleColumnId ? () => null : columnRef}
+      style={{
+        overflow: 'unset',
+        width: columnWidth(props.template.id),
+        opacity: isDragging ? 0.5 : 1,
+        transition: `background-color 150ms ease-in-out`,
+        backgroundColor: isOver ? 'var(--charmeditor-active)' : 'initial'
+      }}
+      ref={columnRef}
     >
       <Stack width='100%' justifyContent='center'>
         {readOnly ? (
