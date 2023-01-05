@@ -38,6 +38,7 @@ type IContext = {
   isSigning: boolean;
   isConnectingIdentity: boolean;
   closeWalletSelector: () => void;
+  resetSigning: () => void;
 };
 
 export const Web3Context = createContext<Readonly<IContext>>({
@@ -56,7 +57,8 @@ export const Web3Context = createContext<Readonly<IContext>>({
   connectWalletModalIsOpen: false,
   isSigning: false,
   isConnectingIdentity: false,
-  closeWalletSelector: () => null
+  closeWalletSelector: () => null,
+  resetSigning: () => null
 });
 
 // a wrapper around account and library from web3react
@@ -215,7 +217,8 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
       connectWalletModalIsOpen: isWalletSelectorModalOpen,
       isSigning,
       isConnectingIdentity,
-      closeWalletSelector: closeWalletSelectorModal
+      closeWalletSelector: closeWalletSelectorModal,
+      resetSigning: () => setIsSigning(false)
     }),
     [
       account,
