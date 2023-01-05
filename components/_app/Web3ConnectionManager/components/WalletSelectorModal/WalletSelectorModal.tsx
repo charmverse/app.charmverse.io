@@ -19,7 +19,6 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import type { UnstoppableDomainsAuthSig } from 'lib/blockchain/unstoppableDomains';
 import { extractDomainFromProof } from 'lib/blockchain/unstoppableDomains/client';
 import log from 'lib/log';
-import { isSmallScreen } from 'lib/utilities/browser';
 import { BrowserPopupError } from 'lib/utilities/errors';
 
 import { Web3Connection } from '../../Web3ConnectionManager';
@@ -45,8 +44,6 @@ export function WalletSelector({ loginSuccess }: Props) {
   const { active, activate, connector, setError } = useWeb3React();
 
   const { showMessage } = useSnackbar();
-
-  const isMobile = isSmallScreen();
 
   const [uAuthPopupError, setUAuthPopupError] = useState<BrowserPopupError | null>(null);
 
