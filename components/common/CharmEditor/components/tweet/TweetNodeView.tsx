@@ -3,9 +3,10 @@ import styled from '@emotion/styled';
 import TwitterIcon from '@mui/icons-material/Twitter';
 import { Box } from '@mui/material';
 import Script from 'next/script';
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
 
 import log from 'lib/log';
+import { randomIntFromInterval } from 'lib/utilities/random';
 
 import BlockAligner from '../BlockAligner';
 import { MediaSelectionPopup } from '../common/MediaSelectionPopup';
@@ -65,11 +66,11 @@ export function TweetNodeView({ deleteNode, readOnly, node, selected, updateAttr
   const theme = useTheme();
   const attrs = node.attrs as Partial<TweetNodeAttrs>;
 
-  useEffect(() => {
-    if (window.twttr && ref.current && attrs.id) {
+  function onLoadScript() {
+    if (ref.current && attrs.id) {
       render(attrs.id, ref.current, { theme: theme.palette.mode });
     }
-  }, [!!window.twttr]);
+  }
 
   // If there are no source for the node, return the image select component
   if (!attrs.id) {
@@ -105,7 +106,7 @@ export function TweetNodeView({ deleteNode, readOnly, node, selected, updateAttr
 
   return (
     <>
-      <Script src={twitterWidgetJs} />
+      <Script src={`${twitterWidgetJs}?id=${randomIntFromInterval(1, 1000000)}`} onReady={onLoadScript} />
       <BlockAligner onDelete={deleteNode}>
         <StyledTweet ref={ref} />
       </BlockAligner>
