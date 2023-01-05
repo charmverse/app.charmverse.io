@@ -36,7 +36,7 @@ export default function PostDialog({ post, spaceId, onClose, open }: Props) {
     if (post) {
       popupState.open();
     }
-  }, [post]);
+  }, [!!post]);
 
   // open modal when page is set
   useEffect(() => {
@@ -71,7 +71,7 @@ export default function PostDialog({ post, spaceId, onClose, open }: Props) {
               </Box>
             )
           }
-          onClose={onClose}
+          onClose={close}
         >
           <PostPage post={post ?? null} spaceId={spaceId} onSave={close} />
         </Dialog>
