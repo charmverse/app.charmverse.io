@@ -14,7 +14,6 @@ import { withSessionRoute } from 'lib/session/withSession';
 import { isTruthy } from 'lib/utilities/types';
 import { relay } from 'lib/websockets/relay';
 
-// TODO: frontend should tell us which space to use
 export type ServerBlockFields = 'spaceId' | 'updatedBy' | 'createdBy';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });

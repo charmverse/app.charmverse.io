@@ -1,3 +1,4 @@
+import type { Prisma, Block as PrismaBlock } from '@prisma/client';
 import difference from 'lodash/difference';
 import { v4 } from 'uuid';
 
@@ -100,4 +101,23 @@ export function createPatchesFromBlocks(newBlock: Block, oldBlock: Block): Block
       deletedFields: newDeletedFields
     }
   ];
+}
+
+// export to BlockUncheckedCreateInput instead of regular Block so that the json 'fields' value is compatible with Prisma ops
+export function blockToPrisma(fbBlock: Block): Prisma.BlockUncheckedCreateInput {
+  return {
+    id: fbBlock.id,
+    parentId: fbBlock.parentId,
+    rootId: fbBlock.rootId,
+    spaceId: fbBlock.spaceId,
+    updatedBy: fbBlock.updatedBy,
+    createdBy: fbBlock.createdBy,
+    schema: fbBlock.schema,
+    type: fbBlock.type,
+    title: fbBlock.title,
+    fields: fbBlock.fields,
+    deletedAt: fbBlock.deletedAt === 0 ? null : fbBlock.deletedAt ? new Date(fbBlock.deletedAt) : null,
+    createdAt: !fbBlock.createdAt || fbBlock.createdAt === 0 ? new Date() : new Date(fbBlock.createdAt),
+    updatedAt: !fbBlock.updatedAt || fbBlock.updatedAt === 0 ? new Date() : new Date(fbBlock.updatedAt)
+  };
 }

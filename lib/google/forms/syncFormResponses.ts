@@ -1,9 +1,11 @@
 import * as googlForms from '@googleapis/forms';
+import type { Prisma } from '@prisma/client';
 
 import { prisma } from 'db';
+import { blockToPrisma } from 'lib/focalboard/block';
 import type { Block } from 'lib/focalboard/block';
 import { createBoard } from 'lib/focalboard/board';
-import type { Board, IPropertyOption, IPropertyTemplate } from 'lib/focalboard/board';
+import type { IPropertyOption, IPropertyTemplate } from 'lib/focalboard/board';
 import type { GoogleFormSourceData } from 'lib/focalboard/boardView';
 import { createCard } from 'lib/focalboard/card';
 import { isTruthy } from 'lib/utilities/types';
@@ -34,7 +36,7 @@ export async function syncFormResponses({ sourceData }: { sourceData: GoogleForm
   const cardProperties = getCardProperties(form);
   board.fields.cardProperties = cardProperties;
 
-  const cardBlocks: Block[] = [];
+  const cardBlocks: Prisma.BlockUncheckedCreateInput[] = [];
 
   if (responses) {
     for (const response of responses) {
@@ -50,7 +52,7 @@ export async function syncFormResponses({ sourceData }: { sourceData: GoogleForm
           responseId
         }
       });
-      cardBlocks.push(cardBlock);
+      cardBlocks.push(blockToPrisma(cardBlock));
     }
   }
 
@@ -58,7 +60,7 @@ export async function syncFormResponses({ sourceData }: { sourceData: GoogleForm
     where: {
       id: board.id
     },
-    create: board,
+    create: blockToPrisma(board),
     update: {
       fields: board.fields
     }
