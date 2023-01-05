@@ -4,6 +4,7 @@ import { v4 } from 'uuid';
 import type { BountyTask } from 'lib/bounties/getBountyTasks';
 import type { DiscussionTask } from 'lib/discussion/interfaces';
 import * as emails from 'lib/emails/emails';
+import type { ForumCommentTask } from 'lib/forums/comments/interface';
 import { onError, onNoMatch } from 'lib/middleware';
 import { getPagePath } from 'lib/pages/utils';
 import type { ProposalTask } from 'lib/proposal/getProposalTasksFromWorkspaceEvents';
@@ -38,6 +39,43 @@ const createDiscussionTask = ({
     bountyTitle: null,
     commentId: null,
     type: 'page',
+    createdBy: {
+      id: v4(),
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      email: '',
+      username: '',
+      avatar: '',
+      path: '',
+      isBot: false,
+      identityType: 'Discord',
+      avatarContract: null,
+      avatarTokenId: null,
+      avatarChain: null,
+      deletedAt: null
+    }
+  };
+};
+
+const createForumTask = ({
+  pageTitle,
+  spaceName,
+  commentText
+}: {
+  spaceName: string;
+  commentText: string;
+  pageTitle: string;
+}): ForumCommentTask => {
+  return {
+    spaceId: v4(),
+    spaceDomain: randomName(),
+    spaceName,
+    pageId: v4(),
+    pageTitle,
+    pagePath: `/forum/post/${getPagePath()}`,
+    commentText,
+    commentId: v4(),
+    createdAt: new Date().toISOString(),
     createdBy: {
       id: v4(),
       createdAt: new Date(),
@@ -267,6 +305,18 @@ const templates = {
           safeUrl: 'https://app.charmverse.io',
           taskId: '2'
         }
+      ],
+      forumTasks: [
+        createForumTask({
+          pageTitle: "New idea. Let's discuss!",
+          commentText: 'Great idea. Keep it up',
+          spaceName: 'CharmVerse'
+        }),
+        createForumTask({
+          pageTitle: 'Start the new process.',
+          commentText: 'Let us have a meeting regarding this topic',
+          spaceName: 'CharmVerse'
+        })
       ]
     });
   }

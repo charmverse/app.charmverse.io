@@ -1,5 +1,6 @@
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
+import CommentIcon from '@mui/icons-material/Comment';
 import ForumIcon from '@mui/icons-material/Forum';
 import HowToVoteIcon from '@mui/icons-material/HowToVote';
 import KeyIcon from '@mui/icons-material/Key';
@@ -17,6 +18,7 @@ import NexusPageTitle from './components/NexusPageTitle';
 import NotifyMeButton from './components/NotifyMeButton';
 import SnoozeButton from './components/SnoozeButton';
 import DiscussionTasksList from './DiscussionTasksList';
+import ForumTasksList from './ForumTasksList';
 import { GnosisTasksList } from './GnosisTasksList';
 import useTasks from './hooks/useTasks';
 import ProposalTasksList from './ProposalTasksList';
@@ -55,7 +57,8 @@ const TASK_TABS = [
   { icon: <BountyIcon />, label: 'Bounty', type: 'bounty' },
   { icon: <HowToVoteIcon />, label: 'Poll', type: 'vote' },
   { icon: <ForumIcon />, label: 'Discussion', type: 'discussion' },
-  { icon: <TaskOutlinedIcon />, label: 'Proposal', type: 'proposal' }
+  { icon: <TaskOutlinedIcon />, label: 'Proposal', type: 'proposal' },
+  { icon: <CommentIcon />, label: 'Forum', type: 'forum' }
 ] as const;
 
 type TaskType = typeof TASK_TABS[number]['type'];
@@ -80,7 +83,8 @@ export default function TasksPage() {
     vote: unvoted ? unvoted.length : 0,
     discussion: tasks ? tasks.discussions.unmarked.length : 0,
     proposal: tasks ? tasks.proposals.unmarked.length : 0,
-    bounty: tasks ? tasks.bounties?.unmarked.length : 0
+    bounty: tasks ? tasks.bounties?.unmarked.length : 0,
+    forum: tasks ? tasks.forum?.unmarked.length : 0
   };
 
   return (
@@ -178,6 +182,7 @@ export default function TasksPage() {
       {currentTaskType === 'vote' && <VoteTasksList mutateTasks={mutateTasks} error={error} tasks={tasks} />}
       {currentTaskType === 'proposal' && <ProposalTasksList error={error} tasks={tasks} mutateTasks={mutateTasks} />}
       {currentTaskType === 'bounty' && <BountyTasksList error={error} tasks={tasks} mutateTasks={mutateTasks} />}
+      {currentTaskType === 'forum' && <ForumTasksList mutateTasks={mutateTasks} error={error} tasks={tasks} />}
     </>
   );
 }

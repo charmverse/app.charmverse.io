@@ -55,6 +55,7 @@ enum NotificationType {
   vote
   proposal
   bounty
+  forum_comment
 }
 
 enum BountyStatus {

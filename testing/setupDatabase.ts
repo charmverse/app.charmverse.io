@@ -5,6 +5,7 @@ import type {
   BountyStatus,
   Comment,
   Page,
+  PageComment,
   Prisma,
   ProposalStatus,
   Role,
@@ -840,4 +841,25 @@ export async function generateWorkspaceEvents({
       pageId
     }
   });
+}
+
+export async function generateForumComment({
+  pageId,
+  createdBy,
+  contentText,
+  parentId
+}: Pick<PageComment, 'contentText' | 'pageId' | 'createdBy' | 'parentId'>): Promise<PageComment> {
+  const comment = await prisma.pageComment.create({
+    data: {
+      createdAt: new Date(),
+      createdBy,
+      content: {},
+      contentText,
+      updatedAt: new Date(),
+      deletedAt: null,
+      parentId,
+      pageId
+    }
+  });
+  return comment;
 }
