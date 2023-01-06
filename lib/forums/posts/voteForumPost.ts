@@ -1,4 +1,6 @@
 import { prisma } from 'db';
+import type { MixpanelEventName } from 'lib/metrics/mixpanel/interfaces';
+import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 
 import { PostNotFoundError } from './errors';
 
@@ -14,7 +16,9 @@ export async function voteForumPost({ upvoted, userId, postId }: PostVote) {
       id: postId
     },
     select: {
-      id: true
+      id: true,
+      spaceId: true,
+      category: true
     }
   });
 
@@ -32,6 +36,13 @@ export async function voteForumPost({ upvoted, userId, postId }: PostVote) {
       }
     });
   } else {
+    const userAction: MixpanelEventName = upvoted ? 'upvote_post' : 'downvote_post';
+    trackUserAction(userAction, {
+      resourceId: post.id,
+      spaceId: post.spaceId,
+      userId,
+      categoryName: post.category.name
+    });
     await prisma.postUpDownVote.upsert({
       create: {
         createdBy: userId,

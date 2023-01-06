@@ -1,7 +1,5 @@
 import type { Space, User } from '@prisma/client';
-import { v4 } from 'uuid';
 
-import { UnauthorisedActionError } from 'lib/utilities/errors';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { generatePostWithComment } from 'testing/utils/forums';
 
