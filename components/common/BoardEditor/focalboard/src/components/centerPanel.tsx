@@ -107,7 +107,12 @@ function CenterPanel(props: Props) {
   const boardPageType = boardPage?.type;
 
   // for 'linked' boards, each view has its own board which we use to determine the cards to show
-  const activeBoardId = props.activeView && (props.activeView?.fields.linkedSourceId || props.board.id);
+  let activeBoardId: string | undefined = props.board.id;
+  if (activeView?.fields.linkedSourceId) {
+    activeBoardId = activeView?.fields.linkedSourceId;
+  } else if (activeView?.fields.sourceType === 'google_form') {
+    activeBoardId = activeView?.fields.sourceData?.boardId;
+  }
   const activeBoard = useAppSelector(getBoard(activeBoardId ?? ''));
   const activePage = pages[activeBoardId ?? ''];
 
@@ -489,7 +494,7 @@ function CenterPanel(props: Props) {
                 setPage={props.setPage}
               />
             )}
-            {activeBoard && activePage && activeView?.fields.sourceType === 'google_form' && (
+            {activeBoard && activeView?.fields.sourceType === 'google_form' && (
               <Typography sx={{ fontSize: 22, fontWeight: 500 }}>
                 Form responses to{' '}
                 <Link

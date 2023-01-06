@@ -53,6 +53,7 @@ export async function syncFormResponses({ createdBy, view }: { createdBy: string
   const { form, responses } = await getFormAndResponses(sourceData, lastUpdated);
 
   const { cardProperties, cards, pages } = getCardsAndPages({
+    cardParentId: board.id,
     rootId,
     createdBy,
     form,
@@ -73,8 +74,11 @@ export async function syncFormResponses({ createdBy, view }: { createdBy: string
       updatedAt: new Date()
     }
   });
+
   // add the boardId to the view's sourceData
   sourceData.boardId = board.id;
+  fields.visiblePropertyIds = cardProperties.map((p) => p.id);
+
   const updateView = lastUpdated ? [] : [prisma.block.update({ where: { id: viewId }, data: { fields } })];
 
   const createCards = prisma.block.createMany({ data: cards });
@@ -174,6 +178,7 @@ async function notifyUsers({ blocks, pageIds, spaceId }: { spaceId: string; page
 
 // utils
 function getCardsAndPages({
+  cardParentId,
   rootId,
   createdBy,
   form,
@@ -182,6 +187,7 @@ function getCardsAndPages({
   permissions,
   spaceId
 }: {
+  cardParentId: string;
   rootId: string;
   createdBy: string;
   form: GoogleForm;
@@ -207,8 +213,8 @@ function getCardsAndPages({
       createdAt: new Date(createdAt).getTime(),
       createdBy,
       updatedBy: createdBy,
-      parentId: rootId,
-      rootId,
+      parentId: cardParentId,
+      rootId: cardParentId,
       spaceId,
       fields: {
         properties: responseAnswers,
@@ -255,7 +261,7 @@ function getCardsAndPages({
       title: `Response ${nextIndex}`,
       type: 'card',
       contentText: '',
-      parentId: cardBlock.parentId,
+      parentId: rootId, // important to inherit permissions
       path: `path-${uuid()}`,
       updatedAt: prismaBlock.updatedAt,
       permissions: {
