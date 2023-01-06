@@ -22,15 +22,14 @@ class CsvExporter {
     let csvContent = 'data:text/csv;charset=utf-8,';
 
     rows.forEach((row) => {
-      const encodedRow = row.join(',');
+      const encodedRow = row.map((str) => encodeURIComponent(str)).join(',');
       csvContent += `${encodedRow}\r\n`;
     });
 
     const filename = `${Utils.sanitizeFilename(viewToExport.title || 'Untitled')}.csv`;
-    const encodedUri = encodeURI(csvContent);
     const link = document.createElement('a');
     link.style.display = 'none';
-    link.setAttribute('href', encodedUri);
+    link.setAttribute('href', csvContent);
     link.setAttribute('download', filename);
     document.body.appendChild(link); // FireFox support
 
@@ -38,7 +37,7 @@ class CsvExporter {
 
     // TODO: Review if this is needed in the future, this is to fix the problem with linux webview links
     if (window.openInNewBrowser) {
-      window.openInNewBrowser(encodedUri);
+      window.openInNewBrowser(csvContent);
     }
 
     // TODO: Remove or reuse link
