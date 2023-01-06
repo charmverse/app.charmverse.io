@@ -266,6 +266,7 @@
     "aws-cdk-lib": "^2.20.0",
     "cross-env": "^7.0.3",
     "eslint": "^8.8.0",
+    "eslint-config-airbnb": "^19.0.4",
     "eslint-config-next": "^13.1.1",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-jsx-a11y": "^6.5.1",
