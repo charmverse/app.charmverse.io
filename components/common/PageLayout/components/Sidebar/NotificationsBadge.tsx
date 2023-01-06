@@ -17,8 +17,9 @@ export default function NotificationsBadge({ children }: { children: JSX.Element
     userNotificationState?.snoozedUntil && new Date(userNotificationState.snoozedUntil) > new Date();
   const gnosisTasksCount = excludeGnosisTasks ? 0 : gnosisTasks?.length ?? 0;
   const proposalTasksCount = tasks?.proposals.unmarked.length ?? 0;
+  const forumTasksCount = tasks?.forum.unmarked.length ?? 0;
 
-  const totalTasks = voteTasksCount + mentionTasksCount + gnosisTasksCount + proposalTasksCount;
+  const totalTasks = voteTasksCount + mentionTasksCount + gnosisTasksCount + proposalTasksCount + forumTasksCount;
 
   return (
     <Badge

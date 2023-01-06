@@ -3,6 +3,7 @@ import { getBountyTasks } from 'lib/bounties/getBountyTasks';
 import { getDiscussionTasks } from 'lib/discussion/getDiscussionTasks';
 import * as emails from 'lib/emails';
 import type { PendingTasksProps } from 'lib/emails/templates/PendingTasks';
+import { getForumCommentsTasks } from 'lib/forums/comments/getForumTasks';
 import type { GnosisSafeTasks } from 'lib/gnosis/gnosis.tasks';
 import { getPendingGnosisTasks } from 'lib/gnosis/gnosis.tasks';
 import log from 'lib/log';
@@ -64,6 +65,7 @@ export async function getNotifications(): Promise<(PendingTasksProps & { unmarke
     const discussionTasks = await getDiscussionTasks(user.id);
     const voteTasks = await getVoteTasks(user.id);
     const bountyTasks = await getBountyTasks(user.id);
+    const forumTasks = await getForumCommentsTasks(user.id);
 
     const sentTasks = await prisma.userNotification.findMany({
       where: {
@@ -101,7 +103,8 @@ export async function getNotifications(): Promise<(PendingTasksProps & { unmarke
       discussionTasks.unmarked.length +
       voteTasksNotSent.length +
       proposalTasks.length +
-      bountyTasks.unmarked.length;
+      bountyTasks.unmarked.length +
+      forumTasks.unmarked.length;
 
     log.debug('Found tasks for notification', {
       notSent:
@@ -109,7 +112,8 @@ export async function getNotifications(): Promise<(PendingTasksProps & { unmarke
         voteTasksNotSent.length +
         discussionTasks.unmarked.length +
         proposalTasks.length +
-        bountyTasks.unmarked.length,
+        bountyTasks.unmarked.length +
+        forumTasks.unmarked.length,
       gnosisSafeTasks: gnosisSafeTasks.length,
       myGnosisTasks: myGnosisTasksNotSent.length
     });
@@ -125,7 +129,8 @@ export async function getNotifications(): Promise<(PendingTasksProps & { unmarke
         voteTasks: voteTasksNotSent,
         proposalTasks,
         unmarkedWorkspaceEvents,
-        bountyTasks: bountyTasks.unmarked
+        bountyTasks: bountyTasks.unmarked,
+        forumTasks: forumTasks.unmarked
       }
     ];
   }, Promise.resolve([] as (PendingTasksProps & { unmarkedWorkspaceEvents: string[] })[]));
@@ -201,6 +206,16 @@ async function sendNotification(
             taskId: bountyTask.id,
             channel: 'email',
             type: 'bounty'
+          }
+        })
+      ),
+      ...notification.forumTasks.map((forumTask) =>
+        prisma.userNotification.create({
+          data: {
+            userId: notification.user.id,
+            taskId: forumTask.commentId,
+            channel: 'email',
+            type: 'post_comment'
           }
         })
       )
