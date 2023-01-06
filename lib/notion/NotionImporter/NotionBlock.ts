@@ -416,7 +416,6 @@ export class NotionBlock {
 
         const columnBlockNode: ColumnBlockNode = {
           type: 'columnBlock',
-          // This empty paragraph is necessary, otherwise charmeditor throws an error
           content: childContent
         };
 
