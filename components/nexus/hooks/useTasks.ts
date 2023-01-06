@@ -8,6 +8,7 @@ export default function useTasks() {
   const {
     data: tasks,
     error: serverError,
+    isLoading,
     mutate
   } = useSWRImmutable(user ? `/tasks/list/${user.id}` : null, () => charmClient.tasks.getTasksList(), {
     // 10 minutes
@@ -24,7 +25,6 @@ export default function useTasks() {
   });
 
   const error = serverError?.message || serverError;
-  const isLoading = !tasks;
 
   return { tasks, gnosisTasks, gnosisTasksServerError, mutateGnosisTasks, mutate, error, isLoading };
 }

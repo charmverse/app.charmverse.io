@@ -6,6 +6,7 @@ import { BOUNTY_STATUS_COLORS, BOUNTY_STATUS_LABELS } from 'components/bounties/
 import { ProposalStatusColors } from 'components/proposals/components/ProposalStatusBadge';
 import type { BountyTask } from 'lib/bounties/getBountyTasks';
 import { DiscussionTask } from 'lib/discussion/interfaces';
+import type { ForumCommentTask } from 'lib/forums/comments/interface';
 import type { GnosisSafeTasks } from 'lib/gnosis/gnosis.tasks';
 import log from 'lib/log';
 import type { ProposalTask } from 'lib/proposal/getProposalTasksFromWorkspaceEvents';
@@ -39,6 +40,7 @@ export interface PendingTasksProps {
   voteTasks: VoteTask[];
   proposalTasks: ProposalTask[];
   bountyTasks: BountyTask[];
+  forumTasks: ForumCommentTask[];
   // eslint-disable-next-line
   user: TemplateUser
 }
@@ -59,12 +61,14 @@ export default function PendingTasks(props: PendingTasksProps) {
   const totalGnosisSafeTasks = props.gnosisSafeTasks.length;
   const totalProposalTasks = props.proposalTasks.length;
   const totalBountyTasks = props.bountyTasks.length;
+  const totalForumTasks = props.forumTasks.length;
 
   const nexusDiscussionLink = `${charmverseUrl}/nexus?task=discussion`;
   const nexusVoteLink = `${charmverseUrl}/nexus?task=vote`;
   const nexusMultisigLink = `${charmverseUrl}/nexus?task=multisig`;
   const nexusProposalLink = `${charmverseUrl}/nexus?task=proposal`;
   const nexusBountyLink = `${charmverseUrl}/nexus?task=bounty`;
+  const nexusForumLink = `${charmverseUrl}/nexus?task=forum`;
 
   const discussionSection =
     totalDiscussionTasks > 0 ? (
@@ -82,7 +86,7 @@ export default function PendingTasks(props: PendingTasksProps) {
               }}
             >
               <span style={h2Style}>
-                {totalDiscussionTasks} Comment{totalDiscussionTasks > 1 ? 's' : ''}
+                {totalDiscussionTasks} Page Comment{totalDiscussionTasks > 1 ? 's' : ''}
               </span>
             </a>
             <a href={nexusDiscussionLink} style={buttonStyle}>
@@ -222,6 +226,38 @@ export default function PendingTasks(props: PendingTasksProps) {
       </>
     ) : null;
 
+  const forumSection =
+    totalForumTasks > 0 ? (
+      <>
+        <MjmlText>
+          <div
+            style={{
+              marginBottom: 15
+            }}
+          >
+            <a
+              href={nexusForumLink}
+              style={{
+                marginRight: 15
+              }}
+            >
+              <span style={h2Style}>
+                {totalForumTasks} Forum Comment{totalForumTasks > 1 ? 's' : ''}
+              </span>
+            </a>
+            <a href={nexusForumLink} style={buttonStyle}>
+              View
+            </a>
+          </div>
+        </MjmlText>
+        {props.forumTasks.slice(0, MAX_ITEMS_PER_TASK).map((forumTask) => (
+          <ForumTask key={forumTask.commentId} task={forumTask} />
+        ))}
+        {totalForumTasks > MAX_ITEMS_PER_TASK ? <ViewAllText href={nexusForumLink} /> : null}
+        <MjmlDivider />
+      </>
+    ) : null;
+
   return (
     <EmailWrapper title='Your open tasks'>
       <MjmlSection backgroundColor='#fff' paddingTop={0} paddingBottom={0}>
@@ -236,6 +272,7 @@ export default function PendingTasks(props: PendingTasksProps) {
           {voteSection}
           {bountySection}
           {discussionSection}
+          {forumSection}
         </MjmlColumn>
       </MjmlSection>
       <Feedback />
@@ -368,6 +405,27 @@ function MultisigTask({ task }: { task: GnosisSafeTasks }) {
         <br />
         {task.tasks[0].transactions[0].description}
       </strong>
+    </MjmlText>
+  );
+}
+
+function ForumTask({ task: { commentText, spaceName, postTitle } }: { task: ForumCommentTask }) {
+  const pageWorkspaceTitle = `${postTitle || 'Untitled'} | ${spaceName}`;
+  return (
+    <MjmlText>
+      <div style={{ fontWeight: 'bold', marginBottom: 5 }}>
+        {commentText.length > MAX_CHAR ? `${commentText.slice(0, MAX_CHAR)}...` : commentText}
+      </div>
+      <div
+        style={{
+          fontSize: 16,
+          marginBottom: 5,
+          color: greyColor2,
+          fontWeight: 500
+        }}
+      >
+        {pageWorkspaceTitle.length > MAX_CHAR ? `${pageWorkspaceTitle.slice(0, MAX_CHAR)}...` : pageWorkspaceTitle}
+      </div>
     </MjmlText>
   );
 }

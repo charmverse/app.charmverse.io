@@ -2,7 +2,7 @@ import type { Post } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { createForumPost } from 'lib/forums/posts/createForumPost';
+import { createForumPost, trackCreateForumPostEvent } from 'lib/forums/posts/createForumPost';
 import type { ListForumPostsRequest, PaginatedPostList } from 'lib/forums/posts/listForumPosts';
 import { listForumPosts } from 'lib/forums/posts/listForumPosts';
 import { onError, onNoMatch, requireSpaceMembership } from 'lib/middleware';
@@ -38,6 +38,12 @@ async function createForumPostController(req: NextApiRequest, res: NextApiRespon
     },
     createdPost.spaceId
   );
+
+  await trackCreateForumPostEvent({
+    post: createdPost,
+    userId: req.session.user.id
+  });
+
   return res.status(201).json(createdPost);
 }
 

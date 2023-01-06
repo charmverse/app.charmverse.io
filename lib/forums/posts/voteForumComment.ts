@@ -1,8 +1,7 @@
 import type { PostCommentUpDownVote } from '@prisma/client';
 
 import { prisma } from 'db';
-
-import { getPostComment } from '../comments/getPostComment';
+import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 
 type CommentVote = {
   commentId: string;
@@ -33,6 +32,25 @@ export async function voteForumComment({
 
     return null;
   } else {
+    const post = await prisma.post.findUnique({
+      where: { id: postId },
+      include: {
+        category: true
+      }
+    });
+
+    const category = post?.category;
+
+    if (category) {
+      trackUserAction(upvoted ? 'upvote_comment' : 'downvote_comment', {
+        resourceId: commentId,
+        spaceId: post.spaceId,
+        userId,
+        categoryName: category.name,
+        postId: post.id
+      });
+    }
+
     const commentVote = await prisma.postCommentUpDownVote.upsert({
       create: {
         createdBy: userId,

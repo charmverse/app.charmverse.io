@@ -9,6 +9,7 @@ import { useRouter } from 'next/router';
 import type { ChangeEvent } from 'react';
 import { useRef, useEffect, useState } from 'react';
 
+import charmClient from 'charmClient';
 import { CenteredPageContent } from 'components/common/PageLayout/components/PageContent';
 import { usePostDialog } from 'components/forum/components/PostDialog/hooks/usePostDialog';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -86,6 +87,14 @@ export function ForumPage() {
       });
     }
   }, [router.query.pageId]);
+
+  useEffect(() => {
+    if (currentSpace) {
+      charmClient.track.trackAction('main_feed_page_load', {
+        spaceId: currentSpace.id
+      });
+    }
+  }, [Boolean(currentSpace)]);
 
   const debounceSearch = useRef(debounce((e: ChangeEvent<HTMLInputElement>) => setSearch(e.target.value), 400)).current;
 

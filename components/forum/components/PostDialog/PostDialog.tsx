@@ -56,7 +56,6 @@ export default function PostDialog({ post, spaceId, onClose, open }: Props) {
       {popupState.isOpen && (
         <Dialog
           fullWidth
-          hideCloseButton
           toolbar={
             post && (
               <Box display='flex' justifyContent='space-between'>
