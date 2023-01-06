@@ -37,11 +37,14 @@ function ForumFilterListLink({ category, label, sort }: { label: string; categor
   const selectedCategory = router.query.categoryId as string | undefined;
   const selectedSort = router.query.sort as string | undefined;
   const admin = isAdmin();
-  const link = category
-    ? `/${router.query.domain}/forum?categoryId=${category.id}`
-    : sort
-    ? `/${router.query.domain}/forum?sort=${sort}`
-    : '';
+  const link =
+    label === 'All categories'
+      ? `/${router.query.domain}/forum`
+      : category
+      ? `/${router.query.domain}/forum?categoryId=${category.id}`
+      : sort
+      ? `/${router.query.domain}/forum?sort=${sort}`
+      : '';
 
   const selected = category ? category.id === selectedCategory : sort ? sort === selectedSort : false;
 
@@ -68,7 +71,9 @@ function ForumFilterListLink({ category, label, sort }: { label: string; categor
           sx={{
             color: 'text.primary'
           }}
-          fontWeight={selected ? 'bold' : 'initial'}
+          fontWeight={
+            selected || (label === 'All categories' && !selectedCategory && !selectedSort) ? 'bold' : 'initial'
+          }
         >
           {label}
         </Typography>

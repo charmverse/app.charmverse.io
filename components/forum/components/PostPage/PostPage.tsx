@@ -1,6 +1,5 @@
 import CommentIcon from '@mui/icons-material/Comment';
 import { Box, Divider, Stack, Typography } from '@mui/material';
-import type { Post } from '@prisma/client';
 import { useEffect, useMemo, useState } from 'react';
 import useSWR from 'swr';
 
@@ -178,7 +177,12 @@ export function PostPage({ post, spaceId, onSave }: Props) {
           >
             <PageTitleInput readOnly={readOnly} value={form.title} onChange={updateTitle} />
             <Box my={2}>
-              <PostCategoryInput spaceId={spaceId} setCategoryId={updateCategoryId} categoryId={categoryId} />
+              <PostCategoryInput
+                readOnly={readOnly}
+                spaceId={spaceId}
+                setCategoryId={updateCategoryId}
+                categoryId={categoryId}
+              />
             </Box>
           </CharmEditor>
         </Box>
