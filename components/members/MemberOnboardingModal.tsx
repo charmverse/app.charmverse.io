@@ -9,7 +9,7 @@ export function MemberOnboardingModal({ userId }: { userId?: string }) {
   const { user } = useUser();
   const { onboarded, completeOnboarding } = useOnboarding();
 
-  if (!space || onboarded !== false || !user) {
+  if (!space || onboarded !== false || !user || !user.spaceRoles.some((sr) => sr.spaceId === space.id)) {
     return null;
   }
 
