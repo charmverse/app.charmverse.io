@@ -1,4 +1,3 @@
-import MetaMaskOnboarding from '@metamask/onboarding';
 import ArrowSquareOut from '@mui/icons-material/Launch';
 import { Grid, IconButton, Typography } from '@mui/material';
 // eslint-disable-next-line import/no-extraneous-dependencies
@@ -8,9 +7,10 @@ import type { AbstractConnector } from '@web3-react/abstract-connector';
 import { UnsupportedChainIdError, useWeb3React } from '@web3-react/core';
 import { WalletConnectConnector } from '@web3-react/walletconnect-connector';
 import { injected, walletConnect, walletLink } from 'connectors';
-import { useContext, useEffect, useRef, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 
 import charmClient from 'charmClient';
+import { useMetamaskConnect } from 'components/_app/Web3ConnectionManager/hooks/useMetamaskConnect';
 import ErrorComponent from 'components/common/errors/WalletError';
 import Link from 'components/common/Link';
 import { Modal } from 'components/common/Modal';
@@ -19,7 +19,6 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import type { UnstoppableDomainsAuthSig } from 'lib/blockchain/unstoppableDomains';
 import { extractDomainFromProof } from 'lib/blockchain/unstoppableDomains/client';
 import log from 'lib/log';
-import { isSmallScreen } from 'lib/utilities/browser';
 import { BrowserPopupError } from 'lib/utilities/errors';
 
 import { Web3Connection } from '../../Web3ConnectionManager';
@@ -46,16 +45,7 @@ export function WalletSelector({ loginSuccess }: Props) {
 
   const { showMessage } = useSnackbar();
 
-  const isMobile = isSmallScreen();
-
   const [uAuthPopupError, setUAuthPopupError] = useState<BrowserPopupError | null>(null);
-
-  // initialize metamask onboarding
-  const onboarding = useRef<MetaMaskOnboarding>();
-  if (typeof window !== 'undefined') {
-    onboarding.current = new MetaMaskOnboarding();
-  }
-
   const handleConnect = (_connector: AbstractConnector) => {
     setActivatingConnector(_connector);
     activate(_connector, undefined, true).catch((err) => {
@@ -69,7 +59,8 @@ export function WalletSelector({ loginSuccess }: Props) {
       }
     });
   };
-  const handleOnboarding = () => onboarding.current?.startOnboarding();
+
+  const { label, connectMetamask } = useMetamaskConnect(() => handleConnect(injected));
 
   // close the modal after signing in
   useEffect(() => {
@@ -127,16 +118,8 @@ export function WalletSelector({ loginSuccess }: Props) {
       <Grid container spacing={2}>
         <Grid item xs={12}>
           <ConnectorButton
-            name={
-              typeof window !== 'undefined' && MetaMaskOnboarding.isMetaMaskInstalled()
-                ? 'MetaMask'
-                : 'Install MetaMask'
-            }
-            onClick={
-              typeof window !== 'undefined' && MetaMaskOnboarding.isMetaMaskInstalled()
-                ? () => handleConnect(injected)
-                : handleOnboarding
-            }
+            name={label}
+            onClick={connectMetamask}
             iconUrl='metamask.png'
             disabled={connector === injected || !!activatingConnector}
             isActive={connector === injected}

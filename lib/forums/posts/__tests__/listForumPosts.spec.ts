@@ -1,15 +1,16 @@
-import type { Space, User } from '@prisma/client';
+import type { Post, Space, User } from '@prisma/client';
 
 import { createPostCategory } from 'lib/forums/categories/createPostCategory';
 import { generateForumPosts } from 'testing/forums';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
-import type { ForumPostPage } from '../interfaces';
-import { defaultPostsPerResult, listForumPosts } from '../listForumPosts';
+import { defaultPostsPerResult } from '../constants';
+import { listForumPosts } from '../listForumPosts';
+import { voteForumPost } from '../voteForumPost';
 
 let space: Space;
 let user: User;
-let spacePosts: ForumPostPage[];
+let spacePosts: Post[];
 
 // Test a space with 16 forum posts
 beforeAll(async () => {
@@ -30,7 +31,7 @@ describe('listForumPosts', () => {
 
     expect(posts.data).toHaveLength(defaultPostsPerResult);
   });
-  it(`should return posts from all cateogories (including uncategorised) if no category is provided`, async () => {
+  it(`should return posts from all categories if no category is provided`, async () => {
     const { space: extraSpace, user: extraUser } = await generateUserAndSpaceWithApiToken();
 
     const category = await createPostCategory({
@@ -173,5 +174,54 @@ describe('listForumPosts', () => {
     expect(secondResult.hasNext).toBe(true);
 
     // What should be left for third query after executing the query twice
+  });
+
+  it(`should support sorting`, async () => {
+    const { space: extraSpace, user: extraUser } = await generateUserAndSpaceWithApiToken();
+    const { user: secondExtraUser } = await generateUserAndSpaceWithApiToken();
+
+    const forumPosts = await generateForumPosts({
+      spaceId: extraSpace.id,
+      createdBy: extraUser.id,
+      count: 20
+    });
+
+    const secondMostVotedPageId = forumPosts[5].id;
+    const mostVotedPageId = forumPosts[2].id;
+
+    await voteForumPost({
+      postId: secondMostVotedPageId,
+      userId: extraUser.id,
+      upvoted: true
+    });
+
+    await voteForumPost({
+      postId: mostVotedPageId,
+      userId: extraUser.id,
+      upvoted: true
+    });
+
+    await voteForumPost({
+      postId: mostVotedPageId,
+      userId: secondExtraUser.id,
+      upvoted: true
+    });
+
+    const resultsPerQuery = 10;
+
+    const postsOrderedByMostVoted = await listForumPosts(
+      {
+        spaceId: extraSpace.id,
+        count: resultsPerQuery,
+        sort: 'most_voted'
+      },
+      user.id
+    );
+
+    // First two results should have upvotes and be ordered by number of votes
+    expect(postsOrderedByMostVoted.data[0].id === mostVotedPageId).toBeTruthy();
+    expect(postsOrderedByMostVoted.data[0].votes.upvotes).toBe(2);
+    expect(postsOrderedByMostVoted.data[1].id === secondMostVotedPageId).toBeTruthy();
+    expect(postsOrderedByMostVoted.data[1].votes.upvotes).toBe(1);
   });
 });

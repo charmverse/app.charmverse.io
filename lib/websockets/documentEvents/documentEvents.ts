@@ -207,7 +207,7 @@ export class DocumentEventHandler {
         break;
 
       case 'diff':
-        if (session.permissions.edit_content) {
+        if (session.permissions.edit_content || session.permissions.comment) {
           await this.handleDiff(message);
         }
         break;
@@ -231,7 +231,7 @@ export class DocumentEventHandler {
         userId
       });
 
-      if (permissions.edit_content !== true) {
+      if (permissions.edit_content !== true && permissions.comment !== true) {
         this.sendError('You do not have permission to edit this page');
         return;
       }

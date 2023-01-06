@@ -9,10 +9,12 @@ import { useRouter } from 'next/router';
 import type { ChangeEvent } from 'react';
 import { useRef, useEffect, useState } from 'react';
 
+import charmClient from 'charmClient';
 import { CenteredPageContent } from 'components/common/PageLayout/components/PageContent';
 import { usePostDialog } from 'components/forum/components/PostDialog/hooks/usePostDialog';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useForumCategories } from 'hooks/useForumCategories';
+import type { PostOrder } from 'lib/forums/posts/listForumPosts';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
 import { CategoryMenu } from './components/CategoryMenu';
@@ -21,15 +23,31 @@ import CreateForumPost from './components/CreateForumPost';
 import PostDialog from './components/PostDialog';
 import { ForumPostList } from './components/PostList/PostList';
 
-export default function ForumPage() {
+export function ForumPage() {
   const [search, setSearch] = useState('');
   const router = useRouter();
   const currentSpace = useCurrentSpace();
+  const categoryId = router.query.categoryId as string | undefined;
+  const sort = router.query.sort as PostOrder | undefined;
   const [showNewPostForm, setShowNewPostForm] = useState(false);
   const { showPost } = usePostDialog();
   const { categories } = useForumCategories();
-  const categoryId = router.query.categoryId as string | undefined;
   const currentCategory = categories.find((category) => category.id === categoryId);
+
+  function handleSortUpdate(sortName?: PostOrder) {
+    const pathname = `/${currentSpace?.domain}/forum`;
+
+    if (sortName) {
+      router.push({
+        pathname,
+        query: { sort: sortName }
+      });
+    } else {
+      router.push({
+        pathname
+      });
+    }
+  }
 
   function handleCategoryUpdate(_categoryId?: string) {
     const pathname = `/${currentSpace?.domain}/forum`;
@@ -70,6 +88,14 @@ export default function ForumPage() {
     }
   }, [router.query.pageId]);
 
+  useEffect(() => {
+    if (currentSpace) {
+      charmClient.track.trackAction('main_feed_page_load', {
+        spaceId: currentSpace.id
+      });
+    }
+  }, [Boolean(currentSpace)]);
+
   const debounceSearch = useRef(debounce((e: ChangeEvent<HTMLInputElement>) => setSearch(e.target.value), 400)).current;
 
   useEffect(() => {
@@ -101,11 +127,16 @@ export default function ForumPage() {
       <Grid container spacing={2}>
         <Grid item xs={12} lg={9}>
           <Box display={{ lg: 'none' }}>
-            <CategorySelect onSelect={handleCategoryUpdate} selectedCategory={currentCategory?.id} />
+            <CategorySelect
+              selectedCategory={currentCategory?.id}
+              sort={sort}
+              handleCategory={handleCategoryUpdate}
+              handleSort={handleSortUpdate}
+            />
           </Box>
           <CreateForumPost onClick={showNewPostPopup} />
           {currentSpace && <PostDialog open={showNewPostForm} onClose={hideNewPostPopup} spaceId={currentSpace.id} />}
-          <ForumPostList search={search} categoryId={currentCategory?.id} />
+          <ForumPostList search={search} categoryId={currentCategory?.id} sort={sort} />
         </Grid>
         <Grid item xs={12} lg={3} display={{ xs: 'none', lg: 'initial' }}>
           <CategoryMenu />

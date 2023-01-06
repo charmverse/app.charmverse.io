@@ -1,5 +1,6 @@
 import OpenInFullIcon from '@mui/icons-material/OpenInFull';
 import { Box } from '@mui/material';
+import type { Post } from '@prisma/client';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
 import { useEffect, useRef } from 'react';
@@ -7,19 +8,18 @@ import { useEffect, useRef } from 'react';
 import Dialog from 'components/common/BoardEditor/focalboard/src/components/dialog';
 import RootPortal from 'components/common/BoardEditor/focalboard/src/components/rootPortal';
 import Button from 'components/common/Button';
-import type { ForumPostPage } from 'lib/forums/posts/interfaces';
+import type { PostWithVotes } from 'lib/forums/posts/interfaces';
 
 import { PostPage } from '../PostPage/PostPage';
 
 interface Props {
-  page?: ForumPostPage | null;
+  post?: PostWithVotes | null;
   spaceId: string;
   onClose: () => void;
   open?: boolean;
 }
 
-export default function PostDialog(props: Props) {
-  const { page } = props;
+export default function PostDialog({ post, spaceId, onClose, open }: Props) {
   const mounted = useRef(false);
   const popupState = usePopupState({ variant: 'popover', popupId: 'post-dialog' });
   const router = useRouter();
@@ -34,21 +34,21 @@ export default function PostDialog(props: Props) {
 
   // open modal when page is set
   useEffect(() => {
-    if (page) {
+    if (post) {
       popupState.open();
     }
-  }, [!!page]);
+  }, [!!post]);
 
   // open modal when page is set
   useEffect(() => {
-    if (props.open) {
+    if (open) {
       popupState.open();
     }
-  }, [props.open]);
+  }, [open]);
 
-  function onClose() {
+  function close() {
     popupState.close();
-    props.onClose();
+    onClose();
   }
 
   return (
@@ -56,28 +56,13 @@ export default function PostDialog(props: Props) {
       {popupState.isOpen && (
         <Dialog
           fullWidth
-          hideCloseButton
-          // toolsMenu={
-          //   page && (
-          //     <PageActions
-          //       page={page}
-          //       onClickDelete={
-          //         user?.id === page.createdBy
-          //           ? () => {
-          //               onClickDelete();
-          //             }
-          //           : undefined
-          //       }
-          //     />
-          //   )
-          // }
           toolbar={
-            page && (
+            post && (
               <Box display='flex' justifyContent='space-between'>
                 <Button
                   size='small'
                   color='secondary'
-                  href={`/${router.query.domain}/forum/post/${page.path}`}
+                  href={`/${router.query.domain}/forum/post/${post.path}`}
                   variant='text'
                   startIcon={<OpenInFullIcon fontSize='small' />}
                 >
@@ -86,9 +71,9 @@ export default function PostDialog(props: Props) {
               </Box>
             )
           }
-          onClose={onClose}
+          onClose={close}
         >
-          <PostPage page={page ?? null} spaceId={props.spaceId} onSave={onClose} />
+          <PostPage post={post ?? null} spaceId={spaceId} onSave={close} />
         </Dialog>
       )}
     </RootPortal>
