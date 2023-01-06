@@ -214,7 +214,7 @@ function getCardsAndPages({
       createdBy,
       updatedBy: createdBy,
       parentId: cardParentId,
-      rootId: cardParentId,
+      rootId,
       spaceId,
       fields: {
         properties: responseAnswers,
