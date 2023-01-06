@@ -515,6 +515,8 @@ function CharmEditor({
     };
   }, [editorRef.current]);
 
+  const enableComments = !disablePageSpecificFeatures && !enableSuggestingMode && !isTemplate;
+
   return (
     <StyledReactBangleEditor
       pageId={pageId}
@@ -525,6 +527,7 @@ function CharmEditor({
       onParticipantUpdate={onParticipantUpdate}
       trackChanges
       readOnly={readOnly}
+      enableComments={enableComments}
       style={{
         ...(style ?? {}),
         width: '100%',
@@ -634,7 +637,7 @@ function CharmEditor({
       <floatingMenu.FloatingMenu
         palettePluginKey={inlinePalettePluginKey}
         // disable comments and polls in suggestions mode since they dont interact well
-        enableComments={!disablePageSpecificFeatures && !enableSuggestingMode && !isTemplate}
+        enableComments={enableComments}
         enableVoting={enableVoting && !enableSuggestingMode && !isTemplate}
         pluginKey={floatingMenuPluginKey}
         pagePermissions={pagePermissions}
