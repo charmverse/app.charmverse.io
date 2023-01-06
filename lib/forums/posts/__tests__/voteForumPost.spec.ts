@@ -19,9 +19,9 @@ beforeAll(async () => {
 
 describe('voteForumPost', () => {
   it('should create page vote if upvoted is true and return correct vote information', async () => {
-    const [category1] = await Promise.all([createPostCategory({ name: 'First', spaceId: space.id })]);
+    const category1 = await createPostCategory({ name: 'First', spaceId: space.id });
 
-    const createdPage = await createForumPost({
+    const createdPost = await createForumPost({
       content: {},
       contentText: '',
       createdBy: user.id,
@@ -31,14 +31,14 @@ describe('voteForumPost', () => {
     });
 
     await voteForumPost({
-      pageId: createdPage.id!,
+      postId: createdPost.id!,
       userId: user.id,
       upvoted: true
     });
 
     const postPageVote = await getPostVote({
       userId: user.id,
-      pageId: createdPage.id
+      pageId: createdPost.id
     });
 
     expect(postPageVote).toStrictEqual({
@@ -49,26 +49,26 @@ describe('voteForumPost', () => {
   });
 
   it('should update page vote if upvoted is false and return correct vote information', async () => {
-    const createdPage = await generateForumPost({
+    const createdPost = await generateForumPost({
       userId: user.id,
       spaceId: space.id
     });
 
     await voteForumPost({
-      pageId: createdPage.id,
+      postId: createdPost.id,
       userId: user.id,
       upvoted: true
     });
 
     await voteForumPost({
-      pageId: createdPage.id,
+      postId: createdPost.id,
       userId: user.id,
       upvoted: false
     });
 
     const postPageVote = await getPostVote({
       userId: user.id,
-      pageId: createdPage.id
+      pageId: createdPost.id
     });
 
     expect(postPageVote).toStrictEqual({
@@ -79,26 +79,26 @@ describe('voteForumPost', () => {
   });
 
   it('should delete page vote if upvoted is null and return correct vote information', async () => {
-    const createdPage = await generateForumPost({
+    const createdPost = await generateForumPost({
       userId: user.id,
       spaceId: space.id
     });
 
     await voteForumPost({
-      pageId: createdPage.id,
+      postId: createdPost.id,
       userId: user.id,
       upvoted: true
     });
 
     await voteForumPost({
-      pageId: createdPage.id,
+      postId: createdPost.id,
       userId: user.id,
       upvoted: null
     });
 
     const postPageVote = await getPostVote({
       userId: user.id,
-      pageId: createdPage.id
+      pageId: createdPost.id
     });
 
     expect(postPageVote).toStrictEqual({

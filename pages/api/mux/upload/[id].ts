@@ -22,7 +22,7 @@ async function getUploadEndpoint(req: NextApiRequest, res: NextApiResponse<Uploa
   const query = req.query as UploadRequest;
   const isAllowed = await canCreate({
     userId: req.session.user.id,
-    pageId: query.pageId
+    resourceId: query.pageId
   });
 
   if (!isAllowed) {

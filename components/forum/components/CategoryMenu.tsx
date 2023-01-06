@@ -1,10 +1,16 @@
 import styled from '@emotion/styled';
 import AddIcon from '@mui/icons-material/Add';
-import { Box, MenuItem, Stack, TextField, Typography } from '@mui/material';
 import Alert from '@mui/material/Alert';
+import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
+import Divider from '@mui/material/Divider';
+import MenuItem from '@mui/material/MenuItem';
+import Stack from '@mui/material/Stack';
+import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
 import type { PostCategory } from '@prisma/client';
+import startCase from 'lodash/startCase';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
@@ -17,6 +23,7 @@ import Modal from 'components/common/Modal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useForumCategories } from 'hooks/useForumCategories';
 import isAdmin from 'hooks/useIsAdmin';
+import { postSortOptions } from 'lib/forums/posts/constants';
 
 import { ForumFilterCategory } from './CategoryPopup';
 
@@ -24,11 +31,19 @@ const StyledBox = styled(Box)`
   ${hoverIconsStyle({ marginForIcons: false })}
 `;
 
-function ForumFilterListLink({ category, label }: { label: string; category?: PostCategory }) {
+function ForumFilterListLink({ category, label, sort }: { label: string; category?: PostCategory; sort?: string }) {
   const { deleteForumCategory, updateForumCategory } = useForumCategories();
   const router = useRouter();
-  const selectedCategory = router.query.categoryId as string;
+  const selectedCategory = router.query.categoryId as string | undefined;
+  const selectedSort = router.query.sort as string | undefined;
   const admin = isAdmin();
+  const link = category
+    ? `/${router.query.domain}/forum?categoryId=${category.id}`
+    : sort
+    ? `/${router.query.domain}/forum?sort=${sort}`
+    : '';
+
+  const selected = category ? category.id === selectedCategory : sort ? sort === selectedSort : false;
 
   return (
     <MenuItem
@@ -41,7 +56,7 @@ function ForumFilterListLink({ category, label }: { label: string; category?: Po
       }}
     >
       <Link
-        href={`/${router.query.domain}/forum${category ? `?categoryId=${category.id}` : ''}`}
+        href={link}
         sx={{
           cursor: 'pointer',
           wordBreak: 'break-all',
@@ -53,7 +68,7 @@ function ForumFilterListLink({ category, label }: { label: string; category?: Po
           sx={{
             color: 'text.primary'
           }}
-          fontWeight={(category ? selectedCategory === category.id : !selectedCategory) ? 'bold' : 'initial'}
+          fontWeight={selected ? 'bold' : 'initial'}
         >
           {label}
         </Typography>
@@ -106,30 +121,15 @@ export function CategoryMenu() {
           px: 0
         }}
       >
-        {/** TODO - Enable sorting
-        <Box display='flex' sx={{ alignItems: 'flex-start', flexDirection: 'column' }} gap={2}>
-          {sortList.map((sort) => (
-            <Link
-              key={sort}
-              href={getLinkUrl(sort)}
-
-              color='inherit'
-            >
-              {sort}
-            </Link>
-          ))}
-        </Box>
-        <Divider sx={{ pt: '10px', mb: '10px' }} />
         <Stack gap={1} my={1}>
-          {
-            // <Link
-            //   key={category.name}
-            //   // sx={{ fontWeight: category.name === query.category ? 'bold' : 'initial' }}
-            //   color='inherit'
-            // >
-            // </Link>
-                <Divider sx={{ pt: '10px', mb: '10px' }} />
-        */}
+          {postSortOptions.map((sort) => (
+            <StyledBox key={sort}>
+              <ForumFilterListLink label={startCase(sort.replace('_', ' '))} sort={sort} />
+            </StyledBox>
+          ))}
+        </Stack>
+
+        <Divider sx={{ pt: '10px', mb: '10px' }} />
         <Stack mb={2}>
           <ForumFilterListLink label='All categories' />
           {categories.map((category) => (

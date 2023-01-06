@@ -1,76 +1,69 @@
-import type { Page, Post, Prisma } from '@prisma/client';
+import type { Post, Prisma } from '@prisma/client';
 
 import { prisma } from 'db';
-import { DataNotFoundError, InsecureOperationError, UndesirableOperationError } from 'lib/utilities/errors';
+import { InsecureOperationError, UndesirableOperationError } from 'lib/utilities/errors';
 
-export type UpdateForumPostInput = Partial<
-  Pick<Page, 'content' | 'contentText' | 'title' | 'galleryImage' | 'headerImage'> & {
-    categoryId?: Post['categoryId'] | null;
-  }
->;
+import { PostNotFoundError } from './errors';
 
-export async function updateForumPost({
-  userId,
-  postId,
-  content,
-  contentText,
-  categoryId,
-  title
-}: UpdateForumPostInput & { postId: string; userId: string }) {
-  if (categoryId) {
-    const [page, category] = await Promise.all([
-      prisma.page.findUnique({
-        where: {
-          postId
-        },
-        select: {
-          spaceId: true
-        }
-      }),
-      prisma.postCategory.findUnique({
-        where: {
-          id: categoryId
-        },
-        select: {
-          spaceId: true
-        }
-      })
-    ]);
+export type UpdateForumPostInput = Partial<Pick<Post, 'content' | 'contentText' | 'title' | 'categoryId'>>;
 
-    if (page?.spaceId !== category?.spaceId) {
-      throw new InsecureOperationError('Cannot update post with a category from another space');
-    }
-  }
-
+export async function updateForumPost(
+  postId: string,
+  { content, contentText, categoryId, title }: UpdateForumPostInput
+): Promise<Post> {
   const post = await prisma.post.findUnique({
     where: {
       id: postId
+    },
+    select: {
+      spaceId: true,
+      locked: true
     }
   });
 
   if (!post) {
-    throw new DataNotFoundError(`Post with id ${postId} not found`);
-  } else if (post.locked) {
-    throw new UndesirableOperationError('Cannot update a locked post');
+    throw new PostNotFoundError(postId);
   }
 
-  const updated = await prisma.$transaction(async (tx) => {
-    const _updated = await tx.page.update({
-      where: { id: postId },
-      data: {
-        content: content as Prisma.InputJsonObject,
-        contentText,
-        title,
-        updatedAt: new Date(),
-        updatedBy: userId
+  if (categoryId) {
+    const category = await prisma.postCategory.findUnique({
+      where: {
+        id: categoryId
+      },
+      select: {
+        spaceId: true
       }
     });
 
-    if (categoryId) {
-      await tx.post.update({ where: { id: postId }, data: { category: { connect: { id: categoryId } } } });
+    if (post?.spaceId !== category?.spaceId) {
+      throw new InsecureOperationError('Cannot update post with a category from another space');
     }
-    return _updated;
-  });
+  }
 
-  return updated;
+  if (post.locked) {
+    throw new UndesirableOperationError('Cannot update a locked post');
+  }
+
+  await prisma.post.update({
+    where: {
+      id: postId
+    },
+    data: {
+      title,
+      content: content as Prisma.InputJsonObject,
+      contentText,
+      category: !categoryId
+        ? undefined
+        : {
+            connect: {
+              id: categoryId
+            }
+          }
+    }
+  });
+  return prisma.post.findUnique({
+    where: {
+      id: postId
+    }
+  }) as Promise<Post>;
 }

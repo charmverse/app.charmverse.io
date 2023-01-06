@@ -1,8 +1,6 @@
 import { prisma } from 'db';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 
-import { getForumPost } from '../posts/getForumPost';
-
 import type { CreatePostCommentInput } from './interface';
 
 export async function createPostComment({
@@ -15,24 +13,28 @@ export async function createPostComment({
   postId: string;
   userId: string;
 }) {
-  const page = await prisma.page.findUnique({
+  const post = await prisma.post.findUnique({
     where: { id: postId },
     include: {
-      post: {
-        include: {
-          category: true
-        }
-      }
+      category: true
     }
   });
 
-  const comment = await prisma.pageComment.create({
+  const comment = await prisma.postComment.create({
     data: {
       content,
       contentText: contentText.trim(),
-      createdBy: userId,
-      pageId: postId,
-      parentId
+      parentId,
+      user: {
+        connect: {
+          id: userId
+        }
+      },
+      post: {
+        connect: {
+          id: postId
+        }
+      }
     },
     include: {
       user: {
@@ -45,7 +47,7 @@ export async function createPostComment({
     }
   });
 
-  const category = page?.post?.category;
+  const category = post?.category;
 
   if (category) {
     trackUserAction('create_comment', {
@@ -53,7 +55,7 @@ export async function createPostComment({
       commentedOn: parentId === postId ? 'post' : 'comment',
       postId,
       resourceId: comment.id,
-      spaceId: page.spaceId,
+      spaceId: post.spaceId,
       userId
     });
   }

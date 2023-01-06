@@ -1,42 +1,10 @@
+import type { PostComment } from '@prisma/client';
+
 import { prisma } from 'db';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
-import { UnauthorisedActionError } from 'lib/utilities/errors';
 
-export async function deletePostComment({
-  postId,
-  commentId,
-  userId
-}: {
-  postId: string;
-  commentId: string;
-  userId: string;
-}) {
-  const pageComment = await prisma.pageComment.findFirst({
-    where: {
-      id: commentId,
-      createdBy: userId,
-      deletedAt: null
-    }
-  });
-
-  if (!pageComment) {
-    throw new UnauthorisedActionError();
-  }
-
-  const page = await prisma.page.findUnique({
-    where: { id: postId },
-    include: {
-      post: {
-        include: {
-          category: true
-        }
-      }
-    }
-  });
-
-  const category = page?.post?.category;
-
-  await prisma.pageComment.update({
+export async function deletePostComment({ commentId }: { commentId: string }): Promise<PostComment> {
+  const postComment = await prisma.postComment.update({
     where: {
       id: commentId
     },
@@ -44,17 +12,28 @@ export async function deletePostComment({
       deletedAt: new Date(),
       content: { type: 'doc', content: [{ type: 'paragraph', content: [] }] },
       contentText: ''
+    },
+    include: {
+      post: {
+        select: {
+          spaceId: true,
+          id: true,
+          category: true
+        }
+      }
     }
   });
 
-  if (category) {
+  if (postComment.post.category) {
     trackUserAction('delete_comment', {
-      categoryName: category.name,
-      commentedOn: pageComment.parentId === postId ? 'post' : 'comment',
-      postId,
+      categoryName: postComment.post.category.name,
+      commentedOn: postComment.parentId === null ? 'post' : 'comment',
+      postId: postComment.post.id,
       resourceId: commentId,
-      spaceId: page.spaceId,
-      userId
+      spaceId: postComment.post.spaceId,
+      userId: postComment.createdBy
     });
   }
+
+  return postComment;
 }

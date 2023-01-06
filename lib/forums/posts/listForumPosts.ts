@@ -2,34 +2,33 @@ import type { Prisma } from '@prisma/client';
 
 import { prisma } from 'db';
 import type { PaginatedResponse } from 'lib/public-api';
-import { isTruthy } from 'lib/utilities/types';
+import { InvalidInputError } from 'lib/utilities/errors';
 
-import type { PageWithRelations } from './getPostMeta';
+import { defaultPostsPerResult, postSortOptions } from './constants';
+import type { PostWithRelations } from './getPostMeta';
 import { getPostMeta } from './getPostMeta';
 import type { ForumPostMeta } from './interfaces';
 
-// Maxium posts we want per response
-export const defaultPostsPerResult = 5;
-
 export type PaginatedPostList = PaginatedResponse<ForumPostMeta & { totalComments: number }> & { cursor: number };
 
-/**
- * @sort ignored for now - the server sorts posts by most recent
- */
+export type PostOrder = typeof postSortOptions[number];
+
 export interface ListForumPostsRequest {
   spaceId: string;
   categoryId?: string;
   page?: number;
   count?: number;
-  sort?: string;
+  sort?: PostOrder;
 }
+
 export async function listForumPosts(
   {
     spaceId,
     page = 0,
     // Count is the number of posts we want per page
     count = defaultPostsPerResult,
-    categoryId
+    categoryId,
+    sort
   }: ListForumPostsRequest,
   userId: string
 ): Promise<PaginatedPostList> {
@@ -40,10 +39,32 @@ export async function listForumPosts(
   page = Math.abs(page);
   const toSkip = Math.max(page, page - 1) * count;
 
-  const orderQuery: Prisma.PageFindManyArgs = {
+  const orderByNewest: Prisma.PostOrderByWithRelationAndSearchRelevanceInput = {
+    createdAt: 'desc'
+  };
+
+  const orderByMostCommmented: Prisma.PostOrderByWithRelationAndSearchRelevanceInput = {
+    comments: {
+      _count: 'desc'
+    }
+  };
+
+  const orderByMostVoted: Prisma.PostOrderByWithRelationAndSearchRelevanceInput = {
+    upDownVotes: {
+      _count: 'desc'
+    }
+  };
+
+  if (sort && !postSortOptions.includes(sort)) {
+    throw new InvalidInputError(`This type of sort does not exist.`);
+  }
+
+  const orderQuery: Prisma.PostFindManyArgs = {
     // Return posts ordered from most recent to oldest
     orderBy: {
-      createdAt: 'desc'
+      ...((sort === 'newest' || !sort || !postSortOptions.includes(sort)) && orderByNewest),
+      ...(sort === 'most_commented' && orderByMostCommmented),
+      ...(sort === 'most_voted' && orderByMostVoted)
     }
   };
 
@@ -53,14 +74,13 @@ export async function listForumPosts(
       }
     : {};
 
-  const pages = await prisma.page.findMany({
+  const posts = await prisma.post.findMany({
     ...orderQuery,
     take: count,
     skip: toSkip,
     where: {
-      type: 'post',
+      ...postPropsQuery,
       spaceId,
-      post: postPropsQuery,
       deletedAt: null
     },
     include: {
@@ -69,48 +89,45 @@ export async function listForumPosts(
           upvoted: true,
           createdBy: true
         }
-      },
-      post: true
+      }
     }
   });
 
   const hasNext =
-    pages.length === 0
+    posts.length === 0
       ? false
       : (
-          await prisma.page.findMany({
+          await prisma.post.findMany({
             ...orderQuery,
             skip: toSkip + count,
             take: 1,
-            where: { type: 'post', spaceId, post: postPropsQuery }
+            where: {
+              ...postPropsQuery,
+              spaceId
+            }
           })
         ).length === 1;
 
-  const comments = await prisma.pageComment.groupBy({
+  const comments = await prisma.postComment.groupBy({
     _count: {
       _all: true
     },
-    by: ['pageId'],
+    by: ['postId'],
     where: {
-      pageId: {
-        in: pages.map((_page) => _page.id)
+      postId: {
+        in: posts.map((_post) => _post.id)
       }
     }
   });
 
-  const data = pages
-    .map((_page) => {
-      if (_page.post) {
-        const comment = comments.find((_comment) => _comment.pageId === _page.id);
-        const postMeta = getPostMeta({ page: _page as PageWithRelations, userId });
-        return {
-          ...postMeta,
-          totalComments: comment?._count._all ?? 0
-        };
-      }
-      return null;
-    })
-    .filter(isTruthy);
+  const data = posts.map((_post) => {
+    const comment = comments.find((_comment) => _comment.postId === _post.id);
+    const postMeta = getPostMeta({ post: _post as PostWithRelations, userId });
+    return {
+      ...postMeta,
+      totalComments: comment?._count._all ?? 0
+    };
+  });
 
   const response: PaginatedPostList = {
     data,

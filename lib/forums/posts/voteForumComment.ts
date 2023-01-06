@@ -1,75 +1,62 @@
+import type { PostCommentUpDownVote } from '@prisma/client';
+
 import { prisma } from 'db';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
-import { DataNotFoundError } from 'lib/utilities/errors';
 
-import { getComment } from '../comments/getComment';
+type CommentVote = {
+  commentId: string;
+  postId: string;
+  userId: string;
+  upvoted: boolean | null;
+};
 
 export async function voteForumComment({
   upvoted,
   userId,
   commentId,
-  pageId
-}: {
-  commentId: string;
-  pageId: string;
-  userId: string;
-  upvoted: boolean | null;
-}) {
-  const comment = await getComment(commentId);
-
-  if (!comment) {
-    throw new DataNotFoundError(commentId);
-  }
-
+  postId
+}: CommentVote): Promise<PostCommentUpDownVote | null> {
   if (upvoted === null) {
-    await prisma.pageCommentUpDownVote.delete({
-      where: {
-        createdBy_commentId: {
-          createdBy: userId,
-          commentId
-        }
-      }
-    });
-  } else {
-    const page = await prisma.page.findUnique({
-      where: { id: pageId },
-      include: {
-        post: {
-          include: {
-            category: true
+    try {
+      await prisma.postCommentUpDownVote.delete({
+        where: {
+          createdBy_commentId: {
+            createdBy: userId,
+            commentId
           }
         }
+      });
+    } catch (error) {
+      // Comment not found
+    }
+
+    return null;
+  } else {
+    const post = await prisma.post.findUnique({
+      where: { id: postId },
+      include: {
+        category: true
       }
     });
 
-    const category = page?.post?.category;
+    const category = post?.category;
 
     if (category) {
-      if (upvoted) {
-        trackUserAction('upvote_comment', {
-          resourceId: commentId,
-          spaceId: page.spaceId,
-          userId,
-          categoryName: category.name,
-          postId: page.id
-        });
-      } else {
-        trackUserAction('downvote_comment', {
-          resourceId: commentId,
-          spaceId: page.spaceId,
-          userId,
-          categoryName: category.name,
-          postId: page.id
-        });
-      }
+      trackUserAction(upvoted ? 'upvote_comment' : 'downvote_comment', {
+        resourceId: commentId,
+        spaceId: post.spaceId,
+        userId,
+        categoryName: category.name,
+        postId: post.id
+      });
     }
 
-    await prisma.pageCommentUpDownVote.upsert({
+    const commentVote = await prisma.postCommentUpDownVote.upsert({
       create: {
         createdBy: userId,
         upvoted,
         commentId,
-        pageId
+        postId
       },
       update: {
         upvoted
@@ -81,5 +68,7 @@ export async function voteForumComment({
         }
       }
     });
+
+    return commentVote;
   }
 }

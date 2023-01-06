@@ -14,6 +14,7 @@ import { useMembers } from 'hooks/useMembers';
 import useOnScreen from 'hooks/useOnScreen';
 import { useUser } from 'hooks/useUser';
 import { useWebSocketClient } from 'hooks/useWebSocketClient';
+import type { PostOrder } from 'lib/forums/posts/listForumPosts';
 import type { WebSocketPayload } from 'lib/websockets/interfaces';
 
 import { PostCard } from './components/PostCard';
@@ -22,6 +23,7 @@ import { PostSkeleton } from './components/PostSkeleton';
 interface ForumPostsProps {
   search: string;
   categoryId?: string;
+  sort?: PostOrder;
 }
 
 const resultsPerQuery = 10;
@@ -30,7 +32,7 @@ const Alert = forwardRef<HTMLDivElement, AlertProps>((props, ref) => {
   return <MuiAlert elevation={6} ref={ref} variant='filled' {...props} />;
 });
 
-export function ForumPostList({ search, categoryId }: ForumPostsProps) {
+export function ForumPostList({ search, categoryId, sort }: ForumPostsProps) {
   const ref = useRef();
   const currentSpace = useCurrentSpace();
   const bottomPostReached = useOnScreen(ref);
@@ -47,13 +49,14 @@ export function ForumPostList({ search, categoryId }: ForumPostsProps) {
     isLoading: isLoadingPosts,
     mutate: mutatePosts
   } = useSWRInfinite(
-    (index) => (currentSpace && !search ? { url: 'forums/posts', arguments: { page: index, categoryId } } : null),
+    (index) => (currentSpace && !search ? { url: 'forums/posts', arguments: { page: index, categoryId, sort } } : null),
     (args) =>
       charmClient.forum.listForumPosts({
         spaceId: currentSpace!.id,
         categoryId: args.arguments.categoryId,
         count: resultsPerQuery,
-        page: args.arguments.page
+        page: args.arguments.page,
+        sort: args.arguments.sort
       })
   );
 
@@ -73,6 +76,9 @@ export function ForumPostList({ search, categoryId }: ForumPostsProps) {
         page: args.arguments.page
       })
   );
+
+  const dataError =
+    postsError?.message ?? searchError?.message ?? 'There was an unexpected error while loading the posts';
 
   const hasNext = useMemo(
     () => (search && searchData ? searchData.at(-1)?.hasNext === true : postsData?.at(-1)?.hasNext === true),
@@ -132,9 +138,7 @@ export function ForumPostList({ search, categoryId }: ForumPostsProps) {
 
   return (
     <>
-      {(postsError || searchError) && (
-        <Alert severity='error'>There was an unexpected error while loading the posts</Alert>
-      )}
+      {(postsError || searchError) && <Alert severity='error'>{dataError}</Alert>}
       {postsToShow.map((post) => (
         <PostCard key={post.id} user={members.find((item) => item.id === post.createdBy)} post={post} />
       ))}

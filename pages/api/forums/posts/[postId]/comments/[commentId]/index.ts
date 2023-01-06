@@ -1,41 +1,38 @@
-import type { PageComment } from '@prisma/client';
+import type { PostComment } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { prisma } from 'db';
 import { deletePostComment } from 'lib/forums/comments/deletePostComment';
-import { getComment } from 'lib/forums/comments/getComment';
+import { getPostComment } from 'lib/forums/comments/getPostComment';
 import type { UpdatePostCommentInput } from 'lib/forums/comments/interface';
 import { updatePostComment } from 'lib/forums/comments/updatePostComment';
+import { PostNotFoundError } from 'lib/forums/posts/errors';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
-import { PageNotFoundError } from 'lib/pages/server';
 import { withSessionRoute } from 'lib/session/withSession';
 import { UserIsNotSpaceMemberError } from 'lib/users/errors';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
-import { UnauthorisedActionError, UndesirableOperationError } from 'lib/utilities/errors';
+import { DataNotFoundError, UnauthorisedActionError, UndesirableOperationError } from 'lib/utilities/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.use(requireUser).put(updatePostCommentHandler).delete(deletePostCommentHandler);
 
-async function updatePostCommentHandler(req: NextApiRequest, res: NextApiResponse<PageComment>) {
-  const { pageId, commentId } = req.query as any as { pageId: string; commentId: string };
+async function updatePostCommentHandler(req: NextApiRequest, res: NextApiResponse<PostComment>) {
+  const { commentId, postId } = req.query as any as { postId: string; commentId: string };
   const body = req.body as UpdatePostCommentInput;
   const userId = req.session.user.id;
 
-  const page = await prisma.page.findUnique({
-    where: { id: pageId },
-    include: {
-      post: true
-    }
+  const post = await prisma.post.findUnique({
+    where: { id: postId }
   });
 
-  if (!page || !page.post) {
-    throw new PageNotFoundError(pageId);
+  if (!post) {
+    throw new PostNotFoundError(postId);
   }
 
   const spaceRole = await hasAccessToSpace({
-    spaceId: page.spaceId,
+    spaceId: post.spaceId,
     userId
   });
 
@@ -43,7 +40,7 @@ async function updatePostCommentHandler(req: NextApiRequest, res: NextApiRespons
     throw new UserIsNotSpaceMemberError();
   }
 
-  const comment = await getComment(commentId);
+  const comment = await getPostComment(commentId);
 
   if (comment?.createdBy !== userId) {
     throw new UnauthorisedActionError();
@@ -59,30 +56,45 @@ async function updatePostCommentHandler(req: NextApiRequest, res: NextApiRespons
 }
 
 async function deletePostCommentHandler(req: NextApiRequest, res: NextApiResponse) {
-  const { pageId, commentId } = req.query as any as { pageId: string; commentId: string };
+  const { commentId, postId } = req.query as any as { postId: string; commentId: string };
   const userId = req.session.user.id;
 
-  const page = await prisma.page.findUnique({
-    where: { id: pageId },
+  const post = await prisma.post.findUnique({
+    where: { id: postId }
+  });
+
+  if (!post) {
+    throw new PostNotFoundError(postId);
+  }
+
+  const postComment = await prisma.postComment.findUnique({
+    where: { id: commentId },
     include: {
-      post: true
+      post: {
+        select: {
+          spaceId: true
+        }
+      }
     }
   });
 
-  if (!page || !page.post) {
-    throw new PageNotFoundError(pageId);
+  if (!postComment) {
+    throw new DataNotFoundError(`Comment with id ${commentId} not found`);
   }
 
-  const spaceRole = await hasAccessToSpace({
-    spaceId: page.spaceId,
-    userId
-  });
+  if (postComment?.createdBy !== userId) {
+    const { error } = await hasAccessToSpace({
+      spaceId: postComment.post.spaceId,
+      userId,
+      adminOnly: true
+    });
 
-  if (!spaceRole.success) {
-    throw new UserIsNotSpaceMemberError();
+    if (error) {
+      throw error;
+    }
   }
 
-  await deletePostComment({ commentId, userId, postId: pageId });
+  await deletePostComment({ commentId });
 
   res.status(200).end();
 }

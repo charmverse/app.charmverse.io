@@ -1,13 +1,14 @@
-import type { Post, Space, User } from '@prisma/client';
+import type { Post, Prisma, Space, User } from '@prisma/client';
 import { v4 } from 'uuid';
 
 import { prisma } from 'db';
-import { PageNotFoundError } from 'lib/pages/server';
-import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { InvalidInputError } from 'lib/utilities/errors';
+import { generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { generateForumPost } from 'testing/utils/forums';
 
+import { PostNotFoundError } from '../errors';
 import { getForumPost } from '../getForumPost';
-import type { ForumPostPage } from '../interfaces';
+import type { PostWithVotes } from '../interfaces';
 
 let space: Space;
 let user: User;
@@ -19,48 +20,104 @@ beforeAll(async () => {
 });
 
 describe('getForumPost', () => {
-  it('should return the page and attached post', async () => {
-    const createdPage = await generateForumPost({
+  it('should return the post', async () => {
+    const testTitle = 'Test Title';
+
+    const createdPost = await generateForumPost({
       userId: user.id,
-      spaceId: space.id
+      spaceId: space.id,
+      title: testTitle
     });
 
-    const retrievedPost = await getForumPost({ pageId: createdPage.id, userId: '' });
+    const retrievedPost = await getForumPost({ postId: createdPost.id });
 
     expect(retrievedPost).toMatchObject(
-      expect.objectContaining<Partial<ForumPostPage>>({
+      expect.objectContaining<Partial<Post>>({
         id: expect.any(String),
         content: expect.any(Object),
-        post: expect.objectContaining<Partial<Post>>({
-          locked: false,
-          pinned: false
-        })
+        locked: false,
+        pinned: false,
+        title: testTitle
       })
     );
   });
 
-  it('should return null if the page does not have the type "post", or it does not exist', async () => {
-    const page = await prisma.page.create({
-      data: {
-        author: {
-          connect: {
-            id: user.id
-          }
-        },
-        space: {
-          connect: {
-            id: space.id
-          }
-        },
-        title: 'Test',
-        type: 'page',
-        contentText: '',
-        content: {},
-        path: `path-${v4()}`,
-        updatedBy: user.id
-      }
+  it('should include a rollup of votes for this post', async () => {
+    const testTitle = 'Test Title';
+    const createdPost = await generateForumPost({
+      userId: user.id,
+      spaceId: space.id,
+      title: testTitle
     });
 
-    await expect(getForumPost({ pageId: page.id, userId: '' })).rejects.toBeInstanceOf(PageNotFoundError);
+    const postVoters: User[] = [];
+
+    const totalVoters = 10;
+
+    for (let i = 0; i < totalVoters; i++) {
+      const votingUser = await generateSpaceUser({
+        spaceId: space.id,
+        isAdmin: false
+      });
+      postVoters.push(votingUser);
+    }
+
+    const voteInputs: Prisma.PostUpDownVoteCreateManyInput[] = postVoters.map((voter) => ({
+      postId: createdPost.id,
+      createdBy: voter.id,
+      upvoted: Math.random() > 0.5
+    }));
+
+    const totalUpvotes = voteInputs.filter((vote) => vote.upvoted).length;
+    const totalDownvotes = voteInputs.length - totalUpvotes;
+
+    await prisma.postUpDownVote.createMany({
+      data: voteInputs
+    });
+
+    const requestingUserId = postVoters[0].id;
+
+    const retrievedPost = await getForumPost({ postId: createdPost.id, userId: requestingUserId });
+
+    expect(retrievedPost).toMatchObject(
+      expect.objectContaining<Partial<PostWithVotes>>({
+        id: expect.any(String),
+        content: expect.any(Object),
+        locked: false,
+        pinned: false,
+        title: testTitle,
+        votes: {
+          downvotes: totalDownvotes,
+          upvotes: totalUpvotes,
+          upvoted: voteInputs[0].upvoted
+        }
+      })
+    );
+  });
+
+  it('should allow looking up a post via path', async () => {
+    const postPath = `post-path-${v4()}`;
+
+    const createdPost = await generateForumPost({
+      userId: user.id,
+      spaceId: space.id,
+      path: postPath
+    });
+
+    const retrievedPost = await getForumPost({ postId: postPath });
+
+    expect(retrievedPost).toMatchObject(
+      expect.objectContaining<Partial<PostWithVotes>>({
+        id: expect.any(String),
+        content: expect.any(Object),
+        locked: false,
+        pinned: false,
+        title: createdPost.title
+      })
+    );
+  });
+
+  it('should throw an error if the post does not exist', async () => {
+    await expect(getForumPost({ postId: v4() })).rejects.toBeInstanceOf(PostNotFoundError);
   });
 });
