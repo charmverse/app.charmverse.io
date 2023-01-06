@@ -17,25 +17,25 @@ beforeAll(async () => {
 
 describe('Video Permissions', () => {
   it('Checks that a user can view a page video', async () => {
-    const isAllowed = await canView({ userId: users.member, pageId });
+    const isAllowed = await canView({ userId: users.member, resourceId: pageId });
 
     expect(isAllowed).toBe(true);
   });
 
   it('Checks that a user cannot view a page video', async () => {
-    const isAllowed = await canView({ userId: users.nonMember, pageId });
+    const isAllowed = await canView({ userId: users.nonMember, resourceId: pageId });
 
     expect(isAllowed).toBe(false);
   });
 
   it('Checks that a user can create a page video', async () => {
-    const isAllowed = await canCreate({ userId: users.member, pageId });
+    const isAllowed = await canCreate({ userId: users.member, resourceId: pageId });
 
     expect(isAllowed).toBe(true);
   });
 
   it('Checks that a user cannot create a page video', async () => {
-    const isAllowed = await canCreate({ userId: users.nonMember, pageId });
+    const isAllowed = await canCreate({ userId: users.nonMember, resourceId: pageId });
 
     expect(isAllowed).toBe(false);
   });

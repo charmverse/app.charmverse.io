@@ -5,7 +5,6 @@ import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { generatePostCategory } from 'testing/utils/forums';
 
 import { createForumPost } from '../createForumPost';
-import type { ForumPostPage } from '../interfaces';
 
 let space: Space;
 let user: User;
@@ -16,7 +15,7 @@ beforeAll(async () => {
   user = generated.user;
 });
 describe('createForumPost', () => {
-  it('should create a page with a draft post', async () => {
+  it('should create a post linked to a specific category', async () => {
     const category = await generatePostCategory({
       spaceId: space.id
     });
@@ -30,41 +29,12 @@ describe('createForumPost', () => {
     });
 
     expect(createdPage).toMatchObject(
-      expect.objectContaining<Partial<ForumPostPage>>({
+      expect.objectContaining<Partial<Post>>({
         id: expect.any(String),
         content: expect.any(Object),
-        post: expect.objectContaining<Partial<Post>>({
-          locked: false,
-          pinned: false
-        })
-      })
-    );
-  });
-
-  it('should create a page with a draft post linked to a category if this is specified', async () => {
-    const category = await generatePostCategory({
-      name: 'Test',
-      spaceId: space.id
-    });
-
-    const createdPage = await createForumPost({
-      content: {},
-      contentText: '',
-      createdBy: user.id,
-      spaceId: space.id,
-      title: 'Test',
-      categoryId: category.id
-    });
-
-    expect(createdPage).toMatchObject(
-      expect.objectContaining<Partial<ForumPostPage>>({
-        id: expect.any(String),
-        content: expect.any(Object),
-        post: expect.objectContaining<Partial<Post>>({
-          locked: false,
-          pinned: false,
-          categoryId: category.id
-        })
+        title: 'Test',
+        locked: false,
+        pinned: false
       })
     );
   });

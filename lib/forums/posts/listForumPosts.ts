@@ -3,10 +3,9 @@ import type { Prisma } from '@prisma/client';
 import { prisma } from 'db';
 import type { PaginatedResponse } from 'lib/public-api';
 import { InvalidInputError } from 'lib/utilities/errors';
-import { isTruthy } from 'lib/utilities/types';
 
 import { defaultPostsPerResult, postSortOptions } from './constants';
-import type { PageWithRelations } from './getPostMeta';
+import type { PostWithRelations } from './getPostMeta';
 import { getPostMeta } from './getPostMeta';
 import type { ForumPostMeta } from './interfaces';
 
@@ -40,17 +39,17 @@ export async function listForumPosts(
   page = Math.abs(page);
   const toSkip = Math.max(page, page - 1) * count;
 
-  const orderByNewest: Prisma.PageOrderByWithRelationAndSearchRelevanceInput = {
+  const orderByNewest: Prisma.PostOrderByWithRelationAndSearchRelevanceInput = {
     createdAt: 'desc'
   };
 
-  const orderByMostCommmented: Prisma.PageOrderByWithRelationAndSearchRelevanceInput = {
+  const orderByMostCommmented: Prisma.PostOrderByWithRelationAndSearchRelevanceInput = {
     comments: {
       _count: 'desc'
     }
   };
 
-  const orderByMostVoted: Prisma.PageOrderByWithRelationAndSearchRelevanceInput = {
+  const orderByMostVoted: Prisma.PostOrderByWithRelationAndSearchRelevanceInput = {
     upDownVotes: {
       _count: 'desc'
     }
@@ -60,7 +59,7 @@ export async function listForumPosts(
     throw new InvalidInputError(`This type of sort does not exist.`);
   }
 
-  const orderQuery: Prisma.PageFindManyArgs = {
+  const orderQuery: Prisma.PostFindManyArgs = {
     // Return posts ordered from most recent to oldest
     orderBy: {
       ...((sort === 'newest' || !sort || !postSortOptions.includes(sort)) && orderByNewest),
@@ -75,14 +74,13 @@ export async function listForumPosts(
       }
     : {};
 
-  const pages = await prisma.page.findMany({
+  const posts = await prisma.post.findMany({
     ...orderQuery,
     take: count,
     skip: toSkip,
     where: {
-      type: 'post',
+      ...postPropsQuery,
       spaceId,
-      post: postPropsQuery,
       deletedAt: null
     },
     include: {
@@ -91,48 +89,45 @@ export async function listForumPosts(
           upvoted: true,
           createdBy: true
         }
-      },
-      post: true
+      }
     }
   });
 
   const hasNext =
-    pages.length === 0
+    posts.length === 0
       ? false
       : (
-          await prisma.page.findMany({
+          await prisma.post.findMany({
             ...orderQuery,
             skip: toSkip + count,
             take: 1,
-            where: { type: 'post', spaceId, post: postPropsQuery }
+            where: {
+              ...postPropsQuery,
+              spaceId
+            }
           })
         ).length === 1;
 
-  const comments = await prisma.pageComment.groupBy({
+  const comments = await prisma.postComment.groupBy({
     _count: {
       _all: true
     },
-    by: ['pageId'],
+    by: ['postId'],
     where: {
-      pageId: {
-        in: pages.map((_page) => _page.id)
+      postId: {
+        in: posts.map((_post) => _post.id)
       }
     }
   });
 
-  const data = pages
-    .map((_page) => {
-      if (_page.post) {
-        const comment = comments.find((_comment) => _comment.pageId === _page.id);
-        const postMeta = getPostMeta({ page: _page as PageWithRelations, userId });
-        return {
-          ...postMeta,
-          totalComments: comment?._count._all ?? 0
-        };
-      }
-      return null;
-    })
-    .filter(isTruthy);
+  const data = posts.map((_post) => {
+    const comment = comments.find((_comment) => _comment.postId === _post.id);
+    const postMeta = getPostMeta({ post: _post as PostWithRelations, userId });
+    return {
+      ...postMeta,
+      totalComments: comment?._count._all ?? 0
+    };
+  });
 
   const response: PaginatedPostList = {
     data,

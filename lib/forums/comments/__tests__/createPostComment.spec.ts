@@ -1,4 +1,4 @@
-import type { PageComment, Space, User } from '@prisma/client';
+import type { PostComment, Space, User } from '@prisma/client';
 import { v4 } from 'uuid';
 
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
@@ -38,9 +38,9 @@ describe('createPostComment', () => {
     });
 
     expect(postComment).toMatchObject(
-      expect.objectContaining<Partial<PageComment>>({
+      expect.objectContaining<Partial<PostComment>>({
         ...commentInput,
-        pageId: post.id
+        postId: post.id
       })
     );
   });
