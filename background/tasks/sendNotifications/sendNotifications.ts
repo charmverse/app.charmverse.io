@@ -103,7 +103,8 @@ export async function getNotifications(): Promise<(PendingTasksProps & { unmarke
       discussionTasks.unmarked.length +
       voteTasksNotSent.length +
       proposalTasks.length +
-      bountyTasks.unmarked.length;
+      bountyTasks.unmarked.length +
+      forumTasks.unmarked.length;
 
     log.debug('Found tasks for notification', {
       notSent:
