@@ -113,7 +113,10 @@ function DocumentPage({ page, setPage, insideModal, readOnly = false, parentProp
   //     : [];
   // });
   const card = useAppSelector((state) => {
-    return (page.cardId && (state.cards.cards[page.cardId] ?? state.cards.templates[page.cardId])) ?? null;
+    if (page.cardId) {
+      return state.cards.cards[page.cardId] ?? state.cards.templates[page.cardId] ?? null;
+    }
+    return null;
   });
 
   const board = useAppSelector((state) => {
