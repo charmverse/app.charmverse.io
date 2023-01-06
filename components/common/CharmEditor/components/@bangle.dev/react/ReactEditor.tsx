@@ -37,6 +37,7 @@ interface BangleEditorProps<PluginMetadata = any> extends CoreBangleEditorProps<
   readOnly?: boolean;
   onParticipantUpdate?: (participants: FrontendParticipant[]) => void;
   isContentControlled?: boolean;
+  enableComments?: boolean;
 }
 
 export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, BangleEditorProps>(
@@ -56,7 +57,8 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
       enableSuggestions = false,
       trackChanges = false,
       onParticipantUpdate = () => {},
-      readOnly = false
+      readOnly = false,
+      enableComments = true
     },
     ref
   ) => {
@@ -65,8 +67,7 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
     const enableFidusEditor = Boolean(user && pageId && trackChanges && !isContentControlled);
     const [isLoading, setIsLoading] = useState(enableFidusEditor);
     const isLoadingRef = useRef(enableFidusEditor);
-
-    const useSockets = user && pageId && trackChanges && !readOnly && !isContentControlled;
+    const useSockets = user && pageId && trackChanges && (!readOnly || enableComments) && !isContentControlled;
 
     const { data: authResponse } = useSWRImmutable(useSockets ? user?.id : null, () => charmClient.socket()); // refresh when user
 
