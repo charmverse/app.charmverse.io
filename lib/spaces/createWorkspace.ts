@@ -48,7 +48,7 @@ export async function createWorkspace({ spaceData, userId }: CreateSpaceProps) {
 
   if (defaultGeneralPostCategory) {
     await setDefaultPostCategory({
-      postCategoryId: defaultGeneralPostCategory.id,
+      postCategoryId: defaultGeneralPostCategory.id as string,
       spaceId: space.id
     });
   }
