@@ -296,7 +296,7 @@ function TableHeader(props: Props): JSX.Element {
       ref={columnRef}
     >
       <Stack width='100%' justifyContent='center'>
-        {readOnly ?? readOnlySourceData ? (
+        {readOnly || readOnlySourceData ? (
           label
         ) : (
           <div ref={toggleRef}>

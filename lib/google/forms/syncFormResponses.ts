@@ -92,8 +92,9 @@ export async function syncFormResponses({ createdBy, view }: { createdBy: string
 
   await notifyUsers({
     spaceId: board.spaceId,
+    view: prismaToBlock(view),
     pageIds,
-    blocks: [board, prismaToBlock(view), ...cards.map((card) => prismaToBlock(card))]
+    blocks: [board, ...cards.map((card) => prismaToBlock(card))]
   });
 }
 
@@ -151,28 +152,39 @@ async function getFormAndResponses(sourceData: GoogleFormSourceData, lastUpdated
   return { form, responses };
 }
 
-async function notifyUsers({ blocks, pageIds, spaceId }: { spaceId: string; pageIds: string[]; blocks: Block[] }) {
-  await Promise.all([
-    async () => {
-      relay.broadcast(
-        {
-          type: 'blocks_created',
-          payload: blocks
-        },
-        spaceId
-      );
+async function notifyUsers({
+  blocks,
+  view,
+  pageIds,
+  spaceId
+}: {
+  spaceId: string;
+  pageIds: string[];
+  blocks: Block[];
+  view: Block;
+}) {
+  relay.broadcast(
+    {
+      type: 'blocks_created',
+      payload: blocks
     },
-    async () => {
-      const createdPages = await getPageMetaList(pageIds);
-      relay.broadcast(
-        {
-          type: 'pages_created',
-          payload: createdPages
-        },
-        spaceId
-      );
-    }
-  ]);
+    spaceId
+  );
+  relay.broadcast(
+    {
+      type: 'blocks_updated',
+      payload: [view]
+    },
+    spaceId
+  );
+  const createdPages = await getPageMetaList(pageIds);
+  relay.broadcast(
+    {
+      type: 'pages_created',
+      payload: createdPages
+    },
+    spaceId
+  );
 }
 
 // utils

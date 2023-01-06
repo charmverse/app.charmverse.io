@@ -239,7 +239,7 @@ function Table(props: Props): JSX.Element {
                   activeView={activeView}
                   groupByProperty={groupByProperty}
                   group={group}
-                  readOnly={props.readOnly ?? props.readOnlySourceData}
+                  readOnly={props.readOnly || props.readOnlySourceData}
                   columnRefs={columnRefs}
                   selectedCardIds={props.selectedCardIds}
                   cardIdToFocusOnRender={props.cardIdToFocusOnRender}
@@ -263,7 +263,7 @@ function Table(props: Props): JSX.Element {
               columnRefs={columnRefs}
               cards={cards}
               selectedCardIds={props.selectedCardIds}
-              readOnly={props.readOnly ?? props.readOnlySourceData}
+              readOnly={props.readOnly || props.readOnlySourceData}
               cardIdToFocusOnRender={props.cardIdToFocusOnRender}
               offset={offset}
               resizingColumn={resizingColumn}
@@ -295,7 +295,7 @@ function Table(props: Props): JSX.Element {
           activeView={activeView}
           resizingColumn={resizingColumn}
           offset={offset}
-          readOnly={props.readOnly ?? props.readOnlySourceData}
+          readOnly={props.readOnly || props.readOnlySourceData}
         />
       </div>
     </div>

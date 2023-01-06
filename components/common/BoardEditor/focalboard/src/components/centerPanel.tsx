@@ -113,6 +113,7 @@ function CenterPanel(props: Props) {
   } else if (activeView?.fields.sourceType === 'google_form') {
     activeBoardId = activeView?.fields.sourceData?.boardId;
   }
+
   const activeBoard = useAppSelector(getBoard(activeBoardId ?? ''));
   const activePage = pages[activeBoardId ?? ''];
 
@@ -412,11 +413,11 @@ function CenterPanel(props: Props) {
   useEffect(() => {
     if (activeView) {
       if (activeView.fields.sourceType === 'google_form') {
-        // console.log('sync responses', activeView.fields.sourceData)
         charmClient.google.forms.syncFormResponses({ viewId: activeView.id });
       }
     }
   }, [activeView?.fields.sourceData?.formId]);
+
   return (
     <div
       className={`BoardComponent ${isEmbedded ? 'embedded-board' : ''}`}
