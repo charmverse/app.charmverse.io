@@ -214,7 +214,7 @@ async function sendNotification(
             userId: notification.user.id,
             taskId: forumTask.commentId,
             channel: 'email',
-            type: 'forum_comment'
+            type: 'post_comment'
           }
         })
       )

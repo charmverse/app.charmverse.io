@@ -102,7 +102,7 @@ export default function ForumTasksList({ tasks, error, mutateTasks }: Discussion
         await charmClient.tasks.markTasks(
           tasks.forum.unmarked.map((unmarkedComment) => ({
             id: unmarkedComment.commentId,
-            type: 'forum_comment'
+            type: 'post_comment'
           }))
         );
       }

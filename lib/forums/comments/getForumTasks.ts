@@ -48,7 +48,7 @@ export async function getForumCommentsTasks(userId: string): Promise<ForumCommen
   const notifications = await prisma.userNotification.findMany({
     where: {
       userId,
-      type: 'forum_comment'
+      type: 'post_comment'
     },
     select: {
       taskId: true
