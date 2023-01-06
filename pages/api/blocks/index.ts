@@ -3,6 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { prisma } from 'db';
+import { prismaToBlock } from 'lib/focalboard/block';
 import type { BoardViewFields, GoogleFormSourceData } from 'lib/focalboard/boardView';
 import { syncFormResponses } from 'lib/google/forms/syncFormResponses';
 import { InvalidStateError, NotFoundError, onError, onNoMatch, requireUser } from 'lib/middleware';
@@ -219,7 +220,7 @@ async function createBlocks(req: NextApiRequest, res: NextApiResponse<Omit<Block
       relay.broadcast(
         {
           type: 'blocks_created',
-          payload: blocksToNotify
+          payload: blocksToNotify.map((block) => prismaToBlock(block))
         },
         space.id
       );
@@ -239,21 +240,21 @@ async function createBlocks(req: NextApiRequest, res: NextApiResponse<Omit<Block
     }
   ]);
 
-  const viewsLinkedToGoogleForm = newBlocks.filter(
-    (newBlock) => newBlock.type === 'view' && (newBlock.fields as BoardViewFields)?.sourceType === 'google_form'
-  );
+  // const viewsLinkedToGoogleForm = newBlocks.filter(
+  //   (newBlock) => newBlock.type === 'view' && (newBlock.fields as BoardViewFields)?.sourceType === 'google_form'
+  // );
 
-  if (viewsLinkedToGoogleForm.length) {
-    Promise.all(
-      viewsLinkedToGoogleForm.map((view) => {
-        const sourceData = (view.fields as any).sourceData as GoogleFormSourceData;
-        return syncFormResponses({ sourceData });
-      })
-    ).catch((err) => {
-      const viewIds = viewsLinkedToGoogleForm.map((block) => block.id);
-      log.error('Could not sync google form', { viewIds, error: err });
-    });
-  }
+  // if (viewsLinkedToGoogleForm.length) {
+  //   Promise.all(
+  //     viewsLinkedToGoogleForm.map((view) => {
+  //       const sourceData = (view.fields as any).sourceData as GoogleFormSourceData;
+  //       return syncFormResponses({ sourceData });
+  //     })
+  //   ).catch((err) => {
+  //     const viewIds = viewsLinkedToGoogleForm.map((block) => block.id);
+  //     log.error('Could not sync google form', { viewIds, error: err });
+  //   });
+  // }
 
   return res.status(200).json(newBlocks);
 }
@@ -261,12 +262,16 @@ async function createBlocks(req: NextApiRequest, res: NextApiResponse<Omit<Block
 async function updateBlocks(req: NextApiRequest, res: NextApiResponse<Block[]>) {
   const blocks: Block[] = req.body;
 
-  const spaceId = blocks[0].spaceId;
-
-  const { error } = await hasAccessToSpace({ userId: req.session.user.id, spaceId });
-  if (error) {
-    throw new UnauthorisedActionError();
-  }
+  // validate access to the space
+  await Promise.all(
+    blocks.map(async (block) => {
+      const spaceId = block.spaceId ?? (await prisma.block.findUnique({ where: { id: block.id } }))?.spaceId;
+      const { error } = await hasAccessToSpace({ userId: req.session.user.id, spaceId });
+      if (error) {
+        throw new UnauthorisedActionError();
+      }
+    })
+  );
 
   const updatedBlocks = await prisma.$transaction(
     blocks.map((block) => {
@@ -285,7 +290,7 @@ async function updateBlocks(req: NextApiRequest, res: NextApiResponse<Block[]>) 
   relay.broadcast(
     {
       type: 'blocks_updated',
-      payload: updatedBlocks
+      payload: updatedBlocks.map((block) => prismaToBlock(block))
     },
     updatedBlocks[0].spaceId
   );

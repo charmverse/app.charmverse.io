@@ -134,7 +134,7 @@ export default function DatabaseView({ containerWidth, readOnly: readOnlyOverrid
   const readOnly =
     typeof readOnlyOverride === 'undefined' ? currentPagePermissions.edit_content !== true : readOnlyOverride;
 
-  const readOnlyData = currentView?.fields?.sourceType === 'google_form'; // blocks that are synced cannot be edited
+  const readOnlySourceData = currentView?.fields?.sourceType === 'google_form'; // blocks that are synced cannot be edited
 
   useEffect(() => {
     if (views.length > 0 && !currentViewId) {
@@ -177,7 +177,7 @@ export default function DatabaseView({ containerWidth, readOnly: readOnlyOverrid
           onDeleteView={deleteView}
           hideBanner
           readOnly={readOnly}
-          readOnlyData={readOnlyData}
+          readOnlySourceData={readOnlySourceData}
           board={board}
           embeddedBoardPath={pages[pageId]?.path}
           setPage={debouncedPageUpdate}

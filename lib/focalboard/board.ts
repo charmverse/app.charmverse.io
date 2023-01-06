@@ -53,7 +53,7 @@ type Board = Block & {
 function createBoard({
   block,
   addDefaultProperty
-}: { block?: Block; addDefaultProperty?: boolean } | undefined = {}): Board {
+}: { block?: Partial<Block>; addDefaultProperty?: boolean } | undefined = {}): Board {
   const cardProperties: IPropertyTemplate[] =
     block?.fields?.cardProperties?.map((o: IPropertyTemplate) => {
       return {

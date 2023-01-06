@@ -38,7 +38,7 @@ type Props = {
   addCardTemplate: () => void;
   editCardTemplate: (cardTemplateId: string) => void;
   readOnly: boolean;
-  readOnlyData: boolean;
+  readOnlySourceData: boolean;
   dateDisplayProperty?: IPropertyTemplate;
   addViewButton?: ReactNode;
   disableUpdatingUrl?: boolean;
@@ -184,7 +184,7 @@ function ViewHeader(props: Props) {
 
             {/* New card button */}
 
-            {!props.readOnlyData && (
+            {!props.readOnlySourceData && (
               <NewCardButton
                 addCard={props.addCard}
                 addCardFromTemplate={addPageFromTemplate}

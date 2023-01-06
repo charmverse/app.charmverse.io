@@ -67,7 +67,7 @@ type Props = WrappedComponentProps &
     views: BoardView[];
     hideBanner?: boolean;
     readOnly: boolean;
-    readOnlyData: boolean;
+    readOnlySourceData: boolean;
     addCard: (card: Card) => void;
     pageIcon?: string | null;
     setPage: (p: Partial<Page>) => void;
@@ -144,7 +144,7 @@ function CenterPanel(props: Props) {
 
   const backgroundRef = React.createRef<HTMLDivElement>();
   const keydownHandler = (keyName: string, e: KeyboardEvent) => {
-    if (e.target !== document.body || props.readOnly || props.readOnlyData) {
+    if (e.target !== document.body || props.readOnly || props.readOnlySourceData) {
       return;
     }
 
@@ -403,6 +403,15 @@ function CenterPanel(props: Props) {
     }
   }, [activeView?.id]);
 
+  // refresh google forms data whenever source changes
+  useEffect(() => {
+    if (activeView) {
+      if (activeView.fields.sourceType === 'google_form') {
+        // console.log('sync responses', activeView.fields.sourceData)
+        charmClient.google.forms.syncFormResponses({ viewId: activeView.id });
+      }
+    }
+  }, [activeView?.fields.sourceData?.formId]);
   return (
     <div
       className={`BoardComponent ${isEmbedded ? 'embedded-board' : ''}`}
@@ -464,7 +473,7 @@ function CenterPanel(props: Props) {
           addCardTemplate={() => addCard('', true, {}, false, true)}
           editCardTemplate={editCardTemplate}
           readOnly={props.readOnly}
-          readOnlyData={props.readOnlyData}
+          readOnlySourceData={props.readOnlySourceData}
           embeddedBoardPath={props.embeddedBoardPath}
         />
       </div>
@@ -493,7 +502,7 @@ function CenterPanel(props: Props) {
                 </Link>
               </Typography>
             )}
-            {activePage && boardPageType === 'inline_linked_board' && (
+            {activePage && activeView?.fields?.sourceType === 'board_page' && (
               <Button
                 color='secondary'
                 startIcon={<CallMadeIcon />}
@@ -521,7 +530,7 @@ function CenterPanel(props: Props) {
                 visibleGroups={visibleGroups}
                 hiddenGroups={hiddenGroups}
                 selectedCardIds={state.selectedCardIds}
-                readOnly={props.readOnly || props.readOnlyData}
+                readOnly={props.readOnly || props.readOnlySourceData}
                 onCardClicked={cardClicked}
                 addCard={addCard}
                 showCard={showCard}
@@ -536,7 +545,7 @@ function CenterPanel(props: Props) {
                 views={props.views}
                 visibleGroups={visibleGroups}
                 selectedCardIds={state.selectedCardIds}
-                readOnly={props.readOnly || props.readOnlyData}
+                readOnly={props.readOnly || props.readOnlySourceData}
                 cardIdToFocusOnRender={state.cardIdToFocusOnRender}
                 showCard={showCard}
                 addCard={addCard}
@@ -548,7 +557,7 @@ function CenterPanel(props: Props) {
                 board={activeBoard}
                 cards={cards}
                 activeView={activeView}
-                readOnly={props.readOnly || props.readOnlyData}
+                readOnly={props.readOnly || props.readOnlySourceData}
                 dateDisplayProperty={dateDisplayProperty}
                 showCard={showCard}
                 addCard={(properties: Record<string, string>) => {
@@ -562,7 +571,7 @@ function CenterPanel(props: Props) {
                 board={activeBoard}
                 cards={cards}
                 activeView={activeView}
-                readOnly={props.readOnly || props.readOnlyData}
+                readOnly={props.readOnly || props.readOnlySourceData}
                 onCardClicked={cardClicked}
                 selectedCardIds={state.selectedCardIds}
                 addCard={(show) => addCard('', show)}

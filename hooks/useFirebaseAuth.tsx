@@ -11,8 +11,6 @@ import { ExternalServiceError, InvalidInputError, SystemError } from 'lib/utilit
 
 import type { AnyIdLogin } from '../components/login/Login';
 
-const scopes = ['openid', 'email', 'profile'];
-
 export function useFirebaseAuth() {
   const [firebaseApp] = useState<FirebaseApp>(initializeApp(googleWebClientConfig));
   // Google client setup start
@@ -20,12 +18,11 @@ export function useFirebaseAuth() {
   const { user, setUser } = useUser();
 
   const [isConnectingGoogle, setIsConnectingGoogle] = useState(false);
-  // console.log(firebaseApp);
+
   useEffect(() => {
-    scopes.forEach((_scope) => {
-      // console.log('add scope', _scope);
-      provider.addScope(_scope);
-    });
+    provider.addScope('email');
+    provider.addScope('openid');
+    provider.addScope('profile');
     provider.setCustomParameters({
       prompt: 'select_account'
     });
@@ -37,7 +34,6 @@ export function useFirebaseAuth() {
       auth.languageCode = 'en';
 
       const result = await signInWithPopup(auth, provider);
-      // console.log('result', result);
 
       // This gives you a Google Access Token. You can use it to access the Google API.
       const credential = GoogleAuthProvider.credentialFromResult(result);

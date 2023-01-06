@@ -50,7 +50,7 @@ export function DatabasePage({ page, setPage, readOnly = false, pagePermissions 
   const { setFocalboardViewsRecord } = useFocalboardViews();
 
   const readOnlyBoard = readOnly || !pagePermissions?.edit_content;
-  const readOnlyData = activeView?.fields?.sourceType === 'google_form'; // blocks that are synced cannot be edited
+  const readOnlySourceData = activeView?.fields?.sourceType === 'google_form'; // blocks that are synced cannot be edited
 
   useEffect(() => {
     const boardId = page.boardId;
@@ -158,7 +158,7 @@ export function DatabasePage({ page, setPage, readOnly = false, pagePermissions 
         <div className='focalboard-body full-page'>
           <CenterPanel
             readOnly={Boolean(readOnlyBoard)}
-            readOnlyData={readOnlyData}
+            readOnlySourceData={readOnlySourceData}
             board={board}
             setPage={setPage}
             pageIcon={page.icon}
