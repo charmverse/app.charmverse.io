@@ -72,7 +72,7 @@ export function GoogleDataSource(props: Props) {
         >
           <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
             Choose from
-            <Tooltip title={credential.name}>
+            <Tooltip disableInteractive title={credential.name}>
               <span> {credential.name}</span>
             </Tooltip>
           </span>

@@ -39,7 +39,6 @@ export async function syncFormResponses({ createdBy, view }: { createdBy: string
   const rootBoardPage = await prisma.page.findUniqueOrThrow({ where: { id: rootId }, include: { permissions: true } });
   board.createdBy = createdBy;
   board.spaceId = rootBoardPage.spaceId;
-  board.spaceId = rootBoardPage.spaceId;
   board.parentId = rootId;
   board.rootId = rootId;
   board.updatedBy = createdBy;

@@ -109,6 +109,7 @@ async function createBlocks(req: NextApiRequest, res: NextApiResponse<Omit<Block
     updatedBy: req.session.user.id,
     deletedAt: null
   }));
+
   const cardBlocks = newBlocks.filter((newBlock) => newBlock.type === 'card');
 
   const parentPageIds = cardBlocks.map((block) => block.parentId).filter((id) => Boolean(id));
@@ -239,22 +240,6 @@ async function createBlocks(req: NextApiRequest, res: NextApiResponse<Omit<Block
       }
     }
   ]);
-
-  // const viewsLinkedToGoogleForm = newBlocks.filter(
-  //   (newBlock) => newBlock.type === 'view' && (newBlock.fields as BoardViewFields)?.sourceType === 'google_form'
-  // );
-
-  // if (viewsLinkedToGoogleForm.length) {
-  //   Promise.all(
-  //     viewsLinkedToGoogleForm.map((view) => {
-  //       const sourceData = (view.fields as any).sourceData as GoogleFormSourceData;
-  //       return syncFormResponses({ sourceData });
-  //     })
-  //   ).catch((err) => {
-  //     const viewIds = viewsLinkedToGoogleForm.map((block) => block.id);
-  //     log.error('Could not sync google form', { viewIds, error: err });
-  //   });
-  // }
 
   return res.status(200).json(newBlocks);
 }

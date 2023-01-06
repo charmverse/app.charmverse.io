@@ -82,7 +82,7 @@ export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: 
   const { user } = useUser();
   const currentSpace = useCurrentSpace();
 
-  const activeBoardId = view?.fields.linkedSourceId || view?.rootId;
+  const activeBoardId = view?.fields.sourceData?.boardId ?? view?.fields.linkedSourceId ?? view?.rootId;
   const board = boards.find((b) => b.id === activeBoardId);
 
   if (!board || !view) {

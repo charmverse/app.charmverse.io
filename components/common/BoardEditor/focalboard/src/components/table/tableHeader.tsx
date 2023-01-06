@@ -9,6 +9,7 @@ import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined';
 import type { PopoverProps } from '@mui/material';
 import {
+  Tooltip,
   Divider,
   IconButton,
   ListItemIcon,
@@ -38,6 +39,7 @@ import HorizontalGrip from './horizontalGrip';
 
 type Props = {
   readOnly: boolean;
+  readOnlySourceData: boolean;
   sorted: 'up' | 'down' | 'none';
   name: string;
   board: Board;
@@ -52,7 +54,7 @@ type Props = {
 };
 
 function TableHeader(props: Props): JSX.Element {
-  const { activeView, board, views, cards, sorted, name, type, template, readOnly } = props;
+  const { activeView, board, views, cards, sorted, name, type, template, readOnly, readOnlySourceData } = props;
   const { id: templateId } = template;
   const [isDragging, isOver, columnRef] = useSortable('column', props.template, !readOnly, props.onDrop);
   const columnWidth = (_templateId: string): number => {
@@ -257,17 +259,19 @@ function TableHeader(props: Props): JSX.Element {
             }
           })}
         </div>
-        <Typography
-          component='span'
-          variant='subtitle1'
-          sx={{
-            textOverflow: 'ellipsis',
-            overflow: 'hidden',
-            whiteSpace: 'nowrap'
-          }}
-        >
-          {name}
-        </Typography>
+        <Tooltip disableInteractive title={name}>
+          <Typography
+            component='span'
+            variant='subtitle1'
+            sx={{
+              textOverflow: 'ellipsis',
+              overflow: 'hidden',
+              whiteSpace: 'nowrap'
+            }}
+          >
+            {name}
+          </Typography>
+        </Tooltip>
         {!readOnly && (
           <IconButton size='small' sx={{ ml: 1 }} onClick={reverseSort}>
             {sorted === 'up' && <ArrowUpwardOutlinedIcon fontSize='small' />}
@@ -292,7 +296,7 @@ function TableHeader(props: Props): JSX.Element {
       ref={columnRef}
     >
       <Stack width='100%' justifyContent='center'>
-        {readOnly ? (
+        {readOnly ?? readOnlySourceData ? (
           label
         ) : (
           <div ref={toggleRef}>

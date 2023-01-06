@@ -550,7 +550,8 @@ function CenterPanel(props: Props) {
                 views={props.views}
                 visibleGroups={visibleGroups}
                 selectedCardIds={state.selectedCardIds}
-                readOnly={props.readOnly || props.readOnlySourceData}
+                readOnly={props.readOnly}
+                readOnlySourceData={props.readOnlySourceData}
                 cardIdToFocusOnRender={state.cardIdToFocusOnRender}
                 showCard={showCard}
                 addCard={addCard}

@@ -329,12 +329,10 @@ const PageTreeItem = forwardRef<any, PageTreeItemProps>((props, ref) => {
             <MoreHorizIcon color='secondary' fontSize='small' />
           </MemoizedIconButton>
 
-          {userSpacePermissions?.createPage &&
-            (pageType === 'board' ? (
-              <AddNewCard pageId={pageId} />
-            ) : (
-              <NewPageMenu tooltip='Add a page inside' addPage={addSubPage} />
-            ))}
+          {userSpacePermissions?.createPage && pageType === 'board' && <AddNewCard pageId={pageId} />}
+          {userSpacePermissions?.createPage && pageType === 'page' && (
+            <NewPageMenu tooltip='Add a page inside' addPage={addSubPage} />
+          )}
         </div>
       </PageLink>
     ),
