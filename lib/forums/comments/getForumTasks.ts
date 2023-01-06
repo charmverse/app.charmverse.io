@@ -151,7 +151,7 @@ async function getPostComments({ userId, spaceIds }: GetForumCommentsInput): Pro
   const parentComments = await prisma.postComment.findMany({
     where: {
       id: {
-        in: comments.map((c) => c.parentId ?? '')
+        in: comments.map((c) => c.parentId ?? '').filter((c) => !!c)
       },
       createdBy: userId,
       deletedAt: null,
