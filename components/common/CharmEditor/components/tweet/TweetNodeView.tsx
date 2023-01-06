@@ -6,6 +6,7 @@ import Script from 'next/script';
 import { useRef } from 'react';
 
 import log from 'lib/log';
+import { randomIntFromInterval } from 'lib/utilities/random';
 
 import BlockAligner from '../BlockAligner';
 import { MediaSelectionPopup } from '../common/MediaSelectionPopup';
@@ -105,7 +106,7 @@ export function TweetNodeView({ deleteNode, readOnly, node, selected, updateAttr
 
   return (
     <>
-      <Script src={twitterWidgetJs} onReady={onLoadScript} />
+      <Script src={`${twitterWidgetJs}?id=${randomIntFromInterval(1, 1000000)}`} onReady={onLoadScript} />
       <BlockAligner onDelete={deleteNode}>
         <StyledTweet ref={ref} />
       </BlockAligner>
