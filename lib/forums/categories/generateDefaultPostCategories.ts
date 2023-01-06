@@ -1,4 +1,5 @@
 import type { Prisma } from '@prisma/client';
+import { v4 } from 'uuid';
 
 export const defaultPostCategories = [
   'General',
@@ -11,6 +12,7 @@ export const defaultPostCategories = [
 
 export function generateDefaultPostCategories(spaceId: string): Prisma.PostCategoryCreateManyInput[] {
   return defaultPostCategories.map((category) => ({
+    id: v4(),
     name: category,
     spaceId
   }));

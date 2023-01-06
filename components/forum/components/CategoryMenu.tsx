@@ -30,11 +30,12 @@ const StyledBox = styled(Box)`
 `;
 
 function ForumFilterListLink({ category, label, sort }: { label: string; category?: PostCategory; sort?: string }) {
-  const { deleteForumCategory, updateForumCategory } = useForumCategories();
+  const { deleteForumCategory, updateForumCategory, setDefaultPostCategory } = useForumCategories();
   const router = useRouter();
   const selectedCategory = router.query.categoryId as string | undefined;
   const selectedSort = router.query.sort as string | undefined;
   const admin = isAdmin();
+
   const link = category
     ? `/${router.query.domain}/forum?categoryId=${category.id}`
     : sort
@@ -77,6 +78,7 @@ function ForumFilterListLink({ category, label, sort }: { label: string; categor
             category={category as PostCategory}
             onChange={updateForumCategory}
             onDelete={deleteForumCategory}
+            onSetNewDefaultCategory={setDefaultPostCategory}
           />
         </span>
       )}
