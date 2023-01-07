@@ -43,7 +43,10 @@ inputs:
   NEXT_PUBLIC_GOOGLE_APP_ID:
     description: "..."
     required: false
-  
+  NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_ID_SENSITIVE:
+    description: "..."
+    required: false
+
 
 runs:
   using: 'composite'

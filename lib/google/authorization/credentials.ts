@@ -4,7 +4,7 @@ import { prisma } from 'db';
 import log from 'lib/log';
 
 import { getClient } from './authClient';
-import { encryptToken } from './token';
+import { decryptToken, encryptToken } from './token';
 
 type AccountRequest = {
   credentialId: string;
@@ -51,6 +51,15 @@ export async function getCredential({ credentialId }: AccountRequest) {
       id: credentialId
     }
   });
+}
+
+export async function getCredentialToken({ credentialId }: AccountRequest) {
+  const credential = await prisma.googleCredential.findUniqueOrThrow({
+    where: {
+      id: credentialId
+    }
+  });
+  return decryptToken(credential.refreshToken);
 }
 
 export async function getCredentialsForUser({ userId }: { userId: string }) {

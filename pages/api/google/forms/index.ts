@@ -2,7 +2,7 @@ import { GaxiosError } from 'gaxios';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { getCredential, invalidateCredential } from 'lib/google/authorization/credentials';
+import { getCredentialToken, invalidateCredential } from 'lib/google/authorization/credentials';
 // import type { GoogleForm } from 'lib/google/forms/forms';
 import { getForms } from 'lib/google/forms/getForms';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
@@ -31,9 +31,9 @@ async function getFormsResponse(req: NextApiRequest, res: NextApiResponse) {
     throw new InvalidInputError('Credential id is required');
   }
 
-  const credential = await getCredential({ credentialId });
   try {
-    const { files } = await getForms(credential);
+    const refreshToken = await getCredentialToken({ credentialId });
+    const { files } = await getForms(refreshToken);
 
     const result = (files ?? []).map(
       (form): GoogleFormItem => ({
@@ -47,7 +47,7 @@ async function getFormsResponse(req: NextApiRequest, res: NextApiResponse) {
   } catch (error) {
     if (error instanceof GaxiosError) {
       if (error.response?.data.error === 'invalid_grant') {
-        await invalidateCredential({ credentialId });
+        await invalidateCredential({ credentialId, error: error.response.data.error });
         throw new UnauthorisedActionError('Invalid credentials');
       }
     }

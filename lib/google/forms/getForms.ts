@@ -2,12 +2,9 @@ import * as googleDrive from '@googleapis/drive';
 
 import { getClient } from '../authorization/authClient';
 
-type Credential = {
-  refreshToken: string;
-};
 // Requires 'https://www.googleapis.com/auth/forms.body.readonly' scope
-export async function getForms(credential: Credential) {
-  const forms = _getDriveClient(credential.refreshToken);
+export async function getForms(refreshToken: string) {
+  const forms = _getDriveClient(refreshToken);
 
   // how to search files: https://developers.google.com/drive/api/guides/search-files
   const res = await forms.files.list({

@@ -17,7 +17,7 @@ import { isTruthy } from 'lib/utilities/types';
 import { relay } from 'lib/websockets/relay';
 
 import { getClient } from '../authorization/authClient';
-import { getCredential } from '../authorization/credentials';
+import { getCredentialToken } from '../authorization/credentials';
 
 import { syncThrottlePeriod, userEmailProperty, responseLinkProperty } from './config';
 
@@ -117,10 +117,10 @@ async function getHiddenDatabaseBlock({ boardId }: { boardId?: string } = {}) {
   return { board, hasRefreshedRecently, lastUpdated, responseCount };
 }
 
-async function getFormAndResponses(sourceData: GoogleFormSourceData, lastUpdated: Date | null) {
+async function getFormAndResponses(sourceData: GoogleFormSourceData, lastUpdated: Date | null = new Date(1970)) {
   const { formId } = sourceData;
-  const credential = await getCredential({ credentialId: sourceData.credentialId });
-  const forms = _getFormsClient(credential.refreshToken);
+  const refreshToken = await getCredentialToken(sourceData);
+  const forms = _getFormsClient(refreshToken);
 
   const { data: form } = await forms.forms.get({
     formId
@@ -132,7 +132,7 @@ async function getFormAndResponses(sourceData: GoogleFormSourceData, lastUpdated
   let maxCalls = 20; // avoid endless loop
   while (pageToken && maxCalls > 0) {
     const res = await forms.forms.responses.list({
-      // filter: lastUpdated ? `timestamp >= '${lastUpdated.toISOString()}'` : undefined,
+      filter: lastUpdated ? `timestamp >= '${lastUpdated.toISOString()}'` : undefined,
       formId
     });
     if (res.data.responses) {

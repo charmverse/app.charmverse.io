@@ -1,6 +1,7 @@
 import Cryptr from 'cryptr';
 
-const secret = typeof process.env.OAUTH_ENCRYPTION_SECRET === 'string' ? process.env.OAUTH_ENCRYPTION_SECRET : '';
+const secret =
+  typeof process.env.GOOGLE_OAUTH_ENCRYPTION_SECRET === 'string' ? process.env.GOOGLE_OAUTH_ENCRYPTION_SECRET : '';
 
 const cryptr = new Cryptr(secret);
 

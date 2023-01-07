@@ -14,7 +14,7 @@ export const cookieName = 'charm.sessionId';
 // web sockets
 export const websocketsHost = process.env.NEXT_PUBLIC_WEBSOCKETS_HOST;
 // Google config
-export const googleOAuthClientId = process.env.GOOGLE_OAUTH_CLIENT_ID || process.env.NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_ID;
+export const googleOAuthClientId = process.env.GOOGLE_OAUTH_CLIENT_ID;
 export const googleOAuthClientSecret = process.env.GOOGLE_OAUTH_CLIENT_SECRET;
 // Google client
 // To retrieve these values, go to Firebase, then project settings, and retrieve the JSON for the web client. You can then assign the values for each key in the client secrets area.
@@ -26,3 +26,8 @@ export const googleWebClientConfig = {
   messagingSenderId: process.env.NEXT_PUBLIC_GOOGLE_MESSAGING_SENDER_ID,
   appId: process.env.NEXT_PUBLIC_GOOGLE_APP_ID
 };
+
+// Google config with sensitive scopes (to eventually replace the primary config)
+export const googleOAuthClientIdSensitive =
+  process.env.GOOGLE_OAUTH_CLIENT_ID_SENSITIVE || process.env.NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_ID_SENSITIVE;
+export const googleOAuthClientSecretSensitive = process.env.GOOGLE_OAUTH_CLIENT_SECRET_SENSITIVE;

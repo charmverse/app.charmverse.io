@@ -3,7 +3,7 @@
 import { useState } from 'react';
 
 import charmClient from 'charmClient';
-import { googleOAuthClientId } from 'config/constants';
+import { googleOAuthClientIdSensitive as googleOAuthClientId } from 'config/constants';
 import { formScopes } from 'lib/google/forms/config';
 import log from 'lib/log';
 import type { CredentialItem } from 'pages/api/google/credentials';

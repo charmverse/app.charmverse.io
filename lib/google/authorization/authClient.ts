@@ -1,6 +1,9 @@
 import { OAuth2Client } from 'google-auth-library';
 
-import { googleOAuthClientId, googleOAuthClientSecret } from 'config/constants';
+import {
+  googleOAuthClientIdSensitive as googleOAuthClientId,
+  googleOAuthClientSecretSensitive as googleOAuthClientSecret
+} from 'config/constants';
 import log from 'lib/log';
 
 // The OAuth2Client is stateful when using user credentials, so as a best practice, we always create a new one each time
