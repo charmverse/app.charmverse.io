@@ -13,6 +13,7 @@ import { injectIntl } from 'react-intl';
 import type { ConnectedProps } from 'react-redux';
 import { connect } from 'react-redux';
 import { mutate } from 'swr';
+import { v4 as uuid } from 'uuid';
 
 import charmClient from 'charmClient';
 import PageBanner, { randomBannerImage } from 'components/[pageId]/DocumentPage/components/PageBanner';
@@ -366,6 +367,7 @@ function CenterPanel(props: Props) {
 
   async function selectViewSource(fields: Pick<BoardViewFields, 'linkedSourceId' | 'sourceData' | 'sourceType'>) {
     const view = createTableView(board);
+    view.id = uuid();
     view.fields.sourceData = fields.sourceData;
     view.fields.sourceType = fields.sourceType;
     view.fields.linkedSourceId = fields.linkedSourceId;

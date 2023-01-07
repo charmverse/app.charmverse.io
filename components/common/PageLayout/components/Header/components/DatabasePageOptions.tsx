@@ -95,11 +95,6 @@ export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: 
       viewId: view.id
     })
   );
-  const cardPages: CardPage[] = cards
-    .map((card) => ({ card, page: pages[card.id] }))
-    .filter((item): item is CardPage => !!item.page);
-
-  const sortedCardPages = sortCards(cardPages, board, view, members);
 
   async function onDeletePage() {
     await deletePage({
@@ -109,6 +104,11 @@ export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: 
   }
 
   const exportCsv = () => {
+    const cardPages: CardPage[] = cards
+      .map((card) => ({ card, page: pages[card.id] }))
+      .filter((item): item is CardPage => !!item.page);
+
+    const sortedCardPages = sortCards(cardPages, board, view, members);
     const _cards = sortedCardPages.map(({ card, page }) => {
       return {
         ...card,
@@ -116,7 +116,6 @@ export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: 
         title: page.title
       };
     });
-
     onExportCsvTrigger(board, view, _cards, intl);
     closeMenu();
     const spaceId = pages[pageId]?.spaceId;
