@@ -37,6 +37,7 @@ import { ViewSourceOptions } from './viewSourceOptions';
 
 interface Props {
   board: Board;
+  parentBoard: Board; // we need the parent board when creating or updating the view
   view: BoardView;
   closeSidebar: () => void;
   isOpen: boolean;
@@ -88,7 +89,7 @@ function ViewSidebar(props: Props) {
   }
 
   async function selectViewSource(fields: Pick<BoardViewFields, 'linkedSourceId' | 'sourceData' | 'sourceType'>) {
-    const newView = createTableView(props.board, props.view);
+    const newView = createTableView(props.parentBoard, props.view);
     newView.fields.sourceData = fields.sourceData;
     newView.fields.sourceType = fields.sourceType;
     newView.fields.linkedSourceId = fields.linkedSourceId;

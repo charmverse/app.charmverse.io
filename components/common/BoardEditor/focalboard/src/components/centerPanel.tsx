@@ -590,6 +590,7 @@ function CenterPanel(props: Props) {
           {activeBoard && activeView && (
             <ViewSidebar
               board={activeBoard}
+              parentBoard={board}
               view={activeView}
               isOpen={state.showSettings === 'view-options'}
               closeSidebar={closeSettings}

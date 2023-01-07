@@ -132,7 +132,7 @@ async function getFormAndResponses(sourceData: GoogleFormSourceData, lastUpdated
   let maxCalls = 20; // avoid endless loop
   while (pageToken && maxCalls > 0) {
     const res = await forms.forms.responses.list({
-      filter: lastUpdated ? `timestamp >= '${lastUpdated.toISOString()}'` : undefined,
+      // filter: lastUpdated ? `timestamp >= '${lastUpdated.toISOString()}'` : undefined,
       formId
     });
     if (res.data.responses) {
