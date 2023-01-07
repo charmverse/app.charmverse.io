@@ -1,10 +1,9 @@
-import { Prisma } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { prisma } from 'db';
 import { getCredentialsFromGoogleCode } from 'lib/google/authorization/authClient';
-import { deleteCredential, getCredentialsForUser } from 'lib/google/authorization/credentials';
+import { deleteCredential, getCredentialsForUser, saveCredential } from 'lib/google/authorization/credentials';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { InvalidInputError } from 'lib/utilities/errors/errors';
@@ -28,8 +27,6 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 handler.use(requireUser).post(createCredentialEndpoint).get(getCredentialEndpoint).delete(deleteCredentialEndpoint);
 
 async function createCredentialEndpoint(req: NextApiRequest, res: NextApiResponse) {
-  const userId = req.session.user.id;
-
   const query = req.body as CreateCredentialRequest;
   const credential = await getCredentialsFromGoogleCode(query.code);
   if (!credential?.tokens.refresh_token) {
@@ -38,25 +35,11 @@ async function createCredentialEndpoint(req: NextApiRequest, res: NextApiRespons
   if (!credential?.email) {
     throw new InvalidInputError('No email found');
   }
-  const { id, name } = await prisma.googleCredential.upsert({
-    where: {
-      userId_name: {
-        userId,
-        name: credential.email
-      }
-    },
-    update: {
-      refreshToken: credential.tokens.refresh_token,
-      scope: query.scope,
-      error: Prisma.DbNull,
-      expiredAt: null
-    },
-    create: {
-      userId,
-      name: credential.email,
-      scope: query.scope,
-      refreshToken: credential.tokens.refresh_token
-    }
+  const { id, name } = await saveCredential({
+    name: credential.email,
+    refreshToken: credential.tokens.refresh_token,
+    scope: query.scope,
+    userId: req.session.user.id
   });
 
   const response: CredentialItem = {

@@ -1,11 +1,49 @@
+import { Prisma } from '@prisma/client';
+
 import { prisma } from 'db';
 import log from 'lib/log';
 
 import { getClient } from './authClient';
+import { encryptToken } from './token';
 
 type AccountRequest = {
   credentialId: string;
 };
+
+export function saveCredential({
+  userId,
+  name,
+  refreshToken,
+  scope
+}: {
+  userId: string;
+  name: string;
+  refreshToken: string;
+  scope: string;
+}) {
+  refreshToken = encryptToken(refreshToken);
+
+  return prisma.googleCredential.upsert({
+    where: {
+      userId_name: {
+        userId,
+        name
+      }
+    },
+    update: {
+      refreshToken,
+      scope,
+      error: Prisma.DbNull,
+      expiredAt: null
+    },
+    create: {
+      userId,
+      name,
+      scope,
+      refreshToken
+    }
+  });
+}
 
 export async function getCredential({ credentialId }: AccountRequest) {
   return prisma.googleCredential.findUniqueOrThrow({
