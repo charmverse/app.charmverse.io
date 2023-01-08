@@ -3,6 +3,7 @@
 import CallMadeIcon from '@mui/icons-material/CallMade';
 import LaunchIcon from '@mui/icons-material/LaunchOutlined';
 import { Box, Typography, Link } from '@mui/material';
+import CircularProgress from '@mui/material/CircularProgress';
 import type { Page } from '@prisma/client';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
@@ -96,6 +97,8 @@ function CenterPanel(props: Props) {
     // assume this is a page type 'inline_linked_board' or 'linked_board' if no view exists
     showSettings: !props.activeView ? 'create-linked-view' : null
   });
+
+  const [loadingFormResponses, setLoadingFormResponses] = useState(false);
 
   const router = useRouter();
   const space = useCurrentSpace();
@@ -416,7 +419,10 @@ function CenterPanel(props: Props) {
   useEffect(() => {
     if (activeView) {
       if (activeView.fields.sourceType === 'google_form') {
-        charmClient.google.forms.syncFormResponses({ viewId: activeView.id });
+        setLoadingFormResponses(true);
+        charmClient.google.forms.syncFormResponses({ viewId: activeView.id }).finally(() => {
+          setLoadingFormResponses(false);
+        });
       }
     }
   }, [activeView?.fields.sourceData?.formId]);
@@ -509,8 +515,13 @@ function CenterPanel(props: Props) {
                   sx={{ color: 'inherit', fontWeight: 700 }}
                 >
                   {activeView?.fields.sourceData?.formName || 'Untitled'}
-                  <LaunchIcon fontSize='small' sx={{ ml: 0.5 }} />
+                  <LaunchIcon fontSize='small' sx={{ ml: 0.5, position: 'relative', top: 2 }} />
                 </Link>
+                {loadingFormResponses && (
+                  <Box ml={2} component='span'>
+                    <CircularProgress style={{ color: '#ccc', height: 14, width: 14 }} />
+                  </Box>
+                )}
               </Typography>
             )}
             {activePage && activeView?.fields?.sourceType === 'board_page' && (
