@@ -116,35 +116,35 @@ export function PagesProvider({ children }: { children: ReactNode }) {
     }
     const userSpaceRole = user?.spaceRoles.find((spaceRole) => spaceRole.spaceId === targetPage.spaceId);
 
-    // For now, we allow admin users to override explicitly assigned permissions
-    if (isAdmin) {
-      computedPermissions.addPermissions(Object.keys(PageOperations) as PageOperationType[]);
-      return computedPermissions;
-    }
-
-    const applicableRoles: Role[] =
-      userSpaceRole?.spaceRoleToRole?.map((spaceRoleToRole) => spaceRoleToRole.role) ?? [];
-
-    targetPage.permissions?.forEach((permission) => {
-      // User gets permission via role or as an individual
-      const shouldApplyPermission =
-        (permission.userId && permission.userId === user?.id) ||
-        (permission.roleId && applicableRoles.some((role) => role.id === permission.roleId)) ||
-        (userSpaceRole && permission.spaceId === userSpaceRole.spaceId) ||
-        permission.public === true;
-
-      const isPreventedBySynced =
-        targetPage.type === 'card_synced' && ['edit', 'delete'].includes(permission.permissionLevel);
-
-      if (shouldApplyPermission && !isPreventedBySynced) {
-        const permissionsToEnable =
-          permission.permissionLevel === 'custom'
-            ? permission.permissions
-            : permissionTemplates[permission.permissionLevel];
-
-        computedPermissions.addPermissions(permissionsToEnable);
+    if (targetPage.type === 'card_synced') {
+      computedPermissions.addPermissions(permissionTemplates.view);
+    } else {
+      // For now, we allow admin users to override explicitly assigned permissions
+      if (isAdmin) {
+        computedPermissions.addPermissions(Object.keys(PageOperations) as PageOperationType[]);
+        return computedPermissions;
       }
-    });
+
+      const applicableRoles: Role[] =
+        userSpaceRole?.spaceRoleToRole?.map((spaceRoleToRole) => spaceRoleToRole.role) ?? [];
+
+      targetPage.permissions?.forEach((permission) => {
+        // User gets permission via role or as an individual
+        const shouldApplyPermission =
+          (permission.userId && permission.userId === user?.id) ||
+          (permission.roleId && applicableRoles.some((role) => role.id === permission.roleId)) ||
+          (userSpaceRole && permission.spaceId === userSpaceRole.spaceId) ||
+          permission.public === true;
+        if (shouldApplyPermission) {
+          const permissionsToEnable =
+            permission.permissionLevel === 'custom'
+              ? permission.permissions
+              : permissionTemplates[permission.permissionLevel];
+
+          computedPermissions.addPermissions(permissionsToEnable);
+        }
+      });
+    }
 
     return computedPermissions;
   }

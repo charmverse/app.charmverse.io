@@ -69,7 +69,7 @@ async function extractPageArtifacts(linkedPageIds: string[]) {
           }
         },
         {
-          parentId: {
+          rootId: {
             in: publicPagesIds
           }
         }
