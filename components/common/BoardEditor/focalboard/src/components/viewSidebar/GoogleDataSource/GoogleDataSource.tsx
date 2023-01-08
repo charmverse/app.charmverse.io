@@ -156,6 +156,13 @@ function GoogleFormSelect({
   if (!forms) {
     return <LoadingComponent size={30} minHeight={60} />;
   }
+  if (forms.length === 0) {
+    return (
+      <ListItem>
+        <Typography color='text.secondary'>No forms found</Typography>
+      </ListItem>
+    );
+  }
   return (
     <>
       {forms.map((form) => (
