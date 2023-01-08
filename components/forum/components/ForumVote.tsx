@@ -20,7 +20,7 @@ export function ForumVote({ votes, onVote }: { votes: ForumVotes; onVote: (upvot
     }
   }
 
-  function getStyle(activeColor: string) {
+  function getStyle(activeColor: string | null) {
     if (activeColor) {
       return { fill: activeColor, fontSize: 16 };
     } else {
