@@ -2,47 +2,14 @@ import type { BaseRawNodeSpec } from '@bangle.dev/core';
 import type { DOMOutputSpec, Node } from '@bangle.dev/pm';
 import BookmarkIcon from '@mui/icons-material/Bookmark';
 import { Box } from '@mui/material';
-import type { HTMLAttributes } from 'react';
-import { memo, useMemo } from 'react';
+import { memo } from 'react';
 
+import fetch from 'adapters/http/fetch.server';
+
+import BlockAligner from './BlockAligner';
 import { MediaSelectionPopup } from './common/MediaSelectionPopup';
 import { MediaUrlInput } from './common/MediaUrlInput';
-import { extractAttrsFromUrl } from './nft/nftUtils';
 import type { CharmNodeViewProps } from './nodeView/nodeView';
-
-function EmptyBookmarkContainer({
-  isSelected,
-  node,
-  deleteNode,
-  updateAttrs
-}: HTMLAttributes<HTMLDivElement> & {
-  updateAttrs: CharmNodeViewProps['updateAttrs'];
-  deleteNode: () => void;
-  isSelected?: boolean;
-  node: Node;
-}) {
-  return (
-    <MediaSelectionPopup
-      icon={<BookmarkIcon fontSize='small' />}
-      isSelected={!!isSelected}
-      buttonText='Add a bookmark'
-      node={node}
-      onDelete={deleteNode}
-    >
-      <Box py={3}>
-        <MediaUrlInput
-          onSubmit={(url) => {
-            const _attrs = extractAttrsFromUrl(url);
-            if (_attrs) {
-              updateAttrs(_attrs);
-            }
-          }}
-          placeholder='https://dune.com/skateordao/Gnars'
-        />
-      </Box>
-    </MediaSelectionPopup>
-  );
-}
 
 export function bookmarkSpec() {
   const spec: BaseRawNodeSpec = {
@@ -50,7 +17,10 @@ export function bookmarkSpec() {
     type: 'node',
     schema: {
       attrs: {
-        src: {
+        url: {
+          default: null
+        },
+        html: {
           default: null
         },
         track: {
@@ -73,6 +43,7 @@ export function bookmarkSpec() {
 
 type BookmarkViewerProps = {
   url: string;
+  html: string;
 };
 
 function Bookmark({
@@ -82,19 +53,49 @@ function Bookmark({
   selected,
   deleteNode
 }: CharmNodeViewProps & { readOnly?: boolean }) {
-  const url: string = useMemo(() => node.attrs.src, [node.attrs.src]);
-  const autoOpen = node.marks.some((mark) => mark.type.name === 'tooltip-marker');
+  const { url, html } = node.attrs as BookmarkViewerProps;
 
-  if (!url) {
+  async function updateNode(bookmarkUrl: string) {
+    try {
+      const iframelyResponse = await fetch<{ html: string; error?: string }>(
+        `https://cdn.iframe.ly/api/iframely?url=${encodeURIComponent(bookmarkUrl)}&key=${
+          process.env.NEXT_PUBLIC_IFRAMELY_API_KEY
+        }&iframe=1&omit_script=1&media=0`
+      );
+      if (iframelyResponse.html) {
+        updateAttrs({
+          url: bookmarkUrl,
+          html: iframelyResponse.html
+        });
+      }
+    } catch (err) {
+      //
+    }
+  }
+
+  if (!url || !html) {
     if (readOnly) {
       return <div />;
     }
     return (
-      <EmptyBookmarkContainer node={node} updateAttrs={updateAttrs} deleteNode={deleteNode} isSelected={selected} />
+      <MediaSelectionPopup
+        icon={<BookmarkIcon fontSize='small' />}
+        isSelected={selected}
+        buttonText='Add a bookmark'
+        node={node}
+        onDelete={deleteNode}
+      >
+        <Box py={3}>
+          <MediaUrlInput onSubmit={updateNode} placeholder='https://dune.com/skateordao/Gnars' />
+        </Box>
+      </MediaSelectionPopup>
     );
   }
-
-  return <div>Hello World</div>;
+  return (
+    <BlockAligner onDelete={deleteNode}>
+      <div dangerouslySetInnerHTML={{ __html: html }} />
+    </BlockAligner>
+  );
 }
 
 export default memo(Bookmark);
