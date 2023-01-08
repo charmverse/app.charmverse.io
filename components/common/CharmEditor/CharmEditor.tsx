@@ -36,6 +36,7 @@ import type { PageContent } from 'lib/prosemirror/interfaces';
 import { extractDeletedThreadIds } from 'lib/prosemirror/plugins/inlineComments/extractDeletedThreadIds';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
+import Bookmark from './components/bookmark';
 import * as bulletList from './components/bulletList';
 import Callout, * as callout from './components/callout';
 import { userDataPlugin } from './components/charm/charm.plugins';
@@ -197,6 +198,10 @@ export function charmEditorPlugins({
     }),
     NodeView.createPlugin({
       name: 'pdf',
+      containerDOM: ['div', { draggable: 'false' }]
+    }),
+    NodeView.createPlugin({
+      name: 'bookmark',
       containerDOM: ['div', { draggable: 'false' }]
     }),
     NodeView.createPlugin({
@@ -612,6 +617,9 @@ function CharmEditor({
           }
           case 'pdf': {
             return <ResizablePDF {...allProps} />;
+          }
+          case 'bookmark': {
+            return <Bookmark {...allProps} />;
           }
           case 'poll': {
             return <poll.Component {...allProps} />;
