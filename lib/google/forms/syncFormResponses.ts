@@ -354,8 +354,8 @@ function getAnswersFromResponse({
   formId?: string;
   properties: IPropertyTemplate[];
   response: GoogleFormResponse;
-}): Record<string, string | number | string[]> {
-  const values: Record<string, string | number | string[]> = {};
+}): Record<string, null | string | number | string[]> {
+  const values: Record<string, null | string | number | string[]> = {};
 
   if (response.respondentEmail) {
     values[userEmailProperty] = response.respondentEmail;
