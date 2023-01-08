@@ -153,7 +153,9 @@ function GoogleFormSelect({
       </ListItem>
     );
   }
-  if (!forms) return <LoadingComponent size={30} minHeight={60} />;
+  if (!forms) {
+    return <LoadingComponent size={30} minHeight={60} />;
+  }
   return (
     <>
       {forms.map((form) => (

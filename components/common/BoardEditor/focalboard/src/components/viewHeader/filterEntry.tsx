@@ -18,17 +18,17 @@ import MenuWrapper from '../../widgets/menuWrapper';
 import FilterValue from './filterValue';
 
 type Props = {
-  board: Board;
+  properties: IPropertyTemplate[];
   view: BoardView;
   conditionClicked: (optionId: string, filter: FilterClause) => void;
   filter: FilterClause;
 };
 
 function FilterEntry(props: Props): JSX.Element {
-  const { board, view, filter } = props;
+  const { properties, view, filter } = props;
   const intl = useIntl();
 
-  const template = board.fields.cardProperties.find((o: IPropertyTemplate) => o.id === filter.propertyId);
+  const template = properties.find((o: IPropertyTemplate) => o.id === filter.propertyId);
   const propertyName = template ? template.name : '(unknown)';
   const key = `${filter.propertyId}-${filter.condition}-${filter.values.join(',')}`;
   return (
@@ -36,7 +36,7 @@ function FilterEntry(props: Props): JSX.Element {
       <MenuWrapper>
         <Button>{propertyName}</Button>
         <Menu>
-          {board.fields.cardProperties
+          {properties
             .filter((o: IPropertyTemplate) => o.type === 'select' || o.type === 'multiSelect')
             .map((o: IPropertyTemplate) => (
               <Menu.Text

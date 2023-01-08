@@ -139,7 +139,11 @@ function ViewHeader(props: Props) {
                 <FormattedMessage id='ViewHeader.filter' defaultMessage='Filter' />
               </Button>
               {showFilter && (
-                <FilterComponent board={activeBoard} activeView={activeView} onClose={() => setShowFilter(false)} />
+                <FilterComponent
+                  properties={activeBoard?.fields.cardProperties ?? []}
+                  activeView={activeView}
+                  onClose={() => setShowFilter(false)}
+                />
               )}
             </ModalWrapper>
 

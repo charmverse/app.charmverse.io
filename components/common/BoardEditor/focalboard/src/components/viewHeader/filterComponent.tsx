@@ -57,7 +57,7 @@ const FilterComponent = React.memo((props: Props): JSX.Element => {
     mutator.changeViewFilter(activeView.id, activeView.fields.filter, filterGroup);
   };
 
-  const { board, activeView } = props;
+  const { activeView, properties } = props;
 
   const filters: FilterClause[] =
     (activeView.fields.filter?.filters.filter((o) => !isAFilterGroupInstance(o)) as FilterClause[]) || [];
@@ -68,7 +68,7 @@ const FilterComponent = React.memo((props: Props): JSX.Element => {
         {filters.map((filter) => (
           <FilterEntry
             key={`${filter.propertyId}-${filter.condition}-${filter.values.join(',')}`}
-            board={board}
+            properties={properties}
             view={activeView}
             conditionClicked={conditionClicked}
             filter={filter}
