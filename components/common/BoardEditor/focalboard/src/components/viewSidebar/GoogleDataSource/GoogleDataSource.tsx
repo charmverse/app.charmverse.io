@@ -10,6 +10,7 @@ import useSwr from 'swr';
 import charmClient from 'charmClient';
 import LoadingComponent from 'components/common/LoadingComponent';
 import type { BoardViewFields } from 'lib/focalboard/boardView';
+import log from 'lib/log';
 import type { CredentialItem } from 'pages/api/google/credentials';
 import type { GoogleFormItem } from 'pages/api/google/forms';
 
@@ -26,7 +27,7 @@ export function GoogleDataSource(props: Props) {
   const [selectedCredential, setSelectedCredential] = useState<CredentialItem | null>(null);
   const { loginWithGoogle, onLoadScript } = useGoogleAuth({
     onConnect: async (credential) => {
-      const result = await mutate();
+      await mutate();
       selectCredential(credential);
     }
   });
@@ -36,7 +37,7 @@ export function GoogleDataSource(props: Props) {
   }
 
   if (!credentials) {
-    return <LoadingComponent />;
+    return <LoadingComponent size={30} minHeight={60} />;
   }
 
   if (credentials.length === 0) {
@@ -145,13 +146,14 @@ function GoogleFormSelect({
         </>
       );
     }
+    log.error('Error loading forms', error);
     return (
-      <Typography color='error' variant='caption'>
-        Error loading forms
-      </Typography>
+      <ListItem>
+        <Typography color='error'>Error loading forms</Typography>
+      </ListItem>
     );
   }
-  if (!forms) return <LoadingComponent />;
+  if (!forms) return <LoadingComponent size={30} minHeight={60} />;
   return (
     <>
       {forms.map((form) => (

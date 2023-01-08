@@ -114,13 +114,13 @@ function ViewHeader(props: Props) {
       <div className='octo-spacer' />
 
       <div className='view-actions'>
-        {!props.readOnly && activeView && activeBoard && (
+        {!props.readOnly && activeView && (
           <>
             {/* Display by */}
 
             {withDisplayBy && (
               <ViewHeaderDisplayByMenu
-                properties={activeBoard.fields.cardProperties}
+                properties={activeBoard?.fields.cardProperties ?? []}
                 activeView={activeView}
                 dateDisplayPropertyName={dateDisplayProperty?.name}
               />
@@ -147,7 +147,7 @@ function ViewHeader(props: Props) {
 
             {withSortBy && (
               <ViewHeaderSortMenu
-                properties={activeBoard.fields.cardProperties}
+                properties={activeBoard?.fields.cardProperties ?? []}
                 activeView={activeView}
                 orderedCards={cards}
               />
