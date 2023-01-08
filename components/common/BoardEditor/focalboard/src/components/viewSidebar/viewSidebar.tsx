@@ -24,11 +24,8 @@ import { createTableView } from 'components/common/BoardEditor/focalboard/src/co
 import { usePages } from 'hooks/usePages';
 import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
 import type { BoardView, BoardViewFields } from 'lib/focalboard/boardView';
-import log from 'lib/log';
 
 import mutator from '../../mutator';
-import { useAppDispatch } from '../../store/hooks';
-import { updateView } from '../../store/views';
 
 import GroupOptions from './viewGroupOptions';
 import ViewLayoutOptions from './viewLayoutOptions';
@@ -36,7 +33,7 @@ import ViewPropertyOptions from './viewPropertyOptions';
 import { ViewSourceOptions } from './viewSourceOptions';
 
 interface Props {
-  board: Board;
+  board?: Board;
   parentBoard: Board; // we need the parent board when creating or updating the view
   view: BoardView;
   closeSidebar: () => void;
@@ -63,15 +60,14 @@ const initialState: SidebarView = 'view-options';
 
 function ViewSidebar(props: Props) {
   const [sidebarView, setSidebarView] = useState<SidebarView>(initialState);
-  const dispatch = useAppDispatch();
   const { pages } = usePages();
 
   const withGroupBy = props.view.fields.viewType.match(/board/) || props.view.fields.viewType === 'table';
-  const currentGroup = props.board.fields.cardProperties.find((prop) => prop.id === props.groupByProperty?.id)?.name;
+  const currentGroup = props.board?.fields.cardProperties.find((prop) => prop.id === props.groupByProperty?.id)?.name;
   const currentLayout = props.view.fields.viewType;
   const visiblePropertyIds = props.view.fields.visiblePropertyIds ?? [];
   const currentProperties = visiblePropertyIds.filter((id) =>
-    props.board.fields.cardProperties.some((c) => c.id === id)
+    props.board?.fields.cardProperties.some((c) => c.id === id)
   ).length;
 
   let SourceIcon = RiFolder2Line;
@@ -93,13 +89,7 @@ function ViewSidebar(props: Props) {
     newView.fields.sourceData = fields.sourceData;
     newView.fields.sourceType = fields.sourceType;
     newView.fields.linkedSourceId = fields.linkedSourceId;
-    try {
-      dispatch(updateView(newView));
-      await mutator.updateBlock(newView, props.view, 'change view source');
-    } catch (error) {
-      log.warn('Undo view source selection', error);
-      dispatch(updateView(props.view));
-    }
+    await mutator.updateBlock(newView, props.view, 'change view source');
   }
   useEffect(() => {
     // reset state on close
@@ -152,20 +142,20 @@ function ViewSidebar(props: Props) {
           {sidebarView === 'layout' && (
             <>
               <SidebarHeader goBack={goBack} title='Layout' closeSidebar={props.closeSidebar} />
-              <ViewLayoutOptions board={props.board} view={props.view} />
+              <ViewLayoutOptions properties={props.board?.fields.cardProperties ?? []} view={props.view} />
             </>
           )}
           {sidebarView === 'card-properties' && (
             <>
               <SidebarHeader goBack={goBack} title='Properties' closeSidebar={props.closeSidebar} />
-              <ViewPropertyOptions properties={props.board.fields.cardProperties} view={props.view} />
+              <ViewPropertyOptions properties={props.board?.fields.cardProperties ?? []} view={props.view} />
             </>
           )}
           {sidebarView === 'group-by' && (
             <>
               <SidebarHeader goBack={goBack} title='Group by' closeSidebar={props.closeSidebar} />
               <GroupOptions
-                properties={props.board.fields.cardProperties}
+                properties={props.board?.fields.cardProperties || []}
                 view={props.view}
                 groupByProperty={props.groupByProperty}
               />

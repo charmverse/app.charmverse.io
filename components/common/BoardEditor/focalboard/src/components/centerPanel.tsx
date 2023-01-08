@@ -31,6 +31,7 @@ import {
   getCurrentViewGroupBy
 } from 'components/common/BoardEditor/focalboard/src/store/views';
 import Button from 'components/common/Button';
+import LoadingComponent from 'components/common/LoadingComponent';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMembers } from 'hooks/useMembers';
 import { usePages } from 'hooks/usePages';
@@ -420,6 +421,8 @@ function CenterPanel(props: Props) {
     }
   }, [activeView?.fields.sourceData?.formId]);
 
+  const isLoadingSourceData = !activeBoard && state.showSettings !== 'create-linked-view';
+
   return (
     <div
       className={`BoardComponent ${isEmbedded ? 'embedded-board' : ''}`}
@@ -574,7 +577,6 @@ function CenterPanel(props: Props) {
                 }}
               />
             )}
-
             {activeBoard && activeView?.fields.viewType === 'gallery' && (
               <Gallery
                 board={activeBoard}
@@ -586,8 +588,9 @@ function CenterPanel(props: Props) {
                 addCard={(show) => addCard('', show)}
               />
             )}
+            {isLoadingSourceData && <LoadingComponent isLoading={true} height={400} />}
           </Box>
-          {activeBoard && activeView && (
+          {activeView && (
             <ViewSidebar
               board={activeBoard}
               parentBoard={board}
