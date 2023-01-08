@@ -11,6 +11,7 @@ import { usePopupState, bindMenu, bindTrigger } from 'material-ui-popup-state/ho
 import { useCallback } from 'react';
 import { injectIntl } from 'react-intl';
 import type { IntlShape } from 'react-intl';
+import { v4 as uuid } from 'uuid';
 
 import Button from 'components/common/Button';
 import type { Block } from 'lib/focalboard/block';
@@ -92,6 +93,7 @@ function AddViewMenu(props: AddViewProps) {
 
     Utils.log('addview-table');
     const view = createTableView(board, activeView, intl);
+    view.id = uuid();
 
     const oldViewId = activeView?.id;
 
