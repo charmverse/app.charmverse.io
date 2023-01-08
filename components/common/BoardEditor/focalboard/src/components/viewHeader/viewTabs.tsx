@@ -242,17 +242,15 @@ function ViewTabs(props: ViewTabsProps) {
           </ListItemIcon>
           <ListItemText>Edit View</ListItemText>
         </MenuItem>
-        {dropdownView?.fields.sourceType !== 'google_form' && (
-          <>
-            <Divider />
-            <MenuItem dense onClick={handleDuplicateView}>
-              <ListItemIcon>
-                <DuplicateIcon />
-              </ListItemIcon>
-              <ListItemText>{duplicateViewText}</ListItemText>
-            </MenuItem>
-          </>
-        )}
+        {dropdownView?.fields.sourceType !== 'google_form' && [
+          <Divider key='divider' />,
+          <MenuItem key='duplicate-view' dense onClick={handleDuplicateView}>
+            <ListItemIcon>
+              <DuplicateIcon />
+            </ListItemIcon>
+            <ListItemText>{duplicateViewText}</ListItemText>
+          </MenuItem>
+        ]}
         {views.length !== 1 && (
           <MenuItem dense onClick={handleDeleteView}>
             <ListItemIcon>

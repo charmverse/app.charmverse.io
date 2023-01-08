@@ -44,7 +44,7 @@ export async function syncFormResponses({ createdBy, view }: { createdBy: string
   board.updatedBy = createdBy;
 
   if (hasRefreshedRecently) {
-    log.debug('Skip refreshing board because it was refreshed recently', { syncThrottlePeriod });
+    // log.debug('Skip refreshing board because it was refreshed recently', { syncThrottlePeriod });
     return;
   }
 
@@ -88,7 +88,11 @@ export async function syncFormResponses({ createdBy, view }: { createdBy: string
 
   const pageIds = pages.map((p) => p.id).filter(isTruthy);
 
-  log.info('Synced Google form responses', { boardId: board.id, formId: form.formId, responseCount: responses.length });
+  log.debug('Synced Google form responses', {
+    boardId: board.id,
+    formId: form.formId,
+    responseCount: responses.length
+  });
 
   await notifyUsers({
     spaceId: board.spaceId,
@@ -132,7 +136,7 @@ async function getFormAndResponses(sourceData: GoogleFormSourceData, lastUpdated
   let maxCalls = 20; // avoid endless loop
   while (pageToken && maxCalls > 0) {
     const res = await forms.forms.responses.list({
-      // filter: lastUpdated ? `timestamp >= '${lastUpdated.toISOString()}'` : undefined,
+      filter: lastUpdated ? `timestamp >= ${lastUpdated.toISOString()}` : undefined,
       formId
     });
     if (res.data.responses) {
