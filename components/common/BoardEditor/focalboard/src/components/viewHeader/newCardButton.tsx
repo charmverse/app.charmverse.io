@@ -48,7 +48,7 @@ const NewCardButton = React.memo(
       <>
         <ButtonGroup size='small' disableElevation variant='contained' ref={buttonRef}>
           <Button onClick={addCard}>
-            <Typography fontWeight={700} variant='subtitle1'>
+            <Typography fontWeight={700} variant='subtitle1' component='div'>
               New
             </Typography>
           </Button>
