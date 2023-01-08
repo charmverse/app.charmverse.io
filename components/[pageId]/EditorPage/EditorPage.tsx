@@ -25,11 +25,25 @@ export default function EditorPage({ pageId }: { pageId: string }) {
   const [isAccessDenied, setIsAccessDenied] = useState(false);
   const { user } = useUser();
   const currentPagePermissions = useMemo(() => getPagePermissions(pageId), [pageId]);
-
+  const currentPage = pages[pageId];
   const parentProposalId = findParentOfType({ pageId, pageType: 'proposal', pageMap: pages });
   const readOnly =
     (currentPagePermissions.edit_content === false && editMode !== 'suggesting') || editMode === 'viewing';
 
+  // memoize the page to avoid re-rendering unless certain fields are changed
+  const memoizedCurrentPage = useMemo(
+    () => pages[pageId],
+    [
+      pageId,
+      currentPage?.headerImage,
+      currentPage?.icon,
+      currentPage?.title,
+      currentPage?.deletedAt,
+      currentPage?.fullWidth,
+      currentPagePermissions,
+      currentPage?.type
+    ]
+  );
   useEffect(() => {
     async function main() {
       setIsAccessDenied(false);
@@ -107,22 +121,6 @@ export default function EditorPage({ pageId }: { pageId: string }) {
         });
     },
     [pageId]
-  );
-
-  // memoize the page to avoid re-rendering unless certain fields are changed
-  const currentPage = pages[pageId];
-  const memoizedCurrentPage = useMemo(
-    () => pages[pageId],
-    [
-      pageId,
-      currentPage?.headerImage,
-      currentPage?.icon,
-      currentPage?.title,
-      currentPage?.deletedAt,
-      currentPage?.fullWidth,
-      currentPagePermissions,
-      currentPage?.type
-    ]
   );
 
   if (isAccessDenied) {

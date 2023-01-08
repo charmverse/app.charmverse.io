@@ -274,7 +274,7 @@ function getCardsAndPages({
       },
       createdAt: prismaBlock.createdAt,
       title: `Response ${nextIndex}`,
-      type: 'card',
+      type: 'card_synced',
       contentText: '',
       parentId: rootId, // important to inherit permissions
       path: `path-${uuid()}`,

@@ -133,7 +133,10 @@ export function PagesProvider({ children }: { children: ReactNode }) {
         (userSpaceRole && permission.spaceId === userSpaceRole.spaceId) ||
         permission.public === true;
 
-      if (shouldApplyPermission) {
+      const isPreventedBySynced =
+        targetPage.type === 'card_synced' && ['edit', 'delete'].includes(permission.permissionLevel);
+
+      if (shouldApplyPermission && !isPreventedBySynced) {
         const permissionsToEnable =
           permission.permissionLevel === 'custom'
             ? permission.permissions

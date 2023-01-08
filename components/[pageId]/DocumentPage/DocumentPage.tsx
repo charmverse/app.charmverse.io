@@ -120,11 +120,9 @@ function DocumentPage({ page, setPage, insideModal, readOnly = false, parentProp
   });
 
   const board = useAppSelector((state) => {
-    if ((page.type === 'card' || page.type === 'card_template') && page.parentId) {
-      return card ? state.boards.boards[card.parentId] : null;
-    }
-    return null;
+    return card ? state.boards.boards[card.parentId] : null;
   });
+
   const cards = useAppSelector((state) => {
     return board
       ? [...Object.values(state.cards.cards), ...Object.values(state.cards.templates)].filter(

@@ -155,6 +155,7 @@ enum PageType {
   page
   page_template
   card
+  card_synced
   card_template
   proposal
   proposal_template
