@@ -1,5 +1,6 @@
 import styled from '@emotion/styled';
 import AddIcon from '@mui/icons-material/Add';
+import AddCircleIcon from '@mui/icons-material/AddCircleOutline';
 import { Card, Grid, Box, ListItemIcon, MenuItem, Typography } from '@mui/material';
 import { useState } from 'react';
 import { RiGoogleFill } from 'react-icons/ri';
@@ -61,28 +62,22 @@ export function ViewSourceOptions(props: ViewSourceOptionsProps) {
       />
       <Box onClick={(e) => e.stopPropagation()}>
         {formStep === 'select_source' && (
-          <>
-            <Grid container spacing={1} px={1}>
-              <SourceType active={activeSourceType === 'board_page'} onClick={selectSourceType('board_page')}>
-                <TbDatabase style={{ fontSize: 24 }} />
-                CharmVerse database
+          <Grid container spacing={1} px={1}>
+            <SourceType active={activeSourceType === 'board_page'} onClick={selectSourceType('board_page')}>
+              <TbDatabase style={{ fontSize: 24 }} />
+              CharmVerse database
+            </SourceType>
+            <SourceType active={activeSourceType === 'google_form'} onClick={selectSourceType('google_form')}>
+              <RiGoogleFill style={{ fontSize: 24 }} />
+              Google Form
+            </SourceType>
+            {props.onCreate && (
+              <SourceType onClick={props.onCreate}>
+                <AddCircleIcon style={{ fontSize: 24 }} />
+                New database
               </SourceType>
-              <SourceType active={activeSourceType === 'google_form'} onClick={selectSourceType('google_form')}>
-                <RiGoogleFill style={{ fontSize: 24 }} />
-                Google Form
-              </SourceType>
-            </Grid>
-            <Box mt={1}>
-              <MenuItem onClick={props.onCreate}>
-                <ListItemIcon>
-                  <AddIcon color='secondary' />
-                </ListItemIcon>
-                <Typography variant='body2' color='secondary'>
-                  New database
-                </Typography>
-              </MenuItem>
-            </Box>
-          </>
+            )}
+          </Grid>
         )}
         {formStep === 'configure_source' && sourceType === 'board_page' && (
           <CharmVerseDatabases
@@ -117,7 +112,7 @@ function SourceType({
       <Card
         variant='outlined'
         sx={{
-          height: '100%',
+          height: '80px',
           cursor: 'pointer',
           borderColor: active ? 'var(--primary-color)' : '',
           '&:hover': { bgcolor: !active ? 'sidebar.background' : '' }
