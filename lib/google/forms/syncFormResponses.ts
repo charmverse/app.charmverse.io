@@ -118,7 +118,7 @@ async function getHiddenDatabaseBlock({ boardId }: { boardId?: string } = {}) {
   const lastUpdated = isNewBoard ? null : now;
   const responseCount = await prisma.block.count({ where: { rootId: board.id } });
 
-  return { board, hasRefreshedRecently, lastUpdated, responseCount };
+  return { board, hasRefreshedRecently: false, lastUpdated, responseCount };
 }
 
 async function getFormAndResponses(sourceData: GoogleFormSourceData, lastUpdated: Date | null = new Date(1970)) {
@@ -292,12 +292,12 @@ function getCardsAndPages({
 
 function getCardProperties(form: GoogleForm): IPropertyTemplate[] {
   const properties: IPropertyTemplate[] = [
-    {
-      id: userEmailProperty,
-      name: 'Respondent Email',
-      type: 'email',
-      options: []
-    },
+    // {
+    //   id: userEmailProperty,
+    //   name: 'Respondent Email',
+    //   type: 'email',
+    //   options: []
+    // },
     {
       id: responseLinkProperty,
       name: 'Link to response',
@@ -311,6 +311,7 @@ function getCardProperties(form: GoogleForm): IPropertyTemplate[] {
 
     if (questionId) {
       const choiceQuestion = item.questionItem?.question?.choiceQuestion;
+      const dateQuestion = item.questionItem?.question?.dateQuestion;
       const options = (choiceQuestion?.options ?? [])
         .map(
           (choice): IPropertyOption => ({
@@ -334,6 +335,9 @@ function getCardProperties(form: GoogleForm): IPropertyTemplate[] {
         prop.type = 'select';
       } else if (choiceQuestion?.type === 'CHECKBOX') {
         prop.type = 'multiSelect';
+      } else if (dateQuestion?.includeYear) {
+        // only work with date questions that include the year
+        prop.type = 'date';
       }
       properties.push(prop);
     }
@@ -350,8 +354,8 @@ function getAnswersFromResponse({
   formId?: string;
   properties: IPropertyTemplate[];
   response: GoogleFormResponse;
-}): Record<string, string | string[]> {
-  const values: Record<string, string | string[]> = {};
+}): Record<string, string | number | string[]> {
+  const values: Record<string, string | number | string[]> = {};
 
   if (response.respondentEmail) {
     values[userEmailProperty] = response.respondentEmail;
@@ -374,6 +378,12 @@ function getAnswersFromResponse({
         values[propId] = (answer.textAnswers?.answers ?? []).map((a) => a.value).filter(isTruthy);
       } else if (question.type === 'text') {
         values[propId] = answer.textAnswers?.answers?.[0]?.value ?? '';
+      } else if (question.type === 'date') {
+        // TODO: we should support dates that dont include time in focalboard
+        const dateTime = answer.textAnswers?.answers?.[0]?.value
+          ? new Date(answer.textAnswers?.answers?.[0]?.value).getTime()
+          : null;
+        values[propId] = dateTime;
       } else {
         // textAnswer is a fallback for all other types
         // https://developers.google.com/forms/api/reference/rest/v1/forms.responses#TextAnswer
