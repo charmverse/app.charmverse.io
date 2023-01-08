@@ -36,7 +36,7 @@ import type { PageContent } from 'lib/prosemirror/interfaces';
 import { extractDeletedThreadIds } from 'lib/prosemirror/plugins/inlineComments/extractDeletedThreadIds';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
-import Bookmark from './components/bookmark';
+import * as bookmark from './components/bookmark';
 import * as bulletList from './components/bulletList';
 import Callout, * as callout from './components/callout';
 import { userDataPlugin } from './components/charm/charm.plugins';
@@ -72,7 +72,7 @@ import Quote from './components/quote';
 import ResizableImage from './components/ResizableImage';
 import ResizablePDF from './components/ResizablePDF';
 import RowActionsMenu, * as rowActions from './components/rowActions';
-import { SidebarDrawer, SIDEBAR_VIEWS } from './components/SidebarDrawer';
+import { SIDEBAR_VIEWS, SidebarDrawer } from './components/SidebarDrawer';
 import SuggestionsPopup from './components/suggestions/SuggestionPopup';
 import { plugins as trackPlugins } from './components/suggestions/suggestions.plugins';
 import * as tabIndent from './components/tabIndent';
@@ -201,10 +201,6 @@ export function charmEditorPlugins({
       containerDOM: ['div', { draggable: 'false' }]
     }),
     NodeView.createPlugin({
-      name: 'bookmark',
-      containerDOM: ['div', { draggable: 'false' }]
-    }),
-    NodeView.createPlugin({
       name: 'cryptoPrice',
       containerDOM: ['div']
     }),
@@ -221,6 +217,7 @@ export function charmEditorPlugins({
       name: 'poll',
       containerDOM: ['div', { draggable: 'false' }]
     }),
+    bookmark.plugins(),
     tabIndent.plugins(),
     table.tableEditing({ allowTableNodeSelection: true }),
     table.columnHandles(),
@@ -619,7 +616,7 @@ function CharmEditor({
             return <ResizablePDF {...allProps} />;
           }
           case 'bookmark': {
-            return <Bookmark {...allProps} />;
+            return <bookmark.Component {...allProps} />;
           }
           case 'poll': {
             return <poll.Component {...allProps} />;

@@ -89,5 +89,5 @@ export const specRegistry = new SpecRegistry([
   textColor.spec(),
   nft.spec(),
   poll.spec(),
-  bookmark.bookmarkSpec()
+  bookmark.spec()
 ]);

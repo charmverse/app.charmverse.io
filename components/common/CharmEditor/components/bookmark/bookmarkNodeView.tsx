@@ -1,52 +1,19 @@
-import type { BaseRawNodeSpec } from '@bangle.dev/core';
-import type { DOMOutputSpec, Node } from '@bangle.dev/pm';
 import BookmarkIcon from '@mui/icons-material/Bookmark';
 import { Box } from '@mui/material';
-import { memo } from 'react';
 
 import fetch from 'adapters/http/fetch.server';
 
-import BlockAligner from './BlockAligner';
-import { MediaSelectionPopup } from './common/MediaSelectionPopup';
-import { MediaUrlInput } from './common/MediaUrlInput';
-import type { CharmNodeViewProps } from './nodeView/nodeView';
-
-export function bookmarkSpec() {
-  const spec: BaseRawNodeSpec = {
-    name: 'bookmark',
-    type: 'node',
-    schema: {
-      attrs: {
-        url: {
-          default: null
-        },
-        html: {
-          default: null
-        },
-        track: {
-          default: []
-        }
-      },
-      group: 'block',
-      draggable: false,
-      parseDOM: [{ tag: 'div.charm-bookmark' }],
-      toDOM: (): DOMOutputSpec => {
-        return ['div.charm-bookmark'];
-      }
-    },
-    markdown: {
-      toMarkdown: () => null
-    }
-  };
-  return spec;
-}
+import BlockAligner from '../BlockAligner';
+import { MediaSelectionPopup } from '../common/MediaSelectionPopup';
+import { MediaUrlInput } from '../common/MediaUrlInput';
+import type { CharmNodeViewProps } from '../nodeView/nodeView';
 
 type BookmarkViewerProps = {
   url: string;
   html: string;
 };
 
-function Bookmark({
+export function Bookmark({
   readOnly = false,
   node,
   updateAttrs,
@@ -97,5 +64,3 @@ function Bookmark({
     </BlockAligner>
   );
 }
-
-export default memo(Bookmark);
