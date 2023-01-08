@@ -139,7 +139,7 @@ function GoogleFormSelect({
             <Box display='flex' gap={2} justifyContent='center'>
               <ReportProblemIcon sx={{ color: 'var(--danger-text)' }} fontSize='small' />
               <Typography color='secondary' variant='caption'>
-                Authentication has expired. Please reconnect your Google account
+                Authorization been denied. Please reconnect your Google account with the correct permissions.
               </Typography>
             </Box>
           </ListItem>

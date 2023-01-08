@@ -4,6 +4,7 @@ import nc from 'next-connect';
 import { prisma } from 'db';
 import { getCredentialsFromGoogleCode } from 'lib/google/authorization/authClient';
 import { deleteCredential, getCredentialsForUser, saveCredential } from 'lib/google/authorization/credentials';
+import { formScopes } from 'lib/google/forms/config';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { InvalidInputError } from 'lib/utilities/errors/errors';
@@ -28,6 +29,15 @@ handler.use(requireUser).post(createCredentialEndpoint).get(getCredentialEndpoin
 
 async function createCredentialEndpoint(req: NextApiRequest, res: NextApiResponse) {
   const query = req.body as CreateCredentialRequest;
+
+  if (!query.code) {
+    throw new InvalidInputError('Code is required');
+  }
+  formScopes.split(' ').forEach((requiredScope) => {
+    if (!query.scope.includes(requiredScope)) {
+      throw new InvalidInputError('Required scopes are missing');
+    }
+  });
   const credential = await getCredentialsFromGoogleCode(query.code);
   if (!credential?.tokens.refresh_token) {
     throw new InvalidInputError('No refresh token found');

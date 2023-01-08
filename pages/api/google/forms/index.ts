@@ -46,10 +46,11 @@ async function getFormsResponse(req: NextApiRequest, res: NextApiResponse) {
     res.send(result);
   } catch (error) {
     if (error instanceof GaxiosError) {
-      if (error.response?.data.error === 'invalid_grant') {
-        await invalidateCredential({ credentialId, error: error.response.data.error });
-        throw new UnauthorisedActionError('Invalid credentials');
-      }
+      // const expiredAuth = error.response?.data.error === 'invalid_grant';
+      // const missingScopes = error.response?.data.error?.status === 'PERMISSION_DENIED';
+      // const missingScopes2 = error.response?.data.error?.code === 403;
+      await invalidateCredential({ credentialId, error: error.response?.data.error });
+      throw new UnauthorisedActionError('Invalid credentials');
     }
     throw error;
   }
