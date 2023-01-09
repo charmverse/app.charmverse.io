@@ -3,6 +3,9 @@ import { Box } from '@mui/material';
 import Script from 'next/script';
 import { useEffect, useRef, useState } from 'react';
 
+import { extractNftAttrs } from 'lib/nft/extractNftAttrs';
+import type { NftNodeAttrs } from 'lib/nft/interface';
+
 import BlockAligner from '../BlockAligner';
 import { MediaSelectionPopup } from '../common/MediaSelectionPopup';
 import { MediaUrlInput } from '../common/MediaUrlInput';
@@ -10,8 +13,6 @@ import { EmbedIcon } from '../iframe/components/EmbedIcon';
 import type { CharmNodeViewProps } from '../nodeView/nodeView';
 
 import { OpenSeaIcon } from './config';
-import type { NodeAttrs } from './nftSpec';
-import { extractAttrsFromUrl } from './nftUtils';
 import { setCSSOverrides } from './styles';
 
 // OpenSea embed plugin: https://github.com/ProjectOpenSea/embeddable-nfts
@@ -26,7 +27,7 @@ const StyledContainer = styled.div`
 
 export function NFTNodeView({ deleteNode, readOnly, node, selected, updateAttrs }: CharmNodeViewProps) {
   const ref = useRef<HTMLDivElement>(null);
-  const attrs = node.attrs as Partial<NodeAttrs>;
+  const attrs = node.attrs as Partial<NftNodeAttrs>;
   const [width, setWidth] = useState(0);
 
   useEffect(() => {
@@ -57,9 +58,9 @@ export function NFTNodeView({ deleteNode, readOnly, node, selected, updateAttrs 
           <Box py={3}>
             <MediaUrlInput
               helperText='Works with NFTs on Ethereum mainnet'
-              isValid={(url) => extractAttrsFromUrl(url) !== null}
+              isValid={(url) => extractNftAttrs(url) !== null}
               onSubmit={(url) => {
-                const _attrs = extractAttrsFromUrl(url);
+                const _attrs = extractNftAttrs(url);
                 if (_attrs) {
                   updateAttrs(_attrs);
                 }
