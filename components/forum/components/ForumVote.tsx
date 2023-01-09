@@ -54,7 +54,7 @@ export function ForumVote({ votes, onVote }: { votes: ForumVotes; onVote: (upvot
           clickVote(e, false);
         }}
       >
-        <ImArrowDown style={getStyle(upvoted === false ? theme.palette.error.main : null)} />
+        <ImArrowDown style={getStyle(upvoted === false ? 'var(--text-red)' : null)} />
       </IconButton>
     </Box>
   );
