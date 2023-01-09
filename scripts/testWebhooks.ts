@@ -29,4 +29,5 @@ export async function testFetchMessages() {
   await processMessages({ processorFn });
 }
 
-testFetchMessages();
+// testFetchMessages();
+testAddMessage();

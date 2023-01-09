@@ -10,14 +10,14 @@ type ProcessMssagesInput = {
 
 const AWS_API_KEY = process.env.AWS_ACCESS_KEY_ID as string;
 const AWS_API_SECRET = process.env.AWS_SECRET_ACCESS_KEY as string;
-const SQS_REGION = 'us-east-1';
+const SQS_REGION = process.env.AWS_REGION as string;
 
 const SQS_NAME = process.env.SQS_NAME as string;
 const client = new SQSClient({
   region: SQS_REGION,
   credentials: { accessKeyId: AWS_API_KEY, secretAccessKey: AWS_API_SECRET }
 });
-let queueUrl = 'https://sqs.us-east-1.amazonaws.com/310849459438/stg-webhook-collabland.fifo';
+let queueUrl = '';
 
 export async function getQueueUrl() {
   if (queueUrl) {
@@ -33,7 +33,8 @@ export async function getQueueUrl() {
 export async function getNextMessage() {
   const QueueUrl = await getQueueUrl();
   if (QueueUrl) {
-    const command = new ReceiveMessageCommand({ QueueUrl, MaxNumberOfMessages: 1 });
+    // 20s polling time
+    const command = new ReceiveMessageCommand({ QueueUrl, MaxNumberOfMessages: 1, WaitTimeSeconds: 20 });
     const res = await client.send(command);
 
     return res?.Messages?.[0] || null;
@@ -52,28 +53,24 @@ export async function deleteMessage(receipt: string) {
 
 export async function processMessages({ processorFn }: ProcessMssagesInput) {
   const message = await getNextMessage();
-  // eslint-disable-next-line no-console
-  console.log('🔥 fetched message:', message);
-  // if (!message) {
-  //   return false;
-  // }
 
-  // let msgBody: Record<string, any> | string = '';
-  // try {
-  //   msgBody = JSON.parse(message.Body || '');
-  //   // eslint-disable-next-line no-empty
-  // } catch (e) {}
+  if (message) {
+    let msgBody: Record<string, any> | string = '';
+    try {
+      msgBody = JSON.parse(message.Body || '');
+      // eslint-disable-next-line no-empty
+    } catch (e) {}
 
-  // try {
-  //   // process message
-  //   await processorFn(msgBody as WebhookMessage);
-  //   // delete if processed correctly
-  //   await deleteMessage(message.ReceiptHandle || '');
-  // } catch (e) {
-  //   log.error('Failed to process webhook message', e);
-  // }
+    try {
+      // process message
+      await processorFn(msgBody as WebhookMessage);
+    } catch (e) {
+      log.error('Failed to process webhook message', e);
+    } finally {
+      await deleteMessage(message.ReceiptHandle || '');
+    }
+  }
 
-  // // process next message
-  // setTimeout(() => processMessages({ processorFn }), 1000);
-  // return true;
+  // process next message
+  processMessages({ processorFn });
 }
