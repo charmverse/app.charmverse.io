@@ -3,7 +3,7 @@ import { v4 } from 'uuid';
 
 import { DataNotFoundError, MissingDataError, UnauthorisedActionError } from 'lib/utilities/errors';
 import { ExpectedAnError } from 'testing/errors';
-import { generateSubmissionContent } from 'testing/generate-stubs';
+import { generateSubmissionContent } from 'testing/generateStubs';
 import { generateBountyWithSingleApplication, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 import type { SubmissionContent } from '../../interfaces';

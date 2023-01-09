@@ -111,6 +111,9 @@ export async function syncFormResponses({
     pageIds,
     blocks: [board, ...cards.map((card) => prismaToBlock(card))]
   });
+
+  // export for testing
+  return { board, cards };
 }
 
 // retrieve or generate the board block which contains card properties
@@ -123,10 +126,9 @@ async function getHiddenDatabaseBlock({ boardId }: { boardId?: string } = {}) {
   const now = new Date();
   const defaultBoardValues: Partial<Block> = { createdAt: now.getTime() };
   const board = (boardBlock ?? createBoard({ block: defaultBoardValues })) as Block;
-
-  const hasRefreshedRecently = now.getTime() - board.updatedAt > syncThrottlePeriod;
   const isNewBoard = now.getTime() === board.createdAt;
   const lastUpdated = isNewBoard ? null : now;
+  const hasRefreshedRecently = !isNewBoard && now.getTime() - board.updatedAt < syncThrottlePeriod;
   const responseCount = await prisma.block.count({ where: { rootId: board.id } });
 
   return { board, hasRefreshedRecently, lastUpdated, responseCount };

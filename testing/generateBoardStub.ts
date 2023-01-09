@@ -4,7 +4,7 @@ import { v4 } from 'uuid';
 import type { PageWithBlocks } from 'lib/templates/interfaces';
 import { typedKeys } from 'lib/utilities/objects';
 
-import { pageContentStub } from './generate-page-stub';
+import { pageContentStub } from './generatePageStub';
 
 /**
  * We are currently lacking a way to generate fresh boards purely from the server side (apart from importing them) as this is currently orchestrated by the client-side focal board libraries
@@ -283,7 +283,7 @@ export function boardWithCardsArgs({
     }
   };
 
-  //
+  rootBoardNode.children = rootBoardNode.children.splice(0, cardCount);
 
   const pageCreateArgs: Prisma.PageCreateArgs[] = [];
   const blockCreateInput: Prisma.BlockCreateManyInput[] = [];
