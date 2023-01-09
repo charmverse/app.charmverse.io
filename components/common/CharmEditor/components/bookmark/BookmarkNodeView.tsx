@@ -60,15 +60,18 @@ export function BookmarkNodeView({
     );
   }
 
-  if (data?.html) {
+  const html = data?.html;
+
+  if (html) {
     return (
       <Box my={2}>
         <BlockAligner onDelete={deleteNode}>
-          <div dangerouslySetInnerHTML={{ __html: data.html }} />
+          <div dangerouslySetInnerHTML={{ __html: html }} />
         </BlockAligner>
       </Box>
     );
   } else if (data?.meta) {
+    const title = data.meta.title ?? new URL(data.meta.canonical).hostname;
     return (
       <Card variant='outlined'>
         <CardActionArea
@@ -79,13 +82,13 @@ export function BookmarkNodeView({
           target='_blank'
         >
           <Typography variant='body2' textOverflow='ellipsis' overflow='hidden' whiteSpace='nowrap'>
-            <strong>{data.meta.title}</strong>
+            <strong>{title}</strong>
           </Typography>
           <Typography color='secondary' variant='body2' lineHeight='1.3em !important'>
             {data.meta.description}
           </Typography>
           <Box display='flex' alignItems='center' gap={1} mt={1}>
-            {data.links.icon[0] && <img src={data.links.icon[0].href} />}
+            {data.links.icon?.[0] && <img src={data.links.icon[0].href} />}
             <Typography component='span' variant='body2' textOverflow='ellipsis' overflow='hidden' whiteSpace='nowrap'>
               {data.meta.canonical}
             </Typography>

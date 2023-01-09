@@ -4,11 +4,24 @@ type IframelyResponse = {
   html?: string;
   error?: string;
   url: string;
-  links: { icon: { href: string; type: string; rel: string[] }[] };
+  links: {
+    icon?: { href: string; type: string; rel: string[] }[];
+    file?: {
+      html?: string;
+      type: 'text/html' | 'application/pdf';
+      href: string;
+      rel: string[];
+    }[];
+    // embedded readers, eg. for PDF
+    reader: { href: string; html: string; media: { 'aspect-ratio': number }; rel: string[]; type: 'text/html' }[];
+  };
   meta: {
     canonical: string;
     description: string;
-    title: string;
+    medium?: 'file';
+    provider?: 'Google Docs';
+    provider_url?: string; // eg. https://docs.google.com
+    title?: string;
   };
 };
 
