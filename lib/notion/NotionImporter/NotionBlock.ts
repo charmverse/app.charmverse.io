@@ -20,6 +20,7 @@ import type {
 import { MAX_IMAGE_WIDTH, MIN_IMAGE_WIDTH } from 'lib/prosemirror/plugins/image/constants';
 import { extractTweetAttrs } from 'lib/twitter/extractTweetAttrs';
 import { isTruthy } from 'lib/utilities/types';
+import { extractYoutubeLinkType } from 'lib/video/extractYoutubeLink';
 
 import { convertRichText } from '../convertRichText';
 import { getPageTitleText } from '../getPageTitle';
@@ -328,6 +329,7 @@ export class NotionBlock {
         const url = block.type === 'bookmark' ? block.bookmark.url : block.embed.url;
         const tweetAttrs = extractTweetAttrs(url);
         const nftAttrs = extractNftAttrs(url);
+        const isYoutube = extractYoutubeLinkType(url);
 
         if (tweetAttrs) {
           return {
@@ -346,6 +348,15 @@ export class NotionBlock {
               chain: nftAttrs.chain,
               token: nftAttrs.token,
               contract: nftAttrs.contract
+            }
+          };
+        }
+
+        if (isYoutube) {
+          return {
+            type: 'video',
+            attrs: {
+              src: url
             }
           };
         }

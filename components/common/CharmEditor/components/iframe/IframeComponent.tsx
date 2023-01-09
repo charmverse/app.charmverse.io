@@ -3,6 +3,7 @@ import { useState, memo } from 'react';
 
 import { extractNftAttrs } from 'lib/nft/extractNftAttrs';
 import { extractTweetAttrs } from 'lib/twitter/extractTweetAttrs';
+import { extractYoutubeLinkType } from 'lib/video/extractYoutubeLink';
 
 import BlockAligner from '../BlockAligner';
 import { IframeContainer } from '../common/IframeContainer';
@@ -10,7 +11,6 @@ import { MediaSelectionPopup } from '../common/MediaSelectionPopup';
 import { MediaUrlInput } from '../common/MediaUrlInput';
 import type { CharmNodeViewProps } from '../nodeView/nodeView';
 import VerticalResizer from '../Resizable/VerticalResizer';
-import { extractYoutubeLinkType } from '../video/utils';
 
 import { EmbedIcon } from './components/EmbedIcon';
 import type { IframeNodeAttrs, Embed, EmbedType } from './config';

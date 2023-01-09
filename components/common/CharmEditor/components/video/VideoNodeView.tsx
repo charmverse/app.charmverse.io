@@ -6,6 +6,7 @@ import useSwr from 'swr';
 import charmClient from 'charmClient';
 import LoadingComponent from 'components/common/LoadingComponent';
 import MultiTabs from 'components/common/MultiTabs';
+import { extractYoutubeEmbedLink } from 'lib/video/extractYoutubeLink';
 
 import BlockAligner from '../BlockAligner';
 import { IframeContainer } from '../common/IframeContainer';
@@ -15,7 +16,6 @@ import { MIN_EMBED_WIDTH } from '../iframe/config';
 import type { CharmNodeViewProps } from '../nodeView/nodeView';
 import Resizable from '../Resizable';
 
-import { extractYoutubeEmbedLink } from './utils';
 import { VIDEO_ASPECT_RATIO } from './videoSpec';
 import type { VideoNodeAttrs } from './videoSpec';
 import { VideoUploadForm } from './VideoUploadForm';
@@ -34,7 +34,7 @@ export function VideoNodeView({
   const [playbackIdWithToken, setPlaybackIdWithToken] = useState('');
 
   // poll endpoint until video is ready
-  const { data: asset, error } = useSwr(
+  const { data: asset } = useSwr(
     () => (attrs.muxAssetId && !playbackIdWithToken && pageId ? `/api/mux/asset/${attrs.muxAssetId}` : null),
     () => {
       return charmClient.mux.getAsset({ id: attrs.muxAssetId!, pageId: pageId! });

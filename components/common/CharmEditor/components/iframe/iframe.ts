@@ -2,8 +2,8 @@ import { Plugin, NodeView } from '@bangle.dev/core';
 import type { EditorView, Slice } from '@bangle.dev/pm';
 
 import { insertNode } from 'lib/prosemirror/insertNode';
+import { extractYoutubeLinkType } from 'lib/video/extractYoutubeLink';
 
-import { extractYoutubeLinkType } from '../video/utils';
 import type { VideoNodeAttrs } from '../video/videoSpec';
 import { name as videoName } from '../video/videoSpec';
 
