@@ -67,7 +67,7 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
     const enableFidusEditor = Boolean(user && pageId && trackChanges && !isContentControlled);
     const [isLoading, setIsLoading] = useState(enableFidusEditor);
     const isLoadingRef = useRef(enableFidusEditor);
-    const useSockets = user && pageId && trackChanges && (!readOnly || enableComments) && !isContentControlled;
+    const useSockets = user && pageId && trackChanges && !readOnly && !isContentControlled;
 
     const { data: authResponse } = useSWRImmutable(useSockets ? user?.id : null, () => charmClient.socket()); // refresh when user
 
