@@ -1,8 +1,20 @@
 import * as http from 'adapters/http';
 
+type IframelyResponse = {
+  html?: string;
+  error?: string;
+  url: string;
+  links: { icon: { href: string; type: string; rel: string[] }[] };
+  meta: {
+    canonical: string;
+    description: string;
+    title: string;
+  };
+};
+
 export class IframelyApi {
   get(url: string) {
-    return http.GET<{ html: string; error?: string }>(
+    return http.GET<IframelyResponse>(
       `https://cdn.iframe.ly/api/iframely`,
       {
         url,
