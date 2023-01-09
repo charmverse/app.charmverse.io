@@ -1,4 +1,4 @@
-import { extractAttrsFromUrl } from '../nftUtils';
+import { extractNftAttrs } from 'lib/nft/extractNftAttrs';
 
 const extractionCases = [
   {
@@ -27,7 +27,7 @@ const extractionCases = [
 describe('NFT Utils', () => {
   extractionCases.forEach((testCase) => {
     test(`extractAttrsFromUrl() should match OpenSea URL: ${testCase.url}`, () => {
-      expect(extractAttrsFromUrl(testCase.url)).toEqual(testCase.result);
+      expect(extractNftAttrs(testCase.url)).toEqual(testCase.result);
     });
   });
 });
