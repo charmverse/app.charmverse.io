@@ -211,7 +211,7 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
 
   // DO NOT REMOVE CacheProvider - it protects MUI from Tailwind CSS in settings
   return (
-    <CacheProvider value={createCache({ key: 'app' })}>
+    <CacheProvider value={createCache({ key: 'app', prepend: true })}>
       <ColorModeContext.Provider value={colorModeContext}>
         <ThemeProvider theme={theme}>
           <LocalizationProvider dateAdapter={AdapterLuxon as any}>
