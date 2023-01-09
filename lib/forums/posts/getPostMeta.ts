@@ -16,7 +16,7 @@ export function getPostVoteSummary(upDownVotes: UpDownVoteData[], userId?: strin
   return {
     downvotes: upDownVotes.filter((vote) => !vote.upvoted).length,
     upvotes: upDownVotes.filter((vote) => vote.upvoted).length,
-    upvoted: userVote ? userVote.upvoted : false
+    upvoted: userVote ? userVote.upvoted : null
   };
 }
 
