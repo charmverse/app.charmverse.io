@@ -140,7 +140,7 @@ async function getHiddenDatabaseBlock({ boardId }: { boardId?: string } = {}) {
   const lastUpdated = isNewBoard ? null : now;
   const responseCount = await prisma.block.count({ where: { rootId: board.id } });
 
-  return { board, hasRefreshedRecently: false, lastUpdated, responseCount };
+  return { board, hasRefreshedRecently, lastUpdated, responseCount };
 }
 
 async function getFormAndResponses(sourceData: GoogleFormSourceData, lastUpdated: Date | null = new Date(1970)) {
