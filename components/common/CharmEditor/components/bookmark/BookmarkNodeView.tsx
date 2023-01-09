@@ -1,8 +1,9 @@
 import BookmarkIcon from '@mui/icons-material/Bookmark';
-import { Box } from '@mui/material';
+import { Box, Card, CardActionArea, Typography } from '@mui/material';
 import useSWRImmutable from 'swr/immutable';
 
 import charmClient from 'charmClient';
+import Link from 'components/common/Link';
 import LoadingComponent from 'components/common/LoadingComponent';
 
 import BlockAligner from '../BlockAligner';
@@ -20,7 +21,7 @@ export function BookmarkNodeView({
   deleteNode
 }: CharmNodeViewProps & { readOnly?: boolean }) {
   const { url } = node.attrs as BookmarkNodeAttrs;
-  const { data, isLoading } = useSWRImmutable(url ? `iframely/${encodeURIComponent(url)}` : null, () =>
+  const { data, error, isLoading } = useSWRImmutable(url ? `iframely/${encodeURIComponent(url)}` : null, () =>
     charmClient.iframely.get(url)
   );
 
@@ -66,6 +67,31 @@ export function BookmarkNodeView({
           <div dangerouslySetInnerHTML={{ __html: data.html }} />
         </BlockAligner>
       </Box>
+    );
+  } else if (data?.meta) {
+    return (
+      <Card variant='outlined'>
+        <CardActionArea
+          component={Link}
+          color='inherit'
+          sx={{ px: 2, py: 1.5 }}
+          href={data.meta.canonical}
+          target='_blank'
+        >
+          <Typography variant='body2' textOverflow='ellipsis' overflow='hidden' whiteSpace='nowrap'>
+            <strong>{data.meta.title}</strong>
+          </Typography>
+          <Typography color='secondary' variant='body2' lineHeight='1.3em !important'>
+            {data.meta.description}
+          </Typography>
+          <Box display='flex' alignItems='center' gap={1} mt={1}>
+            {data.links.icon[0] && <img src={data.links.icon[0].href} />}
+            <Typography component='span' variant='body2' textOverflow='ellipsis' overflow='hidden' whiteSpace='nowrap'>
+              {data.meta.canonical}
+            </Typography>
+          </Box>
+        </CardActionArea>
+      </Card>
     );
   }
 
