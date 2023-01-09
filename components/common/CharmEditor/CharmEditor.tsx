@@ -36,7 +36,8 @@ import type { PageContent } from 'lib/prosemirror/interfaces';
 import { extractDeletedThreadIds } from 'lib/prosemirror/plugins/inlineComments/extractDeletedThreadIds';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
-import * as bookmark from './components/bookmark';
+import { BookmarkNodeView } from './components/bookmark/BookmarkNodeView';
+import { plugins as bookmarkPlugins } from './components/bookmark/bookmarkPlugins';
 import * as bulletList from './components/bulletList';
 import Callout, * as callout from './components/callout';
 import { userDataPlugin } from './components/charm/charm.plugins';
@@ -217,7 +218,7 @@ export function charmEditorPlugins({
       name: 'poll',
       containerDOM: ['div', { draggable: 'false' }]
     }),
-    bookmark.plugins(),
+    bookmarkPlugins(),
     tabIndent.plugins(),
     table.tableEditing({ allowTableNodeSelection: true }),
     table.columnHandles(),
@@ -616,7 +617,7 @@ function CharmEditor({
             return <ResizablePDF {...allProps} />;
           }
           case 'bookmark': {
-            return <bookmark.Component {...allProps} />;
+            return <BookmarkNodeView {...allProps} />;
           }
           case 'poll': {
             return <poll.Component {...allProps} />;

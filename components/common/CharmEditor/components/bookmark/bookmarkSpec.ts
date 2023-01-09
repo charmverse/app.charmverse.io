@@ -1,5 +1,9 @@
 import type { BaseRawNodeSpec } from '@bangle.dev/core';
-import type { DOMOutputSpec } from 'prosemirror-model';
+import type { DOMOutputSpec, Node } from 'prosemirror-model';
+
+export type BookmarkNodeAttrs = {
+  url: string;
+};
 
 export function spec(): BaseRawNodeSpec {
   return {
@@ -10,22 +14,39 @@ export function spec(): BaseRawNodeSpec {
         url: {
           default: null
         },
-        html: {
-          default: null
-        },
         track: {
           default: []
         }
       },
       group: 'block',
       draggable: false,
-      parseDOM: [{ tag: 'div.charm-bookmark' }],
-      toDOM: (): DOMOutputSpec => {
-        return ['div.charm-bookmark'];
+      parseDOM: [
+        {
+          tag: 'div.charm-bookmark',
+          getAttrs: (dom: any): BookmarkNodeAttrs => {
+            return {
+              url: dom.getAttribute('bookmark-url')
+            };
+          }
+        }
+      ],
+      toDOM: (node: Node): DOMOutputSpec => {
+        return [
+          'div.charm-bookmark',
+          {
+            'bookmark-url': node.attrs.url
+          }
+        ];
       }
     },
     markdown: {
-      toMarkdown: () => null
+      toMarkdown: (state, node) => {
+        const { url } = node.attrs as BookmarkNodeAttrs;
+        // Ensure markdown html will be separated by newlines
+        state.ensureNewLine();
+        state.text(url);
+        state.ensureNewLine();
+      }
     }
   };
 }

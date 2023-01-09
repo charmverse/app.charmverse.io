@@ -43,22 +43,6 @@ export const embeds = {
       return url.includes('airtable.com');
     }
   },
-  airtable: {
-    icon: TbBrandAirtable,
-    name: 'Airtable',
-    placeholder: 'https://www.airtable.com/...',
-    text: 'Insert an Airtable embed',
-    convertURLToEmbed(url: string) {
-      if (url.includes('embed')) {
-        return url; // already embeddable
-      }
-      const shareId = url.split('/').pop();
-      return `https://airtable.com/embed/${shareId}`;
-    },
-    urlTest(url: string) {
-      return url.includes('airtable.com');
-    }
-  },
   dune: {
     iconUrl: '/images/dune_logo_bw.png',
     name: 'Dune',

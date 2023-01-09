@@ -4,7 +4,7 @@ import { SpecRegistry } from '@bangle.dev/core';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import * as codeBlock from './components/@bangle.dev/base-components/code-block';
-import * as bookmark from './components/bookmark';
+import { spec as bookmarkSpec } from './components/bookmark/bookmarkSpec';
 import * as bulletList from './components/bulletList';
 import * as callout from './components/callout';
 import * as columnLayout from './components/columnLayout';
@@ -89,5 +89,5 @@ export const specRegistry = new SpecRegistry([
   textColor.spec(),
   nft.spec(),
   poll.spec(),
-  bookmark.spec()
+  bookmarkSpec()
 ]);

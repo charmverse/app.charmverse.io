@@ -1,66 +1,73 @@
 import BookmarkIcon from '@mui/icons-material/Bookmark';
 import { Box } from '@mui/material';
+import useSWRImmutable from 'swr/immutable';
 
-import fetch from 'adapters/http/fetch.server';
+import charmClient from 'charmClient';
+import LoadingComponent from 'components/common/LoadingComponent';
 
 import BlockAligner from '../BlockAligner';
 import { MediaSelectionPopup } from '../common/MediaSelectionPopup';
 import { MediaUrlInput } from '../common/MediaUrlInput';
 import type { CharmNodeViewProps } from '../nodeView/nodeView';
 
-type BookmarkViewerProps = {
-  url: string;
-  html: string;
-};
+import type { BookmarkNodeAttrs } from './bookmarkSpec';
 
-export function Bookmark({
+export function BookmarkNodeView({
   readOnly = false,
   node,
   updateAttrs,
   selected,
   deleteNode
 }: CharmNodeViewProps & { readOnly?: boolean }) {
-  const { url, html } = node.attrs as BookmarkViewerProps;
+  const { url } = node.attrs as BookmarkNodeAttrs;
+  const { data, isLoading } = useSWRImmutable(url ? `iframely/${encodeURIComponent(url)}` : null, () =>
+    charmClient.iframely.get(url)
+  );
 
   async function updateNode(bookmarkUrl: string) {
-    try {
-      const iframelyResponse = await fetch<{ html: string; error?: string }>(
-        `https://cdn.iframe.ly/api/iframely?url=${encodeURIComponent(bookmarkUrl)}&key=${
-          process.env.NEXT_PUBLIC_IFRAMELY_API_KEY
-        }&iframe=1&omit_script=1&media=0`
-      );
-      if (iframelyResponse.html) {
-        updateAttrs({
-          url: bookmarkUrl,
-          html: iframelyResponse.html
-        });
-      }
-    } catch (err) {
-      //
-    }
+    updateAttrs({
+      url: bookmarkUrl
+    });
   }
 
-  if (!url || !html) {
+  if (isLoading) {
+    return (
+      <Box my={5}>
+        <LoadingComponent isLoading />
+      </Box>
+    );
+  }
+
+  if (!url) {
     if (readOnly) {
       return <div />;
     }
     return (
-      <MediaSelectionPopup
-        icon={<BookmarkIcon fontSize='small' />}
-        isSelected={selected}
-        buttonText='Add a bookmark'
-        node={node}
-        onDelete={deleteNode}
-      >
-        <Box py={3}>
-          <MediaUrlInput onSubmit={updateNode} placeholder='https://dune.com/skateordao/Gnars' />
-        </Box>
-      </MediaSelectionPopup>
+      <Box my={2}>
+        <MediaSelectionPopup
+          icon={<BookmarkIcon fontSize='small' />}
+          isSelected={selected}
+          buttonText='Add a bookmark'
+          node={node}
+          onDelete={deleteNode}
+        >
+          <Box py={3}>
+            <MediaUrlInput onSubmit={updateNode} placeholder='https://...' />
+          </Box>
+        </MediaSelectionPopup>
+      </Box>
     );
   }
-  return (
-    <BlockAligner onDelete={deleteNode}>
-      <div dangerouslySetInnerHTML={{ __html: html }} />
-    </BlockAligner>
-  );
+
+  if (data?.html) {
+    return (
+      <Box my={2}>
+        <BlockAligner onDelete={deleteNode}>
+          <div dangerouslySetInnerHTML={{ __html: data.html }} />
+        </BlockAligner>
+      </Box>
+    );
+  }
+
+  return null;
 }
