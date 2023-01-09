@@ -1,12 +1,9 @@
 import type { RawSpecs } from '@bangle.dev/core';
 import type { Node } from '@bangle.dev/pm';
 
-export const name = 'tweet';
+import type { TweetNodeAttrs } from 'lib/twitter/interface';
 
-export type TweetNodeAttrs = {
-  id: string;
-  screenName: string;
-};
+export const name = 'tweet';
 
 export function spec(): RawSpecs {
   return {

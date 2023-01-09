@@ -6,6 +6,7 @@ import {
   MIN_EMBED_HEIGHT
 } from 'components/common/CharmEditor/components/iframe/config';
 import { VIDEO_ASPECT_RATIO } from 'components/common/CharmEditor/components/video/videoSpec';
+import { extractNftAttrs } from 'lib/nft/extractNftAttrs';
 import type {
   TextContent,
   MentionNode,
@@ -325,13 +326,26 @@ export class NotionBlock {
       case 'embed':
       case 'bookmark': {
         const url = block.type === 'bookmark' ? block.bookmark.url : block.embed.url;
-        const tweetParams = extractTweetAttrs(url);
-        if (tweetParams) {
+        const tweetAttrs = extractTweetAttrs(url);
+        const nftAttrs = extractNftAttrs(url);
+
+        if (tweetAttrs) {
           return {
             type: 'tweet',
             attrs: {
-              screenName: tweetParams.screenName,
-              id: tweetParams.id
+              screenName: tweetAttrs.screenName,
+              id: tweetAttrs.id
+            }
+          };
+        }
+
+        if (nftAttrs) {
+          return {
+            type: 'nft',
+            attrs: {
+              chain: nftAttrs.chain,
+              token: nftAttrs.token,
+              contract: nftAttrs.contract
             }
           };
         }

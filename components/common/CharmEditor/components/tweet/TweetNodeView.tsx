@@ -7,14 +7,13 @@ import { useRef } from 'react';
 
 import log from 'lib/log';
 import { extractTweetAttrs } from 'lib/twitter/extractTweetAttrs';
+import type { TweetNodeAttrs } from 'lib/twitter/interface';
 import { randomIntFromInterval } from 'lib/utilities/random';
 
 import BlockAligner from '../BlockAligner';
 import { MediaSelectionPopup } from '../common/MediaSelectionPopup';
 import { MediaUrlInput } from '../common/MediaUrlInput';
 import type { CharmNodeViewProps } from '../nodeView/nodeView';
-
-import type { TweetNodeAttrs } from './tweetSpec';
 
 export const twitterWidgetJs = 'https://platform.twitter.com/widgets.js';
 

@@ -1,13 +1,13 @@
 import { Box } from '@mui/material';
 import { useState, memo } from 'react';
 
+import { extractNftAttrs } from 'lib/nft/extractNftAttrs';
 import { extractTweetAttrs } from 'lib/twitter/extractTweetAttrs';
 
 import BlockAligner from '../BlockAligner';
 import { IframeContainer } from '../common/IframeContainer';
 import { MediaSelectionPopup } from '../common/MediaSelectionPopup';
 import { MediaUrlInput } from '../common/MediaUrlInput';
-import { extractAttrsFromUrl as extractNFTAttrs } from '../nft/nftUtils';
 import type { CharmNodeViewProps } from '../nodeView/nodeView';
 import VerticalResizer from '../Resizable/VerticalResizer';
 import { extractYoutubeLinkType } from '../video/utils';
@@ -49,7 +49,7 @@ function IframeComponent({
         <Box py={3}>
           <MediaUrlInput
             onSubmit={(urlToEmbed) => {
-              const nftAttrs = extractNFTAttrs(urlToEmbed);
+              const nftAttrs = extractNftAttrs(urlToEmbed);
               const tweetAttrs = extractTweetAttrs(urlToEmbed);
               const isYoutube = extractYoutubeLinkType(urlToEmbed);
               if (isYoutube) {

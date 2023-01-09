@@ -1,4 +1,4 @@
-import type { TweetNodeAttrs } from 'components/common/CharmEditor/components/tweet/tweetSpec';
+import type { TweetNodeAttrs } from './interface';
 
 // a function to extract user screen name and tweet id from a tweet url
 export function extractTweetAttrs(url: string): TweetNodeAttrs | null {

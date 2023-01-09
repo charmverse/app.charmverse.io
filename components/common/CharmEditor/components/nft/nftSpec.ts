@@ -1,14 +1,9 @@
 import type { RawSpecs } from '@bangle.dev/core';
 import type { Node } from '@bangle.dev/pm';
-import type { supportedChainIds } from 'connectors';
+
+import type { NftNodeAttrs } from 'lib/nft/interface';
 
 import { name } from './config';
-
-export type NodeAttrs = {
-  chain: typeof supportedChainIds[number];
-  contract: string;
-  token: string;
-};
 
 export function spec(): RawSpecs {
   return {
@@ -16,7 +11,7 @@ export function spec(): RawSpecs {
     name,
     markdown: {
       toMarkdown: (state, node) => {
-        const { chain, contract, token } = node.attrs as NodeAttrs;
+        const { contract, token } = node.attrs as NftNodeAttrs;
 
         const toRender = `Embedded NFT: ${contract} #${token}`;
 
