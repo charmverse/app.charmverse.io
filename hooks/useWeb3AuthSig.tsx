@@ -120,11 +120,13 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
       // Refresh the user account. This was required as otherwise the user would not be able to see the first page upon joining the space
       const refreshedProfile = await charmClient.login({ address: signature.address, walletSignature: signature });
 
+      setSignature(signature, true);
       setUser(refreshedProfile);
 
       return refreshedProfile;
     } catch (err) {
       const newProfile = await charmClient.createUser({ address: signature.address, walletSignature: signature });
+      setSignature(signature, true);
       setUser(newProfile);
       return newProfile;
     }
@@ -150,9 +152,19 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
       const storedWalletSignature = getStoredSignature();
       setSignature(storedWalletSignature);
     } else if (isLoaded && account && !user?.wallets.some((w) => lowerCaseEqual(w.address, account))) {
-      setSignature(null);
-      setStoredAccount(null);
-      logoutUser();
+      const storedSignature = getStoredSignature();
+
+      if (storedSignature) {
+        loginFromWeb3Account(storedSignature).catch((e) => {
+          setSignature(null);
+          setStoredAccount(null);
+          logoutUser();
+        });
+      } else {
+        setSignature(null);
+        setStoredAccount(null);
+        logoutUser();
+      }
     }
   }, [account, user, isConnectingIdentity, isLoaded]);
 
