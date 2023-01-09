@@ -15,6 +15,7 @@ import Button from 'components/common/Button';
 import NetworkModal from 'components/common/PageLayout/components/Account/components/NetworkModal';
 import { useUser } from 'hooks/useUser';
 import { hasNftAvatar } from 'lib/users/hasNftAvatar';
+import { shortWalletAddress } from 'lib/utilities/strings';
 
 const AccountCard = styled.div`
   display: inline-flex;
@@ -120,9 +121,16 @@ function Account(): JSX.Element {
                 }
               : {}
           }
-          endIcon={<Avatar avatar={user?.avatar} name={user?.username || ''} isNft={hasNftAvatar(user)} size='small' />}
+          endIcon={
+            <Avatar
+              avatar={user?.avatar}
+              name={shortWalletAddress(user?.username)}
+              isNft={hasNftAvatar(user)}
+              size='small'
+            />
+          }
         >
-          {user?.username}
+          {shortWalletAddress(user?.username)}
         </AccountButton>
       </StyledButtonGroup>
       <NetworkModal isOpen={networkModalState.isOpen} onClose={networkModalState.close} />

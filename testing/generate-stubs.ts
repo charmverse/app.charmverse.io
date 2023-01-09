@@ -62,6 +62,10 @@ export function generateSubmissionContent(): SubmissionContent {
     walletAddress: '0x123456789'
   };
 }
+
+/**
+ * Generate a random lowercase wallet address
+ */
 export function randomETHWalletAddress() {
   return Wallet.createRandom().address.toLowerCase();
 }

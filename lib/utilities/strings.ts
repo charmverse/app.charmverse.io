@@ -148,10 +148,15 @@ export function sanitizeForRegex(string: string) {
 /**
  * Shortens valid wallet addresses, leaves other strings unchanged
  */
-export function shortWalletAddress(string: string): string {
+export function shortWalletAddress(string?: string): string {
+  if (!string) {
+    return '';
+  }
+
   if (utils.isAddress(string)) {
     return shortenHex(string).toLowerCase();
   }
+
   return string;
 }
 
