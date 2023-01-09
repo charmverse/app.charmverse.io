@@ -21,7 +21,7 @@ If you don't have a local Postgres server running, you can install and run it wi
 ```
 docker run -d -v $HOME/postgresql/data:/var/lib/postgresql/data -p 5432:5432 -e POSTGRES_PASSWORD=postgres postgres
 ```
-The connection string can be overidden by copying the `.env` file and renaming to `.env.local`:
+The connection string can be overridden by copying the `.env` file and renaming to `.env.local`:
 ```
 DATABASE_URL=postgres://postgres:postgres@localhost:5432/charmverse
 ```
@@ -148,7 +148,7 @@ npx prisma migrate dev --name blocks_title_required
 
 For more information about how migrations work: https://www.prisma.io/docs/concepts/components/prisma-migrate.
 
-#### Postgres CLI Cheatsheat
+#### Postgres CLI Cheatsheet
 
 ```
 # Connect to Postgres
@@ -194,7 +194,7 @@ or cmdline
 For a longer version of this Twingate docs: https://app.charmverse.io/charmverse/page-7001517083591569
 
 ### Web Sockets
-Real-time features including the content editor for pages relies on a web socket service. It depends on socket.io.
+Real-time features including the content editor for pages rely on a web socket service. It depends on socket.io.
 
 #### Development
 ```
@@ -279,7 +279,7 @@ To run all tests use `npm run test:e2e`
 
 __Info for running individual e2e in chromium browser__
 
-There is util command that will allow you to run single test in a spawned chromium broser for easier debugging. 
+There is util command that will allow you to run single test in a spawned chromium browser for easier debugging. 
 Command to use: `npm run debug:e2e __e2e__/YOUR_TEST_FILE.spec.ts`
 
 i.e: `npm run debug:e2e __e2e__/login.spec.ts`
