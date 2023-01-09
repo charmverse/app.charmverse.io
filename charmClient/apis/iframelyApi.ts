@@ -9,7 +9,8 @@ export class IframelyApi {
         key: process.env.NEXT_PUBLIC_IFRAMELY_API_KEY,
         iframe: '1',
         omit_script: '1',
-        media: '0'
+        media: '0',
+        card: 'small'
       },
       {
         credentials: 'omit'
