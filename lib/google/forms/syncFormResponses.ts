@@ -274,6 +274,7 @@ function getCardsAndPages({
         }
       },
       createdAt: prismaBlock.createdAt,
+      hasContent: true,
       title: `Response ${nextIndex}`,
       type: 'card_synced',
       contentText: '',

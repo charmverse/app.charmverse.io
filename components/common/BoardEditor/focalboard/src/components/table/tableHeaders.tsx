@@ -175,7 +175,7 @@ function TableHeaders(props: Props): JSX.Element {
       })}
       {/* empty column for actions */}
       <div className='octo-table-cell header-cell' style={{ flexGrow: 1, borderRight: '0 none' }}>
-        {!props.readOnly && (
+        {!props.readOnly && !props.readOnlySourceData && (
           <MenuWrapper>
             <Button>
               <AddIcon fontSize='small' />
