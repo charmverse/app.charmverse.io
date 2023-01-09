@@ -313,7 +313,7 @@ function getCardsAndPages({
   return { cardProperties, cards: cardBlocks, pages: cardPages };
 }
 
-function getCardProperties(form: GoogleForm): IPropertyTemplate[] {
+export function getCardProperties(form: GoogleForm): IPropertyTemplate[] {
   const properties: IPropertyTemplate[] = [
     // {
     //   id: userEmailProperty,
@@ -363,6 +363,29 @@ function getCardProperties(form: GoogleForm): IPropertyTemplate[] {
         prop.type = 'date';
       }
       properties.push(prop);
+    } else if (item.questionGroupItem && item.questionGroupItem.grid?.columns) {
+      const formType = item.questionGroupItem.grid.columns.type as 'RADIO' | 'CHECKBOX';
+      const propertyType = formType === 'RADIO' ? 'select' : 'multiSelect';
+      const options = item.questionGroupItem.grid.columns
+        .options!.map(
+          (choice): IPropertyOption => ({
+            id: choice.value ?? '', // use the value as id so that it is always the same
+            value: choice.value ?? '',
+            color: ''
+          })
+        )
+        // filter out options like { isOther: true }
+        .filter((option) => option.id !== '');
+      item.questionGroupItem.questions?.forEach((question) => {
+        const _questionId = question.questionId!;
+        const prop: IPropertyTemplate = {
+          id: _questionId,
+          name: `${item.title}: ${question.rowQuestion?.title}` ?? _questionId,
+          type: propertyType,
+          options
+        };
+        properties.push(prop);
+      });
     }
   });
 
@@ -407,7 +430,9 @@ function getAnswersFromResponse({
           .map((a) => getAnswerId(question.options, a.value))
           .filter(isTruthy);
       } else if (question.type === 'text') {
-        values[propId] = answer.textAnswers?.answers?.[0]?.value ?? '';
+        const fileName = answer.fileUploadAnswers?.answers?.[0]?.fileName;
+        const textAnswer = answer.textAnswers?.answers?.[0]?.value;
+        values[propId] = fileName ?? textAnswer ?? '';
       } else if (question.type === 'date') {
         // TODO: we should support dates that dont include time in focalboard
         const dateTime = answer.textAnswers?.answers?.[0]?.value
