@@ -1,6 +1,9 @@
 import { createAndAssignRolesDiscord } from 'lib/discord/createAndAssignRolesDiscord';
+import { getSpaceFromDiscord } from 'lib/discord/getSpaceFromDiscord';
 import { removeSpaceMemberDiscord } from 'lib/discord/removeSpaceMemberDiscord';
 import { unassignRolesDiscord } from 'lib/discord/unassignRolesDiscord';
+import { getRequestApiKey } from 'lib/middleware/getRequestApiKey';
+import { verifyApiKeyForSpace } from 'lib/middleware/verifyApiKeyForSpace';
 import type { MemberRoleWebhookData, MemberWebhookData, MessageType, WebhookMessage } from 'lib/webhooks/interfaces';
 
 const messageHandlers: Record<MessageType, (message: WebhookMessage) => Promise<boolean>> = {
@@ -55,6 +58,27 @@ export async function processWebhookMessage(message: WebhookMessage) {
   }
 
   const handler = messageHandlers[data?.type];
+  const hasPermission = await verifyWebhookMessagePermission(message);
+  if (!hasPermission) {
+    return true;
+  }
 
   return handler(message);
+}
+
+export async function verifyWebhookMessagePermission(message: WebhookMessage) {
+  const discordServerId = message?.data?.guild_id;
+  const apiKey = getRequestApiKey({ headers: message?.headers || {}, query: message?.query });
+
+  if (!discordServerId || !apiKey) {
+    return false;
+  }
+
+  try {
+    const space = await getSpaceFromDiscord(discordServerId);
+
+    return verifyApiKeyForSpace({ apiKey, spaceId: space.id });
+  } catch (e) {
+    return false;
+  }
 }
