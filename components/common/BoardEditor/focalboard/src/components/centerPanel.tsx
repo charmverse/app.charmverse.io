@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable max-lines */
+
 import CallMadeIcon from '@mui/icons-material/CallMade';
 import LaunchIcon from '@mui/icons-material/LaunchOutlined';
 import { Box, Typography, Link } from '@mui/material';
@@ -27,10 +28,6 @@ import {
   sortCards
 } from 'components/common/BoardEditor/focalboard/src/store/cards';
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
-import {
-  getCurrentViewDisplayBy,
-  getCurrentViewGroupBy
-} from 'components/common/BoardEditor/focalboard/src/store/views';
 import Button from 'components/common/Button';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -103,8 +100,6 @@ function CenterPanel(props: Props) {
   const router = useRouter();
   const space = useCurrentSpace();
   const { pages, updatePage } = usePages();
-  const _groupByProperty = useAppSelector(getCurrentViewGroupBy);
-  const _dateDisplayProperty = useAppSelector(getCurrentViewDisplayBy);
   const { members } = useMembers();
 
   const isEmbedded = !!props.embeddedBoardPath;
@@ -121,7 +116,10 @@ function CenterPanel(props: Props) {
 
   const activeBoard = useAppSelector(getBoard(activeBoardId ?? ''));
   const activePage = pages[activeBoardId ?? ''];
-
+  const _groupByProperty = activeBoard?.fields.cardProperties.find((o) => o.id === activeView?.fields.groupById);
+  const _dateDisplayProperty = activeBoard?.fields.cardProperties.find(
+    (o) => o.id === activeView?.fields.dateDisplayPropertyId
+  );
   const _cards = useAppSelector(
     getViewCardsSortedFilteredAndGrouped({
       boardId: activeBoard?.id || '',
@@ -137,7 +135,6 @@ function CenterPanel(props: Props) {
   if ((!groupByProperty || _groupByProperty?.type !== 'select') && activeView?.fields.viewType === 'board') {
     groupByProperty = activeBoard?.fields.cardProperties.find((o: any) => o.type === 'select');
   }
-
   let dateDisplayProperty = _dateDisplayProperty;
   if (!dateDisplayProperty && activeView?.fields.viewType === 'calendar') {
     dateDisplayProperty = activeBoard?.fields.cardProperties.find((o: any) => o.type === 'date');
@@ -424,7 +421,7 @@ function CenterPanel(props: Props) {
         });
       }
     }
-  }, [activeView?.fields.sourceData?.formId]);
+  }, [`${activeView?.fields.sourceData?.formId}${activeView?.fields.sourceData?.boardId}`]);
 
   const isLoadingSourceData = !activeBoard && state.showSettings !== 'create-linked-view';
 
@@ -514,7 +511,7 @@ function CenterPanel(props: Props) {
                   sx={{ color: 'inherit', fontWeight: 700 }}
                 >
                   {activeView?.fields.sourceData?.formName || 'Untitled'}
-                  <LaunchIcon fontSize='small' sx={{ ml: 0.5, position: 'relative', top: 2 }} />
+                  <LaunchIcon fontSize='small' sx={{ ml: 0.5, position: 'relative', top: 3 }} />
                 </Link>
                 {loadingFormResponses && (
                   <Box ml={2} component='span'>

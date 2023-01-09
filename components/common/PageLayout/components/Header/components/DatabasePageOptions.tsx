@@ -101,7 +101,7 @@ export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: 
       };
     });
     try {
-      CsvExporter.exportTableCsv(board, view, cards, intl);
+      CsvExporter.exportTableCsv(board, view, _cards, intl);
       showMessage('Export complete!');
     } catch (error) {
       log.error('CSV export failed', error);

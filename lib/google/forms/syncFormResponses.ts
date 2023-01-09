@@ -26,13 +26,31 @@ type GoogleForm = googlForms.forms_v1.Schema$Form;
 type GoogleFormResponse = googlForms.forms_v1.Schema$FormResponse;
 
 // the rootId is the id of the top-level board, from which we inherit permissions
-export async function syncFormResponses({ createdBy, view }: { createdBy: string; view: PrismaBlock }) {
+export async function syncFormResponses({
+  createdBy,
+  view,
+  reset
+}: {
+  createdBy: string;
+  view: PrismaBlock;
+  reset?: boolean;
+}) {
   const rootId = view.rootId;
   const viewId = view.id;
   const fields = view.fields as BoardViewFields;
   const sourceData = fields.sourceData;
   if (fields.sourceType !== 'google_form' || !sourceData) {
     throw new WrongStateError('Board is not set up to connect to Google');
+  }
+  // clear out the board if we're resetting
+  if (reset && fields.sourceData?.boardId) {
+    const cards = await prisma.block.findMany({ where: { parentId: fields.sourceData.boardId } });
+    const pages = await prisma.page.findMany({ where: { id: { in: cards.map((c) => c.id) } } });
+    const r = await prisma.$transaction([
+      prisma.block.deleteMany({ where: { id: fields.sourceData.boardId } }),
+      prisma.page.deleteMany({ where: { id: { in: pages.map((p) => p.id) } } })
+    ]);
+    delete sourceData.boardId;
   }
 
   // First, set up the board or "database" block, including the cardProperties based on form questions
@@ -44,13 +62,13 @@ export async function syncFormResponses({ createdBy, view }: { createdBy: string
   board.rootId = rootId;
   board.updatedBy = createdBy;
 
-  if (hasRefreshedRecently) {
+  if (hasRefreshedRecently && !reset) {
     // log.debug('Skip refreshing board because it was refreshed recently', { syncThrottlePeriod });
     return;
   }
 
   // Retrieve the form and responses
-  const { form, responses } = await getFormAndResponses(sourceData, lastUpdated);
+  const { form, responses } = await getFormAndResponses(sourceData, reset ? null : lastUpdated);
 
   const { cardProperties, cards, pages } = getCardsAndPages({
     cardParentId: board.id,
@@ -77,6 +95,9 @@ export async function syncFormResponses({ createdBy, view }: { createdBy: string
 
   // add the boardId to the view's sourceData
   sourceData.boardId = board.id;
+  if (form.info?.documentTitle) {
+    sourceData.formName = form.info.documentTitle;
+  }
   fields.visiblePropertyIds = cardProperties.map((p) => p.id);
 
   const updateView = lastUpdated ? [] : [prisma.block.update({ where: { id: viewId }, data: { fields } })];

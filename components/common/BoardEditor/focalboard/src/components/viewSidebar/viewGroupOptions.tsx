@@ -16,7 +16,6 @@ interface LayoutOptionsProps {
 
 function GroupByOptions(props: LayoutOptionsProps) {
   const { groupByProperty, properties, view } = props;
-
   const showTableUngroup = view.fields.viewType === 'table' && view.fields.groupById;
   const hasPropertiesToGroupBy =
     showTableUngroup || (properties || []).filter((o: IPropertyTemplate) => o.type === 'select').length > 0;
@@ -24,7 +23,7 @@ function GroupByOptions(props: LayoutOptionsProps) {
   return (
     <Box onClick={(e) => e.stopPropagation()}>
       {properties
-        ?.filter((o: IPropertyTemplate) => o.type === 'select')
+        .filter((o: IPropertyTemplate) => o.type === 'select')
         .map((property: IPropertyTemplate) => (
           <MenuItem
             dense

@@ -11,6 +11,7 @@ import { UnauthorisedActionError } from 'lib/utilities/errors';
 import { InvalidInputError } from 'lib/utilities/errors/errors';
 
 export type RefreshFormsRequest = {
+  reset?: boolean;
   viewId: string;
 };
 
@@ -19,7 +20,7 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 handler.use(requireUser).post(syncResponsesResponse);
 
 async function syncResponsesResponse(req: NextApiRequest, res: NextApiResponse) {
-  const viewId = req.body.viewId;
+  const { reset, viewId } = req.body;
 
   if (typeof viewId !== 'string') {
     throw new InvalidInputError('View id is required');
@@ -28,7 +29,7 @@ async function syncResponsesResponse(req: NextApiRequest, res: NextApiResponse) 
   const view = await prisma.block.findUniqueOrThrow({ where: { id: viewId } });
 
   try {
-    await syncFormResponses({ createdBy: req.session.user.id, view });
+    await syncFormResponses({ createdBy: req.session.user.id, view, reset });
   } catch (error) {
     if (error instanceof GaxiosError) {
       await invalidateCredential({

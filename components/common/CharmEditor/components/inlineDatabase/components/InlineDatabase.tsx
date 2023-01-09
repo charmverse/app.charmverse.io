@@ -9,12 +9,7 @@ import CardDialog from 'components/common/BoardEditor/focalboard/src/components/
 import RootPortal from 'components/common/BoardEditor/focalboard/src/components/rootPortal';
 import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
-import {
-  getCurrentViewDisplayBy,
-  getCurrentViewGroupBy,
-  getSortedViews,
-  getView
-} from 'components/common/BoardEditor/focalboard/src/store/views';
+import { getSortedViews, getView } from 'components/common/BoardEditor/focalboard/src/store/views';
 import FocalBoardPortal from 'components/common/BoardEditor/FocalBoardPortal';
 import { usePages } from 'hooks/usePages';
 import debouncePromise from 'lib/utilities/debouncePromise';
@@ -107,8 +102,6 @@ export default function DatabaseView({ containerWidth, readOnly: readOnlyOverrid
   const [currentViewId, setCurrentViewId] = useState<string | null>(views[0]?.id || null);
   const currentView = useAppSelector(getView(currentViewId || '')) ?? undefined;
 
-  const groupByProperty = useAppSelector(getCurrentViewGroupBy);
-  const dateDisplayProperty = useAppSelector(getCurrentViewDisplayBy);
   const { pages, updatePage, getPagePermissions } = usePages();
 
   const [shownCardId, setShownCardId] = useState<string | null>(null);
@@ -144,16 +137,6 @@ export default function DatabaseView({ containerWidth, readOnly: readOnlyOverrid
 
   if (!board) {
     return null;
-  }
-
-  let property = groupByProperty;
-  if ((!property || property.type !== 'select') && currentView?.fields.viewType === 'board') {
-    property = board.fields.cardProperties.find((o: any) => o.type === 'select');
-  }
-
-  let displayProperty = dateDisplayProperty;
-  if (!displayProperty && currentView?.fields.viewType === 'calendar') {
-    displayProperty = board.fields.cardProperties.find((o: any) => o.type === 'date');
   }
 
   const deleteView = useCallback(

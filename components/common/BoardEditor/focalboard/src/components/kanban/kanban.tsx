@@ -276,7 +276,7 @@ function Kanban(props: Props) {
           />
         ))}
 
-        {groupByProperty && (
+        {!props.readOnly && groupByProperty && (
           <div className='octo-board-header-cell narrow' {...menuTriggerProps}>
             <Button size='small' variant='text' color='secondary'>
               <FormattedMessage id='BoardComponent.add-a-group' defaultMessage='+ Add a group' />
