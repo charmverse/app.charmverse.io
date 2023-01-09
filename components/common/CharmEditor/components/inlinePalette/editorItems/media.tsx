@@ -1,4 +1,5 @@
 import { rafCommandExec } from '@bangle.dev/utils';
+import BookmarkIcon from '@mui/icons-material/Bookmark';
 import ImageIcon from '@mui/icons-material/Image';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import VideoLibraryIcon from '@mui/icons-material/VideoLibrary';
@@ -78,6 +79,34 @@ export function items(): PaletteItemTypeNoGroup[] {
             // let the node view know to show the tooltip by default
             const tooltipMark = _state.schema.mark('tooltip-marker');
             const node = _state.schema.nodes.pdf.create(
+              {
+                src: null
+              },
+              undefined,
+              [tooltipMark]
+            );
+
+            if (_dispatch && isAtBeginningOfLine(_state)) {
+              _dispatch(_state.tr.replaceSelectionWith(node, false));
+              return true;
+            }
+            return insertNode(_state, _dispatch, node);
+          });
+          return replaceSuggestionMarkWith(palettePluginKey, '')(state, dispatch, view);
+        };
+      }
+    },
+    {
+      uid: 'bookmark',
+      title: 'Bookmark',
+      icon: <BookmarkIcon sx={{ fontSize: iconSize }} />,
+      description: 'Save a link as a visual bookmark',
+      editorExecuteCommand: ({ palettePluginKey }) => {
+        return (state, dispatch, view) => {
+          rafCommandExec(view!, (_state, _dispatch) => {
+            // let the node view know to show the tooltip by default
+            const tooltipMark = _state.schema.mark('tooltip-marker');
+            const node = _state.schema.nodes.bookmark.create(
               {
                 src: null
               },
