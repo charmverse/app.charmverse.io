@@ -2,8 +2,9 @@ import { Plugin, NodeView } from '@bangle.dev/core';
 import type { EditorView, Slice } from '@bangle.dev/pm';
 
 import { insertNode } from 'lib/prosemirror/insertNode';
+import { extractTweetAttrs } from 'lib/twitter/extractTweetAttrs';
 
-import { name, extractTweetAttrs } from './tweetSpec';
+import { name } from './tweetSpec';
 
 // inject a tweet node when pasting twitter url
 

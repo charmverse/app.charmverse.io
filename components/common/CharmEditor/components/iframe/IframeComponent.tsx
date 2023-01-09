@@ -1,6 +1,8 @@
 import { Box } from '@mui/material';
 import { useState, memo } from 'react';
 
+import { extractTweetAttrs } from 'lib/twitter/extractTweetAttrs';
+
 import BlockAligner from '../BlockAligner';
 import { IframeContainer } from '../common/IframeContainer';
 import { MediaSelectionPopup } from '../common/MediaSelectionPopup';
@@ -8,7 +10,6 @@ import { MediaUrlInput } from '../common/MediaUrlInput';
 import { extractAttrsFromUrl as extractNFTAttrs } from '../nft/nftUtils';
 import type { CharmNodeViewProps } from '../nodeView/nodeView';
 import VerticalResizer from '../Resizable/VerticalResizer';
-import { extractTweetAttrs } from '../tweet/tweetSpec';
 import { extractYoutubeLinkType } from '../video/utils';
 
 import { EmbedIcon } from './components/EmbedIcon';

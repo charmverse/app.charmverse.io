@@ -6,6 +6,7 @@ import Script from 'next/script';
 import { useRef } from 'react';
 
 import log from 'lib/log';
+import { extractTweetAttrs } from 'lib/twitter/extractTweetAttrs';
 import { randomIntFromInterval } from 'lib/utilities/random';
 
 import BlockAligner from '../BlockAligner';
@@ -14,7 +15,6 @@ import { MediaUrlInput } from '../common/MediaUrlInput';
 import type { CharmNodeViewProps } from '../nodeView/nodeView';
 
 import type { TweetNodeAttrs } from './tweetSpec';
-import { extractTweetAttrs } from './tweetSpec';
 
 export const twitterWidgetJs = 'https://platform.twitter.com/widgets.js';
 

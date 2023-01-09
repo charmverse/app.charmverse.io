@@ -17,6 +17,7 @@ import type {
   ColumnBlockNode
 } from 'lib/prosemirror/interfaces';
 import { MAX_IMAGE_WIDTH, MIN_IMAGE_WIDTH } from 'lib/prosemirror/plugins/image/constants';
+import { extractTweetAttrs } from 'lib/twitter/extractTweetAttrs';
 import { isTruthy } from 'lib/utilities/types';
 
 import { convertRichText } from '../convertRichText';
@@ -323,10 +324,31 @@ export class NotionBlock {
 
       case 'embed':
       case 'bookmark': {
+        const url = block.type === 'bookmark' ? block.bookmark.url : block.embed.url;
+        const tweetParams = extractTweetAttrs(url);
+        if (tweetParams) {
+          return {
+            type: 'tweet',
+            attrs: {
+              screenName: tweetParams.screenName,
+              id: tweetParams.id
+            }
+          };
+        }
+
+        if (block.type === 'bookmark') {
+          return {
+            type: 'bookmark',
+            attrs: {
+              url
+            }
+          };
+        }
+
         return {
           type: 'iframe',
           attrs: {
-            src: block.type === 'bookmark' ? block.bookmark.url : block.embed.url,
+            src: url,
             type: 'embed',
             width: MAX_EMBED_WIDTH,
             height: MIN_EMBED_HEIGHT
