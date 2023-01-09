@@ -37,6 +37,7 @@ import type { Board } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
 import { createCard } from 'lib/focalboard/card';
+import log from 'lib/log';
 import type { IPagePermissionFlags } from 'lib/permissions/pages';
 
 import {
@@ -51,23 +52,6 @@ interface Props {
   closeMenu: () => void;
   pageId: string;
   pagePermissions?: IPagePermissionFlags;
-}
-
-function onExportCsvTrigger(board: Board, activeView: BoardView, cards: Card[], intl: IntlShape) {
-  try {
-    CsvExporter.exportTableCsv(board, activeView, cards, intl);
-    const exportCompleteMessage = intl.formatMessage({
-      id: 'ViewHeader.export-complete',
-      defaultMessage: 'Export complete!'
-    });
-    sendFlashMessage({ content: exportCompleteMessage, severity: 'normal' });
-  } catch (e) {
-    const exportFailedMessage = intl.formatMessage({
-      id: 'ViewHeader.export-failed',
-      defaultMessage: 'Export failed!'
-    });
-    sendFlashMessage({ content: exportFailedMessage, severity: 'high' });
-  }
 }
 
 export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: Props) {
@@ -116,7 +100,13 @@ export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: 
         title: page.title
       };
     });
-    onExportCsvTrigger(board, view, _cards, intl);
+    try {
+      CsvExporter.exportTableCsv(board, view, cards, intl);
+      showMessage('Export complete!');
+    } catch (error) {
+      log.error('CSV export failed', error);
+      showMessage('Export failed', 'error');
+    }
     closeMenu();
     const spaceId = pages[pageId]?.spaceId;
     if (spaceId) {

@@ -13,6 +13,7 @@ import log from 'lib/log';
 import { getPageMetaList } from 'lib/pages/server/getPageMetaList';
 import { copyAllPagePermissions } from 'lib/permissions/pages/actions/copyPermission';
 import { WrongStateError } from 'lib/utilities/errors/invalidData';
+import { uid } from 'lib/utilities/strings';
 import { isTruthy } from 'lib/utilities/types';
 import { relay } from 'lib/websockets/relay';
 
@@ -315,7 +316,7 @@ function getCardProperties(form: GoogleForm): IPropertyTemplate[] {
       const options = (choiceQuestion?.options ?? [])
         .map(
           (choice): IPropertyOption => ({
-            id: choice.value ?? '',
+            id: choice.value ?? '', // use the value as id so that it is always the same
             value: choice.value ?? '',
             color: ''
           })
@@ -368,14 +369,21 @@ function getAnswersFromResponse({
     const question = properties.find((prop) => prop.id === answer.questionId);
     if (question) {
       const propId = question.id;
+
       if (question.type === 'number' && answer.grade) {
         if (answer.grade.score) {
           values[propId] = answer.grade.score?.toString() ?? '';
         } else {
           values[propId] = answer.grade.correct ? 'Correct' : 'Incorrect';
         }
-      } else if (question.type === 'select' || question.type === 'multiSelect') {
-        values[propId] = (answer.textAnswers?.answers ?? []).map((a) => a.value).filter(isTruthy);
+      } else if (question.type === 'select') {
+        values[propId] = (answer.textAnswers?.answers ?? [])
+          .map((a) => getAnswerId(question.options, a.value))
+          .filter(isTruthy)[0];
+      } else if (question.type === 'multiSelect') {
+        values[propId] = (answer.textAnswers?.answers ?? [])
+          .map((a) => getAnswerId(question.options, a.value))
+          .filter(isTruthy);
       } else if (question.type === 'text') {
         values[propId] = answer.textAnswers?.answers?.[0]?.value ?? '';
       } else if (question.type === 'date') {
@@ -393,6 +401,11 @@ function getAnswersFromResponse({
   });
 
   return values;
+}
+
+function getAnswerId(options: IPropertyOption[], value: string | null | undefined): string {
+  const option = options.find((o) => o.value === value);
+  return option?.id ?? '';
 }
 
 function _getFormsClient(refreshToken: string) {

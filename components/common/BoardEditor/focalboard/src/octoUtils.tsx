@@ -31,7 +31,6 @@ class OctoUtils {
         // The property value is the id of the template
         if (propertyValue) {
           const option = propertyTemplate.options.find((o) => o.id === propertyValue);
-
           displayValue = option?.value || '(Unknown)';
         }
         break;
