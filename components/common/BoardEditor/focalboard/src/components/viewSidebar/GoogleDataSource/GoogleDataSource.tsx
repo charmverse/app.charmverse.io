@@ -1,6 +1,6 @@
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import ReportProblemIcon from '@mui/icons-material/ReportProblemOutlined';
-import { Box, MenuItem, ListItemIcon, ListItem, ListItemText, Tooltip, Typography, Link } from '@mui/material';
+import { Alert, Box, MenuItem, ListItemIcon, ListItem, ListItemText, Tooltip, Typography, Link } from '@mui/material';
 import Script from 'next/script';
 import type { MouseEventHandler } from 'react';
 import { useState } from 'react';
@@ -48,6 +48,7 @@ export function GoogleDataSource(props: Props) {
         <ListItem>
           <Typography variant='caption'>Find and embed your Google forms</Typography>
         </ListItem>
+        <GoogleAuthWarning />
       </>
     );
   } else if (selectedCredential) {
@@ -82,7 +83,17 @@ export function GoogleDataSource(props: Props) {
       <MenuItem dense sx={{ color: 'text.secondary' }} onClick={() => loginWithGoogle()} color='secondary'>
         Connect another account
       </MenuItem>
+      <GoogleAuthWarning />
     </>
+  );
+}
+
+function GoogleAuthWarning() {
+  return (
+    <Alert severity='warning'>
+      <Typography variant='body1'>Unverified Google app</Typography>
+      <Typography variant='body2'>This feature is in beta while our app is under review</Typography>
+    </Alert>
   );
 }
 
