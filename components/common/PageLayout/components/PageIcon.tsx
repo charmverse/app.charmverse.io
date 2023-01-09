@@ -18,6 +18,7 @@ export const StyledDatabaseIcon = styled(DatabaseIcon)`
 
 export const StyledPageIcon = styled(EmojiIcon)`
   height: 24px;
+  z-index: 0;
   width: 24px;
   margin-right: 4px;
   color: ${({ theme }) => theme.palette.secondary.light};
