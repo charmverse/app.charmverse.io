@@ -1,8 +1,6 @@
 import type * as googlForms from '@googleapis/forms';
 
-import { uid } from 'lib/utilities/strings';
-
-import { getCardProperties } from '../syncFormResponses';
+import { getCardProperties } from '../getCardsAndPages';
 
 type GoogleForm = googlForms.forms_v1.Schema$Form;
 
