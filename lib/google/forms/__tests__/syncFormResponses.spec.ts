@@ -32,6 +32,26 @@ const testForm: GoogleForm = {
       }
     },
     {
+      itemId: '5a026959',
+      title: 'Multiple choice with other',
+      questionItem: {
+        question: {
+          questionId: '0ca82e53',
+          choiceQuestion: {
+            type: 'RADIO',
+            options: [
+              {
+                value: 'Option 1'
+              },
+              {
+                isOther: true
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
       itemId: '1c41d739',
       title: 'Paragraph answer question',
       questionItem: {
@@ -225,11 +245,12 @@ describe('getCardProperties()', () => {
     expect(cardProperties.length).toBe(testForm.items!.length + 3 + 1);
     expect(cardProperties[0]).toEqual(expect.objectContaining({ id: 'response_link' }));
     expect(cardProperties[1]).toEqual(expect.objectContaining({ type: 'select', name: 'Multiple choice question' }));
-    expect(cardProperties[2]).toEqual(expect.objectContaining({ type: 'text', name: 'Paragraph answer question' }));
+    expect(cardProperties[2]).toEqual(expect.objectContaining({ type: 'text', name: 'Multiple choice with other' }));
+    expect(cardProperties[3]).toEqual(expect.objectContaining({ type: 'text', name: 'Paragraph answer question' }));
 
-    expect(cardProperties[3]).toEqual(expect.objectContaining({ type: 'text', name: 'Short answer question' }));
+    expect(cardProperties[4]).toEqual(expect.objectContaining({ type: 'text', name: 'Short answer question' }));
 
-    expect(cardProperties[4]).toEqual(
+    expect(cardProperties[5]).toEqual(
       expect.objectContaining({
         type: 'multiSelect',
         name: 'Checkboxes question: google search',
@@ -239,27 +260,29 @@ describe('getCardProperties()', () => {
         ])
       })
     );
-    expect(cardProperties[5]).toEqual(
+    expect(cardProperties[6]).toEqual(
       expect.objectContaining({
         type: 'select',
         name: 'Dropdown question',
         options: expect.arrayContaining([{ color: '', id: 'Option 1', value: 'Option 1' }])
       })
     );
-    expect(cardProperties[6]).toEqual(expect.objectContaining({ type: 'text', name: 'File upload question' }));
-    expect(cardProperties[7]).toEqual(expect.objectContaining({ type: 'text', name: 'Linear scale' }));
-    expect(cardProperties[8]).toEqual(expect.objectContaining({ type: 'select', name: 'Multiple choice grid: Row 1' }));
-    expect(cardProperties[9]).toEqual(expect.objectContaining({ type: 'select', name: 'Multiple choice grid: Row 2' }));
+    expect(cardProperties[7]).toEqual(expect.objectContaining({ type: 'text', name: 'File upload question' }));
+    expect(cardProperties[8]).toEqual(expect.objectContaining({ type: 'text', name: 'Linear scale' }));
+    expect(cardProperties[9]).toEqual(expect.objectContaining({ type: 'select', name: 'Multiple choice grid: Row 1' }));
     expect(cardProperties[10]).toEqual(
-      expect.objectContaining({ type: 'select', name: 'Multiple choice grid: Row 3' })
+      expect.objectContaining({ type: 'select', name: 'Multiple choice grid: Row 2' })
     );
     expect(cardProperties[11]).toEqual(
-      expect.objectContaining({ type: 'multiSelect', name: 'Checkbox grid: Checkbox Row 1' })
+      expect.objectContaining({ type: 'select', name: 'Multiple choice grid: Row 3' })
     );
     expect(cardProperties[12]).toEqual(
+      expect.objectContaining({ type: 'multiSelect', name: 'Checkbox grid: Checkbox Row 1' })
+    );
+    expect(cardProperties[13]).toEqual(
       expect.objectContaining({ type: 'multiSelect', name: 'Checkbox grid: Checkbox Row 2' })
     );
-    expect(cardProperties[13]).toEqual(expect.objectContaining({ type: 'date', name: 'Date with year' }));
-    expect(cardProperties[14]).toEqual(expect.objectContaining({ type: 'text', name: 'Time question' }));
+    expect(cardProperties[14]).toEqual(expect.objectContaining({ type: 'date', name: 'Date with year' }));
+    expect(cardProperties[15]).toEqual(expect.objectContaining({ type: 'text', name: 'Time question' }));
   });
 });

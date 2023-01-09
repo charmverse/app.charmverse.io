@@ -347,6 +347,7 @@ export function getCardProperties(form: GoogleForm): IPropertyTemplate[] {
         .filter((option) => option.id !== '');
 
       const hasIsOther = choiceQuestion?.options?.some((option) => option.isOther);
+
       const prop: IPropertyTemplate = {
         id: questionId,
         name: item.title ?? questionId,
@@ -354,9 +355,9 @@ export function getCardProperties(form: GoogleForm): IPropertyTemplate[] {
         options
       };
 
-      if (choiceQuestion?.type === 'RADIO' || (choiceQuestion?.type === 'DROP_DOWN' && !hasIsOther)) {
+      if (!hasIsOther && (choiceQuestion?.type === 'RADIO' || (choiceQuestion?.type === 'DROP_DOWN' && !hasIsOther))) {
         prop.type = 'select';
-      } else if (choiceQuestion?.type === 'CHECKBOX') {
+      } else if (!hasIsOther && choiceQuestion?.type === 'CHECKBOX') {
         prop.type = 'multiSelect';
       } else if (dateQuestion?.includeYear) {
         // only work with date questions that include the year
@@ -364,8 +365,9 @@ export function getCardProperties(form: GoogleForm): IPropertyTemplate[] {
       }
       properties.push(prop);
     } else if (item.questionGroupItem && item.questionGroupItem.grid?.columns) {
+      const hasIsOther = item.questionGroupItem.grid.columns.options?.some((option) => option.isOther);
       const formType = item.questionGroupItem.grid.columns.type as 'RADIO' | 'CHECKBOX';
-      const propertyType = formType === 'RADIO' ? 'select' : 'multiSelect';
+      const propertyType = !hasIsOther ? (formType === 'RADIO' ? 'select' : 'multiSelect') : 'text';
       const options = item.questionGroupItem.grid.columns
         .options!.map(
           (choice): IPropertyOption => ({
