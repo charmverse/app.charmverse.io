@@ -13,7 +13,6 @@ export function pageMetaSelect() {
     boardId: true,
     bountyId: true,
     cardId: true,
-    postId: true,
     createdAt: true,
     createdBy: true,
     deletedAt: true,
@@ -69,7 +68,7 @@ export async function getPageMeta(
         spaceId
       };
 
-  return prisma.page.findFirst({
+  return tx.page.findFirst({
     where: searchQuery,
     select: pageMetaSelect()
   }) as Promise<PageMeta | null>;

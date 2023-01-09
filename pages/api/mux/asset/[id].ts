@@ -22,7 +22,7 @@ async function getAssetEndpoint(req: NextApiRequest, res: NextApiResponse<AssetR
   const query = req.query as AssetRequest;
   const isAllowed = await canView({
     userId: req.session.user?.id,
-    pageId: query.pageId
+    resourceId: query.pageId
   });
 
   if (!isAllowed) {

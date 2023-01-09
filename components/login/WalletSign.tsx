@@ -6,6 +6,7 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import type { AuthSig } from 'lib/blockchain/interfaces';
 import log from 'lib/log';
+import { isTouchScreen } from 'lib/utilities/browser';
 import { lowerCaseEqual } from 'lib/utilities/strings';
 
 interface Props {
@@ -42,7 +43,8 @@ export function WalletSign({
 
   const showLoadingState = loading || isSigning;
   useEffect(() => {
-    if (!isSigning && enableAutosign && verifiableWalletDetected && !isConnectingIdentity) {
+    // Do not trigger signature if user is on a mobile device
+    if (!isTouchScreen() && !isSigning && enableAutosign && verifiableWalletDetected && !isConnectingIdentity) {
       generateWalletAuth();
     }
   }, [verifiableWalletDetected]);

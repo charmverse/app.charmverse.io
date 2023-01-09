@@ -72,11 +72,10 @@ function DocumentPage({ page, setPage, insideModal, readOnly = false, parentProp
   const { pages, getPagePermissions } = usePages();
   const { cancelVote, castVote, deleteVote, votes, isLoading } = useVotes();
   // For post we would artificially construct the permissions
-  const pagePermissions = getPagePermissions(page.id, page.type === 'post' ? page : undefined);
+  const pagePermissions = getPagePermissions(page.id);
   const { draftBounty } = useBounties();
   const { currentPageActionDisplay } = usePageActionDisplay();
   const { editMode, setPageProps } = usePrimaryCharmEditor();
-  const { user } = useUser();
 
   // Only populate bounty permission data if this is a bounty page
   const [bountyPermissions, setBountyPermissions] = useState<AssignedBountyPermissions | null>(null);
