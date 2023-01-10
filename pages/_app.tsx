@@ -221,43 +221,37 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
         <ThemeProvider theme={theme}>
           <LocalizationProvider dateAdapter={AdapterLuxon as any}>
             <SnackbarProvider>
-              <Web3ReactProvider getLibrary={getLibrary}>
-                <Web3ConnectionManager>
-                  <Web3AccountProvider>
-                    <ReactDndProvider>
-                      <DataProviders>
-                        <OnboardingProvider>
-                          <FocalBoardProvider>
-                            <IntlProvider>
-                              <PageHead />
-                              <CssBaseline enableColorScheme={true} />
-                              <Global styles={cssVariables} />
-                              <RouteGuard>
-                                <ErrorBoundary>
-                                  <Snackbar
-                                    isOpen={isOldBuild}
-                                    message='New CharmVerse platform update available. Please refresh.'
-                                    actions={[
-                                      <IconButton key='reload' onClick={() => window.location.reload()} color='inherit'>
-                                        <RefreshIcon fontSize='small' />
-                                      </IconButton>
-                                    ]}
-                                    origin={{ vertical: 'top', horizontal: 'center' }}
-                                    severity='warning'
-                                    handleClose={() => setIsOldBuild(false)}
-                                  />
-                                  {getLayout(<Component {...pageProps} />)}
-                                  <GlobalComponents />
-                                </ErrorBoundary>
-                              </RouteGuard>
-                            </IntlProvider>
-                          </FocalBoardProvider>
-                        </OnboardingProvider>
-                      </DataProviders>
-                    </ReactDndProvider>
-                  </Web3AccountProvider>
-                </Web3ConnectionManager>
-              </Web3ReactProvider>
+              <ReactDndProvider>
+                <DataProviders>
+                  <OnboardingProvider>
+                    <FocalBoardProvider>
+                      <IntlProvider>
+                        <PageHead />
+                        <CssBaseline enableColorScheme={true} />
+                        <Global styles={cssVariables} />
+                        <RouteGuard>
+                          <ErrorBoundary>
+                            <Snackbar
+                              isOpen={isOldBuild}
+                              message='New CharmVerse platform update available. Please refresh.'
+                              actions={[
+                                <IconButton key='reload' onClick={() => window.location.reload()} color='inherit'>
+                                  <RefreshIcon fontSize='small' />
+                                </IconButton>
+                              ]}
+                              origin={{ vertical: 'top', horizontal: 'center' }}
+                              severity='warning'
+                              handleClose={() => setIsOldBuild(false)}
+                            />
+                            {getLayout(<Component {...pageProps} />)}
+                            <GlobalComponents />
+                          </ErrorBoundary>
+                        </RouteGuard>
+                      </IntlProvider>
+                    </FocalBoardProvider>
+                  </OnboardingProvider>
+                </DataProviders>
+              </ReactDndProvider>
             </SnackbarProvider>
           </LocalizationProvider>
         </ThemeProvider>
@@ -269,21 +263,27 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
 function DataProviders({ children }: { children: ReactNode }) {
   return (
     <UserProvider>
-      <SpacesProvider>
-        <WebSocketClientProvider>
-          <MembersProvider>
-            <BountiesProvider>
-              <PaymentMethodsProvider>
-                <PagesProvider>
-                  <PrimaryCharmEditorProvider>
-                    <PageTitleProvider>{children}</PageTitleProvider>
-                  </PrimaryCharmEditorProvider>
-                </PagesProvider>
-              </PaymentMethodsProvider>
-            </BountiesProvider>
-          </MembersProvider>
-        </WebSocketClientProvider>
-      </SpacesProvider>
+      <Web3ReactProvider getLibrary={getLibrary}>
+        <Web3ConnectionManager>
+          <Web3AccountProvider>
+            <SpacesProvider>
+              <WebSocketClientProvider>
+                <MembersProvider>
+                  <BountiesProvider>
+                    <PaymentMethodsProvider>
+                      <PagesProvider>
+                        <PrimaryCharmEditorProvider>
+                          <PageTitleProvider>{children}</PageTitleProvider>
+                        </PrimaryCharmEditorProvider>
+                      </PagesProvider>
+                    </PaymentMethodsProvider>
+                  </BountiesProvider>
+                </MembersProvider>
+              </WebSocketClientProvider>
+            </SpacesProvider>
+          </Web3AccountProvider>
+        </Web3ConnectionManager>
+      </Web3ReactProvider>
     </UserProvider>
   );
 }

@@ -5,6 +5,9 @@ import {
   MAX_EMBED_WIDTH,
   MIN_EMBED_HEIGHT
 } from 'components/common/CharmEditor/components/iframe/config';
+import { extractAttrsFromUrl as extractNFTAttrs } from 'components/common/CharmEditor/components/nft/nftUtils';
+import { extractTweetAttrs } from 'components/common/CharmEditor/components/tweet/tweetSpec';
+import { extractYoutubeLinkType } from 'components/common/CharmEditor/components/video/utils';
 import { VIDEO_ASPECT_RATIO } from 'components/common/CharmEditor/components/video/videoSpec';
 import type {
   TextContent,
@@ -311,22 +314,67 @@ export class NotionBlock {
 
       case 'video': {
         return {
-          type: 'iframe',
+          type: 'video',
           attrs: {
             src: block.video.type === 'external' ? block.video.external.url : null,
-            type: 'video',
-            width: (MIN_EMBED_WIDTH + MAX_EMBED_WIDTH) / 2,
-            height: (MIN_EMBED_WIDTH + MAX_EMBED_WIDTH) / 2 / VIDEO_ASPECT_RATIO
+            width: MAX_EMBED_WIDTH,
+            height: MAX_EMBED_WIDTH / VIDEO_ASPECT_RATIO
           }
         };
       }
 
       case 'embed':
       case 'bookmark': {
+        const url = block.type === 'bookmark' ? block.bookmark.url : block.embed.url;
+        const tweetAttrs = extractTweetAttrs(url);
+        const nftAttrs = extractNFTAttrs(url);
+        const isYoutube = extractYoutubeLinkType(url);
+
+        if (tweetAttrs) {
+          return {
+            type: 'tweet',
+            attrs: {
+              screenName: tweetAttrs.screenName,
+              id: tweetAttrs.id
+            }
+          };
+        }
+
+        if (nftAttrs) {
+          return {
+            type: 'nft',
+            attrs: {
+              chain: nftAttrs.chain,
+              token: nftAttrs.token,
+              contract: nftAttrs.contract
+            }
+          };
+        }
+
+        if (isYoutube) {
+          return {
+            type: 'video',
+            attrs: {
+              src: url,
+              width: MAX_EMBED_WIDTH,
+              height: MAX_EMBED_WIDTH / VIDEO_ASPECT_RATIO
+            }
+          };
+        }
+
+        if (block.type === 'bookmark') {
+          return {
+            type: 'bookmark',
+            attrs: {
+              url
+            }
+          };
+        }
+
         return {
           type: 'iframe',
           attrs: {
-            src: block.type === 'bookmark' ? block.bookmark.url : block.embed.url,
+            src: url,
             type: 'embed',
             width: MAX_EMBED_WIDTH,
             height: MIN_EMBED_HEIGHT

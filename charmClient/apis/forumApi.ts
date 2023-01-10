@@ -1,4 +1,4 @@
-import type { PostComment, PostCategory, Post } from '@prisma/client';
+import type { PostComment, PostCategory, Post, Space } from '@prisma/client';
 
 import * as http from 'adapters/http';
 import type { CreatePostCategoryInput } from 'lib/forums/categories/createPostCategory';
@@ -53,6 +53,12 @@ export class ForumApi {
 
   createPostCategory(spaceId: string, category: CreatePostCategoryInput): Promise<PostCategory> {
     return http.POST(`/api/spaces/${spaceId}/post-categories`, category);
+  }
+
+  setDefaultPostCategory({ spaceId, postCategoryId }: { spaceId: string; postCategoryId: string }): Promise<Space> {
+    return http.POST(`/api/spaces/${spaceId}/set-default-post-category`, {
+      postCategoryId
+    });
   }
 
   updatePostCategory({

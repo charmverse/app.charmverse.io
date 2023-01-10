@@ -13,7 +13,7 @@ type Props = {
 };
 
 export function useDiscordGate({ spaceDomain, onSuccess }: Props) {
-  const { user, refreshUserWithWeb3Account } = useUser();
+  const { user, refreshUser } = useUser();
   const { showMessage } = useSnackbar();
   const discordUserId = user?.discordUser?.discordId;
   const [joiningSpace, setJoiningSpace] = useState(false);
@@ -36,7 +36,7 @@ export function useDiscordGate({ spaceDomain, onSuccess }: Props) {
 
       showMessage(`You have joined the ${space.name} workspace.`, 'success');
 
-      await refreshUserWithWeb3Account();
+      await refreshUser();
 
       const spaceExists = spaces.some((s) => s.id === space.id);
       if (!spaceExists) {
