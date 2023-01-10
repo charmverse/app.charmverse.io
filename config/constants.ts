@@ -26,3 +26,5 @@ export const googleWebClientConfig = {
   messagingSenderId: process.env.NEXT_PUBLIC_GOOGLE_MESSAGING_SENDER_ID,
   appId: process.env.NEXT_PUBLIC_GOOGLE_APP_ID
 };
+
+export const charmverseDiscordInvite = 'https://discord.gg/ACYCzBGC2M';

@@ -4,6 +4,7 @@ import { createSwaggerSpec } from 'next-swagger-doc';
 import dynamic from 'next/dynamic';
 import { useEffect } from 'react';
 
+import { charmverseDiscordInvite } from 'config/constants';
 import { useColorMode } from 'context/darkMode';
 
 import 'swagger-ui-react/swagger-ui.css';
@@ -20,8 +21,7 @@ export const getStaticProps: GetStaticProps = async () => {
       openapi: '3.0.0',
       info: {
         title: 'Charmverse API',
-        description:
-          'The Charmverse public API requires an API key. You can request this on our [Discord server](https://discord.gg/ACYCzBGC2M).\r\n\r\nYour API key can be passed in the **request headers as Authorization: "Bearer <your-api-key>"**.\r\n\r\n**Base path: https://app.charmverse.io/api/v1/**',
+        description: `The Charmverse public API requires an API key. You can request this on our [Discord server](${charmverseDiscordInvite}).\r\n\r\nYour API key can be passed in the **request headers as Authorization: "Bearer <your-api-key>"**.\r\n\r\n**Base path: https://app.charmverse.io/api/v1/**`,
         version: '1.0.0',
         contact: 'hello@charmverse.io',
         host: 'app.charmverse.io',

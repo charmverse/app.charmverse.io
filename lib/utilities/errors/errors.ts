@@ -6,6 +6,7 @@ const ErrorCodes = {
   'Invalid input': 400,
   'Undesirable operation': 400,
   'Maximum size exceeded': 400,
+  'Disabled account': 409,
   'Access denied': 401,
   'Insecure operation': 401,
   'Data not found': 404,
