@@ -66,6 +66,7 @@ import { CommentsApi } from './apis/commentsApi';
 import { FileApi } from './apis/fileApi';
 import { ForumApi } from './apis/forumApi';
 import { GoogleApi } from './apis/googleApi';
+import { IframelyApi } from './apis/iframelyApi';
 import { MembersApi } from './apis/membersApi';
 import { ProfileApi } from './apis/profileApi';
 import { ProposalsApi } from './apis/proposalsApi';
@@ -79,8 +80,6 @@ type BlockUpdater = (blocks: FBBlock[]) => void;
 // CharmClient is the client interface to the server APIs
 //
 class CharmClient {
-  members = new MembersApi();
-
   blockchain = new BlockchainApi();
 
   bounties = new BountiesApi();
@@ -89,29 +88,33 @@ class CharmClient {
 
   comments = new CommentsApi();
 
+  discord = new DiscordApi();
+
+  file = new FileApi();
+
+  forum = new ForumApi();
+
   google = new GoogleApi();
 
-  votes = new VotesApi();
+  iframely = new IframelyApi();
+
+  members = new MembersApi();
+
+  mux = new MuxApi();
+
+  pages = new PagesApi();
 
   profile = new ProfileApi();
 
   proposals = new ProposalsApi();
 
-  pages = new PagesApi();
-
   tasks = new TasksApi();
 
   track = new TrackApi();
 
-  discord = new DiscordApi();
-
-  forum = new ForumApi();
-
-  mux = new MuxApi();
-
-  file = new FileApi();
-
   unstoppableDomains = new UnstoppableDomainsApi();
+
+  votes = new VotesApi();
 
   async socket() {
     return http.GET<SocketAuthReponse>('/api/socket');

@@ -1,4 +1,4 @@
-name: 'Deploy to staging'
+name: "Deploy to staging"
 
 on:
   pull_request:
@@ -24,7 +24,7 @@ jobs:
       - name: Build app
         uses: ./.github/actions/build
         with:
-          NEXT_PUBLIC_APP_ENV: 'staging'
+          NEXT_PUBLIC_APP_ENV: "staging"
           # NEXT_PUBLIC_WEBSOCKETS_HOST: 'https://sockets.charmverse.co' - disabled so that each instance uses its own socket router by default
           NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_CLIENT_ID: ${{ secrets.NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_CLIENT_ID }}
           NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_REDIRECT_URI: ${{ secrets.NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_REDIRECT_URI }}
@@ -35,7 +35,7 @@ jobs:
           NEXT_PUBLIC_GOOGLE_MESSAGING_SENDER_ID: ${{ secrets.NEXT_PUBLIC_GOOGLE_MESSAGING_SENDER_ID_STG }}
           NEXT_PUBLIC_GOOGLE_APP_ID: ${{ secrets.NEXT_PUBLIC_GOOGLE_APP_ID_STG }}
           NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_ID_SENSITIVE: ${{ secrets.NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_ID_SENSITIVE_STG }}
-
+          NEXT_PUBLIC_IFRAMELY_API_KEY: ${{ secrets.NEXT_PUBLIC_IFRAMELY_API_KEY }}
 
       - name: Build and Push Docker image
         uses: ./.github/actions/build_docker_image

@@ -141,7 +141,7 @@ describe('GET /api/forums/posts/[postId] - Get a post', () => {
         votes: {
           downvotes: 0,
           upvotes: 0,
-          upvoted: false
+          upvoted: null
         }
       })
     );
