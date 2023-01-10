@@ -1,5 +1,5 @@
 import createCache from '@emotion/cache';
-import { CacheProvider, Global } from '@emotion/react'; // create a cache so we dont conflict with emotion from react-windowed-select
+import { CacheProvider, Global } from '@emotion/react';
 import type { ExternalProvider, JsonRpcFetchFunc } from '@ethersproject/providers';
 import { Web3Provider } from '@ethersproject/providers';
 import RefreshIcon from '@mui/icons-material/Refresh';
@@ -143,6 +143,7 @@ type AppPropsWithLayout = AppProps & {
 
 // set up styles in Next.js for MUI based on https://github.com/mui-org/material-ui/blob/next/examples/nextjs-with-typescript/pages/_document.tsx
 // Set up MUI xample: https://github.com/mui/material-ui/blob/master/examples/nextjs/pages/_document.js
+// See also https://github.com/emotion-js/emotion/issues/1061 for why we need a cache provider to avoid duplicate style tags
 const emotionCache = createCache({ key: 'mui-style' });
 
 export default function App({ Component, pageProps }: AppPropsWithLayout) {
