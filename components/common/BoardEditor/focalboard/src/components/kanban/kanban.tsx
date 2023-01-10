@@ -252,7 +252,7 @@ function Kanban(props: Props) {
     setShowCalculationsMenu(newShowOptions);
   };
 
-  const createNewSelectType = async () => {
+  const createNewSelectProperty = async () => {
     const template: IPropertyTemplate = {
       id: Utils.createGuid(IDType.BlockID),
       name: typeDisplayName(props.intl, 'select'),
@@ -264,10 +264,10 @@ function Kanban(props: Props) {
 
   const { onClick, ...restBindings } = bindTrigger(popupState);
   const addNewGroupHandler = async (event: React.SyntheticEvent<any, Event>) => {
-    // If no groupByProperty means that we don't have a select property and the board can't be grouped in columns.
     onClick(event);
+    // If no groupByProperty means that we don't have a select property and the board can't be grouped in columns.
     if (!groupByProperty) {
-      await createNewSelectType();
+      await createNewSelectProperty();
     }
   };
   const menuTriggerProps = !props.readOnly ? { ...restBindings, onClick: addNewGroupHandler } : {};
