@@ -224,7 +224,7 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
                         <OnboardingProvider>
                           <FocalBoardProvider>
                             <IntlProvider>
-                              <PageMetaTags />
+                              <PageHead />
                               <CssBaseline enableColorScheme={true} />
                               <Global styles={cssVariables} />
                               <RouteGuard>
@@ -283,7 +283,7 @@ function DataProviders({ children }: { children: ReactNode }) {
   );
 }
 
-function PageMetaTags() {
+function PageHead() {
   const [title] = usePageTitle();
   const prefix = isDevEnv ? 'DEV | ' : '';
 
