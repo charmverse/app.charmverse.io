@@ -131,7 +131,7 @@ const AdjacentDropZone = styled.div`
   background-color: ${({ theme }) => theme.palette.primary.main};
 `;
 
-const PageAnchor = styled.a`
+const PageAnchor = styled(Link)`
   color: inherit;
   text-decoration: none;
   display: flex;
@@ -215,24 +215,18 @@ export function PageLink({
   const triggerState = bindTrigger(popupState);
 
   return (
-    <Link passHref href={href}>
-      <PageAnchor onClick={stopPropagation}>
-        {labelIcon && (
-          <span onClick={preventDefault}>
-            <StyledPageIcon
-              icon={labelIcon}
-              {...triggerState}
-              onClick={showPicker ? triggerState.onClick : undefined}
-            />
-          </span>
-        )}
-        <PageTitle hasContent={isempty} onClick={onClick}>
-          {isempty ? 'Untitled' : label}
-        </PageTitle>
-        {children}
-        {showPicker && pageId && <EmojiMenu popupState={popupState} pageId={pageId} pageType={pageType} />}
-      </PageAnchor>
-    </Link>
+    <PageAnchor href={href} onClick={stopPropagation}>
+      {labelIcon && (
+        <span onClick={preventDefault}>
+          <StyledPageIcon icon={labelIcon} {...triggerState} onClick={showPicker ? triggerState.onClick : undefined} />
+        </span>
+      )}
+      <PageTitle hasContent={isempty} onClick={onClick}>
+        {isempty ? 'Untitled' : label}
+      </PageTitle>
+      {children}
+      {showPicker && pageId && <EmojiMenu popupState={popupState} pageId={pageId} pageType={pageType} />}
+    </PageAnchor>
   );
 }
 

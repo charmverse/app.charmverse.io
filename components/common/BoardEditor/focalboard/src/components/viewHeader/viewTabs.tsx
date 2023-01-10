@@ -279,29 +279,21 @@ function ViewTabs(props: ViewTabsProps) {
             mb: 1
           }}
         >
-          {restViews.map((view) => {
-            const content = (
-              <MenuItem
-                onClick={() => {
-                  onViewTabClick?.(view.id);
-                  showViewsMenuState.onClose();
-                }}
-                component='a'
-                key={view.id}
-                dense
-              >
-                <ListItemIcon>{iconForViewType(view.fields.viewType)}</ListItemIcon>
-                <ListItemText>{view.title || formatViewTitle(view)}</ListItemText>
-              </MenuItem>
-            );
-            return disableUpdatingUrl ? (
-              content
-            ) : (
-              <Link href={getViewUrl(view.id)} passHref>
-                {content}
-              </Link>
-            );
-          })}
+          {restViews.map((view) => (
+            <MenuItem
+              onClick={() => {
+                onViewTabClick?.(view.id);
+                showViewsMenuState.onClose();
+              }}
+              href={disableUpdatingUrl ? '' : getViewUrl(view.id)}
+              component={Link}
+              key={view.id}
+              dense
+            >
+              <ListItemIcon>{iconForViewType(view.fields.viewType)}</ListItemIcon>
+              <ListItemText>{view.title || formatViewTitle(view)}</ListItemText>
+            </MenuItem>
+          ))}
         </Box>
         <Divider />
         {addViewButton}

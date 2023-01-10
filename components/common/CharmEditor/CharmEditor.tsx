@@ -263,7 +263,9 @@ export function charmEditorPlugins({
     }
   }
 
-  return () => basePlugins;
+  return () => {
+    return basePlugins;
+  };
 }
 
 const StyledReactBangleEditor = styled(ReactBangleEditor)<{ disablePageSpecificFeatures?: boolean }>`
@@ -524,7 +526,6 @@ function CharmEditor({
   return (
     <StyledReactBangleEditor
       pageId={pageId}
-      spaceId={currentSpace?.id}
       disablePageSpecificFeatures={disablePageSpecificFeatures}
       isContentControlled={isContentControlled}
       enableSuggestions={enableSuggestingMode}

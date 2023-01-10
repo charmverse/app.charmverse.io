@@ -62,19 +62,17 @@ export default function Workspaces() {
         </Grid>
         {spaces.map((workspace) => (
           <Grid item key={workspace.domain}>
-            <AvatarLink href={`/${workspace.domain}`} passHref>
-              <MuiLink>
-                <Tooltip title={workspace.name} placement='right' arrow>
-                  <span>
-                    <WorkspaceAvatar
-                      active={space?.domain === workspace.domain}
-                      name={workspace.name}
-                      image={workspace.spaceImage}
-                    />
-                  </span>
-                </Tooltip>
-              </MuiLink>
-            </AvatarLink>
+            <MuiLink component={AvatarLink} href={`/${workspace.domain}`}>
+              <Tooltip title={workspace.name} placement='right' arrow>
+                <span>
+                  <WorkspaceAvatar
+                    active={space?.domain === workspace.domain}
+                    name={workspace.name}
+                    image={workspace.spaceImage}
+                  />
+                </span>
+              </Tooltip>
+            </MuiLink>
           </Grid>
         ))}
         <Grid item>

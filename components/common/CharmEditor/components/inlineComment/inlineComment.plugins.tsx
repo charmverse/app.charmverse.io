@@ -2,7 +2,7 @@ import type { RawPlugins } from '@bangle.dev/core';
 import { Plugin } from '@bangle.dev/core';
 import type { PluginKey, EditorState, EditorView, Node, Schema } from '@bangle.dev/pm';
 import { Decoration, DecorationSet } from '@bangle.dev/pm';
-import reactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 
 import { highlightMarkedElement, highlightElement } from 'lib/prosemirror/highlightMarkedElement';
 import { extractInlineCommentRows } from 'lib/prosemirror/plugins/inlineComments/findTotalInlineComments';
@@ -141,7 +141,7 @@ function getDecorations({ schema, doc }: { doc: Node; schema: Schema }) {
       const container = document.createElement('div');
       container.className = 'charm-row-decoration-comments charm-row-decoration';
       container.setAttribute('data-ids', newIds.join(','));
-      reactDOM.render(<RowDecoration count={newIds.length} />, container);
+      createRoot(container).render(<RowDecoration count={newIds.length} />);
 
       decorations.push(Decoration.widget(firstPos, () => container, { key: commentIds.join(',') }));
     }
