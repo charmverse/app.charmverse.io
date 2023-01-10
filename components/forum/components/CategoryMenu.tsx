@@ -23,6 +23,7 @@ import Modal from 'components/common/Modal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useForumCategories } from 'hooks/useForumCategories';
 import isAdmin from 'hooks/useIsAdmin';
+import { useSnackbar } from 'hooks/useSnackbar';
 import { postSortOptions } from 'lib/forums/posts/constants';
 
 import { ForumFilterCategory } from './CategoryPopup';
@@ -33,6 +34,7 @@ const StyledBox = styled(Box)`
 
 function ForumFilterListLink({ category, label, sort }: { label: string; category?: PostCategory; sort?: string }) {
   const { deleteForumCategory, updateForumCategory, setDefaultPostCategory } = useForumCategories();
+  const { showMessage } = useSnackbar();
   const router = useRouter();
   const selectedCategory = router.query.categoryId as string | undefined;
   const selectedSort = router.query.sort as string | undefined;
@@ -47,6 +49,16 @@ function ForumFilterListLink({ category, label, sort }: { label: string; categor
       : '';
 
   const selected = category ? category.id === selectedCategory : sort ? sort === selectedSort : false;
+
+  function deleteCategory() {
+    if (category) {
+      deleteForumCategory(category).catch((err) => {
+        showMessage(err?.message || 'An error occurred while deleting the category');
+      });
+    }
+
+    showMessage('Category deleted');
+  }
 
   return (
     <MenuItem
@@ -83,7 +95,7 @@ function ForumFilterListLink({ category, label, sort }: { label: string; categor
           <ForumFilterCategory
             category={category as PostCategory}
             onChange={updateForumCategory}
-            onDelete={deleteForumCategory}
+            onDelete={deleteCategory}
             onSetNewDefaultCategory={setDefaultPostCategory}
           />
         </span>
