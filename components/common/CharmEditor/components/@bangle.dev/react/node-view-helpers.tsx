@@ -3,6 +3,7 @@ import { saveRenderHandlers } from '@bangle.dev/core';
 import { objectUid } from '@bangle.dev/utils';
 import { useEffect, useState } from 'react';
 import type { RefObject } from 'react';
+import { flushSync } from 'react-dom';
 
 import log from 'lib/log';
 
@@ -13,7 +14,7 @@ type UpdateNodeViewsFunction = (updater: NodeViewsUpdater) => void;
 
 const nodeViewRenderHandlers = (updateNodeViews: UpdateNodeViewsFunction): RenderHandlers => ({
   create: (nodeView, _nodeViewProps) => {
-    // log.debug('create', objectUid.get(nodeView));
+    // log.debug('create', objectUid.get(nodeView), new Error().stack);
     updateNodeViews((nodeViews) => [...nodeViews, nodeView]);
   },
   update: (nodeView, _nodeViewProps) => {
@@ -43,9 +44,13 @@ export function useNodeViews(ref: RefObject<HTMLElement>) {
       ref.current!,
       nodeViewRenderHandlers((cb) => {
         if (!destroyed) {
-          // use callback variant of setState to
-          // always get freshest nodeViews.
-          setNodeViews((_nodeViews) => cb(_nodeViews));
+          // make sure that updates run sequentially for prosemiror, or we get infinite recursion of node views being created and destroyed.
+          // See also: https://github.com/ueberdosis/tiptap/pull/2985
+          flushSync(() => {
+            // use callback variant of setState to
+            // always get freshest nodeViews.
+            setNodeViews((_nodeViews) => cb(_nodeViews));
+          });
         }
       })
     );
