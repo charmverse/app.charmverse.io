@@ -47,8 +47,8 @@ function NewPageMenu({ addPage, tooltip, ...props }: Props) {
     setAnchorEl(null);
   };
   const createPage = (page: { type: Page['type'] }) => {
-    handleClose();
     addPage(page);
+    handleClose();
   };
 
   return (

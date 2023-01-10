@@ -215,17 +215,20 @@ export default function Sidebar({ closeSidebar, favorites }: SidebarProps) {
     setIsScrolled(e.currentTarget?.scrollTop > 0);
   }
 
-  const addPage = useCallback((_page: Partial<Page>) => {
-    if (user && space) {
-      const newPage: NewPageInput = {
-        ..._page,
-        createdBy: user.id,
-        spaceId: space.id
-      };
+  const addPage = useCallback(
+    (_page: Partial<Page>) => {
+      if (user && space) {
+        const newPage: NewPageInput = {
+          ..._page,
+          createdBy: user.id,
+          spaceId: space.id
+        };
 
-      addPageAndRedirect(newPage, router).then();
-    }
-  }, []);
+        addPageAndRedirect(newPage, router).then();
+      }
+    },
+    [user, space]
+  );
 
   function closeSidebarIfIsMobile() {
     if (isMobile) {

@@ -249,16 +249,19 @@ function PageNavigation({ deletePage, isFavorites, rootPageIds, onClick }: PageN
     }
   }
 
-  const addPage = useCallback((page: Partial<Page>) => {
-    if (space && user) {
-      const newPage: NewPageInput = {
-        ...page,
-        createdBy: user.id,
-        spaceId: space.id
-      };
-      return addPageAndRedirect(newPage, router);
-    }
-  }, []);
+  const addPage = useCallback(
+    (page: Partial<Page>) => {
+      if (space && user) {
+        const newPage: NewPageInput = {
+          ...page,
+          createdBy: user.id,
+          spaceId: space.id
+        };
+        return addPageAndRedirect(newPage, router);
+      }
+    },
+    [space, user]
+  );
 
   return (
     <StyledTreeRoot
