@@ -86,7 +86,7 @@ function LoginHandler(props: DialogProps) {
 
         {/** Web 3 login methods */}
         <ListItem>
-          <WalletSelector loginSuccess={handleLogin} />
+          <WalletSelector loginSuccess={handleLogin} onError={handleLoginError} />
         </ListItem>
         {verifiableWalletDetected && (
           <ListItem>

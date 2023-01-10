@@ -1,12 +1,7 @@
-import type { Prisma } from '@prisma/client';
 import { verifyMessage } from 'ethers/lib/utils';
 import { SiweMessage } from 'lit-siwe';
 
-import { prisma } from 'db';
-import { sessionUserRelations } from 'lib/session/config';
-import { DataNotFoundError } from 'lib/utilities/errors';
 import { lowerCaseEqual } from 'lib/utilities/strings';
-import type { LoggedInUser } from 'models';
 
 import type { ProofContent, UnstoppableDomainsAuthSig } from './interfaces';
 
@@ -55,34 +50,4 @@ export function verifyUnstoppableDomainsSignature(authSig: UnstoppableDomainsAut
   }
 
   return true;
-}
-export async function assignUnstoppableDomainAsUserIdentity({
-  userId,
-  tx = prisma,
-  domain
-}: {
-  userId: string;
-  tx?: Prisma.TransactionClient;
-  domain: string;
-}): Promise<LoggedInUser> {
-  const foundDomain = await tx.unstoppableDomain.findUnique({
-    where: {
-      domain
-    }
-  });
-
-  if (!foundDomain || foundDomain.userId !== userId) {
-    throw new DataNotFoundError(`Unstoppable domain ${domain} not found for user ${userId}`);
-  }
-
-  return tx.user.update({
-    where: {
-      id: userId
-    },
-    data: {
-      identityType: 'UnstoppableDomain',
-      username: domain
-    },
-    include: sessionUserRelations
-  });
 }
