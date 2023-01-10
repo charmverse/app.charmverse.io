@@ -3,11 +3,12 @@ import nc from 'next-connect';
 
 import { isTestEnv } from 'config/constants';
 import { AUTH_CODE_COOKIE, AUTH_ERROR_COOKIE } from 'lib/discord/constants';
-import loginByDiscord from 'lib/discord/loginByDiscord';
+import { loginByDiscord } from 'lib/discord/loginByDiscord';
 import { updateGuildRolesForUser } from 'lib/guild-xyz/server/updateGuildRolesForUser';
 import log from 'lib/log';
 import { onError, onNoMatch } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
+import { DisabledAccountError, SystemError } from 'lib/utilities/errors';
 
 const handler = nc({
   onError,
@@ -16,7 +17,7 @@ const handler = nc({
 
 handler.get(async (req, res) => {
   const state = JSON.parse(decodeURIComponent(req.query.state as string));
-  const redirect = state?.redirect || '/';
+  const redirect = (state?.redirect as string) || '/';
   const type: 'connect' | 'server' | 'login' = state.type ?? 'connect';
 
   const cookies = new Cookies(req, res);
@@ -51,10 +52,12 @@ handler.get(async (req, res) => {
       );
     } catch (error) {
       log.warn('Error while connecting to Discord', error);
-      res.status(400).json({
-        error: 'Invalid token'
-      });
-      return;
+
+      const errorContent =
+        error instanceof DisabledAccountError ? error.errorType : 'There was an error from Discord. Please try again';
+      const redirectWithError = `/?discordError=${errorContent}`;
+
+      return res.redirect(redirectWithError);
     }
     await req.session.save();
     return res.redirect(redirect);

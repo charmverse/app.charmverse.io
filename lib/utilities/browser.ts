@@ -105,8 +105,12 @@ export function getNewUrl(params: Record<string, string | null>, currentUrl = wi
   return url;
 }
 
-// update URL without Next.js re-rendering the page
-// source: https://github.com/vercel/next.js/discussions/18072
+/**
+ * update URL without Next.js re-rendering the page
+ * source: https://github.com/vercel/next.js/discussions/18072
+ *
+ * To remove a param from the query, set it as null
+ */
 export function setUrlWithoutRerender(pathname: string, params: Record<string, string | null>) {
   const newUrl = getNewUrl(params);
   // get the path that Next.js uses internally

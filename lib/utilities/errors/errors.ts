@@ -17,7 +17,7 @@ const ErrorCodes = {
   'Unexpected result': 500
 };
 
-type ErrorType = keyof typeof ErrorCodes;
+export type ErrorType = keyof typeof ErrorCodes;
 
 /**
  * @error used for providing structured JSON or a stack trace

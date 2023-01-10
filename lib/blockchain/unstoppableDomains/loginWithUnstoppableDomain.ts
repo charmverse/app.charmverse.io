@@ -45,6 +45,7 @@ export async function loginWithUnstoppableDomain({
     if (user.deletedAt) {
       throw new DisabledAccountError();
     }
+    trackUserAction('sign_in', { userId: user.id, identityType: 'UnstoppableDomain' });
     return user;
   } else {
     // See if we can resolve domain to an existing user
@@ -82,11 +83,12 @@ export async function loginWithUnstoppableDomain({
         displayName: domain,
         identityType: 'UnstoppableDomain'
       });
-
-      updateTrackUserProfile(updatedUser, prisma);
+      updateTrackUserProfile(updatedUser);
       trackUserAction('sign_up', { userId: updatedUser.id, identityType: 'Wallet', ...signupAnalytics });
     }
 
+    updateTrackUserProfile(user);
+    trackUserAction('sign_in', { userId: user.id, identityType: 'UnstoppableDomain' });
     return {
       ...user,
       unstoppableDomains: [createdDomain]

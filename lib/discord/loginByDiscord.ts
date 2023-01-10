@@ -9,8 +9,9 @@ import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { updateTrackUserProfile } from 'lib/metrics/mixpanel/updateTrackUserProfile';
 import { logSignupViaDiscord } from 'lib/metrics/postToDiscord';
 import { sessionUserRelations } from 'lib/session/config';
+import { DisabledAccountError } from 'lib/utilities/errors';
 
-export default async function loginByDiscord({
+export async function loginByDiscord({
   code,
   hostName,
   discordApiUrl,
@@ -39,6 +40,10 @@ export default async function loginByDiscord({
   });
 
   if (discordUser) {
+    if (discordUser.user.deletedAt) {
+      throw new DisabledAccountError();
+    }
+
     trackUserAction('sign_in', { userId: discordUser.user.id, identityType: 'Discord' });
     return discordUser.user;
   } else {
