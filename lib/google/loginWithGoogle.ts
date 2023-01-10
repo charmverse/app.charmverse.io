@@ -1,7 +1,7 @@
 import { prisma } from 'db';
 import { getUserProfile } from 'lib/users/getUser';
 import { updateUserProfile } from 'lib/users/updateUserProfile';
-import { InsecureOperationError, InvalidInputError, SystemError } from 'lib/utilities/errors';
+import { DisabledAccountError, InsecureOperationError, InvalidInputError, SystemError } from 'lib/utilities/errors';
 import type { LoggedInUser } from 'models';
 
 import { verifyGoogleToken } from './verifyGoogleToken';
@@ -28,10 +28,21 @@ export async function loginWithGoogle({
     const googleAccount = await prisma.googleAccount.findUnique({
       where: {
         email
+      },
+      include: {
+        user: {
+          select: {
+            deletedAt: true
+          }
+        }
       }
     });
 
     if (googleAccount) {
+      if (googleAccount.user.deletedAt) {
+        throw new DisabledAccountError(`This account has been disabled`);
+      }
+
       if (googleAccount.name !== displayName || googleAccount.avatarUrl !== avatarUrl) {
         await prisma.googleAccount.update({
           where: {
@@ -49,30 +60,18 @@ export async function loginWithGoogle({
       }
     }
 
-    const existingUser = await prisma.user.findFirst({
-      where: {
-        email
-      }
-    });
-
     const createdGoogleAccount = await prisma.googleAccount.create({
       data: {
         name: displayName,
         avatarUrl,
         email,
-        user: existingUser
-          ? {
-              connect: {
-                id: existingUser.id
-              }
-            }
-          : {
-              create: {
-                identityType: 'Google',
-                username: displayName,
-                avatar: avatarUrl
-              }
-            }
+        user: {
+          create: {
+            identityType: 'Google',
+            username: displayName,
+            avatar: avatarUrl
+          }
+        }
       }
     });
 

@@ -168,3 +168,12 @@ export class BrowserPopupError extends SystemError {
     });
   }
 }
+export class DisabledAccountError extends SystemError {
+  constructor(message = 'This account is disabled.') {
+    super({
+      message,
+      errorType: 'Disabled account',
+      severity: 'warning'
+    });
+  }
+}
