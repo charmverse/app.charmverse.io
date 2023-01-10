@@ -47,11 +47,9 @@ export default function Link({ external, href, onClick, children, color = 'prima
       {children}
     </StyledMuiLink>
   ) : (
-    <NextLink href={href} passHref>
-      <StyledMuiLink onClick={onClick} color={color} {...restProps}>
-        {children}
-      </StyledMuiLink>
-    </NextLink>
+    <StyledMuiLink href={href} component={NextLink} onClick={onClick} color={color} {...restProps}>
+      {children}
+    </StyledMuiLink>
   );
 }
 

@@ -16,18 +16,20 @@ const config = {
   compiler: {
     styledComponents: true
   },
+  reactStrictMode: false,
   experimental: {
-    esmExternals: false,
-    modularizeImports: {
-      '@mui/material': {
-        transform: '@mui/material/{{member}}'
-      },
-      '@mui/icons-material': {
-        transform: '@mui/icons-material/{{member}}'
-      },
-      lodash: {
-        transform: 'lodash/{{member}}'
-      }
+    esmExternals: false
+  },
+  transpilePackages: esmModules,
+  modularizeImports: {
+    '@mui/material': {
+      transform: '@mui/material/{{member}}'
+    },
+    '@mui/icons-material': {
+      transform: '@mui/icons-material/{{member}}'
+    },
+    lodash: {
+      transform: 'lodash/{{member}}'
     }
   },
   async redirects() {
@@ -115,4 +117,4 @@ const withBundleAnalyzer = BundleAnalyzer({
 // fix for esm modules
 const withTM = transpileModules(esmModules);
 
-module.exports = withBundleAnalyzer(withTM(config));
+module.exports = withBundleAnalyzer(config);

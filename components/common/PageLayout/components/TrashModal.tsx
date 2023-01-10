@@ -46,26 +46,31 @@ const ArchivedPageItem = memo<{
   const space = useCurrentSpace();
 
   return (
-    <Link href={`/${space?.domain}/${archivedPage.path}`} passHref key={archivedPage.id}>
-      <MenuItem component='a' dense disabled={disabled} sx={{ pl: 4 }}>
-        <ListItemIcon sx={{ minWidth: 0, mr: 1 }}>
-          <PageIcon pageType={archivedPage.type} icon={archivedPage.icon} isEditorEmpty={!archivedPage.hasContent} />
-        </ListItemIcon>
-        <PageArchivedDate date={archivedPage.deletedAt as Date} title={archivedPage.title} />
-        <div onClick={(e) => e.stopPropagation()}>
-          <IconButton disabled={disabled} size='small' onClick={(e) => onRestore(e as any, archivedPage.id)}>
-            <Tooltip arrow placement='top' title='Restore page'>
-              <RestoreIcon color='info' fontSize='small' />
-            </Tooltip>
-          </IconButton>
-          <IconButton disabled={disabled} size='small' onClick={(e) => onDelete(e as any, archivedPage.id)}>
-            <Tooltip arrow placement='top' title='Delete page permanently'>
-              <DeleteOutlinedIcon color='error' fontSize='small' />
-            </Tooltip>
-          </IconButton>
-        </div>
-      </MenuItem>
-    </Link>
+    <MenuItem
+      component={Link}
+      href={`/${space?.domain}/${archivedPage.path}`}
+      key={archivedPage.id}
+      dense
+      disabled={disabled}
+      sx={{ pl: 4 }}
+    >
+      <ListItemIcon sx={{ minWidth: 0, mr: 1 }}>
+        <PageIcon pageType={archivedPage.type} icon={archivedPage.icon} isEditorEmpty={!archivedPage.hasContent} />
+      </ListItemIcon>
+      <PageArchivedDate date={archivedPage.deletedAt as Date} title={archivedPage.title} />
+      <div onClick={(e) => e.stopPropagation()}>
+        <IconButton disabled={disabled} size='small' onClick={(e) => onRestore(e as any, archivedPage.id)}>
+          <Tooltip arrow placement='top' title='Restore page'>
+            <RestoreIcon color='info' fontSize='small' />
+          </Tooltip>
+        </IconButton>
+        <IconButton disabled={disabled} size='small' onClick={(e) => onDelete(e as any, archivedPage.id)}>
+          <Tooltip arrow placement='top' title='Delete page permanently'>
+            <DeleteOutlinedIcon color='error' fontSize='small' />
+          </Tooltip>
+        </IconButton>
+      </div>
+    </MenuItem>
   );
 });
 
