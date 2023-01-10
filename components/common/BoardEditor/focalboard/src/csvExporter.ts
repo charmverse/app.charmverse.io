@@ -22,8 +22,8 @@ class CsvExporter {
     let csvContent = 'data:text/csv;charset=utf-8,';
 
     rows.forEach((row) => {
-      const encodedRow = row.map((str) => encodeURIComponent(str)).join(',');
-      csvContent += `${encodedRow}\r\n`;
+      const encodedRow = row.join(',');
+      csvContent += encodeURIComponent(`${encodedRow}\r\n`);
     });
 
     const filename = `${Utils.sanitizeFilename(viewToExport.title || 'Untitled')}.csv`;
