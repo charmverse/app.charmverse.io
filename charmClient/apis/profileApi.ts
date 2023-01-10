@@ -1,12 +1,12 @@
 import type { ProfileItem } from '@prisma/client';
 
 import * as http from 'adapters/http';
+import type { UnstoppableDomainsLoginRequest } from 'lib/blockchain/unstoppableDomains/loginWithUnstoppableDomain';
 import type { ConnectGoogleAccountRequest } from 'lib/google/connectGoogleAccount';
 import type { DisconnectGoogleAccountRequest } from 'lib/google/disconnectGoogleAccount';
 import type { LoginWithGoogleRequest } from 'lib/google/loginWithGoogle';
 import type { UserAvatar } from 'lib/users/interfaces';
 import type { LoggedInUser } from 'models';
-import type { UnstoppableDomainsLoginRequest } from 'pages/api/unstoppable-domains/login';
 
 export interface UpdateProfileItemRequest {
   profileItems: Omit<ProfileItem, 'userId'>[];
