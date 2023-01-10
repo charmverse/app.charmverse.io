@@ -48,11 +48,9 @@ export default function RouteGuard({ children }: { children: ReactNode }) {
     if (isLoading) {
       return;
     }
-    log.info('RouteGuard: useEffect()');
 
     async function authCheckAndRedirect(path: string) {
       const result = await authCheck(path);
-      log.info('RouteGuard: authCheck()', result);
 
       setAuthorized(result.authorized);
 
@@ -121,9 +119,7 @@ export default function RouteGuard({ children }: { children: ReactNode }) {
   }
 
   if (!authorized || !router.isReady) {
-    log.info('RouteGuard: unauthorized', router.isReady, authorized);
     return null;
   }
-  log.info('RouteGuard: authorized');
   return <span style={{ display: isLoading ? 'none' : 'inline' }}>{children}</span>;
 }

@@ -11,7 +11,7 @@ export const nodeViewUpdateStore = new WeakMap();
 type NodeViewsUpdater = (nodeViewUpdateStore: NodeView[]) => NodeView[];
 type UpdateNodeViewsFunction = (updater: NodeViewsUpdater) => void;
 
-export const nodeViewRenderHandlers = (updateNodeViews: UpdateNodeViewsFunction): RenderHandlers => ({
+const nodeViewRenderHandlers = (updateNodeViews: UpdateNodeViewsFunction): RenderHandlers => ({
   create: (nodeView, _nodeViewProps) => {
     // log.debug('create', objectUid.get(nodeView));
     updateNodeViews((nodeViews) => [...nodeViews, nodeView]);
