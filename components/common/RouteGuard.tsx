@@ -122,8 +122,7 @@ export default function RouteGuard({ children }: { children: ReactNode }) {
         return {
           authorized: false,
           redirect: {
-            pathname: '/',
-            query: { returnUrl: spaces[0].domain }
+            pathname: `/${spaces[0].domain}`
           }
         };
       }
