@@ -3,7 +3,7 @@ import styled from '@emotion/styled';
 import { Typography } from '@mui/material';
 
 import Link from 'components/common/Link';
-import PageIcon from 'components/common/PageLayout/components/PageIcon';
+import { PageIcon } from 'components/common/PageLayout/components/PageIcon';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 

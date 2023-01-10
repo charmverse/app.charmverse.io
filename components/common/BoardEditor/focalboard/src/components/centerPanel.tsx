@@ -1,21 +1,26 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable max-lines */
+
 import CallMadeIcon from '@mui/icons-material/CallMade';
-import { Box } from '@mui/material';
+import LaunchIcon from '@mui/icons-material/LaunchOutlined';
+import { Box, Typography, Link } from '@mui/material';
+import CircularProgress from '@mui/material/CircularProgress';
 import type { Page } from '@prisma/client';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Hotkeys from 'react-hot-keys';
 import type { WrappedComponentProps } from 'react-intl';
 import { injectIntl } from 'react-intl';
 import type { ConnectedProps } from 'react-redux';
 import { connect } from 'react-redux';
 import { mutate } from 'swr';
+import { v4 as uuid } from 'uuid';
 
 import charmClient from 'charmClient';
 import PageBanner, { randomBannerImage } from 'components/[pageId]/DocumentPage/components/PageBanner';
 import PageDeleteBanner from 'components/[pageId]/DocumentPage/components/PageDeleteBanner';
+import { createTableView } from 'components/common/BoardEditor/focalboard/src/components/addViewMenu';
 import { getBoard } from 'components/common/BoardEditor/focalboard/src/store/boards';
 import type { CardPage } from 'components/common/BoardEditor/focalboard/src/store/cards';
 import {
@@ -23,34 +28,28 @@ import {
   sortCards
 } from 'components/common/BoardEditor/focalboard/src/store/cards';
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
-import {
-  getCurrentViewDisplayBy,
-  getCurrentViewGroupBy
-} from 'components/common/BoardEditor/focalboard/src/store/views';
 import Button from 'components/common/Button';
+import LoadingComponent from 'components/common/LoadingComponent';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMembers } from 'hooks/useMembers';
 import { usePages } from 'hooks/usePages';
-import { createBoardView } from 'lib/focalboard/boardView';
-import { convertToInlineBoard } from 'lib/pages/convertToInlineBoard';
+import type { Block } from 'lib/focalboard/block';
+import type { Board, BoardGroup, IPropertyOption, IPropertyTemplate } from 'lib/focalboard/board';
+import type { BoardView, BoardViewFields } from 'lib/focalboard/boardView';
+import type { Card } from 'lib/focalboard/card';
+import { createCard } from 'lib/focalboard/card';
+import { createNewDataSource } from 'lib/pages/createNewDataSource';
 
-import { BlockIcons } from '../blockIcons';
-import type { Block } from '../blocks/block';
-import type { Board, BoardGroup, IPropertyOption, IPropertyTemplate } from '../blocks/board';
-import type { BoardView } from '../blocks/boardView';
-import type { Card } from '../blocks/card';
-import { createCard } from '../blocks/card';
 import { CardFilter } from '../cardFilter';
 import mutator from '../mutator';
 import { addCard as _addCard, addTemplate } from '../store/cards';
 import { updateView } from '../store/views';
-import { UserSettings } from '../userSettings';
 import { Utils } from '../utils';
 
 import AddViewMenu from './addViewMenu';
+import { CreateLinkedView } from './createLinkedView';
 import Gallery from './gallery/gallery';
 import Kanban from './kanban/kanban';
-import SourceSelection from './SourceSelection';
 import Table from './table/table';
 import ViewHeader from './viewHeader/viewHeader';
 import ViewSidebar from './viewSidebar/viewSidebar';
@@ -68,11 +67,13 @@ type Props = WrappedComponentProps &
     views: BoardView[];
     hideBanner?: boolean;
     readOnly: boolean;
+    readOnlySourceData: boolean;
     addCard: (card: Card) => void;
+    pageIcon?: string | null;
     setPage: (p: Partial<Page>) => void;
     updateView: (view: BoardView) => void;
     showCard: (cardId: string | null) => void;
-    onViewTabClick?: (viewId: string) => void;
+    showView: (viewId: string) => void;
     disableUpdatingUrl?: boolean;
     maxTabsShown?: number;
     onDeleteView?: (viewId: string) => void;
@@ -85,20 +86,20 @@ type State = {
 };
 
 function CenterPanel(props: Props) {
-  const { activeView, board, views } = props;
+  const { activeView, board, pageIcon, showView, views } = props;
 
   const [state, setState] = useState<State>({
     cardIdToFocusOnRender: '',
     selectedCardIds: [],
-    // assume this is a page type 'inline_linked_board' if no view exists
+    // assume this is a page type 'inline_linked_board' or 'linked_board' if no view exists
     showSettings: !props.activeView ? 'create-linked-view' : null
   });
+
+  const [loadingFormResponses, setLoadingFormResponses] = useState(false);
 
   const router = useRouter();
   const space = useCurrentSpace();
   const { pages, updatePage } = usePages();
-  const _groupByProperty = useAppSelector(getCurrentViewGroupBy);
-  const _dateDisplayProperty = useAppSelector(getCurrentViewDisplayBy);
   const { members } = useMembers();
 
   const isEmbedded = !!props.embeddedBoardPath;
@@ -106,17 +107,25 @@ function CenterPanel(props: Props) {
   const boardPageType = boardPage?.type;
 
   // for 'linked' boards, each view has its own board which we use to determine the cards to show
-  const activeBoardId = props.activeView && (props.activeView?.fields.linkedSourceId || props.board.id);
-  const activeBoard = useAppSelector(getBoard(activeBoardId));
-  const activePage = pages[activeBoardId];
+  let activeBoardId: string | undefined = props.board.id;
+  if (activeView?.fields.linkedSourceId) {
+    activeBoardId = activeView?.fields.linkedSourceId;
+  } else if (activeView?.fields.sourceType === 'google_form') {
+    activeBoardId = activeView?.fields.sourceData?.boardId;
+  }
 
+  const activeBoard = useAppSelector(getBoard(activeBoardId ?? ''));
+  const activePage = pages[activeBoardId ?? ''];
+  const _groupByProperty = activeBoard?.fields.cardProperties.find((o) => o.id === activeView?.fields.groupById);
+  const _dateDisplayProperty = activeBoard?.fields.cardProperties.find(
+    (o) => o.id === activeView?.fields.dateDisplayPropertyId
+  );
   const _cards = useAppSelector(
     getViewCardsSortedFilteredAndGrouped({
       boardId: activeBoard?.id || '',
       viewId: activeView?.id || ''
     })
   );
-
   // filter cards by whats accessible
   const cardPages: CardPage[] = _cards.map((card) => ({ card, page: pages[card.id]! })).filter(({ page }) => !!page);
   const sortedCardPages = activeView ? sortCards(cardPages, board, activeView, members) : [];
@@ -126,7 +135,6 @@ function CenterPanel(props: Props) {
   if ((!groupByProperty || _groupByProperty?.type !== 'select') && activeView?.fields.viewType === 'board') {
     groupByProperty = activeBoard?.fields.cardProperties.find((o: any) => o.type === 'select');
   }
-
   let dateDisplayProperty = _dateDisplayProperty;
   if (!dateDisplayProperty && activeView?.fields.viewType === 'calendar') {
     dateDisplayProperty = activeBoard?.fields.cardProperties.find((o: any) => o.type === 'date');
@@ -143,7 +151,7 @@ function CenterPanel(props: Props) {
 
   const backgroundRef = React.createRef<HTMLDivElement>();
   const keydownHandler = (keyName: string, e: KeyboardEvent) => {
-    if (e.target !== document.body || props.readOnly) {
+    if (e.target !== document.body || props.readOnly || props.readOnlySourceData) {
       return;
     }
 
@@ -217,9 +225,6 @@ function CenterPanel(props: Props) {
       }
     }
     card.fields.properties = { ...card.fields.properties, ...properties, ...propertiesThatMeetFilters };
-    if (!card.fields.icon && UserSettings.prefillRandomIcons) {
-      card.fields.icon = BlockIcons.shared.randomIcon();
-    }
 
     card.fields.contentOrder = [];
     card.fields.isTemplate = isTemplate;
@@ -360,51 +365,30 @@ function CenterPanel(props: Props) {
     return { visible: _visibleGroups, hidden: _hiddenGroups };
   }
 
-  const showView = useCallback(
-    (viewId: string) => {
-      if (!props.disableUpdatingUrl) {
-        const { cardId, ...rest } = router.query;
-        router.push(
-          {
-            pathname: router.pathname,
-            query: {
-              ...rest,
-              viewId: viewId || ''
-            }
-          },
-          undefined,
-          { shallow: true }
-        );
-      }
-      props.onViewTabClick?.(viewId);
-    },
-    [router.query, typeof window !== 'undefined' && window.history]
-  );
-
-  async function createLinkedView({ boardId: sourceBoardId }: { boardId: string }) {
-    const view = createBoardView();
-    view.fields.viewType = 'board';
-    view.parentId = board.id;
-    view.rootId = board.id;
-    view.title = '';
-    // A new property to indicate that this view was creating for inline databases only
-    view.fields.sourceType = 'board_page';
-    view.fields.linkedSourceId = sourceBoardId;
+  async function selectViewSource(fields: Pick<BoardViewFields, 'linkedSourceId' | 'sourceData' | 'sourceType'>) {
+    const view = createTableView(board);
+    view.id = uuid();
+    view.fields.sourceData = fields.sourceData;
+    view.fields.sourceType = fields.sourceType;
+    view.fields.linkedSourceId = fields.linkedSourceId;
     await mutator.insertBlock(view);
     showView(view.id);
   }
 
   async function createDatabase() {
-    const { view } = await convertToInlineBoard({ board, updatePage });
+    if (!boardPageType) {
+      throw new Error('No board page type exists');
+    }
+    const { view } = await createNewDataSource({ board, updatePage, currentPageType: boardPageType });
     showView(view.id);
   }
 
   function openSelectSource() {
+    showView('');
     // delay the sidebar opening so that we dont trigger it to close right away
     setTimeout(() => {
       setState({ ...state, showSettings: 'create-linked-view' });
     });
-    props.onViewTabClick?.('');
   }
 
   function toggleViewOptions(enable?: boolean) {
@@ -426,6 +410,20 @@ function CenterPanel(props: Props) {
       closeSettings();
     }
   }, [activeView?.id]);
+
+  // refresh google forms data whenever source changes
+  useEffect(() => {
+    if (activeView) {
+      if (activeView.fields.sourceType === 'google_form') {
+        setLoadingFormResponses(true);
+        charmClient.google.forms.syncFormResponses({ viewId: activeView.id }).finally(() => {
+          setLoadingFormResponses(false);
+        });
+      }
+    }
+  }, [`${activeView?.fields.sourceData?.formId}${activeView?.fields.sourceData?.boardId}`]);
+
+  const isLoadingSourceData = !activeBoard && state.showSettings !== 'create-linked-view';
 
   return (
     <div
@@ -449,20 +447,30 @@ function CenterPanel(props: Props) {
       )}
       <div className='top-head'>
         {board && (boardPageType === 'board' || !isEmbedded) && (
-          <ViewTitle key={board.id + board.title} board={board} readOnly={props.readOnly} setPage={props.setPage} />
+          <ViewTitle
+            key={board.id + board.title}
+            board={board}
+            pageIcon={pageIcon}
+            readOnly={props.readOnly}
+            setPage={props.setPage}
+          />
         )}
         <ViewHeader
           onDeleteView={props.onDeleteView}
           maxTabsShown={props.maxTabsShown}
           disableUpdatingUrl={props.disableUpdatingUrl}
-          onViewTabClick={props.onViewTabClick}
+          showView={props.showView}
           addViewButton={
             <AddViewMenu
               board={board}
               activeView={activeView}
               views={views}
               showView={showView}
-              onClick={boardPageType === 'inline_linked_board' ? openSelectSource : undefined}
+              onClick={
+                boardPageType === 'inline_linked_board' || boardPageType === 'linked_board'
+                  ? openSelectSource
+                  : undefined
+              }
             />
           }
           viewsBoardId={board.id}
@@ -471,15 +479,14 @@ function CenterPanel(props: Props) {
           toggleViewOptions={toggleViewOptions}
           cards={cards}
           views={props.views}
-          groupByProperty={groupByProperty}
           dateDisplayProperty={dateDisplayProperty}
           addCard={() => addCard('', true)}
           showCard={showCard}
-          showView={showView}
           // addCardFromTemplate={addCardFromTemplate}
           addCardTemplate={() => addCard('', true, {}, false, true)}
           editCardTemplate={editCardTemplate}
           readOnly={props.readOnly}
+          readOnlySourceData={props.readOnlySourceData}
           embeddedBoardPath={props.embeddedBoardPath}
         />
       </div>
@@ -495,7 +502,25 @@ function CenterPanel(props: Props) {
                 setPage={props.setPage}
               />
             )}
-            {activePage && boardPageType === 'inline_linked_board' && (
+            {activeBoard && activeView?.fields.sourceType === 'google_form' && (
+              <Typography sx={{ fontSize: 22, fontWeight: 500 }}>
+                Form responses to{' '}
+                <Link
+                  target='_blank'
+                  href={`${activeView?.fields.sourceData?.formUrl}/edit#responses`}
+                  sx={{ color: 'inherit', fontWeight: 700 }}
+                >
+                  {activeView?.fields.sourceData?.formName || 'Untitled'}
+                  <LaunchIcon fontSize='small' sx={{ ml: 0.5, position: 'relative', top: 3 }} />
+                </Link>
+                {loadingFormResponses && (
+                  <Box ml={2} component='span'>
+                    <CircularProgress style={{ color: '#ccc', height: 14, width: 14 }} />
+                  </Box>
+                )}
+              </Typography>
+            )}
+            {activePage && activeView?.fields?.sourceType === 'board_page' && (
               <Button
                 color='secondary'
                 startIcon={<CallMadeIcon />}
@@ -508,11 +533,10 @@ function CenterPanel(props: Props) {
               </Button>
             )}
             {!activeView && state.showSettings === 'create-linked-view' && (
-              <SourceSelection
+              <CreateLinkedView
                 readOnly={props.readOnly}
-                onSelectSource={createLinkedView}
-                onCreateDatabase={createDatabase}
-                showCreateDatabase={views.length === 0}
+                onSelect={selectViewSource}
+                onCreate={views.length === 0 ? createDatabase : undefined}
               />
             )}
             {activeBoard && activeView?.fields.viewType === 'board' && (
@@ -524,7 +548,7 @@ function CenterPanel(props: Props) {
                 visibleGroups={visibleGroups}
                 hiddenGroups={hiddenGroups}
                 selectedCardIds={state.selectedCardIds}
-                readOnly={props.readOnly}
+                readOnly={props.readOnly || props.readOnlySourceData}
                 onCardClicked={cardClicked}
                 addCard={addCard}
                 showCard={showCard}
@@ -540,6 +564,7 @@ function CenterPanel(props: Props) {
                 visibleGroups={visibleGroups}
                 selectedCardIds={state.selectedCardIds}
                 readOnly={props.readOnly}
+                readOnlySourceData={props.readOnlySourceData}
                 cardIdToFocusOnRender={state.cardIdToFocusOnRender}
                 showCard={showCard}
                 addCard={addCard}
@@ -551,7 +576,7 @@ function CenterPanel(props: Props) {
                 board={activeBoard}
                 cards={cards}
                 activeView={activeView}
-                readOnly={props.readOnly}
+                readOnly={props.readOnly || props.readOnlySourceData}
                 dateDisplayProperty={dateDisplayProperty}
                 showCard={showCard}
                 addCard={(properties: Record<string, string>) => {
@@ -559,22 +584,23 @@ function CenterPanel(props: Props) {
                 }}
               />
             )}
-
             {activeBoard && activeView?.fields.viewType === 'gallery' && (
               <Gallery
                 board={activeBoard}
                 cards={cards}
                 activeView={activeView}
-                readOnly={props.readOnly}
+                readOnly={props.readOnly || props.readOnlySourceData}
                 onCardClicked={cardClicked}
                 selectedCardIds={state.selectedCardIds}
                 addCard={(show) => addCard('', show)}
               />
             )}
+            {isLoadingSourceData && <LoadingComponent isLoading={true} height={400} />}
           </Box>
-          {activeBoard && activeView && (
+          {activeView && (
             <ViewSidebar
               board={activeBoard}
+              parentBoard={board}
               view={activeView}
               isOpen={state.showSettings === 'view-options'}
               closeSidebar={closeSettings}

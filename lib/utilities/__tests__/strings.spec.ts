@@ -1,7 +1,7 @@
 import type { UserWallet } from '@prisma/client';
 import { utils, Wallet } from 'ethers';
 
-import { randomETHWalletAddress } from 'testing/generate-stubs';
+import { randomETHWalletAddress } from 'testing/generateStubs';
 
 import { conditionalPlural, matchWalletAddress, sanitizeForRegex, shortenHex, shortWalletAddress } from '../strings';
 

@@ -1,4 +1,5 @@
-import type { IPropertyTemplate, PropertyType } from '../../../blocks/board';
+import type { IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
+
 import type { CommonCalculationOptionProps } from '../../calculations/options';
 import { CalculationOptions, optionsByType } from '../../calculations/options';
 

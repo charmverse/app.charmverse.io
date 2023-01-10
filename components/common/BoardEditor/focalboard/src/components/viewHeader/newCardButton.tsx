@@ -1,16 +1,14 @@
 import { KeyboardArrowDown } from '@mui/icons-material';
-import Box from '@mui/material/Box';
-import ButtonGroup from '@mui/material/ButtonGroup';
-import { bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
+import { ButtonGroup, Tooltip, Typography } from '@mui/material';
+import { usePopupState } from 'material-ui-popup-state/hooks';
 import React from 'react';
 
 import Button from 'components/common/Button';
-import { DownIcon } from 'components/common/Icons/DownIcon';
 import { TemplatesMenu } from 'components/common/TemplatesMenu';
 import { usePages } from 'hooks/usePages';
+import type { Card } from 'lib/focalboard/card';
 import type { PageMeta } from 'lib/pages';
 
-import type { Card } from '../../blocks/card';
 import { getCurrentBoardTemplates } from '../../store/cards';
 import { useAppSelector } from '../../store/hooks';
 
@@ -48,10 +46,14 @@ const NewCardButton = React.memo(
 
     return (
       <>
-        <ButtonGroup variant='contained' ref={buttonRef}>
-          <Button onClick={addCard}>New</Button>
-          <Button size='small' onClick={popupState.open}>
-            <KeyboardArrowDown />
+        <ButtonGroup size='small' disableElevation variant='contained' ref={buttonRef}>
+          <Button onClick={addCard}>
+            <Typography fontWeight={700} variant='subtitle1' component='div'>
+              New
+            </Typography>
+          </Button>
+          <Button sx={{ minWidth: '30px !important', px: 0 }} onClick={popupState.open}>
+            <KeyboardArrowDown fontSize='small' />
           </Button>
         </ButtonGroup>
 

@@ -1,8 +1,11 @@
 import styled from '@emotion/styled';
-import DuplicateIcon from '@mui/icons-material/ContentCopy';
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
-import EditIcon from '@mui/icons-material/Edit';
-import TuneIcon from '@mui/icons-material/Tune';
+import {
+  Edit as EditIcon,
+  Tune as TuneIcon,
+  DeleteOutline as DeleteOutlineIcon,
+  ContentCopy as DuplicateIcon,
+  Refresh as RefreshIcon
+} from '@mui/icons-material';
 import Divider from '@mui/material/Divider';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
@@ -21,13 +24,12 @@ import { useForm } from 'react-hook-form';
 import type { IntlShape } from 'react-intl';
 import { injectIntl } from 'react-intl';
 
+import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import Modal from 'components/common/Modal';
-import { useFocalboardViews } from 'hooks/useFocalboardViews';
-import { formatViewTitle } from 'lib/focalboard/boardView';
+import type { BoardView } from 'lib/focalboard/boardView';
+import { formatViewTitle, createBoardView } from 'lib/focalboard/boardView';
 
-import type { BoardView } from '../../blocks/boardView';
-import { createBoardView } from '../../blocks/boardView';
 import mutator from '../../mutator';
 import { IDType, Utils } from '../../utils';
 import { iconForViewType } from '../viewMenu';
@@ -43,13 +45,11 @@ const StyledButton = styled(Button)`
 
 interface ViewTabsProps {
   intl: IntlShape;
-  viewsBoardId: string;
   activeView?: BoardView | null;
   readOnly?: boolean;
   views: BoardView[];
   showView: (viewId: string) => void;
   addViewButton?: ReactNode;
-  onViewTabClick?: (viewId: string) => void;
   onDeleteView?: (viewId: string) => void;
   disableUpdatingUrl?: boolean;
   maxTabsShown: number;
@@ -61,10 +61,8 @@ function ViewTabs(props: ViewTabsProps) {
     onDeleteView,
     openViewOptions,
     maxTabsShown,
-    onViewTabClick,
     disableUpdatingUrl,
     addViewButton,
-    viewsBoardId,
     activeView,
     intl,
     readOnly,
@@ -79,7 +77,6 @@ function ViewTabs(props: ViewTabsProps) {
   const showViewsTriggerState = bindTrigger(showViewsPopupState);
   const showViewsMenuState = bindMenu(showViewsPopupState);
 
-  const { setFocalboardViewsRecord } = useFocalboardViews();
   const views = viewsProp.filter((view) => !view.fields.inline);
   // Find the index of the current view
   const currentViewIndex = views.findIndex((view) => view.id === activeView?.id);
@@ -101,19 +98,17 @@ function ViewTabs(props: ViewTabsProps) {
 
   function handleViewClick(event: MouseEvent<HTMLElement>) {
     event.stopPropagation();
-    const view = views.find((v) => v.id === event.currentTarget.id);
-    // eslint-disable-next-line no-unused-expressions
-    view && onViewTabClick?.(view.id);
-    if (readOnly) return;
-    if (event.currentTarget.id === activeView?.id) {
-      event.preventDefault();
-      setAnchorEl(event.currentTarget);
-      if (view) {
-        setDropdownView(view);
-      }
+    event.preventDefault();
+    const viewId = event.currentTarget.id;
+    const view = views.find((v) => v.id === viewId);
+    if (!view) {
+      return;
     }
-    if (view) {
-      setFocalboardViewsRecord((focalboardViewsRecord) => ({ ...focalboardViewsRecord, [viewsBoardId]: view.id }));
+    if (view && !readOnly && event.currentTarget.id === activeView?.id) {
+      setAnchorEl(event.currentTarget);
+      setDropdownView(view);
+    } else {
+      showView(viewId);
     }
   }
 
@@ -144,7 +139,6 @@ function ViewTabs(props: ViewTabsProps) {
       'duplicate view',
       async (block) => {
         showView(block.id);
-        setFocalboardViewsRecord((focalboardViewsRecord) => ({ ...focalboardViewsRecord, [viewsBoardId]: newView.id }));
       },
       async () => {
         showView(dropdownView.id);
@@ -162,9 +156,20 @@ function ViewTabs(props: ViewTabsProps) {
     setAnchorEl(null);
     if (nextView) {
       showView(nextView.id);
-      setFocalboardViewsRecord((focalboardViewsRecord) => ({ ...focalboardViewsRecord, [viewsBoardId]: nextView.id }));
     }
   }, [views, dropdownView, showView]);
+
+  function resyncGoogleFormData() {
+    if (dropdownView) {
+      const newView = createBoardView(dropdownView);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { boardId, ...sourceDataWithoutBoard } = newView.fields.sourceData!;
+      newView.fields.sourceData = sourceDataWithoutBoard;
+      mutator.updateBlock(newView, dropdownView, 'reset Google view source');
+      // charmClient.google.forms.syncFormResponses({ reset: true, viewId: dropdownView.id });
+      setAnchorEl(null);
+    }
+  }
 
   function handleRenameView() {
     setAnchorEl(null);
@@ -218,7 +223,7 @@ function ViewTabs(props: ViewTabsProps) {
                 size='small'
                 color={activeView?.id === view.id ? 'textPrimary' : 'secondary'}
                 id={view.id}
-                href={!disableUpdatingUrl ? (activeView?.id === view.id ? null : getViewUrl(view.id)) : ''}
+                href={activeView?.id === view.id ? null : getViewUrl(view.id)}
               >
                 {view.title || formatViewTitle(view)}
               </StyledButton>
@@ -253,13 +258,26 @@ function ViewTabs(props: ViewTabsProps) {
           </ListItemIcon>
           <ListItemText>Edit View</ListItemText>
         </MenuItem>
-        <Divider />
-        <MenuItem dense onClick={handleDuplicateView}>
-          <ListItemIcon>
-            <DuplicateIcon />
-          </ListItemIcon>
-          <ListItemText>{duplicateViewText}</ListItemText>
-        </MenuItem>
+        {dropdownView?.fields.sourceType === 'google_form' && [
+          <Divider key='divider' />,
+          <MenuItem key='duplicate-view' dense onClick={resyncGoogleFormData}>
+            <ListItemIcon>
+              <RefreshIcon />
+            </ListItemIcon>
+            <ListItemText>Resync Google Form</ListItemText>
+          </MenuItem>,
+          <Divider key='divider-2' />
+        ]}
+        {dropdownView &&
+          dropdownView?.fields.sourceType !== 'google_form' && [
+            <Divider key='divider' />,
+            <MenuItem key='duplicate-view' dense onClick={handleDuplicateView}>
+              <ListItemIcon>
+                <DuplicateIcon />
+              </ListItemIcon>
+              <ListItemText>{duplicateViewText}</ListItemText>
+            </MenuItem>
+          ]}
         {views.length !== 1 && (
           <MenuItem dense onClick={handleDeleteView}>
             <ListItemIcon>
@@ -282,7 +300,7 @@ function ViewTabs(props: ViewTabsProps) {
           {restViews.map((view) => (
             <MenuItem
               onClick={() => {
-                onViewTabClick?.(view.id);
+                showView(view.id);
                 showViewsMenuState.onClose();
               }}
               href={disableUpdatingUrl ? '' : getViewUrl(view.id)}

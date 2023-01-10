@@ -108,20 +108,32 @@ function DocumentPage({ page, setPage, insideModal, readOnly = false, parentProp
 
   const pageVote = Object.values(votes).find((v) => v.context === 'proposal');
 
-  const board = useAppSelector((state) => {
-    if ((page.type === 'card' || page.type === 'card_template') && page.parentId) {
-      const parentPage = pages[page.parentId];
-      return parentPage?.boardId && parentPage?.type.match(/board/) ? state.boards.boards[parentPage.boardId] : null;
+  // const cards = useAppSelector((state) => {
+  //   return board
+  //     ? [...Object.values(state.cards.cards), ...Object.values(state.cards.templates)].filter(
+  //         (card) => card.parentId === board.id
+  //       )
+  //     : [];
+  // });
+  const card = useAppSelector((state) => {
+    if (page.cardId) {
+      return state.cards.cards[page.cardId] ?? state.cards.templates[page.cardId] ?? null;
     }
     return null;
   });
+
+  const board = useAppSelector((state) => {
+    return card ? state.boards.boards[card.parentId] : null;
+  });
+
   const cards = useAppSelector((state) => {
     return board
       ? [...Object.values(state.cards.cards), ...Object.values(state.cards.templates)].filter(
-          (card) => card.parentId === board.id
+          (c) => c.parentId === board.id
         )
       : [];
   });
+
   const boardViews = useAppSelector((state) => {
     if (board) {
       return Object.values(state.views.views).filter((view) => view.parentId === board.id);
@@ -141,9 +153,7 @@ function DocumentPage({ page, setPage, insideModal, readOnly = false, parentProp
     pageTop = 200;
   }
 
-  const card = cards.find((_card) => _card.id === page.id);
-
-  const comments = useAppSelector(getCardComments(card?.id ?? page.id));
+  const comments = useAppSelector(getCardComments(page.cardId ?? ''));
 
   const showPageActionSidebar = currentPageActionDisplay !== null && !insideModal;
   const router = useRouter();

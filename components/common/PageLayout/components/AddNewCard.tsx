@@ -5,12 +5,12 @@ import { memo } from 'react';
 import { mutate } from 'swr';
 
 import charmClient from 'charmClient';
-import { createCard } from 'components/common/BoardEditor/focalboard/src/blocks/card';
 import { addCard } from 'components/common/BoardEditor/focalboard/src/store/cards';
 import { useAppDispatch } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { StyledIconButton } from 'components/common/PageLayout/components/NewPageMenu';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
+import { createCard } from 'lib/focalboard/card';
 
 function AddNewCard({ pageId }: { pageId: string }) {
   const router = useRouter();

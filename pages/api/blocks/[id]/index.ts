@@ -3,6 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { prisma } from 'db';
+import type { BlockTypes } from 'lib/focalboard/block';
 import { ApiError, ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { modifyChildPages } from 'lib/pages/modifyChildPages';
 import { resolvePageTree } from 'lib/pages/server';
@@ -60,7 +61,7 @@ async function deleteBlock(
     relay.broadcast(
       {
         type: 'blocks_deleted',
-        payload: deletedChildPageIds.map((id) => ({ id, type: allPages.find((c) => c.id === id)?.type as string }))
+        payload: deletedChildPageIds.map((id) => ({ id, type: 'card' }))
       },
       spaceId
     );
@@ -120,7 +121,7 @@ async function deleteBlock(
     relay.broadcast(
       {
         type: 'blocks_deleted',
-        payload: [{ id: blockId, type: rootBlock.type }]
+        payload: [{ id: blockId, type: rootBlock.type as BlockTypes }]
       },
       spaceId
     );

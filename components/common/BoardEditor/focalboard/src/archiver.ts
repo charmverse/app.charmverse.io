@@ -1,7 +1,8 @@
+import type { Block } from 'lib/focalboard/block';
+import type { Board } from 'lib/focalboard/board';
+
 import type { ArchiveHeader, ArchiveLine, BlockArchiveLine } from './blocks/archive';
 import { ArchiveUtils } from './blocks/archive';
-import type { Block } from './blocks/block';
-import type { Board } from './blocks/board';
 import { LineReader } from './lineReader';
 import mutator from './mutator';
 import type { IAppWindow } from './types';
