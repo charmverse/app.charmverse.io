@@ -1,6 +1,9 @@
 {
   "name": "charmverse.io",
   "version": "0.0.0",
+  "browserslist": [
+    "defaults"
+  ],
   "scripts": {
     "build": "NODE_OPTIONS=\"--max_old_space_size=4096\" next build",
     "build:win": "npx next build",

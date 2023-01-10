@@ -141,6 +141,10 @@ type AppPropsWithLayout = AppProps & {
   Component: NextPageWithLayout;
 };
 
+// set up styles in Next.js for MUI based on https://github.com/mui-org/material-ui/blob/next/examples/nextjs-with-typescript/pages/_document.tsx
+// Set up MUI xample: https://github.com/mui/material-ui/blob/master/examples/nextjs/pages/_document.js
+const emotionCache = createCache({ key: 'mui-style' });
+
 export default function App({ Component, pageProps }: AppPropsWithLayout) {
   const getLayout = Component.getLayout ?? ((page) => page);
   const router = useRouter();
@@ -211,7 +215,7 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
 
   // DO NOT REMOVE CacheProvider - it protects MUI from Tailwind CSS in settings
   return (
-    <CacheProvider value={createCache({ key: 'app', prepend: true })}>
+    <CacheProvider value={emotionCache}>
       <ColorModeContext.Provider value={colorModeContext}>
         <ThemeProvider theme={theme}>
           <LocalizationProvider dateAdapter={AdapterLuxon as any}>
