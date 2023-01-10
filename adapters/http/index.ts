@@ -5,7 +5,7 @@ type Params = { [key: string]: any };
 export function GET<T = Response>(
   path: string,
   data: Params = {},
-  { headers = {} }: { headers?: any } = {}
+  { headers = {}, credentials = 'include' }: { credentials?: RequestCredentials; headers?: any } = {}
 ): Promise<T> {
   const queryStr = Object.keys(data)
     .filter((key) => !!data[key])
@@ -23,7 +23,7 @@ export function GET<T = Response>(
       Accept: 'application/json',
       ...headers
     }),
-    credentials: 'include'
+    credentials
   });
 }
 

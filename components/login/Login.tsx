@@ -9,7 +9,6 @@ import { WalletSelector } from 'components/_app/Web3ConnectionManager/components
 import { ConnectorButton } from 'components/_app/Web3ConnectionManager/components/WalletSelectorModal/components/ConnectorButton';
 import Button from 'components/common/Button';
 import { useSnackbar } from 'hooks/useSnackbar';
-import { useUser } from 'hooks/useUser';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import type { AuthSig } from 'lib/blockchain/interfaces';
 import type { LoggedInUser } from 'models/User';
@@ -33,7 +32,7 @@ export interface DialogProps {
 
 function LoginHandler(props: DialogProps) {
   const { onClose, selectedValue, open } = props;
-  const { loginFromWeb3Account } = useUser();
+  const { loginFromWeb3Account } = useWeb3AuthSig();
 
   const { showMessage } = useSnackbar();
 

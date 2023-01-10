@@ -48,6 +48,11 @@ describe('shortWalletAddress', () => {
     expect(shortWalletAddress(ignoredString)).toBe(ignoredString);
     expect(shortWalletAddress(invalidWallet)).toBe(invalidWallet);
   });
+
+  it('should return an empty string if value is null or undefined', () => {
+    expect(shortWalletAddress(undefined as any)).toBe('');
+    expect(shortWalletAddress(null as any)).toBe('');
+  });
 });
 describe('matchShortAddress', () => {
   it('should return true if the first argument is a valid short version of the wallet address', () => {
