@@ -1,3 +1,4 @@
+import type { Prisma, Block as PrismaBlock } from '@prisma/client';
 import difference from 'lodash/difference';
 import { v4 } from 'uuid';
 
@@ -37,8 +38,12 @@ export type Block = {
   deletedAt: number | null;
 };
 
+// cant think of a better word for this.. handle some edge cases with types from the prisma client
+export type PrismaBlockSortOf = Omit<PrismaBlock, 'fields' | 'type'> & { fields: any; type: BlockTypes };
+
 export function createBlock(block?: Partial<Block>): Block {
-  const now = Date.now();
+  const createdAt = block?.createdAt ?? Date.now();
+  const updatedAt = block?.updatedAt || createdAt;
   return {
     id: block?.id || v4(),
     schema: 1,
@@ -50,8 +55,8 @@ export function createBlock(block?: Partial<Block>): Block {
     type: block?.type || 'unknown',
     fields: block?.fields ? { ...block?.fields } : {},
     title: block?.title || '',
-    createdAt: block?.createdAt || now,
-    updatedAt: block?.updatedAt || now,
+    createdAt,
+    updatedAt,
     deletedAt: block?.deletedAt || null
   };
 }
@@ -100,4 +105,41 @@ export function createPatchesFromBlocks(newBlock: Block, oldBlock: Block): Block
       deletedFields: newDeletedFields
     }
   ];
+}
+
+// export to BlockUncheckedCreateInput instead of regular Block so that the json 'fields' value is compatible with Prisma ops
+export function blockToPrisma(fbBlock: Block): PrismaBlockSortOf {
+  return {
+    id: fbBlock.id,
+    parentId: fbBlock.parentId,
+    rootId: fbBlock.rootId,
+    spaceId: fbBlock.spaceId,
+    updatedBy: fbBlock.updatedBy,
+    createdBy: fbBlock.createdBy,
+    schema: fbBlock.schema,
+    type: fbBlock.type,
+    title: fbBlock.title,
+    fields: fbBlock.fields,
+    deletedAt: fbBlock.deletedAt === 0 ? null : fbBlock.deletedAt ? new Date(fbBlock.deletedAt) : null,
+    createdAt: !fbBlock.createdAt || fbBlock.createdAt === 0 ? new Date() : new Date(fbBlock.createdAt),
+    updatedAt: !fbBlock.updatedAt || fbBlock.updatedAt === 0 ? new Date() : new Date(fbBlock.updatedAt)
+  };
+}
+
+export function prismaToBlock(block: PrismaBlock): Block {
+  return {
+    id: block.id,
+    parentId: block.parentId,
+    rootId: block.rootId,
+    spaceId: block.spaceId,
+    updatedBy: block.updatedBy,
+    createdBy: block.createdBy,
+    schema: block.schema,
+    type: block.type as BlockTypes,
+    title: block.title,
+    fields: block.fields as any,
+    deletedAt: block.deletedAt ? block.deletedAt.getTime() : null,
+    createdAt: block.createdAt.getTime(),
+    updatedAt: block.updatedAt.getTime()
+  };
 }

@@ -7,8 +7,7 @@ import { onError, onNoMatch } from 'lib/middleware';
 import { requireUser } from 'lib/middleware/requireUser';
 import { computeUserPagePermissions } from 'lib/permissions/pages';
 import { withSessionRoute } from 'lib/session/withSession';
-
-import { DataNotFoundError } from '../../../../../lib/utilities/errors';
+import { DataNotFoundError } from 'lib/utilities/errors';
 
 // TODO: frontend should tell us which space to use
 export type ServerBlockFields = 'spaceId' | 'updatedBy' | 'createdBy';

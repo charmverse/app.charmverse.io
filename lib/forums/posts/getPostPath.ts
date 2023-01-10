@@ -1,5 +1,5 @@
-import { randomId } from 'lib/utilities/random';
+import { uid } from 'lib/utilities/strings';
 
 export function getPostPath(postTitle: string): string {
-  return `${postTitle.toLowerCase().replace(/\s{1,}/g, '_')}_${randomId()}`;
+  return `${postTitle.toLowerCase().replace(/\s{1,}/g, '_')}_${uid()}`;
 }

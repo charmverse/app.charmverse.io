@@ -9,6 +9,7 @@ import Image from 'components/common/Image';
 import Link from 'components/common/Link';
 import PrimaryButton from 'components/common/PrimaryButton';
 import { useUser } from 'hooks/useUser';
+import { shortWalletAddress } from 'lib/utilities/strings';
 import gatesImage from 'public/images/artwork/gates.png';
 import rocketImage from 'public/images/artwork/rocket.png';
 
@@ -39,10 +40,9 @@ const ImageContainer = styled.div`
 `;
 
 export default function SignupPageContent() {
-  const router = useRouter();
   const { user } = useUser();
 
-  const welcomeMessage = `Welcome, ${user && user.username}!`;
+  const welcomeMessage = `Welcome, ${user && shortWalletAddress(user.username)}!`;
 
   return (
     <Content px={3}>

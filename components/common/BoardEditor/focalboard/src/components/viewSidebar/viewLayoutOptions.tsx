@@ -3,7 +3,7 @@ import { useCallback } from 'react';
 import type { IntlShape } from 'react-intl';
 import { injectIntl } from 'react-intl';
 
-import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
+import type { IPropertyTemplate } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import { createBoardView } from 'lib/focalboard/boardView';
 
@@ -17,7 +17,7 @@ import GalleryIcon from '../../widgets/icons/gallery';
 import TableIcon from '../../widgets/icons/table';
 
 interface LayoutOptionsProps {
-  board: Board;
+  properties: readonly IPropertyTemplate[];
   view: BoardView;
   intl: IntlShape;
 }
@@ -54,10 +54,10 @@ function LayoutOptions(props: LayoutOptionsProps) {
   }, [activeView]);
 
   const handleAddViewTable = useCallback(async () => {
-    const { board } = props;
+    const { properties } = props;
     const newView = createBoardView(activeView);
     newView.fields.viewType = 'table';
-    newView.fields.visiblePropertyIds = board.fields.cardProperties.map((o: IPropertyTemplate) => o.id);
+    newView.fields.visiblePropertyIds = properties.map((o: IPropertyTemplate) => o.id) ?? [];
     newView.fields.columnWidths = {};
     newView.fields.columnWidths[Constants.titleColumnId] = Constants.defaultTitleColumnWidth;
     newView.fields.cardOrder = newView.fields.cardOrder ?? [];

@@ -65,10 +65,12 @@ import { CollablandApi } from './apis/collablandApi';
 import { CommentsApi } from './apis/commentsApi';
 import { FileApi } from './apis/fileApi';
 import { ForumApi } from './apis/forumApi';
+import { GoogleApi } from './apis/googleApi';
 import { MembersApi } from './apis/membersApi';
 import { ProfileApi } from './apis/profileApi';
 import { ProposalsApi } from './apis/proposalsApi';
 import { TasksApi } from './apis/tasksApi';
+import { UnstoppableDomainsApi } from './apis/unstoppableApi';
 import { VotesApi } from './apis/votesApi';
 
 type BlockUpdater = (blocks: FBBlock[]) => void;
@@ -86,6 +88,8 @@ class CharmClient {
   collabland = new CollablandApi();
 
   comments = new CommentsApi();
+
+  google = new GoogleApi();
 
   votes = new VotesApi();
 
@@ -106,6 +110,8 @@ class CharmClient {
   mux = new MuxApi();
 
   file = new FileApi();
+
+  unstoppableDomains = new UnstoppableDomainsApi();
 
   async socket() {
     return http.GET<SocketAuthReponse>('/api/socket');

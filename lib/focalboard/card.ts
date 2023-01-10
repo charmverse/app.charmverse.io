@@ -8,11 +8,11 @@ type CardFields = {
   contentOrder: (string | string[])[];
 };
 
-type Card = Block & {
+export type Card = Block & {
   fields: CardFields;
 };
 
-function createCard(block?: Partial<Block>): Card {
+export function createCard(block?: Partial<Block>): Card {
   const contentOrder: (string | string[])[] = [];
   const contentIds = block?.fields?.contentOrder?.filter((id: any) => id !== null);
 
@@ -37,6 +37,3 @@ function createCard(block?: Partial<Block>): Card {
     }
   };
 }
-
-export { createCard };
-export type { Card };

@@ -1,7 +1,10 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable max-lines */
+
 import CallMadeIcon from '@mui/icons-material/CallMade';
-import { Box } from '@mui/material';
+import LaunchIcon from '@mui/icons-material/LaunchOutlined';
+import { Box, Typography, Link } from '@mui/material';
+import CircularProgress from '@mui/material/CircularProgress';
 import type { Page } from '@prisma/client';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
@@ -12,6 +15,7 @@ import { injectIntl } from 'react-intl';
 import type { ConnectedProps } from 'react-redux';
 import { connect } from 'react-redux';
 import { mutate } from 'swr';
+import { v4 as uuid } from 'uuid';
 
 import charmClient from 'charmClient';
 import PageBanner, { randomBannerImage } from 'components/[pageId]/DocumentPage/components/PageBanner';
@@ -24,17 +28,14 @@ import {
   sortCards
 } from 'components/common/BoardEditor/focalboard/src/store/cards';
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
-import {
-  getCurrentViewDisplayBy,
-  getCurrentViewGroupBy
-} from 'components/common/BoardEditor/focalboard/src/store/views';
 import Button from 'components/common/Button';
+import LoadingComponent from 'components/common/LoadingComponent';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMembers } from 'hooks/useMembers';
 import { usePages } from 'hooks/usePages';
 import type { Block } from 'lib/focalboard/block';
 import type { Board, BoardGroup, IPropertyOption, IPropertyTemplate } from 'lib/focalboard/board';
-import type { BoardView } from 'lib/focalboard/boardView';
+import type { BoardView, BoardViewFields } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
 import { createCard } from 'lib/focalboard/card';
 import { createNewDataSource } from 'lib/pages/createNewDataSource';
@@ -46,9 +47,9 @@ import { updateView } from '../store/views';
 import { Utils } from '../utils';
 
 import AddViewMenu from './addViewMenu';
+import { CreateLinkedView } from './createLinkedView';
 import Gallery from './gallery/gallery';
 import Kanban from './kanban/kanban';
-import SourceSelection from './SourceSelection';
 import Table from './table/table';
 import ViewHeader from './viewHeader/viewHeader';
 import ViewSidebar from './viewSidebar/viewSidebar';
@@ -66,6 +67,7 @@ type Props = WrappedComponentProps &
     views: BoardView[];
     hideBanner?: boolean;
     readOnly: boolean;
+    readOnlySourceData: boolean;
     addCard: (card: Card) => void;
     pageIcon?: string | null;
     setPage: (p: Partial<Page>) => void;
@@ -93,11 +95,11 @@ function CenterPanel(props: Props) {
     showSettings: !props.activeView ? 'create-linked-view' : null
   });
 
+  const [loadingFormResponses, setLoadingFormResponses] = useState(false);
+
   const router = useRouter();
   const space = useCurrentSpace();
   const { pages, updatePage } = usePages();
-  const _groupByProperty = useAppSelector(getCurrentViewGroupBy);
-  const _dateDisplayProperty = useAppSelector(getCurrentViewDisplayBy);
   const { members } = useMembers();
 
   const isEmbedded = !!props.embeddedBoardPath;
@@ -105,17 +107,25 @@ function CenterPanel(props: Props) {
   const boardPageType = boardPage?.type;
 
   // for 'linked' boards, each view has its own board which we use to determine the cards to show
-  const activeBoardId = props.activeView && (props.activeView?.fields.linkedSourceId || props.board.id);
+  let activeBoardId: string | undefined = props.board.id;
+  if (activeView?.fields.linkedSourceId) {
+    activeBoardId = activeView?.fields.linkedSourceId;
+  } else if (activeView?.fields.sourceType === 'google_form') {
+    activeBoardId = activeView?.fields.sourceData?.boardId;
+  }
+
   const activeBoard = useAppSelector(getBoard(activeBoardId ?? ''));
   const activePage = pages[activeBoardId ?? ''];
-
+  const _groupByProperty = activeBoard?.fields.cardProperties.find((o) => o.id === activeView?.fields.groupById);
+  const _dateDisplayProperty = activeBoard?.fields.cardProperties.find(
+    (o) => o.id === activeView?.fields.dateDisplayPropertyId
+  );
   const _cards = useAppSelector(
     getViewCardsSortedFilteredAndGrouped({
       boardId: activeBoard?.id || '',
       viewId: activeView?.id || ''
     })
   );
-
   // filter cards by whats accessible
   const cardPages: CardPage[] = _cards.map((card) => ({ card, page: pages[card.id]! })).filter(({ page }) => !!page);
   const sortedCardPages = activeView ? sortCards(cardPages, board, activeView, members) : [];
@@ -125,7 +135,6 @@ function CenterPanel(props: Props) {
   if ((!groupByProperty || _groupByProperty?.type !== 'select') && activeView?.fields.viewType === 'board') {
     groupByProperty = activeBoard?.fields.cardProperties.find((o: any) => o.type === 'select');
   }
-
   let dateDisplayProperty = _dateDisplayProperty;
   if (!dateDisplayProperty && activeView?.fields.viewType === 'calendar') {
     dateDisplayProperty = activeBoard?.fields.cardProperties.find((o: any) => o.type === 'date');
@@ -142,7 +151,7 @@ function CenterPanel(props: Props) {
 
   const backgroundRef = React.createRef<HTMLDivElement>();
   const keydownHandler = (keyName: string, e: KeyboardEvent) => {
-    if (e.target !== document.body || props.readOnly) {
+    if (e.target !== document.body || props.readOnly || props.readOnlySourceData) {
       return;
     }
 
@@ -356,11 +365,12 @@ function CenterPanel(props: Props) {
     return { visible: _visibleGroups, hidden: _hiddenGroups };
   }
 
-  async function createLinkedView({ boardId: sourceBoardId }: { boardId: string }) {
+  async function selectViewSource(fields: Pick<BoardViewFields, 'linkedSourceId' | 'sourceData' | 'sourceType'>) {
     const view = createTableView(board);
-    // A new property to indicate that this view was creating for inline databases only
-    view.fields.sourceType = 'board_page';
-    view.fields.linkedSourceId = sourceBoardId;
+    view.id = uuid();
+    view.fields.sourceData = fields.sourceData;
+    view.fields.sourceType = fields.sourceType;
+    view.fields.linkedSourceId = fields.linkedSourceId;
     await mutator.insertBlock(view);
     showView(view.id);
   }
@@ -400,6 +410,20 @@ function CenterPanel(props: Props) {
       closeSettings();
     }
   }, [activeView?.id]);
+
+  // refresh google forms data whenever source changes
+  useEffect(() => {
+    if (activeView) {
+      if (activeView.fields.sourceType === 'google_form') {
+        setLoadingFormResponses(true);
+        charmClient.google.forms.syncFormResponses({ viewId: activeView.id }).finally(() => {
+          setLoadingFormResponses(false);
+        });
+      }
+    }
+  }, [`${activeView?.fields.sourceData?.formId}${activeView?.fields.sourceData?.boardId}`]);
+
+  const isLoadingSourceData = !activeBoard && state.showSettings !== 'create-linked-view';
 
   return (
     <div
@@ -455,7 +479,6 @@ function CenterPanel(props: Props) {
           toggleViewOptions={toggleViewOptions}
           cards={cards}
           views={props.views}
-          groupByProperty={groupByProperty}
           dateDisplayProperty={dateDisplayProperty}
           addCard={() => addCard('', true)}
           showCard={showCard}
@@ -463,6 +486,7 @@ function CenterPanel(props: Props) {
           addCardTemplate={() => addCard('', true, {}, false, true)}
           editCardTemplate={editCardTemplate}
           readOnly={props.readOnly}
+          readOnlySourceData={props.readOnlySourceData}
           embeddedBoardPath={props.embeddedBoardPath}
         />
       </div>
@@ -478,7 +502,25 @@ function CenterPanel(props: Props) {
                 setPage={props.setPage}
               />
             )}
-            {activePage && boardPageType === 'inline_linked_board' && (
+            {activeBoard && activeView?.fields.sourceType === 'google_form' && (
+              <Typography sx={{ fontSize: 22, fontWeight: 500 }}>
+                Form responses to{' '}
+                <Link
+                  target='_blank'
+                  href={`${activeView?.fields.sourceData?.formUrl}/edit#responses`}
+                  sx={{ color: 'inherit', fontWeight: 700 }}
+                >
+                  {activeView?.fields.sourceData?.formName || 'Untitled'}
+                  <LaunchIcon fontSize='small' sx={{ ml: 0.5, position: 'relative', top: 3 }} />
+                </Link>
+                {loadingFormResponses && (
+                  <Box ml={2} component='span'>
+                    <CircularProgress style={{ color: '#ccc', height: 14, width: 14 }} />
+                  </Box>
+                )}
+              </Typography>
+            )}
+            {activePage && activeView?.fields?.sourceType === 'board_page' && (
               <Button
                 color='secondary'
                 startIcon={<CallMadeIcon />}
@@ -491,11 +533,10 @@ function CenterPanel(props: Props) {
               </Button>
             )}
             {!activeView && state.showSettings === 'create-linked-view' && (
-              <SourceSelection
+              <CreateLinkedView
                 readOnly={props.readOnly}
-                onSelectSource={createLinkedView}
-                onCreateDatabase={createDatabase}
-                showCreateDatabase={views.length === 0}
+                onSelect={selectViewSource}
+                onCreate={views.length === 0 ? createDatabase : undefined}
               />
             )}
             {activeBoard && activeView?.fields.viewType === 'board' && (
@@ -507,7 +548,7 @@ function CenterPanel(props: Props) {
                 visibleGroups={visibleGroups}
                 hiddenGroups={hiddenGroups}
                 selectedCardIds={state.selectedCardIds}
-                readOnly={props.readOnly}
+                readOnly={props.readOnly || props.readOnlySourceData}
                 onCardClicked={cardClicked}
                 addCard={addCard}
                 showCard={showCard}
@@ -523,6 +564,7 @@ function CenterPanel(props: Props) {
                 visibleGroups={visibleGroups}
                 selectedCardIds={state.selectedCardIds}
                 readOnly={props.readOnly}
+                readOnlySourceData={props.readOnlySourceData}
                 cardIdToFocusOnRender={state.cardIdToFocusOnRender}
                 showCard={showCard}
                 addCard={addCard}
@@ -534,7 +576,7 @@ function CenterPanel(props: Props) {
                 board={activeBoard}
                 cards={cards}
                 activeView={activeView}
-                readOnly={props.readOnly}
+                readOnly={props.readOnly || props.readOnlySourceData}
                 dateDisplayProperty={dateDisplayProperty}
                 showCard={showCard}
                 addCard={(properties: Record<string, string>) => {
@@ -542,22 +584,23 @@ function CenterPanel(props: Props) {
                 }}
               />
             )}
-
             {activeBoard && activeView?.fields.viewType === 'gallery' && (
               <Gallery
                 board={activeBoard}
                 cards={cards}
                 activeView={activeView}
-                readOnly={props.readOnly}
+                readOnly={props.readOnly || props.readOnlySourceData}
                 onCardClicked={cardClicked}
                 selectedCardIds={state.selectedCardIds}
                 addCard={(show) => addCard('', show)}
               />
             )}
+            {isLoadingSourceData && <LoadingComponent isLoading={true} height={400} />}
           </Box>
-          {activeBoard && activeView && (
+          {activeView && (
             <ViewSidebar
               board={activeBoard}
+              parentBoard={board}
               view={activeView}
               isOpen={state.showSettings === 'view-options'}
               closeSidebar={closeSettings}

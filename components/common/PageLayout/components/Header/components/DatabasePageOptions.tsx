@@ -37,6 +37,7 @@ import type { Board } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
 import { createCard } from 'lib/focalboard/card';
+import log from 'lib/log';
 import type { IPagePermissionFlags } from 'lib/permissions/pages';
 
 import {
@@ -53,23 +54,6 @@ interface Props {
   pagePermissions?: IPagePermissionFlags;
 }
 
-function onExportCsvTrigger(board: Board, activeView: BoardView, cards: Card[], intl: IntlShape) {
-  try {
-    CsvExporter.exportTableCsv(board, activeView, cards, intl);
-    const exportCompleteMessage = intl.formatMessage({
-      id: 'ViewHeader.export-complete',
-      defaultMessage: 'Export complete!'
-    });
-    sendFlashMessage({ content: exportCompleteMessage, severity: 'normal' });
-  } catch (e) {
-    const exportFailedMessage = intl.formatMessage({
-      id: 'ViewHeader.export-failed',
-      defaultMessage: 'Export failed!'
-    });
-    sendFlashMessage({ content: exportFailedMessage, severity: 'high' });
-  }
-}
-
 export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: Props) {
   const intl = useIntl();
   const router = useRouter();
@@ -82,7 +66,7 @@ export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: 
   const { user } = useUser();
   const currentSpace = useCurrentSpace();
 
-  const activeBoardId = view?.fields.linkedSourceId || view?.rootId;
+  const activeBoardId = view?.fields.sourceData?.boardId ?? view?.fields.linkedSourceId ?? view?.rootId;
   const board = boards.find((b) => b.id === activeBoardId);
 
   if (!board || !view) {
@@ -95,11 +79,6 @@ export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: 
       viewId: view.id
     })
   );
-  const cardPages: CardPage[] = cards
-    .map((card) => ({ card, page: pages[card.id] }))
-    .filter((item): item is CardPage => !!item.page);
-
-  const sortedCardPages = sortCards(cardPages, board, view, members);
 
   async function onDeletePage() {
     await deletePage({
@@ -109,6 +88,11 @@ export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: 
   }
 
   const exportCsv = () => {
+    const cardPages: CardPage[] = cards
+      .map((card) => ({ card, page: pages[card.id] }))
+      .filter((item): item is CardPage => !!item.page);
+
+    const sortedCardPages = sortCards(cardPages, board, view, members);
     const _cards = sortedCardPages.map(({ card, page }) => {
       return {
         ...card,
@@ -116,8 +100,13 @@ export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: 
         title: page.title
       };
     });
-
-    onExportCsvTrigger(board, view, _cards, intl);
+    try {
+      CsvExporter.exportTableCsv(board, view, _cards, intl);
+      showMessage('Export complete!');
+    } catch (error) {
+      log.error('CSV export failed', error);
+      showMessage('Export failed', 'error');
+    }
     closeMenu();
     const spaceId = pages[pageId]?.spaceId;
     if (spaceId) {

@@ -215,7 +215,7 @@ const CardDetailProperties = React.memo((props: Props) => {
 
       {showConfirmationDialog && <ConfirmationDialogBox dialogBox={confirmationDialogBox} />}
 
-      {!props.readOnly && props.activeView && (
+      {!props.readOnly && activeView && (
         <div className='octo-propertyname add-property'>
           <MenuWrapper>
             <Button>
@@ -231,7 +231,7 @@ const CardDetailProperties = React.memo((props: Props) => {
                     type,
                     options: []
                   };
-                  const templateId = await mutator.insertPropertyTemplate(board, activeView!, -1, template);
+                  const templateId = await mutator.insertPropertyTemplate(board, activeView, -1, template);
                   setNewTemplateId(templateId);
                 }}
               />

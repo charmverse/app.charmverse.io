@@ -92,3 +92,5 @@ export const focalboardColorsMap: { [key: string]: SupportedColor } = {
   propColorRed: 'red',
   propColorPink: 'pink'
 };
+
+export const dangerColor = '#d32f2f'; // taken from MUI

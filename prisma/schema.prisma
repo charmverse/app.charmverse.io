@@ -1,7 +1,7 @@
 generator client {
   provider        = "prisma-client-js"
   binaryTargets   = ["linux-musl", "darwin", "native"]
-  previewFeatures = ["interactiveTransactions", "fullTextSearch"]
+  previewFeatures = ["interactiveTransactions", "fullTextSearch", "extendedWhereUnique"]
 }
 
 datasource db {
@@ -155,6 +155,7 @@ enum PageType {
   page
   page_template
   card
+  card_synced
   card_template
   proposal
   proposal_template
@@ -447,6 +448,7 @@ model User {
   unstoppableDomains   UnstoppableDomain[]
   postComments         PostComment[]
   googleAccounts       GoogleAccount[]
+  GoogleCredential     GoogleCredential[]
 }
 
 model UserWallet {
@@ -1096,4 +1098,20 @@ model GoogleAccount {
   avatarUrl String
   userId    String @db.Uuid
   user      User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model GoogleCredential {
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  id           String    @id @default(uuid()) @db.Uuid
+  expiredAt    DateTime?
+  error        Json?
+  name         String
+  refreshToken String
+  scope        String
+  userId       String    @db.Uuid
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, name])
+  @@index([userId])
 }

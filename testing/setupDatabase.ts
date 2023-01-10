@@ -11,6 +11,7 @@ import type {
   ProposalStatus,
   Role,
   RoleSource,
+  User,
   Thread,
   Transaction,
   Vote,
@@ -35,7 +36,7 @@ import { createUserFromWallet } from 'lib/users/createUser';
 import { typedKeys } from 'lib/utilities/objects';
 import type { LoggedInUser } from 'models';
 
-import { boardWithCardsArgs } from './generate-board-stub';
+import { boardWithCardsArgs } from './generateBoardStub';
 import { generatePostCategory } from './utils/forums';
 
 export async function generateSpaceUser({
@@ -125,6 +126,66 @@ export async function generateUserAndSpaceWithApiToken(
     user,
     space,
     apiToken
+  };
+}
+
+type CreateUserAndSpaceInput = {
+  user?: Partial<User>;
+  isAdmin?: boolean;
+  onboarded?: boolean;
+  spaceName?: string;
+  publicBountyBoard?: boolean;
+};
+
+export async function generateUserAndSpace({
+  user,
+  isAdmin,
+  onboarded = true,
+  spaceName = 'Example Space',
+  publicBountyBoard
+}: CreateUserAndSpaceInput = {}) {
+  const userId = v4();
+  const newUser = await prisma.user.create({
+    data: {
+      id: userId,
+      identityType: 'Wallet',
+      username: `Test user ${Math.random()}`,
+      spaceRoles: {
+        create: {
+          isAdmin,
+          onboarded,
+          space: {
+            create: {
+              author: {
+                connect: {
+                  id: userId
+                }
+              },
+              updatedBy: userId,
+              name: spaceName,
+              // Adding prefix avoids this being evaluated as uuid
+              domain: `domain-${v4()}`,
+              publicBountyBoard
+            }
+          }
+        }
+      },
+      ...user
+    },
+    include: {
+      spaceRoles: {
+        include: {
+          space: true
+        }
+      }
+    }
+  });
+
+  const { spaceRoles, ...userResult } = newUser;
+
+  return {
+    user: userResult,
+    space: spaceRoles[0].space
   };
 }
 

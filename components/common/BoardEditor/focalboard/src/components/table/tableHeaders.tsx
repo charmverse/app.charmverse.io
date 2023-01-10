@@ -25,6 +25,7 @@ type Props = {
   activeView: BoardView;
   views: BoardView[];
   readOnly: boolean;
+  readOnlySourceData: boolean;
   resizingColumn: string;
   offset: number;
   columnRefs: Map<string, React.RefObject<HTMLDivElement>>;
@@ -159,6 +160,7 @@ function TableHeaders(props: Props): JSX.Element {
             name={template.name}
             sorted={sorted}
             readOnly={props.readOnly}
+            readOnlySourceData={props.readOnlySourceData}
             board={board}
             activeView={activeView}
             cards={cards}
@@ -173,7 +175,7 @@ function TableHeaders(props: Props): JSX.Element {
       })}
       {/* empty column for actions */}
       <div className='octo-table-cell header-cell' style={{ flexGrow: 1, borderRight: '0 none' }}>
-        {!props.readOnly && (
+        {!props.readOnly && !props.readOnlySourceData && (
           <MenuWrapper>
             <Button>
               <AddIcon fontSize='small' />

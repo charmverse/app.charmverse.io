@@ -32,13 +32,13 @@ type Props = {
   views: BoardView[];
   viewsBoardId: string;
   cards: Card[];
-  groupByProperty?: IPropertyTemplate;
   addCard: () => void;
   showCard: (cardId: string | null) => void;
   // addCardFromTemplate: (cardTemplateId: string) => void
   addCardTemplate: () => void;
   editCardTemplate: (cardTemplateId: string) => void;
   readOnly: boolean;
+  readOnlySourceData: boolean;
   dateDisplayProperty?: IPropertyTemplate;
   addViewButton?: ReactNode;
   disableUpdatingUrl?: boolean;
@@ -65,7 +65,6 @@ function ViewHeader(props: Props) {
     viewsBoardId,
     activeBoard,
     activeView,
-    groupByProperty,
     cards,
     dateDisplayProperty
   } = props;
@@ -115,13 +114,13 @@ function ViewHeader(props: Props) {
       <div className='octo-spacer' />
 
       <div className='view-actions'>
-        {!props.readOnly && activeView && activeBoard && (
+        {!props.readOnly && activeView && (
           <>
             {/* Display by */}
 
             {withDisplayBy && (
               <ViewHeaderDisplayByMenu
-                properties={activeBoard.fields.cardProperties}
+                properties={activeBoard?.fields.cardProperties ?? []}
                 activeView={activeView}
                 dateDisplayPropertyName={dateDisplayProperty?.name}
               />
@@ -140,7 +139,11 @@ function ViewHeader(props: Props) {
                 <FormattedMessage id='ViewHeader.filter' defaultMessage='Filter' />
               </Button>
               {showFilter && (
-                <FilterComponent board={activeBoard} activeView={activeView} onClose={() => setShowFilter(false)} />
+                <FilterComponent
+                  properties={activeBoard?.fields.cardProperties ?? []}
+                  activeView={activeView}
+                  onClose={() => setShowFilter(false)}
+                />
               )}
             </ModalWrapper>
 
@@ -148,7 +151,7 @@ function ViewHeader(props: Props) {
 
             {withSortBy && (
               <ViewHeaderSortMenu
-                properties={activeBoard.fields.cardProperties}
+                properties={activeBoard?.fields.cardProperties ?? []}
                 activeView={activeView}
                 orderedCards={cards}
               />
@@ -185,15 +188,17 @@ function ViewHeader(props: Props) {
 
             {/* New card button */}
 
-            <NewCardButton
-              addCard={props.addCard}
-              addCardFromTemplate={addPageFromTemplate}
-              addCardTemplate={props.addCardTemplate}
-              editCardTemplate={props.editCardTemplate}
-              showCard={props.showCard}
-              deleteCardTemplate={deleteCardTemplate}
-              boardId={viewsBoardId}
-            />
+            {!props.readOnlySourceData && (
+              <NewCardButton
+                addCard={props.addCard}
+                addCardFromTemplate={addPageFromTemplate}
+                addCardTemplate={props.addCardTemplate}
+                editCardTemplate={props.editCardTemplate}
+                showCard={props.showCard}
+                deleteCardTemplate={deleteCardTemplate}
+                boardId={viewsBoardId}
+              />
+            )}
           </>
         )}
       </div>

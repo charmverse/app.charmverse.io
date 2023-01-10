@@ -1,8 +1,11 @@
 import styled from '@emotion/styled';
-import DuplicateIcon from '@mui/icons-material/ContentCopy';
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
-import EditIcon from '@mui/icons-material/Edit';
-import TuneIcon from '@mui/icons-material/Tune';
+import {
+  Edit as EditIcon,
+  Tune as TuneIcon,
+  DeleteOutline as DeleteOutlineIcon,
+  ContentCopy as DuplicateIcon,
+  Refresh as RefreshIcon
+} from '@mui/icons-material';
 import Divider from '@mui/material/Divider';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
@@ -21,6 +24,7 @@ import { useForm } from 'react-hook-form';
 import type { IntlShape } from 'react-intl';
 import { injectIntl } from 'react-intl';
 
+import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import Modal from 'components/common/Modal';
 import type { BoardView } from 'lib/focalboard/boardView';
@@ -155,6 +159,18 @@ function ViewTabs(props: ViewTabsProps) {
     }
   }, [views, dropdownView, showView]);
 
+  function resyncGoogleFormData() {
+    if (dropdownView) {
+      const newView = createBoardView(dropdownView);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { boardId, ...sourceDataWithoutBoard } = newView.fields.sourceData!;
+      newView.fields.sourceData = sourceDataWithoutBoard;
+      mutator.updateBlock(newView, dropdownView, 'reset Google view source');
+      // charmClient.google.forms.syncFormResponses({ reset: true, viewId: dropdownView.id });
+      setAnchorEl(null);
+    }
+  }
+
   function handleRenameView() {
     setAnchorEl(null);
     renameViewPopupState.open();
@@ -242,13 +258,26 @@ function ViewTabs(props: ViewTabsProps) {
           </ListItemIcon>
           <ListItemText>Edit View</ListItemText>
         </MenuItem>
-        <Divider />
-        <MenuItem dense onClick={handleDuplicateView}>
-          <ListItemIcon>
-            <DuplicateIcon />
-          </ListItemIcon>
-          <ListItemText>{duplicateViewText}</ListItemText>
-        </MenuItem>
+        {dropdownView?.fields.sourceType === 'google_form' && [
+          <Divider key='divider' />,
+          <MenuItem key='duplicate-view' dense onClick={resyncGoogleFormData}>
+            <ListItemIcon>
+              <RefreshIcon />
+            </ListItemIcon>
+            <ListItemText>Resync Google Form</ListItemText>
+          </MenuItem>,
+          <Divider key='divider-2' />
+        ]}
+        {dropdownView &&
+          dropdownView?.fields.sourceType !== 'google_form' && [
+            <Divider key='divider' />,
+            <MenuItem key='duplicate-view' dense onClick={handleDuplicateView}>
+              <ListItemIcon>
+                <DuplicateIcon />
+              </ListItemIcon>
+              <ListItemText>{duplicateViewText}</ListItemText>
+            </MenuItem>
+          ]}
         {views.length !== 1 && (
           <MenuItem dense onClick={handleDeleteView}>
             <ListItemIcon>
@@ -286,7 +315,7 @@ function ViewTabs(props: ViewTabsProps) {
             return disableUpdatingUrl ? (
               content
             ) : (
-              <Link href={getViewUrl(view.id)} passHref>
+              <Link key={view.id} href={getViewUrl(view.id)} passHref>
                 {content}
               </Link>
             );

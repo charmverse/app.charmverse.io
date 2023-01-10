@@ -515,7 +515,8 @@ function CharmEditor({
     };
   }, [editorRef.current]);
 
-  const enableComments = !disablePageSpecificFeatures && !enableSuggestingMode && !isTemplate;
+  const enableComments =
+    !disablePageSpecificFeatures && !enableSuggestingMode && !isTemplate && !!pagePermissions?.comment;
 
   return (
     <StyledReactBangleEditor

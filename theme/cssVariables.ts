@@ -24,6 +24,7 @@ const globalCSS = css`
     --primary-color: ${colors.blueColor};
     --primary-text: ${colors.primaryTextColor};
     --secondary-text: ${colors.secondaryTextColor};
+    --danger-text: ${colors.dangerColor};
 
     /* copied from https://mui.com/material-ui/customization/z-index/#main-content */
     --z-index-mobileStepper: 1000;

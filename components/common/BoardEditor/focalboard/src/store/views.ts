@@ -101,23 +101,3 @@ export const getCurrentView = createSelector(
     return views[viewId];
   }
 );
-
-export const getCurrentViewGroupBy = createSelector(getCurrentBoard, getCurrentView, (currentBoard, currentView) => {
-  if (!currentBoard) {
-    return undefined;
-  }
-  if (!currentView) {
-    return undefined;
-  }
-  return currentBoard.fields.cardProperties.find((o) => o.id === currentView.fields.groupById);
-});
-
-export const getCurrentViewDisplayBy = createSelector(getCurrentBoard, getCurrentView, (currentBoard, currentView) => {
-  if (!currentBoard) {
-    return undefined;
-  }
-  if (!currentView) {
-    return undefined;
-  }
-  return currentBoard.fields.cardProperties.find((o) => o.id === currentView.fields.dateDisplayPropertyId);
-});

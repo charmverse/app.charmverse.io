@@ -1,7 +1,7 @@
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 
-import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
+import type { IPropertyTemplate } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { FilterClause, FilterCondition } from 'lib/focalboard/filterClause';
 import { createFilterClause } from 'lib/focalboard/filterClause';
@@ -15,7 +15,7 @@ import Modal from '../modal';
 import FilterEntry from './filterEntry';
 
 type Props = {
-  board: Board;
+  properties: IPropertyTemplate[];
   activeView: BoardView;
   onClose: () => void;
 };
@@ -38,7 +38,7 @@ const FilterComponent = React.memo((props: Props): JSX.Element => {
   };
 
   const addFilterClicked = () => {
-    const { board, activeView } = props;
+    const { properties, activeView } = props;
 
     const filters =
       (activeView.fields.filter?.filters.filter((o) => !isAFilterGroupInstance(o)) as FilterClause[]) || [];
@@ -46,7 +46,7 @@ const FilterComponent = React.memo((props: Props): JSX.Element => {
     const filter = createFilterClause();
 
     // Pick the first select property that isn't already filtered on
-    const selectProperty = board.fields.cardProperties
+    const selectProperty = properties
       .filter((o: IPropertyTemplate) => !filters.find((f) => f.propertyId === o.id))
       .find((o: IPropertyTemplate) => o.type === 'select' || o.type === 'multiSelect');
     if (selectProperty) {
@@ -57,7 +57,7 @@ const FilterComponent = React.memo((props: Props): JSX.Element => {
     mutator.changeViewFilter(activeView.id, activeView.fields.filter, filterGroup);
   };
 
-  const { board, activeView } = props;
+  const { activeView, properties } = props;
 
   const filters: FilterClause[] =
     (activeView.fields.filter?.filters.filter((o) => !isAFilterGroupInstance(o)) as FilterClause[]) || [];
@@ -68,7 +68,7 @@ const FilterComponent = React.memo((props: Props): JSX.Element => {
         {filters.map((filter) => (
           <FilterEntry
             key={`${filter.propertyId}-${filter.condition}-${filter.values.join(',')}`}
-            board={board}
+            properties={properties}
             view={activeView}
             conditionClicked={conditionClicked}
             filter={filter}

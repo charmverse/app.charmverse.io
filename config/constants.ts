@@ -26,3 +26,8 @@ export const googleWebClientConfig = {
   messagingSenderId: process.env.NEXT_PUBLIC_GOOGLE_MESSAGING_SENDER_ID,
   appId: process.env.NEXT_PUBLIC_GOOGLE_APP_ID
 };
+
+// Google config with sensitive scopes (to eventually replace the primary config)
+export const googleOAuthClientIdSensitive =
+  process.env.GOOGLE_OAUTH_CLIENT_ID_SENSITIVE || process.env.NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_ID_SENSITIVE;
+export const googleOAuthClientSecretSensitive = process.env.GOOGLE_OAUTH_CLIENT_SECRET_SENSITIVE;

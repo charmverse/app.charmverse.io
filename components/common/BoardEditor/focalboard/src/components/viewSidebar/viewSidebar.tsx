@@ -17,10 +17,15 @@ import {
 } from '@mui/material';
 import { capitalize } from 'lodash';
 import { memo, useEffect, useState } from 'react';
+import { FcGoogle } from 'react-icons/fc';
 import { RiFolder2Line } from 'react-icons/ri';
 
+import { createTableView } from 'components/common/BoardEditor/focalboard/src/components/addViewMenu';
+import { usePages } from 'hooks/usePages';
 import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
-import type { BoardView } from 'lib/focalboard/boardView';
+import type { BoardView, BoardViewFields } from 'lib/focalboard/boardView';
+
+import mutator from '../../mutator';
 
 import GroupOptions from './viewGroupOptions';
 import ViewLayoutOptions from './viewLayoutOptions';
@@ -28,14 +33,15 @@ import ViewPropertyOptions from './viewPropertyOptions';
 import { ViewSourceOptions } from './viewSourceOptions';
 
 interface Props {
-  board: Board;
+  board?: Board;
+  parentBoard: Board; // we need the parent board when creating or updating the view
   view: BoardView;
   closeSidebar: () => void;
   isOpen: boolean;
   groupByProperty?: IPropertyTemplate;
 }
 
-const StyledSidebar = styled.div`
+export const StyledSidebar = styled.div`
   background-color: ${({ theme }) => theme.palette.background.paper};
   border-left: 1px solid rgb(var(--center-channel-color-rgb), 0.12);
   display: flex;
@@ -52,28 +58,45 @@ type SidebarView = 'view-options' | 'layout' | 'card-properties' | 'group-by' | 
 
 const initialState: SidebarView = 'view-options';
 
-function ViewOptionsSidebar(props: Props) {
+function ViewSidebar(props: Props) {
   const [sidebarView, setSidebarView] = useState<SidebarView>(initialState);
+  const { pages } = usePages();
 
   const withGroupBy = props.view.fields.viewType.match(/board/) || props.view.fields.viewType === 'table';
+  const currentGroup = props.board?.fields.cardProperties.find((prop) => prop.id === props.groupByProperty?.id)?.name;
+  const currentLayout = props.view.fields.viewType;
+  const visiblePropertyIds = props.view.fields.visiblePropertyIds ?? [];
+  const currentProperties = visiblePropertyIds.filter((id) =>
+    props.board?.fields.cardProperties.some((c) => c.id === id)
+  ).length;
+
+  let SourceIcon = RiFolder2Line;
+  let sourceTitle = 'None';
+  const sourcePage = pages[props.view.fields.linkedSourceId ?? ''];
+  if (sourcePage) {
+    sourceTitle = sourcePage.title;
+  } else if (props.view.fields.sourceType === 'google_form') {
+    sourceTitle = props.view.fields.sourceData?.formName ?? 'Google Form';
+    SourceIcon = FcGoogle;
+  }
 
   function goBack() {
     setSidebarView(initialState);
   }
 
+  async function selectViewSource(fields: Pick<BoardViewFields, 'linkedSourceId' | 'sourceData' | 'sourceType'>) {
+    const newView = createTableView(props.parentBoard, props.view);
+    newView.fields.sourceData = fields.sourceData;
+    newView.fields.sourceType = fields.sourceType;
+    newView.fields.linkedSourceId = fields.linkedSourceId;
+    await mutator.updateBlock(newView, props.view, 'change view source');
+  }
   useEffect(() => {
     // reset state on close
     if (!props.isOpen) {
       setSidebarView(initialState);
     }
   }, [props.isOpen]);
-
-  const currentGroup = props.board.fields.cardProperties.find((prop) => prop.id === props.groupByProperty?.id)?.name;
-  const currentLayout = props.view.fields.viewType;
-  const visiblePropertyIds = props.view.fields.visiblePropertyIds ?? [];
-  const currentProperties = visiblePropertyIds.filter((id) =>
-    props.board.fields.cardProperties.some((c) => c.id === id)
-  ).length;
 
   return (
     <ClickAwayListener mouseEvent={props.isOpen ? 'onClick' : false} onClickAway={props.closeSidebar}>
@@ -106,43 +129,46 @@ function ViewOptionsSidebar(props: Props) {
                   value={currentGroup ?? 'None'}
                 />
               )}
-              {/* {props.view.fields.sourceType && (
+              {props.view.fields.sourceType && (
                 <MenuRow
                   onClick={() => setSidebarView('source')}
-                  icon={<RiFolder2Line style={{ color: 'var(--secondary-text)' }} />}
+                  icon={<SourceIcon style={{ color: 'var(--secondary-text)' }} />}
                   title='Source'
-                  value={props.view.fields.source ?? 'None'}
+                  value={sourceTitle}
                 />
-              )} */}
+              )}
             </>
           )}
           {sidebarView === 'layout' && (
             <>
               <SidebarHeader goBack={goBack} title='Layout' closeSidebar={props.closeSidebar} />
-              <ViewLayoutOptions board={props.board} view={props.view} />
+              <ViewLayoutOptions properties={props.board?.fields.cardProperties ?? []} view={props.view} />
             </>
           )}
           {sidebarView === 'card-properties' && (
             <>
               <SidebarHeader goBack={goBack} title='Properties' closeSidebar={props.closeSidebar} />
-              <ViewPropertyOptions properties={props.board.fields.cardProperties} view={props.view} />
+              <ViewPropertyOptions properties={props.board?.fields.cardProperties ?? []} view={props.view} />
             </>
           )}
           {sidebarView === 'group-by' && (
             <>
               <SidebarHeader goBack={goBack} title='Group by' closeSidebar={props.closeSidebar} />
               <GroupOptions
-                properties={props.board.fields.cardProperties}
+                properties={props.board?.fields.cardProperties || []}
                 view={props.view}
                 groupByProperty={props.groupByProperty}
               />
             </>
           )}
           {sidebarView === 'source' && (
-            <>
-              <SidebarHeader goBack={goBack} title='Data source' closeSidebar={props.closeSidebar} />
-              <ViewSourceOptions view={props.view} />
-            </>
+            <ViewSourceOptions
+              title='Data source'
+              view={props.view}
+              goBack={goBack}
+              onSelect={selectViewSource}
+              closeSidebar={props.closeSidebar}
+            />
           )}
         </StyledSidebar>
       </Collapse>
@@ -165,10 +191,22 @@ function MenuRow({
     <MenuItem dense onClick={onClick}>
       <ListItemIcon>{icon}</ListItemIcon>
       <ListItemText>{title}</ListItemText>
-      <Typography component='div' color='secondary' variant='body2' sx={{ display: 'flex', alignItems: 'center' }}>
+      <Typography
+        component='div'
+        color='secondary'
+        variant='body2'
+        sx={{
+          flexGrow: 1,
+          maxWidth: '45%',
+          textAlign: 'right',
+          whitespace: 'nowrap',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis'
+        }}
+      >
         {value}
-        <ArrowRightIcon />
       </Typography>
+      <ArrowRightIcon color='secondary' />
     </MenuItem>
   );
 }
@@ -201,4 +239,4 @@ export function SidebarHeader({
   );
 }
 
-export default memo(ViewOptionsSidebar);
+export default memo(ViewSidebar);

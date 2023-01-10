@@ -8,13 +8,13 @@ import { useState } from 'react';
 import { WalletSelector } from 'components/_app/Web3ConnectionManager/components/WalletSelectorModal';
 import { ConnectorButton } from 'components/_app/Web3ConnectionManager/components/WalletSelectorModal/components/ConnectorButton';
 import Button from 'components/common/Button';
+import { useFirebaseAuth } from 'hooks/useFirebaseAuth';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import type { AuthSig } from 'lib/blockchain/interfaces';
 import type { LoggedInUser } from 'models/User';
 
-import { useGoogleAuth } from './hooks/useGoogleAuth';
 import { WalletSign } from './WalletSign';
 
 export type AnyIdLogin<I extends IdentityType = IdentityType> = {
@@ -22,9 +22,7 @@ export type AnyIdLogin<I extends IdentityType = IdentityType> = {
   user: LoggedInUser;
   displayName: string;
 };
-export type AnyIdFunction<I extends IdentityType = IdentityType> = () => Promise<AnyIdLogin<I>>;
 
-export type AnyIdPostLoginHandler<I extends IdentityType = IdentityType> = (loginInfo: AnyIdLogin<I>) => any;
 export interface DialogProps {
   open: boolean;
   selectedValue: string;
@@ -37,7 +35,7 @@ function LoginHandler(props: DialogProps) {
 
   const { showMessage } = useSnackbar();
 
-  const { loginWithGoogle } = useGoogleAuth();
+  const { loginWithGoogle } = useFirebaseAuth();
   const { verifiableWalletDetected } = useWeb3AuthSig();
   async function handleLogin(loggedInUser: AnyIdLogin) {
     showMessage(`Logged in with ${loggedInUser?.identityType}. Redirecting you now`, 'success');
