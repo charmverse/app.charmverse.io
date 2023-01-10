@@ -1,7 +1,7 @@
 import { forwardRef, memo } from 'react';
 
-import type { IViewType } from 'components/common/BoardEditor/focalboard/src/blocks/boardView';
 import { iconForViewType } from 'components/common/BoardEditor/focalboard/src/components/viewMenu';
+import type { IViewType } from 'lib/focalboard/boardView';
 
 import { StyledTreeItem, PageLink } from './PageTreeItem';
 
@@ -20,7 +20,16 @@ const BoardViewTreeItem = forwardRef<HTMLDivElement, BoardViewTreeItemProps>((pr
 
   return (
     <StyledTreeItem
-      label={<PageLink href={href} label={label} labelIcon={labelIcon} showPicker={false} onClick={onClick} />}
+      label={
+        <PageLink
+          href={href}
+          label={label}
+          labelIcon={labelIcon}
+          pageType='board' // this is normally used for icons
+          showPicker={false}
+          onClick={onClick}
+        />
+      }
       nodeId={nodeId}
       ref={ref}
       TransitionProps={{ timeout: 50 }}

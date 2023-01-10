@@ -1,7 +1,7 @@
 import React from 'react';
 import { useDrop } from 'react-dnd';
 
-import type { Card } from '../../blocks/card';
+import type { Card } from 'lib/focalboard/card';
 
 type Props = {
   onDrop: (card: Card) => void;

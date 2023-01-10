@@ -69,7 +69,7 @@ async function extractPageArtifacts(linkedPageIds: string[]) {
           }
         },
         {
-          parentId: {
+          rootId: {
             in: publicPagesIds
           }
         }
@@ -241,7 +241,7 @@ async function getPublicPage(req: NextApiRequest, res: NextApiResponse<PublicPag
     boards = linkedBoards;
     cards = linkedCards;
     views = linkedViews;
-  } else if (page.type === 'inline_linked_board') {
+  } else if (page.type === 'inline_linked_board' || page.type === 'linked_board') {
     const { boards: linkedBoards, cards: linkedCards, views: linkedViews } = await extractPageArtifacts([page.id]);
     boards = linkedBoards;
     cards = linkedCards;

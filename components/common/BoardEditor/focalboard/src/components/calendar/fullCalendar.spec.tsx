@@ -2,7 +2,8 @@ import '@testing-library/jest-dom';
 import { render } from '@testing-library/react';
 import React from 'react';
 
-import type { IPropertyTemplate } from '../../blocks/board';
+import type { IPropertyTemplate } from 'lib/focalboard/board';
+
 import { TestBlockFactory } from '../../test/testBlockFactory';
 import { wrapIntl } from '../../testUtils';
 

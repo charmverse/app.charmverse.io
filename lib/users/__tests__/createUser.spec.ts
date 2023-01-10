@@ -1,8 +1,5 @@
-import { Wallet } from 'ethers';
-import { v4 } from 'uuid';
-
 import { shortWalletAddress } from 'lib/utilities/strings';
-import { randomETHWalletAddress } from 'testing/generate-stubs';
+import { randomETHWalletAddress } from 'testing/generateStubs';
 
 import { createUserFromWallet } from '../createUser';
 

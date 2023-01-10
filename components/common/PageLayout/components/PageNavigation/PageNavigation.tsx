@@ -31,7 +31,13 @@ const StyledTreeRoot = styled(TreeRoot)<{ isFavorites?: boolean }>`
 
 export function filterVisiblePages(pages: (PageMeta | undefined)[], rootPageIds: string[] = []) {
   return pages.filter((page): page is IPageWithPermissions =>
-    isTruthy(page && (page.type === 'board' || page.type === 'page' || rootPageIds?.includes(page.id)))
+    isTruthy(
+      page &&
+        (page.type === 'board' ||
+          page.type === 'page' ||
+          page.type === 'linked_board' ||
+          rootPageIds?.includes(page.id))
+    )
   );
 }
 

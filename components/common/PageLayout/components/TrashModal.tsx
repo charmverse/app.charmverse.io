@@ -27,7 +27,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { fancyTrim } from 'lib/utilities/strings';
 
-import PageIcon from './PageIcon';
+import { PageIcon } from './PageIcon';
 
 const PageArchivedDate = memo<{ date: Date; title: string }>(({ date, title }) => {
   return (

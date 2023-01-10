@@ -22,14 +22,14 @@ interface LoadingProps {
   height?: CSSValue;
   label?: string;
   minHeight?: CSSValue;
-  isLoading: boolean;
+  isLoading?: boolean;
   size?: number;
   children?: React.ReactNode;
 }
 
 export default function LoadingComponent({
   height,
-  isLoading,
+  isLoading = true,
   component,
   label,
   children,
