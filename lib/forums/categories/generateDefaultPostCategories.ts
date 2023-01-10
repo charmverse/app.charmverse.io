@@ -10,7 +10,7 @@ export const defaultPostCategories = [
   'Questions & Support'
 ];
 
-export function generateDefaultPostCategories(spaceId: string): Prisma.PostCategoryCreateManyInput[] {
+export function generateDefaultPostCategories(spaceId: string): Required<Prisma.PostCategoryCreateManyInput>[] {
   return defaultPostCategories.map((category) => ({
     id: v4(),
     name: category,

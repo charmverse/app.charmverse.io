@@ -46,7 +46,7 @@ export async function createWorkspace({ spaceData, userId }: CreateSpaceProps) {
 
   const defaultGeneralPostCategory = defaultPostCategories.find((category) => category.name === 'General');
 
-  if (defaultGeneralPostCategory) {
+  if (defaultGeneralPostCategory?.id) {
     await setDefaultPostCategory({
       postCategoryId: defaultGeneralPostCategory.id as string,
       spaceId: space.id
