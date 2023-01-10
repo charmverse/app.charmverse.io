@@ -179,7 +179,6 @@ export default function WorkspaceSettings() {
               await charmClient.deleteSpace(space.id);
               const filteredSpaces = spaces.filter((s) => s.id !== space.id);
               setSpaces(filteredSpaces);
-              window.location.href = filteredSpaces.length !== 0 ? `/${filteredSpaces[0].domain}` : '/signup';
             }
           }}
         />
@@ -197,7 +196,6 @@ export default function WorkspaceSettings() {
             await charmClient.leaveSpace(space.id);
             const filteredSpaces = spaces.filter((s) => s.id !== space.id);
             setSpaces(filteredSpaces);
-            window.location.href = filteredSpaces.length !== 0 ? `/${filteredSpaces[0].domain}` : '/signup';
           }}
         />
       )}
