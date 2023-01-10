@@ -65,6 +65,7 @@ import { CollablandApi } from './apis/collablandApi';
 import { CommentsApi } from './apis/commentsApi';
 import { FileApi } from './apis/fileApi';
 import { ForumApi } from './apis/forumApi';
+import { IframelyApi } from './apis/iframelyApi';
 import { MembersApi } from './apis/membersApi';
 import { ProfileApi } from './apis/profileApi';
 import { ProposalsApi } from './apis/proposalsApi';
@@ -106,6 +107,8 @@ class CharmClient {
   mux = new MuxApi();
 
   file = new FileApi();
+
+  iframely = new IframelyApi();
 
   async socket() {
     return http.GET<SocketAuthReponse>('/api/socket');
