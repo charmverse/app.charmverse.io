@@ -51,6 +51,7 @@ import { getSelectedChanges } from './components/fiduswriter/state_plugins/track
 import fiduswriterStyles from './components/fiduswriter/styles';
 import { rejectAll } from './components/fiduswriter/track/rejectAll';
 import * as floatingMenu from './components/floatingMenu';
+import { floatingMenuPluginKey } from './components/floatingMenu';
 import * as heading from './components/heading';
 import * as horizontalRule from './components/horizontalRule';
 import * as iframe from './components/iframe';
@@ -94,7 +95,6 @@ export interface ICharmEditorOutput {
 const actionsPluginKey = new PluginKey('row-actions');
 const emojiPluginKey = new PluginKey(emoji.pluginKeyName);
 const mentionPluginKey = new PluginKey(mentionPluginKeyName);
-const floatingMenuPluginKey = new PluginKey('floatingMenu');
 const nestedPagePluginKey = new PluginKey(nestedPagePluginKeyName);
 const inlineCommentPluginKey = new PluginKey(inlineComment.pluginKeyName);
 const inlineVotePluginKey = new PluginKey(inlineVote.pluginKeyName);
@@ -184,7 +184,6 @@ export function charmEditorPlugins({
       key: emojiPluginKey
     }),
     floatingMenu.plugins({
-      key: floatingMenuPluginKey,
       readOnly,
       enableComments
     }),

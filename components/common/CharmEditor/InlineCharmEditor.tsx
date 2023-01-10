@@ -15,6 +15,7 @@ import type { PageContent } from 'lib/prosemirror/interfaces';
 import { userDataPlugin } from './components/charm/charm.plugins';
 import EmojiSuggest, * as emoji from './components/emojiSuggest';
 import * as floatingMenu from './components/floatingMenu';
+import { floatingMenuPluginKey } from './components/floatingMenu';
 import Mention, { mentionPlugins, mentionSpecs, MentionSuggest, mentionPluginKeyName } from './components/mention';
 import { placeholderPlugin } from './components/placeholder';
 import * as tabIndent from './components/tabIndent';
@@ -26,7 +27,6 @@ export interface ICharmEditorOutput {
 
 const emojiPluginKey = new PluginKey(emoji.pluginKeyName);
 const mentionPluginKey = new PluginKey(mentionPluginKeyName);
-const floatingMenuPluginKey = new PluginKey('floatingMenu');
 
 export const specRegistry = new SpecRegistry([
   // MAKE SURE THIS IS ALWAYS AT THE TOP! Or deleting all contents will leave the wrong component in the editor
@@ -86,7 +86,6 @@ export function charmEditorPlugins({
       key: mentionPluginKey
     }),
     floatingMenu.plugins({
-      key: floatingMenuPluginKey,
       readOnly,
       enableComments: false
     }),

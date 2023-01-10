@@ -1,27 +1,21 @@
 import { link } from '@bangle.dev/base-components';
-import type { PluginKey } from '@bangle.dev/core';
-import type { Node, Plugin, ResolvedPos } from '@bangle.dev/pm';
+import { PluginKey } from '@bangle.dev/core';
+import type { Node, ResolvedPos } from '@bangle.dev/pm';
 import type { NodeSelection } from 'prosemirror-state';
 
 import { hasComponentInSchema } from 'lib/prosemirror/hasComponentInSchema';
 
 import { floatingMenu } from './floating-menu';
 
+export const floatingMenuPluginKey = new PluginKey('floatingMenu');
+
 // Components that should not trigger floating menu
 const blacklistedComponents =
   'image cryptoPrice iframe page pdf mention tabIndent codeBlock inlineDatabase poll bookmark';
 
-export function plugins({
-  key,
-  readOnly,
-  enableComments = true
-}: {
-  key: PluginKey;
-  readOnly?: boolean;
-  enableComments?: boolean;
-}) {
+export function plugins({ readOnly, enableComments = true }: { readOnly?: boolean; enableComments?: boolean }) {
   const menuPlugins = floatingMenu({
-    key,
+    key: floatingMenuPluginKey,
     calculateType: (state) => {
       const nodeName = (state.selection as NodeSelection)?.node?.type?.name;
       if (blacklistedComponents.includes(nodeName)) {
@@ -67,25 +61,6 @@ export function plugins({
       return 'defaultMenu';
     }
   });
-
-  // We need to override the selection tooltip plugin to not show up when the rowAction plugin is handling drag and drop.
-  // They both work through pm's active selection, but since this plugin responds to mousedown events, we can safely remove the listener to view updates
-  const selectionTooltipPluginFn = menuPlugins[0] as () => Plugin<any>[];
-  menuPlugins[0] = () => {
-    const selectionTooltipPlugins = selectionTooltipPluginFn();
-    const selectionTooltipController = selectionTooltipPlugins[1] as Plugin<any>;
-    if (!selectionTooltipController.spec.view) {
-      throw new Error('View not found for the selection toolip plugin');
-    }
-    // Remove the watcher in `view.update` to avoid triggering the tooltip when a selection changes
-    // @ts-ignore
-    const view = selectionTooltipController.spec.view();
-    selectionTooltipController.spec.view = () => {
-      view.update = () => {};
-      return view;
-    };
-    return selectionTooltipPlugins;
-  };
 
   return menuPlugins;
 }

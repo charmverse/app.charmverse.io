@@ -6,6 +6,8 @@ import { NodeSelection } from 'prosemirror-state';
 // @ts-ignore
 import { __serializeForClipboard as serializeForClipboard } from 'prosemirror-view';
 
+import { floatingMenuPluginKey } from '../floatingMenu';
+
 // inspiration for this plugin: https://discuss.prosemirror.net/t/creating-a-wrapper-for-all-blocks/3310/9
 
 export interface PluginState {
@@ -73,6 +75,7 @@ export function plugins({ key }: { key: PluginKey }) {
       if (!brokenClipboardAPI) e.dataTransfer.setData('text/plain', text);
 
       view.dragging = { slice, move: true };
+      view.dispatch(view.state.tr.setMeta(floatingMenuPluginKey, { type: null }));
     }
   }
 
@@ -110,6 +113,9 @@ export function plugins({ key }: { key: PluginKey }) {
         }
         view.dom.parentNode?.appendChild(tooltipDOM);
         tooltipDOM.addEventListener('dragstart', onDragStart);
+        tooltipDOM.addEventListener('dragend', () => {
+          view.dispatch(view.state.tr.setMeta(floatingMenuPluginKey, { type: null }));
+        });
 
         return {
           destroy() {
