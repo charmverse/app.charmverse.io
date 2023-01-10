@@ -12,7 +12,6 @@ const config = {
     // add background to the default list of pages for eslint
     dirs: ['pages', 'components', 'lib', 'background']
   },
-  reactStrictMode: true,
   experimental: {
     esmExternals: false
   },

@@ -8,37 +8,37 @@ import Document, { Head, Html, Main, NextScript } from 'next/document';
 import { blueColor } from 'theme/colors';
 
 class MyDocument extends Document<{ emotionStyleTags: any }> {
-  static async getInitialProps(ctx: any) {
-    const originalRenderPage = ctx.renderPage;
+  // static async getInitialProps(ctx: any) {
+  //   const originalRenderPage = ctx.renderPage;
 
-    const cache = createCache({ key: 'app', prepend: true });
-    const { extractCriticalToChunks } = createEmotionServer(cache);
+  //   const cache = createCache({ key: 'app', prepend: true });
+  //   const { extractCriticalToChunks } = createEmotionServer(cache);
 
-    ctx.renderPage = () =>
-      originalRenderPage({
-        enhanceApp: (App: any) =>
-          function EnhanceApp(props: any) {
-            return <App emotionCache={cache} {...props} />;
-          }
-      });
+  //   ctx.renderPage = () =>
+  //     originalRenderPage({
+  //       enhanceApp: (App: any) =>
+  //         function EnhanceApp(props: any) {
+  //           return <App emotionCache={cache} {...props} />;
+  //         }
+  //     });
 
-    const initialProps = await Document.getInitialProps(ctx);
-    // This is important. It prevents Emotion to render invalid HTML.
-    // See https://github.com/mui/material-ui/issues/26561#issuecomment-855286153
-    const emotionStyles = extractCriticalToChunks(initialProps.html);
-    const emotionStyleTags = emotionStyles.styles.map((style) => (
-      <style
-        data-emotion={`${style.key} ${style.ids.join(' ')}`}
-        key={style.key}
-        // eslint-disable-next-line react/no-danger
-        dangerouslySetInnerHTML={{ __html: style.css }}
-      />
-    ));
-    return {
-      ...initialProps,
-      emotionStyleTags
-    };
-  }
+  //   const initialProps = await Document.getInitialProps(ctx);
+  //   // This is important. It prevents Emotion to render invalid HTML.
+  //   // See https://github.com/mui/material-ui/issues/26561#issuecomment-855286153
+  //   const emotionStyles = extractCriticalToChunks(initialProps.html);
+  //   const emotionStyleTags = emotionStyles.styles.map((style) => (
+  //     <style
+  //       data-emotion={`${style.key} ${style.ids.join(' ')}`}
+  //       key={style.key}
+  //       // eslint-disable-next-line react/no-danger
+  //       dangerouslySetInnerHTML={{ __html: style.css }}
+  //     />
+  //   ));
+  //   return {
+  //     ...initialProps,
+  //     emotionStyleTags
+  //   };
+  // }
 
   render() {
     return (
@@ -65,7 +65,7 @@ class MyDocument extends Document<{ emotionStyleTags: any }> {
             property='twitter:image'
             content='https://app.charmverse.io/images/logo_black_lightgrey_opengraph.png'
           />
-          {this.props.emotionStyleTags}
+          {/* {this.props.emotionStyleTags} */}
         </Head>
         <body>
           <Main />

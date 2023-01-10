@@ -48,9 +48,11 @@ export default function RouteGuard({ children }: { children: ReactNode }) {
     if (isLoading) {
       return;
     }
+    log.info('RouteGuard: useEffect()');
 
     async function authCheckAndRedirect(path: string) {
       const result = await authCheck(path);
+      log.info('RouteGuard: authCheck()', result);
 
       setAuthorized(result.authorized);
 
@@ -64,20 +66,10 @@ export default function RouteGuard({ children }: { children: ReactNode }) {
     }
 
     authCheckAndRedirect(router.asPath);
-
-    // on route change start - hide page content by setting authorized to false
-    const hideContent = () => {
-      setAuthorized(false);
-    };
-    router.events.on('routeChangeStart', hideContent);
-
     // on route change complete - run auth check
     router.events.on('routeChangeComplete', authCheckAndRedirect);
 
-    // unsubscribe from events in useEffect return function
-    // eslint-disable-next-line consistent-return
     return () => {
-      router.events.off('routeChangeStart', hideContent);
       router.events.off('routeChangeComplete', authCheckAndRedirect);
     };
   }, [isLoading, user, spaces]);
@@ -129,7 +121,9 @@ export default function RouteGuard({ children }: { children: ReactNode }) {
   }
 
   if (!authorized || !router.isReady) {
+    log.info('RouteGuard: unauthorized', router.isReady, authorized);
     return null;
   }
+  log.info('RouteGuard: authorized');
   return <span style={{ display: isLoading ? 'none' : 'inline' }}>{children}</span>;
 }
