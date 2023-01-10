@@ -84,14 +84,15 @@ export async function loginWithUnstoppableDomain({
         identityType: 'UnstoppableDomain'
       });
       updateTrackUserProfile(updatedUser);
-      trackUserAction('sign_up', { userId: updatedUser.id, identityType: 'Wallet', ...signupAnalytics });
+      trackUserAction('sign_up', { userId: updatedUser.id, identityType: 'UnstoppableDomain', ...signupAnalytics });
+      return updatedUser;
+    } else {
+      updateTrackUserProfile(user);
+      trackUserAction('sign_in', { userId: user.id, identityType: 'UnstoppableDomain' });
+      return {
+        ...user,
+        unstoppableDomains: [createdDomain]
+      };
     }
-
-    updateTrackUserProfile(user);
-    trackUserAction('sign_in', { userId: user.id, identityType: 'UnstoppableDomain' });
-    return {
-      ...user,
-      unstoppableDomains: [createdDomain]
-    };
   }
 }

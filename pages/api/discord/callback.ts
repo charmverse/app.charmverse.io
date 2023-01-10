@@ -6,9 +6,10 @@ import { AUTH_CODE_COOKIE, AUTH_ERROR_COOKIE } from 'lib/discord/constants';
 import { loginByDiscord } from 'lib/discord/loginByDiscord';
 import { updateGuildRolesForUser } from 'lib/guild-xyz/server/updateGuildRolesForUser';
 import log from 'lib/log';
+import { extractSignupAnalytics } from 'lib/metrics/mixpanel/utilsSignup';
 import { onError, onNoMatch } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import { DisabledAccountError, SystemError } from 'lib/utilities/errors';
+import { DisabledAccountError } from 'lib/utilities/errors';
 
 const handler = nc({
   onError,
@@ -37,12 +38,15 @@ handler.get(async (req, res) => {
 
   if (type === 'login') {
     try {
+      const signupAnalytics = extractSignupAnalytics(req.cookies as any);
+
       const discordApiUrl = isTestEnv ? (req.query.discordApiUrl as string) : undefined;
       const user = await loginByDiscord({
         code: tempAuthCode,
         hostName: req.headers.host,
         discordApiUrl,
-        userId: req.session.anonymousUserId
+        userId: req.session.anonymousUserId,
+        signupAnalytics
       });
       req.session.anonymousUserId = undefined;
       req.session.user = { id: user.id };

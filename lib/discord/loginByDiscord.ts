@@ -5,23 +5,28 @@ import { prisma } from 'db';
 import { getUserS3FilePath, uploadUrlToS3 } from 'lib/aws/uploadToS3Server';
 import { getDiscordAccount } from 'lib/discord/getDiscordAccount';
 import log from 'lib/log';
+import type { SignupAnalytics } from 'lib/metrics/mixpanel/interfaces/UserEvent';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { updateTrackUserProfile } from 'lib/metrics/mixpanel/updateTrackUserProfile';
 import { logSignupViaDiscord } from 'lib/metrics/postToDiscord';
 import { sessionUserRelations } from 'lib/session/config';
 import { DisabledAccountError } from 'lib/utilities/errors';
 
-export async function loginByDiscord({
-  code,
-  hostName,
-  discordApiUrl,
-  userId = v4()
-}: {
+type LoginWithDiscord = {
   code: string;
   hostName?: string;
   discordApiUrl?: string;
   userId?: string;
-}) {
+  signupAnalytics?: Partial<SignupAnalytics>;
+};
+
+export async function loginByDiscord({
+  code,
+  hostName,
+  discordApiUrl,
+  userId = v4(),
+  signupAnalytics = {}
+}: LoginWithDiscord) {
   const domain = isProdEnv || isStagingEnv ? `https://${hostName}` : `http://${hostName}`;
   const discordAccount = await getDiscordAccount({
     code,
@@ -87,7 +92,7 @@ export async function loginByDiscord({
     });
 
     updateTrackUserProfile(newUser);
-    trackUserAction('sign_up', { userId: newUser.id, identityType: 'Discord' });
+    trackUserAction('sign_up', { userId: newUser.id, identityType: 'Discord', ...signupAnalytics });
     logSignupViaDiscord();
 
     return newUser;
