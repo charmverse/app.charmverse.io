@@ -5,6 +5,7 @@
 import { GetFederationTokenCommand, STSClient } from '@aws-sdk/client-sts';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
+import { v4 as uuid } from 'uuid';
 
 import { getS3ClientConfig } from 'lib/aws/getS3ClientConfig';
 import { getUserS3FilePath } from 'lib/aws/uploadToS3Server';
@@ -31,7 +32,14 @@ const makeRouteHandler = (options: Options = {}): Handler => {
     } else {
       const bucket = process.env.S3_UPLOAD_BUCKET;
 
-      const filename = decodeURIComponent(req.query.filename as string);
+      let filename = decodeURIComponent(req.query.filename as string);
+      const validCharacters = /^[\000-\177]*$/;
+
+      if (!validCharacters.test(filename)) {
+        const extension = filename.split('.').at(-1);
+        const randomName = uuid();
+        filename = `${randomName}.${extension}`;
+      }
 
       const key = options.key
         ? await Promise.resolve(options.key(req, filename))
