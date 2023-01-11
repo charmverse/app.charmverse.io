@@ -28,6 +28,7 @@ export const jestConfig = {
 
   // The glob patterns Jest uses to detect test files
   testMatch: ['**/lib/**/*.spec.ts', '**/testing/**/*.spec.ts', '**/background/**/*.spec.ts'],
+  modulePathIgnorePatterns: ['focalboard'],
 
   testTimeout: 30000,
   transform: {
