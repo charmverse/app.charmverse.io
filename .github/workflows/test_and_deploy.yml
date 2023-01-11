@@ -40,7 +40,7 @@ jobs:
           NEXT_PUBLIC_APP_ENV: "test"
 
       - name: Setup test database
-        run: bash ./scripts/configure-db.sh
+        run: cp .env.example .env.test.local && bash ./scripts/configure-db.sh
 
       - name: Typecheck tests
         run: npm run test:typecheck
