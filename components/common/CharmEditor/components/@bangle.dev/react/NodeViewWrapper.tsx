@@ -30,10 +30,10 @@ export class NodeViewWrapper extends React.Component<PropsType, StateType> {
       if (!reactElement) {
         return;
       }
-      const contentDOM = this.props.nodeView.contentDOM!;
+      const contentDOM = this.props.nodeView.contentDOM;
       // Since we do not control how many times this callback is called
       // make sure it is not already mounted.
-      if (!reactElement.contains(contentDOM)) {
+      if (contentDOM && !reactElement.contains(contentDOM)) {
         // If contentDOM happens to be mounted to someone else
         // remove it from there.
         if (contentDOM.parentNode) {

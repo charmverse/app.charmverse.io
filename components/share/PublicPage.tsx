@@ -46,8 +46,6 @@ export default function PublicPage() {
   const theme = useTheme();
   const colorMode = useColorMode();
   const router = useRouter();
-  const pageIdOrPath =
-    router.query.pageId instanceof Array ? router.query.pageId.join('/') : (router.query.pageId as string);
   const dispatch = useAppDispatch();
   const { pages, setCurrentPageId, getPagePermissions } = usePages();
   const [loadingSpace, setLoadingSpace] = useState(true);
@@ -63,8 +61,8 @@ export default function PublicPage() {
   const userCanEdit = pagePermissions.edit_content;
   const hasShareInPath = router.asPath.split('/')[1] === 'share';
   const editString = router.asPath.replace('/share', '');
-
-  async function onLoad() {
+  async function onLoad(pageId: string | string[]) {
+    const pageIdOrPath = pageId instanceof Array ? pageId.join('/') : (pageId as string);
     const spaceDomain = (router.query.pageId as string[])[0];
 
     let foundSpace: Space | null = null;
@@ -124,12 +122,14 @@ export default function PublicPage() {
   }
 
   useEffect(() => {
-    onLoad();
+    if (router.query.pageId) {
+      onLoad(router.query.pageId);
+    }
 
     return () => {
       setCurrentPageId('');
     };
-  }, []);
+  }, [router.query.pageId]);
 
   if (!router.query || loadingSpace) {
     return <LoadingComponent height='200px' isLoading={true} />;

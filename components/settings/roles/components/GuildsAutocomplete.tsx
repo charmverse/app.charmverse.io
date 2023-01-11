@@ -41,8 +41,11 @@ function renderRow(props: { data: ItemData[]; index: number; style: React.CSSPro
           <Box display='flex' flexGrow={1} gap={1} alignItems='center'>
             <ListItemIcon>
               <Avatar
+                alt={guild.name}
                 sx={{ width: 32, height: 32 }}
-                src={guild.imageUrl?.startsWith('/') ? `https://guild.xyz${guild.imageUrl}` : guild.imageUrl}
+                src={
+                  guild.imageUrl?.startsWith('/') ? `https://guild.xyz${guild.imageUrl}` : guild.imageUrl ?? undefined
+                }
               />
             </ListItemIcon>
             <ListItemText
@@ -173,6 +176,7 @@ export default function GuildsAutocomplete({
           placeholder='Type Guild name...'
         />
       )}
+      // @ts-ignore follows the example on MUI's site for virtualized autocomplete
       renderOption={(props, guildName) => [props, guildRecord[guildName]]}
     />
   );

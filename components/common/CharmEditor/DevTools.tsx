@@ -8,7 +8,7 @@ export default function RegisterDevTools() {
   const view = useEditorViewContext();
   useEffect(() => {
     if (view && process.env.NODE_ENV === 'development') {
-      applyDevTools(view);
+      // applyDevTools(view);
     }
   }, [view]);
   return null;

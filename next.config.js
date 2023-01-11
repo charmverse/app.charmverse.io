@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 
 const BundleAnalyzer = require('@next/bundle-analyzer');
-const transpileModules = require('next-transpile-modules');
 const next = require('next/dist/lib/is-serializable-props');
 const webpack = require('webpack');
 
@@ -13,18 +12,22 @@ const config = {
     // add background to the default list of pages for eslint
     dirs: ['pages', 'components', 'lib', 'background']
   },
+  compiler: {
+    styledComponents: true
+  },
   experimental: {
-    esmExternals: false,
-    modularizeImports: {
-      '@mui/material': {
-        transform: '@mui/material/{{member}}'
-      },
-      '@mui/icons-material': {
-        transform: '@mui/icons-material/{{member}}'
-      },
-      lodash: {
-        transform: 'lodash/{{member}}'
-      }
+    esmExternals: false
+  },
+  transpilePackages: esmModules,
+  modularizeImports: {
+    '@mui/material': {
+      transform: '@mui/material/{{member}}'
+    },
+    '@mui/icons-material': {
+      transform: '@mui/icons-material/{{member}}'
+    },
+    lodash: {
+      transform: 'lodash/{{member}}'
     }
   },
   async redirects() {
@@ -108,8 +111,4 @@ next.isSerializableProps = function _isSerializableProps(page, method, input) {
 const withBundleAnalyzer = BundleAnalyzer({
   enabled: process.env.ANALYZE === 'true'
 });
-
-// fix for esm modules
-const withTM = transpileModules(esmModules);
-
-module.exports = withBundleAnalyzer(withTM(config));
+module.exports = withBundleAnalyzer(config);
