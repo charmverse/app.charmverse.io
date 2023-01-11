@@ -1,5 +1,6 @@
 import { ethers } from 'ethers';
 
+import { isTestEnv } from 'config/constants';
 import log from 'lib/log';
 
 const providerKey = process.env.ALCHEMY_API_KEY;
@@ -8,7 +9,9 @@ const provider = providerKey ? new ethers.providers.JsonRpcProvider(providerUrl)
 
 export function getENSName(address: string) {
   if (!provider) {
-    log.debug('No api key provided for Alchemy');
+    if (!isTestEnv) {
+      log.warn('No api key provided for Alchemy');
+    }
     return null;
   }
   return provider.lookupAddress(address).catch((error) => {
