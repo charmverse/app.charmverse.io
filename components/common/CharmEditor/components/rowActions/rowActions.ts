@@ -10,6 +10,7 @@ import { __serializeForClipboard as serializeForClipboard } from 'prosemirror-vi
 
 export interface PluginState {
   tooltipDOM: HTMLElement;
+  isDragging: boolean;
   open: boolean;
   rowDOM?: HTMLElement;
   rowPos?: number;
@@ -83,6 +84,7 @@ export function plugins({ key }: { key: PluginKey }) {
         init: (): PluginState => {
           return {
             tooltipDOM,
+            isDragging: false,
             // For tooltipPlacement plugin
             open: false
           };
@@ -92,12 +94,15 @@ export function plugins({ key }: { key: PluginKey }) {
           if (newPluginState) {
             return { ...pluginState, ...newPluginState };
           }
-
           return pluginState;
         }
       },
       props: {
         handleDOMEvents: {
+          // set meta on drop so that floating menu (selection-tooltip) can ignore the event
+          drop: (view) => {
+            view.dispatch(view.state.tr.setMeta('row-handle-drag', true));
+          },
           mousemove: (view: EditorView, event: MouseEvent) => {
             throttledMouseOver(view, event);
             return false;
