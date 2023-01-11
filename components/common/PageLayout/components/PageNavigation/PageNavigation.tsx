@@ -260,7 +260,7 @@ function PageNavigation({ deletePage, isFavorites, rootPageIds, onClick }: PageN
         return addPageAndRedirect(newPage, router);
       }
     },
-    [space, user]
+    [space?.id, user?.id]
   );
 
   return (

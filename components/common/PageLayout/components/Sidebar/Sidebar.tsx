@@ -227,7 +227,7 @@ export default function Sidebar({ closeSidebar, favorites }: SidebarProps) {
         addPageAndRedirect(newPage, router).then();
       }
     },
-    [user, space]
+    [user?.id, space?.id]
   );
 
   function closeSidebarIfIsMobile() {
