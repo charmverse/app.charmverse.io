@@ -1,13 +1,13 @@
 import type { IntlShape } from 'react-intl';
 import { v4 as uuid } from 'uuid';
 
+import { prismaToBlock } from 'lib/focalboard/block';
+import { createBoard } from 'lib/focalboard/board';
+import type { BoardView } from 'lib/focalboard/boardView';
+import { createBoardView } from 'lib/focalboard/boardView';
+import { createCard } from 'lib/focalboard/card';
 import { createBlock, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
-import { prismaToBlock } from '../block';
-import { createBoard } from '../board';
-import type { BoardView } from '../boardView';
-import { createBoardView } from '../boardView';
-import { createCard } from '../card';
 import { CsvExporter } from '../csvExporter';
 
 import { generateFields, mockIntl } from './mocks';

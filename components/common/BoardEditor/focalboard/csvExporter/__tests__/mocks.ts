@@ -1,4 +1,4 @@
-import type { BoardViewFields } from '../boardView';
+import type { BoardViewFields } from 'lib/focalboard/boardView';
 
 export const generateFields = (
   visiblePropertyIds: string[] = [],
