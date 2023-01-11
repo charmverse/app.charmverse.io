@@ -1,3 +1,4 @@
+import SpeakerNotesOffOutlinedIcon from '@mui/icons-material/SpeakerNotesOffOutlined';
 import { Card, CardContent, Divider, MenuItem, Stack, Typography } from '@mui/material';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
@@ -42,7 +43,7 @@ export function CategoryPosts({ categoryId, postId }: { postId: string; category
     );
   }
 
-  const totalPosts = postsData.data.filter((post) => post.id !== postId).length;
+  const totalPosts = 0 && postsData.data.filter((post) => post.id !== postId).length;
 
   return (
     <Card variant='outlined'>
@@ -71,7 +72,10 @@ export function CategoryPosts({ categoryId, postId }: { postId: string; category
         <Divider />
         <Stack gap={1} my={1}>
           {totalPosts === 0 ? (
-            <Typography textAlign='center'>No posts</Typography>
+            <Stack justifyContent='center' alignItems='center' gap={1} my={2}>
+              <SpeakerNotesOffOutlinedIcon color='secondary' fontSize='large' />
+              <Typography color='secondary'>No related posts</Typography>
+            </Stack>
           ) : (
             postsData.data.map((post) =>
               post.id === postId ? null : (
