@@ -1,4 +1,5 @@
-import type { IViewType } from '../blocks/boardView';
+import type { IViewType } from 'lib/focalboard/boardView';
+
 import BoardIcon from '../widgets/icons/board';
 import CalendarIcon from '../widgets/icons/calendar';
 import GalleryIcon from '../widgets/icons/gallery';

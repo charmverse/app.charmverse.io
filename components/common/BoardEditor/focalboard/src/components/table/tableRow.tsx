@@ -2,12 +2,12 @@ import React, { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 
 import { filterPropertyTemplates } from 'components/common/BoardEditor/utils/updateVisibilePropertyIds';
-import PageIcon from 'components/common/PageLayout/components/PageIcon';
+import { PageIcon } from 'components/common/PageLayout/components/PageIcon';
+import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
+import type { BoardView } from 'lib/focalboard/boardView';
+import type { Card } from 'lib/focalboard/card';
 import { isTouchScreen } from 'lib/utilities/browser';
 
-import type { Board } from '../../blocks/board';
-import type { BoardView } from '../../blocks/boardView';
-import type { Card } from '../../blocks/card';
 import { Constants } from '../../constants';
 import { useSortable } from '../../hooks/sortable';
 import Button from '../../widgets/buttons/button';

@@ -1,6 +1,5 @@
 import { prisma } from 'db';
 import type { LoginWithGoogleRequest } from 'lib/google/loginWithGoogle';
-import { sessionUserRelations } from 'lib/session/config';
 import { getUserProfile } from 'lib/users/getUser';
 import { softDeleteUserWithoutConnectableIdentities } from 'lib/users/softDeleteUserWithoutConnectableIdentities';
 import { InvalidInputError, MissingDataError } from 'lib/utilities/errors';

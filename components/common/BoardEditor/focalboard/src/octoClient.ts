@@ -1,4 +1,5 @@
-import type { Block } from './blocks/block';
+import type { Block } from 'lib/focalboard/block';
+
 import type { ISharing } from './blocks/sharing';
 import type { ClientConfig } from './config/clientConfig';
 import { OctoUtils } from './octoUtils';

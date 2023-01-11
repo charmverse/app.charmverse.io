@@ -1,9 +1,10 @@
 import { Delete } from '@mui/icons-material';
 import CheckOutlinedIcon from '@mui/icons-material/CheckOutlined';
-import { Box, Divider, ListItemIcon, ListItemText, MenuItem } from '@mui/material';
+import { Box, Divider, ListItem, ListItemIcon, ListItemText, MenuItem, Typography } from '@mui/material';
 
-import type { IPropertyTemplate } from '../../blocks/board';
-import type { BoardView } from '../../blocks/boardView';
+import type { IPropertyTemplate } from 'lib/focalboard/board';
+import type { BoardView } from 'lib/focalboard/boardView';
+
 import mutator from '../../mutator';
 import { iconForPropertyType } from '../viewHeader/viewHeaderPropertiesMenu';
 
@@ -15,7 +16,6 @@ interface LayoutOptionsProps {
 
 function GroupByOptions(props: LayoutOptionsProps) {
   const { groupByProperty, properties, view } = props;
-
   const showTableUngroup = view.fields.viewType === 'table' && view.fields.groupById;
   const hasPropertiesToGroupBy =
     showTableUngroup || (properties || []).filter((o: IPropertyTemplate) => o.type === 'select').length > 0;
@@ -23,7 +23,7 @@ function GroupByOptions(props: LayoutOptionsProps) {
   return (
     <Box onClick={(e) => e.stopPropagation()}>
       {properties
-        ?.filter((o: IPropertyTemplate) => o.type === 'select')
+        .filter((o: IPropertyTemplate) => o.type === 'select')
         .map((property: IPropertyTemplate) => (
           <MenuItem
             dense
@@ -44,9 +44,11 @@ function GroupByOptions(props: LayoutOptionsProps) {
           </MenuItem>
         ))}
       {!hasPropertiesToGroupBy && (
-        <div className='MenuOption TextOption menu-option disabled-option'>
-          <div className='menu-name'>Add a Select type property to group cards</div>
-        </div>
+        <ListItem>
+          <Typography variant='body2'>
+            Add a <em>Select type</em> property to group cards
+          </Typography>
+        </ListItem>
       )}
       {showTableUngroup && (
         <>

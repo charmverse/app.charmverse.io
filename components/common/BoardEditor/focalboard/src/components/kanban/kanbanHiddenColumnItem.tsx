@@ -3,9 +3,10 @@ import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import { useDrop } from 'react-dnd';
 import type { IntlShape } from 'react-intl';
 
-import type { BoardGroup } from '../../blocks/board';
-import type { BoardView } from '../../blocks/boardView';
-import type { Card } from '../../blocks/card';
+import type { BoardGroup } from 'lib/focalboard/board';
+import type { BoardView } from 'lib/focalboard/boardView';
+import type { Card } from 'lib/focalboard/card';
+
 import mutator from '../../mutator';
 import Button from '../../widgets/buttons/button';
 import Label from '../../widgets/label';

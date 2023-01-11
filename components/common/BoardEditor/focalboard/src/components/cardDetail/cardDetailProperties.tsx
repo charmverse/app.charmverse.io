@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import type { Board, IPropertyTemplate, PropertyType } from '../../blocks/board';
-import type { BoardView } from '../../blocks/boardView';
-import type { Card } from '../../blocks/card';
+import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
+import type { BoardView } from 'lib/focalboard/boardView';
+import type { Card } from 'lib/focalboard/card';
+
 import mutator from '../../mutator';
 import { IDType, Utils } from '../../utils';
 import Button from '../../widgets/buttons/button';
@@ -214,7 +215,7 @@ const CardDetailProperties = React.memo((props: Props) => {
 
       {showConfirmationDialog && <ConfirmationDialogBox dialogBox={confirmationDialogBox} />}
 
-      {!props.readOnly && props.activeView && (
+      {!props.readOnly && activeView && (
         <div className='octo-propertyname add-property'>
           <MenuWrapper>
             <Button>
@@ -230,7 +231,7 @@ const CardDetailProperties = React.memo((props: Props) => {
                     type,
                     options: []
                   };
-                  const templateId = await mutator.insertPropertyTemplate(board, activeView!, -1, template);
+                  const templateId = await mutator.insertPropertyTemplate(board, activeView, -1, template);
                   setNewTemplateId(templateId);
                 }}
               />

@@ -10,7 +10,7 @@ import { usePages } from 'hooks/usePages';
 import { usePageTitle } from 'hooks/usePageTitle';
 import { usePrimaryCharmEditor } from 'hooks/usePrimaryCharmEditor';
 
-import { StyledPageIcon } from '../../PageIcon';
+import { PageIcon } from '../../PageIcon';
 
 const NEXUS_ROUTES = ['/nexus', '/profile', '/integrations'];
 
@@ -32,7 +32,7 @@ const BreadCrumb = styled.span`
   }
 `;
 
-const PageIcon = styled(StyledPageIcon)`
+const StyledPageIcon = styled(PageIcon)`
   cursor: inherit;
   display: inline;
   // this is to vertically center images
@@ -95,7 +95,7 @@ function DocumentPageTitle({ basePath, pageId }: { basePath: string; pageId?: st
           {crumb.path ? (
             <Link href={`${basePath}/${crumb.path}`}>
               <PageTitle sx={{ maxWidth: 160 }}>
-                {crumb.icon && <PageIcon icon={crumb.icon} />}
+                {crumb.icon && <StyledPageIcon icon={crumb.icon} />}
                 {crumb.title || 'Untitled'}
               </PageTitle>
             </Link>
@@ -106,7 +106,7 @@ function DocumentPageTitle({ basePath, pageId }: { basePath: string; pageId?: st
       ))}
       {currentPage && (
         <PageTitle sx={{ maxWidth: 240 }}>
-          {currentPage.icon && <PageIcon icon={currentPage.icon} />}
+          {currentPage.icon && <StyledPageIcon icon={currentPage.icon} />}
           {currentPage.title || 'Untitled'}
         </PageTitle>
       )}
