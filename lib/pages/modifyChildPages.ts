@@ -2,24 +2,17 @@ import type { Prisma } from '@prisma/client';
 
 import { prisma } from 'db';
 
-import type { TargetPageTreeWithFlatChildren } from './server';
 import { resolvePageTree } from './server';
 
 export type ChildModificationAction = 'delete' | 'restore' | 'archive';
 
-export async function modifyChildPages(
-  parentId: string,
-  userId: string,
-  action: ChildModificationAction,
-  resolvedPageTree?: TargetPageTreeWithFlatChildren
-) {
-  const { flatChildren } =
-    resolvedPageTree ??
-    (await resolvePageTree({
-      pageId: parentId,
-      flattenChildren: true,
-      includeDeletedPages: true
-    }));
+export async function modifyChildPages(parentId: string, userId: string, action: ChildModificationAction) {
+  const { flatChildren } = await resolvePageTree({
+    pageId: parentId,
+    flattenChildren: true,
+    includeDeletedPages: true,
+    includeAllPageTypes: true
+  });
 
   const modifiedChildPageIds: string[] = [parentId, ...flatChildren.map((p) => p.id)];
 

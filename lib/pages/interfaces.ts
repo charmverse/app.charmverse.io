@@ -68,6 +68,7 @@ export interface PageTreeMappingInput<T extends PageNode> {
   includeCards?: boolean;
   includeDeletedPages?: boolean;
   includeProposals?: boolean;
+  includeAllPageTypes?: boolean;
 }
 
 /**
@@ -77,6 +78,7 @@ export interface PageTreeResolveInput {
   pageId: string;
   flattenChildren?: boolean;
   includeDeletedPages?: boolean;
+  includeAllPageTypes?: boolean;
   fullPage?: boolean;
   pageNodes?: PageNodeWithPermissions[];
 }

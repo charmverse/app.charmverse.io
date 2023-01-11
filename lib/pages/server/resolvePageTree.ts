@@ -1,6 +1,6 @@
 import type { Prisma } from '@prisma/client';
 
-import type { OptionalTransaction, TransactionClient } from 'db';
+import type { OptionalTransaction } from 'db';
 import { prisma } from 'db';
 import { InvalidInputError } from 'lib/utilities/errors';
 
@@ -109,6 +109,7 @@ export async function resolvePageTree({
   pageId,
   flattenChildren = false,
   includeDeletedPages = false,
+  includeAllPageTypes = false,
   fullPage,
   pageNodes,
   tx = prisma
@@ -139,10 +140,11 @@ export async function resolvePageTree({
       })
     ))) as PageNodeWithPermissions[] | IPageWithPermissions[];
 
-  const { parents, targetPage } = mapTargetPageTree<PageNodeWithPermissions>({
+  const { parents, targetPage } = mapTargetPageTree({
     items: pagesInSpace,
     targetPageId: pageId,
     includeDeletedPages,
+    includeAllPageTypes,
     includeProposals: true
   });
 
