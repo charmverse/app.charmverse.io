@@ -86,7 +86,7 @@ export function plugins({
           return false;
         },
         apply(tr: Transaction) {
-          return tr.getMeta('row-handle-drag');
+          return tr.getMeta('row-handle-is-dragging');
         }
       },
       view: (_view: EditorView) => {
