@@ -4,6 +4,7 @@ import type { HTMLAttributes } from 'react';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 
 type PostCategoryOptionProps = {
   category: PostCategory;
@@ -35,7 +36,18 @@ export function PostCategoryInput({
     charmClient.forum.listPostCategories(spaceId!)
   );
 
-  const postCategory = categories?.find((category) => category.id === categoryId);
+  const space = useCurrentSpace();
+
+  const postCategory = categories?.find((category) => {
+    if (!categoryId && space?.defaultPostCategoryId && category.id === space.defaultPostCategoryId) {
+      updateForumPost(category);
+      return true;
+    } else if (categoryId) {
+      return category.id === categoryId;
+    } else {
+      return false;
+    }
+  });
 
   async function updateForumPost(_postCategory: PostCategory | null) {
     if (_postCategory) {

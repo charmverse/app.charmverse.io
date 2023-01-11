@@ -1,12 +1,12 @@
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { createSelector, createSlice } from '@reduxjs/toolkit';
 
+import type { Board } from 'lib/focalboard/board';
+import type { BoardView } from 'lib/focalboard/boardView';
+import type { Card } from 'lib/focalboard/card';
 import type { Member } from 'lib/members/interfaces';
 import type { PageMeta } from 'lib/pages';
 
-import type { Board } from '../blocks/board';
-import type { BoardView } from '../blocks/boardView';
-import type { Card } from '../blocks/card';
 import { CardFilter } from '../cardFilter';
 import { Constants } from '../constants';
 import type { IUser } from '../user';

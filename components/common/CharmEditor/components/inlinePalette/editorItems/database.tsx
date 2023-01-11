@@ -99,8 +99,7 @@ export function items({
               type: 'inline_linked_board',
               parentId: currentPageId,
               spaceId: space.id,
-              createdBy: userId,
-              shouldCreateDefaultBoardData: false
+              createdBy: userId
             }).then(({ page }) => {
               const node = _state.schema.nodes.inlineDatabase.create({
                 pageId: page.id

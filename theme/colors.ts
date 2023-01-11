@@ -14,6 +14,7 @@ export const greyColor = '#525252';
 
 // light mode
 export const primaryTextColor = '#37352f';
+export const secondaryTextColor = '#888';
 export const backgroundColor = '#fff';
 export const backgroundLightColor = lightGreyColor;
 export const backgroundDarkColor = darken(backgroundColor, 0.1);
@@ -25,6 +26,7 @@ export const inputBorder = 'rgba(15, 15, 15, 0.1)';
 
 // dark mode
 export const primaryTextColorDarkMode = '#ededed';
+export const secondaryTextColorDarkMode = '#999';
 export const backgroundColorDarkMode = '#191919';
 export const backgroundLightColorDarkMode = '#202020';
 export const backgroundDarkColorDarkMode = darken(backgroundColorDarkMode, 0.3);
@@ -90,3 +92,5 @@ export const focalboardColorsMap: { [key: string]: SupportedColor } = {
   propColorRed: 'red',
   propColorPink: 'pink'
 };
+
+export const dangerColor = '#d32f2f'; // taken from MUI

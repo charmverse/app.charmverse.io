@@ -1,6 +1,6 @@
+import type { IPropertyTemplate } from 'lib/focalboard/board';
 import { isTruthy } from 'lib/utilities/types';
 
-import type { IPropertyTemplate } from '../focalboard/src/blocks/board';
 import { Constants } from '../focalboard/src/constants';
 
 export function filterPropertyTemplates(visiblePropertyIds: string[], cardProperties: IPropertyTemplate[]) {

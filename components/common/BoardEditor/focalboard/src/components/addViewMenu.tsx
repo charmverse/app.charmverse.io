@@ -1,6 +1,5 @@
 /* eslint-disable no-unused-expressions */
-/* eslint-disable @typescript-eslint/no-shadow */
-import styled from '@emotion/styled';
+
 import { Add } from '@mui/icons-material';
 import { IconButton } from '@mui/material';
 import ListItemIcon from '@mui/material/ListItemIcon';
@@ -12,13 +11,14 @@ import { usePopupState, bindMenu, bindTrigger } from 'material-ui-popup-state/ho
 import { useCallback } from 'react';
 import { injectIntl } from 'react-intl';
 import type { IntlShape } from 'react-intl';
+import { v4 as uuid } from 'uuid';
 
 import Button from 'components/common/Button';
+import type { Block } from 'lib/focalboard/block';
+import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
+import type { BoardView } from 'lib/focalboard/boardView';
+import { createBoardView } from 'lib/focalboard/boardView';
 
-import type { Block } from '../blocks/block';
-import type { Board, IPropertyTemplate } from '../blocks/board';
-import type { BoardView } from '../blocks/boardView';
-import { createBoardView } from '../blocks/boardView';
 import { Constants } from '../constants';
 import mutator from '../mutator';
 import { Utils } from '../utils';
@@ -58,7 +58,7 @@ function AddViewMenu(props: AddViewProps) {
   });
 
   const handleAddViewBoard = useCallback(() => {
-    const { board, activeView, intl } = props;
+    const { board, activeView } = props;
     Utils.log('addview-board');
     // TelemetryClient.trackEvent(TelemetryCategory, TelemetryActions.CreateBoardView, {board: board.id, view: activeView.id})
     const view = createBoardView();
@@ -89,10 +89,11 @@ function AddViewMenu(props: AddViewProps) {
   }, [props.activeView, props.board, props.intl, showView]);
 
   const handleAddViewTable = useCallback(() => {
-    const { board, activeView, intl } = props;
+    const { board, activeView } = props;
 
     Utils.log('addview-table');
     const view = createTableView(board, activeView, intl);
+    view.id = uuid();
 
     const oldViewId = activeView?.id;
 
@@ -115,7 +116,7 @@ function AddViewMenu(props: AddViewProps) {
   }, [props.activeView, props.board, props.intl, showView]);
 
   const handleAddViewGallery = useCallback(() => {
-    const { board, activeView, intl } = props;
+    const { board, activeView } = props;
 
     Utils.log('addview-gallery');
     const view = createBoardView();
@@ -146,7 +147,7 @@ function AddViewMenu(props: AddViewProps) {
   }, [props.board, props.activeView, props.intl, showView]);
 
   const handleAddViewCalendar = useCallback(() => {
-    const { board, activeView, intl } = props;
+    const { board, activeView } = props;
 
     Utils.log('addview-calendar');
     const view = createBoardView();
@@ -225,7 +226,7 @@ function AddViewMenu(props: AddViewProps) {
 }
 
 export function createTableView(board: Board, activeView?: BoardView, intl?: IntlShape) {
-  const view = createBoardView();
+  const view = createBoardView(activeView);
   view.title = '';
   view.fields.viewType = 'table';
   view.parentId = board.id;
@@ -236,4 +237,5 @@ export function createTableView(board: Board, activeView?: BoardView, intl?: Int
   view.fields.cardOrder = activeView?.fields.cardOrder ?? [];
   return view;
 }
+
 export default injectIntl(AddViewMenu);
