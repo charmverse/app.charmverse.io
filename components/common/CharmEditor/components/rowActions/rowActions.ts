@@ -10,7 +10,6 @@ import { __serializeForClipboard as serializeForClipboard } from 'prosemirror-vi
 
 export interface PluginState {
   tooltipDOM: HTMLElement;
-  isDragging: boolean;
   open: boolean;
   rowDOM?: HTMLElement;
   rowPos?: number;
@@ -84,7 +83,6 @@ export function plugins({ key }: { key: PluginKey }) {
         init: (): PluginState => {
           return {
             tooltipDOM,
-            isDragging: false,
             // For tooltipPlacement plugin
             open: false
           };

@@ -1,15 +1,6 @@
 import { link } from '@bangle.dev/base-components';
 import type { PluginKey } from '@bangle.dev/core';
-import type {
-  EditorState,
-  EditorView,
-  Transaction,
-  Node,
-  ResolvedPos,
-  DirectEditorProps,
-  Plugin
-} from '@bangle.dev/pm';
-import { selectionTooltip } from '@bangle.dev/tooltip';
+import type { EditorState, EditorView, Transaction, Node, ResolvedPos, Plugin } from '@bangle.dev/pm';
 import type { NodeSelection } from 'prosemirror-state';
 
 import { hasComponentInSchema } from 'lib/prosemirror/hasComponentInSchema';
