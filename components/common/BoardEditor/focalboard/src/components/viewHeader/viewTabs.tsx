@@ -169,7 +169,6 @@ function ViewTabs(props: ViewTabsProps) {
       const { boardId, ...sourceDataWithoutBoard } = newView.fields.sourceData!;
       newView.fields.sourceData = sourceDataWithoutBoard;
       mutator.updateBlock(newView, dropdownView, 'reset Google view source');
-      // charmClient.google.forms.syncFormResponses({ reset: true, viewId: dropdownView.id });
       setAnchorEl(null);
     }
   }

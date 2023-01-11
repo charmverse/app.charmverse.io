@@ -7,6 +7,7 @@ import { getClient } from '../authorization/authClient';
 import { getCredentialToken } from '../authorization/credentials';
 
 type GoogleFormResponse = googlForms.forms_v1.Schema$FormResponse;
+type PageToken = googlForms.forms_v1.Schema$ListFormResponsesResponse['nextPageToken'];
 
 export async function getFormAndResponses(sourceData: GoogleFormSourceData, lastUpdated: Date | null = new Date(1970)) {
   const { formId } = sourceData;
@@ -17,19 +18,19 @@ export async function getFormAndResponses(sourceData: GoogleFormSourceData, last
     formId
   });
 
-  // retrieve only the latest responses since we last updated
-  let pageToken: string | null | undefined = 'default';
+  const reqBody: googlForms.forms_v1.Params$Resource$Forms$Responses$List = {
+    formId,
+    filter: lastUpdated ? `timestamp >= ${lastUpdated.toISOString()}` : undefined
+  };
   const responses: GoogleFormResponse[] = [];
+
   let maxCalls = 20; // avoid endless loop
-  while (pageToken && maxCalls > 0) {
-    const res = await forms.forms.responses.list({
-      filter: lastUpdated ? `timestamp >= ${lastUpdated.toISOString()}` : undefined,
-      formId
-    });
+  while ((!reqBody.hasOwnProperty('pageToken') || reqBody.pageToken) && maxCalls > 0) {
+    const res = await forms.forms.responses.list(reqBody);
     if (res.data.responses) {
       responses.push(...res.data.responses);
     }
-    pageToken = res.data.nextPageToken;
+    reqBody.pageToken = res.data.nextPageToken ?? undefined;
     maxCalls -= 1;
   }
 
