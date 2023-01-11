@@ -25,7 +25,7 @@ function Resizable(props: ResizableProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const maxWidth = containerRef.current?.clientWidth;
 
-  const onResizeStopCallback = useCallback((_, data) => {
+  const onResizeStopCallback = useCallback((_: any, data: any) => {
     updateAttrs({
       size: data.size.width
     });
@@ -34,7 +34,7 @@ function Resizable(props: ResizableProps) {
     }
   }, []);
 
-  const onResizeCallback = useCallback((_, data) => {
+  const onResizeCallback = useCallback((_: any, data: any) => {
     if (typeof data.size.width === 'number') {
       setSize(data.size.width);
     }

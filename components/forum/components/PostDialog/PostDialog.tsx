@@ -6,7 +6,6 @@ import { useRouter } from 'next/router';
 import { useEffect, useRef } from 'react';
 
 import Dialog from 'components/common/BoardEditor/focalboard/src/components/dialog';
-import RootPortal from 'components/common/BoardEditor/focalboard/src/components/rootPortal';
 import Button from 'components/common/Button';
 import type { PostWithVotes } from 'lib/forums/posts/interfaces';
 
@@ -51,31 +50,31 @@ export default function PostDialog({ post, spaceId, onClose, open }: Props) {
     onClose();
   }
 
+  if (!popupState.isOpen) {
+    return null;
+  }
+
   return (
-    <RootPortal>
-      {popupState.isOpen && (
-        <Dialog
-          fullWidth
-          toolbar={
-            post && (
-              <Box display='flex' justifyContent='space-between'>
-                <Button
-                  size='small'
-                  color='secondary'
-                  href={`/${router.query.domain}/forum/post/${post.path}`}
-                  variant='text'
-                  startIcon={<OpenInFullIcon fontSize='small' />}
-                >
-                  Open as Page
-                </Button>
-              </Box>
-            )
-          }
-          onClose={close}
-        >
-          <PostPage post={post ?? null} spaceId={spaceId} onSave={close} />
-        </Dialog>
-      )}
-    </RootPortal>
+    <Dialog
+      fullWidth
+      toolbar={
+        post && (
+          <Box display='flex' justifyContent='space-between'>
+            <Button
+              size='small'
+              color='secondary'
+              href={`/${router.query.domain}/forum/post/${post.path}`}
+              variant='text'
+              startIcon={<OpenInFullIcon fontSize='small' />}
+            >
+              Open as Page
+            </Button>
+          </Box>
+        )
+      }
+      onClose={close}
+    >
+      <PostPage post={post ?? null} spaceId={spaceId} onSave={close} />
+    </Dialog>
   );
 }

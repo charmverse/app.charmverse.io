@@ -10,7 +10,6 @@ import { useCallback, useEffect, useMemo, useRef } from 'react';
 import charmClient from 'charmClient';
 import DocumentPage from 'components/[pageId]/DocumentPage';
 import Dialog from 'components/common/BoardEditor/focalboard/src/components/dialog';
-import RootPortal from 'components/common/BoardEditor/focalboard/src/components/rootPortal';
 import Button from 'components/common/Button';
 import { useBounties } from 'hooks/useBounties';
 import { usePages } from 'hooks/usePages';
@@ -119,74 +118,71 @@ export default function PageDialog(props: Props) {
       refreshBounty(bountyId);
     }
   }
+  if (!popupState.isOpen) {
+    return null;
+  }
 
   return (
-    <RootPortal>
-      {popupState.isOpen && (
-        <Dialog
-          hideCloseButton
-          toolsMenu={
-            !hideToolsMenu &&
-            !readOnly &&
-            page && (
-              <PageActions
-                page={page}
-                onClickDelete={
-                  pagePermission?.delete
-                    ? () => {
-                        onClickDelete();
-                        onClose();
-                      }
-                    : undefined
-                }
+    <Dialog
+      hideCloseButton
+      toolsMenu={
+        !hideToolsMenu &&
+        !readOnly &&
+        page && (
+          <PageActions
+            page={page}
+            onClickDelete={
+              pagePermission?.delete
+                ? () => {
+                    onClickDelete();
+                    onClose();
+                  }
+                : undefined
+            }
+          >
+            {bounty && (
+              <MenuItem
+                dense
+                onClick={() => closeBounty(bounty.id)}
+                disabled={bounty.status === 'complete' || (bounty.status !== 'inProgress' && bounty.status !== 'open')}
               >
-                {bounty && (
-                  <MenuItem
-                    dense
-                    onClick={() => closeBounty(bounty.id)}
-                    disabled={
-                      bounty.status === 'complete' || (bounty.status !== 'inProgress' && bounty.status !== 'open')
-                    }
-                  >
-                    <CheckCircleOutlinedIcon
-                      sx={{
-                        mr: 1
-                      }}
-                      fontSize='small'
-                    />
-                    <ListItemText primary='Mark complete' />
-                  </MenuItem>
-                )}
-              </PageActions>
-            )
-          }
-          toolbar={
-            <Box display='flex' justifyContent='space-between'>
-              <Button
-                size='small'
-                color='secondary'
-                href={fullPageUrl}
-                variant='text'
-                startIcon={<OpenInFullIcon fontSize='small' />}
-              >
-                Open as Page
-              </Button>
-              {toolbar}
-            </Box>
-          }
-          onClose={onClose}
-        >
-          {page && (
-            <DocumentPage
-              insideModal
-              page={page}
-              setPage={setPage}
-              readOnly={readOnlyPage}
-              parentProposalId={parentProposalId}
-            />
-          )}
-        </Dialog>
+                <CheckCircleOutlinedIcon
+                  sx={{
+                    mr: 1
+                  }}
+                  fontSize='small'
+                />
+                <ListItemText primary='Mark complete' />
+              </MenuItem>
+            )}
+          </PageActions>
+        )
+      }
+      toolbar={
+        <Box display='flex' justifyContent='space-between'>
+          <Button
+            size='small'
+            color='secondary'
+            href={fullPageUrl}
+            variant='text'
+            startIcon={<OpenInFullIcon fontSize='small' />}
+          >
+            Open as Page
+          </Button>
+          {toolbar}
+        </Box>
+      }
+      onClose={onClose}
+    >
+      {page && (
+        <DocumentPage
+          insideModal
+          page={page}
+          setPage={setPage}
+          readOnly={readOnlyPage}
+          parentProposalId={parentProposalId}
+        />
       )}
-    </RootPortal>
+    </Dialog>
   );
 }

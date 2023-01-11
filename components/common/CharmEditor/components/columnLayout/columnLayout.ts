@@ -93,12 +93,12 @@ export function plugins(): RawPlugins {
       ),
       NodeView.createPlugin({
         name: 'columnLayout',
-        containerDOM: ['div', { class: 'charm-column' }],
+        containerDOM: ['div', { class: 'charm-column-row' }],
         contentDOM: ['div']
       }),
       NodeView.createPlugin({
         name: 'columnBlock',
-        containerDOM: ['div', { class: 'charm-column-row' }],
+        containerDOM: ['div', { class: 'charm-column' }],
         contentDOM: ['div']
       })
     ];

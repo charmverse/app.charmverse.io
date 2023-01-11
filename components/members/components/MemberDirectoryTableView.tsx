@@ -181,7 +181,7 @@ function MemberDirectoryTableRow({ member }: { member: Member }) {
                     color='inherit'
                     href={`/u/${member.path || member.id}${currentSpace ? `?workspace=${currentSpace.id}` : ''}`}
                   >
-                    <Typography fontWeight='bold'>{memberProperty.value ?? member.username}</Typography>
+                    <Typography fontWeight='bold'>{(memberProperty.value as string) ?? member.username}</Typography>
                   </Link>
                 </TableCell>
               );
@@ -207,7 +207,7 @@ function MemberDirectoryTableRow({ member }: { member: Member }) {
             case 'number': {
               return (
                 <TableCell key={property.id}>
-                  <Typography variant='body2'>{memberProperty.value ?? '-'}</Typography>
+                  <Typography variant='body2'>{(memberProperty.value as string) ?? '-'}</Typography>
                 </TableCell>
               );
             }
@@ -236,7 +236,7 @@ function MemberDirectoryTableRow({ member }: { member: Member }) {
             default: {
               return (
                 <TableCell key={property.id}>
-                  <Typography variant='body2'>{memberProperty.value ?? '-'}</Typography>
+                  <Typography variant='body2'>{(memberProperty.value as string) ?? '-'}</Typography>
                 </TableCell>
               );
             }

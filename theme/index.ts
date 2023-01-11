@@ -247,7 +247,7 @@ export const createThemeLightSensitive = (mode: PaletteMode) => {
       MuiAvatar: {
         styleOverrides: {
           root: ({ ownerState }) => ({
-            ...(ownerState.variant === 'rounded' && {
+            ...(ownerState?.variant === 'rounded' && {
               borderRadius: 10
             })
           })
