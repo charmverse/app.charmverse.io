@@ -1,8 +1,9 @@
-import type { IPropertyTemplate } from './blocks/board';
-import type { Card } from './blocks/card';
-import type { FilterClause } from './blocks/filterClause';
-import type { FilterGroup } from './blocks/filterGroup';
-import { isAFilterGroupInstance } from './blocks/filterGroup';
+import type { IPropertyTemplate } from 'lib/focalboard/board';
+import type { Card } from 'lib/focalboard/card';
+import type { FilterClause } from 'lib/focalboard/filterClause';
+import type { FilterGroup } from 'lib/focalboard/filterGroup';
+import { isAFilterGroupInstance } from 'lib/focalboard/filterGroup';
+
 import { Utils } from './utils';
 
 class CardFilter {

@@ -1,7 +1,6 @@
+import type { Block } from 'lib/focalboard/block';
+import { createBlock } from 'lib/focalboard/block';
 import type { PageContent } from 'lib/prosemirror/interfaces';
-
-import type { Block } from './block';
-import { createBlock } from './block';
 
 type CommentBlock = Block & {
   type: 'comment';

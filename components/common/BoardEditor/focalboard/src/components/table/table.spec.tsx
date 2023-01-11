@@ -6,7 +6,8 @@ import configureStore from 'redux-mock-store';
 
 import 'isomorphic-fetch';
 
-import type { BoardView } from '../../blocks/boardView';
+import type { BoardView } from 'lib/focalboard/boardView';
+
 import { FetchMock } from '../../test/fetchMock';
 import { TestBlockFactory } from '../../test/testBlockFactory';
 import { wrapDNDIntl } from '../../testUtils';

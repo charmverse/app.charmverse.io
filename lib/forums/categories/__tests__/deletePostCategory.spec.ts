@@ -1,0 +1,60 @@
+import type { Space, User } from '@prisma/client';
+
+import { prisma } from 'db';
+import { createForumPost } from 'lib/forums/posts/createForumPost';
+import { InvalidInputError } from 'lib/utilities/errors';
+import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+
+import { createPostCategory } from '../createPostCategory';
+import { deletePostCategory } from '../deletePostCategory';
+import { PostCategoryNotDeleteableError } from '../errors';
+
+let space: Space;
+let user: User;
+
+beforeAll(async () => {
+  const generated = await generateUserAndSpaceWithApiToken();
+  space = generated.space;
+  user = generated.user;
+});
+
+describe('deletePostCategory', () => {
+  it('should delete a post category', async () => {
+    const category = await createPostCategory({
+      spaceId: space.id,
+      name: 'Test Category'
+    });
+
+    await deletePostCategory(category.id);
+
+    const categoryAfterDelete = await prisma.postCategory.findUnique({
+      where: {
+        id: category.id
+      }
+    });
+
+    expect(categoryAfterDelete).toBeNull();
+  });
+
+  it('should fail to delete a category if category id is undefined', async () => {
+    await expect(deletePostCategory(undefined as any)).rejects.toBeInstanceOf(InvalidInputError);
+  });
+
+  it('should fail to delete a category if it has a post', async () => {
+    const category = await createPostCategory({
+      spaceId: space.id,
+      name: 'Test Category 2'
+    });
+
+    await createForumPost({
+      content: {},
+      spaceId: space.id,
+      categoryId: category.id,
+      title: 'Test Post',
+      contentText: '',
+      createdBy: user.id
+    });
+
+    await expect(deletePostCategory(category.id)).rejects.toBeInstanceOf(PostCategoryNotDeleteableError);
+  });
+});

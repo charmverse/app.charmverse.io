@@ -4,7 +4,7 @@ import { prisma } from 'db';
 import { sessionUserRelations } from 'lib/session/config';
 import { InsecureOperationError, InvalidInputError, MissingDataError } from 'lib/utilities/errors';
 import { shortWalletAddress } from 'lib/utilities/strings';
-import { randomETHWalletAddress } from 'testing/generate-stubs';
+import { randomETHWalletAddress } from 'testing/generateStubs';
 
 import { updateUsedIdentity } from '../updateUsedIdentity';
 

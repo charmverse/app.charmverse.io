@@ -1,5 +1,5 @@
-import type { Block } from './block';
-import { createBlock } from './block';
+import type { Block } from 'lib/focalboard/block';
+import { createBlock } from 'lib/focalboard/block';
 
 type CardFields = {
   icon?: string;
@@ -8,11 +8,11 @@ type CardFields = {
   contentOrder: (string | string[])[];
 };
 
-type Card = Block & {
+export type Card = Block & {
   fields: CardFields;
 };
 
-function createCard(block?: Partial<Block>): Card {
+export function createCard(block?: Partial<Block>): Card {
   const contentOrder: (string | string[])[] = [];
   const contentIds = block?.fields?.contentOrder?.filter((id: any) => id !== null);
 
@@ -37,6 +37,3 @@ function createCard(block?: Partial<Block>): Card {
     }
   };
 }
-
-export { createCard };
-export type { Card };

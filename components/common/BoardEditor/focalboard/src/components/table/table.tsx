@@ -3,11 +3,11 @@ import { useDragLayer, useDrop } from 'react-dnd';
 import { FormattedMessage } from 'react-intl';
 
 import useEfficientDragLayer from 'hooks/useEffecientDragLayer';
+import type { IPropertyOption, IPropertyTemplate, Board, BoardGroup } from 'lib/focalboard/board';
+import type { BoardView } from 'lib/focalboard/boardView';
+import { createBoardView } from 'lib/focalboard/boardView';
+import type { Card } from 'lib/focalboard/card';
 
-import type { IPropertyOption, IPropertyTemplate, Board, BoardGroup } from '../../blocks/board';
-import type { BoardView } from '../../blocks/boardView';
-import { createBoardView } from '../../blocks/boardView';
-import type { Card } from '../../blocks/card';
 import { Constants } from '../../constants';
 import mutator from '../../mutator';
 import { useAppDispatch } from '../../store/hooks';
@@ -28,6 +28,7 @@ type Props = {
   visibleGroups: BoardGroup[];
   groupByProperty?: IPropertyTemplate;
   readOnly: boolean;
+  readOnlySourceData: boolean;
   cardIdToFocusOnRender: string;
   showCard: (cardId: string | null) => void;
   addCard: (groupByOptionId?: string) => Promise<void>;
@@ -224,6 +225,7 @@ function Table(props: Props): JSX.Element {
           resizingColumn={resizingColumn}
           columnRefs={columnRefs}
           readOnly={props.readOnly}
+          readOnlySourceData={props.readOnlySourceData}
         />
 
         {/* Table rows */}
@@ -237,7 +239,7 @@ function Table(props: Props): JSX.Element {
                   activeView={activeView}
                   groupByProperty={groupByProperty}
                   group={group}
-                  readOnly={props.readOnly}
+                  readOnly={props.readOnly || props.readOnlySourceData}
                   columnRefs={columnRefs}
                   selectedCardIds={props.selectedCardIds}
                   cardIdToFocusOnRender={props.cardIdToFocusOnRender}
@@ -261,7 +263,7 @@ function Table(props: Props): JSX.Element {
               columnRefs={columnRefs}
               cards={cards}
               selectedCardIds={props.selectedCardIds}
-              readOnly={props.readOnly}
+              readOnly={props.readOnly || props.readOnlySourceData}
               cardIdToFocusOnRender={props.cardIdToFocusOnRender}
               offset={offset}
               resizingColumn={resizingColumn}
@@ -275,7 +277,7 @@ function Table(props: Props): JSX.Element {
 
         {/* Add New row */}
         <div className='octo-table-footer'>
-          {!props.readOnly && !activeView.fields.groupById && (
+          {!props.readOnly && !props.readOnlySourceData && !activeView.fields.groupById && (
             <div
               className='octo-table-cell'
               onClick={() => {
@@ -293,7 +295,7 @@ function Table(props: Props): JSX.Element {
           activeView={activeView}
           resizingColumn={resizingColumn}
           offset={offset}
-          readOnly={props.readOnly}
+          readOnly={props.readOnly || props.readOnlySourceData}
         />
       </div>
     </div>

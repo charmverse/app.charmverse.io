@@ -6,7 +6,7 @@ import type { Middleware } from 'redux';
 import type { MockStoreEnhanced } from 'redux-mock-store';
 import configureStore from 'redux-mock-store';
 
-import type { Block } from './blocks/block';
+import type { Block } from 'lib/focalboard/block';
 
 export const wrapIntl = (children?: React.ReactNode): JSX.Element => (
   <IntlProvider locale='en'>{children}</IntlProvider>
