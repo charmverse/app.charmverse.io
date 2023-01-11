@@ -7,7 +7,6 @@ import { getClient } from '../authorization/authClient';
 import { getCredentialToken } from '../authorization/credentials';
 
 type GoogleFormResponse = googlForms.forms_v1.Schema$FormResponse;
-type PageToken = googlForms.forms_v1.Schema$ListFormResponsesResponse['nextPageToken'];
 
 export async function getFormAndResponses(sourceData: GoogleFormSourceData, lastUpdated: Date | null = new Date(1970)) {
   const { formId } = sourceData;
