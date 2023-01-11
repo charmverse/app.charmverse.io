@@ -5,7 +5,9 @@
       "module": "commonjs",
       "jsxImportSource": ""
     },
-    "require": ["tsconfig-paths/register"]
+    "require": [
+      "tsconfig-paths/register"
+    ]
   },
   "compilerOptions": {
     "importHelpers": true,
