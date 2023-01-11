@@ -106,7 +106,8 @@ export async function syncFormResponses({
   log.debug('Synced Google form responses', {
     boardId: board.id,
     formId: form.formId,
-    responseCount: responses.length
+    responseCount: responses.length,
+    lastUpdated
   });
 
   await notifyUsers({
@@ -131,6 +132,7 @@ async function getHiddenDatabaseBlock({ boardId }: { boardId?: string } = {}) {
   const board = createBoard({
     block: {
       createdAt: boardBlock?.createdAt.getTime() ?? now.getTime(),
+      updatedAt: boardBlock?.updatedAt.getTime() ?? now.getTime(),
       fields: boardBlock?.fields as any,
       id: boardId,
       spaceId: boardBlock?.spaceId

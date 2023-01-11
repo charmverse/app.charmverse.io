@@ -8,7 +8,7 @@ import { getCredentialToken } from '../authorization/credentials';
 
 type GoogleFormResponse = googlForms.forms_v1.Schema$FormResponse;
 
-export async function getFormAndResponses(sourceData: GoogleFormSourceData, lastUpdated: Date | null = new Date(1970)) {
+export async function getFormAndResponses(sourceData: GoogleFormSourceData, lastUpdated: Date | null) {
   const { formId } = sourceData;
   const refreshToken = await getCredentialToken(sourceData);
   const forms = _getFormsClient(refreshToken);
