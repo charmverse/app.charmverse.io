@@ -102,8 +102,8 @@ function createBoard({
       isTemplate: block?.fields?.isTemplate ?? false,
       columnCalculations: block?.fields?.columnCalculations ?? [],
       headerImage: block?.fields?.headerImage ?? null,
-      cardProperties,
-      ...block?.fields
+      ...block?.fields,
+      cardProperties
     }
   };
 }
