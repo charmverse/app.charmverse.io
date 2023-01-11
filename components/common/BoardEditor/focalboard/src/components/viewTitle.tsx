@@ -12,10 +12,10 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import { randomBannerImage } from 'components/[pageId]/DocumentPage/components/PageBanner';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEditor';
+import type { Board } from 'lib/focalboard/board';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import { BlockIcons } from '../blockIcons';
-import type { Board } from '../blocks/board';
 import mutator from '../mutator';
 import Button from '../widgets/buttons/button';
 import Editable from '../widgets/editable';
@@ -30,14 +30,18 @@ const StyledEditable = styled(Editable)`
   font-size: 22px !important;
 `;
 
-type Props = {
+type ViewTitleInlineProps = {
   board: Board;
   readOnly: boolean;
   setPage: (page: Partial<Page>) => void;
 };
 
-function ViewTitle(props: Props) {
-  const { board } = props;
+type ViewTitleProps = ViewTitleInlineProps & {
+  pageIcon?: string | null;
+};
+
+function ViewTitle(props: ViewTitleProps) {
+  const { board, pageIcon } = props;
 
   const [title, setTitle] = useState(board.title);
   const onEditTitleSave = useCallback(() => {
@@ -54,9 +58,8 @@ function ViewTitle(props: Props) {
   );
   const onAddRandomIcon = useCallback(() => {
     const newIcon = BlockIcons.shared.randomIcon();
-    mutator.changeIcon(board.id, board.fields.icon, newIcon);
-    return newIcon;
-  }, [board.id, board.fields.icon]);
+    props.setPage({ icon: newIcon });
+  }, [board.id]);
   const setRandomHeaderImage = useCallback(
     (headerImage?: string | null) => {
       const newHeaderImage = headerImage ?? randomBannerImage();
@@ -89,11 +92,9 @@ function ViewTitle(props: Props) {
             </Button>
           </div>
         )}
-        {!props.readOnly && !board.fields.icon && (
+        {!props.readOnly && !pageIcon && (
           <Button
-            onClick={() => {
-              props.setPage({ icon: onAddRandomIcon() });
-            }}
+            onClick={onAddRandomIcon}
             icon={
               <EmojiEmotionsOutlinedIcon
                 fontSize='small'
@@ -137,7 +138,7 @@ function ViewTitle(props: Props) {
       </div>
 
       <div className='title' data-test='board-title'>
-        <BlockIconSelector readOnly={props.readOnly} block={board} setPage={props.setPage} />
+        <BlockIconSelector readOnly={props.readOnly} pageIcon={pageIcon} setPage={props.setPage} />
         <Editable
           className='title'
           value={title}
@@ -168,7 +169,7 @@ function ViewTitle(props: Props) {
   );
 }
 
-export function InlineViewTitle(props: Props) {
+export function InlineViewTitle(props: ViewTitleInlineProps) {
   const { board } = props;
 
   const [title, setTitle] = useState(board.title);

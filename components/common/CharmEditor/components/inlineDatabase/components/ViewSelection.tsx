@@ -2,8 +2,8 @@ import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import { Box, Card, Divider, MenuItem, Typography } from '@mui/material';
 import { upperFirst } from 'lodash';
 
-import type { BoardView } from 'components/common/BoardEditor/focalboard/src/blocks/boardView';
 import Button from 'components/common/Button';
+import type { BoardView } from 'lib/focalboard/boardView';
 import { formatViewTitle } from 'lib/focalboard/boardView';
 
 interface Props {

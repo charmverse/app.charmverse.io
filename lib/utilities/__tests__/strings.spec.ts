@@ -1,7 +1,7 @@
 import type { UserWallet } from '@prisma/client';
 import { utils, Wallet } from 'ethers';
 
-import { randomETHWalletAddress } from 'testing/generate-stubs';
+import { randomETHWalletAddress } from 'testing/generateStubs';
 
 import { conditionalPlural, matchWalletAddress, sanitizeForRegex, shortenHex, shortWalletAddress } from '../strings';
 
@@ -47,6 +47,11 @@ describe('shortWalletAddress', () => {
 
     expect(shortWalletAddress(ignoredString)).toBe(ignoredString);
     expect(shortWalletAddress(invalidWallet)).toBe(invalidWallet);
+  });
+
+  it('should return an empty string if value is null or undefined', () => {
+    expect(shortWalletAddress(undefined as any)).toBe('');
+    expect(shortWalletAddress(null as any)).toBe('');
   });
 });
 describe('matchShortAddress', () => {

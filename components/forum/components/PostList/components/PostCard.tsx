@@ -19,7 +19,7 @@ import { setUrlWithoutRerender } from 'lib/utilities/browser';
 import { getRelativeTimeInThePast } from 'lib/utilities/dates';
 import { fancyTrim } from 'lib/utilities/strings';
 
-import { ForumContentUpDownVotes } from '../../ForumVote';
+import { ForumVote } from '../../ForumVote';
 
 import { PostSummary } from './PostSummary';
 
@@ -119,7 +119,7 @@ export function PostCard({ post, user }: ForumPostProps) {
                 <Typography variant='body2'>{totalComments}</Typography>
               </Stack>
             </Stack>
-            <ForumContentUpDownVotes onVote={voteOnPost} votes={pagePost.votes} />
+            <ForumVote onVote={voteOnPost} votes={pagePost.votes} />
           </Box>
         </CardContent>
       </CardActionArea>

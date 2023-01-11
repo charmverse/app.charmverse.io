@@ -9,9 +9,9 @@ import { useUser } from 'hooks/useUser';
 import type { LoginWithGoogleRequest } from 'lib/google/loginWithGoogle';
 import { ExternalServiceError, InvalidInputError, SystemError } from 'lib/utilities/errors';
 
-import type { AnyIdLogin } from '../Login';
+import type { AnyIdLogin } from '../components/login/Login';
 
-export function useGoogleAuth() {
+export function useFirebaseAuth() {
   const [firebaseApp] = useState<FirebaseApp>(initializeApp(googleWebClientConfig));
   // Google client setup start
   const [provider] = useState(new GoogleAuthProvider());
@@ -74,7 +74,7 @@ export function useGoogleAuth() {
     setIsConnectingGoogle(true);
     try {
       const googleToken = await getGoogleToken();
-      const loggedInUser = await charmClient.profile.loginWithGoogle(googleToken);
+      const loggedInUser = await charmClient.google.login(googleToken);
       return { user: loggedInUser, identityType: 'Google', displayName: googleToken.displayName };
     } finally {
       setIsConnectingGoogle(false);
@@ -85,7 +85,7 @@ export function useGoogleAuth() {
     setIsConnectingGoogle(true);
     try {
       const googleToken = await getGoogleToken();
-      const loggedInUser = await charmClient.profile.connectGoogleAccount(googleToken);
+      const loggedInUser = await charmClient.google.connectAccount(googleToken);
       setUser(loggedInUser);
     } finally {
       setIsConnectingGoogle(false);
@@ -97,7 +97,7 @@ export function useGoogleAuth() {
       throw new InvalidInputError('No Google account connected to user');
     }
 
-    const loggedInUser = await charmClient.profile.disconnectGoogleAccount({
+    const loggedInUser = await charmClient.google.disconnectAccount({
       googleAccountEmail: user?.googleAccounts[0].email as string
     });
     setUser(loggedInUser);

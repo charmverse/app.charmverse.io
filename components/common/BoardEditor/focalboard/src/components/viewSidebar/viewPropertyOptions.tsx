@@ -2,8 +2,9 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import { Box, IconButton, ListItemIcon, ListItemText, MenuItem } from '@mui/material';
 
-import type { IPropertyTemplate } from '../../blocks/board';
-import type { BoardView } from '../../blocks/boardView';
+import type { IPropertyTemplate } from 'lib/focalboard/board';
+import type { BoardView } from 'lib/focalboard/boardView';
+
 import mutator from '../../mutator';
 import { iconForPropertyType } from '../viewHeader/viewHeaderPropertiesMenu';
 

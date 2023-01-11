@@ -1,10 +1,9 @@
 import React from 'react';
 
 import { usePages } from 'hooks/usePages';
-
-import type { Board } from '../../blocks/board';
-import type { BoardView } from '../../blocks/boardView';
-import type { Card } from '../../blocks/card';
+import type { Board } from 'lib/focalboard/board';
+import type { BoardView } from 'lib/focalboard/boardView';
+import type { Card } from 'lib/focalboard/card';
 
 import TableRow from './tableRow';
 
