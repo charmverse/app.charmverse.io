@@ -242,7 +242,7 @@ function ViewTabs(props: ViewTabsProps) {
           />
         )}
       </Tabs>
-      <Menu anchorEl={anchorEl} disablePortal open={Boolean(anchorEl)} onClose={handleClose}>
+      <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleClose}>
         <MenuItem dense onClick={handleRenameView}>
           <ListItemIcon>
             <EditIcon fontSize='small' />
