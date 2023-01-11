@@ -12,7 +12,11 @@
     "baseUrl": ".",
     "strict": true,
     "target": "es2019",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "noEmit": true,
@@ -26,6 +30,13 @@
     "incremental": true,
     "isolatedModules": true
   },
-  "exclude": ["node_modules", "**/focalboard/src/**/*.spec.ts", "**/focalboard/src/**/*.spec.tsx"],
-  "include": ["**/*.ts", "**/*.tsx"]
+  "exclude": [
+    "node_modules",
+    "**/focalboard/src/**/*.spec.ts",
+    "**/focalboard/src/**/*.spec.tsx"
+  ],
+  "include": [
+    "**/*.ts",
+    "**/*.tsx"
+  ]
 }
