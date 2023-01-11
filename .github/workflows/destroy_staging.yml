@@ -19,7 +19,7 @@ jobs:
           aws-region: us-east-1
 
       - name: inject slug/short variables
-        uses: rlespinasse/github-slug-action@v3.x
+        uses: rlespinasse/github-slug-action@v4.x
 
       - name: set STAGE variable in environment for next steps
         run: echo "STAGE=pr-${{ github.event.number }}-${{ env.GITHUB_HEAD_REF_SLUG }}" >> $GITHUB_ENV

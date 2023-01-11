@@ -65,7 +65,7 @@ jobs:
     if: github.ref == 'refs/heads/main'
     needs: test
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v3.x
 
@@ -134,7 +134,7 @@ jobs:
           cat files_to_zip.txt | zip --symlinks -r@ deploy_websockets.zip
 
       - name: Deploy to Beanstalk
-        uses: einaregilsson/beanstalk-deploy@v18
+        uses: einaregilsson/beanstalk-deploy@v21
         with:
           aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -147,7 +147,7 @@ jobs:
           wait_for_deployment: false # set to false to save sweet Github minutes
 
       - name: Deploy Background to Beanstalk
-        uses: einaregilsson/beanstalk-deploy@v18
+        uses: einaregilsson/beanstalk-deploy@v21
         with:
           aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -160,7 +160,7 @@ jobs:
           wait_for_deployment: false # set to false to save sweet Github minutes
 
       - name: Deploy Websockets to Beanstalk
-        uses: einaregilsson/beanstalk-deploy@v18
+        uses: einaregilsson/beanstalk-deploy@v21
         with:
           aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
