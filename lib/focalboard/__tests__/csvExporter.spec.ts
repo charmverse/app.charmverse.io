@@ -15,13 +15,6 @@ import { CsvExporter } from '../csvExporter';
 import { generateFields, mockIntl } from './mocks';
 
 describe('CsvExporter', () => {
-  // @TODO -> Remove this after upgrading jest >29 and jest-environment-jsdom >29
-  // jest-environment-jsdom does not support crypto.getRandomValues() used in uuid lib
-  Object.defineProperty(global.self, 'crypto', {
-    value: {
-      getRandomValues: (arr: any[]) => crypto.randomBytes(arr.length)
-    }
-  });
   test('should generate rows to help export easyar the csv', async () => {
     const { user, space } = await generateUserAndSpaceWithApiToken();
 
