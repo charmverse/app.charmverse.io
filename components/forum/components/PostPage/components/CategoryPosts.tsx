@@ -5,6 +5,7 @@ import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 import Link from 'components/common/Link';
+import LoadingComponent from 'components/common/LoadingComponent';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useForumCategories } from 'hooks/useForumCategories';
 import type { ListForumPostsRequest } from 'lib/forums/posts/listForumPosts';
@@ -27,8 +28,18 @@ export function CategoryPosts({ categoryId, postId }: { postId: string; category
       })
   );
 
-  if (!postsData || isLoadingPosts || !category) {
+  if (!postsData || !category) {
     return null;
+  }
+
+  if (isLoadingPosts) {
+    return (
+      <Card variant='outlined'>
+        <CardContent>
+          <LoadingComponent size={20} label='Fetching related posts' />
+        </CardContent>
+      </Card>
+    );
   }
 
   const totalPosts = postsData.data.filter((post) => post.id !== postId).length;
@@ -39,26 +50,28 @@ export function CategoryPosts({ categoryId, postId }: { postId: string; category
         <Typography variant='h6' mb={2} textAlign='center'>
           {category.name}
         </Typography>
-        <Stack mb={1}>
-          <MenuItem
-            onClick={() => {
-              setSort('newest');
-            }}
-          >
-            <Typography
-              sx={{
-                color: 'text.primary',
-                fontWeight: sort === 'newest' ? 'bold' : 'initial'
+        {totalPosts !== 0 && (
+          <Stack mb={1}>
+            <MenuItem
+              onClick={() => {
+                setSort('newest');
               }}
             >
-              Newest Posts
-            </Typography>
-          </MenuItem>
-        </Stack>
+              <Typography
+                sx={{
+                  color: 'text.primary',
+                  fontWeight: sort === 'newest' ? 'bold' : 'initial'
+                }}
+              >
+                Newest Posts
+              </Typography>
+            </MenuItem>
+          </Stack>
+        )}
         <Divider />
         <Stack gap={1} my={1}>
           {totalPosts === 0 ? (
-            <Typography>No posts</Typography>
+            <Typography textAlign='center'>No posts</Typography>
           ) : (
             postsData.data.map((post) =>
               post.id === postId ? null : (
