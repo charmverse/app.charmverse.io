@@ -43,11 +43,15 @@ export function CategoryPosts({ categoryId, postId }: { postId: string; category
     );
   }
 
-  const totalPosts = 0 && postsData.data.filter((post) => post.id !== postId).length;
+  const totalPosts = postsData.data.filter((post) => post.id !== postId).length;
 
   return (
     <Card variant='outlined'>
-      <CardContent>
+      <CardContent
+        sx={{
+          px: 0
+        }}
+      >
         <Typography variant='h6' mb={2} textAlign='center'>
           {category.name}
         </Typography>
@@ -70,7 +74,7 @@ export function CategoryPosts({ categoryId, postId }: { postId: string; category
           </Stack>
         )}
         <Divider />
-        <Stack gap={1} my={1}>
+        <Stack my={1}>
           {totalPosts === 0 ? (
             <Stack justifyContent='center' alignItems='center' gap={1} my={2}>
               <SpeakerNotesOffOutlinedIcon color='secondary' fontSize='large' />
@@ -81,7 +85,6 @@ export function CategoryPosts({ categoryId, postId }: { postId: string; category
               post.id === postId ? null : (
                 <MenuItem
                   key={post.id}
-                  dense
                   sx={{
                     display: 'flex',
                     flexDirection: 'row',
