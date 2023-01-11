@@ -1,6 +1,6 @@
 import { link } from '@bangle.dev/base-components';
 import type { PluginKey } from '@bangle.dev/core';
-import type { Node, Plugin, ResolvedPos } from '@bangle.dev/pm';
+import type { EditorState, EditorView, Transaction, Node, ResolvedPos, Plugin } from '@bangle.dev/pm';
 import type { NodeSelection } from 'prosemirror-state';
 
 import { hasComponentInSchema } from 'lib/prosemirror/hasComponentInSchema';
@@ -73,17 +73,33 @@ export function plugins({
   const selectionTooltipPluginFn = menuPlugins[0] as () => Plugin<any>[];
   menuPlugins[0] = () => {
     const selectionTooltipPlugins = selectionTooltipPluginFn();
-    const selectionTooltipController = selectionTooltipPlugins[1] as Plugin<any>;
-    if (!selectionTooltipController.spec.view) {
+    const controller = selectionTooltipPlugins[1] as Plugin<any>;
+    if (!controller.spec.view) {
       throw new Error('View not found for the selection toolip plugin');
     }
-    // Remove the watcher in `view.update` to avoid triggering the tooltip when a selection changes
     // @ts-ignore
-    const view = selectionTooltipController.spec.view();
-    selectionTooltipController.spec.view = () => {
-      view.update = () => {};
-      return view;
-    };
+    const viewUpdate = controller.spec.view().update;
+
+    Object.assign(controller.spec, {
+      state: {
+        init() {
+          return false;
+        },
+        apply(tr: Transaction) {
+          return tr.getMeta('row-handle-is-dragging');
+        }
+      },
+      view: (_view: EditorView) => {
+        return {
+          update: (view: EditorView, lastState: EditorState) => {
+            const isDragging = controller.getState(view.state) || controller.getState(lastState);
+            if (viewUpdate && !isDragging) {
+              return viewUpdate(view, lastState);
+            }
+          }
+        };
+      }
+    });
     return selectionTooltipPlugins;
   };
 
