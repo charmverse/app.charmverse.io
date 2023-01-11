@@ -9,6 +9,7 @@ import { extractAttrsFromUrl as extractNFTAttrs } from 'components/common/CharmE
 import { extractTweetAttrs } from 'components/common/CharmEditor/components/tweet/tweetSpec';
 import { extractYoutubeLinkType } from 'components/common/CharmEditor/components/video/utils';
 import { VIDEO_ASPECT_RATIO } from 'components/common/CharmEditor/components/video/videoSpec';
+import log from 'lib/log';
 import type {
   TextContent,
   MentionNode,
@@ -165,6 +166,7 @@ export class NotionBlock {
         }
       } catch (err) {
         if (block) {
+          log.error(`[notion] Failed to convert notion ${block.type}:${block.id} block to charmverse block`);
           const notionPage = this.notionPage.cache.notionPagesRecord[
             this.charmversePage.notionPageId
           ] as PageObjectResponse;
