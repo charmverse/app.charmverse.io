@@ -215,17 +215,15 @@ export function PageLink({
 
   return (
     <PageAnchor href={href} onClick={stopPropagation}>
-      {labelIcon && (
-        <span onClick={preventDefault}>
-          <PageIcon
-            pageType={pageType}
-            isEditorEmpty={isEmptyContent}
-            icon={labelIcon}
-            {...triggerState}
-            onClick={showPicker ? triggerState.onClick : undefined}
-          />
-        </span>
-      )}
+      <span onClick={preventDefault}>
+        <PageIcon
+          pageType={pageType}
+          isEditorEmpty={isEmptyContent}
+          icon={labelIcon}
+          {...triggerState}
+          onClick={showPicker ? triggerState.onClick : undefined}
+        />
+      </span>
       <PageTitle hasContent={isempty} onClick={onClick}>
         {isempty ? 'Untitled' : label}
       </PageTitle>
