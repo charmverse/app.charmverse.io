@@ -17,14 +17,9 @@ export function sortNodes<T>(nodes: PageNode<T>[]) {
   ];
 }
 
-/**
- * @targetPageId If provided, the only root node returned will be the one whose child tree contains the target page ID
- * @includeCards - Defaults to false
- */
 export function reducePagesToPageTree<T extends PageNode = PageNode>({
   items,
   rootPageIds,
-  includeCards = false,
   includeDeletedPages,
   includeProposals,
   includeAllPageTypes
@@ -38,7 +33,7 @@ export function reducePagesToPageTree<T extends PageNode = PageNode>({
       return false;
     } else if (!includeProposals && !includeAllPageTypes && node.type === 'proposal') {
       return false;
-    } else if (!includeCards && !includeAllPageTypes && node.type === 'card') {
+    } else if (!includeAllPageTypes && node.type === 'card') {
       return false;
     } else {
       return true;
@@ -104,7 +99,6 @@ export function mapPageTree<T extends PageNode = PageNode>({
   const { rootNodes } = reducePagesToPageTree({
     items,
     rootPageIds,
-    includeCards: false,
     includeDeletedPages,
     includeProposals
   });
@@ -124,7 +118,6 @@ export function mapTargetPageTree<T extends PageNode = PageNode>({
 }: Omit<PageTreeMappingInput<T>, 'rootPageIds'> & { targetPageId: string }): TargetPageTree<T> {
   const { itemMap, itemsWithChildren } = reducePagesToPageTree({
     items,
-    includeCards: true,
     includeDeletedPages,
     includeAllPageTypes
   });

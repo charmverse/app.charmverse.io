@@ -296,7 +296,7 @@ describe('reducePagesToPageTree', () => {
 
     const { rootNodes } = reducePagesToPageTree({
       items: boardAndCards,
-      includeCards: true
+      includeAllPageTypes: true
     });
 
     expect(rootNodes.length).toBe(1);
@@ -338,7 +338,7 @@ describe('reducePagesToPageTree', () => {
 
     const { rootNodes } = reducePagesToPageTree({
       items: boardAndCards,
-      includeCards: true
+      includeAllPageTypes: true
     });
 
     expect(rootNodes.length).toBe(1);
@@ -388,7 +388,7 @@ describe('mapPageTree', () => {
     const rootList = mapPageTree({
       items: boardAndCards,
       // Added this prop manually, Typescript will prevent us from calling it
-      includeCards: true
+      includeAllPageTypes: true
     } as any);
 
     expect(rootList.length).toBe(1);
