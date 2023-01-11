@@ -1,6 +1,10 @@
 // using deprectead feature, navigator.userAgent doesnt exist yet in FF - https://developer.mozilla.org/en-US/docs/Web/API/Navigator/platform
 export function isMac() {
-  return navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+  return (
+    navigator.platform.toUpperCase().indexOf('MAC') >= 0 ||
+    navigator.platform.toUpperCase().indexOf('IPHONE') >= 0 ||
+    navigator.platform.toUpperCase().indexOf('IPAD') >= 0
+  );
 }
 
 export function isTouchScreen(): boolean {
