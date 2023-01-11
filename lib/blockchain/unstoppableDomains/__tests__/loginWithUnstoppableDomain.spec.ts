@@ -1,12 +1,10 @@
-import { a } from 'prosemirror-test-builder';
-
 import { prisma } from 'db';
 import { createUserFromWallet } from 'lib/users/createUser';
 import { DisabledAccountError } from 'lib/utilities/errors';
 import { shortWalletAddress } from 'lib/utilities/strings';
-import { randomDomain, randomETHWalletAddress } from 'testing/generate-stubs';
+import { randomDomain, randomETHWalletAddress } from 'testing/generateStubs';
 
-import type { ProofParams, UnstoppableDomainsAuthSig } from '../interfaces';
+import type { UnstoppableDomainsAuthSig } from '../interfaces';
 import { loginWithUnstoppableDomain } from '../loginWithUnstoppableDomain';
 
 function unstoppableDomainsSignatureStub({
