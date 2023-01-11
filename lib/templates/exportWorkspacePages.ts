@@ -56,7 +56,7 @@ export async function exportWorkspacePages({
   // Replace by multi resolve page tree in future
   const mappedTrees = await Promise.all(
     rootPages.map(async (page) => {
-      return resolvePageTree({ pageId: page.id, flattenChildren: true, fullPage: true });
+      return resolvePageTree({ pageId: page.id, flattenChildren: true, fullPage: true, includeAllPageTypes: true });
     })
   );
 
