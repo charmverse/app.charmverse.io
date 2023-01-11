@@ -26,7 +26,7 @@ export function getTrackPageProfile(page: PageWithPermissionsMeta) {
     Type: page.type,
     Deleted: !!page.deletedAt,
     Public: isPublic,
-    'Is Database': ['board', 'inline_board', 'inline_linked_board'].includes(page.type),
+    'Is Database': ['board', 'inline_board', 'inline_linked_board', 'linked_board'].includes(page.type),
     'Page Created By': page.createdBy,
     'Page Updated At': page.updatedAt
   };

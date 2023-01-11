@@ -2,12 +2,12 @@ import AddIcon from '@mui/icons-material/Add';
 import React, { useCallback, useMemo } from 'react';
 import { useIntl } from 'react-intl';
 
-import { filterPropertyTemplates } from 'components/common/BoardEditor/utils/updateVisibilePropertyIds';
+import type { IPropertyTemplate, Board } from 'lib/focalboard/board';
+import type { BoardView, ISortOption } from 'lib/focalboard/boardView';
+import { createBoardView } from 'lib/focalboard/boardView';
+import type { Card } from 'lib/focalboard/card';
 
-import type { Board, IPropertyTemplate } from '../../blocks/board';
-import type { BoardView, ISortOption } from '../../blocks/boardView';
-import { createBoardView } from '../../blocks/boardView';
-import type { Card } from '../../blocks/card';
+import { filterPropertyTemplates } from '../../../../utils/updateVisibilePropertyIds';
 import { Constants } from '../../constants';
 import mutator from '../../mutator';
 import { OctoUtils } from '../../octoUtils';
@@ -25,6 +25,7 @@ type Props = {
   activeView: BoardView;
   views: BoardView[];
   readOnly: boolean;
+  readOnlySourceData: boolean;
   resizingColumn: string;
   offset: number;
   columnRefs: Map<string, React.RefObject<HTMLDivElement>>;
@@ -159,6 +160,7 @@ function TableHeaders(props: Props): JSX.Element {
             name={template.name}
             sorted={sorted}
             readOnly={props.readOnly}
+            readOnlySourceData={props.readOnlySourceData}
             board={board}
             activeView={activeView}
             cards={cards}
@@ -173,7 +175,7 @@ function TableHeaders(props: Props): JSX.Element {
       })}
       {/* empty column for actions */}
       <div className='octo-table-cell header-cell' style={{ flexGrow: 1, borderRight: '0 none' }}>
-        {!props.readOnly && (
+        {!props.readOnly && !props.readOnlySourceData && (
           <MenuWrapper>
             <Button>
               <AddIcon fontSize='small' />

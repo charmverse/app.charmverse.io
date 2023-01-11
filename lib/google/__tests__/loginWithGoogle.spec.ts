@@ -1,11 +1,9 @@
 import { v4 } from 'uuid';
 
 import { prisma } from 'db';
-import { getUserProfile } from 'lib/users/getUser';
 import { DisabledAccountError } from 'lib/utilities/errors';
-import { generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
-import { connectGoogleAccount } from '../connectGoogleAccount';
 import { loginWithGoogle } from '../loginWithGoogle';
 
 const googleUserName = 'Test User Google Account';

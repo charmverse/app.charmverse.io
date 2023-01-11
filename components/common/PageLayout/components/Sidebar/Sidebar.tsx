@@ -203,7 +203,7 @@ export default function Sidebar({ closeSidebar, favorites }: SidebarProps) {
   const [userSpacePermissions] = useCurrentSpacePermissions();
   const [isScrolled, setIsScrolled] = useState(false);
   const [showingTrash, setShowingTrash] = useState(false);
-  const showForums = useIsCharmverseSpace(['charmverse', 'bitdao', 'purple']);
+  const showForums = useIsCharmverseSpace(['charmverse', 'bitdao', 'purple', 'arthaus']);
 
   const searchInWorkspaceModalState = usePopupState({ variant: 'popover', popupId: 'search-in-workspace-modal' });
   const openSearchLabel = useKeydownPress(searchInWorkspaceModalState.toggle, { key: 'p', ctrl: true });

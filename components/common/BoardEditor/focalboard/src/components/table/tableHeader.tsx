@@ -9,6 +9,7 @@ import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined';
 import type { PopoverProps } from '@mui/material';
 import {
+  Tooltip,
   Divider,
   IconButton,
   ListItemIcon,
@@ -23,9 +24,10 @@ import {
 import { bindPopover, bindToggle, usePopupState } from 'material-ui-popup-state/hooks';
 import React, { useMemo, useRef, useState } from 'react';
 
-import type { Board, IPropertyTemplate, PropertyType } from '../../blocks/board';
-import type { BoardView } from '../../blocks/boardView';
-import type { Card } from '../../blocks/card';
+import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
+import type { BoardView } from 'lib/focalboard/boardView';
+import type { Card } from 'lib/focalboard/card';
+
 import { Constants } from '../../constants';
 import { useSortable } from '../../hooks/sortable';
 import mutator from '../../mutator';
@@ -37,6 +39,7 @@ import HorizontalGrip from './horizontalGrip';
 
 type Props = {
   readOnly: boolean;
+  readOnlySourceData: boolean;
   sorted: 'up' | 'down' | 'none';
   name: string;
   board: Board;
@@ -51,7 +54,7 @@ type Props = {
 };
 
 function TableHeader(props: Props): JSX.Element {
-  const { activeView, board, views, cards, sorted, name, type, template, readOnly } = props;
+  const { activeView, board, views, cards, sorted, name, type, template, readOnly, readOnlySourceData } = props;
   const { id: templateId } = template;
   const [isDragging, isOver, columnRef] = useSortable('column', props.template, !readOnly, props.onDrop);
   const columnWidth = (_templateId: string): number => {
@@ -256,17 +259,19 @@ function TableHeader(props: Props): JSX.Element {
             }
           })}
         </div>
-        <Typography
-          component='span'
-          variant='subtitle1'
-          sx={{
-            textOverflow: 'ellipsis',
-            overflow: 'hidden',
-            whiteSpace: 'nowrap'
-          }}
-        >
-          {name}
-        </Typography>
+        <Tooltip disableInteractive title={name}>
+          <Typography
+            component='span'
+            variant='subtitle1'
+            sx={{
+              textOverflow: 'ellipsis',
+              overflow: 'hidden',
+              whiteSpace: 'nowrap'
+            }}
+          >
+            {name}
+          </Typography>
+        </Tooltip>
         {!readOnly && (
           <IconButton size='small' sx={{ ml: 1 }} onClick={reverseSort}>
             {sorted === 'up' && <ArrowUpwardOutlinedIcon fontSize='small' />}
@@ -291,7 +296,7 @@ function TableHeader(props: Props): JSX.Element {
       ref={columnRef}
     >
       <Stack width='100%' justifyContent='center'>
-        {readOnly ? (
+        {readOnly || readOnlySourceData ? (
           label
         ) : (
           <div ref={toggleRef}>

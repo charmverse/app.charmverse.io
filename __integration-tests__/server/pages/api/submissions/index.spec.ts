@@ -5,7 +5,7 @@ import request from 'supertest';
 import type { SubmissionCreationData } from 'lib/applications/interfaces';
 import { addBountyPermissionGroup } from 'lib/permissions/bounties';
 import type { LoggedInUser } from 'models';
-import { generateSubmissionContent } from 'testing/generate-stubs';
+import { generateSubmissionContent } from 'testing/generateStubs';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateBounty, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 

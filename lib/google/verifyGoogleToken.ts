@@ -1,15 +1,15 @@
 import type { TokenPayload } from 'google-auth-library';
-import { OAuth2Client } from 'google-auth-library';
 
-import { googleOAuthClientId, googleOAuthClientSecret } from 'config/constants';
+import { googleOAuthClientId } from 'config/constants';
 import { coerceToMilliseconds } from 'lib/utilities/dates';
 import { InvalidInputError, UnauthorisedActionError } from 'lib/utilities/errors';
 
-const googleOAuthClient = new OAuth2Client(googleOAuthClientId, googleOAuthClientSecret);
+import { getClient } from './authorization/authClient';
 
 // https://developers.google.com/people/quickstart/nodejs
 export async function verifyGoogleToken(idToken: string): Promise<TokenPayload> {
-  const ticket = await googleOAuthClient.verifyIdToken({
+  const authClient = getClient();
+  const ticket = await authClient.verifyIdToken({
     idToken,
     audience: googleOAuthClientId
   });
@@ -17,6 +17,7 @@ export async function verifyGoogleToken(idToken: string): Promise<TokenPayload> 
   if (!payload) {
     throw new InvalidInputError('Invalid Google authentication token');
   }
+  // console.log('payload', payload);
 
   const now = Date.now();
   const { exp } = payload;

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 
-import type { IPropertyOption, IPropertyTemplate } from '../../../blocks/board';
+import type { IPropertyOption, IPropertyTemplate } from 'lib/focalboard/board';
+
 import Label from '../../../widgets/label';
 import ValueSelector from '../../../widgets/valueSelector';
 
