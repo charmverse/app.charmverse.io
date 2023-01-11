@@ -15,6 +15,7 @@ import type { ChangeEventHandler } from 'react';
 import { useIntl } from 'react-intl';
 
 import charmClient from 'charmClient';
+import { CsvExporter } from 'components/common/BoardEditor/focalboard/csvExporter/csvExporter';
 import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
 import type { CardPage } from 'components/common/BoardEditor/focalboard/src/store/cards';
 import {
@@ -32,7 +33,6 @@ import { useToggleFavorite } from 'hooks/useToggleFavorite';
 import { useUser } from 'hooks/useUser';
 import type { Board } from 'lib/focalboard/board';
 import { createCard } from 'lib/focalboard/card';
-import { CsvExporter } from 'lib/focalboard/csvExporter';
 import log from 'lib/log';
 import type { IPagePermissionFlags } from 'lib/permissions/pages';
 
