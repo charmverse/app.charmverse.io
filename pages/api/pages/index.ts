@@ -79,7 +79,7 @@ async function createPageHandler(req: NextApiRequest, res: NextApiResponse<IPage
       ? (
           await resolvePageTree({
             pageId: page.id,
-            includeAllaPageTypes: false
+            includeAllPageTypes: false
             // includeDeletedPages: true
           })
         ).parents.find((p) => p.type === 'proposal')?.id
