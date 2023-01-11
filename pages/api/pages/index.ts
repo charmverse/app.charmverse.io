@@ -78,7 +78,8 @@ async function createPageHandler(req: NextApiRequest, res: NextApiResponse<IPage
     const proposalIdForPermissions = page.parentId
       ? (
           await resolvePageTree({
-            pageId: page.id
+            pageId: page.id,
+            includeAllaPageTypes: false
             // includeDeletedPages: true
           })
         ).parents.find((p) => p.type === 'proposal')?.id
