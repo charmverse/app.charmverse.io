@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { IntlProvider } from 'react-intl';
 
-import type { IPropertyOption, IPropertyTemplate } from '../../../blocks/board';
+import type { IPropertyOption, IPropertyTemplate } from 'lib/focalboard/board';
 
 import MultiSelect from './multiSelect';
 

@@ -111,16 +111,19 @@ export async function duplicatePage(pageId: string, userId: string, parentId?: s
 
       blockCreateManyInput.push({
         ...createBoard({
-          fields: boardBlock.fields as Record<string, any>,
-          id: createdPageId,
-          parentId: boardBlock.parentId,
-          rootId: createdPageId,
-          schema: 1,
-          spaceId: boardBlock.spaceId,
-          title: `${boardBlock.title} (copy)`,
-          type: 'board',
-          createdBy: userId,
-          updatedBy: userId
+          // @ts-ignore
+          block: {
+            fields: boardBlock.fields as Record<string, any>,
+            id: createdPageId,
+            parentId: boardBlock.parentId,
+            rootId: createdPageId,
+            schema: 1,
+            spaceId: boardBlock.spaceId,
+            title: `${boardBlock.title} (copy)`,
+            type: 'board',
+            createdBy: userId,
+            updatedBy: userId
+          }
         }),
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -169,6 +172,7 @@ export async function duplicatePage(pageId: string, userId: string, parentId?: s
       });
       blockCreateManyInput.push(
         ...viewBlocks.map((viewBlock) => ({
+          // @ts-ignore
           ...createBoardView({
             fields: {
               ...(viewBlock.fields as Record<string, any>),

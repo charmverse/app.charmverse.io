@@ -15,8 +15,7 @@ import { CenteredBox } from './components/CenteredBox';
 
 export default function InvitationPage({ invite }: { invite: InviteLinkPopulated }) {
   const { user } = useUser();
-  const { walletAuthSignature, verifiableWalletDetected } = useWeb3AuthSig();
-  const { loginFromWeb3Account } = useUser();
+  const { walletAuthSignature, verifiableWalletDetected, loginFromWeb3Account } = useWeb3AuthSig();
   const router = useRouter();
 
   async function joinSpace() {

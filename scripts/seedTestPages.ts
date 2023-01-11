@@ -1,6 +1,6 @@
 import { generateBoard } from 'testing/setupDatabase'
-import { boardWithCardsArgs } from 'testing/generate-board-stub';
-import { pageStubToCreate } from 'testing/generate-page-stub';
+import { boardWithCardsArgs } from 'testing/generateBoardStub';
+import { pageStubToCreate } from 'testing/generatePageStub';
 import {prisma} from 'db'
 import { DataNotFoundError } from 'lib/utilities/errors'
 import { Prisma } from '@prisma/client';

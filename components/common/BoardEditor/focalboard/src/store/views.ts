@@ -1,8 +1,8 @@
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { createSelector, createSlice } from '@reduxjs/toolkit';
 
-import type { BoardView } from '../blocks/boardView';
-import { createBoardView } from '../blocks/boardView';
+import type { BoardView } from 'lib/focalboard/boardView';
+import { createBoardView } from 'lib/focalboard/boardView';
 
 import { getCurrentBoard } from './boards';
 import { initialLoad, initialReadOnlyLoad } from './initialLoad';
@@ -72,9 +72,9 @@ export const getSortedViews = createSelector(getViews, (views) => {
     .map((v) => createBoardView(v));
 });
 
-export function getView(viewId: string): (state: RootState) => BoardView | null {
+export function getView(viewId: string | undefined): (state: RootState) => BoardView | null {
   return (state: RootState): BoardView | null => {
-    return state.views.views[viewId] || null;
+    return viewId ? state.views.views[viewId] ?? null : null;
   };
 }
 
@@ -101,23 +101,3 @@ export const getCurrentView = createSelector(
     return views[viewId];
   }
 );
-
-export const getCurrentViewGroupBy = createSelector(getCurrentBoard, getCurrentView, (currentBoard, currentView) => {
-  if (!currentBoard) {
-    return undefined;
-  }
-  if (!currentView) {
-    return undefined;
-  }
-  return currentBoard.fields.cardProperties.find((o) => o.id === currentView.fields.groupById);
-});
-
-export const getCurrentViewDisplayBy = createSelector(getCurrentBoard, getCurrentView, (currentBoard, currentView) => {
-  if (!currentBoard) {
-    return undefined;
-  }
-  if (!currentView) {
-    return undefined;
-  }
-  return currentBoard.fields.cardProperties.find((o) => o.id === currentView.fields.dateDisplayPropertyId);
-});

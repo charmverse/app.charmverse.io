@@ -7,9 +7,9 @@ import { useIntl } from 'react-intl';
 
 import Avatar from 'components/common/Avatar';
 import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
+import type { Block } from 'lib/focalboard/block';
 import type { Member } from 'lib/members/interfaces';
 
-import type { Block } from '../../blocks/block';
 import mutator from '../../mutator';
 import { Utils } from '../../utils';
 import IconButton from '../../widgets/buttons/iconButton';

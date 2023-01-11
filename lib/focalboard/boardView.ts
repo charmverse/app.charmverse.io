@@ -1,19 +1,29 @@
 import { upperFirst } from 'lodash';
 
-import type { Block } from './block';
-import { createBlock } from './block';
-import type { FilterGroup } from './filterGroup';
-import { createFilterGroup } from './filterGroup';
+import type { Block } from 'lib/focalboard/block';
+import { createBlock } from 'lib/focalboard/block';
+import type { FilterGroup } from 'lib/focalboard/filterGroup';
+import { createFilterGroup } from 'lib/focalboard/filterGroup';
 
-type IViewType = 'board' | 'table' | 'gallery' | 'calendar';
-type ISortOption = { propertyId: '__title' | string; reversed: boolean };
+export type IViewType = 'board' | 'table' | 'gallery' | 'calendar';
+export type ISortOption = { propertyId: '__title' | string; reversed: boolean };
 
-type KanbanCalculationFields = {
+export type ViewSourceType = 'board_page' | 'google_form';
+
+export type GoogleFormSourceData = {
+  credentialId: string;
+  boardId?: string; // the board which contains the blocks that are synced from this form
+  formId: string;
+  formName: string;
+  formUrl: string;
+};
+
+export type KanbanCalculationFields = {
   calculation: string;
   propertyId: string;
 };
 
-type BoardViewFields = {
+export type BoardViewFields = {
   viewType: IViewType;
   groupById?: string;
   dateDisplayPropertyId?: string;
@@ -28,32 +38,41 @@ type BoardViewFields = {
   columnCalculations: Record<string, string>;
   kanbanCalculations: Record<string, KanbanCalculationFields>;
   defaultTemplateId: string;
+  sourceType?: ViewSourceType;
+  sourceData?: GoogleFormSourceData;
+  // TODO: migrate linkedSourceId to be inside sourceData
+  linkedSourceId?: string;
 };
 
-type BoardView = Block & {
+export type BoardView = Block & {
   fields: BoardViewFields;
 };
 
-function createBoardView(block?: Partial<Block>): BoardView {
+function createBoardView(block?: Block): BoardView {
+  const fields: BoardViewFields = {
+    viewType: block?.fields.viewType || 'board',
+    groupById: block?.fields.groupById,
+    dateDisplayPropertyId: block?.fields.dateDisplayPropertyId,
+    sortOptions: block?.fields.sortOptions?.map((o: ISortOption) => ({ ...o })) || [],
+    visiblePropertyIds: block?.fields.visiblePropertyIds?.slice() || [],
+    visibleOptionIds: block?.fields.visibleOptionIds?.slice() || [],
+    hiddenOptionIds: block?.fields.hiddenOptionIds?.slice() || [],
+    collapsedOptionIds: block?.fields.collapsedOptionIds?.slice() || [],
+    filter: createFilterGroup(block?.fields.filter),
+    cardOrder: block?.fields.cardOrder?.slice() || [],
+    columnWidths: { ...(block?.fields.columnWidths || {}) },
+    columnCalculations: { ...(block?.fields.columnCalculations || {}) },
+    kanbanCalculations: { ...(block?.fields.kanbanCalculations || {}) },
+    defaultTemplateId: block?.fields.defaultTemplateId || '',
+    linkedSourceId: block?.fields.linkedSourceId,
+    sourceData: block?.fields.sourceData,
+    sourceType: block?.fields.sourceType
+  };
+
   return {
     ...createBlock(block),
     type: 'view',
-    fields: {
-      viewType: block?.fields?.viewType || 'board',
-      groupById: block?.fields?.groupById,
-      dateDisplayPropertyId: block?.fields?.dateDisplayPropertyId,
-      sortOptions: block?.fields?.sortOptions?.map((o: ISortOption) => ({ ...o })) || [],
-      visiblePropertyIds: block?.fields?.visiblePropertyIds?.slice() || [],
-      visibleOptionIds: block?.fields?.visibleOptionIds?.slice() || [],
-      hiddenOptionIds: block?.fields?.hiddenOptionIds?.slice() || [],
-      collapsedOptionIds: block?.fields?.collapsedOptionIds?.slice() || [],
-      filter: createFilterGroup(block?.fields?.filter),
-      cardOrder: block?.fields?.cardOrder?.slice() || [],
-      columnWidths: { ...(block?.fields?.columnWidths || {}) },
-      columnCalculations: { ...(block?.fields?.columnCalculations || {}) },
-      kanbanCalculations: { ...(block?.fields?.kanbanCalculations || {}) },
-      defaultTemplateId: block?.fields?.defaultTemplateId || ''
-    }
+    fields
   };
 }
 
@@ -62,4 +81,3 @@ export function formatViewTitle(view: BoardView) {
 }
 
 export { createBoardView };
-export type { BoardView, IViewType, ISortOption, KanbanCalculationFields };

@@ -1,5 +1,6 @@
-import type { Block } from './block';
-import { createBlock } from './block';
+import type { Block } from 'lib/focalboard/block';
+import { createBlock } from 'lib/focalboard/block';
+
 import type { ContentBlock } from './contentBlock';
 
 export type TextBlock = ContentBlock & {

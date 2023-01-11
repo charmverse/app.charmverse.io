@@ -1,8 +1,9 @@
 import type { IntlShape } from 'react-intl';
 
-import type { Board, IPropertyTemplate } from './blocks/board';
-import type { BoardView } from './blocks/boardView';
-import type { Card } from './blocks/card';
+import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
+import type { BoardView } from 'lib/focalboard/boardView';
+import type { Card } from 'lib/focalboard/card';
+
 import { OctoUtils } from './octoUtils';
 import type { IAppWindow } from './types';
 import { Utils } from './utils';
@@ -10,14 +11,8 @@ import { Utils } from './utils';
 declare let window: IAppWindow;
 
 class CsvExporter {
-  static exportTableCsv(board: Board, activeView: BoardView, cards: Card[], intl: IntlShape, view?: BoardView): void {
-    const viewToExport = view ?? activeView;
-
-    if (!viewToExport) {
-      return;
-    }
-
-    const rows = CsvExporter.generateTableArray(board, cards, viewToExport, intl);
+  static exportTableCsv(board: Board, view: BoardView, cards: Card[], intl: IntlShape): void {
+    const rows = CsvExporter.generateTableArray(board, cards, view, intl);
 
     let csvContent = 'data:text/csv;charset=utf-8,';
 
@@ -26,7 +21,12 @@ class CsvExporter {
       csvContent += `${encodedRow}\r\n`;
     });
 
-    const filename = `${Utils.sanitizeFilename(viewToExport.title || 'Untitled')}.csv`;
+    let fileTitle = view.title;
+    if (view.fields.sourceType === 'google_form') {
+      fileTitle = `Responses to ${view.fields.sourceData?.formName}`;
+    }
+
+    const filename = `${Utils.sanitizeFilename(fileTitle || 'CharmVerse Table Export')}.csv`;
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement('a');
     link.style.display = 'none';
@@ -53,7 +53,6 @@ class CsvExporter {
     const visibleProperties = board.fields.cardProperties.filter((template: IPropertyTemplate) =>
       viewToExport.fields.visiblePropertyIds.includes(template.id)
     );
-
     if (
       viewToExport.fields.viewType === 'calendar' &&
       viewToExport.fields.dateDisplayPropertyId &&
@@ -68,7 +67,7 @@ class CsvExporter {
     }
 
     // Header row
-    const row: string[] = [intl.formatMessage({ id: 'TableComponent.name', defaultMessage: 'Name' })];
+    const row: string[] = [intl.formatMessage({ id: 'TableComponent.name', defaultMessage: 'Title' })];
     visibleProperties.forEach((template: IPropertyTemplate) => {
       row.push(template.name);
     });
@@ -80,6 +79,7 @@ class CsvExporter {
       visibleProperties.forEach((template: IPropertyTemplate) => {
         const propertyValue = card.fields.properties[template.id];
         const displayValue = (OctoUtils.propertyDisplayValue(card, propertyValue, template, intl) || '') as string;
+
         if (template.type === 'number') {
           const numericValue = propertyValue ? Number(propertyValue).toString() : '';
           _row.push(numericValue);

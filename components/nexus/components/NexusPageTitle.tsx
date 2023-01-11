@@ -1,8 +1,7 @@
-import { Box, Tooltip, Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 
-import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import { useUser } from 'hooks/useUser';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
@@ -11,14 +10,13 @@ export default function PageTitle({ subPage }: { subPage?: string }) {
   const MyNexus = 'My Nexus';
   const { account, disconnectWallet } = useWeb3AuthSig();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-  const { setUser } = useUser();
+  const { setUser, logoutUser } = useUser();
   const router = useRouter();
 
-  async function logoutUser() {
+  async function logoutCurrentUser() {
     disconnectWallet();
     setIsLoggingOut(true);
-    await charmClient.logout();
-    setUser(null);
+    await logoutUser();
     router.push('/');
   }
 
@@ -49,7 +47,7 @@ export default function PageTitle({ subPage }: { subPage?: string }) {
               variant='outlined'
               color='secondary'
               loading={isLoggingOut}
-              onClick={logoutUser}
+              onClick={logoutCurrentUser}
             >
               Logout
             </Button>
