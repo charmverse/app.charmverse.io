@@ -1,5 +1,3 @@
-import crypto from 'crypto';
-
 import type { IntlShape } from 'react-intl';
 import { v4 as uuid } from 'uuid';
 
