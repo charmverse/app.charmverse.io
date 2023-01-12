@@ -5,7 +5,6 @@ import { useState } from 'react';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
-import Link from 'components/common/Link';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useForumCategories } from 'hooks/useForumCategories';
