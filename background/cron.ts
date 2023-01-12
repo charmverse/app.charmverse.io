@@ -4,16 +4,12 @@ import log from 'lib/log';
 
 import app from './server/app';
 import { task as archiveTask } from './tasks/deleteArchivedPages';
-import { task as processWebhookMessages } from './tasks/processWebhookMessages';
 import { task as notificationTask } from './tasks/sendNotifications';
 import { task as proposalTask } from './tasks/updateProposalStatus';
 import { task as voteTask } from './tasks/updateVotesStatus';
 import { task as verifyTokenGateMembershipsTask } from './tasks/verifyTokenGateMemberships';
 
 log.info('Starting cron jobs');
-
-// Start processing webhook messages
-processWebhookMessages();
 
 // Delete archived pages once an hour
 cron.schedule('0 * * * *', archiveTask);
