@@ -4,6 +4,7 @@ import request from 'supertest';
 
 import { prisma } from 'db';
 import { createPostCategory } from 'lib/forums/categories/createPostCategory';
+import type { PostWithVotes } from 'lib/forums/posts/interfaces';
 import type { UpdateForumPostInput } from 'lib/forums/posts/updateForumPost';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
@@ -80,23 +81,31 @@ describe('PUT /api/forums/posts/[postId] - Update a post', () => {
 });
 describe('DELETE /api/forums/posts/[postId] - Delete a post', () => {
   it('should delete a post if the user created it, responding with 200', async () => {
-    const page = await generateForumPost(createInput);
+    const post = await generateForumPost(createInput);
 
-    await request(baseUrl).delete(`/api/forums/posts/${page.id}`).set('Cookie', userCookie).send().expect(200);
+    await request(baseUrl).delete(`/api/forums/posts/${post.id}`).set('Cookie', userCookie).send().expect(200);
 
-    const updatedPage = await prisma.page.findUnique({
+    const postAfterDelete = await prisma.post.findUnique({
       where: {
-        id: page.id
+        id: post.id
       }
     });
 
-    expect(updatedPage?.deletedAt).toBeDefined();
+    expect(postAfterDelete?.deletedAt).toBeDefined();
   });
 
   it('should delete a post if the user did not create the post, but is a space admin, responding with 200', async () => {
-    const page = await generateForumPost(createInput);
+    const post = await generateForumPost(createInput);
 
-    await request(baseUrl).delete(`/api/forums/posts/${page.id}`).set('Cookie', adminUserCookie).send().expect(200);
+    await request(baseUrl).delete(`/api/forums/posts/${post.id}`).set('Cookie', adminUserCookie).send().expect(200);
+
+    const postAfterDelete = await prisma.post.findUnique({
+      where: {
+        id: post.id
+      }
+    });
+
+    expect(postAfterDelete?.deletedAt).toBeDefined();
   });
 
   it('should fail to delete the post if the user did not create it, responding with 401', async () => {
@@ -107,5 +116,42 @@ describe('DELETE /api/forums/posts/[postId] - Delete a post', () => {
       .set('Cookie', extraSpaceUserCookie)
       .send()
       .expect(401);
+  });
+});
+describe('GET /api/forums/posts/[postId] - Get a post', () => {
+  it('should return a post if the user is a space member, responding with 200', async () => {
+    const post = await generateForumPost(createInput);
+
+    const retrievedPost = (
+      await request(baseUrl).get(`/api/forums/posts/${post.id}`).set('Cookie', userCookie).send().expect(200)
+    ).body as PostWithVotes;
+
+    // The retrieved post will have votes data, which the original generated post will not have
+    expect(retrievedPost).toMatchObject(
+      expect.objectContaining<Partial<PostWithVotes>>({
+        id: post.id,
+        categoryId: post.categoryId,
+        spaceId: post.spaceId,
+        content: post.content,
+        title: post.title,
+        contentText: post.contentText,
+        path: post.path,
+        locked: post.locked,
+        pinned: post.pinned,
+        votes: {
+          downvotes: 0,
+          upvotes: 0,
+          upvoted: null
+        }
+      })
+    );
+  });
+  it('should fail to return the post if the user is not a space member, responding with 401', async () => {
+    const { user: externalUser } = await generateUserAndSpaceWithApiToken();
+    const externalUserCookie = await loginUser(externalUser.id);
+
+    const post = await generateForumPost(createInput);
+
+    await request(baseUrl).get(`/api/forums/posts/${post.id}`).set('Cookie', externalUserCookie).send().expect(401);
   });
 });

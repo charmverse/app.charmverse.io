@@ -7,6 +7,7 @@ import { useIntl } from 'react-intl';
 import { Utils } from '../../../utils';
 import Button from '../../../widgets/buttons/button';
 import Editable from '../../../widgets/editable';
+import Label from '../../../widgets/label';
 import SwitchOption from '../../../widgets/menu/switchOption';
 import Modal from '../../modal';
 import ModalWrapper from '../../modalWrapper';
@@ -153,13 +154,17 @@ function DateRange(props: Props): JSX.Element {
     buttonText = intl.formatMessage({ id: 'DateRange.empty', defaultMessage: 'Empty' });
   }
   return (
-    <div className={`DateRange ${displayValue ? '' : 'empty'} ${className}`}>
-      <Button onClick={() => setShowDialog(true)}>{buttonText}</Button>
+    <>
+      <div className='octo-propertyvalue' data-testid='select-non-editable' onClick={() => setShowDialog(true)}>
+        <Label color={displayValue ? 'propColorDefault' : 'empty'}>
+          <span className='Label-text'>{buttonText}</span>
+        </Label>
+      </div>
 
       {showDialog && (
         <ModalWrapper>
           <Modal onClose={() => onClose()}>
-            <div className={`${className}-overlayWrapper`}>
+            <div className={`DateRange ${className}-overlayWrapper`}>
               <div className={`${className}-overlay`}>
                 <div className='inputContainer'>
                   <Editable
@@ -251,7 +256,7 @@ function DateRange(props: Props): JSX.Element {
           </Modal>
         </ModalWrapper>
       )}
-    </div>
+    </>
   );
 }
 

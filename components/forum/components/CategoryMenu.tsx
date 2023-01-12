@@ -13,14 +13,17 @@ import type { PostCategory } from '@prisma/client';
 import startCase from 'lodash/startCase';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
+import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
 import Link from 'components/common/Link';
 import Modal from 'components/common/Modal';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useForumCategories } from 'hooks/useForumCategories';
 import isAdmin from 'hooks/useIsAdmin';
+import { useSnackbar } from 'hooks/useSnackbar';
 import { postSortOptions } from 'lib/forums/posts/constants';
 
 import { ForumFilterCategory } from './CategoryPopup';
@@ -30,18 +33,32 @@ const StyledBox = styled(Box)`
 `;
 
 function ForumFilterListLink({ category, label, sort }: { label: string; category?: PostCategory; sort?: string }) {
-  const { deleteForumCategory, updateForumCategory } = useForumCategories();
+  const { deleteForumCategory, updateForumCategory, setDefaultPostCategory } = useForumCategories();
+  const { showMessage } = useSnackbar();
   const router = useRouter();
   const selectedCategory = router.query.categoryId as string | undefined;
   const selectedSort = router.query.sort as string | undefined;
   const admin = isAdmin();
-  const link = category
-    ? `/${router.query.domain}/forum?categoryId=${category.id}`
-    : sort
-    ? `/${router.query.domain}/forum?sort=${sort}`
-    : '';
+  const link =
+    label === 'All categories'
+      ? `/${router.query.domain}/forum`
+      : category
+      ? `/${router.query.domain}/forum?categoryId=${category.id}`
+      : sort
+      ? `/${router.query.domain}/forum?sort=${sort}`
+      : '';
 
   const selected = category ? category.id === selectedCategory : sort ? sort === selectedSort : false;
+
+  function deleteCategory() {
+    if (category) {
+      deleteForumCategory(category).catch((err) => {
+        showMessage(err?.message || 'An error occurred while deleting the category');
+      });
+    }
+
+    showMessage('Category deleted');
+  }
 
   return (
     <MenuItem
@@ -66,7 +83,9 @@ function ForumFilterListLink({ category, label, sort }: { label: string; categor
           sx={{
             color: 'text.primary'
           }}
-          fontWeight={selected ? 'bold' : 'initial'}
+          fontWeight={
+            selected || (label === 'All categories' && !selectedCategory && !selectedSort) ? 'bold' : 'initial'
+          }
         >
           {label}
         </Typography>
@@ -76,7 +95,8 @@ function ForumFilterListLink({ category, label, sort }: { label: string; categor
           <ForumFilterCategory
             category={category as PostCategory}
             onChange={updateForumCategory}
-            onDelete={deleteForumCategory}
+            onDelete={deleteCategory}
+            onSetNewDefaultCategory={setDefaultPostCategory}
           />
         </span>
       )}
@@ -89,6 +109,8 @@ export function CategoryMenu() {
   const addCategoryPopupState = usePopupState({ variant: 'popover', popupId: 'add-category' });
   const admin = isAdmin();
   const [forumCategoryName, setForumCategoryName] = useState('');
+  const router = useRouter();
+  const currentSpace = useCurrentSpace();
 
   function createCategory() {
     createForumCategory(forumCategoryName);
@@ -99,6 +121,16 @@ export function CategoryMenu() {
   if (error) {
     return <Alert severity='error'>An error occurred while loading the categories</Alert>;
   }
+
+  useEffect(() => {
+    const selectedCategory = categories.find((category) => category.id === router.query.categoryId);
+    if (selectedCategory && currentSpace?.id) {
+      charmClient.track.trackAction('main_feed_filtered', {
+        categoryName: selectedCategory.name,
+        spaceId: currentSpace.id
+      });
+    }
+  }, [router.query.categoryId, currentSpace]);
 
   return (
     <Card variant='outlined'>

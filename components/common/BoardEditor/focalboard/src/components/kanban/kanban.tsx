@@ -9,13 +9,15 @@ import React, { useCallback, useState } from 'react';
 import type { IntlShape } from 'react-intl';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
-import type { Board, BoardGroup, IPropertyOption, IPropertyTemplate } from '../../blocks/board';
-import type { BoardView } from '../../blocks/boardView';
-import type { Card } from '../../blocks/card';
+import type { Board, BoardGroup, IPropertyOption, IPropertyTemplate } from 'lib/focalboard/board';
+import type { BoardView } from 'lib/focalboard/boardView';
+import type { Card } from 'lib/focalboard/card';
+
 import { Constants } from '../../constants';
 import type { BlockChange } from '../../mutator';
 import mutator from '../../mutator';
 import { IDType, Utils } from '../../utils';
+import { typeDisplayName } from '../../widgets/propertyMenu';
 import { dragAndDropRearrange } from '../cardDetail/cardDetailContentsUtility';
 
 import KanbanCard from './kanbanCard';
@@ -251,7 +253,26 @@ function Kanban(props: Props) {
     setShowCalculationsMenu(newShowOptions);
   };
 
-  const menuTriggerProps = !props.readOnly ? bindTrigger(popupState) : {};
+  const createNewSelectProperty = async () => {
+    const template: IPropertyTemplate = {
+      id: Utils.createGuid(IDType.BlockID),
+      name: typeDisplayName(props.intl, 'select'),
+      type: 'select',
+      options: []
+    };
+    await mutator.insertPropertyTemplate(board, activeView, -1, template);
+  };
+
+  const { onClick, ...restBindings } = bindTrigger(popupState);
+  const addNewGroupHandler = async (event: React.SyntheticEvent<any, Event>) => {
+    onClick(event);
+    // If no groupByProperty means that we don't have a select property and the board can't be grouped in columns.
+    if (!groupByProperty) {
+      await createNewSelectProperty();
+    }
+  };
+  const menuTriggerProps = !props.readOnly ? { ...restBindings, onClick: addNewGroupHandler } : {};
+
   return (
     <Box className='Kanban'>
       <div className='octo-board-header' id='mainBoardHeader'>
@@ -275,7 +296,7 @@ function Kanban(props: Props) {
           />
         ))}
 
-        {groupByProperty && (
+        {!props.readOnly && (
           <div className='octo-board-header-cell narrow' {...menuTriggerProps}>
             <Button size='small' variant='text' color='secondary'>
               <FormattedMessage id='BoardComponent.add-a-group' defaultMessage='+ Add a group' />

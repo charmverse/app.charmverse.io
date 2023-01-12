@@ -9,11 +9,11 @@ import { mutate } from 'swr';
 import Button from 'components/common/Button';
 import Link from 'components/common/Link';
 import { usePages } from 'hooks/usePages';
+import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
+import type { BoardView } from 'lib/focalboard/boardView';
+import type { Card } from 'lib/focalboard/card';
 import type { PageMeta } from 'lib/pages';
 
-import type { Board, IPropertyTemplate } from '../../blocks/board';
-import type { BoardView } from '../../blocks/boardView';
-import type { Card } from '../../blocks/card';
 import { mutator } from '../../mutator';
 import { getCurrentBoardTemplates } from '../../store/cards';
 import { useAppSelector } from '../../store/hooks';
@@ -32,16 +32,15 @@ type Props = {
   views: BoardView[];
   viewsBoardId: string;
   cards: Card[];
-  groupByProperty?: IPropertyTemplate;
   addCard: () => void;
   showCard: (cardId: string | null) => void;
   // addCardFromTemplate: (cardTemplateId: string) => void
   addCardTemplate: () => void;
   editCardTemplate: (cardTemplateId: string) => void;
   readOnly: boolean;
+  readOnlySourceData: boolean;
   dateDisplayProperty?: IPropertyTemplate;
   addViewButton?: ReactNode;
-  onViewTabClick?: (viewId: string) => void;
   disableUpdatingUrl?: boolean;
   maxTabsShown?: number;
   onDeleteView?: (viewId: string) => void;
@@ -66,7 +65,6 @@ function ViewHeader(props: Props) {
     viewsBoardId,
     activeBoard,
     activeView,
-    groupByProperty,
     cards,
     dateDisplayProperty
   } = props;
@@ -99,12 +97,10 @@ function ViewHeader(props: Props) {
     <div className={`ViewHeader ${props.showActionsOnHover ? 'hide-actions' : ''}`}>
       <ViewTabs
         onDeleteView={props.onDeleteView}
-        onViewTabClick={props.onViewTabClick}
         addViewButton={props.addViewButton}
         views={views}
         readOnly={props.readOnly}
         showView={showView}
-        viewsBoardId={viewsBoardId}
         activeView={activeView}
         disableUpdatingUrl={props.disableUpdatingUrl}
         maxTabsShown={maxTabsShown}
@@ -118,13 +114,13 @@ function ViewHeader(props: Props) {
       <div className='octo-spacer' />
 
       <div className='view-actions'>
-        {!props.readOnly && activeView && activeBoard && (
+        {!props.readOnly && activeView && (
           <>
             {/* Display by */}
 
             {withDisplayBy && (
               <ViewHeaderDisplayByMenu
-                properties={activeBoard.fields.cardProperties}
+                properties={activeBoard?.fields.cardProperties ?? []}
                 activeView={activeView}
                 dateDisplayPropertyName={dateDisplayProperty?.name}
               />
@@ -143,7 +139,11 @@ function ViewHeader(props: Props) {
                 <FormattedMessage id='ViewHeader.filter' defaultMessage='Filter' />
               </Button>
               {showFilter && (
-                <FilterComponent board={activeBoard} activeView={activeView} onClose={() => setShowFilter(false)} />
+                <FilterComponent
+                  properties={activeBoard?.fields.cardProperties ?? []}
+                  activeView={activeView}
+                  onClose={() => setShowFilter(false)}
+                />
               )}
             </ModalWrapper>
 
@@ -151,7 +151,7 @@ function ViewHeader(props: Props) {
 
             {withSortBy && (
               <ViewHeaderSortMenu
-                properties={activeBoard.fields.cardProperties}
+                properties={activeBoard?.fields.cardProperties ?? []}
                 activeView={activeView}
                 orderedCards={cards}
               />
@@ -188,15 +188,17 @@ function ViewHeader(props: Props) {
 
             {/* New card button */}
 
-            <NewCardButton
-              addCard={props.addCard}
-              addCardFromTemplate={addPageFromTemplate}
-              addCardTemplate={props.addCardTemplate}
-              editCardTemplate={props.editCardTemplate}
-              showCard={props.showCard}
-              deleteCardTemplate={deleteCardTemplate}
-              boardId={viewsBoardId}
-            />
+            {!props.readOnlySourceData && (
+              <NewCardButton
+                addCard={props.addCard}
+                addCardFromTemplate={addPageFromTemplate}
+                addCardTemplate={props.addCardTemplate}
+                editCardTemplate={props.editCardTemplate}
+                showCard={props.showCard}
+                deleteCardTemplate={deleteCardTemplate}
+                boardId={viewsBoardId}
+              />
+            )}
           </>
         )}
       </div>

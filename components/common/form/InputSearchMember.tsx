@@ -25,10 +25,7 @@ function filterMembers(members: Member[], filter: IMembersFilter): Member[] {
   }
 }
 
-type BooleanField = boolean | undefined;
-
-interface Props
-  extends Omit<AutocompleteProps<Member, BooleanField, BooleanField, BooleanField>, 'options' | 'renderInput'> {
+interface Props extends Omit<AutocompleteProps<Member, boolean, boolean, boolean>, 'options' | 'renderInput'> {
   filter?: IMembersFilter;
   options: Member[];
   disableCloseOnSelect?: boolean;
@@ -103,7 +100,7 @@ export function InputSearchMember({ defaultValue, onChange, ...props }: IInputSe
 }
 
 interface IInputSearchMemberMultipleProps
-  extends Partial<Omit<AutocompleteProps<Member, true, true, true>, 'onChange'>> {
+  extends Partial<Omit<AutocompleteProps<Member, boolean, boolean, boolean>, 'onChange'>> {
   onChange: (id: string[]) => void;
   defaultValue?: string[];
   filter?: IMembersFilter;

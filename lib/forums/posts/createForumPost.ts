@@ -1,15 +1,18 @@
-import type { Page, Post, Prisma } from '@prisma/client';
+import type { Post, Prisma } from '@prisma/client';
+import { findChildren } from 'prosemirror-utils';
 import { v4 } from 'uuid';
 
 import { prisma } from 'db';
-import { getPagePath } from 'lib/pages/utils';
+import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
+import { getNodeFromJson } from 'lib/prosemirror/getNodeFromJson';
 import { InsecureOperationError } from 'lib/utilities/errors';
 
-import { selectPageValues } from './getForumPost';
-import type { ForumPostPage } from './interfaces';
+import { getPostPath } from './getPostPath';
 
-export type CreateForumPostInput = Pick<Page, 'createdBy' | 'spaceId' | 'content' | 'contentText' | 'title'> &
-  Pick<Post, 'categoryId'>;
+export type CreateForumPostInput = Pick<
+  Post,
+  'createdBy' | 'spaceId' | 'content' | 'contentText' | 'title' | 'categoryId'
+>;
 
 export async function createForumPost({
   content,
@@ -18,7 +21,7 @@ export async function createForumPost({
   spaceId,
   title,
   categoryId
-}: CreateForumPostInput): Promise<ForumPostPage> {
+}: CreateForumPostInput): Promise<Post> {
   if (categoryId) {
     const category = await prisma.postCategory.findUnique({
       where: {
@@ -36,13 +39,17 @@ export async function createForumPost({
 
   const postId = v4();
 
-  const createdPost = await prisma.page.create({
+  const createdPost = await prisma.post.create({
     data: {
       id: postId,
       title,
       content: (content ?? undefined) as Prisma.InputJsonObject,
       contentText,
-      updatedBy: createdBy,
+      category: {
+        connect: {
+          id: categoryId
+        }
+      },
       author: {
         connect: {
           id: createdBy
@@ -53,23 +60,32 @@ export async function createForumPost({
           id: spaceId
         }
       },
-      type: 'post',
-      path: getPagePath(),
-      post: {
-        create: {
-          id: postId,
-          spaceId,
-          categoryId
-        }
-      }
-    },
-    include: {
-      post: true
+      path: getPostPath(title)
     }
   });
 
-  return {
-    ...selectPageValues(createdPost),
-    post: createdPost.post!
-  };
+  return createdPost;
+}
+
+export async function trackCreateForumPostEvent({ post, userId }: { post: Post; userId: string }) {
+  const category = await prisma.postCategory.findUnique({
+    where: {
+      id: post.categoryId
+    },
+    select: {
+      name: true
+    }
+  });
+
+  if (category) {
+    trackUserAction('create_a_post', {
+      categoryName: category.name,
+      resourceId: post.id,
+      spaceId: post.spaceId,
+      userId,
+      hasImage: post.content
+        ? findChildren(getNodeFromJson(post.content), (node) => node.type.name === 'image', true)?.length !== 0
+        : false
+    });
+  }
 }

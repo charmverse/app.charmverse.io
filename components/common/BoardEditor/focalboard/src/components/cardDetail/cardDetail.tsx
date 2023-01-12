@@ -3,12 +3,11 @@ import { useCallback, useEffect, useRef } from 'react';
 
 import DocumentPage from 'components/[pageId]/DocumentPage';
 import { usePages } from 'hooks/usePages';
+import type { Card } from 'lib/focalboard/card';
 import log from 'lib/log';
 import type { PageUpdates } from 'lib/pages';
 import { findParentOfType } from 'lib/pages/findParentOfType';
 import debouncePromise from 'lib/utilities/debouncePromise';
-
-import type { Card } from '../../blocks/card';
 
 type Props = {
   card: Card;

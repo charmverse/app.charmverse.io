@@ -12,13 +12,14 @@ import { useState } from 'react';
 import charmClient from 'charmClient';
 import UserDisplay from 'components/common/UserDisplay';
 import { usePostDialog } from 'components/forum/components/PostDialog/hooks/usePostDialog';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { ForumPostMeta, ForumVotes } from 'lib/forums/posts/interfaces';
 import type { Member } from 'lib/members/interfaces';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
 import { getRelativeTimeInThePast } from 'lib/utilities/dates';
 import { fancyTrim } from 'lib/utilities/strings';
 
-import { ForumContentUpDownVotes } from '../../ForumVote';
+import { ForumVote } from '../../ForumVote';
 
 import { PostSummary } from './PostSummary';
 
@@ -37,6 +38,7 @@ export function PostCard({ post, user }: ForumPostProps) {
   const { id: postId } = pagePost;
   const router = useRouter();
   const { showPost } = usePostDialog();
+  const currentSpace = useCurrentSpace();
 
   async function voteOnPost(newUpvotedStatus: boolean | null) {
     await charmClient.forum.voteOnPost({
@@ -85,6 +87,12 @@ export function PostCard({ post, user }: ForumPostProps) {
               setUrlWithoutRerender(router.pathname, { pageId: null });
             }
           });
+          if (currentSpace) {
+            charmClient.track.trackAction('load_post_page', {
+              resourceId: postId,
+              spaceId: currentSpace.id
+            });
+          }
           setUrlWithoutRerender(router.pathname, { pageId: postId });
         }}
       >
@@ -111,7 +119,7 @@ export function PostCard({ post, user }: ForumPostProps) {
                 <Typography variant='body2'>{totalComments}</Typography>
               </Stack>
             </Stack>
-            <ForumContentUpDownVotes onVote={voteOnPost} votes={pagePost.votes} />
+            <ForumVote onVote={voteOnPost} votes={pagePost.votes} />
           </Box>
         </CardContent>
       </CardActionArea>

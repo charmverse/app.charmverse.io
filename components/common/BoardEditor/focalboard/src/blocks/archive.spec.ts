@@ -1,7 +1,8 @@
+import type { Block } from 'lib/focalboard/block';
+
 import { TestBlockFactory } from '../test/testBlockFactory';
 
 import { ArchiveUtils } from './archive';
-import type { Block } from './block';
 
 test('archive: archive and unarchive', async () => {
   const blocks: Block[] = [];

@@ -1,47 +1,82 @@
 import { prisma } from 'db';
 import { computeUserPagePermissions } from 'lib/permissions/pages';
+import { DataNotFoundError } from 'lib/utilities/errors';
 
-export async function canCreate({ pageId, userId }: { pageId: string; userId: string }) {
-  const page = await prisma.page.findUniqueOrThrow({
-    where: {
-      id: pageId
-    }
-  });
+type VideoPermissionComputeRequest = {
+  resourceId: string;
+  userId: string;
+};
+export async function canCreate({ resourceId, userId }: VideoPermissionComputeRequest) {
+  const [page, post] = await Promise.all([
+    prisma.page.findUnique({
+      where: {
+        id: resourceId
+      },
+      select: {
+        id: true
+      }
+    }),
+    prisma.post.findUnique({
+      where: {
+        id: resourceId
+      },
+      select: {
+        spaceId: true
+      }
+    })
+  ]);
 
-  if (page.type === 'post') {
+  if (post) {
     return _hasAccessToSpace({
       userId,
-      spaceId: page.spaceId
+      spaceId: post.spaceId
     });
-  } else {
+  } else if (page) {
     const pagePermissions = await computeUserPagePermissions({
-      pageId,
+      pageId: resourceId,
       userId
     });
 
     return pagePermissions.edit_content;
+  } else {
+    throw new DataNotFoundError(`Page or Post with id ${resourceId} not found`);
   }
 }
 
-export async function canView({ pageId, userId }: { pageId: string; userId: string }) {
-  const page = await prisma.page.findUniqueOrThrow({
-    where: {
-      id: pageId
-    }
-  });
+export async function canView({ resourceId, userId }: VideoPermissionComputeRequest) {
+  const [page, post] = await Promise.all([
+    prisma.page.findUnique({
+      where: {
+        id: resourceId
+      },
+      select: {
+        id: true
+      }
+    }),
+    prisma.post.findUnique({
+      where: {
+        id: resourceId
+      },
+      select: {
+        spaceId: true
+      }
+    })
+  ]);
 
-  if (page.type === 'post') {
+  if (post) {
     return _hasAccessToSpace({
       userId,
-      spaceId: page.spaceId
+      spaceId: post.spaceId
     });
-  } else {
+  } else if (page) {
     const pagePermissions = await computeUserPagePermissions({
-      pageId,
+      pageId: resourceId,
       userId
     });
 
     return pagePermissions.read;
+  } else {
+    throw new DataNotFoundError(`Page or Post with id ${resourceId} not found`);
   }
 }
 

@@ -4,9 +4,11 @@ import useSWR from 'swr';
 import charmClient from 'charmClient';
 
 import { useCurrentSpace } from './useCurrentSpace';
+import { useSpaces } from './useSpaces';
 
 export function useForumCategories() {
   const currentSpace = useCurrentSpace();
+  const { setSpace } = useSpaces();
 
   const {
     data: categories = [],
@@ -75,10 +77,21 @@ export function useForumCategories() {
     }
   }
 
+  async function setDefaultPostCategory(option: PostCategory) {
+    if (currentSpace) {
+      const updatedSpace = await charmClient.forum.setDefaultPostCategory({
+        postCategoryId: option.id,
+        spaceId: currentSpace.id
+      });
+      setSpace(updatedSpace);
+    }
+  }
+
   return {
     createForumCategory,
     deleteForumCategory,
     updateForumCategory,
+    setDefaultPostCategory,
     categories,
     error,
     disabled: isValidating

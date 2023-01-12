@@ -31,7 +31,13 @@ const StyledTreeRoot = styled(TreeRoot)<{ isFavorites?: boolean }>`
 
 export function filterVisiblePages(pages: (PageMeta | undefined)[], rootPageIds: string[] = []) {
   return pages.filter((page): page is IPageWithPermissions =>
-    isTruthy(page && (page.type === 'board' || page.type === 'page' || rootPageIds?.includes(page.id)))
+    isTruthy(
+      page &&
+        (page.type === 'board' ||
+          page.type === 'page' ||
+          page.type === 'linked_board' ||
+          rootPageIds?.includes(page.id))
+    )
   );
 }
 
@@ -249,16 +255,19 @@ function PageNavigation({ deletePage, isFavorites, rootPageIds, onClick }: PageN
     }
   }
 
-  const addPage = useCallback((page: Partial<Page>) => {
-    if (space && user) {
-      const newPage: NewPageInput = {
-        ...page,
-        createdBy: user.id,
-        spaceId: space.id
-      };
-      return addPageAndRedirect(newPage, router);
-    }
-  }, []);
+  const addPage = useCallback(
+    (page: Partial<Page>) => {
+      if (space && user) {
+        const newPage: NewPageInput = {
+          ...page,
+          createdBy: user.id,
+          spaceId: space.id
+        };
+        return addPageAndRedirect(newPage, router);
+      }
+    },
+    [space?.id, user?.id]
+  );
 
   return (
     <StyledTreeRoot

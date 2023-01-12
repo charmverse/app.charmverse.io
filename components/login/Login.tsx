@@ -8,13 +8,14 @@ import { useState } from 'react';
 import { WalletSelector } from 'components/_app/Web3ConnectionManager/components/WalletSelectorModal';
 import { ConnectorButton } from 'components/_app/Web3ConnectionManager/components/WalletSelectorModal/components/ConnectorButton';
 import Button from 'components/common/Button';
+import { useFirebaseAuth } from 'hooks/useFirebaseAuth';
 import { useSnackbar } from 'hooks/useSnackbar';
-import { useUser } from 'hooks/useUser';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import type { AuthSig } from 'lib/blockchain/interfaces';
+import type { SystemError } from 'lib/utilities/errors';
 import type { LoggedInUser } from 'models/User';
 
-import { useGoogleAuth } from './hooks/useGoogleAuth';
+import { LoginErrorModal } from './LoginErrorModal';
 import { WalletSign } from './WalletSign';
 
 export type AnyIdLogin<I extends IdentityType = IdentityType> = {
@@ -22,9 +23,7 @@ export type AnyIdLogin<I extends IdentityType = IdentityType> = {
   user: LoggedInUser;
   displayName: string;
 };
-export type AnyIdFunction<I extends IdentityType = IdentityType> = () => Promise<AnyIdLogin<I>>;
 
-export type AnyIdPostLoginHandler<I extends IdentityType = IdentityType> = (loginInfo: AnyIdLogin<I>) => any;
 export interface DialogProps {
   open: boolean;
   selectedValue: string;
@@ -33,11 +32,13 @@ export interface DialogProps {
 
 function LoginHandler(props: DialogProps) {
   const { onClose, selectedValue, open } = props;
-  const { loginFromWeb3Account } = useUser();
+  const { loginFromWeb3Account } = useWeb3AuthSig();
+
+  const [showLoginError, setShowLoginError] = useState(false);
 
   const { showMessage } = useSnackbar();
 
-  const { loginWithGoogle } = useGoogleAuth();
+  const { loginWithGoogle } = useFirebaseAuth();
   const { verifiableWalletDetected } = useWeb3AuthSig();
   async function handleLogin(loggedInUser: AnyIdLogin) {
     showMessage(`Logged in with ${loggedInUser?.identityType}. Redirecting you now`, 'success');
@@ -49,17 +50,31 @@ function LoginHandler(props: DialogProps) {
   };
 
   async function handleGoogleLogin() {
-    const googleLoginResult = await loginWithGoogle();
-    handleLogin(googleLoginResult);
+    try {
+      const googleLoginResult = await loginWithGoogle();
+      handleLogin(googleLoginResult);
+    } catch (err) {
+      handleLoginError(err);
+    }
   }
 
   async function handleWeb3Login(authSig: AuthSig) {
-    const user = await loginFromWeb3Account(authSig);
-    handleLogin({
-      identityType: 'Wallet',
-      displayName: authSig.address,
-      user
-    });
+    try {
+      const user = await loginFromWeb3Account(authSig);
+      handleLogin({
+        identityType: 'Wallet',
+        displayName: authSig.address,
+        user
+      });
+    } catch (err) {
+      handleLoginError(err);
+    }
+  }
+
+  function handleLoginError(err: any) {
+    if ((err as SystemError)?.errorType === 'Disabled account') {
+      setShowLoginError(true);
+    }
   }
 
   return (
@@ -69,9 +84,7 @@ function LoginHandler(props: DialogProps) {
 
         {/** Web 3 login methods */}
         <ListItem>
-          <WalletSelector loginSuccess={handleLogin} />
-
-          {/* <WalletSign signSuccess={handleWalletSign} /> */}
+          <WalletSelector loginSuccess={handleLogin} onError={handleLoginError} />
         </ListItem>
         {verifiableWalletDetected && (
           <ListItem>
@@ -95,12 +108,15 @@ function LoginHandler(props: DialogProps) {
           />
         </ListItem>
       </List>
+      <LoginErrorModal open={showLoginError} onClose={() => setShowLoginError(false)} />
     </Dialog>
   );
 }
 
 export function Login() {
   const [open, setOpen] = useState(false);
+  const { resetSigning } = useWeb3AuthSig();
+
   const [selectedValue, setSelectedValue] = useState('');
 
   const handleClickOpen = () => {
@@ -110,6 +126,7 @@ export function Login() {
   const handleClose = (value: string) => {
     setOpen(false);
     setSelectedValue(value);
+    resetSigning();
   };
 
   return (

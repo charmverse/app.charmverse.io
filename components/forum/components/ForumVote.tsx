@@ -1,19 +1,12 @@
 import { useTheme } from '@emotion/react';
-import NorthIcon from '@mui/icons-material/North';
-import SouthIcon from '@mui/icons-material/South';
 import { IconButton, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import type { MouseEvent } from 'react';
+import { ImArrowUp, ImArrowDown } from 'react-icons/im';
 
 import type { ForumVotes } from 'lib/forums/posts/interfaces';
 
-export function ForumContentUpDownVotes({
-  votes,
-  onVote
-}: {
-  votes: ForumVotes;
-  onVote: (upvoted: boolean | null) => void;
-}) {
+export function ForumVote({ votes, onVote }: { votes: ForumVotes; onVote: (upvoted: boolean | null) => void }) {
   const theme = useTheme();
   const { downvotes, upvotes, upvoted } = votes;
 
@@ -27,6 +20,19 @@ export function ForumContentUpDownVotes({
     }
   }
 
+  function getStyle(activeColor: string | null) {
+    if (activeColor) {
+      return { fill: activeColor, fontSize: 16 };
+    } else {
+      return {
+        fontSize: 16,
+        fill: 'none',
+        stroke: 'var(--primary-text)',
+        strokeWidth: '1px'
+      };
+    }
+  }
+
   return (
     <Box display='flex' alignItems='center' gap={0.5}>
       <IconButton
@@ -35,12 +41,7 @@ export function ForumContentUpDownVotes({
           clickVote(e, true);
         }}
       >
-        <NorthIcon
-          sx={{
-            fill: upvoted === true ? theme.palette.success.main : '',
-            fontSize: 16
-          }}
-        />
+        <ImArrowUp style={getStyle(upvoted === true ? theme.palette.success.main : null)} />
       </IconButton>
       <Box minWidth={14}>
         <Typography align='center' variant='body2'>
@@ -53,12 +54,7 @@ export function ForumContentUpDownVotes({
           clickVote(e, false);
         }}
       >
-        <SouthIcon
-          sx={{
-            fill: upvoted === false ? theme.palette.error.main : '',
-            fontSize: 16
-          }}
-        />
+        <ImArrowDown style={getStyle(upvoted === false ? 'var(--text-red)' : null)} />
       </IconButton>
     </Box>
   );

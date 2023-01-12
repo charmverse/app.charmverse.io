@@ -17,7 +17,7 @@ type Props = {
   fullWidth?: boolean;
 };
 
-const Dialog = React.memo((props: Props) => {
+function FBDialog(props: Props) {
   const { toolbar, toolsMenu, fullWidth = false } = props;
   const intl = useIntl();
 
@@ -58,6 +58,6 @@ const Dialog = React.memo((props: Props) => {
       </div>
     </Modal>
   );
-});
+}
 
-export default Dialog;
+export default React.memo(FBDialog);

@@ -21,9 +21,9 @@ import { DiscordApi } from 'charmClient/apis/discordApi';
 import { MuxApi } from 'charmClient/apis/muxApi';
 import { PagesApi } from 'charmClient/apis/pagesApi';
 import { TrackApi } from 'charmClient/apis/trackApi';
-import type { Block as FBBlock, BlockPatch } from 'components/common/BoardEditor/focalboard/src/blocks/block';
 import type { IUser } from 'components/common/BoardEditor/focalboard/src/user';
 import type { AuthSig, ExtendedPoap } from 'lib/blockchain/interfaces';
+import type { Block as FBBlock, BlockPatch } from 'lib/focalboard/block';
 import type { Member } from 'lib/members/interfaces';
 import type { Web3LoginRequest } from 'lib/middleware/requireWalletSignature';
 import type { FailedImportsError } from 'lib/notion/types';
@@ -65,10 +65,13 @@ import { CollablandApi } from './apis/collablandApi';
 import { CommentsApi } from './apis/commentsApi';
 import { FileApi } from './apis/fileApi';
 import { ForumApi } from './apis/forumApi';
+import { GoogleApi } from './apis/googleApi';
+import { IframelyApi } from './apis/iframelyApi';
 import { MembersApi } from './apis/membersApi';
 import { ProfileApi } from './apis/profileApi';
 import { ProposalsApi } from './apis/proposalsApi';
 import { TasksApi } from './apis/tasksApi';
+import { UnstoppableDomainsApi } from './apis/unstoppableApi';
 import { VotesApi } from './apis/votesApi';
 
 type BlockUpdater = (blocks: FBBlock[]) => void;
@@ -77,8 +80,6 @@ type BlockUpdater = (blocks: FBBlock[]) => void;
 // CharmClient is the client interface to the server APIs
 //
 class CharmClient {
-  members = new MembersApi();
-
   blockchain = new BlockchainApi();
 
   bounties = new BountiesApi();
@@ -87,25 +88,33 @@ class CharmClient {
 
   comments = new CommentsApi();
 
-  votes = new VotesApi();
+  discord = new DiscordApi();
+
+  file = new FileApi();
+
+  forum = new ForumApi();
+
+  google = new GoogleApi();
+
+  iframely = new IframelyApi();
+
+  members = new MembersApi();
+
+  mux = new MuxApi();
+
+  pages = new PagesApi();
 
   profile = new ProfileApi();
 
   proposals = new ProposalsApi();
 
-  pages = new PagesApi();
-
   tasks = new TasksApi();
 
   track = new TrackApi();
 
-  discord = new DiscordApi();
+  unstoppableDomains = new UnstoppableDomainsApi();
 
-  forum = new ForumApi();
-
-  mux = new MuxApi();
-
-  file = new FileApi();
+  votes = new VotesApi();
 
   async socket() {
     return http.GET<SocketAuthReponse>('/api/socket');

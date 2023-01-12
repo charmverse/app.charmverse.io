@@ -37,7 +37,7 @@ export function apply(log: Logger, logPrefix: string = '') {
         originalMethod.apply(null, args);
 
         // post errors to Discord
-        if (methodName === 'error' && ERRORS_WEBHOOK) {
+        if (isProdEnv && methodName === 'error' && ERRORS_WEBHOOK) {
           sendErrorToDiscord(ERRORS_WEBHOOK, message, opt).catch((err) => {
             // eslint-disable-next-line no-console
             console.error('Error posting to discord', err);

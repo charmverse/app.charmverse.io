@@ -1,41 +1,62 @@
-import { prisma } from 'db';
-import { DataNotFoundError } from 'lib/utilities/errors';
+import type { PostCommentUpDownVote } from '@prisma/client';
 
-import { getComment } from '../comments/getComment';
+import { prisma } from 'db';
+import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
+
+type CommentVote = {
+  commentId: string;
+  postId: string;
+  userId: string;
+  upvoted: boolean | null;
+};
 
 export async function voteForumComment({
   upvoted,
   userId,
   commentId,
-  pageId
-}: {
-  commentId: string;
-  pageId: string;
-  userId: string;
-  upvoted: boolean | null;
-}) {
-  const comment = await getComment(commentId);
-
-  if (!comment) {
-    throw new DataNotFoundError(commentId);
-  }
-
+  postId
+}: CommentVote): Promise<PostCommentUpDownVote | null> {
   if (upvoted === null) {
-    await prisma.pageCommentUpDownVote.delete({
-      where: {
-        createdBy_commentId: {
-          createdBy: userId,
-          commentId
+    try {
+      await prisma.postCommentUpDownVote.delete({
+        where: {
+          createdBy_commentId: {
+            createdBy: userId,
+            commentId
+          }
         }
+      });
+    } catch (error) {
+      // Comment not found
+    }
+
+    return null;
+  } else {
+    const post = await prisma.post.findUnique({
+      where: { id: postId },
+      include: {
+        category: true
       }
     });
-  } else {
-    await prisma.pageCommentUpDownVote.upsert({
+
+    const category = post?.category;
+
+    if (category) {
+      trackUserAction(upvoted ? 'upvote_comment' : 'downvote_comment', {
+        resourceId: commentId,
+        spaceId: post.spaceId,
+        userId,
+        categoryName: category.name,
+        postId: post.id
+      });
+    }
+
+    const commentVote = await prisma.postCommentUpDownVote.upsert({
       create: {
         createdBy: userId,
         upvoted,
         commentId,
-        pageId
+        postId
       },
       update: {
         upvoted
@@ -47,5 +68,7 @@ export async function voteForumComment({
         }
       }
     });
+
+    return commentVote;
   }
 }

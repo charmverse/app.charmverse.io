@@ -1,12 +1,13 @@
-import React, { useEffect, useRef, useState, useMemo, memo } from 'react';
+import React, { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 
-import PageIcon from 'components/common/PageLayout/components/PageIcon';
+import { filterPropertyTemplates } from 'components/common/BoardEditor/utils/updateVisibilePropertyIds';
+import { PageIcon } from 'components/common/PageLayout/components/PageIcon';
+import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
+import type { BoardView } from 'lib/focalboard/boardView';
+import type { Card } from 'lib/focalboard/card';
 import { isTouchScreen } from 'lib/utilities/browser';
 
-import type { Board, IPropertyTemplate } from '../../blocks/board';
-import type { BoardView } from '../../blocks/boardView';
-import type { Card } from '../../blocks/card';
 import { Constants } from '../../constants';
 import { useSortable } from '../../hooks/sortable';
 import Button from '../../widgets/buttons/button';
@@ -80,13 +81,9 @@ function TableRow(props: Props) {
     setTitle(pageTitle);
   }, [pageTitle]);
 
-  const visiblePropertyTemplates = useMemo(
-    () =>
-      activeView.fields.visiblePropertyIds
-        .map((id) => board.fields.cardProperties.find((t) => t.id === id))
-        .filter((i) => i) as IPropertyTemplate[],
-    [board.fields.cardProperties, activeView.fields.visiblePropertyIds]
-  );
+  const visiblePropertyTemplates = useMemo(() => {
+    return filterPropertyTemplates(activeView.fields.visiblePropertyIds, board.fields.cardProperties);
+  }, [board.fields.cardProperties, activeView.fields.visiblePropertyIds]);
 
   let className = props.isSelected ? 'TableRow octo-table-row selected' : 'TableRow octo-table-row';
   if (isOver) {
@@ -107,44 +104,47 @@ function TableRow(props: Props) {
       ref={cardRef}
       style={{ opacity: isDragging ? 0.5 : 1 }}
     >
-      {/* Name / title */}
-      <div
-        className='octo-table-cell title-cell'
-        id='mainBoardHeader'
-        style={{
-          width: columnWidth(
-            props.resizingColumn,
-            props.activeView.fields.columnWidths,
-            props.offset,
-            Constants.titleColumnId
-          )
-        }}
-        ref={columnRefs.get(Constants.titleColumnId)}
-      >
-        <div className='octo-icontitle'>
-          <PageIcon isEditorEmpty={!hasContent} pageType='page' icon={pageIcon} />
-
-          <Editable
-            ref={titleRef}
-            value={title}
-            placeholderText='Untitled'
-            onChange={(newTitle: string) => setTitle(newTitle)}
-            onSave={(saveType) => saveTitle(saveType, card.id, title)}
-            onCancel={() => setTitle(card.title || '')}
-            readOnly={props.readOnly}
-            spellCheck={true}
-          />
-        </div>
-
-        <div className='open-button'>
-          <Button onClick={() => props.showCard(props.card.id || '')}>
-            <FormattedMessage id='TableRow.open' defaultMessage='Open' />
-          </Button>
-        </div>
-      </div>
-
       {/* Columns, one per property */}
       {visiblePropertyTemplates.map((template) => {
+        if (template.id === Constants.titleColumnId) {
+          return (
+            <div
+              className='octo-table-cell title-cell'
+              id='mainBoardHeader'
+              style={{
+                width: columnWidth(
+                  props.resizingColumn,
+                  props.activeView.fields.columnWidths,
+                  props.offset,
+                  Constants.titleColumnId
+                )
+              }}
+              ref={columnRefs.get(Constants.titleColumnId)}
+              key={template.id}
+            >
+              <div className='octo-icontitle'>
+                <PageIcon isEditorEmpty={!hasContent} pageType='page' icon={pageIcon} />
+
+                <Editable
+                  ref={titleRef}
+                  value={title}
+                  placeholderText='Untitled'
+                  onChange={(newTitle: string) => setTitle(newTitle)}
+                  onSave={(saveType) => saveTitle(saveType, card.id, title)}
+                  onCancel={() => setTitle(card.title || '')}
+                  readOnly={props.readOnly}
+                  spellCheck={true}
+                />
+              </div>
+
+              <div className='open-button'>
+                <Button onClick={() => props.showCard(props.card.id || '')}>
+                  <FormattedMessage id='TableRow.open' defaultMessage='Open' />
+                </Button>
+              </div>
+            </div>
+          );
+        }
         return (
           <div
             className='octo-table-cell'

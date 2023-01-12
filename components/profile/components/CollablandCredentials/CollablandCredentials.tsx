@@ -1,5 +1,5 @@
 import { Box, Stack, Typography } from '@mui/material';
-import Image from 'next/image';
+import Image from 'next/legacy/image';
 
 import Button from 'components/common/Button';
 import Link from 'components/common/Link';

@@ -1,19 +1,20 @@
 /* eslint-disable default-param-last */
 import charmClient from 'charmClient';
+import type { Block, BlockPatch } from 'lib/focalboard/block';
+import { createPatchesFromBlocks } from 'lib/focalboard/block';
+import type { Board, IPropertyOption, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
+import { createBoard } from 'lib/focalboard/board';
+import type { BoardView, ISortOption, KanbanCalculationFields } from 'lib/focalboard/boardView';
+import { createBoardView } from 'lib/focalboard/boardView';
+import type { Card } from 'lib/focalboard/card';
+import { createCard } from 'lib/focalboard/card';
+import type { FilterGroup } from 'lib/focalboard/filterGroup';
 import type { PageMeta } from 'lib/pages';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import { publishIncrementalUpdate } from '../../publisher';
 
-import type { Block, BlockPatch } from './blocks/block';
-import { createPatchesFromBlocks } from './blocks/block';
-import type { Board, IPropertyOption, IPropertyTemplate, PropertyType } from './blocks/board';
-import { createBoard } from './blocks/board';
-import type { BoardView, ISortOption, KanbanCalculationFields } from './blocks/boardView';
-import { createBoardView } from './blocks/boardView';
-import type { Card } from './blocks/card';
-import { createCard } from './blocks/card';
-import type { FilterGroup } from './blocks/filterGroup';
+import { Constants } from './constants';
 import octoClient, { OctoClient } from './octoClient';
 import { OctoUtils } from './octoUtils';
 import undoManager from './undomanager';
@@ -570,12 +571,21 @@ class Mutator {
     newType: PropertyType,
     newName: string
   ) {
+    const titleProperty: IPropertyTemplate = { id: Constants.titleColumnId, name: 'Title', type: 'text', options: [] };
     if (propertyTemplate.type === newType && propertyTemplate.name === newName) {
       return;
     }
-
     const newBoard = createBoard({ block: board });
-    const newTemplate = newBoard.fields.cardProperties.find((o: IPropertyTemplate) => o.id === propertyTemplate.id)!;
+    const cardProperty = newBoard.fields.cardProperties.find((o: IPropertyTemplate) => o.id === propertyTemplate.id);
+    const newTemplate = propertyTemplate.id === Constants.titleColumnId ? cardProperty || titleProperty : cardProperty;
+
+    if (!newTemplate) {
+      return;
+    }
+
+    if (!cardProperty && propertyTemplate.id === Constants.titleColumnId) {
+      newBoard.fields.cardProperties = [newTemplate, ...newBoard.fields.cardProperties];
+    }
 
     if (propertyTemplate.type !== newType) {
       newTemplate.options = [];
@@ -717,12 +727,13 @@ class Mutator {
   }
 
   async changeViewVisiblePropertiesOrder(
-    view: BoardView,
+    viewId: string,
+    visiblePropertyIds: string[],
     template: IPropertyTemplate,
     destIndex: number,
     description = 'change property order'
   ): Promise<void> {
-    const oldVisiblePropertyIds = view.fields.visiblePropertyIds;
+    const oldVisiblePropertyIds = visiblePropertyIds;
     const newOrder = oldVisiblePropertyIds.slice();
 
     const srcIndex = oldVisiblePropertyIds.indexOf(template.id);
@@ -733,14 +744,14 @@ class Mutator {
     await undoManager.perform(
       async () => {
         await charmClient.patchBlock(
-          view.id,
+          viewId,
           { updatedFields: { visiblePropertyIds: newOrder } },
           publishIncrementalUpdate
         );
       },
       async () => {
         await charmClient.patchBlock(
-          view.id,
+          viewId,
           { updatedFields: { visiblePropertyIds: oldVisiblePropertyIds } },
           publishIncrementalUpdate
         );

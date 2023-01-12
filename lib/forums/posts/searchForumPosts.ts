@@ -1,10 +1,9 @@
 import type { Prisma } from '@prisma/client';
 
 import { prisma } from 'db';
-import { isTruthy } from 'lib/utilities/types';
 
 import { defaultPostsPerResult } from './constants';
-import type { PageWithRelations } from './getPostMeta';
+import type { PostWithRelations } from './getPostMeta';
 import { getPostMeta } from './getPostMeta';
 import type { PaginatedPostList } from './listForumPosts';
 
@@ -34,18 +33,15 @@ export async function searchForumPosts(
   page = Math.abs(page);
   const toSkip = Math.max(page, page - 1) * count;
 
-  const orderQuery: Prisma.PageFindManyArgs = {
+  const orderQuery: Prisma.PostFindManyArgs = {
     // Return posts ordered from most recent to oldest
     orderBy: {
       createdAt: 'desc'
     }
   };
 
-  const whereQuery: Prisma.PageWhereInput = {
-    type: 'post',
-    post: {
-      categoryId
-    },
+  const whereQuery: Prisma.PostWhereInput = {
+    categoryId,
     spaceId,
     deletedAt: null,
     OR: [
@@ -64,7 +60,7 @@ export async function searchForumPosts(
     ]
   };
 
-  const pages = await prisma.page.findMany({
+  const posts = await prisma.post.findMany({
     ...orderQuery,
     take: count,
     skip: toSkip,
@@ -75,49 +71,43 @@ export async function searchForumPosts(
           upvoted: true,
           createdBy: true
         }
-      },
-      post: true
+      }
     }
   });
 
   let hasNext = false;
-  if (pages.length > 0) {
-    const nextPages = await prisma.page.findMany({
+  if (posts.length > 0) {
+    const nextPosts = await prisma.post.findMany({
       ...orderQuery,
       skip: toSkip + count,
       take: 1,
       where: whereQuery
     });
-    if (nextPages.length > 0) {
+    if (nextPosts.length > 0) {
       hasNext = true;
     }
   }
 
-  const comments = await prisma.pageComment.groupBy({
+  const comments = await prisma.postComment.groupBy({
     _count: {
       _all: true
     },
-    by: ['pageId'],
+    by: ['postId'],
     where: {
-      pageId: {
-        in: pages.map((_page) => _page.id)
+      postId: {
+        in: posts.map((_post) => _post.id)
       }
     }
   });
 
-  const data = pages
-    .map((_page) => {
-      if (_page.post) {
-        const comment = comments.find((_comment) => _comment.pageId === _page.id);
-        const postMeta = getPostMeta({ page: _page as PageWithRelations, userId });
-        return {
-          ...postMeta,
-          totalComments: comment?._count._all ?? 0
-        };
-      }
-      return null;
-    })
-    .filter(isTruthy);
+  const data = posts.map((_post) => {
+    const comment = comments.find((_comment) => _comment.postId === _post.id);
+    const postMeta = getPostMeta({ post: _post as PostWithRelations, userId });
+    return {
+      ...postMeta,
+      totalComments: comment?._count._all ?? 0
+    };
+  });
 
   const response: PaginatedPostList = {
     data,

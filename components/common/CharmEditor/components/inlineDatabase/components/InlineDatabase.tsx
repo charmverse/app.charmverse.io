@@ -6,15 +6,9 @@ import { useRouter } from 'next/router';
 import { useCallback, useMemo, useState, useEffect } from 'react';
 
 import CardDialog from 'components/common/BoardEditor/focalboard/src/components/cardDialog';
-import RootPortal from 'components/common/BoardEditor/focalboard/src/components/rootPortal';
 import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
-import {
-  getCurrentViewDisplayBy,
-  getCurrentViewGroupBy,
-  getSortedViews,
-  getView
-} from 'components/common/BoardEditor/focalboard/src/store/views';
+import { getSortedViews, getView } from 'components/common/BoardEditor/focalboard/src/store/views';
 import FocalBoardPortal from 'components/common/BoardEditor/FocalBoardPortal';
 import { usePages } from 'hooks/usePages';
 import debouncePromise from 'lib/utilities/debouncePromise';
@@ -107,8 +101,6 @@ export default function DatabaseView({ containerWidth, readOnly: readOnlyOverrid
   const [currentViewId, setCurrentViewId] = useState<string | null>(views[0]?.id || null);
   const currentView = useAppSelector(getView(currentViewId || '')) ?? undefined;
 
-  const groupByProperty = useAppSelector(getCurrentViewGroupBy);
-  const dateDisplayProperty = useAppSelector(getCurrentViewDisplayBy);
   const { pages, updatePage, getPagePermissions } = usePages();
 
   const [shownCardId, setShownCardId] = useState<string | null>(null);
@@ -134,6 +126,8 @@ export default function DatabaseView({ containerWidth, readOnly: readOnlyOverrid
   const readOnly =
     typeof readOnlyOverride === 'undefined' ? currentPagePermissions.edit_content !== true : readOnlyOverride;
 
+  const readOnlySourceData = currentView?.fields?.sourceType === 'google_form'; // blocks that are synced cannot be edited
+
   useEffect(() => {
     if (views.length > 0 && !currentViewId) {
       setCurrentViewId(views[0].id);
@@ -142,16 +136,6 @@ export default function DatabaseView({ containerWidth, readOnly: readOnlyOverrid
 
   if (!board) {
     return null;
-  }
-
-  let property = groupByProperty;
-  if ((!property || property.type !== 'select') && currentView?.fields.viewType === 'board') {
-    property = board.fields.cardProperties.find((o: any) => o.type === 'select');
-  }
-
-  let displayProperty = dateDisplayProperty;
-  if (!displayProperty && currentView?.fields.viewType === 'calendar') {
-    displayProperty = board.fields.cardProperties.find((o: any) => o.type === 'date');
   }
 
   const deleteView = useCallback(
@@ -170,12 +154,12 @@ export default function DatabaseView({ containerWidth, readOnly: readOnlyOverrid
         onKeyDown={stopPropagation}
       >
         <CenterPanel
-          // @ts-ignore types are wrong for some reason (disableUpdatingUrl should be a prop)
           disableUpdatingUrl
-          onViewTabClick={setCurrentViewId}
+          showView={setCurrentViewId}
           onDeleteView={deleteView}
           hideBanner
           readOnly={readOnly}
+          readOnlySourceData={readOnlySourceData}
           board={board}
           embeddedBoardPath={pages[pageId]?.path}
           setPage={debouncedPageUpdate}
@@ -187,9 +171,7 @@ export default function DatabaseView({ containerWidth, readOnly: readOnlyOverrid
         />
       </StylesContainer>
       {typeof shownCardId === 'string' && shownCardId.length !== 0 && (
-        <RootPortal>
-          <CardDialog key={shownCardId} cardId={shownCardId} onClose={() => setShownCardId(null)} readOnly={readOnly} />
-        </RootPortal>
+        <CardDialog key={shownCardId} cardId={shownCardId} onClose={() => setShownCardId(null)} readOnly={readOnly} />
       )}
       <FocalBoardPortal />
     </>

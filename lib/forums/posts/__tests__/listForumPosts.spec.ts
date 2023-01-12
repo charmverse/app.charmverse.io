@@ -1,17 +1,16 @@
-import type { Space, User } from '@prisma/client';
+import type { Post, Space, User } from '@prisma/client';
 
 import { createPostCategory } from 'lib/forums/categories/createPostCategory';
 import { generateForumPosts } from 'testing/forums';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 import { defaultPostsPerResult } from '../constants';
-import type { ForumPostPage } from '../interfaces';
 import { listForumPosts } from '../listForumPosts';
 import { voteForumPost } from '../voteForumPost';
 
 let space: Space;
 let user: User;
-let spacePosts: ForumPostPage[];
+let spacePosts: Post[];
 
 // Test a space with 16 forum posts
 beforeAll(async () => {
@@ -32,7 +31,7 @@ describe('listForumPosts', () => {
 
     expect(posts.data).toHaveLength(defaultPostsPerResult);
   });
-  it(`should return posts from all cateogories (including uncategorised) if no category is provided`, async () => {
+  it(`should return posts from all categories if no category is provided`, async () => {
     const { space: extraSpace, user: extraUser } = await generateUserAndSpaceWithApiToken();
 
     const category = await createPostCategory({
@@ -191,19 +190,19 @@ describe('listForumPosts', () => {
     const mostVotedPageId = forumPosts[2].id;
 
     await voteForumPost({
-      pageId: secondMostVotedPageId,
+      postId: secondMostVotedPageId,
       userId: extraUser.id,
       upvoted: true
     });
 
     await voteForumPost({
-      pageId: mostVotedPageId,
+      postId: mostVotedPageId,
       userId: extraUser.id,
       upvoted: true
     });
 
     await voteForumPost({
-      pageId: mostVotedPageId,
+      postId: mostVotedPageId,
       userId: secondExtraUser.id,
       upvoted: true
     });

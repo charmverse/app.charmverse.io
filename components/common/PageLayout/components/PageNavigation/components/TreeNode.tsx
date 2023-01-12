@@ -111,7 +111,7 @@ function DraggableTreeNode({
   );
 
   const focusListener = useCallback(
-    (elt) => {
+    (elt: any) => {
       elt?.addEventListener('focusin', (e: any) => {
         // Disable Treeview focus system which make draggable on TreeIten unusable
         // see https://github.com/mui-org/material-ui/issues/29518

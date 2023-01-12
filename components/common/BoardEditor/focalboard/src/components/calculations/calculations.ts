@@ -1,8 +1,9 @@
 import { Duration } from 'luxon';
 import type { IntlShape } from 'react-intl';
 
-import type { IPropertyTemplate } from '../../blocks/board';
-import type { Card } from '../../blocks/card';
+import type { IPropertyTemplate } from 'lib/focalboard/board';
+import type { Card } from 'lib/focalboard/card';
+
 import { Constants } from '../../constants';
 import { Utils } from '../../utils';
 import type { DateProperty } from '../properties/dateRange/dateRange';

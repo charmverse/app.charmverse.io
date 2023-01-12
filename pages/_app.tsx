@@ -1,5 +1,5 @@
 import createCache from '@emotion/cache';
-import { CacheProvider, Global } from '@emotion/react'; // create a cache so we dont conflict with emotion from react-windowed-select
+import { CacheProvider, Global } from '@emotion/react';
 import type { ExternalProvider, JsonRpcFetchFunc } from '@ethersproject/providers';
 import { Web3Provider } from '@ethersproject/providers';
 import RefreshIcon from '@mui/icons-material/Refresh';
@@ -57,9 +57,6 @@ import '@skiff-org/prosemirror-tables/style/tables.css';
 import 'prosemirror-menu/style/menu.css';
 import 'theme/@bangle.dev/styles.scss';
 import 'theme/prosemirror-tables/prosemirror-tables.scss';
-// fullcalendar css
-import '@fullcalendar/common/main.css';
-import '@fullcalendar/daygrid/main.css';
 // init focalboard
 import 'components/common/BoardEditor/focalboard/src/components/blockIconSelector.scss';
 import 'components/common/BoardEditor/focalboard/src/components/calculations/calculation.scss';
@@ -144,6 +141,11 @@ type AppPropsWithLayout = AppProps & {
   Component: NextPageWithLayout;
 };
 
+// set up styles in Next.js for MUI based on https://github.com/mui-org/material-ui/blob/next/examples/nextjs-with-typescript/pages/_document.tsx
+// Set up MUI xample: https://github.com/mui/material-ui/blob/master/examples/nextjs/pages/_document.js
+// See also https://github.com/emotion-js/emotion/issues/1061 for why we need a cache provider to avoid duplicate style tags
+const emotionCache = createCache({ key: 'mui-style' });
+
 export default function App({ Component, pageProps }: AppPropsWithLayout) {
   const getLayout = Component.getLayout ?? ((page) => page);
   const router = useRouter();
@@ -214,48 +216,42 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
 
   // DO NOT REMOVE CacheProvider - it protects MUI from Tailwind CSS in settings
   return (
-    <CacheProvider value={createCache({ key: 'app' })}>
+    <CacheProvider value={emotionCache}>
       <ColorModeContext.Provider value={colorModeContext}>
         <ThemeProvider theme={theme}>
           <LocalizationProvider dateAdapter={AdapterLuxon as any}>
             <SnackbarProvider>
-              <Web3ReactProvider getLibrary={getLibrary}>
-                <Web3ConnectionManager>
-                  <Web3AccountProvider>
-                    <ReactDndProvider>
-                      <DataProviders>
-                        <OnboardingProvider>
-                          <FocalBoardProvider>
-                            <IntlProvider>
-                              <PageMetaTags />
-                              <CssBaseline enableColorScheme={true} />
-                              <Global styles={cssVariables} />
-                              <RouteGuard>
-                                <ErrorBoundary>
-                                  <Snackbar
-                                    isOpen={isOldBuild}
-                                    message='New CharmVerse platform update available. Please refresh.'
-                                    actions={[
-                                      <IconButton key='reload' onClick={() => window.location.reload()} color='inherit'>
-                                        <RefreshIcon fontSize='small' />
-                                      </IconButton>
-                                    ]}
-                                    origin={{ vertical: 'top', horizontal: 'center' }}
-                                    severity='warning'
-                                    handleClose={() => setIsOldBuild(false)}
-                                  />
-                                  {getLayout(<Component {...pageProps} />)}
-                                  <GlobalComponents />
-                                </ErrorBoundary>
-                              </RouteGuard>
-                            </IntlProvider>
-                          </FocalBoardProvider>
-                        </OnboardingProvider>
-                      </DataProviders>
-                    </ReactDndProvider>
-                  </Web3AccountProvider>
-                </Web3ConnectionManager>
-              </Web3ReactProvider>
+              <ReactDndProvider>
+                <DataProviders>
+                  <OnboardingProvider>
+                    <FocalBoardProvider>
+                      <IntlProvider>
+                        <PageHead />
+                        <CssBaseline enableColorScheme={true} />
+                        <Global styles={cssVariables} />
+                        <RouteGuard>
+                          <ErrorBoundary>
+                            <Snackbar
+                              isOpen={isOldBuild}
+                              message='New CharmVerse platform update available. Please refresh.'
+                              actions={[
+                                <IconButton key='reload' onClick={() => window.location.reload()} color='inherit'>
+                                  <RefreshIcon fontSize='small' />
+                                </IconButton>
+                              ]}
+                              origin={{ vertical: 'top', horizontal: 'center' }}
+                              severity='warning'
+                              handleClose={() => setIsOldBuild(false)}
+                            />
+                            {getLayout(<Component {...pageProps} />)}
+                            <GlobalComponents />
+                          </ErrorBoundary>
+                        </RouteGuard>
+                      </IntlProvider>
+                    </FocalBoardProvider>
+                  </OnboardingProvider>
+                </DataProviders>
+              </ReactDndProvider>
             </SnackbarProvider>
           </LocalizationProvider>
         </ThemeProvider>
@@ -267,26 +263,32 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
 function DataProviders({ children }: { children: ReactNode }) {
   return (
     <UserProvider>
-      <SpacesProvider>
-        <WebSocketClientProvider>
-          <MembersProvider>
-            <BountiesProvider>
-              <PaymentMethodsProvider>
-                <PagesProvider>
-                  <PrimaryCharmEditorProvider>
-                    <PageTitleProvider>{children}</PageTitleProvider>
-                  </PrimaryCharmEditorProvider>
-                </PagesProvider>
-              </PaymentMethodsProvider>
-            </BountiesProvider>
-          </MembersProvider>
-        </WebSocketClientProvider>
-      </SpacesProvider>
+      <Web3ReactProvider getLibrary={getLibrary}>
+        <Web3ConnectionManager>
+          <Web3AccountProvider>
+            <SpacesProvider>
+              <WebSocketClientProvider>
+                <MembersProvider>
+                  <BountiesProvider>
+                    <PaymentMethodsProvider>
+                      <PagesProvider>
+                        <PrimaryCharmEditorProvider>
+                          <PageTitleProvider>{children}</PageTitleProvider>
+                        </PrimaryCharmEditorProvider>
+                      </PagesProvider>
+                    </PaymentMethodsProvider>
+                  </BountiesProvider>
+                </MembersProvider>
+              </WebSocketClientProvider>
+            </SpacesProvider>
+          </Web3AccountProvider>
+        </Web3ConnectionManager>
+      </Web3ReactProvider>
     </UserProvider>
   );
 }
 
-function PageMetaTags() {
+function PageHead() {
   const [title] = usePageTitle();
   const prefix = isDevEnv ? 'DEV | ' : '';
 

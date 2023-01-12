@@ -1,12 +1,13 @@
 import AddIcon from '@mui/icons-material/Add';
-import IconButton from '@mui/material/IconButton';
 import React, { useCallback, useMemo } from 'react';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { useIntl } from 'react-intl';
 
-import type { IPropertyTemplate, Board } from '../../blocks/board';
-import type { BoardView, ISortOption } from '../../blocks/boardView';
-import { createBoardView } from '../../blocks/boardView';
-import type { Card } from '../../blocks/card';
+import type { IPropertyTemplate, Board } from 'lib/focalboard/board';
+import type { BoardView, ISortOption } from 'lib/focalboard/boardView';
+import { createBoardView } from 'lib/focalboard/boardView';
+import type { Card } from 'lib/focalboard/card';
+
+import { filterPropertyTemplates } from '../../../../utils/updateVisibilePropertyIds';
 import { Constants } from '../../constants';
 import mutator from '../../mutator';
 import { OctoUtils } from '../../octoUtils';
@@ -14,7 +15,7 @@ import { IDType, Utils } from '../../utils';
 import Button from '../../widgets/buttons/button';
 import Menu from '../../widgets/menu';
 import MenuWrapper from '../../widgets/menuWrapper';
-import PropertyMenu, { PropertyTypes, typeDisplayName } from '../../widgets/propertyMenu';
+import { PropertyTypes, typeDisplayName } from '../../widgets/propertyMenu';
 
 import TableHeader from './tableHeader';
 
@@ -24,6 +25,7 @@ type Props = {
   activeView: BoardView;
   views: BoardView[];
   readOnly: boolean;
+  readOnlySourceData: boolean;
   resizingColumn: string;
   offset: number;
   columnRefs: Map<string, React.RefObject<HTMLDivElement>>;
@@ -32,7 +34,6 @@ type Props = {
 function TableHeaders(props: Props): JSX.Element {
   const { board, cards, activeView, resizingColumn, views, offset, columnRefs } = props;
   const intl = useIntl();
-
   const onAutoSizeColumn = useCallback(
     (columnID: string, headerWidth: number) => {
       let longestSize = headerWidth;
@@ -119,19 +120,24 @@ function TableHeaders(props: Props): JSX.Element {
     [activeView, board, cards]
   );
 
-  const visiblePropertyTemplates = useMemo(
-    () =>
-      activeView.fields.visiblePropertyIds
-        .map((id) => board.fields.cardProperties.find((t) => t.id === id))
-        .filter((i) => i) as IPropertyTemplate[],
-    [board.fields.cardProperties, activeView.fields.visiblePropertyIds]
-  );
+  const visiblePropertyTemplates = useMemo(() => {
+    return filterPropertyTemplates(activeView.fields.visiblePropertyIds, board.fields.cardProperties);
+  }, [board.fields.cardProperties, activeView.fields.visiblePropertyIds]);
 
   const onDropToColumn = async (sourceProperty: IPropertyTemplate, destinationProperty: IPropertyTemplate) => {
     Utils.log(`ondrop. Source column: ${sourceProperty.name}, dest column: ${destinationProperty.name}`);
     // Move template to new index
-    const destIndex = destinationProperty ? activeView.fields.visiblePropertyIds.indexOf(destinationProperty.id) : 0;
-    await mutator.changeViewVisiblePropertiesOrder(activeView, sourceProperty, destIndex >= 0 ? destIndex : 0);
+    let visiblePropertyIds = activeView.fields.visiblePropertyIds;
+    visiblePropertyIds = visiblePropertyIds.includes(Constants.titleColumnId)
+      ? visiblePropertyIds
+      : [Constants.titleColumnId, ...visiblePropertyIds];
+    const destIndex = destinationProperty ? visiblePropertyIds.indexOf(destinationProperty.id) : 0;
+    await mutator.changeViewVisiblePropertiesOrder(
+      activeView.id,
+      visiblePropertyIds,
+      sourceProperty,
+      destIndex >= 0 ? destIndex : 0
+    );
   };
 
   const titleSortOption = activeView.fields.sortOptions?.find((o) => o.propertyId === Constants.titleColumnId);
@@ -142,22 +148,6 @@ function TableHeaders(props: Props): JSX.Element {
 
   return (
     <div className='octo-table-header TableHeaders' id='mainBoardHeader'>
-      <TableHeader
-        type='text'
-        name='Title'
-        sorted={titleSorted}
-        readOnly={props.readOnly}
-        board={board}
-        activeView={activeView}
-        cards={cards}
-        views={views}
-        template={{ id: Constants.titleColumnId, name: 'title', type: 'text', options: [] }}
-        offset={resizingColumn === Constants.titleColumnId ? offset : 0}
-        onDrop={onDropToColumn}
-        onAutoSizeColumn={onAutoSizeColumn}
-      />
-
-      {/* Table header row */}
       {visiblePropertyTemplates.map((template) => {
         let sorted: 'up' | 'down' | 'none' = 'none';
         const sortOption = activeView.fields.sortOptions.find((o: ISortOption) => o.propertyId === template.id);
@@ -170,6 +160,7 @@ function TableHeaders(props: Props): JSX.Element {
             name={template.name}
             sorted={sorted}
             readOnly={props.readOnly}
+            readOnlySourceData={props.readOnlySourceData}
             board={board}
             activeView={activeView}
             cards={cards}
@@ -184,7 +175,7 @@ function TableHeaders(props: Props): JSX.Element {
       })}
       {/* empty column for actions */}
       <div className='octo-table-cell header-cell' style={{ flexGrow: 1, borderRight: '0 none' }}>
-        {!props.readOnly && (
+        {!props.readOnly && !props.readOnlySourceData && (
           <MenuWrapper>
             <Button>
               <AddIcon fontSize='small' />

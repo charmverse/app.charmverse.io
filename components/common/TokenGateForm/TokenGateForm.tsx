@@ -37,8 +37,8 @@ export default function TokenGateForm({
   //  console.log('Renders', renders.current);
   const { showMessage } = useSnackbar();
   const { spaces, setSpaces } = useSpaces();
-  const { getStoredSignature } = useWeb3AuthSig();
-  const { refreshUserWithWeb3Account, loginFromWeb3Account, user } = useUser();
+  const { getStoredSignature, loginFromWeb3Account } = useWeb3AuthSig();
+  const { refreshUser, user } = useUser();
 
   const [tokenGates, setTokenGates] = useState<TokenGateWithRoles[] | null>(null);
 
@@ -127,7 +127,7 @@ export default function TokenGateForm({
 
       showMessage(`You have joined the ${tokenGateResult?.space.name} workspace.`, 'success');
 
-      await refreshUserWithWeb3Account();
+      await refreshUser();
 
       const spaceExists = spaces.some((s) => s.id === tokenGateResult?.space.id);
 

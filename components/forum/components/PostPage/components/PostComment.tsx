@@ -23,7 +23,7 @@ import type {
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { getRelativeTimeInThePast } from 'lib/utilities/dates';
 
-import { ForumContentUpDownVotes } from '../../ForumVote';
+import { ForumVote } from '../../ForumVote';
 
 import { CommentReplyForm } from './CommentReplyForm';
 
@@ -63,7 +63,7 @@ export function PostComment({
       commentId: comment.id,
       content: commentEditContent.doc,
       contentText: commentEditContent.rawText,
-      postId: comment.pageId
+      postId: comment.postId
     });
     setCommentContent(commentEditContent);
     setIsEditingComment(false);
@@ -89,7 +89,7 @@ export function PostComment({
 
   async function voteComment(newUpvotedStatus: boolean | null) {
     await charmClient.forum.upOrDownVoteComment({
-      postId: comment.pageId,
+      postId: comment.postId,
       commentId: comment.id,
       upvoted: newUpvotedStatus
     });
@@ -135,7 +135,7 @@ export function PostComment({
 
   async function onClickDeleteComment() {
     menuState.close();
-    await charmClient.forum.deletePostComment({ commentId: comment.id, postId: comment.pageId });
+    await charmClient.forum.deletePostComment({ commentId: comment.id, postId: comment.postId });
     setPostComments((comments) =>
       comments?.map((_comment) => (_comment.id === comment.id ? { ..._comment, deletedAt: new Date() } : _comment))
     );
@@ -218,7 +218,7 @@ export function PostComment({
           )}
           {!comment.deletedAt && (
             <Stack flexDirection='row' gap={1}>
-              <ForumContentUpDownVotes votes={comment} onVote={voteComment} />
+              <ForumVote votes={comment} onVote={voteComment} />
               <Typography
                 sx={{
                   cursor: 'pointer'
@@ -238,7 +238,7 @@ export function PostComment({
                 commentId={comment.id}
                 onCreateComment={onCreateComment}
                 onCancelComment={() => setShowCommentReply(false)}
-                postId={comment.pageId}
+                postId={comment.postId}
               />
             )}
           </Box>

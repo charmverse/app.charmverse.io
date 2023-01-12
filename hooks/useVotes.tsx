@@ -61,7 +61,8 @@ export function VotesProvider({ children }: { children: ReactNode }) {
         bounties: { marked: [], unmarked: [] },
         votes: [],
         discussions: { marked: [], unmarked: [] },
-        proposals: { marked: [], unmarked: [] }
+        proposals: { marked: [], unmarked: [] },
+        forum: { marked: [], unmarked: [] }
       };
       newVotes.forEach((newVote) => {
         if (!mutatedTasks.votes.find((vote) => vote.id === newVote.id)) {
@@ -86,7 +87,8 @@ export function VotesProvider({ children }: { children: ReactNode }) {
         bounties: { marked: [], unmarked: [] },
         votes: [],
         discussions: { marked: [], unmarked: [] },
-        proposals: { marked: [], unmarked: [] }
+        proposals: { marked: [], unmarked: [] },
+        forum: { marked: [], unmarked: [] }
       };
 
       const deletedVoteIds = deletedVotes.map((vote) => vote.id);
@@ -111,7 +113,8 @@ export function VotesProvider({ children }: { children: ReactNode }) {
         bounties: { marked: [], unmarked: [] },
         votes: [],
         discussions: { marked: [], unmarked: [] },
-        proposals: { marked: [], unmarked: [] }
+        proposals: { marked: [], unmarked: [] },
+        forum: { marked: [], unmarked: [] }
       };
 
       const cancelledVoteIds = updatedVotes.filter((v) => v.status === 'Cancelled').map((vote) => vote.id);

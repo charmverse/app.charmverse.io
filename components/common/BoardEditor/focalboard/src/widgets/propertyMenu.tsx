@@ -2,7 +2,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import type { IntlShape } from 'react-intl';
 import { useIntl } from 'react-intl';
 
-import type { PropertyType } from '../blocks/board';
+import type { PropertyType } from 'lib/focalboard/board';
+
 import { Utils } from '../utils';
 
 import Menu from './menu';

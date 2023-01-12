@@ -9,6 +9,7 @@ import Link from '@mui/material/Link';
 import SvgIcon from '@mui/material/SvgIcon';
 import Typography from '@mui/material/Typography';
 
+import { charmverseDiscordInvite } from 'config/constants';
 import DiscordIcon from 'public/images/discord_logo.svg';
 
 import { Container } from './LoginPageContent';
@@ -75,7 +76,7 @@ export default function Footer() {
               <StyledIconButton href='https://www.facebook.com/charmverse.io' target='_blank'>
                 <FacebookIcon />
               </StyledIconButton>
-              <StyledIconButton href='https://discord.gg/ACYCzBGC2M' target='_blank'>
+              <StyledIconButton href={charmverseDiscordInvite} target='_blank'>
                 <SvgIcon viewBox='0 -5 70 70'>
                   <DiscordIcon />
                 </SvgIcon>
