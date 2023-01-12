@@ -278,7 +278,7 @@ const StyledReactBangleEditor = styled(ReactBangleEditor)<{ disablePageSpecificF
   /** DONT REMOVE THIS STYLING */
   div.ProseMirror.bangle-editor {
     padding-left: 50px;
-    width: calc(100% + 50px);
+    margin-right: -50px;
   }
 
   code {
