@@ -83,6 +83,7 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
     enableSuggestions
   });
   const [editor, setEditor] = useState<CoreBangleEditor>();
+  const [showLoader, setShowLoader] = useState(false);
   const nodeViews = useNodeViews(renderRef);
   const { showMessage } = useSnackbar();
 
@@ -156,13 +157,18 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
     };
   }, [user, pageId, useSockets, authResponse, authResponse, ref]);
 
+  useEffect(() => {
+    const timer = setTimeout(() => setShowLoader(true), 200);
+    return () => clearTimeout(timer);
+  }, [setShowLoader]);
+
   if (nodeViews.length > 0 && renderNodeViews == null) {
     throw new Error('When using nodeViews, you must provide renderNodeViews callback');
   }
   return (
     <EditorViewContext.Provider value={editor?.view as any}>
       <div ref={editorRef} className='bangle-editor-core'>
-        <StyledLoadingComponent height='400px' isLoading={isLoading} />
+        <StyledLoadingComponent height='400px' isLoading={showLoader && isLoading} />
         {editor ? children : null}
         <div ref={renderRef} id={pageId} className={className} style={style} />
       </div>
