@@ -11,6 +11,8 @@ import CharmEditor from 'components/common/CharmEditor';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEditor';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { ScrollableWindow } from 'components/common/PageLayout';
+import UserDisplay from 'components/common/UserDisplay';
+import { useMembers } from 'hooks/useMembers';
 import { usePageTitle } from 'hooks/usePageTitle';
 import { useUser } from 'hooks/useUser';
 import type { PostCommentWithVote, PostCommentWithVoteAndChildren } from 'lib/forums/comments/interface';
@@ -76,6 +78,7 @@ function sortComments({ comments, sort }: { comments: PostCommentWithVoteAndChil
 
 export function PostPage({ post, spaceId, onSave }: Props) {
   const { user } = useUser();
+  const { members } = useMembers();
   const [form, setForm] = useState<FormInputs>(post ?? { title: '', content: null, contentText: '' });
   const [categoryId, setCategoryId] = useState(post?.categoryId ?? null);
   const {
@@ -90,6 +93,8 @@ export function PostPage({ post, spaceId, onSave }: Props) {
   const [commentSort, setCommentSort] = useState<PostCommentSort>('latest');
 
   const isLoading = !postComments && isValidating;
+
+  const createdBy = members.find((_member) => _member.id === post?.createdBy);
 
   function updateTitle(updates: { title: string; updatedAt: any }) {
     setForm((_form) => ({ ..._form, title: updates.title }));
@@ -176,6 +181,7 @@ export function PostPage({ post, spaceId, onSave }: Props) {
             onContentChange={updatePostContent}
           >
             <PageTitleInput readOnly={readOnly} value={form.title} onChange={updateTitle} />
+            <UserDisplay user={createdBy} avatarSize='small' fontSize='medium' mt={2} mb={3} />
             <Box my={2}>
               <PostCategoryInput
                 readOnly={readOnly}
