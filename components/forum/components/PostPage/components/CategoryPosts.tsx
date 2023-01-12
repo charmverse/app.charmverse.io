@@ -32,10 +32,6 @@ export function CategoryPosts({ categoryId, postId }: { postId: string; category
       })
   );
 
-  if (!postsData || !category) {
-    return null;
-  }
-
   if (isLoadingPosts) {
     return (
       <Card variant='outlined'>
@@ -46,7 +42,20 @@ export function CategoryPosts({ categoryId, postId }: { postId: string; category
     );
   }
 
-  const totalPosts = postsData.data.filter((post) => post.id !== postId).length;
+  const totalPosts = postsData?.data.filter((post) => post.id !== postId).length;
+
+  if (totalPosts === 0 || !postsData || !category) {
+    return (
+      <Card variant='outlined'>
+        <CardContent>
+          <Stack justifyContent='center' alignItems='center' gap={1} my={2}>
+            <SpeakerNotesOffOutlinedIcon color='secondary' fontSize='large' />
+            <Typography color='secondary'>No related posts</Typography>
+          </Stack>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card variant='outlined'>
@@ -78,45 +87,38 @@ export function CategoryPosts({ categoryId, postId }: { postId: string; category
         )}
         <Divider />
         <Stack my={1}>
-          {totalPosts === 0 ? (
-            <Stack justifyContent='center' alignItems='center' gap={1} my={2}>
-              <SpeakerNotesOffOutlinedIcon color='secondary' fontSize='large' />
-              <Typography color='secondary'>No related posts</Typography>
-            </Stack>
-          ) : (
-            postsData.data.map((post) =>
-              post.id === postId ? null : (
-                <MenuItem
-                  key={post.id}
+          {postsData.data.map((post) =>
+            post.id === postId ? null : (
+              <MenuItem
+                key={post.id}
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'space-between'
+                }}
+              >
+                <Typography
                   sx={{
-                    display: 'flex',
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    justifyContent: 'space-between'
+                    color: 'text.primary',
+                    cursor: 'pointer',
+                    wordBreak: 'break-all',
+                    pr: 3.5,
+                    width: '100%'
+                  }}
+                  onClick={() => {
+                    showPost({
+                      postId: post.id,
+                      onClose() {
+                        setUrlWithoutRerender(router.pathname, { pageId: null });
+                      }
+                    });
+                    setUrlWithoutRerender(router.pathname, { pageId: post.id });
                   }}
                 >
-                  <Typography
-                    sx={{
-                      color: 'text.primary',
-                      cursor: 'pointer',
-                      wordBreak: 'break-all',
-                      pr: 3.5,
-                      width: '100%'
-                    }}
-                    onClick={() => {
-                      showPost({
-                        postId: post.id,
-                        onClose() {
-                          setUrlWithoutRerender(router.pathname, { pageId: null });
-                        }
-                      });
-                      setUrlWithoutRerender(router.pathname, { pageId: post.id });
-                    }}
-                  >
-                    {post.title}
-                  </Typography>
-                </MenuItem>
-              )
+                  {post.title}
+                </Typography>
+              </MenuItem>
             )
           )}
         </Stack>
