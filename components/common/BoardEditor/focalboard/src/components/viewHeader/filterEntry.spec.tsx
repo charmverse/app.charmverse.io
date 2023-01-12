@@ -4,7 +4,8 @@ import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { Provider as ReduxProvider } from 'react-redux';
 
-import type { FilterClause } from '../../blocks/filterClause';
+import type { FilterClause } from 'lib/focalboard/filterClause';
+
 import mutator from '../../mutator';
 import { TestBlockFactory } from '../../test/testBlockFactory';
 import { mockStateStore, wrapIntl } from '../../testUtils';

@@ -1,8 +1,9 @@
 // @ts-nocheck
 
 // Disable console log
-import type { Block } from './blocks/block';
-import { createBoard } from './blocks/board';
+import type { Block } from 'lib/focalboard/block';
+import { createBoard } from 'lib/focalboard/board';
+
 import octoClient from './octoClient';
 import 'isomorphic-fetch';
 import { FetchMock } from './test/fetchMock';

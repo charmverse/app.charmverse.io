@@ -1,6 +1,6 @@
 import { utils } from 'ethers';
 
-import { randomETHWalletAddress } from 'testing/generate-stubs';
+import { randomETHWalletAddress } from 'testing/generateStubs';
 
 describe('randomETHWalletAddress', () => {
   it('should return a random lowercase ETH wallet address', () => {

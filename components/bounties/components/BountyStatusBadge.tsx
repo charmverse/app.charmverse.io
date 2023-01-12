@@ -183,11 +183,9 @@ export default function BountyStatusBadgeWrapper({
       <Box sx={{ textAlign: 'right' }}>
         <Box display='flex' alignItems='center' justifyContent='space-between'>
           <BountyAmount bounty={bounty} truncate={truncate} />
-          <Link href={bountyLink} passHref={true}>
-            <IconButton>
-              <LaunchIcon fontSize='small' />
-            </IconButton>
-          </Link>
+          <IconButton href={bountyLink} component={Link}>
+            <LaunchIcon fontSize='small' />
+          </IconButton>
         </Box>
         <BountyStatusChip status={bounty.status} />
       </Box>

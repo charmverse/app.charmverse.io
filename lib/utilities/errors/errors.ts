@@ -6,6 +6,7 @@ const ErrorCodes = {
   'Invalid input': 400,
   'Undesirable operation': 400,
   'Maximum size exceeded': 400,
+  'Disabled account': 409,
   'Access denied': 401,
   'Insecure operation': 401,
   'Data not found': 404,
@@ -16,7 +17,7 @@ const ErrorCodes = {
   'Unexpected result': 500
 };
 
-type ErrorType = keyof typeof ErrorCodes;
+export type ErrorType = keyof typeof ErrorCodes;
 
 /**
  * @error used for providing structured JSON or a stack trace
@@ -163,6 +164,15 @@ export class BrowserPopupError extends SystemError {
     super({
       message,
       errorType: 'Unknown',
+      severity: 'warning'
+    });
+  }
+}
+export class DisabledAccountError extends SystemError {
+  constructor(message = 'This account is disabled.') {
+    super({
+      message,
+      errorType: 'Disabled account',
       severity: 'warning'
     });
   }

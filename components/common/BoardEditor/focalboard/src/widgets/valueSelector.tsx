@@ -7,7 +7,8 @@ import { useIntl } from 'react-intl';
 import type { ActionMeta, OnChangeValue, Options } from 'react-select';
 import CreatableSelect from 'react-select/creatable';
 
-import type { IPropertyOption } from '../blocks/board';
+import type { IPropertyOption } from 'lib/focalboard/board';
+
 import { Constants } from '../constants';
 import { getSelectBaseStyle } from '../theme';
 

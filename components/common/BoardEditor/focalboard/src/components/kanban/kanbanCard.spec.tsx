@@ -4,7 +4,8 @@ import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { Provider as ReduxProvider } from 'react-redux';
 
-import type { IPropertyTemplate } from '../../blocks/board';
+import type { IPropertyTemplate } from 'lib/focalboard/board';
+
 import Mutator from '../../mutator';
 import { TestBlockFactory } from '../../test/testBlockFactory';
 import { mockStateStore, wrapDNDIntl } from '../../testUtils';

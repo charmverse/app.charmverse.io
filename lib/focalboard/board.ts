@@ -1,9 +1,9 @@
 import { v4 } from 'uuid';
 
+import type { Block } from 'lib/focalboard/block';
+import { createBlock } from 'lib/focalboard/block';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
-import type { Block } from './block';
-import { createBlock } from './block';
 import type { Card } from './card';
 
 type PropertyType =
@@ -50,8 +50,10 @@ type Board = Block & {
   fields: BoardFields;
 };
 
-function createBoard(block?: Partial<Block>, addDefaultProperty?: boolean): Board {
-  addDefaultProperty = addDefaultProperty ?? false;
+function createBoard({
+  block,
+  addDefaultProperty
+}: { block?: Partial<Block>; addDefaultProperty?: boolean } | undefined = {}): Board {
   const cardProperties: IPropertyTemplate[] =
     block?.fields?.cardProperties?.map((o: IPropertyTemplate) => {
       return {
@@ -100,6 +102,7 @@ function createBoard(block?: Partial<Block>, addDefaultProperty?: boolean): Boar
       isTemplate: block?.fields?.isTemplate ?? false,
       columnCalculations: block?.fields?.columnCalculations ?? [],
       headerImage: block?.fields?.headerImage ?? null,
+      ...block?.fields,
       cardProperties
     }
   };

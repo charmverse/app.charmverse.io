@@ -2,6 +2,7 @@ import ArrowSquareOut from '@mui/icons-material/Launch';
 import { Grid, IconButton, Typography } from '@mui/material';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import Alert from '@mui/material/Alert';
+import type { IdentityType } from '@prisma/client';
 import UAuth from '@uauth/js';
 import type { AbstractConnector } from '@web3-react/abstract-connector';
 import { UnsupportedChainIdError, useWeb3React } from '@web3-react/core';
@@ -14,11 +15,11 @@ import { useMetamaskConnect } from 'components/_app/Web3ConnectionManager/hooks/
 import ErrorComponent from 'components/common/errors/WalletError';
 import Link from 'components/common/Link';
 import { Modal } from 'components/common/Modal';
-import type { AnyIdPostLoginHandler } from 'components/login/Login';
-import { useSnackbar } from 'hooks/useSnackbar';
+import type { AnyIdLogin } from 'components/login/Login';
 import type { UnstoppableDomainsAuthSig } from 'lib/blockchain/unstoppableDomains';
 import { extractDomainFromProof } from 'lib/blockchain/unstoppableDomains/client';
 import log from 'lib/log';
+import type { DisabledAccountError } from 'lib/utilities/errors';
 import { BrowserPopupError } from 'lib/utilities/errors';
 
 import { Web3Connection } from '../../Web3ConnectionManager';
@@ -26,11 +27,14 @@ import { Web3Connection } from '../../Web3ConnectionManager';
 import { ConnectorButton } from './components/ConnectorButton';
 import processConnectionError from './utils/processConnectionError';
 
+type AnyIdPostLoginHandler<I extends IdentityType = IdentityType> = (loginInfo: AnyIdLogin<I>) => any;
+
 interface Props {
   loginSuccess: AnyIdPostLoginHandler<'UnstoppableDomain' | 'Wallet'>;
+  onError?: (err: DisabledAccountError) => void;
 }
 
-export function WalletSelector({ loginSuccess }: Props) {
+export function WalletSelector({ loginSuccess, onError = () => null }: Props) {
   const {
     setActivatingConnector,
     isWalletSelectorModalOpen,
@@ -42,8 +46,6 @@ export function WalletSelector({ loginSuccess }: Props) {
   } = useContext(Web3Connection);
   const { error } = useWeb3React();
   const { active, activate, connector, setError } = useWeb3React();
-
-  const { showMessage } = useSnackbar();
 
   const [uAuthPopupError, setUAuthPopupError] = useState<BrowserPopupError | null>(null);
   const handleConnect = (_connector: AbstractConnector) => {
@@ -95,16 +97,15 @@ export function WalletSelector({ loginSuccess }: Props) {
     setIsConnectingIdentity(true);
     try {
       const authSig = (await uauth.loginWithPopup()) as any as UnstoppableDomainsAuthSig;
-      showMessage(`Logged in with Unstoppable Domains. Redirecting you now.`, 'success');
-      const user = await charmClient.profile.loginWithUnstoppableDomains({ authSig });
+      const user = await charmClient.unstoppableDomains.login({ authSig });
 
       const domain = extractDomainFromProof(authSig);
 
       loginSuccess({ displayName: domain, identityType: 'UnstoppableDomain', user });
-      // This component is above all our data providers in the hierarchy, so we can just reload to open the app with a logged in cookie
-      window.location.reload();
     } catch (err) {
-      if ((err as Error).message.match('failed to be constructed')) {
+      if ((err as DisabledAccountError)?.errorType === 'Disabled account') {
+        onError(err as DisabledAccountError);
+      } else if ((err as Error).message.match('failed to be constructed')) {
         setUAuthPopupError(new BrowserPopupError());
       }
       setIsConnectingIdentity(false);
@@ -184,11 +185,11 @@ function resetWalletConnector(connector: AbstractConnector) {
     connector.walletConnectProvider = undefined;
   }
 }
-export function WalletSelectorModal({ loginSuccess }: Props) {
+export function WalletSelectorModal({ loginSuccess, onError }: Props) {
   const { isWalletSelectorModalOpen, closeWalletSelectorModal } = useContext(Web3Connection);
   return (
     <Modal open={isWalletSelectorModalOpen} onClose={closeWalletSelectorModal}>
-      <WalletSelector loginSuccess={loginSuccess} />
+      <WalletSelector loginSuccess={loginSuccess} onError={onError} />
     </Modal>
   );
 }

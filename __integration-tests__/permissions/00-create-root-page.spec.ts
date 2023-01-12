@@ -5,7 +5,7 @@ import { v4 } from 'uuid';
 
 import type { IPageWithPermissions } from 'lib/pages';
 import type { LoggedInUser } from 'models';
-import { generatePageToCreateStub } from 'testing/generate-stubs';
+import { generatePageToCreateStub } from 'testing/generateStubs';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 

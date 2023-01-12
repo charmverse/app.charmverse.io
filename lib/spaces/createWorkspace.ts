@@ -4,6 +4,7 @@ import type { Prisma } from '@prisma/client';
 
 import { prisma } from 'db';
 import { generateDefaultPostCategories } from 'lib/forums/categories/generateDefaultPostCategories';
+import { setDefaultPostCategory } from 'lib/forums/categories/setDefaultPostCategory';
 import { generateDefaultPropertiesInput } from 'lib/members/generateDefaultPropertiesInput';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { updateTrackGroupProfile } from 'lib/metrics/mixpanel/updateTrackGroupProfile';
@@ -33,14 +34,24 @@ export async function createWorkspace({ spaceData, userId }: CreateSpaceProps) {
 
   const defaultCategories = generateDefaultCategoriesInput(space.id);
   const defaultProperties = generateDefaultPropertiesInput({ userId, spaceId: space.id });
+  const defaultPostCategories = generateDefaultPostCategories(space.id);
 
   await prisma.$transaction([
     ...seedPagesTransactionInput.blocksToCreate.map((input) => prisma.block.create({ data: input })),
     ...seedPagesTransactionInput.pagesToCreate.map((input) => createPage({ data: input })),
     prisma.proposalCategory.createMany({ data: defaultCategories }),
     prisma.memberProperty.createMany({ data: defaultProperties }),
-    prisma.postCategory.createMany({ data: generateDefaultPostCategories(space.id) })
+    prisma.postCategory.createMany({ data: defaultPostCategories })
   ]);
+
+  const defaultGeneralPostCategory = defaultPostCategories.find((category) => category.name === 'General');
+
+  if (defaultGeneralPostCategory?.id) {
+    await setDefaultPostCategory({
+      postCategoryId: defaultGeneralPostCategory.id as string,
+      spaceId: space.id
+    });
+  }
 
   const updatedSpace = await updateSpacePermissionConfigurationMode({
     permissionConfigurationMode: spaceData.permissionConfigurationMode ?? 'collaborative',

@@ -23,7 +23,7 @@ import type {
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { getRelativeTimeInThePast } from 'lib/utilities/dates';
 
-import { ForumContentUpDownVotes } from '../../ForumVote';
+import { ForumVote } from '../../ForumVote';
 
 import { CommentReplyForm } from './CommentReplyForm';
 
@@ -218,7 +218,7 @@ export function PostComment({
           )}
           {!comment.deletedAt && (
             <Stack flexDirection='row' gap={1}>
-              <ForumContentUpDownVotes votes={comment} onVote={voteComment} />
+              <ForumVote votes={comment} onVote={voteComment} />
               <Typography
                 sx={{
                   cursor: 'pointer'

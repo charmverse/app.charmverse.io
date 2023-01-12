@@ -1,7 +1,7 @@
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { createSelector, createSlice } from '@reduxjs/toolkit';
 
-import type { Board } from '../blocks/board';
+import type { Board } from 'lib/focalboard/board';
 
 import { initialLoad, initialReadOnlyLoad } from './initialLoad';
 

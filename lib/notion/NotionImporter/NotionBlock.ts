@@ -5,7 +5,11 @@ import {
   MAX_EMBED_WIDTH,
   MIN_EMBED_HEIGHT
 } from 'components/common/CharmEditor/components/iframe/config';
+import { extractAttrsFromUrl as extractNFTAttrs } from 'components/common/CharmEditor/components/nft/nftUtils';
+import { extractTweetAttrs } from 'components/common/CharmEditor/components/tweet/tweetSpec';
+import { extractYoutubeLinkType } from 'components/common/CharmEditor/components/video/utils';
 import { VIDEO_ASPECT_RATIO } from 'components/common/CharmEditor/components/video/videoSpec';
+import log from 'lib/log';
 import type {
   TextContent,
   MentionNode,
@@ -14,7 +18,8 @@ import type {
   TableNode,
   TableRowNode,
   ColumnLayoutNode,
-  ColumnBlockNode
+  ColumnBlockNode,
+  TextMark
 } from 'lib/prosemirror/interfaces';
 import { MAX_IMAGE_WIDTH, MIN_IMAGE_WIDTH } from 'lib/prosemirror/plugins/image/constants';
 import { isTruthy } from 'lib/utilities/types';
@@ -77,27 +82,41 @@ export class NotionBlock {
         }
       } else if (contents[index].type === 'text') {
         const textContent = contents[index] as TextContent;
+        const marks: TextMark[] = [];
         if (textContent.marks) {
-          for (let textContentIndex = 0; textContentIndex < textContent.marks.length; textContentIndex++) {
-            const mark = textContent.marks[textContentIndex];
+          for (let textContentMarkIndex = 0; textContentMarkIndex < textContent.marks.length; textContentMarkIndex++) {
+            const mark = textContent.marks[textContentMarkIndex];
             if (mark.attrs && mark.type === 'link') {
-              const notionPageLink = mark.attrs.href.slice(1);
-              const notionPageId = [
-                notionPageLink.substring(0, 8),
-                notionPageLink.substring(8, 12),
-                notionPageLink.substring(12, 16),
-                notionPageLink.substring(16, 20),
-                notionPageLink.substring(20)
-              ].join('-');
-              const charmversePage = await this.notionPage.fetchAndCreatePage({
-                notionPageId
-              });
-              if (charmversePage) {
-                mark.attrs.href = charmversePage.path;
+              // If its linking to an internal page
+              if (mark.attrs.href.startsWith('/')) {
+                const notionPageLink = mark.attrs.href.slice(1);
+                const notionPageId = [
+                  notionPageLink.substring(0, 8),
+                  notionPageLink.substring(8, 12),
+                  notionPageLink.substring(12, 16),
+                  notionPageLink.substring(16, 20),
+                  notionPageLink.substring(20)
+                ].join('-');
+                const charmversePage = await this.notionPage.fetchAndCreatePage({
+                  notionPageId
+                });
+                if (charmversePage) {
+                  mark.attrs.href = charmversePage.path;
+                  marks.push(mark);
+                } else {
+                  // Skip adding link mark as the charmverse page was not created
+                  // Most likely the integration doesn't have access to the page
+                }
+              } else {
+                marks.push(mark);
               }
+            } else {
+              marks.push(mark);
             }
           }
         }
+
+        textContent.marks = marks;
       }
     }
 
@@ -147,6 +166,7 @@ export class NotionBlock {
         }
       } catch (err) {
         if (block) {
+          log.error(`[notion] Failed to convert notion ${block.type}:${block.id} block to charmverse block`);
           const notionPage = this.notionPage.cache.notionPagesRecord[
             this.charmversePage.notionPageId
           ] as PageObjectResponse;
@@ -311,22 +331,67 @@ export class NotionBlock {
 
       case 'video': {
         return {
-          type: 'iframe',
+          type: 'video',
           attrs: {
             src: block.video.type === 'external' ? block.video.external.url : null,
-            type: 'video',
-            width: (MIN_EMBED_WIDTH + MAX_EMBED_WIDTH) / 2,
-            height: (MIN_EMBED_WIDTH + MAX_EMBED_WIDTH) / 2 / VIDEO_ASPECT_RATIO
+            width: MAX_EMBED_WIDTH,
+            height: MAX_EMBED_WIDTH / VIDEO_ASPECT_RATIO
           }
         };
       }
 
       case 'embed':
       case 'bookmark': {
+        const url = block.type === 'bookmark' ? block.bookmark.url : block.embed.url;
+        const tweetAttrs = extractTweetAttrs(url);
+        const nftAttrs = extractNFTAttrs(url);
+        const isYoutube = extractYoutubeLinkType(url);
+
+        if (tweetAttrs) {
+          return {
+            type: 'tweet',
+            attrs: {
+              screenName: tweetAttrs.screenName,
+              id: tweetAttrs.id
+            }
+          };
+        }
+
+        if (nftAttrs) {
+          return {
+            type: 'nft',
+            attrs: {
+              chain: nftAttrs.chain,
+              token: nftAttrs.token,
+              contract: nftAttrs.contract
+            }
+          };
+        }
+
+        if (isYoutube) {
+          return {
+            type: 'video',
+            attrs: {
+              src: url,
+              width: MAX_EMBED_WIDTH,
+              height: MAX_EMBED_WIDTH / VIDEO_ASPECT_RATIO
+            }
+          };
+        }
+
+        if (block.type === 'bookmark') {
+          return {
+            type: 'bookmark',
+            attrs: {
+              url
+            }
+          };
+        }
+
         return {
           type: 'iframe',
           attrs: {
-            src: block.type === 'bookmark' ? block.bookmark.url : block.embed.url,
+            src: url,
             type: 'embed',
             width: MAX_EMBED_WIDTH,
             height: MIN_EMBED_HEIGHT

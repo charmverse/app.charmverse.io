@@ -3,6 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { prisma } from 'db';
+import { deletePostCategory } from 'lib/forums/categories/deletePostCategory';
 import { updatePostCategory } from 'lib/forums/categories/updatePostCategory';
 import { onError, onNoMatch, requireSpaceMembership, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -25,11 +26,7 @@ async function updatePostCategoryController(req: NextApiRequest, res: NextApiRes
 async function deletePostCategoryController(req: NextApiRequest, res: NextApiResponse) {
   const { postCategoryId } = req.query;
 
-  await prisma.postCategory.delete({
-    where: {
-      id: postCategoryId as string
-    }
-  });
+  await deletePostCategory(postCategoryId as string);
 
   return res.status(200).end();
 }

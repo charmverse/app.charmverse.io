@@ -97,9 +97,9 @@ function MemberDirectoryGalleryCard({ member }: { member: Member }) {
           <Stack p={2} gap={1}>
             {!isNameHidden && (
               <Typography gutterBottom variant='h6' mb={0} component='div'>
-                {member.properties.find(
+                {(member.properties.find(
                   (memberProperty) => memberProperty.memberPropertyId === propertiesRecord.name?.id
-                )?.value ?? member.username}
+                )?.value as string) ?? member.username}
               </Typography>
             )}
             <SocialIcons gap={1} social={social} showDiscord={!isDiscordHidden} showTwitter={!isTwitterHidden} />
@@ -196,7 +196,7 @@ function MemberDirectoryGalleryCard({ member }: { member: Member }) {
                         <Typography fontWeight='bold' variant='subtitle2'>
                           {property.name}
                         </Typography>
-                        <Typography variant='body2'>{memberProperty.value}</Typography>
+                        <Typography variant='body2'>{memberProperty.value as string}</Typography>
                       </Stack>
                     )
                   );

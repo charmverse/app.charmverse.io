@@ -8,7 +8,7 @@ import type { IPageWithPermissions } from 'lib/pages';
 import { getPage } from 'lib/pages/server';
 import { isTruthy } from 'lib/utilities/types';
 import type { LoggedInUser } from 'models';
-import { generatePageToCreateStub } from 'testing/generate-stubs';
+import { generatePageToCreateStub } from 'testing/generateStubs';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 

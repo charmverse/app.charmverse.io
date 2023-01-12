@@ -1,6 +1,7 @@
-import type { IPropertyTemplate } from './blocks/board';
-import { createFilterClause } from './blocks/filterClause';
-import { createFilterGroup } from './blocks/filterGroup';
+import type { IPropertyTemplate } from 'lib/focalboard/board';
+import { createFilterClause } from 'lib/focalboard/filterClause';
+import { createFilterGroup } from 'lib/focalboard/filterGroup';
+
 import { CardFilter } from './cardFilter';
 import { TestBlockFactory } from './test/testBlockFactory';
 import { Utils } from './utils';

@@ -3,8 +3,9 @@ import React from 'react';
 import { Provider as ReduxProvider } from 'react-redux';
 import configureStore from 'redux-mock-store';
 
-import { createBoard } from '../../../blocks/board';
-import { createCard } from '../../../blocks/card';
+import { createBoard } from 'lib/focalboard/board';
+import { createCard } from 'lib/focalboard/card';
+
 import { createCommentBlock } from '../../../blocks/commentBlock';
 import type { IUser } from '../../../user';
 

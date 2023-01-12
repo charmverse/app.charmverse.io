@@ -36,6 +36,8 @@ import type { PageContent } from 'lib/prosemirror/interfaces';
 import { extractDeletedThreadIds } from 'lib/prosemirror/plugins/inlineComments/extractDeletedThreadIds';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
+import { BookmarkNodeView } from './components/bookmark/BookmarkNodeView';
+import { plugins as bookmarkPlugins } from './components/bookmark/bookmarkPlugins';
 import * as bulletList from './components/bulletList';
 import Callout, * as callout from './components/callout';
 import { userDataPlugin } from './components/charm/charm.plugins';
@@ -71,7 +73,7 @@ import Quote from './components/quote';
 import ResizableImage from './components/ResizableImage';
 import ResizablePDF from './components/ResizablePDF';
 import RowActionsMenu, * as rowActions from './components/rowActions';
-import { SidebarDrawer, SIDEBAR_VIEWS } from './components/SidebarDrawer';
+import { SIDEBAR_VIEWS, SidebarDrawer } from './components/SidebarDrawer';
 import SuggestionsPopup from './components/suggestions/SuggestionPopup';
 import { plugins as trackPlugins } from './components/suggestions/suggestions.plugins';
 import * as tabIndent from './components/tabIndent';
@@ -216,6 +218,7 @@ export function charmEditorPlugins({
       name: 'poll',
       containerDOM: ['div', { draggable: 'false' }]
     }),
+    bookmarkPlugins(),
     tabIndent.plugins(),
     table.tableEditing({ allowTableNodeSelection: true }),
     table.columnHandles(),
@@ -260,7 +263,9 @@ export function charmEditorPlugins({
     }
   }
 
-  return () => basePlugins;
+  return () => {
+    return basePlugins;
+  };
 }
 
 const StyledReactBangleEditor = styled(ReactBangleEditor)<{ disablePageSpecificFeatures?: boolean }>`
@@ -515,12 +520,12 @@ function CharmEditor({
     };
   }, [editorRef.current]);
 
-  const enableComments = !disablePageSpecificFeatures && !enableSuggestingMode && !isTemplate;
+  const enableComments =
+    !disablePageSpecificFeatures && !enableSuggestingMode && !isTemplate && !!pagePermissions?.comment;
 
   return (
     <StyledReactBangleEditor
       pageId={pageId}
-      spaceId={currentSpace?.id}
       disablePageSpecificFeatures={disablePageSpecificFeatures}
       isContentControlled={isContentControlled}
       enableSuggestions={enableSuggestingMode}
@@ -612,6 +617,9 @@ function CharmEditor({
           }
           case 'pdf': {
             return <ResizablePDF {...allProps} />;
+          }
+          case 'bookmark': {
+            return <BookmarkNodeView {...allProps} />;
           }
           case 'poll': {
             return <poll.Component {...allProps} />;

@@ -4,12 +4,12 @@ import nc from 'next-connect';
 import { prisma } from 'db';
 import { updateGuildRolesForUser } from 'lib/guild-xyz/server/updateGuildRolesForUser';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
-import { updateTrackUserProfile } from 'lib/metrics/mixpanel/updateTrackUserProfile';
-import { onError, onNoMatch, ActionNotPermittedError } from 'lib/middleware';
+import { ActionNotPermittedError, onError, onNoMatch } from 'lib/middleware';
 import type { Web3LoginRequest } from 'lib/middleware/requireWalletSignature';
 import { requireWalletSignature } from 'lib/middleware/requireWalletSignature';
 import { sessionUserRelations } from 'lib/session/config';
 import { withSessionRoute } from 'lib/session/withSession';
+import { DisabledAccountError } from 'lib/utilities/errors';
 import type { LoggedInUser } from 'models';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -32,6 +32,10 @@ async function login(req: NextApiRequest, res: NextApiResponse<LoggedInUser | { 
 
   if (!user) {
     throw new ActionNotPermittedError('No user has been associated with this wallet address');
+  }
+
+  if (user.deletedAt) {
+    throw new DisabledAccountError();
   }
 
   req.session.user = { id: user.id };
