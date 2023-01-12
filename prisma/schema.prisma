@@ -246,6 +246,7 @@ model Space {
   Post                        Post[]
   webhookSubscriptionUrl      String?
   webhookSubscriptions        WebhookSubscription[]
+  webhookSigninSecret         String?
 
   @@index([createdBy])
 }
