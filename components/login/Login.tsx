@@ -12,8 +12,10 @@ import { useFirebaseAuth } from 'hooks/useFirebaseAuth';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import type { AuthSig } from 'lib/blockchain/interfaces';
+import type { SystemError } from 'lib/utilities/errors';
 import type { LoggedInUser } from 'models/User';
 
+import { LoginErrorModal } from './LoginErrorModal';
 import { WalletSign } from './WalletSign';
 
 export type AnyIdLogin<I extends IdentityType = IdentityType> = {
@@ -32,6 +34,8 @@ function LoginHandler(props: DialogProps) {
   const { onClose, selectedValue, open } = props;
   const { loginFromWeb3Account } = useWeb3AuthSig();
 
+  const [showLoginError, setShowLoginError] = useState(false);
+
   const { showMessage } = useSnackbar();
 
   const { loginWithGoogle } = useFirebaseAuth();
@@ -46,17 +50,31 @@ function LoginHandler(props: DialogProps) {
   };
 
   async function handleGoogleLogin() {
-    const googleLoginResult = await loginWithGoogle();
-    handleLogin(googleLoginResult);
+    try {
+      const googleLoginResult = await loginWithGoogle();
+      handleLogin(googleLoginResult);
+    } catch (err) {
+      handleLoginError(err);
+    }
   }
 
   async function handleWeb3Login(authSig: AuthSig) {
-    const user = await loginFromWeb3Account(authSig);
-    handleLogin({
-      identityType: 'Wallet',
-      displayName: authSig.address,
-      user
-    });
+    try {
+      const user = await loginFromWeb3Account(authSig);
+      handleLogin({
+        identityType: 'Wallet',
+        displayName: authSig.address,
+        user
+      });
+    } catch (err) {
+      handleLoginError(err);
+    }
+  }
+
+  function handleLoginError(err: any) {
+    if ((err as SystemError)?.errorType === 'Disabled account') {
+      setShowLoginError(true);
+    }
   }
 
   return (
@@ -66,7 +84,7 @@ function LoginHandler(props: DialogProps) {
 
         {/** Web 3 login methods */}
         <ListItem>
-          <WalletSelector loginSuccess={handleLogin} />
+          <WalletSelector loginSuccess={handleLogin} onError={handleLoginError} />
         </ListItem>
         {verifiableWalletDetected && (
           <ListItem>
@@ -90,6 +108,7 @@ function LoginHandler(props: DialogProps) {
           />
         </ListItem>
       </List>
+      <LoginErrorModal open={showLoginError} onClose={() => setShowLoginError(false)} />
     </Dialog>
   );
 }

@@ -58,6 +58,8 @@ export function getTwitterEmoji(emoji: string): string | null {
 
   // @ts-ignore - library type is incorrect
   const html = twemoji.parse(emoji, {
+    // the original maxCDN went down Jan 11, 2023
+    base: 'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/',
     folder: 'svg',
     ext: '.svg'
   }) as string;

@@ -1,6 +1,6 @@
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
-import Image from 'next/image';
+import Image from 'next/legacy/image';
 
 import darkLogoImage from 'public/images/charmverse_logo_sm_black.png';
 import whiteLogoImage from 'public/images/charmverse_logo_sm_white.png';

@@ -62,7 +62,7 @@ export function plugins({ key }: { key: PluginKey }) {
     const pos = blockPosAtCoords(view, coords);
     if (pos != null) {
       view.dispatch(
-        view.state.tr.setSelection(NodeSelection.create(view.state.doc, pos)).setMeta('row-handle-drag', true)
+        view.state.tr.setSelection(NodeSelection.create(view.state.doc, pos)).setMeta('row-handle-is-dragging', true)
       );
 
       const slice = view.state.selection.content();
@@ -92,12 +92,15 @@ export function plugins({ key }: { key: PluginKey }) {
           if (newPluginState) {
             return { ...pluginState, ...newPluginState };
           }
-
           return pluginState;
         }
       },
       props: {
         handleDOMEvents: {
+          // set meta on drop so that floating menu (selection-tooltip) can ignore the event
+          drop: (view) => {
+            view.dispatch(view.state.tr.setMeta('row-handle-is-dragging', true));
+          },
           mousemove: (view: EditorView, event: MouseEvent) => {
             throttledMouseOver(view, event);
             return false;

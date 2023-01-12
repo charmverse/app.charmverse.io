@@ -6,7 +6,6 @@ import { useRouter } from 'next/router';
 import { useCallback, useMemo, useState, useEffect } from 'react';
 
 import CardDialog from 'components/common/BoardEditor/focalboard/src/components/cardDialog';
-import RootPortal from 'components/common/BoardEditor/focalboard/src/components/rootPortal';
 import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { getSortedViews, getView } from 'components/common/BoardEditor/focalboard/src/store/views';
@@ -172,9 +171,7 @@ export default function DatabaseView({ containerWidth, readOnly: readOnlyOverrid
         />
       </StylesContainer>
       {typeof shownCardId === 'string' && shownCardId.length !== 0 && (
-        <RootPortal>
-          <CardDialog key={shownCardId} cardId={shownCardId} onClose={() => setShownCardId(null)} readOnly={readOnly} />
-        </RootPortal>
+        <CardDialog key={shownCardId} cardId={shownCardId} onClose={() => setShownCardId(null)} readOnly={readOnly} />
       )}
       <FocalBoardPortal />
     </>

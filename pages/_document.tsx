@@ -1,10 +1,8 @@
 import Document, { Head, Html, Main, NextScript } from 'next/document';
 
-// set up styles in Next.js for MUI based on https://github.com/mui-org/material-ui/blob/next/examples/nextjs-with-typescript/pages/_document.tsx
-
 import { blueColor } from 'theme/colors';
 
-class MyDocument extends Document {
+class MyDocument extends Document<{ emotionStyleTags: any }> {
   render() {
     return (
       <Html lang='en'>
@@ -30,6 +28,7 @@ class MyDocument extends Document {
             property='twitter:image'
             content='https://app.charmverse.io/images/logo_black_lightgrey_opengraph.png'
           />
+          {/* {this.props.emotionStyleTags} */}
         </Head>
         <body>
           <Main />

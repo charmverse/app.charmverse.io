@@ -3,7 +3,7 @@ import type { UrlObject } from 'url';
 import type { User } from '@prisma/client';
 import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
-import { useEffect, useState } from 'react';
+import { useRef, useEffect, useState } from 'react';
 
 import { getKey } from 'hooks/useLocalStorage';
 import { useSpaces } from 'hooks/useSpaces';
@@ -22,6 +22,7 @@ export default function RouteGuard({ children }: { children: ReactNode }) {
   const { spaces, isLoaded: isSpacesLoaded } = useSpaces();
   const isRouterLoading = !router.isReady;
   const isLoading = !isLoaded || isRouterLoading || !isSpacesLoaded;
+  const authorizedSpaceDomainRef = useRef('');
 
   if (typeof window !== 'undefined') {
     const pathSegments: string[] = router.asPath
@@ -64,20 +65,10 @@ export default function RouteGuard({ children }: { children: ReactNode }) {
     }
 
     authCheckAndRedirect(router.asPath);
-
-    // on route change start - hide page content by setting authorized to false
-    const hideContent = () => {
-      setAuthorized(false);
-    };
-    router.events.on('routeChangeStart', hideContent);
-
     // on route change complete - run auth check
     router.events.on('routeChangeComplete', authCheckAndRedirect);
 
-    // unsubscribe from events in useEffect return function
-    // eslint-disable-next-line consistent-return
     return () => {
-      router.events.off('routeChangeStart', hideContent);
       router.events.off('routeChangeComplete', authCheckAndRedirect);
     };
   }, [isLoading, user, spaces]);
@@ -116,6 +107,15 @@ export default function RouteGuard({ children }: { children: ReactNode }) {
     // condition: trying to access a space without access
     else if (isSpaceDomain(spaceDomain) && !spaces.some((s) => s.domain === spaceDomain)) {
       log.info('[RouteGuard]: send to join workspace page');
+      if (authorizedSpaceDomainRef.current === spaceDomain) {
+        authorizedSpaceDomainRef.current = '';
+        return {
+          authorized: false,
+          redirect: {
+            pathname: spaces.length !== 0 ? `/${spaces[0].domain}` : '/signup'
+          }
+        };
+      }
       return {
         authorized: false,
         redirect: {
@@ -124,6 +124,7 @@ export default function RouteGuard({ children }: { children: ReactNode }) {
         }
       };
     } else {
+      authorizedSpaceDomainRef.current = spaceDomain;
       return { authorized: true };
     }
   }
