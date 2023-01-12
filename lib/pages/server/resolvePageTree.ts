@@ -109,7 +109,6 @@ export async function resolvePageTree({
   pageId,
   flattenChildren = false,
   includeDeletedPages = false,
-  includeAllPageTypes = true,
   fullPage,
   pageNodes,
   tx = prisma

@@ -105,8 +105,7 @@ export function mapPageTree<T extends PageNode = PageNode>({
 export function mapTargetPageTree<T extends PageNode = PageNode>({
   items,
   targetPageId,
-  includeDeletedPages,
-  includeAllPageTypes = true
+  includeDeletedPages
 }: Omit<PageTreeMappingInput<T>, 'rootPageIds'> & { targetPageId: string }): TargetPageTree<T> {
   const { itemMap, itemsWithChildren } = reducePagesToPageTree({
     items,
