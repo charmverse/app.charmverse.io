@@ -5,7 +5,7 @@ import { prisma } from 'db';
 import { addMessageToSQS } from 'lib/aws/SQS';
 import log from 'lib/log';
 
-const SQS_QUEUE_NAME = process.env.SQS_WEBHOOK_QUEUE_NAME;
+const SQS_QUEUE_NAME = 'charmverse-serverless-queue-dev.fifo'; // process.env.SQS_WEBHOOK_QUEUE_NAME;
 
 // This function check subscription status by event name AND name space
 async function fetchSpaceWebhookSubscriptionStatus(spaceId: Space['id'], scope: string) {

@@ -179,6 +179,10 @@ class CharmClient {
     return http.POST(`/api/spaces/${spaceId}/leave`);
   }
 
+  updateWebhookSubscription(spaceId: string, webhookSubscriptionOpts: Record<string, boolean>) {
+    return http.PUT(`/api/webhook/${spaceId}`, webhookSubscriptionOpts);
+  }
+
   getSpaces() {
     return http.GET<Space[]>('/api/spaces');
   }

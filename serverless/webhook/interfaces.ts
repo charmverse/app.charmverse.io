@@ -1,5 +1,3 @@
-import type { Space } from '@prisma/client';
-
 export type UserEntity = {
   avatar: string;
   id: string;
@@ -61,6 +59,7 @@ export enum WebhookEventNames {
 // Utils to share common props among events
 type WebhookEventSharedProps<T = WebhookEventNames> = {
   scope: T;
+  wallet: string;
 };
 
 // Strongly typed events, shared between API, serverless functions and possibly our end users
@@ -114,7 +113,7 @@ export type WebhookEvent<T = WebhookEventNames> =
 export type WebhookPayload<T = WebhookEventNames> = {
   createdAt: string;
   event: WebhookEvent<T>;
-  spaceId: Space['id'];
+  spaceId: string;
   webhookURL: string;
 };
 
