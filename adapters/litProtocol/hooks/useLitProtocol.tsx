@@ -14,9 +14,14 @@ function useLitProtocol() {
   );
 
   useEffect(() => {
-    client.connect().then(() => {
-      setClient(client);
-    });
+    client
+      .connect()
+      .then(() => {
+        setClient(client);
+      })
+      .catch((err) => {
+        log.debug('Error connecting to Lit node', err);
+      });
   }, []);
 
   return litClient;
