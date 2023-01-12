@@ -30,8 +30,9 @@ export type WebhookMessageHeaders = {
 export type WebhookMessageQuery = {
   api_key?: string;
 };
+
 export type WebhookMessage = {
   data?: WebhookMessageData;
-  headers?: WebhookMessageHeaders;
+  headers?: WebhookMessageData;
   query?: WebhookMessageQuery;
 };
