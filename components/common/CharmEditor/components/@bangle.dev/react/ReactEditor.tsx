@@ -4,6 +4,7 @@ import { EditorState } from '@bangle.dev/pm';
 import type { Plugin } from '@bangle.dev/pm';
 import { EditorViewContext } from '@bangle.dev/react';
 import { objectUid } from '@bangle.dev/utils';
+import styled from '@emotion/styled';
 import type { RefObject } from 'react';
 import React, { useEffect, useImperativeHandle, useRef, useState } from 'react';
 import reactDOM from 'react-dom';
@@ -22,6 +23,11 @@ import { FidusEditor } from '../../fiduswriter/fiduseditor';
 import { nodeViewUpdateStore, useNodeViews } from './node-view-helpers';
 import { NodeViewWrapper } from './NodeViewWrapper';
 import type { RenderNodeViewsFunction } from './NodeViewWrapper';
+
+const StyledLoadingComponent = styled(LoadingComponent)`
+  position: absolute;
+  width: 100%;
+`;
 
 interface BangleEditorProps<PluginMetadata = any> extends CoreBangleEditorProps<PluginMetadata> {
   pageId?: string;
@@ -156,9 +162,9 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
   return (
     <EditorViewContext.Provider value={editor?.view as any}>
       <div ref={editorRef} className='bangle-editor-core'>
+        <StyledLoadingComponent height='400px' isLoading={isLoading} />
         {editor ? children : null}
         <div ref={renderRef} id={pageId} className={className} style={style} />
-        <LoadingComponent height='400px' isLoading={isLoading} />
       </div>
       {nodeViews.map((nodeView) => {
         return nodeView.containerDOM
