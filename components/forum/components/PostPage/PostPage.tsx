@@ -165,9 +165,9 @@ export function PostPage({ insideDialog = false, post, spaceId, onSave }: Props)
 
   return (
     <ScrollableWindow>
-      <Stack flexDirection='row' gap={1} position='relative'>
+      <Stack flexDirection='row'>
         <Container top={50}>
-          <Box minHeight={300} display='flex' position='relative'>
+          <Box minHeight={300}>
             <CharmEditor
               readOnly={readOnly}
               pageActionDisplay={null}
@@ -234,7 +234,7 @@ export function PostPage({ insideDialog = false, post, spaceId, onSave }: Props)
           )}
         </Container>
         {post && insideDialog && (
-          <Box height='100%' width='25%' mr={5} position='relative' top={50}>
+          <Box width='25%' mr={8}>
             <CategoryPosts postId={post.id} categoryId={post.categoryId} />
           </Box>
         )}
