@@ -69,3 +69,6 @@ export function generateSubmissionContent(): SubmissionContent {
 export function randomETHWalletAddress() {
   return Wallet.createRandom().address.toLowerCase();
 }
+export function randomDomain() {
+  return `test-${v4()}.nft`;
+}

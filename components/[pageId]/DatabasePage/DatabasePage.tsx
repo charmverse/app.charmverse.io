@@ -6,7 +6,6 @@ import { useHotkeys } from 'react-hotkeys-hook';
 import CardDialog from 'components/common/BoardEditor/focalboard/src/components/cardDialog';
 import CenterPanel from 'components/common/BoardEditor/focalboard/src/components/centerPanel';
 import { FlashMessages, sendFlashMessage } from 'components/common/BoardEditor/focalboard/src/components/flashMessages';
-import RootPortal from 'components/common/BoardEditor/focalboard/src/components/rootPortal';
 import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
 import {
   getCurrentBoard,
@@ -48,23 +47,21 @@ export function DatabasePage({ page, setPage, readOnly = false, pagePermissions 
   const [shownCardId, setShownCardId] = useState<string | null>((router.query.cardId as string) ?? null);
 
   const { setFocalboardViewsRecord } = useFocalboardViews();
-
   const readOnlyBoard = readOnly || !pagePermissions?.edit_content;
   const readOnlySourceData = activeView?.fields?.sourceType === 'google_form'; // blocks that are synced cannot be edited
-
   useEffect(() => {
     const boardId = page.boardId;
     const urlViewId = router.query.viewId as string;
 
     // Ensure boardViews is for our boardId before redirecting
-    const isCorrectBoardView = boardViews.length > 0 && boardViews[0].parentId === boardId;
+    const firstBoardView = boardViews.find((view) => view.parentId === boardId);
 
-    if (!urlViewId && isCorrectBoardView) {
+    if (!urlViewId && firstBoardView) {
       router.replace({
         pathname: router.pathname,
         query: {
           ...router.query,
-          viewId: boardViews[0].id,
+          viewId: firstBoardView.id,
           cardId: router.query.cardId ?? ''
         }
       });
@@ -73,6 +70,7 @@ export function DatabasePage({ page, setPage, readOnly = false, pagePermissions 
 
     if (boardId) {
       dispatch(setCurrentBoard(boardId));
+      setCurrentViewId(urlViewId);
       // Note: current view in Redux is only used for search, which we currently are not using at the moment
       dispatch(setCurrentView(urlViewId || ''));
       setFocalboardViewsRecord((focalboardViewsRecord) => ({ ...focalboardViewsRecord, [boardId]: urlViewId }));
@@ -128,24 +126,20 @@ export function DatabasePage({ page, setPage, readOnly = false, pagePermissions 
   );
 
   const showView = useCallback(
-    (viewId) => {
+    (viewId: string) => {
       if (viewId === '') {
         // when creating an ew view for linked boards, user must select a source before the view exists
         // but we dont want to change the URL until the view is created
         setCurrentViewId('');
       } else {
         const { cardId, ...rest } = router.query;
-        router.push(
-          {
-            pathname: router.pathname,
-            query: {
-              ...rest,
-              viewId: viewId || ''
-            }
-          },
-          undefined,
-          { shallow: true }
-        );
+        router.push({
+          pathname: router.pathname,
+          query: {
+            ...rest,
+            viewId: viewId || ''
+          }
+        });
       }
     },
     [router.query]
@@ -168,17 +162,15 @@ export function DatabasePage({ page, setPage, readOnly = false, pagePermissions 
             views={boardViews}
           />
           {typeof shownCardId === 'string' && shownCardId.length !== 0 && (
-            <RootPortal>
-              <CardDialog
-                key={shownCardId}
-                cardId={shownCardId}
-                onClose={() => {
-                  showCard(null);
-                  setShownCardId(null);
-                }}
-                readOnly={readOnly}
-              />
-            </RootPortal>
+            <CardDialog
+              key={shownCardId}
+              cardId={shownCardId}
+              onClose={() => {
+                showCard(null);
+                setShownCardId(null);
+              }}
+              readOnly={readOnly}
+            />
           )}
         </div>
         {/** include the root portal for focalboard's popup */}

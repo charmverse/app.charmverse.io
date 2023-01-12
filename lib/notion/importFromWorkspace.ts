@@ -1,3 +1,5 @@
+import log from 'lib/log';
+
 import { NotionImporter } from './NotionImporter/NotionImporter';
 
 export async function importFromWorkspace({

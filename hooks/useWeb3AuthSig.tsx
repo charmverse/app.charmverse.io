@@ -9,6 +9,7 @@ import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import charmClient from 'charmClient';
 import type { AuthSig } from 'lib/blockchain/interfaces';
 import log from 'lib/log';
+import type { SystemError } from 'lib/utilities/errors';
 import { ExternalServiceError, MissingWeb3AccountError } from 'lib/utilities/errors';
 import { lowerCaseEqual } from 'lib/utilities/strings';
 import type { LoggedInUser } from 'models';
@@ -125,6 +126,10 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
 
       return refreshedProfile;
     } catch (err) {
+      if ((err as SystemError)?.errorType === 'Disabled account') {
+        throw err;
+      }
+
       const newProfile = await charmClient.createUser({ address: signature.address, walletSignature: signature });
       setSignature(signature, true);
       setUser(newProfile);

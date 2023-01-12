@@ -1,6 +1,7 @@
 import type { Block, Prisma } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
+import { validate } from 'uuid';
 
 import { prisma } from 'db';
 import { prismaToBlock } from 'lib/focalboard/block';
@@ -36,11 +37,14 @@ async function getBlocks(req: NextApiRequest, res: NextApiResponse<Block[] | { e
   }
   // publicly shared focalboard
   if (spaceDomain === 'share') {
-    const pageId = pathnameParts[2];
+    const pageId = pathnameParts[pathnameParts.length - 1];
     if (!pageId) {
       throw new InvalidStateError('invalid referrer url');
     }
-    const page = await prisma.page.findUnique({ where: { id: pageId } });
+    const pageIdIsUUID = validate(pageId);
+    const page = pageIdIsUUID
+      ? await prisma.page.findUnique({ where: { id: pageId } })
+      : await prisma.page.findFirst({ where: { spaceId: req.query.spaceId as string, path: pageId } });
     if (!page) {
       throw new NotFoundError('page not found');
     }

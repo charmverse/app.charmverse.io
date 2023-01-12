@@ -89,7 +89,7 @@ export function SpaceDetailsAccordion({
                         }}
                         whiteSpace={property.type === 'text_multiline' ? 'pre-wrap' : 'initial'}
                       >
-                        {property.value}
+                        {property.value as string}
                       </Typography>
                     </Stack>
                   )

@@ -3,6 +3,7 @@ import type { Page } from '@prisma/client';
 import { RateLimit } from 'async-sema';
 
 import type { IPropertyTemplate } from 'lib/focalboard/board';
+import log from 'lib/log';
 
 import type { BlocksRecord, CreatePageInput } from '../types';
 

@@ -22,6 +22,7 @@ import { useRouter } from 'next/router';
 import { useCallback, useState } from 'react';
 
 import Link from 'components/common/Link';
+import { charmverseDiscordInvite } from 'config/constants';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
@@ -319,7 +320,7 @@ export default function Sidebar({ closeSidebar, favorites }: SidebarProps) {
             />
             <SidebarLink
               active={false}
-              href='https://discord.gg/ACYCzBGC2M'
+              href={charmverseDiscordInvite}
               icon={<QuestionMarkIcon color='secondary' fontSize='small' />}
               label='Support & Feedback'
               target='_blank'

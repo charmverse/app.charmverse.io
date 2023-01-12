@@ -7,7 +7,7 @@ import { memo } from 'react';
 import ImageSelector from 'components/common/ImageSelector/ImageSelector';
 import { randomIntFromInterval } from 'lib/utilities/random';
 
-const StyledPageBanner = styled(Box)<{ focalBoard?: boolean }>`
+const StyledPageBanner = styled(({ focalBoard, ...props }: any) => <div {...props} />)<{ focalBoard?: boolean }>`
   display: flex;
   align-items: center;
   height: 200px;

@@ -22,6 +22,7 @@ import SettingsLayout from 'components/settings/Layout';
 import Legend from 'components/settings/Legend';
 import ImportNotionWorkspace from 'components/settings/workspace/ImportNotionWorkspace';
 import Avatar from 'components/settings/workspace/LargeAvatar';
+import { charmverseDiscordInvite } from 'config/constants';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { setTitle } from 'hooks/usePageTitle';
 import { usePreventReload } from 'hooks/usePreventReload';
@@ -153,7 +154,7 @@ export default function WorkspaceSettings() {
       <Legend>API Key</Legend>
       <Typography variant='body1'>
         Request access to the charmverse API in our{' '}
-        <Link href='https://discord.gg/ACYCzBGC2M' external target='_blank'>
+        <Link href={charmverseDiscordInvite} external target='_blank'>
           Discord Channel <LaunchIcon fontSize='small' />
         </Link>
       </Typography>
@@ -179,7 +180,6 @@ export default function WorkspaceSettings() {
               await charmClient.deleteSpace(space.id);
               const filteredSpaces = spaces.filter((s) => s.id !== space.id);
               setSpaces(filteredSpaces);
-              window.location.href = filteredSpaces.length !== 0 ? `/${filteredSpaces[0].domain}` : '/signup';
             }
           }}
         />
@@ -197,7 +197,6 @@ export default function WorkspaceSettings() {
             await charmClient.leaveSpace(space.id);
             const filteredSpaces = spaces.filter((s) => s.id !== space.id);
             setSpaces(filteredSpaces);
-            window.location.href = filteredSpaces.length !== 0 ? `/${filteredSpaces[0].domain}` : '/signup';
           }}
         />
       )}

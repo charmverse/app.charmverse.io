@@ -83,6 +83,9 @@ function ViewTabs(props: ViewTabsProps) {
   const shownViews = views.slice(0, maxTabsShown);
   let restViews = views.slice(maxTabsShown);
 
+  // make sure active view id is visible
+  const activeShowViewId = shownViews.find((view) => view.id === activeView?.id)?.id ?? false;
+
   // If the current view index is more than what we can show in the screen
   if (currentViewIndex >= maxTabsShown) {
     const replacedView = shownViews[maxTabsShown - 1];
@@ -166,7 +169,6 @@ function ViewTabs(props: ViewTabsProps) {
       const { boardId, ...sourceDataWithoutBoard } = newView.fields.sourceData!;
       newView.fields.sourceData = sourceDataWithoutBoard;
       mutator.updateBlock(newView, dropdownView, 'reset Google view source');
-      // charmClient.google.forms.syncFormResponses({ reset: true, viewId: dropdownView.id });
       setAnchorEl(null);
     }
   }
@@ -204,12 +206,7 @@ function ViewTabs(props: ViewTabsProps) {
 
   return (
     <>
-      <Tabs
-        textColor='primary'
-        indicatorColor='secondary'
-        value={activeView?.id ?? false}
-        sx={{ minHeight: 0, mb: '-4px' }}
-      >
+      <Tabs textColor='primary' indicatorColor='secondary' value={activeShowViewId} sx={{ minHeight: 0, mb: '-4px' }}>
         {shownViews.map((view) => (
           <Tab
             component='div'
@@ -245,7 +242,7 @@ function ViewTabs(props: ViewTabsProps) {
           />
         )}
       </Tabs>
-      <Menu anchorEl={anchorEl} disablePortal open={Boolean(anchorEl)} onClose={handleClose}>
+      <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleClose}>
         <MenuItem dense onClick={handleRenameView}>
           <ListItemIcon>
             <EditIcon fontSize='small' />
@@ -297,29 +294,21 @@ function ViewTabs(props: ViewTabsProps) {
             mb: 1
           }}
         >
-          {restViews.map((view) => {
-            const content = (
-              <MenuItem
-                onClick={() => {
-                  showView(view.id);
-                  showViewsMenuState.onClose();
-                }}
-                component='a'
-                key={view.id}
-                dense
-              >
-                <ListItemIcon>{iconForViewType(view.fields.viewType)}</ListItemIcon>
-                <ListItemText>{view.title || formatViewTitle(view)}</ListItemText>
-              </MenuItem>
-            );
-            return disableUpdatingUrl ? (
-              content
-            ) : (
-              <Link key={view.id} href={getViewUrl(view.id)} passHref>
-                {content}
-              </Link>
-            );
-          })}
+          {restViews.map((view) => (
+            <MenuItem
+              onClick={() => {
+                showView(view.id);
+                showViewsMenuState.onClose();
+              }}
+              href={disableUpdatingUrl ? '' : getViewUrl(view.id)}
+              component={Link}
+              key={view.id}
+              dense
+            >
+              <ListItemIcon>{iconForViewType(view.fields.viewType)}</ListItemIcon>
+              <ListItemText>{view.title || formatViewTitle(view)}</ListItemText>
+            </MenuItem>
+          ))}
         </Box>
         <Divider />
         {addViewButton}
