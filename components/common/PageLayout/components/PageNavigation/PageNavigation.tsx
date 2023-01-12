@@ -75,9 +75,8 @@ function TreeRoot({ children, mutatePage, isFavorites, ...rest }: TreeRootProps)
   const hasChildrenLoaded = !!(children as any[]).length;
 
   useEffect(() => {
-    // if (menuItemCount > 0) {
     const { pageId } = router.query;
-    if (pageId) {
+    if (hasChildrenLoaded && pageId) {
       const anchor = document.querySelector(`a[href^="/${router.query.domain}/${pageId}"]`);
       if (anchor) {
         setTimeout(() => {
