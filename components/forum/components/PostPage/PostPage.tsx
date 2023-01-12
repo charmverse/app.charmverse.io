@@ -1,7 +1,7 @@
 import CommentIcon from '@mui/icons-material/Comment';
 import { Box, Divider, Stack, Typography } from '@mui/material';
 import type { Dispatch, SetStateAction } from 'react';
-import { useEffect, useMemo, useState } from 'react';
+import { useRef, useEffect, useMemo, useState } from 'react';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
@@ -13,6 +13,7 @@ import type { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEdit
 import LoadingComponent from 'components/common/LoadingComponent';
 import { ScrollableWindow } from 'components/common/PageLayout';
 import { usePageTitle } from 'hooks/usePageTitle';
+import { usePreventReload } from 'hooks/usePreventReload';
 import { useUser } from 'hooks/useUser';
 import type { PostCommentWithVote, PostCommentWithVoteAndChildren } from 'lib/forums/comments/interface';
 import type { PostWithVotes } from 'lib/forums/posts/interfaces';
@@ -88,6 +89,9 @@ export function PostPage({ post, spaceId, onSave, setForm, form }: Props) {
     post ? charmClient.forum.listPostComments(post.id) : undefined
   );
 
+  const changed = useRef(false);
+
+  usePreventReload(changed?.current);
   const [, setTitleState] = usePageTitle();
 
   const [commentSort, setCommentSort] = useState<PostCommentSort>('latest');
@@ -134,6 +138,7 @@ export function PostPage({ post, spaceId, onSave, setForm, form }: Props) {
   }
 
   function updatePostContent({ doc, rawText }: ICharmEditorOutput) {
+    changed.current = true;
     setForm((_form) => ({
       ..._form,
       content: doc,
