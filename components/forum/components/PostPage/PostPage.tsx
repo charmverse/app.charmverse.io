@@ -1,5 +1,6 @@
 import CommentIcon from '@mui/icons-material/Comment';
 import { Box, Divider, Stack, Typography } from '@mui/material';
+import type { Dispatch, SetStateAction } from 'react';
 import { useEffect, useMemo, useState } from 'react';
 import useSWR from 'swr';
 
@@ -23,17 +24,19 @@ import { PostComment } from './components/PostComment';
 import { PostCommentForm } from './components/PostCommentForm';
 import { PostCommentSort } from './components/PostCommentSort';
 
-type Props = {
-  spaceId: string;
-  post: PostWithVotes | null;
-  onSave?: () => void;
-};
-
 type FormInputs = {
   title: string;
   content: any | null;
   contentText?: string;
   id?: string;
+};
+
+type Props = {
+  spaceId: string;
+  post: PostWithVotes | null;
+  onSave?: () => void;
+  setForm: Dispatch<SetStateAction<FormInputs>>;
+  form: FormInputs;
 };
 
 function processComments({ postComments }: { postComments: PostCommentWithVote[] }) {
@@ -74,9 +77,8 @@ function sortComments({ comments, sort }: { comments: PostCommentWithVoteAndChil
   return comments;
 }
 
-export function PostPage({ post, spaceId, onSave }: Props) {
+export function PostPage({ post, spaceId, onSave, setForm, form }: Props) {
   const { user } = useUser();
-  const [form, setForm] = useState<FormInputs>(post ?? { title: '', content: null, contentText: '' });
   const [categoryId, setCategoryId] = useState(post?.categoryId ?? null);
   const {
     data: postComments,
@@ -99,7 +101,6 @@ export function PostPage({ post, spaceId, onSave }: Props) {
   useEffect(() => {
     if (post) {
       setTitleState(post.title);
-      setForm((_form) => ({ ...form, content: post.content, contentText: post.contentText }));
     }
   }, [post]);
 

@@ -1,12 +1,12 @@
 import OpenInFullIcon from '@mui/icons-material/OpenInFull';
 import { Box } from '@mui/material';
-import type { Post } from '@prisma/client';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import Dialog from 'components/common/BoardEditor/focalboard/src/components/dialog';
 import Button from 'components/common/Button';
+import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import type { PostWithVotes } from 'lib/forums/posts/interfaces';
 
 import { PostPage } from '../PostPage/PostPage';
@@ -18,10 +18,20 @@ interface Props {
   open?: boolean;
 }
 
+type FormInputs = {
+  title: string;
+  content: any | null;
+  contentText?: string;
+  id?: string;
+};
+
 export default function PostDialog({ post, spaceId, onClose, open }: Props) {
   const mounted = useRef(false);
   const popupState = usePopupState({ variant: 'popover', popupId: 'post-dialog' });
   const router = useRouter();
+  const [form, setForm] = useState<FormInputs>(post ?? { title: '', content: null, contentText: '' });
+  const [contentUpdated, setContentUpdated] = useState(false);
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
 
   // keep track if charmeditor is mounted. There is a bug that it calls the update method on closing the modal, but content is empty
   useEffect(() => {
@@ -36,6 +46,7 @@ export default function PostDialog({ post, spaceId, onClose, open }: Props) {
     if (post) {
       popupState.open();
     }
+    setForm(post ?? { title: '', content: null, contentText: '' });
   }, [!!post]);
 
   // open modal when page is set
@@ -72,9 +83,38 @@ export default function PostDialog({ post, spaceId, onClose, open }: Props) {
           </Box>
         )
       }
-      onClose={close}
+      onClose={() => {
+        if (contentUpdated) {
+          setShowConfirmDialog(true);
+        } else {
+          close();
+        }
+      }}
     >
-      <PostPage post={post ?? null} spaceId={spaceId} onSave={close} />
+      <PostPage
+        form={form}
+        setForm={(_form) => {
+          const updatedFormInputs = typeof _form === 'function' ? _form(form) : _form;
+          if (updatedFormInputs.contentText !== form.contentText) {
+            setContentUpdated(true);
+          }
+          setForm(_form);
+        }}
+        post={post ?? null}
+        spaceId={spaceId}
+        onSave={close}
+      />
+      <ConfirmDeleteModal
+        onClose={() => {
+          setShowConfirmDialog(false);
+        }}
+        title='Unsaved changes'
+        open={showConfirmDialog}
+        buttonText='Close'
+        secondaryButtonText='Go back'
+        question='Are you sure you want to close this post? You have unsaved changes'
+        onConfirm={close}
+      />
     </Dialog>
   );
 }
