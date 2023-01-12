@@ -1,6 +1,7 @@
 import type { SQSClientConfig } from '@aws-sdk/client-sqs';
 import { SQSClient, ReceiveMessageCommand, GetQueueUrlCommand, DeleteMessageCommand } from '@aws-sdk/client-sqs';
 
+import { AWS_REGION, SQS_NAME } from 'lib/aws/config';
 import log from 'lib/log';
 import type { WebhookMessage } from 'lib/webhooks/interfaces';
 
@@ -11,14 +12,13 @@ type ProcessMssagesInput = {
 
 const AWS_API_KEY = process.env.AWS_ACCESS_KEY_ID as string;
 const AWS_API_SECRET = process.env.AWS_SECRET_ACCESS_KEY as string;
-const SQS_REGION = (process.env.AWS_REGION as string) || 'us-east-1';
+const SQS_REGION = (process.env.AWS_REGION as string) || AWS_REGION;
 
 const config: SQSClientConfig = { region: SQS_REGION };
 if (AWS_API_KEY && AWS_API_SECRET) {
   config.credentials = { accessKeyId: AWS_API_KEY, secretAccessKey: AWS_API_SECRET };
 }
 
-const SQS_NAME = process.env.SQS_NAME as string;
 const client = new SQSClient(config);
 let queueUrl = '';
 
