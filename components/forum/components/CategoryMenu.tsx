@@ -27,6 +27,7 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import { postSortOptions } from 'lib/forums/posts/constants';
 
 import { ForumFilterCategory } from './CategoryPopup';
+import type { FilterProps } from './CategorySelect';
 
 const StyledBox = styled(Box)`
   ${hoverIconsStyle({ marginForIcons: false })}
@@ -43,7 +44,7 @@ function ForumFilterListLink({ category, label, sort }: { label: string; categor
     label === 'All categories'
       ? `/${router.query.domain}/forum`
       : category
-      ? `/${router.query.domain}/forum?categoryId=${category.id}`
+      ? `/${router.query.domain}/forum/${category.name}`
       : sort
       ? `/${router.query.domain}/forum?sort=${sort}`
       : '';
@@ -103,34 +104,33 @@ function ForumFilterListLink({ category, label, sort }: { label: string; categor
     </MenuItem>
   );
 }
-
-export function CategoryMenu() {
+export function CategoryMenu({ handleCategory, handleSort, selectedCategory, sort }: FilterProps) {
   const { categories, error, createForumCategory } = useForumCategories();
   const addCategoryPopupState = usePopupState({ variant: 'popover', popupId: 'add-category' });
   const admin = isAdmin();
-  const [forumCategoryName, setForumCategoryName] = useState('');
+
   const router = useRouter();
   const currentSpace = useCurrentSpace();
 
+  const [newForumCategoryName, setNewForumCategoryName] = useState('');
+
   function createCategory() {
-    createForumCategory(forumCategoryName);
-    setForumCategoryName('');
+    createForumCategory(newForumCategoryName);
+    setNewForumCategoryName('');
     addCategoryPopupState.close();
   }
 
   if (error) {
     return <Alert severity='error'>An error occurred while loading the categories</Alert>;
   }
-
   useEffect(() => {
-    const selectedCategory = categories.find((category) => category.id === router.query.categoryId);
-    if (selectedCategory && currentSpace?.id) {
+    if (selectedCategory && currentSpace) {
       charmClient.track.trackAction('main_feed_filtered', {
-        categoryName: selectedCategory.name,
+        categoryName: selectedCategory,
         spaceId: currentSpace.id
       });
     }
-  }, [router.query.categoryId, currentSpace]);
+  }, [router.query.categoryName]);
 
   return (
     <Card variant='outlined'>
@@ -140,9 +140,9 @@ export function CategoryMenu() {
         }}
       >
         <Stack gap={1} my={1}>
-          {postSortOptions.map((sort) => (
-            <StyledBox key={sort}>
-              <ForumFilterListLink label={startCase(sort.replace('_', ' '))} sort={sort} />
+          {postSortOptions.map((_sort) => (
+            <StyledBox key={_sort}>
+              <ForumFilterListLink label={startCase(_sort.replace('_', ' '))} sort={_sort} />
             </StyledBox>
           ))}
         </Stack>
@@ -184,9 +184,9 @@ export function CategoryMenu() {
           }}
           autoFocus
           fullWidth
-          value={forumCategoryName}
+          value={newForumCategoryName}
           onChange={(e) => {
-            setForumCategoryName(e.target.value);
+            setNewForumCategoryName(e.target.value);
           }}
           onKeyPress={(e) => {
             if (e.key === 'Enter') {
@@ -195,9 +195,7 @@ export function CategoryMenu() {
           }}
         />
         <Button
-          disabled={
-            forumCategoryName.length === 0 || categories.find((category) => category.name === forumCategoryName)
-          }
+          disabled={categories.find((category) => category.name === newForumCategoryName)}
           onClick={createCategory}
         >
           Add

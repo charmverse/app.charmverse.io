@@ -27,12 +27,12 @@ export function ForumPage() {
   const [search, setSearch] = useState('');
   const router = useRouter();
   const currentSpace = useCurrentSpace();
-  const categoryId = router.query.categoryId as string | undefined;
+  const categoryName = router.query.categoryId as string | undefined;
   const sort = router.query.sort as PostOrder | undefined;
   const [showNewPostForm, setShowNewPostForm] = useState(false);
   const { showPost } = usePostDialog();
   const { categories } = useForumCategories();
-  const currentCategory = categories.find((category) => category.id === categoryId);
+  const currentCategory = categories.find((category) => category.name === categoryName);
 
   function handleSortUpdate(sortName?: PostOrder) {
     const pathname = `/${currentSpace?.domain}/forum`;
@@ -49,18 +49,12 @@ export function ForumPage() {
     }
   }
 
-  function handleCategoryUpdate(_categoryId?: string) {
+  function handleCategoryUpdate(_categoryName?: string) {
     const pathname = `/${currentSpace?.domain}/forum`;
 
-    if (_categoryId === null) {
+    if (typeof _categoryName === 'string') {
       router.push({
-        pathname,
-        query: { _categoryId: null }
-      });
-    } else if (typeof _categoryId === 'string') {
-      router.push({
-        pathname,
-        query: { _categoryId }
+        pathname: `${pathname}/${_categoryName}`
       });
     } else {
       router.push({
@@ -139,7 +133,12 @@ export function ForumPage() {
           <ForumPostList search={search} categoryId={currentCategory?.id} sort={sort} />
         </Grid>
         <Grid item xs={12} lg={3} display={{ xs: 'none', lg: 'initial' }}>
-          <CategoryMenu />
+          <CategoryMenu
+            handleCategory={handleCategoryUpdate}
+            handleSort={handleSortUpdate}
+            sort={sort}
+            selectedCategory={categoryName}
+          />
         </Grid>
       </Grid>
     </CenteredPageContent>

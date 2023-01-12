@@ -10,7 +10,7 @@ import { useForumCategories } from 'hooks/useForumCategories';
 import { postSortOptions } from 'lib/forums/posts/constants';
 import type { PostOrder } from 'lib/forums/posts/listForumPosts';
 
-type FilterProps = {
+export type FilterProps = {
   selectedCategory?: string;
   handleCategory: (categoryId?: string) => void;
   sort?: PostOrder;
