@@ -10,8 +10,7 @@ export async function modifyChildPages(parentId: string, userId: string, action:
   const { flatChildren } = await resolvePageTree({
     pageId: parentId,
     flattenChildren: true,
-    includeDeletedPages: true,
-    includeAllPageTypes: true
+    includeDeletedPages: true
   });
 
   const modifiedChildPageIds: string[] = [parentId, ...flatChildren.map((p) => p.id)];

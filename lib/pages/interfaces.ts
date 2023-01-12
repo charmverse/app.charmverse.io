@@ -65,8 +65,6 @@ export interface PageTreeMappingInput<T extends PageNode> {
   rootPageIds?: string[];
   targetPageId?: string;
   includeDeletedPages?: boolean;
-  includeProposals?: boolean;
-  includeAllPageTypes?: boolean;
 }
 
 /**

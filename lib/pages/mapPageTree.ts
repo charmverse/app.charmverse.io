@@ -20,9 +20,7 @@ export function sortNodes<T>(nodes: PageNode<T>[]) {
 export function reducePagesToPageTree<T extends PageNode = PageNode>({
   items,
   rootPageIds,
-  includeDeletedPages,
-  includeProposals,
-  includeAllPageTypes
+  includeDeletedPages
 }: Omit<PageTreeMappingInput<T>, 'targetPageId'>): {
   itemMap: { [key: string]: number };
   itemsWithChildren: PageNodeWithChildren<T>[];
@@ -30,10 +28,6 @@ export function reducePagesToPageTree<T extends PageNode = PageNode>({
 } {
   function includableNode(node: PageNode): boolean {
     if (!includeDeletedPages && node.deletedAt) {
-      return false;
-    } else if (!includeProposals && !includeAllPageTypes && node.type === 'proposal') {
-      return false;
-    } else if (!includeAllPageTypes && node.type === 'card') {
       return false;
     } else {
       return true;
@@ -93,14 +87,12 @@ export function reducePagesToPageTree<T extends PageNode = PageNode>({
 export function mapPageTree<T extends PageNode = PageNode>({
   items,
   rootPageIds,
-  includeDeletedPages,
-  includeProposals = false
+  includeDeletedPages
 }: Omit<PageTreeMappingInput<T>, 'targetPageId' | 'includeCards'>): PageNodeWithChildren<T>[] {
   const { rootNodes } = reducePagesToPageTree({
     items,
     rootPageIds,
-    includeDeletedPages,
-    includeProposals
+    includeDeletedPages
   });
 
   return sortNodes(rootNodes);
@@ -118,8 +110,7 @@ export function mapTargetPageTree<T extends PageNode = PageNode>({
 }: Omit<PageTreeMappingInput<T>, 'rootPageIds'> & { targetPageId: string }): TargetPageTree<T> {
   const { itemMap, itemsWithChildren } = reducePagesToPageTree({
     items,
-    includeDeletedPages,
-    includeAllPageTypes
+    includeDeletedPages
   });
 
   /**

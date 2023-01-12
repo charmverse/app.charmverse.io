@@ -143,9 +143,7 @@ export async function resolvePageTree({
   const { parents, targetPage } = mapTargetPageTree({
     items: pagesInSpace,
     targetPageId: pageId,
-    includeDeletedPages,
-    includeAllPageTypes,
-    includeProposals: true
+    includeDeletedPages
   });
 
   // Prune the parent references so we have a direct chain
