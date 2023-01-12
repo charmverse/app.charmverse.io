@@ -73,7 +73,7 @@ export default function PostDialog({ post, spaceId, onClose, open }: Props) {
           }
           onClose={close}
         >
-          <PostPage post={post ?? null} spaceId={spaceId} onSave={close} />
+          <PostPage insideDialog post={post ?? null} spaceId={spaceId} onSave={close} />
         </Dialog>
       )}
     </RootPortal>

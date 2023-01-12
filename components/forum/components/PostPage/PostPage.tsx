@@ -28,6 +28,7 @@ type Props = {
   spaceId: string;
   post: PostWithVotes | null;
   onSave?: () => void;
+  insideDialog?: boolean;
 };
 
 type FormInputs = {
@@ -75,7 +76,7 @@ function sortComments({ comments, sort }: { comments: PostCommentWithVoteAndChil
   return comments;
 }
 
-export function PostPage({ post, spaceId, onSave }: Props) {
+export function PostPage({ insideDialog = false, post, spaceId, onSave }: Props) {
   const { user } = useUser();
   const [form, setForm] = useState<FormInputs>(post ?? { title: '', content: null, contentText: '' });
   const [categoryId, setCategoryId] = useState(post?.categoryId ?? null);
@@ -232,7 +233,7 @@ export function PostPage({ post, spaceId, onSave }: Props) {
             )
           )}
         </Container>
-        {post && (
+        {post && insideDialog && (
           <Box height='100%' width='25%' mr={5} position='relative' top={50}>
             <CategoryPosts postId={post.id} categoryId={post.categoryId} />
           </Box>
