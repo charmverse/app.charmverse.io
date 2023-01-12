@@ -202,21 +202,6 @@ function generateBoardWithCardsStub(): {
 }
 
 describe('reducePagesToPageTree', () => {
-  it('should filter out card type pages by default', async () => {
-    const { board, boardAndCards } = generateBoardWithCardsStub();
-
-    const { rootNodes } = reducePagesToPageTree({
-      items: boardAndCards
-    });
-
-    expect(rootNodes.length).toBe(1);
-
-    expect(rootNodes[0].id).toBe(board.id);
-
-    // No children should have been passed
-    expect(rootNodes[0].children.length).toBe(0);
-  });
-
   it('should filter out deleted pages by default', async () => {
     const root_3 = generatePageNode({
       parentId: null,
@@ -347,22 +332,6 @@ describe('mapPageTree', () => {
 
     validateRootOne(rootList[0]);
   });
-
-  it('should always ignore card type pages', async () => {
-    const { boardAndCards, board } = generateBoardWithCardsStub();
-
-    const rootList = mapPageTree({
-      items: boardAndCards
-    });
-
-    expect(rootList.length).toBe(1);
-
-    expect(rootList[0].id).toBe(board.id);
-
-    // No children should have been passed
-    expect(rootList[0].children.length).toBe(0);
-  });
-
   it('should only return the selected root nodes if this is provided as a parameter', async () => {
     const rootList = mapPageTree({
       items: pages,

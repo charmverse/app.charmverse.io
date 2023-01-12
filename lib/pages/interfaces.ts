@@ -74,7 +74,6 @@ export interface PageTreeResolveInput {
   pageId: string;
   flattenChildren?: boolean;
   includeDeletedPages?: boolean;
-  includeAllPageTypes?: boolean;
   fullPage?: boolean;
   pageNodes?: PageNodeWithPermissions[];
 }
