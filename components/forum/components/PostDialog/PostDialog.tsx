@@ -46,7 +46,6 @@ export default function PostDialog({ post, spaceId, onClose, open }: Props) {
     if (post) {
       popupState.open();
     }
-    setForm(post ?? { title: '', content: null, contentText: '' });
   }, [!!post]);
 
   // open modal when page is set

@@ -87,6 +87,7 @@ export function PostPage({ post, spaceId, onSave, setForm, form }: Props) {
   } = useSWR(post ? `${post.id}/comments` : null, () =>
     post ? charmClient.forum.listPostComments(post.id) : undefined
   );
+
   const [, setTitleState] = usePageTitle();
 
   const [commentSort, setCommentSort] = useState<PostCommentSort>('latest');
@@ -101,6 +102,7 @@ export function PostPage({ post, spaceId, onSave, setForm, form }: Props) {
   useEffect(() => {
     if (post) {
       setTitleState(post.title);
+      setForm((_form) => ({ ..._form, content: post.content, contentText: post.contentText }));
     }
   }, [post]);
 
