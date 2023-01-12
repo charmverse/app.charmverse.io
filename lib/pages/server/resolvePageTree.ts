@@ -1,6 +1,6 @@
 import type { Prisma } from '@prisma/client';
 
-import type { OptionalTransaction, TransactionClient } from 'db';
+import type { OptionalTransaction } from 'db';
 import { prisma } from 'db';
 import { InvalidInputError } from 'lib/utilities/errors';
 
@@ -139,11 +139,10 @@ export async function resolvePageTree({
       })
     ))) as PageNodeWithPermissions[] | IPageWithPermissions[];
 
-  const { parents, targetPage } = mapTargetPageTree<PageNodeWithPermissions>({
+  const { parents, targetPage } = mapTargetPageTree({
     items: pagesInSpace,
     targetPageId: pageId,
-    includeDeletedPages,
-    includeProposals: true
+    includeDeletedPages
   });
 
   // Prune the parent references so we have a direct chain

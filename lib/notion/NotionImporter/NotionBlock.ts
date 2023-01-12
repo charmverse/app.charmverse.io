@@ -9,6 +9,7 @@ import { extractAttrsFromUrl as extractNFTAttrs } from 'components/common/CharmE
 import { extractTweetAttrs } from 'components/common/CharmEditor/components/tweet/tweetSpec';
 import { extractYoutubeLinkType } from 'components/common/CharmEditor/components/video/utils';
 import { VIDEO_ASPECT_RATIO } from 'components/common/CharmEditor/components/video/videoSpec';
+import log from 'lib/log';
 import type {
   TextContent,
   MentionNode,
@@ -17,7 +18,8 @@ import type {
   TableNode,
   TableRowNode,
   ColumnLayoutNode,
-  ColumnBlockNode
+  ColumnBlockNode,
+  TextMark
 } from 'lib/prosemirror/interfaces';
 import { MAX_IMAGE_WIDTH, MIN_IMAGE_WIDTH } from 'lib/prosemirror/plugins/image/constants';
 import { isTruthy } from 'lib/utilities/types';
@@ -80,27 +82,41 @@ export class NotionBlock {
         }
       } else if (contents[index].type === 'text') {
         const textContent = contents[index] as TextContent;
+        const marks: TextMark[] = [];
         if (textContent.marks) {
-          for (let textContentIndex = 0; textContentIndex < textContent.marks.length; textContentIndex++) {
-            const mark = textContent.marks[textContentIndex];
+          for (let textContentMarkIndex = 0; textContentMarkIndex < textContent.marks.length; textContentMarkIndex++) {
+            const mark = textContent.marks[textContentMarkIndex];
             if (mark.attrs && mark.type === 'link') {
-              const notionPageLink = mark.attrs.href.slice(1);
-              const notionPageId = [
-                notionPageLink.substring(0, 8),
-                notionPageLink.substring(8, 12),
-                notionPageLink.substring(12, 16),
-                notionPageLink.substring(16, 20),
-                notionPageLink.substring(20)
-              ].join('-');
-              const charmversePage = await this.notionPage.fetchAndCreatePage({
-                notionPageId
-              });
-              if (charmversePage) {
-                mark.attrs.href = charmversePage.path;
+              // If its linking to an internal page
+              if (mark.attrs.href.startsWith('/')) {
+                const notionPageLink = mark.attrs.href.slice(1);
+                const notionPageId = [
+                  notionPageLink.substring(0, 8),
+                  notionPageLink.substring(8, 12),
+                  notionPageLink.substring(12, 16),
+                  notionPageLink.substring(16, 20),
+                  notionPageLink.substring(20)
+                ].join('-');
+                const charmversePage = await this.notionPage.fetchAndCreatePage({
+                  notionPageId
+                });
+                if (charmversePage) {
+                  mark.attrs.href = charmversePage.path;
+                  marks.push(mark);
+                } else {
+                  // Skip adding link mark as the charmverse page was not created
+                  // Most likely the integration doesn't have access to the page
+                }
+              } else {
+                marks.push(mark);
               }
+            } else {
+              marks.push(mark);
             }
           }
         }
+
+        textContent.marks = marks;
       }
     }
 
@@ -150,6 +166,7 @@ export class NotionBlock {
         }
       } catch (err) {
         if (block) {
+          log.error(`[notion] Failed to convert notion ${block.type}:${block.id} block to charmverse block`);
           const notionPage = this.notionPage.cache.notionPagesRecord[
             this.charmversePage.notionPageId
           ] as PageObjectResponse;

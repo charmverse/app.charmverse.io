@@ -51,13 +51,8 @@ async function deleteBlock(
       throw new ActionNotPermittedError();
     }
 
-    const pageTree = await resolvePageTree({ pageId: rootBlock.id, flattenChildren: true, includeDeletedPages: true });
-
-    const deletedChildPageIds = await modifyChildPages(blockId, userId, 'archive', pageTree);
+    const deletedChildPageIds = await modifyChildPages(blockId, userId, 'archive');
     deletedCount = deletedChildPageIds.length;
-
-    const allPages = [pageTree.targetPage, ...pageTree.flatChildren];
-
     relay.broadcast(
       {
         type: 'blocks_deleted',

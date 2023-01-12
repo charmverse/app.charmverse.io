@@ -169,7 +169,6 @@ function ViewTabs(props: ViewTabsProps) {
       const { boardId, ...sourceDataWithoutBoard } = newView.fields.sourceData!;
       newView.fields.sourceData = sourceDataWithoutBoard;
       mutator.updateBlock(newView, dropdownView, 'reset Google view source');
-      // charmClient.google.forms.syncFormResponses({ reset: true, viewId: dropdownView.id });
       setAnchorEl(null);
     }
   }
@@ -243,7 +242,7 @@ function ViewTabs(props: ViewTabsProps) {
           />
         )}
       </Tabs>
-      <Menu anchorEl={anchorEl} disablePortal open={Boolean(anchorEl)} onClose={handleClose}>
+      <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleClose}>
         <MenuItem dense onClick={handleRenameView}>
           <ListItemIcon>
             <EditIcon fontSize='small' />

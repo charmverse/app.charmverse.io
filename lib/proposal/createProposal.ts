@@ -38,6 +38,7 @@ export async function createProposal(pageProps: ProposalPageInput, proposalProps
           id: pageId
         },
         data: {
+          parentId: null, // unset parentId if this page was a db card before
           proposalId,
           type: 'proposal',
           updatedAt: new Date(),

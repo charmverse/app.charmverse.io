@@ -9,6 +9,7 @@ import promiseRetry from 'promise-retry';
 import { v4 } from 'uuid';
 
 import type { IPropertyTemplate } from 'lib/focalboard/board';
+import log from 'lib/log';
 import { isTruthy } from 'lib/utilities/types';
 
 import { convertPropertyType } from '../convertPropertyType';
@@ -65,9 +66,9 @@ export class NotionPage {
   }
 
   async fetchAndCreatePage({ notionPageId }: { notionPageId: string }): Promise<Page | null> {
+    const { cache } = this;
+    let notionPage = cache.notionPagesRecord[notionPageId];
     try {
-      const { cache } = this;
-      let notionPage = cache.notionPagesRecord[notionPageId];
       if (!notionPage) {
         notionPage = await this.retrievePage(notionPageId);
       }
@@ -112,6 +113,9 @@ export class NotionPage {
     } catch (err: any) {
       if (err.code === 'object_not_found') {
         this.cache.pagesWithoutIntegrationAccess.add(notionPageId);
+      }
+      if (notionPage) {
+        log.debug(`[notion] Failed to fetch and create notion page ${notionPage.id}`);
       }
       return null;
     }
@@ -303,7 +307,7 @@ export class NotionPage {
           });
 
           // Only if there is a next_cursor continue further
-          if (!blockCursorRecord[childBlockListResponse.parent_block_id] && childBlockListResponse.next_cursor) {
+          if (childBlockListResponse.next_cursor) {
             blockCursorRecord[childBlockListResponse.parent_block_id] = childBlockListResponse.next_cursor;
             fetchMore = fetchMore || true;
           }

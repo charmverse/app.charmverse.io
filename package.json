@@ -10,7 +10,7 @@
     "build:prisma": "prisma generate",
     "build:analyze": "cross-env ANALYZE=true next build",
     "deploy:staging": "npx cdk deploy \"stg-charmverse-${STAGE}\" --outputs-file cdk.out.json",
-    "postdeploy:staging": "node --eval \"console.log('::set-output name=env_url::' + require('./cdk.out.json')['stg-charmverse-${STAGE}'].DeploymentUrl)\"",
+    "postdeploy:staging": "node --eval \"console.log('env_url=' + require('./cdk.out.json')['stg-charmverse-${STAGE}'].DeploymentUrl)\"  >> $GITHUB_OUTPUT",
     "destroy:staging": "npx cdk destroy \"stg-charmverse-${STAGE}\" --force",
     "lint": "eslint -c .eslintrc.json . --ext .ts --ext .tsx --quiet",
     "lint:prod": "npm run lint -- --quiet",

@@ -28,7 +28,7 @@ type Props = {
   pageUpdatedAt: string;
 };
 
-const CardDetailProperties = React.memo((props: Props) => {
+function CardDetailProperties(props: Props) {
   const { board, card, cards, views, activeView, pageUpdatedAt, pageUpdatedBy } = props;
   const [newTemplateId, setNewTemplateId] = useState('');
   const intl = useIntl();
@@ -221,7 +221,7 @@ const CardDetailProperties = React.memo((props: Props) => {
             <Button>
               <FormattedMessage id='CardDetail.add-property' defaultMessage='+ Add a property' />
             </Button>
-            <Menu position='bottom-start'>
+            <Menu position='bottom-start' disablePortal={false}>
               <PropertyTypes
                 label={intl.formatMessage({ id: 'PropertyMenu.selectType', defaultMessage: 'Select property type' })}
                 onTypeSelected={async (type) => {
@@ -241,6 +241,6 @@ const CardDetailProperties = React.memo((props: Props) => {
       )}
     </div>
   );
-});
+}
 
-export default CardDetailProperties;
+export default React.memo(CardDetailProperties);
