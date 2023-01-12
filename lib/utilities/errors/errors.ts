@@ -34,7 +34,7 @@ export interface ISystemError<E = any> {
 export type ISystemErrorInput<E = any> = Pick<ISystemError<E>, 'message' | 'errorType'> &
   Partial<Pick<ISystemError<E>, 'severity' | 'error'>>;
 
-export class SystemError<E = any> implements ISystemError<E> {
+export class SystemError<E = any> extends Error implements ISystemError<E> {
   code: number;
 
   errorType: ErrorType;
@@ -48,6 +48,7 @@ export class SystemError<E = any> implements ISystemError<E> {
   error: E;
 
   constructor(errorInfo: ISystemErrorInput<E>) {
+    super(errorInfo.message);
     this.errorType = errorInfo.errorType;
     this.code = ErrorCodes[this.errorType];
     this.message = errorInfo.message;
