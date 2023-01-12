@@ -10,13 +10,17 @@ import LoadingComponent from 'components/common/LoadingComponent';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useForumCategories } from 'hooks/useForumCategories';
 import type { ListForumPostsRequest } from 'lib/forums/posts/listForumPosts';
+import { setUrlWithoutRerender } from 'lib/utilities/browser';
+
+import { usePostDialog } from '../../PostDialog/hooks/usePostDialog';
 
 export function CategoryPosts({ categoryId, postId }: { postId: string; categoryId: string }) {
   const currentSpace = useCurrentSpace();
-  const router = useRouter();
   const { categories } = useForumCategories();
   const category = categories.find((_category) => _category.id === categoryId);
   const [sort, setSort] = useState<ListForumPostsRequest['sort']>('newest');
+  const { showPost } = usePostDialog();
+  const router = useRouter();
 
   const { data: postsData, isLoading: isLoadingPosts } = useSWR(
     currentSpace ? `forums/${categoryId}/posts?sort=${sort}` : null,
@@ -92,23 +96,26 @@ export function CategoryPosts({ categoryId, postId }: { postId: string; category
                     justifyContent: 'space-between'
                   }}
                 >
-                  <Link
-                    href={`/${router.query.domain}/forum/post/${post.path}`}
+                  <Typography
                     sx={{
+                      color: 'text.primary',
                       cursor: 'pointer',
                       wordBreak: 'break-all',
                       pr: 3.5,
                       width: '100%'
                     }}
+                    onClick={() => {
+                      showPost({
+                        postId: post.id,
+                        onClose() {
+                          setUrlWithoutRerender(router.pathname, { pageId: null });
+                        }
+                      });
+                      setUrlWithoutRerender(router.pathname, { pageId: post.id });
+                    }}
                   >
-                    <Typography
-                      sx={{
-                        color: 'text.primary'
-                      }}
-                    >
-                      {post.title}
-                    </Typography>
-                  </Link>
+                    {post.title}
+                  </Typography>
                 </MenuItem>
               )
             )
