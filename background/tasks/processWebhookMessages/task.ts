@@ -3,7 +3,11 @@ import log from 'lib/log';
 import { processWebhookMessage } from 'lib/webhooks/processWebhookMessage';
 
 export async function task() {
-  log.debug('Starting to process webhook messages job');
+  log.debug('Running process webhook messages cron job');
 
-  processMessages({ processorFn: processWebhookMessage });
+  try {
+    await processMessages({ processorFn: processWebhookMessage });
+  } catch (error: any) {
+    log.error(`Error processing webhook messages: ${error.stack || error.message || error}`, { error });
+  }
 }
