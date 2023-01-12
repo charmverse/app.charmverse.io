@@ -202,37 +202,6 @@ function generateBoardWithCardsStub(): {
 }
 
 describe('reducePagesToPageTree', () => {
-  it('should filter out card type pages by default', async () => {
-    const { board, boardAndCards } = generateBoardWithCardsStub();
-
-    const { rootNodes } = reducePagesToPageTree({
-      items: boardAndCards
-    });
-
-    expect(rootNodes.length).toBe(1);
-
-    expect(rootNodes[0].id).toBe(board.id);
-
-    // No children should have been passed
-    expect(rootNodes[0].children.length).toBe(0);
-  });
-
-  it('should filter out proposal type pages by default', async () => {
-    const proposal = generatePageNode({
-      type: 'proposal',
-      parentId: null
-    });
-
-    const { rootNodes } = reducePagesToPageTree({
-      items: [root_1, proposal],
-      includeProposals: false
-    });
-
-    expect(rootNodes.length).toBe(1);
-
-    expect(rootNodes[0].id).toBe(root_1.id);
-  });
-
   it('should filter out deleted pages by default', async () => {
     const root_3 = generatePageNode({
       parentId: null,
@@ -295,8 +264,7 @@ describe('reducePagesToPageTree', () => {
     const { board, card_1, card_2, boardAndCards } = generateBoardWithCardsStub();
 
     const { rootNodes } = reducePagesToPageTree({
-      items: boardAndCards,
-      includeCards: true
+      items: boardAndCards
     });
 
     expect(rootNodes.length).toBe(1);
@@ -337,8 +305,7 @@ describe('reducePagesToPageTree', () => {
     const boardAndCards = [board, card_1, card_page_1, card_page_2];
 
     const { rootNodes } = reducePagesToPageTree({
-      items: boardAndCards,
-      includeCards: true
+      items: boardAndCards
     });
 
     expect(rootNodes.length).toBe(1);
@@ -353,22 +320,6 @@ describe('reducePagesToPageTree', () => {
     expect(rootNodes[0].children[0].children[0].id).toBe(card_page_1.id);
     expect(rootNodes[0].children[0].children[1].id).toBe(card_page_2.id);
   });
-
-  it('should include proposal type pages if this option is true', async () => {
-    const proposal = generatePageNode({
-      type: 'proposal',
-      parentId: null
-    });
-
-    const { rootNodes } = reducePagesToPageTree({
-      items: [root_1, proposal],
-      includeProposals: true
-    });
-
-    expect(rootNodes.length).toBe(2);
-
-    expect(rootNodes.some((node) => node.id === proposal.id)).toBe(true);
-  });
 });
 
 describe('mapPageTree', () => {
@@ -381,41 +332,6 @@ describe('mapPageTree', () => {
 
     validateRootOne(rootList[0]);
   });
-
-  it('should always ignore card type pages', async () => {
-    const { boardAndCards, board } = generateBoardWithCardsStub();
-
-    const rootList = mapPageTree({
-      items: boardAndCards,
-      // Added this prop manually, Typescript will prevent us from calling it
-      includeCards: true
-    } as any);
-
-    expect(rootList.length).toBe(1);
-
-    expect(rootList[0].id).toBe(board.id);
-
-    // No children should have been passed
-    expect(rootList[0].children.length).toBe(0);
-  });
-
-  // This test so we don't accidentally render proposals in the UI page tree
-  it('should ignore proposal type pages by default', async () => {
-    const proposal = generatePageNode({
-      type: 'proposal',
-      parentId: null
-    });
-
-    const mappedPages = mapPageTree({
-      items: [root_1, proposal],
-      includeProposals: false
-    });
-
-    expect(mappedPages.length).toBe(1);
-
-    expect(mappedPages[0].id).toBe(root_1.id);
-  });
-
   it('should only return the selected root nodes if this is provided as a parameter', async () => {
     const rootList = mapPageTree({
       items: pages,

@@ -253,7 +253,10 @@ export async function replaceIllegalPermissions({
 
     const pageAfterPermissionsUpdate = (await getPage(pageId, undefined, tx)) as IPageWithPermissions;
 
-    const { parents: newParents, targetPage: newTargetPage } = await resolvePageTree({ pageId, tx });
+    const { parents: newParents, targetPage: newTargetPage } = await resolvePageTree({
+      pageId,
+      tx
+    });
 
     const pageWithChildren: IPageWithPermissions &
       PageNodeWithChildren<PageNodeWithPermissions> & { tree: TargetPageTree<PageNodeWithPermissions> } = {
