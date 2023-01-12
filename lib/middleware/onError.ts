@@ -18,7 +18,7 @@ export function onError(err: any, req: NextApiRequest, res: NextApiResponse) {
     });
   }
 
-  res.status(errorAsSystemError.code).json(errorAsSystemError);
+  res.status(errorAsSystemError.code).json({ ...errorAsSystemError, message: errorAsSystemError.message });
 }
 
 export default onError;
