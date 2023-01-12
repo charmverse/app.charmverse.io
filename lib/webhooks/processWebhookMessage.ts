@@ -2,6 +2,7 @@ import { createAndAssignRolesDiscord } from 'lib/discord/createAndAssignRolesDis
 import { getSpaceFromDiscord } from 'lib/discord/getSpaceFromDiscord';
 import { removeSpaceMemberDiscord } from 'lib/discord/removeSpaceMemberDiscord';
 import { unassignRolesDiscord } from 'lib/discord/unassignRolesDiscord';
+import log from 'lib/log';
 import { getRequestApiKey } from 'lib/middleware/getRequestApiKey';
 import { verifyApiKeyForSpace } from 'lib/middleware/verifyApiKeyForSpace';
 import type { MemberRoleWebhookData, MemberWebhookData, MessageType, WebhookMessage } from 'lib/webhooks/interfaces';
@@ -60,6 +61,7 @@ export async function processWebhookMessage(message: WebhookMessage) {
   const handler = messageHandlers[data?.type];
   const hasPermission = await verifyWebhookMessagePermission(message);
   if (!hasPermission) {
+    log.warn('Webhook message without permission to be parsed', message);
     return true;
   }
 

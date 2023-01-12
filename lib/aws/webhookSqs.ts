@@ -1,3 +1,4 @@
+import type { SQSClientConfig } from '@aws-sdk/client-sqs';
 import { SQSClient, ReceiveMessageCommand, GetQueueUrlCommand, DeleteMessageCommand } from '@aws-sdk/client-sqs';
 
 import log from 'lib/log';
@@ -12,11 +13,13 @@ const AWS_API_KEY = process.env.AWS_ACCESS_KEY_ID as string;
 const AWS_API_SECRET = process.env.AWS_SECRET_ACCESS_KEY as string;
 const SQS_REGION = process.env.AWS_REGION as string;
 
+const config: SQSClientConfig = { region: SQS_REGION };
+if (AWS_API_KEY && AWS_API_SECRET) {
+  config.credentials = { accessKeyId: AWS_API_KEY, secretAccessKey: AWS_API_SECRET };
+}
+
 const SQS_NAME = process.env.SQS_NAME as string;
-const client = new SQSClient({
-  region: SQS_REGION,
-  credentials: { accessKeyId: AWS_API_KEY, secretAccessKey: AWS_API_SECRET }
-});
+const client = new SQSClient(config);
 let queueUrl = '';
 
 export async function getQueueUrl() {
@@ -31,16 +34,20 @@ export async function getQueueUrl() {
 }
 
 export async function getNextMessage() {
-  const QueueUrl = await getQueueUrl();
-  if (QueueUrl) {
-    // 20s polling time
-    const command = new ReceiveMessageCommand({ QueueUrl, MaxNumberOfMessages: 1, WaitTimeSeconds: 20 });
-    const res = await client.send(command);
+  try {
+    const QueueUrl = await getQueueUrl();
+    if (QueueUrl) {
+      // 20s polling time
+      const command = new ReceiveMessageCommand({ QueueUrl, MaxNumberOfMessages: 1, WaitTimeSeconds: 20 });
+      const res = await client.send(command);
 
-    return res?.Messages?.[0] || null;
+      return res?.Messages?.[0] || null;
+    }
+
+    return null;
+  } catch (e) {
+    return null;
   }
-
-  return null;
 }
 
 export async function deleteMessage(receipt: string) {
@@ -58,8 +65,9 @@ export async function processMessages({ processorFn }: ProcessMssagesInput) {
     let msgBody: Record<string, any> | string = '';
     try {
       msgBody = JSON.parse(message.Body || '');
-      // eslint-disable-next-line no-empty
-    } catch (e) {}
+    } catch (e) {
+      log.warn('SQS message body failes to parse', e);
+    }
 
     try {
       // process message
