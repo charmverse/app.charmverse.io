@@ -1,4 +1,5 @@
 import { prisma } from 'db';
+import { getSpaceFromDiscord } from 'lib/discord/getSpaceFromDiscord';
 import { InvalidInputError } from 'lib/utilities/errors';
 
 export async function getSpaceAndUserFromDiscord({
@@ -8,7 +9,7 @@ export async function getSpaceAndUserFromDiscord({
   discordServerId: string;
   discordUserId: string;
 }) {
-  const space = await prisma.space.findFirst({ where: { discordServerId } });
+  const space = await getSpaceFromDiscord(discordServerId);
 
   if (!space) {
     throw new InvalidInputError('Space not found');

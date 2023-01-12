@@ -1,3 +1,4 @@
+import type { SQSClientConfig } from '@aws-sdk/client-sqs';
 import { SQSClient, ReceiveMessageCommand, GetQueueUrlCommand, DeleteMessageCommand } from '@aws-sdk/client-sqs';
 
 import log from 'lib/log';
@@ -8,15 +9,17 @@ type ProcessMssagesInput = {
   processorFn: (messageBody: WebhookMessage) => Promise<boolean>;
 };
 
-const SQS_KEY = process.env.SQS_KEY as string;
-const SQS_SECRET = process.env.SQS_SECRET as string;
-const SQS_REGION = process.env.SQS_REGION as string;
-const SQS_NAME = process.env.SQS_NAME as string;
-const client = new SQSClient({
-  region: SQS_REGION,
-  credentials: { accessKeyId: SQS_KEY, secretAccessKey: SQS_SECRET }
-});
+const AWS_API_KEY = process.env.AWS_ACCESS_KEY_ID as string;
+const AWS_API_SECRET = process.env.AWS_SECRET_ACCESS_KEY as string;
+const SQS_REGION = process.env.AWS_REGION as string;
 
+const config: SQSClientConfig = { region: SQS_REGION };
+if (AWS_API_KEY && AWS_API_SECRET) {
+  config.credentials = { accessKeyId: AWS_API_KEY, secretAccessKey: AWS_API_SECRET };
+}
+
+const SQS_NAME = process.env.SQS_NAME as string;
+const client = new SQSClient(config);
 let queueUrl = '';
 
 export async function getQueueUrl() {
@@ -27,20 +30,24 @@ export async function getQueueUrl() {
   const command = new GetQueueUrlCommand({ QueueName: SQS_NAME });
   const res = await client.send(command);
   queueUrl = res.QueueUrl || '';
-
   return queueUrl;
 }
 
 export async function getNextMessage() {
-  const QueueUrl = await getQueueUrl();
-  if (QueueUrl) {
-    const command = new ReceiveMessageCommand({ QueueUrl, MaxNumberOfMessages: 1 });
-    const res = await client.send(command);
+  try {
+    const QueueUrl = await getQueueUrl();
+    if (QueueUrl) {
+      // 20s polling time
+      const command = new ReceiveMessageCommand({ QueueUrl, MaxNumberOfMessages: 1, WaitTimeSeconds: 20 });
+      const res = await client.send(command);
 
-    return res?.Messages?.[0] || null;
+      return res?.Messages?.[0] || null;
+    }
+
+    return null;
+  } catch (e) {
+    return null;
   }
-
-  return null;
 }
 
 export async function deleteMessage(receipt: string) {
@@ -54,26 +61,24 @@ export async function deleteMessage(receipt: string) {
 export async function processMessages({ processorFn }: ProcessMssagesInput) {
   const message = await getNextMessage();
 
-  if (!message) {
-    return false;
-  }
+  if (message) {
+    let msgBody: Record<string, any> | string = '';
+    try {
+      msgBody = JSON.parse(message.Body || '');
+    } catch (e) {
+      log.warn('SQS message body failes to parse', e);
+    }
 
-  let msgBody: Record<string, any> | string = '';
-  try {
-    msgBody = JSON.parse(message.Body || '');
-    // eslint-disable-next-line no-empty
-  } catch (e) {}
-
-  try {
-    // process message
-    await processorFn(msgBody as WebhookMessage);
-    // delete if processed correctly
-    await deleteMessage(message.ReceiptHandle || '');
-  } catch (e) {
-    log.error('Failed to process webhook message', e);
+    try {
+      // process message
+      await processorFn(msgBody as WebhookMessage);
+    } catch (e) {
+      log.error('Failed to process webhook message', e);
+    } finally {
+      await deleteMessage(message.ReceiptHandle || '');
+    }
   }
 
   // process next message
-  setTimeout(() => processMessages({ processorFn }), 1000);
-  return true;
+  processMessages({ processorFn });
 }
