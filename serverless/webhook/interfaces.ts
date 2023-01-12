@@ -115,6 +115,7 @@ export type WebhookPayload<T = WebhookEventNames> = {
   event: WebhookEvent<T>;
   spaceId: string;
   webhookURL: string;
+  signingSecret: string;
 };
 
 // Payload example

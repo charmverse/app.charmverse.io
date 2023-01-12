@@ -1,7 +1,23 @@
 import type { SQSBatchItemFailure, SQSEvent, SQSHandler, SQSRecord } from 'aws-lambda';
+import type { KeyLike } from 'jose';
+import { SignJWT } from 'jose';
 import fetch from 'node-fetch';
 
 import type { WebhookPayload } from './interfaces';
+
+const signJwt = async (subject: string, payload: Record<string, any>, secret: KeyLike | Uint8Array) => {
+  return (
+    new SignJWT(payload)
+      .setProtectedHeader({ alg: 'HS256' })
+      // subject
+      .setSubject(subject)
+      .setIssuedAt()
+      .setIssuer('https://www.charmverse.io/')
+      // change it
+      .setExpirationTime('15m')
+      .sign(secret)
+  );
+};
 
 /**
  * SQS worker, message are executed one by one
@@ -17,10 +33,19 @@ export const webhookWorker: SQSHandler = async (event: SQSEvent) => {
 
       try {
         // Gets message information
-        const { webhookURL, ...webhookData } = JSON.parse(body) as WebhookPayload;
+        const { webhookURL, signingSecret, ...webhookData } = JSON.parse(body) as WebhookPayload;
+        const secret = Buffer.from(signingSecret, 'hex');
+
+        const signedJWT = await signJwt('webhook', webhookData, secret);
 
         // Call their endpoint with the event's data
-        const response = await fetch(webhookURL, { method: 'POST', body: JSON.stringify(webhookData) });
+        const response = await fetch(webhookURL, {
+          method: 'POST',
+          body: JSON.stringify(webhookData),
+          headers: {
+            signature: signedJWT
+          }
+        });
 
         // If not 200 back, we throw an error
         if (response.status !== 200) {
