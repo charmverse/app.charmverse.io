@@ -1,6 +1,8 @@
 import LitJsSdk from 'lit-js-sdk';
 import { useEffect, useMemo, useState } from 'react';
 
+import log from 'lib/log';
+
 function useLitProtocol() {
   const [litClient, setClient] = useState<LitJsSdk.LitNodeClient | null>(null);
   const client = useMemo(
