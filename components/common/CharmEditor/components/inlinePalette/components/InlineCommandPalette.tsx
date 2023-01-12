@@ -76,7 +76,7 @@ export default function InlineCommandPalette({
   const view = useEditorViewContext();
   const editorItems = useEditorItems({ disableNestedPage, nestedPagePluginKey });
   const isItemDisabled = useCallback(
-    (item) => {
+    (item: PaletteItem) => {
       return typeof item.disabled === 'function' ? item.disabled(view.state) : item.disabled;
     },
     [view]

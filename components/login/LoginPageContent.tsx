@@ -2,12 +2,18 @@ import styled from '@emotion/styled';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
+import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
 
 import Button from 'components/common/Button';
 import Image from 'components/common/Image';
+import { useSnackbar } from 'hooks/useSnackbar';
+import { setUrlWithoutRerender } from 'lib/utilities/browser';
+import type { ErrorType } from 'lib/utilities/errors';
 import splashImage from 'public/images/artwork/world.png';
 
 import { Login } from './Login';
+import { LoginErrorModal } from './LoginErrorModal';
 
 export const Container = styled(Box)`
   max-width: 100%;
@@ -16,6 +22,25 @@ export const Container = styled(Box)`
 `;
 export function LoginPageContent() {
   const returnUrl = new URLSearchParams(decodeURIComponent(window.location.search)).get('returnUrl');
+  const { showMessage } = useSnackbar();
+  const router = useRouter();
+
+  // We either have disabled account error (handled by our modal) or discord error (handled with snackbar)
+  const [discordLoginError, setDiscordLoginError] = useState(
+    new URLSearchParams(decodeURIComponent(window.location.search)).get('discordError')
+  );
+
+  function clearError() {
+    setDiscordLoginError(null);
+    setUrlWithoutRerender(router.pathname, { discordError: null });
+  }
+
+  useEffect(() => {
+    if (discordLoginError && (discordLoginError as ErrorType) !== 'Disabled account') {
+      showMessage(discordLoginError, 'error');
+      clearError();
+    }
+  }, []);
 
   return (
     <Container px={3}>
@@ -74,6 +99,7 @@ export function LoginPageContent() {
           <Image px={3} src={splashImage} />
         </Grid>
       </Grid>
+      <LoginErrorModal open={(discordLoginError as ErrorType) === 'Disabled account'} onClose={clearError} />
     </Container>
   );
 }

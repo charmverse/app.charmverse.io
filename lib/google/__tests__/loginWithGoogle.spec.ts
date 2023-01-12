@@ -1,5 +1,9 @@
 import { v4 } from 'uuid';
 
+import { prisma } from 'db';
+import { DisabledAccountError } from 'lib/utilities/errors';
+import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+
 import { loginWithGoogle } from '../loginWithGoogle';
 
 const googleUserName = 'Test User Google Account';
@@ -51,5 +55,41 @@ describe('loginWithGoogle', () => {
     expect(newUser.googleAccounts).toHaveLength(1);
     expect(newUser.googleAccounts[0].email).toEqual(testEmail);
     expect(updatedUser.googleAccounts[0].name).toEqual(newGoogleUserName);
+  });
+
+  it('should fail if the user is marked as deleted', async () => {
+    const { user, space } = await generateUserAndSpaceWithApiToken();
+
+    const testEmail = `test-${v4()}@example.com`;
+
+    await prisma.googleAccount.create({
+      data: {
+        email: testEmail,
+        name: googleUserName,
+        avatarUrl: googleAvatarUrl,
+        user: {
+          connect: {
+            id: user.id
+          }
+        }
+      }
+    });
+
+    await prisma.user.update({
+      where: {
+        id: user.id
+      },
+      data: {
+        deletedAt: new Date()
+      }
+    });
+
+    await expect(
+      loginWithGoogle({
+        accessToken: testEmail,
+        avatarUrl: googleAvatarUrl,
+        displayName: googleUserName
+      })
+    ).rejects.toBeInstanceOf(DisabledAccountError);
   });
 });

@@ -139,7 +139,7 @@ export default function BountyProperties(props: {
     }
   }
 
-  const updateBountyAmount = useCallback((e) => {
+  const updateBountyAmount = useCallback((e: any) => {
     setIsAmountInputEmpty(e.target.value === '');
 
     applyBountyUpdatesDebounced({
@@ -147,7 +147,7 @@ export default function BountyProperties(props: {
     });
   }, []);
 
-  const updateBountyMaxSubmissions = useCallback((e) => {
+  const updateBountyMaxSubmissions = useCallback((e: any) => {
     applyBountyUpdatesDebounced({
       maxSubmissions: Number(e.target.value)
     });

@@ -59,13 +59,9 @@ const PimpedButtonWithNextLink = forwardRef<HTMLButtonElement, InputProps<Elemen
     // @ts-ignore
     const mouseOnClick = onClick as MouseEventHandler<HTMLAnchorElement>;
     return (
-      <NextLink href={href} passHref>
-        {/** use an anchor tag to catch the ref passed down by NextLink.
-         *  see https://github.com/vercel/next.js/issues/7915 */}
-        <MuiLink target={target} id={id} onClick={mouseOnClick} data-test={dataTest}>
-          <PimpedButton {...props}>{children}</PimpedButton>
-        </MuiLink>
-      </NextLink>
+      <MuiLink component={NextLink} href={href} target={target} id={id} onClick={mouseOnClick} data-test={dataTest}>
+        <PimpedButton {...props}>{children}</PimpedButton>
+      </MuiLink>
     );
   }
 

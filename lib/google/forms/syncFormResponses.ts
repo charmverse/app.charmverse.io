@@ -87,6 +87,10 @@ export async function syncFormResponses({
   if (form.info?.documentTitle) {
     sourceData.formName = form.info.documentTitle;
   }
+  // document title is "Untitled form" by default
+  if (form.info?.title && sourceData.formName.startsWith('Untitled')) {
+    sourceData.formName = form.info.title;
+  }
   fields.visiblePropertyIds = cardProperties.map((p) => p.id);
 
   const updateView = lastUpdated ? [] : [prisma.block.update({ where: { id: viewId }, data: { fields } })];
@@ -102,7 +106,8 @@ export async function syncFormResponses({
   log.debug('Synced Google form responses', {
     boardId: board.id,
     formId: form.formId,
-    responseCount: responses.length
+    responseCount: responses.length,
+    lastUpdated
   });
 
   await notifyUsers({
@@ -124,11 +129,18 @@ async function getHiddenDatabaseBlock({ boardId }: { boardId?: string } = {}) {
   }
 
   const now = new Date();
-  const defaultBoardValues: Partial<Block> = { createdAt: now.getTime() };
-  const board = (boardBlock ?? createBoard({ block: defaultBoardValues })) as Block;
+  const board = createBoard({
+    block: {
+      createdAt: boardBlock?.createdAt.getTime() ?? now.getTime(),
+      updatedAt: boardBlock?.updatedAt.getTime() ?? now.getTime(),
+      fields: boardBlock?.fields as any,
+      id: boardId,
+      spaceId: boardBlock?.spaceId
+    }
+  });
   const isNewBoard = now.getTime() === board.createdAt;
-  const lastUpdated = isNewBoard ? null : now;
-  const hasRefreshedRecently = !isNewBoard && now.getTime() - board.updatedAt < syncThrottlePeriod;
+  const lastUpdated = isNewBoard ? null : new Date(board.updatedAt);
+  const hasRefreshedRecently = lastUpdated && now.getTime() - lastUpdated.getTime() < syncThrottlePeriod;
   const responseCount = await prisma.block.count({ where: { rootId: board.id } });
 
   return { board, hasRefreshedRecently, lastUpdated, responseCount };

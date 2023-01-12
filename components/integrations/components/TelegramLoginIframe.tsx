@@ -9,7 +9,10 @@ export function loginWithTelegram(callback: (user: TelegramAccount) => void) {
   window.Telegram.Login.auth({ bot_id: TELEGRAM_BOT_ID, request_access: true }, callback);
 }
 
-export default class TelegramLoginButton extends React.Component<{ widgetVersion?: string }> {
+export default class TelegramLoginButton extends React.Component<{
+  widgetVersion?: string;
+  children?: React.ReactNode;
+}> {
   instance: HTMLDivElement | null = null;
 
   componentDidMount() {

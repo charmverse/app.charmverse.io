@@ -3,6 +3,7 @@ import { LitNodeClient } from 'lit-js-sdk';
 import { validate } from 'uuid';
 
 import { prisma } from 'db';
+import log from 'lib/log';
 import { InvalidStateError } from 'lib/middleware';
 import { DataNotFoundError, MissingDataError } from 'lib/utilities/errors';
 
@@ -18,7 +19,11 @@ export async function evalueTokenGateEligibility({
   userId
 }: TokenGateEvaluationAttempt): Promise<TokenGateEvaluationResult> {
   if (!litClient.ready) {
-    await litClient.connect();
+    if (process.env.ENABLE_LIT) {
+      await litClient.connect().catch((err) => {
+        log.debug('Error connecting to lit node', err);
+      });
+    }
   }
 
   const validUuid = validate(spaceIdOrDomain);
