@@ -104,7 +104,9 @@ function PostCategoryAutocomplete({ disabled, options, onChange, value }: Autoco
       getOptionLabel={(option) => option.name}
       noOptionsText='No categories available'
       renderInput={(params) => <TextField {...params} placeholder='Choose a category' size='small' />}
-      onChange={(_event, _value) => onChange(_value)}
+      onChange={(_event, _value) => {
+        onChange(_value);
+      }}
     />
   );
 }
