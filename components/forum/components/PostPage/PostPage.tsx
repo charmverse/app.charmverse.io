@@ -1,6 +1,6 @@
 import CommentIcon from '@mui/icons-material/Comment';
 import { Box, Divider, Stack, Typography } from '@mui/material';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
@@ -30,7 +30,7 @@ type Props = {
   spaceId: string;
   post: PostWithVotes | null;
   onSave?: () => void;
-  setFormInputs: (params: FormInputs) => void;
+  setFormInputs: (params: Partial<FormInputs>) => void;
   formInputs: FormInputs;
 };
 
@@ -83,7 +83,6 @@ export function PostPage({ post, spaceId, onSave, setFormInputs, formInputs }: P
     post ? charmClient.forum.listPostComments(post.id) : undefined
   );
   const [changed, setChanged] = useState(false);
-
   usePreventReload(changed);
   const [, setTitleState] = usePageTitle();
 
@@ -92,7 +91,8 @@ export function PostPage({ post, spaceId, onSave, setFormInputs, formInputs }: P
   const isLoading = !postComments && isValidating;
 
   function updateTitle(updates: { title: string; updatedAt: any }) {
-    setFormInputs({ ...formInputs, title: updates.title });
+    setChanged(true);
+    setFormInputs({ title: updates.title });
     setTitleState(updates.title);
   }
 
@@ -133,11 +133,11 @@ export function PostPage({ post, spaceId, onSave, setFormInputs, formInputs }: P
   function updatePostContent({ doc, rawText }: ICharmEditorOutput) {
     setChanged(true);
     setFormInputs({
-      ...formInputs,
       content: doc,
       contentText: rawText
     });
   }
+
   const isMyPost = !post || post.createdBy === user?.id;
   const readOnly = !isMyPost;
 

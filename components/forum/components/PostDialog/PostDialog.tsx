@@ -52,6 +52,9 @@ export default function PostDialog({ post, spaceId, onClose, open }: Props) {
   function close() {
     popupState.close();
     onClose();
+    setFormInputs({ title: '', content: null, contentText: '' });
+    setContentUpdated(false);
+    setShowConfirmDialog(false);
   }
 
   if (!popupState.isOpen) {
@@ -88,7 +91,7 @@ export default function PostDialog({ post, spaceId, onClose, open }: Props) {
         formInputs={formInputs}
         setFormInputs={(_formInputs) => {
           setContentUpdated(true);
-          setFormInputs(_formInputs);
+          setFormInputs((__formInputs) => ({ ...__formInputs, ..._formInputs }));
         }}
         post={post ?? null}
         spaceId={spaceId}
