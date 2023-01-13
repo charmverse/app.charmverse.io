@@ -268,9 +268,7 @@ export function charmEditorPlugins({
   };
 }
 
-const StyledReactBangleEditor = styled(ReactBangleEditor)<{
-  disablePageSpecificFeatures?: boolean;
-}>`
+const StyledReactBangleEditor = styled(ReactBangleEditor)<{ disablePageSpecificFeatures?: boolean }>`
   position: relative;
 
   /** DONT REMOVE THIS STYLING */
@@ -281,6 +279,11 @@ const StyledReactBangleEditor = styled(ReactBangleEditor)<{
   div.ProseMirror.bangle-editor {
     padding-left: 50px;
     margin-right: -50px;
+  }
+
+  // set background to hide the loading indicator which disappears with a delay
+  .ProseMirror {
+    background-color: ${({ theme }) => theme.palette.background.default};
   }
 
   code {
@@ -332,7 +335,6 @@ const defaultContent: PageContent = {
 export type UpdatePageContent = (content: ICharmEditorOutput) => any;
 
 interface CharmEditorProps {
-  colorMode?: 'dark';
   content?: PageContent;
   children?: ReactNode;
   enableSuggestingMode?: boolean;

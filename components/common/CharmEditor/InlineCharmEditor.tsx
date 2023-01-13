@@ -107,7 +107,7 @@ const StyledReactBangleEditor = styled(ReactBangleEditor)<{ colorMode?: 'dark'; 
     width: 100% !important;
     height: 100%;
   }
-  // set background to hide the loading indicator which disappears with a delay
+
   ${({ colorMode }) =>
     colorMode === 'dark'
       ? `
@@ -116,7 +116,7 @@ const StyledReactBangleEditor = styled(ReactBangleEditor)<{ colorMode?: 'dark'; 
             color: var(--primary-text);
             opacity: 0.5;
           }`
-      : 'background-color: var(--background-default);'};
+      : ''};
 
   code {
     border-radius: 2px !important;
