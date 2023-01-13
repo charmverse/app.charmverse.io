@@ -18,10 +18,10 @@ const accountPages = ['profile'];
 export default function RouteGuard({ children }: { children: ReactNode }) {
   const router = useRouter();
   const [authorized, setAuthorized] = useState(true);
-  const { user, setUser, isLoaded } = useUser();
+  const { user, setUser, isLoaded: isUserLoaded } = useUser();
   const { spaces, isLoaded: isSpacesLoaded } = useSpaces();
   const isRouterLoading = !router.isReady;
-  const isLoading = !isLoaded || isRouterLoading || !isSpacesLoaded;
+  const isLoading = !isUserLoaded || isRouterLoading || !isSpacesLoaded;
   const authorizedSpaceDomainRef = useRef('');
 
   if (typeof window !== 'undefined') {
@@ -129,7 +129,7 @@ export default function RouteGuard({ children }: { children: ReactNode }) {
     }
   }
 
-  if (!authorized || !router.isReady) {
+  if (!authorized || isLoading) {
     return null;
   }
   return <span style={{ display: isLoading ? 'none' : 'inline' }}>{children}</span>;

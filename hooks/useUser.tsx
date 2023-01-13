@@ -2,10 +2,6 @@ import type { ReactNode } from 'react';
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
 import charmClient from 'charmClient';
-import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
-import type { AuthSig } from 'lib/blockchain/interfaces';
-import { countConnectableIdentities } from 'lib/users/countConnectableIdentities';
-import { MissingWeb3AccountError } from 'lib/utilities/errors';
 import type { LoggedInUser } from 'models';
 
 type IContext = {
@@ -13,7 +9,6 @@ type IContext = {
   setUser: (user: LoggedInUser | any) => void;
   updateUser: (user: Partial<LoggedInUser>) => void;
   isLoaded: boolean;
-  setIsLoaded: (isLoaded: boolean) => void;
   refreshUser: () => Promise<void>;
   logoutUser: () => Promise<void>;
 };
@@ -23,7 +18,6 @@ export const UserContext = createContext<Readonly<IContext>>({
   setUser: () => undefined,
   updateUser: () => undefined,
   isLoaded: false,
-  setIsLoaded: () => undefined,
   refreshUser: () => Promise.resolve(),
   logoutUser: () => Promise.resolve()
 });
@@ -74,7 +68,6 @@ export function UserProvider({ children }: { children: ReactNode }) {
       user,
       setUser,
       isLoaded,
-      setIsLoaded,
       updateUser,
       refreshUser,
       logoutUser
