@@ -41,16 +41,19 @@ function FBDialog(props: Props) {
         >
           <div role='dialog' className={clsx('dialog', { fullWidth })}>
             <div className='toolbar'>
+              {toolbar && <div className='cardToolbar'>{toolbar}</div>}
+              {toolsMenu}
               {!props.hideCloseButton && (
                 <IconButton
                   onClick={props.onClose}
                   icon={<CloseIcon />}
+                  style={{
+                    paddingLeft: '20px'
+                  }}
                   title={closeDialogText}
-                  className='IconButton--large'
+                  className='IconButton'
                 />
               )}
-              {toolbar && <div className='cardToolbar'>{toolbar}</div>}
-              {toolsMenu}
             </div>
             {props.children}
           </div>
