@@ -281,11 +281,6 @@ const StyledReactBangleEditor = styled(ReactBangleEditor)<{ disablePageSpecificF
     margin-right: -50px;
   }
 
-  // set background to hide the loading indicator which disappears with a delay
-  .ProseMirror {
-    background-color: ${({ theme }) => theme.palette.background.default};
-  }
-
   code {
     border-radius: 2px !important;
     background-color: ${({ theme }) => theme.palette.code.background};
