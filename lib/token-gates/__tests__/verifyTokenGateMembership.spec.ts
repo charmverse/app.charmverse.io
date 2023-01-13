@@ -489,4 +489,91 @@ describe('verifyTokenGateMembership', () => {
       expect.not.arrayContaining([expect.objectContaining({ roleId: role.id })])
     );
   });
+
+  it('should add missing user roles', async () => {
+    const tokenGate1 = await generateTokenGate({ userId: user.id, spaceId: space.id });
+    const tokenGate2 = await generateTokenGate({ userId: user.id, spaceId: space.id });
+
+    const role = await generateRole({ spaceId: space.id, roleName: 'test role 1', createdBy: user.id });
+    const role2 = await generateRole({ spaceId: space.id, roleName: 'test role 2', createdBy: user.id });
+    const role3 = await generateRole({ spaceId: space.id, roleName: 'test role 3', createdBy: user.id });
+    const role4 = await generateRole({ spaceId: space.id, roleName: 'test role 4', createdBy: user.id });
+
+    await addRoleToTokenGate({ tokenGateId: tokenGate1.id, roleId: role.id });
+    await addRoleToTokenGate({ tokenGateId: tokenGate2.id, roleId: role2.id });
+    const verifyJwtMock = jest
+      .fn()
+      // verify to apply token gate
+      .mockResolvedValueOnce({
+        verified: true,
+        payload: {
+          orgId: space.id,
+          extraData: `{ "tokenGateId": "${tokenGate1.id}" }`
+        }
+      })
+      // verify to apply token gate
+      .mockResolvedValueOnce({
+        verified: true,
+        payload: {
+          orgId: space.id,
+          extraData: `{ "tokenGateId": "${tokenGate2.id}" }`
+        }
+      });
+
+    jest.mock('lit-js-sdk', () => ({
+      verifyJwt: verifyJwtMock
+    }));
+
+    const { verifyTokenGateMembership } = await import('lib/token-gates/verifyTokenGateMembership');
+    const { applyTokenGates } = await import('lib/token-gates/applyTokenGates');
+
+    await applyTokenGates({
+      spaceId: space.id,
+      userId: user.id,
+      commit: true,
+      tokens: [
+        { tokenGateId: tokenGate1.id, signedToken: 'jwt1' },
+        { tokenGateId: tokenGate2.id, signedToken: 'jwt2' }
+      ]
+    });
+
+    // new roles has been assigned to token gates
+    await addRoleToTokenGate({ tokenGateId: tokenGate1.id, roleId: role4.id });
+    await addRoleToTokenGate({ tokenGateId: tokenGate2.id, roleId: role3.id });
+
+    const verifyUser = (await getSpaceUser()) as UserToVerifyMembership;
+
+    verifyJwtMock.mockImplementation(() => {
+      return {
+        verified: true,
+        payload: {
+          orgId: space.id
+        }
+      };
+    });
+
+    const res = await verifyTokenGateMembership({
+      userTokenGates: verifyUser.user.userTokenGates,
+      spaceId: space.id,
+      userId: user.id,
+      canBeRemovedFromSpace: false,
+      userSpaceRoles: verifyUser.spaceRoleToRole,
+      spaceRoleId: verifyUser?.id || ''
+    });
+
+    const spaceUser = await getSpaceUser();
+    expect(verifyUser.user.userTokenGates.length).toBe(2);
+    expect(verifyUser.spaceRoleToRole.length).toBe(2);
+    expect(res).toEqual({ removedRoles: 0, verified: true, addedRoles: 2 });
+    expect(spaceUser).not.toBeNull();
+    expect(spaceUser?.spaceRoleToRole.length).toBe(4);
+    expect(spaceUser?.spaceRoleToRole).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ roleId: role.id }),
+        expect.objectContaining({ roleId: role2.id }),
+        expect.objectContaining({ roleId: role3.id }),
+        expect.objectContaining({ roleId: role4.id })
+      ])
+    );
+  });
 });
