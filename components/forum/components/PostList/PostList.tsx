@@ -10,6 +10,7 @@ import useSWRInfinite from 'swr/infinite';
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useForumCategories } from 'hooks/useForumCategories';
 import { useMembers } from 'hooks/useMembers';
 import useOnScreen from 'hooks/useOnScreen';
 import { useUser } from 'hooks/useUser';
@@ -40,6 +41,7 @@ export function ForumPostList({ search, categoryId, sort }: ForumPostsProps) {
   const { members } = useMembers();
   const { user } = useUser();
   const { subscribe } = useWebSocketClient();
+  const { categories } = useForumCategories();
 
   const {
     data: postsData,
@@ -140,7 +142,12 @@ export function ForumPostList({ search, categoryId, sort }: ForumPostsProps) {
     <>
       {(postsError || searchError) && <Alert severity='error'>{dataError}</Alert>}
       {postsToShow.map((post) => (
-        <PostCard key={post.id} user={members.find((item) => item.id === post.createdBy)} post={post} />
+        <PostCard
+          key={post.id}
+          user={members.find((item) => item.id === post.createdBy)}
+          category={categories.find((cat) => cat.id === post.categoryId)}
+          post={post}
+        />
       ))}
       {(isLoadingPosts || isLoadingSearch) && !hasNext && <PostSkeleton />}
       {!hasNext && (

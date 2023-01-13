@@ -6,6 +6,7 @@ import Card from '@mui/material/Card';
 import CardActionArea from '@mui/material/CardActionArea';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
+import type { PostCategory } from '@prisma/client';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 
@@ -27,10 +28,11 @@ const maxCharactersInPost = 140;
 
 export type ForumPostProps = {
   user?: Member;
+  category?: PostCategory;
   post: ForumPostMeta & { totalComments: number };
 };
 
-export function PostCard({ post, user }: ForumPostProps) {
+export function PostCard({ post, user, category }: ForumPostProps) {
   const { createdAt, updatedAt, totalComments } = post;
   const date = new Date(updatedAt || createdAt);
   const relativeTime = getRelativeTimeInThePast(date);
@@ -97,6 +99,11 @@ export function PostCard({ post, user }: ForumPostProps) {
         }}
       >
         <CardContent>
+          {category?.name && (
+            <Typography variant='caption' component='div' mb={1} fontWeight={500}>
+              {category.name}
+            </Typography>
+          )}
           <Typography variant='h6' variantMapping={{ h6: 'h3' }} gutterBottom>
             {fancyTrim(post.title, maxCharactersInPost)}
           </Typography>
