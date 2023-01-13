@@ -7,18 +7,7 @@ import { createWorkspace } from 'lib/spaces/createWorkspace';
 import { getAvailableDomainName } from 'lib/spaces/getAvailableDomainName';
 import { isValidUrl } from 'lib/utilities/isValidUrl';
 
-export type CreatedSpaceResponse = {
-  id: string;
-  spaceUrl: string;
-  joinUrl: string;
-};
-
-export type CreateSpaceApiInputData = {
-  name: string;
-  discordServerId: string;
-  adminDiscordUserId: string;
-  avatar?: string;
-};
+import type { CreateWorkspaceRequestBody, CreateWorkspaceResponseBody } from './interfaces';
 
 export async function createWorkspaceApi({
   name,
@@ -26,7 +15,7 @@ export async function createWorkspaceApi({
   adminDiscordUserId,
   avatar,
   superApiToken
-}: CreateSpaceApiInputData & { superApiToken?: SuperApiToken | null }): Promise<CreatedSpaceResponse> {
+}: CreateWorkspaceRequestBody & { superApiToken?: SuperApiToken | null }): Promise<CreateWorkspaceResponseBody> {
   // generate a domain name based on space
   const spaceDomain = await getAvailableDomainName(name);
 
@@ -38,7 +27,11 @@ export async function createWorkspaceApi({
       identityType: 'RandomName'
     }
   });
-  const adminUserId = await upsertUserForDiscordId(adminDiscordUserId);
+  const adminUserId = adminDiscordUserId ? await upsertUserForDiscordId(adminDiscordUserId) : null;
+
+  if (!adminUserId) {
+    throw new Error('No admin user ID created. TODO: Implement support for wallet address');
+  }
 
   // Create workspace
   const spaceData = {
