@@ -178,6 +178,7 @@ export function PostPage({ showOtherCategoryPosts = false, post, spaceId, onSave
               pageActionDisplay={null}
               pageId={post?.id}
               disablePageSpecificFeatures
+              enableVoting={false}
               isContentControlled
               key={user?.id}
               content={form.content as PageContent}
