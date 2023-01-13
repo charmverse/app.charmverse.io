@@ -268,10 +268,7 @@ export function charmEditorPlugins({
   };
 }
 
-const StyledReactBangleEditor = styled(ReactBangleEditor)<{
-  readOnly?: boolean;
-  disablePageSpecificFeatures?: boolean;
-}>`
+const StyledReactBangleEditor = styled(ReactBangleEditor)<{ disablePageSpecificFeatures?: boolean }>`
   position: relative;
 
   /** DONT REMOVE THIS STYLING */
@@ -286,7 +283,7 @@ const StyledReactBangleEditor = styled(ReactBangleEditor)<{
 
   // set background to hide the loading indicator which disappears with a delay
   .ProseMirror {
-    background-color: ${({ theme, readOnly }) => (readOnly ? theme.palette.background.default : '')};
+    background-color: ${({ theme }) => theme.palette.background.default};
   }
 
   code {
