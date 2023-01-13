@@ -1,19 +1,12 @@
 import type { Prisma } from '@prisma/client';
 import { PrismaClient } from '@prisma/client';
 
-declare global {
-  // eslint-disable-next-line no-var, vars-on-top
-  var prisma: PrismaClient | undefined;
-}
-
-export const prisma =
-  global.prisma ||
-  new PrismaClient({
-    //    log: ['query']
-  });
+// @ts-expect-error - dont mutate global for Node.js
+export const prisma: PrismaClient = global.prisma || new PrismaClient({});
 
 // remember this instance of prisma in development to avoid too many clients
 if (process.env.NODE_ENV === 'development') {
+  // @ts-expect-error
   global.prisma = prisma;
 }
 

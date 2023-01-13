@@ -21,6 +21,7 @@ import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import type { FormInputs } from '../interfaces';
 
+import { CategoryPosts } from './components/CategoryPosts';
 import { PostCategoryInput } from './components/PostCategoryInput';
 import { PostComment } from './components/PostComment';
 import { PostCommentForm } from './components/PostCommentForm';
@@ -35,6 +36,7 @@ type Props = {
   contentUpdated: boolean;
   setContentUpdated: (changed: boolean) => void;
   shouldUpdateTitleState?: boolean;
+  showOtherCategoryPosts?: boolean;
 };
 
 function processComments({ postComments }: { postComments: PostCommentWithVote[] }) {
@@ -83,7 +85,8 @@ export function PostPage({
   setFormInputs,
   formInputs,
   contentUpdated,
-  setContentUpdated
+  setContentUpdated,
+  showOtherCategoryPosts
 }: Props) {
   const { user } = useUser();
   const [categoryId, setCategoryId] = useState(post?.categoryId ?? null);
@@ -178,77 +181,83 @@ export function PostPage({
 
   return (
     <ScrollableWindow>
-      <Container top={50}>
-        <Box minHeight={300}>
-          <CharmEditor
-            readOnly={readOnly}
-            pageActionDisplay={null}
-            pageId={post?.id}
-            disablePageSpecificFeatures
-            isContentControlled
-            key={user?.id}
-            content={formInputs.content as PageContent}
-            onContentChange={updatePostContent}
-          >
-            <PageTitleInput readOnly={readOnly} value={formInputs.title} onChange={updateTitle} />
-            <Box my={2}>
-              <PostCategoryInput
-                readOnly={readOnly}
-                spaceId={spaceId}
-                setCategoryId={updateCategoryId}
-                categoryId={categoryId}
-              />
-            </Box>
-          </CharmEditor>
-        </Box>
-        {isMyPost && (
-          <Box display='flex' flexDirection='row' justifyContent='right' my={2}>
-            <Button
-              disabled={Boolean(disabledTooltip) || !contentUpdated}
-              disabledTooltip={disabledTooltip}
-              onClick={publishForumPost}
+      <Stack>
+        <Container top={50}>
+          <Box minHeight={300}>
+            <CharmEditor
+              readOnly={readOnly}
+              pageActionDisplay={null}
+              pageId={post?.id}
+              disablePageSpecificFeatures
+              isContentControlled
+              key={user?.id}
+              content={formInputs.content as PageContent}
+              onContentChange={updatePostContent}
             >
-              {post ? 'Update' : 'Post'}
-            </Button>
+              <PageTitleInput readOnly={readOnly} value={formInputs.title} onChange={updateTitle} />
+              <Box my={2}>
+                <PostCategoryInput
+                  readOnly={readOnly}
+                  spaceId={spaceId}
+                  setCategoryId={updateCategoryId}
+                  categoryId={categoryId}
+                />
+              </Box>
+            </CharmEditor>
           </Box>
-        )}
-
-        {post && (
-          <Box my={2}>
-            <PostCommentForm setPostComments={setPostComments} postId={post.id} />
-          </Box>
-        )}
-        <Divider
-          sx={{
-            my: 2
-          }}
-        />
-        {isLoading ? (
-          <Box height={100}>
-            <LoadingComponent size={24} isLoading label='Fetching comments' />
-          </Box>
-        ) : (
-          post && (
-            <>
-              <Stack gap={1}>
-                <PostCommentSort commentSort={commentSort} setCommentSort={setCommentSort} />
-                {topLevelComments.map((comment) => (
-                  <PostComment setPostComments={setPostComments} comment={comment} key={comment.id} />
-                ))}
-              </Stack>
-              {topLevelComments.length === 0 && (
-                <Stack gap={1} alignItems='center' my={1}>
-                  <CommentIcon color='secondary' fontSize='large' />
-                  <Typography color='secondary' variant='h6'>
-                    No Comments Yet
-                  </Typography>
-                  <Typography color='secondary'>Be the first to share what you think!</Typography>
+          {isMyPost && (
+            <Box display='flex' flexDirection='row' justifyContent='right' my={2}>
+              <Button
+                disabled={Boolean(disabledTooltip) || !contentUpdated}
+                disabledTooltip={disabledTooltip}
+                onClick={publishForumPost}
+              >
+                {post ? 'Update' : 'Post'}
+              </Button>
+            </Box>
+          )}
+          {post && (
+            <Box my={2}>
+              <PostCommentForm setPostComments={setPostComments} postId={post.id} />
+            </Box>
+          )}
+          <Divider
+            sx={{
+              my: 2
+            }}
+          />
+          {isLoading ? (
+            <Box height={100}>
+              <LoadingComponent size={24} isLoading label='Fetching comments' />
+            </Box>
+          ) : (
+            post && (
+              <>
+                <Stack gap={1}>
+                  <PostCommentSort commentSort={commentSort} setCommentSort={setCommentSort} />
+                  {topLevelComments.map((comment) => (
+                    <PostComment setPostComments={setPostComments} comment={comment} key={comment.id} />
+                  ))}
                 </Stack>
-              )}
-            </>
-          )
+                {topLevelComments.length === 0 && (
+                  <Stack gap={1} alignItems='center' my={1}>
+                    <CommentIcon color='secondary' fontSize='large' />
+                    <Typography color='secondary' variant='h6'>
+                      No Comments Yet
+                    </Typography>
+                    <Typography color='secondary'>Be the first to share what you think!</Typography>
+                  </Stack>
+                )}
+              </>
+            )
+          )}
+        </Container>
+        {post && showOtherCategoryPosts && (
+          <Box width='25%' mr={8}>
+            <CategoryPosts postId={post.id} categoryId={post.categoryId} />
+          </Box>
         )}
-      </Container>
+      </Stack>
     </ScrollableWindow>
   );
 }

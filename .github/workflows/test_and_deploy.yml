@@ -10,64 +10,64 @@ on:
     branches: ["**"]
 
 jobs:
-  # test:
-  #   name: Test
-  #   runs-on: ubuntu-latest
-  #   # Postgres setup copied from https://gist.github.com/2color/537f8ef13ecec80059abb007839a6878
-  #   services:
-  #     postgres:
-  #       image: postgres
-  #       env:
-  #         POSTGRES_USER: postgres
-  #         POSTGRES_PASSWORD: postgres
-  #       options: >-
-  #         --health-cmd pg_isready
-  #         --health-interval 10s
-  #         --health-timeout 5s
-  #         --health-retries 5
-  #       ports:
-  #         # Maps tcp port 5432 on service container to the host
-  #         - 5432:5432
-  #   steps:
-  #     - uses: actions/checkout@v3
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    # Postgres setup copied from https://gist.github.com/2color/537f8ef13ecec80059abb007839a6878
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          # Maps tcp port 5432 on service container to the host
+          - 5432:5432
+    steps:
+      - uses: actions/checkout@v3
 
-  #     - name: Install dependencies and build app
-  #       uses: ./.github/actions/install
+      - name: Install dependencies and build app
+        uses: ./.github/actions/install
 
-  #     - name: Build app
-  #       uses: ./.github/actions/build
-  #       with:
-  #         NEXT_PUBLIC_APP_ENV: "test"
+      - name: Build app
+        uses: ./.github/actions/build
+        with:
+          NEXT_PUBLIC_APP_ENV: "test"
 
-  #     - name: Setup test database
-  #       run: bash ./scripts/configure-db.sh
+      - name: Setup test database
+        run: bash ./scripts/configure-db.sh
 
-  #     - name: Typecheck tests
-  #       run: npm run test:typecheck
+      - name: Typecheck tests
+        run: npm run test:typecheck
 
-  #     - name: Run basic tests
-  #       run: npm run test:ci
+      - name: Run basic tests
+        run: npm run test:ci
 
-  #     - name: Run server integration tests
-  #       run: |
-  #         npm run start:test:ci &
-  #         npm run test:server:ci
+      - name: Run server integration tests
+        run: |
+          npm run start:test:ci &
+          npm run test:server:ci
 
-  #     - name: Run browser tests
-  #       run: npm run test:browser:ci
+      - name: Run browser tests
+        run: npm run test:browser:ci
 
-  #     - name: Run browser e2e tests
-  #       run: npm run test:e2e:ci
+      - name: Run browser e2e tests
+        run: npm run test:e2e:ci
 
   deploy:
     name: Deploy to production
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
-    # needs: test
+    needs: test
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v2
       - name: Inject slug/short variables
-        uses: rlespinasse/github-slug-action@v4.x
+        uses: rlespinasse/github-slug-action@v3.x
 
       - name: Install dependencies and build app
         uses: ./.github/actions/install
@@ -134,7 +134,7 @@ jobs:
           cat files_to_zip.txt | zip --symlinks -r@ deploy_websockets.zip
 
       - name: Deploy to Beanstalk
-        uses: einaregilsson/beanstalk-deploy@v21
+        uses: einaregilsson/beanstalk-deploy@v18
         with:
           aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -147,7 +147,7 @@ jobs:
           wait_for_deployment: false # set to false to save sweet Github minutes
 
       - name: Deploy Background to Beanstalk
-        uses: einaregilsson/beanstalk-deploy@v21
+        uses: einaregilsson/beanstalk-deploy@v18
         with:
           aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -160,7 +160,7 @@ jobs:
           wait_for_deployment: false # set to false to save sweet Github minutes
 
       - name: Deploy Websockets to Beanstalk
-        uses: einaregilsson/beanstalk-deploy@v21
+        uses: einaregilsson/beanstalk-deploy@v18
         with:
           aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}

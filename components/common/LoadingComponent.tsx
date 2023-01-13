@@ -25,6 +25,7 @@ interface LoadingProps {
   isLoading?: boolean;
   size?: number;
   children?: React.ReactNode;
+  className?: string;
 }
 
 export default function LoadingComponent({
@@ -34,11 +35,12 @@ export default function LoadingComponent({
   label,
   children,
   minHeight,
-  size = 40
+  size = 40,
+  className
 }: LoadingProps): JSX.Element {
   if (!isLoading) return component || <span>{children}</span>;
   return (
-    <LoadingCard height={height} minHeight={minHeight}>
+    <LoadingCard height={height} minHeight={minHeight} className={className}>
       <LoadingIcon style={{ height: size, width: size }} />
       {label ? <span style={{ color: '#aaa', paddingLeft: 8 }}>{label}</span> : null}
     </LoadingCard>

@@ -3,9 +3,9 @@
 import type { TreeItemContentProps } from '@mui/lab/TreeItem';
 import { useTreeItem } from '@mui/lab/TreeItem';
 import clsx from 'clsx';
-import * as React from 'react';
+import { forwardRef, useCallback, memo, useEffect, useMemo } from 'react';
 
-const TreeItemContent = React.forwardRef<HTMLDivElement, TreeItemContentProps>((props, ref) => {
+const TreeItemContent = forwardRef<HTMLDivElement, TreeItemContentProps>((props, ref) => {
   const {
     classes,
     className,
@@ -24,7 +24,7 @@ const TreeItemContent = React.forwardRef<HTMLDivElement, TreeItemContentProps>((
 
   const icon = iconProp || expansionIcon || displayIcon;
 
-  const handleMouseDown = React.useCallback(
+  const handleMouseDown = useCallback(
     (event: React.MouseEvent<HTMLElement>) => {
       preventSelection(event);
 
@@ -35,7 +35,7 @@ const TreeItemContent = React.forwardRef<HTMLDivElement, TreeItemContentProps>((
     [onMouseDown]
   );
 
-  const handleClick = React.useCallback(
+  const handleClick = useCallback(
     (event: React.MouseEvent<HTMLElement>) => {
       handleExpansion(event);
       handleSelection(event);
@@ -47,7 +47,7 @@ const TreeItemContent = React.forwardRef<HTMLDivElement, TreeItemContentProps>((
     [handleExpansion, handleSelection, onClick]
   );
 
-  const newClassName = React.useMemo(
+  const newClassName = useMemo(
     () =>
       clsx(className, classes.root, {
         [classes.expanded]: expanded,
@@ -67,4 +67,4 @@ const TreeItemContent = React.forwardRef<HTMLDivElement, TreeItemContentProps>((
   );
 });
 
-export default React.memo(TreeItemContent);
+export default memo(TreeItemContent);
