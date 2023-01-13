@@ -1,6 +1,6 @@
 import CommentIcon from '@mui/icons-material/Comment';
 import { Box, Divider, Stack, Typography } from '@mui/material';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
@@ -13,6 +13,7 @@ import LoadingComponent from 'components/common/LoadingComponent';
 import { ScrollableWindow } from 'components/common/PageLayout';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useForumCategories } from 'hooks/useForumCategories';
+import { useMembers } from 'hooks/useMembers';
 import { usePageTitle } from 'hooks/usePageTitle';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useUser } from 'hooks/useUser';
@@ -96,6 +97,8 @@ export function PostPage({
   const [categoryId, setCategoryId] = useState(
     post?.categoryId ?? categories.find((category) => category.id === currentSpace?.defaultPostCategoryId)?.id ?? null
   );
+  const { members } = useMembers();
+  const [form, setForm] = useState<FormInputs>(post ?? { title: '', content: null, contentText: '' });
   const {
     data: postComments,
     mutate: setPostComments,
@@ -107,6 +110,8 @@ export function PostPage({
   const [, setTitleState] = usePageTitle();
   const [commentSort, setCommentSort] = useState<PostCommentSort>('latest');
   const isLoading = !postComments && isValidating;
+
+  const createdBy = members.find((_member) => _member.id === post?.createdBy);
 
   function updateTitle(updates: { title: string; updatedAt: any }) {
     setContentUpdated(true);
