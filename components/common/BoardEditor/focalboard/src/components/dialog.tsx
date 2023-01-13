@@ -1,11 +1,10 @@
 import CloseIcon from '@mui/icons-material/Close';
+import IconButton from '@mui/material/IconButton';
 import Modal from '@mui/material/Modal';
 import clsx from 'clsx';
 import React from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { useIntl } from 'react-intl';
-
-import IconButton from '../widgets/buttons/iconButton';
 
 type Props = {
   children: React.ReactNode;
@@ -44,15 +43,9 @@ function FBDialog(props: Props) {
               {toolbar && <div className='cardToolbar'>{toolbar}</div>}
               {toolsMenu}
               {!props.hideCloseButton && (
-                <IconButton
-                  onClick={props.onClose}
-                  icon={<CloseIcon />}
-                  style={{
-                    paddingLeft: '20px'
-                  }}
-                  title={closeDialogText}
-                  className='IconButton'
-                />
+                <IconButton onClick={props.onClose}>
+                  <CloseIcon />
+                </IconButton>
               )}
             </div>
             {props.children}
