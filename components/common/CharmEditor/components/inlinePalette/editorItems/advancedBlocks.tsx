@@ -56,10 +56,10 @@ function createColumnPaletteItem(colCount: number): PaletteItemTypeNoGroup {
   };
 }
 type AdvancedItemsProps = {
-  disableVoting?: boolean;
+  enableVoting?: boolean;
 };
 
-export function items({ disableVoting }: AdvancedItemsProps = {}): PaletteItemTypeNoGroup[] {
+export function items({ enableVoting }: AdvancedItemsProps = {}): PaletteItemTypeNoGroup[] {
   const editorItems: PaletteItemTypeNoGroup[] = [
     createColumnPaletteItem(2),
     createColumnPaletteItem(3),
@@ -94,7 +94,7 @@ export function items({ disableVoting }: AdvancedItemsProps = {}): PaletteItemTy
     }
   ];
 
-  if (!disableVoting) {
+  if (enableVoting) {
     editorItems.push({
       uid: 'poll',
       title: 'Poll',
