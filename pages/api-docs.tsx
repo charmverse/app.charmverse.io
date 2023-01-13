@@ -43,11 +43,11 @@ export default function ApiDoc({ spec }: InferGetStaticPropsType<typeof getStati
   const theme = useTheme();
   const colorMode = useColorMode();
 
-  useEffect(() => {
-    if (theme.palette.mode === 'dark') {
-      colorMode.toggleColorMode();
-    }
-  }, []);
+  // useEffect(() => {
+  //   if (theme.palette.mode === 'dark') {
+  //     colorMode.toggleColorMode();
+  //   }
+  // }, []);
 
   return <SwaggerUI spec={spec}></SwaggerUI>;
   //  ;
