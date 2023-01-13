@@ -170,6 +170,7 @@ export function PostPage({ post, spaceId, onSave }: Props) {
             pageActionDisplay={null}
             pageId={post?.id}
             disablePageSpecificFeatures
+            enableVoting={false}
             isContentControlled
             key={user?.id}
             content={form.content as PageContent}
