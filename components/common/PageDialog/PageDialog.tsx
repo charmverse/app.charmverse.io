@@ -124,7 +124,6 @@ export default function PageDialog(props: Props) {
 
   return (
     <Dialog
-      hideCloseButton
       toolsMenu={
         !hideToolsMenu &&
         !readOnly &&
