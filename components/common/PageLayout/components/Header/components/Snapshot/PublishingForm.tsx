@@ -6,6 +6,7 @@ import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
 import { DateTimePicker } from '@mui/x-date-pickers';
 import { getChainById } from 'connectors';
+import { utils } from 'ethers';
 import { DateTime } from 'luxon';
 import { useEffect, useState } from 'react';
 
@@ -19,6 +20,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import useIsAdmin from 'hooks/useIsAdmin';
 import { usePages } from 'hooks/usePages';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
+import log from 'lib/log';
 import type { PageMeta } from 'lib/pages';
 import { generateMarkdown } from 'lib/pages/generateMarkdown';
 import type { SnapshotReceipt, SnapshotSpace, SnapshotVotingModeType, SnapshotVotingStrategy } from 'lib/snapshot';
@@ -196,26 +198,24 @@ export default function PublishingForm({ onSubmit, page }: Props) {
 
     try {
       const client = await getSnapshotClient();
-      receipt = (await client.proposal(
-        library,
-        account as string,
-        {
-          space: space?.snapshotDomain as any,
-          type: snapshotVoteMode,
-          title: page.title,
-          body: content,
-          choices: votingOptions,
-          start: Math.round(startDate.toSeconds()),
-          end: Math.round(endDate.toSeconds()),
-          snapshot: snapshotBlockNumber,
-          network: snapshotSpace?.network,
-          // strategies: JSON.stringify([]),
-          strategies: JSON.stringify(selectedVotingStrategies),
-          plugins: JSON.stringify({}),
-          metadata: JSON.stringify({})
-        } as any
-      )) as SnapshotReceipt;
+      receipt = (await client.proposal(library, utils.getAddress(account as string), {
+        space: space?.snapshotDomain as any,
+        type: snapshotVoteMode,
+        title: page.title,
+        body: content,
+        choices: votingOptions,
+        start: Math.round(startDate.toSeconds()),
+        end: Math.round(endDate.toSeconds()),
+        snapshot: snapshotBlockNumber,
+        network: snapshotSpace?.network,
+        // strategies: JSON.stringify([]),
+        strategies: JSON.stringify(selectedVotingStrategies),
+        plugins: JSON.stringify({}),
+        metadata: JSON.stringify({})
+      } as any)) as SnapshotReceipt;
     } catch (err: any) {
+      log.debug('Error from snapshot', err);
+
       const errorToShow = err?.error_description
         ? new ExternalServiceError(`Snapshot error: ${err?.error_description}`)
         : new UnknownError();
