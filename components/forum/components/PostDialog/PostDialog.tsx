@@ -1,6 +1,5 @@
 import OpenInFullIcon from '@mui/icons-material/OpenInFull';
 import { Box } from '@mui/material';
-import type { Post } from '@prisma/client';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
 import { useEffect, useRef } from 'react';
@@ -74,7 +73,7 @@ export default function PostDialog({ post, spaceId, onClose, open }: Props) {
       }
       onClose={close}
     >
-      <PostPage post={post ?? null} spaceId={spaceId} onSave={close} />
+      <PostPage key={post?.id} showOtherCategoryPosts post={post ?? null} spaceId={spaceId} onSave={close} />
     </Dialog>
   );
 }
