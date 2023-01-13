@@ -34,16 +34,20 @@ jobs:
       - name: Install dependencies and build app
         uses: ./.github/actions/install
 
+      - name: Create .env.test.local file
+        run: |
+          cp .env.example .env.test.local \
+          echo "DOMAIN=http://127.0.0.1:3335" >> .env.test.local \
+          echo "PORT=3335" >> .env.test.local \
+          echo "DATABASE_URL=postgres://postgres:postgres@127.0.0.1:5432/charmversetest" >> .env.test.local
+
       - name: Build app
         uses: ./.github/actions/build
         with:
           NEXT_PUBLIC_APP_ENV: "test"
 
       - name: Setup test database
-        run: |
-        cp .env.example .env.test.local &
-        echo "DOMAIN=http://127.0.0.1:3335\r\nPORT=3335\r\nNEXT_PUBLIC_APP_ENV=test" >> .env.test.local &
-        bash ./scripts/configure-db.sh
+        run: bash ./scripts/configure-db.sh
 
       - name: Typecheck tests
         run: npm run test:typecheck
