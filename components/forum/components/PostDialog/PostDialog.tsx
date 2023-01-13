@@ -100,7 +100,7 @@ export default function PostDialog({ post, spaceId, onClose, open }: Props) {
         }}
         title='Unsaved changes'
         open={showConfirmDialog}
-        buttonText='Close'
+        buttonText='Discard'
         secondaryButtonText='Go back'
         question='Are you sure you want to close this post? You have unsaved changes'
         onConfirm={close}

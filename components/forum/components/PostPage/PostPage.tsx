@@ -1,7 +1,6 @@
 import CommentIcon from '@mui/icons-material/Comment';
 import { Box, Divider, Stack, Typography } from '@mui/material';
-import type { Dispatch, SetStateAction } from 'react';
-import { useRef, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
@@ -31,7 +30,7 @@ type Props = {
   spaceId: string;
   post: PostWithVotes | null;
   onSave?: () => void;
-  setFormInputs: Dispatch<SetStateAction<FormInputs>>;
+  setFormInputs: (params: FormInputs) => void;
   formInputs: FormInputs;
 };
 
@@ -83,10 +82,9 @@ export function PostPage({ post, spaceId, onSave, setFormInputs, formInputs }: P
   } = useSWR(post ? `${post.id}/comments` : null, () =>
     post ? charmClient.forum.listPostComments(post.id) : undefined
   );
+  const [changed, setChanged] = useState(false);
 
-  const changed = useRef(false);
-
-  usePreventReload(changed?.current);
+  usePreventReload(changed);
   const [, setTitleState] = usePageTitle();
 
   const [commentSort, setCommentSort] = useState<PostCommentSort>('latest');
@@ -94,14 +92,13 @@ export function PostPage({ post, spaceId, onSave, setFormInputs, formInputs }: P
   const isLoading = !postComments && isValidating;
 
   function updateTitle(updates: { title: string; updatedAt: any }) {
-    setFormInputs((_formInputs) => ({ ..._formInputs, title: updates.title }));
+    setFormInputs({ ...formInputs, title: updates.title });
     setTitleState(updates.title);
   }
 
   useEffect(() => {
     if (post) {
       setTitleState(post.title);
-      setFormInputs((_formInputs) => ({ ..._formInputs, content: post.content, contentText: post.contentText }));
     }
   }, [post]);
 
@@ -116,6 +113,7 @@ export function PostPage({ post, spaceId, onSave, setFormInputs, formInputs }: P
         contentText: formInputs.contentText,
         title: formInputs.title
       });
+      setChanged(false);
     } else {
       await charmClient.forum.createForumPost({
         categoryId,
@@ -133,12 +131,12 @@ export function PostPage({ post, spaceId, onSave, setFormInputs, formInputs }: P
   }
 
   function updatePostContent({ doc, rawText }: ICharmEditorOutput) {
-    changed.current = true;
-    setFormInputs((_formInputs) => ({
-      ..._formInputs,
+    setChanged(true);
+    setFormInputs({
+      ...formInputs,
       content: doc,
       contentText: rawText
-    }));
+    });
   }
   const isMyPost = !post || post.createdBy === user?.id;
   const readOnly = !isMyPost;
