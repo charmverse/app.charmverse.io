@@ -163,6 +163,7 @@ export default function PageDialog(props: Props) {
             size='small'
             color='secondary'
             href={fullPageUrl}
+            onClick={onClose}
             variant='text'
             startIcon={<OpenInFullIcon fontSize='small' />}
           >
