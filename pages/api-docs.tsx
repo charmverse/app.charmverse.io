@@ -43,6 +43,7 @@ export default function ApiDoc({ spec }: InferGetStaticPropsType<typeof getStati
   const theme = useTheme();
   const colorMode = useColorMode();
 
+  // TODO: optimize swagger docs for dark mode
   // useEffect(() => {
   //   if (theme.palette.mode === 'dark') {
   //     colorMode.toggleColorMode();
