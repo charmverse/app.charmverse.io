@@ -165,7 +165,7 @@ function DraggableTreeNode({
       ref={mergeRefs([ref, drag, drop, dragPreview, focusListener])}
       label={item.title}
       href={`${pathPrefix}/${item.path}${
-        item.type.match(/board/) && focalboardViewsRecord[item.id] ? `?viewId=${focalboardViewsRecord[item.id]}` : ''
+        item.type.includes('board') && focalboardViewsRecord[item.id] ? `?viewId=${focalboardViewsRecord[item.id]}` : ''
       }`}
       isActive={isActive}
       isAdjacent={isAdjacentActive}

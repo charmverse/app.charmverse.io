@@ -100,6 +100,8 @@
 
 .ProseMirror {
   padding: 5px 0;
+  // set background to hide the loading indicator which disappears with a delay
+  background-color: var(--background-default);
 }
 
 .ProseMirror table {

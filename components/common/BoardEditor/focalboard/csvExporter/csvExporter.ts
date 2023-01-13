@@ -1,19 +1,17 @@
 import type { IntlShape } from 'react-intl';
 
+import { OctoUtils } from 'components/common/BoardEditor/focalboard/src/octoUtils';
+import type { IAppWindow } from 'components/common/BoardEditor/focalboard/src/types';
+import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
 import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
 
-import { OctoUtils } from './octoUtils';
-import type { IAppWindow } from './types';
-import { Utils } from './utils';
-
 declare let window: IAppWindow;
 
 class CsvExporter {
-  static exportTableCsv(board: Board, view: BoardView, cards: Card[], intl: IntlShape): void {
+  static exportTableCsv(board: Board, view: BoardView, cards: Card[], intl: IntlShape): string {
     const rows = CsvExporter.generateTableArray(board, cards, view, intl);
-
     let csvContent = 'data:text/csv;charset=utf-8,';
 
     rows.forEach((row) => {
@@ -40,7 +38,7 @@ class CsvExporter {
       window.openInNewBrowser(csvContent);
     }
 
-    // TODO: Remove or reuse link
+    return csvContent;
   }
 
   private static encodeText(text: string): string {
@@ -52,6 +50,7 @@ class CsvExporter {
     const visibleProperties = board.fields.cardProperties.filter((template: IPropertyTemplate) =>
       viewToExport.fields.visiblePropertyIds.includes(template.id)
     );
+
     if (
       viewToExport.fields.viewType === 'calendar' &&
       viewToExport.fields.dateDisplayPropertyId &&
