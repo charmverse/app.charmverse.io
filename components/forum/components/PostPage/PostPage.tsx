@@ -189,7 +189,11 @@ export function PostPage({ post, spaceId, onSave, setFormInputs, formInputs }: P
         </Box>
         {isMyPost && (
           <Box display='flex' flexDirection='row' justifyContent='right' my={2}>
-            <Button disabled={Boolean(disabledTooltip)} disabledTooltip={disabledTooltip} onClick={publishForumPost}>
+            <Button
+              disabled={Boolean(disabledTooltip) || !changed}
+              disabledTooltip={disabledTooltip}
+              onClick={publishForumPost}
+            >
               {post ? 'Update' : 'Post'}
             </Button>
           </Box>

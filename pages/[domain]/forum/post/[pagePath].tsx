@@ -27,7 +27,16 @@ export default function ForumPostPage() {
 
 function WrapperPostPage({ post }: { post: PostWithVotes }) {
   const [formInputs, setFormInputs] = useState<FormInputs>(post);
-  return <PostPage formInputs={formInputs} setFormInputs={setFormInputs} post={post} spaceId={post.spaceId} />;
+  return (
+    <PostPage
+      formInputs={formInputs}
+      setFormInputs={(_formInputs) => {
+        setFormInputs((__formInputs) => ({ ...__formInputs, ..._formInputs }));
+      }}
+      post={post}
+      spaceId={post.spaceId}
+    />
+  );
 }
 
 ForumPostPage.getLayout = getPageLayout;
