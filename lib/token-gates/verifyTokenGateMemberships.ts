@@ -23,8 +23,6 @@ export type UserToVerifyMembership = SpaceRole & {
 export async function verifyTokenGateMemberships() {
   const usersWithTokenGates = await prisma.spaceRole.findMany({
     where: {
-      // We do not want to delete admins
-      isAdmin: false,
       user: {
         userTokenGates: {
           some: {}
@@ -65,8 +63,9 @@ export async function verifyTokenGateMemberships() {
       userTokenGates: spaceRole.user.userTokenGates,
       userId: spaceRole.user.id,
       spaceId: spaceRole.spaceId,
+      spaceRoleId: spaceRole.id,
       userSpaceRoles: spaceRole.spaceRoleToRole,
-      canBeRemovedFromSpace: !spaceRole.joinedViaLink
+      canBeRemovedFromSpace: !spaceRole.joinedViaLink && !spaceRole.isAdmin
     });
 
     removedRoles += res.removedRoles;

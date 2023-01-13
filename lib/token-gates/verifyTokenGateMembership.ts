@@ -2,6 +2,7 @@ import type { Role, SpaceRoleToRole, TokenGate, TokenGateToRole, UserTokenGate }
 import { verifyJwt } from 'lit-js-sdk';
 
 import { prisma } from 'db';
+import { assignRolesToSpaceRole } from 'lib/roles/assignRolesToSpaceRole';
 import type { LitJwtPayload } from 'lib/token-gates/interfaces';
 
 type TokenGateWithRoles = {
@@ -20,6 +21,7 @@ type VerifyTokenGateMembershipProps = {
   userTokenGates: UserTokenGateProp[];
   userId: string;
   spaceId: string;
+  spaceRoleId: string;
   canBeRemovedFromSpace: boolean;
   userSpaceRoles?: (SpaceRoleToRole & { role: Role })[];
 };
@@ -29,13 +31,13 @@ export async function verifyTokenGateMembership({
   userSpaceRoles,
   userId,
   spaceId,
+  spaceRoleId,
   canBeRemovedFromSpace
-}: VerifyTokenGateMembershipProps): Promise<{ verified: boolean; removedRoles: number }> {
+}: VerifyTokenGateMembershipProps): Promise<{ verified: boolean; removedRoles: number; addedRoles: number }> {
   if (!userTokenGates.length) {
-    return { verified: true, removedRoles: 0 };
+    return { verified: true, removedRoles: 0, addedRoles: 0 };
   }
 
-  // We want to update only invalid token gates
   const tokenGateVerificationPromises = userTokenGates.map(async (userTokenGate) => {
     if (!userTokenGate.jwt || !userTokenGate.tokenGate) {
       return { id: userTokenGate.id, isVerified: false, roleIds: userTokenGate.grantedRoles };
@@ -54,11 +56,14 @@ export async function verifyTokenGateMembership({
   const tokenGateVerificationResults = await Promise.all(tokenGateVerificationPromises);
   const validTokenGates = tokenGateVerificationResults.filter((r) => r.isVerified);
   const invalidTokenGates = tokenGateVerificationResults.filter((r) => !r.isVerified);
+  const assignedUserRoleIds = userSpaceRoles?.map((sr) => sr.roleId) || [];
 
   let validRoleIds: string[] = [];
   validTokenGates.forEach((tg) => {
     validRoleIds = [...validRoleIds, ...tg.roleIds];
   });
+
+  const roleIdsToAssign = validRoleIds.filter((roleId) => !assignedUserRoleIds.includes(roleId));
 
   const invalidSpaceRoleToRoleIds: string[] = [];
   invalidTokenGates.forEach((tg) => {
@@ -77,31 +82,37 @@ export async function verifyTokenGateMembership({
     await removeUserRoles(invalidSpaceRoleToRoleIds);
   }
 
-  // All token gates are invalid and user did not join via invite link soo he should be removed from space
-  if (invalidTokenGates.length === userTokenGates.length && canBeRemovedFromSpace) {
-    // TEMP - run in test mode
-    // await prisma.spaceRole.delete({
-    //   where: {
-    //     spaceUser: {
-    //       userId,
-    //       spaceId
-    //     }
-    //   }
-    // });
-
-    return { verified: false, removedRoles: 0 };
+  if (roleIdsToAssign) {
+    await assignRolesToSpaceRole({ roleIds: roleIdsToAssign, spaceRoleId });
   }
 
-  return { verified: true, removedRoles: invalidSpaceRoleToRoleIds.length || 0 };
+  // All token gates are invalid and user did not join via invite link - should be removed from space
+  if (invalidTokenGates.length === userTokenGates.length && canBeRemovedFromSpace) {
+    await prisma.spaceRole.delete({
+      where: {
+        spaceUser: {
+          userId,
+          spaceId
+        }
+      }
+    });
+
+    return { verified: false, removedRoles: 0, addedRoles: 0 };
+  }
+
+  return {
+    verified: true,
+    removedRoles: invalidSpaceRoleToRoleIds.length || 0,
+    addedRoles: roleIdsToAssign.length || 0
+  };
 }
 
 async function removeUserRoles(spaceRoleToRoleIds: string[]) {
-  // TEMP - run in test mode
-  // return prisma.spaceRoleToRole.deleteMany({
-  //   where: {
-  //     id: {
-  //       in: spaceRoleToRoleIds
-  //     }
-  //   }
-  // });
+  return prisma.spaceRoleToRole.deleteMany({
+    where: {
+      id: {
+        in: spaceRoleToRoleIds
+      }
+    }
+  });
 }

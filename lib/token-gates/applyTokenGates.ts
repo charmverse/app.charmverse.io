@@ -6,6 +6,7 @@ import { prisma } from 'db';
 import { applyDiscordGate } from 'lib/discord/applyDiscordGate';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { updateTrackUserProfileById } from 'lib/metrics/mixpanel/updateTrackUserProfileById';
+import { assignRolesToSpaceRole } from 'lib/roles/assignRolesToSpaceRole';
 import { updateUserTokenGates } from 'lib/token-gates/updateUserTokenGates';
 import { DataNotFoundError, InsecureOperationError, InvalidInputError } from 'lib/utilities/errors';
 
@@ -139,32 +140,7 @@ export async function applyTokenGates({
   if (spaceMembership && roleIdsToAssign.length === 0) {
     return returnValue;
   } else if (spaceMembership) {
-    await prisma.$transaction(
-      roleIdsToAssign.map((roleId) => {
-        return prisma.spaceRoleToRole.upsert({
-          where: {
-            spaceRoleId_roleId: {
-              spaceRoleId: spaceMembership.id,
-              roleId
-            }
-          },
-          create: {
-            role: {
-              connect: {
-                id: roleId
-              }
-            },
-            spaceRole: {
-              connect: {
-                id: spaceMembership.id
-              }
-            }
-          },
-          // Perform an empty update
-          update: {}
-        });
-      })
-    );
+    await assignRolesToSpaceRole({ roleIds: roleIdsToAssign, spaceRoleId: spaceMembership.id });
 
     updateTrackUserProfileById(userId);
 
