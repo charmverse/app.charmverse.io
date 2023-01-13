@@ -1,6 +1,6 @@
 import CommentIcon from '@mui/icons-material/Comment';
 import { Box, Divider, Stack, Typography } from '@mui/material';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
@@ -11,6 +11,8 @@ import CharmEditor from 'components/common/CharmEditor';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEditor';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { ScrollableWindow } from 'components/common/PageLayout';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useForumCategories } from 'hooks/useForumCategories';
 import { usePageTitle } from 'hooks/usePageTitle';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useUser } from 'hooks/useUser';
@@ -88,8 +90,12 @@ export function PostPage({
   setContentUpdated,
   showOtherCategoryPosts
 }: Props) {
+  const currentSpace = useCurrentSpace();
   const { user } = useUser();
-  const [categoryId, setCategoryId] = useState(post?.categoryId ?? null);
+  const { categories } = useForumCategories();
+  const [categoryId, setCategoryId] = useState(
+    post?.categoryId ?? categories.find((category) => category.id === currentSpace?.defaultPostCategoryId)?.id ?? null
+  );
   const {
     data: postComments,
     mutate: setPostComments,
@@ -99,9 +105,7 @@ export function PostPage({
   );
   usePreventReload(contentUpdated);
   const [, setTitleState] = usePageTitle();
-
   const [commentSort, setCommentSort] = useState<PostCommentSort>('latest');
-
   const isLoading = !postComments && isValidating;
 
   function updateTitle(updates: { title: string; updatedAt: any }) {
@@ -143,8 +147,8 @@ export function PostPage({
   }
 
   function updateCategoryId(_categoryId: string) {
-    setCategoryId(_categoryId);
     setContentUpdated(true);
+    setCategoryId(_categoryId);
   }
 
   function updatePostContent({ doc, rawText }: ICharmEditorOutput) {
@@ -181,7 +185,7 @@ export function PostPage({
 
   return (
     <ScrollableWindow>
-      <Stack>
+      <Stack flexDirection='row'>
         <Container top={50}>
           <Box minHeight={300}>
             <CharmEditor
