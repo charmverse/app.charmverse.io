@@ -5,14 +5,9 @@ import type { PageContent } from 'lib/prosemirror/interfaces';
 export type ForumVotes = { upvotes: number; downvotes: number; upvoted: boolean | null };
 export type PostWithVotes = Post & { votes: ForumVotes };
 
-export type ForumPostMeta = {
-  createdAt: string;
-  createdBy: string;
-  categoryId: string;
-  id: string;
-  title: string;
+export type ForumPostMeta = Pick<Post, 'createdBy' | 'id' | 'categoryId' | 'title' | 'path'> & {
   summary: PageContent | null;
-  updatedAt: string;
   votes: ForumVotes;
-  path: string;
+  createdAt: string;
+  updatedAt: string;
 };

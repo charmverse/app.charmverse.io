@@ -73,7 +73,7 @@ export default function PostDialog({ post, spaceId, onClose, open }: Props) {
       }
       onClose={close}
     >
-      <PostPage key={post?.id} insideDialog post={post ?? null} spaceId={spaceId} onSave={close} />
+      <PostPage key={post?.id} showOtherCategoryPosts post={post ?? null} spaceId={spaceId} onSave={close} />
     </Dialog>
   );
 }
