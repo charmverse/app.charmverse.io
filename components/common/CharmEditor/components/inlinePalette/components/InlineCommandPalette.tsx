@@ -61,6 +61,7 @@ interface InlineCommentGroupProps {
   size?: InlinePaletteSize;
   handleActiveItem?: (item: string) => void;
   palettePluginKey: PluginKey;
+  disableVoting?: boolean;
 }
 
 export default function InlineCommandPalette({
@@ -70,11 +71,12 @@ export default function InlineCommandPalette({
   externalPopupState,
   size = 'big',
   handleActiveItem,
-  palettePluginKey
+  palettePluginKey,
+  disableVoting
 }: InlineCommentGroupProps) {
   const { query, counter, isVisible, tooltipContentDOM } = useInlinePaletteQuery(palettePluginKey);
   const view = useEditorViewContext();
-  const editorItems = useEditorItems({ disableNestedPage, nestedPagePluginKey });
+  const editorItems = useEditorItems({ disableNestedPage, nestedPagePluginKey, disableVoting });
   const isItemDisabled = useCallback(
     (item: PaletteItem) => {
       return typeof item.disabled === 'function' ? item.disabled(view.state) : item.disabled;

@@ -660,6 +660,7 @@ function CharmEditor({
         nestedPagePluginKey={nestedPagePluginKey}
         disableNestedPage={disableNestedPage}
         palettePluginKey={inlinePalettePluginKey}
+        disableVoting={!enableVoting}
       />
       {children}
       {!disablePageSpecificFeatures && (
