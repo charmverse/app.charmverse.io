@@ -11,6 +11,7 @@ import CharmEditor from 'components/common/CharmEditor';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEditor';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { ScrollableWindow } from 'components/common/PageLayout';
+import UserDisplay from 'components/common/UserDisplay';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useForumCategories } from 'hooks/useForumCategories';
 import { useMembers } from 'hooks/useMembers';
@@ -205,6 +206,7 @@ export function PostPage({
               onContentChange={updatePostContent}
             >
               <PageTitleInput readOnly={readOnly} value={formInputs.title} onChange={updateTitle} />
+              {createdBy && <UserDisplay user={createdBy} avatarSize='small' fontSize='medium' mt={2} mb={3} />}
               <Box my={2}>
                 <PostCategoryInput
                   readOnly={readOnly}
