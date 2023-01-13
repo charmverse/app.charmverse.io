@@ -1,7 +1,7 @@
 import { Decoration, DecorationSet, Plugin, Selection } from '@bangle.dev/pm';
 import type { EditorState, PluginKey } from '@bangle.dev/pm';
 import { RateReviewOutlined } from '@mui/icons-material';
-import reactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 
 import { createTooltipDOM, tooltipPlacement } from '../@bangle.dev/tooltip';
 import { renderSuggestionsTooltip, referenceElement } from '../@bangle.dev/tooltip/suggest-tooltip';
@@ -164,7 +164,7 @@ function renderComponent({ rowPos, firstMarkPos, count }: { rowPos: number; firs
   container.className = 'charm-row-decoration-suggestions charm-row-decoration';
   container.setAttribute('data-pos', rowPos.toString());
   container.setAttribute('data-mark-pos', firstMarkPos.toString());
-  reactDOM.render(<RowDecoration count={count} icon={RateReviewOutlined} />, container);
+  createRoot(container).render(<RowDecoration count={count} icon={RateReviewOutlined} />);
 
   return container;
 }

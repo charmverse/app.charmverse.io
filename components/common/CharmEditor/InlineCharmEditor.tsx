@@ -98,7 +98,7 @@ export function charmEditorPlugins({
   return () => basePlugins;
 }
 
-const StyledReactBangleEditor = styled(ReactBangleEditor)<{ noPadding?: boolean }>`
+const StyledReactBangleEditor = styled(ReactBangleEditor)<{ colorMode?: 'dark'; noPadding?: boolean }>`
   & {
     padding: ${({ noPadding, theme }) => (noPadding ? 0 : theme.spacing(0, 1))};
   }
@@ -107,6 +107,17 @@ const StyledReactBangleEditor = styled(ReactBangleEditor)<{ noPadding?: boolean 
     width: 100% !important;
     height: 100%;
   }
+
+  ${({ colorMode }) =>
+    colorMode === 'dark'
+      ? `
+          background-color: var(--background-light);
+          .ProseMirror[data-placeholder]::before {
+            color: var(--primary-text);
+            opacity: 0.5;
+          }`
+      : ''};
+
   code {
     border-radius: 2px !important;
     background-color: ${({ theme }) => theme.palette.code.background};
@@ -127,6 +138,7 @@ const StyledReactBangleEditor = styled(ReactBangleEditor)<{ noPadding?: boolean 
 export type UpdatePageContent = (content: ICharmEditorOutput) => any;
 
 interface CharmEditorProps {
+  colorMode?: 'dark';
   content?: PageContent | null;
   children?: ReactNode;
   onContentChange?: UpdatePageContent;
@@ -138,6 +150,7 @@ interface CharmEditorProps {
 }
 
 export default function CharmEditor({
+  colorMode,
   focusOnInit,
   content,
   children,
@@ -193,6 +206,7 @@ export default function CharmEditor({
 
   return (
     <StyledReactBangleEditor
+      colorMode={colorMode}
       focusOnInit={focusOnInit}
       style={{
         ...(style ?? {}),

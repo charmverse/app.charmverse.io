@@ -11,6 +11,8 @@ import CharmEditor from 'components/common/CharmEditor';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEditor';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { ScrollableWindow } from 'components/common/PageLayout';
+import UserDisplay from 'components/common/UserDisplay';
+import { useMembers } from 'hooks/useMembers';
 import { usePageTitle } from 'hooks/usePageTitle';
 import { useUser } from 'hooks/useUser';
 import type { PostCommentWithVote, PostCommentWithVoteAndChildren } from 'lib/forums/comments/interface';
@@ -18,6 +20,7 @@ import type { PostWithVotes } from 'lib/forums/posts/interfaces';
 import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
+import { CategoryPosts } from './components/CategoryPosts';
 import { PostCategoryInput } from './components/PostCategoryInput';
 import { PostComment } from './components/PostComment';
 import { PostCommentForm } from './components/PostCommentForm';
@@ -27,6 +30,7 @@ type Props = {
   spaceId: string;
   post: PostWithVotes | null;
   onSave?: () => void;
+  showOtherCategoryPosts?: boolean;
 };
 
 type FormInputs = {
@@ -74,8 +78,9 @@ function sortComments({ comments, sort }: { comments: PostCommentWithVoteAndChil
   return comments;
 }
 
-export function PostPage({ post, spaceId, onSave }: Props) {
+export function PostPage({ showOtherCategoryPosts = false, post, spaceId, onSave }: Props) {
   const { user } = useUser();
+  const { members } = useMembers();
   const [form, setForm] = useState<FormInputs>(post ?? { title: '', content: null, contentText: '' });
   const [categoryId, setCategoryId] = useState(post?.categoryId ?? null);
   const {
@@ -90,6 +95,8 @@ export function PostPage({ post, spaceId, onSave }: Props) {
   const [commentSort, setCommentSort] = useState<PostCommentSort>('latest');
 
   const isLoading = !postComments && isValidating;
+
+  const createdBy = members.find((_member) => _member.id === post?.createdBy);
 
   function updateTitle(updates: { title: string; updatedAt: any }) {
     setForm((_form) => ({ ..._form, title: updates.title }));
@@ -163,73 +170,82 @@ export function PostPage({ post, spaceId, onSave }: Props) {
 
   return (
     <ScrollableWindow>
-      <Container top={50}>
-        <Box minHeight={300}>
-          <CharmEditor
-            readOnly={readOnly}
-            pageActionDisplay={null}
-            pageId={post?.id}
-            disablePageSpecificFeatures
-            isContentControlled
-            key={user?.id}
-            content={form.content as PageContent}
-            onContentChange={updatePostContent}
-          >
-            <PageTitleInput readOnly={readOnly} value={form.title} onChange={updateTitle} />
-            <Box my={2}>
-              <PostCategoryInput
-                readOnly={readOnly}
-                spaceId={spaceId}
-                setCategoryId={updateCategoryId}
-                categoryId={categoryId}
-              />
+      <Stack flexDirection='row'>
+        <Container top={50}>
+          <Box minHeight={300}>
+            <CharmEditor
+              readOnly={readOnly}
+              pageActionDisplay={null}
+              pageId={post?.id}
+              disablePageSpecificFeatures
+              enableVoting={false}
+              isContentControlled
+              key={user?.id}
+              content={form.content as PageContent}
+              onContentChange={updatePostContent}
+            >
+              <PageTitleInput readOnly={readOnly} value={form.title} onChange={updateTitle} />
+              <UserDisplay user={createdBy} avatarSize='small' fontSize='medium' mt={2} mb={3} />
+              <Box my={2}>
+                <PostCategoryInput
+                  readOnly={readOnly}
+                  spaceId={spaceId}
+                  setCategoryId={updateCategoryId}
+                  categoryId={categoryId}
+                />
+              </Box>
+            </CharmEditor>
+          </Box>
+          {isMyPost && (
+            <Box display='flex' flexDirection='row' justifyContent='right' my={2}>
+              <Button disabled={Boolean(disabledTooltip)} disabledTooltip={disabledTooltip} onClick={publishForumPost}>
+                {post ? 'Update' : 'Post'}
+              </Button>
             </Box>
-          </CharmEditor>
-        </Box>
-        {isMyPost && (
-          <Box display='flex' flexDirection='row' justifyContent='right' my={2}>
-            <Button disabled={Boolean(disabledTooltip)} disabledTooltip={disabledTooltip} onClick={publishForumPost}>
-              {post ? 'Update' : 'Post'}
-            </Button>
-          </Box>
-        )}
+          )}
 
-        {post && (
-          <Box my={2}>
-            <PostCommentForm setPostComments={setPostComments} postId={post.id} />
-          </Box>
-        )}
-        <Divider
-          sx={{
-            my: 2
-          }}
-        />
-        {isLoading ? (
-          <Box height={100}>
-            <LoadingComponent size={24} isLoading label='Fetching comments' />
-          </Box>
-        ) : (
-          post && (
-            <>
-              <Stack gap={1}>
-                <PostCommentSort commentSort={commentSort} setCommentSort={setCommentSort} />
-                {topLevelComments.map((comment) => (
-                  <PostComment setPostComments={setPostComments} comment={comment} key={comment.id} />
-                ))}
-              </Stack>
-              {topLevelComments.length === 0 && (
-                <Stack gap={1} alignItems='center' my={1}>
-                  <CommentIcon color='secondary' fontSize='large' />
-                  <Typography color='secondary' variant='h6'>
-                    No Comments Yet
-                  </Typography>
-                  <Typography color='secondary'>Be the first to share what you think!</Typography>
+          {post && (
+            <Box my={2}>
+              <PostCommentForm setPostComments={setPostComments} postId={post.id} />
+            </Box>
+          )}
+          <Divider
+            sx={{
+              my: 2
+            }}
+          />
+          {isLoading ? (
+            <Box height={100}>
+              <LoadingComponent size={24} isLoading label='Fetching comments' />
+            </Box>
+          ) : (
+            post && (
+              <>
+                <Stack gap={1}>
+                  <PostCommentSort commentSort={commentSort} setCommentSort={setCommentSort} />
+                  {topLevelComments.map((comment) => (
+                    <PostComment setPostComments={setPostComments} comment={comment} key={comment.id} />
+                  ))}
                 </Stack>
-              )}
-            </>
-          )
+                {topLevelComments.length === 0 && (
+                  <Stack gap={1} alignItems='center' my={1}>
+                    <CommentIcon color='secondary' fontSize='large' />
+                    <Typography color='secondary' variant='h6'>
+                      No Comments Yet
+                    </Typography>
+                    <Typography color='secondary'>Be the first to share what you think!</Typography>
+                  </Stack>
+                )}
+              </>
+            )
+          )}
+        </Container>
+        {post && showOtherCategoryPosts && (
+          <Box width='25%' mr={8}>
+            <CategoryPosts postId={post.id} categoryId={post.categoryId} />
+          </Box>
         )}
-      </Container>
+      </Stack>
     </ScrollableWindow>
   );
 }

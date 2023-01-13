@@ -263,7 +263,9 @@ export function charmEditorPlugins({
     }
   }
 
-  return () => basePlugins;
+  return () => {
+    return basePlugins;
+  };
 }
 
 const StyledReactBangleEditor = styled(ReactBangleEditor)<{ disablePageSpecificFeatures?: boolean }>`
@@ -276,7 +278,12 @@ const StyledReactBangleEditor = styled(ReactBangleEditor)<{ disablePageSpecificF
   /** DONT REMOVE THIS STYLING */
   div.ProseMirror.bangle-editor {
     padding-left: 50px;
-    width: calc(100% + 50px);
+    margin-right: -50px;
+  }
+
+  // set background to hide the loading indicator which disappears with a delay
+  .ProseMirror {
+    background-color: ${({ theme }) => theme.palette.background.default};
   }
 
   code {
@@ -524,7 +531,6 @@ function CharmEditor({
   return (
     <StyledReactBangleEditor
       pageId={pageId}
-      spaceId={currentSpace?.id}
       disablePageSpecificFeatures={disablePageSpecificFeatures}
       isContentControlled={isContentControlled}
       enableSuggestions={enableSuggestingMode}
@@ -659,6 +665,7 @@ function CharmEditor({
         nestedPagePluginKey={nestedPagePluginKey}
         disableNestedPage={disableNestedPage}
         palettePluginKey={inlinePalettePluginKey}
+        enableVoting={enableVoting}
       />
       {children}
       {!disablePageSpecificFeatures && (

@@ -4,10 +4,10 @@ import { Box } from '@mui/system';
 import { useState } from 'react';
 
 import charmClient from 'charmClient';
-import Avatar from 'components/common/Avatar';
 import Button from 'components/common/Button';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/InlineCharmEditor';
 import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
+import UserDisplay from 'components/common/UserDisplay';
 import { useUser } from 'hooks/useUser';
 import type { PostCommentWithVote } from 'lib/forums/comments/interface';
 
@@ -60,16 +60,16 @@ export function CommentReplyForm({
   return (
     <Stack gap={1}>
       <Box display='flex' gap={1} flexDirection='row' alignItems='flex-start'>
-        <Avatar size='small' avatar={user.avatar} variant='circular' />
+        <UserDisplay user={user} hideName={true} />
         <InlineCharmEditor
+          colorMode='dark'
           style={{
-            backgroundColor: theme.palette.background.light,
             minHeight: 100
           }}
           key={editorKey}
           content={postContent.doc}
           onContentChange={updateCommentContent}
-          placeholderText='Reply to comment...'
+          placeholderText='What are your thoughts?'
         />
       </Box>
       <Stack gap={1} flexDirection='row' alignSelf='flex-end'>

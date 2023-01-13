@@ -16,16 +16,14 @@ import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/ho
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import type { ReactNode, SyntheticEvent } from 'react';
-import React, { forwardRef, memo, useCallback, useMemo } from 'react';
+import React, { useRef, forwardRef, memo, useEffect, useCallback, useMemo } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 
-import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
 import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import EmojiPicker from 'components/common/BoardEditor/focalboard/src/widgets/emojiPicker';
 import TreeItemContent from 'components/common/TreeItemContent';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
-import { getKey } from 'hooks/useLocalStorage';
 import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { isTouchScreen } from 'lib/utilities/browser';
@@ -128,7 +126,7 @@ const AdjacentDropZone = styled.div`
   background-color: ${({ theme }) => theme.palette.primary.main};
 `;
 
-const PageAnchor = styled.a`
+const PageAnchor = styled(Link)`
   color: inherit;
   text-decoration: none;
   display: flex;
@@ -199,10 +197,6 @@ export function PageLink({
   const isempty = !label;
 
   const stopPropagation = useCallback((event: SyntheticEvent) => {
-    const pageNavigationElement = document.querySelector('.page-navigation');
-    if (pageNavigationElement) {
-      localStorage.setItem(getKey('sidebar-scroll-top'), pageNavigationElement.scrollTop.toString());
-    }
     event.stopPropagation();
   }, []);
 
@@ -214,24 +208,22 @@ export function PageLink({
   const triggerState = bindTrigger(popupState);
 
   return (
-    <Link passHref href={href}>
-      <PageAnchor onClick={stopPropagation}>
-        <span onClick={preventDefault}>
-          <PageIcon
-            icon={labelIcon}
-            pageType={pageType}
-            isEditorEmpty={isEmptyContent}
-            {...triggerState}
-            onClick={showPicker ? triggerState.onClick : undefined}
-          />
-        </span>
-        <PageTitle hasContent={isempty} onClick={onClick}>
-          {isempty ? 'Untitled' : label}
-        </PageTitle>
-        {children}
-        {showPicker && pageId && <EmojiMenu popupState={popupState} pageId={pageId} />}
-      </PageAnchor>
-    </Link>
+    <PageAnchor href={href} onClick={stopPropagation}>
+      <span onClick={preventDefault}>
+        <PageIcon
+          pageType={pageType}
+          isEditorEmpty={isEmptyContent}
+          icon={labelIcon}
+          {...triggerState}
+          onClick={showPicker ? triggerState.onClick : undefined}
+        />
+      </span>
+      <PageTitle hasContent={isempty} onClick={onClick}>
+        {isempty ? 'Untitled' : label}
+      </PageTitle>
+      {children}
+      {showPicker && pageId && <EmojiMenu popupState={popupState} pageId={pageId} />}
+    </PageAnchor>
   );
 }
 
@@ -307,6 +299,7 @@ const PageTreeItem = forwardRef<any, PageTreeItemProps>((props, ref) => {
     () => ({ isAdjacent, className: hasSelectedChildView ? 'Mui-selected' : undefined }),
     [isAdjacent, hasSelectedChildView]
   );
+
   const TransitionProps = useMemo(() => ({ timeout: 50 }), []);
   const anchorOrigin = useMemo(() => ({ vertical: 'bottom', horizontal: 'left' } as const), []);
   const transformOrigin = useMemo(() => ({ vertical: 'top', horizontal: 'left' } as const), []);

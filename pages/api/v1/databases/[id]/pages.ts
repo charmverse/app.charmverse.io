@@ -44,7 +44,6 @@ export async function createPage(req: NextApiRequest, res: NextApiResponse) {
       id: id as string
     }
   });
-
   if (!board || board.spaceId !== spaceId) {
     throw new DatabasePageNotFoundError(id as string);
   }

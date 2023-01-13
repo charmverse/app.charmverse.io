@@ -140,7 +140,7 @@ export const collabCaretsPlugin = function (options: { editor: { docInfo: { acce
         if (
           tr.selectionSet &&
           !sendableSteps(state) &&
-          !tr.getMeta('row-handle-drag') &&
+          !tr.getMeta('row-handle-is-dragging') &&
           !['review', 'review-tracked'].includes(options.editor.docInfo.access_rights)
         ) {
           caretUpdate = { anchor: tr.selection.anchor, head: tr.selection.head };

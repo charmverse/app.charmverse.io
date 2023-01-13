@@ -1,9 +1,10 @@
-import type { Node } from '@bangle.dev/pm';
+import type { EditorView, Node } from '@bangle.dev/pm';
 import { Fragment, setBlockType } from '@bangle.dev/pm';
 import { rafCommandExec } from '@bangle.dev/utils';
 import { FormatListBulleted } from '@mui/icons-material';
 import CodeIcon from '@mui/icons-material/Code';
 import ViewColumnIcon from '@mui/icons-material/ViewColumn';
+import type { EditorState } from 'prosemirror-state';
 import { TextSelection } from 'prosemirror-state';
 
 import { insertNode, isAtBeginningOfLine } from '../../../utils';
@@ -54,9 +55,12 @@ function createColumnPaletteItem(colCount: number): PaletteItemTypeNoGroup {
     }
   };
 }
+type AdvancedItemsProps = {
+  enableVoting?: boolean;
+};
 
-export function items(): PaletteItemTypeNoGroup[] {
-  return [
+export function items({ enableVoting }: AdvancedItemsProps = {}): PaletteItemTypeNoGroup[] {
+  const editorItems: PaletteItemTypeNoGroup[] = [
     createColumnPaletteItem(2),
     createColumnPaletteItem(3),
     {
@@ -87,8 +91,11 @@ export function items(): PaletteItemTypeNoGroup[] {
           return replaceSuggestionMarkWith(palettePluginKey, '')(state, dispatch, view);
         };
       }
-    },
-    {
+    }
+  ];
+
+  if (enableVoting) {
+    editorItems.push({
       uid: 'poll',
       title: 'Poll',
       icon: (
@@ -123,6 +130,8 @@ export function items(): PaletteItemTypeNoGroup[] {
           return replaceSuggestionMarkWith(palettePluginKey, '')(state, dispatch, view);
         };
       }
-    }
-  ];
+    });
+  }
+
+  return editorItems;
 }

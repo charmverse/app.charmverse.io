@@ -22,6 +22,7 @@ import { useRouter } from 'next/router';
 import { useCallback, useState } from 'react';
 
 import Link from 'components/common/Link';
+import { charmverseDiscordInvite } from 'config/constants';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
@@ -215,17 +216,20 @@ export default function Sidebar({ closeSidebar, favorites }: SidebarProps) {
     setIsScrolled(e.currentTarget?.scrollTop > 0);
   }
 
-  const addPage = useCallback((_page: Partial<Page>) => {
-    if (user && space) {
-      const newPage: NewPageInput = {
-        ..._page,
-        createdBy: user.id,
-        spaceId: space.id
-      };
+  const addPage = useCallback(
+    (_page: Partial<Page>) => {
+      if (user && space) {
+        const newPage: NewPageInput = {
+          ..._page,
+          createdBy: user.id,
+          spaceId: space.id
+        };
 
-      addPageAndRedirect(newPage, router).then();
-    }
-  }, []);
+        addPageAndRedirect(newPage, router).then();
+      }
+    },
+    [user?.id, space?.id]
+  );
 
   function closeSidebarIfIsMobile() {
     if (isMobile) {
@@ -316,7 +320,7 @@ export default function Sidebar({ closeSidebar, favorites }: SidebarProps) {
             />
             <SidebarLink
               active={false}
-              href='https://discord.gg/ACYCzBGC2M'
+              href={charmverseDiscordInvite}
               icon={<QuestionMarkIcon color='secondary' fontSize='small' />}
               label='Support & Feedback'
               target='_blank'

@@ -20,7 +20,7 @@ const StyledPopper = styled(Popper)`
   z-index: var(--z-index-modal);
 `;
 
-function Menu({ position, children, disablePortal = true }: Props) {
+function Menu({ position = 'bottom-start', children, disablePortal = true }: Props) {
   const [anchorEl] = useMenuContext();
   const popperRef = useRef<HTMLDivElement>(null);
   const [maxHeight, setMaxHeight] = useState(0);
@@ -51,10 +51,10 @@ function Menu({ position, children, disablePortal = true }: Props) {
   }, []);
 
   return (
-    <StyledPopper anchorEl={anchorEl} open={true} disablePortal={disablePortal} placement={position || 'bottom-start'}>
+    <StyledPopper anchorEl={anchorEl} open={true} disablePortal={disablePortal} placement={position}>
       <div
         ref={popperRef}
-        style={{ maxHeight: maxHeight || 'none' }}
+        style={{ maxHeight: maxHeight || undefined }}
         className={`Menu noselect ${position || 'bottom-start'}`}
       >
         <div className='menu-contents'>

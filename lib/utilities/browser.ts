@@ -1,6 +1,10 @@
 // using deprectead feature, navigator.userAgent doesnt exist yet in FF - https://developer.mozilla.org/en-US/docs/Web/API/Navigator/platform
 export function isMac() {
-  return navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+  return (
+    navigator.platform.toUpperCase().indexOf('MAC') >= 0 ||
+    navigator.platform.toUpperCase().indexOf('IPHONE') >= 0 ||
+    navigator.platform.toUpperCase().indexOf('IPAD') >= 0
+  );
 }
 
 export function isTouchScreen(): boolean {
@@ -105,8 +109,12 @@ export function getNewUrl(params: Record<string, string | null>, currentUrl = wi
   return url;
 }
 
-// update URL without Next.js re-rendering the page
-// source: https://github.com/vercel/next.js/discussions/18072
+/**
+ * update URL without Next.js re-rendering the page
+ * source: https://github.com/vercel/next.js/discussions/18072
+ *
+ * To remove a param from the query, set it as null
+ */
 export function setUrlWithoutRerender(pathname: string, params: Record<string, string | null>) {
   const newUrl = getNewUrl(params);
   // get the path that Next.js uses internally
