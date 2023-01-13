@@ -5,16 +5,10 @@ import useSWR from 'swr';
 import charmClient from 'charmClient';
 import ErrorPage from 'components/common/errors/ErrorPage';
 import getPageLayout from 'components/common/PageLayout/getLayout';
+import type { FormInputs } from 'components/forum/components/interfaces';
 import { PostPage } from 'components/forum/components/PostPage/PostPage';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { PostWithVotes } from 'lib/forums/posts/interfaces';
-
-type FormInputs = {
-  title: string;
-  content: any | null;
-  contentText?: string;
-  id?: string;
-};
 
 export default function ForumPostPage() {
   const router = useRouter();
@@ -32,8 +26,8 @@ export default function ForumPostPage() {
 }
 
 function WrapperPostPage({ post }: { post: PostWithVotes }) {
-  const [form, setForm] = useState<FormInputs>(post);
-  return <PostPage form={form} setForm={setForm} post={post} spaceId={post.spaceId} />;
+  const [formInputs, setFormInputs] = useState<FormInputs>(post);
+  return <PostPage formInputs={formInputs} setFormInputs={setFormInputs} post={post} spaceId={post.spaceId} />;
 }
 
 ForumPostPage.getLayout = getPageLayout;

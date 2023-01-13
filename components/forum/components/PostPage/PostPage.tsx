@@ -20,24 +20,19 @@ import type { PostWithVotes } from 'lib/forums/posts/interfaces';
 import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
+import type { FormInputs } from '../interfaces';
+
 import { PostCategoryInput } from './components/PostCategoryInput';
 import { PostComment } from './components/PostComment';
 import { PostCommentForm } from './components/PostCommentForm';
 import { PostCommentSort } from './components/PostCommentSort';
 
-type FormInputs = {
-  title: string;
-  content: any | null;
-  contentText?: string;
-  id?: string;
-};
-
 type Props = {
   spaceId: string;
   post: PostWithVotes | null;
   onSave?: () => void;
-  setForm: Dispatch<SetStateAction<FormInputs>>;
-  form: FormInputs;
+  setFormInputs: Dispatch<SetStateAction<FormInputs>>;
+  formInputs: FormInputs;
 };
 
 function processComments({ postComments }: { postComments: PostCommentWithVote[] }) {
@@ -78,7 +73,7 @@ function sortComments({ comments, sort }: { comments: PostCommentWithVoteAndChil
   return comments;
 }
 
-export function PostPage({ post, spaceId, onSave, setForm, form }: Props) {
+export function PostPage({ post, spaceId, onSave, setFormInputs, formInputs }: Props) {
   const { user } = useUser();
   const [categoryId, setCategoryId] = useState(post?.categoryId ?? null);
   const {
@@ -99,35 +94,35 @@ export function PostPage({ post, spaceId, onSave, setForm, form }: Props) {
   const isLoading = !postComments && isValidating;
 
   function updateTitle(updates: { title: string; updatedAt: any }) {
-    setForm((_form) => ({ ..._form, title: updates.title }));
+    setFormInputs((_formInputs) => ({ ..._formInputs, title: updates.title }));
     setTitleState(updates.title);
   }
 
   useEffect(() => {
     if (post) {
       setTitleState(post.title);
-      setForm((_form) => ({ ..._form, content: post.content, contentText: post.contentText }));
+      setFormInputs((_formInputs) => ({ ..._formInputs, content: post.content, contentText: post.contentText }));
     }
   }, [post]);
 
   async function publishForumPost() {
-    if (checkIsContentEmpty(form.content) || !categoryId) {
+    if (checkIsContentEmpty(formInputs.content) || !categoryId) {
       throw new Error('Missing required fields to save forum post');
     }
     if (post) {
       await charmClient.forum.updateForumPost(post.id, {
         categoryId,
-        content: form.content,
-        contentText: form.contentText,
-        title: form.title
+        content: formInputs.content,
+        contentText: formInputs.contentText,
+        title: formInputs.title
       });
     } else {
       await charmClient.forum.createForumPost({
         categoryId,
-        content: form.content,
-        contentText: form.contentText ?? '',
+        content: formInputs.content,
+        contentText: formInputs.contentText ?? '',
         spaceId,
-        title: form.title
+        title: formInputs.title
       });
     }
     onSave?.();
@@ -139,8 +134,8 @@ export function PostPage({ post, spaceId, onSave, setForm, form }: Props) {
 
   function updatePostContent({ doc, rawText }: ICharmEditorOutput) {
     changed.current = true;
-    setForm((_form) => ({
-      ..._form,
+    setFormInputs((_formInputs) => ({
+      ..._formInputs,
       content: doc,
       contentText: rawText
     }));
@@ -149,9 +144,9 @@ export function PostPage({ post, spaceId, onSave, setForm, form }: Props) {
   const readOnly = !isMyPost;
 
   let disabledTooltip = '';
-  if (!form.title) {
+  if (!formInputs.title) {
     disabledTooltip = 'Title is required';
-  } else if (checkIsContentEmpty(form.content)) {
+  } else if (checkIsContentEmpty(formInputs.content)) {
     disabledTooltip = 'Content is required';
   } else if (!categoryId) {
     disabledTooltip = 'Category is required';
@@ -180,10 +175,10 @@ export function PostPage({ post, spaceId, onSave, setForm, form }: Props) {
             disablePageSpecificFeatures
             isContentControlled
             key={user?.id}
-            content={form.content as PageContent}
+            content={formInputs.content as PageContent}
             onContentChange={updatePostContent}
           >
-            <PageTitleInput readOnly={readOnly} value={form.title} onChange={updateTitle} />
+            <PageTitleInput readOnly={readOnly} value={formInputs.title} onChange={updateTitle} />
             <Box my={2}>
               <PostCategoryInput
                 readOnly={readOnly}

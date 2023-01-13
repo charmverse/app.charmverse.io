@@ -9,6 +9,7 @@ import Button from 'components/common/Button';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import type { PostWithVotes } from 'lib/forums/posts/interfaces';
 
+import type { FormInputs } from '../interfaces';
 import { PostPage } from '../PostPage/PostPage';
 
 interface Props {
@@ -18,18 +19,11 @@ interface Props {
   open?: boolean;
 }
 
-type FormInputs = {
-  title: string;
-  content: any | null;
-  contentText?: string;
-  id?: string;
-};
-
 export default function PostDialog({ post, spaceId, onClose, open }: Props) {
   const mounted = useRef(false);
   const popupState = usePopupState({ variant: 'popover', popupId: 'post-dialog' });
   const router = useRouter();
-  const [form, setForm] = useState<FormInputs>(post ?? { title: '', content: null, contentText: '' });
+  const [formInputs, setFormInputs] = useState<FormInputs>(post ?? { title: '', content: null, contentText: '' });
   const [contentUpdated, setContentUpdated] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
 
@@ -91,13 +85,10 @@ export default function PostDialog({ post, spaceId, onClose, open }: Props) {
       }}
     >
       <PostPage
-        form={form}
-        setForm={(_form) => {
-          const updatedFormInputs = typeof _form === 'function' ? _form(form) : _form;
-          if (updatedFormInputs.contentText !== form.contentText) {
-            setContentUpdated(true);
-          }
-          setForm(_form);
+        formInputs={formInputs}
+        setFormInputs={(_formInputs) => {
+          setContentUpdated(true);
+          setFormInputs(_formInputs);
         }}
         post={post ?? null}
         spaceId={spaceId}
