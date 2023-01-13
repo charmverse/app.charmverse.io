@@ -9,10 +9,10 @@ import { useState } from 'react';
 import type { KeyedMutator } from 'swr';
 
 import charmClient from 'charmClient';
-import Avatar from 'components/common/Avatar';
 import Button from 'components/common/Button';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/InlineCharmEditor';
 import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
+import UserDisplay from 'components/common/UserDisplay';
 import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
 import type {
@@ -146,7 +146,9 @@ export function PostComment({
       <StyledStack>
         <Stack flexDirection='row' justifyContent='space-between' alignItems='center'>
           <Stack flexDirection='row' alignItems='center'>
-            <Avatar size='small' sx={{ mr: 1 }} avatar={commentUser?.avatar} />
+            <Box mr={1}>
+              <UserDisplay avatarSize='small' user={commentUser} hideName={true} />
+            </Box>
             <Typography mr={1}>{commentUser?.username}</Typography>
             <Typography variant='subtitle1' mr={0.5}>
               {getRelativeTimeInThePast(new Date(comment.createdAt))}
@@ -181,12 +183,12 @@ export function PostComment({
           {isEditingComment ? (
             <Stack>
               <InlineCharmEditor
+                colorMode='dark'
                 style={{
                   paddingTop: 0,
                   paddingBottom: 0,
                   marginLeft: 8,
-                  minHeight: 100,
-                  backgroundColor: theme.palette.background.light
+                  minHeight: 100
                 }}
                 focusOnInit
                 onContentChange={updateCommentContent}

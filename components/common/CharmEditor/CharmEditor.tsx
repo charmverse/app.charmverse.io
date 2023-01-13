@@ -268,7 +268,9 @@ export function charmEditorPlugins({
   };
 }
 
-const StyledReactBangleEditor = styled(ReactBangleEditor)<{ disablePageSpecificFeatures?: boolean }>`
+const StyledReactBangleEditor = styled(ReactBangleEditor)<{
+  disablePageSpecificFeatures?: boolean;
+}>`
   position: relative;
 
   /** DONT REMOVE THIS STYLING */
@@ -330,6 +332,7 @@ const defaultContent: PageContent = {
 export type UpdatePageContent = (content: ICharmEditorOutput) => any;
 
 interface CharmEditorProps {
+  colorMode?: 'dark';
   content?: PageContent;
   children?: ReactNode;
   enableSuggestingMode?: boolean;
