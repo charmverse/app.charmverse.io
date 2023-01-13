@@ -96,6 +96,8 @@ export default function PostDialog({ post, spaceId, onClose, open }: Props) {
         post={post ?? null}
         spaceId={spaceId}
         onSave={close}
+        contentUpdated={contentUpdated}
+        setContentUpdated={setContentUpdated}
       />
       <ConfirmDeleteModal
         onClose={() => {

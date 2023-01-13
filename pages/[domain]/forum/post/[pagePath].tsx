@@ -27,12 +27,18 @@ export default function ForumPostPage() {
 
 function WrapperPostPage({ post }: { post: PostWithVotes }) {
   const [formInputs, setFormInputs] = useState<FormInputs>(post);
+  const [contentUpdated, setContentUpdated] = useState(false);
+
   return (
     <PostPage
       formInputs={formInputs}
       setFormInputs={(_formInputs) => {
+        setContentUpdated(true);
         setFormInputs((__formInputs) => ({ ...__formInputs, ..._formInputs }));
       }}
+      contentUpdated={contentUpdated}
+      setContentUpdated={setContentUpdated}
+      shouldUpdateTitleState
       post={post}
       spaceId={post.spaceId}
     />

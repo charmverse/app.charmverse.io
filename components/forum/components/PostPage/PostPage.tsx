@@ -32,6 +32,9 @@ type Props = {
   onSave?: () => void;
   setFormInputs: (params: Partial<FormInputs>) => void;
   formInputs: FormInputs;
+  contentUpdated: boolean;
+  setContentUpdated: (changed: boolean) => void;
+  shouldUpdateTitleState?: boolean;
 };
 
 function processComments({ postComments }: { postComments: PostCommentWithVote[] }) {
@@ -72,7 +75,16 @@ function sortComments({ comments, sort }: { comments: PostCommentWithVoteAndChil
   return comments;
 }
 
-export function PostPage({ post, spaceId, onSave, setFormInputs, formInputs }: Props) {
+export function PostPage({
+  shouldUpdateTitleState = false,
+  post,
+  spaceId,
+  onSave,
+  setFormInputs,
+  formInputs,
+  contentUpdated,
+  setContentUpdated
+}: Props) {
   const { user } = useUser();
   const [categoryId, setCategoryId] = useState(post?.categoryId ?? null);
   const {
@@ -82,8 +94,7 @@ export function PostPage({ post, spaceId, onSave, setFormInputs, formInputs }: P
   } = useSWR(post ? `${post.id}/comments` : null, () =>
     post ? charmClient.forum.listPostComments(post.id) : undefined
   );
-  const [changed, setChanged] = useState(false);
-  usePreventReload(changed);
+  usePreventReload(contentUpdated);
   const [, setTitleState] = usePageTitle();
 
   const [commentSort, setCommentSort] = useState<PostCommentSort>('latest');
@@ -91,9 +102,11 @@ export function PostPage({ post, spaceId, onSave, setFormInputs, formInputs }: P
   const isLoading = !postComments && isValidating;
 
   function updateTitle(updates: { title: string; updatedAt: any }) {
-    setChanged(true);
+    setContentUpdated(true);
     setFormInputs({ title: updates.title });
-    setTitleState(updates.title);
+    if (shouldUpdateTitleState) {
+      setTitleState(updates.title);
+    }
   }
 
   useEffect(() => {
@@ -113,7 +126,7 @@ export function PostPage({ post, spaceId, onSave, setFormInputs, formInputs }: P
         contentText: formInputs.contentText,
         title: formInputs.title
       });
-      setChanged(false);
+      setContentUpdated(false);
     } else {
       await charmClient.forum.createForumPost({
         categoryId,
@@ -128,10 +141,11 @@ export function PostPage({ post, spaceId, onSave, setFormInputs, formInputs }: P
 
   function updateCategoryId(_categoryId: string) {
     setCategoryId(_categoryId);
+    setContentUpdated(true);
   }
 
   function updatePostContent({ doc, rawText }: ICharmEditorOutput) {
-    setChanged(true);
+    setContentUpdated(true);
     setFormInputs({
       content: doc,
       contentText: rawText
@@ -190,7 +204,7 @@ export function PostPage({ post, spaceId, onSave, setFormInputs, formInputs }: P
         {isMyPost && (
           <Box display='flex' flexDirection='row' justifyContent='right' my={2}>
             <Button
-              disabled={Boolean(disabledTooltip) || !changed}
+              disabled={Boolean(disabledTooltip) || !contentUpdated}
               disabledTooltip={disabledTooltip}
               onClick={publishForumPost}
             >
