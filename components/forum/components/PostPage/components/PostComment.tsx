@@ -191,6 +191,7 @@ export function PostComment({
                   minHeight: 100
                 }}
                 focusOnInit
+                placeholderText='What are your thoughts?'
                 onContentChange={updateCommentContent}
                 content={commentEditContent.doc}
               />

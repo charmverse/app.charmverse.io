@@ -69,7 +69,7 @@ export function CommentReplyForm({
           key={editorKey}
           content={postContent.doc}
           onContentChange={updateCommentContent}
-          placeholderText='Reply to comment...'
+          placeholderText='What are your thoughts?'
         />
       </Box>
       <Stack gap={1} flexDirection='row' alignSelf='flex-end'>

@@ -64,7 +64,7 @@ export function PostCommentForm({
           key={editorKey}
           content={postContent.doc}
           onContentChange={updatePostContent}
-          placeholderText='Add comment to post...'
+          placeholderText='What are your thoughts?'
         />
       </Box>
       <Button
