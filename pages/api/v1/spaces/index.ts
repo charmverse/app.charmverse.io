@@ -37,20 +37,21 @@ async function createSpace(req: NextApiRequest, res: NextApiResponse<CreateWorks
   const { name, discordServerId, avatar, adminDiscordUserId, xpsEngineId, adminWalletAddress } =
     req.body as CreateWorkspaceRequestBody;
 
-  if (name.length < 3) {
-    throw new InvalidInputError('Workspace name must be at least 3 characters.');
+  if (typeof name !== 'string' || name.length < 3) {
+    throw new InvalidInputError('Workspace name must be a string at least 3 characters.');
   }
 
-  if (discordServerId && !adminDiscordUserId) {
-    throw new InvalidInputError('Discord server ID provided but no admin user ID provided.');
-  } else if (xpsEngineId && !adminWalletAddress) {
-    throw new InvalidInputError('XPS engine ID provided but no admin wallet address provided.');
+  // check for an identifier for the admin user
+  const adminIdentifier = adminDiscordUserId || adminWalletAddress;
+  if (!adminIdentifier) {
+    throw new InvalidInputError('At least one admin identifer must be provided.');
   }
 
   const result = await createWorkspaceApi({
     name,
     discordServerId,
     adminDiscordUserId,
+    xpsEngineId,
     avatar,
     superApiToken: req.superApiToken
   });

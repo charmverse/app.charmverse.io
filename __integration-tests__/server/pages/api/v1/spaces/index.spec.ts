@@ -1,4 +1,5 @@
 import type { SuperApiToken } from '@prisma/client';
+import { Wallet } from 'ethers';
 import request from 'supertest';
 
 import { prisma } from 'db';
@@ -10,9 +11,7 @@ let apiToken: SuperApiToken;
 
 const defaultSpaceData = {
   name: 'Test Space',
-  discordServerId: '1234',
-  adminDiscordUserId: '1337',
-  avatar: ''
+  adminDiscordUserId: '1337'
 };
 
 beforeAll(async () => {
@@ -46,43 +45,17 @@ describe('GET /api/v1/spaces', () => {
       .send({ ...defaultSpaceData, name: 'ab' });
 
     expect(response2.statusCode).toBe(400);
-    expect(response2.body.message).toBe('Workspace name must be at least 3 characters.');
+    expect(response2.body.message).toBe('Workspace name must be a string at least 3 characters.');
   });
 
-  it('should respond 400 when discord server id is missing', async () => {
+  it('should respond 400 when admin identifier is missing', async () => {
     const response = await request(baseUrl)
       .post('/api/v1/spaces')
       .set('Authorization', apiToken.token)
-      .send({ ...defaultSpaceData, discordServerId: '' });
+      .send({ ...defaultSpaceData, discordServerId: '', adminWalletAddress: '' });
 
     expect(response.statusCode).toBe(400);
-    expect(response.body.message).toBe(
-      'Key discordServerId is required in request body and must not be an empty value.'
-    );
-  });
-
-  it('should respond 400 when discord admin id is missing', async () => {
-    const response = await request(baseUrl)
-      .post('/api/v1/spaces')
-      .set('Authorization', apiToken.token)
-      .send({ ...defaultSpaceData, adminDiscordUserId: '' });
-
-    expect(response.statusCode).toBe(400);
-    expect(response.body.message).toBe(
-      'Key adminDiscordUserId is required in request body and must not be an empty value.'
-    );
-  });
-
-  it('should respond 400 when discord server id is missing', async () => {
-    const response = await request(baseUrl)
-      .post('/api/v1/spaces')
-      .set('Authorization', apiToken.token)
-      .send({ ...defaultSpaceData, discordServerId: '' });
-
-    expect(response.statusCode).toBe(400);
-    expect(response.body.message).toBe(
-      'Key discordServerId is required in request body and must not be an empty value.'
-    );
+    expect(response.body.message).toBe('At least one admin identifer must be provided.');
   });
 
   it('should respond 201 with created space data', async () => {
@@ -143,6 +116,25 @@ describe('GET /api/v1/spaces', () => {
 
     expect(space?.domain).not.toBe(existingDomain);
     expect((space?.domain as string).startsWith(existingDomain)).toBe(true);
+  });
+
+  it('should create a space for XPS Engine', async () => {
+    const xpsEngineId = 'xps-4eva';
+    const wallet = Wallet.createRandom();
+
+    const response = await request(baseUrl)
+      .post('/api/v1/spaces')
+      .set('Authorization', apiToken.token)
+      .send({ adminWalletAddress: wallet.address, xpsEngineId, name: `${Math.random()}` });
+
+    expect(response.statusCode).toBe(201);
+
+    const space = await prisma.space.findUnique({ where: { id: response.body.id }, include: { spaceRoles: true } });
+    const adminWallet = await prisma.userWallet.findUnique({ where: { address: wallet.address } });
+
+    expect(space?.xpsEngineId).toBe(xpsEngineId);
+    expect(adminWallet).toBeDefined();
+    expect(space?.spaceRoles.some((role) => role.userId === adminWallet?.userId)).toBeDefined();
   });
 });
 
