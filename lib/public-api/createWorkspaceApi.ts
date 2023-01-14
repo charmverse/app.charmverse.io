@@ -5,6 +5,7 @@ import { prisma } from 'db';
 import { upsertUserForDiscordId } from 'lib/discord/upsertUserForDiscordId';
 import { createWorkspace } from 'lib/spaces/createWorkspace';
 import { getAvailableDomainName } from 'lib/spaces/getAvailableDomainName';
+import { createUserFromWallet } from 'lib/users/createUser';
 import { isValidUrl } from 'lib/utilities/isValidUrl';
 
 import type { CreateWorkspaceRequestBody, CreateWorkspaceResponseBody } from './interfaces';
@@ -13,6 +14,7 @@ export async function createWorkspaceApi({
   name,
   discordServerId,
   adminDiscordUserId,
+  adminWalletAddress,
   avatar,
   superApiToken
 }: CreateWorkspaceRequestBody & { superApiToken?: SuperApiToken | null }): Promise<CreateWorkspaceResponseBody> {
@@ -27,7 +29,9 @@ export async function createWorkspaceApi({
       identityType: 'RandomName'
     }
   });
-  const adminUserId = adminDiscordUserId ? await upsertUserForDiscordId(adminDiscordUserId) : null;
+  const adminUserId = adminDiscordUserId
+    ? await upsertUserForDiscordId(adminDiscordUserId)
+    : await createUserFromWallet({ address: adminWalletAddress }).then((user) => user.id);
 
   if (!adminUserId) {
     throw new Error('No admin user ID created. TODO: Implement support for wallet address');
