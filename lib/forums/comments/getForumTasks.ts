@@ -11,7 +11,7 @@ interface GetForumCommentsInput {
   spaceIds: string[];
 }
 
-export async function getForumCommentsTasks(userId: string): Promise<ForumCommentTasksGroup> {
+export async function getForumTasks(userId: string): Promise<ForumCommentTasksGroup> {
   // Get all the spaces the user is part of
   const spaceRoles = await prisma.spaceRole.findMany({
     where: {
@@ -48,7 +48,9 @@ export async function getForumCommentsTasks(userId: string): Promise<ForumCommen
   const notifications = await prisma.userNotification.findMany({
     where: {
       userId,
-      type: 'post_comment'
+      type: {
+        in: ['post_comment', 'mention']
+      }
     },
     select: {
       taskId: true

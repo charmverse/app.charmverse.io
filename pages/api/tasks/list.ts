@@ -5,7 +5,7 @@ import { getBountyTasks } from 'lib/bounties/getBountyTasks';
 import type { BountyTasksGroup } from 'lib/bounties/getBountyTasks';
 import type { DiscussionTasksGroup } from 'lib/discussion/getDiscussionTasks';
 import { getDiscussionTasks } from 'lib/discussion/getDiscussionTasks';
-import { getForumCommentsTasks } from 'lib/forums/comments/getForumTasks';
+import { getForumTasks } from 'lib/forums/comments/getForumTasks';
 import type { ForumCommentTasksGroup } from 'lib/forums/comments/interface';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import type { ProposalTasksGroup } from 'lib/proposal/getProposalTasks';
@@ -32,7 +32,7 @@ async function getTasks(req: NextApiRequest, res: NextApiResponse<GetTasksRespon
   const voteTasks = await getVoteTasks(userId);
   const proposalTasks = await getProposalTasks(userId);
   const bountiesTasks = await getBountyTasks(userId);
-  const forumTasks = await getForumCommentsTasks(userId);
+  const forumTasks = await getForumTasks(userId);
 
   return res.status(200).json({
     proposals: proposalTasks,

@@ -14,5 +14,5 @@ export interface DiscussionTask {
   createdAt: string;
   createdBy: User | null;
   text: string;
-  type: 'bounty' | 'page';
+  type: 'bounty' | 'page' | 'post';
 }

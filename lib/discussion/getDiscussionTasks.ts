@@ -1,4 +1,4 @@
-import type { Page, Space, User } from '@prisma/client';
+import type { Page, Post, Space, User } from '@prisma/client';
 
 import { prisma } from 'db';
 import { extractMentions } from 'lib/prosemirror/extractMentions';
@@ -92,7 +92,8 @@ export async function getDiscussionTasks(userId: string): Promise<DiscussionTask
     getComments(context),
     getMentionsFromComments(context),
     getMentionsFromPages(context),
-    getMentionsFromCommentBlocks(context)
+    getMentionsFromCommentBlocks(context),
+    getPostMentions({ spaceIds, spaceRecord, userId, username })
   ]).then((results) => {
     // aggregate the results
     return results.reduce(
@@ -517,4 +518,78 @@ function getPropertiesFromPage(
     bountyTitle: page.title,
     type: page.bountyId ? 'bounty' : 'page'
   } as const;
+}
+
+function getPropertiesFromPost(page: Pick<Post, 'spaceId' | 'title' | 'id' | 'path'>, spaceRecord: SpaceRecord) {
+  return {
+    pageId: page.id,
+    spaceId: page.spaceId,
+    spaceDomain: spaceRecord[page.spaceId].domain,
+    pagePath: page.path,
+    spaceName: spaceRecord[page.spaceId].name,
+    pageTitle: page.title || 'Untitled'
+  } as const;
+}
+
+export async function getPostMentions({
+  userId,
+  username,
+  spaceIds,
+  spaceRecord
+}: {
+  username: string;
+  userId: string;
+  spaceIds: string[];
+  spaceRecord: SpaceRecord;
+}) {
+  // Get all the pages of all the spaces this user is part of
+  const posts = await prisma.post.findMany({
+    where: {
+      spaceId: {
+        in: spaceIds
+      },
+      deletedAt: null
+    },
+    select: {
+      content: true,
+      id: true,
+      path: true,
+      title: true,
+      createdBy: true,
+      spaceId: true
+    }
+  });
+
+  const mentionsMap: GetDiscussionsResponse['mentions'] = {};
+  const discussionUserIds: string[] = [];
+
+  for (const post of posts) {
+    const content = post.content as PageContent;
+    if (content) {
+      const mentions = extractMentions(content, username);
+      mentions.forEach((mention) => {
+        // Skip mentions not for the user, self mentions and inside user created pages
+        if (mention.value === userId && mention.createdBy !== userId) {
+          discussionUserIds.push(mention.createdBy);
+          mentionsMap[mention.id] = {
+            ...getPropertiesFromPost(post, spaceRecord),
+            mentionId: mention.id,
+            createdAt: mention.createdAt,
+            userId: mention.createdBy,
+            text: mention.text,
+            commentId: null,
+            bountyId: null,
+            bountyTitle: null,
+            type: 'post'
+          };
+        }
+      });
+    }
+  }
+
+  return {
+    mentions: mentionsMap,
+    discussionUserIds,
+    comments: []
+  };
 }
