@@ -3,7 +3,7 @@ import { getBountyTasks } from 'lib/bounties/getBountyTasks';
 import { getDiscussionTasks } from 'lib/discussion/getDiscussionTasks';
 import * as emails from 'lib/emails';
 import type { PendingTasksProps } from 'lib/emails/templates/PendingTasks';
-import { getForumCommentsTasks } from 'lib/forums/comments/getForumTasks';
+import { getForumTasks } from 'lib/forums/comments/getForumTasks';
 import type { GnosisSafeTasks } from 'lib/gnosis/gnosis.tasks';
 import { getPendingGnosisTasks } from 'lib/gnosis/gnosis.tasks';
 import log from 'lib/log';
@@ -65,7 +65,7 @@ export async function getNotifications(): Promise<(PendingTasksProps & { unmarke
     const discussionTasks = await getDiscussionTasks(user.id);
     const voteTasks = await getVoteTasks(user.id);
     const bountyTasks = await getBountyTasks(user.id);
-    const forumTasks = await getForumCommentsTasks(user.id);
+    const forumTasks = await getForumTasks(user.id);
 
     const sentTasks = await prisma.userNotification.findMany({
       where: {
