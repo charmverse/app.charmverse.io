@@ -90,10 +90,11 @@ export async function getDiscussionTasks(userId: string): Promise<DiscussionTask
 
   const { mentions, discussionUserIds, comments } = await Promise.all([
     getComments(context),
-    getMentionsFromComments(context),
-    getMentionsFromPages(context),
+    getPageCommentMentions(context),
+    getPageMentions(context),
     getMentionsFromCommentBlocks(context),
-    getPostMentions({ spaceIds, spaceRecord, userId, username })
+    getPostMentions(context),
+    getPostCommentMentions(context)
   ]).then((results) => {
     // aggregate the results
     return results.reduce(
@@ -380,7 +381,7 @@ async function getComments({ userId, spaceRecord, spaceIds }: GetDiscussionsInpu
   };
 }
 
-async function getMentionsFromComments({
+async function getPageCommentMentions({
   userId,
   username,
   spaceRecord,
@@ -441,7 +442,69 @@ async function getMentionsFromComments({
   };
 }
 
-async function getMentionsFromPages({
+async function getPostCommentMentions({
+  userId,
+  username,
+  spaceRecord,
+  spaceIds
+}: GetDiscussionsInput): Promise<GetDiscussionsResponse> {
+  const comments = await prisma.postComment.findMany({
+    where: {
+      post: {
+        spaceId: {
+          in: spaceIds
+        }
+      },
+      deletedAt: null
+    },
+    select: {
+      id: true,
+      createdBy: true,
+      content: true,
+      post: {
+        select: {
+          title: true,
+          id: true,
+          path: true,
+          spaceId: true
+        }
+      }
+    }
+  });
+
+  const mentionsMap: GetDiscussionsResponse['mentions'] = {};
+  const discussionUserIds: string[] = [];
+
+  for (const comment of comments) {
+    const content = comment.content as PageContent;
+    if (content) {
+      const mentions = extractMentions(content, username);
+      mentions.forEach((mention) => {
+        if (mention.value === userId && mention.createdBy !== userId && comment.createdBy !== userId) {
+          discussionUserIds.push(mention.createdBy);
+          mentionsMap[mention.id] = {
+            ...getPropertiesFromPost(comment.post, spaceRecord),
+            mentionId: mention.id,
+            createdAt: mention.createdAt,
+            userId: mention.createdBy,
+            text: mention.text,
+            commentId: comment.id,
+            bountyId: null,
+            bountyTitle: null,
+            type: 'post'
+          };
+        }
+      });
+    }
+  }
+  return {
+    mentions: mentionsMap,
+    discussionUserIds,
+    comments: []
+  };
+}
+
+async function getPageMentions({
   userId,
   username,
   spaceRecord,

@@ -1,6 +1,7 @@
 import type { PostComment, Space, User } from '@prisma/client';
 
 import { prisma } from 'db';
+import { isTruthy } from 'lib/utilities/types';
 
 import type { ForumCommentTask, ForumCommentTasksGroup } from './interface';
 
@@ -146,14 +147,13 @@ async function getPostComments({ userId, spaceIds }: GetForumCommentsInput): Pro
       }
     }
   });
-
   // Comments that are not created by the user but are on a post page created by the user
   const commentsOnTheUserPage = comments.filter((comment) => comment.post.createdBy === userId);
 
   const parentComments = await prisma.postComment.findMany({
     where: {
       id: {
-        in: comments.map((c) => c.parentId ?? '').filter((c) => !!c)
+        in: comments.map((c) => c.parentId ?? '').filter(isTruthy)
       },
       createdBy: userId,
       deletedAt: null,
