@@ -6,7 +6,7 @@ import type { BountyTasksGroup } from 'lib/bounties/getBountyTasks';
 import type { DiscussionTasksGroup } from 'lib/discussion/getDiscussionTasks';
 import { getDiscussionTasks } from 'lib/discussion/getDiscussionTasks';
 import { getForumTasks } from 'lib/forums/comments/getForumTasks';
-import type { ForumCommentTasksGroup } from 'lib/forums/comments/interface';
+import type { ForumTasksGroup } from 'lib/forums/comments/interface';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import type { ProposalTasksGroup } from 'lib/proposal/getProposalTasks';
 import { getProposalTasks } from 'lib/proposal/getProposalTasks';
@@ -23,7 +23,7 @@ export interface GetTasksResponse {
   votes: VoteTask[];
   proposals: ProposalTasksGroup;
   bounties: BountyTasksGroup;
-  forum: ForumCommentTasksGroup;
+  forum: ForumTasksGroup;
 }
 
 async function getTasks(req: NextApiRequest, res: NextApiResponse<GetTasksResponse>) {

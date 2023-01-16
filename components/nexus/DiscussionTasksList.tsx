@@ -43,11 +43,6 @@ function DiscussionTaskRow({
         discussionLink: `${baseUrl}/${spaceDomain}/bounties?bountyId=${bountyId}`,
         discussionTitle: `${pageTitle}`
       };
-    } else if (type === 'post') {
-      return {
-        discussionLink: `${baseUrl}/${spaceDomain}/forum/post/${pagePath}`,
-        discussionTitle: `${pageTitle}`
-      };
     } else {
       return {
         discussionLink: `${baseUrl}/${spaceDomain}/${pagePath}?${

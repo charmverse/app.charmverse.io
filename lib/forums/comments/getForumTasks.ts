@@ -18,9 +18,9 @@ interface GetForumTasksInput {
 }
 
 interface GetForumTasksResponse {
-  mentions: Record<string, ForumTask>;
+  mentions: Record<string, Omit<ForumTask, 'createdBy'> & { userId: string }>;
   discussionUserIds: string[];
-  comments: ForumTask[];
+  comments: (Omit<ForumTask, 'createdBy'> & { userId: string })[];
 }
 
 export async function getForumTasks(userId: string): Promise<ForumTasksGroup> {

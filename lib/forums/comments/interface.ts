@@ -1,4 +1,4 @@
-import type { PostComment } from '@prisma/client';
+import type { PostComment, User } from '@prisma/client';
 
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
@@ -32,11 +32,11 @@ export type ForumTask = {
   postId: string;
   postPath: string;
   postTitle: string;
-  userId: string;
   createdAt: string;
   commentId: string | null;
   mentionId: string | null;
   commentText: string;
+  createdBy: User | null;
 };
 
 export type ForumTasksGroup = {

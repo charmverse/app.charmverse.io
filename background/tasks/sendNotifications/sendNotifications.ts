@@ -209,16 +209,30 @@ async function sendNotification(
           }
         })
       ),
-      ...notification.forumTasks.map((forumTask) =>
-        prisma.userNotification.create({
-          data: {
-            userId: notification.user.id,
-            taskId: forumTask.commentId,
-            channel: 'email',
-            type: 'post_comment'
-          }
-        })
-      )
+      ...notification.forumTasks
+        .filter((forumTask) => forumTask.commentId)
+        .map((forumTask) =>
+          prisma.userNotification.create({
+            data: {
+              userId: notification.user.id,
+              taskId: forumTask.commentId as string,
+              channel: 'email',
+              type: 'post_comment'
+            }
+          })
+        ),
+      ...notification.forumTasks
+        .filter((forumTask) => forumTask.mentionId)
+        .map((forumTask) =>
+          prisma.userNotification.create({
+            data: {
+              userId: notification.user.id,
+              taskId: forumTask.mentionId as string,
+              channel: 'email',
+              type: 'mention'
+            }
+          })
+        )
     ]);
   } catch (error) {
     log.error(`Updating notifications failed for the user ${notification.user.id}`, { error });
