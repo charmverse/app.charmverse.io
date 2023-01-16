@@ -266,11 +266,9 @@ export function PostPage({
           <Box
             width='25%'
             mr={8}
-            sx={{
-              display: {
-                xs: 'none',
-                md: 'initial'
-              }
+            display={{
+              xs: 'none',
+              md: 'initial'
             }}
           >
             <CategoryPosts postId={post.id} categoryId={post.categoryId} />
