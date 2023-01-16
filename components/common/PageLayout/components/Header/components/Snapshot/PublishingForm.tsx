@@ -18,7 +18,9 @@ import { LoadingIcon } from 'components/common/LoadingComponent';
 import PrimaryButton from 'components/common/PrimaryButton';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import useIsAdmin from 'hooks/useIsAdmin';
+import { useMembers } from 'hooks/useMembers';
 import { usePages } from 'hooks/usePages';
+import { useSnackbar } from 'hooks/useSnackbar';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import log from 'lib/log';
 import type { PageMeta } from 'lib/pages';
@@ -50,6 +52,8 @@ export default function PublishingForm({ onSubmit, page }: Props) {
   const { account, library } = useWeb3AuthSig();
 
   const space = useCurrentSpace();
+  const { members } = useMembers();
+  const { showMessage } = useSnackbar();
 
   const [snapshotSpace, setSnapshotSpace] = useState<SnapshotSpace | null>(null);
   // Ensure we don't show any UI until we are done checking
@@ -101,23 +105,28 @@ export default function PublishingForm({ onSubmit, page }: Props) {
    * Returns markdown content if valid length, or null if not
    */
   async function checkMarkdownLength(): Promise<string | null> {
-    const pageWithDetails = await charmClient.pages.getPage(page.id);
-    const content = await generateMarkdown(pageWithDetails, false);
+    try {
+      const pageWithDetails = await charmClient.pages.getPage(page.id);
+      const content = await generateMarkdown(pageWithDetails, false, { members });
 
-    const markdownCharacterLength = content.length;
+      const markdownCharacterLength = content.length;
 
-    if (markdownCharacterLength > MAX_SNAPSHOT_PROPOSAL_CHARACTERS) {
-      setConfigurationError(
-        new SystemError({
-          errorType: 'Maximum size exceeded',
-          severity: 'warning',
-          message: `The character count of your proposal is ${markdownCharacterLength}.\r\n\nThis exceeds Snapshot's limit of ${MAX_SNAPSHOT_PROPOSAL_CHARACTERS}.\r\n\nTo fix this, reduce text size and check for inline images which were pasted directly instead of being configured with a link.`
-        })
-      );
+      if (markdownCharacterLength > MAX_SNAPSHOT_PROPOSAL_CHARACTERS) {
+        setConfigurationError(
+          new SystemError({
+            errorType: 'Maximum size exceeded',
+            severity: 'warning',
+            message: `The character count of your proposal is ${markdownCharacterLength}.\r\n\nThis exceeds Snapshot's limit of ${MAX_SNAPSHOT_PROPOSAL_CHARACTERS}.\r\n\nTo fix this, reduce text size and check for inline images which were pasted directly instead of being configured with a link.`
+          })
+        );
+        return null;
+      }
+
+      return content;
+    } catch (err) {
+      log.error('Error generating markdown', err);
       return null;
     }
-
-    return content;
   }
 
   async function verifyUserCanPostToSnapshot() {
@@ -179,26 +188,21 @@ export default function PublishingForm({ onSubmit, page }: Props) {
     setFormError(null);
     setPublishing(true);
 
-    const pageWithDetails = await charmClient.pages.getPage(page.id);
-    const content = await generateMarkdown(pageWithDetails, false);
+    try {
+      const pageWithDetails = await charmClient.pages.getPage(page.id);
 
-    let receipt: SnapshotReceipt;
+      const content = await generateMarkdown(pageWithDetails, false, { members });
 
-    if (!account) {
-      setFormError(
-        new SystemError({
+      if (!account) {
+        throw new SystemError({
           errorType: 'External service',
           severity: 'warning',
           message: "We couldn't detect your wallet. Please unlock your wallet and try publishing again."
-        })
-      );
-      setPublishing(false);
-      return;
-    }
+        });
+      }
 
-    try {
       const client = await getSnapshotClient();
-      receipt = (await client.proposal(library, utils.getAddress(account as string), {
+      const receipt: SnapshotReceipt = (await client.proposal(library, utils.getAddress(account as string), {
         space: space?.snapshotDomain as any,
         type: snapshotVoteMode,
         title: page.title,
@@ -213,31 +217,32 @@ export default function PublishingForm({ onSubmit, page }: Props) {
         plugins: JSON.stringify({}),
         metadata: JSON.stringify({})
       } as any)) as SnapshotReceipt;
+
+      const updatedPage = await charmClient.updatePageSnapshotData(page.id, {
+        snapshotProposalId: receipt.id
+      });
+
+      mutatePage(updatedPage);
+      charmClient.track.trackAction('new_vote_created', {
+        platform: 'snapshot',
+        pageId: page.id,
+        resourceId: receipt.id,
+        spaceId: space?.id || ''
+      });
+
+      onSubmit();
     } catch (err: any) {
-      log.debug('Error from snapshot', err);
+      log.error('Error while publishing to snapshot', err);
 
-      const errorToShow = err?.error_description
-        ? new ExternalServiceError(`Snapshot error: ${err?.error_description}`)
-        : new UnknownError();
+      const errorToShow =
+        err instanceof SystemError
+          ? err
+          : (err as any)?.error_description
+          ? new ExternalServiceError(`Snapshot error: ${err?.error_description}`)
+          : new UnknownError();
 
-      setPublishing(false);
       setFormError(errorToShow);
-      return;
     }
-
-    const updatedPage = await charmClient.updatePageSnapshotData(page.id, {
-      snapshotProposalId: receipt.id
-    });
-
-    mutatePage(updatedPage);
-    charmClient.track.trackAction('new_vote_created', {
-      platform: 'snapshot',
-      pageId: page.id,
-      resourceId: receipt.id,
-      spaceId: space?.id || ''
-    });
-
-    onSubmit();
     setPublishing(false);
   }
 
