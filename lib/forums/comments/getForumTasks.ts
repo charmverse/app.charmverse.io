@@ -286,14 +286,14 @@ async function getPostCommentMentions({
   };
 }
 
-function getPropertiesFromPost(page: Pick<Post, 'spaceId' | 'title' | 'id' | 'path'>, spaceRecord: SpaceRecord) {
+function getPropertiesFromPost(post: Pick<Post, 'spaceId' | 'title' | 'id' | 'path'>, spaceRecord: SpaceRecord) {
   return {
-    pageId: page.id,
-    spaceId: page.spaceId,
-    spaceDomain: spaceRecord[page.spaceId].domain,
-    pagePath: page.path,
-    spaceName: spaceRecord[page.spaceId].name,
-    pageTitle: page.title || 'Untitled'
+    postId: post.id,
+    spaceId: post.spaceId,
+    spaceDomain: spaceRecord[post.spaceId].domain,
+    postPath: post.path,
+    spaceName: spaceRecord[post.spaceId].name,
+    postTitle: post.title || 'Untitled'
   } as const;
 }
 
@@ -302,12 +302,7 @@ function getPropertiesFromPost(page: Pick<Post, 'spaceId' | 'title' | 'id' | 'pa
  * 1. My page, but not my comments
  * 2. Not my page, just comments that are direct replies after my comment
  */
-async function getPostComments({
-  userId,
-  spaceIds,
-  username,
-  spaceRecord
-}: GetForumTasksInput): Promise<GetForumTasksResponse> {
+async function getPostComments({ userId, spaceIds, spaceRecord }: GetForumTasksInput): Promise<GetForumTasksResponse> {
   const comments = await prisma.postComment.findMany({
     where: {
       createdBy: {
@@ -363,35 +358,21 @@ async function getPostComments({
 
   const allComments = [...commentsOnTheUserPage, ...commentReplies];
 
-  const mentionsMap: GetForumTasksResponse['mentions'] = {};
-  const discussionUserIds: string[] = [];
+  const commentTasks = allComments.map((comment) => {
+    return {
+      ...getPropertiesFromPost(comment.post, spaceRecord),
+      createdAt: new Date(comment.createdAt).toISOString(),
+      userId: comment.createdBy,
+      commentText: comment.contentText,
+      commentId: comment.id,
+      mentionId: null
+    };
+  });
 
-  for (const comment of allComments) {
-    const content = comment.content as PageContent;
-    if (content) {
-      const mentions = extractMentions(content, username);
-      mentions.forEach((mention) => {
-        if (mention.value === userId && mention.createdBy !== userId && comment.createdBy !== userId) {
-          discussionUserIds.push(mention.createdBy);
-          mentionsMap[mention.id] = {
-            ...getPropertiesFromPost(comment.post, spaceRecord),
-            mentionId: mention.id,
-            createdAt: mention.createdAt,
-            userId: mention.createdBy,
-            commentText: mention.text,
-            commentId: null,
-            postId: comment.post.id,
-            postPath: comment.post.path,
-            postTitle: comment.post.title
-          };
-        }
-      });
-    }
-  }
   return {
-    mentions: mentionsMap,
-    discussionUserIds,
-    comments: []
+    mentions: {},
+    discussionUserIds: commentTasks.map((comm) => comm.userId).concat([userId]),
+    comments: commentTasks
   };
 }
 
