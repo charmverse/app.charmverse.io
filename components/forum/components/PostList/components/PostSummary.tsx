@@ -9,7 +9,11 @@ const StyledCharmEditor = styled(CharmEditor)`
   }
 `;
 
+type Props = {
+  content: PageContent | null;
+  postId: string;
+};
 // pageId is used for permissions to content
-export function PostSummary({ content, pageId }: { content: PageContent | null; pageId: string }) {
-  return <StyledCharmEditor isContentControlled content={content ?? undefined} pageId={pageId} readOnly={true} />;
+export function PostSummary({ content, postId }: Props) {
+  return <StyledCharmEditor isContentControlled content={content ?? undefined} pageId={postId} readOnly={true} />;
 }

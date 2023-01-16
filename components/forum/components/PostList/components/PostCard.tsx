@@ -86,7 +86,7 @@ export function PostCard({ post, user, category }: ForumPostProps) {
           showPost({
             postId,
             onClose() {
-              setUrlWithoutRerender(router.pathname, { pageId: null });
+              setUrlWithoutRerender(router.pathname, { postId: null });
             }
           });
           if (currentSpace) {
@@ -95,7 +95,7 @@ export function PostCard({ post, user, category }: ForumPostProps) {
               spaceId: currentSpace.id
             });
           }
-          setUrlWithoutRerender(router.pathname, { pageId: postId });
+          setUrlWithoutRerender(router.pathname, { postId });
         }}
       >
         <CardContent>
@@ -107,7 +107,7 @@ export function PostCard({ post, user, category }: ForumPostProps) {
           <Typography variant='h6' variantMapping={{ h6: 'h3' }} gutterBottom>
             {fancyTrim(post.title, maxCharactersInPost)}
           </Typography>
-          <PostSummary content={post.summary} pageId={postId} />
+          <PostSummary content={post.summary} postId={postId} />
           <Box display='flex' flexDirection='row' justifyContent='space-between' mt='16px'>
             <Stack flexDirection='row' gap={2} alignItems='center'>
               <UserDisplay

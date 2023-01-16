@@ -88,15 +88,15 @@ export function ForumPage() {
   }
 
   useEffect(() => {
-    if (typeof router.query.pageId === 'string') {
+    if (typeof router.query.postId === 'string') {
       showPost({
-        postId: router.query.pageId,
+        postId: router.query.postId,
         onClose() {
-          setUrlWithoutRerender(router.pathname, { pageId: null });
+          setUrlWithoutRerender(router.pathname, { postId: null });
         }
       });
     }
-  }, [router.query.pageId]);
+  }, [router.query.postId]);
 
   useEffect(() => {
     if (currentSpace) {
