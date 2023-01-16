@@ -6,8 +6,8 @@ import { v4 } from 'uuid';
 
 import { parseMarkdown } from 'components/common/CharmEditor/components/markdownParser/parseMarkdown';
 import { prisma } from 'db';
+import log from 'lib/log';
 import { onError, onNoMatch, requireSpaceMembership, requireUser } from 'lib/middleware';
-import type { PageMeta } from 'lib/pages';
 import { getPagePath } from 'lib/pages';
 import { pageMetaSelect } from 'lib/pages/server/getPageMeta';
 import { withSessionRoute } from 'lib/session/withSession';

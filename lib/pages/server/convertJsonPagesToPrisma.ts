@@ -163,8 +163,15 @@ async function convertFolderContent({
         }
 
         // Assign the actual ID
-        if (typedBlock.type === 'board' || typedBlock.type === 'card') {
+        if (typedBlock.type === 'board') {
           typedBlock.id = newPageId;
+        } else if (typedBlock.type === 'card') {
+          typedBlock.id = newPageId;
+          typedPrismaCreateInput.card = {
+            connect: {
+              id: newPageId
+            }
+          };
         } else {
           typedBlock.id = v4();
         }

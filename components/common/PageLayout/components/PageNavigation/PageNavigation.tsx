@@ -6,12 +6,12 @@ import TreeView from '@mui/lab/TreeView';
 import type { Page } from '@prisma/client';
 import { useRouter } from 'next/router';
 import type { ComponentProps, ReactNode, SyntheticEvent } from 'react';
-import { memo, useCallback, useEffect, useMemo } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useDrop } from 'react-dnd';
 
 import charmClient from 'charmClient';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { getKey, useLocalStorage } from 'hooks/useLocalStorage';
+import { useLocalStorage } from 'hooks/useLocalStorage';
 import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
@@ -65,9 +65,29 @@ function TreeRoot({ children, mutatePage, isFavorites, ...rest }: TreeRootProps)
       })
     })
   );
+  const ref = useRef<HTMLDivElement>(null);
+  const router = useRouter();
 
   const theme = useTheme();
   const isActive = canDrop && isOverCurrent;
+
+  // Need to wait for the child nodes to appear before we can start scrolling
+  const hasChildrenLoaded = !!(children as any[]).length;
+
+  useEffect(() => {
+    const { pageId } = router.query;
+    if (hasChildrenLoaded && pageId) {
+      const anchor = document.querySelector(`a[href^="/${router.query.domain}/${pageId}"]`);
+      if (anchor) {
+        setTimeout(() => {
+          anchor.scrollIntoView({
+            behavior: 'smooth'
+          });
+        });
+      }
+    }
+  }, [hasChildrenLoaded]);
+
   return (
     <div
       ref={drop}
@@ -76,7 +96,9 @@ function TreeRoot({ children, mutatePage, isFavorites, ...rest }: TreeRootProps)
         flexGrow: isFavorites ? 0 : 1
       }}
     >
-      <TreeView {...rest}>{children}</TreeView>
+      <TreeView {...rest} ref={ref}>
+        {children}
+      </TreeView>
     </div>
   );
 }
@@ -93,7 +115,7 @@ function PageNavigation({ deletePage, isFavorites, rootPageIds, onClick }: PageN
   const { pages, currentPageId, setPages, mutatePage } = usePages();
   const space = useCurrentSpace();
   const { user } = useUser();
-  const [expanded, setExpanded] = useLocalStorage<string[]>(`${space!.id}.expanded-pages`, []);
+  const [expanded, setExpanded] = useLocalStorage<string[]>(`${space?.id}.expanded-pages`, []);
   const { showMessage } = useSnackbar();
   const pagesArray: MenuNode[] = filterVisiblePages(Object.values(pages)).map(
     (page): MenuNode => ({
@@ -201,37 +223,6 @@ function PageNavigation({ deletePage, isFavorites, rootPageIds, onClick }: PageN
     },
     [pages]
   );
-
-  const pageNavigationElement = document.querySelector('.page-navigation');
-  const treeViewElement = pageNavigationElement?.querySelector('.MuiTreeView-root');
-  const pageSidebarChildrenCount = treeViewElement?.children.length;
-
-  useEffect(() => {
-    // Need to wait for the child nodes to appear before we can start scrolling
-    if (pageNavigationElement && pageSidebarChildrenCount !== 0) {
-      const sidebarScrollTop = localStorage.getItem(getKey('sidebar-scroll-top'));
-      if (sidebarScrollTop) {
-        pageNavigationElement.scrollBy({
-          top: Number(sidebarScrollTop)
-        });
-      }
-      // If there are no scroll value stored on ls
-      // We use the router's pageId to scroll to the correct place
-      else {
-        const { pageId } = router.query;
-        if (pageId) {
-          const anchor = document.querySelector(`a[href^="/${space?.domain}/${pageId}"]`);
-          if (anchor) {
-            setTimeout(() => {
-              anchor.scrollIntoView({
-                behavior: 'smooth'
-              });
-            });
-          }
-        }
-      }
-    }
-  }, [pageSidebarChildrenCount]);
 
   useEffect(() => {
     const currentPage = pages[currentPageId];

@@ -11,6 +11,7 @@ type Props = Pick<ModalProps, 'onClose' | 'open' | 'size'> & {
   buttonText?: string;
   title?: string;
   onConfirm: () => void;
+  secondaryButtonText?: string;
 };
 
 export default function ConfirmDeleteModal({
@@ -20,7 +21,8 @@ export default function ConfirmDeleteModal({
   buttonText = 'Delete',
   title,
   onConfirm,
-  size
+  size,
+  secondaryButtonText = 'Cancel'
 }: Props) {
   function _onConfirm() {
     onConfirm();
@@ -37,7 +39,7 @@ export default function ConfirmDeleteModal({
         </Button>
 
         <Button color='secondary' variant='outlined' onClick={onClose}>
-          Cancel
+          {secondaryButtonText}
         </Button>
       </Box>
     </Modal>

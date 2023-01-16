@@ -1,11 +1,10 @@
 import CloseIcon from '@mui/icons-material/Close';
+import IconButton from '@mui/material/IconButton';
 import Modal from '@mui/material/Modal';
 import clsx from 'clsx';
 import React from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { useIntl } from 'react-intl';
-
-import IconButton from '../widgets/buttons/iconButton';
 
 type Props = {
   children: React.ReactNode;
@@ -41,16 +40,13 @@ function FBDialog(props: Props) {
         >
           <div role='dialog' className={clsx('dialog', { fullWidth })}>
             <div className='toolbar'>
-              {!props.hideCloseButton && (
-                <IconButton
-                  onClick={props.onClose}
-                  icon={<CloseIcon />}
-                  title={closeDialogText}
-                  className='IconButton--large'
-                />
-              )}
               {toolbar && <div className='cardToolbar'>{toolbar}</div>}
               {toolsMenu}
+              {!props.hideCloseButton && (
+                <IconButton onClick={props.onClose}>
+                  <CloseIcon />
+                </IconButton>
+              )}
             </div>
             {props.children}
           </div>
