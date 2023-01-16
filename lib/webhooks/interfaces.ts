@@ -1,27 +1,15 @@
-import type { ExternalRole } from 'lib/roles';
-
-export type MessageType = 'add_member' | 'remove_member' | 'add_role' | 'remove_role';
-
-export type GuildMember = {
-  discordId: string;
-  username?: string;
-  avatar?: string;
-};
+export type MessageType = 'guildMemberUpdate' | 'guildMemberRemove';
 
 export type MemberWebhookData = {
-  type: 'add_member' | 'remove_member';
-  guild_id: string;
-  member: GuildMember;
+  guildId: string;
+  userId: string;
+  roles: string[];
 };
 
-export type MemberRoleWebhookData = {
-  type: 'add_role' | 'remove_role';
-  guild_id: string;
-  member: GuildMember;
-  role: ExternalRole;
+export type WebhookMessageData = {
+  event: MessageType;
+  payload: MemberWebhookData[];
 };
-
-export type WebhookMessageData = MemberRoleWebhookData | MemberWebhookData;
 
 export type WebhookMessageHeaders = {
   Authorization?: string;
@@ -30,6 +18,7 @@ export type WebhookMessageHeaders = {
 export type WebhookMessageQuery = {
   api_key?: string;
 };
+
 export type WebhookMessage = {
   data?: WebhookMessageData;
   headers?: WebhookMessageHeaders;

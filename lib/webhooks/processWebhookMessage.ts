@@ -1,75 +1,74 @@
-import { createAndAssignRolesDiscord } from 'lib/discord/createAndAssignRolesDiscord';
+import { assignRolesCollabland } from 'lib/collabland/assignRolesCollabland';
 import { getSpaceFromDiscord } from 'lib/discord/getSpaceFromDiscord';
 import { removeSpaceMemberDiscord } from 'lib/discord/removeSpaceMemberDiscord';
 import { unassignRolesDiscord } from 'lib/discord/unassignRolesDiscord';
 import log from 'lib/log';
 import { getRequestApiKey } from 'lib/middleware/getRequestApiKey';
 import { verifyApiKeyForSpace } from 'lib/middleware/verifyApiKeyForSpace';
-import type { MemberRoleWebhookData, MemberWebhookData, MessageType, WebhookMessage } from 'lib/webhooks/interfaces';
+import type { MessageType, WebhookMessage } from 'lib/webhooks/interfaces';
 
-const messageHandlers: Record<MessageType, (message: WebhookMessage) => Promise<boolean>> = {
-  add_role: async (message: WebhookMessage) => {
+const messageHandlers: Record<MessageType, (message: WebhookMessage) => Promise<void>> = {
+  guildMemberUpdate: async (message: WebhookMessage) => {
     try {
-      const {
-        guild_id: discordServerId,
-        member: { discordId: discordUserId },
-        role
-      } = message?.data as MemberRoleWebhookData;
-      await createAndAssignRolesDiscord({ discordUserId, discordServerId, roles: role });
-      return true;
-    } catch (e) {
-      return false;
-    }
+      const payload = message?.data?.payload;
+      if (!payload || payload.length !== 2) {
+        return;
+      }
+
+      const { guildId: discordServerId, userId: discordUserId } = payload[0];
+
+      const [oldMemberData, newMemberData] = payload;
+      const oldRoles = oldMemberData.roles;
+      const newRoles = newMemberData.roles;
+
+      const rolesAdded = newRoles.filter((role) => !oldRoles.includes(role));
+      const rolesRemoved = oldRoles.filter((role) => !newRoles.includes(role));
+
+      if (rolesAdded.length) {
+        await assignRolesCollabland({ discordUserId, discordServerId, roles: rolesAdded });
+      }
+
+      if (rolesRemoved.length) {
+        await unassignRolesDiscord({ discordUserId, discordServerId, roles: rolesRemoved });
+      }
+      // eslint-disable-next-line no-empty
+    } catch (e) {}
   },
-  remove_role: async (message: WebhookMessage) => {
+  guildMemberRemove: async (message: WebhookMessage) => {
     try {
-      const {
-        guild_id: discordServerId,
-        member: { discordId: discordUserId },
-        role
-      } = message?.data as MemberRoleWebhookData;
-      await unassignRolesDiscord({ discordUserId, discordServerId, roles: role });
-      return true;
-    } catch (e) {
-      return false;
-    }
-  },
-  // TODO: we do not need add_member for now
-  add_member: async (message: WebhookMessage) => true,
-  remove_member: async (message: WebhookMessage) => {
-    try {
-      const {
-        guild_id: discordServerId,
-        member: { discordId: discordUserId }
-      } = message?.data as MemberWebhookData;
+      const payload = message?.data?.payload?.[0];
+      if (!payload) {
+        return;
+      }
+
+      const { guildId: discordServerId, userId: discordUserId } = payload;
       await removeSpaceMemberDiscord({ discordUserId, discordServerId });
-      return true;
-    } catch (e) {
-      return false;
-    }
+      // eslint-disable-next-line no-empty
+    } catch (e) {}
   }
 };
 
 export async function processWebhookMessage(message: WebhookMessage) {
   const data = message?.data;
 
-  if (!data?.type || !messageHandlers[data?.type]) {
+  if (!data?.event || !messageHandlers[data?.event] || !data?.payload) {
     // we cannot process this message, just remove from queue
-    return true;
+    return;
   }
 
-  const handler = messageHandlers[data?.type];
+  const handler = messageHandlers[data?.event];
   const hasPermission = await verifyWebhookMessagePermission(message);
   if (!hasPermission) {
     log.warn('Webhook message without permission to be parsed', message);
-    return true;
+    return;
   }
 
   return handler(message);
 }
 
 export async function verifyWebhookMessagePermission(message: WebhookMessage) {
-  const discordServerId = message?.data?.guild_id;
+  const payload = message?.data?.payload?.[0];
+  const discordServerId = payload?.guildId;
   const apiKey = getRequestApiKey({ headers: message?.headers || {}, query: message?.query });
 
   if (!discordServerId || !apiKey) {
