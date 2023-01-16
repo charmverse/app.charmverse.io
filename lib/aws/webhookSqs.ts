@@ -27,10 +27,15 @@ export async function getQueueUrl() {
     return queueUrl;
   }
 
-  const command = new GetQueueUrlCommand({ QueueName: SQS_NAME });
-  const res = await client.send(command);
-  queueUrl = res.QueueUrl || '';
-  return queueUrl;
+  try {
+    const command = new GetQueueUrlCommand({ QueueName: SQS_NAME });
+    const res = await client.send(command);
+    queueUrl = res.QueueUrl || '';
+    return queueUrl;
+  } catch (e) {
+    log.error('[SQS] Error while getting queue url', e);
+    return '';
+  }
 }
 
 export async function getNextMessage() {
@@ -66,19 +71,23 @@ export async function processMessages({ processorFn }: ProcessMssagesInput) {
     try {
       msgBody = JSON.parse(message.Body || '');
     } catch (e) {
-      log.warn('SQS message body failes to parse', e);
+      log.warn('[SQS] SQS message body failed to parse', e);
     }
 
     try {
       // process message
       await processorFn(msgBody as WebhookMessage);
     } catch (e) {
-      log.error('Failed to process webhook message', e);
+      log.error('[SQS] Failed to process webhook message', e);
     } finally {
       await deleteMessage(message.ReceiptHandle || '');
     }
   }
 
   // process next message
-  processMessages({ processorFn });
+  if (queueUrl) {
+    processMessages({ processorFn });
+  } else {
+    log.warn('[SQS] SQS queue url not found');
+  }
 }
