@@ -32,6 +32,10 @@ export async function updateVote(id: string, userId: string, update: Partial<Upd
     throw new UndesirableOperationError("Proposal votes can't be cancelled");
   }
 
+  if (deadline && new Date(existingVote.createdAt) > new Date(deadline)) {
+    throw new UndesirableOperationError('The deadline needs to be in the future');
+  }
+
   const updatedVote = await prisma.vote.update({
     where: {
       id

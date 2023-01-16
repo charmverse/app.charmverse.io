@@ -84,4 +84,11 @@ describe('updateVote', () => {
       UndesirableOperationError
     );
   });
+
+  it('should fail if the user tries to update a deadline in the past', async () => {
+    const { vote } = await setupVoteData();
+    const deadline = new Date();
+    deadline.setDate(deadline.getDate() - 10);
+    await expect(updateVote(vote.id, v4(), { deadline })).rejects.toBeInstanceOf(UndesirableOperationError);
+  });
 });
