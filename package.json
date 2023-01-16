@@ -106,7 +106,7 @@
     "@mui/lab": "^5.0.0-alpha.114",
     "@mui/material": "^5.2.7",
     "@mui/system": "^5.3.0",
-    "@mui/x-date-pickers": "^5.0.12",
+    "@mui/x-date-pickers": "^5.0.13",
     "@mux/mux-node": "^7.0.0",
     "@mux/mux-video-react": "^0.7.1",
     "@mux/upchunk": "^3.0.0",

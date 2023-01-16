@@ -42,6 +42,7 @@ export interface VoteDetailProps {
   castVote: (voteId: string, choice: string) => Promise<UserVote>;
   deleteVote: (voteId: string) => Promise<void>;
   cancelVote: (voteId: string) => Promise<void>;
+  updateDeadline: (voteId: string, deadline: Date) => Promise<void>;
 }
 
 const StyledFormControl = styled(FormControl)`
@@ -58,6 +59,7 @@ export default function VoteDetail({
   cancelVote,
   castVote,
   deleteVote,
+  updateDeadline,
   detailed = false,
   vote,
   isProposal
@@ -105,7 +107,13 @@ export default function VoteDetail({
         <Typography variant='h6' fontWeight='bold' component='span'>
           {!isProposal ? title : 'Poll on this proposal'}
         </Typography>
-        <VoteActionsMenu deleteVote={deleteVote} cancelVote={cancelVote} vote={vote} removeFromPage={removeFromPage} />
+        <VoteActionsMenu
+          deleteVote={deleteVote}
+          cancelVote={cancelVote}
+          vote={vote}
+          removeFromPage={removeFromPage}
+          updateDeadline={updateDeadline}
+        />
       </Box>
       <Box display='flex' justifyContent='space-between'>
         <Typography style={{ margin: 0 }} color='secondary' variant='subtitle1' my={0} component='span'>
@@ -243,7 +251,14 @@ export default function VoteDetail({
         </List>
       )}
       <Modal title='Poll details' size='large' open={voteDetailsPopup.isOpen} onClose={voteDetailsPopup.close}>
-        <VoteDetail vote={vote} detailed={true} cancelVote={cancelVote} castVote={castVote} deleteVote={deleteVote} />
+        <VoteDetail
+          vote={vote}
+          detailed={true}
+          cancelVote={cancelVote}
+          castVote={castVote}
+          deleteVote={deleteVote}
+          updateDeadline={updateDeadline}
+        />
       </Modal>
     </VotesWrapper>
   );

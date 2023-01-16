@@ -1,8 +1,4 @@
-import { useTheme } from '@emotion/react';
-import styled from '@emotion/styled';
 import { FormatListBulleted } from '@mui/icons-material';
-import { Box, ListItem, Typography } from '@mui/material';
-import type { HTMLAttributes } from 'react';
 import { useState } from 'react';
 
 import CreateVoteModal from 'components/votes/components/CreateVoteModal';
@@ -15,7 +11,7 @@ import type { CharmNodeViewProps } from '../nodeView/nodeView';
 
 export function PollNodeView({ node, readOnly, updateAttrs, selected, deleteNode }: CharmNodeViewProps) {
   const { pollId } = node.attrs as { pollId: string | null };
-  const { votes, cancelVote, castVote, deleteVote } = useVotes();
+  const { votes, cancelVote, castVote, deleteVote, updateDeadline } = useVotes();
 
   const autoOpen = node.marks.some((mark) => mark.type.name === 'tooltip-marker');
 
@@ -65,6 +61,7 @@ export function PollNodeView({ node, readOnly, updateAttrs, selected, deleteNode
       deleteVote={deleteVote}
       detailed={false}
       vote={votes[pollId]}
+      updateDeadline={updateDeadline}
     />
   );
 }
