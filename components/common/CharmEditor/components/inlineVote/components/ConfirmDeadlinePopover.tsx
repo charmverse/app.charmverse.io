@@ -23,7 +23,7 @@ export default function ConfirmDeadlinePopover({
         openTo='day'
         displayStaticWrapperAs='desktop'
         minDate={DateTime.now()}
-        minTime={DateTime.now()}
+        minTime={deadline.day === DateTime.now().day ? DateTime.now() : undefined}
         value={deadline}
         onChange={(value) => {
           if (value) {

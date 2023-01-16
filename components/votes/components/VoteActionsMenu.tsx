@@ -7,7 +7,7 @@ import IconButton from '@mui/material/IconButton';
 import ListItemText from '@mui/material/ListItemText';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
-import type { VoteContext } from '@prisma/client';
+import type { VoteContext, VoteStatus } from '@prisma/client';
 import { bindMenu, bindPopover, anchorRef, usePopupState } from 'material-ui-popup-state/hooks';
 
 import ConfirmDeadlinePopover from 'components/common/CharmEditor/components/inlineVote/components/ConfirmDeadlinePopover';
@@ -19,7 +19,7 @@ interface VoteActionsProps {
   cancelVote: (voteId: string) => Promise<void>;
   removeFromPage?: (voteId: string) => void;
   updateDeadline?: (voteId: string, deadline: Date) => Promise<void>;
-  vote: { createdBy: string; id: string; deadline?: Date; status: string; title: string; context: VoteContext };
+  vote: { createdBy: string; id: string; deadline?: Date; status: VoteStatus; title: string; context: VoteContext };
 }
 
 export default function VoteActionsMenu({
@@ -45,7 +45,7 @@ export default function VoteActionsMenu({
     <p>Are you sure you want to remove the vote from this proposal?</p>
   );
 
-  return (
+  return vote.context === 'inline' || vote.status === 'InProgress' ? (
     <>
       <Box position='relative' ref={(c: any) => anchorRef(deadlinePopup)(c)}>
         {vote.deadline && updateDeadline && (
@@ -110,5 +110,5 @@ export default function VoteActionsMenu({
         )}
       </Menu>
     </>
-  );
+  ) : null;
 }
