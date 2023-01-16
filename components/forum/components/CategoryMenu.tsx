@@ -24,6 +24,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useForumCategories } from 'hooks/useForumCategories';
 import isAdmin from 'hooks/useIsAdmin';
 import { useSnackbar } from 'hooks/useSnackbar';
+import type { PostSortOption } from 'lib/forums/posts/constants';
 import { postSortOptions } from 'lib/forums/posts/constants';
 
 import { ForumFilterCategory } from './CategoryPopup';
@@ -33,23 +34,20 @@ const StyledBox = styled(Box)`
   ${hoverIconsStyle({ marginForIcons: false })}
 `;
 
-function ForumFilterListLink({ category, label, sort }: { label: string; category?: PostCategory; sort?: string }) {
-  const { deleteForumCategory, updateForumCategory, setDefaultPostCategory } = useForumCategories();
-  const { showMessage } = useSnackbar();
-  const router = useRouter();
-  const selectedCategory = router.query.categoryId as string | undefined;
-  const selectedSort = router.query.sort as string | undefined;
-  const admin = isAdmin();
-  const link =
-    label === 'All categories'
-      ? `/${router.query.domain}/forum`
-      : category
-      ? `/${router.query.domain}/forum/${category.name}`
-      : sort
-      ? `/${router.query.domain}/forum?sort=${sort}`
-      : '';
+type ForumSortFilterLinkProps = {
+  label: string;
+  isSelected: boolean;
+  // Could be a sort key, a post category ID, or null
+  value?: string;
+  handleSelect: (value?: string | PostSortOption) => void;
+};
 
-  const selected = category ? category.id === selectedCategory : sort ? sort === selectedSort : false;
+function ForumFilterListLink({ label, value, isSelected, handleSelect }: ForumSortFilterLinkProps) {
+  const { deleteForumCategory, updateForumCategory, setDefaultPostCategory, categories } = useForumCategories();
+  const { showMessage } = useSnackbar();
+  const admin = isAdmin();
+
+  const category = value ? categories.find((c) => c.id === value) : null;
 
   function deleteCategory() {
     if (category) {
@@ -71,26 +69,20 @@ function ForumFilterListLink({ category, label, sort }: { label: string; categor
         justifyContent: 'space-between'
       }}
     >
-      <Link
-        href={link}
+      <Typography
         sx={{
+          color: 'text.primary',
           cursor: 'pointer',
           wordBreak: 'break-all',
           pr: 3.5,
           width: '100%'
         }}
+        fontWeight={isSelected ? 'bold' : 'initial'}
+        onClick={() => handleSelect(value)}
       >
-        <Typography
-          sx={{
-            color: 'text.primary'
-          }}
-          fontWeight={
-            selected || (label === 'All categories' && !selectedCategory && !selectedSort) ? 'bold' : 'initial'
-          }
-        >
-          {label}
-        </Typography>
-      </Link>
+        {label}
+      </Typography>
+
       {admin && category && (
         <span className='icons'>
           <ForumFilterCategory
@@ -104,7 +96,7 @@ function ForumFilterListLink({ category, label, sort }: { label: string; categor
     </MenuItem>
   );
 }
-export function CategoryMenu({ handleCategory, handleSort, selectedCategory, sort }: FilterProps) {
+export function CategoryMenu({ handleCategory, handleSort, selectedCategoryId, selectedSort }: FilterProps) {
   const { categories, error, createForumCategory } = useForumCategories();
   const addCategoryPopupState = usePopupState({ variant: 'popover', popupId: 'add-category' });
   const admin = isAdmin();
@@ -124,11 +116,14 @@ export function CategoryMenu({ handleCategory, handleSort, selectedCategory, sor
     return <Alert severity='error'>An error occurred while loading the categories</Alert>;
   }
   useEffect(() => {
-    if (selectedCategory && currentSpace) {
-      charmClient.track.trackAction('main_feed_filtered', {
-        categoryName: selectedCategory,
-        spaceId: currentSpace.id
-      });
+    if (selectedCategoryId && currentSpace) {
+      const selectedCategoryName = categories?.find((category) => category.id === selectedCategoryId)?.name;
+      if (selectedCategoryName) {
+        charmClient.track.trackAction('main_feed_filtered', {
+          categoryName: selectedCategoryName,
+          spaceId: currentSpace.id
+        });
+      }
     }
   }, [router.query.categoryName]);
 
@@ -142,17 +137,27 @@ export function CategoryMenu({ handleCategory, handleSort, selectedCategory, sor
         <Stack gap={1} my={1}>
           {postSortOptions.map((_sort) => (
             <StyledBox key={_sort}>
-              <ForumFilterListLink label={startCase(_sort.replace('_', ' '))} sort={_sort} />
+              <ForumFilterListLink
+                label={startCase(_sort.replace('_', ' '))}
+                isSelected={_sort === selectedSort}
+                value={_sort}
+                handleSelect={handleSort as (value?: string | PostSortOption) => void}
+              />
             </StyledBox>
           ))}
         </Stack>
 
         <Divider sx={{ pt: '10px', mb: '10px' }} />
         <Stack mb={2}>
-          <ForumFilterListLink label='All categories' />
+          <ForumFilterListLink label='All categories' isSelected={!selectedCategoryId} handleSelect={handleCategory} />
           {categories.map((category) => (
             <StyledBox key={category.id}>
-              <ForumFilterListLink label={category.name} category={category} />
+              <ForumFilterListLink
+                label={category.name}
+                value={category.id}
+                isSelected={selectedCategoryId === category.id}
+                handleSelect={handleCategory}
+              />
             </StyledBox>
           ))}
         </Stack>

@@ -15,7 +15,7 @@ import { useMembers } from 'hooks/useMembers';
 import useOnScreen from 'hooks/useOnScreen';
 import { useUser } from 'hooks/useUser';
 import { useWebSocketClient } from 'hooks/useWebSocketClient';
-import type { PostOrder } from 'lib/forums/posts/listForumPosts';
+import type { PostSortOption } from 'lib/forums/posts/constants';
 import type { WebSocketPayload } from 'lib/websockets/interfaces';
 
 import { PostCard } from './components/PostCard';
@@ -24,7 +24,7 @@ import { PostSkeleton } from './components/PostSkeleton';
 interface ForumPostsProps {
   search: string;
   categoryId?: string;
-  sort?: PostOrder;
+  sort?: PostSortOption;
 }
 
 const resultsPerQuery = 10;

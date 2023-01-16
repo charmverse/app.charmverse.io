@@ -4,6 +4,7 @@ import Grid from '@mui/material/Grid';
 import InputAdornment from '@mui/material/InputAdornment';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
+import type { PostCategory } from '@prisma/client';
 import { debounce } from 'lodash';
 import { useRouter } from 'next/router';
 import type { ChangeEvent } from 'react';
@@ -14,27 +15,40 @@ import { CenteredPageContent } from 'components/common/PageLayout/components/Pag
 import { usePostDialog } from 'components/forum/components/PostDialog/hooks/usePostDialog';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useForumCategories } from 'hooks/useForumCategories';
-import type { PostOrder } from 'lib/forums/posts/listForumPosts';
+import type { PostSortOption } from 'lib/forums/posts/constants';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
 import { CategoryMenu } from './components/CategoryMenu';
 import { CategorySelect } from './components/CategorySelect';
 import CreateForumPost from './components/CreateForumPost';
 import PostDialog from './components/PostDialog';
+import { PostSkeleton } from './components/PostList/components/PostSkeleton';
 import { ForumPostList } from './components/PostList/PostList';
 
 export function ForumPage() {
   const [search, setSearch] = useState('');
   const router = useRouter();
   const currentSpace = useCurrentSpace();
-  const categoryName = router.query.categoryId as string | undefined;
-  const sort = router.query.sort as PostOrder | undefined;
+  const sort = router.query.sort as PostSortOption | undefined;
   const [showNewPostForm, setShowNewPostForm] = useState(false);
   const { showPost } = usePostDialog();
   const { categories } = useForumCategories();
-  const currentCategory = categories.find((category) => category.name === categoryName);
 
-  function handleSortUpdate(sortName?: PostOrder) {
+  const [currentCategory, setCurrentCategory] = useState<PostCategory | null>(null);
+
+  useEffect(() => {
+    setCategoryFromPath();
+  }, [categories, router.query]);
+
+  const loadingCategories = !categories || categories.length === 0;
+
+  function setCategoryFromPath() {
+    const categoryName = router.query.categoryName as string | undefined;
+    const category = !categoryName ? null : categories.find((_category) => _category.name === categoryName);
+    setCurrentCategory(category ?? null);
+  }
+
+  function handleSortUpdate(sortName?: PostSortOption) {
     const pathname = `/${currentSpace?.domain}/forum`;
 
     if (sortName) {
@@ -49,12 +63,14 @@ export function ForumPage() {
     }
   }
 
-  function handleCategoryUpdate(_categoryName?: string) {
+  function handleCategoryUpdate(newCategoryId?: string) {
     const pathname = `/${currentSpace?.domain}/forum`;
 
-    if (typeof _categoryName === 'string') {
+    const newCategory = newCategoryId ? categories.find((category) => category.id === newCategoryId) : null;
+
+    if (newCategory) {
       router.push({
-        pathname: `${pathname}/${_categoryName}`
+        pathname: `${pathname}/${newCategory.name}`
       });
     } else {
       router.push({
@@ -122,22 +138,26 @@ export function ForumPage() {
         <Grid item xs={12} lg={9}>
           <Box display={{ lg: 'none' }}>
             <CategorySelect
-              selectedCategory={currentCategory?.id}
-              sort={sort}
+              selectedCategoryId={currentCategory?.id}
+              selectedSort={sort}
               handleCategory={handleCategoryUpdate}
               handleSort={handleSortUpdate}
             />
           </Box>
           <CreateForumPost onClick={showNewPostPopup} />
           {currentSpace && <PostDialog open={showNewPostForm} onClose={hideNewPostPopup} spaceId={currentSpace.id} />}
-          <ForumPostList search={search} categoryId={currentCategory?.id} sort={sort} />
+          {loadingCategories ? (
+            <PostSkeleton />
+          ) : (
+            <ForumPostList search={search} categoryId={currentCategory?.id} sort={sort} />
+          )}
         </Grid>
         <Grid item xs={12} lg={3} display={{ xs: 'none', lg: 'initial' }}>
           <CategoryMenu
             handleCategory={handleCategoryUpdate}
             handleSort={handleSortUpdate}
-            sort={sort}
-            selectedCategory={categoryName}
+            selectedSort={sort}
+            selectedCategoryId={currentCategory?.id}
           />
         </Grid>
       </Grid>
