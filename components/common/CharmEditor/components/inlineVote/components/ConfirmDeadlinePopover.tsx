@@ -22,7 +22,8 @@ export default function ConfirmDeadlinePopover({
       <StaticDateTimePicker
         openTo='day'
         displayStaticWrapperAs='desktop'
-        minDate={DateTime.fromMillis(Date.now())}
+        minDate={DateTime.now()}
+        minTime={DateTime.now()}
         value={deadline}
         onChange={(value) => {
           if (value) {
