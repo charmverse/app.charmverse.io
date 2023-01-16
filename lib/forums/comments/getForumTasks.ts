@@ -1,19 +1,30 @@
-import type { PostComment, Space, User } from '@prisma/client';
+import type { Post, Space, User } from '@prisma/client';
 
 import { prisma } from 'db';
+import { extractMentions } from 'lib/prosemirror/extractMentions';
+import type { PageContent } from 'lib/prosemirror/interfaces';
+import { shortenHex } from 'lib/utilities/strings';
 import { isTruthy } from 'lib/utilities/types';
 
-import type { ForumCommentTask, ForumCommentTasksGroup } from './interface';
+import type { ForumTask, ForumTasksGroup } from './interface';
 
 type SpaceRecord = Record<string, Pick<Space, 'name' | 'domain' | 'id'>>;
 
-interface GetForumCommentsInput {
+interface GetForumTasksInput {
   userId: string;
   spaceIds: string[];
+  spaceRecord: SpaceRecord;
+  username: string;
 }
 
-export async function getForumTasks(userId: string): Promise<ForumCommentTasksGroup> {
-  // Get all the spaces the user is part of
+interface GetForumTasksResponse {
+  mentions: Record<string, ForumTask>;
+  discussionUserIds: string[];
+  comments: ForumTask[];
+}
+
+export async function getForumTasks(userId: string): Promise<ForumTasksGroup> {
+  // Get all the space the user is part of
   const spaceRoles = await prisma.spaceRole.findMany({
     where: {
       userId
@@ -22,6 +33,18 @@ export async function getForumTasks(userId: string): Promise<ForumCommentTasksGr
       spaceId: true
     }
   });
+
+  // Get the username of the user, its required when constructing the mention message text
+  const user = await prisma.user.findUnique({
+    where: {
+      id: userId
+    },
+    select: {
+      username: true
+    }
+  });
+
+  const username = user?.username ?? shortenHex(userId);
 
   // Array of space ids the user is part of
   const spaceIds = spaceRoles.map((spaceRole) => spaceRole.spaceId);
@@ -58,54 +81,220 @@ export async function getForumTasks(userId: string): Promise<ForumCommentTasksGr
     }
   });
 
-  // Get comments specific for the user
-  const comments = await getPostComments({ userId, spaceIds });
+  // Get the marked comment/mention task ids (all the discussion type tasks that exist in the db)
+  const notifiedTaskIds = new Set(notifications.map((notification) => notification.taskId));
 
-  // Only fetch the users that created the comments
-  const uniqueUsers = [...new Set(comments.map((comment) => comment.createdBy))];
+  const context: GetForumTasksInput = { userId, username, spaceRecord, spaceIds };
+
+  const { mentions, discussionUserIds, comments } = await Promise.all([
+    getPostComments(context),
+    getPostMentions(context),
+    getPostCommentMentions(context)
+  ]).then((results) => {
+    // aggregate the results
+    return results.reduce(
+      (acc, result) => {
+        return {
+          mentions: { ...acc.mentions, ...result.mentions },
+          discussionUserIds: [...acc.discussionUserIds, ...result.discussionUserIds],
+          comments: [...acc.comments, ...result.comments]
+        };
+      },
+      { mentions: {}, discussionUserIds: [], comments: [] }
+    );
+  });
+
+  const commentIdsFromMentions = Object.values(mentions)
+    .map((item) => item.commentId)
+    .filter(isTruthy);
+
+  // Filter already added comments from mentions
+  const uniqueComments = comments.filter((item) => item.commentId && !commentIdsFromMentions.includes(item.commentId));
+
+  // Only fetch the users that created the mentions
   const users = await prisma.user.findMany({
     where: {
       id: {
-        in: uniqueUsers
+        in: [...new Set(discussionUserIds)]
       }
     }
   });
 
-  // Get the marked & unique comment task ids
-  const notifiedTaskIds = new Set(notifications.map((notification) => notification.taskId));
-
   // Create a record for the user
   const usersRecord = users.reduce<Record<string, User>>((acc, cur) => ({ ...acc, [cur.id]: cur }), {});
 
-  // Loop through each comment task, attach information about the space & page and set them marked/unmarked,
-  const commentTasks = comments.reduce<ForumCommentTasksGroup>(
-    (acc, commentWithoutUser) => {
-      const commentTask: ForumCommentTask = {
-        spaceId: commentWithoutUser.post.spaceId,
-        spaceDomain: spaceRecord[commentWithoutUser.post.spaceId].domain,
-        spaceName: spaceRecord[commentWithoutUser.post.spaceId].name,
-        postId: commentWithoutUser.postId,
-        postPath: commentWithoutUser.post.path,
-        postTitle: commentWithoutUser.post.title,
-        createdBy: usersRecord[commentWithoutUser.createdBy],
-        createdAt: new Date(commentWithoutUser.createdAt).toISOString(),
-        commentId: commentWithoutUser.id,
-        commentText: commentWithoutUser.contentText
-      };
+  // Loop through each mentioned task and attach the user data using usersRecord
+  const mentionedTasks = Object.values(mentions).reduce<ForumTasksGroup>(
+    (acc, mentionedTaskWithoutUser) => {
+      const mentionedTask = {
+        ...mentionedTaskWithoutUser,
+        createdBy: usersRecord[mentionedTaskWithoutUser.userId]
+      } as ForumTask;
 
-      if (notifiedTaskIds.has(commentTask.commentId)) {
-        return { ...acc, marked: [...acc.marked, commentTask] };
-      } else {
-        return { ...acc, unmarked: [...acc.unmarked, commentTask] };
-      }
+      const taskList = notifiedTaskIds.has(mentionedTask.mentionId ?? '') ? acc.marked : acc.unmarked;
+      taskList.push(mentionedTask);
+
+      return acc;
     },
     { marked: [], unmarked: [] }
   );
 
-  return {
-    marked: commentTasks.marked.sort(sortByDate),
-    unmarked: commentTasks.unmarked.sort(sortByDate)
+  // Loop through each comment task and attach the user data using usersRecord
+  const commentTasks = uniqueComments.reduce<ForumTasksGroup>(
+    (acc, commentTaskWithoutUser) => {
+      const commentTask = {
+        ...commentTaskWithoutUser,
+        createdBy: usersRecord[commentTaskWithoutUser.userId]
+      } as ForumTask;
+
+      const taskList = notifiedTaskIds.has(commentTask.commentId ?? '') ? acc.marked : acc.unmarked;
+      taskList.push(commentTask);
+
+      return acc;
+    },
+    { marked: [], unmarked: [] }
+  );
+
+  const allTasks = {
+    marked: [...mentionedTasks.marked, ...commentTasks.marked],
+    unmarked: [...mentionedTasks.unmarked, ...commentTasks.unmarked]
   };
+
+  return {
+    marked: allTasks.marked.sort(sortByDate),
+    unmarked: allTasks.unmarked.sort(sortByDate)
+  };
+}
+
+export async function getPostMentions({
+  userId,
+  username,
+  spaceIds,
+  spaceRecord
+}: GetForumTasksInput): Promise<GetForumTasksResponse> {
+  // Get all the pages of all the spaces this user is part of
+  const posts = await prisma.post.findMany({
+    where: {
+      spaceId: {
+        in: spaceIds
+      },
+      deletedAt: null
+    },
+    select: {
+      content: true,
+      id: true,
+      path: true,
+      title: true,
+      createdBy: true,
+      spaceId: true
+    }
+  });
+
+  const mentionsMap: GetForumTasksResponse['mentions'] = {};
+  const discussionUserIds: string[] = [];
+
+  for (const post of posts) {
+    const content = post.content as PageContent;
+    if (content) {
+      const mentions = extractMentions(content, username);
+      mentions.forEach((mention) => {
+        // Skip mentions not for the user, self mentions and inside user created pages
+        if (mention.value === userId && mention.createdBy !== userId) {
+          discussionUserIds.push(mention.createdBy);
+          mentionsMap[mention.id] = {
+            ...getPropertiesFromPost(post, spaceRecord),
+            mentionId: mention.id,
+            createdAt: mention.createdAt,
+            userId: mention.createdBy,
+            commentText: mention.text,
+            commentId: null,
+            postId: post.id,
+            postPath: post.path,
+            postTitle: post.title
+          };
+        }
+      });
+    }
+  }
+
+  return {
+    mentions: mentionsMap,
+    discussionUserIds,
+    comments: []
+  };
+}
+
+async function getPostCommentMentions({
+  userId,
+  username,
+  spaceRecord,
+  spaceIds
+}: GetForumTasksInput): Promise<GetForumTasksResponse> {
+  const comments = await prisma.postComment.findMany({
+    where: {
+      post: {
+        spaceId: {
+          in: spaceIds
+        }
+      },
+      deletedAt: null
+    },
+    select: {
+      id: true,
+      createdBy: true,
+      content: true,
+      post: {
+        select: {
+          title: true,
+          id: true,
+          path: true,
+          spaceId: true
+        }
+      }
+    }
+  });
+
+  const mentionsMap: GetForumTasksResponse['mentions'] = {};
+  const discussionUserIds: string[] = [];
+
+  for (const comment of comments) {
+    const content = comment.content as PageContent;
+    if (content) {
+      const mentions = extractMentions(content, username);
+      mentions.forEach((mention) => {
+        if (mention.value === userId && mention.createdBy !== userId && comment.createdBy !== userId) {
+          discussionUserIds.push(mention.createdBy);
+          mentionsMap[mention.id] = {
+            ...getPropertiesFromPost(comment.post, spaceRecord),
+            mentionId: mention.id,
+            createdAt: mention.createdAt,
+            userId: mention.createdBy,
+            commentText: mention.text,
+            commentId: null,
+            postId: comment.post.id,
+            postPath: comment.post.path,
+            postTitle: comment.post.title
+          };
+        }
+      });
+    }
+  }
+  return {
+    mentions: mentionsMap,
+    discussionUserIds,
+    comments: []
+  };
+}
+
+function getPropertiesFromPost(page: Pick<Post, 'spaceId' | 'title' | 'id' | 'path'>, spaceRecord: SpaceRecord) {
+  return {
+    pageId: page.id,
+    spaceId: page.spaceId,
+    spaceDomain: spaceRecord[page.spaceId].domain,
+    pagePath: page.path,
+    spaceName: spaceRecord[page.spaceId].name,
+    pageTitle: page.title || 'Untitled'
+  } as const;
 }
 
 /**
@@ -113,16 +302,12 @@ export async function getForumTasks(userId: string): Promise<ForumCommentTasksGr
  * 1. My page, but not my comments
  * 2. Not my page, just comments that are direct replies after my comment
  */
-async function getPostComments({ userId, spaceIds }: GetForumCommentsInput): Promise<
-  (PostComment & {
-    post: {
-      createdBy: string;
-      title: string;
-      path: string;
-      spaceId: string;
-    };
-  })[]
-> {
+async function getPostComments({
+  userId,
+  spaceIds,
+  username,
+  spaceRecord
+}: GetForumTasksInput): Promise<GetForumTasksResponse> {
   const comments = await prisma.postComment.findMany({
     where: {
       createdBy: {
@@ -142,7 +327,8 @@ async function getPostComments({ userId, spaceIds }: GetForumCommentsInput): Pro
           createdBy: true,
           path: true,
           title: true,
-          spaceId: true
+          spaceId: true,
+          id: true
         }
       }
     }
@@ -175,8 +361,40 @@ async function getPostComments({ userId, spaceIds }: GetForumCommentsInput): Pro
     (comment) => comment.post.createdBy !== userId && parentCommentIds.includes(comment.parentId ?? '')
   );
 
-  return commentsOnTheUserPage.concat(commentReplies);
+  const allComments = [...commentsOnTheUserPage, ...commentReplies];
+
+  const mentionsMap: GetForumTasksResponse['mentions'] = {};
+  const discussionUserIds: string[] = [];
+
+  for (const comment of allComments) {
+    const content = comment.content as PageContent;
+    if (content) {
+      const mentions = extractMentions(content, username);
+      mentions.forEach((mention) => {
+        if (mention.value === userId && mention.createdBy !== userId && comment.createdBy !== userId) {
+          discussionUserIds.push(mention.createdBy);
+          mentionsMap[mention.id] = {
+            ...getPropertiesFromPost(comment.post, spaceRecord),
+            mentionId: mention.id,
+            createdAt: mention.createdAt,
+            userId: mention.createdBy,
+            commentText: mention.text,
+            commentId: null,
+            postId: comment.post.id,
+            postPath: comment.post.path,
+            postTitle: comment.post.title
+          };
+        }
+      });
+    }
+  }
+  return {
+    mentions: mentionsMap,
+    discussionUserIds,
+    comments: []
+  };
 }
+
 // utils
 
 function sortByDate<T extends { createdAt: string }>(a: T, b: T): number {
