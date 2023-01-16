@@ -127,7 +127,7 @@ function Component({ menuState }: { menuState: PluginState }) {
       }
     } else if (node) {
       const copy = node.node.copy(node.node.content);
-      const newTr = safeInsert(copy, node.nodeEnd)(tr);
+      const newTr = safeInsert(copy, node.nodeEnd - 1)(tr);
       view.dispatch(newTr.scrollIntoView());
     }
     popupState.close();
