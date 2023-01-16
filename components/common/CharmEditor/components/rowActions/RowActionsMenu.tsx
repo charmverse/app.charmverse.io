@@ -127,7 +127,7 @@ function Component({ menuState }: { menuState: PluginState }) {
       }
     } else if (node) {
       const copy = node.node.copy(node.node.content);
-      const newTr = safeInsert(copy, node.nodeEnd - 1)(tr);
+      const newTr = safeInsert(copy, node?.node.type.name === 'columnLayout' ? node.nodeEnd - 1 : node.nodeEnd)(tr);
       view.dispatch(newTr.scrollIntoView());
     }
     popupState.close();
