@@ -44,24 +44,24 @@ describe('updateVote', () => {
       spaceId: space.id
     });
 
-    const updatedVote = await updateVote(vote.id, user.id, 'Cancelled');
+    const updatedVote = await updateVote(vote.id, user.id, { status: 'Cancelled' });
     expect(updatedVote.status).toBe('Cancelled');
   });
 
   it("should throw error if vote doesn't exist", async () => {
-    await expect(updateVote(v4(), v4(), 'Cancelled')).rejects.toBeInstanceOf(DataNotFoundError);
+    await expect(updateVote(v4(), v4(), { status: 'Cancelled' })).rejects.toBeInstanceOf(DataNotFoundError);
   });
 
   it('should throw error if vote is not in progress', async () => {
     const { vote } = await setupVoteData({
       status: 'Cancelled'
     });
-    await expect(updateVote(vote.id, v4(), 'Cancelled')).rejects.toBeInstanceOf(UndesirableOperationError);
+    await expect(updateVote(vote.id, v4(), { status: 'Cancelled' })).rejects.toBeInstanceOf(UndesirableOperationError);
   });
 
   it('should fail if the user tries to update the vote status to any other status than cancelled', async () => {
     const { vote } = await setupVoteData();
-    await expect(updateVote(vote.id, v4(), 'InProgress')).rejects.toBeInstanceOf(UndesirableOperationError);
+    await expect(updateVote(vote.id, v4(), { status: 'InProgress' })).rejects.toBeInstanceOf(UndesirableOperationError);
   });
 
   // it('should throw error if user don\'t have permission to update vote', async () => {
@@ -80,6 +80,8 @@ describe('updateVote', () => {
       spaceId: space.id
     });
 
-    await expect(updateVote(vote.id, user.id, 'Cancelled')).rejects.toBeInstanceOf(UndesirableOperationError);
+    await expect(updateVote(vote.id, user.id, { status: 'Cancelled' })).rejects.toBeInstanceOf(
+      UndesirableOperationError
+    );
   });
 });
