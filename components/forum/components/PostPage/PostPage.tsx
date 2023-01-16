@@ -263,7 +263,14 @@ export function PostPage({
           )}
         </Container>
         {post && showOtherCategoryPosts && (
-          <Box width='25%' mr={8}>
+          <Box
+            width='25%'
+            mr={8}
+            display={{
+              xs: 'none',
+              md: 'initial'
+            }}
+          >
             <CategoryPosts postId={post.id} categoryId={post.categoryId} />
           </Box>
         )}
