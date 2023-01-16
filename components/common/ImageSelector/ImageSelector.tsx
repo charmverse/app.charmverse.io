@@ -5,6 +5,7 @@ import { useState } from 'react';
 import MultiTabs from 'components/common/MultiTabs';
 import PopperPopup from 'components/common/PopperPopup';
 import { uploadToS3 } from 'lib/aws/uploadToS3Browser';
+import log from 'lib/log';
 
 import { PimpedButton } from '../Button';
 

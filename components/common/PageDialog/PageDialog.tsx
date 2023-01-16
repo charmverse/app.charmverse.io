@@ -124,7 +124,6 @@ export default function PageDialog(props: Props) {
 
   return (
     <Dialog
-      hideCloseButton
       toolsMenu={
         !hideToolsMenu &&
         !readOnly &&
@@ -164,6 +163,7 @@ export default function PageDialog(props: Props) {
             size='small'
             color='secondary'
             href={fullPageUrl}
+            onClick={onClose}
             variant='text'
             startIcon={<OpenInFullIcon fontSize='small' />}
           >

@@ -16,16 +16,14 @@ import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/ho
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import type { ReactNode, SyntheticEvent } from 'react';
-import React, { forwardRef, memo, useCallback, useMemo } from 'react';
+import React, { useRef, forwardRef, memo, useEffect, useCallback, useMemo } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 
-import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
 import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import EmojiPicker from 'components/common/BoardEditor/focalboard/src/widgets/emojiPicker';
 import TreeItemContent from 'components/common/TreeItemContent';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
-import { getKey } from 'hooks/useLocalStorage';
 import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { isTouchScreen } from 'lib/utilities/browser';
@@ -199,10 +197,6 @@ export function PageLink({
   const isempty = !label;
 
   const stopPropagation = useCallback((event: SyntheticEvent) => {
-    const pageNavigationElement = document.querySelector('.page-navigation');
-    if (pageNavigationElement) {
-      localStorage.setItem(getKey('sidebar-scroll-top'), pageNavigationElement.scrollTop.toString());
-    }
     event.stopPropagation();
   }, []);
 
@@ -305,6 +299,7 @@ const PageTreeItem = forwardRef<any, PageTreeItemProps>((props, ref) => {
     () => ({ isAdjacent, className: hasSelectedChildView ? 'Mui-selected' : undefined }),
     [isAdjacent, hasSelectedChildView]
   );
+
   const TransitionProps = useMemo(() => ({ timeout: 50 }), []);
   const anchorOrigin = useMemo(() => ({ vertical: 'bottom', horizontal: 'left' } as const), []);
   const transformOrigin = useMemo(() => ({ vertical: 'top', horizontal: 'left' } as const), []);

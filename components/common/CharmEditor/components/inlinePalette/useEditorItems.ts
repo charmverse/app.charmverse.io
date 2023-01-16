@@ -19,9 +19,12 @@ import type { PaletteItemTypeNoGroup } from './paletteItem';
 
 export function useEditorItems({
   disableNestedPage,
-  nestedPagePluginKey
+  nestedPagePluginKey,
+  enableVoting
 }: {
   disableNestedPage: boolean;
+  // Defaults to true
+  enableVoting?: boolean;
   nestedPagePluginKey?: PluginKey<NestedPagePluginState>;
 }) {
   const { addNestedPage } = useNestedPage();
@@ -43,7 +46,7 @@ export function useEditorItems({
       ],
       ['media', mediaItems()],
       ['embed', embedItems()],
-      ['advanced blocks', advancedBlocks()]
+      ['advanced blocks', advancedBlocks({ enableVoting })]
     ];
 
     const itemList = itemGroups

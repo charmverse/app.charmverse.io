@@ -80,7 +80,7 @@ export function PageActions({
   }
   return (
     <>
-      <IconButton size='small' className='icons' onClick={handleClick}>
+      <IconButton size='small' sx={{ minWidth: '40px' }} className='icons' onClick={handleClick}>
         <MoreHorizIcon color='secondary' fontSize='small' />
       </IconButton>
       <Menu

@@ -33,5 +33,5 @@ export default function PostDialogGlobal() {
     }
   }, [postId]);
 
-  return post ? <PostDialog post={post} onClose={closeDialog} spaceId={post.spaceId} /> : null;
+  return post ? <PostDialog key={post.id} post={post} onClose={closeDialog} spaceId={post.spaceId} /> : null;
 }
