@@ -31,3 +31,37 @@ export async function testFetchMessages() {
 
 testFetchMessages();
 // testAddMessage();
+
+const data = {
+  event: 'guildMemberUpdate',
+  payload: [
+    {
+      guildId: '889381536904904734',
+      joinedTimestamp: 1644677954638,
+      premiumSinceTimestamp: null,
+      nickname: null,
+      pending: false,
+      communicationDisabledUntilTimestamp: null,
+      userId: '829019255625875456',
+      avatar: null,
+      displayName: 'wishmaster',
+      roles: ['942072530896830544', '942072632986177637', '889381536904904734'],
+      avatarURL: null,
+      displayAvatarURL: 'https://cdn.discordapp.com/avatars/829019255625875456/8e8649f7ffb6008b822872404f7990bc.webp'
+    },
+    {
+      guildId: '889381536904904734',
+      joinedTimestamp: 1644677954638,
+      premiumSinceTimestamp: null,
+      nickname: null,
+      pending: false,
+      communicationDisabledUntilTimestamp: null,
+      userId: '829019255625875456',
+      avatar: null,
+      displayName: 'wishmaster',
+      roles: ['904089148552527942', '942072530896830544', '942072632986177637', '889381536904904734'],
+      avatarURL: null,
+      displayAvatarURL: 'https://cdn.discordapp.com/avatars/829019255625875456/8e8649f7ffb6008b822872404f7990bc.webp'
+    }
+  ]
+};

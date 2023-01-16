@@ -7,7 +7,7 @@ import type { WebhookMessage } from 'lib/webhooks/interfaces';
 
 type ProcessMssagesInput = {
   maxNumOfMessages?: number;
-  processorFn: (messageBody: WebhookMessage) => Promise<boolean>;
+  processorFn: (messageBody: WebhookMessage) => Promise<any>;
 };
 
 const AWS_API_KEY = process.env.AWS_ACCESS_KEY_ID as string;
