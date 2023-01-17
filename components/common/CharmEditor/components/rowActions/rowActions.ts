@@ -1,6 +1,7 @@
 import { createElement } from '@bangle.dev/core';
 import type { EditorView, PluginKey } from '@bangle.dev/pm';
 import { Plugin } from '@bangle.dev/pm';
+import { isMarkActiveInSelection } from '@bangle.dev/utils';
 import throttle from 'lodash/throttle';
 import { NodeSelection } from 'prosemirror-state';
 // @ts-ignore
@@ -31,7 +32,6 @@ export function plugins({ key }: { key: PluginKey }) {
       // Step 1. grab the top-most ancestor of the related DOM element
       const dom = rowNodeAtPos(view, startPos);
       const rowNode = dom.rowNode;
-
       // @ts-ignore pm types are wrong
       if (rowNode && view.dom.contains(rowNode.parentNode) && rowNode.getBoundingClientRect) {
         // @ts-ignore pm types are wrong
@@ -40,7 +40,6 @@ export function plugins({ key }: { key: PluginKey }) {
         // align to the top of the row
         const top = box.top - viewBox.top;
         tooltipDOM.style.top = `${top}px`;
-
         const newState = {
           rowPos: startPos,
           rowDOM: dom.rowNode,
