@@ -22,7 +22,7 @@ if (AWS_API_KEY && AWS_API_SECRET) {
 }
 
 const client = new SQSClient(config);
-let queueUrl = '';
+let queueUrl = 'https://sqs.us-east-1.amazonaws.com/310849459438/stg-webhook-collabland.fifo';
 
 export async function getQueueUrl() {
   if (queueUrl) {
@@ -35,7 +35,7 @@ export async function getQueueUrl() {
     queueUrl = res.QueueUrl || '';
     return queueUrl;
   } catch (e) {
-    log.error('[SQS] Error while getting queue url', e);
+    log.error('Error while getting queue url', e);
     return '';
   }
 }
@@ -53,7 +53,8 @@ export async function getNextMessage() {
 
     return null;
   } catch (e) {
-    log.error('[SQS] Error while getting next message', e);
+    queueUrl = '';
+    log.error('Error while getting next message', e);
     return null;
   }
 }
@@ -68,6 +69,8 @@ export async function deleteMessage(receipt: string) {
 
 export async function processMessages({ processorFn }: ProcessMssagesInput) {
   log.debug('Process messages...');
+  log.debug('Queue name:', SQS_NAME);
+  log.debug('Region name:', AWS_REGION);
 
   const message = await getNextMessage();
 
@@ -76,14 +79,14 @@ export async function processMessages({ processorFn }: ProcessMssagesInput) {
     try {
       msgBody = JSON.parse(message.Body || '');
     } catch (e) {
-      log.warn('[SQS] SQS message body failed to parse', e);
+      log.warn('SQS message body failed to parse', e);
     }
 
     try {
       // process message
       await processorFn(msgBody as WebhookMessage);
     } catch (e) {
-      log.error('[SQS] Failed to process webhook message', e);
+      log.error('Failed to process webhook message', e);
     } finally {
       log.debug('Deleting message', message.ReceiptHandle);
       await deleteMessage(message.ReceiptHandle || '');
@@ -96,6 +99,6 @@ export async function processMessages({ processorFn }: ProcessMssagesInput) {
   if (queueUrl) {
     processMessages({ processorFn });
   } else {
-    log.warn('[SQS] SQS queue url not found');
+    log.warn('SQS queue url not found');
   }
 }
