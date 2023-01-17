@@ -277,7 +277,7 @@
     "@typescript-eslint/parser": "^5.38.1",
     "aws-cdk-lib": "^2.20.0",
     "cross-env": "^7.0.3",
-    "esbuild": "^0.16.14",
+    "esbuild": "^0.16.17",
     "eslint": "^8.8.0",
     "eslint-config-airbnb": "^19.0.4",
     "eslint-config-next": "^13.1.1",
@@ -296,7 +296,7 @@
     "prosemirror-test-builder": "^1.1.0",
     "react-redux": "^8.0.5",
     "sass": "^1.49.0",
-    "serverless-esbuild": "^1.35.3",
+    "serverless-esbuild": "^1.37.0",
     "supertest": "^6.2.2",
     "ts-jest": "^28.0.5",
     "webpack": "^5.73.0"
