@@ -1,15 +1,15 @@
 import type { SQSClientConfig } from '@aws-sdk/client-sqs';
 import { SQSClient, ReceiveMessageCommand, GetQueueUrlCommand, DeleteMessageCommand } from '@aws-sdk/client-sqs';
 
-import { AWS_REGION, SQS_NAME } from 'lib/aws/config';
+import { AWS_REGION, SQS_NAME, SQS_URL } from 'lib/aws/config';
 import { getLogger } from 'lib/log/prefix';
-import type { WebhookMessage } from 'lib/webhooks/interfaces';
+import type { WebhookMessage, WebhookMessageProcessResult } from 'lib/webhooks/interfaces';
 
 const log = getLogger('sqs');
 
 type ProcessMssagesInput = {
   maxNumOfMessages?: number;
-  processorFn: (messageBody: WebhookMessage) => Promise<any>;
+  processorFn: (messageBody: WebhookMessage) => Promise<WebhookMessageProcessResult>;
 };
 
 const AWS_API_KEY = process.env.AWS_ACCESS_KEY_ID as string;
@@ -22,7 +22,7 @@ if (AWS_API_KEY && AWS_API_SECRET) {
 }
 
 const client = new SQSClient(config);
-let queueUrl = 'https://sqs.us-east-1.amazonaws.com/310849459438/stg-webhook-collabland.fifo';
+let queueUrl = SQS_URL || '';
 
 export async function getQueueUrl() {
   if (queueUrl) {
@@ -53,7 +53,6 @@ export async function getNextMessage() {
 
     return null;
   } catch (e) {
-    queueUrl = '';
     log.error('Error while getting next message', e);
     return null;
   }
@@ -84,7 +83,13 @@ export async function processMessages({ processorFn }: ProcessMssagesInput) {
 
     try {
       // process message
-      await processorFn(msgBody as WebhookMessage);
+      log.debug('Processing message', msgBody);
+      const result = await processorFn(msgBody as WebhookMessage);
+
+      log.debug('Message process successful:', result.success);
+      if (result.message) {
+        log.debug(result.message);
+      }
     } catch (e) {
       log.error('Failed to process webhook message', e);
     } finally {

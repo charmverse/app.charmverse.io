@@ -24,3 +24,8 @@ export type WebhookMessage = {
   headers?: WebhookMessageHeaders;
   query?: WebhookMessageQuery;
 };
+
+export type WebhookMessageProcessResult = {
+  success: boolean;
+  message?: string;
+};
