@@ -6,7 +6,7 @@ import { BOUNTY_STATUS_COLORS, BOUNTY_STATUS_LABELS } from 'components/bounties/
 import { ProposalStatusColors } from 'components/proposals/components/ProposalStatusBadge';
 import type { BountyTask } from 'lib/bounties/getBountyTasks';
 import { DiscussionTask } from 'lib/discussion/interfaces';
-import type { ForumCommentTask } from 'lib/forums/comments/interface';
+import { ForumTask } from 'lib/forums/comments/interface';
 import type { GnosisSafeTasks } from 'lib/gnosis/gnosis.tasks';
 import log from 'lib/log';
 import type { ProposalTask } from 'lib/proposal/getProposalTasksFromWorkspaceEvents';
@@ -40,7 +40,7 @@ export interface PendingTasksProps {
   voteTasks: VoteTask[];
   proposalTasks: ProposalTask[];
   bountyTasks: BountyTask[];
-  forumTasks: ForumCommentTask[];
+  forumTasks: ForumTask[];
   // eslint-disable-next-line
   user: TemplateUser
 }
@@ -409,7 +409,7 @@ function MultisigTask({ task }: { task: GnosisSafeTasks }) {
   );
 }
 
-function ForumTask({ task: { commentText, spaceName, postTitle } }: { task: ForumCommentTask }) {
+function ForumTask({ task: { commentText, spaceName, postTitle } }: { task: ForumTask }) {
   const pageWorkspaceTitle = `${postTitle || 'Untitled'} | ${spaceName}`;
   return (
     <MjmlText>

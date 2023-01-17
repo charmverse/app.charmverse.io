@@ -77,6 +77,10 @@ export default function Header({ open, openSidebar }: HeaderProps) {
   const basePage = Object.values(pages).find((page) => page?.id === basePageId || page?.path === basePageId);
   const { isFavorite, toggleFavorite } = useToggleFavorite({ pageId: basePage?.id });
 
+  const { members } = useMembers();
+  const { setCurrentPageActionDisplay } = usePageActionDisplay();
+  const [userSpacePermissions] = useCurrentSpacePermissions();
+
   const pagePermissions = basePage ? getPagePermissions(basePage.id) : null;
 
   const pageType = basePage?.type;
@@ -92,7 +96,7 @@ export default function Header({ open, openSidebar }: HeaderProps) {
 
     // getPage to get content
     const page = await charmClient.pages.getPage(basePage.id);
-    const markdownContent = await generateMarkdown(page);
+    const markdownContent = await generateMarkdown(page, undefined, { members });
     if (markdownContent) {
       const data = new Blob([markdownContent], { type: 'text/plain' });
 
@@ -138,10 +142,6 @@ export default function Header({ open, openSidebar }: HeaderProps) {
       }
     }
   }
-
-  const { members } = useMembers();
-  const { setCurrentPageActionDisplay } = usePageActionDisplay();
-  const [userSpacePermissions] = useCurrentSpacePermissions();
   const canCreateProposal = !!userSpacePermissions?.createVote;
   const charmversePage = basePage ? members.find((member) => member.id === basePage.createdBy) : null;
 
@@ -265,7 +265,9 @@ export default function Header({ open, openSidebar }: HeaderProps) {
           <ListItemButton
             disabled={!isExportablePage}
             onClick={() => {
-              exportMarkdown();
+              exportMarkdown().catch((err) => {
+                showMessage('Error exporting markdown', 'error');
+              });
               setPageMenuOpen(false);
             }}
           >

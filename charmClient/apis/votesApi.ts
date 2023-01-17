@@ -1,7 +1,7 @@
 import type { UserVote } from '@prisma/client';
 
 import * as http from 'adapters/http';
-import type { ExtendedVote, UserVoteExtendedDTO, VoteDTO } from 'lib/votes/interfaces';
+import type { ExtendedVote, UpdateVoteDTO, UserVoteExtendedDTO, VoteDTO } from 'lib/votes/interfaces';
 
 export class VotesApi {
   getVotesByPage(pageId: string) {
@@ -16,9 +16,10 @@ export class VotesApi {
     return http.POST<ExtendedVote>('/api/votes', votePayload);
   }
 
-  cancelVote(voteId: string) {
+  updateVote(voteId: string, { status, deadline }: Partial<UpdateVoteDTO>) {
     return http.PUT(`/api/votes/${voteId}`, {
-      status: 'Cancelled'
+      status,
+      deadline
     });
   }
 

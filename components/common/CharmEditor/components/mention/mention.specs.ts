@@ -1,6 +1,8 @@
 import type { RawSpecs } from '@bangle.dev/core';
 import type { DOMOutputSpec } from '@bangle.dev/pm';
 
+import type { Member } from 'lib/members/interfaces';
+
 import * as suggestTooltip from '../@bangle.dev/tooltip/suggest-tooltip';
 
 import { mentionNodeName, mentionSuggestMarkName, mentionTrigger } from './mention.constants';
@@ -50,7 +52,14 @@ export function mentionSpecs(): RawSpecs {
         }
       },
       markdown: {
-        toMarkdown: () => undefined
+        toMarkdown: (state, node) => {
+          const members = (state.options as any)?.charmOptions?.members as Member[];
+          const mentionedUser = members?.find((member) => member.id === node.attrs.value);
+          if (mentionedUser) {
+            state.write(`@${mentionedUser.username}`);
+          }
+          return null;
+        }
       }
     },
     {

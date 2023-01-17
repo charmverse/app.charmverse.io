@@ -31,6 +31,10 @@ export async function getSnapshotSpace(spaceDomain: string): Promise<SnapshotSpa
         members
         categories
         about
+        voting {
+          period
+          delay
+        }
       }
     }
   `

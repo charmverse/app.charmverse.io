@@ -1,11 +1,9 @@
-import type { Prisma, Page as PrismaPage } from '@prisma/client';
+import type { Page as PrismaPage, Prisma } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { prisma } from 'db';
 import { onError, onNoMatch, requireApiKey } from 'lib/middleware';
-import { generateMarkdown } from 'lib/pages';
-import type { PageContent } from 'lib/prosemirror/interfaces';
 import type { Page, PageProperty, PageQuery, PaginatedQuery, PaginatedResponse } from 'lib/public-api';
 import {
   DatabasePageNotFoundError,

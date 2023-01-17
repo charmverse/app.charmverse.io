@@ -7,6 +7,7 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
+import type { NotificationType } from '@prisma/client';
 import { DateTime } from 'luxon';
 import { useEffect } from 'react';
 import type { KeyedMutator } from 'swr';
@@ -15,7 +16,8 @@ import charmClient from 'charmClient';
 import Link from 'components/common/Link';
 import LoadingComponent from 'components/common/LoadingComponent';
 import UserDisplay from 'components/common/UserDisplay';
-import type { ForumCommentTask } from 'lib/forums/comments/interface';
+import type { ForumTask } from 'lib/forums/comments/interface';
+import { isTruthy } from 'lib/utilities/types';
 import type { GetTasksResponse } from 'pages/api/tasks/list';
 
 import { EmptyTaskState } from './components/EmptyTaskState';
@@ -30,7 +32,7 @@ function ForumTaskRow({
   spaceDomain,
   spaceName,
   postTitle
-}: ForumCommentTask & { marked: boolean }) {
+}: ForumTask & { marked: boolean }) {
   const baseUrl = typeof window !== 'undefined' ? window.location.origin : null;
   const commentLink = `${baseUrl}/${spaceDomain}/forum/post/${postPath}`;
 
@@ -100,10 +102,23 @@ export default function ForumTasksList({ tasks, error, mutateTasks }: Discussion
     async function main() {
       if (tasks?.forum && tasks.forum.unmarked.length !== 0) {
         await charmClient.tasks.markTasks(
-          tasks.forum.unmarked.map((unmarkedComment) => ({
-            id: unmarkedComment.commentId,
-            type: 'post_comment'
-          }))
+          tasks.forum.unmarked
+            .map((unmarkedComment) => {
+              if (unmarkedComment.commentId) {
+                return {
+                  id: unmarkedComment.commentId,
+                  type: 'post_comment' as NotificationType
+                };
+              } else if (unmarkedComment.mentionId) {
+                return {
+                  id: unmarkedComment.mentionId,
+                  type: 'mention' as NotificationType
+                };
+              }
+
+              return null;
+            })
+            .filter(isTruthy)
         );
       }
     }
