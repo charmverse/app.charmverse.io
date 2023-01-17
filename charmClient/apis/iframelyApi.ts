@@ -26,7 +26,7 @@ type IframelyResponse = {
 };
 
 export class IframelyApi {
-  get(url: string) {
+  get(url: string, darkMode: 'dark' | 'light' | 'auto') {
     return http.GET<IframelyResponse>(
       `https://cdn.iframe.ly/api/iframely`,
       {
@@ -34,6 +34,7 @@ export class IframelyApi {
         key: process.env.NEXT_PUBLIC_IFRAMELY_API_KEY,
         iframe: '1',
         omit_script: '1',
+        theme: darkMode,
         media: '0',
         card: 'small'
       },
