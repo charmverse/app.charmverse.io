@@ -31,7 +31,8 @@ async function fetchSpaceWebhookSubscriptionStatus(spaceId: Space['id'], scope: 
     include: {
       space: {
         select: {
-          webhookSubscriptionUrl: true
+          webhookSubscriptionUrl: true,
+          webhookSigningSecret: true
         }
       }
     }

@@ -43,7 +43,7 @@ export const webhookWorker: SQSHandler = async (event: SQSEvent) => {
           method: 'POST',
           body: JSON.stringify(webhookData),
           headers: {
-            signature: signedJWT
+            Signature: signedJWT
           }
         });
 
