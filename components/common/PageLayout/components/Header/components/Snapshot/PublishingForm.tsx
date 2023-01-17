@@ -4,6 +4,7 @@ import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
+import Tooltip from '@mui/material/Tooltip';
 import { DateTimePicker } from '@mui/x-date-pickers';
 import { getChainById } from 'connectors';
 import { utils } from 'ethers';
@@ -77,12 +78,17 @@ export default function PublishingForm({ onSubmit, page }: Props) {
 
   const [publishing, setPublishing] = useState(false);
   const isAdmin = useIsAdmin();
-
   useEffect(() => {
     if (!snapshotBlockNumber) {
       setCurrentBlockNumberAsDefault();
     }
   }, [snapshotSpace]);
+
+  useEffect(() => {
+    if (snapshotSpace?.voting.period && startDate) {
+      setEndDate(DateTime.fromMillis(startDate.toMillis()).plus({ seconds: snapshotSpace.voting.period }));
+    }
+  }, [startDate, snapshotSpace]);
 
   useEffect(() => {
     verifyUserCanPostToSnapshot();
@@ -202,7 +208,8 @@ export default function PublishingForm({ onSubmit, page }: Props) {
       }
 
       const client = await getSnapshotClient();
-      const receipt: SnapshotReceipt = (await client.proposal(library, utils.getAddress(account as string), {
+
+      const proposalParams: any = {
         space: space?.snapshotDomain as any,
         type: snapshotVoteMode,
         title: page.title,
@@ -216,7 +223,12 @@ export default function PublishingForm({ onSubmit, page }: Props) {
         strategies: JSON.stringify(selectedVotingStrategies),
         plugins: JSON.stringify({}),
         metadata: JSON.stringify({})
-      } as any)) as SnapshotReceipt;
+      };
+      const receipt: SnapshotReceipt = (await client.proposal(
+        library,
+        utils.getAddress(account as string),
+        proposalParams
+      )) as SnapshotReceipt;
 
       const updatedPage = await charmClient.updatePageSnapshotData(page.id, {
         snapshotProposalId: receipt.id
@@ -339,30 +351,41 @@ export default function PublishingForm({ onSubmit, page }: Props) {
                   renderInput={(props) => <TextField fullWidth {...props} />}
                 />
               </div>
-              <div
-                style={{
-                  flexGrow: 1
-                }}
+
+              <Tooltip
+                title={
+                  snapshotSpace?.voting.period
+                    ? 'End date is automatically defined by the voting duration configured for your space in Snapshot.org'
+                    : ''
+                }
               >
-                <FieldLabel>End date</FieldLabel>
-                <DateTimePicker
-                  minDateTime={startDate}
-                  value={endDate}
-                  onChange={(value) => {
-                    if (value instanceof DateTime) {
-                      setEndDate(value as DateTime);
-                    }
+                <div
+                  style={{
+                    flexGrow: 1
                   }}
-                  renderInput={(props) => (
-                    <TextField
-                      fullWidth
-                      {...props}
-                      error={!endDateAfterStart}
-                      helperText={!endDateAfterStart ? 'End date must be after start date' : null}
-                    />
-                  )}
-                />
-              </div>
+                >
+                  <FieldLabel>End date</FieldLabel>
+                  <DateTimePicker
+                    minDateTime={startDate}
+                    value={endDate}
+                    onChange={(value) => {
+                      if (value instanceof DateTime) {
+                        setEndDate(value as DateTime);
+                      }
+                    }}
+                    disabled={!!snapshotSpace.voting.period}
+                    renderInput={(props) => (
+                      <TextField
+                        fullWidth
+                        disabled={!!snapshotSpace.voting.period}
+                        {...props}
+                        error={!endDateAfterStart}
+                        helperText={!endDateAfterStart ? 'End date must be after start date' : null}
+                      />
+                    )}
+                  />
+                </div>
+              </Tooltip>
             </Grid>
 
             {endDateAfterStart && (

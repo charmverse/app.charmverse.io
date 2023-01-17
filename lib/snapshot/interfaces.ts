@@ -22,8 +22,11 @@ export interface SnapshotSpace {
   network: string;
   private: boolean;
   strategies: SnapshotVotingStrategy[];
-  // TBC - Check out validation
-  // validation:
+  voting: {
+    // Number of seconds proposals are active for
+    period: number | null;
+    delay: number | null;
+  };
 }
 
 export type SnapshotProposalState = 'pending' | 'active' | 'closed';
