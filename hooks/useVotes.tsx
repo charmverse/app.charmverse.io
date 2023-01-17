@@ -21,6 +21,7 @@ type IContext = {
   castVote: (voteId: string, option: string) => Promise<UserVote>;
   deleteVote: (voteId: string) => Promise<void>;
   cancelVote: (voteId: string) => Promise<void>;
+  updateDeadline: (voteId: string, deadline: Date) => Promise<void>;
 };
 
 const VotesContext = createContext<Readonly<IContext>>({
@@ -30,11 +31,12 @@ const VotesContext = createContext<Readonly<IContext>>({
   castVote: () => undefined as any,
   createVote: () => undefined as any,
   deleteVote: () => undefined as any,
-  cancelVote: () => undefined as any
+  cancelVote: () => undefined as any,
+  updateDeadline: () => undefined as any
 });
 
 export function VotesProvider({ children }: { children: ReactNode }) {
-  const { currentPageId, pages } = usePages();
+  const { currentPageId } = usePages();
   const [votes, setVotes] = useState<IContext['votes']>({});
   const { user } = useUser();
   const currentSpace = useCurrentSpace();
@@ -205,8 +207,11 @@ export function VotesProvider({ children }: { children: ReactNode }) {
     if (vote.context === 'inline') {
       await charmClient.votes.deleteVote(voteId);
       if (currentPageId) {
-        delete votes[voteId];
-        setVotes({ ...votes });
+        setVotes((prevVotes) => {
+          const _votes = { ...prevVotes };
+          delete _votes[voteId];
+          return _votes;
+        });
       }
       removeVoteFromTask(voteId);
     }
@@ -215,15 +220,18 @@ export function VotesProvider({ children }: { children: ReactNode }) {
   async function cancelVote(voteId: string) {
     const vote = votes[voteId];
     if (vote.context === 'inline') {
-      await charmClient.votes.cancelVote(voteId);
+      await charmClient.votes.updateVote(voteId, { status: 'Cancelled' });
       if (currentPageId) {
-        votes[voteId] = {
-          ...votes[voteId],
-          status: 'Cancelled'
-        };
-        setVotes({ ...votes });
+        setVotes((prevVotes) => ({ ...prevVotes, [voteId]: { ...prevVotes[voteId], status: 'Cancelled' } }));
       }
       removeVoteFromTask(voteId);
+    }
+  }
+
+  async function updateDeadline(voteId: string, deadline: Date) {
+    await charmClient.votes.updateVote(voteId, { deadline });
+    if (currentPageId) {
+      setVotes((prevVotes) => ({ ...prevVotes, [voteId]: { ...prevVotes[voteId], deadline } }));
     }
   }
 
@@ -239,7 +247,8 @@ export function VotesProvider({ children }: { children: ReactNode }) {
       castVote,
       createVote,
       deleteVote,
-      cancelVote
+      cancelVote,
+      updateDeadline
     }),
     [currentPageId, votes, isValidating]
   );

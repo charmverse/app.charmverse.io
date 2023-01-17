@@ -20,7 +20,6 @@ import { useBounties } from 'hooks/useBounties';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { usePages } from 'hooks/usePages';
 import { usePrimaryCharmEditor } from 'hooks/usePrimaryCharmEditor';
-import { useUser } from 'hooks/useUser';
 import { useVotes } from 'hooks/useVotes';
 import type { AssignedBountyPermissions } from 'lib/bounties';
 import type { PageMeta } from 'lib/pages';
@@ -73,7 +72,7 @@ export interface DocumentPageProps {
 
 function DocumentPage({ page, setPage, insideModal, readOnly = false, parentProposalId }: DocumentPageProps) {
   const { pages, getPagePermissions } = usePages();
-  const { cancelVote, castVote, deleteVote, votes, isLoading } = useVotes();
+  const { cancelVote, castVote, deleteVote, updateDeadline, votes, isLoading } = useVotes();
   // For post we would artificially construct the permissions
   const pagePermissions = getPagePermissions(page.id);
   const { draftBounty } = useBounties();
@@ -217,6 +216,7 @@ function DocumentPage({ page, setPage, insideModal, readOnly = false, parentProp
                     cancelVote={cancelVote}
                     deleteVote={deleteVote}
                     castVote={castVote}
+                    updateDeadline={updateDeadline}
                     vote={pageVote}
                     detailed={false}
                     isProposal={true}
