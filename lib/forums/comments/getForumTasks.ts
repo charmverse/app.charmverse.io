@@ -17,10 +17,12 @@ interface GetForumTasksInput {
   username: string;
 }
 
+type ForumDiscussionTask = Omit<ForumTask, 'createdBy'> & { userId: string };
+
 interface GetForumTasksResponse {
-  mentions: Record<string, Omit<ForumTask, 'createdBy'> & { userId: string }>;
+  mentions: ForumDiscussionTask[];
   discussionUserIds: string[];
-  comments: (Omit<ForumTask, 'createdBy'> & { userId: string })[];
+  comments: ForumDiscussionTask[];
 }
 
 export async function getForumTasks(userId: string): Promise<ForumTasksGroup> {
@@ -95,12 +97,12 @@ export async function getForumTasks(userId: string): Promise<ForumTasksGroup> {
     return results.reduce(
       (acc, result) => {
         return {
-          mentions: { ...acc.mentions, ...result.mentions },
-          discussionUserIds: [...acc.discussionUserIds, ...result.discussionUserIds],
-          comments: [...acc.comments, ...result.comments]
+          mentions: acc.mentions.concat(result.mentions),
+          discussionUserIds: acc.discussionUserIds.concat(result.discussionUserIds),
+          comments: acc.comments.concat(result.comments)
         };
       },
-      { mentions: {}, discussionUserIds: [], comments: [] }
+      { mentions: [], discussionUserIds: [], comments: [] }
     );
   });
 
@@ -190,18 +192,18 @@ export async function getPostMentions({
     }
   });
 
-  const mentionsMap: GetForumTasksResponse['mentions'] = {};
+  const mentions: GetForumTasksResponse['mentions'] = [];
   const discussionUserIds: string[] = [];
 
   for (const post of posts) {
     const content = post.content as PageContent;
     if (content) {
-      const mentions = extractMentions(content, username);
-      mentions.forEach((mention) => {
+      const extractedMentions = extractMentions(content, username);
+      extractedMentions.forEach((mention) => {
         // Skip mentions not for the user, self mentions and inside user created pages
         if (mention.value === userId && mention.createdBy !== userId) {
           discussionUserIds.push(mention.createdBy);
-          mentionsMap[mention.id] = {
+          mentions.push({
             ...getPropertiesFromPost(post, spaceRecord),
             mentionId: mention.id,
             createdAt: mention.createdAt,
@@ -211,14 +213,14 @@ export async function getPostMentions({
             postId: post.id,
             postPath: post.path,
             postTitle: post.title
-          };
+          });
         }
       });
     }
   }
 
   return {
-    mentions: mentionsMap,
+    mentions,
     discussionUserIds,
     comments: []
   };
@@ -254,17 +256,17 @@ async function getPostCommentMentions({
     }
   });
 
-  const mentionsMap: GetForumTasksResponse['mentions'] = {};
+  const mentions: GetForumTasksResponse['mentions'] = [];
   const discussionUserIds: string[] = [];
 
   for (const comment of comments) {
     const content = comment.content as PageContent;
     if (content) {
-      const mentions = extractMentions(content, username);
-      mentions.forEach((mention) => {
+      const extractedMentions = extractMentions(content, username);
+      extractedMentions.forEach((mention) => {
         if (mention.value === userId && mention.createdBy !== userId && comment.createdBy !== userId) {
           discussionUserIds.push(mention.createdBy);
-          mentionsMap[mention.id] = {
+          mentions.push({
             ...getPropertiesFromPost(comment.post, spaceRecord),
             mentionId: mention.id,
             createdAt: mention.createdAt,
@@ -274,13 +276,13 @@ async function getPostCommentMentions({
             postId: comment.post.id,
             postPath: comment.post.path,
             postTitle: comment.post.title
-          };
+          });
         }
       });
     }
   }
   return {
-    mentions: mentionsMap,
+    mentions,
     discussionUserIds,
     comments: []
   };
@@ -370,7 +372,7 @@ async function getPostComments({ userId, spaceIds, spaceRecord }: GetForumTasksI
   });
 
   return {
-    mentions: {},
+    mentions: [],
     discussionUserIds: commentTasks.map((comm) => comm.userId).concat([userId]),
     comments: commentTasks
   };

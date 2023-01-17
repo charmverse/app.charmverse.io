@@ -23,7 +23,7 @@ interface GetDiscussionsInput {
 }
 
 interface GetDiscussionsResponse {
-  mentions: Record<string, Discussion>;
+  mentions: Discussion[];
   discussionUserIds: string[];
   comments: Discussion[];
 }
@@ -98,12 +98,12 @@ export async function getDiscussionTasks(userId: string): Promise<DiscussionTask
     return results.reduce(
       (acc, result) => {
         return {
-          mentions: { ...acc.mentions, ...result.mentions },
-          discussionUserIds: [...acc.discussionUserIds, ...result.discussionUserIds],
-          comments: [...acc.comments, ...result.comments]
+          mentions: acc.mentions.concat(result.mentions),
+          discussionUserIds: acc.discussionUserIds.concat(result.discussionUserIds),
+          comments: acc.comments.concat(result.comments)
         };
       },
-      { mentions: {}, discussionUserIds: [], comments: [] }
+      { mentions: [], discussionUserIds: [], comments: [] }
     );
   });
 
@@ -200,31 +200,31 @@ async function getCommentBlockMentions({
     }
   });
 
-  const mentionsMap: GetDiscussionsResponse['mentions'] = {};
+  const mentions: GetDiscussionsResponse['mentions'] = [];
   const discussionUserIds: string[] = [];
 
   for (const comment of blockComments) {
     const page = pages.find((p) => p.id === comment.parentId);
     const content = (comment.fields as any)?.content as PageContent;
     if (page && content) {
-      const mentions = extractMentions(content, username);
-      mentions.forEach((mention) => {
+      const extractedMentions = extractMentions(content, username);
+      extractedMentions.forEach((mention) => {
         if (page && mention.value === userId && mention.createdBy !== userId && comment.createdBy !== userId) {
           discussionUserIds.push(mention.createdBy);
-          mentionsMap[mention.id] = {
+          mentions.push({
             ...getPropertiesFromPage(page, spaceRecord),
             mentionId: mention.id,
             createdAt: mention.createdAt,
             userId: mention.createdBy,
             text: mention.text,
             commentId: comment.id
-          };
+          });
         }
       });
     }
   }
   return {
-    mentions: mentionsMap,
+    mentions,
     discussionUserIds,
     comments: []
   };
@@ -377,7 +377,7 @@ async function getPageComments({
   }
 
   return {
-    mentions: {},
+    mentions: [],
     discussionUserIds: textComments.map((comm) => comm.userId).concat([userId]),
     comments: textComments
   };
@@ -415,30 +415,30 @@ async function getPageCommentMentions({
     }
   });
 
-  const mentionsMap: GetDiscussionsResponse['mentions'] = {};
+  const mentions: GetDiscussionsResponse['mentions'] = [];
   const discussionUserIds: string[] = [];
 
   for (const comment of comments) {
     const content = comment.content as PageContent;
     if (content) {
-      const mentions = extractMentions(content, username);
-      mentions.forEach((mention) => {
+      const extractedMentions = extractMentions(content, username);
+      extractedMentions.forEach((mention) => {
         if (mention.value === userId && mention.createdBy !== userId && comment.userId !== userId) {
           discussionUserIds.push(mention.createdBy);
-          mentionsMap[mention.id] = {
+          mentions.push({
             ...getPropertiesFromPage(comment.page, spaceRecord),
             mentionId: mention.id,
             createdAt: mention.createdAt,
             userId: mention.createdBy,
             text: mention.text,
             commentId: comment.id
-          };
+          });
         }
       });
     }
   }
   return {
-    mentions: mentionsMap,
+    mentions,
     discussionUserIds,
     comments: []
   };
@@ -469,32 +469,32 @@ async function getPageMentions({
     }
   });
 
-  const mentionsMap: GetDiscussionsResponse['mentions'] = {};
+  const mentions: GetDiscussionsResponse['mentions'] = [];
   const discussionUserIds: string[] = [];
 
   for (const page of pages) {
     const content = page.content as PageContent;
     if (content) {
-      const mentions = extractMentions(content, username);
-      mentions.forEach((mention) => {
+      const extractedMentions = extractMentions(content, username);
+      extractedMentions.forEach((mention) => {
         // Skip mentions not for the user, self mentions and inside user created pages
         if (mention.value === userId && mention.createdBy !== userId) {
           discussionUserIds.push(mention.createdBy);
-          mentionsMap[mention.id] = {
+          mentions.push({
             ...getPropertiesFromPage(page, spaceRecord),
             mentionId: mention.id,
             createdAt: mention.createdAt,
             userId: mention.createdBy,
             text: mention.text,
             commentId: null
-          };
+          });
         }
       });
     }
   }
 
   return {
-    mentions: mentionsMap,
+    mentions,
     discussionUserIds,
     comments: []
   };
