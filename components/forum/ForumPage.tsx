@@ -43,9 +43,18 @@ export function ForumPage() {
   const loadingCategories = !categories || categories.length === 0;
 
   function setCategoryFromPath() {
-    const categoryName = router.query.categoryName as string | undefined;
-    const category = !categoryName ? null : categories.find((_category) => _category.name === categoryName);
+    const categoryPath = router.query.categoryPath as string | undefined;
+    const category = !categoryPath
+      ? null
+      : categories.find((_category) => _category.path === categoryPath || _category.name === categoryPath);
     setCurrentCategory(category ?? null);
+
+    if (category && currentSpace) {
+      charmClient.track.trackAction('main_feed_filtered', {
+        categoryName: category.name,
+        spaceId: currentSpace.id
+      });
+    }
   }
 
   function handleSortUpdate(sortName?: PostSortOption) {
@@ -70,7 +79,7 @@ export function ForumPage() {
 
     if (newCategory) {
       router.push({
-        pathname: `${pathname}/${newCategory.name}`
+        pathname: `${pathname}/${newCategory.path ?? newCategory.name}`
       });
     } else {
       router.push({

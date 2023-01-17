@@ -115,17 +115,6 @@ export function CategoryMenu({ handleCategory, handleSort, selectedCategoryId, s
   if (error) {
     return <Alert severity='error'>An error occurred while loading the categories</Alert>;
   }
-  useEffect(() => {
-    if (selectedCategoryId && currentSpace) {
-      const selectedCategoryName = categories?.find((category) => category.id === selectedCategoryId)?.name;
-      if (selectedCategoryName) {
-        charmClient.track.trackAction('main_feed_filtered', {
-          categoryName: selectedCategoryName,
-          spaceId: currentSpace.id
-        });
-      }
-    }
-  }, [router.query.categoryName]);
 
   return (
     <Card variant='outlined'>
