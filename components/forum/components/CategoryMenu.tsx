@@ -101,9 +101,6 @@ export function CategoryMenu({ handleCategory, handleSort, selectedCategoryId, s
   const addCategoryPopupState = usePopupState({ variant: 'popover', popupId: 'add-category' });
   const admin = isAdmin();
 
-  const router = useRouter();
-  const currentSpace = useCurrentSpace();
-
   const [newForumCategoryName, setNewForumCategoryName] = useState('');
 
   function createCategory() {
