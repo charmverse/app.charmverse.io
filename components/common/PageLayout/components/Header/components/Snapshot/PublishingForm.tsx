@@ -4,8 +4,10 @@ import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
+import Tooltip from '@mui/material/Tooltip';
 import { DateTimePicker } from '@mui/x-date-pickers';
 import { getChainById } from 'connectors';
+import { utils } from 'ethers';
 import { DateTime } from 'luxon';
 import { useEffect, useState } from 'react';
 
@@ -17,8 +19,11 @@ import { LoadingIcon } from 'components/common/LoadingComponent';
 import PrimaryButton from 'components/common/PrimaryButton';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import useIsAdmin from 'hooks/useIsAdmin';
+import { useMembers } from 'hooks/useMembers';
 import { usePages } from 'hooks/usePages';
+import { useSnackbar } from 'hooks/useSnackbar';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
+import log from 'lib/log';
 import type { PageMeta } from 'lib/pages';
 import { generateMarkdown } from 'lib/pages/generateMarkdown';
 import type { SnapshotReceipt, SnapshotSpace, SnapshotVotingModeType, SnapshotVotingStrategy } from 'lib/snapshot';
@@ -48,6 +53,8 @@ export default function PublishingForm({ onSubmit, page }: Props) {
   const { account, library } = useWeb3AuthSig();
 
   const space = useCurrentSpace();
+  const { members } = useMembers();
+  const { showMessage } = useSnackbar();
 
   const [snapshotSpace, setSnapshotSpace] = useState<SnapshotSpace | null>(null);
   // Ensure we don't show any UI until we are done checking
@@ -71,12 +78,17 @@ export default function PublishingForm({ onSubmit, page }: Props) {
 
   const [publishing, setPublishing] = useState(false);
   const isAdmin = useIsAdmin();
-
   useEffect(() => {
     if (!snapshotBlockNumber) {
       setCurrentBlockNumberAsDefault();
     }
   }, [snapshotSpace]);
+
+  useEffect(() => {
+    if (snapshotSpace?.voting.period && startDate) {
+      setEndDate(DateTime.fromMillis(startDate.toMillis()).plus({ seconds: snapshotSpace.voting.period }));
+    }
+  }, [startDate, snapshotSpace]);
 
   useEffect(() => {
     verifyUserCanPostToSnapshot();
@@ -99,23 +111,28 @@ export default function PublishingForm({ onSubmit, page }: Props) {
    * Returns markdown content if valid length, or null if not
    */
   async function checkMarkdownLength(): Promise<string | null> {
-    const pageWithDetails = await charmClient.pages.getPage(page.id);
-    const content = await generateMarkdown(pageWithDetails, false);
+    try {
+      const pageWithDetails = await charmClient.pages.getPage(page.id);
+      const content = await generateMarkdown(pageWithDetails, false, { members });
 
-    const markdownCharacterLength = content.length;
+      const markdownCharacterLength = content.length;
 
-    if (markdownCharacterLength > MAX_SNAPSHOT_PROPOSAL_CHARACTERS) {
-      setConfigurationError(
-        new SystemError({
-          errorType: 'Maximum size exceeded',
-          severity: 'warning',
-          message: `The character count of your proposal is ${markdownCharacterLength}.\r\n\nThis exceeds Snapshot's limit of ${MAX_SNAPSHOT_PROPOSAL_CHARACTERS}.\r\n\nTo fix this, reduce text size and check for inline images which were pasted directly instead of being configured with a link.`
-        })
-      );
+      if (markdownCharacterLength > MAX_SNAPSHOT_PROPOSAL_CHARACTERS) {
+        setConfigurationError(
+          new SystemError({
+            errorType: 'Maximum size exceeded',
+            severity: 'warning',
+            message: `The character count of your proposal is ${markdownCharacterLength}.\r\n\nThis exceeds Snapshot's limit of ${MAX_SNAPSHOT_PROPOSAL_CHARACTERS}.\r\n\nTo fix this, reduce text size and check for inline images which were pasted directly instead of being configured with a link.`
+          })
+        );
+        return null;
+      }
+
+      return content;
+    } catch (err) {
+      log.error('Error generating markdown', err);
       return null;
     }
-
-    return content;
   }
 
   async function verifyUserCanPostToSnapshot() {
@@ -177,67 +194,67 @@ export default function PublishingForm({ onSubmit, page }: Props) {
     setFormError(null);
     setPublishing(true);
 
-    const pageWithDetails = await charmClient.pages.getPage(page.id);
-    const content = await generateMarkdown(pageWithDetails, false);
+    try {
+      const pageWithDetails = await charmClient.pages.getPage(page.id);
 
-    let receipt: SnapshotReceipt;
+      const content = await generateMarkdown(pageWithDetails, false, { members });
 
-    if (!account) {
-      setFormError(
-        new SystemError({
+      if (!account) {
+        throw new SystemError({
           errorType: 'External service',
           severity: 'warning',
           message: "We couldn't detect your wallet. Please unlock your wallet and try publishing again."
-        })
-      );
-      setPublishing(false);
-      return;
-    }
+        });
+      }
 
-    try {
       const client = await getSnapshotClient();
-      receipt = (await client.proposal(
+
+      const proposalParams: any = {
+        space: space?.snapshotDomain as any,
+        type: snapshotVoteMode,
+        title: page.title,
+        body: content,
+        choices: votingOptions,
+        start: Math.round(startDate.toSeconds()),
+        end: Math.round(endDate.toSeconds()),
+        snapshot: snapshotBlockNumber,
+        network: snapshotSpace?.network,
+        // strategies: JSON.stringify([]),
+        strategies: JSON.stringify(selectedVotingStrategies),
+        plugins: JSON.stringify({}),
+        metadata: JSON.stringify({})
+      };
+      const receipt: SnapshotReceipt = (await client.proposal(
         library,
-        account as string,
-        {
-          space: space?.snapshotDomain as any,
-          type: snapshotVoteMode,
-          title: page.title,
-          body: content,
-          choices: votingOptions,
-          start: Math.round(startDate.toSeconds()),
-          end: Math.round(endDate.toSeconds()),
-          snapshot: snapshotBlockNumber,
-          network: snapshotSpace?.network,
-          // strategies: JSON.stringify([]),
-          strategies: JSON.stringify(selectedVotingStrategies),
-          plugins: JSON.stringify({}),
-          metadata: JSON.stringify({})
-        } as any
+        utils.getAddress(account as string),
+        proposalParams
       )) as SnapshotReceipt;
+
+      const updatedPage = await charmClient.updatePageSnapshotData(page.id, {
+        snapshotProposalId: receipt.id
+      });
+
+      mutatePage(updatedPage);
+      charmClient.track.trackAction('new_vote_created', {
+        platform: 'snapshot',
+        pageId: page.id,
+        resourceId: receipt.id,
+        spaceId: space?.id || ''
+      });
+
+      onSubmit();
     } catch (err: any) {
-      const errorToShow = err?.error_description
-        ? new ExternalServiceError(`Snapshot error: ${err?.error_description}`)
-        : new UnknownError();
+      log.error('Error while publishing to snapshot', err);
 
-      setPublishing(false);
+      const errorToShow =
+        err instanceof SystemError
+          ? err
+          : (err as any)?.error_description
+          ? new ExternalServiceError(`Snapshot error: ${err?.error_description}`)
+          : new UnknownError();
+
       setFormError(errorToShow);
-      return;
     }
-
-    const updatedPage = await charmClient.updatePageSnapshotData(page.id, {
-      snapshotProposalId: receipt.id
-    });
-
-    mutatePage(updatedPage);
-    charmClient.track.trackAction('new_vote_created', {
-      platform: 'snapshot',
-      pageId: page.id,
-      resourceId: receipt.id,
-      spaceId: space?.id || ''
-    });
-
-    onSubmit();
     setPublishing(false);
   }
 
@@ -334,30 +351,41 @@ export default function PublishingForm({ onSubmit, page }: Props) {
                   renderInput={(props) => <TextField fullWidth {...props} />}
                 />
               </div>
-              <div
-                style={{
-                  flexGrow: 1
-                }}
+
+              <Tooltip
+                title={
+                  snapshotSpace?.voting.period
+                    ? 'End date is automatically defined by the voting duration configured for your space in Snapshot.org'
+                    : ''
+                }
               >
-                <FieldLabel>End date</FieldLabel>
-                <DateTimePicker
-                  minDateTime={startDate}
-                  value={endDate}
-                  onChange={(value) => {
-                    if (value instanceof DateTime) {
-                      setEndDate(value as DateTime);
-                    }
+                <div
+                  style={{
+                    flexGrow: 1
                   }}
-                  renderInput={(props) => (
-                    <TextField
-                      fullWidth
-                      {...props}
-                      error={!endDateAfterStart}
-                      helperText={!endDateAfterStart ? 'End date must be after start date' : null}
-                    />
-                  )}
-                />
-              </div>
+                >
+                  <FieldLabel>End date</FieldLabel>
+                  <DateTimePicker
+                    minDateTime={startDate}
+                    value={endDate}
+                    onChange={(value) => {
+                      if (value instanceof DateTime) {
+                        setEndDate(value as DateTime);
+                      }
+                    }}
+                    disabled={!!snapshotSpace.voting.period}
+                    renderInput={(props) => (
+                      <TextField
+                        fullWidth
+                        disabled={!!snapshotSpace.voting.period}
+                        {...props}
+                        error={!endDateAfterStart}
+                        helperText={!endDateAfterStart ? 'End date must be after start date' : null}
+                      />
+                    )}
+                  />
+                </div>
+              </Tooltip>
             </Grid>
 
             {endDateAfterStart && (

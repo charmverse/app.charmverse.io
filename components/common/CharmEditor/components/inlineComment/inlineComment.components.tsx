@@ -119,6 +119,7 @@ export function InlineCommentSubMenu({ pluginKey }: { pluginKey: PluginKey }) {
     <Box display='flex' width='400px'>
       <Box flexGrow={1}>
         <InlineCharmEditor
+          focusOnInit={true}
           content={commentContent}
           style={{
             fontSize: '14px'

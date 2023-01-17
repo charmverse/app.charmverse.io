@@ -165,11 +165,13 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
           setStoredAccount(null);
           logoutUser();
         });
-      } else {
-        setSignature(null);
-        setStoredAccount(null);
-        logoutUser();
       }
+      // TODO: Ask Mo hwo to handle this state
+      // } else {
+      //   setSignature(null);
+      //   setStoredAccount(null);
+      //   logoutUser();
+      // }
     }
   }, [account, user, isConnectingIdentity, isLoaded]);
 

@@ -7,7 +7,8 @@ import { shortenHex } from 'lib/utilities/strings';
  * @returns An array of mention ids
  */
 export function extractMentions(content: PageContent, username?: string) {
-  const mentions: { id: string; createdAt: string; createdBy: string; text: string; value: string }[] = [];
+  const mentions: Map<string, { id: string; createdAt: string; createdBy: string; text: string; value: string }> =
+    new Map();
 
   function recurse(node: PageContent, parentNode: PageContent | null) {
     if (node.content) {
@@ -39,7 +40,7 @@ export function extractMentions(content: PageContent, username?: string) {
         });
       }
 
-      mentions.push({
+      mentions.set(node.attrs.id, {
         id: node.attrs.id,
         text,
         createdAt: node.attrs.createdAt,
@@ -51,5 +52,5 @@ export function extractMentions(content: PageContent, username?: string) {
 
   recurse(content, null);
 
-  return mentions;
+  return Array.from(mentions.values());
 }

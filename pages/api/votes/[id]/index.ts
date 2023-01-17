@@ -27,7 +27,7 @@ async function getVoteController(req: NextApiRequest, res: NextApiResponse<Vote 
 
 async function updateVote(req: NextApiRequest, res: NextApiResponse<Vote | { error: any }>) {
   const voteId = req.query.id as string;
-  const { status } = req.body as UpdateVoteDTO;
+  const update = req.body as Partial<UpdateVoteDTO>;
   const userId = req.session.user.id;
 
   const vote = await prisma.vote.findUnique({
@@ -55,7 +55,8 @@ async function updateVote(req: NextApiRequest, res: NextApiResponse<Vote | { err
   if (!pagePermissions.create_poll) {
     throw new UnauthorisedActionError('You do not have permissions to delete the vote.');
   }
-  await updateVoteService(voteId, userId, status);
+
+  await updateVoteService(voteId, userId, update);
 
   const updatedVote = (await getVote(voteId, userId)) as ExtendedVote;
 

@@ -20,7 +20,6 @@ function FocalBoardWatcher({ children }: { children: JSX.Element }) {
 
   useEffect(() => {
     if (space) {
-      log.debug('Load focalboard blocks');
       dispatch(initialLoad({ spaceId: space.id }));
     }
   }, [space?.id]);

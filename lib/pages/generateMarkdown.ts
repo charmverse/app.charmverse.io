@@ -5,9 +5,18 @@ import type { Page } from '@prisma/client';
 
 import { replaceNestedPages } from 'components/common/CharmEditor/components/nestedPage';
 import { specRegistry } from 'components/common/CharmEditor/specRegistry';
+import type { Member } from 'lib/members/interfaces';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
-export async function generateMarkdown(page: Page, withTitle: boolean = false): Promise<string> {
+export type CharmMarkdownGeneratorOptions = {
+  members?: Member[];
+};
+
+export async function generateMarkdown(
+  page: Page,
+  withTitle: boolean = false,
+  generatorOptions: CharmMarkdownGeneratorOptions = {}
+): Promise<string> {
   if (page) {
     const serializer = markdownSerializer(specRegistry);
 
@@ -20,6 +29,8 @@ export async function generateMarkdown(page: Page, withTitle: boolean = false): 
         }
       }
     });
+
+    (serializer.options as any).charmOptions = generatorOptions;
 
     let markdown = serializer.serialize(state.pmState.doc);
 

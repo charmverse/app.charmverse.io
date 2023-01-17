@@ -18,7 +18,7 @@ class CsvExporter {
 
     rows.forEach((row) => {
       const encodedRow = row.join(',');
-      csvContent += `${encodedRow}\r\n`;
+      csvContent += encodeURIComponent(`${encodedRow}\r\n`);
     });
 
     let fileTitle = view.title;
@@ -27,10 +27,9 @@ class CsvExporter {
     }
 
     const filename = `${Utils.sanitizeFilename(fileTitle || 'CharmVerse Table Export')}.csv`;
-    const encodedUri = encodeURI(csvContent);
     const link = document.createElement('a');
     link.style.display = 'none';
-    link.setAttribute('href', encodedUri);
+    link.setAttribute('href', csvContent);
     link.setAttribute('download', filename);
     document.body.appendChild(link); // FireFox support
 
@@ -38,7 +37,7 @@ class CsvExporter {
 
     // TODO: Review if this is needed in the future, this is to fix the problem with linux webview links
     if (window.openInNewBrowser) {
-      window.openInNewBrowser(encodedUri);
+      window.openInNewBrowser(csvContent);
     }
 
     // TODO: Remove or reuse link

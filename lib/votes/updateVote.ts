@@ -3,10 +3,11 @@ import type { Vote } from '@prisma/client';
 import { prisma } from 'db';
 import { DataNotFoundError, UndesirableOperationError } from 'lib/utilities/errors';
 
-import type { VoteStatusType } from './interfaces';
+import type { UpdateVoteDTO } from './interfaces';
 import { VOTE_STATUS } from './interfaces';
 
-export async function updateVote(id: string, userId: string, status: VoteStatusType): Promise<Vote> {
+export async function updateVote(id: string, userId: string, update: Partial<UpdateVoteDTO>): Promise<Vote> {
+  const { status, deadline } = update;
   const existingVote = await prisma.vote.findUnique({
     where: {
       id
@@ -23,12 +24,16 @@ export async function updateVote(id: string, userId: string, status: VoteStatusT
   }
 
   // If vote has a Cancelled status, it can't be updated.
-  if (status !== VOTE_STATUS[3]) {
+  if (status && status !== VOTE_STATUS[3]) {
     throw new UndesirableOperationError('Votes can only be cancelled.');
   }
 
-  if (existingVote.context === 'proposal') {
+  if (existingVote.context === 'proposal' && status === 'Cancelled') {
     throw new UndesirableOperationError("Proposal votes can't be cancelled");
+  }
+
+  if (deadline && new Date(existingVote.createdAt) > new Date(deadline)) {
+    throw new UndesirableOperationError('The deadline needs to be in the future');
   }
 
   const updatedVote = await prisma.vote.update({
@@ -36,7 +41,8 @@ export async function updateVote(id: string, userId: string, status: VoteStatusT
       id
     },
     data: {
-      status
+      status,
+      deadline
     },
     include: {
       voteOptions: true,
