@@ -1,15 +1,17 @@
 import type { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 
-export const webhookEndpoint = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
+import log from 'lib/log';
+
+export const webhookChecker = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   try {
     const body = event?.body;
     const headers = event?.headers;
 
     // eslint-disable-next-line no-console
-    console.log('BODY', JSON.stringify(body));
+    log.debug('BODY', JSON.stringify(body));
 
     // eslint-disable-next-line no-console
-    console.log('HEADERS', JSON.stringify(headers));
+    log.debug('HEADERS', JSON.stringify(headers));
 
     return {
       statusCode: 200,
@@ -21,6 +23,8 @@ export const webhookEndpoint = async (event: APIGatewayProxyEvent): Promise<APIG
       })
     };
   } catch (e) {
+    log.error(e);
+
     return {
       statusCode: 500,
       headers: {

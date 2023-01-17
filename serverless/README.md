@@ -19,3 +19,17 @@ In order to deploy the serverless environment, you need to run the following com
 ```
 $ serverless deploy
 ```
+
+### Functions
+
+Two functions are currently deployed.
+
+`worker.ts`
+
+One is a SQS worker in charge of executing and handling messages in the SQS queue. This one signs the payload of the webhook and call our user's API with the signature + payload.
+
+The webhook expect a 200 response back. If this isn't successful, the message goes back to the queue and is executed up to 5 times with a delay between each execution.
+
+`checker.ts`
+
+This one is a simple HTTP POST endpoint returning a 200 success message and logging the header and payload for debugging and test purpose.

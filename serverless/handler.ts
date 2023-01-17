@@ -1,2 +1,2 @@
 export { webhookWorker } from './webhook/worker';
-export { webhookEndpoint } from './webhook/endpoint';
+export { webhookChecker } from './webhook/checker';

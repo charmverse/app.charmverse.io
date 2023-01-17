@@ -3,9 +3,11 @@ import type { KeyLike } from 'jose';
 import { SignJWT } from 'jose';
 import fetch from 'node-fetch';
 
+import log from 'lib/log';
+
 import type { WebhookPayload } from './interfaces';
 
-const signJwt = async (subject: string, payload: Record<string, any>, secret: KeyLike | Uint8Array) => {
+const signJwt = (subject: string, payload: Record<string, any>, secret: KeyLike | Uint8Array) => {
   return (
     new SignJWT(payload)
       .setProtectedHeader({ alg: 'HS256' })
@@ -62,7 +64,7 @@ export const webhookWorker: SQSHandler = async (event: SQSEvent) => {
         }
       } catch (e) {
         // eslint-disable-next-line no-console
-        console.log(`Error in processing SQS Worker: ${body}`);
+        log.error(`Error in processing SQS Worker`, { body, record });
 
         batchItemFailures.push({ itemIdentifier: record.messageId });
       }

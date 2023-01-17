@@ -26,11 +26,17 @@ type SetSpaceWebhookBody = {
 async function setSpaceWebhook(req: NextApiRequest, res: NextApiResponse<Space>) {
   const { id: spaceId } = req.query;
   const { webhookUrl, events } = req.body as SetSpaceWebhookBody;
+  const userId = req.session.user.id;
 
   const operationArray = [];
 
   // Generate prisma operations
   for (const [scope, subscribed] of Object.entries(events)) {
+    // The deletedAt is the key factor determining the subscription here
+    // If not present, the space will be subscribed to that event
+    const deletedAt = subscribed ? undefined : new Date();
+
+    // Push the operation in the array
     operationArray.push(
       prisma.webhookSubscription.upsert({
         where: {
@@ -40,12 +46,14 @@ async function setSpaceWebhook(req: NextApiRequest, res: NextApiResponse<Space>)
           }
         },
         update: {
-          deletedAt: subscribed ? undefined : new Date()
+          deletedAt,
+          createdBy: userId
         },
         create: {
           scope,
           spaceId: spaceId as string,
-          deletedAt: subscribed ? undefined : new Date()
+          deletedAt,
+          createdBy: userId
         }
       })
     );

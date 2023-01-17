@@ -5,6 +5,7 @@ ADD COLUMN     "webhookSubscriptionUrl" TEXT;
 -- CreateTable
 CREATE TABLE "WebhookSubscription" (
     "id" UUID NOT NULL,
+    "createdBy" UUID NOT NULL,
     "scope" TEXT NOT NULL,
     "spaceId" UUID NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,

@@ -11,8 +11,8 @@ on:
 jobs:
   deploy:
     if: |
-      (github.event.action == 'labeled' && github.event.label.name == ':rocket: deploy') ||
-      (github.event.action != 'labeled' && contains(github.event.pull_request.labels.*.name, ':rocket: deploy'))
+      (github.event.action == 'labeled' && github.event.label.name == ':rocket: serverless') ||
+      (github.event.action != 'labeled' && contains(github.event.pull_request.labels.*.name, ':rocket: serverless'))
     name: deploy
     runs-on: ubuntu-latest
     strategy:
