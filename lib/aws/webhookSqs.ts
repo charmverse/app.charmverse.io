@@ -2,8 +2,10 @@ import type { SQSClientConfig } from '@aws-sdk/client-sqs';
 import { SQSClient, ReceiveMessageCommand, GetQueueUrlCommand, DeleteMessageCommand } from '@aws-sdk/client-sqs';
 
 import { AWS_REGION, SQS_NAME } from 'lib/aws/config';
-import log from 'lib/log';
+import { getLogger } from 'lib/log/prefix';
 import type { WebhookMessage } from 'lib/webhooks/interfaces';
+
+const log = getLogger('sqs');
 
 type ProcessMssagesInput = {
   maxNumOfMessages?: number;
@@ -51,6 +53,7 @@ export async function getNextMessage() {
 
     return null;
   } catch (e) {
+    log.error('[SQS] Error while getting next message', e);
     return null;
   }
 }
@@ -64,6 +67,8 @@ export async function deleteMessage(receipt: string) {
 }
 
 export async function processMessages({ processorFn }: ProcessMssagesInput) {
+  log.debug('Process messages...');
+
   const message = await getNextMessage();
 
   if (message) {
@@ -80,8 +85,11 @@ export async function processMessages({ processorFn }: ProcessMssagesInput) {
     } catch (e) {
       log.error('[SQS] Failed to process webhook message', e);
     } finally {
+      log.debug('Deleting message', message.ReceiptHandle);
       await deleteMessage(message.ReceiptHandle || '');
     }
+  } else {
+    log.debug('No messages');
   }
 
   // process next message
