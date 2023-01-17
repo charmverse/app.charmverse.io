@@ -33,8 +33,8 @@ export type ForumPostProps = {
 };
 
 export function PostCard({ post, user, category }: ForumPostProps) {
-  const { createdAt, updatedAt, totalComments } = post;
-  const date = new Date(updatedAt || createdAt);
+  const { createdAt, totalComments } = post;
+  const date = new Date(createdAt);
   const relativeTime = getRelativeTimeInThePast(date);
   const [pagePost, setPagePost] = useState(post);
   const { id: postId } = pagePost;
