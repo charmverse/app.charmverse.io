@@ -15,6 +15,7 @@ async function fetchSpaceWebhookSubscriptionStatus(spaceId: Space['id'], scope: 
   const webhookSubscription = await prisma.webhookSubscription.findFirst({
     where: {
       spaceId,
+      deletedAt: undefined,
       OR: [
         {
           scope: {
@@ -51,7 +52,7 @@ export async function publishWebhookEvent<T = WebhookEventNames>(spaceId: Space[
     const subscription = await fetchSpaceWebhookSubscriptionStatus(spaceId, event.scope);
 
     // If no subscription, we stop here
-    if (!subscription || !subscription.space.webhookSubscriptionUrl) {
+    if (!subscription || !subscription.space.webhookSubscriptionUrl || !subscription.space.webhookSigningSecret) {
       return;
     }
 
@@ -59,7 +60,8 @@ export async function publishWebhookEvent<T = WebhookEventNames>(spaceId: Space[
       event,
       createdAt: new Date().toISOString(),
       spaceId,
-      webhookURL: subscription.space.webhookSubscriptionUrl
+      webhookURL: subscription.space.webhookSubscriptionUrl,
+      signingSecret: subscription.space.webhookSigningSecret
     };
 
     // Add the message to the queue

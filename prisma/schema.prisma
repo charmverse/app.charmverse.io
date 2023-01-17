@@ -1103,6 +1103,9 @@ model WebhookSubscription {
   space     Space     @relation(fields: [spaceId], references: [id], onDelete: Cascade)
 	createdAt DateTime  @default(now())
 	updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@unique([scope, spaceId])
 }
 
 model GoogleAccount {
