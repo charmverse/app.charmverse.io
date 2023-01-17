@@ -22,12 +22,12 @@ export function MediaUrlInput(props: InputProps) {
         onChange={(e) => setEmbedUrl(e.target.value)}
       />
       <Button
-        disabled={props.isValid ? !props.isValid(embedUrl) : !isUrl(embedUrl)}
+        disabled={props.isValid ? !props.isValid(getUrl(embedUrl)) : !isUrl(getUrl(embedUrl))}
         sx={{
           width: 250
         }}
         onClick={() => {
-          props.onSubmit(embedUrl);
+          props.onSubmit(getUrl(embedUrl));
           setEmbedUrl('');
         }}
       >
@@ -40,4 +40,12 @@ export function MediaUrlInput(props: InputProps) {
       )}
     </Box>
   );
+}
+
+// automatically add https:// to user input
+function getUrl(userInput: string) {
+  if (userInput.startsWith('http')) {
+    return userInput;
+  }
+  return `https://${userInput}`;
 }

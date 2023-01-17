@@ -1,3 +1,4 @@
+import { useTheme } from '@emotion/react';
 import BookmarkIcon from '@mui/icons-material/Bookmark';
 import { Box, Card, CardActionArea, Typography } from '@mui/material';
 import useSWRImmutable from 'swr/immutable';
@@ -21,8 +22,11 @@ export function BookmarkNodeView({
   deleteNode
 }: CharmNodeViewProps & { readOnly?: boolean }) {
   const { url } = node.attrs as BookmarkNodeAttrs;
+
+  const theme = useTheme();
+
   const { data, error, isLoading } = useSWRImmutable(url ? `iframely/${encodeURIComponent(url)}` : null, () =>
-    charmClient.iframely.get(url)
+    charmClient.iframely.get(url, theme.palette.mode)
   );
 
   async function updateNode(bookmarkUrl: string) {
