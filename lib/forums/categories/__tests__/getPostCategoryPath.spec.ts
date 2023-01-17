@@ -21,8 +21,14 @@ describe('getPostCategoryPath', () => {
     expect(path.length < maxchars).toBe(true);
   });
 
+  it('should replace & by whitespace', () => {
+    const title = 'Questions & Support';
+    const path = getPostCategoryPath(title);
+    expect(path).toBe('questions_support');
+  });
+
   it('should drop any consecutive non alphanumeric / space characters', () => {
-    const titleWithInvalidChars = '$%Post Title!@#abc$%^&*()_+{}:"<>?[];\',./';
+    const titleWithInvalidChars = '$%Post Title!@#abc$%^*()_+{}:"<>?[];\',./';
     const path = getPostCategoryPath(titleWithInvalidChars);
     expect(path).toBe('post_title_abc');
   });
