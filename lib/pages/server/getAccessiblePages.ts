@@ -1,4 +1,4 @@
-import type { Page, Prisma, SpaceRoleToRole } from '@prisma/client';
+import type { Page, Prisma, SpaceRole, SpaceRoleToRole } from '@prisma/client';
 
 import { prisma } from 'db';
 import type { PagePermissionMeta } from 'lib/permissions/interfaces';
@@ -221,16 +221,20 @@ export function generateAccessiblePagesQuery(input: PagesRequest): Prisma.PageFi
 }
 
 export async function getAccessiblePages(input: PagesRequest): Promise<IPageWithPermissions[]> {
-  const spaceRole = await prisma.spaceRole.findFirst({
-    where: {
-      userId: input.userId,
-      spaceId: input.spaceId
-    }
-  });
+  let spaceRole: SpaceRole | null = null;
 
-  // Not a space member, make userId undefined
-  if (!spaceRole) {
-    input.userId = undefined;
+  if (input.userId) {
+    spaceRole = await prisma.spaceRole.findFirst({
+      where: {
+        userId: input.userId,
+        spaceId: input.spaceId
+      }
+    });
+
+    // Not a space member, make userId undefined
+    if (!spaceRole) {
+      input.userId = undefined;
+    }
   }
 
   const availableRoles: { id: string; spaceRolesToRole: SpaceRoleToRole[] }[] =
@@ -288,13 +292,13 @@ export async function getAccessiblePages(input: PagesRequest): Promise<IPageWith
     return page.permissions.some((permission) => {
       if (permission.public) {
         return true;
-      } else if (input.userId) {
+      } else if (input.userId && spaceRole) {
         return (
           permission.userId === input.userId ||
           (permission.roleId &&
             spaceRole &&
             availableRoles.some((r) =>
-              r.spaceRolesToRole.some((s) => s.spaceRoleId === spaceRole.id && r.id === permission.roleId)
+              r.spaceRolesToRole.some((s) => s.spaceRoleId === spaceRole?.id && r.id === permission.roleId)
             )) ||
           permission.spaceId === input.spaceId
         );
