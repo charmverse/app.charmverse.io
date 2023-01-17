@@ -130,8 +130,12 @@ export function VoteTasksList({ error, tasks, mutateTasks }: VoteTasksListProps)
   };
 
   const cancelVote: VoteDetailProps['cancelVote'] = async (voteId) => {
-    await charmClient.votes.cancelVote(voteId);
+    await charmClient.votes.updateVote(voteId, { status: 'Cancelled' });
     removeVoteFromTask(voteId);
+  };
+
+  const updateDeadline: VoteDetailProps['updateDeadline'] = async (voteId, deadline) => {
+    await charmClient.votes.updateVote(voteId, { deadline });
   };
 
   if (error) {
@@ -174,7 +178,14 @@ export function VoteTasksList({ error, tasks, mutateTasks }: VoteTasksListProps)
       </Table>
       <Modal title='Poll details' size='large' open={!!selectedVoteId && !!voteTask} onClose={closeModal}>
         {voteTask && (
-          <VoteDetail vote={voteTask} detailed castVote={castVote} deleteVote={deleteVote} cancelVote={cancelVote} />
+          <VoteDetail
+            vote={voteTask}
+            detailed
+            castVote={castVote}
+            deleteVote={deleteVote}
+            cancelVote={cancelVote}
+            updateDeadline={updateDeadline}
+          />
         )}
       </Modal>
     </Box>

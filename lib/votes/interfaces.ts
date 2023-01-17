@@ -16,9 +16,7 @@ export interface VoteDTO extends Omit<Vote, 'id' | 'status' | 'createdAt'> {
   voteOptions: string[];
 }
 
-export interface UpdateVoteDTO {
-  status: VoteStatusType;
-}
+export type UpdateVoteDTO = Pick<Vote, 'status' | 'deadline'>;
 
 export interface UserVoteDTO {
   choice: string;
