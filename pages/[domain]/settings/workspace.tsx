@@ -56,6 +56,13 @@ export default function WorkspaceSettings() {
     charmClient.track.trackAction('page_view', { spaceId: space?.id, type: 'settings' });
   }, []);
 
+  // set default values when space is set
+  useEffect(() => {
+    if (space) {
+      reset(space);
+    }
+  }, [space?.id]);
+
   const watchName = watch('name');
   const watchSpaceImage = watch('spaceImage');
 
