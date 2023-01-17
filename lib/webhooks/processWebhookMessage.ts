@@ -2,17 +2,19 @@ import { assignRolesCollabland } from 'lib/collabland/assignRolesCollabland';
 import { getSpaceFromDiscord } from 'lib/discord/getSpaceFromDiscord';
 import { removeSpaceMemberDiscord } from 'lib/discord/removeSpaceMemberDiscord';
 import { unassignRolesDiscord } from 'lib/discord/unassignRolesDiscord';
-import log from 'lib/log';
 import { getRequestApiKey } from 'lib/middleware/getRequestApiKey';
 import { verifyApiKeyForSpace } from 'lib/middleware/verifyApiKeyForSpace';
-import type { MessageType, WebhookMessage } from 'lib/webhooks/interfaces';
+import type { MessageType, WebhookMessage, WebhookMessageProcessResult } from 'lib/webhooks/interfaces';
 
-const messageHandlers: Record<MessageType, (message: WebhookMessage) => Promise<void>> = {
+const messageHandlers: Record<MessageType, (message: WebhookMessage) => Promise<WebhookMessageProcessResult>> = {
   guildMemberUpdate: async (message: WebhookMessage) => {
     try {
       const payload = message?.data?.payload;
       if (!payload || payload.length !== 2) {
-        return;
+        return {
+          success: false,
+          message: 'Invalid payload.'
+        };
       }
 
       const { guildId: discordServerId, userId: discordUserId } = payload[0];
@@ -31,36 +33,63 @@ const messageHandlers: Record<MessageType, (message: WebhookMessage) => Promise<
       if (rolesRemoved.length) {
         await unassignRolesDiscord({ discordUserId, discordServerId, roles: rolesRemoved });
       }
+
+      return {
+        success: true,
+        message: 'Roles updated.'
+      };
       // eslint-disable-next-line no-empty
-    } catch (e) {}
+    } catch (e: any) {
+      return {
+        success: false,
+        message: e?.message || 'Failed to process guildMemberUpdate event.'
+      };
+    }
   },
   guildMemberRemove: async (message: WebhookMessage) => {
     try {
       const payload = message?.data?.payload?.[0];
       if (!payload) {
-        return;
+        return {
+          success: false,
+          message: 'Invalid payload.'
+        };
       }
 
       const { guildId: discordServerId, userId: discordUserId } = payload;
       await removeSpaceMemberDiscord({ discordUserId, discordServerId });
-      // eslint-disable-next-line no-empty
-    } catch (e) {}
+
+      return {
+        success: true,
+        message: 'Member removed.'
+      };
+    } catch (e: any) {
+      return {
+        success: false,
+        message: e?.message || 'Failed to process guildMemberRemove event.'
+      };
+    }
   }
 };
 
-export async function processWebhookMessage(message: WebhookMessage) {
+export async function processWebhookMessage(message: WebhookMessage): Promise<WebhookMessageProcessResult> {
   const data = message?.data;
 
   if (!data?.event || !messageHandlers[data?.event] || !data?.payload) {
     // we cannot process this message, just remove from queue
-    return;
+    return {
+      success: false,
+      message: 'Unsupported message type or payload.'
+    };
   }
 
   const handler = messageHandlers[data?.event];
   const hasPermission = await verifyWebhookMessagePermission(message);
   if (!hasPermission) {
-    log.warn('Webhook message without permission to be parsed', message);
-    return;
+    return {
+      success: false,
+      message: 'Webhook message without permission to be parsed.'
+    };
   }
 
   return handler(message);
