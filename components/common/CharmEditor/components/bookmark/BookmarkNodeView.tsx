@@ -25,7 +25,7 @@ export function BookmarkNodeView({
 
   const theme = useTheme();
 
-  const { data, error, isLoading } = useSWRImmutable(url ? `iframely/${encodeURIComponent(url)}?theme=${theme.palette.mode}` : null, () =>
+  const { data, error, isLoading } = useSWRImmutable(url ? `iframely/${encodeURIComponent(url)}/theme-${theme.palette.mode}` : null, () =>
     charmClient.iframely.get(url, theme.palette.mode)
   );
 
