@@ -54,7 +54,6 @@ $ cp .env.example .env
 $ npm start
 ```
 
-
 You can also easily switch environments using dotenv.
 
 To do so, create a file in the root directory ie. '.env.myenv'
