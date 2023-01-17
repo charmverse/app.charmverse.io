@@ -1,3 +1,5 @@
+import crypto from 'node:crypto';
+
 import type {
   ApplicationStatus,
   Block,
@@ -104,6 +106,8 @@ export async function generateUserAndSpaceWithApiToken(
             id: user.id
           }
         },
+        webhookSubscriptionUrl: 'https://test.com/webhook',
+        webhookSigningSecret: crypto.randomBytes(160 / 8).toString('hex'),
         updatedBy: user.id,
         updatedAt: new Date().toISOString(),
         spaceRoles: {

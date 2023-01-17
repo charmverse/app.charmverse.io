@@ -1,4 +1,4 @@
-import type { SQSBatchItemFailure, SQSEvent, SQSHandler, SQSRecord } from 'aws-lambda';
+import type { SQSBatchItemFailure, SQSBatchResponse, SQSEvent, SQSHandler, SQSRecord } from 'aws-lambda';
 import type { KeyLike } from 'jose';
 import { SignJWT } from 'jose';
 import fetch from 'node-fetch';
@@ -24,7 +24,7 @@ const signJwt = (subject: string, payload: Record<string, any>, secret: KeyLike 
 /**
  * SQS worker, message are executed one by one
  */
-export const webhookWorker: SQSHandler = async (event: SQSEvent) => {
+export const webhookWorker = async (event: SQSEvent): Promise<SQSBatchResponse> => {
   // Store failed messageIDs
   const batchItemFailures: SQSBatchItemFailure[] = [];
 
