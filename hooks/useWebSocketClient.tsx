@@ -76,7 +76,7 @@ export function WebSocketClientProvider({ children }: { children: ReactNode }) {
     socket = io(socketHost, {
       withCredentials: true
       // path: '/api/socket'
-    }).connect();
+    });
 
     socket.on('connect', () => {
       log.info('[ws] Client connected');
