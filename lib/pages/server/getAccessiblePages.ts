@@ -296,6 +296,7 @@ export async function getAccessiblePages(input: PagesRequest): Promise<IPageWith
         return (
           permission.userId === input.userId ||
           (permission.roleId &&
+            input.userId &&
             spaceRole &&
             availableRoles.some((r) =>
               r.spaceRolesToRole.some((s) => s.spaceRoleId === spaceRole?.id && r.id === permission.roleId)
