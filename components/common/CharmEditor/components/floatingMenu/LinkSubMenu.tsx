@@ -36,7 +36,13 @@ function LinkMenu({ view, originalHref = '' }: { view: EditorView; originalHref?
   };
 
   return (
-    <Stack py={2} px={1}>
+    <Stack
+      sx={{
+        backgroundColor: 'background.light',
+        px: 1
+      }}
+      py={1}
+    >
       <FieldLabel variant='subtitle2'>Link</FieldLabel>
       <TextField value={href} onChange={(e) => setHref(e.target.value)} autoFocus onKeyDown={handleSubmit} />
     </Stack>

@@ -94,6 +94,9 @@ export function LinksPopup({ pluginKey, readOnly }: { pluginKey: PluginKey<LinkP
               pt={0.5}
               pb={0.25}
               borderRadius={0.5}
+              onMouseLeave={() => {
+                hideSuggestionsTooltip(pluginKey)(view.state, view.dispatch, view);
+              }}
             >
               <Typography variant='subtitle1' color='secondary'>
                 {href}

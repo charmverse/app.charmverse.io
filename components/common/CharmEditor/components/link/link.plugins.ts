@@ -3,7 +3,11 @@ import { Plugin } from '@bangle.dev/pm';
 import { getMarkAttrs } from '@bangle.dev/utils';
 
 import { createTooltipDOM, tooltipPlacement } from '../@bangle.dev/tooltip';
-import { referenceElement, renderSuggestionsTooltip } from '../@bangle.dev/tooltip/suggest-tooltip';
+import {
+  hideSuggestionsTooltip,
+  referenceElement,
+  renderSuggestionsTooltip
+} from '../@bangle.dev/tooltip/suggest-tooltip';
 import type { SuggestionPluginState } from '../suggestions/suggestions.plugins';
 
 export type LinkPluginState = {
@@ -66,20 +70,27 @@ export function plugins({ key }: { key: PluginKey }) {
         },
         handleDOMEvents: {
           mouseover: (view, event) => {
-            const target = event.target as HTMLAnchorElement;
-            const parentElement = target?.parentElement;
+            const target = event.target as HTMLAnchorElement; // span for link
+            const parentElement = target?.parentElement; // anchor for link
             if (parentElement) {
-              const href = parentElement?.getAttribute('href');
-              if (href) {
+              const boundingRect = parentElement.getBoundingClientRect();
+              const isCharmLink = parentElement.classList.contains('charm-link');
+              const href = parentElement.getAttribute('href');
+              if (href && isCharmLink) {
                 renderSuggestionsTooltip(key, {
                   href,
                   ref: parentElement
                 })(view.state, view.dispatch, view);
+                // hover region in px
+                const BUFFER = 25;
+                parentElement.onmouseleave = (ev) => {
+                  const isWithinBufferRegion =
+                    ev.clientY > boundingRect.top && ev.clientY < boundingRect.bottom + BUFFER;
+                  if (!isWithinBufferRegion) {
+                    hideSuggestionsTooltip(key)(view.state, view.dispatch, view);
+                  }
+                };
               }
-
-              // parentElement.onmouseleave = (ev) => {
-              //   hideSuggestionsTooltip(key)(view.state, view.dispatch, view);
-              // };
             }
             return false;
           }
