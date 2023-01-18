@@ -1,6 +1,6 @@
 import ClearIcon from '@mui/icons-material/Clear';
 import ReplayIcon from '@mui/icons-material/Replay';
-import { Box, Divider, Typography, IconButton, Stack } from '@mui/material';
+import { Box, Divider, IconButton, Stack, Typography } from '@mui/material';
 import type { AlertProps } from '@mui/material/Alert';
 import MuiAlert from '@mui/material/Alert';
 import Snackbar from '@mui/material/Snackbar';
@@ -15,7 +15,7 @@ import { useMembers } from 'hooks/useMembers';
 import useOnScreen from 'hooks/useOnScreen';
 import { useUser } from 'hooks/useUser';
 import { useWebSocketClient } from 'hooks/useWebSocketClient';
-import type { PostOrder } from 'lib/forums/posts/listForumPosts';
+import type { PostSortOption } from 'lib/forums/posts/constants';
 import type { WebSocketPayload } from 'lib/websockets/interfaces';
 
 import { PostCard } from './components/PostCard';
@@ -24,7 +24,7 @@ import { PostSkeleton } from './components/PostSkeleton';
 interface ForumPostsProps {
   search: string;
   categoryId?: string;
-  sort?: PostOrder;
+  sort?: PostSortOption;
 }
 
 const resultsPerQuery = 10;

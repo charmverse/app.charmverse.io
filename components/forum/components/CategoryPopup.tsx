@@ -1,5 +1,6 @@
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+import TaskIcon from '@mui/icons-material/Task';
 import { IconButton, ListItemIcon, MenuItem, MenuList, Stack, TextField, Typography } from '@mui/material';
 import Tooltip from '@mui/material/Tooltip';
 import type { PostCategory, Space } from '@prisma/client';
@@ -49,6 +50,22 @@ export function ForumFilterCategory({ category, onChange, onDelete, onSetNewDefa
             }}
           />
         </Stack>
+        {!isDefaultSpacePostCategory && (
+          <MenuItem
+            disabled={isDefaultSpacePostCategory}
+            onClick={() => {
+              onSetNewDefaultCategory(category);
+            }}
+            sx={{
+              py: 1
+            }}
+          >
+            <ListItemIcon>
+              <TaskIcon fontSize='small' />
+            </ListItemIcon>
+            <Typography variant='subtitle1'>Set as default</Typography>
+          </MenuItem>
+        )}
         {!!onDelete && (
           <Tooltip title={isDefaultSpacePostCategory ? 'You cannot delete the default post category' : ''}>
             <div>
@@ -68,22 +85,6 @@ export function ForumFilterCategory({ category, onChange, onDelete, onSetNewDefa
               </MenuItem>
             </div>
           </Tooltip>
-        )}
-        {!isDefaultSpacePostCategory && (
-          <MenuItem
-            disabled={isDefaultSpacePostCategory}
-            onClick={() => {
-              onSetNewDefaultCategory(category);
-            }}
-            sx={{
-              py: 1
-            }}
-          >
-            <ListItemIcon>
-              <DeleteOutlinedIcon fontSize='small' />
-            </ListItemIcon>
-            <Typography variant='subtitle1'>Set as default</Typography>
-          </MenuItem>
         )}
       </MenuList>
     ),
