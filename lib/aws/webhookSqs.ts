@@ -1,7 +1,7 @@
 import type { SQSClientConfig } from '@aws-sdk/client-sqs';
-import { SQSClient, ReceiveMessageCommand, GetQueueUrlCommand, DeleteMessageCommand } from '@aws-sdk/client-sqs';
+import { SQSClient, ReceiveMessageCommand, DeleteMessageCommand } from '@aws-sdk/client-sqs';
 
-import { AWS_REGION, SQS_NAME, SQS_URL } from 'lib/aws/config';
+import { AWS_REGION, SQS_URL } from 'lib/aws/config';
 import { getLogger } from 'lib/log/prefix';
 import type { WebhookMessage, WebhookMessageProcessResult } from 'lib/webhooks/interfaces';
 
@@ -22,30 +22,13 @@ if (AWS_API_KEY && AWS_API_SECRET) {
 }
 
 const client = new SQSClient(config);
-let queueUrl = SQS_URL || '';
-
-export async function getQueueUrl() {
-  if (queueUrl) {
-    return queueUrl;
-  }
-
-  try {
-    const command = new GetQueueUrlCommand({ QueueName: SQS_NAME });
-    const res = await client.send(command);
-    queueUrl = res.QueueUrl || '';
-    return queueUrl;
-  } catch (e) {
-    log.error('Error while getting queue url', e);
-    return '';
-  }
-}
+const queueUrl = SQS_URL || '';
 
 export async function getNextMessage() {
   try {
-    const QueueUrl = await getQueueUrl();
-    if (QueueUrl) {
+    if (queueUrl) {
       // 20s polling time
-      const command = new ReceiveMessageCommand({ QueueUrl, MaxNumberOfMessages: 1, WaitTimeSeconds: 20 });
+      const command = new ReceiveMessageCommand({ QueueUrl: queueUrl, MaxNumberOfMessages: 1, WaitTimeSeconds: 20 });
       const res = await client.send(command);
 
       return res?.Messages?.[0] || null;
@@ -59,17 +42,17 @@ export async function getNextMessage() {
 }
 
 export async function deleteMessage(receipt: string) {
-  const QueueUrl = await getQueueUrl();
-  const command = new DeleteMessageCommand({ ReceiptHandle: receipt, QueueUrl });
+  const command = new DeleteMessageCommand({ ReceiptHandle: receipt, QueueUrl: queueUrl });
   const res = await client.send(command);
 
   return res.$metadata.httpStatusCode === 200;
 }
 
 export async function processMessages({ processorFn }: ProcessMssagesInput) {
-  log.debug('Process messages...');
-  log.debug('Queue name:', SQS_NAME);
-  log.debug('Region name:', AWS_REGION);
+  if (!queueUrl) {
+    log.warn('SQS queue url not found. Aborting process messages.');
+    return;
+  }
 
   const message = await getNextMessage();
 
@@ -101,9 +84,5 @@ export async function processMessages({ processorFn }: ProcessMssagesInput) {
   }
 
   // process next message
-  if (queueUrl) {
-    processMessages({ processorFn });
-  } else {
-    log.warn('SQS queue url not found');
-  }
+  processMessages({ processorFn });
 }
