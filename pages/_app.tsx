@@ -209,11 +209,6 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
       refreshSignupData();
     }
   }, [router.isReady]);
-
-  if (!router.isReady) {
-    return null;
-  }
-
   // DO NOT REMOVE CacheProvider - it protects MUI from Tailwind CSS in settings
   return (
     <CacheProvider value={emotionCache}>
