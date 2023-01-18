@@ -39,7 +39,6 @@ import { typedKeys } from 'lib/utilities/objects';
 import type { LoggedInUser } from 'models';
 
 import { boardWithCardsArgs } from './generateBoardStub';
-import { generatePostCategory } from './utils/forums';
 
 export async function generateSpaceUser({
   spaceId,

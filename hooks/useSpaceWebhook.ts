@@ -1,43 +1,58 @@
-import type { Role, Space } from '@prisma/client';
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import useSWR, { mutate } from 'swr';
 
 import charmClient from 'charmClient';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { isUrl } from 'lib/utilities/strings';
+import type { SetSpaceWebhookBody, SetSpaceWebhookResponse } from 'pages/api/spaces/[id]/set-webhook';
 
-import { useSpaces } from './useSpaces';
+import { useCurrentSpace } from './useCurrentSpace';
 
-export default function useWebhookSubscription(spaceId: string) {
-  const { setSpace } = useSpaces();
+const convertToEventMap = (webhook: SetSpaceWebhookResponse | undefined) => {
+  const eventMap = new Map<string, boolean>();
 
-  // const { data: roles } = useSWR(
-  //   () => (space ? `roles/${spaceId}` : null),
-  //   () => space && charmClient.listRoles(spaceId)
-  // );
-
-  async function updateSpaceWebhookUrl(url: string): Promise<Space> {
-    if (!isUrl(url)) {
-      throw new Error("Url isn't valid.");
-    }
-
-    const updatedSpace = await charmClient.updateSpace({ webhookSubscriptionUrl: url, id: spaceId });
-
-    setSpace(updatedSpace);
-
-    return updatedSpace;
+  if (!webhook) {
+    return undefined;
   }
 
-  async function updateWebhookSubscriptions(namespaces: Record<string, boolean>) {
-    if (!spaceId) {
-      return;
-    }
+  // Loop over all the subscriptions and create a map out of it
+  for (const subscription of webhook.webhookSubscriptions) {
+    const value = !subscription.deletedAt;
 
-    await charmClient.updateWebhookSubscription(spaceId, namespaces);
+    eventMap.set(subscription.scope, value);
   }
 
   return {
-    updateSpaceWebhookUrl,
-    updateWebhookSubscriptions
+    ...webhook,
+    eventMap
+  };
+};
+
+export default function useWebhookSubscription(spaceId: string) {
+  const space = useCurrentSpace();
+
+  const { data: spaceWebhook } = useSWR(
+    () => (space ? `webhook/${space.id}` : null),
+    () => space && charmClient.getSpaceWebhook(space.id)
+  );
+
+  async function updateSpaceWebhook(webhookOpts: SetSpaceWebhookBody): Promise<SetSpaceWebhookResponse> {
+    if (!isUrl(webhookOpts.webhookUrl)) {
+      throw new Error("Url isn't valid.");
+    }
+
+    const updatedSpaceWebhook = await charmClient.updateSpaceWebhook(spaceId, webhookOpts);
+
+    if (space?.id) {
+      mutate(`roles/${space.id}`, updatedSpaceWebhook);
+    }
+
+    return updatedSpaceWebhook;
+  }
+
+  const webhookData = useMemo(() => convertToEventMap(spaceWebhook), [spaceWebhook]);
+
+  return {
+    spaceWebhook: webhookData,
+    updateSpaceWebhook
   };
 }

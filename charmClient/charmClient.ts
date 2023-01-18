@@ -56,6 +56,7 @@ import type { ImportGuildRolesPayload } from 'pages/api/guild-xyz/importRoles';
 import type { InviteLinkPopulated } from 'pages/api/invites/index';
 import type { PublicUser } from 'pages/api/public/profile/[userId]';
 import type { ListSpaceRolesResponse } from 'pages/api/roles';
+import type { SetSpaceWebhookBody, SetSpaceWebhookResponse } from 'pages/api/spaces/[id]/set-webhook';
 import type { Response as CheckDomainResponse } from 'pages/api/spaces/checkDomain';
 import type { TelegramAccount } from 'pages/api/telegram/connect';
 
@@ -184,16 +185,20 @@ class CharmClient {
     return http.PUT<Space>(`/api/spaces/${spaceOpts.id}`, spaceOpts);
   }
 
+  updateSpaceWebhook(spaceId: string, webhookOpts: SetSpaceWebhookBody) {
+    return http.PUT<SetSpaceWebhookResponse>(`/api/spaces/${spaceId}/set-webhook`, webhookOpts);
+  }
+
   leaveSpace(spaceId: string) {
     return http.POST(`/api/spaces/${spaceId}/leave`);
   }
 
-  updateWebhookSubscription(spaceId: string, webhookSubscriptionOpts: Record<string, boolean>) {
-    return http.PUT(`/api/webhook/${spaceId}`, webhookSubscriptionOpts);
-  }
-
   getSpaces() {
     return http.GET<Space[]>('/api/spaces');
+  }
+
+  getSpaceWebhook(spaceId: string) {
+    return http.GET<SetSpaceWebhookResponse>(`/api/spaces/${spaceId}/webhook`);
   }
 
   checkDomain(params: { spaceId?: string; domain: string }) {

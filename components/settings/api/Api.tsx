@@ -2,13 +2,14 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import LaunchIcon from '@mui/icons-material/LaunchOutlined';
 import { Alert, Button, FormControlLabel, FormGroup, Grid, InputLabel, Switch, TextField } from '@mui/material';
 import Typography from '@mui/material/Typography';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
 import Link from 'components/common/Link';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import useWebhookSubscription from 'hooks/useSpaceWebhook';
+import log from 'lib/log';
 import type { ISystemError } from 'lib/utilities/errors';
 
 import Legend from '../Legend';
@@ -20,11 +21,15 @@ interface Props {
 }
 
 export const schema = yup.object({
-  webhookURL: yup.string().nullable(true),
-  discussion: yup.boolean().nullable(true),
-  comment: yup.boolean().nullable(true),
-  proposal: yup.boolean(),
-  bounty: yup.boolean()
+  webhookUrl: yup.string().nullable(true),
+  events: yup
+    .object({
+      discussion: yup.boolean().defined(),
+      comment: yup.boolean().defined(),
+      proposal: yup.boolean().defined(),
+      bounty: yup.boolean().defined()
+    })
+    .defined()
 });
 
 type FormValues = yup.InferType<typeof schema>;
@@ -32,35 +37,53 @@ type FormValues = yup.InferType<typeof schema>;
 export default function Api({ isAdmin, spaceId, spaceOwner }: Props) {
   const space = useCurrentSpace();
   const [formError, setFormError] = useState<ISystemError | null>(null);
-  const { updateSpaceWebhookUrl } = useWebhookSubscription(spaceId);
+  const { updateSpaceWebhook, spaceWebhook } = useWebhookSubscription(spaceId);
 
   const {
     register,
     handleSubmit,
     watch,
+    reset,
     formState: { errors, isValid }
   } = useForm<FormValues>({
     mode: 'onChange',
-    defaultValues: {
-      webhookURL: space?.webhookSubscriptionUrl
-    },
     resolver: yupResolver(schema)
   });
 
-  const [webhookUrl] = watch(['webhookURL']);
+  useEffect(() => {
+    if (spaceWebhook === undefined) {
+      return; // loading
+    }
+
+    const data = {
+      webhookUrl: spaceWebhook.webhookSubscriptionUrl,
+      events: {
+        discussion: spaceWebhook.eventMap.get('discussion') || false,
+        comment: spaceWebhook.eventMap.get('comment') || false,
+        proposal: spaceWebhook.eventMap.get('proposal') || false,
+        bounty: spaceWebhook.eventMap.get('bounty') || false
+      }
+    };
+
+    reset(data);
+  }, [spaceWebhook]);
+
+  const [webhookUrl, events] = watch(['webhookUrl', 'events']);
 
   async function updateWebhookSubscription(subscription: FormValues) {
-    const promises: Promise<any>[] = [];
     setFormError(null);
 
-    if (subscription.webhookURL) {
-      promises.push(updateSpaceWebhookUrl(subscription.webhookURL));
+    if (!subscription.webhookUrl) {
+      return;
     }
 
     try {
-      await Promise.all(promises);
+      await updateSpaceWebhook({
+        webhookUrl: subscription.webhookUrl,
+        events: subscription.events
+      });
     } catch (err) {
-      log.error('There was an error updating', err);
+      log.error('There was an error updating webhooks', err);
     }
 
     return false;
@@ -93,38 +116,84 @@ export default function Api({ isAdmin, spaceId, spaceOwner }: Props) {
           <Grid item xs={10}>
             <InputLabel>Webhook URL</InputLabel>
             <TextField
-              {...register('webhookURL')}
+              {...register('webhookUrl', { required: true })}
               type='text'
               size='small'
+              disabled={!isAdmin}
               fullWidth
-              error={!!errors.webhookURL?.message}
-              helperText={errors.webhookURL?.message}
+              error={!!errors.webhookUrl?.message}
+              helperText={errors.webhookUrl?.message}
               placeholder='https://your-api.com/webhook'
             />
-            {errors?.webhookURL && <Alert severity='error'>Invalid webhook url</Alert>}
+            {errors?.webhookUrl && <Alert severity='error'>Invalid webhook url</Alert>}
           </Grid>
+          {spaceWebhook?.webhookSigningSecret && isAdmin && (
+            <Grid item xs={10} mt={2}>
+              <InputLabel>Webhook Signature Secret</InputLabel>
+              <TextField
+                type='text'
+                size='small'
+                disabled={true}
+                fullWidth
+                value={spaceWebhook?.webhookSigningSecret}
+              />
+            </Grid>
+          )}
         </Grid>
         {webhookUrl && (
           <Grid item container xs mt={2}>
             <FormGroup>
-              <FormControlLabel control={<Switch defaultChecked />} label='Discussion' />
-              <FormControlLabel control={<Switch defaultChecked />} label='Comment' />
-              <FormControlLabel control={<Switch defaultChecked />} label='Proposal' />
-              <FormControlLabel control={<Switch defaultChecked />} label='Bounty' />
+              <FormControlLabel
+                control={
+                  <Switch
+                    {...register('events.discussion', { required: true })}
+                    checked={events.discussion}
+                    disabled={!isAdmin}
+                  />
+                }
+                label='Discussion'
+              />
+              <FormControlLabel
+                control={
+                  <Switch
+                    {...register('events.comment', { required: true })}
+                    checked={events.comment}
+                    disabled={!isAdmin}
+                  />
+                }
+                label='Comment'
+              />
+              <FormControlLabel
+                control={
+                  <Switch
+                    {...register('events.proposal', { required: true })}
+                    checked={events.proposal}
+                    disabled={!isAdmin}
+                  />
+                }
+                label='Proposal'
+              />
+              <FormControlLabel
+                control={
+                  <Switch
+                    {...register('events.bounty', { required: true })}
+                    checked={events.bounty}
+                    disabled={!isAdmin}
+                  />
+                }
+                label='Bounty'
+              />
             </FormGroup>
           </Grid>
         )}
         {isAdmin && (
           <Grid item container xs mt={2}>
             <Grid item xs mt={2}>
-              <Button type='submit' variant='contained' color='secondary' sx={{ mr: 1 }}>
-                Test
-              </Button>
-            </Grid>
-            <Grid item mt={2}>
-              <Button type='submit' variant='contained' color='primary' sx={{ mr: 1 }}>
-                Save
-              </Button>
+              <Grid item mt={2}>
+                <Button type='submit' variant='contained' color='primary' sx={{ mr: 1 }}>
+                  Save
+                </Button>
+              </Grid>
             </Grid>
           </Grid>
         )}
