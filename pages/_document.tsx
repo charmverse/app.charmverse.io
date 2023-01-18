@@ -1,10 +1,11 @@
 import createCache from '@emotion/cache';
 import createEmotionServer from '@emotion/server/create-instance';
 import Document, { Head, Html, Main, NextScript } from 'next/document';
+import React from 'react';
 
 import { blueColor } from 'theme/colors';
 
-// Source for Emotion SSR: import createEmotionServer from '@emotion/server/create-instance';
+// Source for Emotion SSR: https://github.com/mui/material-ui/tree/332081eb5e5e107d915e3c70f92e430dc364048f/examples/nextjs-with-typescript
 
 class MyDocument extends Document<{ emotionStyleTags: any }> {
   render() {
@@ -81,10 +82,7 @@ MyDocument.getInitialProps = async (ctx) => {
 
   ctx.renderPage = () =>
     originalRenderPage({
-      enhanceApp: (App: any) =>
-        function EnhanceApp(props) {
-          return <App emotionCache={cache} {...props} />;
-        }
+      enhanceApp: (App: any) => (props) => <App emotionCache={cache} {...props} />
     });
 
   const initialProps = await Document.getInitialProps(ctx);
@@ -102,7 +100,7 @@ MyDocument.getInitialProps = async (ctx) => {
 
   return {
     ...initialProps,
-    emotionStyleTags
+    styles: [...React.Children.toArray(initialProps.styles), ...emotionStyleTags]
   };
 };
 
