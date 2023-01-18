@@ -26,9 +26,7 @@ export function setStorageValue<T = any>(key: string, value: T, noPrefix?: boole
 }
 
 export function useLocalStorage<T = any>(key: string | null, defaultValue: T, noPrefix?: boolean) {
-  const [value, setValue] = useState<T>(() => {
-    return key ? getStorageValue(key, defaultValue, noPrefix) : defaultValue;
-  });
+  const [value, setValue] = useState<T>(defaultValue);
 
   // Any time the key changes we need to get the value from ls again
   useEffect(() => {
