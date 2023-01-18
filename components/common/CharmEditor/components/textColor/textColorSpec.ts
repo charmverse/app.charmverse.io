@@ -1,7 +1,10 @@
 // @ref: https://github.com/chanzuckerberg/czi-prosemirror/blob/master/src/TextColorMarkSpec.js
 
 import type { BaseRawMarkSpec } from '@bangle.dev/core';
+import type { MarkdownSerializerState } from 'prosemirror-markdown';
 import type { Mark } from 'prosemirror-model';
+
+import log from 'lib/log';
 
 import type { TextColorAttrs } from './config';
 import { markName } from './config';
@@ -41,6 +44,12 @@ export function spec(): BaseRawMarkSpec {
           style += `background-color: var(--bg-${bgColor});`;
         }
         return ['span', { 'data-color': color, 'data-bg-color': bgColor, style }, 0];
+      }
+    },
+    markdown: {
+      toMarkdown: {
+        open: '',
+        close: ''
       }
     }
   };
