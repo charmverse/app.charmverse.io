@@ -37,7 +37,7 @@ function ForumFilterListLink({ category, label, sort }: { label: string; categor
   const { showMessage } = useSnackbar();
   const router = useRouter();
   const selectedCategory = router.query.categoryId as string | undefined;
-  const selectedSort = router.query.sort as string | undefined;
+  const selectedSort = (router.query.sort as string | undefined) ?? 'new';
   const admin = isAdmin();
   const link =
     label === 'All categories'
