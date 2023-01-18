@@ -38,8 +38,8 @@ describe('getTemplateExplanation', () => {
       'Space members can view, edit, comment on, share and delete new top-level pages by default.'
     ];
     const cannot = [
-      'Anyone outside the Space cannot see new top-level pages by default.',
-      'Anyone outside the Space cannot see bounties and bounty suggestions.'
+      'Anyone outside the space cannot see new top-level pages by default.',
+      'Anyone outside the space cannot see bounties and bounty suggestions.'
     ];
 
     const [canExplained, cannotExplained] = getTemplateExplanation('collaborative');
