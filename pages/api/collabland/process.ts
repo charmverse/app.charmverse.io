@@ -8,7 +8,7 @@ import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireUser).get(processSqs);
+handler.get(processSqs);
 
 async function processSqs(req: NextApiRequest, res: NextApiResponse<{ status: 'ok' }>) {
   log.info('Start processing webhook messages');
