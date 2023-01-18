@@ -42,9 +42,21 @@ npm start
 
 3. Configure your environment.
 
-You'll need certain environment variables to be set for Charmverse to work.
+Copy [.env.example](https://github.com/charmverse/app.charmverse.io/blob/main/.env.example) to .env, and add the required secrets as well as any extra ones for features you wish to enable.
 
-See [.env.example](https://github.com/charmverse/app.charmverse.io/blob/main/.env.example) for the full list of variables.
+
+```bash
+# Setup the .env file
+$ cp .env.example .env
+```
+
+4. Start the app.
+
+```bash
+# By default, Next.JS will search for the values
+$ npm start
+```
+
 
 You can also easily switch environments using dotenv.
 
@@ -52,19 +64,8 @@ To do so, create a file in the root directory ie. '.env.myenv'
 
 Start the app from the dotenv CLI, which you can download [here](https://www.npmjs.com/package/dotenv-cli).
 
-```
-$ dotenv -e .env.myenv -- npm start
-```
-
 For further information about environment variables in Next.js, see the [docs](https://nextjs.org/docs/basic-features/environment-variables).
 
-4. (Optional) Configure S3 for image uploads.
-
-Until we have a decentralized solution, we currently use s3 to store images. You will need to add the following to your `.env.local` file:
-S3_UPLOAD_KEY=???
-S3_UPLOAD_SECRET=???
-S3_UPLOAD_BUCKET=charm.public.dev
-S3_UPLOAD_REGION=us-east-1
 
 ### Access your local server via https
 

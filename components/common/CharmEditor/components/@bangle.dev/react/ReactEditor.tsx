@@ -158,7 +158,7 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
   }, [user, pageId, useSockets, authResponse, authResponse, ref]);
 
   useEffect(() => {
-    const timer = setTimeout(() => setShowLoader(true), 200);
+    const timer = setTimeout(() => setShowLoader(true), 300);
     return () => clearTimeout(timer);
   }, [setShowLoader]);
 
