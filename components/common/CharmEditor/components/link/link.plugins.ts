@@ -70,9 +70,9 @@ export function plugins({ key }: { key: PluginKey }) {
                 })(view.state, view.dispatch, view);
               }
 
-              parentElement.onmouseleave = (ev) => {
-                hideSuggestionsTooltip(key)(view.state, view.dispatch, view);
-              };
+              // parentElement.onmouseleave = (ev) => {
+              //   hideSuggestionsTooltip(key)(view.state, view.dispatch, view);
+              // };
             }
             return false;
           }
