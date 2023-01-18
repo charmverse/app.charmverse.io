@@ -53,7 +53,11 @@ export function ForumPostList({ search, categoryId, sort }: ForumPostsProps) {
   } = useSWRInfinite(
     (index) =>
       currentSpace && !search
-        ? { url: 'forums/posts', arguments: { spaceId: currentSpace?.id, page: index, categoryId, sort } }
+        ? {
+            url: 'forums/posts',
+            // include userId to update votes if the user changes
+            arguments: { userId: user?.id, spaceId: currentSpace?.id, page: index, categoryId, sort }
+          }
         : null,
     (args) =>
       charmClient.forum.listForumPosts({
@@ -72,7 +76,13 @@ export function ForumPostList({ search, categoryId, sort }: ForumPostsProps) {
     setSize: setSearchSize,
     isLoading: isLoadingSearch
   } = useSWRInfinite(
-    (index) => (currentSpace && search ? { url: 'forums/posts/search', arguments: { page: index, search } } : null),
+    (index) =>
+      currentSpace && search
+        ? {
+            url: 'forums/posts/search',
+            arguments: { userId: user?.id, spaceId: currentSpace?.id, page: index, search }
+          }
+        : null,
     (args) =>
       charmClient.forum.searchForumPosts({
         spaceId: currentSpace!.id,
