@@ -35,13 +35,6 @@ export function plugins({
         return null;
       }
 
-      // If we are inside a link
-      if (hasComponentInSchema(state, 'link')) {
-        if (link.queryIsSelectionAroundLink()(state) || link.queryIsLinkActive()(state)) {
-          return 'linkSubMenu';
-        }
-      }
-
       // if inside a table, first check to see if we are resizing or not
       const isInsideTable = state.selection.$anchor.parent.type.name.match(
         /^(table_cell|table_header|horizontalRule)$/

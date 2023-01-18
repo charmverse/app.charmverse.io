@@ -13,6 +13,7 @@ export type LinkPluginState = {
   show: boolean;
   href: string;
   tooltipContentDOM: HTMLElement;
+  ref: HTMLElement | null;
 };
 
 export function plugins({ key }: { key: PluginKey }) {
@@ -48,6 +49,7 @@ export function plugins({ key }: { key: PluginKey }) {
             return {
               ...pluginState,
               href: null,
+              ref: null,
               show: false
             };
           }
@@ -58,16 +60,21 @@ export function plugins({ key }: { key: PluginKey }) {
         handleDOMEvents: {
           mouseover: (view, event) => {
             const target = event.target as HTMLAnchorElement;
-            const href = target?.parentElement?.getAttribute('href');
-            if (href) {
-              renderSuggestionsTooltip(key, {
-                href
-              })(view.state, view.dispatch, view);
+            const parentElement = target?.parentElement;
+            if (parentElement) {
+              const href = parentElement?.getAttribute('href');
+              if (href) {
+                renderSuggestionsTooltip(key, {
+                  href,
+                  ref: parentElement
+                })(view.state, view.dispatch, view);
+              }
+
+              parentElement.onmouseleave = (ev) => {
+                hideSuggestionsTooltip(key)(view.state, view.dispatch, view);
+              };
             }
             return false;
-          },
-          mouseleave: (view) => {
-            hideSuggestionsTooltip(key)(view.state, view.dispatch, view);
           }
         }
       }

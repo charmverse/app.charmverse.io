@@ -365,7 +365,7 @@ export function FloatingLinkButton({
         (state: EditorState) => createLink('')(state),
         (_state, dispatch, _view) => {
           if (dispatch && _view) {
-            toggleSubMenu(menuKey, 'linkSubMenu')(_view.state, _view.dispatch, _view);
+            // toggleSubMenu(menuKey, 'linkSubMenu')(_view.state, _view.dispatch, _view);
             rafCommandExec(_view, focusFloatingMenuInput(menuKey));
           }
           return true;

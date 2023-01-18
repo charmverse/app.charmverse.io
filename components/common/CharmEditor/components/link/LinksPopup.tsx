@@ -11,7 +11,6 @@ import type { LinkPluginState } from './link.plugins';
 export function LinksPopup({ pluginKey, readOnly }: { pluginKey: PluginKey<LinkPluginState>; readOnly: boolean }) {
   const view = useEditorViewContext();
   const { tooltipContentDOM, show: isVisible, href } = usePluginState(pluginKey) as LinkPluginState;
-
   if (isVisible) {
     return createPortal(
       <ClickAwayListener
@@ -29,7 +28,17 @@ export function LinksPopup({ pluginKey, readOnly }: { pluginKey: PluginKey<LinkP
           }}
           timeout={250}
         >
-          <Box display='flex' alignItems='center' flexDirection='row' gap={1}>
+          <Box
+            sx={{ backgroundColor: 'background.light' }}
+            display='flex'
+            alignItems='center'
+            flexDirection='row'
+            gap={1}
+            px={1}
+            pt={0.5}
+            pb={0.25}
+            borderRadius={0.5}
+          >
             <Typography variant='subtitle1' color='secondary'>
               {href}
             </Typography>
@@ -39,7 +48,7 @@ export function LinksPopup({ pluginKey, readOnly }: { pluginKey: PluginKey<LinkP
                 fontSize: 14
               }}
             />
-            {!readOnly && <Typography>Edit</Typography>}
+            {!readOnly && <Typography variant='subtitle1'>Edit</Typography>}
           </Box>
         </Grow>
       </ClickAwayListener>,
