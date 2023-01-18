@@ -17,7 +17,7 @@ export function CategoryPosts({ categoryId, postId }: { postId: string; category
   const currentSpace = useCurrentSpace();
   const { categories } = useForumCategories();
   const category = categories.find((_category) => _category.id === categoryId);
-  const [sort, setSort] = useState<ListForumPostsRequest['sort']>('newest');
+  const [sort, setSort] = useState<ListForumPostsRequest['sort']>('new');
   const { showPost } = usePostDialog();
   const router = useRouter();
 
