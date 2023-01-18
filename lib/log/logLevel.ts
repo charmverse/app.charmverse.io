@@ -3,11 +3,12 @@ import _log from 'loglevel';
 import { DateTime } from 'luxon';
 
 import * as http from 'adapters/http';
-import { isNodeEnv, isProdEnv } from 'config/constants';
+import { isNodeEnv, isProdEnv, isStagingEnv } from 'config/constants';
 
 const TIMESTAMP_FORMAT = 'yyyy-LL-dd HH:mm:ss';
 const ERRORS_WEBHOOK = process.env.NEXT_PUBLIC_DISCORD_WEBHOOK_ERRORS;
 const originalFactory = _log.methodFactory;
+const logsForDatadog = true; // (isProdEnv || isStagingEnv) && isNodeEnv;
 
 export function apply(log: Logger, logPrefix: string = '') {
   const defaultLevel = (process.env.LOG_LEVEL as LogLevelDesc) || log.levels.DEBUG;
@@ -20,7 +21,7 @@ export function apply(log: Logger, logPrefix: string = '') {
 
       return (message, opt) => {
         let prefix = '';
-        if (isProdEnv && isNodeEnv) {
+        if (logsForDatadog) {
           prefix = `[${DateTime.local().toFormat(TIMESTAMP_FORMAT)}]`;
         }
         if (isNodeEnv) {
@@ -33,7 +34,20 @@ export function apply(log: Logger, logPrefix: string = '') {
           prefix += ' ';
         }
 
-        const args = opt ? [`${prefix}${message}`, opt] : [`${prefix}${message}`];
+        let args: any[];
+        if (logsForDatadog) {
+          const _opt = { ...opt };
+          // TODO: try adding datadog trace info to logs, it wont build with webpack though
+          // const span = tracer.scope().active();
+          // if (span) {
+          //   tracer.inject(span.context(), formats.LOG, _opt);
+          // }
+          // use JSON format for datadog
+          const singleLineLog = `${prefix}${message} ${JSON.stringify(_opt)}`;
+          args = [singleLineLog];
+        } else {
+          args = opt ? [`${prefix}${message}`, opt] : [`${prefix}${message}`];
+        }
         originalMethod.apply(null, args);
 
         // post errors to Discord
