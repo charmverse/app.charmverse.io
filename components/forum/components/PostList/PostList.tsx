@@ -51,10 +51,13 @@ export function ForumPostList({ search, categoryId, sort }: ForumPostsProps) {
     isLoading: isLoadingPosts,
     mutate: mutatePosts
   } = useSWRInfinite(
-    (index) => (currentSpace && !search ? { url: 'forums/posts', arguments: { page: index, categoryId, sort } } : null),
+    (index) =>
+      currentSpace && !search
+        ? { url: 'forums/posts', arguments: { spaceId: currentSpace?.id, page: index, categoryId, sort } }
+        : null,
     (args) =>
       charmClient.forum.listForumPosts({
-        spaceId: currentSpace!.id,
+        spaceId: args.arguments.spaceId,
         categoryId: args.arguments.categoryId,
         count: resultsPerQuery,
         page: args.arguments.page,
