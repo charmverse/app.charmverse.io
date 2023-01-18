@@ -20,8 +20,7 @@ export default function RouteGuard({ children }: { children: ReactNode }) {
   const [authorized, setAuthorized] = useState(true);
   const { user, setUser, isLoaded } = useUser();
   const { spaces, isLoaded: isSpacesLoaded } = useSpaces();
-  const isRouterLoading = !router.isReady;
-  const isLoading = !isLoaded || isRouterLoading || !isSpacesLoaded;
+  const isLoading = !isLoaded || !isSpacesLoaded;
   const authorizedSpaceDomainRef = useRef('');
 
   if (typeof window !== 'undefined') {
@@ -129,7 +128,7 @@ export default function RouteGuard({ children }: { children: ReactNode }) {
     }
   }
 
-  if (!authorized || !router.isReady) {
+  if (!authorized) {
     return null;
   }
   return <span style={{ display: isLoading ? 'none' : 'inline' }}>{children}</span>;
