@@ -71,13 +71,13 @@ export function CategoryPosts({ categoryId, postId }: { postId: string; category
           <Stack mb={1}>
             <MenuItem
               onClick={() => {
-                setSort('newest');
+                setSort('new');
               }}
             >
               <Typography
                 sx={{
                   color: 'text.primary',
-                  fontWeight: sort === 'newest' ? 'bold' : 'initial'
+                  fontWeight: sort === 'new' ? 'bold' : 'initial'
                 }}
               >
                 Newest Posts
