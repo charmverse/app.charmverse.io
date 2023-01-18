@@ -156,7 +156,12 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
 
       const storedWalletSignature = getStoredSignature();
       setSignature(storedWalletSignature);
-    } else if (isLoaded && account && !user?.wallets.some((w) => lowerCaseEqual(w.address, account))) {
+    } else if (
+      isLoaded &&
+      account &&
+      // Only apply the following logic to users that have at least 1 wallet
+      (!user || (!!user?.wallets.length && !user?.wallets.some((w) => lowerCaseEqual(w.address, account))))
+    ) {
       const storedSignature = getStoredSignature();
 
       if (storedSignature) {
@@ -165,13 +170,11 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
           setStoredAccount(null);
           logoutUser();
         });
+      } else {
+        setSignature(null);
+        setStoredAccount(null);
+        logoutUser();
       }
-      // TODO: Ask Mo hwo to handle this state
-      // } else {
-      //   setSignature(null);
-      //   setStoredAccount(null);
-      //   logoutUser();
-      // }
     }
   }, [account, user, isConnectingIdentity, isLoaded]);
 
