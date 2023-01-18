@@ -2,11 +2,7 @@ import type { PluginKey } from '@bangle.dev/pm';
 import { Plugin } from '@bangle.dev/pm';
 
 import { createTooltipDOM, tooltipPlacement } from '../@bangle.dev/tooltip';
-import {
-  hideSuggestionsTooltip,
-  referenceElement,
-  renderSuggestionsTooltip
-} from '../@bangle.dev/tooltip/suggest-tooltip';
+import { referenceElement, renderSuggestionsTooltip } from '../@bangle.dev/tooltip/suggest-tooltip';
 import type { SuggestionPluginState } from '../suggestions/suggestions.plugins';
 
 export type LinkPluginState = {

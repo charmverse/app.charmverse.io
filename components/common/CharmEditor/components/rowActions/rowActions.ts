@@ -125,7 +125,7 @@ export function plugins({ key }: { key: PluginKey }) {
   ];
 }
 
-function posAtCoords(view: EditorView, coords: { left: number; top: number }) {
+export function posAtCoords(view: EditorView, coords: { left: number; top: number }) {
   const pos = view.posAtCoords(coords);
   if (!pos) {
     return null;
@@ -135,7 +135,7 @@ function posAtCoords(view: EditorView, coords: { left: number; top: number }) {
   return startPos;
 }
 
-function rowNodeAtPos(view: EditorView, startPos: number) {
+export function rowNodeAtPos(view: EditorView, startPos: number) {
   const dom = view.domAtPos(startPos);
   let rowNode = dom.node;
   // Note: for leaf nodes, domAtPos() only returns the parent with an offset. text nodes have an offset but don't have childNodes

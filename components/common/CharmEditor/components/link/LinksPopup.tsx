@@ -1,6 +1,18 @@
 import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
 import ContentCopyOutlinedIcon from '@mui/icons-material/ContentCopyOutlined';
-import { Box, ClickAwayListener, Grow, IconButton, Stack, TextField, Typography } from '@mui/material';
+import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
+import {
+  Box,
+  ClickAwayListener,
+  Grow,
+  IconButton,
+  ListItemIcon,
+  MenuItem,
+  MenuList,
+  Stack,
+  TextField,
+  Typography
+} from '@mui/material';
 import type { PluginKey } from 'prosemirror-state';
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
@@ -16,8 +28,7 @@ export function LinksPopup({ pluginKey, readOnly }: { pluginKey: PluginKey<LinkP
   const { showMessage } = useSnackbar();
   const view = useEditorViewContext();
   const [linkView, setLinkView] = useState<'link-textfield' | 'options'>('options');
-  const { tooltipContentDOM, show: isVisible, href } = usePluginState(pluginKey) as LinkPluginState;
-
+  const { tooltipContentDOM, show: isVisible, href, ref } = usePluginState(pluginKey) as LinkPluginState;
   const [linkHref, setLinkHref] = useState(href);
 
   useEffect(() => {
@@ -28,6 +39,36 @@ export function LinksPopup({ pluginKey, readOnly }: { pluginKey: PluginKey<LinkP
     setLinkView('options');
     setLinkHref('');
     hideSuggestionsTooltip(pluginKey)(view.state, view.dispatch, view);
+  }
+
+  function deleteHref() {
+    if (ref) {
+      const pmViewDesc = ref.pmViewDesc;
+      const linkMarkType = view.state.schema.marks.link;
+      if (pmViewDesc) {
+        view.dispatch(view.state.tr.removeMark(pmViewDesc.posAtStart, pmViewDesc.posAtEnd, linkMarkType));
+        hideTooltip();
+      }
+    }
+  }
+
+  function updateHref(e: React.KeyboardEvent) {
+    e.stopPropagation();
+    if (e.code === 'Enter' && ref) {
+      const pmViewDesc = ref.pmViewDesc;
+      const linkMarkType = view.state.schema.marks.link;
+      const updatedLinkMarkType = linkMarkType.create({
+        href: linkHref
+      });
+      if (pmViewDesc) {
+        view.dispatch(
+          view.state.tr
+            .removeMark(pmViewDesc.posAtStart, pmViewDesc.posAtEnd, linkMarkType)
+            .addMark(pmViewDesc.posAtStart, pmViewDesc.posAtEnd, updatedLinkMarkType)
+        );
+        hideTooltip();
+      }
+    }
   }
 
   if (isVisible) {
@@ -83,25 +124,35 @@ export function LinksPopup({ pluginKey, readOnly }: { pluginKey: PluginKey<LinkP
               )}
             </Box>
           ) : (
-            <Stack
-              p={1}
+            <MenuList
               sx={{
                 backgroundColor: 'background.light'
               }}
             >
-              <FieldLabel variant='subtitle2'>Link</FieldLabel>
-              <TextField
-                value={linkHref}
-                onChange={(e) => setLinkHref(e.target.value)}
-                autoFocus
-                onKeyDown={(e) => {
-                  e.stopPropagation();
-                  if (e.code === 'Enter') {
-                    hideTooltip();
-                  }
-                }}
-              />
-            </Stack>
+              <Stack p={1}>
+                <FieldLabel variant='subtitle2'>Link</FieldLabel>
+                <TextField
+                  value={linkHref}
+                  onChange={(e) => setLinkHref(e.target.value)}
+                  autoFocus
+                  onKeyDown={updateHref}
+                />
+              </Stack>
+              <div>
+                <MenuItem
+                  disabled={readOnly}
+                  onClick={deleteHref}
+                  sx={{
+                    py: 1
+                  }}
+                >
+                  <ListItemIcon>
+                    <DeleteOutlinedIcon fontSize='small' />
+                  </ListItemIcon>
+                  <Typography variant='subtitle1'>Delete</Typography>
+                </MenuItem>
+              </div>
+            </MenuList>
           )}
         </Grow>
       </ClickAwayListener>,
@@ -110,24 +161,3 @@ export function LinksPopup({ pluginKey, readOnly }: { pluginKey: PluginKey<LinkP
   }
   return null;
 }
-
-// {!!onDelete && (
-//   <Tooltip title={isDefaultSpacePostCategory ? 'You cannot delete the default post category' : ''}>
-//     <div>
-//       <MenuItem
-//         disabled={isDefaultSpacePostCategory}
-//         onClick={() => {
-//           onDelete(category);
-//         }}
-//         sx={{
-//           py: 1
-//         }}
-//       >
-//         <ListItemIcon>
-//           <DeleteOutlinedIcon fontSize='small' />
-//         </ListItemIcon>
-//         <Typography variant='subtitle1'>Delete</Typography>
-//       </MenuItem>
-//     </div>
-//   </Tooltip>
-// )}}
