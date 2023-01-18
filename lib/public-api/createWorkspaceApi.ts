@@ -89,7 +89,6 @@ export async function createWorkspaceApi({
 
   // create roles from discord
   if (discordServerId) {
-    // upsert all roles from discord
     await upsertSpaceRolesFromDiscord({ space, userId: botUser.id });
   }
 
