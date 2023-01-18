@@ -2,6 +2,11 @@
 import { prisma } from 'db'
 import { strict as assert } from 'node:assert';
 
+
+/**
+ * See this doc for usage instructions
+ * https://app.charmverse.io/charmverse/page-8245745086136205
+ */
 async function reopenProposal (path: string, newDate: Date) {
   const spaceDomain = path.split('/')[0];
   const spacePagePath = path.split('/')[1];
@@ -49,5 +54,4 @@ async function reopenProposal (path: string, newDate: Date) {
   console.log('Proposal updated', proposalRes.id, proposalRes.status);
 }
 
-reopenProposal('story-dao/page-04742242151671694', new Date(2022, 11, 21, 23 ));
-reopenProposal('story-dao/page-08009722798423935', new Date(2022, 11, 21, 23 ));
+reopenProposal('spacedomain/page-5167169422333', new Date(2022, 11, 21, 23 ));
