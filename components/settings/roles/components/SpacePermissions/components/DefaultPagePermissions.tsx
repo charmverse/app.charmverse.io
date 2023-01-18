@@ -34,7 +34,7 @@ export default function DefaultSpacePagePermissions() {
 
   const isAdmin = useIsAdmin();
   const [touched, setTouched] = useState<boolean>(false);
-  const popupState = usePopupState({ variant: 'popover', popupId: 'space-default-page-permission' });
+  const popupState = usePopupState({ variant: 'popover', popupId: 'workspace-default-page-permission' });
 
   // Permission states
   const [selectedPagePermission, setSelectedPagePermission] =

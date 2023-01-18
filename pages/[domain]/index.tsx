@@ -19,7 +19,7 @@ export default function RedirectToMainPage() {
     'bounties',
     'members',
     'proposals',
-    'settings/space',
+    'settings/workspace',
     'settings/members',
     'settings/roles',
     'settings/invites'

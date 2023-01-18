@@ -1,7 +1,7 @@
 export const DOMAIN_BLACKLIST = [
   'api',
   'api-docs',
-  'createSpace',
+  'createWorkspace',
   'integrations',
   'invite',
   'login',

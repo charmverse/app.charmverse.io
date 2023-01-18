@@ -34,7 +34,7 @@ const config = {
     return [
       {
         source: '/:domain(^(?!.*\bapi\b).*$)/settings',
-        destination: '/:domain/settings/space',
+        destination: '/:domain/settings/workspace',
         permanent: false
       },
       {
