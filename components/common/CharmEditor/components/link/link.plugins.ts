@@ -1,5 +1,6 @@
 import type { PluginKey } from '@bangle.dev/pm';
 import { Plugin } from '@bangle.dev/pm';
+import { getMarkAttrs } from '@bangle.dev/utils';
 
 import { createTooltipDOM, tooltipPlacement } from '../@bangle.dev/tooltip';
 import { referenceElement, renderSuggestionsTooltip } from '../@bangle.dev/tooltip/suggest-tooltip';
@@ -53,6 +54,16 @@ export function plugins({ key }: { key: PluginKey }) {
         }
       },
       props: {
+        handleClick: (view, _pos, event) => {
+          const { schema } = view.state;
+          const markType = schema.marks.link;
+          const attrs = getMarkAttrs(view.state, markType);
+          if (attrs.href) {
+            event.stopPropagation();
+            window.open(attrs.href);
+          }
+          return false;
+        },
         handleDOMEvents: {
           mouseover: (view, event) => {
             const target = event.target as HTMLAnchorElement;
