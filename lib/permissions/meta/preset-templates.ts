@@ -51,9 +51,9 @@ export const permissionTemplates: Record<SpaceConfigurationPreset, SpacePermissi
 
 export const configurationModeName: Record<SpacePermissionConfigurationMode, string> = {
   custom: 'Custom settings',
-  readOnly: 'Read-only workspace',
-  collaborative: 'Collaborative workspace',
-  open: 'Public workspace'
+  readOnly: 'Read-only space',
+  collaborative: 'Collaborative space',
+  open: 'Public space'
 };
 
 export const configurationModeDescription: Record<SpacePermissionConfigurationMode, string> = {
@@ -79,7 +79,7 @@ export function getTemplateExplanation(template: SpacePermissionConfigurationMod
   for (const [operation, can] of Object.entries(templateData.spaceOperations) as [SpaceOperation, boolean][]) {
     const qualifier = can ? 'can' : 'cannot';
 
-    const sentence = `Workspace members ${qualifier} ${spaceOperationLabels[operation].toLowerCase()}.`;
+    const sentence = `Space members ${qualifier} ${spaceOperationLabels[operation].toLowerCase()}.`;
 
     if (can) {
       canAndCannot[0].push(sentence);
@@ -92,18 +92,16 @@ export function getTemplateExplanation(template: SpacePermissionConfigurationMod
   const { defaultPagePermissionGroup } = templateData.pagePermissionDefaults;
 
   if (defaultPagePermissionGroup === 'full_access') {
-    canAndCannot[0].push(
-      'Workspace members can view, edit, comment on, share and delete new top-level pages by default.'
-    );
+    canAndCannot[0].push('Space members can view, edit, comment on, share and delete new top-level pages by default.');
   } else if (defaultPagePermissionGroup === 'editor') {
-    canAndCannot[0].push('Workspace members can view, edit and comment on new top-level pages by default.');
-    canAndCannot[1].push('Workspace members cannot share or delete new top-level pages by default.');
+    canAndCannot[0].push('Space members can view, edit and comment on new top-level pages by default.');
+    canAndCannot[1].push('Space members cannot share or delete new top-level pages by default.');
   } else if (defaultPagePermissionGroup === 'view_comment') {
-    canAndCannot[0].push('Workspace members can view and comment on new top-level pages by default.');
-    canAndCannot[1].push('Workspace members cannot edit, share or delete new top-level pages by default.');
+    canAndCannot[0].push('Space members can view and comment on new top-level pages by default.');
+    canAndCannot[1].push('Space members cannot edit, share or delete new top-level pages by default.');
   } else if (templateData.pagePermissionDefaults.defaultPagePermissionGroup === 'view') {
-    canAndCannot[0].push('Workspace members can view new top-level pages by default.');
-    canAndCannot[1].push('Workspace members cannot comment on, edit, share or delete new top-level pages by default.');
+    canAndCannot[0].push('Space members can view new top-level pages by default.');
+    canAndCannot[1].push('Space members cannot comment on, edit, share or delete new top-level pages by default.');
   }
 
   // Explain if new top level pages will be public
@@ -112,16 +110,16 @@ export function getTemplateExplanation(template: SpacePermissionConfigurationMod
   if (defaultPublicPages) {
     canAndCannot[0].push('Anyone can see new top-level pages by default.');
   } else {
-    canAndCannot[1].push('Anyone outside the workspace cannot see new top-level pages by default.');
+    canAndCannot[1].push('Anyone outside the space cannot see new top-level pages by default.');
   }
 
   // Explain the status of the bounty board
   const { publicBountyBoard } = templateData.pagePermissionDefaults;
 
   if (publicBountyBoard) {
-    canAndCannot[0].push('Anyone can see bounties and bounty suggestions visible to workspace members.');
+    canAndCannot[0].push('Anyone can see bounties and bounty suggestions visible to space members.');
   } else {
-    canAndCannot[1].push('Anyone outside the workspace cannot see bounties and bounty suggestions.');
+    canAndCannot[1].push('Anyone outside the space cannot see bounties and bounty suggestions.');
   }
 
   return canAndCannot;

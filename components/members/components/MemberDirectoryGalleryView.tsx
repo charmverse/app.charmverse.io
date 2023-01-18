@@ -61,7 +61,7 @@ function MemberDirectoryGalleryCard({ member }: { member: Member }) {
   return (
     <>
       <StyledLink
-        href={`/u/${member.path || member.id}${currentSpace ? `?workspace=${currentSpace.id}` : ''}`}
+        href={`/u/${member.path || member.id}${currentSpace ? `?space=${currentSpace.id}` : ''}`}
         color='primary'
       >
         <Card sx={{ width: '100%' }}>

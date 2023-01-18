@@ -106,7 +106,7 @@ export default function RouteGuard({ children }: { children: ReactNode }) {
     }
     // condition: trying to access a space without access
     else if (isSpaceDomain(spaceDomain) && !spaces.some((s) => s.domain === spaceDomain)) {
-      log.info('[RouteGuard]: send to join workspace page');
+      log.info('[RouteGuard]: send to join space page');
       if (authorizedSpaceDomainRef.current === spaceDomain) {
         authorizedSpaceDomainRef.current = '';
         return {

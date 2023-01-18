@@ -147,17 +147,17 @@ export default function SpacePermissions({ targetGroup, id, callback = () => nul
         <Grid container direction='column' gap={2}>
           <Grid item xs>
             <Typography variant='body2' fontWeight='bold'>
-              Workspace permissions
+              Space permissions
             </Typography>
             <Typography variant='caption'>
               {targetGroup === 'space' &&
-                'Enabling permissions here will allow every workspace member to perform the relevant action, whatever their roles and permissions.'}
+                'Enabling permissions here will allow every space member to perform the relevant action, whatever their roles and permissions.'}
 
               {targetGroup === 'role' &&
-                'Workspace members with this role can perform all enabled actions, even if these actions are disabled at the workspace level.'}
+                'Space members with this role can perform all enabled actions, even if these actions are disabled at the space level.'}
 
               {targetGroup === 'user' &&
-                'This user can perform all enabled actions, even if these actions are disabled at the workspace level.'}
+                'This user can perform all enabled actions, even if these actions are disabled at the space level.'}
             </Typography>
           </Grid>
 
@@ -190,10 +190,10 @@ export default function SpacePermissions({ targetGroup, id, callback = () => nul
                   >
                     {targetGroup === 'space' &&
                       newValues[operation] === true &&
-                      `All members of your workspace can ${actionLabel.toLowerCase()}`}
+                      `All members of your space can ${actionLabel.toLowerCase()}`}
                     {targetGroup === 'space' &&
                       newValues[operation] === false &&
-                      `Workspace members cannot ${actionLabel.toLowerCase()}`}
+                      `Space members cannot ${actionLabel.toLowerCase()}`}
                     {targetGroup === 'role' &&
                       newValues[operation] === true &&
                       `Members with this role can ${actionLabel.toLowerCase()}`}

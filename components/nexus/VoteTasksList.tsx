@@ -163,7 +163,7 @@ export function VoteTasksList({ error, tasks, mutateTasks }: VoteTasksListProps)
           <TableRow>
             <TableCell>Poll</TableCell>
             <TableCell width={300}>Page</TableCell>
-            <TableCell width={200}>Workspace</TableCell>
+            <TableCell width={200}>Space</TableCell>
             <TableCell align='center'>Due</TableCell>
             <TableCell width='135' align='center'>
               Action

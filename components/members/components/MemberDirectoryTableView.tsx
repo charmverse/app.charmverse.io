@@ -179,7 +179,7 @@ function MemberDirectoryTableRow({ member }: { member: Member }) {
                 <TableCell key={property.id}>
                   <Link
                     color='inherit'
-                    href={`/u/${member.path || member.id}${currentSpace ? `?workspace=${currentSpace.id}` : ''}`}
+                    href={`/u/${member.path || member.id}${currentSpace ? `?space=${currentSpace.id}` : ''}`}
                   >
                     <Typography fontWeight='bold'>{(memberProperty.value as string) ?? member.username}</Typography>
                   </Link>

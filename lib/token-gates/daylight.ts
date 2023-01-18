@@ -43,7 +43,7 @@ export async function addDaylightAbility(tokenGate: TokenGate) {
       requirements: requirementsData.requirements,
       requirementsLogic: requirementsData.operator,
       action: { linkUrl: getActionUrl(space.domain) },
-      title: ` Join the ${space.name} Workspace on CharmVerse`,
+      title: ` Join the ${space.name} Space on CharmVerse`,
       description:
         'We are using CharmVerse to coordinate tasks, host discussion, share documents and facilitate decisions. Join us.',
       type: 'access',

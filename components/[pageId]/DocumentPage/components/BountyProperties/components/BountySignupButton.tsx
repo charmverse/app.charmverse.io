@@ -1,13 +1,11 @@
 import { Box } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
-import { useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import charmClient from 'charmClient';
-import { Web3Connection } from 'components/_app/Web3ConnectionManager';
 import Button from 'components/common/Button';
 import Modal from 'components/common/Modal';
-import PrimaryButton from 'components/common/PrimaryButton';
 import TokenGateForm from 'components/common/TokenGateForm';
 import { WalletSign } from 'components/login/WalletSign';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -62,7 +60,7 @@ export function BountySignupButton({ bountyPage }: Props) {
       <Box display='flex' justifyContent='center' sx={{ my: 2 }} data-test='public-bounty-space-action'>
         {showSignup && (
           <Button color='primary' onClick={loginViaTokenGateModal.open}>
-            Join this workspace to apply
+            Join this space to apply
           </Button>
         )}
 
@@ -73,7 +71,7 @@ export function BountySignupButton({ bountyPage }: Props) {
               router.push(`/${space?.domain}/${bountyPage.path}`);
             }}
           >
-            View this bounty inside the workspace
+            View this bounty inside the space
           </Button>
         )}
       </Box>
@@ -82,7 +80,7 @@ export function BountySignupButton({ bountyPage }: Props) {
         size='large'
         open={loginViaTokenGateModal.isOpen}
         onClose={loginViaTokenGateModal.close}
-        title={`Join the ${space?.name} workspace to apply`}
+        title={`Join the ${space?.name} space to apply`}
       >
         {!account ? (
           <Box display='flex' justifyContent='center' sx={{ mt: 3 }}>

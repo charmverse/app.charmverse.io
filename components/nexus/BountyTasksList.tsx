@@ -22,7 +22,7 @@ import Table from './components/NexusTable';
 function BountiesTasksListRow({ bountyTask }: { bountyTask: BountyTask }) {
   const { pageTitle, spaceName, spaceDomain, pagePath, action } = bountyTask;
   const bountyLink = `/${spaceDomain}/${pagePath}`;
-  const workspaceBounties = `/${spaceDomain}/bounties`;
+  const spaceBounties = `/${spaceDomain}/bounties`;
 
   return (
     <TableRow>
@@ -34,7 +34,7 @@ function BountiesTasksListRow({ bountyTask }: { bountyTask: BountyTask }) {
         </Link>
       </TableCell>
       <TableCell>
-        <Link color='inherit' href={workspaceBounties}>
+        <Link color='inherit' href={spaceBounties}>
           <Typography variant='body1'>{spaceName}</Typography>
         </Link>
       </TableCell>
@@ -118,7 +118,7 @@ function BountiesTasksList({
         <TableHead>
           <TableRow>
             <TableCell>Bounty Name</TableCell>
-            <TableCell>Workspace</TableCell>
+            <TableCell>Space</TableCell>
             <TableCell align='center' width={200}>
               Status
             </TableCell>

@@ -46,7 +46,7 @@ export function SpacesMemberDetails({ memberId }: Props) {
           properties={pv.properties}
           readOnly={!canEditSpaceProfile(pv.spaceId)}
           onEdit={() => setEditSpaceId(pv.spaceId)}
-          expanded={query.workspace === pv.spaceId}
+          expanded={query.space === pv.spaceId}
         />
       ))}
 
