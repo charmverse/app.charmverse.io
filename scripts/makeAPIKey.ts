@@ -5,7 +5,6 @@ import { prisma } from 'db';
 
 // use this file and run against production to generate api keys
 
-
 (async () => {
 
   const space = await prisma.space.findUnique({
