@@ -47,7 +47,7 @@ export default function ApiDoc({ spec }: InferGetStaticPropsType<typeof getStati
     if (theme.palette.mode === 'dark') {
       colorMode.toggleColorMode();
     }
-  }, []);
+  }, [theme.palette.mode]);
 
   return <SwaggerUI spec={spec}></SwaggerUI>;
   //  ;

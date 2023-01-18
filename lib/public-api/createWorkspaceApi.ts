@@ -5,30 +5,29 @@ import { prisma } from 'db';
 import { upsertUserForDiscordId } from 'lib/discord/upsertUserForDiscordId';
 import { createWorkspace } from 'lib/spaces/createWorkspace';
 import { getAvailableDomainName } from 'lib/spaces/getAvailableDomainName';
+import { createUserFromWallet } from 'lib/users/createUser';
+import { InvalidInputError } from 'lib/utilities/errors';
 import { isValidUrl } from 'lib/utilities/isValidUrl';
 
-export type CreatedSpaceResponse = {
-  id: string;
-  spaceUrl: string;
-  joinUrl: string;
-};
-
-export type CreateSpaceApiInputData = {
-  name: string;
-  discordServerId: string;
-  adminDiscordUserId: string;
-  avatar?: string;
-};
+import type { CreateWorkspaceRequestBody, CreateWorkspaceResponseBody } from './interfaces';
 
 export async function createWorkspaceApi({
   name,
   discordServerId,
   adminDiscordUserId,
+  adminWalletAddress,
+  xpsEngineId,
   avatar,
   superApiToken
-}: CreateSpaceApiInputData & { superApiToken?: SuperApiToken | null }): Promise<CreatedSpaceResponse> {
-  // generate a domain name based on space
-  const spaceDomain = await getAvailableDomainName(name);
+}: CreateWorkspaceRequestBody & { superApiToken?: SuperApiToken | null }): Promise<CreateWorkspaceResponseBody> {
+  // Retrieve an id for the admin user
+  const adminUserId = adminDiscordUserId
+    ? await upsertUserForDiscordId(adminDiscordUserId)
+    : await createUserFromWallet({ address: adminWalletAddress }).then((user) => user.id);
+
+  if (!adminUserId) {
+    throw new InvalidInputError('No admin user ID created.');
+  }
 
   // create new bot user as space creator
   const botUser = await prisma.user.create({
@@ -38,7 +37,9 @@ export async function createWorkspaceApi({
       identityType: 'RandomName'
     }
   });
-  const adminUserId = await upsertUserForDiscordId(adminDiscordUserId);
+
+  // generate a domain name based on space
+  const spaceDomain = await getAvailableDomainName(name);
 
   // Create workspace
   const spaceData = {
@@ -47,6 +48,7 @@ export async function createWorkspaceApi({
     domain: spaceDomain,
     spaceImage: avatar && isValidUrl(avatar) ? avatar : undefined,
     discordServerId,
+    xpsEngineId,
     author: {
       connect: {
         id: adminUserId
