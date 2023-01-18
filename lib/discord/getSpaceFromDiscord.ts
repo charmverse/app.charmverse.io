@@ -1,12 +1,12 @@
 import { prisma } from 'db';
 import { InvalidInputError } from 'lib/utilities/errors';
 
-export async function getSpaceFromDiscord(discordServerId: string) {
-  const space = await prisma.space.findFirst({ where: { discordServerId } });
+export async function getSpacesFromDiscord(discordServerId: string) {
+  const spaces = await prisma.space.findMany({ where: { discordServerId } });
 
-  if (!space) {
+  if (!spaces.length) {
     throw new InvalidInputError('Space not found');
   }
 
-  return space;
+  return spaces;
 }
