@@ -295,10 +295,15 @@ const StyledReactBangleEditor = styled(ReactBangleEditor)<{ disablePageSpecificF
     tab-size: 4;
     caret-color: var(--primary-text);
   }
+
   pre code {
     color: inherit;
     display: block;
     padding: ${({ theme }) => theme.spacing(2)};
+  }
+
+  .charm-link:hover {
+    cursor: pointer;
   }
 
   hr {
