@@ -1,6 +1,7 @@
 import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
 import ContentCopyOutlinedIcon from '@mui/icons-material/ContentCopyOutlined';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
+import LanguageOutlinedIcon from '@mui/icons-material/LanguageOutlined';
 import {
   Box,
   ClickAwayListener,
@@ -89,7 +90,7 @@ export function LinksPopup({ pluginKey, readOnly }: { pluginKey: PluginKey<LinkP
               display='flex'
               alignItems='center'
               flexDirection='row'
-              gap={1}
+              gap={0.5}
               px={1}
               pt={0.5}
               pb={0.25}
@@ -98,6 +99,12 @@ export function LinksPopup({ pluginKey, readOnly }: { pluginKey: PluginKey<LinkP
                 hideSuggestionsTooltip(pluginKey)(view.state, view.dispatch, view);
               }}
             >
+              <LanguageOutlinedIcon
+                sx={{
+                  fontSize: 14
+                }}
+                color='secondary'
+              />
               <Typography variant='subtitle1' color='secondary'>
                 {href}
               </Typography>
