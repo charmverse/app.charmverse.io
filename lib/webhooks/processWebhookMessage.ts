@@ -1,5 +1,5 @@
 import { assignRolesCollabland } from 'lib/collabland/assignRolesCollabland';
-import { getSpaceFromDiscord } from 'lib/discord/getSpaceFromDiscord';
+import { getSpacesFromDiscord } from 'lib/discord/getSpaceFromDiscord';
 import { removeSpaceMemberDiscord } from 'lib/discord/removeSpaceMemberDiscord';
 import { unassignRolesDiscord } from 'lib/discord/unassignRolesDiscord';
 import { getRequestApiKey } from 'lib/middleware/getRequestApiKey';
@@ -105,9 +105,9 @@ export async function verifyWebhookMessagePermission(message: WebhookMessage) {
   }
 
   try {
-    const space = await getSpaceFromDiscord(discordServerId);
+    const spaces = await getSpacesFromDiscord(discordServerId);
 
-    return verifyApiKeyForSpace({ apiKey, spaceId: space.id });
+    return spaces.some((space) => verifyApiKeyForSpace({ apiKey, spaceId: space.id }));
   } catch (e) {
     return false;
   }

@@ -1,5 +1,5 @@
 import { getGuildRoles } from 'lib/collabland/collablandClient';
-import { getSpaceAndUserFromDiscord } from 'lib/discord/getSpaceAndUserFromDiscord';
+import { getSpacesAndUserFromDiscord } from 'lib/discord/getSpaceAndUserFromDiscord';
 import type { ExternalRole } from 'lib/roles';
 import { createAndAssignRoles } from 'lib/roles/createAndAssignRoles';
 
@@ -19,9 +19,13 @@ export async function assignRolesCollabland({
       .map((roleId) => discordRoles.find((role) => role.id === roleId))
       .filter(Boolean) as ExternalRole[];
 
-    const { space, user } = await getSpaceAndUserFromDiscord({ discordUserId, discordServerId });
+    const spacesData = await getSpacesAndUserFromDiscord({ discordUserId, discordServerId });
 
-    return createAndAssignRoles({ userId: user.id, spaceId: space.id, roles: rolesToAdd });
+    return Promise.allSettled(
+      spacesData.map(({ space, user }) =>
+        createAndAssignRoles({ userId: user.id, spaceId: space.id, roles: rolesToAdd })
+      )
+    );
   } catch (e) {
     return null;
   }
