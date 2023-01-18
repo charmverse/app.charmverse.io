@@ -2,6 +2,7 @@ import type { SuperApiToken } from '@prisma/client';
 
 import { baseUrl } from 'config/constants';
 import { prisma } from 'db';
+import { upsertSpaceRolesFromDiscord } from 'lib/discord/upsertSpaceRolesFromDiscord';
 import { upsertUserForDiscordId } from 'lib/discord/upsertUserForDiscordId';
 import { upsertUserRolesFromDiscord } from 'lib/discord/upsertUserRolesFromDiscord';
 import { createWorkspace } from 'lib/spaces/createWorkspace';
@@ -86,6 +87,13 @@ export async function createWorkspaceApi({
 
   const space = await createWorkspace({ spaceData, userId: botUser.id });
 
+  // create roles from discord
+  if (discordServerId) {
+    // upsert all roles from discord
+    await upsertSpaceRolesFromDiscord({ space, userId: botUser.id });
+  }
+
+  // assing roles to discord admin user
   if (adminDiscordUserId) {
     await upsertUserRolesFromDiscord({ space, userId: adminUserId });
   }
