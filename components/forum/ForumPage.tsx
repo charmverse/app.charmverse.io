@@ -107,7 +107,7 @@ export function ForumPage() {
   return (
     <CenteredPageContent>
       <Typography variant='h1' mb={2}>
-        {`${currentCategory ? `${currentCategory?.name} - ` : ''}Forum`}
+        {currentCategory ? currentCategory?.name : 'All categories'}
       </Typography>
 
       <TextField

@@ -136,10 +136,18 @@ function ForumPageTitle({ basePath }: { basePath: string }) {
   const [pageTitle] = usePageTitle();
   return (
     <PageTitle>
-      <BreadCrumb>
-        <Link href={`${basePath}/forum`}>Forum</Link>
-      </BreadCrumb>
-      {pageTitle || 'Untitled'}
+      {pageTitle === 'Forum' ? (
+        <Link href={`${basePath}/forum`} color={(theme) => theme.palette.text.primary}>
+          Forum
+        </Link>
+      ) : (
+        <>
+          <BreadCrumb>
+            <Link href={`${basePath}/forum`}>Forum</Link>
+          </BreadCrumb>
+          {pageTitle ?? 'Untitled'}
+        </>
+      )}
     </PageTitle>
   );
 }
@@ -209,7 +217,7 @@ export default function PageTitleWithBreadcrumbs({ pageId, pageType }: { pageId?
     return <ProposalPageTitle basePath={`/${router.query.domain}`} />;
   } else if (router.route === '/[domain]/[pageId]') {
     return <DocumentPageTitle basePath={`/${space?.domain}`} pageId={pageId} />;
-  } else if (router.route === '/[domain]/forum/post/[pagePath]') {
+  } else if (router.route.includes('/[domain]/forum')) {
     return <ForumPageTitle basePath={`/${router.query.domain}`} />;
   } else if (router.route === '/share/[...pageId]') {
     return <DocumentPageTitle basePath={`/share/${space?.domain}`} pageId={pageId} />;
