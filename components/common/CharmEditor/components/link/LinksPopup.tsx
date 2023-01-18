@@ -70,7 +70,6 @@ export function LinksPopup({ pluginKey, readOnly }: { pluginKey: PluginKey<LinkP
       }
     }
   }
-
   if (isVisible) {
     return createPortal(
       <ClickAwayListener onClickAway={hideTooltip}>

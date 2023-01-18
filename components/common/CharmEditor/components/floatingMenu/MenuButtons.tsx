@@ -4,7 +4,6 @@ import { useEditorViewContext } from '@bangle.dev/react';
 import { filter, rafCommandExec } from '@bangle.dev/utils';
 import { KeyboardArrowDown } from '@mui/icons-material';
 import ChatBubbleIcon from '@mui/icons-material/ChatBubbleOutline';
-import HowToVoteIcon from '@mui/icons-material/HowToVote';
 import MessageOutlinedIcon from '@mui/icons-material/MessageOutlined';
 import { Box } from '@mui/material';
 import React, { useCallback } from 'react';
@@ -365,7 +364,7 @@ export function FloatingLinkButton({
         (state: EditorState) => createLink('')(state),
         (_state, dispatch, _view) => {
           if (dispatch && _view) {
-            // toggleSubMenu(menuKey, 'linkSubMenu')(_view.state, _view.dispatch, _view);
+            toggleSubMenu(menuKey, 'linkSubMenu')(_view.state, _view.dispatch, _view);
             rafCommandExec(_view, focusFloatingMenuInput(menuKey));
           }
           return true;

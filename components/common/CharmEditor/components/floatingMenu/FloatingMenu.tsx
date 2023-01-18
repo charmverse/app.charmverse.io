@@ -143,6 +143,15 @@ function MenuByType(props: MenuProps) {
       </Menu>
     );
   }
+
+  if (type === 'linkSubMenu') {
+    return (
+      <Menu hideMenu={hideMenu}>
+        <LinkSubMenu />
+      </Menu>
+    );
+  }
+
   if (type === 'inlineCommentSubMenu' && !inline) {
     return (
       <Menu hideMenu={hideMenu}>
