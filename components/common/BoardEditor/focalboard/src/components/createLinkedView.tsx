@@ -46,7 +46,11 @@ export function CreateLinkedView(props: CreateLinkedViewProps) {
         </Stack>
       </Box>
       <Collapse in={props.readOnly === true ? false : Boolean(sidebarState)} orientation='horizontal'>
-        <StyledSidebar>
+        <StyledSidebar
+          style={{
+            height: 'fit-content'
+          }}
+        >
           <ViewSourceOptions {...props} title='Select data source' closeSidebar={closeSidebar} />
         </StyledSidebar>
       </Collapse>
