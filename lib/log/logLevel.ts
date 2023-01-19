@@ -20,7 +20,8 @@ type LogMeta = {
  * Example:
  *    charmverse \[%{date("yyyy-MM-dd HH:mm:ss"):date}\]\s+%{word:level}: (\[%{notSpace:logger}\] )?[^{]*%{data::json}
  * Resources for Datadog logging:
- *    Parsing rules: https://docs.datadoghq.com/logs/log_configuration/parsing/
+ *    Parsing rules: https://docs.datadoghq.com/logs/log_configuration/parsing/?tab=matchers#examples
+ *    Mapping fields to log message and log level: https://docs.datadoghq.com/logs/log_configuration/processors/?tab=ui#log-status-remapper
  *    Best practices: https://docs.datadoghq.com/logs/guide/log-parsing-best-practice/
  */
 const formatLogsForDatadog = true; // (isProdEnv || isStagingEnv) && isNodeEnv;
@@ -55,15 +56,9 @@ export function apply(log: Logger, logPrefix: string = '') {
           let _opt: LogMeta = {};
           if (opt) {
             let error: LogMeta['error'];
-            if (opt instanceof Error || opt instanceof SystemError) {
-              error = { ...opt, message: opt.message, stack: opt.stack };
-            } else if (opt.error instanceof Error) {
-              error = {
-                ...opt.error,
-                message: opt.error.message,
-                code: (opt.error as SystemError).code,
-                stack: opt.error.stack
-              };
+            const maybeError = opt.error || opt;
+            if (maybeError instanceof Error || maybeError instanceof SystemError) {
+              error = { ...maybeError, message: maybeError.message, stack: maybeError.stack };
             }
             if (opt instanceof Array) {
               _opt = { data: opt };
