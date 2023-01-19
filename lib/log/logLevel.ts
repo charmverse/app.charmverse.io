@@ -10,6 +10,11 @@ const TIMESTAMP_FORMAT = 'yyyy-LL-dd HH:mm:ss';
 const ERRORS_WEBHOOK = process.env.NEXT_PUBLIC_DISCORD_WEBHOOK_ERRORS;
 const originalFactory = _log.methodFactory;
 
+type LogMeta = {
+  data?: any;
+  error?: { message: string; code?: number; stack?: string };
+};
+
 /**
  * Enable formatting special logs for Datadog in production
  * Example:
@@ -47,13 +52,14 @@ export function apply(log: Logger, logPrefix: string = '') {
         let args: any[];
         if (formatLogsForDatadog) {
           // extract information from errors, and ensure that opts is always a JSON-serializable object
-          let _opt: { data?: any; error?: { message: string; code?: number; stack: string } } = {};
+          let _opt: LogMeta = {};
           if (opt) {
-            let error: { message: string; code?: number; stack: string } | undefined;
+            let error: LogMeta['error'];
             if (opt instanceof Error || opt instanceof SystemError) {
-              error = { message: opt.message, code: (opt as SystemError).code, stack: opt.stack };
+              error = { ...opt, message: opt.message, stack: opt.stack };
             } else if (opt.error instanceof Error) {
               error = {
+                ...opt.error,
                 message: opt.error.message,
                 code: (opt.error as SystemError).code,
                 stack: opt.error.stack
