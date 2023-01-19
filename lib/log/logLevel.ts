@@ -1,18 +1,13 @@
 import type { Logger, LogLevelDesc } from 'loglevel';
 import _log from 'loglevel';
-import { DateTime } from 'luxon';
 
 import * as http from 'adapters/http';
 import { isNodeEnv, isProdEnv, isStagingEnv } from 'config/constants';
 
-const TIMESTAMP_FORMAT = 'yyyy-LL-dd HH:mm:ss';
+import { formatLog } from './logUtils';
+
 const ERRORS_WEBHOOK = process.env.NEXT_PUBLIC_DISCORD_WEBHOOK_ERRORS;
 const originalFactory = _log.methodFactory;
-
-type LogMeta = {
-  data?: any;
-  error?: { message: string; code?: number; stack?: string };
-};
 
 /**
  * Enable formatting special logs for Datadog in production
@@ -23,7 +18,7 @@ type LogMeta = {
  *    Mapping fields to log message and log level: https://docs.datadoghq.com/logs/log_configuration/processors/?tab=ui#log-status-remapper
  *    Best practices: https://docs.datadoghq.com/logs/guide/log-parsing-best-practice/
  */
-const formatLogsForDatadog = (isProdEnv || isStagingEnv) && isNodeEnv;
+const formatLogsForDocker = (isProdEnv || isStagingEnv) && isNodeEnv;
 
 export function apply(log: Logger, logPrefix: string = '') {
   const defaultLevel = (process.env.LOG_LEVEL as LogLevelDesc) || log.levels.DEBUG;
@@ -35,46 +30,12 @@ export function apply(log: Logger, logPrefix: string = '') {
       const originalMethod = originalFactory(methodName, logLevel, loggerName);
 
       return (message, opt: unknown) => {
-        let prefix = '';
-        if (formatLogsForDatadog) {
-          prefix = `[${DateTime.local().toFormat(TIMESTAMP_FORMAT)}]`;
-        }
-        if (isNodeEnv) {
-          prefix += `${prefix ? ' ' : ''}${methodName}:`;
-        }
-        if (logPrefix) {
-          prefix += `${prefix ? ' ' : ''}[${logPrefix}]`;
-        }
-        if (prefix) {
-          prefix += ' ';
-        }
-
-        let args: any[];
-        if (formatLogsForDatadog) {
-          // extract information from errors, and ensure that opts is always a JSON-serializable object
-          let _opt: LogMeta = {};
-          if (opt) {
-            let error: LogMeta['error'];
-            const maybeError = (opt as { error?: Error }).error || opt;
-            if (maybeError instanceof Error) {
-              error = { ...maybeError, message: maybeError.message, stack: maybeError.stack };
-            }
-            if (isPrimitiveValue(opt) || opt instanceof Array) {
-              _opt = { data: opt };
-            } else {
-              _opt = { ...opt };
-            }
-            _opt.error = error;
-          }
-          // TODO: try adding datadog trace info to logs, it wont build with webpack though
-          // const span = tracer.scope().active();
-          // if (span) {
-          //   tracer.inject(span.context(), formats.LOG, _opt);
-          // }
-          args = [`${prefix}${message} ${JSON.stringify(_opt)}`];
-        } else {
-          args = opt ? [`${prefix}${message}`, opt] : [`${prefix}${message}`];
-        }
+        const args = formatLog(message, opt, {
+          formatLogsForDocker,
+          isNodeEnv,
+          logPrefix,
+          methodName
+        });
         originalMethod.apply(null, args);
 
         // post errors to Discord
@@ -117,17 +78,4 @@ function sendErrorToDiscord(webhook: string, message: any, opt: any) {
       }
     ]
   });
-}
-
-// Check if value is primitive value
-function isPrimitiveValue(value: unknown): boolean {
-  return (
-    typeof value === 'symbol' ||
-    typeof value === 'string' ||
-    typeof value === 'number' ||
-    typeof value === 'boolean' ||
-    typeof value === 'undefined' ||
-    value === null ||
-    typeof value === 'bigint'
-  );
 }
