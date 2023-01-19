@@ -11,8 +11,8 @@ import { useForm } from 'react-hook-form';
 
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
-import type { FormValues } from 'components/common/CreateSpaceForm';
-import { schema } from 'components/common/CreateSpaceForm';
+import type { FormValues } from 'components/common/CreateSpaceForm/CreateSpaceForm';
+import { schema } from 'components/common/CreateSpaceForm/CreateSpaceForm';
 import FieldLabel from 'components/common/form/FieldLabel';
 import Link from 'components/common/Link';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';

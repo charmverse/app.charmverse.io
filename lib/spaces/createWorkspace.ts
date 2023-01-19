@@ -25,12 +25,15 @@ export async function createWorkspace({ spaceData, userId }: CreateSpaceProps) {
   const space = await prisma.space.create({ data: spaceData, include: { pages: true } });
 
   // Create all page content in a single transaction
+
+  // ---------- Section for selecting template to create from ----------
   const sourceDataPath = path.resolve('seedData/space/space-da74cab3-c2b6-40bb-8734-0de5375b0fce-pages-1657887621286');
 
   const seedPagesTransactionInput = await convertJsonPagesToPrisma({
     folderPath: sourceDataPath,
     spaceId: space.id
   });
+  // ---------- Section for selecting template to create from ----------
 
   const defaultCategories = generateDefaultCategoriesInput(space.id);
   const defaultProperties = generateDefaultPropertiesInput({ userId, spaceId: space.id });

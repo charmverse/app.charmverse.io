@@ -30,3 +30,4 @@ export function getSpaceDomainFromName(name: string) {
     .replace(/\s/g, '-')
     .toLowerCase();
 }
+export const workspaceCreateOptions = ['Choose my own', 'NFT Community', 'Import from Notion', 'Import from Markdown'];

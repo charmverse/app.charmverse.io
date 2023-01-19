@@ -11,7 +11,7 @@ import NextLink from 'next/link';
 import { useState } from 'react';
 
 import Button from 'components/common/Button';
-import CreateWorkspaceForm from 'components/common/CreateSpaceForm';
+import { CreateSpaceForm } from 'components/common/CreateSpaceForm/CreateSpaceForm';
 import { Modal } from 'components/common/Modal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSpaces } from 'hooks/useSpaces';
@@ -84,7 +84,7 @@ export default function Workspaces() {
         </Grid>
       </Grid>
       <Modal open={spaceFormOpen} onClose={closeSpaceForm}>
-        <CreateWorkspaceForm onSubmit={createNewSpace} onCancel={closeSpaceForm} isSubmitting={isCreatingSpace} />
+        <CreateSpaceForm onSubmit={createNewSpace} onCancel={closeSpaceForm} isSubmitting={isCreatingSpace} />
         <Typography variant='body2' align='center' sx={{ pt: 2 }}>
           <Button variant='text' href='/join' endIcon={<NavigateNextIcon />}>
             Join an existing workspace

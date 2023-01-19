@@ -1,6 +1,6 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import RefreshIcon from '@mui/icons-material/Refresh';
-import { IconButton, Tooltip, InputAdornment } from '@mui/material';
+import { IconButton, Tooltip, InputAdornment, Typography } from '@mui/material';
 import Alert from '@mui/material/Alert';
 import Divider from '@mui/material/Divider';
 import Grid from '@mui/material/Grid';
@@ -22,6 +22,8 @@ import { getSpaceDomainFromName } from 'lib/spaces/utils';
 import { domainSchema } from 'lib/spaces/validateDomainName';
 import randomName from 'lib/utilities/randomName';
 
+import { SelectNewSpaceTemplate } from './SpaceTemplateOptions';
+
 export const schema = yup.object({
   id: yup.string(),
   domain: domainSchema.test('domain-exists', 'Domain already exists', async function checkDomain(domain) {
@@ -42,14 +44,11 @@ interface Props {
   isSubmitting: boolean;
 }
 
-export default function WorkspaceSettings({
-  defaultValues,
-  onSubmit: _onSubmit,
-  onCancel,
-  submitText,
-  isSubmitting
-}: Props) {
+export function CreateSpaceForm({ defaultValues, onSubmit: _onSubmit, onCancel, submitText, isSubmitting }: Props) {
   const { user } = useUser();
+
+  const [step, setStep] = useState<1 | 2>(1);
+
   const [saveError, setSaveError] = useState<any | null>(null);
   const {
     register,
@@ -111,7 +110,9 @@ export default function WorkspaceSettings({
     setValue('domain', domain);
   }
 
-  return (
+  return step === 1 ? (
+    <SelectNewSpaceTemplate />
+  ) : (
     <form data-test='create-space-form' onSubmit={handleSubmit(onSubmit)}>
       <DialogTitle onClose={onCancel}>Create a workspace</DialogTitle>
       <Divider />
