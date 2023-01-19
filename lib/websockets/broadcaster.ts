@@ -52,20 +52,12 @@ export class WebsocketBroadcaster {
         // clientCount: io.engine.clientsCount,
         clientCount: io.of('/').sockets.size
       });
-      log.info('[ws] Web socket connected info', {
-        // clientCount: io.engine.clientsCount,
-        clientCount: io.of('/').sockets.size
+      log.info('Info test', {
+        nested: { prop: { prop: 'value', arr: ['1', '2', 3] } }
       });
-      log.error('Web socket connected error', {
-        // clientCount: io.engine.clientsCount,
-        clientCount: io.of('/').sockets.size
-      });
-      log.warn('Web socket connected warn', {
-        // clientCount: io.engine.clientsCount,
-        clientCount: io.of('/').sockets.size
-      });
+      log.warn('Warning test', 42);
       log.error('Error test', new Error('somethin '));
-      log.error('Error test', { error: new DataNotFoundError('another somethin') });
+      log.error('Error test with error property', { error: new DataNotFoundError('another somethin') });
 
       socket.on('disconnect', () => {
         log.debug('[ws] Web socket disconnected', {
