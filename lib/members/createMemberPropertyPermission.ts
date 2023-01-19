@@ -21,7 +21,7 @@ export async function createMemberPropertyPermission(data: CreateMemberPropertyP
   });
 
   if (!space) {
-    throw new InvalidInputError('Member property and role must be in the same workspace');
+    throw new InvalidInputError('Member property and role must be in the same space');
   }
 
   return prisma.memberPropertyPermission.create({

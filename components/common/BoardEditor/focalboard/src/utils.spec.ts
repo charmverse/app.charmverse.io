@@ -24,8 +24,8 @@ describe('utils', () => {
   });
 
   describe('createGuid', () => {
-    test('should create 27 char random id for workspace', () => {
-      expect(Utils.createGuid(IDType.Workspace)).toMatch(/^w[ybndrfg8ejkmcpqxot1uwisza345h769]{26}$/);
+    test('should create 27 char random id for space', () => {
+      expect(Utils.createGuid(IDType.Space)).toMatch(/^s[ybndrfg8ejkmcpqxot1uwisza345h769]{26}$/);
     });
     test('should create 27 char random id for board', () => {
       expect(Utils.createGuid(IDType.Board)).toMatch(/^b[ybndrfg8ejkmcpqxot1uwisza345h769]{26}$/);

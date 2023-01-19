@@ -3,11 +3,27 @@ import _log from 'loglevel';
 import { DateTime } from 'luxon';
 
 import * as http from 'adapters/http';
-import { isNodeEnv, isProdEnv } from 'config/constants';
+import { isNodeEnv, isProdEnv, isStagingEnv } from 'config/constants';
 
 const TIMESTAMP_FORMAT = 'yyyy-LL-dd HH:mm:ss';
 const ERRORS_WEBHOOK = process.env.NEXT_PUBLIC_DISCORD_WEBHOOK_ERRORS;
 const originalFactory = _log.methodFactory;
+
+type LogMeta = {
+  data?: any;
+  error?: { message: string; code?: number; stack?: string };
+};
+
+/**
+ * Enable formatting special logs for Datadog in production
+ * Example:
+ *    charmverse \[%{date("yyyy-MM-dd HH:mm:ss"):date}\]\s+%{word:level}: (\[%{notSpace:logger}\] )?%{regex("[^{]*"):message}%{data::json}
+ * Resources for Datadog logging:
+ *    Parsing rules: https://docs.datadoghq.com/logs/log_configuration/parsing/?tab=matchers#examples
+ *    Mapping fields to log message and log level: https://docs.datadoghq.com/logs/log_configuration/processors/?tab=ui#log-status-remapper
+ *    Best practices: https://docs.datadoghq.com/logs/guide/log-parsing-best-practice/
+ */
+const formatLogsForDatadog = (isProdEnv || isStagingEnv) && isNodeEnv;
 
 export function apply(log: Logger, logPrefix: string = '') {
   const defaultLevel = (process.env.LOG_LEVEL as LogLevelDesc) || log.levels.DEBUG;
@@ -20,7 +36,7 @@ export function apply(log: Logger, logPrefix: string = '') {
 
       return (message, opt) => {
         let prefix = '';
-        if (isProdEnv && isNodeEnv) {
+        if (formatLogsForDatadog) {
           prefix = `[${DateTime.local().toFormat(TIMESTAMP_FORMAT)}]`;
         }
         if (isNodeEnv) {
@@ -33,7 +49,36 @@ export function apply(log: Logger, logPrefix: string = '') {
           prefix += ' ';
         }
 
-        const args = opt ? [`${prefix}${message}`, opt] : [`${prefix}${message}`];
+        let args: any[];
+        if (formatLogsForDatadog) {
+          // extract information from errors, and ensure that opts is always a JSON-serializable object
+          let _opt: LogMeta = {};
+          if (opt) {
+            let error: LogMeta['error'];
+            const maybeError = opt.error || opt;
+            if (maybeError instanceof Error) {
+              error = { ...maybeError, message: maybeError.message, stack: maybeError.stack };
+            }
+            if (opt instanceof Array) {
+              _opt = { data: opt };
+            } else {
+              try {
+                _opt = { ...opt };
+              } catch (e) {
+                _opt = { data: opt };
+              }
+            }
+            _opt.error = error;
+          }
+          // TODO: try adding datadog trace info to logs, it wont build with webpack though
+          // const span = tracer.scope().active();
+          // if (span) {
+          //   tracer.inject(span.context(), formats.LOG, _opt);
+          // }
+          args = [`${prefix}${message} ${JSON.stringify(_opt)}`];
+        } else {
+          args = opt ? [`${prefix}${message}`, opt] : [`${prefix}${message}`];
+        }
         originalMethod.apply(null, args);
 
         // post errors to Discord

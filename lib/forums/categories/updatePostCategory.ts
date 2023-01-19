@@ -2,6 +2,8 @@ import type { PostCategory } from '@prisma/client';
 
 import { prisma } from 'db';
 
+import { getPostCategoryPath } from './getPostCategoryPath';
+
 export type PostCategoryUpdate = Partial<Pick<PostCategory, 'name'>>;
 
 export async function updatePostCategory(postCategoryId: string, update: PostCategoryUpdate): Promise<PostCategory> {
@@ -9,6 +11,9 @@ export async function updatePostCategory(postCategoryId: string, update: PostCat
     where: {
       id: postCategoryId
     },
-    data: update
+    data: {
+      name: update.name ? update.name : undefined,
+      path: update.name ? getPostCategoryPath(update.name) : undefined
+    }
   });
 }

@@ -60,7 +60,7 @@ export default function MissingPagePermissions({ bountyPermissions, pagePermissi
       {missingPermissionsWithName.map((bountyPermissionAssignee) => (
         <Typography key={bountyPermissionAssignee.id} variant='caption' display='flex' sx={{ alignItems: 'center' }}>
           {bountyPermissionAssignee.group === 'space'
-            ? 'Workspace members'
+            ? 'Space members'
             : bountyPermissionAssignee.group === 'role'
             ? `${bountyPermissionAssignee.name} role`
             : `${bountyPermissionAssignee.name}`}{' '}

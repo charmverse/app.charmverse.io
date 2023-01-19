@@ -99,7 +99,7 @@ export class WebSocketConnector {
         authToken
       }
       // path: '/api/socket'
-    }).connect();
+    });
     this.createWSConnection();
   }
 

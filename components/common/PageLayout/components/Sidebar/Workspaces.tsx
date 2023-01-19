@@ -76,7 +76,7 @@ export default function Workspaces() {
           </Grid>
         ))}
         <Grid item>
-          <Tooltip title='Create or join a workspace' placement='top' arrow>
+          <Tooltip title='Create or join a space' placement='top' arrow>
             <IconButton data-test='sidebar-add-new-space' sx={{ borderRadius: '8px' }} onClick={showSpaceForm}>
               <AddIcon />
             </IconButton>
@@ -87,7 +87,7 @@ export default function Workspaces() {
         <CreateWorkspaceForm onSubmit={createNewSpace} onCancel={closeSpaceForm} isSubmitting={isCreatingSpace} />
         <Typography variant='body2' align='center' sx={{ pt: 2 }}>
           <Button variant='text' href='/join' endIcon={<NavigateNextIcon />}>
-            Join an existing workspace
+            Join an existing space
           </Button>
         </Typography>
       </Modal>

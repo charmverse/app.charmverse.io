@@ -20,7 +20,7 @@ export function AlternateRouteButton({ href, children }: { href: string; childre
     <Box display='flex' alignItems='center' justifyContent={showMySpacesLink ? 'space-between' : 'center'}>
       {showMySpacesLink && (
         <Button variant='text' href={`/${spaces[0]?.domain}`} endIcon={<NavigateNextIcon />}>
-          Go to my workspace
+          Go to my space
         </Button>
       )}
       <Button variant='text' href={href} endIcon={<NavigateNextIcon />}>
@@ -45,11 +45,11 @@ export default function JoinWorkspace() {
   return (
     <Box sx={{ width: 600, maxWidth: '100%', mx: 'auto', mb: 6, px: 2 }}>
       <Card sx={{ p: 4, mb: 3 }} variant='outlined'>
-        <DialogTitle>Join a workspace</DialogTitle>
+        <DialogTitle>Join a space</DialogTitle>
         <Divider />
         {domain ? <JoinPredefinedSpaceDomain spaceDomain={domain} /> : <JoinDynamicSpaceForm />}
       </Card>
-      <AlternateRouteButton href='/createWorkspace'>Create a workspace</AlternateRouteButton>
+      <AlternateRouteButton href='/createWorkspace'>Create a space</AlternateRouteButton>
     </Box>
   );
 }

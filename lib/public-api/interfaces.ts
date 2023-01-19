@@ -293,11 +293,20 @@ export interface Workspace {
  *          type: string
  *          example: Test DAO Space
  *        discordServerId:
+ *          required: false
  *          type: string
  *          example: 260918243123345408
  *        adminDiscordUserId:
+ *          required: false
  *          type: string
  *          example: 260918243123345408
+ *        adminWalletAddress:
+ *          required: false
+ *          type: string
+ *          example: 0x7684F0170a3B37640423b1CD9d8Cb817Edf301aE
+ *        xpsEngineId:
+ *          required: false
+ *          type: string
  *        avatar:
  *          required: false
  *          type: url
@@ -305,8 +314,10 @@ export interface Workspace {
  */
 export interface CreateWorkspaceRequestBody {
   name: string;
-  discordServerId: string;
-  adminDiscordUserId: string;
+  discordServerId?: string;
+  adminDiscordUserId?: string;
+  xpsEngineId?: string;
+  adminWalletAddress?: string;
   avatar?: string;
 }
 

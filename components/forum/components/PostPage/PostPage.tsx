@@ -1,5 +1,7 @@
 import CommentIcon from '@mui/icons-material/Comment';
 import { Box, Divider, Stack, Typography } from '@mui/material';
+import type { PostCategory } from '@prisma/client';
+import { useRouter } from 'next/router';
 import { useEffect, useMemo, useState } from 'react';
 import useSWR from 'swr';
 
@@ -41,6 +43,7 @@ type Props = {
   setContentUpdated: (changed: boolean) => void;
   shouldUpdateTitleState?: boolean;
   showOtherCategoryPosts?: boolean;
+  newPostCategory?: PostCategory | null;
 };
 
 function processComments({ postComments }: { postComments: PostCommentWithVote[] }) {
@@ -90,16 +93,20 @@ export function PostPage({
   formInputs,
   contentUpdated,
   setContentUpdated,
-  showOtherCategoryPosts
+  showOtherCategoryPosts,
+  newPostCategory
 }: Props) {
   const currentSpace = useCurrentSpace();
   const { user } = useUser();
   const { categories } = useForumCategories();
   const [categoryId, setCategoryId] = useState(
-    post?.categoryId ?? categories.find((category) => category.id === currentSpace?.defaultPostCategoryId)?.id ?? null
+    post?.categoryId ??
+      newPostCategory?.id ??
+      categories.find((category) => category.id === currentSpace?.defaultPostCategoryId)?.id ??
+      null
   );
   const { members } = useMembers();
-  const [form, setForm] = useState<FormInputs>(post ?? { title: '', content: null, contentText: '' });
+  const router = useRouter();
   const {
     data: postComments,
     mutate: setPostComments,
@@ -141,13 +148,14 @@ export function PostPage({
       });
       setContentUpdated(false);
     } else {
-      await charmClient.forum.createForumPost({
+      const newPost = await charmClient.forum.createForumPost({
         categoryId,
         content: formInputs.content,
         contentText: formInputs.contentText ?? '',
         spaceId,
         title: formInputs.title
       });
+      router.push(`/${currentSpace?.domain}/forum/post/${newPost.path}`);
     }
     onSave?.();
   }

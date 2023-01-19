@@ -1,5 +1,8 @@
 // using deprectead feature, navigator.userAgent doesnt exist yet in FF - https://developer.mozilla.org/en-US/docs/Web/API/Navigator/platform
 export function isMac() {
+  if (typeof navigator === 'undefined') {
+    return false;
+  }
   return (
     navigator.platform.toUpperCase().indexOf('MAC') >= 0 ||
     navigator.platform.toUpperCase().indexOf('IPHONE') >= 0 ||
@@ -131,7 +134,10 @@ export function setUrlWithoutRerender(pathname: string, params: Record<string, s
   window.history.replaceState(newState, '', displayPath);
 }
 
-export function getCookie(name: string): string {
+export function getCookie(name: string): string | undefined {
+  if (typeof document === 'undefined') {
+    return undefined;
+  }
   const cookieMap = document.cookie.split(';').reduce<{ [key: string]: string }>((cookies, cookie) => {
     const _name = cookie.trim().split('=')[0];
     const value = cookie.trim().split('=')[1];

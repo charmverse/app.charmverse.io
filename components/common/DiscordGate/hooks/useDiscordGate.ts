@@ -34,7 +34,7 @@ export function useDiscordGate({ spaceDomain, onSuccess }: Props) {
     try {
       const space = await charmClient.discord.verifyDiscordGate(data.spaceId);
 
-      showMessage(`You have joined the ${space.name} workspace.`, 'success');
+      showMessage(`You have joined the ${space.name} space.`, 'success');
 
       await refreshUser();
 
