@@ -137,7 +137,7 @@ function PageLayout({ sidebarWidth = 300, children, sidebar: SidebarOverride }: 
       <Head>
         <CurrentPageFavicon />
       </Head>
-      <LayoutContainer>
+      <LayoutContainer data-test='space-page-layout'>
         <FocalboardViewsProvider>
           <ThreadsProvider>
             <VotesProvider>

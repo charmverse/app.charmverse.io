@@ -59,14 +59,16 @@ export const usePublicPage = () => {
   } = useSWR(shouldLoadSpace ? `space/${spaceDomain}` : null, () => charmClient.getSpaceByDomain(spaceDomain || ''));
 
   const space = publicSpace || publicPage?.space;
+  const hasError = !!publicPageError || !!spaceError;
   const hasPublicBounties = space?.publicBountyBoard;
   const hasPublicPageAccess = !!publicPage || !!hasPublicBounties;
-  const accessCheked = spacesLoaded && (hasPublicPageAccess || (!shouldLoadSpace && !shouldLoadPublicPage) || !!space);
+  const accessCheked =
+    (spacesLoaded && (hasPublicPageAccess || (!shouldLoadSpace && !shouldLoadPublicPage) || !!space)) || hasError;
 
   return {
     isCheckingAccess: isPublicPageLoading || isSpaceLoading,
     accessCheked,
-    hasError: !!publicPageError || !!spaceError,
+    hasError,
     hasPublicPageAccess: !!publicPage || !!hasPublicBounties,
     publicSpace: space,
     publicPage

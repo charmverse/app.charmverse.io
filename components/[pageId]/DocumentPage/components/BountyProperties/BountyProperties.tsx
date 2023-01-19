@@ -15,6 +15,7 @@ import InputSearchBlockchain from 'components/common/form/InputSearchBlockchain'
 import { InputSearchCrypto } from 'components/common/form/InputSearchCrypto';
 import InputSearchReviewers from 'components/common/form/InputSearchReviewers';
 import { InputSearchRoleMultiple } from 'components/common/form/InputSearchRole';
+import { usePublicPage } from 'components/publicPages/hooks/usePublicPage';
 import { useBounties } from 'hooks/useBounties';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
@@ -62,11 +63,9 @@ export default function BountyProperties(props: {
     () => isAmountInputEmpty || Number(currentBounty?.rewardAmount) <= 0,
     [isAmountInputEmpty, currentBounty]
   );
+  const { hasPublicPageAccess } = usePublicPage();
 
-  const router = useRouter();
-
-  const isPublic = router.asPath.split('/')[1] === 'share';
-  const readOnly = parentReadOnly || isPublic;
+  const readOnly = parentReadOnly || hasPublicPageAccess;
 
   const bountyPage = pages[pageId];
 
@@ -495,7 +494,7 @@ export default function BountyProperties(props: {
 
       {
         // Bounty creator cannot apply to their own bounty
-        permissions && !isPublic && currentBounty.createdBy !== user?.id && (
+        permissions && !hasPublicPageAccess && currentBounty.createdBy !== user?.id && (
           <>
             <BountyApplicantForm
               bounty={currentBounty}
@@ -512,7 +511,7 @@ export default function BountyProperties(props: {
         )
       }
 
-      {isPublic && bountyPage && <BountySignupButton bountyPage={bountyPage} />}
+      {hasPublicPageAccess && bountyPage && <BountySignupButton bountyPage={bountyPage} />}
 
       {permissions?.userPermissions?.review && currentBounty.status !== 'suggestion' && !draftBounty && (
         <BountyApplicantsTable bounty={currentBounty} permissions={permissions} />
