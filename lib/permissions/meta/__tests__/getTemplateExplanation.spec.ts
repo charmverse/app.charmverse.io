@@ -7,14 +7,14 @@ describe('getTemplateExplanation', () => {
     expect(cannot.length).toBe(0);
   });
   it('should return the correct explanation for the read-only template', () => {
-    const can = ['Workspace members can view new top-level pages by default.'];
+    const can = ['Space members can view new top-level pages by default.'];
     const cannot = [
-      'Workspace members cannot create new bounties.',
-      'Workspace members cannot create new pages.',
-      'Workspace members cannot create new proposals.',
-      'Workspace members cannot comment on, edit, share or delete new top-level pages by default.',
-      'Anyone outside the workspace cannot see new top-level pages by default.',
-      'Anyone outside the workspace cannot see bounties and bounty suggestions.'
+      'Space members cannot create new bounties.',
+      'Space members cannot create new pages.',
+      'Space members cannot create new proposals.',
+      'Space members cannot comment on, edit, share or delete new top-level pages by default.',
+      'Anyone outside the space cannot see new top-level pages by default.',
+      'Anyone outside the space cannot see bounties and bounty suggestions.'
     ];
 
     const [canExplained, cannotExplained] = getTemplateExplanation('readOnly');
@@ -32,14 +32,14 @@ describe('getTemplateExplanation', () => {
 
   it('should return the correct explanation for the collaborative template', () => {
     const can = [
-      'Workspace members can create new pages.',
-      'Workspace members can create new bounties.',
-      'Workspace members can create new proposals.',
-      'Workspace members can view, edit, comment on, share and delete new top-level pages by default.'
+      'Space members can create new pages.',
+      'Space members can create new bounties.',
+      'Space members can create new proposals.',
+      'Space members can view, edit, comment on, share and delete new top-level pages by default.'
     ];
     const cannot = [
-      'Anyone outside the workspace cannot see new top-level pages by default.',
-      'Anyone outside the workspace cannot see bounties and bounty suggestions.'
+      'Anyone outside the space cannot see new top-level pages by default.',
+      'Anyone outside the space cannot see bounties and bounty suggestions.'
     ];
 
     const [canExplained, cannotExplained] = getTemplateExplanation('collaborative');
@@ -57,12 +57,12 @@ describe('getTemplateExplanation', () => {
 
   it('should return the correct explanation for the public template', () => {
     const can = [
-      'Workspace members can create new pages.',
-      'Workspace members can create new bounties.',
-      'Workspace members can create new proposals.',
-      'Workspace members can view, edit, comment on, share and delete new top-level pages by default.',
+      'Space members can create new pages.',
+      'Space members can create new bounties.',
+      'Space members can create new proposals.',
+      'Space members can view, edit, comment on, share and delete new top-level pages by default.',
       'Anyone can see new top-level pages by default.',
-      'Anyone can see bounties and bounty suggestions visible to workspace members.'
+      'Anyone can see bounties and bounty suggestions visible to space members.'
     ];
 
     const cannot: string[] = [];

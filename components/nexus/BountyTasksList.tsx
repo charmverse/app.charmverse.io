@@ -118,7 +118,7 @@ function BountiesTasksList({
         <TableHead>
           <TableRow>
             <TableCell>Bounty Name</TableCell>
-            <TableCell>Workspace</TableCell>
+            <TableCell>Space</TableCell>
             <TableCell align='center' width={200}>
               Status
             </TableCell>

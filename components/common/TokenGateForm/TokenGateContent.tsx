@@ -28,7 +28,7 @@ export function TokenGateContent({
     <Grid container direction='column' spacing={2} data-test='token-gate-form'>
       <Grid item>
         <Typography variant='body2'>
-          Verify your wallet to check if you can join this workspace and which roles you can receive.
+          Verify your wallet to check if you can join this space and which roles you can receive.
         </Typography>
       </Grid>
 
@@ -55,7 +55,7 @@ export function TokenGateContent({
             </Alert>
           ) : (
             <Alert severity='success'>
-              You can join this workspace.{' '}
+              You can join this space.{' '}
               {tokenGateResult.roles.length > 0
                 ? 'You will also receive the roles attached to each condition you passed'
                 : ''}
@@ -76,7 +76,7 @@ export function TokenGateContent({
             disabled={joiningSpace}
             onClick={joinSpace}
           >
-            Join workspace
+            Join space
           </PrimaryButton>
         )}
       </Grid>

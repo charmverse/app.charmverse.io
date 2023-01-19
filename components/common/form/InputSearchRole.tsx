@@ -54,9 +54,9 @@ function InputSearchRoleBase({
   if (roles?.length === 0 && showWarningOnNoRoles) {
     return (
       <Alert severity='warning'>
-        There are no roles in this space. Workspace admins can create roles in the{' '}
+        There are no roles in this space. Space admins can create roles in the{' '}
         <Link external={false} sx={{ fontWeight: 'bold' }} href={`/${space?.domain}/settings/roles`}>
-          workspace settings page
+          space settings page
         </Link>
         .
       </Alert>

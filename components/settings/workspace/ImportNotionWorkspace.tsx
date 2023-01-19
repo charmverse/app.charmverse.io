@@ -7,6 +7,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import Grid from '@mui/material/Grid';
 import SvgIcon from '@mui/material/SvgIcon';
 import Typography from '@mui/material/Typography';
+import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { useSWRConfig } from 'swr';
 
@@ -34,6 +35,7 @@ interface NotionResponseState {
 export default function ImportNotionWorkspace() {
   const [notionState, setNotionState] = useState<NotionResponseState>({ loading: false });
   const { showMessage } = useSnackbar();
+  const router = useRouter();
   const [modalOpen, setModalOpen] = useState(false);
   const { mutate } = useSWRConfig();
   const space = useCurrentSpace();
@@ -105,7 +107,7 @@ export default function ImportNotionWorkspace() {
             disabled={!isAdmin}
             disabledTooltip='Only admins can import content from Notion'
             loading={notionState.loading}
-            href={`/api/notion/login?redirect=${encodeURIComponent(window.location.href.split('?')[0])}`}
+            href={`/api/notion/login?redirect=${encodeURIComponent(router.asPath.split('?')[0])}`}
             variant='outlined'
             startIcon={
               <SvgIcon sx={{ color: 'text.primary' }}>

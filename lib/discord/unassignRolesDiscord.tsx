@@ -1,6 +1,5 @@
 import { prisma } from 'db';
-import { getSpaceAndUserFromDiscord } from 'lib/discord/getSpaceAndUserFromDiscord';
-import type { ExternalRole } from 'lib/roles';
+import { getSpacesAndUserFromDiscord } from 'lib/discord/getSpaceAndUserFromDiscord';
 import { unassignRole } from 'lib/roles';
 
 export async function unassignRolesDiscord({
@@ -10,12 +9,14 @@ export async function unassignRolesDiscord({
 }: {
   discordUserId: string;
   discordServerId: string;
-  roles: ExternalRole[] | ExternalRole;
+  roles: string[] | string;
 }) {
   const rolesToRemove = Array.isArray(roles) ? roles : [roles];
-  const { user } = await getSpaceAndUserFromDiscord({ discordUserId, discordServerId });
+  const spacesAndUser = await getSpacesAndUserFromDiscord({ discordUserId, discordServerId });
+  const { user } = spacesAndUser[0];
+
   const removeRoles = await prisma?.role.findMany({
-    where: { externalId: { in: rolesToRemove.map((role) => String(role.id)) } }
+    where: { externalId: { in: rolesToRemove.map((role) => String(role)) } }
   });
 
   for (const role of removeRoles) {

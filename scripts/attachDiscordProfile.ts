@@ -3,6 +3,13 @@ import { User } from '@prisma/client';
 import { prisma } from 'db';
 import { DataNotFoundError } from 'lib/utilities/errors';
 
+
+/**
+ * See this page for more information on how to use this script
+ * https://app.charmverse.io/charmverse/page-8133628154153136
+ */
+
+
 function queryDiscord ({
   discordId,
   discordUsername,

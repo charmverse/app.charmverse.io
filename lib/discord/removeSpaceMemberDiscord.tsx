@@ -1,5 +1,5 @@
 import { prisma } from 'db';
-import { getSpaceAndUserFromDiscord } from 'lib/discord/getSpaceAndUserFromDiscord';
+import { getSpacesAndUserFromDiscord } from 'lib/discord/getSpaceAndUserFromDiscord';
 
 export async function removeSpaceMemberDiscord({
   discordUserId,
@@ -8,14 +8,18 @@ export async function removeSpaceMemberDiscord({
   discordUserId: string;
   discordServerId: string;
 }) {
-  const { space, user } = await getSpaceAndUserFromDiscord({ discordUserId, discordServerId });
+  const spacesData = await getSpacesAndUserFromDiscord({ discordUserId, discordServerId });
 
-  return prisma.spaceRole.delete({
-    where: {
-      spaceUser: {
-        spaceId: space.id,
-        userId: user.id
-      }
-    }
-  });
+  return Promise.allSettled(
+    spacesData.map(({ space, user }) =>
+      prisma.spaceRole.delete({
+        where: {
+          spaceUser: {
+            spaceId: space.id,
+            userId: user.id
+          }
+        }
+      })
+    )
+  );
 }

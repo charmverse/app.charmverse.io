@@ -1,6 +1,8 @@
 import {  deleteDaylightAbility, getAllAbilities } from "lib/token-gates/daylight";
 
-
+/**
+ * Use this script for testing Daylight abilities
+ */
 export async function listAbilities() {
   const { abilities } = await getAllAbilities();
 
