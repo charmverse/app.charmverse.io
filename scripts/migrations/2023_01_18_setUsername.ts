@@ -13,6 +13,8 @@ export async function setUserName() {
       wallets: true
     }
   });
+  const addressUsernames = usersWithWalletId.filter(u => u.username.startsWith('0x'));
+  console.log('users to check', addressUsernames.length)
   let i = 0;
   for (const user of usersWithWalletId) {
     if (i++ % 100 === 0) {
