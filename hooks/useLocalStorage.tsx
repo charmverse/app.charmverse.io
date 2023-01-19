@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 // Add a prefix so if our schema changes, we can invalidate previous content
 export const PREFIX = 'charm.v1';
@@ -30,7 +30,7 @@ export function useLocalStorage<T = any>(key: string | null, defaultValue: T, no
   const [value, setValue] = useState<T | null>(null);
 
   // Any time the key changes we need to get the value from ls again
-  useLayoutEffect(() => {
+  useEffect(() => {
     if (key) {
       setValue(getStorageValue(key, defaultValue, noPrefix));
     }
