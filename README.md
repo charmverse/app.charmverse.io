@@ -230,8 +230,9 @@ You can run individual tests, or test the whole system.
 
 Before running tests, configure a .env.test.local file.
 
-Set the following value inside the .env.test.local file
-DATABASE_URL=postgres://postgres:postgres@localhost:5432/charmversetest
+```bash
+  cp .env.test.local.example .env.test.local
+```
 
 **Initial setup**
 
