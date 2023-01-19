@@ -1,15 +1,14 @@
 export type UserEntity = {
-  avatar: string;
-  id: string;
-  discordId: string;
+  avatar: string | null;
+  wallet: string;
   username: string;
 };
 
 export type CommentEntity = {
   createdAt: string;
   id: string;
-  parentId: string;
-  threadId: string;
+  parentId: string | null;
+  threadId: string | null;
   author: UserEntity;
 };
 
@@ -59,7 +58,6 @@ export enum WebhookEventNames {
 // Utils to share common props among events
 type WebhookEventSharedProps<T = WebhookEventNames> = {
   scope: T;
-  wallet: string;
 };
 
 // Strongly typed events, shared between API, serverless functions and possibly our end users
@@ -71,7 +69,7 @@ export type WebhookEvent<T = WebhookEventNames> =
   | (WebhookEventSharedProps<T> & {
       scope: WebhookEventNames.CommentCreated;
       comment: CommentEntity;
-      discussion: DiscussionEntity;
+      discussion: DiscussionEntity | null;
     })
   | (WebhookEventSharedProps<T> & {
       scope: WebhookEventNames.CommentUpvoted;

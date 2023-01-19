@@ -1,17 +1,13 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import type { Bounty, Space, User } from '@prisma/client';
+import type { Space } from '@prisma/client';
 import type { SQSEvent, SQSRecord } from 'aws-lambda';
-import fetch from 'node-fetch';
+import 'node-fetch';
 import { webhookWorker } from 'serverless/handler';
 import type { WebhookPayload } from 'serverless/webhook/interfaces';
 import { WebhookEventNames } from 'serverless/webhook/interfaces';
-import request from 'supertest';
 
-import { prisma } from 'db';
-import { createBounty } from 'lib/bounties';
-import { addSpaceOperations } from 'lib/permissions/spaces';
 import type { LoggedInUser } from 'models';
-import { baseUrl, loginUser } from 'testing/mockApiCall';
+import { loginUser } from 'testing/mockApiCall';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 let nonAdminUser: LoggedInUser;
@@ -47,7 +43,6 @@ describe('SERVERLESS webhook worker', () => {
     const testWebhookPayload: WebhookPayload = {
       createdAt: new Date().toISOString(),
       event: {
-        wallet: '',
         scope: WebhookEventNames.ProposalPassed,
         proposal: {
           id: 'id',
