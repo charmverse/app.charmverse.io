@@ -6,10 +6,12 @@ import type { Upload } from 'lib/mux/getUpload';
 import { getUpload } from 'lib/mux/getUpload';
 import { canCreate } from 'lib/mux/permissions';
 import { withSessionRoute } from 'lib/session/withSession';
+import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 
 export type UploadRequest = {
-  pageId: string;
+  pageId: string | null;
   id: string;
+  spaceId: string;
 };
 
 export type UploadResponse = Upload;
@@ -20,9 +22,26 @@ handler.use(requireUser).get(getUploadEndpoint);
 
 async function getUploadEndpoint(req: NextApiRequest, res: NextApiResponse<UploadResponse>) {
   const query = req.query as UploadRequest;
+  const userId = req.session.user.id;
+
+  if (!query.pageId) {
+    const hasAccess = await hasAccessToSpace({
+      userId,
+      spaceId: query.spaceId
+    });
+
+    if (!hasAccess) {
+      throw new ActionNotPermittedError();
+    }
+
+    const upload = await getUpload(query.id);
+    return res.status(200).json(upload);
+  }
+
   const isAllowed = await canCreate({
-    userId: req.session.user.id,
-    resourceId: query.pageId
+    userId,
+    resourceId: query.pageId,
+    spaceId: query.spaceId
   });
 
   if (!isAllowed) {

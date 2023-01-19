@@ -1,11 +1,11 @@
 import * as http from 'adapters/http';
 import type { AssetRequest, AssetResponse } from 'pages/api/mux/asset/[id]';
-import type { CreateUploadRequest, CreateUploadResponse } from 'pages/api/mux/upload';
+import type { CreateUploadResponse } from 'pages/api/mux/upload';
 import type { UploadRequest, UploadResponse } from 'pages/api/mux/upload/[id]';
 
 export class MuxApi {
-  createUpload(params: CreateUploadRequest) {
-    return http.POST<CreateUploadResponse>('/api/mux/upload', params);
+  createUpload() {
+    return http.POST<CreateUploadResponse>('/api/mux/upload');
   }
 
   getAsset(params: AssetRequest) {
