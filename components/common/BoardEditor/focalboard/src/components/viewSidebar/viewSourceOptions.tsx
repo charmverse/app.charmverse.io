@@ -1,14 +1,14 @@
 import styled from '@emotion/styled';
 import AddIcon from '@mui/icons-material/Add';
 import AddCircleIcon from '@mui/icons-material/AddCircleOutline';
-import { Card, Grid, Box, ListItemIcon, MenuItem, Typography } from '@mui/material';
-import { useState } from 'react';
+import { Box, Card, Grid, ListItemIcon, MenuItem, TextField, Typography } from '@mui/material';
+import { useMemo, useState } from 'react';
 import { RiGoogleFill } from 'react-icons/ri';
 import { TbDatabase } from 'react-icons/tb';
 
 import PagesList from 'components/common/CharmEditor/components/PageList';
 import { usePages } from 'hooks/usePages';
-import type { BoardView, ViewSourceType, BoardViewFields } from 'lib/focalboard/boardView';
+import type { BoardView, BoardViewFields, ViewSourceType } from 'lib/focalboard/boardView';
 import type { PageMeta } from 'lib/pages';
 import { isTruthy } from 'lib/utilities/types';
 
@@ -60,12 +60,7 @@ export function ViewSourceOptions(props: ViewSourceOptionsProps) {
         title={props.title}
         closeSidebar={props.closeSidebar}
       />
-      <Box
-        onClick={(e) => e.stopPropagation()}
-        sx={{
-          overflow: 'auto'
-        }}
-      >
+      <Box onClick={(e) => e.stopPropagation()}>
         {formStep === 'select_source' && (
           <Grid container spacing={1} px={1}>
             <SourceType active={activeSourceType === 'board_page'} onClick={selectSourceType('board_page')}>
@@ -143,9 +138,17 @@ function SourceType({
 
 function CharmVerseDatabases(props: DatabaseSourceProps & { activePageId?: string }) {
   const { pages } = usePages();
-  const boardPages = Object.values(pages)
-    .filter((p) => p?.type === 'board' || p?.type === 'inline_board')
-    .filter(isTruthy);
+  const [searchTerm, setSearchTerm] = useState('');
+  const sortedPages = useMemo(() => {
+    return Object.values(pages)
+      .filter(
+        (p) =>
+          (p?.type === 'board' || p?.type === 'inline_board') &&
+          p.title.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+      .filter(isTruthy)
+      .sort((pageA, pageB) => ((pageA.title || 'Untitled') > (pageB.title || 'Untitled') ? 1 : -1));
+  }, [pages, searchTerm]);
 
   function onSelect(page: PageMeta) {
     props.onSelect({
@@ -156,7 +159,18 @@ function CharmVerseDatabases(props: DatabaseSourceProps & { activePageId?: strin
   return (
     <>
       <SidebarContent>
-        <PagesList pages={boardPages} activePageId={props.activePageId} onSelectPage={onSelect} />
+        <TextField
+          placeholder='Search pages'
+          value={searchTerm}
+          onChange={(e) => {
+            setSearchTerm(e.target.value);
+          }}
+          sx={{
+            mb: 1
+          }}
+          fullWidth
+        />
+        <PagesList isDatabase pages={sortedPages} activePageId={props.activePageId} onSelectPage={onSelect} />
       </SidebarContent>
       {props.onCreate && (
         <MenuItem onClick={props.onCreate}>
