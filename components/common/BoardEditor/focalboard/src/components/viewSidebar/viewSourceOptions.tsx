@@ -60,7 +60,12 @@ export function ViewSourceOptions(props: ViewSourceOptionsProps) {
         title={props.title}
         closeSidebar={props.closeSidebar}
       />
-      <Box onClick={(e) => e.stopPropagation()}>
+      <Box
+        onClick={(e) => e.stopPropagation()}
+        sx={{
+          overflow: 'auto'
+        }}
+      >
         {formStep === 'select_source' && (
           <Grid container spacing={1} px={1}>
             <SourceType active={activeSourceType === 'board_page'} onClick={selectSourceType('board_page')}>

@@ -7,7 +7,7 @@ type FocalboardViewsRecord = Record<string, null | string>;
 
 interface IContext {
   focalboardViewsRecord: FocalboardViewsRecord;
-  setFocalboardViewsRecord: React.Dispatch<React.SetStateAction<FocalboardViewsRecord>>;
+  setFocalboardViewsRecord: React.Dispatch<React.SetStateAction<FocalboardViewsRecord | null>>;
 }
 
 export const FocalboardViewsContext = createContext<Readonly<IContext>>({
@@ -20,7 +20,7 @@ export function FocalboardViewsProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo(
     () => ({
-      focalboardViewsRecord,
+      focalboardViewsRecord: focalboardViewsRecord ?? {},
       setFocalboardViewsRecord
     }),
     [focalboardViewsRecord]
