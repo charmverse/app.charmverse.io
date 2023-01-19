@@ -34,7 +34,7 @@ export function apply(log: Logger, logPrefix: string = '') {
     log.methodFactory = (methodName, logLevel, loggerName) => {
       const originalMethod = originalFactory(methodName, logLevel, loggerName);
 
-      return (message, opt) => {
+      return (message, opt: unknown) => {
         let prefix = '';
         if (formatLogsForDatadog) {
           prefix = `[${DateTime.local().toFormat(TIMESTAMP_FORMAT)}]`;
@@ -55,11 +55,11 @@ export function apply(log: Logger, logPrefix: string = '') {
           let _opt: LogMeta = {};
           if (opt) {
             let error: LogMeta['error'];
-            const maybeError = opt.error || opt;
+            const maybeError = (opt as { error?: Error }).error || opt;
             if (maybeError instanceof Error) {
               error = { ...maybeError, message: maybeError.message, stack: maybeError.stack };
             }
-            if (opt instanceof Array) {
+            if (isPrimitiveValue(opt) || opt instanceof Array) {
               _opt = { data: opt };
             } else {
               try {
@@ -121,4 +121,17 @@ function sendErrorToDiscord(webhook: string, message: any, opt: any) {
       }
     ]
   });
+}
+
+// Check if value is primitive value
+function isPrimitiveValue(value: unknown): boolean {
+  return (
+    typeof value === 'symbol' ||
+    typeof value === 'string' ||
+    typeof value === 'number' ||
+    typeof value === 'boolean' ||
+    typeof value === 'undefined' ||
+    value === null ||
+    typeof value === 'bigint'
+  );
 }
