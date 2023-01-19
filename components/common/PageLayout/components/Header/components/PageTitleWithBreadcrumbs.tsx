@@ -134,20 +134,14 @@ function ProposalPageTitle({ basePath }: { basePath: string }) {
 
 function ForumPageTitle({ basePath }: { basePath: string }) {
   const [pageTitle] = usePageTitle();
+  const firstTitle = pageTitle === 'Forum' ? 'All Categories' : pageTitle;
+
   return (
     <PageTitle>
-      {pageTitle === 'Forum' ? (
-        <Link href={`${basePath}/forum`} color={(theme) => theme.palette.text.primary}>
-          Forum
-        </Link>
-      ) : (
-        <>
-          <BreadCrumb>
-            <Link href={`${basePath}/forum`}>Forum</Link>
-          </BreadCrumb>
-          {pageTitle ?? 'Untitled'}
-        </>
-      )}
+      <BreadCrumb>
+        <Link href={`${basePath}/forum`}>Forum</Link>
+      </BreadCrumb>
+      {firstTitle ?? 'Untitled'}
     </PageTitle>
   );
 }

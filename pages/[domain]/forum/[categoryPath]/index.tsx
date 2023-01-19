@@ -5,8 +5,6 @@ import { ForumPage } from 'components/forum/ForumPage';
 import { setTitle } from 'hooks/usePageTitle';
 
 export default function ForumPageComponent() {
-  setTitle('Forum');
-
   return (
     <PostDialogProvider>
       <ForumPage />

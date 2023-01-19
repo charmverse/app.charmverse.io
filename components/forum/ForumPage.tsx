@@ -15,6 +15,7 @@ import { CenteredPageContent } from 'components/common/PageLayout/components/Pag
 import { usePostDialog } from 'components/forum/components/PostDialog/hooks/usePostDialog';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useForumCategories } from 'hooks/useForumCategories';
+import { usePageTitle } from 'hooks/usePageTitle';
 import type { PostSortOption } from 'lib/forums/posts/constants';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
@@ -33,8 +34,14 @@ export function ForumPage() {
   const [showNewPostForm, setShowNewPostForm] = useState(false);
   const { showPost } = usePostDialog();
   const { categories } = useForumCategories();
-
+  const [, setTitle] = usePageTitle();
   const [currentCategory, setCurrentCategory] = useState<PostCategory | null>(null);
+
+  useEffect(() => {
+    if (currentCategory?.name) {
+      setTitle(currentCategory.name);
+    }
+  }, [currentCategory?.name]);
 
   useEffect(() => {
     setCategoryFromPath();
