@@ -101,13 +101,13 @@ export default function MemberRow({ isAdmin, isSpaceOwner, member, onChange }: P
                   {action === 'makeAdmin' && (
                     <StyledListItemText
                       primary='Admin'
-                      secondary='Can access all settings and invite new members to the workspace'
+                      secondary='Can access all settings and invite new members to the space'
                     />
                   )}
                   {action === 'makeMember' && (
                     <StyledListItemText
                       primary='Member'
-                      secondary='Cannot change workspace settings or invite new members to the workspace'
+                      secondary='Cannot change space settings or invite new members to the space'
                     />
                   )}
                   {action === 'removeFromSpace' && (

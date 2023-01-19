@@ -31,7 +31,7 @@ export function MemberPropertiesPopup({
   spaceId,
   updateMemberPropertyValues,
   onClose,
-  title = 'Edit workspace profile'
+  title = 'Edit space profile'
 }: Props) {
   const { data, mutate } = useSWR(
     spaceId ? `members/${memberId}/values/${spaceId}` : null,

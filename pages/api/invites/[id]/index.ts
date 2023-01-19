@@ -32,9 +32,9 @@ async function acceptInvite(req: NextApiRequest, res: NextApiResponse) {
     }
   });
 
-  // Only proceed if they are not a member of the workspace
+  // Only proceed if they are not a member of the space
   if (spaceRole.length === 0) {
-    log.info('User joined workspace via invite', { spaceId: invite.spaceId, userId });
+    log.info('User joined space via invite', { spaceId: invite.spaceId, userId });
     const createdSpaceRole = await prisma.spaceRole.create({
       data: {
         space: {
