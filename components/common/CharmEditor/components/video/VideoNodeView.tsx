@@ -6,6 +6,7 @@ import useSwr from 'swr';
 import charmClient from 'charmClient';
 import LoadingComponent from 'components/common/LoadingComponent';
 import MultiTabs from 'components/common/MultiTabs';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 
 import BlockAligner from '../BlockAligner';
 import { IframeContainer } from '../common/IframeContainer';
@@ -27,14 +28,15 @@ export function VideoNodeView({
   node,
   onResizeStop,
   selected,
-  updateAttrs
-}: CharmNodeViewProps) {
+  updateAttrs,
+  isPost = false
+}: CharmNodeViewProps & { isPost?: boolean }) {
   const attrs = node.attrs as VideoNodeAttrs;
-
+  const space = useCurrentSpace();
   const [playbackIdWithToken, setPlaybackIdWithToken] = useState('');
 
   // poll endpoint until video is ready
-  const { data: asset, error } = useSwr(
+  const { data: asset } = useSwr(
     () => (attrs.muxAssetId && !playbackIdWithToken && pageId ? `/api/mux/asset/${attrs.muxAssetId}` : null),
     () => {
       return charmClient.mux.getAsset({ id: attrs.muxAssetId!, pageId: pageId! });
@@ -59,7 +61,7 @@ export function VideoNodeView({
 
   // If there are no source for the node, return the image select component
   if (!attrs.src && !attrs.muxAssetId) {
-    if (readOnly || !pageId) {
+    if (readOnly || (!pageId && (!isPost || !space))) {
       // hide the row completely
       return <div />;
     } else {
@@ -85,7 +87,7 @@ export function VideoNodeView({
                   placeholder='https://youtube.com...'
                 />
               ],
-              ['Upload', <VideoUploadForm key='upload' onComplete={onUploadComplete} pageId={pageId} />]
+              ['Upload', <VideoUploadForm key='upload' onComplete={onUploadComplete} pageId={pageId ?? null} />]
             ]}
           />
         </MediaSelectionPopup>
