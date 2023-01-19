@@ -1,4 +1,4 @@
-import { getSpaceAndUserFromDiscord } from 'lib/discord/getSpaceAndUserFromDiscord';
+import { getSpacesAndUserFromDiscord } from 'lib/discord/getSpaceAndUserFromDiscord';
 import type { ExternalRole } from 'lib/roles';
 import { createAndAssignRoles } from 'lib/roles/createAndAssignRoles';
 
@@ -12,7 +12,9 @@ export async function createAndAssignRolesDiscord({
   roles: ExternalRole[] | ExternalRole;
 }) {
   const rolesToAdd = Array.isArray(roles) ? roles : [roles];
-  const { space, user } = await getSpaceAndUserFromDiscord({ discordUserId, discordServerId });
+  const spacesData = await getSpacesAndUserFromDiscord({ discordUserId, discordServerId });
 
-  return createAndAssignRoles({ userId: user.id, spaceId: space.id, roles: rolesToAdd });
+  return Promise.all(
+    spacesData.map(({ space, user }) => createAndAssignRoles({ userId: user.id, spaceId: space.id, roles: rolesToAdd }))
+  );
 }

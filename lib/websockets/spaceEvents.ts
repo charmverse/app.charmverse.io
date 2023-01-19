@@ -18,7 +18,7 @@ export class SpaceEventHandler {
       try {
         await this.onMessage(message);
       } catch (error) {
-        log.error('Error handling workspace socket message', error);
+        log.error('Error handling space socket message', error);
       }
     });
 
@@ -40,7 +40,7 @@ export class SpaceEventHandler {
         }
       } catch (error) {
         log.error('Error subscribing user to space events', { error });
-        this.sendError('Error subscribing to workspace');
+        this.sendError('Error subscribing to space');
       }
     }
   }

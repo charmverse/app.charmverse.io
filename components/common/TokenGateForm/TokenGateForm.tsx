@@ -125,7 +125,7 @@ export default function TokenGateForm({
         joinType
       });
 
-      showMessage(`You have joined the ${tokenGateResult?.space.name} workspace.`, 'success');
+      showMessage(`You have joined the ${tokenGateResult?.space.name} space.`, 'success');
 
       await refreshUser();
 
@@ -150,7 +150,7 @@ export default function TokenGateForm({
   if (!isLoading && (!tokenGates || tokenGates?.length === 0)) {
     return (
       <Alert data-test='token-gate-empty-state' severity='info' sx={{ my: 1 }}>
-        No token gates found for this workspace.
+        No token gates found for this space.
       </Alert>
     );
   }

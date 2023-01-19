@@ -1,6 +1,11 @@
 
 import { getAccessiblePages, includePagePermissionsMeta } from 'lib/pages/server';
 import { prisma } from 'db'
+
+/**
+ * Use this script to perform database searches.
+ */
+
 async function search () {
   const user = await prisma.user.findFirst({
     where: {

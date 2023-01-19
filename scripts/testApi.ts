@@ -3,7 +3,6 @@
 export {};
 
 // use this file and test api keys
-
 const apiDomain = 'https://app.charmverse.io';
 const apiKey = process.env.API_KEY;
 

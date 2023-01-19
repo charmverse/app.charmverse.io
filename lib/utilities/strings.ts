@@ -35,12 +35,24 @@ export function getDomain(url: string, includeProtocol?: boolean) {
 }
 
 export function isUrl(text: string) {
-  const urlRegex = /(https?:\/\/[^\s]+)/g;
-  return urlRegex.test(text);
+  const urlPattern = new RegExp(
+    '^(https?:\\/\\/)?' + // validate protocol
+      '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' + // validate domain name
+      '((\\d{1,3}\\.){3}\\d{1,3}))' + // validate OR ip (v4) address
+      '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' + // validate port and path
+      '(\\?[;&a-z\\d%_.~+=-]*)?' + // validate query string
+      '(\\#[-a-z\\d_]*)?$',
+    'i'
+  );
+  return urlPattern.test(text);
 }
 
 // generate a color based on a string. Copied from https://medium.com/@pppped/compute-an-arbitrary-color-for-user-avatar-starting-from-his-username-with-javascript-cd0675943b66
 export function stringToColor(name: string, saturation = 50, lightness = 60) {
+  if (name === '') {
+    // return 'var(--background-dark)';
+    return 'transparent';
+  }
   return `hsl(${stringToHue(name)}, ${saturation}%, ${lightness}%)`;
 }
 

@@ -34,6 +34,10 @@ jobs:
       - name: Install dependencies and build app
         uses: ./.github/actions/install
 
+      - name: Create .env.test.local file
+        run: |
+          cp .env.test.local.example .env.test.local
+
       - name: Build app
         uses: ./.github/actions/build
         with:

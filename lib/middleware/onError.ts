@@ -16,6 +16,11 @@ export function onError(err: any, req: NextApiRequest, res: NextApiResponse) {
       url: req.url,
       body: req.body
     });
+  } else {
+    log.warn(`Client Error: ${errorAsSystemError.message}`, {
+      url: req.url,
+      body: req.body
+    });
   }
 
   const { stack, message, ...withoutStack } = errorAsSystemError;

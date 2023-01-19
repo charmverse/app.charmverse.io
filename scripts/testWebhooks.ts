@@ -24,7 +24,7 @@ export async function testAddMessage()  {
 }
 
 export async function testFetchMessages() {
-  const processorFn = async () => true;
+  const processorFn = async () => ({ success: true });
 
   await processMessages({ processorFn });
 }

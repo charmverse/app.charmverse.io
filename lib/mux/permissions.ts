@@ -5,8 +5,9 @@ import { DataNotFoundError } from 'lib/utilities/errors';
 type VideoPermissionComputeRequest = {
   resourceId: string;
   userId: string;
+  spaceId: string;
 };
-export async function canCreate({ resourceId, userId }: VideoPermissionComputeRequest) {
+export async function canCreate({ resourceId, userId, spaceId }: VideoPermissionComputeRequest) {
   const [page, post] = await Promise.all([
     prisma.page.findUnique({
       where: {
@@ -26,7 +27,12 @@ export async function canCreate({ resourceId, userId }: VideoPermissionComputeRe
     })
   ]);
 
-  if (post) {
+  if (!post && !page) {
+    return _hasAccessToSpace({
+      userId,
+      spaceId
+    });
+  } else if (post) {
     return _hasAccessToSpace({
       userId,
       spaceId: post.spaceId

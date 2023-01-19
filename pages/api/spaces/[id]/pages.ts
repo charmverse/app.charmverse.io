@@ -54,6 +54,7 @@ async function getPages(req: NextApiRequest, res: NextApiResponse<IPageWithPermi
       createdPages.push(createdPage);
     }
   }
+
   return res.status(200).json([...accessiblePages, ...createdPages]);
 }
 

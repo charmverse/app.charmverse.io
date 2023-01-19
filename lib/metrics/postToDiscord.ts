@@ -23,17 +23,17 @@ export type FunnelEvent = 'awareness' | 'acquisition' | 'activation' | 'revenue'
 
 export type EventType =
   | 'create_user'
-  | 'create_workspace'
+  | 'create_space'
   | 'first_user_create_page'
-  | 'first_workspace_create_page'
+  | 'first_space_create_page'
   | 'create_bounty'
   | 'first_user_create_bounty'
-  | 'first_workspace_create_bounty'
-  | 'join_workspace_from_link'
+  | 'first_space_create_bounty'
+  | 'join_space_from_link'
   | 'first_user_proposal_create'
   | 'first_user_proposal_template_create'
-  | 'first_workspace_proposal_create'
-  | 'first_workspace_proposal_template_create';
+  | 'first_space_proposal_create'
+  | 'first_space_proposal_template_create';
 
 /// ------
 /**
@@ -99,16 +99,16 @@ export async function logFirstProposal({ spaceId, userId }: UserSpaceAction) {
     const eventLog: IEventToLog = {
       eventType: 'first_user_proposal_create',
       funnelStage: 'activation',
-      message: `Someone inside ${space?.domain} workspace created their first proposal`
+      message: `Someone inside ${space?.domain} space created their first proposal`
     };
     postToDiscord(eventLog);
   }
 
   if (spaceProposals === 1) {
     const eventLog: IEventToLog = {
-      eventType: 'first_workspace_proposal_create',
+      eventType: 'first_space_proposal_create',
       funnelStage: 'activation',
-      message: `The ${space?.domain} workspace just created its first proposal`
+      message: `The ${space?.domain} space just created its first proposal`
     };
     postToDiscord(eventLog);
   }
@@ -147,16 +147,16 @@ export async function logFirstProposalTemplate({ spaceId, userId }: UserSpaceAct
     const eventLog: IEventToLog = {
       eventType: 'first_user_proposal_create',
       funnelStage: 'activation',
-      message: `Someone inside ${space?.domain} workspace created their first proposal template`
+      message: `Someone inside ${space?.domain} space created their first proposal template`
     };
     postToDiscord(eventLog);
   }
 
   if (spaceProposals === 1) {
     const eventLog: IEventToLog = {
-      eventType: 'first_workspace_proposal_create',
+      eventType: 'first_space_proposal_create',
       funnelStage: 'activation',
-      message: `The ${space?.domain} workspace just created its first proposal template`
+      message: `The ${space?.domain} space just created its first proposal template`
     };
     postToDiscord(eventLog);
   }
@@ -189,9 +189,9 @@ export async function logWorkspaceFirstBountyEvents(bounty: Bounty) {
     });
 
     const event: IEventToLog = {
-      eventType: 'first_workspace_create_bounty',
+      eventType: 'first_space_create_bounty',
       funnelStage: 'activation',
-      message: `${workspace?.domain} workspace just posted its first bounty`
+      message: `${workspace?.domain} space just posted its first bounty`
     };
 
     postToDiscord(event);
@@ -220,7 +220,7 @@ export async function logUserFirstBountyEvents(bounty: Bounty) {
     const event: IEventToLog = {
       eventType: 'first_user_create_bounty',
       funnelStage: 'activation',
-      message: `A user just created their first bounty inside the ${workspace?.domain} workspace`
+      message: `A user just created their first bounty inside the ${workspace?.domain} space`
     };
 
     postToDiscord(event);
@@ -245,9 +245,9 @@ export async function logInviteAccepted({ spaceId }: Omit<UserSpaceAction, 'user
   });
 
   const eventLog: IEventToLog = {
-    eventType: 'join_workspace_from_link',
+    eventType: 'join_space_from_link',
     funnelStage: 'acquisition',
-    message: `Someone joined ${space?.domain} workspace via an invite link`
+    message: `Someone joined ${space?.domain} space via an invite link`
   };
 
   postToDiscord(eventLog);
@@ -280,9 +280,9 @@ export async function logFirstWorkspacePageCreation(page: Page) {
     });
 
     const eventLog: IEventToLog = {
-      eventType: 'first_workspace_create_page',
+      eventType: 'first_space_create_page',
       funnelStage: 'activation',
-      message: `First page created in ${space!.domain} workspace`
+      message: `First page created in ${space!.domain} space`
     };
 
     postToDiscord(eventLog);
@@ -318,7 +318,7 @@ export async function logFirstUserPageCreation(page: Page) {
     const eventLog: IEventToLog = {
       eventType: 'first_user_create_page',
       funnelStage: 'activation',
-      message: `A user just created their first page. This happened in the ${space!.domain} workspace`
+      message: `A user just created their first page. This happened in the ${space!.domain} space`
     };
 
     postToDiscord(eventLog);
@@ -336,8 +336,8 @@ export async function logSignupViaWallet() {
 export function logSpaceCreation(space: Space) {
   const eventLog: IEventToLog = {
     funnelStage: 'acquisition',
-    eventType: 'create_workspace',
-    message: `New workspace ${space.domain} has just been created`
+    eventType: 'create_space',
+    message: `New space ${space.domain} has just been created`
   };
 
   postToDiscord(eventLog);
@@ -357,7 +357,7 @@ export async function logWorkspaceJoinedViaTokenGate(spaceId: string) {
     postToDiscord({
       funnelStage: 'acquisition',
       eventType: 'create_user',
-      message: `A user has joined the ${space.domain} workspace via token gate.`
+      message: `A user has joined the ${space.domain} space via token gate.`
     });
   }
 }

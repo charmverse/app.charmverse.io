@@ -27,6 +27,7 @@ import type { RenderNodeViewsFunction } from './NodeViewWrapper';
 const StyledLoadingComponent = styled(LoadingComponent)`
   position: absolute;
   width: 100%;
+  align-items: flex-end;
 `;
 
 interface BangleEditorProps<PluginMetadata = any> extends CoreBangleEditorProps<PluginMetadata> {
@@ -158,7 +159,7 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
   }, [user, pageId, useSockets, authResponse, authResponse, ref]);
 
   useEffect(() => {
-    const timer = setTimeout(() => setShowLoader(true), 200);
+    const timer = setTimeout(() => setShowLoader(true), 300);
     return () => clearTimeout(timer);
   }, [setShowLoader]);
 
@@ -168,8 +169,12 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
   return (
     <EditorViewContext.Provider value={editor?.view as any}>
       {editor ? children : null}
-      <div ref={editorRef} className='bangle-editor-core'>
-        <StyledLoadingComponent height='400px' isLoading={showLoader && isLoading} />
+      <div
+        ref={editorRef}
+        className='bangle-editor-core'
+        style={{ minHeight: showLoader && isLoading ? '300px' : undefined }}
+      >
+        <StyledLoadingComponent height='300px' isLoading={showLoader && isLoading} />
         <div ref={renderRef} id={pageId} className={className} style={style} />
       </div>
       {nodeViews.map((nodeView) => {

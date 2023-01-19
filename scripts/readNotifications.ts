@@ -1,9 +1,11 @@
 
 
 import log from 'lib/log';
-import { number } from 'yup';
 import { getNotifications } from '../background/tasks/sendNotifications/sendNotifications';
 
+/**
+ * Read notifications that should be sent out
+ */
 export async function readUserNotifications (): Promise<number> {
 
   const notificationsToSend = await getNotifications();

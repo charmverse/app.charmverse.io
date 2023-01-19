@@ -71,10 +71,10 @@ describe('getAccessiblePages', () => {
   });
 
   it('Should return only public pages if an anonymous person is requesting', async () => {
-    const { space, user: nonAdminUser } = await generateUserAndSpaceWithApiToken(undefined, false);
+    const { space, user: adminUser } = await generateUserAndSpaceWithApiToken(undefined, true);
 
-    const page1 = await createPage({ createdBy: nonAdminUser.id, spaceId: space.id });
-    const page2 = await createPage({ createdBy: nonAdminUser.id, spaceId: space.id });
+    const page1 = await createPage({ createdBy: adminUser.id, spaceId: space.id });
+    const page2 = await createPage({ createdBy: adminUser.id, spaceId: space.id });
 
     await upsertPermission(page1.id, {
       permissionLevel: 'view',
