@@ -1,4 +1,4 @@
-import type { SQSBatchItemFailure, SQSBatchResponse, SQSEvent, SQSHandler, SQSRecord } from 'aws-lambda';
+import type { SQSBatchItemFailure, SQSBatchResponse, SQSEvent, SQSRecord } from 'aws-lambda';
 import type { KeyLike } from 'jose';
 import { SignJWT } from 'jose';
 import fetch from 'node-fetch';
@@ -55,12 +55,7 @@ export const webhookWorker = async (event: SQSEvent): Promise<SQSBatchResponse> 
           batchItemFailures.push({ itemIdentifier: record.messageId });
 
           // Throw the error so we can log it for debugging
-          throw new Error(`Expect error 200 back. Received: ${response.status}`, {
-            cause: {
-              webhookData,
-              status: response.status
-            }
-          });
+          throw new Error(`Expect error 200 back. Received: ${response.status}`);
         }
       } catch (e) {
         // eslint-disable-next-line no-console
