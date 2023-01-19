@@ -87,16 +87,18 @@ export async function createWorkspaceApi({
 
   const space = await createWorkspace({ spaceData, userId: botUser.id });
 
-  // create roles from discord
-  if (discordServerId) {
-    // upsert all roles from discord
-    await upsertSpaceRolesFromDiscord({ space, userId: botUser.id });
-  }
+  setTimeout(async () => {
+    // create roles from discord
+    if (discordServerId) {
+      // upsert all roles from discord
+      await upsertSpaceRolesFromDiscord({ space, userId: botUser.id });
+    }
 
-  // assing roles to discord admin user
-  if (adminDiscordUserId) {
-    await upsertUserRolesFromDiscord({ space, userId: adminUserId });
-  }
+    // assing roles to discord admin user
+    if (adminDiscordUserId) {
+      await upsertUserRolesFromDiscord({ space, userId: adminUserId });
+    }
+  }, 5000);
 
   return {
     id: space.id,
