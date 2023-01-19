@@ -1,5 +1,3 @@
-import { useEffect } from 'react';
-
 import BountiesPage from 'components/bounties/BountiesPage';
 import LoadingComponent from 'components/common/LoadingComponent';
 import getPageLayout from 'components/common/PageLayout/getLayout';
@@ -8,20 +6,13 @@ import { useBounties } from 'hooks/useBounties';
 import { setTitle } from 'hooks/usePageTitle';
 
 export default function BountyPage() {
-  const { bounties, loadingBounties, setPublicSpaceId } = useBounties();
-  const { publicSpace, accessCheked } = usePublicPage();
-
-  useEffect(() => {
-    setPublicSpaceId(publicSpace?.id || null);
-  }, []);
-
+  const { bounties, loadingBounties } = useBounties();
+  const { hasPublicPageAccess, accessCheked } = usePublicPage();
   setTitle('Bounties');
-
-  if (loadingBounties || !bounties || !publicSpace || !accessCheked) {
+  if (loadingBounties || !bounties || !accessCheked) {
     return <LoadingComponent isLoading />;
   }
-
-  return <BountiesPage bounties={bounties} publicMode={publicSpace.publicBountyBoard || false} />;
+  return <BountiesPage bounties={bounties} publicMode={hasPublicPageAccess} />;
 }
 
 BountyPage.getLayout = getPageLayout;

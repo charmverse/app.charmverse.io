@@ -14,7 +14,7 @@ export const usePublicPage = () => {
 
   const { spaces, isLoaded: spacesLoaded } = useSpaces();
   const spaceDomain = isPublicPath ? (query.domain as string) : null;
-  const loadedSpace = spaces.find((s) => s.domain !== spaceDomain);
+  const loadedSpace = spaces.find((s) => s.domain === spaceDomain);
   const pagePath = isPublicPath && !isBountiesPath ? (query.pageId as string) : null;
 
   const pageKey = useMemo(() => {
@@ -58,10 +58,10 @@ export const usePublicPage = () => {
     error: spaceError
   } = useSWR(shouldLoadSpace ? `space/${spaceDomain}` : null, () => charmClient.getSpaceByDomain(spaceDomain || ''));
 
-  const space = loadedSpace || publicSpace || publicPage?.space;
+  const space = publicSpace || publicPage?.space;
   const hasPublicBounties = space?.publicBountyBoard;
   const hasPublicPageAccess = !!publicPage || !!hasPublicBounties;
-  const accessCheked = spacesLoaded && (hasPublicPageAccess || (!shouldLoadSpace && !shouldLoadPublicPage));
+  const accessCheked = spacesLoaded && (hasPublicPageAccess || (!shouldLoadSpace && !shouldLoadPublicPage) || !!space);
 
   return {
     isCheckingAccess: isPublicPageLoading || isSpaceLoading,

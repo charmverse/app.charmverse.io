@@ -38,7 +38,6 @@ export type PagesContext = {
   deletePage: (data: { pageId: string; board?: Block }) => Promise<PageMeta | null | undefined>;
   getPagePermissions: (pageId: string, page?: PageMeta) => IPagePermissionFlags;
   mutatePagesList: KeyedMutator<PagesMap<PageMeta>>;
-  setPublicSpaceId: (spaceId: string | null) => void;
 };
 
 const refreshInterval = 1000 * 5 * 60; // 5 minutes
@@ -55,8 +54,7 @@ export const PagesContext = createContext<Readonly<PagesContext>>({
   mutatePage: () => {},
   mutatePagesRemove: () => {},
   deletePage: () => Promise.resolve({} as any),
-  mutatePagesList: () => Promise.resolve({} as any),
-  setPublicSpaceId: () => {}
+  mutatePagesList: () => Promise.resolve({} as any)
 });
 
 export function PagesProvider({ children }: { children: ReactNode }) {
@@ -67,16 +65,15 @@ export function PagesProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
   const { user } = useUser();
   const { subscribe } = useWebSocketClient();
-  const [publicSpaceId, setPublicSpaceId] = useState<string | null>(null);
 
   const { data, mutate: mutatePagesList } = useSWR(
-    () => getPagesListCacheKey(currentSpace?.id || publicSpaceId || ''),
+    () => getPagesListCacheKey(currentSpace?.id),
     async () => {
-      if (!currentSpace && !publicSpaceId) {
+      if (!currentSpace) {
         return {};
       }
 
-      const pagesRes = await charmClient.pages.getPages(currentSpace?.id || publicSpaceId || '');
+      const pagesRes = await charmClient.pages.getPages(currentSpace?.id);
       const pagesDict: PagesContext['pages'] = {};
       pagesRes?.forEach((page) => {
         pagesDict[page.id] = page;
@@ -344,8 +341,7 @@ export function PagesProvider({ children }: { children: ReactNode }) {
       updatePage,
       mutatePage,
       mutatePagesRemove,
-      mutatePagesList,
-      setPublicSpaceId
+      mutatePagesList
     }),
     [currentPageId, router, !!data, pages, user]
   );

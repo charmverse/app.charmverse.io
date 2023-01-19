@@ -1,13 +1,16 @@
 import styled from '@emotion/styled';
 import type { Theme } from '@mui/material';
+import { Box } from '@mui/material';
 import MuiAppBar from '@mui/material/AppBar';
 import MuiDrawer from '@mui/material/Drawer';
 import Head from 'next/head';
 import * as React from 'react';
 
+import LoadingComponent from 'components/common/LoadingComponent';
 import { PageDialogProvider } from 'components/common/PageDialog/hooks/usePageDialog';
 import PageDialogGlobalModal from 'components/common/PageDialog/PageDialogGlobal';
 import { usePublicPage } from 'components/publicPages/hooks/usePublicPage';
+import { PublicPageLayout } from 'components/publicPages/PublicPageLayout';
 import { FocalboardViewsProvider } from 'hooks/useFocalboardViews';
 import { useLocalStorage } from 'hooks/useLocalStorage';
 import { PageActionDisplayProvider } from 'hooks/usePageActionDisplay';
@@ -107,7 +110,7 @@ function PageLayout({ sidebarWidth = 300, children, sidebar: SidebarOverride }: 
   const smallScreen = React.useMemo(() => isSmallScreen(), []);
   const [open, setOpen] = useLocalStorage('leftSidebar', !smallScreen);
   const { user } = useUser();
-  const { hasPublicPageAccess, accessCheked } = usePublicPage();
+  const { hasPublicPageAccess, accessCheked, publicPage } = usePublicPage();
 
   const handleDrawerOpen = React.useCallback(() => {
     setOpen(true);
@@ -118,12 +121,15 @@ function PageLayout({ sidebarWidth = 300, children, sidebar: SidebarOverride }: 
   }, []);
 
   if (!accessCheked) {
-    // TODO: loading state
-    return null;
+    return (
+      <Box display='flex' height='100%' alignSelf='stretch' justifyContent='center' flex={1}>
+        <LoadingComponent isLoading />
+      </Box>
+    );
   }
 
   if (hasPublicPageAccess) {
-    return <div>{children || null}</div>;
+    return <PublicPageLayout basePageId={publicPage?.page?.id}>{children || null}</PublicPageLayout>;
   }
 
   return (

@@ -17,11 +17,11 @@ const accountPages = ['profile'];
 
 export default function RouteGuard({ children }: { children: ReactNode }) {
   const router = useRouter();
-  const { isCheckingAccess, hasPublicPageAccess } = usePublicPage();
+  const { accessCheked, hasPublicPageAccess } = usePublicPage();
   const [authorized, setAuthorized] = useState(true);
   const { user, isLoaded } = useUser();
   const { spaces, isLoaded: isSpacesLoaded } = useSpaces();
-  const isLoading = !isLoaded || !isSpacesLoaded || isCheckingAccess;
+  const isLoading = !isLoaded || !isSpacesLoaded || !accessCheked;
   const authorizedSpaceDomainRef = useRef('');
 
   if (typeof window !== 'undefined') {
