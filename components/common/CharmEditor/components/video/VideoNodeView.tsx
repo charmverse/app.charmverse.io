@@ -37,9 +37,9 @@ export function VideoNodeView({
 
   // poll endpoint until video is ready
   const { data: asset } = useSwr(
-    () => (attrs.muxAssetId && !playbackIdWithToken && pageId ? `/api/mux/asset/${attrs.muxAssetId}` : null),
+    () => (attrs.muxAssetId && !playbackIdWithToken && pageId && space ? `/api/mux/asset/${attrs.muxAssetId}` : null),
     () => {
-      return charmClient.mux.getAsset({ id: attrs.muxAssetId!, pageId: pageId! });
+      return charmClient.mux.getAsset({ id: attrs.muxAssetId!, pageId: pageId!, spaceId: space!.id });
     },
     {
       refreshInterval: 5000
