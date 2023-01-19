@@ -6,7 +6,6 @@ import { redisClient } from 'adapters/redis/redisClient';
 import { prisma } from 'db';
 import log from 'lib/log';
 import { SpaceMembershipRequiredError } from 'lib/permissions/errors';
-import { DataNotFoundError } from 'lib/utilities/errors';
 import { authOnConnect } from 'lib/websockets/authentication';
 import { DocumentEventHandler } from 'lib/websockets/documentEvents';
 import { SpaceEventHandler } from 'lib/websockets/spaceEvents';
@@ -52,12 +51,6 @@ export class WebsocketBroadcaster {
         // clientCount: io.engine.clientsCount,
         clientCount: io.of('/').sockets.size
       });
-      log.info('Info test', {
-        nested: { prop: { prop: 'value', arr: ['1', '2', 3] } }
-      });
-      log.warn('Warning test', 42);
-      log.error('Error test', new Error('somethin '));
-      log.error('Error test with error property', { error: new DataNotFoundError('another somethin') });
 
       socket.on('disconnect', () => {
         log.debug('[ws] Web socket disconnected', {
