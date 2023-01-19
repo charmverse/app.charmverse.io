@@ -61,9 +61,9 @@ export async function listForumPosts(
   const orderQuery: Prisma.PostFindManyArgs = {
     // Return posts ordered from most recent to oldest
     orderBy: {
-      ...((sort === 'newest' || !sort || !postSortOptions.includes(sort)) && orderByNewest),
-      ...(sort === 'most_commented' && orderByMostCommmented),
-      ...(sort === 'most_voted' && orderByMostVoted)
+      ...((sort === 'new' || !sort || !postSortOptions.includes(sort)) && orderByNewest),
+      ...(sort === 'hot' && orderByMostCommmented),
+      ...(sort === 'top' && orderByMostVoted)
     }
   };
 

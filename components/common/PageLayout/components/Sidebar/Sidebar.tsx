@@ -335,7 +335,7 @@ export default function Sidebar({ closeSidebar, favorites }: SidebarProps) {
               </Box>
             )}
             <WorkspaceLabel>
-              <SectionName>WORKSPACE</SectionName>
+              <SectionName>SPACE</SectionName>
               {/** Test component */}
               {userSpacePermissions?.createPage && (
                 <div className='add-a-page'>

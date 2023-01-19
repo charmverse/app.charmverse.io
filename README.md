@@ -1,6 +1,6 @@
 # app.charmverse.io
 
-The all-in-one Workspace for DAOs
+The all-in-one Space for DAOs
 
 ## Contributing
 
@@ -18,10 +18,13 @@ There are several ways you can contribute:
 1. This application requires a PostgreSQL database while we figure out decentralized storage:
 
 If you don't have a local Postgres server running, you can install and run it with Docker:
+
 ```
 docker run -d -v $HOME/postgresql/data:/var/lib/postgresql/data -p 5432:5432 -e POSTGRES_PASSWORD=postgres postgres
 ```
+
 The connection string can be overridden by copying the `.env` file and renaming to `.env.local`:
+
 ```
 DATABASE_URL=postgres://postgres:postgres@localhost:5432/charmverse
 ```
@@ -64,8 +67,8 @@ Start the app from the dotenv CLI, which you can download [here](https://www.npm
 For further information about environment variables in Next.js, see the [docs](https://nextjs.org/docs/basic-features/environment-variables).
 
 
-
 ### Access your local server via https
+
 You may want to access your local development server using https from another device (such as in the case of mobile testing).
 
 **Steps**
@@ -73,10 +76,10 @@ You may want to access your local development server using https from another de
 1. Run the following command in your terminal to generate the certificate
 
 openssl req -x509 -out localhost.crt -keyout localhost.key \
-  -days 365 \
-  -newkey rsa:2048 -nodes -sha256 \
-  -subj '/CN=localhost' -extensions EXT -config <( \
-   printf "[dn]\nCN=localhost\n[req]\ndistinguished_name = dn\n[EXT]\nsubjectAltName=DNS:localhost\nkeyUsage=digitalSignature\nextendedKeyUsage=serverAuth")
+ -days 365 \
+ -newkey rsa:2048 -nodes -sha256 \
+ -subj '/CN=localhost' -extensions EXT -config <( \
+ printf "[dn]\nCN=localhost\n[req]\ndistinguished_name = dn\n[EXT]\nsubjectAltName=DNS:localhost\nkeyUsage=digitalSignature\nextendedKeyUsage=serverAuth")
 
 2. Create the extra certificates directory
 
@@ -174,17 +177,17 @@ SELECT started_at,migration_name FROM "_prisma_migrations" ORDER BY "started_at"
 
 ### Get access to AWS resources:
 
-Get on Twingate to use the ZeroTrust network to get access to AWS. 
+Get on Twingate to use the ZeroTrust network to get access to AWS.
 
 - Download the Twingate client here: https://www.twingate.com/download
 - Install client
 - When prompted with "Connect to a Network", type in "charmverse.twingate.com"
-- Client will then forward you to Google auth page. If asked to grant twingate access to your google account please do so. 
-- Your Client is now properly configured to connect to resources behind AWS. 
+- Client will then forward you to Google auth page. If asked to grant twingate access to your google account please do so.
+- Your Client is now properly configured to connect to resources behind AWS.
 
 To test your connection:
 
-Use your favorite database client and connect to stg postgres at URL hostname 
+Use your favorite database client and connect to stg postgres at URL hostname
 
 `stg-app-charmverse-io.ckvazun0eddr.us-east-1.rds.amazonaws.com`
 
@@ -195,9 +198,11 @@ or cmdline
 For a longer version of this Twingate docs: https://app.charmverse.io/charmverse/page-7001517083591569
 
 ### Web Sockets
+
 Real-time features including the content editor for pages rely on a web socket service. It depends on socket.io.
 
 #### Development
+
 ```
 # Running the standard dev command will serve web sockets as part of the Next.js process:
 npm start
@@ -209,12 +214,13 @@ npm run sockets
 npm run sockets:dev
 ```
 
-
 ### Testing
+
 Testing for client-side and server-side code happens separately.
 
 **Server-side testing**
 Our server contains 2 types of tests:
+
 - Unit tests: Covering the functionality of individual components
 - Integration tests: Covering the expected responses from API endpoints
 
@@ -227,7 +233,7 @@ Before running tests, configure a .env.test.local file.
 Set the following value inside the .env.test.local file
 DATABASE_URL=postgres://postgres:postgres@localhost:5432/charmversetest
 
-__Initial setup__
+**Initial setup**
 
 We've provided a script you can use to configure a test database that won't interfere with your usual local development database.
 
@@ -241,8 +247,9 @@ $ npm run test:setup-db
 
 ```
 
-__Run tests__
+**Run tests**
 Start your server with following command
+
 ```bash
 # Start the server
 $ npm run start:test
@@ -259,11 +266,12 @@ $ npm run test:server
 
 On the client side, we have tests written with `react-testing-library`. In order to run them, please go through the following section.
 
-__Info for running individual tests__
+**Info for running individual tests**
 
 If you are using VSCode, install the (Jest Runner plugin)[https://marketplace.visualstudio.com/items?itemName=firsttris.vscode-jest-runner]
 
 In .vscode/settings.json, add:
+
 - for running server side tests: "jestrunner.configPath": "jest.config-server.ts"
 - for running client side tests: "jestrunner.configPath": "jest.config-browser.ts"
 
@@ -278,9 +286,9 @@ This will also work for the API integration tests, but you must make sure your s
 We use `playwright` for end-to-end testing.
 To run all tests use `npm run test:e2e`
 
-__Info for running individual e2e in chromium browser__
+**Info for running individual e2e in chromium browser**
 
-There is util command that will allow you to run single test in a spawned chromium browser for easier debugging. 
+There is util command that will allow you to run single test in a spawned chromium browser for easier debugging.
 Command to use: `npm run debug:e2e __e2e__/YOUR_TEST_FILE.spec.ts`
 
 i.e: `npm run debug:e2e __e2e__/login.spec.ts`
@@ -299,28 +307,30 @@ const Container = styled(Box)`
 <Box sx={{ bgcolor: 'sidebar.background' }} />
 ```
 
-
 # Background Workers (/background folder)
 
 There are several cron tasks managed inside the /background/tasks folder. These run inside their own Beanstalk environment. Visit the folder to see the latest tasks.
 
 ## Notifications
+
 To debug notifications, you can run a command to read back current tasks:
+
 ```
 dotenv -e .env.local -- npm run notifications:debug
 ```
 
 # Stuff related to running in Elastic Beanstalk
+
 ## Adding a new secret to Beanstalk app & environment:
 
-***Create the secret:***
+**_Create the secret:_**
 
 Secret names have the following format:
 `/io.cv.app/<env>/<secret name>`
 
 Secret names are namespaced by the running environment. If, for example, you are only using this secret when
-running the app in production, then namespace is `prd`. In staging environment, then secret namespace is `stg`. 
-Many secrets are the same regardless of whether you're running the app in production or staging, then the namespace is `shared`. 
+running the app in production, then namespace is `prd`. In staging environment, then secret namespace is `stg`.
+Many secrets are the same regardless of whether you're running the app in production or staging, then the namespace is `shared`.
 
 If you have more than 1 secrets that are from the same vendor, then name the secret after the vendor, and
 add each secret as a key:value pair under the vendor secret
@@ -335,17 +345,18 @@ aws secretsmanager create-secret --name /io.cv.app/shared/discord --secret-strin
 
 ```
 
-***Add template mustache to pull secrets when deploying:***
-  
+**_Add template mustache to pull secrets when deploying:_**
+
 In `.ebextensions/00_env_vars.config` add the mustache placeholder lines so beanstalk can pull the secret and
-set it to the right environment variable. 
+set it to the right environment variable.
 
 Format of the mustache placeholder is:
+
 ```
 {{pull:secretsmanager:<SECRET_NAME>:SecretString:<SECRET_JSON_KEY>}}
 ```
 
-Following up with the previous example, we want to grab discord_oauth_client_id and set it to 
+Following up with the previous example, we want to grab discord_oauth_client_id and set it to
 env variable `Discord_oauth_client_id`
 
 ```
@@ -355,7 +366,7 @@ option_settings:
       DISCORD_OAUTH_CLIENT_SECRET: "{{pull:secretsmanager:/io.cv.app/shared/discord:SecretString:discord_oauth_client_secret}}"
 ```
 
-***NOTE:***
+**_NOTE:_**
 
 This template placeholder format mimics that of Cloudformation mustache placeholder to pull secrets from secrets manager:
 
@@ -365,12 +376,10 @@ This template placeholder format mimics that of Cloudformation mustache placehol
 
 Currently resolving the Secrets Manager template placeholder is not supported in ElasticBeanstalk. If we
 specify template variable using the `{{resolve:secretsmanager}}` format, it will be stripped out entirely
-from `.env` file. So we came up with a modified version `{{pull:secretsmanager}}`. 
-Should/when Secrets Manager template variable placeholder becomes supported in Elastic beanstalk, we can simply do a global replace of `pull` to `resolve` to leverage that support. 
+from `.env` file. So we came up with a modified version `{{pull:secretsmanager}}`.
+Should/when Secrets Manager template variable placeholder becomes supported in Elastic beanstalk, we can simply do a global replace of `pull` to `resolve` to leverage that support.
 
 ## To set up datadog in staging environment
 
-Normally datadog agent is not deployed in the staging environment. To run datadog agent in staging environment edit 
+Normally datadog agent is not deployed in the staging environment. To run datadog agent in staging environment edit
 `.ebextensions/00_env_vars.config` and append `,ddtst` to the `COMPOSE_PROFILES` (Note you'll want to separate the profiles with a comma)
-
-

@@ -151,7 +151,7 @@ export default function ProposalTasksList({
         <TableHead>
           <TableRow>
             <TableCell width={400}>Proposal Name</TableCell>
-            <TableCell>Workspace</TableCell>
+            <TableCell>Space</TableCell>
             <TableCell align='center' width={SMALL_TABLE_CELL_WIDTH}>
               Status
             </TableCell>

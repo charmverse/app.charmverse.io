@@ -90,7 +90,7 @@ function InviteActions({
 
   return (
     <>
-      <Tooltip title={!isAdmin ? 'Only workspace admins can create invite links' : ''} arrow>
+      <Tooltip title={!isAdmin ? 'Only space admins can create invite links' : ''} arrow>
         {/* Tooltip on disabled button requires one block element below wrapper */}
         <span>
           <Button
@@ -121,7 +121,7 @@ function InviteActions({
           <Box>
             <ListItemText
               primary='Add a Private Link'
-              secondary='Anyone with this link can join your workspace'
+              secondary='Anyone with this link can join your space'
               primaryTypographyProps={{ fontWeight: 600 }}
               secondaryTypographyProps={{ variant: 'caption', color: 'secondary' }}
             />
@@ -132,7 +132,7 @@ function InviteActions({
           <Box>
             <ListItemText
               primary='Add a Token Gate'
-              secondary='Control access to your workspace with tokens & NFTS (Wallet Required)'
+              secondary='Control access to your space with tokens & NFTS (Wallet Required)'
               primaryTypographyProps={{ fontWeight: 600 }}
               secondaryTypographyProps={{ variant: 'caption', color: 'secondary' }}
             />

@@ -28,11 +28,11 @@ const PROPOSAL_STATUSES = Object.keys(proposalStatusTransitionRecord) as Proposa
 
 const proposalStatusTooltips: Record<ProposalStatus, string> = {
   private_draft: 'Only authors can view and edit this proposal',
-  draft: 'Authors can edit and Workspace member can view this proposal ',
-  discussion: 'Workspace members can comment on this proposal',
+  draft: 'Authors can edit and space member can view this proposal ',
+  discussion: 'Space members can comment on this proposal',
   review: 'Reviewers can approve this proposal',
   reviewed: 'Authors can move this proposal to vote',
-  vote_active: 'Workspace members are voting on this proposal',
+  vote_active: 'Space members are voting on this proposal',
   vote_closed: 'The vote is complete'
 };
 

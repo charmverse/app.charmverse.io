@@ -96,7 +96,7 @@ function ForumFilterListLink({ label, value, isSelected, handleSelect }: ForumSo
     </MenuItem>
   );
 }
-export function CategoryMenu({ handleCategory, handleSort, selectedCategoryId, selectedSort }: FilterProps) {
+export function CategoryMenu({ handleCategory, handleSort, selectedCategoryId, selectedSort = 'new' }: FilterProps) {
   const { categories, error, createForumCategory } = useForumCategories();
   const addCategoryPopupState = usePopupState({ variant: 'popover', popupId: 'add-category' });
   const admin = isAdmin();

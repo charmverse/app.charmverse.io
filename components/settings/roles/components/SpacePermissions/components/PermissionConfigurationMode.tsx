@@ -74,7 +74,7 @@ export default function PermissionConfigurationMode({ permissionModeSelected = (
           Configuration mode
         </Typography>
         <Typography variant='caption'>
-          Use a preset workspace permissions mode, or choose "custom" to configure individual settings manually.
+          Use a preset space permissions mode, or choose "custom" to configure individual settings manually.
         </Typography>
       </Grid>
 

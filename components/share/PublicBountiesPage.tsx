@@ -26,6 +26,6 @@ export default function PublicBountiesPage() {
   return space.publicBountyBoard ? (
     <BountiesPage publicMode bounties={bounties} />
   ) : (
-    <ErrorPage message={"Sorry, this workspace's bounties are reserved to its members."} />
+    <ErrorPage message={"Sorry, this space's bounties are reserved to its members."} />
   );
 }
