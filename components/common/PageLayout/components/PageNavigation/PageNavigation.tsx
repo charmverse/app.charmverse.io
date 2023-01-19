@@ -228,8 +228,8 @@ function PageNavigation({ deletePage, isFavorites, rootPageIds, onClick }: PageN
     const currentPage = pages[currentPageId];
     // expand the parent of the active page
     if (currentPage?.parentId && !isFavorites) {
-      if (!expanded.includes(currentPage.parentId) && currentPage.type !== 'card') {
-        setExpanded(expanded.concat(currentPage.parentId));
+      if (!expanded?.includes(currentPage.parentId) && currentPage.type !== 'card') {
+        setExpanded(expanded?.concat(currentPage.parentId) ?? []);
       }
     }
   }, [currentPageId, pages, isFavorites]);
@@ -263,7 +263,7 @@ function PageNavigation({ deletePage, isFavorites, rootPageIds, onClick }: PageN
   return (
     <StyledTreeRoot
       mutatePage={mutatePage}
-      expanded={expanded}
+      expanded={expanded ?? []}
       // @ts-ignore - we use null instead of undefined to control the element
       selected={selectedNodeId}
       onNodeToggle={onNodeToggle}
