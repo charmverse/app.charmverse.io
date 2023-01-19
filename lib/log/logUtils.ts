@@ -45,7 +45,7 @@ export function formatLog(
       if (_isPrimitiveValue(opt) || opt instanceof Array) {
         _opt = { data: opt };
       } else {
-        _opt = { ...opt };
+        _opt = { ...(opt as object) };
       }
       _opt.error = error;
     }
