@@ -62,11 +62,7 @@ export function apply(log: Logger, logPrefix: string = '') {
             if (isPrimitiveValue(opt) || opt instanceof Array) {
               _opt = { data: opt };
             } else {
-              try {
-                _opt = { ...opt };
-              } catch (e) {
-                _opt = { data: opt };
-              }
+              _opt = { ...opt };
             }
             _opt.error = error;
           }
