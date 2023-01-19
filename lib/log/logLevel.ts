@@ -24,7 +24,7 @@ type LogMeta = {
  *    Mapping fields to log message and log level: https://docs.datadoghq.com/logs/log_configuration/processors/?tab=ui#log-status-remapper
  *    Best practices: https://docs.datadoghq.com/logs/guide/log-parsing-best-practice/
  */
-const formatLogsForDatadog = true; // (isProdEnv || isStagingEnv) && isNodeEnv;
+const formatLogsForDatadog = (isProdEnv || isStagingEnv) && isNodeEnv;
 
 export function apply(log: Logger, logPrefix: string = '') {
   const defaultLevel = (process.env.LOG_LEVEL as LogLevelDesc) || log.levels.DEBUG;
