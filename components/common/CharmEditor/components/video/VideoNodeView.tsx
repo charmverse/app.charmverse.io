@@ -61,7 +61,7 @@ export function VideoNodeView({
 
   // If there are no source for the node, return the image select component
   if (!attrs.src && !attrs.muxAssetId) {
-    if (readOnly || (!pageId && (!isPost || !space))) {
+    if (readOnly || (!pageId && !isPost)) {
       // hide the row completely
       return <div />;
     } else {
