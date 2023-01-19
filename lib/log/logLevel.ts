@@ -4,11 +4,21 @@ import { DateTime } from 'luxon';
 
 import * as http from 'adapters/http';
 import { isNodeEnv, isProdEnv, isStagingEnv } from 'config/constants';
+import { SystemError } from 'lib/utilities/errors';
 
 const TIMESTAMP_FORMAT = 'yyyy-LL-dd HH:mm:ss';
 const ERRORS_WEBHOOK = process.env.NEXT_PUBLIC_DISCORD_WEBHOOK_ERRORS;
 const originalFactory = _log.methodFactory;
-const logsForDatadog = true; // (isProdEnv || isStagingEnv) && isNodeEnv;
+
+/**
+ * Enable formatting special logs for Datadog in production
+ * Example:
+ *    charmverse \[%{date("yyyy-MM-dd HH:mm:ss"):date}\]\s+%{word:level}: (\[%{notSpace:logger}\] )?[^{]*%{data::json}
+ * Resources for Datadog logging:
+ *    Parsing rules: https://docs.datadoghq.com/logs/log_configuration/parsing/
+ *    Best practices: https://docs.datadoghq.com/logs/guide/log-parsing-best-practice/
+ */
+const formatLogsForDatadog = true; // (isProdEnv || isStagingEnv) && isNodeEnv;
 
 export function apply(log: Logger, logPrefix: string = '') {
   const defaultLevel = (process.env.LOG_LEVEL as LogLevelDesc) || log.levels.DEBUG;
@@ -21,7 +31,7 @@ export function apply(log: Logger, logPrefix: string = '') {
 
       return (message, opt) => {
         let prefix = '';
-        if (logsForDatadog) {
+        if (formatLogsForDatadog) {
           prefix = `[${DateTime.local().toFormat(TIMESTAMP_FORMAT)}]`;
         }
         if (isNodeEnv) {
@@ -35,8 +45,31 @@ export function apply(log: Logger, logPrefix: string = '') {
         }
 
         let args: any[];
-        if (logsForDatadog) {
-          const _opt = { ...opt };
+        if (formatLogsForDatadog) {
+          // extract information from errors, and ensure that opts is always a JSON-serializable object
+          let _opt: { data?: any; error?: { message: string; code?: number; stack: string } } = {};
+          if (opt) {
+            let error: { message: string; code?: number; stack: string } | undefined;
+            if (opt instanceof Error || opt instanceof SystemError) {
+              error = { message: opt.message, code: (opt as SystemError).code, stack: opt.stack };
+            } else if (opt.error instanceof Error) {
+              error = {
+                message: opt.error.message,
+                code: (opt.error as SystemError).code,
+                stack: opt.error.stack
+              };
+            }
+            if (opt instanceof Array) {
+              _opt = { data: opt };
+            } else {
+              try {
+                _opt = { ...opt };
+              } catch (e) {
+                _opt = { data: opt };
+              }
+            }
+            _opt.error = error;
+          }
           // TODO: try adding datadog trace info to logs, it wont build with webpack though
           // const span = tracer.scope().active();
           // if (span) {

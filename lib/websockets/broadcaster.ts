@@ -63,6 +63,8 @@ export class WebsocketBroadcaster {
         // clientCount: io.engine.clientsCount,
         clientCount: io.of('/').sockets.size
       });
+      log.error('Error test', new Error('somethin '));
+      log.error('Error test', { error: new Error('another somethin') });
 
       socket.on('disconnect', () => {
         log.debug('[ws] Web socket disconnected', {
