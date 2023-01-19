@@ -29,7 +29,12 @@ export default function PagesList({ activeItemIndex = -1, activePageId, pages, o
       No pages found
     </Typography>
   ) : (
-    <div>
+    <div
+      style={{
+        height: '250px',
+        overflow: 'auto'
+      }}
+    >
       {pages.map((page, pageIndex) => {
         return (
           <MenuItem
