@@ -22,7 +22,6 @@ type IContext = {
   deleteBounty: (bountyId: string) => Promise<true>;
   refreshBounty: (bountyId: string) => Promise<void>;
   loadingBounties: boolean;
-  setPublicSpaceId: (spaceId: string | null) => void;
 };
 
 export const BountiesContext = createContext<Readonly<IContext>>({
@@ -37,13 +36,11 @@ export const BountiesContext = createContext<Readonly<IContext>>({
   updateBounty: () => Promise.resolve({} as any),
   deleteBounty: () => Promise.resolve(true),
   refreshBounty: () => Promise.resolve(undefined),
-  loadingBounties: false,
-  setPublicSpaceId: () => {}
+  loadingBounties: false
 });
 
 export function BountiesProvider({ children }: { children: ReactNode }) {
   const space = useCurrentSpace();
-  const [publicSpaceId, setPublicSpaceId] = useState<string | null>(null);
 
   const { user } = useUser();
   const [bounties, bountiesRef, setBounties] = useRefState<BountyWithDetails[]>([]);
@@ -52,15 +49,15 @@ export function BountiesProvider({ children }: { children: ReactNode }) {
   const [draftBounty, setDraftBounty] = useState<BountyCreationData | null>(null);
 
   useEffect(() => {
-    if (space?.id || publicSpaceId) {
+    if (space?.id) {
       setIsLoading(true);
       setBounties([]);
-      charmClient.bounties.listBounties(space?.id || publicSpaceId || '').then((_bounties) => {
+      charmClient.bounties.listBounties(space?.id).then((_bounties) => {
         setBounties(_bounties);
         setIsLoading(false);
       });
     }
-  }, [user?.id, space?.id, publicSpaceId]);
+  }, [user?.id, space?.id]);
 
   const [currentBountyId, setCurrentBountyId] = useState<string | null>(null);
 
@@ -176,8 +173,7 @@ export function BountiesProvider({ children }: { children: ReactNode }) {
       updateBounty,
       deleteBounty,
       refreshBounty,
-      loadingBounties: isLoading,
-      setPublicSpaceId
+      loadingBounties: isLoading
     }),
     [bounties, currentBountyId, currentBounty, draftBounty, isLoading]
   );

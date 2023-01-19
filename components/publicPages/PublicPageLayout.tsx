@@ -34,7 +34,7 @@ export function PublicPageLayout({ children, basePageId }: Props) {
       <Head>
         <CurrentPageFavicon />
       </Head>
-      <LayoutContainer>
+      <LayoutContainer data-testid='public-page-layout'>
         <AppBar sidebarWidth={0} position='fixed' open={false}>
           <StyledToolbar variant='dense'>
             <Box
