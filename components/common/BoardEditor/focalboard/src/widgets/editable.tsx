@@ -127,7 +127,7 @@ function Editable(props: EditableProps, ref: React.Ref<Focusable>): JSX.Element 
     if (props.autoExpand && elementRef.current) {
       const input = elementRef.current;
       const computed = getComputedStyle(input);
-      input.style.width = 'auto';
+      input.style.width = '100%';
       input.style.width = `${input.scrollWidth + borderWidth(computed) + 1}px`;
     }
   });

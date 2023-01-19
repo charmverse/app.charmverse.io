@@ -30,6 +30,12 @@ function EditableArea(props: EditableProps, ref: React.Ref<Focusable>): JSX.Elem
 
       heightRef.current = height;
     }
+
+    if (props.autoExpand && elementRef.current) {
+      elementRef.current.style.width = '100%';
+    }
+
+    elementRef.current?.style.setProperty('word-break', 'break-all');
   });
 
   const heightProps = {

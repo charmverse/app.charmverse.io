@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 import React from 'react';
 
 import { Utils } from '../../../utils';
-import Editable from '../../../widgets/editable';
+import EditableArea from '../../../widgets/editableArea';
 
 type Props = {
   value: string;
@@ -34,11 +34,10 @@ function URLProperty(props: Props): JSX.Element {
   return (
     <div className='URLProperty property-link url'>
       {(hasValue || props.placeholder) && (
-        <Editable
-          className='octo-propertyvalue'
+        <EditableArea
           placeholderText={props.placeholder}
           value={props.value}
-          autoExpand={false}
+          autoExpand
           readOnly={props.readOnly}
           onChange={props.onChange}
           onSave={props.onSave}

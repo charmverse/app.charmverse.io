@@ -9,6 +9,7 @@ import type { Card } from 'lib/focalboard/card';
 import mutator from '../mutator';
 import { OctoUtils } from '../octoUtils';
 import Editable from '../widgets/editable';
+import EditableArea from '../widgets/editableArea';
 import Switch from '../widgets/switch';
 
 import CreatedAt from './properties/createdAt/createdAt';
@@ -164,19 +165,30 @@ function PropertyValueElement(props: Props): JSX.Element {
 
   if (editableFields.includes(propertyTemplate.type)) {
     if (!readOnly) {
-      return (
-        <Editable
-          className='octo-propertyvalue'
+      return propertyTemplate.type === 'text' ? (
+        <EditableArea
           placeholderText={emptyDisplayValue}
           value={value.toString()}
-          autoExpand={false}
+          autoExpand
           onChange={setValue}
           onSave={() => {
             mutator.changePropertyValue(card, propertyTemplate.id, value);
           }}
           onCancel={() => setValue(propertyValue || '')}
           validator={(newValue) => validateProp(propertyTemplate.type, newValue)}
-          spellCheck={propertyTemplate.type === 'text'}
+          spellCheck
+        />
+      ) : (
+        <Editable
+          placeholderText={emptyDisplayValue}
+          value={value.toString()}
+          autoExpand
+          onChange={setValue}
+          onSave={() => {
+            mutator.changePropertyValue(card, propertyTemplate.id, value);
+          }}
+          onCancel={() => setValue(propertyValue || '')}
+          validator={(newValue) => validateProp(propertyTemplate.type, newValue)}
         />
       );
     }
