@@ -9,6 +9,8 @@ import { useUser } from '../../../hooks/useUser';
 const DD_SITE = 'datadoghq.com';
 const DD_SERVICE = 'webapp-browser';
 
+const env = process.env.NODE_ENV === 'production' ? 'prd' : 'dev';
+
 export default function useDatadogLogger() {
   const { user } = useUser();
 
@@ -21,7 +23,7 @@ export default function useDatadogLogger() {
         service: DD_SERVICE,
         forwardErrorsToLogs: true,
         sampleRate: 100,
-        env: process.env.NODE_ENV,
+        env,
         version: process.env.NEXT_PUBLIC_BUILD_ID,
         forwardConsoleLogs: ['error']
       });
@@ -42,7 +44,7 @@ export default function useDatadogLogger() {
         trackResources: true,
         trackLongTasks: true,
         defaultPrivacyLevel: 'mask-user-input',
-        env: process.env.NODE_ENV,
+        env,
         version: process.env.NEXT_PUBLIC_BUILD_ID
       });
 
