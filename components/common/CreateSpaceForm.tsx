@@ -113,7 +113,7 @@ export default function WorkspaceSettings({
 
   return (
     <form data-test='create-space-form' onSubmit={handleSubmit(onSubmit)}>
-      <DialogTitle onClose={onCancel}>Create a workspace</DialogTitle>
+      <DialogTitle onClose={onCancel}>Create a space</DialogTitle>
       <Divider />
       <br />
       <Grid container direction='column' spacing={2}>
@@ -173,7 +173,7 @@ export default function WorkspaceSettings({
             data-test='create-workspace'
             loading={isSubmitting}
           >
-            {submitText || 'Create Workspace'}
+            {submitText || 'Create Space'}
           </PrimaryButton>
         </Grid>
         {saveError && (

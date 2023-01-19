@@ -60,7 +60,7 @@ export function JoinDynamicSpaceForm() {
   return (
     <>
       <br />
-      <FieldLabel>Enter a CharmVerse workspace name</FieldLabel>
+      <FieldLabel>Enter a CharmVerse space name</FieldLabel>
       <Autocomplete<Space>
         disablePortal
         options={spacesInfo}

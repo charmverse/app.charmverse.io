@@ -24,7 +24,7 @@ const base32Alphabet = 'ybndrfg8ejkmcpqxot1uwisza345h769';
 // eslint-disable-next-line no-shadow
 enum IDType {
   None = '7',
-  Workspace = 'w',
+  Space = 's',
   Board = 'b',
   Card = 'c',
   View = 'v',
@@ -42,8 +42,8 @@ class Utils {
   static blockTypeToIDType(blockType: string | undefined): IDType {
     let ret: IDType = IDType.None;
     switch (blockType) {
-      case 'workspace':
-        ret = IDType.Workspace;
+      case 'Space':
+        ret = IDType.Space;
         break;
       case 'board':
         ret = IDType.Board;

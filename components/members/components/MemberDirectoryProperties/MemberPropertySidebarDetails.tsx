@@ -99,9 +99,9 @@ export function MemberPropertySidebarDetails({
                 ))}
               </Stack>
             ) : (
-              <Tooltip title={`Everyone in workspace can see ${property.name} property`}>
+              <Tooltip title={`Everyone in space can see ${property.name} property`}>
                 <Typography pl={4} variant='overline' alignItems='center' display='flex'>
-                  Everyone in workspace
+                  Everyone in space
                   <VisibilityOutlinedIcon fontSize='small' color='secondary' sx={{ ml: 1 }} />
                 </Typography>
               </Tooltip>

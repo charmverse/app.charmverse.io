@@ -174,7 +174,7 @@ export default function DiscussionTasksList({ tasks, error, mutateTasks }: Discu
         <TableHead>
           <TableRow>
             <TableCell>Comment</TableCell>
-            <TableCell width={200}>Workspace</TableCell>
+            <TableCell width={200}>Space</TableCell>
             <TableCell width={200}>Page</TableCell>
             <TableCell width={140} align='center'>
               Date

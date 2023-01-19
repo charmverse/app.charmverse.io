@@ -7,11 +7,12 @@ import useSwr from 'swr';
 
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import log from 'lib/log';
 
 type Props = {
   onComplete: (upload: { assetId: string; playbackId: string }) => void;
-  pageId: string;
+  pageId: string | null;
 };
 
 export function VideoUploadForm(props: Props) {
@@ -20,12 +21,17 @@ export function VideoUploadForm(props: Props) {
   const [uploadId, setUploadId] = useState<string | null>(null);
   const [progress, setProgress] = useState<number | null>(null);
   const [errorMessage, setErrorMessage] = useState('');
+  const space = useCurrentSpace();
 
   // poll endpoint until video is ready
   const { data: upload, error } = useSwr(
-    () => (isPreparing ? `/api/mux/upload/${uploadId}` : null),
+    () => (isPreparing && space ? `/api/mux/upload/${uploadId}` : null),
     () => {
-      return charmClient.mux.getUpload({ id: uploadId!, pageId: props.pageId });
+      return charmClient.mux.getUpload({
+        id: uploadId!,
+        pageId: props.pageId,
+        spaceId: space!.id
+      });
     },
     {
       refreshInterval: 5000
@@ -42,7 +48,7 @@ export function VideoUploadForm(props: Props) {
 
   async function createUpload() {
     try {
-      const result = await charmClient.mux.createUpload({ pageId: props.pageId });
+      const result = await charmClient.mux.createUpload();
       setUploadId(result.id);
       return result.url;
     } catch (e) {
