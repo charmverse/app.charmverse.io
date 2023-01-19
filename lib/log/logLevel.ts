@@ -4,7 +4,6 @@ import { DateTime } from 'luxon';
 
 import * as http from 'adapters/http';
 import { isNodeEnv, isProdEnv, isStagingEnv } from 'config/constants';
-import { SystemError } from 'lib/utilities/errors';
 
 const TIMESTAMP_FORMAT = 'yyyy-LL-dd HH:mm:ss';
 const ERRORS_WEBHOOK = process.env.NEXT_PUBLIC_DISCORD_WEBHOOK_ERRORS;
@@ -57,7 +56,7 @@ export function apply(log: Logger, logPrefix: string = '') {
           if (opt) {
             let error: LogMeta['error'];
             const maybeError = opt.error || opt;
-            if (maybeError instanceof Error || maybeError instanceof SystemError) {
+            if (maybeError instanceof Error) {
               error = { ...maybeError, message: maybeError.message, stack: maybeError.stack };
             }
             if (opt instanceof Array) {
