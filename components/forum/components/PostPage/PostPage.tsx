@@ -1,5 +1,6 @@
 import CommentIcon from '@mui/icons-material/Comment';
 import { Box, Divider, Stack, Typography } from '@mui/material';
+import type { PostCategory } from '@prisma/client';
 import { useRouter } from 'next/router';
 import { useEffect, useMemo, useState } from 'react';
 import useSWR from 'swr';
@@ -42,6 +43,7 @@ type Props = {
   setContentUpdated: (changed: boolean) => void;
   shouldUpdateTitleState?: boolean;
   showOtherCategoryPosts?: boolean;
+  newPostCategory?: PostCategory | null;
 };
 
 function processComments({ postComments }: { postComments: PostCommentWithVote[] }) {
@@ -91,13 +93,17 @@ export function PostPage({
   formInputs,
   contentUpdated,
   setContentUpdated,
-  showOtherCategoryPosts
+  showOtherCategoryPosts,
+  newPostCategory
 }: Props) {
   const currentSpace = useCurrentSpace();
   const { user } = useUser();
   const { categories } = useForumCategories();
   const [categoryId, setCategoryId] = useState(
-    post?.categoryId ?? categories.find((category) => category.id === currentSpace?.defaultPostCategoryId)?.id ?? null
+    post?.categoryId ??
+      newPostCategory?.id ??
+      categories.find((category) => category.id === currentSpace?.defaultPostCategoryId)?.id ??
+      null
   );
   const { members } = useMembers();
   const router = useRouter();

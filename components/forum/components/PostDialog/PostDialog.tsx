@@ -1,5 +1,6 @@
 import OpenInFullIcon from '@mui/icons-material/OpenInFull';
 import { Box } from '@mui/material';
+import type { PostCategory } from '@prisma/client';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
 import { useEffect, useRef, useState } from 'react';
@@ -17,9 +18,10 @@ interface Props {
   spaceId: string;
   onClose: () => void;
   open?: boolean;
+  newPostCategory?: PostCategory | null;
 }
 
-export default function PostDialog({ post, spaceId, onClose, open }: Props) {
+export default function PostDialog({ post, spaceId, onClose, open, newPostCategory }: Props) {
   const mounted = useRef(false);
   const popupState = usePopupState({ variant: 'popover', popupId: 'post-dialog' });
   const router = useRouter();
@@ -99,6 +101,7 @@ export default function PostDialog({ post, spaceId, onClose, open }: Props) {
         contentUpdated={contentUpdated}
         setContentUpdated={setContentUpdated}
         showOtherCategoryPosts
+        newPostCategory={newPostCategory}
       />
       <ConfirmDeleteModal
         onClose={() => {
