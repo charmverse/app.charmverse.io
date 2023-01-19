@@ -11,7 +11,7 @@ beforeAll(async () => {
   space = (await generateUserAndSpaceWithApiToken()).space;
 });
 describe('createPostCategory', () => {
-  it('should create a post category', async () => {
+  it('should create a post category with an encoded path', async () => {
     const createInput: CreatePostCategoryInput = {
       name: 'Test Category',
       spaceId: space.id
@@ -19,7 +19,12 @@ describe('createPostCategory', () => {
 
     const postCategory = await createPostCategory(createInput);
 
-    expect(postCategory).toMatchObject(expect.objectContaining<Partial<PostCategory>>(createInput));
+    expect(postCategory).toMatchObject(
+      expect.objectContaining<Partial<PostCategory>>({
+        ...createInput,
+        path: 'test_category'
+      })
+    );
   });
 
   it('should fail to create a post category if one with the same name already exists in this space', async () => {

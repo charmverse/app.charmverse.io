@@ -4,6 +4,7 @@ import { prisma } from 'db';
 import type { PaginatedResponse } from 'lib/public-api';
 import { InvalidInputError } from 'lib/utilities/errors';
 
+import type { PostSortOption } from './constants';
 import { defaultPostsPerResult, postSortOptions } from './constants';
 import type { PostWithRelations } from './getPostMeta';
 import { getPostMeta } from './getPostMeta';
@@ -11,14 +12,12 @@ import type { ForumPostMeta } from './interfaces';
 
 export type PaginatedPostList = PaginatedResponse<ForumPostMeta & { totalComments: number }> & { cursor: number };
 
-export type PostOrder = typeof postSortOptions[number];
-
 export interface ListForumPostsRequest {
   spaceId: string;
   categoryId?: string;
   page?: number;
   count?: number;
-  sort?: PostOrder;
+  sort?: PostSortOption;
 }
 
 export async function listForumPosts(
@@ -62,9 +61,9 @@ export async function listForumPosts(
   const orderQuery: Prisma.PostFindManyArgs = {
     // Return posts ordered from most recent to oldest
     orderBy: {
-      ...((sort === 'newest' || !sort || !postSortOptions.includes(sort)) && orderByNewest),
-      ...(sort === 'most_commented' && orderByMostCommmented),
-      ...(sort === 'most_voted' && orderByMostVoted)
+      ...((sort === 'new' || !sort || !postSortOptions.includes(sort)) && orderByNewest),
+      ...(sort === 'hot' && orderByMostCommmented),
+      ...(sort === 'top' && orderByMostVoted)
     }
   };
 

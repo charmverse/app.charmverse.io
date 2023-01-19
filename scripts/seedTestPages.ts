@@ -7,6 +7,9 @@ import { Prisma } from '@prisma/client';
 import { createPage } from 'lib/pages/server/createPage';
 
 /**
+ * See this doc for usage instructions
+ * https://app.charmverse.io/charmverse/page-8095374127900168
+ * 
  * @nestedPercent The percentage of pages that should have a parent. This is a number between 0 and 100. Defaults to 30
  */
 export async function seedTestPages({spaceDomain, nestedPercent = 50, pagesToCreate}: {spaceDomain: string, pagesToCreate: number, nestedPercent?: number }) {

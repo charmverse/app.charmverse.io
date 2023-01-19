@@ -140,7 +140,7 @@ export default function WorkspaceSettings() {
                 Save
               </PrimaryButton>
               <Button variant='outlined' color='error' onClick={deleteWorkspace}>
-                Delete Workspace
+                Delete Space
               </Button>
             </Grid>
           ) : (
@@ -152,7 +152,7 @@ export default function WorkspaceSettings() {
                   workspaceLeaveModalState.open();
                 }}
               >
-                Leave Workspace
+                Leave Space
               </Button>
             </Grid>
           )}
@@ -177,7 +177,7 @@ export default function WorkspaceSettings() {
       </Box>
       {space && (
         <ConfirmDeleteModal
-          title='Delete workspace'
+          title='Delete space'
           onClose={closeInviteLinkDeleteModal}
           open={workspaceRemoveModalState.isOpen}
           buttonText={`Delete ${space.name}`}
@@ -193,7 +193,7 @@ export default function WorkspaceSettings() {
       )}
       {space && (
         <ConfirmDeleteModal
-          title='Leave workspace'
+          title='Leave space'
           onClose={() => {
             workspaceLeaveModalState.close();
           }}

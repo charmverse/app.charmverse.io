@@ -3,7 +3,6 @@ import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
-import { useRouter } from 'next/router';
 
 import Image from 'components/common/Image';
 import Link from 'components/common/Link';
@@ -62,7 +61,7 @@ export default function SignupPageContent() {
                 <Image src={rocketImage} />
               </ImageContainer>
               <PrimaryButton size='large' data-test='goto-create-workspace'>
-                Create a new workspace
+                Create a new space
               </PrimaryButton>
             </AdventureCard>
           </Link>
@@ -73,7 +72,7 @@ export default function SignupPageContent() {
               <ImageContainer>
                 <Image src={gatesImage} />
               </ImageContainer>
-              <PrimaryButton size='large'>Join an existing workspace</PrimaryButton>
+              <PrimaryButton size='large'>Join an existing space</PrimaryButton>
             </AdventureCard>
           </Link>
         </Grid>

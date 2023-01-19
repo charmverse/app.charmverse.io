@@ -9,7 +9,7 @@ import UserDisplay from 'components/common/UserDisplay';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { useUser } from 'hooks/useUser';
 
-function CreateForumPost({ onClick }: { onClick: () => void }) {
+export function CreateForumPost({ onClick }: { onClick: () => void }) {
   const { user } = useUser();
   const [userSpacePermissions] = useCurrentSpacePermissions();
 
@@ -41,5 +41,3 @@ function CreateForumPost({ onClick }: { onClick: () => void }) {
     </Card>
   );
 }
-
-export default CreateForumPost;

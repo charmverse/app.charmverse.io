@@ -20,10 +20,10 @@ import { typedKeys } from 'lib/utilities/objects';
 
 type PagePermissionLevelWithoutCustomAndProposalEditor = Exclude<PagePermissionLevel, 'custom' | 'proposal_editor'>;
 const pagePermissionDescriptions: Record<PagePermissionLevelWithoutCustomAndProposalEditor, string> = {
-  full_access: 'Workspace members can edit pages, share them with the public and manage permissions.',
-  editor: 'Workspace members can edit but not share pages.',
-  view_comment: 'Workspace members can view and comment on pages.',
-  view: 'Workspace members can only view pages.'
+  full_access: 'Space members can edit pages, share them with the public and manage permissions.',
+  editor: 'Space members can edit but not share pages.',
+  view_comment: 'Space members can view and comment on pages.',
+  view: 'Space members can only view pages.'
 };
 
 export default function DefaultSpacePagePermissions() {
@@ -164,7 +164,7 @@ export default function DefaultSpacePagePermissions() {
             variant='body2'
           >
             {defaultPublicPages === true && 'New top-level pages will be viewable by the public.'}
-            {defaultPublicPages === false && 'New top-level pages can only be seen by workspace members.'}
+            {defaultPublicPages === false && 'New top-level pages can only be seen by space members.'}
           </Typography>
         </Grid>
       </Grid>
