@@ -49,6 +49,10 @@ export function isUrl(text: string) {
 
 // generate a color based on a string. Copied from https://medium.com/@pppped/compute-an-arbitrary-color-for-user-avatar-starting-from-his-username-with-javascript-cd0675943b66
 export function stringToColor(name: string, saturation = 50, lightness = 60) {
+  if (name === '') {
+    // return 'var(--background-dark)';
+    return 'transparent';
+  }
   return `hsl(${stringToHue(name)}, ${saturation}%, ${lightness}%)`;
 }
 
