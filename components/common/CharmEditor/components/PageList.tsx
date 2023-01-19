@@ -10,11 +10,11 @@ interface Props {
   activePageId?: string;
   pages: PageMeta[];
   onSelectPage: (page: PageMeta) => void;
-  isDatabase?: boolean;
+  emptyText?: string;
 }
 
 export default function PagesList({
-  isDatabase = false,
+  emptyText = 'No pages found',
   activeItemIndex = -1,
   activePageId,
   pages,
@@ -33,7 +33,7 @@ export default function PagesList({
       variant='subtitle2'
       color='secondary'
     >
-      No {isDatabase ? 'databases' : 'pages'} found
+      {emptyText}
     </Typography>
   ) : (
     <div
