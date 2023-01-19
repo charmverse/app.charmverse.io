@@ -1,7 +1,5 @@
 /* eslint-disable no-console */
 import { prisma } from 'db';
-import { setupPermissionsAfterPageRepositioned } from 'lib/permissions/pages/triggers';
-import { IPageWithPermissions } from 'lib/pages/server';
 import { upsertPermission } from '../lib/permissions/pages';
 
 /**
