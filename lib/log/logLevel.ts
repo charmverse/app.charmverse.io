@@ -75,9 +75,7 @@ export function apply(log: Logger, logPrefix: string = '') {
           // if (span) {
           //   tracer.inject(span.context(), formats.LOG, _opt);
           // }
-          // use JSON format for datadog
-          const singleLineLog = `${prefix}${message} ${JSON.stringify(_opt)}`;
-          args = [singleLineLog];
+          args = [`${prefix}${message} ${JSON.stringify(_opt)}`];
         } else {
           args = opt ? [`${prefix}${message}`, opt] : [`${prefix}${message}`];
         }
