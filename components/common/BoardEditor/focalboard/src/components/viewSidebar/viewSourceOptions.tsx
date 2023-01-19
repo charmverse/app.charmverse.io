@@ -170,7 +170,7 @@ function CharmVerseDatabases(props: DatabaseSourceProps & { activePageId?: strin
           }}
           fullWidth
         />
-        <PagesList pages={sortedPages} activePageId={props.activePageId} onSelectPage={onSelect} />
+        <PagesList isDatabase pages={sortedPages} activePageId={props.activePageId} onSelectPage={onSelect} />
       </SidebarContent>
       {props.onCreate && (
         <MenuItem onClick={props.onCreate}>
