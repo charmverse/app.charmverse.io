@@ -94,7 +94,7 @@ export default function WorkspaceSettings() {
     workspaceRemoveModalState.open();
   }
 
-  setTitle('Workspace Options');
+  setTitle('Space Options');
   usePreventReload(isDirty);
 
   return (
