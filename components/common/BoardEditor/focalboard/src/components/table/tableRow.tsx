@@ -162,6 +162,8 @@ function TableRow(props: Props) {
               showEmptyPlaceholder={true}
               updatedAt={pageUpdatedAt}
               updatedBy={pageUpdatedBy}
+              displayType='table'
+              maxRows={3}
             />
           </div>
         );

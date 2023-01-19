@@ -29,6 +29,7 @@ type Props = {
   propertyTemplate: IPropertyTemplate;
   showEmptyPlaceholder: boolean;
   displayType?: PropertyValueDisplayType;
+  maxRows?: number;
 };
 
 function PropertyValueElement(props: Props): JSX.Element {
@@ -177,6 +178,7 @@ function PropertyValueElement(props: Props): JSX.Element {
           onCancel={() => setValue(propertyValue || '')}
           validator={(newValue) => validateProp(propertyTemplate.type, newValue)}
           spellCheck
+          maxRows={props.maxRows}
         />
       ) : (
         <Editable

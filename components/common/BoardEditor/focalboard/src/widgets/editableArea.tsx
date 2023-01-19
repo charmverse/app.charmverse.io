@@ -7,7 +7,8 @@ function getBorderWidth(style: CSSStyleDeclaration): number {
   return parseInt(style.borderTopWidth || '0', 10) + parseInt(style.borderBottomWidth || '0', 10);
 }
 
-function EditableArea(props: EditableProps, ref: React.Ref<Focusable>): JSX.Element {
+// Max rows feature is used only in the context where we list multiple items (such as a table view)
+function EditableArea(props: EditableProps & { maxRows?: number }, ref: React.Ref<Focusable>): JSX.Element {
   const elementRef = useRef<HTMLTextAreaElement>(null);
   const referenceRef = useRef<HTMLTextAreaElement>(null);
   const heightRef = useRef(0);
@@ -25,10 +26,12 @@ function EditableArea(props: EditableProps, ref: React.Ref<Focusable>): JSX.Elem
       const style = getComputedStyle(textarea);
       const borderWidth = getBorderWidth(style);
 
-      // Directly change the height to avoid circular rerenders
-      textarea.style.height = `${String(height + borderWidth)}px`;
+      if (!props.maxRows) {
+        // Directly change the height to avoid circular rerenders
+        textarea.style.height = `${String(height + borderWidth)}px`;
 
-      heightRef.current = height;
+        heightRef.current = height;
+      }
     }
 
     if (props.autoExpand && elementRef.current) {
@@ -40,7 +43,7 @@ function EditableArea(props: EditableProps, ref: React.Ref<Focusable>): JSX.Elem
 
   const heightProps = {
     height: heightRef.current,
-    rows: 1
+    rows: props.maxRows ?? 1
   };
 
   return (
