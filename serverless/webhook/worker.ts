@@ -1,7 +1,6 @@
 import type { SQSBatchItemFailure, SQSBatchResponse, SQSEvent, SQSRecord } from 'aws-lambda';
 import type { KeyLike } from 'jose';
 import { SignJWT } from 'jose';
-import fetch from 'node-fetch';
 
 import log from 'lib/log';
 

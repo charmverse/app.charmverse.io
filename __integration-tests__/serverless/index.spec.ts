@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import type { Space } from '@prisma/client';
 import type { SQSEvent, SQSRecord } from 'aws-lambda';
-import 'node-fetch';
 import { webhookWorker } from 'serverless/handler';
 import type { WebhookPayload } from 'serverless/webhook/interfaces';
 import { WebhookEventNames } from 'serverless/webhook/interfaces';
@@ -18,11 +17,9 @@ let adminUser: LoggedInUser;
 let adminUserSpace: Space;
 let adminCookie: string;
 
-jest.mock('node-fetch', () =>
-  jest.fn().mockResolvedValueOnce({
-    status: 200
-  })
-);
+global.fetch = jest.fn().mockResolvedValueOnce({
+  status: 200
+});
 
 beforeAll(async () => {
   const first = await generateUserAndSpaceWithApiToken(undefined, false);
