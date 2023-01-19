@@ -22,7 +22,7 @@ export function formatLog(
   if (formatLogsForDocker) {
     prefix = `[${formatTime(now)}]`;
   }
-  if (isNodeEnv) {
+  if (isNodeEnv ?? formatLogsForDocker) {
     prefix += `${prefix ? ' ' : ''}${methodName}:`;
   }
   if (logPrefix) {

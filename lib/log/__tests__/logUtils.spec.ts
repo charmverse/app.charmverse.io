@@ -16,19 +16,25 @@ describe('Log formatting', () => {
 
   it('includes timestamp for Docker', () => {
     expect(formatLog('hello world', null, { methodName: 'info', formatLogsForDocker: true, now })).toEqual([
-      `[${nowString}] hello world`
+      `[${nowString}] info: hello world`
     ]);
   });
 
   it('includes metadata for Docker', () => {
     expect(formatLog('hello world', { foo: 'bar' }, { methodName: 'info', formatLogsForDocker: true, now })).toEqual([
-      `[${nowString}] hello world {"foo":"bar"}`
+      `[${nowString}] info: hello world {"foo":"bar"}`
     ]);
   });
 
   it('handles string as metadata for Docker', () => {
     expect(formatLog('hello world', 'foobar', { methodName: 'info', formatLogsForDocker: true, now })).toEqual([
-      `[${nowString}] hello world {"data":"foobar"}`
+      `[${nowString}] info: hello world {"data":"foobar"}`
     ]);
+  });
+
+  it('includes a logger name', () => {
+    expect(
+      formatLog('hello world', null, { logPrefix: 'alien', formatLogsForDocker: true, methodName: 'info', now })
+    ).toEqual([`[${nowString}] info: [alien] hello world`]);
   });
 });
