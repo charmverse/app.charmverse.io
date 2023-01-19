@@ -7,6 +7,7 @@ import * as React from 'react';
 
 import { PageDialogProvider } from 'components/common/PageDialog/hooks/usePageDialog';
 import PageDialogGlobalModal from 'components/common/PageDialog/PageDialogGlobal';
+import { usePublicPage } from 'components/publicPages/hooks/usePublicPage';
 import { FocalboardViewsProvider } from 'hooks/useFocalboardViews';
 import { useLocalStorage } from 'hooks/useLocalStorage';
 import { PageActionDisplayProvider } from 'hooks/usePageActionDisplay';
@@ -106,6 +107,7 @@ function PageLayout({ sidebarWidth = 300, children, sidebar: SidebarOverride }: 
   const smallScreen = React.useMemo(() => isSmallScreen(), []);
   const [open, setOpen] = useLocalStorage('leftSidebar', !smallScreen);
   const { user } = useUser();
+  const { hasPublicPageAccess, accessCheked } = usePublicPage();
 
   const handleDrawerOpen = React.useCallback(() => {
     setOpen(true);
@@ -114,6 +116,15 @@ function PageLayout({ sidebarWidth = 300, children, sidebar: SidebarOverride }: 
   const handleDrawerClose = React.useCallback(() => {
     setOpen(false);
   }, []);
+
+  if (!accessCheked) {
+    // TODO: loading state
+    return null;
+  }
+
+  if (hasPublicPageAccess) {
+    return <div>{children || null}</div>;
+  }
 
   return (
     <>

@@ -38,6 +38,7 @@ export type PagesContext = {
   deletePage: (data: { pageId: string; board?: Block }) => Promise<PageMeta | null | undefined>;
   getPagePermissions: (pageId: string, page?: PageMeta) => IPagePermissionFlags;
   mutatePagesList: KeyedMutator<PagesMap<PageMeta>>;
+  setPublicSpaceId: (spaceId: string | null) => void;
 };
 
 const refreshInterval = 1000 * 5 * 60; // 5 minutes
@@ -54,7 +55,8 @@ export const PagesContext = createContext<Readonly<PagesContext>>({
   mutatePage: () => {},
   mutatePagesRemove: () => {},
   deletePage: () => Promise.resolve({} as any),
-  mutatePagesList: () => Promise.resolve({} as any)
+  mutatePagesList: () => Promise.resolve({} as any),
+  setPublicSpaceId: () => {}
 });
 
 export function PagesProvider({ children }: { children: ReactNode }) {
@@ -65,15 +67,16 @@ export function PagesProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
   const { user } = useUser();
   const { subscribe } = useWebSocketClient();
+  const [publicSpaceId, setPublicSpaceId] = useState<string | null>(null);
 
   const { data, mutate: mutatePagesList } = useSWR(
-    () => (currentSpace ? getPagesListCacheKey(currentSpace.id) : null),
+    () => getPagesListCacheKey(currentSpace?.id || publicSpaceId || ''),
     async () => {
-      if (!currentSpace) {
+      if (!currentSpace && !publicSpaceId) {
         return {};
       }
 
-      const pagesRes = await charmClient.pages.getPages(currentSpace.id);
+      const pagesRes = await charmClient.pages.getPages(currentSpace?.id || publicSpaceId || '');
       const pagesDict: PagesContext['pages'] = {};
       pagesRes?.forEach((page) => {
         pagesDict[page.id] = page;
@@ -312,7 +315,6 @@ export function PagesProvider({ children }: { children: ReactNode }) {
       }
     );
   }, []);
-
   useEffect(() => {
     const unsubscribeFromPageUpdates = subscribe('pages_meta_updated', handleUpdateEvent);
     const unsubscribeFromNewPages = subscribe('pages_created', handleNewPageEvent);
@@ -342,7 +344,8 @@ export function PagesProvider({ children }: { children: ReactNode }) {
       updatePage,
       mutatePage,
       mutatePagesRemove,
-      mutatePagesList
+      mutatePagesList,
+      setPublicSpaceId
     }),
     [currentPageId, router, !!data, pages, user]
   );
@@ -350,7 +353,9 @@ export function PagesProvider({ children }: { children: ReactNode }) {
   return <PagesContext.Provider value={value}>{children}</PagesContext.Provider>;
 }
 
-export function getPagesListCacheKey(spaceId: string) {
+export function getPagesListCacheKey(spaceId?: string) {
+  if (!spaceId) return null;
+
   return `pages/${spaceId}`;
 }
 

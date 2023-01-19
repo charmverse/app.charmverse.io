@@ -9,7 +9,6 @@ import type { BountyWithDetails } from 'lib/bounties';
 
 export default function PublicBountiesPage() {
   const space = useCurrentSpace();
-
   const [bounties, setBounties] = useState<BountyWithDetails[] | null>(null);
 
   useEffect(() => {

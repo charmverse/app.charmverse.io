@@ -1,10 +1,10 @@
 import type { UrlObject } from 'url';
 
-import type { User } from '@prisma/client';
 import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
 import { useRef, useEffect, useState } from 'react';
 
+import { usePublicPage } from 'components/publicPages/hooks/usePublicPage';
 import { getKey } from 'hooks/useLocalStorage';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
@@ -17,10 +17,11 @@ const accountPages = ['profile'];
 
 export default function RouteGuard({ children }: { children: ReactNode }) {
   const router = useRouter();
+  const { isCheckingAccess, hasPublicPageAccess } = usePublicPage();
   const [authorized, setAuthorized] = useState(true);
-  const { user, setUser, isLoaded } = useUser();
+  const { user, isLoaded } = useUser();
   const { spaces, isLoaded: isSpacesLoaded } = useSpaces();
-  const isLoading = !isLoaded || !isSpacesLoaded;
+  const isLoading = !isLoaded || !isSpacesLoaded || isCheckingAccess;
   const authorizedSpaceDomainRef = useRef('');
 
   if (typeof window !== 'undefined') {
@@ -54,10 +55,6 @@ export default function RouteGuard({ children }: { children: ReactNode }) {
 
       setAuthorized(result.authorized);
 
-      if (result.user) {
-        setUser(result.user);
-      }
-
       if (result.redirect) {
         router.push(result.redirect);
       }
@@ -73,7 +70,7 @@ export default function RouteGuard({ children }: { children: ReactNode }) {
   }, [isLoading, user, spaces]);
 
   // authCheck runs before each page load and redirects to login if user is not logged in
-  async function authCheck(url: string): Promise<{ authorized: boolean; redirect?: UrlObject; user?: User }> {
+  async function authCheck(url: string): Promise<{ authorized: boolean; redirect?: UrlObject }> {
     const path = url.split('?')[0];
 
     const firstPathSegment =
@@ -85,7 +82,7 @@ export default function RouteGuard({ children }: { children: ReactNode }) {
     const spaceDomain = path.split('/')[1];
 
     // condition: public page
-    if (publicPages.some((basePath) => firstPathSegment === basePath)) {
+    if (publicPages.some((basePath) => firstPathSegment === basePath) || hasPublicPageAccess) {
       return { authorized: true };
     }
     // condition: no user session and no wallet address
@@ -115,6 +112,7 @@ export default function RouteGuard({ children }: { children: ReactNode }) {
           }
         };
       }
+
       return {
         authorized: false,
         redirect: {
