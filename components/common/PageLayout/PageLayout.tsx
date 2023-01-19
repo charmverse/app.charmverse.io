@@ -126,16 +126,20 @@ function PageLayout({ sidebarWidth = 300, children, sidebar: SidebarOverride }: 
             <VotesProvider>
               <PageDialogProvider>
                 <PageActionDisplayProvider>
-                  <AppBar open={open} sidebarWidth={sidebarWidth} position='fixed'>
-                    <Header open={open} openSidebar={handleDrawerOpen} />
-                  </AppBar>
-                  <Drawer sidebarWidth={sidebarWidth} variant='permanent' open={open}>
-                    {SidebarOverride ? (
-                      <SidebarOverride closeSidebar={handleDrawerClose} />
-                    ) : (
-                      <Sidebar closeSidebar={handleDrawerClose} favorites={user?.favorites || []} />
-                    )}
-                  </Drawer>
+                  {open !== null && (
+                    <>
+                      <AppBar open={open} sidebarWidth={sidebarWidth} position='fixed'>
+                        <Header open={open} openSidebar={handleDrawerOpen} />
+                      </AppBar>
+                      <Drawer sidebarWidth={sidebarWidth} variant='permanent' open={open}>
+                        {SidebarOverride ? (
+                          <SidebarOverride closeSidebar={handleDrawerClose} />
+                        ) : (
+                          <Sidebar closeSidebar={handleDrawerClose} favorites={user?.favorites || []} />
+                        )}
+                      </Drawer>
+                    </>
+                  )}
                   <PageContainer>
                     <HeaderSpacer />
                     {children}
