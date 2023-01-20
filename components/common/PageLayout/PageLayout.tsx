@@ -9,11 +9,11 @@ import * as React from 'react';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { PageDialogProvider } from 'components/common/PageDialog/hooks/usePageDialog';
 import PageDialogGlobalModal from 'components/common/PageDialog/PageDialogGlobal';
-import { usePublicPage } from 'components/publicPages/hooks/usePublicPage';
-import { PublicPageLayout } from 'components/publicPages/PublicPageLayout';
+import { SharedPageLayout } from 'components/common/PageLayout/SharedPageLayout';
 import { FocalboardViewsProvider } from 'hooks/useFocalboardViews';
 import { useLocalStorage } from 'hooks/useLocalStorage';
 import { PageActionDisplayProvider } from 'hooks/usePageActionDisplay';
+import { useSharedPage } from 'hooks/useSharedPage';
 import { ThreadsProvider } from 'hooks/useThreads';
 import { useUser } from 'hooks/useUser';
 import { VotesProvider } from 'hooks/useVotes';
@@ -110,7 +110,7 @@ function PageLayout({ sidebarWidth = 300, children, sidebar: SidebarOverride }: 
   const smallScreen = React.useMemo(() => isSmallScreen(), []);
   const [open, setOpen] = useLocalStorage('leftSidebar', !smallScreen);
   const { user } = useUser();
-  const { hasPublicPageAccess, accessCheked, publicPage } = usePublicPage();
+  const { hasPublicPageAccess, accessCheked, publicPage } = useSharedPage();
 
   const handleDrawerOpen = React.useCallback(() => {
     setOpen(true);
@@ -129,7 +129,7 @@ function PageLayout({ sidebarWidth = 300, children, sidebar: SidebarOverride }: 
   }
 
   if (hasPublicPageAccess) {
-    return <PublicPageLayout basePageId={publicPage?.page?.id}>{children || null}</PublicPageLayout>;
+    return <SharedPageLayout basePageId={publicPage?.page?.id}>{children || null}</SharedPageLayout>;
   }
 
   return (

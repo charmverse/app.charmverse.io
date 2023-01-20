@@ -4,7 +4,6 @@ import { Box, Collapse, Divider, IconButton, Stack, TextField, Tooltip } from '@
 import type { PaymentMethod } from '@prisma/client';
 import type { CryptoCurrency } from 'connectors';
 import { getChainById } from 'connectors';
-import { useRouter } from 'next/router';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import charmClient from 'charmClient';
@@ -15,11 +14,11 @@ import InputSearchBlockchain from 'components/common/form/InputSearchBlockchain'
 import { InputSearchCrypto } from 'components/common/form/InputSearchCrypto';
 import InputSearchReviewers from 'components/common/form/InputSearchReviewers';
 import { InputSearchRoleMultiple } from 'components/common/form/InputSearchRole';
-import { usePublicPage } from 'components/publicPages/hooks/usePublicPage';
 import { useBounties } from 'hooks/useBounties';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
+import { useSharedPage } from 'hooks/useSharedPage';
 import { useUser } from 'hooks/useUser';
 import type { ApplicationWithTransactions } from 'lib/applications/interfaces';
 import type {
@@ -63,7 +62,7 @@ export default function BountyProperties(props: {
     () => isAmountInputEmpty || Number(currentBounty?.rewardAmount) <= 0,
     [isAmountInputEmpty, currentBounty]
   );
-  const { hasPublicPageAccess } = usePublicPage();
+  const { hasPublicPageAccess } = useSharedPage();
 
   const readOnly = parentReadOnly || hasPublicPageAccess;
 

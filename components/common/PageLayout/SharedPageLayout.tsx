@@ -25,7 +25,7 @@ type Props = {
   basePageId?: string;
 };
 
-export function PublicPageLayout({ children, basePageId }: Props) {
+export function SharedPageLayout({ children, basePageId }: Props) {
   const theme = useTheme();
   const colorMode = useColorMode();
 

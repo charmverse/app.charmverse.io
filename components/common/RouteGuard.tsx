@@ -4,8 +4,8 @@ import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
 import { useRef, useEffect, useState } from 'react';
 
-import { usePublicPage } from 'components/publicPages/hooks/usePublicPage';
 import { getKey } from 'hooks/useLocalStorage';
+import { useSharedPage } from 'hooks/useSharedPage';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
 import log from 'lib/log';
@@ -17,7 +17,7 @@ const accountPages = ['profile'];
 
 export default function RouteGuard({ children }: { children: ReactNode }) {
   const router = useRouter();
-  const { accessCheked, hasPublicPageAccess } = usePublicPage();
+  const { accessCheked, hasPublicPageAccess } = useSharedPage();
   const [authorized, setAuthorized] = useState(true);
   const { user, isLoaded } = useUser();
   const { spaces, isLoaded: isSpacesLoaded } = useSpaces();

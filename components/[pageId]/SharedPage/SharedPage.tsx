@@ -18,7 +18,7 @@ type Props = {
   publicPage: PublicPageResponse;
 };
 
-export function PublicPage({ publicPage }: Props) {
+export function SharedPage({ publicPage }: Props) {
   const dispatch = useAppDispatch();
   const { setCurrentPageId, pages } = usePages();
   const [, setTitleState] = usePageTitle();
