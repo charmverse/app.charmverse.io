@@ -1,3 +1,4 @@
+import { link } from '@bangle.dev/base-components';
 import type { PluginKey } from '@bangle.dev/pm';
 import { Plugin } from '@bangle.dev/pm';
 import { getMarkAttrs } from '@bangle.dev/utils';
@@ -22,6 +23,7 @@ export function plugins({ key }: { key: PluginKey }) {
   let tooltipTimer: null | NodeJS.Timer = null;
 
   return [
+    link.plugins(),
     new Plugin<LinkPluginState>({
       key,
       state: {
