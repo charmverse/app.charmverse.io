@@ -59,6 +59,8 @@ import InlineDatabase from './components/inlineDatabase/components/InlineDatabas
 import InlineCommandPalette from './components/inlinePalette/components/InlineCommandPalette';
 import { plugins as inlinePalettePlugins } from './components/inlinePalette/inlinePalette';
 import * as inlineVote from './components/inlineVote';
+import { plugins as linkPlugins } from './components/link/link.plugins';
+import { LinksPopup } from './components/link/LinksPopup';
 import * as listItem from './components/listItem/listItem';
 import Mention, { mentionPluginKeyName, mentionPlugins, MentionSuggest } from './components/mention';
 import NestedPage, { nestedPagePluginKeyName, nestedPagePlugins, NestedPagesList } from './components/nestedPage';
@@ -99,6 +101,7 @@ const nestedPagePluginKey = new PluginKey(nestedPagePluginKeyName);
 const inlineCommentPluginKey = new PluginKey(inlineComment.pluginKeyName);
 const inlineVotePluginKey = new PluginKey(inlineVote.pluginKeyName);
 const suggestionsPluginKey = new PluginKey('suggestions');
+const linksPluginKey = new PluginKey('links');
 const inlinePalettePluginKey = new PluginKey('inlinePalette');
 
 export function charmEditorPlugins({
@@ -130,6 +133,7 @@ export function charmEditorPlugins({
     // this trackPlugin should be called before the one below which calls onSelectionSet().
     // TODO: find a cleaner way to combine this logic?
     trackPlugins({ onSelectionSet, key: suggestionsPluginKey }),
+    linkPlugins({ key: linksPluginKey }),
     pasteChecker.plugins({ onError }),
     new Plugin({
       view: (_view) => {
@@ -173,7 +177,6 @@ export function charmEditorPlugins({
     heading.plugins(),
     horizontalRule.plugins(),
     italic.plugins(),
-    link.plugins(),
     listItem.plugins(),
     orderedList.plugins(),
     columnLayout.plugins(),
@@ -291,10 +294,15 @@ const StyledReactBangleEditor = styled(ReactBangleEditor)<{ disablePageSpecificF
     tab-size: 4;
     caret-color: var(--primary-text);
   }
+
   pre code {
     color: inherit;
     display: block;
     padding: ${({ theme }) => theme.spacing(2)};
+  }
+
+  .charm-link:hover {
+    cursor: pointer;
   }
 
   hr {
@@ -689,6 +697,7 @@ function CharmEditor({
               readOnly={readOnly}
             />
           )}
+          {currentSpace && pageId && <LinksPopup pluginKey={linksPluginKey} readOnly={readOnly} />}
         </>
       )}
       {!readOnly && <DevTools />}
