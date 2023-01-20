@@ -136,7 +136,11 @@ function IframeComponent({ readOnly, node, getPos, view, deleteNode, selected, u
             allowFullScreen
             title='iframe'
             src={embeddableSrc}
-            style={{ height: '100%', border: '0 solid transparent', width: '100%' }}
+            style={{
+              width: '100%',
+              height: '100%',
+              border: '0 solid transparent'
+            }}
           />
         </IframeContainer>
       </VerticalResizer>
