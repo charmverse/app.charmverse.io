@@ -41,6 +41,12 @@ const config = {
         source: '/:domain(^(?!.*\bapi\b).*$)/bounties/:id',
         destination: '/:domain/bounties?bountyId=:id',
         permanent: false
+      },
+      {
+        // strip out old /share prefix
+        source: '/share/:path*',
+        destination: '/:path*',
+        permanent: true
       }
     ];
   },
