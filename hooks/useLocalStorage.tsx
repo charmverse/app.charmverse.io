@@ -33,6 +33,7 @@ export function useLocalStorage<T = any>(key: string | null, defaultValue: T, no
   useEffect(() => {
     if (key) {
       const storedValue = getStorageValue(key, defaultValue, noPrefix);
+      // use defaultValue as a fallback in case storedValue is null
       setValue(storedValue || defaultValue);
     }
   }, [key]);
