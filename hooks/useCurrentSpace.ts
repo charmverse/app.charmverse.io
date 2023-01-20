@@ -10,8 +10,7 @@ export function useCurrentSpace() {
   const { publicSpace, accessChecked } = useSharedPage();
 
   // Support for extracting domain from logged in view or shared bounties view
-  // The other part of this logic, which retrieves list of spaces in public mode is in components/share/PublicPage
-  const domain = router.query.domain ?? router.query.pageId?.[0];
+  const domain = router.query.domain;
 
   const space = spaces.find((w) => w.domain === domain);
 
