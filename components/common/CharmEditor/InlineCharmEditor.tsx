@@ -15,6 +15,9 @@ import type { PageContent } from 'lib/prosemirror/interfaces';
 import { userDataPlugin } from './components/charm/charm.plugins';
 import EmojiSuggest, * as emoji from './components/emojiSuggest';
 import * as floatingMenu from './components/floatingMenu';
+import { plugins as linkPlugins } from './components/link/link.plugins';
+import { spec as linkSpec } from './components/link/link.specs';
+import { LinksPopup } from './components/link/LinksPopup';
 import Mention, { mentionPlugins, mentionSpecs, MentionSuggest, mentionPluginKeyName } from './components/mention';
 import { placeholderPlugin } from './components/placeholder';
 import * as tabIndent from './components/tabIndent';
@@ -27,13 +30,14 @@ export interface ICharmEditorOutput {
 const emojiPluginKey = new PluginKey(emoji.pluginKeyName);
 const mentionPluginKey = new PluginKey(mentionPluginKeyName);
 const floatingMenuPluginKey = new PluginKey('floatingMenu');
+const linksPluginKey = new PluginKey('links');
 
 export const specRegistry = new SpecRegistry([
   // MAKE SURE THIS IS ALWAYS AT THE TOP! Or deleting all contents will leave the wrong component in the editor
   paragraph.spec(), // OK
   bold.spec(), // OK
   italic.spec(), // OK
-  link.spec(), // OK
+  linkSpec(), // OK
   strike.spec(), // OK
   underline.spec(), // OK
   emoji.specs(), // ??
@@ -75,7 +79,7 @@ export function charmEditorPlugins({
     bold.plugins(),
     code.plugins(),
     italic.plugins(),
-    link.plugins(),
+    linkPlugins({ key: linksPluginKey }),
     paragraph.plugins(),
     strike.plugins(),
     underline.plugins(),
@@ -234,6 +238,7 @@ export default function CharmEditor({
       <floatingMenu.FloatingMenu inline pluginKey={floatingMenuPluginKey} />
       <MentionSuggest pluginKey={mentionPluginKey} />
       <EmojiSuggest pluginKey={emojiPluginKey} />
+      {currentSpace && <LinksPopup pluginKey={linksPluginKey} readOnly={readOnly} />}
       {children}
     </StyledReactBangleEditor>
   );

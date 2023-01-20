@@ -67,7 +67,7 @@ export function PagesProvider({ children }: { children: ReactNode }) {
   const { subscribe } = useWebSocketClient();
 
   const { data, mutate: mutatePagesList } = useSWR(
-    () => (currentSpace ? getPagesListCacheKey(currentSpace.id) : null),
+    () => getPagesListCacheKey(currentSpace?.id),
     async () => {
       if (!currentSpace) {
         return {};
@@ -312,7 +312,6 @@ export function PagesProvider({ children }: { children: ReactNode }) {
       }
     );
   }, []);
-
   useEffect(() => {
     const unsubscribeFromPageUpdates = subscribe('pages_meta_updated', handleUpdateEvent);
     const unsubscribeFromNewPages = subscribe('pages_created', handleNewPageEvent);
@@ -350,7 +349,9 @@ export function PagesProvider({ children }: { children: ReactNode }) {
   return <PagesContext.Provider value={value}>{children}</PagesContext.Provider>;
 }
 
-export function getPagesListCacheKey(spaceId: string) {
+export function getPagesListCacheKey(spaceId?: string) {
+  if (!spaceId) return null;
+
   return `pages/${spaceId}`;
 }
 

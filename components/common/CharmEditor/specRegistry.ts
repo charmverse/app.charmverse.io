@@ -1,4 +1,4 @@
-import { bold, code, hardBreak, italic, link, strike, underline } from '@bangle.dev/base-components';
+import { bold, code, hardBreak, italic, strike, underline } from '@bangle.dev/base-components';
 import { SpecRegistry } from '@bangle.dev/core';
 
 import type { PageContent } from 'lib/prosemirror/interfaces';
@@ -12,7 +12,7 @@ import { cryptoPriceSpec } from './components/CryptoPrice';
 import * as disclosure from './components/disclosure';
 import * as doc from './components/doc';
 import * as emoji from './components/emojiSuggest';
-import { deletion, insertion, formatChange } from './components/fiduswriter/schema/common/track';
+import { deletion, formatChange, insertion } from './components/fiduswriter/schema/common/track';
 import * as heading from './components/heading';
 import * as horizontalRule from './components/horizontalRule';
 import * as iframe from './components/iframe';
@@ -20,6 +20,7 @@ import * as inlineComment from './components/inlineComment';
 import * as inlineDatabase from './components/inlineDatabase';
 import { spec as inlinePaletteSpecs } from './components/inlinePalette';
 import * as inlineVote from './components/inlineVote';
+import { spec as linkSpec } from './components/link/link.specs';
 import * as listItem from './components/listItem/listItem';
 import { mentionSpecs } from './components/mention';
 import { nestedPageSpec } from './components/nestedPage';
@@ -58,7 +59,7 @@ export const specRegistry = new SpecRegistry([
   hardBreak.spec(), // OK
   horizontalRule.spec(), // OK
   italic.spec(), // OK
-  link.spec(), // OK
+  linkSpec(), // OK
   listItem.spec(), // OK
   orderedList.spec(), // OK
   strike.spec(), // OK

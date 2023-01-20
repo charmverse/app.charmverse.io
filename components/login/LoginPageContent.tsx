@@ -43,7 +43,7 @@ export function LoginPageContent() {
   }, []);
 
   return (
-    <Container px={3}>
+    <Container px={3} data-test='login-page-content'>
       <Grid container>
         <Grid item xs={12} display={{ xs: 'flex', sm: 'none' }} justifyContent='center' py={3} px={6}>
           <Image sx={{ maxWidth: 300 }} src={splashImage} />

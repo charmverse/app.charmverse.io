@@ -8,6 +8,7 @@ type InputProps = {
   helperText?: string;
   isValid?: (url: string) => boolean;
   onSubmit: (url: string) => void;
+  multiline?: boolean;
 };
 
 export function MediaUrlInput(props: InputProps) {
@@ -17,7 +18,9 @@ export function MediaUrlInput(props: InputProps) {
     <Box display='flex' flexDirection='column' gap={2} alignItems='center'>
       <TextField
         autoFocus
+        multiline={props.multiline}
         placeholder={props.placeholder}
+        sx={{ width: 400, maxWidth: '100%' }}
         value={embedUrl}
         onChange={(e) => setEmbedUrl(e.target.value)}
       />
@@ -27,7 +30,7 @@ export function MediaUrlInput(props: InputProps) {
           width: 250
         }}
         onClick={() => {
-          props.onSubmit(ensureProtocol(embedUrl));
+          props.onSubmit(ensureProtocol(embedUrl.trim()));
           setEmbedUrl('');
         }}
       >
@@ -44,7 +47,7 @@ export function MediaUrlInput(props: InputProps) {
 
 // automatically add https:// to user input
 function ensureProtocol(userInput: string) {
-  if (userInput.startsWith('http')) {
+  if (userInput.includes('http')) {
     return userInput;
   }
   return `https://${userInput}`;

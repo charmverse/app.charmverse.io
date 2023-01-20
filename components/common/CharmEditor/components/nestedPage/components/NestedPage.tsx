@@ -36,9 +36,7 @@ export default function NestedPage({ node }: NodeViewProps) {
   const { pages } = usePages();
   const nestedPage = pages[node.attrs.id];
 
-  const isPublicShareMode = window.location.href.match(`${window.location.origin}/share/`) !== null;
-
-  const appPath = `${isPublicShareMode ? 'share/' : ''}${space?.domain}/${nestedPage?.path}`;
+  const appPath = `${space?.domain}/${nestedPage?.path}`;
 
   const fullPath = `${window.location.origin}/${appPath}`;
 

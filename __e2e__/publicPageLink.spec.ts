@@ -51,7 +51,7 @@ test('click on link for another public page in same workspace and make sure that
     linkedPageId: firstPageId
   });
 
-  const publicSharePrefix = `${baseUrl}/share/${space.domain}`;
+  const publicSharePrefix = `${baseUrl}/${space.domain}`;
 
   const firstPageUrl = `${publicSharePrefix}/${firstPage.path}`;
   const secondPageUrl = `${publicSharePrefix}/${secondPage.path}`;
