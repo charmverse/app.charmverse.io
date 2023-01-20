@@ -38,6 +38,12 @@ function EditableArea(
       }
     }
 
+    // Next 4 lines are needed so that the textarea looks aligned with other table items
+    if (!textarea.value) {
+      textarea.rows = 1;
+    }
+    textarea.style.lineHeight = '24px';
+
     if (props.autoExpand && elementRef.current) {
       elementRef.current.style.width = '100%';
     }
@@ -54,6 +60,7 @@ function EditableArea(
     <div className='EditableAreaWrap'>
       <div style={{ display: 'inline-flex', minHeight: '50px', width: '100%' }}>
         <textarea
+          style={{ alignSelf: 'center' }}
           readOnly={!!props.readOnly}
           contentEditable={!props.readOnly}
           {...elementProps}
