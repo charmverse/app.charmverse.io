@@ -1,6 +1,7 @@
 import { Plugin, NodeView } from '@bangle.dev/core';
 import type { EditorView, Slice } from '@bangle.dev/pm';
 
+import log from 'lib/log';
 import { insertNode } from 'lib/prosemirror/insertNode';
 
 import { extractYoutubeLinkType } from '../video/utils';
@@ -11,7 +12,6 @@ import { MIN_EMBED_HEIGHT } from './config';
 import type { IframeNodeAttrs } from './config';
 import { name } from './iframeSpec';
 import { extractIframeProps, extractEmbedType } from './utils';
-
 // inject a tweet node when pasting twitter url
 
 export function plugins() {
@@ -30,10 +30,11 @@ export function plugins() {
           const text = event.clipboardData.getData('text/plain');
           const html = event.clipboardData.getData('text/html');
           const isPlainText = text && !html;
+
           if (!isPlainText) {
             return false;
           }
-          const props = extractIframeProps(text);
+          const props = extractIframeProps(text.trim());
           if (props) {
             const { src, height, width } = props;
             if (extractYoutubeLinkType(src)) {
