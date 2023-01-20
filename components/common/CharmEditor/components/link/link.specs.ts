@@ -12,7 +12,8 @@ export function spec() {
       {
         ...node.attrs,
         rel: 'noopener noreferrer nofollow',
-        class: 'charm-link'
+        class: 'charm-link',
+        target: '_blank'
       }
     ];
   };

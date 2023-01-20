@@ -66,7 +66,6 @@ function MenuByType(props: MenuProps) {
     disableNestedPage
   } = props;
   const { type } = usePluginState(props.pluginKey) as { type: SubMenu };
-  const { showMessage } = useSnackbar();
 
   const popupState = usePopupState({ variant: 'popover', popupId: 'commands-menu' });
   const displayInlineCommentButton = !inline && pagePermissions?.comment && enableComments;
