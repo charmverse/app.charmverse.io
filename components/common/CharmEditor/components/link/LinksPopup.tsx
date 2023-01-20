@@ -11,13 +11,13 @@ import {
   IconButton,
   ListItemIcon,
   MenuItem,
-  MenuList,
+  Paper,
   Stack,
   TextField,
   Typography
 } from '@mui/material';
 import type { PluginKey } from 'prosemirror-state';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 
 import FieldLabel from 'components/common/form/FieldLabel';
@@ -108,6 +108,11 @@ export function LinksPopup({ pluginKey, readOnly }: { pluginKey: PluginKey<LinkP
     }
   }
 
+  function updateLink(e: React.KeyboardEvent) {
+    updateText(e);
+    updateHref(e);
+  }
+
   if (isVisible) {
     return createPortal(
       <ClickAwayListener onClickAway={hideTooltip}>
@@ -178,9 +183,9 @@ export function LinksPopup({ pluginKey, readOnly }: { pluginKey: PluginKey<LinkP
             )}
           </Box>
         ) : (
-          <MenuList
+          <Paper
             sx={{
-              backgroundColor: 'background.light'
+              minWidth: 350
             }}
           >
             <Stack p={1}>
@@ -189,7 +194,7 @@ export function LinksPopup({ pluginKey, readOnly }: { pluginKey: PluginKey<LinkP
                 value={linkHref}
                 onChange={(e) => setLinkHref(e.target.value)}
                 autoFocus
-                onKeyDown={updateHref}
+                onKeyDown={updateLink}
               />
             </Stack>
             <Stack p={1}>
@@ -198,7 +203,7 @@ export function LinksPopup({ pluginKey, readOnly }: { pluginKey: PluginKey<LinkP
                 value={linkText}
                 onChange={(e) => setLinkText(e.target.value)}
                 autoFocus
-                onKeyDown={updateText}
+                onKeyDown={updateLink}
               />
             </Stack>
             <div>
@@ -216,7 +221,7 @@ export function LinksPopup({ pluginKey, readOnly }: { pluginKey: PluginKey<LinkP
                 <Typography variant='subtitle1'>Remove link</Typography>
               </MenuItem>
             </div>
-          </MenuList>
+          </Paper>
         )}
       </ClickAwayListener>,
       tooltipContentDOM
