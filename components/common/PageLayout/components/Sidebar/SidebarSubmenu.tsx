@@ -1,8 +1,8 @@
 import styled from '@emotion/styled';
 import AddIcon from '@mui/icons-material/Add';
 import NavigateNextIcon from '@mui/icons-material/ArrowRightAlt';
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import MenuOpenIcon from '@mui/icons-material/MenuOpen';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import IconButton from '@mui/material/IconButton';
@@ -120,7 +120,7 @@ export default function SidebarSubmenu({
         </MenuItem>
       </Menu>
       <IconButton onClick={closeSidebar} size='small'>
-        <ChevronLeftIcon />
+        <MenuOpenIcon />
       </IconButton>
       <Modal open={spaceFormOpen} onClose={closeSpaceForm}>
         <CreateWorkspaceForm onSubmit={createNewSpace} onCancel={closeSpaceForm} isSubmitting={isCreatingSpace} />
