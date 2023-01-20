@@ -4,7 +4,6 @@ import { Box, Collapse, Divider, IconButton, Stack, TextField, Tooltip } from '@
 import type { PaymentMethod } from '@prisma/client';
 import type { CryptoCurrency } from 'connectors';
 import { getChainById } from 'connectors';
-import { useRouter } from 'next/router';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import charmClient from 'charmClient';
@@ -19,6 +18,7 @@ import { useBounties } from 'hooks/useBounties';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
+import { useSharedPage } from 'hooks/useSharedPage';
 import { useUser } from 'hooks/useUser';
 import type { ApplicationWithTransactions } from 'lib/applications/interfaces';
 import type {
@@ -62,11 +62,9 @@ export default function BountyProperties(props: {
     () => isAmountInputEmpty || Number(currentBounty?.rewardAmount) <= 0,
     [isAmountInputEmpty, currentBounty]
   );
+  const { hasSharedPageAccess } = useSharedPage();
 
-  const router = useRouter();
-
-  const isPublic = router.asPath.split('/')[1] === 'share';
-  const readOnly = parentReadOnly || isPublic;
+  const readOnly = parentReadOnly || hasSharedPageAccess;
 
   const bountyPage = pages[pageId];
 
@@ -495,7 +493,7 @@ export default function BountyProperties(props: {
 
       {
         // Bounty creator cannot apply to their own bounty
-        permissions && !isPublic && currentBounty.createdBy !== user?.id && (
+        permissions && !hasSharedPageAccess && currentBounty.createdBy !== user?.id && (
           <>
             <BountyApplicantForm
               bounty={currentBounty}
@@ -512,7 +510,7 @@ export default function BountyProperties(props: {
         )
       }
 
-      {isPublic && bountyPage && <BountySignupButton bountyPage={bountyPage} />}
+      {hasSharedPageAccess && bountyPage && <BountySignupButton bountyPage={bountyPage} />}
 
       {permissions?.userPermissions?.review && currentBounty.status !== 'suggestion' && !draftBounty && (
         <BountyApplicantsTable bounty={currentBounty} permissions={permissions} />

@@ -165,13 +165,7 @@ function ViewHeader(props: Props) {
 
         {/* Link to view embedded table in full */}
         {props.embeddedBoardPath && (
-          <Link
-            href={
-              router.pathname.startsWith('/share')
-                ? `/share/${router.query.pageId?.[0]}/${props.embeddedBoardPath}`
-                : `/${router.query.domain}/${props.embeddedBoardPath}`
-            }
-          >
+          <Link href={`/${router.query.domain}/${props.embeddedBoardPath}`}>
             <Tooltip title='Open as full page' placement='top'>
               <IconButton style={{ width: '32px' }}>
                 <OpenInFullIcon color='secondary' sx={{ fontSize: 14 }} />

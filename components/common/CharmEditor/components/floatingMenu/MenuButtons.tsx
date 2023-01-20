@@ -4,7 +4,6 @@ import { useEditorViewContext } from '@bangle.dev/react';
 import { filter, rafCommandExec } from '@bangle.dev/utils';
 import { KeyboardArrowDown } from '@mui/icons-material';
 import ChatBubbleIcon from '@mui/icons-material/ChatBubbleOutline';
-import HowToVoteIcon from '@mui/icons-material/HowToVote';
 import MessageOutlinedIcon from '@mui/icons-material/MessageOutlined';
 import { Box } from '@mui/material';
 import React, { useCallback } from 'react';

@@ -203,6 +203,7 @@ export function PostPage({
         <Container top={50}>
           <Box minHeight={300}>
             <CharmEditor
+              pageType='post'
               readOnly={readOnly}
               pageActionDisplay={null}
               pageId={post?.id}
