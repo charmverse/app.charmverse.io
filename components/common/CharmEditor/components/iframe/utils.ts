@@ -35,6 +35,10 @@ export function extractIframeProps(pastedHtml: string): IframeProps | null {
 
 function getNumberFromString(html: string, param: string): number | null {
   const extracted = getParamFromString(html, param);
+  // ignore percentages
+  if (extracted?.includes('%')) {
+    return null;
+  }
   const parsed = extracted ? parseInt(extracted.replace('px', '').trim(), 10) : null;
   // check if parsed is a number
   if (parsed && !Number.isNaN(parsed)) {
