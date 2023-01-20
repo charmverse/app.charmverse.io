@@ -96,7 +96,7 @@ export function plugins({ key }: { key: PluginKey }) {
                       if (tooltipTimer) clearTimeout(tooltipTimer);
                       tooltipTimer = setTimeout(() => {
                         hideSuggestionsTooltip(key)(view.state, view.dispatch, view);
-                      }, 700);
+                      }, 750);
                     }
                   };
                 }, 400);
