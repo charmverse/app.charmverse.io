@@ -36,7 +36,7 @@ function UserProperty(props: Props): JSX.Element | null {
             user={memberMap[props.value]}
             avatarSize='xSmall'
             fontSize='small'
-            sx={{ wordWrap: 'break-word' }}
+            sx={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
           />
         </div>
       );
