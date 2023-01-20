@@ -208,13 +208,7 @@ function ResizablePDF({
     return <PDF url={url} width={size} />;
   } else {
     return (
-      <Resizable
-        initialSize={size}
-        minWidth={MIN_PDF_WIDTH}
-        updateAttrs={updateAttrs}
-        onDelete={() => handleDelete()}
-        onResizeStop={onResizeStop}
-      >
+      <Resizable initialSize={size} minWidth={MIN_PDF_WIDTH} updateAttrs={updateAttrs} onDelete={() => handleDelete()}>
         <PDF url={url} width={size} />
       </Resizable>
     );

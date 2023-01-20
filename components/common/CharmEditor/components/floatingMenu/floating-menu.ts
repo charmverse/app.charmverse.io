@@ -39,8 +39,8 @@ export function floatingMenu({
     keybindings
       ? keymap(
           createObject([
-            [keybindings.hide, filter(queryIsSelectionTooltipActive(key), hideSelectionTooltip(key))],
-            [keybindings.toggleLink, toggleLinkSubMenu(key)]
+            [keybindings.hide, filter(queryIsSelectionTooltipActive(key), hideSelectionTooltip(key))]
+            // [keybindings.toggleLink, toggleLinkSubMenu(key)]
           ])
         )
       : undefined
@@ -70,32 +70,6 @@ export function toggleSubMenu(floatingMenuPluginKey: PluginKey, subMenu: SubMenu
     rafCommandExec(view!, focusFloatingMenuInput(floatingMenuPluginKey));
 
     return updateSelectionTooltipType(floatingMenuPluginKey, subMenu)(view!.state, view!.dispatch, view);
-  };
-}
-
-export function toggleLinkSubMenu(key: PluginKey): Command {
-  return (state, _dispatch, view) => {
-    const type = querySelectionTooltipType(key)(state);
-
-    if (!view || !hasComponentInSchema(state, 'link')) {
-      return false;
-    }
-
-    if (state.selection.empty) {
-      // Focus on link tooltip by keyboard shortcut
-      if (type === 'linkSubMenu') {
-        rafCommandExec(view, focusFloatingMenuInput(key));
-      }
-      return false;
-    }
-
-    if (type === 'linkSubMenu') {
-      return hideSelectionTooltip(key)(view.state, view.dispatch, view);
-    }
-
-    rafCommandExec(view, focusFloatingMenuInput(key));
-
-    return updateSelectionTooltipType(key, 'linkSubMenu')(view.state, view.dispatch, view);
   };
 }
 

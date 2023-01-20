@@ -36,7 +36,7 @@ import {
 } from './MenuButtons';
 import { MenuGroup } from './MenuGroup';
 
-type FloatingMenuVariant = 'defaultMenu' | 'linkSubMenu' | 'inlineCommentSubMenu' | 'commentOnlyMenu';
+type FloatingMenuVariant = 'defaultMenu' | 'inlineCommentSubMenu' | 'commentOnlyMenu';
 
 type MenuProps = {
   enableComments?: boolean;
@@ -66,7 +66,6 @@ function MenuByType(props: MenuProps) {
     disableNestedPage
   } = props;
   const { type } = usePluginState(props.pluginKey) as { type: SubMenu };
-  const { showMessage } = useSnackbar();
 
   const popupState = usePopupState({ variant: 'popover', popupId: 'commands-menu' });
   const displayInlineCommentButton = !inline && pagePermissions?.comment && enableComments;
@@ -143,13 +142,15 @@ function MenuByType(props: MenuProps) {
       </Menu>
     );
   }
+
   if (type === 'linkSubMenu') {
     return (
       <Menu hideMenu={hideMenu}>
-        <LinkSubMenu showMessage={showMessage} />
+        <LinkSubMenu />
       </Menu>
     );
   }
+
   if (type === 'inlineCommentSubMenu' && !inline) {
     return (
       <Menu hideMenu={hideMenu}>

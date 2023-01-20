@@ -17,9 +17,6 @@ CREATE INDEX "Post_spaceId_deletedAt_idx" ON "Post"("spaceId", "deletedAt");
 CREATE INDEX "Post_spaceId_deletedAt_categoryId_idx" ON "Post"("spaceId", "deletedAt", "categoryId");
 
 -- CreateIndex
-CREATE INDEX "Post_spaceId_deletedAt_categoryId_title_contentText_idx" ON "Post"("spaceId", "deletedAt", "categoryId", "title", "contentText");
-
--- CreateIndex
 CREATE INDEX "UnstoppableDomain_domain_idx" ON "UnstoppableDomain"("domain");
 
 -- CreateIndex
