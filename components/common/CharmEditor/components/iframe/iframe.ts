@@ -1,7 +1,6 @@
 import { Plugin, NodeView } from '@bangle.dev/core';
 import type { EditorView, Slice } from '@bangle.dev/pm';
 
-import log from 'lib/log';
 import { insertNode } from 'lib/prosemirror/insertNode';
 
 import { extractYoutubeLinkType } from '../video/utils';
@@ -34,7 +33,7 @@ export function plugins() {
           if (!isPlainText) {
             return false;
           }
-          const props = extractIframeProps(text.trim());
+          const props = extractIframeProps(text);
           if (props) {
             const { src, height, width } = props;
             if (extractYoutubeLinkType(src)) {
