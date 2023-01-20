@@ -165,36 +165,41 @@ function PropertyValueElement(props: Props): JSX.Element {
   }
 
   if (editableFields.includes(propertyTemplate.type)) {
-    if (!readOnly) {
-      return propertyTemplate.type === 'text' ? (
-        <EditableArea
-          placeholderText={emptyDisplayValue}
-          value={value.toString()}
-          autoExpand
-          onChange={setValue}
-          onSave={() => {
-            mutator.changePropertyValue(card, propertyTemplate.id, value);
-          }}
-          onCancel={() => setValue(propertyValue || '')}
-          validator={(newValue) => validateProp(propertyTemplate.type, newValue)}
-          spellCheck
-          maxRows={props.maxRows}
-        />
-      ) : (
-        <Editable
-          placeholderText={emptyDisplayValue}
-          value={value.toString()}
-          autoExpand
-          onChange={setValue}
-          onSave={() => {
-            mutator.changePropertyValue(card, propertyTemplate.id, value);
-          }}
-          onCancel={() => setValue(propertyValue || '')}
-          validator={(newValue) => validateProp(propertyTemplate.type, newValue)}
-        />
-      );
-    }
-    return <div className='octo-propertyvalue octo-propertyvalue--readonly'>{displayValue}</div>;
+    return propertyTemplate.type === 'text' ? (
+      <EditableArea
+        className='octo-propertyvalue'
+        placeholderText={emptyDisplayValue}
+        value={value.toString()}
+        autoExpand
+        onChange={setValue}
+        onSave={() => {
+          mutator.changePropertyValue(card, propertyTemplate.id, value);
+        }}
+        onCancel={() => setValue(propertyValue || '')}
+        validator={(newValue) => validateProp(propertyTemplate.type, newValue)}
+        spellCheck
+        maxRows={props.maxRows}
+      />
+    ) : (
+      <Editable
+        className='octo-propertyvalue'
+        placeholderText={emptyDisplayValue}
+        value={value.toString()}
+        autoExpand
+        onChange={setValue}
+        onSave={() => {
+          mutator.changePropertyValue(card, propertyTemplate.id, value);
+        }}
+        onCancel={() => setValue(propertyValue || '')}
+        validator={(newValue) => validateProp(propertyTemplate.type, newValue)}
+      />
+    );
+
+    return (
+      <div className='octo-propertyvalue octo-propertyvalue--readonly' style={{ maxHeight: '50px' }}>
+        {displayValue}
+      </div>
+    );
   }
   return <div className='octo-propertyvalue'>{finalDisplayValue}</div>;
 }

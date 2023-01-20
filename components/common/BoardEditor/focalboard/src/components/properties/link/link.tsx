@@ -35,6 +35,7 @@ function URLProperty(props: Props): JSX.Element {
     <div className='URLProperty property-link url'>
       {(hasValue || props.placeholder) && (
         <EditableArea
+          className='octo-propertyvalue'
           placeholderText={props.placeholder}
           value={props.value}
           autoExpand

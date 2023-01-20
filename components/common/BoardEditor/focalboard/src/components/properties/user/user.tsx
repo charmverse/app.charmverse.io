@@ -32,7 +32,12 @@ function UserProperty(props: Props): JSX.Element | null {
     if (memberMap[props.value]) {
       return (
         <div className='UserProperty octo-propertyvalue'>
-          <UserDisplay user={memberMap[props.value]} avatarSize='xSmall' fontSize='small' />
+          <UserDisplay
+            user={memberMap[props.value]}
+            avatarSize='xSmall'
+            fontSize='small'
+            sx={{ wordWrap: 'break-word' }}
+          />
         </div>
       );
     }

@@ -137,7 +137,7 @@ function Editable(props: EditableProps, ref: React.Ref<Focusable>): JSX.Element 
     e.stopPropagation();
   }
 
-  return <input {...elementProps} onPaste={disablePropagation} ref={elementRef} />;
+  return <input disabled {...elementProps} onPaste={disablePropagation} ref={elementRef} />;
 }
 
 export default forwardRef(Editable);

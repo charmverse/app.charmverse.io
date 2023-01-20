@@ -38,7 +38,7 @@ function EditableArea(props: EditableProps & { maxRows?: number }, ref: React.Re
       elementRef.current.style.width = '100%';
     }
 
-    elementRef.current?.style.setProperty('word-break', 'break-all');
+    //    elementRef.current?.style.setProperty('word-break', '');
   });
 
   const heightProps = {
@@ -49,6 +49,8 @@ function EditableArea(props: EditableProps & { maxRows?: number }, ref: React.Re
   return (
     <div className='EditableAreaWrap'>
       <textarea
+        readOnly
+        contentEditable={false}
         {...elementProps}
         {...heightProps}
         ref={elementRef}
@@ -56,6 +58,8 @@ function EditableArea(props: EditableProps & { maxRows?: number }, ref: React.Re
       />
       <div className='EditableAreaContainer'>
         <textarea
+          readOnly
+          contentEditable={false}
           ref={referenceRef}
           className={`EditableAreaReference ${elementProps.className}`}
           dir='auto'
