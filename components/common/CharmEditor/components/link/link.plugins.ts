@@ -13,6 +13,7 @@ export type LinkPluginState = {
   show: boolean;
   href: string | null;
   tooltipContentDOM: HTMLElement;
+  ref?: HTMLElement | null;
 };
 
 export function plugins({ key }: { key: PluginKey }) {
