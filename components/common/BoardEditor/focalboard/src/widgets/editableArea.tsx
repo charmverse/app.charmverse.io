@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import React, { forwardRef, useEffect, useRef } from 'react';
 
 import type { EditableProps, Focusable } from './editable';
@@ -8,7 +9,10 @@ function getBorderWidth(style: CSSStyleDeclaration): number {
 }
 
 // Max rows feature is used only in the context where we list multiple items (such as a table view)
-function EditableArea(props: EditableProps & { maxRows?: number }, ref: React.Ref<Focusable>): JSX.Element {
+function EditableArea(
+  props: EditableProps & { maxRows?: number; children?: ReactNode },
+  ref: React.Ref<Focusable>
+): JSX.Element {
   const elementRef = useRef<HTMLTextAreaElement>(null);
   const referenceRef = useRef<HTMLTextAreaElement>(null);
   const heightRef = useRef(0);
@@ -48,18 +52,17 @@ function EditableArea(props: EditableProps & { maxRows?: number }, ref: React.Re
 
   return (
     <div className='EditableAreaWrap'>
-      <textarea
-        readOnly
-        contentEditable={false}
-        {...elementProps}
-        {...heightProps}
-        ref={elementRef}
-        className={`EditableArea ${elementProps.className}`}
-      />
+      <div style={{ display: 'inline-flex', minHeight: '50px', width: '100%' }}>
+        <textarea
+          {...elementProps}
+          {...heightProps}
+          ref={elementRef}
+          className={`EditableArea ${elementProps.className}`}
+        />
+        {props.children && props.children}
+      </div>
       <div className='EditableAreaContainer'>
         <textarea
-          readOnly
-          contentEditable={false}
           ref={referenceRef}
           className={`EditableAreaReference ${elementProps.className}`}
           dir='auto'

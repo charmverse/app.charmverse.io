@@ -20,15 +20,17 @@ function URLProperty(props: Props): JSX.Element {
   const hasValue = Boolean(props.value?.trim());
   if (hasValue) {
     link = (
-      <a
-        className='Link__button'
-        href={Utils.ensureProtocol(props.value.trim())}
-        target='_blank'
-        rel='noreferrer'
-        onClick={(event) => event.stopPropagation()}
-      >
-        <LinkIcon fontSize='small' />
-      </a>
+      <span style={{ minWidth: '30px', verticalAlign: 'middle', display: 'inline-block' }}>
+        <a
+          className='Link__button'
+          href={Utils.ensureProtocol(props.value.trim())}
+          target='_blank'
+          rel='noreferrer'
+          onClick={(event) => event.stopPropagation()}
+        >
+          <LinkIcon fontSize='small' />
+        </a>
+      </span>
     );
   }
   return (
@@ -44,9 +46,10 @@ function URLProperty(props: Props): JSX.Element {
           onSave={props.onSave}
           onCancel={props.onCancel}
           validator={props.validator}
-        />
+        >
+          {link}
+        </EditableArea>
       )}
-      {link}
     </div>
   );
 }
