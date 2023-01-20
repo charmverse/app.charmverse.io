@@ -177,7 +177,6 @@ export function charmEditorPlugins({
     heading.plugins(),
     horizontalRule.plugins(),
     italic.plugins(),
-    link.plugins(),
     listItem.plugins(),
     orderedList.plugins(),
     columnLayout.plugins(),
