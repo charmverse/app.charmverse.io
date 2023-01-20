@@ -1,5 +1,5 @@
 import { Box } from '@mui/material';
-import { useState, memo } from 'react';
+import { useState, memo, useEffect } from 'react';
 
 import BlockAligner from '../BlockAligner';
 import { IframeContainer } from '../common/IframeContainer';
@@ -13,22 +13,16 @@ import { extractYoutubeLinkType } from '../video/utils';
 
 import { EmbedIcon } from './components/EmbedIcon';
 import type { IframeNodeAttrs, Embed, EmbedType } from './config';
-import { embeds, MAX_EMBED_WIDTH, MIN_EMBED_HEIGHT, MAX_EMBED_HEIGHT } from './config';
+import { embeds, MAX_EMBED_WIDTH, MIN_EMBED_WIDTH, MIN_EMBED_HEIGHT, MAX_EMBED_HEIGHT } from './config';
 import { extractEmbedType } from './utils';
 
-function IframeComponent({
-  readOnly,
-  node,
-  getPos,
-  view,
-  deleteNode,
-  selected,
-  updateAttrs,
-  onResizeStop
-}: CharmNodeViewProps) {
+function IframeComponent({ readOnly, node, getPos, view, deleteNode, selected, updateAttrs }: CharmNodeViewProps) {
   const attrs = node.attrs as IframeNodeAttrs;
 
-  const [height, setHeight] = useState(attrs.height);
+  const [state, setState] = useState({
+    width: attrs.width,
+    height: attrs.height
+  });
 
   const config = embeds[attrs.type as EmbedType] || embeds.embed;
 
@@ -91,6 +85,10 @@ function IframeComponent({
     );
   }
 
+  useEffect(() => {
+    setState({ ...attrs });
+  }, [attrs.height, attrs.width]);
+
   const embeddableSrc = (config as Embed).convertURLToEmbed?.(attrs.src) || attrs.src;
 
   if (readOnly) {
@@ -105,25 +103,20 @@ function IframeComponent({
       </IframeContainer>
     );
   }
-
   return (
     <BlockAligner onDelete={deleteNode}>
       <VerticalResizer
         onResizeStop={(_, data) => {
-          updateAttrs({
-            height: data.size.height
-          });
-          if (onResizeStop) {
-            onResizeStop(view);
-          }
+          // save to db
+          updateAttrs(data.size);
         }}
-        width={attrs.width}
-        height={height}
+        width={state.width}
+        height={state.height}
         onResize={(_, data) => {
-          setHeight(data.size.height);
+          setState(data.size);
         }}
         maxConstraints={[MAX_EMBED_WIDTH, MAX_EMBED_HEIGHT]}
-        minConstraints={[MAX_EMBED_WIDTH, MIN_EMBED_HEIGHT]}
+        minConstraints={[MIN_EMBED_WIDTH, MIN_EMBED_HEIGHT]}
       >
         <IframeContainer>
           <iframe

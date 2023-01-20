@@ -1,7 +1,3 @@
-import type { Slice } from 'prosemirror-model';
-
-import { isUrl } from 'lib/utilities/strings';
-
 import { embeds } from './config';
 import type { Embed, EmbedType } from './config';
 
@@ -18,24 +14,41 @@ export function extractEmbedType(url: string): EmbedType {
 }
 
 // a utility for pasting: take a slice of content and extract the url from it if it includes an iframe
-export function extractIframeProps(pastedHtml: string): { src: string; height: number | null } | null {
+type IframeProps = {
+  src: string;
+  height: number | null;
+  width: number | null;
+};
+
+export function extractIframeProps(pastedHtml: string): IframeProps | null {
   const isIframeHtml = pastedHtml.includes('<iframe');
   if (isIframeHtml) {
     const src = getParamFromString(pastedHtml, 'src');
-    const height = getParamFromString(pastedHtml, 'height');
+    const height = getNumberFromString(pastedHtml, 'height');
+    const width = getNumberFromString(pastedHtml, 'width');
     if (src) {
-      const heightInt = height ? parseInt(height, 10) : null;
-      return { src, height: heightInt };
+      return { src, height, width };
     }
   }
   return null;
 }
 
+function getNumberFromString(html: string, param: string): number | null {
+  const extracted = getParamFromString(html, param);
+  const parsed = extracted ? parseInt(extracted.replace('px', '').trim(), 10) : null;
+  // check if parsed is a number
+  if (parsed && !Number.isNaN(parsed)) {
+    return parsed;
+  }
+  return null;
+}
 function getParamFromString(html: string, param: string): string | null {
   const indexOfSrc = html.indexOf(param);
   if (indexOfSrc === -1) {
     return null;
   }
+  // replace fancy quotes with normal quotes
+  html = html.replaceAll('“', '"').replaceAll('”', '"');
   const indexOfFirstQuote = html.indexOf('"', indexOfSrc);
   const indexOfLastQuote = html.indexOf('"', indexOfFirstQuote + 1);
   return html.slice(indexOfFirstQuote + 1, indexOfLastQuote);

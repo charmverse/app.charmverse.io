@@ -15,13 +15,11 @@ interface ResizableProps {
   minWidth: number;
   updateAttrs: NodeViewProps['updateAttrs'];
   onDelete: () => void;
-  onResizeStop?: (view: EditorView) => void;
 }
 
 function Resizable(props: ResizableProps) {
-  const { onResizeStop, updateAttrs, onDelete, initialSize = 100, aspectRatio, children, minWidth } = props;
+  const { updateAttrs, onDelete, initialSize = 100, aspectRatio, children, minWidth } = props;
   const [size, setSize] = useState(initialSize || 100);
-  const view = useEditorViewContext();
   const containerRef = useRef<HTMLDivElement>(null);
   const maxWidth = containerRef.current?.clientWidth;
 
@@ -29,9 +27,6 @@ function Resizable(props: ResizableProps) {
     updateAttrs({
       size: data.size.width
     });
-    if (onResizeStop) {
-      onResizeStop(view);
-    }
   }, []);
 
   const onResizeCallback = useCallback((_: any, data: any) => {
