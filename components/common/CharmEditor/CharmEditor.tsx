@@ -273,13 +273,14 @@ export function charmEditorPlugins({
 
 const StyledReactBangleEditor = styled(ReactBangleEditor)<{
   colorMode?: 'dark';
+  removeLeftPosition?: boolean;
   disablePageSpecificFeatures?: boolean;
 }>`
   position: relative;
 
   /** DONT REMOVE THIS STYLING */
   /** ITS TO MAKE SURE THE USER CAN DRAG PAST THE ACTUAL CONTENT FROM RIGHT TO LEFT AND STILL SHOW THE FLOATING MENU */
-  left: -50px;
+  ${({ removeLeftPosition }) => !removeLeftPosition && `left: -50px`};
 
   ${({ colorMode }) =>
     colorMode === 'dark'
@@ -368,6 +369,7 @@ interface CharmEditorProps {
   pagePermissions?: IPagePermissionFlags;
   onParticipantUpdate?: (participants: FrontendParticipant[]) => void;
   placeholderText?: string;
+  removeLeftPosition?: boolean;
 }
 
 export function convertPageContentToMarkdown(content: PageContent, title?: string): string {
@@ -406,7 +408,8 @@ function CharmEditor({
   pageType,
   pagePermissions,
   placeholderText,
-  onParticipantUpdate
+  onParticipantUpdate,
+  removeLeftPosition = false
 }: CharmEditorProps) {
   const router = useRouter();
   const { showMessage } = useSnackbar();
@@ -551,6 +554,7 @@ function CharmEditor({
 
   return (
     <StyledReactBangleEditor
+      removeLeftPosition={removeLeftPosition}
       colorMode={colorMode}
       pageId={pageId}
       disablePageSpecificFeatures={disablePageSpecificFeatures}
@@ -671,7 +675,7 @@ function CharmEditor({
     >
       <floatingMenu.FloatingMenu
         palettePluginKey={inlinePalettePluginKey}
-        // disable comments and polls in suggestions mode since they dont interact well
+        // disable comments in suggestions mode since they dont interact well
         enableComments={enableComments}
         enableVoting={enableVoting && !enableSuggestingMode && !isTemplate}
         pluginKey={floatingMenuPluginKey}

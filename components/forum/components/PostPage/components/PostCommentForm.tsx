@@ -55,6 +55,8 @@ export function PostCommentForm({
       <Box display='flex' gap={1} flexDirection='row' alignItems='flex-start'>
         <UserDisplay user={user} hideName={true} />
         <CharmEditor
+          removeLeftPosition
+          disablePageSpecificFeatures
           colorMode='dark'
           style={{
             minHeight: 100
