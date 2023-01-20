@@ -129,7 +129,7 @@ export function LinksPopup({ pluginKey, readOnly }: { pluginKey: PluginKey<LinkP
             borderRadius={0.5}
             onMouseLeave={() => {
               setTimeout(() => {
-                hideSuggestionsTooltip(pluginKey)(view.state, view.dispatch, view);
+                hideTooltip();
               }, 750);
             }}
           >
