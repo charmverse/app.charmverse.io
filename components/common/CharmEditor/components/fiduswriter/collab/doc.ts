@@ -127,6 +127,7 @@ export class ModCollabDoc {
       schema: this.mod.editor.schema,
       doc: stateDoc,
       plugins: this.mod.editor.view.state.plugins.concat(plugins),
+      // if we dont include the selection, the first node gets selected for some reason
       selection: this.mod.editor.view.state.selection
     };
 
