@@ -176,6 +176,10 @@ function CharmVerseDatabases(props: DatabaseSourceProps & { activePageId?: strin
           pages={sortedPages}
           activePageId={props.activePageId}
           onSelectPage={onSelect}
+          style={{
+            height: '250px',
+            overflow: 'auto'
+          }}
         />
       </SidebarContent>
       {props.onCreate && (

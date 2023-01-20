@@ -1,4 +1,3 @@
-import { useTheme } from '@emotion/react';
 import { Stack } from '@mui/material';
 import { Box } from '@mui/system';
 import { useState } from 'react';
@@ -6,8 +5,8 @@ import type { KeyedMutator } from 'swr';
 
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
+import CharmEditor from 'components/common/CharmEditor';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/InlineCharmEditor';
-import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
 import UserDisplay from 'components/common/UserDisplay';
 import { useUser } from 'hooks/useUser';
 import type { PostCommentWithVote } from 'lib/forums/comments/interface';
@@ -28,7 +27,6 @@ export function PostCommentForm({
   setPostComments: KeyedMutator<PostCommentWithVote[] | undefined>;
 }) {
   const { user } = useUser();
-  const theme = useTheme();
   const [postContent, setPostContent] = useState<ICharmEditorOutput>({
     ...defaultCharmEditorOutput
   });
@@ -56,7 +54,7 @@ export function PostCommentForm({
     <Stack gap={1}>
       <Box display='flex' gap={1} flexDirection='row' alignItems='flex-start'>
         <UserDisplay user={user} hideName={true} />
-        <InlineCharmEditor
+        <CharmEditor
           colorMode='dark'
           style={{
             minHeight: 100

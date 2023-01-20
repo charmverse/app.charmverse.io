@@ -140,7 +140,7 @@ const StyledReactBangleEditor = styled(ReactBangleEditor)<{ colorMode?: 'dark'; 
 
 export type UpdatePageContent = (content: ICharmEditorOutput) => any;
 
-interface CharmEditorProps {
+interface InlineCharmEditorProps {
   colorMode?: 'dark';
   content?: PageContent | null;
   children?: ReactNode;
@@ -162,7 +162,7 @@ export default function CharmEditor({
   noPadding,
   placeholderText,
   readOnly = false
-}: CharmEditorProps) {
+}: InlineCharmEditorProps) {
   const currentSpace = useCurrentSpace();
   const { user } = useUser();
 

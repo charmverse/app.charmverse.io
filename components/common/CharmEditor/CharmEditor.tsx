@@ -1,4 +1,4 @@
-import { bold, code, hardBreak, italic, link, strike, underline } from '@bangle.dev/base-components';
+import { bold, code, hardBreak, italic, strike, underline } from '@bangle.dev/base-components';
 import type { RawPlugins } from '@bangle.dev/core';
 import { BangleEditorState, NodeView, Plugin } from '@bangle.dev/core';
 import { markdownSerializer } from '@bangle.dev/markdown';
@@ -271,12 +271,25 @@ export function charmEditorPlugins({
   };
 }
 
-const StyledReactBangleEditor = styled(ReactBangleEditor)<{ disablePageSpecificFeatures?: boolean }>`
+const StyledReactBangleEditor = styled(ReactBangleEditor)<{
+  colorMode?: 'dark';
+  disablePageSpecificFeatures?: boolean;
+}>`
   position: relative;
 
   /** DONT REMOVE THIS STYLING */
   /** ITS TO MAKE SURE THE USER CAN DRAG PAST THE ACTUAL CONTENT FROM RIGHT TO LEFT AND STILL SHOW THE FLOATING MENU */
   left: -50px;
+
+  ${({ colorMode }) =>
+    colorMode === 'dark'
+      ? `
+          background-color: var(--background-light);
+          .ProseMirror[data-placeholder]::before {
+            color: var(--primary-text);
+            opacity: 0.5;
+          }`
+      : ''};
 
   /** DONT REMOVE THIS STYLING */
   div.ProseMirror.bangle-editor {
@@ -338,6 +351,7 @@ const defaultContent: PageContent = {
 export type UpdatePageContent = (content: ICharmEditorOutput) => any;
 
 interface CharmEditorProps {
+  colorMode?: 'dark';
   content?: PageContent;
   children?: ReactNode;
   enableSuggestingMode?: boolean;
@@ -353,6 +367,7 @@ interface CharmEditorProps {
   pageType?: PageType | 'post';
   pagePermissions?: IPagePermissionFlags;
   onParticipantUpdate?: (participants: FrontendParticipant[]) => void;
+  placeholderText?: string;
 }
 
 export function convertPageContentToMarkdown(content: PageContent, title?: string): string {
@@ -375,6 +390,7 @@ export function convertPageContentToMarkdown(content: PageContent, title?: strin
 }
 
 function CharmEditor({
+  colorMode,
   enableSuggestingMode = false,
   pageActionDisplay = null,
   content = defaultContent,
@@ -389,6 +405,7 @@ function CharmEditor({
   containerWidth,
   pageType,
   pagePermissions,
+  placeholderText,
   onParticipantUpdate
 }: CharmEditorProps) {
   const router = useRouter();
@@ -476,6 +493,7 @@ function CharmEditor({
         debouncedUpdate(view, prevDoc);
         sendPageEvent();
       },
+      placeholderText,
       onError(err) {
         showMessage(err.message, 'warning');
       },
@@ -533,6 +551,7 @@ function CharmEditor({
 
   return (
     <StyledReactBangleEditor
+      colorMode={colorMode}
       pageId={pageId}
       disablePageSpecificFeatures={disablePageSpecificFeatures}
       isContentControlled={isContentControlled}
