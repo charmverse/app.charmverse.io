@@ -26,7 +26,6 @@ export function VideoNodeView({
   pageId,
   readOnly,
   node,
-  onResizeStop,
   selected,
   updateAttrs,
   isPost = false
@@ -128,7 +127,6 @@ export function VideoNodeView({
           updateAttrs({ width: args.size });
         }}
         onDelete={deleteNode}
-        onResizeStop={onResizeStop}
       >
         <IframeContainer>
           <iframe

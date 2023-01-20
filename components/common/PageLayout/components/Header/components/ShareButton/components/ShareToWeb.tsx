@@ -101,13 +101,13 @@ export default function ShareToWeb({ pageId, pagePermissions, refreshPermissions
       setShareLink(null);
     } else if (currentPage?.type === 'page' || currentPage?.type === 'card' || currentPage?.type === 'proposal') {
       const shareLinkToSet =
-        typeof window !== 'undefined' ? `${window.location.origin}/share/${space?.domain}/${currentPage.path}` : '';
+        typeof window !== 'undefined' ? `${window.location.origin}/${space?.domain}/${currentPage.path}` : '';
       setShareLink(shareLinkToSet);
     } else if (currentPage?.type.match(/board/)) {
       const viewIdToProvide = router.query.viewId;
       const shareLinkToSet =
         typeof window !== 'undefined'
-          ? `${window.location.origin}/share/${space?.domain}/${currentPage.path}?viewId=${viewIdToProvide}`
+          ? `${window.location.origin}/${space?.domain}/${currentPage.path}?viewId=${viewIdToProvide}`
           : '';
       setShareLink(shareLinkToSet);
     }

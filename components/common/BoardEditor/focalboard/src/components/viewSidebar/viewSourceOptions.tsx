@@ -160,6 +160,7 @@ function CharmVerseDatabases(props: DatabaseSourceProps & { activePageId?: strin
     <>
       <SidebarContent>
         <TextField
+          autoFocus
           placeholder='Search pages'
           value={searchTerm}
           onChange={(e) => {
@@ -170,7 +171,12 @@ function CharmVerseDatabases(props: DatabaseSourceProps & { activePageId?: strin
           }}
           fullWidth
         />
-        <PagesList isDatabase pages={sortedPages} activePageId={props.activePageId} onSelectPage={onSelect} />
+        <PagesList
+          emptyText='No databases found'
+          pages={sortedPages}
+          activePageId={props.activePageId}
+          onSelectPage={onSelect}
+        />
       </SidebarContent>
       {props.onCreate && (
         <MenuItem onClick={props.onCreate}>
