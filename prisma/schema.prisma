@@ -265,9 +265,10 @@ model SuperApiToken {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   token     String   @unique
-  name      String?
+  name      String
   spaces    Space[]
 
+  @@unique(name)
   @@index([token])
 }
 
