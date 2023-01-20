@@ -4,6 +4,7 @@ import type { ReactNode } from 'react';
 import { useCallback, createContext, useContext, useEffect, useMemo, useState } from 'react';
 
 import charmClient from 'charmClient';
+import type { CreateSpaceProps } from 'lib/spaces/createWorkspace';
 
 import { useUser } from './useUser';
 
@@ -12,7 +13,7 @@ type IContext = {
   setSpace: (spaces: Space) => void;
   setSpaces: (spaces: Space[]) => void;
   isLoaded: boolean;
-  createNewSpace: (data: Prisma.SpaceCreateInput) => Promise<Space | null>;
+  createNewSpace: (data: Pick<CreateSpaceProps, 'createSpaceOption' | 'spaceData'>) => Promise<Space | null>;
   isCreatingSpace: boolean;
 };
 
@@ -47,7 +48,7 @@ export function SpacesProvider({ children }: { children: ReactNode }) {
     }
   }, [user?.id, isUserLoaded]);
 
-  const createNewSpace = useCallback(async (newSpace: Prisma.SpaceCreateInput) => {
+  const createNewSpace = useCallback(async (newSpace: Pick<CreateSpaceProps, 'createSpaceOption' | 'spaceData'>) => {
     setIsCreatingSpace(true);
 
     try {

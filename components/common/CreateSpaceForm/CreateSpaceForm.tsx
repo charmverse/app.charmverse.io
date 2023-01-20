@@ -1,6 +1,7 @@
 import { yupResolver } from '@hookform/resolvers/yup';
+import ArrowCircleLeftIcon from '@mui/icons-material/ArrowCircleLeft';
 import RefreshIcon from '@mui/icons-material/Refresh';
-import { IconButton, Tooltip, InputAdornment, Typography } from '@mui/material';
+import { IconButton, InputAdornment, Tooltip, Typography } from '@mui/material';
 import Alert from '@mui/material/Alert';
 import Divider from '@mui/material/Divider';
 import Grid from '@mui/material/Grid';
@@ -18,6 +19,8 @@ import PrimaryButton from 'components/common/PrimaryButton';
 import Avatar from 'components/settings/workspace/LargeAvatar';
 import { useUser } from 'hooks/useUser';
 import log from 'lib/log';
+import type { CreateSpaceProps } from 'lib/spaces/createWorkspace';
+import type { SpaceCreateTemplate } from 'lib/spaces/utils';
 import { getSpaceDomainFromName } from 'lib/spaces/utils';
 import { domainSchema } from 'lib/spaces/validateDomainName';
 import randomName from 'lib/utilities/randomName';
@@ -31,7 +34,8 @@ export const schema = yup.object({
     return !ok;
   }),
   name: yup.string().ensure().trim().min(3, 'Name must be at least 3 characters').required('Name is required'),
-  spaceImage: yup.string().nullable(true)
+  spaceImage: yup.string().nullable(true),
+  spaceTemplateOption: yup.string().nullable(true)
 });
 
 export type FormValues = yup.InferType<typeof schema>;
@@ -39,7 +43,7 @@ export type FormValues = yup.InferType<typeof schema>;
 interface Props {
   defaultValues?: { name: string; domain: string };
   onCancel?: () => void;
-  onSubmit: (values: Prisma.SpaceCreateInput) => Promise<Space | null>;
+  onSubmit: (values: Pick<CreateSpaceProps, 'createSpaceOption' | 'spaceData'>) => Promise<Space | null>;
   submitText?: string;
   isSubmitting: boolean;
 }
@@ -64,32 +68,34 @@ export function CreateSpaceForm({ defaultValues, onSubmit: _onSubmit, onCancel, 
   const watchName = watch('name');
   const watchDomain = watch('domain');
   const watchSpaceImage = watch('spaceImage');
+  const watchSpaceTemplate = watch('spaceTemplateOption');
 
   async function onSubmit(values: FormValues) {
     try {
       setSaveError(null);
       const space = await _onSubmit({
-        author: {
-          connect: {
-            id: user!.id
-          }
-        },
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        updatedBy: user!.id,
-        spaceRoles: {
-          create: [
-            {
-              isAdmin: true,
-              user: {
-                connect: {
-                  id: user!.id
+        createSpaceOption: values.spaceTemplateOption as SpaceCreateTemplate,
+        spaceData: {
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          updatedBy: user!.id,
+          spaceRoles: {
+            create: [
+              {
+                isAdmin: true,
+                user: {
+                  connect: {
+                    id: user!.id
+                  }
                 }
               }
-            }
-          ]
-        },
-        ...values
+            ]
+          },
+          id: values.id,
+          domain: values.domain,
+          name: values.name,
+          spaceImage: values.spaceImage
+        }
       });
     } catch (err) {
       log.error('Error creating space', err);
@@ -110,12 +116,23 @@ export function CreateSpaceForm({ defaultValues, onSubmit: _onSubmit, onCancel, 
     setValue('domain', domain);
   }
 
+  function handleNewSpaceTemplate(value: SpaceCreateTemplate) {
+    setValue('spaceTemplateOption', value);
+    setStep(2);
+  }
+
   return step === 1 ? (
-    <SelectNewSpaceTemplate />
+    <SelectNewSpaceTemplate
+      selectedTemplate={watchSpaceTemplate as SpaceCreateTemplate}
+      onSelect={handleNewSpaceTemplate}
+    />
   ) : (
     <form data-test='create-space-form' onSubmit={handleSubmit(onSubmit)}>
       <DialogTitle onClose={onCancel}>Create a space</DialogTitle>
       <Divider />
+      <Typography>
+        <ArrowCircleLeftIcon onClick={() => setStep(1)} /> Selected template: {watchSpaceTemplate}
+      </Typography>
       <br />
       <Grid container direction='column' spacing={2}>
         <Grid item display='flex' justifyContent='center'>

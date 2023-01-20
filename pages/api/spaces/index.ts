@@ -5,6 +5,7 @@ import nc from 'next-connect';
 import { prisma } from 'db';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
+import type { CreateSpaceProps } from 'lib/spaces/createWorkspace';
 import { createWorkspace } from 'lib/spaces/createWorkspace';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -28,9 +29,9 @@ async function getSpaces(req: NextApiRequest, res: NextApiResponse<Space[]>) {
 
 async function createSpace(req: NextApiRequest, res: NextApiResponse<Space>) {
   const userId = req.session.user.id;
-  const data = req.body as Prisma.SpaceCreateInput;
+  const data = req.body as CreateSpaceProps;
 
-  const space = await createWorkspace({ spaceData: data, userId });
+  const space = await createWorkspace({ spaceData: data.spaceData, createSpaceOption: data.createSpaceOption, userId });
 
   return res.status(200).json(space);
 }

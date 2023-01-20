@@ -15,24 +15,26 @@ import { createPage } from 'lib/pages/server/createPage';
 import { setupDefaultPaymentMethods } from 'lib/payment-methods/defaultPaymentMethods';
 import { updateSpacePermissionConfigurationMode } from 'lib/permissions/meta';
 import { generateDefaultCategoriesInput } from 'lib/proposal/generateDefaultCategoriesInput';
+import { importWorkspacePages } from 'lib/templates/importWorkspacePages';
 
-type CreateSpaceProps = {
-  spaceData: Prisma.SpaceCreateInput;
+import type { SpaceCreateTemplate } from './utils';
+
+export type CreateSpaceProps = {
+  spaceData: Omit<Prisma.SpaceCreateInput, 'author'>;
   userId: string;
+  createSpaceOption?: SpaceCreateTemplate;
 };
 
-export async function createWorkspace({ spaceData, userId }: CreateSpaceProps) {
-  const space = await prisma.space.create({ data: spaceData, include: { pages: true } });
+export async function createWorkspace({ spaceData, userId, createSpaceOption }: CreateSpaceProps) {
+  const space = await prisma.space.create({
+    data: { ...spaceData, author: { connect: { id: userId } } },
+    include: { pages: true }
+  });
 
   // Create all page content in a single transaction
 
   // ---------- Section for selecting template to create from ----------
-  const sourceDataPath = path.resolve('seedData/space/space-da74cab3-c2b6-40bb-8734-0de5375b0fce-pages-1657887621286');
 
-  const seedPagesTransactionInput = await convertJsonPagesToPrisma({
-    folderPath: sourceDataPath,
-    spaceId: space.id
-  });
   // ---------- Section for selecting template to create from ----------
 
   const defaultCategories = generateDefaultCategoriesInput(space.id);
@@ -40,12 +42,31 @@ export async function createWorkspace({ spaceData, userId }: CreateSpaceProps) {
   const defaultPostCategories = generateDefaultPostCategories(space.id);
 
   await prisma.$transaction([
-    ...seedPagesTransactionInput.blocksToCreate.map((input) => prisma.block.create({ data: input })),
-    ...seedPagesTransactionInput.pagesToCreate.map((input) => createPage({ data: input })),
     prisma.proposalCategory.createMany({ data: defaultCategories }),
     prisma.memberProperty.createMany({ data: defaultProperties }),
     prisma.postCategory.createMany({ data: defaultPostCategories })
   ]);
+
+  // Handle the population of pages data
+  if (!createSpaceOption) {
+    const sourceDataPath = path.resolve(
+      'seedData/space/space-da74cab3-c2b6-40bb-8734-0de5375b0fce-pages-1657887621286'
+    );
+
+    const seedPagesTransactionInput = await convertJsonPagesToPrisma({
+      folderPath: sourceDataPath,
+      spaceId: space.id
+    });
+    await prisma.$transaction([
+      ...seedPagesTransactionInput.blocksToCreate.map((input) => prisma.block.create({ data: input })),
+      ...seedPagesTransactionInput.pagesToCreate.map((input) => createPage({ data: input }))
+    ]);
+  } else if (createSpaceOption === 'NFT Community') {
+    await importWorkspacePages({
+      targetSpaceIdOrDomain: space.id,
+      exportName: 'cvt-nft-community-template'
+    });
+  }
 
   const defaultGeneralPostCategory = defaultPostCategories.find((category) => category.name === 'General');
 
