@@ -24,6 +24,7 @@ function specFactory(): RawSpecs {
     type: 'node',
     name,
     schema: {
+      atom: true,
       inline: true,
       attrs: {
         caption: {

@@ -18,12 +18,6 @@ type Props = {
 
 function FBDialog(props: Props) {
   const { toolbar, toolsMenu, fullWidth = false } = props;
-  const intl = useIntl();
-
-  const closeDialogText = intl.formatMessage({
-    id: 'Dialog.closeDialog',
-    defaultMessage: 'Close dialog'
-  });
 
   useHotkeys('esc', () => props.onClose());
 
@@ -43,8 +37,8 @@ function FBDialog(props: Props) {
               {toolbar && <div className='cardToolbar'>{toolbar}</div>}
               {toolsMenu}
               {!props.hideCloseButton && (
-                <IconButton onClick={props.onClose}>
-                  <CloseIcon />
+                <IconButton size='small' onClick={props.onClose}>
+                  <CloseIcon color='secondary' fontSize='small' />
                 </IconButton>
               )}
             </div>

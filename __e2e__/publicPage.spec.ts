@@ -1,15 +1,13 @@
 import type { Browser } from '@playwright/test';
 import { chromium, expect, test } from '@playwright/test';
-import type { Page } from '@prisma/client';
+import type { Page, User } from '@prisma/client';
 
 import { baseUrl } from 'config/constants';
 import { prisma } from 'db';
-import type { IPageWithPermissions } from 'lib/pages/interfaces';
 import { generateBoard } from 'testing/setupDatabase';
 
 import { generateUserAndSpace } from './utils/mocks';
 import { login } from './utils/session';
-import { mockWeb3 } from './utils/web3';
 
 let browser: Browser;
 
@@ -23,6 +21,7 @@ test.describe.serial('Make a page public and visit it', async () => {
   let shareUrl = '';
   let boardPage: Page;
   let cardPage: Page;
+  let spaceUser: User;
 
   test('make a page public', async () => {
     // Arrange ------------------
@@ -35,6 +34,7 @@ test.describe.serial('Make a page public and visit it', async () => {
       createdBy: user.id
     });
 
+    spaceUser = user;
     await login({ userId: user.id, page });
 
     const domain = space.domain;
@@ -66,7 +66,7 @@ test.describe.serial('Make a page public and visit it', async () => {
     const publicShareToggle = page.locator('data-test=toggle-public-page');
 
     await publicShareToggle.click();
-    shareUrl = `${baseUrl}/share/${domain}/${boardPage.path}`;
+    shareUrl = `${baseUrl}/${domain}/${boardPage.path}`;
 
     await page.waitForResponse(/\/api\/permissions/);
 
@@ -76,45 +76,18 @@ test.describe.serial('Make a page public and visit it', async () => {
     const inputValue = await shareLinkInput.inputValue();
 
     expect(inputValue.match(shareUrl)).not.toBe(null);
-
-    // const copyButton = page.locator('data-test=copy-button');
-
-    // await expect(copyButton).toBeVisible();
-
-    // await copyButton.click({ force: true });
-
-    // const clipboardContent = await page.evaluate(async () => {
-    //   return navigator.clipboard.readText();
-    // });
-
-    // expect(clipboardContent.match(shareUrl)).not.toBe(null);
-
-    // // Set the share URL we will visit to be the exact clipboard content
-    // shareUrl = clipboardContent;
   });
 
-  test('open a page with id in url', async () => {
+  test('open a page with invalid domain and path', async () => {
     const publicContext = await browser.newContext({});
 
     const page = await publicContext.newPage();
 
-    await page.goto(`share/${boardPage?.id}`);
+    await page.goto('invalid-domain/not-existing-page-id');
 
-    const boardTitle = page.locator('data-test=board-title').locator('input');
+    const loginPageContent = page.locator('data-test=login-page-content');
 
-    await expect(boardTitle).toBeVisible();
-  });
-
-  test('open a page with incorrect in url', async () => {
-    const publicContext = await browser.newContext({});
-
-    const page = await publicContext.newPage();
-
-    await page.goto('share/not-existing-page-id');
-
-    const errorTitle = page.locator('data-test=error-title');
-
-    await expect(errorTitle).toBeVisible();
+    await expect(loginPageContent).toBeVisible();
   });
 
   test('visit the public page', async () => {
@@ -159,5 +132,30 @@ test.describe.serial('Make a page public and visit it', async () => {
     await expect(documentTitle).toBeVisible();
 
     expect(await documentTitle.innerText()).toBe(cardPage.title);
+
+    // 5. Make sure page is displayed using public layout
+    const publicPageLayout = page.locator('data-test=public-page-layout');
+    await expect(publicPageLayout).toBeVisible();
+  });
+
+  test('visit shared page as logged in user', async () => {
+    const userContext = await browser.newContext({ permissions: ['clipboard-read', 'clipboard-write'] });
+
+    const page = await userContext.newPage();
+    await login({ userId: spaceUser.id, page });
+
+    // 1. Visit the page
+    await page.goto(shareUrl);
+
+    // 2. Make sure the board renders
+    const boardTitle = page.locator('data-test=board-title').locator('input');
+
+    await expect(boardTitle).toBeVisible();
+
+    expect(await boardTitle.inputValue()).toBe(boardPage?.title);
+
+    // 3. Make sure page is displayed using space layout
+    const spacePageLayout = page.locator('data-test=space-page-layout');
+    await expect(spacePageLayout).toBeVisible();
   });
 });

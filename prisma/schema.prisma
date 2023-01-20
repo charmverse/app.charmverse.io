@@ -265,9 +265,10 @@ model SuperApiToken {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   token     String   @unique
-  name      String?
+  name      String
   spaces    Space[]
 
+  @@unique(name)
   @@index([token])
 }
 
@@ -1012,12 +1013,12 @@ model MemberPropertyPermission {
 
 // Begin Forum models
 model PostCategory {
-  id      String @id @default(uuid()) @db.Uuid
-  name    String
-  path    String?
-  defaultForSpace Space? @relation(name: "defaultPostCategory")
-  spaceId         String @db.Uuid
-  space           Space  @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  id              String  @id @default(uuid()) @db.Uuid
+  name            String
+  path            String?
+  defaultForSpace Space?  @relation(name: "defaultPostCategory")
+  spaceId         String  @db.Uuid
+  space           Space   @relation(fields: [spaceId], references: [id], onDelete: Cascade)
   Post            Post[]
 
   @@unique([spaceId, name])
@@ -1044,6 +1045,11 @@ model Post {
   comments           PostComment[]
   upDownVotes        PostUpDownVote[]
   commentUpDownVotes PostCommentUpDownVote[]
+
+  @@index([categoryId])
+  @@index([path])
+  @@index([spaceId, deletedAt]) // space feed
+  @@index([spaceId, deletedAt, categoryId]) // category feed
 }
 
 model PostUpDownVote {
@@ -1095,6 +1101,9 @@ model UnstoppableDomain {
   domain String @unique
   userId String @db.Uuid
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([domain])
+  @@index([userId])
 }
 
 model GoogleAccount {
@@ -1104,6 +1113,9 @@ model GoogleAccount {
   avatarUrl String
   userId    String @db.Uuid
   user      User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([email])
+  @@index([userId])
 }
 
 model GoogleCredential {
