@@ -115,7 +115,7 @@ export default function BountyReviewers({ bounty, permissions }: BountyReviewers
           >
             {reviewerNames.users.map((reviewer) => {
               const userName = !reviewer.name
-                ? 'Unknown user. This person has most likely left this workspace.'
+                ? 'Unknown user. This person has most likely left this space.'
                 : reviewer.name.slice(0, 2).match('0x')
                 ? reviewer.name.slice(2, 3).toUpperCase()
                 : reviewer.name.slice(0, 1).toUpperCase();

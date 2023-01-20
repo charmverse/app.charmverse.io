@@ -170,7 +170,7 @@ export default function ForumTasksList({ tasks, error, mutateTasks }: Discussion
         <TableHead>
           <TableRow>
             <TableCell>Comment</TableCell>
-            <TableCell width={200}>Workspace</TableCell>
+            <TableCell width={200}>Space</TableCell>
             <TableCell width={200}>Post</TableCell>
             <TableCell width={140} align='center'>
               Date

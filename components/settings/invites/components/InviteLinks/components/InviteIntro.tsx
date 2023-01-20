@@ -19,15 +19,15 @@ function InviteIntro() {
   return (
     <Legend noBorder variant='inherit' variantMapping={{ inherit: 'div' }} whiteSpace='normal'>
       <Typography variant='h2' fontSize='inherit' fontWeight={700} marginBottom='24px'>
-        Invite Members to this Workspace
+        Invite Members to this Space
       </Typography>
       <Typography variant='body1' gutterBottom>
-        There are 2 ways admins can invite users to this Workspace:
+        There are 2 ways admins can invite users to this Space:
       </Typography>
       <StyledList>
-        <StyledListItemText>Private Invite Links: Anyone with this link can join your workspace.</StyledListItemText>
+        <StyledListItemText>Private Invite Links: Anyone with this link can join your space.</StyledListItemText>
         <StyledListItemText>
-          Token Gates: Control access to your workspace automatically with tokens/NFTs.
+          Token Gates: Control access to your space automatically with tokens/NFTs.
         </StyledListItemText>
       </StyledList>
     </Legend>

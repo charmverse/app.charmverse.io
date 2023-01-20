@@ -77,7 +77,7 @@ export default function BountySuggestionApproval({ bounty }: Props) {
       <Modal title='Approve bounty suggestion' open={bountyApproveModal.isOpen} onClose={bountyApproveModal.close}>
         <Typography sx={{ whiteSpace: 'pre-wrap' }}>
           {
-            "Confirm you want to approve this bounty.\r\n\r\nIts status will be changed to 'open' and workspace members will be able to apply."
+            "Confirm you want to approve this bounty.\r\n\r\nIts status will be changed to 'open' and space members will be able to apply."
           }
         </Typography>
 

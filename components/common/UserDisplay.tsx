@@ -66,8 +66,11 @@ interface UserDisplayProps extends StyleProps {
 
 function UserDisplay({ user, linkToProfile = false, ...props }: UserDisplayProps) {
   if (!user) {
+    // strip out invalid names
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { hideName, avatarSize, ...boxProps } = props;
     return (
-      <Box display='flex' alignItems='center' gap={1} {...props}>
+      <Box display='flex' alignItems='center' gap={1} {...boxProps}>
         <Avatar avatar={null} size='small' />
       </Box>
     );

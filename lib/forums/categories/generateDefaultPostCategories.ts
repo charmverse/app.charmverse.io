@@ -1,6 +1,8 @@
 import type { Prisma } from '@prisma/client';
 import { v4 } from 'uuid';
 
+import { getPostCategoryPath } from './getPostCategoryPath';
+
 export const defaultPostCategories = [
   'General',
   'Announcements',
@@ -14,6 +16,7 @@ export function generateDefaultPostCategories(spaceId: string): Required<Prisma.
   return defaultPostCategories.map((category) => ({
     id: v4(),
     name: category,
-    spaceId
+    spaceId,
+    path: getPostCategoryPath(category)
   }));
 }

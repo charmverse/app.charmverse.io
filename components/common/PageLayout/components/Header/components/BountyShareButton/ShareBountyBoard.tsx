@@ -77,7 +77,7 @@ export default function ShareBountyBoard({ padding = 1 }: Props) {
     if (!space?.publicBountyBoard) {
       setShareLink(null);
     } else {
-      const shareLinkToSet = `${window.location.origin}/share/${space?.domain}/bounties`;
+      const shareLinkToSet = `${window.location.origin}/${space?.domain}/bounties`;
       setShareLink(shareLinkToSet);
     }
   }
@@ -98,12 +98,12 @@ export default function ShareBountyBoard({ padding = 1 }: Props) {
       </Box>
       {space?.permissionConfigurationMode !== 'custom' && (
         <Alert severity='info'>
-          Your workspace is using the
+          Your space is using the
           <b>{` ${configurationModeName[space?.permissionConfigurationMode as SpacePermissionConfigurationMode]} `}</b>
           preset.
           <br />
           <br />
-          Manual updates here will change workspace permissions to <b>custom mode.</b>
+          Manual updates here will change space permissions to <b>custom mode.</b>
         </Alert>
       )}
       <Collapse in={bountiesArePublic}>

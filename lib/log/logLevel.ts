@@ -1,13 +1,24 @@
 import type { Logger, LogLevelDesc } from 'loglevel';
 import _log from 'loglevel';
-import { DateTime } from 'luxon';
 
 import * as http from 'adapters/http';
-import { isNodeEnv, isProdEnv } from 'config/constants';
+import { isNodeEnv, isProdEnv, isStagingEnv } from 'config/constants';
 
-const TIMESTAMP_FORMAT = 'yyyy-LL-dd HH:mm:ss';
+import { formatLog } from './logUtils';
+
 const ERRORS_WEBHOOK = process.env.NEXT_PUBLIC_DISCORD_WEBHOOK_ERRORS;
 const originalFactory = _log.methodFactory;
+
+/**
+ * Enable formatting special logs for Datadog in production
+ * Example:
+ *    charmverse \[%{date("yyyy-MM-dd HH:mm:ss"):date}\]\s+%{word:level}: (\[%{notSpace:logger}\] )?%{regex("[^{]*"):message}%{data::json}
+ * Resources for Datadog logging:
+ *    Parsing rules: https://docs.datadoghq.com/logs/log_configuration/parsing/?tab=matchers#examples
+ *    Mapping fields to log message and log level: https://docs.datadoghq.com/logs/log_configuration/processors/?tab=ui#log-status-remapper
+ *    Best practices: https://docs.datadoghq.com/logs/guide/log-parsing-best-practice/
+ */
+const formatLogsForDocker = (isProdEnv || isStagingEnv) && isNodeEnv;
 
 export function apply(log: Logger, logPrefix: string = '') {
   const defaultLevel = (process.env.LOG_LEVEL as LogLevelDesc) || log.levels.DEBUG;
@@ -18,22 +29,13 @@ export function apply(log: Logger, logPrefix: string = '') {
     log.methodFactory = (methodName, logLevel, loggerName) => {
       const originalMethod = originalFactory(methodName, logLevel, loggerName);
 
-      return (message, opt) => {
-        let prefix = '';
-        if (isProdEnv && isNodeEnv) {
-          prefix = `[${DateTime.local().toFormat(TIMESTAMP_FORMAT)}]`;
-        }
-        if (isNodeEnv) {
-          prefix += `${prefix ? ' ' : ''}${methodName}:`;
-        }
-        if (logPrefix) {
-          prefix += `${prefix ? ' ' : ''}[${logPrefix}]`;
-        }
-        if (prefix) {
-          prefix += ' ';
-        }
-
-        const args = opt ? [`${prefix}${message}`, opt] : [`${prefix}${message}`];
+      return (message, opt: unknown) => {
+        const args = formatLog(message, opt, {
+          formatLogsForDocker,
+          isNodeEnv,
+          logPrefix,
+          methodName
+        });
         originalMethod.apply(null, args);
 
         // post errors to Discord

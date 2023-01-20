@@ -10,6 +10,7 @@ import { withSessionRoute } from 'lib/session/withSession';
 export type AssetRequest = {
   pageId: string;
   id: string;
+  spaceId: string;
 };
 
 export type AssetResponse = Asset;
@@ -22,7 +23,8 @@ async function getAssetEndpoint(req: NextApiRequest, res: NextApiResponse<AssetR
   const query = req.query as AssetRequest;
   const isAllowed = await canView({
     userId: req.session.user?.id,
-    resourceId: query.pageId
+    resourceId: query.pageId,
+    spaceId: query.spaceId
   });
 
   if (!isAllowed) {

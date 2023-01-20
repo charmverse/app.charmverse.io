@@ -83,7 +83,7 @@ export default function ConnectSnapshot() {
           <FieldLabel>Snapshot domain</FieldLabel>
 
           {!space?.snapshotDomain && !isAdmin ? (
-            <Typography>No Snapshot domain connected yet. Only workspace admins can configure this.</Typography>
+            <Typography>No Snapshot domain connected yet. Only space admins can configure this.</Typography>
           ) : (
             <TextField
               {...register('snapshotDomain', {
