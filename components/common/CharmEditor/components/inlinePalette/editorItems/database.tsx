@@ -89,7 +89,7 @@ export function items({
     uid: 'database-linked',
     title: 'Linked view of database',
     icon: <DatabaseIcon sx={{ fontSize: iconSize }} />,
-    description: 'Embed a view from an existing board',
+    description: 'Insert a view from an existing board',
     editorExecuteCommand: ({ palettePluginKey }) => {
       return (state, dispatch, view) => {
         // Execute the animation

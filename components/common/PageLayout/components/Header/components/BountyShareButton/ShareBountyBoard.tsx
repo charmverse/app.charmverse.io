@@ -77,7 +77,7 @@ export default function ShareBountyBoard({ padding = 1 }: Props) {
     if (!space?.publicBountyBoard) {
       setShareLink(null);
     } else {
-      const shareLinkToSet = `${window.location.origin}/share/${space?.domain}/bounties`;
+      const shareLinkToSet = `${window.location.origin}/${space?.domain}/bounties`;
       setShareLink(shareLinkToSet);
     }
   }
