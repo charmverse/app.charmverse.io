@@ -8,20 +8,21 @@ import {
   referenceElement,
   renderSuggestionsTooltip
 } from '../@bangle.dev/tooltip/suggest-tooltip';
-import type { SuggestionPluginState } from '../suggestions/suggestions.plugins';
 
 export type LinkPluginState = {
   show: boolean;
-  href: string;
+  href: string | null;
   tooltipContentDOM: HTMLElement;
-  ref: HTMLElement | null;
+  ref?: HTMLElement | null;
 };
 
 export function plugins({ key }: { key: PluginKey }) {
   const tooltipDOMSpec = createTooltipDOM();
 
+  let tooltipTimer: null | NodeJS.Timer = null;
+
   return [
-    new Plugin<SuggestionPluginState>({
+    new Plugin<LinkPluginState>({
       key,
       state: {
         init() {
@@ -73,23 +74,32 @@ export function plugins({ key }: { key: PluginKey }) {
             const target = event.target as HTMLAnchorElement; // span for link
             const parentElement = target?.parentElement; // anchor for link
             if (parentElement) {
-              const boundingRect = parentElement.getBoundingClientRect();
               const isCharmLink = parentElement.classList.contains('charm-link');
               const href = parentElement.getAttribute('href');
               if (href && isCharmLink) {
-                renderSuggestionsTooltip(key, {
-                  href,
-                  ref: parentElement
-                })(view.state, view.dispatch, view);
-                // hover region in px
-                const BUFFER = 25;
-                parentElement.onmouseleave = (ev) => {
-                  const isWithinBufferRegion =
-                    ev.clientY > boundingRect.top && ev.clientY < boundingRect.bottom + BUFFER;
-                  if (!isWithinBufferRegion) {
-                    hideSuggestionsTooltip(key)(view.state, view.dispatch, view);
-                  }
-                };
+                if (tooltipTimer) clearTimeout(tooltipTimer);
+                tooltipTimer = setTimeout(() => {
+                  renderSuggestionsTooltip(key, {
+                    href,
+                    ref: parentElement
+                  })(view.state, view.dispatch, view);
+                  // hover region in px
+                  const BUFFER = 25;
+                  parentElement.onmouseleave = (ev) => {
+                    const boundingRect = parentElement.getBoundingClientRect();
+                    const isWithinBufferRegion =
+                      ev.clientY > boundingRect.top &&
+                      ev.clientY < boundingRect.bottom + BUFFER &&
+                      ev.clientX > boundingRect.left &&
+                      ev.clientX < boundingRect.right;
+                    if (!isWithinBufferRegion) {
+                      if (tooltipTimer) clearTimeout(tooltipTimer);
+                      tooltipTimer = setTimeout(() => {
+                        hideSuggestionsTooltip(key)(view.state, view.dispatch, view);
+                      }, 700);
+                    }
+                  };
+                }, 400);
               }
             }
             return false;
@@ -100,7 +110,7 @@ export function plugins({ key }: { key: PluginKey }) {
     tooltipPlacement.plugins({
       stateKey: key,
       renderOpts: {
-        placement: 'bottom',
+        placement: 'bottom-start',
         tooltipDOMSpec,
         getReferenceElement: referenceElement(key, (state) => {
           const { selection } = state;

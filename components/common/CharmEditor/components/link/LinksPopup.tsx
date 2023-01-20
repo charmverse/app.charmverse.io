@@ -5,7 +5,6 @@ import LanguageOutlinedIcon from '@mui/icons-material/LanguageOutlined';
 import {
   Box,
   ClickAwayListener,
-  Grow,
   IconButton,
   ListItemIcon,
   MenuItem,
@@ -71,99 +70,104 @@ export function LinksPopup({ pluginKey, readOnly }: { pluginKey: PluginKey<LinkP
       }
     }
   }
+
   if (isVisible) {
     return createPortal(
       <ClickAwayListener onClickAway={hideTooltip}>
-        <Grow
-          in
-          style={{
-            transformOrigin: 'left top'
-          }}
-          easing={{
-            enter: 'ease-in-out'
-          }}
-          timeout={250}
-        >
-          {linkView === 'options' ? (
-            <Box
-              sx={{ backgroundColor: 'background.light' }}
-              display='flex'
-              alignItems='center'
-              flexDirection='row'
-              gap={0.5}
-              px={1}
-              pt={0.5}
-              pb={0.25}
-              borderRadius={0.5}
-              onMouseLeave={() => {
-                hideSuggestionsTooltip(pluginKey)(view.state, view.dispatch, view);
-              }}
-            >
-              <LanguageOutlinedIcon
-                sx={{
-                  fontSize: 14
-                }}
-                color='secondary'
-              />
-              <Typography variant='subtitle1' color='secondary'>
-                {href}
-              </Typography>
-              <IconButton size='small'>
-                <ContentCopyOutlinedIcon
-                  sx={{
-                    fontSize: 12
-                  }}
-                  onClick={() => {
-                    hideTooltip();
-                    navigator.clipboard.writeText(href);
-                    showMessage('Link copied to clipboard');
-                  }}
-                />
-              </IconButton>
-              {!readOnly && (
-                <Typography
-                  sx={{
-                    cursor: 'pointer'
-                  }}
-                  onClick={() => setLinkView('link-textfield')}
-                  variant='subtitle1'
-                >
-                  Edit
-                </Typography>
-              )}
-            </Box>
-          ) : (
-            <MenuList
+        {linkView === 'options' ? (
+          <Box
+            sx={{ backgroundColor: 'background.light' }}
+            display='flex'
+            alignItems='center'
+            flexDirection='row'
+            gap={0.5}
+            px={1}
+            pt={0.5}
+            pb={0.25}
+            borderRadius={0.5}
+            onMouseLeave={() => {
+              hideSuggestionsTooltip(pluginKey)(view.state, view.dispatch, view);
+            }}
+          >
+            <LanguageOutlinedIcon
               sx={{
-                backgroundColor: 'background.light'
+                fontSize: 14
+              }}
+              color='secondary'
+            />
+            <Typography
+              variant='subtitle1'
+              color='secondary'
+              sx={{
+                display: 'block',
+                maxWidth: 200,
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis'
               }}
             >
-              <Stack p={1}>
-                <FieldLabel variant='subtitle2'>Link</FieldLabel>
-                <TextField
-                  value={linkHref}
-                  onChange={(e) => setLinkHref(e.target.value)}
-                  autoFocus
-                  onKeyDown={updateHref}
-                />
-              </Stack>
-              <div>
-                <MenuItem
-                  disabled={readOnly}
-                  onClick={deleteHref}
-                  sx={{
-                    py: 1
-                  }}
-                >
-                  <ListItemIcon>
-                    <DeleteOutlinedIcon fontSize='small' />
-                  </ListItemIcon>
-                  <Typography variant='subtitle1'>Delete</Typography>
-                </MenuItem>
-              </div>
-            </MenuList>
-          )}
-        </Grow>
+              {href}
+            </Typography>
+            <IconButton
+              size='small'
+              onClick={() => {
+                hideTooltip();
+                if (href) {
+                  navigator.clipboard.writeText(href);
+                }
+                showMessage('Link copied to clipboard');
+              }}
+            >
+              <ContentCopyOutlinedIcon
+                sx={{
+                  fontSize: 12
+                }}
+              />
+            </IconButton>
+            {!readOnly && (
+              <Typography
+                sx={{
+                  cursor: 'pointer'
+                }}
+                onClick={() => setLinkView('link-textfield')}
+                variant='subtitle1'
+              >
+                Edit
+              </Typography>
+            )}
+          </Box>
+        ) : (
+          <MenuList
+            sx={{
+              backgroundColor: 'background.light'
+            }}
+          >
+            <Stack p={1}>
+              <FieldLabel variant='subtitle2'>Link</FieldLabel>
+              <TextField
+                value={linkHref}
+                onChange={(e) => setLinkHref(e.target.value)}
+                autoFocus
+                onKeyDown={updateHref}
+              />
+            </Stack>
+            <div>
+              <MenuItem
+                dense
+                disabled={readOnly}
+                onClick={deleteHref}
+                sx={{
+                  py: 1
+                }}
+              >
+                <ListItemIcon>
+                  <DeleteOutlinedIcon fontSize='small' />
+                </ListItemIcon>
+                <Typography variant='subtitle1'>Remove link</Typography>
+              </MenuItem>
+            </div>
+          </MenuList>
+        )}
       </ClickAwayListener>,
       tooltipContentDOM
     );
