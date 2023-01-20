@@ -1050,7 +1050,6 @@ model Post {
   @@index([path])
   @@index([spaceId, deletedAt]) // space feed
   @@index([spaceId, deletedAt, categoryId]) // category feed
-  @@index([spaceId, deletedAt, categoryId, title, contentText]) // search results
 }
 
 model PostUpDownVote {
