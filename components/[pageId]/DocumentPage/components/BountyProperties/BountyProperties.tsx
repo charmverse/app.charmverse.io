@@ -62,9 +62,9 @@ export default function BountyProperties(props: {
     () => isAmountInputEmpty || Number(currentBounty?.rewardAmount) <= 0,
     [isAmountInputEmpty, currentBounty]
   );
-  const { hasPublicPageAccess } = useSharedPage();
+  const { hasSharedPageAccess } = useSharedPage();
 
-  const readOnly = parentReadOnly || hasPublicPageAccess;
+  const readOnly = parentReadOnly || hasSharedPageAccess;
 
   const bountyPage = pages[pageId];
 
@@ -493,7 +493,7 @@ export default function BountyProperties(props: {
 
       {
         // Bounty creator cannot apply to their own bounty
-        permissions && !hasPublicPageAccess && currentBounty.createdBy !== user?.id && (
+        permissions && !hasSharedPageAccess && currentBounty.createdBy !== user?.id && (
           <>
             <BountyApplicantForm
               bounty={currentBounty}
@@ -510,7 +510,7 @@ export default function BountyProperties(props: {
         )
       }
 
-      {hasPublicPageAccess && bountyPage && <BountySignupButton bountyPage={bountyPage} />}
+      {hasSharedPageAccess && bountyPage && <BountySignupButton bountyPage={bountyPage} />}
 
       {permissions?.userPermissions?.review && currentBounty.status !== 'suggestion' && !draftBounty && (
         <BountyApplicantsTable bounty={currentBounty} permissions={permissions} />

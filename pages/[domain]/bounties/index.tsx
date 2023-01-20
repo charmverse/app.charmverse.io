@@ -7,12 +7,12 @@ import { useSharedPage } from 'hooks/useSharedPage';
 
 export default function BountyPage() {
   const { bounties, loadingBounties } = useBounties();
-  const { hasPublicPageAccess, accessCheked } = useSharedPage();
+  const { hasSharedPageAccess, accessChecked } = useSharedPage();
   setTitle('Bounties');
-  if (loadingBounties || !bounties || !accessCheked) {
+  if (loadingBounties || !bounties || !accessChecked) {
     return <LoadingComponent isLoading />;
   }
-  return <BountiesPage bounties={bounties} publicMode={hasPublicPageAccess} />;
+  return <BountiesPage bounties={bounties} publicMode={hasSharedPageAccess} />;
 }
 
 BountyPage.getLayout = getPageLayout;

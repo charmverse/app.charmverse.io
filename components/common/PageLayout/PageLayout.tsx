@@ -110,7 +110,7 @@ function PageLayout({ sidebarWidth = 300, children, sidebar: SidebarOverride }: 
   const smallScreen = React.useMemo(() => isSmallScreen(), []);
   const [open, setOpen] = useLocalStorage('leftSidebar', !smallScreen);
   const { user } = useUser();
-  const { hasPublicPageAccess, accessCheked, publicPage } = useSharedPage();
+  const { hasSharedPageAccess, accessChecked, publicPage } = useSharedPage();
 
   const handleDrawerOpen = React.useCallback(() => {
     setOpen(true);
@@ -120,7 +120,7 @@ function PageLayout({ sidebarWidth = 300, children, sidebar: SidebarOverride }: 
     setOpen(false);
   }, []);
 
-  if (!accessCheked) {
+  if (!accessChecked) {
     return (
       <Box display='flex' height='100%' alignSelf='stretch' justifyContent='center' flex={1}>
         <LoadingComponent isLoading />
@@ -128,7 +128,7 @@ function PageLayout({ sidebarWidth = 300, children, sidebar: SidebarOverride }: 
     );
   }
 
-  if (hasPublicPageAccess) {
+  if (hasSharedPageAccess) {
     return <SharedPageLayout basePageId={publicPage?.page?.id}>{children || null}</SharedPageLayout>;
   }
 

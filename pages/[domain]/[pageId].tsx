@@ -10,13 +10,13 @@ import type { PageMeta } from 'lib/pages';
 export default function BlocksEditorPage() {
   const { pages } = usePages();
   const router = useRouter();
-  const { publicPage, hasPublicPageAccess } = useSharedPage();
+  const { publicPage, hasSharedPageAccess } = useSharedPage();
 
   const pagePath = router.query.pageId as string;
   const pageIdList = Object.values(pages ?? {}) as PageMeta[];
   const pageId = pageIdList.find((p) => p.path === pagePath)?.id;
 
-  if (hasPublicPageAccess && publicPage) {
+  if (hasSharedPageAccess && publicPage) {
     return <SharedPage publicPage={publicPage} />;
   }
 

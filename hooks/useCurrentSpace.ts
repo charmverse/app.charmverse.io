@@ -7,7 +7,7 @@ import { useSpaces } from './useSpaces';
 export function useCurrentSpace() {
   const router = useRouter();
   const { spaces } = useSpaces();
-  const { publicSpace, accessCheked } = useSharedPage();
+  const { publicSpace, accessChecked } = useSharedPage();
 
   // Support for extracting domain from logged in view or shared bounties view
   // The other part of this logic, which retrieves list of spaces in public mode is in components/share/PublicPage
@@ -15,7 +15,7 @@ export function useCurrentSpace() {
 
   const space = spaces.find((w) => w.domain === domain);
 
-  if (accessCheked) {
+  if (accessChecked) {
     // IF we are viewing a public page, we want to return the public space as current one
     return publicSpace || space;
   }

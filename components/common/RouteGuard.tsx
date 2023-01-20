@@ -17,11 +17,11 @@ const accountPages = ['profile'];
 
 export default function RouteGuard({ children }: { children: ReactNode }) {
   const router = useRouter();
-  const { accessCheked, hasPublicPageAccess } = useSharedPage();
+  const { accessChecked, hasSharedPageAccess } = useSharedPage();
   const [authorized, setAuthorized] = useState(true);
   const { user, isLoaded } = useUser();
   const { spaces, isLoaded: isSpacesLoaded } = useSpaces();
-  const isLoading = !isLoaded || !isSpacesLoaded || !accessCheked;
+  const isLoading = !isLoaded || !isSpacesLoaded || !accessChecked;
   const authorizedSpaceDomainRef = useRef('');
 
   if (typeof window !== 'undefined') {
@@ -82,7 +82,7 @@ export default function RouteGuard({ children }: { children: ReactNode }) {
     const spaceDomain = path.split('/')[1];
 
     // condition: public page
-    if (publicPages.some((basePath) => firstPathSegment === basePath) || hasPublicPageAccess) {
+    if (publicPages.some((basePath) => firstPathSegment === basePath) || hasSharedPageAccess) {
       return { authorized: true };
     }
     // condition: no user session and no wallet address

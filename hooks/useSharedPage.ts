@@ -63,15 +63,15 @@ export const useSharedPage = () => {
   const space = publicSpace || publicPage?.space;
   const hasError = !!publicPageError || !!spaceError;
   const hasPublicBounties = space?.publicBountyBoard;
-  const hasPublicPageAccess = !!publicPage || !!hasPublicBounties;
-  const accessCheked =
-    (spacesLoaded && (hasPublicPageAccess || (!shouldLoadSpace && !shouldLoadPublicPage) || !!space)) || hasError;
+  const hasSharedPageAccess = !!publicPage || !!hasPublicBounties;
+  const accessChecked =
+    (spacesLoaded && (hasSharedPageAccess || (!shouldLoadSpace && !shouldLoadPublicPage) || !!space)) || hasError;
 
   return {
     isCheckingAccess: isPublicPageLoading || isSpaceLoading,
-    accessCheked,
+    accessChecked,
     hasError,
-    hasPublicPageAccess: !!publicPage || !!hasPublicBounties,
+    hasSharedPageAccess: !!publicPage || !!hasPublicBounties,
     publicSpace: space,
     publicPage
   };
