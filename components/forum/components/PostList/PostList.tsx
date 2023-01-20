@@ -108,11 +108,17 @@ export function ForumPostList({ search, categoryId, sort }: ForumPostsProps) {
   const handlePostPublishEvent = useCallback(
     (postWithPage: WebSocketPayload<'post_published'>) => {
       if (!currentCategoryId || postWithPage.categoryId === currentCategoryId) {
-        if (postWithPage.createdBy === user?.id) {
-          refreshPosts();
-        } else {
+        if (postWithPage.createdBy !== user?.id) {
           setMorePostsAvailable(true);
         }
+      }
+    },
+    [user, categoryId]
+  );
+  const handlePostUpdateEvent = useCallback(
+    (postWithPage: WebSocketPayload<'post_updated'>) => {
+      if (!currentCategoryId || postWithPage.categoryId === currentCategoryId) {
+        refreshPosts();
       }
     },
     [user, categoryId]
@@ -128,10 +134,12 @@ export function ForumPostList({ search, categoryId, sort }: ForumPostsProps) {
 
   useEffect(() => {
     const unsubscribeFromPostPublishEvent = subscribe('post_published', handlePostPublishEvent);
+    const unsubscribeFromPostUpdateEvent = subscribe('post_updated', handlePostUpdateEvent);
     return () => {
       unsubscribeFromPostPublishEvent();
+      unsubscribeFromPostUpdateEvent();
     };
-  }, [handlePostPublishEvent]);
+  }, [handlePostPublishEvent, handlePostUpdateEvent]);
 
   useEffect(() => {
     if (

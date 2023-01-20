@@ -147,6 +147,7 @@ export function PostPage({
         title: formInputs.title
       });
       setContentUpdated(false);
+      onSave?.();
     } else {
       const newPost = await charmClient.forum.createForumPost({
         categoryId,
@@ -155,9 +156,8 @@ export function PostPage({
         spaceId,
         title: formInputs.title
       });
-      router.push(`/${currentSpace?.domain}/forum/post/${newPost.path}`);
+      router.push(`/${router.query.domain}/forum/post/${newPost.path}`);
     }
-    onSave?.();
   }
 
   function updateCategoryId(_categoryId: string) {

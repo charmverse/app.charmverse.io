@@ -100,7 +100,6 @@ export default function PostDialog({ post, spaceId, onClose, open, newPostCatego
         onSave={close}
         contentUpdated={contentUpdated}
         setContentUpdated={setContentUpdated}
-        showOtherCategoryPosts
         newPostCategory={newPostCategory}
       />
       <ConfirmDeleteModal
