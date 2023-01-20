@@ -13,12 +13,11 @@ declare module 'http' {
   }
 }
 
-export async function provisionSuperApiKey(name: string): Promise<SuperApiToken> {
-  const newApiKey = crypto.randomBytes(160 / 8).toString('hex');
-
+export async function provisionSuperApiKey(name: string, token?: string): Promise<SuperApiToken> {
+  token ||= crypto.randomBytes(160 / 8).toString('hex');
   const superToken = await prisma.superApiToken.create({
     data: {
-      token: newApiKey,
+      token,
       name
     }
   });

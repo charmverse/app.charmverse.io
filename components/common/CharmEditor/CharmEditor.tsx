@@ -13,7 +13,7 @@ import debounce from 'lodash/debounce';
 import throttle from 'lodash/throttle';
 import { useRouter } from 'next/router';
 import type { CSSProperties, ReactNode } from 'react';
-import { memo, useCallback, useEffect, useRef, useState } from 'react';
+import { memo, useEffect, useRef, useState } from 'react';
 import { useSWRConfig } from 'swr';
 
 import charmClient from 'charmClient';
@@ -59,6 +59,8 @@ import InlineDatabase from './components/inlineDatabase/components/InlineDatabas
 import InlineCommandPalette from './components/inlinePalette/components/InlineCommandPalette';
 import { plugins as inlinePalettePlugins } from './components/inlinePalette/inlinePalette';
 import * as inlineVote from './components/inlineVote';
+import { plugins as linkPlugins } from './components/link/link.plugins';
+import { LinksPopup } from './components/link/LinksPopup';
 import * as listItem from './components/listItem/listItem';
 import Mention, { mentionPluginKeyName, mentionPlugins, MentionSuggest } from './components/mention';
 import NestedPage, { nestedPagePluginKeyName, nestedPagePlugins, NestedPagesList } from './components/nestedPage';
@@ -99,6 +101,7 @@ const nestedPagePluginKey = new PluginKey(nestedPagePluginKeyName);
 const inlineCommentPluginKey = new PluginKey(inlineComment.pluginKeyName);
 const inlineVotePluginKey = new PluginKey(inlineVote.pluginKeyName);
 const suggestionsPluginKey = new PluginKey('suggestions');
+const linksPluginKey = new PluginKey('links');
 const inlinePalettePluginKey = new PluginKey('inlinePalette');
 
 export function charmEditorPlugins({
@@ -130,6 +133,7 @@ export function charmEditorPlugins({
     // this trackPlugin should be called before the one below which calls onSelectionSet().
     // TODO: find a cleaner way to combine this logic?
     trackPlugins({ onSelectionSet, key: suggestionsPluginKey }),
+    linkPlugins({ key: linksPluginKey }),
     pasteChecker.plugins({ onError }),
     new Plugin({
       view: (_view) => {
@@ -173,7 +177,6 @@ export function charmEditorPlugins({
     heading.plugins(),
     horizontalRule.plugins(),
     italic.plugins(),
-    link.plugins(),
     listItem.plugins(),
     orderedList.plugins(),
     columnLayout.plugins(),
@@ -291,10 +294,15 @@ const StyledReactBangleEditor = styled(ReactBangleEditor)<{ disablePageSpecificF
     tab-size: 4;
     caret-color: var(--primary-text);
   }
+
   pre code {
     color: inherit;
     display: block;
     padding: ${({ theme }) => theme.spacing(2)};
+  }
+
+  .charm-link:hover {
+    cursor: pointer;
   }
 
   hr {
@@ -342,7 +350,7 @@ interface CharmEditorProps {
   enableVoting?: boolean;
   pageId?: string;
   containerWidth?: number;
-  pageType?: PageType;
+  pageType?: PageType | 'post';
   pagePermissions?: IPagePermissionFlags;
   onParticipantUpdate?: (participants: FrontendParticipant[]) => void;
 }
@@ -489,15 +497,6 @@ function CharmEditor({
       color: 'var(--charmeditor-active)'
     }
   });
-
-  const onResizeStop = useCallback(
-    (view: EditorView) => {
-      // Save the current embed size on the backend after we are done resizing
-      debouncedUpdate(view);
-    },
-    [debouncedUpdate]
-  );
-
   useEffect(() => {
     if (editorRef.current) {
       const highlightedMentionId = router.query.mentionId;
@@ -547,7 +546,6 @@ function CharmEditor({
       renderNodeViews={({ children: _children, ...props }) => {
         const allProps: CharmNodeViewProps = {
           ...props,
-          onResizeStop,
           pageId,
           readOnly,
           deleteNode: () => {
@@ -605,7 +603,7 @@ function CharmEditor({
           case 'iframe': {
             // support old video nodes which piggybacked on iframe type
             if (props.node.attrs.type === 'video') {
-              return <VideoNodeView {...allProps} />;
+              return <VideoNodeView isPost={pageType === 'post'} {...allProps} />;
             }
             return <iframe.Component {...allProps} />;
           }
@@ -634,7 +632,7 @@ function CharmEditor({
             return <NFTNodeView {...allProps} />;
           }
           case 'video': {
-            return <VideoNodeView {...allProps} />;
+            return <VideoNodeView isPost={pageType === 'post'} {...allProps} />;
           }
           default: {
             return null;
@@ -689,6 +687,7 @@ function CharmEditor({
               readOnly={readOnly}
             />
           )}
+          {currentSpace && pageId && <LinksPopup pluginKey={linksPluginKey} readOnly={readOnly} />}
         </>
       )}
       {!readOnly && <DevTools />}

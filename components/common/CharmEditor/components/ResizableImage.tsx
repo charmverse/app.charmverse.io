@@ -128,7 +128,6 @@ function ResizableImage({
   readOnly = false,
   getPos,
   view,
-  onResizeStop,
   deleteNode,
   node,
   updateAttrs,
@@ -215,13 +214,7 @@ function ResizableImage({
     );
   } else {
     return (
-      <Resizable
-        initialSize={node.attrs.size}
-        minWidth={MIN_IMAGE_WIDTH}
-        updateAttrs={updateAttrs}
-        onDelete={onDelete}
-        onResizeStop={onResizeStop}
-      >
+      <Resizable initialSize={node.attrs.size} minWidth={MIN_IMAGE_WIDTH} updateAttrs={updateAttrs} onDelete={onDelete}>
         <StyledImage draggable={false} src={node.attrs.src} alt={node.attrs.alt} />
       </Resizable>
     );

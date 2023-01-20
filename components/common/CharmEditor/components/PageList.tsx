@@ -10,9 +10,16 @@ interface Props {
   activePageId?: string;
   pages: PageMeta[];
   onSelectPage: (page: PageMeta) => void;
+  emptyText?: string;
 }
 
-export default function PagesList({ activeItemIndex = -1, activePageId, pages, onSelectPage }: Props) {
+export default function PagesList({
+  emptyText = 'No pages found',
+  activeItemIndex = -1,
+  activePageId,
+  pages,
+  onSelectPage
+}: Props) {
   function isActive(pageId: string, index: number) {
     return pageId === activePageId || index === activeItemIndex;
   }
@@ -26,10 +33,15 @@ export default function PagesList({ activeItemIndex = -1, activePageId, pages, o
       variant='subtitle2'
       color='secondary'
     >
-      No pages found
+      {emptyText}
     </Typography>
   ) : (
-    <div>
+    <div
+      style={{
+        height: '250px',
+        overflow: 'auto'
+      }}
+    >
       {pages.map((page, pageIndex) => {
         return (
           <MenuItem

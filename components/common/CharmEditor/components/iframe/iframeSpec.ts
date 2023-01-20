@@ -54,13 +54,24 @@ export function spec(): RawSpecs {
           tag: 'iframe',
           getAttrs: (dom: any) => {
             return {
-              src: dom.getAttribute('src')
+              src: dom.getAttribute('src'),
+              width: dom.getAttribute('data-width'),
+              height: dom.getAttribute('data-height'),
+              type: dom.getAttribute('data-type')
             };
           }
         }
       ],
       toDOM: (node: Node) => {
-        return ['iframe', { class: 'ns-embed', style: `height: ${node.attrs.height};`, ...node.attrs }];
+        return [
+          'iframe',
+          {
+            class: 'ns-embed',
+            'data-height': node.attrs.height,
+            'data-width': node.attrs.height,
+            'data-type': node.attrs.height
+          }
+        ];
       }
     }
   });

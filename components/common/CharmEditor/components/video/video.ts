@@ -8,7 +8,7 @@ export function plugins() {
   return [
     NodeView.createPlugin({
       name: 'video',
-      containerDOM: ['video-embed']
+      containerDOM: ['div', { class: 'video-container' }]
     })
   ];
 }

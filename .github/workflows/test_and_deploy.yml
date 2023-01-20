@@ -36,10 +36,7 @@ jobs:
 
       - name: Create .env.test.local file
         run: |
-          cp .env.example .env.test.local
-          echo "DOMAIN=http://127.0.0.1:3335" >> .env.test.local
-          echo "PORT=3335" >> .env.test.local
-          echo "DATABASE_URL=postgres://postgres:postgres@127.0.0.1:5432/charmversetest" >> .env.test.local
+          cp .env.test.local.example .env.test.local
 
       - name: Build app
         uses: ./.github/actions/build
