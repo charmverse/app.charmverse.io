@@ -30,7 +30,7 @@ const convertToEventMap = (webhook: SetSpaceWebhookResponse | undefined) => {
 export default function useWebhookSubscription(spaceId: string) {
   const space = useCurrentSpace();
 
-  const { data: spaceWebhook } = useSWR(
+  const { data: spaceWebhook, isLoading } = useSWR(
     () => (space ? `webhook/${space.id}` : null),
     () => space && charmClient.getSpaceWebhook(space.id)
   );
@@ -43,7 +43,7 @@ export default function useWebhookSubscription(spaceId: string) {
     const updatedSpaceWebhook = await charmClient.updateSpaceWebhook(spaceId, webhookOpts);
 
     if (space?.id) {
-      mutate(`roles/${space.id}`, updatedSpaceWebhook);
+      mutate(`webhook/${space.id}`, updatedSpaceWebhook);
     }
 
     return updatedSpaceWebhook;
@@ -53,6 +53,7 @@ export default function useWebhookSubscription(spaceId: string) {
 
   return {
     spaceWebhook: webhookData,
-    updateSpaceWebhook
+    updateSpaceWebhook,
+    isLoading
   };
 }

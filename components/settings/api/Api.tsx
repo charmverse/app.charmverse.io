@@ -2,15 +2,13 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import LaunchIcon from '@mui/icons-material/LaunchOutlined';
 import { Alert, Button, FormControlLabel, FormGroup, Grid, InputLabel, Switch, TextField } from '@mui/material';
 import Typography from '@mui/material/Typography';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
 import Link from 'components/common/Link';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import useWebhookSubscription from 'hooks/useSpaceWebhook';
 import log from 'lib/log';
-import type { ISystemError } from 'lib/utilities/errors';
 
 import Legend from '../Legend';
 
@@ -34,17 +32,15 @@ export const schema = yup.object({
 
 type FormValues = yup.InferType<typeof schema>;
 
-export default function Api({ isAdmin, spaceId, spaceOwner }: Props) {
-  const space = useCurrentSpace();
-  const [formError, setFormError] = useState<ISystemError | null>(null);
-  const { updateSpaceWebhook, spaceWebhook } = useWebhookSubscription(spaceId);
+export default function Api({ isAdmin, spaceId }: Props) {
+  const { updateSpaceWebhook, spaceWebhook, isLoading } = useWebhookSubscription(spaceId);
 
   const {
     register,
     handleSubmit,
     watch,
     reset,
-    formState: { errors, isValid }
+    formState: { errors, isDirty, isSubmitting }
   } = useForm<FormValues>({
     mode: 'onChange',
     resolver: yupResolver(schema)
@@ -71,8 +67,6 @@ export default function Api({ isAdmin, spaceId, spaceOwner }: Props) {
   const [webhookUrl, events] = watch(['webhookUrl', 'events']);
 
   async function updateWebhookSubscription(subscription: FormValues) {
-    setFormError(null);
-
     if (!subscription.webhookUrl) {
       return;
     }
@@ -190,7 +184,13 @@ export default function Api({ isAdmin, spaceId, spaceOwner }: Props) {
           <Grid item container xs mt={2}>
             <Grid item xs mt={2}>
               <Grid item mt={2}>
-                <Button type='submit' variant='contained' color='primary' sx={{ mr: 1 }}>
+                <Button
+                  type='submit'
+                  variant='contained'
+                  color='primary'
+                  sx={{ mr: 1 }}
+                  disabled={isLoading || !isDirty || isSubmitting}
+                >
                   Save
                 </Button>
               </Grid>
