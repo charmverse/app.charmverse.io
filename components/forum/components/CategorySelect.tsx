@@ -27,7 +27,7 @@ export function CategorySelect({ handleCategory, selectedCategoryId, handleSort,
   return (
     <Box display='flex' justifyContent='flex-start' flexWrap='wrap'>
       <ViewOptions label='Sort' sx={{ mr: '10px', pb: '20px' }}>
-        <Select value={selectedSort ?? 'newest'} onChange={(e) => handleSort(e.target.value as PostSortOption)}>
+        <Select value={selectedSort ?? 'new'} onChange={(e) => handleSort(e.target.value as PostSortOption)}>
           {postSortOptions.map((s) => (
             <MenuItem key={s} value={s}>
               <Typography>{startCase(s.replace('_', ' '))}</Typography>
