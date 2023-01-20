@@ -342,7 +342,7 @@ interface CharmEditorProps {
   enableVoting?: boolean;
   pageId?: string;
   containerWidth?: number;
-  pageType?: PageType;
+  pageType?: PageType | 'post';
   pagePermissions?: IPagePermissionFlags;
   onParticipantUpdate?: (participants: FrontendParticipant[]) => void;
 }
@@ -605,7 +605,7 @@ function CharmEditor({
           case 'iframe': {
             // support old video nodes which piggybacked on iframe type
             if (props.node.attrs.type === 'video') {
-              return <VideoNodeView {...allProps} />;
+              return <VideoNodeView isPost={pageType === 'post'} {...allProps} />;
             }
             return <iframe.Component {...allProps} />;
           }
@@ -634,7 +634,7 @@ function CharmEditor({
             return <NFTNodeView {...allProps} />;
           }
           case 'video': {
-            return <VideoNodeView {...allProps} />;
+            return <VideoNodeView isPost={pageType === 'post'} {...allProps} />;
           }
           default: {
             return null;
