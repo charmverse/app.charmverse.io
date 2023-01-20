@@ -273,14 +273,13 @@ export function charmEditorPlugins({
 
 const StyledReactBangleEditor = styled(ReactBangleEditor)<{
   colorMode?: 'dark';
-  removeLeftPosition?: boolean;
   disablePageSpecificFeatures?: boolean;
 }>`
   position: relative;
 
   /** DONT REMOVE THIS STYLING */
   /** ITS TO MAKE SURE THE USER CAN DRAG PAST THE ACTUAL CONTENT FROM RIGHT TO LEFT AND STILL SHOW THE FLOATING MENU */
-  ${({ removeLeftPosition }) => !removeLeftPosition && `left: -50px`};
+  left: -50px;
 
   ${({ colorMode }) =>
     colorMode === 'dark'
@@ -298,7 +297,7 @@ const StyledReactBangleEditor = styled(ReactBangleEditor)<{
     margin-right: -50px;
   }
 
-  code {
+  code {s
     border-radius: 2px !important;
     background-color: ${({ theme }) => theme.palette.code.background};
     color: ${({ theme }) => theme.palette.code.color};
@@ -369,7 +368,7 @@ interface CharmEditorProps {
   pagePermissions?: IPagePermissionFlags;
   onParticipantUpdate?: (participants: FrontendParticipant[]) => void;
   placeholderText?: string;
-  removeLeftPosition?: boolean;
+  focusOnInit?: boolean;
 }
 
 export function convertPageContentToMarkdown(content: PageContent, title?: string): string {
@@ -408,8 +407,8 @@ function CharmEditor({
   pageType,
   pagePermissions,
   placeholderText,
-  onParticipantUpdate,
-  removeLeftPosition = false
+  focusOnInit,
+  onParticipantUpdate
 }: CharmEditorProps) {
   const router = useRouter();
   const { showMessage } = useSnackbar();
@@ -554,9 +553,9 @@ function CharmEditor({
 
   return (
     <StyledReactBangleEditor
-      removeLeftPosition={removeLeftPosition}
       colorMode={colorMode}
       pageId={pageId}
+      focusOnInit={focusOnInit}
       disablePageSpecificFeatures={disablePageSpecificFeatures}
       isContentControlled={isContentControlled}
       enableSuggestions={enableSuggestingMode}

@@ -10,8 +10,8 @@ import type { KeyedMutator } from 'swr';
 
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
+import CharmEditor from 'components/common/CharmEditor/CharmEditor';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/InlineCharmEditor';
-import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
 import UserDisplay from 'components/common/UserDisplay';
 import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
@@ -182,13 +182,14 @@ export function PostComment({
         <Box ml={3}>
           {isEditingComment ? (
             <Stack>
-              <InlineCharmEditor
+              <CharmEditor
                 colorMode='dark'
                 style={{
                   paddingTop: 0,
                   paddingBottom: 0,
                   marginLeft: 8,
-                  minHeight: 100
+                  minHeight: 100,
+                  left: 0
                 }}
                 focusOnInit
                 placeholderText='What are your thoughts?'
@@ -209,10 +210,12 @@ export function PostComment({
               Comment deleted by user
             </Typography>
           ) : (
-            <InlineCharmEditor
+            <CharmEditor
               style={{
                 paddingTop: 0,
-                paddingBottom: 0
+                paddingBottom: 0,
+                left: 0,
+                paddingLeft: 0
               }}
               readOnly
               key={isEditingComment.toString()}
