@@ -30,6 +30,7 @@ type Props = {
   showEmptyPlaceholder: boolean;
   displayType?: PropertyValueDisplayType;
   maxRows?: number;
+  linkAlign?: string;
 };
 
 function PropertyValueElement(props: Props): JSX.Element {
@@ -141,6 +142,7 @@ function PropertyValueElement(props: Props): JSX.Element {
         }}
         onCancel={() => setValue(propertyValue || '')}
         validator={(newValue) => validateProp(propertyTemplate.type, newValue)}
+        linkAlign={props.linkAlign}
       />
     );
   } else if (propertyTemplate.type === 'checkbox') {
@@ -179,6 +181,7 @@ function PropertyValueElement(props: Props): JSX.Element {
         validator={(newValue) => validateProp(propertyTemplate.type, newValue)}
         spellCheck
         maxRows={props.maxRows}
+        readOnly={readOnly}
       />
     ) : (
       <Editable
@@ -192,13 +195,8 @@ function PropertyValueElement(props: Props): JSX.Element {
         }}
         onCancel={() => setValue(propertyValue || '')}
         validator={(newValue) => validateProp(propertyTemplate.type, newValue)}
+        readOnly={readOnly}
       />
-    );
-
-    return (
-      <div className='octo-propertyvalue octo-propertyvalue--readonly' style={{ maxHeight: '50px' }}>
-        {displayValue}
-      </div>
     );
   }
   return <div className='octo-propertyvalue'>{finalDisplayValue}</div>;

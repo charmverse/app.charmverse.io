@@ -13,6 +13,7 @@ type Props = {
   onSave: () => void;
   onCancel: () => void;
   validator: (newValue: string) => boolean;
+  linkAlign?: string;
 };
 
 function URLProperty(props: Props): JSX.Element {
@@ -20,7 +21,7 @@ function URLProperty(props: Props): JSX.Element {
   const hasValue = Boolean(props.value?.trim());
   if (hasValue) {
     link = (
-      <span style={{ minWidth: '30px', verticalAlign: 'middle', display: 'inline-block' }}>
+      <span style={{ minWidth: '35px', alignItems: props.linkAlign ?? 'flex-start', display: 'flex' }}>
         <a
           className='Link__button'
           href={Utils.ensureProtocol(props.value.trim())}

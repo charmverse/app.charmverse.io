@@ -17,6 +17,14 @@ import ConfirmationDialogBox from '../confirmationDialogBox';
 import { sendFlashMessage } from '../flashMessages';
 import PropertyValueElement from '../propertyValueElement';
 
+function topAlignProp(propertyTemplate: IPropertyTemplate): string {
+  if (propertyTemplate.type === 'text' || propertyTemplate.type === 'url' || propertyTemplate.type === 'multiSelect') {
+    return 'octo-topalign-prop';
+  }
+
+  return '';
+}
+
 type Props = {
   board: Board;
   card: Card;
@@ -181,10 +189,15 @@ function CardDetailProperties(props: Props) {
         return (
           <div key={`${propertyTemplate.id}-${propertyTemplate.type}-${propertyValue}`} className='octo-propertyrow'>
             {props.readOnly && (
-              <div className='octo-propertyname octo-propertyname--readonly'>{propertyTemplate.name}</div>
+              <div
+                className={`octo-propertyname octo-propertyname--readonly ${topAlignProp(propertyTemplate)}`}
+                style={{ fontSize: '12px' }}
+              >
+                {propertyTemplate.name}
+              </div>
             )}
             {!props.readOnly && (
-              <MenuWrapper isOpen={propertyTemplate.id === newTemplateId}>
+              <MenuWrapper isOpen={propertyTemplate.id === newTemplateId} className={topAlignProp(propertyTemplate)}>
                 <div className='octo-propertyname'>
                   <Button>{propertyTemplate.name}</Button>
                 </div>

@@ -10,7 +10,7 @@ function getBorderWidth(style: CSSStyleDeclaration): number {
 
 // Max rows feature is used only in the context where we list multiple items (such as a table view)
 function EditableArea(
-  props: EditableProps & { maxRows?: number; children?: ReactNode },
+  props: EditableProps & { maxRows?: number; children?: ReactNode; readOnly?: boolean },
   ref: React.Ref<Focusable>
 ): JSX.Element {
   const elementRef = useRef<HTMLTextAreaElement>(null);
@@ -54,6 +54,8 @@ function EditableArea(
     <div className='EditableAreaWrap'>
       <div style={{ display: 'inline-flex', minHeight: '50px', width: '100%' }}>
         <textarea
+          readOnly={!!props.readOnly}
+          contentEditable={!props.readOnly}
           {...elementProps}
           {...heightProps}
           ref={elementRef}
@@ -70,6 +72,8 @@ function EditableArea(
           rows={1}
           value={elementProps.value}
           aria-hidden={true}
+          readOnly={!!props.readOnly}
+          contentEditable={!props.readOnly}
         />
       </div>
     </div>

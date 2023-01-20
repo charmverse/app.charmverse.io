@@ -164,6 +164,7 @@ function TableRow(props: Props) {
               updatedBy={pageUpdatedBy}
               displayType='table'
               maxRows={3}
+              linkAlign='center'
             />
           </div>
         );
