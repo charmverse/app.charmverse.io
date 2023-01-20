@@ -25,7 +25,6 @@ import Link from 'components/common/Link';
 import { charmverseDiscordInvite } from 'config/constants';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
-import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import useKeydownPress from 'hooks/useKeydownPress';
 import { useUser } from 'hooks/useUser';
 import type { NewPageInput } from 'lib/pages';
@@ -203,7 +202,6 @@ export default function Sidebar({ closeSidebar, favorites }: SidebarProps) {
   const [userSpacePermissions] = useCurrentSpacePermissions();
   const [isScrolled, setIsScrolled] = useState(false);
   const [showingTrash, setShowingTrash] = useState(false);
-  const showForums = useIsCharmverseSpace(['charmverse', 'bitdao', 'purple', 'arthaus']);
 
   const searchInWorkspaceModalState = usePopupState({ variant: 'popover', popupId: 'search-in-workspace-modal' });
   const openSearchLabel = useKeydownPress(searchInWorkspaceModalState.toggle, { key: 'p', ctrl: true });
@@ -273,15 +271,13 @@ export default function Sidebar({ closeSidebar, favorites }: SidebarProps) {
               label='Bounties'
               onClick={closeSidebarIfIsMobile}
             />
-            {showForums && (
-              <SidebarLink
-                href={`/${space.domain}/forum`}
-                active={router.pathname.startsWith('/[domain]/forum')}
-                icon={<MessageOutlinedIcon fontSize='small' />}
-                label='Forum'
-                onClick={closeSidebarIfIsMobile}
-              />
-            )}
+            <SidebarLink
+              href={`/${space.domain}/forum`}
+              active={router.pathname.startsWith('/[domain]/forum')}
+              icon={<MessageOutlinedIcon fontSize='small' />}
+              label='Forum'
+              onClick={closeSidebarIfIsMobile}
+            />
             <Divider sx={{ mx: 2, my: 1 }} />
             <Tooltip
               title={
