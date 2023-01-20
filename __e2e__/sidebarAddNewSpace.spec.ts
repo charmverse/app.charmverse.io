@@ -1,5 +1,4 @@
-import type { Browser } from '@playwright/test';
-import { chromium, expect, test } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 import { baseUrl } from 'config/constants';
 
