@@ -1,6 +1,7 @@
 import type { Transaction } from '@bangle.dev/pm';
 import { Step, EditorState } from '@bangle.dev/pm';
 import { sendableSteps, receiveTransaction } from 'prosemirror-collab';
+import type { EditorStateConfig } from 'prosemirror-state';
 
 import log from 'lib/log';
 import type {
@@ -122,10 +123,11 @@ export class ModCollabDoc {
       // filter out plugins in case we already loaded the doc once
       .filter((plugin) => !currentPlugins.some((p) => (p as any).key === plugin.key));
 
-    const stateConfig = {
+    const stateConfig: EditorStateConfig = {
       schema: this.mod.editor.schema,
       doc: stateDoc,
-      plugins: this.mod.editor.view.state.plugins.concat(plugins)
+      plugins: this.mod.editor.view.state.plugins.concat(plugins),
+      selection: this.mod.editor.view.state.selection
     };
 
     // Set document in prosemirror
@@ -138,8 +140,9 @@ export class ModCollabDoc {
       // this.mod.editor.scrollIdIntoView(locationHash.slice(1));
     }
 
+    // DISABLED FOR NOW (Matt) - this moves the page around after first load
     // scroll to top in case we had to reset the content due to large payload
-    this.mod.editor.view.dispatch(this.mod.editor.view.state.tr.scrollIntoView());
+    // this.mod.editor.view.dispatch(this.mod.editor.view.state.tr.scrollIntoView());
 
     this.mod.editor.waitingForDocument = false;
   }
