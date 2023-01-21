@@ -79,7 +79,7 @@ export default function PostDialog({ post, spaceId, onClose, open, newPostCatego
     <Dialog
       fullWidth
       toolbar={
-        post && (
+        post ? (
           <Box display='flex' justifyContent='space-between'>
             <Button
               size='small'
@@ -91,6 +91,8 @@ export default function PostDialog({ post, spaceId, onClose, open, newPostCatego
               Open as Page
             </Button>
           </Box>
+        ) : (
+          <div />
         )
       }
       toolsMenu={post && <PageActions page={{ ...post, relativePath }} onClickDelete={deletePost} />}
