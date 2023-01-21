@@ -254,12 +254,14 @@ export function PostPage({
           ) : (
             post && (
               <>
-                <Stack gap={1}>
-                  <PostCommentSort commentSort={commentSort} setCommentSort={setCommentSort} />
-                  {topLevelComments.map((comment) => (
-                    <PostComment setPostComments={setPostComments} comment={comment} key={comment.id} />
-                  ))}
-                </Stack>
+                {topLevelComments.length > 0 && (
+                  <Stack gap={1}>
+                    <PostCommentSort commentSort={commentSort} setCommentSort={setCommentSort} />
+                    {topLevelComments.map((comment) => (
+                      <PostComment setPostComments={setPostComments} comment={comment} key={comment.id} />
+                    ))}
+                  </Stack>
+                )}
                 {topLevelComments.length === 0 && (
                   <Stack gap={1} alignItems='center' my={1}>
                     <CommentIcon color='secondary' fontSize='large' />
