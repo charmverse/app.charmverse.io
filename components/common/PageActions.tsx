@@ -74,11 +74,15 @@ export function PageActions({
   function onClickOpenInNewTab() {
     let link = window.location.href;
 
-    const queryString = new URLSearchParams(window.location.search);
-    if (queryString.get(PageTypeQueryParamRecord[pageType]) !== page.id) {
-      const newUrl = new URL(window.location.toString());
-      newUrl.searchParams.set(PageTypeQueryParamRecord[pageType], page.id);
-      link = newUrl.toString();
+    if (page.relativePath) {
+      link = `${window.location.origin}${page.relativePath}`;
+    } else {
+      const queryString = new URLSearchParams(window.location.search);
+      if (queryString.get(PageTypeQueryParamRecord[pageType]) !== page.id) {
+        const newUrl = new URL(window.location.toString());
+        newUrl.searchParams.set(PageTypeQueryParamRecord[pageType], page.id);
+        link = newUrl.toString();
+      }
     }
 
     window.open(link);
