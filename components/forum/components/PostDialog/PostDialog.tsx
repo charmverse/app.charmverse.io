@@ -5,9 +5,11 @@ import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
 import { useEffect, useRef, useState } from 'react';
 
+import charmClient from 'charmClient';
 import Dialog from 'components/common/BoardEditor/focalboard/src/components/dialog';
 import Button from 'components/common/Button';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
+import { PageActions } from 'components/common/PageActions';
 import type { PostWithVotes } from 'lib/forums/posts/interfaces';
 
 import type { FormInputs } from '../interfaces';
@@ -59,9 +61,19 @@ export default function PostDialog({ post, spaceId, onClose, open, newPostCatego
     setShowConfirmDialog(false);
   }
 
+  function deletePost() {
+    if (post) {
+      charmClient.forum.deleteForumPost(post.id).then(() => {
+        close();
+      });
+    }
+  }
+
   if (!popupState.isOpen) {
     return null;
   }
+
+  const relativePath = `/${router.query.domain}/forum/post/${post?.path}`;
 
   return (
     <Dialog
@@ -72,7 +84,7 @@ export default function PostDialog({ post, spaceId, onClose, open, newPostCatego
             <Button
               size='small'
               color='secondary'
-              href={`/${router.query.domain}/forum/post/${post.path}`}
+              href={relativePath}
               variant='text'
               startIcon={<OpenInFullIcon fontSize='small' />}
             >
@@ -81,6 +93,7 @@ export default function PostDialog({ post, spaceId, onClose, open, newPostCatego
           </Box>
         )
       }
+      toolsMenu={post && <PageActions page={{ ...post, relativePath }} onClickDelete={deletePost} />}
       onClose={() => {
         if (contentUpdated) {
           setShowConfirmDialog(true);

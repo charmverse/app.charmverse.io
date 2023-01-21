@@ -78,6 +78,14 @@ type PostUpdated = {
   };
 };
 
+type PostDeleted = {
+  type: 'post_deleted';
+  payload: {
+    categoryId: string;
+    id: string;
+  };
+};
+
 type ErrorMessage = {
   type: 'error';
   payload: string;
@@ -104,7 +112,8 @@ export type ServerMessage =
   | VotesDeleted
   | VotesUpdated
   | PostPublished
-  | PostUpdated;
+  | PostUpdated
+  | PostDeleted;
 
 export type WebSocketMessage = ClientMessage | ServerMessage;
 

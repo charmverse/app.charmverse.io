@@ -85,15 +85,14 @@ export function ForumPostList({ search, categoryId, sort }: ForumPostsProps) {
         : null,
     (args) =>
       charmClient.forum.searchForumPosts({
-        spaceId: currentSpace!.id,
+        spaceId: args.arguments.spaceId,
         search: args.arguments.search,
         count: resultsPerQuery,
         page: args.arguments.page
       })
   );
 
-  const dataError =
-    postsError?.message ?? searchError?.message ?? 'There was an unexpected error while loading the posts';
+  const errorMessage = postsError?.message ?? searchError?.message;
 
   const hasNext = useMemo(
     () => (search && searchData ? searchData.at(-1)?.hasNext === true : postsData?.at(-1)?.hasNext === true),
@@ -116,7 +115,7 @@ export function ForumPostList({ search, categoryId, sort }: ForumPostsProps) {
     [user, categoryId]
   );
   const handlePostUpdateEvent = useCallback(
-    (postWithPage: WebSocketPayload<'post_updated'>) => {
+    (postWithPage: WebSocketPayload<'post_updated' | 'post_deleted'>) => {
       if (!currentCategoryId || postWithPage.categoryId === currentCategoryId) {
         refreshPosts();
       }
@@ -133,11 +132,13 @@ export function ForumPostList({ search, categoryId, sort }: ForumPostsProps) {
   }
 
   useEffect(() => {
-    const unsubscribeFromPostPublishEvent = subscribe('post_published', handlePostPublishEvent);
-    const unsubscribeFromPostUpdateEvent = subscribe('post_updated', handlePostUpdateEvent);
+    const unsubscribePublishListener = subscribe('post_published', handlePostPublishEvent);
+    const unsubscribeUpdatesListener = subscribe('post_updated', handlePostUpdateEvent);
+    const unsubscribeDeletesListener = subscribe('post_deleted', handlePostUpdateEvent);
     return () => {
-      unsubscribeFromPostPublishEvent();
-      unsubscribeFromPostUpdateEvent();
+      unsubscribePublishListener();
+      unsubscribeUpdatesListener();
+      unsubscribeDeletesListener();
     };
   }, [handlePostPublishEvent, handlePostUpdateEvent]);
 
@@ -161,7 +162,11 @@ export function ForumPostList({ search, categoryId, sort }: ForumPostsProps) {
 
   return (
     <>
-      {(postsError || searchError) && <Alert severity='error'>{dataError}</Alert>}
+      {errorMessage && (
+        <Alert variant='outlined' severity='error'>
+          {errorMessage}
+        </Alert>
+      )}
       {postsToShow.map((post) => (
         <PostCard
           key={post.id}

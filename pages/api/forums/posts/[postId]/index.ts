@@ -58,7 +58,18 @@ async function deleteForumPostController(req: NextApiRequest, res: NextApiRespon
     throw new UnauthorisedActionError(`User ${userId} cannot edit post ${postId}`);
   }
 
-  await deleteForumPost(postId);
+  const post = await deleteForumPost(postId);
+
+  relay.broadcast(
+    {
+      type: 'post_deleted',
+      payload: {
+        id: postId,
+        categoryId: post.categoryId
+      }
+    },
+    post.spaceId
+  );
 
   res.status(200).end();
 }
