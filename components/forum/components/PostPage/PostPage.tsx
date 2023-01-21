@@ -147,6 +147,7 @@ export function PostPage({
         title: formInputs.title
       });
       setContentUpdated(false);
+      onSave?.();
     } else {
       const newPost = await charmClient.forum.createForumPost({
         categoryId,
@@ -155,9 +156,8 @@ export function PostPage({
         spaceId,
         title: formInputs.title
       });
-      router.push(`/${currentSpace?.domain}/forum/post/${newPost.path}`);
+      router.push(`/${router.query.domain}/forum/post/${newPost.path}`);
     }
-    onSave?.();
   }
 
   function updateCategoryId(_categoryId: string) {
@@ -254,12 +254,14 @@ export function PostPage({
           ) : (
             post && (
               <>
-                <Stack gap={1}>
-                  <PostCommentSort commentSort={commentSort} setCommentSort={setCommentSort} />
-                  {topLevelComments.map((comment) => (
-                    <PostComment setPostComments={setPostComments} comment={comment} key={comment.id} />
-                  ))}
-                </Stack>
+                {topLevelComments.length > 0 && (
+                  <Stack gap={1}>
+                    <PostCommentSort commentSort={commentSort} setCommentSort={setCommentSort} />
+                    {topLevelComments.map((comment) => (
+                      <PostComment setPostComments={setPostComments} comment={comment} key={comment.id} />
+                    ))}
+                  </Stack>
+                )}
                 {topLevelComments.length === 0 && (
                   <Stack gap={1} alignItems='center' my={1}>
                     <CommentIcon color='secondary' fontSize='large' />
