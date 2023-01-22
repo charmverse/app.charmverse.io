@@ -20,7 +20,7 @@ export function PostCommentSort({
         onChange={(e) => setCommentSort(e.target.value as PostCommentSort)}
       >
         {['latest', 'top'].map((sort) => (
-          <MenuItem key={sort} value={sort}>
+          <MenuItem dense key={sort} value={sort}>
             {sort.charAt(0).toUpperCase() + sort.slice(1)}
           </MenuItem>
         ))}
