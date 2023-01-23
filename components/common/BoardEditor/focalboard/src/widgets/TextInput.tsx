@@ -7,6 +7,7 @@ import { useEditable } from './editable';
 
 export type TextInputProps = EditableProps & {
   className?: string;
+  maxRows?: number;
   multiline?: boolean;
 };
 const StyledInput = styled(InputBase)`
@@ -24,7 +25,8 @@ function Editable(_props: TextInputProps, ref: React.Ref<Focusable>): JSX.Elemen
     <StyledInput
       {...props}
       inputProps={{
-        className
+        className,
+        maxRows: _props.maxRows
       }}
       multiline={_props.multiline}
       // props from Editable that are not implemented

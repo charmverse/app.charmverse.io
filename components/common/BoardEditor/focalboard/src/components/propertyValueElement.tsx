@@ -172,7 +172,8 @@ function PropertyValueElement(props: Props): JSX.Element {
         value={value.toString()}
         autoExpand={false}
         onChange={setValue}
-        multiline={displayType === 'details'}
+        multiline={true}
+        maxRows={displayType === 'details' ? undefined : 1}
         onSave={() => {
           mutator.changePropertyValue(card, propertyTemplate.id, value);
         }}
