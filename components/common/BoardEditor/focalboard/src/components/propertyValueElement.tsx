@@ -172,7 +172,7 @@ function PropertyValueElement(props: Props): JSX.Element {
           value={value.toString()}
           autoExpand={false}
           onChange={setValue}
-          multiline={false}
+          multiline={true}
           onSave={() => {
             mutator.changePropertyValue(card, propertyTemplate.id, value);
           }}
