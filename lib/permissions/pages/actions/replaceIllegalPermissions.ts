@@ -1,11 +1,9 @@
-import type { PagePermission, Prisma } from '@prisma/client';
+import type { Prisma } from '@prisma/client';
 
 import type { OptionalTransaction, TransactionClient } from 'db';
 import { prisma } from 'db';
-import log from 'lib/log';
 import type {
   IPageWithPermissions,
-  PageMeta,
   PageNodeWithChildren,
   PageNodeWithPermissions,
   TargetPageTree
@@ -13,7 +11,6 @@ import type {
 import { flattenTree } from 'lib/pages/mapPageTree';
 import { getPage } from 'lib/pages/server';
 import { resolvePageTree } from 'lib/pages/server/resolvePageTree';
-import { isTruthy } from 'lib/utilities/types';
 
 import type { IPagePermissionWithSource } from '../page-permission-interfaces';
 
