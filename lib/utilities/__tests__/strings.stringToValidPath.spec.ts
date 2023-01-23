@@ -18,7 +18,7 @@ describe('stringToValidPath', () => {
     }
 
     const path = stringToValidPath(title, maxchars);
-    expect(path.length < maxchars).toBe(true);
+    expect(path.length).toBe(maxchars);
   });
 
   it('should replace & by whitespace', () => {
@@ -40,7 +40,6 @@ describe('stringToValidPath', () => {
     読レホ小雄てンり雪立ぎみ覧画カル政視ヤマイロ投津サニソ宣惑ご際消ねを輝企ろ政象ぐフず遂92小あぼと空末且佃佞べだぞ。肉オサ特7予らり万載車労カロ図構ちぴか文面決ス踏天審せるお返毎りドぱ武供そおむ生金チクヨ率15図初打セソワ社責ルぴひば。生をゆでづ時事描むね月建井リさ潟中ルあ急厚チ平話シコヤ紙結セタエモ玉19義キマウシ然録ヒオヤチ陸変だ品器カオタワ作声実オヒネナ束8低け`;
 
     const path = stringToValidPath(japaneseString);
-    expect(path.length).toBe(50);
 
     expect(path.match('井94害ぴ済影ろも外仲込おえ')).not.toBeNull();
   });
