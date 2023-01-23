@@ -68,7 +68,7 @@ export default function SidebarSubmenu({
   return (
     <SidebarHeader className='sidebar-header'>
       <Button
-        id='basic-button'
+        data-test='sidebar-space-menu'
         endIcon={<KeyboardArrowDownIcon fontSize='small' />}
         variant='text'
         color='inherit'
@@ -110,7 +110,7 @@ export default function SidebarSubmenu({
             </Typography>
           </MenuItem>
         ))}
-        <MenuItem onClick={showSpaceForm} data-test='sidebar-add-new-space' sx={{ fontWeight: 600 }}>
+        <MenuItem onClick={showSpaceForm} data-test='spaces-menu-add-new-space' sx={{ fontWeight: 600 }}>
           <AddIcon sx={{ m: '5px 15px 5px 8px' }} />
           Create or join a space
         </MenuItem>
