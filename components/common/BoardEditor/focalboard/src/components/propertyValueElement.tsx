@@ -164,25 +164,23 @@ function PropertyValueElement(props: Props): JSX.Element {
   }
 
   if (editableFields.includes(propertyTemplate.type)) {
-    if (!readOnly) {
-      return (
-        <TextInput
-          className='octo-propertyvalue'
-          placeholderText={emptyDisplayValue}
-          value={value.toString()}
-          autoExpand={false}
-          onChange={setValue}
-          multiline={displayType === 'details'}
-          onSave={() => {
-            mutator.changePropertyValue(card, propertyTemplate.id, value);
-          }}
-          onCancel={() => setValue(propertyValue || '')}
-          validator={(newValue) => validateProp(propertyTemplate.type, newValue)}
-          spellCheck={propertyTemplate.type === 'text'}
-        />
-      );
-    }
-    return <div className='octo-propertyvalue octo-propertyvalue--readonly'>{displayValue}</div>;
+    return (
+      <TextInput
+        className={readOnly ? 'octo-propertyvalue octo-propertyvalue--readonly' : 'octo-propertyvalue'}
+        placeholderText={emptyDisplayValue}
+        readOnly={readOnly}
+        value={value.toString()}
+        autoExpand={false}
+        onChange={setValue}
+        multiline={displayType === 'details'}
+        onSave={() => {
+          mutator.changePropertyValue(card, propertyTemplate.id, value);
+        }}
+        onCancel={() => setValue(propertyValue || '')}
+        validator={(newValue) => validateProp(propertyTemplate.type, newValue)}
+        spellCheck={propertyTemplate.type === 'text'}
+      />
+    );
   }
   return <div className='octo-propertyvalue'>{finalDisplayValue}</div>;
 }
