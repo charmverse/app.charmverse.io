@@ -74,7 +74,8 @@ export default function SidebarSubmenu({
         color='inherit'
         {...bindTrigger(menuPopupState)}
       >
-        <Typography variant='body2' data-test='sidebar-space-name' fontWeight={600} noWrap>
+        <WorkspaceAvatar name={currentSpace?.name ?? ''} image={currentSpace?.spaceImage ?? null} />
+        <Typography variant='body1' data-test='sidebar-space-name' fontWeight={600} noWrap ml={1}>
           {currentSpace?.name}
         </Typography>
       </Button>
