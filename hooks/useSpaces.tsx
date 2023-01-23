@@ -13,7 +13,7 @@ type IContext = {
   setSpace: (spaces: Space) => void;
   setSpaces: (spaces: Space[]) => void;
   isLoaded: boolean;
-  createNewSpace: (data: Pick<CreateSpaceProps, 'createSpaceOption' | 'spaceData'>) => Promise<Space | null>;
+  createNewSpace: (data: Pick<CreateSpaceProps, 'createSpaceOption' | 'spaceData'>) => Promise<Space>;
   isCreatingSpace: boolean;
 };
 
@@ -22,7 +22,7 @@ export const SpacesContext = createContext<Readonly<IContext>>({
   setSpace: () => undefined,
   setSpaces: () => undefined,
   isLoaded: false,
-  createNewSpace: () => Promise.resolve(null),
+  createNewSpace: () => Promise.reject(),
   isCreatingSpace: false
 });
 
@@ -57,17 +57,12 @@ export function SpacesProvider({ children }: { children: ReactNode }) {
       // refresh user permissions
       const _user = await charmClient.getUser();
       setUser(_user);
-      // give some time for spaces state to update or user will be redirected to /join in RouteGuard
-      setTimeout(() => {
-        router.push(`/${space.domain}`);
-        setIsCreatingSpace(false);
-      }, 200);
+      setIsCreatingSpace(false);
       return space;
     } catch (e) {
       setIsCreatingSpace(false);
+      throw e;
     }
-
-    return null;
   }, []);
 
   const setSpace = useCallback(

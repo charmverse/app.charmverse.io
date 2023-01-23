@@ -7,6 +7,7 @@ import Divider from '@mui/material/Divider';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
 import type { Prisma, Space } from '@prisma/client';
+import { useRouter } from 'next/router';
 import type { ChangeEvent } from 'react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -17,8 +18,11 @@ import FieldLabel from 'components/common/form/FieldLabel';
 import { DialogTitle } from 'components/common/Modal';
 import PrimaryButton from 'components/common/PrimaryButton';
 import Avatar from 'components/settings/workspace/LargeAvatar';
+import { useSnackbar } from 'hooks/useSnackbar';
+import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
 import log from 'lib/log';
+import { generateNotionImportRedirectUrl } from 'lib/notion/generateNotionImportRedirectUrl';
 import type { CreateSpaceProps } from 'lib/spaces/createWorkspace';
 import type { SpaceCreateTemplate } from 'lib/spaces/utils';
 import { getSpaceDomainFromName } from 'lib/spaces/utils';
@@ -43,15 +47,17 @@ export type FormValues = yup.InferType<typeof schema>;
 interface Props {
   defaultValues?: { name: string; domain: string };
   onCancel?: () => void;
-  onSubmit: (values: Pick<CreateSpaceProps, 'createSpaceOption' | 'spaceData'>) => Promise<Space | null>;
   submitText?: string;
-  isSubmitting: boolean;
 }
 
-export function CreateSpaceForm({ defaultValues, onSubmit: _onSubmit, onCancel, submitText, isSubmitting }: Props) {
+export function CreateSpaceForm({ defaultValues, onCancel, submitText }: Props) {
   const { user } = useUser();
+  const { createNewSpace, isCreatingSpace } = useSpaces();
+  const { showMessage } = useSnackbar();
 
   const [step, setStep] = useState<1 | 2>(1);
+
+  const router = useRouter();
 
   const [saveError, setSaveError] = useState<any | null>(null);
   const {
@@ -73,7 +79,7 @@ export function CreateSpaceForm({ defaultValues, onSubmit: _onSubmit, onCancel, 
   async function onSubmit(values: FormValues) {
     try {
       setSaveError(null);
-      const space = await _onSubmit({
+      const space = await createNewSpace({
         createSpaceOption: values.spaceTemplateOption as SpaceCreateTemplate,
         spaceData: {
           createdAt: new Date(),
@@ -97,6 +103,20 @@ export function CreateSpaceForm({ defaultValues, onSubmit: _onSubmit, onCancel, 
           spaceImage: values.spaceImage
         }
       });
+
+      if ((values.spaceTemplateOption as SpaceCreateTemplate) === 'Import from Notion') {
+        const notionUrl = generateNotionImportRedirectUrl({
+          origin: router.asPath.split('/')?.[0],
+          spaceDomain: space.domain
+        });
+
+        router.push(notionUrl);
+      } else {
+        // Give time for spaces hook to update so user doesn't end up on Routeguard
+        setTimeout(() => {
+          router.push(`/${space.domain}`);
+        }, 200);
+      }
     } catch (err) {
       log.error('Error creating space', err);
       setSaveError((err as Error).message || err);
@@ -189,7 +209,7 @@ export function CreateSpaceForm({ defaultValues, onSubmit: _onSubmit, onCancel, 
             disabled={!watchName || !watchDomain}
             type='submit'
             data-test='create-workspace'
-            loading={isSubmitting}
+            loading={isCreatingSpace}
           >
             {submitText || 'Create Space'}
           </PrimaryButton>
