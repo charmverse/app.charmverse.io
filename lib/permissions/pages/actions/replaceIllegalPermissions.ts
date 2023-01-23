@@ -42,12 +42,14 @@ export function generateReplaceIllegalPermissions({ parents, targetPage }: Targe
   // Iterate through the page permissions to detect permissions that inherit from outside the tree
   targetPage.permissions.forEach((permission) => {
     const sourcePermission = permission.sourcePermission;
-    // This source permission originates from outside the tree. Mark the reference for deletion and add the permission to permissions we want to establish inheritance for
-    if (sourcePermission && !parentMap[sourcePermission.pageId]) {
-      let newSourcePermission: IPagePermissionWithSource | null = permission;
+
+    // This source permission originates from outside the tree.
+    if (sourcePermission && typeof parentMap[sourcePermission.pageId] !== 'number') {
+      // This permission should now be authority for its child pages
+      let newSourcePermission = permission;
 
       // We need to refresh permission, so we need to find the closest parent that has the same permission
-      for (const parent of pageWithParents) {
+      for (const parent of parents) {
         const matchingPermission = findExistingPermissionForGroup(permission, parent.permissions, false) as
           | IPagePermissionWithSource
           | undefined;
@@ -60,7 +62,7 @@ export function generateReplaceIllegalPermissions({ parents, targetPage }: Targe
 
       permissionUpdates.push({
         where: {
-          id: permission.id
+          id: newSourcePermission.id
         },
         data: {
           inheritedFromPermission: null
@@ -85,7 +87,7 @@ export function generateReplaceIllegalPermissions({ parents, targetPage }: Targe
             }
           },
           data: {
-            inheritedFromPermission: permission.id
+            inheritedFromPermission: newSourcePermission.id
           }
         });
       }
