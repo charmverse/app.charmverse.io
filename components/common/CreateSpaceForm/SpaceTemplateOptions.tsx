@@ -4,6 +4,7 @@ import Grid from '@mui/material/Grid';
 
 import Button from 'components/common/Button';
 import { DialogTitle } from 'components/common/Modal';
+import { useFilePicker } from 'hooks/useFilePicker';
 import type { SpaceCreateTemplate } from 'lib/spaces/utils';
 import { spaceCreateTemplates } from 'lib/spaces/utils';
 import { typedKeys } from 'lib/utilities/objects';
@@ -21,11 +22,13 @@ const ImageIcon = styled.img`
 
 type TemplateOptionProps = {
   option: SpaceCreateTemplate;
-  isSelected: boolean;
+  currentSelection: SpaceCreateTemplate;
   onSelect: (option: SpaceCreateTemplate) => void;
 };
 
-function TemplateOption({ option, onSelect, isSelected }: TemplateOptionProps) {
+function TemplateOption({ option, onSelect, currentSelection }: TemplateOptionProps) {
+  const isSelected = option === currentSelection;
+
   return (
     <Button
       onClick={() => onSelect(option)}
@@ -46,33 +49,37 @@ function TemplateOption({ option, onSelect, isSelected }: TemplateOptionProps) {
 
 type SelectNewSpaceTemplateProps = {
   onSelect: (option: SpaceCreateTemplate) => void;
-  selectedTemplate?: SpaceCreateTemplate;
+  selectedTemplate: SpaceCreateTemplate;
 };
-
-const createOptions = typedKeys(spaceCreateTemplates).filter((opt) => opt !== 'default');
 
 export function SelectNewSpaceTemplate({ onSelect, selectedTemplate }: SelectNewSpaceTemplateProps) {
   return (
     <Grid container spacing={2} flexDirection='column'>
       <Grid item>
-        <DialogTitle sx={{ textAlign: 'center', display: 'block' }}>Create a space</DialogTitle>
         <Typography textAlign='center' variant='body2'>
           A space is where your organization collaborates
         </Typography>
       </Grid>
       <Grid item>
-        <TemplateOption onSelect={onSelect} option='default' isSelected={selectedTemplate === 'default'} />
+        <TemplateOption onSelect={onSelect} option='default' currentSelection={selectedTemplate} />
       </Grid>
       <Grid item>
         <Typography textAlign='center' variant='body2'>
           Start from a template
         </Typography>
       </Grid>
-      {createOptions.map((opt) => (
-        <Grid item key='opt'>
-          <TemplateOption onSelect={onSelect} option={opt} isSelected={selectedTemplate === opt} />
-        </Grid>
-      ))}
+
+      <Grid item>
+        <TemplateOption onSelect={onSelect} option='templateNftCommunity' currentSelection={selectedTemplate} />
+      </Grid>
+
+      <Grid item>
+        <TemplateOption onSelect={onSelect} option='importNotion' currentSelection={selectedTemplate} />
+      </Grid>
+
+      <Grid item>
+        <TemplateOption onSelect={onSelect} option='importMarkdown' currentSelection={selectedTemplate} />
+      </Grid>
     </Grid>
   );
 }
