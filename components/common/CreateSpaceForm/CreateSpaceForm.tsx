@@ -6,7 +6,6 @@ import Alert from '@mui/material/Alert';
 import Divider from '@mui/material/Divider';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
-import type { Prisma, Space } from '@prisma/client';
 import { useRouter } from 'next/router';
 import type { ChangeEvent } from 'react';
 import { useState } from 'react';
@@ -18,18 +17,18 @@ import FieldLabel from 'components/common/form/FieldLabel';
 import { DialogTitle } from 'components/common/Modal';
 import PrimaryButton from 'components/common/PrimaryButton';
 import Avatar from 'components/settings/workspace/LargeAvatar';
-import { useSnackbar } from 'hooks/useSnackbar';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
 import log from 'lib/log';
 import { generateNotionImportRedirectUrl } from 'lib/notion/generateNotionImportRedirectUrl';
-import type { CreateSpaceProps } from 'lib/spaces/createWorkspace';
 import type { SpaceCreateTemplate } from 'lib/spaces/utils';
 import { getSpaceDomainFromName } from 'lib/spaces/utils';
 import { domainSchema } from 'lib/spaces/validateDomainName';
 import randomName from 'lib/utilities/randomName';
 
 import { SelectNewSpaceTemplate } from './SpaceTemplateOptions';
+
+const defaultTemplate: SpaceCreateTemplate = 'default';
 
 export const schema = yup.object({
   id: yup.string(),
@@ -39,7 +38,7 @@ export const schema = yup.object({
   }),
   name: yup.string().ensure().trim().min(3, 'Name must be at least 3 characters').required('Name is required'),
   spaceImage: yup.string().nullable(true),
-  spaceTemplateOption: yup.string().nullable(true)
+  spaceTemplateOption: yup.string().default(defaultTemplate)
 });
 
 export type FormValues = yup.InferType<typeof schema>;
@@ -53,7 +52,6 @@ interface Props {
 export function CreateSpaceForm({ defaultValues, onCancel, submitText }: Props) {
   const { user } = useUser();
   const { createNewSpace, isCreatingSpace } = useSpaces();
-  const { showMessage } = useSnackbar();
 
   const [step, setStep] = useState<1 | 2>(1);
 
@@ -104,7 +102,7 @@ export function CreateSpaceForm({ defaultValues, onCancel, submitText }: Props) 
         }
       });
 
-      if ((values.spaceTemplateOption as SpaceCreateTemplate) === 'Import from Notion') {
+      if ((values.spaceTemplateOption as SpaceCreateTemplate) === 'importNotion') {
         const notionUrl = generateNotionImportRedirectUrl({
           origin: router.asPath.split('/')?.[0],
           spaceDomain: space.domain

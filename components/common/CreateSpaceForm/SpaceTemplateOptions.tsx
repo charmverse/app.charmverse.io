@@ -1,13 +1,12 @@
 import styled from '@emotion/styled';
 import { Typography } from '@mui/material';
-import Divider from '@mui/material/Divider';
 import Grid from '@mui/material/Grid';
-import { useState } from 'react';
 
 import Button from 'components/common/Button';
 import { DialogTitle } from 'components/common/Modal';
 import type { SpaceCreateTemplate } from 'lib/spaces/utils';
 import { spaceCreateTemplates } from 'lib/spaces/utils';
+import { typedKeys } from 'lib/utilities/objects';
 
 const ButtonContent = styled.div`
   display: block;
@@ -21,15 +20,15 @@ const ImageIcon = styled.img`
 `;
 
 type TemplateOptionProps = {
-  option: string;
+  option: SpaceCreateTemplate;
   isSelected: boolean;
-  onSelect: () => void;
+  onSelect: (option: SpaceCreateTemplate) => void;
 };
 
 function TemplateOption({ option, onSelect, isSelected }: TemplateOptionProps) {
   return (
     <Button
-      onClick={onSelect}
+      onClick={() => onSelect(option)}
       color={isSelected ? 'primary' : 'secondary'}
       variant='outlined'
       sx={{
@@ -40,7 +39,7 @@ function TemplateOption({ option, onSelect, isSelected }: TemplateOptionProps) {
       fullWidth
       size='large'
     >
-      <ButtonContent>{option}</ButtonContent>
+      <ButtonContent>{spaceCreateTemplates[option]}</ButtonContent>
     </Button>
   );
 }
@@ -49,6 +48,8 @@ type SelectNewSpaceTemplateProps = {
   onSelect: (option: SpaceCreateTemplate) => void;
   selectedTemplate?: SpaceCreateTemplate;
 };
+
+const createOptions = typedKeys(spaceCreateTemplates).filter((opt) => opt !== 'default');
 
 export function SelectNewSpaceTemplate({ onSelect, selectedTemplate }: SelectNewSpaceTemplateProps) {
   return (
@@ -60,16 +61,16 @@ export function SelectNewSpaceTemplate({ onSelect, selectedTemplate }: SelectNew
         </Typography>
       </Grid>
       <Grid item>
-        <TemplateOption onSelect={() => onSelect(null)} option='Create my own' isSelected={selectedTemplate === null} />
+        <TemplateOption onSelect={onSelect} option='default' isSelected={selectedTemplate === 'default'} />
       </Grid>
       <Grid item>
         <Typography textAlign='center' variant='body2'>
           Start from a template
         </Typography>
       </Grid>
-      {spaceCreateTemplates.map((opt) => (
+      {createOptions.map((opt) => (
         <Grid item key='opt'>
-          <TemplateOption onSelect={() => onSelect(opt)} option={opt} isSelected={selectedTemplate === opt} />
+          <TemplateOption onSelect={onSelect} option={opt} isSelected={selectedTemplate === opt} />
         </Grid>
       ))}
     </Grid>

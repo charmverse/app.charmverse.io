@@ -3,7 +3,6 @@ import Card from '@mui/material/Card';
 
 import getBaseLayout from 'components/common/BaseLayout/BaseLayout';
 import { CreateSpaceForm } from 'components/common/CreateSpaceForm/CreateSpaceForm';
-import { useSpaces } from 'hooks/useSpaces';
 
 import { AlternateRouteButton } from './join';
 

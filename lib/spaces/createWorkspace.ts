@@ -48,7 +48,7 @@ export async function createWorkspace({ spaceData, userId, createSpaceOption }: 
   ]);
 
   // Handle the population of pages data
-  if (!createSpaceOption) {
+  if (!createSpaceOption || createSpaceOption === 'default') {
     const sourceDataPath = path.resolve(
       'seedData/space/space-da74cab3-c2b6-40bb-8734-0de5375b0fce-pages-1657887621286'
     );
@@ -61,7 +61,7 @@ export async function createWorkspace({ spaceData, userId, createSpaceOption }: 
       ...seedPagesTransactionInput.blocksToCreate.map((input) => prisma.block.create({ data: input })),
       ...seedPagesTransactionInput.pagesToCreate.map((input) => createPage({ data: input }))
     ]);
-  } else if (createSpaceOption === 'NFT Community') {
+  } else if (createSpaceOption === 'templateNftCommunity') {
     await importWorkspacePages({
       targetSpaceIdOrDomain: space.id,
       exportName: 'cvt-nft-community-template'

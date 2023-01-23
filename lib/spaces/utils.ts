@@ -30,6 +30,11 @@ export function getSpaceDomainFromName(name: string) {
     .replace(/\s/g, '-')
     .toLowerCase();
 }
-export const spaceCreateTemplates = ['NFT Community', 'Import from Notion', 'Import from Markdown'] as const;
+export const spaceCreateTemplates = {
+  default: 'Create my own',
+  importNotion: 'Import from Notion',
+  importMarkdown: 'Import from Markdown',
+  templateNftCommunity: 'NFT Community'
+} as const;
 
-export type SpaceCreateTemplate = typeof spaceCreateTemplates[number] | null;
+export type SpaceCreateTemplate = keyof typeof spaceCreateTemplates;
