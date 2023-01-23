@@ -4,7 +4,7 @@ import React from 'react';
 
 import { Utils } from '../../../utils';
 import Editable from '../../../widgets/editable';
-import { TextProperty } from '../../../widgets/TextInput';
+import { TextInput } from '../../../widgets/TextInput';
 
 type Props = {
   value: string;
@@ -35,7 +35,7 @@ function URLProperty(props: Props): JSX.Element {
   return (
     <div className='URLProperty property-link url'>
       {(hasValue || props.placeholder) && (
-        <TextProperty
+        <TextInput
           className='octo-propertyvalue'
           placeholderText={props.placeholder}
           value={props.value}

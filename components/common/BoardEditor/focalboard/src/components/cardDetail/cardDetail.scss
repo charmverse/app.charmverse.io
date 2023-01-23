@@ -131,6 +131,14 @@
       white-space: nowrap;
     }
 
+    &.octo-propertyname--readonly {
+      font-size: 12px;
+      padding: 4px 8px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+    }
+
     &.octo-propertyname--readonly .Button:hover {
       background: transparent;
       cursor: text;

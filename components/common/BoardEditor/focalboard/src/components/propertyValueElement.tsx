@@ -10,6 +10,7 @@ import mutator from '../mutator';
 import { OctoUtils } from '../octoUtils';
 import Editable from '../widgets/editable';
 import Switch from '../widgets/switch';
+import { TextInput } from '../widgets/TextInput';
 
 import CreatedAt from './properties/createdAt/createdAt';
 import CreatedBy from './properties/createdBy/createdBy';
@@ -165,12 +166,13 @@ function PropertyValueElement(props: Props): JSX.Element {
   if (editableFields.includes(propertyTemplate.type)) {
     if (!readOnly) {
       return (
-        <Editable
+        <TextInput
           className='octo-propertyvalue'
           placeholderText={emptyDisplayValue}
           value={value.toString()}
           autoExpand={false}
           onChange={setValue}
+          multiline={false}
           onSave={() => {
             mutator.changePropertyValue(card, propertyTemplate.id, value);
           }}

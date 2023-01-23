@@ -17,20 +17,16 @@ const StyledInput = styled(InputBase)`
   padding: 0; // disable padding added for multi-line input
 `;
 
-function EditableArea(_props: TextInputProps, ref: React.Ref<Focusable>): JSX.Element {
+function Editable(_props: TextInputProps, ref: React.Ref<Focusable>): JSX.Element {
   const elementRef = useRef<HTMLTextAreaElement>(null);
-  const props = useEditable(_props, ref, elementRef);
+  const { className, ...props } = useEditable(_props, ref, elementRef);
   return (
     <StyledInput
+      {...props}
       inputProps={{
-        className: props.className
+        className
       }}
-      onChange={props.onChange}
       multiline={_props.multiline}
-      value={props.value}
-      placeholder={props.placeholder}
-      readOnly={props.readOnly}
-      spellCheck={props.spellCheck}
       // props from Editable that are not implemented
       // saveOnEsc
       //   autoExpand?: boolean;
@@ -42,4 +38,4 @@ function EditableArea(_props: TextInputProps, ref: React.Ref<Focusable>): JSX.El
   );
 }
 
-export const TextProperty = forwardRef(EditableArea);
+export const TextInput = forwardRef(Editable);
