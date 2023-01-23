@@ -5,6 +5,7 @@ import { prisma } from 'db';
 import log from 'lib/log';
 import type {
   IPageWithPermissions,
+  PageMeta,
   PageNodeWithChildren,
   PageNodeWithPermissions,
   TargetPageTree
@@ -13,6 +14,8 @@ import { flattenTree } from 'lib/pages/mapPageTree';
 import { getPage } from 'lib/pages/server';
 import { resolvePageTree } from 'lib/pages/server/resolvePageTree';
 import { isTruthy } from 'lib/utilities/types';
+
+import type { IPagePermissionWithSource } from '../page-permission-interfaces';
 
 import { findExistingPermissionForGroup } from './find-existing-permission-for-group';
 import { hasSameOrMorePermissions } from './has-same-or-more-permissions';
@@ -23,224 +26,74 @@ import { hasSameOrMorePermissions } from './has-same-or-more-permissions';
 export function generateReplaceIllegalPermissions({ parents, targetPage }: TargetPageTree<PageNodeWithPermissions>): {
   updateManyOperations: Prisma.PagePermissionUpdateManyArgs[];
 } {
+  // List of parents with index from closest to furthest
   const parentMap = parents.reduce<Record<string, number>>((acc, parent, index) => {
     acc[parent.id] = index;
     return acc;
   }, {});
 
-  const illegalPermissionMap: Record<string, PagePermission> = {};
+  const pageWithParents = [targetPage, ...parents];
 
+  const flatTargetPageChildrenIds = flattenTree(targetPage).map((page) => page.id);
+
+  // Permissions that were inheriting from outside the tree
+  const permissionUpdates: Prisma.PagePermissionUpdateManyArgs[] = [];
+
+  // Iterate through the page permissions to detect permissions that inherit from outside the tree
   targetPage.permissions.forEach((permission) => {
     const sourcePermission = permission.sourcePermission;
+    // This source permission originates from outside the tree. Mark the reference for deletion and add the permission to permissions we want to establish inheritance for
+    if (sourcePermission && !parentMap[sourcePermission.pageId]) {
+      let newSourcePermission: IPagePermissionWithSource | null = permission;
 
-    if (permission.inheritedFromPermission && sourcePermission && !parentMap[sourcePermission.pageId]) {
-      illegalPermissionMap[permission.inheritedFromPermission] = sourcePermission;
+      // We need to refresh permission, so we need to find the closest parent that has the same permission
+      for (const parent of pageWithParents) {
+        const matchingPermission = findExistingPermissionForGroup(permission, parent.permissions, false) as
+          | IPagePermissionWithSource
+          | undefined;
+        if (matchingPermission && hasSameOrMorePermissions(parent.permissions, targetPage.permissions)) {
+          newSourcePermission = matchingPermission;
+        } else {
+          break;
+        }
+      }
+
+      permissionUpdates.push({
+        where: {
+          id: permission.id
+        },
+        data: {
+          inheritedFromPermission: null
+        }
+      });
+
+      const targetPageIds = [...flatTargetPageChildrenIds];
+
+      for (const page of pageWithParents) {
+        if (page.id !== newSourcePermission.pageId) {
+          targetPageIds.push(page.id);
+        } else {
+          break;
+        }
+      }
+
+      if (targetPageIds.length > 0) {
+        permissionUpdates.push({
+          where: {
+            pageId: {
+              in: targetPageIds
+            }
+          },
+          data: {
+            inheritedFromPermission: permission.id
+          }
+        });
+      }
     }
   });
 
-  const illegalPermissionIds: string[] = Object.keys(illegalPermissionMap);
-
-  if (illegalPermissionIds.length === 0) {
-    return {
-      updateManyOperations: []
-    };
-  }
-
-  // Page permissions which should become new source permissions
-  const pagePermissionsToDisconnect: Prisma.Enumerable<Prisma.PagePermissionWhereInput> = [];
-
-  // Permission inheritance references to update
-  const oldNewMap: { oldSourcePermissionId: string; newSourcePermissionId: string }[] = [];
-
-  /**
-   * 1. Go up the tree to find where we went wrong
-   * 2. Disconnect the top most illegal inheritor
-   * 3. Update all children of that inheritor to inherit from the inheritor
-   */
-  for (const illegalPermissionRef of illegalPermissionIds) {
-    const illegalSourcePagePermission = illegalPermissionMap[illegalPermissionRef];
-
-    // No parents detected
-    if (parents.length === 0) {
-      const contaminatedTargetPagePermission = targetPage.permissions.find(
-        (p) => p.inheritedFromPermission === illegalPermissionRef
-      );
-
-      const permissionId = targetPage.permissions.find((p) => p.inheritedFromPermission === illegalPermissionRef)?.id;
-      if (permissionId) {
-        pagePermissionsToDisconnect.push({
-          id: permissionId
-        });
-      } else {
-        log.warn('Skip page permission to disconnect as it was not found', {
-          permissions: targetPage.permissions,
-          permissionId,
-          illegalPermissionRef
-        });
-      }
-
-      if (contaminatedTargetPagePermission) {
-        oldNewMap.push({
-          oldSourcePermissionId: illegalPermissionRef,
-          newSourcePermissionId: contaminatedTargetPagePermission.id
-        });
-      }
-
-      // Exceptionally adding a continue statement as the following nested for loop is quite long
-      // eslint-disable-next-line no-continue
-      continue;
-    }
-
-    // We should stop this loop once we cannot find anymore refs
-    for (let i = 0; i < parents.length; i++) {
-      const parent = parents[i];
-      const matchingIllegalPermission = parent.permissions.find(
-        (permission) => permission.inheritedFromPermission === illegalPermissionRef
-      );
-
-      // Only the target page has an illegal permission. Parents were not contaminated
-      if (i === 0 && !matchingIllegalPermission) {
-        const canInherit = hasSameOrMorePermissions(parent.permissions, targetPage.permissions);
-
-        // Make sure the parent will have a permission to inherit from
-        // This logic was added to deal with an edge case where a page had an extra permission from an old parent which became a sibling, and the parent did not have this permission
-        const newParentPermissionRef = findExistingPermissionForGroup(illegalSourcePagePermission, parent.permissions);
-
-        if (canInherit && newParentPermissionRef) {
-          oldNewMap.push({
-            oldSourcePermissionId: illegalPermissionRef,
-            newSourcePermissionId: newParentPermissionRef.id
-          });
-        } else {
-          pagePermissionsToDisconnect.push({
-            pageId: targetPage.id,
-            inheritedFromPermission: illegalPermissionRef
-          });
-          const newPermissionRef = findExistingPermissionForGroup(illegalSourcePagePermission, targetPage.permissions);
-          if (newPermissionRef) {
-            oldNewMap.push({
-              oldSourcePermissionId: illegalPermissionRef,
-              newSourcePermissionId: newPermissionRef.id
-            });
-          } else {
-            log.warn('Skip page permission to disconnect as it was not found', {
-              permissions: targetPage.permissions,
-              permission: illegalSourcePagePermission
-            });
-          }
-        }
-
-        break;
-      }
-      // The current item does not contain the illegal reference, so we can stop at the previous item
-      else if (!matchingIllegalPermission) {
-        const previousParent = parents[i - 1];
-        // Inheritance check goes here
-        const canInherit = hasSameOrMorePermissions(parent.permissions, previousParent.permissions);
-
-        if (canInherit) {
-          // Find the new source permission
-          const newPermissionRef = findExistingPermissionForGroup(illegalSourcePagePermission, parent.permissions);
-
-          if (newPermissionRef) {
-            oldNewMap.push({
-              oldSourcePermissionId: illegalPermissionRef,
-              newSourcePermissionId: newPermissionRef.id
-            });
-          }
-        } else {
-          pagePermissionsToDisconnect.push({
-            pageId: previousParent.id,
-            inheritedFromPermission: illegalPermissionRef
-          });
-          const newPermissionRef = findExistingPermissionForGroup(
-            illegalSourcePagePermission,
-            previousParent.permissions
-          );
-          if (newPermissionRef) {
-            oldNewMap.push({
-              oldSourcePermissionId: illegalPermissionRef,
-              newSourcePermissionId: newPermissionRef.id
-            });
-          }
-        }
-
-        break;
-      }
-      // We reached the top, and all parents are inheriting a bad permission. Disconnect the top parent and make it the root
-      else if (i === parents.length - 1) {
-        pagePermissionsToDisconnect.push({
-          pageId: parent.id,
-          inheritedFromPermission: illegalPermissionRef
-        });
-        const newPermissionRef = findExistingPermissionForGroup(illegalSourcePagePermission, parent.permissions);
-        if (newPermissionRef) {
-          oldNewMap.push({
-            oldSourcePermissionId: illegalPermissionRef,
-            newSourcePermissionId: newPermissionRef.id
-          });
-        } else {
-          log.warn('Skip page permission to disconnect as it was not found', {
-            permissions: parent.permissions,
-            permission: illegalSourcePagePermission
-          });
-        }
-      }
-    }
-  }
-
-  // Generate instructions for permissions that should become source permission
-  const prismaDisconnectArgs: Prisma.PagePermissionUpdateManyArgs = {
-    where: {
-      OR: pagePermissionsToDisconnect
-    },
-    data: {
-      inheritedFromPermission: null
-    }
-  };
-
-  // We can include all parents in the updateMany, since disconnect will be run prior
-  const pagesToUpdate: Prisma.PagePermissionWhereInput[] = [...flattenTree(targetPage), targetPage, ...parents].map(
-    (page) => {
-      return {
-        pageId: page.id
-      };
-    }
-  );
-
-  const prismaRefreshedInheritanceArgs: Prisma.PagePermissionUpdateManyArgs[] = oldNewMap.map(
-    ({ oldSourcePermissionId, newSourcePermissionId }) => {
-      return {
-        where: {
-          AND: [
-            {
-              inheritedFromPermission: oldSourcePermissionId
-            },
-            {
-              OR: pagesToUpdate
-            }
-          ]
-        },
-        data: {
-          inheritedFromPermission: newSourcePermissionId
-        }
-      };
-    }
-  );
-
-  // Construct this manually so we don't accidentally emit an updateMany with an empty where clause
-  const updateManyOperations: Prisma.PagePermissionUpdateManyArgs[] = [];
-
-  if (pagePermissionsToDisconnect.length > 0) {
-    updateManyOperations.push(prismaDisconnectArgs);
-  }
-
-  if (pagesToUpdate.length > 0) {
-    updateManyOperations.push(...prismaRefreshedInheritanceArgs);
-  }
-
   return {
-    updateManyOperations
+    updateManyOperations: permissionUpdates
   };
 }
 
