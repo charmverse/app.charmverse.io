@@ -10,6 +10,7 @@ export const initialLoad = createAsyncThunk('initialLoad', async ({ spaceId }: {
 
   return {
     workspaceUsers,
+    loaded: true,
     blocks
   };
 });

@@ -28,6 +28,7 @@ import {
   sortCards
 } from 'components/common/BoardEditor/focalboard/src/store/cards';
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
+import { getLoadingState } from 'components/common/BoardEditor/focalboard/src/store/loadingState';
 import Button from 'components/common/Button';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -102,6 +103,12 @@ function CenterPanel(props: Props) {
   const { pages, updatePage } = usePages();
   const { members } = useMembers();
 
+  useEffect(() => {
+    if (views.length === 0 && !activeView) {
+      setState((s) => ({ ...s, showSettings: 'create-linked-view' }));
+    }
+  }, [!!activeView, views.length]);
+
   const isEmbedded = !!props.embeddedBoardPath;
   const boardPage = pages[board.id];
   const boardPageType = boardPage?.type;
@@ -115,6 +122,7 @@ function CenterPanel(props: Props) {
   }
 
   const activeBoard = useAppSelector(getBoard(activeBoardId ?? ''));
+  const loadingState = useAppSelector(getLoadingState());
   const activePage = pages[activeBoardId ?? ''];
   const _groupByProperty = activeBoard?.fields.cardProperties.find((o) => o.id === activeView?.fields.groupById);
   const _dateDisplayProperty = activeBoard?.fields.cardProperties.find(
@@ -423,7 +431,7 @@ function CenterPanel(props: Props) {
     }
   }, [`${activeView?.fields.sourceData?.formId}${activeView?.fields.sourceData?.boardId}`]);
 
-  const isLoadingSourceData = !activeBoard && state.showSettings !== 'create-linked-view';
+  const isLoadingSourceData = !loadingState.loaded || (!activeBoard && state.showSettings !== 'create-linked-view');
 
   return (
     <div
