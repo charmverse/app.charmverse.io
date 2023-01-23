@@ -73,9 +73,10 @@ function ForumFilterListLink({ label, value, isSelected, handleSelect }: ForumSo
         sx={{
           color: 'text.primary',
           cursor: 'pointer',
-          wordBreak: 'break-all',
-          pr: 3.5,
-          width: '100%'
+          whiteSpace: 'nowrap',
+          width: '100%',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis'
         }}
         fontWeight={isSelected ? 'bold' : 'initial'}
         onClick={() => handleSelect(value)}
@@ -120,20 +121,18 @@ export function CategoryMenu({ handleCategory, handleSort, selectedCategoryId, s
           px: 0
         }}
       >
-        <Stack gap={1} my={1}>
-          {postSortOptions.map((_sort) => (
-            <StyledBox key={_sort}>
-              <ForumFilterListLink
-                label={startCase(_sort.replace('_', ' '))}
-                isSelected={_sort === selectedSort}
-                value={_sort}
-                handleSelect={handleSort as (value?: string | PostSortOption) => void}
-              />
-            </StyledBox>
-          ))}
-        </Stack>
+        {postSortOptions.map((_sort) => (
+          <StyledBox key={_sort}>
+            <ForumFilterListLink
+              label={startCase(_sort.replace('_', ' '))}
+              isSelected={_sort === selectedSort}
+              value={_sort}
+              handleSelect={handleSort as (value?: string | PostSortOption) => void}
+            />
+          </StyledBox>
+        ))}
 
-        <Divider sx={{ pt: '10px', mb: '10px' }} />
+        <Divider sx={{ my: 2 }} />
         <Stack mb={2}>
           <ForumFilterListLink label='All categories' isSelected={!selectedCategoryId} handleSelect={handleCategory} />
           {categories.map((category) => (

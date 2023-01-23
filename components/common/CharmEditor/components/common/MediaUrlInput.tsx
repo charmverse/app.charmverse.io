@@ -19,6 +19,7 @@ export function MediaUrlInput(props: InputProps) {
       <TextField
         autoFocus
         multiline={props.multiline}
+        maxRows={3}
         placeholder={props.placeholder}
         sx={{ width: 400, maxWidth: '100%' }}
         value={embedUrl}

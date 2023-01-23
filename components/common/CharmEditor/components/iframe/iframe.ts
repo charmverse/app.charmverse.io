@@ -11,7 +11,6 @@ import { MIN_EMBED_HEIGHT } from './config';
 import type { IframeNodeAttrs } from './config';
 import { name } from './iframeSpec';
 import { extractIframeProps, extractEmbedType } from './utils';
-
 // inject a tweet node when pasting twitter url
 
 export function plugins() {
@@ -30,6 +29,7 @@ export function plugins() {
           const text = event.clipboardData.getData('text/plain');
           const html = event.clipboardData.getData('text/html');
           const isPlainText = text && !html;
+
           if (!isPlainText) {
             return false;
           }
