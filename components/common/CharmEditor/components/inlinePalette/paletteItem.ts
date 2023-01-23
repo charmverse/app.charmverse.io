@@ -39,6 +39,7 @@ export interface PaletteItemTypeNoGroup {
   editorExecuteCommand: EditorExecuteCommand;
   skipFiltering?: boolean;
   _isItemDisabled?: boolean;
+  showInFloatingMenu?: boolean; // make it appear in the floating menu to convert highlighted text
   icon?: JSX.Element | null | undefined;
 }
 
@@ -72,6 +73,8 @@ export class PaletteItem implements PaletteItemType {
   group: string;
 
   skipFiltering: boolean;
+
+  showInFloatingMenu?: boolean; // make it appear in the floating menu to convert highlighted text
 
   icon?: JSX.Element | null | undefined;
 
