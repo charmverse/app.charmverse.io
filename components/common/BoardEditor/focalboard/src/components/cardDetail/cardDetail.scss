@@ -38,9 +38,13 @@
 
   .octo-propertyrow {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     margin: 6px 0;
     min-height: 32px;
+
+    .MenuWrapper {
+      margin: 2px 0;
+    }
 
     .Switch {
       margin-left: 8px;
