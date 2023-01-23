@@ -19,7 +19,6 @@ function createColumnPaletteItem(colCount: number): PaletteItemTypeNoGroup {
     title: `${colCount} Columns`,
     icon: <ViewColumnIcon sx={{ fontSize: iconSize }} />,
     description: `${colCount} Column Layout`,
-    showInFloatingMenu: true,
     editorExecuteCommand: ({ palettePluginKey }) => {
       return (state, dispatch, view) => {
         if (view) {

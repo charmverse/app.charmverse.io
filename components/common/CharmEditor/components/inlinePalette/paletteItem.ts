@@ -95,6 +95,7 @@ export class PaletteItem implements PaletteItemType {
       editorExecuteCommand,
       group,
       skipFiltering,
+      showInFloatingMenu,
       icon,
       ...otherKeys
     } = obj;
@@ -121,5 +122,6 @@ export class PaletteItem implements PaletteItemType {
     this.skipFiltering = skipFiltering ?? false;
     this._isItemDisabled = false;
     this.icon = icon;
+    this.showInFloatingMenu = showInFloatingMenu;
   }
 }
