@@ -10,6 +10,7 @@ type Props = {
   value: string;
   readOnly?: boolean;
   placeholder?: string;
+  multiline?: boolean;
   onChange: (value: string) => void;
   onSave: () => void;
   onCancel: () => void;
@@ -40,7 +41,7 @@ function URLProperty(props: Props): JSX.Element {
           placeholderText={props.placeholder}
           value={props.value}
           autoExpand={false}
-          multiline={true}
+          multiline={props.multiline}
           readOnly={props.readOnly}
           onChange={props.onChange}
           onSave={props.onSave}

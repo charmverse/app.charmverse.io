@@ -8,7 +8,6 @@ import type { Card } from 'lib/focalboard/card';
 
 import mutator from '../mutator';
 import { OctoUtils } from '../octoUtils';
-import Editable from '../widgets/editable';
 import Switch from '../widgets/switch';
 import { TextInput } from '../widgets/TextInput';
 
@@ -138,6 +137,7 @@ function PropertyValueElement(props: Props): JSX.Element {
         onSave={() => {
           mutator.changePropertyValue(card, propertyTemplate.id, value);
         }}
+        multiline={displayType === 'details'}
         onCancel={() => setValue(propertyValue || '')}
         validator={(newValue) => validateProp(propertyTemplate.type, newValue)}
       />
@@ -172,7 +172,7 @@ function PropertyValueElement(props: Props): JSX.Element {
           value={value.toString()}
           autoExpand={false}
           onChange={setValue}
-          multiline={true}
+          multiline={displayType === 'details'}
           onSave={() => {
             mutator.changePropertyValue(card, propertyTemplate.id, value);
           }}
