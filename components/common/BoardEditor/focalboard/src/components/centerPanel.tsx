@@ -106,8 +106,10 @@ function CenterPanel(props: Props) {
   useEffect(() => {
     if (views.length === 0 && !activeView) {
       setState((s) => ({ ...s, showSettings: 'create-linked-view' }));
+    } else if (activeView) {
+      setState((s) => ({ ...s, showSettings: null }));
     }
-  }, [!!activeView, views.length]);
+  }, [activeView?.id, views.length]);
 
   const isEmbedded = !!props.embeddedBoardPath;
   const boardPage = pages[board.id];

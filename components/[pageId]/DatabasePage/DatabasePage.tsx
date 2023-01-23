@@ -142,6 +142,8 @@ export function DatabasePage({ page, setPage, readOnly = false, pagePermissions 
             viewId: viewId || ''
           }
         });
+        // call setCurrentViewId in case user clicked "add view", because we didnt update the URL so it wouldnt affect the activeView
+        setCurrentViewId(viewId);
       }
     },
     [router.query]
