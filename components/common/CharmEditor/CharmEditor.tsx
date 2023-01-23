@@ -297,7 +297,7 @@ const StyledReactBangleEditor = styled(ReactBangleEditor)<{
     margin-right: -50px;
   }
 
-  code {s
+  code {
     border-radius: 2px !important;
     background-color: ${({ theme }) => theme.palette.code.background};
     color: ${({ theme }) => theme.palette.code.color};
