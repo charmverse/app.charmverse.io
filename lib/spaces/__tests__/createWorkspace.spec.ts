@@ -14,11 +14,6 @@ describe('createWorkspace', () => {
       spaceData: {
         name: `Name-${v4()}`,
         domain: `domain-${v4()}`,
-        author: {
-          connect: {
-            id: user.id
-          }
-        },
         updatedBy: user.id
       }
     });
