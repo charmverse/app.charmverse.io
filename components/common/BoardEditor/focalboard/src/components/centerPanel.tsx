@@ -93,7 +93,7 @@ function CenterPanel(props: Props) {
     cardIdToFocusOnRender: '',
     selectedCardIds: [],
     // assume this is a page type 'inline_linked_board' or 'linked_board' if no view exists
-    showSettings: !props.activeView ? 'create-linked-view' : null
+    showSettings: null
   });
 
   const [loadingFormResponses, setLoadingFormResponses] = useState(false);
@@ -122,7 +122,6 @@ function CenterPanel(props: Props) {
   }
 
   const activeBoard = useAppSelector(getBoard(activeBoardId ?? ''));
-  const loadingState = useAppSelector(getLoadingState());
   const activePage = pages[activeBoardId ?? ''];
   const _groupByProperty = activeBoard?.fields.cardProperties.find((o) => o.id === activeView?.fields.groupById);
   const _dateDisplayProperty = activeBoard?.fields.cardProperties.find(
