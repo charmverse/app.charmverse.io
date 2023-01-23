@@ -431,7 +431,7 @@ function CenterPanel(props: Props) {
     }
   }, [`${activeView?.fields.sourceData?.formId}${activeView?.fields.sourceData?.boardId}`]);
 
-  const isLoadingSourceData = !loadingState.loaded || (!activeBoard && state.showSettings !== 'create-linked-view');
+  const isLoadingSourceData = !activeBoard && state.showSettings !== 'create-linked-view';
 
   return (
     <div
