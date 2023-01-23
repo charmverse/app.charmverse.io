@@ -25,7 +25,7 @@ test.describe.serial('Add a new space from sidebar and load it', async () => {
     // Part A - Prepare the page as a logged in user
     // 1. Click on the space menu button to open the dropdown
     const spaceMenuBtn = page.locator('data-test=sidebar-space-menu');
-    spaceMenuBtn.click();
+    await spaceMenuBtn.click();
 
     // 2. Make sure there is a button to add a new space
     const addNewSpaceBtn = page.locator('data-test=spaces-menu-add-new-space');
@@ -53,7 +53,6 @@ test.describe.serial('Add a new space from sidebar and load it', async () => {
     await expect(closePropertiesModalBtn).toBeVisible();
     await closePropertiesModalBtn.click();
 
-    await expect(addNewSpaceBtn).toBeVisible();
     await page.locator('text=[Your DAO] Home').first().waitFor();
 
     // check sidebar space name
@@ -61,6 +60,7 @@ test.describe.serial('Add a new space from sidebar and load it', async () => {
     expect(sidebarSpaceName).toBe(uniqueDomainName);
 
     // Create and verify 2nd space
+    await spaceMenuBtn.click();
     await addNewSpaceBtn.click();
     const uniqueDomainName2 = Math.random().toString().replace('.', '');
     await domainInput.fill(uniqueDomainName2);
