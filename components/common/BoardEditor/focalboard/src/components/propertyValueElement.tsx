@@ -166,7 +166,7 @@ function PropertyValueElement(props: Props): JSX.Element {
   if (editableFields.includes(propertyTemplate.type)) {
     return (
       <TextInput
-        className={readOnly ? 'octo-propertyvalue octo-propertyvalue--readonly' : 'octo-propertyvalue'}
+        className='octo-propertyvalue'
         placeholderText={emptyDisplayValue}
         readOnly={readOnly}
         value={value.toString()}
