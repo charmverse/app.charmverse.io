@@ -4,17 +4,18 @@ import NavigateNextIcon from '@mui/icons-material/ArrowRightAlt';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import MenuOpenIcon from '@mui/icons-material/MenuOpen';
 import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
 import Divider from '@mui/material/Divider';
 import IconButton from '@mui/material/IconButton';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
+import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import { bindTrigger, bindMenu } from 'material-ui-popup-state';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import NextLink from 'next/link';
 import { useState } from 'react';
 
-import Button from 'components/common/Button';
 import CreateWorkspaceForm from 'components/common/CreateSpaceForm';
 import { Modal } from 'components/common/Modal';
 import UserDisplay from 'components/common/UserDisplay';
@@ -31,15 +32,22 @@ const SidebarHeader = styled(Box)(
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: ${theme.spacing(1.5)};
   min-height: ${headerHeight}px;
-  & .MuiIconButton-root {
-    border-radius: 4px;
-    transition: ${theme.transitions.create('opacity', {
+  .MuiIconButton-root, .MuiButton-root {
+    transition: ${theme.transitions.create('all', {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.enteringScreen
-    })};
+    })}
   }
+  & .MuiIconButton-root {
+    border-radius: 4px;
+  }
+  &:hover {
+    & .MuiButton-root {
+      padding-right: ${theme.spacing(5)}
+    }
+  }
+ 
 `
 );
 
@@ -66,63 +74,72 @@ export default function SidebarSubmenu({
   const menuPopupState = usePopupState({ variant: 'popover', popupId: 'profile-dropdown' });
 
   return (
-    <SidebarHeader className='sidebar-header'>
+    <SidebarHeader className='sidebar-header' position='relative'>
       <Button
         data-test='sidebar-space-menu'
         endIcon={<KeyboardArrowDownIcon fontSize='small' />}
         variant='text'
         color='inherit'
+        sx={(theme) => ({
+          px: theme.spacing(2),
+          py: 0.2,
+          '&:hover': { backgroundColor: theme.palette.action.hover, color: 'inherit' }
+        })}
         {...bindTrigger(menuPopupState)}
       >
         <WorkspaceAvatar name={currentSpace?.name ?? ''} image={currentSpace?.spaceImage ?? null} />
-        <Typography variant='body1' data-test='sidebar-space-name' fontWeight={600} noWrap ml={1}>
+        <Typography variant='body1' data-test='sidebar-space-name' noWrap ml={1}>
           {currentSpace?.name}
         </Typography>
       </Button>
-      <Menu {...bindMenu(menuPopupState)} onClick={menuPopupState.close}>
+      <Menu
+        onClick={menuPopupState.close}
+        PaperProps={{ sx: (theme) => ({ background: theme.palette.sidebar.background }) }}
+        {...bindMenu(menuPopupState)}
+      >
         <MenuItem component={NextLink} href='/profile'>
           <Box display='flex' flexDirection='row'>
             <Box>
               <UserDisplay user={user} hideName />
             </Box>
             <Box ml={1}>
-              <Typography variant='body2' fontWeight={600}>
-                {user?.username}
-              </Typography>
-              <Typography variant='body2' fontWeight={600}>
+              <Typography variant='body2'>{user?.username}</Typography>
+              <Typography variant='body2' color='secondary'>
                 My Profile
               </Typography>
             </Box>
           </Box>
         </MenuItem>
         <Divider />
-        <Typography component='p' variant='caption' mx={2} mb={0.5} fontWeight={600}>
+        <Typography component='p' variant='caption' mx={2} mb={0.5}>
           My Spaces
         </Typography>
         {spaces.map((_space) => (
-          <MenuItem key={_space.domain} component={NextLink} href={`/${_space.domain}`} sx={{ maxWidth: '276px' }}>
-            <WorkspaceAvatar
-              active={currentSpace?.domain === _space.domain}
-              name={_space.name}
-              image={_space.spaceImage}
-            />
-            <Typography noWrap ml={1} fontWeight={600}>
-              <strong>{_space.name}</strong>
+          <MenuItem
+            key={_space.domain}
+            component={NextLink}
+            href={`/${_space.domain}`}
+            sx={{ maxWidth: '276px' }}
+            selected={currentSpace?.domain === _space.domain}
+          >
+            <WorkspaceAvatar name={_space.name} image={_space.spaceImage} />
+            <Typography noWrap ml={1}>
+              {_space.name}
             </Typography>
           </MenuItem>
         ))}
-        <MenuItem onClick={showSpaceForm} data-test='spaces-menu-add-new-space' sx={{ fontWeight: 600 }}>
+        <MenuItem onClick={showSpaceForm} data-test='spaces-menu-add-new-space'>
           <AddIcon sx={{ m: '5px 15px 5px 8px' }} />
           Create or join a space
         </MenuItem>
         <Divider />
-        <MenuItem onClick={logoutCurrentUser} sx={{ fontWeight: 600 }}>
-          Sign out
-        </MenuItem>
+        <MenuItem onClick={logoutCurrentUser}>Sign out</MenuItem>
       </Menu>
-      <IconButton onClick={closeSidebar} size='small'>
-        <MenuOpenIcon />
-      </IconButton>
+      <Tooltip title='Close sidebar' placement='bottom'>
+        <IconButton onClick={closeSidebar} size='small' sx={{ position: 'absolute', right: 0, top: 12 }}>
+          <MenuOpenIcon />
+        </IconButton>
+      </Tooltip>
       <Modal open={spaceFormOpen} onClose={closeSpaceForm}>
         <CreateWorkspaceForm onSubmit={createNewSpace} onCancel={closeSpaceForm} isSubmitting={isCreatingSpace} />
         <Typography variant='body2' align='center' sx={{ pt: 2 }}>
