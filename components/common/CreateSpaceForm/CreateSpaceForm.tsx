@@ -7,6 +7,7 @@ import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
 import type { Space } from '@prisma/client';
 import { useRouter } from 'next/router';
 import type { ChangeEvent } from 'react';
@@ -29,6 +30,7 @@ import { domainSchema } from 'lib/spaces/validateDomainName';
 import randomName from 'lib/utilities/randomName';
 
 import { ImportZippedMarkdown } from '../CharmEditor/components/markdownParser/ImportZippedMarkdown';
+import { JoinDynamicSpaceForm } from '../TokenGateForm/JoinDynamicSpaceForm';
 
 import { SelectNewSpaceTemplate } from './SpaceTemplateOptions';
 
@@ -51,7 +53,10 @@ interface Props {
   defaultValues?: { name: string; domain: string };
   onCancel?: () => void;
   submitText?: string;
+  setModalWidth?: (width: 'number') => void;
 }
+
+type SpaceFormStep = 'select_template' | 'create_space' | 'join_space';
 
 export function CreateSpaceForm({ defaultValues, onCancel, submitText }: Props) {
   const { createNewSpace, isCreatingSpace } = useSpaces();
@@ -59,7 +64,7 @@ export function CreateSpaceForm({ defaultValues, onCancel, submitText }: Props) 
 
   const [newSpace, setNewSpace] = useState<Space | null>(null);
 
-  const [step, setStep] = useState<1 | 2>(1);
+  const [step, setStep] = useState<SpaceFormStep>('select_template');
 
   const router = useRouter();
 
@@ -140,23 +145,42 @@ export function CreateSpaceForm({ defaultValues, onCancel, submitText }: Props) 
 
   function handleNewSpaceTemplate(value: SpaceCreateTemplate) {
     setValue('spaceTemplateOption', value);
-    setStep(2);
+    setStep('create_space');
   }
 
+  if (step === 'join_space') {
+    return <JoinDynamicSpaceForm goBack={() => setStep('select_template')} />;
+  }
   return (
     <div>
-      <DialogTitle onClose={onCancel}>
+      <DialogTitle onClose={onCancel} sx={{ textAlign: 'center' }}>
         <Box display='flex' alignItems='center' gap={2}>
-          Create a space {step === 2 && <ArrowCircleLeftIcon onClick={() => setStep(1)} />}
+          Create a space{' '}
+          {step !== 'select_template' && <ArrowCircleLeftIcon onClick={() => setStep('select_template')} />}
         </Box>
       </DialogTitle>
-      <Divider sx={{ mb: 2 }} />
-      {step === 1 ? (
-        <SelectNewSpaceTemplate
-          selectedTemplate={watchSpaceTemplate as SpaceCreateTemplate}
-          onSelect={handleNewSpaceTemplate}
-        />
-      ) : (
+      <Typography textAlign='center' variant='body2'>
+        A space is where your organization collaborates
+      </Typography>
+      <Divider sx={{ my: 2 }} />
+
+      {step === 'select_template' && (
+        <>
+          <SelectNewSpaceTemplate
+            selectedTemplate={watchSpaceTemplate as SpaceCreateTemplate}
+            onSelect={handleNewSpaceTemplate}
+          />
+          <Divider sx={{ my: 2 }} />
+          <Typography sx={{ mb: 2 }} textAlign='center' fontWeight='bold'>
+            Join an existing space
+          </Typography>
+          <PrimaryButton fullWidth onClick={() => setStep('join_space')}>
+            Search for space
+          </PrimaryButton>
+        </>
+      )}
+
+      {step === 'create_space' && (
         <form data-test='create-space-form' onSubmit={handleSubmit(onSubmit)}>
           <Grid container direction='column' spacing={2}>
             <Grid item display='flex' justifyContent='center'>

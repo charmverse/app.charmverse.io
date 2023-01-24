@@ -56,15 +56,10 @@ export function SelectNewSpaceTemplate({ onSelect, selectedTemplate }: SelectNew
   return (
     <Grid container spacing={2} flexDirection='column'>
       <Grid item>
-        <Typography textAlign='center' variant='body2'>
-          A space is where your organization collaborates
-        </Typography>
-      </Grid>
-      <Grid item>
         <TemplateOption onSelect={onSelect} option='default' currentSelection={selectedTemplate} />
       </Grid>
       <Grid item>
-        <Typography textAlign='center' variant='body2'>
+        <Typography textAlign='center' fontWeight='bold'>
           Start from a template
         </Typography>
       </Grid>

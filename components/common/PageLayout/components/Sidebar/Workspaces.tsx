@@ -83,13 +83,8 @@ export default function Workspaces() {
           </Tooltip>
         </Grid>
       </Grid>
-      <Modal open={spaceFormOpen} onClose={closeSpaceForm}>
+      <Modal size='medium' open={spaceFormOpen} onClose={closeSpaceForm}>
         <CreateSpaceForm onCancel={closeSpaceForm} />
-        <Typography variant='body2' align='center' sx={{ pt: 2 }}>
-          <Button variant='text' href='/join' endIcon={<NavigateNextIcon />}>
-            Join an existing space
-          </Button>
-        </Typography>
       </Modal>
     </WorkspacesContainer>
   );
