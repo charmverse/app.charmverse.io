@@ -152,7 +152,7 @@ function DocumentPage({ page, setPage, insideModal, readOnly = false, parentProp
     pageTop = 200;
   }
 
-  const comments = useAppSelector(getCardComments(page.cardId ?? ''));
+  const comments = useAppSelector(getCardComments(page.cardId ?? page.id));
 
   const showPageActionSidebar = currentPageActionDisplay !== null && !insideModal;
   const router = useRouter();
@@ -161,7 +161,6 @@ function DocumentPage({ page, setPage, insideModal, readOnly = false, parentProp
   function onParticipantUpdate(participants: FrontendParticipant[]) {
     setPageProps({ participants });
   }
-
   return (
     <ScrollableWindow
       sx={{

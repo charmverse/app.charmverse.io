@@ -38,9 +38,13 @@
 
   .octo-propertyrow {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     margin: 6px 0;
     min-height: 32px;
+
+    .MenuWrapper {
+      margin: 2px 0;
+    }
 
     .Switch {
       margin-left: 8px;
@@ -125,6 +129,14 @@
       text-overflow: ellipsis;
       overflow: hidden;
       white-space: nowrap;
+    }
+
+    &.octo-propertyname--readonly {
+      font-size: 12px;
+      padding: 4px 8px;
+      height: 32px;
+      display: flex;
+      align-items: center;
     }
 
     &.octo-propertyname--readonly .Button:hover {
