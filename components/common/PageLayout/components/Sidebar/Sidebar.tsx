@@ -29,7 +29,6 @@ import useKeydownPress from 'hooks/useKeydownPress';
 import { useUser } from 'hooks/useUser';
 import type { NewPageInput } from 'lib/pages';
 import { addPageAndRedirect } from 'lib/pages';
-import { isSmallScreen } from 'lib/utilities/browser';
 import type { LoggedInUser } from 'models';
 
 import { headerHeight } from '../Header/Header';
@@ -193,9 +192,10 @@ function SidebarBox({ icon, label, ...props }: { icon: any; label: string } & Bo
 interface SidebarProps {
   closeSidebar: () => void;
   favorites: LoggedInUser['favorites'];
+  navAction?: () => void;
 }
 
-export default function Sidebar({ closeSidebar, favorites }: SidebarProps) {
+export default function Sidebar({ closeSidebar, favorites, navAction }: SidebarProps) {
   const router = useRouter();
   const { user } = useUser();
   const space = useCurrentSpace();
@@ -207,8 +207,6 @@ export default function Sidebar({ closeSidebar, favorites }: SidebarProps) {
   const openSearchLabel = useKeydownPress(searchInWorkspaceModalState.toggle, { key: 'p', ctrl: true });
 
   const favoritePageIds = favorites.map((f) => f.pageId);
-
-  const isMobile = isSmallScreen();
 
   function onScroll(e: React.UIEvent<HTMLDivElement>) {
     setIsScrolled(e.currentTarget?.scrollTop > 0);
@@ -228,13 +226,6 @@ export default function Sidebar({ closeSidebar, favorites }: SidebarProps) {
     },
     [user?.id, space?.id]
   );
-
-  function closeSidebarIfIsMobile() {
-    if (isMobile) {
-      closeSidebar();
-    }
-  }
-
   return (
     <SidebarContainer>
       <Workspaces />
@@ -255,28 +246,28 @@ export default function Sidebar({ closeSidebar, favorites }: SidebarProps) {
               active={router.pathname.startsWith('/[domain]/members')}
               icon={<AccountCircleIcon fontSize='small' />}
               label='Member Directory'
-              onClick={closeSidebarIfIsMobile}
+              onClick={navAction}
             />
             <SidebarLink
               href={`/${space.domain}/proposals`}
               active={router.pathname.startsWith('/[domain]/proposals')}
               icon={<TaskOutlinedIcon fontSize='small' />}
               label='Proposals'
-              onClick={closeSidebarIfIsMobile}
+              onClick={navAction}
             />
             <SidebarLink
               href={`/${space.domain}/bounties`}
               active={router.pathname.startsWith('/[domain]/bounties')}
               icon={<BountyIcon fontSize='small' />}
               label='Bounties'
-              onClick={closeSidebarIfIsMobile}
+              onClick={navAction}
             />
             <SidebarLink
               href={`/${space.domain}/forum`}
               active={router.pathname.startsWith('/[domain]/forum')}
               icon={<MessageOutlinedIcon fontSize='small' />}
               label='Forum'
-              onClick={closeSidebarIfIsMobile}
+              onClick={navAction}
             />
             <Divider sx={{ mx: 2, my: 1 }} />
             <Tooltip
@@ -301,7 +292,7 @@ export default function Sidebar({ closeSidebar, favorites }: SidebarProps) {
               href={`/${space.domain}/settings/invites`}
               icon={<GroupAddOutlinedIcon color='secondary' fontSize='small' />}
               label='Invite Members'
-              onClick={closeSidebarIfIsMobile}
+              onClick={navAction}
             />
             <SearchInWorkspaceModal
               isOpen={searchInWorkspaceModalState.isOpen}
@@ -312,7 +303,7 @@ export default function Sidebar({ closeSidebar, favorites }: SidebarProps) {
               href={`/${space.domain}/settings/workspace`}
               icon={<SettingsIcon color='secondary' fontSize='small' />}
               label='Settings'
-              onClick={closeSidebarIfIsMobile}
+              onClick={navAction}
             />
             <SidebarLink
               active={false}
@@ -320,7 +311,7 @@ export default function Sidebar({ closeSidebar, favorites }: SidebarProps) {
               icon={<QuestionMarkIcon color='secondary' fontSize='small' />}
               label='Support & Feedback'
               target='_blank'
-              onClick={closeSidebarIfIsMobile}
+              onClick={navAction}
             />
           </Box>
           <ScrollingContainer isScrolled={isScrolled} onScroll={onScroll} className='page-navigation'>
@@ -340,7 +331,7 @@ export default function Sidebar({ closeSidebar, favorites }: SidebarProps) {
               )}
             </WorkspaceLabel>
             <Box mb={6}>
-              <PageNavigation onClick={closeSidebarIfIsMobile} />
+              <PageNavigation onClick={navAction} />
             </Box>
             <Box mb={2}>
               <SidebarBox

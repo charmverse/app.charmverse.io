@@ -5,6 +5,7 @@ import MuiAppBar from '@mui/material/AppBar';
 import MuiDrawer from '@mui/material/Drawer';
 import Head from 'next/head';
 import * as React from 'react';
+import { useMemo, useState } from 'react';
 
 import LoadingComponent from 'components/common/LoadingComponent';
 import { PageDialogProvider } from 'components/common/PageDialog/hooks/usePageDialog';
@@ -17,12 +18,15 @@ import { useSharedPage } from 'hooks/useSharedPage';
 import { ThreadsProvider } from 'hooks/useThreads';
 import { useUser } from 'hooks/useUser';
 import { VotesProvider } from 'hooks/useVotes';
-import { isSmallScreen } from 'lib/utilities/browser';
+import { useWindowSize } from 'hooks/useWindowSize';
 
 import CurrentPageFavicon from './components/CurrentPageFavicon';
 import Header, { headerHeight } from './components/Header';
 import PageContainer from './components/PageContainer';
 import Sidebar from './components/Sidebar';
+
+const SMALL_LAYOUT_BREAKPOINT = 1000;
+const MOBILE_SIDEBAR_MAX_WIDTH = 500;
 
 const openedMixin = (theme: Theme, sidebarWidth: number) => ({
   maxWidth: '100%',
@@ -107,18 +111,50 @@ interface PageLayoutProps {
 }
 
 function PageLayout({ sidebarWidth = 300, children, sidebar: SidebarOverride }: PageLayoutProps) {
-  const smallScreen = React.useMemo(() => isSmallScreen(), []);
-  const [open, setOpen] = useLocalStorage('leftSidebar', !smallScreen);
+  const { width } = useWindowSize();
+  const smallScreen = width ? width < SMALL_LAYOUT_BREAKPOINT : false;
+
+  let mobileSidebarWidth = width ? Math.min(width * 0.8, MOBILE_SIDEBAR_MAX_WIDTH) : sidebarWidth;
+  if (SidebarOverride) {
+    mobileSidebarWidth = sidebarWidth;
+  }
+
+  const [storageOpen, setStorageOpen] = useLocalStorage('leftSidebar', !smallScreen);
+  const [mobileOpen, setMobileOpen] = useState(false);
+
   const { user } = useUser();
   const { hasSharedPageAccess, accessChecked, publicPage } = useSharedPage();
+  const open = smallScreen ? mobileOpen : storageOpen;
 
   const handleDrawerOpen = React.useCallback(() => {
-    setOpen(true);
-  }, []);
+    if (smallScreen) {
+      setMobileOpen(true);
+    } else {
+      setStorageOpen(true);
+    }
+  }, [smallScreen]);
 
   const handleDrawerClose = React.useCallback(() => {
-    setOpen(false);
-  }, []);
+    if (smallScreen) {
+      setMobileOpen(false);
+    } else {
+      setStorageOpen(false);
+    }
+  }, [smallScreen]);
+
+  const drawerContent = useMemo(
+    () =>
+      SidebarOverride ? (
+        <SidebarOverride closeSidebar={handleDrawerClose} />
+      ) : (
+        <Sidebar
+          closeSidebar={handleDrawerClose}
+          favorites={user?.favorites || []}
+          navAction={smallScreen ? handleDrawerClose : undefined}
+        />
+      ),
+    [handleDrawerClose, user?.favorites, smallScreen]
+  );
 
   if (!accessChecked) {
     return (
@@ -148,13 +184,17 @@ function PageLayout({ sidebarWidth = 300, children, sidebar: SidebarOverride }: 
                       <AppBar open={open} sidebarWidth={sidebarWidth} position='fixed'>
                         <Header open={open} openSidebar={handleDrawerOpen} />
                       </AppBar>
-                      <Drawer sidebarWidth={sidebarWidth} variant='permanent' open={open}>
-                        {SidebarOverride ? (
-                          <SidebarOverride closeSidebar={handleDrawerClose} />
-                        ) : (
-                          <Sidebar closeSidebar={handleDrawerClose} favorites={user?.favorites || []} />
-                        )}
-                      </Drawer>
+                      {smallScreen ? (
+                        <MuiDrawer open={open} variant='temporary' onClose={handleDrawerClose}>
+                          <Box width={mobileSidebarWidth} minHeight='100vh'>
+                            {drawerContent}
+                          </Box>
+                        </MuiDrawer>
+                      ) : (
+                        <Drawer sidebarWidth={sidebarWidth} open={open} variant='permanent'>
+                          {drawerContent}
+                        </Drawer>
+                      )}
                     </>
                   )}
                   <PageContainer>
