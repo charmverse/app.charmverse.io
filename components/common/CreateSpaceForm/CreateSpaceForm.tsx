@@ -11,7 +11,7 @@ import Typography from '@mui/material/Typography';
 import type { Space } from '@prisma/client';
 import { useRouter } from 'next/router';
 import type { ChangeEvent } from 'react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
@@ -37,11 +37,6 @@ import { SelectNewSpaceTemplate } from './SpaceTemplateOptions';
 const defaultTemplate: SpaceCreateTemplate = 'default';
 
 export const schema = yup.object({
-  id: yup.string(),
-  domain: domainSchema.test('domain-exists', 'Domain already exists', async function checkDomain(domain) {
-    const { ok } = await charmClient.checkDomain({ domain, spaceId: this.parent.id });
-    return !ok;
-  }),
   name: yup.string().ensure().trim().min(3, 'Name must be at least 3 characters').required('Name is required'),
   spaceImage: yup.string().nullable(true),
   spaceTemplateOption: yup.string().default(defaultTemplate)
@@ -84,16 +79,56 @@ export function CreateSpaceForm({ defaultValues, onCancel, submitText }: Props) 
   const watchSpaceImage = watch('spaceImage');
   const watchSpaceTemplate = watch('spaceTemplateOption');
 
-  function uploadMarkdownToNewSpace(file: File) {
+  // This use effect should only be relevant when a user uploads markdown, has an error, and then changes the space name or image. In other cases, the space is created and the user is redirected to the space.
+  useEffect(() => {
     if (newSpace) {
+      charmClient.updateSpace({
+        name: watchName,
+        spaceImage: watchSpaceImage
+      });
+    }
+  }, [watchName, watchSpaceImage]);
+
+  const editableFields = !newSpace || (newSpace && watchSpaceTemplate === 'importMarkdown');
+
+  function onClose() {
+    setNewSpace(null);
+    onCancel?.();
+  }
+
+  async function uploadMarkdownToNewSpace(file: File) {
+    setSaveError(null);
+    const spaceToUploadFiles =
+      newSpace ??
+      (await createNewSpace({
+        spaceData: {
+          name: watchName,
+          spaceImage: watchSpaceImage
+        },
+        createSpaceOption: watchSpaceTemplate as SpaceCreateTemplate
+      })
+        .then((_space) => {
+          setNewSpace(_space);
+          return _space;
+        })
+        .catch((err) => {
+          setSaveError(err);
+        }));
+
+    if (spaceToUploadFiles) {
       charmClient.file
         .uploadZippedMarkdown({
           file,
-          spaceId: newSpace.id
+          spaceId: spaceToUploadFiles.id
         })
         .then((pages) => {
-          showMessage(`Imported ${pages.length} pages to the ${newSpace.name} space`);
-          router.push(`/${newSpace.domain}`);
+          showMessage(`Imported ${pages.length} pages to the ${spaceToUploadFiles.name} space`);
+          setTimeout(() => {
+            router.push(`/${spaceToUploadFiles.domain}`);
+          }, 200);
+        })
+        .catch((err) => {
+          setSaveError(err);
         });
     }
   }
@@ -131,13 +166,6 @@ export function CreateSpaceForm({ defaultValues, onCancel, submitText }: Props) 
     }
   }
 
-  function onChangeName(event: ChangeEvent<HTMLInputElement>) {
-    const name = event.target.value;
-    if (!touchedFields.domain) {
-      setValue('domain', getSpaceDomainFromName(name));
-    }
-  }
-
   function randomizeName() {
     const name = randomName();
     setValue('name', name);
@@ -153,7 +181,7 @@ export function CreateSpaceForm({ defaultValues, onCancel, submitText }: Props) 
   }
   return (
     <div>
-      <DialogTitle onClose={onCancel} sx={{ textAlign: 'center' }}>
+      <DialogTitle onClose={onClose} sx={{ textAlign: 'center' }}>
         <Box display='flex' alignItems='center' gap={2}>
           Create a space{' '}
           {step !== 'select_template' && <ArrowCircleLeftIcon onClick={() => setStep('select_template')} />}
@@ -189,16 +217,15 @@ export function CreateSpaceForm({ defaultValues, onCancel, submitText }: Props) 
                 variant='rounded'
                 image={watchSpaceImage}
                 updateImage={(url) => setValue('spaceImage', url, { shouldDirty: true })}
-                editable={true}
+                editable={editableFields}
               />
             </Grid>
             <Grid item>
               <FieldLabel>Name</FieldLabel>
               <TextField
                 data-test='workspace-name-input'
-                {...register('name', {
-                  onChange: onChangeName
-                })}
+                {...register('name')}
+                disabled={!editableFields}
                 autoFocus
                 fullWidth
                 error={!!errors.name}
@@ -221,7 +248,7 @@ export function CreateSpaceForm({ defaultValues, onCancel, submitText }: Props) 
               />
             </Grid>
             <Grid item sx={{ display: 'flex', justifyContent: 'center' }}>
-              {(!newSpace || watchSpaceTemplate !== 'importMarkdown') && (
+              {watchSpaceTemplate !== 'importMarkdown' && (
                 <PrimaryButton
                   disabled={!watchName || !!newSpace}
                   type='submit'
@@ -231,9 +258,7 @@ export function CreateSpaceForm({ defaultValues, onCancel, submitText }: Props) 
                   {submitText || 'Create Space'}
                 </PrimaryButton>
               )}
-              {newSpace && watchSpaceTemplate === 'importMarkdown' && (
-                <ImportZippedMarkdown onFile={uploadMarkdownToNewSpace} />
-              )}
+              {watchSpaceTemplate === 'importMarkdown' && <ImportZippedMarkdown onFile={uploadMarkdownToNewSpace} />}
             </Grid>
             {saveError && (
               <Grid item>
