@@ -1,3 +1,4 @@
+import { history } from '@bangle.dev/base-components';
 import type { BangleEditorProps as CoreBangleEditorProps } from '@bangle.dev/core';
 import { BangleEditor as CoreBangleEditor } from '@bangle.dev/core';
 import { EditorState } from '@bangle.dev/pm';
@@ -23,6 +24,8 @@ import { FidusEditor } from '../../fiduswriter/fiduseditor';
 import { nodeViewUpdateStore, useNodeViews } from './node-view-helpers';
 import { NodeViewWrapper } from './NodeViewWrapper';
 import type { RenderNodeViewsFunction } from './NodeViewWrapper';
+
+const { undo } = history;
 
 const StyledLoadingComponent = styled(LoadingComponent)`
   position: absolute;
@@ -107,6 +110,24 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
     showMessage(error.message, 'warning');
     log.error('[ws/ceditor]: Error message displayed to user', { error });
   }
+
+  useEffect(() => {
+    function listener(event: Event) {
+      if (editor) {
+        const detail = (event as CustomEvent).detail as { pageId: string } | null;
+        if (detail && detail.pageId === pageId) {
+          undo()(editor.view.state, editor.view.dispatch);
+        }
+      }
+    }
+
+    if (editorRef && editorRef.current && editor) {
+      editorRef.current.addEventListener('undo', listener);
+      return () => {
+        editorRef.current?.removeEventListener('undo', listener);
+      };
+    }
+  }, [editorRef, editor]);
 
   useEffect(() => {
     const _editor = new CoreBangleEditor(renderRef.current!, editorViewPayloadRef.current);

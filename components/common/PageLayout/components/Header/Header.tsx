@@ -11,6 +11,7 @@ import RateReviewOutlinedIcon from '@mui/icons-material/RateReviewOutlined';
 import FavoritedIcon from '@mui/icons-material/Star';
 import NotFavoritedIcon from '@mui/icons-material/StarBorder';
 import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
+import UndoIcon from '@mui/icons-material/Undo';
 import SunIcon from '@mui/icons-material/WbSunny';
 import { Divider, FormControlLabel, Stack, Switch, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
@@ -23,7 +24,7 @@ import Toolbar from '@mui/material/Toolbar';
 import Tooltip from '@mui/material/Tooltip';
 import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
-import { useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 
 import charmClient from 'charmClient';
 import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
@@ -76,11 +77,9 @@ export default function Header({ open, openSidebar }: HeaderProps) {
   const basePageId = router.query.pageId as string;
   const basePage = Object.values(pages).find((page) => page?.id === basePageId || page?.path === basePageId);
   const { isFavorite, toggleFavorite } = useToggleFavorite({ pageId: basePage?.id });
-
   const { members } = useMembers();
   const { setCurrentPageActionDisplay } = usePageActionDisplay();
   const [userSpacePermissions] = useCurrentSpacePermissions();
-
   const pagePermissions = basePage ? getPagePermissions(basePage.id) : null;
 
   const pageType = basePage?.type;
@@ -88,6 +87,13 @@ export default function Header({ open, openSidebar }: HeaderProps) {
     pageType === 'card' || pageType === 'page' || pageType === 'proposal' || pageType === 'bounty';
 
   const isBountyBoard = router.route === '/[domain]/bounties';
+
+  const undoEvent = useMemo(() => {
+    if (basePage) {
+      return new CustomEvent('undo', { detail: { pageId: basePage.id } });
+    }
+    return null;
+  }, [basePage]);
 
   async function exportMarkdown() {
     if (!basePage) {
@@ -142,6 +148,15 @@ export default function Header({ open, openSidebar }: HeaderProps) {
       }
     }
   }
+
+  async function undoEditorChanges() {
+    const bangleEditorCoreElement = document.querySelector('.bangle-editor-core');
+    if (bangleEditorCoreElement) {
+      bangleEditorCoreElement.dispatchEvent(undoEvent as Event);
+    }
+    setPageMenuOpen(false);
+  }
+
   const canCreateProposal = !!userSpacePermissions?.createVote;
   const charmversePage = basePage ? members.find((member) => member.id === basePage.createdBy) : null;
 
@@ -248,6 +263,17 @@ export default function Header({ open, openSidebar }: HeaderProps) {
           </ListItemButton>
         </div>
       </Tooltip>
+      <div>
+        <ListItemButton onClick={undoEditorChanges}>
+          <UndoIcon
+            fontSize='small'
+            sx={{
+              mr: 1
+            }}
+          />
+          <ListItemText primary='Undo' />
+        </ListItemButton>
+      </div>
       <Divider />
       {basePage && (
         <PublishToSnapshot
