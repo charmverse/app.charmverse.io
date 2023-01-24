@@ -6,7 +6,7 @@ import { CreateSpaceForm } from 'components/common/CreateSpaceForm/CreateSpaceFo
 
 export default function CreateSpace() {
   return (
-    <Box sx={{ width: 400, maxWidth: '100%', mx: 'auto', px: 2 }}>
+    <Box sx={{ minWidth: 400, maxWidth: '100%', mx: 'auto', px: 2 }}>
       <Card sx={{ p: 4, mb: 3 }} variant='outlined'>
         <CreateSpaceForm submitText='Get Started' />
       </Card>
