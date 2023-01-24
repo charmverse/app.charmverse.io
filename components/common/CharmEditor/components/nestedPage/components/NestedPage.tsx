@@ -31,10 +31,11 @@ const NestedPageContainer = styled(Link)`
   }
 `;
 
-export default function NestedPage({ node }: NodeViewProps) {
+export default function NestedPage({ node, currentPageId }: NodeViewProps & { currentPageId?: string }) {
   const space = useCurrentSpace();
   const { pages } = usePages();
   const nestedPage = pages[node.attrs.id];
+  const parentPage = nestedPage?.parentId ? pages[nestedPage.parentId] : null;
 
   const appPath = `${space?.domain}/${nestedPage?.path}`;
 
@@ -51,7 +52,12 @@ export default function NestedPage({ node }: NodeViewProps) {
     >
       <div>
         {nestedPage && (
-          <PageIcon isEditorEmpty={!nestedPage.hasContent} icon={nestedPage.icon} pageType={nestedPage.type} />
+          <PageIcon
+            isLinkedPage={currentPageId ? parentPage?.id !== currentPageId : false}
+            isEditorEmpty={!nestedPage.hasContent}
+            icon={nestedPage.icon}
+            pageType={nestedPage.type}
+          />
         )}
       </div>
       <Typography fontWeight={600}>{nestedPage ? nestedPage.title || 'Untitled' : 'Page not found'}</Typography>

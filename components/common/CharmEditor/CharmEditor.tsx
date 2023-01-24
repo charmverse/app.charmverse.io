@@ -611,7 +611,7 @@ function CharmEditor({
             return <Mention {...props}>{_children}</Mention>;
           }
           case 'page': {
-            return <NestedPage {...props} />;
+            return <NestedPage currentPageId={pageId} {...props} />;
           }
           case 'pdf': {
             return <ResizablePDF {...allProps} />;
