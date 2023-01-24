@@ -124,11 +124,21 @@ const StyledSidebarLink = styled(Link, { shouldForwardProp: (prop) => prop !== '
     color: ${theme.palette.text.primary};
   `
       : ''}
+      ${({ theme }) => `
+      ${theme.breakpoints.down('md')} {
+        min-height: 34px;
+      }
+    `}
 `;
 
 const StyledSidebarBox = styled(Box)`
   cursor: pointer;
   ${sidebarItemStyles}
+  ${({ theme }) => `
+    ${theme.breakpoints.down('md')} {
+      min-height: 34px;
+    }
+  `}
 `;
 
 const SidebarHeader = styled.div(

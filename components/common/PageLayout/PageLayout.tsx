@@ -1,6 +1,7 @@
+import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import type { Theme } from '@mui/material';
-import { Box } from '@mui/material';
+import { useMediaQuery, Box } from '@mui/material';
 import MuiAppBar from '@mui/material/AppBar';
 import MuiDrawer from '@mui/material/Drawer';
 import Head from 'next/head';
@@ -25,7 +26,6 @@ import Header, { headerHeight } from './components/Header';
 import PageContainer from './components/PageContainer';
 import Sidebar from './components/Sidebar';
 
-const SMALL_LAYOUT_BREAKPOINT = 1000;
 const MOBILE_SIDEBAR_MAX_WIDTH = 500;
 
 const openedMixin = (theme: Theme, sidebarWidth: number) => ({
@@ -112,7 +112,8 @@ interface PageLayoutProps {
 
 function PageLayout({ sidebarWidth = 300, children, sidebar: SidebarOverride }: PageLayoutProps) {
   const { width } = useWindowSize();
-  const smallScreen = width ? width < SMALL_LAYOUT_BREAKPOINT : false;
+  const theme = useTheme();
+  const smallScreen = useMediaQuery(theme.breakpoints.down('md'));
 
   let mobileSidebarWidth = width ? Math.min(width * 0.8, MOBILE_SIDEBAR_MAX_WIDTH) : sidebarWidth;
   if (SidebarOverride) {
@@ -185,7 +186,14 @@ function PageLayout({ sidebarWidth = 300, children, sidebar: SidebarOverride }: 
                         <Header open={open} openSidebar={handleDrawerOpen} />
                       </AppBar>
                       {smallScreen ? (
-                        <MuiDrawer open={open} variant='temporary' onClose={handleDrawerClose}>
+                        <MuiDrawer
+                          open={open}
+                          variant='temporary'
+                          onClose={handleDrawerClose}
+                          ModalProps={{
+                            keepMounted: true
+                          }}
+                        >
                           <Box width={mobileSidebarWidth} minHeight='100vh'>
                             {drawerContent}
                           </Box>
