@@ -92,7 +92,7 @@
     "@fullcalendar/interaction": "^6.0.2",
     "@fullcalendar/react": "^6.0.2",
     "@gnosis.pm/safe-core-sdk": "^2.0.0",
-    "@gnosis.pm/safe-core-sdk-types": "^1.0.0",
+    "@gnosis.pm/safe-core-sdk-types": "^1.7.0",
     "@gnosis.pm/safe-ethers-lib": "^1.0.0",
     "@gnosis.pm/safe-service-client": "^1.1.1",
     "@googleapis/drive": "^4.0.1",
@@ -291,7 +291,7 @@
     "prosemirror-test-builder": "^1.1.0",
     "react-redux": "^8.0.5",
     "sass": "^1.49.0",
-    "supertest": "^6.2.2",
+    "supertest": "^6.3.3",
     "ts-jest": "^28.0.5",
     "webpack": "^5.73.0"
   },
