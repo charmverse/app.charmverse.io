@@ -11,7 +11,6 @@ import { useState } from 'react';
 import reactDOM from 'react-dom';
 
 import Button from 'components/common/Button';
-import { useSnackbar } from 'hooks/useSnackbar';
 import type { IPagePermissionFlags } from 'lib/permissions/pages';
 
 import { InlineCommentSubMenu } from '../inlineComment/inlineComment.components';
@@ -109,7 +108,8 @@ function MenuByType(props: MenuProps) {
               nestedPagePluginKey={nestedPagePluginKey}
               disableNestedPage={disableNestedPage}
               externalPopupState={popupState}
-              size='small'
+              filterItem={(item) => !!item.showInFloatingMenu}
+              isFloatingMenuList={true}
               handleActiveItem={handleActiveItem}
             />
           </MenuGroup>
