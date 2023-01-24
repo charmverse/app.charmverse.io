@@ -20,10 +20,14 @@ export function SocialIcons({
   },
   showDiscord = true,
   showTwitter = true,
+  showGithub = true,
+  showLinkedIn = true,
   ...props
 }: {
   showDiscord?: boolean;
   showTwitter?: boolean;
+  showGithub?: boolean;
+  showLinkedIn?: boolean;
   children?: ReactNode;
   social?: {
     twitterURL?: string;
@@ -36,6 +40,14 @@ export function SocialIcons({
 
   return (
     <Stack direction='row' alignItems='center' gap={2} {...props}>
+      {showDiscord &&
+        (social?.discordUsername && showDiscord ? (
+          <DiscordSocialIcon username={social.discordUsername} />
+        ) : (
+          <SvgIcon color='disabled' sx={{ height: '22px' }}>
+            <DiscordIcon />
+          </SvgIcon>
+        ))}
       {showTwitter &&
         (social.twitterURL ? (
           <Link href={social.twitterURL} target='_blank' display='flex'>
@@ -44,28 +56,22 @@ export function SocialIcons({
         ) : (
           <TwitterIcon color='disabled' style={{ height: '22px' }} />
         ))}
-      {social.githubURL ? (
-        <Link href={social.githubURL} target='_blank' display='flex'>
-          <GitHubIcon style={{ color: '#888', height: '22px' }} />
-        </Link>
-      ) : (
-        <GitHubIcon color='disabled' style={{ height: '22px' }} />
-      )}
-      {showDiscord &&
-        (social?.discordUsername && showDiscord ? (
-          <DiscordSocialIcon username={social.discordUsername} />
+      {showLinkedIn &&
+        (social?.linkedinURL ? (
+          <Link href={social.linkedinURL} target='_blank' display='flex'>
+            <LinkedInIcon style={{ color: '#0072B1', height: '22px' }} />
+          </Link>
         ) : (
-          <SvgIcon viewBox='0 -10 70 70' sx={{ color: theme.palette.text.disabled, height: '22px' }}>
-            <DiscordIcon />
-          </SvgIcon>
+          <LinkedInIcon color='disabled' style={{ height: '22px' }} />
         ))}
-      {social?.linkedinURL ? (
-        <Link href={social.linkedinURL} target='_blank' display='flex'>
-          <LinkedInIcon style={{ color: '#0072B1', height: '22px' }} />
-        </Link>
-      ) : (
-        <LinkedInIcon color='disabled' style={{ height: '22px' }} />
-      )}
+      {showGithub &&
+        (social.githubURL ? (
+          <Link href={social.githubURL} target='_blank' display='flex'>
+            <GitHubIcon style={{ color: '#888', height: '22px' }} />
+          </Link>
+        ) : (
+          <GitHubIcon color='disabled' style={{ height: '22px' }} />
+        ))}
       {children}
     </Stack>
   );
