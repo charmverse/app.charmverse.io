@@ -2,7 +2,6 @@ import type { Theme } from '@emotion/react';
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import GroupAddOutlinedIcon from '@mui/icons-material/GroupAddOutlined';
 import MessageOutlinedIcon from '@mui/icons-material/MessageOutlined';
@@ -11,9 +10,9 @@ import BountyIcon from '@mui/icons-material/RequestPageOutlined';
 import SearchIcon from '@mui/icons-material/Search';
 import SettingsIcon from '@mui/icons-material/Settings';
 import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
-import { Divider, Tooltip } from '@mui/material';
 import Box from '@mui/material/Box';
-import IconButton from '@mui/material/IconButton';
+import Divider from '@mui/material/Divider';
+import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import type { BoxProps } from '@mui/system';
 import type { Page } from '@prisma/client';
@@ -27,17 +26,17 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import useKeydownPress from 'hooks/useKeydownPress';
 import { useUser } from 'hooks/useUser';
+import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import type { NewPageInput } from 'lib/pages';
 import { addPageAndRedirect } from 'lib/pages';
 import type { LoggedInUser } from 'models';
 
-import { headerHeight } from '../Header/Header';
 import NewPageMenu from '../NewPageMenu';
 import PageNavigation from '../PageNavigation';
 import SearchInWorkspaceModal from '../SearchInWorkspaceModal';
 import TrashModal from '../TrashModal';
 
-import Workspaces from './Workspaces';
+import SidebarSubmenu from './SidebarSubmenu';
 
 const WorkspaceLabel = styled.div`
   display: flex;
@@ -141,24 +140,6 @@ const StyledSidebarBox = styled(Box)`
   `}
 `;
 
-const SidebarHeader = styled.div(
-  ({ theme }) => `
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: ${theme.spacing(0, 1.5, 0, 2)};
-  & .MuiIconButton-root {
-    border-radius: 4px;
-    transition: ${theme.transitions.create('opacity', {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.enteringScreen
-    })};
-  }
-  // necessary for content to be below app bar
-  min-height: ${headerHeight}px;
-`
-);
-
 const ScrollingContainer = styled.div<{ isScrolled: boolean }>`
   flex-grow: 1;
   overflow-y: auto;
@@ -207,11 +188,12 @@ interface SidebarProps {
 
 export default function Sidebar({ closeSidebar, favorites, navAction }: SidebarProps) {
   const router = useRouter();
-  const { user } = useUser();
+  const { user, logoutUser } = useUser();
   const space = useCurrentSpace();
   const [userSpacePermissions] = useCurrentSpacePermissions();
   const [isScrolled, setIsScrolled] = useState(false);
   const [showingTrash, setShowingTrash] = useState(false);
+  const { disconnectWallet } = useWeb3AuthSig();
 
   const searchInWorkspaceModalState = usePopupState({ variant: 'popover', popupId: 'search-in-workspace-modal' });
   const openSearchLabel = useKeydownPress(searchInWorkspaceModalState.toggle, { key: 'p', ctrl: true });
@@ -236,21 +218,19 @@ export default function Sidebar({ closeSidebar, favorites, navAction }: SidebarP
     },
     [user?.id, space?.id]
   );
+
+  async function logoutCurrentUser() {
+    disconnectWallet();
+    await logoutUser();
+    router.push('/');
+  }
+
   return (
     <SidebarContainer>
-      <Workspaces />
       {space && (
         <Box display='flex' flexDirection='column' sx={{ height: '100%', flexGrow: 1, width: 'calc(100% - 57px)' }}>
-          <SidebarHeader className='sidebar-header'>
-            <Typography>
-              <strong data-test='sidebar-space-name'>{space.name}</strong>
-            </Typography>
-            <IconButton onClick={closeSidebar} size='small'>
-              <ChevronLeftIcon />
-            </IconButton>
-          </SidebarHeader>
+          <SidebarSubmenu closeSidebar={closeSidebar} logoutCurrentUser={logoutCurrentUser} />
           <Box mb={2}>
-            {/** New navigation order: 1. Member Director, 2. Proposals, 3. Bounties */}
             <SidebarLink
               href={`/${space.domain}/members`}
               active={router.pathname.startsWith('/[domain]/members')}

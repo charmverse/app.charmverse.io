@@ -8,9 +8,9 @@ import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 
 export default function PageTitle({ subPage }: { subPage?: string }) {
   const MyNexus = 'My Nexus';
-  const { account, disconnectWallet } = useWeb3AuthSig();
+  const { disconnectWallet } = useWeb3AuthSig();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-  const { setUser, logoutUser } = useUser();
+  const { logoutUser } = useUser();
   const router = useRouter();
 
   async function logoutCurrentUser() {

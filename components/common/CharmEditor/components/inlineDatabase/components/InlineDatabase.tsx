@@ -100,7 +100,6 @@ export default function DatabaseView({ containerWidth, readOnly: readOnlyOverrid
   const views = useMemo(() => allViews.filter((view) => view.parentId === pageId), [pageId, allViews]);
   const [currentViewId, setCurrentViewId] = useState<string | null>(views[0]?.id || null);
   const currentView = useAppSelector(getView(currentViewId || '')) ?? undefined;
-
   const { pages, updatePage, getPagePermissions } = usePages();
 
   const [shownCardId, setShownCardId] = useState<string | null>(null);
@@ -127,12 +126,6 @@ export default function DatabaseView({ containerWidth, readOnly: readOnlyOverrid
     typeof readOnlyOverride === 'undefined' ? currentPagePermissions.edit_content !== true : readOnlyOverride;
 
   const readOnlySourceData = currentView?.fields?.sourceType === 'google_form'; // blocks that are synced cannot be edited
-
-  useEffect(() => {
-    if (views.length > 0 && !currentViewId) {
-      setCurrentViewId(views[0].id);
-    }
-  }, [currentViewId, views]);
 
   if (!board) {
     return null;
