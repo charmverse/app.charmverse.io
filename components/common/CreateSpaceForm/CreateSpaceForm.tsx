@@ -1,8 +1,9 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import ArrowCircleLeftIcon from '@mui/icons-material/ArrowCircleLeft';
 import RefreshIcon from '@mui/icons-material/Refresh';
-import { IconButton, InputAdornment, Tooltip, Typography } from '@mui/material';
+import { IconButton, InputAdornment, Tooltip } from '@mui/material';
 import Alert from '@mui/material/Alert';
+import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
@@ -20,7 +21,6 @@ import PrimaryButton from 'components/common/PrimaryButton';
 import Avatar from 'components/settings/workspace/LargeAvatar';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useSpaces } from 'hooks/useSpaces';
-import { useUser } from 'hooks/useUser';
 import log from 'lib/log';
 import { generateNotionImportRedirectUrl } from 'lib/notion/generateNotionImportRedirectUrl';
 import type { SpaceCreateTemplate } from 'lib/spaces/utils';
@@ -54,7 +54,6 @@ interface Props {
 }
 
 export function CreateSpaceForm({ defaultValues, onCancel, submitText }: Props) {
-  const { user } = useUser();
   const { createNewSpace, isCreatingSpace } = useSpaces();
   const { showMessage } = useSnackbar();
 
@@ -72,12 +71,11 @@ export function CreateSpaceForm({ defaultValues, onCancel, submitText }: Props) 
     watch,
     formState: { errors, touchedFields }
   } = useForm<FormValues>({
-    defaultValues: defaultValues || getDefaultName(),
+    defaultValues: defaultValues || { name: randomName() },
     resolver: yupResolver(schema)
   });
 
   const watchName = watch('name');
-  const watchDomain = watch('domain');
   const watchSpaceImage = watch('spaceImage');
   const watchSpaceTemplate = watch('spaceTemplateOption');
 
@@ -101,23 +99,6 @@ export function CreateSpaceForm({ defaultValues, onCancel, submitText }: Props) 
       const space = await createNewSpace({
         createSpaceOption: values.spaceTemplateOption as SpaceCreateTemplate,
         spaceData: {
-          createdAt: new Date(),
-          updatedAt: new Date(),
-          updatedBy: user!.id,
-          spaceRoles: {
-            create: [
-              {
-                isAdmin: true,
-                user: {
-                  connect: {
-                    id: user!.id
-                  }
-                }
-              }
-            ]
-          },
-          id: values.id,
-          domain: values.domain,
           name: values.name,
           spaceImage: values.spaceImage
         }
@@ -153,9 +134,8 @@ export function CreateSpaceForm({ defaultValues, onCancel, submitText }: Props) 
   }
 
   function randomizeName() {
-    const { name, domain } = getDefaultName();
+    const name = randomName();
     setValue('name', name);
-    setValue('domain', domain);
   }
 
   function handleNewSpaceTemplate(value: SpaceCreateTemplate) {
@@ -165,7 +145,12 @@ export function CreateSpaceForm({ defaultValues, onCancel, submitText }: Props) 
 
   return (
     <div>
-      <DialogTitle onClose={onCancel}>Create a space</DialogTitle>
+      <DialogTitle onClose={onCancel}>
+        <Box display='flex' alignItems='center' gap={2}>
+          Create a space {step === 2 && <ArrowCircleLeftIcon onClick={() => setStep(1)} />}
+        </Box>
+      </DialogTitle>
+      <Divider sx={{ mb: 2 }} />
       {step === 1 ? (
         <SelectNewSpaceTemplate
           selectedTemplate={watchSpaceTemplate as SpaceCreateTemplate}
@@ -173,11 +158,6 @@ export function CreateSpaceForm({ defaultValues, onCancel, submitText }: Props) 
         />
       ) : (
         <form data-test='create-space-form' onSubmit={handleSubmit(onSubmit)}>
-          <Divider />
-          <Typography>
-            <ArrowCircleLeftIcon onClick={() => setStep(1)} /> Selected template: {watchSpaceTemplate}
-          </Typography>
-          <br />
           <Grid container direction='column' spacing={2}>
             <Grid item display='flex' justifyContent='center'>
               <Avatar
@@ -216,22 +196,10 @@ export function CreateSpaceForm({ defaultValues, onCancel, submitText }: Props) 
                 }
               />
             </Grid>
-            <Grid item>
-              <FieldLabel>Domain</FieldLabel>
-              <TextField
-                {...register('domain')}
-                fullWidth
-                error={!!errors.domain}
-                helperText={errors.domain?.message}
-                inputProps={{
-                  'data-test': 'workspace-domain-input'
-                }}
-              />
-            </Grid>
             <Grid item sx={{ display: 'flex', justifyContent: 'center' }}>
               {(!newSpace || watchSpaceTemplate !== 'importMarkdown') && (
                 <PrimaryButton
-                  disabled={!watchName || !watchDomain || !!newSpace}
+                  disabled={!watchName || !!newSpace}
                   type='submit'
                   data-test='create-workspace'
                   loading={isCreatingSpace}
@@ -253,12 +221,4 @@ export function CreateSpaceForm({ defaultValues, onCancel, submitText }: Props) 
       )}
     </div>
   );
-}
-
-function getDefaultName(): { name: string; domain: string } {
-  const name = randomName();
-  return {
-    name,
-    domain: name
-  };
 }

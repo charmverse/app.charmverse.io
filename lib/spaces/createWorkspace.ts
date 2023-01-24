@@ -1,6 +1,6 @@
 import path from 'node:path';
 
-import type { Prisma } from '@prisma/client';
+import type { Space } from '@prisma/client';
 
 import { prisma } from 'db';
 import { generateDefaultPostCategories } from 'lib/forums/categories/generateDefaultPostCategories';
@@ -17,17 +17,45 @@ import { updateSpacePermissionConfigurationMode } from 'lib/permissions/meta';
 import { generateDefaultCategoriesInput } from 'lib/proposal/generateDefaultCategoriesInput';
 import { importWorkspacePages } from 'lib/templates/importWorkspacePages';
 
+import { getAvailableDomainName } from './getAvailableDomainName';
+import { getSpaceByDomain } from './getSpaceByDomain';
 import type { SpaceCreateTemplate } from './utils';
 
+type SpaceCreateInput = Pick<Space, 'name'> &
+  Partial<Pick<Space, 'permissionConfigurationMode' | 'domain' | 'spaceImage'>>;
+
 export type CreateSpaceProps = {
-  spaceData: Omit<Prisma.SpaceCreateInput, 'author'>;
+  spaceData: SpaceCreateInput;
   userId: string;
   createSpaceOption?: SpaceCreateTemplate;
 };
 
 export async function createWorkspace({ spaceData, userId, createSpaceOption }: CreateSpaceProps) {
+  let domain = spaceData.domain;
+
+  if (!domain) {
+    domain = await getAvailableDomainName(spaceData.name);
+  } else {
+    const existingSpace = await getSpaceByDomain(domain);
+    if (existingSpace) {
+      domain = await getAvailableDomainName(spaceData.name, true);
+    }
+  }
+
   const space = await prisma.space.create({
-    data: { ...spaceData, author: { connect: { id: userId } } },
+    data: {
+      name: spaceData.name,
+      domain,
+      spaceImage: spaceData.spaceImage,
+      updatedBy: userId,
+      author: { connect: { id: userId } },
+      spaceRoles: {
+        create: {
+          isAdmin: true,
+          userId
+        }
+      }
+    },
     include: { pages: true }
   });
 
@@ -88,7 +116,7 @@ export async function createWorkspace({ spaceData, userId, createSpaceOption }: 
   logSpaceCreation(space);
   updateTrackGroupProfile(space);
   updateTrackUserProfileById(userId);
-  trackUserAction('create_new_workspace', { userId, spaceId: space.id });
+  trackUserAction('create_new_workspace', { userId, spaceId: space.id, template: createSpaceOption ?? 'default' });
 
   return updatedSpace;
 }
