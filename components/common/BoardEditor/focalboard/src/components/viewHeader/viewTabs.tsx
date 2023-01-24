@@ -238,7 +238,6 @@ function ViewTabs(props: ViewTabsProps) {
                 fontWeight={500}
                 gap={1}
               >
-                {iconForViewType(view.fields.viewType)}
                 {view.title || formatViewTitle(view)}
               </StyledTabContent>
             }

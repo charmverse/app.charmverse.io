@@ -466,7 +466,6 @@ function CenterPanel(props: Props) {
           />
         )}
         <ViewHeader
-          key={board.id}
           onDeleteView={props.onDeleteView}
           maxTabsShown={props.maxTabsShown}
           disableUpdatingUrl={props.disableUpdatingUrl}
