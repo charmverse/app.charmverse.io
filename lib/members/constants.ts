@@ -47,7 +47,7 @@ export const MEMBER_PROPERTY_CONFIG: Record<MemberPropertyType, MemberPropertyCo
     readonly: true
   },
   github: {
-    label: 'Github',
+    label: 'GitHub',
     default: true,
     readonly: true
   },
