@@ -92,11 +92,7 @@ export default function SidebarSubmenu({
           {currentSpace?.name}
         </Typography>
       </Button>
-      <Menu
-        onClick={menuPopupState.close}
-        PaperProps={{ sx: (theme) => ({ background: theme.palette.sidebar.background }) }}
-        {...bindMenu(menuPopupState)}
-      >
+      <Menu onClick={menuPopupState.close} {...bindMenu(menuPopupState)}>
         <MenuItem component={NextLink} href='/profile'>
           <Box display='flex' flexDirection='row'>
             <Box>
