@@ -36,7 +36,7 @@ export default function Mention({ node }: NodeViewProps) {
     value = page && (
       <MentionContainer color='inherit' href={`/${space?.domain}/${page.path}`}>
         <Box display='flex' alignItems='center'>
-          <PageIcon icon={page.icon} isEditorEmpty={!page.hasContent} pageType={page.type} />
+          <PageIcon isLinkedPage icon={page.icon} isEditorEmpty={!page.hasContent} pageType={page.type} />
           <Typography component='span' fontWeight={600}>
             {page.title || 'Untitled'}
           </Typography>
