@@ -2,10 +2,6 @@ import type { ReactNode } from 'react';
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
 import charmClient from 'charmClient';
-import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
-import type { AuthSig } from 'lib/blockchain/interfaces';
-import { countConnectableIdentities } from 'lib/users/countConnectableIdentities';
-import { MissingWeb3AccountError } from 'lib/utilities/errors';
 import type { LoggedInUser } from 'models';
 
 type IContext = {
