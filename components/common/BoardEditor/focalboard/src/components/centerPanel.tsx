@@ -436,6 +436,7 @@ function CenterPanel(props: Props) {
 
   return (
     <div
+      // remount components between pages
       className={`BoardComponent ${isEmbedded ? 'embedded-board' : ''}`}
       ref={backgroundRef}
       onClick={(e) => {
@@ -465,6 +466,7 @@ function CenterPanel(props: Props) {
           />
         )}
         <ViewHeader
+          key={board.id}
           onDeleteView={props.onDeleteView}
           maxTabsShown={props.maxTabsShown}
           disableUpdatingUrl={props.disableUpdatingUrl}

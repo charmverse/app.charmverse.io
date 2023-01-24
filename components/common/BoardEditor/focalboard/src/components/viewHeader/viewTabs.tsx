@@ -24,7 +24,6 @@ import { useForm } from 'react-hook-form';
 import type { IntlShape } from 'react-intl';
 import { injectIntl } from 'react-intl';
 
-import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import Modal from 'components/common/Modal';
 import type { BoardView } from 'lib/focalboard/boardView';
@@ -84,7 +83,13 @@ function ViewTabs(props: ViewTabsProps) {
   let restViews = views.slice(maxTabsShown);
 
   // make sure active view id is visible
-  const activeShowViewId = shownViews.find((view) => view.id === activeView?.id)?.id ?? false;
+  // during transition between boards, there is a period where activeView has not caught up with the new views
+  const activeShowViewId =
+    shownViews.find((view) => view.id === activeView?.id)?.id ??
+    // check viewId by the query, there is a period where activeView has not caught up
+    shownViews.find((view) => view.id === router.query.viewId)?.id ??
+    shownViews[0]?.id ??
+    false;
 
   // If the current view index is more than what we can show in the screen
   if (currentViewIndex >= maxTabsShown) {
@@ -206,10 +211,16 @@ function ViewTabs(props: ViewTabsProps) {
 
   return (
     <>
-      <Tabs textColor='primary' indicatorColor='secondary' value={activeShowViewId} sx={{ minHeight: 0, mb: '-4px' }}>
+      <Tabs
+        // assign a key so that the tabs are remounted when the page change, otherwise the indicator will animate to the new tab
+        key={viewsProp[0]?.id}
+        textColor='primary'
+        indicatorColor='secondary'
+        value={activeShowViewId}
+        sx={{ minHeight: 0, mb: '-4px' }}
+      >
         {shownViews.map((view) => (
           <Tab
-            component='div'
             disableRipple
             key={view.id}
             label={
@@ -231,7 +242,6 @@ function ViewTabs(props: ViewTabsProps) {
         ))}
         {restViews.length !== 0 && (
           <Tab
-            component='div'
             disableRipple
             sx={{ p: 0, mb: 0.5 }}
             label={
