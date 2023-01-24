@@ -93,7 +93,7 @@ export default function SidebarSubmenu({
         </Typography>
       </Button>
       <Menu onClick={menuPopupState.close} {...bindMenu(menuPopupState)}>
-        <MenuItem component={NextLink} href='/profile'>
+        <MenuItem component={NextLink} href='/nexus'>
           <Box display='flex' flexDirection='row'>
             <Box>
               <UserDisplay user={user} hideName />
