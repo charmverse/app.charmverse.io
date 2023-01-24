@@ -6,11 +6,14 @@ import {
   ContentCopy as DuplicateIcon,
   Refresh as RefreshIcon
 } from '@mui/icons-material';
+import { Typography } from '@mui/material';
+import type { ButtonProps } from '@mui/material/Button';
 import Divider from '@mui/material/Divider';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
+import type { TabProps } from '@mui/material/Tab';
 import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
 import TextField from '@mui/material/TextField';
@@ -33,8 +36,11 @@ import mutator from '../../mutator';
 import { IDType, Utils } from '../../utils';
 import { iconForViewType } from '../viewMenu';
 
-const StyledButton = styled(Button)`
-  padding: ${({ theme }) => theme.spacing(0.5, 1)};
+// fix types for MUI Tab to include Button Props
+const TabButton = Tab as React.ComponentType<TabProps & ButtonProps>;
+
+const StyledTabContent = styled(Typography)`
+  padding: ${({ theme }) => theme.spacing('6px', 1, '10px')};
 
   .Icon {
     width: 20px;
@@ -82,15 +88,6 @@ function ViewTabs(props: ViewTabsProps) {
   const shownViews = views.slice(0, maxTabsShown);
   let restViews = views.slice(maxTabsShown);
 
-  // make sure active view id is visible
-  // during transition between boards, there is a period where activeView has not caught up with the new views
-  const activeShowViewId =
-    shownViews.find((view) => view.id === activeView?.id)?.id ??
-    // check viewId by the query, there is a period where activeView has not caught up
-    shownViews.find((view) => view.id === router.query.viewId)?.id ??
-    shownViews[0]?.id ??
-    false;
-
   // If the current view index is more than what we can show in the screen
   if (currentViewIndex >= maxTabsShown) {
     const replacedView = shownViews[maxTabsShown - 1];
@@ -99,6 +96,14 @@ function ViewTabs(props: ViewTabsProps) {
     restViews = restViews.filter((restView) => restView.id !== activeView?.id);
     restViews.unshift(replacedView);
   }
+  // make sure active view id is visible or the value for Tabs will be invalid
+  // during transition between boards, there is a period where activeView has not caught up with the new views
+  const activeShowViewId =
+    shownViews.find((view) => view.id === activeView?.id)?.id ??
+    // check viewId by the query, there is a period where activeView has not caught up
+    shownViews.find((view) => view.id === router.query.viewId)?.id ??
+    shownViews[0]?.id ??
+    false;
 
   const { register, handleSubmit, setValue } = useForm<{ title: string }>({
     defaultValues: { title: dropdownView?.title || '' }
@@ -126,14 +131,8 @@ function ViewTabs(props: ViewTabsProps) {
   }
 
   function getViewUrl(viewId: string) {
-    const { cardId, ...rest } = router.query;
-    return {
-      pathname: router.pathname,
-      query: {
-        ...rest,
-        viewId
-      }
-    };
+    const pathWithoutQuery = router.asPath.split('?')[0];
+    return `${pathWithoutQuery}?viewId=${viewId}`;
   }
 
   const handleDuplicateView = useCallback(() => {
@@ -217,38 +216,41 @@ function ViewTabs(props: ViewTabsProps) {
         textColor='primary'
         indicatorColor='secondary'
         value={activeShowViewId}
-        sx={{ minHeight: 0, mb: '-4px' }}
+        sx={{ minHeight: 0, mb: '-6px' }}
       >
         {shownViews.map((view) => (
-          <Tab
+          <TabButton
             disableRipple
             key={view.id}
-            label={
-              <StyledButton
-                startIcon={iconForViewType(view.fields.viewType)}
-                onClick={handleViewClick}
-                variant='text'
-                size='small'
-                color={activeView?.id === view.id ? 'textPrimary' : 'secondary'}
-                id={view.id}
-                href={activeView?.id === view.id ? null : getViewUrl(view.id)}
-              >
-                {view.title || formatViewTitle(view)}
-              </StyledButton>
-            }
-            sx={{ p: 0, mb: '5px' }}
+            href={activeView?.id === view.id ? undefined : getViewUrl(view.id)}
+            onClick={handleViewClick}
+            variant='text'
+            size='small'
+            id={view.id}
+            sx={{ p: 0 }}
             value={view.id}
+            label={
+              <StyledTabContent
+                color={activeView?.id === view.id ? 'textPrimary' : 'secondary'}
+                display='flex'
+                alignItems='center'
+                fontSize='small'
+                fontWeight={500}
+                gap={1}
+              >
+                {iconForViewType(view.fields.viewType)}
+                {view.title || formatViewTitle(view)}
+              </StyledTabContent>
+            }
           />
         ))}
         {restViews.length !== 0 && (
-          <Tab
+          <TabButton
             disableRipple
             sx={{ p: 0, mb: 0.5 }}
-            label={
-              <Button variant='text' size='small' color='secondary' {...showViewsTriggerState}>
-                {restViews.length} more...
-              </Button>
-            }
+            color='secondary'
+            {...showViewsTriggerState}
+            label={<>{restViews.length} more...</>}
           />
         )}
       </Tabs>
