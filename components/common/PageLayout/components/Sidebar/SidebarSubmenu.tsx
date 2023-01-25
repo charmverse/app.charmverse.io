@@ -41,14 +41,7 @@ const SidebarHeader = styled(Box)(
   }
   & .MuiIconButton-root {
     border-radius: 4px;
-  }
-  &:hover {
-    & .MuiButton-root {
-      padding-right: ${theme.spacing(5)}
-    }
-  }
- 
-`
+  }`
 );
 
 export default function SidebarSubmenu({
