@@ -1,9 +1,11 @@
-import type { SpaceRole, User } from '@prisma/client';
+import type { Space, SpaceRole, User } from '@prisma/client';
 import { v4 } from 'uuid';
 
 import { prisma } from 'db';
 import { defaultPostCategories } from 'lib/forums/categories/generateDefaultPostCategories';
+import { uid } from 'lib/utilities/strings';
 
+import type { SpaceCreateInput } from '../createWorkspace';
 import { createWorkspace } from '../createWorkspace';
 
 let user: User;
@@ -13,6 +15,99 @@ beforeAll(async () => {
 });
 
 describe('createWorkspace', () => {
+  it('should create a space allowing for an xpsengine and discord integration, and register the token used to create the space if one was used', async () => {
+    const tokenName = `Integration partner ${uid}`;
+
+    const tokenValue = `key-${v4()}`;
+
+    const superApiToken = await prisma.superApiToken.create({
+      data: {
+        name: tokenName,
+        token: tokenValue
+      }
+    });
+
+    const input: SpaceCreateInput = {
+      discordServerId: '123',
+      xpsEngineId: '123',
+      name: 'Test space',
+      spaceImage: 'https://example.com/avatar.png',
+      superApiTokenId: superApiToken.id
+    };
+
+    const space = await createWorkspace({
+      spaceData: input,
+      userId: user.id
+    });
+
+    const spaceInDb = await prisma.space.findUnique({
+      where: {
+        id: space.id
+      }
+    });
+
+    expect(spaceInDb).toMatchObject(expect.objectContaining<Partial<Space>>(input));
+  });
+
+  // This supports the createWorkspaceApi method which consumes this function and marks the space as updated by the bot, and created by the user
+  it('should allow assigning additional users as admins on creation, and optionally mark the space as updated by a specific user', async () => {
+    const tokenName = `Integration partner ${uid()}`;
+
+    const tokenValue = `key-${v4()}`;
+
+    const superApiToken = await prisma.superApiToken.create({
+      data: {
+        name: tokenName,
+        token: tokenValue
+      }
+    });
+
+    const bot = await prisma.user.create({
+      data: {
+        username: 'Bot user',
+        isBot: true
+      }
+    });
+
+    const input: SpaceCreateInput = {
+      name: 'Test space',
+      spaceImage: 'https://example.com/avatar.png',
+      superApiTokenId: superApiToken.id,
+      updatedBy: bot.id
+    };
+
+    const space = await createWorkspace({
+      spaceData: input,
+      userId: user.id,
+      extraAdmins: [bot.id]
+    });
+
+    const spaceInDb = await prisma.space.findUnique({
+      where: {
+        id: space.id
+      },
+      include: {
+        spaceRoles: {
+          include: {
+            user: true
+          }
+        }
+      }
+    });
+
+    const botUserSpaceRole = spaceInDb?.spaceRoles.find((r) => r.userId === bot.id);
+    const adminUserSpaceRole = spaceInDb?.spaceRoles.find((r) => r.userId === user.id);
+
+    expect(botUserSpaceRole).toBeDefined();
+    expect(adminUserSpaceRole).toBeDefined();
+
+    expect(botUserSpaceRole?.isAdmin).toBe(true);
+    expect(adminUserSpaceRole?.isAdmin).toBe(true);
+
+    expect(spaceInDb?.updatedBy).toBe(bot.id);
+    expect(spaceInDb?.createdBy).toBe(user.id);
+  });
+
   it('should auto-assign the userId as an admin for this space', async () => {
     const space = await createWorkspace({
       spaceData: {

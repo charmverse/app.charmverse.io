@@ -21,16 +21,28 @@ import { getAvailableDomainName } from './getAvailableDomainName';
 import { getSpaceByDomain } from './getSpaceByDomain';
 import type { SpaceCreateTemplate } from './utils';
 
-type SpaceCreateInput = Pick<Space, 'name'> &
-  Partial<Pick<Space, 'permissionConfigurationMode' | 'domain' | 'spaceImage'>>;
+export type SpaceCreateInput = Pick<Space, 'name'> &
+  Partial<
+    Pick<
+      Space,
+      | 'permissionConfigurationMode'
+      | 'domain'
+      | 'spaceImage'
+      | 'discordServerId'
+      | 'xpsEngineId'
+      | 'superApiTokenId'
+      | 'updatedBy'
+    >
+  >;
 
 export type CreateSpaceProps = {
   spaceData: SpaceCreateInput;
   userId: string;
+  extraAdmins?: string[];
   createSpaceOption?: SpaceCreateTemplate;
 };
 
-export async function createWorkspace({ spaceData, userId, createSpaceOption }: CreateSpaceProps) {
+export async function createWorkspace({ spaceData, userId, createSpaceOption, extraAdmins = [] }: CreateSpaceProps) {
   let domain = spaceData.domain;
 
   if (!domain) {
@@ -42,17 +54,30 @@ export async function createWorkspace({ spaceData, userId, createSpaceOption }: 
     }
   }
 
+  const userList = [userId, ...extraAdmins];
+
   const space = await prisma.space.create({
     data: {
       name: spaceData.name,
       domain,
       spaceImage: spaceData.spaceImage,
-      updatedBy: userId,
+      discordServerId: spaceData.discordServerId,
+      xpsEngineId: spaceData.xpsEngineId,
+      superApiToken: spaceData.superApiTokenId
+        ? {
+            connect: {
+              id: spaceData.superApiTokenId
+            }
+          }
+        : undefined,
+      updatedBy: spaceData.updatedBy ?? userId,
       author: { connect: { id: userId } },
       spaceRoles: {
-        create: {
-          isAdmin: true,
-          userId
+        createMany: {
+          data: userList.map((_userId) => ({
+            userId: _userId,
+            isAdmin: true
+          }))
         }
       }
     },
