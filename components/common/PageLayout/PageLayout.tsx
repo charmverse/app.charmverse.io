@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 import type { Theme } from '@mui/material';
-import { Box } from '@mui/material';
+import { Tooltip, Box } from '@mui/material';
 import MuiAppBar from '@mui/material/AppBar';
 import MuiDrawer from '@mui/material/Drawer';
 import Head from 'next/head';
@@ -15,6 +15,7 @@ import { FocalboardViewsProvider } from 'hooks/useFocalboardViews';
 import { useLocalStorage } from 'hooks/useLocalStorage';
 import { useMobileSidebar } from 'hooks/useMobileSidebar';
 import { PageActionDisplayProvider } from 'hooks/usePageActionDisplay';
+import { useResize } from 'hooks/useResize';
 import { useSharedPage } from 'hooks/useSharedPage';
 import { ThreadsProvider } from 'hooks/useThreads';
 import { useUser } from 'hooks/useUser';
@@ -26,7 +27,8 @@ import Header, { headerHeight } from './components/Header';
 import PageContainer from './components/PageContainer';
 import Sidebar from './components/Sidebar';
 
-const MOBILE_SIDEBAR_MAX_WIDTH = 500;
+const MAX_SIDEBAR_WIDTH = 500;
+const MIN_SIDEBAR_WIDTH = 200;
 
 const openedMixin = (theme: Theme, sidebarWidth: number) => ({
   maxWidth: '100%',
@@ -35,7 +37,8 @@ const openedMixin = (theme: Theme, sidebarWidth: number) => ({
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.enteringScreen
   }),
-  overflowX: 'hidden'
+  overflowX: 'hidden',
+  border: 'none'
 });
 
 const closedMixin = (theme: Theme) =>
@@ -45,7 +48,8 @@ const closedMixin = (theme: Theme) =>
       duration: theme.transitions.duration.leavingScreen
     }),
     overflowX: 'hidden',
-    width: 0
+    width: 0,
+    border: 'none'
   } as const);
 
 export const AppBar = styled(MuiAppBar, {
@@ -91,7 +95,8 @@ const Drawer = styled(MuiDrawer, {
     ...(!open && {
       ...closedMixin(theme),
       '& .MuiDrawer-paper': closedMixin(theme)
-    })
+    }),
+    paddingRight: 3
   })
 );
 
@@ -104,6 +109,24 @@ const LayoutContainer = styled.div`
   height: 100%;
 `;
 
+const DraggableHandle = styled.div<{ isActive?: boolean }>`
+  position: absolute;
+  width: 5px;
+  bottom: 0;
+  top: 0;
+  right: 0;
+  cursor: col-resize;
+  border-right: 1px solid ${({ theme }) => theme.palette.divider};
+  transition: all 0.2s ease-in-out;
+  background: transparent;
+
+  &:hover {
+    border-right: 3px solid ${({ theme }) => theme.palette.primary.main};
+  }
+
+  ${({ isActive, theme }) => (isActive ? `border-right: 3px solid ${theme.palette.primary.main}` : '')}
+`;
+
 interface PageLayoutProps {
   children: React.ReactNode;
   sidebar?: (p: { closeSidebar: () => void }) => JSX.Element;
@@ -113,8 +136,17 @@ interface PageLayoutProps {
 function PageLayout({ sidebarWidth = 300, children, sidebar: SidebarOverride }: PageLayoutProps) {
   const { width } = useWindowSize();
   const isMobileSidebar = useMobileSidebar();
+  const {
+    width: resizableSidebarWidth,
+    enableResize,
+    isResizing
+  } = useResize({
+    initialWidth: sidebarWidth,
+    minWidth: MIN_SIDEBAR_WIDTH,
+    maxWidth: MAX_SIDEBAR_WIDTH
+  });
 
-  let mobileSidebarWidth = width ? Math.min(width * 0.8, MOBILE_SIDEBAR_MAX_WIDTH) : sidebarWidth;
+  let mobileSidebarWidth = width ? Math.min(width * 0.8, MAX_SIDEBAR_WIDTH) : sidebarWidth;
   if (SidebarOverride) {
     mobileSidebarWidth = sidebarWidth;
   }
@@ -181,7 +213,7 @@ function PageLayout({ sidebarWidth = 300, children, sidebar: SidebarOverride }: 
                 <PageActionDisplayProvider>
                   {open !== null && (
                     <>
-                      <AppBar open={open} sidebarWidth={sidebarWidth} position='fixed'>
+                      <AppBar open={open} sidebarWidth={isMobileSidebar ? 0 : resizableSidebarWidth} position='fixed'>
                         <Header open={open} openSidebar={handleDrawerOpen} />
                       </AppBar>
                       {isMobileSidebar ? (
@@ -198,8 +230,12 @@ function PageLayout({ sidebarWidth = 300, children, sidebar: SidebarOverride }: 
                           </Box>
                         </MuiDrawer>
                       ) : (
-                        <Drawer sidebarWidth={sidebarWidth} open={open} variant='permanent'>
+                        <Drawer sidebarWidth={resizableSidebarWidth} open={open} variant='permanent'>
                           {drawerContent}
+
+                          <Tooltip title={isResizing ? '' : 'Drag to resize'} placement='right' followCursor>
+                            <DraggableHandle onMouseDown={(e) => enableResize(e)} isActive={isResizing} />
+                          </Tooltip>
                         </Drawer>
                       )}
                     </>
