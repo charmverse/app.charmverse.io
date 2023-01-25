@@ -186,6 +186,8 @@ enum MemberPropertyType {
   twitter
   bio
   join_date
+  linked_in
+  github
 }
 
 enum MemberPropertyPermissionLevel {

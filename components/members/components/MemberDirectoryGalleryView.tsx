@@ -50,6 +50,8 @@ function MemberDirectoryGalleryCard({ member }: { member: Member }) {
   const isNameHidden = !propertiesRecord.name?.enabledViews.includes('gallery');
   const isDiscordHidden = !propertiesRecord.discord?.enabledViews.includes('gallery');
   const isTwitterHidden = !propertiesRecord.twitter?.enabledViews.includes('gallery');
+  const isLinkedInHidden = !propertiesRecord.linked_in?.enabledViews.includes('gallery');
+  const isGithubHidden = !propertiesRecord.github?.enabledViews.includes('gallery');
   const admin = isAdmin();
 
   const updateMemberPropertyValues = async (spaceId: string, values: UpdateMemberPropertyValuePayload[]) => {
@@ -102,7 +104,14 @@ function MemberDirectoryGalleryCard({ member }: { member: Member }) {
                 )?.value as string) ?? member.username}
               </Typography>
             )}
-            <SocialIcons gap={1} social={social} showDiscord={!isDiscordHidden} showTwitter={!isTwitterHidden} />
+            <SocialIcons
+              gap={1}
+              social={social}
+              showLinkedIn={!isLinkedInHidden}
+              showGithub={!isGithubHidden}
+              showDiscord={!isDiscordHidden}
+              showTwitter={!isTwitterHidden}
+            />
             {properties.map((property) => {
               const memberProperty = member.properties.find((mp) => mp.memberPropertyId === property.id);
               const hiddenInGallery = !property.enabledViews.includes('gallery');

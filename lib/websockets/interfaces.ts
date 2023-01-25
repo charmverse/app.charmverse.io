@@ -64,8 +64,25 @@ type VotesUpdated = {
 type PostPublished = {
   type: 'post_published';
   payload: {
-    categoryId: string | null;
+    categoryId: string;
     createdBy: string;
+  };
+};
+
+type PostUpdated = {
+  type: 'post_updated';
+  payload: {
+    id: string;
+    categoryId: string;
+    createdBy: string;
+  };
+};
+
+type PostDeleted = {
+  type: 'post_deleted';
+  payload: {
+    categoryId: string;
+    id: string;
   };
 };
 
@@ -94,7 +111,9 @@ export type ServerMessage =
   | VotesCreated
   | VotesDeleted
   | VotesUpdated
-  | PostPublished;
+  | PostPublished
+  | PostUpdated
+  | PostDeleted;
 
 export type WebSocketMessage = ClientMessage | ServerMessage;
 
