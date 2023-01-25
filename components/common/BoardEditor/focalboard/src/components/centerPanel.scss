@@ -75,14 +75,13 @@
   .view-actions {
     display: flex;
     transition: opacity 0.2s ease-in-out;
-    opacity: 0;
   }
 
   &.embedded-board .view-actions {
     opacity: 0;
   }
 
-  &.BoardComponent:hover .view-actions {
+  &.embedded-board:hover .view-actions {
     opacity: 1;
   }
 }
