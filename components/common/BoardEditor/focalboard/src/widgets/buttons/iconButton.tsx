@@ -12,7 +12,7 @@ type Props = {
 
 const StyledButton = styled.button`
   &:hover {
-    background: var(--input-bg);
+    background: var(--button-text-hover);
   }
 `;
 

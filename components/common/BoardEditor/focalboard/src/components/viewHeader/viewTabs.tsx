@@ -55,7 +55,7 @@ const StyledTabContent = styled(Typography)`
     width: 100%;
   }
   &:hover span {
-    background-color: var(--input-bg);
+    background-color: var(--button-text-hover);
   }
 `;
 
