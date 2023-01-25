@@ -1,3 +1,4 @@
+import styled from '@emotion/styled';
 import React from 'react';
 
 type Props = {
@@ -9,13 +10,19 @@ type Props = {
   style?: React.CSSProperties;
 };
 
+const StyledButton = styled.button`
+  &:hover {
+    background: var(--input-bg);
+  }
+`;
+
 function IconButton(props: Props): JSX.Element {
   let className = 'Button IconButton';
   if (props.className) {
     className += ` ${props.className}`;
   }
   return (
-    <button
+    <StyledButton
       type='button'
       onClick={props.onClick}
       onMouseDown={props.onMouseDown}
@@ -25,7 +32,7 @@ function IconButton(props: Props): JSX.Element {
       style={props.style}
     >
       {props.icon}
-    </button>
+    </StyledButton>
   );
 }
 

@@ -287,7 +287,7 @@ export const createThemeLightSensitive = (mode: PaletteMode) => {
           },
           text: {
             ':hover': {
-              backgroundColor: 'rgba(var(--center-channel-color-rgb), 0.1)'
+              backgroundColor: 'var(--input-bg)'
             }
             // borderRadius: '10px'
           }
@@ -297,7 +297,7 @@ export const createThemeLightSensitive = (mode: PaletteMode) => {
         styleOverrides: {
           root: {
             ':hover': {
-              backgroundColor: 'rgba(var(--center-channel-color-rgb), 0.1)'
+              backgroundColor: 'var(--input-bg)'
             }
           }
         }

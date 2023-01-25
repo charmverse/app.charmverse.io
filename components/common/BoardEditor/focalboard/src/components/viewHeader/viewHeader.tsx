@@ -1,5 +1,5 @@
 import OpenInFullIcon from '@mui/icons-material/OpenInFull';
-import { Popover, Tooltip } from '@mui/material';
+import { Box, Popover, Tooltip } from '@mui/material';
 import PopupState, { bindTrigger, bindPopover } from 'material-ui-popup-state';
 import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
@@ -53,7 +53,6 @@ type Props = {
 };
 
 function ViewHeader(props: Props) {
-  const [showFilter, setShowFilter] = useState(false);
   const router = useRouter();
   const { pages, refreshPage } = usePages();
   const cardTemplates: Card[] = useAppSelector(getCurrentBoardTemplates);
@@ -111,7 +110,11 @@ function ViewHeader(props: Props) {
 
       {/* add a view */}
 
-      {!props.readOnly && views.length <= maxTabsShown && props.addViewButton}
+      {!props.readOnly && views.length <= maxTabsShown && (
+        <Box className='view-actions' pt='4px'>
+          {props.addViewButton}
+        </Box>
+      )}
 
       <div className='octo-spacer' />
 
@@ -144,6 +147,7 @@ function ViewHeader(props: Props) {
                   </Button>
                   <Popover
                     {...bindPopover(popupState)}
+                    disablePortal
                     PaperProps={{
                       sx: {
                         overflow: 'visible'

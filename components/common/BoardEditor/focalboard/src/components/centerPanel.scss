@@ -40,7 +40,7 @@
     position: sticky;
     left: 0;
     background: rgb(var(--center-channel-bg-rgb));
-    z-index: 1;
+    z-index: 2;
   }
 
   > .container-container {
@@ -75,13 +75,14 @@
   .view-actions {
     display: flex;
     transition: opacity 0.2s ease-in-out;
+    opacity: 0;
   }
 
   &.embedded-board .view-actions {
     opacity: 0;
   }
 
-  &.embedded-board:hover .view-actions {
+  &.BoardComponent:hover .view-actions {
     opacity: 1;
   }
 }

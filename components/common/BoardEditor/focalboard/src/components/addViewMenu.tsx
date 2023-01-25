@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-expressions */
 
 import { Add } from '@mui/icons-material';
-import { IconButton } from '@mui/material';
+// import { IconButton } from '@mui/material';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Menu from '@mui/material/Menu';
@@ -22,6 +22,7 @@ import { createBoardView } from 'lib/focalboard/boardView';
 import { Constants } from '../constants';
 import mutator from '../mutator';
 import { Utils } from '../utils';
+import IconButton from '../widgets/buttons/iconButton';
 import BoardIcon from '../widgets/icons/board';
 import CalendarIcon from '../widgets/icons/calendar';
 import GalleryIcon from '../widgets/icons/gallery';
@@ -191,9 +192,7 @@ function AddViewMenu(props: AddViewProps) {
           Add view
         </Button>
       ) : (
-        <IconButton {...triggers} color='secondary' size='small'>
-          <Add fontSize='small' />
-        </IconButton>
+        <IconButton style={{ width: 28, height: 28 }} {...triggers} icon={<Add color='secondary' fontSize='small' />} />
       )}
       <Menu {...bindMenu(popupState)}>
         <MenuItem dense onClick={handleAddViewBoard}>

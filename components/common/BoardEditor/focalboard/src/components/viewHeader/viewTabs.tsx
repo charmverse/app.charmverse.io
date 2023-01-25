@@ -6,7 +6,7 @@ import {
   ContentCopy as DuplicateIcon,
   Refresh as RefreshIcon
 } from '@mui/icons-material';
-import { Typography } from '@mui/material';
+import { Typography, Box } from '@mui/material';
 import type { ButtonProps } from '@mui/material/Button';
 import Divider from '@mui/material/Divider';
 import ListItemIcon from '@mui/material/ListItemIcon';
@@ -17,7 +17,6 @@ import type { TabProps } from '@mui/material/Tab';
 import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
 import TextField from '@mui/material/TextField';
-import { Box } from '@mui/system';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -40,11 +39,23 @@ import { iconForViewType } from '../viewMenu';
 const TabButton = Tab as React.ComponentType<TabProps & ButtonProps>;
 
 const StyledTabContent = styled(Typography)`
-  padding: ${({ theme }) => theme.spacing('6px', 1, '10px')};
+  padding: ${({ theme }) => theme.spacing('6px', '2px', '6px')};
+  width: 100%;
 
   .Icon {
     width: 20px;
     height: 20px;
+  }
+
+  span {
+    display: inline-flex;
+    gap: 4px;
+    border-radius: 4px;
+    padding: 4px 8px;
+    width: 100%;
+  }
+  &:hover span {
+    background-color: var(--input-bg);
   }
 `;
 
@@ -238,7 +249,10 @@ function ViewTabs(props: ViewTabsProps) {
                 fontWeight={500}
                 gap={1}
               >
-                {view.title || formatViewTitle(view)}
+                <span>
+                  {iconForViewType(view.fields.viewType)}
+                  {view.title || formatViewTitle(view)}
+                </span>
               </StyledTabContent>
             }
           />
@@ -246,10 +260,13 @@ function ViewTabs(props: ViewTabsProps) {
         {restViews.length !== 0 && (
           <TabButton
             disableRipple
-            sx={{ p: 0, mb: 0.5 }}
-            color='secondary'
+            sx={{ p: 0 }}
             {...showViewsTriggerState}
-            label={<>{restViews.length} more...</>}
+            label={
+              <StyledTabContent color='secondary' fontSize='small' fontWeight={500}>
+                <span>{restViews.length} more...</span>
+              </StyledTabContent>
+            }
           />
         )}
       </Tabs>
@@ -322,7 +339,9 @@ function ViewTabs(props: ViewTabsProps) {
           ))}
         </Box>
         <Divider />
-        {addViewButton}
+        <Box pl='14px' pt='4px'>
+          {addViewButton}
+        </Box>
       </Menu>
 
       {/* Form to rename views */}
