@@ -41,7 +41,7 @@ export function items({
               rafCommandExec(view, (_state, _dispatch) => {
                 // The page must be created before the node can be created
                 addPage({
-                  type: 'inline_board',
+                  type: 'inline_linked_board',
                   parentId: currentPageId,
                   spaceId: space.id,
                   createdBy: userId

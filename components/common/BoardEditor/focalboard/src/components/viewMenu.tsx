@@ -8,13 +8,13 @@ import TableIcon from '../widgets/icons/table';
 export const iconForViewType = (viewType: IViewType) => {
   switch (viewType) {
     case 'board':
-      return <BoardIcon />;
+      return <BoardIcon fontSize='small' />;
     case 'table':
-      return <TableIcon />;
+      return <TableIcon fontSize='small' />;
     case 'gallery':
-      return <GalleryIcon />;
+      return <GalleryIcon fontSize='small' />;
     case 'calendar':
-      return <CalendarIcon />;
+      return <CalendarIcon fontSize='small' />;
     default:
       return <div />;
   }

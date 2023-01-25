@@ -21,6 +21,7 @@ const globalCSS = css`
     --input-bg: ${colors.inputBackground};
     --input-border: ${colors.inputBorder};
     --input-border-hover: #37352f;
+    --button-text-hover: var(--input-bg);
     --primary-color: ${colors.blueColor};
     --primary-text: ${colors.primaryTextColor};
     --secondary-text: ${colors.secondaryTextColor};
