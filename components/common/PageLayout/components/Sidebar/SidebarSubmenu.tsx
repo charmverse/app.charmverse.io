@@ -27,6 +27,19 @@ import { headerHeight } from '../Header';
 
 import WorkspaceAvatar from './WorkspaceAvatar';
 
+const StyledButton = styled(Button)(
+  ({ theme }) => `
+  justify-content: flex-start;
+  padding: ${theme.spacing(0.3, 5, 0.3, 2)};
+  '&:hover': { 
+    backgroundColor: ${theme.palette.action.hover};
+  }
+  ${theme.breakpoints.up('lg')} {
+    padding-right: ${theme.spacing(2)};
+  }
+`
+);
+
 const SidebarHeader = styled(Box)(
   ({ theme }) => `
   display: flex;
@@ -68,23 +81,19 @@ export default function SidebarSubmenu({
 
   return (
     <SidebarHeader className='sidebar-header' position='relative'>
-      <Button
+      <StyledButton
         data-test='sidebar-space-menu'
         endIcon={<KeyboardArrowDownIcon fontSize='small' />}
         variant='text'
         color='inherit'
-        sx={(theme) => ({
-          px: theme.spacing(2),
-          py: 0.2,
-          '&:hover': { backgroundColor: theme.palette.action.hover, color: 'inherit' }
-        })}
+        fullWidth
         {...bindTrigger(menuPopupState)}
       >
         <WorkspaceAvatar name={currentSpace?.name ?? ''} image={currentSpace?.spaceImage ?? null} />
         <Typography variant='body1' data-test='sidebar-space-name' noWrap ml={1}>
           {currentSpace?.name}
         </Typography>
-      </Button>
+      </StyledButton>
       <Menu onClick={menuPopupState.close} {...bindMenu(menuPopupState)}>
         <MenuItem component={NextLink} href='/nexus'>
           <Box display='flex' flexDirection='row'>
