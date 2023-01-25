@@ -18,8 +18,8 @@ handler
  * @swagger
  * /api/v1/spaces:
  *   post:
- *     summary: Create a new workspace
- *     description: Create a new workspace with discord server and discord admin user. Requires a valid super API key.
+ *     summary: Create a new space
+ *     description: Create a new space with discord server and discord admin user. Requires a valid super API key.
  *     requestBody:
  *       content:
  *          application/json:
@@ -27,7 +27,7 @@ handler
  *                $ref: '#/components/schemas/CreateWorkspaceRequestBody'
  *     responses:
  *       200:
- *         description: Summary of created workspace
+ *         description: Summary of created space
  *         content:
  *            application/json:
  *              schema:
@@ -38,7 +38,7 @@ async function createSpace(req: NextApiRequest, res: NextApiResponse<CreateWorks
     req.body as CreateWorkspaceRequestBody;
 
   if (typeof name !== 'string' || name.length < 3) {
-    throw new InvalidInputError('Workspace name must be a string at least 3 characters.');
+    throw new InvalidInputError('Space name must be a string at least 3 characters.');
   }
 
   // check for an identifier for the admin user

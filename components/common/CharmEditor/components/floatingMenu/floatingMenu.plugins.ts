@@ -1,6 +1,6 @@
 import { link } from '@bangle.dev/base-components';
 import type { PluginKey } from '@bangle.dev/core';
-import type { EditorState, EditorView, Transaction, Node, ResolvedPos, Plugin } from '@bangle.dev/pm';
+import type { EditorState, EditorView, Node, Plugin, ResolvedPos, Transaction } from '@bangle.dev/pm';
 import type { NodeSelection } from 'prosemirror-state';
 
 import { hasComponentInSchema } from 'lib/prosemirror/hasComponentInSchema';
@@ -9,7 +9,7 @@ import { floatingMenu } from './floating-menu';
 
 // Components that should not trigger floating menu
 const blacklistedComponents =
-  'image cryptoPrice iframe page pdf mention tabIndent codeBlock inlineDatabase poll bookmark';
+  'video image cryptoPrice iframe page pdf mention tabIndent codeBlock inlineDatabase poll bookmark';
 
 export function plugins({
   key,
@@ -33,13 +33,6 @@ export function plugins({
           return 'commentOnlyMenu';
         }
         return null;
-      }
-
-      // If we are inside a link
-      if (hasComponentInSchema(state, 'link')) {
-        if (link.queryIsSelectionAroundLink()(state) || link.queryIsLinkActive()(state)) {
-          return 'linkSubMenu';
-        }
       }
 
       // if inside a table, first check to see if we are resizing or not
@@ -75,7 +68,7 @@ export function plugins({
     const selectionTooltipPlugins = selectionTooltipPluginFn();
     const controller = selectionTooltipPlugins[1] as Plugin<any>;
     if (!controller.spec.view) {
-      throw new Error('View not found for the selection toolip plugin');
+      throw new Error('View not found for the selection tooltip plugin');
     }
     // @ts-ignore
     const viewUpdate = controller.spec.view().update;

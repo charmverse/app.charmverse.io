@@ -7,17 +7,17 @@ import startCase from 'lodash/startCase';
 
 import { ViewOptions } from 'components/common/ViewOptions';
 import { useForumCategories } from 'hooks/useForumCategories';
+import type { PostSortOption } from 'lib/forums/posts/constants';
 import { postSortOptions } from 'lib/forums/posts/constants';
-import type { PostOrder } from 'lib/forums/posts/listForumPosts';
 
-type FilterProps = {
-  selectedCategory?: string;
+export type FilterProps = {
+  selectedCategoryId?: string | null;
   handleCategory: (categoryId?: string) => void;
-  sort?: PostOrder;
-  handleSort: (sort?: PostOrder) => void;
+  selectedSort?: PostSortOption | null;
+  handleSort: (sort?: PostSortOption) => void;
 };
 
-export function CategorySelect({ handleCategory, selectedCategory, handleSort, sort }: FilterProps) {
+export function CategorySelect({ handleCategory, selectedCategoryId, handleSort, selectedSort }: FilterProps) {
   const { categories, error } = useForumCategories();
 
   if (error) {
@@ -27,7 +27,7 @@ export function CategorySelect({ handleCategory, selectedCategory, handleSort, s
   return (
     <Box display='flex' justifyContent='flex-start' flexWrap='wrap'>
       <ViewOptions label='Sort' sx={{ mr: '10px', pb: '20px' }}>
-        <Select value={sort ?? 'newest'} onChange={(e) => handleSort(e.target.value as PostOrder)}>
+        <Select value={selectedSort ?? 'new'} onChange={(e) => handleSort(e.target.value as PostSortOption)}>
           {postSortOptions.map((s) => (
             <MenuItem key={s} value={s}>
               <Typography>{startCase(s.replace('_', ' '))}</Typography>
@@ -37,13 +37,18 @@ export function CategorySelect({ handleCategory, selectedCategory, handleSort, s
       </ViewOptions>
       <ViewOptions label='Categories' sx={{ pb: '20px' }}>
         <Select
-          value={selectedCategory ?? 'all-category'}
+          value={selectedCategoryId ?? 'all-category'}
           onChange={(e) => {
             handleCategory(e.target.value);
           }}
+          renderValue={(value) => (
+            <Typography color='inherit'>
+              {value === 'all-category' ? 'All categories' : categories?.find((c) => c.id === value)?.name}
+            </Typography>
+          )}
         >
           <MenuItem value='all-category'>
-            <Typography sx={{ fontWeight: selectedCategory?.length === 0 ? 'bold' : 'initial' }} color='inherit'>
+            <Typography sx={{ fontWeight: !selectedCategoryId ? 'bold' : 'initial' }} color='inherit'>
               All categories
             </Typography>
           </MenuItem>
@@ -51,7 +56,7 @@ export function CategorySelect({ handleCategory, selectedCategory, handleSort, s
             <MenuItem key={category.id} value={category.id}>
               <Typography
                 key={category.id}
-                sx={{ fontWeight: selectedCategory === category.id ? 'bold' : 'initial' }}
+                sx={{ fontWeight: selectedCategoryId === category.id ? 'bold' : 'initial' }}
                 color='inherit'
               >
                 {category.name}

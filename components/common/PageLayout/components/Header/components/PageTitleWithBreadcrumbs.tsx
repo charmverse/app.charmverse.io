@@ -132,14 +132,16 @@ function ProposalPageTitle({ basePath }: { basePath: string }) {
   );
 }
 
-function ForumPageTitle({ basePath }: { basePath: string }) {
+function ForumPostTitle({ basePath, pathName }: { basePath: string; pathName: string }) {
   const [pageTitle] = usePageTitle();
+  const title = pathName === '/[domain]/forum' ? 'All Categories' : pageTitle;
+
   return (
     <PageTitle>
       <BreadCrumb>
         <Link href={`${basePath}/forum`}>Forum</Link>
       </BreadCrumb>
-      {pageTitle || 'Untitled'}
+      {title ?? 'Untitled'}
     </PageTitle>
   );
 }
@@ -209,8 +211,8 @@ export default function PageTitleWithBreadcrumbs({ pageId, pageType }: { pageId?
     return <ProposalPageTitle basePath={`/${router.query.domain}`} />;
   } else if (router.route === '/[domain]/[pageId]') {
     return <DocumentPageTitle basePath={`/${space?.domain}`} pageId={pageId} />;
-  } else if (router.route === '/[domain]/forum/post/[pagePath]') {
-    return <ForumPageTitle basePath={`/${router.query.domain}`} />;
+  } else if (router.route.includes('/[domain]/forum')) {
+    return <ForumPostTitle basePath={`/${router.query.domain}`} pathName={router.pathname} />;
   } else if (router.route === '/share/[...pageId]') {
     return <DocumentPageTitle basePath={`/share/${space?.domain}`} pageId={pageId} />;
   } else if (NEXUS_ROUTES.includes(router.route)) {

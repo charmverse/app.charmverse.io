@@ -4,6 +4,7 @@ import Grid from '@mui/material/Grid';
 import InputAdornment from '@mui/material/InputAdornment';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
+import type { PostCategory } from '@prisma/client';
 import { debounce } from 'lodash';
 import { useRouter } from 'next/router';
 import type { ChangeEvent } from 'react';
@@ -14,27 +15,56 @@ import { CenteredPageContent } from 'components/common/PageLayout/components/Pag
 import { usePostDialog } from 'components/forum/components/PostDialog/hooks/usePostDialog';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useForumCategories } from 'hooks/useForumCategories';
-import type { PostOrder } from 'lib/forums/posts/listForumPosts';
+import { usePageTitle } from 'hooks/usePageTitle';
+import type { PostSortOption } from 'lib/forums/posts/constants';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
 import { CategoryMenu } from './components/CategoryMenu';
 import { CategorySelect } from './components/CategorySelect';
-import CreateForumPost from './components/CreateForumPost';
+import { CreateForumPost } from './components/CreateForumPost';
 import PostDialog from './components/PostDialog';
+import { PostSkeleton } from './components/PostList/components/PostSkeleton';
 import { ForumPostList } from './components/PostList/PostList';
 
 export function ForumPage() {
   const [search, setSearch] = useState('');
   const router = useRouter();
   const currentSpace = useCurrentSpace();
-  const categoryId = router.query.categoryId as string | undefined;
-  const sort = router.query.sort as PostOrder | undefined;
+  const sort = router.query.sort as PostSortOption | undefined;
   const [showNewPostForm, setShowNewPostForm] = useState(false);
   const { showPost } = usePostDialog();
   const { categories } = useForumCategories();
-  const currentCategory = categories.find((category) => category.id === categoryId);
+  const [, setTitle] = usePageTitle();
+  const [currentCategory, setCurrentCategory] = useState<PostCategory | null>(null);
 
-  function handleSortUpdate(sortName?: PostOrder) {
+  useEffect(() => {
+    if (currentCategory?.name) {
+      setTitle(currentCategory.name);
+    }
+  }, [currentCategory?.name]);
+
+  useEffect(() => {
+    setCategoryFromPath();
+  }, [categories, router.query]);
+
+  const loadingCategories = !categories || categories.length === 0;
+
+  function setCategoryFromPath() {
+    const categoryPath = router.query.categoryPath as string | undefined;
+    const category = !categoryPath
+      ? null
+      : categories.find((_category) => _category.path === categoryPath || _category.name === categoryPath);
+    setCurrentCategory(category ?? null);
+
+    if (category && currentSpace) {
+      charmClient.track.trackAction('main_feed_filtered', {
+        categoryName: category.name,
+        spaceId: currentSpace.id
+      });
+    }
+  }
+
+  function handleSortUpdate(sortName?: PostSortOption) {
     const pathname = `/${currentSpace?.domain}/forum`;
 
     if (sortName) {
@@ -49,18 +79,14 @@ export function ForumPage() {
     }
   }
 
-  function handleCategoryUpdate(_categoryId?: string) {
+  function handleCategoryUpdate(newCategoryId?: string) {
     const pathname = `/${currentSpace?.domain}/forum`;
 
-    if (_categoryId === null) {
+    const newCategory = newCategoryId ? categories.find((category) => category.id === newCategoryId) : null;
+
+    if (newCategory) {
       router.push({
-        pathname,
-        query: { _categoryId: null }
-      });
-    } else if (typeof _categoryId === 'string') {
-      router.push({
-        pathname,
-        query: { _categoryId }
+        pathname: `${pathname}/${newCategory.path ?? newCategory.name}`
       });
     } else {
       router.push({
@@ -78,15 +104,15 @@ export function ForumPage() {
   }
 
   useEffect(() => {
-    if (typeof router.query.pageId === 'string') {
+    if (typeof router.query.postId === 'string') {
       showPost({
-        postId: router.query.pageId,
+        postId: router.query.postId,
         onClose() {
-          setUrlWithoutRerender(router.pathname, { pageId: null });
+          setUrlWithoutRerender(router.pathname, { postId: null });
         }
       });
     }
-  }, [router.query.pageId]);
+  }, [router.query.postId]);
 
   useEffect(() => {
     if (currentSpace) {
@@ -105,9 +131,9 @@ export function ForumPage() {
   }, [debounceSearch]);
 
   return (
-    <CenteredPageContent>
+    <CenteredPageContent style={{ width: 1100 }}>
       <Typography variant='h1' mb={2}>
-        {`${currentCategory ? `${currentCategory?.name} - ` : ''}Forum`}
+        {currentCategory ? currentCategory?.name : 'All categories'}
       </Typography>
 
       <TextField
@@ -124,24 +150,47 @@ export function ForumPage() {
           )
         }}
       />
-      <Grid container spacing={2}>
-        <Grid item xs={12} lg={9}>
-          <Box display={{ lg: 'none' }}>
+      <Box display='flex' gap={4}>
+        <Box
+          sx={{
+            width: {
+              xs: '100%',
+              md: 640
+            }
+          }}
+        >
+          <Box display={{ md: 'none' }}>
             <CategorySelect
-              selectedCategory={currentCategory?.id}
-              sort={sort}
+              selectedCategoryId={currentCategory?.id}
+              selectedSort={sort}
               handleCategory={handleCategoryUpdate}
               handleSort={handleSortUpdate}
             />
           </Box>
           <CreateForumPost onClick={showNewPostPopup} />
-          {currentSpace && <PostDialog open={showNewPostForm} onClose={hideNewPostPopup} spaceId={currentSpace.id} />}
-          <ForumPostList search={search} categoryId={currentCategory?.id} sort={sort} />
-        </Grid>
-        <Grid item xs={12} lg={3} display={{ xs: 'none', lg: 'initial' }}>
-          <CategoryMenu />
-        </Grid>
-      </Grid>
+          {currentSpace && (
+            <PostDialog
+              newPostCategory={currentCategory}
+              open={showNewPostForm}
+              onClose={hideNewPostPopup}
+              spaceId={currentSpace.id}
+            />
+          )}
+          {loadingCategories ? (
+            <PostSkeleton />
+          ) : (
+            <ForumPostList search={search} categoryId={currentCategory?.id} sort={sort} />
+          )}
+        </Box>
+        <Box flexGrow={1} display={{ xs: 'none', md: 'initial' }}>
+          <CategoryMenu
+            handleCategory={handleCategoryUpdate}
+            handleSort={handleSortUpdate}
+            selectedSort={sort}
+            selectedCategoryId={currentCategory?.id}
+          />
+        </Box>
+      </Box>
     </CenteredPageContent>
   );
 }

@@ -40,6 +40,7 @@ export default function SuggestionsPopup({
       .flat()
       .find((mark) => mark.active);
     const suggestions = activeSuggestion ? [activeSuggestion] : rows.find((row) => row.pos === rowPos)?.marks ?? [];
+
     return createPortal(
       <ClickAwayListener
         onClickAway={() => {

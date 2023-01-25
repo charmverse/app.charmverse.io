@@ -1,6 +1,6 @@
 import ClearIcon from '@mui/icons-material/Clear';
 import ReplayIcon from '@mui/icons-material/Replay';
-import { Box, Divider, Typography, IconButton, Stack } from '@mui/material';
+import { Box, Divider, IconButton, Stack, Typography } from '@mui/material';
 import type { AlertProps } from '@mui/material/Alert';
 import MuiAlert from '@mui/material/Alert';
 import Snackbar from '@mui/material/Snackbar';
@@ -15,7 +15,7 @@ import { useMembers } from 'hooks/useMembers';
 import useOnScreen from 'hooks/useOnScreen';
 import { useUser } from 'hooks/useUser';
 import { useWebSocketClient } from 'hooks/useWebSocketClient';
-import type { PostOrder } from 'lib/forums/posts/listForumPosts';
+import type { PostSortOption } from 'lib/forums/posts/constants';
 import type { WebSocketPayload } from 'lib/websockets/interfaces';
 
 import { PostCard } from './components/PostCard';
@@ -24,7 +24,7 @@ import { PostSkeleton } from './components/PostSkeleton';
 interface ForumPostsProps {
   search: string;
   categoryId?: string;
-  sort?: PostOrder;
+  sort?: PostSortOption;
 }
 
 const resultsPerQuery = 10;
@@ -53,7 +53,11 @@ export function ForumPostList({ search, categoryId, sort }: ForumPostsProps) {
   } = useSWRInfinite(
     (index) =>
       currentSpace && !search
-        ? { url: 'forums/posts', arguments: { spaceId: currentSpace?.id, page: index, categoryId, sort } }
+        ? {
+            url: 'forums/posts',
+            // include userId to update votes if the user changes
+            arguments: { userId: user?.id, spaceId: currentSpace?.id, page: index, categoryId, sort }
+          }
         : null,
     (args) =>
       charmClient.forum.listForumPosts({
@@ -72,18 +76,23 @@ export function ForumPostList({ search, categoryId, sort }: ForumPostsProps) {
     setSize: setSearchSize,
     isLoading: isLoadingSearch
   } = useSWRInfinite(
-    (index) => (currentSpace && search ? { url: 'forums/posts/search', arguments: { page: index, search } } : null),
+    (index) =>
+      currentSpace && search
+        ? {
+            url: 'forums/posts/search',
+            arguments: { userId: user?.id, spaceId: currentSpace?.id, page: index, search }
+          }
+        : null,
     (args) =>
       charmClient.forum.searchForumPosts({
-        spaceId: currentSpace!.id,
+        spaceId: args.arguments.spaceId,
         search: args.arguments.search,
         count: resultsPerQuery,
         page: args.arguments.page
       })
   );
 
-  const dataError =
-    postsError?.message ?? searchError?.message ?? 'There was an unexpected error while loading the posts';
+  const errorMessage = postsError?.message ?? searchError?.message;
 
   const hasNext = useMemo(
     () => (search && searchData ? searchData.at(-1)?.hasNext === true : postsData?.at(-1)?.hasNext === true),
@@ -98,11 +107,17 @@ export function ForumPostList({ search, categoryId, sort }: ForumPostsProps) {
   const handlePostPublishEvent = useCallback(
     (postWithPage: WebSocketPayload<'post_published'>) => {
       if (!currentCategoryId || postWithPage.categoryId === currentCategoryId) {
-        if (postWithPage.createdBy === user?.id) {
-          refreshPosts();
-        } else {
+        if (postWithPage.createdBy !== user?.id) {
           setMorePostsAvailable(true);
         }
+      }
+    },
+    [user, categoryId]
+  );
+  const handlePostUpdateEvent = useCallback(
+    (postWithPage: WebSocketPayload<'post_updated' | 'post_deleted'>) => {
+      if (!currentCategoryId || postWithPage.categoryId === currentCategoryId) {
+        refreshPosts();
       }
     },
     [user, categoryId]
@@ -117,11 +132,15 @@ export function ForumPostList({ search, categoryId, sort }: ForumPostsProps) {
   }
 
   useEffect(() => {
-    const unsubscribeFromPostPublishEvent = subscribe('post_published', handlePostPublishEvent);
+    const unsubscribePublishListener = subscribe('post_published', handlePostPublishEvent);
+    const unsubscribeUpdatesListener = subscribe('post_updated', handlePostUpdateEvent);
+    const unsubscribeDeletesListener = subscribe('post_deleted', handlePostUpdateEvent);
     return () => {
-      unsubscribeFromPostPublishEvent();
+      unsubscribePublishListener();
+      unsubscribeUpdatesListener();
+      unsubscribeDeletesListener();
     };
-  }, [handlePostPublishEvent]);
+  }, [handlePostPublishEvent, handlePostUpdateEvent]);
 
   useEffect(() => {
     if (
@@ -143,7 +162,11 @@ export function ForumPostList({ search, categoryId, sort }: ForumPostsProps) {
 
   return (
     <>
-      {(postsError || searchError) && <Alert severity='error'>{dataError}</Alert>}
+      {errorMessage && (
+        <Alert variant='outlined' severity='error'>
+          {errorMessage}
+        </Alert>
+      )}
       {postsToShow.map((post) => (
         <PostCard
           key={post.id}

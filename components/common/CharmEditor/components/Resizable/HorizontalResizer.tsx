@@ -19,8 +19,9 @@ function Resizer(props: ResizerProps) {
   const width = Math.min(props.width, props.maxWidth || Infinity);
   const height = props.aspectRatio ? width / props.aspectRatio : 0;
 
+  // stop propagation of mousedown event to avoid selection in Prosemirror, which makes drag/drop not work very well
   return (
-    <ResizableContainer>
+    <ResizableContainer onMouseDown={(e) => e.stopPropagation()}>
       <ResizableBox
         onResize={props.onResize}
         width={width}

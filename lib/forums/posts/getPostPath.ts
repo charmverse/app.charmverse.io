@@ -1,5 +1,7 @@
-import { uid } from 'lib/utilities/strings';
+import { stringToValidPath, uid } from 'lib/utilities/strings';
+
+const maxTitleCharacters = 50;
 
 export function getPostPath(postTitle: string): string {
-  return `${postTitle.toLowerCase().replace(/\s{1,}/g, '_')}_${uid()}`;
+  return `${stringToValidPath(postTitle, maxTitleCharacters)}_${uid()}`;
 }

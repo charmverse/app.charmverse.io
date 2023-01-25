@@ -106,9 +106,6 @@ export function createNewPropertiesForBoard(
 
     return { ...defaultProps, options, type: 'multiSelect' };
   }
-  if (propValues.every((p) => uuidValidate(p))) {
-    return { ...defaultProps, type: 'person' };
-  }
   if (propValues.every(validateAllBlockDates)) {
     return { ...defaultProps, type: 'date' };
   }

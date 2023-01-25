@@ -40,7 +40,7 @@ export function JoinPredefinedSpaceDomain({ spaceDomain }: { spaceDomain: string
     ) : (
       <>
         <br />
-        <Alert severity='error'>No workspace found</Alert>
+        <Alert severity='error'>No space found</Alert>
       </>
     );
   }

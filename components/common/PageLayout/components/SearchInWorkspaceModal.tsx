@@ -202,7 +202,7 @@ function SearchInWorkspaceModal(props: SearchInWorkspaceModalProps) {
         renderInput={(params) => (
           <TextField
             {...params}
-            placeholder='Search inside the workspace'
+            placeholder='Search inside the space'
             variant='standard'
             size='small'
             autoFocus={true}

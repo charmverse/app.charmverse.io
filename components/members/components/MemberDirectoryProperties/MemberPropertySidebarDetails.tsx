@@ -55,7 +55,7 @@ export function MemberPropertySidebarDetails({
 
   return (
     <>
-      <Collapse in={isExpanded}>
+      <Collapse in={isExpanded} mountOnEnter={true} unmountOnExit={true}>
         <Stack mb={1}>
           <Stack>
             <Box pl={4}>
@@ -99,9 +99,9 @@ export function MemberPropertySidebarDetails({
                 ))}
               </Stack>
             ) : (
-              <Tooltip title={`Everyone in workspace can see ${property.name} property`}>
+              <Tooltip title={`Everyone in space can see ${property.name} property`} disableInteractive>
                 <Typography pl={4} variant='overline' alignItems='center' display='flex'>
-                  Everyone in workspace
+                  Everyone in space
                   <VisibilityOutlinedIcon fontSize='small' color='secondary' sx={{ ml: 1 }} />
                 </Typography>
               </Tooltip>

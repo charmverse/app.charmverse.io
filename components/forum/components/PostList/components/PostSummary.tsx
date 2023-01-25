@@ -1,4 +1,5 @@
 import styled from '@emotion/styled';
+import { useState } from 'react';
 
 import CharmEditor from 'components/common/CharmEditor/CharmEditor';
 import type { PageContent } from 'lib/prosemirror/interfaces';
@@ -9,7 +10,20 @@ const StyledCharmEditor = styled(CharmEditor)`
   }
 `;
 
+type Props = {
+  content: PageContent | null;
+  postId: string;
+};
 // pageId is used for permissions to content
-export function PostSummary({ content, pageId }: { content: PageContent | null; pageId: string }) {
-  return <StyledCharmEditor isContentControlled content={content ?? undefined} pageId={pageId} readOnly={true} />;
+export function PostSummary({ content, postId }: Props) {
+  return (
+    <StyledCharmEditor
+      // TODO: Maybe CharmEditor should watch content for changes, ubt dont have time to test all implementations
+      key={JSON.stringify(content)}
+      isContentControlled
+      content={content ?? undefined}
+      pageId={postId}
+      readOnly={true}
+    />
+  );
 }

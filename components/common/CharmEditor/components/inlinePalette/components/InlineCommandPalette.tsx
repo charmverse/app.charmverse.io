@@ -57,19 +57,25 @@ interface InlineCommentGroupProps {
   menuKey?: PluginKey;
   nestedPagePluginKey?: PluginKey<NestedPagePluginState>;
   disableNestedPage?: boolean;
+  filterItem?: (item: PaletteItem) => boolean;
   externalPopupState?: PopupState;
-  size?: InlinePaletteSize;
+  isFloatingMenuList?: boolean;
   handleActiveItem?: (item: string) => void;
   palettePluginKey: PluginKey;
   enableVoting?: boolean;
+}
+
+function defaultFilterItem(item: PaletteItem, { disableNestedPage }: { disableNestedPage: boolean }) {
+  return (disableNestedPage && item.uid !== 'insert-page') || !disableNestedPage;
 }
 
 export default function InlineCommandPalette({
   menuKey,
   nestedPagePluginKey,
   disableNestedPage = false,
+  filterItem,
   externalPopupState,
-  size = 'big',
+  isFloatingMenuList = false,
   handleActiveItem,
   palettePluginKey,
   enableVoting
@@ -119,7 +125,8 @@ export default function InlineCommandPalette({
 
   const paletteGroupItemsRecord: Record<string, ReactNode[]> = useMemo(() => {
     return items.reduce<Record<string, ReactNode[]>>((acc, item, intex) => {
-      if ((disableNestedPage && item.uid !== 'insert-page') || !disableNestedPage) {
+      const canShowItem = filterItem ? filterItem(item) : defaultFilterItem(item, { disableNestedPage });
+      if (canShowItem) {
         const itemProps = { ...getItemProps(item, intex) };
         const itemNode = (
           <MenuItem
@@ -134,9 +141,9 @@ export default function InlineCommandPalette({
               disabled={item._isItemDisabled}
               title={item.title}
               icon={item.icon}
-              description={size === 'big' ? item.description : undefined}
+              description={!isFloatingMenuList ? item.description : undefined}
               {...itemProps}
-              size={size}
+              size={isFloatingMenuList ? 'small' : 'big'}
               onClick={(e) => {
                 itemProps.onClick(e);
                 closePalette();
@@ -160,7 +167,7 @@ export default function InlineCommandPalette({
       }
       return acc;
     }, {});
-  }, [items, disableNestedPage, size, getItemProps, closePalette]);
+  }, [items, disableNestedPage, isFloatingMenuList, getItemProps, closePalette]);
 
   useEffect(() => {
     const activeItem = items.find((item, index) => !!getItemProps(item, index).isActive);
@@ -182,9 +189,6 @@ export default function InlineCommandPalette({
     dismissPalette();
     closePalette();
   }
-
-  const filteredPaletteGroupItemsRecord =
-    size === 'small' && paletteGroupItemsRecord.text ? { text: paletteGroupItemsRecord.text } : paletteGroupItemsRecord;
 
   return (
     <Popper
@@ -221,9 +225,9 @@ export default function InlineCommandPalette({
               }}
               sx={{ py: 0 }}
             >
-              {Object.entries(filteredPaletteGroupItemsRecord).map(([group, paletteItems]) => (
+              {Object.entries(paletteGroupItemsRecord).map(([group, paletteItems]) => (
                 <InlinePaletteGroup key={group}>
-                  <GroupLabel>{size === 'small' ? 'Turn into' : group}</GroupLabel>
+                  <GroupLabel>{isFloatingMenuList ? 'Turn into' : group}</GroupLabel>
                   {paletteItems}
                 </InlinePaletteGroup>
               ))}

@@ -144,7 +144,7 @@ export default function PublishingForm({ onSubmit, page }: Props) {
           errorType: 'Data not found',
           severity: 'warning',
           message:
-            'This space must be connected to Snapshot.org before you can export proposals to it. Only workspace admins can connect Snapshot to this Workspace.'
+            'This space must be connected to Snapshot.org before you can export proposals to it. Only space admins can connect Snapshot to this Space.'
         })
       );
     } else if (space.snapshotDomain && !snapshotSpace) {

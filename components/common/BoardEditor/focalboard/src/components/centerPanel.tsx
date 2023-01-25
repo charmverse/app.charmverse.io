@@ -28,6 +28,7 @@ import {
   sortCards
 } from 'components/common/BoardEditor/focalboard/src/store/cards';
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
+import { getLoadingState } from 'components/common/BoardEditor/focalboard/src/store/loadingState';
 import Button from 'components/common/Button';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -92,7 +93,7 @@ function CenterPanel(props: Props) {
     cardIdToFocusOnRender: '',
     selectedCardIds: [],
     // assume this is a page type 'inline_linked_board' or 'linked_board' if no view exists
-    showSettings: !props.activeView ? 'create-linked-view' : null
+    showSettings: null
   });
 
   const [loadingFormResponses, setLoadingFormResponses] = useState(false);
@@ -101,6 +102,14 @@ function CenterPanel(props: Props) {
   const space = useCurrentSpace();
   const { pages, updatePage } = usePages();
   const { members } = useMembers();
+
+  useEffect(() => {
+    if (views.length === 0 && !activeView) {
+      setState((s) => ({ ...s, showSettings: 'create-linked-view' }));
+    } else if (activeView) {
+      setState((s) => ({ ...s, showSettings: null }));
+    }
+  }, [activeView?.id, views.length]);
 
   const isEmbedded = !!props.embeddedBoardPath;
   const boardPage = pages[board.id];
@@ -427,6 +436,7 @@ function CenterPanel(props: Props) {
 
   return (
     <div
+      // remount components between pages
       className={`BoardComponent ${isEmbedded ? 'embedded-board' : ''}`}
       ref={backgroundRef}
       onClick={(e) => {

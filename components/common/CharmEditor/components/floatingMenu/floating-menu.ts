@@ -46,32 +46,6 @@ export function floatingMenu({
       : undefined
   ];
 }
-export function toggleSubMenu(floatingMenuPluginKey: PluginKey, subMenu: SubMenu): Command {
-  const nodeName = subMenu === 'inlineCommentSubMenu' ? inlineCommentMarkName : 'link';
-  return (state, _dispatch, view) => {
-    const type = querySelectionTooltipType(floatingMenuPluginKey)(state);
-
-    if (!hasComponentInSchema(state, nodeName)) {
-      return false;
-    }
-
-    if (state.selection.empty) {
-      // Focus on link tooltip by keyboard shortcut
-      if (type === subMenu) {
-        rafCommandExec(view!, focusFloatingMenuInput(floatingMenuPluginKey));
-      }
-      return false;
-    }
-
-    if (type === subMenu) {
-      return hideSelectionTooltip(floatingMenuPluginKey)(view!.state, view!.dispatch, view);
-    }
-
-    rafCommandExec(view!, focusFloatingMenuInput(floatingMenuPluginKey));
-
-    return updateSelectionTooltipType(floatingMenuPluginKey, subMenu)(view!.state, view!.dispatch, view);
-  };
-}
 
 export function toggleLinkSubMenu(key: PluginKey): Command {
   return (state, _dispatch, view) => {
@@ -96,6 +70,33 @@ export function toggleLinkSubMenu(key: PluginKey): Command {
     rafCommandExec(view, focusFloatingMenuInput(key));
 
     return updateSelectionTooltipType(key, 'linkSubMenu')(view.state, view.dispatch, view);
+  };
+}
+
+export function toggleSubMenu(floatingMenuPluginKey: PluginKey, subMenu: SubMenu): Command {
+  const nodeName = subMenu === 'inlineCommentSubMenu' ? inlineCommentMarkName : 'link';
+  return (state, _dispatch, view) => {
+    const type = querySelectionTooltipType(floatingMenuPluginKey)(state);
+
+    if (!hasComponentInSchema(state, nodeName)) {
+      return false;
+    }
+
+    if (state.selection.empty) {
+      // Focus on link tooltip by keyboard shortcut
+      if (type === subMenu) {
+        rafCommandExec(view!, focusFloatingMenuInput(floatingMenuPluginKey));
+      }
+      return false;
+    }
+
+    if (type === subMenu) {
+      return hideSelectionTooltip(floatingMenuPluginKey)(view!.state, view!.dispatch, view);
+    }
+
+    rafCommandExec(view!, focusFloatingMenuInput(floatingMenuPluginKey));
+
+    return updateSelectionTooltipType(floatingMenuPluginKey, subMenu)(view!.state, view!.dispatch, view);
   };
 }
 

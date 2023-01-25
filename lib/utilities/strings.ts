@@ -49,6 +49,10 @@ export function isUrl(text: string) {
 
 // generate a color based on a string. Copied from https://medium.com/@pppped/compute-an-arbitrary-color-for-user-avatar-starting-from-his-username-with-javascript-cd0675943b66
 export function stringToColor(name: string, saturation = 50, lightness = 60) {
+  if (name === '') {
+    // return 'var(--background-dark)';
+    return 'transparent';
+  }
   return `hsl(${stringToHue(name)}, ${saturation}%, ${lightness}%)`;
 }
 
@@ -62,6 +66,27 @@ export function stringToHue(name: string) {
 
   const h = hash % 360;
   return h;
+}
+
+// A future update can use https://www.npmjs.com/package/friendly-url
+// Info for japanese title characters: https://gist.github.com/ryanmcgrath/982242
+export function stringToValidPath(input: string, maxLength?: number): string {
+  const sanitizedInput = input
+    .slice(0, maxLength)
+    .toLowerCase()
+    .replace(/&/g, ' ')
+    .replace(
+      /[^a-zA-Z\d\s\u3000-\u303F\u3040-\u309F\u30A0-\u30FF\uFF00-\uFFEF\u4E00-\u9FAF\u2605-\u2606\u2190-\u2195\u203B]{1,}/g,
+      ' '
+    )
+    .trim()
+    .replace(/\s{1,}/g, '_');
+
+  if (sanitizedInput.length < 3) {
+    return `${sanitizedInput}_${uid()}`;
+  } else {
+    return sanitizedInput;
+  }
 }
 
 export const shortenHex = (hex: string = '', length = 4): string => {

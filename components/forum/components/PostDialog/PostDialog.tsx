@@ -1,12 +1,15 @@
 import OpenInFullIcon from '@mui/icons-material/OpenInFull';
 import { Box } from '@mui/material';
+import type { PostCategory } from '@prisma/client';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
 import { useEffect, useRef, useState } from 'react';
 
+import charmClient from 'charmClient';
 import Dialog from 'components/common/BoardEditor/focalboard/src/components/dialog';
 import Button from 'components/common/Button';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
+import { PageActions } from 'components/common/PageActions';
 import type { PostWithVotes } from 'lib/forums/posts/interfaces';
 
 import type { FormInputs } from '../interfaces';
@@ -17,9 +20,10 @@ interface Props {
   spaceId: string;
   onClose: () => void;
   open?: boolean;
+  newPostCategory?: PostCategory | null;
 }
 
-export default function PostDialog({ post, spaceId, onClose, open }: Props) {
+export default function PostDialog({ post, spaceId, onClose, open, newPostCategory }: Props) {
   const mounted = useRef(false);
   const popupState = usePopupState({ variant: 'popover', popupId: 'post-dialog' });
   const router = useRouter();
@@ -57,28 +61,41 @@ export default function PostDialog({ post, spaceId, onClose, open }: Props) {
     setShowConfirmDialog(false);
   }
 
+  function deletePost() {
+    if (post) {
+      charmClient.forum.deleteForumPost(post.id).then(() => {
+        close();
+      });
+    }
+  }
+
   if (!popupState.isOpen) {
     return null;
   }
+
+  const relativePath = `/${router.query.domain}/forum/post/${post?.path}`;
 
   return (
     <Dialog
       fullWidth
       toolbar={
-        post && (
+        post ? (
           <Box display='flex' justifyContent='space-between'>
             <Button
               size='small'
               color='secondary'
-              href={`/${router.query.domain}/forum/post/${post.path}`}
+              href={relativePath}
               variant='text'
               startIcon={<OpenInFullIcon fontSize='small' />}
             >
               Open as Page
             </Button>
           </Box>
+        ) : (
+          <div />
         )
       }
+      toolsMenu={post && <PageActions page={{ ...post, relativePath }} onClickDelete={deletePost} />}
       onClose={() => {
         if (contentUpdated) {
           setShowConfirmDialog(true);
@@ -98,7 +115,7 @@ export default function PostDialog({ post, spaceId, onClose, open }: Props) {
         onSave={close}
         contentUpdated={contentUpdated}
         setContentUpdated={setContentUpdated}
-        showOtherCategoryPosts
+        newPostCategory={newPostCategory}
       />
       <ConfirmDeleteModal
         onClose={() => {
