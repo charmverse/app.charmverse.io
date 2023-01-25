@@ -1,7 +1,11 @@
 # Install dependencies only when needed
-FROM node:18 AS BASE_APP
-# Check https://github.com/nodejs/docker-node/tree/b4117f9333da4138b03a546ec926ef50a31506c3#nodealpine to understand why libc6-compat might be needed.
-#RUN apk add --no-cache libc6-compat git
+
+# Use node-slim because node-alpine does not seem to supports the `sharp` npm library that gets built
+FROM node:18-slim AS BASE_APP
+
+# useful for node-alpine
+# RUN apk add --no-cache libc6-compat git
+
 WORKDIR /app
 
 COPY . .
