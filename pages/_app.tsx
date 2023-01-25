@@ -107,7 +107,6 @@ import 'components/common/BoardEditor/focalboard/src/styles/_markdown.scss';
 import 'components/common/BoardEditor/focalboard/src/widgets/buttons/buttonWithMenu.scss';
 import 'components/common/BoardEditor/focalboard/src/widgets/buttons/iconButton.scss';
 import 'components/common/BoardEditor/focalboard/src/widgets/editable.scss';
-import 'components/common/BoardEditor/focalboard/src/widgets/editableArea.scss';
 import 'components/common/BoardEditor/focalboard/src/widgets/editableDayPicker.scss';
 import 'components/common/BoardEditor/focalboard/src/widgets/emojiPicker.scss';
 import 'components/common/BoardEditor/focalboard/src/widgets/label.scss';

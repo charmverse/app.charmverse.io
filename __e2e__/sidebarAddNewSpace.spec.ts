@@ -1,12 +1,11 @@
-import type { Browser } from '@playwright/test';
-import { chromium, expect, test } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 import { baseUrl } from 'config/constants';
 
 import { generateUserAndSpace } from './utils/mocks';
 import { login } from './utils/session';
 
-test.describe.serial('Add a new workspace from sidebar and load it', async () => {
+test.describe.serial('Add a new space from sidebar and load it', async () => {
   test('Fill the form and create a new space', async ({ page }) => {
     // Arrange ------------------
     // const userContext = await browser.newContext();
@@ -24,11 +23,15 @@ test.describe.serial('Add a new workspace from sidebar and load it', async () =>
 
     // Act ----------------------
     // Part A - Prepare the page as a logged in user
-    // 1. Make sure there is a button to add a new workspace
-    const addNewSpaceBtn = page.locator('data-test=sidebar-add-new-space');
+    // 1. Click on the space menu button to open the dropdown
+    const spaceMenuBtn = page.locator('data-test=sidebar-space-menu');
+    await spaceMenuBtn.click();
+
+    // 2. Make sure there is a button to add a new space
+    const addNewSpaceBtn = page.locator('data-test=spaces-menu-add-new-space');
     await addNewSpaceBtn.waitFor();
 
-    // 2. Open create space dialod
+    // 3. Open create space dialod
     await addNewSpaceBtn.click();
 
     await expect(page.locator('data-test=create-space-form')).toBeVisible();
@@ -50,7 +53,6 @@ test.describe.serial('Add a new workspace from sidebar and load it', async () =>
     await expect(closePropertiesModalBtn).toBeVisible();
     await closePropertiesModalBtn.click();
 
-    await expect(addNewSpaceBtn).toBeVisible();
     await page.locator('text=[Your DAO] Home').first().waitFor();
 
     // check sidebar space name
@@ -58,6 +60,7 @@ test.describe.serial('Add a new workspace from sidebar and load it', async () =>
     expect(sidebarSpaceName).toBe(uniqueDomainName);
 
     // Create and verify 2nd space
+    await spaceMenuBtn.click();
     await addNewSpaceBtn.click();
     const uniqueDomainName2 = Math.random().toString().replace('.', '');
     await domainInput.fill(uniqueDomainName2);

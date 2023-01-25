@@ -132,7 +132,7 @@ function ProposalPageTitle({ basePath }: { basePath: string }) {
   );
 }
 
-function ForumPageTitle({ basePath, pathName }: { basePath: string; pathName: string }) {
+function ForumPostTitle({ basePath, pathName }: { basePath: string; pathName: string }) {
   const [pageTitle] = usePageTitle();
   const title = pathName === '/[domain]/forum' ? 'All Categories' : pageTitle;
 
@@ -212,7 +212,7 @@ export default function PageTitleWithBreadcrumbs({ pageId, pageType }: { pageId?
   } else if (router.route === '/[domain]/[pageId]') {
     return <DocumentPageTitle basePath={`/${space?.domain}`} pageId={pageId} />;
   } else if (router.route.includes('/[domain]/forum')) {
-    return <ForumPageTitle basePath={`/${router.query.domain}`} pathName={router.pathname} />;
+    return <ForumPostTitle basePath={`/${router.query.domain}`} pathName={router.pathname} />;
   } else if (router.route === '/share/[...pageId]') {
     return <DocumentPageTitle basePath={`/share/${space?.domain}`} pageId={pageId} />;
   } else if (NEXUS_ROUTES.includes(router.route)) {

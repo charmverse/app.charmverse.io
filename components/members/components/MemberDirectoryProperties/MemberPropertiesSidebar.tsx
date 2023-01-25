@@ -206,7 +206,7 @@ export function MemberPropertySidebarItem({ property }: { property: MemberProper
               alignItems: 'center'
             }}
           >
-            <Tooltip title={`Edit ${property.name} property.`}>
+            <Tooltip title={`Edit ${property.name} property.`} disableInteractive>
               <EditIcon
                 cursor='pointer'
                 fontSize='small'
@@ -218,7 +218,7 @@ export function MemberPropertySidebarItem({ property }: { property: MemberProper
               />
             </Tooltip>
             {!MEMBER_PROPERTY_CONFIG[property.type]?.default && (
-              <Tooltip title={`Delete ${property.name} property.`}>
+              <Tooltip title={`Delete ${property.name} property.`} disableInteractive>
                 <DeleteOutlinedIcon
                   cursor='pointer'
                   fontSize='small'

@@ -12,7 +12,7 @@ import {
   setCurrent as setCurrentBoard
 } from 'components/common/BoardEditor/focalboard/src/store/boards';
 import { useAppDispatch, useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
-import { initialReadOnlyLoad } from 'components/common/BoardEditor/focalboard/src/store/initialLoad';
+import { initialLoad, initialReadOnlyLoad } from 'components/common/BoardEditor/focalboard/src/store/initialLoad';
 import {
   getCurrentBoardViews,
   getView,
@@ -40,9 +40,11 @@ interface Props {
 export function DatabasePage({ page, setPage, readOnly = false, pagePermissions }: Props) {
   const router = useRouter();
   const board = useAppSelector(getCurrentBoard);
-  const [currentViewId, setCurrentViewId] = useState<string>(router.query.viewId as string);
-  const activeView = useAppSelector(getView(currentViewId));
+  const [currentViewId, setCurrentViewId] = useState<string | undefined>(router.query.viewId as string | undefined);
   const boardViews = useAppSelector(getCurrentBoardViews);
+  // grab the first board view if current view is not specified
+  const activeView =
+    typeof currentViewId === 'string' ? boardViews.find((view) => view.id === currentViewId) : boardViews[0];
   const dispatch = useAppDispatch();
   const [shownCardId, setShownCardId] = useState<string | null>((router.query.cardId as string) ?? null);
 
@@ -140,6 +142,8 @@ export function DatabasePage({ page, setPage, readOnly = false, pagePermissions 
             viewId: viewId || ''
           }
         });
+        // call setCurrentViewId in case user clicked "add view", because we didnt update the URL so it wouldnt affect the activeView
+        setCurrentViewId(viewId);
       }
     },
     [router.query]

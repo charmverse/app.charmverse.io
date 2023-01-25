@@ -16,7 +16,7 @@ export const StyledSpinner = styled(CircularProgress)`
 `;
 
 type ButtonProps = ComponentProps<typeof Button>;
-export type InputProps<C extends ElementType> = ButtonProps &
+export type InputProps<C extends ElementType = ElementType> = ButtonProps &
   // Omit 'variant' because it gets overridden sometimes by component
   Omit<ComponentProps<C>, 'variant'> & {
     component?: C;
