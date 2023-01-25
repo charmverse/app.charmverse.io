@@ -24,6 +24,7 @@ import { useSpaces } from 'hooks/useSpaces';
 import log from 'lib/log';
 import { generateNotionImportRedirectUrl } from 'lib/notion/generateNotionImportRedirectUrl';
 import type { SpaceCreateTemplate } from 'lib/spaces/utils';
+import { defaultTemplate } from 'lib/spaces/utils';
 import randomName from 'lib/utilities/randomName';
 
 import { ImportZippedMarkdown } from '../CharmEditor/components/markdownParser/ImportZippedMarkdown';
@@ -31,15 +32,13 @@ import { JoinDynamicSpaceForm } from '../TokenGateForm/JoinDynamicSpaceForm';
 
 import { SelectNewSpaceTemplate } from './SpaceTemplateOptions';
 
-const defaultTemplate: SpaceCreateTemplate = 'default';
-
-export const schema = yup.object({
+const schema = yup.object({
   name: yup.string().ensure().trim().min(3, 'Name must be at least 3 characters').required('Name is required'),
   spaceImage: yup.string().nullable(true),
   spaceTemplateOption: yup.string().default(defaultTemplate)
 });
 
-export type FormValues = yup.InferType<typeof schema>;
+type FormValues = yup.InferType<typeof schema>;
 
 interface Props {
   defaultValues?: { name: string; domain: string };

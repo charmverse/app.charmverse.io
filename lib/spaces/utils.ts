@@ -44,3 +44,5 @@ export const spaceCreateTemplates = {
 } as const;
 
 export type SpaceCreateTemplate = keyof typeof spaceCreateTemplates;
+
+export const defaultTemplate: SpaceCreateTemplate = 'default';
