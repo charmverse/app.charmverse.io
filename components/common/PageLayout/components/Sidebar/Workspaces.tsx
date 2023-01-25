@@ -1,17 +1,14 @@
 import styled from '@emotion/styled';
 import AddIcon from '@mui/icons-material/Add';
-import NavigateNextIcon from '@mui/icons-material/ArrowRightAlt';
 import { Divider } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import IconButton from '@mui/material/IconButton';
 import MuiLink from '@mui/material/Link';
 import Tooltip from '@mui/material/Tooltip';
-import Typography from '@mui/material/Typography';
 import NextLink from 'next/link';
 import { useState } from 'react';
 
-import Button from 'components/common/Button';
-import { CreateSpaceForm } from 'components/common/CreateSpaceForm/CreateSpaceForm';
+import { CreateSpaceForm } from 'components/common/CreateSpaceForm';
 import { Modal } from 'components/common/Modal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSpaces } from 'hooks/useSpaces';
