@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import ArrowCircleLeftIcon from '@mui/icons-material/ArrowCircleLeft';
+import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import { Autocomplete, Popper, Stack, TextField, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import type { Space } from '@prisma/client';
@@ -68,8 +68,9 @@ export function JoinDynamicSpaceForm({ goBack }: Props) {
   return (
     <Box sx={{ minHeight: '200px' }}>
       <br />
-      <FieldLabel sx={{ display: 'flex', justifyContent: 'center', gap: 2 }}>
-        Enter a CharmVerse space name {goBack && <ArrowCircleLeftIcon onClick={goBack} />}
+      <FieldLabel sx={{ display: 'flex', justifyContent: 'center', gap: 2, pb: 1 }}>
+        {goBack && <ArrowBackIosNewIcon onClick={goBack} />}
+        Enter a CharmVerse space name
       </FieldLabel>
       <Autocomplete<Space>
         disablePortal

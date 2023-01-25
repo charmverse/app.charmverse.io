@@ -1,5 +1,5 @@
 import { yupResolver } from '@hookform/resolvers/yup';
-import ArrowCircleLeftIcon from '@mui/icons-material/ArrowCircleLeft';
+import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import { IconButton, InputAdornment, Tooltip } from '@mui/material';
 import Alert from '@mui/material/Alert';
@@ -31,6 +31,10 @@ import { ImportZippedMarkdown } from '../CharmEditor/components/markdownParser/I
 import { JoinDynamicSpaceForm } from '../TokenGateForm/JoinDynamicSpaceForm';
 
 import { SelectNewSpaceTemplate } from './SpaceTemplateOptions';
+
+function GoBack() {
+  return <Typography>Back</Typography>;
+}
 
 const schema = yup.object({
   name: yup.string().ensure().trim().min(3, 'Name must be at least 3 characters').required('Name is required'),
@@ -172,15 +176,23 @@ export function CreateSpaceForm({ defaultValues, onCancel, submitText }: Props) 
     setStep('create_space');
   }
 
+  function goToSelectTemplate() {
+    setStep('select_template');
+  }
+
   if (step === 'join_space') {
-    return <JoinDynamicSpaceForm goBack={() => setStep('select_template')} />;
+    return (
+      <Box>
+        <JoinDynamicSpaceForm goBack={goToSelectTemplate} />
+      </Box>
+    );
   }
   return (
     <div>
       <DialogTitle onClose={onClose} sx={{ textAlign: 'center' }}>
         <Box display='flex' alignItems='center' gap={2}>
+          {step !== 'select_template' && <ArrowBackIosNewIcon onClick={goToSelectTemplate} />}
           Create a space{' '}
-          {step !== 'select_template' && <ArrowCircleLeftIcon onClick={() => setStep('select_template')} />}
         </Box>
       </DialogTitle>
       <Typography textAlign='center' variant='body2'>

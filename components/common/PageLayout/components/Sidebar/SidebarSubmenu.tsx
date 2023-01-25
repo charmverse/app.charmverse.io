@@ -16,7 +16,7 @@ import { usePopupState } from 'material-ui-popup-state/hooks';
 import NextLink from 'next/link';
 import { useState } from 'react';
 
-import CreateWorkspaceForm from 'components/common/CreateSpaceForm';
+import { CreateSpaceForm } from 'components/common/CreateSpaceForm';
 import { Modal } from 'components/common/Modal';
 import UserDisplay from 'components/common/UserDisplay';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -136,13 +136,8 @@ export default function SidebarSubmenu({
           <MenuOpenIcon />
         </IconButton>
       </Tooltip>
-      <Modal open={spaceFormOpen} onClose={closeSpaceForm}>
-        <CreateWorkspaceForm onSubmit={createNewSpace} onCancel={closeSpaceForm} isSubmitting={isCreatingSpace} />
-        <Typography variant='body2' align='center' sx={{ pt: 2 }}>
-          <Button variant='text' href='/join' endIcon={<NavigateNextIcon />}>
-            Join an existing space
-          </Button>
-        </Typography>
+      <Modal size='medium' open={spaceFormOpen} onClose={closeSpaceForm}>
+        <CreateSpaceForm onCancel={closeSpaceForm} />
       </Modal>
     </SidebarHeader>
   );
