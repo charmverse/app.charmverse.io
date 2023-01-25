@@ -110,7 +110,7 @@ export default function MemberDirectoryPage() {
         </Stack>
       </Stack>
       <Box position='relative' display='flex' height='100%'>
-        <Box width='100%' overflow='auto' height='fit-content'>
+        <Box width='100%' overflow={currentView === 'table' ? 'auto' : 'visible'} height='fit-content'>
           {currentView === 'table' && <MemberDirectoryTableView members={sortedMembers} />}
           {currentView === 'gallery' && <MemberDirectoryGalleryView members={sortedMembers} />}
         </Box>

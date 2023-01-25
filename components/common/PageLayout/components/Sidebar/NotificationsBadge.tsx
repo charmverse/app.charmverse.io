@@ -15,7 +15,7 @@ export default function NotificationsBadge({ children }: { children: JSX.Element
   // If the user has snoozed multisig tasks don't count them
   const excludeGnosisTasks =
     userNotificationState?.snoozedUntil && new Date(userNotificationState.snoozedUntil) > new Date();
-  const gnosisTasksCount = excludeGnosisTasks ? 0 : gnosisTasks?.length ?? 0;
+  const gnosisTasksCount = excludeGnosisTasks ? 0 : gnosisTasks?.filter((gnosisTask) => !gnosisTask.marked).length ?? 0;
   const proposalTasksCount = tasks?.proposals.unmarked.length ?? 0;
   const forumTasksCount = tasks?.forum.unmarked.length ?? 0;
 

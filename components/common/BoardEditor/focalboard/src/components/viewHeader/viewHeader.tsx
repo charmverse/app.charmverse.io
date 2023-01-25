@@ -94,7 +94,7 @@ function ViewHeader(props: Props) {
   }
 
   return (
-    <div className={`ViewHeader ${props.showActionsOnHover ? 'hide-actions' : ''}`}>
+    <div key={viewsBoardId} className={`ViewHeader ${props.showActionsOnHover ? 'hide-actions' : ''}`}>
       <ViewTabs
         onDeleteView={props.onDeleteView}
         addViewButton={props.addViewButton}
