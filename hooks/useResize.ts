@@ -3,16 +3,17 @@ import { useCallback, useEffect, useState } from 'react';
 type UseResizeProps = {
   minWidth: number;
   maxWidth?: number;
-  initialWidth?: number;
+  initialWidth?: number | null;
+  onResize?: (width: number) => void;
 };
 
-export function useResize({ minWidth, initialWidth, maxWidth }: UseResizeProps) {
+export function useResize({ minWidth, initialWidth, maxWidth, onResize }: UseResizeProps) {
   const [isResizing, setIsResizing] = useState(false);
-  const [width, setWidth] = useState(initialWidth || minWidth);
+  const [width, setWidth] = useState(initialWidth || 0);
   const [startXOffset, setStartXOffset] = useState(0);
 
   useEffect(() => {
-    if (initialWidth) {
+    if (initialWidth && !width) {
       setWidth(initialWidth);
     }
   }, [initialWidth]);
@@ -34,19 +35,23 @@ export function useResize({ minWidth, initialWidth, maxWidth }: UseResizeProps) 
     (e: MouseEvent) => {
       if (isResizing) {
         const offset = e.clientX - startXOffset;
-        const newWidth = width + offset;
+        let newWidth = width + offset;
 
         if (newWidth < minWidth) {
-          setWidth(minWidth);
-          return;
+          newWidth = minWidth;
         }
 
         if (maxWidth && newWidth > maxWidth) {
-          setWidth(maxWidth);
-          return;
+          newWidth = maxWidth;
         }
 
-        setWidth(newWidth);
+        setWidth((currentWidth) => {
+          if (currentWidth !== newWidth) {
+            onResize?.(newWidth);
+          }
+
+          return newWidth;
+        });
       }
     },
     [minWidth, isResizing, setWidth]
@@ -55,10 +60,12 @@ export function useResize({ minWidth, initialWidth, maxWidth }: UseResizeProps) 
   useEffect(() => {
     document.addEventListener('mousemove', resize);
     document.addEventListener('mouseup', disableResize);
+    document.body.classList.add('no-select');
 
     return () => {
       document.removeEventListener('mousemove', resize);
       document.removeEventListener('mouseup', disableResize);
+      document.body.classList.remove('no-select');
     };
   }, [disableResize, resize]);
 

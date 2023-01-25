@@ -136,15 +136,6 @@ interface PageLayoutProps {
 function PageLayout({ sidebarWidth = 300, children, sidebar: SidebarOverride }: PageLayoutProps) {
   const { width } = useWindowSize();
   const isMobileSidebar = useMobileSidebar();
-  const {
-    width: resizableSidebarWidth,
-    enableResize,
-    isResizing
-  } = useResize({
-    initialWidth: sidebarWidth,
-    minWidth: MIN_SIDEBAR_WIDTH,
-    maxWidth: MAX_SIDEBAR_WIDTH
-  });
 
   let mobileSidebarWidth = width ? Math.min(width * 0.8, MAX_SIDEBAR_WIDTH) : sidebarWidth;
   if (SidebarOverride) {
@@ -152,8 +143,19 @@ function PageLayout({ sidebarWidth = 300, children, sidebar: SidebarOverride }: 
   }
 
   const [storageOpen, setStorageOpen] = useLocalStorage('leftSidebar', !isMobileSidebar);
+  const [sidebarStorageWidth, setSidebarStorageWidth] = useLocalStorage('leftSidebarWidth', 0);
   const [mobileOpen, setMobileOpen] = useState(false);
 
+  const {
+    width: resizableSidebarWidth,
+    enableResize,
+    isResizing
+  } = useResize({
+    initialWidth: sidebarStorageWidth,
+    minWidth: MIN_SIDEBAR_WIDTH,
+    maxWidth: MAX_SIDEBAR_WIDTH,
+    onResize: setSidebarStorageWidth
+  });
   const { user } = useUser();
   const { hasSharedPageAccess, accessChecked, publicPage } = useSharedPage();
   const open = isMobileSidebar ? mobileOpen : storageOpen;
@@ -213,7 +215,11 @@ function PageLayout({ sidebarWidth = 300, children, sidebar: SidebarOverride }: 
                 <PageActionDisplayProvider>
                   {open !== null && (
                     <>
-                      <AppBar open={open} sidebarWidth={isMobileSidebar ? 0 : resizableSidebarWidth} position='fixed'>
+                      <AppBar
+                        open={open}
+                        sidebarWidth={isMobileSidebar ? 0 : resizableSidebarWidth || sidebarWidth}
+                        position='fixed'
+                      >
                         <Header open={open} openSidebar={handleDrawerOpen} />
                       </AppBar>
                       {isMobileSidebar ? (
@@ -230,7 +236,7 @@ function PageLayout({ sidebarWidth = 300, children, sidebar: SidebarOverride }: 
                           </Box>
                         </MuiDrawer>
                       ) : (
-                        <Drawer sidebarWidth={resizableSidebarWidth} open={open} variant='permanent'>
+                        <Drawer sidebarWidth={resizableSidebarWidth || sidebarWidth} open={open} variant='permanent'>
                           {drawerContent}
 
                           <Tooltip title={isResizing ? '' : 'Drag to resize'} placement='right' followCursor>
