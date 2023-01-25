@@ -69,7 +69,7 @@ export function CreateSpaceForm({ defaultValues, onCancel, submitText }: Props) 
     handleSubmit,
     setValue,
     watch,
-    formState: { errors, touchedFields }
+    formState: { errors }
   } = useForm<FormValues>({
     defaultValues: defaultValues || { name: randomName() },
     resolver: yupResolver(schema)

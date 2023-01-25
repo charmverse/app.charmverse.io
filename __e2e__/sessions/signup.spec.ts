@@ -54,6 +54,7 @@ test('signup - allows user to sign up and create a workspace using Metamask wall
 
   await signupPage.waitForURL();
   await signupPage.selectCreateWorkspace();
+  await signupPage.selectNewSpaceFormTemplate('default');
 
   await signupPage.waitForWorkspaceForm();
   const space = await signupPage.submitWorkspaceForm();

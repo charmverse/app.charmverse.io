@@ -2,6 +2,8 @@
 import type { Locator, Page } from '@playwright/test';
 import type { Space } from '@prisma/client';
 
+import type { SpaceCreateTemplate } from 'lib/spaces/utils';
+
 // capture actions on the pages in signup flow
 export class SignUpPage {
   readonly page: Page;
@@ -21,6 +23,11 @@ export class SignUpPage {
   }
 
   async waitForWorkspaceForm() {
+    await this.page.waitForURL('**/createWorkspace');
+  }
+
+  async selectNewSpaceFormTemplate(spaceTemplateOption: SpaceCreateTemplate) {
+    await this.page.click(`data-test=space-template-${spaceTemplateOption}`);
     await this.page.waitForURL('**/createWorkspace');
   }
 

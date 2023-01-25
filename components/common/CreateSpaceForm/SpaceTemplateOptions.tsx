@@ -29,6 +29,7 @@ function TemplateOption({ option, onSelect, currentSelection }: TemplateOptionPr
 
   return (
     <Button
+      data-test={`space-template-${option}`}
       onClick={() => onSelect(option)}
       color={isSelected ? 'primary' : 'secondary'}
       variant='outlined'
