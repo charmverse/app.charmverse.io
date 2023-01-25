@@ -6,6 +6,7 @@ import LinkIcon from '@mui/icons-material/Link';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { Divider, IconButton, ListItemText, Menu, MenuItem, Stack, Typography } from '@mui/material';
 import type { PageType } from '@prisma/client';
+import { useRouter } from 'next/router';
 import { useState } from 'react';
 import type { MouseEvent, ReactNode } from 'react';
 
@@ -15,15 +16,6 @@ import { humanFriendlyDate } from 'lib/utilities/dates';
 
 import { Utils } from './BoardEditor/focalboard/src/utils';
 
-type SupportedPageType = 'bounty' | 'card' | 'proposal' | 'page';
-
-const PageTypeQueryParamRecord: Record<SupportedPageType, string> = {
-  card: 'cardId',
-  bounty: 'bountyId',
-  proposal: 'id',
-  page: '' // page type "page" doesn't have a query param
-};
-
 export function PageActions({
   page,
   onClickDelete,
@@ -31,12 +23,13 @@ export function PageActions({
   onClickDuplicate,
   children
 }: {
-  page: { createdBy: string; type?: PageType; id: string; updatedAt: Date; relativePath?: string };
+  page: { createdBy: string; type?: PageType; id: string; updatedAt: Date; relativePath?: string; path: string };
   onClickDelete?: VoidFunction;
   onClickEdit?: VoidFunction;
   onClickDuplicate?: VoidFunction;
   children?: ReactNode;
 }) {
+  const router = useRouter();
   const { showMessage } = useSnackbar();
   const { members } = useMembers();
   const charmversePage = members.find((member) => member.id === page.createdBy);
@@ -51,42 +44,26 @@ export function PageActions({
     setAnchorEl(null);
   };
 
-  const pageType = page.type as SupportedPageType;
-
-  function onClickCopyLink() {
+  function getPageLink() {
     let link = window.location.href;
 
     if (page.relativePath) {
       link = `${window.location.origin}${page.relativePath}`;
     } else {
-      const queryString = new URLSearchParams(window.location.search);
-      if (queryString.get(PageTypeQueryParamRecord[pageType]) !== page.id) {
-        const newUrl = new URL(window.location.toString());
-        newUrl.searchParams.set(PageTypeQueryParamRecord[pageType], page.id);
-        link = newUrl.toString();
-      }
+      link = `${window.location.origin}/${router.query.domain}/${page.path}`;
     }
+    return link;
+  }
 
-    Utils.copyTextToClipboard(link);
+  function onClickCopyLink() {
+    Utils.copyTextToClipboard(getPageLink());
     showMessage(`Copied ${page.type} link to clipboard`, 'success');
   }
 
   function onClickOpenInNewTab() {
-    let link = window.location.href;
-
-    if (page.relativePath) {
-      link = `${window.location.origin}${page.relativePath}`;
-    } else {
-      const queryString = new URLSearchParams(window.location.search);
-      if (queryString.get(PageTypeQueryParamRecord[pageType]) !== page.id) {
-        const newUrl = new URL(window.location.toString());
-        newUrl.searchParams.set(PageTypeQueryParamRecord[pageType], page.id);
-        link = newUrl.toString();
-      }
-    }
-
-    window.open(link);
+    window.open(getPageLink());
   }
+
   return (
     <>
       <IconButton size='small' className='icons' onClick={handleClick}>
