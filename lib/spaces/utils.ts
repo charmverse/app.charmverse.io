@@ -32,8 +32,7 @@ export function getSpaceDomainFromName(name: string) {
 }
 
 export const spaceContentTemplates = {
-  templateNftCommunity: 'NFT Community',
-  templateSpace: 'Investor template'
+  templateNftCommunity: 'NFT Community'
 };
 
 export const spaceCreateTemplates = {

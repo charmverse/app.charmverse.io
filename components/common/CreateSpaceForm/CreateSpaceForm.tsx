@@ -226,6 +226,7 @@ export function CreateSpaceForm({ defaultValues, onCancel, submitText }: Props) 
                 image={watchSpaceImage}
                 updateImage={(url) => setValue('spaceImage', url, { shouldDirty: true })}
                 editable={editableFields}
+                alwaysShowEdit={editableFields}
               />
             </Grid>
             <Grid item>
