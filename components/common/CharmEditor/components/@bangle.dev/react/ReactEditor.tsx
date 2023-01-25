@@ -13,6 +13,7 @@ import useSWRImmutable from 'swr/immutable';
 
 import charmClient from 'charmClient';
 import type { FrontendParticipant } from 'components/common/CharmEditor/components/fiduswriter/collab';
+import { undoEventName } from 'components/common/CharmEditor/utils';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
@@ -122,9 +123,9 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
     }
 
     if (editorRef && editorRef.current && editor) {
-      editorRef.current.addEventListener('undo', listener);
+      editorRef.current.addEventListener(undoEventName, listener);
       return () => {
-        editorRef.current?.removeEventListener('undo', listener);
+        editorRef.current?.removeEventListener(undoEventName, listener);
       };
     }
   }, [editorRef, editor]);

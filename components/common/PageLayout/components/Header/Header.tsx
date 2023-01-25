@@ -28,6 +28,7 @@ import { useMemo, useRef, useState } from 'react';
 
 import charmClient from 'charmClient';
 import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
+import { undoEventName } from 'components/common/CharmEditor/utils';
 import { useColorMode } from 'context/darkMode';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { useMembers } from 'hooks/useMembers';
@@ -90,7 +91,7 @@ export default function Header({ open, openSidebar }: HeaderProps) {
 
   const undoEvent = useMemo(() => {
     if (basePage) {
-      return new CustomEvent('undo', { detail: { pageId: basePage.id } });
+      return new CustomEvent(undoEventName, { detail: { pageId: basePage.id } });
     }
     return null;
   }, [basePage?.id]);
