@@ -10,7 +10,6 @@ import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import type { Space } from '@prisma/client';
 import { useRouter } from 'next/router';
-import type { ChangeEvent } from 'react';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
@@ -25,8 +24,6 @@ import { useSpaces } from 'hooks/useSpaces';
 import log from 'lib/log';
 import { generateNotionImportRedirectUrl } from 'lib/notion/generateNotionImportRedirectUrl';
 import type { SpaceCreateTemplate } from 'lib/spaces/utils';
-import { getSpaceDomainFromName } from 'lib/spaces/utils';
-import { domainSchema } from 'lib/spaces/validateDomainName';
 import randomName from 'lib/utilities/randomName';
 
 import { ImportZippedMarkdown } from '../CharmEditor/components/markdownParser/ImportZippedMarkdown';

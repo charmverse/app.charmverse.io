@@ -3,10 +3,8 @@ import { Typography } from '@mui/material';
 import Grid from '@mui/material/Grid';
 
 import Button from 'components/common/Button';
-import { DialogTitle } from 'components/common/Modal';
-import { useFilePicker } from 'hooks/useFilePicker';
 import type { SpaceCreateTemplate } from 'lib/spaces/utils';
-import { spaceCreateTemplates } from 'lib/spaces/utils';
+import { spaceContentTemplates, spaceCreateTemplates } from 'lib/spaces/utils';
 import { typedKeys } from 'lib/utilities/objects';
 
 const ButtonContent = styled.div`
@@ -52,6 +50,8 @@ type SelectNewSpaceTemplateProps = {
   selectedTemplate: SpaceCreateTemplate;
 };
 
+const templates = typedKeys(spaceContentTemplates);
+
 export function SelectNewSpaceTemplate({ onSelect, selectedTemplate }: SelectNewSpaceTemplateProps) {
   return (
     <Grid container spacing={2} flexDirection='column'>
@@ -64,9 +64,11 @@ export function SelectNewSpaceTemplate({ onSelect, selectedTemplate }: SelectNew
         </Typography>
       </Grid>
 
-      <Grid item>
-        <TemplateOption onSelect={onSelect} option='templateNftCommunity' currentSelection={selectedTemplate} />
-      </Grid>
+      {templates.map((template) => (
+        <Grid item key={template}>
+          <TemplateOption onSelect={onSelect} option={template} currentSelection={selectedTemplate} />
+        </Grid>
+      ))}
 
       <Grid item>
         <TemplateOption onSelect={onSelect} option='importNotion' currentSelection={selectedTemplate} />
