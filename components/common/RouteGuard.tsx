@@ -92,7 +92,7 @@ export default function RouteGuard({ children }: { children: ReactNode }) {
         authorized: true,
         redirect: {
           pathname: '/',
-          query: { returnUrl: encodeURIComponent(router.asPath) }
+          query: { returnUrl: router.asPath }
         }
       };
     }
@@ -117,7 +117,7 @@ export default function RouteGuard({ children }: { children: ReactNode }) {
         authorized: false,
         redirect: {
           pathname: '/join',
-          query: { domain: spaceDomain, returnUrl: encodeURIComponent(router.asPath) }
+          query: { domain: spaceDomain, returnUrl: router.asPath }
         }
       };
     } else {
