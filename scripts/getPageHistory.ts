@@ -5,10 +5,16 @@ const spaceDomain = 'charmverse';
 const pagePath = 'page-24404801619516814';
 const maxContentSize = 150;
 const maxRows = 200;
-const startDate = new Date('2023-01-23T00:00:00');
-const endDate = new Date('2023-01-23T00:25:00');
+
+// Restrict results to a specific date range, or leave empty to get the entire history
+const minimumDiffDate: Date | null = null;
+const maximumDiffDate: Date | null = null;
 
 async function exec () {
+
+  const startDate = minimumDiffDate ?? new Date(0)
+  const endDate = maximumDiffDate ?? new Date(Date.now())
+
   const space = await prisma.space.findUniqueOrThrow({
     where: {
       domain: spaceDomain
