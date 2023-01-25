@@ -23,8 +23,8 @@ export function LinkSubMenu() {
   return (
     <Stack
       sx={{
-        backgroundColor: 'background.light',
-        px: 1
+        px: 1,
+        minWidth: 350
       }}
       py={1}
       key={originalHref}

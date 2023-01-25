@@ -4,11 +4,13 @@ import React from 'react';
 
 import { Utils } from '../../../utils';
 import Editable from '../../../widgets/editable';
+import { TextInput } from '../../../widgets/TextInput';
 
 type Props = {
   value: string;
   readOnly?: boolean;
   placeholder?: string;
+  multiline?: boolean;
   onChange: (value: string) => void;
   onSave: () => void;
   onCancel: () => void;
@@ -34,11 +36,12 @@ function URLProperty(props: Props): JSX.Element {
   return (
     <div className='URLProperty property-link url'>
       {(hasValue || props.placeholder) && (
-        <Editable
+        <TextInput
           className='octo-propertyvalue'
           placeholderText={props.placeholder}
           value={props.value}
           autoExpand={false}
+          multiline={props.multiline}
           readOnly={props.readOnly}
           onChange={props.onChange}
           onSave={props.onSave}

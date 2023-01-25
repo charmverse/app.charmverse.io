@@ -7,6 +7,7 @@ import GetAppOutlinedIcon from '@mui/icons-material/GetAppOutlined';
 import MenuIcon from '@mui/icons-material/Menu';
 import MessageOutlinedIcon from '@mui/icons-material/MessageOutlined';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+import NotificationsIcon from '@mui/icons-material/Notifications';
 import RateReviewOutlinedIcon from '@mui/icons-material/RateReviewOutlined';
 import FavoritedIcon from '@mui/icons-material/Star';
 import NotFavoritedIcon from '@mui/icons-material/StarBorder';
@@ -21,6 +22,7 @@ import ListItemText from '@mui/material/ListItemText';
 import Popover from '@mui/material/Popover';
 import Toolbar from '@mui/material/Toolbar';
 import Tooltip from '@mui/material/Tooltip';
+import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
 import { useRef, useState } from 'react';
@@ -39,6 +41,7 @@ import { generateMarkdown } from 'lib/pages/generateMarkdown';
 import { humanFriendlyDate } from 'lib/utilities/dates';
 
 import DocumentHistory from '../DocumentHistory';
+import NotificationsBadge from '../Sidebar/NotificationsBadge';
 
 import BountyShareButton from './components/BountyShareButton/BountyShareButton';
 import DatabasePageOptions from './components/DatabasePageOptions';
@@ -396,24 +399,31 @@ export default function Header({ open, openSidebar }: HeaderProps) {
 
           {/** dark mode toggle */}
           {user && (
-            <IconButton
-              size='small'
-              sx={{ display: { xs: 'none', md: 'inline-flex' }, mx: 1 }}
-              onClick={colorMode.toggleColorMode}
-              color='inherit'
-            >
-              <Tooltip
-                title={`Enable ${theme.palette.mode === 'dark' ? 'light mode' : 'dark mode'}`}
-                arrow
-                placement='top'
+            <>
+              <NotificationsBadge>
+                <IconButton size='small' sx={{ mx: 1 }} LinkComponent={NextLink} href='/nexus' color='inherit'>
+                  <NotificationsIcon fontSize='small' color='secondary' />
+                </IconButton>
+              </NotificationsBadge>
+              <IconButton
+                size='small'
+                sx={{ display: { xs: 'none', md: 'inline-flex' }, mx: 1 }}
+                onClick={colorMode.toggleColorMode}
+                color='inherit'
               >
-                {theme.palette.mode === 'dark' ? (
-                  <SunIcon fontSize='small' color='secondary' />
-                ) : (
-                  <MoonIcon fontSize='small' color='secondary' />
-                )}
-              </Tooltip>
-            </IconButton>
+                <Tooltip
+                  title={`Enable ${theme.palette.mode === 'dark' ? 'light mode' : 'dark mode'}`}
+                  arrow
+                  placement='top'
+                >
+                  {theme.palette.mode === 'dark' ? (
+                    <SunIcon fontSize='small' color='secondary' />
+                  ) : (
+                    <MoonIcon fontSize='small' color='secondary' />
+                  )}
+                </Tooltip>
+              </IconButton>
+            </>
           )}
           {/* <NotificationsBadge /> */}
           {/** user account */}

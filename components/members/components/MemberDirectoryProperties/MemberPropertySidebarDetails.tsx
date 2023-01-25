@@ -99,7 +99,7 @@ export function MemberPropertySidebarDetails({
                 ))}
               </Stack>
             ) : (
-              <Tooltip title={`Everyone in space can see ${property.name} property`}>
+              <Tooltip title={`Everyone in space can see ${property.name} property`} disableInteractive>
                 <Typography pl={4} variant='overline' alignItems='center' display='flex'>
                   Everyone in space
                   <VisibilityOutlinedIcon fontSize='small' color='secondary' sx={{ ml: 1 }} />
