@@ -166,10 +166,10 @@ function ViewTabs(props: ViewTabsProps) {
     Utils.log('deleteView');
     if (!dropdownView) return;
 
+    setAnchorEl(null);
     const nextView = views.find((o) => o !== dropdownView);
     await mutator.deleteBlock(dropdownView, 'delete view');
     onDeleteView?.(dropdownView.id);
-    setAnchorEl(null);
     if (nextView) {
       showView(nextView.id);
     }
