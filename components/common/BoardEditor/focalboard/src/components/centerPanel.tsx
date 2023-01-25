@@ -502,7 +502,7 @@ function CenterPanel(props: Props) {
       </div>
 
       <div className={`container-container ${state.showSettings ? 'sidebar-visible' : ''}`}>
-        <Box display='flex'>
+        <Box display='flex' sx={{ minHeight: state.showSettings ? 450 : 0 }}>
           <Box width='100%'>
             {activeBoard && activePage && isEmbedded && boardPageType === 'inline_board' && (
               <InlineViewTitle

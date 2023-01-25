@@ -60,7 +60,7 @@ const ViewHeaderSortMenu = React.memo((props: Props) => {
       <Button color={hasSort ? 'primary' : 'secondary'} variant='text' size='small' sx={{ minWidth: 0 }}>
         <FormattedMessage id='ViewHeader.sort' defaultMessage='Sort' />
       </Button>
-      <Menu>
+      <Menu disablePortal={false}>
         {activeView.fields.sortOptions?.length > 0 && (
           <>
             <Menu.Text id='manual' name='Manual' onClick={onManualSort} />

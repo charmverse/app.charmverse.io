@@ -284,7 +284,21 @@ export const createThemeLightSensitive = (mode: PaletteMode) => {
         styleOverrides: {
           root: {
             textTransform: 'none'
+          },
+          text: {
+            ':hover': {
+              backgroundColor: 'rgba(var(--center-channel-color-rgb), 0.1)'
+            }
             // borderRadius: '10px'
+          }
+        }
+      },
+      MuiIconButton: {
+        styleOverrides: {
+          root: {
+            ':hover': {
+              backgroundColor: 'rgba(var(--center-channel-color-rgb), 0.1)'
+            }
           }
         }
       },

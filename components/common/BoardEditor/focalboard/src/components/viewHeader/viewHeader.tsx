@@ -1,5 +1,6 @@
 import OpenInFullIcon from '@mui/icons-material/OpenInFull';
-import { IconButton, Tooltip } from '@mui/material';
+import { Popover, Tooltip } from '@mui/material';
+import PopupState, { bindTrigger, bindPopover } from 'material-ui-popup-state';
 import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
 import React, { useState } from 'react';
@@ -17,6 +18,7 @@ import type { PageMeta } from 'lib/pages';
 import { mutator } from '../../mutator';
 import { getCurrentBoardTemplates } from '../../store/cards';
 import { useAppSelector } from '../../store/hooks';
+import IconButton from '../../widgets/buttons/iconButton';
 import ModalWrapper from '../modalWrapper';
 
 import FilterComponent from './filterComponent';
@@ -128,24 +130,35 @@ function ViewHeader(props: Props) {
 
             {/* Filter */}
 
-            <ModalWrapper>
-              <Button
-                color={hasFilter ? 'primary' : 'secondary'}
-                variant='text'
-                size='small'
-                sx={{ minWidth: 0 }}
-                onClick={() => setShowFilter(true)}
-              >
-                <FormattedMessage id='ViewHeader.filter' defaultMessage='Filter' />
-              </Button>
-              {showFilter && (
-                <FilterComponent
-                  properties={activeBoard?.fields.cardProperties ?? []}
-                  activeView={activeView}
-                  onClose={() => setShowFilter(false)}
-                />
+            <PopupState variant='popover' popupId='view-filter'>
+              {(popupState) => (
+                <>
+                  <Button
+                    color={hasFilter ? 'primary' : 'secondary'}
+                    variant='text'
+                    size='small'
+                    sx={{ minWidth: 0 }}
+                    {...bindTrigger(popupState)}
+                  >
+                    <FormattedMessage id='ViewHeader.filter' defaultMessage='Filter' />
+                  </Button>
+                  <Popover
+                    {...bindPopover(popupState)}
+                    PaperProps={{
+                      sx: {
+                        overflow: 'visible'
+                      }
+                    }}
+                    anchorOrigin={{
+                      vertical: 'bottom',
+                      horizontal: 'left'
+                    }}
+                  >
+                    <FilterComponent properties={activeBoard?.fields.cardProperties ?? []} activeView={activeView} />
+                  </Popover>
+                </>
               )}
-            </ModalWrapper>
+            </PopupState>
 
             {/* Sort */}
 
@@ -167,9 +180,7 @@ function ViewHeader(props: Props) {
         {props.embeddedBoardPath && (
           <Link href={`/${router.query.domain}/${props.embeddedBoardPath}`}>
             <Tooltip title='Open as full page' placement='top'>
-              <IconButton style={{ width: '32px' }}>
-                <OpenInFullIcon color='secondary' sx={{ fontSize: 14 }} />
-              </IconButton>
+              <IconButton icon={<OpenInFullIcon color='secondary' sx={{ fontSize: 14 }} />} style={{ width: '32px' }} />
             </Tooltip>
           </Link>
         )}
