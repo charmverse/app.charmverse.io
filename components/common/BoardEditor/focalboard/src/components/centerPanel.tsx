@@ -47,7 +47,6 @@ import { addCard as _addCard, addTemplate } from '../store/cards';
 import { updateView } from '../store/views';
 import { Utils } from '../utils';
 
-import AddViewMenu from './addViewMenu';
 import { CreateLinkedView } from './createLinkedView';
 import Gallery from './gallery/gallery';
 import Kanban from './kanban/kanban';
@@ -470,21 +469,11 @@ function CenterPanel(props: Props) {
           maxTabsShown={props.maxTabsShown}
           disableUpdatingUrl={props.disableUpdatingUrl}
           showView={props.showView}
-          addViewButton={
-            <AddViewMenu
-              board={board}
-              activeView={activeView}
-              views={views}
-              showView={showView}
-              onClick={
-                boardPageType === 'inline_linked_board' || boardPageType === 'linked_board'
-                  ? openSelectSource
-                  : undefined
-              }
-            />
+          onClickNewView={
+            boardPageType === 'inline_linked_board' || boardPageType === 'linked_board' ? openSelectSource : undefined
           }
-          viewsBoardId={board.id}
           activeBoard={activeBoard}
+          viewsBoard={board}
           activeView={props.activeView}
           toggleViewOptions={toggleViewOptions}
           cards={cards}

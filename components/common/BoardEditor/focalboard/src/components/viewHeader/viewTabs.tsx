@@ -28,11 +28,13 @@ import { injectIntl } from 'react-intl';
 
 import Button from 'components/common/Button';
 import Modal from 'components/common/Modal';
+import type { Board } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import { formatViewTitle, createBoardView } from 'lib/focalboard/boardView';
 
 import mutator from '../../mutator';
 import { IDType, Utils } from '../../utils';
+import AddViewMenu from '../addViewMenu';
 import { iconForViewType } from '../viewMenu';
 
 // fix types for MUI Tab to include Button Props
@@ -41,11 +43,6 @@ const TabButton = Tab as React.ComponentType<TabProps & ButtonProps>;
 const StyledTabContent = styled(Typography)`
   padding: ${({ theme }) => theme.spacing('6px', '2px', '6px')};
   width: 100%;
-
-  .Icon {
-    width: 20px;
-    height: 20px;
-  }
 
   span {
     display: inline-flex;
@@ -62,11 +59,13 @@ const StyledTabContent = styled(Typography)`
 interface ViewTabsProps {
   intl: IntlShape;
   activeView?: BoardView | null;
+  board: Board;
   readOnly?: boolean;
   views: BoardView[];
   showView: (viewId: string) => void;
   addViewButton?: ReactNode;
   onDeleteView?: (viewId: string) => void;
+  onClickNewView?: () => void;
   disableUpdatingUrl?: boolean;
   maxTabsShown: number;
   openViewOptions: () => void;
@@ -78,8 +77,8 @@ function ViewTabs(props: ViewTabsProps) {
     openViewOptions,
     maxTabsShown,
     disableUpdatingUrl,
-    addViewButton,
     activeView,
+    board,
     intl,
     readOnly,
     showView,
@@ -89,9 +88,9 @@ function ViewTabs(props: ViewTabsProps) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [dropdownView, setDropdownView] = useState<BoardView | null>(null);
   const renameViewPopupState = usePopupState({ variant: 'popover', popupId: 'rename-view-popup' });
-  const showViewsPopupState = usePopupState({ variant: 'popover', popupId: 'show-views-popup' });
-  const showViewsTriggerState = bindTrigger(showViewsPopupState);
-  const showViewsMenuState = bindMenu(showViewsPopupState);
+  const hiddenViewsPopupState = usePopupState({ variant: 'popover', popupId: 'show-views-popup' });
+  const showViewsTriggerState = bindTrigger(hiddenViewsPopupState);
+  const showViewsMenuState = bindMenu(hiddenViewsPopupState);
 
   const views = viewsProp.filter((view) => !view.fields.inline);
   // Find the index of the current view
@@ -137,8 +136,7 @@ function ViewTabs(props: ViewTabsProps) {
   }
 
   function handleClose() {
-    setAnchorEl(null);
-    setDropdownView(null);
+    hiddenViewsPopupState.close();
   }
 
   function getViewUrl(viewId: string) {
@@ -314,33 +312,34 @@ function ViewTabs(props: ViewTabsProps) {
       </Menu>
 
       <Menu {...showViewsMenuState}>
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 1,
-            mb: 1
-          }}
-        >
-          {restViews.map((view) => (
-            <MenuItem
-              onClick={() => {
-                showView(view.id);
-                showViewsMenuState.onClose();
-              }}
-              href={disableUpdatingUrl ? '' : getViewUrl(view.id)}
-              component={Link}
-              key={view.id}
-              dense
-            >
-              <ListItemIcon>{iconForViewType(view.fields.viewType)}</ListItemIcon>
-              <ListItemText>{view.title || formatViewTitle(view)}</ListItemText>
-            </MenuItem>
-          ))}
-        </Box>
-        <Divider />
-        <Box pl='14px' pt='4px'>
-          {addViewButton}
+        {restViews.map((view) => (
+          <MenuItem
+            onClick={() => {
+              showView(view.id);
+              showViewsMenuState.onClose();
+            }}
+            href={disableUpdatingUrl ? '' : getViewUrl(view.id)}
+            component={Link}
+            key={view.id}
+            dense
+          >
+            <ListItemIcon>{iconForViewType(view.fields.viewType)}</ListItemIcon>
+            <ListItemText>{view.title || formatViewTitle(view)}</ListItemText>
+          </MenuItem>
+        ))}
+        <Divider sx={{ my: 1 }} />
+        <Box pl='14px'>
+          {activeView && (
+            <AddViewMenu
+              board={board}
+              activeView={activeView}
+              views={views}
+              showView={showView}
+              showLabel={true}
+              onClose={handleClose}
+              onClickIcon={props.onClickNewView}
+            />
+          )}
         </Box>
       </Menu>
 

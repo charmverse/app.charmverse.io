@@ -2,8 +2,7 @@ import OpenInFullIcon from '@mui/icons-material/OpenInFull';
 import { Box, Popover, Tooltip } from '@mui/material';
 import PopupState, { bindTrigger, bindPopover } from 'material-ui-popup-state';
 import { useRouter } from 'next/router';
-import type { ReactNode } from 'react';
-import React, { useState } from 'react';
+import React from 'react';
 import { FormattedMessage } from 'react-intl';
 import { mutate } from 'swr';
 
@@ -19,7 +18,7 @@ import { mutator } from '../../mutator';
 import { getCurrentBoardTemplates } from '../../store/cards';
 import { useAppSelector } from '../../store/hooks';
 import IconButton from '../../widgets/buttons/iconButton';
-import ModalWrapper from '../modalWrapper';
+import AddViewMenu from '../addViewMenu';
 
 import FilterComponent from './filterComponent';
 import NewCardButton from './newCardButton';
@@ -32,7 +31,7 @@ type Props = {
   activeBoard?: Board;
   activeView?: BoardView;
   views: BoardView[];
-  viewsBoardId: string;
+  viewsBoard: Board; // the parent board which keeps track of the views on this page
   cards: Card[];
   addCard: () => void;
   showCard: (cardId: string | null) => void;
@@ -42,9 +41,9 @@ type Props = {
   readOnly: boolean;
   readOnlySourceData: boolean;
   dateDisplayProperty?: IPropertyTemplate;
-  addViewButton?: ReactNode;
   disableUpdatingUrl?: boolean;
   maxTabsShown?: number;
+  onClickNewView?: () => void;
   onDeleteView?: (viewId: string) => void;
   showActionsOnHover?: boolean;
   showView: (viewId: string) => void;
@@ -63,8 +62,9 @@ function ViewHeader(props: Props) {
     maxTabsShown = 3,
     showView,
     toggleViewOptions,
-    viewsBoardId,
+    viewsBoard,
     activeBoard,
+    onClickNewView,
     activeView,
     cards,
     dateDisplayProperty
@@ -77,7 +77,7 @@ function ViewHeader(props: Props) {
 
   async function addPageFromTemplate(pageId: string) {
     const [blocks] = await mutator.duplicateCard({
-      board: props.activeBoard as Board,
+      board: activeBoard as Board,
       cardId: pageId,
       cardPage: pages[pageId] as PageMeta
     });
@@ -95,10 +95,11 @@ function ViewHeader(props: Props) {
   }
 
   return (
-    <div key={viewsBoardId} className={`ViewHeader ${props.showActionsOnHover ? 'hide-actions' : ''}`}>
+    <div key={viewsBoard.id} className={`ViewHeader ${props.showActionsOnHover ? 'hide-actions' : ''}`}>
       <ViewTabs
         onDeleteView={props.onDeleteView}
-        addViewButton={props.addViewButton}
+        onClickNewView={onClickNewView}
+        board={viewsBoard}
         views={views}
         readOnly={props.readOnly}
         showView={showView}
@@ -112,7 +113,13 @@ function ViewHeader(props: Props) {
 
       {!props.readOnly && views.length <= maxTabsShown && (
         <Box className='view-actions' pt='4px'>
-          {props.addViewButton}
+          <AddViewMenu
+            board={viewsBoard}
+            activeView={activeView}
+            views={views}
+            showView={showView}
+            onClickIcon={onClickNewView}
+          />
         </Box>
       )}
 
@@ -205,7 +212,7 @@ function ViewHeader(props: Props) {
                 editCardTemplate={props.editCardTemplate}
                 showCard={props.showCard}
                 deleteCardTemplate={deleteCardTemplate}
-                boardId={viewsBoardId}
+                boardId={viewsBoard.id}
               />
             )}
           </>

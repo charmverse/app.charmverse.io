@@ -336,7 +336,7 @@ export const createThemeLightSensitive = (mode: PaletteMode) => {
         styleOverrides: {
           root: {
             fontSize: 'inherit',
-            minWidth: '30px'
+            minWidth: '30px !important'
           }
         }
       },
