@@ -64,6 +64,8 @@ describe('createWorkspace', () => {
         name: `Name-${v4()}`
       }
     });
+
+    expect(typeof newWorkspace.domain === 'string').toBe(true);
   });
 
   it('should regenerate the provided space domain if a space with this domain already exists', async () => {
