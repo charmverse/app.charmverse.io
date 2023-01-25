@@ -3,7 +3,10 @@ import { fancyTrim } from 'lib/utilities/strings';
 
 const spaceDomain = 'charmverse';
 const pagePath = 'page-24404801619516814';
-const maxContentSize = 100;
+const maxContentSize = 150;
+const maxRows = 200;
+const startDate = new Date('2023-01-23T00:00:00');
+const endDate = new Date('2023-01-23T00:25:00');
 
 async function exec () {
   const space = await prisma.space.findUniqueOrThrow({
@@ -37,29 +40,51 @@ async function exec () {
     }
   });
 
+  const sortedDiffs = page.diffs
+    .filter(diff => diff.createdAt >= startDate && diff.createdAt <= endDate)
+    .sort((a, b) => a.version - b.version)
+    .slice(0, maxRows);
+  const dateRange = `${page.diffs[0].createdAt.toLocaleString()} to ${page.diffs[page.diffs.length - 1].createdAt.toLocaleString()}`
+
   console.log('------------------------------------');
-  console.log('Page History: ' + page.title);
+  console.log('Page History');
+  console.log('Page Title: ' + page.title);
+  console.log('Page Id: ' + page.id);
+  console.log('Date Range: ' + dateRange);
   console.log('------------------------------------');
-  const tableData = page.diffs.slice(0, 100).map((diff) => ({
-    date: diff.createdAt.toLocaleString(undefined, { dateStyle: 'short', timeStyle: 'long' }),
-    user: usernameMap[diff.createdBy],
-    version: diff.version,
+  const tableData = sortedDiffs
     // @ts-ignore
-    'client V': diff.data.c,
-    // @ts-ignore
-    'server V': diff.data.s,
-    // @ts-ignore
-    stepType: diff.data.ds[0]?.stepType,
-    // @ts-ignore
-    content: diff.data.ds.map(ds => fancyTrim(JSON.stringify(ds.slice || ds.mark), maxContentSize)).join(' | ')
-  }))
-  .reduce<Record<string, any>>((acc, { version, ...row }) => {
-    acc[version] = row;
-    return acc;
-  }, {});
+    .map((diff) => diff.data.ds.map((ds, i) => ({
+      version: (diff.version + (i * .10)).toFixed(1),
+      date: diff.createdAt.toLocaleString(),
+      // @ts-ignore
+      'User (client #)': usernameMap[diff.createdBy] + ' (' + diff.data.cid + ')',
+      // @ts-ignore
+      'Version (client / server)': `${diff.data.c} / ${diff.data.s}`,
+      // @ts-ignore
+      stepType: ds.stepType,
+      // @ts-ignore
+      position: ds.from === ds.to ? '' + ds.from : `${ds.from} to ${ds.to}`,
+      // @ts-ignore
+      content: fancyTrim(stringifyStep(ds), maxContentSize)
+    })))
+    .flat()
+    .reduce<Record<string, any>>((acc, { version, ...row }) => {
+      acc[version] = row;
+      return acc;
+    }, {});
 
   console.table(tableData)
 
+}
+
+function stringifyStep(ds: any) {
+  let content = ds.slice?.content || ds.mark;
+  if (Array.isArray(content)) {
+    // extract marks which are noisy
+    content = content.map(({ marks, ...row}) => row);
+  }
+  return JSON.stringify(content)
 }
 
 
