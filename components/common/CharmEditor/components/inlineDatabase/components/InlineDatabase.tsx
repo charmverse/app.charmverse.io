@@ -145,7 +145,6 @@ export default function DatabaseView({ containerWidth, readOnly: readOnlyOverrid
         containerWidth={containerWidth}
         onKeyPress={stopPropagation}
         onKeyDown={stopPropagation}
-        onMouseMove={stopPropagation}
       >
         <CenterPanel
           disableUpdatingUrl
