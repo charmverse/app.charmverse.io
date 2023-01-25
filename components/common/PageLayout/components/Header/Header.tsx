@@ -93,7 +93,7 @@ export default function Header({ open, openSidebar }: HeaderProps) {
       return new CustomEvent('undo', { detail: { pageId: basePage.id } });
     }
     return null;
-  }, [basePage]);
+  }, [basePage?.id]);
 
   async function exportMarkdown() {
     if (!basePage) {
@@ -150,9 +150,12 @@ export default function Header({ open, openSidebar }: HeaderProps) {
   }
 
   async function undoEditorChanges() {
-    const bangleEditorCoreElement = document.querySelector('.bangle-editor-core');
-    if (bangleEditorCoreElement) {
-      bangleEditorCoreElement.dispatchEvent(undoEvent as Event);
+    if (basePage) {
+      // There might be multiple instances of bangle editor in the document
+      const bangleEditorCoreElement = document.querySelector(`.bangle-editor-core[data-page-id="${basePage.id}"]`);
+      if (bangleEditorCoreElement) {
+        bangleEditorCoreElement.dispatchEvent(undoEvent as Event);
+      }
     }
     setPageMenuOpen(false);
   }

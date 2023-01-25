@@ -193,6 +193,7 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
       <div
         ref={editorRef}
         className='bangle-editor-core'
+        data-page-id={pageId}
         style={{ minHeight: showLoader && isLoading ? '300px' : undefined }}
       >
         <StyledLoadingComponent height='300px' isLoading={showLoader && isLoading} />
