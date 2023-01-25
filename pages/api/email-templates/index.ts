@@ -247,6 +247,7 @@ const templates = {
       ],
       gnosisSafeTasks: [
         {
+          marked: true,
           tasks: [
             {
               nonce: 3,
@@ -277,6 +278,7 @@ const templates = {
           taskId: '1'
         },
         {
+          marked: false,
           tasks: [
             {
               nonce: 7,

@@ -1,4 +1,4 @@
-import { bold, code, hardBreak, italic, link, strike, underline } from '@bangle.dev/base-components';
+import { bold, code, hardBreak, italic, strike, underline } from '@bangle.dev/base-components';
 import type { RawPlugins } from '@bangle.dev/core';
 import { BangleEditorState, NodeView, Plugin } from '@bangle.dev/core';
 import { markdownSerializer } from '@bangle.dev/markdown';
@@ -611,7 +611,7 @@ function CharmEditor({
             return <Mention {...props}>{_children}</Mention>;
           }
           case 'page': {
-            return <NestedPage {...props} />;
+            return <NestedPage currentPageId={pageId} {...props} />;
           }
           case 'pdf': {
             return <ResizablePDF {...allProps} />;

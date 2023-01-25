@@ -1,4 +1,4 @@
-import type { User, UserGnosisSafe, UserNotificationState, UserWallet } from '@prisma/client';
+import type { User, UserGnosisSafe, UserNotification, UserNotificationState, UserWallet } from '@prisma/client';
 import { ethers } from 'ethers';
 import groupBy from 'lodash/groupBy';
 import intersection from 'lodash/intersection';
@@ -55,6 +55,7 @@ export interface GnosisSafeTasks {
   safeUrl: string;
   tasks: GnosisTask[];
   taskId: string;
+  marked: boolean;
 }
 
 function getTaskDescription(transaction: GnosisTransaction): string {
@@ -215,7 +216,24 @@ interface TransactionsToTaskProps {
   wallets: (UserWallet & { user: UserWithGnosisSafeState })[];
 }
 
-function transactionsToTasks({ transactions, safes, myUserId, wallets }: TransactionsToTaskProps): GnosisSafeTasks[] {
+async function transactionsToTasks({
+  transactions,
+  safes,
+  myUserId,
+  wallets
+}: TransactionsToTaskProps): Promise<GnosisSafeTasks[]> {
+  const userMultisigNotificationsRecord = (
+    await prisma.userNotification.findMany({
+      where: {
+        type: 'multisig',
+        userId: myUserId
+      }
+    })
+  ).reduce<Record<string, UserNotification>>((merged, multisigNotification) => {
+    merged[multisigNotification.taskId] = multisigNotification;
+    return merged;
+  }, {});
+
   const myAddresses = (wallets.filter((wallet) => wallet.userId === myUserId) ?? []).map((w) => w.address);
   const safesByAddress = safes.reduce<Record<string, UserGnosisSafe>>(
     (acc, safe) => ({ ...acc, [safe.address]: safe }),
@@ -242,7 +260,8 @@ function transactionsToTasks({ transactions, safes, myUserId, wallets }: Transac
         safeAddress: _transactions[0].safeAddress,
         safeName: _transactions[0].safeName,
         safeUrl: getGnosisTransactionQueueUrl(_transactions[0].safeAddress, _transactions[0].safeChainId),
-        tasks
+        tasks,
+        marked: !!userMultisigNotificationsRecord[taskId]
       };
     })
     .sort((safeA, safeB) => (safeA.safeAddress > safeB.safeAddress ? -1 : 1));
@@ -281,7 +300,5 @@ export async function getPendingGnosisTasks(myUserId: string) {
     }
   });
 
-  const tasks = transactionsToTasks({ transactions, safes, myUserId, wallets });
-
-  return tasks;
+  return transactionsToTasks({ transactions, safes, myUserId, wallets });
 }

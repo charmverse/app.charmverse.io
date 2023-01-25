@@ -51,6 +51,8 @@ const globalCSS = css`
     --background-dark: ${colors.backgroundDarkColor};
     --background-light: ${colors.backgroundLightColor};
 
+    --link-underline: ${colors.linkUnderlineColor};
+
     --charmeditor-active: rgba(46, 170, 220, 0.2);
 
     --page-layout-pb: 180px;
@@ -80,6 +82,7 @@ const globalCSS = css`
     --background-paper: ${colors.backgroundLightColorDarkMode};
     --background-dark: ${colors.backgroundDarkColorDarkMode};
     --background-light: ${colors.backgroundLightColorDarkMode};
+    --link-underline: ${colors.linkUnderlineColorDarkMode};
   }
 `;
 
