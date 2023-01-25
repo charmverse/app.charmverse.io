@@ -450,7 +450,7 @@ function CenterPanel(props: Props) {
             focalBoard
             headerImage={board.fields.headerImage}
             readOnly={props.readOnly}
-            setPage={({ headerImage }) => setRandomHeaderImage(board, headerImage!)}
+            setPage={({ headerImage }) => setRandomHeaderImage(board, headerImage)}
           />
         </Box>
       )}
@@ -493,6 +493,7 @@ function CenterPanel(props: Props) {
       <div className={`container-container ${state.showSettings ? 'sidebar-visible' : ''}`}>
         <Box display='flex' sx={{ minHeight: state.showSettings ? 450 : 0 }}>
           <Box width='100%'>
+            {/* Show page title for inline boards */}
             {activeBoard && activePage && isEmbedded && boardPageType === 'inline_board' && (
               <InlineViewTitle
                 key={activePage.id + activePage.title}
@@ -519,18 +520,21 @@ function CenterPanel(props: Props) {
                 )}
               </Typography>
             )}
-            {activePage && activeView?.fields?.sourceType === 'board_page' && (
-              <Button
-                color='secondary'
-                startIcon={<CallMadeIcon />}
-                variant='text'
-                size='large'
-                href={`${router.pathname.startsWith('/share') ? '/share' : ''}/${space?.domain}/${activePage?.path}`}
-                sx={{ fontSize: 22, fontWeight: 700, py: 0 }}
-              >
-                {activePage.title || 'Untitled'}
-              </Button>
-            )}
+            {/* Show page title for linked boards */}
+            {activePage &&
+              activeView?.fields?.sourceType === 'board_page' &&
+              boardPageType === 'inline_linked_board' && (
+                <Button
+                  color='secondary'
+                  startIcon={<CallMadeIcon />}
+                  variant='text'
+                  size='large'
+                  href={`${router.pathname.startsWith('/share') ? '/share' : ''}/${space?.domain}/${activePage?.path}`}
+                  sx={{ fontSize: 22, fontWeight: 700, py: 0 }}
+                >
+                  {activePage.title || 'Untitled'}
+                </Button>
+              )}
             {!activeView && state.showSettings === 'create-linked-view' && (
               <CreateLinkedView
                 readOnly={props.readOnly}
