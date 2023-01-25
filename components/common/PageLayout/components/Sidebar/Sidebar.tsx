@@ -18,13 +18,14 @@ import type { BoxProps } from '@mui/system';
 import type { Page } from '@prisma/client';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 import Link from 'components/common/Link';
 import { charmverseDiscordInvite } from 'config/constants';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import useKeydownPress from 'hooks/useKeydownPress';
+import { useMobileSidebar } from 'hooks/useMobileSidebar';
 import { useUser } from 'hooks/useUser';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import type { NewPageInput } from 'lib/pages';
@@ -54,7 +55,13 @@ const WorkspaceLabel = styled.div`
 const SidebarContainer = styled.div`
   display: flex;
   background-color: ${({ theme }) => theme.palette.sidebar.background};
-  height: 100%;
+  min-height: 100vh;
+
+  ${({ theme }) => `
+    ${theme.breakpoints.up('md')} {
+      height: 100%;
+    }
+`}
 
   // disable hover UX on ios which converts first click to a hover event
   @media (pointer: fine) {
@@ -102,6 +109,11 @@ const sidebarItemStyles = ({ theme }: { theme: Theme }) => css`
     font-size: 1.2em;
     margin-right: ${theme.spacing(1)};
   }
+  ${theme.breakpoints.down('md')} {
+    min-height: 38px;
+    font-size: 16px;
+    line-height: 26px;
+  }
 `;
 
 const SectionName = styled(Typography)`
@@ -123,21 +135,11 @@ const StyledSidebarLink = styled(Link, { shouldForwardProp: (prop) => prop !== '
     color: ${theme.palette.text.primary};
   `
       : ''}
-      ${({ theme }) => `
-      ${theme.breakpoints.down('md')} {
-        min-height: 34px;
-      }
-    `}
 `;
 
 const StyledSidebarBox = styled(Box)`
   cursor: pointer;
   ${sidebarItemStyles}
-  ${({ theme }) => `
-    ${theme.breakpoints.down('md')} {
-      min-height: 34px;
-    }
-  `}
 `;
 
 const ScrollingContainer = styled.div<{ isScrolled: boolean }>`
@@ -194,6 +196,7 @@ export default function Sidebar({ closeSidebar, favorites, navAction }: SidebarP
   const [isScrolled, setIsScrolled] = useState(false);
   const [showingTrash, setShowingTrash] = useState(false);
   const { disconnectWallet } = useWeb3AuthSig();
+  const isMobileSidebar = useMobileSidebar();
 
   const searchInWorkspaceModalState = usePopupState({ variant: 'popover', popupId: 'search-in-workspace-modal' });
   const openSearchLabel = useKeydownPress(searchInWorkspaceModalState.toggle, { key: 'p', ctrl: true });
@@ -224,6 +227,40 @@ export default function Sidebar({ closeSidebar, favorites, navAction }: SidebarP
     await logoutUser();
     router.push('/');
   }
+
+  const pagesNavigation = useMemo(() => {
+    return (
+      <>
+        {favoritePageIds.length > 0 && (
+          <Box mb={2}>
+            <SectionName>FAVORITES</SectionName>
+            <PageNavigation isFavorites={true} rootPageIds={favoritePageIds} />
+          </Box>
+        )}
+        <WorkspaceLabel>
+          <SectionName>SPACE</SectionName>
+          {/** Test component */}
+          {userSpacePermissions?.createPage && (
+            <div className='add-a-page'>
+              <NewPageMenu tooltip='Add a page' addPage={addPage} />
+            </div>
+          )}
+        </WorkspaceLabel>
+        <Box mb={6}>
+          <PageNavigation onClick={navAction} />
+        </Box>
+        <Box mb={2}>
+          <SidebarBox
+            onClick={() => {
+              setShowingTrash(true);
+            }}
+            icon={<DeleteOutlinedIcon fontSize='small' />}
+            label='Trash'
+          />
+        </Box>
+      </>
+    );
+  }, [favoritePageIds, userSpacePermissions, navAction, addPage]);
 
   return (
     <SidebarContainer>
@@ -304,35 +341,13 @@ export default function Sidebar({ closeSidebar, favorites, navAction }: SidebarP
               onClick={navAction}
             />
           </Box>
-          <ScrollingContainer isScrolled={isScrolled} onScroll={onScroll} className='page-navigation'>
-            {favoritePageIds.length > 0 && (
-              <Box mb={2}>
-                <SectionName>FAVORITES</SectionName>
-                <PageNavigation isFavorites={true} rootPageIds={favoritePageIds} />
-              </Box>
-            )}
-            <WorkspaceLabel>
-              <SectionName>SPACE</SectionName>
-              {/** Test component */}
-              {userSpacePermissions?.createPage && (
-                <div className='add-a-page'>
-                  <NewPageMenu tooltip='Add a page' addPage={addPage} />
-                </div>
-              )}
-            </WorkspaceLabel>
-            <Box mb={6}>
-              <PageNavigation onClick={navAction} />
-            </Box>
-            <Box mb={2}>
-              <SidebarBox
-                onClick={() => {
-                  setShowingTrash(true);
-                }}
-                icon={<DeleteOutlinedIcon fontSize='small' />}
-                label='Trash'
-              />
-            </Box>
-          </ScrollingContainer>
+          {isMobileSidebar ? (
+            <div>{pagesNavigation}</div>
+          ) : (
+            <ScrollingContainer isScrolled={isScrolled} onScroll={onScroll} className='page-navigation'>
+              {pagesNavigation}
+            </ScrollingContainer>
+          )}
         </Box>
       )}
       {showingTrash && (

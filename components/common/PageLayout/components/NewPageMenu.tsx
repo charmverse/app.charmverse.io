@@ -20,12 +20,19 @@ export const StyledIconButton = styled(IconButton)`
   border: 1px solid ${({ theme }) => theme.palette.divider};
   width: 20px;
   height: 20px;
+  cursor: pointer;
+
   svg {
     font-size: 16px;
   }
   &:hover {
     background-color: ${({ theme }) => theme.palette.action.hover};
   }
+  ${({ theme }) => `
+    ${theme.breakpoints.down('md')} {
+      height: 26px;
+      width: 26px;
+  `}
 `;
 
 export const StyledArticleIcon = styled(ArticleIcon)`

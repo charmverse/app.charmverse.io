@@ -1,7 +1,6 @@
-import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import type { Theme } from '@mui/material';
-import { useMediaQuery, Box } from '@mui/material';
+import { Box } from '@mui/material';
 import MuiAppBar from '@mui/material/AppBar';
 import MuiDrawer from '@mui/material/Drawer';
 import Head from 'next/head';
@@ -14,6 +13,7 @@ import PageDialogGlobalModal from 'components/common/PageDialog/PageDialogGlobal
 import { SharedPageLayout } from 'components/common/PageLayout/SharedPageLayout';
 import { FocalboardViewsProvider } from 'hooks/useFocalboardViews';
 import { useLocalStorage } from 'hooks/useLocalStorage';
+import { useMobileSidebar } from 'hooks/useMobileSidebar';
 import { PageActionDisplayProvider } from 'hooks/usePageActionDisplay';
 import { useSharedPage } from 'hooks/useSharedPage';
 import { ThreadsProvider } from 'hooks/useThreads';
@@ -112,36 +112,35 @@ interface PageLayoutProps {
 
 function PageLayout({ sidebarWidth = 300, children, sidebar: SidebarOverride }: PageLayoutProps) {
   const { width } = useWindowSize();
-  const theme = useTheme();
-  const smallScreen = useMediaQuery(theme.breakpoints.down('md'));
+  const isMobileSidebar = useMobileSidebar();
 
   let mobileSidebarWidth = width ? Math.min(width * 0.8, MOBILE_SIDEBAR_MAX_WIDTH) : sidebarWidth;
   if (SidebarOverride) {
     mobileSidebarWidth = sidebarWidth;
   }
 
-  const [storageOpen, setStorageOpen] = useLocalStorage('leftSidebar', !smallScreen);
+  const [storageOpen, setStorageOpen] = useLocalStorage('leftSidebar', !isMobileSidebar);
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const { user } = useUser();
   const { hasSharedPageAccess, accessChecked, publicPage } = useSharedPage();
-  const open = smallScreen ? mobileOpen : storageOpen;
+  const open = isMobileSidebar ? mobileOpen : storageOpen;
 
   const handleDrawerOpen = React.useCallback(() => {
-    if (smallScreen) {
+    if (isMobileSidebar) {
       setMobileOpen(true);
     } else {
       setStorageOpen(true);
     }
-  }, [smallScreen]);
+  }, [isMobileSidebar]);
 
   const handleDrawerClose = React.useCallback(() => {
-    if (smallScreen) {
+    if (isMobileSidebar) {
       setMobileOpen(false);
     } else {
       setStorageOpen(false);
     }
-  }, [smallScreen]);
+  }, [isMobileSidebar]);
 
   const drawerContent = useMemo(
     () =>
@@ -151,10 +150,10 @@ function PageLayout({ sidebarWidth = 300, children, sidebar: SidebarOverride }: 
         <Sidebar
           closeSidebar={handleDrawerClose}
           favorites={user?.favorites || []}
-          navAction={smallScreen ? handleDrawerClose : undefined}
+          navAction={isMobileSidebar ? handleDrawerClose : undefined}
         />
       ),
-    [handleDrawerClose, user?.favorites, smallScreen]
+    [handleDrawerClose, user?.favorites, isMobileSidebar]
   );
 
   if (!accessChecked) {
@@ -185,7 +184,7 @@ function PageLayout({ sidebarWidth = 300, children, sidebar: SidebarOverride }: 
                       <AppBar open={open} sidebarWidth={sidebarWidth} position='fixed'>
                         <Header open={open} openSidebar={handleDrawerOpen} />
                       </AppBar>
-                      {smallScreen ? (
+                      {isMobileSidebar ? (
                         <MuiDrawer
                           open={open}
                           variant='temporary'

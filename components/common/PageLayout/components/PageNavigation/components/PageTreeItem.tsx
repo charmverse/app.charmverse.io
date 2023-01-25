@@ -88,8 +88,7 @@ export const StyledTreeItem = styled(TreeItem, { shouldForwardProp: (prop) => pr
     },
     [`& .${treeItemClasses.label}`]: {
       fontWeight: 'inherit',
-      color: 'inherit',
-      paddingLeft: 0
+      color: 'inherit'
     },
     [`& .${treeItemClasses.iconContainer}`]: {
       marginRight: 0,
@@ -134,11 +133,6 @@ const PageAnchor = styled(Link)`
   overflow: hidden;
   padding: 2px 0;
   position: relative;
-  ${({ theme }) => `
-    ${theme.breakpoints.down('md')} {
-      min-height: 40px;
-    }
-  `}
 
   .page-actions {
     display: flex;
@@ -156,6 +150,20 @@ const PageAnchor = styled(Link)`
       width: 20px;
     }
   }
+
+  ${({ theme }) => `
+    ${theme.breakpoints.down('md')} {
+      min-height: 38px;
+
+      .page-actions {
+        gap: 8px;
+        .MuiIconButton-root {
+          height: 26px;
+          width: 26px;
+        }
+      }
+    }
+  `}
 
   // disable hover UX on ios which converts first click to a hover event
   @media (pointer: fine) {
