@@ -29,9 +29,11 @@ describe('createWorkspaceApi', () => {
       name: 'Test space'
     };
 
+    const adminDiscordUserId = `admin-discord-${v4()}`;
+
     const space = await createWorkspaceApi({
       ...input,
-      adminDiscordUserId: '123',
+      adminDiscordUserId,
       avatar: 'https://example.com/avatar.png',
       adminWalletAddress: '0x123',
       superApiToken

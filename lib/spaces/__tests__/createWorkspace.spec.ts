@@ -16,7 +16,7 @@ beforeAll(async () => {
 
 describe('createWorkspace', () => {
   it('should create a space allowing for an xpsengine and discord integration, and register the token used to create the space if one was used', async () => {
-    const tokenName = `Integration partner ${uid}`;
+    const tokenName = `Integration partner ${uid()}`;
 
     const tokenValue = `key-${v4()}`;
 
@@ -27,9 +27,12 @@ describe('createWorkspace', () => {
       }
     });
 
+    const discordServerId = `discord-${v4()}`;
+    const xpsEngineId = `xps-${v4()}`;
+
     const input: SpaceCreateInput = {
-      discordServerId: '123',
-      xpsEngineId: '123',
+      discordServerId,
+      xpsEngineId,
       name: 'Test space',
       spaceImage: 'https://example.com/avatar.png',
       superApiTokenId: superApiToken.id
