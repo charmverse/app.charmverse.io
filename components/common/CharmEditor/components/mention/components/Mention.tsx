@@ -24,6 +24,11 @@ const MentionContainer = styled(Link)`
   }
 `;
 
+const StyledTypography = styled(Typography)`
+  font-weight: 600;
+  border-bottom: 0.05em solid var(--link-underline);
+`;
+
 export default function Mention({ node }: NodeViewProps) {
   const attrs = node.attrs as MentionSpecSchemaAttrs;
   const { members } = useMembers();
@@ -37,9 +42,7 @@ export default function Mention({ node }: NodeViewProps) {
       <MentionContainer color='inherit' href={`/${space?.domain}/${page.path}`}>
         <Box display='flex' alignItems='center'>
           <PageIcon isLinkedPage icon={page.icon} isEditorEmpty={!page.hasContent} pageType={page.type} />
-          <Typography component='span' fontWeight={600}>
-            {page.title || 'Untitled'}
-          </Typography>
+          <StyledTypography>{page.title || 'Untitled'}</StyledTypography>
         </Box>
       </MentionContainer>
     );
