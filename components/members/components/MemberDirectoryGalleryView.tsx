@@ -36,9 +36,6 @@ const StyledLink = styled(Link)`
   position: relative;
   cursor: pointer;
 `;
-
-const StyledBox = StyledLink.withComponent(Box);
-
 function MemberDirectoryGalleryCard({ member }: { member: Member }) {
   const { properties = [] } = useMemberProperties();
   const propertiesRecord = properties.reduce<Record<MemberPropertyType, MemberProperty>>((record, prop) => {
@@ -232,7 +229,7 @@ function MemberDirectoryGalleryCard({ member }: { member: Member }) {
   return (
     <>
       {isUserCard ? (
-        <StyledBox onClick={() => setIsModalOpen(true)}>{content}</StyledBox>
+        <StyledLink onClick={() => setIsModalOpen(true)}>{content}</StyledLink>
       ) : (
         <StyledLink
           href={`/u/${member.path || member.id}${currentSpace ? `?workspace=${currentSpace.id}` : ''}`}
