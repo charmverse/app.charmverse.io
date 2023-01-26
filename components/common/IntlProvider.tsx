@@ -10,13 +10,14 @@ import { fetchLanguage, getLanguage } from 'components/common/BoardEditor/focalb
 export default function IntlProviderComponent({ children }: { children: ReactNode }) {
   const language = useAppSelector<string>(getLanguage);
   const dispatch = useAppDispatch();
+  const locale = 'en'; // language.split(/[_]/)[0];
 
   useEffect(() => {
     dispatch(fetchLanguage());
   }, []);
 
   return (
-    <IntlProvider locale={language.split(/[_]/)[0]} messages={englishMessages}>
+    <IntlProvider locale={locale} messages={englishMessages}>
       {children}
     </IntlProvider>
   );
