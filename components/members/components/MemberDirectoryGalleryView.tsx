@@ -1,7 +1,8 @@
 import styled from '@emotion/styled';
 import EditIcon from '@mui/icons-material/Edit';
-import { Box, Card, Chip, Grid, IconButton, Stack, Typography } from '@mui/material';
+import { Card, Chip, Grid, IconButton, Stack, Tooltip, Typography } from '@mui/material';
 import type { MemberProperty, MemberPropertyType } from '@prisma/client';
+import type { MouseEvent } from 'react';
 import { useState } from 'react';
 
 import Avatar from 'components/common/Avatar';
@@ -53,24 +54,21 @@ function MemberDirectoryGalleryCard({ member }: { member: Member }) {
 
   const isUserCard = user?.id === member.id && currentSpace;
 
+  function openUserCard(e: MouseEvent<HTMLAnchorElement>) {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsModalOpen(true);
+  }
+
   const social = (member.profile?.social as Social) ?? {};
   const content = (
     <Card sx={{ width: '100%' }}>
       {isUserCard && (
-        <IconButton
-          size='small'
-          className='icons'
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            setIsModalOpen(true);
-          }}
-          style={{
-            opacity: 1
-          }}
-        >
-          <EditIcon fontSize='small' />
-        </IconButton>
+        <Tooltip title='Edit my member profile'>
+          <IconButton size='small' className='icons'>
+            <EditIcon fontSize='small' />
+          </IconButton>
+        </Tooltip>
       )}
       <Avatar
         sx={{
@@ -215,11 +213,12 @@ function MemberDirectoryGalleryCard({ member }: { member: Member }) {
       </Stack>
     </Card>
   );
+
   return (
     <>
       <StyledLink
         href={`/u/${member.path || member.id}${currentSpace ? `?workspace=${currentSpace.id}` : ''}`}
-        onClick={isUserCard ? () => setIsModalOpen(true) : undefined}
+        onClick={isUserCard ? openUserCard : undefined}
         color='primary'
       >
         {content}
