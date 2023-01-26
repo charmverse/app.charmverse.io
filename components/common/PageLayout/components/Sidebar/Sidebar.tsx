@@ -50,6 +50,7 @@ const WorkspaceLabel = styled.div`
     right: 8px;
     top: 0px;
   }
+  padding: 4px 0;
 `;
 
 const SidebarContainer = styled.div`
@@ -126,7 +127,6 @@ const SectionName = styled(Typography)`
   font-size: 11.5px;
   font-weight: 600;
   letter-spacing: 0.03em;
-  margin-bottom: ${({ theme }) => theme.spacing(1)};
 `;
 
 const StyledSidebarLink = styled(Link, { shouldForwardProp: (prop) => prop !== 'active' })<{ active: boolean }>`
@@ -236,7 +236,7 @@ export default function Sidebar({ closeSidebar, favorites, navAction }: SidebarP
       <>
         {favoritePageIds.length > 0 && (
           <Box mb={2}>
-            <SectionName>FAVORITES</SectionName>
+            <SectionName mb={1}>FAVORITES</SectionName>
             <PageNavigation isFavorites={true} rootPageIds={favoritePageIds} />
           </Box>
         )}
