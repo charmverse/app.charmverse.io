@@ -20,7 +20,9 @@ export function onError(err: any, req: NextApiRequest, res: NextApiResponse) {
   } else {
     log.warn(`Client Error: ${errorAsSystemError.message}`, {
       url: req.url,
-      body: req.body
+      body: req.body,
+      userId: req.session?.user?.id,
+      spaceId: req.query?.spaceId || req.body?.spaceId
     });
   }
 
