@@ -284,7 +284,21 @@ export const createThemeLightSensitive = (mode: PaletteMode) => {
         styleOverrides: {
           root: {
             textTransform: 'none'
+          },
+          text: {
+            ':hover': {
+              backgroundColor: 'var(--input-bg)'
+            }
             // borderRadius: '10px'
+          }
+        }
+      },
+      MuiIconButton: {
+        styleOverrides: {
+          root: {
+            ':hover': {
+              backgroundColor: 'var(--input-bg)'
+            }
           }
         }
       },
@@ -322,7 +336,7 @@ export const createThemeLightSensitive = (mode: PaletteMode) => {
         styleOverrides: {
           root: {
             fontSize: 'inherit',
-            minWidth: '30px'
+            minWidth: '30px !important'
           }
         }
       },

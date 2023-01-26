@@ -83,6 +83,9 @@ const SidebarContainer = styled.div`
         .MuiIconButton-root {
           opacity: 1;
         }
+        > .MuiButton-root {
+          padding-right: ${({ theme }) => theme.spacing(5)};
+        }
       }
       .add-a-page {
         opacity: 1;

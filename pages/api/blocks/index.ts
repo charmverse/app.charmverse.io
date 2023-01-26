@@ -213,7 +213,7 @@ async function createBlocks(req: NextApiRequest, res: NextApiResponse<Omit<Block
   ]);
 
   await Promise.all([
-    async () => {
+    (async () => {
       const blocksToNotify = await prisma.block.findMany({
         where: {
           id: {
@@ -229,10 +229,9 @@ async function createBlocks(req: NextApiRequest, res: NextApiResponse<Omit<Block
         },
         space.id
       );
-    },
-    async () => {
+    })(),
+    (async () => {
       const createdPages = await getPageMetaList(newBlocks.map((b) => b.id));
-
       if (createdPages.length) {
         relay.broadcast(
           {
@@ -242,7 +241,7 @@ async function createBlocks(req: NextApiRequest, res: NextApiResponse<Omit<Block
           space.id
         );
       }
-    }
+    })()
   ]);
 
   return res.status(200).json(newBlocks);

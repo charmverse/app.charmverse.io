@@ -118,7 +118,7 @@ export default function DatabaseView({ containerWidth, readOnly: readOnlyOverrid
     }, 500);
   }, [updatePage]);
 
-  function stopPropagation(e: React.KeyboardEvent) {
+  function stopPropagation(e: React.KeyboardEvent | React.MouseEvent) {
     e.stopPropagation();
   }
 
