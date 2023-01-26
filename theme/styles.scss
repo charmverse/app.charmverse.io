@@ -53,3 +53,7 @@ input:-webkit-autofill:active {
   -webkit-box-shadow: 0 0 0 60px var(--bg-gray) inset !important;
   background-clip: content-box !important;
 }
+
+.not-selectable {
+  user-select: none;
+}
