@@ -12,10 +12,9 @@ import {
   setCurrent as setCurrentBoard
 } from 'components/common/BoardEditor/focalboard/src/store/boards';
 import { useAppDispatch, useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
-import { initialLoad, initialReadOnlyLoad } from 'components/common/BoardEditor/focalboard/src/store/initialLoad';
+import { initialReadOnlyLoad } from 'components/common/BoardEditor/focalboard/src/store/initialLoad';
 import {
   getCurrentBoardViews,
-  getView,
   setCurrent as setCurrentView
 } from 'components/common/BoardEditor/focalboard/src/store/views';
 import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
@@ -51,6 +50,12 @@ export function DatabasePage({ page, setPage, readOnly = false, pagePermissions 
   const { setFocalboardViewsRecord } = useFocalboardViews();
   const readOnlyBoard = readOnly || !pagePermissions?.edit_content;
   const readOnlySourceData = activeView?.fields?.sourceType === 'google_form'; // blocks that are synced cannot be edited
+  useEffect(() => {
+    if (typeof router.query.cardId === 'string') {
+      setShownCardId(router.query.cardId);
+    }
+  }, [router.query.cardId]);
+
   useEffect(() => {
     const boardId = page.boardId;
     const urlViewId = router.query.viewId as string;
@@ -171,7 +176,6 @@ export function DatabasePage({ page, setPage, readOnly = false, pagePermissions 
               cardId={shownCardId}
               onClose={() => {
                 showCard(null);
-                setShownCardId(null);
               }}
               readOnly={readOnly}
             />
