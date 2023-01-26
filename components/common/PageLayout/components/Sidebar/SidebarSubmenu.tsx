@@ -67,11 +67,10 @@ export default function SidebarSubmenu({
   logoutCurrentUser: () => void;
 }) {
   const currentSpace = useCurrentSpace();
-  const { spaces, createNewSpace, isCreatingSpace } = useSpaces();
+  const { spaces, createNewSpace, isCreatingSpace, setSpaces, isLoaded } = useSpaces();
   const [spaceFormOpen, setSpaceFormOpen] = useState(false);
-  const { user, setUser } = useUser();
+  const { user } = useUser();
   const { handleUserUpdate, isSaving } = useUserDetails({
-    updateUser: setUser,
     user: user!
   });
 
@@ -85,22 +84,18 @@ export default function SidebarSubmenu({
 
   const menuPopupState = usePopupState({ variant: 'popover', popupId: 'profile-dropdown' });
 
-  const sortOrder =
-    user?.spacesOrder && user.spacesOrder.length === spaces.length ? user.spacesOrder : spaces.map((s) => s.id);
-
   const changeOrderHandler = useCallback(
     async (draggedProperty: string, droppedOnProperty: string) => {
-      const newOrder = [...sortOrder];
+      const newOrder = spaces.map((s) => s.id);
       const propIndex = newOrder.indexOf(draggedProperty); // find the property that was dragged
       newOrder.splice(propIndex, 1); // remove the dragged property from the array
       const droppedOnIndex = newOrder.indexOf(droppedOnProperty); // find the index of the space that was dropped on
       newOrder.splice(droppedOnIndex, 0, draggedProperty); // add the property to the new index
       await handleUserUpdate({ spacesOrder: newOrder });
+      await setSpaces();
     },
-    [sortOrder, handleUserUpdate]
+    [handleUserUpdate]
   );
-
-  const sortedSpaces = [...spaces].sort((a, b) => sortOrder.indexOf(a.id) - sortOrder.indexOf(b.id));
 
   return (
     <SidebarHeader className='sidebar-header' position='relative'>
@@ -135,10 +130,10 @@ export default function SidebarSubmenu({
         <Typography component='p' variant='caption' mx={2} mb={0.5}>
           My Spaces
         </Typography>
-        {sortedSpaces.map((_space) => (
+        {spaces.map((_space) => (
           <SpaceListItem
             key={_space.id}
-            disabled={isSaving}
+            disabled={isSaving || !isLoaded || isCreatingSpace}
             selected={currentSpace?.domain === _space.domain}
             space={_space}
             changeOrderHandler={changeOrderHandler}
