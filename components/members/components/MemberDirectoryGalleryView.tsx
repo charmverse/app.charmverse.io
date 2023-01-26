@@ -4,21 +4,18 @@ import { Box, Card, Chip, Grid, IconButton, Stack, Typography } from '@mui/mater
 import type { MemberProperty, MemberPropertyType } from '@prisma/client';
 import { useState } from 'react';
 
-import charmClient from 'charmClient';
 import Avatar from 'components/common/Avatar';
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
 import { SelectPreview } from 'components/common/form/fields/Select/SelectPreview';
 import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
 import Link from 'components/common/Link';
-import { MemberPropertiesPopup } from 'components/profile/components/SpacesMemberDetails/components/MemberPropertiesPopup';
 import { SocialIcons } from 'components/profile/components/UserDetails/SocialIcons';
 import type { Social } from 'components/profile/interfaces';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import isAdmin from 'hooks/useIsAdmin';
 import { useMemberProperties } from 'hooks/useMemberProperties';
 import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
-import type { Member, UpdateMemberPropertyValuePayload } from 'lib/members/interfaces';
+import type { Member } from 'lib/members/interfaces';
 import { humanFriendlyDate } from 'lib/utilities/dates';
 
 import { MemberPropertyTextMultiline } from './MemberDirectoryProperties/MemberPropertyTextMultiline';
@@ -50,23 +47,19 @@ function MemberDirectoryGalleryCard({ member }: { member: Member }) {
   const { user } = useUser();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { mutateMembers } = useMembers();
-  const updateMemberPropertyValues = async (spaceId: string, values: UpdateMemberPropertyValuePayload[]) => {
-    await charmClient.members.updateSpacePropertyValues(member.id, spaceId, values);
-    mutateMembers();
-  };
+
   const isNameHidden = !propertiesRecord.name?.enabledViews.includes('gallery');
   const isDiscordHidden = !propertiesRecord.discord?.enabledViews.includes('gallery');
   const isTwitterHidden = !propertiesRecord.twitter?.enabledViews.includes('gallery');
   const isLinkedInHidden = !propertiesRecord.linked_in?.enabledViews.includes('gallery');
   const isGithubHidden = !propertiesRecord.github?.enabledViews.includes('gallery');
-  const admin = isAdmin();
 
   const isUserCard = user?.id === member.id && currentSpace;
 
   const social = (member.profile?.social as Social) ?? {};
   const content = (
     <Card sx={{ width: '100%' }}>
-      {(isUserCard || admin) && (
+      {isUserCard && (
         <IconButton
           size='small'
           className='icons'
@@ -75,13 +68,9 @@ function MemberDirectoryGalleryCard({ member }: { member: Member }) {
             e.stopPropagation();
             setIsModalOpen(true);
           }}
-          style={
-            !admin
-              ? {
-                  opacity: 1
-                }
-              : {}
-          }
+          style={{
+            opacity: 1
+          }}
         >
           <EditIcon fontSize='small' />
         </IconButton>
@@ -242,29 +231,18 @@ function MemberDirectoryGalleryCard({ member }: { member: Member }) {
         </StyledLink>
       )}
 
-      {isModalOpen && user && currentSpace ? (
-        user.id === member.id ? (
-          <MemberOnboardingForm
-            userId={member.id}
-            spaceName={currentSpace.name}
-            spaceId={currentSpace.id}
-            onClose={() => {
-              mutateMembers();
-              setIsModalOpen(false);
-            }}
-            title='Edit your profile'
-          />
-        ) : (
-          <MemberPropertiesPopup
-            onClose={() => {
-              setIsModalOpen(false);
-            }}
-            memberId={member.id}
-            spaceId={currentSpace.id}
-            updateMemberPropertyValues={updateMemberPropertyValues}
-          />
-        )
-      ) : null}
+      {isModalOpen && user && currentSpace && user.id === member.id && (
+        <MemberOnboardingForm
+          userId={member.id}
+          spaceName={currentSpace.name}
+          spaceId={currentSpace.id}
+          onClose={() => {
+            mutateMembers();
+            setIsModalOpen(false);
+          }}
+          title='Edit your profile'
+        />
+      )}
     </>
   );
 }
