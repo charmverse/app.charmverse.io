@@ -28,12 +28,19 @@ import { updateInlineComment } from './inlineComment.utils';
 const hideSelectionTooltip = selectionTooltip.hideSelectionTooltip;
 
 export const ThreadContainer = styled(Paper)`
-  max-height: 400px;
   display: flex;
   gap: ${({ theme }) => theme.spacing(1)};
   flex-direction: column;
-  min-width: 500px;
   overflow: auto;
+  width: calc(100vw - ${({ theme }) => theme.spacing(1)});
+  margin: ${({ theme }) => theme.spacing(0.5)};
+  max-height: 60vh;
+
+  ${({ theme }) => theme.breakpoints.up('sm')} {
+    width: 100%;
+    min-width: 500px;
+    max-height: 400px;
+  }
 `;
 
 export default function InlineCommentThread({ pluginKey }: { pluginKey: PluginKey<InlineCommentPluginState> }) {
