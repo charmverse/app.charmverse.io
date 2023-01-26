@@ -85,7 +85,7 @@ function ViewTabs(props: ViewTabsProps) {
     views: viewsProp
   } = props;
   const router = useRouter();
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [viewMenuAnchorEl, setViewMenuAnchorEl] = useState<null | HTMLElement>(null);
   const [dropdownView, setDropdownView] = useState<BoardView | null>(null);
   const renameViewPopupState = usePopupState({ variant: 'popover', popupId: 'rename-view-popup' });
   const hiddenViewsPopupState = usePopupState({ variant: 'popover', popupId: 'show-views-popup' });
@@ -128,7 +128,7 @@ function ViewTabs(props: ViewTabsProps) {
       return;
     }
     if (view && !readOnly && event.currentTarget.id === activeView?.id) {
-      setAnchorEl(event.currentTarget);
+      setViewMenuAnchorEl(event.currentTarget);
       setDropdownView(view);
     } else {
       showView(viewId);
@@ -137,6 +137,10 @@ function ViewTabs(props: ViewTabsProps) {
 
   function handleClose() {
     hiddenViewsPopupState.close();
+  }
+
+  function closeViewMenu() {
+    setViewMenuAnchorEl(null);
   }
 
   function getViewUrl(viewId: string) {
@@ -166,7 +170,7 @@ function ViewTabs(props: ViewTabsProps) {
     Utils.log('deleteView');
     if (!dropdownView) return;
 
-    setAnchorEl(null);
+    setViewMenuAnchorEl(null);
     const nextView = views.find((o) => o !== dropdownView);
     await mutator.deleteBlock(dropdownView, 'delete view');
     onDeleteView?.(dropdownView.id);
@@ -182,18 +186,18 @@ function ViewTabs(props: ViewTabsProps) {
       const { boardId, ...sourceDataWithoutBoard } = newView.fields.sourceData!;
       newView.fields.sourceData = sourceDataWithoutBoard;
       mutator.updateBlock(newView, dropdownView, 'reset Google view source');
-      setAnchorEl(null);
+      setViewMenuAnchorEl(null);
     }
   }
 
   function handleRenameView() {
-    setAnchorEl(null);
+    setViewMenuAnchorEl(null);
     renameViewPopupState.open();
   }
 
   function handleViewOptions() {
     openViewOptions();
-    setAnchorEl(null);
+    setViewMenuAnchorEl(null);
   }
 
   function saveViewTitle(form: { title: string }) {
@@ -268,7 +272,7 @@ function ViewTabs(props: ViewTabsProps) {
           />
         )}
       </Tabs>
-      <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleClose}>
+      <Menu anchorEl={viewMenuAnchorEl} open={Boolean(viewMenuAnchorEl)} onClose={closeViewMenu}>
         <MenuItem dense onClick={handleRenameView}>
           <ListItemIcon>
             <EditIcon fontSize='small' />

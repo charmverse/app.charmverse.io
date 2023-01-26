@@ -34,40 +34,43 @@ export const StyledArticleIcon = styled(ArticleIcon)`
   font-size: 22px;
 `;
 
-type Props = { addPage: (p: Partial<Page>) => void; tooltip: string; sx?: any };
+type Props = { addPage: (p: Partial<Page>) => void; tooltip: string };
 
-function NewPageMenu({ addPage, tooltip, ...props }: Props) {
+function NewPageMenu({ addPage, tooltip }: Props) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
     event.preventDefault();
+    event.stopPropagation();
   };
-  const handleClose = () => {
+  const handleClose = (event?: any) => {
     setAnchorEl(null);
+    event?.stopPropagation();
   };
-  const createPage = (page: { type: Page['type'] }) => {
+  const createPage = (event: any | undefined, page: { type: Page['type'] }) => {
     addPage(page);
     handleClose();
+    event?.stopPropagation();
   };
 
   return (
     <>
       <Tooltip disableInteractive title={tooltip} leaveDelay={0} placement='top' arrow>
-        <StyledIconButton onClick={handleClick} {...props}>
+        <StyledIconButton onClick={handleClick}>
           <AddIcon color='secondary' />
         </StyledIconButton>
       </Tooltip>
 
       <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
-        <MenuItem onClick={() => createPage({ type: 'page' })}>
+        <MenuItem onClick={(e) => createPage(e, { type: 'page' })}>
           <ListItemIcon>
             <StyledArticleIcon fontSize='small' />
           </ListItemIcon>
           <Typography sx={{ fontSize: 15, fontWeight: 600 }}>Add Page</Typography>
         </MenuItem>
         {/* create a linked board page by default, which can be changed to 'board' by the user */}
-        <MenuItem onClick={() => createPage({ type: 'linked_board' })}>
+        <MenuItem onClick={(e) => createPage(e, { type: 'linked_board' })}>
           <ListItemIcon>
             <StyledDatabaseIcon fontSize='small' />
           </ListItemIcon>
