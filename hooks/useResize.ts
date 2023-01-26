@@ -9,14 +9,14 @@ type UseResizeProps = {
 
 export function useResize({ minWidth, initialWidth, maxWidth, onResize }: UseResizeProps) {
   const [isResizing, setIsResizing] = useState(false);
-  const [width, setWidth] = useState(initialWidth || 0);
+  const [width, setWidth] = useState(initialWidth || minWidth);
   const [startXOffset, setStartXOffset] = useState(0);
 
   useEffect(() => {
-    if (initialWidth && !width) {
+    if (initialWidth && initialWidth !== width) {
       setWidth(initialWidth);
     }
-  }, [initialWidth]);
+  }, [initialWidth, width]);
 
   const enableResize = useCallback(
     (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {

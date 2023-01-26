@@ -143,7 +143,7 @@ function PageLayout({ sidebarWidth = 300, children, sidebar: SidebarOverride }: 
   }
 
   const [storageOpen, setStorageOpen] = useLocalStorage('leftSidebar', !isMobileSidebar);
-  const [sidebarStorageWidth, setSidebarStorageWidth] = useLocalStorage('leftSidebarWidth', 0);
+  const [sidebarStorageWidth, setSidebarStorageWidth] = useLocalStorage('leftSidebarWidth', sidebarWidth);
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const {
