@@ -109,20 +109,23 @@ const LayoutContainer = styled.div`
   height: 100%;
 `;
 
-const DraggableHandle = styled.div<{ isActive?: boolean }>`
+const DraggableHandle = styled.div<{ isActive?: boolean; disabled?: boolean }>`
   position: absolute;
   width: 5px;
   bottom: 0;
   top: 0;
   right: 0;
-  cursor: col-resize;
   border-right: 1px solid ${({ theme }) => theme.palette.divider};
   transition: all 0.2s ease-in-out;
   background: transparent;
 
-  &:hover {
-    border-right: 3px solid ${({ theme }) => theme.palette.primary.main};
-  }
+  ${({ disabled, theme }) =>
+    !disabled &&
+    `&:hover {
+        border-right: 3px solid ${theme.palette.primary.main}
+        }
+      cursor: col-resize;
+    `}
 
   ${({ isActive, theme }) => (isActive ? `border-right: 3px solid ${theme.palette.primary.main}` : '')}
 `;
@@ -137,7 +140,7 @@ function PageLayout({ sidebarWidth = 300, children, sidebar: SidebarOverride }: 
   const { width } = useWindowSize();
   const isMobileSidebar = useMobileSidebar();
 
-  let mobileSidebarWidth = width ? Math.min(width * 0.8, MAX_SIDEBAR_WIDTH) : sidebarWidth;
+  let mobileSidebarWidth = width ? Math.min(width * 0.85, MAX_SIDEBAR_WIDTH) : sidebarWidth;
   if (SidebarOverride) {
     mobileSidebarWidth = sidebarWidth;
   }
@@ -236,11 +239,23 @@ function PageLayout({ sidebarWidth = 300, children, sidebar: SidebarOverride }: 
                           </Box>
                         </MuiDrawer>
                       ) : (
-                        <Drawer sidebarWidth={resizableSidebarWidth || sidebarWidth} open={open} variant='permanent'>
+                        <Drawer
+                          sidebarWidth={SidebarOverride ? sidebarWidth : resizableSidebarWidth || sidebarWidth}
+                          open={open}
+                          variant='permanent'
+                        >
                           {drawerContent}
 
-                          <Tooltip title={isResizing ? '' : 'Drag to resize'} placement='right' followCursor>
-                            <DraggableHandle onMouseDown={(e) => enableResize(e)} isActive={isResizing} />
+                          <Tooltip
+                            title={!!SidebarOverride || isResizing ? '' : 'Drag to resize'}
+                            placement='right'
+                            followCursor
+                          >
+                            <DraggableHandle
+                              onMouseDown={(e) => enableResize(e)}
+                              isActive={isResizing}
+                              disabled={!!SidebarOverride}
+                            />
                           </Tooltip>
                         </Drawer>
                       )}

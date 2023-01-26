@@ -58,16 +58,18 @@ export function useResize({ minWidth, initialWidth, maxWidth, onResize }: UseRes
   );
 
   useEffect(() => {
-    document.addEventListener('mousemove', resize);
-    document.addEventListener('mouseup', disableResize);
-    document.body.classList.add('no-select');
+    if (isResizing) {
+      document.addEventListener('mousemove', resize);
+      document.addEventListener('mouseup', disableResize);
+      document.body.classList.add('not-selectable');
+    }
 
     return () => {
       document.removeEventListener('mousemove', resize);
       document.removeEventListener('mouseup', disableResize);
-      document.body.classList.remove('no-select');
+      document.body.classList.remove('not-selectable');
     };
-  }, [disableResize, resize]);
+  }, [disableResize, resize, isResizing]);
 
   return { width, enableResize, isResizing };
 }
