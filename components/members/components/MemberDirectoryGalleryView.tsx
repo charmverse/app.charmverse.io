@@ -22,6 +22,7 @@ import type { Member, UpdateMemberPropertyValuePayload } from 'lib/members/inter
 import { humanFriendlyDate } from 'lib/utilities/dates';
 
 import { MemberPropertyTextMultiline } from './MemberDirectoryProperties/MemberPropertyTextMultiline';
+import { MemberOnboardingForm } from './MemberOnboardingForm';
 import { TimezoneDisplay } from './TimezoneDisplay';
 
 const StyledLink = styled(Link)`
@@ -49,7 +50,10 @@ function MemberDirectoryGalleryCard({ member }: { member: Member }) {
   const { user } = useUser();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { mutateMembers } = useMembers();
-
+  const updateMemberPropertyValues = async (spaceId: string, values: UpdateMemberPropertyValuePayload[]) => {
+    await charmClient.members.updateSpacePropertyValues(member.id, spaceId, values);
+    mutateMembers();
+  };
   const isNameHidden = !propertiesRecord.name?.enabledViews.includes('gallery');
   const isDiscordHidden = !propertiesRecord.discord?.enabledViews.includes('gallery');
   const isTwitterHidden = !propertiesRecord.twitter?.enabledViews.includes('gallery');
@@ -57,10 +61,6 @@ function MemberDirectoryGalleryCard({ member }: { member: Member }) {
   const isGithubHidden = !propertiesRecord.github?.enabledViews.includes('gallery');
   const admin = isAdmin();
 
-  const updateMemberPropertyValues = async (spaceId: string, values: UpdateMemberPropertyValuePayload[]) => {
-    await charmClient.members.updateSpacePropertyValues(member.id, spaceId, values);
-    mutateMembers();
-  };
   const isUserCard = user?.id === member.id && currentSpace;
 
   const social = (member.profile?.social as Social) ?? {};
@@ -242,16 +242,29 @@ function MemberDirectoryGalleryCard({ member }: { member: Member }) {
         </StyledLink>
       )}
 
-      {isModalOpen && user && currentSpace && (
-        <MemberPropertiesPopup
-          onClose={() => {
-            setIsModalOpen(false);
-          }}
-          memberId={member.id}
-          spaceId={currentSpace.id}
-          updateMemberPropertyValues={updateMemberPropertyValues}
-        />
-      )}
+      {isModalOpen && user && currentSpace ? (
+        user.id === member.id ? (
+          <MemberOnboardingForm
+            userId={member.id}
+            spaceName={currentSpace.name}
+            spaceId={currentSpace.id}
+            onClose={() => {
+              mutateMembers();
+              setIsModalOpen(false);
+            }}
+            title='Edit your profile'
+          />
+        ) : (
+          <MemberPropertiesPopup
+            onClose={() => {
+              setIsModalOpen(false);
+            }}
+            memberId={member.id}
+            spaceId={currentSpace.id}
+            updateMemberPropertyValues={updateMemberPropertyValues}
+          />
+        )
+      ) : null}
     </>
   );
 }
