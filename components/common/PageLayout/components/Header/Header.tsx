@@ -210,25 +210,27 @@ export default function Header({ open, openSidebar }: HeaderProps) {
         <ListItemText primary='View suggestions' />
       </ListItemButton>
       <Divider />
-      <ListItemButton
-        onClick={() => {
-          toggleFavorite();
-          setPageMenuOpen(false);
-        }}
-      >
-        <Box
-          sx={{
-            mr: 0.5,
-            position: 'relative',
-            left: -4,
-            display: 'flex',
-            alignItems: 'center'
+      {(basePage?.type === 'card' || basePage?.type === 'page') && (
+        <ListItemButton
+          onClick={() => {
+            toggleFavorite();
+            setPageMenuOpen(false);
           }}
         >
-          {isFavorite ? <FavoritedIcon /> : <NotFavoritedIcon />}
-        </Box>
-        <ListItemText primary={isFavorite ? 'Remove from Favorites' : 'Add to Favorites'} />
-      </ListItemButton>
+          <Box
+            sx={{
+              mr: 0.5,
+              position: 'relative',
+              left: -4,
+              display: 'flex',
+              alignItems: 'center'
+            }}
+          >
+            {isFavorite ? <FavoritedIcon /> : <NotFavoritedIcon />}
+          </Box>
+          <ListItemText primary={isFavorite ? 'Remove from Favorites' : 'Add to Favorites'} />
+        </ListItemButton>
+      )}
       <ListItemButton onClick={onCopyLink}>
         <ContentCopyIcon
           fontSize='small'
