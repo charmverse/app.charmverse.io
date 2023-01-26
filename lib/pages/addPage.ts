@@ -46,7 +46,7 @@ export async function addPage({ createdBy, spaceId, ...page }: NewPageInput): Pr
     path: getPagePath(),
     spaceId,
     title: '',
-    type: page.type ?? 'page',
+    type: 'page',
     ...page
   };
 

@@ -5,6 +5,7 @@ import ArrowForwardIcon from '@mui/icons-material/ArrowForwardIos';
 import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
 import ChatOutlinedIcon from '@mui/icons-material/ChatOutlined';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
+import EmojiEmotionsOutlinedIcon from '@mui/icons-material/EmojiEmotionsOutlined';
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import FormatListNumberedIcon from '@mui/icons-material/FormatListNumbered';
 import HorizontalRuleIcon from '@mui/icons-material/HorizontalRule';
@@ -430,6 +431,35 @@ export function items(props: ItemsProps): PaletteItemTypeNoGroup[] {
               return true;
             }
             return insertNode(_state, _dispatch, node);
+          });
+          return replaceSuggestionMarkWith(palettePluginKey, '')(state, dispatch, view);
+        };
+      }
+    },
+    {
+      uid: 'emoji',
+      title: 'Emoji',
+      icon: (
+        <EmojiEmotionsOutlinedIcon
+          sx={{
+            fontSize: iconSize
+          }}
+        />
+      ),
+      description: 'Search for an emoji to place in text',
+      showInFloatingMenu: false,
+      editorExecuteCommand: ({ palettePluginKey }) => {
+        return (state, dispatch, view) => {
+          rafCommandExec(view!, () => {
+            if (view) {
+              const { schema, tr, selection } = view.state;
+              const markName = 'emojiSuggest';
+              const mark = schema.mark(markName, { trigger: ':' });
+              const marks = selection.$from.marks();
+              view.dispatch(tr.replaceSelectionWith(schema.text(':', [mark, ...marks]), false));
+              return true;
+            }
+            return true;
           });
           return replaceSuggestionMarkWith(palettePluginKey, '')(state, dispatch, view);
         };

@@ -1,7 +1,7 @@
-import EthersAdapter from '@gnosis.pm/safe-ethers-lib';
-import type { SafeInfoResponse, SafeMultisigTransactionResponse } from '@gnosis.pm/safe-service-client';
-import SafeServiceClient from '@gnosis.pm/safe-service-client';
 import type { UserGnosisSafe } from '@prisma/client';
+import EthersAdapter from '@safe-global/safe-ethers-lib';
+import type { SafeInfoResponse, SafeMultisigTransactionListResponse } from '@safe-global/safe-service-client';
+import SafeServiceClient from '@safe-global/safe-service-client';
 import { getChainById, RPC } from 'connectors';
 import type { Signer } from 'ethers';
 import { ethers } from 'ethers';
@@ -10,7 +10,7 @@ import uniqBy from 'lodash/uniqBy';
 
 import log from 'lib/log';
 
-export type GnosisTransaction = SafeMultisigTransactionResponse; // AllTransactionsListResponse['results'][0];
+export type GnosisTransaction = SafeMultisigTransactionListResponse['results'][number];
 
 function getGnosisRPCUrl(chainId: number) {
   return getChainById(chainId)?.gnosisUrl;
@@ -30,7 +30,7 @@ function getGnosisService({ signer, chainId, serviceUrl }: GetGnosisServiceProps
 
   const ethAdapter = new EthersAdapter({
     ethers,
-    signer
+    signerOrProvider: signer
   });
 
   const safeService = new SafeServiceClient({
@@ -89,7 +89,7 @@ async function getTransactionsforSafe(signer: Signer, wallet: UserGnosisSafe): P
 }
 
 export async function getTransactionsforSafes(signer: Signer, safes: UserGnosisSafe[]) {
-  const transactionList: SafeMultisigTransactionResponse[] = [];
+  const transactionList: GnosisTransaction[] = [];
   for (const safe of safes) {
     try {
       const transactions = await getTransactionsforSafe(signer, safe);

@@ -1,10 +1,9 @@
-import React from 'react';
-
-export default function BoardIcon(): JSX.Element {
+export default function BoardIcon({ fontSize }: { fontSize?: 'small' }): JSX.Element {
+  const size = fontSize === 'small' ? 20 : 24;
   return (
     <svg
-      width='24'
-      height='24'
+      width={size}
+      height={size}
       viewBox='0 0 24 24'
       fill='currentColor'
       xmlns='http://www.w3.org/2000/svg'

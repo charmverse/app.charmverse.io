@@ -1,5 +1,5 @@
-import type { MetaTransactionData } from '@gnosis.pm/safe-core-sdk-types';
 import type { Bounty } from '@prisma/client';
+import type { MetaTransactionData } from '@safe-global/safe-core-sdk-types';
 import { getChainById } from 'connectors';
 import { ethers } from 'ethers';
 import { useMemo, useState } from 'react';
