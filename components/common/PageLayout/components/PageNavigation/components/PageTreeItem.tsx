@@ -16,7 +16,7 @@ import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/ho
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import type { ReactNode, SyntheticEvent } from 'react';
-import React, { useRef, forwardRef, memo, useEffect, useCallback, useMemo } from 'react';
+import React, { forwardRef, memo, useCallback, useMemo } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 
 import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
@@ -95,8 +95,7 @@ export const StyledTreeItem = styled(TreeItem, { shouldForwardProp: (prop) => pr
       width: '28px'
     },
     [`& .${treeItemClasses.iconContainer} svg`]: {
-      color: greyColor2,
-      marginLeft: 12
+      color: greyColor2
     },
     [`& .${treeItemClasses.iconContainer} svg.MuiSvgIcon-fontSizeLarge`]: {
       fontSize: 24
@@ -151,6 +150,20 @@ const PageAnchor = styled(Link)`
       width: 20px;
     }
   }
+
+  ${({ theme }) => `
+    ${theme.breakpoints.down('md')} {
+      min-height: 38px;
+
+      .page-actions {
+        gap: 8px;
+        .MuiIconButton-root {
+          height: 26px;
+          width: 26px;
+        }
+      }
+    }
+  `}
 
   // disable hover UX on ios which converts first click to a hover event
   @media (pointer: fine) {
