@@ -1,8 +1,7 @@
 import styled from '@emotion/styled';
-import { MoreHoriz } from '@mui/icons-material';
-import { Box, IconButton, Stack, Tab, Tabs, Typography } from '@mui/material';
+import { Box, Stack, Tab, Tabs, Typography } from '@mui/material';
 import { useRouter } from 'next/router';
-import { useEffect, useMemo, useState } from 'react';
+import { useState } from 'react';
 
 import { iconForViewType } from 'components/common/BoardEditor/focalboard/src/components/viewMenu';
 import Button from 'components/common/Button';
@@ -15,8 +14,6 @@ import { setUrlWithoutRerender } from 'lib/utilities/browser';
 import { MemberDirectoryGalleryView } from './components/MemberDirectoryGalleryView';
 import { MemberPropertiesSidebar } from './components/MemberDirectoryProperties/MemberPropertiesSidebar';
 import { MemberDirectorySearchBar } from './components/MemberDirectorySearchBar';
-import { MemberDirectorySort } from './components/MemberDirectorySort/MemberDirectorySort';
-import { sortMembers } from './components/MemberDirectorySort/utils';
 import { MemberDirectoryTableView } from './components/MemberDirectoryTableView';
 
 const StyledButton = styled(Button)`
@@ -38,22 +35,26 @@ export default function MemberDirectoryPage() {
   const { properties = [] } = useMemberProperties();
   const [currentView, setCurrentView] = useState<View>((router.query.view as View) ?? 'gallery');
   const [isPropertiesDrawerVisible, setIsPropertiesDrawerVisible] = useState(false);
-  const [sortedProperty, setSortedProperty] = useState<string>('');
+  const nameProperty = properties.find((property) => property.type === 'name') ?? null;
 
-  useEffect(() => {
-    // Only set initial property sort if none exist before
-    if (!sortedProperty) {
-      setSortedProperty(properties.find((property) => property.type === 'name')?.name ?? '');
+  const sortedMembers = searchedMembers.sort((mem1, mem2) => {
+    const member1Property = mem1.properties.find((prop) => prop.memberPropertyId === nameProperty?.id);
+    const member2Property = mem2.properties.find((prop) => prop.memberPropertyId === nameProperty?.id);
+    const member1Name = (member1Property?.value ?? mem1.username).toString();
+    const member2Name = (member2Property?.value ?? mem2.username).toString();
+    const isMember1NameWallet = member1Name.startsWith('0x');
+    const isMember2NameWallet = member2Name.startsWith('0x');
+    // Making sure wallet named are pushed back to last
+    if (isMember1NameWallet && isMember2NameWallet) {
+      return 0;
+    } else if (isMember1NameWallet && !isMember2NameWallet) {
+      return 1;
+    } else if (!isMember1NameWallet && isMember2NameWallet) {
+      return -1;
+    } else {
+      return member1Name > member2Name ? 1 : -1;
     }
-  }, [properties, sortedProperty]);
-
-  const sortedMembers = useMemo(() => {
-    const memberProperty = sortedProperty ? properties.find((property) => property.name === sortedProperty) : null;
-    if (sortedProperty && memberProperty) {
-      return sortMembers(searchedMembers, memberProperty);
-    }
-    return searchedMembers;
-  }, [sortedProperty, properties, searchedMembers]);
+  });
 
   return (
     <CenteredPageContent>
@@ -92,22 +93,6 @@ export default function MemberDirectoryPage() {
             />
           ))}
         </Tabs>
-        <Stack flexDirection='row' gap={1}>
-          <MemberDirectorySort
-            setSortedProperty={setSortedProperty}
-            sortedProperty={sortedProperty}
-            view={currentView}
-          />
-          <IconButton
-            onClick={() => {
-              setTimeout(() => {
-                setIsPropertiesDrawerVisible(!isPropertiesDrawerVisible);
-              });
-            }}
-          >
-            <MoreHoriz color='secondary' />
-          </IconButton>
-        </Stack>
       </Stack>
       <Box position='relative' display='flex' height='100%'>
         <Box width='100%' overflow={currentView === 'table' ? 'auto' : 'visible'} height='fit-content'>
