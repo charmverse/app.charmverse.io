@@ -1,4 +1,3 @@
-import { useTheme } from '@emotion/react';
 import { KeyboardArrowDown } from '@mui/icons-material';
 import type { Theme } from '@mui/material';
 import { Box, ButtonGroup, Tooltip, useMediaQuery } from '@mui/material';
