@@ -31,8 +31,6 @@ function AddNewCard({ pageId }: { pageId: string }) {
             card.fields.properties = { ...card.fields.properties };
             card.fields.contentOrder = [];
             await charmClient.insertBlocks([card], () => null);
-            mutate(`pages/${space.id}`);
-            dispatch(addCard(card));
             router.push(`/${space.domain}/${page.path}?cardId=${card.id}`);
           }
           e.stopPropagation();

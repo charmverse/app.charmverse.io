@@ -13,6 +13,7 @@ export function onError(err: any, req: NextApiRequest, res: NextApiResponse) {
       error: err instanceof SystemError === false ? err.message || 'Something went wrong' : errorAsSystemError,
       stack: err.error?.stack || err.stack,
       userId: req.session?.user?.id,
+      spaceId: req.query?.spaceId || req.body?.spaceId,
       url: req.url,
       body: req.body
     });
