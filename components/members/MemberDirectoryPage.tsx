@@ -1,5 +1,6 @@
 import styled from '@emotion/styled';
 import { Box, Stack, Tab, Tabs, Typography } from '@mui/material';
+import { MemberPropertyPermission } from '@prisma/client';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 
@@ -8,7 +9,7 @@ import Button from 'components/common/Button';
 import { CenteredPageContent } from 'components/common/PageLayout/components/PageContent';
 import { useMemberProperties } from 'hooks/useMemberProperties';
 import { useMembers } from 'hooks/useMembers';
-import type { Member } from 'lib/members/interfaces';
+import type { Member, MemberPropertyWithPermissions } from 'lib/members/interfaces';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
 import { MemberDirectoryGalleryView } from './components/MemberDirectoryGalleryView';
@@ -28,6 +29,13 @@ const StyledButton = styled(Button)`
 const views = ['gallery', 'table'] as const;
 type View = typeof views[number];
 
+function memberNamePropertyValue(member: Member, nameProperty: MemberPropertyWithPermissions | null) {
+  const memberNameProperty = member.properties.find((prop) => prop.memberPropertyId === nameProperty?.id);
+  const memberName = (memberNameProperty?.value ?? member.username).toString();
+
+  return memberName.startsWith('0x') ? `zzzzzzzz${memberName}` : memberName;
+}
+
 export default function MemberDirectoryPage() {
   const router = useRouter();
   const { members } = useMembers();
@@ -37,24 +45,9 @@ export default function MemberDirectoryPage() {
   const [isPropertiesDrawerVisible, setIsPropertiesDrawerVisible] = useState(false);
   const nameProperty = properties.find((property) => property.type === 'name') ?? null;
 
-  const sortedMembers = searchedMembers.sort((mem1, mem2) => {
-    const member1Property = mem1.properties.find((prop) => prop.memberPropertyId === nameProperty?.id);
-    const member2Property = mem2.properties.find((prop) => prop.memberPropertyId === nameProperty?.id);
-    const member1Name = (member1Property?.value ?? mem1.username).toString();
-    const member2Name = (member2Property?.value ?? mem2.username).toString();
-    const isMember1NameWallet = member1Name.startsWith('0x');
-    const isMember2NameWallet = member2Name.startsWith('0x');
-    // Making sure wallet named are pushed back to last
-    if (isMember1NameWallet && isMember2NameWallet) {
-      return 0;
-    } else if (isMember1NameWallet && !isMember2NameWallet) {
-      return 1;
-    } else if (!isMember1NameWallet && isMember2NameWallet) {
-      return -1;
-    } else {
-      return member1Name > member2Name ? 1 : -1;
-    }
-  });
+  const sortedMembers = searchedMembers.sort((mem1, mem2) =>
+    memberNamePropertyValue(mem1, nameProperty) > memberNamePropertyValue(mem2, nameProperty) ? 1 : -1
+  );
 
   return (
     <CenteredPageContent>
