@@ -30,7 +30,7 @@ import { isTouchScreen } from 'lib/utilities/browser';
 import { greyColor2 } from 'theme/colors';
 
 import AddNewCard from '../../AddNewCard';
-import NewPageMenu from '../../NewPageMenu';
+import NewPageMenu, { StyledIconButton } from '../../NewPageMenu';
 import { PageIcon } from '../../PageIcon';
 import PageTitle from '../../PageTitle';
 
@@ -258,8 +258,6 @@ const TreeItemComponent = React.forwardRef<React.Ref<HTMLDivElement>, TreeItemCo
   )
 );
 
-const MemoizedIconButton = memo(IconButton);
-
 const PageMenuItem = styled(ListItemButton)`
   .MuiTypography-root {
     font-weight: 600;
@@ -318,9 +316,9 @@ const PageTreeItem = forwardRef<any, PageTreeItemProps>((props, ref) => {
         onClick={onClick}
       >
         <div className='page-actions'>
-          <MemoizedIconButton size='small' onClick={showMenu}>
+          <StyledIconButton size='small' onClick={showMenu}>
             <MoreHorizIcon color='secondary' fontSize='small' />
-          </MemoizedIconButton>
+          </StyledIconButton>
 
           {userSpacePermissions?.createPage && pageType === 'board' && <AddNewCard pageId={pageId} />}
           {userSpacePermissions?.createPage && pageType === 'page' && (
