@@ -228,16 +228,13 @@ function MemberDirectoryGalleryCard({ member }: { member: Member }) {
   );
   return (
     <>
-      {isUserCard ? (
-        <StyledLink onClick={() => setIsModalOpen(true)}>{content}</StyledLink>
-      ) : (
-        <StyledLink
-          href={`/u/${member.path || member.id}${currentSpace ? `?workspace=${currentSpace.id}` : ''}`}
-          color='primary'
-        >
-          {content}
-        </StyledLink>
-      )}
+      <StyledLink
+        href={`/u/${member.path || member.id}${currentSpace ? `?workspace=${currentSpace.id}` : ''}`}
+        onClick={isUserCard ? () => setIsModalOpen(true) : undefined}
+        color='primary'
+      >
+        {content}
+      </StyledLink>
 
       {isModalOpen && user && currentSpace ? (
         user.id === member.id ? (
