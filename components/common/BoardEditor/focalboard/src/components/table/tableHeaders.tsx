@@ -180,7 +180,7 @@ function TableHeaders(props: Props): JSX.Element {
             <Button>
               <AddIcon fontSize='small' />
             </Button>
-            <Menu>
+            <Menu disablePortal={false}>
               <PropertyTypes
                 label={intl.formatMessage({ id: 'PropertyMenu.selectType', defaultMessage: 'Select property type' })}
                 onTypeSelected={async (type) => {
