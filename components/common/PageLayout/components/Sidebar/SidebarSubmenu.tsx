@@ -92,9 +92,10 @@ export default function SidebarSubmenu({
       const droppedOnIndex = newOrder.indexOf(droppedOnProperty); // find the index of the space that was dropped on
       newOrder.splice(droppedOnIndex, 0, draggedProperty); // add the property to the new index
       await handleUserUpdate({ spacesOrder: newOrder });
-      await setSpaces();
+      const newOrderedSpaces = spaces.sort((a, b) => newOrder.indexOf(a.id) - newOrder.indexOf(b.id));
+      setSpaces(newOrderedSpaces);
     },
-    [handleUserUpdate]
+    [handleUserUpdate, spaces]
   );
 
   return (

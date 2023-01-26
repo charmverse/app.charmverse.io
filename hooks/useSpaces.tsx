@@ -1,8 +1,7 @@
 import type { Prisma, Space } from '@prisma/client';
 import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
-import { useEffect, useCallback, createContext, useContext, useMemo, useState } from 'react';
-import useSWR from 'swr';
+import { useCallback, createContext, useContext, useEffect, useMemo, useState } from 'react';
 
 import charmClient from 'charmClient';
 
@@ -11,7 +10,7 @@ import { useUser } from './useUser';
 type IContext = {
   spaces: Space[];
   setSpace: (spaces: Space) => void;
-  setSpaces: (spaces?: Space[]) => Promise<void>;
+  setSpaces: (spaces: Space[]) => void;
   isLoaded: boolean;
   createNewSpace: (data: Prisma.SpaceCreateInput) => Promise<Space | null>;
   isCreatingSpace: boolean;
@@ -20,7 +19,7 @@ type IContext = {
 export const SpacesContext = createContext<Readonly<IContext>>({
   spaces: [],
   setSpace: () => undefined,
-  setSpaces: async () => undefined,
+  setSpaces: () => undefined,
   isLoaded: false,
   createNewSpace: () => Promise.resolve(null),
   isCreatingSpace: false
@@ -28,15 +27,10 @@ export const SpacesContext = createContext<Readonly<IContext>>({
 
 export function SpacesProvider({ children }: { children: ReactNode }) {
   const { user, isLoaded: isUserLoaded, setUser } = useUser();
+  const [spaces, setSpaces] = useState<Space[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
   const [isCreatingSpace, setIsCreatingSpace] = useState(false);
   const router = useRouter();
-
-  const {
-    data: spaces = [],
-    mutate: setSpaces,
-    isLoading: isSpacesLoading
-  } = useSWR('/spaces', user?.id && isUserLoaded ? () => charmClient.getSpaces() : null);
 
   useEffect(() => {
     if (user) {
@@ -58,7 +52,7 @@ export function SpacesProvider({ children }: { children: ReactNode }) {
 
     try {
       const space = await charmClient.createSpace(newSpace);
-      await setSpaces();
+      setSpaces((s) => [...s, space]);
       // refresh user permissions
       const _user = await charmClient.getUser();
       setUser(_user);
@@ -89,11 +83,11 @@ export function SpacesProvider({ children }: { children: ReactNode }) {
         spaces,
         setSpace,
         setSpaces,
-        isLoaded: isUserLoaded && !!user && !isSpacesLoading && !!spaces && isLoaded,
+        isLoaded,
         createNewSpace,
         isCreatingSpace
       } as IContext),
-    [spaces, isSpacesLoading, isCreatingSpace, isUserLoaded, isLoaded, !!user]
+    [spaces, isLoaded, isCreatingSpace]
   );
 
   return <SpacesContext.Provider value={value}>{children}</SpacesContext.Provider>;
