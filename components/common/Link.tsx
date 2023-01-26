@@ -39,7 +39,7 @@ interface Props extends Omit<LinkProps, 'href'> {
 
 export default function Link({ external, href, onClick, children, color = 'primary', ...restProps }: Props) {
   if (!href) {
-    return <div>{children}</div>;
+    return <div className={restProps.className}>{children}</div>;
   }
 
   return external ? (
