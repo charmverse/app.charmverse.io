@@ -137,7 +137,7 @@ function PageLayout({ sidebarWidth = 300, children, sidebar: SidebarOverride }: 
   const { width } = useWindowSize();
   const isMobileSidebar = useMobileSidebar();
 
-  let mobileSidebarWidth = width ? Math.min(width * 0.8, MAX_SIDEBAR_WIDTH) : sidebarWidth;
+  let mobileSidebarWidth = width ? Math.min(width * 0.85, MAX_SIDEBAR_WIDTH) : sidebarWidth;
   if (SidebarOverride) {
     mobileSidebarWidth = sidebarWidth;
   }
