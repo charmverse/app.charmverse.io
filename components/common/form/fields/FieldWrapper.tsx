@@ -21,6 +21,7 @@ export function FieldWrapper({ children, label, inline, iconLabel }: Props) {
           {iconLabel ?? null}
           {label && (
             <Typography
+              component='span'
               sx={{
                 wordBreak: 'break-word'
               }}

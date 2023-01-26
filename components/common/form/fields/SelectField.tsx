@@ -116,7 +116,7 @@ export const SelectField = forwardRef<HTMLDivElement, Props>(
           handleHomeEndKeys
           multiple
           filterSelectedOptions
-          sx={{ minWidth: 150, width: '100%', background: 'transparent' }}
+          sx={{ minWidth: 150, width: '100%', zIndex: 1 }}
           options={options}
           autoHighlight
           clearIcon={null}

@@ -147,7 +147,7 @@ export function SelectProperty({
           options={selectOptions}
           size='small'
           emptyComponent={
-            <Typography variant='subtitle2' sx={{ opacity: 0.4, pl: '2px', fontSize: '14px' }}>
+            <Typography component='span' variant='subtitle2' sx={{ opacity: 0.4, pl: '2px' }}>
               Empty
             </Typography>
           }

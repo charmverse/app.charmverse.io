@@ -10,6 +10,7 @@ import { memo, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useDrop } from 'react-dnd';
 
 import charmClient from 'charmClient';
+import { NavIconHover } from 'components/common/PageLayout/components/PageNavigation/components/NavIconHover';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useLocalStorage } from 'hooks/useLocalStorage';
 import { usePages } from 'hooks/usePages';
@@ -269,8 +270,28 @@ function PageNavigation({ deletePage, isFavorites, rootPageIds, onClick }: PageN
       selected={selectedNodeId}
       onNodeToggle={onNodeToggle}
       aria-label='items navigator'
-      defaultCollapseIcon={<ExpandMoreIcon fontSize='large' />}
-      defaultExpandIcon={<ChevronRightIcon fontSize='large' />}
+      defaultCollapseIcon={
+        <NavIconHover
+          width={{ xs: 30, md: 24 }}
+          height={{ xs: 30, md: 24 }}
+          display='flex'
+          alignItems='center'
+          justifyContent='center'
+        >
+          <ExpandMoreIcon fontSize='large' />
+        </NavIconHover>
+      }
+      defaultExpandIcon={
+        <NavIconHover
+          width={{ xs: 30, md: 24 }}
+          height={{ xs: 30, md: 24 }}
+          display='flex'
+          alignItems='center'
+          justifyContent='center'
+        >
+          <ChevronRightIcon fontSize='large' />
+        </NavIconHover>
+      }
       isFavorites={isFavorites}
     >
       {mappedItems.map((item) => (
