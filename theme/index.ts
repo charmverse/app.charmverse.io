@@ -302,6 +302,11 @@ export const createThemeLightSensitive = (mode: PaletteMode) => {
           }
         }
       },
+      MuiMenuItem: {
+        defaultProps: {
+          dense: true
+        }
+      },
       MuiTooltip: {
         defaultProps: {
           arrow: true,
