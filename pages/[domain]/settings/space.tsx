@@ -81,7 +81,7 @@ export default function WorkspaceSettings() {
     // reload with new subdomain
     const newDomain = space.domain !== values.domain;
     charmClient
-      .updateSpace({ ...space, ...values })
+      .updateSpace({ ...space, name: values.name, domain: values.domain, spaceImage: values.spaceImage })
       .then((updatedSpace) => {
         if (newDomain) {
           window.location.href = router.asPath.replace(space.domain, values.domain as string);
