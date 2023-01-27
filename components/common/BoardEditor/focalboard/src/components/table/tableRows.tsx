@@ -68,6 +68,7 @@ function TableRows(props: Props): JSX.Element {
             offset={props.offset}
             resizingColumn={props.resizingColumn}
             columnRefs={props.columnRefs}
+            cardPage={cardPage}
           />
         );
 
