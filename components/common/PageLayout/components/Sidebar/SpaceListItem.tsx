@@ -53,11 +53,7 @@ export default function SpaceListItem({ space, changeOrderHandler, selected, dis
       key={space.domain}
       component={NextLink}
       href={`/${space.domain}`}
-      sx={{
-        boxSizing: 'content-box',
-        maxWidth: '276px',
-        ...(isOver && canDrop && { borderTopWidth: 2, borderStyle: 'solid', borderColor: 'action.active' })
-      }}
+      sx={{ ...(isOver && canDrop && { borderTopWidth: 2, borderStyle: 'solid', borderColor: 'action.active' }) }}
       ref={ref}
       selected={selected}
       disabled={disabled}

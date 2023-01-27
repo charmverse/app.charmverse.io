@@ -113,19 +113,24 @@ export default function SidebarSubmenu({
           {currentSpace?.name}
         </Typography>
       </StyledButton>
-      <Menu onClick={menuPopupState.close} {...bindMenu(menuPopupState)}>
-        <MenuItem component={NextLink} href='/nexus'>
-          <Box display='flex' flexDirection='row'>
-            <Box>
-              <UserDisplay user={user} hideName />
-            </Box>
-            <Box ml={1}>
-              <Typography variant='body2'>{user?.username}</Typography>
-              <Typography variant='body2' color='secondary'>
-                My Profile
-              </Typography>
-            </Box>
-          </Box>
+      <Menu onClick={menuPopupState.close} {...bindMenu(menuPopupState)} sx={{ maxWidth: '330px' }}>
+        <MenuItem
+          component={NextLink}
+          href='/nexus'
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: 'auto 1fr',
+            gridTemplateRows: 'auto auto',
+            columnGap: 1
+          }}
+        >
+          <UserDisplay user={user} hideName gridColumn='1' gridRow='1/3' />
+          <Typography variant='body2' noWrap>
+            {user?.username}
+          </Typography>
+          <Typography variant='body2' color='secondary'>
+            My Profile
+          </Typography>
         </MenuItem>
         <Divider />
         <Typography component='p' variant='caption' mx={2} mb={0.5}>
