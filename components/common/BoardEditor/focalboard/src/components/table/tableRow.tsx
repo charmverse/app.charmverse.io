@@ -158,7 +158,6 @@ function TableRow(props: Props) {
           return (
             <Box
               className='octo-table-cell title-cell'
-              id='mainBoardHeader'
               sx={{
                 width: columnWidth(
                   props.resizingColumn,
@@ -169,6 +168,7 @@ function TableRow(props: Props) {
               }}
               ref={columnRefs.get(Constants.titleColumnId)}
               key={template.id}
+              onPaste={(e) => e.stopPropagation()}
             >
               {!props.readOnly && (
                 <IconButton className='icons' onClick={handleClick} size='small'>
@@ -206,6 +206,7 @@ function TableRow(props: Props) {
               width: columnWidth(props.resizingColumn, props.activeView.fields.columnWidths, props.offset, template.id)
             }}
             ref={columnRefs.get(template.id)}
+            onPaste={(e) => e.stopPropagation()}
           >
             <PropertyValueElement
               readOnly={props.readOnly}
