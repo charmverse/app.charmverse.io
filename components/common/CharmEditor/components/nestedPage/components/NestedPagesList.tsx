@@ -1,4 +1,5 @@
 import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
+import type { PageType } from '@prisma/client';
 import type { PluginKey } from 'prosemirror-state';
 import { useCallback, memo, useEffect } from 'react';
 
@@ -13,6 +14,8 @@ import PagesList from '../../PageList';
 import PopoverMenu, { GroupLabel } from '../../PopoverMenu';
 import type { NestedPagePluginState } from '../nestedPage.interfaces';
 
+const linkablePageTypes: PageType[] = ['card', 'board', 'page', 'bounty', 'proposal', 'linked_board'];
+
 function NestedPagesList({ pluginKey }: { pluginKey: PluginKey<NestedPagePluginState> }) {
   const { pages } = usePages();
   const view = useEditorViewContext();
@@ -25,11 +28,13 @@ function NestedPagesList({ pluginKey }: { pluginKey: PluginKey<NestedPagePluginS
   const filteredPages = Object.values(pages).filter(
     (page) =>
       page &&
-      page?.deletedAt === null &&
+      page.deletedAt === null &&
+      linkablePageTypes.includes(page.type) &&
       (triggerText.length !== 0
         ? (page.title || 'Untitled').toLowerCase().startsWith(triggerText.toLowerCase().trim())
         : true)
   );
+
   const totalItems = filteredPages.length;
   const activeItemIndex = (counter < 0 ? (counter % totalItems) + totalItems : counter) % totalItems;
 
