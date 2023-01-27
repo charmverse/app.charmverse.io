@@ -136,7 +136,7 @@ function CenterPanel(props: Props) {
   );
   // filter cards by whats accessible
   const cardPages: CardPage[] = _cards.map((card) => ({ card, page: pages[card.id]! })).filter(({ page }) => !!page);
-  const sortedCardPages = activeView ? sortCards(cardPages, board, activeView, members) : [];
+  const sortedCardPages = activeView && activeBoard ? sortCards(cardPages, activeBoard, activeView, members) : [];
   const cards = sortedCardPages.map(({ card }) => card);
 
   let groupByProperty = _groupByProperty;
