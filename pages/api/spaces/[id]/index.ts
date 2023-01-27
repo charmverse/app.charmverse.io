@@ -6,36 +6,21 @@ import { prisma } from 'db';
 import { updateTrackGroupProfile } from 'lib/metrics/mixpanel/updateTrackGroupProfile';
 import { onError, onNoMatch, requireSpaceMembership, ActionNotPermittedError } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
+import { updateSpace } from 'lib/spaces/updateSpace';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
   .use(requireSpaceMembership({ adminOnly: true, spaceIdKey: 'id' }))
-  .put(updateSpace)
+  .put(updateSpaceController)
   .delete(deleteSpace);
 
-async function updateSpace(req: NextApiRequest, res: NextApiResponse<Space>) {
-  const spaceDomain = req.body.domain as string | undefined;
+async function updateSpaceController(req: NextApiRequest, res: NextApiResponse<Space>) {
+  const spaceId = req.query.id as string;
 
-  const existing =
-    typeof spaceDomain === 'string'
-      ? await prisma.space.findFirst({
-          where: {
-            domain: spaceDomain
-          }
-        })
-      : null;
+  const updatedSpace = await updateSpace(spaceId, req.body);
 
-  if (existing && existing.id !== req.query.id) {
-    throw new ActionNotPermittedError('This domain is already in use');
-  }
-
-  const space = await prisma.space.update({
-    where: {
-      id: req.query.id as string
-    },
-    data: req.body
-  });
+  res.status(200).send(updatedSpace);
 
   updateTrackGroupProfile(space);
 
