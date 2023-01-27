@@ -21,10 +21,6 @@ async function updateSpaceController(req: NextApiRequest, res: NextApiResponse<S
   const updatedSpace = await updateSpace(spaceId, req.body);
 
   res.status(200).send(updatedSpace);
-
-  updateTrackGroupProfile(space);
-
-  return res.status(200).json(space);
 }
 
 async function deleteSpace(req: NextApiRequest, res: NextApiResponse) {
