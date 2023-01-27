@@ -1,3 +1,4 @@
+import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import AddIcon from '@mui/icons-material/Add';
 import NavigateNextIcon from '@mui/icons-material/ArrowRightAlt';
@@ -11,12 +12,13 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
+import useMediaQuery from '@mui/material/useMediaQuery';
 import { bindTrigger, bindMenu } from 'material-ui-popup-state';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import NextLink from 'next/link';
 import { useCallback, useState } from 'react';
 
-import CreateWorkspaceForm from 'components/common/CreateSpaceForm';
+import { CreateSpaceForm } from 'components/common/CreateSpaceForm';
 import { Modal } from 'components/common/Modal';
 import UserDisplay from 'components/common/UserDisplay';
 import { useUserDetails } from 'components/profile/components/UserDetails/hooks/useUserDetails';
@@ -66,6 +68,9 @@ export default function SidebarSubmenu({
   closeSidebar: () => void;
   logoutCurrentUser: () => void;
 }) {
+  const theme = useTheme();
+  const showMobileFullWidthModal = !useMediaQuery(theme.breakpoints.down('sm'));
+
   const currentSpace = useCurrentSpace();
   const { spaces, createNewSpace, isCreatingSpace, setSpaces, isLoaded } = useSpaces();
   const [spaceFormOpen, setSpaceFormOpen] = useState(false);
@@ -157,13 +162,13 @@ export default function SidebarSubmenu({
           <MenuOpenIcon />
         </IconButton>
       </Tooltip>
-      <Modal open={spaceFormOpen} onClose={closeSpaceForm}>
-        <CreateWorkspaceForm onSubmit={createNewSpace} onCancel={closeSpaceForm} isSubmitting={isCreatingSpace} />
-        <Typography variant='body2' align='center' sx={{ pt: 2 }}>
-          <Button variant='text' href='/join' endIcon={<NavigateNextIcon />}>
-            Join an existing space
-          </Button>
-        </Typography>
+      <Modal
+        size='medium'
+        open={spaceFormOpen}
+        sx={{ width: showMobileFullWidthModal ? '100%' : undefined }}
+        onClose={closeSpaceForm}
+      >
+        <CreateSpaceForm onCancel={closeSpaceForm} />
       </Modal>
     </SidebarHeader>
   );

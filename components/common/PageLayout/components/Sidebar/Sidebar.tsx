@@ -329,8 +329,8 @@ export default function Sidebar({ closeSidebar, favorites, navAction }: SidebarP
               close={searchInWorkspaceModalState.close}
             />
             <SidebarLink
-              active={router.pathname.startsWith('/[domain]/settings/workspace')}
-              href={`/${space.domain}/settings/workspace`}
+              active={router.pathname.startsWith('/[domain]/settings/space')}
+              href={`/${space.domain}/settings/space`}
               icon={<SettingsIcon color='secondary' fontSize='small' />}
               label='Settings'
               onClick={navAction}

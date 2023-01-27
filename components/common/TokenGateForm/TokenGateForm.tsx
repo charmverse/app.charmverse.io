@@ -88,8 +88,9 @@ export default function TokenGateForm({
     if (!user) {
       try {
         await loginFromWeb3Account(authSig);
-      } catch {
+      } catch (err: any) {
         setIsVerifyingGates(false);
+        showMessage(err?.message ?? 'An unknown error occurred', err?.severity ?? 'error');
         return;
       }
     }
@@ -104,6 +105,9 @@ export default function TokenGateForm({
         if (verifyResult.canJoinSpace) {
           showMessage('Verification succeeded.', 'success');
         }
+      })
+      .catch((err: any) => {
+        showMessage(err?.message ?? 'An unknown error occurred', err?.severity ?? 'error');
       })
       .finally(() => setIsVerifyingGates(false));
   }

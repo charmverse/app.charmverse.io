@@ -8,11 +8,10 @@ import { useRouter } from 'next/router';
 import type { ReactElement } from 'react';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
+import * as yup from 'yup';
 
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
-import type { FormValues } from 'components/common/CreateSpaceForm';
-import { schema } from 'components/common/CreateSpaceForm';
 import FieldLabel from 'components/common/form/FieldLabel';
 import Link from 'components/common/Link';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
@@ -28,7 +27,17 @@ import { setTitle } from 'hooks/usePageTitle';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
+import { defaultTemplate } from 'lib/spaces/utils';
 import isSpaceAdmin from 'lib/users/isSpaceAdmin';
+
+const schema = yup.object({
+  name: yup.string().ensure().trim().min(3, 'Name must be at least 3 characters').required('Name is required'),
+  spaceImage: yup.string().nullable(true),
+  spaceTemplateOption: yup.string().default(defaultTemplate),
+  domain: yup.string()
+});
+
+type FormValues = yup.InferType<typeof schema>;
 
 export default function WorkspaceSettings() {
   const router = useRouter();
@@ -67,7 +76,7 @@ export default function WorkspaceSettings() {
   const watchSpaceImage = watch('spaceImage');
 
   function onSubmit(values: FormValues) {
-    if (!space || !isAdmin) return;
+    if (!space || !isAdmin || !values.domain) return;
     setError(null);
     // reload with new subdomain
     const newDomain = space.domain !== values.domain;
@@ -75,7 +84,7 @@ export default function WorkspaceSettings() {
       .updateSpace({ ...space, ...values })
       .then((updatedSpace) => {
         if (newDomain) {
-          window.location.href = router.asPath.replace(space.domain, values.domain);
+          window.location.href = router.asPath.replace(space.domain, values.domain as string);
         } else {
           setSpace(updatedSpace);
         }

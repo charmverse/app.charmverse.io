@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import type { Space } from '@prisma/client';
 
 import { baseUrl } from 'config/constants';
 
@@ -31,22 +32,30 @@ test.describe.serial('Add a new space from sidebar and load it', async () => {
     const addNewSpaceBtn = page.locator('data-test=spaces-menu-add-new-space');
     await addNewSpaceBtn.waitFor();
 
-    // 3. Open create space dialod
+    // 3. Open create space dialog
     await addNewSpaceBtn.click();
+
+    const defaultTemplateButton = page.locator('data-test=space-template-default');
+
+    await expect(defaultTemplateButton).toBeVisible();
+
+    await defaultTemplateButton.click();
 
     await expect(page.locator('data-test=create-space-form')).toBeVisible();
 
     const nameInput = page.locator('data-test=workspace-name-input >> input');
-    const domainInput = page.locator('data-test=workspace-domain-input');
 
     // change domain to unique one
-    const uniqueDomainName = Math.random().toString().replace('.', '');
-    await domainInput.fill(uniqueDomainName);
-    await nameInput.fill(uniqueDomainName);
-    // submit form
-    await page.locator('data-test=create-workspace').click();
+    const spaceName = Math.random().toString().replace('.', '');
 
-    await page.waitForURL(`**/${uniqueDomainName}`);
+    await nameInput.fill(spaceName);
+    // submit form
+    page.locator('data-test=create-workspace').click();
+
+    // Intercept the response from the form
+    const response = await page.waitForResponse('**/api/spaces');
+    const createdSpace = (await response.json()) as Space;
+    await page.waitForURL(`**/${createdSpace.domain}`);
 
     // Await new onboarding form popup so we can close it and click on new space
     let closePropertiesModalBtn = await page.locator('data-test=close-member-properties-modal');
@@ -57,13 +66,15 @@ test.describe.serial('Add a new space from sidebar and load it', async () => {
 
     // check sidebar space name
     const sidebarSpaceName = await page.locator('data-test=sidebar-space-name').textContent();
-    expect(sidebarSpaceName).toBe(uniqueDomainName);
+    expect(sidebarSpaceName).toBe(createdSpace.domain);
 
     // Create and verify 2nd space
     await spaceMenuBtn.click();
     await addNewSpaceBtn.click();
+    await defaultTemplateButton.click();
+
     const uniqueDomainName2 = Math.random().toString().replace('.', '');
-    await domainInput.fill(uniqueDomainName2);
+
     await nameInput.fill(uniqueDomainName2);
     await page.locator('data-test=create-workspace').click();
     await page.waitForURL(`**/${uniqueDomainName2}`);
