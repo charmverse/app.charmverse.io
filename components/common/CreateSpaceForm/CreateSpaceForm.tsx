@@ -184,7 +184,7 @@ export function CreateSpaceForm({ defaultValues, onCancel, submitText }: Props) 
   }
   return (
     <div>
-      <DialogTitle onClose={onClose} sx={{ textAlign: 'center' }}>
+      <DialogTitle onClose={onCancel ? onClose : undefined} sx={{ textAlign: 'center' }}>
         <Box display='flex' alignItems='center' gap={2}>
           {step !== 'select_template' && <ArrowBackIosNewIcon onClick={goToSelectTemplate} />}
           Create a space{' '}
