@@ -97,15 +97,6 @@ function TableRow(props: Props) {
     }
   };
 
-  const deleteCard = () => {
-    // user trying to delete a card with blank name
-    // but content present cannot be deleted without
-    // confirmation dialog
-    if (card?.title === '' && card?.fields.contentOrder.length === 0) {
-      handleDeleteCard();
-    }
-  };
-
   const duplicateCard = () => {
     if (space && cardPage) {
       mutator.duplicateCard({
@@ -179,8 +170,8 @@ function TableRow(props: Props) {
               ref={columnRefs.get(Constants.titleColumnId)}
               key={template.id}
             >
-              <IconButton onClick={handleClick} size='small'>
-                <DragIndicatorIcon className='icons' />
+              <IconButton className='icons' onClick={handleClick} size='small'>
+                <DragIndicatorIcon />
               </IconButton>
               <div className='octo-icontitle'>
                 <PageIcon isEditorEmpty={!hasContent} pageType='page' icon={pageIcon} />
@@ -229,7 +220,7 @@ function TableRow(props: Props) {
       {cardPage && (
         <PageActionsMenu
           onClickDuplicate={duplicateCard}
-          onClickDelete={pagePermissions.delete && cardPage.deletedAt === null ? deleteCard : undefined}
+          onClickDelete={pagePermissions.delete && cardPage.deletedAt === null ? handleDeleteCard : undefined}
           anchorEl={anchorEl}
           setAnchorEl={setAnchorEl}
           page={cardPage}
