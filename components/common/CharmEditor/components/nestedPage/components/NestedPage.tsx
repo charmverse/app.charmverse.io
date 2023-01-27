@@ -31,7 +31,9 @@ const NestedPageContainer = styled(Link)`
   }
 `;
 
-const StyledTypography = styled(Typography)<{ showBorderBottom?: boolean }>`
+const StyledTypography = styled(Typography, {
+  shouldForwardProp: (prop) => prop !== 'showBorderBottom'
+})<{ showBorderBottom?: boolean }>`
   font-weight: 600;
   ${({ showBorderBottom }) =>
     showBorderBottom &&
