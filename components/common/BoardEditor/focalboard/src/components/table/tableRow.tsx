@@ -170,9 +170,11 @@ function TableRow(props: Props) {
               ref={columnRefs.get(Constants.titleColumnId)}
               key={template.id}
             >
-              <IconButton className='icons' onClick={handleClick} size='small'>
-                <DragIndicatorIcon />
-              </IconButton>
+              {!props.readOnly && (
+                <IconButton className='icons' onClick={handleClick} size='small'>
+                  <DragIndicatorIcon />
+                </IconButton>
+              )}
               <div className='octo-icontitle'>
                 <PageIcon isEditorEmpty={!hasContent} pageType='page' icon={pageIcon} />
 
@@ -217,7 +219,7 @@ function TableRow(props: Props) {
           </div>
         );
       })}
-      {cardPage && (
+      {cardPage && !props.readOnly && (
         <PageActionsMenu
           onClickDuplicate={duplicateCard}
           onClickDelete={pagePermissions.delete && cardPage.deletedAt === null ? handleDeleteCard : undefined}
