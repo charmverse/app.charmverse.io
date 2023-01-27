@@ -47,7 +47,6 @@ import { addCard as _addCard, addTemplate } from '../store/cards';
 import { updateView } from '../store/views';
 import { Utils } from '../utils';
 
-import AddViewMenu from './addViewMenu';
 import { CreateLinkedView } from './createLinkedView';
 import Gallery from './gallery/gallery';
 import Kanban from './kanban/kanban';
@@ -210,8 +209,9 @@ function CenterPanel(props: Props) {
     insertLast = true,
     isTemplate = false
   ) => {
-    const { activeView, board } = props;
-
+    if (!activeBoard) {
+      throw new Error('No active view');
+    }
     if (!activeView) {
       throw new Error('No active view');
     }
@@ -220,11 +220,11 @@ function CenterPanel(props: Props) {
 
     // TelemetryClient.trackEvent(TelemetryCategory, TelemetryActions.CreateCard, {board: board.id, view: activeView.id, card: card.id})
 
-    card.parentId = board.id;
-    card.rootId = board.rootId;
+    card.parentId = activeBoard.id;
+    card.rootId = activeBoard.rootId;
     const propertiesThatMeetFilters = CardFilter.propertiesThatMeetFilterGroup(
       activeView.fields.filter,
-      board.fields.cardProperties
+      activeBoard.fields.cardProperties
     );
     if ((activeView.fields.viewType === 'board' || activeView.fields.viewType === 'table') && groupByProperty) {
       if (groupByOptionId) {
@@ -451,7 +451,7 @@ function CenterPanel(props: Props) {
             focalBoard
             headerImage={board.fields.headerImage}
             readOnly={props.readOnly}
-            setPage={({ headerImage }) => setRandomHeaderImage(board, headerImage!)}
+            setPage={({ headerImage }) => setRandomHeaderImage(board, headerImage)}
           />
         </Box>
       )}
@@ -470,21 +470,11 @@ function CenterPanel(props: Props) {
           maxTabsShown={props.maxTabsShown}
           disableUpdatingUrl={props.disableUpdatingUrl}
           showView={props.showView}
-          addViewButton={
-            <AddViewMenu
-              board={board}
-              activeView={activeView}
-              views={views}
-              showView={showView}
-              onClick={
-                boardPageType === 'inline_linked_board' || boardPageType === 'linked_board'
-                  ? openSelectSource
-                  : undefined
-              }
-            />
+          onClickNewView={
+            boardPageType === 'inline_linked_board' || boardPageType === 'linked_board' ? openSelectSource : undefined
           }
-          viewsBoardId={board.id}
           activeBoard={activeBoard}
+          viewsBoard={board}
           activeView={props.activeView}
           toggleViewOptions={toggleViewOptions}
           cards={cards}
@@ -502,8 +492,9 @@ function CenterPanel(props: Props) {
       </div>
 
       <div className={`container-container ${state.showSettings ? 'sidebar-visible' : ''}`}>
-        <Box display='flex'>
+        <Box display='flex' sx={{ minHeight: state.showSettings ? 450 : 0 }}>
           <Box width='100%'>
+            {/* Show page title for inline boards */}
             {activeBoard && activePage && isEmbedded && boardPageType === 'inline_board' && (
               <InlineViewTitle
                 key={activePage.id + activePage.title}
@@ -530,18 +521,21 @@ function CenterPanel(props: Props) {
                 )}
               </Typography>
             )}
-            {activePage && activeView?.fields?.sourceType === 'board_page' && (
-              <Button
-                color='secondary'
-                startIcon={<CallMadeIcon />}
-                variant='text'
-                size='large'
-                href={`${router.pathname.startsWith('/share') ? '/share' : ''}/${space?.domain}/${activePage?.path}`}
-                sx={{ fontSize: 22, fontWeight: 700, py: 0 }}
-              >
-                {activePage.title || 'Untitled'}
-              </Button>
-            )}
+            {/* Show page title for linked boards */}
+            {activePage &&
+              activeView?.fields?.sourceType === 'board_page' &&
+              boardPageType === 'inline_linked_board' && (
+                <Button
+                  color='secondary'
+                  startIcon={<CallMadeIcon />}
+                  variant='text'
+                  size='large'
+                  href={`${router.pathname.startsWith('/share') ? '/share' : ''}/${space?.domain}/${activePage?.path}`}
+                  sx={{ fontSize: 22, fontWeight: 700, py: 0 }}
+                >
+                  {activePage.title || 'Untitled'}
+                </Button>
+              )}
             {!activeView && state.showSettings === 'create-linked-view' && (
               <CreateLinkedView
                 readOnly={props.readOnly}

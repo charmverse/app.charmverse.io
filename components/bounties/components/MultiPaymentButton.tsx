@@ -1,6 +1,6 @@
-import type { MetaTransactionData } from '@gnosis.pm/safe-core-sdk-types';
 import { Tooltip } from '@mui/material';
 import Button from '@mui/material/Button';
+import type { MetaTransactionData } from '@safe-global/safe-core-sdk-types';
 
 import type { GnosisPaymentProps } from 'hooks/useGnosisPayment';
 import { useGnosisPayment } from 'hooks/useGnosisPayment';

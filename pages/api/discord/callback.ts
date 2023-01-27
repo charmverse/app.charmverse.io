@@ -17,11 +17,14 @@ const handler = nc({
 });
 
 handler.get(async (req, res) => {
+  const cookies = new Cookies(req, res);
   const state = JSON.parse(decodeURIComponent(req.query.state as string));
-  const redirect = (state?.redirect as string) || '/';
   const type: 'connect' | 'server' | 'login' = state.type ?? 'connect';
 
-  const cookies = new Cookies(req, res);
+  // sanitize the redirect path in case of invalid characters
+  const redirectPath = (state?.redirect as string) || '/';
+  const redirectUrl = new URL(redirectPath, 'https://tacos4everyone.net');
+  const redirect = redirectUrl.pathname + redirectUrl.search;
 
   const tempAuthCode = req.query.code;
   if (req.query.error || typeof tempAuthCode !== 'string') {

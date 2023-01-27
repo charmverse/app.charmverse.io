@@ -65,41 +65,32 @@ type PageIconProps = ComponentProps<typeof StyledPageIcon> & {
 export function PageIcon({ icon, isEditorEmpty, isLinkedPage = false, pageType, ...props }: PageIconProps) {
   if (!icon) {
     if (pageType === 'linked_board') {
-      icon = (
-        <LinkedIcon>
-          <StyledDatabaseIcon />
-        </LinkedIcon>
+      return (
+        <StyledPageIcon
+          icon={
+            <LinkedIcon>
+              <StyledDatabaseIcon />
+            </LinkedIcon>
+          }
+          {...props}
+        />
       );
     } else if (pageType === 'board' || pageType === 'inline_board' || pageType === 'inline_linked_board') {
-      icon = isLinkedPage ? (
-        <LinkedIcon>
-          <StyledDatabaseIcon />
-        </LinkedIcon>
-      ) : (
-        <StyledDatabaseIcon />
-      );
+      icon = <StyledDatabaseIcon />;
     } else if (pageType === 'proposal') {
       icon = <ProposalIcon />;
     } else if (pageType === 'bounty') {
       icon = <BountyIcon />;
     } else if (isEditorEmpty) {
-      icon = isLinkedPage ? (
-        <LinkedIcon>
-          <EmptyPageIcon />
-        </LinkedIcon>
-      ) : (
-        <EmptyPageIcon />
-      );
+      icon = <EmptyPageIcon />;
     } else {
-      icon = isLinkedPage ? (
-        <LinkedIcon>
-          <FilledPageIcon />
-        </LinkedIcon>
-      ) : (
-        <FilledPageIcon />
-      );
+      icon = <FilledPageIcon />;
     }
   }
 
-  return <StyledPageIcon icon={icon} {...props} />;
+  return isLinkedPage ? (
+    <StyledPageIcon icon={<LinkedIcon>{icon}</LinkedIcon>} {...props} />
+  ) : (
+    <StyledPageIcon icon={icon} {...props} />
+  );
 }
