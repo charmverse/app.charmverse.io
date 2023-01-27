@@ -544,9 +544,10 @@ details {
   cursor: pointer;
   display: inline;
   position: absolute;
-  right: -10px;
+  right: -40px;
   // add a width so that icons are left-aligned even if counts get large
   width: 40px;
+
   @media (min-width: 600px)  {
     right: -70px;
   }

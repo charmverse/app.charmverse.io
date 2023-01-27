@@ -46,7 +46,7 @@ export const Container = styled(({ fullWidth, ...props }: any) => <Box {...props
   margin: 0 auto ${({ top }) => top + 100}px;
   position: relative;
   top: ${({ top }) => top}px;
-  padding: ${({ theme }) => theme.spacing(0, '20px')};
+  padding: 0 40px 0 30px;
 
   ${({ theme }) => theme.breakpoints.up('sm')} {
     padding: 0 80px;
