@@ -14,7 +14,7 @@ import NotFavoritedIcon from '@mui/icons-material/StarBorder';
 import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
 import UndoIcon from '@mui/icons-material/Undo';
 import SunIcon from '@mui/icons-material/WbSunny';
-import { Divider, FormControlLabel, Stack, Switch, Typography } from '@mui/material';
+import { Divider, FormControlLabel, Stack, Switch, Typography, useMediaQuery } from '@mui/material';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
 import List from '@mui/material/List';
@@ -85,6 +85,7 @@ export default function Header({ open, openSidebar }: HeaderProps) {
   const { setCurrentPageActionDisplay } = usePageActionDisplay();
   const [userSpacePermissions] = useCurrentSpacePermissions();
   const pagePermissions = basePage ? getPagePermissions(basePage.id) : null;
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('lg'));
 
   const pageType = basePage?.type;
   const isExportablePage =
@@ -129,7 +130,7 @@ export default function Header({ open, openSidebar }: HeaderProps) {
     }
   }
 
-  const isFullWidth = basePage?.fullWidth ?? false;
+  const isFullWidth = isSmallScreen || (basePage?.fullWidth ?? false);
   const isBasePageDocument = documentTypes.includes(basePage?.type ?? '');
   const isBasePageDatabase = /board/.test(basePage?.type ?? '');
 
@@ -316,20 +317,24 @@ export default function Header({ open, openSidebar }: HeaderProps) {
           </ListItemButton>
         </div>
       </Tooltip>
-      <Divider />
-      <ListItemButton>
-        <FormControlLabel
-          sx={{
-            marginLeft: 0.5,
-            width: '100%',
-            display: 'flex',
-            justifyContent: 'space-between'
-          }}
-          labelPlacement='start'
-          control={<Switch size='small' checked={isFullWidth} onChange={onSwitchChange} />}
-          label={<Typography variant='body2'>Full Width</Typography>}
-        />
-      </ListItemButton>
+      {!isSmallScreen && (
+        <>
+          <Divider />
+          <ListItemButton>
+            <FormControlLabel
+              sx={{
+                marginLeft: 0.5,
+                width: '100%',
+                display: 'flex',
+                justifyContent: 'space-between'
+              }}
+              labelPlacement='start'
+              control={<Switch size='small' checked={isFullWidth} onChange={onSwitchChange} />}
+              label={<Typography variant='body2'>Full Width</Typography>}
+            />
+          </ListItemButton>
+        </>
+      )}
       {charmversePage && basePage && (
         <>
           <Divider />

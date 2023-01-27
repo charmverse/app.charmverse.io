@@ -40,10 +40,50 @@ export default function ProposalsPage() {
   return (
     <CenteredPageContent>
       <Grid container mb={6}>
-        <Grid item xs>
-          <Typography variant='h1' gutterBottom>
-            Proposals
-          </Typography>
+        <Grid item xs={12}>
+          <Box display='flex' alignItems='flex-start' justifyContent='space-between'>
+            <Typography variant='h1' gutterBottom>
+              Proposals
+            </Typography>
+
+            <Box display='flex'>
+              <Box
+                gap={3}
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  flexWrap: 'wrap',
+                  flexDirection: 'row-reverse'
+                }}
+              >
+                <NewProposalButton mutateProposals={mutateProposals} />
+
+                <Box sx={{ display: { xs: 'none', lg: 'flex' } }}>
+                  <ProposalsViewOptions
+                    proposalFilter={proposalFilter}
+                    setProposalFilter={setProposalFilter}
+                    proposalSort={proposalSort}
+                    setProposalSort={setProposalSort}
+                    categoryIdFilter={categoryIdFilter}
+                    setCategoryIdFilter={setCategoryIdFilter}
+                    categories={categories}
+                  />
+                </Box>
+              </Box>
+            </Box>
+          </Box>
+
+          <Box sx={{ display: { xs: 'flex', lg: 'none' }, justifyContent: 'flex-end' }}>
+            <ProposalsViewOptions
+              proposalFilter={proposalFilter}
+              setProposalFilter={setProposalFilter}
+              proposalSort={proposalSort}
+              setProposalSort={setProposalSort}
+              categoryIdFilter={categoryIdFilter}
+              setCategoryIdFilter={setCategoryIdFilter}
+              categories={categories}
+            />
+          </Box>
         </Grid>
 
         {loadingData ? (
@@ -51,41 +91,16 @@ export default function ProposalsPage() {
             <LoadingComponent isLoading size={50} />
           </Grid>
         ) : (
-          <>
-            <Grid item xs={12} lg={8} display='flex'>
-              <Box
-                gap={3}
-                sx={{
-                  display: 'flex',
-                  alignItems: { xs: 'flex-start', lg: 'center' },
-                  width: '100%',
-                  justifyContent: { xs: 'flex-start', lg: 'flex-end' },
-                  flexDirection: { xs: 'column-reverse', lg: 'row' }
-                }}
-              >
-                <ProposalsViewOptions
-                  proposalFilter={proposalFilter}
-                  setProposalFilter={setProposalFilter}
-                  proposalSort={proposalSort}
-                  setProposalSort={setProposalSort}
-                  categoryIdFilter={categoryIdFilter}
-                  setCategoryIdFilter={setCategoryIdFilter}
-                  categories={categories}
-                />
-                <NewProposalButton mutateProposals={mutateProposals} />
-              </Box>
-            </Grid>
-            <Grid item xs={12} sx={{ mt: 5 }}>
-              {data?.length === 0 && (
-                <EmptyStateVideo
-                  description='Getting started with proposals'
-                  videoTitle='Proposals | Getting started with Charmverse'
-                  videoUrl='https://tiny.charmverse.io/proposal-builder'
-                />
-              )}
-              {data?.length > 0 && <ProposalsTable proposals={filteredProposals} mutateProposals={mutateProposals} />}
-            </Grid>
-          </>
+          <Grid item xs={12} sx={{ mt: 5 }}>
+            {data?.length === 0 && (
+              <EmptyStateVideo
+                description='Getting started with proposals'
+                videoTitle='Proposals | Getting started with Charmverse'
+                videoUrl='https://tiny.charmverse.io/proposal-builder'
+              />
+            )}
+            {data?.length > 0 && <ProposalsTable proposals={filteredProposals} mutateProposals={mutateProposals} />}
+          </Grid>
         )}
       </Grid>
     </CenteredPageContent>

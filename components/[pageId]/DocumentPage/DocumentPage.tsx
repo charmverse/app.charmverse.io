@@ -1,4 +1,6 @@
 import styled from '@emotion/styled';
+import { useMediaQuery } from '@mui/material';
+import type { Theme } from '@mui/material';
 import Box from '@mui/material/Box';
 import type { Page } from '@prisma/client';
 import dynamic from 'next/dynamic';
@@ -44,7 +46,7 @@ export const Container = styled(({ fullWidth, ...props }: any) => <Box {...props
   margin: 0 auto ${({ top }) => top + 100}px;
   position: relative;
   top: ${({ top }) => top}px;
-  padding: ${({ theme }) => theme.spacing(0, 3)};
+  padding: 0 40px 0 30px;
 
   ${({ theme }) => theme.breakpoints.up('sm')} {
     padding: 0 80px;
@@ -78,6 +80,7 @@ function DocumentPage({ page, setPage, insideModal, readOnly = false, parentProp
   const { draftBounty } = useBounties();
   const { currentPageActionDisplay } = usePageActionDisplay();
   const { editMode, setPageProps } = usePrimaryCharmEditor();
+  const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'));
 
   // Only populate bounty permission data if this is a bounty page
   const [bountyPermissions, setBountyPermissions] = useState<AssignedBountyPermissions | null>(null);
@@ -177,7 +180,7 @@ function DocumentPage({ page, setPage, insideModal, readOnly = false, parentProp
           {page.headerImage && (
             <PageBanner headerImage={page.headerImage} readOnly={readOnly || enableSuggestingMode} setPage={setPage} />
           )}
-          <Container top={pageTop} fullWidth={page.fullWidth ?? false}>
+          <Container top={pageTop} fullWidth={isSmallScreen || (page.fullWidth ?? false)}>
             <CharmEditor
               key={page.id + editMode}
               // content={pageDetails?.content as PageContent}

@@ -87,7 +87,7 @@ function MenuByType(props: MenuProps) {
 
   if (type === 'defaultMenu') {
     return (
-      <Menu hideMenu={hideMenu} type={type}>
+      <Menu hideMenu={hideMenu} type={type} inline={inline}>
         {!inline && palettePluginKey && (
           <MenuGroup>
             <Tooltip title={<Typography component='div'>Turn into</Typography>}>
@@ -153,7 +153,7 @@ function MenuByType(props: MenuProps) {
 
   if (type === 'inlineCommentSubMenu' && !inline) {
     return (
-      <Menu hideMenu={hideMenu}>
+      <Menu hideMenu={hideMenu} type={type} noScroll>
         <InlineCommentSubMenu pluginKey={pluginKey} />
       </Menu>
     );

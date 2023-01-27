@@ -1,7 +1,9 @@
 import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
 import { selectionTooltip } from '@bangle.dev/tooltip';
 import styled from '@emotion/styled';
-import { Box, Button, ClickAwayListener, Grow, Paper } from '@mui/material';
+import SendIcon from '@mui/icons-material/Send';
+import type { Theme } from '@mui/material';
+import { Box, Button, ClickAwayListener, Grow, Paper, useMediaQuery } from '@mui/material';
 import type { PluginKey } from 'prosemirror-state';
 import { TextSelection } from 'prosemirror-state';
 import React, { useState } from 'react';
@@ -26,12 +28,19 @@ import { updateInlineComment } from './inlineComment.utils';
 const hideSelectionTooltip = selectionTooltip.hideSelectionTooltip;
 
 export const ThreadContainer = styled(Paper)`
-  max-height: 400px;
   display: flex;
   gap: ${({ theme }) => theme.spacing(1)};
   flex-direction: column;
-  min-width: 500px;
   overflow: auto;
+  width: calc(100vw - ${({ theme }) => theme.spacing(1)});
+  margin: ${({ theme }) => theme.spacing(0.5)};
+  max-height: 60vh;
+
+  ${({ theme }) => theme.breakpoints.up('sm')} {
+    width: 100%;
+    min-width: 500px;
+    max-height: 400px;
+  }
 `;
 
 export default function InlineCommentThread({ pluginKey }: { pluginKey: PluginKey<InlineCommentPluginState> }) {
@@ -97,6 +106,8 @@ export function InlineCommentSubMenu({ pluginKey }: { pluginKey: PluginKey }) {
   const { setThreads } = useThreads();
   const { currentPageId } = usePages();
   const isEmpty = checkIsContentEmpty(commentContent);
+  const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'));
+
   const handleSubmit = async (e: React.KeyboardEvent<HTMLElement> | React.MouseEvent<HTMLElement, MouseEvent>) => {
     if (!isEmpty) {
       const cardId = typeof window !== 'undefined' ? new URLSearchParams(window.location.href).get('cardId') : null;
@@ -116,7 +127,7 @@ export function InlineCommentSubMenu({ pluginKey }: { pluginKey: PluginKey }) {
   };
 
   return (
-    <Box display='flex' width='400px'>
+    <Box display='flex' width={{ xs: '100%', sm: '400px' }}>
       <Box flexGrow={1}>
         <InlineCharmEditor
           focusOnInit={true}
@@ -135,11 +146,12 @@ export function InlineCommentSubMenu({ pluginKey }: { pluginKey: PluginKey }) {
         sx={{
           alignSelf: 'flex-end',
           marginBottom: '4px',
-          marginRight: '8px'
+          minWidth: ['36px', '64px'],
+          px: ['4px', '10px']
         }}
         disabled={isEmpty}
       >
-        Start
+        {isSmallScreen ? <SendIcon /> : 'Start'}
       </Button>
     </Box>
   );

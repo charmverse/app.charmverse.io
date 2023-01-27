@@ -154,9 +154,11 @@ const PageAnchor = styled(Link)`
   ${({ theme }) => `
     ${theme.breakpoints.down('md')} {
       min-height: 38px;
+      width: 100%;
+      padding-right: 62px;
 
       .page-actions {
-        gap: 8px;
+        gap: 6px;
         .MuiIconButton-root {
           height: 26px;
           width: 26px;
