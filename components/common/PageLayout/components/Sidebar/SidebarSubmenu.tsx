@@ -1,3 +1,4 @@
+import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import AddIcon from '@mui/icons-material/Add';
 import NavigateNextIcon from '@mui/icons-material/ArrowRightAlt';
@@ -11,6 +12,7 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
+import useMediaQuery from '@mui/material/useMediaQuery';
 import { bindTrigger, bindMenu } from 'material-ui-popup-state';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import NextLink from 'next/link';
@@ -66,6 +68,9 @@ export default function SidebarSubmenu({
   closeSidebar: () => void;
   logoutCurrentUser: () => void;
 }) {
+  const theme = useTheme();
+  const showMobileFullWidthModal = !useMediaQuery(theme.breakpoints.down('sm'));
+
   const currentSpace = useCurrentSpace();
   const { spaces, createNewSpace, isCreatingSpace, setSpaces, isLoaded } = useSpaces();
   const [spaceFormOpen, setSpaceFormOpen] = useState(false);
@@ -157,7 +162,12 @@ export default function SidebarSubmenu({
           <MenuOpenIcon />
         </IconButton>
       </Tooltip>
-      <Modal size='medium' open={spaceFormOpen} onClose={closeSpaceForm}>
+      <Modal
+        size='medium'
+        open={spaceFormOpen}
+        sx={{ width: showMobileFullWidthModal ? '100%' : undefined }}
+        onClose={closeSpaceForm}
+      >
         <CreateSpaceForm onCancel={closeSpaceForm} />
       </Modal>
     </SidebarHeader>

@@ -30,11 +30,7 @@ import randomName from 'lib/utilities/randomName';
 import { ImportZippedMarkdown } from '../CharmEditor/components/markdownParser/ImportZippedMarkdown';
 import { JoinDynamicSpaceForm } from '../TokenGateForm/JoinDynamicSpaceForm';
 
-import { SelectNewSpaceTemplate } from './SpaceTemplateOptions';
-
-function GoBack() {
-  return <Typography>Back</Typography>;
-}
+import { SelectNewSpaceTemplate } from './SelectNewSpaceTemplate';
 
 const schema = yup.object({
   name: yup.string().ensure().trim().min(3, 'Name must be at least 3 characters').required('Name is required'),
@@ -62,7 +58,6 @@ export function CreateSpaceForm({ defaultValues, onCancel, submitText }: Props) 
   const [step, setStep] = useState<SpaceFormStep>('select_template');
 
   const router = useRouter();
-
   const [saveError, setSaveError] = useState<any | null>(null);
   const {
     register,
@@ -148,7 +143,7 @@ export function CreateSpaceForm({ defaultValues, onCancel, submitText }: Props) 
 
       if ((values.spaceTemplateOption as SpaceCreateTemplate) === 'importNotion') {
         const notionUrl = generateNotionImportRedirectUrl({
-          origin: router.asPath.split('/')?.[0],
+          origin: window?.location.origin,
           spaceDomain: space.domain
         });
 

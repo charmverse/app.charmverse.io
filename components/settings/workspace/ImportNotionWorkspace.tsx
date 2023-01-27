@@ -110,7 +110,7 @@ export default function ImportNotionWorkspace() {
             loading={notionState.loading}
             href={generateNotionImportRedirectUrl({
               spaceDomain: space?.domain as string,
-              origin: router.basePath.split('/')[0]
+              origin: window?.location.origin
             })}
             variant='outlined'
             startIcon={
