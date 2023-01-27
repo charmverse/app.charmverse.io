@@ -27,13 +27,11 @@ import { setTitle } from 'hooks/usePageTitle';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
-import { defaultTemplate } from 'lib/spaces/utils';
 import isSpaceAdmin from 'lib/users/isSpaceAdmin';
 
 const schema = yup.object({
   name: yup.string().ensure().trim().min(3, 'Name must be at least 3 characters').required('Name is required'),
   spaceImage: yup.string().nullable(true),
-  spaceTemplateOption: yup.string().default(defaultTemplate),
   domain: yup.string()
 });
 
