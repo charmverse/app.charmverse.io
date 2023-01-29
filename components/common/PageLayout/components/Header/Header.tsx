@@ -165,6 +165,14 @@ export default function Header({ open, openSidebar }: HeaderProps) {
     }
   }
 
+  function deletePost() {
+    if (forumPost) {
+      charmClient.forum.deleteForumPost(forumPost.id).then(() => {
+        router.push(`/${router.query.domain}/forum`);
+      });
+    }
+  }
+
   async function undoEditorChanges() {
     if (targetPage) {
       // There might be multiple instances of bangle editor in the document
@@ -389,9 +397,9 @@ export default function Header({ open, openSidebar }: HeaderProps) {
           <ListItemText primary='Copy link' />
         </ListItemButton>
         <Divider />
-        <Tooltip title={postCreator?.id !== user?.id ? "You don't have permission to delete this page" : ''}>
+        <Tooltip title={postCreator?.id !== user?.id ? "You don't have permission to delete this post" : ''}>
           <div>
-            <ListItemButton disabled={postCreator?.id !== user?.id} onClick={onDeletePage}>
+            <ListItemButton disabled={postCreator?.id !== user?.id} onClick={deletePost}>
               <DeleteOutlineOutlinedIcon
                 fontSize='small'
                 sx={{
