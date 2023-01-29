@@ -27,11 +27,13 @@ import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
 import { useMemo, useRef, useState } from 'react';
+import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
 import { undoEventName } from 'components/common/CharmEditor/utils';
 import { useColorMode } from 'context/darkMode';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { useMembers } from 'hooks/useMembers';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
@@ -72,6 +74,8 @@ export default function Header({ open, openSidebar }: HeaderProps) {
   const router = useRouter();
   const colorMode = useColorMode();
   const { pages, updatePage, getPagePermissions, deletePage } = usePages();
+  const currentSpace = useCurrentSpace();
+
   const { user } = useUser();
   const theme = useTheme();
   const [pageMenuOpen, setPageMenuOpen] = useState(false);
@@ -86,6 +90,12 @@ export default function Header({ open, openSidebar }: HeaderProps) {
   const [userSpacePermissions] = useCurrentSpacePermissions();
   const pagePermissions = basePage ? getPagePermissions(basePage.id) : null;
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('lg'));
+  const isForumPost = router.route === '/[domain]/forum/post/[pagePath]';
+  const pagePath = isForumPost ? (router.query.pagePath as string) : null;
+
+  const { data: forumPost = null } = useSWR(currentSpace && pagePath ? `post-${pagePath}` : null, () =>
+    charmClient.forum.getForumPost(pagePath!)
+  );
 
   const pageType = basePage?.type;
   const isExportablePage =
@@ -363,6 +373,61 @@ export default function Header({ open, openSidebar }: HeaderProps) {
   } else if (isBasePageDatabase && basePage) {
     pageOptionsList = (
       <DatabasePageOptions pagePermissions={pagePermissions ?? undefined} pageId={basePage.id} closeMenu={closeMenu} />
+    );
+  } else if (isForumPost && forumPost) {
+    const postCreator = members.find((member) => member.id === forumPost.createdBy);
+    pageOptionsList = (
+      <List dense>
+        <ListItemButton onClick={onCopyLink}>
+          <ContentCopyIcon
+            fontSize='small'
+            sx={{
+              mr: 1
+            }}
+          />
+          <ListItemText primary='Copy link' />
+        </ListItemButton>
+        <Divider />
+        <Tooltip title={postCreator?.id !== user?.id ? "You don't have permission to delete this page" : ''}>
+          <div>
+            <ListItemButton disabled={postCreator?.id !== user?.id} onClick={onDeletePage}>
+              <DeleteOutlineOutlinedIcon
+                fontSize='small'
+                sx={{
+                  mr: 1
+                }}
+              />
+              <ListItemText primary='Delete' />
+            </ListItemButton>
+          </div>
+        </Tooltip>
+        <div>
+          <ListItemButton onClick={undoEditorChanges}>
+            <UndoIcon
+              fontSize='small'
+              sx={{
+                mr: 1
+              }}
+            />
+            <ListItemText primary='Undo' />
+          </ListItemButton>
+        </div>
+        <Divider />
+        {forumPost && postCreator && (
+          <>
+            <Divider />
+            <Stack
+              sx={{
+                mx: 2,
+                my: 1
+              }}
+            >
+              <Typography variant='subtitle2'>Last edited by {postCreator.username}</Typography>
+              <Typography variant='subtitle2'>Last edited at {humanFriendlyDate(forumPost.updatedAt)}</Typography>
+            </Stack>
+          </>
+        )}
+      </List>
     );
   }
 
