@@ -102,13 +102,14 @@ export default function Header({ open, openSidebar }: HeaderProps) {
     pageType === 'card' || pageType === 'page' || pageType === 'proposal' || pageType === 'bounty';
 
   const isBountyBoard = router.route === '/[domain]/bounties';
+  const targetPage = basePage ?? forumPost;
 
   const undoEvent = useMemo(() => {
-    if (basePage) {
-      return new CustomEvent(undoEventName, { detail: { pageId: basePage.id } });
+    if (targetPage) {
+      return new CustomEvent(undoEventName, { detail: { pageId: targetPage.id } });
     }
     return null;
-  }, [basePage?.id]);
+  }, [targetPage?.id]);
 
   async function exportMarkdown() {
     if (!basePage) {
@@ -165,9 +166,9 @@ export default function Header({ open, openSidebar }: HeaderProps) {
   }
 
   async function undoEditorChanges() {
-    if (basePage) {
+    if (targetPage) {
       // There might be multiple instances of bangle editor in the document
-      const bangleEditorCoreElement = document.querySelector(`.bangle-editor-core[data-page-id="${basePage.id}"]`);
+      const bangleEditorCoreElement = document.querySelector(`.bangle-editor-core[data-page-id="${targetPage.id}"]`);
       if (bangleEditorCoreElement) {
         bangleEditorCoreElement.dispatchEvent(undoEvent as Event);
       }
