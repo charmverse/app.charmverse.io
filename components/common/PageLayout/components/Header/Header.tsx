@@ -292,17 +292,19 @@ export default function Header({ open, openSidebar }: HeaderProps) {
           </ListItemButton>
         </div>
       </Tooltip>
-      <div>
-        <ListItemButton onClick={undoEditorChanges}>
-          <UndoIcon
-            fontSize='small'
-            sx={{
-              mr: 1
-            }}
-          />
-          <ListItemText primary='Undo' />
-        </ListItemButton>
-      </div>
+      <Tooltip title={!pagePermissions?.edit_content ? "You don't have permission to undo changes" : ''}>
+        <div>
+          <ListItemButton disabled={!pagePermissions?.edit_content} onClick={undoEditorChanges}>
+            <UndoIcon
+              fontSize='small'
+              sx={{
+                mr: 1
+              }}
+            />
+            <ListItemText primary='Undo' />
+          </ListItemButton>
+        </div>
+      </Tooltip>
       <Divider />
       {basePage && (
         <PublishToSnapshot
@@ -385,6 +387,7 @@ export default function Header({ open, openSidebar }: HeaderProps) {
     );
   } else if (isForumPost && forumPost) {
     const postCreator = members.find((member) => member.id === forumPost.createdBy);
+    const isPostCreator = postCreator?.id === user?.id;
     pageOptionsList = (
       <List dense>
         <ListItemButton onClick={onCopyLink}>
@@ -397,9 +400,9 @@ export default function Header({ open, openSidebar }: HeaderProps) {
           <ListItemText primary='Copy link' />
         </ListItemButton>
         <Divider />
-        <Tooltip title={postCreator?.id !== user?.id ? "You don't have permission to delete this post" : ''}>
+        <Tooltip title={!isPostCreator ? "You don't have permission to delete this post" : ''}>
           <div>
-            <ListItemButton disabled={postCreator?.id !== user?.id} onClick={deletePost}>
+            <ListItemButton disabled={!isPostCreator} onClick={deletePost}>
               <DeleteOutlineOutlinedIcon
                 fontSize='small'
                 sx={{
@@ -410,17 +413,19 @@ export default function Header({ open, openSidebar }: HeaderProps) {
             </ListItemButton>
           </div>
         </Tooltip>
-        <div>
-          <ListItemButton onClick={undoEditorChanges}>
-            <UndoIcon
-              fontSize='small'
-              sx={{
-                mr: 1
-              }}
-            />
-            <ListItemText primary='Undo' />
-          </ListItemButton>
-        </div>
+        <Tooltip title={!isPostCreator ? "You don't have permission to undo changes" : ''}>
+          <div>
+            <ListItemButton disabled={!isPostCreator} onClick={undoEditorChanges}>
+              <UndoIcon
+                fontSize='small'
+                sx={{
+                  mr: 1
+                }}
+              />
+              <ListItemText primary='Undo' />
+            </ListItemButton>
+          </div>
+        </Tooltip>
         <Divider />
         {forumPost && postCreator && (
           <>
