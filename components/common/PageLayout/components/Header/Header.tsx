@@ -167,7 +167,8 @@ export default function Header({ open, openSidebar }: HeaderProps) {
   async function convertToProposal(pageId: string) {
     setPageMenuOpen(false);
     if (isForumPost) {
-      await charmClient.forum.convertToProposal(pageId);
+      const proposalPageDetails = await charmClient.forum.convertToProposal(pageId);
+      router.push(`/${router.query.domain}/${proposalPageDetails.path}`);
     } else {
       await charmClient.pages.convertToProposal(pageId);
     }

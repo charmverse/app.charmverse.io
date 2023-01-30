@@ -4,7 +4,7 @@ import nc from 'next-connect';
 import { prisma } from 'db';
 import { updateTrackPageProfile } from 'lib/metrics/mixpanel/updateTrackPageProfile';
 import { ActionNotPermittedError, NotFoundError, onError, onNoMatch, requireUser } from 'lib/middleware';
-import type { IPageWithPermissions } from 'lib/pages';
+import type { IPageWithPermissions, PageMeta } from 'lib/pages';
 import { computeSpacePermissions } from 'lib/permissions/spaces';
 import { createProposal } from 'lib/proposal/createProposal';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -15,7 +15,7 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.use(requireUser).post(convertToProposal);
 
-async function convertToProposal(req: NextApiRequest, res: NextApiResponse<IPageWithPermissions>) {
+async function convertToProposal(req: NextApiRequest, res: NextApiResponse<Omit<PageMeta, 'permissions'>>) {
   const postId = req.query.postId as string;
   const userId = req.session.user.id;
 
@@ -74,7 +74,7 @@ async function convertToProposal(req: NextApiRequest, res: NextApiResponse<IPage
     post.spaceId
   );
 
-  return res.status(200);
+  return res.status(200).json(updatedPage);
 }
 
 export default withSessionRoute(handler);

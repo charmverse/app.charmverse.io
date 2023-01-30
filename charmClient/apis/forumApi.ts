@@ -13,7 +13,7 @@ import type { PostWithVotes } from 'lib/forums/posts/interfaces';
 import type { ListForumPostsRequest, PaginatedPostList } from 'lib/forums/posts/listForumPosts';
 import type { SearchForumPostsRequest } from 'lib/forums/posts/searchForumPosts';
 import type { UpdateForumPostInput } from 'lib/forums/posts/updateForumPost';
-import type { PageDetails } from 'lib/pages';
+import type { PageDetails, PageMeta } from 'lib/pages';
 
 export class ForumApi {
   createForumPost(payload: Omit<CreateForumPostInput, 'createdBy'>) {
@@ -95,6 +95,6 @@ export class ForumApi {
   }
 
   convertToProposal(postId: string) {
-    return http.POST<PageDetails>(`/api/forums/posts/${postId}/convert-to-proposal`);
+    return http.POST<Omit<PageMeta, 'permissions'>>(`/api/forums/posts/${postId}/convert-to-proposal`);
   }
 }
