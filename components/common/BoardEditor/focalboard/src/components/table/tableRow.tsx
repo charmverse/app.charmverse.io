@@ -1,15 +1,26 @@
+import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
+import { IconButton } from '@mui/material';
+import { Box } from '@mui/system';
 import React, { memo, useEffect, useMemo, useRef, useState } from 'react';
+import type { MouseEvent } from 'react';
 import { FormattedMessage } from 'react-intl';
+import { mutate } from 'swr';
 
 import { filterPropertyTemplates } from 'components/common/BoardEditor/utils/updateVisibilePropertyIds';
+import { PageActionsMenu } from 'components/common/PageActionsMenu';
 import { PageIcon } from 'components/common/PageLayout/components/PageIcon';
-import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { usePages } from 'hooks/usePages';
+import type { Board } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
+import type { PageMeta } from 'lib/pages';
 import { isTouchScreen } from 'lib/utilities/browser';
 
 import { Constants } from '../../constants';
 import { useSortable } from '../../hooks/sortable';
+import mutator from '../../mutator';
+import { Utils } from '../../utils';
 import Button from '../../widgets/buttons/button';
 import Editable from '../../widgets/editable';
 import PropertyValueElement from '../propertyValueElement';
@@ -33,6 +44,7 @@ type Props = {
   onClick?: (e: React.MouseEvent<HTMLDivElement>, card: Card) => void;
   onDrop: (srcCard: Card, dstCard: Card) => void;
   saveTitle: (saveType: string, cardId: string, title: string) => void;
+  cardPage: PageMeta;
 };
 
 export const columnWidth = (
@@ -49,6 +61,7 @@ export const columnWidth = (
 
 function TableRow(props: Props) {
   const {
+    cardPage,
     hasContent,
     board,
     activeView,
@@ -60,6 +73,8 @@ function TableRow(props: Props) {
     pageUpdatedBy,
     saveTitle
   } = props;
+  const space = useCurrentSpace();
+  const { pages, getPagePermissions } = usePages();
   const titleRef = useRef<{ focus(selectAll?: boolean): void }>(null);
   const [title, setTitle] = useState('');
   const isManualSort = activeView.fields.sortOptions.length === 0;
@@ -70,6 +85,39 @@ function TableRow(props: Props) {
     !isTouchScreen() && !props.readOnly && (isManualSort || isGrouped),
     props.onDrop
   );
+  const pagePermissions = getPagePermissions(card.id);
+  const handleDeleteCard = async () => {
+    if (!card) {
+      Utils.assertFailure();
+      return;
+    }
+    if (pagePermissions.delete) {
+      await mutator.deleteBlock(card, 'delete card');
+      mutate(`pages/${space?.id}`);
+    }
+  };
+
+  const duplicateCard = () => {
+    if (space && cardPage) {
+      mutator.duplicateCard({
+        cardId: card.id,
+        board,
+        cardPage,
+        afterRedo: async (newCardId) => {
+          props.showCard(newCardId);
+          mutate(`pages/${space.id}`);
+        },
+        beforeUndo: async () => {}
+      });
+    }
+  };
+
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+    event.preventDefault();
+    setAnchorEl(event.currentTarget);
+  };
 
   useEffect(() => {
     if (props.focusOnMount) {
@@ -108,10 +156,9 @@ function TableRow(props: Props) {
       {visiblePropertyTemplates.map((template) => {
         if (template.id === Constants.titleColumnId) {
           return (
-            <div
+            <Box
               className='octo-table-cell title-cell'
-              id='mainBoardHeader'
-              style={{
+              sx={{
                 width: columnWidth(
                   props.resizingColumn,
                   props.activeView.fields.columnWidths,
@@ -121,7 +168,13 @@ function TableRow(props: Props) {
               }}
               ref={columnRefs.get(Constants.titleColumnId)}
               key={template.id}
+              onPaste={(e) => e.stopPropagation()}
             >
+              {!props.readOnly && (
+                <IconButton className='icons' onClick={handleClick} size='small'>
+                  <DragIndicatorIcon />
+                </IconButton>
+              )}
               <div className='octo-icontitle'>
                 <PageIcon isEditorEmpty={!hasContent} pageType='page' icon={pageIcon} />
 
@@ -142,7 +195,7 @@ function TableRow(props: Props) {
                   <FormattedMessage id='TableRow.open' defaultMessage='Open' />
                 </Button>
               </div>
-            </div>
+            </Box>
           );
         }
         return (
@@ -153,6 +206,7 @@ function TableRow(props: Props) {
               width: columnWidth(props.resizingColumn, props.activeView.fields.columnWidths, props.offset, template.id)
             }}
             ref={columnRefs.get(template.id)}
+            onPaste={(e) => e.stopPropagation()}
           >
             <PropertyValueElement
               readOnly={props.readOnly}
@@ -166,6 +220,15 @@ function TableRow(props: Props) {
           </div>
         );
       })}
+      {cardPage && !props.readOnly && (
+        <PageActionsMenu
+          onClickDuplicate={duplicateCard}
+          onClickDelete={pagePermissions.delete && cardPage.deletedAt === null ? handleDeleteCard : undefined}
+          anchorEl={anchorEl}
+          setAnchorEl={setAnchorEl}
+          page={cardPage}
+        />
+      )}
       {/* empty column for actions on header row */}
       <div className='octo-table-cell' style={{ flexGrow: 1, borderRight: '0 none' }}></div>
     </div>

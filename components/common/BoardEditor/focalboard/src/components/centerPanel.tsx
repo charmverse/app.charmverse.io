@@ -136,7 +136,7 @@ function CenterPanel(props: Props) {
   );
   // filter cards by whats accessible
   const cardPages: CardPage[] = _cards.map((card) => ({ card, page: pages[card.id]! })).filter(({ page }) => !!page);
-  const sortedCardPages = activeView ? sortCards(cardPages, board, activeView, members) : [];
+  const sortedCardPages = activeView && activeBoard ? sortCards(cardPages, activeBoard, activeView, members) : [];
   const cards = sortedCardPages.map(({ card }) => card);
 
   let groupByProperty = _groupByProperty;
@@ -209,8 +209,9 @@ function CenterPanel(props: Props) {
     insertLast = true,
     isTemplate = false
   ) => {
-    const { activeView, board } = props;
-
+    if (!activeBoard) {
+      throw new Error('No active view');
+    }
     if (!activeView) {
       throw new Error('No active view');
     }
@@ -219,11 +220,11 @@ function CenterPanel(props: Props) {
 
     // TelemetryClient.trackEvent(TelemetryCategory, TelemetryActions.CreateCard, {board: board.id, view: activeView.id, card: card.id})
 
-    card.parentId = board.id;
-    card.rootId = board.rootId;
+    card.parentId = activeBoard.id;
+    card.rootId = activeBoard.rootId;
     const propertiesThatMeetFilters = CardFilter.propertiesThatMeetFilterGroup(
       activeView.fields.filter,
-      board.fields.cardProperties
+      activeBoard.fields.cardProperties
     );
     if ((activeView.fields.viewType === 'board' || activeView.fields.viewType === 'table') && groupByProperty) {
       if (groupByOptionId) {

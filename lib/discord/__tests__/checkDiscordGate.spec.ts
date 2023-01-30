@@ -1,3 +1,5 @@
+import { v4 } from 'uuid';
+
 import { prisma } from 'db';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
@@ -10,10 +12,13 @@ describe('checkDiscordGate', () => {
   it('should verify user with discord account', async () => {
     const { user, space } = await generateUserAndSpaceWithApiToken(undefined, true);
 
-    await prisma.space.update({ where: { id: space.id }, data: { discordServerId: '123' } });
+    const discordServerId = `discord-${v4()}`;
+    const discordUserId = `discord-user-${v4()}`;
+
+    await prisma.space.update({ where: { id: space.id }, data: { discordServerId } });
     await prisma.user.update({
       where: { id: user.id },
-      data: { discordUser: { create: { discordId: '456', account: {} } } }
+      data: { discordUser: { create: { discordId: discordUserId, account: {} } } }
     });
 
     const canJoinSpaceMock = jest.fn().mockResolvedValue({ isEligible: true, roles: [] });
@@ -27,7 +32,7 @@ describe('checkDiscordGate', () => {
     expect(res.hasDiscordServer).toBe(true);
     expect(res.isEligible).toBe(true);
     expect(res.spaceId).toBe(space.id);
-    expect(canJoinSpaceMock).toHaveBeenCalledWith({ discordServerId: '123', discordUserId: '456' });
+    expect(canJoinSpaceMock).toHaveBeenCalledWith({ discordServerId, discordUserId });
   });
 
   it('should not make user eligible to join space that does not have discord server id', async () => {
@@ -48,9 +53,11 @@ describe('checkDiscordGate', () => {
   });
 
   it('should not make user without connected discort eligible to join the space', async () => {
+    const discordServerId = `discord-${v4()}`;
+
     const { user, space } = await generateUserAndSpaceWithApiToken(undefined, true);
 
-    await prisma.space.update({ where: { id: space.id }, data: { discordServerId: '123' } });
+    await prisma.space.update({ where: { id: space.id }, data: { discordServerId } });
 
     const canJoinSpaceMock = jest.fn().mockResolvedValueOnce({ isEligible: true, roles: [] });
     jest.mock('lib/collabland/collablandClient', () => ({

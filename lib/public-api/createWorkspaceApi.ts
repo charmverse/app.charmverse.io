@@ -5,6 +5,7 @@ import { prisma } from 'db';
 import { upsertSpaceRolesFromDiscord } from 'lib/discord/upsertSpaceRolesFromDiscord';
 import { upsertUserForDiscordId } from 'lib/discord/upsertUserForDiscordId';
 import { upsertUserRolesFromDiscord } from 'lib/discord/upsertUserRolesFromDiscord';
+import type { CreateSpaceProps, SpaceCreateInput } from 'lib/spaces/createWorkspace';
 import { createWorkspace } from 'lib/spaces/createWorkspace';
 import { getAvailableDomainName } from 'lib/spaces/getAvailableDomainName';
 import { createUserFromWallet } from 'lib/users/createUser';
@@ -23,7 +24,7 @@ export async function createWorkspaceApi({
   superApiToken
 }: CreateWorkspaceRequestBody & { superApiToken?: SuperApiToken | null }): Promise<CreateWorkspaceResponseBody> {
   // Retrieve an id for the admin user
-  const adminUserId = adminDiscordUserId
+  const adminUserId: string = adminDiscordUserId
     ? await upsertUserForDiscordId(adminDiscordUserId)
     : await createUserFromWallet({ address: adminWalletAddress }).then((user) => user.id);
 
@@ -44,61 +45,27 @@ export async function createWorkspaceApi({
   const spaceDomain = await getAvailableDomainName(name);
 
   // Create workspace
-  const spaceData = {
+  const spaceData: SpaceCreateInput = {
     name,
     updatedBy: botUser.id,
     domain: spaceDomain,
     spaceImage: avatar && isValidUrl(avatar) ? avatar : undefined,
     discordServerId,
     xpsEngineId,
-    author: {
-      connect: {
-        id: adminUserId
-      }
-    },
-    superApiToken: {
-      connect: {
-        id: superApiToken?.id
-      }
-    },
-    spaceRoles: {
-      create: [
-        // add bot user to space
-        {
-          isAdmin: true,
-          user: {
-            connect: {
-              id: botUser.id
-            }
-          }
-        },
-        // add discord admin user to space
-        {
-          isAdmin: true,
-          user: {
-            connect: {
-              id: adminUserId
-            }
-          }
-        }
-      ]
-    }
+    superApiTokenId: superApiToken?.id
   };
 
-  const space = await createWorkspace({ spaceData, userId: botUser.id });
+  const space = await createWorkspace({ spaceData, userId: adminUserId, extraAdmins: [botUser.id] });
 
-  setTimeout(async () => {
-    // create roles from discord
-    if (discordServerId) {
-      // upsert all roles from discord
-      await upsertSpaceRolesFromDiscord({ space, userId: botUser.id });
-    }
+  // create roles from discord
+  if (discordServerId) {
+    await upsertSpaceRolesFromDiscord({ space, userId: botUser.id });
+  }
 
-    // assing roles to discord admin user
-    if (adminDiscordUserId) {
-      await upsertUserRolesFromDiscord({ space, userId: adminUserId });
-    }
-  }, 5000);
+  // assing roles to discord admin user
+  if (adminDiscordUserId) {
+    await upsertUserRolesFromDiscord({ space, userId: adminUserId });
+  }
 
   return {
     id: space.id,

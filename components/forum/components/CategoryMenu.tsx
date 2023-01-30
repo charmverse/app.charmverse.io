@@ -12,15 +12,11 @@ import Typography from '@mui/material/Typography';
 import type { PostCategory } from '@prisma/client';
 import startCase from 'lodash/startCase';
 import { usePopupState } from 'material-ui-popup-state/hooks';
-import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
-import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
-import Link from 'components/common/Link';
 import Modal from 'components/common/Modal';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useForumCategories } from 'hooks/useForumCategories';
 import isAdmin from 'hooks/useIsAdmin';
 import { useSnackbar } from 'hooks/useSnackbar';

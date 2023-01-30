@@ -1,8 +1,10 @@
 import { useEditorViewContext } from '@bangle.dev/react';
 import styled from '@emotion/styled';
+import { Check } from '@mui/icons-material';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import EditIcon from '@mui/icons-material/Edit';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+import SettingsBackupRestoreIcon from '@mui/icons-material/SettingsBackupRestore';
 import {
   Box,
   Collapse,
@@ -14,10 +16,11 @@ import {
   Typography,
   ListItem,
   IconButton,
-  Tooltip
+  Tooltip,
+  useMediaQuery
 } from '@mui/material';
 import type { ButtonProps, SxProps } from '@mui/material';
-import type { BoxProps } from '@mui/system';
+import type { BoxProps, Theme } from '@mui/system';
 import { DateTime } from 'luxon';
 import { usePopupState, bindMenu } from 'material-ui-popup-state/hooks';
 import type { MouseEvent } from 'react';
@@ -53,8 +56,8 @@ const ContextBorder = styled.div`
 const StyledPageThread = styled(Paper)<{ inline: string }>`
   overflow: ${({ inline }) => (inline === 'true' ? 'auto' : 'unset')};
   padding: ${({ theme, inline }) => theme.spacing(inline === 'true' ? 2 : 1)};
-  width: ${({ inline }) => (inline === 'true' ? '500px' : 'inherit')};
-  max-height: ${({ inline }) => (inline === 'true' ? '350px' : 'fit-content')};
+  width: ${({ inline }) => (inline === 'true' ? '100%' : 'inherit')};
+  max-height: ${({ inline }) => (inline === 'true' ? 'initial' : 'fit-content')};
 `;
 
 const ThreadCommentListItem = styled(ListItem)<{ highlighted?: string }>`
@@ -81,8 +84,8 @@ const ThreadCommentListItem = styled(ListItem)<{ highlighted?: string }>`
 
 function ThreadHeaderButton({
   disabled = false,
-  onClick,
   text,
+  onClick,
   startIcon,
   ...props
 }: { disabled?: boolean; onClick: ButtonProps['onClick']; text: string } & ButtonProps) {
@@ -95,8 +98,9 @@ function ThreadHeaderButton({
       color='secondary'
       size='small'
       {...props}
+      sx={{ minWidth: ['unset', '64px'], px: [0.5, '10px'] }}
     >
-      <span className='label'>{text}</span>
+      {text}
     </Button>
   );
 }
@@ -138,7 +142,7 @@ function AddCommentCharmEditor({
         }}
         readOnly={readOnly || disabled}
       />
-      <Box display='flex' gap={1}>
+      <Box display='flex' gap={1} justifyContent='flex-end'>
         <Button
           disabled={disabled || isEmpty}
           size='small'
@@ -286,6 +290,7 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(
     const permissions = currentPageId ? getPagePermissions(currentPageId) : new AllowedPagePermissions();
     const view = useEditorViewContext();
     const thread = threadId ? (threads[threadId] as ThreadWithCommentsAndAuthors) : null;
+    const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'));
 
     function resetState() {
       setEditedCommentId(null);
@@ -374,7 +379,7 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(
                   </Box>
                   <div>
                     <Box display='flex' alignItems='center' gap={1}>
-                      {commentIndex === 0 && (
+                      {commentIndex === 0 && !isSmallScreen && (
                         <ThreadHeaderButton
                           text={thread.resolved ? 'Un-resolve' : 'Resolve'}
                           disabled={isMutating || !permissions.comment}
@@ -450,6 +455,12 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(
             transformOrigin={{ vertical: 'top', horizontal: 'right' }}
             onClick={(e) => e.stopPropagation()}
           >
+            {isSmallScreen && (
+              <MenuItem onClick={onClickEditComment}>
+                <ListItemIcon>{thread.resolved ? <SettingsBackupRestoreIcon /> : <Check />}</ListItemIcon>
+                <ListItemText>{thread.resolved ? 'Un-resolve' : 'Resolve'}</ListItemText>
+              </MenuItem>
+            )}
             <MenuItem onClick={onClickEditComment}>
               <ListItemIcon>
                 <EditIcon />

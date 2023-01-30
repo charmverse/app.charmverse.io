@@ -21,6 +21,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import useIsAdmin from 'hooks/useIsAdmin';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { AUTH_CODE_COOKIE, AUTH_ERROR_COOKIE } from 'lib/notion/constants';
+import { generateNotionImportRedirectUrl } from 'lib/notion/generateNotionImportRedirectUrl';
 import type { FailedImportsError } from 'lib/notion/types';
 import { deleteCookie, getCookie, isSmallScreen } from 'lib/utilities/browser';
 import NotionIcon from 'public/images/notion_logo.svg';
@@ -107,7 +108,10 @@ export default function ImportNotionWorkspace() {
             disabled={!isAdmin}
             disabledTooltip='Only admins can import content from Notion'
             loading={notionState.loading}
-            href={`/api/notion/login?redirect=${encodeURIComponent(router.asPath.split('?')[0])}`}
+            href={generateNotionImportRedirectUrl({
+              spaceDomain: space?.domain as string,
+              origin: window?.location.origin
+            })}
             variant='outlined'
             startIcon={
               <SvgIcon sx={{ color: 'text.primary' }}>

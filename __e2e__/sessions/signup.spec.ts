@@ -50,17 +50,16 @@ test('signup - allows user to sign up and create a workspace using Metamask wall
 
   await createUser({ browserPage: sandboxPage, address });
 
-  const uniqueDomain = Math.random().toString().replace('.', '');
-
   await loginPage.goto();
 
   await signupPage.waitForURL();
   await signupPage.selectCreateWorkspace();
+  await signupPage.selectNewSpaceFormTemplate('default');
 
   await signupPage.waitForWorkspaceForm();
-  await signupPage.submitWorkspaceForm({ domain: uniqueDomain });
+  const space = await signupPage.submitWorkspaceForm();
 
-  await signupPage.waitForWorkspaceLoaded({ domain: uniqueDomain });
+  await signupPage.waitForWorkspaceLoaded({ domain: space.domain });
 });
 
 // test('signup - ignores the logic to redirect user after connect if the user has 0 spaces', async ({

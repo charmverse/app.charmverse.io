@@ -131,7 +131,7 @@ function TableHeaders(props: Props): JSX.Element {
     visiblePropertyIds = visiblePropertyIds.includes(Constants.titleColumnId)
       ? visiblePropertyIds
       : [Constants.titleColumnId, ...visiblePropertyIds];
-    const destIndex = destinationProperty ? visiblePropertyIds.indexOf(destinationProperty.id) : 0;
+    const destIndex = visiblePropertyIds.indexOf(destinationProperty.id);
     await mutator.changeViewVisiblePropertiesOrder(
       activeView.id,
       visiblePropertyIds,
@@ -180,7 +180,7 @@ function TableHeaders(props: Props): JSX.Element {
             <Button>
               <AddIcon fontSize='small' />
             </Button>
-            <Menu>
+            <Menu disablePortal={false}>
               <PropertyTypes
                 label={intl.formatMessage({ id: 'PropertyMenu.selectType', defaultMessage: 'Select property type' })}
                 onTypeSelected={async (type) => {

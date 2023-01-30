@@ -13,7 +13,7 @@ interface AWSAssetUrl {
   awsUrl: string;
 }
 
-interface ConverterOutput {
+export interface ConverterOutput {
   blocksToCreate: Prisma.BlockCreateInput[];
   pagesToCreate: Prisma.PageCreateInput[];
   oldNewHashmap: Record<string, string>;

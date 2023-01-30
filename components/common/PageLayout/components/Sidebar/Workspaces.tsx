@@ -1,17 +1,14 @@
 import styled from '@emotion/styled';
 import AddIcon from '@mui/icons-material/Add';
-import NavigateNextIcon from '@mui/icons-material/ArrowRightAlt';
 import { Divider } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import IconButton from '@mui/material/IconButton';
 import MuiLink from '@mui/material/Link';
 import Tooltip from '@mui/material/Tooltip';
-import Typography from '@mui/material/Typography';
 import NextLink from 'next/link';
 import { useState } from 'react';
 
-import Button from 'components/common/Button';
-import CreateWorkspaceForm from 'components/common/CreateSpaceForm';
+import { CreateSpaceForm } from 'components/common/CreateSpaceForm';
 import { Modal } from 'components/common/Modal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSpaces } from 'hooks/useSpaces';
@@ -39,7 +36,7 @@ const WorkspacesContainer = styled.div`
 
 export default function Workspaces() {
   const space = useCurrentSpace();
-  const { spaces, createNewSpace, isCreatingSpace } = useSpaces();
+  const { spaces } = useSpaces();
   const [spaceFormOpen, setSpaceFormOpen] = useState(false);
   const { user } = useUser();
 
@@ -83,13 +80,8 @@ export default function Workspaces() {
           </Tooltip>
         </Grid>
       </Grid>
-      <Modal open={spaceFormOpen} onClose={closeSpaceForm}>
-        <CreateWorkspaceForm onSubmit={createNewSpace} onCancel={closeSpaceForm} isSubmitting={isCreatingSpace} />
-        <Typography variant='body2' align='center' sx={{ pt: 2 }}>
-          <Button variant='text' href='/join' endIcon={<NavigateNextIcon />}>
-            Join an existing space
-          </Button>
-        </Typography>
+      <Modal size='medium' open={spaceFormOpen} onClose={closeSpaceForm}>
+        <CreateSpaceForm onCancel={closeSpaceForm} />
       </Modal>
     </WorkspacesContainer>
   );
