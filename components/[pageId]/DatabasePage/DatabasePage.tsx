@@ -15,7 +15,6 @@ import { useAppDispatch, useAppSelector } from 'components/common/BoardEditor/fo
 import { initialReadOnlyLoad } from 'components/common/BoardEditor/focalboard/src/store/initialLoad';
 import {
   getCurrentBoardViews,
-  getView,
   setCurrent as setCurrentView
 } from 'components/common/BoardEditor/focalboard/src/store/views';
 import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
@@ -40,15 +39,23 @@ interface Props {
 export function DatabasePage({ page, setPage, readOnly = false, pagePermissions }: Props) {
   const router = useRouter();
   const board = useAppSelector(getCurrentBoard);
-  const [currentViewId, setCurrentViewId] = useState<string>(router.query.viewId as string);
-  const activeView = useAppSelector(getView(currentViewId));
+  const [currentViewId, setCurrentViewId] = useState<string | undefined>(router.query.viewId as string | undefined);
   const boardViews = useAppSelector(getCurrentBoardViews);
+  // grab the first board view if current view is not specified
+  const activeView =
+    typeof currentViewId === 'string' ? boardViews.find((view) => view.id === currentViewId) : boardViews[0];
   const dispatch = useAppDispatch();
   const [shownCardId, setShownCardId] = useState<string | null>((router.query.cardId as string) ?? null);
 
   const { setFocalboardViewsRecord } = useFocalboardViews();
   const readOnlyBoard = readOnly || !pagePermissions?.edit_content;
   const readOnlySourceData = activeView?.fields?.sourceType === 'google_form'; // blocks that are synced cannot be edited
+  useEffect(() => {
+    if (typeof router.query.cardId === 'string') {
+      setShownCardId(router.query.cardId);
+    }
+  }, [router.query.cardId]);
+
   useEffect(() => {
     const boardId = page.boardId;
     const urlViewId = router.query.viewId as string;
@@ -140,6 +147,8 @@ export function DatabasePage({ page, setPage, readOnly = false, pagePermissions 
             viewId: viewId || ''
           }
         });
+        // call setCurrentViewId in case user clicked "add view", because we didnt update the URL so it wouldnt affect the activeView
+        setCurrentViewId(viewId);
       }
     },
     [router.query]
@@ -167,7 +176,6 @@ export function DatabasePage({ page, setPage, readOnly = false, pagePermissions 
               cardId={shownCardId}
               onClose={() => {
                 showCard(null);
-                setShownCardId(null);
               }}
               readOnly={readOnly}
             />

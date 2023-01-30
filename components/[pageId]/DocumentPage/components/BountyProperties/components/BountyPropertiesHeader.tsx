@@ -27,7 +27,7 @@ interface Props {
 
 export default function BountyPropertiesHeader({ bounty, bountyPermissions, pagePermissions, pageId }: Props) {
   const { roleups } = useRoles();
-  const { pages, mutatePage } = usePages();
+  const { mutatePage } = usePages();
   const { showMessage } = useSnackbar();
 
   const [updatingPermissions, setUpdatingPermissions] = useState(false);

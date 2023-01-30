@@ -1,6 +1,7 @@
 import CommentIcon from '@mui/icons-material/Comment';
 import { Box, Divider, Stack, Typography } from '@mui/material';
 import type { PostCategory } from '@prisma/client';
+import { useRouter } from 'next/router';
 import { useEffect, useMemo, useState } from 'react';
 import useSWR from 'swr';
 
@@ -105,7 +106,7 @@ export function PostPage({
       null
   );
   const { members } = useMembers();
-  const [form, setForm] = useState<FormInputs>(post ?? { title: '', content: null, contentText: '' });
+  const router = useRouter();
   const {
     data: postComments,
     mutate: setPostComments,
@@ -146,16 +147,17 @@ export function PostPage({
         title: formInputs.title
       });
       setContentUpdated(false);
+      onSave?.();
     } else {
-      await charmClient.forum.createForumPost({
+      const newPost = await charmClient.forum.createForumPost({
         categoryId,
         content: formInputs.content,
         contentText: formInputs.contentText ?? '',
         spaceId,
         title: formInputs.title
       });
+      router.push(`/${router.query.domain}/forum/post/${newPost.path}`);
     }
-    onSave?.();
   }
 
   function updateCategoryId(_categoryId: string) {
@@ -201,6 +203,7 @@ export function PostPage({
         <Container top={50}>
           <Box minHeight={300}>
             <CharmEditor
+              pageType='post'
               readOnly={readOnly}
               pageActionDisplay={null}
               pageId={post?.id}
@@ -251,12 +254,14 @@ export function PostPage({
           ) : (
             post && (
               <>
-                <Stack gap={1}>
-                  <PostCommentSort commentSort={commentSort} setCommentSort={setCommentSort} />
-                  {topLevelComments.map((comment) => (
-                    <PostComment setPostComments={setPostComments} comment={comment} key={comment.id} />
-                  ))}
-                </Stack>
+                {topLevelComments.length > 0 && (
+                  <Stack gap={1}>
+                    <PostCommentSort commentSort={commentSort} setCommentSort={setCommentSort} />
+                    {topLevelComments.map((comment) => (
+                      <PostComment setPostComments={setPostComments} comment={comment} key={comment.id} />
+                    ))}
+                  </Stack>
+                )}
                 {topLevelComments.length === 0 && (
                   <Stack gap={1} alignItems='center' my={1}>
                     <CommentIcon color='secondary' fontSize='large' />

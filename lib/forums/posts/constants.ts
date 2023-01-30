@@ -1,4 +1,4 @@
-export const postSortOptions = ['newest', 'most_commented', 'most_voted'] as const;
+export const postSortOptions = ['new', 'hot', 'top'] as const; // Please use underscore if you have more then 1 word as a sort
 
 export type PostSortOption = typeof postSortOptions[number];
 

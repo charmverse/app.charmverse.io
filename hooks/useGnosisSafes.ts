@@ -1,5 +1,5 @@
-import Safe from '@gnosis.pm/safe-core-sdk';
-import EthersAdapter from '@gnosis.pm/safe-ethers-lib';
+import Safe from '@safe-global/safe-core-sdk';
+import EthersAdapter from '@safe-global/safe-ethers-lib';
 import { ethers } from 'ethers';
 import { useEffect, useState } from 'react';
 
@@ -15,7 +15,7 @@ export default function useSafes(safeAddresses: string[]) {
     const signer = library.getSigner(account);
     const ethAdapter = new EthersAdapter({
       ethers,
-      signer
+      signerOrProvider: signer
     });
     const _safes = await Promise.all(
       safeAddresses.map((safeAddress) =>

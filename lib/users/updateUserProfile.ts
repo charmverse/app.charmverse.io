@@ -11,8 +11,6 @@ import { updateUsedIdentity } from './updateUsedIdentity';
 export async function updateUserProfile(userId: string, update: Partial<User>): Promise<LoggedInUser> {
   const { username, identityType, ...updateContent } = update;
 
-  const avatar = update.avatar;
-
   if ((identityType && !username) || (!identityType && username)) {
     throw new MissingDataError(`Username is required along with identity type`);
   } else if (username && identityType) {
@@ -29,12 +27,13 @@ export async function updateUserProfile(userId: string, update: Partial<User>): 
       },
       include: sessionUserRelations,
       data: {
-        avatar,
+        avatar: update.avatar,
         avatarChain: update.avatarChain,
         avatarContract: update.avatarContract,
         avatarTokenId: update.avatarTokenId,
         path: update.path,
-        email: update.email
+        email: update.email,
+        spacesOrder: update.spacesOrder
       }
     });
   }

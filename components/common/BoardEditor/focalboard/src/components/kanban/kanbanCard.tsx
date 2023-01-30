@@ -64,7 +64,8 @@ const StyledBox = styled(Box)`
 const KanbanCard = React.memo((props: Props) => {
   const { card, board } = props;
   const intl = useIntl();
-  const [isDragging, isOver, cardRef] = useSortable('card', card, !props.readOnly && !isTouchScreen(), props.onDrop);
+
+  const [isDragging, isOver, cardRef] = useSortable('card', card, !props.readOnly, props.onDrop);
   const visiblePropertyTemplates = props.visiblePropertyTemplates || [];
   let className = props.isSelected ? 'KanbanCard selected' : 'KanbanCard';
   if (props.isManualSort && isOver) {
@@ -79,9 +80,7 @@ const KanbanCard = React.memo((props: Props) => {
   const cardPage = pages[card.id];
   const router = useRouter();
   const domain = router.query.domain || /^\/share\/(.*)\//.exec(router.asPath)?.[1];
-  const fullPageUrl = router.route.startsWith('/share')
-    ? `/share/${domain}/${cardPage?.path}`
-    : `/${domain}/${cardPage?.path}`;
+  const fullPageUrl = `/${domain}/${cardPage?.path}`;
 
   // Check if the current user is an admin, admin means implicit full access
   const pagePermissions = getPagePermissions(card.id);

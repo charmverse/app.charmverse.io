@@ -25,13 +25,16 @@ export function setStorageValue<T = any>(key: string, value: T, noPrefix?: boole
   return value;
 }
 
+// value is null until we have a chance to check local storage
 export function useLocalStorage<T = any>(key: string | null, defaultValue: T, noPrefix?: boolean) {
-  const [value, setValue] = useState<T>(defaultValue);
+  const [value, setValue] = useState<T | null>(null);
 
   // Any time the key changes we need to get the value from ls again
   useEffect(() => {
     if (key) {
-      setValue(getStorageValue(key, defaultValue, noPrefix));
+      const storedValue = getStorageValue(key, defaultValue, noPrefix);
+      // use defaultValue as a fallback in case storedValue is null
+      setValue(storedValue ?? defaultValue);
     }
   }, [key]);
 

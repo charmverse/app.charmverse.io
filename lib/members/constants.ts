@@ -41,6 +41,16 @@ export const MEMBER_PROPERTY_CONFIG: Record<MemberPropertyType, MemberPropertyCo
     default: true,
     readonly: true
   },
+  linked_in: {
+    label: 'LinkedIn',
+    default: true,
+    readonly: true
+  },
+  github: {
+    label: 'GitHub',
+    default: true,
+    readonly: true
+  },
   timezone: {
     label: 'Timezone',
     default: true,

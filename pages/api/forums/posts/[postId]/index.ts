@@ -10,12 +10,12 @@ import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { UnauthorisedActionError } from 'lib/utilities/errors';
+import { relay } from 'lib/websockets/relay';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.use(requireUser).get(getForumPostController).put(updateForumPostController).delete(deleteForumPostController);
 
-// TODO - Update posts
 async function updateForumPostController(req: NextApiRequest, res: NextApiResponse<Post>) {
   const { postId } = req.query as any as { postId: string };
   const userId = req.session.user.id;
@@ -29,8 +29,19 @@ async function updateForumPostController(req: NextApiRequest, res: NextApiRespon
     throw new UnauthorisedActionError(`User ${userId} cannot edit post ${postId}`);
   }
 
-  await updateForumPost(postId, req.body);
+  const post = await updateForumPost(postId, req.body);
 
+  relay.broadcast(
+    {
+      type: 'post_updated',
+      payload: {
+        id: postId,
+        createdBy: post.createdBy,
+        categoryId: post.categoryId
+      }
+    },
+    post.spaceId
+  );
   res.status(200).end();
 }
 
@@ -47,7 +58,18 @@ async function deleteForumPostController(req: NextApiRequest, res: NextApiRespon
     throw new UnauthorisedActionError(`User ${userId} cannot edit post ${postId}`);
   }
 
-  await deleteForumPost(postId);
+  const post = await deleteForumPost(postId);
+
+  relay.broadcast(
+    {
+      type: 'post_deleted',
+      payload: {
+        id: postId,
+        categoryId: post.categoryId
+      }
+    },
+    post.spaceId
+  );
 
   res.status(200).end();
 }

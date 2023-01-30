@@ -10,7 +10,7 @@ export async function findOrCreateRoles(
   externalRoles: ExternalRole[],
   spaceId: string,
   userId: string,
-  options?: { source?: RoleSource | null; createRoles?: boolean; preserveIds?: boolean }
+  options?: { source?: RoleSource | null; createRoles?: boolean }
 ): Promise<RolesRecord> {
   const { createRoles = true, source = null } = options ?? {};
   const rolesRecord: RolesRecord = {};

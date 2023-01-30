@@ -24,6 +24,8 @@ interface UpdateRefs {
  * Mutates the provided content to replace nested page refs
  */
 function updateReferences({ oldNewHashMap, pages }: UpdateRefs) {
+  let foundPageRefs = 0;
+
   pages.forEach((p) => {
     const prosemirrorNodes = (p.content as PageContent)?.content;
     if (prosemirrorNodes) {
@@ -31,10 +33,12 @@ function updateReferences({ oldNewHashMap, pages }: UpdateRefs) {
 
       // Step 1 - Update all nested page links
       const nestedPageRefs = prosemirrorNodesAsText.match(
-        /{"type":"page","attrs":{"id":"((\d|[a-f]){1,}-){1,}(\d|[a-f]){1,}"}}/g
+        /{"type":"page","attrs":{"id":"((\d|[a-f]){1,}-){1,}(\d|[a-f]){1,}"/g
       );
 
       nestedPageRefs?.forEach((pageLinkNode) => {
+        foundPageRefs += 1;
+
         const oldPageId = pageLinkNode.match(/((\d|[a-f]){1,}-){1,}(\d|[a-f]){1,}/)?.[0];
         const newPageId = oldPageId ? oldNewHashMap[oldPageId] : undefined;
 
@@ -68,8 +72,8 @@ export async function generateImportWorkspacePages({
     throw new DataNotFoundError(`Space not found: ${targetSpaceIdOrDomain}`);
   }
 
-  const dataToImport: WorkspaceExport =
-    exportData ?? JSON.parse(await fs.readFile(path.join(__dirname, 'exports', `${exportName}.json`), 'utf-8'));
+  const resolvedPath = path.resolve(path.join('lib', 'templates', 'exports', `${exportName}.json`));
+  const dataToImport: WorkspaceExport = exportData ?? JSON.parse(await fs.readFile(resolvedPath, 'utf-8'));
 
   if (!dataToImport) {
     throw new InvalidInputError('Please provide the source export data, or export path');

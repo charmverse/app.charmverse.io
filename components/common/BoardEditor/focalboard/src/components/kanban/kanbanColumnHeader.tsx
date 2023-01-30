@@ -166,7 +166,7 @@ export default function KanbanColumnHeader(props: Props): JSX.Element {
         <>
           <MenuWrapper>
             <IconButton icon={<MoreHorizIcon fontSize='small' />} />
-            <Menu>
+            <Menu disablePortal={false}>
               <Menu.Text
                 id='hide'
                 icon={<VisibilityOffOutlinedIcon fontSize='small' />}

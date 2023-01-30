@@ -1,4 +1,5 @@
 import styled from '@emotion/styled';
+import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import { Autocomplete, Popper, Stack, TextField, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import type { Space } from '@prisma/client';
@@ -22,7 +23,14 @@ const StyledPopper = styled(Popper)`
   height: 0;
 `;
 
-export function JoinDynamicSpaceForm() {
+/**
+ * @goBack - function to go back to the previous step. Used in context of CreateSpaceForm
+ */
+type Props = {
+  goBack?: () => void;
+};
+
+export function JoinDynamicSpaceForm({ goBack }: Props) {
   const router = useRouter();
   const [spaceDomain, setSpaceDomain] = useState<string>(router.query.domain as string);
   const [spacesInfo, setSpacesInfo] = useState<Space[]>([]);
@@ -58,9 +66,12 @@ export function JoinDynamicSpaceForm() {
   }
 
   return (
-    <>
+    <Box sx={{ minHeight: '200px' }}>
       <br />
-      <FieldLabel>Enter a CharmVerse space name</FieldLabel>
+      <FieldLabel sx={{ display: 'flex', justifyContent: 'center', gap: 2, pb: 1 }}>
+        {goBack && <ArrowBackIosNewIcon onClick={goBack} />}
+        Enter a CharmVerse space name
+      </FieldLabel>
       <Autocomplete<Space>
         disablePortal
         options={spacesInfo}
@@ -101,6 +112,6 @@ export function JoinDynamicSpaceForm() {
         )}
       />
       {selectedSpace && <TokenGateForm onSuccess={onJoinSpace} spaceDomain={selectedSpace.domain} />}
-    </>
+    </Box>
   );
 }

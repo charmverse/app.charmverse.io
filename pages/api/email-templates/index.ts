@@ -52,7 +52,8 @@ const createDiscussionTask = ({
       avatarContract: null,
       avatarTokenId: null,
       avatarChain: null,
-      deletedAt: null
+      deletedAt: null,
+      spacesOrder: []
     }
   };
 };
@@ -90,7 +91,8 @@ const createForumTask = ({
       avatarContract: null,
       avatarTokenId: null,
       avatarChain: null,
-      deletedAt: null
+      deletedAt: null,
+      spacesOrder: []
     }
   };
 };
@@ -247,6 +249,7 @@ const templates = {
       ],
       gnosisSafeTasks: [
         {
+          marked: true,
           tasks: [
             {
               nonce: 3,
@@ -277,6 +280,7 @@ const templates = {
           taskId: '1'
         },
         {
+          marked: false,
           tasks: [
             {
               nonce: 7,

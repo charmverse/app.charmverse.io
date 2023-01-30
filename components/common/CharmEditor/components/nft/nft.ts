@@ -1,5 +1,5 @@
 import { Plugin, NodeView } from '@bangle.dev/core';
-import type { EditorView, Slice } from '@bangle.dev/pm';
+import type { EditorView } from '@bangle.dev/pm';
 
 import { insertNode } from 'lib/prosemirror/insertNode';
 
@@ -16,10 +16,9 @@ export function plugins() {
     }),
     new Plugin({
       props: {
-        handlePaste: (view: EditorView, rawEvent: ClipboardEvent, slice: Slice) => {
-          // @ts-ignore
-          const contentRow = slice.content.content?.[0]?.content.content?.[0] ?? slice.content.content?.[0];
-          const attrs = extractAttrsFromEmbedCode(contentRow?.text);
+        handlePaste: (view: EditorView, rawEvent: ClipboardEvent) => {
+          const text = rawEvent.clipboardData?.getData('text/plain');
+          const attrs = extractAttrsFromEmbedCode(text ?? '');
           if (attrs) {
             insertNode(name, view.state, view.dispatch, view, attrs);
             return true;

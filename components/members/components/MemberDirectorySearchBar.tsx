@@ -1,5 +1,6 @@
 import SearchIcon from '@mui/icons-material/Search';
-import { InputAdornment, TextField } from '@mui/material';
+import type { Theme } from '@mui/material';
+import { useMediaQuery, InputAdornment, TextField } from '@mui/material';
 import debounce from 'lodash/debounce';
 import type { Dispatch, SetStateAction } from 'react';
 import { useEffect, useMemo } from 'react';
@@ -12,6 +13,7 @@ import type { Member } from 'lib/members/interfaces';
 export function MemberDirectorySearchBar({ onChange }: { onChange: Dispatch<SetStateAction<Member[]>> }) {
   const { members } = useMembers();
   const space = useCurrentSpace();
+  const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'));
 
   useEffect(() => {
     onChange(members);
@@ -30,7 +32,7 @@ export function MemberDirectorySearchBar({ onChange }: { onChange: Dispatch<SetS
 
   return (
     <TextField
-      placeholder='Search for members, roles, skills, interests, etc'
+      placeholder={isSmallScreen ? 'Search for members' : 'Search for members, roles, skills, interests, etc'}
       fullWidth
       sx={{
         my: 2

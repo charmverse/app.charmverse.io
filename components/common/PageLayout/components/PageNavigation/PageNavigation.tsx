@@ -10,6 +10,7 @@ import { memo, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useDrop } from 'react-dnd';
 
 import charmClient from 'charmClient';
+import { NavIconHover } from 'components/common/PageLayout/components/PageNavigation/components/NavIconHover';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useLocalStorage } from 'hooks/useLocalStorage';
 import { usePages } from 'hooks/usePages';
@@ -112,7 +113,7 @@ type PageNavigationProps = {
 
 function PageNavigation({ deletePage, isFavorites, rootPageIds, onClick }: PageNavigationProps) {
   const router = useRouter();
-  const { pages, currentPageId, setPages, mutatePage } = usePages();
+  const { pages, setPages, mutatePage } = usePages();
   const space = useCurrentSpace();
   const { user } = useUser();
   const [expanded, setExpanded] = useLocalStorage<string[]>(`${space?.id}.expanded-pages`, []);
@@ -132,6 +133,9 @@ function PageNavigation({ deletePage, isFavorites, rootPageIds, onClick }: PageN
       spaceId: page.spaceId
     })
   );
+
+  const currentPage = pagesArray.find((page) => page.path === router.query.pageId);
+  const currentPageId = currentPage?.id ?? '';
 
   const pageHash = JSON.stringify(pagesArray);
 
@@ -168,10 +172,10 @@ function PageNavigation({ deletePage, isFavorites, rootPageIds, onClick }: PageN
         });
       });
       siblings.forEach((page) => {
-        const currentPage = _pages[page.id];
-        if (currentPage) {
+        const _currentPage = _pages[page.id];
+        if (_currentPage) {
           _pages[page.id] = {
-            ...currentPage,
+            ..._currentPage,
             index: page.index,
             parentId: page.parentId
           };
@@ -225,11 +229,11 @@ function PageNavigation({ deletePage, isFavorites, rootPageIds, onClick }: PageN
   );
 
   useEffect(() => {
-    const currentPage = pages[currentPageId];
+    const _currentPage = pages[currentPageId];
     // expand the parent of the active page
-    if (currentPage?.parentId && !isFavorites) {
-      if (!expanded.includes(currentPage.parentId) && currentPage.type !== 'card') {
-        setExpanded(expanded.concat(currentPage.parentId));
+    if (_currentPage?.parentId && !isFavorites) {
+      if (!expanded?.includes(_currentPage.parentId) && _currentPage.type !== 'card') {
+        setExpanded(expanded?.concat(_currentPage.parentId) ?? []);
       }
     }
   }, [currentPageId, pages, isFavorites]);
@@ -238,12 +242,10 @@ function PageNavigation({ deletePage, isFavorites, rootPageIds, onClick }: PageN
     setExpanded(nodeIds);
   }
 
-  let selectedNodeId: string | null = null;
-  if (currentPageId) {
-    selectedNodeId = currentPageId;
-    if (typeof router.query.viewId === 'string') {
-      selectedNodeId = router.query.viewId;
-    }
+  let selectedNodeId: string | null = currentPageId ?? null;
+
+  if (typeof router.query.viewId === 'string') {
+    selectedNodeId = router.query.viewId;
   }
 
   const addPage = useCallback(
@@ -263,13 +265,33 @@ function PageNavigation({ deletePage, isFavorites, rootPageIds, onClick }: PageN
   return (
     <StyledTreeRoot
       mutatePage={mutatePage}
-      expanded={expanded}
+      expanded={expanded ?? []}
       // @ts-ignore - we use null instead of undefined to control the element
       selected={selectedNodeId}
       onNodeToggle={onNodeToggle}
       aria-label='items navigator'
-      defaultCollapseIcon={<ExpandMoreIcon fontSize='large' />}
-      defaultExpandIcon={<ChevronRightIcon fontSize='large' />}
+      defaultCollapseIcon={
+        <NavIconHover
+          width={{ xs: 30, md: 24 }}
+          height={{ xs: 30, md: 24 }}
+          display='flex'
+          alignItems='center'
+          justifyContent='center'
+        >
+          <ExpandMoreIcon fontSize='large' />
+        </NavIconHover>
+      }
+      defaultExpandIcon={
+        <NavIconHover
+          width={{ xs: 30, md: 24 }}
+          height={{ xs: 30, md: 24 }}
+          display='flex'
+          alignItems='center'
+          justifyContent='center'
+        >
+          <ChevronRightIcon fontSize='large' />
+        </NavIconHover>
+      }
       isFavorites={isFavorites}
     >
       {mappedItems.map((item) => (

@@ -1,7 +1,6 @@
 import PersonIcon from '@mui/icons-material/Person';
 import { Stack, Tooltip, Typography } from '@mui/material';
 import type { VisibilityView } from '@prisma/client';
-import type { SVGProps } from 'react';
 
 import GalleryIcon from 'components/common/BoardEditor/focalboard/src/widgets/icons/gallery';
 import TableIcon from 'components/common/BoardEditor/focalboard/src/widgets/icons/table';
@@ -15,7 +14,7 @@ function VisibilityViewIcon({
   ...props
 }: {
   view: VisibilityView;
-} & SVGProps<any>) {
+} & { fontSize?: 'small' }) {
   if (view === 'gallery') {
     return <GalleryIcon {...props} />;
   } else if (view === 'table') {
@@ -48,21 +47,17 @@ function MemberPropertyVisibilityView({
           color: isDisabled ? 'action.disabled' : 'inherit',
           cursor: disabled ? 'initial' : 'pointer'
         }}
+        onClick={(e) => {
+          e.stopPropagation();
+          e.preventDefault();
+          updateMemberPropertyVisibility({
+            memberPropertyId,
+            view,
+            visible: isDisabled
+          });
+        }}
       >
-        <VisibilityViewIcon
-          view={view}
-          width={20}
-          height={20}
-          onClick={(e) => {
-            e.stopPropagation();
-            e.preventDefault();
-            updateMemberPropertyVisibility({
-              memberPropertyId,
-              view,
-              visible: isDisabled
-            });
-          }}
-        />
+        <VisibilityViewIcon view={view} fontSize='small' />
       </Typography>
     </Tooltip>
   );

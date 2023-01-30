@@ -1,8 +1,8 @@
 import OpenInFullIcon from '@mui/icons-material/OpenInFull';
-import { IconButton, Tooltip } from '@mui/material';
+import { Box, Popover, Tooltip } from '@mui/material';
+import PopupState, { bindTrigger, bindPopover } from 'material-ui-popup-state';
 import { useRouter } from 'next/router';
-import type { ReactNode } from 'react';
-import React, { useState } from 'react';
+import React from 'react';
 import { FormattedMessage } from 'react-intl';
 import { mutate } from 'swr';
 
@@ -17,7 +17,8 @@ import type { PageMeta } from 'lib/pages';
 import { mutator } from '../../mutator';
 import { getCurrentBoardTemplates } from '../../store/cards';
 import { useAppSelector } from '../../store/hooks';
-import ModalWrapper from '../modalWrapper';
+import IconButton from '../../widgets/buttons/iconButton';
+import AddViewMenu from '../addViewMenu';
 
 import FilterComponent from './filterComponent';
 import NewCardButton from './newCardButton';
@@ -30,7 +31,7 @@ type Props = {
   activeBoard?: Board;
   activeView?: BoardView;
   views: BoardView[];
-  viewsBoardId: string;
+  viewsBoard: Board; // the parent board which keeps track of the views on this page
   cards: Card[];
   addCard: () => void;
   showCard: (cardId: string | null) => void;
@@ -40,9 +41,9 @@ type Props = {
   readOnly: boolean;
   readOnlySourceData: boolean;
   dateDisplayProperty?: IPropertyTemplate;
-  addViewButton?: ReactNode;
   disableUpdatingUrl?: boolean;
   maxTabsShown?: number;
+  onClickNewView?: () => void;
   onDeleteView?: (viewId: string) => void;
   showActionsOnHover?: boolean;
   showView: (viewId: string) => void;
@@ -51,7 +52,6 @@ type Props = {
 };
 
 function ViewHeader(props: Props) {
-  const [showFilter, setShowFilter] = useState(false);
   const router = useRouter();
   const { pages, refreshPage } = usePages();
   const cardTemplates: Card[] = useAppSelector(getCurrentBoardTemplates);
@@ -62,8 +62,9 @@ function ViewHeader(props: Props) {
     maxTabsShown = 3,
     showView,
     toggleViewOptions,
-    viewsBoardId,
+    viewsBoard,
     activeBoard,
+    onClickNewView,
     activeView,
     cards,
     dateDisplayProperty
@@ -76,7 +77,7 @@ function ViewHeader(props: Props) {
 
   async function addPageFromTemplate(pageId: string) {
     const [blocks] = await mutator.duplicateCard({
-      board: props.activeBoard as Board,
+      board: activeBoard as Board,
       cardId: pageId,
       cardPage: pages[pageId] as PageMeta
     });
@@ -94,10 +95,11 @@ function ViewHeader(props: Props) {
   }
 
   return (
-    <div className={`ViewHeader ${props.showActionsOnHover ? 'hide-actions' : ''}`}>
+    <div key={viewsBoard.id} className={`ViewHeader ${props.showActionsOnHover ? 'hide-actions' : ''}`}>
       <ViewTabs
         onDeleteView={props.onDeleteView}
-        addViewButton={props.addViewButton}
+        onClickNewView={onClickNewView}
+        board={viewsBoard}
         views={views}
         readOnly={props.readOnly}
         showView={showView}
@@ -109,7 +111,17 @@ function ViewHeader(props: Props) {
 
       {/* add a view */}
 
-      {!props.readOnly && views.length <= maxTabsShown && props.addViewButton}
+      {!props.readOnly && views.length <= maxTabsShown && (
+        <Box className='view-actions' pt='4px'>
+          <AddViewMenu
+            board={viewsBoard}
+            activeView={activeView}
+            views={views}
+            showView={showView}
+            onClickIcon={onClickNewView}
+          />
+        </Box>
+      )}
 
       <div className='octo-spacer' />
 
@@ -128,24 +140,36 @@ function ViewHeader(props: Props) {
 
             {/* Filter */}
 
-            <ModalWrapper>
-              <Button
-                color={hasFilter ? 'primary' : 'secondary'}
-                variant='text'
-                size='small'
-                sx={{ minWidth: 0 }}
-                onClick={() => setShowFilter(true)}
-              >
-                <FormattedMessage id='ViewHeader.filter' defaultMessage='Filter' />
-              </Button>
-              {showFilter && (
-                <FilterComponent
-                  properties={activeBoard?.fields.cardProperties ?? []}
-                  activeView={activeView}
-                  onClose={() => setShowFilter(false)}
-                />
+            <PopupState variant='popover' popupId='view-filter'>
+              {(popupState) => (
+                <>
+                  <Button
+                    color={hasFilter ? 'primary' : 'secondary'}
+                    variant='text'
+                    size='small'
+                    sx={{ minWidth: 0 }}
+                    {...bindTrigger(popupState)}
+                  >
+                    <FormattedMessage id='ViewHeader.filter' defaultMessage='Filter' />
+                  </Button>
+                  <Popover
+                    {...bindPopover(popupState)}
+                    disablePortal
+                    PaperProps={{
+                      sx: {
+                        overflow: 'visible'
+                      }
+                    }}
+                    anchorOrigin={{
+                      vertical: 'bottom',
+                      horizontal: 'left'
+                    }}
+                  >
+                    <FilterComponent properties={activeBoard?.fields.cardProperties ?? []} activeView={activeView} />
+                  </Popover>
+                </>
               )}
-            </ModalWrapper>
+            </PopupState>
 
             {/* Sort */}
 
@@ -165,17 +189,9 @@ function ViewHeader(props: Props) {
 
         {/* Link to view embedded table in full */}
         {props.embeddedBoardPath && (
-          <Link
-            href={
-              router.pathname.startsWith('/share')
-                ? `/share/${router.query.pageId?.[0]}/${props.embeddedBoardPath}`
-                : `/${router.query.domain}/${props.embeddedBoardPath}`
-            }
-          >
+          <Link href={`/${router.query.domain}/${props.embeddedBoardPath}`}>
             <Tooltip title='Open as full page' placement='top'>
-              <IconButton style={{ width: '32px' }}>
-                <OpenInFullIcon color='secondary' sx={{ fontSize: 14 }} />
-              </IconButton>
+              <IconButton icon={<OpenInFullIcon color='secondary' sx={{ fontSize: 14 }} />} style={{ width: '32px' }} />
             </Tooltip>
           </Link>
         )}
@@ -196,7 +212,7 @@ function ViewHeader(props: Props) {
                 editCardTemplate={props.editCardTemplate}
                 showCard={props.showCard}
                 deleteCardTemplate={deleteCardTemplate}
-                boardId={viewsBoardId}
+                boardId={viewsBoard.id}
               />
             )}
           </>

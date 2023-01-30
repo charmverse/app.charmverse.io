@@ -2,12 +2,14 @@ import { Client } from '@notionhq/client';
 import type { DatabaseObjectResponse, PageObjectResponse } from '@notionhq/client/build/src/api-endpoints';
 import { v4 } from 'uuid';
 
-import log from 'lib/log';
+import { getLogger } from 'lib/log/prefix';
 
 import { createPrismaPage } from '../createPrismaPage';
 
 import { NotionCache } from './NotionCache';
 import { NotionPage } from './NotionPage';
+
+const log = getLogger('notion-client');
 
 export class NotionImporter {
   cache: NotionCache;
@@ -44,7 +46,12 @@ export class NotionImporter {
     this.client =
       client ??
       new Client({
-        auth: accessToken
+        auth: accessToken,
+        logger(logLevel, message, extraInfo) {
+          if (log[logLevel]) {
+            log[logLevel](message, extraInfo);
+          }
+        }
       });
     const notionCache = new NotionCache();
 

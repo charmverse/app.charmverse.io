@@ -213,7 +213,7 @@ describe('listForumPosts', () => {
       {
         spaceId: extraSpace.id,
         count: resultsPerQuery,
-        sort: 'most_voted'
+        sort: 'top'
       },
       user.id
     );
