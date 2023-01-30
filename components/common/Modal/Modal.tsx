@@ -1,10 +1,14 @@
 import styled from '@emotion/styled';
 import CloseIcon from '@mui/icons-material/Close';
+import type { Theme } from '@mui/material';
+import { useMediaQuery } from '@mui/material';
 import Box from '@mui/material/Box';
 import MuiDialogTitle from '@mui/material/DialogTitle';
 import IconButton from '@mui/material/IconButton';
 import MuiModal from '@mui/material/Modal';
 import type { ComponentProps, ReactNode } from 'react';
+
+import { MobileDialog } from 'components/common/MobileDialog/MobileDialog';
 
 export type ModalSize = 'large' | 'fluid' | 'small' | string;
 
@@ -67,6 +71,7 @@ export type ModalProps = Omit<ComponentProps<typeof MuiModal>, 'children' | 'onC
   position?: ModalPosition;
   noPadding?: boolean;
   onClose: () => void;
+  mobileDialog?: boolean;
 };
 
 export function Modal({
@@ -75,8 +80,20 @@ export function Modal({
   position = ModalPosition.center,
   size = defaultSize,
   title,
+  mobileDialog,
   ...props
 }: ModalProps) {
+  const isLargeScreen = useMediaQuery((theme: Theme) => theme.breakpoints.up('sm'));
+  const isMobileDialog = !isLargeScreen && mobileDialog;
+
+  if (isMobileDialog) {
+    return (
+      <MobileDialog title={title} {...props}>
+        {children}
+      </MobileDialog>
+    );
+  }
+
   return (
     <MuiModal {...props}>
       <div>
