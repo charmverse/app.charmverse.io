@@ -166,12 +166,7 @@ export default function Header({ open, openSidebar }: HeaderProps) {
 
   async function convertToProposal(pageId: string) {
     setPageMenuOpen(false);
-    if (isForumPost) {
-      const proposalPageDetails = await charmClient.forum.convertToProposal(pageId);
-      router.push(`/${router.query.domain}/${proposalPageDetails.path}`);
-    } else {
-      await charmClient.pages.convertToProposal(pageId);
-    }
+    await charmClient.pages.convertToProposal(pageId);
   }
 
   const documentOptions = (
@@ -384,25 +379,6 @@ export default function Header({ open, openSidebar }: HeaderProps) {
           />
           <ListItemText primary='Copy link' />
         </ListItemButton>
-        <Divider />
-        <Tooltip
-          title={!canCreateProposal || !isPostCreator ? 'You do not have the permission to convert to proposal' : ''}
-        >
-          <div>
-            <ListItemButton
-              onClick={() => convertToProposal(forumPost.id)}
-              disabled={!canCreateProposal || !isPostCreator}
-            >
-              <TaskOutlinedIcon
-                fontSize='small'
-                sx={{
-                  mr: 1
-                }}
-              />
-              <ListItemText primary='Convert to proposal' />
-            </ListItemButton>
-          </div>
-        </Tooltip>
         <Divider />
         <Tooltip title={!isPostCreator ? "You don't have permission to delete this post" : ''}>
           <div>

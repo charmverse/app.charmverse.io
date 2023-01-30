@@ -93,8 +93,4 @@ export class ForumApi {
   deletePostComment({ commentId, postId }: { postId: string; commentId: string }): Promise<void> {
     return http.DELETE(`/api/forums/posts/${postId}/comments/${commentId}`);
   }
-
-  convertToProposal(postId: string) {
-    return http.POST<Omit<PageMeta, 'permissions'>>(`/api/forums/posts/${postId}/convert-to-proposal`);
-  }
 }
