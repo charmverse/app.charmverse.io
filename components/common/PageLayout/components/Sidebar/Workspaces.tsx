@@ -80,7 +80,7 @@ export default function Workspaces() {
           </Tooltip>
         </Grid>
       </Grid>
-      <Modal size='medium' open={spaceFormOpen} onClose={closeSpaceForm}>
+      <Modal size='medium' open={spaceFormOpen} onClose={closeSpaceForm} mobileDialog>
         <CreateSpaceForm onCancel={closeSpaceForm} />
       </Modal>
     </WorkspacesContainer>
