@@ -186,6 +186,7 @@ function DocumentPage({ page, setPage, insideModal, readOnly = false, parentProp
               // content={pageDetails?.content as PageContent}
               // onContentChange={updatePageContent}
               readOnly={readOnly}
+              autoFocus={false}
               pageActionDisplay={!insideModal ? currentPageActionDisplay : null}
               pageId={page.id}
               disablePageSpecificFeatures={isSharedPage}

@@ -55,7 +55,7 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
     state,
     children,
     isContentControlled,
-    focusOnInit = !isTouchScreen(),
+    focusOnInit,
     pmViewOpts,
     renderNodeViews,
     className,
@@ -69,6 +69,8 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
   },
   ref
 ) {
+  focusOnInit = focusOnInit ?? (!readOnly && !isTouchScreen());
+
   const renderRef = useRef<HTMLDivElement>(null);
   const { user } = useUser();
   const enableFidusEditor = Boolean(user && pageId && trackChanges && !isContentControlled);
