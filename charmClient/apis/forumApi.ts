@@ -13,6 +13,7 @@ import type { PostWithVotes } from 'lib/forums/posts/interfaces';
 import type { ListForumPostsRequest, PaginatedPostList } from 'lib/forums/posts/listForumPosts';
 import type { SearchForumPostsRequest } from 'lib/forums/posts/searchForumPosts';
 import type { UpdateForumPostInput } from 'lib/forums/posts/updateForumPost';
+import type { PageDetails } from 'lib/pages';
 
 export class ForumApi {
   createForumPost(payload: Omit<CreateForumPostInput, 'createdBy'>) {
@@ -91,5 +92,9 @@ export class ForumApi {
 
   deletePostComment({ commentId, postId }: { postId: string; commentId: string }): Promise<void> {
     return http.DELETE(`/api/forums/posts/${postId}/comments/${commentId}`);
+  }
+
+  convertToProposal(postId: string) {
+    return http.POST<PageDetails>(`/api/forums/posts/${postId}/convert-to-proposal`);
   }
 }

@@ -5,7 +5,6 @@ import { prisma } from 'db';
 import { updateTrackPageProfile } from 'lib/metrics/mixpanel/updateTrackPageProfile';
 import { ActionNotPermittedError, NotFoundError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import type { IPageWithPermissions } from 'lib/pages';
-import { computeUserPagePermissions } from 'lib/permissions/pages';
 import { computeSpacePermissions } from 'lib/permissions/spaces';
 import { createProposal } from 'lib/proposal/createProposal';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -17,39 +16,33 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 handler.use(requireUser).post(convertToProposal);
 
 async function convertToProposal(req: NextApiRequest, res: NextApiResponse<IPageWithPermissions>) {
-  const pageId = req.query.id as string;
+  const postId = req.query.postId as string;
   const userId = req.session.user.id;
 
-  const page = await prisma.page.findUnique({
+  const post = await prisma.post.findUnique({
     where: {
-      id: pageId
+      id: postId
     },
     select: {
       id: true,
-      parentId: true,
-      type: true,
       spaceId: true,
       content: true,
-      title: true
+      title: true,
+      createdBy: true
     }
   });
 
-  if (!page) {
+  if (!post) {
     throw new NotFoundError();
   }
 
-  const permissions = await computeUserPagePermissions({
-    pageId,
-    userId
-  });
-
-  if (permissions.edit_content !== true) {
+  if (post.createdBy !== userId) {
     throw new ActionNotPermittedError('You do not have permission to update this page');
   }
 
   const spacePermissions = await computeSpacePermissions({
     allowAdminBypass: true,
-    resourceId: page.spaceId,
+    resourceId: post.spaceId,
     userId
   });
 
@@ -58,11 +51,10 @@ async function convertToProposal(req: NextApiRequest, res: NextApiResponse<IPage
   }
 
   const { page: updatedPage } = await createProposal({
-    id: page.id,
     createdBy: userId,
-    spaceId: page.spaceId,
-    content: page.content ?? undefined,
-    title: page.title
+    spaceId: post.spaceId,
+    content: post.content ?? undefined,
+    title: post.title
   });
 
   updateTrackPageProfile(updatedPage.id);
@@ -79,7 +71,7 @@ async function convertToProposal(req: NextApiRequest, res: NextApiResponse<IPage
       type: 'pages_meta_updated',
       payload: [updatedPageData]
     },
-    page.spaceId
+    post.spaceId
   );
 
   return res.status(200);
