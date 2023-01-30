@@ -388,10 +388,13 @@ export default function Header({ open, openSidebar }: HeaderProps) {
           alignItems: 'center',
           alignSelf: 'stretch',
           gap: 1,
-          width: '100%'
+          width: 'calc(100% - 40px)'
         }}
       >
-        <PageTitleWithBreadcrumbs pageId={basePage?.id} pageType={basePage?.type} />
+        <div style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
+          <PageTitleWithBreadcrumbs pageId={basePage?.id} pageType={basePage?.type} />
+        </div>
+
         <Box display='flex' alignItems='center' alignSelf='stretch' mr={-1}>
           {isBountyBoard && <BountyShareButton headerHeight={headerHeight} />}
 
