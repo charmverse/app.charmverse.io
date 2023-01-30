@@ -41,7 +41,7 @@ import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useToggleFavorite } from 'hooks/useToggleFavorite';
 import { useUser } from 'hooks/useUser';
-import { generateMarkdown } from 'lib/pages/generateMarkdown';
+import type { PageContent } from 'lib/prosemirror/interfaces';
 import { humanFriendlyDate } from 'lib/utilities/dates';
 
 import DocumentHistory from '../DocumentHistory';
@@ -54,6 +54,7 @@ import EditingModeToggle from './components/EditingModeToggle';
 import PageTitleWithBreadcrumbs from './components/PageTitleWithBreadcrumbs';
 import ShareButton from './components/ShareButton';
 import PublishToSnapshot from './components/Snapshot/PublishToSnapshot';
+import { exportMarkdown } from './components/utils/exportMarkdown';
 
 export const headerHeight = 56;
 
@@ -110,36 +111,6 @@ export default function Header({ open, openSidebar }: HeaderProps) {
     }
     return null;
   }, [targetPage?.id]);
-
-  async function exportMarkdown() {
-    if (!basePage) {
-      return;
-    }
-
-    // getPage to get content
-    const page = await charmClient.pages.getPage(basePage.id);
-    const markdownContent = await generateMarkdown(page, undefined, { members });
-    if (markdownContent) {
-      const data = new Blob([markdownContent], { type: 'text/plain' });
-
-      const linkElement = document.createElement('a');
-
-      linkElement.download = `${basePage?.title || 'page'}.md`;
-
-      const downloadLink = URL.createObjectURL(data);
-
-      linkElement.href = downloadLink;
-
-      linkElement.click();
-
-      URL.revokeObjectURL(downloadLink);
-
-      charmClient.track.trackAction('export_page_markdown', {
-        pageId: page.id,
-        spaceId: page.spaceId
-      });
-    }
-  }
 
   const isFullWidth = isSmallScreen || (basePage?.fullWidth ?? false);
   const isBasePageDocument = documentTypes.includes(basePage?.type ?? '');
@@ -321,11 +292,20 @@ export default function Header({ open, openSidebar }: HeaderProps) {
         <div>
           <ListItemButton
             disabled={!isExportablePage}
-            onClick={() => {
-              exportMarkdown().catch((err) => {
-                showMessage('Error exporting markdown', 'error');
-              });
-              setPageMenuOpen(false);
+            onClick={async () => {
+              if (basePage) {
+                const page = await charmClient.pages.getPage(basePage.id);
+                exportMarkdown({
+                  content: page.content as PageContent,
+                  id: page.id,
+                  members,
+                  spaceId: page.spaceId,
+                  title: page.title
+                }).catch((err) => {
+                  showMessage('Error exporting markdown', 'error');
+                });
+                setPageMenuOpen(false);
+              }
             }}
           >
             <GetAppOutlinedIcon
@@ -426,6 +406,28 @@ export default function Header({ open, openSidebar }: HeaderProps) {
             </ListItemButton>
           </div>
         </Tooltip>
+        <ListItemButton
+          onClick={async () => {
+            exportMarkdown({
+              content: forumPost.content as PageContent,
+              id: forumPost.id,
+              members,
+              spaceId: forumPost.spaceId,
+              title: forumPost.title
+            }).catch((err) => {
+              showMessage('Error exporting markdown', 'error');
+            });
+            setPageMenuOpen(false);
+          }}
+        >
+          <GetAppOutlinedIcon
+            fontSize='small'
+            sx={{
+              mr: 1
+            }}
+          />
+          <ListItemText primary='Export to markdown' />
+        </ListItemButton>
         <Divider />
         {forumPost && postCreator && (
           <>

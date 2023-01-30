@@ -21,11 +21,11 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import useIsAdmin from 'hooks/useIsAdmin';
 import { useMembers } from 'hooks/useMembers';
 import { usePages } from 'hooks/usePages';
-import { useSnackbar } from 'hooks/useSnackbar';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import log from 'lib/log';
 import type { PageMeta } from 'lib/pages';
 import { generateMarkdown } from 'lib/pages/generateMarkdown';
+import type { PageContent } from 'lib/prosemirror/interfaces';
 import type { SnapshotReceipt, SnapshotSpace, SnapshotVotingModeType, SnapshotVotingStrategy } from 'lib/snapshot';
 import { getSnapshotSpace, SnapshotVotingMode } from 'lib/snapshot';
 import { ExternalServiceError, SystemError, UnknownError } from 'lib/utilities/errors';
@@ -54,7 +54,6 @@ export default function PublishingForm({ onSubmit, page }: Props) {
 
   const space = useCurrentSpace();
   const { members } = useMembers();
-  const { showMessage } = useSnackbar();
 
   const [snapshotSpace, setSnapshotSpace] = useState<SnapshotSpace | null>(null);
   // Ensure we don't show any UI until we are done checking
@@ -113,7 +112,14 @@ export default function PublishingForm({ onSubmit, page }: Props) {
   async function checkMarkdownLength(): Promise<string | null> {
     try {
       const pageWithDetails = await charmClient.pages.getPage(page.id);
-      const content = await generateMarkdown(pageWithDetails, false, { members });
+      const content = await generateMarkdown(
+        {
+          title: pageWithDetails.title,
+          content: pageWithDetails.content as PageContent
+        },
+        false,
+        { members }
+      );
 
       const markdownCharacterLength = content.length;
 
@@ -197,7 +203,14 @@ export default function PublishingForm({ onSubmit, page }: Props) {
     try {
       const pageWithDetails = await charmClient.pages.getPage(page.id);
 
-      const content = await generateMarkdown(pageWithDetails, false, { members });
+      const content = await generateMarkdown(
+        {
+          content: pageWithDetails.content as PageContent,
+          title: pageWithDetails.title
+        },
+        false,
+        { members }
+      );
 
       if (!account) {
         throw new SystemError({
