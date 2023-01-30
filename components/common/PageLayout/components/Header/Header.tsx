@@ -27,15 +27,12 @@ import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
 import { useMemo, useRef, useState } from 'react';
-import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
 import { undoEventName } from 'components/common/CharmEditor/utils';
 import { usePostByPath } from 'components/forum/hooks/usePostByPath';
-import { usePostPermissions } from 'components/forum/hooks/usePostPermissions';
 import { useColorMode } from 'context/darkMode';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { useMembers } from 'hooks/useMembers';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
@@ -166,7 +163,6 @@ export default function Header({ open, openSidebar }: HeaderProps) {
   const router = useRouter();
   const colorMode = useColorMode();
   const { pages, updatePage, getPagePermissions, deletePage } = usePages();
-  const currentSpace = useCurrentSpace();
 
   const { user } = useUser();
   const theme = useTheme();
@@ -255,7 +251,11 @@ export default function Header({ open, openSidebar }: HeaderProps) {
 
   async function convertToProposal(pageId: string) {
     setPageMenuOpen(false);
-    await charmClient.pages.convertToProposal(pageId);
+    if (isForumPost) {
+      await charmClient.forum.convertToProposal(pageId);
+    } else {
+      await charmClient.pages.convertToProposal(pageId);
+    }
   }
 
   function closeMenu() {
@@ -420,7 +420,7 @@ export default function Header({ open, openSidebar }: HeaderProps) {
     );
   } else if (isForumPost && forumPostInfo.forumPost) {
     const postCreator = members.find((member) => member.id === forumPostInfo.forumPost?.createdBy);
-
+    const isPostCreator = postCreator?.id === user?.id;
     pageOptionsList = (
       <List data-test='forum-post-actions' dense>
         <CopyLinkMenuItem closeMenu={closeMenu} />
@@ -428,6 +428,24 @@ export default function Header({ open, openSidebar }: HeaderProps) {
         <DeleteMenuItem onClick={deletePost} disabled={!forumPostInfo.permissions?.delete_post} />
         <UndoMenuItem onClick={undoEditorChanges} disabled={!forumPostInfo?.permissions?.edit_post} />
         <ExportMarkdownMenuItem onClick={exportMarkdownPage} />
+        <Tooltip
+          title={!canCreateProposal || !isPostCreator ? 'You do not have the permission to convert to proposal' : ''}
+        >
+          <div>
+            <ListItemButton
+              onClick={() => forumPostInfo.forumPost && convertToProposal(forumPostInfo.forumPost.id)}
+              disabled={!canCreateProposal || !isPostCreator}
+            >
+              <TaskOutlinedIcon
+                fontSize='small'
+                sx={{
+                  mr: 1
+                }}
+              />
+              <ListItemText primary='Convert to proposal' />
+            </ListItemButton>
+          </div>
+        </Tooltip>
         <Divider />
         {forumPostInfo.forumPost && postCreator && (
           <>
