@@ -52,9 +52,20 @@ export function PostCommentForm({
 
   return (
     <Stack gap={1}>
-      <Box display='flex' gap={1} flexDirection='row' alignItems='flex-start'>
+      <Box
+        display='flex'
+        gap={1}
+        flexDirection='row'
+        alignItems='flex-start'
+        sx={{
+          'div.ProseMirror.bangle-editor': {
+            paddingLeft: '10px !important'
+          }
+        }}
+      >
         <UserDisplay user={user} hideName={true} />
         <CharmEditor
+          disableRowHandles
           disablePageSpecificFeatures
           colorMode='dark'
           style={{

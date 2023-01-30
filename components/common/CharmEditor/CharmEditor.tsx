@@ -115,8 +115,10 @@ export function charmEditorPlugins({
   userId = null,
   pageId = null,
   spaceId = null,
-  placeholderText
+  placeholderText,
+  disableRowHandles = false
 }: {
+  disableRowHandles?: boolean;
   spaceId?: string | null;
   pageId?: string | null;
   userId?: string | null;
@@ -243,11 +245,13 @@ export function charmEditorPlugins({
   ];
 
   if (!readOnly) {
-    basePlugins.push(
-      rowActions.plugins({
-        key: actionsPluginKey
-      })
-    );
+    if (!disableRowHandles) {
+      basePlugins.push(
+        rowActions.plugins({
+          key: actionsPluginKey
+        })
+      );
+    }
     basePlugins.push(placeholderPlugin(placeholderText));
   }
 
@@ -369,6 +373,7 @@ interface CharmEditorProps {
   onParticipantUpdate?: (participants: FrontendParticipant[]) => void;
   placeholderText?: string;
   focusOnInit?: boolean;
+  disableRowHandles?: boolean;
 }
 
 export function convertPageContentToMarkdown(content: PageContent, title?: string): string {
@@ -408,7 +413,8 @@ function CharmEditor({
   pagePermissions,
   placeholderText,
   focusOnInit,
-  onParticipantUpdate
+  onParticipantUpdate,
+  disableRowHandles = false
 }: CharmEditorProps) {
   const router = useRouter();
   const { showMessage } = useSnackbar();
@@ -491,6 +497,7 @@ function CharmEditor({
 
   function getPlugins() {
     return charmEditorPlugins({
+      disableRowHandles,
       onContentChange: (view: EditorView, prevDoc: Node) => {
         debouncedUpdate(view, prevDoc);
         sendPageEvent();
@@ -675,7 +682,7 @@ function CharmEditor({
       <MentionSuggest pluginKey={mentionPluginKey} />
       <NestedPagesList pluginKey={nestedPagePluginKey} />
       <EmojiSuggest pluginKey={emojiPluginKey} />
-      {!readOnly && <RowActionsMenu pluginKey={actionsPluginKey} />}
+      {!readOnly && !disableRowHandles && <RowActionsMenu pluginKey={actionsPluginKey} />}
       <InlineCommandPalette
         nestedPagePluginKey={nestedPagePluginKey}
         disableNestedPage={disableNestedPage}

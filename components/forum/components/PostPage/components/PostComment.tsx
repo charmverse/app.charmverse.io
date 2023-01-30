@@ -179,7 +179,14 @@ export function PostComment({
             left: 10
           }}
         />
-        <Box ml={3}>
+        <Box
+          ml={3}
+          sx={{
+            'div.ProseMirror.bangle-editor': {
+              paddingLeft: '10px !important'
+            }
+          }}
+        >
           {isEditingComment ? (
             <Stack>
               <CharmEditor
@@ -191,6 +198,7 @@ export function PostComment({
                   minHeight: 100,
                   left: 0
                 }}
+                disableRowHandles
                 focusOnInit
                 placeholderText='What are your thoughts?'
                 onContentChange={updateCommentContent}
@@ -217,6 +225,7 @@ export function PostComment({
                 left: 0,
                 paddingLeft: 0
               }}
+              disableRowHandles
               readOnly
               key={isEditingComment.toString()}
               content={commentContent.doc}
