@@ -101,25 +101,6 @@ export class WebSocketConnector {
       // path: '/api/socket'
     });
     this.createWSConnection();
-    this.init();
-  }
-
-  init() {
-    const warningText = 'You have unsaved changes. Please confirm changes.';
-    // Close the socket manually for now when the connection is lost. Sometimes the socket isn't closed on disconnection.
-    // const onOffline = () => this.ws?.close();
-    // this.listeners.onOffline = onOffline;
-    // window.addEventListener('offline', onOffline);
-    const handleWindowClose = (e: BeforeUnloadEvent) => {
-      if (this.messagesToSend.length === 0) return;
-      e.preventDefault();
-      (e || window.event).returnValue = warningText;
-      return warningText;
-    };
-
-    window.addEventListener('beforeunload', (e) => {
-      handleWindowClose(e);
-    });
   }
 
   // these methods are for testing
