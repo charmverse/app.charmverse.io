@@ -126,9 +126,7 @@ export class ModCollabDoc {
     const stateConfig: EditorStateConfig = {
       schema: this.mod.editor.schema,
       doc: stateDoc,
-      plugins: this.mod.editor.view.state.plugins.concat(plugins),
-      // if we dont include the selection, the first node gets selected for some reason
-      selection: this.mod.editor.view.state.selection
+      plugins: this.mod.editor.view.state.plugins.concat(plugins)
     };
 
     // Set document in prosemirror
