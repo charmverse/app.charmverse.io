@@ -27,13 +27,11 @@ import { setTitle } from 'hooks/usePageTitle';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
-import { defaultTemplate } from 'lib/spaces/utils';
 import isSpaceAdmin from 'lib/users/isSpaceAdmin';
 
 const schema = yup.object({
   name: yup.string().ensure().trim().min(3, 'Name must be at least 3 characters').required('Name is required'),
   spaceImage: yup.string().nullable(true),
-  spaceTemplateOption: yup.string().default(defaultTemplate),
   domain: yup.string()
 });
 
@@ -81,7 +79,7 @@ export default function WorkspaceSettings() {
     // reload with new subdomain
     const newDomain = space.domain !== values.domain;
     charmClient
-      .updateSpace({ ...space, ...values })
+      .updateSpace({ ...space, name: values.name, domain: values.domain, spaceImage: values.spaceImage })
       .then((updatedSpace) => {
         if (newDomain) {
           window.location.href = router.asPath.replace(space.domain, values.domain as string);
@@ -129,6 +127,7 @@ export default function WorkspaceSettings() {
               fullWidth
               error={!!errors.name}
               helperText={errors.name?.message}
+              data-test='set-space-name'
             />
           </Grid>
           <Grid item>
@@ -140,12 +139,13 @@ export default function WorkspaceSettings() {
               error={!!errors.domain}
               helperText={errors.domain?.message}
               sx={{ mb: 1 }}
+              data-test='set-space-domain'
             />
             {error && <FormHelperText error>{error}</FormHelperText>}
           </Grid>
           {isAdmin ? (
             <Grid item display='flex' justifyContent='space-between'>
-              <PrimaryButton disabled={!isDirty} type='submit'>
+              <PrimaryButton data-test='submit-space-update' disabled={!isDirty} type='submit'>
                 Save
               </PrimaryButton>
               <Button variant='outlined' color='error' onClick={deleteWorkspace}>

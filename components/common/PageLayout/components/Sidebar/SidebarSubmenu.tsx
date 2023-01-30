@@ -1,7 +1,6 @@
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import AddIcon from '@mui/icons-material/Add';
-import NavigateNextIcon from '@mui/icons-material/ArrowRightAlt';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import MenuOpenIcon from '@mui/icons-material/MenuOpen';
 import Box from '@mui/material/Box';
@@ -167,6 +166,7 @@ export default function SidebarSubmenu({
         open={spaceFormOpen}
         sx={{ width: showMobileFullWidthModal ? '100%' : undefined }}
         onClose={closeSpaceForm}
+        mobileDialog
       >
         <CreateSpaceForm onCancel={closeSpaceForm} />
       </Modal>
