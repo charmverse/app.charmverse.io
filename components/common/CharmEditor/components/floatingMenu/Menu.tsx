@@ -5,7 +5,11 @@ import React from 'react';
 
 import type { SubMenu } from './floating-menu';
 
-const StyledMenu = styled(Paper)<{ type?: SubMenu; noScroll?: boolean; inline?: boolean }>`
+const StyledMenu = styled(Paper, { shouldForwardProp: (prop: string) => prop !== 'noScroll' })<{
+  type?: SubMenu;
+  noScroll?: boolean;
+  inline?: boolean;
+}>`
   display: flex;
   padding: ${({ theme }) => theme.spacing(0, 0.5)};
   border-radius: 4px;

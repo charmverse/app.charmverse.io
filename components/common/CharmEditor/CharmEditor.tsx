@@ -339,6 +339,7 @@ export type UpdatePageContent = (content: ICharmEditorOutput) => any;
 
 interface CharmEditorProps {
   content?: PageContent;
+  autoFocus?: boolean;
   children?: ReactNode;
   enableSuggestingMode?: boolean;
   onContentChange?: UpdatePageContent;
@@ -379,6 +380,7 @@ function CharmEditor({
   pageActionDisplay = null,
   content = defaultContent,
   children,
+  autoFocus,
   onContentChange,
   style,
   readOnly = false,
@@ -531,6 +533,7 @@ function CharmEditor({
       onParticipantUpdate={onParticipantUpdate}
       trackChanges
       readOnly={readOnly}
+      focusOnInit={autoFocus}
       enableComments={enableComments}
       style={{
         ...(style ?? {}),

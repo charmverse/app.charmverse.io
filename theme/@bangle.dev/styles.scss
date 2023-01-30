@@ -2,26 +2,6 @@
   border-radius: 8px;
 }
 
-.bangle-editor .selected-node {
-  animation-duration: 0.75s;
-  animation-name: editorSelectedNode;
-  animation-timing-function: ease-out;
-}
-
-@keyframes editorSelectedNode {
-  from {
-    border-radius: 4px;
-    background-color: var(--editorCore-selectionChange-bgColor);
-  }
-
-  to {}
-}
-
-:root {
-  --window-tooltip-zIndex: 5;
-  --inlineUniversalPalette-height: 400px;
-}
-
 .bangle-tooltip {
   z-index: var(--z-index-modal);
 }
@@ -30,15 +10,10 @@
   text-decoration: underline;
 }
 
-.bangle-editor p > code {}
-
 .bangle-editor li[data-bangle-is-todo] > span:first-child > input {
   margin-top: 0.45rem;
 }
 
-.bangle-editor .ProseMirror-selectednode {
-  border-radius: var(--window-pill-borderRadius);
-}
 
 .bangle-editor {
   border: none;
@@ -151,16 +126,14 @@
   /* the above doesn't seem to work in Edge */
 }
 
-.ProseMirror-hideselection *::selection {
-  background: transparent;
-}
-
-.ProseMirror-hideselection *::-moz-selection {
-  background: transparent;
+.ProseMirror-hideselection *::selection,
+.ProseMirror-hideselection *::-moz-selection,
+.ProseMirror-hideselection .ProseMirror-selectednode {
+  background-color: transparent !important;
 }
 
 .ProseMirror-hideselection {
-  caret-color: transparent;
+  caret-color: transparent !important;
 }
 
 /* Protect against generic img rules */
@@ -548,7 +521,7 @@ details {
   // add a width so that icons are left-aligned even if counts get large
   width: 40px;
 
-  @media (min-width: 600px)  {
+  @media (min-width: 600px) {
     right: -70px;
   }
 
