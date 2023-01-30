@@ -8,8 +8,8 @@ import type { Card } from 'lib/focalboard/card';
 
 import mutator from '../mutator';
 import { OctoUtils } from '../octoUtils';
-import Editable from '../widgets/editable';
 import Switch from '../widgets/switch';
+import { TextInput } from '../widgets/TextInput';
 
 import CreatedAt from './properties/createdAt/createdAt';
 import CreatedBy from './properties/createdBy/createdBy';
@@ -137,6 +137,7 @@ function PropertyValueElement(props: Props): JSX.Element {
         onSave={() => {
           mutator.changePropertyValue(card, propertyTemplate.id, value);
         }}
+        multiline={displayType === 'details'}
         onCancel={() => setValue(propertyValue || '')}
         validator={(newValue) => validateProp(propertyTemplate.type, newValue)}
       />
@@ -163,24 +164,24 @@ function PropertyValueElement(props: Props): JSX.Element {
   }
 
   if (editableFields.includes(propertyTemplate.type)) {
-    if (!readOnly) {
-      return (
-        <Editable
-          className='octo-propertyvalue'
-          placeholderText={emptyDisplayValue}
-          value={value.toString()}
-          autoExpand={false}
-          onChange={setValue}
-          onSave={() => {
-            mutator.changePropertyValue(card, propertyTemplate.id, value);
-          }}
-          onCancel={() => setValue(propertyValue || '')}
-          validator={(newValue) => validateProp(propertyTemplate.type, newValue)}
-          spellCheck={propertyTemplate.type === 'text'}
-        />
-      );
-    }
-    return <div className='octo-propertyvalue octo-propertyvalue--readonly'>{displayValue}</div>;
+    return (
+      <TextInput
+        className='octo-propertyvalue'
+        placeholderText={emptyDisplayValue}
+        readOnly={readOnly}
+        value={value.toString()}
+        autoExpand={false}
+        onChange={setValue}
+        multiline={true}
+        maxRows={displayType === 'details' ? undefined : 1}
+        onSave={() => {
+          mutator.changePropertyValue(card, propertyTemplate.id, value);
+        }}
+        onCancel={() => setValue(propertyValue || '')}
+        validator={(newValue) => validateProp(propertyTemplate.type, newValue)}
+        spellCheck={propertyTemplate.type === 'text'}
+      />
+    );
   }
   return <div className='octo-propertyvalue'>{finalDisplayValue}</div>;
 }

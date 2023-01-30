@@ -11,7 +11,6 @@ import { useState } from 'react';
 import reactDOM from 'react-dom';
 
 import Button from 'components/common/Button';
-import { useSnackbar } from 'hooks/useSnackbar';
 import type { IPagePermissionFlags } from 'lib/permissions/pages';
 
 import { InlineCommentSubMenu } from '../inlineComment/inlineComment.components';
@@ -66,7 +65,6 @@ function MenuByType(props: MenuProps) {
     disableNestedPage
   } = props;
   const { type } = usePluginState(props.pluginKey) as { type: SubMenu };
-  const { showMessage } = useSnackbar();
 
   const popupState = usePopupState({ variant: 'popover', popupId: 'commands-menu' });
   const displayInlineCommentButton = !inline && pagePermissions?.comment && enableComments;
@@ -89,7 +87,7 @@ function MenuByType(props: MenuProps) {
 
   if (type === 'defaultMenu') {
     return (
-      <Menu hideMenu={hideMenu} type={type}>
+      <Menu hideMenu={hideMenu} type={type} inline={inline}>
         {!inline && palettePluginKey && (
           <MenuGroup>
             <Tooltip title={<Typography component='div'>Turn into</Typography>}>
@@ -110,7 +108,8 @@ function MenuByType(props: MenuProps) {
               nestedPagePluginKey={nestedPagePluginKey}
               disableNestedPage={disableNestedPage}
               externalPopupState={popupState}
-              size='small'
+              filterItem={(item) => !!item.showInFloatingMenu}
+              isFloatingMenuList={true}
               handleActiveItem={handleActiveItem}
             />
           </MenuGroup>
@@ -154,7 +153,7 @@ function MenuByType(props: MenuProps) {
 
   if (type === 'inlineCommentSubMenu' && !inline) {
     return (
-      <Menu hideMenu={hideMenu}>
+      <Menu hideMenu={hideMenu} type={type} noScroll>
         <InlineCommentSubMenu pluginKey={pluginKey} />
       </Menu>
     );

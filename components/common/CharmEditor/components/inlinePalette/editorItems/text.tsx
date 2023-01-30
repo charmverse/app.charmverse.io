@@ -5,6 +5,7 @@ import ArrowForwardIcon from '@mui/icons-material/ArrowForwardIos';
 import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
 import ChatOutlinedIcon from '@mui/icons-material/ChatOutlined';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
+import EmojiEmotionsOutlinedIcon from '@mui/icons-material/EmojiEmotionsOutlined';
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import FormatListNumberedIcon from '@mui/icons-material/FormatListNumbered';
 import HorizontalRuleIcon from '@mui/icons-material/HorizontalRule';
@@ -103,6 +104,7 @@ export function items(props: ItemsProps): PaletteItemTypeNoGroup[] {
         />
       ),
       description: 'Create a plain text block',
+      showInFloatingMenu: true,
       editorExecuteCommand: ({ palettePluginKey }) => {
         return (state, dispatch, view) => {
           rafCommandExec(view!, (_state, _dispatch, _view) => {
@@ -135,6 +137,7 @@ export function items(props: ItemsProps): PaletteItemTypeNoGroup[] {
       ),
       keywords: ['todo', 'lists', 'checkbox', 'checked'],
       description: 'Create a todo list',
+      showInFloatingMenu: true,
       editorExecuteCommand: ({ palettePluginKey }) => {
         return (state, dispatch, view) => {
           rafCommandExec(view!, (_state, _dispatch, _view) => {
@@ -164,6 +167,7 @@ export function items(props: ItemsProps): PaletteItemTypeNoGroup[] {
         ),
         title: `Heading ${level}`,
         description: `Create a heading level ${level}`,
+        showInFloatingMenu: true,
         disabled: (state) => {
           const result = isList()(state);
           return result;
@@ -233,6 +237,7 @@ export function items(props: ItemsProps): PaletteItemTypeNoGroup[] {
       ),
       keywords: ['unordered', 'lists'],
       description: 'Create a simple bulleted list',
+      showInFloatingMenu: true,
       editorExecuteCommand: ({ palettePluginKey }) => {
         return (state, dispatch, view) => {
           rafCommandExec(view!, (_state, _dispatch, _view) => {
@@ -255,6 +260,7 @@ export function items(props: ItemsProps): PaletteItemTypeNoGroup[] {
       title: 'Ordered List',
       keywords: ['numbered', 'lists'],
       description: 'Create an ordered list',
+      showInFloatingMenu: true,
       editorExecuteCommand: ({ palettePluginKey }) => {
         return (state, dispatch, view) => {
           rafCommandExec(view!, (_state, _dispatch, _view) => {
@@ -271,6 +277,7 @@ export function items(props: ItemsProps): PaletteItemTypeNoGroup[] {
       title: 'Toggle List/Heading',
       keywords: ['summary', 'disclosure', 'toggle', 'collapse'],
       description: 'Insert a summary and content',
+      showInFloatingMenu: true,
       editorExecuteCommand: ({ palettePluginKey }) => {
         return (state, dispatch, view) => {
           rafCommandExec(view!, (_state, _dispatch) => {
@@ -318,6 +325,7 @@ export function items(props: ItemsProps): PaletteItemTypeNoGroup[] {
         />
       ),
       description: 'Insert a quote in the line below',
+      showInFloatingMenu: true,
       editorExecuteCommand: ({ palettePluginKey }) => {
         return (state, dispatch, view) => {
           rafCommandExec(view!, (_state, _dispatch) => {
@@ -403,6 +411,7 @@ export function items(props: ItemsProps): PaletteItemTypeNoGroup[] {
         />
       ),
       description: 'Insert a callout block in the line below',
+      showInFloatingMenu: true,
       editorExecuteCommand: ({ palettePluginKey }) => {
         return (state, dispatch, view) => {
           rafCommandExec(view!, (_state, _dispatch) => {
@@ -422,6 +431,35 @@ export function items(props: ItemsProps): PaletteItemTypeNoGroup[] {
               return true;
             }
             return insertNode(_state, _dispatch, node);
+          });
+          return replaceSuggestionMarkWith(palettePluginKey, '')(state, dispatch, view);
+        };
+      }
+    },
+    {
+      uid: 'emoji',
+      title: 'Emoji',
+      icon: (
+        <EmojiEmotionsOutlinedIcon
+          sx={{
+            fontSize: iconSize
+          }}
+        />
+      ),
+      description: 'Search for an emoji to place in text',
+      showInFloatingMenu: false,
+      editorExecuteCommand: ({ palettePluginKey }) => {
+        return (state, dispatch, view) => {
+          rafCommandExec(view!, () => {
+            if (view) {
+              const { schema, tr, selection } = view.state;
+              const markName = 'emojiSuggest';
+              const mark = schema.mark(markName, { trigger: ':' });
+              const marks = selection.$from.marks();
+              view.dispatch(tr.replaceSelectionWith(schema.text(':', [mark, ...marks]), false));
+              return true;
+            }
+            return true;
           });
           return replaceSuggestionMarkWith(palettePluginKey, '')(state, dispatch, view);
         };

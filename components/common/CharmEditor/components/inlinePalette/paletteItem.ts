@@ -39,6 +39,7 @@ export interface PaletteItemTypeNoGroup {
   editorExecuteCommand: EditorExecuteCommand;
   skipFiltering?: boolean;
   _isItemDisabled?: boolean;
+  showInFloatingMenu?: boolean; // make it appear in the floating menu to convert highlighted text
   icon?: JSX.Element | null | undefined;
 }
 
@@ -73,6 +74,8 @@ export class PaletteItem implements PaletteItemType {
 
   skipFiltering: boolean;
 
+  showInFloatingMenu?: boolean; // make it appear in the floating menu to convert highlighted text
+
   icon?: JSX.Element | null | undefined;
 
   keybinding?: string;
@@ -92,6 +95,7 @@ export class PaletteItem implements PaletteItemType {
       editorExecuteCommand,
       group,
       skipFiltering,
+      showInFloatingMenu,
       icon,
       ...otherKeys
     } = obj;
@@ -118,5 +122,6 @@ export class PaletteItem implements PaletteItemType {
     this.skipFiltering = skipFiltering ?? false;
     this._isItemDisabled = false;
     this.icon = icon;
+    this.showInFloatingMenu = showInFloatingMenu;
   }
 }

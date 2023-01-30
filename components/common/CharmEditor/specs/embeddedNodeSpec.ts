@@ -10,6 +10,7 @@ export function embeddedNodeSpec(_spec: EmbeddedSpecProps): RawSpecs {
     name: _spec.name,
     markdown: _spec.markdown,
     schema: {
+      atom: true,
       group: 'block',
       inline: false,
       draggable: false,

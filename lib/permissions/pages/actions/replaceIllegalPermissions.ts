@@ -1,14 +1,14 @@
 import type { PagePermission, Prisma } from '@prisma/client';
 
-import type { OptionalTransaction, Transaction, TransactionClient } from 'db';
+import type { OptionalTransaction, TransactionClient } from 'db';
 import { prisma } from 'db';
+import log from 'lib/log';
 import type {
   IPageWithPermissions,
   PageNodeWithChildren,
   PageNodeWithPermissions,
   TargetPageTree
 } from 'lib/pages/interfaces';
-import { TargetPageTreeWithFlatChildren } from 'lib/pages/interfaces';
 import { flattenTree } from 'lib/pages/mapPageTree';
 import { getPage } from 'lib/pages/server';
 import { resolvePageTree } from 'lib/pages/server/resolvePageTree';
@@ -23,19 +23,18 @@ import { hasSameOrMorePermissions } from './has-same-or-more-permissions';
 export function generateReplaceIllegalPermissions({ parents, targetPage }: TargetPageTree<PageNodeWithPermissions>): {
   updateManyOperations: Prisma.PagePermissionUpdateManyArgs[];
 } {
-  const parentMap = parents.reduce((acc, parent, index) => {
+  const parentMap = parents.reduce<Record<string, number>>((acc, parent, index) => {
     acc[parent.id] = index;
     return acc;
-  }, {} as Record<string, number>);
+  }, {});
 
   const illegalPermissionMap: Record<string, PagePermission> = {};
 
   targetPage.permissions.forEach((permission) => {
-    const isInherited = isTruthy(permission.sourcePermission);
+    const sourcePermission = permission.sourcePermission;
 
-    if (isInherited && !parentMap[(permission.sourcePermission as PagePermission).pageId]) {
-      illegalPermissionMap[permission.inheritedFromPermission as string] =
-        permission.sourcePermission as PagePermission;
+    if (permission.inheritedFromPermission && sourcePermission && !parentMap[sourcePermission.pageId]) {
+      illegalPermissionMap[permission.inheritedFromPermission] = sourcePermission;
     }
   });
 
@@ -65,16 +64,27 @@ export function generateReplaceIllegalPermissions({ parents, targetPage }: Targe
     if (parents.length === 0) {
       const contaminatedTargetPagePermission = targetPage.permissions.find(
         (p) => p.inheritedFromPermission === illegalPermissionRef
-      ) as PagePermission;
+      );
 
-      pagePermissionsToDisconnect.push({
-        id: targetPage.permissions.find((p) => p.inheritedFromPermission === illegalPermissionRef)?.id
-      });
+      const permissionId = targetPage.permissions.find((p) => p.inheritedFromPermission === illegalPermissionRef)?.id;
+      if (permissionId) {
+        pagePermissionsToDisconnect.push({
+          id: permissionId
+        });
+      } else {
+        log.warn('Skip page permission to disconnect as it was not found', {
+          permissions: targetPage.permissions,
+          permissionId,
+          illegalPermissionRef
+        });
+      }
 
-      oldNewMap.push({
-        oldSourcePermissionId: illegalPermissionRef,
-        newSourcePermissionId: contaminatedTargetPagePermission.id
-      });
+      if (contaminatedTargetPagePermission) {
+        oldNewMap.push({
+          oldSourcePermissionId: illegalPermissionRef,
+          newSourcePermissionId: contaminatedTargetPagePermission.id
+        });
+      }
 
       // Exceptionally adding a continue statement as the following nested for loop is quite long
       // eslint-disable-next-line no-continue
@@ -94,10 +104,7 @@ export function generateReplaceIllegalPermissions({ parents, targetPage }: Targe
 
         // Make sure the parent will have a permission to inherit from
         // This logic was added to deal with an edge case where a page had an extra permission from an old parent which became a sibling, and the parent did not have this permission
-        const newParentPermissionRef = findExistingPermissionForGroup(
-          illegalSourcePagePermission,
-          parent.permissions
-        ) as PagePermission;
+        const newParentPermissionRef = findExistingPermissionForGroup(illegalSourcePagePermission, parent.permissions);
 
         if (canInherit && newParentPermissionRef) {
           oldNewMap.push({
@@ -109,14 +116,18 @@ export function generateReplaceIllegalPermissions({ parents, targetPage }: Targe
             pageId: targetPage.id,
             inheritedFromPermission: illegalPermissionRef
           });
-          const newPermissionRef = findExistingPermissionForGroup(
-            illegalSourcePagePermission,
-            targetPage.permissions
-          ) as PagePermission;
-          oldNewMap.push({
-            oldSourcePermissionId: illegalPermissionRef,
-            newSourcePermissionId: newPermissionRef.id as string
-          });
+          const newPermissionRef = findExistingPermissionForGroup(illegalSourcePagePermission, targetPage.permissions);
+          if (newPermissionRef) {
+            oldNewMap.push({
+              oldSourcePermissionId: illegalPermissionRef,
+              newSourcePermissionId: newPermissionRef.id
+            });
+          } else {
+            log.warn('Skip page permission to disconnect as it was not found', {
+              permissions: targetPage.permissions,
+              permission: illegalSourcePagePermission
+            });
+          }
         }
 
         break;
@@ -129,15 +140,14 @@ export function generateReplaceIllegalPermissions({ parents, targetPage }: Targe
 
         if (canInherit) {
           // Find the new source permission
-          const newPermissionRef = findExistingPermissionForGroup(
-            illegalSourcePagePermission,
-            parent.permissions
-          ) as PagePermission;
+          const newPermissionRef = findExistingPermissionForGroup(illegalSourcePagePermission, parent.permissions);
 
-          oldNewMap.push({
-            oldSourcePermissionId: illegalPermissionRef,
-            newSourcePermissionId: newPermissionRef.id
-          });
+          if (newPermissionRef) {
+            oldNewMap.push({
+              oldSourcePermissionId: illegalPermissionRef,
+              newSourcePermissionId: newPermissionRef.id
+            });
+          }
         } else {
           pagePermissionsToDisconnect.push({
             pageId: previousParent.id,
@@ -146,11 +156,13 @@ export function generateReplaceIllegalPermissions({ parents, targetPage }: Targe
           const newPermissionRef = findExistingPermissionForGroup(
             illegalSourcePagePermission,
             previousParent.permissions
-          ) as PagePermission;
-          oldNewMap.push({
-            oldSourcePermissionId: illegalPermissionRef,
-            newSourcePermissionId: newPermissionRef.id as string
-          });
+          );
+          if (newPermissionRef) {
+            oldNewMap.push({
+              oldSourcePermissionId: illegalPermissionRef,
+              newSourcePermissionId: newPermissionRef.id
+            });
+          }
         }
 
         break;
@@ -161,14 +173,18 @@ export function generateReplaceIllegalPermissions({ parents, targetPage }: Targe
           pageId: parent.id,
           inheritedFromPermission: illegalPermissionRef
         });
-        const newPermissionRef = findExistingPermissionForGroup(
-          illegalSourcePagePermission,
-          parent.permissions
-        ) as PagePermission;
-        oldNewMap.push({
-          oldSourcePermissionId: illegalPermissionRef,
-          newSourcePermissionId: newPermissionRef.id as string
-        });
+        const newPermissionRef = findExistingPermissionForGroup(illegalSourcePagePermission, parent.permissions);
+        if (newPermissionRef) {
+          oldNewMap.push({
+            oldSourcePermissionId: illegalPermissionRef,
+            newSourcePermissionId: newPermissionRef.id
+          });
+        } else {
+          log.warn('Skip page permission to disconnect as it was not found', {
+            permissions: parent.permissions,
+            permission: illegalSourcePagePermission
+          });
+        }
       }
     }
   }
@@ -251,7 +267,10 @@ export async function replaceIllegalPermissions({
       await tx.pagePermission.updateMany(op);
     }
 
-    const pageAfterPermissionsUpdate = (await getPage(pageId, undefined, tx)) as IPageWithPermissions;
+    const pageAfterPermissionsUpdate = await getPage(pageId, undefined, tx);
+    if (!pageAfterPermissionsUpdate) {
+      throw new Error(`Could not find page after updating permissions: ${pageId}`);
+    }
 
     const { parents: newParents, targetPage: newTargetPage } = await resolvePageTree({
       pageId,

@@ -11,7 +11,6 @@ import { MIN_EMBED_HEIGHT } from './config';
 import type { IframeNodeAttrs } from './config';
 import { name } from './iframeSpec';
 import { extractIframeProps, extractEmbedType } from './utils';
-
 // inject a tweet node when pasting twitter url
 
 export function plugins() {
@@ -36,13 +35,18 @@ export function plugins() {
           }
           const props = extractIframeProps(text);
           if (props) {
-            const { src, height } = props;
+            const { src, height, width } = props;
             if (extractYoutubeLinkType(src)) {
               const attrs: Partial<VideoNodeAttrs> = { src };
               insertNode(videoName, view.state, view.dispatch, view, attrs);
             } else {
               const embedType = extractEmbedType(src);
-              const attrs: Partial<IframeNodeAttrs> = { src, height: height ?? MIN_EMBED_HEIGHT, type: embedType };
+              const attrs: Partial<IframeNodeAttrs> = {
+                src,
+                height: height ?? MIN_EMBED_HEIGHT,
+                width: width || undefined,
+                type: embedType
+              };
               insertNode(name, view.state, view.dispatch, view, attrs);
             }
             return true;

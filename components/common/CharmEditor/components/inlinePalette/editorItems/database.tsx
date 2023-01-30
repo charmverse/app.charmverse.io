@@ -41,7 +41,7 @@ export function items({
               rafCommandExec(view, (_state, _dispatch) => {
                 // The page must be created before the node can be created
                 addPage({
-                  type: 'inline_board',
+                  type: 'inline_linked_board',
                   parentId: currentPageId,
                   spaceId: space.id,
                   createdBy: userId
@@ -89,7 +89,7 @@ export function items({
     uid: 'database-linked',
     title: 'Linked view of database',
     icon: <DatabaseIcon sx={{ fontSize: iconSize }} />,
-    description: 'Embed a view from an existing board',
+    description: 'Insert a view from an existing board',
     editorExecuteCommand: ({ palettePluginKey }) => {
       return (state, dispatch, view) => {
         // Execute the animation

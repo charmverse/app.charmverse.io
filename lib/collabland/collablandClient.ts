@@ -133,11 +133,13 @@ export async function canJoinSpaceViaDiscord({
 }
 
 export async function getGuildRoles(discordServerId: string) {
-  return fetch<ExternalRole[]>(`${DOMAIN}/discord/${discordServerId}/roles`, {
+  const allRoles = await fetch<ExternalRole[]>(`${DOMAIN}/discord/${discordServerId}/roles`, {
     headers: {
       Accept: 'application/json',
       'Content-Type': 'application/json',
       'X-API-KEY': API_KEY
     }
   });
+  // filter out irrelevant roles
+  return allRoles.filter((role) => role.name !== '@everyone' && !role.managed);
 }

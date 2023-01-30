@@ -15,6 +15,7 @@ import { CenteredPageContent } from 'components/common/PageLayout/components/Pag
 import { usePostDialog } from 'components/forum/components/PostDialog/hooks/usePostDialog';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useForumCategories } from 'hooks/useForumCategories';
+import { usePageTitle } from 'hooks/usePageTitle';
 import type { PostSortOption } from 'lib/forums/posts/constants';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
@@ -33,8 +34,14 @@ export function ForumPage() {
   const [showNewPostForm, setShowNewPostForm] = useState(false);
   const { showPost } = usePostDialog();
   const { categories } = useForumCategories();
-
+  const [, setTitle] = usePageTitle();
   const [currentCategory, setCurrentCategory] = useState<PostCategory | null>(null);
+
+  useEffect(() => {
+    if (currentCategory?.name) {
+      setTitle(currentCategory.name);
+    }
+  }, [currentCategory?.name]);
 
   useEffect(() => {
     setCategoryFromPath();
@@ -124,9 +131,9 @@ export function ForumPage() {
   }, [debounceSearch]);
 
   return (
-    <CenteredPageContent>
+    <CenteredPageContent style={{ width: 1100 }}>
       <Typography variant='h1' mb={2}>
-        {`${currentCategory ? `${currentCategory?.name} - ` : ''}Forum`}
+        {currentCategory ? currentCategory?.name : 'All categories'}
       </Typography>
 
       <TextField
@@ -143,9 +150,16 @@ export function ForumPage() {
           )
         }}
       />
-      <Grid container spacing={2}>
-        <Grid item xs={12} lg={9}>
-          <Box display={{ lg: 'none' }}>
+      <Box display='flex' gap={4}>
+        <Box
+          sx={{
+            width: {
+              xs: '100%',
+              md: 640
+            }
+          }}
+        >
+          <Box display={{ md: 'none' }}>
             <CategorySelect
               selectedCategoryId={currentCategory?.id}
               selectedSort={sort}
@@ -167,16 +181,16 @@ export function ForumPage() {
           ) : (
             <ForumPostList search={search} categoryId={currentCategory?.id} sort={sort} />
           )}
-        </Grid>
-        <Grid item xs={12} lg={3} display={{ xs: 'none', lg: 'initial' }}>
+        </Box>
+        <Box flexGrow={1} display={{ xs: 'none', md: 'initial' }}>
           <CategoryMenu
             handleCategory={handleCategoryUpdate}
             handleSort={handleSortUpdate}
             selectedSort={sort}
             selectedCategoryId={currentCategory?.id}
           />
-        </Grid>
-      </Grid>
+        </Box>
+      </Box>
     </CenteredPageContent>
   );
 }

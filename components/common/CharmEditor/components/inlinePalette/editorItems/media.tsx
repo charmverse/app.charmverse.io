@@ -47,6 +47,7 @@ export function items(): PaletteItemTypeNoGroup[] {
       title: 'Video',
       icon: <VideoLibraryIcon sx={{ fontSize: iconSize }} />,
       description: 'Insert a video block',
+      keywords: ['youtube'],
       editorExecuteCommand: ({ palettePluginKey }) => {
         return (state, dispatch, view) => {
           if (view) {

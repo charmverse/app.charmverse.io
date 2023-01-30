@@ -13,7 +13,7 @@ import debounce from 'lodash/debounce';
 import throttle from 'lodash/throttle';
 import { useRouter } from 'next/router';
 import type { CSSProperties, ReactNode } from 'react';
-import { memo, useCallback, useEffect, useRef, useState } from 'react';
+import { memo, useEffect, useRef, useState } from 'react';
 import { useSWRConfig } from 'swr';
 
 import charmClient from 'charmClient';
@@ -517,15 +517,6 @@ function CharmEditor({
       color: 'var(--charmeditor-active)'
     }
   });
-
-  const onResizeStop = useCallback(
-    (view: EditorView) => {
-      // Save the current embed size on the backend after we are done resizing
-      debouncedUpdate(view);
-    },
-    [debouncedUpdate]
-  );
-
   useEffect(() => {
     if (editorRef.current) {
       const highlightedMentionId = router.query.mentionId;
@@ -577,7 +568,6 @@ function CharmEditor({
       renderNodeViews={({ children: _children, ...props }) => {
         const allProps: CharmNodeViewProps = {
           ...props,
-          onResizeStop,
           pageId,
           readOnly,
           deleteNode: () => {
@@ -643,7 +633,7 @@ function CharmEditor({
             return <Mention {...props}>{_children}</Mention>;
           }
           case 'page': {
-            return <NestedPage {...props} />;
+            return <NestedPage currentPageId={pageId} {...props} />;
           }
           case 'pdf': {
             return <ResizablePDF {...allProps} />;

@@ -1,7 +1,7 @@
 generator client {
   provider        = "prisma-client-js"
-  binaryTargets   = ["linux-musl", "darwin", "native"]
-  previewFeatures = ["interactiveTransactions", "fullTextSearch", "extendedWhereUnique"]
+  binaryTargets   = ["debian-openssl-1.1.x", "linux-musl", "darwin", "native"]
+  previewFeatures = ["fullTextSearch", "extendedWhereUnique"]
 }
 
 datasource db {
@@ -186,6 +186,8 @@ enum MemberPropertyType {
   twitter
   bio
   join_date
+  linked_in
+  github
 }
 
 enum MemberPropertyPermissionLevel {
@@ -433,6 +435,7 @@ model User {
   spacesCreated        Space[]
   spacePermissions     SpacePermission[]
   spaceRoles           SpaceRole[]
+  spacesOrder          String[]
   telegramUser         TelegramUser?
   threads              Thread[]
   profile              UserDetails?
@@ -1050,7 +1053,6 @@ model Post {
   @@index([path])
   @@index([spaceId, deletedAt]) // space feed
   @@index([spaceId, deletedAt, categoryId]) // category feed
-  @@index([spaceId, deletedAt, categoryId, title, contentText]) // search results
 }
 
 model PostUpDownVote {

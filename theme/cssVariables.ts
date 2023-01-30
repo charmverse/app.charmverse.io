@@ -21,6 +21,7 @@ const globalCSS = css`
     --input-bg: ${colors.inputBackground};
     --input-border: ${colors.inputBorder};
     --input-border-hover: #37352f;
+    --button-text-hover: var(--input-bg);
     --primary-color: ${colors.blueColor};
     --primary-text: ${colors.primaryTextColor};
     --secondary-text: ${colors.secondaryTextColor};
@@ -51,6 +52,8 @@ const globalCSS = css`
     --background-dark: ${colors.backgroundDarkColor};
     --background-light: ${colors.backgroundLightColor};
 
+    --link-underline: ${colors.linkUnderlineColor};
+
     --charmeditor-active: rgba(46, 170, 220, 0.2);
 
     --page-layout-pb: 180px;
@@ -80,6 +83,7 @@ const globalCSS = css`
     --background-paper: ${colors.backgroundLightColorDarkMode};
     --background-dark: ${colors.backgroundDarkColorDarkMode};
     --background-light: ${colors.backgroundLightColorDarkMode};
+    --link-underline: ${colors.linkUnderlineColorDarkMode};
   }
 `;
 

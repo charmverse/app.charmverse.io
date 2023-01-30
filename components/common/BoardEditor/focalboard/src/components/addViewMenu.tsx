@@ -1,13 +1,13 @@
 /* eslint-disable no-unused-expressions */
 
 import { Add } from '@mui/icons-material';
-import { IconButton } from '@mui/material';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import type { SxProps } from '@mui/system';
-import { usePopupState, bindMenu, bindTrigger } from 'material-ui-popup-state/hooks';
+import { usePopupState, bindMenu } from 'material-ui-popup-state/hooks';
+import type { MouseEvent } from 'react';
 import { useCallback } from 'react';
 import { injectIntl } from 'react-intl';
 import type { IntlShape } from 'react-intl';
@@ -22,6 +22,7 @@ import { createBoardView } from 'lib/focalboard/boardView';
 import { Constants } from '../constants';
 import mutator from '../mutator';
 import { Utils } from '../utils';
+import IconButton from '../widgets/buttons/iconButton';
 import BoardIcon from '../widgets/icons/board';
 import CalendarIcon from '../widgets/icons/calendar';
 import GalleryIcon from '../widgets/icons/gallery';
@@ -35,7 +36,8 @@ type AddViewProps = {
   showLabel?: boolean;
   showView: (viewId: string) => void;
   sx?: SxProps;
-  onClick?: () => void;
+  onClickIcon?: () => void; // override the icon click
+  onClose?: () => void;
 };
 
 function AddViewMenu(props: AddViewProps) {
@@ -85,7 +87,7 @@ function AddViewMenu(props: AddViewProps) {
         oldViewId && showView(oldViewId);
       }
     );
-    popupState.close();
+    closePopup();
   }, [props.activeView, props.board, props.intl, showView]);
 
   const handleAddViewTable = useCallback(() => {
@@ -112,7 +114,7 @@ function AddViewMenu(props: AddViewProps) {
         oldViewId && showView(oldViewId);
       }
     );
-    popupState.close();
+    closePopup();
   }, [props.activeView, props.board, props.intl, showView]);
 
   const handleAddViewGallery = useCallback(() => {
@@ -143,7 +145,7 @@ function AddViewMenu(props: AddViewProps) {
         oldViewId && showView(oldViewId);
       }
     );
-    popupState.close();
+    closePopup();
   }, [props.board, props.activeView, props.intl, showView]);
 
   const handleAddViewCalendar = useCallback(() => {
@@ -179,44 +181,58 @@ function AddViewMenu(props: AddViewProps) {
         oldViewId && showView(oldViewId);
       }
     );
-    popupState.close();
+    closePopup();
   }, [props.board, props.activeView, props.intl, showView]);
 
-  const triggers = props.onClick ? { onClick: props.onClick } : bindTrigger(popupState);
+  function onClickIcon(e: MouseEvent) {
+    if (props.onClickIcon) {
+      props.onClickIcon();
+      closePopup();
+    } else {
+      popupState.open(e);
+    }
+  }
+
+  function closePopup() {
+    popupState.close();
+    props.onClose?.();
+  }
 
   return (
     <>
       {props.showLabel ? (
-        <Button {...triggers} color='secondary' size='small' startIcon={<Add />} variant='text'>
+        <Button onClick={onClickIcon} color='secondary' size='small' startIcon={<Add />} variant='text'>
           Add view
         </Button>
       ) : (
-        <IconButton {...triggers} color='secondary' size='small'>
-          <Add fontSize='small' />
-        </IconButton>
+        <IconButton
+          style={{ width: 28, height: 28 }}
+          onClick={onClickIcon}
+          icon={<Add color='secondary' fontSize='small' />}
+        />
       )}
       <Menu {...bindMenu(popupState)}>
         <MenuItem dense onClick={handleAddViewBoard}>
           <ListItemIcon>
-            <BoardIcon />
+            <BoardIcon fontSize='small' />
           </ListItemIcon>
           <ListItemText>{boardText}</ListItemText>
         </MenuItem>
         <MenuItem dense onClick={handleAddViewTable}>
           <ListItemIcon>
-            <TableIcon />
+            <TableIcon fontSize='small' />
           </ListItemIcon>
           <ListItemText>{tableText}</ListItemText>
         </MenuItem>
         <MenuItem dense onClick={handleAddViewGallery}>
           <ListItemIcon>
-            <GalleryIcon />
+            <GalleryIcon fontSize='small' />
           </ListItemIcon>
           <ListItemText>{galleryText}</ListItemText>
         </MenuItem>
         <MenuItem dense onClick={handleAddViewCalendar}>
           <ListItemIcon>
-            <CalendarIcon />
+            <CalendarIcon fontSize='small' />
           </ListItemIcon>
           <ListItemText>Calendar</ListItemText>
         </MenuItem>

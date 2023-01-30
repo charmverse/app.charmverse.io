@@ -10,16 +10,20 @@ import useIsAdmin from 'hooks/useIsAdmin';
 import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { PagesMap } from 'lib/pages';
+import { SystemError } from 'lib/utilities/errors';
 
-export function ImportZippedMarkdown() {
+type Props = {
+  onFile?: (file: File) => void;
+};
+
+export function ImportZippedMarkdown({ onFile }: Props) {
   const space = useCurrentSpace();
   const { mutatePagesList } = usePages();
   const [uploading, setIsUploading] = useState(false);
   const { showMessage } = useSnackbar();
   const isAdmin = useIsAdmin();
 
-  const { inputRef, onFileChange, openFilePicker } = useFilePicker((file) => {
-    setIsUploading(true);
+  async function defaultFileUploadSuccess(file: File) {
     charmClient.file
       .uploadZippedMarkdown({
         spaceId: space!.id,
@@ -32,11 +36,19 @@ export function ImportZippedMarkdown() {
           return acc;
         }, {} as PagesMap);
         mutatePagesList(pageMap);
-      })
-      .catch((err) => {
-        showMessage(err.message, err.severity ?? 'error');
-      })
-      .finally(() => setIsUploading(false));
+      });
+  }
+
+  const { inputRef, onFileChange, openFilePicker } = useFilePicker(async (file) => {
+    setIsUploading(true);
+
+    try {
+      await (onFile ? onFile(file) : defaultFileUploadSuccess(file));
+    } catch (err: any) {
+      showMessage(err.message, err.severity ?? 'error');
+    } finally {
+      setIsUploading(false);
+    }
   });
 
   return (
@@ -47,7 +59,8 @@ export function ImportZippedMarkdown() {
             <DriveFolderUploadIcon sx={{ fontSize: 60 }} />
           </SvgIcon>
         }
-        disabled={!isAdmin}
+        // Default behaviour uploads to current space. Since onFile may upload to another space, we cannot rely on isAdmin hook
+        disabled={!isAdmin && !onFile}
         disabledTooltip='Only admins can import a zipped markdown folder'
         loading={uploading}
         variant='outlined'

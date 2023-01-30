@@ -1,5 +1,6 @@
 import { KeyboardArrowDown } from '@mui/icons-material';
-import { Box, ButtonGroup, Tooltip } from '@mui/material';
+import type { Theme } from '@mui/material';
+import { Box, ButtonGroup, Tooltip, useMediaQuery } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
 import { useEffect, useRef, useState } from 'react';
@@ -29,6 +30,7 @@ export default function NewProposalButton({ mutateProposals }: { mutateProposals
   const isAdmin = useIsAdmin();
   const { mutatePagesRemove, mutatePage, pages } = usePages();
   const { mutate } = useTasks();
+  const isXsScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'));
 
   // MUI Menu specific content
   const buttonRef = useRef<HTMLDivElement>(null);
@@ -114,7 +116,7 @@ export default function NewProposalButton({ mutateProposals }: { mutateProposals
         <Box>
           <ButtonGroup variant='contained' ref={buttonRef}>
             <Button disabled={!canCreateProposal} onClick={onClickCreate}>
-              Create Proposal
+              {isXsScreen ? 'Create' : 'Create Proposal'}
             </Button>
             <Button size='small' disabled={!canCreateProposal} onClick={popupState.open}>
               <KeyboardArrowDown />

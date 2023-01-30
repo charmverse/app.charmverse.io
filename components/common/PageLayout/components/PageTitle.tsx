@@ -18,6 +18,13 @@ const PageTitle = styled(({ hasContent, ...props }: any) => <Typography {...prop
   white-space: nowrap;
   text-overflow: ellipsis;
   width: calc(80%); // hack to get ellipsis to appear
+  ${({ theme }) => `
+  ${theme.breakpoints.down('md')} {
+    font-size: 16px;
+    line-height: 26px;
+    height: 26px;
+  }
+`}
 `;
 
 export default memo(PageTitle);

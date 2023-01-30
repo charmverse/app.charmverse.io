@@ -16,6 +16,7 @@ import { userDataPlugin } from './components/charm/charm.plugins';
 import EmojiSuggest, * as emoji from './components/emojiSuggest';
 import * as floatingMenu from './components/floatingMenu';
 import { plugins as linkPlugins } from './components/link/link.plugins';
+import { spec as linkSpec } from './components/link/link.specs';
 import { LinksPopup } from './components/link/LinksPopup';
 import Mention, { mentionPlugins, mentionSpecs, MentionSuggest, mentionPluginKeyName } from './components/mention';
 import { placeholderPlugin } from './components/placeholder';
@@ -36,7 +37,7 @@ export const specRegistry = new SpecRegistry([
   paragraph.spec(), // OK
   bold.spec(), // OK
   italic.spec(), // OK
-  link.spec(), // OK
+  linkSpec(), // OK
   strike.spec(), // OK
   underline.spec(), // OK
   emoji.specs(), // ??

@@ -33,6 +33,7 @@ function StyledIconButton({
   children: ReactNode;
   key: string;
   onClick: (e: React.MouseEvent<HTMLElement>) => void;
+  alwaysShow?: boolean;
 }) {
   return (
     <IconButton
@@ -58,6 +59,7 @@ type LargeAvatarProps = {
   canSetNft?: boolean;
   isSaving?: boolean;
   isNft?: boolean;
+  alwaysShowEdit?: boolean;
 };
 
 const getIcons = (editIcon: ReactNode, deleteIcon: ReactNode, avatar: string | null | undefined) => {
@@ -116,10 +118,10 @@ export default function LargeAvatar(props: LargeAvatarProps) {
   }
 
   const icons = getIcons(
-    <StyledIconButton key='edit-avatar' onClick={onEditClick}>
+    <StyledIconButton alwaysShow={props.alwaysShowEdit} key='edit-avatar' onClick={onEditClick}>
       <EditIcon ref={editIconRef} fontSize='small' />
     </StyledIconButton>,
-    <StyledIconButton key='delete-avatar' onClick={() => updateImageAvatar('')}>
+    <StyledIconButton alwaysShow={props.alwaysShowEdit} key='delete-avatar' onClick={() => updateImageAvatar('')}>
       <DeleteOutlinedIcon fontSize='small' />
     </StyledIconButton>,
     image
@@ -128,7 +130,15 @@ export default function LargeAvatar(props: LargeAvatarProps) {
   return (
     <StyledBox>
       <input type='file' hidden accept='image/*' ref={inputRef} onChange={onFileChange} />
-      <StyledAvatarWithIcons avatar={image} name={name} variant={variant} icons={icons} isNft={isNft} size='2xLarge' />
+      <StyledAvatarWithIcons
+        alwaysShow={props.alwaysShowEdit}
+        avatar={image}
+        name={name}
+        variant={variant}
+        icons={icons}
+        isNft={isNft}
+        size='2xLarge'
+      />
       {canSetNft && (
         <>
           <AvatarEditMenu

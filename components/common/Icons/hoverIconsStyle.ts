@@ -32,7 +32,7 @@ export const hoverIconsStyle =
     top: 0;
     right: 0;
     margin: ${marginForIcons ? theme.spacing(1) : 0};
-    z-index: 0;
+    z-index: 1;
   `}
       }
     `;

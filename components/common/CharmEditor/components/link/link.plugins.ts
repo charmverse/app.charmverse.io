@@ -1,3 +1,4 @@
+import { link } from '@bangle.dev/base-components';
 import type { PluginKey } from '@bangle.dev/pm';
 import { Plugin } from '@bangle.dev/pm';
 import { getMarkAttrs } from '@bangle.dev/utils';
@@ -22,6 +23,7 @@ export function plugins({ key }: { key: PluginKey }) {
   let tooltipTimer: null | NodeJS.Timer = null;
 
   return [
+    link.plugins(),
     new Plugin<LinkPluginState>({
       key,
       state: {
@@ -65,7 +67,7 @@ export function plugins({ key }: { key: PluginKey }) {
           const attrs = getMarkAttrs(view.state, markType);
           if (attrs.href) {
             event.stopPropagation();
-            window.open(attrs.href);
+            window.open(attrs.href, '_blank');
           }
           return false;
         },
@@ -73,20 +75,25 @@ export function plugins({ key }: { key: PluginKey }) {
           mouseover: (view, event) => {
             const target = event.target as HTMLAnchorElement; // span for link
             const parentElement = target?.parentElement; // anchor for link
-            if (parentElement) {
-              const isCharmLink = parentElement.classList.contains('charm-link');
-              const href = parentElement.getAttribute('href');
-              if (href && isCharmLink) {
+            const hrefElement = parentElement?.classList.contains('charm-link')
+              ? parentElement
+              : target?.classList.contains('charm-link')
+              ? target
+              : null;
+
+            if (hrefElement) {
+              const href = hrefElement.getAttribute('href');
+              if (href) {
                 if (tooltipTimer) clearTimeout(tooltipTimer);
                 tooltipTimer = setTimeout(() => {
                   renderSuggestionsTooltip(key, {
                     href,
-                    ref: parentElement
+                    ref: hrefElement
                   })(view.state, view.dispatch, view);
                   // hover region in px
                   const BUFFER = 25;
-                  parentElement.onmouseleave = (ev) => {
-                    const boundingRect = parentElement.getBoundingClientRect();
+                  hrefElement.onmouseleave = (ev) => {
+                    const boundingRect = hrefElement.getBoundingClientRect();
                     const isWithinBufferRegion =
                       ev.clientY > boundingRect.top &&
                       ev.clientY < boundingRect.bottom + BUFFER &&

@@ -2,7 +2,6 @@ import type { Theme } from '@emotion/react';
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import GroupAddOutlinedIcon from '@mui/icons-material/GroupAddOutlined';
 import MessageOutlinedIcon from '@mui/icons-material/MessageOutlined';
@@ -11,35 +10,34 @@ import BountyIcon from '@mui/icons-material/RequestPageOutlined';
 import SearchIcon from '@mui/icons-material/Search';
 import SettingsIcon from '@mui/icons-material/Settings';
 import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
-import { Divider, Tooltip } from '@mui/material';
 import Box from '@mui/material/Box';
-import IconButton from '@mui/material/IconButton';
+import Divider from '@mui/material/Divider';
+import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import type { BoxProps } from '@mui/system';
 import type { Page } from '@prisma/client';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 import Link from 'components/common/Link';
 import { charmverseDiscordInvite } from 'config/constants';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
-import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import useKeydownPress from 'hooks/useKeydownPress';
+import { useMobileSidebar } from 'hooks/useMobileSidebar';
 import { useUser } from 'hooks/useUser';
+import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import type { NewPageInput } from 'lib/pages';
 import { addPageAndRedirect } from 'lib/pages';
-import { isSmallScreen } from 'lib/utilities/browser';
 import type { LoggedInUser } from 'models';
 
-import { headerHeight } from '../Header/Header';
 import NewPageMenu from '../NewPageMenu';
 import PageNavigation from '../PageNavigation';
 import SearchInWorkspaceModal from '../SearchInWorkspaceModal';
 import TrashModal from '../TrashModal';
 
-import Workspaces from './Workspaces';
+import SidebarSubmenu from './SidebarSubmenu';
 
 const WorkspaceLabel = styled.div`
   display: flex;
@@ -52,12 +50,19 @@ const WorkspaceLabel = styled.div`
     right: 8px;
     top: 0px;
   }
+  padding: 4px 0;
 `;
 
 const SidebarContainer = styled.div`
   display: flex;
   background-color: ${({ theme }) => theme.palette.sidebar.background};
-  height: 100%;
+  min-height: 100vh;
+
+  ${({ theme }) => `
+    ${theme.breakpoints.up('md')} {
+      height: 100%;
+    }
+`}
 
   // disable hover UX on ios which converts first click to a hover event
   @media (pointer: fine) {
@@ -78,6 +83,9 @@ const SidebarContainer = styled.div`
         }
         .MuiIconButton-root {
           opacity: 1;
+        }
+        > .MuiButton-root {
+          padding-right: ${({ theme }) => theme.spacing(5)};
         }
       }
       .add-a-page {
@@ -105,6 +113,11 @@ const sidebarItemStyles = ({ theme }: { theme: Theme }) => css`
     font-size: 1.2em;
     margin-right: ${theme.spacing(1)};
   }
+  ${theme.breakpoints.down('md')} {
+    min-height: 38px;
+    font-size: 16px;
+    line-height: 26px;
+  }
 `;
 
 const SectionName = styled(Typography)`
@@ -114,7 +127,6 @@ const SectionName = styled(Typography)`
   font-size: 11.5px;
   font-weight: 600;
   letter-spacing: 0.03em;
-  margin-bottom: ${({ theme }) => theme.spacing(1)};
 `;
 
 const StyledSidebarLink = styled(Link, { shouldForwardProp: (prop) => prop !== 'active' })<{ active: boolean }>`
@@ -132,24 +144,6 @@ const StyledSidebarBox = styled(Box)`
   cursor: pointer;
   ${sidebarItemStyles}
 `;
-
-const SidebarHeader = styled.div(
-  ({ theme }) => `
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: ${theme.spacing(0, 1.5, 0, 2)};
-  & .MuiIconButton-root {
-    border-radius: 4px;
-    transition: ${theme.transitions.create('opacity', {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.enteringScreen
-    })};
-  }
-  // necessary for content to be below app bar
-  min-height: ${headerHeight}px;
-`
-);
 
 const ScrollingContainer = styled.div<{ isScrolled: boolean }>`
   flex-grow: 1;
@@ -194,23 +188,23 @@ function SidebarBox({ icon, label, ...props }: { icon: any; label: string } & Bo
 interface SidebarProps {
   closeSidebar: () => void;
   favorites: LoggedInUser['favorites'];
+  navAction?: () => void;
 }
 
-export default function Sidebar({ closeSidebar, favorites }: SidebarProps) {
+export default function Sidebar({ closeSidebar, favorites, navAction }: SidebarProps) {
   const router = useRouter();
-  const { user } = useUser();
+  const { user, logoutUser } = useUser();
   const space = useCurrentSpace();
   const [userSpacePermissions] = useCurrentSpacePermissions();
   const [isScrolled, setIsScrolled] = useState(false);
   const [showingTrash, setShowingTrash] = useState(false);
-  const showForums = useIsCharmverseSpace(['charmverse', 'bitdao', 'purple', 'arthaus']);
+  const { disconnectWallet } = useWeb3AuthSig();
+  const isMobileSidebar = useMobileSidebar();
 
   const searchInWorkspaceModalState = usePopupState({ variant: 'popover', popupId: 'search-in-workspace-modal' });
   const openSearchLabel = useKeydownPress(searchInWorkspaceModalState.toggle, { key: 'p', ctrl: true });
 
   const favoritePageIds = favorites.map((f) => f.pageId);
-
-  const isMobile = isSmallScreen();
 
   function onScroll(e: React.UIEvent<HTMLDivElement>) {
     setIsScrolled(e.currentTarget?.scrollTop > 0);
@@ -231,57 +225,80 @@ export default function Sidebar({ closeSidebar, favorites }: SidebarProps) {
     [user?.id, space?.id]
   );
 
-  function closeSidebarIfIsMobile() {
-    if (isMobile) {
-      closeSidebar();
-    }
+  async function logoutCurrentUser() {
+    disconnectWallet();
+    await logoutUser();
+    router.push('/');
   }
+
+  const pagesNavigation = useMemo(() => {
+    return (
+      <>
+        {favoritePageIds.length > 0 && (
+          <Box mb={2}>
+            <SectionName mb={1}>FAVORITES</SectionName>
+            <PageNavigation isFavorites={true} rootPageIds={favoritePageIds} />
+          </Box>
+        )}
+        <WorkspaceLabel>
+          <SectionName>SPACE</SectionName>
+          {/** Test component */}
+          {userSpacePermissions?.createPage && (
+            <div className='add-a-page'>
+              <NewPageMenu tooltip='Add a page' addPage={addPage} />
+            </div>
+          )}
+        </WorkspaceLabel>
+        <Box mb={6}>
+          <PageNavigation onClick={navAction} />
+        </Box>
+        <Box mb={2}>
+          <SidebarBox
+            onClick={() => {
+              setShowingTrash(true);
+            }}
+            icon={<DeleteOutlinedIcon fontSize='small' />}
+            label='Trash'
+          />
+        </Box>
+      </>
+    );
+  }, [favoritePageIds, userSpacePermissions, navAction, addPage]);
 
   return (
     <SidebarContainer>
-      <Workspaces />
       {space && (
         <Box display='flex' flexDirection='column' sx={{ height: '100%', flexGrow: 1, width: 'calc(100% - 57px)' }}>
-          <SidebarHeader className='sidebar-header'>
-            <Typography>
-              <strong data-test='sidebar-space-name'>{space.name}</strong>
-            </Typography>
-            <IconButton onClick={closeSidebar} size='small'>
-              <ChevronLeftIcon />
-            </IconButton>
-          </SidebarHeader>
+          <SidebarSubmenu closeSidebar={closeSidebar} logoutCurrentUser={logoutCurrentUser} />
           <Box mb={2}>
-            {/** New navigation order: 1. Member Director, 2. Proposals, 3. Bounties */}
             <SidebarLink
               href={`/${space.domain}/members`}
               active={router.pathname.startsWith('/[domain]/members')}
               icon={<AccountCircleIcon fontSize='small' />}
               label='Member Directory'
-              onClick={closeSidebarIfIsMobile}
+              onClick={navAction}
             />
             <SidebarLink
               href={`/${space.domain}/proposals`}
               active={router.pathname.startsWith('/[domain]/proposals')}
               icon={<TaskOutlinedIcon fontSize='small' />}
               label='Proposals'
-              onClick={closeSidebarIfIsMobile}
+              onClick={navAction}
             />
             <SidebarLink
               href={`/${space.domain}/bounties`}
               active={router.pathname.startsWith('/[domain]/bounties')}
               icon={<BountyIcon fontSize='small' />}
               label='Bounties'
-              onClick={closeSidebarIfIsMobile}
+              onClick={navAction}
             />
-            {showForums && (
-              <SidebarLink
-                href={`/${space.domain}/forum`}
-                active={router.pathname.startsWith('/[domain]/forum')}
-                icon={<MessageOutlinedIcon fontSize='small' />}
-                label='Forum'
-                onClick={closeSidebarIfIsMobile}
-              />
-            )}
+            <SidebarLink
+              href={`/${space.domain}/forum`}
+              active={router.pathname.startsWith('/[domain]/forum')}
+              icon={<MessageOutlinedIcon fontSize='small' />}
+              label='Forum'
+              onClick={navAction}
+            />
             <Divider sx={{ mx: 2, my: 1 }} />
             <Tooltip
               title={
@@ -305,18 +322,18 @@ export default function Sidebar({ closeSidebar, favorites }: SidebarProps) {
               href={`/${space.domain}/settings/invites`}
               icon={<GroupAddOutlinedIcon color='secondary' fontSize='small' />}
               label='Invite Members'
-              onClick={closeSidebarIfIsMobile}
+              onClick={navAction}
             />
             <SearchInWorkspaceModal
               isOpen={searchInWorkspaceModalState.isOpen}
               close={searchInWorkspaceModalState.close}
             />
             <SidebarLink
-              active={router.pathname.startsWith('/[domain]/settings/workspace')}
-              href={`/${space.domain}/settings/workspace`}
+              active={router.pathname.startsWith('/[domain]/settings/space')}
+              href={`/${space.domain}/settings/space`}
               icon={<SettingsIcon color='secondary' fontSize='small' />}
               label='Settings'
-              onClick={closeSidebarIfIsMobile}
+              onClick={navAction}
             />
             <SidebarLink
               active={false}
@@ -324,38 +341,16 @@ export default function Sidebar({ closeSidebar, favorites }: SidebarProps) {
               icon={<QuestionMarkIcon color='secondary' fontSize='small' />}
               label='Support & Feedback'
               target='_blank'
-              onClick={closeSidebarIfIsMobile}
+              onClick={navAction}
             />
           </Box>
-          <ScrollingContainer isScrolled={isScrolled} onScroll={onScroll} className='page-navigation'>
-            {favoritePageIds.length > 0 && (
-              <Box mb={2}>
-                <SectionName>FAVORITES</SectionName>
-                <PageNavigation isFavorites={true} rootPageIds={favoritePageIds} />
-              </Box>
-            )}
-            <WorkspaceLabel>
-              <SectionName>SPACE</SectionName>
-              {/** Test component */}
-              {userSpacePermissions?.createPage && (
-                <div className='add-a-page'>
-                  <NewPageMenu tooltip='Add a page' addPage={addPage} />
-                </div>
-              )}
-            </WorkspaceLabel>
-            <Box mb={6}>
-              <PageNavigation onClick={closeSidebarIfIsMobile} />
-            </Box>
-            <Box mb={2}>
-              <SidebarBox
-                onClick={() => {
-                  setShowingTrash(true);
-                }}
-                icon={<DeleteOutlinedIcon fontSize='small' />}
-                label='Trash'
-              />
-            </Box>
-          </ScrollingContainer>
+          {isMobileSidebar ? (
+            <div>{pagesNavigation}</div>
+          ) : (
+            <ScrollingContainer isScrolled={isScrolled} onScroll={onScroll} className='page-navigation'>
+              {pagesNavigation}
+            </ScrollingContainer>
+          )}
         </Box>
       )}
       {showingTrash && (

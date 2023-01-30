@@ -64,6 +64,12 @@
   background-color: var(--background-default);
 }
 
+
+/* Prevent iframes from stealing drag events - https://github.com/react-grid-layout/react-draggable/issues/613 */
+.react-draggable-transparent-selection iframe {
+  pointer-events: none;
+}
+
 .ProseMirror .column-resize-handle {
   position: absolute;
   right: -2px;
@@ -538,9 +544,13 @@ details {
   cursor: pointer;
   display: inline;
   position: absolute;
-  right: -70px;
+  right: -40px;
   // add a width so that icons are left-aligned even if counts get large
   width: 40px;
+
+  @media (min-width: 600px)  {
+    right: -70px;
+  }
 
   svg {
     color: rgba(var(--center-channel-color-rgb), 0.5);

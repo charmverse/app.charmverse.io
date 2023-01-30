@@ -3,7 +3,8 @@ import styled from '@emotion/styled';
 import type { Page } from '@prisma/client';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
-import { useCallback, useMemo, useState, useEffect } from 'react';
+import type { KeyboardEvent, MouseEvent, ClipboardEvent } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 import CardDialog from 'components/common/BoardEditor/focalboard/src/components/cardDialog';
 import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
@@ -100,7 +101,6 @@ export default function DatabaseView({ containerWidth, readOnly: readOnlyOverrid
   const views = useMemo(() => allViews.filter((view) => view.parentId === pageId), [pageId, allViews]);
   const [currentViewId, setCurrentViewId] = useState<string | null>(views[0]?.id || null);
   const currentView = useAppSelector(getView(currentViewId || '')) ?? undefined;
-
   const { pages, updatePage, getPagePermissions } = usePages();
 
   const [shownCardId, setShownCardId] = useState<string | null>(null);
@@ -119,7 +119,7 @@ export default function DatabaseView({ containerWidth, readOnly: readOnlyOverrid
     }, 500);
   }, [updatePage]);
 
-  function stopPropagation(e: React.KeyboardEvent) {
+  function stopPropagation(e: KeyboardEvent | MouseEvent | ClipboardEvent) {
     e.stopPropagation();
   }
 
@@ -127,12 +127,6 @@ export default function DatabaseView({ containerWidth, readOnly: readOnlyOverrid
     typeof readOnlyOverride === 'undefined' ? currentPagePermissions.edit_content !== true : readOnlyOverride;
 
   const readOnlySourceData = currentView?.fields?.sourceType === 'google_form'; // blocks that are synced cannot be edited
-
-  useEffect(() => {
-    if (views.length > 0 && !currentViewId) {
-      setCurrentViewId(views[0].id);
-    }
-  }, [currentViewId, views]);
 
   if (!board) {
     return null;
@@ -152,6 +146,7 @@ export default function DatabaseView({ containerWidth, readOnly: readOnlyOverrid
         containerWidth={containerWidth}
         onKeyPress={stopPropagation}
         onKeyDown={stopPropagation}
+        onPaste={stopPropagation}
       >
         <CenterPanel
           disableUpdatingUrl

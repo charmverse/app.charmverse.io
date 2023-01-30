@@ -18,16 +18,6 @@ export interface ExportWorkspacePage {
 
 const excludedPageTypes: PageType[] = ['bounty', 'bounty_template', 'proposal', 'proposal_template'];
 
-/**
- * @abstract Does not currently support bounty or proposal pages
- */
-export async function exportWorkspacePages({
-  sourceSpaceIdOrDomain
-}: Pick<ExportWorkspacePage, 'sourceSpaceIdOrDomain'>): Promise<{ data: WorkspaceExport }>;
-export async function exportWorkspacePages({
-  sourceSpaceIdOrDomain,
-  exportName
-}: Required<ExportWorkspacePage>): Promise<{ data: WorkspaceExport; path: string }>;
 export async function exportWorkspacePages({
   sourceSpaceIdOrDomain,
   exportName

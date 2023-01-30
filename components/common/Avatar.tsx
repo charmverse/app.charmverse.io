@@ -108,6 +108,7 @@ export default function InitialAvatar({
       variant={muiVariant}
       src={avatar ?? undefined}
       imgProps={{ referrerPolicy: 'no-referrer' }}
+      alt={name}
     >
       {nameStr.charAt(0).toUpperCase()}
     </AvatarComponent>
