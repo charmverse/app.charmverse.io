@@ -2,7 +2,7 @@ import type { Page } from '@playwright/test';
 import { test as base } from '@playwright/test';
 
 import { LoginPage } from '../po/login.po';
-import { createUserAndSpace, generateUserAndSpace } from '../utils/mocks';
+import { createUserAndSpace } from '../utils/mocks';
 import { mockWeb3 } from '../utils/web3';
 
 type Fixtures = {
@@ -40,6 +40,21 @@ test('login - redirects a logged in user on the site to their workspace', async 
 
   await loginPage.goto();
 
+  // Prepare pages as a glob OR pattern since we might land on any of them
+  const rootPagePaths = pages.filter((page) => !page.parentId).map((page) => page.path);
+
+  function matchPath(url: URL) {
+    const pathName = url.pathname;
+
+    for (const pagePath of rootPagePaths) {
+      if (pathName.match(`${space.domain}/${pagePath}`)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
   // should auto redirect to workspace
-  await loginPage.waitForWorkspaceLoaded({ domain: space.domain, page: pages[0] });
+  await loginPage.page.waitForURL(matchPath);
 });
