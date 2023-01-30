@@ -3,12 +3,13 @@ import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import FavoritedIcon from '@mui/icons-material/Star';
 import NotFavoritedIcon from '@mui/icons-material/StarBorder';
+import UndoIcon from '@mui/icons-material/Undo';
 import VerticalAlignBottomOutlinedIcon from '@mui/icons-material/VerticalAlignBottomOutlined';
-import { Divider, Tooltip } from '@mui/material';
+import { Divider, Tooltip, Typography } from '@mui/material';
 import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
-import { Box } from '@mui/system';
+import { Box, Stack } from '@mui/system';
 import { useRouter } from 'next/router';
 import Papa from 'papaparse';
 import type { ChangeEventHandler } from 'react';
@@ -16,6 +17,7 @@ import { useIntl } from 'react-intl';
 
 import charmClient from 'charmClient';
 import { CsvExporter } from 'components/common/BoardEditor/focalboard/csvExporter/csvExporter';
+import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
 import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
 import type { CardPage } from 'components/common/BoardEditor/focalboard/src/store/cards';
 import {
@@ -35,6 +37,7 @@ import type { Board } from 'lib/focalboard/board';
 import { createCard } from 'lib/focalboard/card';
 import log from 'lib/log';
 import type { IPagePermissionFlags } from 'lib/permissions/pages';
+import { humanFriendlyDate } from 'lib/utilities/dates';
 
 import {
   createCardFieldProperties,
@@ -64,6 +67,18 @@ export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: 
 
   const activeBoardId = view?.fields.sourceData?.boardId ?? view?.fields.linkedSourceId ?? view?.rootId;
   const board = boards.find((b) => b.id === activeBoardId);
+  const lastUpdatedBy = members.find((member) => member.id === board?.createdBy);
+
+  function undoChanges() {
+    if (mutator.canUndo) {
+      const description = mutator.undoDescription;
+      mutator.undo().then(() => {
+        showMessage(description ? `Undo ${description}` : 'Undo', 'success');
+      });
+    } else {
+      showMessage('Nothing to Undo', 'info');
+    }
+  }
 
   if (!board || !view) {
     return null;
@@ -255,6 +270,19 @@ export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: 
           </ListItemButton>
         </div>
       </Tooltip>
+      <Tooltip title={!mutator.canUndo ? 'Nothing to undo' : ''}>
+        <div>
+          <ListItemButton disabled={!mutator.canUndo} onClick={undoChanges}>
+            <UndoIcon
+              fontSize='small'
+              sx={{
+                mr: 1
+              }}
+            />
+            <ListItemText primary='Undo' />
+          </ListItemButton>
+        </div>
+      </Tooltip>
       <ListItemButton onClick={exportCsv}>
         <FormatListBulletedIcon
           fontSize='small'
@@ -274,6 +302,20 @@ export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: 
         />
         <ListItemText primary='Import CSV' />
       </ListItemButton>
+      {lastUpdatedBy && (
+        <>
+          <Divider />
+          <Stack
+            sx={{
+              mx: 2,
+              my: 1
+            }}
+          >
+            <Typography variant='subtitle2'>Last edited by {lastUpdatedBy.username}</Typography>
+            <Typography variant='subtitle2'>Last edited at {humanFriendlyDate(board.updatedAt)}</Typography>
+          </Stack>
+        </>
+      )}
     </List>
   );
 }
