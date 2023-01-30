@@ -1149,6 +1149,7 @@ enum PostCategoryOperation {
 
 enum PostOperation {
   view_post
+  edit_post
   delete_post
   pin_post
   lock_post
@@ -1183,4 +1184,5 @@ model PostCategoryPermission {
 
   @@unique([roleId, postCategoryId])
   @@unique([spaceId, postCategoryId])
+  @@unique([public, postCategoryId])
 }
