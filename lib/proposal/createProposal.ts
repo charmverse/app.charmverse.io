@@ -5,6 +5,7 @@ import { prisma } from 'db';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { createPage } from 'lib/pages/server/createPage';
 
+import type { IPageWithPermissions } from '../pages';
 import { getPagePath } from '../pages';
 
 import { generateSyncProposalPermissions } from './syncProposalPermissions';
@@ -43,6 +44,9 @@ export async function createProposal(pageProps: ProposalPageInput, proposalProps
           type: 'proposal',
           updatedAt: new Date(),
           updatedBy: createdBy
+        },
+        include: {
+          permissions: true
         }
       });
     } else {
@@ -57,7 +61,9 @@ export async function createProposal(pageProps: ProposalPageInput, proposalProps
           id: proposalId,
           type: 'proposal'
         },
-        include: null
+        include: {
+          permissions: true
+        }
       });
     }
   }
@@ -109,5 +115,5 @@ export async function createProposal(pageProps: ProposalPageInput, proposalProps
 
   trackUserAction('new_proposal_created', { userId: createdBy, pageId: page.id, resourceId: proposal.id, spaceId });
 
-  return { page, proposal, workspaceEvent };
+  return { page: page as IPageWithPermissions, proposal, workspaceEvent };
 }

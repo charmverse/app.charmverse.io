@@ -162,7 +162,7 @@ export function Metadata({ creator, lastUpdatedAt }: { creator: string; lastUpda
 export default function Header({ open, openSidebar }: HeaderProps) {
   const router = useRouter();
   const colorMode = useColorMode();
-  const { pages, updatePage, getPagePermissions, deletePage } = usePages();
+  const { pages, setPages, updatePage, getPagePermissions, deletePage } = usePages();
 
   const { user } = useUser();
   const theme = useTheme();
@@ -249,15 +249,6 @@ export default function Header({ open, openSidebar }: HeaderProps) {
   const canCreateProposal = !!userSpacePermissions?.createVote;
   const charmversePage = basePage ? members.find((member) => member.id === basePage.createdBy) : null;
 
-  async function convertToProposal(pageId: string) {
-    setPageMenuOpen(false);
-    if (isForumPost) {
-      await charmClient.forum.convertToProposal(pageId);
-    } else {
-      await charmClient.pages.convertToProposal(pageId);
-    }
-  }
-
   function closeMenu() {
     setPageMenuOpen(false);
   }
@@ -286,6 +277,20 @@ export default function Header({ open, openSidebar }: HeaderProps) {
         showMessage('Error exporting markdown', 'error');
       });
       setPageMenuOpen(false);
+    }
+  }
+
+  async function convertToProposal(pageId: string) {
+    setPageMenuOpen(false);
+    if (isForumPost) {
+      const proposalPage = await charmClient.forum.convertToProposal(pageId);
+      setPages((_pages) => ({
+        ..._pages,
+        [proposalPage.id]: proposalPage
+      }));
+      router.push(`/${router.query.domain}/${proposalPage.path}`);
+    } else {
+      await charmClient.pages.convertToProposal(pageId);
     }
   }
 
@@ -443,6 +448,33 @@ export default function Header({ open, openSidebar }: HeaderProps) {
                 }}
               />
               <ListItemText primary='Convert to proposal' />
+            </ListItemButton>
+          </div>
+        </Tooltip>
+        <Divider />
+        <Tooltip title={!isPostCreator ? "You don't have permission to delete this post" : ''}>
+          <div>
+            <ListItemButton disabled={!isPostCreator} onClick={deletePost}>
+              <DeleteOutlineOutlinedIcon
+                fontSize='small'
+                sx={{
+                  mr: 1
+                }}
+              />
+              <ListItemText primary='Delete' />
+            </ListItemButton>
+          </div>
+        </Tooltip>
+        <Tooltip title={!isPostCreator ? "You don't have permission to undo changes" : ''}>
+          <div>
+            <ListItemButton disabled={!isPostCreator} onClick={undoEditorChanges}>
+              <UndoIcon
+                fontSize='small'
+                sx={{
+                  mr: 1
+                }}
+              />
+              <ListItemText primary='Undo' />
             </ListItemButton>
           </div>
         </Tooltip>
