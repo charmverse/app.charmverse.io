@@ -85,7 +85,7 @@ export default function Header({ open, openSidebar }: HeaderProps) {
   const { setCurrentPageActionDisplay } = usePageActionDisplay();
   const [userSpacePermissions] = useCurrentSpacePermissions();
   const pagePermissions = basePage ? getPagePermissions(basePage.id) : null;
-  const isSmallScreen = useMediaQuery(theme.breakpoints.down('lg'));
+  const isLargeScreen = useMediaQuery(theme.breakpoints.up('md'));
 
   const pageType = basePage?.type;
   const isExportablePage =
@@ -130,7 +130,7 @@ export default function Header({ open, openSidebar }: HeaderProps) {
     }
   }
 
-  const isFullWidth = isSmallScreen || (basePage?.fullWidth ?? false);
+  const isFullWidth = !isLargeScreen || (basePage?.fullWidth ?? false);
   const isBasePageDocument = documentTypes.includes(basePage?.type ?? '');
   const isBasePageDatabase = /board/.test(basePage?.type ?? '');
 
@@ -317,7 +317,7 @@ export default function Header({ open, openSidebar }: HeaderProps) {
           </ListItemButton>
         </div>
       </Tooltip>
-      {!isSmallScreen && (
+      {isLargeScreen && (
         <>
           <Divider />
           <ListItemButton>
@@ -375,7 +375,7 @@ export default function Header({ open, openSidebar }: HeaderProps) {
         sx={{
           display: 'inline-flex',
           mr: 2,
-          ...(open && { display: 'none' })
+          ...(open && isLargeScreen && { display: 'none' })
         }}
       >
         <MenuIcon />
@@ -388,7 +388,7 @@ export default function Header({ open, openSidebar }: HeaderProps) {
           alignItems: 'center',
           alignSelf: 'stretch',
           gap: 1,
-          width: 'calc(100% - 40px)'
+          width: { xs: 'calc(100% - 40px)', md: '100%' }
         }}
       >
         <div style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
@@ -411,7 +411,7 @@ export default function Header({ open, openSidebar }: HeaderProps) {
             <Box ref={pageMenuAnchor} display='flex' alignSelf='stretch' alignItems='center'>
               <div>
                 <IconButton
-                  size='small'
+                  size={isLargeScreen ? 'small' : 'medium'}
                   onClick={() => {
                     setPageMenuOpen(!pageMenuOpen);
                     setPageMenuAnchorElement(pageMenuAnchor.current || null);
@@ -441,7 +441,12 @@ export default function Header({ open, openSidebar }: HeaderProps) {
           {user && (
             <>
               <NotificationsBadge>
-                <IconButton size='small' sx={{ mx: 1 }} LinkComponent={NextLink} href='/nexus' color='inherit'>
+                <IconButton
+                  size={isLargeScreen ? 'small' : 'medium'}
+                  LinkComponent={NextLink}
+                  href='/nexus'
+                  color='inherit'
+                >
                   <NotificationsIcon fontSize='small' color='secondary' />
                 </IconButton>
               </NotificationsBadge>
