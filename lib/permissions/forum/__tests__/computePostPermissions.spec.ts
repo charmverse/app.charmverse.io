@@ -10,6 +10,7 @@ import { generateForumPost, generatePostCategory } from 'testing/utils/forums';
 import { computePostPermissions } from '../computePostPermissions';
 import { postOperations, postOperationsWithoutEdit } from '../interfaces';
 import { postPermissionsMapping } from '../mapping';
+import { upsertPostCategoryPermission } from '../upsertPostCategoryPermission';
 
 let adminUser: User;
 let spaceMemberUser: User;
@@ -126,6 +127,37 @@ describe('computePostPermissions', () => {
 
     postOperations.forEach((op) => {
       if (op === 'edit_post' || op === 'delete_post') {
+        expect(permissions[op]).toBe(true);
+      } else {
+        expect(permissions[op]).toBe(false);
+      }
+    });
+  });
+
+  // We'll often assign member-level access at space level
+  it('should take into account space-level permissions', async () => {
+    const postCategory = await generatePostCategory({ spaceId: space.id });
+    const post = await generateForumPost({
+      spaceId: space.id,
+      categoryId: postCategory.id,
+      userId: authorUser.id
+    });
+
+    await upsertPostCategoryPermission({
+      assignee: { group: 'space', id: space.id },
+      permissionLevel: 'member',
+      postCategoryId: postCategory.id
+    });
+
+    const permissions = await computePostPermissions({
+      resourceId: post.id,
+      userId: spaceMemberUser.id
+    });
+
+    const memberPermissions = postPermissionsMapping.member;
+
+    postOperations.forEach((op) => {
+      if (memberPermissions.includes(op)) {
         expect(permissions[op]).toBe(true);
       } else {
         expect(permissions[op]).toBe(false);
