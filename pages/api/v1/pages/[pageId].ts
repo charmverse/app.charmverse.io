@@ -155,7 +155,7 @@ async function updatePage(req: NextApiRequest, res: NextApiResponse) {
   if (cardPage) {
     cardToReturn.content.markdown = await generateMarkdown(
       {
-        content: cardPage.content as PageContent,
+        content: cardPage.content,
         title: cardPage.title
       },
       true

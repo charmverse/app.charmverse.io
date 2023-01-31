@@ -1,3 +1,5 @@
+import type { Prisma } from '@prisma/client';
+
 import charmClient from 'charmClient';
 import type { Member } from 'lib/members/interfaces';
 import { generateMarkdown } from 'lib/pages';
@@ -13,7 +15,7 @@ export async function exportMarkdown({
   spaceId: string;
   id: string;
   title?: string;
-  content: PageContent;
+  content: Prisma.JsonValue;
   members: Member[];
 }) {
   // getPage to get content

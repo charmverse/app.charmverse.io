@@ -115,7 +115,7 @@ export default function PublishingForm({ onSubmit, page }: Props) {
       const content = await generateMarkdown(
         {
           title: pageWithDetails.title,
-          content: pageWithDetails.content as PageContent
+          content: pageWithDetails.content
         },
         false,
         { members }
@@ -205,7 +205,7 @@ export default function PublishingForm({ onSubmit, page }: Props) {
 
       const content = await generateMarkdown(
         {
-          content: pageWithDetails.content as PageContent,
+          content: pageWithDetails.content,
           title: pageWithDetails.title
         },
         false,

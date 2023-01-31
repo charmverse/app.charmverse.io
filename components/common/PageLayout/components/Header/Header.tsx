@@ -263,7 +263,7 @@ export default function Header({ open, openSidebar }: HeaderProps) {
     if (basePage) {
       const page = await charmClient.pages.getPage(basePage.id);
       exportMarkdown({
-        content: page.content as PageContent,
+        content: page.content,
         id: page.id,
         members,
         spaceId: page.spaceId,
@@ -274,7 +274,7 @@ export default function Header({ open, openSidebar }: HeaderProps) {
       setPageMenuOpen(false);
     } else if (forumPost) {
       exportMarkdown({
-        content: forumPost.content as PageContent,
+        content: forumPost.content,
         id: forumPost.id,
         members,
         spaceId: forumPost.spaceId,

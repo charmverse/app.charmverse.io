@@ -52,7 +52,7 @@ export async function getPageInBoard(pageId: string): Promise<Page> {
   cardToReturn.content.markdown = await generateMarkdown(
     {
       title: cardPage.title,
-      content: cardPage.content as PageContent
+      content: cardPage.content
     },
     true
   );
