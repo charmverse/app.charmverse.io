@@ -1,6 +1,7 @@
 import log from 'loglevel';
 
 import fetch from 'adapters/http/fetch.server';
+import { isTestEnv } from 'config/constants';
 
 import type { DeepDaoOrganizationDetails, DeepDaoParticipationScore, DeepDaoProfile } from './interfaces';
 
@@ -39,8 +40,12 @@ export async function getAllOrganizations(apiToken?: string): Promise<GetOrganiz
 }
 
 function _requestGET<T>(endpoint: string, { apiToken = DEEPDAO_API_KEY }: { apiToken: string | undefined }) {
+  // run requests even in test mode for now (see getAggregatedData.spec.ts)
+  if (isTestEnv) {
+    return fetch<T>(`${DEEPDAO_BASE_URL}/v0.1${endpoint}`, { method: 'GET' });
+  }
   if (!apiToken || !DEEPDAO_BASE_URL) {
-    log.debug('Skip request: No API Key for DeepDAO');
+    log.debug('Skip request: No API Key or URL for DeepDAO');
     return Promise.resolve(null);
   }
   return fetch<T>(`${DEEPDAO_BASE_URL}/v0.1${endpoint}`, {
