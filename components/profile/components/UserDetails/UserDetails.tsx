@@ -101,6 +101,12 @@ function UserDetails({ readOnly, user, updateUser, sx = {} }: UserDetailsProps) 
     linkedinURL: ''
   };
 
+  const isSocialEmpty =
+    socialDetails.twitterURL?.length === 0 &&
+    socialDetails.githubURL?.length === 0 &&
+    socialDetails.discordUsername?.length === 0 &&
+    socialDetails.linkedinURL?.length === 0;
+
   const identityTypes: IntegrationModel[] = useMemo(() => {
     if (isPublicUser(user)) {
       return [];
@@ -214,12 +220,20 @@ function UserDetails({ readOnly, user, updateUser, sx = {} }: UserDetailsProps) 
               </EditIconContainer>
             </Grid>
           )}
-          <Grid item mt={1} height={40}>
-            <EditIconContainer onClick={socialModalState.open} readOnly={readOnly} data-testid='edit-social'>
-              <SocialIcons social={socialDetails} />
-              {!readOnly && <StyledDivider orientation='vertical' flexItem />}
-            </EditIconContainer>
-          </Grid>
+          {!isSocialEmpty && (
+            <Grid item mt={1} height={40}>
+              <EditIconContainer onClick={socialModalState.open} readOnly={readOnly} data-testid='edit-social'>
+                <SocialIcons
+                  showDiscord={!!socialDetails.discordUsername && socialDetails.discordUsername?.length !== 0}
+                  showTwitter={!!socialDetails.twitterURL && socialDetails.twitterURL?.length !== 0}
+                  showGithub={!!socialDetails.githubURL && socialDetails.githubURL?.length !== 0}
+                  showLinkedIn={!!socialDetails.linkedinURL && socialDetails.linkedinURL?.length !== 0}
+                  social={socialDetails}
+                />
+                {!readOnly && <StyledDivider orientation='vertical' flexItem />}
+              </EditIconContainer>
+            </Grid>
+          )}
           <Grid item container alignItems='center' sx={{ width: 'fit-content', flexWrap: 'initial' }}>
             <EditIconContainer readOnly={readOnly} onClick={descriptionModalState.open} data-testid='edit-description'>
               <span>
