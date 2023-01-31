@@ -39,7 +39,9 @@ export default function BountyReviewers({ bounty, permissions }: BountyReviewers
           users: roleups?.find((r) => r.id === reviewer.id)?.users ?? []
         };
       } else {
-        const reviewerUser: Member | undefined = members?.find((c) => c.id === reviewer.id);
+        const reviewerUser: Member | undefined = members?.find(
+          (c) => c.id === (reviewer as TargetPermissionGroup<'role' | 'user'>).id
+        );
         return {
           ...(reviewer as TargetPermissionGroup<'user'>),
           name: reviewerUser?.username ?? '',
