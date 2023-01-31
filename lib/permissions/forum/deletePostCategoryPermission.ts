@@ -1,9 +1,7 @@
 import { prisma } from 'db';
 import { UndesirableOperationError } from 'lib/utilities/errors';
 
-type PermissionToDelete = {
-  permissionId: string;
-};
+import type { PermissionToDelete } from '../interfaces';
 
 export async function deletePostCategoryPermission({ permissionId }: PermissionToDelete) {
   const permission = await prisma.postCategoryPermission.findUnique({

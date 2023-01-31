@@ -6,14 +6,12 @@ import {
   DataNotFoundError,
   InsecureOperationError,
   InvalidInputError,
-  MissingDataError,
   UndesirableOperationError
 } from 'lib/utilities/errors';
 import { isUUID } from 'lib/utilities/strings';
 
-import { AssignmentNotPermittedError, InvalidPermissionGranteeError } from '../errors';
+import { AssignmentNotPermittedError } from '../errors';
 import type { TargetPermissionGroup } from '../interfaces';
-import { PermissionAssignee } from '../interfaces';
 
 import type { AssignablePostCategoryPermissionGroups } from './interfaces';
 import { postCategoryPermissionGroups } from './interfaces';
