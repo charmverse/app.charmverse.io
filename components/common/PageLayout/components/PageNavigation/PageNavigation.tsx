@@ -96,7 +96,7 @@ function PageNavigation({ deletePage, isFavorites, rootPageIds, onClick }: PageN
 
         const droppedPage = _pages[droppedItem.id];
         if (!droppedPage) {
-          throw new Error('canot find dropped page');
+          throw new Error('cannot find dropped page');
         }
         const originIndex: number = siblings.findIndex((sibling) => sibling.id === containerItem.id);
         siblings.splice(originIndex, 0, droppedPage);
@@ -246,6 +246,7 @@ function PageNavigation({ deletePage, isFavorites, rootPageIds, onClick }: PageN
           addPage={addPage}
           deletePage={deletePage}
           onClick={onClick}
+          validateTarget={isValidDropTarget}
         />
       ))}
     </TreeRoot>

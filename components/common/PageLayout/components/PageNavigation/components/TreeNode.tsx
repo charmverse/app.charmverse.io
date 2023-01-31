@@ -33,6 +33,7 @@ type NodeProps = {
   deletePage?: (id: string) => void;
   selectedNodeId: string | null;
   onClick?: () => void;
+  validateTarget?: ({ droppedItem, targetItem }: { droppedItem: MenuNode; targetItem: MenuNode }) => boolean;
 };
 
 function DraggableTreeNode({
@@ -43,7 +44,8 @@ function DraggableTreeNode({
   pathPrefix,
   addPage,
   deletePage,
-  selectedNodeId
+  selectedNodeId,
+  validateTarget
 }: NodeProps) {
   const ref = useRef<HTMLDivElement>(null);
   const [isAdjacent, isAdjacentRef, setIsAdjacent] = useRefState(false);
@@ -106,6 +108,17 @@ function DraggableTreeNode({
           isOverCurrent: monitor.isOver({ shallow: true }),
           canDrop: canDropItem
         };
+      },
+      canDrop: (droppedItem) => {
+        if (droppedItem.id === item.id) {
+          return false;
+        }
+
+        if (validateTarget) {
+          return validateTarget({ droppedItem, targetItem: item });
+        }
+
+        return true;
       }
     })
   );
@@ -203,6 +216,7 @@ function DraggableTreeNode({
             selectedNodeId={selectedNodeId}
             deletePage={deletePage}
             onClick={onClick}
+            validateTarget={validateTarget}
           />
         ))
       ) : (
