@@ -82,7 +82,10 @@ export default function WorkspaceSettings() {
       .updateSpace({ ...space, name: values.name, domain: values.domain, spaceImage: values.spaceImage })
       .then((updatedSpace) => {
         if (newDomain) {
-          window.location.href = router.asPath.replace(space.domain, values.domain as string);
+          // add a delay so that the form resets
+          setTimeout(() => {
+            window.location.href = router.asPath.replace(space.domain, values.domain as string);
+          }, 100);
         } else {
           setSpace(updatedSpace);
         }
