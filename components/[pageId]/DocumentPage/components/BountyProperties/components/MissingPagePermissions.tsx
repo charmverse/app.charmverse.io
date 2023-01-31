@@ -14,6 +14,8 @@ interface Props {
   target: Extract<BountyPermissionLevel, 'reviewer' | 'submitter'>;
 }
 
+type BountyPermissionGroup = TargetPermissionGroup<'role' | 'user' | 'space'>;
+
 export default function MissingPagePermissions({ bountyPermissions, pagePermissions, target }: Props) {
   const { roleups } = useRoles();
   const { members } = useMembers();
@@ -23,7 +25,7 @@ export default function MissingPagePermissions({ bountyPermissions, pagePermissi
   // Compare each existing assignee against page permissions
   const assigneesMissingPermissions = visibleToSpace
     ? []
-    : (bountyPermissions[target] ?? []).filter(
+    : ((bountyPermissions[target] ?? []).filter(
         (bountyPermissionAssignee) =>
           bountyPermissionAssignee.group !== 'public' &&
           !pagePermissions.some((pp) => {
@@ -38,13 +40,13 @@ export default function MissingPagePermissions({ bountyPermissions, pagePermissi
               return pp.roleId === bountyPermissionAssignee.id;
             }
           })
-      );
+      ) as BountyPermissionGroup[]);
 
   if (assigneesMissingPermissions.length === 0) {
     return null;
   }
 
-  const missingPermissionsWithName: (TargetPermissionGroup & { name: string })[] = assigneesMissingPermissions.map(
+  const missingPermissionsWithName: (BountyPermissionGroup & { name: string })[] = assigneesMissingPermissions.map(
     (assignee) => {
       return {
         ...assignee,
