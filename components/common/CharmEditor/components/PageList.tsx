@@ -11,6 +11,7 @@ interface Props {
   pages: PageMeta[];
   onSelectPage: (page: PageMeta) => void;
   emptyText?: string;
+  style?: React.CSSProperties;
 }
 
 export default function PagesList({
@@ -18,7 +19,8 @@ export default function PagesList({
   activeItemIndex = -1,
   activePageId,
   pages,
-  onSelectPage
+  onSelectPage,
+  style
 }: Props) {
   function isActive(pageId: string, index: number) {
     return pageId === activePageId || index === activeItemIndex;
@@ -36,12 +38,7 @@ export default function PagesList({
       {emptyText}
     </Typography>
   ) : (
-    <div
-      style={{
-        height: '250px',
-        overflow: 'auto'
-      }}
-    >
+    <div style={style}>
       {pages.map((page, pageIndex) => {
         return (
           <MenuItem
