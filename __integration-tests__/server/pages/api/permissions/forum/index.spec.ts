@@ -124,7 +124,7 @@ describe('POST /api/permissions/forum - Add post category permissions', () => {
 });
 
 describe('DELETE /api/permissions/forum - Delete post category permissions', () => {
-  it('should succeed if the user has "manage_permissions" access for the category, and respond 201', async () => {
+  it('should succeed if the user has "manage_permissions" access for the category, and respond 200', async () => {
     const postCategory = await generatePostCategory({
       spaceId: space.id
     });
@@ -156,7 +156,7 @@ describe('DELETE /api/permissions/forum - Delete post category permissions', () 
       .expect(200);
   });
 
-  it('should succeed if the user is a space administrator and respond 201', async () => {
+  it('should succeed if the user is a space administrator and respond 200', async () => {
     const postCategory = await generatePostCategory({
       spaceId: space.id
     });
