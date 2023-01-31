@@ -3,10 +3,13 @@ import { v4 } from 'uuid';
 
 import { prisma } from 'db';
 import { defaultPostCategories } from 'lib/forums/categories/generateDefaultPostCategories';
+import { typedKeys } from 'lib/utilities/objects';
 import { uid } from 'lib/utilities/strings';
+import { gettingStartedPage } from 'seedData/gettingStartedPage';
 
 import type { SpaceCreateInput } from '../createWorkspace';
 import { createWorkspace } from '../createWorkspace';
+import { spaceCreateTemplates } from '../utils';
 
 let user: User;
 
@@ -193,6 +196,30 @@ describe('createWorkspace', () => {
     // Make sure we only mutated domain, not name
     expect(secondSpace.name).toBe(newSpace.name);
     expect(secondSpace.domain).not.toBe(newSpace.domain);
+  });
+
+  it('should always include the getting started page when creating a space', async () => {
+    const spaceCreateOptions = typedKeys(spaceCreateTemplates);
+
+    for (const options of spaceCreateOptions) {
+      const newSpace = await createWorkspace({
+        userId: user.id,
+        createSpaceOption: options,
+        spaceData: {
+          name: `Name-${v4()}`
+        }
+      });
+
+      const page = await prisma.page.findFirst({
+        where: {
+          spaceId: newSpace.id,
+          contentText: gettingStartedPage.contentText,
+          headerImage: gettingStartedPage.headerImage
+        }
+      });
+
+      expect(page).toMatchObject(gettingStartedPage);
+    }
   });
 
   it('should generate a random space domain if no domain is provided with the name, and the name converted to a domain would evaluate to an existing domain', async () => {
