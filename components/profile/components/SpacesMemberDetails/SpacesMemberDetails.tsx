@@ -5,19 +5,23 @@ import { useState } from 'react';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { MemberPropertiesPopup } from 'components/profile/components/SpacesMemberDetails/components/MemberPropertiesPopup';
 import { SpaceDetailsAccordion } from 'components/profile/components/SpacesMemberDetails/components/SpaceDetailsAccordion';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMemberPropertyValues } from 'hooks/useMemberPropertyValues';
 import { useUser } from 'hooks/useUser';
 
 type Props = {
   memberId: string;
+  expandCurrentSpace?: boolean;
+  showOnlyCurrentSpace?: boolean;
 };
 
-export function SpacesMemberDetails({ memberId }: Props) {
+export function SpacesMemberDetails({ memberId, expandCurrentSpace = false, showOnlyCurrentSpace = false }: Props) {
   const { isLoading, memberPropertyValues, canEditSpaceProfile, updateSpaceValues } = useMemberPropertyValues(memberId);
   const [editSpaceId, setEditSpaceId] = useState<null | string>(null);
   const { query } = useRouter();
   const { user } = useUser();
   const readOnly = memberId !== user?.id;
+  const space = useCurrentSpace();
 
   if (isLoading) {
     return <LoadingComponent isLoading />;
@@ -39,9 +43,13 @@ export function SpacesMemberDetails({ memberId }: Props) {
         ]
       : memberPropertyValues;
 
+  const filteredPropertyValues = showOnlyCurrentSpace
+    ? propertyValues.filter((pv) => pv.spaceId === space?.id)
+    : propertyValues;
+
   return (
     <Box mt={2}>
-      {propertyValues.map((pv) => (
+      {filteredPropertyValues.map((pv) => (
         <SpaceDetailsAccordion
           key={pv.spaceId}
           spaceName={pv.spaceName}
@@ -49,7 +57,7 @@ export function SpacesMemberDetails({ memberId }: Props) {
           properties={pv.properties}
           readOnly={!canEditSpaceProfile(pv.spaceId) || readOnly}
           onEdit={() => setEditSpaceId(pv.spaceId)}
-          expanded={query.workspace === pv.spaceId}
+          expanded={expandCurrentSpace ? space?.id === pv.spaceId : query.workspace === pv.spaceId}
         />
       ))}
 

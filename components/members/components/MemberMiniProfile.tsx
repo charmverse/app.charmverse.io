@@ -43,7 +43,7 @@ export function MemberMiniProfile({ member, onClose }: { member: Member; onClose
             onClose={onClose}
           >
             <Stack display='flex' flexDirection='row' width='100%' alignItems='center' justifyContent='space-between'>
-              <Typography>{username} public profile</Typography>
+              <Typography variant='h6'>{username}'s profile</Typography>
               <Button
                 href={`/u/${user.path}`}
                 color='secondary'
@@ -58,7 +58,7 @@ export function MemberMiniProfile({ member, onClose }: { member: Member; onClose
           </DialogTitle>
           <DialogContent dividers>
             <UserDetails user={user} readOnly />
-            <SpacesMemberDetails memberId={user.id} />
+            <SpacesMemberDetails memberId={user.id} expandCurrentSpace showOnlyCurrentSpace />
           </DialogContent>
         </>
       )}
