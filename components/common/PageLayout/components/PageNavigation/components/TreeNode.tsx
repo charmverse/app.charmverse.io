@@ -26,8 +26,8 @@ export type ParentMenuNode = MenuNode & {
 
 type NodeProps = {
   item: ParentMenuNode;
-  onDropAdjacent: (a: ParentMenuNode, b: ParentMenuNode) => void;
-  onDropChild: (a: ParentMenuNode, b: ParentMenuNode) => void;
+  onDropAdjacent: null | ((a: ParentMenuNode, b: ParentMenuNode) => void);
+  onDropChild: null | ((a: ParentMenuNode, b: ParentMenuNode) => void);
   pathPrefix: string;
   addPage?: (p: Partial<Page>) => void;
   deletePage?: (id: string) => void;
@@ -57,19 +57,21 @@ function DraggableTreeNode({
     })
   }));
 
+  const dndEnabled = !!onDropAdjacent && !!onDropChild;
+
   const [{ canDrop, isOverCurrent }, drop] = useDrop<ParentMenuNode, any, { canDrop: boolean; isOverCurrent: boolean }>(
     () => ({
       accept: 'item',
       drop(droppedItem, monitor) {
         const didDrop = monitor.didDrop();
-        if (didDrop) {
+        if (didDrop || !dndEnabled) {
           return;
         }
         if (isAdjacentRef.current) {
-          onDropAdjacent(droppedItem, item);
+          onDropAdjacent?.(droppedItem, item);
           setIsAdjacent(false);
         } else {
-          onDropChild(droppedItem, item);
+          onDropChild?.(droppedItem, item);
         }
       },
 
@@ -110,7 +112,7 @@ function DraggableTreeNode({
         };
       },
       canDrop: (droppedItem) => {
-        if (droppedItem.id === item.id) {
+        if (droppedItem.id === item.id || !dndEnabled) {
           return false;
         }
 
@@ -175,7 +177,7 @@ function DraggableTreeNode({
       pageId={item.id}
       addSubPage={addSubPage}
       hasSelectedChildView={hasSelectedChildView}
-      ref={mergeRefs([ref, drag, drop, dragPreview, focusListener])}
+      ref={dndEnabled ? mergeRefs([ref, drag, drop, dragPreview, focusListener]) : null}
       label={item.title}
       href={`${pathPrefix}/${item.path}${
         item.type.includes('board') && focalboardViewsRecord[item.id] ? `?viewId=${focalboardViewsRecord[item.id]}` : ''
