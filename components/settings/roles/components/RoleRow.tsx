@@ -121,15 +121,11 @@ export default function RoleRow({
               </Typography>
             </Box>
             {isEditable && (
-              <IconButton
-                size='small'
-                onClick={(e) => {
-                  e.stopPropagation();
-                  menuState.open();
-                }}
-              >
-                <MoreHorizIcon />
-              </IconButton>
+              <div onClick={(e) => e.stopPropagation()}>
+                <IconButton size='small' {...bindTrigger(menuState)}>
+                  <MoreHorizIcon />
+                </IconButton>
+              </div>
             )}
           </Box>
         </AccordionSummary>
