@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 import EditIcon from '@mui/icons-material/Edit';
-import { Card, Chip, Grid, IconButton, Stack, Tooltip, Typography } from '@mui/material';
+import { Box, Card, Chip, Grid, IconButton, Stack, Tooltip, Typography } from '@mui/material';
 import type { MemberProperty, MemberPropertyType } from '@prisma/client';
 import type { MouseEvent } from 'react';
 import { useState } from 'react';
@@ -9,7 +9,6 @@ import Avatar from 'components/common/Avatar';
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
 import { SelectPreview } from 'components/common/form/fields/Select/SelectPreview';
 import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
-import Link from 'components/common/Link';
 import { SocialIcons } from 'components/profile/components/UserDetails/SocialIcons';
 import type { Social } from 'components/profile/interfaces';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -20,10 +19,11 @@ import type { Member } from 'lib/members/interfaces';
 import { humanFriendlyDate } from 'lib/utilities/dates';
 
 import { MemberPropertyTextMultiline } from './MemberDirectoryProperties/MemberPropertyTextMultiline';
+import { MemberMiniProfile } from './MemberMiniProfile';
 import { MemberOnboardingForm } from './MemberOnboardingForm';
 import { TimezoneDisplay } from './TimezoneDisplay';
 
-const StyledLink = styled(Link)`
+const StyledBox = styled(Box)`
   ${hoverIconsStyle({ absolutePositioning: true })};
 
   height: 100%;
@@ -54,7 +54,7 @@ function MemberDirectoryGalleryCard({ member }: { member: Member }) {
 
   const isUserCard = user?.id === member.id && currentSpace;
 
-  function openUserCard(e: MouseEvent<HTMLAnchorElement>) {
+  function openUserCard(e: MouseEvent<HTMLDivElement>) {
     e.preventDefault();
     e.stopPropagation();
     setIsModalOpen(true);
@@ -216,26 +216,32 @@ function MemberDirectoryGalleryCard({ member }: { member: Member }) {
 
   return (
     <>
-      <StyledLink
-        href={`/u/${member.path || member.id}${currentSpace ? `?workspace=${currentSpace.id}` : ''}`}
-        onClick={isUserCard ? openUserCard : undefined}
-        color='primary'
-      >
+      <StyledBox onClick={openUserCard} color='primary'>
         {content}
-      </StyledLink>
+      </StyledBox>
 
-      {isModalOpen && user && currentSpace && user.id === member.id && (
-        <MemberOnboardingForm
-          userId={member.id}
-          spaceName={currentSpace.name}
-          spaceId={currentSpace.id}
-          onClose={() => {
-            mutateMembers();
-            setIsModalOpen(false);
-          }}
-          title='Edit your profile'
-        />
-      )}
+      {isModalOpen &&
+        user &&
+        currentSpace &&
+        (user.id === member.id ? (
+          <MemberOnboardingForm
+            userId={member.id}
+            spaceName={currentSpace.name}
+            spaceId={currentSpace.id}
+            onClose={() => {
+              mutateMembers();
+              setIsModalOpen(false);
+            }}
+            title='Edit your profile'
+          />
+        ) : (
+          <MemberMiniProfile
+            onClose={() => {
+              setIsModalOpen(false);
+            }}
+            member={member}
+          />
+        ))}
     </>
   );
 }
