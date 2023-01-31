@@ -1,15 +1,13 @@
-import type { PostCategoryPermission, Role, Space, User } from '@prisma/client';
+import type { Space } from '@prisma/client';
 import request from 'supertest';
 
 import { prisma } from 'db';
 import type { AssignedPostCategoryPermission } from 'lib/permissions/forum/interfaces';
 import type { PostCategoryPermissionInput } from 'lib/permissions/forum/upsertPostCategoryPermission';
 import { upsertPostCategoryPermission } from 'lib/permissions/forum/upsertPostCategoryPermission';
-import type { IPagePermissionToCreate } from 'lib/permissions/pages';
-import { upsertPermission } from 'lib/permissions/pages';
 import type { LoggedInUser } from 'models';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
-import { createPage, generateRole, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { generateRole, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { generatePostCategory } from 'testing/utils/forums';
 
 let user: LoggedInUser;
@@ -29,7 +27,7 @@ beforeAll(async () => {
 });
 
 describe('POST /api/permissions/forum - Add post category permissions', () => {
-  it('should succeed if the user has permissions for the category, and respond 201', async () => {
+  it('should succeed if the user has "manage_permissions" access for the category, and respond 201', async () => {
     const postCategory = await generatePostCategory({
       spaceId: space.id
     });
@@ -107,7 +105,7 @@ describe('POST /api/permissions/forum - Add post category permissions', () => {
     );
   });
 
-  it('should fail if the user does not have permissions for the category and respond 401', async () => {
+  it('should fail if the user does not have "manage_permissions" access for the category and respond 401', async () => {
     const postCategory = await generatePostCategory({
       spaceId: space.id
     });
@@ -126,7 +124,7 @@ describe('POST /api/permissions/forum - Add post category permissions', () => {
 });
 
 describe('DELETE /api/permissions/forum - Delete post category permissions', () => {
-  it('should succeed if the user has permissions for the category, and respond 201', async () => {
+  it('should succeed if the user has "manage_permissions" access for the category, and respond 201', async () => {
     const postCategory = await generatePostCategory({
       spaceId: space.id
     });
@@ -175,7 +173,7 @@ describe('DELETE /api/permissions/forum - Delete post category permissions', () 
       .expect(200);
   });
 
-  it('should fail if the user does not have permissions for the category and respond 401', async () => {
+  it('should fail if the user does not have "manage_permissions" access for the category and respond 401', async () => {
     const postCategory = await generatePostCategory({
       spaceId: space.id
     });

@@ -58,7 +58,7 @@ describe('computePostCategoryPermissions', () => {
     });
   });
 
-  it('should return the correct operations for a moderator', async () => {
+  it('should only allow a moderator to create a post', async () => {
     const role = await generateRole({
       createdBy: adminUser.id,
       spaceId: space.id,
@@ -81,14 +81,10 @@ describe('computePostCategoryPermissions', () => {
       userId: spaceMemberUser.id
     });
 
-    const assignedPermissions = postCategoryPermissionsMapping[assignedPermission];
-
-    assignedPermissions.forEach((op) => {
-      expect(permissions[op]).toBe(true);
-    });
-
     postCategoryOperations.forEach((op) => {
-      if (!assignedPermissions.includes(op)) {
+      if (op === 'create_post') {
+        expect(permissions[op]).toBe(true);
+      } else {
         expect(permissions[op]).toBe(false);
       }
     });

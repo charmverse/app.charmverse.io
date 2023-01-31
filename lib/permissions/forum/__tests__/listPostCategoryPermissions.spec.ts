@@ -1,14 +1,12 @@
 import type { Role, Space, User } from '@prisma/client';
 import { v4 } from 'uuid';
 
-import { prisma } from 'db';
 import { PostCategoryNotFoundError } from 'lib/forums/categories/errors';
 import { InvalidInputError } from 'lib/utilities/errors';
-import { generateUserAndSpace, generateRole } from 'testing/setupDatabase';
+import { generateRole, generateUserAndSpace } from 'testing/setupDatabase';
 import { generatePostCategory } from 'testing/utils/forums';
 
 import { listPostCategoryPermissions } from '../listPostCategoryPermissions';
-import { mapPostCategoryPermissionToAssignee } from '../mapPostCategoryPermissionToAssignee';
 import { upsertPostCategoryPermission } from '../upsertPostCategoryPermission';
 
 let space: Space;
@@ -54,11 +52,8 @@ describe('listPostCategoryPermissions', () => {
     });
 
     expect(foundPermissions.length).toBe(permissions.length);
-
-    const mappedPermissions = permissions.map(mapPostCategoryPermissionToAssignee);
-
     foundPermissions.forEach((foundPermission) => {
-      expect(mappedPermissions).toContainEqual(expect.objectContaining(foundPermission));
+      expect(permissions).toContainEqual(expect.objectContaining(foundPermission));
     });
   });
 
