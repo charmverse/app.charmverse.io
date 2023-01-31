@@ -21,7 +21,6 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import useIsAdmin from 'hooks/useIsAdmin';
 import { useMembers } from 'hooks/useMembers';
 import { usePages } from 'hooks/usePages';
-import { useSnackbar } from 'hooks/useSnackbar';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import log from 'lib/log';
 import type { PageMeta } from 'lib/pages';
@@ -54,7 +53,6 @@ export default function PublishingForm({ onSubmit, page }: Props) {
 
   const space = useCurrentSpace();
   const { members } = useMembers();
-  const { showMessage } = useSnackbar();
 
   const [snapshotSpace, setSnapshotSpace] = useState<SnapshotSpace | null>(null);
   // Ensure we don't show any UI until we are done checking
@@ -102,7 +100,7 @@ export default function PublishingForm({ onSubmit, page }: Props) {
         const blockNum = await provider.getBlockNumber();
         setSnapshotBlockNumber(blockNum);
       } catch (err) {
-        setSnapshotBlockNumber(1);
+        setSnapshotBlockNumber(0);
       }
     }
   }
@@ -207,6 +205,14 @@ export default function PublishingForm({ onSubmit, page }: Props) {
         });
       }
 
+      if (!snapshotBlockNumber) {
+        throw new SystemError({
+          errorType: 'External service',
+          severity: 'warning',
+          message: 'Please provide correct snapshot block number.'
+        });
+      }
+
       const client = await getSnapshotClient();
 
       const proposalParams: any = {
@@ -219,11 +225,12 @@ export default function PublishingForm({ onSubmit, page }: Props) {
         end: Math.round(endDate.toSeconds()),
         snapshot: snapshotBlockNumber,
         network: snapshotSpace?.network,
-        // strategies: JSON.stringify([]),
         strategies: JSON.stringify(selectedVotingStrategies),
         plugins: JSON.stringify({}),
-        metadata: JSON.stringify({})
+        metadata: JSON.stringify({}),
+        app: ''
       };
+
       const receipt: SnapshotReceipt = (await client.proposal(
         library,
         utils.getAddress(account as string),
@@ -313,13 +320,14 @@ export default function PublishingForm({ onSubmit, page }: Props) {
 
             <Grid item>
               <FieldLabel>Block number</FieldLabel>
-              {!snapshotBlockNumber ? (
+              {snapshotBlockNumber == null ? (
                 <>
                   <LoadingIcon size={18} sx={{ mr: 1 }} />
                   Getting current block number
                 </>
               ) : (
                 <TextField
+                  error={!snapshotBlockNumber}
                   defaultValue={snapshotBlockNumber}
                   type='number'
                   onInput={(input: any) => {
