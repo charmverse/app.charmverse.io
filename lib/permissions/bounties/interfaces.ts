@@ -23,6 +23,8 @@ export type BountyReviewer = Extract<AssignablePermissionGroupsWithPublic, 'role
 
 export type BountySubmitter = Extract<AssignablePermissionGroupsWithPublic, 'space' | 'role'>;
 
+export type BountyPermissionGroup = TargetPermissionGroup<BountyReviewer | BountySubmitter>;
+
 export interface AssignedBountyPermissions {
   bountyPermissions: BountyPermissions;
   userPermissions: BountyPermissionFlags;

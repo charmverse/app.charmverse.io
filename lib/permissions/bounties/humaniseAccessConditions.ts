@@ -32,7 +32,7 @@ export function humaniseBountyAccessConditions({
 
   // No need to calculate roles if the target level is allowed for the whole space
   const assignedRoleNames = assignedRoles.map((r) => {
-    const matchingRole = roles.find((role) => role.id === r.id);
+    const matchingRole = roles.find((role) => role.id === (r as TargetPermissionGroup<'role'>).id);
 
     totalRoleMembers += matchingRole?.members ?? 0;
 
@@ -66,7 +66,7 @@ export function humaniseBountyAccessConditions({
             shouldCheckForDuplicates &&
             assignedRoles.some((reviewerRole) =>
               roles.some((roleInSpace) => {
-                return roleInSpace.users.some((u) => u.id === reviewerRole.id);
+                return roleInSpace.users.some((u) => u.id === (reviewerRole as TargetPermissionGroup<'role'>).id);
               })
             );
 

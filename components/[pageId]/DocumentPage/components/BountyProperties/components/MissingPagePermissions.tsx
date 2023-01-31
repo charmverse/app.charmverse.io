@@ -4,8 +4,8 @@ import type { BountyPermissionLevel } from '@prisma/client';
 
 import { useMembers } from 'hooks/useMembers';
 import useRoles from 'hooks/useRoles';
-import type { BountyPermissions } from 'lib/bounties';
-import type { PagePermissionMeta, TargetPermissionGroup } from 'lib/permissions/interfaces';
+import type { BountyPermissionGroup, BountyPermissions } from 'lib/bounties';
+import type { PagePermissionMeta } from 'lib/permissions/interfaces';
 import { isTruthy } from 'lib/utilities/types';
 
 interface Props {
@@ -13,8 +13,6 @@ interface Props {
   pagePermissions: PagePermissionMeta[];
   target: Extract<BountyPermissionLevel, 'reviewer' | 'submitter'>;
 }
-
-type BountyPermissionGroup = TargetPermissionGroup<'role' | 'user' | 'space'>;
 
 export default function MissingPagePermissions({ bountyPermissions, pagePermissions, target }: Props) {
   const { roleups } = useRoles();
