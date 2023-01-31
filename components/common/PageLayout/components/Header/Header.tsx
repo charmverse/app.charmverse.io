@@ -395,7 +395,7 @@ export default function Header({ open, openSidebar }: HeaderProps) {
           <PageTitleWithBreadcrumbs pageId={basePage?.id} pageType={basePage?.type} />
         </div>
 
-        <Box display='flex' alignItems='center' alignSelf='stretch' mr={-1}>
+        <Box display='flex' alignItems='center' alignSelf='stretch' mr={-1} gap={0.25}>
           {isBountyBoard && <BountyShareButton headerHeight={headerHeight} />}
 
           {basePage && (
@@ -410,17 +410,17 @@ export default function Header({ open, openSidebar }: HeaderProps) {
           {pageOptionsList && (
             <Box ref={pageMenuAnchor} display='flex' alignSelf='stretch' alignItems='center'>
               <div>
-                <IconButton
-                  size={isLargeScreen ? 'small' : 'medium'}
-                  onClick={() => {
-                    setPageMenuOpen(!pageMenuOpen);
-                    setPageMenuAnchorElement(pageMenuAnchor.current || null);
-                  }}
-                >
-                  <Tooltip title='View comments, export content and more' arrow>
+                <Tooltip title='View comments, export content and more' arrow>
+                  <IconButton
+                    size={isLargeScreen ? 'small' : 'medium'}
+                    onClick={() => {
+                      setPageMenuOpen(!pageMenuOpen);
+                      setPageMenuAnchorElement(pageMenuAnchor.current || null);
+                    }}
+                  >
                     <MoreHorizIcon color='secondary' />
-                  </Tooltip>
-                </IconButton>
+                  </IconButton>
+                </Tooltip>
               </div>
               <Popover
                 anchorEl={pageMenuAnchorElement}
@@ -452,7 +452,7 @@ export default function Header({ open, openSidebar }: HeaderProps) {
               </NotificationsBadge>
               <IconButton
                 size='small'
-                sx={{ display: { xs: 'none', md: 'inline-flex' }, mx: 1 }}
+                sx={{ display: { xs: 'none', md: 'inline-flex' } }}
                 onClick={colorMode.toggleColorMode}
                 color='inherit'
               >
