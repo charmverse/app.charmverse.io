@@ -71,6 +71,96 @@ interface HeaderProps {
 
 const documentTypes = ['page', 'card', 'proposal', 'proposal_template', 'bounty'];
 
+function CopyLinkMenuItem({ closeMenu }: { closeMenu: VoidFunction }) {
+  const { showMessage } = useSnackbar();
+
+  function onCopyLink() {
+    Utils.copyTextToClipboard(window.location.href);
+    showMessage('Copied link to clipboard', 'success');
+    closeMenu();
+  }
+
+  return (
+    <ListItemButton onClick={onCopyLink}>
+      <ContentCopyIcon
+        fontSize='small'
+        sx={{
+          mr: 1
+        }}
+      />
+      <ListItemText primary='Copy link' />
+    </ListItemButton>
+  );
+}
+
+function DeleteMenuItem({ disabled = false, onClick }: { disabled?: boolean; onClick: VoidFunction }) {
+  return (
+    <Tooltip title={disabled ? "You don't have permission to delete this page" : ''}>
+      <div>
+        <ListItemButton disabled={disabled} onClick={onClick}>
+          <DeleteOutlineOutlinedIcon
+            fontSize='small'
+            sx={{
+              mr: 1
+            }}
+          />
+          <ListItemText primary='Delete' />
+        </ListItemButton>
+      </div>
+    </Tooltip>
+  );
+}
+
+function UndoMenuItem({ disabled = false, onClick }: { disabled?: boolean; onClick: VoidFunction }) {
+  return (
+    <Tooltip title={disabled ? "You don't have permission to undo changes" : ''}>
+      <div>
+        <ListItemButton disabled={disabled} onClick={onClick}>
+          <UndoIcon
+            fontSize='small'
+            sx={{
+              mr: 1
+            }}
+          />
+          <ListItemText primary='Undo' />
+        </ListItemButton>
+      </div>
+    </Tooltip>
+  );
+}
+
+export function ExportMarkdownMenuItem({ disabled = false, onClick }: { disabled?: boolean; onClick: VoidFunction }) {
+  return (
+    <Tooltip title={disabled ? "This page can't be exported" : ''}>
+      <div>
+        <ListItemButton disabled={disabled} onClick={onClick}>
+          <GetAppOutlinedIcon
+            fontSize='small'
+            sx={{
+              mr: 1
+            }}
+          />
+          <ListItemText primary='Export to markdown' />
+        </ListItemButton>
+      </div>
+    </Tooltip>
+  );
+}
+
+export function Metadata({ creator, lastUpdatedAt }: { creator: string; lastUpdatedAt: Date }) {
+  return (
+    <Stack
+      sx={{
+        mx: 2,
+        my: 1
+      }}
+    >
+      <Typography variant='subtitle2'>Last edited by {creator}</Typography>
+      <Typography variant='subtitle2'>Last edited at {humanFriendlyDate(lastUpdatedAt)}</Typography>
+    </Stack>
+  );
+}
+
 export default function Header({ open, openSidebar }: HeaderProps) {
   const router = useRouter();
   const colorMode = useColorMode();
@@ -103,14 +193,14 @@ export default function Header({ open, openSidebar }: HeaderProps) {
     pageType === 'card' || pageType === 'page' || pageType === 'proposal' || pageType === 'bounty';
 
   const isBountyBoard = router.route === '/[domain]/bounties';
-  const targetPage = basePage ?? forumPost;
+  const currentPageOrPost = basePage ?? forumPost;
 
   const undoEvent = useMemo(() => {
-    if (targetPage) {
-      return new CustomEvent(undoEventName, { detail: { pageId: targetPage.id } });
+    if (currentPageOrPost) {
+      return new CustomEvent(undoEventName, { detail: { pageId: currentPageOrPost.id } });
     }
     return null;
-  }, [targetPage?.id]);
+  }, [currentPageOrPost?.id]);
 
   const isFullWidth = isSmallScreen || (basePage?.fullWidth ?? false);
   const isBasePageDocument = documentTypes.includes(basePage?.type ?? '');
@@ -145,9 +235,11 @@ export default function Header({ open, openSidebar }: HeaderProps) {
   }
 
   async function undoEditorChanges() {
-    if (targetPage) {
+    if (currentPageOrPost) {
       // There might be multiple instances of bangle editor in the document
-      const bangleEditorCoreElement = document.querySelector(`.bangle-editor-core[data-page-id="${targetPage.id}"]`);
+      const bangleEditorCoreElement = document.querySelector(
+        `.bangle-editor-core[data-page-id="${currentPageOrPost.id}"]`
+      );
       if (bangleEditorCoreElement) {
         bangleEditorCoreElement.dispatchEvent(undoEvent as Event);
       }
@@ -158,15 +250,40 @@ export default function Header({ open, openSidebar }: HeaderProps) {
   const canCreateProposal = !!userSpacePermissions?.createVote;
   const charmversePage = basePage ? members.find((member) => member.id === basePage.createdBy) : null;
 
-  function onCopyLink() {
-    Utils.copyTextToClipboard(window.location.href);
-    showMessage('Copied link to clipboard', 'success');
-    setPageMenuOpen(false);
-  }
-
   async function convertToProposal(pageId: string) {
     setPageMenuOpen(false);
     await charmClient.pages.convertToProposal(pageId);
+  }
+
+  function closeMenu() {
+    setPageMenuOpen(false);
+  }
+
+  async function exportMarkdownPage() {
+    if (basePage) {
+      const page = await charmClient.pages.getPage(basePage.id);
+      exportMarkdown({
+        content: page.content as PageContent,
+        id: page.id,
+        members,
+        spaceId: page.spaceId,
+        title: page.title
+      }).catch((err) => {
+        showMessage('Error exporting markdown', 'error');
+      });
+      setPageMenuOpen(false);
+    } else if (forumPost) {
+      exportMarkdown({
+        content: forumPost.content as PageContent,
+        id: forumPost.id,
+        members,
+        spaceId: forumPost.spaceId,
+        title: forumPost.title
+      }).catch((err) => {
+        showMessage('Error exporting markdown', 'error');
+      });
+      setPageMenuOpen(false);
+    }
   }
 
   const documentOptions = (
@@ -222,15 +339,7 @@ export default function Header({ open, openSidebar }: HeaderProps) {
           <ListItemText primary={isFavorite ? 'Remove from Favorites' : 'Add to Favorites'} />
         </ListItemButton>
       )}
-      <ListItemButton onClick={onCopyLink}>
-        <ContentCopyIcon
-          fontSize='small'
-          sx={{
-            mr: 1
-          }}
-        />
-        <ListItemText primary='Copy link' />
-      </ListItemButton>
+      <CopyLinkMenuItem closeMenu={closeMenu} />
       <Divider />
       {(basePage?.type === 'card' || basePage?.type === 'page') && (
         <>
@@ -250,32 +359,8 @@ export default function Header({ open, openSidebar }: HeaderProps) {
           <Divider />
         </>
       )}
-      <Tooltip title={!pagePermissions?.delete ? "You don't have permission to delete this page" : ''}>
-        <div>
-          <ListItemButton disabled={!pagePermissions?.delete || basePage?.deletedAt !== null} onClick={onDeletePage}>
-            <DeleteOutlineOutlinedIcon
-              fontSize='small'
-              sx={{
-                mr: 1
-              }}
-            />
-            <ListItemText primary='Delete' />
-          </ListItemButton>
-        </div>
-      </Tooltip>
-      <Tooltip title={!pagePermissions?.edit_content ? "You don't have permission to undo changes" : ''}>
-        <div>
-          <ListItemButton disabled={!pagePermissions?.edit_content} onClick={undoEditorChanges}>
-            <UndoIcon
-              fontSize='small'
-              sx={{
-                mr: 1
-              }}
-            />
-            <ListItemText primary='Undo' />
-          </ListItemButton>
-        </div>
-      </Tooltip>
+      <DeleteMenuItem onClick={onDeletePage} disabled={!pagePermissions?.delete || basePage?.deletedAt !== null} />
+      <UndoMenuItem onClick={undoEditorChanges} disabled={!pagePermissions?.edit_content} />
       <Divider />
       {basePage && (
         <PublishToSnapshot
@@ -288,36 +373,7 @@ export default function Header({ open, openSidebar }: HeaderProps) {
           )}
         />
       )}
-      <Tooltip title={!isExportablePage ? "This page can't be exported" : ''}>
-        <div>
-          <ListItemButton
-            disabled={!isExportablePage}
-            onClick={async () => {
-              if (basePage) {
-                const page = await charmClient.pages.getPage(basePage.id);
-                exportMarkdown({
-                  content: page.content as PageContent,
-                  id: page.id,
-                  members,
-                  spaceId: page.spaceId,
-                  title: page.title
-                }).catch((err) => {
-                  showMessage('Error exporting markdown', 'error');
-                });
-                setPageMenuOpen(false);
-              }
-            }}
-          >
-            <GetAppOutlinedIcon
-              fontSize='small'
-              sx={{
-                mr: 1
-              }}
-            />
-            <ListItemText primary='Export to markdown' />
-          </ListItemButton>
-        </div>
-      </Tooltip>
+      <ExportMarkdownMenuItem disabled={!isExportablePage} onClick={exportMarkdownPage} />
       {!isSmallScreen && (
         <>
           <Divider />
@@ -339,23 +395,11 @@ export default function Header({ open, openSidebar }: HeaderProps) {
       {charmversePage && basePage && (
         <>
           <Divider />
-          <Stack
-            sx={{
-              mx: 2,
-              my: 1
-            }}
-          >
-            <Typography variant='subtitle2'>Last edited by {charmversePage.username}</Typography>
-            <Typography variant='subtitle2'>Last edited at {humanFriendlyDate(basePage.updatedAt)}</Typography>
-          </Stack>
+          <Metadata creator={charmversePage.username} lastUpdatedAt={basePage.updatedAt} />
         </>
       )}
     </List>
   );
-
-  function closeMenu() {
-    setPageMenuOpen(false);
-  }
 
   let pageOptionsList: ReactNode;
 
@@ -367,80 +411,20 @@ export default function Header({ open, openSidebar }: HeaderProps) {
     );
   } else if (isForumPost && forumPost) {
     const postCreator = members.find((member) => member.id === forumPost.createdBy);
-    const isPostCreator = postCreator?.id === user?.id;
+
+    const isPostCreator = forumPost.createdBy === user?.id;
     pageOptionsList = (
       <List dense>
-        <ListItemButton onClick={onCopyLink}>
-          <ContentCopyIcon
-            fontSize='small'
-            sx={{
-              mr: 1
-            }}
-          />
-          <ListItemText primary='Copy link' />
-        </ListItemButton>
+        <CopyLinkMenuItem closeMenu={closeMenu} />
         <Divider />
-        <Tooltip title={!isPostCreator ? "You don't have permission to delete this post" : ''}>
-          <div>
-            <ListItemButton disabled={!isPostCreator} onClick={deletePost}>
-              <DeleteOutlineOutlinedIcon
-                fontSize='small'
-                sx={{
-                  mr: 1
-                }}
-              />
-              <ListItemText primary='Delete' />
-            </ListItemButton>
-          </div>
-        </Tooltip>
-        <Tooltip title={!isPostCreator ? "You don't have permission to undo changes" : ''}>
-          <div>
-            <ListItemButton disabled={!isPostCreator} onClick={undoEditorChanges}>
-              <UndoIcon
-                fontSize='small'
-                sx={{
-                  mr: 1
-                }}
-              />
-              <ListItemText primary='Undo' />
-            </ListItemButton>
-          </div>
-        </Tooltip>
-        <ListItemButton
-          onClick={async () => {
-            exportMarkdown({
-              content: forumPost.content as PageContent,
-              id: forumPost.id,
-              members,
-              spaceId: forumPost.spaceId,
-              title: forumPost.title
-            }).catch((err) => {
-              showMessage('Error exporting markdown', 'error');
-            });
-            setPageMenuOpen(false);
-          }}
-        >
-          <GetAppOutlinedIcon
-            fontSize='small'
-            sx={{
-              mr: 1
-            }}
-          />
-          <ListItemText primary='Export to markdown' />
-        </ListItemButton>
+        <DeleteMenuItem onClick={deletePost} disabled={!isPostCreator} />
+        <UndoMenuItem onClick={undoEditorChanges} disabled={!isPostCreator} />
+        <ExportMarkdownMenuItem onClick={exportMarkdownPage} />
         <Divider />
         {forumPost && postCreator && (
           <>
             <Divider />
-            <Stack
-              sx={{
-                mx: 2,
-                my: 1
-              }}
-            >
-              <Typography variant='subtitle2'>Last edited by {postCreator.username}</Typography>
-              <Typography variant='subtitle2'>Last edited at {humanFriendlyDate(forumPost.updatedAt)}</Typography>
-            </Stack>
+            <Metadata creator={postCreator.username} lastUpdatedAt={forumPost.updatedAt} />
           </>
         )}
       </List>
