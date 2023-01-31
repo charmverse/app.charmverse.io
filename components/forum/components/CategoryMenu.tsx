@@ -5,11 +5,8 @@ import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Divider from '@mui/material/Divider';
-import MenuItem from '@mui/material/MenuItem';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
-import Typography from '@mui/material/Typography';
-import type { PostCategory } from '@prisma/client';
 import startCase from 'lodash/startCase';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useState } from 'react';
@@ -19,80 +16,16 @@ import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
 import Modal from 'components/common/Modal';
 import { useForumCategories } from 'hooks/useForumCategories';
 import isAdmin from 'hooks/useIsAdmin';
-import { useSnackbar } from 'hooks/useSnackbar';
 import type { PostSortOption } from 'lib/forums/posts/constants';
 import { postSortOptions } from 'lib/forums/posts/constants';
 
-import { ForumFilterCategory } from './CategoryPopup';
 import type { FilterProps } from './CategorySelect';
+import { ForumFilterListLink } from './ForumFilterListLink';
 
 const StyledBox = styled(Box)`
   ${hoverIconsStyle({ marginForIcons: false })}
 `;
 
-type ForumSortFilterLinkProps = {
-  label: string;
-  isSelected: boolean;
-  // Could be a sort key, a post category ID, or null
-  value?: string;
-  handleSelect: (value?: string | PostSortOption) => void;
-};
-
-function ForumFilterListLink({ label, value, isSelected, handleSelect }: ForumSortFilterLinkProps) {
-  const { deleteForumCategory, updateForumCategory, setDefaultPostCategory, categories } = useForumCategories();
-  const { showMessage } = useSnackbar();
-  const admin = isAdmin();
-
-  const category = value ? categories.find((c) => c.id === value) : null;
-
-  function deleteCategory() {
-    if (category) {
-      deleteForumCategory(category).catch((err) => {
-        showMessage(err?.message || 'An error occurred while deleting the category');
-      });
-    }
-
-    showMessage('Category deleted');
-  }
-
-  return (
-    <MenuItem
-      dense
-      sx={{
-        display: 'flex',
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between'
-      }}
-    >
-      <Typography
-        sx={{
-          color: 'text.primary',
-          cursor: 'pointer',
-          whiteSpace: 'nowrap',
-          width: '100%',
-          overflow: 'hidden',
-          textOverflow: 'ellipsis'
-        }}
-        fontWeight={isSelected ? 'bold' : 'initial'}
-        onClick={() => handleSelect(value)}
-      >
-        {label}
-      </Typography>
-
-      {admin && category && (
-        <span className='icons'>
-          <ForumFilterCategory
-            category={category as PostCategory}
-            onChange={updateForumCategory}
-            onDelete={deleteCategory}
-            onSetNewDefaultCategory={setDefaultPostCategory}
-          />
-        </span>
-      )}
-    </MenuItem>
-  );
-}
 export function CategoryMenu({ handleCategory, handleSort, selectedCategoryId, selectedSort = 'new' }: FilterProps) {
   const { categories, error, createForumCategory } = useForumCategories();
   const addCategoryPopupState = usePopupState({ variant: 'popover', popupId: 'add-category' });

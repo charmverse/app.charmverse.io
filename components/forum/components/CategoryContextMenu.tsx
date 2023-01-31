@@ -9,17 +9,21 @@ import { useEffect, useMemo, useState } from 'react';
 import FieldLabel from 'components/common/form/FieldLabel';
 import PopperPopup from 'components/common/PopperPopup';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import useIsAdmin from 'hooks/useIsAdmin';
+import type { AvailablePostCategoryPermissionFlags } from 'lib/permissions/forum/interfaces';
 
 type Props = {
   category: PostCategory;
   onChange: (category: PostCategory) => void;
   onDelete: (category: PostCategory) => void;
   onSetNewDefaultCategory: (category: PostCategory) => void;
+  permissions: AvailablePostCategoryPermissionFlags;
 };
 
-export function ForumFilterCategory({ category, onChange, onDelete, onSetNewDefaultCategory }: Props) {
+export function CategoryContextMenu({ category, onChange, onDelete, onSetNewDefaultCategory, permissions }: Props) {
   const [tempName, setTempName] = useState(category.name || '');
   const space = useCurrentSpace();
+  const isAdmin = useIsAdmin();
 
   useEffect(() => {
     setTempName(category.name || '');
@@ -39,6 +43,7 @@ export function ForumFilterCategory({ category, onChange, onDelete, onSetNewDefa
         <Stack p={1}>
           <FieldLabel variant='subtitle2'>Category name</FieldLabel>
           <TextField
+            disabled={!permissions.edit_category}
             value={tempName}
             onChange={(e) => setTempName(e.target.value)}
             autoFocus
@@ -52,7 +57,7 @@ export function ForumFilterCategory({ category, onChange, onDelete, onSetNewDefa
         </Stack>
         {!isDefaultSpacePostCategory && (
           <MenuItem
-            disabled={isDefaultSpacePostCategory}
+            disabled={isDefaultSpacePostCategory || !isAdmin}
             onClick={() => {
               onSetNewDefaultCategory(category);
             }}
