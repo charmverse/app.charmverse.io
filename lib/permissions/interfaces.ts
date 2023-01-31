@@ -58,6 +58,15 @@ export interface PermissionComputeRequest {
 }
 
 /**
+ * This is the data we need to compute permissions for a resource
+ * It is an improvement after Permission Compute Request, since we assume that all permission compute methods should be responsible for deciding if an admin override is available for a specific operation
+ */
+export type PermissionCompute = {
+  resourceId: string;
+  userId?: string;
+};
+
+/**
  * @id The userId, roleId or spaceId
  * @resourceId The resource such as Space or Page we are querying permissions for
  */
@@ -101,4 +110,14 @@ export interface BountyPagePermissionIntersectionQuery {
 export interface BountyPagePermissionIntersection {
   hasPermissions: TargetPermissionGroup[];
   missingPermissions: TargetPermissionGroup[];
+}
+
+export interface AbstractPermissions<O extends string> {
+  get empty(): UserPermissionFlags<O, false>;
+  get full(): UserPermissionFlags<O, true>;
+  get operationFlags(): UserPermissionFlags<O>;
+
+  addPermissions(operations: O[] | Partial<UserPermissionFlags<O>>): void;
+
+  hasPermissions(operations: O[]): boolean;
 }

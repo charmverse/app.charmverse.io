@@ -1145,6 +1145,7 @@ enum PostCategoryOperation {
   manage_permissions
   delete_category
   edit_category
+  create_post
 }
 
 enum PostOperation {
@@ -1155,6 +1156,8 @@ enum PostOperation {
   lock_post
   add_comment
   delete_comments
+  upvote
+  downvote
 }
 
 
