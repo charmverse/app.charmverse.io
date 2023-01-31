@@ -95,6 +95,36 @@ describe('computePostCategoryPermissions', () => {
     });
   });
 
+  it('should only allow a member-level user to create a post', async () => {
+    const role = await generateRole({
+      createdBy: adminUser.id,
+      spaceId: space.id,
+      assigneeUserIds: [spaceMemberUser.id]
+    });
+    const postCategory = await generatePostCategory({ spaceId: space.id });
+
+    await prisma.postCategoryPermission.create({
+      data: {
+        permissionLevel: 'member',
+        postCategory: { connect: { id: postCategory.id } },
+        role: { connect: { id: role.id } }
+      }
+    });
+
+    const permissions = await computePostCategoryPermissions({
+      resourceId: postCategory.id,
+      userId: spaceMemberUser.id
+    });
+
+    postCategoryOperations.forEach((op) => {
+      if (op === 'create_post') {
+        expect(permissions[op]).toBe(true);
+      } else {
+        expect(permissions[op]).toBe(false);
+      }
+    });
+  });
+
   it('should always return full permissions for a space administrator', async () => {
     const postCategory = await generatePostCategory({ spaceId: space.id });
     const permissions = await computePostCategoryPermissions({

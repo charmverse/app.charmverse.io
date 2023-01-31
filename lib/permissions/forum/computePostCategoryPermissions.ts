@@ -36,7 +36,7 @@ export async function computePostCategoryPermissions({
   if (isAdmin) {
     return permissions.full;
 
-    // Requester does not have category permissions
+    // Requester is not a space member
   } else if (error) {
     return permissions.empty;
   }
