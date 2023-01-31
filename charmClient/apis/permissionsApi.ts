@@ -28,4 +28,10 @@ export class PermissionsApi {
   deletePostCategoryPermission(permissionId: string) {
     return http.DELETE('/api/forum/permissions', { permissionId } as PermissionToDelete);
   }
+
+  listPostCategoryPermissions(postCategoryId: string) {
+    return http.GET<PostCategoryPermission[]>('/api/permissions/forum/list-post-category-permissions', {
+      resourceId: postCategoryId
+    } as PermissionCompute);
+  }
 }
