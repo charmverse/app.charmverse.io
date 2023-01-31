@@ -75,9 +75,7 @@ function PageNavigation({ deletePage, isFavorites, rootPageIds, onClick }: PageN
   const isValidDropTarget = useCallback(
     ({ droppedItem, targetItem }: { droppedItem: MenuNode; targetItem: MenuNode }) => {
       // do not allow to drop parent onto children
-      return (
-        droppedItem.id !== targetItem?.id && !isParentNode({ node: droppedItem, child: targetItem, items: pagesArray })
-      );
+      return droppedItem.id !== targetItem?.id && !isParentNode({ node: droppedItem, child: targetItem, items: pages });
     },
     [pagesArray]
   );

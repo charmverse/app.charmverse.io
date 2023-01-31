@@ -185,14 +185,22 @@ export function flattenTree<T extends PageNode = PageNode>(
   return flatNodes;
 }
 
-export function isParentNode({ node, child, items }: { node: PageNode; child: PageNode; items: PageNode[] }): boolean {
+type BaseNode = { id: string; parentId: string | null };
+
+export function isParentNode({
+  node,
+  child,
+  items
+}: {
+  node: BaseNode | null;
+  child: BaseNode | null;
+  items: Record<string, BaseNode | undefined>;
+}): boolean {
   if (!node || !child || node.id === child.id || !child.parentId) {
     return false;
   }
+  const parentNode = items[child.parentId];
 
-  const currentNode = child;
-
-  const parentNode = items.find((item) => item.id === currentNode.parentId);
   if (!parentNode) {
     return false;
   }
