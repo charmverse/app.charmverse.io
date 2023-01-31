@@ -1,8 +1,9 @@
+import type { PostCategoryPermission, PostCategoryPermissionLevel } from '@prisma/client';
 import { PostCategoryOperation, PostOperation } from '@prisma/client';
 
 import { typedKeys } from 'lib/utilities/objects';
 
-import type { AssignablePermissionGroupsWithPublic, UserPermissionFlags } from '../interfaces';
+import type { AssignablePermissionGroupsWithPublic, TargetPermissionGroup, UserPermissionFlags } from '../interfaces';
 
 export type AssignablePostCategoryPermissionGroups = Extract<
   AssignablePermissionGroupsWithPublic,
@@ -18,3 +19,12 @@ export const postOperationsWithoutEdit = postOperations.filter((operation) => op
 
 export type AvailablePostPermissionFlags = UserPermissionFlags<PostOperation>;
 export type AvailablePostCategoryPermissionFlags = UserPermissionFlags<PostCategoryOperation>;
+
+export type AssignedPostCategoryPermission<
+  T extends AssignablePostCategoryPermissionGroups = AssignablePostCategoryPermissionGroups
+> = {
+  id: string;
+  postCategoryId: string;
+  permissionLevel: PostCategoryPermissionLevel;
+  assignee: TargetPermissionGroup<T>;
+};

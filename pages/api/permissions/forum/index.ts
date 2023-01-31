@@ -1,4 +1,3 @@
-import type { PostCategoryPermission } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -6,7 +5,7 @@ import { prisma } from 'db';
 import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { computePostCategoryPermissions } from 'lib/permissions/forum/computePostCategoryPermissions';
 import { deletePostCategoryPermission } from 'lib/permissions/forum/deletePostCategoryPermission';
-import type { PostCategoryPermissionInput } from 'lib/permissions/forum/upsertPostCategoryPermission';
+import type { AssignedPostCategoryPermission } from 'lib/permissions/forum/interfaces';
 import { upsertPostCategoryPermission } from 'lib/permissions/forum/upsertPostCategoryPermission';
 import type { PermissionToDelete } from 'lib/permissions/interfaces';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -19,8 +18,8 @@ handler
   .delete(requireKeys<PermissionToDelete>(['permissionId'], 'body'), removePostCategoryPermission)
   .post(addPostCategoryPermission);
 
-async function addPostCategoryPermission(req: NextApiRequest, res: NextApiResponse<PostCategoryPermission>) {
-  const input = req.body as PostCategoryPermissionInput;
+async function addPostCategoryPermission(req: NextApiRequest, res: NextApiResponse<AssignedPostCategoryPermission>) {
+  const input = req.body as AssignedPostCategoryPermission;
 
   const permissions = await computePostCategoryPermissions({
     resourceId: input.postCategoryId,

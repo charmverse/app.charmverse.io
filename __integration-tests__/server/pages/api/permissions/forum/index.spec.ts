@@ -2,6 +2,7 @@ import type { PostCategoryPermission, Role, Space, User } from '@prisma/client';
 import request from 'supertest';
 
 import { prisma } from 'db';
+import type { AssignedPostCategoryPermission } from 'lib/permissions/forum/interfaces';
 import type { PostCategoryPermissionInput } from 'lib/permissions/forum/upsertPostCategoryPermission';
 import { upsertPostCategoryPermission } from 'lib/permissions/forum/upsertPostCategoryPermission';
 import type { IPagePermissionToCreate } from 'lib/permissions/pages';
@@ -59,18 +60,17 @@ describe('POST /api/permissions/forum - Add post category permissions', () => {
         .set('Cookie', userCookie)
         .send(permissionToCreate)
         .expect(201)
-    ).body as PostCategoryPermission;
+    ).body as AssignedPostCategoryPermission;
 
     expect(result).toMatchObject(
-      expect.objectContaining<PostCategoryPermission>({
+      expect.objectContaining<AssignedPostCategoryPermission>({
         id: expect.any(String),
         permissionLevel: 'member',
         postCategoryId: postCategory.id,
-        public: null,
-        roleId: null,
-        spaceId: space.id,
-        categoryOperations: [],
-        postOperations: []
+        assignee: {
+          group: 'space',
+          id: space.id
+        }
       })
     );
   });
@@ -92,18 +92,17 @@ describe('POST /api/permissions/forum - Add post category permissions', () => {
         .set('Cookie', adminUserCookie)
         .send(permissionToCreate)
         .expect(201)
-    ).body as PostCategoryPermission;
+    ).body as AssignedPostCategoryPermission;
 
     expect(result).toMatchObject(
-      expect.objectContaining<PostCategoryPermission>({
+      expect.objectContaining<AssignedPostCategoryPermission>({
         id: expect.any(String),
         permissionLevel: 'member',
         postCategoryId: postCategory.id,
-        public: null,
-        roleId: null,
-        spaceId: space.id,
-        categoryOperations: [],
-        postOperations: []
+        assignee: {
+          group: 'space',
+          id: space.id
+        }
       })
     );
   });

@@ -1,6 +1,6 @@
-import type { PostCategoryPermission } from '@prisma/client';
 import request from 'supertest';
 
+import type { AssignedPostCategoryPermission } from 'lib/permissions/forum/interfaces';
 import { upsertPostCategoryPermission } from 'lib/permissions/forum/upsertPostCategoryPermission';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateRole, generateUserAndSpace } from 'testing/setupDatabase';
@@ -34,7 +34,7 @@ describe('GET /api/permissions/forum/list-post-category-permissions - List avail
         .set('Cookie', userCookie)
         .send({ resourceId: postCategory.id })
         .expect(200)
-    ).body as PostCategoryPermission[];
+    ).body as AssignedPostCategoryPermission[];
 
     expect(result.length).toBe(1);
     expect(result[0]).toMatchObject(expect.objectContaining(permission));
@@ -45,7 +45,7 @@ describe('GET /api/permissions/forum/list-post-category-permissions - List avail
         .get(`/api/permissions/forum/list-post-category-permissions?resourceId=${postCategory.id}`)
         .send({ resourceId: postCategory.id })
         .expect(200)
-    ).body as PostCategoryPermission[];
+    ).body as AssignedPostCategoryPermission[];
 
     expect(publicResult.length).toBe(0);
   });

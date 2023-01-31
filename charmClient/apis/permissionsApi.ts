@@ -3,7 +3,8 @@ import type { PostCategoryPermission } from '@prisma/client';
 import * as http from 'adapters/http';
 import type {
   AvailablePostCategoryPermissionFlags,
-  AvailablePostPermissionFlags
+  AvailablePostPermissionFlags,
+  AssignedPostCategoryPermission
 } from 'lib/permissions/forum/interfaces';
 import type { PostCategoryPermissionInput } from 'lib/permissions/forum/upsertPostCategoryPermission';
 import type { PermissionCompute, PermissionToDelete } from 'lib/permissions/interfaces';
@@ -22,7 +23,7 @@ export class PermissionsApi {
   }
 
   addPostCategoryPermission(permissionInput: PostCategoryPermissionInput) {
-    return http.POST<PostCategoryPermission>('/api/forum/permissions', permissionInput);
+    return http.POST<AssignedPostCategoryPermission>('/api/forum/permissions', permissionInput);
   }
 
   deletePostCategoryPermission(permissionId: string) {
@@ -30,7 +31,7 @@ export class PermissionsApi {
   }
 
   listPostCategoryPermissions(postCategoryId: string) {
-    return http.GET<PostCategoryPermission[]>('/api/permissions/forum/list-post-category-permissions', {
+    return http.GET<AssignedPostCategoryPermission[]>('/api/permissions/forum/list-post-category-permissions', {
       resourceId: postCategoryId
     } as PermissionCompute);
   }

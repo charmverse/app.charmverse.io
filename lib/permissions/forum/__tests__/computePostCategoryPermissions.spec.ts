@@ -1,16 +1,15 @@
-import type { PostCategoryPermissionLevel, Space, User, SpaceRole } from '@prisma/client';
+import type { PostCategoryPermissionLevel, Space, User } from '@prisma/client';
 import { v4 } from 'uuid';
 
 import { prisma } from 'db';
 import { PostCategoryNotFoundError } from 'lib/forums/categories/errors';
-import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
+import { InvalidInputError } from 'lib/utilities/errors';
 import { generateRole, generateSpaceUser, generateUserAndSpace } from 'testing/setupDatabase';
 import { generatePostCategory } from 'testing/utils/forums';
 
 import { computePostCategoryPermissions } from '../computePostCategoryPermissions';
 import { postCategoryOperations } from '../interfaces';
 import { postCategoryPermissionsMapping } from '../mapping';
-import { upsertPostCategoryPermission } from '../upsertPostCategoryPermission';
 
 let adminUser: User;
 let spaceMemberUser: User;

@@ -8,6 +8,7 @@ import { generateUserAndSpace, generateRole } from 'testing/setupDatabase';
 import { generatePostCategory } from 'testing/utils/forums';
 
 import { listPostCategoryPermissions } from '../listPostCategoryPermissions';
+import { mapPostCategoryPermissionToAssignee } from '../mapPostCategoryPermissionToAssignee';
 import { upsertPostCategoryPermission } from '../upsertPostCategoryPermission';
 
 let space: Space;
@@ -52,10 +53,12 @@ describe('listPostCategoryPermissions', () => {
       userId: user.id
     });
 
-    expect(permissions.length).toBe(permissions.length);
+    expect(foundPermissions.length).toBe(permissions.length);
+
+    const mappedPermissions = permissions.map(mapPostCategoryPermissionToAssignee);
 
     foundPermissions.forEach((foundPermission) => {
-      expect(permissions).toContainEqual(expect.objectContaining(foundPermission));
+      expect(mappedPermissions).toContainEqual(expect.objectContaining(foundPermission));
     });
   });
 

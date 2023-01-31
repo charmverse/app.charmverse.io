@@ -11,20 +11,22 @@ import {
 import { isUUID } from 'lib/utilities/strings';
 
 import { AssignmentNotPermittedError } from '../errors';
-import type { TargetPermissionGroup } from '../interfaces';
 
-import type { AssignablePostCategoryPermissionGroups } from './interfaces';
+import type { AssignablePostCategoryPermissionGroups, AssignedPostCategoryPermission } from './interfaces';
 import { postCategoryPermissionGroups } from './interfaces';
+import { mapPostCategoryPermissionToAssignee } from './mapPostCategoryPermissionToAssignee';
 
 export type PostCategoryPermissionInput<
   T extends AssignablePostCategoryPermissionGroups = AssignablePostCategoryPermissionGroups
-> = Pick<PostCategoryPermission, 'postCategoryId' | 'permissionLevel'> & {
-  assignee: TargetPermissionGroup<T>;
-};
+> = Pick<AssignedPostCategoryPermission<T>, 'assignee' | 'permissionLevel' | 'postCategoryId'>;
 
 export async function upsertPostCategoryPermission<
   T extends AssignablePostCategoryPermissionGroups = AssignablePostCategoryPermissionGroups
->({ assignee, permissionLevel, postCategoryId }: PostCategoryPermissionInput<T>): Promise<PostCategoryPermission> {
+>({
+  assignee,
+  permissionLevel,
+  postCategoryId
+}: PostCategoryPermissionInput<T>): Promise<AssignedPostCategoryPermission<T>> {
   if (!isUUID(postCategoryId)) {
     throw new InvalidInputError('Valid post category ID is required');
   }
@@ -104,7 +106,7 @@ export async function upsertPostCategoryPermission<
           }
         };
 
-  return prisma.postCategoryPermission.upsert({
+  const permission = await prisma.postCategoryPermission.upsert({
     where: whereQuery,
     create: {
       permissionLevel,
@@ -119,4 +121,6 @@ export async function upsertPostCategoryPermission<
       permissionLevel
     }
   });
+
+  return mapPostCategoryPermissionToAssignee(permission) as AssignedPostCategoryPermission<T>;
 }

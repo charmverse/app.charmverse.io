@@ -8,10 +8,13 @@ import { isUUID } from 'lib/utilities/strings';
 
 import type { PermissionCompute, PermissionComputeRequest } from '../interfaces';
 
+import type { AssignablePostCategoryPermissionGroups, AssignedPostCategoryPermission } from './interfaces';
+import { mapPostCategoryPermissionToAssignee } from './mapPostCategoryPermissionToAssignee';
+
 export async function listPostCategoryPermissions({
   resourceId,
   userId
-}: PermissionCompute): Promise<PostCategoryPermission[]> {
+}: PermissionCompute): Promise<AssignedPostCategoryPermission[]> {
   if (!userId) {
     return [];
   }
@@ -42,9 +45,22 @@ export async function listPostCategoryPermissions({
     return [];
   }
 
-  return prisma.postCategoryPermission.findMany({
+  const permissions = await prisma.postCategoryPermission.findMany({
     where: {
       postCategoryId: resourceId
     }
   });
+
+  const mappedPermissions: AssignedPostCategoryPermission[] = permissions
+    .map((permission) => {
+      try {
+        const mapped = mapPostCategoryPermissionToAssignee(permission);
+        return mapped;
+      } catch (err) {
+        return null;
+      }
+    })
+    .filter((permission) => permission !== null) as AssignedPostCategoryPermission[];
+
+  return mappedPermissions;
 }

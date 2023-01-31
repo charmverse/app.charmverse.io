@@ -1,18 +1,17 @@
 import type { PostCategory, Space, User } from '@prisma/client';
 import { v4 } from 'uuid';
 
-import { AssignmentNotPermittedError, InvalidPermissionGranteeError } from 'lib/permissions/errors';
+import { AssignmentNotPermittedError } from 'lib/permissions/errors';
 import {
   DataNotFoundError,
   InsecureOperationError,
   InvalidInputError,
-  MissingDataError,
   UndesirableOperationError
 } from 'lib/utilities/errors';
 import { generateRole, generateUserAndSpace } from 'testing/setupDatabase';
 import { generatePostCategory } from 'testing/utils/forums';
 
-import { upsertPostCategoryPermission, PostCategoryPermissionInput } from '../upsertPostCategoryPermission';
+import { upsertPostCategoryPermission } from '../upsertPostCategoryPermission';
 
 let space: Space;
 let user: User;
@@ -35,9 +34,8 @@ describe('upsertPostCategoryPermission', () => {
     });
 
     expect(permission.permissionLevel).toBe('member');
-    expect(permission.roleId).toBe(role.id);
-    expect(permission.spaceId).toBe(null);
-    expect(permission.public).toBe(null);
+    expect(permission.assignee.group).toBe('role');
+    expect(permission.assignee.id).toBe(role.id);
   });
 
   it('should create a new post category permission with a space assignee', async () => {
@@ -48,9 +46,8 @@ describe('upsertPostCategoryPermission', () => {
     });
 
     expect(permission.permissionLevel).toBe('member');
-    expect(permission.spaceId).toBe(space.id);
-    expect(permission.roleId).toBe(null);
-    expect(permission.public).toBe(null);
+    expect(permission.assignee.group).toBe('space');
+    expect(permission.assignee.id).toBe(space.id);
   });
 
   it('should create a new post category permission with a public assignee', async () => {
@@ -61,9 +58,8 @@ describe('upsertPostCategoryPermission', () => {
     });
 
     expect(permission.permissionLevel).toBe('guest');
-    expect(permission.public).toBe(true);
-    expect(permission.spaceId).toBe(null);
-    expect(permission.roleId).toBe(null);
+    expect(permission.assignee.group).toBe('public');
+    expect((permission.assignee as any).id).toBeUndefined();
   });
 
   it('should update an existing permission for the same group', async () => {
@@ -85,18 +81,19 @@ describe('upsertPostCategoryPermission', () => {
     expect(afterUpdate.id).toBe(permission.id);
   });
 
-  it('should should leave category operation and post operation fields empty when the level is not "custom"', async () => {
-    const role = await generateRole({ createdBy: user.id, spaceId: space.id });
+  // Re-add this test when we add support for custom permissions
+  // it('should should leave category operation and post operation fields empty when the level is not "custom"', async () => {
+  //   const role = await generateRole({ createdBy: user.id, spaceId: space.id });
 
-    const permission = await upsertPostCategoryPermission({
-      permissionLevel: 'member',
-      postCategoryId: postCategory.id,
-      assignee: { group: 'role', id: role.id }
-    });
+  //   const permission = await upsertPostCategoryPermission({
+  //     permissionLevel: 'member',
+  //     postCategoryId: postCategory.id,
+  //     assignee: { group: 'role', id: role.id }
+  //   });
 
-    expect(permission.categoryOperations.length).toBe(0);
-    expect(permission.postOperations.length).toBe(0);
-  });
+  //   expect(permission.categoryOperations.length).toBe(0);
+  //   expect(permission.postOperations.length).toBe(0);
+  // });
 
   it('should fail to create a new post category permission for roles or spaces not matching the current space', async () => {
     const { space: otherSpace, user: otherSpaceUser } = await generateUserAndSpace();
