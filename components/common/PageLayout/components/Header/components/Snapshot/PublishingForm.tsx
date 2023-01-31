@@ -209,7 +209,7 @@ export default function PublishingForm({ onSubmit, page }: Props) {
         throw new SystemError({
           errorType: 'External service',
           severity: 'warning',
-          message: 'Please provide correct snapshot block number.'
+          message: 'Could not retrieve block number from Snapshot. Please enter this manually.'
         });
       }
 
