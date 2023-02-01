@@ -60,9 +60,8 @@ async function exec() {
   console.log('Date Range: ' + dateRange);
   console.log('------------------------------------');
   const tableData = sortedDiffs
-    // @ts-ignore
     .map((diff) =>
-      diff.data.ds.map((ds, i) => ({
+      (diff.data as { ds: any[] })?.ds.map((ds, i) => ({
         version: (diff.version + i * 0.1).toFixed(1),
         date: diff.createdAt.toLocaleString(),
         // @ts-ignore
