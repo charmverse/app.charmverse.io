@@ -55,6 +55,8 @@ describe('updateSpace', () => {
       defaultPublicPages: false,
       discordServerId: v4(),
       permissionConfigurationMode: 'readOnly',
+      webhookSubscriptionUrl: null,
+      webhookSigningSecret: null,
       superApiTokenId: v4()
     };
 
