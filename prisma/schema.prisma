@@ -1151,7 +1151,9 @@ model NotificationPreferences {
   spaceId             String                   @db.Uuid
   space               Space                    @relation(fields: [spaceId], references: [id], onDelete: Cascade)
   forumCategoriesMode CategorySubscriptionMode @default(blacklist)
+  // just keep a list of ids instead of another table, since we dont really care if they exist or not in the db
   forumCategories     String[]
 
   @@unique([userId, spaceId])
+  @@index([userId, spaceId])
 }
