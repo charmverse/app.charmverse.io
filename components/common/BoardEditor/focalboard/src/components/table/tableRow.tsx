@@ -172,7 +172,7 @@ function TableRow(props: Props) {
             >
               {!props.readOnly && (
                 <IconButton className='icons' onClick={handleClick} size='small'>
-                  <DragIndicatorIcon />
+                  <DragIndicatorIcon color='secondary' />
                 </IconButton>
               )}
               <div className='octo-icontitle'>

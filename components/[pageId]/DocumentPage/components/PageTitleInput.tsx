@@ -78,7 +78,7 @@ export function PageTitleInput({ value, updatedAt: updatedAtExternal, onChange, 
       value={title}
       onChange={_onChange}
       placeholder='Untitled'
-      autoFocus={!readOnly && !isTouchScreen()}
+      autoFocus={!value && !readOnly && !isTouchScreen()}
       multiline
       variant='standard'
       onKeyDown={(e) => {
