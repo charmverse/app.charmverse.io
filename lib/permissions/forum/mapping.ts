@@ -17,3 +17,11 @@ export const postPermissionsMapping: Record<PostCategoryPermissionLevel, PostOpe
   guest: ['view_post'],
   custom: []
 };
+
+export const postCategoryPermissionLabels: Record<PostCategoryPermissionLevel, string> = {
+  category_admin: 'Category Admin',
+  moderator: 'Moderator',
+  member: 'Member',
+  guest: 'Guest',
+  custom: 'Custom'
+} as const;

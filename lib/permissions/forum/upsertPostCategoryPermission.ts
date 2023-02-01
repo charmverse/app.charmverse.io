@@ -1,4 +1,4 @@
-import type { PostCategoryPermission, Prisma } from '@prisma/client';
+import type { Prisma } from '@prisma/client';
 import { PostCategoryPermissionLevel } from '@prisma/client';
 
 import { prisma } from 'db';

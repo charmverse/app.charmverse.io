@@ -16,9 +16,12 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 handler
   .use(requireUser)
   .delete(requireKeys<PermissionToDelete>(['permissionId'], 'body'), removePostCategoryPermission)
-  .post(addPostCategoryPermission);
+  .post(upsertPostCategoryPermissionController);
 
-async function addPostCategoryPermission(req: NextApiRequest, res: NextApiResponse<AssignedPostCategoryPermission>) {
+async function upsertPostCategoryPermissionController(
+  req: NextApiRequest,
+  res: NextApiResponse<AssignedPostCategoryPermission>
+) {
   const input = req.body as AssignedPostCategoryPermission;
 
   const permissions = await computePostCategoryPermissions({

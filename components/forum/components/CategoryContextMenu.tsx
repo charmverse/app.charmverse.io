@@ -136,7 +136,12 @@ export function CategoryContextMenu({ category, onChange, onDelete, onSetNewDefa
           <MoreHorizIcon fontSize='small' />
         </IconButton>
       </PopperPopup>
-      <PostCategoryPermissionsDialog onClose={closeDialog} open={permissionsDialogIsOpen} postCategory={category} />
+      <PostCategoryPermissionsDialog
+        permissions={permissions}
+        onClose={closeDialog}
+        open={permissionsDialogIsOpen}
+        postCategory={category}
+      />
     </>
   );
 }

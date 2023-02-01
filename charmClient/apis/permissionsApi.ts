@@ -22,12 +22,12 @@ export class PermissionsApi {
     } as PermissionCompute);
   }
 
-  addPostCategoryPermission(permissionInput: PostCategoryPermissionInput) {
-    return http.POST<AssignedPostCategoryPermission>('/api/forum/permissions', permissionInput);
+  upsertPostCategoryPermission(permissionInput: PostCategoryPermissionInput) {
+    return http.POST<AssignedPostCategoryPermission>('/api/permissions/forum', permissionInput);
   }
 
   deletePostCategoryPermission(permissionId: string) {
-    return http.DELETE('/api/forum/permissions', { permissionId } as PermissionToDelete);
+    return http.DELETE('/api/permissions/forum', { permissionId } as PermissionToDelete);
   }
 
   listPostCategoryPermissions(postCategoryId: string) {
