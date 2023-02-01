@@ -31,9 +31,6 @@
     "collapsedOptionIds": [],
     "columnCalculations": {},
     "kanbanCalculations": {},
-    "visiblePropertyIds": [
-      "__title",
-      "29c17abf-5d6a-4cfc-a626-f3dc7d8e932c"
-    ]
+    "visiblePropertyIds": ["__title", "29c17abf-5d6a-4cfc-a626-f3dc7d8e932c"]
   }
 }

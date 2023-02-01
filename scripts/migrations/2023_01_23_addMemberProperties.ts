@@ -1,7 +1,6 @@
-import { prisma } from 'db'
+import { prisma } from 'db';
 
-async function init () {
-
+async function init() {
   const spaces = await prisma.space.findMany({
     include: {
       memberProperties: true
@@ -11,9 +10,9 @@ async function init () {
   let count = 0;
   for (let space of spaces) {
     if (count++ % 100 === 0) {
-      console.log('updated', count, 'spaces')
+      console.log('updated', count, 'spaces');
     }
-    if (!space.memberProperties.some(prop => prop.type === 'linked_in')) {
+    if (!space.memberProperties.some((prop) => prop.type === 'linked_in')) {
       const admin = await prisma.user.findFirst({
         where: {
           spaceRoles: {
@@ -26,7 +25,11 @@ async function init () {
       });
       if (admin) {
         // we want to inject these after the last social property
-        const lastSocialIndex = Math.max(...space.memberProperties.filter(prop => prop.type === 'twitter' || prop.type === 'discord').map(prop => prop.index));
+        const lastSocialIndex = Math.max(
+          ...space.memberProperties
+            .filter((prop) => prop.type === 'twitter' || prop.type === 'discord')
+            .map((prop) => prop.index)
+        );
 
         const createdBy = admin.id;
         await prisma.$transaction([
@@ -39,37 +42,37 @@ async function init () {
               }
             },
             data: {
-              index:{
+              index: {
                 increment: 2
               }
             }
           }),
           prisma.memberProperty.createMany({
-              data: [{
+            data: [
+              {
                 createdBy,
                 updatedBy: createdBy,
                 index: lastSocialIndex + 1,
                 name: 'LinkedIn',
                 type: 'linked_in',
                 spaceId: space.id
-              },{
+              },
+              {
                 createdBy,
                 updatedBy: createdBy,
                 index: lastSocialIndex + 2,
                 name: 'GitHub',
                 type: 'github',
                 spaceId: space.id
-              }],
+              }
+            ]
           })
-        ])
-      }
-      else {
-        console.warn('No admin for space', { spaceId: space.id, spaceName: space.name })
+        ]);
+      } else {
+        console.warn('No admin for space', { spaceId: space.id, spaceName: space.name });
       }
     }
   }
-
-
 }
 
-init()
+init();

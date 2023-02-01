@@ -7,4 +7,4 @@ export const signupCookieNames = [
   'marketingCampaign'
 ] as const;
 
-export type SignupCookieType = typeof signupCookieNames[number];
+export type SignupCookieType = (typeof signupCookieNames)[number];
