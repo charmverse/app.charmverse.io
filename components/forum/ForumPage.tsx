@@ -46,7 +46,7 @@ export function ForumPage() {
     setCategoryFromPath();
   }, [categories, router.query]);
 
-  const loadingCategories = !categories || categories.length === 0;
+  const loadingCategories = !categories;
 
   function setCategoryFromPath() {
     const categoryPath = router.query.categoryPath as string | undefined;
