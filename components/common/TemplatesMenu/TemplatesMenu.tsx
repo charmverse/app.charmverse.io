@@ -47,6 +47,7 @@ export function TemplatesMenu({
   return (
     <Menu
       {...bindMenu(popupState)}
+      disablePortal
       onClose={popupState.close}
       anchorEl={anchorEl}
       anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}

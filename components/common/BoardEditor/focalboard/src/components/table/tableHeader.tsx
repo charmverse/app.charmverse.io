@@ -121,131 +121,128 @@ function TableHeader(props: Props): JSX.Element {
     e.stopPropagation();
   }
 
-  const popupContent = useMemo(
-    () => (
-      <Stack>
-        <MenuList>
-          <Stack p={1}>
-            <TextField
-              value={tempName}
-              onClick={(e) => {
-                e.stopPropagation();
-              }}
-              onChange={(e) => {
-                e.stopPropagation();
-                setTempName(e.target.value);
-              }}
-              autoFocus
-              onKeyDown={(e) => {
-                e.stopPropagation();
-                if (e.code === 'Enter' && tempName.length !== 0) {
-                  renameColumn();
-                }
-              }}
-            />
-          </Stack>
-          <MenuItem
-            onClick={() => {
-              mutator.changeViewSortOptions(activeView.id, activeView.fields.sortOptions, [
-                { propertyId: templateId, reversed: false }
-              ]);
+  const popupContent = (
+    <Stack>
+      <MenuList>
+        <Stack p={1}>
+          <TextField
+            value={tempName}
+            onClick={(e) => {
+              e.stopPropagation();
             }}
-          >
-            <ListItemIcon>
-              <ArrowUpwardIcon fontSize='small' />
-            </ListItemIcon>
-            <Typography variant='subtitle1'>Sort ascending</Typography>
-          </MenuItem>
-          <MenuItem
-            onClick={() => {
-              mutator.changeViewSortOptions(activeView.id, activeView.fields.sortOptions, [
-                { propertyId: templateId, reversed: true }
-              ]);
+            onChange={(e) => {
+              e.stopPropagation();
+              setTempName(e.target.value);
             }}
-          >
-            <ListItemIcon>
-              <ArrowDownwardIcon fontSize='small' />
-            </ListItemIcon>
-            <Typography variant='subtitle1'>Sort descending</Typography>
-          </MenuItem>
-          <Divider />
-          <MenuItem
-            onClick={() => {
-              if (templateId === Constants.titleColumnId) {
-                // eslint-disable-next-line no-warning-comments
-                // TODO: Handle name column
-              } else {
-                const index = activeView.fields.visiblePropertyIds.findIndex((i) => i === templateId);
-
-                // const index = board.fields.cardProperties.findIndex((o: IPropertyTemplate) => o.id === templateId)
-                mutator.insertPropertyTemplate(board, activeView, index);
+            autoFocus
+            onKeyDown={(e) => {
+              e.stopPropagation();
+              if (e.code === 'Enter' && tempName.length !== 0) {
+                renameColumn();
               }
             }}
-          >
-            <ListItemIcon>
-              <ArrowBackIcon fontSize='small' />
-            </ListItemIcon>
-            <Typography variant='subtitle1'>Insert left</Typography>
-          </MenuItem>
-          <MenuItem
-            onClick={() => {
-              if (templateId === Constants.titleColumnId) {
-                // eslint-disable-next-line no-warning-comments
-                // TODO: Handle title column
-              } else {
-                const index = activeView.fields.visiblePropertyIds.findIndex((i) => i === templateId) + 1;
+          />
+        </Stack>
+        <MenuItem
+          onClick={() => {
+            mutator.changeViewSortOptions(activeView.id, activeView.fields.sortOptions, [
+              { propertyId: templateId, reversed: false }
+            ]);
+          }}
+        >
+          <ListItemIcon>
+            <ArrowUpwardIcon fontSize='small' />
+          </ListItemIcon>
+          <Typography variant='subtitle1'>Sort ascending</Typography>
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            mutator.changeViewSortOptions(activeView.id, activeView.fields.sortOptions, [
+              { propertyId: templateId, reversed: true }
+            ]);
+          }}
+        >
+          <ListItemIcon>
+            <ArrowDownwardIcon fontSize='small' />
+          </ListItemIcon>
+          <Typography variant='subtitle1'>Sort descending</Typography>
+        </MenuItem>
+        <Divider />
+        <MenuItem
+          onClick={() => {
+            if (templateId === Constants.titleColumnId) {
+              // eslint-disable-next-line no-warning-comments
+              // TODO: Handle name column
+            } else {
+              const index = activeView.fields.visiblePropertyIds.findIndex((i) => i === templateId);
 
-                // const index = board.fields.cardProperties.findIndex((o: IPropertyTemplate) => o.id === templateId) + 1
-                mutator.insertPropertyTemplate(board, activeView, index);
-              }
+              // const index = board.fields.cardProperties.findIndex((o: IPropertyTemplate) => o.id === templateId)
+              mutator.insertPropertyTemplate(board, activeView, index);
+            }
+          }}
+        >
+          <ListItemIcon>
+            <ArrowBackIcon fontSize='small' />
+          </ListItemIcon>
+          <Typography variant='subtitle1'>Insert left</Typography>
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            if (templateId === Constants.titleColumnId) {
+              // eslint-disable-next-line no-warning-comments
+              // TODO: Handle title column
+            } else {
+              const index = activeView.fields.visiblePropertyIds.findIndex((i) => i === templateId) + 1;
+
+              // const index = board.fields.cardProperties.findIndex((o: IPropertyTemplate) => o.id === templateId) + 1
+              mutator.insertPropertyTemplate(board, activeView, index);
+            }
+          }}
+        >
+          <ListItemIcon>
+            <ArrowForwardIcon fontSize='small' />
+          </ListItemIcon>
+          <Typography variant='subtitle1'>Insert right</Typography>
+        </MenuItem>
+        {templateId !== Constants.titleColumnId && [
+          <Divider key='divider' />,
+          <MenuItem
+            key='hide'
+            onClick={() => {
+              const viewIds = activeView.fields.visiblePropertyIds.filter((o: string) => o !== templateId);
+              mutator.changeViewVisibleProperties(activeView.id, activeView.fields.visiblePropertyIds, viewIds);
             }}
           >
             <ListItemIcon>
-              <ArrowForwardIcon fontSize='small' />
+              <VisibilityOffOutlinedIcon fontSize='small' />
             </ListItemIcon>
-            <Typography variant='subtitle1'>Insert right</Typography>
+            <Typography variant='subtitle1'>Hide in view</Typography>
+          </MenuItem>,
+          <MenuItem
+            key='duplicate'
+            onClick={() => {
+              mutator.duplicatePropertyTemplate(board, activeView, templateId);
+            }}
+          >
+            <ListItemIcon>
+              <ContentCopyOutlinedIcon fontSize='small' />
+            </ListItemIcon>
+            <Typography variant='subtitle1'>Duplicate</Typography>
+          </MenuItem>,
+          <MenuItem
+            key='delete'
+            onClick={() => {
+              mutator.deleteProperty(board, views, cards, templateId);
+            }}
+          >
+            <ListItemIcon>
+              <DeleteOutlinedIcon fontSize='small' />
+            </ListItemIcon>
+            <Typography variant='subtitle1'>Delete</Typography>
           </MenuItem>
-          <Divider />
-
-          {templateId !== Constants.titleColumnId && (
-            <>
-              <MenuItem
-                onClick={() => {
-                  const viewIds = activeView.fields.visiblePropertyIds.filter((o: string) => o !== templateId);
-                  mutator.changeViewVisibleProperties(activeView.id, activeView.fields.visiblePropertyIds, viewIds);
-                }}
-              >
-                <ListItemIcon>
-                  <VisibilityOffOutlinedIcon fontSize='small' />
-                </ListItemIcon>
-                <Typography variant='subtitle1'>Hide in view</Typography>
-              </MenuItem>
-              <MenuItem
-                onClick={() => {
-                  mutator.duplicatePropertyTemplate(board, activeView, templateId);
-                }}
-              >
-                <ListItemIcon>
-                  <ContentCopyOutlinedIcon fontSize='small' />
-                </ListItemIcon>
-                <Typography variant='subtitle1'>Duplicate</Typography>
-              </MenuItem>
-              <MenuItem
-                onClick={() => {
-                  mutator.deleteProperty(board, views, cards, templateId);
-                }}
-              >
-                <ListItemIcon>
-                  <DeleteOutlinedIcon fontSize='small' />
-                </ListItemIcon>
-                <Typography variant='subtitle1'>Delete</Typography>
-              </MenuItem>
-            </>
-          )}
-        </MenuList>
-      </Stack>
-    ),
-    [tempName]
+        ]}
+      </MenuList>
+    </Stack>
   );
 
   const label = useMemo(

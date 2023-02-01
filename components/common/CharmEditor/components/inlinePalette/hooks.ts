@@ -10,12 +10,9 @@ import type { InlinePaletteItem } from './paletteItem';
 
 export function useInlinePaletteQuery(palettePluginKey: PluginKey) {
   const view = useEditorViewContext();
+  const pluginKey = getSuggestTooltipKey(palettePluginKey)(view.state) as PluginKey; // usePluginState is not typed correctly
   // TODO show is a bad name
-  const {
-    triggerText: query,
-    counter,
-    show: isVisible
-  } = usePluginState(getSuggestTooltipKey(palettePluginKey)(view.state), true);
+  const { triggerText: query, counter, show: isVisible } = usePluginState(pluginKey, true);
   const { tooltipContentDOM } = usePluginState(palettePluginKey);
 
   return { query, counter, isVisible, tooltipContentDOM };

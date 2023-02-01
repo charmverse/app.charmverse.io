@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
+import { useSnackbar } from 'hooks/useSnackbar';
 import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
@@ -14,7 +15,6 @@ import PropertyMenu, { PropertyTypes, typeDisplayName } from '../../widgets/prop
 import Calculations from '../calculations/calculations';
 import type { ConfirmationDialogBoxProps } from '../confirmationDialogBox';
 import ConfirmationDialogBox from '../confirmationDialogBox';
-import { sendFlashMessage } from '../flashMessages';
 import PropertyValueElement from '../propertyValueElement';
 
 type Props = {
@@ -32,6 +32,7 @@ function CardDetailProperties(props: Props) {
   const { board, card, cards, views, activeView, pageUpdatedAt, pageUpdatedBy } = props;
   const [newTemplateId, setNewTemplateId] = useState('');
   const intl = useIntl();
+  const { showMessage } = useSnackbar();
 
   useEffect(() => {
     const newProperty = board.fields.cardProperties.find((property) => property.id === newTemplateId);
@@ -114,13 +115,13 @@ function CardDetailProperties(props: Props) {
         } catch (err: any) {
           Utils.logError(`Error Changing Property And Name:${propertyTemplate.name}: ${err?.toString()}`);
         }
-        sendFlashMessage({
-          content: intl.formatMessage({
+        showMessage(
+          intl.formatMessage({
             id: 'CardDetailProperty.property-changed',
             defaultMessage: 'Changed property successfully!'
           }),
-          severity: 'high'
-        });
+          'success'
+        );
       },
       onClose: () => setShowConfirmationDialog(false)
     });
@@ -153,13 +154,13 @@ function CardDetailProperties(props: Props) {
         setShowConfirmationDialog(false);
         try {
           await mutator.deleteProperty(board, views, cards, propertyTemplate.id);
-          sendFlashMessage({
-            content: intl.formatMessage(
+          showMessage(
+            intl.formatMessage(
               { id: 'CardDetailProperty.property-deleted', defaultMessage: 'Deleted {propertyName} Successfully!' },
               { propertyName: deletingPropName }
             ),
-            severity: 'high'
-          });
+            'success'
+          );
         } catch (err: any) {
           Utils.logError(
             `Error Deleting Property!: Could Not delete Property -" + ${deletingPropName} ${err?.toString()}`

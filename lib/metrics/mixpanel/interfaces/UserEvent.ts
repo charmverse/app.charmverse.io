@@ -1,5 +1,6 @@
 import type { IdentityType } from '@prisma/client';
 
+import type { SpaceCreateTemplate } from 'lib/spaces/utils';
 import type { TokenGateJoinType } from 'lib/token-gates/interfaces';
 
 import type { BaseEvent, BaseEventWithoutGroup } from './BaseEvent';
@@ -21,28 +22,33 @@ export type SignupAnalytics = {
   signupCampaign: string;
 };
 
-export interface UserSignupEvent extends BaseEventWithoutGroup, Partial<SignupAnalytics> {
-  identityType: IdentityType;
-}
+export type UserSignupEvent = BaseEventWithoutGroup &
+  Partial<SignupAnalytics> & {
+    identityType: IdentityType;
+  };
 
-export interface UserLoginEvent extends BaseEventWithoutGroup {
+export type UserLoginEvent = BaseEventWithoutGroup & {
   identityType: IdentityType;
-}
+};
 
-export interface TokenGateVerificationEvent extends BaseEvent {
+export type TokenGateVerificationEvent = BaseEvent & {
   roles?: string[];
   result: 'pass' | 'fail';
-}
+};
 
-export interface SpaceJoined extends BaseEvent {
+export type SpaceJoined = BaseEvent & {
   source: 'invite_link' | TokenGateJoinType;
-}
+};
+
+export type CreateNewSpace = BaseEvent & {
+  template: SpaceCreateTemplate;
+};
 
 export interface UserEventMap {
   sign_up: UserSignupEvent;
   sign_in: UserLoginEvent;
   load_a_workspace: BaseEvent;
-  create_new_workspace: BaseEvent;
+  create_new_workspace: CreateNewSpace;
   join_a_workspace: SpaceJoined;
   token_gate_verification: TokenGateVerificationEvent;
 }

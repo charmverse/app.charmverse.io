@@ -1,8 +1,10 @@
 import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
-import { useState } from 'react';
+import type { NotificationType } from '@prisma/client';
+import { useEffect, useState } from 'react';
 import type { KeyedMutator } from 'swr';
 
+import charmClient from 'charmClient';
 import LoadingComponent from 'components/common/LoadingComponent';
 import useMultiWalletSigs from 'hooks/useMultiWalletSigs';
 import { useSnackbar } from 'hooks/useSnackbar';
@@ -10,6 +12,7 @@ import { useUser } from 'hooks/useUser';
 import useGnosisSigner from 'hooks/useWeb3Signer';
 import { importSafesFromWallet } from 'lib/gnosis/gnosis.importSafes';
 import type { GnosisSafeTasks } from 'lib/gnosis/gnosis.tasks';
+import { isTruthy } from 'lib/utilities/types';
 
 import { GnosisConnectCard } from '../../integrations/components/GnosisSafes';
 import useTasksState from '../hooks/useTasksState';
@@ -35,6 +38,37 @@ export function GnosisTasksList({ error, mutateTasks, tasks }: GnosisTasksSectio
   const [isRefreshingSafes, setIsRefreshingSafes] = useState(false);
 
   const { showMessage } = useSnackbar();
+
+  useEffect(() => {
+    const unmarkedTasks = tasks?.filter((task) => !task.marked) ?? [];
+    async function markTasks() {
+      if (tasks && unmarkedTasks.length !== 0) {
+        await charmClient.tasks.markTasks(
+          unmarkedTasks
+            .map((unmarkedTask) => {
+              return {
+                id: unmarkedTask.taskId,
+                type: 'multisig' as NotificationType
+              };
+            })
+            .filter(isTruthy)
+        );
+      }
+    }
+
+    markTasks();
+
+    if (tasks && unmarkedTasks.length !== 0) {
+      mutateTasks(
+        (_tasks) => {
+          return _tasks ? _tasks.map((task) => ({ ...task, marked: true })) : undefined;
+        },
+        {
+          revalidate: false
+        }
+      );
+    }
+  }, [tasks]);
 
   async function importSafes() {
     if (gnosisSigner && user) {

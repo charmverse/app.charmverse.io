@@ -55,7 +55,7 @@ export function MemberPropertySidebarDetails({
 
   return (
     <>
-      <Collapse in={isExpanded}>
+      <Collapse in={isExpanded} mountOnEnter={true} unmountOnExit={true}>
         <Stack mb={1}>
           <Stack>
             <Box pl={4}>

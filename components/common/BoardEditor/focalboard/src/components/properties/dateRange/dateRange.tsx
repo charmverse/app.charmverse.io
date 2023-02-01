@@ -1,5 +1,8 @@
+import { Divider, Popover } from '@mui/material';
 import { DateTime } from 'luxon';
-import React, { useState } from 'react';
+import { bindPopover, bindTrigger } from 'material-ui-popup-state';
+import { usePopupState } from 'material-ui-popup-state/hooks';
+import { useState } from 'react';
 import { DateUtils } from 'react-day-picker';
 import DayPicker from 'react-day-picker/DayPicker';
 import { useIntl } from 'react-intl';
@@ -9,8 +12,6 @@ import Button from '../../../widgets/buttons/button';
 import Editable from '../../../widgets/editable';
 import Label from '../../../widgets/label';
 import SwitchOption from '../../../widgets/menu/switchOption';
-import Modal from '../../modal';
-import ModalWrapper from '../../modalWrapper';
 
 import 'react-day-picker/lib/style.css';
 
@@ -45,11 +46,10 @@ export function createDatePropertyFromString(initialValue: string): DateProperty
   return dateProperty;
 }
 
-const loadedLocales: Record<string, any> = {};
-
 function DateRange(props: Props): JSX.Element {
   const { className, value, showEmptyPlaceholder, onChange } = props;
   const intl = useIntl();
+  const popupState = usePopupState({ variant: 'popover', popupId: 'dateRangePopup' });
 
   const getDisplayDate = (date: Date | null | undefined) => {
     let displayDate = '';
@@ -146,116 +146,112 @@ function DateRange(props: Props): JSX.Element {
       }
       return { ...current };
     });
-    setShowDialog(false);
+    popupState.close();
   };
 
   let buttonText = displayValue;
   if (!buttonText && showEmptyPlaceholder) {
     buttonText = intl.formatMessage({ id: 'DateRange.empty', defaultMessage: 'Empty' });
   }
+
   return (
     <>
-      <div className='octo-propertyvalue' data-testid='select-non-editable' onClick={() => setShowDialog(true)}>
+      <div className='octo-propertyvalue' data-testid='select-non-editable' {...bindTrigger(popupState)}>
         <Label color={displayValue ? 'propColorDefault' : 'empty'}>
           <span className='Label-text'>{buttonText}</span>
         </Label>
       </div>
-
-      {showDialog && (
-        <ModalWrapper>
-          <Modal onClose={() => onClose()}>
-            <div className={`DateRange ${className}-overlayWrapper`}>
-              <div className={`${className}-overlay`}>
-                <div className='inputContainer'>
-                  <Editable
-                    value={fromInput}
-                    placeholderText={DateTime.local().setLocale(locale).toFormat('DD/MM/YYYY')}
-                    onFocus={() => {
-                      if (dateFrom) {
-                        return setFromInput(Utils.inputDate(dateFrom, intl));
-                      }
-                      return undefined;
-                    }}
-                    onChange={setFromInput}
-                    onSave={() => {
-                      const newDate = DateTime.fromFormat(fromInput, 'DD/MM/YYYY', { locale: intl.locale }).toJSDate();
-                      if (newDate && DateUtils.isDate(newDate)) {
-                        newDate.setHours(12);
-                        const range: DateProperty = {
-                          from: newDate.getTime(),
-                          to: dateTo?.getTime()
-                        };
-                        saveRangeValue(range);
-                      } else {
-                        setFromInput(getDisplayDate(dateFrom));
-                      }
-                    }}
-                    onCancel={() => {
-                      setFromInput(getDisplayDate(dateFrom));
-                    }}
-                  />
-                  {dateTo && (
-                    <Editable
-                      value={toInput}
-                      placeholderText={DateTime.local().setLocale(locale).toFormat('DD/MM/YYYY')}
-                      onFocus={() => {
-                        if (dateTo) {
-                          return setToInput(Utils.inputDate(dateTo, intl));
-                        }
-                        return undefined;
-                      }}
-                      onChange={setToInput}
-                      onSave={() => {
-                        const newDate = DateTime.fromFormat(fromInput, 'DD/MM/YYYY', {
-                          locale: intl.locale
-                        }).toJSDate();
-                        if (newDate && DateUtils.isDate(newDate)) {
-                          newDate.setHours(12);
-                          const range: DateProperty = {
-                            from: dateFrom?.getTime(),
-                            to: newDate.getTime()
-                          };
-                          saveRangeValue(range);
-                        } else {
-                          setToInput(getDisplayDate(dateTo));
-                        }
-                      }}
-                      onCancel={() => {
-                        setToInput(getDisplayDate(dateTo));
-                      }}
-                    />
-                  )}
-                </div>
-                <DayPicker
-                  onDayClick={handleDayClick}
-                  initialMonth={dateFrom || new Date()}
-                  showOutsideDays={false}
-                  locale={locale}
-                  todayButton={intl.formatMessage({ id: 'DateRange.today', defaultMessage: 'Today' })}
-                  onTodayButtonClick={handleDayClick}
-                  month={dateFrom}
-                  selectedDays={[dateFrom, dateTo ? { from: dateFrom, to: dateTo } : { from: dateFrom, to: dateFrom }]}
-                  modifiers={dateTo ? { start: dateFrom, end: dateTo } : { start: dateFrom, end: dateFrom }}
+      <Popover {...bindPopover(popupState)} onClose={onClose} PaperProps={{ sx: { p: 2, fontSize: 14 } }}>
+        <div className={`DateRange ${className}-overlayWrapper`}>
+          <div className={`${className}-overlay`}>
+            <div className='inputContainer'>
+              <Editable
+                value={fromInput}
+                placeholderText={DateTime.local().setLocale(locale).toFormat('DD/MM/YYYY')}
+                onFocus={() => {
+                  if (dateFrom) {
+                    return setFromInput(Utils.inputDate(dateFrom, intl));
+                  }
+                  return undefined;
+                }}
+                onChange={setFromInput}
+                onSave={() => {
+                  const newDate = DateTime.fromFormat(fromInput, 'DD/MM/YYYY', { locale: intl.locale }).toJSDate();
+                  if (newDate && DateUtils.isDate(newDate)) {
+                    newDate.setHours(12);
+                    const range: DateProperty = {
+                      from: newDate.getTime(),
+                      to: dateTo?.getTime()
+                    };
+                    saveRangeValue(range);
+                  } else {
+                    setFromInput(getDisplayDate(dateFrom));
+                  }
+                }}
+                onCancel={() => {
+                  setFromInput(getDisplayDate(dateFrom));
+                }}
+              />
+              {dateTo && (
+                <Editable
+                  value={toInput}
+                  placeholderText={DateTime.local().setLocale(locale).toFormat('DD/MM/YYYY')}
+                  onFocus={() => {
+                    if (dateTo) {
+                      return setToInput(Utils.inputDate(dateTo, intl));
+                    }
+                    return undefined;
+                  }}
+                  onChange={setToInput}
+                  onSave={() => {
+                    const newDate = DateTime.fromFormat(fromInput, 'DD/MM/YYYY', {
+                      locale: intl.locale
+                    }).toJSDate();
+                    if (newDate && DateUtils.isDate(newDate)) {
+                      newDate.setHours(12);
+                      const range: DateProperty = {
+                        from: dateFrom?.getTime(),
+                        to: newDate.getTime()
+                      };
+                      saveRangeValue(range);
+                    } else {
+                      setToInput(getDisplayDate(dateTo));
+                    }
+                  }}
+                  onCancel={() => {
+                    setToInput(getDisplayDate(dateTo));
+                  }}
                 />
-                <hr />
-                <SwitchOption
-                  key='EndDateOn'
-                  id='EndDateOn'
-                  name={intl.formatMessage({ id: 'DateRange.endDate', defaultMessage: 'End date' })}
-                  isOn={isRange}
-                  onClick={onRangeClick}
-                />
-                <hr />
-                <div className='MenuOption menu-option'>
-                  <Button onClick={onClear}>
-                    {intl.formatMessage({ id: 'DateRange.clear', defaultMessage: 'Clear' })}
-                  </Button>
-                </div>
-              </div>
+              )}
             </div>
-          </Modal>
-        </ModalWrapper>
-      )}
+            <DayPicker
+              onDayClick={handleDayClick}
+              initialMonth={dateFrom || new Date()}
+              showOutsideDays={false}
+              locale={locale}
+              todayButton={intl.formatMessage({ id: 'DateRange.today', defaultMessage: 'Today' })}
+              onTodayButtonClick={handleDayClick}
+              month={dateFrom}
+              selectedDays={[dateFrom, dateTo ? { from: dateFrom, to: dateTo } : { from: dateFrom, to: dateFrom }]}
+              modifiers={dateTo ? { start: dateFrom, end: dateTo } : { start: dateFrom, end: dateFrom }}
+            />
+            <Divider sx={{ my: 1 }} />
+            <SwitchOption
+              key='EndDateOn'
+              id='EndDateOn'
+              name={intl.formatMessage({ id: 'DateRange.endDate', defaultMessage: 'End date' })}
+              isOn={isRange}
+              onClick={onRangeClick}
+            />
+            <Divider sx={{ my: 1 }} />
+            <div className='MenuOption menu-option'>
+              <Button onClick={onClear}>
+                {intl.formatMessage({ id: 'DateRange.clear', defaultMessage: 'Clear' })}
+              </Button>
+            </div>
+          </div>
+        </div>
+      </Popover>
     </>
   );
 }

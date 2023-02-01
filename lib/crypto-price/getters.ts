@@ -34,13 +34,15 @@ class PricingCache {
    * @param quote
    * @returns
    */
-  getQuote(base: CryptoCurrency | string, quote: FiatCurrency): Promise<IPairQuote> {
+  getQuote(base: CryptoCurrency | string, quote: FiatCurrency): Promise<IPairQuote | null> {
     return new Promise((resolve, reject) => {
       const cachedQuote = this.loadFromCache(base, quote);
       if (cachedQuote === null) {
         this.getPricing(base, quote)
           .then((freshQuote) => {
-            this.cacheQuote(freshQuote);
+            if (freshQuote) {
+              this.cacheQuote(freshQuote);
+            }
             resolve(freshQuote);
           })
           .catch((error) => {
@@ -79,7 +81,7 @@ class PricingCache {
     this.cache.push(pairQuote);
   }
 
-  private getPricing(base: CryptoCurrency | string, quote: FiatCurrency): Promise<IPairQuote> {
+  private getPricing(base: CryptoCurrency | string, quote: FiatCurrency): Promise<IPairQuote | null> {
     if (base === 'XDAI') {
       return getPriceFromCoinMarketCap(base, quote);
     }

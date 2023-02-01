@@ -1,10 +1,9 @@
 import styled from '@emotion/styled';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import EditIcon from '@mui/icons-material/Edit';
-import Box from '@mui/material/Box';
-import IconButton from '@mui/material/IconButton';
+import { Box, IconButton } from '@mui/material';
 import type { ReactNode } from 'react';
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 
 import Avatar from 'components/common/Avatar';
 import AvatarWithIcons from 'components/common/AvatarWithIcons';
@@ -14,6 +13,8 @@ import { useS3UploadInput } from 'hooks/useS3UploadInput';
 import type { NftData } from 'lib/blockchain/interfaces';
 import type { SupportedChainId } from 'lib/blockchain/provider/alchemy';
 import type { UserAvatar } from 'lib/users/interfaces';
+
+import { ProgressOverlay } from './ProgressOverlay';
 
 const StyledBox = styled(Box)`
   display: inline-block;
@@ -33,6 +34,7 @@ function StyledIconButton({
   children: ReactNode;
   key: string;
   onClick: (e: React.MouseEvent<HTMLElement>) => void;
+  alwaysShow?: boolean;
 }) {
   return (
     <IconButton
@@ -58,19 +60,11 @@ type LargeAvatarProps = {
   canSetNft?: boolean;
   isSaving?: boolean;
   isNft?: boolean;
-};
-
-const getIcons = (editIcon: ReactNode, deleteIcon: ReactNode, avatar: string | null | undefined) => {
-  if (!avatar) {
-    return [editIcon];
-  }
-
-  return [editIcon, deleteIcon];
+  alwaysShowEdit?: boolean;
 };
 
 export default function LargeAvatar(props: LargeAvatarProps) {
   const { name, image, updateAvatar, variant, editable, canSetNft, isSaving, updateImage, isNft } = props;
-  const editIconRef = useRef(null);
   const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
   const [isGalleryVisible, setIsGalleryVisible] = useState(false);
 
@@ -115,20 +109,35 @@ export default function LargeAvatar(props: LargeAvatarProps) {
     return <Avatar avatar={image} name={name} variant={variant} isNft={isNft} size='2xLarge' />;
   }
 
-  const icons = getIcons(
-    <StyledIconButton key='edit-avatar' onClick={onEditClick}>
-      <EditIcon ref={editIconRef} fontSize='small' />
-    </StyledIconButton>,
-    <StyledIconButton key='delete-avatar' onClick={() => updateImageAvatar('')}>
-      <DeleteOutlinedIcon fontSize='small' />
-    </StyledIconButton>,
-    image
-  );
-
   return (
     <StyledBox>
-      <input type='file' hidden accept='image/*' ref={inputRef} onChange={onFileChange} />
-      <StyledAvatarWithIcons avatar={image} name={name} variant={variant} icons={icons} isNft={isNft} size='2xLarge' />
+      <ProgressOverlay isLoading={isSaving}>
+        <input type='file' hidden accept='image/*' ref={inputRef} onChange={onFileChange} />
+        <StyledAvatarWithIcons
+          alwaysShow={props.alwaysShowEdit}
+          avatar={image}
+          name={name}
+          variant={variant}
+          icons={
+            <>
+              <StyledIconButton alwaysShow={props.alwaysShowEdit} key='edit-avatar' onClick={onEditClick}>
+                <EditIcon fontSize='small' />
+              </StyledIconButton>
+              {image && (
+                <StyledIconButton
+                  alwaysShow={props.alwaysShowEdit}
+                  key='delete-avatar'
+                  onClick={() => updateImageAvatar('')}
+                >
+                  <DeleteOutlinedIcon fontSize='small' />
+                </StyledIconButton>
+              )}
+            </>
+          }
+          isNft={isNft}
+          size='2xLarge'
+        />
+      </ProgressOverlay>
       {canSetNft && (
         <>
           <AvatarEditMenu

@@ -1,15 +1,13 @@
-import type { SVGProps } from 'react';
-
-export default function GalleryIcon(props: SVGProps<any>): JSX.Element {
+export default function GalleryIcon({ fontSize }: { fontSize?: 'small' }): JSX.Element {
+  const size = fontSize === 'small' ? 20 : 24;
   return (
     <svg
-      width='24'
-      height='24'
+      width={size}
+      height={size}
       viewBox='0 0 24 24'
       fill='currentColor'
       xmlns='http://www.w3.org/2000/svg'
       className='GalleryIcon Icon'
-      {...props}
     >
       <g opacity='0.8'>
         <path

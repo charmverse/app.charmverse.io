@@ -15,7 +15,13 @@ export async function createNewDataSource({
   currentPageType: PageType;
   updatePage: PageUpdater;
 }) {
-  const newPageType = currentPageType === 'inline_linked_board' ? 'inline_board' : 'board';
+  let newPageType = currentPageType;
+  if (currentPageType === 'inline_linked_board') {
+    newPageType = 'inline_board';
+  }
+  if (currentPageType === 'linked_board') {
+    newPageType = 'board';
+  }
   const view = createTableView(board);
   await mutator.insertBlocks([view], 'convert board');
 

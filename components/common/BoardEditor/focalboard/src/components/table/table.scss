@@ -93,8 +93,18 @@
     position: relative;
     text-overflow: ellipsis;
 
+    .icons {
+      opacity: 0;
+      position: absolute;
+      left: -40px;
+    }
+
     &:hover {
       background-color: rgba(var(--center-channel-color-rgb), 0.05);
+      
+      .icons {
+        opacity: 1;
+      }
     }
 
     &.title-cell {

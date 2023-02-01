@@ -204,6 +204,7 @@ export function PostPage({
           <Box minHeight={300}>
             <CharmEditor
               pageType='post'
+              autoFocus={false}
               readOnly={readOnly}
               pageActionDisplay={null}
               pageId={post?.id}

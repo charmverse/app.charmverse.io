@@ -5,28 +5,38 @@ import React from 'react';
 
 import type { SubMenu } from './floating-menu';
 
-const StyledMenu = styled(Paper)<{ type?: SubMenu }>`
+const StyledMenu = styled(Paper, { shouldForwardProp: (prop: string) => prop !== 'noScroll' })<{
+  type?: SubMenu;
+  noScroll?: boolean;
+  inline?: boolean;
+}>`
   display: flex;
   padding: ${({ theme }) => theme.spacing(0, 0.5)};
   border-radius: 4px;
-  ${({ theme, type }) => type === 'defaultMenu' && theme.breakpoints.down('sm')} {
-    width: 100vw;
-    overflow-x: auto;
+  ${({ theme, type }) =>
+    type && ['defaultMenu', 'inlineCommentSubMenu'].includes(type) && theme.breakpoints.down('sm')} {
+    ${({ inline, theme }) => !inline && `width: calc(100vw - ${theme.spacing(1)})`};
+    margin: 0 ${({ theme }) => theme.spacing(0.5)};
+    ${({ noScroll }) => (noScroll ? '' : 'overflow-x: auto')};
   }
 `;
 
 export function Menu({
   children,
   hideMenu,
-  type
+  type,
+  noScroll,
+  inline
 }: {
   children: React.ReactNode;
   hideMenu: () => void;
   type?: SubMenu;
+  noScroll?: boolean;
+  inline?: boolean;
 }) {
   return (
     <ClickAwayListener onClickAway={hideMenu}>
-      <StyledMenu elevation={8} type={type}>
+      <StyledMenu elevation={8} type={type} noScroll={noScroll} inline={inline}>
         {children}
       </StyledMenu>
     </ClickAwayListener>

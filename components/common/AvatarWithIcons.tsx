@@ -29,6 +29,7 @@ const StyledBox = styled(Box)`
 
 export type AvatarWithIconsProps = InitialAvatarProps & {
   icons: ReactNode;
+  alwaysShow?: boolean;
 };
 
 export default function AvatarWithIcons(props: AvatarWithIconsProps) {
@@ -36,7 +37,13 @@ export default function AvatarWithIcons(props: AvatarWithIconsProps) {
 
   return (
     <StyledBox>
-      <StyledStack direction='row' spacing={1} padding={1} className='icons-stack'>
+      <StyledStack
+        direction='row'
+        spacing={1}
+        padding={1}
+        className='icons-stack'
+        style={{ display: props.alwaysShow ? 'flex' : undefined }}
+      >
         {icons}
       </StyledStack>
       <Avatar {...props} />

@@ -6,6 +6,7 @@ import LoadingComponent from 'components/common/LoadingComponent';
 import { MemberPropertiesPopup } from 'components/profile/components/SpacesMemberDetails/components/MemberPropertiesPopup';
 import { SpaceDetailsAccordion } from 'components/profile/components/SpacesMemberDetails/components/SpaceDetailsAccordion';
 import { useMemberPropertyValues } from 'hooks/useMemberPropertyValues';
+import { useUser } from 'hooks/useUser';
 
 type Props = {
   memberId: string;
@@ -15,6 +16,8 @@ export function SpacesMemberDetails({ memberId }: Props) {
   const { isLoading, memberPropertyValues, canEditSpaceProfile, updateSpaceValues } = useMemberPropertyValues(memberId);
   const [editSpaceId, setEditSpaceId] = useState<null | string>(null);
   const { query } = useRouter();
+  const { user } = useUser();
+  const readOnly = memberId !== user?.id;
 
   if (isLoading) {
     return <LoadingComponent isLoading />;
@@ -44,7 +47,7 @@ export function SpacesMemberDetails({ memberId }: Props) {
           spaceName={pv.spaceName}
           spaceImage={pv.spaceImage}
           properties={pv.properties}
-          readOnly={!canEditSpaceProfile(pv.spaceId)}
+          readOnly={!canEditSpaceProfile(pv.spaceId) || readOnly}
           onEdit={() => setEditSpaceId(pv.spaceId)}
           expanded={query.workspace === pv.spaceId}
         />

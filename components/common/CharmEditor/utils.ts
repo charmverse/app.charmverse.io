@@ -2,6 +2,8 @@ import { safeInsert } from '@bangle.dev/utils';
 import type { Node } from 'prosemirror-model';
 import type { EditorState, Transaction } from 'prosemirror-state';
 
+export const undoEventName = 'editor-undo';
+
 export function insertNode(state: EditorState, dispatch: ((tr: Transaction) => void) | undefined, nodeToInsert: Node) {
   const insertPos = state.selection.$from.after();
 

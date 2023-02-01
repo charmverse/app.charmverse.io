@@ -27,8 +27,7 @@ export async function createAndAssignRoles({
 
   const rolesRecord = await findOrCreateRoles(roles, spaceId, userId, {
     source: 'collabland',
-    createRoles: true,
-    preserveIds: true
+    createRoles: true
   });
 
   const roleIdsToAssign: string[] = [];

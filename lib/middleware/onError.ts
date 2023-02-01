@@ -13,13 +13,18 @@ export function onError(err: any, req: NextApiRequest, res: NextApiResponse) {
       error: err instanceof SystemError === false ? err.message || 'Something went wrong' : errorAsSystemError,
       stack: err.error?.stack || err.stack,
       userId: req.session?.user?.id,
+      pageId: req.query?.pageId || req.body?.pageId,
+      spaceId: req.query?.spaceId || req.body?.spaceId,
       url: req.url,
       body: req.body
     });
   } else {
     log.warn(`Client Error: ${errorAsSystemError.message}`, {
       url: req.url,
-      body: req.body
+      body: req.body,
+      userId: req.session?.user?.id,
+      pageId: req.query?.pageId || req.body?.pageId,
+      spaceId: req.query?.spaceId || req.body?.spaceId
     });
   }
 
