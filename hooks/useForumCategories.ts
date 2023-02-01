@@ -1,4 +1,5 @@
 import type { PostCategory } from '@prisma/client';
+import { useMemo } from 'react';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
@@ -11,7 +12,7 @@ export function useForumCategories() {
   const { setSpace } = useSpaces();
 
   const {
-    data: categories = [],
+    data: categories,
     error,
     isValidating,
     mutate: mutateForumCategories
@@ -92,7 +93,8 @@ export function useForumCategories() {
     deleteForumCategory,
     updateForumCategory,
     setDefaultPostCategory,
-    categories,
+    isCategoriesLoaded: !!categories,
+    categories: categories || [],
     error,
     disabled: isValidating
   };
