@@ -1,12 +1,12 @@
 import type { ReactElement } from 'react';
 
-import Api from 'components/settings/api/Api';
+import { ApiSettings } from 'components/settings/api/Api';
 import SettingsLayout from 'components/settings/Layout';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import useIsAdmin from 'hooks/useIsAdmin';
 import { setTitle } from 'hooks/usePageTitle';
 
-export default function ApiSettings() {
+export default function ApiSettingsPage() {
   const space = useCurrentSpace();
   const isAdmin = useIsAdmin();
 
@@ -14,9 +14,9 @@ export default function ApiSettings() {
   if (!space) {
     return null;
   }
-  return <Api isAdmin={isAdmin} spaceId={space.id} spaceOwner={space.createdBy} />;
+  return <ApiSettings isAdmin={isAdmin} spaceId={space.id} spaceOwner={space.createdBy} />;
 }
 
-ApiSettings.getLayout = (page: ReactElement) => {
+ApiSettingsPage.getLayout = (page: ReactElement) => {
   return <SettingsLayout>{page}</SettingsLayout>;
 };

@@ -7,6 +7,7 @@ import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
 import Link from 'components/common/Link';
+import { useSnackbar } from 'hooks/useSnackbar';
 import useWebhookSubscription from 'hooks/useSpaceWebhook';
 import log from 'lib/log';
 
@@ -32,8 +33,9 @@ export const schema = yup.object({
 
 type FormValues = yup.InferType<typeof schema>;
 
-export default function Api({ isAdmin, spaceId }: Props) {
+export function ApiSettings({ isAdmin, spaceId }: Props) {
   const { updateSpaceWebhook, spaceWebhook, isLoading } = useWebhookSubscription(spaceId);
+  const { showMessage } = useSnackbar();
 
   const {
     register,
@@ -78,6 +80,7 @@ export default function Api({ isAdmin, spaceId }: Props) {
       });
     } catch (err) {
       log.error('There was an error updating webhooks', err);
+      showMessage((err as Error).message || 'Could not save form', 'error');
     }
 
     return false;
