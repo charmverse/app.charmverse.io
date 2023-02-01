@@ -190,13 +190,19 @@ export function CryptoPrice({
             </Box>
           )}
 
-          <Typography component='div' align='center' sx={{ fontSize: 36, lineHeight: 1, mt: 2 }}>
-            {loading === false &&
-              !error &&
-              formatMoney(lastQuote.amount ?? 0, quoteCurrency, window.navigator.language)}
-            {loading === true && !error && '- -'}
-            {error && 'No price found'}
-          </Typography>
+          {!error && (
+            <Typography component='div' align='center' sx={{ fontSize: 36, lineHeight: 1, mt: 2 }}>
+              {loading === false &&
+                !error &&
+                formatMoney(lastQuote.amount ?? 0, quoteCurrency, window.navigator.language)}
+              {loading === true && !error && '- -'}
+            </Typography>
+          )}
+          {error && (
+            <Typography component='div' align='center' sx={{ fontSize: 24, lineHeight: 1, mt: 2 }}>
+              No price found
+            </Typography>
+          )}
         </CardContent>
       )}
 
