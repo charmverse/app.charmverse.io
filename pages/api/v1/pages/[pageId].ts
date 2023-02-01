@@ -5,6 +5,7 @@ import nc from 'next-connect';
 import { prisma } from 'db';
 import { onError, onNoMatch, requireApiKey, SpaceAccessDeniedError } from 'lib/middleware';
 import { generateMarkdown } from 'lib/pages';
+import type { PageContent } from 'lib/prosemirror/interfaces';
 import type { Page, PageProperty } from 'lib/public-api';
 import { getPageInBoard, mapProperties, PageFromBlock, validateUpdateData } from 'lib/public-api';
 
@@ -152,7 +153,13 @@ async function updatePage(req: NextApiRequest, res: NextApiResponse) {
 
   const cardToReturn = new PageFromBlock(updatedPage, boardSchema);
   if (cardPage) {
-    cardToReturn.content.markdown = await generateMarkdown(cardPage, true);
+    cardToReturn.content.markdown = await generateMarkdown(
+      {
+        content: cardPage.content,
+        title: cardPage.title
+      },
+      true
+    );
   }
 
   return res.status(200).json(cardToReturn);

@@ -1,5 +1,4 @@
 import styled from '@emotion/styled';
-import { useState } from 'react';
 
 import CharmEditor from 'components/common/CharmEditor/CharmEditor';
 import type { PageContent } from 'lib/prosemirror/interfaces';

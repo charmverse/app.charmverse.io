@@ -49,13 +49,15 @@ interface BangleEditorProps<PluginMetadata = any> extends CoreBangleEditorProps<
   enableComments?: boolean;
 }
 
+const warningText = 'You have unsaved changes. Please confirm changes.';
+
 export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, BangleEditorProps>(function ReactEditor(
   {
     pageId,
     state,
     children,
     isContentControlled,
-    focusOnInit = !isTouchScreen(),
+    focusOnInit,
     pmViewOpts,
     renderNodeViews,
     className,
@@ -69,6 +71,8 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
   },
   ref
 ) {
+  focusOnInit = focusOnInit ?? (!readOnly && !isTouchScreen());
+
   const renderRef = useRef<HTMLDivElement>(null);
   const { user } = useUser();
   const enableFidusEditor = Boolean(user && pageId && trackChanges && !isContentControlled);
@@ -130,9 +134,27 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
     }
   }, [editorRef, editor]);
 
+  let fEditor: FidusEditor | null = null;
+
+  useEffect(() => {
+    const handleWindowClose = (e: BeforeUnloadEvent) => {
+      if (fEditor) {
+        if (fEditor.ws?.messagesToSend.length === 0) return;
+        e.preventDefault();
+        (e || window.event).returnValue = warningText;
+        return warningText;
+      }
+    };
+
+    window.addEventListener('beforeunload', handleWindowClose);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleWindowClose);
+    };
+  }, []);
+
   useEffect(() => {
     const _editor = new CoreBangleEditor(renderRef.current!, editorViewPayloadRef.current);
-    let fEditor: FidusEditor;
 
     if (isContentControlled) {
       setIsLoading(false);
