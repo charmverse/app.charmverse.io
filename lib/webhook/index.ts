@@ -67,6 +67,6 @@ export async function publishWebhookEvent<T = WebhookEventNames>(spaceId: Space[
     // Add the message to the queue
     await addMessageToSQS(SQS_QUEUE_NAME, JSON.stringify(webhookPayload));
   } catch (e) {
-    log.error('Error while publishing webhook event. Error occurred', e);
+    log.warn('Error while publishing webhook event. Error occurred', { error: e, spaceId });
   }
 }
