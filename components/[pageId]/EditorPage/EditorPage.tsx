@@ -51,7 +51,6 @@ export default function EditorPage({ pageId }: { pageId: string }) {
         try {
           const page = await charmClient.pages.getPage(pageId, space.id);
           if (page) {
-            mutatePage(page);
             setPageNotFound(false);
             setCurrentPageId(page.id);
             setTitleState(page.title);

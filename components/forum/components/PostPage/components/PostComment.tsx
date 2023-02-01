@@ -10,8 +10,8 @@ import type { KeyedMutator } from 'swr';
 
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
+import CharmEditor from 'components/common/CharmEditor/CharmEditor';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/InlineCharmEditor';
-import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
 import UserDisplay from 'components/common/UserDisplay';
 import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
@@ -179,17 +179,26 @@ export function PostComment({
             left: 10
           }}
         />
-        <Box ml={3}>
+        <Box
+          ml={3}
+          sx={{
+            'div.ProseMirror.bangle-editor': {
+              paddingLeft: '10px !important'
+            }
+          }}
+        >
           {isEditingComment ? (
             <Stack>
-              <InlineCharmEditor
+              <CharmEditor
                 colorMode='dark'
                 style={{
                   paddingTop: 0,
                   paddingBottom: 0,
                   marginLeft: 8,
-                  minHeight: 100
+                  minHeight: 100,
+                  left: 0
                 }}
+                disableRowHandles
                 focusOnInit
                 placeholderText='What are your thoughts?'
                 onContentChange={updateCommentContent}
@@ -209,11 +218,14 @@ export function PostComment({
               Comment deleted by user
             </Typography>
           ) : (
-            <InlineCharmEditor
+            <CharmEditor
               style={{
                 paddingTop: 0,
-                paddingBottom: 0
+                paddingBottom: 0,
+                left: 0,
+                paddingLeft: 0
               }}
+              disableRowHandles
               readOnly
               key={isEditingComment.toString()}
               content={commentContent.doc}

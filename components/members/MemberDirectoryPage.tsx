@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
-import { Box, Stack, Tab, Tabs, Typography } from '@mui/material';
-import { MemberPropertyPermission } from '@prisma/client';
+import { MoreHoriz } from '@mui/icons-material';
+import { Box, IconButton, Stack, Tab, Tabs, Typography } from '@mui/material';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 
@@ -86,6 +86,16 @@ export default function MemberDirectoryPage() {
             />
           ))}
         </Tabs>
+
+        <IconButton
+          onClick={() => {
+            setTimeout(() => {
+              setIsPropertiesDrawerVisible(!isPropertiesDrawerVisible);
+            });
+          }}
+        >
+          <MoreHoriz color='secondary' />
+        </IconButton>
       </Stack>
       <Box position='relative' display='flex' height='100%'>
         <Box width='100%' overflow={currentView === 'table' ? 'auto' : 'visible'} height='fit-content'>
