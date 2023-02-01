@@ -120,7 +120,7 @@ import 'theme/focalboard/focalboard.main.scss';
 import 'theme/focalboard/focalboard.typography.scss';
 
 // Lit Protocol CSS
-import 'lit-share-modal-v3-react-17/dist/ShareModal.css';
+import 'lit-share-modal-v3/dist/ShareModal.css';
 import 'react-resizable/css/styles.css';
 import 'theme/lit-protocol/lit-protocol.scss';
 import 'theme/styles.scss';

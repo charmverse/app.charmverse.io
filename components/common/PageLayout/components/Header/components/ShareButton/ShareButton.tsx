@@ -1,4 +1,6 @@
-import { Box, Divider, Popover, Tooltip } from '@mui/material';
+import { IosShare, Share } from '@mui/icons-material';
+import type { Theme } from '@mui/material';
+import { Box, Divider, IconButton, Popover, Tooltip, useMediaQuery } from '@mui/material';
 import type { PageType } from '@prisma/client';
 import { bindPopover, usePopupState } from 'material-ui-popup-state/hooks';
 import { memo, useEffect } from 'react';
@@ -20,6 +22,7 @@ function ShareButton({ headerHeight, pageId }: { headerHeight: number; pageId: s
     pageId ? `/api/pages/${pageId}/permissions` : null,
     () => charmClient.listPagePermissions(pageId)
   );
+  const isLargeScreen = useMediaQuery((theme: Theme) => theme.breakpoints.up('md'));
 
   const proposalParentId = findParentOfType({ pageId, pageType: 'proposal', pageMap: pages });
 
@@ -33,18 +36,30 @@ function ShareButton({ headerHeight, pageId }: { headerHeight: number; pageId: s
   return (
     <>
       <Tooltip arrow title='Share or publish to the web'>
-        <Button
-          data-test='toggle-page-permissions-dialog'
-          color='secondary'
-          variant='text'
-          size='small'
-          onClick={() => {
-            refreshPermissions();
-            popupState.open();
-          }}
-        >
-          Share
-        </Button>
+        {isLargeScreen ? (
+          <Button
+            data-test='toggle-page-permissions-dialog'
+            color='secondary'
+            variant='text'
+            size='small'
+            onClick={() => {
+              refreshPermissions();
+              popupState.open();
+            }}
+          >
+            Share
+          </Button>
+        ) : (
+          <IconButton
+            data-test='toggle-page-permissions-dialog'
+            onClick={() => {
+              refreshPermissions();
+              popupState.open();
+            }}
+          >
+            <IosShare color='secondary' fontSize='small' />
+          </IconButton>
+        )}
       </Tooltip>
       <Popover
         {...bindPopover(popupState)}
