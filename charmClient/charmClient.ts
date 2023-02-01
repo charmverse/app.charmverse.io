@@ -152,7 +152,7 @@ class CharmClient {
     return http.PUT<LoggedInUser>('/api/profile', data);
   }
 
-  checkNexusPath(path: string) {
+  checkPublicProfilePath(path: string) {
     return http.GET<{ available: boolean }>('/api/profile/check-path-availability', { path });
   }
 
