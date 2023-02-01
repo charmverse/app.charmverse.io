@@ -2,6 +2,7 @@ import { Dialog, DialogContent, Typography, useMediaQuery } from '@mui/material'
 import { Box, Stack, useTheme } from '@mui/system';
 import type { MemberProperty, MemberPropertyType } from '@prisma/client';
 import useSWR from 'swr';
+import useSWRImmutable from 'swr/immutable';
 
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
@@ -13,6 +14,8 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMemberProperties } from 'hooks/useMemberProperties';
 import { useMemberPropertyValues } from 'hooks/useMemberPropertyValues';
 import type { Member } from 'lib/members/interfaces';
+
+import { PoapsList } from './PoapsList';
 
 export function MemberMiniProfile({ member, onClose }: { member: Member; onClose: VoidFunction }) {
   const theme = useTheme();
@@ -28,13 +31,19 @@ export function MemberMiniProfile({ member, onClose }: { member: Member; onClose
     (memberPropertyValue) => memberPropertyValue.spaceId === currentSpace?.id
   );
 
+  const { data: poaps = [], isLoading: isFetchingPoaps } = useSWRImmutable(`/poaps/${member.id}`, () => {
+    return charmClient.getUserPoaps();
+  });
+
   const username =
     (member.properties.find((memberProperty) => memberProperty.memberPropertyId === propertiesRecord.name?.id)
       ?.value as string) ?? member.username;
 
-  const { data: user, isLoading } = useSWR(`users/${member.path}`, () =>
+  const { data: user, isLoading: isFetchingUser } = useSWR(`users/${member.path}`, () =>
     charmClient.getUserByPath(member.path as string)
   );
+
+  const isLoading = isFetchingUser || isFetchingPoaps;
 
   return (
     <Dialog open onClose={onClose} fullScreen={fullScreen} fullWidth>
@@ -64,12 +73,13 @@ export function MemberMiniProfile({ member, onClose }: { member: Member; onClose
           </DialogTitle>
           <DialogContent dividers>
             <UserDetails user={user} readOnly />
-
             {currentSpacePropertyValues && (
               <Box my={3}>
                 <MemberPropertiesRenderer properties={currentSpacePropertyValues.properties} />
               </Box>
             )}
+
+            <PoapsList poaps={poaps} />
           </DialogContent>
         </>
       )}
