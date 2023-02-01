@@ -1,6 +1,7 @@
 import log from 'loglevel';
 
 import fetch from 'adapters/http/fetch.server';
+import { isTestEnv } from 'config/constants';
 
 import type { DeepDaoOrganizationDetails, DeepDaoParticipationScore, DeepDaoProfile } from './interfaces';
 
@@ -21,44 +22,33 @@ export async function getParticipationScore(
 ): Promise<GetParticipationScoreResponse | null> {
   // Use this address for testing as it has alot of on-chain data
   // address = '0x155b6485305ccab44ef7da58ac886c62ce105cf9';
-
-  if (!apiToken) {
-    log.debug('Skip request: No API Key for DeepDAO');
-    return null;
-  }
-
-  return fetch<GetParticipationScoreResponse>(`${DEEPDAO_BASE_URL}/v0.1/people/participation_score/${address}`, {
-    method: 'GET',
-    headers: {
-      'x-api-key': apiToken
-    }
-  });
+  return _requestGET(`/people/participation_score/${address}`, { apiToken });
 }
 
-export async function getProfile(address: string, apiToken = DEEPDAO_API_KEY): Promise<GetProfileResponse | null> {
+export async function getProfile(address: string, apiToken?: string): Promise<GetProfileResponse | null> {
   // Use this address for testing as it has alot of on-chain data
   // address = '0xef8305e140ac520225daf050e2f71d5fbcc543e7';
-
-  if (!apiToken) {
-    log.debug('Skip request: No API Key for DeepDAO');
-    return null;
-  }
-
-  return fetch<GetProfileResponse>(`${DEEPDAO_BASE_URL}/v0.1/people/profile/${address}`, {
-    method: 'GET',
-    headers: {
-      'x-api-key': apiToken
-    }
-  });
+  return _requestGET(`/people/profile/${address}`, { apiToken });
 }
 
-export async function getAllOrganizations(apiToken = DEEPDAO_API_KEY): Promise<GetOrganizationsResponse> {
-  if (!apiToken) {
-    log.debug('Skip request: No API Key for DeepDAO');
-    return { data: { resources: [], totalResources: 0 } };
-  }
+const emptyOrgsResponse: GetOrganizationsResponse = { data: { resources: [], totalResources: 0 } };
 
-  return fetch<GetOrganizationsResponse>(`${DEEPDAO_BASE_URL}/v0.1/organizations`, {
+export async function getAllOrganizations(apiToken?: string): Promise<GetOrganizationsResponse> {
+  return _requestGET<GetOrganizationsResponse>('/organizations', { apiToken }).then(
+    (response) => response || emptyOrgsResponse
+  );
+}
+
+function _requestGET<T>(endpoint: string, { apiToken = DEEPDAO_API_KEY }: { apiToken: string | undefined }) {
+  // run requests even in test mode for now (see getAggregatedData.spec.ts)
+  if (isTestEnv) {
+    return fetch<T>(`${DEEPDAO_BASE_URL}/v0.1${endpoint}`, { method: 'GET' });
+  }
+  if (!apiToken || !DEEPDAO_BASE_URL) {
+    log.debug('Skip request: No API Key or URL for DeepDAO');
+    return Promise.resolve(null);
+  }
+  return fetch<T>(`${DEEPDAO_BASE_URL}/v0.1${endpoint}`, {
     method: 'GET',
     headers: {
       'x-api-key': apiToken

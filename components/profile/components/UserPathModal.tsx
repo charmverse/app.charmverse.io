@@ -12,7 +12,10 @@ import { DialogTitle, Modal } from 'components/common/Modal';
 import debouncePromise from 'lib/utilities/debouncePromise';
 
 async function validatePath(path: string) {
-  const result = await charmClient.checkNexusPath(path);
+  if (!path || path.length < 3) {
+    return false;
+  }
+  const result = await charmClient.checkPublicProfilePath(path);
   return result.available;
 }
 
