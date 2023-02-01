@@ -1,4 +1,4 @@
-import type { Space, SpaceRole, User } from '@prisma/client';
+import type { PostCategoryPermission, Space, SpaceRole, User } from '@prisma/client';
 import { v4 } from 'uuid';
 
 import { prisma } from 'db';
@@ -138,7 +138,7 @@ describe('createWorkspace', () => {
       })
     );
   });
-  it('should create default post categories for the workspace', async () => {
+  it('should create default post categories for the workspace that are accessible to all space members by default', async () => {
     const newWorkspace = await createWorkspace({
       userId: user.id,
       spaceData: {
@@ -150,12 +150,26 @@ describe('createWorkspace', () => {
     const categories = await prisma.postCategory.findMany({
       where: {
         spaceId: newWorkspace.id
+      },
+      include: {
+        postCategoryPermissions: true
       }
     });
 
     expect(categories).toHaveLength(defaultPostCategories.length);
 
     expect(categories.every((c) => defaultPostCategories.includes(c.name))).toBe(true);
+
+    categories.forEach((c) => {
+      expect(c.postCategoryPermissions).toHaveLength(1);
+      expect(c.postCategoryPermissions[0]).toMatchObject(
+        expect.objectContaining<Partial<PostCategoryPermission>>({
+          spaceId: newWorkspace.id,
+          postCategoryId: c.id,
+          permissionLevel: 'member'
+        })
+      );
+    });
   });
 
   it('should auto-assign the space domain', async () => {

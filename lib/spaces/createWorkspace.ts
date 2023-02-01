@@ -99,7 +99,17 @@ export async function createWorkspace({ spaceData, userId, createSpaceOption, ex
   await prisma.$transaction([
     prisma.proposalCategory.createMany({ data: defaultCategories }),
     prisma.memberProperty.createMany({ data: defaultProperties }),
-    prisma.postCategory.createMany({ data: defaultPostCategories })
+    prisma.postCategory.createMany({ data: defaultPostCategories }),
+    prisma.postCategoryPermission.createMany({
+      data: defaultPostCategories.map(
+        (category) =>
+          ({
+            permissionLevel: 'member',
+            postCategoryId: category.id,
+            spaceId: space.id
+          } as Prisma.PostCategoryPermissionCreateManyInput)
+      )
+    })
   ]);
 
   // Handle the population of pages data
