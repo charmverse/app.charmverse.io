@@ -8,9 +8,6 @@ import { forwardRef } from 'react';
 import { MobileDialogTitle } from 'components/common/MobileDialog/MobileDialogTitle';
 
 const StyledDialog = styled(Dialog)(({ theme }) => ({
-  '& .MuiDialogContent-root': {
-    // padding: theme.spacing(2)
-  },
   '& .MuiDialogActions-root': {
     padding: theme.spacing(1)
   }
@@ -38,7 +35,7 @@ export function MobileDialog({ children, title, rightActions, onClose, contentSx
     <StyledDialog fullScreen {...dialogProps} TransitionComponent={Transition} onClose={onClose} sx={{ padding: 0 }}>
       {hasTitle && <MobileDialogTitle title={title} rightActions={rightActions} onClose={onClose as VoidFunction} />}
 
-      <DialogContent dividers sx={contentSx}>
+      <DialogContent dividers sx={contentSx || { padding: 2 }}>
         {children}
       </DialogContent>
     </StyledDialog>
