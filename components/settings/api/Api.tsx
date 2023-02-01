@@ -111,7 +111,7 @@ export function ApiSettings({ isAdmin, spaceId }: Props) {
       >
         <Grid item container xs mt={2}>
           <Grid item xs={10}>
-            <InputLabel>Webhook URL</InputLabel>
+            <InputLabel>Events Webhook (beta)</InputLabel>
             <TextField
               {...register('webhookUrl', { required: true })}
               type='text'
