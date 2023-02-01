@@ -59,15 +59,21 @@ type PageIconProps = ComponentProps<typeof StyledPageIcon> & {
   icon?: ReactNode;
   pageType?: Page['type'];
   isEditorEmpty?: boolean;
+  isLinkedPage?: boolean;
 };
 
-export function PageIcon({ icon, isEditorEmpty, pageType, ...props }: PageIconProps) {
+export function PageIcon({ icon, isEditorEmpty, isLinkedPage = false, pageType, ...props }: PageIconProps) {
   if (!icon) {
     if (pageType === 'linked_board') {
-      icon = (
-        <LinkedIcon>
-          <StyledDatabaseIcon />
-        </LinkedIcon>
+      return (
+        <StyledPageIcon
+          icon={
+            <LinkedIcon>
+              <StyledDatabaseIcon />
+            </LinkedIcon>
+          }
+          {...props}
+        />
       );
     } else if (pageType === 'board' || pageType === 'inline_board' || pageType === 'inline_linked_board') {
       icon = <StyledDatabaseIcon />;
@@ -81,5 +87,10 @@ export function PageIcon({ icon, isEditorEmpty, pageType, ...props }: PageIconPr
       icon = <FilledPageIcon />;
     }
   }
-  return <StyledPageIcon icon={icon} {...props} />;
+
+  return isLinkedPage ? (
+    <StyledPageIcon icon={<LinkedIcon>{icon}</LinkedIcon>} {...props} />
+  ) : (
+    <StyledPageIcon icon={icon} {...props} />
+  );
 }

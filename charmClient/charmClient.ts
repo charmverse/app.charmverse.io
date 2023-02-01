@@ -41,6 +41,7 @@ import type {
 } from 'lib/permissions/pages/page-permission-interfaces';
 import type { SpacePermissionFlags, SpacePermissionModification } from 'lib/permissions/spaces';
 import type { AggregatedProfileData } from 'lib/profile';
+import type { CreateSpaceProps } from 'lib/spaces/createWorkspace';
 import type {
   TokenGateEvaluationAttempt,
   TokenGateEvaluationResult,
@@ -151,7 +152,7 @@ class CharmClient {
     return http.PUT<LoggedInUser>('/api/profile', data);
   }
 
-  checkNexusPath(path: string) {
+  checkPublicProfilePath(path: string) {
     return http.GET<{ available: boolean }>('/api/profile/check-path-availability', { path });
   }
 
@@ -171,8 +172,8 @@ class CharmClient {
     return http.POST<User>('/api/profile/add-wallets', { addressesToAdd: data });
   }
 
-  async createSpace(spaceOpts: Prisma.SpaceCreateInput) {
-    const space = await http.POST<Space>('/api/spaces', spaceOpts);
+  async createSpace(spaceOptions: Pick<CreateSpaceProps, 'createSpaceOption' | 'spaceData'>) {
+    const space = await http.POST<Space>('/api/spaces', spaceOptions);
     return space;
   }
 

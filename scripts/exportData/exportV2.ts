@@ -33,3 +33,7 @@ async function exportImport ({ sourceSpaceIdOrDomain, targetSpaceIdOrDomain }:
 //   console.log('Job done');
 // });
 
+importWorkspacePages({
+  exportName: 'cvt-nft-community-template',
+  targetSpaceIdOrDomain: 'forthepeopledao'
+}).then(() => console.log('Complete'))

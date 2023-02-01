@@ -31,14 +31,28 @@ const NestedPageContainer = styled(Link)`
   }
 `;
 
-export default function NestedPage({ node }: NodeViewProps) {
+const StyledTypography = styled(Typography, {
+  shouldForwardProp: (prop) => prop !== 'showBorderBottom'
+})<{ showBorderBottom?: boolean }>`
+  font-weight: 600;
+  ${({ showBorderBottom }) =>
+    showBorderBottom &&
+    `
+    border-bottom: 0.05em solid var(--link-underline);
+  `}
+`;
+
+export default function NestedPage({ node, currentPageId }: NodeViewProps & { currentPageId?: string }) {
   const space = useCurrentSpace();
   const { pages } = usePages();
   const nestedPage = pages[node.attrs.id];
+  const parentPage = nestedPage?.parentId ? pages[nestedPage.parentId] : null;
 
   const appPath = `${space?.domain}/${nestedPage?.path}`;
 
   const fullPath = `${window.location.origin}/${appPath}`;
+
+  const isLinkedPage = currentPageId ? parentPage?.id !== currentPageId : false;
 
   return (
     <NestedPageContainer
@@ -51,10 +65,17 @@ export default function NestedPage({ node }: NodeViewProps) {
     >
       <div>
         {nestedPage && (
-          <PageIcon isEditorEmpty={!nestedPage.hasContent} icon={nestedPage.icon} pageType={nestedPage.type} />
+          <PageIcon
+            isLinkedPage={isLinkedPage}
+            isEditorEmpty={!nestedPage.hasContent}
+            icon={nestedPage.icon}
+            pageType={nestedPage.type}
+          />
         )}
       </div>
-      <Typography fontWeight={600}>{nestedPage ? nestedPage.title || 'Untitled' : 'Page not found'}</Typography>
+      <StyledTypography showBorderBottom={isLinkedPage}>
+        {nestedPage ? nestedPage.title || 'Untitled' : 'Page not found'}
+      </StyledTypography>
     </NestedPageContainer>
   );
 }

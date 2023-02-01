@@ -1,3 +1,4 @@
+import styled from '@emotion/styled';
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 
@@ -10,15 +11,19 @@ import { createFilterGroup, isAFilterGroupInstance } from 'lib/focalboard/filter
 import mutator from '../../mutator';
 import { Utils } from '../../utils';
 import Button from '../../widgets/buttons/button';
-import Modal from '../modal';
 
 import FilterEntry from './filterEntry';
 
 type Props = {
   properties: IPropertyTemplate[];
   activeView: BoardView;
-  onClose: () => void;
 };
+
+const StyledFilterComponent = styled.div`
+  color: var(--secondary-text);
+  min-width: 430px;
+  padding: 10px;
+`;
 
 const FilterComponent = React.memo((props: Props): JSX.Element => {
   const conditionClicked = (optionId: string, filter: FilterClause): void => {
@@ -63,23 +68,21 @@ const FilterComponent = React.memo((props: Props): JSX.Element => {
     (activeView.fields.filter?.filters.filter((o) => !isAFilterGroupInstance(o)) as FilterClause[]) || [];
 
   return (
-    <Modal onClose={props.onClose}>
-      <div className='FilterComponent'>
-        {filters.map((filter) => (
-          <FilterEntry
-            key={`${filter.propertyId}-${filter.condition}-${filter.values.join(',')}`}
-            properties={properties}
-            view={activeView}
-            conditionClicked={conditionClicked}
-            filter={filter}
-          />
-        ))}
+    <StyledFilterComponent>
+      {filters.map((filter) => (
+        <FilterEntry
+          key={`${filter.propertyId}-${filter.condition}-${filter.values.join(',')}`}
+          properties={properties}
+          view={activeView}
+          conditionClicked={conditionClicked}
+          filter={filter}
+        />
+      ))}
 
-        <Button onClick={() => addFilterClicked()}>
-          <FormattedMessage id='FilterComponent.add-filter' defaultMessage='+ Add filter' />
-        </Button>
-      </div>
-    </Modal>
+      <Button onClick={() => addFilterClicked()}>
+        <FormattedMessage id='FilterComponent.add-filter' defaultMessage='+ Add filter' />
+      </Button>
+    </StyledFilterComponent>
   );
 });
 

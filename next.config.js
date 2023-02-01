@@ -34,8 +34,13 @@ const config = {
     return [
       {
         source: '/:domain(^(?!.*\bapi\b).*$)/settings',
-        destination: '/:domain/settings/workspace',
+        destination: '/:domain/settings/space',
         permanent: false
+      },
+      {
+        source: '/:domain(^(?!.*\bapi\b).*$)/settings/workspace',
+        destination: '/:domain/settings/space',
+        permanent: true
       },
       {
         source: '/:domain(^(?!.*\bapi\b).*$)/bounties/:id',

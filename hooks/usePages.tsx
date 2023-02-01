@@ -105,10 +105,10 @@ export function PagesProvider({ children }: { children: ReactNode }) {
    * Will return permissions for the currently connected user
    * @param pageId
    */
-  function getPagePermissions(pageId: string): IPagePermissionFlags {
+  function getPagePermissions(pageId: string, deletedPage?: PageMeta): IPagePermissionFlags {
     const computedPermissions = new AllowedPagePermissions();
 
-    const targetPage = pages[pageId] as PageMeta;
+    const targetPage = pages[pageId] ?? deletedPage;
 
     // Return empty permission set so this silently fails
     if (!targetPage) {

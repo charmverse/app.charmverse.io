@@ -1,3 +1,4 @@
+import { history } from '@bangle.dev/base-components';
 import type { BangleEditorProps as CoreBangleEditorProps } from '@bangle.dev/core';
 import { BangleEditor as CoreBangleEditor } from '@bangle.dev/core';
 import { EditorState } from '@bangle.dev/pm';
@@ -12,6 +13,7 @@ import useSWRImmutable from 'swr/immutable';
 
 import charmClient from 'charmClient';
 import type { FrontendParticipant } from 'components/common/CharmEditor/components/fiduswriter/collab';
+import { undoEventName } from 'components/common/CharmEditor/utils';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
@@ -23,6 +25,8 @@ import { FidusEditor } from '../../fiduswriter/fiduseditor';
 import { nodeViewUpdateStore, useNodeViews } from './node-view-helpers';
 import { NodeViewWrapper } from './NodeViewWrapper';
 import type { RenderNodeViewsFunction } from './NodeViewWrapper';
+
+const { undo } = history;
 
 const StyledLoadingComponent = styled(LoadingComponent)`
   position: absolute;
@@ -45,13 +49,15 @@ interface BangleEditorProps<PluginMetadata = any> extends CoreBangleEditorProps<
   enableComments?: boolean;
 }
 
+const warningText = 'You have unsaved changes. Please confirm changes.';
+
 export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, BangleEditorProps>(function ReactEditor(
   {
     pageId,
     state,
     children,
     isContentControlled,
-    focusOnInit = !isTouchScreen(),
+    focusOnInit,
     pmViewOpts,
     renderNodeViews,
     className,
@@ -65,6 +71,8 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
   },
   ref
 ) {
+  focusOnInit = focusOnInit ?? (!readOnly && !isTouchScreen());
+
   const renderRef = useRef<HTMLDivElement>(null);
   const { user } = useUser();
   const enableFidusEditor = Boolean(user && pageId && trackChanges && !isContentControlled);
@@ -109,8 +117,44 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
   }
 
   useEffect(() => {
+    function listener(event: Event) {
+      if (editor) {
+        const detail = (event as CustomEvent).detail as { pageId: string } | null;
+        if (detail && detail.pageId === pageId) {
+          undo()(editor.view.state, editor.view.dispatch);
+        }
+      }
+    }
+
+    if (editorRef && editorRef.current && editor) {
+      editorRef.current.addEventListener(undoEventName, listener);
+      return () => {
+        editorRef.current?.removeEventListener(undoEventName, listener);
+      };
+    }
+  }, [editorRef, editor]);
+
+  let fEditor: FidusEditor | null = null;
+
+  useEffect(() => {
+    const handleWindowClose = (e: BeforeUnloadEvent) => {
+      if (fEditor) {
+        if (fEditor.ws?.messagesToSend.length === 0) return;
+        e.preventDefault();
+        (e || window.event).returnValue = warningText;
+        return warningText;
+      }
+    };
+
+    window.addEventListener('beforeunload', handleWindowClose);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleWindowClose);
+    };
+  }, []);
+
+  useEffect(() => {
     const _editor = new CoreBangleEditor(renderRef.current!, editorViewPayloadRef.current);
-    let fEditor: FidusEditor;
 
     if (isContentControlled) {
       setIsLoading(false);
@@ -172,6 +216,7 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
       <div
         ref={editorRef}
         className='bangle-editor-core'
+        data-page-id={pageId}
         style={{ minHeight: showLoader && isLoading ? '300px' : undefined }}
       >
         <StyledLoadingComponent height='300px' isLoading={showLoader && isLoading} />

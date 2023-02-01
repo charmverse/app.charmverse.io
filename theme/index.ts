@@ -254,6 +254,9 @@ export const createThemeLightSensitive = (mode: PaletteMode) => {
         }
       },
       MuiAutocomplete: {
+        defaultProps: {
+          blurOnSelect: 'touch'
+        },
         styleOverrides: {
           popper: {
             zIndex: 'var(--z-index-speedDial)'
@@ -284,8 +287,27 @@ export const createThemeLightSensitive = (mode: PaletteMode) => {
         styleOverrides: {
           root: {
             textTransform: 'none'
+          },
+          text: {
+            ':hover': {
+              backgroundColor: 'var(--input-bg)'
+            }
             // borderRadius: '10px'
           }
+        }
+      },
+      MuiIconButton: {
+        styleOverrides: {
+          root: {
+            ':hover': {
+              backgroundColor: 'var(--input-bg)'
+            }
+          }
+        }
+      },
+      MuiMenuItem: {
+        defaultProps: {
+          dense: true
         }
       },
       MuiTooltip: {
@@ -322,7 +344,7 @@ export const createThemeLightSensitive = (mode: PaletteMode) => {
         styleOverrides: {
           root: {
             fontSize: 'inherit',
-            minWidth: '30px'
+            minWidth: '30px !important'
           }
         }
       },

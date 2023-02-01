@@ -3,7 +3,8 @@ import styled from '@emotion/styled';
 import type { Page } from '@prisma/client';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
-import { useCallback, useMemo, useState, useEffect } from 'react';
+import type { KeyboardEvent, MouseEvent, ClipboardEvent } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 import CardDialog from 'components/common/BoardEditor/focalboard/src/components/cardDialog';
 import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
@@ -118,7 +119,7 @@ export default function DatabaseView({ containerWidth, readOnly: readOnlyOverrid
     }, 500);
   }, [updatePage]);
 
-  function stopPropagation(e: React.KeyboardEvent) {
+  function stopPropagation(e: KeyboardEvent | MouseEvent | ClipboardEvent) {
     e.stopPropagation();
   }
 
@@ -145,6 +146,7 @@ export default function DatabaseView({ containerWidth, readOnly: readOnlyOverrid
         containerWidth={containerWidth}
         onKeyPress={stopPropagation}
         onKeyDown={stopPropagation}
+        onPaste={stopPropagation}
       >
         <CenterPanel
           disableUpdatingUrl

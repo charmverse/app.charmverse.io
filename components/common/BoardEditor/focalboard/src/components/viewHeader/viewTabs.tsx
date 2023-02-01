@@ -6,7 +6,7 @@ import {
   ContentCopy as DuplicateIcon,
   Refresh as RefreshIcon
 } from '@mui/icons-material';
-import { Typography } from '@mui/material';
+import { Typography, Box } from '@mui/material';
 import type { ButtonProps } from '@mui/material/Button';
 import Divider from '@mui/material/Divider';
 import ListItemIcon from '@mui/material/ListItemIcon';
@@ -17,7 +17,6 @@ import type { TabProps } from '@mui/material/Tab';
 import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
 import TextField from '@mui/material/TextField';
-import { Box } from '@mui/system';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -29,33 +28,44 @@ import { injectIntl } from 'react-intl';
 
 import Button from 'components/common/Button';
 import Modal from 'components/common/Modal';
+import type { Board } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import { formatViewTitle, createBoardView } from 'lib/focalboard/boardView';
 
 import mutator from '../../mutator';
 import { IDType, Utils } from '../../utils';
+import AddViewMenu from '../addViewMenu';
 import { iconForViewType } from '../viewMenu';
 
 // fix types for MUI Tab to include Button Props
 const TabButton = Tab as React.ComponentType<TabProps & ButtonProps>;
 
 const StyledTabContent = styled(Typography)`
-  padding: ${({ theme }) => theme.spacing('6px', 1, '10px')};
+  padding: ${({ theme }) => theme.spacing('6px', '2px', '6px')};
+  width: 100%;
 
-  .Icon {
-    width: 20px;
-    height: 20px;
+  span {
+    display: inline-flex;
+    gap: 4px;
+    border-radius: 4px;
+    padding: 4px 8px;
+    width: 100%;
+  }
+  &:hover span {
+    background-color: var(--button-text-hover);
   }
 `;
 
 interface ViewTabsProps {
   intl: IntlShape;
   activeView?: BoardView | null;
+  board: Board;
   readOnly?: boolean;
   views: BoardView[];
   showView: (viewId: string) => void;
   addViewButton?: ReactNode;
   onDeleteView?: (viewId: string) => void;
+  onClickNewView?: () => void;
   disableUpdatingUrl?: boolean;
   maxTabsShown: number;
   openViewOptions: () => void;
@@ -67,20 +77,20 @@ function ViewTabs(props: ViewTabsProps) {
     openViewOptions,
     maxTabsShown,
     disableUpdatingUrl,
-    addViewButton,
     activeView,
+    board,
     intl,
     readOnly,
     showView,
     views: viewsProp
   } = props;
   const router = useRouter();
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [viewMenuAnchorEl, setViewMenuAnchorEl] = useState<null | HTMLElement>(null);
   const [dropdownView, setDropdownView] = useState<BoardView | null>(null);
   const renameViewPopupState = usePopupState({ variant: 'popover', popupId: 'rename-view-popup' });
-  const showViewsPopupState = usePopupState({ variant: 'popover', popupId: 'show-views-popup' });
-  const showViewsTriggerState = bindTrigger(showViewsPopupState);
-  const showViewsMenuState = bindMenu(showViewsPopupState);
+  const hiddenViewsPopupState = usePopupState({ variant: 'popover', popupId: 'show-views-popup' });
+  const showViewsTriggerState = bindTrigger(hiddenViewsPopupState);
+  const showViewsMenuState = bindMenu(hiddenViewsPopupState);
 
   const views = viewsProp.filter((view) => !view.fields.inline);
   // Find the index of the current view
@@ -118,7 +128,7 @@ function ViewTabs(props: ViewTabsProps) {
       return;
     }
     if (view && !readOnly && event.currentTarget.id === activeView?.id) {
-      setAnchorEl(event.currentTarget);
+      setViewMenuAnchorEl(event.currentTarget);
       setDropdownView(view);
     } else {
       showView(viewId);
@@ -126,8 +136,11 @@ function ViewTabs(props: ViewTabsProps) {
   }
 
   function handleClose() {
-    setAnchorEl(null);
-    setDropdownView(null);
+    hiddenViewsPopupState.close();
+  }
+
+  function closeViewMenu() {
+    setViewMenuAnchorEl(null);
   }
 
   function getViewUrl(viewId: string) {
@@ -157,10 +170,10 @@ function ViewTabs(props: ViewTabsProps) {
     Utils.log('deleteView');
     if (!dropdownView) return;
 
+    setViewMenuAnchorEl(null);
     const nextView = views.find((o) => o !== dropdownView);
     await mutator.deleteBlock(dropdownView, 'delete view');
     onDeleteView?.(dropdownView.id);
-    setAnchorEl(null);
     if (nextView) {
       showView(nextView.id);
     }
@@ -173,18 +186,18 @@ function ViewTabs(props: ViewTabsProps) {
       const { boardId, ...sourceDataWithoutBoard } = newView.fields.sourceData!;
       newView.fields.sourceData = sourceDataWithoutBoard;
       mutator.updateBlock(newView, dropdownView, 'reset Google view source');
-      setAnchorEl(null);
+      setViewMenuAnchorEl(null);
     }
   }
 
   function handleRenameView() {
-    setAnchorEl(null);
+    setViewMenuAnchorEl(null);
     renameViewPopupState.open();
   }
 
   function handleViewOptions() {
     openViewOptions();
-    setAnchorEl(null);
+    setViewMenuAnchorEl(null);
   }
 
   function saveViewTitle(form: { title: string }) {
@@ -238,7 +251,10 @@ function ViewTabs(props: ViewTabsProps) {
                 fontWeight={500}
                 gap={1}
               >
-                {view.title || formatViewTitle(view)}
+                <span>
+                  {iconForViewType(view.fields.viewType)}
+                  {view.title || formatViewTitle(view)}
+                </span>
               </StyledTabContent>
             }
           />
@@ -246,14 +262,17 @@ function ViewTabs(props: ViewTabsProps) {
         {restViews.length !== 0 && (
           <TabButton
             disableRipple
-            sx={{ p: 0, mb: 0.5 }}
-            color='secondary'
+            sx={{ p: 0 }}
             {...showViewsTriggerState}
-            label={<>{restViews.length} more...</>}
+            label={
+              <StyledTabContent color='secondary' fontSize='small' fontWeight={500}>
+                <span>{restViews.length} more...</span>
+              </StyledTabContent>
+            }
           />
         )}
       </Tabs>
-      <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleClose}>
+      <Menu anchorEl={viewMenuAnchorEl} open={Boolean(viewMenuAnchorEl)} onClose={closeViewMenu}>
         <MenuItem dense onClick={handleRenameView}>
           <ListItemIcon>
             <EditIcon fontSize='small' />
@@ -297,32 +316,35 @@ function ViewTabs(props: ViewTabsProps) {
       </Menu>
 
       <Menu {...showViewsMenuState}>
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 1,
-            mb: 1
-          }}
-        >
-          {restViews.map((view) => (
-            <MenuItem
-              onClick={() => {
-                showView(view.id);
-                showViewsMenuState.onClose();
-              }}
-              href={disableUpdatingUrl ? '' : getViewUrl(view.id)}
-              component={Link}
-              key={view.id}
-              dense
-            >
-              <ListItemIcon>{iconForViewType(view.fields.viewType)}</ListItemIcon>
-              <ListItemText>{view.title || formatViewTitle(view)}</ListItemText>
-            </MenuItem>
-          ))}
+        {restViews.map((view) => (
+          <MenuItem
+            onClick={() => {
+              showView(view.id);
+              showViewsMenuState.onClose();
+            }}
+            href={disableUpdatingUrl ? '' : getViewUrl(view.id)}
+            component={Link}
+            key={view.id}
+            dense
+          >
+            <ListItemIcon>{iconForViewType(view.fields.viewType)}</ListItemIcon>
+            <ListItemText>{view.title || formatViewTitle(view)}</ListItemText>
+          </MenuItem>
+        ))}
+        <Divider sx={{ my: 1 }} />
+        <Box pl='14px'>
+          {activeView && (
+            <AddViewMenu
+              board={board}
+              activeView={activeView}
+              views={views}
+              showView={showView}
+              showLabel={true}
+              onClose={handleClose}
+              onClickIcon={props.onClickNewView}
+            />
+          )}
         </Box>
-        <Divider />
-        {addViewButton}
       </Menu>
 
       {/* Form to rename views */}

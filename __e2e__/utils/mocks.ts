@@ -33,36 +33,16 @@ export async function createUser({
 
 export async function createSpace({
   browserPage,
-  createdBy,
   permissionConfigurationMode
 }: { browserPage: BrowserPage } & Pick<Space, 'createdBy'> &
   Partial<Pick<Space, 'permissionConfigurationMode'>>): Promise<Space> {
   return browserPage.request
     .post(`${baseUrl}/api/spaces`, {
       data: {
-        author: {
-          connect: {
-            id: createdBy
-          }
-        },
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        updatedBy: createdBy,
-        spaceRoles: {
-          create: [
-            {
-              isAdmin: true,
-              user: {
-                connect: {
-                  id: createdBy
-                }
-              }
-            }
-          ]
-        },
-        permissionConfigurationMode,
-        domain: `domain-${v4()}`,
-        name: 'Testing space'
+        spaceData: {
+          name: 'Testing space',
+          permissionConfigurationMode
+        }
       }
     })
     .then((res) => res.json());

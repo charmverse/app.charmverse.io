@@ -5,22 +5,21 @@ import { useHotkeys } from 'react-hotkeys-hook';
 
 import CardDialog from 'components/common/BoardEditor/focalboard/src/components/cardDialog';
 import CenterPanel from 'components/common/BoardEditor/focalboard/src/components/centerPanel';
-import { FlashMessages, sendFlashMessage } from 'components/common/BoardEditor/focalboard/src/components/flashMessages';
 import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
 import {
   getCurrentBoard,
   setCurrent as setCurrentBoard
 } from 'components/common/BoardEditor/focalboard/src/store/boards';
 import { useAppDispatch, useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
-import { initialLoad, initialReadOnlyLoad } from 'components/common/BoardEditor/focalboard/src/store/initialLoad';
+import { initialReadOnlyLoad } from 'components/common/BoardEditor/focalboard/src/store/initialLoad';
 import {
   getCurrentBoardViews,
-  getView,
   setCurrent as setCurrentView
 } from 'components/common/BoardEditor/focalboard/src/store/views';
 import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
 import FocalBoardPortal from 'components/common/BoardEditor/FocalBoardPortal';
 import { useFocalboardViews } from 'hooks/useFocalboardViews';
+import { useSnackbar } from 'hooks/useSnackbar';
 import type { PageMeta } from 'lib/pages';
 import type { IPagePermissionFlags } from 'lib/permissions/pages';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
@@ -43,6 +42,7 @@ export function DatabasePage({ page, setPage, readOnly = false, pagePermissions 
   const [currentViewId, setCurrentViewId] = useState<string | undefined>(router.query.viewId as string | undefined);
   const boardViews = useAppSelector(getCurrentBoardViews);
   // grab the first board view if current view is not specified
+  const { showMessage } = useSnackbar();
   const activeView =
     typeof currentViewId === 'string' ? boardViews.find((view) => view.id === currentViewId) : boardViews[0];
   const dispatch = useAppDispatch();
@@ -51,6 +51,12 @@ export function DatabasePage({ page, setPage, readOnly = false, pagePermissions 
   const { setFocalboardViewsRecord } = useFocalboardViews();
   const readOnlyBoard = readOnly || !pagePermissions?.edit_content;
   const readOnlySourceData = activeView?.fields?.sourceType === 'google_form'; // blocks that are synced cannot be edited
+  useEffect(() => {
+    if (typeof router.query.cardId === 'string') {
+      setShownCardId(router.query.cardId);
+    }
+  }, [router.query.cardId]);
+
   useEffect(() => {
     const boardId = page.boardId;
     const urlViewId = router.query.viewId as string;
@@ -92,14 +98,10 @@ export function DatabasePage({ page, setPage, readOnly = false, pagePermissions 
     if (mutator.canUndo) {
       const description = mutator.undoDescription;
       mutator.undo().then(() => {
-        if (description) {
-          sendFlashMessage({ content: `Undo ${description}`, severity: 'low' });
-        } else {
-          sendFlashMessage({ content: 'Undo', severity: 'low' });
-        }
+        showMessage(description ? `Undo ${description}` : 'Undo', 'success');
       });
     } else {
-      sendFlashMessage({ content: 'Nothing to Undo', severity: 'low' });
+      showMessage('Nothing to Undo', 'info');
     }
   });
 
@@ -108,14 +110,10 @@ export function DatabasePage({ page, setPage, readOnly = false, pagePermissions 
     if (mutator.canRedo) {
       const description = mutator.redoDescription;
       mutator.redo().then(() => {
-        if (description) {
-          sendFlashMessage({ content: `Redo ${description}`, severity: 'low' });
-        } else {
-          sendFlashMessage({ content: 'Redu', severity: 'low' });
-        }
+        showMessage(description ? `Redo ${description}` : 'Undo', 'success');
       });
     } else {
-      sendFlashMessage({ content: 'Nothing to Redo', severity: 'low' });
+      showMessage('Nothing to Redo', 'info');
     }
   });
 
@@ -152,7 +150,6 @@ export function DatabasePage({ page, setPage, readOnly = false, pagePermissions 
   if (board) {
     return (
       <>
-        <FlashMessages milliseconds={2000} />
         <div className='focalboard-body full-page'>
           <CenterPanel
             readOnly={Boolean(readOnlyBoard)}
@@ -171,7 +168,6 @@ export function DatabasePage({ page, setPage, readOnly = false, pagePermissions 
               cardId={shownCardId}
               onClose={() => {
                 showCard(null);
-                setShownCardId(null);
               }}
               readOnly={readOnly}
             />

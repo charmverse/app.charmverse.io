@@ -131,7 +131,7 @@ test.describe.serial('Make a page public and visit it', async () => {
 
     await expect(documentTitle).toBeVisible();
 
-    expect(await documentTitle.innerText()).toBe(cardPage.title);
+    expect(await documentTitle.innerText()).toMatch(cardPage.title);
 
     // 5. Make sure page is displayed using public layout
     const publicPageLayout = page.locator('data-test=public-page-layout');

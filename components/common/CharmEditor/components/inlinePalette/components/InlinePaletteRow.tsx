@@ -24,14 +24,15 @@ interface InlinePaletteRowProps {
   size: InlinePaletteSize;
 }
 
-const StyledPaper = styled(Paper)<{ size: InlinePaletteSize }>`
-  width: ${({ size }) => (size === 'small' ? '22px' : '46px')};
+const IconContainer = styled(Paper)<{ size: InlinePaletteSize }>`
+  width: 100%;
+  max-width: ${({ size }) => (size === 'small' ? '22px' : '46px')};
   height: ${({ size }) => (size === 'small' ? '22px' : '46px')};
   display: flex;
   align-items: center;
   justify-content: center;
   color: ${({ theme }) => theme.palette.secondary.light};
-  margin-left: 10px;
+  margin-left: ${({ theme }) => theme.spacing(0.5)};
 `;
 
 const StyledInlinePaletteRow = styled.div<{ disabled: boolean; size: InlinePaletteSize }>`
@@ -41,6 +42,7 @@ const StyledInlinePaletteRow = styled.div<{ disabled: boolean; size: InlinePalet
   align-items: center;
   font-weight: bold;
   font-size: 14px;
+  width: 100%;
   ${({ size }) =>
     size === 'big' &&
     `
@@ -107,10 +109,10 @@ export default function InlinePaletteRow({
       style={style}
       size={size}
     >
-      <StyledPaper elevation={0} variant='outlined' size={size}>
+      <IconContainer elevation={0} variant='outlined' size={size}>
         {icon}
-      </StyledPaper>
-      <Box padding='0 12px 0 6px' display='flex' flexDirection='column'>
+      </IconContainer>
+      <Box pl={1.5} pr={0.5} flexGrow={1}>
         <Typography variant='body2' noWrap whiteSpace='normal'>
           {title}
         </Typography>

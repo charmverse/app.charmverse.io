@@ -14,24 +14,22 @@ import {
 } from '@mui/material';
 import { useState } from 'react';
 
-import charmClient from 'charmClient';
 import Avatar from 'components/common/Avatar';
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
 import { SelectPreview } from 'components/common/form/fields/Select/SelectPreview';
 import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
 import Link from 'components/common/Link';
-import { MemberPropertiesPopup } from 'components/profile/components/SpacesMemberDetails/components/MemberPropertiesPopup';
 import { DiscordSocialIcon } from 'components/profile/components/UserDetails/DiscordSocialIcon';
 import type { Social } from 'components/profile/interfaces';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import isAdmin from 'hooks/useIsAdmin';
 import { useMemberProperties } from 'hooks/useMemberProperties';
 import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
-import type { Member, UpdateMemberPropertyValuePayload } from 'lib/members/interfaces';
+import type { Member } from 'lib/members/interfaces';
 import { humanFriendlyDate } from 'lib/utilities/dates';
 
 import { MemberPropertyTextMultiline } from './MemberDirectoryProperties/MemberPropertyTextMultiline';
+import { MemberOnboardingForm } from './MemberOnboardingForm';
 import { TimezoneDisplay } from './TimezoneDisplay';
 
 const StyledTableCell = styled(TableCell)`
@@ -48,7 +46,6 @@ function MemberDirectoryTableRow({ member }: { member: Member }) {
   const discordUsername = (member.profile?.social as Social)?.discordUsername;
   const currentSpace = useCurrentSpace();
   const { user } = useUser();
-  const admin = isAdmin();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { properties = [] } = useMemberProperties();
   const { mutateMembers } = useMembers();
@@ -58,11 +55,6 @@ function MemberDirectoryTableRow({ member }: { member: Member }) {
     return null;
   }
 
-  const updateMemberPropertyValues = async (spaceId: string, values: UpdateMemberPropertyValuePayload[]) => {
-    await charmClient.members.updateSpacePropertyValues(member.id, spaceId, values);
-    mutateMembers();
-  };
-
   return (
     <StyledTableRow>
       <TableCell
@@ -70,7 +62,7 @@ function MemberDirectoryTableRow({ member }: { member: Member }) {
           p: 1
         }}
       >
-        {((user?.id === member.id && currentSpace) || admin) && (
+        {user?.id === member.id && currentSpace && (
           <IconButton
             size='small'
             className='icons'
@@ -79,13 +71,9 @@ function MemberDirectoryTableRow({ member }: { member: Member }) {
               e.stopPropagation();
               setIsModalOpen(true);
             }}
-            style={
-              !admin
-                ? {
-                    opacity: 1
-                  }
-                : {}
-            }
+            style={{
+              opacity: 1
+            }}
           >
             <EditIcon fontSize='small' />
           </IconButton>
@@ -175,14 +163,24 @@ function MemberDirectoryTableRow({ member }: { member: Member }) {
               );
             }
             case 'name': {
+              const content = (
+                <Typography fontWeight='bold'>{(memberProperty.value as string) ?? member.username}</Typography>
+              );
+
               return (
                 <TableCell key={property.id}>
-                  <Link
-                    color='inherit'
-                    href={`/u/${member.path || member.id}${currentSpace ? `?workspace=${currentSpace.id}` : ''}`}
-                  >
-                    <Typography fontWeight='bold'>{(memberProperty.value as string) ?? member.username}</Typography>
-                  </Link>
+                  {member.id !== user?.id ? (
+                    <Link
+                      color='inherit'
+                      href={`/u/${member.path || member.id}${currentSpace ? `?workspace=${currentSpace.id}` : ''}`}
+                    >
+                      {content}
+                    </Link>
+                  ) : (
+                    <Box sx={{ cursor: 'pointer' }} onClick={() => setIsModalOpen(true)}>
+                      {content}
+                    </Box>
+                  )}
                 </TableCell>
               );
             }
@@ -244,14 +242,17 @@ function MemberDirectoryTableRow({ member }: { member: Member }) {
         }
         return null;
       })}
-      {isModalOpen && user && currentSpace && (
-        <MemberPropertiesPopup
+
+      {isModalOpen && user && currentSpace && user.id === member.id && (
+        <MemberOnboardingForm
+          userId={member.id}
+          spaceName={currentSpace.name}
+          spaceId={currentSpace.id}
           onClose={() => {
+            mutateMembers();
             setIsModalOpen(false);
           }}
-          memberId={member.id}
-          spaceId={currentSpace.id}
-          updateMemberPropertyValues={updateMemberPropertyValues}
+          title='Edit your profile'
         />
       )}
     </StyledTableRow>

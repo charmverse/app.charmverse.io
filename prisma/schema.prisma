@@ -1,7 +1,7 @@
 generator client {
   provider        = "prisma-client-js"
-  binaryTargets   = ["linux-musl", "darwin", "native"]
-  previewFeatures = ["interactiveTransactions", "fullTextSearch", "extendedWhereUnique"]
+  binaryTargets   = ["debian-openssl-1.1.x", "linux-musl", "darwin", "native"]
+  previewFeatures = ["fullTextSearch", "extendedWhereUnique"]
 }
 
 datasource db {
@@ -435,6 +435,7 @@ model User {
   spacesCreated        Space[]
   spacePermissions     SpacePermission[]
   spaceRoles           SpaceRole[]
+  spacesOrder          String[]
   telegramUser         TelegramUser?
   threads              Thread[]
   profile              UserDetails?

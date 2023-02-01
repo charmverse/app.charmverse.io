@@ -2,21 +2,19 @@ import styled from '@emotion/styled';
 import { MoreHoriz } from '@mui/icons-material';
 import { Box, IconButton, Stack, Tab, Tabs, Typography } from '@mui/material';
 import { useRouter } from 'next/router';
-import { useEffect, useMemo, useState } from 'react';
+import { useState } from 'react';
 
 import { iconForViewType } from 'components/common/BoardEditor/focalboard/src/components/viewMenu';
 import Button from 'components/common/Button';
 import { CenteredPageContent } from 'components/common/PageLayout/components/PageContent';
 import { useMemberProperties } from 'hooks/useMemberProperties';
 import { useMembers } from 'hooks/useMembers';
-import type { Member } from 'lib/members/interfaces';
+import type { Member, MemberPropertyWithPermissions } from 'lib/members/interfaces';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
 import { MemberDirectoryGalleryView } from './components/MemberDirectoryGalleryView';
 import { MemberPropertiesSidebar } from './components/MemberDirectoryProperties/MemberPropertiesSidebar';
 import { MemberDirectorySearchBar } from './components/MemberDirectorySearchBar';
-import { MemberDirectorySort } from './components/MemberDirectorySort/MemberDirectorySort';
-import { sortMembers } from './components/MemberDirectorySort/utils';
 import { MemberDirectoryTableView } from './components/MemberDirectoryTableView';
 
 const StyledButton = styled(Button)`
@@ -31,6 +29,13 @@ const StyledButton = styled(Button)`
 const views = ['gallery', 'table'] as const;
 type View = typeof views[number];
 
+function memberNamePropertyValue(member: Member, nameProperty: MemberPropertyWithPermissions | null) {
+  const memberNameProperty = member.properties.find((prop) => prop.memberPropertyId === nameProperty?.id);
+  const memberName = (memberNameProperty?.value ?? member.username).toString();
+
+  return memberName.startsWith('0x') ? `zzzzzzzz${memberName}` : memberName;
+}
+
 export default function MemberDirectoryPage() {
   const router = useRouter();
   const { members } = useMembers();
@@ -38,22 +43,11 @@ export default function MemberDirectoryPage() {
   const { properties = [] } = useMemberProperties();
   const [currentView, setCurrentView] = useState<View>((router.query.view as View) ?? 'gallery');
   const [isPropertiesDrawerVisible, setIsPropertiesDrawerVisible] = useState(false);
-  const [sortedProperty, setSortedProperty] = useState<string>('');
+  const nameProperty = properties.find((property) => property.type === 'name') ?? null;
 
-  useEffect(() => {
-    // Only set initial property sort if none exist before
-    if (!sortedProperty) {
-      setSortedProperty(properties.find((property) => property.type === 'name')?.name ?? '');
-    }
-  }, [properties, sortedProperty]);
-
-  const sortedMembers = useMemo(() => {
-    const memberProperty = sortedProperty ? properties.find((property) => property.name === sortedProperty) : null;
-    if (sortedProperty && memberProperty) {
-      return sortMembers(searchedMembers, memberProperty);
-    }
-    return searchedMembers;
-  }, [sortedProperty, properties, searchedMembers]);
+  const sortedMembers = searchedMembers.sort((mem1, mem2) =>
+    memberNamePropertyValue(mem1, nameProperty) > memberNamePropertyValue(mem2, nameProperty) ? 1 : -1
+  );
 
   return (
     <CenteredPageContent>
@@ -92,22 +86,16 @@ export default function MemberDirectoryPage() {
             />
           ))}
         </Tabs>
-        <Stack flexDirection='row' gap={1}>
-          <MemberDirectorySort
-            setSortedProperty={setSortedProperty}
-            sortedProperty={sortedProperty}
-            view={currentView}
-          />
-          <IconButton
-            onClick={() => {
-              setTimeout(() => {
-                setIsPropertiesDrawerVisible(!isPropertiesDrawerVisible);
-              });
-            }}
-          >
-            <MoreHoriz color='secondary' />
-          </IconButton>
-        </Stack>
+
+        <IconButton
+          onClick={() => {
+            setTimeout(() => {
+              setIsPropertiesDrawerVisible(!isPropertiesDrawerVisible);
+            });
+          }}
+        >
+          <MoreHoriz color='secondary' />
+        </IconButton>
       </Stack>
       <Box position='relative' display='flex' height='100%'>
         <Box width='100%' overflow={currentView === 'table' ? 'auto' : 'visible'} height='fit-content'>
