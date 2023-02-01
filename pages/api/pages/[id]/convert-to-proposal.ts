@@ -14,9 +14,9 @@ import { relay } from 'lib/websockets/relay';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireUser).post(updatePageHandler);
+handler.use(requireUser).post(convertToProposal);
 
-async function updatePageHandler(req: NextApiRequest, res: NextApiResponse<IPageWithPermissions>) {
+async function convertToProposal(req: NextApiRequest, res: NextApiResponse<IPageWithPermissions>) {
   const pageId = req.query.id as string;
   const userId = req.session.user.id;
 
