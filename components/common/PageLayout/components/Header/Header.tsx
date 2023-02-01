@@ -85,7 +85,7 @@ export default function Header({ open, openSidebar }: HeaderProps) {
   const { setCurrentPageActionDisplay } = usePageActionDisplay();
   const [userSpacePermissions] = useCurrentSpacePermissions();
   const pagePermissions = basePage ? getPagePermissions(basePage.id) : null;
-  const isSmallScreen = useMediaQuery(theme.breakpoints.down('lg'));
+  const isLargeScreen = useMediaQuery(theme.breakpoints.up('md'));
 
   const pageType = basePage?.type;
   const isExportablePage =
@@ -130,7 +130,7 @@ export default function Header({ open, openSidebar }: HeaderProps) {
     }
   }
 
-  const isFullWidth = isSmallScreen || (basePage?.fullWidth ?? false);
+  const isFullWidth = !isLargeScreen || (basePage?.fullWidth ?? false);
   const isBasePageDocument = documentTypes.includes(basePage?.type ?? '');
   const isBasePageDatabase = /board/.test(basePage?.type ?? '');
 
@@ -317,7 +317,7 @@ export default function Header({ open, openSidebar }: HeaderProps) {
           </ListItemButton>
         </div>
       </Tooltip>
-      {!isSmallScreen && (
+      {isLargeScreen && (
         <>
           <Divider />
           <ListItemButton>
@@ -375,7 +375,7 @@ export default function Header({ open, openSidebar }: HeaderProps) {
         sx={{
           display: 'inline-flex',
           mr: 2,
-          ...(open && { display: 'none' })
+          ...(open && isLargeScreen && { display: 'none' })
         }}
       >
         <MenuIcon />
@@ -388,11 +388,14 @@ export default function Header({ open, openSidebar }: HeaderProps) {
           alignItems: 'center',
           alignSelf: 'stretch',
           gap: 1,
-          width: '100%'
+          width: { xs: 'calc(100% - 40px)', md: '100%' }
         }}
       >
-        <PageTitleWithBreadcrumbs pageId={basePage?.id} pageType={basePage?.type} />
-        <Box display='flex' alignItems='center' alignSelf='stretch' mr={-1}>
+        <div style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
+          <PageTitleWithBreadcrumbs pageId={basePage?.id} pageType={basePage?.type} />
+        </div>
+
+        <Box display='flex' alignItems='center' alignSelf='stretch' mr={-1} gap={0.25}>
           {isBountyBoard && <BountyShareButton headerHeight={headerHeight} />}
 
           {basePage && (
@@ -407,17 +410,17 @@ export default function Header({ open, openSidebar }: HeaderProps) {
           {pageOptionsList && (
             <Box ref={pageMenuAnchor} display='flex' alignSelf='stretch' alignItems='center'>
               <div>
-                <IconButton
-                  size='small'
-                  onClick={() => {
-                    setPageMenuOpen(!pageMenuOpen);
-                    setPageMenuAnchorElement(pageMenuAnchor.current || null);
-                  }}
-                >
-                  <Tooltip title='View comments, export content and more' arrow>
+                <Tooltip title='View comments, export content and more' arrow>
+                  <IconButton
+                    size={isLargeScreen ? 'small' : 'medium'}
+                    onClick={() => {
+                      setPageMenuOpen(!pageMenuOpen);
+                      setPageMenuAnchorElement(pageMenuAnchor.current || null);
+                    }}
+                  >
                     <MoreHorizIcon color='secondary' />
-                  </Tooltip>
-                </IconButton>
+                  </IconButton>
+                </Tooltip>
               </div>
               <Popover
                 anchorEl={pageMenuAnchorElement}
@@ -438,13 +441,18 @@ export default function Header({ open, openSidebar }: HeaderProps) {
           {user && (
             <>
               <NotificationsBadge>
-                <IconButton size='small' sx={{ mx: 1 }} LinkComponent={NextLink} href='/nexus' color='inherit'>
+                <IconButton
+                  size={isLargeScreen ? 'small' : 'medium'}
+                  LinkComponent={NextLink}
+                  href='/nexus'
+                  color='inherit'
+                >
                   <NotificationsIcon fontSize='small' color='secondary' />
                 </IconButton>
               </NotificationsBadge>
               <IconButton
                 size='small'
-                sx={{ display: { xs: 'none', md: 'inline-flex' }, mx: 1 }}
+                sx={{ display: { xs: 'none', md: 'inline-flex' } }}
                 onClick={colorMode.toggleColorMode}
                 color='inherit'
               >
