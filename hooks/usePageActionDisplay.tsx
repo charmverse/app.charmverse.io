@@ -2,8 +2,8 @@ import type { ReactNode } from 'react';
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { useSWRConfig } from 'swr';
 
+import { useLgScreen } from 'hooks/useMediaScreens';
 import type { ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
-import { isSmallScreen } from 'lib/utilities/browser';
 
 import { usePages } from './usePages';
 import { useThreads } from './useThreads';
@@ -26,8 +26,7 @@ export const PageActionDisplayContext = createContext<IPageActionDisplayContext>
 });
 
 export function PageActionDisplayProvider({ children }: { children: ReactNode }) {
-  // only calculate once
-  const smallScreen = useMemo(() => isSmallScreen(), []);
+  const isLargeScreen = useLgScreen();
   const { currentPageId } = usePages();
   const { isValidating: isValidatingInlineComments } = useThreads();
   const { isValidating: isValidatingInlineVotes } = useVotes();
@@ -41,7 +40,7 @@ export function PageActionDisplayProvider({ children }: { children: ReactNode })
       // dont redirect if sidebar is already open
       return setCurrentPageActionDisplay(null);
     }
-    if (currentPageId && !isValidatingInlineComments && !isValidatingInlineVotes && !smallScreen) {
+    if (currentPageId && !isValidatingInlineComments && !isValidatingInlineVotes && isLargeScreen) {
       const cachedInlineCommentData: ThreadWithCommentsAndAuthors[] | undefined = cache.get(
         `pages/${currentPageId}/threads`
       )?.data as ThreadWithCommentsAndAuthors[] | undefined;

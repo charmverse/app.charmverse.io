@@ -1,10 +1,13 @@
+import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
-import { MessageOutlined, FormatListBulleted, RateReviewOutlined } from '@mui/icons-material';
+import { MessageOutlined, RateReviewOutlined } from '@mui/icons-material';
 import { Box, IconButton, Slide, Tooltip, Typography } from '@mui/material';
 import type { ReactNode } from 'react';
 import { memo } from 'react';
 
 import PageActionToggle from 'components/[pageId]/DocumentPage/components/PageActionToggle';
+import { MobileDialog } from 'components/common/MobileDialog/MobileDialog';
+import { useMdScreen } from 'hooks/useMediaScreens';
 import type { PageAction } from 'hooks/usePageActionDisplay';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 
@@ -45,7 +48,11 @@ function SidebarDrawerComponent({
   open: boolean;
   title: string;
 }) {
-  return (
+  const { setCurrentPageActionDisplay } = usePageActionDisplay();
+  const isMdScreen = useMdScreen();
+  const theme = useTheme();
+
+  return isMdScreen ? (
     <Slide
       appear={false}
       direction='left'
@@ -78,14 +85,33 @@ function SidebarDrawerComponent({
               <PageActionIcon view='suggestions' />
             </Box>
           </Box>
+
           {children}
         </Box>
       </PageActionListBox>
     </Slide>
+  ) : (
+    <MobileDialog
+      title={title}
+      open={open}
+      onClose={() => setCurrentPageActionDisplay(null)}
+      rightActions={
+        <Box display='flex' alignItems='center' pr={1} justifyContent='flex-end'>
+          <PageActionIcon view='comments' size='medium' />
+          <PageActionIcon view='suggestions' size='medium' />
+        </Box>
+      }
+      PaperProps={{ sx: { background: theme.palette.background.light } }}
+      contentSx={{ pr: 0, pb: 0, pl: 1 }}
+    >
+      <Box display='flex' gap={1} flexDirection='column' flex={1} height='100%'>
+        {children}
+      </Box>
+    </MobileDialog>
   );
 }
 
-function PageActionIcon({ view }: { view: PageAction }) {
+function PageActionIcon({ view, size = 'small' }: { view: PageAction; size?: 'small' | 'medium' }) {
   const { currentPageActionDisplay, setCurrentPageActionDisplay } = usePageActionDisplay();
 
   function setView() {
@@ -94,7 +120,7 @@ function PageActionIcon({ view }: { view: PageAction }) {
 
   return (
     <Tooltip title={SIDEBAR_VIEWS[view].tooltip}>
-      <IconButton color={currentPageActionDisplay === view ? 'inherit' : 'secondary'} size='small' onClick={setView}>
+      <IconButton color={currentPageActionDisplay === view ? 'inherit' : 'secondary'} size={size} onClick={setView}>
         {SIDEBAR_VIEWS[view].icon}
       </IconButton>
     </Tooltip>

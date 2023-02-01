@@ -128,7 +128,7 @@ function getScrollContainer(view: EditorView) {
 
 export function getSuggestTooltipKey(key: PluginKey) {
   return (state: EditorState) => {
-    return key.getState(state).suggestTooltipKey as PluginKey;
+    return key.getState(state)?.suggestTooltipKey as PluginKey;
   };
 }
 
