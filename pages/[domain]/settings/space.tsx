@@ -82,7 +82,7 @@ export default function WorkspaceSettings() {
       .updateSpace({ ...space, name: values.name, domain: values.domain, spaceImage: values.spaceImage })
       .then((updatedSpace) => {
         if (newDomain) {
-          // add a delay so that the form resets
+          // add a delay so that the form resets and doesnt block user from reloading due to calling usePreventReload(isDirty)
           setTimeout(() => {
             window.location.href = router.asPath.replace(space.domain, values.domain as string);
           }, 100);
