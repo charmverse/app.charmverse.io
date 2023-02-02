@@ -5,8 +5,8 @@ import type { KeyedMutator } from 'swr';
 
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
-import CharmEditor from 'components/common/CharmEditor';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/InlineCharmEditor';
+import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
 import UserDisplay from 'components/common/UserDisplay';
 import { useUser } from 'hooks/useUser';
 import type { PostCommentWithVote } from 'lib/forums/comments/interface';
@@ -52,31 +52,20 @@ export function PostCommentForm({
 
   return (
     <Stack gap={1}>
-      <Box
-        display='flex'
-        gap={1}
-        flexDirection='row'
-        alignItems='flex-start'
-        sx={{
-          'div.ProseMirror.bangle-editor': {
-            paddingLeft: '10px !important'
-          }
-        }}
-      >
+      <Box display='flex' gap={1} flexDirection='row' alignItems='flex-start'>
         <UserDisplay user={user} hideName={true} />
-        <CharmEditor
-          disableRowHandles
-          disablePageSpecificFeatures
-          colorMode='dark'
-          style={{
-            minHeight: 100,
-            left: 0
-          }}
-          key={editorKey}
-          content={postContent.doc}
-          onContentChange={updatePostContent}
-          placeholderText='What are your thoughts?'
-        />
+        <Box width='calc(100% - 48px)'>
+          <InlineCharmEditor
+            colorMode='dark'
+            style={{
+              minHeight: 100
+            }}
+            key={editorKey}
+            content={postContent.doc}
+            onContentChange={updatePostContent}
+            placeholderText='What are your thoughts?'
+          />
+        </Box>
       </Box>
       <Button
         sx={{

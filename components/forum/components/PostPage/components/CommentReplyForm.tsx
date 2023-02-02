@@ -61,16 +61,18 @@ export function CommentReplyForm({
     <Stack gap={1}>
       <Box display='flex' gap={1} flexDirection='row' alignItems='flex-start'>
         <UserDisplay user={user} hideName={true} />
-        <InlineCharmEditor
-          colorMode='dark'
-          style={{
-            minHeight: 100
-          }}
-          key={editorKey}
-          content={postContent.doc}
-          onContentChange={updateCommentContent}
-          placeholderText='What are your thoughts?'
-        />
+        <Box width='calc(100% - 48px)'>
+          <InlineCharmEditor
+            colorMode='dark'
+            style={{
+              minHeight: 100
+            }}
+            key={editorKey}
+            content={postContent.doc}
+            onContentChange={updateCommentContent}
+            placeholderText='What are your thoughts?'
+          />
+        </Box>
       </Box>
       <Stack gap={1} flexDirection='row' alignSelf='flex-end'>
         <Button variant='outlined' color='secondary' onClick={onCancelComment}>
