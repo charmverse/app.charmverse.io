@@ -5,9 +5,10 @@ import type { BoxProps, SelectProps } from '@mui/material';
 import { Box, InputLabel, List, MenuItem, Select, Typography } from '@mui/material';
 import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
-import { useEffect, useState } from 'react';
+import { useLayoutEffect, useMemo, useState } from 'react';
 
 import PageThread from 'components/common/CharmEditor/components/PageThread';
+import { useDOMElement } from 'hooks/useDOMElement';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { useThreads } from 'hooks/useThreads';
 import { useUser } from 'hooks/useUser';
@@ -67,13 +68,18 @@ export function CommentsSidebar({ inline }: BoxProps & { inline?: boolean }) {
   const { threads } = useThreads();
   const { user } = useUser();
 
-  const allThreads = Object.values(threads).filter(isTruthy);
+  const allThreads = useMemo(() => Object.values(threads).filter(isTruthy), [threads]);
   const unResolvedThreads = allThreads.filter((thread) => thread && !thread.resolved);
   const resolvedThreads = allThreads.filter((thread) => thread && thread.resolved);
   const [threadFilter, setThreadFilter] = useState<'resolved' | 'open' | 'all' | 'you'>('open');
   const handleThreadClassChange: SelectProps['onChange'] = (event) => {
     setThreadFilter(event.target.value as any);
   };
+
+  const highlightedCommentId = router.query.commentId;
+  const highlightedComment =
+    typeof highlightedCommentId === 'string' ? getCommentFromThreads(allThreads, highlightedCommentId) : null;
+  const highlightedCommentElement = useDOMElement(highlightedComment ? `#comment\\.${highlightedComment.id}` : null);
 
   const { setCurrentPageActionDisplay } = usePageActionDisplay();
 
@@ -106,34 +112,28 @@ export function CommentsSidebar({ inline }: BoxProps & { inline?: boolean }) {
     .map((filteredThreadId) => threads[filteredThreadId])
     .filter(isTruthy);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     // Highlight the comment id when navigation from nexus mentioned tasks list tab
-    const highlightedCommentId = router.query.commentId;
-    if (typeof highlightedCommentId === 'string') {
-      const highlightedComment = getCommentFromThreads(allThreads, highlightedCommentId);
-      if (highlightedComment) {
-        const highlightedCommentDomNode = document.getElementById(`comment.${highlightedComment.id}`);
-        if (highlightedCommentDomNode) {
-          setTimeout(() => {
-            setCurrentPageActionDisplay('comments');
-            setThreadFilter('all');
-            // Remove query parameters from url
-            setUrlWithoutRerender(router.pathname, { commentId: null });
-            requestAnimationFrame(() => {
-              highlightedCommentDomNode.scrollIntoView({
-                behavior: 'smooth'
-              });
-              setTimeout(() => {
-                requestAnimationFrame(() => {
-                  highlightDomElement(highlightedCommentDomNode);
-                });
-              }, 250);
-            });
-          }, 250);
-        }
-      }
+    // const highlightedCommentId = router.query.commentId;
+    if (highlightedCommentElement) {
+      setCurrentPageActionDisplay('comments');
+      setThreadFilter('all');
+      // Remove query parameters from url
+
+      setUrlWithoutRerender(router.pathname, { commentId: null });
+      requestAnimationFrame(() => {
+        highlightedCommentElement.scrollIntoView({
+          behavior: 'smooth'
+        });
+
+        setTimeout(() => {
+          requestAnimationFrame(() => {
+            highlightDomElement(highlightedCommentElement as HTMLElement);
+          });
+        }, 250);
+      });
     }
-  }, [allThreads, router.query.commentId]);
+  }, [highlightedCommentElement]);
 
   return (
     <>
