@@ -66,8 +66,8 @@ export function MemberMiniProfile({ member, onClose }: { member: Member; onClose
       <MemberPropertiesPopup
         title='Edit your profile'
         onClose={() => {
-          onClose();
           mutateMembers();
+          onClose();
         }}
         memberId={currentUser.id}
         spaceId={currentSpace.id}
@@ -80,7 +80,9 @@ export function MemberMiniProfile({ member, onClose }: { member: Member; onClose
               sx={{
                 mt: 0
               }}
-              user={user}
+              // currentUser doesn't have profile thus is not considered as publicUser inside UserDetails
+              // giving the ability to update the profile properties
+              user={user.id === currentUser?.id ? currentUser : user}
               updateUser={setUser}
             />
             <Box my={3}>

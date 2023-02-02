@@ -241,7 +241,7 @@ function MemberDirectoryTableRow({ member }: { member: Member }) {
         return null;
       })}
 
-      {isModalOpen && user && currentSpace && user.id === member.id && (
+      {isModalOpen && user && currentSpace && (
         <MemberMiniProfile
           onClose={() => {
             setIsModalOpen(false);

@@ -48,7 +48,6 @@ export function SocialIcons({
           </SvgIcon>
         ))}
       {showTwitter &&
-        social.twitterURL?.length !== 0 &&
         (social.twitterURL ? (
           <Link href={social.twitterURL} target='_blank' display='flex'>
             <TwitterIcon style={{ color: '#00ACEE', height: iconHeight }} />
