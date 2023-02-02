@@ -23,10 +23,7 @@ export function ForumFilterListLink({ label, value, isSelected, handleSelect }: 
   const { showMessage } = useSnackbar();
 
   const category = value ? categories.find((c) => c.id === value) : null;
-
-  const [categoryIdToQuery, setCategoryIdToQuery] = useState<string | null>(null);
-
-  const { permissions } = usePostCategoryPermissions(categoryIdToQuery as string);
+  const { permissions } = usePostCategoryPermissions(category?.id as string);
 
   function deleteCategory() {
     if (category) {
@@ -47,8 +44,6 @@ export function ForumFilterListLink({ label, value, isSelected, handleSelect }: 
         alignItems: 'center',
         justifyContent: 'space-between'
       }}
-      // This optimisation allows us to only compute category permissions when the user hovers over the category
-      onMouseEnter={() => (category && !categoryIdToQuery ? setCategoryIdToQuery(category.id) : null)}
     >
       <Typography
         sx={{

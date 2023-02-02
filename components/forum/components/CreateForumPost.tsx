@@ -13,11 +13,11 @@ import { useUser } from 'hooks/useUser';
 export function CreateForumPost({ onClick }: { onClick: () => void }) {
   const { user } = useUser();
   const [userSpacePermissions] = useCurrentSpacePermissions();
-  const { categories } = useForumCategories();
-  const canPost = categories.filter((c) => c.create_post).length > 0;
+  const { getPostableCategories } = useForumCategories();
+  const canPost = getPostableCategories().length > 0;
 
   function clickHandler() {
-    if (userSpacePermissions?.createPage) {
+    if (canPost) {
       onClick();
     }
   }
@@ -27,7 +27,7 @@ export function CreateForumPost({ onClick }: { onClick: () => void }) {
         <CardContent>
           <Box display='flex' flexDirection='row' justifyContent='space-between' mb='16px'>
             <UserDisplay user={user} avatarSize='medium' hideName mr='10px' />
-            <TextField variant='outlined' placeholder='Create Post' fullWidth />
+            <TextField disabled={!canPost} variant='outlined' placeholder='Create Post' fullWidth />
           </Box>
           <Box display='flex' justifyContent='flex-end'>
             <Button

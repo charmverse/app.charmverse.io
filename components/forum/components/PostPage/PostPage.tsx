@@ -106,15 +106,15 @@ export function PostPage({
     (() => {
       if (post?.categoryId) {
         return post.categoryId;
-      } else if (newPostCategory?.id && getForumCategoryById(newPostCategory.id)?.create_post) {
+      } else if (newPostCategory?.id && getForumCategoryById(newPostCategory.id)?.permissions.create_post) {
         return newPostCategory?.id;
       } else if (
         currentSpace?.defaultPostCategoryId &&
-        getForumCategoryById(currentSpace?.defaultPostCategoryId)?.create_post
+        getForumCategoryById(currentSpace?.defaultPostCategoryId)?.permissions.create_post
       ) {
         return currentSpace?.defaultPostCategoryId;
       } else {
-        return categories.find((category) => category.create_post)?.id;
+        return categories.find((category) => category.permissions.create_post)?.id;
       }
     })()
   );

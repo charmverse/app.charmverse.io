@@ -1,9 +1,7 @@
-import { Autocomplete, Box, Chip, Stack, TextField, Typography } from '@mui/material';
+import { Autocomplete, Box, Chip, TextField } from '@mui/material';
 import type { PostCategory } from '@prisma/client';
 import type { HTMLAttributes } from 'react';
-import useSWR from 'swr';
 
-import charmClient from 'charmClient';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useForumCategories } from 'hooks/useForumCategories';
 
@@ -31,7 +29,7 @@ export function PostCategoryInput({
   readOnly?: boolean;
   setCategoryId: (categoryId: string) => void;
 }) {
-  const { categories } = useForumCategories();
+  const { categories, getPostableCategories } = useForumCategories();
 
   const space = useCurrentSpace();
 
@@ -46,7 +44,7 @@ export function PostCategoryInput({
     }
   });
 
-  const writeableCategories = (categories ?? []).filter((category) => !!category.create_post);
+  const postableCategories = getPostableCategories();
 
   async function updateForumPost(_postCategory: PostCategory | null) {
     if (_postCategory) {
@@ -56,7 +54,7 @@ export function PostCategoryInput({
   return (
     <PostCategoryAutocomplete
       value={postCategory ?? null}
-      options={readOnly ? categories ?? [] : writeableCategories}
+      options={readOnly ? categories ?? [] : postableCategories}
       disabled={readOnly}
       onChange={updateForumPost}
     />

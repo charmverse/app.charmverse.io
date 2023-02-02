@@ -1,16 +1,9 @@
-import useSWR from 'swr';
-
-import charmClient from 'charmClient';
-import { AvailablePostCategoryPermissions } from 'lib/permissions/forum/availablePostCategoryPermissions.class';
+import { useForumCategories } from 'hooks/useForumCategories';
 
 export function usePostCategoryPermissions(postCategoryId: string) {
-  const { data } = useSWR(
-    !postCategoryId ? null : `compute-post-category-permissions-${postCategoryId}`,
-    () => charmClient.permissions.computePostCategoryPermissions(postCategoryId),
-    {
-      fallbackData: new AvailablePostCategoryPermissions().empty
-    }
-  );
+  const { getForumCategoryById } = useForumCategories();
 
-  return { permissions: data };
+  const permissions = getForumCategoryById(postCategoryId)?.permissions;
+
+  return { permissions };
 }

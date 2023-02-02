@@ -92,12 +92,17 @@ export function useForumCategories() {
     return categories?.find((category) => category.id === id);
   }
 
+  function getPostableCategories() {
+    return (categories ?? []).filter((c) => c.permissions.create_post);
+  }
+
   return {
     createForumCategory,
     deleteForumCategory,
     updateForumCategory,
     setDefaultPostCategory,
     getForumCategoryById,
+    getPostableCategories,
     isCategoriesLoaded: !!categories,
     categories: categories || [],
     error,
