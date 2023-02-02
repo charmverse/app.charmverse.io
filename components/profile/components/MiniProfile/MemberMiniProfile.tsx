@@ -15,6 +15,7 @@ import { useMemberProperties } from 'hooks/useMemberProperties';
 import { useMemberPropertyValues } from 'hooks/useMemberPropertyValues';
 import type { Member } from 'lib/members/interfaces';
 
+import { NftsList } from './NftsList';
 import { PoapsList } from './PoapsList';
 
 export function MemberMiniProfile({ member, onClose }: { member: Member; onClose: VoidFunction }) {
@@ -35,6 +36,10 @@ export function MemberMiniProfile({ member, onClose }: { member: Member; onClose
     return charmClient.getUserPoaps();
   });
 
+  const { data: nfts = [], isLoading: isFetchingNfts } = useSWRImmutable(`/nfts/${member.id}`, () => {
+    return charmClient.blockchain.listNFTs(member.id, { pinned: true });
+  });
+
   const username =
     (member.properties.find((memberProperty) => memberProperty.memberPropertyId === propertiesRecord.name?.id)
       ?.value as string) ?? member.username;
@@ -43,7 +48,7 @@ export function MemberMiniProfile({ member, onClose }: { member: Member; onClose
     charmClient.getUserByPath(member.path as string)
   );
 
-  const isLoading = isFetchingUser || isFetchingPoaps;
+  const isLoading = isFetchingUser || isFetchingPoaps || isFetchingNfts;
 
   return (
     <Dialog open onClose={onClose} fullScreen={fullScreen} fullWidth>
@@ -79,6 +84,7 @@ export function MemberMiniProfile({ member, onClose }: { member: Member; onClose
               </Box>
             )}
 
+            <NftsList nfts={nfts} />
             <PoapsList poaps={poaps} />
           </DialogContent>
         </>

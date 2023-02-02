@@ -5,44 +5,17 @@ import useSWRImmutable from 'swr/immutable';
 import charmClient from 'charmClient';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { SpacesMemberDetails } from 'components/profile/components/SpacesMemberDetails/SpacesMemberDetails';
-import type { ExtendedPoap, NftData } from 'lib/blockchain/interfaces';
+import type { Collectable, ExtendedPoap } from 'lib/blockchain/interfaces';
+import { transformNft } from 'lib/blockchain/transformNft';
+import { transformPoap } from 'lib/blockchain/transformPoap';
 
 import AggregatedData from './components/AggregatedData';
-import type { Collectable } from './components/CollectibleRow';
 import CollectableRow from './components/CollectibleRow';
 import type { CommunityDetails } from './components/CommunityRow';
 import CommunityRow from './components/CommunityRow';
 import type { UserDetailsProps } from './components/UserDetails';
 import UserDetails, { isPublicUser } from './components/UserDetails';
 import { useCollablandCredentials } from './hooks/useCollablandCredentials';
-
-function transformPoap(poap: ExtendedPoap): Collectable {
-  return {
-    type: 'poap',
-    date: poap.created as string,
-    id: poap.id,
-    image: poap.imageURL,
-    title: poap.name,
-    link: `https://app.poap.xyz/token/${poap.tokenId}`,
-    isHidden: poap.isHidden
-  };
-}
-
-function transformNft(nft: NftData): Collectable {
-  const tokenId = nft.tokenId.startsWith('0x') ? parseInt(nft.tokenId, 16) : nft.tokenId;
-  return {
-    type: 'nft',
-    date: nft.timeLastUpdated,
-    id: nft.id,
-    image: nft.image ?? nft.imageThumb,
-    title: nft.title,
-    link:
-      nft.chainId === 42161
-        ? `https://stratosnft.io/assets/${nft.contract}/${tokenId}`
-        : `https://opensea.io/assets/${nft.chainId === 1 ? 'ethereum' : 'matic'}/${nft.contract}/${tokenId}`,
-    isHidden: nft.isHidden
-  };
-}
 
 export default function PublicProfile(props: UserDetailsProps) {
   const { user } = props;
@@ -75,7 +48,7 @@ export default function PublicProfile(props: UserDetailsProps) {
     mutate: mutateNfts,
     isValidating: isNftDataValidating
   } = useSWRImmutable(`/nfts/${user.id}/${readOnly}`, () => {
-    return readOnly ? Promise.resolve(user.visibleNfts) : charmClient.blockchain.listNFTs(user.id);
+    return readOnly ? Promise.resolve(user.visibleNfts) : charmClient.blockchain.listNFTs(user.id, { pinned: false });
   });
 
   const isLoading =
@@ -100,7 +73,8 @@ export default function PublicProfile(props: UserDetailsProps) {
           id: community.id,
           isHidden: !community.isHidden,
           type: 'community',
-          metadata: null
+          metadata: null,
+          isPinned: false
         }
       ]
     });
@@ -134,7 +108,8 @@ export default function PublicProfile(props: UserDetailsProps) {
           id: item.id,
           isHidden: !item.isHidden,
           type: item.type,
-          metadata: null
+          metadata: null,
+          isPinned: false
         }
       ]
     });

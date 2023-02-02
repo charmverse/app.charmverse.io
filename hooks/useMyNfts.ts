@@ -4,7 +4,7 @@ import charmClient from 'charmClient';
 
 export const useMyNfts = (userId: string) => {
   const { data, error: serverError } = useSWR(userId && `/nfts/list/${userId}`, () =>
-    charmClient.blockchain.listNFTs(userId)
+    charmClient.blockchain.listNFTs(userId, { pinned: false })
   );
   const error = serverError?.message || serverError;
 
