@@ -1,7 +1,7 @@
 import { useTheme } from '@emotion/react';
 import type { GetStaticProps, InferGetStaticPropsType } from 'next';
-import { createSwaggerSpec } from 'next-swagger-doc';
 import dynamic from 'next/dynamic';
+import { createSwaggerSpec } from 'next-swagger-doc';
 import { useEffect } from 'react';
 
 import { charmverseDiscordInvite } from 'config/constants';
