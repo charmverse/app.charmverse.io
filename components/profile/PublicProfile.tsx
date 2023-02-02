@@ -48,7 +48,7 @@ export default function PublicProfile(props: UserDetailsProps) {
     mutate: mutateNfts,
     isValidating: isNftDataValidating
   } = useSWRImmutable(`/nfts/${user.id}/${readOnly}`, () => {
-    return readOnly ? Promise.resolve(user.visibleNfts) : charmClient.blockchain.listNFTs(user.id, { pinned: false });
+    return readOnly ? Promise.resolve(user.visibleNfts) : charmClient.blockchain.listNFTs(user.id);
   });
 
   const isLoading =

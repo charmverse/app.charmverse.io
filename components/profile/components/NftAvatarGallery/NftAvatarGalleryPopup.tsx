@@ -38,7 +38,7 @@ export default function NftAvatarGalleryPopup({
     <Dialog onClose={onClose} open={isVisible} scroll='paper'>
       <DialogTitle>Your NFTs gallery</DialogTitle>
       <DialogContent dividers>
-        {showSearchBar && (
+        {showSearchBar && !isLoading && (
           <TextField
             fullWidth
             sx={{

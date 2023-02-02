@@ -3,8 +3,8 @@ import type { NftData } from 'lib/blockchain/interfaces';
 import type { LoggedInUser } from 'models';
 
 export class BlockchainApi {
-  listNFTs(userId: string, { pinned = false }: { pinned?: boolean }) {
-    return http.GET<NftData[]>(`/api/nft/list/${userId}`, { pinned });
+  listNFTs(userId: string) {
+    return http.GET<NftData[]>(`/api/nft/list/${userId}`);
   }
 
   refreshENSName(address: string) {

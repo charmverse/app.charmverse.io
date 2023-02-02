@@ -36,8 +36,12 @@ export function MemberMiniProfile({ member, onClose }: { member: Member; onClose
     return charmClient.getUserPoaps();
   });
 
-  const { data: nfts = [], isLoading: isFetchingNfts } = useSWRImmutable(`/nfts/${member.id}`, () => {
-    return charmClient.blockchain.listNFTs(member.id, { pinned: true });
+  const {
+    data: nfts = [],
+    mutate: mutateNfts,
+    isLoading: isFetchingNfts
+  } = useSWRImmutable(`/nfts/${member.id}`, () => {
+    return charmClient.blockchain.listNFTs(member.id);
   });
 
   const username =
@@ -85,7 +89,7 @@ export function MemberMiniProfile({ member, onClose }: { member: Member; onClose
             )}
 
             <Box my={3}>
-              <NftsList nfts={nfts} memberId={user.id} />
+              <NftsList mutateNfts={mutateNfts} nfts={nfts} memberId={user.id} />
             </Box>
             <Box my={3}>
               <PoapsList poaps={poaps} />

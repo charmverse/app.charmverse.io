@@ -2,8 +2,11 @@ import styled from '@emotion/styled';
 import AddIcon from '@mui/icons-material/Add';
 import { Link, Typography } from '@mui/material';
 import { Box, Stack } from '@mui/system';
+import type { ProfileItem } from '@prisma/client';
 import { useState } from 'react';
+import type { KeyedMutator } from 'swr';
 
+import charmClient from 'charmClient';
 import Avatar from 'components/common/Avatar';
 import { useUser } from 'hooks/useUser';
 import type { NftData } from 'lib/blockchain/interfaces';
@@ -31,11 +34,41 @@ function NonPinnedNftBox({ onClick }: { onClick: VoidFunction }) {
   );
 }
 
-export function NftsList({ memberId, nfts }: { memberId: string; nfts: NftData[] }) {
+type Props = { memberId: string; nfts: NftData[]; mutateNfts: KeyedMutator<NftData[]> };
+
+export function NftsList({ mutateNfts, memberId, nfts }: Props) {
   const { user: currentUser } = useUser();
   const pinnedNfts = nfts.filter((nft) => nft.isPinned);
   const emptyNftsCount = totalShownNfts - pinnedNfts.length;
   const [showingNftGallery, setIsShowingNftGallery] = useState(false);
+
+  async function updateNft(nft: NftData) {
+    const profileItem: Omit<ProfileItem, 'userId'> = {
+      id: nft.id,
+      isHidden: nft.isHidden,
+      type: 'nft',
+      metadata: null,
+      isPinned: !nft.isPinned
+    };
+
+    await charmClient.profile.updateProfileItem({
+      profileItems: [profileItem]
+    });
+
+    await mutateNfts(
+      (cachedNfts) => {
+        if (!cachedNfts) {
+          return undefined;
+        }
+
+        return cachedNfts.map((cachedNft) =>
+          cachedNft.id === nft.id ? { ...cachedNft, isPinned: !nft.isPinned } : cachedNft
+        );
+      },
+      { revalidate: false }
+    );
+    setIsShowingNftGallery(false);
+  }
 
   return (
     <Stack gap={1}>
@@ -51,7 +84,7 @@ export function NftsList({ memberId, nfts }: { memberId: string; nfts: NftData[]
             </Box>
           );
         })}
-        {currentUser?.id !== memberId ? (
+        {currentUser?.id === memberId ? (
           new Array(emptyNftsCount)
             .fill(0)
             .map((_, i) => <NonPinnedNftBox onClick={() => setIsShowingNftGallery(true)} key={`${i.toString()}`} />)
@@ -65,7 +98,7 @@ export function NftsList({ memberId, nfts }: { memberId: string; nfts: NftData[]
               setIsShowingNftGallery(false);
             }}
             showSearchBar
-            onSelect={(selectedNft) => {}}
+            onSelect={updateNft}
           />
         )}
       </Stack>
