@@ -28,9 +28,7 @@ export function FocalboardViewsProvider({ children }: { children: ReactNode }) {
 
   return (
     // eslint-disable-next-line
-    <FocalboardViewsContext.Provider value={value}>
-      {children}
-    </FocalboardViewsContext.Provider>
+    <FocalboardViewsContext.Provider value={value}>{children}</FocalboardViewsContext.Provider>
   );
 }
 

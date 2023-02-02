@@ -5,7 +5,7 @@ import type { PageMeta } from 'lib/pages';
 export const DEFAULT_THRESHOLD = 50;
 
 export const VOTE_STATUS = ['InProgress', 'Passed', 'Rejected', 'Cancelled'] as const;
-export type VoteStatusType = typeof VOTE_STATUS[number];
+export type VoteStatusType = (typeof VOTE_STATUS)[number];
 
 export interface VoteOptionsDTO {
   name: string;

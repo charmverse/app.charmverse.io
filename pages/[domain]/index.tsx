@@ -22,7 +22,8 @@ export default function RedirectToMainPage() {
     'settings/workspace',
     'settings/members',
     'settings/roles',
-    'settings/invites'
+    'settings/invites',
+    'settings/api'
   ];
 
   useEffect(() => {

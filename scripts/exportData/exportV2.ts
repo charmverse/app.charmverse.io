@@ -2,15 +2,18 @@
 import { exportWorkspacePages } from 'lib/templates/exportWorkspacePages';
 import { importWorkspacePages } from 'lib/templates/importWorkspacePages';
 
-
 // exportWorkspacePages({
 //   sourceSpaceIdOrDomain: 'deafening-apricot-crane',
 //   exportName: 'test-stub'
 // }).then(() => console.log('Complete'))
 
-
-async function exportImport ({ sourceSpaceIdOrDomain, targetSpaceIdOrDomain }:
-  {sourceSpaceIdOrDomain: string, targetSpaceIdOrDomain: string}): Promise<true> {
+async function exportImport({
+  sourceSpaceIdOrDomain,
+  targetSpaceIdOrDomain
+}: {
+  sourceSpaceIdOrDomain: string;
+  targetSpaceIdOrDomain: string;
+}): Promise<true> {
   const { data } = await exportWorkspacePages({
     sourceSpaceIdOrDomain
   });
@@ -36,4 +39,4 @@ async function exportImport ({ sourceSpaceIdOrDomain, targetSpaceIdOrDomain }:
 importWorkspacePages({
   exportName: 'cvt-nft-community-template',
   targetSpaceIdOrDomain: 'forthepeopledao'
-}).then(() => console.log('Complete'))
+}).then(() => console.log('Complete'));

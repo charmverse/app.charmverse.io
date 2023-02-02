@@ -60,5 +60,24 @@ export async function createPostComment({
     });
   }
 
+  // // Publish webhook event if needed
+  // await publishWebhookEvent(thread.spaceId, {
+  //   scope: WebhookEventNames.CommentCreated,
+  //   comment: {
+  //     createdAt: createdComment.createdAt.toISOString(),
+  //     id: createdComment.id,
+  //     threadId: createdComment.threadId,
+  //     parentId: createdComment.parentId || null,
+  //     author: {
+  //       wallet: '',
+  //       avatar: createdComment.user.avatar,
+  //       username: createdComment.user.username
+  //     }
+  //   },
+  //   discussion: {
+  //     id: thread
+  //   }
+  // });
+
   return comment;
 }

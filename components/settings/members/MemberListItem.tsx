@@ -22,7 +22,7 @@ export const StyledRow = styled(Box)`
 `;
 
 const roleActions = ['makeAdmin', 'makeMember', 'removeFromSpace'] as const;
-export type RoleAction = typeof roleActions[number];
+export type RoleAction = (typeof roleActions)[number];
 
 interface Props {
   member: Member;
