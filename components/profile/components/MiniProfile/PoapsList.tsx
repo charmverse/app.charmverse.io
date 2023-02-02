@@ -11,18 +11,22 @@ export function PoapsList({ poaps }: { poaps: ExtendedPoap[] }) {
   return (
     <Stack gap={1}>
       <Typography variant='h6'>Recent POAPs</Typography>
-      <Stack gap={1} display='flex' flexDirection='row'>
-        {sortedPoapData.slice(0, 5).map((poap) => {
-          const poapData = transformPoap(poap);
+      <Stack gap={2} display='flex' flexDirection='row'>
+        {sortedPoapData.length !== 0 ? (
+          sortedPoapData.slice(0, 5).map((poap) => {
+            const poapData = transformPoap(poap);
 
-          return (
-            <Box key={poapData.id}>
-              <Link href={poapData.link} target='_blank' display='flex'>
-                <Avatar size='large' avatar={poapData.image} />
-              </Link>
-            </Box>
-          );
-        })}
+            return (
+              <Box key={poapData.id}>
+                <Link href={poapData.link} target='_blank' display='flex'>
+                  <Avatar size='large' avatar={poapData.image} />
+                </Link>
+              </Box>
+            );
+          })
+        ) : (
+          <Typography color='secondary'>No POAPs</Typography>
+        )}
       </Stack>
     </Stack>
   );

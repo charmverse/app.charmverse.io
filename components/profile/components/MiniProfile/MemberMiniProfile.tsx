@@ -84,8 +84,12 @@ export function MemberMiniProfile({ member, onClose }: { member: Member; onClose
               </Box>
             )}
 
-            <NftsList nfts={nfts} />
-            <PoapsList poaps={poaps} />
+            <Box my={3}>
+              <NftsList nfts={nfts} memberId={user.id} />
+            </Box>
+            <Box my={3}>
+              <PoapsList poaps={poaps} />
+            </Box>
           </DialogContent>
         </>
       )}
