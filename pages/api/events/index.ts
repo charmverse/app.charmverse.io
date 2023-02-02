@@ -16,6 +16,9 @@ async function trackHandler(req: NextApiRequest, res: NextApiResponse<{ success:
   const userId = req.session.user?.id ?? req.session.anonymousUserId;
   // Make sure to use userId from session
   eventPayload.userId = userId;
+  if (eventPayload.userId === req.session.anonymousUserId) {
+    eventPayload.isAnonymous = true;
+  }
 
   // backwards compatibility - can delete after December 14
   const _eventName = eventName ?? req.query.event;
