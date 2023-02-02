@@ -82,7 +82,10 @@ export default function WorkspaceSettings() {
       .updateSpace({ ...space, name: values.name, domain: values.domain, spaceImage: values.spaceImage })
       .then((updatedSpace) => {
         if (newDomain) {
-          window.location.href = router.asPath.replace(space.domain, values.domain as string);
+          // add a delay so that the form resets and doesnt block user from reloading due to calling usePreventReload(isDirty)
+          setTimeout(() => {
+            window.location.href = router.asPath.replace(space.domain, values.domain as string);
+          }, 100);
         } else {
           setSpace(updatedSpace);
         }
@@ -167,14 +170,6 @@ export default function WorkspaceSettings() {
           )}
         </Grid>
       </form>
-      <Legend>API Key</Legend>
-      <Typography variant='body1'>
-        Request access to the charmverse API in our{' '}
-        <Link href={charmverseDiscordInvite} external target='_blank'>
-          Discord Channel <LaunchIcon fontSize='small' />
-        </Link>
-      </Typography>
-
       <Legend>Import Content</Legend>
       <Box sx={{ ml: 1 }} display='flex' flexDirection='column' gap={1}>
         <ImportNotionWorkspace />

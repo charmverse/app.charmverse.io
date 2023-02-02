@@ -2,7 +2,7 @@ import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import type { TokenGate } from '@prisma/client';
 import type { ResourceId, SigningConditions } from 'lit-js-sdk';
-import LitShareModal from 'lit-share-modal-v3-react-17';
+import LitShareModal from 'lit-share-modal-v3';
 import type { PopupState } from 'material-ui-popup-state/hooks';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useState } from 'react';

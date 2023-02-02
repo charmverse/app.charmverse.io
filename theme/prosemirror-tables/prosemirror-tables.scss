@@ -2,7 +2,6 @@
   display: none;
 }
 
-
 .textItemIcon {
   content: '';
   //content: url(/images/prosemirror/types/text_type.svg);
@@ -31,7 +30,6 @@
 }
 
 .CellColorItem {
-
   display: block;
   padding: 4px;
 
@@ -48,11 +46,10 @@
       display: block;
       mask-image: url(/images/prosemirror/no_entry.svg);
       mask-size: cover;
-      background-color: rgba(var(--sidebar-text-rgb), .5) !important;
+      background-color: rgba(var(--sidebar-text-rgb), 0.5) !important;
       width: 100%;
       height: 100%;
     }
-
   }
 
   &.ProseMirror-menu-active {
@@ -71,7 +68,7 @@
 }
 
 .ProseMirror-menuseparator {
-  border-color: rgba(var(--sidebar-text-rgb), .2);
+  border-color: rgba(var(--sidebar-text-rgb), 0.2);
 }
 
 // popup when clicking the button above a table header
@@ -103,7 +100,6 @@
   }
 
   .sortColButton {
-
     &::after {
       background-color: rgba(var(--sidebar-text-rgb), 0.5);
       content: '';
@@ -132,7 +128,6 @@
   }
 
   .ProseMirror-menu-dropdown-wrap {
-
     padding: 2px 8px;
 
     .ProseMirror-menu-dropdown-item {
@@ -176,7 +171,6 @@
 
 //  top toggle buttons
 .ProseMirror {
-
   // disable - for some reason selecting the whole table doesnt work
   .tableHandle {
     display: none;
@@ -256,7 +250,6 @@
     mask-position: center center;
     content: '';
   }
-
 }
 
 .addAfterButton {
@@ -309,8 +302,6 @@
 // .currencyItemIcon {
 //   content: url(/images/prosemirror/types/currency.svg);
 // }
-
-
 
 .colItem.textType .select-dropdown-item-icon,
 .column-chooser .selected-icon.textType {

@@ -6,7 +6,7 @@ import type { FrontendParticipant } from 'components/common/CharmEditor/componen
 import type { IPagePermissionFlags } from 'lib/permissions/pages';
 
 const EDIT_MODES = ['editing', 'suggesting', 'viewing'] as const;
-export type EditMode = typeof EDIT_MODES[number];
+export type EditMode = (typeof EDIT_MODES)[number];
 
 export const EDIT_MODE_CONFIG = {
   editing: {

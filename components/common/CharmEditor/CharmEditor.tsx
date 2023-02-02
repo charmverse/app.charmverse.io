@@ -562,7 +562,6 @@ function CharmEditor({
       onParticipantUpdate={onParticipantUpdate}
       trackChanges
       readOnly={readOnly}
-      focusOnInit={autoFocus}
       enableComments={enableComments}
       style={{
         ...(style ?? {}),

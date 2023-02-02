@@ -10,7 +10,7 @@ const esmModules = [
   'react-dnd',
   'react-pdf',
   '@hookform/resolvers',
-  'lit-share-modal-v3-react-17',
+  'lit-share-modal-v3',
   'uuid',
   'data-uri-to-buffer',
   'fetch-blob',

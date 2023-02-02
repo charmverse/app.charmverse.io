@@ -1,10 +1,9 @@
-import type { Prisma, Space } from '@prisma/client';
+import type { Space } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { prisma } from 'db';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
-import { generateNotionImportRedirectUrl } from 'lib/notion/generateNotionImportRedirectUrl';
 import { withSessionRoute } from 'lib/session/withSession';
 import type { CreateSpaceProps } from 'lib/spaces/createWorkspace';
 import { createWorkspace } from 'lib/spaces/createWorkspace';
@@ -40,6 +39,8 @@ async function getSpaces(req: NextApiRequest, res: NextApiResponse<Space[]>) {
       ? sortOrder.spacesOrder
       : spaces.map((sp) => sp.id);
   const sortedSpaces = spaces.sort((a, b) => spacesOrder.indexOf(a.id) - spacesOrder.indexOf(b.id));
+
+  res.setHeader('Cache-Control', 'no-store');
 
   return res.status(200).json(sortedSpaces);
 }

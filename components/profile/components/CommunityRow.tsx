@@ -59,7 +59,7 @@ function CountIcon({ label, icon, count }: { label: string; icon: ReactNode; cou
   );
 }
 
-function TaskTab({ task, value, onClick }: { task: typeof TASK_TABS[number]; value: number; onClick: () => void }) {
+function TaskTab({ task, value, onClick }: { task: (typeof TASK_TABS)[number]; value: number; onClick: () => void }) {
   return (
     <Tab
       iconPosition='start'
