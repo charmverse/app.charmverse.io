@@ -14,6 +14,7 @@ import type { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEdit
 import LoadingComponent from 'components/common/LoadingComponent';
 import { ScrollableWindow } from 'components/common/PageLayout';
 import UserDisplay from 'components/common/UserDisplay';
+import { usePostPermissions } from 'components/forum/hooks/usePostPermissions';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useForumCategories } from 'hooks/useForumCategories';
 import { useMembers } from 'hooks/useMembers';
@@ -114,6 +115,9 @@ export function PostPage({
   } = useSWR(post ? `${post.id}/comments` : null, () =>
     post ? charmClient.forum.listPostComments(post.id) : undefined
   );
+
+  const { permissions } = usePostPermissions(post?.id as string);
+
   usePreventReload(contentUpdated);
   const [, setTitleState] = usePageTitle();
   const [commentSort, setCommentSort] = useState<PostCommentSort>('latest');
@@ -173,9 +177,6 @@ export function PostPage({
     });
   }
 
-  const isMyPost = !post || post.createdBy === user?.id;
-  const readOnly = !isMyPost;
-
   let disabledTooltip = '';
   if (!formInputs.title) {
     disabledTooltip = 'Title is required';
@@ -197,6 +198,8 @@ export function PostPage({
     return [];
   }, [postComments, post, commentSort]);
 
+  const canEdit = !!permissions?.edit_post;
+
   return (
     <ScrollableWindow>
       <Stack flexDirection='row'>
@@ -205,7 +208,7 @@ export function PostPage({
             <CharmEditor
               pageType='post'
               autoFocus={false}
-              readOnly={readOnly}
+              readOnly={!canEdit}
               pageActionDisplay={null}
               pageId={post?.id}
               disablePageSpecificFeatures
@@ -215,11 +218,11 @@ export function PostPage({
               content={formInputs.content as PageContent}
               onContentChange={updatePostContent}
             >
-              <PageTitleInput readOnly={readOnly} value={formInputs.title} onChange={updateTitle} />
+              <PageTitleInput readOnly={!canEdit} value={formInputs.title} onChange={updateTitle} />
               {createdBy && <UserDisplay user={createdBy} avatarSize='small' fontSize='medium' mt={2} mb={3} />}
               <Box my={2}>
                 <PostCategoryInput
-                  readOnly={readOnly}
+                  readOnly={!canEdit}
                   spaceId={spaceId}
                   setCategoryId={updateCategoryId}
                   categoryId={categoryId}
@@ -227,7 +230,7 @@ export function PostPage({
               </Box>
             </CharmEditor>
           </Box>
-          {isMyPost && (
+          {canEdit && (
             <Box display='flex' flexDirection='row' justifyContent='right' my={2}>
               <Button
                 disabled={Boolean(disabledTooltip) || !contentUpdated}
@@ -238,7 +241,7 @@ export function PostPage({
               </Button>
             </Box>
           )}
-          {post && (
+          {post && !!permissions?.add_comment && (
             <Box my={2}>
               <PostCommentForm setPostComments={setPostComments} postId={post.id} />
             </Box>
@@ -259,7 +262,12 @@ export function PostPage({
                   <Stack gap={1}>
                     <PostCommentSort commentSort={commentSort} setCommentSort={setCommentSort} />
                     {topLevelComments.map((comment) => (
-                      <PostComment setPostComments={setPostComments} comment={comment} key={comment.id} />
+                      <PostComment
+                        permissions={permissions}
+                        setPostComments={setPostComments}
+                        comment={comment}
+                        key={comment.id}
+                      />
                     ))}
                   </Stack>
                 )}

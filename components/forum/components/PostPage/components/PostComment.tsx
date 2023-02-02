@@ -20,6 +20,7 @@ import type {
   PostCommentWithVote,
   PostCommentWithVoteAndChildren
 } from 'lib/forums/comments/interface';
+import type { AvailablePostPermissionFlags } from 'lib/permissions/forum/interfaces';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { getRelativeTimeInThePast } from 'lib/utilities/dates';
 
@@ -39,13 +40,13 @@ const StyledStack = styled(Stack)`
   }
 `;
 
-export function PostComment({
-  comment,
-  setPostComments
-}: {
+type Props = {
   comment: PostCommentWithVoteAndChildren;
   setPostComments: KeyedMutator<PostCommentWithVote[] | undefined>;
-}) {
+  permissions?: AvailablePostPermissionFlags;
+};
+
+export function PostComment({ comment, setPostComments, permissions }: Props) {
   const [showCommentReply, setShowCommentReply] = useState(false);
   const theme = useTheme();
   const { user } = useUser();
@@ -233,12 +234,16 @@ export function PostComment({
           )}
           {!comment.deletedAt && (
             <Stack flexDirection='row' gap={1}>
-              <ForumVote votes={comment} onVote={voteComment} />
+              <ForumVote permissions={permissions} votes={comment} onVote={voteComment} />
               <Typography
                 sx={{
                   cursor: 'pointer'
                 }}
-                onClick={() => setShowCommentReply(true)}
+                onClick={() => {
+                  if (permissions?.add_comment) {
+                    setShowCommentReply(true);
+                  }
+                }}
                 color='secondary'
                 fontWeight='semibold'
                 variant='subtitle1'
@@ -261,7 +266,12 @@ export function PostComment({
       </StyledStack>
       <Box ml={3} position='relative'>
         {comment.children.map((childComment) => (
-          <PostComment setPostComments={setPostComments} comment={childComment} key={childComment.id} />
+          <PostComment
+            permissions={permissions}
+            setPostComments={setPostComments}
+            comment={childComment}
+            key={childComment.id}
+          />
         ))}
       </Box>
       <Menu

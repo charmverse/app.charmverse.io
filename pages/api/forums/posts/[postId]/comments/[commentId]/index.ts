@@ -8,11 +8,12 @@ import { getPostComment } from 'lib/forums/comments/getPostComment';
 import type { UpdatePostCommentInput } from 'lib/forums/comments/interface';
 import { updatePostComment } from 'lib/forums/comments/updatePostComment';
 import { PostNotFoundError } from 'lib/forums/posts/errors';
-import { onError, onNoMatch, requireUser } from 'lib/middleware';
+import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
+import { computePostPermissions } from 'lib/permissions/forum/computePostPermissions';
 import { withSessionRoute } from 'lib/session/withSession';
 import { UserIsNotSpaceMemberError } from 'lib/users/errors';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
-import { DataNotFoundError, UnauthorisedActionError, UndesirableOperationError } from 'lib/utilities/errors';
+import { DataNotFoundError, UndesirableOperationError } from 'lib/utilities/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -43,7 +44,7 @@ async function updatePostCommentHandler(req: NextApiRequest, res: NextApiRespons
   const comment = await getPostComment(commentId);
 
   if (comment?.createdBy !== userId) {
-    throw new UnauthorisedActionError();
+    throw new ActionNotPermittedError(`You cannot edit other peoples' comments`);
   }
 
   if (comment.deletedAt) {
@@ -82,19 +83,16 @@ async function deletePostCommentHandler(req: NextApiRequest, res: NextApiRespons
     throw new DataNotFoundError(`Comment with id ${commentId} not found`);
   }
 
-  if (postComment?.createdBy !== userId) {
-    const { error } = await hasAccessToSpace({
-      spaceId: postComment.post.spaceId,
-      userId,
-      adminOnly: true
-    });
+  const permissions = await computePostPermissions({
+    resourceId: postId,
+    userId: req.session.user.id
+  });
 
-    if (error) {
-      throw error;
-    }
+  if (permissions.delete_comments || postComment.createdBy === userId) {
+    await deletePostComment({ commentId });
+  } else {
+    throw new ActionNotPermittedError('You do not have permission to delete this comment.');
   }
-
-  await deletePostComment({ commentId });
 
   res.status(200).end();
 }
