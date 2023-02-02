@@ -14,6 +14,7 @@ type Props = {
   onClose: () => void;
   isSaving?: boolean;
   showSearchBar?: boolean;
+  hiddenNfts?: string[];
 };
 
 export default function NftAvatarGalleryPopup({
@@ -21,24 +22,26 @@ export default function NftAvatarGalleryPopup({
   isVisible,
   onClose,
   isSaving,
-  showSearchBar = false
+  showSearchBar = false,
+  hiddenNfts = []
 }: Props) {
   const { user } = useUser();
   const { nfts = [], isLoading } = useMyNfts(user?.id || '');
   const [searchedTerm, setSearchedTerm] = useState('');
 
   const filteredNfts = useMemo(() => {
-    if (searchedTerm.length === 0) {
-      return nfts;
-    }
-    return nfts.filter((nft) => nft.title.toLowerCase().includes(searchedTerm.toLowerCase()));
-  }, [nfts, searchedTerm]);
+    return (
+      searchedTerm.length === 0
+        ? nfts
+        : nfts.filter((nft) => nft.title.toLowerCase().includes(searchedTerm.toLowerCase()))
+    ).filter((nft) => !hiddenNfts.includes(nft.id));
+  }, [nfts, searchedTerm, hiddenNfts]);
 
   return (
     <Dialog onClose={onClose} open={isVisible} scroll='paper'>
       <DialogTitle>Your NFTs gallery</DialogTitle>
       <DialogContent dividers>
-        {showSearchBar && !isLoading && (
+        {showSearchBar && !isLoading && filteredNfts.length !== 0 && (
           <TextField
             fullWidth
             sx={{

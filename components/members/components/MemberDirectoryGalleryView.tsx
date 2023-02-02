@@ -14,13 +14,11 @@ import { SocialIcons } from 'components/profile/components/UserDetails/SocialIco
 import type { Social } from 'components/profile/interfaces';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMemberProperties } from 'hooks/useMemberProperties';
-import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
 import type { Member } from 'lib/members/interfaces';
 import { humanFriendlyDate } from 'lib/utilities/dates';
 
 import { MemberPropertyTextMultiline } from './MemberDirectoryProperties/MemberPropertyTextMultiline';
-import { MemberOnboardingForm } from './MemberOnboardingForm';
 import { TimezoneDisplay } from './TimezoneDisplay';
 
 const StyledBox = styled(Box)`
@@ -44,7 +42,6 @@ function MemberDirectoryGalleryCard({ member }: { member: Member }) {
   const currentSpace = useCurrentSpace();
   const { user } = useUser();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { mutateMembers } = useMembers();
 
   const isNameHidden = !propertiesRecord.name?.enabledViews.includes('gallery');
   const isDiscordHidden = !propertiesRecord.discord?.enabledViews.includes('gallery');
@@ -220,28 +217,14 @@ function MemberDirectoryGalleryCard({ member }: { member: Member }) {
         {content}
       </StyledBox>
 
-      {isModalOpen &&
-        user &&
-        currentSpace &&
-        (user.id === member.id ? (
-          <MemberOnboardingForm
-            userId={member.id}
-            spaceName={currentSpace.name}
-            spaceId={currentSpace.id}
-            onClose={() => {
-              mutateMembers();
-              setIsModalOpen(false);
-            }}
-            title='Edit your profile'
-          />
-        ) : (
-          <MemberMiniProfile
-            onClose={() => {
-              setIsModalOpen(false);
-            }}
-            member={member}
-          />
-        ))}
+      {isModalOpen && user && currentSpace && (
+        <MemberMiniProfile
+          onClose={() => {
+            setIsModalOpen(false);
+          }}
+          member={member}
+        />
+      )}
     </>
   );
 }

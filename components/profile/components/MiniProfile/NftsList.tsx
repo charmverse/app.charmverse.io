@@ -34,13 +34,14 @@ function NonPinnedNftBox({ onClick }: { onClick: VoidFunction }) {
   );
 }
 
-type Props = { memberId: string; nfts: NftData[]; mutateNfts: KeyedMutator<NftData[]> };
+type Props = { memberId: string; nfts: NftData[]; mutateNfts?: KeyedMutator<NftData[]> };
 
 export function NftsList({ mutateNfts, memberId, nfts }: Props) {
   const { user: currentUser } = useUser();
   const pinnedNfts = nfts.filter((nft) => nft.isPinned);
   const emptyNftsCount = totalShownNfts - pinnedNfts.length;
   const [showingNftGallery, setIsShowingNftGallery] = useState(false);
+  const readOnly = mutateNfts === undefined;
 
   async function updateNft(nft: NftData) {
     const profileItem: Omit<ProfileItem, 'userId'> = {
@@ -55,18 +56,21 @@ export function NftsList({ mutateNfts, memberId, nfts }: Props) {
       profileItems: [profileItem]
     });
 
-    await mutateNfts(
-      (cachedNfts) => {
-        if (!cachedNfts) {
-          return undefined;
-        }
+    if (mutateNfts) {
+      await mutateNfts(
+        (cachedNfts) => {
+          if (!cachedNfts) {
+            return undefined;
+          }
 
-        return cachedNfts.map((cachedNft) =>
-          cachedNft.id === nft.id ? { ...cachedNft, isPinned: !nft.isPinned } : cachedNft
-        );
-      },
-      { revalidate: false }
-    );
+          return cachedNfts.map((cachedNft) =>
+            cachedNft.id === nft.id ? { ...cachedNft, isPinned: !nft.isPinned } : cachedNft
+          );
+        },
+        { revalidate: false }
+      );
+    }
+
     setIsShowingNftGallery(false);
   }
 
@@ -85,9 +89,16 @@ export function NftsList({ mutateNfts, memberId, nfts }: Props) {
           );
         })}
         {currentUser?.id === memberId ? (
-          new Array(emptyNftsCount)
-            .fill(0)
-            .map((_, i) => <NonPinnedNftBox onClick={() => setIsShowingNftGallery(true)} key={`${i.toString()}`} />)
+          new Array(emptyNftsCount).fill(0).map((_, i) => (
+            <NonPinnedNftBox
+              onClick={() => {
+                if (!readOnly) {
+                  setIsShowingNftGallery(true);
+                }
+              }}
+              key={`${i.toString()}`}
+            />
+          ))
         ) : pinnedNfts.length === 0 ? (
           <Typography color='secondary'>No pinned NFTs</Typography>
         ) : null}
@@ -99,6 +110,7 @@ export function NftsList({ mutateNfts, memberId, nfts }: Props) {
             }}
             showSearchBar
             onSelect={updateNft}
+            hiddenNfts={pinnedNfts.map((pinnedNft) => pinnedNft.id)}
           />
         )}
       </Stack>
