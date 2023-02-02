@@ -124,7 +124,7 @@ export function BookmarkNodeView({
               <Box display='flex' maxWidth='160px' maxHeight='140px' overflow='hidden'>
                 {data.links.icon?.[0] && <PreviewImage src={data.links.icon[0].href} />}
               </Box>
-              <Box display='flex' flexDirection='column' alignSelf='flex-start' gap={2} py={2}>
+              <Box display='flex' flexDirection='column' alignSelf='flex-start' gap={2} py={3}>
                 <Typography
                   component='span'
                   textOverflow='ellipsis'
