@@ -14,6 +14,7 @@ import { StyledTreeItem } from 'components/common/PageLayout/components/PageNavi
 import IntegrationSettings from 'components/integrations/IntegrationsPage';
 import TasksPage from 'components/nexus/TasksPage';
 import ProfileSettings from 'components/profile/ProfileSettings';
+import { ApiSettings } from 'components/settings/api/Api';
 import Invites from 'components/settings/invites/Invites';
 import MemberSettings from 'components/settings/members/MemberSettings';
 import { SETTINGS_TABS, ACCOUNT_TABS } from 'components/settings/pages';
@@ -30,7 +31,7 @@ interface TabPanelProps extends BoxProps {
   value: string;
 }
 
-function TabView(props: { space?: Space; tab: typeof SETTINGS_TABS[0] }) {
+function TabView(props: { space?: Space; tab: (typeof SETTINGS_TABS)[0] }) {
   const { space, tab } = props;
 
   if (tab.path === SETTINGS_TABS[0].path && space) {
@@ -47,6 +48,10 @@ function TabView(props: { space?: Space; tab: typeof SETTINGS_TABS[0] }) {
 
   if (tab.path === SETTINGS_TABS[3].path && space) {
     return <Invites space={space} />;
+  }
+
+  if (tab.path === SETTINGS_TABS[4].path && space) {
+    return <ApiSettings space={space} />;
   }
 
   if (tab.path === ACCOUNT_TABS[0].path) {
