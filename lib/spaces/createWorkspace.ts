@@ -104,7 +104,7 @@ export async function createWorkspace({ spaceData, userId, createSpaceOption, ex
       data: defaultPostCategories.map(
         (category) =>
           ({
-            permissionLevel: 'member',
+            permissionLevel: 'full_access',
             postCategoryId: category.id,
             spaceId: space.id
           } as Prisma.PostCategoryPermissionCreateManyInput)

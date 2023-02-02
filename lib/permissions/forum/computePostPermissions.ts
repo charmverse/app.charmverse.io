@@ -1,7 +1,6 @@
 import type { Prisma } from '@prisma/client';
 
 import { prisma } from 'db';
-import { PostCategoryNotFoundError } from 'lib/forums/categories/errors';
 import { PostNotFoundError } from 'lib/forums/posts/errors';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { InvalidInputError } from 'lib/utilities/errors';
@@ -9,10 +8,9 @@ import { isUUID } from 'lib/utilities/strings';
 
 import type { PermissionCompute } from '../interfaces';
 
-import { AvailablePostCategoryPermissions } from './availablePostCategoryPermissions.class';
 import { AvailablePostPermissions } from './availablePostPermissions.class';
 import type { AvailablePostPermissionFlags } from './interfaces';
-import { postCategoryPermissionsMapping, postPermissionsMapping } from './mapping';
+import { postPermissionsMapping } from './mapping';
 
 export async function computePostPermissions({
   resourceId,

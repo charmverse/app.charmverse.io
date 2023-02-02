@@ -1,4 +1,4 @@
-import type { PostCategory, PostCategoryPermission, PostCategoryPermissionLevel } from '@prisma/client';
+import type { PostCategory, PostCategoryPermissionLevel } from '@prisma/client';
 import { PostCategoryOperation, PostOperation } from '@prisma/client';
 
 import { typedKeys } from 'lib/utilities/objects';
@@ -31,4 +31,4 @@ export type AssignedPostCategoryPermission<
 /**
  * When returning post categories, also pre-compute if a user can add a post to that category
  */
-export type PostCategoryWithWriteable = PostCategory & Record<Extract<PostCategoryOperation, 'create_post'>, boolean>;
+export type PostCategoryWithPermissions = PostCategory & { permissions: AvailablePostCategoryPermissionFlags };

@@ -28,36 +28,36 @@ describe('upsertPostCategoryPermission', () => {
   it('should create a new post category permission with a role assignee', async () => {
     const role = await generateRole({ createdBy: user.id, spaceId: space.id });
     const permission = await upsertPostCategoryPermission({
-      permissionLevel: 'member',
+      permissionLevel: 'full_access',
       postCategoryId: postCategory.id,
       assignee: { group: 'role', id: role.id }
     });
 
-    expect(permission.permissionLevel).toBe('member');
+    expect(permission.permissionLevel).toBe('full_access');
     expect(permission.assignee.group).toBe('role');
     expect(permission.assignee.id).toBe(role.id);
   });
 
   it('should create a new post category permission with a space assignee', async () => {
     const permission = await upsertPostCategoryPermission({
-      permissionLevel: 'member',
+      permissionLevel: 'full_access',
       postCategoryId: postCategory.id,
       assignee: { group: 'space', id: space.id }
     });
 
-    expect(permission.permissionLevel).toBe('member');
+    expect(permission.permissionLevel).toBe('full_access');
     expect(permission.assignee.group).toBe('space');
     expect(permission.assignee.id).toBe(space.id);
   });
 
   it('should create a new post category permission with a public assignee', async () => {
     const permission = await upsertPostCategoryPermission({
-      permissionLevel: 'guest',
+      permissionLevel: 'view',
       postCategoryId: postCategory.id,
       assignee: { group: 'public' }
     });
 
-    expect(permission.permissionLevel).toBe('guest');
+    expect(permission.permissionLevel).toBe('view');
     expect(permission.assignee.group).toBe('public');
     expect((permission.assignee as any).id).toBeUndefined();
   });
@@ -66,18 +66,18 @@ describe('upsertPostCategoryPermission', () => {
     const role = await generateRole({ createdBy: user.id, spaceId: space.id });
 
     const permission = await upsertPostCategoryPermission({
-      permissionLevel: 'member',
+      permissionLevel: 'full_access',
       postCategoryId: postCategory.id,
       assignee: { group: 'role', id: role.id }
     });
 
     const afterUpdate = await upsertPostCategoryPermission({
-      permissionLevel: 'guest',
+      permissionLevel: 'view',
       postCategoryId: postCategory.id,
       assignee: { group: 'role', id: role.id }
     });
 
-    expect(afterUpdate.permissionLevel).toBe('guest');
+    expect(afterUpdate.permissionLevel).toBe('view');
     expect(afterUpdate.id).toBe(permission.id);
   });
 
@@ -86,7 +86,7 @@ describe('upsertPostCategoryPermission', () => {
   //   const role = await generateRole({ createdBy: user.id, spaceId: space.id });
 
   //   const permission = await upsertPostCategoryPermission({
-  //     permissionLevel: 'member',
+  //     permissionLevel: 'full_access',
   //     postCategoryId: postCategory.id,
   //     assignee: { group: 'role', id: role.id }
   //   });
@@ -101,7 +101,7 @@ describe('upsertPostCategoryPermission', () => {
 
     await expect(
       upsertPostCategoryPermission({
-        permissionLevel: 'member',
+        permissionLevel: 'full_access',
         postCategoryId: postCategory.id,
         assignee: {
           group: 'role',
@@ -112,7 +112,7 @@ describe('upsertPostCategoryPermission', () => {
 
     await expect(
       upsertPostCategoryPermission({
-        permissionLevel: 'member',
+        permissionLevel: 'full_access',
         postCategoryId: postCategory.id,
         assignee: {
           group: 'space',
@@ -125,7 +125,7 @@ describe('upsertPostCategoryPermission', () => {
   it('should fail to create a new post category permission if no assignee is provided', async () => {
     await expect(
       upsertPostCategoryPermission({
-        permissionLevel: 'member',
+        permissionLevel: 'full_access',
         postCategoryId: postCategory.id
       } as any)
     ).rejects.toBeInstanceOf(InvalidInputError);
@@ -134,7 +134,7 @@ describe('upsertPostCategoryPermission', () => {
   it('should fail to create a new post category permission if the post category does not exist or the ID is invalid', async () => {
     await expect(
       upsertPostCategoryPermission({
-        permissionLevel: 'member',
+        permissionLevel: 'full_access',
         postCategoryId: 'invalid-uuid',
         assignee: {
           group: 'space',
@@ -145,7 +145,7 @@ describe('upsertPostCategoryPermission', () => {
 
     await expect(
       upsertPostCategoryPermission({
-        permissionLevel: 'member',
+        permissionLevel: 'full_access',
         postCategoryId: v4(),
         assignee: {
           group: 'space',
@@ -182,7 +182,7 @@ describe('upsertPostCategoryPermission', () => {
   it('should fail to create a new post category permission for the user assignee', async () => {
     await expect(
       upsertPostCategoryPermission({
-        permissionLevel: 'member',
+        permissionLevel: 'full_access',
         postCategoryId: postCategory.id,
         assignee: {
           group: 'user' as any,
@@ -195,7 +195,7 @@ describe('upsertPostCategoryPermission', () => {
   it('should fail to create a new post category permission for the public group if the permission level is other than "guest"', async () => {
     await expect(
       upsertPostCategoryPermission({
-        permissionLevel: 'member',
+        permissionLevel: 'full_access',
         postCategoryId: postCategory.id,
         assignee: {
           group: 'public'

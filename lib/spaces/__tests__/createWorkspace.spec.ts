@@ -166,7 +166,7 @@ describe('createWorkspace', () => {
         expect.objectContaining<Partial<PostCategoryPermission>>({
           spaceId: newWorkspace.id,
           postCategoryId: c.id,
-          permissionLevel: 'member'
+          permissionLevel: 'full_access'
         })
       );
     });

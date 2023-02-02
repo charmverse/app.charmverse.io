@@ -1,11 +1,11 @@
-import type { PostCategory } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { deletePostCategory } from 'lib/forums/categories/deletePostCategory';
 import { updatePostCategory } from 'lib/forums/categories/updatePostCategory';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
-import type { PostCategoryWithWriteable } from 'lib/permissions/forum/interfaces';
+import { computePostCategoryPermissions } from 'lib/permissions/forum/computePostCategoryPermissions';
+import type { PostCategoryWithPermissions } from 'lib/permissions/forum/interfaces';
 import { requestOperations } from 'lib/permissions/requestOperations';
 import { withSessionRoute } from 'lib/session/withSession';
 
@@ -13,19 +13,26 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.use(requireUser).put(updatePostCategoryController).delete(deletePostCategoryController);
 
-async function updatePostCategoryController(req: NextApiRequest, res: NextApiResponse<PostCategoryWithWriteable>) {
-  const { postCategoryId } = req.query;
+async function updatePostCategoryController(req: NextApiRequest, res: NextApiResponse<PostCategoryWithPermissions>) {
+  const { postCategoryId } = req.query as { postCategoryId: string };
+
+  const userId = req.session.user.id;
 
   await requestOperations({
     resourceType: 'post_category',
     operations: ['edit_category'],
     resourceId: postCategoryId as string,
-    userId: req.session.user.id
+    userId
   });
 
   const updatedPostCategory = await updatePostCategory(postCategoryId as string, req.body);
 
-  return res.status(200).json({ ...updatedPostCategory, create_post: true });
+  const permissions = await computePostCategoryPermissions({
+    resourceId: postCategoryId,
+    userId
+  });
+
+  return res.status(200).json({ ...updatedPostCategory, permissions });
 }
 async function deletePostCategoryController(req: NextApiRequest, res: NextApiResponse) {
   const { postCategoryId } = req.query;

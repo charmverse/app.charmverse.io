@@ -48,7 +48,7 @@ describe('POST /api/permissions/forum - Add post category permissions', () => {
 
     const permissionToCreate: PostCategoryPermissionInput = {
       assignee: { group: 'space', id: space.id },
-      permissionLevel: 'member',
+      permissionLevel: 'full_access',
       postCategoryId: postCategory.id
     };
 
@@ -63,7 +63,7 @@ describe('POST /api/permissions/forum - Add post category permissions', () => {
     expect(result).toMatchObject(
       expect.objectContaining<AssignedPostCategoryPermission>({
         id: expect.any(String),
-        permissionLevel: 'member',
+        permissionLevel: 'full_access',
         postCategoryId: postCategory.id,
         assignee: {
           group: 'space',
@@ -80,7 +80,7 @@ describe('POST /api/permissions/forum - Add post category permissions', () => {
 
     const permissionToCreate: PostCategoryPermissionInput = {
       assignee: { group: 'space', id: space.id },
-      permissionLevel: 'member',
+      permissionLevel: 'full_access',
       postCategoryId: postCategory.id
     };
 
@@ -95,7 +95,7 @@ describe('POST /api/permissions/forum - Add post category permissions', () => {
     expect(result).toMatchObject(
       expect.objectContaining<AssignedPostCategoryPermission>({
         id: expect.any(String),
-        permissionLevel: 'member',
+        permissionLevel: 'full_access',
         postCategoryId: postCategory.id,
         assignee: {
           group: 'space',
@@ -111,7 +111,7 @@ describe('POST /api/permissions/forum - Add post category permissions', () => {
     });
     const permissionToCreate: PostCategoryPermissionInput = {
       assignee: { group: 'space', id: space.id },
-      permissionLevel: 'member',
+      permissionLevel: 'full_access',
       postCategoryId: postCategory.id
     };
 
@@ -145,7 +145,7 @@ describe('DELETE /api/permissions/forum - Delete post category permissions', () 
 
     const permissionToDelete = await upsertPostCategoryPermission({
       assignee: { group: 'space', id: space.id },
-      permissionLevel: 'member',
+      permissionLevel: 'full_access',
       postCategoryId: postCategory.id
     });
 
@@ -162,7 +162,7 @@ describe('DELETE /api/permissions/forum - Delete post category permissions', () 
     });
     const permissionToDelete = await upsertPostCategoryPermission({
       assignee: { group: 'space', id: space.id },
-      permissionLevel: 'member',
+      permissionLevel: 'full_access',
       postCategoryId: postCategory.id
     });
 
@@ -180,7 +180,7 @@ describe('DELETE /api/permissions/forum - Delete post category permissions', () 
 
     const permissionToDelete = await upsertPostCategoryPermission({
       assignee: { group: 'space', id: space.id },
-      permissionLevel: 'member',
+      permissionLevel: 'full_access',
       postCategoryId: postCategory.id
     });
 

@@ -31,17 +31,17 @@ describe('listPostCategoryPermissions', () => {
     const permissions = await Promise.all([
       upsertPostCategoryPermission({
         assignee: { group: 'role', id: role.id },
-        permissionLevel: 'member',
+        permissionLevel: 'full_access',
         postCategoryId: postCategory.id
       }),
       upsertPostCategoryPermission({
         assignee: { group: 'space', id: space.id },
-        permissionLevel: 'guest',
+        permissionLevel: 'view',
         postCategoryId: postCategory.id
       }),
       upsertPostCategoryPermission({
         assignee: { group: 'public' },
-        permissionLevel: 'guest',
+        permissionLevel: 'view',
         postCategoryId: postCategory.id
       })
     ]);
@@ -62,17 +62,17 @@ describe('listPostCategoryPermissions', () => {
     await Promise.all([
       upsertPostCategoryPermission({
         assignee: { group: 'role', id: role.id },
-        permissionLevel: 'member',
+        permissionLevel: 'full_access',
         postCategoryId: postCategory.id
       }),
       upsertPostCategoryPermission({
         assignee: { group: 'space', id: space.id },
-        permissionLevel: 'guest',
+        permissionLevel: 'view',
         postCategoryId: postCategory.id
       }),
       upsertPostCategoryPermission({
         assignee: { group: 'public' },
-        permissionLevel: 'guest',
+        permissionLevel: 'view',
         postCategoryId: postCategory.id
       })
     ]);

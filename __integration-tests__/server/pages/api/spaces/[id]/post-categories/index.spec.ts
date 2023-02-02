@@ -58,13 +58,13 @@ beforeAll(async () => {
 
   await upsertPostCategoryPermission({
     assignee: { group: 'space', id: secondSpace.id },
-    permissionLevel: 'member',
+    permissionLevel: 'full_access',
     postCategoryId: spaceCategoryPermissionId
   });
 
   await upsertPostCategoryPermission({
     assignee: { group: 'public' },
-    permissionLevel: 'guest',
+    permissionLevel: 'view',
     postCategoryId: publicCategoryPermissionId
   });
 });

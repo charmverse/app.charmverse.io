@@ -28,7 +28,7 @@ describe('POST /api/permissions/forum/compute-post-permissions - Compute permiss
 
     await upsertPostCategoryPermission({
       assignee: { group: 'role', id: role.id },
-      permissionLevel: 'member',
+      permissionLevel: 'full_access',
       postCategoryId: postCategory.id
     });
 

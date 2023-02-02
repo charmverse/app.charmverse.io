@@ -15,7 +15,7 @@ export async function mutatePostCategorySearch({
   spaceId,
   userId
 }: PostCategorySearchToMutate): Promise<{ categoryId?: string | string[] }> {
-  const { error, isAdmin } = await hasAccessToSpace({
+  const { isAdmin } = await hasAccessToSpace({
     spaceId,
     userId
   });

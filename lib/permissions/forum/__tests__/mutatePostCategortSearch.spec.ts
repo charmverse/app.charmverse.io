@@ -31,7 +31,7 @@ beforeAll(async () => {
     name: 'Member Category'
   });
   await upsertPostCategoryPermission({
-    permissionLevel: 'member',
+    permissionLevel: 'full_access',
     postCategoryId: memberPostCategory.id,
     assignee: { group: 'space', id: space.id }
   });
@@ -41,7 +41,7 @@ beforeAll(async () => {
     name: 'Public Category'
   });
   await upsertPostCategoryPermission({
-    permissionLevel: 'guest',
+    permissionLevel: 'view',
     postCategoryId: publicPostCategory.id,
     assignee: { group: 'public' }
   });

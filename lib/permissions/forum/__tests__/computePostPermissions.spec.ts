@@ -145,7 +145,7 @@ describe('computePostPermissions', () => {
 
     await upsertPostCategoryPermission({
       assignee: { group: 'space', id: space.id },
-      permissionLevel: 'member',
+      permissionLevel: 'full_access',
       postCategoryId: postCategory.id
     });
 
@@ -154,7 +154,7 @@ describe('computePostPermissions', () => {
       userId: spaceMemberUser.id
     });
 
-    const memberPermissions = postPermissionsMapping.member;
+    const memberPermissions = postPermissionsMapping.full_access;
 
     postOperations.forEach((op) => {
       if (memberPermissions.includes(op)) {
@@ -177,7 +177,7 @@ describe('computePostPermissions', () => {
     // This should never usually happen, but if it somehow does, we want the compute operation to act as a failsafe
     await prisma.postCategoryPermission.create({
       data: {
-        permissionLevel: 'guest',
+        permissionLevel: 'view',
         postCategory: { connect: { id: postCategory.id } },
         public: true
       }
@@ -188,7 +188,7 @@ describe('computePostPermissions', () => {
       userId: spaceMemberUser.id
     });
 
-    const guestOperations = postPermissionsMapping.guest;
+    const guestOperations = postPermissionsMapping.view;
 
     postOperations.forEach((op) => {
       if (guestOperations.includes(op)) {
@@ -218,7 +218,7 @@ describe('computePostPermissions', () => {
     });
     await prisma.postCategoryPermission.create({
       data: {
-        permissionLevel: 'guest',
+        permissionLevel: 'view',
         postCategory: { connect: { id: postCategory.id } },
         public: true
       }
@@ -229,7 +229,7 @@ describe('computePostPermissions', () => {
       userId: otherSpaceAdminUser.id
     });
 
-    const guestOperations = postPermissionsMapping.guest;
+    const guestOperations = postPermissionsMapping.view;
 
     postOperations.forEach((op) => {
       if (guestOperations.includes(op)) {

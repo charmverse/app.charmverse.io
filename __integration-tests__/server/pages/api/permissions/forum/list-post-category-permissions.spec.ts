@@ -23,7 +23,7 @@ describe('GET /api/permissions/forum/list-post-category-permissions - List avail
     });
     const permission = await upsertPostCategoryPermission({
       assignee: { group: 'role', id: role.id },
-      permissionLevel: 'member',
+      permissionLevel: 'full_access',
       postCategoryId: postCategory.id
     });
 

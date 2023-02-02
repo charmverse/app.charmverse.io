@@ -30,7 +30,7 @@ describe('deletePostCategoryPermission', () => {
     });
     const postCategoryPermission = await prisma.postCategoryPermission.create({
       data: {
-        permissionLevel: 'member',
+        permissionLevel: 'full_access',
         postCategory: { connect: { id: postCategory.id } },
         role: { connect: { id: role.id } }
       }

@@ -40,7 +40,7 @@ describe('requestOperations', () => {
 
     await upsertPostCategoryPermission({
       assignee: { group: 'space', id: space.id },
-      permissionLevel: 'member',
+      permissionLevel: 'full_access',
       postCategoryId: postCategory.id
     });
 
@@ -64,7 +64,7 @@ describe('requestOperations', () => {
     const postCategory = await generatePostCategory({ spaceId: space.id });
     await upsertPostCategoryPermission({
       assignee: { group: 'space', id: space.id },
-      permissionLevel: 'member',
+      permissionLevel: 'full_access',
       postCategoryId: postCategory.id
     });
 
@@ -82,7 +82,7 @@ describe('requestOperations', () => {
     const postCategory = await generatePostCategory({ spaceId: space.id });
     await upsertPostCategoryPermission({
       assignee: { group: 'space', id: space.id },
-      permissionLevel: 'member',
+      permissionLevel: 'full_access',
       postCategoryId: postCategory.id
     });
 

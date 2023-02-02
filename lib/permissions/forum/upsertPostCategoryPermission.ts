@@ -46,7 +46,7 @@ export async function upsertPostCategoryPermission<
     throw new InvalidInputError('Assignee is required');
   } else if (!postCategoryPermissionGroups.includes(assignee.group)) {
     throw new AssignmentNotPermittedError(assignee.group);
-  } else if (assignee.group === 'public' && permissionLevel !== 'guest') {
+  } else if (assignee.group === 'public' && permissionLevel !== 'view') {
     throw new InsecureOperationError(
       'Cannot assign a public permission to a post category with a non-guest permission'
     );

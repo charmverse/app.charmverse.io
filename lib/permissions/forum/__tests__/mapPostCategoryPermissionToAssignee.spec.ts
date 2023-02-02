@@ -15,7 +15,7 @@ describe('mapPostCategoryPermissionToAssignee', () => {
       public: true,
       roleId: null,
       spaceId: null,
-      permissionLevel: 'guest',
+      permissionLevel: 'view',
       postOperations: [],
       categoryOperations: []
     };
@@ -39,7 +39,7 @@ describe('mapPostCategoryPermissionToAssignee', () => {
       public: null,
       roleId: null,
       spaceId: v4(),
-      permissionLevel: 'member',
+      permissionLevel: 'full_access',
       postOperations: [],
       categoryOperations: []
     };
@@ -64,7 +64,7 @@ describe('mapPostCategoryPermissionToAssignee', () => {
       public: null,
       roleId: v4(),
       spaceId: null,
-      permissionLevel: 'member',
+      permissionLevel: 'full_access',
       postOperations: [],
       categoryOperations: []
     };
@@ -90,7 +90,7 @@ describe('mapPostCategoryPermissionToAssignee', () => {
         public: null,
         roleId: null,
         spaceId: null,
-        permissionLevel: 'member',
+        permissionLevel: 'full_access',
         postOperations: [],
         categoryOperations: []
       };
@@ -109,7 +109,7 @@ describe('mapPostCategoryPermissionToAssignee', () => {
         public: true,
         roleId: v4(),
         spaceId: v4(),
-        permissionLevel: 'member',
+        permissionLevel: 'full_access',
         postOperations: [],
         categoryOperations: []
       };
