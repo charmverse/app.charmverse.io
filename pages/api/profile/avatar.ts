@@ -5,10 +5,10 @@ import { prisma } from 'db';
 import { getUserS3FilePath, uploadUrlToS3 } from 'lib/aws/uploadToS3Server';
 import { getNFT } from 'lib/blockchain/nfts';
 import * as alchemyApi from 'lib/blockchain/provider/alchemy';
+import log from 'lib/log';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { sessionUserRelations } from 'lib/session/config';
 import { withSessionRoute } from 'lib/session/withSession';
-import { getUserProfile } from 'lib/users/getUser';
 import type { UserAvatar } from 'lib/users/interfaces';
 import { InvalidInputError } from 'lib/utilities/errors';
 import { getFilenameWithExtension } from 'lib/utilities/getFilenameWithExtension';
@@ -34,23 +34,31 @@ async function updateAvatar(req: NextApiRequest, res: NextApiResponse<LoggedInUs
 
   // Provided NFT data
   if (isNftAvatar) {
-    const user = await getUserProfile('id', req.session.user.id);
+    const wallets = await prisma.userWallet.findMany({
+      where: {
+        userId: req.session.user.id
+      }
+    });
     const owners = await alchemyApi.getOwners(updatedContract, updatedTokenId, avatarChain);
-
-    const isOwner = user?.wallets.some((a) => {
+    const isOwner = wallets.some((a) => {
       return owners.find((o) => o.toLowerCase() === a.address.toLowerCase());
     });
 
     if (!isOwner) {
-      throw new InvalidInputError('You do not own selected NFT');
+      throw new InvalidInputError('You do not own the selected NFT');
     }
 
     const nft = await getNFT(updatedContract, updatedTokenId, avatarChain);
 
     if (nft.image) {
       const pathInS3 = getUserS3FilePath({ userId, url: getFilenameWithExtension(nft.image) });
-      const { url } = await uploadUrlToS3({ pathInS3, url: nft.image });
-      avatarUrl = url;
+      try {
+        const { url } = await uploadUrlToS3({ pathInS3, url: nft.image });
+        avatarUrl = url;
+      } catch (e) {
+        log.error('Failed to save avatar', { error: e, pathInS3, url: nft.image, userId });
+        throw new InvalidInputError('Failed to save avatar');
+      }
     }
   }
 

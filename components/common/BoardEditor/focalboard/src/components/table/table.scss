@@ -101,7 +101,7 @@
 
     &:hover {
       background-color: rgba(var(--center-channel-color-rgb), 0.05);
-      
+
       .icons {
         opacity: 1;
       }
@@ -162,7 +162,8 @@
       left: -5px;
     }
 
-    textarea.Editable {}
+    textarea.Editable {
+    }
 
     .Editable.Editable.active {
       overflow: hidden;
@@ -241,7 +242,6 @@
   }
 
   .table-row-container {
-
     .octo-table-cell {
       align-items: center;
     }

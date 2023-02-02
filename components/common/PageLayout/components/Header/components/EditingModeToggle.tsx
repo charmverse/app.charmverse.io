@@ -1,5 +1,6 @@
 import { ArrowDropDown } from '@mui/icons-material';
-import { ListItemIcon, ListItemText, Menu, MenuItem, Tooltip } from '@mui/material';
+import type { Theme } from '@mui/material';
+import { IconButton, useMediaQuery, ListItemIcon, ListItemText, Menu, MenuItem, Tooltip } from '@mui/material';
 import PopupState, { bindMenu, bindTrigger } from 'material-ui-popup-state';
 import { memo } from 'react';
 
@@ -24,6 +25,7 @@ const editModeConfig = {
 
 function EditModeToggle() {
   const { availableEditModes, editMode, setPageProps } = usePrimaryCharmEditor();
+  const isLargeScreen = useMediaQuery((theme: Theme) => theme.breakpoints.up('md'));
 
   function setMode(mode: EditMode) {
     setPageProps({ editMode: mode });
@@ -39,19 +41,23 @@ function EditModeToggle() {
     <PopupState variant='popover' popupId='edit-mode-select'>
       {(popupState) => (
         <>
-          <Tooltip title='Toggle suggestion mode'>
-            <Button
-              {...bindTrigger(popupState)}
-              startIcon={EDIT_MODE_CONFIG[editMode].icon}
-              endIcon={<ArrowDropDown />}
-              size='small'
-              disableElevation
-              variant='outlined'
-              color={editModeConfig[editMode].color}
-            >
-              {editModeConfig[editMode].label}
-            </Button>
-          </Tooltip>
+          {isLargeScreen ? (
+            <Tooltip title='Toggle suggestion mode'>
+              <Button
+                {...bindTrigger(popupState)}
+                startIcon={EDIT_MODE_CONFIG[editMode].icon}
+                endIcon={<ArrowDropDown />}
+                size='small'
+                disableElevation
+                variant='outlined'
+                color={editModeConfig[editMode].color}
+              >
+                {editModeConfig[editMode].label}
+              </Button>
+            </Tooltip>
+          ) : (
+            <IconButton {...bindTrigger(popupState)}>{EDIT_MODE_CONFIG[editMode].icon}</IconButton>
+          )}
 
           <Menu
             {...bindMenu(popupState)}

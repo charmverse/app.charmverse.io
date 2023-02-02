@@ -254,6 +254,9 @@ export const createThemeLightSensitive = (mode: PaletteMode) => {
         }
       },
       MuiAutocomplete: {
+        defaultProps: {
+          blurOnSelect: 'touch'
+        },
         styleOverrides: {
           popper: {
             zIndex: 'var(--z-index-speedDial)'

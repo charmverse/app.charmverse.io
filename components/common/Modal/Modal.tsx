@@ -25,7 +25,7 @@ const ModalContainer = styled.div<{ padding?: string; size: ModalSize }>`
   border-radius: ${({ theme }) => theme.spacing(1)};
   box-shadow: ${({ theme }) => theme.shadows[15]};
   padding: ${({ padding, theme }) => padding || theme.spacing(4)};
-  max-height: calc(80vh - ${({ theme }) => theme.spacing(4)});
+  max-height: calc(80vh);
   max-width: 100%;
   overflow-y: auto;
 

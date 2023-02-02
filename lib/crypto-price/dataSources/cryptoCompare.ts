@@ -5,7 +5,7 @@ import fetch from 'adapters/http/fetch';
 export function getPriceFromCryptoCompare(base: CryptoCurrency | string, quote: FiatCurrency) {
   return fetch<any>(`https://min-api.cryptocompare.com/data/price?fsym=${base}&tsyms=${quote}`).then((data) => {
     if (!data[quote]) {
-      throw new Error('No valid price');
+      return null;
     }
 
     const pairQuote: IPairQuote = {

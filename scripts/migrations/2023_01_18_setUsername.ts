@@ -1,9 +1,8 @@
-import { prisma } from "db"
-import { updateUsedIdentity } from "lib/users/updateUsedIdentity";
-import { shortWalletAddress } from "lib/utilities/strings";
+import { prisma } from 'db';
+import { updateUsedIdentity } from 'lib/users/updateUsedIdentity';
+import { shortWalletAddress } from 'lib/utilities/strings';
 
 export async function setUserName() {
-
   const usersWithWalletId = await prisma.user.findMany({
     where: {
       identityType: 'Wallet',
@@ -13,8 +12,8 @@ export async function setUserName() {
       wallets: true
     }
   });
-  const addressUsernames = usersWithWalletId.filter(u => u.username.startsWith('0x'));
-  console.log('users to check', addressUsernames.length)
+  const addressUsernames = usersWithWalletId.filter((u) => u.username.startsWith('0x'));
+  console.log('users to check', addressUsernames.length);
   let i = 0;
   for (const user of usersWithWalletId) {
     if (i++ % 100 === 0) {
@@ -23,8 +22,8 @@ export async function setUserName() {
     if (user.wallets.length > 0) {
       await updateUsedIdentity(user.id, {
         displayName: user.wallets[0].ensname ?? shortWalletAddress(user.wallets[0].address),
-        identityType: 'Wallet',
-      })
+        identityType: 'Wallet'
+      });
     }
   }
 }

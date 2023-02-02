@@ -1,6 +1,6 @@
 import { yupResolver } from '@hookform/resolvers/yup';
-import LaunchIcon from '@mui/icons-material/LaunchOutlined';
-import { Box, FormHelperText, Typography } from '@mui/material';
+import Box from '@mui/material/Box';
+import FormHelperText from '@mui/material/FormHelperText';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
 import type { Space } from '@prisma/client';
@@ -13,14 +13,12 @@ import * as yup from 'yup';
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import FieldLabel from 'components/common/form/FieldLabel';
-import Link from 'components/common/Link';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import ConnectSnapshot from 'components/common/PageLayout/components/Header/components/Snapshot/ConnectSnapshot';
 import PrimaryButton from 'components/common/PrimaryButton';
 import Legend from 'components/settings/Legend';
 import ImportNotionWorkspace from 'components/settings/workspace/ImportNotionWorkspace';
 import Avatar from 'components/settings/workspace/LargeAvatar';
-import { charmverseDiscordInvite } from 'config/constants';
 import { setTitle } from 'hooks/usePageTitle';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useSpaces } from 'hooks/useSpaces';
@@ -75,7 +73,10 @@ export default function SpaceSettings({ space }: { space: Space }) {
       .updateSpace({ ...space, name: values.name, domain: values.domain, spaceImage: values.spaceImage })
       .then((updatedSpace) => {
         if (newDomain) {
-          window.location.href = router.asPath.replace(space.domain, values.domain as string);
+          // add a delay so that the form resets and doesnt block user from reloading due to calling usePreventReload(isDirty)
+          setTimeout(() => {
+            window.location.href = router.asPath.replace(space.domain, values.domain as string);
+          }, 100);
         } else {
           setSpace(updatedSpace);
         }
@@ -160,14 +161,6 @@ export default function SpaceSettings({ space }: { space: Space }) {
           )}
         </Grid>
       </form>
-      <Legend mt={4}>API Key</Legend>
-      <Typography variant='body1'>
-        Request access to the charmverse API in our{' '}
-        <Link href={charmverseDiscordInvite} external target='_blank'>
-          Discord Channel <LaunchIcon fontSize='small' />
-        </Link>
-      </Typography>
-
       <Legend mt={4}>Import Content</Legend>
       <Box sx={{ ml: 1 }} display='flex' flexDirection='column' gap={1}>
         <ImportNotionWorkspace />

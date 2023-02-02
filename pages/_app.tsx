@@ -69,7 +69,6 @@ import 'components/common/BoardEditor/focalboard/src/components/cardDialog.scss'
 import 'components/common/BoardEditor/focalboard/src/components/centerPanel.scss';
 import 'components/common/BoardEditor/focalboard/src/components/confirmationDialogBox.scss';
 import 'components/common/BoardEditor/focalboard/src/components/dialog.scss';
-import 'components/common/BoardEditor/focalboard/src/components/flashMessages.scss';
 import 'components/common/BoardEditor/focalboard/src/components/gallery/gallery.scss';
 import 'components/common/BoardEditor/focalboard/src/components/gallery/galleryCard.scss';
 import 'components/common/BoardEditor/focalboard/src/components/kanban/calculation/calculation.scss';
@@ -122,7 +121,7 @@ import 'theme/focalboard/focalboard.main.scss';
 import 'theme/focalboard/focalboard.typography.scss';
 
 // Lit Protocol CSS
-import 'lit-share-modal-v3-react-17/dist/ShareModal.css';
+import 'lit-share-modal-v3/dist/ShareModal.css';
 import 'react-resizable/css/styles.css';
 import 'theme/lit-protocol/lit-protocol.scss';
 import 'theme/styles.scss';

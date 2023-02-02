@@ -159,6 +159,11 @@ function PageLayout({ children }: PageLayoutProps) {
   const { hasSharedPageAccess, accessChecked, publicPage } = useSharedPage();
   const open = isMobileSidebar ? mobileOpen : storageOpen;
 
+  let displaySidebarWidth = resizableSidebarWidth;
+  if (isMobileSidebar || !user) {
+    displaySidebarWidth = 0;
+  }
+
   const handleDrawerOpen = React.useCallback(() => {
     if (isMobileSidebar) {
       setMobileOpen(true);
@@ -214,11 +219,7 @@ function PageLayout({ children }: PageLayoutProps) {
                 <PageActionDisplayProvider>
                   {open !== null && (
                     <>
-                      <AppBar
-                        open={open}
-                        sidebarWidth={isMobileSidebar || !user ? 0 : resizableSidebarWidth}
-                        position='fixed'
-                      >
+                      <AppBar open={open} sidebarWidth={displaySidebarWidth} position='fixed'>
                         <Header open={open} openSidebar={handleDrawerOpen} />
                       </AppBar>
                       {isMobileSidebar ? (
@@ -235,7 +236,7 @@ function PageLayout({ children }: PageLayoutProps) {
                           </Box>
                         </MuiDrawer>
                       ) : (
-                        <Drawer sidebarWidth={!user ? 0 : resizableSidebarWidth} open={open} variant='permanent'>
+                        <Drawer sidebarWidth={displaySidebarWidth} open={open} variant='permanent'>
                           {drawerContent}
                           <Tooltip title={!user || isResizing ? '' : 'Drag to resize'} placement='right' followCursor>
                             <DraggableHandle

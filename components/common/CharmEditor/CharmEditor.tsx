@@ -115,8 +115,10 @@ export function charmEditorPlugins({
   userId = null,
   pageId = null,
   spaceId = null,
-  placeholderText
+  placeholderText,
+  disableRowHandles = false
 }: {
+  disableRowHandles?: boolean;
   spaceId?: string | null;
   pageId?: string | null;
   userId?: string | null;
@@ -243,11 +245,13 @@ export function charmEditorPlugins({
   ];
 
   if (!readOnly) {
-    basePlugins.push(
-      rowActions.plugins({
-        key: actionsPluginKey
-      })
-    );
+    if (!disableRowHandles) {
+      basePlugins.push(
+        rowActions.plugins({
+          key: actionsPluginKey
+        })
+      );
+    }
     basePlugins.push(placeholderPlugin(placeholderText));
   }
 
@@ -271,12 +275,25 @@ export function charmEditorPlugins({
   };
 }
 
-const StyledReactBangleEditor = styled(ReactBangleEditor)<{ disablePageSpecificFeatures?: boolean }>`
+const StyledReactBangleEditor = styled(ReactBangleEditor)<{
+  colorMode?: 'dark';
+  disablePageSpecificFeatures?: boolean;
+}>`
   position: relative;
 
   /** DONT REMOVE THIS STYLING */
   /** ITS TO MAKE SURE THE USER CAN DRAG PAST THE ACTUAL CONTENT FROM RIGHT TO LEFT AND STILL SHOW THE FLOATING MENU */
   left: -50px;
+
+  ${({ colorMode }) =>
+    colorMode === 'dark'
+      ? `
+          background-color: var(--background-light);
+          .ProseMirror[data-placeholder]::before {
+            color: var(--primary-text);
+            opacity: 0.5;
+          }`
+      : ''};
 
   /** DONT REMOVE THIS STYLING */
   div.ProseMirror.bangle-editor {
@@ -338,6 +355,7 @@ const defaultContent: PageContent = {
 export type UpdatePageContent = (content: ICharmEditorOutput) => any;
 
 interface CharmEditorProps {
+  colorMode?: 'dark';
   content?: PageContent;
   autoFocus?: boolean;
   children?: ReactNode;
@@ -354,6 +372,9 @@ interface CharmEditorProps {
   pageType?: PageType | 'post';
   pagePermissions?: IPagePermissionFlags;
   onParticipantUpdate?: (participants: FrontendParticipant[]) => void;
+  placeholderText?: string;
+  focusOnInit?: boolean;
+  disableRowHandles?: boolean;
 }
 
 export function convertPageContentToMarkdown(content: PageContent, title?: string): string {
@@ -376,6 +397,7 @@ export function convertPageContentToMarkdown(content: PageContent, title?: strin
 }
 
 function CharmEditor({
+  colorMode,
   enableSuggestingMode = false,
   pageActionDisplay = null,
   content = defaultContent,
@@ -391,7 +413,10 @@ function CharmEditor({
   containerWidth,
   pageType,
   pagePermissions,
-  onParticipantUpdate
+  placeholderText,
+  focusOnInit,
+  onParticipantUpdate,
+  disableRowHandles = false
 }: CharmEditorProps) {
   const router = useRouter();
   const { showMessage } = useSnackbar();
@@ -474,10 +499,12 @@ function CharmEditor({
 
   function getPlugins() {
     return charmEditorPlugins({
+      disableRowHandles,
       onContentChange: (view: EditorView, prevDoc: Node) => {
         debouncedUpdate(view, prevDoc);
         sendPageEvent();
       },
+      placeholderText,
       onError(err) {
         showMessage(err.message, 'warning');
       },
@@ -526,14 +553,15 @@ function CharmEditor({
 
   return (
     <StyledReactBangleEditor
+      colorMode={colorMode}
       pageId={pageId}
+      focusOnInit={focusOnInit}
       disablePageSpecificFeatures={disablePageSpecificFeatures}
       isContentControlled={isContentControlled}
       enableSuggestions={enableSuggestingMode}
       onParticipantUpdate={onParticipantUpdate}
       trackChanges
       readOnly={readOnly}
-      focusOnInit={autoFocus}
       enableComments={enableComments}
       style={{
         ...(style ?? {}),
@@ -645,7 +673,7 @@ function CharmEditor({
     >
       <floatingMenu.FloatingMenu
         palettePluginKey={inlinePalettePluginKey}
-        // disable comments and polls in suggestions mode since they dont interact well
+        // disable comments in suggestions mode since they dont interact well
         enableComments={enableComments}
         enableVoting={enableVoting && !enableSuggestingMode && !isTemplate}
         pluginKey={floatingMenuPluginKey}
@@ -656,7 +684,7 @@ function CharmEditor({
       <MentionSuggest pluginKey={mentionPluginKey} />
       <NestedPagesList pluginKey={nestedPagePluginKey} />
       <EmojiSuggest pluginKey={emojiPluginKey} />
-      {!readOnly && <RowActionsMenu pluginKey={actionsPluginKey} />}
+      {!readOnly && !disableRowHandles && <RowActionsMenu pluginKey={actionsPluginKey} />}
       <InlineCommandPalette
         nestedPagePluginKey={nestedPagePluginKey}
         disableNestedPage={disableNestedPage}

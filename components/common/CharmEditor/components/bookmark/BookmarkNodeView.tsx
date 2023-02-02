@@ -1,6 +1,7 @@
 import { useTheme } from '@emotion/react';
 import BookmarkIcon from '@mui/icons-material/Bookmark';
 import { Box, Card, CardActionArea, Typography } from '@mui/material';
+import Script from 'next/script';
 import useSWRImmutable from 'swr/immutable';
 
 import charmClient from 'charmClient';
@@ -13,6 +14,16 @@ import { MediaUrlInput } from '../common/MediaUrlInput';
 import type { CharmNodeViewProps } from '../nodeView/nodeView';
 
 import type { BookmarkNodeAttrs } from './bookmarkSpec';
+
+const iframelyWidgetJs = 'https://cdn.iframe.ly/embed.js';
+
+declare global {
+  interface Window {
+    iframely: {
+      load: VoidFunction;
+    };
+  }
+}
 
 export function BookmarkNodeView({
   readOnly = false,
@@ -34,6 +45,16 @@ export function BookmarkNodeView({
     updateAttrs({
       url: bookmarkUrl
     });
+  }
+
+  function onLoadScript() {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    if (window.iframely) {
+      window.iframely.load();
+    }
   }
 
   if (isLoading) {
@@ -70,6 +91,7 @@ export function BookmarkNodeView({
   if (html) {
     return (
       <Box my={2}>
+        <Script src={iframelyWidgetJs} onReady={onLoadScript} />
         <BlockAligner onDelete={deleteNode}>
           <div dangerouslySetInnerHTML={{ __html: html }} />
         </BlockAligner>

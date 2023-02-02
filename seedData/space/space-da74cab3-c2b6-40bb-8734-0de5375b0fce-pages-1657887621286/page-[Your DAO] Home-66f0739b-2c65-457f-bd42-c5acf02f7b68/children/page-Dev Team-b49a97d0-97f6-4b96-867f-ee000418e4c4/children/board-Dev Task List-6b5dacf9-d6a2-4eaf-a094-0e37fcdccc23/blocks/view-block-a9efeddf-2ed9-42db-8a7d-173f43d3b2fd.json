@@ -25,9 +25,7 @@
     ],
     "sortOptions": [],
     "columnWidths": {},
-    "hiddenOptionIds": [
-      ""
-    ],
+    "hiddenOptionIds": [""],
     "visibleOptionIds": [
       "1e4f3635-40ec-4838-bd5a-b3c9e4107381",
       "9c047d40-c4e2-416e-bb0b-d54e79983564",
@@ -38,8 +36,6 @@
     "collapsedOptionIds": [],
     "columnCalculations": {},
     "kanbanCalculations": {},
-    "visiblePropertyIds": [
-      "57039289-9873-4ce9-a637-05c4697f899a"
-    ]
+    "visiblePropertyIds": ["57039289-9873-4ce9-a637-05c4697f899a"]
   }
 }
