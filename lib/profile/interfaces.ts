@@ -2,6 +2,7 @@ export interface UserCommunity {
   id: string;
   name: string;
   isHidden: boolean;
+  isPinned: boolean;
   logo: string | null;
 }
 

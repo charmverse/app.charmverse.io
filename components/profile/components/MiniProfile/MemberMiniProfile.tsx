@@ -20,6 +20,7 @@ import type { Member } from 'lib/members/interfaces';
 import { MemberPropertiesPopup } from '../SpacesMemberDetails/components/MemberPropertiesPopup';
 
 import { NftsList } from './NftsList';
+import { OrgsList } from './OrgsList';
 import { PoapsList } from './PoapsList';
 
 export function MemberMiniProfile({ member, onClose }: { member: Member; onClose: VoidFunction }) {
@@ -44,6 +45,14 @@ export function MemberMiniProfile({ member, onClose }: { member: Member; onClose
   });
 
   const {
+    data: orgs = [],
+    mutate: mutateOrgs,
+    isLoading: isFetchingOrgs
+  } = useSWRImmutable(`/orgs/${member.id}`, () => {
+    return charmClient.profile.getOrgs(member.id);
+  });
+
+  const {
     data: nfts = [],
     mutate: mutateNfts,
     isLoading: isFetchingNfts
@@ -59,7 +68,7 @@ export function MemberMiniProfile({ member, onClose }: { member: Member; onClose
     charmClient.getUserByPath(member.path as string)
   );
 
-  const isLoading = isFetchingUser || isFetchingPoaps || isFetchingNfts;
+  const isLoading = isFetchingUser || isFetchingPoaps || isFetchingNfts || isFetchingOrgs;
 
   if (!currentSpace || !currentUser) {
     return null;
@@ -90,12 +99,11 @@ export function MemberMiniProfile({ member, onClose }: { member: Member; onClose
               user={user.id === currentUser?.id ? currentUser : user}
               updateUser={setUser}
             />
-            <Box my={3}>
+            <Stack gap={3}>
               <NftsList mutateNfts={mutateNfts} nfts={nfts} memberId={user.id} />
-            </Box>
-            <Box my={3}>
+              <OrgsList mutateOrgs={mutateOrgs} orgs={orgs} memberId={user.id} />
               <PoapsList poaps={poaps} />
-            </Box>
+            </Stack>
             <Divider
               sx={{
                 my: 1
@@ -142,12 +150,11 @@ export function MemberMiniProfile({ member, onClose }: { member: Member; onClose
               </Box>
             )}
 
-            <Box my={3}>
+            <Stack gap={3}>
               <NftsList nfts={nfts} memberId={user.id} />
-            </Box>
-            <Box my={3}>
+              <OrgsList orgs={orgs} memberId={user.id} />
               <PoapsList poaps={poaps} />
-            </Box>
+            </Stack>
           </DialogContent>
         </>
       )}

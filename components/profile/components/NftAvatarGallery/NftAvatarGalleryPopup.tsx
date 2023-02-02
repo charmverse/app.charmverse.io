@@ -1,7 +1,8 @@
 import SearchIcon from '@mui/icons-material/Search';
-import { Dialog, DialogContent, DialogTitle, TextField } from '@mui/material';
+import { Dialog, DialogContent, TextField } from '@mui/material';
 import { useMemo, useState } from 'react';
 
+import { DialogTitle } from 'components/common/Modal';
 import { useMyNfts } from 'hooks/useMyNfts';
 import { useUser } from 'hooks/useUser';
 import type { NftData } from 'lib/blockchain/interfaces';
@@ -31,7 +32,9 @@ export default function NftAvatarGalleryPopup({ onSelect, isVisible, onClose, is
 
   return (
     <Dialog onClose={onClose} open={isVisible} scroll='paper'>
-      <DialogTitle>Your NFTs gallery</DialogTitle>
+      <DialogTitle sx={{ '&&': { px: 2, py: 2 } }} onClose={onClose}>
+        Your NFTs gallery
+      </DialogTitle>
       <DialogContent dividers>
         {!isLoading && nfts.length !== 0 && (
           <TextField

@@ -15,6 +15,8 @@ import { transformNft } from 'lib/blockchain/transformNft';
 
 import NftAvatarGalleryPopup from '../NftAvatarGallery/NftAvatarGalleryPopup';
 
+import { ProfileItemContainer } from './ProfileItemContainer';
+
 const totalShownNfts = 5;
 
 const NonPinnedBox = styled(Box)`
@@ -34,25 +36,6 @@ function NonPinnedNftBox({ onClick }: { onClick: VoidFunction }) {
     </NonPinnedBox>
   );
 }
-
-const NftContainer = styled(Box)`
-  position: relative;
-
-  &:hover .icons {
-    opacity: 1;
-    transition: opacity 150ms ease-in-out;
-  }
-
-  & .icons {
-    position: absolute;
-    opacity: 0;
-    z-index: 1;
-    right: -10px;
-    top: -5px;
-    cursor: pointer;
-    transition: opacity 150ms ease-in-out;
-  }
-`;
 
 type Props = { memberId: string; nfts: NftData[]; mutateNfts?: KeyedMutator<NftData[]> };
 
@@ -101,14 +84,14 @@ export function NftsList({ mutateNfts, memberId, nfts }: Props) {
         {pinnedNfts.map((nft) => {
           const nftData = transformNft(nft);
           return (
-            <NftContainer key={nft.id}>
+            <ProfileItemContainer key={nft.id}>
               {!readOnly && (
                 <CancelIcon color='error' fontSize='small' className='icons' onClick={() => updateNft(nft)} />
               )}
               <Link href={nftData.link} target='_blank' display='flex'>
                 <Avatar size='large' isNft avatar={nftData.image} />
               </Link>
-            </NftContainer>
+            </ProfileItemContainer>
           );
         })}
         {currentUser?.id === memberId ? (

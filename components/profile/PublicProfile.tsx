@@ -170,7 +170,8 @@ export default function PublicProfile(props: UserDetailsProps) {
       logo: credential.subject.discordGuildAvatar,
       votes: [],
       proposals: [],
-      bounties: []
+      bounties: [],
+      isPinned: false
       // roles: credential.subject.discordRoles.map((role, i) => <><strong>{role.name} </strong>{i < credential.subject.discordRoles.length - 1 && ' and '}</>)} issued on {toMonthDate(credential.createdAt)
     })
   );
