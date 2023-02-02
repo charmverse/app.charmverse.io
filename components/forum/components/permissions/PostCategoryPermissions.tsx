@@ -1,14 +1,12 @@
+import { Divider } from '@mui/material';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
-import type { PostCategory, PostCategoryPermissionLevel } from '@prisma/client';
+import type { PostCategory } from '@prisma/client';
 import { usePopupState } from 'material-ui-popup-state/hooks';
-import { useState } from 'react';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
-import { SmallSelect } from 'components/common/form/InputEnumToOptions';
-import { InputSearchRole, InputSearchRoleMultiple } from 'components/common/form/InputSearchRole';
 import Loader from 'components/common/LoadingComponent';
 import Modal from 'components/common/Modal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -17,14 +15,11 @@ import type {
   AssignedPostCategoryPermission,
   AvailablePostCategoryPermissionFlags
 } from 'lib/permissions/forum/interfaces';
-import { postCategoryPermissionLabels } from 'lib/permissions/forum/mapping';
 import type { PostCategoryPermissionInput } from 'lib/permissions/forum/upsertPostCategoryPermission';
-import { conditionalPlural } from 'lib/utilities/strings';
 
-import { PostCategoryPermissionAddRolesDialog } from './PostCategoryPermissionAddRolesDialog';
+import { PostCategoryPermissionsAddRoles } from './PostCategoryPermissionAddRolesDialog';
 import { PostCategoryRolePermissionRow } from './PostCategoryPermissionRow';
 import type { BulkRolePostCategoryPermissionUpsert } from './shared';
-import { forumMemberPermissionOptions } from './shared';
 
 /**
  * @permissions The actions a user can perform on a post category
@@ -155,20 +150,31 @@ function PostCategoryPermissions({ postCategory, permissions }: Props) {
           </Grid>
         ))}
 
-        {canAddRoles && (
+        {addRolesDialog.isOpen && (
           <Grid item xs>
-            <Button onClick={addRolesDialog.open} variant='text' color='secondary'>
-              + Add roles
-            </Button>
+            <Divider sx={{ my: 2 }} />
+            <PostCategoryPermissionsAddRoles
+              onSave={addMultiplePermissions}
+              onClose={addRolesDialog.close}
+              roleIdsToHide={mappedPermissions.roles.map((r) => r.assignee.id)}
+            />
+          </Grid>
+        )}
+
+        {canAddRoles && (
+          <Grid item xs={12} display='flex' justifyContent='flex-start'>
+            {!addRolesDialog.isOpen ? (
+              <Button onClick={addRolesDialog.open} variant='text' color='secondary'>
+                + Add roles
+              </Button>
+            ) : (
+              <Button onClick={addRolesDialog.close} variant='text' color='secondary'>
+                Cancel
+              </Button>
+            )}
           </Grid>
         )}
       </Grid>
-      <PostCategoryPermissionAddRolesDialog
-        onSave={addMultiplePermissions}
-        isOpen={addRolesDialog.isOpen}
-        onClose={addRolesDialog.close}
-        roleIdsToHide={mappedPermissions.roles.map((r) => r.id)}
-      />
     </Box>
   );
 }
