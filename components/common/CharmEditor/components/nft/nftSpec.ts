@@ -5,7 +5,7 @@ import type { supportedChainIds } from 'connectors';
 import { name } from './config';
 
 export type NodeAttrs = {
-  chain: typeof supportedChainIds[number];
+  chain: (typeof supportedChainIds)[number];
   contract: string;
   token: string;
 };

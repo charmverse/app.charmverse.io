@@ -59,7 +59,7 @@ const TASK_TABS = [
   { icon: <CommentIcon />, label: 'Forum', type: 'forum' }
 ] as const;
 
-type TaskType = typeof TASK_TABS[number]['type'];
+type TaskType = (typeof TASK_TABS)[number]['type'];
 
 export default function TasksPage() {
   const router = useRouter();
@@ -76,7 +76,7 @@ export default function TasksPage() {
 
   const unvoted = tasks?.votes.filter((vote) => !vote.userChoice && new Date() < new Date(vote.deadline));
 
-  const notificationCount: Record<typeof TASK_TABS[number]['type'], number> = {
+  const notificationCount: Record<(typeof TASK_TABS)[number]['type'], number> = {
     multisig:
       gnosisTasks && !hasSnoozedNotifications ? gnosisTasks.filter((gnosisTask) => !gnosisTask.marked).length : 0,
     vote: unvoted ? unvoted.length : 0,

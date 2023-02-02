@@ -27,7 +27,7 @@ const StyledButton = styled(Button)`
 `;
 
 const views = ['gallery', 'table'] as const;
-type View = typeof views[number];
+type View = (typeof views)[number];
 
 function memberNamePropertyValue(member: Member, nameProperty: MemberPropertyWithPermissions | null) {
   const memberNameProperty = member.properties.find((prop) => prop.memberPropertyId === nameProperty?.id);
