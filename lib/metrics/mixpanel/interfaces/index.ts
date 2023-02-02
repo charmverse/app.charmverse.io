@@ -8,6 +8,7 @@ import type { UserEventMap } from './UserEvent';
 export interface MixpanelTrackBase {
   // distinct_id - property name required by mixpanel to identify unique users
   distinct_id: string;
+  isAnonymous?: boolean;
 }
 
 export interface MixpanelUserProfile {

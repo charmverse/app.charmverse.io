@@ -110,7 +110,7 @@ export function MemberPropertiesPopup({
                   const fieldRendererConfig = getFieldRendererConfig({
                     type: property.type,
                     label: property.name,
-                    error: errors[property.memberPropertyId],
+                    error: errors[property.memberPropertyId] as any,
                     inline: true,
                     options: property.options,
                     onCreateOption: (option) => createOption(property, option),

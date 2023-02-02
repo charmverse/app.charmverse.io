@@ -1,21 +1,21 @@
 .EmojiPicker {
-    .emoji-mart {
-        color: rgb(var(--center-channel-color-rgb));
-        background: rgb(var(--center-channel-bg-rgb));
-        border-color: rgba(var(--center-channel-color-rgb), 0.16);
+  .emoji-mart {
+    color: rgb(var(--center-channel-color-rgb));
+    background: rgb(var(--center-channel-bg-rgb));
+    border-color: rgba(var(--center-channel-color-rgb), 0.16);
 
-        .emoji-mart-search input {
-            border: 1px solid rgba(var(--center-channel-color-rgb), 0.16);
-        }
-
-        .emoji-mart-category-label span {
-            background: rgb(var(--center-channel-bg-rgb));
-        }
-
-        .emoji-mart-search-icon svg {
-            fill: rgb(var(--center-channel-color-rgb));
-        }
+    .emoji-mart-search input {
+      border: 1px solid rgba(var(--center-channel-color-rgb), 0.16);
     }
+
+    .emoji-mart-category-label span {
+      background: rgb(var(--center-channel-bg-rgb));
+    }
+
+    .emoji-mart-search-icon svg {
+      fill: rgb(var(--center-channel-color-rgb));
+    }
+  }
 }
 
 // Remove emoji mark footer with watermark

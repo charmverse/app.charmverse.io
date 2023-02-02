@@ -1,12 +1,11 @@
-import {validate} from 'uuid'
-import {prisma} from 'db'
+import { validate } from 'uuid';
+import { prisma } from 'db';
 import randomName from 'lib/utilities/randomName';
 
-export async function seedUsers({spaceDomainOrId, amount}: {spaceDomainOrId: string, amount: number}) {
+export async function seedUsers({ spaceDomainOrId, amount }: { spaceDomainOrId: string; amount: number }) {
+  const query = validate(spaceDomainOrId) ? { id: spaceDomainOrId } : { domain: spaceDomainOrId };
 
-  const query = validate(spaceDomainOrId) ? {id: spaceDomainOrId} : {domain: spaceDomainOrId}
-
-  const space = await prisma.space.findUnique({where: query});
+  const space = await prisma.space.findUnique({ where: query });
 
   if (!space) {
     throw new Error(`Space ${spaceDomainOrId} not found`);
@@ -27,7 +26,7 @@ export async function seedUsers({spaceDomainOrId, amount}: {spaceDomainOrId: str
             }
           }
         }
-      })
+      });
     }
   });
 }

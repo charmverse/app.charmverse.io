@@ -73,7 +73,7 @@ export default function PaymentForm({ onSubmit, defaultChainId = 1 }: Props) {
   const values = watch();
 
   useEffect(() => {
-    const newContractAddress = watch(({ contractAddress, chainId }, { value, name }) => {
+    const newContractAddress = watch(({ contractAddress, chainId }, { name }) => {
       if ((name === 'contractAddress' || name === 'chainId') && isValidChainAddress(contractAddress as string)) {
         loadToken({ chainId: chainId as SupportedChainId, contractAddress: contractAddress as string });
       }

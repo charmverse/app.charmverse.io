@@ -29,6 +29,7 @@ export class WebsocketBroadcaster {
       await Promise.all([pubClient.connect(), subClient.connect()]);
 
       log.debug('Connecting to Redis for socket.io');
+      // @ts-ignore
       io.adapter(createAdapter(pubClient, subClient));
     }
 

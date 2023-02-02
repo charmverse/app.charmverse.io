@@ -81,6 +81,8 @@ async function getUser(req: NextApiRequest, res: NextApiResponse<LoggedInUser | 
     await req.session.save();
   }
 
+  res.setHeader('Cache-Control', 'no-store');
+
   return res.status(200).json(profile);
 }
 
