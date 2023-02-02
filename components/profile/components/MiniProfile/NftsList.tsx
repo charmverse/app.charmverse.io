@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
 import AddIcon from '@mui/icons-material/Add';
 import CancelIcon from '@mui/icons-material/Cancel';
-import { Link, Typography } from '@mui/material';
+import { Link, Tooltip, Typography } from '@mui/material';
 import { Box, Stack } from '@mui/system';
 import type { ProfileItem } from '@prisma/client';
 import { useState } from 'react';
@@ -88,9 +88,11 @@ export function NftsList({ mutateNfts, memberId, nfts }: Props) {
               {!readOnly && (
                 <CancelIcon color='error' fontSize='small' className='icons' onClick={() => updateNft(nft)} />
               )}
-              <Link href={nftData.link} target='_blank' display='flex'>
-                <Avatar size='large' isNft avatar={nftData.image} />
-              </Link>
+              <Tooltip title={nftData.title}>
+                <Link href={nftData.link} target='_blank' display='flex'>
+                  <Avatar size='large' isNft avatar={nftData.image} />
+                </Link>
+              </Tooltip>
             </ProfileItemContainer>
           );
         })}

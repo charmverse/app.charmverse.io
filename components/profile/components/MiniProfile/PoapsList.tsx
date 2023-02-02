@@ -1,4 +1,4 @@
-import { Link, Typography } from '@mui/material';
+import { Link, Tooltip, Typography } from '@mui/material';
 import { Box, Stack } from '@mui/system';
 
 import Avatar from 'components/common/Avatar';
@@ -17,11 +17,11 @@ export function PoapsList({ poaps }: { poaps: ExtendedPoap[] }) {
             const poapData = transformPoap(poap);
 
             return (
-              <Box key={poapData.id}>
+              <Tooltip title={poapData.title} key={poapData.id}>
                 <Link href={poapData.link} target='_blank' display='flex'>
                   <Avatar size='large' avatar={poapData.image} />
                 </Link>
-              </Box>
+              </Tooltip>
             );
           })
         ) : (

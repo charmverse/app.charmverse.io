@@ -87,7 +87,9 @@ export function OrgsList({ mutateOrgs, memberId, orgs }: Props) {
                 <CancelIcon color='error' fontSize='small' className='icons' onClick={() => updateOrg(pinnedOrg)} />
               )}
               <Tooltip title={pinnedOrg.name}>
-                <Avatar size='large' avatar={pinnedOrg.logo} />
+                <div>
+                  <Avatar size='large' name={pinnedOrg.name} avatar={pinnedOrg.logo} />
+                </div>
               </Tooltip>
             </ProfileItemContainer>
           );
