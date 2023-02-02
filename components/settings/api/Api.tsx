@@ -16,7 +16,7 @@ import Legend from '../Legend';
 interface Props {
   isAdmin: boolean;
   spaceId: string;
-  spaceOwner: string;
+  // spaceOwner: string;
 }
 
 export const schema = yup.object({
@@ -95,9 +95,9 @@ export function ApiSettings({ isAdmin, spaceId }: Props) {
           Discord Channel <LaunchIcon fontSize='small' />
         </Link>
       </Typography>
-      <Legend>Webhook</Legend>
+      {/* <Legend>Webhook (beta)</Legend>
       <Typography variant='body1'>
-        Subscribe to Charmverse's event using webhooks. You must provide us with an http endpoint which returns a 200
+        Subscribe to events in Charmverse using webhooks. You must provide us with an http endpoint which returns a 200
         response upon reception of the event.
       </Typography>
       <form
@@ -111,7 +111,7 @@ export function ApiSettings({ isAdmin, spaceId }: Props) {
       >
         <Grid item container xs mt={2}>
           <Grid item xs={10}>
-            <InputLabel>Events Webhook (beta)</InputLabel>
+            <InputLabel>Events Webhook</InputLabel>
             <TextField
               {...register('webhookUrl', { required: true })}
               type='text'
@@ -200,7 +200,7 @@ export function ApiSettings({ isAdmin, spaceId }: Props) {
             </Grid>
           </Grid>
         )}
-      </form>
+      </form> */}
     </>
   );
 }
