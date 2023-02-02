@@ -93,13 +93,13 @@ export interface ListItemNode {
   attrs: { todoChecked?: null | boolean };
   type: 'listItem';
   // eslint-disable-next-line
-  content: (ParagraphNode | BulletListNode)[]
+  content: (ParagraphNode | BulletListNode)[];
 }
 
 export interface ColumnBlockNode {
   type: 'columnBlock';
   // eslint-disable-next-line
-  content: ParagraphNode[]
+  content: ParagraphNode[];
 }
 
 export interface ColumnLayoutNode {

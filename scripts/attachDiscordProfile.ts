@@ -3,14 +3,12 @@ import { User } from '@prisma/client';
 import { prisma } from 'db';
 import { DataNotFoundError } from 'lib/utilities/errors';
 
-
 /**
  * See this page for more information on how to use this script
  * https://app.charmverse.io/charmverse/page-8133628154153136
  */
 
-
-function queryDiscord ({
+function queryDiscord({
   discordId,
   discordUsername,
   discordDiscriminator
@@ -29,14 +27,13 @@ function queryDiscord ({
   });
 }
 
-async function attachDiscordToProfile ({
+async function attachDiscordToProfile({
   discordId,
   walletAddress
 }: {
-  discordId: string,
-  walletAddress: string
+  discordId: string;
+  walletAddress: string;
 }): Promise<User> {
-
   const targetUser = await prisma.user.findFirst({
     where: {
       wallets: {
@@ -65,7 +62,6 @@ async function attachDiscordToProfile ({
   });
 
   return targetUser as User;
-
 }
 
 /**

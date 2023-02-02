@@ -12,29 +12,34 @@ export function useUpdateProfileAvatar() {
   const [isSaving, setIsSaving] = useState(false);
   const { showMessage } = useSnackbar();
 
-  const updateProfileAvatar = useCallback(async (avatar: string | UserAvatar) => {
-    const updatedAvatar = isAvatarObject(avatar)
-      ? avatar
-      : {
-          avatar,
-          avatarContract: null,
-          avatarChain: null,
-          avatarTokenId: null
-        };
+  const updateProfileAvatar = useCallback(
+    async (avatar: string | UserAvatar) => {
+      const updatedAvatar = isAvatarObject(avatar)
+        ? avatar
+        : {
+            avatar,
+            avatarContract: null,
+            avatarChain: null,
+            avatarTokenId: null
+          };
 
-    setIsSaving(true);
-    try {
-      const updatedUser = await charmClient.profile.setAvatar(updatedAvatar);
-      setUser(updatedUser);
-
-      return updatedUser;
-    } catch (e) {
-      showMessage('Failed to update avatar. Please try again.', 'error');
-      return user;
-    } finally {
-      setIsSaving(false);
-    }
-  }, []);
+      setIsSaving(true);
+      try {
+        setUser({ ...user, avatar: updatedAvatar.avatar });
+        const updatedUser = await charmClient.profile.setAvatar(updatedAvatar);
+        setUser(updatedUser);
+        return updatedUser;
+      } catch (e) {
+        const message = (e as Error).message || 'Please try again.';
+        showMessage(`Failed to update avatar: ${message}`, 'error');
+        setUser({ ...user });
+        return user;
+      } finally {
+        setIsSaving(false);
+      }
+    },
+    [user]
+  );
 
   return { updateProfileAvatar, isSaving };
 }

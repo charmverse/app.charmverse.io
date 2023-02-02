@@ -1,10 +1,8 @@
-
-name: "Build Docker Image"
+name: 'Build Docker Image'
 
 runs:
   using: 'composite'
   steps:
-
     - name: Remove dev dependencies
       shell: bash
       run: |
@@ -31,6 +29,6 @@ runs:
       with:
         context: .
         push: true
-        tags: "${{ env.REGISTRY }}/${{ env.REPO }}:${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}"
+        tags: '${{ env.REGISTRY }}/${{ env.REPO }}:${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}'
         cache-from: type=gha
         cache-to: type=gha,mode=max

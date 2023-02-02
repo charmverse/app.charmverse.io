@@ -1,0 +1,35 @@
+name: 'Deploy serverless to staging'
+
+on:
+  pull_request:
+    types: [labeled, opened, synchronize]
+    paths:
+      # Trigger the job only when the serverless config or files have been changed
+      - serverless/**
+      - serverless.yml
+
+jobs:
+  deploy:
+    if: |
+      (github.event.action == 'labeled' && github.event.label.name == ':rocket: serverless') ||
+      (github.event.action != 'labeled' && contains(github.event.pull_request.labels.*.name, ':rocket: serverless'))
+    name: deploy
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: 18
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+      - run: npm ci
+      - name: serverless deploy
+        uses: serverless/github-action@v3.1
+        with:
+          args: deploy
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: us-east-1

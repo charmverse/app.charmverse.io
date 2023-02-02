@@ -52,7 +52,6 @@ html {
   }
 
   #focalboard-app {
-
     button {
       &.style--none {
         background: transparent;
@@ -97,8 +96,8 @@ html {
   /* Icons */
 
   .octo-icon {
-    font-family: "Apple Color Emoji", "Segoe UI Emoji", NotoColorEmoji,
-      "Noto Color Emoji", "Segoe UI Symbol", "Android Emoji", EmojiSymbols;
+    font-family: 'Apple Color Emoji', 'Segoe UI Emoji', NotoColorEmoji, 'Noto Color Emoji', 'Segoe UI Symbol',
+      'Android Emoji', EmojiSymbols;
     line-height: 1.2;
     align-self: baseline;
     overflow: visible;
@@ -149,11 +148,11 @@ html {
     color: rgba(var(--center-channel-color-rgb), 0.4);
   }
 
-  [contentEditable="true"] {
+  [contentEditable='true'] {
     user-select: text;
   }
 
-  [contentEditable="true"]:empty::before {
+  [contentEditable='true']:empty::before {
     content: attr(placeholder);
     display: block;
     color: rgba(var(--center-channel-color-rgb), 0.4);
@@ -162,18 +161,15 @@ html {
   .octo-propertyvalue.Editable.active,
   .octo-table-cell .Editable.active {
     border-radius: 3px;
-    box-shadow: rgba(15, 15, 15, 0.05) 0 0 0 1px,
-      rgba(15, 15, 15, 0.1) 0 3px 6px, rgba(15, 15, 15, 0.2) 0 9px 24px;
+    box-shadow: rgba(15, 15, 15, 0.05) 0 0 0 1px, rgba(15, 15, 15, 0.1) 0 3px 6px, rgba(15, 15, 15, 0.2) 0 9px 24px;
   }
 
   .octo-content {
     width: 100%;
   }
-
 }
 
 .CalendarContainer {
-
   /* fullcalendar */
   --fc-border-color: var(--bg-gray);
   --fc-today-bg-color: rgba(var(--button-bg-rgb), 0.08);
@@ -201,7 +197,7 @@ html {
 
   // brighten the "Add event" button in dark mode
   .CalendarContainer .fc-day .dateContainer .addEvent {
-    color: rgba(var(--center-channel-color-rgb), .8);
+    color: rgba(var(--center-channel-color-rgb), 0.8);
   }
 
   td,
@@ -213,5 +209,4 @@ html {
   .fc .fc-toolbar-title {
     font-size: 1em;
   }
-
 }

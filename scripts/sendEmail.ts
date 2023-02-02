@@ -1,4 +1,3 @@
-
 import { sendEmail } from 'lib/mailer';
 import log from 'lib/log';
 
@@ -7,7 +6,6 @@ import log from 'lib/log';
  * https://app.charmverse.io/charmverse/page-2517846892483364
  */
 (async () => {
-
   const r = await sendEmail({
     html: 'This is a test email',
     subject: 'Test Email',
@@ -18,5 +16,4 @@ import log from 'lib/log';
   });
 
   log.info('Sent email', r);
-
 })();

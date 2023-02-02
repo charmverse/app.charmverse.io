@@ -8,11 +8,10 @@ const name = '';
 const token = ''; // set this to create a specific token
 
 (async () => {
-    if (!name) {
-      throw 'Please provide a name for the key';
-    }
+  if (!name) {
+    throw 'Please provide a name for the key';
+  }
 
-    const key = await provisionSuperApiKey(name, token);
-    console.log('Super api key provisioned:', key);
-
+  const key = await provisionSuperApiKey(name, token);
+  console.log('Super api key provisioned:', key);
 })();

@@ -14,7 +14,6 @@
   margin-top: 0.45rem;
 }
 
-
 .bangle-editor {
   border: none;
   outline: none;
@@ -38,7 +37,6 @@
   position: relative;
   background-color: var(--background-default);
 }
-
 
 /* Prevent iframes from stealing drag events - https://github.com/react-grid-layout/react-draggable/issues/613 */
 .react-draggable-transparent-selection iframe {
@@ -65,7 +63,7 @@
 .ProseMirror .selectedCell:after {
   z-index: 2;
   position: absolute;
-  content: "";
+  content: '';
   left: 0;
   right: 0;
   top: 0;
@@ -122,7 +120,7 @@
   white-space: break-spaces;
   -webkit-font-variant-ligatures: none;
   font-variant-ligatures: none;
-  font-feature-settings: "liga" 0;
+  font-feature-settings: 'liga' 0;
   /* the above doesn't seem to work in Edge */
 }
 
@@ -309,7 +307,7 @@ ol li {
 }
 
 .bangle-editor li.ProseMirror-selectednode:after {
-  content: "";
+  content: '';
   position: absolute;
   left: -32px;
   right: -2px;
@@ -367,8 +365,7 @@ ol li {
 }
 
 .bangle-editor p > code {
-  font-family: Menlo, Monaco, Consolas, "Liberation Mono", "Courier New",
-    monospace;
+  font-family: Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
   padding: 0.2em 0.4em;
   margin: 0 0.1em;
   font-size: 85%;
@@ -399,7 +396,7 @@ details {
   padding-left: 20px;
 
   &[open] > summary::before {
-    content: "▼";
+    content: '▼';
     transform: rotate(0);
     top: 6px;
   }
@@ -411,7 +408,7 @@ details {
     margin-left: -20px;
 
     &::before {
-      content: "▼";
+      content: '▼';
       cursor: pointer;
       transform: rotate(-90deg);
       position: relative;
@@ -449,7 +446,7 @@ details {
 }
 
 .ProseMirror-gapcursor:after {
-  content: "";
+  content: '';
   display: block;
   position: absolute;
   top: -2px;

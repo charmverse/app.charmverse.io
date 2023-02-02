@@ -1,12 +1,11 @@
-
 import { getAccessiblePages, includePagePermissionsMeta } from 'lib/pages/server';
-import { prisma } from 'db'
+import { prisma } from 'db';
 
 /**
  * Use this script to perform database searches.
  */
 
-async function search () {
+async function search() {
   const user = await prisma.user.findFirst({
     where: {
       spaceRoles: {
@@ -25,10 +24,13 @@ async function search () {
     meta: false,
     search: 'forum',
     spaceId: 'bc9e8464-4166-4f7c-8a14-bb293cc30d2a',
-    userId: user.id,
-  }).then(record => {
+    userId: user.id
+  }).then((record) => {
     // eslint-disable-next-line no-console
-    console.log( record.length, record.slice(0, 10).map(r => r.title));
+    console.log(
+      record.length,
+      record.slice(0, 10).map((r) => r.title)
+    );
   });
 }
 
