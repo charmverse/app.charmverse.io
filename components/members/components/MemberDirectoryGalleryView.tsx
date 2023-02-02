@@ -9,7 +9,7 @@ import Avatar from 'components/common/Avatar';
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
 import { SelectPreview } from 'components/common/form/fields/Select/SelectPreview';
 import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
-import { MemberMiniProfile } from 'components/profile/components/MiniProfile/MemberMiniProfile';
+import { MemberMiniProfile } from 'components/profile/components/MemberMiniProfile/MemberMiniProfile';
 import { SocialIcons } from 'components/profile/components/UserDetails/SocialIcons';
 import type { Social } from 'components/profile/interfaces';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';

@@ -1,5 +1,5 @@
 import { Link, Tooltip, Typography } from '@mui/material';
-import { Box, Stack } from '@mui/system';
+import { Stack } from '@mui/system';
 
 import Avatar from 'components/common/Avatar';
 import type { ExtendedPoap } from 'lib/blockchain/interfaces';

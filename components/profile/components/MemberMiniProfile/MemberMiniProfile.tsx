@@ -19,9 +19,9 @@ import type { Member } from 'lib/members/interfaces';
 
 import { MemberPropertiesPopup } from '../SpacesMemberDetails/components/MemberPropertiesPopup';
 
-import { NftsList } from './NftsList';
-import { OrgsList } from './OrgsList';
-import { PoapsList } from './PoapsList';
+import { NftsList } from './BlockchainData/NftsList';
+import { OrgsList } from './BlockchainData/OrgsList';
+import { PoapsList } from './BlockchainData/PoapsList';
 
 export function MemberMiniProfile({ member, onClose }: { member: Member; onClose: VoidFunction }) {
   const theme = useTheme();

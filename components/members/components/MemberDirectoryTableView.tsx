@@ -19,7 +19,7 @@ import type { SelectOptionType } from 'components/common/form/fields/Select/inte
 import { SelectPreview } from 'components/common/form/fields/Select/SelectPreview';
 import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
 import Link from 'components/common/Link';
-import { MemberMiniProfile } from 'components/profile/components/MiniProfile/MemberMiniProfile';
+import { MemberMiniProfile } from 'components/profile/components/MemberMiniProfile/MemberMiniProfile';
 import { DiscordSocialIcon } from 'components/profile/components/UserDetails/DiscordSocialIcon';
 import type { Social } from 'components/profile/interfaces';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';

@@ -1,39 +1,18 @@
-import styled from '@emotion/styled';
-import AddIcon from '@mui/icons-material/Add';
 import CancelIcon from '@mui/icons-material/Cancel';
 import { Tooltip, Typography } from '@mui/material';
-import { Box, Stack } from '@mui/system';
-import type { ProfileItem } from '@prisma/client';
+import { Stack } from '@mui/system';
 import { useState } from 'react';
 import type { KeyedMutator } from 'swr';
 
-import charmClient from 'charmClient';
 import Avatar from 'components/common/Avatar';
 import { useUser } from 'hooks/useUser';
 import type { UserCommunity } from 'lib/profile';
 
 import { OrgsGalleryPopup } from './OrgsGalleryPopup';
-import { ProfileItemContainer } from './ProfileItemContainer';
+import { NonPinnedItem, ProfileItemContainer } from './ProfileItemContainer';
+import { updateProfileItem } from './utils';
 
 const totalShownOrgs = 5;
-
-const NonPinnedBox = styled(Box)`
-  width: 54px;
-  height: 54px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  ${({ theme }) => `border: 2px solid ${theme.palette.secondary.main}`};
-  cursor: pointer;
-`;
-
-function NonPinnedOrgsBox({ onClick }: { onClick: VoidFunction }) {
-  return (
-    <NonPinnedBox onClick={onClick}>
-      <AddIcon color='secondary' />
-    </NonPinnedBox>
-  );
-}
 
 type Props = { memberId: string; orgs: UserCommunity[]; mutateOrgs?: KeyedMutator<UserCommunity[]> };
 
@@ -46,33 +25,7 @@ export function OrgsList({ mutateOrgs, memberId, orgs }: Props) {
   const readOnly = mutateOrgs === undefined;
 
   async function updateOrg(org: UserCommunity) {
-    const profileItem: Omit<ProfileItem, 'userId'> = {
-      id: org.id,
-      isHidden: org.isHidden,
-      type: 'community',
-      metadata: null,
-      isPinned: !org.isPinned
-    };
-
-    await charmClient.profile.updateProfileItem({
-      profileItems: [profileItem]
-    });
-
-    if (mutateOrgs) {
-      await mutateOrgs(
-        (cachedOrgs) => {
-          if (!cachedOrgs) {
-            return [];
-          }
-
-          return cachedOrgs.map((cachedOrg) =>
-            cachedOrg.id === org.id ? { ...cachedOrg, isPinned: !org.isPinned } : cachedOrg
-          );
-        },
-        { revalidate: false }
-      );
-    }
-
+    await updateProfileItem<UserCommunity>(org, mutateOrgs);
     setIsShowingOrgsGallery(false);
   }
 
@@ -96,7 +49,7 @@ export function OrgsList({ mutateOrgs, memberId, orgs }: Props) {
         })}
         {currentUser?.id === memberId ? (
           new Array(emptyOrgsCount).fill(0).map((_, i) => (
-            <NonPinnedOrgsBox
+            <NonPinnedItem
               onClick={() => {
                 if (!readOnly) {
                   setIsShowingOrgsGallery(true);

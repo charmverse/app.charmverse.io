@@ -1,6 +1,7 @@
 import { useTheme } from '@emotion/react';
 import SearchIcon from '@mui/icons-material/Search';
 import {
+  Box,
   Dialog,
   DialogContent,
   List,
@@ -56,33 +57,39 @@ export function OrgsGalleryPopup({
           />
         )}
         <List>
-          {filteredOrgs.map((org) => {
-            return (
-              <MenuItem sx={{ p: 1 }} key={org.id} onClick={() => onSelect(org)}>
-                <Avatar
-                  sx={{ mr: 2 }}
-                  className='hidden-on-visible'
-                  avatar={org.logo}
-                  name={org.name}
-                  variant='rounded'
-                  size='medium'
-                />
-                <ListItemText>
-                  <Typography
-                    sx={{
-                      fontSize: {
-                        sm: '1.15rem',
-                        xs: '1.05rem'
-                      }
-                    }}
-                    fontWeight={500}
-                  >
-                    {org.name}
-                  </Typography>
-                </ListItemText>
-              </MenuItem>
-            );
-          })}
+          {filteredOrgs.length === 0 ? (
+            <Box p={2} textAlign='center' flex={1}>
+              <Typography>No organizations found</Typography>
+            </Box>
+          ) : (
+            filteredOrgs.map((org) => {
+              return (
+                <MenuItem sx={{ p: 1 }} key={org.id} onClick={() => onSelect(org)}>
+                  <Avatar
+                    sx={{ mr: 2 }}
+                    className='hidden-on-visible'
+                    avatar={org.logo}
+                    name={org.name}
+                    variant='rounded'
+                    size='medium'
+                  />
+                  <ListItemText>
+                    <Typography
+                      sx={{
+                        fontSize: {
+                          sm: '1.15rem',
+                          xs: '1.05rem'
+                        }
+                      }}
+                      fontWeight={500}
+                    >
+                      {org.name}
+                    </Typography>
+                  </ListItemText>
+                </MenuItem>
+              );
+            })
+          )}
         </List>
       </DialogContent>
     </Dialog>
