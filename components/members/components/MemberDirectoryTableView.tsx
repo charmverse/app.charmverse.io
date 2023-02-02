@@ -19,17 +19,16 @@ import type { SelectOptionType } from 'components/common/form/fields/Select/inte
 import { SelectPreview } from 'components/common/form/fields/Select/SelectPreview';
 import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
 import Link from 'components/common/Link';
+import { MemberMiniProfile } from 'components/profile/components/MiniProfile/MemberMiniProfile';
 import { DiscordSocialIcon } from 'components/profile/components/UserDetails/DiscordSocialIcon';
 import type { Social } from 'components/profile/interfaces';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMemberProperties } from 'hooks/useMemberProperties';
-import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
 import type { Member } from 'lib/members/interfaces';
 import { humanFriendlyDate } from 'lib/utilities/dates';
 
 import { MemberPropertyTextMultiline } from './MemberDirectoryProperties/MemberPropertyTextMultiline';
-import { MemberOnboardingForm } from './MemberOnboardingForm';
 import { TimezoneDisplay } from './TimezoneDisplay';
 
 const StyledTableCell = styled(TableCell)`
@@ -48,7 +47,6 @@ function MemberDirectoryTableRow({ member }: { member: Member }) {
   const { user } = useUser();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { properties = [] } = useMemberProperties();
-  const { mutateMembers } = useMembers();
   const visibleProperties = properties.filter((property) => property.enabledViews.includes('table'));
 
   if (visibleProperties.length === 0) {
@@ -244,15 +242,11 @@ function MemberDirectoryTableRow({ member }: { member: Member }) {
       })}
 
       {isModalOpen && user && currentSpace && user.id === member.id && (
-        <MemberOnboardingForm
-          userId={member.id}
-          spaceName={currentSpace.name}
-          spaceId={currentSpace.id}
+        <MemberMiniProfile
           onClose={() => {
-            mutateMembers();
             setIsModalOpen(false);
           }}
-          title='Edit your profile'
+          member={member}
         />
       )}
     </StyledTableRow>

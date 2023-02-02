@@ -41,15 +41,17 @@ const NftContainer = styled(Box)`
 
   &:hover .icons {
     opacity: 1;
+    transition: opacity 150ms ease-in-out;
   }
 
   & .icons {
     position: absolute;
     opacity: 0;
     z-index: 1;
-    right: 0;
+    right: -10px;
     top: -5px;
     cursor: pointer;
+    transition: opacity 150ms ease-in-out;
   }
 `;
 
@@ -105,7 +107,7 @@ export function NftsList({ mutateNfts, memberId, nfts }: Props) {
                 <CancelIcon color='error' fontSize='small' className='icons' onClick={() => updateNft(nft)} />
               )}
               <Link href={nftData.link} target='_blank' display='flex'>
-                <Avatar size='large' avatar={nftData.image} />
+                <Avatar size='large' isNft avatar={nftData.image} />
               </Link>
             </NftContainer>
           );
