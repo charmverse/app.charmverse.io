@@ -16,6 +16,7 @@ const sqs = new SQS({
 export async function addMessageToSQS(queueUrl: string, stringifiedBody: string) {
   await sqs.sendMessage({
     QueueUrl: queueUrl,
-    MessageBody: stringifiedBody
+    MessageBody: stringifiedBody,
+    MessageGroupId: 'webhook-message'
   });
 }

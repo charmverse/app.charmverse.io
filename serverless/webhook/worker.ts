@@ -27,6 +27,8 @@ export const webhookWorker = async (event: SQSEvent): Promise<SQSBatchResponse> 
   // Store failed messageIDs
   const batchItemFailures: SQSBatchItemFailure[] = [];
 
+  log.debug('Webhook worker initiated');
+
   // Execute messages
   await Promise.allSettled(
     event.Records.map(async (record: SQSRecord) => {
@@ -47,6 +49,8 @@ export const webhookWorker = async (event: SQSEvent): Promise<SQSBatchResponse> 
             Signature: signedJWT
           }
         });
+
+        log.debug('Webhook call response', response);
 
         // If not 200 back, we throw an error
         if (response.status !== 200) {
