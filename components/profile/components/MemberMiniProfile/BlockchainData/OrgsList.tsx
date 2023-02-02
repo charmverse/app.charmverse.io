@@ -25,7 +25,7 @@ export function OrgsList({ mutateOrgs, memberId, orgs }: Props) {
   const readOnly = mutateOrgs === undefined;
 
   async function updateOrg(org: UserCommunity) {
-    await updateProfileItem<UserCommunity>(org, mutateOrgs);
+    await updateProfileItem<UserCommunity>(org, 'community', mutateOrgs);
     setIsShowingOrgsGallery(false);
   }
 

@@ -5,12 +5,13 @@ import charmClient from 'charmClient';
 
 export async function updateProfileItem<Data extends { id: string; isPinned: boolean; isHidden: boolean }>(
   data: Data,
+  type: ProfileItem['type'],
   mutate?: KeyedMutator<Data[]>
 ) {
   const profileItem: Omit<ProfileItem, 'userId'> = {
     id: data.id,
     isHidden: data.isHidden,
-    type: 'nft',
+    type,
     metadata: null,
     isPinned: !data.isPinned
   };

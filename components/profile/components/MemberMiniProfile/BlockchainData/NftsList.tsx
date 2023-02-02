@@ -26,7 +26,7 @@ export function NftsList({ mutateNfts, memberId, nfts }: Props) {
   const readOnly = mutateNfts === undefined;
 
   async function updateNft(nft: NftData) {
-    await updateProfileItem<NftData>(nft, mutateNfts);
+    await updateProfileItem<NftData>(nft, 'nft', mutateNfts);
     setIsShowingNftGallery(false);
   }
 

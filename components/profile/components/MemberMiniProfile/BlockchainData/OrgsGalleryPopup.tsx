@@ -59,7 +59,7 @@ export function OrgsGalleryPopup({
         <List>
           {filteredOrgs.length === 0 ? (
             <Box p={2} textAlign='center' flex={1}>
-              <Typography>No organizations found</Typography>
+              <Typography>The organization you are looking for couldn't be found.</Typography>
             </Box>
           ) : (
             filteredOrgs.map((org) => {
