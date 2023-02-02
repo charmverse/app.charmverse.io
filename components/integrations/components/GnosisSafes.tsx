@@ -27,6 +27,7 @@ import Link from 'components/common/Link';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import Legend from 'components/settings/Legend';
 import useMultiWalletSigs from 'hooks/useMultiWalletSigs';
+import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useUser } from 'hooks/useUser';
 import useGnosisSigner from 'hooks/useWeb3Signer';
 import { importSafesFromWallet } from 'lib/gnosis/gnosis.importSafes';
@@ -54,6 +55,9 @@ export default function GnosisSafesList() {
   const gnosisSigner = useGnosisSigner();
   const { user } = useUser();
   const [isLoadingSafes, setIsLoadingSafes] = useState(false);
+
+  const { setActivePath } = useSettingsDialog();
+  const openSettingsModal = () => setActivePath('notifications');
 
   async function importSafes() {
     if (gnosisSigner && user) {
@@ -84,7 +88,10 @@ export default function GnosisSafesList() {
 
   return (
     <>
-      <Legend sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <Legend
+        sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+        marginTop={(theme) => theme.spacing(4)}
+      >
         <Box component='span' display='flex' alignItems='center' gap={1}>
           <KeyIcon fontSize='large' /> Multisig
         </Box>
@@ -97,7 +104,12 @@ export default function GnosisSafesList() {
       </Legend>
 
       {sortedSafes.length === 0 && (
-        <GnosisConnectCard connectable={!!gnosisSigner} loading={isLoadingSafes} onClick={importSafes} />
+        <GnosisConnectCard
+          connectable={!!gnosisSigner}
+          loading={isLoadingSafes}
+          onClick={importSafes}
+          openNotificationsTab={openSettingsModal}
+        />
       )}
 
       {sortedSafes.length > 0 && (
@@ -124,11 +136,13 @@ export default function GnosisSafesList() {
 export function GnosisConnectCard({
   loading,
   onClick,
-  connectable
+  connectable,
+  openNotificationsTab
 }: {
   loading: boolean;
   onClick: () => void;
   connectable: boolean;
+  openNotificationsTab: () => void;
 }) {
   const router = useRouter();
   const isTasksPage = router.pathname.includes('/tasks');
@@ -141,7 +155,10 @@ export function GnosisConnectCard({
           {!isTasksPage && (
             <>
               {' '}
-              under <Link href='/nexus'>My Tasks</Link>
+              under{' '}
+              <Button variant='text' onClick={openNotificationsTab}>
+                My Tasks
+              </Button>
             </>
           )}
         </Typography>

@@ -14,16 +14,20 @@ import NotFavoritedIcon from '@mui/icons-material/StarBorder';
 import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
 import UndoIcon from '@mui/icons-material/Undo';
 import SunIcon from '@mui/icons-material/WbSunny';
-import { Divider, FormControlLabel, Stack, Switch, Typography, useMediaQuery } from '@mui/material';
 import Box from '@mui/material/Box';
+import Divider from '@mui/material/Divider';
+import FormControlLabel from '@mui/material/FormControlLabel';
 import IconButton from '@mui/material/IconButton';
 import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import Popover from '@mui/material/Popover';
+import Stack from '@mui/material/Stack';
+import Switch from '@mui/material/Switch';
 import Toolbar from '@mui/material/Toolbar';
 import Tooltip from '@mui/material/Tooltip';
-import NextLink from 'next/link';
+import Typography from '@mui/material/Typography';
+import useMediaQuery from '@mui/material/useMediaQuery';
 import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
 import { useMemo, useRef, useState } from 'react';
@@ -36,6 +40,7 @@ import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { useMembers } from 'hooks/useMembers';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { usePages } from 'hooks/usePages';
+import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useToggleFavorite } from 'hooks/useToggleFavorite';
 import { useUser } from 'hooks/useUser';
@@ -86,6 +91,7 @@ export default function Header({ open, openSidebar }: HeaderProps) {
   const [userSpacePermissions] = useCurrentSpacePermissions();
   const pagePermissions = basePage ? getPagePermissions(basePage.id) : null;
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('lg'));
+  const { onClick: clickToOpenSettingsModal, onTouchStart: touchStartToOpenSettingsModal } = useSettingsDialog();
 
   const pageType = basePage?.type;
   const isExportablePage =
@@ -301,7 +307,7 @@ export default function Header({ open, openSidebar }: HeaderProps) {
           <ListItemButton
             disabled={!isExportablePage}
             onClick={() => {
-              exportMarkdown().catch((err) => {
+              exportMarkdown().catch(() => {
                 showMessage('Error exporting markdown', 'error');
               });
               setPageMenuOpen(false);
@@ -438,7 +444,12 @@ export default function Header({ open, openSidebar }: HeaderProps) {
           {user && (
             <>
               <NotificationsBadge>
-                <IconButton size='small' sx={{ mx: 1 }} LinkComponent={NextLink} href='/nexus' color='inherit'>
+                <IconButton
+                  size='small'
+                  sx={{ mx: 1 }}
+                  onClick={(e) => clickToOpenSettingsModal(e, 'notifications')}
+                  onTouchStart={(e) => touchStartToOpenSettingsModal(e, 'notifications')}
+                >
                   <NotificationsIcon fontSize='small' color='secondary' />
                 </IconButton>
               </NotificationsBadge>

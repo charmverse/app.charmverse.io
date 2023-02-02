@@ -6,7 +6,7 @@ export type PageEvent = BaseEvent & {
   pageId: string;
 };
 
-type CustomPageType = 'settings' | 'proposals_list' | 'bounties_list' | 'nexus' | 'profile' | 'integrations';
+type CustomPageType = 'settings' | 'proposals_list' | 'bounties_list' | 'profile' | 'integrations';
 
 type CustomPageViewEvent = BaseEventWithoutGroup & {
   pageId?: string;

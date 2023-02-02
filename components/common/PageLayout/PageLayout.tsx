@@ -16,6 +16,7 @@ import { useLocalStorage } from 'hooks/useLocalStorage';
 import { useMobileSidebar } from 'hooks/useMobileSidebar';
 import { PageActionDisplayProvider } from 'hooks/usePageActionDisplay';
 import { useResize } from 'hooks/useResize';
+import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useSharedPage } from 'hooks/useSharedPage';
 import { ThreadsProvider } from 'hooks/useThreads';
 import { useUser } from 'hooks/useUser';
@@ -132,21 +133,16 @@ const DraggableHandle = styled.div<{ isActive?: boolean; disabled?: boolean }>`
 
 interface PageLayoutProps {
   children: React.ReactNode;
-  sidebar?: (p: { closeSidebar: () => void }) => JSX.Element;
-  sidebarWidth?: number;
 }
 
-function PageLayout({ sidebarWidth = 300, children, sidebar: SidebarOverride }: PageLayoutProps) {
+function PageLayout({ children }: PageLayoutProps) {
   const { width } = useWindowSize();
   const isMobileSidebar = useMobileSidebar();
 
-  let mobileSidebarWidth = width ? Math.min(width * 0.85, MAX_SIDEBAR_WIDTH) : sidebarWidth;
-  if (SidebarOverride) {
-    mobileSidebarWidth = sidebarWidth;
-  }
+  const mobileSidebarWidth = width ? Math.min(width * 0.85, MAX_SIDEBAR_WIDTH) : 0;
 
   const [storageOpen, setStorageOpen] = useLocalStorage('leftSidebar', !isMobileSidebar);
-  const [sidebarStorageWidth, setSidebarStorageWidth] = useLocalStorage('leftSidebarWidth', sidebarWidth);
+  const [sidebarStorageWidth, setSidebarStorageWidth] = useLocalStorage('leftSidebarWidth', 300);
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const {
@@ -181,8 +177,8 @@ function PageLayout({ sidebarWidth = 300, children, sidebar: SidebarOverride }: 
 
   const drawerContent = useMemo(
     () =>
-      SidebarOverride ? (
-        <SidebarOverride closeSidebar={handleDrawerClose} />
+      !user ? (
+        <div></div>
       ) : (
         <Sidebar
           closeSidebar={handleDrawerClose}
@@ -190,7 +186,7 @@ function PageLayout({ sidebarWidth = 300, children, sidebar: SidebarOverride }: 
           navAction={isMobileSidebar ? handleDrawerClose : undefined}
         />
       ),
-    [handleDrawerClose, user?.favorites, isMobileSidebar]
+    [handleDrawerClose, user?.favorites, !!user, isMobileSidebar]
   );
 
   if (!accessChecked) {
@@ -220,7 +216,7 @@ function PageLayout({ sidebarWidth = 300, children, sidebar: SidebarOverride }: 
                     <>
                       <AppBar
                         open={open}
-                        sidebarWidth={isMobileSidebar ? 0 : resizableSidebarWidth || sidebarWidth}
+                        sidebarWidth={isMobileSidebar || !user ? 0 : resizableSidebarWidth}
                         position='fixed'
                       >
                         <Header open={open} openSidebar={handleDrawerOpen} />
@@ -239,22 +235,13 @@ function PageLayout({ sidebarWidth = 300, children, sidebar: SidebarOverride }: 
                           </Box>
                         </MuiDrawer>
                       ) : (
-                        <Drawer
-                          sidebarWidth={SidebarOverride ? sidebarWidth : resizableSidebarWidth || sidebarWidth}
-                          open={open}
-                          variant='permanent'
-                        >
+                        <Drawer sidebarWidth={!user ? 0 : resizableSidebarWidth} open={open} variant='permanent'>
                           {drawerContent}
-
-                          <Tooltip
-                            title={!!SidebarOverride || isResizing ? '' : 'Drag to resize'}
-                            placement='right'
-                            followCursor
-                          >
+                          <Tooltip title={!user || isResizing ? '' : 'Drag to resize'} placement='right' followCursor>
                             <DraggableHandle
                               onMouseDown={(e) => enableResize(e)}
                               isActive={isResizing}
-                              disabled={!!SidebarOverride}
+                              disabled={!user}
                             />
                           </Tooltip>
                         </Drawer>

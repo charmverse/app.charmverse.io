@@ -7,7 +7,6 @@ export const DOMAIN_BLACKLIST = [
   'login',
   'images',
   'join',
-  'nexus',
   'profile',
   'share',
   'signup',

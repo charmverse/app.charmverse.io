@@ -7,6 +7,7 @@ import type { KeyedMutator } from 'swr';
 import charmClient from 'charmClient';
 import LoadingComponent from 'components/common/LoadingComponent';
 import useMultiWalletSigs from 'hooks/useMultiWalletSigs';
+import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import useGnosisSigner from 'hooks/useWeb3Signer';
@@ -31,6 +32,8 @@ export function GnosisTasksList({ error, mutateTasks, tasks }: GnosisTasksSectio
   const { user } = useUser();
   const gnosisSigner = useGnosisSigner();
   const isSnoozed = snoozedForDate !== null;
+  const { setActivePath } = useSettingsDialog();
+  const openSettingsModal = () => setActivePath('notifications');
 
   const isLoadingSafeTasks = !safeData || !tasks;
 
@@ -104,7 +107,12 @@ export function GnosisTasksList({ error, mutateTasks, tasks }: GnosisTasksSectio
   return (
     <>
       {safeData.length === 0 && (
-        <GnosisConnectCard connectable={!!gnosisSigner} loading={isRefreshingSafes} onClick={importSafes} />
+        <GnosisConnectCard
+          connectable={!!gnosisSigner}
+          loading={isRefreshingSafes}
+          onClick={importSafes}
+          openNotificationsTab={openSettingsModal}
+        />
       )}
       {safeData.map((safe) => {
         const safeTasks = tasks

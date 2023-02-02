@@ -1,9 +1,11 @@
 import { Box, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
+import type { Space } from '@prisma/client';
 import { bindMenu, usePopupState } from 'material-ui-popup-state/hooks';
 import { useState } from 'react';
 
 import charmClient from 'charmClient';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
+import useIsAdmin from 'hooks/useIsAdmin';
 import { useMembers } from 'hooks/useMembers';
 import type { Member } from 'lib/members/interfaces';
 
@@ -12,13 +14,9 @@ import Legend from '../Legend';
 import type { RoleAction } from './MemberListItem';
 import MemberListItem from './MemberListItem';
 
-interface Props {
-  isAdmin: boolean;
-  spaceId: string;
-  spaceOwner: string;
-}
-
-export default function MemberList({ isAdmin, spaceId, spaceOwner }: Props) {
+export default function MemberSettings({ space }: { space: Space }) {
+  const isAdmin = useIsAdmin();
+  const { id: spaceId, createdBy: spaceOwner } = space;
   const popupState = usePopupState({ variant: 'popover', popupId: 'member-list' });
   const { members, mutateMembers } = useMembers();
   const [removedMemberId, setRemovedMemberId] = useState<string | null>(null);

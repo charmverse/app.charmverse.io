@@ -41,7 +41,8 @@ const StyledDivider = styled(Divider)`
   height: 36px;
 `;
 
-export const isPublicUser = (user: PublicUser | LoggedInUser): user is PublicUser => user.hasOwnProperty('profile');
+export const isPublicUser = (user: PublicUser | LoggedInUser | undefined): user is PublicUser =>
+  !!user && user.hasOwnProperty('profile');
 
 export interface UserDetailsProps {
   readOnly?: boolean;

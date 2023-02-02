@@ -7,7 +7,8 @@ import useSWR from 'swr';
 import charmClient from 'charmClient';
 import ErrorPage from 'components/common/errors/ErrorPage';
 import LoadingComponent from 'components/common/LoadingComponent';
-import PageLayout from 'components/nexus/components/NexusLayout';
+import { CenteredPageContent } from 'components/common/PageLayout/components/PageContent';
+import PageLayout from 'components/common/PageLayout/PageLayout';
 import PublicProfile from 'components/profile/PublicProfile';
 import { usePageTitle } from 'hooks/usePageTitle';
 
@@ -21,10 +22,8 @@ export default function UserProfilePage() {
   const [, setPageTitle] = usePageTitle();
 
   useEffect(() => {
-    let pageTitle = '';
-    if (user) {
-      pageTitle = user.username || '';
-    }
+    const pageTitle = user?.username || '';
+
     setPageTitle(pageTitle);
   }, [user]);
 
@@ -42,5 +41,9 @@ export default function UserProfilePage() {
 }
 
 UserProfilePage.getLayout = (page: ReactElement) => {
-  return <PageLayout>{page}</PageLayout>;
+  return (
+    <PageLayout>
+      <CenteredPageContent>{page}</CenteredPageContent>
+    </PageLayout>
+  );
 };

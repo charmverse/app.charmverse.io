@@ -14,7 +14,6 @@ import Typography from '@mui/material/Typography';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { bindTrigger, bindMenu } from 'material-ui-popup-state';
 import { usePopupState } from 'material-ui-popup-state/hooks';
-import NextLink from 'next/link';
 import { useCallback, useState } from 'react';
 
 import { CreateSpaceForm } from 'components/common/CreateSpaceForm';
@@ -62,16 +61,18 @@ const SidebarHeader = styled(Box)(
 
 export default function SidebarSubmenu({
   closeSidebar,
-  logoutCurrentUser
+  logoutCurrentUser,
+  openProfileModal
 }: {
   closeSidebar: () => void;
   logoutCurrentUser: () => void;
+  openProfileModal: () => void;
 }) {
   const theme = useTheme();
   const showMobileFullWidthModal = !useMediaQuery(theme.breakpoints.down('sm'));
 
   const currentSpace = useCurrentSpace();
-  const { spaces, createNewSpace, isCreatingSpace, setSpaces, isLoaded } = useSpaces();
+  const { spaces, isCreatingSpace, setSpaces, isLoaded } = useSpaces();
   const [spaceFormOpen, setSpaceFormOpen] = useState(false);
   const { user } = useUser();
   const { handleUserUpdate, isSaving } = useUserDetails({
@@ -112,15 +113,14 @@ export default function SidebarSubmenu({
         fullWidth
         {...bindTrigger(menuPopupState)}
       >
-        <WorkspaceAvatar name={currentSpace?.name ?? ''} image={currentSpace?.spaceImage ?? null} />
+        <WorkspaceAvatar name={currentSpace?.name ?? 'Select a space'} image={currentSpace?.spaceImage ?? null} />
         <Typography variant='body1' data-test='sidebar-space-name' noWrap ml={1}>
-          {currentSpace?.name}
+          {currentSpace?.name ?? 'Spaces'}
         </Typography>
       </StyledButton>
       <Menu onClick={menuPopupState.close} {...bindMenu(menuPopupState)} sx={{ maxWidth: '330px' }}>
         <MenuItem
-          component={NextLink}
-          href='/nexus'
+          onClick={openProfileModal}
           sx={{
             display: 'grid',
             gridTemplateColumns: 'auto 1fr',

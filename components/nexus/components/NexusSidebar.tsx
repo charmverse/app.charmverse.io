@@ -3,7 +3,6 @@ import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import { Box, IconButton } from '@mui/material';
 
 import { headerHeight } from 'components/common/PageLayout/components/Header';
-import Workspaces from 'components/common/PageLayout/components/Sidebar/Workspaces';
 
 const SidebarContainer = styled.div`
   display: flex;
@@ -47,9 +46,6 @@ export default function Sidebar({ closeSidebar }: SidebarProps) {
         <IconButton onClick={closeSidebar} size='small'>
           <ChevronLeftIcon />
         </IconButton>
-      </Box>
-      <Box flexGrow={1}>
-        <Workspaces />
       </Box>
     </SidebarContainer>
   );

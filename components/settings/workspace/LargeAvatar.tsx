@@ -33,7 +33,6 @@ function StyledIconButton({
   children: ReactNode;
   key: string;
   onClick: (e: React.MouseEvent<HTMLElement>) => void;
-  alwaysShow?: boolean;
 }) {
   return (
     <IconButton
@@ -118,10 +117,10 @@ export default function LargeAvatar(props: LargeAvatarProps) {
   }
 
   const icons = getIcons(
-    <StyledIconButton alwaysShow={props.alwaysShowEdit} key='edit-avatar' onClick={onEditClick}>
+    <StyledIconButton key='edit-avatar' onClick={onEditClick}>
       <EditIcon ref={editIconRef} fontSize='small' />
     </StyledIconButton>,
-    <StyledIconButton alwaysShow={props.alwaysShowEdit} key='delete-avatar' onClick={() => updateImageAvatar('')}>
+    <StyledIconButton key='delete-avatar' onClick={() => updateImageAvatar('')}>
       <DeleteOutlinedIcon fontSize='small' />
     </StyledIconButton>,
     image

@@ -1,5 +1,3 @@
-import type { Theme } from '@emotion/react';
-import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
@@ -18,14 +16,16 @@ import type { BoxProps } from '@mui/system';
 import type { Page } from '@prisma/client';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
+import type { MouseEvent, TouchEvent } from 'react';
 import { useCallback, useMemo, useState } from 'react';
 
-import Link from 'components/common/Link';
+import SettingsDialog from 'components/common/Modal/SettingsDialog';
 import { charmverseDiscordInvite } from 'config/constants';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import useKeydownPress from 'hooks/useKeydownPress';
 import { useMobileSidebar } from 'hooks/useMobileSidebar';
+import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useUser } from 'hooks/useUser';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import type { NewPageInput } from 'lib/pages';
@@ -37,6 +37,7 @@ import PageNavigation from '../PageNavigation';
 import SearchInWorkspaceModal from '../SearchInWorkspaceModal';
 import TrashModal from '../TrashModal';
 
+import { sidebarItemStyles, SidebarLink } from './SidebarBtn';
 import SidebarSubmenu from './SidebarSubmenu';
 
 const WorkspaceLabel = styled.div`
@@ -95,31 +96,6 @@ const SidebarContainer = styled.div`
   }
 `;
 
-const sidebarItemStyles = ({ theme }: { theme: Theme }) => css`
-  padding-left: ${theme.spacing(2)};
-  padding-right: ${theme.spacing(2)};
-  align-items: center;
-  color: ${theme.palette.secondary.main};
-  display: flex;
-  font-size: 14px;
-  font-weight: 500;
-  padding-top: 4px;
-  padding-bottom: 4px;
-  &:hover {
-    background-color: ${theme.palette.action.hover};
-    color: inherit;
-  }
-  svg {
-    font-size: 1.2em;
-    margin-right: ${theme.spacing(1)};
-  }
-  ${theme.breakpoints.down('md')} {
-    min-height: 38px;
-    font-size: 16px;
-    line-height: 26px;
-  }
-`;
-
 const SectionName = styled(Typography)`
   padding-left: ${({ theme }) => theme.spacing(2)};
   padding-right: ${({ theme }) => theme.spacing(2)};
@@ -127,17 +103,6 @@ const SectionName = styled(Typography)`
   font-size: 11.5px;
   font-weight: 600;
   letter-spacing: 0.03em;
-`;
-
-const StyledSidebarLink = styled(Link, { shouldForwardProp: (prop) => prop !== 'active' })<{ active: boolean }>`
-  ${sidebarItemStyles}
-  ${({ active, theme }) =>
-    active
-      ? `
-    background-color: ${theme.palette.action.selected};
-    color: ${theme.palette.text.primary};
-  `
-      : ''}
 `;
 
 const StyledSidebarBox = styled(Box)`
@@ -152,29 +117,6 @@ const ScrollingContainer = styled.div<{ isScrolled: boolean }>`
   border-top: 1px solid transparent;
   ${({ isScrolled, theme }) => (isScrolled ? `border-top: 1px solid ${theme.palette.divider}` : '')};
 `;
-
-function SidebarLink({
-  active,
-  href,
-  icon,
-  label,
-  target,
-  onClick
-}: {
-  active: boolean;
-  href: string;
-  icon: any;
-  label: string;
-  target?: string;
-  onClick?: () => void;
-}) {
-  return (
-    <StyledSidebarLink href={href} active={active} target={target} onClick={onClick}>
-      {icon}
-      {label}
-    </StyledSidebarLink>
-  );
-}
 
 function SidebarBox({ icon, label, ...props }: { icon: any; label: string } & BoxProps) {
   return (
@@ -201,11 +143,20 @@ export default function Sidebar({ closeSidebar, favorites, navAction }: SidebarP
   const { disconnectWallet } = useWeb3AuthSig();
   const isMobileSidebar = useMobileSidebar();
 
+  const { onClick, onTouchStart } = useSettingsDialog();
+  const handleModalClick = (event: MouseEvent<Element, globalThis.MouseEvent>, path?: string) => {
+    onClick(event, path);
+    navAction?.();
+  };
+  const handleModalTouchStart = (event: TouchEvent<Element>, path?: string) => {
+    onTouchStart(event, path);
+    navAction?.();
+  };
   const searchInWorkspaceModalState = usePopupState({ variant: 'popover', popupId: 'search-in-workspace-modal' });
+
   const openSearchLabel = useKeydownPress(searchInWorkspaceModalState.toggle, { key: 'p', ctrl: true });
 
   const favoritePageIds = favorites.map((f) => f.pageId);
-
   function onScroll(e: React.UIEvent<HTMLDivElement>) {
     setIsScrolled(e.currentTarget?.scrollTop > 0);
   }
@@ -230,6 +181,8 @@ export default function Sidebar({ closeSidebar, favorites, navAction }: SidebarP
     await logoutUser();
     router.push('/');
   }
+
+  const openProfileModal = () => {};
 
   const pagesNavigation = useMemo(() => {
     return (
@@ -267,92 +220,99 @@ export default function Sidebar({ closeSidebar, favorites, navAction }: SidebarP
 
   return (
     <SidebarContainer>
-      {space && (
-        <Box display='flex' flexDirection='column' sx={{ height: '100%', flexGrow: 1, width: 'calc(100% - 57px)' }}>
-          <SidebarSubmenu closeSidebar={closeSidebar} logoutCurrentUser={logoutCurrentUser} />
-          <Box mb={2}>
-            <SidebarLink
-              href={`/${space.domain}/members`}
-              active={router.pathname.startsWith('/[domain]/members')}
-              icon={<AccountCircleIcon fontSize='small' />}
-              label='Member Directory'
-              onClick={navAction}
-            />
-            <SidebarLink
-              href={`/${space.domain}/proposals`}
-              active={router.pathname.startsWith('/[domain]/proposals')}
-              icon={<TaskOutlinedIcon fontSize='small' />}
-              label='Proposals'
-              onClick={navAction}
-            />
-            <SidebarLink
-              href={`/${space.domain}/bounties`}
-              active={router.pathname.startsWith('/[domain]/bounties')}
-              icon={<BountyIcon fontSize='small' />}
-              label='Bounties'
-              onClick={navAction}
-            />
-            <SidebarLink
-              href={`/${space.domain}/forum`}
-              active={router.pathname.startsWith('/[domain]/forum')}
-              icon={<MessageOutlinedIcon fontSize='small' />}
-              label='Forum'
-              onClick={navAction}
-            />
-            <Divider sx={{ mx: 2, my: 1 }} />
-            <Tooltip
-              title={
-                <>
-                  Search and jump to a page <br />
-                  {openSearchLabel}
-                </>
-              }
-              placement='right'
-            >
-              <div>
-                <SidebarBox
-                  onClick={searchInWorkspaceModalState.open}
-                  icon={<SearchIcon color='secondary' fontSize='small' />}
-                  label='Quick Find'
-                />
-              </div>
-            </Tooltip>
-            <SidebarLink
-              active={router.pathname.startsWith('/[domain]/settings/invites')}
-              href={`/${space.domain}/settings/invites`}
-              icon={<GroupAddOutlinedIcon color='secondary' fontSize='small' />}
-              label='Invite Members'
-              onClick={navAction}
-            />
-            <SearchInWorkspaceModal
-              isOpen={searchInWorkspaceModalState.isOpen}
-              close={searchInWorkspaceModalState.close}
-            />
-            <SidebarLink
-              active={router.pathname.startsWith('/[domain]/settings/space')}
-              href={`/${space.domain}/settings/space`}
-              icon={<SettingsIcon color='secondary' fontSize='small' />}
-              label='Settings'
-              onClick={navAction}
-            />
-            <SidebarLink
-              active={false}
-              href={charmverseDiscordInvite}
-              icon={<QuestionMarkIcon color='secondary' fontSize='small' />}
-              label='Support & Feedback'
-              target='_blank'
-              onClick={navAction}
-            />
-          </Box>
-          {isMobileSidebar ? (
-            <div>{pagesNavigation}</div>
-          ) : (
-            <ScrollingContainer isScrolled={isScrolled} onScroll={onScroll} className='page-navigation'>
-              {pagesNavigation}
-            </ScrollingContainer>
-          )}
-        </Box>
-      )}
+      <Box display='flex' flexDirection='column' sx={{ height: '100%', flexGrow: 1, width: 'calc(100% - 57px)' }}>
+        <SidebarSubmenu
+          closeSidebar={closeSidebar}
+          logoutCurrentUser={logoutCurrentUser}
+          openProfileModal={openProfileModal}
+        />
+        {space && (
+          <>
+            <Box mb={2}>
+              <SidebarLink
+                href={`/${space.domain}/members`}
+                active={router.pathname.startsWith('/[domain]/members')}
+                icon={<AccountCircleIcon fontSize='small' />}
+                label='Member Directory'
+                onClick={navAction}
+              />
+              <SidebarLink
+                href={`/${space.domain}/proposals`}
+                active={router.pathname.startsWith('/[domain]/proposals')}
+                icon={<TaskOutlinedIcon fontSize='small' />}
+                label='Proposals'
+                onClick={navAction}
+              />
+              <SidebarLink
+                href={`/${space.domain}/bounties`}
+                active={router.pathname.startsWith('/[domain]/bounties')}
+                icon={<BountyIcon fontSize='small' />}
+                label='Bounties'
+                onClick={navAction}
+              />
+              <SidebarLink
+                href={`/${space.domain}/forum`}
+                active={router.pathname.startsWith('/[domain]/forum')}
+                icon={<MessageOutlinedIcon fontSize='small' />}
+                label='Forum'
+                onClick={navAction}
+              />
+              <Divider sx={{ mx: 2, my: 1 }} />
+              <Tooltip
+                title={
+                  <>
+                    Search and jump to a page <br />
+                    {openSearchLabel}
+                  </>
+                }
+                placement='right'
+              >
+                <div>
+                  <SidebarBox
+                    onClick={(e) => {
+                      searchInWorkspaceModalState.open(e);
+                      navAction?.();
+                    }}
+                    icon={<SearchIcon color='secondary' fontSize='small' />}
+                    label='Quick Find'
+                  />
+                </div>
+              </Tooltip>
+              <SearchInWorkspaceModal
+                isOpen={searchInWorkspaceModalState.isOpen}
+                close={searchInWorkspaceModalState.close}
+              />
+              <SidebarBox
+                onClick={(e) => handleModalClick(e, `${space.name}-invites`)}
+                onTouchStart={(e) => handleModalTouchStart(e, `${space.name}-invites`)}
+                icon={<GroupAddOutlinedIcon color='secondary' fontSize='small' />}
+                label='Invites'
+              />
+              <SidebarBox
+                onClick={(e) => handleModalClick(e, `${space.name}-space`)}
+                onTouchStart={(e) => handleModalTouchStart(e, `${space.name}-space`)}
+                icon={<SettingsIcon color='secondary' fontSize='small' />}
+                label='Settings'
+              />
+              <SidebarLink
+                active={false}
+                href={charmverseDiscordInvite}
+                icon={<QuestionMarkIcon color='secondary' fontSize='small' />}
+                label='Support & Feedback'
+                target='_blank'
+                onClick={navAction}
+              />
+            </Box>
+            {isMobileSidebar ? (
+              <div>{pagesNavigation}</div>
+            ) : (
+              <ScrollingContainer isScrolled={isScrolled} onScroll={onScroll} className='page-navigation'>
+                {pagesNavigation}
+              </ScrollingContainer>
+            )}
+          </>
+        )}
+      </Box>
       {showingTrash && (
         <TrashModal
           isOpen={showingTrash}
@@ -361,6 +321,7 @@ export default function Sidebar({ closeSidebar, favorites, navAction }: SidebarP
           }}
         />
       )}
+      <SettingsDialog />
     </SidebarContainer>
   );
 }
