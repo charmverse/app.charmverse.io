@@ -1,12 +1,11 @@
 import type { BoxProps } from '@mui/material';
 import { Box, Typography } from '@mui/material';
 import type { User } from '@prisma/client';
-import { memo, useState } from 'react';
+import { memo } from 'react';
 
 import type { InitialAvatarProps } from 'components/common/Avatar';
 import Avatar from 'components/common/Avatar';
 import Link from 'components/common/Link';
-import { MemberMiniProfile } from 'components/profile/components/MemberMiniProfile/MemberMiniProfile';
 import useENSName from 'hooks/useENSName';
 import { hasNftAvatar } from 'lib/users/hasNftAvatar';
 
@@ -66,8 +65,7 @@ interface UserDisplayProps extends StyleProps {
   showProfileOnClick?: boolean;
 }
 
-function UserDisplay({ user, showProfileOnClick = false, linkToProfile = false, ...props }: UserDisplayProps) {
-  const [isShowingUserProfile, setIsShowingUserProfile] = useState(false);
+function UserDisplay({ user, linkToProfile = false, ...props }: UserDisplayProps) {
   if (!user) {
     // strip out invalid names
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -84,25 +82,6 @@ function UserDisplay({ user, showProfileOnClick = false, linkToProfile = false, 
   const userPath = user.path || user.id;
   const userLink = `${hostname}/u/${userPath}`;
   const isNft = hasNftAvatar(user);
-
-  if (showProfileOnClick) {
-    return (
-      <>
-        <BaseComponent
-          onClick={() => {
-            setIsShowingUserProfile(true);
-          }}
-          username={user.username}
-          avatar={user.avatar}
-          isNft={isNft}
-          {...props}
-        />
-        {isShowingUserProfile && (
-          <MemberMiniProfile memberId={user.id} onClose={() => setIsShowingUserProfile(false)} />
-        )}
-      </>
-    );
-  }
 
   if (linkToProfile) {
     return (

@@ -27,6 +27,7 @@ import IntlProvider from 'components/common/IntlProvider';
 import ReactDndProvider from 'components/common/ReactDndProvider';
 import RouteGuard from 'components/common/RouteGuard';
 import Snackbar from 'components/common/Snackbar';
+import { MemberProfileProvider } from 'components/profile/hooks/useMemberProfile';
 import { isDevEnv } from 'config/constants';
 import { ColorModeContext } from 'context/darkMode';
 import { BountiesProvider } from 'hooks/useBounties';
@@ -262,7 +263,9 @@ function DataProviders({ children }: { children: ReactNode }) {
                     <PaymentMethodsProvider>
                       <PagesProvider>
                         <PrimaryCharmEditorProvider>
-                          <PageTitleProvider>{children}</PageTitleProvider>
+                          <MemberProfileProvider>
+                            <PageTitleProvider>{children}</PageTitleProvider>
+                          </MemberProfileProvider>
                         </PrimaryCharmEditorProvider>
                       </PagesProvider>
                     </PaymentMethodsProvider>

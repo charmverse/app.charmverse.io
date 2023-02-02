@@ -3,14 +3,13 @@ import EditIcon from '@mui/icons-material/Edit';
 import { Box, Card, Chip, Grid, IconButton, Stack, Tooltip, Typography } from '@mui/material';
 import type { MemberProperty, MemberPropertyType } from '@prisma/client';
 import type { MouseEvent } from 'react';
-import { useState } from 'react';
 
 import Avatar from 'components/common/Avatar';
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
 import { SelectPreview } from 'components/common/form/fields/Select/SelectPreview';
 import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
-import { MemberMiniProfile } from 'components/profile/components/MemberMiniProfile/MemberMiniProfile';
 import { SocialIcons } from 'components/profile/components/UserDetails/SocialIcons';
+import { useMemberProfile } from 'components/profile/hooks/useMemberProfile';
 import type { Social } from 'components/profile/interfaces';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMemberProperties } from 'hooks/useMemberProperties';
@@ -41,20 +40,20 @@ function MemberDirectoryGalleryCard({ member }: { member: Member }) {
 
   const currentSpace = useCurrentSpace();
   const { user } = useUser();
-  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const isNameHidden = !propertiesRecord.name?.enabledViews.includes('gallery');
   const isDiscordHidden = !propertiesRecord.discord?.enabledViews.includes('gallery');
   const isTwitterHidden = !propertiesRecord.twitter?.enabledViews.includes('gallery');
   const isLinkedInHidden = !propertiesRecord.linked_in?.enabledViews.includes('gallery');
   const isGithubHidden = !propertiesRecord.github?.enabledViews.includes('gallery');
+  const { showMemberProfile } = useMemberProfile();
 
   const isUserCard = user?.id === member.id && currentSpace;
 
   function openUserCard(e: MouseEvent<HTMLDivElement>) {
     e.preventDefault();
     e.stopPropagation();
-    setIsModalOpen(true);
+    showMemberProfile(member.id);
   }
 
   const social = (member.profile?.social as Social) ?? {};
@@ -212,20 +211,9 @@ function MemberDirectoryGalleryCard({ member }: { member: Member }) {
   );
 
   return (
-    <>
-      <StyledBox onClick={openUserCard} color='primary'>
-        {content}
-      </StyledBox>
-
-      {isModalOpen && user && currentSpace && (
-        <MemberMiniProfile
-          onClose={() => {
-            setIsModalOpen(false);
-          }}
-          memberId={member.id}
-        />
-      )}
-    </>
+    <StyledBox onClick={openUserCard} color='primary'>
+      {content}
+    </StyledBox>
   );
 }
 
