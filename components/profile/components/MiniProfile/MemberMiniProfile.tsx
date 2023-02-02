@@ -40,7 +40,7 @@ export function MemberMiniProfile({ member, onClose }: { member: Member; onClose
   const { updateSpaceValues } = useMemberPropertyValues(member.id);
 
   const { data: poaps = [], isLoading: isFetchingPoaps } = useSWRImmutable(`/poaps/${member.id}`, () => {
-    return charmClient.getUserPoaps();
+    return charmClient.getUserPoaps(member.id);
   });
 
   const {

@@ -40,7 +40,7 @@ export default function PublicProfile(props: UserDetailsProps) {
     mutate: mutatePoaps,
     isValidating: isPoapDataValidating
   } = useSWRImmutable(`/poaps/${user.id}/${readOnly}`, () => {
-    return readOnly ? Promise.resolve(user.visiblePoaps as ExtendedPoap[]) : charmClient.getUserPoaps();
+    return readOnly ? Promise.resolve(user.visiblePoaps as ExtendedPoap[]) : charmClient.getUserPoaps(user.id);
   });
 
   const {
