@@ -1,7 +1,6 @@
 import styled from '@emotion/styled';
 import AddIcon from '@mui/icons-material/Add';
 import CancelIcon from '@mui/icons-material/Cancel';
-import CloseIcon from '@mui/icons-material/Close';
 import { Link, Typography } from '@mui/material';
 import { Box, Stack } from '@mui/system';
 import type { ProfileItem } from '@prisma/client';
@@ -132,7 +131,6 @@ export function NftsList({ mutateNfts, memberId, nfts }: Props) {
             onClose={() => {
               setIsShowingNftGallery(false);
             }}
-            showSearchBar
             onSelect={updateNft}
             hiddenNfts={pinnedNfts.map((pinnedNft) => pinnedNft.id)}
           />

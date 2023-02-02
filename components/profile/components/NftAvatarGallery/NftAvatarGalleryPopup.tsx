@@ -13,18 +13,10 @@ type Props = {
   isVisible: boolean;
   onClose: () => void;
   isSaving?: boolean;
-  showSearchBar?: boolean;
   hiddenNfts?: string[];
 };
 
-export default function NftAvatarGalleryPopup({
-  onSelect,
-  isVisible,
-  onClose,
-  isSaving,
-  showSearchBar = false,
-  hiddenNfts = []
-}: Props) {
+export default function NftAvatarGalleryPopup({ onSelect, isVisible, onClose, isSaving, hiddenNfts = [] }: Props) {
   const { user } = useUser();
   const { nfts = [], isLoading } = useMyNfts(user?.id || '');
   const [searchedTerm, setSearchedTerm] = useState('');
@@ -41,7 +33,7 @@ export default function NftAvatarGalleryPopup({
     <Dialog onClose={onClose} open={isVisible} scroll='paper'>
       <DialogTitle>Your NFTs gallery</DialogTitle>
       <DialogContent dividers>
-        {showSearchBar && !isLoading && nfts.length !== 0 && (
+        {!isLoading && nfts.length !== 0 && (
           <TextField
             fullWidth
             sx={{
