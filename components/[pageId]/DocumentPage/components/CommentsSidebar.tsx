@@ -5,7 +5,7 @@ import type { BoxProps, SelectProps } from '@mui/material';
 import { Box, InputLabel, List, MenuItem, Select, Typography } from '@mui/material';
 import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
-import { useLayoutEffect, useMemo, useState } from 'react';
+import React, { memo, useLayoutEffect, useMemo, useState } from 'react';
 
 import PageThread from 'components/common/CharmEditor/components/PageThread';
 import { useDOMElement } from 'hooks/useDOMElement';
@@ -63,7 +63,7 @@ function getCommentFromThreads(threads: (ThreadWithCommentsAndAuthors | undefine
   return null;
 }
 
-export function CommentsSidebar({ inline }: BoxProps & { inline?: boolean }) {
+function CommentsSidebarComponent({ inline }: BoxProps & { inline?: boolean }) {
   const router = useRouter();
   const { threads } = useThreads();
   const { user } = useUser();
@@ -186,3 +186,5 @@ export function NoCommentsMessage({ icon, message }: { icon: ReactNode; message:
     </EmptyThreadContainerBox>
   );
 }
+
+export const CommentsSidebar = memo(CommentsSidebarComponent);
