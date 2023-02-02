@@ -25,9 +25,9 @@ import { PoapsList } from './PoapsList';
 
 export function MemberMiniProfile({ member, onClose }: { member: Member; onClose: VoidFunction }) {
   const theme = useTheme();
+  const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
   const { user: currentUser, setUser } = useUser();
   const currentSpace = useCurrentSpace();
-  const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
   const { properties = [] } = useMemberProperties();
   const propertiesRecord = properties.reduce((record, prop) => {
     record[prop.type] = prop;
@@ -103,12 +103,12 @@ export function MemberMiniProfile({ member, onClose }: { member: Member; onClose
               <NftsList mutateNfts={mutateNfts} nfts={nfts} memberId={user.id} />
               <OrgsList mutateOrgs={mutateOrgs} orgs={orgs} memberId={user.id} />
               <PoapsList poaps={poaps} />
+              <Divider
+                sx={{
+                  mb: 3
+                }}
+              />
             </Stack>
-            <Divider
-              sx={{
-                my: 1
-              }}
-            />
           </>
         )}
         <Typography fontWeight={600}>Member details</Typography>

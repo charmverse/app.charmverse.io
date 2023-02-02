@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
 import AddIcon from '@mui/icons-material/Add';
 import CancelIcon from '@mui/icons-material/Cancel';
-import { Link, Tooltip, Typography } from '@mui/material';
+import { Tooltip, Typography } from '@mui/material';
 import { Box, Stack } from '@mui/system';
 import type { ProfileItem } from '@prisma/client';
 import { useState } from 'react';
@@ -12,6 +12,7 @@ import Avatar from 'components/common/Avatar';
 import { useUser } from 'hooks/useUser';
 import type { UserCommunity } from 'lib/profile';
 
+import { OrgsGalleryPopup } from './OrgsGalleryPopup';
 import { ProfileItemContainer } from './ProfileItemContainer';
 
 const totalShownOrgs = 5;
@@ -39,11 +40,12 @@ type Props = { memberId: string; orgs: UserCommunity[]; mutateOrgs?: KeyedMutato
 export function OrgsList({ mutateOrgs, memberId, orgs }: Props) {
   const { user: currentUser } = useUser();
   const pinnedOrgs = orgs.filter((org) => org.isPinned);
+  const nonPinnedOrgs = orgs.filter((org) => !org.isPinned);
   const emptyOrgsCount = totalShownOrgs - pinnedOrgs.length;
   const [showingOrgsGallery, setIsShowingOrgsGallery] = useState(false);
   const readOnly = mutateOrgs === undefined;
 
-  async function updateOrgs(org: UserCommunity) {
+  async function updateOrg(org: UserCommunity) {
     const profileItem: Omit<ProfileItem, 'userId'> = {
       id: org.id,
       isHidden: org.isHidden,
@@ -82,7 +84,7 @@ export function OrgsList({ mutateOrgs, memberId, orgs }: Props) {
           return (
             <ProfileItemContainer key={pinnedOrg.id}>
               {!readOnly && (
-                <CancelIcon color='error' fontSize='small' className='icons' onClick={() => updateOrgs(pinnedOrg)} />
+                <CancelIcon color='error' fontSize='small' className='icons' onClick={() => updateOrg(pinnedOrg)} />
               )}
               <Tooltip title={pinnedOrg.name}>
                 <Avatar size='large' avatar={pinnedOrg.logo} />
@@ -104,6 +106,16 @@ export function OrgsList({ mutateOrgs, memberId, orgs }: Props) {
         ) : pinnedOrgs.length === 0 ? (
           <Typography color='secondary'>No pinned Organizations</Typography>
         ) : null}
+
+        {showingOrgsGallery && (
+          <OrgsGalleryPopup
+            onClose={() => {
+              setIsShowingOrgsGallery(false);
+            }}
+            orgs={nonPinnedOrgs}
+            onSelect={updateOrg}
+          />
+        )}
       </Stack>
     </Stack>
   );
