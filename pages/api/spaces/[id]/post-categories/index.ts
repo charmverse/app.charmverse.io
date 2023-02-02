@@ -7,6 +7,7 @@ import { createPostCategory } from 'lib/forums/categories/createPostCategory';
 import { getPostCategories } from 'lib/forums/categories/getPostCategories';
 import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { filterAccessiblePostCategories } from 'lib/permissions/forum/filterAccessiblePostCategories';
+import type { PostCategoryWithWriteable } from 'lib/permissions/forum/interfaces';
 import { withSessionRoute } from 'lib/session/withSession';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 
@@ -18,7 +19,7 @@ handler
   .use(requireKeys<CreatePostCategoryInput>(['name'], 'body'))
   .post(createPostCategoryController);
 
-async function getPostCategoriesController(req: NextApiRequest, res: NextApiResponse<PostCategory[]>) {
+async function getPostCategoriesController(req: NextApiRequest, res: NextApiResponse<PostCategoryWithWriteable[]>) {
   const userId = req.session.user?.id as string;
 
   const { id: spaceId } = req.query;
@@ -32,7 +33,7 @@ async function getPostCategoriesController(req: NextApiRequest, res: NextApiResp
   return res.status(200).json(filteredPostCategories);
 }
 
-async function createPostCategoryController(req: NextApiRequest, res: NextApiResponse<PostCategory>) {
+async function createPostCategoryController(req: NextApiRequest, res: NextApiResponse<PostCategoryWithWriteable>) {
   const { id: spaceId } = req.query;
 
   const { error } = await hasAccessToSpace({
@@ -50,7 +51,7 @@ async function createPostCategoryController(req: NextApiRequest, res: NextApiRes
     spaceId: spaceId as string
   });
 
-  return res.status(201).json(postCategory);
+  return res.status(201).json({ ...postCategory, create_post: true });
 }
 
 export default withSessionRoute(handler);

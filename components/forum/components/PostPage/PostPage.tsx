@@ -99,12 +99,24 @@ export function PostPage({
 }: Props) {
   const currentSpace = useCurrentSpace();
   const { user } = useUser();
-  const { categories } = useForumCategories();
+  const { categories, getForumCategoryById } = useForumCategories();
+
+  // We should only set writeable categories for new postd
   const [categoryId, setCategoryId] = useState(
-    post?.categoryId ??
-      newPostCategory?.id ??
-      categories.find((category) => category.id === currentSpace?.defaultPostCategoryId)?.id ??
-      null
+    (() => {
+      if (post?.categoryId) {
+        return post.categoryId;
+      } else if (newPostCategory?.id && getForumCategoryById(newPostCategory.id)?.create_post) {
+        return newPostCategory?.id;
+      } else if (
+        currentSpace?.defaultPostCategoryId &&
+        getForumCategoryById(currentSpace?.defaultPostCategoryId)?.create_post
+      ) {
+        return currentSpace?.defaultPostCategoryId;
+      } else {
+        return categories.find((category) => category.create_post)?.id;
+      }
+    })()
   );
   const { members } = useMembers();
   const router = useRouter();
@@ -116,7 +128,7 @@ export function PostPage({
     post ? charmClient.forum.listPostComments(post.id) : undefined
   );
 
-  const { permissions } = usePostPermissions(post?.id as string);
+  const { permissions } = usePostPermissions(post?.id as string, !post);
 
   usePreventReload(contentUpdated);
   const [, setTitleState] = usePageTitle();
@@ -221,12 +233,7 @@ export function PostPage({
               <PageTitleInput readOnly={!canEdit} value={formInputs.title} onChange={updateTitle} />
               {createdBy && <UserDisplay user={createdBy} avatarSize='small' fontSize='medium' mt={2} mb={3} />}
               <Box my={2}>
-                <PostCategoryInput
-                  readOnly={!canEdit}
-                  spaceId={spaceId}
-                  setCategoryId={updateCategoryId}
-                  categoryId={categoryId}
-                />
+                <PostCategoryInput readOnly={!canEdit} setCategoryId={updateCategoryId} categoryId={categoryId} />
               </Box>
             </CharmEditor>
           </Box>
@@ -277,7 +284,9 @@ export function PostPage({
                     <Typography color='secondary' variant='h6'>
                       No Comments Yet
                     </Typography>
-                    <Typography color='secondary'>Be the first to share what you think!</Typography>
+                    {permissions?.add_comment && (
+                      <Typography color='secondary'>Be the first to share what you think!</Typography>
+                    )}
                   </Stack>
                 )}
               </>

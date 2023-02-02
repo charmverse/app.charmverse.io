@@ -5,6 +5,7 @@ import nc from 'next-connect';
 import { deletePostCategory } from 'lib/forums/categories/deletePostCategory';
 import { updatePostCategory } from 'lib/forums/categories/updatePostCategory';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
+import type { PostCategoryWithWriteable } from 'lib/permissions/forum/interfaces';
 import { requestOperations } from 'lib/permissions/requestOperations';
 import { withSessionRoute } from 'lib/session/withSession';
 
@@ -12,7 +13,7 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.use(requireUser).put(updatePostCategoryController).delete(deletePostCategoryController);
 
-async function updatePostCategoryController(req: NextApiRequest, res: NextApiResponse<PostCategory>) {
+async function updatePostCategoryController(req: NextApiRequest, res: NextApiResponse<PostCategoryWithWriteable>) {
   const { postCategoryId } = req.query;
 
   await requestOperations({
@@ -24,7 +25,7 @@ async function updatePostCategoryController(req: NextApiRequest, res: NextApiRes
 
   const updatedPostCategory = await updatePostCategory(postCategoryId as string, req.body);
 
-  return res.status(200).json(updatedPostCategory);
+  return res.status(200).json({ ...updatedPostCategory, create_post: true });
 }
 async function deletePostCategoryController(req: NextApiRequest, res: NextApiResponse) {
   const { postCategoryId } = req.query;

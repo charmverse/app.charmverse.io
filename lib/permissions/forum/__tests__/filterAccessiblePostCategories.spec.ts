@@ -56,36 +56,36 @@ beforeAll(async () => {
 });
 
 describe('filterAccessiblePostCategories', () => {
-  it('returns only categories a member can see, including public categories', async () => {
+  it('returns only categories a member can see, including public categories and create_post set to correct value', async () => {
     const visibleCategories = await filterAccessiblePostCategories({
       postCategories,
       userId: spaceMemberUser.id
     });
 
     expect(visibleCategories.length).toBe(2);
-    expect(visibleCategories).toContain(spaceOnlyCategory);
-    expect(visibleCategories).toContain(publicCategory);
+    expect(visibleCategories).toContainEqual({ ...spaceOnlyCategory, create_post: true });
+    expect(visibleCategories).toContainEqual({ ...publicCategory, create_post: false });
   });
-  it('returns all categories if user is admin', async () => {
+  it('returns all categories if user is admin, and create_post set to true', async () => {
     const visibleCategories = await filterAccessiblePostCategories({
       postCategories,
       userId: adminUser.id
     });
 
     expect(visibleCategories.length).toBe(postCategories.length);
-    expect(visibleCategories).toContain(adminOnlyCategory);
-    expect(visibleCategories).toContain(spaceOnlyCategory);
-    expect(visibleCategories).toContain(publicCategory);
+    expect(visibleCategories).toContainEqual({ ...adminOnlyCategory, create_post: true });
+    expect(visibleCategories).toContainEqual({ ...spaceOnlyCategory, create_post: true });
+    expect(visibleCategories).toContainEqual({ ...publicCategory, create_post: true });
   });
 
-  it('returns only categories accessible to the public if there is no user, or user is not a space member', async () => {
+  it('returns only categories accessible to the public if there is no user, or user is not a space member, and create_post set to false', async () => {
     let visibleCategories = await filterAccessiblePostCategories({
       postCategories,
       userId: otherSpaceAdminUser.id
     });
 
     expect(visibleCategories.length).toBe(1);
-    expect(visibleCategories).toContain(publicCategory);
+    expect(visibleCategories).toContainEqual({ ...publicCategory, create_post: false });
 
     visibleCategories = await filterAccessiblePostCategories({
       postCategories,
@@ -93,6 +93,6 @@ describe('filterAccessiblePostCategories', () => {
     });
 
     expect(visibleCategories.length).toBe(1);
-    expect(visibleCategories).toContain(publicCategory);
+    expect(visibleCategories).toContainEqual({ ...publicCategory, create_post: false });
   });
 });

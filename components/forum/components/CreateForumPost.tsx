@@ -7,11 +7,14 @@ import TextField from '@mui/material/TextField';
 import Button from 'components/common/Button';
 import UserDisplay from 'components/common/UserDisplay';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
+import { useForumCategories } from 'hooks/useForumCategories';
 import { useUser } from 'hooks/useUser';
 
 export function CreateForumPost({ onClick }: { onClick: () => void }) {
   const { user } = useUser();
   const [userSpacePermissions] = useCurrentSpacePermissions();
+  const { categories } = useForumCategories();
+  const canPost = categories.filter((c) => c.create_post).length > 0;
 
   function clickHandler() {
     if (userSpacePermissions?.createPage) {
@@ -28,8 +31,8 @@ export function CreateForumPost({ onClick }: { onClick: () => void }) {
           </Box>
           <Box display='flex' justifyContent='flex-end'>
             <Button
-              disabledTooltip='You are not allowed to create a post'
-              disabled={!userSpacePermissions?.createPage}
+              disabledTooltip='There are no categories in which you can create a post.'
+              disabled={!canPost}
               component='div'
               float='right'
             >

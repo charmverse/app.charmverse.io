@@ -88,11 +88,16 @@ export function useForumCategories() {
     }
   }
 
+  function getForumCategoryById(id: string) {
+    return categories?.find((category) => category.id === id);
+  }
+
   return {
     createForumCategory,
     deleteForumCategory,
     updateForumCategory,
     setDefaultPostCategory,
+    getForumCategoryById,
     isCategoriesLoaded: !!categories,
     categories: categories || [],
     error,

@@ -1,9 +1,12 @@
-import type { PostCategory, Prisma } from '@prisma/client';
+import type { PostCategory, PostCategoryPermission, Prisma } from '@prisma/client';
 
 import { prisma } from 'db';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { uniqueValues } from 'lib/utilities/array';
 import { InvalidInputError } from 'lib/utilities/errors';
+
+import type { PostCategoryWithWriteable } from './interfaces';
+import { postCategoryPermissionsMapping } from './mapping';
 
 type CategoriesToFilter = {
   postCategories: PostCategory[];
@@ -13,10 +16,10 @@ type CategoriesToFilter = {
 export async function filterAccessiblePostCategories({
   postCategories,
   userId
-}: CategoriesToFilter): Promise<PostCategory[]> {
+}: CategoriesToFilter): Promise<PostCategoryWithWriteable[]> {
   // Avoid expensive computation
   if (postCategories.length === 0) {
-    return postCategories;
+    return [];
   }
 
   const uniqueSpaceIds = uniqueValues(postCategories.map((category) => category.spaceId));
@@ -33,7 +36,7 @@ export async function filterAccessiblePostCategories({
   });
 
   if (isAdmin) {
-    return postCategories;
+    return postCategories.map((c) => ({ ...c, create_post: true }));
   }
 
   const postCategoryIds = postCategories.map((category) => category.id);
@@ -49,9 +52,9 @@ export async function filterAccessiblePostCategories({
       }
     });
 
-    return postCategories.filter((category) =>
-      publicCategoryPermissions.some((permission) => permission.postCategoryId === category.id)
-    );
+    return postCategories
+      .filter((category) => publicCategoryPermissions.some((permission) => permission.postCategoryId === category.id))
+      .map((c) => ({ ...c, create_post: false }));
   } else {
     const userRolesInSpace = await prisma.spaceRoleToRole.findMany({
       where: {
@@ -89,6 +92,32 @@ export async function filterAccessiblePostCategories({
       }
     });
 
-    return postCategories.filter((category) => postCategoryPermissions.some((p) => p.postCategoryId === category.id));
+    const mappedPostCategoryPermissions = postCategoryPermissions.reduce((acc, permission) => {
+      if (!acc[permission.postCategoryId]) {
+        acc[permission.postCategoryId] = [];
+      }
+
+      acc[permission.postCategoryId].push(permission);
+      return acc;
+    }, {} as Record<string, PostCategoryPermission[]>);
+
+    // Optimise the computation to mutate returned values inside the filter operation
+    return postCategories.filter((category) => {
+      const relevantPermissions = mappedPostCategoryPermissions[category.id];
+
+      if (!relevantPermissions || relevantPermissions.length === 0) {
+        return false;
+      }
+
+      (category as PostCategoryWithWriteable).create_post = false;
+
+      for (const perm of relevantPermissions) {
+        if (postCategoryPermissionsMapping[perm.permissionLevel].includes('create_post')) {
+          (category as PostCategoryWithWriteable).create_post = true;
+          break;
+        }
+      }
+      return true;
+    }) as PostCategoryWithWriteable[];
   }
 }

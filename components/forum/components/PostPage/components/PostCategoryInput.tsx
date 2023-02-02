@@ -5,6 +5,7 @@ import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useForumCategories } from 'hooks/useForumCategories';
 
 type PostCategoryOptionProps = {
   category: PostCategory;
@@ -24,17 +25,13 @@ type PostCategoryOptionProps = {
 export function PostCategoryInput({
   categoryId,
   readOnly,
-  spaceId,
   setCategoryId
 }: {
-  categoryId: string | null;
+  categoryId?: string | null;
   readOnly?: boolean;
-  spaceId?: string;
   setCategoryId: (categoryId: string) => void;
 }) {
-  const { data: categories } = useSWR(spaceId ? `spaces/${spaceId}/post-categories` : null, () =>
-    charmClient.forum.listPostCategories(spaceId!)
-  );
+  const { categories } = useForumCategories();
 
   const space = useCurrentSpace();
 
@@ -49,6 +46,8 @@ export function PostCategoryInput({
     }
   });
 
+  const writeableCategories = (categories ?? []).filter((category) => !!category.create_post);
+
   async function updateForumPost(_postCategory: PostCategory | null) {
     if (_postCategory) {
       setCategoryId(_postCategory.id);
@@ -57,7 +56,7 @@ export function PostCategoryInput({
   return (
     <PostCategoryAutocomplete
       value={postCategory ?? null}
-      options={categories ?? []}
+      options={readOnly ? categories ?? [] : writeableCategories}
       disabled={readOnly}
       onChange={updateForumPost}
     />
