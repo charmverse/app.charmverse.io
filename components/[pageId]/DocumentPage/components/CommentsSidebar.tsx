@@ -8,7 +8,6 @@ import type { ReactNode } from 'react';
 import React, { memo, useLayoutEffect, useMemo, useState } from 'react';
 
 import PageThread from 'components/common/CharmEditor/components/PageThread';
-import { useDOMElement } from 'hooks/useDOMElement';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { useThreads } from 'hooks/useThreads';
 import { useUser } from 'hooks/useUser';
@@ -45,24 +44,6 @@ const EmptyThreadContainerBox = styled(Box)`
   background-color: ${({ theme }) => theme.palette.background.light};
 `;
 
-function getCommentFromThreads(threads: (ThreadWithCommentsAndAuthors | undefined)[], commentId: string) {
-  if (!threads) {
-    return null;
-  }
-
-  for (let threadIdx = 0; threadIdx < threads.length; threadIdx += 1) {
-    const thread = threads[threadIdx];
-    if (thread) {
-      for (let commentIdx = 0; commentIdx < thread.comments.length; commentIdx += 1) {
-        if (thread.comments[commentIdx].id === commentId) {
-          return thread.comments[commentIdx];
-        }
-      }
-    }
-  }
-  return null;
-}
-
 function CommentsSidebarComponent({ inline }: BoxProps & { inline?: boolean }) {
   const router = useRouter();
   const { threads } = useThreads();
@@ -75,11 +56,6 @@ function CommentsSidebarComponent({ inline }: BoxProps & { inline?: boolean }) {
   const handleThreadClassChange: SelectProps['onChange'] = (event) => {
     setThreadFilter(event.target.value as any);
   };
-
-  const highlightedCommentId = router.query.commentId;
-  const highlightedComment =
-    typeof highlightedCommentId === 'string' ? getCommentFromThreads(allThreads, highlightedCommentId) : null;
-  const highlightedCommentElement = useDOMElement(highlightedComment ? `#comment\\.${highlightedComment.id}` : null);
 
   const { setCurrentPageActionDisplay } = usePageActionDisplay();
 
@@ -114,7 +90,10 @@ function CommentsSidebarComponent({ inline }: BoxProps & { inline?: boolean }) {
 
   useLayoutEffect(() => {
     // Highlight the comment id when navigation from nexus mentioned tasks list tab
-    // const highlightedCommentId = router.query.commentId;
+
+    const highlightedCommentId = router.query.commentId;
+    const highlightedCommentElement = document.getElementById(`comment.${highlightedCommentId}`);
+
     if (highlightedCommentElement) {
       setCurrentPageActionDisplay('comments');
       setThreadFilter('all');
@@ -133,7 +112,7 @@ function CommentsSidebarComponent({ inline }: BoxProps & { inline?: boolean }) {
         }, 250);
       });
     }
-  }, [highlightedCommentElement]);
+  }, [router.query.commentId]);
 
   return (
     <>
