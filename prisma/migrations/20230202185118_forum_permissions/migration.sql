@@ -1,11 +1,11 @@
 -- CreateEnum
-CREATE TYPE "PostCategoryOperation" AS ENUM ('manage_permissions', 'delete_category', 'edit_category');
+CREATE TYPE "PostCategoryOperation" AS ENUM ('manage_permissions', 'delete_category', 'edit_category', 'create_post');
 
 -- CreateEnum
-CREATE TYPE "PostOperation" AS ENUM ('view_post', 'edit_post', 'delete_post', 'pin_post', 'lock_post', 'add_comment', 'delete_comments');
+CREATE TYPE "PostOperation" AS ENUM ('view_post', 'edit_post', 'delete_post', 'pin_post', 'lock_post', 'add_comment', 'delete_comments', 'upvote', 'downvote');
 
 -- CreateEnum
-CREATE TYPE "PostCategoryPermissionLevel" AS ENUM ('category_admin', 'moderator', 'member', 'guest', 'custom');
+CREATE TYPE "PostCategoryPermissionLevel" AS ENUM ('category_admin', 'moderator', 'full_access', 'view', 'custom');
 
 -- AlterEnum
 ALTER TYPE "SpaceOperation" ADD VALUE 'createForumCategory';

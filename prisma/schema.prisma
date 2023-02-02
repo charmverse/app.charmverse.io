@@ -1164,8 +1164,8 @@ enum PostOperation {
 enum PostCategoryPermissionLevel {
   category_admin
   moderator
-  member
-  guest
+  full_access
+  view
   custom
 }
 
