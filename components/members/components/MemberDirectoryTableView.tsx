@@ -246,7 +246,7 @@ function MemberDirectoryTableRow({ member }: { member: Member }) {
           onClose={() => {
             setIsModalOpen(false);
           }}
-          member={member}
+          memberId={member.id}
         />
       )}
     </StyledTableRow>

@@ -23,7 +23,8 @@ import { NftsList } from './BlockchainData/NftsList';
 import { OrgsList } from './BlockchainData/OrgsList';
 import { PoapsList } from './BlockchainData/PoapsList';
 
-export function MemberMiniProfile({ member, onClose }: { member: Member; onClose: VoidFunction }) {
+function MemberProfile({ member, onClose }: { member: Member; onClose: VoidFunction }) {
+  const { mutateMembers } = useMembers();
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
   const { user: currentUser, setUser } = useUser();
@@ -33,11 +34,11 @@ export function MemberMiniProfile({ member, onClose }: { member: Member; onClose
     record[prop.type] = prop;
     return record;
   }, {} as Record<MemberPropertyType, MemberProperty>);
+
   const { memberPropertyValues = [] } = useMemberPropertyValues(member.id);
   const currentSpacePropertyValues = memberPropertyValues.find(
     (memberPropertyValue) => memberPropertyValue.spaceId === currentSpace?.id
   );
-  const { mutateMembers } = useMembers();
   const { updateSpaceValues } = useMemberPropertyValues(member.id);
 
   const { data: poaps = [], isLoading: isFetchingPoaps } = useSWRImmutable(`/poaps/${member.id}`, () => {
@@ -160,4 +161,15 @@ export function MemberMiniProfile({ member, onClose }: { member: Member; onClose
       )}
     </Dialog>
   );
+}
+
+export function MemberMiniProfile({ memberId, onClose }: { memberId: string; onClose: VoidFunction }) {
+  const { members } = useMembers();
+  const member = members.find((_member) => _member.id === memberId);
+
+  if (!member) {
+    return null;
+  }
+
+  return <MemberProfile member={member} onClose={onClose} />;
 }
