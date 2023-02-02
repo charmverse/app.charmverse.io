@@ -14,7 +14,7 @@ export default function ApiSettingsPage() {
   if (!space) {
     return null;
   }
-  return <ApiSettings isAdmin={isAdmin} spaceId={space.id} spaceOwner={space.createdBy} />;
+  return <ApiSettings isAdmin={isAdmin} spaceId={space.id} />;
 }
 
 ApiSettingsPage.getLayout = (page: ReactElement) => {
