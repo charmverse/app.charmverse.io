@@ -7,7 +7,7 @@ on:
   push:
     branches: [main]
   pull_request:
-    branches: ["**"]
+    branches: ['**']
 
 jobs:
   test:
@@ -41,7 +41,7 @@ jobs:
       - name: Build app
         uses: ./.github/actions/build
         with:
-          NEXT_PUBLIC_APP_ENV: "test"
+          NEXT_PUBLIC_APP_ENV: 'test'
 
       - name: Setup test database
         run: bash ./scripts/configure-db.sh
@@ -79,7 +79,7 @@ jobs:
       - name: Build app
         uses: ./.github/actions/build
         with:
-          NEXT_PUBLIC_APP_ENV: "production"
+          NEXT_PUBLIC_APP_ENV: 'production'
           NEXT_PUBLIC_DD_CLIENT_TOKEN: ${{ secrets.NEXT_PUBLIC_DD_CLIENT_TOKEN }}
           NEXT_PUBLIC_DD_RUM_CLIENT_TOKEN: ${{ secrets.NEXT_PUBLIC_DD_RUM_CLIENT_TOKEN }}
           NEXT_PUBLIC_DD_RUM_APP_ID: ${{ secrets.NEXT_PUBLIC_DD_RUM_APP_ID }}

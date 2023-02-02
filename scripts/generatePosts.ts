@@ -1,41 +1,50 @@
-
-import {generateForumPosts} from 'testing/forums';
-import {prisma} from 'db';
+import { generateForumPosts } from 'testing/forums';
+import { prisma } from 'db';
 import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
-import {validate} from 'uuid';
+import { validate } from 'uuid';
 import { stubPostContent, stubPostContentText } from 'testing/forums.stub';
 
-
-
-async function listCategories({spaceDomain}: {spaceDomain: string}) {
-  return prisma.postCategory.findMany({
-    where: {
-      space: {
-        domain: spaceDomain
+async function listCategories({ spaceDomain }: { spaceDomain: string }) {
+  return prisma.postCategory
+    .findMany({
+      where: {
+        space: {
+          domain: spaceDomain
+        }
       }
-    }
-  }).then(categories => {
-    console.log(categories)
-    return categories
-  });
+    })
+    .then((categories) => {
+      console.log(categories);
+      return categories;
+    });
 }
 
 /**
- * 
+ *
  * @title - Will increment a number at the end of the title for each generated post
  */
-async function generatePosts({spaceDomain, count, categoryId, title, withImageRatio}: {spaceDomain: string, count: number, categoryId?: string, title?: string, withImageRatio?: number}) {
-
-  if(categoryId && !validate(categoryId)) {
+async function generatePosts({
+  spaceDomain,
+  count,
+  categoryId,
+  title,
+  withImageRatio
+}: {
+  spaceDomain: string;
+  count: number;
+  categoryId?: string;
+  title?: string;
+  withImageRatio?: number;
+}) {
+  if (categoryId && !validate(categoryId)) {
     throw new InvalidInputError(`Please provide a valid category ID`);
   }
-
 
   const space = await prisma.space.findUnique({
     where: {
       domain: spaceDomain
     }
-  })
+  });
 
   if (!space) {
     throw new DataNotFoundError(`Space with domain ${spaceDomain} not found`);
@@ -50,18 +59,16 @@ async function generatePosts({spaceDomain, count, categoryId, title, withImageRa
     contentText: stubPostContentText,
     title,
     withImageRatio
-  })
-  return posts
+  });
+  return posts;
 }
 
-
-async function wipePosts({spaceDomain}: {spaceDomain: string}) {
-
+async function wipePosts({ spaceDomain }: { spaceDomain: string }) {
   const space = await prisma.space.findUnique({
     where: {
       domain: spaceDomain
     }
-  })
+  });
 
   if (!space) {
     throw new DataNotFoundError(`Space with domain ${spaceDomain} not found`);
@@ -71,22 +78,29 @@ async function wipePosts({spaceDomain}: {spaceDomain: string}) {
     where: {
       spaceId: space.id
     }
-  })
-
+  });
 }
 
 // Step 2 - generate posts in different categories
 
-function autogeneratePosts({spaceDomain, postsPerCategory = 10, withImageRatio = 50}: {spaceDomain: string, postsPerCategory?: number, withImageRatio?: number}) {
-  return listCategories({spaceDomain}).then(async categories => {
+function autogeneratePosts({
+  spaceDomain,
+  postsPerCategory = 10,
+  withImageRatio = 50
+}: {
+  spaceDomain: string;
+  postsPerCategory?: number;
+  withImageRatio?: number;
+}) {
+  return listCategories({ spaceDomain }).then(async (categories) => {
     for (let i = 0; i <= categories.length; i++) {
       if (i === categories.length) {
         await generatePosts({
           spaceDomain,
           title: `Uncategorised post`,
           count: postsPerCategory,
-          withImageRatio,
-        })
+          withImageRatio
+        });
       } else {
         const category = categories[i];
         await generatePosts({
@@ -94,18 +108,17 @@ function autogeneratePosts({spaceDomain, postsPerCategory = 10, withImageRatio =
           title: `${category.name} post`,
           categoryId: category.id,
           count: postsPerCategory,
-          withImageRatio,
-        })
+          withImageRatio
+        });
       }
     }
-  
-    const totalCategories = categories.length;
-  
-    console.log(`Generated ${postsPerCategory * (totalCategories + 1)} posts across ${totalCategories } categories`);
-    return true
-  })
-}
 
+    const totalCategories = categories.length;
+
+    console.log(`Generated ${postsPerCategory * (totalCategories + 1)} posts across ${totalCategories} categories`);
+    return true;
+  });
+}
 
 const spaceDomain = 'shivering-solana-rooster';
 
@@ -124,6 +137,3 @@ const withImageRatio = 55;
 // }).catch(err => {
 //   console.log(err);
 // })
-
-
-

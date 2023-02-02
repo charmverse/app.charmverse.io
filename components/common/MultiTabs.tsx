@@ -65,7 +65,7 @@ export default function MultiTabs(props: MultiTabsProps) {
       </Box>
       {tabs.map(([_, tabComponent], tabIndex) => (
         /* eslint-disable-next-line */
-          <TabPanel value={value} index={tabIndex} key={tabIndex}>
+        <TabPanel value={value} index={tabIndex} key={tabIndex}>
           {tabComponent}
         </TabPanel>
       ))}
