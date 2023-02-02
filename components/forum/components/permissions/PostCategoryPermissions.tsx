@@ -1,6 +1,7 @@
-import { Divider } from '@mui/material';
 import Box from '@mui/material/Box';
+import Divider from '@mui/material/Divider';
 import Grid from '@mui/material/Grid';
+import Tooltip from '@mui/material/Tooltip';
 import type { PostCategory } from '@prisma/client';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import useSWR from 'swr';
@@ -120,7 +121,11 @@ function PostCategoryPermissions({ postCategory, permissions }: Props) {
     );
   }
 
-  const canAddRoles = permissions.manage_permissions && (roles?.length ?? 0) > mappedPermissions.roles.length;
+  const allSpaceMembersHaveAccess = mappedPermissions.space?.permissionLevel === 'full_access';
+  const canAddRoles =
+    !allSpaceMembersHaveAccess &&
+    permissions.manage_permissions &&
+    (roles?.length ?? 0) > mappedPermissions.roles.length;
 
   return (
     <Box>
@@ -160,20 +165,29 @@ function PostCategoryPermissions({ postCategory, permissions }: Props) {
             />
           </Grid>
         )}
-
-        {canAddRoles && (
-          <Grid item xs={12} display='flex' justifyContent='flex-start'>
-            {!addRolesDialog.isOpen ? (
-              <Button onClick={addRolesDialog.open} variant='text' color='secondary'>
-                + Add roles
-              </Button>
-            ) : (
-              <Button onClick={addRolesDialog.close} variant='text' color='secondary'>
-                Cancel
-              </Button>
-            )}
-          </Grid>
-        )}
+        <Grid item xs={12} display='flex' justifyContent='flex-start'>
+          {!addRolesDialog.isOpen ? (
+            <Tooltip
+              title={
+                allSpaceMembersHaveAccess
+                  ? 'All space members already have full access to this post category.'
+                  : !canAddRoles
+                  ? 'There are no roles available to add to this post category.'
+                  : ''
+              }
+            >
+              <div>
+                <Button disabled={!canAddRoles} onClick={addRolesDialog.open} variant='text' color='secondary'>
+                  + Add roles
+                </Button>
+              </div>
+            </Tooltip>
+          ) : (
+            <Button onClick={addRolesDialog.close} variant='text' color='secondary'>
+              Cancel
+            </Button>
+          )}
+        </Grid>
       </Grid>
     </Box>
   );
@@ -186,7 +200,7 @@ type PostCategoryDialogProps = Props & {
 
 export function PostCategoryPermissionsDialog({ postCategory, onClose, open, permissions }: PostCategoryDialogProps) {
   return (
-    <Modal onClose={onClose} title={`${postCategory.name} permissions`} open={open}>
+    <Modal mobileDialog onClose={onClose} title={`${postCategory.name} permissions`} open={open}>
       <PostCategoryPermissions postCategory={postCategory} permissions={permissions} />
     </Modal>
   );
