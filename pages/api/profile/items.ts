@@ -16,21 +16,11 @@ async function updateUserProfileItems(req: NextApiRequest, res: NextApiResponse<
 
   const shownProfileItems: Omit<ProfileItem, 'userId'>[] = [];
   const hiddenProfileItems: Omit<ProfileItem, 'userId'>[] = [];
-
-  const pinnedProfileItems: Omit<ProfileItem, 'userId'>[] = [];
-  const unpinnedProfileItems: Omit<ProfileItem, 'userId'>[] = [];
-
   profileItems.forEach((profileItem) => {
     if (!profileItem.isHidden) {
       shownProfileItems.push(profileItem);
     } else {
       hiddenProfileItems.push(profileItem);
-    }
-
-    if (!profileItem.isPinned) {
-      pinnedProfileItems.push(profileItem);
-    } else {
-      unpinnedProfileItems.push(profileItem);
     }
   });
 
@@ -44,20 +34,6 @@ async function updateUserProfileItems(req: NextApiRequest, res: NextApiResponse<
       },
       data: {
         isHidden: false
-      }
-    });
-  }
-
-  if (pinnedProfileItems.length) {
-    const ids: string[] = pinnedProfileItems.map((profileItem) => profileItem.id);
-    await prisma.profileItem.updateMany({
-      where: {
-        id: {
-          in: ids
-        }
-      },
-      data: {
-        isPinned: true
       }
     });
   }
@@ -85,28 +61,26 @@ async function updateUserProfileItems(req: NextApiRequest, res: NextApiResponse<
     );
   }
 
-  if (unpinnedProfileItems.length) {
-    await Promise.all(
-      unpinnedProfileItems.map((profileItem) =>
-        prisma.profileItem.upsert({
-          where: {
-            id: profileItem.id
-          },
-          update: {
-            id: profileItem.id,
-            isPinned: false
-          },
-          create: {
-            id: profileItem.id,
-            userId: req.session.user.id,
-            metadata: profileItem.metadata === null ? undefined : profileItem.metadata,
-            isPinned: false,
-            type: profileItem.type
-          }
-        })
-      )
-    );
-  }
+  await Promise.all(
+    profileItems.map((profileItem) =>
+      prisma.profileItem.upsert({
+        where: {
+          id: profileItem.id
+        },
+        update: {
+          id: profileItem.id,
+          isPinned: profileItem.isPinned
+        },
+        create: {
+          id: profileItem.id,
+          userId: req.session.user.id,
+          metadata: profileItem.metadata === null ? undefined : profileItem.metadata,
+          isPinned: profileItem.isPinned,
+          type: profileItem.type
+        }
+      })
+    )
+  );
 
   return res.status(200).end();
 }

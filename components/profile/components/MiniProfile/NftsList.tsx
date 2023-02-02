@@ -1,5 +1,7 @@
 import styled from '@emotion/styled';
 import AddIcon from '@mui/icons-material/Add';
+import CancelIcon from '@mui/icons-material/Cancel';
+import CloseIcon from '@mui/icons-material/Close';
 import { Link, Typography } from '@mui/material';
 import { Box, Stack } from '@mui/system';
 import type { ProfileItem } from '@prisma/client';
@@ -34,6 +36,23 @@ function NonPinnedNftBox({ onClick }: { onClick: VoidFunction }) {
   );
 }
 
+const NftContainer = styled(Box)`
+  position: relative;
+
+  &:hover .icons {
+    opacity: 1;
+  }
+
+  & .icons {
+    position: absolute;
+    opacity: 0;
+    z-index: 1;
+    right: 0;
+    top: -5px;
+    cursor: pointer;
+  }
+`;
+
 type Props = { memberId: string; nfts: NftData[]; mutateNfts?: KeyedMutator<NftData[]> };
 
 export function NftsList({ mutateNfts, memberId, nfts }: Props) {
@@ -60,7 +79,7 @@ export function NftsList({ mutateNfts, memberId, nfts }: Props) {
       await mutateNfts(
         (cachedNfts) => {
           if (!cachedNfts) {
-            return undefined;
+            return [];
           }
 
           return cachedNfts.map((cachedNft) =>
@@ -81,11 +100,14 @@ export function NftsList({ mutateNfts, memberId, nfts }: Props) {
         {pinnedNfts.map((nft) => {
           const nftData = transformNft(nft);
           return (
-            <Box key={nft.id}>
+            <NftContainer key={nft.id}>
+              {!readOnly && (
+                <CancelIcon color='error' fontSize='small' className='icons' onClick={() => updateNft(nft)} />
+              )}
               <Link href={nftData.link} target='_blank' display='flex'>
                 <Avatar size='large' avatar={nftData.image} />
               </Link>
-            </Box>
+            </NftContainer>
           );
         })}
         {currentUser?.id === memberId ? (

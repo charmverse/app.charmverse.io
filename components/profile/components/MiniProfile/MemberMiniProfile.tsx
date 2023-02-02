@@ -72,7 +72,7 @@ export function MemberMiniProfile({ member, onClose }: { member: Member; onClose
         memberId={currentUser.id}
         spaceId={currentSpace.id}
         updateMemberPropertyValues={updateSpaceValues}
-        cancelButtonText='Set up later'
+        cancelButtonText='Cancel'
       >
         {user && (
           <>
