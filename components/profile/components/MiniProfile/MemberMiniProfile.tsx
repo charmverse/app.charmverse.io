@@ -61,7 +61,11 @@ export function MemberMiniProfile({ member, onClose }: { member: Member; onClose
 
   const isLoading = isFetchingUser || isFetchingPoaps || isFetchingNfts;
 
-  if (user?.id === currentUser?.id && currentSpace && currentUser) {
+  if (!currentSpace || !currentUser) {
+    return null;
+  }
+
+  if (member.id === currentUser.id) {
     return (
       <MemberPropertiesPopup
         title='Edit your profile'
@@ -69,6 +73,7 @@ export function MemberMiniProfile({ member, onClose }: { member: Member; onClose
           mutateMembers();
           onClose();
         }}
+        isLoading={isLoading}
         memberId={currentUser.id}
         spaceId={currentSpace.id}
         updateMemberPropertyValues={updateSpaceValues}
