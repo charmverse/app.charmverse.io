@@ -10,3 +10,6 @@ export const spaceOperationLabels: Record<SpaceOperation, string> = {
 export function spaceOperations() {
   return Object.keys(SpaceOperation) as SpaceOperation[];
 }
+
+// We don't want to have explicit support for forum categories in space permissions config yet
+export const spaceOperationsWithoutForumCategory = ['createPage', 'createBounty', 'createVote'] as const;

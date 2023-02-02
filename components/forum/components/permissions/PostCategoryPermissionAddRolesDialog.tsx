@@ -31,14 +31,18 @@ type Props = {
   onSave: (input: BulkRolePostCategoryPermissionUpsert) => void;
   roleIdsToHide: string[];
 };
+
+const defaultPermissionLevel: PostCategoryPermissionLevel = 'full_access';
+
 export function PostCategoryPermissionAddRolesDialog({ isOpen, onClose, onSave, roleIdsToHide }: Props) {
-  const [newRolesPermissionLevel, setNewRolesPermissionLevel] = useState<PostCategoryPermissionLevel>('member');
+  const [newRolesPermissionLevel, setNewRolesPermissionLevel] =
+    useState<PostCategoryPermissionLevel>(defaultPermissionLevel);
   const [newRoleIds, setNewRoleIds] = useState<string[]>([]);
 
   function addRolePermissions() {
     onSave({ roleIds: newRoleIds, permissionLevel: newRolesPermissionLevel });
     setNewRoleIds([]);
-    setNewRolesPermissionLevel('member');
+    setNewRolesPermissionLevel(defaultPermissionLevel);
     onClose();
   }
 
@@ -48,6 +52,9 @@ export function PostCategoryPermissionAddRolesDialog({ isOpen, onClose, onSave, 
         <Grid container item xs justifyContent='space-between'>
           <Grid item xs={8}>
             <SmallSelect
+              sx={{
+                textAlign: 'left'
+              }}
               renderValue={(value) =>
                 (forumMemberPermissionOptions[value as keyof typeof forumMemberPermissionOptions] as string as any) ||
                 'No access'

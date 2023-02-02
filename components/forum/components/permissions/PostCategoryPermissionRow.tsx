@@ -1,4 +1,5 @@
 import Box from '@mui/material/Box';
+import Stack from '@mui/material/Stack';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import type { PostCategoryPermissionLevel } from '@prisma/client';
@@ -52,7 +53,7 @@ export function PostCategoryRolePermissionRow({
   return (
     <Box display='flex' justifyContent='space-between' alignItems='center'>
       <Typography variant='body2'>{assigneeName}</Typography>
-      <div style={{ width: '160px', textAlign: 'right' }}>
+      <div style={{ width: '120px', textAlign: 'left' }}>
         {canEdit ? (
           <SmallSelect
             renderValue={(value) =>
