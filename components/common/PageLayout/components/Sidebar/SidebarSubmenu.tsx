@@ -14,6 +14,7 @@ import Typography from '@mui/material/Typography';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { bindTrigger, bindMenu } from 'material-ui-popup-state';
 import { usePopupState } from 'material-ui-popup-state/hooks';
+import type { MouseEvent } from 'react';
 import { useCallback, useState } from 'react';
 
 import { CreateSpaceForm } from 'components/common/CreateSpaceForm';
@@ -66,7 +67,7 @@ export default function SidebarSubmenu({
 }: {
   closeSidebar: () => void;
   logoutCurrentUser: () => void;
-  openProfileModal: () => void;
+  openProfileModal: (event: MouseEvent<Element, globalThis.MouseEvent>, path?: string) => void;
 }) {
   const theme = useTheme();
   const showMobileFullWidthModal = !useMediaQuery(theme.breakpoints.down('sm'));

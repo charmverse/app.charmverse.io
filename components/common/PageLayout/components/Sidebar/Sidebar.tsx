@@ -182,8 +182,6 @@ export default function Sidebar({ closeSidebar, favorites, navAction }: SidebarP
     router.push('/');
   }
 
-  const openProfileModal = () => {};
-
   const pagesNavigation = useMemo(() => {
     return (
       <>
@@ -224,7 +222,7 @@ export default function Sidebar({ closeSidebar, favorites, navAction }: SidebarP
         <SidebarSubmenu
           closeSidebar={closeSidebar}
           logoutCurrentUser={logoutCurrentUser}
-          openProfileModal={openProfileModal}
+          openProfileModal={(e) => handleModalClick(e, 'profile')}
         />
         {space && (
           <>

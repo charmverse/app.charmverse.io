@@ -27,7 +27,7 @@ export const SettingsDialogContext = createContext<Readonly<IContext>>({
 });
 
 export function SettingsDialogProvider({ children }: { children: ReactNode }) {
-  const settingsModalState = usePopupState({ variant: 'popover', popupId: 'profile-modal' });
+  const settingsModalState = usePopupState({ variant: 'dialog', popupId: 'settings-dialog' });
   const [activePath, setActivePath] = useState('');
 
   const initialTriggerDialogState = { ...bindTrigger(settingsModalState) };

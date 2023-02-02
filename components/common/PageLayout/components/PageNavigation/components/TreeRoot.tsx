@@ -12,7 +12,7 @@ type TreeRootProps = {
   mutatePage: (page: PageUpdates) => void;
 } & ComponentProps<typeof TreeView>;
 
-export function TreeRoot({ children, isFavorites, ...rest }: TreeRootProps) {
+export function TreeRoot({ children, isFavorites, mutatePage, ...rest }: TreeRootProps) {
   const ref = useRef<HTMLDivElement>(null);
   const router = useRouter();
 

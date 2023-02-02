@@ -16,7 +16,6 @@ import { useLocalStorage } from 'hooks/useLocalStorage';
 import { useMobileSidebar } from 'hooks/useMobileSidebar';
 import { PageActionDisplayProvider } from 'hooks/usePageActionDisplay';
 import { useResize } from 'hooks/useResize';
-import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useSharedPage } from 'hooks/useSharedPage';
 import { ThreadsProvider } from 'hooks/useThreads';
 import { useUser } from 'hooks/useUser';
@@ -191,7 +190,7 @@ function PageLayout({ children }: PageLayoutProps) {
           navAction={isMobileSidebar ? handleDrawerClose : undefined}
         />
       ),
-    [handleDrawerClose, user?.favorites, !!user, isMobileSidebar]
+    [handleDrawerClose, !!user, isMobileSidebar]
   );
 
   if (!accessChecked) {
