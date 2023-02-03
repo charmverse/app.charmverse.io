@@ -65,6 +65,16 @@ jobs:
       - name: Setup test database
         run: bash ./scripts/configure-db.sh
 
+      - name: Restore dependencies cache
+        id: cache_node_modules
+        uses: actions/cache@v3
+        with:
+          path: |
+            ./node_modules
+            /home/runner/.cache/ms-playwright
+          restore-keys: |
+            nodemodules-cache-${{ hashFiles('package-lock.json') }}-
+
       - name: Cache restore nextjs code
         id: cache_build
         uses: actions/cache@v3
@@ -73,28 +83,18 @@ jobs:
             .next
             .env.test.local
           # including the app_env helps make sure that deploy_staging.yml does not reuse values from test_and_deploy.yml which are meant for production
-          key: nextjs-build-${{ github.sha }}-${{ inputs.NEXT_PUBLIC_APP_ENV }}
+          restore-keys: |
+            nextjs-build-${{ github.sha }}-${{ inputs.NEXT_PUBLIC_APP_ENV }}
 
-      - name: Cache Next.js build # copied from https://github.com/vercel/next.js/blob/canary/errors/no-cache.md
+      - name: Restore Next.js build # copied from https://github.com/vercel/next.js/blob/canary/errors/no-cache.md
         uses: actions/cache@v3
         with:
           path: |
             ~/.npm
             ${{ github.workspace }}/.next/cache
-          # Generate a new cache whenever packages or source files change.
-          key: nextjs-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**.[jt]s', '**.[jt]sx') }}
           # If source files changed but packages didn't, rebuild from a prior cache.
           restore-keys: |
-            ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-
-
-      - name: Cache dependencies
-        id: cache_node_modules
-        uses: actions/cache@v3
-        with:
-          path: |
-            ./node_modules
-            /home/runner/.cache/ms-playwright
-          key: nodemodules-cache-${{ hashFiles('package-lock.json') }}-${{ hashFiles('patches/**.patch') }}
+            nextjs-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}-
 
       - name: Run ${{matrix.test_name}}
         run: |
