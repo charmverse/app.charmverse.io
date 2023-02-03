@@ -73,7 +73,8 @@ test.describe.serial('Manage post permissions', () => {
 
     await forumHomePage.page.waitForTimeout(2000);
 
-    await forumHomePage.page.press('data-test=member-onboarding-form', 'Escape');
+    // Close member onboarding modal which shows up first time
+    await forumHomePage.closeModalButton.click();
 
     // Login as user and not find the forum category or the post
 
@@ -103,7 +104,8 @@ test.describe.serial('Manage post permissions', () => {
 
     await forumHomePage.page.waitForTimeout(2000);
 
-    await forumHomePage.page.press('data-test=member-onboarding-form', 'Escape');
+    // Close member onboarding modal which shows up first time
+    await forumHomePage.closeModalButton.click();
 
     const category = forumHomePage.getCategoryLocator(hiddenCategory.id);
     await category.hover();
@@ -147,7 +149,6 @@ test.describe.serial('Manage post permissions', () => {
     // Start the navigation steps
     await forumHomePage.goToForumHome(space.domain);
     await forumHomePage.page.waitForTimeout(2000);
-    await forumHomePage.page.press('data-test=member-onboarding-form', 'Escape');
 
     const category = forumHomePage.getCategoryLocator(hiddenCategory.id);
 
