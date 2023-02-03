@@ -1,5 +1,6 @@
 import CancelIcon from '@mui/icons-material/Cancel';
-import { Tooltip, Typography } from '@mui/material';
+import { Grid, Tooltip, Typography } from '@mui/material';
+import Alert from '@mui/material/Alert';
 import { Stack } from '@mui/system';
 import { useState } from 'react';
 import useSWRImmutable from 'swr/immutable';
@@ -23,7 +24,8 @@ export function OrgsList({ memberId, readOnly = false }: Props) {
   const {
     data: orgs = [],
     mutate: mutateOrgs,
-    isLoading: isFetchingOrgs
+    isLoading: isFetchingOrgs,
+    error
   } = useSWRImmutable(`/orgs/${memberId}`, () => {
     return charmClient.profile.getOrgs(memberId);
   });
@@ -41,50 +43,56 @@ export function OrgsList({ memberId, readOnly = false }: Props) {
   return (
     <Stack gap={1}>
       <Typography variant='h6'>Organizations</Typography>
-      {isFetchingOrgs ? (
-        <LoadingComponent isLoading />
-      ) : (
-        <Stack gap={2} display='flex' flexDirection='row'>
-          {pinnedOrgs.map((pinnedOrg) => {
-            return (
-              <ProfileItemContainer key={pinnedOrg.id}>
-                {!readOnly && (
-                  <CancelIcon color='error' fontSize='small' className='icons' onClick={() => updateOrg(pinnedOrg)} />
-                )}
-                <Tooltip title={pinnedOrg.name}>
-                  <div>
-                    <Avatar size='large' name={pinnedOrg.name} avatar={pinnedOrg.logo} />
-                  </div>
-                </Tooltip>
-              </ProfileItemContainer>
-            );
-          })}
-          {currentUser?.id === memberId ? (
-            new Array(emptyOrgsCount).fill(0).map((_, i) => (
-              <NonPinnedItem
-                onClick={() => {
-                  if (!readOnly) {
-                    setIsShowingOrgsGallery(true);
-                  }
-                }}
-                key={`${i.toString()}`}
-              />
-            ))
-          ) : pinnedOrgs.length === 0 ? (
-            <Typography color='secondary'>No pinned Organizations</Typography>
-          ) : null}
-
-          {showingOrgsGallery && (
-            <OrgsGalleryPopup
-              onClose={() => {
-                setIsShowingOrgsGallery(false);
-              }}
-              orgs={nonPinnedOrgs}
-              onSelect={updateOrg}
-            />
-          )}
-        </Stack>
+      {error && (
+        <Grid item>
+          <Alert severity='error'>Failed to fetch your token organizations</Alert>
+        </Grid>
       )}
+      {!error &&
+        (isFetchingOrgs ? (
+          <LoadingComponent isLoading />
+        ) : (
+          <Stack gap={2} display='flex' flexDirection='row'>
+            {pinnedOrgs.map((pinnedOrg) => {
+              return (
+                <ProfileItemContainer key={pinnedOrg.id}>
+                  {!readOnly && (
+                    <CancelIcon color='error' fontSize='small' className='icons' onClick={() => updateOrg(pinnedOrg)} />
+                  )}
+                  <Tooltip title={pinnedOrg.name}>
+                    <div>
+                      <Avatar size='large' name={pinnedOrg.name} avatar={pinnedOrg.logo} />
+                    </div>
+                  </Tooltip>
+                </ProfileItemContainer>
+              );
+            })}
+            {currentUser?.id === memberId ? (
+              new Array(emptyOrgsCount).fill(0).map((_, i) => (
+                <NonPinnedItem
+                  onClick={() => {
+                    if (!readOnly) {
+                      setIsShowingOrgsGallery(true);
+                    }
+                  }}
+                  key={`${i.toString()}`}
+                />
+              ))
+            ) : pinnedOrgs.length === 0 ? (
+              <Typography color='secondary'>No pinned Organizations</Typography>
+            ) : null}
+
+            {showingOrgsGallery && (
+              <OrgsGalleryPopup
+                onClose={() => {
+                  setIsShowingOrgsGallery(false);
+                }}
+                orgs={nonPinnedOrgs}
+                onSelect={updateOrg}
+              />
+            )}
+          </Stack>
+        ))}
     </Stack>
   );
 }

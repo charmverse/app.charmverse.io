@@ -1,5 +1,5 @@
 import CancelIcon from '@mui/icons-material/Cancel';
-import { Link, Tooltip, Typography } from '@mui/material';
+import { Alert, Grid, Link, Tooltip, Typography } from '@mui/material';
 import { Stack } from '@mui/system';
 import { useState } from 'react';
 import useSWRImmutable from 'swr/immutable';
@@ -26,7 +26,8 @@ export function NftsList({ memberId, readOnly = false }: Props) {
   const {
     data: nfts = [],
     mutate: mutateNfts,
-    isLoading: isFetchingNfts
+    isLoading: isFetchingNfts,
+    error
   } = useSWRImmutable(`/nfts/${memberId}`, () => {
     return charmClient.blockchain.listNFTs(memberId);
   });
@@ -41,51 +42,57 @@ export function NftsList({ memberId, readOnly = false }: Props) {
   return (
     <Stack gap={1}>
       <Typography variant='h6'>NFTs</Typography>
-      {isFetchingNfts ? (
-        <LoadingComponent isLoading />
-      ) : (
-        <Stack gap={2} display='flex' flexDirection='row'>
-          {pinnedNfts.map((nft) => {
-            const nftData = transformNft(nft);
-            return (
-              <ProfileItemContainer key={nft.id}>
-                {!readOnly && (
-                  <CancelIcon color='error' fontSize='small' className='icons' onClick={() => updateNft(nft)} />
-                )}
-                <Tooltip title={nftData.title}>
-                  <Link href={nftData.link} target='_blank' display='flex'>
-                    <Avatar size='large' isNft avatar={nftData.image} />
-                  </Link>
-                </Tooltip>
-              </ProfileItemContainer>
-            );
-          })}
-          {currentUser?.id === memberId ? (
-            new Array(emptyNftsCount).fill(0).map((_, i) => (
-              <NonPinnedItem
-                onClick={() => {
-                  if (!readOnly) {
-                    setIsShowingNftGallery(true);
-                  }
-                }}
-                key={`${i.toString()}`}
-              />
-            ))
-          ) : pinnedNfts.length === 0 ? (
-            <Typography color='secondary'>No pinned NFTs</Typography>
-          ) : null}
-          {showingNftGallery && (
-            <NftAvatarGalleryPopup
-              isVisible
-              onClose={() => {
-                setIsShowingNftGallery(false);
-              }}
-              onSelect={updateNft}
-              hiddenNfts={pinnedNfts.map((pinnedNft) => pinnedNft.id)}
-            />
-          )}
-        </Stack>
+      {error && (
+        <Grid item>
+          <Alert severity='error'>Failed to fetch your NFTs</Alert>
+        </Grid>
       )}
+      {!error &&
+        (isFetchingNfts ? (
+          <LoadingComponent isLoading />
+        ) : (
+          <Stack gap={2} display='flex' flexDirection='row'>
+            {pinnedNfts.map((nft) => {
+              const nftData = transformNft(nft);
+              return (
+                <ProfileItemContainer key={nft.id}>
+                  {!readOnly && (
+                    <CancelIcon color='error' fontSize='small' className='icons' onClick={() => updateNft(nft)} />
+                  )}
+                  <Tooltip title={nftData.title}>
+                    <Link href={nftData.link} target='_blank' display='flex'>
+                      <Avatar size='large' isNft avatar={nftData.image} />
+                    </Link>
+                  </Tooltip>
+                </ProfileItemContainer>
+              );
+            })}
+            {currentUser?.id === memberId ? (
+              new Array(emptyNftsCount).fill(0).map((_, i) => (
+                <NonPinnedItem
+                  onClick={() => {
+                    if (!readOnly) {
+                      setIsShowingNftGallery(true);
+                    }
+                  }}
+                  key={`${i.toString()}`}
+                />
+              ))
+            ) : pinnedNfts.length === 0 ? (
+              <Typography color='secondary'>No pinned NFTs</Typography>
+            ) : null}
+            {showingNftGallery && (
+              <NftAvatarGalleryPopup
+                isVisible
+                onClose={() => {
+                  setIsShowingNftGallery(false);
+                }}
+                onSelect={updateNft}
+                hiddenNfts={pinnedNfts.map((pinnedNft) => pinnedNft.id)}
+              />
+            )}
+          </Stack>
+        ))}
     </Stack>
   );
 }
