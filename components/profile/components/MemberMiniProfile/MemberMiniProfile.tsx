@@ -2,7 +2,6 @@ import { Dialog, DialogContent, Divider, Typography, useMediaQuery } from '@mui/
 import { Box, Stack, useTheme } from '@mui/system';
 import type { MemberProperty, MemberPropertyType } from '@prisma/client';
 import useSWR from 'swr';
-import useSWRImmutable from 'swr/immutable';
 
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
@@ -41,26 +40,6 @@ function MemberProfile({ member, onClose }: { member: Member; onClose: VoidFunct
   );
   const { updateSpaceValues } = useMemberPropertyValues(member.id);
 
-  const { data: poaps = [], isLoading: isFetchingPoaps } = useSWRImmutable(`/poaps/${member.id}`, () => {
-    return charmClient.getUserPoaps(member.id);
-  });
-
-  const {
-    data: orgs = [],
-    mutate: mutateOrgs,
-    isLoading: isFetchingOrgs
-  } = useSWRImmutable(`/orgs/${member.id}`, () => {
-    return charmClient.profile.getOrgs(member.id);
-  });
-
-  const {
-    data: nfts = [],
-    mutate: mutateNfts,
-    isLoading: isFetchingNfts
-  } = useSWRImmutable(`/nfts/${member.id}`, () => {
-    return charmClient.blockchain.listNFTs(member.id);
-  });
-
   const username =
     (member.properties.find((memberProperty) => memberProperty.memberPropertyId === propertiesRecord.name?.id)
       ?.value as string) ?? member.username;
@@ -69,7 +48,7 @@ function MemberProfile({ member, onClose }: { member: Member; onClose: VoidFunct
     charmClient.getUserByPath(member.path as string)
   );
 
-  const isLoading = isFetchingUser || isFetchingPoaps || isFetchingNfts || isFetchingOrgs;
+  const isLoading = isFetchingUser;
 
   if (!currentSpace || !currentUser) {
     return null;
@@ -96,9 +75,9 @@ function MemberProfile({ member, onClose }: { member: Member; onClose: VoidFunct
                   mt: 3
                 }}
               />
-              <NftsList mutateNfts={mutateNfts} nfts={nfts} memberId={user.id} />
-              <OrgsList mutateOrgs={mutateOrgs} orgs={orgs} memberId={user.id} />
-              <PoapsList poaps={poaps} />
+              <NftsList memberId={user.id} />
+              <OrgsList memberId={user.id} />
+              <PoapsList memberId={user.id} />
             </Stack>
           )
         }
@@ -154,9 +133,9 @@ function MemberProfile({ member, onClose }: { member: Member; onClose: VoidFunct
             )}
 
             <Stack gap={3}>
-              <NftsList nfts={nfts} memberId={user.id} />
-              <OrgsList orgs={orgs} memberId={user.id} />
-              <PoapsList poaps={poaps} />
+              <NftsList memberId={user.id} readOnly />
+              <OrgsList memberId={user.id} readOnly />
+              <PoapsList memberId={user.id} />
             </Stack>
           </DialogContent>
         </>
