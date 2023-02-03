@@ -36,18 +36,19 @@ export function PageActionDisplayProvider({ children }: { children: ReactNode })
 
   function updatePageActionDisplay(defaultAction: PageAction | null = null) {
     const highlightedCommentId = new URLSearchParams(window.location.search).get('commentId');
-    if (currentPageActionDisplay) {
+    if (currentPageActionDisplay && !highlightedCommentId) {
       // dont redirect if sidebar is already open
-      return setCurrentPageActionDisplay(null);
+      return;
     }
-    if (currentPageId && !isValidatingInlineComments && !isValidatingInlineVotes && isLargeScreen) {
+
+    if (currentPageId && !isValidatingInlineComments && !isValidatingInlineVotes) {
       const cachedInlineCommentData: ThreadWithCommentsAndAuthors[] | undefined = cache.get(
         `pages/${currentPageId}/threads`
       )?.data as ThreadWithCommentsAndAuthors[] | undefined;
       // For some reason we cant get the threads map using useThreads, its empty even after isValidating is true (data has loaded)
       if (
         highlightedCommentId ||
-        (cachedInlineCommentData && cachedInlineCommentData.find((thread) => thread && !thread.resolved))
+        (isLargeScreen && cachedInlineCommentData?.find((thread) => thread && !thread.resolved))
       ) {
         return setCurrentPageActionDisplay('comments');
       } else {
