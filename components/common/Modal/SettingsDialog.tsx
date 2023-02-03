@@ -25,6 +25,8 @@ import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
 
+import WorkspaceAvatar from '../PageLayout/components/Sidebar/WorkspaceAvatar';
+
 interface TabPanelProps extends BoxProps {
   children?: React.ReactNode;
   index: string;
@@ -133,7 +135,18 @@ export default function SettingsModal() {
             ))}
             <StyledTreeItem nodeId='my-spaces' label='My spaces' icon={null}>
               {spaces.map((space) => (
-                <StyledTreeItem key={space.id} nodeId={space.name} label={space.name} icon={null}>
+                <StyledTreeItem
+                  key={space.id}
+                  nodeId={space.name}
+                  label={
+                    <Box display='flex' alignItems='center' gap={1} py={1}>
+                      <WorkspaceAvatar name={space.name} image={space.spaceImage} />
+                      <Typography noWrap>{space.name}</Typography>
+                    </Box>
+                  }
+                  icon={null}
+                  ContentProps={{ style: { paddingLeft: 18 } }}
+                >
                   {SETTINGS_TABS.map((tab) => (
                     <StyledTreeItem
                       key={tab.path}
@@ -142,6 +155,7 @@ export default function SettingsModal() {
                       icon={tab.icon}
                       onClick={(e) => handleChange(e, `${space.name}-${tab.path}`)}
                       isActive={activePath === `${space.name}-${tab.path}`}
+                      ContentProps={{ style: { paddingLeft: 50 } }}
                     />
                   ))}
                 </StyledTreeItem>
