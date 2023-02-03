@@ -105,13 +105,14 @@ export default function SettingsModal() {
       onClose={onClose}
       open={open}
     >
-      <Box display='flex' flexDirection='row' flex='1'>
+      <Box display='flex' flexDirection='row' flex='1' overflow='hidden'>
         <Box
           component='aside'
           maxWidth={350}
           minWidth={300}
           borderRight='1px solid'
           borderColor='divider'
+          overflow='auto'
           sx={{ backgroundColor: (theme) => theme.palette.sidebar.background }}
         >
           <Typography p='10px' variant='body1'>
@@ -166,7 +167,7 @@ export default function SettingsModal() {
             </StyledTreeItem>
           </TreeView>
         </Box>
-        <Box flex='1 1 auto' position='relative'>
+        <Box flex='1 1 auto' position='relative' overflow='auto'>
           {onClose ? (
             <IconButton
               aria-label='close'
