@@ -66,15 +66,13 @@ jobs:
             include_postgres: "true"
     steps:
       - uses: actions/checkout@v3
+      - name: Install dependencies (from cache)
+        uses: ./.github/actions/install
       - name: Setup test database
         run: |
           if [ "${{matrix.include_postgres}}" == "true" ]; then
             bash ./scripts/configure-db.sh
           fi
-
-      - name: Install dependencies (from cache)
-        uses: ./.github/actions/install
-
       - name: Build app (from cache)
         uses: ./.github/actions/build
         with:
