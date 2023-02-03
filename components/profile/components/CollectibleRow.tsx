@@ -5,17 +5,8 @@ import { IconButton, Link, Stack, Tooltip, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 
 import Avatar from 'components/common/Avatar';
+import type { Collectable } from 'lib/blockchain/interfaces';
 import { showDateWithMonthAndYear } from 'lib/utilities/dates';
-
-export interface Collectable {
-  title: string;
-  date: string;
-  id: string;
-  image: string;
-  type: 'poap' | 'nft';
-  link: string;
-  isHidden: boolean;
-}
 
 interface ProfileItemProps {
   onClick: () => void;

@@ -362,6 +362,7 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(
                     }}
                   >
                     <UserDisplay
+                      showMiniProfile
                       component='div'
                       user={comment.user}
                       avatarSize='small'

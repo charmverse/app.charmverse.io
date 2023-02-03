@@ -935,6 +935,7 @@ model ProfileItem {
   isHidden Boolean?
   metadata Json?
   type     ProfileItemType
+  isPinned Boolean?
 
   @@index([userId])
 }

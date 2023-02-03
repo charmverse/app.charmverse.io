@@ -161,8 +161,8 @@ class CharmClient {
     return http.GET<UserDetails>('/api/profile/details');
   }
 
-  getUserPoaps() {
-    return http.GET<ExtendedPoap[]>('/api/profile/poaps');
+  getUserPoaps(userId: string) {
+    return http.GET<ExtendedPoap[]>(`/api/profile/poaps/${userId}`);
   }
 
   updateUserDetails(data: Partial<UserDetails>) {
