@@ -50,7 +50,7 @@ export function highlightElement({
 }) {
   const pageActionListNode = document.getElementById(elementId) as HTMLDivElement;
   // Page action list node might not be present
-  const isShowingActionList = pageActionListNode.style.visibility !== 'hidden';
+  const isShowingActionList = !!pageActionListNode && pageActionListNode.style.visibility !== 'hidden';
   // Check if we are inside a card page modal
   const cardId = new URLSearchParams(window.location.href).get('cardId');
   if (ids.length > 0) {

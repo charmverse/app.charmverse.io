@@ -1,10 +1,12 @@
 import { useTheme } from '@emotion/react';
+import styled from '@emotion/styled';
 import BookmarkIcon from '@mui/icons-material/Bookmark';
 import { Box, Card, CardActionArea, Typography } from '@mui/material';
 import Script from 'next/script';
 import useSWRImmutable from 'swr/immutable';
 
 import charmClient from 'charmClient';
+import Image from 'components/common/Image';
 import Link from 'components/common/Link';
 import LoadingComponent from 'components/common/LoadingComponent';
 
@@ -16,6 +18,11 @@ import type { CharmNodeViewProps } from '../nodeView/nodeView';
 import type { BookmarkNodeAttrs } from './bookmarkSpec';
 
 const iframelyWidgetJs = 'https://cdn.iframe.ly/embed.js';
+
+const PreviewImage = styled.img`
+  object-fit: cover;
+  width: 100%;
+`;
 
 declare global {
   interface Window {
@@ -99,29 +106,49 @@ export function BookmarkNodeView({
     );
   } else if (data?.meta) {
     const title = data.meta.title ?? new URL(data.meta.canonical).hostname;
+
     return (
-      <Card variant='outlined'>
-        <CardActionArea
-          component={Link}
-          color='inherit'
-          sx={{ px: 2, py: 1.5 }}
-          href={data.meta.canonical}
-          target='_blank'
-        >
-          <Typography variant='body2' textOverflow='ellipsis' overflow='hidden' whiteSpace='nowrap'>
-            <strong>{title}</strong>
-          </Typography>
-          <Typography color='secondary' variant='body2' lineHeight='1.3em !important'>
-            {data.meta.description}
-          </Typography>
-          <Box display='flex' alignItems='center' gap={1} mt={1}>
-            {data.links.icon?.[0] && <img src={data.links.icon[0].href} />}
-            <Typography component='span' variant='body2' textOverflow='ellipsis' overflow='hidden' whiteSpace='nowrap'>
-              {data.meta.canonical}
+      <BlockAligner onDelete={deleteNode}>
+        <Card variant='outlined'>
+          <CardActionArea
+            component={Link}
+            color='inherit'
+            sx={{ p: 0, m: 0 }}
+            href={data.meta.canonical}
+            target='_blank'
+          >
+            <Typography color='secondary' variant='body2' lineHeight='1.3em !important'>
+              {data.meta.description}
             </Typography>
-          </Box>
-        </CardActionArea>
-      </Card>
+            <Box display='flex' alignItems='center' gap={2}>
+              <Box display='flex' maxWidth='160px' maxHeight='140px' overflow='hidden'>
+                {data.links.icon?.[0] && <PreviewImage src={data.links.icon[0].href} />}
+              </Box>
+              <Box display='flex' flexDirection='column' alignSelf='flex-start' gap={2} py={3}>
+                <Typography
+                  component='span'
+                  textOverflow='ellipsis'
+                  overflow='hidden'
+                  whiteSpace='nowrap'
+                  textAlign='left'
+                  fontWeight='bold'
+                >
+                  {title}
+                </Typography>
+                <Typography
+                  component='span'
+                  variant='body2'
+                  textOverflow='ellipsis'
+                  overflow='hidden'
+                  whiteSpace='nowrap'
+                >
+                  {data.meta.canonical}
+                </Typography>
+              </Box>
+            </Box>
+          </CardActionArea>
+        </Card>
+      </BlockAligner>
     );
   }
 
