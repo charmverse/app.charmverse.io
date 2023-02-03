@@ -11,7 +11,7 @@ on:
 
 jobs:
   build-test-env:
-    name: build-test-env
+    name: Build test env
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
