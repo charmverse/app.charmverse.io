@@ -19,7 +19,7 @@ runs:
         key: nextjs-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**.[jt]s', '**.[jt]sx') }}
         # If source files changed but packages didn't, rebuild from a prior cache.
         restore-keys: |
-          ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-
+          nextjs-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}-
 
     - name: Cache dependencies
       id: cache_node_modules
