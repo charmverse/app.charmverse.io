@@ -170,14 +170,6 @@ export default function WorkspaceSettings() {
           )}
         </Grid>
       </form>
-      <Legend>API Key</Legend>
-      <Typography variant='body1'>
-        Request access to the charmverse API in our{' '}
-        <Link href={charmverseDiscordInvite} external target='_blank'>
-          Discord Channel <LaunchIcon fontSize='small' />
-        </Link>
-      </Typography>
-
       <Legend>Import Content</Legend>
       <Box sx={{ ml: 1 }} display='flex' flexDirection='column' gap={1}>
         <ImportNotionWorkspace />

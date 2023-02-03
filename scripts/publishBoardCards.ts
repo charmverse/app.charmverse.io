@@ -5,8 +5,7 @@ import { upsertPermission } from '../lib/permissions/pages';
 /**
  * Publish or unpublish all cards in a board, and the board itself
  */
-async function toggleBoardPublishedState (boardId: string, publish: boolean): Promise<true> {
-
+async function toggleBoardPublishedState(boardId: string, publish: boolean): Promise<true> {
   if (publish === false) {
     await prisma.pagePermission.deleteMany({
       where: {
@@ -27,7 +26,6 @@ async function toggleBoardPublishedState (boardId: string, publish: boolean): Pr
             ]
           }
         ]
-
       }
     });
     return true;

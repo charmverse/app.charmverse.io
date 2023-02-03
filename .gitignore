@@ -1,6 +1,11 @@
 
 # dependencies
 /node_modules
+jspm_packages
+
+# Serverless directories
+.serverless
+.build
 
 # next.js
 /.next/

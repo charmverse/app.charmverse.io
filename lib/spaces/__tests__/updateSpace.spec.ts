@@ -39,7 +39,7 @@ describe('updateSpace', () => {
       spaceImage: 'https://new-space-logo.png'
     };
 
-    const droppedUpdate: Omit<Space, keyof UpdateableSpaceFields> = {
+    const droppedUpdate: Partial<Omit<Space, keyof UpdateableSpaceFields>> = {
       createdBy: secondUser.id,
       createdAt: new Date(),
       updatedAt: new Date(),

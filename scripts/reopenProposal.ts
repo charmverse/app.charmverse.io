@@ -1,13 +1,11 @@
-
-import { prisma } from 'db'
+import { prisma } from 'db';
 import { strict as assert } from 'node:assert';
-
 
 /**
  * See this doc for usage instructions
  * https://app.charmverse.io/charmverse/page-8245745086136205
  */
-async function reopenProposal (path: string, newDate: Date) {
+async function reopenProposal(path: string, newDate: Date) {
   const spaceDomain = path.split('/')[0];
   const spacePagePath = path.split('/')[1];
 
@@ -26,10 +24,14 @@ async function reopenProposal (path: string, newDate: Date) {
 
   const proposal = page.proposal;
   assert(proposal, 'Proposal not found');
-  const vote = page.votes.find(vote => vote.context === 'proposal');
+  const vote = page.votes.find((vote) => vote.context === 'proposal');
   assert(vote, 'Proposal vote not found');
 
-  console.log('Proposal + Vote found', { voteDeadline: vote.deadline, voteStatus: vote.status, proposalStatus: proposal.status });
+  console.log('Proposal + Vote found', {
+    voteDeadline: vote.deadline,
+    voteStatus: vote.status,
+    proposalStatus: proposal.status
+  });
 
   const [voteRes, proposalRes] = await prisma.$transaction([
     prisma.vote.update({
@@ -54,4 +56,4 @@ async function reopenProposal (path: string, newDate: Date) {
   console.log('Proposal updated', proposalRes.id, proposalRes.status);
 }
 
-reopenProposal('spacedomain/page-5167169422333', new Date(2022, 11, 21, 23 ));
+reopenProposal('spacedomain/page-5167169422333', new Date(2022, 11, 21, 23));

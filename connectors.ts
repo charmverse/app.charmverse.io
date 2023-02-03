@@ -244,7 +244,7 @@ export function getChainShortname(chainId: string | number): string {
   return RPCList.find((chain) => chain.chainId === parsedChainId)?.shortName ?? '';
 }
 
-export type CryptoCurrency = typeof RPC[Blockchain]['nativeCurrency']['symbol'];
+export type CryptoCurrency = (typeof RPC)[Blockchain]['nativeCurrency']['symbol'];
 
 export const CryptoCurrencyList = Object.values(RPC).reduce((acc, chain) => {
   acc[chain.nativeCurrency.symbol] = chain.nativeCurrency.name;
