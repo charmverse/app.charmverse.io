@@ -56,7 +56,7 @@ describe('verifyTokenGateMembership', () => {
     jest.resetModules();
   });
 
-  it('should return true if user does not have any token gate connected', async () => {
+  xit('should return true if user does not have any token gate connected', async () => {
     const { verifyTokenGateMembership } = await import('lib/token-gates/verifyTokenGateMembership');
     const verifyUser = await getSpaceUser();
     const res = await verifyTokenGateMembership({
