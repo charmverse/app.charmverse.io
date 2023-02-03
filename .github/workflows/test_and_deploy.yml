@@ -53,7 +53,7 @@ jobs:
           - test_name: "Typecheck tests"
             test_command: "test:typecheck"
           - test_name: "Basic tests"
-            test_command: "npm run test:ci"
+            test_command: "test:ci"
           - test_name: "Server integration tests"
             test_command: "test:server:ci"
           - test_name: "Browser tests"
