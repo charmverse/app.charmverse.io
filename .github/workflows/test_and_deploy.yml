@@ -11,7 +11,7 @@ on:
 
 jobs:
   build:
-    name: build
+    name: build-test-env
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -30,7 +30,7 @@ jobs:
   test:
     name: Test
     runs-on: ubuntu-latest
-    needs: build
+    needs: build-test-env
     # Postgres setup copied from https://gist.github.com/2color/537f8ef13ecec80059abb007839a6878
     services:
       postgres:
@@ -55,16 +55,22 @@ jobs:
             test_command: "test:typecheck"
           - test_name: "Basic tests"
             test_command: "test:ci"
+            include_postgres: true
           - test_name: "Server integration tests"
-            test_command: "test:server:ci"
+            test_command: "run start:test:ci & npm run test:server:ci"
+            include_postgres: true
           - test_name: "Browser tests"
             test_command: "test:browser:ci"
           - test_name: "Browser e2e test"
             test_command: "test:e2e:ci"
+            include_postgres: true
     steps:
       - uses: actions/checkout@v3
       - name: Setup test database
-        run: bash ./scripts/configure-db.sh
+        run: |
+          if [ "${{matrix.include_postgres}}" == true ]; then
+            bash ./scripts/configure-db.sh
+          fi
 
       - name: Restore dependencies cache
         id: cache_node_modules
@@ -78,35 +84,13 @@ jobs:
             nodemodules-cache-${{ hashFiles('package-lock.json') }}-${{ hashFiles('patches/**.patch', 'prisma/schema.prisma') }}
             nodemodules-cache-${{ hashFiles('package-lock.json') }}-
 
-      - name: Cache restore nextjs code
-        id: cache_build
-        uses: actions/cache@v3
+      - name: Build app (restore from cache this time)
+        uses: ./.github/actions/build
         with:
-          path: |
-            .next
-            .env.test.local
-          # including the app_env helps make sure that deploy_staging.yml does not reuse values from test_and_deploy.yml which are meant for production
-          key: nextjs-build-${{ github.sha }}-${{ inputs.NEXT_PUBLIC_APP_ENV }}
-          restore-keys: |
-            nextjs-build-${{ github.sha }}-${{ inputs.NEXT_PUBLIC_APP_ENV }}
-
-      - name: Restore Next.js build # copied from https://github.com/vercel/next.js/blob/canary/errors/no-cache.md
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.npm
-            ${{ github.workspace }}/.next/cache
-          key: nextjs-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**.[jt]s', '**.[jt]sx') }}
-          restore-keys: |
-            nextjs-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**.[jt]s', '**.[jt]sx') }}
-            nextjs-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}-
+          NEXT_PUBLIC_APP_ENV: 'test'
 
       - name: Run ${{matrix.test_name}}
-        run: |
-          if [ "${{matrix.test_command}}" == "test:server:ci" ]; then
-            npm run start:test:ci &
-          fi
-          npm run ${{matrix.test_command}}
+        run: npm run ${{matrix.test_command}}
 
   deploy:
     name: Deploy to production
