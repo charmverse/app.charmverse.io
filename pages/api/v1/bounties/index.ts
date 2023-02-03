@@ -152,7 +152,7 @@ async function getBounties(req: NextApiRequest, res: NextApiResponse) {
   /**
    * Returns the wallet addresses that have received a payment for this bounty
    */
-  function getRecipients(bounty: typeof bounties[number]) {
+  function getRecipients(bounty: (typeof bounties)[number]) {
     return bounty.applications
       .filter((application) => application.status === 'paid' && application.walletAddress)
       .map((application) => ({
@@ -160,7 +160,7 @@ async function getBounties(req: NextApiRequest, res: NextApiResponse) {
       }));
   }
 
-  function getUrl(bounty: typeof bounties[number]) {
+  function getUrl(bounty: (typeof bounties)[number]) {
     return `${process.env.DOMAIN}/${bounty.space.domain}/bounties/${bounty.id}`;
   }
 
