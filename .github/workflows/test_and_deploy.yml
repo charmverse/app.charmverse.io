@@ -14,6 +14,7 @@ jobs:
     name: build
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v3
       - name: Install dependencies and build app
         uses: ./.github/actions/install
 
@@ -59,6 +60,7 @@ jobs:
           - test_name: "Browser e2e test"
             test_command: "test:e2e:ci"
     steps:
+      - uses: actions/checkout@v3
       - name: Setup test database
         run: bash ./scripts/configure-db.sh
 
