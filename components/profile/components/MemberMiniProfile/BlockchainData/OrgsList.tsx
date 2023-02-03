@@ -67,7 +67,7 @@ export function OrgsList({ memberId, readOnly = false }: Props) {
                 </ProfileItemContainer>
               );
             })}
-            {currentUser?.id === memberId && emptyOrgsCount !== 0 && nonPinnedOrgs.length !== 0 ? (
+            {currentUser?.id === memberId && emptyOrgsCount !== 0 ? (
               <Tooltip title='Add upto 5 orgs'>
                 <div>
                   <NonPinnedItem

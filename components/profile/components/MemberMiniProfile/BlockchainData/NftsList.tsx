@@ -32,7 +32,6 @@ export function NftsList({ memberId, readOnly = false }: Props) {
     return charmClient.blockchain.listNFTs(memberId);
   });
   const pinnedNfts = nfts.filter((nft) => nft.isPinned);
-  const nonPinnedNfts = nfts.filter((nft) => !nft.isPinned);
   const emptyNftsCount = totalShownNfts - pinnedNfts.length;
 
   async function updateNft(nft: NftData) {
@@ -68,7 +67,7 @@ export function NftsList({ memberId, readOnly = false }: Props) {
                 </ProfileItemContainer>
               );
             })}
-            {currentUser?.id === memberId && emptyNftsCount !== 0 && nonPinnedNfts.length !== 0 ? (
+            {currentUser?.id === memberId && emptyNftsCount !== 0 ? (
               <Tooltip title='Add upto 5 NFTs'>
                 <div>
                   <NonPinnedItem
