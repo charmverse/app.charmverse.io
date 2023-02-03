@@ -75,6 +75,7 @@ jobs:
             /home/runner/.cache/ms-playwright
           key: nodemodules-cache-${{ hashFiles('package-lock.json') }}-${{ hashFiles('patches/**.patch') }}
           restore-keys: |
+            nodemodules-cache-${{ hashFiles('package-lock.json') }}-${{ hashFiles('patches/**.patch') }}
             nodemodules-cache-${{ hashFiles('package-lock.json') }}-
 
       - name: Cache restore nextjs code
@@ -97,6 +98,7 @@ jobs:
             ${{ github.workspace }}/.next/cache
           key: nextjs-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**.[jt]s', '**.[jt]sx', '**.prisma') }}
           restore-keys: |
+            nextjs-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**.[jt]s', '**.[jt]sx') }}
             nextjs-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}-
 
       - name: Run ${{matrix.test_name}}
