@@ -72,19 +72,10 @@ jobs:
             bash ./scripts/configure-db.sh
           fi
 
-      - name: Restore dependencies cache
-        id: cache_node_modules
-        uses: actions/cache@v3
-        with:
-          path: |
-            ./node_modules
-            /home/runner/.cache/ms-playwright
-          key: nodemodules-cache-${{ hashFiles('package-lock.json') }}-${{ hashFiles('patches/**.patch', 'prisma/schema.prisma') }}
-          restore-keys: |
-            nodemodules-cache-${{ hashFiles('package-lock.json') }}-${{ hashFiles('patches/**.patch', 'prisma/schema.prisma') }}
-            nodemodules-cache-${{ hashFiles('package-lock.json') }}-
+      - name: Install dependencies (from cache)
+        uses: ./.github/actions/install
 
-      - name: Build app (restore from cache this time)
+      - name: Build app (from cache)
         uses: ./.github/actions/build
         with:
           NEXT_PUBLIC_APP_ENV: 'test'
