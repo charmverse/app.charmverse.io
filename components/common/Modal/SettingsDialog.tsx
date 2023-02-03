@@ -106,12 +106,7 @@ export default function SettingsModal() {
       open={open}
     >
       <Box display='flex' flexDirection='row' flex='1'>
-        <Box
-          component='aside'
-          sx={{ flex: { xs: '1 1 auto', sm: '0 0 300px' } }}
-          borderRight='1px solid'
-          borderColor='divider'
-        >
+        <Box component='aside' flex='1 1 auto' maxWidth={300} borderRight='1px solid' borderColor='divider'>
           <Typography p='10px' variant='body1'>
             {user?.username}
           </Typography>
@@ -155,7 +150,7 @@ export default function SettingsModal() {
                       icon={tab.icon}
                       onClick={(e) => handleChange(e, `${space.name}-${tab.path}`)}
                       isActive={activePath === `${space.name}-${tab.path}`}
-                      ContentProps={{ style: { paddingLeft: 50 } }}
+                      ContentProps={{ style: { paddingLeft: 45 } }}
                     />
                   ))}
                 </StyledTreeItem>
