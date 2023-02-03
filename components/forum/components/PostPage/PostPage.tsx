@@ -249,7 +249,7 @@ export function PostPage({
             </Box>
           )}
           {post && !!permissions?.add_comment && (
-            <Box my={2}>
+            <Box my={2} data-test='new-top-level-post-comment'>
               <PostCommentForm setPostComments={setPostComments} postId={post.id} />
             </Box>
           )}

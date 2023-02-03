@@ -6,15 +6,21 @@ export class ForumPostPage {
 
   readonly newTopLevelCommentInputLocator: Locator;
 
-  readonly charmEditor: Locator;
+  readonly newTopLevelCommentSubmitButtonLocator: Locator;
 
   constructor(page: Page) {
     this.page = page;
-    this.newTopLevelCommentInputLocator = page.locator('data-test=new-top-level-post-comment');
-    this.charmEditor = page.locator('data-test=new-top-level-post-comment');
+    this.newTopLevelCommentInputLocator = this.page.locator('data-test=new-top-level-post-comment');
+    this.newTopLevelCommentSubmitButtonLocator = this.newTopLevelCommentInputLocator.locator(
+      'data-test=post-comment-button'
+    );
   }
 
-  getPostPageTitleLocator(postTitle: string) {
+  getCommentLocator(commentId: string) {
+    return this.page.locator(`data-test=post-comment-${commentId}`);
+  }
+
+  getPostPageTitleLocator() {
     return this.page.locator('data-test=editor-page-title');
   }
 

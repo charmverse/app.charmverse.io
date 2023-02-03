@@ -143,7 +143,7 @@ export function PostComment({ comment, setPostComments, permissions }: Props) {
   }
 
   return (
-    <Stack my={1} position='relative'>
+    <Stack my={1} position='relative' data-test={`post-comment-${comment.id}`}>
       <StyledStack>
         <Stack flexDirection='row' justifyContent='space-between' alignItems='center'>
           <Stack flexDirection='row' alignItems='center'>
