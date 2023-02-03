@@ -1,8 +1,5 @@
 import type { Role, SpaceRoleToRole, TokenGate, TokenGateToRole, UserTokenGate } from '@prisma/client';
-import { verifyJwt } from 'lit-js-sdk';
-
-import { prisma } from 'db';
-import type { LitJwtPayload } from 'lib/token-gates/interfaces';
+import * as lit from 'lit-js-sdk';
 
 type TokenGateWithRoles = {
   tokenGate:
@@ -41,7 +38,7 @@ export async function verifyTokenGateMembership({
       return { id: userTokenGate.id, isVerified: false, roleIds: userTokenGate.grantedRoles };
     }
 
-    const result = (await verifyJwt({ jwt: userTokenGate.jwt })) as { payload: LitJwtPayload; verified: boolean };
+    const result = await lit.verifyJwt({ jwt: userTokenGate.jwt });
     const isVerified = result.verified && result.payload?.orgId === spaceId;
 
     return {
