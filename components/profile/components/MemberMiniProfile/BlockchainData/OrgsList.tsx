@@ -53,20 +53,27 @@ export function OrgsList({ memberId, readOnly = false }: Props) {
           <LoadingComponent isLoading />
         ) : (
           <Stack gap={2} display='flex' flexDirection='row'>
-            {pinnedOrgs.map((pinnedOrg) => {
-              return (
-                <ProfileItemContainer key={pinnedOrg.id}>
-                  {!readOnly && (
-                    <CancelIcon color='error' fontSize='small' className='icons' onClick={() => updateOrg(pinnedOrg)} />
-                  )}
-                  <Tooltip title={pinnedOrg.name}>
-                    <div>
-                      <Avatar size='large' name={pinnedOrg.name} avatar={pinnedOrg.logo} />
-                    </div>
-                  </Tooltip>
-                </ProfileItemContainer>
-              );
-            })}
+            {pinnedOrgs
+              .sort((org1, org2) => (org1.name > org2.name ? 1 : -1))
+              .map((pinnedOrg) => {
+                return (
+                  <ProfileItemContainer key={pinnedOrg.id}>
+                    {!readOnly && (
+                      <CancelIcon
+                        color='error'
+                        fontSize='small'
+                        className='icons'
+                        onClick={() => updateOrg(pinnedOrg)}
+                      />
+                    )}
+                    <Tooltip title={pinnedOrg.name}>
+                      <div>
+                        <Avatar size='large' name={pinnedOrg.name} avatar={pinnedOrg.logo} />
+                      </div>
+                    </Tooltip>
+                  </ProfileItemContainer>
+                );
+              })}
             {currentUser?.id === memberId && emptyOrgsCount !== 0 ? (
               <Tooltip title='Add upto 5 orgs'>
                 <div>
