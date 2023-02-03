@@ -56,7 +56,7 @@ export const Container = styled(({ fullWidth, ...props }: any) => <Box {...props
 const ScrollContainer = styled.div<{ showPageActionSidebar: boolean }>(
   ({ showPageActionSidebar, theme }) => `
   transition: width ease-in 0.25s;
-  ${theme.breakpoints.up('md')} {
+  ${theme.breakpoints.up('lg')} {
     width: ${showPageActionSidebar ? 'calc(100% - 430px)' : '100%'};
     height: ${showPageActionSidebar ? 'calc(100vh - 65px)' : '100%'};
     overflow: ${showPageActionSidebar ? 'auto' : 'inherit'};

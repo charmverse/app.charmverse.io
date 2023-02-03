@@ -56,6 +56,7 @@ function CommentsSidebarComponent({ inline }: BoxProps & { inline?: boolean }) {
   const handleThreadClassChange: SelectProps['onChange'] = (event) => {
     setThreadFilter(event.target.value as any);
   };
+  const lastHighlightedCommentId = React.useRef<string | null>(null);
 
   const { setCurrentPageActionDisplay } = usePageActionDisplay();
 
@@ -92,15 +93,19 @@ function CommentsSidebarComponent({ inline }: BoxProps & { inline?: boolean }) {
     // Highlight the comment id when navigation from nexus mentioned tasks list tab
 
     const highlightedCommentId = router.query.commentId;
-    const highlightedCommentElement = document.getElementById(`comment.${highlightedCommentId}`);
 
-    if (highlightedCommentElement) {
+    if (typeof highlightedCommentId === 'string' && highlightedCommentId !== lastHighlightedCommentId.current) {
       setCurrentPageActionDisplay('comments');
       setThreadFilter('all');
       // Remove query parameters from url
 
       setUrlWithoutRerender(router.pathname, { commentId: null });
       requestAnimationFrame(() => {
+        const highlightedCommentElement = document.getElementById(`comment.${highlightedCommentId}`);
+        if (!highlightedCommentElement) {
+          return;
+        }
+
         highlightedCommentElement.scrollIntoView({
           behavior: 'smooth'
         });
@@ -108,6 +113,7 @@ function CommentsSidebarComponent({ inline }: BoxProps & { inline?: boolean }) {
         setTimeout(() => {
           requestAnimationFrame(() => {
             highlightDomElement(highlightedCommentElement as HTMLElement);
+            lastHighlightedCommentId.current = highlightedCommentId;
           });
         }, 250);
       });
