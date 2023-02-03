@@ -96,7 +96,7 @@ export default function TasksPage() {
           display='flex'
           alignItems='center'
           justifyContent={{ sm: 'flex-end', xs: 'flex-start' }}
-          mr={6}
+          mr={{ md: 6 }}
           gap={{ sm: 2, xs: 1 }}
         >
           <NotifyMeButton />

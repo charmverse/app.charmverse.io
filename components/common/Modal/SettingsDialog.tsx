@@ -1,7 +1,9 @@
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import CloseIcon from '@mui/icons-material/Close';
+import MenuIcon from '@mui/icons-material/Menu';
 import TreeView from '@mui/lab/TreeView';
+import { Slide } from '@mui/material';
 import type { BoxProps } from '@mui/material/Box';
 import Box from '@mui/material/Box';
 import Dialog from '@mui/material/Dialog';
@@ -9,6 +11,7 @@ import DialogContent from '@mui/material/DialogContent';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import type { Space } from '@prisma/client';
+import type { ReactNode } from 'react';
 
 import { StyledTreeItem } from 'components/common/PageLayout/components/PageNavigation//components/PageTreeItem';
 import IntegrationSettings from 'components/integrations/IntegrationsPage';
@@ -21,6 +24,7 @@ import { SETTINGS_TABS, ACCOUNT_TABS } from 'components/settings/pages';
 import RoleSettings from 'components/settings/roles/RoleSettings';
 import SpaceSettings from 'components/settings/workspace/Space';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useSmallScreen } from 'hooks/useMediaScreens';
 import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
@@ -28,7 +32,7 @@ import { useUser } from 'hooks/useUser';
 import WorkspaceAvatar from '../PageLayout/components/Sidebar/WorkspaceAvatar';
 
 interface TabPanelProps extends BoxProps {
-  children?: React.ReactNode;
+  children?: ReactNode;
   index: string;
   value: string;
 }
@@ -91,97 +95,107 @@ export default function SettingsModal() {
   const { user } = useUser();
   const { spaces } = useSpaces();
   const currentSpace = useCurrentSpace();
-  const { activePath, setActivePath, onClose, open } = useSettingsDialog();
+  const isMobile = useSmallScreen();
+  const { activePath, setActivePath, mobileView, setMobileView, onClose, open } = useSettingsDialog();
 
   const handleChange = (_event: React.SyntheticEvent, newValue: string) => {
     setActivePath(newValue);
+    if (isMobile) {
+      setMobileView('content');
+    }
   };
 
   return (
     <Dialog
       fullWidth
       maxWidth='lg'
-      PaperProps={{ sx: { height: '90vh', borderRadius: (theme) => theme.spacing(1) } }}
+      fullScreen={isMobile}
+      PaperProps={{ sx: { md: { height: '90vh' }, borderRadius: (theme) => theme.spacing(1) } }}
       onClose={onClose}
       open={open}
     >
       <Box display='flex' flexDirection='row' flex='1' overflow='hidden'>
-        <Box
-          component='aside'
-          maxWidth={350}
-          minWidth={300}
-          borderRight='1px solid'
-          borderColor='divider'
-          overflow='auto'
-          sx={{ backgroundColor: (theme) => theme.palette.sidebar.background }}
-        >
-          <Typography p='10px' variant='body1'>
-            {user?.username}
-          </Typography>
-          <TreeView
-            aria-label='Profile settings tree view'
-            defaultCollapseIcon={<ArrowDropDownIcon fontSize='large' />}
-            defaultExpandIcon={<ArrowRightIcon fontSize='large' />}
-            defaultExpanded={currentSpace?.name ? ['my-spaces', currentSpace?.name] : ['my-spaces']}
-            sx={{
-              '& .MuiTreeItem-content': { py: 0.5 },
-              '& .MuiTreeItem-root[aria-expanded] > .MuiTreeItem-content': { py: 1 }
-            }}
+        <Slide direction='left' in={isMobile ? open && mobileView === 'sidebar' : true} appear={isMobile} unmountOnExit>
+          <Box
+            component='aside'
+            maxWidth={{ xs: '100%', md: 350 }}
+            minWidth={{ xs: '100%', md: 300 }}
+            borderRight='1px solid'
+            borderColor='divider'
+            overflow='auto'
+            sx={{ backgroundColor: (theme) => theme.palette.sidebar.background }}
           >
-            {ACCOUNT_TABS.map((tab) => (
-              <StyledTreeItem
-                key={tab.path}
-                nodeId={tab.path}
-                label={tab.label}
-                icon={tab.icon}
-                onClick={(e) => handleChange(e, tab.path)}
-                isActive={activePath === tab.path}
-              />
-            ))}
-            <StyledTreeItem nodeId='my-spaces' label='My spaces' icon={null} sx={{ mt: 1.5 }}>
-              {spaces.map((space) => (
-                <StyledTreeItem
-                  key={space.id}
-                  nodeId={space.name}
-                  label={
-                    <Box display='flex' alignItems='center' gap={1}>
-                      <WorkspaceAvatar name={space.name} image={space.spaceImage} />
-                      <Typography noWrap>{space.name}</Typography>
-                    </Box>
-                  }
-                  icon={null}
-                >
-                  {SETTINGS_TABS.map((tab) => (
-                    <StyledTreeItem
-                      key={tab.path}
-                      nodeId={`${space.name}-${tab.path}`}
-                      label={tab.label}
-                      icon={tab.icon}
-                      onClick={(e) => handleChange(e, `${space.name}-${tab.path}`)}
-                      isActive={activePath === `${space.name}-${tab.path}`}
-                      ContentProps={{ style: { paddingLeft: 45 } }}
-                    />
-                  ))}
-                </StyledTreeItem>
-              ))}
-            </StyledTreeItem>
-          </TreeView>
-        </Box>
-        <Box flex='1 1 auto' position='relative' overflow='auto'>
-          {onClose ? (
-            <IconButton
-              aria-label='close'
-              onClick={(e) => onClose(e)}
+            <Typography p='10px' variant='body1'>
+              {user?.username}
+            </Typography>
+            <TreeView
+              aria-label='Profile settings tree view'
+              defaultCollapseIcon={<ArrowDropDownIcon fontSize='large' />}
+              defaultExpandIcon={<ArrowRightIcon fontSize='large' />}
+              defaultExpanded={currentSpace?.name ? ['my-spaces', currentSpace?.name] : ['my-spaces']}
               sx={{
-                position: 'absolute',
-                right: 15,
-                top: 20,
-                color: (theme) => theme.palette.grey[500]
+                '& .MuiTreeItem-content': { py: 0.5 },
+                '& .MuiTreeItem-root[aria-expanded] > .MuiTreeItem-content': { py: 1 }
               }}
             >
-              <CloseIcon color='secondary' fontSize='small' />
-            </IconButton>
-          ) : null}
+              {ACCOUNT_TABS.map((tab) => (
+                <StyledTreeItem
+                  key={tab.path}
+                  nodeId={tab.path}
+                  label={tab.label}
+                  icon={tab.icon}
+                  onClick={(e) => handleChange(e, tab.path)}
+                  isActive={activePath === tab.path}
+                />
+              ))}
+              <StyledTreeItem nodeId='my-spaces' label='My spaces' icon={null} sx={{ mt: 1.5 }}>
+                {spaces.map((space) => (
+                  <StyledTreeItem
+                    key={space.id}
+                    nodeId={space.name}
+                    label={
+                      <Box display='flex' alignItems='center' gap={1}>
+                        <WorkspaceAvatar name={space.name} image={space.spaceImage} />
+                        <Typography noWrap>{space.name}</Typography>
+                      </Box>
+                    }
+                    icon={null}
+                  >
+                    {SETTINGS_TABS.map((tab) => (
+                      <StyledTreeItem
+                        key={tab.path}
+                        nodeId={`${space.name}-${tab.path}`}
+                        label={tab.label}
+                        icon={tab.icon}
+                        onClick={(e) => handleChange(e, `${space.name}-${tab.path}`)}
+                        isActive={activePath === `${space.name}-${tab.path}`}
+                        ContentProps={{ style: { paddingLeft: 45 } }}
+                      />
+                    ))}
+                  </StyledTreeItem>
+                ))}
+              </StyledTreeItem>
+            </TreeView>
+          </Box>
+        </Slide>
+        <Box flex='1 1 auto' position='relative' overflow='auto'>
+          <Box
+            display='flex'
+            justifyContent='space-between'
+            px={2}
+            pt={1}
+            position={{ xs: 'sticky', md: 'absolute' }}
+            top={0}
+            right={0}
+            zIndex={1}
+            sx={{ backgroundColor: (theme) => theme.palette.background.paper }}
+          >
+            {isMobile && mobileView === 'content' && (
+              <IconButton aria-label='open settings dialog menu' onClick={() => setMobileView('sidebar')}>
+                <MenuIcon />
+              </IconButton>
+            )}
+          </Box>
           {spaces.map((space) =>
             SETTINGS_TABS.map((tab) => (
               <TabPanel key={`${space.name}-${tab.path}`} value={activePath} index={`${space.name}-${tab.path}`}>
@@ -195,6 +209,18 @@ export default function SettingsModal() {
             </TabPanel>
           ))}
         </Box>
+        <IconButton
+          aria-label='close the settings modal'
+          onClick={onClose}
+          sx={{
+            position: 'absolute',
+            right: 15,
+            top: 8,
+            zIndex: 1
+          }}
+        >
+          <CloseIcon color='secondary' fontSize='small' />
+        </IconButton>
       </Box>
     </Dialog>
   );

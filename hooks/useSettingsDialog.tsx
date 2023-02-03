@@ -2,9 +2,13 @@ import { usePopupState, bindDialog, bindTrigger } from 'material-ui-popup-state/
 import type { MouseEvent, ReactNode, SyntheticEvent, TouchEvent } from 'react';
 import { useMemo, createContext, useContext, useState } from 'react';
 
+type MobileView = 'sidebar' | 'content';
+
 type IContext = {
   activePath: string;
   setActivePath: (path: string) => void;
+  mobileView: MobileView;
+  setMobileView: (view: MobileView) => void;
   open: boolean;
   onClose: (event: SyntheticEvent<Element, Event>) => any;
   'aria-controls'?: string | undefined;
@@ -17,6 +21,8 @@ type IContext = {
 export const SettingsDialogContext = createContext<Readonly<IContext>>({
   activePath: '',
   setActivePath: () => undefined,
+  mobileView: 'sidebar',
+  setMobileView: () => undefined,
   open: false,
   'aria-controls': undefined,
   'aria-describedby': undefined,
@@ -29,6 +35,7 @@ export const SettingsDialogContext = createContext<Readonly<IContext>>({
 export function SettingsDialogProvider({ children }: { children: ReactNode }) {
   const settingsModalState = usePopupState({ variant: 'dialog', popupId: 'settings-dialog' });
   const [activePath, setActivePath] = useState('');
+  const [mobileView, setMobileView] = useState<MobileView>('sidebar');
 
   const initialTriggerDialogState = { ...bindTrigger(settingsModalState) };
   const triggerDialogState = {
@@ -42,12 +49,22 @@ export function SettingsDialogProvider({ children }: { children: ReactNode }) {
       initialTriggerDialogState.onTouchStart(event);
     }
   };
-  const settingsDialogState = { ...bindDialog(settingsModalState) };
+
+  const initialSettingsDialogState = { ...bindDialog(settingsModalState) };
+  const settingsDialogState = {
+    ...initialSettingsDialogState,
+    onClose: (event: SyntheticEvent<Element, Event>) => {
+      initialSettingsDialogState.onClose(event);
+      setMobileView('sidebar');
+    }
+  };
 
   const value = useMemo<IContext>(
     () => ({
       activePath,
+      mobileView,
       setActivePath,
+      setMobileView,
       ...triggerDialogState,
       ...settingsDialogState
     }),
