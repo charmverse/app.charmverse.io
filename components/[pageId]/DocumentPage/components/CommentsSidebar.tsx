@@ -5,7 +5,7 @@ import type { BoxProps, SelectProps } from '@mui/material';
 import { Box, InputLabel, List, MenuItem, Select, Typography } from '@mui/material';
 import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
-import { useEffect, useState } from 'react';
+import React, { memo, useLayoutEffect, useMemo, useState } from 'react';
 
 import PageThread from 'components/common/CharmEditor/components/PageThread';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
@@ -44,36 +44,19 @@ const EmptyThreadContainerBox = styled(Box)`
   background-color: ${({ theme }) => theme.palette.background.light};
 `;
 
-function getCommentFromThreads(threads: (ThreadWithCommentsAndAuthors | undefined)[], commentId: string) {
-  if (!threads) {
-    return null;
-  }
-
-  for (let threadIdx = 0; threadIdx < threads.length; threadIdx += 1) {
-    const thread = threads[threadIdx];
-    if (thread) {
-      for (let commentIdx = 0; commentIdx < thread.comments.length; commentIdx += 1) {
-        if (thread.comments[commentIdx].id === commentId) {
-          return thread.comments[commentIdx];
-        }
-      }
-    }
-  }
-  return null;
-}
-
-export function CommentsSidebar({ inline }: BoxProps & { inline?: boolean }) {
+function CommentsSidebarComponent({ inline }: BoxProps & { inline?: boolean }) {
   const router = useRouter();
   const { threads } = useThreads();
   const { user } = useUser();
 
-  const allThreads = Object.values(threads).filter(isTruthy);
+  const allThreads = useMemo(() => Object.values(threads).filter(isTruthy), [threads]);
   const unResolvedThreads = allThreads.filter((thread) => thread && !thread.resolved);
   const resolvedThreads = allThreads.filter((thread) => thread && thread.resolved);
   const [threadFilter, setThreadFilter] = useState<'resolved' | 'open' | 'all' | 'you'>('open');
   const handleThreadClassChange: SelectProps['onChange'] = (event) => {
     setThreadFilter(event.target.value as any);
   };
+  const lastHighlightedCommentId = React.useRef<string | null>(null);
 
   const { setCurrentPageActionDisplay } = usePageActionDisplay();
 
@@ -106,34 +89,36 @@ export function CommentsSidebar({ inline }: BoxProps & { inline?: boolean }) {
     .map((filteredThreadId) => threads[filteredThreadId])
     .filter(isTruthy);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     // Highlight the comment id when navigation from nexus mentioned tasks list tab
+
     const highlightedCommentId = router.query.commentId;
-    if (typeof highlightedCommentId === 'string') {
-      const highlightedComment = getCommentFromThreads(allThreads, highlightedCommentId);
-      if (highlightedComment) {
-        const highlightedCommentDomNode = document.getElementById(`comment.${highlightedComment.id}`);
-        if (highlightedCommentDomNode) {
-          setTimeout(() => {
-            setCurrentPageActionDisplay('comments');
-            setThreadFilter('all');
-            // Remove query parameters from url
-            setUrlWithoutRerender(router.pathname, { commentId: null });
-            requestAnimationFrame(() => {
-              highlightedCommentDomNode.scrollIntoView({
-                behavior: 'smooth'
-              });
-              setTimeout(() => {
-                requestAnimationFrame(() => {
-                  highlightDomElement(highlightedCommentDomNode);
-                });
-              }, 250);
-            });
-          }, 250);
+
+    if (typeof highlightedCommentId === 'string' && highlightedCommentId !== lastHighlightedCommentId.current) {
+      setCurrentPageActionDisplay('comments');
+      setThreadFilter('all');
+      // Remove query parameters from url
+
+      setUrlWithoutRerender(router.pathname, { commentId: null });
+      requestAnimationFrame(() => {
+        const highlightedCommentElement = document.getElementById(`comment.${highlightedCommentId}`);
+        if (!highlightedCommentElement) {
+          return;
         }
-      }
+
+        highlightedCommentElement.scrollIntoView({
+          behavior: 'smooth'
+        });
+
+        setTimeout(() => {
+          requestAnimationFrame(() => {
+            highlightDomElement(highlightedCommentElement as HTMLElement);
+            lastHighlightedCommentId.current = highlightedCommentId;
+          });
+        }, 250);
+      });
     }
-  }, [allThreads, router.query.commentId]);
+  }, [router.query.commentId]);
 
   return (
     <>
@@ -186,3 +171,5 @@ export function NoCommentsMessage({ icon, message }: { icon: ReactNode; message:
     </EmptyThreadContainerBox>
   );
 }
+
+export const CommentsSidebar = memo(CommentsSidebarComponent);
