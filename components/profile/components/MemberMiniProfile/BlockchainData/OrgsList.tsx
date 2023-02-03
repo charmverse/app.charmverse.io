@@ -67,17 +67,18 @@ export function OrgsList({ memberId, readOnly = false }: Props) {
                 </ProfileItemContainer>
               );
             })}
-            {currentUser?.id === memberId ? (
-              new Array(emptyOrgsCount).fill(0).map((_, i) => (
-                <NonPinnedItem
-                  onClick={() => {
-                    if (!readOnly) {
-                      setIsShowingOrgsGallery(true);
-                    }
-                  }}
-                  key={`${i.toString()}`}
-                />
-              ))
+            {currentUser?.id === memberId && emptyOrgsCount !== 0 && nonPinnedOrgs.length !== 0 ? (
+              <Tooltip title='Add upto 5 orgs'>
+                <div>
+                  <NonPinnedItem
+                    onClick={() => {
+                      if (!readOnly) {
+                        setIsShowingOrgsGallery(true);
+                      }
+                    }}
+                  />
+                </div>
+              </Tooltip>
             ) : pinnedOrgs.length === 0 ? (
               <Typography color='secondary'>No pinned Organizations</Typography>
             ) : null}

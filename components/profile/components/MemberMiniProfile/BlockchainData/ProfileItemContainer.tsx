@@ -27,7 +27,7 @@ const NonPinnedBox = styled(Box)`
   display: flex;
   justify-content: center;
   align-items: center;
-  ${({ theme }) => `border: 2px solid ${theme.palette.secondary.main}`};
+  ${({ theme }) => `border: 2px solid ${theme.palette.secondary.dark}`};
   cursor: pointer;
 `;
 
