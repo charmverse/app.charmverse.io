@@ -13,6 +13,7 @@ import Button from 'components/common/Button';
 import CharmEditor from 'components/common/CharmEditor/CharmEditor';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/InlineCharmEditor';
 import UserDisplay from 'components/common/UserDisplay';
+import { useMemberProfile } from 'components/profile/hooks/useMemberProfile';
 import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
 import type {
@@ -57,6 +58,7 @@ export function PostComment({
     rawText: comment.contentText
   });
   const [commentEditContent, setCommentEditContent] = useState<ICharmEditorOutput>(commentContent);
+  const { showMemberProfile } = useMemberProfile();
 
   async function saveCommentContent() {
     const updatedComment = await charmClient.forum.updatePostComment({
@@ -149,7 +151,16 @@ export function PostComment({
             <Box mr={1}>
               <UserDisplay avatarSize='small' user={commentUser} hideName={true} />
             </Box>
-            <Typography mr={1}>{commentUser?.username}</Typography>
+            <Typography
+              mr={1}
+              onClick={() => {
+                if (commentUser) {
+                  showMemberProfile(commentUser.id);
+                }
+              }}
+            >
+              {commentUser?.username}
+            </Typography>
             <Typography variant='subtitle1' mr={0.5}>
               {getRelativeTimeInThePast(new Date(comment.createdAt))}
             </Typography>

@@ -102,6 +102,13 @@ function UserDetails({ readOnly, user, updateUser, sx = {} }: UserDetailsProps) 
     linkedinURL: ''
   };
 
+  const hideSocials =
+    readOnly &&
+    socialDetails.discordUsername?.length === 0 &&
+    socialDetails.githubURL?.length === 0 &&
+    socialDetails.twitterURL?.length === 0 &&
+    socialDetails.linkedinURL?.length === 0;
+
   const identityTypes: IntegrationModel[] = useMemo(() => {
     if (isPublicUser(user)) {
       return [];
@@ -215,12 +222,20 @@ function UserDetails({ readOnly, user, updateUser, sx = {} }: UserDetailsProps) 
               </EditIconContainer>
             </Grid>
           )}
-          <Grid item mt={1} height={40}>
-            <EditIconContainer onClick={socialModalState.open} readOnly={readOnly} data-testid='edit-social'>
-              <SocialIcons social={socialDetails} />
-              {!readOnly && <StyledDivider orientation='vertical' flexItem />}
-            </EditIconContainer>
-          </Grid>
+          {!hideSocials && (
+            <Grid item mt={1} height={40}>
+              <EditIconContainer onClick={socialModalState.open} readOnly={readOnly} data-testid='edit-social'>
+                <SocialIcons
+                  showDiscord={readOnly && socialDetails.discordUsername?.length !== 0}
+                  showGithub={readOnly && socialDetails.githubURL?.length !== 0}
+                  showLinkedIn={readOnly && socialDetails.linkedinURL?.length !== 0}
+                  showTwitter={readOnly && socialDetails.twitterURL?.length !== 0}
+                  social={socialDetails}
+                />
+                {!readOnly && <StyledDivider orientation='vertical' flexItem />}
+              </EditIconContainer>
+            </Grid>
+          )}
           <Grid item container alignItems='center' sx={{ width: 'fit-content', flexWrap: 'initial' }}>
             <EditIconContainer readOnly={readOnly} onClick={descriptionModalState.open} data-testid='edit-description'>
               <span>
