@@ -82,7 +82,7 @@ export function PostCard({ post, user, category }: ForumPostProps) {
   }
 
   return (
-    <Card variant='outlined' sx={{ mb: '15px' }}>
+    <Card data-test={`forum-post-card-${post.id}`} variant='outlined' sx={{ mb: '15px' }}>
       <CardActionArea
         component='div'
         onClick={() => {

@@ -28,8 +28,16 @@ export class ForumHomePage {
     await this.page.waitForURL(`**/${domain}/forum`);
   }
 
-  categoryLocator(categoryId: string) {
+  getCategoryLocator(categoryId: string) {
     return this.page.locator(`data-test=forum-category-${categoryId}`);
+  }
+
+  getPostCardLocator(postId: string) {
+    return this.page.locator(`data-test=forum-post-card-${postId}`);
+  }
+
+  getOpenPostAsPageLocator() {
+    return this.page.locator('data-test=open-post-as-page');
   }
 
   async waitForCategory({ domain, path }: { domain: string; path: string }) {
