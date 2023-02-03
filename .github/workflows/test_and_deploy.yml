@@ -30,6 +30,7 @@ jobs:
   test:
     name: Test
     runs-on: ubuntu-latest
+    needs: build
     # Postgres setup copied from https://gist.github.com/2color/537f8ef13ecec80059abb007839a6878
     services:
       postgres:
