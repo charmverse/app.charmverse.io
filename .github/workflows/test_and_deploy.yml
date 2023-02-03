@@ -72,6 +72,7 @@ jobs:
           path: |
             ./node_modules
             /home/runner/.cache/ms-playwright
+          key: nodemodules-cache-${{ hashFiles('package-lock.json') }}-${{ hashFiles('patches/**.patch') }}
           restore-keys: |
             nodemodules-cache-${{ hashFiles('package-lock.json') }}-
 
@@ -83,6 +84,7 @@ jobs:
             .next
             .env.test.local
           # including the app_env helps make sure that deploy_staging.yml does not reuse values from test_and_deploy.yml which are meant for production
+          key: nextjs-build-${{ github.sha }}-${{ inputs.NEXT_PUBLIC_APP_ENV }}
           restore-keys: |
             nextjs-build-${{ github.sha }}-${{ inputs.NEXT_PUBLIC_APP_ENV }}
 
@@ -92,7 +94,7 @@ jobs:
           path: |
             ~/.npm
             ${{ github.workspace }}/.next/cache
-          # If source files changed but packages didn't, rebuild from a prior cache.
+          key: nextjs-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**.[jt]s', '**.[jt]sx') }}
           restore-keys: |
             nextjs-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}-
 
