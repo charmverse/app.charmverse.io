@@ -100,7 +100,7 @@ jobs:
 
       - name: Run ${{matrix.test_name}}
         run: |
-          if [ "${{matrix.test_command}}" == "test:server:ci" ]; 
+          if [ "${{matrix.test_command}}" == "test:server:ci" ]; then
             npm run start:test:ci &  
           fi 
           npm run ${{matrix.test_command}}
