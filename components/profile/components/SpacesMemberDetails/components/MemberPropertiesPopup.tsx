@@ -23,6 +23,7 @@ type Props = {
   cancelButtonText?: string;
   children?: ReactNode;
   isLoading?: boolean;
+  postComponent?: ReactNode;
 };
 
 export function MemberPropertiesPopup({
@@ -33,7 +34,8 @@ export function MemberPropertiesPopup({
   updateMemberPropertyValues,
   onClose,
   title = 'Edit space profile',
-  isLoading = false
+  isLoading = false,
+  postComponent = null
 }: Props) {
   const {
     data,
@@ -136,6 +138,7 @@ export function MemberPropertiesPopup({
                 })}
               </Box>
             </form>
+            {postComponent}
             <DialogActions>
               <Button
                 data-test='close-member-properties-modal'

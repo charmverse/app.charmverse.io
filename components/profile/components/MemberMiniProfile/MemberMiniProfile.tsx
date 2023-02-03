@@ -88,29 +88,31 @@ function MemberProfile({ member, onClose }: { member: Member; onClose: VoidFunct
         spaceId={currentSpace.id}
         updateMemberPropertyValues={updateSpaceValues}
         cancelButtonText='Cancel'
-      >
-        {user && (
-          <>
-            <UserDetails
-              sx={{
-                mt: 0
-              }}
-              // currentUser doesn't have profile thus is not considered as publicUser inside UserDetails
-              // giving the ability to update the profile properties
-              user={user.id === currentUser?.id ? currentUser : user}
-              updateUser={setUser}
-            />
+        postComponent={
+          user && (
             <Stack gap={3}>
+              <Divider
+                sx={{
+                  mt: 3
+                }}
+              />
               <NftsList mutateNfts={mutateNfts} nfts={nfts} memberId={user.id} />
               <OrgsList mutateOrgs={mutateOrgs} orgs={orgs} memberId={user.id} />
               <PoapsList poaps={poaps} />
-              <Divider
-                sx={{
-                  mb: 3
-                }}
-              />
             </Stack>
-          </>
+          )
+        }
+      >
+        {user && (
+          <UserDetails
+            sx={{
+              mt: 0
+            }}
+            // currentUser doesn't have profile thus is not considered as publicUser inside UserDetails
+            // giving the ability to update the profile properties
+            user={user.id === currentUser?.id ? currentUser : user}
+            updateUser={setUser}
+          />
         )}
         <Typography fontWeight={600}>Member details</Typography>
       </MemberPropertiesPopup>
@@ -118,7 +120,7 @@ function MemberProfile({ member, onClose }: { member: Member; onClose: VoidFunct
   }
 
   return (
-    <Dialog open onClose={onClose} fullScreen={fullScreen} fullWidth>
+    <Dialog open onClose={onClose} fullScreen={fullScreen}>
       {isLoading || !user ? (
         <DialogContent>
           <LoadingComponent isLoading />
