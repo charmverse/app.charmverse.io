@@ -12,10 +12,12 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 handler.use(requireUser).get(getUserPoaps);
 
 async function getUserPoaps(req: NextApiRequest, res: NextApiResponse<ExtendedPoap[]>) {
+  const { userId } = req.query as { userId: string };
+
   const hiddenPoapIDs: string[] = (
     await prisma.profileItem.findMany({
       where: {
-        userId: req.session.user.id,
+        userId,
         isHidden: true,
         type: 'poap'
       },
@@ -27,7 +29,7 @@ async function getUserPoaps(req: NextApiRequest, res: NextApiResponse<ExtendedPo
 
   const wallets = await prisma.userWallet.findMany({
     where: {
-      userId: req.session.user.id
+      userId
     }
   });
 

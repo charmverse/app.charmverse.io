@@ -12,7 +12,6 @@ import {
   TableRow,
   Typography
 } from '@mui/material';
-import { useState } from 'react';
 
 import Avatar from 'components/common/Avatar';
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
@@ -20,16 +19,15 @@ import { SelectPreview } from 'components/common/form/fields/Select/SelectPrevie
 import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
 import Link from 'components/common/Link';
 import { DiscordSocialIcon } from 'components/profile/components/UserDetails/DiscordSocialIcon';
+import { useMemberProfile } from 'components/profile/hooks/useMemberProfile';
 import type { Social } from 'components/profile/interfaces';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMemberProperties } from 'hooks/useMemberProperties';
-import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
 import type { Member } from 'lib/members/interfaces';
 import { humanFriendlyDate } from 'lib/utilities/dates';
 
 import { MemberPropertyTextMultiline } from './MemberDirectoryProperties/MemberPropertyTextMultiline';
-import { MemberOnboardingForm } from './MemberOnboardingForm';
 import { TimezoneDisplay } from './TimezoneDisplay';
 
 const StyledTableCell = styled(TableCell)`
@@ -46,10 +44,9 @@ function MemberDirectoryTableRow({ member }: { member: Member }) {
   const discordUsername = (member.profile?.social as Social)?.discordUsername;
   const currentSpace = useCurrentSpace();
   const { user } = useUser();
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const { properties = [] } = useMemberProperties();
-  const { mutateMembers } = useMembers();
   const visibleProperties = properties.filter((property) => property.enabledViews.includes('table'));
+  const { showMemberProfile } = useMemberProfile();
 
   if (visibleProperties.length === 0) {
     return null;
@@ -69,7 +66,7 @@ function MemberDirectoryTableRow({ member }: { member: Member }) {
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
-              setIsModalOpen(true);
+              showMemberProfile(member.id);
             }}
             style={{
               opacity: 1
@@ -177,7 +174,7 @@ function MemberDirectoryTableRow({ member }: { member: Member }) {
                       {content}
                     </Link>
                   ) : (
-                    <Box sx={{ cursor: 'pointer' }} onClick={() => setIsModalOpen(true)}>
+                    <Box sx={{ cursor: 'pointer' }} onClick={() => showMemberProfile(member.id)}>
                       {content}
                     </Box>
                   )}
@@ -242,19 +239,6 @@ function MemberDirectoryTableRow({ member }: { member: Member }) {
         }
         return null;
       })}
-
-      {isModalOpen && user && currentSpace && user.id === member.id && (
-        <MemberOnboardingForm
-          userId={member.id}
-          spaceName={currentSpace.name}
-          spaceId={currentSpace.id}
-          onClose={() => {
-            mutateMembers();
-            setIsModalOpen(false);
-          }}
-          title='Edit your profile'
-        />
-      )}
     </StyledTableRow>
   );
 }

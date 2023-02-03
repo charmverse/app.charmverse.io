@@ -13,6 +13,7 @@ export interface NftData {
   imageThumb?: string;
   timeLastUpdated: string;
   isHidden: boolean;
+  isPinned: boolean;
 }
 
 export interface ExtendedPoap {
@@ -33,4 +34,14 @@ export interface AuthSig {
   derivedVia: string;
   signedMessage: string;
   address: string;
+}
+
+export interface Collectable {
+  title: string;
+  date: string;
+  id: string;
+  image: string;
+  type: 'poap' | 'nft';
+  link: string;
+  isHidden: boolean;
 }

@@ -25,6 +25,7 @@ function mapNftFromAlchemy(nft: alchemyApi.AlchemyNft, chainId: alchemyApi.Suppo
     description: nft.description,
     chainId,
     timeLastUpdated: nft.timeLastUpdated,
-    isHidden: false
+    isHidden: false,
+    isPinned: false
   };
 }

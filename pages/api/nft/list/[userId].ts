@@ -17,18 +17,21 @@ async function getNFTsMiddleware(req: NextApiRequest, res: NextApiResponse<NftDa
   // address = '0x155b6485305ccab44ef7da58ac886c62ce105cf9'
   const userId = req.query.userId as string;
 
-  const hiddenNftIds: string[] = (
-    await prisma.profileItem.findMany({
-      where: {
-        userId,
-        isHidden: true,
-        type: 'nft'
-      },
-      select: {
-        id: true
-      }
-    })
-  ).map((p) => p.id);
+  const profileItems = await prisma.profileItem.findMany({
+    where: {
+      userId,
+      type: 'nft',
+      OR: [{ isHidden: true }, { isPinned: true }]
+    },
+    select: {
+      id: true,
+      isHidden: true,
+      isPinned: true
+    }
+  });
+
+  const hiddenNftIds = profileItems.filter((p) => p.isHidden).map((p) => p.id);
+  const pinnedNftIds = profileItems.filter((p) => p.isPinned).map((p) => p.id);
 
   const wallets = await prisma.userWallet.findMany({
     where: {
@@ -50,7 +53,8 @@ async function getNFTsMiddleware(req: NextApiRequest, res: NextApiResponse<NftDa
   res.status(200).json(
     mappedNfts.map((nft) => ({
       ...nft,
-      isHidden: hiddenNftIds.includes(nft.id)
+      isHidden: hiddenNftIds.includes(nft.id),
+      isPinned: pinnedNftIds.includes(nft.id)
     }))
   );
 }
