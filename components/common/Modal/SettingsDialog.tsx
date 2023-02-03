@@ -1,6 +1,6 @@
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import CloseIcon from '@mui/icons-material/Close';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import TreeView from '@mui/lab/TreeView';
 import type { BoxProps } from '@mui/material/Box';
 import Box from '@mui/material/Box';
@@ -106,16 +106,26 @@ export default function SettingsModal() {
       open={open}
     >
       <Box display='flex' flexDirection='row' flex='1'>
-        <Box component='aside' flex='1 1 auto' maxWidth={300} borderRight='1px solid' borderColor='divider'>
+        <Box
+          component='aside'
+          maxWidth={350}
+          minWidth={300}
+          borderRight='1px solid'
+          borderColor='divider'
+          sx={{ backgroundColor: (theme) => theme.palette.sidebar.background }}
+        >
           <Typography p='10px' variant='body1'>
             {user?.username}
           </Typography>
           <TreeView
             aria-label='Profile settings tree view'
-            defaultCollapseIcon={<ExpandMoreIcon />}
-            defaultExpandIcon={<ChevronRightIcon />}
+            defaultCollapseIcon={<ArrowDropDownIcon fontSize='large' />}
+            defaultExpandIcon={<ArrowRightIcon fontSize='large' />}
             defaultExpanded={currentSpace?.name ? ['my-spaces', currentSpace?.name] : ['my-spaces']}
-            sx={{ flexGrow: 1, overflowY: 'auto' }}
+            sx={{
+              '& .MuiTreeItem-content': { py: 0.5 },
+              '& .MuiTreeItem-root[aria-expanded] > .MuiTreeItem-content': { py: 1 }
+            }}
           >
             {ACCOUNT_TABS.map((tab) => (
               <StyledTreeItem
@@ -127,19 +137,18 @@ export default function SettingsModal() {
                 isActive={activePath === tab.path}
               />
             ))}
-            <StyledTreeItem nodeId='my-spaces' label='My spaces' icon={null} sx={{ mt: 2 }}>
+            <StyledTreeItem nodeId='my-spaces' label='My spaces' icon={null} sx={{ mt: 1.5 }}>
               {spaces.map((space) => (
                 <StyledTreeItem
                   key={space.id}
                   nodeId={space.name}
                   label={
-                    <Box display='flex' alignItems='center' gap={1} py={1}>
+                    <Box display='flex' alignItems='center' gap={1}>
                       <WorkspaceAvatar name={space.name} image={space.spaceImage} />
                       <Typography noWrap>{space.name}</Typography>
                     </Box>
                   }
                   icon={null}
-                  ContentProps={{ style: { paddingLeft: 18 } }}
                 >
                   {SETTINGS_TABS.map((tab) => (
                     <StyledTreeItem
