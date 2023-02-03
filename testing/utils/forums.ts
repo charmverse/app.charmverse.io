@@ -1,6 +1,8 @@
+import type { PostCategory } from '@prisma/client';
 import { v4 } from 'uuid';
 
 import { prisma } from 'db';
+import { getPostCategoryPath } from 'lib/forums/categories/getPostCategoryPath';
 import { createPostComment } from 'lib/forums/comments/createPostComment';
 import type { CreatePostCommentInput } from 'lib/forums/comments/interface';
 
@@ -10,11 +12,12 @@ export async function generatePostCategory({
 }: {
   spaceId: string;
   name?: string;
-}) {
+}): Promise<Required<PostCategory>> {
   return prisma.postCategory.create({
     data: {
       name,
-      spaceId
+      spaceId,
+      path: getPostCategoryPath(name)
     }
   });
 }

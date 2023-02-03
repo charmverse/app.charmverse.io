@@ -79,6 +79,7 @@ export function PostCommentForm({
         />
       </Box>
       <Button
+        data-test='post-comment-button'
         sx={{
           alignSelf: 'flex-end'
         }}

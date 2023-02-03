@@ -293,6 +293,7 @@ export default function Sidebar({ closeSidebar, favorites, navAction }: SidebarP
               onClick={navAction}
             />
             <SidebarLink
+              data-test='sidebar-link-forum'
               href={`/${space.domain}/forum`}
               active={router.pathname.startsWith('/[domain]/forum')}
               icon={<MessageOutlinedIcon fontSize='small' />}

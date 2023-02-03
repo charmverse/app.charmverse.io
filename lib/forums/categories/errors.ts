@@ -9,3 +9,13 @@ export class PostCategoryNotDeleteableError extends SystemError {
     });
   }
 }
+
+export class PostCategoryNotFoundError extends SystemError {
+  constructor(categoryId: string) {
+    super({
+      message: `Post category with ID ${categoryId} not found`,
+      errorType: 'Data not found',
+      severity: 'warning'
+    });
+  }
+}

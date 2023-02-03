@@ -13,6 +13,8 @@ export class AvailableSpacePermissions
 
   createVote: boolean = false;
 
+  createForumCategory: boolean = false;
+
   constructor(operations: SpaceOperation[] = []) {
     super({ allowedOperations: Object.keys(SpaceOperation) as SpaceOperation[] });
 

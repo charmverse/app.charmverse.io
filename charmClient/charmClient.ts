@@ -70,6 +70,7 @@ import { ForumApi } from './apis/forumApi';
 import { GoogleApi } from './apis/googleApi';
 import { IframelyApi } from './apis/iframelyApi';
 import { MembersApi } from './apis/membersApi';
+import { PermissionsApi } from './apis/permissionsApi';
 import { ProfileApi } from './apis/profileApi';
 import { ProposalsApi } from './apis/proposalsApi';
 import { TasksApi } from './apis/tasksApi';
@@ -113,6 +114,8 @@ class CharmClient {
   tasks = new TasksApi();
 
   track = new TrackApi();
+
+  permissions = new PermissionsApi();
 
   unstoppableDomains = new UnstoppableDomainsApi();
 

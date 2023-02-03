@@ -6,7 +6,10 @@ import { canEditPost } from 'lib/forums/posts/canEditPost';
 import { deleteForumPost } from 'lib/forums/posts/deleteForumPost';
 import { getForumPost } from 'lib/forums/posts/getForumPost';
 import { updateForumPost } from 'lib/forums/posts/updateForumPost';
-import { onError, onNoMatch, requireUser } from 'lib/middleware';
+import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
+import { computePostCategoryPermissions } from 'lib/permissions/forum/computePostCategoryPermissions';
+import { computePostPermissions } from 'lib/permissions/forum/computePostPermissions';
+import { requestOperations } from 'lib/permissions/requestOperations';
 import { withSessionRoute } from 'lib/session/withSession';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { UnauthorisedActionError } from 'lib/utilities/errors';
@@ -20,15 +23,12 @@ async function updateForumPostController(req: NextApiRequest, res: NextApiRespon
   const { postId } = req.query as any as { postId: string };
   const userId = req.session.user.id;
 
-  const canEdit = await canEditPost({
-    postId,
+  await requestOperations({
+    resourceType: 'post',
+    operations: ['edit_post'],
+    resourceId: postId,
     userId
   });
-
-  if (!canEdit) {
-    throw new UnauthorisedActionError(`User ${userId} cannot edit post ${postId}`);
-  }
-
   const post = await updateForumPost(postId, req.body);
 
   relay.broadcast(
@@ -49,14 +49,12 @@ async function deleteForumPostController(req: NextApiRequest, res: NextApiRespon
   const { postId } = req.query as any as { postId: string };
   const userId = req.session.user.id;
 
-  const canDelete = await canEditPost({
-    postId,
+  await requestOperations({
+    resourceType: 'post',
+    resourceId: postId,
+    operations: ['delete_post'],
     userId
   });
-
-  if (!canDelete) {
-    throw new UnauthorisedActionError(`User ${userId} cannot edit post ${postId}`);
-  }
 
   const post = await deleteForumPost(postId);
 
@@ -80,15 +78,12 @@ async function getForumPostController(req: NextApiRequest, res: NextApiResponse<
 
   const post = await getForumPost({ userId, postId });
 
-  const { error } = await hasAccessToSpace({
-    spaceId: post.spaceId,
+  await requestOperations({
+    resourceType: 'post',
+    resourceId: post.id,
+    operations: ['view_post'],
     userId
   });
-
-  if (error) {
-    throw error;
-  }
-
   res.status(200).json(post);
 }
 

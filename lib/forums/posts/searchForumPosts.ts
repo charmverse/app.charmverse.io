@@ -12,7 +12,7 @@ export interface SearchForumPostsRequest {
   search?: string;
   page?: number;
   count?: number;
-  categoryId?: string;
+  categoryId?: string | string[];
 }
 export async function searchForumPosts(
   {
@@ -25,6 +25,15 @@ export async function searchForumPosts(
   }: SearchForumPostsRequest,
   userId: string
 ): Promise<PaginatedPostList> {
+  // Replicates prisma behaviour, but avoids a database call
+  if (categoryId instanceof Array && categoryId.length === 0) {
+    return {
+      data: [],
+      cursor: 0,
+      hasNext: false
+    };
+  }
+
   // Fix string input values
   page = typeof page === 'string' ? parseInt(page) : page;
   count = typeof count === 'string' ? parseInt(count) : count;
@@ -41,23 +50,25 @@ export async function searchForumPosts(
   };
 
   const whereQuery: Prisma.PostWhereInput = {
-    categoryId,
+    categoryId: categoryId instanceof Array ? { in: categoryId } : categoryId,
     spaceId,
     deletedAt: null,
-    OR: [
-      {
-        title: {
-          contains: search,
-          mode: 'insensitive'
-        }
-      },
-      {
-        contentText: {
-          contains: search,
-          mode: 'insensitive'
-        }
-      }
-    ]
+    OR: search
+      ? [
+          {
+            title: {
+              contains: search,
+              mode: 'insensitive'
+            }
+          },
+          {
+            contentText: {
+              contains: search,
+              mode: 'insensitive'
+            }
+          }
+        ]
+      : undefined
   };
 
   const posts = await prisma.post.findMany({

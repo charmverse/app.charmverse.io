@@ -172,7 +172,7 @@ describe('removeBountyPermissionGroup', () => {
       await removeBountyPermissionGroup({
         assignee: {
           group: 'user',
-          id: undefined
+          id: undefined as any
         },
         level: 'creator',
         resourceId: bounty.id

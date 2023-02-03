@@ -14,7 +14,7 @@ export type PaginatedPostList = PaginatedResponse<ForumPostMeta & { totalComment
 
 export interface ListForumPostsRequest {
   spaceId: string;
-  categoryId?: string;
+  categoryId?: string | string[];
   page?: number;
   count?: number;
   sort?: PostSortOption;
@@ -31,6 +31,15 @@ export async function listForumPosts(
   }: ListForumPostsRequest,
   userId: string
 ): Promise<PaginatedPostList> {
+  // Replicates prisma behaviour, but avoids a database call
+  if (categoryId instanceof Array && categoryId.length === 0) {
+    return {
+      data: [],
+      cursor: 0,
+      hasNext: false
+    };
+  }
+
   // Fix string input values
   page = typeof page === 'string' ? parseInt(page) : page;
   count = typeof count === 'string' ? parseInt(count) : count;
@@ -67,11 +76,9 @@ export async function listForumPosts(
     }
   };
 
-  const postPropsQuery: Prisma.PostWhereInput = categoryId
-    ? {
-        categoryId
-      }
-    : {};
+  const postPropsQuery: Prisma.PostWhereInput = {
+    categoryId: categoryId instanceof Array ? { in: categoryId } : categoryId
+  };
 
   const posts = await prisma.post.findMany({
     ...orderQuery,

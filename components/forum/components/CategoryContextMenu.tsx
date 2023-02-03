@@ -1,3 +1,4 @@
+import { Edit } from '@mui/icons-material';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import TaskIcon from '@mui/icons-material/Task';
@@ -9,17 +10,23 @@ import { useEffect, useMemo, useState } from 'react';
 import FieldLabel from 'components/common/form/FieldLabel';
 import PopperPopup from 'components/common/PopperPopup';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import useIsAdmin from 'hooks/useIsAdmin';
+import type { AvailablePostCategoryPermissionFlags } from 'lib/permissions/forum/interfaces';
+
+import { PostCategoryPermissionsDialog } from './permissions/PostCategoryPermissions';
 
 type Props = {
   category: PostCategory;
   onChange: (category: PostCategory) => void;
   onDelete: (category: PostCategory) => void;
   onSetNewDefaultCategory: (category: PostCategory) => void;
+  permissions: AvailablePostCategoryPermissionFlags;
 };
 
-export function ForumFilterCategory({ category, onChange, onDelete, onSetNewDefaultCategory }: Props) {
+export function CategoryContextMenu({ category, onChange, onDelete, onSetNewDefaultCategory, permissions }: Props) {
   const [tempName, setTempName] = useState(category.name || '');
   const space = useCurrentSpace();
+  const isAdmin = useIsAdmin();
 
   useEffect(() => {
     setTempName(category.name || '');
@@ -31,6 +38,12 @@ export function ForumFilterCategory({ category, onChange, onDelete, onSetNewDefa
     }
   }
 
+  const [permissionsDialogIsOpen, setPermissionsDialogIsOpen] = useState(false);
+
+  function closeDialog() {
+    setPermissionsDialogIsOpen(false);
+  }
+
   const isDefaultSpacePostCategory = space?.defaultPostCategoryId === category.id;
 
   const popupContent = useMemo(
@@ -39,6 +52,7 @@ export function ForumFilterCategory({ category, onChange, onDelete, onSetNewDefa
         <Stack p={1}>
           <FieldLabel variant='subtitle2'>Category name</FieldLabel>
           <TextField
+            disabled={!permissions.edit_category}
             value={tempName}
             onChange={(e) => setTempName(e.target.value)}
             autoFocus
@@ -52,7 +66,7 @@ export function ForumFilterCategory({ category, onChange, onDelete, onSetNewDefa
         </Stack>
         {!isDefaultSpacePostCategory && (
           <MenuItem
-            disabled={isDefaultSpacePostCategory}
+            disabled={isDefaultSpacePostCategory || !isAdmin}
             onClick={() => {
               onSetNewDefaultCategory(category);
             }}
@@ -67,10 +81,18 @@ export function ForumFilterCategory({ category, onChange, onDelete, onSetNewDefa
           </MenuItem>
         )}
         {!!onDelete && (
-          <Tooltip title={isDefaultSpacePostCategory ? 'You cannot delete the default post category' : ''}>
+          <Tooltip
+            title={
+              !permissions.delete_category
+                ? 'You do not have permissions to delete this category'
+                : isDefaultSpacePostCategory
+                ? 'You cannot delete the default post category'
+                : ''
+            }
+          >
             <div>
               <MenuItem
-                disabled={isDefaultSpacePostCategory}
+                disabled={isDefaultSpacePostCategory || !permissions.delete_category}
                 onClick={() => {
                   onDelete(category);
                 }}
@@ -86,16 +108,41 @@ export function ForumFilterCategory({ category, onChange, onDelete, onSetNewDefa
             </div>
           </Tooltip>
         )}
+        <Tooltip title={!permissions.manage_permissions ? 'Only forum administrators can manage permisions' : ''}>
+          <div>
+            <MenuItem
+              data-test={`open-category-permissions-dialog-${category.id}`}
+              disabled={!permissions.manage_permissions}
+              onClick={() => setPermissionsDialogIsOpen(true)}
+              sx={{
+                py: 1
+              }}
+            >
+              <ListItemIcon>
+                <Edit fontSize='small' />
+              </ListItemIcon>
+              <Typography variant='subtitle1'>Manage permissions</Typography>
+            </MenuItem>
+          </div>
+        </Tooltip>
       </MenuList>
     ),
     [category, tempName, space?.defaultPostCategoryId]
   );
 
   return (
-    <PopperPopup popupContent={popupContent} onClose={onSave}>
-      <IconButton size='small'>
-        <MoreHorizIcon fontSize='small' />
-      </IconButton>
-    </PopperPopup>
+    <>
+      <PopperPopup popupContent={popupContent} onClose={onSave}>
+        <IconButton data-test={`open-category-context-menu-${category.id}`} size='small'>
+          <MoreHorizIcon fontSize='small' />
+        </IconButton>
+      </PopperPopup>
+      <PostCategoryPermissionsDialog
+        permissions={permissions}
+        onClose={closeDialog}
+        open={permissionsDialogIsOpen}
+        postCategory={category}
+      />
+    </>
   );
 }
