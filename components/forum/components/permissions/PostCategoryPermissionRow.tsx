@@ -56,6 +56,7 @@ export function PostCategoryRolePermissionRow({
       <div style={{ width: '120px', textAlign: 'left' }}>
         {canEdit ? (
           <SmallSelect
+            data-test={assignee.group === 'space' ? 'category-space-permission' : null}
             renderValue={(value) =>
               (forumMemberPermissionOptions[value as keyof typeof forumMemberPermissionOptions] as string as any) ||
               'No access'

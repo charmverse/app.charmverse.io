@@ -111,6 +111,7 @@ export function CategoryContextMenu({ category, onChange, onDelete, onSetNewDefa
         <Tooltip title={!permissions.manage_permissions ? 'Only forum administrators can manage permisions' : ''}>
           <div>
             <MenuItem
+              data-test={`open-category-permissions-dialog-${category.id}`}
               disabled={!permissions.manage_permissions}
               onClick={() => setPermissionsDialogIsOpen(true)}
               sx={{
@@ -132,7 +133,7 @@ export function CategoryContextMenu({ category, onChange, onDelete, onSetNewDefa
   return (
     <>
       <PopperPopup popupContent={popupContent} onClose={onSave}>
-        <IconButton size='small'>
+        <IconButton data-test={`open-category-context-menu-${category.id}`} size='small'>
           <MoreHorizIcon fontSize='small' />
         </IconButton>
       </PopperPopup>

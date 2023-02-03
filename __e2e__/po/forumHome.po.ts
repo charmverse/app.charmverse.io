@@ -15,12 +15,21 @@ export class ForumHomePage {
 
   readonly confirmNewCategoryButton: Locator;
 
+  readonly categoryPermissionsDialog: Locator;
+
+  readonly spaceCategoryPermissionSelect: Locator;
+
+  readonly closeModalButton: Locator;
+
   constructor(page: Page) {
     this.page = page;
     this.addCategoryButton = page.locator('data-test=add-category-button');
     this.addCategoryInput = page.locator('data-test=add-category-input >> input');
     this.confirmNewCategoryButton = page.locator('data-test=confirm-new-category-button');
     this.sidebarForumLink = page.locator('data-test=sidebar-link-forum');
+    this.categoryPermissionsDialog = page.locator('data-test=category-permissions-dialog');
+    this.spaceCategoryPermissionSelect = page.locator('data-test=category-space-permission >> input');
+    this.closeModalButton = page.locator('data-test=close-modal');
   }
 
   async goToForumHome(domain: string) {
@@ -28,10 +37,7 @@ export class ForumHomePage {
     await this.page.waitForURL(`**/${domain}/forum`);
   }
 
-  getCategoryLocator(categoryId: string) {
-    return this.page.locator(`data-test=forum-category-${categoryId}`);
-  }
-
+  // Navigation across forum home page ----------------
   getPostCardLocator(postId: string) {
     return this.page.locator(`data-test=forum-post-card-${postId}`);
   }
@@ -42,5 +48,18 @@ export class ForumHomePage {
 
   async waitForCategory({ domain, path }: { domain: string; path: string }) {
     await this.page.waitForURL(`**/${domain}/forum/${path}`);
+  }
+
+  // Interactions with categories sidebar ----------------
+  getCategoryLocator(categoryId: string) {
+    return this.page.locator(`data-test=forum-category-${categoryId}`);
+  }
+
+  getCategoryContextMenuLocator(categoryId: string) {
+    return this.page.locator(`data-test=open-category-context-menu-${categoryId}`);
+  }
+
+  getCategoryManagePermissionsLocator(categoryId: string) {
+    return this.page.locator(`data-test=open-category-permissions-dialog-${categoryId}`);
   }
 }

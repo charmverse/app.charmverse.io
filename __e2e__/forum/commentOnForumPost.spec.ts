@@ -20,7 +20,7 @@ const test = base.extend<Fixtures>({
   forumPostPage: ({ page }, use) => use(new ForumPostPage(page))
 });
 
-test('add forum category - navigate to a forum post and create a new top level comment', async ({
+test('view forum post content - navigate to a forum post and view the content and comments', async ({
   page,
   forumHomePage,
   forumPostPage

@@ -32,12 +32,9 @@ type Props = {
   permissions: AvailablePostCategoryPermissionFlags;
 };
 function PostCategoryPermissions({ postCategory, permissions }: Props) {
-  const {
-    data,
-    isLoading,
-    mutate: mutatePermissions
-  } = useSWR(`/api/forum/list-post-category-permissions-${postCategory.id}`, () =>
-    charmClient.permissions.listPostCategoryPermissions(postCategory.id)
+  const { data, mutate: mutatePermissions } = useSWR(
+    `/api/forum/list-post-category-permissions-${postCategory.id}`,
+    () => charmClient.permissions.listPostCategoryPermissions(postCategory.id)
   );
 
   const { roles } = useRoles();
@@ -128,7 +125,7 @@ function PostCategoryPermissions({ postCategory, permissions }: Props) {
     (roles?.length ?? 0) > mappedPermissions.roles.length;
 
   return (
-    <Box>
+    <Box data-test='category-permissions-dialog'>
       <Grid container spacing={2}>
         <Grid item xs={12}>
           <PostCategoryRolePermissionRow
