@@ -48,6 +48,7 @@ jobs:
           - 5432:5432
     strategy:
       max-parallel: 5
+      fail-fast: false
       matrix:
         include:
           - test_name: "Typecheck tests"
