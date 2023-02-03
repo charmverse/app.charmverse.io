@@ -95,15 +95,15 @@ jobs:
           path: |
             ~/.npm
             ${{ github.workspace }}/.next/cache
-          key: nextjs-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**.[jt]s', '**.[jt]sx') }}
+          key: nextjs-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**.[jt]s', '**.[jt]sx', '**.prisma') }}
           restore-keys: |
             nextjs-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}-
 
       - name: Run ${{matrix.test_name}}
         run: |
           if [ "${{matrix.test_command}}" == "test:server:ci" ]; then
-            npm run start:test:ci &  
-          fi 
+            npm run start:test:ci &
+          fi
           npm run ${{matrix.test_command}}
 
   deploy:
