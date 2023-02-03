@@ -1,14 +1,10 @@
 import { expect, test as base } from '@playwright/test';
-import type { PostCategory, PostCategoryPermissionLevel, Space, User } from '@prisma/client';
+import type { Post, PostCategory, Space, User } from '@prisma/client';
 
-import { prisma } from 'db';
-import { postCategoryPermissionLabels } from 'lib/permissions/forum/mapping';
-import { upsertPostCategoryPermission } from 'lib/permissions/forum/upsertPostCategoryPermission';
 import { randomETHWalletAddress } from 'testing/generateStubs';
 import { generateForumPost, generatePostCategory } from 'testing/utils/forums';
 
 import { ForumHomePage } from '../po/forumHome.po';
-import type { ForumPostPage } from '../po/forumPost.po';
 import { createUser, createUserAndSpace, generateSpaceRole } from '../utils/mocks';
 import { login } from '../utils/session';
 
@@ -24,6 +20,7 @@ let space: Space;
 let adminUser: User;
 let memberUser: User;
 let hiddenCategory: PostCategory;
+let hiddenPost: Post;
 
 test.describe.serial('Manage post permissions', () => {
   test('hidden category - member user cannot view a category without correct permissions', async ({
@@ -59,35 +56,38 @@ test.describe.serial('Manage post permissions', () => {
 
     const postName = 'Post in hidden category';
 
-    const post = await generateForumPost({
+    hiddenPost = await generateForumPost({
       spaceId: space.id,
       userId: adminUser.id,
       categoryId: hiddenCategory.id,
       title: postName
     });
+    await login({
+      page,
+      userId: memberUser.id
+    });
 
-    // Login as user and not find the forum category
+    // Start the navigation steps
 
-    // await login({
-    //   page,
-    //   userId: memberUser.id
-    // });
+    await forumHomePage.goToForumHome(space.domain);
 
-    // // Start the navigation steps
+    await forumHomePage.page.waitForTimeout(2000);
 
-    // await forumHomePage.goToForumHome(space.domain);
+    await forumHomePage.page.press('data-test=member-onboarding-form', 'Escape');
 
-    // await forumHomePage.page.waitForTimeout(2000);
+    // Login as user and not find the forum category or the post
 
-    // await forumHomePage.page.press('data-test=member-onboarding-form', 'Escape');
+    const category = forumHomePage.getCategoryLocator(hiddenCategory.id);
 
-    // const postCard = forumHomePage.getPostCardLocator(post.id);
+    await expect(category).not.toBeVisible({
+      timeout: 3000
+    });
 
-    // await expect(postCard).not.toBeVisible({
-    //   timeout: 3000
-    // });
+    const postCard = forumHomePage.getPostCardLocator(hiddenPost.id);
 
-    // await page.pause();
+    await expect(postCard).not.toBeVisible({
+      timeout: 3000
+    });
   });
 
   test('manage category permissions - admin user can configure permissions for a category', async ({
@@ -134,5 +134,33 @@ test.describe.serial('Manage post permissions', () => {
     await forumHomePage.closeModalButton.click();
 
     await expect(forumHomePage.categoryPermissionsDialog).not.toBeVisible();
+  });
+
+  test('hidden category - member user can now view the category once an admin has provided permissions for the space', async ({
+    page,
+    forumHomePage
+  }) => {
+    await login({
+      page,
+      userId: memberUser.id
+    });
+    // Start the navigation steps
+    await forumHomePage.goToForumHome(space.domain);
+    await forumHomePage.page.waitForTimeout(2000);
+    await forumHomePage.page.press('data-test=member-onboarding-form', 'Escape');
+
+    const category = forumHomePage.getCategoryLocator(hiddenCategory.id);
+
+    await expect(category).toBeVisible();
+
+    await category.click();
+
+    await forumHomePage.waitForCategory({ domain: space.domain, path: hiddenCategory.path as string });
+
+    const postCard = forumHomePage.getPostCardLocator(hiddenPost.id);
+
+    await expect(postCard).toBeVisible({
+      timeout: 3000
+    });
   });
 });
