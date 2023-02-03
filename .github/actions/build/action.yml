@@ -63,7 +63,9 @@ runs:
       id: cache_build
       uses: actions/cache@v3
       with:
-        path: .next
+        path: |
+          .next
+          .env.test.local
         # including the app_env helps make sure that deploy_staging.yml does not reuse values from test_and_deploy.yml which are meant for production
         key: nextjs-build-${{ github.sha }}-${{ inputs.NEXT_PUBLIC_APP_ENV }}
 
