@@ -46,6 +46,9 @@ export function ForumFilterListLink({ label, value, isSelected, handleSelect }: 
       }}
     >
       <Typography
+        data-test={
+          category ? `forum-category-${category.id}` : label === 'All categories' ? 'forum-all-categories' : null
+        }
         sx={{
           color: 'text.primary',
           cursor: 'pointer',
