@@ -117,18 +117,17 @@ export default function SettingsModal() {
             defaultExpanded={currentSpace?.name ? ['my-spaces', currentSpace?.name] : ['my-spaces']}
             sx={{ flexGrow: 1, overflowY: 'auto' }}
           >
-            {ACCOUNT_TABS.map((tab, _index, arr) => (
+            {ACCOUNT_TABS.map((tab) => (
               <StyledTreeItem
                 key={tab.path}
                 nodeId={tab.path}
                 label={tab.label}
                 icon={tab.icon}
-                sx={{ mb: arr.length - 1 === _index ? 2 : 0 }}
                 onClick={(e) => handleChange(e, tab.path)}
                 isActive={activePath === tab.path}
               />
             ))}
-            <StyledTreeItem nodeId='my-spaces' label='My spaces' icon={null}>
+            <StyledTreeItem nodeId='my-spaces' label='My spaces' icon={null} sx={{ mt: 2 }}>
               {spaces.map((space) => (
                 <StyledTreeItem
                   key={space.id}
