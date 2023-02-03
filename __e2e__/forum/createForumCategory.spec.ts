@@ -19,8 +19,7 @@ const test = base.extend<Fixtures>({
 test('add forum category - navigate to forum and add a forum category', async ({ page, forumHomePage }) => {
   const { space, address, privateKey, pages, user } = await createUserAndSpace({
     browserPage: page,
-    permissionConfigurationMode: 'collaborative',
-    isNew: false
+    permissionConfigurationMode: 'collaborative'
   });
 
   await login({
@@ -55,7 +54,7 @@ test('add forum category - navigate to forum and add a forum category', async ({
     }
   });
 
-  const newCategoryMenuOption = forumHomePage.categoryLocator(category?.id as string);
+  const newCategoryMenuOption = forumHomePage.getCategoryLocator(category?.id as string);
 
   await expect(newCategoryMenuOption).toBeVisible();
 

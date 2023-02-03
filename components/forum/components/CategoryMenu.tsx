@@ -76,6 +76,7 @@ export function CategoryMenu({ handleCategory, handleSort, selectedCategoryId, s
           ))}
         </Stack>
         <Button
+          data-test='add-category-button'
           sx={{
             ml: 2
           }}
@@ -85,7 +86,7 @@ export function CategoryMenu({ handleCategory, handleSort, selectedCategoryId, s
           variant='outlined'
           color='secondary'
           size='small'
-          disabledTooltip="You don't have permission to add category"
+          disabledTooltip="You don't have the permissions to add new forum categories"
         >
           Add category
         </Button>
@@ -98,6 +99,7 @@ export function CategoryMenu({ handleCategory, handleSort, selectedCategoryId, s
         title='Add forum category'
       >
         <TextField
+          data-test='add-category-input'
           sx={{
             mb: 1
           }}
@@ -114,6 +116,7 @@ export function CategoryMenu({ handleCategory, handleSort, selectedCategoryId, s
           }}
         />
         <Button
+          data-test='confirm-new-category-button'
           disabled={categories.find((category) => category.name === newForumCategoryName)}
           onClick={createCategory}
         >
