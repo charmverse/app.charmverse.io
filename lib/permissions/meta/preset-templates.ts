@@ -8,7 +8,8 @@ const readOnly: SpacePermissionTemplate = {
   spaceOperations: {
     createBounty: false,
     createPage: false,
-    createVote: false
+    createVote: false,
+    createForumCategory: false
   },
   pagePermissionDefaults: {
     defaultPagePermissionGroup: 'view',
@@ -21,7 +22,8 @@ const collaborative: SpacePermissionTemplate = {
   spaceOperations: {
     createPage: true,
     createBounty: true,
-    createVote: true
+    createVote: true,
+    createForumCategory: false
   },
   pagePermissionDefaults: {
     defaultPagePermissionGroup: 'full_access',
@@ -34,7 +36,8 @@ const open: SpacePermissionTemplate = {
   spaceOperations: {
     createPage: true,
     createBounty: true,
-    createVote: true
+    createVote: true,
+    createForumCategory: false
   },
   pagePermissionDefaults: {
     defaultPagePermissionGroup: 'full_access',

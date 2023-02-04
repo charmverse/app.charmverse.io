@@ -6,8 +6,11 @@ import { InvalidInputError } from 'lib/utilities/errors';
 
 import { AdministratorOnlyError, UserIsNotSpaceMemberError } from './errors';
 
+/**
+ * @param userId - The ID of the user to check. If empty, the hasAccess should always return an error
+ */
 interface Input {
-  userId: string;
+  userId?: string;
   spaceId: string;
   adminOnly?: boolean;
 }

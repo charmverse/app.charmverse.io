@@ -3,9 +3,17 @@ import { BountyPermissionLevel } from '@prisma/client';
 import { getBountyOrThrow } from 'lib/bounties/getBounty';
 
 import { typedKeys } from '../../utilities/objects';
+import type { TargetPermissionGroup } from '../interfaces';
 
 import { addBountyPermissionGroup } from './addBountyPermissionGroup';
-import type { BountyPermissionAssignment, BountyPermissions, BulkBountyPermissionAssignment } from './interfaces';
+import type {
+  BountyPermissionAssignment,
+  BountyPermissionGroup,
+  BountyPermissions,
+  BountyReviewer,
+  BountySubmitter,
+  BulkBountyPermissionAssignment
+} from './interfaces';
 import { queryBountyPermissions } from './queryBountyPermissions';
 import { removeBountyPermissionGroup } from './removeBountyPermissionGroup';
 
@@ -50,8 +58,11 @@ export async function setBountyPermissions({
     const assigneesToRemove = oldAssignees
       .filter((assignee) => {
         return (
-          currentAssignees.find((a) => a.assignee.group === assignee.group && a.assignee.id === assignee.id) ===
-          undefined
+          currentAssignees.find(
+            (a) =>
+              a.assignee.group === assignee.group &&
+              (a.assignee as BountyPermissionGroup).id === (assignee as BountyPermissionGroup).id
+          ) === undefined
         );
       })
       .map((a) => {
@@ -68,8 +79,11 @@ export async function setBountyPermissions({
   toAssign.forEach((perm) => {
     const existingSamePermissionsGroups = permissions[perm.level];
     if (
-      existingSamePermissionsGroups.find((p) => p.group === perm.assignee.group && perm.assignee.id === p.id) ===
-      undefined
+      existingSamePermissionsGroups.find(
+        (p) =>
+          p.group === perm.assignee.group &&
+          (perm.assignee as BountyPermissionGroup).id === (p as BountyPermissionGroup).id
+      ) === undefined
     ) {
       toAdd.push({
         assignee: perm.assignee,

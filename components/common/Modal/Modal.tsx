@@ -131,7 +131,7 @@ export function DialogTitle({ children, onClose, sx }: { children: ReactNode; on
     <StyledDialogTitle sx={sx}>
       {children}
       {onClose && (
-        <CloseButton onClick={onClose}>
+        <CloseButton data-test='close-modal' onClick={onClose}>
           <CloseIcon color='secondary' />
         </CloseButton>
       )}

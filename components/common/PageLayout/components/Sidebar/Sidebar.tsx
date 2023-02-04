@@ -250,6 +250,7 @@ export default function Sidebar({ closeSidebar, favorites, navAction }: SidebarP
               />
               <SidebarLink
                 href={`/${space.domain}/forum`}
+                data-test='sidebar-link-forum'
                 active={router.pathname.startsWith('/[domain]/forum')}
                 icon={<MessageOutlinedIcon fontSize='small' />}
                 label='Forum'

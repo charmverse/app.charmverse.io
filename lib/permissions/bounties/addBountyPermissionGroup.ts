@@ -5,6 +5,7 @@ import { prisma } from 'db';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { DataNotFoundError, InsecureOperationError, InvalidInputError } from 'lib/utilities/errors';
 
+import type { TargetPermissionGroup } from '../interfaces';
 import { assigneeGroupIsValid } from '../validateAssigneeGroup';
 
 import type { BountyPermissionAssignment, BountyPermissions } from './interfaces';
@@ -88,7 +89,8 @@ export async function addBountyPermissionGroup({
       return p.roleId === assignee.id && p.permissionLevel === level;
     } else if (assignee.group === 'user') {
       return p.userId === assignee.id && p.permissionLevel === level;
-    } else if (assignee.group === 'public') {
+      // We should never get here, but just in case
+    } else if ((assignee as TargetPermissionGroup).group === 'public') {
       return p.public === true && p.permissionLevel === level;
     }
 
