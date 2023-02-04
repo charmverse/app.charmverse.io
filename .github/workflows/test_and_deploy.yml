@@ -77,13 +77,13 @@ jobs:
       matrix:
         include:
           - test_name: "Basic tests"
-            test_command: "test:ci"
+            test_command: "npm run test:ci"
           - test_name: "Server integration tests"
-            test_command: "start:test:ci & npm run test:server:ci"
+            test_command: "npm run start:test:ci & npm run test:server:ci"
           - test_name: "Browser tests"
-            test_command: "test:browser:ci"
+            test_command: "npm run test:browser:ci"
           - test_name: "Browser e2e test"
-            test_command: "test:e2e:ci"
+            test_command: "npx playwright install chromium chrome --with-deps; npm run test:e2e:ci"
     steps:
       - uses: actions/checkout@v3
 
@@ -99,7 +99,7 @@ jobs:
           NEXT_PUBLIC_APP_ENV: 'test'
 
       - name: Run ${{matrix.test_name}}
-        run: npm run ${{matrix.test_command}}
+        run: ${{matrix.test_command}}
 
   deploy:
     name: Deploy to production
