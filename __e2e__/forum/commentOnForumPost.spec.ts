@@ -144,11 +144,9 @@ test('view forum post content - navigate to a forum post and view the content an
 
   const postTitle = forumPostPage.getPostPageTitleLocator();
 
-  await expect(postTitle).toBeVisible();
+  const titleInput = postTitle.getByText(post.title);
 
-  // Simplest way I could find to target the value of the input
-  // Makes sure user can see the post title
-  expect(await postTitle.allTextContents()).toContain(post.title);
+  await expect(titleInput).toBeVisible();
 
   // Check existing comments show. We can't target CharmEditor yet, so we just get all text contents of the HTML
   const topLevelCommentLocator = forumPostPage.getCommentLocator(topLevelComment.id);
