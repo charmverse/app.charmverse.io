@@ -30,10 +30,6 @@ export const jestConfig = {
   testMatch: ['**/lib/**/*.spec.ts', '**/testing/**/*.spec.ts', '**/background/**/*.spec.ts'],
 
   testTimeout: 30000
-  // transform: {
-  //   // '^.+\\.(ts)$': '@swc/jest'
-  //   '^.+\\.(ts)$': 'ts-jest'
-  // }
 };
 
 export default createJestConfig(jestConfig);
