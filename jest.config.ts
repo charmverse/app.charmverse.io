@@ -29,10 +29,11 @@ export const jestConfig = {
   // The glob patterns Jest uses to detect test files
   testMatch: ['**/lib/**/*.spec.ts', '**/testing/**/*.spec.ts', '**/background/**/*.spec.ts'],
 
-  testTimeout: 30000,
-  transform: {
-    '^.+\\.(ts)$': 'ts-jest'
-  }
+  testTimeout: 30000
+  // transform: {
+  //   // '^.+\\.(ts)$': '@swc/jest'
+  //   '^.+\\.(ts)$': 'ts-jest'
+  // }
 };
 
 export default createJestConfig(jestConfig);
