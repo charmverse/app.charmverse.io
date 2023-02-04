@@ -61,9 +61,7 @@ jobs:
         run: npm run test:browser:ci
 
       - name: Run browser e2e tests
-        run: |
-          npm run start:test:ci &
-          npm run test:e2e:ci
+        run: npm run test:e2e:ci
 
   deploy:
     name: Deploy to production
