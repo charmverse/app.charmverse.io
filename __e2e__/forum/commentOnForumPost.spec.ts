@@ -150,10 +150,13 @@ test('view forum post content - navigate to a forum post and view the content an
 
   // Check existing comments show. We can't target CharmEditor yet, so we just get all text contents of the HTML
   const topLevelCommentLocator = forumPostPage.getCommentLocator(topLevelComment.id);
-  expect((await topLevelCommentLocator.allTextContents())[0]).toMatch(topLevelContentText);
+
+  const commentBody1 = topLevelCommentLocator.getByText(topLevelContentText);
+  await expect(commentBody1).toBeVisible();
 
   const childLevelCommentLocator = forumPostPage.getCommentLocator(childComment.id);
-  expect((await childLevelCommentLocator.allTextContents())[0]).toMatch(childContentText);
+  const commentBody2 = childLevelCommentLocator.getByText(childContentText);
+  await expect(commentBody2).toBeVisible();
 
   // The button is usually disabled as the user hasn't typed anything yet
   await expect(forumPostPage.newTopLevelCommentInputLocator).toBeVisible();
