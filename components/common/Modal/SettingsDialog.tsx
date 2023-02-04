@@ -110,7 +110,7 @@ export default function SettingsModal() {
       fullWidth
       maxWidth='lg'
       fullScreen={isMobile}
-      PaperProps={{ sx: { md: { height: '90vh' }, borderRadius: (theme) => theme.spacing(1) } }}
+      PaperProps={{ sx: { height: { md: '90vh' }, borderRadius: (theme) => theme.spacing(1) } }}
       onClose={onClose}
       open={open}
     >
