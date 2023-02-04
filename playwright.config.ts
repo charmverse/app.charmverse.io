@@ -1,6 +1,9 @@
 import type { PlaywrightTestConfig } from '@playwright/test';
 import { devices } from '@playwright/test';
 
+// eslint-disable-next-line no-console
+console.log('playwright config', process.env.CI);
+
 /**
  * Read environment variables from file.
  * https://github.com/motdotla/dotenv
