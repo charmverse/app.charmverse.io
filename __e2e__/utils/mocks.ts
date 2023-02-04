@@ -232,10 +232,18 @@ export async function generateDiscordUser() {
   return user;
 }
 
-export async function generateSpaceRole({ spaceId, userId }: { userId: string; spaceId: string }) {
+export async function generateSpaceRole({
+  spaceId,
+  userId,
+  isAdmin = false
+}: {
+  userId: string;
+  spaceId: string;
+  isAdmin?: boolean;
+}) {
   return prisma.spaceRole.create({
     data: {
-      isAdmin: false,
+      isAdmin,
       spaceId,
       userId
     }

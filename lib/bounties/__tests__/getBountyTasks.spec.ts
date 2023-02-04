@@ -171,8 +171,7 @@ describe('getBountyTasks', () => {
         reviewer: [
           {
             group: 'user',
-            id: user.id,
-            roleId: 'space'
+            id: user.id
           }
         ]
       },
@@ -195,8 +194,7 @@ describe('getBountyTasks', () => {
         reviewer: [
           {
             group: 'user',
-            id: user.id,
-            roleId: 'space'
+            id: user.id
           }
         ]
       },

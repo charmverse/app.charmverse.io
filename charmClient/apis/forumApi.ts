@@ -14,6 +14,7 @@ import type { ListForumPostsRequest, PaginatedPostList } from 'lib/forums/posts/
 import type { SearchForumPostsRequest } from 'lib/forums/posts/searchForumPosts';
 import type { UpdateForumPostInput } from 'lib/forums/posts/updateForumPost';
 import type { PageDetails, PageMeta } from 'lib/pages';
+import type { PostCategoryWithPermissions } from 'lib/permissions/forum/interfaces';
 
 export class ForumApi {
   createForumPost(payload: Omit<CreateForumPostInput, 'createdBy'>) {
@@ -40,7 +41,7 @@ export class ForumApi {
     return http.GET<PostWithVotes>(`/api/forums/posts/${postId}`);
   }
 
-  listPostCategories(spaceId: string): Promise<PostCategory[]> {
+  listPostCategories(spaceId: string): Promise<PostCategoryWithPermissions[]> {
     return http.GET(`/api/spaces/${spaceId}/post-categories`);
   }
 
@@ -52,7 +53,7 @@ export class ForumApi {
     return http.POST(`/api/forums/posts/${postId}/comments`, body);
   }
 
-  createPostCategory(spaceId: string, category: CreatePostCategoryInput): Promise<PostCategory> {
+  createPostCategory(spaceId: string, category: CreatePostCategoryInput): Promise<PostCategoryWithPermissions> {
     return http.POST(`/api/spaces/${spaceId}/post-categories`, category);
   }
 
@@ -66,7 +67,7 @@ export class ForumApi {
     spaceId,
     id,
     name
-  }: PostCategoryUpdate & Pick<PostCategory, 'spaceId' | 'id'>): Promise<PostCategory> {
+  }: PostCategoryUpdate & Pick<PostCategory, 'spaceId' | 'id'>): Promise<PostCategoryWithPermissions> {
     return http.PUT(`/api/spaces/${spaceId}/post-categories/${id}`, { name });
   }
 

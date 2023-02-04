@@ -224,4 +224,59 @@ describe('listForumPosts', () => {
     expect(postsOrderedByMostVoted.data[1].id === secondMostVotedPageId).toBeTruthy();
     expect(postsOrderedByMostVoted.data[1].votes.upvotes).toBe(1);
   });
+
+  it('should support lookup of posts in multiple categories', async () => {
+    const { space: extraSpace, user: extraUser } = await generateUserAndSpaceWithApiToken();
+
+    const category1 = await createPostCategory({ spaceId: extraSpace.id, name: 'Test Category 1' });
+    const category2 = await createPostCategory({ spaceId: extraSpace.id, name: 'Test Category 2' });
+    const category3 = await createPostCategory({ spaceId: extraSpace.id, name: 'Test Category 3' });
+
+    const postsInCategory1 = await generateForumPosts({
+      spaceId: extraSpace.id,
+      createdBy: extraUser.id,
+      count: 5,
+      categoryId: category1.id
+    });
+
+    const postsInCategory2 = await generateForumPosts({
+      spaceId: extraSpace.id,
+      createdBy: extraUser.id,
+      count: 5,
+      categoryId: category2.id
+    });
+
+    const postsInCategory3 = await generateForumPosts({
+      spaceId: extraSpace.id,
+      createdBy: extraUser.id,
+      count: 5,
+      categoryId: category3.id
+    });
+
+    const resultsPerQuery = 100;
+
+    const postsInCategory1And2 = await listForumPosts(
+      {
+        spaceId: extraSpace.id,
+        count: resultsPerQuery,
+        categoryId: [category1.id, category2.id]
+      },
+      user.id
+    );
+
+    expect(postsInCategory1And2.data).toHaveLength([postsInCategory1, postsInCategory2].flat().length);
+    expect(postsInCategory1And2.data.every((post) => !postsInCategory3.some((p) => p.id === post.id))).toBe(true);
+  });
+
+  it('should return empty results if categoryId is an empty array', async () => {
+    const results = await listForumPosts(
+      {
+        spaceId: space.id,
+        categoryId: []
+      },
+      user.id
+    );
+
+    expect(results.data).toHaveLength(0);
+  });
 });
