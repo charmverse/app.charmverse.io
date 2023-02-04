@@ -14,7 +14,7 @@ import {
   generateUserAndSpace,
   generateUserAndSpaceWithApiToken
 } from 'testing/setupDatabase';
-import { generateForumPost } from 'testing/utils/forums';
+import { generateForumPost, generatePostCategory } from 'testing/utils/forums';
 
 let space: Space;
 let user: User;
@@ -73,6 +73,24 @@ describe('PUT /api/forums/posts/[postId] - Update a post', () => {
       .put(`/api/forums/posts/${post.id}`)
       .set('Cookie', adminUserCookie)
       .send(updateInput)
+      .expect(401);
+  });
+
+  it('should fail to update the post to a new category if the author cannot create posts in that category, responding with 401', async () => {
+    const post = await generateForumPost(createInput);
+
+    const unauthorisedCategory = await generatePostCategory({
+      spaceId: space.id,
+      name: 'Unauthorised category'
+    });
+
+    await request(baseUrl)
+      .put(`/api/forums/posts/${post.id}`)
+      .set('Cookie', adminUserCookie)
+      .send({
+        ...updateInput,
+        categoryId: unauthorisedCategory.id
+      } as UpdateForumPostInput)
       .expect(401);
   });
 });

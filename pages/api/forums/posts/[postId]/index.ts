@@ -2,17 +2,14 @@ import type { Post } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { canEditPost } from 'lib/forums/posts/canEditPost';
+import { prisma } from 'db';
 import { deleteForumPost } from 'lib/forums/posts/deleteForumPost';
 import { getForumPost } from 'lib/forums/posts/getForumPost';
+import type { UpdateForumPostInput } from 'lib/forums/posts/updateForumPost';
 import { updateForumPost } from 'lib/forums/posts/updateForumPost';
-import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
-import { computePostCategoryPermissions } from 'lib/permissions/forum/computePostCategoryPermissions';
-import { computePostPermissions } from 'lib/permissions/forum/computePostPermissions';
+import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { requestOperations } from 'lib/permissions/requestOperations';
 import { withSessionRoute } from 'lib/session/withSession';
-import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
-import { UnauthorisedActionError } from 'lib/utilities/errors';
 import { relay } from 'lib/websockets/relay';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -29,6 +26,28 @@ async function updateForumPostController(req: NextApiRequest, res: NextApiRespon
     resourceId: postId,
     userId
   });
+
+  const existingPost = await prisma.post.findUnique({
+    where: {
+      id: postId
+    },
+    select: {
+      categoryId: true
+    }
+  });
+
+  const newCategoryId = (req.body as UpdateForumPostInput).categoryId;
+
+  // Don't allow an update to a new category ID if the user doesn't have permission to create posts in that category
+  if (typeof newCategoryId === 'string' && existingPost?.categoryId !== newCategoryId) {
+    await requestOperations({
+      resourceType: 'post_category',
+      operations: ['create_post'],
+      resourceId: newCategoryId,
+      userId
+    });
+  }
+
   const post = await updateForumPost(postId, req.body);
 
   relay.broadcast(
