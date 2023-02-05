@@ -1,23 +1,45 @@
 import { Box } from '@mui/material';
-import { useRouter } from 'next/router';
+import type { GetServerSideProps, InferGetServerSidePropsType } from 'next';
+import Head from 'next/head';
 import type { ReactElement } from 'react';
 import { useEffect } from 'react';
-import useSWR from 'swr';
 
-import charmClient from 'charmClient';
+import fetch from 'adapters/http/fetch.server';
 import ErrorPage from 'components/common/errors/ErrorPage';
-import LoadingComponent from 'components/common/LoadingComponent';
 import PageLayout from 'components/nexus/components/NexusLayout';
 import PublicProfile from 'components/profile/PublicProfile';
 import { usePageTitle } from 'hooks/usePageTitle';
+import type { PublicUser } from 'pages/api/public/profile/[userId]';
 
-export default function UserProfilePage() {
-  const router = useRouter();
+export const getServerSideProps: GetServerSideProps<{ user: PublicUser | null }, { userPath: string }> = async (
+  context
+) => {
+  const params = context.params;
+  const origin = process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : 'https://app.charmverse.io';
+  try {
+    if (params?.userPath) {
+      const user = await fetch<PublicUser>(`${origin}/api/public/profile/${params.userPath}`);
+      return {
+        props: {
+          user
+        }
+      };
+    }
+    return {
+      props: {
+        user: null
+      }
+    };
+  } catch (err) {
+    return {
+      props: {
+        user: null
+      }
+    };
+  }
+};
 
-  const { data: user, error } = useSWR(`users/${router.query.userPath}`, () =>
-    charmClient.getUserByPath(router.query.userPath as string)
-  );
-
+export default function UserProfilePage({ user }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const [, setPageTitle] = usePageTitle();
 
   useEffect(() => {
@@ -28,16 +50,32 @@ export default function UserProfilePage() {
     setPageTitle(pageTitle);
   }, [user]);
 
-  if (error?.status === 404) {
+  if (!user) {
     return (
       <Box my={12}>
         <ErrorPage message={"Sorry, that user doesn't exist"} />
       </Box>
     );
-  } else if (!user) {
-    return <LoadingComponent minHeight={400} isLoading={true}></LoadingComponent>;
   } else {
-    return <PublicProfile readOnly={true} user={user} />;
+    return (
+      <>
+        <Head>
+          <title>{user.username} | Profile</title>
+          <meta
+            name='description'
+            content={user.profile?.description ?? `Check out ${user.username}'s public CharmVerse profile`}
+          />
+          <meta
+            property='og:description'
+            content={user.profile?.description ?? `Check out ${user.username}'s public CharmVerse profile`}
+          />
+          <meta property='og:title' content={`${user.username} | Profile`} />
+          {user.avatar && <meta property='og:image' content={user.avatar} />}
+          {user.avatar && <meta property='twitter:image' content={user.avatar} />}
+        </Head>
+        <PublicProfile readOnly={true} user={user} />
+      </>
+    );
   }
 }
 
