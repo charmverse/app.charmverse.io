@@ -1,9 +1,12 @@
 import { Divider, Typography } from '@mui/material';
+import { useEffect, useState } from 'react';
 
 import { UserDetails } from 'components/profile/components';
 import { MemberPropertiesPopup } from 'components/profile/components/SpacesMemberDetails/components/MemberPropertiesPopup';
 import { useMemberPropertyValues } from 'hooks/useMemberPropertyValues';
 import { useUser } from 'hooks/useUser';
+
+import { MemberEmailForm } from '../MemberEmailForm';
 
 export function MemberOnboardingForm({
   userId,
@@ -20,8 +23,17 @@ export function MemberOnboardingForm({
 }) {
   const { updateSpaceValues } = useMemberPropertyValues(userId);
   const { setUser, user } = useUser();
+  const [showEmailForm, setShowEmailForm] = useState(false);
 
-  return (
+  useEffect(() => {
+    if (!user?.email) {
+      setShowEmailForm(true);
+    }
+  }, [user?.email]);
+
+  return showEmailForm ? (
+    <MemberEmailForm onNext={() => setShowEmailForm(false)} />
+  ) : (
     <MemberPropertiesPopup
       title={title ?? `Welcome to ${spaceName}. Set up your profile`}
       onClose={onClose}
