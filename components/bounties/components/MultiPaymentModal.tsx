@@ -145,7 +145,7 @@ export default function MultiPaymentModal({ bounties }: { bounties: BountyWithDe
                       />
                       <Box display='flex' justifyContent='space-between' sx={{ width: '100%' }}>
                         <Box display='flex' gap={2} alignItems='center'>
-                          <UserDisplay avatarSize='small' user={user} />
+                          <UserDisplay showMiniProfile avatarSize='small' user={user} />
                           <Typography variant='body2' color='secondary'>
                             {title}
                           </Typography>

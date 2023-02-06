@@ -150,7 +150,7 @@ export function PostComment({ comment, setPostComments, permissions }: Props) {
         <Stack flexDirection='row' justifyContent='space-between' alignItems='center'>
           <Stack flexDirection='row' alignItems='center'>
             <Box mr={1}>
-              <UserDisplay avatarSize='small' user={commentUser} hideName={true} />
+              <UserDisplay showMiniProfile avatarSize='small' user={commentUser} hideName={true} />
             </Box>
             <Typography
               mr={1}
