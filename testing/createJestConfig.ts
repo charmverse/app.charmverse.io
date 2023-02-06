@@ -11,6 +11,7 @@ interface JestConfig {
 }
 
 // we have to use this override since next/js hard-codes node_modules in transformIgnorePatterns
+// see issue: https://github.com/vercel/next.js/issues/40183#issuecomment-1249077718
 export default async function overriddenConfig(_config: any) {
   return async function defaultExport() {
     const config: JestConfig = await createJestConfig(_config)();
