@@ -30,12 +30,13 @@ const StyledEmptyImageContainer = styled(Box)`
 function EmptyImageContainer({
   onDelete,
   isSelected,
+  readOnly,
   ...props
 }: HTMLAttributes<HTMLDivElement> & { onDelete: () => void; readOnly: boolean; isSelected?: boolean }) {
   const theme = useTheme();
 
   return (
-    <BlockAligner onDelete={onDelete}>
+    <BlockAligner readOnly={readOnly} onDelete={onDelete}>
       <ListItem
         button
         disableTouchRipple

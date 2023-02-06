@@ -97,7 +97,7 @@ export function VideoNodeView({
   if (attrs.muxAssetId) {
     if (playbackIdWithToken) {
       return (
-        <BlockAligner onDelete={deleteNode}>
+        <BlockAligner readOnly={readOnly} onDelete={deleteNode}>
           <MuxVideo
             style={{ height: '100%', maxWidth: '100%', width: '100%' }}
             playbackId={playbackIdWithToken} // asset.playbackId includes signed token
@@ -120,6 +120,7 @@ export function VideoNodeView({
     const embedUrl = (attrs.src && extractYoutubeEmbedLink(attrs.src)) || attrs.src;
     return (
       <Resizable
+        readOnly={readOnly}
         aspectRatio={VIDEO_ASPECT_RATIO}
         initialSize={attrs.width}
         minWidth={MIN_EMBED_WIDTH}
