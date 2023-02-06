@@ -84,7 +84,6 @@ function sortComments({ comments, sort }: { comments: PostCommentWithVoteAndChil
   }
   return comments;
 }
-
 export function PostPage({
   shouldUpdateTitleState = false,
   post,
@@ -188,7 +187,6 @@ export function PostPage({
       contentText: rawText
     });
   }
-
   let disabledTooltip = '';
   if (!formInputs.title) {
     disabledTooltip = 'Title is required';
@@ -211,6 +209,10 @@ export function PostPage({
   }, [postComments, post, commentSort]);
 
   const canEdit = !!permissions?.edit_post;
+
+  if (!permissions.view_post) {
+    return null;
+  }
 
   return (
     <ScrollableWindow>
