@@ -15,6 +15,12 @@ export function createPostCategory({ name, spaceId }: CreatePostCategoryInput): 
         connect: {
           id: spaceId
         }
+      },
+      postCategoryPermissions: {
+        create: {
+          permissionLevel: 'full_access',
+          space: { connect: { id: spaceId } }
+        }
       }
     }
   });
