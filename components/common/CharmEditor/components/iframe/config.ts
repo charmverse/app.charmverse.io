@@ -1,4 +1,5 @@
 import PreviewIcon from '@mui/icons-material/Preview';
+import type { ElementType } from 'react';
 import { FiFigma } from 'react-icons/fi';
 import { RiGoogleFill } from 'react-icons/ri';
 import { SiLoom, SiOdysee } from 'react-icons/si';
@@ -10,7 +11,7 @@ export const MAX_EMBED_HEIGHT = 2500;
 export const MIN_EMBED_HEIGHT = 200;
 
 export type Embed = {
-  icon?: React.ReactNode;
+  icon?: ElementType;
   keywords?: string[];
   iconUrl?: string;
   name: string;
@@ -108,6 +109,7 @@ export const embeds = {
     placeholder: 'https://odysee.com/...',
     text: 'Insert an Odysee embed',
     // example input: https://odysee.com/@Coldfusion:f/google-panics-over-chatgpt-the-ai-wars:a
+    // How to embed Odysee: https://odysee.com/@brent:d/automatic-embedding-of-odysee-videos-on-websites:4
     convertURLToEmbed(url: string) {
       const urlParts = new URL(url.replace('/$/embed', '')).pathname.split('/').filter(Boolean);
       const channel = urlParts[0]?.replace(':', '#');
