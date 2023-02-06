@@ -113,20 +113,17 @@ export function BookmarkNodeView({
           <CardActionArea
             component={Link}
             color='inherit'
-            sx={{ p: 0, m: 0 }}
+            sx={{ p: 0, m: 0, backgroundColor: theme.palette.mode === 'dark' ? 'common.black' : 'inherit' }}
             href={data.meta.canonical}
             target='_blank'
           >
-            <Typography color='secondary' variant='body2' lineHeight='1.3em !important'>
-              {data.meta.description}
-            </Typography>
             <Box display='flex' alignItems='center' gap={2}>
               <Box display='flex' maxWidth='160px' maxHeight='140px' overflow='hidden'>
                 {data.links.icon?.[0] && <PreviewImage src={data.links.icon[0].href} />}
               </Box>
               <Box display='flex' flexDirection='column' alignSelf='flex-start' gap={2} py={3}>
                 <Typography
-                  component='span'
+                  fontSize={17}
                   textOverflow='ellipsis'
                   overflow='hidden'
                   whiteSpace='nowrap'
@@ -135,12 +132,16 @@ export function BookmarkNodeView({
                 >
                   {title}
                 </Typography>
+                <Typography variant='body1' lineHeight='1.3em !important'>
+                  {data.meta.description}
+                </Typography>
                 <Typography
-                  component='span'
+                  textAlign='left'
                   variant='body2'
                   textOverflow='ellipsis'
                   overflow='hidden'
                   whiteSpace='nowrap'
+                  color='secondary'
                 >
                   {data.meta.canonical}
                 </Typography>
