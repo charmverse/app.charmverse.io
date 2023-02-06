@@ -619,7 +619,7 @@ function CharmEditor({
             );
           }
           case 'blockquote': {
-            return <Callout {...props}>{_children}</Callout>;
+            return <Callout {...allProps}>{_children}</Callout>;
           }
           case 'horizontalRule': {
             return (

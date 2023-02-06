@@ -1,14 +1,14 @@
-import type { NodeViewProps } from '@bangle.dev/core';
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
-import { Box, Menu } from '@mui/material';
-import { alpha } from '@mui/system';
+import { IconButton, Menu } from '@mui/material';
 import type { BaseEmoji } from 'emoji-mart';
 import { Picker } from 'emoji-mart';
 import type { MouseEvent, ReactNode } from 'react';
 import { useState } from 'react';
 
 import { getTwitterEmoji } from 'components/common/Emoji';
+
+import type { CharmNodeViewProps } from '../../nodeView/nodeView';
 
 const StyledCallout = styled.div`
   background-color: ${({ theme }) => theme.palette.background.light};
@@ -40,7 +40,12 @@ const CalloutEmoji = styled.div`
   }
 `;
 
-export default function Callout({ children, node, updateAttrs }: NodeViewProps & { children: ReactNode }) {
+export default function Callout({
+  children,
+  node,
+  updateAttrs,
+  readOnly
+}: CharmNodeViewProps & { children: ReactNode }) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const handleClick = (event: MouseEvent<HTMLElement>) => {
@@ -56,7 +61,7 @@ export default function Callout({ children, node, updateAttrs }: NodeViewProps &
   return (
     <StyledCallout>
       <CalloutEmoji>
-        <Box
+        <IconButton
           sx={{
             width: 35,
             height: 35,
@@ -65,14 +70,10 @@ export default function Callout({ children, node, updateAttrs }: NodeViewProps &
             borderRadius: '50%',
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'center',
-            '&:hover': {
-              // Copied from IconButton.js in @mui/system
-              background: alpha(theme.palette.action.active, theme.palette.action.hoverOpacity),
-              transition: 'background 100ms ease-in-out'
-            }
+            justifyContent: 'center'
           }}
           onClick={handleClick}
+          disabled={readOnly}
         >
           {twemojiImage ? (
             <img
@@ -92,7 +93,7 @@ export default function Callout({ children, node, updateAttrs }: NodeViewProps &
               {node.attrs.emoji}
             </div>
           )}
-        </Box>
+        </IconButton>
         <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
           <Picker
             theme={theme.palette.mode}
