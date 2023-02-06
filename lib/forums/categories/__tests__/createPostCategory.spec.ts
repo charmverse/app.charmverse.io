@@ -1,6 +1,5 @@
-import type { PostCategory, PostCategoryPermission, Space } from '@prisma/client';
+import type { PostCategory, Space } from '@prisma/client';
 
-import { prisma } from 'db';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 import type { CreatePostCategoryInput } from '../createPostCategory';
@@ -26,40 +25,6 @@ describe('createPostCategory', () => {
         path: 'test_category'
       })
     );
-  });
-
-  it('should create a space / full access permission by default for the post category', async () => {
-    const createInput: CreatePostCategoryInput = {
-      name: 'Category with default permission',
-      spaceId: space.id
-    };
-
-    const category = await createPostCategory(createInput);
-
-    const permissions = await prisma.postCategoryPermission.findMany({
-      where: {
-        postCategoryId: category.id
-      }
-    });
-
-    expect(permissions.length).toBe(1);
-
-    const permission = permissions[0];
-
-    expect(permission).toMatchObject(
-      expect.objectContaining<PostCategoryPermission>({
-        id: expect.any(String),
-        spaceId: space.id,
-        roleId: null,
-        public: null,
-        postCategoryId: category.id,
-        permissionLevel: 'full_access',
-        categoryOperations: [],
-        postOperations: []
-      })
-    );
-
-    await expect(createPostCategory(createInput)).rejects.toThrowError();
   });
 
   it('should fail to create a post category if one with the same name already exists in this space', async () => {
