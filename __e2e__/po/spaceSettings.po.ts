@@ -21,14 +21,14 @@ export class SpaceSettingsPage {
   }
 
   async goTo(domain: string) {
-    await this.page.goto(`${baseUrl}/${domain}/settings/space`);
+    await this.page.goto(`${baseUrl}/${domain}`);
   }
 
   async waitForSpaceSettingsURL(domain?: string) {
     if (domain) {
-      await this.page.waitForURL(`**/${domain}/settings/space`);
+      await this.page.waitForURL(`**/${domain}`);
     } else {
-      await this.page.waitForURL('**/settings/space');
+      await this.page.waitForURL('**/');
     }
   }
 }

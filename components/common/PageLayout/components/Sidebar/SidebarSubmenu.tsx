@@ -155,7 +155,9 @@ export default function SidebarSubmenu({
           Create or join a space
         </MenuItem>
         <Divider />
-        <MenuItem onClick={logoutCurrentUser}>Sign out</MenuItem>
+        <MenuItem onClick={logoutCurrentUser} data-test='logout-button'>
+          Sign out
+        </MenuItem>
       </Menu>
       <Tooltip title='Close sidebar' placement='bottom'>
         <IconButton onClick={closeSidebar} size='small' sx={{ position: 'absolute', right: 0, top: 12 }}>
