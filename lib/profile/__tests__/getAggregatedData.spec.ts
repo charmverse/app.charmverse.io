@@ -100,6 +100,7 @@ describe('GET /api/public/profile/[userPath]', () => {
           id: '1',
           name: 'organization 1',
           isHidden: false,
+          isPinned: false,
           logo: null,
           joinDate: proposal1.createdAt,
           votes: [vote1, vote2],
@@ -110,6 +111,7 @@ describe('GET /api/public/profile/[userPath]', () => {
         {
           id: '2',
           name: 'organization 2',
+          isPinned: false,
           isHidden: false,
           logo: null,
           joinDate: vote3.createdAt,
@@ -123,6 +125,7 @@ describe('GET /api/public/profile/[userPath]', () => {
           joinDate: space.spaceRoles[0].createdAt.toISOString(),
           latestEventDate: bounty.createdAt.toISOString(),
           name: space.name,
+          isPinned: false,
           isHidden: false,
           logo: null,
           votes: [],

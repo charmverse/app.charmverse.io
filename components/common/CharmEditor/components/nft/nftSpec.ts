@@ -16,7 +16,7 @@ export function spec(): RawSpecs {
     name,
     markdown: {
       toMarkdown: (state, node) => {
-        const { chain, contract, token } = node.attrs as NodeAttrs;
+        const { contract, token } = node.attrs as NodeAttrs;
 
         const toRender = `Embedded NFT: ${contract} #${token}`;
 

@@ -14,6 +14,7 @@ import type { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEdit
 import LoadingComponent from 'components/common/LoadingComponent';
 import { ScrollableWindow } from 'components/common/PageLayout';
 import UserDisplay from 'components/common/UserDisplay';
+import { usePostPermissions } from 'components/forum/hooks/usePostPermissions';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useForumCategories } from 'hooks/useForumCategories';
 import { useMembers } from 'hooks/useMembers';
@@ -98,12 +99,24 @@ export function PostPage({
 }: Props) {
   const currentSpace = useCurrentSpace();
   const { user } = useUser();
-  const { categories } = useForumCategories();
+  const { categories, getForumCategoryById } = useForumCategories();
+
+  // We should only set writeable categories for new postd
   const [categoryId, setCategoryId] = useState(
-    post?.categoryId ??
-      newPostCategory?.id ??
-      categories.find((category) => category.id === currentSpace?.defaultPostCategoryId)?.id ??
-      null
+    (() => {
+      if (post?.categoryId) {
+        return post.categoryId;
+      } else if (newPostCategory?.id && getForumCategoryById(newPostCategory.id)?.permissions.create_post) {
+        return newPostCategory?.id;
+      } else if (
+        currentSpace?.defaultPostCategoryId &&
+        getForumCategoryById(currentSpace?.defaultPostCategoryId)?.permissions.create_post
+      ) {
+        return currentSpace?.defaultPostCategoryId;
+      } else {
+        return categories.find((category) => category.permissions.create_post)?.id;
+      }
+    })()
   );
   const { members } = useMembers();
   const router = useRouter();
@@ -114,6 +127,9 @@ export function PostPage({
   } = useSWR(post ? `${post.id}/comments` : null, () =>
     post ? charmClient.forum.listPostComments(post.id) : undefined
   );
+
+  const { permissions } = usePostPermissions(post?.id as string, !post);
+
   usePreventReload(contentUpdated);
   const [, setTitleState] = usePageTitle();
   const [commentSort, setCommentSort] = useState<PostCommentSort>('latest');
@@ -173,9 +189,6 @@ export function PostPage({
     });
   }
 
-  const isMyPost = !post || post.createdBy === user?.id;
-  const readOnly = !isMyPost;
-
   let disabledTooltip = '';
   if (!formInputs.title) {
     disabledTooltip = 'Title is required';
@@ -197,6 +210,8 @@ export function PostPage({
     return [];
   }, [postComments, post, commentSort]);
 
+  const canEdit = !!permissions?.edit_post;
+
   return (
     <ScrollableWindow>
       <Stack flexDirection='row'>
@@ -205,7 +220,7 @@ export function PostPage({
             <CharmEditor
               pageType='post'
               autoFocus={false}
-              readOnly={readOnly}
+              readOnly={!canEdit}
               pageActionDisplay={null}
               pageId={post?.id}
               disablePageSpecificFeatures
@@ -215,19 +230,14 @@ export function PostPage({
               content={formInputs.content as PageContent}
               onContentChange={updatePostContent}
             >
-              <PageTitleInput readOnly={readOnly} value={formInputs.title} onChange={updateTitle} />
+              <PageTitleInput readOnly={!canEdit} value={formInputs.title} onChange={updateTitle} />
               {createdBy && <UserDisplay user={createdBy} avatarSize='small' fontSize='medium' mt={2} mb={3} />}
               <Box my={2}>
-                <PostCategoryInput
-                  readOnly={readOnly}
-                  spaceId={spaceId}
-                  setCategoryId={updateCategoryId}
-                  categoryId={categoryId}
-                />
+                <PostCategoryInput readOnly={!canEdit} setCategoryId={updateCategoryId} categoryId={categoryId} />
               </Box>
             </CharmEditor>
           </Box>
-          {isMyPost && (
+          {canEdit && (
             <Box display='flex' flexDirection='row' justifyContent='right' my={2}>
               <Button
                 disabled={Boolean(disabledTooltip) || !contentUpdated}
@@ -238,8 +248,8 @@ export function PostPage({
               </Button>
             </Box>
           )}
-          {post && (
-            <Box my={2}>
+          {post && !!permissions?.add_comment && (
+            <Box my={2} data-test='new-top-level-post-comment'>
               <PostCommentForm setPostComments={setPostComments} postId={post.id} />
             </Box>
           )}
@@ -259,7 +269,12 @@ export function PostPage({
                   <Stack gap={1}>
                     <PostCommentSort commentSort={commentSort} setCommentSort={setCommentSort} />
                     {topLevelComments.map((comment) => (
-                      <PostComment setPostComments={setPostComments} comment={comment} key={comment.id} />
+                      <PostComment
+                        permissions={permissions}
+                        setPostComments={setPostComments}
+                        comment={comment}
+                        key={comment.id}
+                      />
                     ))}
                   </Stack>
                 )}
@@ -269,7 +284,9 @@ export function PostPage({
                     <Typography color='secondary' variant='h6'>
                       No Comments Yet
                     </Typography>
-                    <Typography color='secondary'>Be the first to share what you think!</Typography>
+                    {permissions?.add_comment && (
+                      <Typography color='secondary'>Be the first to share what you think!</Typography>
+                    )}
                   </Stack>
                 )}
               </>

@@ -18,9 +18,13 @@ import useIsAdmin from 'hooks/useIsAdmin';
 import { usePreventReload } from 'hooks/usePreventReload';
 import type { AssignablePermissionGroups } from 'lib/permissions/interfaces';
 import type { SpacePermissionFlags } from 'lib/permissions/spaces/client';
-import { AvailableSpacePermissions, spaceOperationLabels, spaceOperations } from 'lib/permissions/spaces/client';
+import {
+  AvailableSpacePermissions,
+  spaceOperationLabels,
+  spaceOperationsWithoutForumCategory
+} from 'lib/permissions/spaces/client';
 
-const fields: Record<SpaceOperation, BooleanSchema> = spaceOperations().reduce(
+const fields: Record<SpaceOperation, BooleanSchema> = spaceOperationsWithoutForumCategory.reduce(
   (_schema: Record<SpaceOperation, BooleanSchema>, op) => {
     _schema[op] = yup.boolean();
     return _schema;
@@ -70,7 +74,7 @@ export default function SpacePermissions({ targetGroup, id, callback = () => nul
         id,
         resourceId: space.id
       });
-      spaceOperations().forEach((op) => {
+      spaceOperationsWithoutForumCategory.forEach((op) => {
         setValue(op, permissionFlags[op]);
       });
       setAssignedPermissions(permissionFlags);
@@ -161,7 +165,7 @@ export default function SpacePermissions({ targetGroup, id, callback = () => nul
             </Typography>
           </Grid>
 
-          {(Object.keys(spaceOperationLabels) as SpaceOperation[]).map((operation) => {
+          {spaceOperationsWithoutForumCategory.map((operation) => {
             const userCanPerformAction = assignedPermissions[operation];
             const actionLabel = spaceOperationLabels[operation];
 

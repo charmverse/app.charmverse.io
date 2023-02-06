@@ -6,7 +6,7 @@ import { getPostCategoryPath } from './getPostCategoryPath';
 
 export type CreatePostCategoryInput = Pick<PostCategory, 'name' | 'spaceId'>;
 
-export function createPostCategory({ name, spaceId }: CreatePostCategoryInput) {
+export function createPostCategory({ name, spaceId }: CreatePostCategoryInput): Promise<PostCategory> {
   return prisma.postCategory.create({
     data: {
       name,

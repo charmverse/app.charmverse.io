@@ -1,10 +1,9 @@
-import { Autocomplete, Box, Chip, Stack, TextField, Typography } from '@mui/material';
+import { Autocomplete, Box, Chip, TextField } from '@mui/material';
 import type { PostCategory } from '@prisma/client';
 import type { HTMLAttributes } from 'react';
-import useSWR from 'swr';
 
-import charmClient from 'charmClient';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useForumCategories } from 'hooks/useForumCategories';
 
 type PostCategoryOptionProps = {
   category: PostCategory;
@@ -24,17 +23,13 @@ type PostCategoryOptionProps = {
 export function PostCategoryInput({
   categoryId,
   readOnly,
-  spaceId,
   setCategoryId
 }: {
-  categoryId: string | null;
+  categoryId?: string | null;
   readOnly?: boolean;
-  spaceId?: string;
   setCategoryId: (categoryId: string) => void;
 }) {
-  const { data: categories } = useSWR(spaceId ? `spaces/${spaceId}/post-categories` : null, () =>
-    charmClient.forum.listPostCategories(spaceId!)
-  );
+  const { categories, getPostableCategories } = useForumCategories();
 
   const space = useCurrentSpace();
 
@@ -49,6 +44,8 @@ export function PostCategoryInput({
     }
   });
 
+  const postableCategories = getPostableCategories();
+
   async function updateForumPost(_postCategory: PostCategory | null) {
     if (_postCategory) {
       setCategoryId(_postCategory.id);
@@ -57,7 +54,7 @@ export function PostCategoryInput({
   return (
     <PostCategoryAutocomplete
       value={postCategory ?? null}
-      options={categories ?? []}
+      options={readOnly ? categories ?? [] : postableCategories}
       disabled={readOnly}
       onChange={updateForumPost}
     />

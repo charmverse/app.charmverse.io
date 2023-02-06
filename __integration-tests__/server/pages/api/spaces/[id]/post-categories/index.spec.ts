@@ -1,9 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import type { PostCategory, Prisma, Space, User } from '@prisma/client';
 import request from 'supertest';
+import { v4 } from 'uuid';
 
 import { prisma } from 'db';
 import type { CreatePostCategoryInput } from 'lib/forums/categories/createPostCategory';
+import { upsertPostCategoryPermission } from 'lib/permissions/forum/upsertPostCategoryPermission';
+import { upsertPermission } from 'lib/permissions/pages';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
@@ -12,6 +15,11 @@ let firstSpaceAdminUser: User;
 let firstSpaceUser: User;
 let secondSpace: Space;
 let secondSpaceUser: User;
+
+// Just compare the IDs
+const adminCategoryPermissionId = v4();
+const publicCategoryPermissionId = v4();
+const spaceCategoryPermissionId = v4();
 
 beforeAll(async () => {
   const { space: _firstSpace, user: _firstAdminUser } = await generateUserAndSpaceWithApiToken(undefined, true);
@@ -28,21 +36,36 @@ beforeAll(async () => {
   // Provision post categories for the second space
   const createInput: Prisma.PostCategoryCreateManyInput[] = [
     {
-      name: 'Category 1',
+      id: adminCategoryPermissionId,
+      name: 'Admin Category',
       spaceId: secondSpace.id
     },
     {
-      name: 'Category 2',
+      id: spaceCategoryPermissionId,
+      name: 'Space Category',
       spaceId: secondSpace.id
     },
     {
-      name: 'Category 3',
+      id: publicCategoryPermissionId,
+      name: 'Public Category',
       spaceId: secondSpace.id
     }
   ];
 
   await prisma.postCategory.createMany({
     data: createInput
+  });
+
+  await upsertPostCategoryPermission({
+    assignee: { group: 'space', id: secondSpace.id },
+    permissionLevel: 'full_access',
+    postCategoryId: spaceCategoryPermissionId
+  });
+
+  await upsertPostCategoryPermission({
+    assignee: { group: 'public' },
+    permissionLevel: 'view',
+    postCategoryId: publicCategoryPermissionId
   });
 });
 
@@ -80,7 +103,7 @@ describe('POST /api/spaces/[id]/post-categories - Create a post category', () =>
   });
 });
 describe('GET /api/spaces/[id]/post-categories - Retrieve space post categories', () => {
-  it('should return all post categories if the user is a space member, responding with 200', async () => {
+  it('should return all post categories user can see, responding with 200', async () => {
     const userCookie = await loginUser(secondSpaceUser.id);
 
     const postCategories = (
@@ -91,16 +114,40 @@ describe('GET /api/spaces/[id]/post-categories - Retrieve space post categories'
         .expect(200)
     ).body as PostCategory[];
 
-    expect(postCategories.length).toBe(3);
+    expect(postCategories.length).toBe(2);
+    expect(postCategories.some((p) => p.id === spaceCategoryPermissionId));
+    expect(postCategories.some((p) => p.id === publicCategoryPermissionId));
   });
 
-  it('should fail to return the post categories if the user is not a space member, responding with 401', async () => {
+  it('should return all post categories for a space admin, responding with 200', async () => {
+    const secondSpaceAdminUser = await generateSpaceUser({ isAdmin: true, spaceId: secondSpace.id });
+    const adminUserCookie = await loginUser(secondSpaceAdminUser.id);
+
+    const postCategories = (
+      await request(baseUrl)
+        .get(`/api/spaces/${secondSpace.id}/post-categories`)
+        .set('Cookie', adminUserCookie)
+        .send()
+        .expect(200)
+    ).body as PostCategory[];
+
+    expect(postCategories.length).toBe(3);
+    expect(postCategories.some((p) => p.id === adminCategoryPermissionId));
+    expect(postCategories.some((p) => p.id === spaceCategoryPermissionId));
+    expect(postCategories.some((p) => p.id === publicCategoryPermissionId));
+  });
+
+  it('should return only the public post categories if the user is not a space member, responding with 200', async () => {
     const userInOtherSpaceCookie = await loginUser(firstSpaceUser.id);
 
-    await request(baseUrl)
-      .get(`/api/spaces/${secondSpace.id}/post-categories`)
-      .set('Cookie', userInOtherSpaceCookie)
-      .send()
-      .expect(401);
+    const postCategories = (
+      await request(baseUrl)
+        .get(`/api/spaces/${secondSpace.id}/post-categories`)
+        .set('Cookie', userInOtherSpaceCookie)
+        .send()
+        .expect(200)
+    ).body as PostCategory[];
+    expect(postCategories.length).toBe(1);
+    expect(postCategories[0].id).toBe(publicCategoryPermissionId);
   });
 });

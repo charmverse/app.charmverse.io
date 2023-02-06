@@ -221,4 +221,59 @@ describe('searchForumPosts', () => {
     // Make sure ignored posts didn't enter the result
     expect(foundCategoryPosts.data.every((item) => categoryPosts.some((_post) => _post.id === item.id)));
   });
+
+  it('should support lookup of posts in multiple categories', async () => {
+    const { space: extraSpace, user: extraUser } = await generateUserAndSpaceWithApiToken();
+
+    const category1 = await createPostCategory({ spaceId: extraSpace.id, name: 'Test Category 1' });
+    const category2 = await createPostCategory({ spaceId: extraSpace.id, name: 'Test Category 2' });
+    const category3 = await createPostCategory({ spaceId: extraSpace.id, name: 'Test Category 3' });
+
+    const postsInCategory1 = await generateForumPosts({
+      spaceId: extraSpace.id,
+      createdBy: extraUser.id,
+      count: 5,
+      categoryId: category1.id
+    });
+
+    const postsInCategory2 = await generateForumPosts({
+      spaceId: extraSpace.id,
+      createdBy: extraUser.id,
+      count: 5,
+      categoryId: category2.id
+    });
+
+    const postsInCategory3 = await generateForumPosts({
+      spaceId: extraSpace.id,
+      createdBy: extraUser.id,
+      count: 5,
+      categoryId: category3.id
+    });
+
+    const resultsPerQuery = 100;
+
+    const postsInCategory1And2 = await searchForumPosts(
+      {
+        spaceId: extraSpace.id,
+        count: resultsPerQuery,
+        categoryId: [category1.id, category2.id]
+      },
+      extraUser.id
+    );
+
+    expect(postsInCategory1And2.data).toHaveLength([postsInCategory1, postsInCategory2].flat().length);
+    expect(postsInCategory1And2.data.every((post) => !postsInCategory3.some((p) => p.id === post.id))).toBe(true);
+  });
+
+  it('should return empty results if categoryId is an empty array', async () => {
+    const results = await searchForumPosts(
+      {
+        spaceId: space.id,
+        categoryId: []
+      },
+      user.id
+    );
+
+    expect(results.data).toHaveLength(0);
+  });
 });

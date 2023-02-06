@@ -14,11 +14,13 @@ export function MemberOnboardingModal({ userId }: { userId?: string }) {
   }
 
   return (
-    <MemberOnboardingForm
-      userId={userId ?? user.id}
-      spaceName={space.name}
-      spaceId={space.id}
-      onClose={completeOnboarding}
-    />
+    <div data-test='member-onboarding-form'>
+      <MemberOnboardingForm
+        userId={userId ?? user.id}
+        spaceName={space.name}
+        spaceId={space.id}
+        onClose={completeOnboarding}
+      />
+    </div>
   );
 }

@@ -35,6 +35,8 @@ import type { ProposalReviewerInput, ProposalWithUsers } from 'lib/proposal/inte
 import { syncProposalPermissions } from 'lib/proposal/syncProposalPermissions';
 import { sessionUserRelations } from 'lib/session/config';
 import { createUserFromWallet } from 'lib/users/createUser';
+import { uniqueValues } from 'lib/utilities/array';
+import { InvalidInputError } from 'lib/utilities/errors';
 import { typedKeys } from 'lib/utilities/objects';
 import type { LoggedInUser } from 'models';
 
@@ -441,7 +443,9 @@ export async function generateRole({
   spaceId,
   createdBy,
   roleName = `role-${v4()}`,
-  source
+  source,
+  assigneeUserIds,
+  id = v4()
 }: {
   externalId?: string;
   spaceId: string;
@@ -449,7 +453,32 @@ export async function generateRole({
   createdBy: string;
   source?: RoleSource;
   id?: string;
+  assigneeUserIds?: string[];
 }): Promise<Role> {
+  const assignUsers = assigneeUserIds && assigneeUserIds.length >= 1;
+
+  const roleAssignees: Omit<Prisma.SpaceRoleToRoleCreateManyInput, 'roleId'>[] = [];
+
+  // check assignees
+  if (assignUsers) {
+    const uniqueIds = uniqueValues(assigneeUserIds);
+
+    const spaceRoles = await prisma.spaceRole.findMany({
+      where: {
+        spaceId,
+        userId: {
+          in: uniqueIds
+        }
+      }
+    });
+
+    if (spaceRoles.length !== uniqueIds.length) {
+      throw new InvalidInputError(`Cannot assign role to a user not inside the space`);
+    }
+
+    roleAssignees.push(...spaceRoles.map((sr) => ({ spaceRoleId: sr.id })));
+  }
+
   const role = await prisma.role.create({
     data: {
       externalId,
@@ -460,7 +489,15 @@ export async function generateRole({
           id: spaceId
         }
       },
-      source
+      source,
+      spaceRolesToRole:
+        roleAssignees.length > 0
+          ? {
+              createMany: {
+                data: roleAssignees
+              }
+            }
+          : undefined
     }
   });
 

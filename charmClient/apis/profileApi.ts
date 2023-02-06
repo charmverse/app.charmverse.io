@@ -1,6 +1,7 @@
 import type { ProfileItem } from '@prisma/client';
 
 import * as http from 'adapters/http';
+import type { UserCommunity } from 'lib/profile';
 import type { UserAvatar } from 'lib/users/interfaces';
 import type { LoggedInUser } from 'models';
 
@@ -15,5 +16,9 @@ export class ProfileApi {
 
   updateProfileItem(data: UpdateProfileItemRequest) {
     return http.PUT('/api/profile/items', data);
+  }
+
+  getOrgs(userId: string) {
+    return http.GET<UserCommunity[]>(`/api/profile/orgs/${userId}`);
   }
 }

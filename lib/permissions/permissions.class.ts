@@ -1,9 +1,9 @@
-import type { UserPermissionFlags } from './interfaces';
+import type { AbstractPermissions, UserPermissionFlags } from './interfaces';
 
 /**
  * Defines each operation as a member property queryable as true / false
  */
-export abstract class Permissions<O extends string> {
+export abstract class Permissions<O extends string> implements AbstractPermissions<O> {
   get empty(): UserPermissionFlags<O, false> {
     return (Object.keys(this.operations) as O[]).reduce((flags, operation) => {
       flags[operation] = false;

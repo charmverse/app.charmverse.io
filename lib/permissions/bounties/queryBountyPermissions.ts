@@ -30,7 +30,7 @@ export async function queryBountyPermissions({ bountyId }: { bountyId: string })
 
   const mapped = mapBountyPermissions(permissions);
 
-  if (mapped.creator.every((p) => p.id !== bounty.createdBy && p.group !== 'user')) {
+  if (mapped.creator.every((p) => p.group !== 'user' || p.id !== bounty.createdBy)) {
     mapped.creator.push({
       id: bounty.createdBy,
       group: 'user'
