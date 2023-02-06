@@ -270,9 +270,17 @@ export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: 
           </ListItemButton>
         </div>
       </Tooltip>
-      <Tooltip title={!mutator.canUndo ? 'Nothing to undo' : ''}>
+      <Tooltip
+        title={
+          !pagePermissions?.edit_content
+            ? "You don't have permission to undo changes"
+            : !mutator.canUndo
+            ? 'Nothing to undo'
+            : ''
+        }
+      >
         <div>
-          <ListItemButton disabled={!mutator.canUndo} onClick={undoChanges}>
+          <ListItemButton disabled={!mutator.canUndo || !pagePermissions?.edit_content} onClick={undoChanges}>
             <UndoIcon
               fontSize='small'
               sx={{
