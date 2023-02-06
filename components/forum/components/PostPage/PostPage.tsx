@@ -11,6 +11,7 @@ import { Container } from 'components/[pageId]/DocumentPage/DocumentPage';
 import Button from 'components/common/Button';
 import CharmEditor from 'components/common/CharmEditor';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEditor';
+import ErrorPage from 'components/common/errors/ErrorPage';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { ScrollableWindow } from 'components/common/PageLayout';
 import UserDisplay from 'components/common/UserDisplay';
@@ -210,8 +211,10 @@ export function PostPage({
 
   const canEdit = !!permissions?.edit_post;
 
-  if (!permissions.view_post) {
-    return null;
+  if (!permissions) {
+    return <LoadingComponent />;
+  } else if (!permissions.view_post) {
+    return <ErrorPage message='Post not found' />;
   }
 
   return (
