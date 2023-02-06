@@ -6,7 +6,6 @@ import Script from 'next/script';
 import useSWRImmutable from 'swr/immutable';
 
 import charmClient from 'charmClient';
-import Image from 'components/common/Image';
 import Link from 'components/common/Link';
 import LoadingComponent from 'components/common/LoadingComponent';
 
