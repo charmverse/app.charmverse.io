@@ -16,6 +16,7 @@ import { StyledToolbar } from 'components/common/PageLayout/components/Header';
 import PageTitleWithBreadcrumbs from 'components/common/PageLayout/components/Header/components/PageTitleWithBreadcrumbs';
 import { CenteredPageContent } from 'components/common/PageLayout/components/PageContent';
 import NotificationsBadge from 'components/common/PageLayout/components/Sidebar/NotificationsBadge';
+import { SidebarProfile } from 'components/common/PageLayout/components/Sidebar/SidebarProfile';
 import SpaceListItem from 'components/common/PageLayout/components/Sidebar/SpaceListItem';
 import { AppBar } from 'components/common/PageLayout/PageLayout';
 import UserDisplay from 'components/common/UserDisplay';
@@ -85,21 +86,7 @@ export default function NexusLayout(props: { children: ReactNode }) {
                 <PageTitleWithBreadcrumbs />
               </div>
             </Box>
-            <Menu onClick={menuPopupState.close} {...bindMenu(menuPopupState)} sx={{ maxWidth: '330px' }}>
-              <Typography component='p' variant='caption' mx={2} mb={0.5}>
-                My Spaces
-              </Typography>
-              {spaces.map((_space) => (
-                <SpaceListItem
-                  key={_space.id}
-                  disabled={isSaving || !isLoaded || isCreatingSpace}
-                  space={_space}
-                  changeOrderHandler={changeOrderHandler}
-                />
-              ))}
-              <Divider />
-              <MenuItem onClick={logoutCurrentUser}>Sign out</MenuItem>
-            </Menu>
+            <SidebarProfile hideProfile menuPopupState={menuPopupState} />
             <Box display='flex' alignItems='center'>
               {user && (
                 <NotificationsBadge>
