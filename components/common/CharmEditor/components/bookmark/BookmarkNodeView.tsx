@@ -120,7 +120,15 @@ export function BookmarkNodeView({
               <Box display='flex' maxWidth='160px' maxHeight='140px' overflow='hidden'>
                 {data.links.icon?.[0] && <PreviewImage src={data.links.icon[0].href} />}
               </Box>
-              <Box display='flex' flexDirection='column' alignSelf='flex-start' gap={2} py={3}>
+              <Box
+                display='flex'
+                flexDirection='column'
+                flex={1}
+                gap={1}
+                py={3}
+                justifyContent='space-between'
+                alignSelf='stretch'
+              >
                 <Typography
                   fontSize={17}
                   textOverflow='ellipsis'
@@ -131,7 +139,7 @@ export function BookmarkNodeView({
                 >
                   {title}
                 </Typography>
-                <Typography variant='body1' lineHeight='1.3em !important'>
+                <Typography variant='body1' lineHeight='1.3em !important' textAlign='left'>
                   {data.meta.description}
                 </Typography>
                 <Typography
