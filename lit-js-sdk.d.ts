@@ -1,5 +1,4 @@
 import type { Web3Provider } from '@ethersproject/providers';
-import * as React from 'react';
 
 declare module 'lit-js-sdk' {
   // derived from https://github.com/LIT-Protocol/lit-js-sdk/blob/main/src/lib/constants.js
@@ -115,7 +114,22 @@ declare module 'lit-js-sdk' {
   export async function verifyJwt(input: { jwt: string }): Promise<{
     verified: boolean;
     header: string;
-    payload: unknown;
+    /**
+     * @extraData Contains the tokenGate Id as stringified JSON
+     * @orgId The spaceId
+     */
+    payload: {
+      iss: 'LIT';
+      sub: string;
+      chain: Chain;
+      iat: number;
+      exp: number;
+      baseUrl: string; // 'https://app.charmverse.io';
+      path: string;
+      orgId: string; // '73ff04b5-6475-4291-a7c6-262f18598a1a';
+      role: 'member';
+      extraData: string; // '{"tokenGateId":"bd177a2f-c980-4595-8079-d4bee95a7924"}';
+    };
     signature: Uint8Array;
   }>;
 
