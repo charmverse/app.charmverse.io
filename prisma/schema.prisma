@@ -1205,4 +1205,9 @@ model PostCategoryPermission {
   @@unique([roleId, postCategoryId])
   @@unique([spaceId, postCategoryId])
   @@unique([public, postCategoryId])
+
+  @@index([postCategoryId])
+  @@index([postCategoryId, roleId])
+  @@index([postCategoryId, spaceId])
+  @@index([postCategoryId, public])
 }
