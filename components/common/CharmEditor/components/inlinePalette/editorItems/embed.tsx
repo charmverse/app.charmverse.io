@@ -17,7 +17,7 @@ function iframeEmbedType(type: EmbedType): PaletteItemTypeNoGroup {
     uid: type,
     title: embeds[type].name,
     icon: <EmbedIcon {...embeds[type]} size='large' />,
-    keywords: ['iframe'],
+    keywords: ['iframe'].concat(embeds[type].keywords || []),
     description: embeds[type].text,
     editorExecuteCommand: ({ palettePluginKey }) => {
       return (state, dispatch, view) => {
@@ -63,6 +63,7 @@ export function items(): PaletteItemTypeNoGroup[] {
     iframeEmbedType('figma'),
     iframeEmbedType('google'),
     iframeEmbedType('loom'),
+    iframeEmbedType('odysee'),
     iframeEmbedType('typeform'),
     {
       uid: 'price',

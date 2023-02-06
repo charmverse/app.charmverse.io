@@ -3,7 +3,14 @@ import { utils, Wallet } from 'ethers';
 
 import { randomETHWalletAddress } from 'testing/generateStubs';
 
-import { conditionalPlural, matchWalletAddress, sanitizeForRegex, shortenHex, shortWalletAddress } from '../strings';
+import {
+  conditionalPlural,
+  matchWalletAddress,
+  sanitizeForRegex,
+  shortenHex,
+  shortWalletAddress,
+  isUrl
+} from '../strings';
 
 describe('strings', () => {
   it('should sanitize parenthesis in a regex', () => {
@@ -114,5 +121,29 @@ describe('matchShortAddress', () => {
   it('should return false if the input is undefined', () => {
     expect(matchWalletAddress('123', undefined as any)).toBe(false);
     expect(matchWalletAddress(null as any, null as any)).toBe(false);
+  });
+});
+
+describe('isUrl()', () => {
+  const validUrls = [
+    'https://twitter.com',
+    'https://docs.google.com/forms/d/e/1FAIpQLSf-Z7e_l7htY7DO6GQuzkW2KWsqUOcXjzLS2fwvWnapvfltEQ/viewform',
+    'https://www.loom.com/share/d0e3f7b3abb6448eb0c7a00bdd6dcd90',
+    'https://en.m.wikipedia.org/wiki/C_Sharp_(programming_language)',
+    'https://zh.wikipedia.org/wiki/Wikipedia:维基百科:关于中文维基百科/en',
+    'https://odysee.com/@Coldfusion:f/google-panics-over-chatgpt-the-ai-wars:a'
+  ];
+
+  validUrls.forEach((url) => {
+    it(`should return true for ${url}`, () => {
+      expect(isUrl(url)).toBe(true);
+    });
+  });
+
+  const invalidUrls = ['', 'hippo!', 'https://www', 'mailto://mail@freecodecamp.org'];
+  invalidUrls.forEach((url) => {
+    it(`should return false for ${url}`, () => {
+      expect(isUrl(url)).toBe(false);
+    });
   });
 });
