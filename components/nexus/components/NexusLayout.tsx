@@ -12,8 +12,6 @@ import { AppBar } from 'components/common/PageLayout/PageLayout';
 import { useColorMode } from 'context/darkMode';
 import { useUser } from 'hooks/useUser';
 
-import NexusSidebar from './NexusSidebar';
-
 const emptySidebar = () => <div></div>;
 
 export default function NexusLayout(props: { children: ReactNode }) {
@@ -23,7 +21,7 @@ export default function NexusLayout(props: { children: ReactNode }) {
   const colorMode = useColorMode();
 
   return (
-    <PageLayout sidebarWidth={user ? 55 : 0} sidebar={user ? NexusSidebar : emptySidebar}>
+    <PageLayout hideSidebar sidebarWidth={user ? 55 : 0}>
       {!user && (
         <AppBar sidebarWidth={0} position='fixed' open={false}>
           <StyledToolbar variant='dense'>
