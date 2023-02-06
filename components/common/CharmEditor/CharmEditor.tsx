@@ -179,7 +179,9 @@ export function charmEditorPlugins({
     heading.plugins(),
     horizontalRule.plugins(),
     italic.plugins(),
-    listItem.plugins(),
+    listItem.plugins({
+      readOnly
+    }),
     orderedList.plugins(),
     columnLayout.plugins(),
     paragraph.plugins(),
