@@ -16,6 +16,7 @@ const StyledCallout = styled.div`
   margin-top: ${({ theme }) => theme.spacing(1)};
   border-radius: ${({ theme }) => theme.spacing(0.5)};
   display: flex;
+  flex-wrap: wrap;
   gap: ${({ theme }) => theme.spacing(1)};
 `;
 
