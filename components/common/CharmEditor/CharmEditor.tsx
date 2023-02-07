@@ -605,6 +605,7 @@ function CharmEditor({
             const attrs = props.attrs as { base: null | CryptoCurrency; quote: null | FiatCurrency };
             return (
               <CryptoPrice
+                readOnly={readOnly}
                 base={attrs.base}
                 quote={attrs.quote}
                 onBaseCurrencyChange={(newBaseCurrency) => {
