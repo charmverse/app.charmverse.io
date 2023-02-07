@@ -22,7 +22,7 @@ handler
 // TODO - Update posts
 async function getPosts(req: NextApiRequest, res: NextApiResponse<PaginatedPostList>) {
   const postQuery = req.query as any as ListForumPostsRequest;
-  const userId = req.session.user.id;
+  const userId = req.session.user?.id;
 
   // Apply permissions to what we are searching for
   postQuery.categoryId = (
