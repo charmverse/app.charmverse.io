@@ -1,5 +1,5 @@
 import { KeyboardArrowRight } from '@mui/icons-material';
-import { Box } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import type { ReactNode } from 'react';
 
 import Button from 'components/common/Button';
@@ -14,16 +14,18 @@ export function TemplateOption({ icon, label, onSelect }: TemplateOptionProps) {
   return (
     <Button
       onClick={onSelect}
-      color='inherit'
+      color='secondary'
       variant='outlined'
-      sx={{ justifyContent: 'space-between', py: 2, fontWeight: 'bold' }}
+      sx={{ justifyContent: 'space-between', py: 2 }}
       fullWidth
       endIcon={<KeyboardArrowRight />}
       size='large'
     >
       <Box display='flex' gap={2} alignItems='center'>
         {icon}
-        {label}
+        <Typography color='textPrimary' fontWeight='bold'>
+          {label}
+        </Typography>
       </Box>
     </Button>
   );

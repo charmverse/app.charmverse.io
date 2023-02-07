@@ -195,10 +195,11 @@ export function CreateSpaceForm({ defaultValues, onCancel, submitText }: Props) 
           Create a space{' '}
         </Box>
       </DialogTitle>
-      <Typography textAlign='center' variant='body2'>
-        A space is where your organization collaborates
-      </Typography>
-      <Divider sx={{ my: 2 }} />
+      <Box mb={2}>
+        <Typography textAlign='center' variant='body2' whiteSpace='nowrap'>
+          A space is where your organization collaborates
+        </Typography>
+      </Box>
 
       {step === 'select_template' && (
         <>
