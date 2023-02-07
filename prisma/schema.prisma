@@ -1082,6 +1082,7 @@ model PostComment {
   contentText String
   updatedAt   DateTime  @updatedAt
   deletedAt   DateTime?
+  deletedBy   String?
   parentId    String?
 
   postId String                  @db.Uuid

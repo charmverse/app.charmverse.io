@@ -137,5 +137,36 @@ test.describe.serial('Moderate forum posts', () => {
 
     // Start the real test ------------------
     await login({ page, userId: moderatorUser.id });
+
+    await forumPostPage.goToPostPage({
+      domain: space.domain,
+      path: post.path
+    });
+
+    await forumPostPage.waitForPostLoad({
+      domain: space.domain,
+      path: post.path
+    });
+
+    await page.locator('data-test=close-modal').click();
+
+    const contextMenu = forumPostPage.getPostCommentMenuLocator(unwantedcomment.id);
+
+    await expect(contextMenu).toBeVisible();
+
+    await contextMenu.click();
+
+    const deleteOption = forumPostPage.getPostDeleteCommentLocator(unwantedcomment.id);
+
+    await expect(deleteOption).toBeVisible();
+
+    await deleteOption.click();
+
+    const deletedComment = forumPostPage.getDeletedCommentLocator(unwantedcomment.id);
+
+    await expect(deletedComment).toBeVisible();
   });
+  test('delete an unwanted post', async ({ forumPostPage, page }) => {});
+
+  test('normal member cannot see the context menu for deleting a post', async ({ forumPostPage, page }) => {});
 });

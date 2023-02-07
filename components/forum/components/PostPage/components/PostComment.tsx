@@ -145,8 +145,9 @@ export function PostComment({ comment, setPostComments, permissions }: Props) {
   }
 
   return (
-    <Stack my={1} position='relative' data-test={`post-comment-${comment.id}`}>
-      <StyledStack>
+    <Stack my={1} position='relative'>
+      {/** test marker is here to avoid accidentally loading comments from recursive post comment components */}
+      <StyledStack data-test={`post-comment-${comment.id}`}>
         <Stack flexDirection='row' justifyContent='space-between' alignItems='center'>
           <Stack flexDirection='row' alignItems='center'>
             <Box mr={1}>
@@ -169,7 +170,7 @@ export function PostComment({ comment, setPostComments, permissions }: Props) {
               <Typography variant='subtitle2'>(Edited)</Typography>
             )}
           </Stack>
-          {comment.createdBy === user?.id && !comment.deletedAt && (
+          {(comment.createdBy === user?.id || permissions?.delete_comments) && !comment.deletedAt && (
             <IconButton
               className='comment-actions'
               size='small'
@@ -228,8 +229,9 @@ export function PostComment({ comment, setPostComments, permissions }: Props) {
               </Stack>
             </Stack>
           ) : comment.deletedAt ? (
-            <Typography color='secondary' my={1}>
-              Comment deleted by user
+            <Typography data-test={`deleted-comment-${comment.id}`} color='secondary' my={1}>
+              Comment deleted{' '}
+              {!comment.deletedBy ? '' : comment.deletedBy === comment.createdBy ? 'by user' : 'by moderator'}
             </Typography>
           ) : (
             <CharmEditor
@@ -293,18 +295,22 @@ export function PostComment({ comment, setPostComments, permissions }: Props) {
         transformOrigin={{ vertical: 'top', horizontal: 'right' }}
         onClick={(e) => e.stopPropagation()}
       >
-        <MenuItem data-test={`edit-comment-${comment.id}`} onClick={onClickEditComment}>
-          <ListItemIcon>
-            <EditIcon />
-          </ListItemIcon>
-          <ListItemText>Edit comment</ListItemText>
-        </MenuItem>
-        <MenuItem data-test={`delete-comment-${comment.id}`} onClick={onClickDeleteComment}>
-          <ListItemIcon>
-            <DeleteOutlinedIcon />
-          </ListItemIcon>
-          <ListItemText>Delete comment</ListItemText>
-        </MenuItem>
+        {comment.createdBy === user?.id && (
+          <MenuItem data-test={`edit-comment-${comment.id}`} onClick={onClickEditComment}>
+            <ListItemIcon>
+              <EditIcon />
+            </ListItemIcon>
+            <ListItemText>Edit comment</ListItemText>
+          </MenuItem>
+        )}
+        {(comment.createdBy === user?.id || permissions?.delete_comments) && (
+          <MenuItem data-test={`delete-comment-${comment.id}`} onClick={onClickDeleteComment}>
+            <ListItemIcon>
+              <DeleteOutlinedIcon />
+            </ListItemIcon>
+            <ListItemText>Delete comment</ListItemText>
+          </MenuItem>
+        )}
       </Menu>
     </Stack>
   );

@@ -128,7 +128,7 @@ export function PostPage({
     post ? charmClient.forum.listPostComments(post.id) : undefined
   );
 
-  const { permissions } = usePostPermissions(post?.id as string, !post);
+  const { permissions } = usePostPermissions({ postIdOrPath: post?.id as string, isNewPost: !post });
 
   usePreventReload(contentUpdated);
   const [, setTitleState] = usePageTitle();

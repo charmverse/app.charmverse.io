@@ -32,6 +32,7 @@ import useSWR from 'swr';
 import charmClient from 'charmClient';
 import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
 import { undoEventName } from 'components/common/CharmEditor/utils';
+import { usePostPermissions } from 'components/forum/hooks/usePostPermissions';
 import { useColorMode } from 'context/darkMode';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
@@ -182,6 +183,10 @@ export default function Header({ open, openSidebar }: HeaderProps) {
   const isForumPost = router.route === '/[domain]/forum/post/[pagePath]';
   const pagePath = isForumPost ? (router.query.pagePath as string) : null;
 
+  const postPermissions = isForumPost
+    ? usePostPermissions({ postIdOrPath: pagePath as string, spaceDomain: router.query.domain as string })
+    : null;
+
   const { data: forumPost = null } = useSWR(currentSpace && pagePath ? `post-${pagePath}` : null, () =>
     charmClient.forum.getForumPost(pagePath!)
   );
@@ -301,7 +306,6 @@ export default function Header({ open, openSidebar }: HeaderProps) {
         />
         <ListItemText primary='View comments' />
       </ListItemButton>
-
       <ListItemButton
         onClick={() => {
           setCurrentPageActionDisplay('suggestions');
@@ -339,6 +343,7 @@ export default function Header({ open, openSidebar }: HeaderProps) {
         </ListItemButton>
       )}
       <CopyLinkMenuItem closeMenu={closeMenu} />
+
       <Divider />
       {(basePage?.type === 'card' || basePage?.type === 'page') && (
         <>
@@ -411,13 +416,12 @@ export default function Header({ open, openSidebar }: HeaderProps) {
   } else if (isForumPost && forumPost) {
     const postCreator = members.find((member) => member.id === forumPost.createdBy);
 
-    const isPostCreator = forumPost.createdBy === user?.id;
     pageOptionsList = (
       <List dense>
         <CopyLinkMenuItem closeMenu={closeMenu} />
         <Divider />
-        <DeleteMenuItem onClick={deletePost} disabled={!isPostCreator} />
-        <UndoMenuItem onClick={undoEditorChanges} disabled={!isPostCreator} />
+        <DeleteMenuItem onClick={deletePost} disabled={!postPermissions?.permissions?.delete_post} />
+        <UndoMenuItem onClick={undoEditorChanges} disabled={!postPermissions?.permissions?.edit_post} />
         <ExportMarkdownMenuItem onClick={exportMarkdownPage} />
         <Divider />
         {forumPost && postCreator && (

@@ -10,6 +10,7 @@ import Dialog from 'components/common/BoardEditor/focalboard/src/components/dial
 import Button from 'components/common/Button';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { PageActions } from 'components/common/PageActions';
+import { usePostPermissions } from 'components/forum/hooks/usePostPermissions';
 import { useUser } from 'hooks/useUser';
 import type { PostWithVotes } from 'lib/forums/posts/interfaces';
 
@@ -32,6 +33,11 @@ export default function PostDialog({ post, spaceId, onClose, open, newPostCatego
   const [contentUpdated, setContentUpdated] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const { user } = useUser();
+
+  const permissions = usePostPermissions({
+    postIdOrPath: post?.id as string,
+    isNewPost: !post
+  });
 
   // keep track if charmeditor is mounted. There is a bug that it calls the update method on closing the modal, but content is empty
   useEffect(() => {
@@ -102,7 +108,7 @@ export default function PostDialog({ post, spaceId, onClose, open, newPostCatego
         post && (
           <PageActions
             page={{ ...post, relativePath }}
-            onClickDelete={post.createdBy === user?.id ? deletePost : undefined}
+            onClickDelete={permissions.permissions?.delete_post ? deletePost : undefined}
           />
         )
       }

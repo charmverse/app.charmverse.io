@@ -43,7 +43,7 @@ export function PostCard({ post, user, category }: ForumPostProps) {
   const { showPost } = usePostDialog();
   const currentSpace = useCurrentSpace();
 
-  const { permissions } = usePostPermissions(post.id);
+  const { permissions } = usePostPermissions({ postIdOrPath: post.id });
 
   async function voteOnPost(newUpvotedStatus: boolean | null) {
     await charmClient.forum.voteOnPost({

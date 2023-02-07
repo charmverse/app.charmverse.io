@@ -45,6 +45,10 @@ export class ForumPostPage {
     return this.page.locator(`data-test=post-comment-${commentId}`);
   }
 
+  getDeletedCommentLocator(commentId: string) {
+    return this.page.locator(`data-test=deleted-comment-${commentId}`);
+  }
+
   async isCommentEditable(commentId: string) {
     const commentEditor = await this.page.locator(
       `data-test=post-comment-charmeditor-${commentId} >> div[contenteditable]`
