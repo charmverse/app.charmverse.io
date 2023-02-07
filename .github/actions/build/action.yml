@@ -75,6 +75,7 @@ runs:
         SEPARATOR: ','
 
     - run: echo '${{ env.GIT_DIFF }}'
+      shell: bash
     - name: Cache build
       id: cache_build
       uses: actions/cache@v3
