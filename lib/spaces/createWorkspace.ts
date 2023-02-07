@@ -184,8 +184,8 @@ export async function createWorkspace({ spaceData, userId, createSpaceOption, ex
   // Add default stablecoin methods
   await setupDefaultPaymentMethods({ spaceIdOrSpace: space });
 
-  // Push the new space id to the user.spaceOrder array if it exists.
-  // This way we ensure the order of spaces is kept after a new space is created
+  // Push the new space id to the user.spaceOrder array if it exist.
+  // This way we ensure the order of spaces is kept after a new space is created.
   const user = await prisma.user.findUnique({ where: { id: userId }, select: { spacesOrder: true } });
   if (user?.spacesOrder && user.spacesOrder.length > 0) {
     await prisma.user.update({
