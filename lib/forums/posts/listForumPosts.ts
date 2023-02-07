@@ -29,7 +29,7 @@ export async function listForumPosts(
     categoryId,
     sort
   }: ListForumPostsRequest,
-  userId: string
+  userId?: string
 ): Promise<PaginatedPostList> {
   // Replicates prisma behaviour, but avoids a database call
   if (categoryId instanceof Array && categoryId.length === 0) {
