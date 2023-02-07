@@ -97,7 +97,7 @@ function DeleteMenuItem({ disabled = false, onClick }: { disabled?: boolean; onC
   return (
     <Tooltip title={disabled ? "You don't have permission to delete this page" : ''}>
       <div>
-        <ListItemButton disabled={disabled} onClick={onClick}>
+        <ListItemButton data-test='delete-current-page' disabled={disabled} onClick={onClick}>
           <DeleteOutlineOutlinedIcon
             fontSize='small'
             sx={{
@@ -365,7 +365,13 @@ export default function Header({ open, openSidebar }: HeaderProps) {
           <Divider />
         </>
       )}
-      <DeleteMenuItem onClick={onDeletePage} disabled={!pagePermissions?.delete || basePage?.deletedAt !== null} />
+      <DeleteMenuItem
+        onClick={onDeletePage}
+        disabled={
+          (isForumPost ? !postPermissions.permissions?.delete_post : !pagePermissions?.delete) ||
+          basePage?.deletedAt !== null
+        }
+      />
       <UndoMenuItem onClick={undoEditorChanges} disabled={!pagePermissions?.edit_content} />
       <Divider />
       {basePage && (
@@ -419,7 +425,7 @@ export default function Header({ open, openSidebar }: HeaderProps) {
     const postCreator = members.find((member) => member.id === forumPost.createdBy);
 
     pageOptionsList = (
-      <List dense>
+      <List data-test='forum-post-actions' dense>
         <CopyLinkMenuItem closeMenu={closeMenu} />
         <Divider />
         <DeleteMenuItem onClick={deletePost} disabled={!postPermissions?.permissions?.delete_post} />
@@ -488,7 +494,7 @@ export default function Header({ open, openSidebar }: HeaderProps) {
                       setPageMenuAnchorElement(pageMenuAnchor.current || null);
                     }}
                   >
-                    <MoreHorizIcon color='secondary' />
+                    <MoreHorizIcon data-test='page-toplevel-menu' color='secondary' />
                   </IconButton>
                 </Tooltip>
               </div>

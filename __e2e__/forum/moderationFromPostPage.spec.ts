@@ -1,6 +1,8 @@
 import { expect, test as base } from '@playwright/test';
-import type { Post, Space, User } from '@prisma/client';
+import type { Post, PostCategory, Space, User } from '@prisma/client';
+import { ForumHomePage } from '__e2e__/po/forumHome.po';
 import { ForumPostPage } from '__e2e__/po/forumPost.po';
+import { PageHeader } from '__e2e__/po/pageHeader';
 import { createUserAndSpace, createUser, generateSpaceRole } from '__e2e__/utils/mocks';
 
 import { prisma } from 'db';
@@ -11,11 +13,15 @@ import { generatePostCategory, generateForumPost } from 'testing/utils/forums';
 import { login } from '../utils/session';
 
 type Fixtures = {
+  pageHeader: PageHeader;
   forumPostPage: ForumPostPage;
+  forumHomePage: ForumHomePage;
 };
 
 const test = base.extend<Fixtures>({
-  forumPostPage: ({ page }, use) => use(new ForumPostPage(page))
+  forumPostPage: ({ page }, use) => use(new ForumPostPage(page)),
+  forumHomePage: ({ page }, use) => use(new ForumHomePage(page)),
+  pageHeader: ({ page }, use) => use(new PageHeader(page))
 });
 
 let moderatorUser: User;
@@ -23,9 +29,10 @@ let memberUser: User;
 let authorUser: User;
 let space: Space;
 let post: Post;
+let postCategory: PostCategory;
 
 test.describe.serial('Moderate forum posts', () => {
-  test('delete an unwanted comment', async ({ forumPostPage, page }) => {
+  test('moderator can delete an unwanted comment', async ({ forumPostPage, page }) => {
     // Setup test environment
     const generated = await createUserAndSpace({
       browserPage: page,
@@ -69,7 +76,7 @@ test.describe.serial('Moderate forum posts', () => {
 
     const categoryName = 'Example category';
 
-    const category = await generatePostCategory({
+    postCategory = await generatePostCategory({
       spaceId: space.id,
       name: categoryName
     });
@@ -78,7 +85,7 @@ test.describe.serial('Moderate forum posts', () => {
     await upsertPostCategoryPermission({
       assignee: { group: 'space', id: space.id },
       permissionLevel: 'full_access',
-      postCategoryId: category.id
+      postCategoryId: postCategory.id
     });
 
     // Create a moderation role and assign it to the moderator
@@ -100,7 +107,7 @@ test.describe.serial('Moderate forum posts', () => {
     await prisma.postCategoryPermission.create({
       data: {
         permissionLevel: 'moderator',
-        postCategory: { connect: { id: category.id } },
+        postCategory: { connect: { id: postCategory.id } },
         role: { connect: { id: moderationRole.id } }
       }
     });
@@ -110,7 +117,7 @@ test.describe.serial('Moderate forum posts', () => {
     post = await generateForumPost({
       spaceId: space.id,
       userId: authorUser.id,
-      categoryId: category.id,
+      categoryId: postCategory.id,
       title: postName
     });
 
@@ -166,7 +173,96 @@ test.describe.serial('Moderate forum posts', () => {
 
     await expect(deletedComment).toBeVisible();
   });
-  test('delete an unwanted post', async ({ forumPostPage, page }) => {});
+  test('moderator can delete an unwanted post from the full view post page', async ({
+    forumPostPage,
+    forumHomePage,
+    page,
+    pageHeader
+  }) => {
+    const postToDelete = await generateForumPost({
+      spaceId: space.id,
+      userId: authorUser.id,
+      categoryId: postCategory.id
+    });
+    await login({ page, userId: moderatorUser.id });
+    await forumPostPage.goToPostPage({
+      domain: space.domain,
+      path: postToDelete.path
+    });
+    const header = pageHeader.pageTopLevelMenu;
+    await expect(header).toBeVisible();
+    await header.click();
+    const forumPostActions = pageHeader.forumPostActions;
+    await expect(forumPostActions).toBeVisible();
+    const deleteOption = pageHeader.deleteCurentPage;
+    await expect(deleteOption).toBeVisible();
+    await deleteOption.click();
+    // After deleting, user should be redirected to the forum home page
+    await forumHomePage.waitForForumHome(space.domain);
+  });
 
-  test('normal member cannot see the context menu for deleting a post', async ({ forumPostPage, page }) => {});
+  test('author can delete their own post from the full view post page', async ({
+    forumPostPage,
+    forumHomePage,
+    page,
+    pageHeader
+  }) => {
+    const postToDelete = await generateForumPost({
+      spaceId: space.id,
+      userId: authorUser.id,
+      categoryId: postCategory.id
+    });
+    await login({ page, userId: authorUser.id });
+    await forumPostPage.goToPostPage({
+      domain: space.domain,
+      path: postToDelete.path
+    });
+
+    await page.locator('data-test=close-modal').click();
+
+    const header = pageHeader.pageTopLevelMenu;
+    await expect(header).toBeVisible();
+    await header.click();
+    const forumPostActions = pageHeader.forumPostActions;
+    await expect(forumPostActions).toBeVisible();
+    const deleteOption = pageHeader.deleteCurentPage;
+    await expect(deleteOption).toBeVisible();
+    await deleteOption.click();
+    // After deleting, user should be redirected to the forum home page
+    await forumHomePage.waitForForumHome(space.domain);
+  });
+
+  test('normal member sees a disabled delete post button', async ({ forumPostPage, page, pageHeader }) => {
+    const postToDelete = await generateForumPost({
+      spaceId: space.id,
+      userId: authorUser.id,
+      categoryId: postCategory.id
+    });
+
+    await login({ page, userId: memberUser.id });
+
+    await forumPostPage.goToPostPage({
+      domain: space.domain,
+      path: postToDelete.path
+    });
+
+    await page.locator('data-test=close-modal').click();
+
+    const header = pageHeader.pageTopLevelMenu;
+
+    await expect(header).toBeVisible();
+
+    await header.click();
+
+    const forumPostActions = pageHeader.forumPostActions;
+    await expect(forumPostActions).toBeVisible();
+
+    const deleteOption = pageHeader.deleteCurentPage;
+    await expect(deleteOption).toBeVisible();
+
+    // The mui lib renders this element as a div with a disabled css class, but no prop. We can check for the aria-disabled attribute instead as a workaround
+    const isDisabled = await deleteOption.getAttribute('aria-disabled');
+
+    expect(isDisabled).toBe('true');
+  });
 });
