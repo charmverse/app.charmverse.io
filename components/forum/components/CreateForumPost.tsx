@@ -25,11 +25,9 @@ export function CreateForumPost({ onClick }: { onClick: () => void }) {
     <Card variant='outlined' sx={{ mb: '15px' }} onClick={clickHandler}>
       <CardActionArea disabled={!userSpacePermissions?.createPage}>
         <CardContent>
-          <Box display='flex' flexDirection='row' justifyContent='space-between' mb='16px'>
+          <Box display='flex' flexDirection='row' justifyContent='space-between' alignItems='center' gap={1}>
             <UserDisplay user={user} avatarSize='medium' hideName mr='10px' />
-            <TextField disabled={!canPost} variant='outlined' placeholder='Create Post' fullWidth />
-          </Box>
-          <Box display='flex' justifyContent='flex-end'>
+            <TextField variant='outlined' placeholder='Create Post' fullWidth sx={{ pointerEvents: 'none' }} disabled />
             <Button
               disabledTooltip='There are no categories in which you can create a post.'
               disabled={!canPost}
