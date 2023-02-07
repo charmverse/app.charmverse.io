@@ -22,7 +22,7 @@ export function getPostVoteSummary(upDownVotes: UpDownVoteData[], userId?: strin
 
 type PostMetaToGet = {
   post: PostWithRelations;
-  userId: string;
+  userId?: string;
 };
 
 export function getPostMeta({ post, userId }: PostMetaToGet): ForumPostMeta {

@@ -4,6 +4,7 @@ import request from 'supertest';
 
 import { createPostCategory } from 'lib/forums/categories/createPostCategory';
 import type { CreateForumPostInput } from 'lib/forums/posts/createForumPost';
+import type { ListForumPostsRequest } from 'lib/forums/posts/listForumPosts';
 import { upsertPostCategoryPermission } from 'lib/permissions/forum/upsertPostCategoryPermission';
 import { upsertPermission } from 'lib/permissions/pages';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
@@ -20,6 +21,16 @@ beforeAll(async () => {
   user = _firstAdminUser;
   user = await generateSpaceUser({ isAdmin: false, spaceId: space.id });
   userCookie = await loginUser(user.id);
+});
+
+describe('GET /api/forums/posts', () => {
+  it('should return a 200 for anonymous users', async () => {
+    const query: ListForumPostsRequest = {
+      spaceId: space.id
+    };
+
+    await request(baseUrl).get(`/api/forums/posts`).query(query).expect(200);
+  });
 });
 
 describe('POST /api/forums/posts - Create a post', () => {
