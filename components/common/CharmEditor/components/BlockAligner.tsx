@@ -7,6 +7,7 @@ import { memo, forwardRef } from 'react';
 interface BlockAlignerProps {
   children: ReactNode;
   onDelete: () => void;
+  readOnly?: boolean;
 }
 
 const StyledBlockAligner = styled.div`
@@ -35,7 +36,7 @@ const Controls = styled.div`
 `;
 
 const BlockAligner = forwardRef<HTMLDivElement, BlockAlignerProps>((props, ref) => {
-  const { children, onDelete } = props;
+  const { children, onDelete, readOnly } = props;
 
   function handleDelete(e: MouseEvent) {
     onDelete();
@@ -45,17 +46,19 @@ const BlockAligner = forwardRef<HTMLDivElement, BlockAlignerProps>((props, ref) 
   return (
     <StyledBlockAligner draggable={false}>
       {children}
-      <Controls className='controls'>
-        <ListItemButton
-          onClick={handleDelete}
-          sx={{
-            padding: 1,
-            backgroundColor: 'inherit'
-          }}
-        >
-          <DeleteOutlinedIcon sx={{ fontSize: 14 }} />
-        </ListItemButton>
-      </Controls>
+      {!readOnly && (
+        <Controls className='controls'>
+          <ListItemButton
+            onClick={handleDelete}
+            sx={{
+              padding: 1,
+              backgroundColor: 'inherit'
+            }}
+          >
+            <DeleteOutlinedIcon sx={{ fontSize: 14 }} />
+          </ListItemButton>
+        </Controls>
+      )}
     </StyledBlockAligner>
   );
 });

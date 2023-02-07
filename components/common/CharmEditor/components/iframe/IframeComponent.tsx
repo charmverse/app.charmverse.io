@@ -117,7 +117,7 @@ function IframeComponent({ readOnly, node, getPos, view, deleteNode, selected, u
     );
   }
   return (
-    <BlockAligner onDelete={deleteNode}>
+    <BlockAligner readOnly={readOnly} onDelete={deleteNode}>
       <VerticalResizer
         onResizeStop={(_, data) => {
           // save to db

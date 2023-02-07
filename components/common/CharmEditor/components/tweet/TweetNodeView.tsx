@@ -107,7 +107,7 @@ export function TweetNodeView({ deleteNode, readOnly, node, selected, updateAttr
   return (
     <>
       <Script src={`${twitterWidgetJs}?id=${randomIntFromInterval(1, 1000000)}`} onReady={onLoadScript} />
-      <BlockAligner onDelete={deleteNode}>
+      <BlockAligner readOnly={readOnly} onDelete={deleteNode}>
         <StyledTweet ref={ref} />
       </BlockAligner>
     </>

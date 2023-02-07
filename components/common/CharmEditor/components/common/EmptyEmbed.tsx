@@ -7,11 +7,12 @@ export type EmptyContentProps = {
   isSelected: boolean;
   buttonText: string;
   icon: JSX.Element;
+  readOnly?: boolean;
 };
 
 export function EmptyEmbed(props: EmptyContentProps) {
   return (
-    <BlockAligner onDelete={props.onDelete}>
+    <BlockAligner readOnly={props.readOnly} onDelete={props.onDelete}>
       <ListItem
         button
         sx={{
