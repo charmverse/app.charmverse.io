@@ -185,7 +185,7 @@ export default function Header({ open, openSidebar }: HeaderProps) {
   const [userSpacePermissions] = useCurrentSpacePermissions();
   const pagePermissions = basePage ? getPagePermissions(basePage.id) : null;
 
-  const { onClick: clickToOpenSettingsModal, onTouchStart: touchStartToOpenSettingsModal } = useSettingsDialog();
+  const { onClick: clickToOpenSettingsModal } = useSettingsDialog();
   const isForumPost = router.route === '/[domain]/forum/post/[pagePath]';
   const pagePath = isForumPost ? (router.query.pagePath as string) : null;
 
@@ -515,7 +515,6 @@ export default function Header({ open, openSidebar }: HeaderProps) {
                 <IconButton
                   size={isLargeScreen ? 'small' : 'medium'}
                   onClick={(e) => clickToOpenSettingsModal(e, 'notifications')}
-                  onTouchStart={(e) => touchStartToOpenSettingsModal(e, 'notifications')}
                 >
                   <NotificationsIcon fontSize='small' color='secondary' />
                 </IconButton>

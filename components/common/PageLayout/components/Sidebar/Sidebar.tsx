@@ -143,13 +143,9 @@ export default function Sidebar({ closeSidebar, favorites, navAction }: SidebarP
   const { disconnectWallet } = useWeb3AuthSig();
   const isMobileSidebar = useMobileSidebar();
 
-  const { onClick, onTouchStart } = useSettingsDialog();
+  const { onClick } = useSettingsDialog();
   const handleModalClick = (event: MouseEvent<Element, globalThis.MouseEvent>, path?: string) => {
     onClick(event, path);
-    navAction?.();
-  };
-  const handleModalTouchStart = (event: TouchEvent<Element>, path?: string) => {
-    onTouchStart(event, path);
     navAction?.();
   };
   const searchInWorkspaceModalState = usePopupState({ variant: 'popover', popupId: 'search-in-workspace-modal' });
@@ -283,13 +279,11 @@ export default function Sidebar({ closeSidebar, favorites, navAction }: SidebarP
               />
               <SidebarBox
                 onClick={(e) => handleModalClick(e, `${space.name}-invites`)}
-                onTouchStart={(e) => handleModalTouchStart(e, `${space.name}-invites`)}
                 icon={<GroupAddOutlinedIcon color='secondary' fontSize='small' />}
                 label='Invites'
               />
               <SidebarBox
                 onClick={(e) => handleModalClick(e, `${space.name}-space`)}
-                onTouchStart={(e) => handleModalTouchStart(e, `${space.name}-space`)}
                 icon={<SettingsIcon color='secondary' fontSize='small' />}
                 label='Settings'
                 data-test='sidebar-settings'
