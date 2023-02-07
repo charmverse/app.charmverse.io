@@ -231,7 +231,9 @@ export function PostPage({
               onContentChange={updatePostContent}
             >
               <PageTitleInput readOnly={!canEdit} value={formInputs.title} onChange={updateTitle} />
-              {createdBy && <UserDisplay user={createdBy} avatarSize='small' fontSize='medium' mt={2} mb={3} />}
+              {createdBy && (
+                <UserDisplay showMiniProfile user={createdBy} avatarSize='small' fontSize='medium' mt={2} mb={3} />
+              )}
               <Box my={2}>
                 <PostCategoryInput readOnly={!canEdit} setCategoryId={updateCategoryId} categoryId={categoryId} />
               </Box>
