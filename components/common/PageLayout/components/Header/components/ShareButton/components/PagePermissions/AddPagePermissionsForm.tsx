@@ -159,7 +159,7 @@ export default function AddPagePermissionsForm({
 
           {permissionBeingAdded && (
             <Grid item>
-              <Alert severity='info'>
+              <Alert severity='info' sx={{ '& .MuiAlert-message': { flex: 1 } }}>
                 <Loader
                   position='right'
                   sx={{ display: 'inline', ' & span': { ml: 2 }, '& div': { width: '100%', display: 'flex' } }}
