@@ -63,8 +63,8 @@ runs:
       id: changed_file_list
       shell: bash
       run: |
-        git diff HEAD^ HEAD --name-only | egrep '\.([tj]s$|scss$)'
-        echo "changed_files=$(git diff HEAD^ HEAD --name-only | egrep '\.([tj]s$|scss$)')" >> $GITHUB_OUTPUT
+        git diff HEAD^ HEAD -- --name-only | egrep '\.([tj]s$|scss$)'
+        echo "changed_files=$(git diff HEAD^ HEAD -- --name-only | egrep '\.([tj]s$|scss$)')" >> $GITHUB_OUTPUT
 
     - name: Cache build
       id: cache_build
