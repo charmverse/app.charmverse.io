@@ -80,16 +80,6 @@ runs:
         # including the app_env helps make sure that deploy_staging.yml does not reuse values from test_and_deploy.yml which are meant for production
         key: nextjs-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-${{github.ref_name}}-${{ hashFiles( env.GIT_DIFF ) }}-${{ inputs.NEXT_PUBLIC_APP_ENV }}
 
-    - name: Cache build
-      id: cache_build
-      uses: actions/cache@v3
-      with:
-        path: |
-          .next
-          .env.test.local
-        # including the app_env helps make sure that deploy_staging.yml does not reuse values from test_and_deploy.yml which are meant for production
-        key: nextjs-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**/*.[jt]s', '**/*.[jt]sx', '**/*.scss') }}-${{ inputs.NEXT_PUBLIC_APP_ENV }}
-
     - name: Build
       shell: bash
       if: steps.cache_build.outputs.cache-hit != 'true'
