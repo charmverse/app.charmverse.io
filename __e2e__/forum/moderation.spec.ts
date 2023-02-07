@@ -8,6 +8,8 @@ import { upsertPostCategoryPermission } from 'lib/permissions/forum/upsertPostCa
 import { randomETHWalletAddress } from 'testing/generateStubs';
 import { generatePostCategory, generateForumPost } from 'testing/utils/forums';
 
+import { login } from '../utils/session';
+
 type Fixtures = {
   forumPostPage: ForumPostPage;
 };
@@ -24,6 +26,7 @@ let post: Post;
 
 test.describe.serial('Moderate forum posts', () => {
   test('delete an unwanted comment', async ({ forumPostPage, page }) => {
+    // Setup test environment
     const generated = await createUserAndSpace({
       browserPage: page,
       permissionConfigurationMode: 'collaborative'
@@ -112,25 +115,27 @@ test.describe.serial('Moderate forum posts', () => {
     });
 
     const commenttext = 'This is a great idea!';
-    const childContentText = 'This is a great idea!';
 
-    memberComment = await prisma.postComment.create({
+    const unwantedcomment = await prisma.postComment.create({
       data: {
         user: {
           connect: { id: memberUser.id }
         },
         post: { connect: { id: post.id } },
-        contentText: topLevelContentText,
+        contentText: commenttext,
         content: {
           type: 'doc',
           content: [
             {
-              text: topLevelContentText,
+              text: commenttext,
               type: 'text'
             }
           ]
         }
       }
     });
+
+    // Start the real test ------------------
+    await login({ page, userId: moderatorUser.id });
   });
 });

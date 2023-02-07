@@ -173,6 +173,7 @@ export function PostComment({ comment, setPostComments, permissions }: Props) {
             <IconButton
               className='comment-actions'
               size='small'
+              data-test={`post-comment-menu-${comment.id}`}
               onClick={(event) => {
                 menuState.open(event.currentTarget);
               }}
@@ -192,6 +193,7 @@ export function PostComment({ comment, setPostComments, permissions }: Props) {
           }}
         />
         <Box
+          data-test={`post-comment-charmeditor-${comment.id}`}
           ml={3}
           sx={{
             'div.ProseMirror.bangle-editor': {
@@ -217,7 +219,7 @@ export function PostComment({ comment, setPostComments, permissions }: Props) {
                 content={commentEditContent.doc}
               />
               <Stack flexDirection='row' my={1} ml={1} gap={1}>
-                <Button size='small' onClick={saveCommentContent}>
+                <Button data-test={`save-comment-${comment.id}`} size='small' onClick={saveCommentContent}>
                   Save
                 </Button>
                 <Button size='small' variant='outlined' color='secondary' onClick={cancelEditingComment}>
@@ -291,13 +293,13 @@ export function PostComment({ comment, setPostComments, permissions }: Props) {
         transformOrigin={{ vertical: 'top', horizontal: 'right' }}
         onClick={(e) => e.stopPropagation()}
       >
-        <MenuItem onClick={onClickEditComment}>
+        <MenuItem data-test={`edit-comment-${comment.id}`} onClick={onClickEditComment}>
           <ListItemIcon>
             <EditIcon />
           </ListItemIcon>
           <ListItemText>Edit comment</ListItemText>
         </MenuItem>
-        <MenuItem onClick={onClickDeleteComment}>
+        <MenuItem data-test={`delete-comment-${comment.id}`} onClick={onClickDeleteComment}>
           <ListItemIcon>
             <DeleteOutlinedIcon />
           </ListItemIcon>
