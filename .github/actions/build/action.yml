@@ -70,8 +70,7 @@ runs:
       id: diffset
       with:
         PATTERNS: |
-          **/*.js
-          **/*.ts
+          **/*.+(j|t)s
           **/*.scss
         SEPARATOR: ','
 
