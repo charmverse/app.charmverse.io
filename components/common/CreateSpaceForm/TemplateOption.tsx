@@ -1,39 +1,30 @@
-import styled from '@emotion/styled';
+import { KeyboardArrowRight } from '@mui/icons-material';
+import { Box } from '@mui/material';
+import type { ReactNode } from 'react';
 
 import Button from 'components/common/Button';
-import type { SpaceCreateTemplate } from 'lib/spaces/utils';
-import { spaceCreateTemplates } from 'lib/spaces/utils';
-
-const ButtonContent = styled.div`
-  display: block;
-  text-align: center;
-  width: 100%;
-`;
 
 type TemplateOptionProps = {
-  option: SpaceCreateTemplate;
-  currentSelection: SpaceCreateTemplate;
-  onSelect: (option: SpaceCreateTemplate) => void;
+  icon?: ReactNode;
+  label: string;
+  onSelect: () => void;
 };
 
-export function TemplateOption({ option, onSelect, currentSelection }: TemplateOptionProps) {
-  const isSelected = option === currentSelection;
-
+export function TemplateOption({ icon, label, onSelect }: TemplateOptionProps) {
   return (
     <Button
-      data-test={`space-template-${option}`}
-      onClick={() => onSelect(option)}
-      color={isSelected ? 'primary' : 'secondary'}
+      onClick={onSelect}
+      color='inherit'
       variant='outlined'
-      sx={{
-        width: '100%',
-        justifyContent: 'space-between',
-        display: 'flex'
-      }}
+      sx={{ justifyContent: 'space-between', py: 2, fontWeight: 'bold' }}
       fullWidth
+      endIcon={<KeyboardArrowRight />}
       size='large'
     >
-      <ButtonContent>{spaceCreateTemplates[option]}</ButtonContent>
+      <Box display='flex' gap={2} alignItems='center'>
+        {icon}
+        {label}
+      </Box>
     </Button>
   );
 }

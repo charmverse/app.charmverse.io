@@ -7,9 +7,9 @@ import { typedKeys } from 'lib/utilities/objects';
 import { uid } from 'lib/utilities/strings';
 import { gettingStartedPage } from 'seedData/gettingStartedPage';
 
+import { spaceCreateTemplates } from '../config';
 import type { SpaceCreateInput } from '../createWorkspace';
 import { createWorkspace } from '../createWorkspace';
-import { spaceCreateTemplates } from '../utils';
 
 let user: User;
 
