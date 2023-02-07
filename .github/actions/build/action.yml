@@ -70,7 +70,7 @@ runs:
       id: diffset
       uses: softprops/diffset@v1
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ inputs.GITHUB_TOKEN }}
       with:
         changed_files: |
           **/*.([jt]s)

@@ -26,6 +26,7 @@ jobs:
         uses: ./.github/actions/build
         with:
           NEXT_PUBLIC_APP_ENV: 'test'
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
 
   test:
     name: Tests
