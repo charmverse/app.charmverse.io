@@ -6,3 +6,7 @@ export interface UserAvatar {
   avatarTokenId: string | null;
   avatarChain: SupportedChainId | null;
 }
+
+export type UserPreferences = {
+  locale?: string;
+};

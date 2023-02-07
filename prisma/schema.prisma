@@ -461,6 +461,7 @@ model User {
   postComments         PostComment[]
   googleAccounts       GoogleAccount[]
   GoogleCredential     GoogleCredential[]
+  preferences          Json?
 }
 
 model UserWallet {
