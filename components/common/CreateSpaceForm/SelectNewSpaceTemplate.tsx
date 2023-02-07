@@ -1,5 +1,5 @@
 import DriveFolderUploadIcon from '@mui/icons-material/DriveFolderUpload';
-import { Typography } from '@mui/material';
+import { Divider, Typography } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import { AiOutlineFileMarkdown } from 'react-icons/ai';
 import { MdOutlineBuild } from 'react-icons/md';
@@ -44,8 +44,8 @@ export function SelectNewSpaceTemplate({ onSelect }: SelectNewSpaceTemplateProps
           />
         </Grid>
       ))}
-
       <Grid item>
+        <Divider flexItem sx={{ mb: 2 }} />
         <TemplateOption
           onSelect={() => onSelect('importNotion')}
           label='Import from Notion'
