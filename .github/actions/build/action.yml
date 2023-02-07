@@ -59,6 +59,12 @@ runs:
     #     GITHUB_CONTEXT: ${{ toJson(github) }}
     #   run: echo "$GITHUB_CONTEXT"
 
+    - name: Get list of files changed
+      id: changed_file_list
+      shell: bash
+      run: |
+        echo "changed_files=$(git diff main --name-only | egrep '\.([tj]s$|scss$)')" >> $GITHUB_OUTPUT
+
     - name: Cache build
       id: cache_build
       uses: actions/cache@v3
@@ -67,7 +73,7 @@ runs:
           .next
           .env.test.local
         # including the app_env helps make sure that deploy_staging.yml does not reuse values from test_and_deploy.yml which are meant for production
-        key: nextjs-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**/*.[jt]s', '**/*.[jt]sx', '**/*.scss') }}-${{ inputs.NEXT_PUBLIC_APP_ENV }}
+        key: nextjs-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-${{ hashFiles( ${{steps.changed_file_list.outputs.changed_files}} ) }}-${{ inputs.NEXT_PUBLIC_APP_ENV }}
 
     - name: Build
       shell: bash
