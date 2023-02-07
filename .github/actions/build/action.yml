@@ -74,6 +74,7 @@ runs:
           **/*.scss
         SEPARATOR: ','
 
+    - run: echo '${{ env.GIT_DIFF }}'
     - name: Cache build
       id: cache_build
       uses: actions/cache@v3
