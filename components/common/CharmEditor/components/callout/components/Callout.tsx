@@ -70,7 +70,11 @@ export default function Callout({
             borderRadius: '50%',
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'center'
+            justifyContent: 'center',
+            // This is necessary to fix a bug on Macbook, where readonly emojis showed as greyed out
+            '&.Mui-disabled': {
+              color: '#FFFFFFFF'
+            }
           }}
           onClick={handleClick}
           disabled={readOnly}
