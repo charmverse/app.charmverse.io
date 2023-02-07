@@ -21,24 +21,51 @@ export class ForumPostPage {
     this.postCharmeditor = this.page.locator('data-test=post-charmeditor').locator('div[contenteditable]');
   }
 
-  async isPostEditable() {
-    const isEditable = await this.postCharmeditor.getAttribute('contenteditable');
-    return isEditable === 'true';
-  }
-
+  // Navigation utilities
   async goToPostPage({ domain, path }: { domain: string; path: string }) {
     await this.page.goto(`${baseUrl}/${domain}/forum/post/${path}`);
-  }
-
-  getCommentLocator(commentId: string) {
-    return this.page.locator(`data-test=post-comment-${commentId}`);
   }
 
   getPostPageTitleLocator() {
     return this.page.locator('data-test=editor-page-title');
   }
 
+  // Post charmeditor utilities
+  async isPostEditable() {
+    const isEditable = await this.postCharmeditor.getAttribute('contenteditable');
+    return isEditable === 'true';
+  }
+
   async waitForPostLoad({ domain, path }: { domain: string; path: string }) {
     await this.page.waitForURL(`**/${domain}/forum/post/${path}`);
+  }
+
+  // Comment-level utilities
+  getCommentLocator(commentId: string) {
+    return this.page.locator(`data-test=post-comment-${commentId}`);
+  }
+
+  async isCommentEditable(commentId: string) {
+    const commentEditor = await this.page.locator(
+      `data-test=post-comment-charmeditor-${commentId} >> div[contenteditable]`
+    );
+    const isEditable = await commentEditor.getAttribute('contenteditable');
+    return isEditable === 'true';
+  }
+
+  getPostCommentMenuLocator(commentId: string) {
+    return this.page.locator(`data-test=post-comment-menu-${commentId}`);
+  }
+
+  getPostEditCommentLocator(commentId: string) {
+    return this.page.locator(`data-test=edit-comment-${commentId}`);
+  }
+
+  getPostDeleteCommentLocator(commentId: string) {
+    return this.page.locator(`data-test=delete-comment-${commentId}`);
+  }
+
+  getPostSaveCommentButtonLocator(commentId: string) {
+    return this.page.locator(`data-test=save-comment-${commentId}`);
   }
 }
