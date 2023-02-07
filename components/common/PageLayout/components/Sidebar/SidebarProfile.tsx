@@ -2,7 +2,7 @@ import AddIcon from '@mui/icons-material/Add';
 import { Divider, Menu, MenuItem, Typography, useMediaQuery } from '@mui/material';
 import { useTheme } from '@mui/system';
 import { bindMenu } from 'material-ui-popup-state';
-import type { PopupState } from 'material-ui-popup-state/core';
+import type { PopupState } from 'material-ui-popup-state/hooks';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 import { useCallback, useState } from 'react';
