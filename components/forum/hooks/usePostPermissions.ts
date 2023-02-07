@@ -20,8 +20,8 @@ export function usePostPermissions({ postIdOrPath, spaceDomain, isNewPost }: Pro
   );
 
   if (isNewPost) {
-    return { permissions: new AvailablePostPermissions().full };
+    return new AvailablePostPermissions().full;
   }
 
-  return { permissions: data };
+  return data;
 }

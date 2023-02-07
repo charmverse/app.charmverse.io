@@ -108,7 +108,7 @@ export default function PostDialog({ post, spaceId, onClose, open, newPostCatego
         post && (
           <PageActions
             page={{ ...post, relativePath }}
-            onClickDelete={permissions.permissions?.delete_post ? deletePost : undefined}
+            onClickDelete={permissions?.delete_post ? deletePost : undefined}
           />
         )
       }

@@ -1057,6 +1057,7 @@ model Post {
   upDownVotes        PostUpDownVote[]
   commentUpDownVotes PostCommentUpDownVote[]
 
+  @@unique([spaceId, path])
   @@index([categoryId])
   @@index([path])
   @@index([spaceId, deletedAt]) // space feed

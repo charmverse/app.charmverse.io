@@ -21,7 +21,7 @@ export default function PostDialogGlobal() {
   useEffect(() => {
     if (postId) {
       charmClient.forum
-        .getForumPost(postId)
+        .getForumPost({ postIdOrPath: postId })
         .then((_post) => {
           setPost(_post);
         })
