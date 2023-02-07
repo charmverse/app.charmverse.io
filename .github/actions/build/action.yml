@@ -59,12 +59,22 @@ runs:
     #     GITHUB_CONTEXT: ${{ toJson(github) }}
     #   run: echo "$GITHUB_CONTEXT"
 
-    - name: Get list of files changed
-      id: changed_file_list
-      shell: bash
-      run: |
-        git diff HEAD^ HEAD -- --name-only | egrep '\.([tj]s$|scss$)'
-        echo "changed_files=$(git diff HEAD^ HEAD -- --name-only | egrep '\.([tj]s$|scss$)')" >> $GITHUB_OUTPUT
+    # - name: Get list of files changed
+    #   id: changed_file_list
+    #   shell: bash
+    #   run: |
+    #     git diff HEAD^ HEAD -- --name-only | egrep '\.([tj]s$|scss$)'
+    #     echo "changed_files=$(git diff HEAD^ HEAD -- --name-only | egrep '\.([tj]s$|scss$)')" >> $GITHUB_OUTPUT
+
+    - name: Diffset
+      id: diffset
+      uses: softprops/diffset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        changed_files: |
+          **/*.([jt]s)
+          **/*.scss
 
     - name: Cache build
       id: cache_build
@@ -74,7 +84,7 @@ runs:
           .next
           .env.test.local
         # including the app_env helps make sure that deploy_staging.yml does not reuse values from test_and_deploy.yml which are meant for production
-        key: nextjs-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-${{github.ref_name}}-${{ hashFiles( join(steps.changed_file_list.outputs.changed_files, ', ') ) }}-${{ inputs.NEXT_PUBLIC_APP_ENV }}
+        key: nextjs-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-${{github.ref_name}}-${{ hashFiles( join(steps.diffset.outputs.changed_files, ', ') ) }}-${{ inputs.NEXT_PUBLIC_APP_ENV }}
 #        restore_keys: |
 #          nextjs-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-${{github.ref_name}}-${{ hashFiles( join(steps.changed_file_list.outputs.changed_files, ', ') ) }}-${{ inputs.NEXT_PUBLIC_APP_ENV }}
 
