@@ -134,10 +134,9 @@ interface PageLayoutProps {
   children: React.ReactNode;
   sidebar?: (p: { closeSidebar: () => void }) => JSX.Element;
   sidebarWidth?: number;
-  hideSidebar?: boolean;
 }
 
-function PageLayout({ sidebarWidth = 300, children, hideSidebar = false, sidebar: SidebarOverride }: PageLayoutProps) {
+function PageLayout({ sidebarWidth = 300, children, sidebar: SidebarOverride }: PageLayoutProps) {
   const { width } = useWindowSize();
   const isMobileSidebar = useMobileSidebar();
 
@@ -227,33 +226,36 @@ function PageLayout({ sidebarWidth = 300, children, hideSidebar = false, sidebar
                       <AppBar open={open} sidebarWidth={displaySidebarWidth} position='fixed'>
                         <Header open={open} openSidebar={handleDrawerOpen} />
                       </AppBar>
-                      {!hideSidebar &&
-                        (isMobileSidebar ? (
-                          <MuiDrawer
-                            open={open}
-                            variant='temporary'
-                            onClose={handleDrawerClose}
-                            ModalProps={{
-                              keepMounted: true
-                            }}
-                          ></MuiDrawer>
-                        ) : (
-                          <Drawer sidebarWidth={displaySidebarWidth} open={open} variant='permanent'>
+                      {isMobileSidebar ? (
+                        <MuiDrawer
+                          open={open}
+                          variant='temporary'
+                          onClose={handleDrawerClose}
+                          ModalProps={{
+                            keepMounted: true
+                          }}
+                        >
+                          <Box width={mobileSidebarWidth} minHeight='100vh'>
                             {drawerContent}
+                          </Box>
+                        </MuiDrawer>
+                      ) : (
+                        <Drawer sidebarWidth={displaySidebarWidth} open={open} variant='permanent'>
+                          {drawerContent}
 
-                            <Tooltip
-                              title={!!SidebarOverride || isResizing ? '' : 'Drag to resize'}
-                              placement='right'
-                              followCursor
-                            >
-                              <DraggableHandle
-                                onMouseDown={(e) => enableResize(e)}
-                                isActive={isResizing}
-                                disabled={!!SidebarOverride}
-                              />
-                            </Tooltip>
-                          </Drawer>
-                        ))}
+                          <Tooltip
+                            title={!!SidebarOverride || isResizing ? '' : 'Drag to resize'}
+                            placement='right'
+                            followCursor
+                          >
+                            <DraggableHandle
+                              onMouseDown={(e) => enableResize(e)}
+                              isActive={isResizing}
+                              disabled={!!SidebarOverride}
+                            />
+                          </Tooltip>
+                        </Drawer>
+                      )}
                     </>
                   )}
                   <PageContainer>

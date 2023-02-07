@@ -269,7 +269,7 @@ export default function Sidebar({ closeSidebar, favorites, navAction }: SidebarP
     <SidebarContainer>
       {space && (
         <Box display='flex' flexDirection='column' sx={{ height: '100%', flexGrow: 1, width: 'calc(100% - 57px)' }}>
-          <SidebarSubmenu closeSidebar={closeSidebar} />
+          <SidebarSubmenu closeSidebar={closeSidebar} logoutCurrentUser={logoutCurrentUser} />
           <Box mb={2}>
             <SidebarLink
               href={`/${space.domain}/members`}
