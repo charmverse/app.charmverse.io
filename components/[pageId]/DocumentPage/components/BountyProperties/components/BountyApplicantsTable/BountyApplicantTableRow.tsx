@@ -127,7 +127,7 @@ export default function BountyApplicantTableRow({
     <>
       <TableRow key={submission.id} hover sx={{ '.MuiTableCell-root': { borderBottom: 0 } }}>
         <TableCell size='small'>
-          {member ? <UserDisplay avatarSize='small' user={member} fontSize='small' linkToProfile /> : 'Anonymous'}
+          {member ? <UserDisplay avatarSize='small' user={member} fontSize='small' showMiniProfile /> : 'Anonymous'}
         </TableCell>
         <TableCell>
           <BountyApplicantStatus submission={submission} />

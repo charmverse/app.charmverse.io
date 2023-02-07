@@ -98,7 +98,7 @@ export function BookmarkNodeView({
     return (
       <Box my={2}>
         <Script src={iframelyWidgetJs} onReady={onLoadScript} />
-        <BlockAligner onDelete={deleteNode}>
+        <BlockAligner readOnly={readOnly} onDelete={deleteNode}>
           <div dangerouslySetInnerHTML={{ __html: html }} />
         </BlockAligner>
       </Box>
@@ -107,7 +107,7 @@ export function BookmarkNodeView({
     const title = data.meta.title ?? new URL(data.meta.canonical).hostname;
 
     return (
-      <BlockAligner onDelete={deleteNode}>
+      <BlockAligner readOnly={readOnly} onDelete={deleteNode}>
         <Card variant='outlined'>
           <CardActionArea
             component={Link}

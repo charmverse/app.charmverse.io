@@ -34,6 +34,7 @@ const schema = yup.object({
     .trim()
     .min(3, 'Domain must be at least 3 characters')
     .matches(/^[^!?@#$%^&*+=<>(){}.'"\\[\]|~/]*$/, 'The symbols you entered are not allowed')
+    .matches(/^\S*$/, 'Space is not allowed')
 });
 
 type FormValues = yup.InferType<typeof schema>;
