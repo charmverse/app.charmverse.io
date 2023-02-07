@@ -221,7 +221,7 @@ export function PostPage({
     <ScrollableWindow>
       <Stack flexDirection='row'>
         <Container top={50}>
-          <Box minHeight={300}>
+          <Box minHeight={300} data-test='post-charmeditor'>
             <CharmEditor
               pageType='post'
               autoFocus={false}
