@@ -22,12 +22,11 @@ export class EditorPage {
       throw new Error('Page ID is not set');
     }
 
-    return this.page.locator(`id=${this.pageId} >> div`).first();
+    return this.page.locator('div[contenteditable]');
   }
 
   async isEditable() {
     const contentEditable = await this.editorContainer.getAttribute('contenteditable');
-
     return contentEditable === 'true';
   }
 
