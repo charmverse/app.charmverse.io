@@ -7,13 +7,14 @@ import Button from 'components/common/Button';
 type TemplateOptionProps = {
   icon?: ReactNode;
   label: string;
-  onSelect: () => void;
+  onClick: () => void;
+  'data-test'?: string;
 };
 
-export function TemplateOption({ icon, label, onSelect }: TemplateOptionProps) {
+export function TemplateOption({ icon, label, ...props }: TemplateOptionProps) {
   return (
     <Button
-      onClick={onSelect}
+      {...props}
       color='secondary'
       variant='outlined'
       sx={{ justifyContent: 'space-between', py: 2 }}

@@ -1,7 +1,6 @@
 import DriveFolderUploadIcon from '@mui/icons-material/DriveFolderUpload';
 import { Divider, Typography } from '@mui/material';
 import Grid from '@mui/material/Grid';
-import { AiOutlineFileMarkdown } from 'react-icons/ai';
 import { MdOutlineBuild } from 'react-icons/md';
 import { SiNotion } from 'react-icons/si';
 import { SlBadge } from 'react-icons/sl';
@@ -23,8 +22,9 @@ export function SelectNewSpaceTemplate({ onSelect }: SelectNewSpaceTemplateProps
     <Grid container spacing={2} flexDirection='column'>
       <Grid item>
         <TemplateOption
-          onSelect={() => onSelect('default')}
+          onClick={() => onSelect('default')}
           label='Create my own'
+          data-test='space-template-default'
           icon={<MdOutlineBuild color='var(--secondary-text)' size={fontSize} />}
         />
       </Grid>
@@ -38,7 +38,7 @@ export function SelectNewSpaceTemplate({ onSelect }: SelectNewSpaceTemplateProps
         <Grid item key={template}>
           <TemplateOption
             data-test={`space-template-${template}`}
-            onSelect={() => onSelect(template)}
+            onClick={() => onSelect(template)}
             label={spaceContentTemplates[template]}
             icon={<SlBadge color='var(--secondary-text)' size={fontSize} />}
           />
@@ -47,7 +47,8 @@ export function SelectNewSpaceTemplate({ onSelect }: SelectNewSpaceTemplateProps
       <Grid item>
         <Divider flexItem sx={{ mb: 2 }} />
         <TemplateOption
-          onSelect={() => onSelect('importNotion')}
+          data-test='space-template-importNotion'
+          onClick={() => onSelect('importNotion')}
           label='Import from Notion'
           icon={<SiNotion color='var(--secondary-text)' size={fontSize} />}
         />
@@ -55,7 +56,8 @@ export function SelectNewSpaceTemplate({ onSelect }: SelectNewSpaceTemplateProps
 
       <Grid item>
         <TemplateOption
-          onSelect={() => onSelect('importMarkdown')}
+          data-test='space-template-importMarkdown'
+          onClick={() => onSelect('importMarkdown')}
           label='Import from Markdown'
           icon={<DriveFolderUploadIcon color='secondary' sx={{ fontSize }} />}
         />
