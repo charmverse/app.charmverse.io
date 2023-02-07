@@ -3,7 +3,7 @@ import styled from '@emotion/styled';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import EditIcon from '@mui/icons-material/Edit';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import { Box, IconButton, ListItemIcon, ListItemText, Menu, MenuItem, Stack, Typography } from '@mui/material';
+import { Box, IconButton, ListItemIcon, ListItemText, Menu, MenuItem, Stack, Tooltip, Typography } from '@mui/material';
 import { bindMenu, usePopupState } from 'material-ui-popup-state/hooks';
 import { useState } from 'react';
 import type { KeyedMutator } from 'swr';
@@ -143,6 +143,9 @@ export function PostComment({ comment, setPostComments, permissions }: Props) {
       comments?.map((_comment) => (_comment.id === comment.id ? { ..._comment, deletedAt: new Date() } : _comment))
     );
   }
+
+  const isCommentAuthor = comment.createdBy === user?.id;
+  const canDeleteComment = permissions?.delete_comments || isCommentAuthor;
 
   return (
     <Stack my={1} position='relative'>
@@ -295,22 +298,32 @@ export function PostComment({ comment, setPostComments, permissions }: Props) {
         transformOrigin={{ vertical: 'top', horizontal: 'right' }}
         onClick={(e) => e.stopPropagation()}
       >
-        {comment.createdBy === user?.id && (
-          <MenuItem data-test={`edit-comment-${comment.id}`} onClick={onClickEditComment}>
-            <ListItemIcon>
-              <EditIcon />
-            </ListItemIcon>
-            <ListItemText>Edit comment</ListItemText>
-          </MenuItem>
-        )}
-        {(comment.createdBy === user?.id || permissions?.delete_comments) && (
-          <MenuItem data-test={`delete-comment-${comment.id}`} onClick={onClickDeleteComment}>
-            <ListItemIcon>
-              <DeleteOutlinedIcon />
-            </ListItemIcon>
-            <ListItemText>Delete comment</ListItemText>
-          </MenuItem>
-        )}
+        <Tooltip title={!isCommentAuthor ? "You cannot edit another user's comment" : ''}>
+          <div>
+            <MenuItem disabled={!isCommentAuthor} data-test={`edit-comment-${comment.id}`} onClick={onClickEditComment}>
+              <ListItemIcon>
+                <EditIcon />
+              </ListItemIcon>
+              <ListItemText>Edit comment</ListItemText>
+            </MenuItem>
+          </div>
+        </Tooltip>
+
+        {/**  This tooltip shouldn't ever be needed since only moderators and comment authors should be able see this context menu, but adding for future proofing */}
+        <Tooltip title={!canDeleteComment ? "You don't have the permissions to delete this comment" : ''}>
+          <div>
+            <MenuItem
+              disabled={!canDeleteComment}
+              data-test={`delete-comment-${comment.id}`}
+              onClick={onClickDeleteComment}
+            >
+              <ListItemIcon>
+                <DeleteOutlinedIcon />
+              </ListItemIcon>
+              <ListItemText>Delete comment</ListItemText>
+            </MenuItem>
+          </div>
+        </Tooltip>
       </Menu>
     </Stack>
   );
