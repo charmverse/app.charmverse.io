@@ -5,6 +5,7 @@ import type { ReactNode } from 'react';
 
 import Link from 'components/common/Link';
 import { PageIcon } from 'components/common/PageLayout/components/PageIcon';
+import { useMemberProfile } from 'components/profile/hooks/useMemberProfile';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMembers } from 'hooks/useMembers';
 import { usePages } from 'hooks/usePages';
@@ -30,6 +31,7 @@ const StyledTypography = styled(Typography)`
 `;
 
 export default function Mention({ node }: NodeViewProps) {
+  const { showMemberProfile } = useMemberProfile();
   const attrs = node.attrs as MentionSpecSchemaAttrs;
   const { members } = useMembers();
   const { pages } = usePages();
@@ -48,8 +50,14 @@ export default function Mention({ node }: NodeViewProps) {
     );
   } else if (attrs.type === 'user') {
     value = (
-      <MentionContainer color='secondary' href={`/u/${member?.path || member?.id}`}>
-        <Typography component='span' fontWeight={600}>
+      <MentionContainer color='secondary'>
+        <Typography
+          onClick={() => member?.id && showMemberProfile(member.id)}
+          component='span'
+          color='secondary'
+          sx={{ cursor: 'pointer' }}
+          fontWeight={600}
+        >
           <span style={{ opacity: 0.5 }}>@</span>
           {member?.username}
         </Typography>
