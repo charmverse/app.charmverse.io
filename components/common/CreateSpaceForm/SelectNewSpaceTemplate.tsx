@@ -29,7 +29,7 @@ export function SelectNewSpaceTemplate({ onSelect }: SelectNewSpaceTemplateProps
         />
       </Grid>
       <Grid item>
-        <Typography variant='caption' textTransform='uppercase' fontWeight='bold'>
+        <Typography variant='caption' color='secondary' textTransform='uppercase' fontWeight='bold'>
           Start from a template
         </Typography>
       </Grid>
