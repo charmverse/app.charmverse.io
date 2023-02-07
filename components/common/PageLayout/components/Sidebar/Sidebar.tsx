@@ -292,6 +292,7 @@ export default function Sidebar({ closeSidebar, favorites, navAction }: SidebarP
                 onTouchStart={(e) => handleModalTouchStart(e, `${space.name}-space`)}
                 icon={<SettingsIcon color='secondary' fontSize='small' />}
                 label='Settings'
+                data-test='sidebar-settings'
               />
               <SidebarLink
                 active={false}
