@@ -63,7 +63,7 @@ runs:
       id: changed_file_list
       shell: bash
       run: |
-        echo "changed_files=$(git diff main --name-only | egrep '\.([tj]s$|scss$)')" >> $GITHUB_OUTPUT
+        echo "changed_files=$(git diff main -- --name-only | egrep '\.([tj]s$|scss$)')" >> $GITHUB_OUTPUT
 
     - name: Cache build
       id: cache_build
