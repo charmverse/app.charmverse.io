@@ -213,9 +213,7 @@ describe('createWorkspace', () => {
   });
 
   it('should always include the getting started page when creating a space', async () => {
-    const spaceCreateOptions = typedKeys(spaceCreateTemplates);
-
-    for (const options of spaceCreateOptions) {
+    for (const options of spaceCreateTemplates) {
       const newSpace = await createWorkspace({
         userId: user.id,
         createSpaceOption: options,
