@@ -64,7 +64,6 @@ export const AppBar = styled(MuiAppBar, {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen
     })};
-
   ${({ open, sidebarWidth, theme }) =>
     open
       ? `
@@ -118,7 +117,6 @@ const DraggableHandle = styled.div<{ isActive?: boolean; disabled?: boolean }>`
   border-right: 1px solid ${({ theme }) => theme.palette.divider};
   transition: all 0.2s ease-in-out;
   background: transparent;
-
   ${({ disabled, theme }) =>
     !disabled &&
     `&:hover {
@@ -126,7 +124,6 @@ const DraggableHandle = styled.div<{ isActive?: boolean; disabled?: boolean }>`
         }
       cursor: col-resize;
     `}
-
   ${({ isActive, theme }) => (isActive ? `border-right: 3px solid ${theme.palette.primary.main}` : '')}
 `;
 

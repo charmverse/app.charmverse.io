@@ -58,24 +58,20 @@ const SidebarContainer = styled.div`
   display: flex;
   background-color: ${({ theme }) => theme.palette.sidebar.background};
   min-height: 100vh;
-
   ${({ theme }) => `
     ${theme.breakpoints.up('md')} {
       height: 100%;
     }
 `}
-
   // disable hover UX on ios which converts first click to a hover event
   @media (pointer: fine) {
     .add-a-page {
       opacity: 0;
       transition: opacity 0.2s ease-in-out;
     }
-
     .sidebar-header .MuiIconButton-root {
       opacity: 0;
     }
-
     &:hover {
       .sidebar-header {
         .MuiTypography-root {
