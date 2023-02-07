@@ -25,10 +25,6 @@ beforeAll(async () => {
 
 describe('GET /api/forums/posts', () => {
   it('should return a 200 for anonymous users', async () => {
-    const postCategory = await generatePostCategory({
-      spaceId: space.id
-    });
-
     const query: ListForumPostsRequest = {
       spaceId: space.id
     };
