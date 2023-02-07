@@ -183,9 +183,11 @@ export default function Header({ open, openSidebar }: HeaderProps) {
   const isForumPost = router.route === '/[domain]/forum/post/[pagePath]';
   const pagePath = isForumPost ? (router.query.pagePath as string) : null;
 
-  const postPermissions = isForumPost
-    ? usePostPermissions({ postIdOrPath: pagePath as string, spaceDomain: router.query.domain as string })
-    : null;
+  const postPermissions = usePostPermissions({
+    // Post permissions hook will not make an API call if post ID is null. Since we can't conditionally render hooks, we pass null as the post ID. This is the reason for the 'null as any' statement
+    postIdOrPath: isForumPost ? (pagePath as string) : (null as any),
+    spaceDomain: router.query.domain as string
+  });
 
   const { data: forumPost = null } = useSWR(currentSpace && pagePath ? `post-${pagePath}` : null, () =>
     charmClient.forum.getForumPost(pagePath!)
