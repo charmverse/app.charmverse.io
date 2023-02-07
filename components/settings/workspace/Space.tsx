@@ -28,7 +28,12 @@ import isSpaceAdmin from 'lib/users/isSpaceAdmin';
 const schema = yup.object({
   name: yup.string().ensure().trim().min(3, 'Name must be at least 3 characters').required('Name is required'),
   spaceImage: yup.string().nullable(true),
-  domain: yup.string()
+  domain: yup
+    .string()
+    .ensure()
+    .trim()
+    .min(3, 'Domain must be at least 3 characters')
+    .matches(/^[^!?@#$%^&*+=<>(){}.'"\\[\]|~/]*$/, 'The symbols you entered are not allowed')
 });
 
 type FormValues = yup.InferType<typeof schema>;

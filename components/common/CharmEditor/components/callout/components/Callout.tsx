@@ -17,6 +17,10 @@ const StyledCallout = styled.div`
   border-radius: ${({ theme }) => theme.spacing(0.5)};
   display: flex;
   gap: ${({ theme }) => theme.spacing(1)};
+
+  ${({ theme }) => theme.breakpoints.down('sm')} {
+    flex-wrap: wrap;
+  }
 `;
 
 const CalloutEmoji = styled.div`
