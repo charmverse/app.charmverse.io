@@ -1,4 +1,5 @@
 import { expect, test as base } from '@playwright/test';
+import type { Post, PostComment, Space, User } from '@prisma/client';
 
 import { prisma } from 'db';
 import { upsertPostCategoryPermission } from 'lib/permissions/forum/upsertPostCategoryPermission';
@@ -20,145 +21,219 @@ const test = base.extend<Fixtures>({
   forumPostPage: ({ page }, use) => use(new ForumPostPage(page))
 });
 
-test('view forum post content - navigate to a forum post and view the content and comments', async ({
-  page,
-  forumHomePage,
-  forumPostPage
-}) => {
-  const { space } = await createUserAndSpace({
-    browserPage: page,
-    permissionConfigurationMode: 'collaborative'
-  });
+let memberUser: User;
+let authorUser: User;
+let space: Space;
+let post: Post;
+let memberComment: PostComment;
+let authorComment: PostComment;
 
-  const memberUser = await createUser({
-    browserPage: page,
-    address: randomETHWalletAddress()
-  });
-
-  const authorUser = await createUser({
-    browserPage: page,
-    address: randomETHWalletAddress()
-  });
-
-  await generateSpaceRole({
-    spaceId: space.id,
-    userId: memberUser.id,
-    isAdmin: false
-  });
-
-  await generateSpaceRole({
-    spaceId: space.id,
-    userId: authorUser.id,
-    isAdmin: false
-  });
-
-  const categoryName = 'Example category';
-
-  const category = await generatePostCategory({
-    spaceId: space.id,
-    name: categoryName
-  });
-
-  await upsertPostCategoryPermission({
-    assignee: { group: 'space', id: space.id },
-    permissionLevel: 'full_access',
-    postCategoryId: category.id
-  });
-
-  const postName = 'Example post';
-
-  const post = await generateForumPost({
-    spaceId: space.id,
-    userId: memberUser.id,
-    categoryId: category.id,
-    title: postName
-  });
-
-  const topLevelContentText = 'This is a great idea!';
-  const childContentText = 'This is a great idea!';
-
-  const topLevelComment = await prisma.postComment.create({
-    data: {
-      user: {
-        connect: { id: authorUser.id }
-      },
-      post: { connect: { id: post.id } },
-      contentText: topLevelContentText,
-      content: {
-        type: 'doc',
-        content: [
-          {
-            text: topLevelContentText,
-            type: 'text'
-          }
-        ]
-      }
-    }
-  });
-
-  const childComment = await prisma.postComment.create({
-    data: {
-      user: {
-        connect: { id: authorUser.id }
-      },
-      post: { connect: { id: post.id } },
-      contentText: childContentText,
-      content: {
-        type: 'doc',
-        content: [
-          {
-            text: childContentText,
-            type: 'text'
-          }
-        ]
-      }
-    }
-  });
-
-  await login({
+test.describe.serial('Comment on forum posts', () => {
+  test('view forum post content - navigate to a forum post and view the content and comments', async ({
     page,
-    userId: memberUser.id
+    forumHomePage,
+    forumPostPage
+  }) => {
+    const generated = await createUserAndSpace({
+      browserPage: page,
+      permissionConfigurationMode: 'collaborative'
+    });
+
+    space = generated.space;
+
+    memberUser = await createUser({
+      browserPage: page,
+      address: randomETHWalletAddress()
+    });
+
+    authorUser = await createUser({
+      browserPage: page,
+      address: randomETHWalletAddress()
+    });
+
+    await generateSpaceRole({
+      spaceId: space.id,
+      userId: memberUser.id,
+      isAdmin: false
+    });
+
+    await generateSpaceRole({
+      spaceId: space.id,
+      userId: authorUser.id,
+      isAdmin: false
+    });
+
+    const categoryName = 'Example category';
+
+    const category = await generatePostCategory({
+      spaceId: space.id,
+      name: categoryName
+    });
+
+    await upsertPostCategoryPermission({
+      assignee: { group: 'space', id: space.id },
+      permissionLevel: 'full_access',
+      postCategoryId: category.id
+    });
+
+    const postName = 'Example post';
+
+    post = await generateForumPost({
+      spaceId: space.id,
+      userId: authorUser.id,
+      categoryId: category.id,
+      title: postName
+    });
+
+    const topLevelContentText = 'This is a great idea!';
+    const childContentText = 'This is a great idea!';
+
+    memberComment = await prisma.postComment.create({
+      data: {
+        user: {
+          connect: { id: memberUser.id }
+        },
+        post: { connect: { id: post.id } },
+        contentText: topLevelContentText,
+        content: {
+          type: 'doc',
+          content: [
+            {
+              text: topLevelContentText,
+              type: 'text'
+            }
+          ]
+        }
+      }
+    });
+
+    authorComment = await prisma.postComment.create({
+      data: {
+        user: {
+          connect: { id: authorUser.id }
+        },
+        post: { connect: { id: post.id } },
+        contentText: childContentText,
+        content: {
+          type: 'doc',
+          content: [
+            {
+              text: childContentText,
+              type: 'text'
+            }
+          ]
+        }
+      }
+    });
+
+    await login({
+      page,
+      userId: memberUser.id
+    });
+
+    // Start the navigation steps
+
+    await forumHomePage.goToForumHome(space.domain);
+
+    await forumHomePage.page.waitForTimeout(2000);
+
+    await forumHomePage.page.press('data-test=member-onboarding-form', 'Escape');
+
+    const postCard = forumHomePage.getPostCardLocator(post.id);
+
+    await expect(postCard).toBeVisible();
+
+    await postCard.click();
+
+    const openAsPage = forumHomePage.getOpenPostAsPageLocator();
+
+    await expect(openAsPage).toBeVisible();
+
+    await openAsPage.click();
+
+    await forumPostPage.waitForPostLoad({ domain: space.domain, path: post.path });
+
+    const postTitle = forumPostPage.getPostPageTitleLocator();
+
+    const titleInput = postTitle.getByText(post.title);
+
+    await expect(titleInput).toBeVisible();
+
+    // Check existing comments show. We can't target CharmEditor yet, so we just get all text contents of the HTML
+    const topLevelCommentLocator = forumPostPage.getCommentLocator(memberComment.id);
+
+    const commentBody1 = topLevelCommentLocator.getByText(topLevelContentText);
+    await expect(commentBody1).toBeVisible();
+
+    const childLevelCommentLocator = forumPostPage.getCommentLocator(authorComment.id);
+    const commentBody2 = childLevelCommentLocator.getByText(childContentText);
+    await expect(commentBody2).toBeVisible();
+
+    // The button is usually disabled as the user hasn't typed anything yet
+    await expect(forumPostPage.newTopLevelCommentInputLocator).toBeVisible();
+    await expect(forumPostPage.newTopLevelCommentSubmitButtonLocator).toBeVisible();
   });
 
-  // Start the navigation steps
+  test('author of a comment can edit their own post', async ({ forumPostPage, page }) => {
+    await login({
+      page,
+      userId: memberUser.id
+    });
 
-  await forumHomePage.goToForumHome(space.domain);
+    await forumPostPage.goToPostPage({
+      domain: space.domain,
+      path: post.path
+    });
 
-  await forumHomePage.page.waitForTimeout(2000);
+    await forumPostPage.waitForPostLoad({ domain: space.domain, path: post.path });
+    const isCommentEditable = await forumPostPage.isCommentEditable(memberComment.id);
 
-  await forumHomePage.page.press('data-test=member-onboarding-form', 'Escape');
+    expect(isCommentEditable).toBe(false);
 
-  const postCard = forumHomePage.getPostCardLocator(post.id);
+    // Click on edit comment
+    const commentContextMenu = forumPostPage.getPostCommentMenuLocator(memberComment.id);
 
-  await expect(postCard).toBeVisible();
+    await expect(commentContextMenu).toBeVisible();
 
-  await postCard.click();
+    await commentContextMenu.click();
 
-  const openAsPage = forumHomePage.getOpenPostAsPageLocator();
+    // Make sure user has access to both options
+    const editOption = forumPostPage.getPostEditCommentLocator(memberComment.id);
+    await expect(editOption).toBeVisible();
+    const deleteOption = forumPostPage.getPostDeleteCommentLocator(memberComment.id);
+    await expect(deleteOption).toBeVisible();
 
-  await expect(openAsPage).toBeVisible();
+    await editOption.click();
+    const isCommentEditableAfterClick = await forumPostPage.isCommentEditable(memberComment.id);
 
-  await openAsPage.click();
+    expect(isCommentEditableAfterClick).toBe(true);
 
-  await forumPostPage.waitForPostLoad({ domain: space.domain, path: post.path });
+    const saveButton = forumPostPage.getPostSaveCommentButtonLocator(memberComment.id);
 
-  const postTitle = forumPostPage.getPostPageTitleLocator();
+    await expect(saveButton).toBeVisible();
 
-  const titleInput = postTitle.getByText(post.title);
+    const isButtonDisabled = await saveButton.getAttribute('disabled');
+    await expect(isButtonDisabled).not.toBe('true');
+  });
 
-  await expect(titleInput).toBeVisible();
+  test('another space user cannot edit a comment they did not write', async ({ forumPostPage, page }) => {
+    await login({
+      page,
+      userId: memberUser.id
+    });
 
-  // Check existing comments show. We can't target CharmEditor yet, so we just get all text contents of the HTML
-  const topLevelCommentLocator = forumPostPage.getCommentLocator(topLevelComment.id);
+    await forumPostPage.goToPostPage({
+      domain: space.domain,
+      path: post.path
+    });
 
-  const commentBody1 = topLevelCommentLocator.getByText(topLevelContentText);
-  await expect(commentBody1).toBeVisible();
+    await forumPostPage.waitForPostLoad({ domain: space.domain, path: post.path });
+    const isCommentEditable = await forumPostPage.isCommentEditable(memberComment.id);
 
-  const childLevelCommentLocator = forumPostPage.getCommentLocator(childComment.id);
-  const commentBody2 = childLevelCommentLocator.getByText(childContentText);
-  await expect(commentBody2).toBeVisible();
+    expect(isCommentEditable).toBe(false);
 
-  // The button is usually disabled as the user hasn't typed anything yet
-  await expect(forumPostPage.newTopLevelCommentInputLocator).toBeVisible();
-  await expect(forumPostPage.newTopLevelCommentSubmitButtonLocator).toBeVisible();
+    // Click on edit comment
+    const commentContextMenu = forumPostPage.getPostCommentMenuLocator(authorComment.id);
+    await expect(commentContextMenu).not.toBeVisible();
+  });
 });
