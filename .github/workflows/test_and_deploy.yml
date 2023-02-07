@@ -24,9 +24,10 @@ jobs:
 
       - name: Build app
         uses: ./.github/actions/build
+        env: 
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
         with:
           NEXT_PUBLIC_APP_ENV: 'test'
-          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
 
   test:
     name: Tests
@@ -47,6 +48,8 @@ jobs:
 
       - name: Restore app from cache
         uses: ./.github/actions/build
+        env: 
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
         with:
           NEXT_PUBLIC_APP_ENV: 'test'
 
@@ -96,6 +99,8 @@ jobs:
 
       - name: Restore app from cache
         uses: ./.github/actions/build
+        env: 
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
         with:
           NEXT_PUBLIC_APP_ENV: 'test'
 
