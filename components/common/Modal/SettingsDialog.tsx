@@ -115,7 +115,12 @@ export default function SettingsModal() {
       open={open}
     >
       <Box display='flex' flexDirection='row' flex='1' overflow='hidden'>
-        <Slide direction='left' in={isMobile ? open && mobileView === 'sidebar' : true} appear={isMobile} unmountOnExit>
+        <Slide
+          direction='right'
+          in={isMobile ? open && mobileView === 'sidebar' : true}
+          appear={isMobile}
+          unmountOnExit
+        >
           <Box
             component='aside'
             maxWidth={{ xs: '100%', md: 350 }}
