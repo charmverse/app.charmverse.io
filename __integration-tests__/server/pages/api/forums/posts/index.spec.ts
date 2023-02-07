@@ -33,7 +33,7 @@ describe('GET /api/forums/posts', () => {
       spaceId: space.id
     };
 
-    await request(baseUrl).get(`/api/forums/posts`).send(query).expect(200);
+    await request(baseUrl).get(`/api/forums/posts`).query(query).expect(200);
   });
 });
 
