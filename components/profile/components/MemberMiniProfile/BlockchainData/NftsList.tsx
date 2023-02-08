@@ -86,6 +86,7 @@ export function NftsList({ memberId, readOnly = false }: Props) {
             ) : null}
             {showingNftGallery && (
               <NftAvatarGalleryPopup
+                disableAutoSelectAvatarNft
                 isVisible
                 onClose={() => {
                   setIsShowingNftGallery(false);
