@@ -28,6 +28,7 @@ import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/sto
 import { getView } from 'components/common/BoardEditor/focalboard/src/store/views';
 import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useMembers } from 'hooks/useMembers';
 import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
@@ -38,7 +39,6 @@ import type { BoardView } from 'lib/focalboard/boardView';
 import { createCard } from 'lib/focalboard/card';
 import log from 'lib/log';
 import type { IPagePermissionFlags } from 'lib/permissions/pages';
-import { humanFriendlyDate } from 'lib/utilities/dates';
 
 import {
   createCardFieldProperties,
@@ -65,6 +65,7 @@ export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: 
   const { members } = useMembers();
   const { user } = useUser();
   const currentSpace = useCurrentSpace();
+  const { formatDate } = useDateFormatter();
 
   const activeBoardId = view?.fields.sourceData?.boardId ?? view?.fields.linkedSourceId ?? view?.rootId;
   const board = boards.find((b) => b.id === activeBoardId);
@@ -321,7 +322,7 @@ export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: 
             }}
           >
             <Typography variant='subtitle2'>Last edited by {lastUpdatedBy.username}</Typography>
-            <Typography variant='subtitle2'>Last edited at {humanFriendlyDate(board.updatedAt)}</Typography>
+            <Typography variant='subtitle2'>Last edited at {formatDate(new Date(board.updatedAt))}</Typography>
           </Stack>
         </>
       )}

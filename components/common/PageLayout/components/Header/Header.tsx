@@ -27,23 +27,21 @@ import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
 import { useMemo, useRef, useState } from 'react';
-import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
 import { undoEventName } from 'components/common/CharmEditor/utils';
 import { usePostByPath } from 'components/forum/hooks/usePostByPath';
-import { usePostPermissions } from 'components/forum/hooks/usePostPermissions';
 import { useColorMode } from 'context/darkMode';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
+import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useMembers } from 'hooks/useMembers';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useToggleFavorite } from 'hooks/useToggleFavorite';
 import { useUser } from 'hooks/useUser';
-import { humanFriendlyDate } from 'lib/utilities/dates';
 
 import DocumentHistory from '../DocumentHistory';
 import NotificationsBadge from '../Sidebar/NotificationsBadge';
@@ -149,6 +147,8 @@ export function ExportMarkdownMenuItem({ disabled = false, onClick }: { disabled
 }
 
 export function Metadata({ creator, lastUpdatedAt }: { creator: string; lastUpdatedAt: Date }) {
+  const { formatDateTime } = useDateFormatter();
+
   return (
     <Stack
       sx={{
@@ -157,7 +157,7 @@ export function Metadata({ creator, lastUpdatedAt }: { creator: string; lastUpda
       }}
     >
       <Typography variant='subtitle2'>Last edited by {creator}</Typography>
-      <Typography variant='subtitle2'>Last edited at {humanFriendlyDate(lastUpdatedAt)}</Typography>
+      <Typography variant='subtitle2'>Last edited at {formatDateTime(lastUpdatedAt)}</Typography>
     </Stack>
   );
 }
@@ -166,8 +166,6 @@ export default function Header({ open, openSidebar }: HeaderProps) {
   const router = useRouter();
   const colorMode = useColorMode();
   const { pages, updatePage, getPagePermissions, deletePage } = usePages();
-  const currentSpace = useCurrentSpace();
-
   const { user } = useUser();
   const theme = useTheme();
   const [pageMenuOpen, setPageMenuOpen] = useState(false);

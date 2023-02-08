@@ -8,9 +8,9 @@ import type { PageType } from '@prisma/client';
 import { useRouter } from 'next/router';
 import type { Dispatch, ReactNode, SetStateAction } from 'react';
 
+import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useMembers } from 'hooks/useMembers';
 import { useSnackbar } from 'hooks/useSnackbar';
-import { humanFriendlyDate } from 'lib/utilities/dates';
 
 import { Utils } from './BoardEditor/focalboard/src/utils';
 
@@ -36,6 +36,7 @@ export function PageActionsMenu({
   const { showMessage } = useSnackbar();
   const charmversePage = members.find((member) => member.id === page.createdBy);
   const open = Boolean(anchorEl);
+  const { formatDateTime } = useDateFormatter();
 
   function getPageLink() {
     let link = window.location.href;
@@ -109,7 +110,7 @@ export function PageActionsMenu({
             Last edited by {charmversePage.username}
           </Typography>
           <Typography variant='caption' color='secondary'>
-            Last edited at {humanFriendlyDate(page.updatedAt)}
+            Last edited at {formatDateTime(page.updatedAt)}
           </Typography>
         </Stack>
       )}
