@@ -57,6 +57,12 @@ test.describe.serial('Add a new space from sidebar and load it', async () => {
     const createdSpace = (await response.json()) as Space;
     await page.waitForURL(`**/${createdSpace.domain}`);
 
+    const memberEmailInput = await page.locator('data-test=member-email-input >> input');
+    await memberEmailInput.fill('john.doe@gmail.com');
+
+    const memberEmailNextButton = await page.locator('data-test=member-email-next');
+    await memberEmailNextButton.click();
+
     // Await new onboarding form popup so we can close it and click on new space
     let closePropertiesModalBtn = await page.locator('data-test=close-member-properties-modal');
     await expect(closePropertiesModalBtn).toBeVisible();
@@ -78,6 +84,10 @@ test.describe.serial('Add a new space from sidebar and load it', async () => {
     await nameInput.fill(uniqueDomainName2);
     await page.locator('data-test=create-workspace').click();
     await page.waitForURL(`**/${uniqueDomainName2}`);
+
+    // Since the user has filled their email it should not show member-email-modal again
+    const memberEmailModal = await page.locator('data-test=member-email-modal');
+    await expect(memberEmailModal).not.toBeVisible();
 
     // Close the modal again
     closePropertiesModalBtn = await page.locator('data-test=close-member-properties-modal');

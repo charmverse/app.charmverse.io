@@ -21,7 +21,6 @@ export function MemberEmailForm({ onNext }: { onNext: VoidFunction }) {
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
   const { user, setUser, isLoaded } = useUser();
-  const [memberEmail, setMemberEmail] = useState('');
 
   const {
     register,
@@ -29,7 +28,7 @@ export function MemberEmailForm({ onNext }: { onNext: VoidFunction }) {
     formState: { errors }
   } = useForm<FormValues>({
     defaultValues: {
-      email: memberEmail || ''
+      email: ''
     },
     resolver: yupResolver(schema)
   });
@@ -47,7 +46,7 @@ export function MemberEmailForm({ onNext }: { onNext: VoidFunction }) {
   }
 
   return (
-    <Dialog open fullWidth fullScreen={fullScreen}>
+    <Dialog data-test='member-email-modal' open fullWidth fullScreen={fullScreen}>
       {!isLoaded && !user ? (
         <DialogContent>
           <LoadingComponent isLoading />
@@ -73,6 +72,7 @@ export function MemberEmailForm({ onNext }: { onNext: VoidFunction }) {
                 helperText={errors.email?.message}
                 placeholder='me@gmail.com'
                 sx={{ mb: 2 }}
+                data-test='member-email-input'
               />
               <DialogActions
                 sx={{
@@ -83,7 +83,7 @@ export function MemberEmailForm({ onNext }: { onNext: VoidFunction }) {
                 <Button variant='outlined' color='secondary' onClick={onNext}>
                   Skip
                 </Button>
-                <Button type='submit' color='primary'>
+                <Button data-test='member-email-next' type='submit' color='primary'>
                   Next
                 </Button>
               </DialogActions>
