@@ -278,7 +278,7 @@ export default function Sidebar({ closeSidebar, favorites, navAction }: SidebarP
                 label='Invites'
               />
               <SidebarBox
-                onClick={() => handleModalClick('')}
+                onClick={() => handleModalClick(isMobile ? '' : `${space.name}-space`)}
                 icon={<SettingsIcon color='secondary' fontSize='small' />}
                 label='Settings'
                 data-test='sidebar-settings'

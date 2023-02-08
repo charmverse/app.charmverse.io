@@ -60,6 +60,10 @@ export default function SpaceSettings({ space }: { space: Space }) {
     resolver: yupResolver(schema)
   });
 
+  useEffect(() => {
+    charmClient.track.trackAction('page_view', { spaceId: space?.id, type: 'settings' });
+  }, []);
+
   // set default values when space is set
   useEffect(() => {
     if (space) {

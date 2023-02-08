@@ -7,8 +7,9 @@ import BountyIcon from '@mui/icons-material/RequestPageOutlined';
 import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
 import { Badge, Box, Tab, Tabs, Typography } from '@mui/material';
 import { useRouter } from 'next/router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
+import charmClient from 'charmClient';
 import Legend from 'components/settings/Legend';
 import { useUser } from 'hooks/useUser';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
@@ -62,6 +63,10 @@ export default function TasksPage() {
   const [currentTaskType, setCurrentTaskType] = useState<TaskType>((router.query?.task ?? 'multisig') as TaskType);
   const { error, mutate: mutateTasks, tasks, gnosisTasks, gnosisTasksServerError, mutateGnosisTasks } = useTasks();
   const theme = useTheme();
+
+  useEffect(() => {
+    charmClient.track.trackAction('page_view', { type: 'nexus' });
+  }, []);
 
   const userNotificationState = user?.notificationState;
   const hasSnoozedNotifications =
