@@ -73,7 +73,7 @@ runs:
       id: formatting_diffset
       shell: bash
       run: |
-        echo ${{ hashFiles(toJSON(steps.diffset.outputs.diff)) }}
+        echo ${{ hashFiles(toJSON(steps.diffset.outputs.diff.[])) }}
       
     # - name: Cache build
     #   id: cache_build
