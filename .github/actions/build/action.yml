@@ -60,6 +60,7 @@ runs:
     #   run: echo "$GITHUB_CONTEXT"
 
     - uses: technote-space/get-diff-action@v6
+      name: Get diff
       id: diffset
       with:
         PATTERNS: |
