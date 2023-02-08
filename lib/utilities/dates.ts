@@ -118,7 +118,11 @@ export function getTimezonesWithOffset() {
   });
 }
 
-export function getFormattedDateTime(dateInput: Date | string, options?: Intl.DateTimeFormatOptions, locale?: string) {
+export function getFormattedDateTime(
+  dateInput: Date | string,
+  options?: Intl.DateTimeFormatOptions,
+  locale?: string | null
+) {
   const date = new Date(dateInput);
   const isLocaleSupported = toLocaleDateStringSupportsLocales();
   const formatLocale = isLocaleSupported ? locale || 'default' : undefined;
@@ -142,7 +146,7 @@ function toLocaleDateStringSupportsLocales() {
   return false;
 }
 
-export function formatDateTime(dateInput: Date | string, locale?: string) {
+export function formatDateTime(dateInput: Date | string, locale?: string | null) {
   return getFormattedDateTime(
     dateInput,
     {
@@ -153,7 +157,7 @@ export function formatDateTime(dateInput: Date | string, locale?: string) {
   );
 }
 
-export function formatDate(dateInput: Date | string, config?: DateFormatConfig, locale?: string) {
+export function formatDate(dateInput: Date | string, config?: DateFormatConfig, locale?: string | null) {
   // Add year by default if date is not in current year
   const isCurrentYear = new Date().getFullYear() === new Date(dateInput).getFullYear();
 
@@ -164,6 +168,6 @@ export function formatDate(dateInput: Date | string, config?: DateFormatConfig, 
   );
 }
 
-export function formatTime(dateInput: Date | string, locale?: string) {
+export function formatTime(dateInput: Date | string, locale?: string | null) {
   return getFormattedDateTime(dateInput, { timeStyle: 'short' }, locale);
 }
