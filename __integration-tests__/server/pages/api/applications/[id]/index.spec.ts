@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import type { Application, Space, User } from '@prisma/client';
+import type { Application, Space } from '@prisma/client';
 import request from 'supertest';
 
 import type { ApplicationCreationData, ApplicationUpdateData } from 'lib/applications/interfaces';
