@@ -22,7 +22,17 @@ import { NftsList } from './BlockchainData/NftsList';
 import { OrgsList } from './BlockchainData/OrgsList';
 import { PoapsList } from './BlockchainData/PoapsList';
 
-function MemberProfile({ member, onClose }: { member: Member; onClose: VoidFunction }) {
+function MemberProfile({
+  cancelButtonText,
+  title,
+  member,
+  onClose
+}: {
+  cancelButtonText?: string;
+  title?: string;
+  member: Member;
+  onClose: VoidFunction;
+}) {
   const { mutateMembers } = useMembers();
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
@@ -57,7 +67,7 @@ function MemberProfile({ member, onClose }: { member: Member; onClose: VoidFunct
   if (member.id === currentUser.id) {
     return (
       <MemberPropertiesPopup
-        title='Edit your profile'
+        title={title && title.length !== 0 ? title : 'Edit your profile'}
         onClose={() => {
           mutateMembers();
           onClose();
@@ -66,7 +76,7 @@ function MemberProfile({ member, onClose }: { member: Member; onClose: VoidFunct
         memberId={currentUser.id}
         spaceId={currentSpace.id}
         updateMemberPropertyValues={updateSpaceValues}
-        cancelButtonText='Cancel'
+        cancelButtonText={cancelButtonText && cancelButtonText.length !== 0 ? cancelButtonText : 'Cancel'}
         postComponent={
           user && (
             <Stack gap={3}>
@@ -144,7 +154,17 @@ function MemberProfile({ member, onClose }: { member: Member; onClose: VoidFunct
   );
 }
 
-export function MemberMiniProfile({ memberId, onClose }: { memberId: string; onClose: VoidFunction }) {
+export function MemberMiniProfile({
+  memberId,
+  onClose,
+  title,
+  cancelButtonText
+}: {
+  cancelButtonText?: string;
+  title?: string;
+  memberId: string;
+  onClose: VoidFunction;
+}) {
   const { members } = useMembers();
   const member = members.find((_member) => _member.id === memberId);
 
@@ -152,5 +172,5 @@ export function MemberMiniProfile({ memberId, onClose }: { memberId: string; onC
     return null;
   }
 
-  return <MemberProfile member={member} onClose={onClose} />;
+  return <MemberProfile title={title} cancelButtonText={cancelButtonText} member={member} onClose={onClose} />;
 }
