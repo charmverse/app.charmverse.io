@@ -70,6 +70,7 @@ runs:
         SEPARATOR: ','
 
     - name: some debug stuff
+      shell: bash
       run: echo ${{ steps.diffset.outputs.diff }}
       
     - name: Cache build
