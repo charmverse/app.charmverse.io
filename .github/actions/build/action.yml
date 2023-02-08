@@ -73,8 +73,14 @@ runs:
       id: formatting_diffset
       shell: bash
       run: |
-        echo ${{ hashFiles(toJSON(steps.diffset.outputs.diff).[]) }}
-      
+        echo "DIFF_FILES=('pages/api/email-templates/index.ts' 'prisma/migrations/20230207125953_user_preferences/migration.sql' 'prisma/schema.prisma' 'testing/setupDatabase.ts'" >> $GITHUB_OUTPUT
+
+    - name: some debug stuff
+      id: formatting_diffset_test_hash
+      shell: bash
+      run: |
+        echo ${{ hashFiles( steps.formatting_diffset.outputs.DIFF_FILES ) }}
+
     # - name: Cache build
     #   id: cache_build
     #   uses: actions/cache@v3
