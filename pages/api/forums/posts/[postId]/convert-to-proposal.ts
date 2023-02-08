@@ -2,6 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { prisma } from 'db';
+import { updateTrackPageProfile } from 'lib/metrics/mixpanel/updateTrackPageProfile';
 import { ActionNotPermittedError, NotFoundError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import type { PageDetails, PageMeta } from 'lib/pages';
 import { computeSpacePermissions } from 'lib/permissions/spaces';
@@ -56,17 +57,12 @@ async function convertToProposal(req: NextApiRequest, res: NextApiResponse<PageM
     title: post.title
   });
 
-  const updatedPageData = {
-    id: updatedPage.id,
-    spaceId: updatedPage.spaceId,
-    proposalId: updatedPage.proposalId,
-    type: updatedPage.type
-  };
+  updateTrackPageProfile(updatedPage.id);
 
   relay.broadcast(
     {
-      type: 'pages_meta_updated',
-      payload: [updatedPageData]
+      type: 'pages_created',
+      payload: [updatedPage]
     },
     post.spaceId
   );
