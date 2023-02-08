@@ -34,6 +34,10 @@ export class ForumHomePage {
 
   async goToForumHome(domain: string) {
     await this.page.goto(`${baseUrl}/${domain}/forum`);
+    await this.waitForForumHome(domain);
+  }
+
+  async waitForForumHome(domain: string) {
     await this.page.waitForURL(`**/${domain}/forum`);
   }
 

@@ -3,13 +3,20 @@ import type { PostComment } from '@prisma/client';
 import { prisma } from 'db';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 
-export async function deletePostComment({ commentId }: { commentId: string }): Promise<PostComment> {
+export async function deletePostComment({
+  commentId,
+  userId
+}: {
+  commentId: string;
+  userId: string;
+}): Promise<PostComment> {
   const postComment = await prisma.postComment.update({
     where: {
       id: commentId
     },
     data: {
       deletedAt: new Date(),
+      deletedBy: userId,
       content: { type: 'doc', content: [{ type: 'paragraph', content: [] }] },
       contentText: ''
     },

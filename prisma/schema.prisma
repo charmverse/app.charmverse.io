@@ -1058,6 +1058,7 @@ model Post {
   upDownVotes        PostUpDownVote[]
   commentUpDownVotes PostCommentUpDownVote[]
 
+  @@unique([spaceId, path])
   @@index([categoryId])
   @@index([path])
   @@index([spaceId, deletedAt]) // space feed
@@ -1083,6 +1084,7 @@ model PostComment {
   contentText String
   updatedAt   DateTime  @updatedAt
   deletedAt   DateTime?
+  deletedBy   String?
   parentId    String?
 
   postId String                  @db.Uuid

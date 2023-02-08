@@ -15,18 +15,20 @@ beforeAll(async () => {
 });
 
 describe('deletePostComment', () => {
-  it('should mark the comment as deleted and remove its content', async () => {
+  it('should mark the comment as deleted, remove its content and save who deleted the comment', async () => {
     const { comment } = await generatePostWithComment({
       userId: user.id,
       spaceId: space.id
     });
 
     const afterDelete = await deletePostComment({
-      commentId: comment.id
+      commentId: comment.id,
+      userId: user.id
     });
 
     expect(afterDelete.deletedAt).toBeInstanceOf(Date);
     expect(afterDelete.contentText).toBe('');
     expect(afterDelete.content).toStrictEqual({ type: 'doc', content: [{ type: 'paragraph', content: [] }] });
+    expect(afterDelete.deletedBy).toBe(user.id);
   });
 });
