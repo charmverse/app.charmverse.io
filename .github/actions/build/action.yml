@@ -78,6 +78,7 @@ runs:
         DIFF_FILES=$(echo ${{ toJSON(steps.diffset.outputs.diff) }} | jq '.[]')
         echo $DIFF_FILES
         hash_of_files=${{ hashFiles(join('', env.DIFF_FILES)) }}
+        hash_of_files2=${{ hashFiles(join('', $DIFF_FILES)) }}
 
     # - name: some debug stuff
     #   id: formatting_diffset_test_hash
