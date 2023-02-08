@@ -2,10 +2,12 @@ import { Chip, Typography } from '@mui/material';
 import { Stack } from '@mui/system';
 
 import { SelectPreview } from 'components/common/form/fields/Select/SelectPreview';
+import { useDateFormatter } from 'hooks/useDateFormatter';
 import type { PropertyValueWithDetails } from 'lib/members/interfaces';
-import { humanFriendlyDate } from 'lib/utilities/dates';
 
 export function MemberPropertiesRenderer({ properties }: { properties: PropertyValueWithDetails[] }) {
+  const { formatDate } = useDateFormatter();
+
   return (
     <Stack gap={2}>
       {properties.map((property) => {
@@ -48,11 +50,7 @@ export function MemberPropertiesRenderer({ properties }: { properties: PropertyV
             return (
               <Stack key={property.memberPropertyId}>
                 <Typography fontWeight='bold'>{property.name}</Typography>
-                <Typography>
-                  {humanFriendlyDate(property.value as string, {
-                    withYear: true
-                  })}
-                </Typography>
+                <Typography>{formatDate(property.value as string, { withYear: true })}</Typography>
               </Stack>
             );
           }
