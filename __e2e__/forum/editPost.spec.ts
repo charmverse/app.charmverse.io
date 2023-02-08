@@ -79,6 +79,8 @@ test.describe.serial('Edit a forum post', () => {
       path: post.path
     });
 
+    await page.locator('data-test=close-modal').click();
+
     const isEditable = await forumPostPage.isPostEditable();
 
     expect(isEditable).toBe(true);

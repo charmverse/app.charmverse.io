@@ -36,6 +36,8 @@ import useSWR from 'swr';
 import charmClient from 'charmClient';
 import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
 import { undoEventName } from 'components/common/CharmEditor/utils';
+import { usePostByPath } from 'components/forum/hooks/usePostByPath';
+import { usePostPermissions } from 'components/forum/hooks/usePostPermissions';
 import { useColorMode } from 'context/darkMode';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
@@ -101,7 +103,7 @@ function DeleteMenuItem({ disabled = false, onClick }: { disabled?: boolean; onC
   return (
     <Tooltip title={disabled ? "You don't have permission to delete this page" : ''}>
       <div>
-        <ListItemButton disabled={disabled} onClick={onClick}>
+        <ListItemButton data-test='delete-current-page' disabled={disabled} onClick={onClick}>
           <DeleteOutlineOutlinedIcon
             fontSize='small'
             sx={{
@@ -188,10 +190,12 @@ export default function Header({ open, openSidebar }: HeaderProps) {
   const { onClick: clickToOpenSettingsModal } = useSettingsDialog();
   const isForumPost = router.route === '/[domain]/forum/post/[pagePath]';
   const pagePath = isForumPost ? (router.query.pagePath as string) : null;
+  // Post permissions hook will not make an API call if post ID is null. Since we can't conditionally render hooks, we pass null as the post ID. This is the reason for the 'null as any' statement
+  const forumPostInfo = usePostByPath({
+    postPath: isForumPost ? pagePath : isForumPost ? (pagePath as string) : (null as any),
+    spaceDomain: router.query.domain as string
+  });
 
-  const { data: forumPost = null } = useSWR(currentSpace && pagePath ? `post-${pagePath}` : null, () =>
-    charmClient.forum.getForumPost(pagePath!)
-  );
   const isLargeScreen = useMediaQuery(theme.breakpoints.up('md'));
 
   const pageType = basePage?.type;
@@ -199,7 +203,7 @@ export default function Header({ open, openSidebar }: HeaderProps) {
     pageType === 'card' || pageType === 'page' || pageType === 'proposal' || pageType === 'bounty';
 
   const isBountyBoard = router.route === '/[domain]/bounties';
-  const currentPageOrPost = basePage ?? forumPost;
+  const currentPageOrPost = basePage ?? forumPostInfo.forumPost;
 
   const undoEvent = useMemo(() => {
     if (currentPageOrPost) {
@@ -233,8 +237,8 @@ export default function Header({ open, openSidebar }: HeaderProps) {
   }
 
   function deletePost() {
-    if (forumPost) {
-      charmClient.forum.deleteForumPost(forumPost.id).then(() => {
+    if (forumPostInfo.forumPost) {
+      charmClient.forum.deleteForumPost(forumPostInfo.forumPost.id).then(() => {
         router.push(`/${router.query.domain}/forum`);
       });
     }
@@ -278,14 +282,14 @@ export default function Header({ open, openSidebar }: HeaderProps) {
         showMessage('Error exporting markdown', 'error');
       });
       setPageMenuOpen(false);
-    } else if (forumPost) {
+    } else if (forumPostInfo.forumPost) {
       exportMarkdown({
-        content: forumPost.content,
-        id: forumPost.id,
+        content: forumPostInfo.forumPost.content,
+        id: forumPostInfo.forumPost.id,
         members,
-        spaceId: forumPost.spaceId,
-        title: forumPost.title
-      }).catch(() => {
+        spaceId: forumPostInfo.forumPost.spaceId,
+        title: forumPostInfo.forumPost.title
+      }).catch((err) => {
         showMessage('Error exporting markdown', 'error');
       });
       setPageMenuOpen(false);
@@ -308,7 +312,6 @@ export default function Header({ open, openSidebar }: HeaderProps) {
         />
         <ListItemText primary='View comments' />
       </ListItemButton>
-
       <ListItemButton
         onClick={() => {
           setCurrentPageActionDisplay('suggestions');
@@ -346,6 +349,7 @@ export default function Header({ open, openSidebar }: HeaderProps) {
         </ListItemButton>
       )}
       <CopyLinkMenuItem closeMenu={closeMenu} />
+
       <Divider />
       {(basePage?.type === 'card' || basePage?.type === 'page') && (
         <>
@@ -365,7 +369,13 @@ export default function Header({ open, openSidebar }: HeaderProps) {
           <Divider />
         </>
       )}
-      <DeleteMenuItem onClick={onDeletePage} disabled={!pagePermissions?.delete || basePage?.deletedAt !== null} />
+      <DeleteMenuItem
+        onClick={onDeletePage}
+        disabled={
+          (isForumPost ? !forumPostInfo.permissions?.delete_post : !pagePermissions?.delete) ||
+          basePage?.deletedAt !== null
+        }
+      />
       <UndoMenuItem onClick={undoEditorChanges} disabled={!pagePermissions?.edit_content} />
       <Divider />
       {basePage && (
@@ -415,22 +425,21 @@ export default function Header({ open, openSidebar }: HeaderProps) {
     pageOptionsList = (
       <DatabasePageOptions pagePermissions={pagePermissions ?? undefined} pageId={basePage.id} closeMenu={closeMenu} />
     );
-  } else if (isForumPost && forumPost) {
-    const postCreator = members.find((member) => member.id === forumPost.createdBy);
+  } else if (isForumPost && forumPostInfo.forumPost) {
+    const postCreator = members.find((member) => member.id === forumPostInfo.forumPost?.createdBy);
 
-    const isPostCreator = forumPost.createdBy === user?.id;
     pageOptionsList = (
-      <List dense>
+      <List data-test='forum-post-actions' dense>
         <CopyLinkMenuItem closeMenu={closeMenu} />
         <Divider />
-        <DeleteMenuItem onClick={deletePost} disabled={!isPostCreator} />
-        <UndoMenuItem onClick={undoEditorChanges} disabled={!isPostCreator} />
+        <DeleteMenuItem onClick={deletePost} disabled={!forumPostInfo.permissions?.delete_post} />
+        <UndoMenuItem onClick={undoEditorChanges} disabled={!forumPostInfo?.permissions?.edit_post} />
         <ExportMarkdownMenuItem onClick={exportMarkdownPage} />
         <Divider />
-        {forumPost && postCreator && (
+        {forumPostInfo.forumPost && postCreator && (
           <>
             <Divider />
-            <Metadata creator={postCreator.username} lastUpdatedAt={forumPost.updatedAt} />
+            <Metadata creator={postCreator.username} lastUpdatedAt={forumPostInfo.forumPost.updatedAt} />
           </>
         )}
       </List>
@@ -489,7 +498,7 @@ export default function Header({ open, openSidebar }: HeaderProps) {
                       setPageMenuAnchorElement(pageMenuAnchor.current || null);
                     }}
                   >
-                    <MoreHorizIcon color='secondary' />
+                    <MoreHorizIcon data-test='page-toplevel-menu' color='secondary' />
                   </IconButton>
                 </Tooltip>
               </div>

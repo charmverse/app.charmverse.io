@@ -244,8 +244,8 @@ export async function generateSpaceRole({
   return prisma.spaceRole.create({
     data: {
       isAdmin,
-      spaceId,
-      userId
+      space: { connect: { id: spaceId } },
+      user: { connect: { id: userId } }
     }
   });
 }
