@@ -69,12 +69,12 @@ runs:
           **/*.scss
         FORMAT: 'json'
 
-    - name: some debug stuff
-      id: formatting_diffset
-      shell: bash
-      run: |
-        DIFF_FILES=$(echo ${{ steps.diffset.outputs.diff }} | jq -r '.[].file')
-        echo "DIFF_FILES=$DIFF_FILES" >> $GITHUB_OUTPUT
+    # - name: some debug stuff
+    #   id: formatting_diffset
+    #   shell: bash
+    #   run: |
+    #     DIFF_FILES=$(echo ${{ steps.diffset.outputs.diff }} | jq -r '.[].file')
+    #     echo "DIFF_FILES=$DIFF_FILES" >> $GITHUB_OUTPUT
       
     - name: Cache build
       id: cache_build
