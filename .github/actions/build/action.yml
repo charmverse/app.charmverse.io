@@ -69,12 +69,11 @@ runs:
           **/*.scss
         FORMAT: 'json'
 
-    # - name: some debug stuff
-    #   id: formatting_diffset
-    #   shell: bash
-    #   run: |
-    #     DIFF_FILES=$(echo ${{ steps.diffset.outputs.diff }} | jq -r '.[].file')
-    #     echo "DIFF_FILES=$DIFF_FILES" >> $GITHUB_OUTPUT
+    - name: some debug stuff
+      id: formatting_diffset
+      shell: bash
+      run: |
+        echo ${{ steps.diffset.outputs.diff }} | jq -r '.[]'
       
     - name: Cache build
       id: cache_build
@@ -84,7 +83,7 @@ runs:
           .next
           .env.test.local
         # including the app_env helps make sure that deploy_staging.yml does not reuse values from test_and_deploy.yml which are meant for production
-        key: nextjs-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-${{github.ref_name}}-${{ hashFiles( fromJSON(steps.diffset.outputs.diff) ) }}-${{ inputs.NEXT_PUBLIC_APP_ENV }}
+        key: nextjs-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-${{github.ref_name}}-${{ hashFiles( fromJSON(steps.diffset.outputs.diff).[] ) }}-${{ inputs.NEXT_PUBLIC_APP_ENV }}
 
     - name: Build
       shell: bash
