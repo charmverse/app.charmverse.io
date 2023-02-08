@@ -74,7 +74,10 @@ runs:
       shell: bash
       run: |
         echo ${{ toJSON(steps.diffset.outputs.diff) }} | jq '.[]'
-        echo ${{ join(',' , toJSON(steps.diffset.outputs.diff)) }}
+        echo "DIFF_FILES=$(echo ${{ toJSON(steps.diffset.outputs.diff) }} | jq '.[]')"
+        DIFF_FILES=$(echo ${{ toJSON(steps.diffset.outputs.diff) }} | jq '.[]')
+        hash_of_files=${{ hashFiles(join('', $DIFF_FILES)) }}
+
     # - name: some debug stuff
     #   id: formatting_diffset_test_hash
     #   shell: bash
