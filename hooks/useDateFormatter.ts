@@ -1,41 +1,18 @@
 import { useMemo } from 'react';
 
 import { useUserPreferences } from 'hooks/useUserPreferences';
+import type { DateFormatConfig } from 'lib/utilities/dates';
+import { formatDate, formatDateTime, getFormattedDateTime } from 'lib/utilities/dates';
 
-type FormatConfig = {
-  locale?: string;
-};
-
-export function useDateFormatter() {
+export function useDateFormatter(locale?: string) {
   const { userPreferences } = useUserPreferences();
+  const localeToUse = locale ?? userPreferences.locale;
 
   return useMemo(() => {
     return {
-      getFormattedDateTime: (dateInput: Date | string) =>
-        getFormattedDateTime(dateInput, { locale: userPreferences.locale }),
-      getFormattedDate: (dateInput: Date | string) => getFormattedDate(dateInput, { locale: userPreferences.locale }),
-      getFormattedTime: (dateInput: Date | string) => getFormattedTime(dateInput, { locale: userPreferences.locale })
+      formatDateTime: (dateInput: Date | string) => formatDateTime(dateInput, localeToUse),
+      formatDate: (dateInput: Date | string, config?: DateFormatConfig) => formatDate(dateInput, config, localeToUse),
+      formatTime: (dateInput: Date | string) => getFormattedDateTime(dateInput, { timeStyle: 'short' }, localeToUse)
     };
   }, [userPreferences]);
-}
-
-function getFormattedDateTime(dateInput: Date | string, config?: FormatConfig) {
-  const date = new Date(dateInput);
-
-  // TODO - more formatting options
-  return date.toLocaleString(config?.locale || 'default');
-}
-
-function getFormattedDate(dateInput: Date | string, config?: FormatConfig) {
-  const date = new Date(dateInput);
-
-  // TODO - more formatting options
-  return date.toLocaleDateString(config?.locale || 'default');
-}
-
-function getFormattedTime(dateInput: Date | string, config?: FormatConfig) {
-  const date = new Date(dateInput);
-
-  // TODO - more formatting options
-  return date.toLocaleTimeString(config?.locale || 'default');
 }

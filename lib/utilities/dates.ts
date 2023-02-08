@@ -7,6 +7,10 @@ export type DateTimeFormat = 'relative' | 'absolute';
 
 export type TimeUnit = 'millisecond' | 'second' | 'minute' | 'hour' | 'day' | 'week' | 'month' | 'year';
 
+export type DateFormatConfig = {
+  withYear?: boolean;
+};
+
 const SystemToLuxonUnitMapping: { [key in TimeUnit]: LuxonTimeUnit } = {
   millisecond: 'millisecond',
   second: 'second',
@@ -157,4 +161,51 @@ export function getTimezonesWithOffset() {
       tz: timeZone
     };
   });
+}
+
+export function getFormattedDateTime(dateInput: Date | string, options?: Intl.DateTimeFormatOptions, locale?: string) {
+  const date = new Date(dateInput);
+  const isLocaleSupported = toLocaleDateStringSupportsLocales();
+  const formatLocale = isLocaleSupported ? locale || 'default' : undefined;
+
+  try {
+    return date.toLocaleString(formatLocale, options);
+  } catch (e: any) {
+    return date.toLocaleString();
+    // log error
+  }
+}
+
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toLocaleDateString#checking_for_support_for_locales_and_options_arguments
+function toLocaleDateStringSupportsLocales() {
+  try {
+    new Date().toLocaleDateString('i');
+  } catch (e: any) {
+    return e.name === 'RangeError';
+  }
+
+  return false;
+}
+
+export function formatDateTime(dateInput: Date | string, locale?: string) {
+  return getFormattedDateTime(
+    dateInput,
+    {
+      dateStyle: 'short',
+      timeStyle: 'short'
+    },
+    locale
+  );
+}
+
+export function formatDate(dateInput: Date | string, config?: DateFormatConfig, locale?: string) {
+  return getFormattedDateTime(
+    dateInput,
+    { day: 'numeric', month: 'short', year: config?.withYear ? 'numeric' : undefined },
+    locale
+  );
+}
+
+export function formatTime(dateInput: Date | string, locale?: string) {
+  return getFormattedDateTime(dateInput, { timeStyle: 'short' }, locale);
 }
