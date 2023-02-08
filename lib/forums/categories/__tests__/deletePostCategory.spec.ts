@@ -4,8 +4,8 @@ import { prisma } from 'db';
 import { createForumPost } from 'lib/forums/posts/createForumPost';
 import { InvalidInputError } from 'lib/utilities/errors';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { generatePostCategory } from 'testing/utils/forums';
 
-import { createPostCategory } from '../createPostCategory';
 import { deletePostCategory } from '../deletePostCategory';
 import { PostCategoryNotDeleteableError } from '../errors';
 
@@ -20,7 +20,7 @@ beforeAll(async () => {
 
 describe('deletePostCategory', () => {
   it('should delete a post category', async () => {
-    const category = await createPostCategory({
+    const category = await generatePostCategory({
       spaceId: space.id,
       name: 'Test Category'
     });
@@ -41,7 +41,7 @@ describe('deletePostCategory', () => {
   });
 
   it('should fail to delete a category if it has a post', async () => {
-    const category = await createPostCategory({
+    const category = await generatePostCategory({
       spaceId: space.id,
       name: 'Test Category 2'
     });

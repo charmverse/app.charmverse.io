@@ -51,17 +51,9 @@ async function createPostCategoryController(req: NextApiRequest, res: NextApiRes
     throw error;
   }
 
-  const postCategory: PostCategory = await prisma.$transaction(async (tx) => {
-    const createdCategory = await createPostCategory({
-      name: req.body.name,
-      spaceId: spaceId as string,
-      tx
-    });
-    await assignDefaultPostCategoryPermissions({
-      postCategoryId: createdCategory.id,
-      tx
-    });
-    return createdCategory;
+  const postCategory: PostCategory = await createPostCategory({
+    name: req.body.name,
+    spaceId: spaceId as string
   });
 
   const permissions = await computePostCategoryPermissions({

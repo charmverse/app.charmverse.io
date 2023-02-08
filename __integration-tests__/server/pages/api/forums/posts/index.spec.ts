@@ -1,11 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import type { Post, PostCategory, Space, User } from '@prisma/client';
+import type { Post, Space, User } from '@prisma/client';
 import request from 'supertest';
 
-import { createPostCategory } from 'lib/forums/categories/createPostCategory';
 import type { CreateForumPostInput } from 'lib/forums/posts/createForumPost';
 import { upsertPostCategoryPermission } from 'lib/permissions/forum/upsertPostCategoryPermission';
-import { upsertPermission } from 'lib/permissions/pages';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { generatePostCategory } from 'testing/utils/forums';

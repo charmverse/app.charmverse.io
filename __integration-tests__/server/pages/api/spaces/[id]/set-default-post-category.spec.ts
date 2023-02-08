@@ -1,12 +1,11 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import type { Space, User } from '@prisma/client';
+import type { Space } from '@prisma/client';
 import request from 'supertest';
 
-import { createPostCategory } from 'lib/forums/categories/createPostCategory';
-import { updateSpacePermissionConfigurationMode } from 'lib/permissions/meta';
 import type { LoggedInUser } from 'models';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { generatePostCategory } from 'testing/utils/forums';
 
 let nonAdminUser: LoggedInUser;
 let nonAdminUserSpace: Space;
@@ -30,7 +29,7 @@ beforeAll(async () => {
 
 describe('POST /api/spaces/[id]/set-default-post-category - Set default page permission level for a space', () => {
   it('should update the default post category if user is a space admin, responding with 200', async () => {
-    const postCategory = await createPostCategory({
+    const postCategory = await generatePostCategory({
       name: `Test Category`,
       spaceId: adminUserSpace.id
     });
@@ -48,7 +47,7 @@ describe('POST /api/spaces/[id]/set-default-post-category - Set default page per
   });
 
   it('should fail if the user is not an admin of the space, and respond 401', async () => {
-    const postCategory = await createPostCategory({
+    const postCategory = await generatePostCategory({
       name: `Test Category 2`,
       spaceId: nonAdminUserSpace.id
     });
@@ -63,7 +62,7 @@ describe('POST /api/spaces/[id]/set-default-post-category - Set default page per
   });
 
   it('should fail if the user is not a member of the space, and respond 401', async () => {
-    const postCategory = await createPostCategory({
+    const postCategory = await generatePostCategory({
       name: `Test Category 3`,
       spaceId: nonAdminUserSpace.id
     });
