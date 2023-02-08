@@ -47,7 +47,6 @@ export async function publishWebhookEvent<T = WebhookEventNames>(spaceId: Space[
     if (!SQS_QUEUE_NAME) {
       throw new Error('Webhook SQS env var missing');
     }
-
     // Find if the space is subscribed to an event name or name space
     const subscription = await fetchSpaceWebhookSubscriptionStatus(spaceId, event.scope);
 
