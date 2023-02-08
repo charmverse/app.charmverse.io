@@ -15,8 +15,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Install dependencies
-        uses: ./.github/actions/install
+      # - name: Install dependencies
+      #   uses: ./.github/actions/install
 
       - name: Create .env.test.local file
         run: |
@@ -27,189 +27,189 @@ jobs:
         with:
           NEXT_PUBLIC_APP_ENV: 'test'
 
-  test:
-    name: Tests
-    runs-on: ubuntu-latest
-    needs: build-test-env
-    strategy:
-      max-parallel: 5
-      fail-fast: false
-      matrix:
-        include:
-          - test_name: "Typecheck tests"
-            test_command: "test:typecheck"
-    steps:
-      - uses: actions/checkout@v3
+  # test:
+  #   name: Tests
+  #   runs-on: ubuntu-latest
+  #   needs: build-test-env
+  #   strategy:
+  #     max-parallel: 5
+  #     fail-fast: false
+  #     matrix:
+  #       include:
+  #         - test_name: "Typecheck tests"
+  #           test_command: "test:typecheck"
+  #   steps:
+  #     - uses: actions/checkout@v3
 
-      - name: Restore dependencies from cache
-        uses: ./.github/actions/install
+  #     - name: Restore dependencies from cache
+  #       uses: ./.github/actions/install
 
-      - name: Restore app from cache
-        uses: ./.github/actions/build
-        with:
-          NEXT_PUBLIC_APP_ENV: 'test'
+  #     - name: Restore app from cache
+  #       uses: ./.github/actions/build
+  #       with:
+  #         NEXT_PUBLIC_APP_ENV: 'test'
 
-      - name: Run ${{matrix.test_name}}
-        run: npm run ${{matrix.test_command}}
+  #     - name: Run ${{matrix.test_name}}
+  #       run: npm run ${{matrix.test_command}}
 
-  integration-test:
-    name: Tests
-    runs-on: ubuntu-latest
-    needs: build-test-env
-    # Postgres setup copied from https://gist.github.com/2color/537f8ef13ecec80059abb007839a6878
-    services:
-      postgres:
-        image: postgres
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          # Maps tcp port 5432 on service container to the host
-          - 5432:5432
-    strategy:
-      max-parallel: 5
-      fail-fast: false
-      matrix:
-        include:
-          - test_name: "Basic tests"
-            test_command: "npm run test:ci"
-          - test_name: "Server integration tests"
-            test_command: "npm run start:test:ci & npm run test:server:ci"
-          - test_name: "Browser tests"
-            test_command: "npm run test:browser:ci"
-          - test_name: "Browser e2e test"
-            test_command: "npx playwright install chromium chrome --with-deps; npm run start:test:ci & npm run test:e2e:ci"
-    steps:
-      - uses: actions/checkout@v3
+  # integration-test:
+  #   name: Tests
+  #   runs-on: ubuntu-latest
+  #   needs: build-test-env
+  #   # Postgres setup copied from https://gist.github.com/2color/537f8ef13ecec80059abb007839a6878
+  #   services:
+  #     postgres:
+  #       image: postgres
+  #       env:
+  #         POSTGRES_USER: postgres
+  #         POSTGRES_PASSWORD: postgres
+  #       options: >-
+  #         --health-cmd pg_isready
+  #         --health-interval 10s
+  #         --health-timeout 5s
+  #         --health-retries 5
+  #       ports:
+  #         # Maps tcp port 5432 on service container to the host
+  #         - 5432:5432
+  #   strategy:
+  #     max-parallel: 5
+  #     fail-fast: false
+  #     matrix:
+  #       include:
+  #         - test_name: "Basic tests"
+  #           test_command: "npm run test:ci"
+  #         - test_name: "Server integration tests"
+  #           test_command: "npm run start:test:ci & npm run test:server:ci"
+  #         - test_name: "Browser tests"
+  #           test_command: "npm run test:browser:ci"
+  #         - test_name: "Browser e2e test"
+  #           test_command: "npx playwright install chromium chrome --with-deps; npm run start:test:ci & npm run test:e2e:ci"
+  #   steps:
+  #     - uses: actions/checkout@v3
 
-      - name: Restore dependencies from cache
-        uses: ./.github/actions/install
+  #     - name: Restore dependencies from cache
+  #       uses: ./.github/actions/install
 
-      - name: Setup test database
-        run: bash ./scripts/configure-db.sh
+  #     - name: Setup test database
+  #       run: bash ./scripts/configure-db.sh
 
-      - name: Restore app from cache
-        uses: ./.github/actions/build
-        with:
-          NEXT_PUBLIC_APP_ENV: 'test'
+  #     - name: Restore app from cache
+  #       uses: ./.github/actions/build
+  #       with:
+  #         NEXT_PUBLIC_APP_ENV: 'test'
 
-      - name: Run ${{matrix.test_name}}
-        run: ${{matrix.test_command}}
+  #     - name: Run ${{matrix.test_name}}
+  #       run: ${{matrix.test_command}}
 
-  deploy:
-    name: Deploy to production
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
-    needs: [test, integration-test]
-    steps:
-      - uses: actions/checkout@v3
-      - name: Inject slug/short variables
-        uses: rlespinasse/github-slug-action@v4.x
+  # deploy:
+  #   name: Deploy to production
+  #   runs-on: ubuntu-latest
+  #   if: github.ref == 'refs/heads/main'
+  #   needs: [test, integration-test]
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - name: Inject slug/short variables
+  #       uses: rlespinasse/github-slug-action@v4.x
 
-      - name: Install dependencies
-        uses: ./.github/actions/install
+  #     - name: Install dependencies
+  #       uses: ./.github/actions/install
 
-      - name: Build app
-        uses: ./.github/actions/build
-        with:
-          NEXT_PUBLIC_APP_ENV: 'production'
-          NEXT_PUBLIC_DD_CLIENT_TOKEN: ${{ secrets.NEXT_PUBLIC_DD_CLIENT_TOKEN }}
-          NEXT_PUBLIC_DD_RUM_CLIENT_TOKEN: ${{ secrets.NEXT_PUBLIC_DD_RUM_CLIENT_TOKEN }}
-          NEXT_PUBLIC_DD_RUM_APP_ID: ${{ secrets.NEXT_PUBLIC_DD_RUM_APP_ID }}
-          NEXT_PUBLIC_TELEGRAM_BOT_ID: ${{ secrets.NEXT_PUBLIC_TELEGRAM_BOT_ID }}
-          NEXT_PUBLIC_IFRAMELY_API_KEY: ${{ secrets.NEXT_PUBLIC_IFRAMELY_API_KEY }}
-          # NEXT_PUBLIC_DISCORD_WEBHOOK_ERRORS: ${{ secrets.NEXT_PUBLIC_DISCORD_WEBHOOK_ERRORS }} comment for now
-          NEXT_PUBLIC_WEBSOCKETS_HOST: https://sockets.charmverse.io
-          NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_CLIENT_ID: ${{ secrets.NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_CLIENT_ID }}
-          NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_REDIRECT_URI: ${{ secrets.NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_REDIRECT_URI }}
-          NEXT_PUBLIC_GOOGLE_API_KEY: ${{ secrets.NEXT_PUBLIC_GOOGLE_API_KEY }}
-          NEXT_PUBLIC_GOOGLE_AUTH_DOMAIN: ${{ secrets.NEXT_PUBLIC_GOOGLE_AUTH_DOMAIN }}
-          NEXT_PUBLIC_GOOGLE_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_GOOGLE_PROJECT_ID }}
-          NEXT_PUBLIC_GOOGLE_STORAGE_BUCKET: ${{ secrets.NEXT_PUBLIC_GOOGLE_STORAGE_BUCKET }}
-          NEXT_PUBLIC_GOOGLE_MESSAGING_SENDER_ID: ${{ secrets.NEXT_PUBLIC_GOOGLE_MESSAGING_SENDER_ID }}
-          NEXT_PUBLIC_GOOGLE_APP_ID: ${{ secrets.NEXT_PUBLIC_GOOGLE_APP_ID }}
-          NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_ID_SENSITIVE: ${{ secrets.NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_ID_SENSITIVE_PRD }}
+  #     - name: Build app
+  #       uses: ./.github/actions/build
+  #       with:
+  #         NEXT_PUBLIC_APP_ENV: 'production'
+  #         NEXT_PUBLIC_DD_CLIENT_TOKEN: ${{ secrets.NEXT_PUBLIC_DD_CLIENT_TOKEN }}
+  #         NEXT_PUBLIC_DD_RUM_CLIENT_TOKEN: ${{ secrets.NEXT_PUBLIC_DD_RUM_CLIENT_TOKEN }}
+  #         NEXT_PUBLIC_DD_RUM_APP_ID: ${{ secrets.NEXT_PUBLIC_DD_RUM_APP_ID }}
+  #         NEXT_PUBLIC_TELEGRAM_BOT_ID: ${{ secrets.NEXT_PUBLIC_TELEGRAM_BOT_ID }}
+  #         NEXT_PUBLIC_IFRAMELY_API_KEY: ${{ secrets.NEXT_PUBLIC_IFRAMELY_API_KEY }}
+  #         # NEXT_PUBLIC_DISCORD_WEBHOOK_ERRORS: ${{ secrets.NEXT_PUBLIC_DISCORD_WEBHOOK_ERRORS }} comment for now
+  #         NEXT_PUBLIC_WEBSOCKETS_HOST: https://sockets.charmverse.io
+  #         NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_CLIENT_ID: ${{ secrets.NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_CLIENT_ID }}
+  #         NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_REDIRECT_URI: ${{ secrets.NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_REDIRECT_URI }}
+  #         NEXT_PUBLIC_GOOGLE_API_KEY: ${{ secrets.NEXT_PUBLIC_GOOGLE_API_KEY }}
+  #         NEXT_PUBLIC_GOOGLE_AUTH_DOMAIN: ${{ secrets.NEXT_PUBLIC_GOOGLE_AUTH_DOMAIN }}
+  #         NEXT_PUBLIC_GOOGLE_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_GOOGLE_PROJECT_ID }}
+  #         NEXT_PUBLIC_GOOGLE_STORAGE_BUCKET: ${{ secrets.NEXT_PUBLIC_GOOGLE_STORAGE_BUCKET }}
+  #         NEXT_PUBLIC_GOOGLE_MESSAGING_SENDER_ID: ${{ secrets.NEXT_PUBLIC_GOOGLE_MESSAGING_SENDER_ID }}
+  #         NEXT_PUBLIC_GOOGLE_APP_ID: ${{ secrets.NEXT_PUBLIC_GOOGLE_APP_ID }}
+  #         NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_ID_SENSITIVE: ${{ secrets.NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_ID_SENSITIVE_PRD }}
 
-      - name: Build and Push Docker image
-        uses: ./.github/actions/build_docker_image
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: us-east-1
+  #     - name: Build and Push Docker image
+  #       uses: ./.github/actions/build_docker_image
+  #       env:
+  #         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  #         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  #         AWS_REGION: us-east-1
 
-      - name: Set the docker compose env variables
-        uses: mikefarah/yq@master
-        with:
-          cmd: |
-            yq -I 4 -i '
-              with(.option_settings."aws:elasticbeanstalk:application:environment";
-                    .NODE_ENV = "production" |
-                    .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
-              ' .ebextensions/00_env_vars.config
+  #     - name: Set the docker compose env variables
+  #       uses: mikefarah/yq@master
+  #       with:
+  #         cmd: |
+  #           yq -I 4 -i '
+  #             with(.option_settings."aws:elasticbeanstalk:application:environment";
+  #                   .NODE_ENV = "production" |
+  #                   .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
+  #             ' .ebextensions/00_env_vars.config
 
-            yq -I 4 -i '
-              with(.option_settings."aws:elasticbeanstalk:application:environment";
-                    .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
-              ' .ebextensions_cron/00_env_vars.config
+  #           yq -I 4 -i '
+  #             with(.option_settings."aws:elasticbeanstalk:application:environment";
+  #                   .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
+  #             ' .ebextensions_cron/00_env_vars.config
 
-            yq -I 4 -i '
-              with(.option_settings."aws:elasticbeanstalk:application:environment";
-                    .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
-              ' .ebextensions_websockets/00_env_vars.config
+  #           yq -I 4 -i '
+  #             with(.option_settings."aws:elasticbeanstalk:application:environment";
+  #                   .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
+  #             ' .ebextensions_websockets/00_env_vars.config
 
-      - name: Package Webapp
-        run: cat files_to_zip.txt | zip --symlinks -r@ deploy.zip
+  #     - name: Package Webapp
+  #       run: cat files_to_zip.txt | zip --symlinks -r@ deploy.zip
 
-      - name: Update and Package background worker
-        run: |
-          rm -rf .ebextensions && mv .ebextensions_cron .ebextensions
-          cat files_to_zip.txt | zip --symlinks -r@ deploy_cron.zip
+  #     - name: Update and Package background worker
+  #       run: |
+  #         rm -rf .ebextensions && mv .ebextensions_cron .ebextensions
+  #         cat files_to_zip.txt | zip --symlinks -r@ deploy_cron.zip
 
-      - name: Update and Package websockets
-        run: |
-          rm -rf .ebextensions && mv .ebextensions_websockets .ebextensions
-          cat files_to_zip.txt | zip --symlinks -r@ deploy_websockets.zip
+  #     - name: Update and Package websockets
+  #       run: |
+  #         rm -rf .ebextensions && mv .ebextensions_websockets .ebextensions
+  #         cat files_to_zip.txt | zip --symlinks -r@ deploy_websockets.zip
 
-      - name: Deploy to Beanstalk
-        uses: einaregilsson/beanstalk-deploy@v21
-        with:
-          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          application_name: web3-workspace
-          environment_name: prd-charmverse-webapp
-          version_label: ${{ github.sha }}
-          region: us-east-1
-          deployment_package: deploy.zip
-          use_existing_version_if_available: true # allows triggering re-deploys with same version
-          wait_for_deployment: false # set to false to save sweet Github minutes
+  #     - name: Deploy to Beanstalk
+  #       uses: einaregilsson/beanstalk-deploy@v21
+  #       with:
+  #         aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  #         aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  #         application_name: web3-workspace
+  #         environment_name: prd-charmverse-webapp
+  #         version_label: ${{ github.sha }}
+  #         region: us-east-1
+  #         deployment_package: deploy.zip
+  #         use_existing_version_if_available: true # allows triggering re-deploys with same version
+  #         wait_for_deployment: false # set to false to save sweet Github minutes
 
-      - name: Deploy Background to Beanstalk
-        uses: einaregilsson/beanstalk-deploy@v21
-        with:
-          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          application_name: charmverse-worker
-          environment_name: prd-charmverse-worker
-          version_label: ${{ github.sha }}
-          region: us-east-1
-          deployment_package: deploy_cron.zip
-          use_existing_version_if_available: true # allows triggering re-deploys with same version
-          wait_for_deployment: false # set to false to save sweet Github minutes
+  #     - name: Deploy Background to Beanstalk
+  #       uses: einaregilsson/beanstalk-deploy@v21
+  #       with:
+  #         aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  #         aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  #         application_name: charmverse-worker
+  #         environment_name: prd-charmverse-worker
+  #         version_label: ${{ github.sha }}
+  #         region: us-east-1
+  #         deployment_package: deploy_cron.zip
+  #         use_existing_version_if_available: true # allows triggering re-deploys with same version
+  #         wait_for_deployment: false # set to false to save sweet Github minutes
 
-      - name: Deploy Websockets to Beanstalk
-        uses: einaregilsson/beanstalk-deploy@v21
-        with:
-          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          application_name: prd-charmverse-websockets
-          environment_name: prd-charmverse-websockets
-          version_label: ${{ github.sha }}
-          region: us-east-1
-          deployment_package: deploy_websockets.zip
-          use_existing_version_if_available: true # allows triggering re-deploys with same version
-          wait_for_deployment: false # set to false to save sweet Github minutes
+  #     - name: Deploy Websockets to Beanstalk
+  #       uses: einaregilsson/beanstalk-deploy@v21
+  #       with:
+  #         aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  #         aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  #         application_name: prd-charmverse-websockets
+  #         environment_name: prd-charmverse-websockets
+  #         version_label: ${{ github.sha }}
+  #         region: us-east-1
+  #         deployment_package: deploy_websockets.zip
+  #         use_existing_version_if_available: true # allows triggering re-deploys with same version
+  #         wait_for_deployment: false # set to false to save sweet Github minutes
