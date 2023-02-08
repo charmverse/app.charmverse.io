@@ -59,16 +59,18 @@ async function updatePageHandler(req: NextApiRequest, res: NextApiResponse<IPage
     userId
   });
 
-  const updateContent = (req.body as Partial<Page>) ?? {};
+  const updateContent = (req.body ?? {}) as Partial<Page>;
   if (
     (typeof updateContent.index === 'number' || updateContent.parentId !== undefined) &&
     permissions.edit_position !== true
   ) {
     throw new ActionNotPermittedError('You do not have permission to reposition this page');
-  }
-  // Allow user with View & Comment permission to edit the page content
-  // This is required as in order to create a comment, the page needs to be updated
-  else if (permissions.edit_content !== true && permissions.comment !== true) {
+  } else if ((updateContent.icon || updateContent.headerImage || updateContent.title) && !permissions.edit_content) {
+    throw new ActionNotPermittedError('You do not have permissions to edit the icon of this page');
+
+    // Allow user with View & Comment permission to edit the page content
+    // This is required as in order to create a comment, the page needs to be updated
+  } else if (permissions.edit_content !== true && permissions.comment !== true) {
     throw new ActionNotPermittedError('You do not have permission to update this page');
   }
 

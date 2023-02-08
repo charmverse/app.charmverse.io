@@ -1,6 +1,6 @@
 import { yupResolver } from '@hookform/resolvers/yup';
-import LaunchIcon from '@mui/icons-material/LaunchOutlined';
-import { Box, FormHelperText, Typography } from '@mui/material';
+import Box from '@mui/material/Box';
+import FormHelperText from '@mui/material/FormHelperText';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
 import { usePopupState } from 'material-ui-popup-state/hooks';
@@ -13,7 +13,6 @@ import * as yup from 'yup';
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import FieldLabel from 'components/common/form/FieldLabel';
-import Link from 'components/common/Link';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import ConnectSnapshot from 'components/common/PageLayout/components/Header/components/Snapshot/ConnectSnapshot';
 import PrimaryButton from 'components/common/PrimaryButton';
@@ -21,7 +20,6 @@ import SettingsLayout from 'components/settings/Layout';
 import Legend from 'components/settings/Legend';
 import ImportNotionWorkspace from 'components/settings/workspace/ImportNotionWorkspace';
 import Avatar from 'components/settings/workspace/LargeAvatar';
-import { charmverseDiscordInvite } from 'config/constants';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { setTitle } from 'hooks/usePageTitle';
 import { usePreventReload } from 'hooks/usePreventReload';
@@ -32,7 +30,13 @@ import isSpaceAdmin from 'lib/users/isSpaceAdmin';
 const schema = yup.object({
   name: yup.string().ensure().trim().min(3, 'Name must be at least 3 characters').required('Name is required'),
   spaceImage: yup.string().nullable(true),
-  domain: yup.string()
+  domain: yup
+    .string()
+    .ensure()
+    .trim()
+    .min(3, 'Domain must be at least 3 characters')
+    .matches(/^[^!?@#$%^&*+=<>(){}.'"\\[\]|~/]*$/, 'The symbols you entered are not allowed')
+    .matches(/^\S*$/, 'Space is not allowed')
 });
 
 type FormValues = yup.InferType<typeof schema>;

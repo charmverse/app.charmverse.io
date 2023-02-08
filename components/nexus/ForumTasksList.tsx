@@ -52,7 +52,7 @@ function ForumTaskRow({
             {createdBy && (
               <Tooltip title={createdBy.username}>
                 <div>
-                  <UserDisplay avatarSize='small' user={createdBy} hideName={true} marginRight='10px' />
+                  <UserDisplay showMiniProfile avatarSize='small' user={createdBy} hideName={true} marginRight='10px' />
                 </div>
               </Tooltip>
             )}

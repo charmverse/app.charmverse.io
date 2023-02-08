@@ -11,6 +11,7 @@ import { Container } from 'components/[pageId]/DocumentPage/DocumentPage';
 import Button from 'components/common/Button';
 import CharmEditor from 'components/common/CharmEditor';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEditor';
+import ErrorPage from 'components/common/errors/ErrorPage';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { ScrollableWindow } from 'components/common/PageLayout';
 import UserDisplay from 'components/common/UserDisplay';
@@ -84,7 +85,6 @@ function sortComments({ comments, sort }: { comments: PostCommentWithVoteAndChil
   }
   return comments;
 }
-
 export function PostPage({
   shouldUpdateTitleState = false,
   post,
@@ -128,7 +128,7 @@ export function PostPage({
     post ? charmClient.forum.listPostComments(post.id) : undefined
   );
 
-  const { permissions } = usePostPermissions(post?.id as string, !post);
+  const permissions = usePostPermissions({ postIdOrPath: post?.id as string, isNewPost: !post });
 
   usePreventReload(contentUpdated);
   const [, setTitleState] = usePageTitle();
@@ -188,7 +188,6 @@ export function PostPage({
       contentText: rawText
     });
   }
-
   let disabledTooltip = '';
   if (!formInputs.title) {
     disabledTooltip = 'Title is required';
@@ -212,11 +211,17 @@ export function PostPage({
 
   const canEdit = !!permissions?.edit_post;
 
+  if (!permissions) {
+    return <LoadingComponent />;
+  } else if (!permissions.view_post) {
+    return <ErrorPage message='Post not found' />;
+  }
+
   return (
     <ScrollableWindow>
       <Stack flexDirection='row'>
         <Container top={50}>
-          <Box minHeight={300}>
+          <Box minHeight={300} data-test='post-charmeditor'>
             <CharmEditor
               pageType='post'
               autoFocus={false}
@@ -231,7 +236,9 @@ export function PostPage({
               onContentChange={updatePostContent}
             >
               <PageTitleInput readOnly={!canEdit} value={formInputs.title} onChange={updateTitle} />
-              {createdBy && <UserDisplay user={createdBy} avatarSize='small' fontSize='medium' mt={2} mb={3} />}
+              {createdBy && (
+                <UserDisplay showMiniProfile user={createdBy} avatarSize='small' fontSize='medium' mt={2} mb={3} />
+              )}
               <Box my={2}>
                 <PostCategoryInput readOnly={!canEdit} setCategoryId={updateCategoryId} categoryId={categoryId} />
               </Box>

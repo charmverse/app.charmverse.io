@@ -15,10 +15,11 @@ interface ResizableProps {
   minWidth: number;
   updateAttrs: NodeViewProps['updateAttrs'];
   onDelete: () => void;
+  readOnly?: boolean;
 }
 
 function Resizable(props: ResizableProps) {
-  const { updateAttrs, onDelete, initialSize = 100, aspectRatio, children, minWidth } = props;
+  const { readOnly = false, updateAttrs, onDelete, initialSize = 100, aspectRatio, children, minWidth } = props;
   const [size, setSize] = useState(initialSize || 100);
   const containerRef = useRef<HTMLDivElement>(null);
   const maxWidth = containerRef.current?.clientWidth;
@@ -41,7 +42,7 @@ function Resizable(props: ResizableProps) {
 
   return (
     <div ref={containerRef}>
-      <BlockAligner onDelete={onDelete}>
+      <BlockAligner readOnly={readOnly} onDelete={onDelete}>
         <HorizontalResizer
           aspectRatio={aspectRatio}
           onResizeStop={onResizeStopCallback}

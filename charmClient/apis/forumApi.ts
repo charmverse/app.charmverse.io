@@ -37,8 +37,10 @@ export class ForumApi {
     return http.DELETE(`/api/forums/posts/${postId}`);
   }
 
-  getForumPost(postId: string) {
-    return http.GET<PostWithVotes>(`/api/forums/posts/${postId}`);
+  getForumPost({ postIdOrPath, spaceDomain }: { postIdOrPath: string; spaceDomain?: string }) {
+    return http.GET<PostWithVotes>(
+      `/api/forums/posts/${postIdOrPath}${spaceDomain ? `?spaceDomain=${spaceDomain}` : ''}`
+    );
   }
 
   listPostCategories(spaceId: string): Promise<PostCategoryWithPermissions[]> {
