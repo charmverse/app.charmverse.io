@@ -18,9 +18,9 @@ import { generateDefaultCategoriesInput } from 'lib/proposal/generateDefaultCate
 import { importWorkspacePages } from 'lib/templates/importWorkspacePages';
 import { gettingStartedPage } from 'seedData/gettingStartedPage';
 
+import type { SpaceCreateTemplate } from './config';
 import { getAvailableDomainName } from './getAvailableDomainName';
 import { getSpaceByDomain } from './getSpaceByDomain';
-import type { SpaceCreateTemplate } from './utils';
 
 export type SpaceCreateInput = Pick<Space, 'name'> &
   Partial<

@@ -15,6 +15,7 @@ import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
 import charmClient from 'charmClient';
+import Button from 'components/common/Button';
 import FieldLabel from 'components/common/form/FieldLabel';
 import { DialogTitle } from 'components/common/Modal';
 import PrimaryButton from 'components/common/PrimaryButton';
@@ -23,8 +24,8 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import { useSpaces } from 'hooks/useSpaces';
 import log from 'lib/log';
 import { generateNotionImportRedirectUrl } from 'lib/notion/generateNotionImportRedirectUrl';
-import type { SpaceCreateTemplate } from 'lib/spaces/utils';
-import { defaultTemplate } from 'lib/spaces/utils';
+import { spaceCreateTemplates } from 'lib/spaces/config';
+import type { SpaceCreateTemplate } from 'lib/spaces/config';
 import randomName from 'lib/utilities/randomName';
 
 import { ImportZippedMarkdown } from '../CharmEditor/components/markdownParser/ImportZippedMarkdown';
@@ -35,7 +36,7 @@ import { SelectNewSpaceTemplate } from './SelectNewSpaceTemplate';
 const schema = yup.object({
   name: yup.string().ensure().trim().min(3, 'Name must be at least 3 characters').required('Name is required'),
   spaceImage: yup.string().nullable(true),
-  spaceTemplateOption: yup.string().default(defaultTemplate)
+  spaceTemplateOption: yup.mixed<SpaceCreateTemplate>().oneOf(spaceCreateTemplates).default('default')
 });
 
 type FormValues = yup.InferType<typeof schema>;
@@ -100,7 +101,7 @@ export function CreateSpaceForm({ defaultValues, onCancel, submitText }: Props) 
           name: watchName,
           spaceImage: watchSpaceImage
         },
-        createSpaceOption: watchSpaceTemplate as SpaceCreateTemplate
+        createSpaceOption: watchSpaceTemplate
       })
         .then((_space) => {
           setNewSpace(_space);
@@ -185,29 +186,31 @@ export function CreateSpaceForm({ defaultValues, onCancel, submitText }: Props) 
   return (
     <div>
       <DialogTitle onClose={onCancel ? onClose : undefined} sx={{ textAlign: 'center' }}>
-        <Box display='flex' alignItems='center' gap={2}>
-          {step !== 'select_template' && <ArrowBackIosNewIcon onClick={goToSelectTemplate} />}
+        <Box display='flex' alignItems='center' gap={1}>
+          {step !== 'select_template' && (
+            <IconButton onClick={goToSelectTemplate} size='small'>
+              <ArrowBackIosNewIcon />
+            </IconButton>
+          )}
           Create a space{' '}
         </Box>
       </DialogTitle>
-      <Typography textAlign='center' variant='body2'>
-        A space is where your organization collaborates
-      </Typography>
-      <Divider sx={{ my: 2 }} />
+      <Box mb={2}>
+        <Typography textAlign='center' variant='body2' whiteSpace='nowrap'>
+          A space is where your organization collaborates
+        </Typography>
+      </Box>
 
       {step === 'select_template' && (
         <>
-          <SelectNewSpaceTemplate
-            selectedTemplate={watchSpaceTemplate as SpaceCreateTemplate}
-            onSelect={handleNewSpaceTemplate}
-          />
+          <SelectNewSpaceTemplate onSelect={handleNewSpaceTemplate} />
           <Divider sx={{ my: 2 }} />
           <Typography sx={{ mb: 2 }} textAlign='center' fontWeight='bold'>
             Join an existing space
           </Typography>
-          <PrimaryButton fullWidth onClick={() => setStep('join_space')}>
+          <Button size='large' disableElevation fullWidth onClick={() => setStep('join_space')}>
             Search for space
-          </PrimaryButton>
+          </Button>
         </>
       )}
 
@@ -259,10 +262,17 @@ export function CreateSpaceForm({ defaultValues, onCancel, submitText }: Props) 
                   data-test='create-workspace'
                   loading={isCreatingSpace}
                 >
-                  {submitText || 'Create Space'}
+                  {submitText || 'Create'}
                 </PrimaryButton>
               )}
-              {watchSpaceTemplate === 'importMarkdown' && <ImportZippedMarkdown onFile={uploadMarkdownToNewSpace} />}
+              {watchSpaceTemplate === 'importMarkdown' && (
+                <ImportZippedMarkdown
+                  size='large'
+                  variant='contained'
+                  disableElevation
+                  onFile={uploadMarkdownToNewSpace}
+                />
+              )}
             </Grid>
             {saveError && (
               <Grid item>

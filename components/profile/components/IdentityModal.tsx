@@ -124,7 +124,7 @@ function IdentityModal(props: IdentityModalProps) {
               name={item.type === 'RandomName' ? 'Anonymous' : item.type}
               username={shortWalletAddress(usernameToDisplay)}
               secondaryUserName={item.secondaryUserName}
-              useIntegration={() => save(usernameToDisplay, item.type)}
+              selectIntegration={() => save(usernameToDisplay, item.type)}
               action={
                 item.type === 'RandomName' ? (
                   <Tooltip arrow placement='top' title='Generate a new name'>

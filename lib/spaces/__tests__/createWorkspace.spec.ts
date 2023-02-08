@@ -7,9 +7,9 @@ import { typedKeys } from 'lib/utilities/objects';
 import { uid } from 'lib/utilities/strings';
 import { gettingStartedPage } from 'seedData/gettingStartedPage';
 
+import { spaceCreateTemplates } from '../config';
 import type { SpaceCreateInput } from '../createWorkspace';
 import { createWorkspace } from '../createWorkspace';
-import { spaceCreateTemplates } from '../utils';
 
 let user: User;
 
@@ -213,9 +213,7 @@ describe('createWorkspace', () => {
   });
 
   it('should always include the getting started page when creating a space', async () => {
-    const spaceCreateOptions = typedKeys(spaceCreateTemplates);
-
-    for (const options of spaceCreateOptions) {
+    for (const options of spaceCreateTemplates) {
       const newSpace = await createWorkspace({
         userId: user.id,
         createSpaceOption: options,
