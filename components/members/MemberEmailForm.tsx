@@ -80,7 +80,7 @@ export function MemberEmailForm({ onNext }: { onNext: VoidFunction }) {
                   display: 'flex'
                 }}
               >
-                <Button variant='outlined' color='secondary' onClick={onNext}>
+                <Button data-test='member-email-skip' variant='outlined' color='secondary' onClick={onNext}>
                   Skip
                 </Button>
                 <Button data-test='member-email-next' type='submit' color='primary'>
