@@ -13,12 +13,13 @@ import type { PaletteItemTypeNoGroup } from '../paletteItem';
 const iconSize = 30;
 
 function iframeEmbedType(type: EmbedType): PaletteItemTypeNoGroup {
+  const config = embeds[type] as Embed;
   return {
     uid: type,
-    title: embeds[type].name,
-    icon: <EmbedIcon {...embeds[type]} size='large' />,
-    keywords: ['iframe'],
-    description: embeds[type].text,
+    title: config.name,
+    icon: <EmbedIcon {...config} size='large' />,
+    keywords: ['iframe'].concat(config.keywords || []),
+    description: config.text,
     editorExecuteCommand: ({ palettePluginKey }) => {
       return (state, dispatch, view) => {
         if (view) {
@@ -26,7 +27,6 @@ function iframeEmbedType(type: EmbedType): PaletteItemTypeNoGroup {
             // let the node view know to show the tooltip by default
             const tooltipMark = _state.schema.mark('tooltip-marker');
             let height = MIN_EMBED_HEIGHT;
-            const config = embeds[type] as Embed;
             if (config.heightRatio) {
               height = Math.round(MAX_EMBED_WIDTH / config.heightRatio);
             }
@@ -63,6 +63,7 @@ export function items(): PaletteItemTypeNoGroup[] {
     iframeEmbedType('figma'),
     iframeEmbedType('google'),
     iframeEmbedType('loom'),
+    iframeEmbedType('odysee'),
     iframeEmbedType('typeform'),
     {
       uid: 'price',

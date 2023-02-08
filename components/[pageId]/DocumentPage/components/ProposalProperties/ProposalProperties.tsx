@@ -1,7 +1,6 @@
-import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import { Divider, Grid, IconButton, Menu, MenuItem, Typography } from '@mui/material';
+import { Divider, Grid, Typography } from '@mui/material';
 import { Box } from '@mui/system';
-import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
+import { usePopupState } from 'material-ui-popup-state/hooks';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
@@ -213,7 +212,7 @@ export default function ProposalProperties({ pageId, proposalId, readOnly, isTem
           </div>
           <div style={{ width: '100%' }}>
             {proposalStatus === 'reviewed' && proposalReviewer ? (
-              <UserDisplay user={proposalReviewer} avatarSize='small' />
+              <UserDisplay showMiniProfile user={proposalReviewer} avatarSize='small' />
             ) : (
               <InputSearchReviewers
                 disabled={readOnly || !canUpdateProposalProperties}

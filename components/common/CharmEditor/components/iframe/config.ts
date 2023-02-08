@@ -1,7 +1,8 @@
 import PreviewIcon from '@mui/icons-material/Preview';
+import type { ElementType } from 'react';
 import { FiFigma } from 'react-icons/fi';
 import { RiGoogleFill } from 'react-icons/ri';
-import { SiLoom } from 'react-icons/si';
+import { SiLoom, SiOdysee } from 'react-icons/si';
 import { TbBrandAirtable } from 'react-icons/tb';
 
 export const MAX_EMBED_WIDTH = 700;
@@ -10,7 +11,8 @@ export const MAX_EMBED_HEIGHT = 2500;
 export const MIN_EMBED_HEIGHT = 200;
 
 export type Embed = {
-  icon?: React.ReactNode;
+  icon?: ElementType;
+  keywords?: string[];
   iconUrl?: string;
   name: string;
   placeholder: string;
@@ -88,6 +90,7 @@ export const embeds = {
   loom: {
     icon: SiLoom,
     name: 'Loom',
+    keywords: ['video'],
     placeholder: 'https://www.loom.com/...',
     text: 'Insert a Loom embed',
     // example input: https://www.loom.com/share/d0e3f7b3abb6448eb0c7a00bdd6dcd90
@@ -98,6 +101,25 @@ export const embeds = {
       return url.includes('www.loom.com');
     },
     heightRatio: 1.63
+  },
+  odysee: {
+    icon: SiOdysee,
+    name: 'Odysee',
+    keywords: ['video'],
+    placeholder: 'https://odysee.com/...',
+    text: 'Insert an Odysee embed',
+    // example input: https://odysee.com/@Coldfusion:f/google-panics-over-chatgpt-the-ai-wars:a
+    // How to embed Odysee: https://odysee.com/@brent:d/automatic-embedding-of-odysee-videos-on-websites:4
+    convertURLToEmbed(url: string) {
+      const urlParts = new URL(url.replace('/$/embed', '')).pathname.split('/').filter(Boolean);
+      const channel = urlParts[0]?.replace(':', '#');
+      const video = urlParts[1]?.replace(':', '#');
+      return `https://odysee.com/$/embed/${video}/${channel}`;
+    },
+    urlTest(url: string) {
+      return url.includes('odysee.com');
+    },
+    heightRatio: 560 / 315
   },
   typeform: {
     iconUrl: '/images/typeform_logo.png',

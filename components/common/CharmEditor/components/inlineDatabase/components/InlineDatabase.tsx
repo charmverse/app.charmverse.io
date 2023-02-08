@@ -127,17 +127,16 @@ export default function DatabaseView({ containerWidth, readOnly: readOnlyOverrid
     typeof readOnlyOverride === 'undefined' ? currentPagePermissions.edit_content !== true : readOnlyOverride;
 
   const readOnlySourceData = currentView?.fields?.sourceType === 'google_form'; // blocks that are synced cannot be edited
-
-  if (!board) {
-    return null;
-  }
-
   const deleteView = useCallback(
     (viewId: string) => {
       setCurrentViewId(views.filter((view) => view.id !== viewId)?.[0]?.id ?? null);
     },
     [setCurrentViewId, views]
   );
+
+  if (!board) {
+    return null;
+  }
 
   return (
     <>

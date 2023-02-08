@@ -92,10 +92,10 @@ async function deleteForumPostController(req: NextApiRequest, res: NextApiRespon
 }
 
 async function getForumPostController(req: NextApiRequest, res: NextApiResponse<Post>) {
-  const { postId } = req.query as any as { postId: string };
+  const { postId, spaceDomain } = req.query as any as { postId: string; spaceDomain?: string };
   const userId = req.session.user.id;
 
-  const post = await getForumPost({ userId, postId });
+  const post = await getForumPost({ userId, postId, spaceDomain });
 
   await requestOperations({
     resourceType: 'post',

@@ -22,11 +22,11 @@ type IntegrationProps = {
   username: string;
   // Used for showing email for Google accounts, and wallet address for shortened wallet names or ens names
   secondaryUserName?: string;
-  useIntegration: (id: string, type: IdentityType) => void;
+  selectIntegration: (id: string, type: IdentityType) => void;
 };
 
 function Integration(props: IntegrationProps) {
-  const { isInUse, icon, action, username, name, identityType, useIntegration, secondaryUserName } = props;
+  const { isInUse, icon, action, username, name, identityType, selectIntegration, secondaryUserName } = props;
 
   return (
     <Grid container>
@@ -58,7 +58,7 @@ function Integration(props: IntegrationProps) {
               </Typography>
             </>
           ) : (
-            <Button size='small' onClick={() => useIntegration(username, identityType)}>
+            <Button size='small' onClick={() => selectIntegration(username, identityType)}>
               Select
             </Button>
           )}

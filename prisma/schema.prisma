@@ -817,6 +817,7 @@ model PagePermission {
   @@unique([roleId, pageId], name: "roleId_pageId")
   @@unique([spaceId, pageId], name: "spaceId_pageId")
   @@unique([public, pageId], name: "public_pageId")
+  @@index([id])
   @@index([pageId])
   @@index([roleId])
   @@index([userId])
@@ -1058,6 +1059,7 @@ model Post {
   upDownVotes        PostUpDownVote[]
   commentUpDownVotes PostCommentUpDownVote[]
 
+  @@unique([spaceId, path])
   @@index([categoryId])
   @@index([path])
   @@index([spaceId, deletedAt]) // space feed
@@ -1083,6 +1085,7 @@ model PostComment {
   contentText String
   updatedAt   DateTime  @updatedAt
   deletedAt   DateTime?
+  deletedBy   String?
   parentId    String?
 
   postId String                  @db.Uuid
@@ -1206,4 +1209,9 @@ model PostCategoryPermission {
   @@unique([roleId, postCategoryId])
   @@unique([spaceId, postCategoryId])
   @@unique([public, postCategoryId])
+
+  @@index([postCategoryId])
+  @@index([postCategoryId, roleId])
+  @@index([postCategoryId, spaceId])
+  @@index([postCategoryId, public])
 }

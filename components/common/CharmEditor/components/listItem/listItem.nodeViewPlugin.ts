@@ -5,11 +5,10 @@ import { createElement } from '@bangle.dev/utils';
 
 import log from 'lib/log';
 
-export function listItemNodeViewPlugin(name: string) {
+export function listItemNodeViewPlugin(name: string, readOnly?: boolean) {
   const checkParentBulletList = (state: EditorState, pos: number) => {
     return state.doc.resolve(pos).parent.type.name === 'bulletList';
   };
-
   const removeCheckbox = (instance: NodeView) => {
     // already removed
     if (!instance.containerDOM!.hasAttribute('data-bangle-is-todo')) {
@@ -26,9 +25,15 @@ export function listItemNodeViewPlugin(name: string) {
       { contentEditable: false },
       [
         'input',
-        {
-          type: 'checkbox'
-        }
+        // For some reason the presence of disabled key makes it disabled even if disabled: false
+        readOnly
+          ? {
+              type: 'checkbox',
+              disabled: true
+            }
+          : {
+              type: 'checkbox'
+            }
       ]
     ]);
     const inputElement = checkBox.querySelector('input')!;
@@ -79,7 +84,6 @@ export function listItemNodeViewPlugin(name: string) {
     renderHandlers: {
       create: (instance, { attrs, updateAttrs, getPos, view }) => {
         const todoChecked = attrs.todoChecked;
-
         // branch if todo needs to be created
         if (todoChecked != null) {
           // todo only makes sense if parent is bullet list
@@ -97,7 +101,6 @@ export function listItemNodeViewPlugin(name: string) {
       // Second binding: editor -> dom: Done by the `update` handler below
       update: (instance, { attrs, view, getPos, updateAttrs }) => {
         const { todoChecked } = attrs;
-
         if (todoChecked == null) {
           removeCheckbox(instance as NodeView);
           return;
