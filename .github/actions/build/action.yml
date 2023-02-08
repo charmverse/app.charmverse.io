@@ -67,6 +67,7 @@ runs:
           **/*.+(j|t)s
           **/*.+(j|t)sx
           **/*.scss
+        SEPARATOR: ','
 
     - name: some debug stuff
       shell: bash
@@ -81,7 +82,7 @@ runs:
           .next
           .env.test.local
         # including the app_env helps make sure that deploy_staging.yml does not reuse values from test_and_deploy.yml which are meant for production
-        key: nextjs-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-${{github.ref_name}}-${{ hashFiles( 'hooks/__tests__/useDateFormatter.spec.ts','hooks/useDateFormatter.ts','hooks/useUserPreferences.ts','jest.config-browser.ts' ) }}-${{ inputs.NEXT_PUBLIC_APP_ENV }}
+        key: nextjs-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-${{github.ref_name}}-${{ hashFiles( steps.diffset.outputs.diff ) }}-${{ inputs.NEXT_PUBLIC_APP_ENV }}
 
     - name: Build
       shell: bash
