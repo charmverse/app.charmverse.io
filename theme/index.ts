@@ -303,6 +303,9 @@ export const createThemeLightSensitive = (mode: PaletteMode) => {
               backgroundColor: 'var(--input-bg)'
             }
           }
+        },
+        defaultProps: {
+          color: 'inherit' // set to inherit, the default is rgba (0,0,0, .54) which makes icons half-opaque
         }
       },
       MuiMenuItem: {

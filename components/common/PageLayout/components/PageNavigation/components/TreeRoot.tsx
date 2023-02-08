@@ -4,12 +4,9 @@ import { useRouter } from 'next/router';
 import type { ComponentProps, ReactNode } from 'react';
 import { useEffect, useRef } from 'react';
 
-import type { PageUpdates } from 'lib/pages';
-
 type TreeRootProps = {
   children: ReactNode;
   isFavorites?: boolean;
-  mutatePage: (page: PageUpdates) => void;
 } & ComponentProps<typeof TreeView>;
 
 export function TreeRoot({ children, isFavorites, mutatePage, ...rest }: TreeRootProps) {
