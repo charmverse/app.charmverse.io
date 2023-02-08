@@ -1,6 +1,6 @@
 import path from 'node:path';
 
-import type { PagePermissionLevel, Prisma, Space } from '@prisma/client';
+import type { Prisma, Space } from '@prisma/client';
 
 import { prisma } from 'db';
 import { generateDefaultPostCategories } from 'lib/forums/categories/generateDefaultPostCategories';
@@ -183,20 +183,6 @@ export async function createWorkspace({ spaceData, userId, createSpaceOption, ex
 
   // Add default stablecoin methods
   await setupDefaultPaymentMethods({ spaceIdOrSpace: space });
-
-  // Push the new space id to the user.spaceOrder array if it exist.
-  // This way we ensure the order of spaces is kept after a new space is created.
-  const user = await prisma.user.findUnique({ where: { id: userId }, select: { spacesOrder: true } });
-  if (user?.spacesOrder && user.spacesOrder.length > 0) {
-    await prisma.user.update({
-      where: { id: userId },
-      data: {
-        spacesOrder: {
-          push: [space.id]
-        }
-      }
-    });
-  }
 
   logSpaceCreation(space);
   updateTrackGroupProfile(space);
