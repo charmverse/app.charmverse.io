@@ -6,15 +6,14 @@ import type { UserPreferences } from 'lib/users/interfaces';
 
 export function useUserPreferences() {
   const { user, updateUser } = useUser();
-  // TODO: user preferences from UserDetails
-  const userPreferences: UserPreferences = useMemo(() => ({}), [user]);
+  const userPreferences: UserPreferences = useMemo(() => user?.profile || {}, [user]);
 
   const updatePreferences = useCallback(
-    async (updateObj: Record<string, string>) => {
+    async (updateObj: Partial<UserPreferences>) => {
       const updatedPreferences = { ...userPreferences, ...updateObj };
 
-      const updatedUser = await charmClient.updateUser({});
-      updateUser(updatedUser);
+      await charmClient.updateUserDetails(updatedPreferences);
+      updateUser({ profile: updatedPreferences });
     },
     [userPreferences]
   );

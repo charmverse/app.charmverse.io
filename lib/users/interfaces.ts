@@ -8,5 +8,6 @@ export interface UserAvatar {
 }
 
 export type UserPreferences = {
-  locale?: string;
+  locale?: string | null;
+  timezone?: string | null;
 };
