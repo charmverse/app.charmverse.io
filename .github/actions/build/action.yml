@@ -73,8 +73,9 @@ runs:
     - name: Cache build
       id: cache_build
       uses: actions/cache@v3
-      with:
+      inputs:
         git_diff: ${{ env.GIT_DIFF }}
+      with:
         path: |
           .next
           .env.test.local
