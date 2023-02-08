@@ -50,37 +50,37 @@ export function getTimeDifference(
   return timeDifference[`${timeUnit}s`];
 }
 
-// export function humanFriendlyDate(
-//   date: DateInput,
-//   options: {
-//     withYear?: boolean;
-//     withTime?: boolean;
-//   } = {
-//     withYear: false,
-//     withTime: false
-//   }
-// ): string {
-//   const parsedDate = convertToLuxonDate(date);
+export function humanFriendlyDate(
+  date: DateInput,
+  options: {
+    withYear?: boolean;
+    withTime?: boolean;
+  } = {
+    withYear: false,
+    withTime: false
+  }
+): string {
+  const parsedDate = convertToLuxonDate(date);
 
-//   /**
-//    * See these tables for the conversion tokens
-//    * https://moment.github.io/luxon/#/formatting?id=table-of-tokens
-//    */
+  /**
+   * See these tables for the conversion tokens
+   * https://moment.github.io/luxon/#/formatting?id=table-of-tokens
+   */
 
-//   let formatString = 'MMM d';
+  let formatString = 'MMM d';
 
-//   if (options?.withYear === true) {
-//     formatString += ', yyyy';
-//   }
+  if (options?.withYear === true) {
+    formatString += ', yyyy';
+  }
 
-//   if (options?.withTime === true) {
-//     formatString += " 'at' hh:mm a";
-//   }
+  if (options?.withTime === true) {
+    formatString += " 'at' hh:mm a";
+  }
 
-//   const formatted = parsedDate.toFormat(formatString);
+  const formatted = parsedDate.toFormat(formatString);
 
-//   return formatted;
-// }
+  return formatted;
+}
 
 export function showDateWithMonthAndYear(dateInput: Date | string, showDate?: boolean) {
   const date = typeof dateInput === 'string' ? new Date(dateInput) : dateInput;
