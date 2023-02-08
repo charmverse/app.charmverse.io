@@ -1,6 +1,6 @@
 import path from 'node:path';
 
-import type { Prisma, Space } from '@prisma/client';
+import type { PagePermissionLevel, Prisma, Space } from '@prisma/client';
 
 import { prisma } from 'db';
 import { generateDefaultPostCategories } from 'lib/forums/categories/generateDefaultPostCategories';
