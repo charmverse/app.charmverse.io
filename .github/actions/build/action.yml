@@ -74,11 +74,12 @@ runs:
       id: cache_build
       uses: actions/cache@v3
       with:
+        git_diff: ${{ env.GIT_DIFF }}
         path: |
           .next
           .env.test.local
         # including the app_env helps make sure that deploy_staging.yml does not reuse values from test_and_deploy.yml which are meant for production
-        key: nextjs-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-${{github.ref_name}}-${{ hashFiles( $GIT_DIFF ) }}-${{ inputs.NEXT_PUBLIC_APP_ENV }}
+        key: nextjs-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-${{github.ref_name}}-${{ hashFiles( inputs.git_diff ) }}-${{ inputs.NEXT_PUBLIC_APP_ENV }}
 
     - name: Build
       shell: bash
