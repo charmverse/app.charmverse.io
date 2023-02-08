@@ -22,10 +22,22 @@ jobs:
         run: |
           cp .env.test.local.example .env.test.local
 
+      - name: Get github diff
+        id: diffset
+        uses: technote-space/get-diff-action@v6
+        with:
+          PATTERNS: |
+            **/*.+(j|t)s
+            **/*.+(j|t)sx
+            **/*.scss
+            **/*.yml
+          SEPARATOR: ','
+
       - name: Build app
         uses: ./.github/actions/build
         with:
           NEXT_PUBLIC_APP_ENV: 'test'
+          GIT_DIFF: ${{ steps.diffset.outputs.diff }}
 
   test:
     name: Tests
