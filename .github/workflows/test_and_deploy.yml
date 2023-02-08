@@ -33,6 +33,11 @@ jobs:
             **/*.yml
           SEPARATOR: ','
 
+      - run: echo '--DUMP GITDIFF Values ${{ env.GIT_DIFF }}'
+        shell: bash
+
+      
+
       - name: Build app
         uses: ./.github/actions/build
         with:
