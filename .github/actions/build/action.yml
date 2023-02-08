@@ -69,27 +69,27 @@ runs:
           **/*.scss
         FORMAT: 'json'
 
-    - name: some debug stuff
-      id: formatting_diffset
-      shell: bash
-      run: |
-        echo "DIFF_FILES=('pages/api/email-templates/index.ts' 'prisma/migrations/20230207125953_user_preferences/migration.sql' 'prisma/schema.prisma' 'testing/setupDatabase.ts'" >> $GITHUB_OUTPUT
+    # - name: some debug stuff
+    #   id: formatting_diffset
+    #   shell: bash
+    #   run: |
+    #     echo "DIFF_FILES=('pages/api/email-templates/index.ts' 'prisma/migrations/20230207125953_user_preferences/migration.sql' 'prisma/schema.prisma' 'testing/setupDatabase.ts'" >> $GITHUB_OUTPUT
 
-    - name: some debug stuff
-      id: formatting_diffset_test_hash
-      shell: bash
-      run: |
-        echo ${{ hashFiles( steps.formatting_diffset.outputs.DIFF_FILES ) }}
+    # - name: some debug stuff
+    #   id: formatting_diffset_test_hash
+    #   shell: bash
+    #   run: |
+    #     echo ${{ hashFiles( steps.formatting_diffset.outputs.DIFF_FILES ) }}
 
-    # - name: Cache build
-    #   id: cache_build
-    #   uses: actions/cache@v3
-    #   with:
-    #     path: |
-    #       .next
-    #       .env.test.local
-    #     # including the app_env helps make sure that deploy_staging.yml does not reuse values from test_and_deploy.yml which are meant for production
-    #     key: nextjs-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-${{github.ref_name}}-${{ hashFiles( toJSON(steps.diffset.outputs.diff) ) }}-${{ inputs.NEXT_PUBLIC_APP_ENV }}
+    - name: Cache build
+      id: cache_build
+      uses: actions/cache@v3
+      with:
+        path: |
+          .next
+          .env.test.local
+        # including the app_env helps make sure that deploy_staging.yml does not reuse values from test_and_deploy.yml which are meant for production
+        key: nextjs-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-${{github.ref_name}}-${{ hashFiles( join(',' toJSON(steps.diffset.outputs.diff)) ) }}-${{ inputs.NEXT_PUBLIC_APP_ENV }}
 
     # - name: Build
     #   shell: bash
