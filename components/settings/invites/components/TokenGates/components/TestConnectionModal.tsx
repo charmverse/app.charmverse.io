@@ -19,7 +19,7 @@ export default function StatusModal({ status, message, ...props }: Props) {
   }
 
   return (
-    <Modal size='fluid' {...props} title='xxx'>
+    <Modal size='fluid' {...props}>
       <DialogTitle onClose={props.onClose} sx={!message ? { padding: 0 } : {}}>
         <Box display='flex' gap={1} width={300} alignItems='center'>
           {status === 'success' && (

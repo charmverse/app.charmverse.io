@@ -13,7 +13,7 @@ import Typography from '@mui/material/Typography';
 import type { Space } from '@prisma/client';
 import type { ReactNode } from 'react';
 
-import { StyledTreeItem } from 'components/common/PageLayout/components/PageNavigation//components/PageTreeItem';
+import { StyledTreeItem } from 'components/common/PageLayout/components/PageNavigation/components/PageTreeItem';
 import IntegrationSettings from 'components/integrations/IntegrationsPage';
 import TasksPage from 'components/nexus/TasksPage';
 import ProfileSettings from 'components/profile/ProfileSettings';
@@ -184,23 +184,23 @@ export default function SettingsModal() {
           </Box>
         </Slide>
         <Box flex='1 1 auto' position='relative' overflow='auto'>
-          <Box
-            display='flex'
-            justifyContent='space-between'
-            px={2}
-            pt={1}
-            position={{ xs: 'sticky', md: 'absolute' }}
-            top={0}
-            right={0}
-            zIndex={1}
-            sx={{ backgroundColor: (theme) => theme.palette.background.paper }}
-          >
-            {isMobile && mobileView === 'content' && (
+          {isMobile && mobileView === 'content' && (
+            <Box
+              display='flex'
+              justifyContent='space-between'
+              px={2}
+              pt={1}
+              position={{ xs: 'sticky', md: 'absolute' }}
+              top={0}
+              right={0}
+              zIndex={1}
+              sx={{ backgroundColor: (theme) => theme.palette.background.paper }}
+            >
               <IconButton aria-label='open settings dialog menu' onClick={() => setMobileView('sidebar')}>
                 <MenuIcon />
               </IconButton>
-            )}
-          </Box>
+            </Box>
+          )}
           {spaces.map((space) =>
             SETTINGS_TABS.map((tab) => (
               <TabPanel key={`${space.name}-${tab.path}`} value={activePath} index={`${space.name}-${tab.path}`}>

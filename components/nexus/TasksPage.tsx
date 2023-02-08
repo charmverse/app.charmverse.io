@@ -5,12 +5,7 @@ import HowToVoteIcon from '@mui/icons-material/HowToVote';
 import KeyIcon from '@mui/icons-material/Key';
 import BountyIcon from '@mui/icons-material/RequestPageOutlined';
 import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
-import Badge from '@mui/material/Badge';
-import Box from '@mui/material/Box';
-import Divider from '@mui/material/Divider';
-import Tab from '@mui/material/Tab';
-import Tabs from '@mui/material/Tabs';
-import Typography from '@mui/material/Typography';
+import { Badge, Box, Tab, Tabs, Typography } from '@mui/material';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 

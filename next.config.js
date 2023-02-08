@@ -33,13 +33,28 @@ const config = {
   async redirects() {
     return [
       {
-        source: '/:domain(^(?!.*\bapi\b).*$)/settings',
+        source: '/:domain(^(?!.*\bapi\b).*$)/settings/:path*',
         destination: '/:domain',
-        permanent: false
+        permanent: true
       },
       {
-        source: '/:domain(^(?!.*\bapi\b).*$)/settings/workspace',
-        destination: '/:domain/settings/space',
+        source: '/:domain(^(?!.*\bapi\b).*$)/settings',
+        destination: '/:domain',
+        permanent: true
+      },
+      {
+        source: '/:domain(^(?!.*\bapi\b).*$)/nexus',
+        destination: '/:domain',
+        permanent: true
+      },
+      {
+        source: '/:domain(^(?!.*\bapi\b).*$)/profile',
+        destination: '/:domain',
+        permanent: true
+      },
+      {
+        source: '/:domain(^(?!.*\bapi\b).*$)/integrations',
+        destination: '/:domain',
         permanent: true
       },
       {

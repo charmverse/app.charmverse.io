@@ -11,9 +11,6 @@ type IContext = {
   setMobileView: (view: MobileView) => void;
   open: boolean;
   onClose: (event: SyntheticEvent<Element, Event>) => any;
-  'aria-controls'?: string | undefined;
-  'aria-describedby'?: string | undefined;
-  'aria-haspopup'?: true | undefined;
   onClick: (event: MouseEvent<Element, globalThis.MouseEvent>, path?: string) => void;
   onTouchStart: (event: TouchEvent<Element>, path?: string) => void;
 };
@@ -24,9 +21,6 @@ export const SettingsDialogContext = createContext<Readonly<IContext>>({
   mobileView: 'sidebar',
   setMobileView: () => undefined,
   open: false,
-  'aria-controls': undefined,
-  'aria-describedby': undefined,
-  'aria-haspopup': undefined,
   onClose: () => {},
   onClick: () => undefined,
   onTouchStart: () => undefined
@@ -68,7 +62,7 @@ export function SettingsDialogProvider({ children }: { children: ReactNode }) {
       ...triggerDialogState,
       ...settingsDialogState
     }),
-    [triggerDialogState, settingsDialogState, activePath]
+    [triggerDialogState, settingsDialogState, mobileView, activePath]
   );
 
   return <SettingsDialogContext.Provider value={value}>{children}</SettingsDialogContext.Provider>;
