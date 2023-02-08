@@ -96,14 +96,7 @@ export default function SettingsModal() {
   const { spaces } = useSpaces();
   const currentSpace = useCurrentSpace();
   const isMobile = useSmallScreen();
-  const { activePath, setActivePath, mobileView, setMobileView, onClose, open } = useSettingsDialog();
-
-  const handleChange = (_event: React.SyntheticEvent, newValue: string) => {
-    setActivePath(newValue);
-    if (isMobile) {
-      setMobileView('content');
-    }
-  };
+  const { activePath, onClose, onClick, open } = useSettingsDialog();
 
   return (
     <Dialog
@@ -115,12 +108,7 @@ export default function SettingsModal() {
       open={open}
     >
       <Box display='flex' flexDirection='row' flex='1' overflow='hidden'>
-        <Slide
-          direction='right'
-          in={isMobile ? open && mobileView === 'sidebar' : true}
-          appear={isMobile}
-          unmountOnExit
-        >
+        <Slide direction='right' in={isMobile ? open && !activePath : true} appear={isMobile} unmountOnExit>
           <Box
             component='aside'
             maxWidth={{ xs: '100%', md: 350 }}
@@ -149,7 +137,7 @@ export default function SettingsModal() {
                   nodeId={tab.path}
                   label={tab.label}
                   icon={tab.icon}
-                  onClick={(e) => handleChange(e, tab.path)}
+                  onClick={() => onClick(tab.path)}
                   isActive={activePath === tab.path}
                 />
               ))}
@@ -172,7 +160,7 @@ export default function SettingsModal() {
                         nodeId={`${space.name}-${tab.path}`}
                         label={tab.label}
                         icon={tab.icon}
-                        onClick={(e) => handleChange(e, `${space.name}-${tab.path}`)}
+                        onClick={() => onClick(`${space.name}-${tab.path}`)}
                         isActive={activePath === `${space.name}-${tab.path}`}
                         ContentProps={{ style: { paddingLeft: 45 } }}
                       />
@@ -184,7 +172,7 @@ export default function SettingsModal() {
           </Box>
         </Slide>
         <Box flex='1 1 auto' position='relative' overflow='auto'>
-          {isMobile && mobileView === 'content' && (
+          {isMobile && !!activePath && (
             <Box
               display='flex'
               justifyContent='space-between'
@@ -196,7 +184,7 @@ export default function SettingsModal() {
               zIndex={1}
               sx={{ backgroundColor: (theme) => theme.palette.background.paper }}
             >
-              <IconButton aria-label='open settings dialog menu' onClick={() => setMobileView('sidebar')}>
+              <IconButton aria-label='open settings dialog menu' onClick={() => onClick()}>
                 <MenuIcon />
               </IconButton>
             </Box>

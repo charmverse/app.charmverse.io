@@ -57,11 +57,7 @@ function InputSearchRoleBase({
     return (
       <Alert severity='warning'>
         There are no roles in this space. Space admins can create roles in the{' '}
-        <Button
-          variant='text'
-          sx={{ fontWeight: 'bold' }}
-          onClick={(event: any) => onClick(event, `${space?.name}-roles`)}
-        >
+        <Button variant='text' sx={{ fontWeight: 'bold' }} onClick={() => onClick(`${space?.name}-roles`)}>
           space settings page
         </Button>
         .

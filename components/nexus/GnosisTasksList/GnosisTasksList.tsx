@@ -32,8 +32,8 @@ export function GnosisTasksList({ error, mutateTasks, tasks }: GnosisTasksSectio
   const { user } = useUser();
   const gnosisSigner = useGnosisSigner();
   const isSnoozed = snoozedForDate !== null;
-  const { setActivePath } = useSettingsDialog();
-  const openSettingsModal = () => setActivePath('notifications');
+  const { onClick } = useSettingsDialog();
+  const openSettingsModal = () => onClick('notifications');
 
   const isLoadingSafeTasks = !safeData || !tasks;
 

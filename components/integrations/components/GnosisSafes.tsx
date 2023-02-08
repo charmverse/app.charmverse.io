@@ -56,8 +56,8 @@ export default function GnosisSafesList() {
   const { user } = useUser();
   const [isLoadingSafes, setIsLoadingSafes] = useState(false);
 
-  const { setActivePath } = useSettingsDialog();
-  const openSettingsModal = () => setActivePath('notifications');
+  const { onClick } = useSettingsDialog();
+  const openSettingsModal = () => onClick('notifications');
 
   async function importSafes() {
     if (gnosisSigner && user) {

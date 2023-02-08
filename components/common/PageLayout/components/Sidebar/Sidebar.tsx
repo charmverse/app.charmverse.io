@@ -16,7 +16,6 @@ import type { BoxProps } from '@mui/system';
 import type { Page } from '@prisma/client';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
-import type { MouseEvent, TouchEvent } from 'react';
 import { useCallback, useMemo, useState } from 'react';
 
 import SettingsDialog from 'components/common/Modal/SettingsDialog';
@@ -24,7 +23,7 @@ import { charmverseDiscordInvite } from 'config/constants';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import useKeydownPress from 'hooks/useKeydownPress';
-import { useMobileSidebar } from 'hooks/useMobileSidebar';
+import { useSmallScreen } from 'hooks/useMediaScreens';
 import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useUser } from 'hooks/useUser';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
@@ -137,11 +136,11 @@ export default function Sidebar({ closeSidebar, favorites, navAction }: SidebarP
   const [isScrolled, setIsScrolled] = useState(false);
   const [showingTrash, setShowingTrash] = useState(false);
   const { disconnectWallet } = useWeb3AuthSig();
-  const isMobileSidebar = useMobileSidebar();
+  const isMobile = useSmallScreen();
 
   const { onClick } = useSettingsDialog();
-  const handleModalClick = (event: MouseEvent<Element, globalThis.MouseEvent>, path?: string) => {
-    onClick(event, path);
+  const handleModalClick = (path?: string) => {
+    onClick(path);
     navAction?.();
   };
   const searchInWorkspaceModalState = usePopupState({ variant: 'popover', popupId: 'search-in-workspace-modal' });
@@ -214,7 +213,7 @@ export default function Sidebar({ closeSidebar, favorites, navAction }: SidebarP
         <SidebarSubmenu
           closeSidebar={closeSidebar}
           logoutCurrentUser={logoutCurrentUser}
-          openProfileModal={(e) => handleModalClick(e, 'profile')}
+          openProfileModal={() => handleModalClick('profile')}
         />
         {space && (
           <>
@@ -274,12 +273,12 @@ export default function Sidebar({ closeSidebar, favorites, navAction }: SidebarP
                 close={searchInWorkspaceModalState.close}
               />
               <SidebarBox
-                onClick={(e) => handleModalClick(e, `${space.name}-invites`)}
+                onClick={() => handleModalClick(`${space.name}-invites`)}
                 icon={<GroupAddOutlinedIcon color='secondary' fontSize='small' />}
                 label='Invites'
               />
               <SidebarBox
-                onClick={(e) => handleModalClick(e, `${space.name}-space`)}
+                onClick={() => handleModalClick('')}
                 icon={<SettingsIcon color='secondary' fontSize='small' />}
                 label='Settings'
                 data-test='sidebar-settings'
@@ -293,7 +292,7 @@ export default function Sidebar({ closeSidebar, favorites, navAction }: SidebarP
                 onClick={navAction}
               />
             </Box>
-            {isMobileSidebar ? (
+            {isMobile ? (
               <div>{pagesNavigation}</div>
             ) : (
               <ScrollingContainer isScrolled={isScrolled} onScroll={onScroll} className='page-navigation'>

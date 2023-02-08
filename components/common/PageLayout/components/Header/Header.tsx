@@ -514,7 +514,7 @@ export default function Header({ open, openSidebar }: HeaderProps) {
               <NotificationsBadge>
                 <IconButton
                   size={isLargeScreen ? 'small' : 'medium'}
-                  onClick={(e) => clickToOpenSettingsModal(e, 'notifications')}
+                  onClick={() => clickToOpenSettingsModal('notifications')}
                 >
                   <NotificationsIcon fontSize='small' color='secondary' />
                 </IconButton>
