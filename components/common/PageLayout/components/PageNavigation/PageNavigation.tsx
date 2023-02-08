@@ -204,7 +204,6 @@ function PageNavigation({ deletePage, isFavorites, rootPageIds, onClick }: PageN
 
   return (
     <TreeRoot
-      mutatePage={mutatePage}
       expanded={expanded ?? []}
       // @ts-ignore - we use null instead of undefined to control the element
       selected={selectedNodeId}

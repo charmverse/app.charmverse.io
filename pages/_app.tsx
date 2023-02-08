@@ -1,6 +1,5 @@
-// testing github diff
-import createCache from '@emotion/cache';
 import { CacheProvider, Global } from '@emotion/react';
+import type { EmotionCache } from '@emotion/utils';
 import type { ExternalProvider, JsonRpcFetchFunc } from '@ethersproject/providers';
 import { Web3Provider } from '@ethersproject/providers';
 import RefreshIcon from '@mui/icons-material/Refresh';
@@ -47,6 +46,7 @@ import { useUserAcquisition } from 'hooks/useUserAcquisition';
 import { Web3AccountProvider } from 'hooks/useWeb3AuthSig';
 import { WebSocketClientProvider } from 'hooks/useWebSocketClient';
 import { createThemeLightSensitive } from 'theme';
+import { createEmotionCache } from 'theme/createEmotionCache';
 import cssVariables from 'theme/cssVariables';
 import { setDarkMode } from 'theme/darkMode';
 import { darkTheme, lightTheme } from 'theme/focalboard/theme';
@@ -129,20 +129,17 @@ import 'theme/styles.scss';
 
 const getLibrary = (provider: ExternalProvider | JsonRpcFetchFunc) => new Web3Provider(provider);
 
+const clientSideEmotionCache = createEmotionCache();
+
 type NextPageWithLayout = NextPage & {
   getLayout: (page: ReactElement) => ReactElement;
 };
 
 type AppPropsWithLayout = AppProps & {
   Component: NextPageWithLayout;
+  emotionCache?: EmotionCache;
 };
-
-// set up styles in Next.js for MUI based on https://github.com/mui-org/material-ui/blob/next/examples/nextjs-with-typescript/pages/_document.tsx
-// Set up MUI xample: https://github.com/mui/material-ui/blob/master/examples/nextjs/pages/_document.js
-// See also https://github.com/emotion-js/emotion/issues/1061 for why we need a cache provider to avoid duplicate style tags
-const emotionCache = createCache({ key: 'mui-style' });
-
-export default function App({ Component, pageProps }: AppPropsWithLayout) {
+export default function App({ Component, emotionCache = clientSideEmotionCache, pageProps }: AppPropsWithLayout) {
   const getLayout = Component.getLayout ?? ((page) => page);
   const router = useRouter();
 
