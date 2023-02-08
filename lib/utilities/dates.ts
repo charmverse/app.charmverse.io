@@ -50,13 +50,6 @@ export function getTimeDifference(
   return timeDifference[`${timeUnit}s`];
 }
 
-export function showDateWithMonthAndYear(dateInput: Date | string, showDate?: boolean) {
-  const date = typeof dateInput === 'string' ? new Date(dateInput) : dateInput;
-  return `${date.toLocaleString('default', {
-    month: 'long'
-  })}${showDate ? ` ${date.getDate()},` : ''} ${date.getFullYear()}`;
-}
-
 /**
  * Returns a string representation of a this time relative to now, such as "in two days".
  */
