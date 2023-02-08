@@ -1,5 +1,6 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import LaunchIcon from '@mui/icons-material/LaunchOutlined';
+import { Alert, Button, FormControlLabel, FormGroup, Grid, InputLabel, Switch, TextField } from '@mui/material';
 import Typography from '@mui/material/Typography';
 import type { Space } from '@prisma/client';
 import { useEffect } from 'react';
@@ -91,7 +92,7 @@ export function ApiSettings({ space }: { space: Space }) {
           Discord Channel <LaunchIcon fontSize='small' />
         </Link>
       </Typography>
-      {/* <Legend>Webhook (beta)</Legend>
+      <Legend>Webhook (beta)</Legend>
       <Typography variant='body1'>
         Subscribe to events in Charmverse using webhooks. You must provide us with an http endpoint which returns a 200
         response upon reception of the event.
@@ -196,7 +197,7 @@ export function ApiSettings({ space }: { space: Space }) {
             </Grid>
           </Grid>
         )}
-      </form> */}
+      </form>
     </>
   );
 }
