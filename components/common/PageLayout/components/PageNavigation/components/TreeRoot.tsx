@@ -9,7 +9,7 @@ type TreeRootProps = {
   isFavorites?: boolean;
 } & ComponentProps<typeof TreeView>;
 
-export function TreeRoot({ children, isFavorites, mutatePage, ...rest }: TreeRootProps) {
+export function TreeRoot({ children, isFavorites, ...rest }: TreeRootProps) {
   const ref = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
