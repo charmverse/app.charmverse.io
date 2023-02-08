@@ -73,35 +73,35 @@ runs:
       id: formatting_diffset
       shell: bash
       run: |
-        echo ${{ toJSON(steps.diffset.outputs.diff) }} | jq -r '.[]'
+        echo ${{ hashFiles(toJSON(steps.diffset.outputs.diff)) }}
       
-    - name: Cache build
-      id: cache_build
-      uses: actions/cache@v3
-      with:
-        path: |
-          .next
-          .env.test.local
-        # including the app_env helps make sure that deploy_staging.yml does not reuse values from test_and_deploy.yml which are meant for production
-        key: nextjs-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-${{github.ref_name}}-${{ hashFiles( toJSON(steps.diffset.outputs.diff) ) }}-${{ inputs.NEXT_PUBLIC_APP_ENV }}
+    # - name: Cache build
+    #   id: cache_build
+    #   uses: actions/cache@v3
+    #   with:
+    #     path: |
+    #       .next
+    #       .env.test.local
+    #     # including the app_env helps make sure that deploy_staging.yml does not reuse values from test_and_deploy.yml which are meant for production
+    #     key: nextjs-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-${{github.ref_name}}-${{ hashFiles( toJSON(steps.diffset.outputs.diff) ) }}-${{ inputs.NEXT_PUBLIC_APP_ENV }}
 
-    - name: Build
-      shell: bash
-      if: steps.cache_build.outputs.cache-hit != 'true'
-      run: npm run build
-      env:
-        NEXT_PUBLIC_APP_ENV: ${{ inputs.NEXT_PUBLIC_APP_ENV }}
-        NEXT_PUBLIC_DD_CLIENT_TOKEN: ${{ inputs.NEXT_PUBLIC_DD_CLIENT_TOKEN }}
-        NEXT_PUBLIC_DD_RUM_CLIENT_TOKEN: ${{ inputs.NEXT_PUBLIC_DD_RUM_CLIENT_TOKEN }}
-        NEXT_PUBLIC_DD_RUM_APP_ID: ${{ inputs.NEXT_PUBLIC_DD_RUM_APP_ID }}
-        NEXT_PUBLIC_TELEGRAM_BOT_ID: ${{ inputs.NEXT_PUBLIC_TELEGRAM_BOT_ID }}
-        NEXT_PUBLIC_IFRAMELY_API_KEY: ${{ inputs.NEXT_PUBLIC_IFRAMELY_API_KEY }}
-        NEXT_PUBLIC_WEBSOCKETS_HOST: ${{ inputs.NEXT_PUBLIC_WEBSOCKETS_HOST }}
-        NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_CLIENT_ID: ${{ inputs.NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_CLIENT_ID }}
-        NEXT_PUBLIC_GOOGLE_API_KEY: ${{ inputs.NEXT_PUBLIC_GOOGLE_API_KEY }}
-        NEXT_PUBLIC_GOOGLE_AUTH_DOMAIN: ${{ inputs.NEXT_PUBLIC_GOOGLE_AUTH_DOMAIN }}
-        NEXT_PUBLIC_GOOGLE_PROJECT_ID: ${{ inputs.NEXT_PUBLIC_GOOGLE_PROJECT_ID }}
-        NEXT_PUBLIC_GOOGLE_STORAGE_BUCKET: ${{ inputs.NEXT_PUBLIC_GOOGLE_STORAGE_BUCKET }}
-        NEXT_PUBLIC_GOOGLE_MESSAGING_SENDER_ID: ${{ inputs.NEXT_PUBLIC_GOOGLE_MESSAGING_SENDER_ID }}
-        NEXT_PUBLIC_GOOGLE_APP_ID: ${{ inputs.NEXT_PUBLIC_GOOGLE_APP_ID }}
-        NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_ID_SENSITIVE: ${{ inputs.NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_ID_SENSITIVE }}
+    # - name: Build
+    #   shell: bash
+    #   if: steps.cache_build.outputs.cache-hit != 'true'
+    #   run: npm run build
+    #   env:
+    #     NEXT_PUBLIC_APP_ENV: ${{ inputs.NEXT_PUBLIC_APP_ENV }}
+    #     NEXT_PUBLIC_DD_CLIENT_TOKEN: ${{ inputs.NEXT_PUBLIC_DD_CLIENT_TOKEN }}
+    #     NEXT_PUBLIC_DD_RUM_CLIENT_TOKEN: ${{ inputs.NEXT_PUBLIC_DD_RUM_CLIENT_TOKEN }}
+    #     NEXT_PUBLIC_DD_RUM_APP_ID: ${{ inputs.NEXT_PUBLIC_DD_RUM_APP_ID }}
+    #     NEXT_PUBLIC_TELEGRAM_BOT_ID: ${{ inputs.NEXT_PUBLIC_TELEGRAM_BOT_ID }}
+    #     NEXT_PUBLIC_IFRAMELY_API_KEY: ${{ inputs.NEXT_PUBLIC_IFRAMELY_API_KEY }}
+    #     NEXT_PUBLIC_WEBSOCKETS_HOST: ${{ inputs.NEXT_PUBLIC_WEBSOCKETS_HOST }}
+    #     NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_CLIENT_ID: ${{ inputs.NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_CLIENT_ID }}
+    #     NEXT_PUBLIC_GOOGLE_API_KEY: ${{ inputs.NEXT_PUBLIC_GOOGLE_API_KEY }}
+    #     NEXT_PUBLIC_GOOGLE_AUTH_DOMAIN: ${{ inputs.NEXT_PUBLIC_GOOGLE_AUTH_DOMAIN }}
+    #     NEXT_PUBLIC_GOOGLE_PROJECT_ID: ${{ inputs.NEXT_PUBLIC_GOOGLE_PROJECT_ID }}
+    #     NEXT_PUBLIC_GOOGLE_STORAGE_BUCKET: ${{ inputs.NEXT_PUBLIC_GOOGLE_STORAGE_BUCKET }}
+    #     NEXT_PUBLIC_GOOGLE_MESSAGING_SENDER_ID: ${{ inputs.NEXT_PUBLIC_GOOGLE_MESSAGING_SENDER_ID }}
+    #     NEXT_PUBLIC_GOOGLE_APP_ID: ${{ inputs.NEXT_PUBLIC_GOOGLE_APP_ID }}
+    #     NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_ID_SENSITIVE: ${{ inputs.NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_ID_SENSITIVE }}
