@@ -199,9 +199,12 @@ export function formatDateTime(dateInput: Date | string, locale?: string) {
 }
 
 export function formatDate(dateInput: Date | string, config?: DateFormatConfig, locale?: string) {
+  // Add year by default if date is not in current year
+  const isCurrentYear = new Date().getFullYear() === new Date(dateInput).getFullYear();
+
   return getFormattedDateTime(
     dateInput,
-    { day: 'numeric', month: 'short', year: config?.withYear ? 'numeric' : undefined },
+    { day: 'numeric', month: 'short', year: config?.withYear ?? !isCurrentYear ? 'numeric' : undefined },
     locale
   );
 }

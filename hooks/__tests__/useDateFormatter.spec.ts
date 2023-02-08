@@ -33,10 +33,13 @@ describe('useDateFormatter', () => {
     const { result, rerender } = renderHook(() => useDateFormatter());
     const testDate = '2023-02-08T07:59:48.698Z';
     const testDate2 = '2023-11-28T17:59:48.698Z';
+    const testDatePastYear = '2020-03-08T03:30:48.698Z';
 
     expect(result.current.formatDate(testDate)).toEqual('Feb 8');
     expect(result.current.formatDate(testDate, { withYear: true })).toEqual('Feb 8, 2023');
     expect(result.current.formatDate(testDate2)).toEqual('Nov 28');
+    expect(result.current.formatDate(testDatePastYear)).toEqual('Mar 8, 2020');
+    expect(result.current.formatDate(testDatePastYear, { withYear: false })).toEqual('Mar 8');
 
     (useUserPreferences as jest.Mock<any, any>).mockReturnValue({ userPreferences: { locale: 'en-GB' } });
     rerender();
@@ -44,6 +47,8 @@ describe('useDateFormatter', () => {
     expect(result.current.formatDate(testDate)).toEqual('8 Feb');
     expect(result.current.formatDate(testDate, { withYear: true })).toEqual('8 Feb 2023');
     expect(result.current.formatDate(testDate2)).toEqual('28 Nov');
+    expect(result.current.formatDate(testDatePastYear)).toEqual('8 Mar 2020');
+    expect(result.current.formatDate(testDatePastYear, { withYear: false })).toEqual('8 Mar');
   });
 
   test('should format time using locale from user preferences', () => {
