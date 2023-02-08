@@ -74,7 +74,7 @@ runs:
       shell: bash
       run: |
         echo ${{ toJSON(steps.diffset.outputs.diff) }} | jq '.[]'
-
+        echo ${{ join(',' , toJSON(steps.diffset.outputs.diff)) }}
     # - name: some debug stuff
     #   id: formatting_diffset_test_hash
     #   shell: bash
