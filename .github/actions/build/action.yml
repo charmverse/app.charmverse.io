@@ -62,11 +62,11 @@ runs:
     - uses: technote-space/get-diff-action@v6
       id: diffset
       with:
-        SET_ENV_NAME: GIT_DIFF
         PATTERNS: |
           **/*.+(j|t)s
           **/*.+(j|t)sx
           **/*.scss
+          **/*.yml
         SEPARATOR: ','
 
     - run: echo '--- DEBUG ---'
