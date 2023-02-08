@@ -28,13 +28,16 @@ export async function getUserProfile(
     query.id = value;
   }
 
-  const profile = await tx.user.findFirst({
+  const user = await tx.user.findFirst({
     where: query,
     include: sessionUserRelations
   });
 
-  if (!profile) {
+  if (!user) {
     throw new MissingDataError(`User with ${key} ${value} not found`);
   }
-  return profile;
+  const { profile, ...restProfile } = user;
+  const userProfile: LoggedInUser = { ...restProfile, preferences: profile };
+
+  return userProfile;
 }
