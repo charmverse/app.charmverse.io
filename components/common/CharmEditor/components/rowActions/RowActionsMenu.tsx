@@ -14,6 +14,7 @@ import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/st
 import { useAppDispatch, useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { initialLoad } from 'components/common/BoardEditor/focalboard/src/store/initialLoad';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useFocusedPage } from 'hooks/useFocusedPage';
 import { usePages } from 'hooks/usePages';
 import log from 'lib/log';
 
@@ -33,7 +34,8 @@ const menuPosition: Partial<MenuProps> = {
 function Component({ menuState }: { menuState: PluginState }) {
   const popupState = usePopupState({ variant: 'popover', popupId: 'user-role' });
   const view = useEditorViewContext();
-  const { deletePage, currentPageId, pages } = usePages();
+  const { currentPageId } = useFocusedPage();
+  const { deletePage, pages } = usePages();
   const currentPage = pages[currentPageId];
   const currentSpace = useCurrentSpace();
   const dispatch = useAppDispatch();

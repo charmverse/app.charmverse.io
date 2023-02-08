@@ -9,6 +9,7 @@ import { useAppDispatch } from 'components/common/BoardEditor/focalboard/src/sto
 import { addView, setCurrent } from 'components/common/BoardEditor/focalboard/src/store/views';
 import ErrorPage from 'components/common/errors/ErrorPage';
 import LoadingComponent from 'components/common/LoadingComponent';
+import { useFocusedPage } from 'hooks/useFocusedPage';
 import { usePages } from 'hooks/usePages';
 import { usePageTitle } from 'hooks/usePageTitle';
 import type { PublicPageResponse } from 'lib/pages';
@@ -20,7 +21,8 @@ type Props = {
 
 export function SharedPage({ publicPage }: Props) {
   const dispatch = useAppDispatch();
-  const { setCurrentPageId, pages } = usePages();
+  const { setCurrentPageId } = useFocusedPage();
+  const { pages } = usePages();
   const [, setTitleState] = usePageTitle();
   // keep track of the pageId by path since currentPageId may change when a page is viewed inside a modal
   const basePageId = publicPage?.page?.id || '';

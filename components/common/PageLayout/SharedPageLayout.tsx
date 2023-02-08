@@ -9,8 +9,8 @@ import { PageDialogProvider } from 'components/common/PageDialog/hooks/usePageDi
 import PageDialogGlobalModal from 'components/common/PageDialog/PageDialogGlobal';
 import Account from 'components/common/PageLayout/components/Account';
 import CurrentPageFavicon from 'components/common/PageLayout/components/CurrentPageFavicon';
-import { StyledToolbar } from 'components/common/PageLayout/components/Header';
 import PageTitleWithBreadcrumbs from 'components/common/PageLayout/components/Header/components/PageTitleWithBreadcrumbs';
+import { StyledToolbar } from 'components/common/PageLayout/components/Header/Header';
 import PageContainer from 'components/common/PageLayout/components/PageContainer';
 import { AppBar, HeaderSpacer } from 'components/common/PageLayout/PageLayout';
 import { useColorMode } from 'context/darkMode';

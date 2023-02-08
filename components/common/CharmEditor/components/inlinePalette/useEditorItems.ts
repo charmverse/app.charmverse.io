@@ -3,6 +3,7 @@ import { useMemo } from 'react';
 
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
+import { useFocusedPage } from 'hooks/useFocusedPage';
 import { usePages } from 'hooks/usePages';
 import { useUser } from 'hooks/useUser';
 
@@ -30,7 +31,8 @@ export function useEditorItems({
   const { addNestedPage } = useNestedPage();
   const space = useCurrentSpace();
   const { user } = useUser();
-  const { currentPageId, pages } = usePages();
+  const { currentPageId } = useFocusedPage();
+  const { pages } = usePages();
   const [userSpacePermissions] = useCurrentSpacePermissions();
 
   const pageType = currentPageId ? pages[currentPageId]?.type : undefined;

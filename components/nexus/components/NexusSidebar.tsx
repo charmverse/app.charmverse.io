@@ -2,7 +2,7 @@ import styled from '@emotion/styled';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import { Box, IconButton } from '@mui/material';
 
-import { headerHeight } from 'components/common/PageLayout/components/Header';
+import { headerHeight } from 'components/common/PageLayout/components/Header/Header';
 import Workspaces from 'components/common/PageLayout/components/Sidebar/Workspaces';
 
 const SidebarContainer = styled.div`

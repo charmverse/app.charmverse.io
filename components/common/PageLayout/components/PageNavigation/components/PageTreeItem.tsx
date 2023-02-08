@@ -4,7 +4,6 @@ import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import type { TreeItemContentProps } from '@mui/lab/TreeItem';
 import TreeItem, { treeItemClasses } from '@mui/lab/TreeItem';
-import IconButton from '@mui/material/IconButton';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
@@ -24,6 +23,7 @@ import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/sto
 import EmojiPicker from 'components/common/BoardEditor/focalboard/src/widgets/emojiPicker';
 import TreeItemContent from 'components/common/TreeItemContent';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
+import { useFocusedPage } from 'hooks/useFocusedPage';
 import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { isTouchScreen } from 'lib/utilities/browser';
@@ -377,7 +377,8 @@ const PageTreeItem = forwardRef<any, PageTreeItemProps>((props, ref) => {
 
 function PageActionsMenu({ closeMenu, pageId, pagePath }: { closeMenu: () => void; pageId: string; pagePath: string }) {
   const boards = useAppSelector(getSortedBoards);
-  const { deletePage, currentPageId, getPagePermissions, pages } = usePages();
+  const { currentPageId } = useFocusedPage();
+  const { deletePage, getPagePermissions, pages } = usePages();
   const { showMessage } = useSnackbar();
   const permissions = getPagePermissions(pageId);
   const router = useRouter();

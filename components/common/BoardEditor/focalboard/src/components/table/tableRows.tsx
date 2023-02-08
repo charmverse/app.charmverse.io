@@ -27,7 +27,11 @@ function TableRows(props: Props): JSX.Element {
   const { board, cards, activeView } = props;
   const { pages, updatePage } = usePages();
 
-  const saveTitle = React.useCallback(async (saveType: string, cardId: string, title: string) => {
+  const saveTitle = React.useCallback(async (saveType: string, cardId: string, title: string, oldTitle: string) => {
+    // ignore if title is unchanged
+    if (title === oldTitle) {
+      return;
+    }
     await updatePage({ id: cardId, title });
 
     if (saveType === 'onEnter') {
@@ -39,6 +43,7 @@ function TableRows(props: Props): JSX.Element {
       }
     }
   }, []);
+
   return (
     <>
       {cards.map((card) => {

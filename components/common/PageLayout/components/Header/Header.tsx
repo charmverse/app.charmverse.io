@@ -26,14 +26,12 @@ import Tooltip from '@mui/material/Tooltip';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
-import { useMemo, useRef, useState } from 'react';
-import useSWR from 'swr';
+import { memo, useMemo, useRef, useState } from 'react';
 
 import charmClient from 'charmClient';
 import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
 import { undoEventName } from 'components/common/CharmEditor/utils';
 import { usePostByPath } from 'components/forum/hooks/usePostByPath';
-import { usePostPermissions } from 'components/forum/hooks/usePostPermissions';
 import { useColorMode } from 'context/darkMode';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
@@ -162,11 +160,10 @@ export function Metadata({ creator, lastUpdatedAt }: { creator: string; lastUpda
   );
 }
 
-export default function Header({ open, openSidebar }: HeaderProps) {
+function HeaderComponent({ open, openSidebar }: HeaderProps) {
   const router = useRouter();
   const colorMode = useColorMode();
   const { pages, updatePage, getPagePermissions, deletePage } = usePages();
-  const currentSpace = useCurrentSpace();
 
   const { user } = useUser();
   const theme = useTheme();
@@ -551,3 +548,5 @@ export default function Header({ open, openSidebar }: HeaderProps) {
     </StyledToolbar>
   );
 }
+
+export const Header = memo(HeaderComponent);

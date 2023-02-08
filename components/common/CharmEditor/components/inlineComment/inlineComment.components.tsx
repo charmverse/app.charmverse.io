@@ -11,9 +11,9 @@ import { createPortal } from 'react-dom';
 
 import charmClient from 'charmClient';
 import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
+import { useFocusedPage } from 'hooks/useFocusedPage';
 import { useInlineComment } from 'hooks/useInlineComment';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
-import { usePages } from 'hooks/usePages';
 import { useThreads } from 'hooks/useThreads';
 import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
 import type { PageContent } from 'lib/prosemirror/interfaces';
@@ -104,7 +104,7 @@ export function InlineCommentSubMenu({ pluginKey }: { pluginKey: PluginKey }) {
   });
   const { extractTextFromSelection } = useInlineComment();
   const { setThreads } = useThreads();
-  const { currentPageId } = usePages();
+  const { currentPageId } = useFocusedPage();
   const isEmpty = checkIsContentEmpty(commentContent);
   const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'));
 

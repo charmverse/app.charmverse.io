@@ -23,7 +23,7 @@ import { VotesProvider } from 'hooks/useVotes';
 import { useWindowSize } from 'hooks/useWindowSize';
 
 import CurrentPageFavicon from './components/CurrentPageFavicon';
-import Header, { headerHeight } from './components/Header';
+import { Header, headerHeight } from './components/Header/Header';
 import PageContainer from './components/PageContainer';
 import Sidebar from './components/Sidebar';
 

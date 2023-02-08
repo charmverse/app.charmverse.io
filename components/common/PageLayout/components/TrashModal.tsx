@@ -24,6 +24,7 @@ import { useAppDispatch } from 'components/common/BoardEditor/focalboard/src/sto
 import { initialLoad } from 'components/common/BoardEditor/focalboard/src/store/initialLoad';
 import { ScrollableModal as Modal } from 'components/common/Modal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useFocusedPage } from 'hooks/useFocusedPage';
 import { usePages } from 'hooks/usePages';
 import { fancyTrim } from 'lib/utilities/strings';
 
@@ -79,7 +80,8 @@ export default function TrashModal({ onClose, isOpen }: { onClose: () => void; i
   const [isMutating, setIsMutating] = useState(false);
   const [searchText, setSearchText] = useState('');
   const space = useCurrentSpace();
-  const { pages, getPagePermissions, mutatePagesRemove, currentPageId } = usePages();
+  const { currentPageId } = useFocusedPage();
+  const { pages, getPagePermissions, mutatePagesRemove } = usePages();
   const dispatch = useAppDispatch();
   const router = useRouter();
 

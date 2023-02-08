@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import { useDragLayer, useDrop } from 'react-dnd';
+import { useDrop } from 'react-dnd';
 import { FormattedMessage } from 'react-intl';
 
 import useEfficientDragLayer from 'hooks/useEffecientDragLayer';

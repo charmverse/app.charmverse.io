@@ -25,7 +25,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
 
-import { headerHeight } from '../Header';
+import { headerHeight } from '../Header/Header';
 
 import SpaceListItem from './SpaceListItem';
 import WorkspaceAvatar from './WorkspaceAvatar';
@@ -34,7 +34,7 @@ const StyledButton = styled(Button)(
   ({ theme }) => `
   justify-content: flex-start;
   padding: ${theme.spacing(0.3, 5, 0.3, 2)};
-  '&:hover': { 
+  '&:hover': {
     backgroundColor: ${theme.palette.action.hover};
   }
   ${theme.breakpoints.up('lg')} {

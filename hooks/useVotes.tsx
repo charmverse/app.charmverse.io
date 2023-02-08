@@ -9,7 +9,7 @@ import type { ExtendedVote, VoteDTO, VoteTask } from 'lib/votes/interfaces';
 import type { GetTasksResponse } from 'pages/api/tasks/list';
 
 import { useCurrentSpace } from './useCurrentSpace';
-import { usePages } from './usePages';
+import { useFocusedPage } from './useFocusedPage';
 import { useUser } from './useUser';
 import { useWebSocketClient } from './useWebSocketClient';
 
@@ -36,7 +36,7 @@ const VotesContext = createContext<Readonly<IContext>>({
 });
 
 export function VotesProvider({ children }: { children: ReactNode }) {
-  const { currentPageId } = usePages();
+  const { currentPageId } = useFocusedPage();
   const [votes, setVotes] = useState<IContext['votes']>({});
   const { user } = useUser();
   const currentSpace = useCurrentSpace();

@@ -4,10 +4,9 @@ import type { KeyedMutator } from 'swr';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
+import { useFocusedPage } from 'hooks/useFocusedPage';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import type { ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
-
-import { usePages } from './usePages';
 
 type IContext = {
   isValidating: boolean;
@@ -34,7 +33,7 @@ export const ThreadsContext = createContext<Readonly<IContext>>({
 });
 
 export function ThreadsProvider({ children }: { children: ReactNode }) {
-  const { currentPageId } = usePages();
+  const { currentPageId } = useFocusedPage();
   const [threads, setThreads] = useState<Record<string, ThreadWithCommentsAndAuthors | undefined>>({});
 
   const { data, isValidating, mutate } = useSWR(

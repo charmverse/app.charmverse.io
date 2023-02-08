@@ -8,7 +8,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import type { Page } from '@prisma/client';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import Hotkeys from 'react-hot-keys';
 import type { WrappedComponentProps } from 'react-intl';
 import { injectIntl } from 'react-intl';
@@ -286,46 +286,47 @@ function CenterPanel(props: Props) {
     showCard(cardTemplateId);
   };
 
-  const cardClicked = (e: React.MouseEvent, card: Card): void => {
-    const { activeView } = props;
-
-    if (!activeView) {
-      return;
-    }
-
-    if (e.shiftKey) {
-      let selectedCardIds = state.selectedCardIds.slice();
-      if (selectedCardIds.length > 0 && (e.metaKey || e.ctrlKey)) {
-        // Cmd+Shift+Click: Extend the selection
-        const orderedCardIds = cards.map((o) => o.id);
-        const lastCardId = selectedCardIds[selectedCardIds.length - 1];
-        const srcIndex = orderedCardIds.indexOf(lastCardId);
-        const destIndex = orderedCardIds.indexOf(card.id);
-        const newCardIds =
-          srcIndex < destIndex
-            ? orderedCardIds.slice(srcIndex, destIndex + 1)
-            : orderedCardIds.slice(destIndex, srcIndex + 1);
-        for (const newCardId of newCardIds) {
-          if (!selectedCardIds.includes(newCardId)) {
-            selectedCardIds.push(newCardId);
-          }
-        }
-        setState({ ...state, selectedCardIds });
-      } else {
-        // Shift+Click: add to selection
-        if (selectedCardIds.includes(card.id)) {
-          selectedCardIds = selectedCardIds.filter((o) => o !== card.id);
-        } else {
-          selectedCardIds.push(card.id);
-        }
-        setState({ ...state, selectedCardIds });
+  const cardClicked = useCallback(
+    (e: React.MouseEvent, card: Card): void => {
+      if (!activeView) {
+        return;
       }
-    } else if (activeView.fields.viewType === 'board' || activeView.fields.viewType === 'gallery') {
-      showCard(card.id);
-    }
 
-    e.stopPropagation();
-  };
+      if (e.shiftKey) {
+        let selectedCardIds = state.selectedCardIds.slice();
+        if (selectedCardIds.length > 0 && (e.metaKey || e.ctrlKey)) {
+          // Cmd+Shift+Click: Extend the selection
+          const orderedCardIds = cards.map((o) => o.id);
+          const lastCardId = selectedCardIds[selectedCardIds.length - 1];
+          const srcIndex = orderedCardIds.indexOf(lastCardId);
+          const destIndex = orderedCardIds.indexOf(card.id);
+          const newCardIds =
+            srcIndex < destIndex
+              ? orderedCardIds.slice(srcIndex, destIndex + 1)
+              : orderedCardIds.slice(destIndex, srcIndex + 1);
+          for (const newCardId of newCardIds) {
+            if (!selectedCardIds.includes(newCardId)) {
+              selectedCardIds.push(newCardId);
+            }
+          }
+          setState({ ...state, selectedCardIds });
+        } else {
+          // Shift+Click: add to selection
+          if (selectedCardIds.includes(card.id)) {
+            selectedCardIds = selectedCardIds.filter((o) => o !== card.id);
+          } else {
+            selectedCardIds.push(card.id);
+          }
+          setState({ ...state, selectedCardIds });
+        }
+      } else if (activeView.fields.viewType === 'board' || activeView.fields.viewType === 'gallery') {
+        showCard(card.id);
+      }
+
+      e.stopPropagation();
+    },
+    [activeView]
+  );
 
   async function deleteSelectedCards() {
     const { selectedCardIds } = state;

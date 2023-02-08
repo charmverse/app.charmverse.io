@@ -5,14 +5,14 @@ import { useRouter } from 'next/router';
 import { useCallback } from 'react';
 
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { usePages } from 'hooks/usePages';
+import { useFocusedPage } from 'hooks/useFocusedPage';
 import { useUser } from 'hooks/useUser';
 import { addPage } from 'lib/pages';
 
 export default function useNestedPage() {
   const space = useCurrentSpace();
   const { user } = useUser();
-  const { currentPageId } = usePages();
+  const { currentPageId } = useFocusedPage();
   const view = useEditorViewContext();
   const router = useRouter();
   const cardId = new URLSearchParams(window.location.search).get('cardId');
