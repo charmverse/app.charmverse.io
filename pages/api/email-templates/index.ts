@@ -53,8 +53,7 @@ const createDiscussionTask = ({
       avatarTokenId: null,
       avatarChain: null,
       deletedAt: null,
-      spacesOrder: [],
-      preferences: {}
+      spacesOrder: []
     }
   };
 };
@@ -93,8 +92,7 @@ const createForumTask = ({
       avatarTokenId: null,
       avatarChain: null,
       deletedAt: null,
-      spacesOrder: [],
-      preferences: {}
+      spacesOrder: []
     }
   };
 };

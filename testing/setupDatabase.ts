@@ -175,8 +175,7 @@ export async function generateUserAndSpace({
           }
         }
       },
-      ...user,
-      preferences: {}
+      ...user
     },
     include: {
       spaceRoles: {

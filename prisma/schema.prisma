@@ -461,7 +461,6 @@ model User {
   postComments         PostComment[]
   googleAccounts       GoogleAccount[]
   GoogleCredential     GoogleCredential[]
-  preferences          Json?  @default("{}")
 }
 
 model UserWallet {
@@ -500,6 +499,7 @@ model UserDetails {
   social      Json?
   user        User    @relation(fields: [id], references: [id], onDelete: Cascade)
   timezone    String?
+  locale      String?
 }
 
 model TelegramUser {
