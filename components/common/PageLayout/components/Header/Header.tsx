@@ -171,7 +171,6 @@ export default function Header({ open, openSidebar }: HeaderProps) {
   const router = useRouter();
   const colorMode = useColorMode();
   const { pages, updatePage, getPagePermissions, deletePage } = usePages();
-  const currentSpace = useCurrentSpace();
 
   const { user } = useUser();
   const theme = useTheme();
@@ -455,7 +454,7 @@ export default function Header({ open, openSidebar }: HeaderProps) {
         sx={{
           display: 'inline-flex',
           mr: 2,
-          ...(open && isLargeScreen && { display: 'none' })
+          ...(open && { display: 'none' })
         }}
       >
         <MenuIcon />
@@ -516,39 +515,35 @@ export default function Header({ open, openSidebar }: HeaderProps) {
             </Box>
           )}
           {/** End of CharmEditor page specific header content */}
-
-          {/** dark mode toggle */}
           {user && (
-            <>
-              <NotificationsBadge>
-                <IconButton
-                  size={isLargeScreen ? 'small' : 'medium'}
-                  onClick={() => clickToOpenSettingsModal('notifications')}
-                >
-                  <NotificationsIcon fontSize='small' color='secondary' />
-                </IconButton>
-              </NotificationsBadge>
+            <NotificationsBadge>
               <IconButton
-                size='small'
-                sx={{ display: { xs: 'none', md: 'inline-flex' } }}
-                onClick={colorMode.toggleColorMode}
-                color='inherit'
+                size={isLargeScreen ? 'small' : 'medium'}
+                onClick={() => clickToOpenSettingsModal('notifications')}
               >
-                <Tooltip
-                  title={`Enable ${theme.palette.mode === 'dark' ? 'light mode' : 'dark mode'}`}
-                  arrow
-                  placement='top'
-                >
-                  {theme.palette.mode === 'dark' ? (
-                    <SunIcon fontSize='small' color='secondary' />
-                  ) : (
-                    <MoonIcon fontSize='small' color='secondary' />
-                  )}
-                </Tooltip>
+                <NotificationsIcon fontSize='small' color='secondary' />
               </IconButton>
-            </>
+            </NotificationsBadge>
           )}
-          {/* <NotificationsBadge /> */}
+          <IconButton
+            sx={{ display: { xs: 'none', md: 'inline-flex' } }}
+            size='small'
+            onClick={colorMode.toggleColorMode}
+            color='inherit'
+          >
+            <Tooltip
+              title={`Enable ${theme.palette.mode === 'dark' ? 'light mode' : 'dark mode'}`}
+              arrow
+              placement='top'
+            >
+              {theme.palette.mode === 'dark' ? (
+                <SunIcon fontSize='small' color='secondary' />
+              ) : (
+                <MoonIcon fontSize='small' color='secondary' />
+              )}
+            </Tooltip>
+          </IconButton>
+
           {/** user account */}
           {/* <Account /> */}
         </Box>

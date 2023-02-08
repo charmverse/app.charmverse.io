@@ -8,7 +8,7 @@ import charmClient from 'charmClient';
 import ErrorPage from 'components/common/errors/ErrorPage';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { CenteredPageContent } from 'components/common/PageLayout/components/PageContent';
-import PageLayout from 'components/common/PageLayout/PageLayout';
+import NexusLayout from 'components/common/PageLayout/NexusLayout';
 import PublicProfile from 'components/profile/PublicProfile';
 import { usePageTitle } from 'hooks/usePageTitle';
 
@@ -42,8 +42,8 @@ export default function UserProfilePage() {
 
 UserProfilePage.getLayout = (page: ReactElement) => {
   return (
-    <PageLayout>
+    <NexusLayout>
       <CenteredPageContent>{page}</CenteredPageContent>
-    </PageLayout>
+    </NexusLayout>
   );
 };

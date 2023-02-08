@@ -17,6 +17,7 @@ import { usePopupState } from 'material-ui-popup-state/hooks';
 import type { MouseEvent } from 'react';
 import { useCallback, useState } from 'react';
 
+import Avatar from 'components/common/Avatar';
 import { CreateSpaceForm } from 'components/common/CreateSpaceForm';
 import { Modal } from 'components/common/Modal';
 import UserDisplay from 'components/common/UserDisplay';
@@ -31,14 +32,15 @@ import SpaceListItem from './SpaceListItem';
 import WorkspaceAvatar from './WorkspaceAvatar';
 
 const StyledButton = styled(Button)(
-  ({ theme }) => `
+  ({ theme, fullWidth }) => `
   justify-content: flex-start;
-  padding: ${theme.spacing(0.3, 5, 0.3, 2)};
-  '&:hover': { 
+  padding: ${fullWidth ? theme.spacing(0.3, 5, 0.3, 2) : theme.spacing(0.5, 1)};
+
+  &:hover: {
     backgroundColor: ${theme.palette.action.hover};
   }
   ${theme.breakpoints.up('lg')} {
-    padding-right: ${theme.spacing(2)};
+    padding-right: ${fullWidth ? theme.spacing(2) : 0};
   }
 `
 );
@@ -111,13 +113,19 @@ export default function SidebarSubmenu({
         endIcon={<KeyboardArrowDownIcon fontSize='small' />}
         variant='text'
         color='inherit'
-        fullWidth
+        fullWidth={!!currentSpace}
         {...bindTrigger(menuPopupState)}
       >
-        <WorkspaceAvatar name={currentSpace?.name ?? 'Select a space'} image={currentSpace?.spaceImage ?? null} />
-        <Typography variant='body1' data-test='sidebar-space-name' noWrap ml={1}>
-          {currentSpace?.name ?? 'Spaces'}
-        </Typography>
+        {currentSpace ? (
+          <>
+            <WorkspaceAvatar name={currentSpace.name} image={currentSpace.spaceImage ?? null} />
+            <Typography variant='body1' data-test='sidebar-space-name' noWrap ml={1}>
+              {currentSpace.name ?? 'Spaces'}
+            </Typography>
+          </>
+        ) : user ? (
+          <Avatar name={user.username} avatar={user.avatar ?? null} />
+        ) : null}
       </StyledButton>
       <Menu onClick={menuPopupState.close} {...bindMenu(menuPopupState)} sx={{ maxWidth: '330px' }}>
         <MenuItem
@@ -159,11 +167,13 @@ export default function SidebarSubmenu({
           Sign out
         </MenuItem>
       </Menu>
-      <Tooltip title='Close sidebar' placement='bottom'>
-        <IconButton onClick={closeSidebar} size='small' sx={{ position: 'absolute', right: 0, top: 12 }}>
-          <MenuOpenIcon />
-        </IconButton>
-      </Tooltip>
+      {currentSpace && (
+        <Tooltip title='Close sidebar' placement='bottom'>
+          <IconButton onClick={closeSidebar} size='small' sx={{ position: 'absolute', right: 0, top: 12 }}>
+            <MenuOpenIcon />
+          </IconButton>
+        </Tooltip>
+      )}
       <Modal
         size='medium'
         open={spaceFormOpen}
