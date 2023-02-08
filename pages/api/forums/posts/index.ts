@@ -6,8 +6,7 @@ import type { CreateForumPostInput } from 'lib/forums/posts/createForumPost';
 import { createForumPost, trackCreateForumPostEvent } from 'lib/forums/posts/createForumPost';
 import type { ListForumPostsRequest, PaginatedPostList } from 'lib/forums/posts/listForumPosts';
 import { listForumPosts } from 'lib/forums/posts/listForumPosts';
-import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
-import { computePostCategoryPermissions } from 'lib/permissions/forum/computePostCategoryPermissions';
+import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { mutatePostCategorySearch } from 'lib/permissions/forum/mutatePostCategorySearch';
 import { requestOperations } from 'lib/permissions/requestOperations';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -22,7 +21,7 @@ handler
 // TODO - Update posts
 async function getPosts(req: NextApiRequest, res: NextApiResponse<PaginatedPostList>) {
   const postQuery = req.query as any as ListForumPostsRequest;
-  const userId = req.session.user.id;
+  const userId = req.session.user?.id as string | undefined;
 
   // Apply permissions to what we are searching for
   postQuery.categoryId = (

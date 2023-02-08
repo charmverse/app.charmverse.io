@@ -179,7 +179,9 @@ export function charmEditorPlugins({
     heading.plugins(),
     horizontalRule.plugins(),
     italic.plugins(),
-    listItem.plugins(),
+    listItem.plugins({
+      readOnly
+    }),
     orderedList.plugins(),
     columnLayout.plugins(),
     paragraph.plugins(),
@@ -603,6 +605,7 @@ function CharmEditor({
             const attrs = props.attrs as { base: null | CryptoCurrency; quote: null | FiatCurrency };
             return (
               <CryptoPrice
+                readOnly={readOnly}
                 base={attrs.base}
                 quote={attrs.quote}
                 onBaseCurrencyChange={(newBaseCurrency) => {
@@ -619,7 +622,7 @@ function CharmEditor({
             );
           }
           case 'blockquote': {
-            return <Callout {...props}>{_children}</Callout>;
+            return <Callout {...allProps}>{_children}</Callout>;
           }
           case 'horizontalRule': {
             return (

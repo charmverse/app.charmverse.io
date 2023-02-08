@@ -104,7 +104,9 @@ function specFactory(): RawSpecs {
   };
 }
 
-function pluginsFactory({ keybindings = defaultKeys, nodeView = true } = {}): RawPlugins {
+function pluginsFactory({ keybindings = defaultKeys, nodeView = true, readOnly = false } = {}): RawPlugins & {
+  readOnly?: boolean;
+} {
   return ({ schema }: { schema: Schema }) => {
     const type = getTypeFromSchema(schema);
 
@@ -133,7 +135,7 @@ function pluginsFactory({ keybindings = defaultKeys, nodeView = true } = {}): Ra
           ])
         }),
 
-      nodeView && listItemNodeViewPlugin(name)
+      nodeView && listItemNodeViewPlugin(name, readOnly)
     ];
   };
 }
