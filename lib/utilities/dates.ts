@@ -82,12 +82,6 @@ export function humanFriendlyDate(
   return formatted;
 }
 
-export function toMonthDate(date: DateInput): string {
-  const parsedDate = convertToLuxonDate(date);
-
-  return parsedDate.toFormat('MMM d');
-}
-
 export function showDateWithMonthAndYear(dateInput: Date | string, showDate?: boolean) {
   const date = typeof dateInput === 'string' ? new Date(dateInput) : dateInput;
   return `${date.toLocaleString('default', {
