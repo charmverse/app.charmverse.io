@@ -62,6 +62,13 @@ test.describe.serial('Add a new space from sidebar and load it', async () => {
     await expect(closePropertiesModalBtn).toBeVisible();
     await closePropertiesModalBtn.click();
 
+    let memberProfileNftList = await page.locator('data-test=member-profile-nft-list');
+    let memberProfileOrgList = await page.locator('data-test=member-profile-org-list');
+    let memberProfilePoapList = await page.locator('data-test=member-profile-poap-list');
+    await expect(memberProfileNftList).toBeVisible();
+    await expect(memberProfileOrgList).toBeVisible();
+    await expect(memberProfilePoapList).toBeVisible();
+
     await page.locator('text=[Your DAO] Home').first().waitFor();
 
     // check sidebar space name
@@ -78,6 +85,13 @@ test.describe.serial('Add a new space from sidebar and load it', async () => {
     await nameInput.fill(uniqueDomainName2);
     await page.locator('data-test=create-workspace').click();
     await page.waitForURL(`**/${uniqueDomainName2}`);
+
+    memberProfileNftList = await page.locator('data-test=member-profile-nft-list');
+    memberProfileOrgList = await page.locator('data-test=member-profile-org-list');
+    memberProfilePoapList = await page.locator('data-test=member-profile-poap-list');
+    await expect(memberProfileNftList).toBeVisible();
+    await expect(memberProfileOrgList).toBeVisible();
+    await expect(memberProfilePoapList).toBeVisible();
 
     // Close the modal again
     closePropertiesModalBtn = await page.locator('data-test=close-member-properties-modal');

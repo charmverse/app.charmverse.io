@@ -41,7 +41,7 @@ export function OrgsList({ memberId, readOnly = false }: Props) {
   }
 
   return (
-    <Stack gap={1}>
+    <Stack gap={1} data-test='member-profile-org-list'>
       <Typography variant='h6'>Organizations</Typography>
       {error && (
         <Grid item>

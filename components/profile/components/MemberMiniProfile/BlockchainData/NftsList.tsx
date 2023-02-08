@@ -40,7 +40,7 @@ export function NftsList({ memberId, readOnly = false }: Props) {
   }
 
   return (
-    <Stack gap={1}>
+    <Stack gap={1} data-test='member-profile-nft-list'>
       <Typography variant='h6'>NFTs</Typography>
       {error && (
         <Grid item>

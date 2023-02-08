@@ -19,7 +19,7 @@ export function PoapsList({ memberId }: { memberId: string }) {
   const sortedPoapData = poaps.sort((p1, p2) => (p1.created > p2.created ? -1 : 1));
 
   return (
-    <Stack gap={1}>
+    <Stack gap={1} data-test='member-profile-poap-list'>
       <Typography variant='h6'>Recent POAPs</Typography>
       {error && (
         <Grid item>
