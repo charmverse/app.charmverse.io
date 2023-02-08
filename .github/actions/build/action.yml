@@ -69,11 +69,11 @@ runs:
           **/*.scss
         FORMAT: 'json'
 
-    # - name: some debug stuff
-    #   id: formatting_diffset
-    #   shell: bash
-    #   run: |
-    #     echo "DIFF_FILES=('pages/api/email-templates/index.ts' 'prisma/migrations/20230207125953_user_preferences/migration.sql' 'prisma/schema.prisma' 'testing/setupDatabase.ts'" >> $GITHUB_OUTPUT
+    - name: some debug stuff
+      id: formatting_diffset
+      shell: bash
+      run: |
+        echo ${{ toJSON(steps.diffset.outputs.diff) }} | jq '.[]'
 
     # - name: some debug stuff
     #   id: formatting_diffset_test_hash
