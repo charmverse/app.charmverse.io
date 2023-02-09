@@ -14,9 +14,10 @@ import Typography from '@mui/material/Typography';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { bindTrigger, bindMenu } from 'material-ui-popup-state';
 import { usePopupState } from 'material-ui-popup-state/hooks';
-import NextLink from 'next/link';
+import type { MouseEvent } from 'react';
 import { useCallback, useState } from 'react';
 
+import Avatar from 'components/common/Avatar';
 import { CreateSpaceForm } from 'components/common/CreateSpaceForm';
 import { Modal } from 'components/common/Modal';
 import UserDisplay from 'components/common/UserDisplay';
@@ -31,14 +32,15 @@ import SpaceListItem from './SpaceListItem';
 import WorkspaceAvatar from './WorkspaceAvatar';
 
 const StyledButton = styled(Button)(
-  ({ theme }) => `
+  ({ theme, fullWidth }) => `
   justify-content: flex-start;
-  padding: ${theme.spacing(0.3, 5, 0.3, 2)};
-  '&:hover': {
+  padding: ${fullWidth ? theme.spacing(0.3, 5, 0.3, 2) : theme.spacing(0.5, 1)};
+
+  &:hover: {
     backgroundColor: ${theme.palette.action.hover};
   }
   ${theme.breakpoints.up('lg')} {
-    padding-right: ${theme.spacing(2)};
+    padding-right: ${fullWidth ? theme.spacing(2) : 0};
   }
 `
 );
@@ -62,21 +64,21 @@ const SidebarHeader = styled(Box)(
 
 export default function SidebarSubmenu({
   closeSidebar,
-  logoutCurrentUser
+  logoutCurrentUser,
+  openProfileModal
 }: {
   closeSidebar: () => void;
   logoutCurrentUser: () => void;
+  openProfileModal: (event: MouseEvent<Element, globalThis.MouseEvent>, path?: string) => void;
 }) {
   const theme = useTheme();
   const showMobileFullWidthModal = !useMediaQuery(theme.breakpoints.down('sm'));
 
   const currentSpace = useCurrentSpace();
-  const { spaces, createNewSpace, isCreatingSpace, setSpaces, isLoaded } = useSpaces();
+  const { spaces, isCreatingSpace, setSpaces, isLoaded } = useSpaces();
   const [spaceFormOpen, setSpaceFormOpen] = useState(false);
   const { user } = useUser();
-  const { handleUserUpdate, isSaving } = useUserDetails({
-    user: user!
-  });
+  const { handleUserUpdate, isSaving } = useUserDetails();
 
   function showSpaceForm() {
     setSpaceFormOpen(true);
@@ -109,18 +111,23 @@ export default function SidebarSubmenu({
         endIcon={<KeyboardArrowDownIcon fontSize='small' />}
         variant='text'
         color='inherit'
-        fullWidth
+        fullWidth={!!currentSpace}
         {...bindTrigger(menuPopupState)}
       >
-        <WorkspaceAvatar name={currentSpace?.name ?? ''} image={currentSpace?.spaceImage ?? null} />
-        <Typography variant='body1' data-test='sidebar-space-name' noWrap ml={1}>
-          {currentSpace?.name}
-        </Typography>
+        {currentSpace ? (
+          <>
+            <WorkspaceAvatar name={currentSpace.name} image={currentSpace.spaceImage ?? null} />
+            <Typography variant='body1' data-test='sidebar-space-name' noWrap ml={1}>
+              {currentSpace.name ?? 'Spaces'}
+            </Typography>
+          </>
+        ) : user ? (
+          <Avatar name={user.username} avatar={user.avatar ?? null} />
+        ) : null}
       </StyledButton>
       <Menu onClick={menuPopupState.close} {...bindMenu(menuPopupState)} sx={{ maxWidth: '330px' }}>
         <MenuItem
-          component={NextLink}
-          href='/nexus'
+          onClick={openProfileModal}
           sx={{
             display: 'grid',
             gridTemplateColumns: 'auto 1fr',
@@ -154,13 +161,17 @@ export default function SidebarSubmenu({
           Create or join a space
         </MenuItem>
         <Divider />
-        <MenuItem onClick={logoutCurrentUser}>Sign out</MenuItem>
+        <MenuItem onClick={logoutCurrentUser} data-test='logout-button'>
+          Sign out
+        </MenuItem>
       </Menu>
-      <Tooltip title='Close sidebar' placement='bottom'>
-        <IconButton onClick={closeSidebar} size='small' sx={{ position: 'absolute', right: 0, top: 12 }}>
-          <MenuOpenIcon />
-        </IconButton>
-      </Tooltip>
+      {currentSpace && (
+        <Tooltip title='Close sidebar' placement='bottom'>
+          <IconButton onClick={closeSidebar} size='small' sx={{ position: 'absolute', right: 0, top: 12 }}>
+            <MenuOpenIcon />
+          </IconButton>
+        </Tooltip>
+      )}
       <Modal
         size='medium'
         open={spaceFormOpen}

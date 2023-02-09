@@ -5,8 +5,8 @@ import type { MenuProps } from '@mui/material/Menu';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import { styled } from '@mui/material/styles';
-import { bindTrigger } from 'material-ui-popup-state';
-import type { PopupState } from 'material-ui-popup-state/core';
+import { bindTrigger } from 'material-ui-popup-state/hooks';
+import type { PopupState } from 'material-ui-popup-state/hooks';
 import type { MouseEvent, SyntheticEvent } from 'react';
 import { memo, useState } from 'react';
 

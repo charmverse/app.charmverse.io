@@ -14,7 +14,7 @@ import PageDialogGlobalModal from 'components/common/PageDialog/PageDialogGlobal
 import { SharedPageLayout } from 'components/common/PageLayout/SharedPageLayout';
 import { FocalboardViewsProvider } from 'hooks/useFocalboardViews';
 import { useLocalStorage } from 'hooks/useLocalStorage';
-import { useMobileSidebar } from 'hooks/useMobileSidebar';
+import { useSmallScreen } from 'hooks/useMediaScreens';
 import { useResize } from 'hooks/useResize';
 import { useSharedPage } from 'hooks/useSharedPage';
 import { useUser } from 'hooks/useUser';
@@ -62,7 +62,6 @@ export const AppBar = styled(MuiAppBar, {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen
     })};
-
   ${({ open, sidebarWidth, theme }) =>
     open
       ? `
@@ -116,7 +115,6 @@ const DraggableHandle = styled.div<{ isActive?: boolean; disabled?: boolean }>`
   border-right: 1px solid ${({ theme }) => theme.palette.divider};
   transition: all 0.2s ease-in-out;
   background: transparent;
-
   ${({ disabled, theme }) =>
     !disabled &&
     `&:hover {
@@ -124,27 +122,21 @@ const DraggableHandle = styled.div<{ isActive?: boolean; disabled?: boolean }>`
         }
       cursor: col-resize;
     `}
-
   ${({ isActive, theme }) => (isActive ? `border-right: 3px solid ${theme.palette.primary.main}` : '')}
 `;
 
 interface PageLayoutProps {
   children: React.ReactNode;
-  sidebar?: (p: { closeSidebar: () => void }) => JSX.Element;
-  sidebarWidth?: number;
 }
 
-function PageLayout({ sidebarWidth = 300, children, sidebar: SidebarOverride }: PageLayoutProps) {
+function PageLayout({ children }: PageLayoutProps) {
   const { width } = useWindowSize();
-  const isMobileSidebar = useMobileSidebar();
+  const isMobile = useSmallScreen();
 
-  let mobileSidebarWidth = width ? Math.min(width * 0.85, MAX_SIDEBAR_WIDTH) : sidebarWidth;
-  if (SidebarOverride) {
-    mobileSidebarWidth = sidebarWidth;
-  }
+  const mobileSidebarWidth = width ? Math.min(width * 0.85, MAX_SIDEBAR_WIDTH) : 0;
 
-  const [storageOpen, setStorageOpen] = useLocalStorage('leftSidebar', !isMobileSidebar);
-  const [sidebarStorageWidth, setSidebarStorageWidth] = useLocalStorage('leftSidebarWidth', sidebarWidth);
+  const [storageOpen, setStorageOpen] = useLocalStorage('leftSidebar', !isMobile);
+  const [sidebarStorageWidth, setSidebarStorageWidth] = useLocalStorage('leftSidebarWidth', 300);
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const {
@@ -159,41 +151,41 @@ function PageLayout({ sidebarWidth = 300, children, sidebar: SidebarOverride }: 
   });
   const { user } = useUser();
   const { hasSharedPageAccess, accessChecked, publicPage } = useSharedPage();
-  const open = isMobileSidebar ? mobileOpen : storageOpen;
+  const open = isMobile ? mobileOpen : storageOpen;
 
-  let displaySidebarWidth = SidebarOverride ? sidebarWidth : resizableSidebarWidth || sidebarWidth;
-  if (isMobileSidebar) {
+  let displaySidebarWidth = resizableSidebarWidth;
+  if (isMobile || !user) {
     displaySidebarWidth = 0;
   }
 
   const handleDrawerOpen = React.useCallback(() => {
-    if (isMobileSidebar) {
+    if (isMobile) {
       setMobileOpen(true);
     } else {
       setStorageOpen(true);
     }
-  }, [isMobileSidebar]);
+  }, [isMobile]);
 
   const handleDrawerClose = React.useCallback(() => {
-    if (isMobileSidebar) {
+    if (isMobile) {
       setMobileOpen(false);
     } else {
       setStorageOpen(false);
     }
-  }, [isMobileSidebar]);
+  }, [isMobile]);
 
   const drawerContent = useMemo(
     () =>
-      SidebarOverride ? (
-        <SidebarOverride closeSidebar={handleDrawerClose} />
+      !user ? (
+        <div></div>
       ) : (
         <Sidebar
           closeSidebar={handleDrawerClose}
           favorites={user?.favorites || []}
-          navAction={isMobileSidebar ? handleDrawerClose : undefined}
+          navAction={isMobile ? handleDrawerClose : undefined}
         />
       ),
-    [handleDrawerClose, user?.favorites, isMobileSidebar]
+    [handleDrawerClose, !!user, isMobile]
   );
 
   if (!accessChecked) {
@@ -222,7 +214,7 @@ function PageLayout({ sidebarWidth = 300, children, sidebar: SidebarOverride }: 
                   <AppBar open={open} sidebarWidth={displaySidebarWidth} position='fixed'>
                     <Header open={open} openSidebar={handleDrawerOpen} />
                   </AppBar>
-                  {isMobileSidebar ? (
+                  {isMobile ? (
                     <MuiDrawer
                       open={open}
                       variant='temporary'
@@ -238,17 +230,8 @@ function PageLayout({ sidebarWidth = 300, children, sidebar: SidebarOverride }: 
                   ) : (
                     <Drawer sidebarWidth={displaySidebarWidth} open={open} variant='permanent'>
                       {drawerContent}
-
-                      <Tooltip
-                        title={!!SidebarOverride || isResizing ? '' : 'Drag to resize'}
-                        placement='right'
-                        followCursor
-                      >
-                        <DraggableHandle
-                          onMouseDown={(e) => enableResize(e)}
-                          isActive={isResizing}
-                          disabled={!!SidebarOverride}
-                        />
+                      <Tooltip title={!user || isResizing ? '' : 'Drag to resize'} placement='right' followCursor>
+                        <DraggableHandle onMouseDown={(e) => enableResize(e)} isActive={isResizing} disabled={!user} />
                       </Tooltip>
                     </Drawer>
                   )}

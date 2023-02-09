@@ -15,7 +15,7 @@ const test = base.extend<Fixtures>({
   acceptInvitePage: ({ page }, use) => use(new AcceptInvitePage(page))
 });
 
-test('private invite link - accepting invite sends user to workspace page', async ({ page, acceptInvitePage }) => {
+test('private invite link - accepting invite sends user your space', async ({ page, acceptInvitePage }) => {
   const { space, user: spaceUser } = await generateUserAndSpace();
   const user = await generateUser();
 
