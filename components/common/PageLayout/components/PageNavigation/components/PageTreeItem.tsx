@@ -4,7 +4,6 @@ import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import type { TreeItemContentProps } from '@mui/lab/TreeItem';
 import TreeItem, { treeItemClasses } from '@mui/lab/TreeItem';
-import IconButton from '@mui/material/IconButton';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
@@ -19,11 +18,13 @@ import type { ReactNode, SyntheticEvent } from 'react';
 import React, { forwardRef, memo, useCallback, useMemo } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 
+import charmClient from 'charmClient';
 import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import EmojiPicker from 'components/common/BoardEditor/focalboard/src/widgets/emojiPicker';
 import TreeItemContent from 'components/common/TreeItemContent';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
+import { usePageFromPath } from 'hooks/usePageFromPath';
 import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { isTouchScreen } from 'lib/utilities/browser';
@@ -243,13 +244,12 @@ export function PageLink({
 }
 
 function EmojiMenu({ popupState, pageId }: { popupState: any; pageId: string }) {
-  const { updatePage } = usePages();
   const onSelectEmoji = useCallback(
     async (emoji: string) => {
-      updatePage({ id: pageId, icon: emoji });
+      charmClient.pages.updatePage({ id: pageId, icon: emoji });
       popupState.close();
     },
-    [pageId, updatePage]
+    [pageId]
   );
 
   return (
@@ -377,7 +377,8 @@ const PageTreeItem = forwardRef<any, PageTreeItemProps>((props, ref) => {
 
 function PageActionsMenu({ closeMenu, pageId, pagePath }: { closeMenu: () => void; pageId: string; pagePath: string }) {
   const boards = useAppSelector(getSortedBoards);
-  const { deletePage, currentPageId, getPagePermissions, pages } = usePages();
+  const currentPage = usePageFromPath();
+  const { deletePage, getPagePermissions, pages } = usePages();
   const { showMessage } = useSnackbar();
   const permissions = getPagePermissions(pageId);
   const router = useRouter();
@@ -390,7 +391,6 @@ function PageActionsMenu({ closeMenu, pageId, pagePath }: { closeMenu: () => voi
     }
     const page = pages[pageId];
     const board = boards.find((b) => b.id === page?.id);
-    const currentPage = pages[currentPageId];
     const newPage = await deletePage({
       board,
       pageId

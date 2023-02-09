@@ -39,7 +39,6 @@ import { OnboardingProvider } from 'hooks/useOnboarding';
 import { PagesProvider } from 'hooks/usePages';
 import { PageTitleProvider, usePageTitle } from 'hooks/usePageTitle';
 import { PaymentMethodsProvider } from 'hooks/usePaymentMethods';
-import { PrimaryCharmEditorProvider } from 'hooks/usePrimaryCharmEditor';
 import { SettingsDialogProvider } from 'hooks/useSettingsDialog';
 import { SnackbarProvider } from 'hooks/useSnackbar';
 import { useSpaceFromPath } from 'hooks/useSpaceFromPath';
@@ -268,11 +267,9 @@ function DataProviders({ children }: { children: ReactNode }) {
                     <BountiesProvider>
                       <PaymentMethodsProvider>
                         <PagesProvider>
-                          <PrimaryCharmEditorProvider>
-                            <MemberProfileProvider>
-                              <PageTitleProvider>{children}</PageTitleProvider>
-                            </MemberProfileProvider>
-                          </PrimaryCharmEditorProvider>
+                          <MemberProfileProvider>
+                            <PageTitleProvider>{children}</PageTitleProvider>
+                          </MemberProfileProvider>
                         </PagesProvider>
                       </PaymentMethodsProvider>
                     </BountiesProvider>

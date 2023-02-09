@@ -5,10 +5,10 @@ import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
 
 import Link from 'components/common/Link';
+import { useCharmEditor } from 'hooks/useCharmEditor';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { usePageTitle } from 'hooks/usePageTitle';
-import { usePrimaryCharmEditor } from 'hooks/usePrimaryCharmEditor';
 
 import { PageIcon } from '../../PageIcon';
 
@@ -62,7 +62,7 @@ interface PageBreadCrumb {
 
 function DocumentPageTitle({ basePath, pageId }: { basePath: string; pageId?: string }) {
   const { pages } = usePages();
-  const { isSaving } = usePrimaryCharmEditor();
+  const { isSaving } = useCharmEditor();
 
   const currentPage = pageId ? pages[pageId] : undefined;
 

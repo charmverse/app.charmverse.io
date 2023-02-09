@@ -19,7 +19,6 @@ import charmClient from 'charmClient';
 import { CsvExporter } from 'components/common/BoardEditor/focalboard/csvExporter/csvExporter';
 import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
 import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
-import type { CardPage } from 'components/common/BoardEditor/focalboard/src/store/cards';
 import {
   getViewCardsSortedFilteredAndGrouped,
   sortCards
@@ -35,6 +34,7 @@ import { useToggleFavorite } from 'hooks/useToggleFavorite';
 import { useUser } from 'hooks/useUser';
 import type { Board } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
+import type { CardPage } from 'lib/focalboard/card';
 import { createCard } from 'lib/focalboard/card';
 import log from 'lib/log';
 import type { IPagePermissionFlags } from 'lib/permissions/pages';

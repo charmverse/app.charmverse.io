@@ -9,7 +9,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { ExtendedVote, VoteDTO, VoteTask } from 'lib/votes/interfaces';
 import type { GetTasksResponse } from 'pages/api/tasks/list';
 
-import { usePages } from './usePages';
+import { useCurrentPage } from './useCurrentPage';
 import { useUser } from './useUser';
 import { useWebSocketClient } from './useWebSocketClient';
 
@@ -36,7 +36,7 @@ const VotesContext = createContext<Readonly<IContext>>({
 });
 
 export function VotesProvider({ children }: { children: ReactNode }) {
-  const { currentPageId } = usePages();
+  const { currentPageId } = useCurrentPage();
   const [votes, setVotes] = useState<IContext['votes']>({});
   const { user } = useUser();
   const currentSpace = useCurrentSpace();
@@ -105,7 +105,9 @@ export function VotesProvider({ children }: { children: ReactNode }) {
 
       setVotes((_votes) => {
         updatedVotes.forEach((vote) => {
-          _votes[vote.id] = vote;
+          if (vote) {
+            _votes[vote.id] = vote;
+          }
         });
         return { ..._votes };
       });

@@ -26,11 +26,9 @@ export type LinkedPage = Page & { children: LinkedPage[]; parent: null | LinkedP
 export type PageUpdater = (updates: PageUpdates, revalidate?: boolean) => Promise<PageMeta>;
 
 export type PagesContext = {
-  currentPageId: string;
   loadingPages: boolean;
   pages: PagesMap;
   setPages: Dispatch<SetStateAction<PagesMap>>;
-  setCurrentPageId: Dispatch<SetStateAction<string>>;
   refreshPage: (pageId: string) => Promise<PageMeta>;
   updatePage: PageUpdater;
   mutatePage: (updates: PageUpdates, revalidate?: boolean) => void;
@@ -40,13 +38,11 @@ export type PagesContext = {
   mutatePagesList: KeyedMutator<PagesMap<PageMeta>>;
 };
 
-const refreshInterval = 1000 * 5 * 60; // 5 minutes
+const refreshInterval = 1000 * 30 * 60; // 30 minutes - this is just a fallback in case the websocket fails
 
 export const PagesContext = createContext<Readonly<PagesContext>>({
-  currentPageId: '',
   loadingPages: true,
   pages: {},
-  setCurrentPageId: () => '',
   setPages: () => undefined,
   getPagePermissions: () => new AllowedPagePermissions(),
   refreshPage: () => Promise.resolve({} as any),
@@ -60,7 +56,6 @@ export const PagesContext = createContext<Readonly<PagesContext>>({
 export function PagesProvider({ children }: { children: ReactNode }) {
   const isAdmin = useIsAdmin();
   const currentSpace = useCurrentSpace();
-  const [currentPageId, setCurrentPageId] = useState<string>('');
   const currentSpaceId = useRef<undefined | string>();
   const router = useRouter();
   const { user } = useUser();
@@ -81,7 +76,7 @@ export function PagesProvider({ children }: { children: ReactNode }) {
 
       return pagesDict;
     },
-    { refreshInterval }
+    { refreshInterval, revalidateOnFocus: false }
   );
 
   const pages = data || {};
@@ -231,14 +226,9 @@ export function PagesProvider({ children }: { children: ReactNode }) {
     [mutate]
   );
 
-  const updatePage = useCallback(
-    async (updates: PageUpdates) => {
-      const updatedPage = await charmClient.pages.updatePage(updates);
-
-      return updatedPage;
-    },
-    [mutatePage]
-  );
+  const updatePage = useCallback((updates: PageUpdates) => {
+    return charmClient.pages.updatePage(updates);
+  }, []);
 
   async function refreshPage(pageId: string): Promise<PageMeta> {
     const freshPageVersion = await charmClient.pages.getPage(pageId);
@@ -312,6 +302,11 @@ export function PagesProvider({ children }: { children: ReactNode }) {
       }
     );
   }, []);
+
+  useEffect(() => {
+    currentSpaceId.current = currentSpace?.id;
+  }, [currentSpace]);
+
   useEffect(() => {
     const unsubscribeFromPageUpdates = subscribe('pages_meta_updated', handleUpdateEvent);
     const unsubscribeFromNewPages = subscribe('pages_created', handleNewPageEvent);
@@ -324,17 +319,11 @@ export function PagesProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  useEffect(() => {
-    currentSpaceId.current = currentSpace?.id;
-  }, [currentSpace]);
-
   const value: PagesContext = useMemo(
     () => ({
-      currentPageId,
       deletePage,
       loadingPages: !data,
       pages,
-      setCurrentPageId,
       setPages: _setPages,
       getPagePermissions,
       refreshPage,
@@ -343,7 +332,7 @@ export function PagesProvider({ children }: { children: ReactNode }) {
       mutatePagesRemove,
       mutatePagesList
     }),
-    [currentPageId, router, !!data, pages, user]
+    [router, !!data, pages, user]
   );
 
   return <PagesContext.Provider value={value}>{children}</PagesContext.Provider>;
