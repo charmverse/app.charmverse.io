@@ -7,7 +7,8 @@ const webpack = require('webpack');
 const esmModules = require('./next.base').esmModules;
 
 // we can ignore warnings in production builds because they are checked in test builds
-const ignoreBuildWarnings = process.env.NEXT_PUBLIC_APP_ENV === 'production';
+const ignoreBuildWarnings =
+  process.env.NEXT_PUBLIC_APP_ENV === 'production' || process.env.NEXT_PUBLIC_APP_ENV === 'staging';
 
 const config = {
   poweredByHeader: false,
