@@ -1,14 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import type { PostCategory, Space, User } from '@prisma/client';
 import request from 'supertest';
-import { v4 } from 'uuid';
 
-import { createPostCategory } from 'lib/forums/categories/createPostCategory';
 import type { UpdatePostCommentInput } from 'lib/forums/comments/interface';
 import type { CreateForumPostInput } from 'lib/forums/posts/createForumPost';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { generatePostWithComment } from 'testing/utils/forums';
+import { generatePostWithComment, generatePostCategory } from 'testing/utils/forums';
 
 let space: Space;
 let user: User;
@@ -41,7 +39,7 @@ beforeAll(async () => {
   adminUser = await generateSpaceUser({ isAdmin: true, spaceId: space.id });
   adminUserCookie = await loginUser(adminUser.id);
 
-  postCategory = await createPostCategory({
+  postCategory = await generatePostCategory({
     name: 'Test Category',
     spaceId: space.id
   });
