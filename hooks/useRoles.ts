@@ -1,4 +1,4 @@
-import type { Role } from '@prisma/client';
+import type { Role, Space } from '@prisma/client';
 import { useMemo } from 'react';
 import useSWR, { mutate } from 'swr';
 
@@ -7,8 +7,10 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 
 import type { RoleupWithMembers } from '../lib/roles';
 
-export default function useRoles() {
-  const space = useCurrentSpace();
+export default function useRoles(externalSpace: Space | undefined) {
+  const currentSpace = useCurrentSpace();
+
+  const space = externalSpace || currentSpace;
 
   const { data: roles } = useSWR(
     () => (space ? `roles/${space.id}` : null),
