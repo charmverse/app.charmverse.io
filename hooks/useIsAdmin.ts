@@ -2,7 +2,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useUser } from 'hooks/useUser';
 import isSpaceAdmin from 'lib/users/isSpaceAdmin';
 
-export default function isAdmin(spaceId?: string) {
+export function useIsAdmin(spaceId?: string) {
   const space = useCurrentSpace();
   const { user } = useUser();
 

@@ -12,6 +12,7 @@ import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import type { Space } from '@prisma/client';
 import type { ReactNode } from 'react';
+import { useEffect } from 'react';
 
 import { StyledTreeItem } from 'components/common/PageLayout/components/PageNavigation/components/PageTreeItem';
 import IntegrationSettings from 'components/integrations/IntegrationsPage';
@@ -27,6 +28,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { CurrentSpaceProvider, useCurrentSpaceId } from 'hooks/useCurrentSpaceId';
 import { useSmallScreen } from 'hooks/useMediaScreens';
 import { useSettingsDialog } from 'hooks/useSettingsDialog';
+import { useSpaceFromPath } from 'hooks/useSpaceFromPath';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
 
@@ -93,11 +95,20 @@ function TabPanel(props: TabPanelProps) {
 }
 
 function SpaceSettingsModalComponent() {
-  const { setCurrentSpaceId } = useCurrentSpaceId();
+  const { setCurrentSpaceId, currentSpaceId } = useCurrentSpaceId();
+
+  // This is only ever used for setting the current space as the target space, on the initial popup of the dialog
+  const spaceByPath = useSpaceFromPath();
+  useEffect(() => {
+    if (!currentSpaceId && spaceByPath) {
+      setCurrentSpaceId(spaceByPath.id);
+    }
+  }, [spaceByPath]);
 
   const { user } = useUser();
   const { spaces } = useSpaces();
   const currentSpace = useCurrentSpace();
+
   const isMobile = useSmallScreen();
   const { activePath, onClose, onClick, open } = useSettingsDialog();
 
@@ -148,6 +159,10 @@ function SpaceSettingsModalComponent() {
                 {spaces.map((space) => (
                   <StyledTreeItem
                     key={space.id}
+                    onClick={() => {
+                      setCurrentSpaceId(space.id);
+                      onClick(`${space.name}-space`);
+                    }}
                     nodeId={space.name}
                     label={
                       <Box display='flex' alignItems='center' gap={1}>

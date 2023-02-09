@@ -14,7 +14,7 @@ import * as yup from 'yup';
 import charmClient from 'charmClient';
 import Loader from 'components/common/Loader';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import useIsAdmin from 'hooks/useIsAdmin';
+import { useIsAdmin } from 'hooks/useIsAdmin';
 import { usePreventReload } from 'hooks/usePreventReload';
 import type { AssignablePermissionGroups } from 'lib/permissions/interfaces';
 import type { SpacePermissionFlags } from 'lib/permissions/spaces/client';
