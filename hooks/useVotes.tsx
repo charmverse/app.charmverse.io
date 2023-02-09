@@ -8,8 +8,8 @@ import useTasks from 'components/nexus/hooks/useTasks';
 import type { ExtendedVote, VoteDTO, VoteTask } from 'lib/votes/interfaces';
 import type { GetTasksResponse } from 'pages/api/tasks/list';
 
+import { useCurrentPage } from './useCurrentPage';
 import { useCurrentSpace } from './useCurrentSpace';
-import { useFocusedPage } from './useFocusedPage';
 import { useUser } from './useUser';
 import { useWebSocketClient } from './useWebSocketClient';
 
@@ -36,7 +36,7 @@ const VotesContext = createContext<Readonly<IContext>>({
 });
 
 export function VotesProvider({ children }: { children: ReactNode }) {
-  const { currentPageId } = useFocusedPage();
+  const { currentPageId } = useCurrentPage();
   const [votes, setVotes] = useState<IContext['votes']>({});
   const { user } = useUser();
   const currentSpace = useCurrentSpace();

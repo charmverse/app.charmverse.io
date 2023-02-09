@@ -2,20 +2,20 @@ import type { Dispatch, ReactNode, SetStateAction } from 'react';
 import { createContext, useContext, useMemo, useState } from 'react';
 // keep track of the focused page (may be different from what's in the URL or header)
 
-type IFocusedPageContext = {
+type ICurrentPageContext = {
   currentPageId: string;
   setCurrentPageId: Dispatch<SetStateAction<string>>;
 };
 
-export const FocusedPageContext = createContext<Readonly<IFocusedPageContext>>({
+export const CurrentPageContext = createContext<Readonly<ICurrentPageContext>>({
   currentPageId: '',
   setCurrentPageId: () => ''
 });
 
-export function FocusedPageProvider({ children }: { children: ReactNode }) {
+export function CurrentPageProvider({ children }: { children: ReactNode }) {
   const [currentPageId, setCurrentPageId] = useState<string>('');
 
-  const value: IFocusedPageContext = useMemo(
+  const value: ICurrentPageContext = useMemo(
     () => ({
       currentPageId,
       setCurrentPageId
@@ -23,7 +23,7 @@ export function FocusedPageProvider({ children }: { children: ReactNode }) {
     [currentPageId]
   );
 
-  return <FocusedPageContext.Provider value={value}>{children}</FocusedPageContext.Provider>;
+  return <CurrentPageContext.Provider value={value}>{children}</CurrentPageContext.Provider>;
 }
 
-export const useFocusedPage = () => useContext(FocusedPageContext);
+export const useCurrentPage = () => useContext(CurrentPageContext);

@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { useSWRConfig } from 'swr';
 
-import { useFocusedPage } from 'hooks/useFocusedPage';
+import { useCurrentPage } from 'hooks/useCurrentPage';
 import { useLgScreen } from 'hooks/useMediaScreens';
 import type { ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
 
@@ -25,7 +25,7 @@ const PageActionDisplayContext = createContext<IPageActionDisplayContext>({
 
 export function PageActionDisplayProvider({ children }: { children: ReactNode }) {
   const isLargeScreen = useLgScreen();
-  const { currentPageId } = useFocusedPage();
+  const { currentPageId } = useCurrentPage();
   const { isValidating: isValidatingInlineComments } = useThreads();
   const { isValidating: isValidatingInlineVotes } = useVotes();
   const { cache } = useSWRConfig();

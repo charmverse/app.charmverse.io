@@ -12,7 +12,7 @@ import DocumentPage from 'components/[pageId]/DocumentPage';
 import Dialog from 'components/common/BoardEditor/focalboard/src/components/dialog';
 import Button from 'components/common/Button';
 import { useBounties } from 'hooks/useBounties';
-import { useFocusedPage } from 'hooks/useFocusedPage';
+import { useCurrentPage } from 'hooks/useCurrentPage';
 import { usePages } from 'hooks/usePages';
 import type { BountyWithDetails } from 'lib/bounties';
 import log from 'lib/log';
@@ -37,7 +37,7 @@ export default function PageDialog(props: Props) {
   const popupState = usePopupState({ variant: 'popover', popupId: 'page-dialog' });
   const router = useRouter();
   const { refreshBounty, setBounties } = useBounties();
-  const { currentPageId, setCurrentPageId } = useFocusedPage();
+  const { currentPageId, setCurrentPageId } = useCurrentPage();
 
   const { updatePage, getPagePermissions, deletePage, pages } = usePages();
   const pagePermission = page ? getPagePermissions(page.id) : null;
