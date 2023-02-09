@@ -299,6 +299,7 @@ export function PostPage({
                       <PostCommentSort commentSort={commentSort} setCommentSort={setCommentSort} />
                       {topLevelComments.map((comment) => (
                         <PostComment
+                          post={post}
                           permissions={permissions}
                           setPostComments={setPostComments}
                           comment={comment}
