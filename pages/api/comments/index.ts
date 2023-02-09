@@ -10,7 +10,7 @@ import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser }
 import { computeUserPagePermissions } from 'lib/permissions/pages/page-permission-compute';
 import { withSessionRoute } from 'lib/session/withSession';
 import { DataNotFoundError } from 'lib/utilities/errors';
-import { publishWebhookEvent } from 'lib/webhook';
+import { publishWebhookEvent } from 'lib/webhook/publishEvent';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

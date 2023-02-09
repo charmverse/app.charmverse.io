@@ -2,7 +2,7 @@ import { WebhookEventNames } from 'serverless/webhook/interfaces';
 
 import { prisma } from 'db';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
-import { publishWebhookEvent } from 'lib/webhook';
+import { publishWebhookEvent } from 'lib/webhook/publishEvent';
 
 import type { CreatePostCommentInput } from './interface';
 

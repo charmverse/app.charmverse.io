@@ -1,6 +1,9 @@
 export type UserEntity = {
+  id: string;
   avatar: string | null;
-  wallet: string;
+  discordId?: string;
+  wallet?: string;
+  googleEmail?: string;
   username: string;
 };
 
