@@ -105,7 +105,9 @@ export function VotesProvider({ children }: { children: ReactNode }) {
 
       setVotes((_votes) => {
         updatedVotes.forEach((vote) => {
-          _votes[vote.id] = vote;
+          if (vote) {
+            _votes[vote.id] = vote;
+          }
         });
         return { ..._votes };
       });
