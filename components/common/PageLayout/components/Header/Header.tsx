@@ -25,13 +25,14 @@ import Toolbar from '@mui/material/Toolbar';
 import Tooltip from '@mui/material/Tooltip';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
-import type { ReactNode } from 'react';
+import type { Dispatch, ReactNode, SetStateAction } from 'react';
 import { useMemo, useRef, useState } from 'react';
 
 import charmClient from 'charmClient';
 import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
 import { undoEventName } from 'components/common/CharmEditor/utils';
 import { usePostByPath } from 'components/forum/hooks/usePostByPath';
+import { usePostPermissions } from 'components/forum/hooks/usePostPermissions';
 import { useColorMode } from 'context/darkMode';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { useMembers } from 'hooks/useMembers';
@@ -159,10 +160,124 @@ export function Metadata({ creator, lastUpdatedAt }: { creator: string; lastUpda
   );
 }
 
+function PostHeader({
+  setPageMenuOpen,
+  undoEditorChanges,
+  forumPostInfo
+}: {
+  forumPostInfo: ReturnType<typeof usePostByPath>;
+  setPageMenuOpen: Dispatch<SetStateAction<boolean>>;
+  undoEditorChanges: VoidFunction;
+}) {
+  const [userSpacePermissions] = useCurrentSpacePermissions();
+  const { showMessage } = useSnackbar();
+  const { members } = useMembers();
+
+  const router = useRouter();
+
+  const canCreateProposal = !!userSpacePermissions?.createVote;
+
+  const postCreator = members.find((member) => member.id === forumPostInfo.forumPost?.createdBy);
+
+  function deletePost() {
+    if (forumPostInfo.forumPost) {
+      charmClient.forum.deleteForumPost(forumPostInfo.forumPost.id).then(() => {
+        router.push(`/${router.query.domain}/forum`);
+      });
+    }
+  }
+
+  async function exportMarkdownPage() {
+    if (forumPostInfo.forumPost) {
+      exportMarkdown({
+        content: forumPostInfo.forumPost.content,
+        id: forumPostInfo.forumPost.id,
+        members,
+        spaceId: forumPostInfo.forumPost.spaceId,
+        title: forumPostInfo.forumPost.title
+      }).catch(() => {
+        showMessage('Error exporting markdown', 'error');
+      });
+      setPageMenuOpen(false);
+    }
+  }
+
+  function closeMenu() {
+    setPageMenuOpen(false);
+  }
+
+  async function convertToProposal(pageId: string) {
+    setPageMenuOpen(false);
+    await charmClient.pages.convertToProposal(pageId);
+    await charmClient.forum.convertToProposal(pageId);
+    // router.push(`/${router.query.domain}/${proposalPage.path}`);
+  }
+
+  return (
+    <List data-test='forum-post-actions' dense>
+      <CopyLinkMenuItem closeMenu={closeMenu} />
+      <Divider />
+      <DeleteMenuItem onClick={deletePost} disabled={!forumPostInfo.permissions?.delete_post} />
+      <UndoMenuItem onClick={undoEditorChanges} disabled={!forumPostInfo?.permissions?.edit_post} />
+      <ExportMarkdownMenuItem onClick={exportMarkdownPage} />
+      <Tooltip title={!canCreateProposal ? 'You do not have the permission to convert to proposal' : ''}>
+        <div>
+          <ListItemButton
+            onClick={() => forumPostInfo.forumPost && convertToProposal(forumPostInfo.forumPost.id)}
+            disabled={!canCreateProposal}
+          >
+            <TaskOutlinedIcon
+              fontSize='small'
+              sx={{
+                mr: 1
+              }}
+            />
+            <ListItemText primary='Convert to proposal' />
+          </ListItemButton>
+        </div>
+      </Tooltip>
+      <Divider />
+      <Tooltip title={!forumPostInfo.permissions?.delete_post ? "You don't have permission to delete this post" : ''}>
+        <div>
+          <ListItemButton disabled={!forumPostInfo.permissions?.delete_post} onClick={deletePost}>
+            <DeleteOutlineOutlinedIcon
+              fontSize='small'
+              sx={{
+                mr: 1
+              }}
+            />
+            <ListItemText primary='Delete' />
+          </ListItemButton>
+        </div>
+      </Tooltip>
+      <Tooltip title={!forumPostInfo.permissions?.edit_post ? "You don't have permission to undo changes" : ''}>
+        <div>
+          <ListItemButton disabled={!forumPostInfo.permissions?.edit_post} onClick={undoEditorChanges}>
+            <UndoIcon
+              fontSize='small'
+              sx={{
+                mr: 1
+              }}
+            />
+            <ListItemText primary='Undo' />
+          </ListItemButton>
+        </div>
+      </Tooltip>
+      <Divider />
+      {forumPostInfo.forumPost && postCreator ? (
+        <>
+          <Divider />
+          <Metadata creator={postCreator.username} lastUpdatedAt={forumPostInfo.forumPost.updatedAt} />
+        </>
+      ) : null}
+    </List>
+  );
+}
+
 export default function Header({ open, openSidebar }: HeaderProps) {
   const router = useRouter();
   const colorMode = useColorMode();
-  const { pages, setPages, updatePage, getPagePermissions, deletePage } = usePages();
+  const { pages, updatePage, getPagePermissions, deletePage } = usePages();
 
   const { user } = useUser();
   const theme = useTheme();
@@ -178,6 +293,7 @@ export default function Header({ open, openSidebar }: HeaderProps) {
   const [userSpacePermissions] = useCurrentSpacePermissions();
   const pagePermissions = basePage ? getPagePermissions(basePage.id) : null;
   const isForumPost = router.route === '/[domain]/forum/post/[pagePath]';
+
   const pagePath = isForumPost ? (router.query.pagePath as string) : null;
   // Post permissions hook will not make an API call if post ID is null. Since we can't conditionally render hooks, we pass null as the post ID. This is the reason for the 'null as any' statement
   const forumPostInfo = usePostByPath({
@@ -225,14 +341,6 @@ export default function Header({ open, openSidebar }: HeaderProps) {
     }
   }
 
-  function deletePost() {
-    if (forumPostInfo.forumPost) {
-      charmClient.forum.deleteForumPost(forumPostInfo.forumPost.id).then(() => {
-        router.push(`/${router.query.domain}/forum`);
-      });
-    }
-  }
-
   async function undoEditorChanges() {
     if (currentPageOrPost) {
       // There might be multiple instances of bangle editor in the document
@@ -262,18 +370,7 @@ export default function Header({ open, openSidebar }: HeaderProps) {
         members,
         spaceId: page.spaceId,
         title: page.title
-      }).catch((err) => {
-        showMessage('Error exporting markdown', 'error');
-      });
-      setPageMenuOpen(false);
-    } else if (forumPostInfo.forumPost) {
-      exportMarkdown({
-        content: forumPostInfo.forumPost.content,
-        id: forumPostInfo.forumPost.id,
-        members,
-        spaceId: forumPostInfo.forumPost.spaceId,
-        title: forumPostInfo.forumPost.title
-      }).catch((err) => {
+      }).catch(() => {
         showMessage('Error exporting markdown', 'error');
       });
       setPageMenuOpen(false);
@@ -282,16 +379,7 @@ export default function Header({ open, openSidebar }: HeaderProps) {
 
   async function convertToProposal(pageId: string) {
     setPageMenuOpen(false);
-    if (isForumPost) {
-      const proposalPage = await charmClient.forum.convertToProposal(pageId);
-      setPages((_pages) => ({
-        ..._pages,
-        [proposalPage.id]: proposalPage
-      }));
-      router.push(`/${router.query.domain}/${proposalPage.path}`);
-    } else {
-      await charmClient.pages.convertToProposal(pageId);
-    }
+    await charmClient.pages.convertToProposal(pageId);
   }
 
   const documentOptions = (
@@ -367,13 +455,7 @@ export default function Header({ open, openSidebar }: HeaderProps) {
           <Divider />
         </>
       )}
-      <DeleteMenuItem
-        onClick={onDeletePage}
-        disabled={
-          (isForumPost ? !forumPostInfo.permissions?.delete_post : !pagePermissions?.delete) ||
-          basePage?.deletedAt !== null
-        }
-      />
+      <DeleteMenuItem onClick={onDeletePage} disabled={!pagePermissions?.delete || basePage?.deletedAt !== null} />
       <UndoMenuItem onClick={undoEditorChanges} disabled={!pagePermissions?.edit_content} />
       <Divider />
       {basePage && (
@@ -423,69 +505,13 @@ export default function Header({ open, openSidebar }: HeaderProps) {
     pageOptionsList = (
       <DatabasePageOptions pagePermissions={pagePermissions ?? undefined} pageId={basePage.id} closeMenu={closeMenu} />
     );
-  } else if (isForumPost && forumPostInfo.forumPost) {
-    const postCreator = members.find((member) => member.id === forumPostInfo.forumPost?.createdBy);
-    const isPostCreator = postCreator?.id === user?.id;
+  } else if (isForumPost) {
     pageOptionsList = (
-      <List data-test='forum-post-actions' dense>
-        <CopyLinkMenuItem closeMenu={closeMenu} />
-        <Divider />
-        <DeleteMenuItem onClick={deletePost} disabled={!forumPostInfo.permissions?.delete_post} />
-        <UndoMenuItem onClick={undoEditorChanges} disabled={!forumPostInfo?.permissions?.edit_post} />
-        <ExportMarkdownMenuItem onClick={exportMarkdownPage} />
-        <Tooltip
-          title={!canCreateProposal || !isPostCreator ? 'You do not have the permission to convert to proposal' : ''}
-        >
-          <div>
-            <ListItemButton
-              onClick={() => forumPostInfo.forumPost && convertToProposal(forumPostInfo.forumPost.id)}
-              disabled={!canCreateProposal || !isPostCreator}
-            >
-              <TaskOutlinedIcon
-                fontSize='small'
-                sx={{
-                  mr: 1
-                }}
-              />
-              <ListItemText primary='Convert to proposal' />
-            </ListItemButton>
-          </div>
-        </Tooltip>
-        <Divider />
-        <Tooltip title={!isPostCreator ? "You don't have permission to delete this post" : ''}>
-          <div>
-            <ListItemButton disabled={!isPostCreator} onClick={deletePost}>
-              <DeleteOutlineOutlinedIcon
-                fontSize='small'
-                sx={{
-                  mr: 1
-                }}
-              />
-              <ListItemText primary='Delete' />
-            </ListItemButton>
-          </div>
-        </Tooltip>
-        <Tooltip title={!isPostCreator ? "You don't have permission to undo changes" : ''}>
-          <div>
-            <ListItemButton disabled={!isPostCreator} onClick={undoEditorChanges}>
-              <UndoIcon
-                fontSize='small'
-                sx={{
-                  mr: 1
-                }}
-              />
-              <ListItemText primary='Undo' />
-            </ListItemButton>
-          </div>
-        </Tooltip>
-        <Divider />
-        {forumPostInfo.forumPost && postCreator && (
-          <>
-            <Divider />
-            <Metadata creator={postCreator.username} lastUpdatedAt={forumPostInfo.forumPost.updatedAt} />
-          </>
-        )}
-      </List>
+      <PostHeader
+        forumPostInfo={forumPostInfo}
+        setPageMenuOpen={setPageMenuOpen}
+        undoEditorChanges={undoEditorChanges}
+      />
     );
   }
 
