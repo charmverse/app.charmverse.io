@@ -64,9 +64,7 @@ export async function closeOutProposals({proposalIds}: Input): Promise<ProposalO
 
       let voteStatus: VoteStatus | null = null;
 
-      if (!page.snapshotProposalId && !page.votes?.length) {
-        throw new InvalidInputError(`Proposal ID ${proposal.id} with title ${title} and proposal status ${proposal.status} has no snapshot proposal ID or votes`)
-      } else if (page.votes.length) {
+      if (page.votes.length) {
         const tenSecondsAgo = new Date(Date.now() - 10000);
 
         await tx.vote.update({
@@ -117,5 +115,5 @@ export async function closeOutProposals({proposalIds}: Input): Promise<ProposalO
 
 closeOutProposals({
   // These IDs can be obtained by opening proposal in popup view from proposals list
-  proposalIds: ['d0f959ca-f2c0-4021-86eb-92226ba24424', 'cfdf1581-110b-44a6-9b37-f4ea8e4372d9']
+  proposalIds: ['53bf33bd-3227-4bf1-80a0-977049558d4e', '692aaf47-7a38-4279-a0e2-7085883f4edc', 'e63c1826-0a71-4513-b137-9529bee30290']
 }).then(console.log).catch(console.error)
