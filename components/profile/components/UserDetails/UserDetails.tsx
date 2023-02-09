@@ -87,7 +87,7 @@ function UserDetails({ readOnly, user, updateUser, sx = {} }: UserDetailsProps) 
   const timezoneModalState = usePopupState({ variant: 'popover', popupId: 'timezone-modal' });
 
   const { updateProfileAvatar, isSaving: isSavingAvatar } = useUpdateProfileAvatar();
-  const { handleUserUpdate } = useUserDetails({ readOnly, user, updateUser });
+  const { handleUserUpdate } = useUserDetails({ updateUser });
 
   const onLinkCopy = () => {
     setIsPersonalLinkCopied(true);

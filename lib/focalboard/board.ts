@@ -4,7 +4,7 @@ import type { Block } from 'lib/focalboard/block';
 import { createBlock } from 'lib/focalboard/block';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
-import type { Card } from './card';
+import type { Card, CardPage } from './card';
 
 type PropertyType =
   | 'text'
@@ -111,6 +111,7 @@ function createBoard({
 type BoardGroup = {
   option: IPropertyOption;
   cards: Card[];
+  cardPages: CardPage[];
 };
 
 export { createBoard };

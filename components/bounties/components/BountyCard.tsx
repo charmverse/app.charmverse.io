@@ -7,7 +7,6 @@ import { PageActions } from 'components/common/PageActions';
 import { usePageDetails } from 'hooks/usePageDetails';
 import type { BountyWithDetails } from 'lib/bounties';
 import type { PageMeta } from 'lib/pages';
-import type { IPagePermissionFlags } from 'lib/permissions/pages';
 import { fancyTrim } from 'lib/utilities/strings';
 
 import BountyStatusBadge from './BountyStatusBadge';
@@ -15,18 +14,17 @@ import BountyStatusBadge from './BountyStatusBadge';
 interface Props {
   bounty: BountyWithDetails;
   page: PageMeta;
-  onClick?: () => void;
-  onDelete?: (bountyId: string) => void;
-  getPagePermissions: (pageId: string, page?: PageMeta | undefined) => IPagePermissionFlags;
+  onClick: () => void;
+  onDelete: (bountyId: string) => void;
+  readOnly: boolean;
 }
 
 const StyledBox = styled(Box)`
   ${hoverIconsStyle({ absolutePositioning: true })}
 `;
 
-function BountyCard({ onDelete, bounty, getPagePermissions, page, onClick }: Props) {
+function BountyCard({ onDelete, bounty, page, onClick, readOnly }: Props) {
   const { pageDetails } = usePageDetails(page?.id);
-  const pagePermission = getPagePermissions(page.id);
   return (
     <StyledBox
       onClick={onClick}
@@ -56,9 +54,7 @@ function BountyCard({ onDelete, bounty, getPagePermissions, page, onClick }: Pro
           <BountyStatusBadge bounty={bounty} hideStatus={true} truncate />
         </Box>
       </Box>
-      {onDelete && (
-        <PageActions page={page} onClickDelete={pagePermission?.delete ? () => onDelete(bounty.id) : undefined} />
-      )}
+      {onDelete && <PageActions page={page} readOnly={readOnly} onClickDelete={() => onDelete(bounty.id)} />}
     </StyledBox>
   );
 }

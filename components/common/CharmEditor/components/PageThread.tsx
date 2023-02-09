@@ -28,6 +28,7 @@ import { forwardRef, memo, useRef, useEffect, useState } from 'react';
 
 import Button from 'components/common/Button';
 import UserDisplay from 'components/common/UserDisplay';
+import { useCurrentPage } from 'hooks/useCurrentPage';
 import { usePages } from 'hooks/usePages';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useThreads } from 'hooks/useThreads';
@@ -283,7 +284,8 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(
     const { user } = useUser();
     const [isMutating, setIsMutating] = useState(false);
     const [editedCommentId, setEditedCommentId] = useState<null | string>(null);
-    const { getPagePermissions, currentPageId } = usePages();
+    const { currentPageId } = useCurrentPage();
+    const { getPagePermissions } = usePages();
     const menuState = usePopupState({ variant: 'popover', popupId: 'comment-action' });
     const [actionComment, setActionComment] = useState<null | CommentWithUser>(null);
 
