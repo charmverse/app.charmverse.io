@@ -7,7 +7,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import Grid from '@mui/material/Grid';
 import SvgIcon from '@mui/material/SvgIcon';
 import Typography from '@mui/material/Typography';
-import { useRouter } from 'next/router';
+import type { Space } from '@prisma/client';
 import { useEffect, useState } from 'react';
 import { useSWRConfig } from 'swr';
 
@@ -17,13 +17,11 @@ import { initialLoad } from 'components/common/BoardEditor/focalboard/src/store/
 import Button from 'components/common/Button';
 import { ImportZippedMarkdown } from 'components/common/CharmEditor/components/markdownParser/ImportZippedMarkdown';
 import Modal from 'components/common/Modal';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import useIsAdmin from 'hooks/useIsAdmin';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { AUTH_CODE_COOKIE, AUTH_ERROR_COOKIE } from 'lib/notion/constants';
 import { generateNotionImportRedirectUrl } from 'lib/notion/generateNotionImportRedirectUrl';
 import type { FailedImportsError } from 'lib/notion/types';
-import { deleteCookie, getCookie, isSmallScreen } from 'lib/utilities/browser';
+import { deleteCookie, getCookie } from 'lib/utilities/browser';
 import NotionIcon from 'public/images/notion_logo.svg';
 
 interface NotionResponseState {
@@ -33,21 +31,18 @@ interface NotionResponseState {
   failedImports?: FailedImportsError[];
 }
 
-export default function ImportNotionWorkspace() {
+export default function ImportNotionWorkspace({ space, isAdmin }: { space: Space; isAdmin: boolean }) {
   const [notionState, setNotionState] = useState<NotionResponseState>({ loading: false });
   const { showMessage } = useSnackbar();
-  const router = useRouter();
   const [modalOpen, setModalOpen] = useState(false);
   const { mutate } = useSWRConfig();
-  const space = useCurrentSpace();
-  const isAdmin = useIsAdmin();
   const dispatch = useAppDispatch();
 
   const notionCode = getCookie(AUTH_CODE_COOKIE);
   const notionError = getCookie(AUTH_ERROR_COOKIE);
 
   useEffect(() => {
-    if (space && notionCode && !notionState.loading) {
+    if (space?.id && notionCode && !notionState.loading) {
       setNotionState({ failedImports: [], loading: true });
       setModalOpen(true);
       deleteCookie(AUTH_CODE_COOKIE);
@@ -82,7 +77,7 @@ export default function ImportNotionWorkspace() {
           }
         });
     }
-  }, [space]);
+  }, [space?.id]);
 
   // show errors from server
   useEffect(() => {

@@ -173,12 +173,12 @@ export default function SpaceSettings({ space }: { space: Space }) {
       </form>
       <Legend mt={4}>Import Content</Legend>
       <Box sx={{ ml: 1 }} display='flex' flexDirection='column' gap={1}>
-        <ImportNotionWorkspace />
+        <ImportNotionWorkspace space={space} isAdmin={isAdmin} />
       </Box>
 
       <Legend mt={4}>Snapshot.org Integration</Legend>
       <Box sx={{ ml: 1 }} display='flex' flexDirection='column' gap={1}>
-        <ConnectSnapshot />
+        <ConnectSnapshot space={space} isAdmin={isAdmin} />
       </Box>
       {space && (
         <ConfirmDeleteModal

@@ -3,6 +3,7 @@ import { Typography } from '@mui/material';
 import Alert from '@mui/material/Alert';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
+import type { Space } from '@prisma/client';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
@@ -10,8 +11,6 @@ import * as yup from 'yup';
 import charmClient from 'charmClient';
 import FieldLabel from 'components/common/form/FieldLabel';
 import PrimaryButton from 'components/common/PrimaryButton';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import useIsAdmin from 'hooks/useIsAdmin';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useSpaces } from 'hooks/useSpaces';
 import { getSnapshotSpace } from 'lib/snapshot/getSpace';
@@ -38,12 +37,10 @@ export type FormValues = yup.InferType<typeof schema>;
 
 const DEFAULT_VOTING_DURATION = 7;
 
-export default function ConnectSnapshot() {
-  const space = useCurrentSpace();
+export default function ConnectSnapshot({ space, isAdmin }: { space: Space; isAdmin: boolean }) {
   const { setSpace } = useSpaces();
   const [formError, setFormError] = useState<SystemError | null>(null);
   const [touched, setTouched] = useState<boolean>(false);
-  const isAdmin = useIsAdmin();
 
   const {
     register,

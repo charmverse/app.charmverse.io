@@ -300,7 +300,7 @@ export default function PublishingForm({ onSubmit, page }: Props) {
       <Box sx={{ whiteSpace: 'pre-wrap', mb: 1 }}>
         <Alert severity={configurationError.severity as AlertColor}>{configurationError.message}</Alert>
       </Box>
-      {!snapshotSpace && isAdmin && <ConnectSnapshot />}
+      {!snapshotSpace && isAdmin && space && <ConnectSnapshot space={space} isAdmin={isAdmin} />}
     </>
   ) : (
     // Only proceed with rest of UI if proposal has correct length
