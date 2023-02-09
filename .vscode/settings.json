@@ -22,6 +22,6 @@
   },
   "editor.detectIndentation": false,
   "editor.tabSize": 2,
-  "jestrunner.configPath": "jest.config-browser.ts",
+  "jestrunner.configPath": "jest.config-all.ts",
   "typescript.tsdk": "node_modules/typescript/lib",
 }
