@@ -3,7 +3,7 @@ import { createContext, useContext, useMemo } from 'react';
 
 import charmClient from 'charmClient';
 
-import { useCurrentSpace } from './useCurrentSpaceId';
+import { useCurrentSpace } from './useCurrentSpace';
 import { useMembers } from './useMembers';
 import { useUser } from './useUser';
 

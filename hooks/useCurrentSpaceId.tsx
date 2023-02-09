@@ -4,21 +4,21 @@ import { createContext, useContext, useMemo, useState } from 'react';
 
 type ICurrentSpaceContext = {
   currentSpaceId: string;
-  setcurrentSpaceId: Dispatch<SetStateAction<string>>;
+  setCurrentSpaceId: Dispatch<SetStateAction<string>>;
 };
 
 export const CurrentSpaceContext = createContext<Readonly<ICurrentSpaceContext>>({
   currentSpaceId: '',
-  setcurrentSpaceId: () => ''
+  setCurrentSpaceId: () => ''
 });
 
 export function CurrentSpaceProvider({ children }: { children: ReactNode }) {
-  const [currentSpaceId, setcurrentSpaceId] = useState<string>('');
+  const [currentSpaceId, setCurrentSpaceId] = useState<string>('');
 
   const value: ICurrentSpaceContext = useMemo(
     () => ({
       currentSpaceId,
-      setcurrentSpaceId
+      setCurrentSpaceId
     }),
     [currentSpaceId]
   );

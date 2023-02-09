@@ -4,7 +4,7 @@ import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 
 import charmClient from 'charmClient';
 
-import { useCurrentSpace } from './useCurrentSpaceId';
+import { useCurrentSpace } from './useCurrentSpace';
 
 type IContext = [
   paymentMethods: PaymentMethod[],

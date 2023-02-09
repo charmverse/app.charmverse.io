@@ -12,7 +12,7 @@ import type {
   UpdateMemberPropertyVisibilityPayload
 } from 'lib/members/interfaces';
 
-import { useCurrentSpace } from './useCurrentSpaceId';
+import { useCurrentSpace } from './useCurrentSpace';
 
 type Context = {
   properties: MemberPropertyWithPermissions[] | undefined;

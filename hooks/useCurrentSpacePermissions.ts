@@ -2,7 +2,7 @@ import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 
-import { useCurrentSpace } from './useCurrentSpaceId';
+import { useCurrentSpace } from './useCurrentSpace';
 import { useUser } from './useUser';
 
 export function useCurrentSpacePermissions() {

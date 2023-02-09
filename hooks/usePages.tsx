@@ -16,7 +16,7 @@ import { AllowedPagePermissions } from 'lib/permissions/pages/available-page-per
 import { permissionTemplates } from 'lib/permissions/pages/page-permission-mapping';
 import type { WebSocketPayload } from 'lib/websockets/interfaces';
 
-import { useCurrentSpace } from './useCurrentSpaceId';
+import { useCurrentSpace } from './useCurrentSpace';
 import useIsAdmin from './useIsAdmin';
 import { useUser } from './useUser';
 import { useWebSocketClient } from './useWebSocketClient';
