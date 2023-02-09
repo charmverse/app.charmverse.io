@@ -1,5 +1,4 @@
-import { Divider, Grid, Typography } from '@mui/material';
-import { Box } from '@mui/system';
+import { Divider, Grid, Typography, Box } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import useSWR from 'swr';
 

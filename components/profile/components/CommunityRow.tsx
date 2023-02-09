@@ -9,8 +9,7 @@ import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import CheckIcon from '@mui/icons-material/VerifiedUser';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
-import { Collapse, IconButton, Stack, Tab, Tabs, Tooltip, Typography } from '@mui/material';
-import { Box } from '@mui/system';
+import { Collapse, IconButton, Stack, Tab, Tabs, Tooltip, Typography, Box } from '@mui/material';
 import type { ReactNode } from 'react';
 import { useEffect, useState } from 'react';
 
