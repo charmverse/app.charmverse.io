@@ -35,6 +35,12 @@ export async function computePostPermissions({
 
   const permissions = new AvailablePostPermissions();
 
+  // If post has been converted to a proposal make it read-only
+  if (post.proposalId) {
+    permissions.addPermissions(['view_post']);
+    return permissions.operationFlags;
+  }
+
   if (isAdmin) {
     return {
       ...permissions.full,
