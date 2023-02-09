@@ -42,7 +42,7 @@ import { PaymentMethodsProvider } from 'hooks/usePaymentMethods';
 import { PrimaryCharmEditorProvider } from 'hooks/usePrimaryCharmEditor';
 import { SettingsDialogProvider } from 'hooks/useSettingsDialog';
 import { SnackbarProvider } from 'hooks/useSnackbar';
-import { useSpaceIdFromPath } from 'hooks/useSpaceFromPath';
+import { useSpaceFromPath } from 'hooks/useSpaceFromPath';
 import { SpacesProvider } from 'hooks/useSpaces';
 import { UserProvider } from 'hooks/useUser';
 import { useUserAcquisition } from 'hooks/useUserAcquisition';
@@ -288,12 +288,14 @@ function DataProviders({ children }: { children: ReactNode }) {
 }
 
 function CurrentSpaceSetter() {
-  const spaceIdFromPath = useSpaceIdFromPath();
+  const spaceFromPath = useSpaceFromPath();
   const { setCurrentSpaceId } = useCurrentSpaceId();
 
   useEffect(() => {
-    setCurrentSpaceId(spaceIdFromPath);
-  }, [spaceIdFromPath]);
+    if (spaceFromPath) {
+      setCurrentSpaceId(spaceFromPath.id);
+    }
+  }, [spaceFromPath]);
 
   return null;
 }
