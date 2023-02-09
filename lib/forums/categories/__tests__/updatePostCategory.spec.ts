@@ -1,9 +1,9 @@
 import type { PostCategory, Space } from '@prisma/client';
 
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { generatePostCategory } from 'testing/utils/forums';
 
 import type { CreatePostCategoryInput } from '../createPostCategory';
-import { createPostCategory } from '../createPostCategory';
 import type { PostCategoryUpdate } from '../updatePostCategory';
 import { updatePostCategory } from '../updatePostCategory';
 
@@ -19,7 +19,7 @@ describe('updatePostCategory', () => {
       spaceId: space.id
     };
 
-    const postCategory = await createPostCategory(createInput);
+    const postCategory = await generatePostCategory(createInput);
 
     // Generate a second space to try to move this post category to, and a manual path
     const { space: secondSpace } = await generateUserAndSpaceWithApiToken();
@@ -44,7 +44,7 @@ describe('updatePostCategory', () => {
       spaceId: space.id
     };
 
-    const postCategory = await createPostCategory(createInput);
+    const postCategory = await generatePostCategory(createInput);
 
     expect(postCategory.path).toBe('test_category_path');
 
@@ -70,8 +70,8 @@ describe('updatePostCategory', () => {
       spaceId: space.id
     };
 
-    await createPostCategory(createInput);
-    const secondCategory = await createPostCategory(secondCreateInput);
+    await generatePostCategory(createInput);
+    const secondCategory = await generatePostCategory(secondCreateInput);
 
     const update: PostCategoryUpdate = {
       name: 'First Category'

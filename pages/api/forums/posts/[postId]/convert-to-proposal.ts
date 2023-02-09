@@ -30,7 +30,8 @@ async function convertToProposal(req: NextApiRequest, res: NextApiResponse<PageM
       spaceId: true,
       content: true,
       title: true,
-      createdBy: true
+      createdBy: true,
+      proposalId: true
     }
   });
 
@@ -38,7 +39,7 @@ async function convertToProposal(req: NextApiRequest, res: NextApiResponse<PageM
     throw new NotFoundError();
   }
 
-  if (post.createdBy !== userId) {
+  if (post.createdBy !== userId || post.proposalId) {
     throw new ActionNotPermittedError('You do not have permission to update this page');
   }
 

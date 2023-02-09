@@ -1061,7 +1061,6 @@ model Post {
   proposalId         String?                 @db.Uuid
   proposal           Proposal?               @relation(fields: [proposalId], references: [id], onDelete: SetNull)
 
-  @@unique([spaceId, path])
   @@index([categoryId])
   @@index([path])
   @@index([spaceId, deletedAt]) // space feed

@@ -1,8 +1,8 @@
 import type { Post, Space, User } from '@prisma/client';
 
-import { createPostCategory } from 'lib/forums/categories/createPostCategory';
 import { generateForumPosts } from 'testing/forums';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { generatePostCategory } from 'testing/utils/forums';
 
 import { defaultPostsPerResult } from '../constants';
 import { searchForumPosts } from '../searchForumPosts';
@@ -114,7 +114,7 @@ describe('searchForumPosts', () => {
 
     const exampleTitle = `Example title`;
 
-    const category = await createPostCategory({
+    const category = await generatePostCategory({
       spaceId: extraSpace.id,
       name: 'Test Category'
     });
@@ -195,7 +195,7 @@ describe('searchForumPosts', () => {
 
     const exampleTitle = `Example title`;
 
-    const category = await createPostCategory({
+    const category = await generatePostCategory({
       spaceId: extraSpace.id,
       name: 'Test Category'
     });
@@ -225,9 +225,9 @@ describe('searchForumPosts', () => {
   it('should support lookup of posts in multiple categories', async () => {
     const { space: extraSpace, user: extraUser } = await generateUserAndSpaceWithApiToken();
 
-    const category1 = await createPostCategory({ spaceId: extraSpace.id, name: 'Test Category 1' });
-    const category2 = await createPostCategory({ spaceId: extraSpace.id, name: 'Test Category 2' });
-    const category3 = await createPostCategory({ spaceId: extraSpace.id, name: 'Test Category 3' });
+    const category1 = await generatePostCategory({ spaceId: extraSpace.id, name: 'Test Category 1' });
+    const category2 = await generatePostCategory({ spaceId: extraSpace.id, name: 'Test Category 2' });
+    const category3 = await generatePostCategory({ spaceId: extraSpace.id, name: 'Test Category 3' });
 
     const postsInCategory1 = await generateForumPosts({
       spaceId: extraSpace.id,

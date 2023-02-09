@@ -1,35 +1,37 @@
 import { test as base } from '@playwright/test';
 import { v4 } from 'uuid';
 
-import { SpaceSettingsPage } from './po/spaceSettings.po';
+import { SpaceSettings } from './po/spaceSettings.po';
 import { generateUserAndSpace } from './utils/mocks';
 import { login } from './utils/session';
 
 type Fixtures = {
-  spaceSettingsPage: SpaceSettingsPage;
+  spaceSettings: SpaceSettings;
 };
 
 const test = base.extend<Fixtures>({
-  spaceSettingsPage: ({ page }, use) => use(new SpaceSettingsPage(page))
+  spaceSettings: ({ page }, use) => use(new SpaceSettings(page))
 });
 
-test('Space settings - update the space name and domain', async ({ page, spaceSettingsPage }) => {
+test('Space settings - update the space name and domain', async ({ page, spaceSettings }) => {
   const { space, user: spaceUser } = await generateUserAndSpace({ spaceName: v4(), isAdmin: true, onboarded: true });
   // go to a page to which we don't have access
 
   await login({ page, userId: spaceUser.id });
 
-  await spaceSettingsPage.goTo(space.domain);
+  await spaceSettings.goTo(space.domain);
 
-  await spaceSettingsPage.waitForSpaceSettingsURL();
+  await spaceSettings.waitForSpaceSettingsURL();
+
+  await spaceSettings.openSettingsModal();
 
   const newName = `New space name ${v4()}`;
   const newDomain = `new-space-domain-${v4()}`;
 
-  await spaceSettingsPage.spaceNameField.fill(newName);
-  await spaceSettingsPage.spaceDomainField.fill(newDomain);
+  await spaceSettings.spaceNameField.fill(newName);
+  await spaceSettings.spaceDomainField.fill(newDomain);
 
-  await spaceSettingsPage.submitSpaceUpdateButton.click();
+  await spaceSettings.submitSpaceUpdateButton.click();
 
-  await spaceSettingsPage.waitForSpaceSettingsURL(newDomain);
+  await spaceSettings.waitForSpaceSettingsURL(newDomain);
 });

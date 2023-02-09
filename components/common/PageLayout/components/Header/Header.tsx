@@ -14,16 +14,20 @@ import NotFavoritedIcon from '@mui/icons-material/StarBorder';
 import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
 import UndoIcon from '@mui/icons-material/Undo';
 import SunIcon from '@mui/icons-material/WbSunny';
-import { Alert, Divider, FormControlLabel, Stack, Switch, Typography, useMediaQuery } from '@mui/material';
 import Box from '@mui/material/Box';
+import Divider from '@mui/material/Divider';
+import FormControlLabel from '@mui/material/FormControlLabel';
 import IconButton from '@mui/material/IconButton';
 import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import Popover from '@mui/material/Popover';
+import Stack from '@mui/material/Stack';
+import Switch from '@mui/material/Switch';
 import Toolbar from '@mui/material/Toolbar';
 import Tooltip from '@mui/material/Tooltip';
-import NextLink from 'next/link';
+import Typography from '@mui/material/Typography';
+import useMediaQuery from '@mui/material/useMediaQuery';
 import { useRouter } from 'next/router';
 import type { Dispatch, ReactNode, SetStateAction } from 'react';
 import { useEffect, useMemo, useRef, useState } from 'react';
@@ -31,13 +35,13 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import charmClient from 'charmClient';
 import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
 import { undoEventName } from 'components/common/CharmEditor/utils';
-import Link from 'components/common/Link';
 import { usePostByPath } from 'components/forum/hooks/usePostByPath';
 import { useColorMode } from 'context/darkMode';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { useMembers } from 'hooks/useMembers';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { usePages } from 'hooks/usePages';
+import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useToggleFavorite } from 'hooks/useToggleFavorite';
 import { useUser } from 'hooks/useUser';
@@ -221,11 +225,17 @@ function PostHeader({
       <DeleteMenuItem onClick={deletePost} disabled={!forumPostInfo.permissions?.delete_post} />
       <UndoMenuItem onClick={undoEditorChanges} disabled={!forumPostInfo?.permissions?.edit_post} />
       <ExportMarkdownMenuItem onClick={exportMarkdownPage} />
-      <Tooltip title={!canCreateProposal ? 'You do not have the permission to convert to proposal' : ''}>
+      <Tooltip
+        title={
+          !canCreateProposal || forumPostInfo.forumPost?.proposalId
+            ? 'You do not have the permission to convert to proposal'
+            : ''
+        }
+      >
         <div>
           <ListItemButton
             onClick={() => forumPostInfo.forumPost && convertToProposal(forumPostInfo.forumPost.id)}
-            disabled={!canCreateProposal}
+            disabled={!canCreateProposal || !!forumPostInfo.forumPost?.proposalId}
           >
             <TaskOutlinedIcon
               fontSize='small'
@@ -293,6 +303,8 @@ export default function Header({ open, openSidebar }: HeaderProps) {
   const { setCurrentPageActionDisplay } = usePageActionDisplay();
   const [userSpacePermissions] = useCurrentSpacePermissions();
   const pagePermissions = basePage ? getPagePermissions(basePage.id) : null;
+
+  const { onClick: clickToOpenSettingsModal } = useSettingsDialog();
   const isForumPost = router.route === '/[domain]/forum/post/[pagePath]';
   const [convertedProposalId, setConvertedProposalId] = useState<string | null>(null);
 
@@ -535,7 +547,7 @@ export default function Header({ open, openSidebar }: HeaderProps) {
         sx={{
           display: 'inline-flex',
           mr: 2,
-          ...(open && isLargeScreen && { display: 'none' })
+          ...(open && { display: 'none' })
         }}
       >
         <MenuIcon />
@@ -596,41 +608,35 @@ export default function Header({ open, openSidebar }: HeaderProps) {
             </Box>
           )}
           {/** End of CharmEditor page specific header content */}
-
-          {/** dark mode toggle */}
           {user && (
-            <>
-              <NotificationsBadge>
-                <IconButton
-                  size={isLargeScreen ? 'small' : 'medium'}
-                  LinkComponent={NextLink}
-                  href='/nexus'
-                  color='inherit'
-                >
-                  <NotificationsIcon fontSize='small' color='secondary' />
-                </IconButton>
-              </NotificationsBadge>
+            <NotificationsBadge>
               <IconButton
-                size='small'
-                sx={{ display: { xs: 'none', md: 'inline-flex' } }}
-                onClick={colorMode.toggleColorMode}
-                color='inherit'
+                size={isLargeScreen ? 'small' : 'medium'}
+                onClick={() => clickToOpenSettingsModal('notifications')}
               >
-                <Tooltip
-                  title={`Enable ${theme.palette.mode === 'dark' ? 'light mode' : 'dark mode'}`}
-                  arrow
-                  placement='top'
-                >
-                  {theme.palette.mode === 'dark' ? (
-                    <SunIcon fontSize='small' color='secondary' />
-                  ) : (
-                    <MoonIcon fontSize='small' color='secondary' />
-                  )}
-                </Tooltip>
+                <NotificationsIcon fontSize='small' color='secondary' />
               </IconButton>
-            </>
+            </NotificationsBadge>
           )}
-          {/* <NotificationsBadge /> */}
+          <IconButton
+            sx={{ display: { xs: 'none', md: 'inline-flex' } }}
+            size='small'
+            onClick={colorMode.toggleColorMode}
+            color='inherit'
+          >
+            <Tooltip
+              title={`Enable ${theme.palette.mode === 'dark' ? 'light mode' : 'dark mode'}`}
+              arrow
+              placement='top'
+            >
+              {theme.palette.mode === 'dark' ? (
+                <SunIcon fontSize='small' color='secondary' />
+              ) : (
+                <MoonIcon fontSize='small' color='secondary' />
+              )}
+            </Tooltip>
+          </IconButton>
+
           {/** user account */}
           {/* <Account /> */}
         </Box>

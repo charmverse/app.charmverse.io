@@ -15,11 +15,7 @@ import InviteActions from './components/InviteLinks/components/InviteActions';
 import InviteIntro from './components/InviteLinks/components/InviteIntro';
 import TokenGates from './components/TokenGates';
 
-interface InvitesProps {
-  space: Space;
-}
-
-function Invites({ space }: InvitesProps) {
+function Invites({ space }: { space: Space }) {
   const spaceId = space.id;
   const isAdmin = useIsAdmin();
   const popupInvitesState = usePopupState({ variant: 'popover', popupId: 'invites' });
