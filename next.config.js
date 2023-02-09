@@ -6,18 +6,11 @@ const webpack = require('webpack');
 
 const esmModules = require('./next.base').esmModules;
 
-// we can ignore warnings in production builds because they are checked in test builds
-const ignoreBuildWarnings = process.env.NODE_ENV === 'production';
-
 const config = {
   poweredByHeader: false,
   eslint: {
     // add background to the default list of pages for eslint
-    dirs: ['pages', 'components', 'lib', 'background'],
-    ignoreDuringBuilds: ignoreBuildWarnings
-  },
-  typescript: {
-    ignoreBuildErrors: ignoreBuildWarnings
+    dirs: ['pages', 'components', 'lib', 'background']
   },
   compiler: {
     styledComponents: true
