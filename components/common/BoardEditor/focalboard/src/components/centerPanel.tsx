@@ -22,13 +22,11 @@ import PageBanner, { randomBannerImage } from 'components/[pageId]/DocumentPage/
 import PageDeleteBanner from 'components/[pageId]/DocumentPage/components/PageDeleteBanner';
 import { createTableView } from 'components/common/BoardEditor/focalboard/src/components/addViewMenu';
 import { getBoard } from 'components/common/BoardEditor/focalboard/src/store/boards';
-import type { CardPage } from 'components/common/BoardEditor/focalboard/src/store/cards';
 import {
   getViewCardsSortedFilteredAndGrouped,
   sortCards
 } from 'components/common/BoardEditor/focalboard/src/store/cards';
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
-import { getLoadingState } from 'components/common/BoardEditor/focalboard/src/store/loadingState';
 import Button from 'components/common/Button';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -37,8 +35,8 @@ import { usePages } from 'hooks/usePages';
 import type { Block } from 'lib/focalboard/block';
 import type { Board, BoardGroup, IPropertyOption, IPropertyTemplate } from 'lib/focalboard/board';
 import type { BoardView, BoardViewFields } from 'lib/focalboard/boardView';
-import type { Card } from 'lib/focalboard/card';
 import { createCard } from 'lib/focalboard/card';
+import type { Card, CardPage } from 'lib/focalboard/card';
 import { createNewDataSource } from 'lib/pages/createNewDataSource';
 
 import { CardFilter } from '../cardFilter';
@@ -563,7 +561,7 @@ function CenterPanel(props: Props) {
               <Table
                 board={activeBoard}
                 activeView={activeView}
-                cards={cards}
+                cardPages={cardPages}
                 groupByProperty={groupByProperty}
                 views={props.views}
                 visibleGroups={visibleGroups}

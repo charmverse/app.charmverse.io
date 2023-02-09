@@ -302,6 +302,11 @@ export function PagesProvider({ children }: { children: ReactNode }) {
       }
     );
   }, []);
+
+  useEffect(() => {
+    currentSpaceId.current = currentSpace?.id;
+  }, [currentSpace]);
+
   useEffect(() => {
     const unsubscribeFromPageUpdates = subscribe('pages_meta_updated', handleUpdateEvent);
     const unsubscribeFromNewPages = subscribe('pages_created', handleNewPageEvent);
