@@ -38,6 +38,9 @@ export async function computePostPermissions({
   // If post has been converted to a proposal make it read-only
   if (post.proposalId) {
     permissions.addPermissions(['view_post']);
+    if (isAdmin || post.createdBy === userId) {
+      permissions.addPermissions(['delete_post']);
+    }
     return permissions.operationFlags;
   }
 
