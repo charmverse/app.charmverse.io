@@ -1,11 +1,10 @@
 import { expect, test as base } from '@playwright/test';
-import type { Post, PostComment, Space, User } from '@prisma/client';
+import type { Space, User } from '@prisma/client';
 import { LoggedInPage } from '__e2e__/po/loggedIn.po';
 import { SpaceSettings } from '__e2e__/po/spaceSettings.po';
 import { SpaceSettingsTabRoles } from '__e2e__/po/spaceSettingsTabRoles.po';
 
 import { prisma } from 'db';
-import { upsertPostCategoryPermission } from 'lib/permissions/forum/upsertPostCategoryPermission';
 import { randomETHWalletAddress } from 'testing/generateStubs';
 import { generateForumPost, generatePostCategory } from 'testing/utils/forums';
 
@@ -33,9 +32,6 @@ const test = base.extend<Fixtures>({
 let adminUser: User;
 let moderatorUser: User;
 let space: Space;
-let post: Post;
-let adminComment: PostComment;
-
 test.describe.serial('Comment on forum posts', () => {
   test('assign space-wide forum moderators - admin can assign a user as a space-wide forum moderator', async ({
     page,
@@ -75,44 +71,6 @@ test.describe.serial('Comment on forum posts', () => {
           create: {
             spaceRoleId: moderatorSpaceRole.id
           }
-        }
-      }
-    });
-
-    const categoryName = 'Example category';
-
-    // A category without any permissions. Nobody can see it apart from moderators
-    const category = await generatePostCategory({
-      spaceId: space.id,
-      name: categoryName
-    });
-
-    const postName = 'Example post';
-
-    post = await generateForumPost({
-      spaceId: space.id,
-      userId: adminUser.id,
-      categoryId: category.id,
-      title: postName
-    });
-
-    const adminCommentText = 'This is a great idea!';
-
-    adminComment = await prisma.postComment.create({
-      data: {
-        user: {
-          connect: { id: adminUser.id }
-        },
-        post: { connect: { id: post.id } },
-        contentText: adminCommentText,
-        content: {
-          type: 'doc',
-          content: [
-            {
-              text: adminCommentText,
-              type: 'text'
-            }
-          ]
         }
       }
     });
@@ -158,7 +116,7 @@ test.describe.serial('Comment on forum posts', () => {
 
     await openManageRoleSpacePermissionsModal.click();
 
-    // Interact with the form to add a permission
+    // Interact with the form to add a permission, and make sure it's added
     await expect(spaceSettingsTabRoles.spacePermissionsForm).toBeVisible();
 
     const managePermissionsToggle = spaceSettingsTabRoles.getRoleSpaceOperationSwitchLocator('moderate_forums');
@@ -166,9 +124,6 @@ test.describe.serial('Comment on forum posts', () => {
     await expect(managePermissionsToggle).toBeVisible();
 
     await managePermissionsToggle.click();
-
-    // Leave time for the toggling action to occur
-
     const isChecked = await spaceSettingsTabRoles.isOperationChecked('moderate_forums');
 
     expect(isChecked).toBe(true);
@@ -178,15 +133,74 @@ test.describe.serial('Comment on forum posts', () => {
     expect(newRolePermissions.moderate_forums).toBe(true);
   });
 
-  // test('space-wide moderator can delete a comment', async ({ forumPostPage, page }) => {
-  //   await login({
-  //     page,
-  //     userId: moderatorUser.id
-  //   });
+  // We don't need to test all moderation paths since moderation from post page already handles this
+  test('space-wide moderator can delete a comment', async ({ forumPostPage, page }) => {
+    const categoryName = 'Example category';
 
-  //   await forumPostPage.goToPostPage({
-  //     domain: space.domain,
-  //     path: post.path
-  //   });
-  // });
+    // A category without any permissions. Nobody can see it apart from moderators
+    const category = await generatePostCategory({
+      spaceId: space.id,
+      name: categoryName
+    });
+
+    const postName = 'Example post';
+
+    const post = await generateForumPost({
+      spaceId: space.id,
+      userId: adminUser.id,
+      categoryId: category.id,
+      title: postName
+    });
+
+    const adminCommentText = 'This is a great idea!';
+
+    const adminComment = await prisma.postComment.create({
+      data: {
+        user: {
+          connect: { id: adminUser.id }
+        },
+        post: { connect: { id: post.id } },
+        contentText: adminCommentText,
+        content: {
+          type: 'doc',
+          content: [
+            {
+              text: adminCommentText,
+              type: 'text'
+            }
+          ]
+        }
+      }
+    });
+
+    await login({
+      page,
+      userId: moderatorUser.id
+    });
+
+    //
+    await forumPostPage.goToPostPage({
+      domain: space.domain,
+      path: post.path
+    });
+    await forumPostPage.waitForPostLoad({
+      domain: space.domain,
+      path: post.path
+    });
+    const contextMenu = forumPostPage.getPostCommentMenuLocator(adminComment.id);
+
+    await expect(contextMenu).toBeVisible();
+
+    await contextMenu.click();
+
+    const deleteOption = forumPostPage.getPostDeleteCommentLocator(adminComment.id);
+
+    await expect(deleteOption).toBeVisible();
+
+    await deleteOption.click();
+
+    const deletedComment = forumPostPage.getDeletedCommentLocator(adminComment.id);
+
+    await expect(deletedComment).toBeVisible();
+  });
 });
