@@ -12,8 +12,6 @@ import { usePrimaryCharmEditor } from 'hooks/usePrimaryCharmEditor';
 
 import { PageIcon } from '../../PageIcon';
 
-const NEXUS_ROUTES = ['/nexus', '/profile', '/integrations'];
-
 const BreadCrumb = styled.span`
   display: none;
 
@@ -172,24 +170,6 @@ function PublicBountyPageTitle() {
   );
 }
 
-function NexusPageTitle({ route }: { route: string }) {
-  const [pageTitle] = usePageTitle();
-
-  // show /nexus as the parent page
-  const showNexusParent = route !== '/nexus';
-
-  return (
-    <PageTitle>
-      {showNexusParent && (
-        <BreadCrumb>
-          <Link href='/nexus'>My Nexus</Link>
-        </BreadCrumb>
-      )}
-      {pageTitle}
-    </PageTitle>
-  );
-}
-
 function DefaultPageTitle() {
   const [pageTitle] = usePageTitle();
   return <PageTitle>{pageTitle}</PageTitle>;
@@ -215,8 +195,6 @@ export default function PageTitleWithBreadcrumbs({ pageId, pageType }: { pageId?
     return <ForumPostTitle basePath={`/${router.query.domain}`} pathName={router.pathname} />;
   } else if (router.route === '/share/[...pageId]') {
     return <DocumentPageTitle basePath={`/share/${space?.domain}`} pageId={pageId} />;
-  } else if (NEXUS_ROUTES.includes(router.route)) {
-    return <NexusPageTitle route={router.route} />;
   } else if (router.route.startsWith('/u/')) {
     return <EmptyPageTitle />;
   } else {

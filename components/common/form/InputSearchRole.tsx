@@ -3,9 +3,10 @@ import Alert from '@mui/material/Alert';
 import type { Role } from '@prisma/client';
 import type { ComponentProps } from 'react';
 
-import Link from 'components/common/Link';
+import Button from 'components/common/Button';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import useRoles from 'hooks/useRoles';
+import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import type { ListSpaceRolesResponse } from 'pages/api/roles';
 
 interface IRolesFilter {
@@ -39,6 +40,7 @@ function InputSearchRoleBase({
 }: Partial<ComponentProps<typeof Autocomplete>> & { filter?: IRolesFilter } & { showWarningOnNoRoles?: boolean }) {
   const { roles } = useRoles();
   const space = useCurrentSpace();
+  const { onClick } = useSettingsDialog();
 
   const defaultRole =
     typeof defaultValue === 'string'
@@ -55,9 +57,9 @@ function InputSearchRoleBase({
     return (
       <Alert severity='warning'>
         There are no roles in this space. Space admins can create roles in the{' '}
-        <Link external={false} sx={{ fontWeight: 'bold' }} href={`/${space?.domain}/settings/roles`}>
+        <Button variant='text' sx={{ fontWeight: 'bold' }} onClick={() => onClick(`${space?.name}-roles`)}>
           space settings page
-        </Link>
+        </Button>
         .
       </Alert>
     );

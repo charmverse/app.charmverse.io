@@ -3,7 +3,6 @@ import type { Post, PostCategory, Space, User } from '@prisma/client';
 import request from 'supertest';
 
 import { prisma } from 'db';
-import { createPostCategory } from 'lib/forums/categories/createPostCategory';
 import type { PostWithVotes } from 'lib/forums/posts/interfaces';
 import type { UpdateForumPostInput } from 'lib/forums/posts/updateForumPost';
 import { upsertPostCategoryPermission } from 'lib/permissions/forum/upsertPostCategoryPermission';
@@ -38,7 +37,7 @@ beforeAll(async () => {
   adminUser = await generateSpaceUser({ isAdmin: true, spaceId: space.id });
   adminUserCookie = await loginUser(adminUser.id);
 
-  postCategory = await createPostCategory({
+  postCategory = await generatePostCategory({
     name: 'Test Category',
     spaceId: space.id
   });

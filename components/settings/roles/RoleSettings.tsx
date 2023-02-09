@@ -1,7 +1,7 @@
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import { CircularProgress, Menu, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
-import type { SpacePermissionConfigurationMode } from '@prisma/client';
+import type { Space, SpacePermissionConfigurationMode } from '@prisma/client';
 import { bindPopover, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import { useRef, useState } from 'react';
 
@@ -10,9 +10,10 @@ import Modal from 'components/common/Modal';
 import ShareBountyBoard from 'components/common/PageLayout/components/Header/components/BountyShareButton/ShareBountyBoard';
 import Legend from 'components/settings/Legend';
 import ImportGuildRolesMenuItem from 'components/settings/roles/components/ImportGuildRolesMenuItem';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import useIsAdmin from 'hooks/useIsAdmin';
 import useRoles from 'hooks/useRoles';
+import { useUser } from 'hooks/useUser';
+import isSpaceAdmin from 'lib/users/isSpaceAdmin';
 
 import ImportDiscordRolesMenuItem from './components/ImportDiscordRolesMenuItem';
 import RoleForm from './components/RoleForm';
@@ -22,16 +23,16 @@ import DefaultPagePermissions from './components/SpacePermissions/components/Def
 import PermissionConfigurationMode from './components/SpacePermissions/components/PermissionConfigurationMode';
 import { useImportDiscordRoles } from './hooks/useImportDiscordRoles';
 
-export default function RoleSettings() {
-  const { assignRoles, deleteRole, refreshRoles, unassignRole, roles } = useRoles();
-  const isAdmin = useIsAdmin();
+export default function RoleSettings({ space }: { space: Space }) {
+  const { assignRoles, deleteRole, refreshRoles, unassignRole, roles } = useRoles(space);
+  const { user } = useUser();
+  const isAdmin = isSpaceAdmin(user, space?.id);
   const popupState = usePopupState({ variant: 'popover', popupId: 'add-a-role' });
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
   const open = Boolean(anchorEl);
   const handleClose = () => {
     setAnchorEl(null);
   };
-  const space = useCurrentSpace();
   const buttonRef = useRef<HTMLButtonElement>(null);
 
   const { isValidating } = useImportDiscordRoles();
@@ -42,7 +43,6 @@ export default function RoleSettings() {
 
   return (
     <>
-      {/* Space permissions */}
       <Legend sx={{ display: 'flex', justifyContent: 'space-between' }}>Permissions</Legend>
 
       <PermissionConfigurationMode permissionModeSelected={setSelectedPermissionMode} />
@@ -63,7 +63,7 @@ export default function RoleSettings() {
       )}
 
       {/* Roles */}
-      <Legend sx={{ display: 'flex', justifyContent: 'space-between' }}>
+      <Legend display='flex' justifyContent='space-between' mt={4}>
         Roles
         {isAdmin && (
           <Box component='span' display='flex' gap={1}>
