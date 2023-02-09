@@ -346,3 +346,72 @@ export interface CreateWorkspaceResponseBody {
   spaceUrl: string;
   joinUrl: string;
 }
+
+/**
+ * @example https://github.com/jellydn/next-swagger-doc/blob/main/example/models/organization.ts
+ *
+ * @swagger
+ * components:
+ *  schemas:
+ *    CastProposalVoteRequestBody:
+ *      required:
+ *        - spaceId
+ *        - proposalId
+ *        - userId
+ *        - choice
+ *      type: object
+ *      properties:
+ *        spaceId:
+ *          type: string
+ *          example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+ *        proposalId:
+ *          type: string
+ *          example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+ *        userId:
+ *          type: string
+ *          example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+ *        choice:
+ *          type: string
+ *          example: Abstain
+ */
+export interface CastProposalVoteRequestBody {
+  spaceId: string;
+  proposalId: string;
+  userId: string;
+  choice: string;
+}
+
+/**
+ * @example https://github.com/jellydn/next-swagger-doc/blob/main/example/models/organization.ts
+ *
+ * @swagger
+ * components:
+ *  schemas:
+ *    CastProposalVoteResponseBody:
+ *      type: object
+ *      properties:
+ *        voteId:
+ *          type: string
+ *          example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+ *        userId:
+ *          type: string
+ *          example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+ *        choice:
+ *          type: string
+ *          example: Abstain
+ *        createdAt:
+ *          type: string
+ *          format: date-time
+ *          example: 2022-04-04T21:32:38.317Z
+ *        updatedAt:
+ *          type: string
+ *          format: date-time
+ *          example: 2022-04-04T21:32:38.317Z
+ */
+export interface CastProposalVoteResponseBody {
+  voteId: string;
+  userId: string;
+  choice: string;
+  createdAt: string;
+  updatedAt: string;
+}
