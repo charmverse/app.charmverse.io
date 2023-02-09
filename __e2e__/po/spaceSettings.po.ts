@@ -4,7 +4,7 @@ import type { Locator, Page } from '@playwright/test';
 import { baseUrl } from 'config/constants';
 
 // capture actions on the pages in signup flow
-export class SpaceSettings {
+export class SpaceSettingsPage {
   readonly page: Page;
 
   readonly spaceNameField: Locator;
@@ -13,29 +13,22 @@ export class SpaceSettings {
 
   readonly submitSpaceUpdateButton: Locator;
 
-  readonly settingsBtn: Locator;
-
   constructor(page: Page) {
     this.page = page;
     this.spaceNameField = page.locator('data-test=set-space-name >> input');
     this.spaceDomainField = page.locator('data-test=set-space-domain >> input');
     this.submitSpaceUpdateButton = page.locator('data-test=submit-space-update');
-    this.settingsBtn = page.locator('data-test=sidebar-settings');
   }
 
   async goTo(domain: string) {
-    await this.page.goto(`${baseUrl}/${domain}`);
-  }
-
-  async openSettingsModal() {
-    await this.settingsBtn.click();
+    await this.page.goto(`${baseUrl}/${domain}/settings/space`);
   }
 
   async waitForSpaceSettingsURL(domain?: string) {
     if (domain) {
-      await this.page.waitForURL(`**/${domain}/*`);
+      await this.page.waitForURL(`**/${domain}/settings/space`);
     } else {
-      await this.page.waitForURL('**/*');
+      await this.page.waitForURL('**/settings/space');
     }
   }
 }

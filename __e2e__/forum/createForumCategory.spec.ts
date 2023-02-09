@@ -1,12 +1,10 @@
-import { test as base, expect } from '@playwright/test';
+import { expect, test as base } from '@playwright/test';
 
-import { baseUrl } from 'config/constants';
 import { prisma } from 'db';
 
 import { ForumHomePage } from '../po/forumHome.po';
 import { createUserAndSpace } from '../utils/mocks';
 import { login } from '../utils/session';
-import { mockWeb3 } from '../utils/web3';
 
 type Fixtures = {
   forumHomePage: ForumHomePage;
@@ -17,7 +15,7 @@ const test = base.extend<Fixtures>({
 });
 
 test('add forum category - navigate to forum and add a forum category', async ({ page, forumHomePage }) => {
-  const { space, address, privateKey, pages, user } = await createUserAndSpace({
+  const { space, user } = await createUserAndSpace({
     browserPage: page,
     permissionConfigurationMode: 'collaborative'
   });
@@ -29,10 +27,6 @@ test('add forum category - navigate to forum and add a forum category', async ({
 
   await forumHomePage.goToForumHome(space.domain);
 
-  await forumHomePage.page.waitForTimeout(2000);
-
-  await forumHomePage.page.press('data-test=member-onboarding-form', 'Escape');
-
   await expect(forumHomePage.addCategoryButton).toBeVisible();
 
   await forumHomePage.addCategoryButton.click();
@@ -43,17 +37,7 @@ test('add forum category - navigate to forum and add a forum category', async ({
 
   await forumHomePage.addCategoryInput.fill(newCategoryName);
 
-  await forumHomePage.confirmNewCategoryButton.click();
-
-  const category = await prisma.postCategory.findUnique({
-    where: {
-      spaceId_name: {
-        spaceId: space.id,
-        name: newCategoryName
-      }
-    }
-  });
-
+  const category = await forumHomePage.submitNewCategory();
   const newCategoryMenuOption = forumHomePage.getCategoryLocator(category?.id as string);
 
   await expect(newCategoryMenuOption).toBeVisible();
