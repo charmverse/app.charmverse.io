@@ -1,6 +1,6 @@
 import { expect, test as base } from '@playwright/test';
 import type { Post, Space } from '@prisma/client';
-import { LoggedInPage } from '__e2e__/po/loggedIn.po';
+import type { LoggedInPage } from '__e2e__/po/loggedIn.po';
 
 import { upsertPostCategoryPermission } from 'lib/permissions/forum/upsertPostCategoryPermission';
 import { randomETHWalletAddress } from 'testing/generateStubs';
@@ -16,8 +16,7 @@ type Fixtures = {
 };
 
 const test = base.extend<Fixtures>({
-  forumPostPage: ({ page }, use) => use(new ForumPostPage(page)),
-  loggedInPage: ({ page }, use) => use(new LoggedInPage(page))
+  forumPostPage: ({ page }, use) => use(new ForumPostPage(page))
 });
 
 let space: Space;
@@ -26,8 +25,7 @@ let post: Post;
 test.describe.serial('Edit a forum post', () => {
   test('editable for the author - navigate to a forum post and be able to edit post if user is the author', async ({
     page,
-    forumPostPage,
-    loggedInPage
+    forumPostPage
   }) => {
     const generated = await createUserAndSpace({
       browserPage: page,
@@ -83,8 +81,6 @@ test.describe.serial('Edit a forum post', () => {
       path: post.path
     });
 
-    await loggedInPage.skipOnboarding();
-
     const isEditable = await forumPostPage.isPostEditable();
 
     expect(isEditable).toBe(true);
@@ -92,8 +88,7 @@ test.describe.serial('Edit a forum post', () => {
 
   test('noneditable for the admin - navigate to a forum post and be unable to edit post if user is not the author, even if they are an admin', async ({
     page,
-    forumPostPage,
-    loggedInPage
+    forumPostPage
   }) => {
     const adminUser = await createUser({
       browserPage: page,
@@ -122,9 +117,6 @@ test.describe.serial('Edit a forum post', () => {
       domain: space.domain,
       path: post.path
     });
-
-    await loggedInPage.skipOnboarding();
-
     const isEditable = await forumPostPage.isPostEditable();
 
     expect(isEditable).toBe(false);
