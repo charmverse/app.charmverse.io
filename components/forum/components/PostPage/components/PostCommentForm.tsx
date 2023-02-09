@@ -1,5 +1,4 @@
-import { Stack } from '@mui/material';
-import { Box } from '@mui/system';
+import { Stack, Box } from '@mui/material';
 import { useState } from 'react';
 import type { KeyedMutator } from 'swr';
 

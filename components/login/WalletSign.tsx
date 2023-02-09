@@ -1,4 +1,4 @@
-import type { SxProps, Theme } from '@mui/system';
+import type { SxProps, Theme } from '@mui/material';
 import { useEffect } from 'react';
 
 import PrimaryButton from 'components/common/PrimaryButton';

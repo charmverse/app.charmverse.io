@@ -1,5 +1,5 @@
 import AddIcon from '@mui/icons-material/Add';
-import type { AutocompleteProps, SxProps } from '@mui/material';
+import type { AutocompleteProps, SxProps, Theme } from '@mui/material';
 import { Autocomplete, Box, TextField, Typography } from '@mui/material';
 import type { PaymentMethod } from '@prisma/client';
 import type { CryptoCurrency } from 'connectors';
@@ -23,7 +23,7 @@ export interface IInputSearchCryptoProps
   hideBackdrop?: boolean; // hide backdrop when modal is open
   cryptoList?: (string | CryptoCurrency)[];
   chainId?: number; // allow passing this down to the 'new custom token' form
-  sx?: SxProps;
+  sx?: SxProps<Theme>;
 }
 
 const ADD_NEW_CUSTOM = 'ADD_NEW_CUSTOM';
