@@ -1,5 +1,4 @@
-import type { Prisma, Space } from '@prisma/client';
-import { useRouter } from 'next/router';
+import type { Space } from '@prisma/client';
 import type { ReactNode } from 'react';
 import { useCallback, createContext, useContext, useEffect, useMemo, useState } from 'react';
 
@@ -31,7 +30,6 @@ export function SpacesProvider({ children }: { children: ReactNode }) {
   const [spaces, setSpaces] = useState<Space[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
   const [isCreatingSpace, setIsCreatingSpace] = useState(false);
-  const router = useRouter();
 
   useEffect(() => {
     if (user) {
