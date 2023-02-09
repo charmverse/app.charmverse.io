@@ -1,16 +1,15 @@
-import { Prisma, SpaceOperation } from '@prisma/client';
+import { SpaceOperation } from '@prisma/client';
 
 import { prisma } from 'db';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { uniqueValues } from 'lib/utilities/array';
 import { InsecureOperationError, InvalidInputError, MissingDataError } from 'lib/utilities/errors';
 
-import { InvalidPermissionGranteeError } from '../errors';
+import { AssignableToRolesOnlyError, AssignmentNotPermittedError, InvalidPermissionGranteeError } from '../errors';
 import type { AssignablePermissionGroups } from '../interfaces';
 
 import { computeGroupSpacePermissions } from './computeGroupSpacePermissions';
 import type { SpacePermissionFlags, SpacePermissionModification } from './interfaces';
-import { SpacePermissionWithAssignee } from './interfaces';
 import { generateSpacePermissionQuery } from './utility';
 
 export async function addSpaceOperations<A extends AssignablePermissionGroups = 'any'>({
@@ -35,6 +34,8 @@ export async function addSpaceOperations<A extends AssignablePermissionGroups = 
   for (const op of operations) {
     if (!SpaceOperation[op]) {
       throw new InvalidInputError(`Operation ${op} is an invalid space operation.`);
+    } else if (op === 'moderate_forums' && group !== 'role') {
+      throw new AssignableToRolesOnlyError(op);
     }
   }
 
