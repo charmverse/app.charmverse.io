@@ -1,8 +1,5 @@
 import type { Dispatch, ReactNode, SetStateAction } from 'react';
-import { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
-
-import { useCurrentSpace } from './useCurrentSpace';
-
+import { createContext, useContext, useMemo, useState } from 'react';
 // keep track of the focused page (may be different from what's in the URL or header)
 
 type IFocusedPageContext = {
@@ -15,14 +12,8 @@ export const FocusedPageContext = createContext<Readonly<IFocusedPageContext>>({
   setCurrentPageId: () => ''
 });
 
-export function CurrentPageProvider({ children }: { children: ReactNode }) {
-  const currentSpace = useCurrentSpace();
+export function FocusedPageProvider({ children }: { children: ReactNode }) {
   const [currentPageId, setCurrentPageId] = useState<string>('');
-  const currentSpaceId = useRef<undefined | string>();
-
-  useEffect(() => {
-    currentSpaceId.current = currentSpace?.id;
-  }, [currentSpace]);
 
   const value: IFocusedPageContext = useMemo(
     () => ({

@@ -38,6 +38,7 @@ export default function PageDialog(props: Props) {
   const router = useRouter();
   const { refreshBounty, setBounties } = useBounties();
   const { currentPageId, setCurrentPageId } = useFocusedPage();
+
   const { updatePage, getPagePermissions, deletePage, pages } = usePages();
   const pagePermission = page ? getPagePermissions(page.id) : null;
   const domain = router.query.domain as string;
@@ -92,8 +93,7 @@ export default function PageDialog(props: Props) {
       setCurrentPageId(page?.id);
     }
     return () => {
-      // kind of a hack for focalboards that are embedded inside CharmEditor. TODO: use localized currentPageId and dont import from usePages
-      setCurrentPageId(ogCurrentPageId);
+      setCurrentPageId('');
     };
   }, [page?.id]);
 

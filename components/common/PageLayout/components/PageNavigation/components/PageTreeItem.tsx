@@ -23,7 +23,7 @@ import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/sto
 import EmojiPicker from 'components/common/BoardEditor/focalboard/src/widgets/emojiPicker';
 import TreeItemContent from 'components/common/TreeItemContent';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
-import { useFocusedPage } from 'hooks/useFocusedPage';
+import { usePageFromPath } from 'hooks/usePageFromPath';
 import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { isTouchScreen } from 'lib/utilities/browser';
@@ -377,7 +377,7 @@ const PageTreeItem = forwardRef<any, PageTreeItemProps>((props, ref) => {
 
 function PageActionsMenu({ closeMenu, pageId, pagePath }: { closeMenu: () => void; pageId: string; pagePath: string }) {
   const boards = useAppSelector(getSortedBoards);
-  const { currentPageId } = useFocusedPage();
+  const currentPage = usePageFromPath();
   const { deletePage, getPagePermissions, pages } = usePages();
   const { showMessage } = useSnackbar();
   const permissions = getPagePermissions(pageId);
@@ -391,7 +391,6 @@ function PageActionsMenu({ closeMenu, pageId, pagePath }: { closeMenu: () => voi
     }
     const page = pages[pageId];
     const board = boards.find((b) => b.id === page?.id);
-    const currentPage = pages[currentPageId];
     const newPage = await deletePage({
       board,
       pageId

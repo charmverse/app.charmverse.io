@@ -18,7 +18,7 @@ export interface IPageActionDisplayContext {
   >;
 }
 
-export const PageActionDisplayContext = createContext<IPageActionDisplayContext>({
+const PageActionDisplayContext = createContext<IPageActionDisplayContext>({
   currentPageActionDisplay: null,
   setCurrentPageActionDisplay: () => undefined
 });

@@ -47,6 +47,7 @@ export default function InlineCommentThread({ pluginKey }: { pluginKey: PluginKe
   const view = useEditorViewContext();
   const { tooltipContentDOM, show: isVisible, ids } = usePluginState(pluginKey) as InlineCommentPluginState;
   const { threads } = useThreads();
+
   const cardId = new URLSearchParams(window.location.href).get('cardId');
 
   const { currentPageActionDisplay } = usePageActionDisplay();

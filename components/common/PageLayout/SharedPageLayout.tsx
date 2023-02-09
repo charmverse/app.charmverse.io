@@ -5,6 +5,7 @@ import SunIcon from '@mui/icons-material/WbSunny';
 import { Box, IconButton, Tooltip } from '@mui/material';
 import Head from 'next/head';
 
+import { DocumentPageProviders } from 'components/[pageId]/DocumentPage/DocumentPageProviders';
 import { PageDialogProvider } from 'components/common/PageDialog/hooks/usePageDialog';
 import PageDialogGlobalModal from 'components/common/PageDialog/PageDialogGlobal';
 import Account from 'components/common/PageLayout/components/Account';
@@ -30,7 +31,7 @@ export function SharedPageLayout({ children, basePageId }: Props) {
   const colorMode = useColorMode();
 
   return (
-    <>
+    <DocumentPageProviders>
       <Head>
         <CurrentPageFavicon />
       </Head>
@@ -73,6 +74,6 @@ export function SharedPageLayout({ children, basePageId }: Props) {
           </PageContainer>
         </PageDialogProvider>
       </LayoutContainer>
-    </>
+    </DocumentPageProviders>
   );
 }

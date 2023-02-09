@@ -33,10 +33,10 @@ import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
 import { undoEventName } from 'components/common/CharmEditor/utils';
 import { usePostByPath } from 'components/forum/hooks/usePostByPath';
 import { useColorMode } from 'context/darkMode';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { useMembers } from 'hooks/useMembers';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
+import { usePageFromPath } from 'hooks/usePageFromPath';
 import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useToggleFavorite } from 'hooks/useToggleFavorite';
@@ -163,7 +163,7 @@ export function Metadata({ creator, lastUpdatedAt }: { creator: string; lastUpda
 function HeaderComponent({ open, openSidebar }: HeaderProps) {
   const router = useRouter();
   const colorMode = useColorMode();
-  const { pages, updatePage, getPagePermissions, deletePage } = usePages();
+  const { updatePage, getPagePermissions, deletePage } = usePages();
 
   const { user } = useUser();
   const theme = useTheme();
@@ -171,8 +171,7 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
   const [pageMenuAnchorElement, setPageMenuAnchorElement] = useState<null | Element>(null);
   const pageMenuAnchor = useRef();
   const { showMessage } = useSnackbar();
-  const basePageId = router.query.pageId as string;
-  const basePage = Object.values(pages).find((page) => page?.id === basePageId || page?.path === basePageId);
+  const basePage = usePageFromPath();
   const { isFavorite, toggleFavorite } = useToggleFavorite({ pageId: basePage?.id });
   const { members } = useMembers();
   const { setCurrentPageActionDisplay } = usePageActionDisplay();
@@ -209,7 +208,7 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
   const onSwitchChange = () => {
     if (basePage) {
       updatePage({
-        id: basePage?.id,
+        id: basePage.id,
         fullWidth: !isFullWidth
       });
     }

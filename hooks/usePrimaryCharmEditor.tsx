@@ -24,7 +24,6 @@ export const EDIT_MODE_CONFIG = {
 } as const;
 
 interface PrimaryCharmEditorContext {
-  currentPageId: string;
   isSaving: boolean;
   availableEditModes: EditMode[];
   editMode: EditMode | null;
@@ -38,7 +37,6 @@ interface PrimaryCharmEditorContextWithSetter extends PrimaryCharmEditorContext 
 }
 
 const defaultProps = {
-  currentPageId: '',
   isSaving: false,
   availableEditModes: [],
   editMode: null,
