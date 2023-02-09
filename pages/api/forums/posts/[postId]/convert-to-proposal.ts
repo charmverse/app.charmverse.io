@@ -5,6 +5,7 @@ import { prisma } from 'db';
 import { updateTrackPageProfile } from 'lib/metrics/mixpanel/updateTrackPageProfile';
 import { ActionNotPermittedError, NotFoundError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import type { PageMeta } from 'lib/pages';
+import { computePostPermissions } from 'lib/permissions/forum/computePostPermissions';
 import { computeSpacePermissions } from 'lib/permissions/spaces';
 import { createProposal } from 'lib/proposal/createProposal';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -39,8 +40,8 @@ async function convertToProposal(req: NextApiRequest, res: NextApiResponse<PageM
     throw new NotFoundError();
   }
 
-  if (post.createdBy !== userId || post.proposalId) {
-    throw new ActionNotPermittedError('You do not have permission to update this page');
+  if (post.proposalId) {
+    throw new ActionNotPermittedError("Post converted to proposal can't be edited");
   }
 
   const spacePermissions = await computeSpacePermissions({
