@@ -30,7 +30,7 @@ export default function RouteGuard({ children }: { children: ReactNode }) {
       .split('/')
       .filter((segment) => !!segment);
     const firstSegment: string = pathSegments[0];
-    const isDomain: boolean = !!isSpaceDomain(firstSegment) || firstSegment === 'nexus';
+    const isDomain: boolean = !!isSpaceDomain(firstSegment);
     const workspaceDomain = isDomain ? firstSegment : null;
     const defaultPageKey: string = workspaceDomain ? getKey(`last-page-${workspaceDomain}`) : '';
     const defaultWorkspaceKey: string = getKey('last-workspace');

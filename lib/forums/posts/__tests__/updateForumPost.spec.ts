@@ -2,11 +2,10 @@ import type { Page, Post, Space, User } from '@prisma/client';
 import { v4 } from 'uuid';
 
 import { prisma } from 'db';
-import { createPostCategory } from 'lib/forums/categories/createPostCategory';
 import { InsecureOperationError, UndesirableOperationError } from 'lib/utilities/errors';
 import { typedKeys } from 'lib/utilities/objects';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { generateForumPost } from 'testing/utils/forums';
+import { generateForumPost, generatePostCategory } from 'testing/utils/forums';
 
 import { updateForumPost } from '../updateForumPost';
 
@@ -22,8 +21,8 @@ beforeAll(async () => {
 describe('updateForumPost', () => {
   it('should only update post.content, post.contentText, post.title, and post.categoryId', async () => {
     const [category1, category2] = await Promise.all([
-      createPostCategory({ name: 'First', spaceId: space.id }),
-      createPostCategory({ name: 'Second', spaceId: space.id })
+      generatePostCategory({ name: 'First', spaceId: space.id }),
+      generatePostCategory({ name: 'Second', spaceId: space.id })
     ]);
 
     const createdPost = await generateForumPost({
@@ -73,8 +72,8 @@ describe('updateForumPost', () => {
     const { space: secondSpace } = await generateUserAndSpaceWithApiToken();
 
     const [category1, otherSpaceCategory] = await Promise.all([
-      createPostCategory({ name: 'Third', spaceId: space.id }),
-      createPostCategory({ name: 'Fourth', spaceId: secondSpace.id })
+      generatePostCategory({ name: 'Third', spaceId: space.id }),
+      generatePostCategory({ name: 'Fourth', spaceId: secondSpace.id })
     ]);
 
     const createdPost = await generateForumPost({

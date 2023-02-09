@@ -3,8 +3,8 @@ import type { Space } from '@prisma/client';
 import { prisma } from 'db';
 import { getSpaceByDomain } from 'lib/spaces/getSpaceByDomain';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { generatePostCategory } from 'testing/utils/forums';
 
-import { createPostCategory } from '../createPostCategory';
 import { setDefaultPostCategory } from '../setDefaultPostCategory';
 
 describe('setDefaultPostCategory', () => {
@@ -13,7 +13,7 @@ describe('setDefaultPostCategory', () => {
 
     expect(space.defaultPostCategoryId).toBeNull();
 
-    const postCategory = await createPostCategory({
+    const postCategory = await generatePostCategory({
       spaceId: space.id,
       name: 'Test Category 1'
     });
@@ -32,7 +32,7 @@ describe('setDefaultPostCategory', () => {
 
     expect(space.defaultPostCategoryId).toBeNull();
 
-    const postCategory = await createPostCategory({
+    const postCategory = await generatePostCategory({
       spaceId: space.id,
       name: 'Test Category 1'
     });

@@ -2,7 +2,6 @@
 import type { Post, PostCategory, Space, User } from '@prisma/client';
 import request from 'supertest';
 
-import { createPostCategory } from 'lib/forums/categories/createPostCategory';
 import type { ForumPostMeta } from 'lib/forums/posts/interfaces';
 import type { PaginatedPostList } from 'lib/forums/posts/listForumPosts';
 import type { SearchForumPostsRequest } from 'lib/forums/posts/searchForumPosts';
@@ -10,6 +9,7 @@ import { upsertPostCategoryPermission } from 'lib/permissions/forum/upsertPostCa
 import { generateForumPosts } from 'testing/forums';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateSpaceUser, generateUserAndSpace, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { generatePostCategory } from 'testing/utils/forums';
 
 let firstSpace: Space;
 let firstSpaceUser: User;
@@ -37,7 +37,7 @@ beforeAll(async () => {
   secondSpace = _secondSpace;
   secondSpaceUser = _secondUser;
 
-  firstSpacePostCategory = await createPostCategory({
+  firstSpacePostCategory = await generatePostCategory({
     name: 'Test Category',
     spaceId: firstSpace.id
   });
@@ -48,7 +48,7 @@ beforeAll(async () => {
     assignee: { group: 'space', id: firstSpace.id }
   });
 
-  firstSpaceAdminOnlyPostCategory = await createPostCategory({
+  firstSpaceAdminOnlyPostCategory = await generatePostCategory({
     spaceId: firstSpace.id,
     name: 'Admin category'
   });
