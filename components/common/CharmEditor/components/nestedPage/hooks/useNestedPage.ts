@@ -4,15 +4,15 @@ import type { Page } from '@prisma/client';
 import { useRouter } from 'next/router';
 import { useCallback } from 'react';
 
+import { useCurrentPage } from 'hooks/useCurrentPage';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { usePages } from 'hooks/usePages';
 import { useUser } from 'hooks/useUser';
 import { addPage } from 'lib/pages';
 
 export default function useNestedPage() {
   const space = useCurrentSpace();
   const { user } = useUser();
-  const { currentPageId } = usePages();
+  const { currentPageId } = useCurrentPage();
   const view = useEditorViewContext();
   const router = useRouter();
   const cardId = new URLSearchParams(window.location.search).get('cardId');

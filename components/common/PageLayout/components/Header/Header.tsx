@@ -30,7 +30,7 @@ import Typography from '@mui/material/Typography';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
-import { useMemo, useRef, useState } from 'react';
+import { memo, useMemo, useRef, useState } from 'react';
 
 import charmClient from 'charmClient';
 import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
@@ -41,6 +41,7 @@ import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useMembers } from 'hooks/useMembers';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
+import { usePageFromPath } from 'hooks/usePageFromPath';
 import { usePages } from 'hooks/usePages';
 import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useSnackbar } from 'hooks/useSnackbar';
@@ -166,18 +167,17 @@ export function Metadata({ creator, lastUpdatedAt }: { creator: string; lastUpda
   );
 }
 
-export default function Header({ open, openSidebar }: HeaderProps) {
+function HeaderComponent({ open, openSidebar }: HeaderProps) {
   const router = useRouter();
   const colorMode = useColorMode();
-  const { pages, updatePage, getPagePermissions, deletePage } = usePages();
+  const { updatePage, getPagePermissions, deletePage } = usePages();
   const { user } = useUser();
   const theme = useTheme();
   const [pageMenuOpen, setPageMenuOpen] = useState(false);
   const [pageMenuAnchorElement, setPageMenuAnchorElement] = useState<null | Element>(null);
   const pageMenuAnchor = useRef();
   const { showMessage } = useSnackbar();
-  const basePageId = router.query.pageId as string;
-  const basePage = Object.values(pages).find((page) => page?.id === basePageId || page?.path === basePageId);
+  const basePage = usePageFromPath();
   const { isFavorite, toggleFavorite } = useToggleFavorite({ pageId: basePage?.id });
   const { members } = useMembers();
   const { setCurrentPageActionDisplay } = usePageActionDisplay();
@@ -216,7 +216,7 @@ export default function Header({ open, openSidebar }: HeaderProps) {
   const onSwitchChange = () => {
     if (basePage) {
       updatePage({
-        id: basePage?.id,
+        id: basePage.id,
         fullWidth: !isFullWidth
       });
     }
@@ -549,3 +549,5 @@ export default function Header({ open, openSidebar }: HeaderProps) {
     </StyledToolbar>
   );
 }
+
+export const Header = memo(HeaderComponent);

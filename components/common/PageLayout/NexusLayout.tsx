@@ -10,12 +10,13 @@ import SettingsDialog from 'components/common/Modal/SettingsDialog';
 import { PageDialogProvider } from 'components/common/PageDialog/hooks/usePageDialog';
 import PageDialogGlobalModal from 'components/common/PageDialog/PageDialogGlobal';
 import { PageActionDisplayProvider } from 'hooks/usePageActionDisplay';
+import { usePageIdFromPath } from 'hooks/usePageFromPath';
 import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useUser } from 'hooks/useUser';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 
 import CurrentPageFavicon from './components/CurrentPageFavicon';
-import Header, { headerHeight } from './components/Header';
+import { Header, headerHeight } from './components/Header/Header';
 import PageContainer from './components/PageContainer';
 import SidebarSubmenu from './components/Sidebar/SidebarSubmenu';
 
@@ -45,39 +46,34 @@ function NexusLayout({ children }: NexusLayoutProps) {
   }
 
   return (
-    <>
-      <Head>
-        <CurrentPageFavicon />
-      </Head>
-      <Box display='flex' height='100%' data-test='space-page-layout'>
-        <PageDialogProvider>
-          <PageActionDisplayProvider>
-            <AppBar position='fixed'>
-              <Box display='flex'>
-                {!!user && (
-                  <SidebarSubmenu
-                    closeSidebar={() => undefined}
-                    logoutCurrentUser={logoutCurrentUser}
-                    openProfileModal={() => onClick('profile')}
-                  />
-                )}
-              </Box>
-              <Box display='flex'>
-                <Header open={true} openSidebar={() => undefined} />
-                {!user && isLoaded && <Button sx={{ my: 1 }}>Join Charmverse</Button>}
-              </Box>
-            </AppBar>
+    <Box display='flex' height='100%' data-test='space-page-layout'>
+      <PageDialogProvider>
+        <PageActionDisplayProvider>
+          <AppBar position='fixed'>
+            <Box display='flex'>
+              {!!user && (
+                <SidebarSubmenu
+                  closeSidebar={() => undefined}
+                  logoutCurrentUser={logoutCurrentUser}
+                  openProfileModal={() => onClick('profile')}
+                />
+              )}
+            </Box>
+            <Box display='flex'>
+              <Header open={true} openSidebar={() => undefined} />
+              {!user && isLoaded && <Button sx={{ my: 1 }}>Join Charmverse</Button>}
+            </Box>
+          </AppBar>
 
-            <PageContainer>
-              <Box minHeight={`${headerHeight}px`} />
-              {children}
-              <SettingsDialog />
-            </PageContainer>
-            <PageDialogGlobalModal />
-          </PageActionDisplayProvider>
-        </PageDialogProvider>
-      </Box>
-    </>
+          <PageContainer>
+            <Box minHeight={`${headerHeight}px`} />
+            {children}
+            <SettingsDialog />
+          </PageContainer>
+          <PageDialogGlobalModal />
+        </PageActionDisplayProvider>
+      </PageDialogProvider>
+    </Box>
   );
 }
 

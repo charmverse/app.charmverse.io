@@ -1,12 +1,12 @@
 import React, { useCallback } from 'react';
-import { useDragLayer, useDrop } from 'react-dnd';
+import { useDrop } from 'react-dnd';
 import { FormattedMessage } from 'react-intl';
 
 import useEfficientDragLayer from 'hooks/useEffecientDragLayer';
 import type { IPropertyOption, IPropertyTemplate, Board, BoardGroup } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import { createBoardView } from 'lib/focalboard/boardView';
-import type { Card } from 'lib/focalboard/card';
+import type { CardPage, Card } from 'lib/focalboard/card';
 
 import { Constants } from '../../constants';
 import mutator from '../../mutator';
@@ -22,7 +22,7 @@ import TableRows from './tableRows';
 type Props = {
   selectedCardIds: string[];
   board: Board;
-  cards: Card[];
+  cardPages: CardPage[];
   activeView: BoardView;
   views: BoardView[];
   visibleGroups: BoardGroup[];
@@ -36,7 +36,7 @@ type Props = {
 };
 
 function Table(props: Props): JSX.Element {
-  const { board, cards, activeView, visibleGroups, groupByProperty, views } = props;
+  const { board, cardPages, activeView, visibleGroups, groupByProperty, views } = props;
   const isManualSort = activeView.fields.sortOptions?.length === 0;
   const dispatch = useAppDispatch();
 
@@ -141,13 +141,10 @@ function Table(props: Props): JSX.Element {
       const description = draggedCardIds.length > 1 ? `drag ${draggedCardIds.length} cards` : 'drag card';
 
       if (activeView.fields.groupById !== undefined) {
-        const cardsById: { [key: string]: Card } = cards.reduce(
-          (acc: { [key: string]: Card }, card: Card): { [key: string]: Card } => {
-            acc[card.id] = card;
-            return acc;
-          },
-          {}
-        );
+        const cardsById = cardPages.reduce<{ [key: string]: Card }>((acc, card) => {
+          acc[card.card.id] = card.card;
+          return acc;
+        }, {});
         const draggedCards: Card[] = draggedCardIds.map((o: string) => cardsById[o]);
 
         mutator.performAsUndoGroup(async () => {
@@ -169,7 +166,7 @@ function Table(props: Props): JSX.Element {
 
       // Update dstCard order
       if (isManualSort) {
-        let cardOrder = Array.from(new Set([...activeView.fields.cardOrder, ...cards.map((o) => o.id)]));
+        let cardOrder = Array.from(new Set([...activeView.fields.cardOrder, ...cardPages.map((o) => o.card.id)]));
         if (dstCardID) {
           const isDraggingDown = cardOrder.indexOf(srcCard.id) <= cardOrder.indexOf(dstCardID);
           cardOrder = cardOrder.filter((id) => !draggedCardIds.includes(id));
@@ -180,9 +177,11 @@ function Table(props: Props): JSX.Element {
           cardOrder.splice(destIndex, 0, ...draggedCardIds);
         } else {
           // Find index of first group item
-          const firstCard = cards.find((card) => card.fields.properties[activeView.fields.groupById!] === groupID);
+          const firstCard = cardPages.find(
+            ({ card }) => card.fields.properties[activeView.fields.groupById!] === groupID
+          );
           if (firstCard) {
-            const destIndex = cardOrder.indexOf(firstCard.id);
+            const destIndex = cardOrder.indexOf(firstCard.card.id);
             cardOrder.splice(destIndex, 0, ...draggedCardIds);
           } else {
             // if not found, this is the only item in group.
@@ -195,7 +194,7 @@ function Table(props: Props): JSX.Element {
         });
       }
     },
-    [activeView, cards, props.selectedCardIds, groupByProperty]
+    [activeView, cardPages, props.selectedCardIds, groupByProperty]
   );
 
   const onDropToCard = useCallback(
@@ -218,7 +217,7 @@ function Table(props: Props): JSX.Element {
       <div className='octo-table-body'>
         <TableHeaders
           board={board}
-          cards={cards}
+          cards={cardPages.map((c) => c.card)}
           activeView={activeView}
           views={views}
           offset={offset}
@@ -261,7 +260,7 @@ function Table(props: Props): JSX.Element {
               board={board}
               activeView={activeView}
               columnRefs={columnRefs}
-              cards={cards}
+              cardPages={cardPages}
               selectedCardIds={props.selectedCardIds}
               readOnly={props.readOnly || props.readOnlySourceData}
               cardIdToFocusOnRender={props.cardIdToFocusOnRender}
@@ -291,7 +290,7 @@ function Table(props: Props): JSX.Element {
 
         <CalculationRow
           board={board}
-          cards={cards}
+          cards={cardPages.map((c) => c.card)}
           activeView={activeView}
           resizingColumn={resizingColumn}
           offset={offset}

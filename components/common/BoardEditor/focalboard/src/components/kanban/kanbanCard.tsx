@@ -76,24 +76,20 @@ const KanbanCard = React.memo((props: Props) => {
   const { bounties } = useBounties();
   const linkedBounty = bounties.find((bounty) => bounty.page?.id === card.id);
 
-  const { pages, getPagePermissions } = usePages();
+  const { pages } = usePages();
   const cardPage = pages[card.id];
   const router = useRouter();
   const domain = router.query.domain || /^\/share\/(.*)\//.exec(router.asPath)?.[1];
   const fullPageUrl = `/${domain}/${cardPage?.path}`;
 
-  // Check if the current user is an admin, admin means implicit full access
-  const pagePermissions = getPagePermissions(card.id);
   const [showConfirmationDialogBox, setShowConfirmationDialogBox] = useState<boolean>(false);
   const handleDeleteCard = async () => {
     if (!card) {
       Utils.assertFailure();
       return;
     }
-    if (pagePermissions.delete) {
-      await mutator.deleteBlock(card, 'delete card');
-      mutate(`pages/${space?.id}`);
-    }
+    await mutator.deleteBlock(card, 'delete card');
+    mutate(`pages/${space?.id}`);
   };
   const confirmDialogProps: ConfirmationDialogBoxProps = {
     heading: intl.formatMessage({
@@ -154,11 +150,7 @@ const KanbanCard = React.memo((props: Props) => {
           data-test={`kanban-card-${card.id}`}
         >
           {!props.readOnly && cardPage && (
-            <PageActions
-              page={cardPage}
-              onClickDelete={pagePermissions.delete && cardPage.deletedAt === null ? deleteCard : undefined}
-              onClickDuplicate={duplicateCard}
-            />
+            <PageActions page={cardPage} onClickDelete={deleteCard} onClickDuplicate={duplicateCard} />
           )}
 
           <div className='octo-icontitle'>

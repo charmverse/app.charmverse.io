@@ -10,6 +10,7 @@ import type { Dispatch, ReactNode, SetStateAction } from 'react';
 
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useMembers } from 'hooks/useMembers';
+import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
 
 import { Utils } from './BoardEditor/focalboard/src/utils';
@@ -21,7 +22,8 @@ export function PageActionsMenu({
   onClickDuplicate,
   anchorEl,
   page,
-  setAnchorEl
+  setAnchorEl,
+  readOnly
 }: {
   onClickDelete?: VoidFunction;
   onClickEdit?: VoidFunction;
@@ -29,15 +31,25 @@ export function PageActionsMenu({
   onClickDuplicate?: VoidFunction;
   setAnchorEl: Dispatch<SetStateAction<HTMLElement | null>>;
   anchorEl: HTMLElement | null;
-  page: { createdBy: string; type?: PageType; id: string; updatedAt: Date; relativePath?: string; path: string };
+  page: {
+    createdBy: string;
+    type?: PageType;
+    id: string;
+    updatedAt: Date;
+    relativePath?: string;
+    path: string;
+    deletedAt: Date | null;
+  };
+  readOnly?: boolean;
 }) {
+  const { getPagePermissions } = usePages();
   const { members } = useMembers();
   const router = useRouter();
   const { showMessage } = useSnackbar();
   const charmversePage = members.find((member) => member.id === page.createdBy);
   const open = Boolean(anchorEl);
   const { formatDateTime } = useDateFormatter();
-
+  const pagePermissions = getPagePermissions(page.id);
   function getPageLink() {
     let link = window.location.href;
 
@@ -74,13 +86,13 @@ export function PageActionsMenu({
       transformOrigin={{ vertical: 'top', horizontal: 'left' }}
       open={open}
     >
-      {onClickEdit && (
+      {onClickEdit && !readOnly && (
         <MenuItem dense onClick={onClickEdit}>
           <EditOutlined fontSize='small' sx={{ mr: 1 }} />
           <ListItemText>Edit</ListItemText>
         </MenuItem>
       )}
-      <MenuItem dense onClick={onClickDelete} disabled={!onClickDelete}>
+      <MenuItem dense onClick={onClickDelete} disabled={Boolean(readOnly || !pagePermissions.delete || page.deletedAt)}>
         <DeleteOutlineIcon fontSize='small' sx={{ mr: 1 }} />
         <ListItemText>Delete</ListItemText>
       </MenuItem>

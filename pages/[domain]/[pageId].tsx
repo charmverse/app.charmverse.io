@@ -1,26 +1,20 @@
-import { useRouter } from 'next/router';
-
 import EditorPage from 'components/[pageId]/EditorPage/EditorPage';
 import { SharedPage } from 'components/[pageId]/SharedPage/SharedPage';
 import getPageLayout from 'components/common/PageLayout/getLayout';
-import { usePages } from 'hooks/usePages';
+import { usePageFromPath } from 'hooks/usePageFromPath';
 import { useSharedPage } from 'hooks/useSharedPage';
-import type { PageMeta } from 'lib/pages';
 
-export default function BlocksEditorPage() {
-  const { pages } = usePages();
-  const router = useRouter();
+export default function PageView() {
   const { publicPage, hasSharedPageAccess } = useSharedPage();
-
-  const pagePath = router.query.pageId as string;
-  const pageIdList = Object.values(pages ?? {}) as PageMeta[];
-  const pageId = pageIdList.find((p) => p.path === pagePath)?.id;
+  const currentPage = usePageFromPath();
 
   if (hasSharedPageAccess && publicPage) {
     return <SharedPage publicPage={publicPage} />;
+  } else if (!currentPage) {
+    return null;
   }
 
-  return <EditorPage pageId={pageId ?? pagePath} />;
+  return <EditorPage pageId={currentPage.id} />;
 }
 
-BlocksEditorPage.getLayout = getPageLayout;
+PageView.getLayout = getPageLayout;

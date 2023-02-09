@@ -1,5 +1,6 @@
 import type { Block } from 'lib/focalboard/block';
 import { createBlock } from 'lib/focalboard/block';
+import type { PageMeta } from 'lib/pages';
 
 type CardFields = {
   icon?: string;
@@ -10,6 +11,11 @@ type CardFields = {
 
 export type Card = Block & {
   fields: CardFields;
+};
+
+export type CardPage = {
+  card: Card;
+  page: PageMeta;
 };
 
 export function createCard(block?: Partial<Block>): Card {
