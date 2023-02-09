@@ -20,6 +20,7 @@ import ProfileSettings from 'components/profile/ProfileSettings';
 import { ApiSettings } from 'components/settings/api/Api';
 import Invites from 'components/settings/invites/Invites';
 import MemberSettings from 'components/settings/members/MemberSettings';
+import type { SpaceSettingsTab, UserSettingsTab } from 'components/settings/pages';
 import { SETTINGS_TABS, ACCOUNT_TABS } from 'components/settings/pages';
 import RoleSettings from 'components/settings/roles/RoleSettings';
 import SpaceSettings from 'components/settings/workspace/Space';
@@ -37,7 +38,7 @@ interface TabPanelProps extends BoxProps {
   value: string;
 }
 
-function TabView(props: { space?: Space; tab: (typeof SETTINGS_TABS)[0] }) {
+function TabView(props: { space?: Space; tab: SpaceSettingsTab | UserSettingsTab }) {
   const { space, tab } = props;
 
   if (tab.path === SETTINGS_TABS[0].path && space) {
@@ -144,6 +145,7 @@ export default function SettingsModal() {
               <StyledTreeItem nodeId='my-spaces' label='My spaces' icon={null} sx={{ mt: 1.5 }}>
                 {spaces.map((space) => (
                   <StyledTreeItem
+                    data-test={`space-settings-tab-${space.id}`}
                     key={space.id}
                     nodeId={space.name}
                     label={
@@ -156,6 +158,7 @@ export default function SettingsModal() {
                   >
                     {SETTINGS_TABS.map((tab) => (
                       <StyledTreeItem
+                        data-test={`space-settings-tab-${space.id}-${tab.path}`}
                         key={tab.path}
                         nodeId={`${space.name}-${tab.path}`}
                         label={tab.label}

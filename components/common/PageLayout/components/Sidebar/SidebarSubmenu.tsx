@@ -78,7 +78,7 @@ export default function SidebarSubmenu({
   const { spaces, isCreatingSpace, setSpaces, isLoaded } = useSpaces();
   const [spaceFormOpen, setSpaceFormOpen] = useState(false);
   const { user } = useUser();
-  const { handleUserUpdate, isSaving } = useUserDetails();
+  const { handleUserUpdate, isSaving } = useUserDetails({});
 
   function showSpaceForm() {
     setSpaceFormOpen(true);
