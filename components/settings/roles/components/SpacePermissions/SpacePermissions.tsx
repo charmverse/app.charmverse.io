@@ -141,7 +141,7 @@ export default function SpacePermissions({ targetGroup, id, callback = () => nul
   }
 
   return (
-    <div>
+    <div data-test={`space-permissions-form-${targetGroup}`}>
       <form onSubmit={handleSubmit((formValue) => submitted(formValue))} style={{ margin: 'auto' }}>
         <Grid container direction='column' gap={2}>
           <Grid item xs>
@@ -170,6 +170,7 @@ export default function SpacePermissions({ targetGroup, id, callback = () => nul
                   <FormControlLabel
                     control={
                       <Switch
+                        data-test={`space-operation-${targetGroup}-${operation}`}
                         disabled={!isAdmin}
                         defaultChecked={userCanPerformAction}
                         onChange={(ev) => {
@@ -207,7 +208,14 @@ export default function SpacePermissions({ targetGroup, id, callback = () => nul
 
           {isAdmin && (
             <Grid item xs>
-              <Button disabled={!settingsChanged} type='submit' variant='contained' color='primary' sx={{ mr: 1 }}>
+              <Button
+                data-test='submit-space-permission-settings'
+                disabled={!settingsChanged}
+                type='submit'
+                variant='contained'
+                color='primary'
+                sx={{ mr: 1 }}
+              >
                 Save
               </Button>
             </Grid>
