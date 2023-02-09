@@ -7,7 +7,7 @@ import charmClient from 'charmClient';
 import type { Member } from 'lib/members/interfaces';
 import { shortWalletAddress } from 'lib/utilities/strings';
 
-import { useCurrentSpace } from './useCurrentSpace';
+import { useCurrentSpace } from './useCurrentSpaceId';
 
 type Context = {
   members: Member[];

@@ -1,6 +1,6 @@
 import { isProdEnv } from 'config/constants';
 
-import { useCurrentSpace } from './useCurrentSpace';
+import { useCurrentSpace } from './useCurrentSpaceId';
 
 const defaultDomains = ['charmverse'];
 

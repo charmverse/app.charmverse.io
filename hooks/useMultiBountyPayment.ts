@@ -16,7 +16,7 @@ import { getSafesForAddress } from 'lib/gnosis';
 import { eToNumber } from 'lib/utilities/numbers';
 
 import { useBounties } from './useBounties';
-import { useCurrentSpace } from './useCurrentSpace';
+import { useCurrentSpace } from './useCurrentSpaceId';
 
 const ERC20_ABI = ['function transfer(address to, uint256 value)'];
 

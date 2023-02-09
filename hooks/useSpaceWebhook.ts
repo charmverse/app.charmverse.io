@@ -5,7 +5,7 @@ import charmClient from 'charmClient';
 import { isUrl } from 'lib/utilities/strings';
 import type { SetSpaceWebhookBody, SetSpaceWebhookResponse } from 'pages/api/spaces/[id]/set-webhook';
 
-import { useCurrentSpace } from './useCurrentSpace';
+import { useCurrentSpace } from './useCurrentSpaceId';
 
 const convertToEventMap = (webhook: SetSpaceWebhookResponse | undefined) => {
   const eventMap = new Map<string, boolean>();

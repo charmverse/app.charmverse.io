@@ -10,7 +10,7 @@ import log from 'lib/log';
 import type { ClientMessage, ServerMessage, WebSocketMessage, WebSocketPayload } from 'lib/websockets/interfaces';
 import { PubSub } from 'lib/websockets/pubSub';
 
-import { useCurrentSpace } from './useCurrentSpace';
+import { useCurrentSpace } from './useCurrentSpaceId';
 import { useUser } from './useUser';
 
 const socketHost = `${websocketsHost || ''}/`;

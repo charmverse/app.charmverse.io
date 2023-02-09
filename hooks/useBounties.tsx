@@ -5,7 +5,7 @@ import charmClient from 'charmClient';
 import useRefState from 'hooks/useRefState';
 import type { BountyCreationData, UpdateableBountyFields, BountyWithDetails } from 'lib/bounties';
 
-import { useCurrentSpace } from './useCurrentSpace';
+import { useCurrentSpace } from './useCurrentSpaceId';
 import { useUser } from './useUser';
 
 type IContext = {

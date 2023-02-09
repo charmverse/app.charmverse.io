@@ -4,7 +4,7 @@ import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 
-import { useCurrentSpace } from './useCurrentSpace';
+import { useCurrentSpace } from './useCurrentSpaceId';
 import { useSpaces } from './useSpaces';
 
 export function useForumCategories() {
