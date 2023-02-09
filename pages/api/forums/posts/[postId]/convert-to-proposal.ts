@@ -4,12 +4,14 @@ import nc from 'next-connect';
 import { prisma } from 'db';
 import { updateTrackPageProfile } from 'lib/metrics/mixpanel/updateTrackPageProfile';
 import { ActionNotPermittedError, NotFoundError, onError, onNoMatch, requireUser } from 'lib/middleware';
-import type { PageDetails, PageMeta } from 'lib/pages';
+import type { PageMeta } from 'lib/pages';
 import { computeSpacePermissions } from 'lib/permissions/spaces';
 import { createProposal } from 'lib/proposal/createProposal';
 import { withSessionRoute } from 'lib/session/withSession';
 import { UnauthorisedActionError } from 'lib/utilities/errors';
 import { relay } from 'lib/websockets/relay';
+
+import { convertPostToProposal } from '../../../../../lib/forums/posts/convertPostToProposal';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -50,24 +52,29 @@ async function convertToProposal(req: NextApiRequest, res: NextApiResponse<PageM
     throw new UnauthorisedActionError('You do not have permission to create a page in this space');
   }
 
-  const { page: updatedPage } = await createProposal({
+  const { page: proposalPage } = await createProposal({
     createdBy: userId,
     spaceId: post.spaceId,
     content: post.content ?? undefined,
     title: post.title
   });
 
-  updateTrackPageProfile(updatedPage.id);
+  await convertPostToProposal({
+    postId: post.id,
+    proposalId: proposalPage.id
+  });
+
+  updateTrackPageProfile(proposalPage.id);
 
   relay.broadcast(
     {
       type: 'pages_created',
-      payload: [updatedPage]
+      payload: [proposalPage]
     },
     post.spaceId
   );
 
-  return res.status(200).json(updatedPage);
+  return res.status(200).json(proposalPage);
 }
 
 export default withSessionRoute(handler);

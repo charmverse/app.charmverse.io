@@ -899,6 +899,7 @@ model Proposal {
   categoryId             String?            @db.Uuid
   category               ProposalCategory?  @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   snapshotProposalExpiry DateTime?
+  Post                   Post[]
 
   @@index([spaceId])
   @@index([reviewedBy])
@@ -1057,7 +1058,8 @@ model Post {
   comments           PostComment[]
   upDownVotes        PostUpDownVote[]
   commentUpDownVotes PostCommentUpDownVote[]
-  proposalLink       String?
+  proposalId         String?                 @db.Uuid
+  proposal           Proposal?               @relation(fields: [proposalId], references: [id], onDelete: SetNull)
 
   @@unique([spaceId, path])
   @@index([categoryId])

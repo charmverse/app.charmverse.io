@@ -208,7 +208,6 @@ function PostHeader({
 
   async function convertToProposal(pageId: string) {
     setPageMenuOpen(false);
-    await charmClient.pages.convertToProposal(pageId);
     await charmClient.forum.convertToProposal(pageId);
     // router.push(`/${router.query.domain}/${proposalPage.path}`);
   }
