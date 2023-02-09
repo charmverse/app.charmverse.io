@@ -57,17 +57,17 @@ test.describe.serial('Add a new space from sidebar and load it', async () => {
     const createdSpace = (await response.json()) as Space;
     await page.waitForURL(`**/${createdSpace.domain}`);
 
-    // Await new onboarding form popup so we can close it and click on new space
-    let closePropertiesModalBtn = await page.locator('data-test=close-member-properties-modal');
-    await expect(closePropertiesModalBtn).toBeVisible();
-    await closePropertiesModalBtn.click();
-
     let memberProfileNftList = await page.locator('data-test=member-profile-nft-list');
     let memberProfileOrgList = await page.locator('data-test=member-profile-org-list');
     let memberProfilePoapList = await page.locator('data-test=member-profile-poap-list');
     await expect(memberProfileNftList).toBeVisible();
     await expect(memberProfileOrgList).toBeVisible();
     await expect(memberProfilePoapList).toBeVisible();
+
+    // Await new onboarding form popup so we can close it and click on new space
+    let closePropertiesModalBtn = await page.locator('data-test=close-member-properties-modal');
+    await expect(closePropertiesModalBtn).toBeVisible();
+    await closePropertiesModalBtn.click();
 
     await page.locator('text=[Your DAO] Home').first().waitFor();
 
