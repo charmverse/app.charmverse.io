@@ -18,7 +18,7 @@ import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
 import { useCallback, useMemo, useState } from 'react';
 
-import SettingsDialog from 'components/common/Modal/SettingsDialog';
+import { SpaceSettingsDialog } from 'components/common/Modal/SettingsDialog';
 import { charmverseDiscordInvite } from 'config/constants';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
@@ -310,7 +310,7 @@ export default function Sidebar({ closeSidebar, favorites, navAction }: SidebarP
           }}
         />
       )}
-      <SettingsDialog />
+      <SpaceSettingsDialog />
     </SidebarContainer>
   );
 }

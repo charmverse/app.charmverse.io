@@ -24,6 +24,7 @@ import { SETTINGS_TABS, ACCOUNT_TABS } from 'components/settings/pages';
 import RoleSettings from 'components/settings/roles/RoleSettings';
 import SpaceSettings from 'components/settings/workspace/Space';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { CurrentSpaceProvider, useCurrentSpaceId } from 'hooks/useCurrentSpaceId';
 import { useSmallScreen } from 'hooks/useMediaScreens';
 import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useSpaces } from 'hooks/useSpaces';
@@ -91,7 +92,9 @@ function TabPanel(props: TabPanelProps) {
   );
 }
 
-export default function SettingsModal() {
+function SpaceSettingsModalComponent() {
+  const { setCurrentSpaceId } = useCurrentSpaceId();
+
   const { user } = useUser();
   const { spaces } = useSpaces();
   const currentSpace = useCurrentSpace();
@@ -160,7 +163,10 @@ export default function SettingsModal() {
                         nodeId={`${space.name}-${tab.path}`}
                         label={tab.label}
                         icon={tab.icon}
-                        onClick={() => onClick(`${space.name}-${tab.path}`)}
+                        onClick={() => {
+                          setCurrentSpaceId(space.id);
+                          onClick(`${space.name}-${tab.path}`);
+                        }}
                         isActive={activePath === `${space.name}-${tab.path}`}
                         ContentProps={{ style: { paddingLeft: 45 } }}
                       />
@@ -216,5 +222,12 @@ export default function SettingsModal() {
         </IconButton>
       </Box>
     </Dialog>
+  );
+}
+export function SpaceSettingsDialog() {
+  return (
+    <CurrentSpaceProvider>
+      <SpaceSettingsModalComponent />
+    </CurrentSpaceProvider>
   );
 }
