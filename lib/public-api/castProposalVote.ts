@@ -1,10 +1,17 @@
 import { prisma } from 'db';
-import type { CastProposalVoteRequestBody } from 'lib/public-api/interfaces';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { DataNotFoundError, UndesirableOperationError } from 'lib/utilities/errors';
 import { castVote as castVoteService } from 'lib/votes';
 
-export async function castProposalVote({ userId, proposalId, choice }: CastProposalVoteRequestBody) {
+export async function castProposalVote({
+  userId,
+  proposalId,
+  choice
+}: {
+  userId: string;
+  proposalId: string;
+  choice: string;
+}) {
   const vote = await prisma.vote.findFirst({
     where: {
       pageId: proposalId,
