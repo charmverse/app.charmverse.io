@@ -26,7 +26,7 @@ export interface LoggedInUser extends User {
   telegramUser?: TelegramUser | null;
   notificationState?: UserNotificationState | null;
   isNew?: boolean;
-  preferences?: {
+  profile?: {
     timezone?: string | null;
     locale?: string | null;
   } | null;

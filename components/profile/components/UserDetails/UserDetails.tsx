@@ -19,6 +19,7 @@ import { TimezoneDisplay } from 'components/members/components/TimezoneDisplay';
 import { useUpdateProfileAvatar } from 'components/profile/components/UserDetails/hooks/useUpdateProfileAvatar';
 import { useUserDetails } from 'components/profile/components/UserDetails/hooks/useUserDetails';
 import Avatar from 'components/settings/workspace/LargeAvatar';
+import { useUser } from 'hooks/useUser';
 import type { DiscordAccount } from 'lib/discord/getDiscordAccount';
 import { hasNftAvatar } from 'lib/users/hasNftAvatar';
 import randomName from 'lib/utilities/randomName';
@@ -41,7 +42,8 @@ const StyledDivider = styled(Divider)`
   height: 36px;
 `;
 
-export const isPublicUser = (user: PublicUser | LoggedInUser): user is PublicUser => user.hasOwnProperty('profile');
+export const isPublicUser = (user: PublicUser | LoggedInUser, currentUser: null | LoggedInUser): user is PublicUser =>
+  user.id !== currentUser?.id;
 
 export interface UserDetailsProps {
   readOnly?: boolean;
@@ -73,7 +75,8 @@ function EditIconContainer({
 }
 
 function UserDetails({ readOnly, user, updateUser, sx = {} }: UserDetailsProps) {
-  const isPublic = isPublicUser(user);
+  const { user: currentUser } = useUser();
+  const isPublic = isPublicUser(user, currentUser);
   const { data: userDetails, mutate } = useSWRImmutable(`/userDetails/${user.id}/${isPublic}`, () => {
     return isPublic ? user.profile : charmClient.getUserDetails();
   });
@@ -109,7 +112,7 @@ function UserDetails({ readOnly, user, updateUser, sx = {} }: UserDetailsProps) 
     socialDetails.linkedinURL?.length === 0;
 
   const identityTypes: IntegrationModel[] = useMemo(() => {
-    if (isPublicUser(user)) {
+    if (isPublic) {
       return [];
     }
 
@@ -196,7 +199,7 @@ function UserDetails({ readOnly, user, updateUser, sx = {} }: UserDetailsProps) 
         <Grid container direction='column' spacing={0.5}>
           <Grid item>
             <EditIconContainer data-testid='edit-identity' readOnly={readOnly} onClick={identityModalState.open}>
-              {user && !isPublicUser(user) && getIdentityIcon(user.identityType as IdentityType)}
+              {user && !isPublic && getIdentityIcon(user.identityType as IdentityType)}
               <Typography variant='h1'>{shortWalletAddress(user.username)}</Typography>
             </EditIconContainer>
           </Grid>
@@ -252,7 +255,7 @@ function UserDetails({ readOnly, user, updateUser, sx = {} }: UserDetailsProps) 
           </Grid>
         </Grid>
       </Stack>
-      {!isPublicUser(user) && (
+      {!isPublic && (
         <>
           <IdentityModal
             isOpen={identityModalState.isOpen}
