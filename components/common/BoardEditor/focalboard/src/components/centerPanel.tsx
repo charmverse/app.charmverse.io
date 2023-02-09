@@ -148,7 +148,7 @@ function CenterPanel(props: Props) {
 
   const { visible: visibleGroups, hidden: hiddenGroups } = activeView
     ? getVisibleAndHiddenGroups(
-        cards,
+        cardPages,
         activeView.fields.visibleOptionIds,
         activeView.fields.hiddenOptionIds,
         groupByProperty
@@ -350,7 +350,7 @@ function CenterPanel(props: Props) {
   }
 
   function getVisibleAndHiddenGroups(
-    __cards: Card[],
+    __cardPages: CardPage[],
     visibleOptionIds: string[],
     hiddenOptionIds: string[],
     groupByProperty?: IPropertyTemplate
@@ -368,8 +368,8 @@ function CenterPanel(props: Props) {
       allVisibleOptionIds.unshift('');
     }
 
-    const _visibleGroups = groupCardsByOptions(__cards, allVisibleOptionIds, groupByProperty);
-    const _hiddenGroups = groupCardsByOptions(__cards, hiddenOptionIds, groupByProperty);
+    const _visibleGroups = groupCardsByOptions(__cardPages, allVisibleOptionIds, groupByProperty);
+    const _hiddenGroups = groupCardsByOptions(__cardPages, hiddenOptionIds, groupByProperty);
     return { visible: _visibleGroups, hidden: _hiddenGroups };
   }
 
@@ -617,7 +617,7 @@ function CenterPanel(props: Props) {
 }
 
 export function groupCardsByOptions(
-  cards: Card[],
+  cardPages: CardPage[],
   optionIds: string[],
   groupByProperty?: IPropertyTemplate
 ): BoardGroup[] {
@@ -627,22 +627,24 @@ export function groupCardsByOptions(
     if (optionId) {
       const option = groupByProperty?.options.find((o) => o.id === optionId);
       if (option) {
-        const c = cards.filter((o) => optionId === o.fields.properties[groupByProperty!.id]);
+        const c = cardPages.filter((o) => optionId === o.card.fields.properties[groupByProperty!.id]);
         const group: BoardGroup = {
           option,
-          cards: c
+          cardPages: c,
+          cards: c.map((c) => c.card)
         };
         groups.push(group);
       }
     } else {
       // Empty group
-      const emptyGroupCards = cards.filter((card) => {
+      const emptyGroupCards = cardPages.filter(({ card }) => {
         const groupByOptionId = card.fields.properties[groupByProperty?.id || ''];
         return !groupByOptionId || !groupByProperty?.options.find((option) => option.id === groupByOptionId);
       });
       const group: BoardGroup = {
         option: { id: '', value: `No ${groupByProperty?.name}`, color: '' },
-        cards: emptyGroupCards
+        cardPages: emptyGroupCards,
+        cards: emptyGroupCards.map((c) => c.card)
       };
       groups.push(group);
     }
