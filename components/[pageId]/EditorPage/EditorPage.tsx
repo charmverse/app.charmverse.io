@@ -4,11 +4,11 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import charmClient from 'charmClient';
 import ErrorPage from 'components/common/errors/ErrorPage';
+import { useCharmEditor } from 'hooks/useCharmEditor';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useFocusedPage } from 'hooks/useFocusedPage';
 import { usePages } from 'hooks/usePages';
 import { usePageTitle } from 'hooks/usePageTitle';
-import { usePrimaryCharmEditor } from 'hooks/usePrimaryCharmEditor';
 import { useUser } from 'hooks/useUser';
 import type { PageUpdates } from 'lib/pages';
 import { findParentOfType } from 'lib/pages/findParentOfType';
@@ -20,7 +20,7 @@ import DocumentPage from '../DocumentPage';
 export default function EditorPage({ pageId }: { pageId: string }) {
   const { setCurrentPageId } = useFocusedPage();
   const { pages, getPagePermissions, loadingPages, updatePage } = usePages();
-  const { editMode, resetPageProps, setPageProps } = usePrimaryCharmEditor();
+  const { editMode, resetPageProps, setPageProps } = useCharmEditor();
   const [, setTitleState] = usePageTitle();
   const [pageNotFound, setPageNotFound] = useState(false);
   const space = useCurrentSpace();

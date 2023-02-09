@@ -1,6 +1,6 @@
+import { CharmEditorProvider } from 'hooks/useCharmEditor';
 import { FocusedPageProvider } from 'hooks/useFocusedPage';
 import { PageActionDisplayProvider } from 'hooks/usePageActionDisplay';
-import { PrimaryCharmEditorProvider } from 'hooks/usePrimaryCharmEditor';
 import { ThreadsProvider } from 'hooks/useThreads';
 import { VotesProvider } from 'hooks/useVotes';
 
@@ -8,13 +8,13 @@ import { VotesProvider } from 'hooks/useVotes';
 export function DocumentPageProviders({ children }: { children: React.ReactNode }) {
   return (
     <FocusedPageProvider>
-      <PrimaryCharmEditorProvider>
+      <CharmEditorProvider>
         <ThreadsProvider>
           <VotesProvider>
             <PageActionDisplayProvider>{children}</PageActionDisplayProvider>
           </VotesProvider>
         </ThreadsProvider>
-      </PrimaryCharmEditorProvider>
+      </CharmEditorProvider>
     </FocusedPageProvider>
   );
 }
