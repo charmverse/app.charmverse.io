@@ -7,6 +7,7 @@ import { isUUID } from 'lib/utilities/strings';
 import type { PermissionCompute } from '../interfaces';
 
 import { AvailablePostCategoryPermissions } from './availablePostCategoryPermissions.class';
+import { hasSpaceWideModerateForumsPermission } from './hasSpaceWideModerateForumsPermission';
 import type { AvailablePostCategoryPermissionFlags } from './interfaces';
 import { postCategoryPermissionsMapping } from './mapping';
 
@@ -40,6 +41,16 @@ export async function computePostCategoryPermissions({
   } else if (error) {
     return permissions.empty;
   }
+
+  const hasSpaceWideModerate = await hasSpaceWideModerateForumsPermission({
+    spaceId: postCategory.spaceId,
+    userId
+  });
+
+  if (hasSpaceWideModerate) {
+    permissions.addPermissions(postCategoryPermissionsMapping.moderator);
+  }
+
   const assignedPermissions = await prisma.postCategoryPermission.findMany({
     where: {
       postCategoryId: resourceId,

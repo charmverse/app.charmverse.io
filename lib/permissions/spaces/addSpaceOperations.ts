@@ -104,27 +104,9 @@ export async function addSpaceOperations<A extends AssignablePermissionGroups = 
         }
       },
       operations: deduplicatedOperations,
-      role: roleId
-        ? {
-            connect: {
-              id: roleId
-            }
-          }
-        : undefined,
-      user: userId
-        ? {
-            connect: {
-              id: userId
-            }
-          }
-        : undefined,
-      space: spaceId
-        ? {
-            connect: {
-              id: spaceId
-            }
-          }
-        : undefined
+      role: group === 'role' ? { connect: { id: roleId as string } } : undefined,
+      user: group === 'user' ? { connect: { id: userId as string } } : undefined,
+      space: group === 'space' ? { connect: { id: spaceId as string } } : undefined
     },
     include: {
       role: true,

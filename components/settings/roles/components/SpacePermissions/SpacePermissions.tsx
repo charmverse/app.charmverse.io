@@ -63,28 +63,23 @@ export default function SpacePermissions({ targetGroup, id, callback = () => nul
 
   const newValues = watch();
 
-  async function refreshGroupPermissions() {
-    if (!space) {
-      setTimeout(() => {
-        return refreshGroupPermissions();
-      }, 1000);
-    } else {
-      const permissionFlags = await charmClient.queryGroupSpacePermissions({
-        group: targetGroup,
-        id,
-        resourceId: space.id
-      });
-      spaceOperationsWithoutForumCategory.forEach((op) => {
-        setValue(op, permissionFlags[op]);
-      });
-      setAssignedPermissions(permissionFlags);
-    }
-  }
-
   useEffect(() => {
-    refreshGroupPermissions();
-  }, []);
+    if (space) {
+      refreshGroupPermissions();
+    }
+  }, [space]);
 
+  async function refreshGroupPermissions() {
+    const permissionFlags = await charmClient.queryGroupSpacePermissions({
+      group: targetGroup,
+      id,
+      resourceId: space?.id as string
+    });
+    spaceOperationsWithoutForumCategory.forEach((op) => {
+      setValue(op, permissionFlags[op]);
+    });
+    setAssignedPermissions(permissionFlags);
+  }
   const settingsChanged =
     assignedPermissions !== null &&
     (Object.entries(assignedPermissions) as [SpaceOperation, boolean][]).some(([operation, hasAccess]) => {
@@ -193,24 +188,17 @@ export default function SpacePermissions({ targetGroup, id, callback = () => nul
                     variant='body2'
                   >
                     {targetGroup === 'space' &&
-                      newValues[operation] === true &&
-                      `All members of your space can ${actionLabel.toLowerCase()}`}
-                    {targetGroup === 'space' &&
-                      newValues[operation] === false &&
-                      `Space members cannot ${actionLabel.toLowerCase()}`}
+                      (newValues[operation] === true
+                        ? `All members of your space can ${actionLabel.toLowerCase()}`
+                        : `Space members cannot ${actionLabel.toLowerCase()}`)}
                     {targetGroup === 'role' &&
-                      newValues[operation] === true &&
-                      `Members with this role can ${actionLabel.toLowerCase()}`}
-                    {targetGroup === 'role' &&
-                      newValues[operation] === false &&
-                      `Members with this role cannot ${actionLabel.toLowerCase()}`}
+                      (newValues[operation] === true
+                        ? `Members with this role can ${actionLabel.toLowerCase()}`
+                        : `Members with this role cannot ${actionLabel.toLowerCase()}`)}
                     {targetGroup === 'user' &&
-                      newValues[operation] === true &&
-                      `This user can ${actionLabel.toLowerCase()}`}
-                    {targetGroup === 'user' &&
-                      newValues[operation] === false &&
-                      `This user cannot ${actionLabel.toLowerCase()}`}
-                    .
+                      (newValues[operation] === true
+                        ? `This user can ${actionLabel.toLowerCase()}`
+                        : `This user cannot ${actionLabel.toLowerCase()}`)}
                   </Typography>
                 </Grid>
               </Grid>

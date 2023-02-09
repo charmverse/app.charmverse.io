@@ -1,6 +1,7 @@
 import type { PostCategory, PostCategoryPermissionLevel, Space, User } from '@prisma/client';
 
-import { generateSpaceUser, generateUserAndSpace } from 'testing/setupDatabase';
+import { addSpaceOperations } from 'lib/permissions/spaces';
+import { generateRole, generateSpaceUser, generateUserAndSpace } from 'testing/setupDatabase';
 import { generatePostCategory } from 'testing/utils/forums';
 
 import { AvailablePostCategoryPermissions } from '../availablePostCategoryPermissions.class';
@@ -96,6 +97,40 @@ describe('filterAccessiblePostCategories', () => {
     expect(visibleCategories).toContainEqual({ ...adminOnlyCategory, permissions });
     expect(visibleCategories).toContainEqual({ ...spaceOnlyCategory, permissions });
     expect(visibleCategories).toContainEqual({ ...publicCategory, permissions });
+  });
+
+  it('returns all categories if user is a spacewide forum moderator, and moderator permissions everywhere', async () => {
+    const spaceWideForumModeratorUser = await generateSpaceUser({
+      spaceId: space.id,
+      isAdmin: false
+    });
+
+    const role = await generateRole({
+      createdBy: adminUser.id,
+      spaceId: space.id,
+      assigneeUserIds: [spaceWideForumModeratorUser.id]
+    });
+
+    await addSpaceOperations({
+      forSpaceId: space.id,
+      operations: ['moderate_forums'],
+      roleId: role.id
+    });
+
+    const visibleCategories = await filterAccessiblePostCategories({
+      postCategories,
+      userId: spaceWideForumModeratorUser.id
+    });
+
+    const moderatorPermissions = new AvailablePostCategoryPermissions();
+    moderatorPermissions.addPermissions(postCategoryPermissionsMapping.moderator);
+
+    const moderatorPermissionFlags = moderatorPermissions.operationFlags;
+
+    expect(visibleCategories.length).toBe(postCategories.length);
+    expect(visibleCategories).toContainEqual({ ...adminOnlyCategory, permissions: moderatorPermissionFlags });
+    expect(visibleCategories).toContainEqual({ ...spaceOnlyCategory, permissions: moderatorPermissionFlags });
+    expect(visibleCategories).toContainEqual({ ...publicCategory, permissions: moderatorPermissionFlags });
   });
 
   it('returns only categories accessible to the public if there is no user, or user is not a space member, and create_post set to false', async () => {

@@ -15,6 +15,8 @@ export class AvailableSpacePermissions
 
   createForumCategory: boolean = false;
 
+  moderate_forums: boolean = false;
+
   constructor(operations: SpaceOperation[] = []) {
     super({ allowedOperations: Object.keys(SpaceOperation) as SpaceOperation[] });
 

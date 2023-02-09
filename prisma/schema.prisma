@@ -125,7 +125,7 @@ enum SpaceOperation {
   createBounty
   createVote
   createForumCategory
-  // Our standard for enums is to use snake case. Adding the new value in our up to date format. We should migrate other SpaceOperations later
+    // Our standard for enums is to use snake case. Adding the new value in our up to date format. We should migrate other SpaceOperations later
   moderate_forums
 }
 
