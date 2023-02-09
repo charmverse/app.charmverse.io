@@ -14,7 +14,7 @@ import NotFavoritedIcon from '@mui/icons-material/StarBorder';
 import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
 import UndoIcon from '@mui/icons-material/Undo';
 import SunIcon from '@mui/icons-material/WbSunny';
-import { Divider, FormControlLabel, Stack, Switch, Typography, useMediaQuery } from '@mui/material';
+import { Alert, Divider, FormControlLabel, Stack, Switch, Typography, useMediaQuery } from '@mui/material';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
 import List from '@mui/material/List';
@@ -26,13 +26,13 @@ import Tooltip from '@mui/material/Tooltip';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 import type { Dispatch, ReactNode, SetStateAction } from 'react';
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 import charmClient from 'charmClient';
 import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
 import { undoEventName } from 'components/common/CharmEditor/utils';
+import Link from 'components/common/Link';
 import { usePostByPath } from 'components/forum/hooks/usePostByPath';
-import { usePostPermissions } from 'components/forum/hooks/usePostPermissions';
 import { useColorMode } from 'context/darkMode';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { useMembers } from 'hooks/useMembers';
@@ -163,11 +163,13 @@ export function Metadata({ creator, lastUpdatedAt }: { creator: string; lastUpda
 function PostHeader({
   setPageMenuOpen,
   undoEditorChanges,
-  forumPostInfo
+  forumPostInfo,
+  setConvertedProposalId
 }: {
   forumPostInfo: ReturnType<typeof usePostByPath>;
   setPageMenuOpen: Dispatch<SetStateAction<boolean>>;
   undoEditorChanges: VoidFunction;
+  setConvertedProposalId: Dispatch<SetStateAction<string | null>>;
 }) {
   const [userSpacePermissions] = useCurrentSpacePermissions();
   const { showMessage } = useSnackbar();
@@ -208,8 +210,8 @@ function PostHeader({
 
   async function convertToProposal(pageId: string) {
     setPageMenuOpen(false);
-    await charmClient.forum.convertToProposal(pageId);
-    // router.push(`/${router.query.domain}/${proposalPage.path}`);
+    const { id } = await charmClient.forum.convertToProposal(pageId);
+    setConvertedProposalId(id);
   }
 
   return (
@@ -292,6 +294,7 @@ export default function Header({ open, openSidebar }: HeaderProps) {
   const [userSpacePermissions] = useCurrentSpacePermissions();
   const pagePermissions = basePage ? getPagePermissions(basePage.id) : null;
   const isForumPost = router.route === '/[domain]/forum/post/[pagePath]';
+  const [convertedProposalId, setConvertedProposalId] = useState<string | null>(null);
 
   const pagePath = isForumPost ? (router.query.pagePath as string) : null;
   // Post permissions hook will not make an API call if post ID is null. Since we can't conditionally render hooks, we pass null as the post ID. This is the reason for the 'null as any' statement
@@ -299,6 +302,14 @@ export default function Header({ open, openSidebar }: HeaderProps) {
     postPath: isForumPost ? pagePath : isForumPost ? (pagePath as string) : (null as any),
     spaceDomain: router.query.domain as string
   });
+
+  useEffect(() => {
+    if (isForumPost && forumPostInfo.forumPost) {
+      setConvertedProposalId(forumPostInfo.forumPost.proposalId);
+    } else if (!isForumPost) {
+      setConvertedProposalId(null);
+    }
+  }, [forumPostInfo, isForumPost]);
 
   const isLargeScreen = useMediaQuery(theme.breakpoints.up('md'));
 
@@ -507,6 +518,7 @@ export default function Header({ open, openSidebar }: HeaderProps) {
   } else if (isForumPost) {
     pageOptionsList = (
       <PostHeader
+        setConvertedProposalId={setConvertedProposalId}
         forumPostInfo={forumPostInfo}
         setPageMenuOpen={setPageMenuOpen}
         undoEditorChanges={undoEditorChanges}
