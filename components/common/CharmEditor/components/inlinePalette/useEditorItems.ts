@@ -1,6 +1,7 @@
 import type { PluginKey } from 'prosemirror-state';
 import { useMemo } from 'react';
 
+import { useCurrentPage } from 'hooks/useCurrentPage';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { usePages } from 'hooks/usePages';
@@ -30,7 +31,8 @@ export function useEditorItems({
   const { addNestedPage } = useNestedPage();
   const space = useCurrentSpace();
   const { user } = useUser();
-  const { currentPageId, pages } = usePages();
+  const { currentPageId } = useCurrentPage();
+  const { pages } = usePages();
   const [userSpacePermissions] = useCurrentSpacePermissions();
 
   const pageType = currentPageId ? pages[currentPageId]?.type : undefined;

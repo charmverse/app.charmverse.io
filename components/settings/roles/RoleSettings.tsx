@@ -12,6 +12,8 @@ import Legend from 'components/settings/Legend';
 import ImportGuildRolesMenuItem from 'components/settings/roles/components/ImportGuildRolesMenuItem';
 import useIsAdmin from 'hooks/useIsAdmin';
 import useRoles from 'hooks/useRoles';
+import { useUser } from 'hooks/useUser';
+import isSpaceAdmin from 'lib/users/isSpaceAdmin';
 
 import ImportDiscordRolesMenuItem from './components/ImportDiscordRolesMenuItem';
 import RoleForm from './components/RoleForm';
@@ -22,8 +24,9 @@ import PermissionConfigurationMode from './components/SpacePermissions/component
 import { useImportDiscordRoles } from './hooks/useImportDiscordRoles';
 
 export default function RoleSettings({ space }: { space: Space }) {
-  const { assignRoles, deleteRole, refreshRoles, unassignRole, roles } = useRoles();
-  const isAdmin = useIsAdmin();
+  const { assignRoles, deleteRole, refreshRoles, unassignRole, roles } = useRoles(space);
+  const { user } = useUser();
+  const isAdmin = isSpaceAdmin(user, space?.id);
   const popupState = usePopupState({ variant: 'popover', popupId: 'add-a-role' });
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
   const open = Boolean(anchorEl);

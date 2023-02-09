@@ -7,6 +7,7 @@ import Head from 'next/head';
 import * as React from 'react';
 import { useMemo, useState } from 'react';
 
+import { DocumentPageProviders } from 'components/[pageId]/DocumentPage/DocumentPageProviders';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { PageDialogProvider } from 'components/common/PageDialog/hooks/usePageDialog';
 import PageDialogGlobalModal from 'components/common/PageDialog/PageDialogGlobal';
@@ -14,16 +15,13 @@ import { SharedPageLayout } from 'components/common/PageLayout/SharedPageLayout'
 import { FocalboardViewsProvider } from 'hooks/useFocalboardViews';
 import { useLocalStorage } from 'hooks/useLocalStorage';
 import { useSmallScreen } from 'hooks/useMediaScreens';
-import { PageActionDisplayProvider } from 'hooks/usePageActionDisplay';
 import { useResize } from 'hooks/useResize';
 import { useSharedPage } from 'hooks/useSharedPage';
-import { ThreadsProvider } from 'hooks/useThreads';
 import { useUser } from 'hooks/useUser';
-import { VotesProvider } from 'hooks/useVotes';
 import { useWindowSize } from 'hooks/useWindowSize';
 
 import CurrentPageFavicon from './components/CurrentPageFavicon';
-import Header, { headerHeight } from './components/Header';
+import { Header, headerHeight } from './components/Header/Header';
 import PageContainer from './components/PageContainer';
 import Sidebar from './components/Sidebar';
 
@@ -209,51 +207,43 @@ function PageLayout({ children }: PageLayoutProps) {
       </Head>
       <LayoutContainer data-test='space-page-layout'>
         <FocalboardViewsProvider>
-          <ThreadsProvider>
-            <VotesProvider>
-              <PageDialogProvider>
-                <PageActionDisplayProvider>
-                  {open !== null && (
-                    <>
-                      <AppBar open={open} sidebarWidth={displaySidebarWidth} position='fixed'>
-                        <Header open={open} openSidebar={handleDrawerOpen} />
-                      </AppBar>
-                      {isMobile ? (
-                        <MuiDrawer
-                          open={open}
-                          variant='temporary'
-                          onClose={handleDrawerClose}
-                          ModalProps={{
-                            keepMounted: true
-                          }}
-                        >
-                          <Box width={mobileSidebarWidth} minHeight='100vh'>
-                            {drawerContent}
-                          </Box>
-                        </MuiDrawer>
-                      ) : (
-                        <Drawer sidebarWidth={displaySidebarWidth} open={open} variant='permanent'>
-                          {drawerContent}
-                          <Tooltip title={!user || isResizing ? '' : 'Drag to resize'} placement='right' followCursor>
-                            <DraggableHandle
-                              onMouseDown={(e) => enableResize(e)}
-                              isActive={isResizing}
-                              disabled={!user}
-                            />
-                          </Tooltip>
-                        </Drawer>
-                      )}
-                    </>
+          <DocumentPageProviders>
+            <PageDialogProvider>
+              {open !== null && (
+                <>
+                  <AppBar open={open} sidebarWidth={displaySidebarWidth} position='fixed'>
+                    <Header open={open} openSidebar={handleDrawerOpen} />
+                  </AppBar>
+                  {isMobile ? (
+                    <MuiDrawer
+                      open={open}
+                      variant='temporary'
+                      onClose={handleDrawerClose}
+                      ModalProps={{
+                        keepMounted: true
+                      }}
+                    >
+                      <Box width={mobileSidebarWidth} minHeight='100vh'>
+                        {drawerContent}
+                      </Box>
+                    </MuiDrawer>
+                  ) : (
+                    <Drawer sidebarWidth={displaySidebarWidth} open={open} variant='permanent'>
+                      {drawerContent}
+                      <Tooltip title={!user || isResizing ? '' : 'Drag to resize'} placement='right' followCursor>
+                        <DraggableHandle onMouseDown={(e) => enableResize(e)} isActive={isResizing} disabled={!user} />
+                      </Tooltip>
+                    </Drawer>
                   )}
-                  <PageContainer>
-                    <HeaderSpacer />
-                    {children}
-                  </PageContainer>
-                  <PageDialogGlobalModal />
-                </PageActionDisplayProvider>
-              </PageDialogProvider>
-            </VotesProvider>
-          </ThreadsProvider>
+                </>
+              )}
+              <PageContainer>
+                <HeaderSpacer />
+                {children}
+              </PageContainer>
+              <PageDialogGlobalModal />
+            </PageDialogProvider>
+          </DocumentPageProviders>
         </FocalboardViewsProvider>
       </LayoutContainer>
     </>
