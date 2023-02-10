@@ -108,7 +108,7 @@ handler.use(requireApiKey).get(listProposals);
 
 /**
  * @swagger
- * /api/v1/proposals:
+ * /proposals:
  *   get:
  *     summary: Get active proposals.
  *     description: Get a list of all proposals that are currently active in the space.

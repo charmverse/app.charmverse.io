@@ -89,7 +89,7 @@ export interface CastProposalVoteResponseBody {
 
 /**
  * @swagger
- * /api/v1/proposals/vote:
+ * /proposals/vote:
  *   post:
  *     summary: Cast a vote on a proposal.
  *     description: Cast a vote on a proposal with active voting.

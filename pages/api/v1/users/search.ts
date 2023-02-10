@@ -39,7 +39,7 @@ type SearchUserResponseBody = UserProfile;
 
 /**
  * @swagger
- * /api/v1/users/search:
+ * /users/search:
  *   get:
  *     summary: Search for a user.
  *     description: Search for a user profile either by known email or wallet address.

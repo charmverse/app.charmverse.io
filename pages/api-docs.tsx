@@ -23,7 +23,7 @@ export const getStaticProps: GetStaticProps = async () => {
       servers: [{ url: 'https://app.charmverse.io/api/v1', description: 'Production' }],
       info: {
         title: 'Charmverse API',
-        description: `The Charmverse public API requires an API key linked to your space, or a partner API key allowing access to multiple spaces. You can request this on our [Discord server](${charmverseDiscordInvite}).\r\n\r\nYour API key can be passed in the request headers as **Authorization: "Bearer <your-api-key>"** or as part of your request ie. **"/api/v1/endpoint?api_key=abcdef-123456"**.\r\n\r\n⚠️ If you are using a multi-space partner API key, any requests to API endpoints in the default group should also contain the spaceId you wish to make the request for as part of the query.\r\nExample:**"/api/v1/endpoint?api_key=abcdef-123456&spaceId=fc59c720-40de-bc1a-8b2b-00538f02953c"**`,
+        description: `The Charmverse public API requires an API key linked to your space, or a partner API key allowing access to multiple spaces. You can request this on our [Discord server](${charmverseDiscordInvite}).\r\n\r\nYour API key should be passed in the request headers as **Authorization: "Bearer <your-api-key>"**\r\n\r\n⚠️ If you are using a multi-space partner API key, any requests to API endpoints in the default group should also contain the spaceId you wish to make the request for as part of the query.\r\nExample:**"/api/v1/endpoint?spaceId=fc59c720-40de-bc1a-8b2b-00538f02953c"**`,
         version: '1.0.0',
         contact: 'hello@charmverse.io',
         host: 'app.charmverse.io',
