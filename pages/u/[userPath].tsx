@@ -107,6 +107,12 @@ export default function UserProfilePage({ publicUser }: InferGetServerSidePropsT
         <meta property='og:title' content={`${publicUser.username} | Profile`} />
         {publicUser.avatar && <meta property='og:image' content={publicUser.avatar} />}
         {publicUser.avatar && <meta property='twitter:image' content={publicUser.avatar} />}
+
+        <meta property='twitter:title' content={`${publicUser.username} | Profile`} />
+        <meta
+          property='twitter:description'
+          content={publicUser.profile?.description ?? `Check out ${publicUser.username}'s public CharmVerse profile`}
+        />
       </Head>
       <PublicProfile readOnly={true} user={user ?? publicUser} />
     </>
