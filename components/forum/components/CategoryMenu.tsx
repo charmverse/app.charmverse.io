@@ -15,7 +15,7 @@ import Button from 'components/common/Button';
 import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
 import Modal from 'components/common/Modal';
 import { useForumCategories } from 'hooks/useForumCategories';
-import isAdmin from 'hooks/useIsAdmin';
+import { useIsAdmin } from 'hooks/useIsAdmin';
 import type { PostSortOption } from 'lib/forums/posts/constants';
 import { postSortOptions } from 'lib/forums/posts/constants';
 
@@ -29,7 +29,7 @@ const StyledBox = styled(Box)`
 export function CategoryMenu({ handleCategory, handleSort, selectedCategoryId, selectedSort = 'new' }: FilterProps) {
   const { categories, error, createForumCategory } = useForumCategories();
   const addCategoryPopupState = usePopupState({ variant: 'popover', popupId: 'add-category' });
-  const admin = isAdmin();
+  const admin = useIsAdmin();
 
   const [newForumCategoryName, setNewForumCategoryName] = useState('');
 

@@ -5,6 +5,7 @@ import useSWRImmutable from 'swr/immutable';
 import charmClient from 'charmClient';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { SpacesMemberDetails } from 'components/profile/components/SpacesMemberDetails/SpacesMemberDetails';
+import { useUser } from 'hooks/useUser';
 import type { Collectable, ExtendedPoap } from 'lib/blockchain/interfaces';
 import { transformNft } from 'lib/blockchain/transformNft';
 import { transformPoap } from 'lib/blockchain/transformPoap';
@@ -19,6 +20,7 @@ import { useCollablandCredentials } from './hooks/useCollablandCredentials';
 
 export default function PublicProfile(props: UserDetailsProps) {
   const { user } = props;
+  const { user: currentUser } = useUser();
 
   const { aeToken, setAeToken } = useCollablandCredentials();
   const { data: credentials, error: collabError } = useSWRImmutable(
@@ -33,7 +35,7 @@ export default function PublicProfile(props: UserDetailsProps) {
   } = useSWRImmutable(user ? `userAggregatedData/${user.id}` : null, () => {
     return charmClient.getAggregatedData(user.id);
   });
-  const readOnly = isPublicUser(user);
+  const readOnly = isPublicUser(user, currentUser);
 
   const {
     data: poapData,

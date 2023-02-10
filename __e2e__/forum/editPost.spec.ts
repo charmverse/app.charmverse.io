@@ -1,5 +1,6 @@
 import { expect, test as base } from '@playwright/test';
 import type { Post, Space } from '@prisma/client';
+import type { LoggedInPage } from '__e2e__/po/loggedIn.po';
 
 import { upsertPostCategoryPermission } from 'lib/permissions/forum/upsertPostCategoryPermission';
 import { randomETHWalletAddress } from 'testing/generateStubs';
@@ -11,6 +12,7 @@ import { login } from '../utils/session';
 
 type Fixtures = {
   forumPostPage: ForumPostPage;
+  loggedInPage: LoggedInPage;
 };
 
 const test = base.extend<Fixtures>({
@@ -79,8 +81,6 @@ test.describe.serial('Edit a forum post', () => {
       path: post.path
     });
 
-    await page.locator('data-test=close-modal').click();
-
     const isEditable = await forumPostPage.isPostEditable();
 
     expect(isEditable).toBe(true);
@@ -117,9 +117,6 @@ test.describe.serial('Edit a forum post', () => {
       domain: space.domain,
       path: post.path
     });
-
-    await page.locator('data-test=close-modal').click();
-
     const isEditable = await forumPostPage.isPostEditable();
 
     expect(isEditable).toBe(false);

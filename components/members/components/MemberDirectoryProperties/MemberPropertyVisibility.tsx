@@ -4,7 +4,7 @@ import type { VisibilityView } from '@prisma/client';
 
 import GalleryIcon from 'components/common/BoardEditor/focalboard/src/widgets/icons/gallery';
 import TableIcon from 'components/common/BoardEditor/focalboard/src/widgets/icons/table';
-import isAdmin from 'hooks/useIsAdmin';
+import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useMemberProperties } from 'hooks/useMemberProperties';
 import { MEMBER_PROPERTY_CONFIG } from 'lib/members/constants';
 import type { MemberPropertyWithPermissions } from 'lib/members/interfaces';
@@ -65,11 +65,13 @@ function MemberPropertyVisibilityView({
 
 export function MemberPropertyVisibility({ property }: { property: MemberPropertyWithPermissions }) {
   const enabledViews = property.enabledViews;
+
+  const admin = useIsAdmin();
+
   if (MEMBER_PROPERTY_CONFIG[property.type]?.unhideable) {
     return null;
   }
 
-  const admin = isAdmin();
   return (
     <Stack flexDirection='row' justifyContent='space-between' mr={2}>
       <Typography variant='overline' alignItems='center' display='flex'>

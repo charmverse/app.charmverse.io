@@ -3,6 +3,7 @@ import { v4 } from 'uuid';
 
 import { prisma } from 'db';
 import { PostCategoryNotFoundError } from 'lib/forums/categories/errors';
+import { addSpaceOperations } from 'lib/permissions/spaces';
 import { InvalidInputError } from 'lib/utilities/errors';
 import { generateRole, generateSpaceUser, generateUserAndSpace } from 'testing/setupDatabase';
 import { generatePostCategory } from 'testing/utils/forums';
@@ -58,6 +59,39 @@ describe('computePostCategoryPermissions', () => {
     });
   });
 
+  /// In future, we will want to extend this test to ensure it doesn't override an individual permission assigned as category admin for a specific space. The implementation already takes care of this, but we should have a test to ensure it doesn't regress.
+  it('should return at least moderator level permissions if user is a space wide forum moderator', async () => {
+    const spaceWideForumModeratorUser = await generateSpaceUser({
+      spaceId: space.id,
+      isAdmin: false
+    });
+
+    const role = await generateRole({
+      createdBy: adminUser.id,
+      spaceId: space.id,
+      assigneeUserIds: [spaceWideForumModeratorUser.id]
+    });
+
+    await addSpaceOperations({
+      forSpaceId: space.id,
+      operations: ['moderateForums'],
+      roleId: role.id
+    });
+    const postCategory = await generatePostCategory({ spaceId: space.id });
+
+    const permissions = await computePostCategoryPermissions({
+      resourceId: postCategory.id,
+      userId: spaceWideForumModeratorUser.id
+    });
+
+    postCategoryOperations.forEach((op) => {
+      if (postCategoryPermissionsMapping.moderator.includes(op)) {
+        expect(permissions[op]).toBe(true);
+      } else {
+        expect(permissions[op]).toBe(false);
+      }
+    });
+  });
   it('should only allow a moderator to create a post', async () => {
     const role = await generateRole({
       createdBy: adminUser.id,

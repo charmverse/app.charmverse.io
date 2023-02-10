@@ -8,11 +8,10 @@ import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
 import Link from 'components/common/Link';
+import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSnackbar } from 'hooks/useSnackbar';
 import useWebhookSubscription from 'hooks/useSpaceWebhook';
-import { useUser } from 'hooks/useUser';
 import log from 'lib/log';
-import isSpaceAdmin from 'lib/users/isSpaceAdmin';
 
 import Legend from '../Legend';
 
@@ -31,8 +30,7 @@ export const schema = yup.object({
 type FormValues = yup.InferType<typeof schema>;
 
 export function ApiSettings({ space }: { space: Space }) {
-  const { user } = useUser();
-  const isAdmin = isSpaceAdmin(user, space?.id);
+  const isAdmin = useIsAdmin();
   const { updateSpaceWebhook, spaceWebhook, isLoading } = useWebhookSubscription(space.id);
   const { showMessage } = useSnackbar();
 

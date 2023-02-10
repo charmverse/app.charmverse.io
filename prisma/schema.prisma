@@ -125,6 +125,7 @@ enum SpaceOperation {
   createBounty
   createVote
   createForumCategory
+  moderateForums
 }
 
 enum ProfileItemType {
@@ -499,6 +500,7 @@ model UserDetails {
   social      Json?
   user        User    @relation(fields: [id], references: [id], onDelete: Cascade)
   timezone    String?
+  locale      String?
 }
 
 model TelegramUser {

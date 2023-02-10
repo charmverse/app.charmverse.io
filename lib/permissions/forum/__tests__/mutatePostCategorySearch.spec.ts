@@ -1,6 +1,7 @@
 import type { PostCategory, Space, User } from '@prisma/client';
 
-import { generateSpaceUser, generateUserAndSpace } from 'testing/setupDatabase';
+import { addSpaceOperations } from 'lib/permissions/spaces';
+import { generateRole, generateSpaceUser, generateUserAndSpace } from 'testing/setupDatabase';
 import { generatePostCategory } from 'testing/utils/forums';
 
 import { mutatePostCategorySearch } from '../mutatePostCategorySearch';
@@ -69,6 +70,49 @@ describe('mutatePostCategorySearch', () => {
       spaceId: space.id,
       categoryId: [adminPostCategory.id, memberPostCategory.id],
       userId: adminUser.id
+    });
+
+    expect(multipleCategoryIds).toEqual({ categoryId: [adminPostCategory.id, memberPostCategory.id] });
+  });
+
+  it('should return an unmodified categoryId if the requester has space-wide moderator permissions', async () => {
+    const spaceWideForumModeratorUser = await generateSpaceUser({
+      spaceId: space.id,
+      isAdmin: false
+    });
+
+    const role = await generateRole({
+      createdBy: adminUser.id,
+      spaceId: space.id,
+      assigneeUserIds: [spaceWideForumModeratorUser.id]
+    });
+
+    await addSpaceOperations({
+      forSpaceId: space.id,
+      operations: ['moderateForums'],
+      roleId: role.id
+    });
+
+    const undefinedCategoryId = await mutatePostCategorySearch({
+      spaceId: space.id,
+      categoryId: undefined,
+      userId: spaceWideForumModeratorUser.id
+    });
+
+    expect(undefinedCategoryId.categoryId).toEqual(undefined);
+
+    const singleCategoryId = await mutatePostCategorySearch({
+      spaceId: space.id,
+      categoryId: adminPostCategory.id,
+      userId: spaceWideForumModeratorUser.id
+    });
+
+    expect(singleCategoryId).toEqual({ categoryId: adminPostCategory.id });
+
+    const multipleCategoryIds = await mutatePostCategorySearch({
+      spaceId: space.id,
+      categoryId: [adminPostCategory.id, memberPostCategory.id],
+      userId: spaceWideForumModeratorUser.id
     });
 
     expect(multipleCategoryIds).toEqual({ categoryId: [adminPostCategory.id, memberPostCategory.id] });
