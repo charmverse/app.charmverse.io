@@ -31,6 +31,7 @@ import { MemberProfileProvider } from 'components/profile/hooks/useMemberProfile
 import { isDevEnv } from 'config/constants';
 import { ColorModeContext } from 'context/darkMode';
 import { BountiesProvider } from 'hooks/useBounties';
+import { CurrentSpaceProvider, useCurrentSpaceId } from 'hooks/useCurrentSpaceId';
 import { useInterval } from 'hooks/useInterval';
 import { useLocalStorage } from 'hooks/useLocalStorage';
 import { MembersProvider } from 'hooks/useMembers';
@@ -38,9 +39,9 @@ import { OnboardingProvider } from 'hooks/useOnboarding';
 import { PagesProvider } from 'hooks/usePages';
 import { PageTitleProvider, usePageTitle } from 'hooks/usePageTitle';
 import { PaymentMethodsProvider } from 'hooks/usePaymentMethods';
-import { PrimaryCharmEditorProvider } from 'hooks/usePrimaryCharmEditor';
 import { SettingsDialogProvider } from 'hooks/useSettingsDialog';
 import { SnackbarProvider } from 'hooks/useSnackbar';
+import { useSpaceFromPath } from 'hooks/useSpaceFromPath';
 import { SpacesProvider } from 'hooks/useSpaces';
 import { UserProvider } from 'hooks/useUser';
 import { useUserAcquisition } from 'hooks/useUserAcquisition';
@@ -203,6 +204,7 @@ export default function App({ Component, emotionCache = clientSideEmotionCache, 
       refreshSignupData();
     }
   }, [router.isReady]);
+
   // DO NOT REMOVE CacheProvider - it protects MUI from Tailwind CSS in settings
   return (
     <CacheProvider value={emotionCache}>
@@ -258,27 +260,41 @@ function DataProviders({ children }: { children: ReactNode }) {
         <Web3ConnectionManager>
           <Web3AccountProvider>
             <SpacesProvider>
-              <WebSocketClientProvider>
-                <MembersProvider>
-                  <BountiesProvider>
-                    <PaymentMethodsProvider>
-                      <PagesProvider>
-                        <PrimaryCharmEditorProvider>
+              <CurrentSpaceProvider>
+                <CurrentSpaceSetter />
+                <WebSocketClientProvider>
+                  <MembersProvider>
+                    <BountiesProvider>
+                      <PaymentMethodsProvider>
+                        <PagesProvider>
                           <MemberProfileProvider>
                             <PageTitleProvider>{children}</PageTitleProvider>
                           </MemberProfileProvider>
-                        </PrimaryCharmEditorProvider>
-                      </PagesProvider>
-                    </PaymentMethodsProvider>
-                  </BountiesProvider>
-                </MembersProvider>
-              </WebSocketClientProvider>
+                        </PagesProvider>
+                      </PaymentMethodsProvider>
+                    </BountiesProvider>
+                  </MembersProvider>
+                </WebSocketClientProvider>
+              </CurrentSpaceProvider>
             </SpacesProvider>
           </Web3AccountProvider>
         </Web3ConnectionManager>
       </Web3ReactProvider>
     </UserProvider>
   );
+}
+
+function CurrentSpaceSetter() {
+  const spaceFromPath = useSpaceFromPath();
+  const { setCurrentSpaceId } = useCurrentSpaceId();
+
+  useEffect(() => {
+    if (spaceFromPath) {
+      setCurrentSpaceId(spaceFromPath.id);
+    }
+  }, [spaceFromPath]);
+
+  return null;
 }
 
 function PageHead() {

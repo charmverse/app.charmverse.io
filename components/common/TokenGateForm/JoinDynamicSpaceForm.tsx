@@ -1,7 +1,6 @@
 import styled from '@emotion/styled';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
-import { Autocomplete, IconButton, Popper, Stack, TextField, Typography } from '@mui/material';
-import { Box } from '@mui/system';
+import { Autocomplete, IconButton, Popper, Stack, TextField, Typography, Box } from '@mui/material';
 import type { Space } from '@prisma/client';
 import { debounce } from 'lodash';
 import { useRouter } from 'next/router';

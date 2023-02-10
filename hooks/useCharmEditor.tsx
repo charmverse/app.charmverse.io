@@ -23,8 +23,7 @@ export const EDIT_MODE_CONFIG = {
   }
 } as const;
 
-interface PrimaryCharmEditorContext {
-  currentPageId: string;
+interface CharmEditorContext {
   isSaving: boolean;
   availableEditModes: EditMode[];
   editMode: EditMode | null;
@@ -32,13 +31,12 @@ interface PrimaryCharmEditorContext {
   participants: FrontendParticipant[];
 }
 
-interface PrimaryCharmEditorContextWithSetter extends PrimaryCharmEditorContext {
-  setPageProps: Dispatch<SetStateAction<Partial<PrimaryCharmEditorContext>>>;
+interface CharmEditorContextWithSetter extends CharmEditorContext {
+  setPageProps: Dispatch<SetStateAction<Partial<CharmEditorContext>>>;
   resetPageProps: () => void;
 }
 
 const defaultProps = {
-  currentPageId: '',
   isSaving: false,
   availableEditModes: [],
   editMode: null,
@@ -46,14 +44,14 @@ const defaultProps = {
   participants: []
 };
 
-const CharmEditorContext = createContext<Readonly<PrimaryCharmEditorContextWithSetter>>({
+const CharmEditorContext = createContext<Readonly<CharmEditorContextWithSetter>>({
   ...defaultProps,
   setPageProps: () => {},
   resetPageProps: () => {}
 });
 
-export function PrimaryCharmEditorProvider({ children }: { children: ReactNode }) {
-  const [props, _setPageProps] = useState<PrimaryCharmEditorContext>(defaultProps);
+export function CharmEditorProvider({ children }: { children: ReactNode }) {
+  const [props, _setPageProps] = useState<CharmEditorContext>(defaultProps);
 
   const availableEditModes = Object.entries(EDIT_MODE_CONFIG)
     .filter(([, config]) => {
@@ -61,15 +59,15 @@ export function PrimaryCharmEditorProvider({ children }: { children: ReactNode }
     })
     .map(([mode]) => mode as EditMode);
 
-  const setPageProps: PrimaryCharmEditorContextWithSetter['setPageProps'] = (_props) => {
+  const setPageProps: CharmEditorContextWithSetter['setPageProps'] = (_props) => {
     _setPageProps((prev) => ({ ...prev, ..._props }));
   };
 
-  const resetPageProps: PrimaryCharmEditorContextWithSetter['resetPageProps'] = () => {
+  const resetPageProps: CharmEditorContextWithSetter['resetPageProps'] = () => {
     _setPageProps({ ...defaultProps });
   };
 
-  const value: PrimaryCharmEditorContextWithSetter = useMemo(
+  const value: CharmEditorContextWithSetter = useMemo(
     () => ({
       ...props,
       availableEditModes,
@@ -82,4 +80,4 @@ export function PrimaryCharmEditorProvider({ children }: { children: ReactNode }
   return <CharmEditorContext.Provider value={value}>{children}</CharmEditorContext.Provider>;
 }
 
-export const usePrimaryCharmEditor = () => useContext(CharmEditorContext);
+export const useCharmEditor = () => useContext(CharmEditorContext);

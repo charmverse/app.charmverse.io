@@ -280,6 +280,7 @@ export function charmEditorPlugins({
 const StyledReactBangleEditor = styled(ReactBangleEditor)<{
   colorMode?: 'dark';
   disablePageSpecificFeatures?: boolean;
+  disableRowHandles?: boolean;
 }>`
   position: relative;
 
@@ -297,11 +298,17 @@ const StyledReactBangleEditor = styled(ReactBangleEditor)<{
           }`
       : ''};
 
-  /** DONT REMOVE THIS STYLING */
-  div.ProseMirror.bangle-editor {
-    padding-left: 50px;
-    margin-right: -50px;
-  }
+  ${({ disableRowHandles }) =>
+    disableRowHandles
+      ? `
+      padding-left: 10px;
+      padding-right: 10px;
+    `
+      : `/** DONT REMOVE THIS STYLING */
+    div.ProseMirror.bangle-editor {
+      padding-left: 50px;
+      margin-right: -50px;
+    }`}
 
   code {
     border-radius: 2px !important;
@@ -559,6 +566,7 @@ function CharmEditor({
       pageId={pageId}
       focusOnInit={focusOnInit}
       disablePageSpecificFeatures={disablePageSpecificFeatures}
+      disableRowHandles={disableRowHandles}
       isContentControlled={isContentControlled}
       enableSuggestions={enableSuggestingMode}
       onParticipantUpdate={onParticipantUpdate}

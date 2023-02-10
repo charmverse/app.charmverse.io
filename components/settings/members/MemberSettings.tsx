@@ -4,8 +4,9 @@ import { bindMenu, usePopupState } from 'material-ui-popup-state/hooks';
 import { useState } from 'react';
 
 import charmClient from 'charmClient';
+import Loader from 'components/common/Loader';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
-import useIsAdmin from 'hooks/useIsAdmin';
+import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useMembers } from 'hooks/useMembers';
 import type { Member } from 'lib/members/interfaces';
 
@@ -34,18 +35,16 @@ export default function MemberSettings({ space }: { space: Space }) {
     switch (action) {
       case 'makeAdmin':
         await charmClient.updateMember({ spaceId, userId: member.id, isAdmin: true });
-        mutateMembers(
-          members.map((c) => (c.id === member.id ? { ...c, isAdmin: true } : c)),
-          { revalidate: false }
-        );
         break;
 
       case 'makeMember':
         await charmClient.updateMember({ spaceId, userId: member.id, isAdmin: false });
-        mutateMembers(
-          members.map((c) => (c.id === member.id ? { ...c, isAdmin: false } : c)),
-          { revalidate: false }
-        );
+        if (members) {
+          mutateMembers(
+            members.map((c) => (c.id === member.id ? { ...c, isAdmin: false } : c)),
+            { revalidate: false }
+          );
+        }
         break;
 
       case 'removeFromSpace':
@@ -61,11 +60,13 @@ export default function MemberSettings({ space }: { space: Space }) {
 
   async function removeMember() {
     await charmClient.removeMember({ spaceId, userId: removedMemberId as string });
-    mutateMembers(
-      members.filter((c) => c.id !== removedMemberId),
-      { revalidate: false }
-    );
-    setRemovedMemberId(null);
+    if (members) {
+      mutateMembers(
+        members.filter((c) => c.id !== removedMemberId),
+        { revalidate: false }
+      );
+      setRemovedMemberId(null);
+    }
   }
 
   return (
@@ -82,7 +83,7 @@ export default function MemberSettings({ space }: { space: Space }) {
           </TableHead>
           <TableBody>
             {members
-              .filter((member) => !member.isBot)
+              ?.filter((member) => !member.isBot)
               .map((member) => (
                 <MemberListItem
                   isAdmin={isAdmin}

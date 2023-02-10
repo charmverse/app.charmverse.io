@@ -5,11 +5,10 @@ import FavoritedIcon from '@mui/icons-material/Star';
 import NotFavoritedIcon from '@mui/icons-material/StarBorder';
 import UndoIcon from '@mui/icons-material/Undo';
 import VerticalAlignBottomOutlinedIcon from '@mui/icons-material/VerticalAlignBottomOutlined';
-import { Divider, Tooltip, Typography } from '@mui/material';
+import { Divider, Tooltip, Typography, Box, Stack } from '@mui/material';
 import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
-import { Box, Stack } from '@mui/system';
 import { useRouter } from 'next/router';
 import Papa from 'papaparse';
 import type { ChangeEventHandler } from 'react';
@@ -19,7 +18,6 @@ import charmClient from 'charmClient';
 import { CsvExporter } from 'components/common/BoardEditor/focalboard/csvExporter/csvExporter';
 import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
 import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
-import type { CardPage } from 'components/common/BoardEditor/focalboard/src/store/cards';
 import {
   getViewCardsSortedFilteredAndGrouped,
   sortCards
@@ -35,6 +33,7 @@ import { useToggleFavorite } from 'hooks/useToggleFavorite';
 import { useUser } from 'hooks/useUser';
 import type { Board } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
+import type { CardPage } from 'lib/focalboard/card';
 import { createCard } from 'lib/focalboard/card';
 import log from 'lib/log';
 import type { IPagePermissionFlags } from 'lib/permissions/pages';

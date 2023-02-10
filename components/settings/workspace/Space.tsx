@@ -19,11 +19,10 @@ import PrimaryButton from 'components/common/PrimaryButton';
 import Legend from 'components/settings/Legend';
 import ImportNotionWorkspace from 'components/settings/workspace/ImportNotionWorkspace';
 import Avatar from 'components/settings/workspace/LargeAvatar';
+import { useIsAdmin } from 'hooks/useIsAdmin';
 import { setTitle } from 'hooks/usePageTitle';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useSpaces } from 'hooks/useSpaces';
-import { useUser } from 'hooks/useUser';
-import isSpaceAdmin from 'lib/users/isSpaceAdmin';
 
 const schema = yup.object({
   name: yup.string().ensure().trim().min(3, 'Name must be at least 3 characters').required('Name is required'),
@@ -42,9 +41,8 @@ type FormValues = yup.InferType<typeof schema>;
 export default function SpaceSettings({ space }: { space: Space }) {
   const router = useRouter();
   const { spaces, setSpace, setSpaces } = useSpaces();
-  const { user } = useUser();
   const [error, setError] = useState<string | null>(null);
-  const isAdmin = isSpaceAdmin(user, space?.id);
+  const isAdmin = useIsAdmin();
   const workspaceRemoveModalState = usePopupState({ variant: 'popover', popupId: 'workspace-remove' });
   const workspaceLeaveModalState = usePopupState({ variant: 'popover', popupId: 'workspace-leave' });
   const unsavedChangesModalState = usePopupState({ variant: 'popover', popupId: 'unsaved-changes' });

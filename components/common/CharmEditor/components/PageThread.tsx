@@ -19,8 +19,7 @@ import {
   Tooltip,
   useMediaQuery
 } from '@mui/material';
-import type { ButtonProps, SxProps } from '@mui/material';
-import type { BoxProps, Theme } from '@mui/system';
+import type { ButtonProps, SxProps, Theme, BoxProps } from '@mui/material';
 import { DateTime } from 'luxon';
 import { usePopupState, bindMenu } from 'material-ui-popup-state/hooks';
 import type { MouseEvent } from 'react';
@@ -28,6 +27,7 @@ import { forwardRef, memo, useRef, useEffect, useState } from 'react';
 
 import Button from 'components/common/Button';
 import UserDisplay from 'components/common/UserDisplay';
+import { useCurrentPage } from 'hooks/useCurrentPage';
 import { usePages } from 'hooks/usePages';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useThreads } from 'hooks/useThreads';
@@ -116,7 +116,7 @@ function AddCommentCharmEditor({
   readOnly: boolean;
   disabled: boolean;
   threadId: string;
-  sx: SxProps;
+  sx: SxProps<Theme>;
 }) {
   const [commentContent, setCommentContent] = useState<PageContent | null>(null);
   const isEmpty = checkIsContentEmpty(commentContent);
@@ -283,7 +283,8 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(
     const { user } = useUser();
     const [isMutating, setIsMutating] = useState(false);
     const [editedCommentId, setEditedCommentId] = useState<null | string>(null);
-    const { getPagePermissions, currentPageId } = usePages();
+    const { currentPageId } = useCurrentPage();
+    const { getPagePermissions } = usePages();
     const menuState = usePopupState({ variant: 'popover', popupId: 'comment-action' });
     const [actionComment, setActionComment] = useState<null | CommentWithUser>(null);
 

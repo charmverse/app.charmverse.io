@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import EditIcon from '@mui/icons-material/Edit';
-import type { SxProps } from '@mui/material';
+import type { SxProps, Theme } from '@mui/material';
 import { Box, Divider, Grid, Stack, Tooltip, Typography } from '@mui/material';
 import type { IconButtonProps } from '@mui/material/IconButton';
 import IconButton from '@mui/material/IconButton';
@@ -47,7 +47,7 @@ export interface UserDetailsProps {
   readOnly?: boolean;
   user: PublicUser | LoggedInUser;
   updateUser?: Dispatch<SetStateAction<LoggedInUser | null>>;
-  sx?: SxProps;
+  sx?: SxProps<Theme>;
 }
 
 const StyledStack = styled(Stack)`
@@ -87,7 +87,7 @@ function UserDetails({ readOnly, user, updateUser, sx = {} }: UserDetailsProps) 
   const timezoneModalState = usePopupState({ variant: 'popover', popupId: 'timezone-modal' });
 
   const { updateProfileAvatar, isSaving: isSavingAvatar } = useUpdateProfileAvatar();
-  const { handleUserUpdate } = useUserDetails({ readOnly, user, updateUser });
+  const { handleUserUpdate } = useUserDetails({ updateUser });
 
   const onLinkCopy = () => {
     setIsPersonalLinkCopied(true);

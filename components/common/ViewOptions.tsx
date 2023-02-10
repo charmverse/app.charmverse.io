@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import type { SxProps } from '@mui/material';
+import type { SxProps, Theme } from '@mui/material';
 import { InputLabel, Stack } from '@mui/material';
 import type { ReactNode } from 'react';
 
@@ -19,7 +19,7 @@ export const StyledViewOptions = styled(Stack)`
   }
 `;
 
-export function ViewOptions({ children, label, sx = {} }: { children: ReactNode; label: string; sx?: SxProps }) {
+export function ViewOptions({ children, label, sx = {} }: { children: ReactNode; label: string; sx?: SxProps<Theme> }) {
   return (
     <StyledViewOptions sx={sx}>
       <InputLabel>{label}</InputLabel>
