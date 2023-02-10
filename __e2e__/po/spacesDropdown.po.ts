@@ -19,7 +19,6 @@ export class SpacesDropdown {
   }
 
   async signOut() {
-    await this.closeMemberPropertiesModalBtn.click();
     await this.spaceMenuBtn.click();
     await this.logoutButton.click();
   }
