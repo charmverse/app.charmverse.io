@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 
 import charmClient from 'charmClient';
+import { AccountSettings } from 'components/settings/AccountSettings';
 
 import MultiSigList from './components/GnosisSafes';
 import IdentityProviders from './components/IdentityProviders';
@@ -12,6 +13,7 @@ export default function IntegrationSettings() {
 
   return (
     <>
+      <AccountSettings />
       <IdentityProviders />
       <MultiSigList />
     </>

@@ -8,11 +8,12 @@ import { parseMarkdown } from 'components/common/CharmEditor/components/markdown
 import { prisma } from 'db';
 import log from 'lib/log';
 import { onError, onNoMatch, requireSpaceMembership, requireUser } from 'lib/middleware';
+import { getRequestLanguage } from 'lib/middleware/getRequestLanguage';
 import { getPagePath } from 'lib/pages';
 import { pageMetaSelect } from 'lib/pages/server/getPageMeta';
 import { withSessionRoute } from 'lib/session/withSession';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
-import { humanFriendlyDate } from 'lib/utilities/dates';
+import { formatDateTime } from 'lib/utilities/dates';
 import { DataConflictError } from 'lib/utilities/errors';
 
 export const config = {
@@ -98,7 +99,7 @@ async function importZippedController(req: NextApiRequest, res: NextApiResponse)
           const parentPage = await prisma.page.create({
             data: {
               id: parentPageId,
-              title: `Markdown import ${humanFriendlyDate(new Date(), { withTime: true, withYear: true })}`,
+              title: `Markdown import ${formatDateTime(new Date(), getRequestLanguage(req))}`,
               content: { type: 'doc', content: [] },
               contentText: '',
               hasContent: false,

@@ -9,10 +9,10 @@ import GridHeader from 'components/common/Grid/GridHeader';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { usePageDialog } from 'components/common/PageDialog/hooks/usePageDialog';
 import useTasks from 'components/nexus/hooks/useTasks';
+import { useDateFormatter } from 'hooks/useDateFormatter';
 import { usePages } from 'hooks/usePages';
 import type { ProposalWithUsers } from 'lib/proposal/interface';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
-import { humanFriendlyDate, toMonthDate } from 'lib/utilities/dates';
 import type { BrandColor } from 'theme/colors';
 
 import NoProposalsMessage from './NoProposalsMessage';
@@ -30,6 +30,7 @@ export default function ProposalsTable({
   const { mutate: mutateTasks } = useTasks();
   const { showPage } = usePageDialog();
   const router = useRouter();
+  const { formatDateTime, formatDate } = useDateFormatter();
 
   function onClose() {
     setUrlWithoutRerender(router.pathname, { id: null });
@@ -121,12 +122,8 @@ export default function ProposalsTable({
               {category ? <Chip size='small' color={category.color as BrandColor} label={category.title} /> : '-'}
             </Grid>
             <Grid item xs={2} sx={{ display: { xs: 'none', md: 'flex' } }} display='flex' justifyContent='center'>
-              <Tooltip
-                arrow
-                placement='top'
-                title={`Created on ${humanFriendlyDate(proposalPage.createdAt, { withTime: true })}`}
-              >
-                <span>{toMonthDate(proposalPage.createdAt)}</span>
+              <Tooltip arrow placement='top' title={`Created on ${formatDateTime(proposalPage.createdAt)}`}>
+                <span>{formatDate(proposalPage.createdAt)}</span>
               </Tooltip>
             </Grid>
             <Grid item xs={1} display='flex' justifyContent='flex-end'>

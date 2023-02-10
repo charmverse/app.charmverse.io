@@ -22,10 +22,10 @@ import { DiscordSocialIcon } from 'components/profile/components/UserDetails/Dis
 import { useMemberProfile } from 'components/profile/hooks/useMemberProfile';
 import type { Social } from 'components/profile/interfaces';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useMemberProperties } from 'hooks/useMemberProperties';
 import { useUser } from 'hooks/useUser';
 import type { Member } from 'lib/members/interfaces';
-import { humanFriendlyDate } from 'lib/utilities/dates';
 
 import { MemberPropertyTextMultiline } from './MemberDirectoryProperties/MemberPropertyTextMultiline';
 import { TimezoneDisplay } from './TimezoneDisplay';
@@ -47,6 +47,7 @@ function MemberDirectoryTableRow({ member }: { member: Member }) {
   const { properties = [] } = useMemberProperties();
   const visibleProperties = properties.filter((property) => property.enabledViews.includes('table'));
   const { showMemberProfile } = useMemberProfile();
+  const { formatDate } = useDateFormatter();
 
   if (visibleProperties.length === 0) {
     return null;
@@ -119,11 +120,7 @@ function MemberDirectoryTableRow({ member }: { member: Member }) {
             case 'join_date': {
               return (
                 <TableCell>
-                  <Typography variant='body2'>
-                    {humanFriendlyDate(member.joinDate, {
-                      withYear: true
-                    })}
-                  </Typography>
+                  <Typography variant='body2'>{formatDate(member.joinDate)}</Typography>
                 </TableCell>
               );
             }
