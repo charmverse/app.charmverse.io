@@ -64,7 +64,7 @@ export enum WebhookEventNames {
   ProposalPassed = 'proposal.passed',
   ProposalFailed = 'proposal.failed',
   ProposalSuggestionApproved = 'proposal.suggestion_approved',
-  ProposalUserVote = 'proposal.user_voted',
+  ProposalUserVoted = 'proposal.user_voted',
   MemberJoined = 'member.joined'
 }
 
@@ -111,7 +111,7 @@ export type WebhookEvent<T = WebhookEventNames> =
       user: UserEntity;
     })
   | (WebhookEventSharedProps<T> & {
-      scope: WebhookEventNames.ProposalUserVote;
+      scope: WebhookEventNames.ProposalUserVoted;
       proposal: ProposalEntity;
       user: UserEntity;
     })
