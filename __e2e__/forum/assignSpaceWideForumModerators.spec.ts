@@ -119,18 +119,18 @@ test.describe.serial('Comment on forum posts', () => {
     // Interact with the form to add a permission, and make sure it's added
     await expect(spaceSettingsTabRoles.spacePermissionsForm).toBeVisible();
 
-    const managePermissionsToggle = spaceSettingsTabRoles.getRoleSpaceOperationSwitchLocator('moderate_forums');
+    const managePermissionsToggle = spaceSettingsTabRoles.getRoleSpaceOperationSwitchLocator('moderateForums');
 
     await expect(managePermissionsToggle).toBeVisible();
 
     await managePermissionsToggle.click();
-    const isChecked = await spaceSettingsTabRoles.isOperationChecked('moderate_forums');
+    const isChecked = await spaceSettingsTabRoles.isOperationChecked('moderateForums');
 
     expect(isChecked).toBe(true);
 
     const newRolePermissions = await spaceSettingsTabRoles.submitSpacePermissionSettings();
 
-    expect(newRolePermissions.moderate_forums).toBe(true);
+    expect(newRolePermissions.moderateForums).toBe(true);
   });
 
   // We don't need to test all moderation paths since moderation from post page already handles this

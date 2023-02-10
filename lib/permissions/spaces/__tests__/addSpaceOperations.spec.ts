@@ -95,25 +95,25 @@ describe('addSpaceOperations', () => {
     expect(updatedPermission.createBounty).toBe(createdPermission.createBounty);
   });
 
-  it('should only allow roles as assignees for moderate_forums', async () => {
+  it('should only allow roles as assignees for moderateForums', async () => {
     const role = await generateRole({
       spaceId: space.id,
       createdBy: user.id
     });
 
-    // Test by adding multiple operations to make sure moderate_forums doesn't slip through
+    // Test by adding multiple operations to make sure moderateForums doesn't slip through
     const createdPermission = await addSpaceOperations({
       forSpaceId: space.id,
-      operations: ['createPage', 'moderate_forums'],
+      operations: ['createPage', 'moderateForums'],
       roleId: role.id
     });
 
-    expect(createdPermission.moderate_forums).toBe(true);
+    expect(createdPermission.moderateForums).toBe(true);
 
     await expect(
       addSpaceOperations({
         forSpaceId: space.id,
-        operations: ['createPage', 'moderate_forums'],
+        operations: ['createPage', 'moderateForums'],
         spaceId: space.id
       })
     ).rejects.toBeInstanceOf(AssignableToRolesOnlyError);
@@ -121,7 +121,7 @@ describe('addSpaceOperations', () => {
     await expect(
       addSpaceOperations({
         forSpaceId: space.id,
-        operations: ['createPage', 'moderate_forums'],
+        operations: ['createPage', 'moderateForums'],
         userId: user.id
       })
     ).rejects.toBeInstanceOf(AssignableToRolesOnlyError);

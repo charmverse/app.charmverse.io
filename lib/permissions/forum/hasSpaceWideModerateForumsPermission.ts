@@ -57,5 +57,5 @@ export async function hasSpaceWideModerateForumsPermission({
     }
   });
 
-  return permissions.some((p) => p.operations.includes('moderate_forums'));
+  return permissions.some((p) => p.operations.includes('moderateForums'));
 }

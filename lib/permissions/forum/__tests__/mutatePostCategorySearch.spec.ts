@@ -89,7 +89,7 @@ describe('mutatePostCategorySearch', () => {
 
     await addSpaceOperations({
       forSpaceId: space.id,
-      operations: ['moderate_forums'],
+      operations: ['moderateForums'],
       roleId: role.id
     });
 

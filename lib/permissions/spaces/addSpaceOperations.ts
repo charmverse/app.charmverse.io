@@ -34,7 +34,7 @@ export async function addSpaceOperations<A extends AssignablePermissionGroups = 
   for (const op of operations) {
     if (!SpaceOperation[op]) {
       throw new InvalidInputError(`Operation ${op} is an invalid space operation.`);
-    } else if (op === 'moderate_forums' && group !== 'role') {
+    } else if (op === 'moderateForums' && group !== 'role') {
       throw new AssignableToRolesOnlyError(op);
     }
   }
