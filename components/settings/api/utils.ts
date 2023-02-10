@@ -1,5 +1,6 @@
-import { WebhookEventNames, WebhookNameSpaceNames } from 'serverless/webhook/interfaces';
 import * as yup from 'yup';
+
+import { WebhookEventNames, WebhookNameSpaceNames } from 'lib/webhook/interfaces';
 
 export type WebhookNamespaces = { [key: string]: string[] };
 const WEBHOOK_EVENT_NAMES = Object.keys(WebhookEventNames);

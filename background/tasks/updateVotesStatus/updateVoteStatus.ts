@@ -1,6 +1,8 @@
 import { prisma } from 'db';
 import { getVotesByState } from 'lib/votes/getVotesByState';
 import { VOTE_STATUS } from 'lib/votes/interfaces';
+import { WebhookEventNames } from 'lib/webhook/interfaces';
+import { publishProposalEvent } from 'lib/webhook/publishEvent';
 
 const updateVoteStatus = async () => {
   const votesPassedDeadline = await prisma.vote.findMany({
@@ -54,6 +56,23 @@ const updateVoteStatus = async () => {
         status: 'vote_closed'
       }
     })
+  ]);
+
+  await Promise.all([
+    ...rejectedVotes.map((vote) =>
+      publishProposalEvent({
+        scope: WebhookEventNames.ProposalFailed,
+        spaceId: vote.spaceId,
+        proposalId: vote.pageId
+      })
+    ),
+    ...passedVotes.map((vote) =>
+      publishProposalEvent({
+        scope: WebhookEventNames.ProposalPassed,
+        spaceId: vote.spaceId,
+        proposalId: vote.pageId
+      })
+    )
   ]);
 
   return votesPassedDeadline.length;

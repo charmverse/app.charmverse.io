@@ -11,9 +11,19 @@ export function PageActions({
   onClickDelete,
   onClickEdit,
   onClickDuplicate,
+  readOnly,
   children
 }: {
-  page: { createdBy: string; type?: PageType; id: string; updatedAt: Date; relativePath?: string; path: string };
+  page: {
+    createdBy: string;
+    type?: PageType;
+    id: string;
+    updatedAt: Date;
+    relativePath?: string;
+    path: string;
+    deletedAt: Date | null;
+  };
+  readOnly?: boolean;
   onClickDelete?: VoidFunction;
   onClickEdit?: VoidFunction;
   onClickDuplicate?: VoidFunction;
@@ -38,6 +48,7 @@ export function PageActions({
         onClickDelete={onClickDelete}
         onClickDuplicate={onClickDuplicate}
         onClickEdit={onClickEdit}
+        readOnly={readOnly}
       >
         {children}
       </PageActionsMenu>

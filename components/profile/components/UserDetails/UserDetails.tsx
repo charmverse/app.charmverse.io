@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import EditIcon from '@mui/icons-material/Edit';
-import type { SxProps } from '@mui/material';
+import type { SxProps, Theme } from '@mui/material';
 import { Box, Divider, Grid, Stack, Tooltip, Typography } from '@mui/material';
 import type { IconButtonProps } from '@mui/material/IconButton';
 import IconButton from '@mui/material/IconButton';
@@ -19,6 +19,7 @@ import { TimezoneDisplay } from 'components/members/components/TimezoneDisplay';
 import { useUpdateProfileAvatar } from 'components/profile/components/UserDetails/hooks/useUpdateProfileAvatar';
 import { useUserDetails } from 'components/profile/components/UserDetails/hooks/useUserDetails';
 import Avatar from 'components/settings/workspace/LargeAvatar';
+import { useUser } from 'hooks/useUser';
 import type { DiscordAccount } from 'lib/discord/getDiscordAccount';
 import { hasNftAvatar } from 'lib/users/hasNftAvatar';
 import randomName from 'lib/utilities/randomName';
@@ -41,13 +42,14 @@ const StyledDivider = styled(Divider)`
   height: 36px;
 `;
 
-export const isPublicUser = (user: PublicUser | LoggedInUser): user is PublicUser => user.hasOwnProperty('profile');
+export const isPublicUser = (user: PublicUser | LoggedInUser, currentUser: null | LoggedInUser): user is PublicUser =>
+  user.id !== currentUser?.id;
 
 export interface UserDetailsProps {
   readOnly?: boolean;
   user: PublicUser | LoggedInUser;
   updateUser?: Dispatch<SetStateAction<LoggedInUser | null>>;
-  sx?: SxProps;
+  sx?: SxProps<Theme>;
 }
 
 const StyledStack = styled(Stack)`
@@ -73,7 +75,8 @@ function EditIconContainer({
 }
 
 function UserDetails({ readOnly, user, updateUser, sx = {} }: UserDetailsProps) {
-  const isPublic = isPublicUser(user);
+  const { user: currentUser } = useUser();
+  const isPublic = isPublicUser(user, currentUser);
   const { data: userDetails, mutate } = useSWRImmutable(`/userDetails/${user.id}/${isPublic}`, () => {
     return isPublic ? user.profile : charmClient.getUserDetails();
   });
@@ -87,7 +90,7 @@ function UserDetails({ readOnly, user, updateUser, sx = {} }: UserDetailsProps) 
   const timezoneModalState = usePopupState({ variant: 'popover', popupId: 'timezone-modal' });
 
   const { updateProfileAvatar, isSaving: isSavingAvatar } = useUpdateProfileAvatar();
-  const { handleUserUpdate } = useUserDetails({ readOnly, user, updateUser });
+  const { handleUserUpdate } = useUserDetails({ updateUser });
 
   const onLinkCopy = () => {
     setIsPersonalLinkCopied(true);
@@ -101,13 +104,20 @@ function UserDetails({ readOnly, user, updateUser, sx = {} }: UserDetailsProps) 
     linkedinURL: ''
   };
 
+  const hideSocials =
+    readOnly &&
+    socialDetails.discordUsername?.length === 0 &&
+    socialDetails.githubURL?.length === 0 &&
+    socialDetails.twitterURL?.length === 0 &&
+    socialDetails.linkedinURL?.length === 0;
+
   const identityTypes: IntegrationModel[] = useMemo(() => {
-    if (isPublicUser(user)) {
+    if (isPublic) {
       return [];
     }
 
     const types: IntegrationModel[] = [];
-    user.wallets.forEach((wallet) => {
+    user.wallets?.forEach((wallet) => {
       const address = wallet.address;
 
       types.push({
@@ -118,6 +128,7 @@ function UserDetails({ readOnly, user, updateUser, sx = {} }: UserDetailsProps) 
         icon: getIdentityIcon('Wallet')
       });
     });
+
     if (user?.discordUser && user.discordUser.account) {
       const discordAccount = user.discordUser.account as Partial<DiscordAccount>;
       types.push({
@@ -189,7 +200,7 @@ function UserDetails({ readOnly, user, updateUser, sx = {} }: UserDetailsProps) 
         <Grid container direction='column' spacing={0.5}>
           <Grid item>
             <EditIconContainer data-testid='edit-identity' readOnly={readOnly} onClick={identityModalState.open}>
-              {user && !isPublicUser(user) && getIdentityIcon(user.identityType as IdentityType)}
+              {user && !isPublic && getIdentityIcon(user.identityType as IdentityType)}
               <Typography variant='h1'>{shortWalletAddress(user.username)}</Typography>
             </EditIconContainer>
           </Grid>
@@ -214,12 +225,20 @@ function UserDetails({ readOnly, user, updateUser, sx = {} }: UserDetailsProps) 
               </EditIconContainer>
             </Grid>
           )}
-          <Grid item mt={1} height={40}>
-            <EditIconContainer onClick={socialModalState.open} readOnly={readOnly} data-testid='edit-social'>
-              <SocialIcons social={socialDetails} />
-              {!readOnly && <StyledDivider orientation='vertical' flexItem />}
-            </EditIconContainer>
-          </Grid>
+          {!hideSocials && (
+            <Grid item mt={1} height={40}>
+              <EditIconContainer onClick={socialModalState.open} readOnly={readOnly} data-testid='edit-social'>
+                <SocialIcons
+                  showDiscord={readOnly && socialDetails.discordUsername?.length !== 0}
+                  showGithub={readOnly && socialDetails.githubURL?.length !== 0}
+                  showLinkedIn={readOnly && socialDetails.linkedinURL?.length !== 0}
+                  showTwitter={readOnly && socialDetails.twitterURL?.length !== 0}
+                  social={socialDetails}
+                />
+                {!readOnly && <StyledDivider orientation='vertical' flexItem />}
+              </EditIconContainer>
+            </Grid>
+          )}
           <Grid item container alignItems='center' sx={{ width: 'fit-content', flexWrap: 'initial' }}>
             <EditIconContainer readOnly={readOnly} onClick={descriptionModalState.open} data-testid='edit-description'>
               <span>
@@ -237,7 +256,7 @@ function UserDetails({ readOnly, user, updateUser, sx = {} }: UserDetailsProps) 
           </Grid>
         </Grid>
       </Stack>
-      {!isPublicUser(user) && (
+      {!isPublic && (
         <>
           <IdentityModal
             isOpen={identityModalState.isOpen}

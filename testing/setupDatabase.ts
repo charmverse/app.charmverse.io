@@ -1,4 +1,4 @@
-import crypto from 'node:crypto';
+import crypto, { randomUUID } from 'node:crypto';
 
 import type {
   ApplicationStatus,
@@ -35,6 +35,8 @@ import type { ProposalReviewerInput, ProposalWithUsers } from 'lib/proposal/inte
 import { syncProposalPermissions } from 'lib/proposal/syncProposalPermissions';
 import { sessionUserRelations } from 'lib/session/config';
 import { createUserFromWallet } from 'lib/users/createUser';
+import { uniqueValues } from 'lib/utilities/array';
+import { InvalidInputError } from 'lib/utilities/errors';
 import { typedKeys } from 'lib/utilities/objects';
 import type { LoggedInUser } from 'models';
 
@@ -379,7 +381,9 @@ export async function generateBountyWithSingleApplication({
   bountyCap,
   userId,
   spaceId,
-  bountyStatus
+  bountyStatus,
+  bountyTitle = 'Bounty',
+  bountyDescription = 'Bounty description'
 }: {
   applicationStatus: ApplicationStatus;
   bountyCap: number | null;
@@ -388,6 +392,8 @@ export async function generateBountyWithSingleApplication({
   bountyStatus?: BountyStatus;
   // This should be deleted on future PR. Left for backwards compatibility for now
   reviewer?: string;
+  bountyTitle?: string;
+  bountyDescription?: string;
 }): Promise<BountyWithDetails> {
   const createdBounty = (await prisma.bounty.create({
     data: {
@@ -399,12 +405,40 @@ export async function generateBountyWithSingleApplication({
       spaceId,
       approveSubmitters: false,
       // Important variable
-      maxSubmissions: bountyCap
+      maxSubmissions: bountyCap,
+      page: {
+        create: {
+          title: bountyTitle,
+          path: `bounty-${randomUUID()}`,
+          type: 'bounty',
+          updatedBy: userId,
+          space: { connect: { id: spaceId } },
+          author: { connect: { id: userId } },
+          contentText: bountyDescription,
+          content: {
+            type: 'doc',
+            content: bountyDescription
+              ? [
+                  {
+                    type: 'paragraph',
+                    content: [
+                      {
+                        text: bountyDescription,
+                        type: 'text'
+                      }
+                    ]
+                  }
+                ]
+              : []
+          }
+        }
+      }
     },
     include: {
-      applications: true
+      applications: true,
+      page: true
     }
-  })) as BountyWithDetails;
+  })) as BountyWithDetails & { page: Page };
 
   const user = await prisma.user.findUnique({ where: { id: userId }, include: { wallets: true } });
 
@@ -441,7 +475,9 @@ export async function generateRole({
   spaceId,
   createdBy,
   roleName = `role-${v4()}`,
-  source
+  source,
+  assigneeUserIds,
+  id = v4()
 }: {
   externalId?: string;
   spaceId: string;
@@ -449,7 +485,32 @@ export async function generateRole({
   createdBy: string;
   source?: RoleSource;
   id?: string;
+  assigneeUserIds?: string[];
 }): Promise<Role> {
+  const assignUsers = assigneeUserIds && assigneeUserIds.length >= 1;
+
+  const roleAssignees: Omit<Prisma.SpaceRoleToRoleCreateManyInput, 'roleId'>[] = [];
+
+  // check assignees
+  if (assignUsers) {
+    const uniqueIds = uniqueValues(assigneeUserIds);
+
+    const spaceRoles = await prisma.spaceRole.findMany({
+      where: {
+        spaceId,
+        userId: {
+          in: uniqueIds
+        }
+      }
+    });
+
+    if (spaceRoles.length !== uniqueIds.length) {
+      throw new InvalidInputError(`Cannot assign role to a user not inside the space`);
+    }
+
+    roleAssignees.push(...spaceRoles.map((sr) => ({ spaceRoleId: sr.id })));
+  }
+
   const role = await prisma.role.create({
     data: {
       externalId,
@@ -460,7 +521,15 @@ export async function generateRole({
           id: spaceId
         }
       },
-      source
+      source,
+      spaceRolesToRole:
+        roleAssignees.length > 0
+          ? {
+              createMany: {
+                data: roleAssignees
+              }
+            }
+          : undefined
     }
   });
 

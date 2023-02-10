@@ -14,13 +14,17 @@ import * as yup from 'yup';
 import charmClient from 'charmClient';
 import Loader from 'components/common/Loader';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import useIsAdmin from 'hooks/useIsAdmin';
+import { useIsAdmin } from 'hooks/useIsAdmin';
 import { usePreventReload } from 'hooks/usePreventReload';
 import type { AssignablePermissionGroups } from 'lib/permissions/interfaces';
 import type { SpacePermissionFlags } from 'lib/permissions/spaces/client';
-import { AvailableSpacePermissions, spaceOperationLabels, spaceOperations } from 'lib/permissions/spaces/client';
+import {
+  AvailableSpacePermissions,
+  spaceOperationLabels,
+  spaceOperationsWithoutForumCategory
+} from 'lib/permissions/spaces/client';
 
-const fields: Record<SpaceOperation, BooleanSchema> = spaceOperations().reduce(
+const fields: Record<SpaceOperation, BooleanSchema> = spaceOperationsWithoutForumCategory.reduce(
   (_schema: Record<SpaceOperation, BooleanSchema>, op) => {
     _schema[op] = yup.boolean();
     return _schema;
@@ -59,34 +63,35 @@ export default function SpacePermissions({ targetGroup, id, callback = () => nul
 
   const newValues = watch();
 
-  async function refreshGroupPermissions() {
-    if (!space) {
-      setTimeout(() => {
-        return refreshGroupPermissions();
-      }, 1000);
-    } else {
-      const permissionFlags = await charmClient.queryGroupSpacePermissions({
-        group: targetGroup,
-        id,
-        resourceId: space.id
-      });
-      spaceOperations().forEach((op) => {
-        setValue(op, permissionFlags[op]);
-      });
-      setAssignedPermissions(permissionFlags);
-    }
-  }
-
   useEffect(() => {
-    refreshGroupPermissions();
-  }, []);
+    if (space) {
+      refreshGroupPermissions();
+    }
+  }, [space]);
 
+  async function refreshGroupPermissions() {
+    const permissionFlags = await charmClient.queryGroupSpacePermissions({
+      group: targetGroup,
+      id,
+      resourceId: space?.id as string
+    });
+    spaceOperationsWithoutForumCategory.forEach((op) => {
+      setValue(op, permissionFlags[op]);
+    });
+    setAssignedPermissions(permissionFlags);
+  }
   const settingsChanged =
     assignedPermissions !== null &&
     (Object.entries(assignedPermissions) as [SpaceOperation, boolean][]).some(([operation, hasAccess]) => {
       const newValue = newValues[operation];
       return newValue !== hasAccess;
     });
+
+  // We don't want to show the forum category moderate permission in context of the entire space
+  const assignableOperations =
+    targetGroup === 'space'
+      ? spaceOperationsWithoutForumCategory.filter((op) => op !== 'moderateForums')
+      : spaceOperationsWithoutForumCategory;
 
   async function submitted(formValues: FormValues) {
     // Make sure we have existing permission set to compare against
@@ -142,7 +147,7 @@ export default function SpacePermissions({ targetGroup, id, callback = () => nul
   }
 
   return (
-    <div>
+    <div data-test={`space-permissions-form-${targetGroup}`}>
       <form onSubmit={handleSubmit((formValue) => submitted(formValue))} style={{ margin: 'auto' }}>
         <Grid container direction='column' gap={2}>
           <Grid item xs>
@@ -161,7 +166,7 @@ export default function SpacePermissions({ targetGroup, id, callback = () => nul
             </Typography>
           </Grid>
 
-          {(Object.keys(spaceOperationLabels) as SpaceOperation[]).map((operation) => {
+          {assignableOperations.map((operation) => {
             const userCanPerformAction = assignedPermissions[operation];
             const actionLabel = spaceOperationLabels[operation];
 
@@ -171,6 +176,7 @@ export default function SpacePermissions({ targetGroup, id, callback = () => nul
                   <FormControlLabel
                     control={
                       <Switch
+                        data-test={`space-operation-${targetGroup}-${operation}`}
                         disabled={!isAdmin}
                         defaultChecked={userCanPerformAction}
                         onChange={(ev) => {
@@ -189,24 +195,17 @@ export default function SpacePermissions({ targetGroup, id, callback = () => nul
                     variant='body2'
                   >
                     {targetGroup === 'space' &&
-                      newValues[operation] === true &&
-                      `All members of your space can ${actionLabel.toLowerCase()}`}
-                    {targetGroup === 'space' &&
-                      newValues[operation] === false &&
-                      `Space members cannot ${actionLabel.toLowerCase()}`}
+                      (newValues[operation] === true
+                        ? `All members of your space can ${actionLabel.toLowerCase()}`
+                        : `Space members cannot ${actionLabel.toLowerCase()}`)}
                     {targetGroup === 'role' &&
-                      newValues[operation] === true &&
-                      `Members with this role can ${actionLabel.toLowerCase()}`}
-                    {targetGroup === 'role' &&
-                      newValues[operation] === false &&
-                      `Members with this role cannot ${actionLabel.toLowerCase()}`}
+                      (newValues[operation] === true
+                        ? `Members with this role can ${actionLabel.toLowerCase()}`
+                        : `Members with this role cannot ${actionLabel.toLowerCase()}`)}
                     {targetGroup === 'user' &&
-                      newValues[operation] === true &&
-                      `This user can ${actionLabel.toLowerCase()}`}
-                    {targetGroup === 'user' &&
-                      newValues[operation] === false &&
-                      `This user cannot ${actionLabel.toLowerCase()}`}
-                    .
+                      (newValues[operation] === true
+                        ? `This user can ${actionLabel.toLowerCase()}`
+                        : `This user cannot ${actionLabel.toLowerCase()}`)}
                   </Typography>
                 </Grid>
               </Grid>
@@ -215,7 +214,14 @@ export default function SpacePermissions({ targetGroup, id, callback = () => nul
 
           {isAdmin && (
             <Grid item xs>
-              <Button disabled={!settingsChanged} type='submit' variant='contained' color='primary' sx={{ mr: 1 }}>
+              <Button
+                data-test='submit-space-permission-settings'
+                disabled={!settingsChanged}
+                type='submit'
+                variant='contained'
+                color='primary'
+                sx={{ mr: 1 }}
+              >
                 Save
               </Button>
             </Grid>

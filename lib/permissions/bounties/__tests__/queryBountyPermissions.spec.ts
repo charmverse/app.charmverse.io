@@ -4,6 +4,7 @@ import { DataNotFoundError } from 'lib/utilities/errors';
 import { generateBounty, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 import { addBountyPermissionGroup } from '../addBountyPermissionGroup';
+import type { BountyPermissionGroup } from '../interfaces';
 import { queryBountyPermissions } from '../queryBountyPermissions';
 
 describe('queryBountyPermissions', () => {
@@ -41,9 +42,9 @@ describe('queryBountyPermissions', () => {
     });
 
     expect(queryResult.submitter.length).toBe(1);
-    expect(queryResult.submitter[0].id).toBe(space.id);
+    expect((queryResult.submitter[0] as BountyPermissionGroup).id).toBe(space.id);
     expect(queryResult.reviewer.length).toBe(1);
-    expect(queryResult.reviewer[0].id).toBe(user.id);
+    expect((queryResult.reviewer[0] as BountyPermissionGroup).id).toBe(user.id);
     // Creator gets a synthetic permission injected
     expect(queryResult.creator.length).toBe(1);
   });

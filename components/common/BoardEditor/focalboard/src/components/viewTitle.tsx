@@ -162,6 +162,7 @@ function ViewTitle(props: ViewTitleProps) {
               onDescriptionChange(content.doc);
             }}
             pageId={board.id}
+            readOnly={props.readOnly}
           />
         </div>
       )}

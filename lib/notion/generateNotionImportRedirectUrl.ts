@@ -4,5 +4,5 @@ type Props = {
 };
 
 export function generateNotionImportRedirectUrl({ spaceDomain, origin }: Props): string {
-  return `/api/notion/login?redirect=${encodeURIComponent(`${origin}/${spaceDomain}/settings/space`)}`;
+  return `/api/notion/login?redirect=${encodeURIComponent(`${origin}/${spaceDomain}`)}`;
 }

@@ -1,5 +1,6 @@
+import { DOMAIN_BLACKLIST } from 'lib/spaces/config';
 import { getSpaceByDomain } from 'lib/spaces/getSpaceByDomain';
-import { DOMAIN_BLACKLIST, getSpaceDomainFromName } from 'lib/spaces/utils';
+import { getSpaceDomainFromName } from 'lib/spaces/utils';
 import randomName from 'lib/utilities/randomName';
 
 export async function getAvailableDomainName(name?: string, randomize = false): Promise<string> {

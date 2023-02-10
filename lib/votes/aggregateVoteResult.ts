@@ -9,7 +9,7 @@ export function aggregateVoteResult({
 }: {
   voteOptions: Pick<VoteOptions, 'name'>[];
   userVotes: Pick<UserVote, 'choice' | 'userId'>[];
-  userId: string;
+  userId?: string;
 }) {
   const aggregatedResult: ExtendedVote['aggregatedResult'] = {};
   voteOptions.forEach((voteOption) => {

@@ -19,8 +19,7 @@ import {
   Tooltip,
   useMediaQuery
 } from '@mui/material';
-import type { ButtonProps, SxProps } from '@mui/material';
-import type { BoxProps, Theme } from '@mui/system';
+import type { ButtonProps, SxProps, Theme, BoxProps } from '@mui/material';
 import { DateTime } from 'luxon';
 import { usePopupState, bindMenu } from 'material-ui-popup-state/hooks';
 import type { MouseEvent } from 'react';
@@ -28,6 +27,8 @@ import { forwardRef, memo, useRef, useEffect, useState } from 'react';
 
 import Button from 'components/common/Button';
 import UserDisplay from 'components/common/UserDisplay';
+import { useCurrentPage } from 'hooks/useCurrentPage';
+import { useDateFormatter } from 'hooks/useDateFormatter';
 import { usePages } from 'hooks/usePages';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useThreads } from 'hooks/useThreads';
@@ -116,7 +117,7 @@ function AddCommentCharmEditor({
   readOnly: boolean;
   disabled: boolean;
   threadId: string;
-  sx: SxProps;
+  sx: SxProps<Theme>;
 }) {
   const [commentContent, setCommentContent] = useState<PageContent | null>(null);
   const isEmpty = checkIsContentEmpty(commentContent);
@@ -239,8 +240,9 @@ interface PageThreadProps {
 }
 
 export const RelativeDate = memo<{ createdAt: string; prefix?: string; updatedAt?: string | null }>(
-  ({ createdAt, prefix, updatedAt }) => {
+  ({ createdAt, updatedAt }) => {
     const getDateTime = () => DateTime.fromISO(createdAt);
+    const { formatDateTime } = useDateFormatter();
 
     const [dateTime, setTime] = useState(getDateTime());
 
@@ -263,11 +265,11 @@ export const RelativeDate = memo<{ createdAt: string; prefix?: string; updatedAt
         color='secondary'
         variant='subtitle1'
       >
-        <Tooltip arrow placement='top' title={new Date(createdAt).toLocaleString()}>
+        <Tooltip arrow placement='top' title={formatDateTime(createdAt)}>
           <span>{dateTime.toRelative({ style: 'short' })}</span>
         </Tooltip>
         {updatedAt && (
-          <Tooltip arrow placement='top' title={new Date(updatedAt).toLocaleString()}>
+          <Tooltip arrow placement='top' title={formatDateTime(updatedAt)}>
             <span style={{ marginLeft: '4px' }}>(edited)</span>
           </Tooltip>
         )}
@@ -283,7 +285,8 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(
     const { user } = useUser();
     const [isMutating, setIsMutating] = useState(false);
     const [editedCommentId, setEditedCommentId] = useState<null | string>(null);
-    const { getPagePermissions, currentPageId } = usePages();
+    const { currentPageId } = useCurrentPage();
+    const { getPagePermissions } = usePages();
     const menuState = usePopupState({ variant: 'popover', popupId: 'comment-action' });
     const [actionComment, setActionComment] = useState<null | CommentWithUser>(null);
 
@@ -362,6 +365,7 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(
                     }}
                   >
                     <UserDisplay
+                      showMiniProfile
                       component='div'
                       user={comment.user}
                       avatarSize='small'

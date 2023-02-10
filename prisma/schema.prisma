@@ -124,6 +124,8 @@ enum SpaceOperation {
   createPage
   createBounty
   createVote
+  createForumCategory
+  moderateForums
 }
 
 enum ProfileItemType {
@@ -247,6 +249,7 @@ model Space {
   userTokenGates              UserTokenGate[]
   postCategories              PostCategory[]
   Post                        Post[]
+  postCategoryPermissions     PostCategoryPermission[]
   webhookSubscriptionUrl      String?
   webhookSubscriptions        WebhookSubscription[]
   webhookSigningSecret        String?
@@ -497,6 +500,7 @@ model UserDetails {
   social      Json?
   user        User    @relation(fields: [id], references: [id], onDelete: Cascade)
   timezone    String?
+  locale      String?
 }
 
 model TelegramUser {
@@ -748,6 +752,7 @@ model Role {
   proposalReviewer          ProposalReviewer[]
   inviteLinkToRoles         InviteLinkToRole[]
   memberPropertyPermissions MemberPropertyPermission[]
+  postCategoryPermissions   PostCategoryPermission[]
 
   @@unique([spaceId, name])
   @@index([spaceId])
@@ -813,6 +818,7 @@ model PagePermission {
   @@unique([roleId, pageId], name: "roleId_pageId")
   @@unique([spaceId, pageId], name: "spaceId_pageId")
   @@unique([public, pageId], name: "public_pageId")
+  @@index([id])
   @@index([pageId])
   @@index([roleId])
   @@index([userId])
@@ -935,6 +941,7 @@ model ProfileItem {
   isHidden Boolean?
   metadata Json?
   type     ProfileItemType
+  isPinned Boolean?
 
   @@index([userId])
 }
@@ -1019,13 +1026,14 @@ model MemberPropertyPermission {
 
 // Begin Forum models
 model PostCategory {
-  id              String  @id @default(uuid()) @db.Uuid
-  name            String
-  path            String?
-  defaultForSpace Space?  @relation(name: "defaultPostCategory")
-  spaceId         String  @db.Uuid
-  space           Space   @relation(fields: [spaceId], references: [id], onDelete: Cascade)
-  Post            Post[]
+  id                      String                    @id @default(uuid()) @db.Uuid
+  name                    String
+  path                    String?
+  defaultForSpace         Space?                    @relation(name: "defaultPostCategory")
+  spaceId                 String                    @db.Uuid
+  space                   Space                     @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  Post                    Post[]
+  postCategoryPermissions PostCategoryPermission[]
 
   @@unique([spaceId, name])
   @@unique([spaceId, path])
@@ -1077,6 +1085,7 @@ model PostComment {
   contentText String
   updatedAt   DateTime  @updatedAt
   deletedAt   DateTime?
+  deletedBy   String?
   parentId    String?
 
   postId String                  @db.Uuid
@@ -1151,4 +1160,58 @@ model GoogleCredential {
 
   @@unique([userId, name])
   @@index([userId])
+}
+
+enum PostCategoryOperation {
+  manage_permissions
+  delete_category
+  edit_category
+  create_post
+}
+
+enum PostOperation {
+  view_post
+  edit_post
+  delete_post
+  pin_post
+  lock_post
+  add_comment
+  delete_comments
+  upvote
+  downvote
+}
+
+
+enum PostCategoryPermissionLevel {
+  category_admin
+  moderator
+  full_access
+  view
+  custom
+}
+
+model PostCategoryPermission {
+  id              String                       @id @default(uuid()) @db.Uuid
+  permissionLevel PostCategoryPermissionLevel
+  postCategoryId  String                       @db.Uuid
+  postCategory    PostCategory                 @relation(fields: [postCategoryId], references: [id], onDelete: Cascade)
+  // These fields will only be used when the custom permission level is used
+  categoryOperations PostCategoryOperation[]
+  postOperations     PostOperation[]
+
+  // Permission assignees
+  roleId          String?                      @db.Uuid
+  role            Role?                        @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  spaceId         String?                      @db.Uuid
+  space           Space?                       @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  public          Boolean?
+
+  @@unique([roleId, postCategoryId])
+  @@unique([spaceId, postCategoryId])
+  @@unique([public, postCategoryId])
+
+  @@index([postCategoryId])
+  @@index([postCategoryId, roleId])
+  @@index([postCategoryId, spaceId])
+  @@index([postCategoryId, public])
 }

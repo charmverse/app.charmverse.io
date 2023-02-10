@@ -3,12 +3,17 @@ import type { Post, PostCategory, Space, User } from '@prisma/client';
 import request from 'supertest';
 
 import { prisma } from 'db';
-import { createPostCategory } from 'lib/forums/categories/createPostCategory';
 import type { PostWithVotes } from 'lib/forums/posts/interfaces';
 import type { UpdateForumPostInput } from 'lib/forums/posts/updateForumPost';
+import { upsertPostCategoryPermission } from 'lib/permissions/forum/upsertPostCategoryPermission';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
-import { generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { generateForumPost } from 'testing/utils/forums';
+import {
+  generateRole,
+  generateSpaceUser,
+  generateUserAndSpace,
+  generateUserAndSpaceWithApiToken
+} from 'testing/setupDatabase';
+import { generateForumPost, generatePostCategory } from 'testing/utils/forums';
 
 let space: Space;
 let user: User;
@@ -24,7 +29,7 @@ const updateInput: UpdateForumPostInput = {
 };
 
 beforeAll(async () => {
-  const { space: _space, user: _user } = await generateUserAndSpaceWithApiToken(undefined, false);
+  const { space: _space, user: _user } = await generateUserAndSpace({ isAdmin: false });
 
   space = _space;
   user = _user;
@@ -32,9 +37,15 @@ beforeAll(async () => {
   adminUser = await generateSpaceUser({ isAdmin: true, spaceId: space.id });
   adminUserCookie = await loginUser(adminUser.id);
 
-  postCategory = await createPostCategory({
+  postCategory = await generatePostCategory({
     name: 'Test Category',
     spaceId: space.id
+  });
+
+  await upsertPostCategoryPermission({
+    assignee: { group: 'space', id: space.id },
+    permissionLevel: 'view',
+    postCategoryId: postCategory.id
   });
 
   createInput = {
@@ -54,28 +65,31 @@ describe('PUT /api/forums/posts/[postId] - Update a post', () => {
 
     await request(baseUrl).put(`/api/forums/posts/${post.id}`).set('Cookie', userCookie).send(updateInput).expect(200);
   });
-
-  it('should update a post if the user did not create the post, but is a space admin, responding with 200', async () => {
+  it('should fail to update the post if the user did not create it even if they are an admin, responding with 401', async () => {
     const post = await generateForumPost(createInput);
 
     await request(baseUrl)
       .put(`/api/forums/posts/${post.id}`)
       .set('Cookie', adminUserCookie)
       .send(updateInput)
-      .expect(200);
+      .expect(401);
   });
 
-  it('should fail to update the post if the user did not create it, responding with 401', async () => {
-    const forumPost = await generateForumPost(createInput);
+  it('should fail to update the post to a new category if the author cannot create posts in that category, responding with 401', async () => {
+    const post = await generateForumPost(createInput);
 
-    const update: UpdateForumPostInput = {
-      title: 'Updated title'
-    };
+    const unauthorisedCategory = await generatePostCategory({
+      spaceId: space.id,
+      name: 'Unauthorised category'
+    });
 
     await request(baseUrl)
-      .put(`/api/forums/posts/${forumPost.id}`)
-      .set('Cookie', extraSpaceUserCookie)
-      .send(update)
+      .put(`/api/forums/posts/${post.id}`)
+      .set('Cookie', adminUserCookie)
+      .send({
+        ...updateInput,
+        categoryId: unauthorisedCategory.id
+      } as UpdateForumPostInput)
       .expect(401);
   });
 });
@@ -94,10 +108,35 @@ describe('DELETE /api/forums/posts/[postId] - Delete a post', () => {
     expect(postAfterDelete?.deletedAt).toBeDefined();
   });
 
-  it('should delete a post if the user did not create the post, but is a space admin, responding with 200', async () => {
-    const post = await generateForumPost(createInput);
+  it('should delete a post if the user has the permissions for this, responding with 200', async () => {
+    const role = await generateRole({
+      spaceId: space.id,
+      createdBy: adminUser.id,
+      assigneeUserIds: [extraSpaceUser.id]
+    });
 
-    await request(baseUrl).delete(`/api/forums/posts/${post.id}`).set('Cookie', adminUserCookie).send().expect(200);
+    const moderatedPostCategory = await prisma.postCategory.create({
+      data: {
+        name: 'Moderated category',
+        space: { connect: { id: space.id } },
+        postCategoryPermissions: {
+          create: {
+            permissionLevel: 'moderator',
+            role: { connect: { id: role.id } }
+          }
+        }
+      }
+    });
+
+    const post = await generateForumPost({
+      ...createInput,
+      categoryId: moderatedPostCategory.id
+    });
+    await request(baseUrl)
+      .delete(`/api/forums/posts/${post.id}`)
+      .set('Cookie', extraSpaceUserCookie)
+      .send()
+      .expect(200);
 
     const postAfterDelete = await prisma.post.findUnique({
       where: {
@@ -108,7 +147,7 @@ describe('DELETE /api/forums/posts/[postId] - Delete a post', () => {
     expect(postAfterDelete?.deletedAt).toBeDefined();
   });
 
-  it('should fail to delete the post if the user did not create it, responding with 401', async () => {
+  it('should fail to delete the post if the user does not have permissions to do so in this category, responding with 401', async () => {
     const page = await generateForumPost(createInput);
 
     await request(baseUrl)
@@ -119,7 +158,7 @@ describe('DELETE /api/forums/posts/[postId] - Delete a post', () => {
   });
 });
 describe('GET /api/forums/posts/[postId] - Get a post', () => {
-  it('should return a post if the user is a space member, responding with 200', async () => {
+  it('should return a post if the user has permissions for this category, responding with 200', async () => {
     const post = await generateForumPost(createInput);
 
     const retrievedPost = (
@@ -146,7 +185,7 @@ describe('GET /api/forums/posts/[postId] - Get a post', () => {
       })
     );
   });
-  it('should fail to return the post if the user is not a space member, responding with 401', async () => {
+  it('should fail to return the post if the user does not have permissions for this category, responding with 401', async () => {
     const { user: externalUser } = await generateUserAndSpaceWithApiToken();
     const externalUserCookie = await loginUser(externalUser.id);
 

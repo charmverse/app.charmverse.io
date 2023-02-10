@@ -4,7 +4,7 @@ import { SignJWT } from 'jose';
 
 import log from 'lib/log';
 
-import type { WebhookPayload } from './interfaces';
+import type { WebhookPayload } from '../../lib/webhook/interfaces';
 
 const signJwt = (subject: string, payload: Record<string, any>, secret: KeyLike | Uint8Array) => {
   return (
@@ -27,6 +27,8 @@ export const webhookWorker = async (event: SQSEvent): Promise<SQSBatchResponse> 
   // Store failed messageIDs
   const batchItemFailures: SQSBatchItemFailure[] = [];
 
+  log.debug('Webhook worker initiated');
+
   // Execute messages
   await Promise.allSettled(
     event.Records.map(async (record: SQSRecord) => {
@@ -47,6 +49,8 @@ export const webhookWorker = async (event: SQSEvent): Promise<SQSBatchResponse> 
             Signature: signedJWT
           }
         });
+
+        log.debug('Webhook call response', response);
 
         // If not 200 back, we throw an error
         if (response.status !== 200) {

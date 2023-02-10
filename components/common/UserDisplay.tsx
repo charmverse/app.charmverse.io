@@ -1,3 +1,5 @@
+import { log } from 'console';
+
 import type { BoxProps } from '@mui/material';
 import { Box, Typography } from '@mui/material';
 import type { User } from '@prisma/client';
@@ -6,6 +8,7 @@ import { memo } from 'react';
 import type { InitialAvatarProps } from 'components/common/Avatar';
 import Avatar from 'components/common/Avatar';
 import Link from 'components/common/Link';
+import { useMemberProfile } from 'components/profile/hooks/useMemberProfile';
 import useENSName from 'hooks/useENSName';
 import { hasNftAvatar } from 'lib/users/hasNftAvatar';
 
@@ -33,7 +36,16 @@ function BaseComponent({
   ...props
 }: BaseComponentProps) {
   return (
-    <Box display='flex' alignItems='center' gap={1} {...props}>
+    <Box
+      display='flex'
+      alignItems='center'
+      gap={1}
+      {...props}
+      sx={{
+        ...(props.sx ?? {}),
+        cursor: props.onClick ? 'pointer' : 'initial'
+      }}
+    >
       <Avatar size={avatarSize} name={username} avatar={avatar} isNft={isNft} />
       {!hideName && (
         <Typography whiteSpace='nowrap' fontSize={fontSize} fontWeight={fontWeight}>
@@ -62,9 +74,12 @@ export const AnonUserDisplay = memo(AnonUserDisplayComponent);
 interface UserDisplayProps extends StyleProps {
   user?: Omit<User, 'addresses'> | null;
   linkToProfile?: boolean;
+  showMiniProfile?: boolean;
 }
 
-function UserDisplay({ user, linkToProfile = false, ...props }: UserDisplayProps) {
+function UserDisplay({ showMiniProfile = false, user, linkToProfile = false, ...props }: UserDisplayProps) {
+  const { showMemberProfile } = useMemberProfile();
+
   if (!user) {
     // strip out invalid names
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -90,7 +105,19 @@ function UserDisplay({ user, linkToProfile = false, ...props }: UserDisplayProps
     );
   }
 
-  return <BaseComponent username={user.username} avatar={user.avatar} isNft={isNft} {...props} />;
+  return (
+    <BaseComponent
+      onClick={() => {
+        if (showMiniProfile) {
+          showMemberProfile(user.id);
+        }
+      }}
+      username={user.username}
+      avatar={user.avatar}
+      isNft={isNft}
+      {...props}
+    />
+  );
 }
 
 export default memo(UserDisplay);

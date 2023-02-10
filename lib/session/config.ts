@@ -67,5 +67,11 @@ export const sessionUserRelations = {
       email: true,
       name: true
     }
+  },
+  profile: {
+    select: {
+      timezone: true,
+      locale: true
+    }
   }
 } as const;

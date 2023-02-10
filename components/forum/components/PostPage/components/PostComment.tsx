@@ -3,7 +3,7 @@ import styled from '@emotion/styled';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import EditIcon from '@mui/icons-material/Edit';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import { Box, IconButton, ListItemIcon, ListItemText, Menu, MenuItem, Stack, Typography } from '@mui/material';
+import { Box, IconButton, ListItemIcon, ListItemText, Menu, MenuItem, Stack, Tooltip, Typography } from '@mui/material';
 import { bindMenu, usePopupState } from 'material-ui-popup-state/hooks';
 import { useState } from 'react';
 import type { KeyedMutator } from 'swr';
@@ -13,6 +13,7 @@ import Button from 'components/common/Button';
 import CharmEditor from 'components/common/CharmEditor/CharmEditor';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/InlineCharmEditor';
 import UserDisplay from 'components/common/UserDisplay';
+import { useMemberProfile } from 'components/profile/hooks/useMemberProfile';
 import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
 import type {
@@ -20,6 +21,7 @@ import type {
   PostCommentWithVote,
   PostCommentWithVoteAndChildren
 } from 'lib/forums/comments/interface';
+import type { AvailablePostPermissionFlags } from 'lib/permissions/forum/interfaces';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { getRelativeTimeInThePast } from 'lib/utilities/dates';
 
@@ -39,13 +41,13 @@ const StyledStack = styled(Stack)`
   }
 `;
 
-export function PostComment({
-  comment,
-  setPostComments
-}: {
+type Props = {
   comment: PostCommentWithVoteAndChildren;
   setPostComments: KeyedMutator<PostCommentWithVote[] | undefined>;
-}) {
+  permissions?: AvailablePostPermissionFlags;
+};
+
+export function PostComment({ comment, setPostComments, permissions }: Props) {
   const [showCommentReply, setShowCommentReply] = useState(false);
   const theme = useTheme();
   const { user } = useUser();
@@ -57,6 +59,7 @@ export function PostComment({
     rawText: comment.contentText
   });
   const [commentEditContent, setCommentEditContent] = useState<ICharmEditorOutput>(commentContent);
+  const { showMemberProfile } = useMemberProfile();
 
   async function saveCommentContent() {
     const updatedComment = await charmClient.forum.updatePostComment({
@@ -141,15 +144,28 @@ export function PostComment({
     );
   }
 
+  const isCommentAuthor = comment.createdBy === user?.id;
+  const canDeleteComment = permissions?.delete_comments || isCommentAuthor;
+
   return (
     <Stack my={1} position='relative'>
-      <StyledStack>
+      {/** test marker is here to avoid accidentally loading comments from recursive post comment components */}
+      <StyledStack data-test={`post-comment-${comment.id}`}>
         <Stack flexDirection='row' justifyContent='space-between' alignItems='center'>
           <Stack flexDirection='row' alignItems='center'>
             <Box mr={1}>
-              <UserDisplay avatarSize='small' user={commentUser} hideName={true} />
+              <UserDisplay showMiniProfile avatarSize='small' user={commentUser} hideName={true} />
             </Box>
-            <Typography mr={1}>{commentUser?.username}</Typography>
+            <Typography
+              mr={1}
+              onClick={() => {
+                if (commentUser) {
+                  showMemberProfile(commentUser.id);
+                }
+              }}
+            >
+              {commentUser?.username}
+            </Typography>
             <Typography variant='subtitle1' mr={0.5}>
               {getRelativeTimeInThePast(new Date(comment.createdAt))}
             </Typography>
@@ -157,10 +173,11 @@ export function PostComment({
               <Typography variant='subtitle2'>(Edited)</Typography>
             )}
           </Stack>
-          {comment.createdBy === user?.id && !comment.deletedAt && (
+          {(comment.createdBy === user?.id || permissions?.delete_comments) && !comment.deletedAt && (
             <IconButton
               className='comment-actions'
               size='small'
+              data-test={`post-comment-menu-${comment.id}`}
               onClick={(event) => {
                 menuState.open(event.currentTarget);
               }}
@@ -179,14 +196,7 @@ export function PostComment({
             left: 10
           }}
         />
-        <Box
-          ml={3}
-          sx={{
-            'div.ProseMirror.bangle-editor': {
-              paddingLeft: '10px !important'
-            }
-          }}
-        >
+        <Box data-test={`post-comment-charmeditor-${comment.id}`} ml={3}>
           {isEditingComment ? (
             <Stack>
               <CharmEditor
@@ -205,7 +215,7 @@ export function PostComment({
                 content={commentEditContent.doc}
               />
               <Stack flexDirection='row' my={1} ml={1} gap={1}>
-                <Button size='small' onClick={saveCommentContent}>
+                <Button data-test={`save-comment-${comment.id}`} size='small' onClick={saveCommentContent}>
                   Save
                 </Button>
                 <Button size='small' variant='outlined' color='secondary' onClick={cancelEditingComment}>
@@ -214,8 +224,9 @@ export function PostComment({
               </Stack>
             </Stack>
           ) : comment.deletedAt ? (
-            <Typography color='secondary' my={1}>
-              Comment deleted by user
+            <Typography data-test={`deleted-comment-${comment.id}`} color='secondary' my={1}>
+              Comment deleted{' '}
+              {!comment.deletedBy ? '' : comment.deletedBy === comment.createdBy ? 'by user' : 'by moderator'}
             </Typography>
           ) : (
             <CharmEditor
@@ -233,12 +244,16 @@ export function PostComment({
           )}
           {!comment.deletedAt && (
             <Stack flexDirection='row' gap={1}>
-              <ForumVote votes={comment} onVote={voteComment} />
+              <ForumVote permissions={permissions} votes={comment} onVote={voteComment} />
               <Typography
                 sx={{
                   cursor: 'pointer'
                 }}
-                onClick={() => setShowCommentReply(true)}
+                onClick={() => {
+                  if (permissions?.add_comment) {
+                    setShowCommentReply(true);
+                  }
+                }}
                 color='secondary'
                 fontWeight='semibold'
                 variant='subtitle1'
@@ -261,7 +276,12 @@ export function PostComment({
       </StyledStack>
       <Box ml={3} position='relative'>
         {comment.children.map((childComment) => (
-          <PostComment setPostComments={setPostComments} comment={childComment} key={childComment.id} />
+          <PostComment
+            permissions={permissions}
+            setPostComments={setPostComments}
+            comment={childComment}
+            key={childComment.id}
+          />
         ))}
       </Box>
       <Menu
@@ -270,18 +290,32 @@ export function PostComment({
         transformOrigin={{ vertical: 'top', horizontal: 'right' }}
         onClick={(e) => e.stopPropagation()}
       >
-        <MenuItem onClick={onClickEditComment}>
-          <ListItemIcon>
-            <EditIcon />
-          </ListItemIcon>
-          <ListItemText>Edit comment</ListItemText>
-        </MenuItem>
-        <MenuItem onClick={onClickDeleteComment}>
-          <ListItemIcon>
-            <DeleteOutlinedIcon />
-          </ListItemIcon>
-          <ListItemText>Delete comment</ListItemText>
-        </MenuItem>
+        <Tooltip title={!isCommentAuthor ? "You cannot edit another user's comment" : ''}>
+          <div>
+            <MenuItem disabled={!isCommentAuthor} data-test={`edit-comment-${comment.id}`} onClick={onClickEditComment}>
+              <ListItemIcon>
+                <EditIcon />
+              </ListItemIcon>
+              <ListItemText>Edit comment</ListItemText>
+            </MenuItem>
+          </div>
+        </Tooltip>
+
+        {/**  This tooltip shouldn't ever be needed since only moderators and comment authors should be able see this context menu, but adding for future proofing */}
+        <Tooltip title={!canDeleteComment ? "You don't have the permissions to delete this comment" : ''}>
+          <div>
+            <MenuItem
+              disabled={!canDeleteComment}
+              data-test={`delete-comment-${comment.id}`}
+              onClick={onClickDeleteComment}
+            >
+              <ListItemIcon>
+                <DeleteOutlinedIcon />
+              </ListItemIcon>
+              <ListItemText>Delete comment</ListItemText>
+            </MenuItem>
+          </div>
+        </Tooltip>
       </Menu>
     </Stack>
   );

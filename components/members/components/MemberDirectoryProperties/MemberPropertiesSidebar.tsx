@@ -17,7 +17,7 @@ import { isSelectType } from 'components/common/form/fields/utils';
 import Modal from 'components/common/Modal';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { MemberPropertySidebarDetails } from 'components/members/components/MemberDirectoryProperties/MemberPropertySidebarDetails';
-import isAdmin from 'hooks/useIsAdmin';
+import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useMemberProperties } from 'hooks/useMemberProperties';
 import { MEMBER_PROPERTY_CONFIG } from 'lib/members/constants';
 import type { MemberPropertyWithPermissions } from 'lib/members/interfaces';
@@ -108,7 +108,7 @@ export function MemberPropertySidebarItem({ property }: { property: MemberProper
   const [toggled, setToggled] = useState(false);
   const { updateProperty, deleteProperty, addPropertyPermissions, removePropertyPermission } = useMemberProperties();
   const propertyRenamePopupState = usePopupState({ variant: 'popover', popupId: 'property-rename-modal' });
-  const admin = isAdmin();
+  const admin = useIsAdmin();
 
   const [{ offset }, drag, dragPreview] = useDrag(() => ({
     type: 'item',

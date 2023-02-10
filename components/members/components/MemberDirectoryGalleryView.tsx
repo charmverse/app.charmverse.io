@@ -1,29 +1,26 @@
 import styled from '@emotion/styled';
 import EditIcon from '@mui/icons-material/Edit';
-import { Card, Chip, Grid, IconButton, Stack, Tooltip, Typography } from '@mui/material';
+import { Box, Card, Chip, Grid, IconButton, Stack, Tooltip, Typography } from '@mui/material';
 import type { MemberProperty, MemberPropertyType } from '@prisma/client';
 import type { MouseEvent } from 'react';
-import { useState } from 'react';
 
 import Avatar from 'components/common/Avatar';
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
 import { SelectPreview } from 'components/common/form/fields/Select/SelectPreview';
 import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
-import Link from 'components/common/Link';
 import { SocialIcons } from 'components/profile/components/UserDetails/SocialIcons';
+import { useMemberProfile } from 'components/profile/hooks/useMemberProfile';
 import type { Social } from 'components/profile/interfaces';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useMemberProperties } from 'hooks/useMemberProperties';
-import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
 import type { Member } from 'lib/members/interfaces';
-import { humanFriendlyDate } from 'lib/utilities/dates';
 
 import { MemberPropertyTextMultiline } from './MemberDirectoryProperties/MemberPropertyTextMultiline';
-import { MemberOnboardingForm } from './MemberOnboardingForm';
 import { TimezoneDisplay } from './TimezoneDisplay';
 
-const StyledLink = styled(Link)`
+const StyledBox = styled(Box)`
   ${hoverIconsStyle({ absolutePositioning: true })};
 
   height: 100%;
@@ -36,6 +33,7 @@ const StyledLink = styled(Link)`
 `;
 function MemberDirectoryGalleryCard({ member }: { member: Member }) {
   const { properties = [] } = useMemberProperties();
+  const { formatDate } = useDateFormatter();
   const propertiesRecord = properties.reduce<Record<MemberPropertyType, MemberProperty>>((record, prop) => {
     record[prop.type] = prop;
     return record;
@@ -43,21 +41,20 @@ function MemberDirectoryGalleryCard({ member }: { member: Member }) {
 
   const currentSpace = useCurrentSpace();
   const { user } = useUser();
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const { mutateMembers } = useMembers();
 
   const isNameHidden = !propertiesRecord.name?.enabledViews.includes('gallery');
   const isDiscordHidden = !propertiesRecord.discord?.enabledViews.includes('gallery');
   const isTwitterHidden = !propertiesRecord.twitter?.enabledViews.includes('gallery');
   const isLinkedInHidden = !propertiesRecord.linked_in?.enabledViews.includes('gallery');
   const isGithubHidden = !propertiesRecord.github?.enabledViews.includes('gallery');
+  const { showMemberProfile } = useMemberProfile();
 
   const isUserCard = user?.id === member.id && currentSpace;
 
-  function openUserCard(e: MouseEvent<HTMLAnchorElement>) {
+  function openUserCard(e: MouseEvent<HTMLDivElement>) {
     e.preventDefault();
     e.stopPropagation();
-    setIsModalOpen(true);
+    showMemberProfile(member.id);
   }
 
   const social = (member.profile?.social as Social) ?? {};
@@ -127,11 +124,7 @@ function MemberDirectoryGalleryCard({ member }: { member: Member }) {
                   <Typography fontWeight='bold' variant='subtitle2'>
                     {property.name}
                   </Typography>
-                  <Typography variant='body2'>
-                    {humanFriendlyDate(member.joinDate, {
-                      withYear: true
-                    })}
-                  </Typography>
+                  <Typography variant='body2'>{formatDate(member.joinDate)}</Typography>
                 </Stack>
               );
             }
@@ -215,28 +208,9 @@ function MemberDirectoryGalleryCard({ member }: { member: Member }) {
   );
 
   return (
-    <>
-      <StyledLink
-        href={`/u/${member.path || member.id}${currentSpace ? `?workspace=${currentSpace.id}` : ''}`}
-        onClick={isUserCard ? openUserCard : undefined}
-        color='primary'
-      >
-        {content}
-      </StyledLink>
-
-      {isModalOpen && user && currentSpace && user.id === member.id && (
-        <MemberOnboardingForm
-          userId={member.id}
-          spaceName={currentSpace.name}
-          spaceId={currentSpace.id}
-          onClose={() => {
-            mutateMembers();
-            setIsModalOpen(false);
-          }}
-          title='Edit your profile'
-        />
-      )}
-    </>
+    <StyledBox onClick={openUserCard} color='primary'>
+      {content}
+    </StyledBox>
   );
 }
 

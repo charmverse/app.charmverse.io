@@ -9,21 +9,19 @@ export function MemberOnboardingForm({
   userId,
   spaceId,
   spaceName,
-  onClose,
-  title
+  onClose
 }: {
   onClose: () => void;
   spaceName: string;
   spaceId: string;
   userId: string;
-  title?: string;
 }) {
   const { updateSpaceValues } = useMemberPropertyValues(userId);
   const { setUser, user } = useUser();
 
   return (
     <MemberPropertiesPopup
-      title={title ?? `Welcome to ${spaceName}. Set up your profile`}
+      title={`Welcome to ${spaceName}. Set up your profile`}
       onClose={onClose}
       memberId={userId}
       spaceId={spaceId}

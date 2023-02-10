@@ -10,18 +10,17 @@ import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { updateTrackGroupProfile } from 'lib/metrics/mixpanel/updateTrackGroupProfile';
 import { updateTrackUserProfileById } from 'lib/metrics/mixpanel/updateTrackUserProfileById';
 import { logSpaceCreation } from 'lib/metrics/postToDiscord';
-import { getPagePath } from 'lib/pages';
 import { convertJsonPagesToPrisma } from 'lib/pages/server/convertJsonPagesToPrisma';
 import { createPage } from 'lib/pages/server/createPage';
 import { setupDefaultPaymentMethods } from 'lib/payment-methods/defaultPaymentMethods';
-import { permissionTemplates, updateSpacePermissionConfigurationMode } from 'lib/permissions/meta';
+import { updateSpacePermissionConfigurationMode } from 'lib/permissions/meta';
 import { generateDefaultCategoriesInput } from 'lib/proposal/generateDefaultCategoriesInput';
 import { importWorkspacePages } from 'lib/templates/importWorkspacePages';
 import { gettingStartedPage } from 'seedData/gettingStartedPage';
 
+import type { SpaceCreateTemplate } from './config';
 import { getAvailableDomainName } from './getAvailableDomainName';
 import { getSpaceByDomain } from './getSpaceByDomain';
-import type { SpaceCreateTemplate } from './utils';
 
 export type SpaceCreateInput = Pick<Space, 'name'> &
   Partial<
@@ -99,7 +98,17 @@ export async function createWorkspace({ spaceData, userId, createSpaceOption, ex
   await prisma.$transaction([
     prisma.proposalCategory.createMany({ data: defaultCategories }),
     prisma.memberProperty.createMany({ data: defaultProperties }),
-    prisma.postCategory.createMany({ data: defaultPostCategories })
+    prisma.postCategory.createMany({ data: defaultPostCategories }),
+    prisma.postCategoryPermission.createMany({
+      data: defaultPostCategories.map(
+        (category) =>
+          ({
+            permissionLevel: 'full_access',
+            postCategoryId: category.id,
+            spaceId: space.id
+          } as Prisma.PostCategoryPermissionCreateManyInput)
+      )
+    })
   ]);
 
   // Handle the population of pages data

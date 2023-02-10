@@ -10,6 +10,7 @@ import { NavIconHover } from 'components/common/PageLayout/components/PageNaviga
 import { TreeRoot } from 'components/common/PageLayout/components/PageNavigation/components/TreeRoot';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useLocalStorage } from 'hooks/useLocalStorage';
+import { usePageFromPath } from 'hooks/usePageFromPath';
 import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
@@ -43,6 +44,7 @@ type PageNavigationProps = {
 function PageNavigation({ deletePage, isFavorites, rootPageIds, onClick }: PageNavigationProps) {
   const router = useRouter();
   const { pages, setPages, mutatePage } = usePages();
+  const currentPage = usePageFromPath();
   const space = useCurrentSpace();
   const { user } = useUser();
   const [expanded, setExpanded] = useLocalStorage<string[]>(`${space?.id}.expanded-pages`, []);
@@ -63,7 +65,6 @@ function PageNavigation({ deletePage, isFavorites, rootPageIds, onClick }: PageN
     })
   );
 
-  const currentPage = pagesArray.find((page) => page.path === router.query.pageId);
   const currentPageId = currentPage?.id ?? '';
 
   const pageHash = JSON.stringify(pagesArray);
@@ -169,14 +170,13 @@ function PageNavigation({ deletePage, isFavorites, rootPageIds, onClick }: PageN
   );
 
   useEffect(() => {
-    const _currentPage = pages[currentPageId];
     // expand the parent of the active page
-    if (_currentPage?.parentId && !isFavorites) {
-      if (!expanded?.includes(_currentPage.parentId) && _currentPage.type !== 'card') {
-        setExpanded(expanded?.concat(_currentPage.parentId) ?? []);
+    if (currentPage?.parentId && !isFavorites) {
+      if (!expanded?.includes(currentPage.parentId) && currentPage.type !== 'card') {
+        setExpanded(expanded?.concat(currentPage.parentId) ?? []);
       }
     }
-  }, [currentPageId, pages, isFavorites]);
+  }, [currentPage, pages, isFavorites]);
 
   function onNodeToggle(event: SyntheticEvent, nodeIds: string[]) {
     setExpanded(nodeIds);
@@ -204,7 +204,6 @@ function PageNavigation({ deletePage, isFavorites, rootPageIds, onClick }: PageN
 
   return (
     <TreeRoot
-      mutatePage={mutatePage}
       expanded={expanded ?? []}
       // @ts-ignore - we use null instead of undefined to control the element
       selected={selectedNodeId}
