@@ -9,6 +9,29 @@ import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 describe('POST /api/forums/posts/[postId]/convert-to-proposal - Convert post to proposal', () => {
+  it('should succeed if the user has permission, and respond 200', async () => {
+    const { space, user: nonAdminUser1 } = await generateUserAndSpaceWithApiToken(undefined, false);
+
+    const nonAdminCookie = await loginUser(nonAdminUser1.id);
+
+    await addSpaceOperations({
+      forSpaceId: space.id,
+      operations: ['createVote'],
+      spaceId: space.id
+    });
+
+    const posts = await generateForumPosts({
+      spaceId: space.id,
+      createdBy: nonAdminUser1.id,
+      count: 5
+    });
+
+    await request(baseUrl)
+      .post(`/api/forums/posts/${posts[0].id}/convert-to-proposal`)
+      .set('Cookie', nonAdminCookie)
+      .expect(200);
+  });
+
   it('should fail if the post does not exist, and respond 404', async () => {
     const { user: nonAdminUser } = await generateUserAndSpaceWithApiToken(undefined, false);
 
@@ -63,28 +86,5 @@ describe('POST /api/forums/posts/[postId]/convert-to-proposal - Convert post to 
       .post(`/api/forums/posts/${posts[0].id}/convert-to-proposal`)
       .set('Cookie', nonAdminCookie)
       .expect(401);
-  });
-
-  it('should succeed if the user has permission, and respond 200', async () => {
-    const { space, user: nonAdminUser1 } = await generateUserAndSpaceWithApiToken(undefined, false);
-
-    const nonAdminCookie = await loginUser(nonAdminUser1.id);
-
-    await addSpaceOperations({
-      forSpaceId: space.id,
-      operations: ['createVote'],
-      spaceId: space.id
-    });
-
-    const posts = await generateForumPosts({
-      spaceId: space.id,
-      createdBy: nonAdminUser1.id,
-      count: 5
-    });
-
-    await request(baseUrl)
-      .post(`/api/forums/posts/${posts[0].id}/convert-to-proposal`)
-      .set('Cookie', nonAdminCookie)
-      .expect(200);
   });
 });

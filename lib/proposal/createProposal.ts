@@ -44,9 +44,6 @@ export async function createProposal(pageProps: ProposalPageInput, proposalProps
           type: 'proposal',
           updatedAt: new Date(),
           updatedBy: createdBy
-        },
-        include: {
-          permissions: true
         }
       });
     } else {
@@ -60,9 +57,6 @@ export async function createProposal(pageProps: ProposalPageInput, proposalProps
           ...pageProps,
           id: proposalId,
           type: 'proposal'
-        },
-        include: {
-          permissions: true
         }
       });
     }

@@ -2,17 +2,14 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { prisma } from 'db';
+import { convertPostToProposal } from 'lib/forums/posts/convertPostToProposal';
 import { updateTrackPageProfile } from 'lib/metrics/mixpanel/updateTrackPageProfile';
 import { ActionNotPermittedError, NotFoundError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import type { PageMeta } from 'lib/pages';
-import { computePostPermissions } from 'lib/permissions/forum/computePostPermissions';
 import { computeSpacePermissions } from 'lib/permissions/spaces';
-import { createProposal } from 'lib/proposal/createProposal';
 import { withSessionRoute } from 'lib/session/withSession';
 import { UnauthorisedActionError } from 'lib/utilities/errors';
 import { relay } from 'lib/websockets/relay';
-
-import { convertPostToProposal } from '../../../../../lib/forums/posts/convertPostToProposal';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
