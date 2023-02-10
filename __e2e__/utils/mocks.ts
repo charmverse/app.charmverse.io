@@ -255,12 +255,14 @@ type UserAndSpaceInput = {
   onboarded?: boolean;
   spaceName?: string;
   publicBountyBoard?: boolean;
+  skipOnboarding?: boolean;
 };
 
 export async function generateUserAndSpace({
   isAdmin,
   spaceName = 'Example Space',
-  publicBountyBoard
+  publicBountyBoard,
+  skipOnboarding = true
 }: UserAndSpaceInput = {}) {
   const wallet = Wallet.createRandom();
   const address = wallet.address;
@@ -295,7 +297,7 @@ export async function generateUserAndSpace({
             userId: user.id,
             isAdmin,
             // skip onboarding for normal test users
-            onboarded: true
+            onboarded: skipOnboarding
           }
         }
       }
