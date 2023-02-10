@@ -130,8 +130,7 @@ export function getFormattedDateTime(
   try {
     return date.toLocaleString(formatLocale, options);
   } catch (e: any) {
-    return date.toLocaleString();
-    // log error
+    return date.toLocaleString('default', options);
   }
 }
 

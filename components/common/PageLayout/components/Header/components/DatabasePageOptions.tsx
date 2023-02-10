@@ -64,7 +64,7 @@ export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: 
   const { members } = useMembers();
   const { user } = useUser();
   const currentSpace = useCurrentSpace();
-  const { formatDate } = useDateFormatter();
+  const { formatDateTime } = useDateFormatter();
 
   const activeBoardId = view?.fields.sourceData?.boardId ?? view?.fields.linkedSourceId ?? view?.rootId;
   const board = boards.find((b) => b.id === activeBoardId);
@@ -320,8 +320,12 @@ export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: 
               my: 1
             }}
           >
-            <Typography variant='subtitle2'>Last edited by {lastUpdatedBy.username}</Typography>
-            <Typography variant='subtitle2'>Last edited at {formatDate(new Date(board.updatedAt))}</Typography>
+            <Typography variant='subtitle2'>
+              Last edited by <strong>{lastUpdatedBy.username}</strong>
+            </Typography>
+            <Typography variant='subtitle2'>
+              at <strong>{formatDateTime(new Date(board.updatedAt))}</strong>
+            </Typography>
           </Stack>
         </>
       )}

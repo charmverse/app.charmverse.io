@@ -119,10 +119,10 @@ export function PageActionsMenu({
           }}
         >
           <Typography variant='caption' color='secondary'>
-            Last edited by {charmversePage.username}
+            Last edited by <strong>{charmversePage.username}</strong>
           </Typography>
           <Typography variant='caption' color='secondary'>
-            Last edited at {formatDateTime(page.updatedAt)}
+            at <strong>{formatDateTime(page.updatedAt)}</strong>
           </Typography>
         </Stack>
       )}

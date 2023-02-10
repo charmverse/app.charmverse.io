@@ -161,8 +161,12 @@ export function Metadata({ creator, lastUpdatedAt }: { creator: string; lastUpda
         my: 1
       }}
     >
-      <Typography variant='subtitle2'>Last edited by {creator}</Typography>
-      <Typography variant='subtitle2'>Last edited at {formatDateTime(lastUpdatedAt)}</Typography>
+      <Typography variant='subtitle2'>
+        Last edited by <strong>{creator}</strong>
+      </Typography>
+      <Typography variant='subtitle2'>
+        at <strong>{formatDateTime(lastUpdatedAt)}</strong>
+      </Typography>
     </Stack>
   );
 }
