@@ -3,7 +3,6 @@ import { v4 } from 'uuid';
 
 import { convertPostToProposal } from 'lib/forums/posts/convertPostToProposal';
 import { addSpaceOperations } from 'lib/permissions/spaces';
-import { createProposal } from 'lib/proposal/createProposal';
 import { generateForumPosts } from 'testing/forums';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
@@ -54,15 +53,11 @@ describe('POST /api/forums/posts/[postId]/convert-to-proposal - Convert post to 
       count: 5
     });
 
-    const { page: proposalPage } = await createProposal({
-      createdBy: nonAdminUser1.id,
-      spaceId: space.id,
-      title: 'page-title'
-    });
-
     await convertPostToProposal({
       postId: posts[0].id,
-      proposalId: proposalPage.id
+      spaceId: space.id,
+      title: posts[0].title,
+      userId: nonAdminUser1.id
     });
 
     await request(baseUrl)
