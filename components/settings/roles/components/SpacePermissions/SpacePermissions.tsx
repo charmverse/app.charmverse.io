@@ -87,6 +87,12 @@ export default function SpacePermissions({ targetGroup, id, callback = () => nul
       return newValue !== hasAccess;
     });
 
+  // We don't want to show the forum category moderate permission in context of the entire space
+  const assignableOperations =
+    targetGroup === 'space'
+      ? spaceOperationsWithoutForumCategory.filter((op) => op !== 'moderateForums')
+      : spaceOperationsWithoutForumCategory;
+
   async function submitted(formValues: FormValues) {
     // Make sure we have existing permission set to compare against
     if (assignedPermissions && space) {
@@ -160,7 +166,7 @@ export default function SpacePermissions({ targetGroup, id, callback = () => nul
             </Typography>
           </Grid>
 
-          {spaceOperationsWithoutForumCategory.map((operation) => {
+          {assignableOperations.map((operation) => {
             const userCanPerformAction = assignedPermissions[operation];
             const actionLabel = spaceOperationLabels[operation];
 
