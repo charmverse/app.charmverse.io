@@ -1,5 +1,6 @@
 import styled from '@emotion/styled';
 import CommentIcon from '@mui/icons-material/Comment';
+import EastIcon from '@mui/icons-material/East';
 import { Box, Divider, Stack, Typography } from '@mui/material';
 import type { PostCategory } from '@prisma/client';
 import { useRouter } from 'next/router';
@@ -56,8 +57,8 @@ const StyledPostProposalBanner = styled(Box)<{ card?: boolean }>`
   z-index: var(--z-index-appBar);
   display: flex;
   justify-content: center;
-  color: ${({ theme }) => theme.palette.templateBanner.text};
-  background-color: ${({ theme }) => theme.palette.templateBanner.background};
+  color: ${({ theme }) => theme.palette.text.primary};
+  background-color: var(--bg-blue);
   padding: ${({ theme }) => theme.spacing(1.4)};
 `;
 
@@ -114,7 +115,7 @@ export function PostPage({
   const { user } = useUser();
   const { categories, getForumCategoryById } = useForumCategories();
 
-  // We should only set writeable categories for new postd
+  // We should only set writeable categories for new post
   const [categoryId, setCategoryId] = useState(
     (() => {
       if (post?.categoryId) {
@@ -237,7 +238,18 @@ export function PostPage({
           <StyledPostProposalBanner>
             <Typography>
               This post has been converted to a proposal and is read-only now. You can continue the conversation{' '}
-              <Link href={`/${router.query.domain}/${post.proposalId}`}>here</Link>
+              <Stack gap={0.5} flexDirection='row' alignItems='center' display='inline-flex'>
+                <Link
+                  color='inherit'
+                  href={`/${router.query.domain}/${post.proposalId}`}
+                  sx={{
+                    fontWeight: 600
+                  }}
+                >
+                  here
+                </Link>
+                <EastIcon sx={{ position: 'relative', top: 1.5, fontSize: 16 }} />
+              </Stack>
             </Typography>
           </StyledPostProposalBanner>
         )}
