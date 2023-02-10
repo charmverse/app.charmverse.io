@@ -51,21 +51,20 @@ async function addCommentController(req: NextApiRequest, res: NextApiResponse) {
   });
 
   // Publish webhook event if needed
-  await publishWebhookEvent(thread.spaceId, {
-    scope: WebhookEventNames.CommentCreated,
-    comment: {
-      createdAt: createdComment.createdAt.toISOString(),
-      id: createdComment.id,
-      threadId: createdComment.threadId,
-      parentId: null,
-      author: {
-        wallet: '',
-        avatar: createdComment.user.avatar,
-        username: createdComment.user.username
-      }
-    },
-    discussion: null
-  });
+  await publishWebhookEvent(
+    { scope: WebhookEventNames.CommentCreated, spaceId: thread.spaceId, userId },
+    ({ space, user }) => ({
+      comment: {
+        createdAt: createdComment.createdAt.toISOString(),
+        id: createdComment.id,
+        threadId: createdComment.threadId,
+        parentId: null,
+        author: user
+      },
+      discussion: null,
+      space
+    })
+  );
 
   trackUserAction('page_comment_created', {
     pageId: thread.pageId,

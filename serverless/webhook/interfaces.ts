@@ -7,6 +7,13 @@ export type UserEntity = {
   username: string;
 };
 
+export type SpaceEntity = {
+  avatar: string | null;
+  id: string;
+  name: string;
+  url: string;
+};
+
 export type CommentEntity = {
   createdAt: string;
   id: string;
@@ -61,6 +68,7 @@ export enum WebhookEventNames {
 // Utils to share common props among events
 type WebhookEventSharedProps<T = WebhookEventNames> = {
   scope: T;
+  space: SpaceEntity;
 };
 
 // Strongly typed events, shared between API, serverless functions and possibly our end users

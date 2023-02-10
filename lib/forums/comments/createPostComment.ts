@@ -38,15 +38,6 @@ export async function createPostComment({
           id: postId
         }
       }
-    },
-    include: {
-      user: {
-        select: {
-          id: true,
-          avatar: true,
-          username: true
-        }
-      }
     }
   });
 
@@ -65,21 +56,21 @@ export async function createPostComment({
 
   if (post) {
     // Publish webhook event if needed
-    await publishWebhookEvent(post.spaceId, {
-      scope: WebhookEventNames.CommentCreated,
-      comment: {
-        createdAt: comment.createdAt.toISOString(),
-        id: comment.id,
-        threadId: postId,
-        parentId: parentId ?? null,
-        author: {
-          wallet: '',
-          avatar: comment.user.avatar,
-          username: comment.user.username
-        }
-      },
-      discussion: null
-    });
+    await publishWebhookEvent(
+      { scope: WebhookEventNames.CommentCreated, spaceId: post.spaceId, userId },
+      ({ user, space }) => ({
+        comment: {
+          createdAt: comment.createdAt.toISOString(),
+          id: comment.id,
+          threadId: postId,
+          parentId: parentId ?? null,
+          space,
+          author: user
+        },
+        discussion: null,
+        space
+      })
+    );
   }
 
   return comment;
