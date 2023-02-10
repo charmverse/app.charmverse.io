@@ -113,6 +113,7 @@ function MemberProfile({ member, onClose }: { member: Member; onClose: VoidFunct
             <Stack display='flex' flexDirection='row' width='100%' alignItems='center' justifyContent='space-between'>
               <Typography variant='h6'>{username}'s profile</Typography>
               <Button
+                onClick={onClose}
                 href={`/u/${user.path}`}
                 color='secondary'
                 variant='outlined'

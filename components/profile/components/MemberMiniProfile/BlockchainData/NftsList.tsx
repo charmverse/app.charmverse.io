@@ -38,6 +38,10 @@ export function NftsList({ memberId, readOnly = false }: Props) {
     setIsShowingNftGallery(false);
   }
 
+  if (currentUser?.id !== memberId && pinnedNfts.length === 0) {
+    return null;
+  }
+
   return (
     <Stack gap={1}>
       <Typography variant='h6'>NFTs</Typography>
@@ -80,8 +84,6 @@ export function NftsList({ memberId, readOnly = false }: Props) {
                   />
                 </div>
               </Tooltip>
-            ) : pinnedNfts.length === 0 ? (
-              <Typography color='secondary'>No pinned NFTs</Typography>
             ) : null}
             {showingNftGallery && (
               <NftAvatarGalleryPopup
