@@ -6,11 +6,17 @@ import type { NextHandler } from 'next-connect';
 
 import { prisma } from 'db';
 import log from 'lib/log';
-import { ApiError } from 'lib/middleware/errors';
+import { ApiError, InvalidApiKeyError } from 'lib/middleware/errors';
 
 declare module 'http' {
+  /**
+   * @authorizedSpaceid - Space ID that the API key is making a request for and authorized to use
+   * @spaceIdRange - Range of spaceIDs that a super API key can use
+   */
   interface IncomingMessage {
     authorizedSpaceId: string;
+    // When using
+    spaceIdRange?: string[];
     botUser: User;
   }
 }
@@ -81,34 +87,52 @@ export async function getBotUser(spaceId: string): Promise<User> {
  * @returns Space linked to API key in the request
  * Throws if the API key or space do not exist
  */
-export async function getSpaceFromApiKey(req: NextApiRequest): Promise<Space> {
+export async function setRequestSpaceFromApiKey(req: NextApiRequest): Promise<Space> {
   const apiKey = req.headers?.authorization?.split('Bearer').join('').trim() ?? (req.query.api_key as string);
 
   // Protect against api keys or nullish API Keys
   if (!apiKey || apiKey.length < 1) {
-    throw new ApiError({
-      message: 'API Key not found',
-      errorType: 'Access denied'
-    });
+    throw new InvalidApiKeyError();
   }
 
-  const spaceToken = await prisma.spaceApiToken.findFirst({
-    where: {
-      token: apiKey
-    },
-    include: {
-      space: true
+  if (req.query?.spaceId && typeof req.query?.spaceId === 'string') {
+    const superApiKey = await prisma.superApiToken.findFirst({
+      where: {
+        token: apiKey,
+        spaces: {
+          some: {
+            id: req.query.spaceId as string
+          }
+        }
+      },
+      include: {
+        spaces: true
+      }
+    });
+
+    if (!superApiKey) {
+      throw new InvalidApiKeyError();
     }
-  });
 
-  if (!spaceToken) {
-    throw new ApiError({
-      message: 'Invalid API key',
-      errorType: 'Access denied'
+    req.authorizedSpaceId = req.query?.spaceId as string;
+    req.spaceIdRange = superApiKey.spaces.map((space) => space.id);
+    return superApiKey.spaces.find((s) => s.id === (req.query.spaceId as string)) as Space;
+  } else {
+    const spaceToken = await prisma.spaceApiToken.findFirst({
+      where: {
+        token: apiKey
+      },
+      include: {
+        space: true
+      }
     });
-  }
 
-  return spaceToken.space;
+    if (!spaceToken) {
+      throw new InvalidApiKeyError();
+    }
+    req.authorizedSpaceId = spaceToken.spaceId;
+    return spaceToken.space;
+  }
 }
 
 /**
@@ -118,37 +142,32 @@ export async function getSpaceFromApiKey(req: NextApiRequest): Promise<Space> {
  */
 export async function requireApiKey(req: NextApiRequest, res: NextApiResponse, next: NextHandler) {
   try {
-    const space = await getSpaceFromApiKey(req);
+    await setRequestSpaceFromApiKey(req);
 
-    const querySpaceId = req.query.spaceId;
+    const querySpaceId = req.query?.spaceId;
 
-    if (querySpaceId && querySpaceId !== space.id) {
+    if (querySpaceId && querySpaceId !== req.authorizedSpaceId) {
       throw new ApiError({
         message: 'API Token does not have access to this space',
         errorType: 'Access denied'
       });
     }
 
-    const bodySpaceId = req.body.spaceId;
+    const bodySpaceId = req.body?.spaceId;
 
-    if (bodySpaceId && bodySpaceId !== space.id) {
+    if (bodySpaceId && bodySpaceId !== req.authorizedSpaceId) {
       throw new ApiError({
         message: 'API Token does not have access to this space',
         errorType: 'Access denied'
       });
     }
 
-    req.authorizedSpaceId = space.id;
-
-    const botUser = await getBotUser(space.id);
+    const botUser = await getBotUser(req.authorizedSpaceId);
 
     req.botUser = botUser;
   } catch (error) {
     log.warn('Found error', error);
-    throw new ApiError({
-      message: 'Please provide a valid API token',
-      errorType: 'Access denied'
-    });
+    throw new InvalidApiKeyError();
   }
 
   next();

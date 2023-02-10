@@ -10,7 +10,7 @@ import {
 
 describe('GET /api/v1/bounties', () => {
   // This test needs to be fixed.
-  it.skip('should return a list of bounties in the workspace along with who has been paid for this bounty', async () => {
+  it('should return a list of bounties in the workspace along with who has been paid for this bounty', async () => {
     const { user, space, apiToken } = await generateUserAndSpaceWithApiToken(undefined, false);
 
     const secondUser = await generateSpaceUser({ spaceId: space.id, isAdmin: false });
@@ -46,7 +46,7 @@ describe('GET /api/v1/bounties', () => {
     expect(bountyWithPaidFromApi).toEqual<PublicApiBounty>(
       expect.objectContaining<PublicApiBounty>({
         createdAt: bountyWithPaidApplication.createdAt.toISOString(),
-        description: (bountyWithPaidApplication as unknown as PublicApiBounty).description,
+        description: bountyWithPaidApplication.page.contentText,
         id: bountyWithPaidApplication.id,
         issuer: {
           address: user.wallets[0].address
@@ -61,7 +61,7 @@ describe('GET /api/v1/bounties', () => {
           chain: bountyWithPaidApplication.chainId,
           token: bountyWithPaidApplication.rewardToken
         },
-        title: (bountyWithPaidApplication as unknown as PublicApiBounty).title,
+        title: bountyWithPaidApplication.page.title,
         status: bountyWithPaidApplication.status,
         url: `${baseUrl}/${space.domain}/bounties/${bountyWithPaidApplication.id}`
       })
@@ -72,7 +72,7 @@ describe('GET /api/v1/bounties', () => {
     expect(bountyWithInProgressFromApi).toEqual<PublicApiBounty>(
       expect.objectContaining<PublicApiBounty>({
         createdAt: bountyWithInProgressWork.createdAt.toISOString(),
-        description: (bountyWithInProgressWork as unknown as PublicApiBounty).description,
+        description: bountyWithInProgressWork.page.contentText,
         id: bountyWithInProgressWork.id,
         issuer: {
           address: secondUser.wallets[0].address
@@ -84,7 +84,7 @@ describe('GET /api/v1/bounties', () => {
           chain: bountyWithInProgressWork.chainId,
           token: bountyWithInProgressWork.rewardToken
         },
-        title: (bountyWithInProgressWork as unknown as PublicApiBounty).title,
+        title: bountyWithInProgressWork.page.title,
         status: bountyWithInProgressWork.status,
         url: `${baseUrl}/${space.domain}/bounties/${bountyWithInProgressWork.id}`
       })
