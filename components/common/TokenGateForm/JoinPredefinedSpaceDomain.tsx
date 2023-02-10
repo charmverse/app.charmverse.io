@@ -1,5 +1,4 @@
-import { Alert, Card, Typography } from '@mui/material';
-import { Box } from '@mui/system';
+import { Alert, Card, Typography, Box } from '@mui/material';
 import type { Space } from '@prisma/client';
 import { useRouter } from 'next/router';
 import useSWR from 'swr';

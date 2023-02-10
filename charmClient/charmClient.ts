@@ -57,6 +57,7 @@ import type { ImportGuildRolesPayload } from 'pages/api/guild-xyz/importRoles';
 import type { InviteLinkPopulated } from 'pages/api/invites/index';
 import type { PublicUser } from 'pages/api/public/profile/[userId]';
 import type { ListSpaceRolesResponse } from 'pages/api/roles';
+import type { SetSpaceWebhookBody, SetSpaceWebhookResponse } from 'pages/api/spaces/[id]/set-webhook';
 import type { Response as CheckDomainResponse } from 'pages/api/spaces/checkDomain';
 import type { TelegramAccount } from 'pages/api/telegram/connect';
 
@@ -69,6 +70,7 @@ import { ForumApi } from './apis/forumApi';
 import { GoogleApi } from './apis/googleApi';
 import { IframelyApi } from './apis/iframelyApi';
 import { MembersApi } from './apis/membersApi';
+import { PermissionsApi } from './apis/permissionsApi';
 import { ProfileApi } from './apis/profileApi';
 import { ProposalsApi } from './apis/proposalsApi';
 import { TasksApi } from './apis/tasksApi';
@@ -112,6 +114,8 @@ class CharmClient {
   tasks = new TasksApi();
 
   track = new TrackApi();
+
+  permissions = new PermissionsApi();
 
   unstoppableDomains = new UnstoppableDomainsApi();
 
@@ -160,8 +164,8 @@ class CharmClient {
     return http.GET<UserDetails>('/api/profile/details');
   }
 
-  getUserPoaps() {
-    return http.GET<ExtendedPoap[]>('/api/profile/poaps');
+  getUserPoaps(userId: string) {
+    return http.GET<ExtendedPoap[]>(`/api/profile/poaps/${userId}`);
   }
 
   updateUserDetails(data: Partial<UserDetails>) {
@@ -185,12 +189,20 @@ class CharmClient {
     return http.PUT<Space>(`/api/spaces/${spaceOpts.id}`, spaceOpts);
   }
 
+  updateSpaceWebhook(spaceId: string, webhookOpts: SetSpaceWebhookBody) {
+    return http.PUT<SetSpaceWebhookResponse>(`/api/spaces/${spaceId}/set-webhook`, webhookOpts);
+  }
+
   leaveSpace(spaceId: string) {
     return http.POST(`/api/spaces/${spaceId}/leave`);
   }
 
   getSpaces() {
     return http.GET<Space[]>('/api/spaces');
+  }
+
+  getSpaceWebhook(spaceId: string) {
+    return http.GET<SetSpaceWebhookResponse>(`/api/spaces/${spaceId}/webhook`);
   }
 
   checkDomain(params: { spaceId?: string; domain: string }) {

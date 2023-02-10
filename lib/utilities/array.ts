@@ -1,5 +1,3 @@
-import { typedKeys } from './objects';
-
 /**
  * Sort an array of objects by a property. Include an optional valuesOrder for looking up the order of a certain value
  */

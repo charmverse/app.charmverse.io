@@ -1,4 +1,8 @@
-import { generateUserAndSpaceWithApiToken } from '../setupDatabase';
+import { prisma } from 'db';
+import { InvalidInputError } from 'lib/utilities/errors';
+import { uid } from 'lib/utilities/strings';
+
+import { generateRole, generateUserAndSpaceWithApiToken } from '../setupDatabase';
 
 describe('generateUserAndSpaceWithApiToken', () => {
   // Random key format - Ensures no conflicts if this is run against an existing database
@@ -44,5 +48,115 @@ describe('generateUserAndSpaceWithApiToken', () => {
     expect(generated.space.id).not.toEqual(generated2.space.id);
 
     expect(generated.user.wallets[0].address).not.toEqual(generated2.user.wallets[0].address);
+  });
+});
+describe('generateRole', () => {
+  it('should generate a role and optionally assign some users to it', async () => {
+    const users = await Promise.all([
+      prisma.user.create({
+        data: {
+          username: 'test'
+        }
+      }),
+      prisma.user.create({
+        data: {
+          username: 'test'
+        }
+      })
+    ]);
+
+    const space = await prisma.space.create({
+      data: {
+        domain: `test-${uid()}`,
+        name: 'test name',
+        updatedBy: users[0].id,
+        author: {
+          connect: {
+            id: users[0].id
+          }
+        },
+        spaceRoles: {
+          createMany: {
+            data: [
+              {
+                userId: users[0].id
+              },
+              {
+                userId: users[1].id
+              }
+            ]
+          }
+        }
+      }
+    });
+
+    const role = await generateRole({
+      createdBy: users[0].id,
+      spaceId: space.id,
+      assigneeUserIds: users.map((u) => u.id)
+    });
+
+    const withAssignees = await prisma.role.findUnique({
+      where: {
+        id: role.id
+      },
+      include: {
+        spaceRolesToRole: {
+          include: {
+            spaceRole: true
+          }
+        }
+      }
+    });
+
+    // Make sure assignment worked
+    expect(withAssignees?.spaceRolesToRole.length).toEqual(2);
+    expect(withAssignees?.spaceRolesToRole.some((sr) => sr.spaceRole.userId === users[0].id)).toEqual(true);
+    expect(withAssignees?.spaceRolesToRole.some((sr) => sr.spaceRole.userId === users[1].id)).toEqual(true);
+  });
+
+  it('should throw an error if trying to assign a user not belonging to this spaces', async () => {
+    const [spaceUser, outsideUser] = await Promise.all([
+      prisma.user.create({
+        data: {
+          username: 'test'
+        }
+      }),
+      prisma.user.create({
+        data: {
+          username: 'test'
+        }
+      })
+    ]);
+
+    const space = await prisma.space.create({
+      data: {
+        domain: `test-${uid()}`,
+        name: 'test name',
+        updatedBy: spaceUser.id,
+        author: {
+          connect: {
+            id: spaceUser.id
+          }
+        },
+        spaceRoles: {
+          createMany: {
+            data: [
+              {
+                userId: spaceUser.id
+              }
+            ]
+          }
+        }
+      }
+    });
+
+    await expect(
+      generateRole({
+        createdBy: spaceUser.id,
+        spaceId: space.id,
+        assigneeUserIds: [outsideUser.id]
+      })
+    ).rejects.toBeInstanceOf(InvalidInputError);
   });
 });

@@ -61,14 +61,17 @@ export async function getPages({
 /**
  * @browserPage - the page object for the browser context that will execute the requests
  *
+ * @isOnboarded Default to true so all user / space pairs start as onboarded, and the tester can focus on the happy path they are targeting
+ *
  * Returns a user and space along with this space's pages
  */
 export async function createUserAndSpace({
   browserPage,
-  permissionConfigurationMode = 'collaborative'
+  permissionConfigurationMode = 'collaborative',
+  isOnboarded = true
 }: {
   browserPage: BrowserPage;
-} & Partial<Pick<Space, 'permissionConfigurationMode'>>): Promise<{
+} & Partial<Pick<Space, 'permissionConfigurationMode'>> & { isOnboarded?: boolean }): Promise<{
   user: LoggedInUser;
   address: string;
   privateKey: string;
@@ -81,6 +84,37 @@ export async function createUserAndSpace({
   const user = await createUser({ browserPage, address });
   const space = await createSpace({ browserPage, createdBy: user.id, permissionConfigurationMode });
   const pages = await getPages({ browserPage, spaceId: space.id });
+
+  const updatedRole = await prisma.spaceRole.update({
+    where: {
+      spaceUser: {
+        spaceId: space.id,
+        userId: user.id
+      }
+    },
+    data: {
+      onboarded: isOnboarded
+    },
+    include: {
+      spaceRoleToRole: {
+        include: {
+          role: true
+        }
+      }
+    }
+  });
+
+  if (!user.spaceRoles.some((sr) => sr.id === updatedRole.id)) {
+    user.spaceRoles.push(updatedRole);
+  } else {
+    user.spaceRoles = user.spaceRoles.map((r) => {
+      if (r.id !== updatedRole.id) {
+        return r;
+      } else {
+        return updatedRole;
+      }
+    });
+  }
 
   return {
     space,
@@ -232,12 +266,24 @@ export async function generateDiscordUser() {
   return user;
 }
 
-export async function generateSpaceRole({ spaceId, userId }: { userId: string; spaceId: string }) {
+export async function generateSpaceRole({
+  spaceId,
+  userId,
+  isAdmin = false,
+  // Defaults to true so that users dont see the onboarding experience
+  isOnboarded = true
+}: {
+  userId: string;
+  spaceId: string;
+  isAdmin?: boolean;
+  isOnboarded?: boolean;
+}) {
   return prisma.spaceRole.create({
     data: {
-      isAdmin: false,
-      spaceId,
-      userId
+      isAdmin,
+      space: { connect: { id: spaceId } },
+      user: { connect: { id: userId } },
+      onboarded: isOnboarded
     }
   });
 }
@@ -247,12 +293,14 @@ type UserAndSpaceInput = {
   onboarded?: boolean;
   spaceName?: string;
   publicBountyBoard?: boolean;
+  skipOnboarding?: boolean;
 };
 
 export async function generateUserAndSpace({
   isAdmin,
   spaceName = 'Example Space',
-  publicBountyBoard
+  publicBountyBoard,
+  skipOnboarding = true
 }: UserAndSpaceInput = {}) {
   const wallet = Wallet.createRandom();
   const address = wallet.address;
@@ -287,7 +335,7 @@ export async function generateUserAndSpace({
             userId: user.id,
             isAdmin,
             // skip onboarding for normal test users
-            onboarded: true
+            onboarded: skipOnboarding
           }
         }
       }

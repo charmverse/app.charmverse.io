@@ -6,11 +6,19 @@ const webpack = require('webpack');
 
 const esmModules = require('./next.base').esmModules;
 
+// we can save time and skip code checks, which are handle in a special step by the CI
+const skipCodeChecks = process.env.CI === 'true';
+
 const config = {
   poweredByHeader: false,
   eslint: {
-    // add background to the default list of pages for eslint
-    dirs: ['pages', 'components', 'lib', 'background']
+    // add background and serverless to the default list of pages for eslint
+    dirs: ['pages', 'components', 'lib', 'background', 'serverless'],
+    ignoreDuringBuilds: skipCodeChecks
+  },
+  // types are tested separately from the build
+  typescript: {
+    ignoreBuildErrors: skipCodeChecks
   },
   compiler: {
     styledComponents: true
@@ -33,13 +41,28 @@ const config = {
   async redirects() {
     return [
       {
-        source: '/:domain(^(?!.*\bapi\b).*$)/settings',
-        destination: '/:domain/settings/space',
-        permanent: false
+        source: '/:domain(^(?!.*\bapi\b).*$)/settings/:path*',
+        destination: '/:domain',
+        permanent: true
       },
       {
-        source: '/:domain(^(?!.*\bapi\b).*$)/settings/workspace',
-        destination: '/:domain/settings/space',
+        source: '/:domain(^(?!.*\bapi\b).*$)/settings',
+        destination: '/:domain',
+        permanent: true
+      },
+      {
+        source: '/:domain(^(?!.*\bapi\b).*$)/nexus',
+        destination: '/:domain',
+        permanent: true
+      },
+      {
+        source: '/:domain(^(?!.*\bapi\b).*$)/profile',
+        destination: '/:domain',
+        permanent: true
+      },
+      {
+        source: '/:domain(^(?!.*\bapi\b).*$)/integrations',
+        destination: '/:domain',
         permanent: true
       },
       {

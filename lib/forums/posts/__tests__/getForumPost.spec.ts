@@ -2,7 +2,6 @@ import type { Post, Prisma, Space, User } from '@prisma/client';
 import { v4 } from 'uuid';
 
 import { prisma } from 'db';
-import { InvalidInputError } from 'lib/utilities/errors';
 import { generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { generateForumPost } from 'testing/utils/forums';
 
@@ -38,6 +37,27 @@ describe('getForumPost', () => {
         locked: false,
         pinned: false,
         title: testTitle
+      })
+    );
+  });
+
+  it('should support looking up the post by post path + spacedomain', async () => {
+    const postTitle = `Test Title-${v4()}`;
+
+    const createdPost = await generateForumPost({
+      userId: user.id,
+      spaceId: space.id,
+      title: postTitle
+    });
+    const retrievedPost = await getForumPost({ postId: createdPost.path, spaceDomain: space.domain });
+
+    expect(retrievedPost).toMatchObject(
+      expect.objectContaining<Partial<Post>>({
+        id: expect.any(String),
+        content: expect.any(Object),
+        locked: false,
+        pinned: false,
+        title: postTitle
       })
     );
   });
@@ -91,28 +111,6 @@ describe('getForumPost', () => {
           upvotes: totalUpvotes,
           upvoted: voteInputs[0].upvoted
         }
-      })
-    );
-  });
-
-  it('should allow looking up a post via path', async () => {
-    const postPath = `post-path-${v4()}`;
-
-    const createdPost = await generateForumPost({
-      userId: user.id,
-      spaceId: space.id,
-      path: postPath
-    });
-
-    const retrievedPost = await getForumPost({ postId: postPath });
-
-    expect(retrievedPost).toMatchObject(
-      expect.objectContaining<Partial<PostWithVotes>>({
-        id: expect.any(String),
-        content: expect.any(Object),
-        locked: false,
-        pinned: false,
-        title: createdPost.title
       })
     );
   });

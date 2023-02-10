@@ -1,57 +1,57 @@
-name: "Build application"
+name: 'Build application'
 
 inputs:
   NEXT_PUBLIC_APP_ENV:
-    description: "..."
+    description: '...'
     required: false
   NEXT_PUBLIC_DD_CLIENT_TOKEN:
-    description: "..."
+    description: '...'
     required: false
   NEXT_PUBLIC_DD_RUM_CLIENT_TOKEN:
-    description: "..."
+    description: '...'
     required: false
   NEXT_PUBLIC_DD_RUM_APP_ID:
-    description: "..."
+    description: '...'
     required: false
   NEXT_PUBLIC_TELEGRAM_BOT_ID:
-    description: "..."
+    description: '...'
     required: false
   NEXT_PUBLIC_IFRAMELY_API_KEY:
-    description: "..."
+    description: '...'
     required: false
   NEXT_PUBLIC_WEBSOCKETS_HOST:
-    description: "..."
+    description: '...'
     required: false
   NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_CLIENT_ID:
-    description: "..."
+    description: '...'
     required: false
   NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_REDIRECT_URI:
-    description: "..."
+    description: '...'
     required: false
   NEXT_PUBLIC_GOOGLE_API_KEY:
-    description: "..."
+    description: '...'
     required: false
   NEXT_PUBLIC_GOOGLE_AUTH_DOMAIN:
-    description: "..."
+    description: '...'
     required: false
   NEXT_PUBLIC_GOOGLE_PROJECT_ID:
-    description: "..."
+    description: '...'
     required: false
   NEXT_PUBLIC_GOOGLE_STORAGE_BUCKET:
-    description: "..."
+    description: '...'
     required: false
   NEXT_PUBLIC_GOOGLE_MESSAGING_SENDER_ID:
-    description: "..."
+    description: '...'
     required: false
   NEXT_PUBLIC_GOOGLE_APP_ID:
-    description: "..."
+    description: '...'
     required: false
   NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_ID_SENSITIVE:
-    description: "..."
+    description: '...'
     required: false
 
 runs:
-  using: "composite"
+  using: 'composite'
   steps:
     # - name: Show GitHub context
     #   shell: bash
@@ -59,18 +59,17 @@ runs:
     #     GITHUB_CONTEXT: ${{ toJson(github) }}
     #   run: echo "$GITHUB_CONTEXT"
 
+    - run: echo '${{ env.GIT_DIFF }}'
+      shell: bash
     - name: Cache build
       id: cache_build
       uses: actions/cache@v3
       with:
-        path: .next
+        path: |
+          .next
+          .env.test.local
         # including the app_env helps make sure that deploy_staging.yml does not reuse values from test_and_deploy.yml which are meant for production
-        key: nextjs-build-${{ github.sha }}-${{ inputs.NEXT_PUBLIC_APP_ENV }}
-
-    # Re-build prisma types which are cached inside of node_modules
-    - name: Re-build Prisma types
-      shell: bash
-      run: npm run build:prisma
+        key: nextjs-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**/*.[jt]s', '**/*.[jt]sx', '**/*.scss', '!node_modules', '!.next', '!dont_cache') }}-${{ inputs.NEXT_PUBLIC_APP_ENV }}
 
     - name: Build
       shell: bash

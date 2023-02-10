@@ -8,7 +8,9 @@ const readOnly: SpacePermissionTemplate = {
   spaceOperations: {
     createBounty: false,
     createPage: false,
-    createVote: false
+    createVote: false,
+    createForumCategory: false,
+    moderateForums: false
   },
   pagePermissionDefaults: {
     defaultPagePermissionGroup: 'view',
@@ -21,7 +23,9 @@ const collaborative: SpacePermissionTemplate = {
   spaceOperations: {
     createPage: true,
     createBounty: true,
-    createVote: true
+    createVote: true,
+    createForumCategory: false,
+    moderateForums: false
   },
   pagePermissionDefaults: {
     defaultPagePermissionGroup: 'full_access',
@@ -34,7 +38,9 @@ const open: SpacePermissionTemplate = {
   spaceOperations: {
     createPage: true,
     createBounty: true,
-    createVote: true
+    createVote: true,
+    createForumCategory: false,
+    moderateForums: false
   },
   pagePermissionDefaults: {
     defaultPagePermissionGroup: 'full_access',
@@ -75,8 +81,10 @@ export function getTemplateExplanation(template: SpacePermissionConfigurationMod
 
   const templateData = permissionTemplates[template];
 
+  // eslint-disable-next-line camelcase
+  const { moderateForums, ...applicableOperations } = templateData.spaceOperations;
   // Handle space operations
-  for (const [operation, can] of Object.entries(templateData.spaceOperations) as [SpaceOperation, boolean][]) {
+  for (const [operation, can] of Object.entries(applicableOperations) as [SpaceOperation, boolean][]) {
     const qualifier = can ? 'can' : 'cannot';
 
     const sentence = `Space members ${qualifier} ${spaceOperationLabels[operation].toLowerCase()}.`;

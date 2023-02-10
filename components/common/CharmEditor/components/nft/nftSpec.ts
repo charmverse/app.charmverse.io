@@ -5,7 +5,7 @@ import type { supportedChainIds } from 'connectors';
 import { name } from './config';
 
 export type NodeAttrs = {
-  chain: typeof supportedChainIds[number];
+  chain: (typeof supportedChainIds)[number];
   contract: string;
   token: string;
 };
@@ -16,7 +16,7 @@ export function spec(): RawSpecs {
     name,
     markdown: {
       toMarkdown: (state, node) => {
-        const { chain, contract, token } = node.attrs as NodeAttrs;
+        const { contract, token } = node.attrs as NodeAttrs;
 
         const toRender = `Embedded NFT: ${contract} #${token}`;
 

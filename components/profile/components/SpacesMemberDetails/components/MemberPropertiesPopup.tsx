@@ -22,6 +22,8 @@ type Props = {
   title?: string;
   cancelButtonText?: string;
   children?: ReactNode;
+  isLoading?: boolean;
+  postComponent?: ReactNode;
 };
 
 export function MemberPropertiesPopup({
@@ -31,9 +33,15 @@ export function MemberPropertiesPopup({
   spaceId,
   updateMemberPropertyValues,
   onClose,
-  title = 'Edit space profile'
+  title = 'Edit space profile',
+  isLoading = false,
+  postComponent = null
 }: Props) {
-  const { data, mutate } = useSWR(
+  const {
+    data,
+    mutate,
+    isLoading: isFetchingSpaceProperties
+  } = useSWR(
     spaceId ? `members/${memberId}/values/${spaceId}` : null,
     () => charmClient.members.getSpacePropertyValues(memberId, spaceId || ''),
     { revalidateOnMount: true }
@@ -93,7 +101,7 @@ export function MemberPropertiesPopup({
 
   return (
     <Dialog open={!!spaceId} onClose={onClose} fullScreen={fullScreen} fullWidth>
-      {!data ? (
+      {!data || isFetchingSpaceProperties || isLoading ? (
         <DialogContent>
           <LoadingComponent isLoading />
         </DialogContent>
@@ -110,7 +118,7 @@ export function MemberPropertiesPopup({
                   const fieldRendererConfig = getFieldRendererConfig({
                     type: property.type,
                     label: property.name,
-                    error: errors[property.memberPropertyId],
+                    error: errors[property.memberPropertyId] as any,
                     inline: true,
                     options: property.options,
                     onCreateOption: (option) => createOption(property, option),
@@ -130,6 +138,7 @@ export function MemberPropertiesPopup({
                 })}
               </Box>
             </form>
+            {postComponent}
             <DialogActions>
               <Button
                 data-test='close-member-properties-modal'

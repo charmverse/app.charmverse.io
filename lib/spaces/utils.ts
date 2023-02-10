@@ -1,18 +1,4 @@
-export const DOMAIN_BLACKLIST = [
-  'api',
-  'api-docs',
-  'createWorkspace',
-  'integrations',
-  'invite',
-  'login',
-  'images',
-  'join',
-  'nexus',
-  'profile',
-  'share',
-  'signup',
-  'u'
-];
+import { DOMAIN_BLACKLIST } from './config';
 
 export function isSpaceDomain(path?: string) {
   if (!path) {
@@ -30,18 +16,3 @@ export function getSpaceDomainFromName(name: string) {
     .replace(/\s/g, '-')
     .toLowerCase();
 }
-
-export const spaceContentTemplates = {
-  templateNftCommunity: 'NFT Community'
-};
-
-export const spaceCreateTemplates = {
-  ...spaceContentTemplates,
-  default: 'Create my own',
-  importNotion: 'Import from Notion',
-  importMarkdown: 'Import from Markdown'
-} as const;
-
-export type SpaceCreateTemplate = keyof typeof spaceCreateTemplates;
-
-export const defaultTemplate: SpaceCreateTemplate = 'default';

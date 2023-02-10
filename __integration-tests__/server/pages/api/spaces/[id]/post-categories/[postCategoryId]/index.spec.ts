@@ -1,14 +1,13 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import type { PostCategory, Prisma, Space, User } from '@prisma/client';
+import type { PostCategory, Space, User } from '@prisma/client';
 import request from 'supertest';
 
 import { prisma } from 'db';
 import type { PostCategoryUpdate } from 'lib//forums/categories/updatePostCategory';
 import type { CreatePostCategoryInput } from 'lib/forums/categories/createPostCategory';
-import { createPostCategory } from 'lib/forums/categories/createPostCategory';
-import { updateSpacePermissionConfigurationMode } from 'lib/permissions/meta';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { generatePostCategory } from 'testing/utils/forums';
 
 let firstSpace: Space;
 let firstSpaceAdminUser: User;
@@ -30,7 +29,7 @@ describe('PUT /api/spaces/[id]/post-categories/[postCategoryId] - Update a post 
       name: 'Test Category'
     };
 
-    const postCategory = await createPostCategory({
+    const postCategory = await generatePostCategory({
       spaceId: firstSpace.id,
       name: createInput.name as string
     });
@@ -58,7 +57,7 @@ describe('PUT /api/spaces/[id]/post-categories/[postCategoryId] - Update a post 
       name: 'Example Category'
     };
 
-    const postCategory = await createPostCategory({
+    const postCategory = await generatePostCategory({
       spaceId: firstSpace.id,
       name: createInput.name as string
     });
@@ -83,7 +82,7 @@ describe('DELETE /api/spaces/[id]/post-categories/[postCategoryId] - Delete a po
       name: 'Deletable category'
     };
 
-    const postCategory = await createPostCategory({
+    const postCategory = await generatePostCategory({
       spaceId: firstSpace.id,
       name: createInput.name as string
     });
@@ -109,7 +108,7 @@ describe('DELETE /api/spaces/[id]/post-categories/[postCategoryId] - Delete a po
       name: 'Deletable category 2'
     };
 
-    const postCategory = await createPostCategory({
+    const postCategory = await generatePostCategory({
       spaceId: firstSpace.id,
       name: createInput.name as string
     });

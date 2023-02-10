@@ -255,8 +255,7 @@ describe('addBountyPermissionGroup', () => {
     try {
       await addBountyPermissionGroup({
         assignee: {
-          group: 'public',
-          id: undefined
+          group: 'public'
         },
         // Too high permission level for reviewers
         level: 'reviewer',

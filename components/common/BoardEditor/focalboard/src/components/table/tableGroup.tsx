@@ -71,7 +71,7 @@ const TableGroup = React.memo((props: Props): JSX.Element => {
           board={board}
           activeView={activeView}
           columnRefs={props.columnRefs}
-          cards={group.cards}
+          cardPages={group.cardPages}
           selectedCardIds={props.selectedCardIds}
           readOnly={props.readOnly}
           cardIdToFocusOnRender={props.cardIdToFocusOnRender}

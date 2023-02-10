@@ -1,5 +1,5 @@
 /* Make the Next.j wrappers 100% height */
-
+/* testing git diff */
 
 html {
   height: 100%;
@@ -20,7 +20,7 @@ body {
   bottom: 0;
 }
 
-div[role="presentation"] {
+div[role='presentation'] {
   z-index: var(--z-index-modal);
 }
 
@@ -38,7 +38,6 @@ blockquote .bangle-nv-child-container {
 .MuiTooltip-popper {
   z-index: var(--z-index-tooltip) !important;
 }
-
 
 .telegram-login-CharmverseBot {
   width: 100%;

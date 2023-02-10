@@ -87,31 +87,38 @@ function PageHeader({ headerImage, icon, readOnly, setPage, title, updatedAt }: 
         {icon && (
           <MenuWrapper>
             <EmojiIcon size='large' icon={icon} />
-            <Menu>
-              <Menu.Text
-                id='random'
-                icon={<EmojiEmotionsOutlinedIcon />}
-                name='Random'
-                onClick={() => {
-                  updatePageIcon(BlockIcons.shared.randomIcon());
-                }}
-              />
-              <Menu.SubMenu id='pick' icon={<EmojiEmotionsOutlinedIcon />} name='Pick icon'>
-                <EmojiPicker
-                  onSelect={(emoji) => {
-                    updatePageIcon(emoji);
-                  }}
-                />
-              </Menu.SubMenu>
-              <Menu.Text
-                id='remove'
-                icon={<DeleteOutlineOutlinedIcon />}
-                name='Remove icon'
-                onClick={() => {
-                  updatePageIcon(null);
-                }}
-              />
-            </Menu>
+            {
+              // Menu wrapper requires 2 children to show, so we provide an empty div in readonly case
+              readOnly ? (
+                <div></div>
+              ) : (
+                <Menu>
+                  <Menu.Text
+                    id='random'
+                    icon={<EmojiEmotionsOutlinedIcon />}
+                    name='Random'
+                    onClick={() => {
+                      updatePageIcon(BlockIcons.shared.randomIcon());
+                    }}
+                  />
+                  <Menu.SubMenu id='pick' icon={<EmojiEmotionsOutlinedIcon />} name='Pick icon'>
+                    <EmojiPicker
+                      onSelect={(emoji) => {
+                        updatePageIcon(emoji);
+                      }}
+                    />
+                  </Menu.SubMenu>
+                  <Menu.Text
+                    id='remove'
+                    icon={<DeleteOutlineOutlinedIcon />}
+                    name='Remove icon'
+                    onClick={() => {
+                      updatePageIcon(null);
+                    }}
+                  />
+                </Menu>
+              )
+            }
           </MenuWrapper>
         )}
         <Controls className='page-controls'>

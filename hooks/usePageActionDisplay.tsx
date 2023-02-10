@@ -2,10 +2,10 @@ import type { ReactNode } from 'react';
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { useSWRConfig } from 'swr';
 
+import { useCurrentPage } from 'hooks/useCurrentPage';
+import { useLgScreen } from 'hooks/useMediaScreens';
 import type { ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
-import { isSmallScreen } from 'lib/utilities/browser';
 
-import { usePages } from './usePages';
 import { useThreads } from './useThreads';
 import { useVotes } from './useVotes';
 
@@ -16,43 +16,41 @@ export interface IPageActionDisplayContext {
   setCurrentPageActionDisplay: React.Dispatch<
     React.SetStateAction<IPageActionDisplayContext['currentPageActionDisplay']>
   >;
-  updatePageActionDisplay: (defaultAction: PageAction | null) => void;
 }
 
-export const PageActionDisplayContext = createContext<IPageActionDisplayContext>({
+const PageActionDisplayContext = createContext<IPageActionDisplayContext>({
   currentPageActionDisplay: null,
-  setCurrentPageActionDisplay: () => undefined,
-  updatePageActionDisplay: () => null
+  setCurrentPageActionDisplay: () => undefined
 });
 
 export function PageActionDisplayProvider({ children }: { children: ReactNode }) {
-  // only calculate once
-  const smallScreen = useMemo(() => isSmallScreen(), []);
-  const { currentPageId } = usePages();
+  const isLargeScreen = useLgScreen();
+  const { currentPageId } = useCurrentPage();
   const { isValidating: isValidatingInlineComments } = useThreads();
   const { isValidating: isValidatingInlineVotes } = useVotes();
   const { cache } = useSWRConfig();
   const [currentPageActionDisplay, setCurrentPageActionDisplay] =
     useState<IPageActionDisplayContext['currentPageActionDisplay']>(null);
 
-  function updatePageActionDisplay(defaultAction: PageAction | null = null) {
+  function updatePageActionDisplay() {
     const highlightedCommentId = new URLSearchParams(window.location.search).get('commentId');
-    if (currentPageActionDisplay) {
+    if (currentPageActionDisplay && !highlightedCommentId) {
       // dont redirect if sidebar is already open
-      return setCurrentPageActionDisplay(null);
+      return;
     }
-    if (currentPageId && !isValidatingInlineComments && !isValidatingInlineVotes && !smallScreen) {
+
+    if (currentPageId && !isValidatingInlineComments && !isValidatingInlineVotes) {
       const cachedInlineCommentData: ThreadWithCommentsAndAuthors[] | undefined = cache.get(
         `pages/${currentPageId}/threads`
       )?.data as ThreadWithCommentsAndAuthors[] | undefined;
       // For some reason we cant get the threads map using useThreads, its empty even after isValidating is true (data has loaded)
       if (
         highlightedCommentId ||
-        (cachedInlineCommentData && cachedInlineCommentData.find((thread) => thread && !thread.resolved))
+        (isLargeScreen && cachedInlineCommentData?.find((thread) => thread && !thread.resolved))
       ) {
         return setCurrentPageActionDisplay('comments');
       } else {
-        return setCurrentPageActionDisplay(defaultAction);
+        return setCurrentPageActionDisplay(null);
       }
     }
   }
@@ -65,7 +63,6 @@ export function PageActionDisplayProvider({ children }: { children: ReactNode })
   const value = useMemo<IPageActionDisplayContext>(
     () => ({
       currentPageActionDisplay,
-      updatePageActionDisplay,
       setCurrentPageActionDisplay
     }),
     [currentPageActionDisplay]

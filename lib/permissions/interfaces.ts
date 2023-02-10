@@ -58,6 +58,15 @@ export interface PermissionComputeRequest {
 }
 
 /**
+ * This is the data we need to compute permissions for a resource
+ * It is an improvement after Permission Compute Request, since we assume that all permission compute methods should be responsible for deciding if an admin override is available for a specific operation
+ */
+export type PermissionCompute = {
+  resourceId: string;
+  userId?: string;
+};
+
+/**
  * @id The userId, roleId or spaceId
  * @resourceId The resource such as Space or Page we are querying permissions for
  */
@@ -73,11 +82,7 @@ export type AssignablePermissionGroupsWithPublic = AssignablePermissionGroups | 
 // Public is a pure true / false. We only need to know there is a public group, to know it is true
 export type TargetPermissionGroup<
   G extends Exclude<AssignablePermissionGroupsWithPublic, 'any'> = Exclude<AssignablePermissionGroupsWithPublic, 'any'>
-> = {
-  group: G;
-  id: G extends 'public' ? undefined : string;
-  roleId?: G;
-};
+> = G extends 'public' ? { group: 'public' } : { group: G; id: string };
 
 // A permission mapping is a mapping of a permission group to a list of operations
 // Example is page permission {editor: ['view', 'edit', 'comment']}
@@ -106,3 +111,17 @@ export interface BountyPagePermissionIntersection {
   hasPermissions: TargetPermissionGroup[];
   missingPermissions: TargetPermissionGroup[];
 }
+
+export interface AbstractPermissions<O extends string> {
+  get empty(): UserPermissionFlags<O, false>;
+  get full(): UserPermissionFlags<O, true>;
+  get operationFlags(): UserPermissionFlags<O>;
+
+  addPermissions(operations: O[] | Partial<UserPermissionFlags<O>>): void;
+
+  hasPermissions(operations: O[]): boolean;
+}
+
+export type PermissionToDelete = {
+  permissionId: string;
+};

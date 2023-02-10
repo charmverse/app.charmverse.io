@@ -10,7 +10,6 @@ import { updateUserTokenGates } from 'lib/token-gates/updateUserTokenGates';
 import { DataNotFoundError, InsecureOperationError, InvalidInputError } from 'lib/utilities/errors';
 
 import type {
-  LitJwtPayload,
   TokenGateJwtResult,
   TokenGateVerification,
   TokenGateVerificationResult,
@@ -65,7 +64,7 @@ export async function applyTokenGates({
   const verifiedTokenGates: (TokenGateWithRoles & TokenGateJwtResult)[] = (
     await Promise.all(
       tokens.map(async (tk) => {
-        const result = (await verifyJwt({ jwt: tk.signedToken })) as { payload: LitJwtPayload; verified: boolean };
+        const result = await verifyJwt({ jwt: tk.signedToken });
         const matchingTokenGate = tokenGates.find((g) => g.id === tk.tokenGateId);
 
         // Only check against existing token gates for this space

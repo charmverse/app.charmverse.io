@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
+import type { SxProps, Theme } from '@mui/material';
 import Avatar from '@mui/material/Avatar';
-import type { SxProps } from '@mui/system';
 import React from 'react';
 
 import { stringToColor } from 'lib/utilities/strings';
@@ -78,7 +78,7 @@ export type InitialAvatarProps = {
   variant?: AvatarVariant;
   size?: AvatarSize;
   isNft?: boolean;
-  sx?: SxProps;
+  sx?: SxProps<Theme>;
   onMouseEnter?: (e: React.MouseEvent<HTMLElement>) => void;
 };
 

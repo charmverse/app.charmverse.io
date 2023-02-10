@@ -11,8 +11,8 @@ import { useEffect, useRef, useState } from 'react';
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import Modal from 'components/common/Modal';
+import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useUser } from 'hooks/useUser';
-import { humanFriendlyDate } from 'lib/utilities/dates';
 import type { LoggedInUser } from 'models';
 
 import useTasksState from '../hooks/useTasksState';
@@ -20,6 +20,7 @@ import useTasksState from '../hooks/useTasksState';
 export default function SnoozeButton() {
   const { setUser } = useUser();
   const { isLoading, snoozedForDate, snoozedMessage, mutate: mutateTasks } = useTasksState();
+  const { formatDate, formatDateTime } = useDateFormatter();
 
   const isSnoozed = snoozedForDate !== null;
 
@@ -157,7 +158,7 @@ export default function SnoozeButton() {
         <Tooltip
           arrow
           placement='top'
-          title={snoozedForDate ? `Snoozed until ${humanFriendlyDate(snoozedForDate, { withTime: true })}` : ''}
+          title={snoozedForDate ? `Snoozed until ${formatDateTime(snoozedForDate.toJSDate())}` : ''}
         >
           <Button
             color={snoozedForDate ? 'warning' : dateInput.isOpen ? 'primary' : 'secondary'}
@@ -273,7 +274,7 @@ export default function SnoozeButton() {
         )}
         {isSnoozed && <MenuItem onClick={messageInput.open}>Edit message</MenuItem>}
       </Menu>
-      <Modal {...bindPopover(messageInput)} title={`Snooze until ${humanFriendlyDate(getSnoozedDate())}`}>
+      <Modal {...bindPopover(messageInput)} title={`Snooze until ${formatDate(getSnoozedDate().toJSDate())}`}>
         <TextField
           sx={{ mb: 2 }}
           onKeyDown={(e) => {

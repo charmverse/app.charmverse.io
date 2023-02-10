@@ -7,6 +7,10 @@ export type DateTimeFormat = 'relative' | 'absolute';
 
 export type TimeUnit = 'millisecond' | 'second' | 'minute' | 'hour' | 'day' | 'week' | 'month' | 'year';
 
+export type DateFormatConfig = {
+  withYear?: boolean;
+};
+
 const SystemToLuxonUnitMapping: { [key in TimeUnit]: LuxonTimeUnit } = {
   millisecond: 'millisecond',
   second: 'second',
@@ -44,51 +48,6 @@ export function getTimeDifference(
   const timeDifference = timeToAssess.diff(baseTime, timeUnit);
 
   return timeDifference[`${timeUnit}s`];
-}
-
-export function humanFriendlyDate(
-  date: DateInput,
-  options: {
-    withYear?: boolean;
-    withTime?: boolean;
-  } = {
-    withYear: false,
-    withTime: false
-  }
-): string {
-  const parsedDate = convertToLuxonDate(date);
-
-  /**
-   * See these tables for the conversion tokens
-   * https://moment.github.io/luxon/#/formatting?id=table-of-tokens
-   */
-
-  let formatString = 'MMM d';
-
-  if (options?.withYear === true) {
-    formatString += ', yyyy';
-  }
-
-  if (options?.withTime === true) {
-    formatString += " 'at' hh:mm a";
-  }
-
-  const formatted = parsedDate.toFormat(formatString);
-
-  return formatted;
-}
-
-export function toMonthDate(date: DateInput): string {
-  const parsedDate = convertToLuxonDate(date);
-
-  return parsedDate.toFormat('MMM d');
-}
-
-export function showDateWithMonthAndYear(dateInput: Date | string, showDate?: boolean) {
-  const date = typeof dateInput === 'string' ? new Date(dateInput) : dateInput;
-  return `${date.toLocaleString('default', {
-    month: 'long'
-  })}${showDate ? ` ${date.getDate()},` : ''} ${date.getFullYear()}`;
 }
 
 /**
@@ -157,4 +116,57 @@ export function getTimezonesWithOffset() {
       tz: timeZone
     };
   });
+}
+
+export function getFormattedDateTime(
+  dateInput: Date | string,
+  options?: Intl.DateTimeFormatOptions,
+  locale?: string | null
+) {
+  const date = new Date(dateInput);
+  const isLocaleSupported = toLocaleDateStringSupportsLocales();
+  const formatLocale = isLocaleSupported ? locale || 'default' : undefined;
+
+  try {
+    return date.toLocaleString(formatLocale, options);
+  } catch (e: any) {
+    return date.toLocaleString('default', options);
+  }
+}
+
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toLocaleDateString#checking_for_support_for_locales_and_options_arguments
+function toLocaleDateStringSupportsLocales() {
+  try {
+    new Date().toLocaleDateString('i');
+  } catch (e: any) {
+    return e.name === 'RangeError';
+  }
+
+  return false;
+}
+
+export function formatDateTime(dateInput: Date | string, locale?: string | null) {
+  return getFormattedDateTime(
+    dateInput,
+    {
+      dateStyle: 'short',
+      timeStyle: 'short'
+    },
+    locale
+  );
+}
+
+export function formatDate(dateInput: Date | string, config?: DateFormatConfig, locale?: string | null) {
+  // Add year by default if date is not in current year
+  const isCurrentYear = new Date().getFullYear() === new Date(dateInput).getFullYear();
+
+  return getFormattedDateTime(
+    dateInput,
+    { day: 'numeric', month: 'short', year: config?.withYear ?? !isCurrentYear ? 'numeric' : undefined },
+    locale
+  );
+}
+
+export function formatTime(dateInput: Date | string, locale?: string | null) {
+  return getFormattedDateTime(dateInput, { timeStyle: 'short' }, locale);
 }

@@ -1,6 +1,5 @@
 import type { PaletteMode, Theme as MaterialUITheme } from '@mui/material';
-import { createTheme } from '@mui/material/styles';
-import { darken } from '@mui/system';
+import { createTheme, darken } from '@mui/material/styles';
 
 import type { BrandColor } from './colors';
 import {
@@ -303,6 +302,9 @@ export const createThemeLightSensitive = (mode: PaletteMode) => {
               backgroundColor: 'var(--input-bg)'
             }
           }
+        },
+        defaultProps: {
+          color: 'inherit' // set to inherit, the default is rgba (0,0,0, .54) which makes icons half-opaque
         }
       },
       MuiMenuItem: {

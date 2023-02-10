@@ -16,7 +16,6 @@ async function updateUserProfileItems(req: NextApiRequest, res: NextApiResponse<
 
   const shownProfileItems: Omit<ProfileItem, 'userId'>[] = [];
   const hiddenProfileItems: Omit<ProfileItem, 'userId'>[] = [];
-
   profileItems.forEach((profileItem) => {
     if (!profileItem.isHidden) {
       shownProfileItems.push(profileItem);
@@ -61,6 +60,27 @@ async function updateUserProfileItems(req: NextApiRequest, res: NextApiResponse<
       )
     );
   }
+
+  await Promise.all(
+    profileItems.map((profileItem) =>
+      prisma.profileItem.upsert({
+        where: {
+          id: profileItem.id
+        },
+        update: {
+          id: profileItem.id,
+          isPinned: profileItem.isPinned
+        },
+        create: {
+          id: profileItem.id,
+          userId: req.session.user.id,
+          metadata: profileItem.metadata === null ? undefined : profileItem.metadata,
+          isPinned: profileItem.isPinned,
+          type: profileItem.type
+        }
+      })
+    )
+  );
 
   return res.status(200).end();
 }

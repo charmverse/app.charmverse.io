@@ -24,8 +24,9 @@
     "sourceType": "module"
   },
   "plugins": [
+    "@typescript-eslint",
     "react",
-    "@typescript-eslint"
+    "react-hooks"
   ],
   "rules": {
     "react/jsx-key": "error",
@@ -171,6 +172,8 @@
     "react/react-in-jsx-scope": "off",
     "react/self-closing-comp": "off",
     "react/state-in-constructor": "off",
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "off",
     "prefer-spread": "off",
     "no-bitwise": "warn",
     "no-undef": "off",

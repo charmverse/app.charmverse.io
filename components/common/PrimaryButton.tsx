@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import { darken } from '@mui/system';
+import { darken } from '@mui/material/styles';
 import type { ElementType } from 'react';
 
 import { blueColor } from 'theme/colors';

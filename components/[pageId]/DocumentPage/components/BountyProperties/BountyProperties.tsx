@@ -71,11 +71,17 @@ export default function BountyProperties(props: {
   const bountyPermissions = permissions?.bountyPermissions || currentBounty?.permissions;
 
   const assignedRoleSubmitters =
-    bountyPermissions?.submitter?.filter((p) => p.group === 'role').map((p) => p.id as string) ?? [];
+    bountyPermissions?.submitter
+      ?.filter((p) => p.group === 'role')
+      .map((p) => (p as TargetPermissionGroup<'role'>).id as string) ?? [];
   const selectedReviewerUsers =
-    bountyPermissions?.reviewer?.filter((p) => p.group === 'user').map((p) => p.id as string) ?? [];
+    bountyPermissions?.reviewer
+      ?.filter((p) => p.group === 'user')
+      .map((p) => (p as TargetPermissionGroup<'user'>).id as string) ?? [];
   const selectedReviewerRoles =
-    bountyPermissions?.reviewer?.filter((p) => p.group === 'role').map((p) => p.id as string) ?? [];
+    bountyPermissions?.reviewer
+      ?.filter((p) => p.group === 'role')
+      .map((p) => (p as TargetPermissionGroup<'role'>).id as string) ?? [];
 
   // Copied from BountyApplicantsTable
   const [applications, setListApplications] = useState<ApplicationWithTransactions[]>([]);

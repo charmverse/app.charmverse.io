@@ -5064,10 +5064,7 @@
                   "collapsedOptionIds": [],
                   "columnCalculations": {},
                   "kanbanCalculations": {},
-                  "visiblePropertyIds": [
-                    "__title",
-                    "11eefd10-f082-40d6-abc0-0a8cec44fb90"
-                  ]
+                  "visiblePropertyIds": ["__title", "11eefd10-f082-40d6-abc0-0a8cec44fb90"]
                 }
               }
             ]
@@ -5890,9 +5887,7 @@
                       "sortOptions": [],
                       "columnWidths": {},
                       "linkedSourceId": null,
-                      "hiddenOptionIds": [
-                        ""
-                      ],
+                      "hiddenOptionIds": [""],
                       "visibleOptionIds": [
                         "35bbea47-5c02-431b-89cd-ee7b796aba04",
                         "181ec031-6afc-4414-b1b8-87d2ecc74b82",
@@ -5902,9 +5897,7 @@
                       "collapsedOptionIds": [],
                       "columnCalculations": {},
                       "kanbanCalculations": {},
-                      "visiblePropertyIds": [
-                        "c55a109e-a5b5-4cdd-9902-483ec65d58ee"
-                      ]
+                      "visiblePropertyIds": ["c55a109e-a5b5-4cdd-9902-483ec65d58ee"]
                     }
                   }
                 ]

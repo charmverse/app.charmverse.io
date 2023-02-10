@@ -1,10 +1,10 @@
-import type { Prisma, Block as PrismaBlock } from '@prisma/client';
+import type { Block as PrismaBlock } from '@prisma/client';
 import difference from 'lodash/difference';
 import { v4 } from 'uuid';
 
 export const contentBlockTypes = ['text', 'image', 'divider', 'checkbox'] as const;
 export const blockTypes = [...contentBlockTypes, 'board', 'view', 'card', 'comment', 'unknown'] as const;
-export type BlockTypes = typeof blockTypes[number];
+export type BlockTypes = (typeof blockTypes)[number];
 
 export type BlockPatch = {
   spaceId?: string;

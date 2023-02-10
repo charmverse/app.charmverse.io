@@ -19,9 +19,9 @@ import { SnapshotVoteDetails } from 'components/common/CharmEditor/components/in
 import VoteDetail from 'components/common/CharmEditor/components/inlineVote/components/VoteDetail';
 import ScrollableWindow from 'components/common/PageLayout/components/ScrollableWindow';
 import { useBounties } from 'hooks/useBounties';
+import { useCharmEditor } from 'hooks/useCharmEditor';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { usePages } from 'hooks/usePages';
-import { usePrimaryCharmEditor } from 'hooks/usePrimaryCharmEditor';
 import { useVotes } from 'hooks/useVotes';
 import type { AssignedBountyPermissions } from 'lib/bounties';
 import type { PageMeta } from 'lib/pages';
@@ -56,7 +56,7 @@ export const Container = styled(({ fullWidth, ...props }: any) => <Box {...props
 const ScrollContainer = styled.div<{ showPageActionSidebar: boolean }>(
   ({ showPageActionSidebar, theme }) => `
   transition: width ease-in 0.25s;
-  ${theme.breakpoints.up('md')} {
+  ${theme.breakpoints.up('lg')} {
     width: ${showPageActionSidebar ? 'calc(100% - 430px)' : '100%'};
     height: ${showPageActionSidebar ? 'calc(100vh - 65px)' : '100%'};
     overflow: ${showPageActionSidebar ? 'auto' : 'inherit'};
@@ -79,7 +79,7 @@ function DocumentPage({ page, setPage, insideModal, readOnly = false, parentProp
   const pagePermissions = getPagePermissions(page.id);
   const { draftBounty } = useBounties();
   const { currentPageActionDisplay } = usePageActionDisplay();
-  const { editMode, setPageProps } = usePrimaryCharmEditor();
+  const { editMode, setPageProps } = useCharmEditor();
   const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'));
 
   // Only populate bounty permission data if this is a bounty page

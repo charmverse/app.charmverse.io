@@ -1,6 +1,5 @@
 import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
-import { Divider, MenuItem, Typography } from '@mui/material';
-import { Box } from '@mui/system';
+import { Divider, MenuItem, Typography, Box } from '@mui/material';
 import type { PluginKey } from 'prosemirror-state';
 import { memo, useCallback, useEffect } from 'react';
 

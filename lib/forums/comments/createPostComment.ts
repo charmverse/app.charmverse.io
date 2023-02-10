@@ -1,5 +1,7 @@
 import { prisma } from 'db';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
+import { WebhookEventNames } from 'lib/webhook/interfaces';
+import { publishPostCommentEvent } from 'lib/webhook/publishEvent';
 
 import type { CreatePostCommentInput } from './interface';
 
@@ -13,7 +15,7 @@ export async function createPostComment({
   postId: string;
   userId: string;
 }) {
-  const post = await prisma.post.findUnique({
+  const post = await prisma.post.findUniqueOrThrow({
     where: { id: postId },
     include: {
       category: true
@@ -35,19 +37,10 @@ export async function createPostComment({
           id: postId
         }
       }
-    },
-    include: {
-      user: {
-        select: {
-          id: true,
-          avatar: true,
-          username: true
-        }
-      }
     }
   });
 
-  const category = post?.category;
+  const category = post.category;
 
   if (category) {
     trackUserAction('create_comment', {
@@ -59,6 +52,14 @@ export async function createPostComment({
       userId
     });
   }
+
+  // Publish webhook event if needed
+  await publishPostCommentEvent({
+    scope: WebhookEventNames.CommentCreated,
+    spaceId: post.spaceId,
+    commentId: comment.id,
+    postId
+  });
 
   return comment;
 }

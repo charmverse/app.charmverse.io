@@ -4,8 +4,7 @@ import fetch from 'node-fetch';
 
 // use this file and run against production to generate api keys
 
-
-export async function testAddMessage()  {
+export async function testAddMessage() {
   const res = await fetch('https://webhooks.charmverse.co/collabland-events', {
     method: 'POST',
     headers: {

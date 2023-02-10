@@ -13,8 +13,10 @@ import type { LoggedInUser } from 'models';
 
 import { getUserProfile } from './getUser';
 
+type UserProps = { address?: string; email?: string; id?: string; avatar?: string };
+
 export async function createUserFromWallet(
-  { id = v4(), address = Wallet.createRandom().address, email }: { address?: string; email?: string; id?: string } = {},
+  { id = v4(), address = Wallet.createRandom().address, email, avatar }: UserProps = {},
   signupAnalytics: Partial<SignupAnalytics> = {}
 ): Promise<LoggedInUser> {
   const lowercaseAddress = address.toLowerCase();
@@ -29,6 +31,7 @@ export async function createUserFromWallet(
 
     const newUser = await prisma.user.create({
       data: {
+        avatar,
         email,
         id,
         identityType: 'Wallet',

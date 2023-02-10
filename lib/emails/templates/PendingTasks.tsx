@@ -42,7 +42,7 @@ export interface PendingTasksProps {
   bountyTasks: BountyTask[];
   forumTasks: ForumTask[];
   // eslint-disable-next-line
-  user: TemplateUser
+  user: TemplateUser;
 }
 
 function ViewAllText({ href }: { href: string }) {
