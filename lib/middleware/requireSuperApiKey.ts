@@ -31,7 +31,7 @@ export async function provisionSuperApiKey(name: string, token?: string): Promis
  * assigns superApiToken so follow-on endpoints can use it
  */
 export async function requireSuperApiKey(req: NextApiRequest, res: NextApiResponse, next: NextHandler) {
-  const apiKey = req.headers?.authorization?.split('Bearer').join('').trim() ?? (req.query.api_key as string);
+  const apiKey = getAPIKeyFromRequest(req);
 
   const superApiToken: SuperApiToken | null = apiKey ? await getVerifiedSuperApiToken(apiKey) : null;
 
@@ -47,10 +47,24 @@ export async function requireSuperApiKey(req: NextApiRequest, res: NextApiRespon
   next();
 }
 
-export function getVerifiedSuperApiToken(token: string): Promise<SuperApiToken | null> {
-  return prisma.superApiToken.findFirst({
+function getVerifiedSuperApiToken(token: string): Promise<SuperApiToken | null> {
+  return prisma.superApiToken.findUnique({
     where: {
       token
     }
   });
+}
+
+function getAPIKeyFromRequest(req: NextApiRequest): string | null {
+  return req.headers?.authorization?.split('Bearer').join('').trim() ?? (req.query.api_key as string);
+}
+
+export async function retrieveSuperApiKeySpaceIds(req: NextApiRequest): Promise<string[]> {
+  const superApiTokenId = getAPIKeyFromRequest(req);
+  const spaces = await prisma.space.findMany({
+    where: {
+      superApiTokenId
+    }
+  });
+  return spaces.map((space) => space.id);
 }

@@ -6,10 +6,10 @@ import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
 
 export async function searchUserProfile({
   email,
-  spaceId,
+  spaceIds,
   wallet
 }: {
-  spaceId: string;
+  spaceIds: string[];
   email?: string;
   wallet?: string;
 }): Promise<UserProfile> {
@@ -27,7 +27,10 @@ export async function searchUserProfile({
   if (email) {
     user = await prisma.user.findFirst({
       where: {
-        AND: [{ spaceRoles: { some: { spaceId } } }, { OR: [{ email }, { googleAccounts: { some: { email } } }] }]
+        AND: [
+          { spaceRoles: { some: { spaceId: { in: spaceIds } } } },
+          { OR: [{ email }, { googleAccounts: { some: { email } } }] }
+        ]
       },
       include: { wallets: true, googleAccounts: true }
     });
@@ -35,7 +38,9 @@ export async function searchUserProfile({
 
   if (wallet) {
     user = await prisma.user.findFirst({
-      where: { AND: [{ spaceRoles: { some: { spaceId } } }, { wallets: { some: { address: wallet } } }] },
+      where: {
+        AND: [{ spaceRoles: { some: { spaceId: { in: spaceIds } } } }, { wallets: { some: { address: wallet } } }]
+      },
       include: { wallets: true, googleAccounts: true }
     });
   }

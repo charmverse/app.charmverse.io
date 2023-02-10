@@ -1,14 +1,14 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { InvalidStateError, onError, onNoMatch, requireApiKey } from 'lib/middleware';
+import { InvalidStateError, onError, onNoMatch, requireSuperApiKey, retrieveSuperApiKeySpaceIds } from 'lib/middleware';
 import type { UserProfile } from 'lib/public-api/interfaces';
 import { searchUserProfile } from 'lib/public-api/searchUserProfile';
 import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireApiKey).get(searchUser);
+handler.use(requireSuperApiKey).get(searchUser);
 
 /**
  * @example https://github.com/jellydn/next-swagger-doc/blob/main/example/models/organization.ts
@@ -67,12 +67,8 @@ type SearchUserResponseBody = UserProfile;
 async function searchUser(req: NextApiRequest, res: NextApiResponse<SearchUserResponseBody>) {
   const email = (req.query.email as string) || '';
   const wallet = (req.query.wallet as string) || '';
-  const spaceId = req.authorizedSpaceId;
-
-  if (!spaceId) {
-    throw new InvalidStateError('Space ID is undefined');
-  }
-  const result = await searchUserProfile({ email, wallet, spaceId });
+  const spaceIds = await retrieveSuperApiKeySpaceIds(req);
+  const result = await searchUserProfile({ email, wallet, spaceIds });
 
   return res.status(200).json(result);
 }
