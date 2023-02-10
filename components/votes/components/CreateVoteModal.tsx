@@ -9,9 +9,9 @@ import {
   Stack,
   TextField,
   Tooltip,
-  Typography
+  Typography,
+  Box
 } from '@mui/material';
-import { Box } from '@mui/system';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { VoteType } from '@prisma/client';
 import { DateTime } from 'luxon';
@@ -22,7 +22,7 @@ import Button from 'components/common/Button';
 import FieldLabel from 'components/common/form/FieldLabel';
 import Modal from 'components/common/Modal';
 import PublishToSnapshot from 'components/common/PageLayout/components/Header/components/Snapshot/PublishToSnapshot';
-import { usePages } from 'hooks/usePages';
+import { useCurrentPage } from 'hooks/useCurrentPage';
 import { useUser } from 'hooks/useUser';
 import { useVotes } from 'hooks/useVotes';
 import type { ProposalWithUsers } from 'lib/proposal/interface';
@@ -144,7 +144,7 @@ export default function CreateVoteModal({
   }, [voteType]);
 
   const [deadline, setDeadline] = useState(DateTime.fromMillis(Date.now()).plus({ hour: 12 }));
-  const { currentPageId } = usePages();
+  const { currentPageId } = useCurrentPage();
   const handleSubmit = async (e: React.KeyboardEvent<HTMLElement> | React.MouseEvent<HTMLElement, MouseEvent>) => {
     const cardId = typeof window !== 'undefined' ? new URLSearchParams(window.location.href).get('cardId') : null;
     e.preventDefault();

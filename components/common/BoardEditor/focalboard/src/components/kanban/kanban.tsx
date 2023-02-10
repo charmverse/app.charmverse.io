@@ -1,10 +1,8 @@
 /* eslint-disable max-lines */
 // import Button from '../../widgets/buttons/button'
-import { Menu, TextField } from '@mui/material';
+import { Box, Menu, TextField } from '@mui/material';
 import Button from '@mui/material/Button';
-import { Box } from '@mui/system';
-import { bindMenu, bindTrigger } from 'material-ui-popup-state';
-import { usePopupState } from 'material-ui-popup-state/hooks';
+import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import React, { useCallback, useState } from 'react';
 import type { IntlShape } from 'react-intl';
 import { FormattedMessage, injectIntl } from 'react-intl';
@@ -264,7 +262,7 @@ function Kanban(props: Props) {
   };
 
   const { onClick, ...restBindings } = bindTrigger(popupState);
-  const addNewGroupHandler = async (event: React.SyntheticEvent<any, Event>) => {
+  const addNewGroupHandler = async (event: React.MouseEvent<Element, MouseEvent>) => {
     onClick(event);
     // If no groupByProperty means that we don't have a select property and the board can't be grouped in columns.
     if (!groupByProperty) {

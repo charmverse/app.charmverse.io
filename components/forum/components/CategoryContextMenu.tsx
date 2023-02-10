@@ -10,7 +10,7 @@ import { useEffect, useMemo, useState } from 'react';
 import FieldLabel from 'components/common/form/FieldLabel';
 import PopperPopup from 'components/common/PopperPopup';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import useIsAdmin from 'hooks/useIsAdmin';
+import { useIsAdmin } from 'hooks/useIsAdmin';
 import type { AvailablePostCategoryPermissionFlags } from 'lib/permissions/forum/interfaces';
 
 import { PostCategoryPermissionsDialog } from './permissions/PostCategoryPermissions';

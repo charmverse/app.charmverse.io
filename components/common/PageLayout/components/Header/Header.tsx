@@ -14,32 +14,35 @@ import NotFavoritedIcon from '@mui/icons-material/StarBorder';
 import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
 import UndoIcon from '@mui/icons-material/Undo';
 import SunIcon from '@mui/icons-material/WbSunny';
-import { Divider, FormControlLabel, Stack, Switch, Typography, useMediaQuery } from '@mui/material';
 import Box from '@mui/material/Box';
+import Divider from '@mui/material/Divider';
+import FormControlLabel from '@mui/material/FormControlLabel';
 import IconButton from '@mui/material/IconButton';
 import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import Popover from '@mui/material/Popover';
+import Stack from '@mui/material/Stack';
+import Switch from '@mui/material/Switch';
 import Toolbar from '@mui/material/Toolbar';
 import Tooltip from '@mui/material/Tooltip';
-import NextLink from 'next/link';
+import Typography from '@mui/material/Typography';
+import useMediaQuery from '@mui/material/useMediaQuery';
 import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
-import { useMemo, useRef, useState } from 'react';
-import useSWR from 'swr';
+import { memo, useMemo, useRef, useState } from 'react';
 
 import charmClient from 'charmClient';
 import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
 import { undoEventName } from 'components/common/CharmEditor/utils';
 import { usePostByPath } from 'components/forum/hooks/usePostByPath';
-import { usePostPermissions } from 'components/forum/hooks/usePostPermissions';
 import { useColorMode } from 'context/darkMode';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { useMembers } from 'hooks/useMembers';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
+import { usePageFromPath } from 'hooks/usePageFromPath';
 import { usePages } from 'hooks/usePages';
+import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useToggleFavorite } from 'hooks/useToggleFavorite';
 import { useUser } from 'hooks/useUser';
@@ -162,25 +165,24 @@ export function Metadata({ creator, lastUpdatedAt }: { creator: string; lastUpda
   );
 }
 
-export default function Header({ open, openSidebar }: HeaderProps) {
+function HeaderComponent({ open, openSidebar }: HeaderProps) {
   const router = useRouter();
   const colorMode = useColorMode();
-  const { pages, updatePage, getPagePermissions, deletePage } = usePages();
-  const currentSpace = useCurrentSpace();
-
+  const { updatePage, getPagePermissions, deletePage } = usePages();
   const { user } = useUser();
   const theme = useTheme();
   const [pageMenuOpen, setPageMenuOpen] = useState(false);
   const [pageMenuAnchorElement, setPageMenuAnchorElement] = useState<null | Element>(null);
   const pageMenuAnchor = useRef();
   const { showMessage } = useSnackbar();
-  const basePageId = router.query.pageId as string;
-  const basePage = Object.values(pages).find((page) => page?.id === basePageId || page?.path === basePageId);
+  const basePage = usePageFromPath();
   const { isFavorite, toggleFavorite } = useToggleFavorite({ pageId: basePage?.id });
   const { members } = useMembers();
   const { setCurrentPageActionDisplay } = usePageActionDisplay();
   const [userSpacePermissions] = useCurrentSpacePermissions();
   const pagePermissions = basePage ? getPagePermissions(basePage.id) : null;
+
+  const { onClick: clickToOpenSettingsModal } = useSettingsDialog();
   const isForumPost = router.route === '/[domain]/forum/post/[pagePath]';
   const pagePath = isForumPost ? (router.query.pagePath as string) : null;
   // Post permissions hook will not make an API call if post ID is null. Since we can't conditionally render hooks, we pass null as the post ID. This is the reason for the 'null as any' statement
@@ -212,7 +214,7 @@ export default function Header({ open, openSidebar }: HeaderProps) {
   const onSwitchChange = () => {
     if (basePage) {
       updatePage({
-        id: basePage?.id,
+        id: basePage.id,
         fullWidth: !isFullWidth
       });
     }
@@ -271,7 +273,7 @@ export default function Header({ open, openSidebar }: HeaderProps) {
         members,
         spaceId: page.spaceId,
         title: page.title
-      }).catch((err) => {
+      }).catch(() => {
         showMessage('Error exporting markdown', 'error');
       });
       setPageMenuOpen(false);
@@ -448,7 +450,7 @@ export default function Header({ open, openSidebar }: HeaderProps) {
         sx={{
           display: 'inline-flex',
           mr: 2,
-          ...(open && isLargeScreen && { display: 'none' })
+          ...(open && { display: 'none' })
         }}
       >
         <MenuIcon />
@@ -509,41 +511,35 @@ export default function Header({ open, openSidebar }: HeaderProps) {
             </Box>
           )}
           {/** End of CharmEditor page specific header content */}
-
-          {/** dark mode toggle */}
           {user && (
-            <>
-              <NotificationsBadge>
-                <IconButton
-                  size={isLargeScreen ? 'small' : 'medium'}
-                  LinkComponent={NextLink}
-                  href='/nexus'
-                  color='inherit'
-                >
-                  <NotificationsIcon fontSize='small' color='secondary' />
-                </IconButton>
-              </NotificationsBadge>
+            <NotificationsBadge>
               <IconButton
-                size='small'
-                sx={{ display: { xs: 'none', md: 'inline-flex' } }}
-                onClick={colorMode.toggleColorMode}
-                color='inherit'
+                size={isLargeScreen ? 'small' : 'medium'}
+                onClick={() => clickToOpenSettingsModal('notifications')}
               >
-                <Tooltip
-                  title={`Enable ${theme.palette.mode === 'dark' ? 'light mode' : 'dark mode'}`}
-                  arrow
-                  placement='top'
-                >
-                  {theme.palette.mode === 'dark' ? (
-                    <SunIcon fontSize='small' color='secondary' />
-                  ) : (
-                    <MoonIcon fontSize='small' color='secondary' />
-                  )}
-                </Tooltip>
+                <NotificationsIcon fontSize='small' color='secondary' />
               </IconButton>
-            </>
+            </NotificationsBadge>
           )}
-          {/* <NotificationsBadge /> */}
+          <IconButton
+            sx={{ display: { xs: 'none', md: 'inline-flex' } }}
+            size='small'
+            onClick={colorMode.toggleColorMode}
+            color='inherit'
+          >
+            <Tooltip
+              title={`Enable ${theme.palette.mode === 'dark' ? 'light mode' : 'dark mode'}`}
+              arrow
+              placement='top'
+            >
+              {theme.palette.mode === 'dark' ? (
+                <SunIcon fontSize='small' color='secondary' />
+              ) : (
+                <MoonIcon fontSize='small' color='secondary' />
+              )}
+            </Tooltip>
+          </IconButton>
+
           {/** user account */}
           {/* <Account /> */}
         </Box>
@@ -551,3 +547,5 @@ export default function Header({ open, openSidebar }: HeaderProps) {
     </StyledToolbar>
   );
 }
+
+export const Header = memo(HeaderComponent);

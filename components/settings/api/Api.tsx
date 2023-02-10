@@ -2,22 +2,18 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import LaunchIcon from '@mui/icons-material/LaunchOutlined';
 import { Alert, Button, FormControlLabel, FormGroup, Grid, InputLabel, Switch, TextField } from '@mui/material';
 import Typography from '@mui/material/Typography';
+import type { Space } from '@prisma/client';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
 import Link from 'components/common/Link';
+import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSnackbar } from 'hooks/useSnackbar';
 import useWebhookSubscription from 'hooks/useSpaceWebhook';
 import log from 'lib/log';
 
 import Legend from '../Legend';
-
-interface Props {
-  isAdmin: boolean;
-  spaceId: string;
-  // spaceOwner: string;
-}
 
 export const schema = yup.object({
   webhookUrl: yup.string().nullable(true),
@@ -33,8 +29,9 @@ export const schema = yup.object({
 
 type FormValues = yup.InferType<typeof schema>;
 
-export function ApiSettings({ isAdmin, spaceId }: Props) {
-  const { updateSpaceWebhook, spaceWebhook, isLoading } = useWebhookSubscription(spaceId);
+export function ApiSettings({ space }: { space: Space }) {
+  const isAdmin = useIsAdmin();
+  const { updateSpaceWebhook, spaceWebhook, isLoading } = useWebhookSubscription(space.id);
   const { showMessage } = useSnackbar();
 
   const {

@@ -1,15 +1,15 @@
 import type { Page } from '@playwright/test';
-import { expect, test as base } from '@playwright/test';
+import { test as base } from '@playwright/test';
 
 import { LoginPage } from '../po/login.po';
-import { NexusPage } from '../po/nexus.po';
-import { createUserAndSpace, generateUserAndSpace } from '../utils/mocks';
+import { SpacesDropdown } from '../po/spacesDropdown.po';
+import { createUserAndSpace } from '../utils/mocks';
 import { mockWeb3 } from '../utils/web3';
 
 type Fixtures = {
   sandboxPage: Page;
   loginPage: LoginPage;
-  nexusPage: NexusPage;
+  spacesDropdown: SpacesDropdown;
 };
 
 const test = base.extend<Fixtures>({
@@ -19,11 +19,11 @@ const test = base.extend<Fixtures>({
     await use(page);
   },
   loginPage: ({ sandboxPage }, use) => use(new LoginPage(sandboxPage)),
-  nexusPage: ({ sandboxPage }, use) => use(new NexusPage(sandboxPage))
+  spacesDropdown: ({ sandboxPage }, use) => use(new SpacesDropdown(sandboxPage))
 });
 
-test('login - allows user to logout even with a connected wallet', async ({ loginPage, nexusPage }) => {
-  const { address, privateKey } = await createUserAndSpace({ browserPage: loginPage.page });
+test('login - allows user to logout even with a connected wallet', async ({ loginPage, spacesDropdown }) => {
+  const { address, privateKey, space } = await createUserAndSpace({ browserPage: loginPage.page });
 
   await mockWeb3({
     page: loginPage.page,
@@ -38,11 +38,16 @@ test('login - allows user to logout even with a connected wallet', async ({ logi
     }
   });
 
-  await nexusPage.goto();
+  await loginPage.goto();
 
-  await nexusPage.waitForURL();
+  await loginPage.waitForWorkspaceLoaded({
+    domain: space.domain,
+    page: { path: 'getting-started', title: 'Getting started' }
+  });
 
-  await nexusPage.logoutButton.click();
+  await spacesDropdown.spaceMenuBtn.click();
+
+  await spacesDropdown.logoutButton.click();
 
   // should auto redirect to workspace
   await loginPage.waitForURL();

@@ -1,17 +1,17 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import type { PostCategory, Prisma, Space, User } from '@prisma/client';
+import type { PostCategory, PostCategoryPermission, Prisma, Space, User } from '@prisma/client';
 import request from 'supertest';
 import { v4 } from 'uuid';
 
 import { prisma } from 'db';
 import type { CreatePostCategoryInput } from 'lib/forums/categories/createPostCategory';
 import { upsertPostCategoryPermission } from 'lib/permissions/forum/upsertPostCategoryPermission';
-import { upsertPermission } from 'lib/permissions/pages';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 let firstSpace: Space;
 let firstSpaceAdminUser: User;
+let firstSpaceAdminUserCookie: string;
 let firstSpaceUser: User;
 let secondSpace: Space;
 let secondSpaceUser: User;
@@ -26,6 +26,7 @@ beforeAll(async () => {
 
   firstSpace = _firstSpace;
   firstSpaceAdminUser = _firstAdminUser;
+  firstSpaceAdminUserCookie = await loginUser(firstSpaceAdminUser.id);
   firstSpaceUser = await generateSpaceUser({ isAdmin: false, spaceId: firstSpace.id });
 
   const { space: _secondSpace, user: _secondUser } = await generateUserAndSpaceWithApiToken(undefined, false);
@@ -71,8 +72,6 @@ beforeAll(async () => {
 
 describe('POST /api/spaces/[id]/post-categories - Create a post category', () => {
   it('should create the post category if the user is a space admin, and return the post category, responding with 201', async () => {
-    const adminUserCookie = await loginUser(firstSpaceAdminUser.id);
-
     const createInput: Partial<CreatePostCategoryInput> = {
       name: 'Test Category'
     };
@@ -80,13 +79,50 @@ describe('POST /api/spaces/[id]/post-categories - Create a post category', () =>
     const postCategory = (
       await request(baseUrl)
         .post(`/api/spaces/${firstSpace.id}/post-categories`)
-        .set('Cookie', adminUserCookie)
+        .set('Cookie', firstSpaceAdminUserCookie)
         .send(createInput)
         .expect(201)
     ).body as PostCategory;
 
     expect(postCategory.name).toBe(createInput.name);
     expect(postCategory.spaceId).toBe(firstSpace.id);
+  });
+
+  it('should create a space / full access permission by default for the post category', async () => {
+    const createInput: Partial<CreatePostCategoryInput> = {
+      name: 'Category with default permission'
+    };
+
+    const category = (
+      await request(baseUrl)
+        .post(`/api/spaces/${firstSpace.id}/post-categories`)
+        .set('Cookie', firstSpaceAdminUserCookie)
+        .send(createInput)
+        .expect(201)
+    ).body as PostCategory;
+
+    const permissions = await prisma.postCategoryPermission.findMany({
+      where: {
+        postCategoryId: category.id
+      }
+    });
+
+    expect(permissions.length).toBe(1);
+
+    const permission = permissions[0];
+
+    expect(permission).toMatchObject(
+      expect.objectContaining<PostCategoryPermission>({
+        id: expect.any(String),
+        spaceId: firstSpace.id,
+        roleId: null,
+        public: null,
+        postCategoryId: category.id,
+        permissionLevel: 'full_access',
+        categoryOperations: [],
+        postOperations: []
+      })
+    );
   });
 
   it('should fail to create the post category if the user is not a space admin, responding with 401', async () => {

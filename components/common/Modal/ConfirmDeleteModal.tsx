@@ -34,7 +34,17 @@ export default function ConfirmDeleteModal({
       {typeof question === 'string' ? <Typography>{question}</Typography> : question}
 
       <Box sx={{ columnSpacing: 2, mt: 3, display: 'flex' }}>
-        <Button color='error' sx={{ mr: 2, fontWeight: 'bold' }} onClick={_onConfirm}>
+        <Button
+          color='error'
+          sx={{
+            mr: 2,
+            fontWeight: 'bold',
+            display: 'block',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis'
+          }}
+          onClick={_onConfirm}
+        >
           {buttonText}
         </Button>
 

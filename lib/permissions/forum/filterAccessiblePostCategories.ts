@@ -6,6 +6,7 @@ import { uniqueValues } from 'lib/utilities/array';
 import { InvalidInputError } from 'lib/utilities/errors';
 
 import { AvailablePostCategoryPermissions } from './availablePostCategoryPermissions.class';
+import { hasSpaceWideModerateForumsPermission } from './hasSpaceWideModerateForumsPermission';
 import type { PostCategoryWithPermissions } from './interfaces';
 import { postCategoryPermissionsMapping } from './mapping';
 
@@ -61,6 +62,17 @@ export async function filterAccessiblePostCategories({
       .filter((category) => publicCategoryPermissions.some((permission) => permission.postCategoryId === category.id))
       .map((c) => ({ ...c, permissions }));
   } else {
+    const hasSpaceWideModerator = await hasSpaceWideModerateForumsPermission({
+      spaceId,
+      userId
+    });
+
+    if (hasSpaceWideModerator) {
+      const moderatorPermissions = new AvailablePostCategoryPermissions();
+      moderatorPermissions.addPermissions(postCategoryPermissionsMapping.moderator);
+      return postCategories.map((c) => ({ ...c, permissions: moderatorPermissions.operationFlags }));
+    }
+
     const userRolesInSpace = await prisma.spaceRoleToRole.findMany({
       where: {
         spaceRoleId: spaceRole.id

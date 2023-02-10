@@ -1,6 +1,5 @@
 import { useTheme } from '@emotion/react';
-import { IconButton, Tooltip, Typography } from '@mui/material';
-import { Box } from '@mui/system';
+import { IconButton, Tooltip, Typography, Box } from '@mui/material';
 import type { MouseEvent } from 'react';
 import { ImArrowDown, ImArrowUp } from 'react-icons/im';
 

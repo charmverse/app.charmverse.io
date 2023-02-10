@@ -1,11 +1,11 @@
 /* eslint-disable no-unused-expressions */
 
 import { Add } from '@mui/icons-material';
+import type { SxProps, Theme } from '@mui/material';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
-import type { SxProps } from '@mui/system';
 import { usePopupState, bindMenu } from 'material-ui-popup-state/hooks';
 import type { MouseEvent } from 'react';
 import { useCallback } from 'react';
@@ -35,7 +35,7 @@ type AddViewProps = {
   intl: IntlShape;
   showLabel?: boolean;
   showView: (viewId: string) => void;
-  sx?: SxProps;
+  sx?: SxProps<Theme>;
   onClickIcon?: () => void; // override the icon click
   onClose?: () => void;
 };

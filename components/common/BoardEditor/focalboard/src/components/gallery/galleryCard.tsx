@@ -36,7 +36,7 @@ type Props = {
 
 const GalleryCard = React.memo((props: Props) => {
   const { card, board } = props;
-  const { pages, getPagePermissions } = usePages();
+  const { pages } = usePages();
   const space = useCurrentSpace();
   const [isDragging, isOver, cardRef] = useSortable(
     'card',
@@ -54,8 +54,6 @@ const GalleryCard = React.memo((props: Props) => {
   }
 
   const galleryImageUrl: null | string | undefined = cardPage?.headerImage || cardPage?.galleryImage;
-
-  const pagePermissions = getPagePermissions(card.id);
 
   const deleteCard = () => {
     mutator.deleteBlock(card, 'delete card');
@@ -82,13 +80,7 @@ const GalleryCard = React.memo((props: Props) => {
       ref={cardRef}
       data-test={`gallery-card-${card.id}`}
     >
-      {!props.readOnly && (
-        <PageActions
-          page={cardPage}
-          onClickDuplicate={duplicateCard}
-          onClickDelete={pagePermissions.delete && cardPage.deletedAt === null ? deleteCard : undefined}
-        />
-      )}
+      {!props.readOnly && <PageActions page={cardPage} onClickDuplicate={duplicateCard} onClickDelete={deleteCard} />}
       {galleryImageUrl && (
         <div className='gallery-image'>
           <img className='ImageElement' src={galleryImageUrl} alt='Gallery item' />

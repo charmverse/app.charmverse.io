@@ -1,7 +1,6 @@
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
-import { ListItem, Typography } from '@mui/material';
-import { Box } from '@mui/system';
+import { ListItem, Typography, Box } from '@mui/material';
 import { memo } from 'react';
 
 import ImageSelector from 'components/common/ImageSelector/ImageSelector';

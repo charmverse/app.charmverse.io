@@ -1,6 +1,5 @@
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
-import { IconButton } from '@mui/material';
-import { Box } from '@mui/system';
+import { IconButton, Box } from '@mui/material';
 import React, { memo, useEffect, useMemo, useRef, useState } from 'react';
 import type { MouseEvent } from 'react';
 import { FormattedMessage } from 'react-intl';
@@ -10,7 +9,6 @@ import { filterPropertyTemplates } from 'components/common/BoardEditor/utils/upd
 import { PageActionsMenu } from 'components/common/PageActionsMenu';
 import { PageIcon } from 'components/common/PageLayout/components/PageIcon';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { usePages } from 'hooks/usePages';
 import type { Board } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
@@ -43,7 +41,7 @@ type Props = {
   columnRefs: Map<string, React.RefObject<HTMLDivElement>>;
   onClick?: (e: React.MouseEvent<HTMLDivElement>, card: Card) => void;
   onDrop: (srcCard: Card, dstCard: Card) => void;
-  saveTitle: (saveType: string, cardId: string, title: string) => void;
+  saveTitle: (saveType: string, cardId: string, title: string, oldTitle: string) => void;
   cardPage: PageMeta;
 };
 
@@ -74,7 +72,6 @@ function TableRow(props: Props) {
     saveTitle
   } = props;
   const space = useCurrentSpace();
-  const { pages, getPagePermissions } = usePages();
   const titleRef = useRef<{ focus(selectAll?: boolean): void }>(null);
   const [title, setTitle] = useState('');
   const isManualSort = activeView.fields.sortOptions.length === 0;
@@ -85,16 +82,13 @@ function TableRow(props: Props) {
     !isTouchScreen() && !props.readOnly && (isManualSort || isGrouped),
     props.onDrop
   );
-  const pagePermissions = getPagePermissions(card.id);
   const handleDeleteCard = async () => {
     if (!card) {
       Utils.assertFailure();
       return;
     }
-    if (pagePermissions.delete) {
-      await mutator.deleteBlock(card, 'delete card');
-      mutate(`pages/${space?.id}`);
-    }
+    await mutator.deleteBlock(card, 'delete card');
+    mutate(`pages/${space?.id}`);
   };
 
   const duplicateCard = () => {
@@ -183,7 +177,7 @@ function TableRow(props: Props) {
                   value={title}
                   placeholderText='Untitled'
                   onChange={(newTitle: string) => setTitle(newTitle)}
-                  onSave={(saveType) => saveTitle(saveType, card.id, title)}
+                  onSave={(saveType) => saveTitle(saveType, card.id, title, pageTitle)}
                   onCancel={() => setTitle(card.title || '')}
                   readOnly={props.readOnly}
                   spellCheck={true}
@@ -223,7 +217,7 @@ function TableRow(props: Props) {
       {cardPage && !props.readOnly && (
         <PageActionsMenu
           onClickDuplicate={duplicateCard}
-          onClickDelete={pagePermissions.delete && cardPage.deletedAt === null ? handleDeleteCard : undefined}
+          onClickDelete={handleDeleteCard}
           anchorEl={anchorEl}
           setAnchorEl={setAnchorEl}
           page={cardPage}

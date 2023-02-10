@@ -1,8 +1,8 @@
+import type { SxProps, Theme } from '@mui/material';
 import type { AutocompleteProps } from '@mui/material/Autocomplete';
 import Autocomplete from '@mui/material/Autocomplete';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
-import type { SxProps } from '@mui/system';
 import type { IChainDetails } from 'connectors';
 import { RPCList } from 'connectors';
 import { useEffect, useState } from 'react';
@@ -11,7 +11,7 @@ interface Props extends Omit<Partial<AutocompleteProps<IChainDetails, false, tru
   onChange?: (chainId: number) => void;
   defaultChainId?: number; // allow setting a default
   chainId?: number; // allow overriding from the parent
-  sx?: SxProps;
+  sx?: SxProps<Theme>;
 }
 
 export default function InputSearchBlockchain({

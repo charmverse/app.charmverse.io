@@ -217,9 +217,9 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
         ref={editorRef}
         className='bangle-editor-core'
         data-page-id={pageId}
-        style={{ minHeight: showLoader && isLoading ? '300px' : undefined }}
+        style={{ minHeight: showLoader && isLoading ? '200px' : undefined }}
       >
-        <StyledLoadingComponent height='300px' isLoading={showLoader && isLoading} />
+        <StyledLoadingComponent isLoading={showLoader && isLoading} />
         <div ref={renderRef} id={pageId} className={className} style={style} />
       </div>
       {nodeViews.map((nodeView) => {

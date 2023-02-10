@@ -1,5 +1,5 @@
-import { Dialog, DialogContent, Divider, Typography, useMediaQuery } from '@mui/material';
-import { Box, Stack, useTheme } from '@mui/system';
+import { Dialog, DialogContent, Divider, Typography, useMediaQuery, Box, Stack } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import type { MemberProperty, MemberPropertyType } from '@prisma/client';
 import useSWR from 'swr';
 
