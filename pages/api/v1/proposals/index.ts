@@ -3,7 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { prisma } from 'db';
-import { InvalidStateError, onError, onNoMatch, requireApiKey, requireKeys, requireSuperApiKey } from 'lib/middleware';
+import { InvalidStateError, onError, onNoMatch, requireApiKey } from 'lib/middleware';
 import { generateMarkdown } from 'lib/pages';
 import { withSessionRoute } from 'lib/session/withSession';
 
@@ -104,15 +104,12 @@ export interface PublicApiProposal {
   url: string;
 }
 
-handler
-  // TODO: require either super api key or "regular" api key
-  .use(requireApiKey)
-  .get(listProposals);
+handler.use(requireApiKey).get(listProposals);
 
 /**
  * @swagger
  * /api/v1/proposals:
- *   post:
+ *   get:
  *     summary: Get active proposals.
  *     description: Get a list of all proposals that are currently active in the space.
  *     responses:
