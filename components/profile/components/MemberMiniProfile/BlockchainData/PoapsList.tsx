@@ -24,7 +24,7 @@ export function PoapsList({ memberId }: { memberId: string }) {
   }
 
   return (
-    <Stack gap={1}>
+    <Stack gap={1} data-test='member-profile-poap-list'>
       <Typography variant='h6'>Recent POAPs</Typography>
       {error && (
         <Grid item>
