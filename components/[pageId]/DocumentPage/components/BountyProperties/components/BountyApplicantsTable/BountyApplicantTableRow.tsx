@@ -1,18 +1,6 @@
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import OpenInNewIcon from '@mui/icons-material/OpenInNew';
-import {
-  Alert,
-  Card,
-  Collapse,
-  FormLabel,
-  IconButton,
-  Box,
-  Tooltip,
-  TableCell,
-  TableRow,
-  Typography
-} from '@mui/material';
+import { Alert, Collapse, FormLabel, IconButton, Box, Tooltip, TableCell, TableRow, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { v4 as uuid } from 'uuid';
 
@@ -22,16 +10,15 @@ import { createCommentBlock } from 'components/common/BoardEditor/focalboard/src
 import { NewCommentInput } from 'components/common/BoardEditor/focalboard/src/components/cardDetail/commentsList';
 import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
 import Button from 'components/common/Button';
-import Link from 'components/common/Link';
 import Modal from 'components/common/Modal';
 import UserDisplay from 'components/common/UserDisplay';
 import { useBounties } from 'hooks/useBounties';
+import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
 import type { ApplicationWithTransactions } from 'lib/applications/actions';
 import type { ReviewDecision, SubmissionReview } from 'lib/applications/interfaces';
 import type { AssignedBountyPermissions, BountyWithDetails } from 'lib/bounties';
-import { humanFriendlyDate } from 'lib/utilities/dates';
 import type { SystemError } from 'lib/utilities/errors';
 
 import ApplicationInput from '../BountyApplicantForm/components/ApplicationInput';
@@ -61,6 +48,7 @@ export default function BountyApplicantTableRow({
   const member = members.find((c) => c.id === submission.createdBy);
   const { refreshBounty } = useBounties();
   const [editorKey, setEditorKey] = useState(0); // a key to allow us to reset charmeditor contents
+  const { formatDateTime } = useDateFormatter();
 
   const [defaultComment, setDefaultComment] = useState<CommentBlock['fields'] | null>(null);
   const [reviewDecision, setReviewDecision] = useState<SubmissionReview | null>(null);
@@ -132,7 +120,7 @@ export default function BountyApplicantTableRow({
         <TableCell>
           <BountyApplicantStatus submission={submission} />
         </TableCell>
-        <TableCell>{humanFriendlyDate(submission.updatedAt, { withTime: true })}</TableCell>
+        <TableCell>{formatDateTime(submission.updatedAt)}</TableCell>
         <TableCell>
           <Tooltip title={isExpandedRow ? 'Hide details' : 'View details'}>
             <IconButton

@@ -1,6 +1,5 @@
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
-import { IconButton } from '@mui/material';
-import { Box } from '@mui/system';
+import { IconButton, Box } from '@mui/material';
 import React, { memo, useEffect, useMemo, useRef, useState } from 'react';
 import type { MouseEvent } from 'react';
 import { FormattedMessage } from 'react-intl';

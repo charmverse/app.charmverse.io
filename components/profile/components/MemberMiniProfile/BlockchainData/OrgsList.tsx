@@ -1,7 +1,6 @@
 import CancelIcon from '@mui/icons-material/Cancel';
-import { Grid, Tooltip, Typography } from '@mui/material';
+import { Grid, Tooltip, Typography, Stack } from '@mui/material';
 import Alert from '@mui/material/Alert';
-import { Stack } from '@mui/system';
 import { useState } from 'react';
 import useSWRImmutable from 'swr/immutable';
 
@@ -40,8 +39,12 @@ export function OrgsList({ memberId, readOnly = false }: Props) {
     setIsShowingOrgsGallery(false);
   }
 
+  if (currentUser?.id !== memberId && pinnedOrgs.length === 0) {
+    return null;
+  }
+
   return (
-    <Stack gap={1}>
+    <Stack gap={1} data-test='member-profile-org-list'>
       <Typography variant='h6'>Organizations</Typography>
       {error && (
         <Grid item>
@@ -86,8 +89,6 @@ export function OrgsList({ memberId, readOnly = false }: Props) {
                   />
                 </div>
               </Tooltip>
-            ) : pinnedOrgs.length === 0 ? (
-              <Typography color='secondary'>No pinned Organizations</Typography>
             ) : null}
 
             {showingOrgsGallery && (

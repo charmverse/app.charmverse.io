@@ -2,7 +2,7 @@ import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import useIsAdmin from 'hooks/useIsAdmin';
+import { useIsAdmin } from 'hooks/useIsAdmin';
 import type { NewProposalCategory } from 'lib/proposal/interface';
 
 export function useProposalCategories() {

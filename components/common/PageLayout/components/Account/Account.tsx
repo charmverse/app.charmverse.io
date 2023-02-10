@@ -1,8 +1,8 @@
 import styled from '@emotion/styled';
 import ButtonGroup from '@mui/material/ButtonGroup';
+import { alpha } from '@mui/material/styles';
 import SvgIcon from '@mui/material/SvgIcon';
 import Tooltip from '@mui/material/Tooltip';
-import { alpha } from '@mui/system';
 import { UnsupportedChainIdError, useWeb3React } from '@web3-react/core';
 import { getChainById } from 'connectors';
 import { usePopupState } from 'material-ui-popup-state/hooks';

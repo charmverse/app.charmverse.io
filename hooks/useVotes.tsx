@@ -5,11 +5,11 @@ import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 import useTasks from 'components/nexus/hooks/useTasks';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { ExtendedVote, VoteDTO, VoteTask } from 'lib/votes/interfaces';
 import type { GetTasksResponse } from 'pages/api/tasks/list';
 
 import { useCurrentPage } from './useCurrentPage';
-import { useCurrentSpace } from './useCurrentSpace';
 import { useUser } from './useUser';
 import { useWebSocketClient } from './useWebSocketClient';
 

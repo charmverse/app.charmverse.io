@@ -135,10 +135,6 @@ test.describe.serial('Comment on forum posts', () => {
 
     await forumHomePage.goToForumHome(space.domain);
 
-    await forumHomePage.page.waitForTimeout(2000);
-
-    await forumHomePage.page.press('data-test=member-onboarding-form', 'Escape');
-
     const postCard = forumHomePage.getPostCardLocator(post.id);
 
     await expect(postCard).toBeVisible();

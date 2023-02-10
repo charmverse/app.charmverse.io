@@ -18,7 +18,7 @@ export class ForumPostPage {
     this.newTopLevelCommentSubmitButtonLocator = this.newTopLevelCommentInputLocator.locator(
       'data-test=post-comment-button'
     );
-    this.postCharmeditor = this.page.locator('data-test=post-charmeditor').locator('div[contenteditable]').first();
+    this.postCharmeditor = this.page.locator('data-test=post-charmeditor').locator('div[contenteditable]');
   }
 
   // Navigation utilities

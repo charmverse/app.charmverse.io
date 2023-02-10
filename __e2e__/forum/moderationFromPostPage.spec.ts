@@ -154,9 +154,6 @@ test.describe.serial('Moderate forum posts', () => {
       domain: space.domain,
       path: post.path
     });
-
-    await page.locator('data-test=close-modal').click();
-
     const contextMenu = forumPostPage.getPostCommentMenuLocator(unwantedcomment.id);
 
     await expect(contextMenu).toBeVisible();
@@ -217,9 +214,6 @@ test.describe.serial('Moderate forum posts', () => {
       domain: space.domain,
       path: postToDelete.path
     });
-
-    await page.locator('data-test=close-modal').click();
-
     const header = pageHeader.pageTopLevelMenu;
     await expect(header).toBeVisible();
     await header.click();
@@ -245,8 +239,6 @@ test.describe.serial('Moderate forum posts', () => {
       domain: space.domain,
       path: postToDelete.path
     });
-
-    await page.locator('data-test=close-modal').click();
 
     const header = pageHeader.pageTopLevelMenu;
 

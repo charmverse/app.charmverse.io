@@ -1,6 +1,5 @@
 import CancelIcon from '@mui/icons-material/Cancel';
-import { Alert, Grid, Link, Tooltip, Typography } from '@mui/material';
-import { Stack } from '@mui/system';
+import { Alert, Grid, Link, Tooltip, Typography, Stack } from '@mui/material';
 import { useState } from 'react';
 import useSWRImmutable from 'swr/immutable';
 
@@ -39,8 +38,12 @@ export function NftsList({ memberId, readOnly = false }: Props) {
     setIsShowingNftGallery(false);
   }
 
+  if (currentUser?.id !== memberId && pinnedNfts.length === 0) {
+    return null;
+  }
+
   return (
-    <Stack gap={1}>
+    <Stack gap={1} data-test='member-profile-nft-list'>
       <Typography variant='h6'>NFTs</Typography>
       {error && (
         <Grid item>
@@ -81,11 +84,10 @@ export function NftsList({ memberId, readOnly = false }: Props) {
                   />
                 </div>
               </Tooltip>
-            ) : pinnedNfts.length === 0 ? (
-              <Typography color='secondary'>No pinned NFTs</Typography>
             ) : null}
             {showingNftGallery && (
               <NftAvatarGalleryPopup
+                disableAutoSelectAvatarNft
                 isVisible
                 onClose={() => {
                   setIsShowingNftGallery(false);

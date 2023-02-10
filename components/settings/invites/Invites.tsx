@@ -1,13 +1,12 @@
 import { Typography } from '@mui/material';
 import type { Space } from '@prisma/client';
 import { usePopupState } from 'material-ui-popup-state/hooks';
-import { useEffect, useContext, useRef } from 'react';
+import { useContext, useEffect, useRef } from 'react';
 
 import { Web3Connection } from 'components/_app/Web3ConnectionManager';
+import { useIsAdmin } from 'hooks/useIsAdmin';
 import { usePendingLocalAction } from 'hooks/usePendingLocalAction';
-import { useUser } from 'hooks/useUser';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
-import isSpaceAdmin from 'lib/users/isSpaceAdmin';
 
 import Legend from '../Legend';
 
@@ -18,8 +17,7 @@ import TokenGates from './components/TokenGates';
 
 function Invites({ space }: { space: Space }) {
   const spaceId = space.id;
-  const { user } = useUser();
-  const isAdmin = isSpaceAdmin(user, space?.id);
+  const isAdmin = useIsAdmin();
   const popupInvitesState = usePopupState({ variant: 'popover', popupId: 'invites' });
   const popupTokenGateState = usePopupState({ variant: 'popover', popupId: 'token-gate' });
   const { isPendingAction, setPendingAction } = usePendingLocalAction('open-token-gate-modal');

@@ -12,6 +12,7 @@ import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import type { Space } from '@prisma/client';
 import type { ReactNode } from 'react';
+import { useEffect } from 'react';
 
 import { StyledTreeItem } from 'components/common/PageLayout/components/PageNavigation/components/PageTreeItem';
 import IntegrationSettings from 'components/integrations/IntegrationsPage';
@@ -20,12 +21,16 @@ import ProfileSettings from 'components/profile/ProfileSettings';
 import { ApiSettings } from 'components/settings/api/Api';
 import Invites from 'components/settings/invites/Invites';
 import MemberSettings from 'components/settings/members/MemberSettings';
+import type { SpaceSettingsTab, UserSettingsTab } from 'components/settings/pages';
 import { SETTINGS_TABS, ACCOUNT_TABS } from 'components/settings/pages';
 import RoleSettings from 'components/settings/roles/RoleSettings';
 import SpaceSettings from 'components/settings/workspace/Space';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { CurrentSpaceProvider, useCurrentSpaceId } from 'hooks/useCurrentSpaceId';
 import { useSmallScreen } from 'hooks/useMediaScreens';
+import { MembersProvider } from 'hooks/useMembers';
 import { useSettingsDialog } from 'hooks/useSettingsDialog';
+import { useSpaceFromPath } from 'hooks/useSpaceFromPath';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
 
@@ -37,7 +42,7 @@ interface TabPanelProps extends BoxProps {
   value: string;
 }
 
-function TabView(props: { space?: Space; tab: (typeof SETTINGS_TABS)[0] }) {
+function TabView(props: { space?: Space; tab: SpaceSettingsTab | UserSettingsTab }) {
   const { space, tab } = props;
 
   if (tab.path === SETTINGS_TABS[0].path && space) {
@@ -91,10 +96,21 @@ function TabPanel(props: TabPanelProps) {
   );
 }
 
-export default function SettingsModal() {
+function SpaceSettingsModalComponent() {
+  const { setCurrentSpaceId, currentSpaceId } = useCurrentSpaceId();
+
+  // This is only ever used for setting the current space as the target space, on the initial popup of the dialog
+  const spaceByPath = useSpaceFromPath();
+  useEffect(() => {
+    if (!currentSpaceId && spaceByPath) {
+      setCurrentSpaceId(spaceByPath.id);
+    }
+  }, [spaceByPath]);
+
   const { user } = useUser();
   const { spaces } = useSpaces();
   const currentSpace = useCurrentSpace();
+
   const isMobile = useSmallScreen();
   const { activePath, onClose, onClick, open } = useSettingsDialog();
 
@@ -144,7 +160,12 @@ export default function SettingsModal() {
               <StyledTreeItem nodeId='my-spaces' label='My spaces' icon={null} sx={{ mt: 1.5 }}>
                 {spaces.map((space) => (
                   <StyledTreeItem
+                    data-test={`space-settings-tab-${space.id}`}
                     key={space.id}
+                    onClick={() => {
+                      setCurrentSpaceId(space.id);
+                      onClick(`${space.name}-space`);
+                    }}
                     nodeId={space.name}
                     label={
                       <Box display='flex' alignItems='center' gap={1}>
@@ -156,11 +177,15 @@ export default function SettingsModal() {
                   >
                     {SETTINGS_TABS.map((tab) => (
                       <StyledTreeItem
+                        data-test={`space-settings-tab-${space.id}-${tab.path}`}
                         key={tab.path}
                         nodeId={`${space.name}-${tab.path}`}
                         label={tab.label}
                         icon={tab.icon}
-                        onClick={() => onClick(`${space.name}-${tab.path}`)}
+                        onClick={() => {
+                          setCurrentSpaceId(space.id);
+                          onClick(`${space.name}-${tab.path}`);
+                        }}
                         isActive={activePath === `${space.name}-${tab.path}`}
                         ContentProps={{ style: { paddingLeft: 45 } }}
                       />
@@ -216,5 +241,14 @@ export default function SettingsModal() {
         </IconButton>
       </Box>
     </Dialog>
+  );
+}
+export function SpaceSettingsDialog() {
+  return (
+    <CurrentSpaceProvider>
+      <MembersProvider>
+        <SpaceSettingsModalComponent />
+      </MembersProvider>
+    </CurrentSpaceProvider>
   );
 }

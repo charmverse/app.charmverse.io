@@ -1,12 +1,11 @@
 import styled from '@emotion/styled';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
-import { IconButton, Link, Stack, Tooltip, Typography } from '@mui/material';
-import { Box } from '@mui/system';
+import { IconButton, Link, Stack, Tooltip, Typography, Box } from '@mui/material';
 
 import Avatar from 'components/common/Avatar';
+import { useDateFormatter } from 'hooks/useDateFormatter';
 import type { Collectable } from 'lib/blockchain/interfaces';
-import { showDateWithMonthAndYear } from 'lib/utilities/dates';
 
 interface ProfileItemProps {
   onClick: () => void;
@@ -35,6 +34,8 @@ export const ProfileItemContainer = styled(({ visible, ...props }: any) => <Stac
 `;
 
 export default function CollectibleRow({ onClick, collectable, visible, showVisibilityIcon }: ProfileItemProps) {
+  const { formatDate } = useDateFormatter();
+
   return (
     <ProfileItemContainer visible={visible} display='flex' gap={2} flexDirection='row'>
       <Link className='hidden-on-visible' href={collectable.link} target='_blank' display='flex'>
@@ -54,7 +55,7 @@ export default function CollectibleRow({ onClick, collectable, visible, showVisi
             {collectable.title}
           </Typography>
         </Box>
-        <Typography variant='subtitle2'>{showDateWithMonthAndYear(collectable.date) ?? '?'}</Typography>
+        <Typography variant='subtitle2'>{formatDate(collectable.date) ?? '?'}</Typography>
       </Stack>
       {showVisibilityIcon && (
         <Box display='flex' alignItems='center'>

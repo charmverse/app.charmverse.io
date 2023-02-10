@@ -2,15 +2,13 @@ import { Box, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/mate
 import type { Space } from '@prisma/client';
 import { bindMenu, usePopupState } from 'material-ui-popup-state/hooks';
 import { useState } from 'react';
-import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 import Loader from 'components/common/Loader';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
-import { useUser } from 'hooks/useUser';
+import { useIsAdmin } from 'hooks/useIsAdmin';
+import { useMembers } from 'hooks/useMembers';
 import type { Member } from 'lib/members/interfaces';
-import isSpaceAdmin from 'lib/users/isSpaceAdmin';
-import { shortWalletAddress } from 'lib/utilities/strings';
 
 import Legend from '../Legend';
 
@@ -18,30 +16,13 @@ import type { RoleAction } from './MemberListItem';
 import MemberListItem from './MemberListItem';
 
 export default function MemberSettings({ space }: { space: Space }) {
-  const { user } = useUser();
-  const isAdmin = isSpaceAdmin(user, space?.id);
+  const isAdmin = useIsAdmin();
   const { id: spaceId, createdBy: spaceOwner } = space;
   const popupState = usePopupState({ variant: 'popover', popupId: 'member-list' });
-  const {
-    data: members,
-    mutate: mutateMembers,
-    isLoading
-  } = useSWR(
-    () => (space ? `members/${space?.id}` : null),
-    () => {
-      return charmClient.members.getMembers(space!.id).then((_members) =>
-        _members.map((m) => {
-          if (m.identityType === 'Wallet') {
-            m.username = shortWalletAddress(m.username);
-          }
-          return m;
-        })
-      );
-    }
-  );
+  const { members, mutateMembers } = useMembers();
   const [removedMemberId, setRemovedMemberId] = useState<string | null>(null);
 
-  const removedMember = removedMemberId && members ? members.find((member) => member.id === removedMemberId) : null;
+  const removedMember = removedMemberId ? members.find((member) => member.id === removedMemberId) : null;
 
   const closed = popupState.close;
 
@@ -54,12 +35,6 @@ export default function MemberSettings({ space }: { space: Space }) {
     switch (action) {
       case 'makeAdmin':
         await charmClient.updateMember({ spaceId, userId: member.id, isAdmin: true });
-        if (members) {
-          mutateMembers(
-            members.map((c) => (c.id === member.id ? { ...c, isAdmin: true } : c)),
-            { revalidate: false }
-          );
-        }
         break;
 
       case 'makeMember':
@@ -107,7 +82,6 @@ export default function MemberSettings({ space }: { space: Space }) {
             </TableRow>
           </TableHead>
           <TableBody>
-            {isLoading && <Loader />}
             {members
               ?.filter((member) => !member.isBot)
               .map((member) => (
