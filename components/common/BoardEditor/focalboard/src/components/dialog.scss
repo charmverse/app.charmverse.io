@@ -44,6 +44,7 @@
     left: 0;
     right: 0;
     bottom: 0;
+    margin: 0 auto;
     max-width: 100%;
 
     &.fullWidth {
@@ -62,6 +63,7 @@
       top: 50%;
       width: 100%;
       margin: 0;
+      height: calc(100% - 144px);
       min-width: 500px;
       max-width: 975px;
     }
