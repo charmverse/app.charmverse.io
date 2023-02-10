@@ -117,7 +117,7 @@ function UserDetails({ readOnly, user, updateUser, sx = {} }: UserDetailsProps) 
     }
 
     const types: IntegrationModel[] = [];
-    user.wallets.forEach((wallet) => {
+    user.wallets?.forEach((wallet) => {
       const address = wallet.address;
 
       types.push({
@@ -128,6 +128,7 @@ function UserDetails({ readOnly, user, updateUser, sx = {} }: UserDetailsProps) 
         icon: getIdentityIcon('Wallet')
       });
     });
+
     if (user?.discordUser && user.discordUser.account) {
       const discordAccount = user.discordUser.account as Partial<DiscordAccount>;
       types.push({
