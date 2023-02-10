@@ -3,6 +3,7 @@ import { v4 } from 'uuid';
 
 import { prisma } from 'db';
 import { PostNotFoundError } from 'lib/forums/posts/errors';
+import { addSpaceOperations } from 'lib/permissions/spaces';
 import { InvalidInputError } from 'lib/utilities/errors';
 import { generateRole, generateSpaceUser, generateUserAndSpace } from 'testing/setupDatabase';
 import { generateForumPost, generatePostCategory } from 'testing/utils/forums';
@@ -106,6 +107,40 @@ describe('computePostPermissions', () => {
     const permissions = await computePostPermissions({
       resourceId: post.id,
       userId: adminUser.id
+    });
+    postOperationsWithoutEdit.forEach((op) => {
+      expect(permissions[op]).toBe(true);
+    });
+    expect(permissions.edit_post).toBe(false);
+  });
+
+  it('should always return full permissions for a user with space-wide forum moderator permission, except editing a post they did not create', async () => {
+    const spaceWideForumModeratorUser = await generateSpaceUser({
+      spaceId: space.id,
+      isAdmin: false
+    });
+
+    const role = await generateRole({
+      createdBy: adminUser.id,
+      spaceId: space.id,
+      assigneeUserIds: [spaceWideForumModeratorUser.id]
+    });
+
+    await addSpaceOperations({
+      forSpaceId: space.id,
+      operations: ['moderateForums'],
+      roleId: role.id
+    });
+
+    const postCategory = await generatePostCategory({ spaceId: space.id });
+    const post = await generateForumPost({
+      spaceId: space.id,
+      categoryId: postCategory.id,
+      userId: authorUser.id
+    });
+    const permissions = await computePostPermissions({
+      resourceId: post.id,
+      userId: spaceWideForumModeratorUser.id
     });
     postOperationsWithoutEdit.forEach((op) => {
       expect(permissions[op]).toBe(true);

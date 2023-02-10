@@ -1,11 +1,10 @@
 import type { Space, User } from '@prisma/client';
-import { v4 } from 'uuid';
 
+import { InsecureOperationError, InvalidInputError, MissingDataError } from 'lib/utilities/errors';
 import { ExpectedAnError } from 'testing/errors';
 import { generateRole, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
-import { InsecureOperationError, InvalidInputError, MissingDataError } from '../../../utilities/errors';
-import { InvalidPermissionGranteeError } from '../../errors';
+import { AssignableToRolesOnlyError, InvalidPermissionGranteeError } from '../../errors';
 import { addSpaceOperations } from '../addSpaceOperations';
 
 let user: User;
@@ -92,8 +91,40 @@ describe('addSpaceOperations', () => {
     });
 
     // Nothing has changed
-    expect(createdPermission.createPage).toBe(true);
-    expect(createdPermission.createBounty).toBe(false);
+    expect(updatedPermission.createPage).toBe(createdPermission.createPage);
+    expect(updatedPermission.createBounty).toBe(createdPermission.createBounty);
+  });
+
+  it('should only allow roles as assignees for moderateForums', async () => {
+    const role = await generateRole({
+      spaceId: space.id,
+      createdBy: user.id
+    });
+
+    // Test by adding multiple operations to make sure moderateForums doesn't slip through
+    const createdPermission = await addSpaceOperations({
+      forSpaceId: space.id,
+      operations: ['createPage', 'moderateForums'],
+      roleId: role.id
+    });
+
+    expect(createdPermission.moderateForums).toBe(true);
+
+    await expect(
+      addSpaceOperations({
+        forSpaceId: space.id,
+        operations: ['createPage', 'moderateForums'],
+        spaceId: space.id
+      })
+    ).rejects.toBeInstanceOf(AssignableToRolesOnlyError);
+
+    await expect(
+      addSpaceOperations({
+        forSpaceId: space.id,
+        operations: ['createPage', 'moderateForums'],
+        userId: user.id
+      })
+    ).rejects.toBeInstanceOf(AssignableToRolesOnlyError);
   });
 
   it('should fail if 0 assignee groups are provided', async () => {
