@@ -318,6 +318,9 @@ export interface CreateWorkspaceRequestBody {
   adminDiscordUserId?: string;
   xpsEngineId?: string;
   adminWalletAddress?: string;
+  adminAvatar?: string;
+  adminUsername?: string;
+  webhookUrl?: string;
   avatar?: string;
 }
 
