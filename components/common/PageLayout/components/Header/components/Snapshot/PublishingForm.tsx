@@ -18,7 +18,7 @@ import InputGeneratorText from 'components/common/form/InputGeneratorText';
 import { LoadingIcon } from 'components/common/LoadingComponent';
 import PrimaryButton from 'components/common/PrimaryButton';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import useIsAdmin from 'hooks/useIsAdmin';
+import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useMembers } from 'hooks/useMembers';
 import { usePages } from 'hooks/usePages';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';

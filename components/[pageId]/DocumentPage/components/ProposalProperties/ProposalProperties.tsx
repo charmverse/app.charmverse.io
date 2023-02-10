@@ -10,7 +10,7 @@ import UserDisplay from 'components/common/UserDisplay';
 import ProposalCategoryInput from 'components/proposals/components/ProposalCategoryInput';
 import ProposalStepper from 'components/proposals/components/ProposalStepper';
 import { useProposalCategories } from 'components/proposals/hooks/useProposalCategories';
-import useIsAdmin from 'hooks/useIsAdmin';
+import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useMembers } from 'hooks/useMembers';
 import useRoles from 'hooks/useRoles';
 import { useUser } from 'hooks/useUser';

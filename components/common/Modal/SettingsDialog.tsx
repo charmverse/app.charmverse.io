@@ -12,6 +12,7 @@ import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import type { Space } from '@prisma/client';
 import type { ReactNode } from 'react';
+import { useEffect } from 'react';
 
 import { StyledTreeItem } from 'components/common/PageLayout/components/PageNavigation/components/PageTreeItem';
 import IntegrationSettings from 'components/integrations/IntegrationsPage';
@@ -24,8 +25,10 @@ import { SETTINGS_TABS, ACCOUNT_TABS } from 'components/settings/pages';
 import RoleSettings from 'components/settings/roles/RoleSettings';
 import SpaceSettings from 'components/settings/workspace/Space';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { CurrentSpaceProvider, useCurrentSpaceId } from 'hooks/useCurrentSpaceId';
 import { useSmallScreen } from 'hooks/useMediaScreens';
 import { useSettingsDialog } from 'hooks/useSettingsDialog';
+import { useSpaceFromPath } from 'hooks/useSpaceFromPath';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
 
@@ -91,10 +94,21 @@ function TabPanel(props: TabPanelProps) {
   );
 }
 
-export default function SettingsModal() {
+function SpaceSettingsModalComponent() {
+  const { setCurrentSpaceId, currentSpaceId } = useCurrentSpaceId();
+
+  // This is only ever used for setting the current space as the target space, on the initial popup of the dialog
+  const spaceByPath = useSpaceFromPath();
+  useEffect(() => {
+    if (!currentSpaceId && spaceByPath) {
+      setCurrentSpaceId(spaceByPath.id);
+    }
+  }, [spaceByPath]);
+
   const { user } = useUser();
   const { spaces } = useSpaces();
   const currentSpace = useCurrentSpace();
+
   const isMobile = useSmallScreen();
   const { activePath, onClose, onClick, open } = useSettingsDialog();
 
@@ -145,6 +159,10 @@ export default function SettingsModal() {
                 {spaces.map((space) => (
                   <StyledTreeItem
                     key={space.id}
+                    onClick={() => {
+                      setCurrentSpaceId(space.id);
+                      onClick(`${space.name}-space`);
+                    }}
                     nodeId={space.name}
                     label={
                       <Box display='flex' alignItems='center' gap={1}>
@@ -160,7 +178,10 @@ export default function SettingsModal() {
                         nodeId={`${space.name}-${tab.path}`}
                         label={tab.label}
                         icon={tab.icon}
-                        onClick={() => onClick(`${space.name}-${tab.path}`)}
+                        onClick={() => {
+                          setCurrentSpaceId(space.id);
+                          onClick(`${space.name}-${tab.path}`);
+                        }}
                         isActive={activePath === `${space.name}-${tab.path}`}
                         ContentProps={{ style: { paddingLeft: 45 } }}
                       />
@@ -216,5 +237,12 @@ export default function SettingsModal() {
         </IconButton>
       </Box>
     </Dialog>
+  );
+}
+export function SpaceSettingsDialog() {
+  return (
+    <CurrentSpaceProvider>
+      <SpaceSettingsModalComponent />
+    </CurrentSpaceProvider>
   );
 }

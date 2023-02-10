@@ -7,7 +7,7 @@ import type { InputProps } from 'components/common/Button';
 import Button from 'components/common/Button';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useFilePicker } from 'hooks/useFilePicker';
-import useIsAdmin from 'hooks/useIsAdmin';
+import { useIsAdmin } from 'hooks/useIsAdmin';
 import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { PagesMap } from 'lib/pages';
