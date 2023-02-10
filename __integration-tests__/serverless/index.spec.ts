@@ -51,7 +51,7 @@ describe('SERVERLESS webhook worker', () => {
         space: {
           id: adminUserSpace.id,
           name: nonAdminUserSpace.name,
-          avatar: nonAdminUserSpace.spaceImage,
+          avatar: nonAdminUserSpace.spaceImage ?? undefined,
           url: `https://app.charmverse.io/${nonAdminUserSpace.domain}`
         }
       },
