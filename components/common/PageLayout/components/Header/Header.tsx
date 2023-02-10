@@ -38,6 +38,7 @@ import { undoEventName } from 'components/common/CharmEditor/utils';
 import { usePostByPath } from 'components/forum/hooks/usePostByPath';
 import { useColorMode } from 'context/darkMode';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
+import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useMembers } from 'hooks/useMembers';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { usePageFromPath } from 'hooks/usePageFromPath';
@@ -46,7 +47,6 @@ import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useToggleFavorite } from 'hooks/useToggleFavorite';
 import { useUser } from 'hooks/useUser';
-import { humanFriendlyDate } from 'lib/utilities/dates';
 
 import DocumentHistory from '../DocumentHistory';
 import NotificationsBadge from '../Sidebar/NotificationsBadge';
@@ -152,6 +152,8 @@ export function ExportMarkdownMenuItem({ disabled = false, onClick }: { disabled
 }
 
 export function Metadata({ creator, lastUpdatedAt }: { creator: string; lastUpdatedAt: Date }) {
+  const { formatDateTime } = useDateFormatter();
+
   return (
     <Stack
       sx={{
@@ -159,8 +161,12 @@ export function Metadata({ creator, lastUpdatedAt }: { creator: string; lastUpda
         my: 1
       }}
     >
-      <Typography variant='subtitle2'>Last edited by {creator}</Typography>
-      <Typography variant='subtitle2'>Last edited at {humanFriendlyDate(lastUpdatedAt)}</Typography>
+      <Typography variant='subtitle2'>
+        Last edited by <strong>{creator}</strong>
+      </Typography>
+      <Typography variant='subtitle2'>
+        at <strong>{formatDateTime(lastUpdatedAt)}</strong>
+      </Typography>
     </Stack>
   );
 }

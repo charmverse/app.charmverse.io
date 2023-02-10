@@ -1,16 +1,16 @@
 import PublishIcon from '@mui/icons-material/ElectricBolt';
 import { Box, FormControlLabel, Radio, RadioGroup, Typography } from '@mui/material';
 import Alert from '@mui/material/Alert';
-import { useEffect, useState } from 'react';
 import useSWR from 'swr';
 
 import Button from 'components/common/Button';
 import Loader from 'components/common/LoadingComponent';
 import VoteStatusChip from 'components/votes/components/VoteStatusChip';
+import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import type { SnapshotProposal } from 'lib/snapshot';
 import { getSnapshotProposal, getUserProposalVotes } from 'lib/snapshot';
-import { coerceToMilliseconds, humanFriendlyDate, relativeTime } from 'lib/utilities/dates';
+import { coerceToMilliseconds, relativeTime } from 'lib/utilities/dates';
 import { percent } from 'lib/utilities/numbers';
 
 import { StyledFormControl, VotesWrapper } from './VotesWrapper';
@@ -27,6 +27,7 @@ export function SnapshotVoteDetails({ snapshotProposalId }: Props) {
   const { data: userVotes } = useSWR(account ? `snapshotUserVotes-${account}` : null, () =>
     getUserProposalVotes({ walletAddress: account as string, snapshotProposalId })
   );
+  const { formatDate } = useDateFormatter();
 
   const loading = snapshotProposal === undefined;
 
@@ -67,9 +68,7 @@ export function SnapshotVoteDetails({ snapshotProposalId }: Props) {
         <Typography color='secondary' variant='subtitle1'>
           {!snapshotProposal && loading && 'Loading...'}
           {snapshotProposal &&
-            (hasPassedDeadline
-              ? `Finished on ${humanFriendlyDate(proposalEndDate, { withYear: true })}`
-              : `Finishes ${remainingTime}`)}
+            (hasPassedDeadline ? `Finished on ${formatDate(new Date(proposalEndDate))}` : `Finishes ${remainingTime}`)}
         </Typography>
         {snapshotProposal && <VoteStatusChip size='small' status={hasPassedDeadline ? 'Complete' : 'InProgress'} />}
       </Box>
