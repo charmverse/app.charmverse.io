@@ -2,6 +2,7 @@ import type { Space, User } from '@prisma/client';
 import { v4 } from 'uuid';
 
 import { prisma } from 'db';
+import { convertPostToProposal } from 'lib/forums/posts/convertPostToProposal';
 import { PostNotFoundError } from 'lib/forums/posts/errors';
 import { addSpaceOperations } from 'lib/permissions/spaces';
 import { InvalidInputError } from 'lib/utilities/errors';
@@ -34,6 +35,189 @@ beforeAll(async () => {
 });
 
 describe('computePostPermissions', () => {
+  it('should return delete_post and view_post permissions of a proposal converted post for admins', async () => {
+    const postCategory = await generatePostCategory({ spaceId: space.id });
+    const post = await generateForumPost({
+      spaceId: space.id,
+      categoryId: postCategory.id,
+      userId: authorUser.id
+    });
+
+    await convertPostToProposal({
+      postId: post.id,
+      spaceId: space.id,
+      title: post.title,
+      userId: authorUser.id
+    });
+
+    const permissions = await computePostPermissions({
+      resourceId: post.id,
+      userId: adminUser.id
+    });
+
+    postOperationsWithoutEdit.forEach((op) => {
+      if (op === 'delete_post' || op === 'view_post') {
+        expect(permissions[op]).toBe(true);
+      } else {
+        expect(permissions[op]).toBe(false);
+      }
+    });
+  });
+
+  it('should return delete_post and view_post permissions of a proposal converted post for author', async () => {
+    const postCategory = await generatePostCategory({ spaceId: space.id });
+    const post = await generateForumPost({
+      spaceId: space.id,
+      categoryId: postCategory.id,
+      userId: authorUser.id
+    });
+
+    await convertPostToProposal({
+      postId: post.id,
+      spaceId: space.id,
+      title: post.title,
+      userId: authorUser.id
+    });
+
+    const permissions = await computePostPermissions({
+      resourceId: post.id,
+      userId: authorUser.id
+    });
+
+    postOperationsWithoutEdit.forEach((op) => {
+      if (op === 'delete_post' || op === 'view_post') {
+        expect(permissions[op]).toBe(true);
+      } else {
+        expect(permissions[op]).toBe(false);
+      }
+    });
+  });
+
+  it('should return delete_post and view_post permissions of a proposal converted post for space-wide forum permission', async () => {
+    const spaceWideForumModeratorUser = await generateSpaceUser({
+      spaceId: space.id,
+      isAdmin: false
+    });
+
+    const role = await generateRole({
+      createdBy: adminUser.id,
+      spaceId: space.id,
+      assigneeUserIds: [spaceWideForumModeratorUser.id]
+    });
+
+    await addSpaceOperations({
+      forSpaceId: space.id,
+      operations: ['moderateForums'],
+      roleId: role.id
+    });
+
+    const postCategory = await generatePostCategory({ spaceId: space.id });
+    const post = await generateForumPost({
+      spaceId: space.id,
+      categoryId: postCategory.id,
+      userId: authorUser.id
+    });
+
+    await convertPostToProposal({
+      postId: post.id,
+      spaceId: space.id,
+      title: post.title,
+      userId: authorUser.id
+    });
+
+    const permissions = await computePostPermissions({
+      resourceId: post.id,
+      userId: spaceWideForumModeratorUser.id
+    });
+
+    postOperationsWithoutEdit.forEach((op) => {
+      if (op === 'delete_post' || op === 'view_post') {
+        expect(permissions[op]).toBe(true);
+      } else {
+        expect(permissions[op]).toBe(false);
+      }
+    });
+  });
+
+  it('should return delete_post and view_post permissions of a proposal converted post for category level admin', async () => {
+    const categoryLevelAdminUser = await generateSpaceUser({
+      spaceId: space.id,
+      isAdmin: false
+    });
+
+    const role = await generateRole({
+      createdBy: adminUser.id,
+      spaceId: space.id,
+      assigneeUserIds: [categoryLevelAdminUser.id]
+    });
+
+    const postCategory = await generatePostCategory({ spaceId: space.id });
+
+    const post = await generateForumPost({
+      spaceId: space.id,
+      categoryId: postCategory.id,
+      userId: authorUser.id
+    });
+
+    await prisma.postCategoryPermission.create({
+      data: {
+        permissionLevel: 'category_admin',
+        postCategory: { connect: { id: postCategory.id } },
+        role: { connect: { id: role.id } }
+      }
+    });
+
+    await convertPostToProposal({
+      postId: post.id,
+      spaceId: space.id,
+      title: post.title,
+      userId: authorUser.id
+    });
+
+    const permissions = await computePostPermissions({
+      resourceId: post.id,
+      userId: categoryLevelAdminUser.id
+    });
+
+    postOperationsWithoutEdit.forEach((op) => {
+      if (op === 'delete_post' || op === 'view_post') {
+        expect(permissions[op]).toBe(true);
+      } else {
+        expect(permissions[op]).toBe(false);
+      }
+    });
+  });
+
+  it('should return only view_post permissions of a proposal converted post for a regular user', async () => {
+    const postCategory = await generatePostCategory({ spaceId: space.id });
+
+    const post = await generateForumPost({
+      spaceId: space.id,
+      categoryId: postCategory.id,
+      userId: authorUser.id
+    });
+
+    await convertPostToProposal({
+      postId: post.id,
+      spaceId: space.id,
+      title: post.title,
+      userId: authorUser.id
+    });
+
+    const permissions = await computePostPermissions({
+      resourceId: post.id,
+      userId: spaceMemberUser.id
+    });
+
+    postOperationsWithoutEdit.forEach((op) => {
+      if (op === 'view_post') {
+        expect(permissions[op]).toBe(true);
+      } else {
+        expect(permissions[op]).toBe(false);
+      }
+    });
+  });
+
   it('should return full permissions for a category admin, except editing a post they did not create', async () => {
     const role = await generateRole({
       createdBy: adminUser.id,

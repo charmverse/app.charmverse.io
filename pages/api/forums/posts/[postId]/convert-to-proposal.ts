@@ -54,16 +54,12 @@ async function convertToProposal(req: NextApiRequest, res: NextApiResponse<PageM
     throw new UnauthorisedActionError('You do not have permission to create a page in this space');
   }
 
-  const { page: proposalPage } = await createProposal({
-    createdBy: userId,
-    spaceId: post.spaceId,
-    content: post.content ?? undefined,
-    title: post.title
-  });
-
-  await convertPostToProposal({
+  const proposalPage = await convertPostToProposal({
     postId: post.id,
-    proposalId: proposalPage.id
+    spaceId: post.spaceId,
+    title: post.title,
+    userId,
+    content: post.content
   });
 
   updateTrackPageProfile(proposalPage.id);
