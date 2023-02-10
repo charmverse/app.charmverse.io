@@ -13,7 +13,7 @@ import type { LoggedInUser } from 'models';
 
 import { getUserProfile } from './getUser';
 
-type UserProps = { address?: string; email?: string; id?: string; avatar?: string; username?: string };
+type UserProps = { address?: string; email?: string; id?: string; avatar?: string };
 
 export async function createUserFromWallet(
   { id = v4(), address = Wallet.createRandom().address, email, avatar }: UserProps = {},
