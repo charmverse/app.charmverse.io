@@ -1,4 +1,4 @@
-import crypto from 'node:crypto';
+import crypto, { randomUUID } from 'node:crypto';
 
 import type {
   ApplicationStatus,
@@ -381,7 +381,9 @@ export async function generateBountyWithSingleApplication({
   bountyCap,
   userId,
   spaceId,
-  bountyStatus
+  bountyStatus,
+  bountyTitle = 'Bounty',
+  bountyDescription = 'Bounty description'
 }: {
   applicationStatus: ApplicationStatus;
   bountyCap: number | null;
@@ -390,6 +392,8 @@ export async function generateBountyWithSingleApplication({
   bountyStatus?: BountyStatus;
   // This should be deleted on future PR. Left for backwards compatibility for now
   reviewer?: string;
+  bountyTitle?: string;
+  bountyDescription?: string;
 }): Promise<BountyWithDetails> {
   const createdBounty = (await prisma.bounty.create({
     data: {
@@ -401,12 +405,40 @@ export async function generateBountyWithSingleApplication({
       spaceId,
       approveSubmitters: false,
       // Important variable
-      maxSubmissions: bountyCap
+      maxSubmissions: bountyCap,
+      page: {
+        create: {
+          title: bountyTitle,
+          path: `bounty-${randomUUID()}`,
+          type: 'bounty',
+          updatedBy: userId,
+          space: { connect: { id: spaceId } },
+          author: { connect: { id: userId } },
+          contentText: bountyDescription,
+          content: {
+            type: 'doc',
+            content: bountyDescription
+              ? [
+                  {
+                    type: 'paragraph',
+                    content: [
+                      {
+                        text: bountyDescription,
+                        type: 'text'
+                      }
+                    ]
+                  }
+                ]
+              : []
+          }
+        }
+      }
     },
     include: {
-      applications: true
+      applications: true,
+      page: true
     }
-  })) as BountyWithDetails;
+  })) as BountyWithDetails & { page: Page };
 
   const user = await prisma.user.findUnique({ where: { id: userId }, include: { wallets: true } });
 

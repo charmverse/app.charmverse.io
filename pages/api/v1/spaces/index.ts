@@ -16,10 +16,12 @@ handler
 
 /**
  * @swagger
- * /api/v1/spaces:
+ * /spaces:
  *   post:
  *     summary: Create a new space
  *     description: Create a new space with discord server and discord admin user. Requires a valid super API key.
+ *     tags:
+ *       - 'Partner API'
  *     requestBody:
  *       content:
  *          application/json:
