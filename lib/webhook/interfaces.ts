@@ -65,7 +65,7 @@ export enum WebhookEventNames {
   ProposalFailed = 'proposal.failed',
   ProposalSuggestionApproved = 'proposal.suggestion_approved',
   ProposalUserVoted = 'proposal.user_voted',
-  MemberJoined = 'member.joined'
+  UserJoined = 'user.joined'
 }
 
 // Utils to share common props among events
@@ -121,7 +121,7 @@ export type WebhookEvent<T = WebhookEventNames> =
       user: UserEntity;
     })
   | (WebhookEventSharedProps<T> & {
-      scope: WebhookEventNames.MemberJoined;
+      scope: WebhookEventNames.UserJoined;
       user: UserEntity;
     });
 

@@ -65,7 +65,7 @@ async function createForumPostController(req: NextApiRequest, res: NextApiRespon
 
   // Publish webhook event if needed
   await publishPostEvent({
-    scope: WebhookEventNames.DiscussionCreated,
+    scope: WebhookEventNames.PostCreated,
     postId: createdPost.id,
     spaceId: createdPost.spaceId
   });

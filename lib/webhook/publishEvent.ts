@@ -71,7 +71,7 @@ export async function publishPostCommentVoteEvent(context: CommentVoteEventConte
 }
 
 type MemberEventContext = {
-  scope: WebhookEventNames.MemberJoined;
+  scope: WebhookEventNames.UserJoined;
   spaceId: string;
   userId: string;
 };
