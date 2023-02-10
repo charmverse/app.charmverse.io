@@ -18,7 +18,6 @@ export type CommentEntity = {
   createdAt: string;
   id: string;
   parentId: string | null;
-  threadId: string | null;
   author: UserEntity;
 };
 
@@ -27,7 +26,7 @@ export type DiscussionEntity = {
   title: string;
   url: string;
   author: UserEntity;
-  category: string;
+  category: { id: string; name: string };
 };
 
 export type ProposalEntity = {
@@ -47,22 +46,23 @@ export type BountyEntity = {
 };
 
 export enum WebhookNameSpaceNames {
+  Bounty = 'bounty',
   Discussion = 'discussion',
-  Comment = 'comment',
-  Proposal = 'proposal',
-  Bounty = 'bounty'
+  Member = 'member',
+  Proposal = 'proposal'
 }
 
 export enum WebhookEventNames {
+  BountyCompleted = 'bounty.completed',
+  CommentCreated = 'discussion.comment.created',
+  CommentUpvoted = 'discussion.comment.upvoted',
+  CommentDownvoted = 'discussion.comment.downvoted',
   DiscussionCreated = 'discussion.created',
-  CommentCreated = 'comment.created',
-  CommentUpvoted = 'comment.upvoted',
-  CommentDownvoted = 'comment.downvoted',
   ProposalPassed = 'proposal.passed',
   ProposalFailed = 'proposal.failed',
   ProposalSuggestionApproved = 'proposal.suggestion_approved',
   ProposalUserVote = 'proposal.user_voted',
-  BountyCompleted = 'bounty.completed'
+  MemberJoined = 'member.joined'
 }
 
 // Utils to share common props among events
@@ -115,6 +115,10 @@ export type WebhookEvent<T = WebhookEventNames> =
   | (WebhookEventSharedProps<T> & {
       scope: WebhookEventNames.BountyCompleted;
       bounty: BountyEntity;
+      user: UserEntity;
+    })
+  | (WebhookEventSharedProps<T> & {
+      scope: WebhookEventNames.MemberJoined;
       user: UserEntity;
     });
 

@@ -1,6 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
-import { WebhookEventNames } from 'serverless/webhook/interfaces';
 
 import { prisma } from 'db';
 import type { CommentCreate } from 'lib/comments';
@@ -10,7 +9,6 @@ import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser }
 import { computeUserPagePermissions } from 'lib/permissions/pages/page-permission-compute';
 import { withSessionRoute } from 'lib/session/withSession';
 import { DataNotFoundError } from 'lib/utilities/errors';
-import { publishWebhookEvent } from 'lib/webhook/publishEvent';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -49,22 +47,6 @@ async function addCommentController(req: NextApiRequest, res: NextApiResponse) {
     userId,
     content
   });
-
-  // Publish webhook event if needed
-  await publishWebhookEvent(
-    { scope: WebhookEventNames.CommentCreated, spaceId: thread.spaceId, userId },
-    ({ space, user }) => ({
-      comment: {
-        createdAt: createdComment.createdAt.toISOString(),
-        id: createdComment.id,
-        threadId: createdComment.threadId,
-        parentId: null,
-        author: user
-      },
-      discussion: null,
-      space
-    })
-  );
 
   trackUserAction('page_comment_created', {
     pageId: thread.pageId,

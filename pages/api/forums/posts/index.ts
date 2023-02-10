@@ -10,6 +10,8 @@ import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { mutatePostCategorySearch } from 'lib/permissions/forum/mutatePostCategorySearch';
 import { requestOperations } from 'lib/permissions/requestOperations';
 import { withSessionRoute } from 'lib/session/withSession';
+import { WebhookEventNames } from 'lib/webhook/interfaces';
+import { publishPostEvent } from 'lib/webhook/publishEvent';
 import { relay } from 'lib/websockets/relay';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -59,6 +61,13 @@ async function createForumPostController(req: NextApiRequest, res: NextApiRespon
   await trackCreateForumPostEvent({
     post: createdPost,
     userId: req.session.user.id
+  });
+
+  // Publish webhook event if needed
+  await publishPostEvent({
+    scope: WebhookEventNames.DiscussionCreated,
+    postId: createdPost.id,
+    spaceId: createdPost.spaceId
   });
 
   return res.status(201).json(createdPost);

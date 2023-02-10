@@ -1,129 +1,85 @@
-import type { Space } from '@prisma/client';
-import type {
-  SpaceEntity,
-  UserEntity,
-  WebhookEventNames,
-  WebhookEvent,
-  WebhookPayload
-} from 'serverless/webhook/interfaces';
+import type { WebhookEventNames } from 'lib/webhook/interfaces';
 
-import { prisma } from 'db';
-import { addMessageToSQS } from 'lib/aws/SQS';
-import log from 'lib/log';
+import { getUserEntity, getCommentEntity, getSpaceEntity, getPostEntity } from './entities';
+import { publishWebhookEvent } from './publisher';
 
-import { getWebhookSpaceEntity } from './getWebhookSpaceEntity';
-import { getWebhookUserEntity } from './getWebhookUserEntity';
+type DiscussionEventContext = {
+  scope: WebhookEventNames.DiscussionCreated;
+  spaceId: string;
+  postId: string;
+};
 
-const SQS_QUEUE_NAME = 'charmverse-serverless-queue-dev.fifo'; // process.env.SQS_WEBHOOK_QUEUE_NAME;
-
-// This function check subscription status by event name AND name space
-async function fetchSpaceWebhookSubscriptionStatus(spaceId: Space['id'], scope: string) {
-  // scope = `{nameSpace}.{specificEventname}`
-  const [nameSpace] = scope.split('.');
-
-  const webhookSubscription = await prisma.webhookSubscription.findFirst({
-    where: {
-      spaceId,
-      deletedAt: undefined,
-      OR: [
-        {
-          scope: {
-            contains: nameSpace
-          }
-        },
-        {
-          scope: {
-            equals: scope
-          }
-        }
-      ]
-    },
-    include: {
-      space: {
-        select: {
-          webhookSubscriptionUrl: true,
-          webhookSigningSecret: true
-        }
-      }
-    }
+export async function publishPostEvent({ scope, spaceId, postId }: DiscussionEventContext) {
+  const [post, space] = await Promise.all([getPostEntity(postId), getSpaceEntity(spaceId)]);
+  return publishWebhookEvent(spaceId, {
+    scope,
+    space,
+    discussion: post
   });
-
-  return webhookSubscription;
 }
 
-// export async function publishWebhookEvent<T = WebhookEventNames>(spaceId: string, event: WebhookEvent<T>) {
-//   try {
-//     if (!SQS_QUEUE_NAME) {
-//       throw new Error('Webhook SQS env var missing');
-//     }
-//     // Find if the space is subscribed to an event name or name space
-//     const subscription = await fetchSpaceWebhookSubscriptionStatus(spaceId, event.scope);
+type CommentEventContext = {
+  scope: WebhookEventNames.CommentCreated;
+  spaceId: string;
+  postId: string;
+  commentId: string;
+};
 
-//     // If no subscription, we stop here
-//     if (!subscription || !subscription.space.webhookSubscriptionUrl || !subscription.space.webhookSigningSecret) {
-//       return;
-//     }
+export async function publishPostCommentEvent({ scope, spaceId, commentId, postId }: CommentEventContext) {
+  const [post, comment, space] = await Promise.all([
+    getPostEntity(postId),
+    getCommentEntity(commentId),
+    getSpaceEntity(spaceId)
+  ]);
+  return publishWebhookEvent(spaceId, {
+    scope,
+    space,
+    comment,
+    discussion: post
+  });
+}
 
-//     const webhookPayload: WebhookPayload = {
-//       event,
-//       createdAt: new Date().toISOString(),
-//       spaceId,
-//       webhookURL: subscription.space.webhookSubscriptionUrl,
-//       signingSecret: subscription.space.webhookSigningSecret
-//     };
+type CommentVoteEventContext = {
+  scope: WebhookEventNames.CommentDownvoted | WebhookEventNames.CommentUpvoted;
+  spaceId: string;
+  postId: string;
+  commentId: string;
+  voterId: string;
+};
 
-//     // Add the message to the queue
-//     await addMessageToSQS(SQS_QUEUE_NAME, JSON.stringify(webhookPayload));
-//     log.debug(`Sent event to webhook queue: "${event.scope}"`, {
-//       spaceId,
-//       createdAt: webhookPayload.createdAt,
-//       webhookURL: webhookPayload.webhookURL
-//     });
-//   } catch (e) {
-//     log.warn('Error while publishing webhook event. Error occurred', { error: e, scope: event.scope, spaceId });
-//   }
-// }
+export async function publishPostCommentVoteEvent({
+  scope,
+  spaceId,
+  commentId,
+  postId,
+  voterId
+}: CommentVoteEventContext) {
+  const [discussion, comment, space, voter] = await Promise.all([
+    getPostEntity(postId),
+    getCommentEntity(commentId),
+    getSpaceEntity(spaceId),
+    getUserEntity(voterId)
+  ]);
+  return publishWebhookEvent(spaceId, {
+    scope,
+    space,
+    comment,
+    discussion,
+    voter
+  });
+}
 
-export async function publishWebhookEvent<T = WebhookEventNames>(
-  { scope, spaceId, userId }: { scope: T; spaceId: string; userId: string },
-  eventFn: (context: { space: SpaceEntity; user: UserEntity }) => Omit<WebhookEvent<T>, 'scope'>
-) {
-  try {
-    if (!SQS_QUEUE_NAME) {
-      throw new Error('Webhook SQS env var missing');
-    }
-    // Find if the space is subscribed to an event name or name space
-    const subscription = await fetchSpaceWebhookSubscriptionStatus(spaceId, scope as string);
+type MemberEventContext = {
+  scope: WebhookEventNames.MemberJoined;
+  spaceId: string;
+  userId: string;
+};
 
-    // If no subscription, we stop here
-    if (!subscription || !subscription.space.webhookSubscriptionUrl || !subscription.space.webhookSigningSecret) {
-      return;
-    }
-
-    const user = await getWebhookUserEntity(userId);
-    const space = await getWebhookSpaceEntity(spaceId);
-    const event = {
-      ...eventFn({ space, user }),
-      scope
-    } as WebhookEvent<T>;
-
-    const webhookPayload: WebhookPayload = {
-      event,
-      createdAt: new Date().toISOString(),
-      spaceId,
-      webhookURL: subscription.space.webhookSubscriptionUrl,
-      signingSecret: subscription.space.webhookSigningSecret
-    };
-
-    // Add the message to the queue
-    await addMessageToSQS(SQS_QUEUE_NAME, JSON.stringify(webhookPayload));
-    log.debug('Sent webhook event to SQS', {
-      spaceId,
-      scope,
-      createdAt: webhookPayload.createdAt,
-      webhookURL: webhookPayload.webhookURL
-    });
-  } catch (e) {
-    log.warn('Error while publishing webhook event. Error occurred', { error: e, spaceId });
-  }
+export async function publishMemberEvent({ scope, spaceId, userId }: MemberEventContext) {
+  const [space, user] = await Promise.all([getSpaceEntity(spaceId), getUserEntity(userId)]);
+  return publishWebhookEvent(spaceId, {
+    scope,
+    space,
+    user
+  });
 }

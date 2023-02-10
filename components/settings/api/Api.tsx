@@ -56,7 +56,6 @@ export function ApiSettings({ space }: { space: Space }) {
       webhookUrl: spaceWebhook.webhookSubscriptionUrl,
       events: {
         discussion: spaceWebhook.eventMap.get('discussion') || false,
-        comment: spaceWebhook.eventMap.get('comment') || false,
         proposal: spaceWebhook.eventMap.get('proposal') || false,
         bounty: spaceWebhook.eventMap.get('bounty') || false
       }
@@ -147,17 +146,7 @@ export function ApiSettings({ space }: { space: Space }) {
                     disabled={!isAdmin}
                   />
                 }
-                label='Discussion'
-              />
-              <FormControlLabel
-                control={
-                  <Switch
-                    {...register('events.comment', { required: true })}
-                    checked={events.comment}
-                    disabled={!isAdmin}
-                  />
-                }
-                label='Comment'
+                label='Forum'
               />
               <FormControlLabel
                 control={
