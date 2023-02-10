@@ -1,26 +1,37 @@
 export type UserEntity = {
-  avatar: string | null;
-  wallet: string;
+  id: string;
+  avatar?: string;
+  discordId?: string;
+  walletAddress?: string;
+  googleEmail?: string;
   username: string;
+};
+
+export type SpaceEntity = {
+  avatar?: string;
+  id: string;
+  name: string;
+  url: string;
 };
 
 export type CommentEntity = {
   createdAt: string;
   id: string;
   parentId: string | null;
-  threadId: string | null;
   author: UserEntity;
 };
 
-export type DiscussionEntity = {
+export type PostEntity = {
+  createdAt: string;
   id: string;
   title: string;
   url: string;
   author: UserEntity;
-  category: string;
+  category: { id: string; name: string };
 };
 
 export type ProposalEntity = {
+  createdAt: string;
   id: string;
   title: string;
   url: string;
@@ -28,59 +39,62 @@ export type ProposalEntity = {
 };
 
 export type BountyEntity = {
+  createdAt: string;
   id: string;
   title: string;
   url: string;
   rewardToken: string;
-  rewardChain: string;
+  rewardChain: number;
   rewardAmount: number;
 };
 
 export enum WebhookNameSpaceNames {
-  Discussion = 'discussion',
-  Comment = 'comment',
-  Proposal = 'proposal',
-  Bounty = 'bounty'
+  Bounty = 'bounty',
+  Forum = 'forum',
+  Member = 'member',
+  Proposal = 'proposal'
 }
 
 export enum WebhookEventNames {
-  DiscussionCreated = 'discussion.created',
-  CommentCreated = 'comment.created',
-  CommentUpvoted = 'comment.upvoted',
-  CommentDownvoted = 'comment.downvoted',
+  BountyCompleted = 'bounty.completed',
+  CommentCreated = 'forum.comment.created',
+  CommentUpvoted = 'forum.comment.upvoted',
+  CommentDownvoted = 'forum.comment.downvoted',
+  PostCreated = 'forum.post.created',
   ProposalPassed = 'proposal.passed',
   ProposalFailed = 'proposal.failed',
   ProposalSuggestionApproved = 'proposal.suggestion_approved',
-  ProposalUserVote = 'proposal.user_voted',
-  BountyCompleted = 'bounty.completed'
+  ProposalUserVoted = 'proposal.user_voted',
+  UserJoined = 'user.joined'
 }
 
 // Utils to share common props among events
 type WebhookEventSharedProps<T = WebhookEventNames> = {
   scope: T;
+  space: SpaceEntity;
 };
 
 // Strongly typed events, shared between API, serverless functions and possibly our end users
 export type WebhookEvent<T = WebhookEventNames> =
   | (WebhookEventSharedProps<T> & {
-      scope: WebhookEventNames.DiscussionCreated;
-      discussion: DiscussionEntity;
+      scope: WebhookEventNames.PostCreated;
+      post: PostEntity;
     })
   | (WebhookEventSharedProps<T> & {
       scope: WebhookEventNames.CommentCreated;
       comment: CommentEntity;
-      discussion: DiscussionEntity | null;
+      post: PostEntity | null;
     })
   | (WebhookEventSharedProps<T> & {
       scope: WebhookEventNames.CommentUpvoted;
       comment: CommentEntity;
-      discussion: DiscussionEntity;
+      post: PostEntity;
       voter: UserEntity;
     })
   | (WebhookEventSharedProps<T> & {
       scope: WebhookEventNames.CommentDownvoted;
       comment: CommentEntity;
-      discussion: DiscussionEntity;
+      post: PostEntity;
       voter: UserEntity;
     })
   | (WebhookEventSharedProps<T> & {
@@ -97,13 +111,17 @@ export type WebhookEvent<T = WebhookEventNames> =
       user: UserEntity;
     })
   | (WebhookEventSharedProps<T> & {
-      scope: WebhookEventNames.ProposalUserVote;
+      scope: WebhookEventNames.ProposalUserVoted;
       proposal: ProposalEntity;
       user: UserEntity;
     })
   | (WebhookEventSharedProps<T> & {
       scope: WebhookEventNames.BountyCompleted;
       bounty: BountyEntity;
+      user: UserEntity;
+    })
+  | (WebhookEventSharedProps<T> & {
+      scope: WebhookEventNames.UserJoined;
       user: UserEntity;
     });
 
