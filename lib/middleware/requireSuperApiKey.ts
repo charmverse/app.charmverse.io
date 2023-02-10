@@ -5,7 +5,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import type { NextHandler } from 'next-connect';
 
 import { prisma } from 'db';
-import { ApiError } from 'lib/middleware/errors';
+import { InvalidApiKeyError } from 'lib/middleware/errors';
 
 declare module 'http' {
   interface IncomingMessage {
@@ -38,10 +38,7 @@ export async function requireSuperApiKey(req: NextApiRequest, res: NextApiRespon
   if (superApiToken) {
     req.superApiToken = superApiToken;
   } else {
-    throw new ApiError({
-      message: 'Invalid API key',
-      errorType: 'Access denied'
-    });
+    throw new InvalidApiKeyError();
   }
 
   next();
@@ -61,6 +58,9 @@ function getAPIKeyFromRequest(req: NextApiRequest): string | null {
 
 export async function retrieveSuperApiKeySpaceIds(req: NextApiRequest): Promise<string[]> {
   const superApiTokenId = getAPIKeyFromRequest(req);
+  if (!superApiTokenId) {
+    return [];
+  }
   const spaces = await prisma.space.findMany({
     where: {
       superApiTokenId
