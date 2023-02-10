@@ -12,10 +12,10 @@ import { SocialIcons } from 'components/profile/components/UserDetails/SocialIco
 import { useMemberProfile } from 'components/profile/hooks/useMemberProfile';
 import type { Social } from 'components/profile/interfaces';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useMemberProperties } from 'hooks/useMemberProperties';
 import { useUser } from 'hooks/useUser';
 import type { Member } from 'lib/members/interfaces';
-import { humanFriendlyDate } from 'lib/utilities/dates';
 
 import { MemberPropertyTextMultiline } from './MemberDirectoryProperties/MemberPropertyTextMultiline';
 import { TimezoneDisplay } from './TimezoneDisplay';
@@ -33,6 +33,7 @@ const StyledBox = styled(Box)`
 `;
 function MemberDirectoryGalleryCard({ member }: { member: Member }) {
   const { properties = [] } = useMemberProperties();
+  const { formatDate } = useDateFormatter();
   const propertiesRecord = properties.reduce<Record<MemberPropertyType, MemberProperty>>((record, prop) => {
     record[prop.type] = prop;
     return record;
@@ -123,11 +124,7 @@ function MemberDirectoryGalleryCard({ member }: { member: Member }) {
                   <Typography fontWeight='bold' variant='subtitle2'>
                     {property.name}
                   </Typography>
-                  <Typography variant='body2'>
-                    {humanFriendlyDate(member.joinDate, {
-                      withYear: true
-                    })}
-                  </Typography>
+                  <Typography variant='body2'>{formatDate(member.joinDate)}</Typography>
                 </Stack>
               );
             }

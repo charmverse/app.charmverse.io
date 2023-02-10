@@ -15,9 +15,9 @@ import { useEffect, useState } from 'react';
 
 import Avatar from 'components/common/Avatar';
 import Link from 'components/common/Link';
+import { useDateFormatter } from 'hooks/useDateFormatter';
 import type { DeepDaoProposal, DeepDaoVote } from 'lib/deepdao/interfaces';
 import type { ProfileBountyEvent, UserCommunity } from 'lib/profile/interfaces';
-import { showDateWithMonthAndYear } from 'lib/utilities/dates';
 
 import { ProfileItemContainer } from './CollectibleRow';
 
@@ -87,6 +87,8 @@ interface EventRowProps {
 }
 
 function EventRow(event: EventRowProps) {
+  const { formatDate } = useDateFormatter();
+
   return (
     <Stack flexDirection='row' gap={1}>
       <Stack flexDirection='row' gap={1} alignItems='center' alignSelf='flex-start'>
@@ -110,7 +112,7 @@ function EventRow(event: EventRowProps) {
           {event.title}
         </Typography>
         <Typography variant='subtitle1' color='secondary' textAlign={{ sm: 'left', md: 'right' }} minWidth={100}>
-          {showDateWithMonthAndYear(event.createdAt, true)}
+          {formatDate(event.createdAt)}
         </Typography>
       </Stack>
     </Stack>
@@ -214,6 +216,7 @@ export default function CommunityRow({ community, showVisibilityIcon, visible, o
   const hasBounties = community.bounties.length > 0;
   const isCollapsible = hasVotes || hasProposals || hasBounties;
   const defaultTab = hasVotes ? 0 : hasProposals ? 1 : hasBounties ? 2 : null;
+  const { formatDate } = useDateFormatter();
 
   const [currentTab, setCurrentTab] = useState<number>(0);
   const [isCollapsed, setIsCollapsed] = useState(true);
@@ -255,8 +258,8 @@ export default function CommunityRow({ community, showVisibilityIcon, visible, o
             </Typography>
             {community.joinDate && (
               <Typography variant='subtitle2'>
-                {showDateWithMonthAndYear(community.joinDate)} -{' '}
-                {community.latestEventDate ? showDateWithMonthAndYear(community.latestEventDate) : 'Present'}
+                {formatDate(community.joinDate)} -{' '}
+                {community.latestEventDate ? formatDate(community.latestEventDate) : 'Present'}
               </Typography>
             )}
             <CountIcon icon={<HowToVoteIcon />} label='Votes' count={community.votes.length} />

@@ -28,6 +28,7 @@ import { forwardRef, memo, useRef, useEffect, useState } from 'react';
 import Button from 'components/common/Button';
 import UserDisplay from 'components/common/UserDisplay';
 import { useCurrentPage } from 'hooks/useCurrentPage';
+import { useDateFormatter } from 'hooks/useDateFormatter';
 import { usePages } from 'hooks/usePages';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useThreads } from 'hooks/useThreads';
@@ -239,8 +240,9 @@ interface PageThreadProps {
 }
 
 export const RelativeDate = memo<{ createdAt: string; prefix?: string; updatedAt?: string | null }>(
-  ({ createdAt, prefix, updatedAt }) => {
+  ({ createdAt, updatedAt }) => {
     const getDateTime = () => DateTime.fromISO(createdAt);
+    const { formatDateTime } = useDateFormatter();
 
     const [dateTime, setTime] = useState(getDateTime());
 
@@ -263,11 +265,11 @@ export const RelativeDate = memo<{ createdAt: string; prefix?: string; updatedAt
         color='secondary'
         variant='subtitle1'
       >
-        <Tooltip arrow placement='top' title={new Date(createdAt).toLocaleString()}>
+        <Tooltip arrow placement='top' title={formatDateTime(createdAt)}>
           <span>{dateTime.toRelative({ style: 'short' })}</span>
         </Tooltip>
         {updatedAt && (
-          <Tooltip arrow placement='top' title={new Date(updatedAt).toLocaleString()}>
+          <Tooltip arrow placement='top' title={formatDateTime(updatedAt)}>
             <span style={{ marginLeft: '4px' }}>(edited)</span>
           </Tooltip>
         )}
