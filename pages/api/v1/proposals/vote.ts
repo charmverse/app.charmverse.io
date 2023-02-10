@@ -31,6 +31,8 @@ handler
  *   post:
  *     summary: Cast a vote on a proposal.
  *     description: Cast a vote on a proposal with active voting.
+ *     tags:
+ *       - 'Partner API'
  *     requestBody:
  *       content:
  *          application/json:
