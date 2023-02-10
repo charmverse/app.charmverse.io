@@ -1,7 +1,10 @@
 import { prisma } from 'db';
 import type { DiscordAccount } from 'lib/discord/getDiscordAccount';
+import randomName from 'lib/utilities/randomName';
 
-export async function upsertUserForDiscordId(discordId: string, account?: Partial<DiscordAccount>) {
+type UserProps = { discordId: string; avatar?: string; username?: string; account?: Partial<DiscordAccount> };
+
+export async function upsertUserForDiscordId({ discordId, account, username, avatar }: UserProps) {
   const existingDiscordUser = await prisma.discordUser.findFirst({
     where: {
       discordId
@@ -19,8 +22,9 @@ export async function upsertUserForDiscordId(discordId: string, account?: Partia
       discordId,
       user: {
         create: {
+          avatar,
           identityType: 'Discord',
-          username: discordId,
+          username: username || randomName(),
           path: null
         }
       }

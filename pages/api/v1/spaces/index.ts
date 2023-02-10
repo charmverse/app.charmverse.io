@@ -36,8 +36,17 @@ handler
  *                $ref: '#/components/schemas/CreateWorkspaceResponseBody'
  */
 async function createSpace(req: NextApiRequest, res: NextApiResponse<CreateWorkspaceResponseBody>) {
-  const { name, discordServerId, avatar, adminDiscordUserId, xpsEngineId, adminWalletAddress } =
-    req.body as CreateWorkspaceRequestBody;
+  const {
+    name,
+    discordServerId,
+    avatar,
+    adminDiscordUserId,
+    xpsEngineId,
+    adminWalletAddress,
+    adminAvatar,
+    adminUsername,
+    webhookUrl
+  } = req.body as CreateWorkspaceRequestBody;
 
   if (typeof name !== 'string' || name.length < 3) {
     throw new InvalidInputError('Space name must be a string at least 3 characters.');
@@ -53,9 +62,13 @@ async function createSpace(req: NextApiRequest, res: NextApiResponse<CreateWorks
     name,
     discordServerId,
     adminDiscordUserId,
+    adminWalletAddress,
+    adminAvatar,
+    adminUsername,
     xpsEngineId,
     avatar,
-    superApiToken: req.superApiToken
+    superApiToken: req.superApiToken,
+    webhookUrl
   });
 
   return res.status(201).json(result);

@@ -48,7 +48,7 @@ export type BountyEntity = {
   rewardAmount: number;
 };
 
-export enum WebhookNameSpaceNames {
+export enum WebhookNameSpaces {
   Bounty = 'bounty',
   Forum = 'forum',
   Member = 'member',

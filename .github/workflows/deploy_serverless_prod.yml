@@ -1,4 +1,4 @@
-name: 'Deploy serverless to staging'
+name: 'Deploy serverless to production'
 
 on:
   push:
