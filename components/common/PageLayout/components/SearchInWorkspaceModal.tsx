@@ -157,6 +157,7 @@ function SearchInWorkspaceModal(props: SearchInWorkspaceModalProps) {
         onChange={(_e, item) => {
           if (item) {
             router.push((item as SearchResultItem).link);
+            close();
           }
         }}
         getOptionLabel={(option) => (typeof option === 'object' ? option.name : option)}
