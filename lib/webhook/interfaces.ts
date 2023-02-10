@@ -1,14 +1,14 @@
 export type UserEntity = {
   id: string;
-  avatar: string | null;
+  avatar?: string;
   discordId?: string;
-  wallet?: string;
+  walletAddress?: string;
   googleEmail?: string;
   username: string;
 };
 
 export type SpaceEntity = {
-  avatar: string | null;
+  avatar?: string;
   id: string;
   name: string;
   url: string;

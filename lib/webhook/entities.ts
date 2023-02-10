@@ -67,7 +67,7 @@ export async function getPostEntity(id: string): Promise<DiscussionEntity> {
     createdAt: post.createdAt.toISOString(),
     title: post.title,
     category: { id: post.category.id, name: post.category.name },
-    url: `https://app.charmverse.io/${post.space.domain}/forum/post/${post.path}`
+    url: `${baseUrl}/${post.space.domain}/forum/post/${post.path}`
   };
 }
 
@@ -101,8 +101,8 @@ export async function getSpaceEntity(id: string): Promise<SpaceEntity> {
   return {
     id,
     name: space.name,
-    avatar: space.spaceImage,
-    url: `https://app.charmverse.io/${space.domain}`
+    avatar: space.spaceImage ?? undefined,
+    url: `${baseUrl}/${space.domain}`
   };
 }
 
@@ -120,9 +120,9 @@ export async function getUserEntity(id: string): Promise<UserEntity> {
   return {
     id,
     username: user.username,
-    avatar: user.avatar,
+    avatar: user.avatar ?? undefined,
     googleEmail: user.googleAccounts[0]?.email,
-    wallet: user.wallets[0]?.address,
+    walletAddress: user.wallets[0]?.address,
     discordId: user.discordUser?.discordId
   };
 }
