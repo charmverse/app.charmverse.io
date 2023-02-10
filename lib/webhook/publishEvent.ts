@@ -10,18 +10,18 @@ import {
 } from './entities';
 import { publishWebhookEvent } from './publisher';
 
-type DiscussionEventContext = {
-  scope: WebhookEventNames.DiscussionCreated;
+type PostEventContext = {
+  scope: WebhookEventNames.PostCreated;
   spaceId: string;
   postId: string;
 };
 
-export async function publishPostEvent(context: DiscussionEventContext) {
+export async function publishPostEvent(context: PostEventContext) {
   const [post, space] = await Promise.all([getPostEntity(context.postId), getSpaceEntity(context.spaceId)]);
   return publishWebhookEvent(context.spaceId, {
     scope: context.scope,
     space,
-    discussion: post
+    post
   });
 }
 
@@ -42,7 +42,7 @@ export async function publishPostCommentEvent(context: CommentEventContext) {
     scope: context.scope,
     space,
     comment,
-    discussion: post
+    post
   });
 }
 
@@ -55,7 +55,7 @@ type CommentVoteEventContext = {
 };
 
 export async function publishPostCommentVoteEvent(context: CommentVoteEventContext) {
-  const [discussion, comment, space, voter] = await Promise.all([
+  const [post, comment, space, voter] = await Promise.all([
     getPostEntity(context.postId),
     getCommentEntity(context.commentId),
     getSpaceEntity(context.spaceId),
@@ -65,7 +65,7 @@ export async function publishPostCommentVoteEvent(context: CommentVoteEventConte
     scope: context.scope,
     space,
     comment,
-    discussion,
+    post,
     voter
   });
 }

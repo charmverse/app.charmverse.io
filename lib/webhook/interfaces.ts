@@ -21,7 +21,7 @@ export type CommentEntity = {
   author: UserEntity;
 };
 
-export type DiscussionEntity = {
+export type PostEntity = {
   createdAt: string;
   id: string;
   title: string;
@@ -50,17 +50,17 @@ export type BountyEntity = {
 
 export enum WebhookNameSpaceNames {
   Bounty = 'bounty',
-  Discussion = 'discussion',
+  Forum = 'forum',
   Member = 'member',
   Proposal = 'proposal'
 }
 
 export enum WebhookEventNames {
   BountyCompleted = 'bounty.completed',
-  CommentCreated = 'discussion.comment.created',
-  CommentUpvoted = 'discussion.comment.upvoted',
-  CommentDownvoted = 'discussion.comment.downvoted',
-  DiscussionCreated = 'discussion.created',
+  CommentCreated = 'forum.comment.created',
+  CommentUpvoted = 'forum.comment.upvoted',
+  CommentDownvoted = 'forum.comment.downvoted',
+  PostCreated = 'forum.post.created',
   ProposalPassed = 'proposal.passed',
   ProposalFailed = 'proposal.failed',
   ProposalSuggestionApproved = 'proposal.suggestion_approved',
@@ -77,24 +77,24 @@ type WebhookEventSharedProps<T = WebhookEventNames> = {
 // Strongly typed events, shared between API, serverless functions and possibly our end users
 export type WebhookEvent<T = WebhookEventNames> =
   | (WebhookEventSharedProps<T> & {
-      scope: WebhookEventNames.DiscussionCreated;
-      discussion: DiscussionEntity;
+      scope: WebhookEventNames.PostCreated;
+      post: PostEntity;
     })
   | (WebhookEventSharedProps<T> & {
       scope: WebhookEventNames.CommentCreated;
       comment: CommentEntity;
-      discussion: DiscussionEntity | null;
+      post: PostEntity | null;
     })
   | (WebhookEventSharedProps<T> & {
       scope: WebhookEventNames.CommentUpvoted;
       comment: CommentEntity;
-      discussion: DiscussionEntity;
+      post: PostEntity;
       voter: UserEntity;
     })
   | (WebhookEventSharedProps<T> & {
       scope: WebhookEventNames.CommentDownvoted;
       comment: CommentEntity;
-      discussion: DiscussionEntity;
+      post: PostEntity;
       voter: UserEntity;
     })
   | (WebhookEventSharedProps<T> & {

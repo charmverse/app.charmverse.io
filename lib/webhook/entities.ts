@@ -1,14 +1,7 @@
 import { baseUrl } from 'config/constants';
 import { prisma } from 'db';
 
-import type {
-  BountyEntity,
-  CommentEntity,
-  DiscussionEntity,
-  ProposalEntity,
-  SpaceEntity,
-  UserEntity
-} from './interfaces';
+import type { BountyEntity, CommentEntity, PostEntity, ProposalEntity, SpaceEntity, UserEntity } from './interfaces';
 
 export async function getBountyEntity(id: string): Promise<BountyEntity> {
   const bounty = await prisma.bounty.findUniqueOrThrow({
@@ -46,7 +39,7 @@ export async function getCommentEntity(id: string): Promise<CommentEntity> {
   };
 }
 
-export async function getPostEntity(id: string): Promise<DiscussionEntity> {
+export async function getPostEntity(id: string): Promise<PostEntity> {
   const post = await prisma.post.findUniqueOrThrow({
     where: {
       id
