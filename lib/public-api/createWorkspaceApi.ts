@@ -72,7 +72,7 @@ export async function createWorkspaceApi({
 
   return {
     id: space.id,
-    signingSecret: space.webhookSigningSecret ?? undefined,
+    webhookSigningSecret: space.webhookSigningSecret ?? undefined,
     spaceUrl: `${baseUrl}/${space.domain}`,
     joinUrl: `${baseUrl}/join?domain=${space.domain}`
   };
