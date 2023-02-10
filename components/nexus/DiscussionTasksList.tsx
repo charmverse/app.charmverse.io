@@ -15,6 +15,7 @@ import charmClient from 'charmClient';
 import Link from 'components/common/Link';
 import LoadingComponent from 'components/common/LoadingComponent';
 import UserDisplay from 'components/common/UserDisplay';
+import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import type { DiscussionTask } from 'lib/discussion/interfaces';
 import type { GetTasksResponse } from 'pages/api/tasks/list';
 
@@ -33,8 +34,9 @@ function DiscussionTaskRow({
   text,
   bountyId,
   type,
-  commentId
-}: DiscussionTask & { marked: boolean }) {
+  commentId,
+  onClose
+}: DiscussionTask & { marked: boolean; onClose: () => void }) {
   const { discussionLink, discussionTitle } = useMemo(() => {
     const baseUrl = typeof window !== 'undefined' ? window.location.origin : null;
 
@@ -95,12 +97,12 @@ function DiscussionTaskRow({
         <Typography noWrap>{spaceName}</Typography>
       </TableCell>
       <TableCell>
-        <Link color='inherit' href={discussionLink} variant='body1' noWrap>
+        <Link color='inherit' href={discussionLink} variant='body1' noWrap onClick={onClose}>
           {discussionTitle}
         </Link>
       </TableCell>
       <TableCell align='center'>
-        <Link color='inherit' href={discussionLink} variant='body1' noWrap>
+        <Link color='inherit' href={discussionLink} variant='body1' noWrap onClick={onClose}>
           {DateTime.fromISO(createdAt).toRelative({ base: DateTime.now() })}
         </Link>
       </TableCell>
@@ -115,6 +117,8 @@ interface DiscussionTasksListProps {
 }
 
 export default function DiscussionTasksList({ tasks, error, mutateTasks }: DiscussionTasksListProps) {
+  const { onClose } = useSettingsDialog();
+
   useEffect(() => {
     async function main() {
       if (tasks?.discussions && tasks.discussions.unmarked.length !== 0) {
@@ -187,6 +191,7 @@ export default function DiscussionTasksList({ tasks, error, mutateTasks }: Discu
               key={discussionTask.commentId ?? discussionTask.mentionId ?? ''}
               {...discussionTask}
               marked={false}
+              onClose={onClose}
             />
           ))}
           {tasks.discussions.marked.map((discussionTask) => (
@@ -194,6 +199,7 @@ export default function DiscussionTasksList({ tasks, error, mutateTasks }: Discu
               key={discussionTask.commentId ?? discussionTask.mentionId ?? ''}
               {...discussionTask}
               marked
+              onClose={onClose}
             />
           ))}
         </TableBody>
