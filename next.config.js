@@ -6,19 +6,19 @@ const webpack = require('webpack');
 
 const esmModules = require('./next.base').esmModules;
 
-// we can skip eslint and typechecking in production builds because they are already checked in test builds
-const skipCodeChecks =
-  process.env.NEXT_PUBLIC_APP_ENV === 'production' || process.env.NEXT_PUBLIC_APP_ENV === 'staging';
+// we can skip eslint in production/staging builds because it is already checked in test builds
+const skipLinting = process.env.NEXT_PUBLIC_APP_ENV === 'production' || process.env.NEXT_PUBLIC_APP_ENV === 'staging';
 
 const config = {
   poweredByHeader: false,
   eslint: {
-    // add background to the default list of pages for eslint
-    dirs: ['pages', 'components', 'lib', 'background'],
-    ignoreDuringBuilds: skipCodeChecks
+    // add background and serverless to the default list of pages for eslint
+    dirs: ['pages', 'components', 'lib', 'background', 'serverless'],
+    ignoreDuringBuilds: skipLinting
   },
+  // types are tested separately from the build
   typescript: {
-    ignoreBuildErrors: skipCodeChecks
+    ignoreBuildErrors: process.env.CI === 'true'
   },
   compiler: {
     styledComponents: true
