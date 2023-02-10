@@ -16,6 +16,9 @@ describe('GET /api/v1/bounties', () => {
     const secondUser = await generateSpaceUser({ spaceId: space.id, isAdmin: false });
     const reviewerUser = await generateSpaceUser({ spaceId: space.id, isAdmin: false });
 
+    const paidBountyDescription = 'This is a bounty description for a paid application';
+    const inProgressBountyDescription = 'This is a bounty description for an in progress application';
+
     const [bountyWithPaidApplication, bountyWithInProgressWork] = await Promise.all([
       generateBountyWithSingleApplication({
         spaceId: space.id,
@@ -23,7 +26,8 @@ describe('GET /api/v1/bounties', () => {
         bountyCap: 10,
         bountyStatus: 'open',
         userId: user.id,
-        reviewer: reviewerUser.id
+        reviewer: reviewerUser.id,
+        bountyDescription: paidBountyDescription
       }),
       generateBountyWithSingleApplication({
         spaceId: space.id,
@@ -31,7 +35,8 @@ describe('GET /api/v1/bounties', () => {
         bountyCap: 10,
         bountyStatus: 'open',
         userId: secondUser.id,
-        reviewer: reviewerUser.id
+        reviewer: reviewerUser.id,
+        bountyDescription: inProgressBountyDescription
       })
     ]);
 
@@ -46,7 +51,10 @@ describe('GET /api/v1/bounties', () => {
     expect(bountyWithPaidFromApi).toEqual<PublicApiBounty>(
       expect.objectContaining<PublicApiBounty>({
         createdAt: bountyWithPaidApplication.createdAt.toISOString(),
-        description: bountyWithPaidApplication.page.contentText,
+        content: {
+          text: paidBountyDescription,
+          markdown: paidBountyDescription
+        },
         id: bountyWithPaidApplication.id,
         issuer: {
           address: user.wallets[0].address
@@ -72,7 +80,10 @@ describe('GET /api/v1/bounties', () => {
     expect(bountyWithInProgressFromApi).toEqual<PublicApiBounty>(
       expect.objectContaining<PublicApiBounty>({
         createdAt: bountyWithInProgressWork.createdAt.toISOString(),
-        description: bountyWithInProgressWork.page.contentText,
+        content: {
+          markdown: inProgressBountyDescription,
+          text: inProgressBountyDescription
+        },
         id: bountyWithInProgressWork.id,
         issuer: {
           address: secondUser.wallets[0].address

@@ -408,26 +408,28 @@ export async function generateBountyWithSingleApplication({
       maxSubmissions: bountyCap,
       page: {
         create: {
-          title: 'Bounty',
+          title: bountyTitle,
           path: `bounty-${randomUUID()}`,
           type: 'bounty',
           updatedBy: userId,
           space: { connect: { id: spaceId } },
           author: { connect: { id: userId } },
-          contentText: 'Bounty description',
+          contentText: bountyDescription,
           content: {
             type: 'doc',
-            content: [
-              {
-                type: 'paragraph',
-                content: [
+            content: bountyDescription
+              ? [
                   {
-                    text: 'Some demo text',
-                    type: 'text'
+                    type: 'paragraph',
+                    content: [
+                      {
+                        text: bountyDescription,
+                        type: 'text'
+                      }
+                    ]
                   }
                 ]
-              }
-            ]
+              : []
           }
         }
       }

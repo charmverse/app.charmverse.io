@@ -60,7 +60,7 @@ type ProposalReviewer = {
  *          type: string
  *          format: date-time
  *          example: 2022-04-04T21:32:38.317Z
- *        description:
+ *        content:
  *          type: object
  *          properties:
  *            text:
@@ -93,7 +93,7 @@ type ProposalReviewer = {
 export interface PublicApiProposal {
   id: string;
   createdAt: string;
-  description: {
+  content: {
     text: string;
     markdown: string;
   };
@@ -204,7 +204,7 @@ async function listProposals(req: NextApiRequest, res: NextApiResponse<PublicApi
       createdAt: proposal.page?.createdAt as any,
       url: `${process.env.DOMAIN}/${space?.domain}/${proposal.page?.path}`,
       title: proposal.page?.title ?? '',
-      description: {
+      content: {
         text: proposal.page?.contentText ?? '',
         markdown: markdownTexts[index]
       },

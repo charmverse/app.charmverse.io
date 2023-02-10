@@ -238,7 +238,7 @@ describe('GET /api/v1/proposals', () => {
     expect(activeProposal).toEqual<PublicApiProposal>(
       expect.objectContaining<PublicApiProposal>({
         createdAt: proposal.page.createdAt.toISOString() as any,
-        description: {
+        content: {
           text: proposalText,
           markdown: proposalText
         },
@@ -293,7 +293,7 @@ describe('GET /api/v1/proposals', () => {
     expect(activeProposal).toEqual<PublicApiProposal>(
       expect.objectContaining<PublicApiProposal>({
         createdAt: proposal.page.createdAt.toISOString() as any,
-        description: {
+        content: {
           text: proposalText,
           markdown: proposalText
         },
