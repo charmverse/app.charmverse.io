@@ -42,10 +42,17 @@ describe('SERVERLESS webhook worker', () => {
       event: {
         scope: WebhookEventNames.ProposalPassed,
         proposal: {
+          createdAt: '',
           id: 'id',
           title: 'title',
           url: 'url',
           authors: []
+        },
+        space: {
+          id: adminUserSpace.id,
+          name: nonAdminUserSpace.name,
+          avatar: nonAdminUserSpace.spaceImage,
+          url: `https://app.charmverse.io/${nonAdminUserSpace.domain}`
         }
       },
       webhookURL: adminUserSpace.webhookSubscriptionUrl || '',
