@@ -22,6 +22,7 @@ export type CommentEntity = {
 };
 
 export type DiscussionEntity = {
+  createdAt: string;
   id: string;
   title: string;
   url: string;
@@ -30,6 +31,7 @@ export type DiscussionEntity = {
 };
 
 export type ProposalEntity = {
+  createdAt: string;
   id: string;
   title: string;
   url: string;
@@ -37,11 +39,12 @@ export type ProposalEntity = {
 };
 
 export type BountyEntity = {
+  createdAt: string;
   id: string;
   title: string;
   url: string;
   rewardToken: string;
-  rewardChain: string;
+  rewardChain: number;
   rewardAmount: number;
 };
 

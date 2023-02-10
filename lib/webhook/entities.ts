@@ -1,6 +1,35 @@
+import { baseUrl } from 'config/constants';
 import { prisma } from 'db';
 
-import type { CommentEntity, DiscussionEntity, SpaceEntity, UserEntity } from './interfaces';
+import type {
+  BountyEntity,
+  CommentEntity,
+  DiscussionEntity,
+  ProposalEntity,
+  SpaceEntity,
+  UserEntity
+} from './interfaces';
+
+export async function getBountyEntity(id: string): Promise<BountyEntity> {
+  const bounty = await prisma.bounty.findUniqueOrThrow({
+    where: {
+      id
+    },
+    include: {
+      page: true,
+      space: true
+    }
+  });
+  return {
+    createdAt: bounty.createdAt.toISOString(),
+    id: bounty.id,
+    title: bounty.page?.title ?? '',
+    rewardToken: bounty.rewardToken,
+    rewardChain: bounty.chainId,
+    rewardAmount: bounty.rewardAmount,
+    url: `${baseUrl}/${bounty.space.domain}/bounties/${bounty.id}`
+  };
+}
 
 export async function getCommentEntity(id: string): Promise<CommentEntity> {
   const comment = await prisma.postComment.findUniqueOrThrow({
@@ -10,9 +39,9 @@ export async function getCommentEntity(id: string): Promise<CommentEntity> {
   });
   const author = await getUserEntity(comment.createdBy);
   return {
+    id,
     author,
     createdAt: comment.createdAt.toISOString(),
-    id: comment.id,
     parentId: comment.parentId
   };
 }
@@ -33,11 +62,33 @@ export async function getPostEntity(id: string): Promise<DiscussionEntity> {
   });
   const author = await getUserEntity(post.createdBy);
   return {
+    id,
     author,
-    id: post.id,
+    createdAt: post.createdAt.toISOString(),
     title: post.title,
     category: { id: post.category.id, name: post.category.name },
     url: `https://app.charmverse.io/${post.space.domain}/forum/post/${post.path}`
+  };
+}
+
+export async function getProposalEntity(id: string): Promise<ProposalEntity> {
+  const proposal = await prisma.proposal.findUniqueOrThrow({
+    where: {
+      id
+    },
+    include: {
+      authors: true,
+      page: true,
+      space: true
+    }
+  });
+  const authors = await Promise.all(proposal.authors.map(({ userId }) => getUserEntity(userId)));
+  return {
+    authors,
+    createdAt: proposal.page?.createdAt.toISOString() ?? '',
+    id: proposal.id,
+    title: proposal.page?.title ?? '',
+    url: `${baseUrl}/${proposal.space.domain}/${proposal.page?.path}`
   };
 }
 
@@ -48,7 +99,7 @@ export async function getSpaceEntity(id: string): Promise<SpaceEntity> {
     }
   });
   return {
-    id: space.id,
+    id,
     name: space.name,
     avatar: space.spaceImage,
     url: `https://app.charmverse.io/${space.domain}`
@@ -67,7 +118,7 @@ export async function getUserEntity(id: string): Promise<UserEntity> {
     }
   });
   return {
-    id: user.id,
+    id,
     username: user.username,
     avatar: user.avatar,
     googleEmail: user.googleAccounts[0]?.email,

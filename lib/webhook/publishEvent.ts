@@ -1,6 +1,13 @@
 import type { WebhookEventNames } from 'lib/webhook/interfaces';
 
-import { getUserEntity, getCommentEntity, getSpaceEntity, getPostEntity } from './entities';
+import {
+  getBountyEntity,
+  getUserEntity,
+  getCommentEntity,
+  getSpaceEntity,
+  getPostEntity,
+  getProposalEntity
+} from './entities';
 import { publishWebhookEvent } from './publisher';
 
 type DiscussionEventContext = {
@@ -9,10 +16,10 @@ type DiscussionEventContext = {
   postId: string;
 };
 
-export async function publishPostEvent({ scope, spaceId, postId }: DiscussionEventContext) {
-  const [post, space] = await Promise.all([getPostEntity(postId), getSpaceEntity(spaceId)]);
-  return publishWebhookEvent(spaceId, {
-    scope,
+export async function publishPostEvent(context: DiscussionEventContext) {
+  const [post, space] = await Promise.all([getPostEntity(context.postId), getSpaceEntity(context.spaceId)]);
+  return publishWebhookEvent(context.spaceId, {
+    scope: context.scope,
     space,
     discussion: post
   });
@@ -25,14 +32,14 @@ type CommentEventContext = {
   commentId: string;
 };
 
-export async function publishPostCommentEvent({ scope, spaceId, commentId, postId }: CommentEventContext) {
+export async function publishPostCommentEvent(context: CommentEventContext) {
   const [post, comment, space] = await Promise.all([
-    getPostEntity(postId),
-    getCommentEntity(commentId),
-    getSpaceEntity(spaceId)
+    getPostEntity(context.postId),
+    getCommentEntity(context.commentId),
+    getSpaceEntity(context.spaceId)
   ]);
-  return publishWebhookEvent(spaceId, {
-    scope,
+  return publishWebhookEvent(context.spaceId, {
+    scope: context.scope,
     space,
     comment,
     discussion: post
@@ -47,21 +54,15 @@ type CommentVoteEventContext = {
   voterId: string;
 };
 
-export async function publishPostCommentVoteEvent({
-  scope,
-  spaceId,
-  commentId,
-  postId,
-  voterId
-}: CommentVoteEventContext) {
+export async function publishPostCommentVoteEvent(context: CommentVoteEventContext) {
   const [discussion, comment, space, voter] = await Promise.all([
-    getPostEntity(postId),
-    getCommentEntity(commentId),
-    getSpaceEntity(spaceId),
-    getUserEntity(voterId)
+    getPostEntity(context.postId),
+    getCommentEntity(context.commentId),
+    getSpaceEntity(context.spaceId),
+    getUserEntity(context.voterId)
   ]);
-  return publishWebhookEvent(spaceId, {
-    scope,
+  return publishWebhookEvent(context.spaceId, {
+    scope: context.scope,
     space,
     comment,
     discussion,
@@ -75,10 +76,67 @@ type MemberEventContext = {
   userId: string;
 };
 
-export async function publishMemberEvent({ scope, spaceId, userId }: MemberEventContext) {
-  const [space, user] = await Promise.all([getSpaceEntity(spaceId), getUserEntity(userId)]);
-  return publishWebhookEvent(spaceId, {
-    scope,
+export async function publishMemberEvent(context: MemberEventContext) {
+  const [space, user] = await Promise.all([getSpaceEntity(context.spaceId), getUserEntity(context.userId)]);
+  return publishWebhookEvent(context.spaceId, {
+    scope: context.scope,
+    space,
+    user
+  });
+}
+
+type BountyEventContext = {
+  scope: WebhookEventNames.BountyCompleted;
+  bountyId: string;
+  spaceId: string;
+  userId: string;
+};
+
+export async function publishBountyEvent(context: BountyEventContext) {
+  const [space, bounty, user] = await Promise.all([
+    getSpaceEntity(context.spaceId),
+    getBountyEntity(context.bountyId),
+    getUserEntity(context.userId)
+  ]);
+  return publishWebhookEvent(context.spaceId, {
+    scope: context.scope,
+    bounty,
+    space,
+    user
+  });
+}
+
+type ProposalEventContext = {
+  scope: WebhookEventNames.ProposalPassed | WebhookEventNames.ProposalFailed;
+  proposalId: string;
+  spaceId: string;
+};
+
+export async function publishProposalEvent(context: ProposalEventContext) {
+  const [space, proposal] = await Promise.all([getSpaceEntity(context.spaceId), getProposalEntity(context.proposalId)]);
+  return publishWebhookEvent(context.spaceId, {
+    scope: context.scope,
+    proposal,
+    space
+  });
+}
+
+type ProposalUserEventContext = {
+  scope: WebhookEventNames.ProposalSuggestionApproved | WebhookEventNames.ProposalUserVote;
+  proposalId: string;
+  spaceId: string;
+  userId: string;
+};
+
+export async function publishUserProposalEvent(context: ProposalUserEventContext) {
+  const [space, proposal, user] = await Promise.all([
+    getSpaceEntity(context.spaceId),
+    getProposalEntity(context.proposalId),
+    getUserEntity(context.userId)
+  ]);
+  return publishWebhookEvent(context.spaceId, {
+    scope: context.scope,
+    proposal,
     space,
     user
   });
