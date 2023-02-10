@@ -122,7 +122,7 @@ export async function publishProposalEvent(context: ProposalEventContext) {
 }
 
 type ProposalUserEventContext = {
-  scope: WebhookEventNames.ProposalSuggestionApproved | WebhookEventNames.ProposalUserVote;
+  scope: WebhookEventNames.ProposalSuggestionApproved | WebhookEventNames.ProposalUserVoted;
   proposalId: string;
   spaceId: string;
   userId: string;
