@@ -348,6 +348,7 @@ export interface CreateWorkspaceResponseBody {
   id: string;
   spaceUrl: string;
   joinUrl: string;
+  signingSecret?: string;
 }
 
 export type UserProfile = {
