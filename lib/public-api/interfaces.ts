@@ -346,3 +346,11 @@ export interface CreateWorkspaceResponseBody {
   spaceUrl: string;
   joinUrl: string;
 }
+
+export type UserProfile = {
+  id: string;
+  avatar: string | null;
+  wallet: string;
+  username: string;
+  email: string;
+};
