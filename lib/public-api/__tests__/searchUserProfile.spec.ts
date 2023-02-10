@@ -35,7 +35,7 @@ beforeAll(async () => {
 
 describe('searchUserProfile', () => {
   it('should find user by wallet', async () => {
-    const res = await searchUserProfile({ spaceId: space.id, wallet: user2Wallet });
+    const res = await searchUserProfile({ spaceIds: [space.id], wallet: user2Wallet });
 
     expect(res).toMatchObject(
       expect.objectContaining({
@@ -49,7 +49,7 @@ describe('searchUserProfile', () => {
   });
 
   it('should find user by email', async () => {
-    const res = await searchUserProfile({ spaceId: space.id, email: 'user3@example.com' });
+    const res = await searchUserProfile({ spaceIds: [space.id], email: 'user3@example.com' });
 
     expect(res).toMatchObject(
       expect.objectContaining({
@@ -63,7 +63,7 @@ describe('searchUserProfile', () => {
   });
 
   it('should find user by email associated with google account', async () => {
-    const res = await searchUserProfile({ spaceId: space.id, email: 'user1@gmail.com' });
+    const res = await searchUserProfile({ spaceIds: [space.id], email: 'user1@gmail.com' });
 
     expect(res).toMatchObject(
       expect.objectContaining({
@@ -77,11 +77,11 @@ describe('searchUserProfile', () => {
   });
 
   it('should throw error if search params are not provided', async () => {
-    await expect(searchUserProfile({ spaceId: space.id })).rejects.toBeInstanceOf(InvalidInputError);
+    await expect(searchUserProfile({ spaceIds: [space.id] })).rejects.toBeInstanceOf(InvalidInputError);
   });
 
   it('should throw error if user does not exist', async () => {
-    await expect(searchUserProfile({ spaceId: space.id, email: 'user123@gmail.com' })).rejects.toBeInstanceOf(
+    await expect(searchUserProfile({ spaceIds: [space.id], email: 'user123@gmail.com' })).rejects.toBeInstanceOf(
       DataNotFoundError
     );
   });
@@ -90,7 +90,7 @@ describe('searchUserProfile', () => {
     const randomEmail = 'random@example.com';
     await createUserFromWallet({ email: randomEmail });
 
-    await expect(searchUserProfile({ spaceId: space.id, email: randomEmail })).rejects.toBeInstanceOf(
+    await expect(searchUserProfile({ spaceIds: [space.id], email: randomEmail })).rejects.toBeInstanceOf(
       DataNotFoundError
     );
   });

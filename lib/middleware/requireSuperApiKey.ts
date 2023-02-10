@@ -33,7 +33,17 @@ export async function provisionSuperApiKey(name: string, token?: string): Promis
 export async function requireSuperApiKey(req: NextApiRequest, res: NextApiResponse, next: NextHandler) {
   const apiKey = getAPIKeyFromRequest(req);
 
-  const superApiToken: SuperApiToken | null = apiKey ? await getVerifiedSuperApiToken(apiKey) : null;
+  let superApiToken: SuperApiToken | null = null;
+  if (apiKey) {
+    const apiTokenData = await getVerifiedSuperApiToken(apiKey);
+
+    superApiToken = apiTokenData?.superApiKey || null;
+
+    if (apiTokenData) {
+      req.authorizedSpaceId = apiTokenData.authorizedSpace?.id || '';
+      req.spaceIdRange = apiTokenData.spaceIdRange;
+    }
+  }
 
   if (superApiToken) {
     req.superApiToken = superApiToken;
@@ -44,27 +54,32 @@ export async function requireSuperApiKey(req: NextApiRequest, res: NextApiRespon
   next();
 }
 
-function getVerifiedSuperApiToken(token: string): Promise<SuperApiToken | null> {
-  return prisma.superApiToken.findUnique({
+export async function getVerifiedSuperApiToken(token: string, spaceId?: string) {
+  const superApiKey = await prisma.superApiToken.findUnique({
     where: {
       token
+    },
+    include: {
+      spaces: true
     }
   });
+
+  if (superApiKey) {
+    const spaceIdRange = superApiKey.spaces.map((space) => space.id);
+    const authorizedSpace = spaceId ? superApiKey.spaces.find((space) => space.id === spaceId) : null;
+
+    if (spaceId && !authorizedSpace) {
+      return null;
+    }
+
+    return {
+      superApiKey,
+      spaceIdRange,
+      authorizedSpace
+    };
+  }
 }
 
 function getAPIKeyFromRequest(req: NextApiRequest): string | null {
   return req.headers?.authorization?.split('Bearer').join('').trim() ?? (req.query.api_key as string);
-}
-
-export async function retrieveSuperApiKeySpaceIds(req: NextApiRequest): Promise<string[]> {
-  const superApiTokenId = getAPIKeyFromRequest(req);
-  if (!superApiTokenId) {
-    return [];
-  }
-  const spaces = await prisma.space.findMany({
-    where: {
-      superApiTokenId
-    }
-  });
-  return spaces.map((space) => space.id);
 }

@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { InvalidStateError, onError, onNoMatch, requireSuperApiKey, retrieveSuperApiKeySpaceIds } from 'lib/middleware';
+import { InvalidStateError, onError, onNoMatch, requireSuperApiKey } from 'lib/middleware';
 import type { UserProfile } from 'lib/public-api/interfaces';
 import { searchUserProfile } from 'lib/public-api/searchUserProfile';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -67,7 +67,12 @@ type SearchUserResponseBody = UserProfile;
 async function searchUser(req: NextApiRequest, res: NextApiResponse<SearchUserResponseBody>) {
   const email = (req.query.email as string) || '';
   const wallet = (req.query.wallet as string) || '';
-  const spaceIds = await retrieveSuperApiKeySpaceIds(req);
+  const spaceIds = req.spaceIdRange;
+
+  if (!spaceIds || !spaceIds.length) {
+    throw new InvalidStateError('Space ID is undefined');
+  }
+
   const result = await searchUserProfile({ email, wallet, spaceIds });
 
   return res.status(200).json(result);
