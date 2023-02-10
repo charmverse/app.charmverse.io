@@ -1,4 +1,4 @@
-import type { Role } from '@prisma/client';
+import type { Role, Space } from '@prisma/client';
 import { useMemo } from 'react';
 import useSWR, { mutate } from 'swr';
 

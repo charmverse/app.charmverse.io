@@ -10,6 +10,7 @@ import useSWR from 'swr';
 import charmClient from 'charmClient';
 import ErrorPage from 'components/common/errors/ErrorPage';
 import { CenteredPageContent } from 'components/common/PageLayout/components/PageContent';
+import NexusLayout from 'components/common/PageLayout/NexusLayout';
 import PublicProfile from 'components/profile/PublicProfile';
 import { prisma } from 'db';
 import { usePageTitle } from 'hooks/usePageTitle';
@@ -120,5 +121,9 @@ export default function UserProfilePage({ publicUser }: InferGetServerSidePropsT
 }
 
 UserProfilePage.getLayout = (page: ReactElement) => {
-  return <CenteredPageContent>{page}</CenteredPageContent>;
+  return (
+    <NexusLayout>
+      <CenteredPageContent>{page}</CenteredPageContent>
+    </NexusLayout>
+  );
 };

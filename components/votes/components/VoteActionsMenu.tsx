@@ -47,7 +47,7 @@ export default function VoteActionsMenu({
 
   return vote.context === 'inline' || vote.status === 'InProgress' ? (
     <>
-      <Box position='relative' ref={(c: any) => anchorRef(deadlinePopup)(c)}>
+      <Box position='relative'>
         {vote.deadline && updateDeadline && (
           <ConfirmDeadlinePopover
             initialDeadline={vote.deadline}

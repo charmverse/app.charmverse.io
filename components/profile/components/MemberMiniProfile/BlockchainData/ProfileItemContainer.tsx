@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 import AddIcon from '@mui/icons-material/Add';
-import { Box } from '@mui/system';
+import { Box } from '@mui/material';
 
 export const ProfileItemContainer = styled(Box)`
   position: relative;

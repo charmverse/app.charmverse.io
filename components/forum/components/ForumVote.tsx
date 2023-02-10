@@ -1,11 +1,9 @@
 import { useTheme } from '@emotion/react';
-import { IconButton, Tooltip, Typography } from '@mui/material';
-import { Box } from '@mui/system';
+import { IconButton, Tooltip, Typography, Box } from '@mui/material';
 import type { MouseEvent } from 'react';
-import { ImArrowUp, ImArrowDown } from 'react-icons/im';
+import { ImArrowDown, ImArrowUp } from 'react-icons/im';
 
 import type { ForumVotes } from 'lib/forums/posts/interfaces';
-import type { AvailablePostPermissions } from 'lib/permissions/forum/availablePostPermissions.class';
 import type { AvailablePostPermissionFlags } from 'lib/permissions/forum/interfaces';
 
 type Props = {

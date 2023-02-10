@@ -2,7 +2,7 @@
 import type { Locator, Page } from '@playwright/test';
 import type { Space } from '@prisma/client';
 
-import type { SpaceCreateTemplate } from 'lib/spaces/utils';
+import type { SpaceCreateTemplate } from 'lib/spaces/config';
 
 // capture actions on the pages in signup flow
 export class SignUpPage {

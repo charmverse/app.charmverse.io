@@ -1,7 +1,9 @@
 // playwright-dev-page.ts
 import type { Locator, Page } from '@playwright/test';
+import type { PostCategory } from '@prisma/client';
 
 import { baseUrl } from 'config/constants';
+import { PostCategoryWithPermissions } from 'lib/permissions/forum/interfaces';
 
 // capture actions on the pages in signup flow
 export class ForumHomePage {
@@ -34,6 +36,10 @@ export class ForumHomePage {
 
   async goToForumHome(domain: string) {
     await this.page.goto(`${baseUrl}/${domain}/forum`);
+    await this.waitForForumHome(domain);
+  }
+
+  async waitForForumHome(domain: string) {
     await this.page.waitForURL(`**/${domain}/forum`);
   }
 
@@ -61,5 +67,18 @@ export class ForumHomePage {
 
   getCategoryManagePermissionsLocator(categoryId: string) {
     return this.page.locator(`data-test=open-category-permissions-dialog-${categoryId}`);
+  }
+
+  async submitNewCategory(): Promise<PostCategory> {
+    this.confirmNewCategoryButton.click();
+    const response = await this.page.waitForResponse('**/api/spaces/*/post-categories');
+
+    const parsedResponse = await response.json();
+
+    if (response.status() >= 400) {
+      throw parsedResponse;
+    }
+
+    return parsedResponse as PostCategory;
   }
 }

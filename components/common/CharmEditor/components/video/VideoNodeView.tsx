@@ -12,7 +12,9 @@ import BlockAligner from '../BlockAligner';
 import { IframeContainer } from '../common/IframeContainer';
 import { MediaSelectionPopup } from '../common/MediaSelectionPopup';
 import { MediaUrlInput } from '../common/MediaUrlInput';
-import { MIN_EMBED_WIDTH } from '../iframe/config';
+import type { Embed, IframeNodeAttrs } from '../iframe/config';
+import { MIN_EMBED_WIDTH, embeds } from '../iframe/config';
+import { extractEmbedType as extractIframeEmbedType } from '../iframe/utils';
 import type { CharmNodeViewProps } from '../nodeView/nodeView';
 import Resizable from '../Resizable';
 
@@ -26,6 +28,8 @@ export function VideoNodeView({
   pageId,
   readOnly,
   node,
+  getPos,
+  view,
   selected,
   updateAttrs,
   isPost = false
@@ -79,9 +83,31 @@ export function VideoNodeView({
                 <MediaUrlInput
                   key='link'
                   onSubmit={(videoUrl) => {
-                    updateAttrs({
-                      src: videoUrl
-                    });
+                    // check for other embed types (e.g. Loom, Odysee)
+                    const embedType = extractIframeEmbedType(videoUrl);
+                    if (embedType) {
+                      const pos = getPos();
+                      const newConfig = embeds[embedType] as Embed;
+                      const width = attrs.width;
+                      let height = width * VIDEO_ASPECT_RATIO;
+                      if (width && height && newConfig.heightRatio) {
+                        height = width / newConfig.heightRatio;
+                      }
+                      const newAttrs: IframeNodeAttrs = {
+                        src: videoUrl,
+                        height,
+                        width,
+                        type: embedType
+                      };
+                      const _node = view.state.schema.nodes.iframe.createAndFill(newAttrs);
+                      if (_node) {
+                        view.dispatch(view.state.tr.replaceWith(pos, pos + node.nodeSize, _node));
+                      }
+                    } else {
+                      updateAttrs({
+                        src: videoUrl
+                      });
+                    }
                   }}
                   placeholder='https://youtube.com...'
                 />
@@ -97,7 +123,7 @@ export function VideoNodeView({
   if (attrs.muxAssetId) {
     if (playbackIdWithToken) {
       return (
-        <BlockAligner onDelete={deleteNode}>
+        <BlockAligner readOnly={readOnly} onDelete={deleteNode}>
           <MuxVideo
             style={{ height: '100%', maxWidth: '100%', width: '100%' }}
             playbackId={playbackIdWithToken} // asset.playbackId includes signed token
@@ -120,6 +146,7 @@ export function VideoNodeView({
     const embedUrl = (attrs.src && extractYoutubeEmbedLink(attrs.src)) || attrs.src;
     return (
       <Resizable
+        readOnly={readOnly}
         aspectRatio={VIDEO_ASPECT_RATIO}
         initialSize={attrs.width}
         minWidth={MIN_EMBED_WIDTH}

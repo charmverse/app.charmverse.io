@@ -1,5 +1,5 @@
-import createCache from '@emotion/cache';
 import { CacheProvider, Global } from '@emotion/react';
+import type { EmotionCache } from '@emotion/utils';
 import type { ExternalProvider, JsonRpcFetchFunc } from '@ethersproject/providers';
 import { Web3Provider } from '@ethersproject/providers';
 import RefreshIcon from '@mui/icons-material/Refresh';
@@ -31,6 +31,7 @@ import { MemberProfileProvider } from 'components/profile/hooks/useMemberProfile
 import { isDevEnv } from 'config/constants';
 import { ColorModeContext } from 'context/darkMode';
 import { BountiesProvider } from 'hooks/useBounties';
+import { CurrentSpaceProvider, useCurrentSpaceId } from 'hooks/useCurrentSpaceId';
 import { useInterval } from 'hooks/useInterval';
 import { useLocalStorage } from 'hooks/useLocalStorage';
 import { MembersProvider } from 'hooks/useMembers';
@@ -38,14 +39,16 @@ import { OnboardingProvider } from 'hooks/useOnboarding';
 import { PagesProvider } from 'hooks/usePages';
 import { PageTitleProvider, usePageTitle } from 'hooks/usePageTitle';
 import { PaymentMethodsProvider } from 'hooks/usePaymentMethods';
-import { PrimaryCharmEditorProvider } from 'hooks/usePrimaryCharmEditor';
+import { SettingsDialogProvider } from 'hooks/useSettingsDialog';
 import { SnackbarProvider } from 'hooks/useSnackbar';
+import { useSpaceFromPath } from 'hooks/useSpaceFromPath';
 import { SpacesProvider } from 'hooks/useSpaces';
 import { UserProvider } from 'hooks/useUser';
 import { useUserAcquisition } from 'hooks/useUserAcquisition';
 import { Web3AccountProvider } from 'hooks/useWeb3AuthSig';
 import { WebSocketClientProvider } from 'hooks/useWebSocketClient';
 import { createThemeLightSensitive } from 'theme';
+import { createEmotionCache } from 'theme/createEmotionCache';
 import cssVariables from 'theme/cssVariables';
 import { setDarkMode } from 'theme/darkMode';
 import { darkTheme, lightTheme } from 'theme/focalboard/theme';
@@ -128,20 +131,17 @@ import 'theme/styles.scss';
 
 const getLibrary = (provider: ExternalProvider | JsonRpcFetchFunc) => new Web3Provider(provider);
 
+const clientSideEmotionCache = createEmotionCache();
+
 type NextPageWithLayout = NextPage & {
   getLayout: (page: ReactElement) => ReactElement;
 };
 
 type AppPropsWithLayout = AppProps & {
   Component: NextPageWithLayout;
+  emotionCache?: EmotionCache;
 };
-
-// set up styles in Next.js for MUI based on https://github.com/mui-org/material-ui/blob/next/examples/nextjs-with-typescript/pages/_document.tsx
-// Set up MUI xample: https://github.com/mui/material-ui/blob/master/examples/nextjs/pages/_document.js
-// See also https://github.com/emotion-js/emotion/issues/1061 for why we need a cache provider to avoid duplicate style tags
-const emotionCache = createCache({ key: 'mui-style' });
-
-export default function App({ Component, pageProps }: AppPropsWithLayout) {
+export default function App({ Component, emotionCache = clientSideEmotionCache, pageProps }: AppPropsWithLayout) {
   const getLayout = Component.getLayout ?? ((page) => page);
   const router = useRouter();
 
@@ -204,6 +204,7 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
       refreshSignupData();
     }
   }, [router.isReady]);
+
   // DO NOT REMOVE CacheProvider - it protects MUI from Tailwind CSS in settings
   return (
     <CacheProvider value={emotionCache}>
@@ -211,37 +212,39 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
         <ThemeProvider theme={theme}>
           <LocalizationProvider dateAdapter={AdapterLuxon as any}>
             <SnackbarProvider>
-              <ReactDndProvider>
-                <DataProviders>
-                  <OnboardingProvider>
-                    <FocalBoardProvider>
-                      <IntlProvider>
-                        <PageHead />
-                        <CssBaseline enableColorScheme={true} />
-                        <Global styles={cssVariables} />
-                        <RouteGuard>
-                          <ErrorBoundary>
-                            <Snackbar
-                              isOpen={isOldBuild}
-                              message='New CharmVerse platform update available. Please refresh.'
-                              actions={[
-                                <IconButton key='reload' onClick={() => window.location.reload()} color='inherit'>
-                                  <RefreshIcon fontSize='small' />
-                                </IconButton>
-                              ]}
-                              origin={{ vertical: 'top', horizontal: 'center' }}
-                              severity='warning'
-                              handleClose={() => setIsOldBuild(false)}
-                            />
-                            {getLayout(<Component {...pageProps} />)}
-                            <GlobalComponents />
-                          </ErrorBoundary>
-                        </RouteGuard>
-                      </IntlProvider>
-                    </FocalBoardProvider>
-                  </OnboardingProvider>
-                </DataProviders>
-              </ReactDndProvider>
+              <SettingsDialogProvider>
+                <ReactDndProvider>
+                  <DataProviders>
+                    <OnboardingProvider>
+                      <FocalBoardProvider>
+                        <IntlProvider>
+                          <PageHead />
+                          <CssBaseline enableColorScheme={true} />
+                          <Global styles={cssVariables} />
+                          <RouteGuard>
+                            <ErrorBoundary>
+                              <Snackbar
+                                isOpen={isOldBuild}
+                                message='New CharmVerse platform update available. Please refresh.'
+                                actions={[
+                                  <IconButton key='reload' onClick={() => window.location.reload()} color='inherit'>
+                                    <RefreshIcon fontSize='small' />
+                                  </IconButton>
+                                ]}
+                                origin={{ vertical: 'top', horizontal: 'center' }}
+                                severity='warning'
+                                handleClose={() => setIsOldBuild(false)}
+                              />
+                              {getLayout(<Component {...pageProps} />)}
+                              <GlobalComponents />
+                            </ErrorBoundary>
+                          </RouteGuard>
+                        </IntlProvider>
+                      </FocalBoardProvider>
+                    </OnboardingProvider>
+                  </DataProviders>
+                </ReactDndProvider>
+              </SettingsDialogProvider>
             </SnackbarProvider>
           </LocalizationProvider>
         </ThemeProvider>
@@ -257,27 +260,41 @@ function DataProviders({ children }: { children: ReactNode }) {
         <Web3ConnectionManager>
           <Web3AccountProvider>
             <SpacesProvider>
-              <WebSocketClientProvider>
-                <MembersProvider>
-                  <BountiesProvider>
-                    <PaymentMethodsProvider>
-                      <PagesProvider>
-                        <PrimaryCharmEditorProvider>
+              <CurrentSpaceProvider>
+                <CurrentSpaceSetter />
+                <WebSocketClientProvider>
+                  <MembersProvider>
+                    <BountiesProvider>
+                      <PaymentMethodsProvider>
+                        <PagesProvider>
                           <MemberProfileProvider>
                             <PageTitleProvider>{children}</PageTitleProvider>
                           </MemberProfileProvider>
-                        </PrimaryCharmEditorProvider>
-                      </PagesProvider>
-                    </PaymentMethodsProvider>
-                  </BountiesProvider>
-                </MembersProvider>
-              </WebSocketClientProvider>
+                        </PagesProvider>
+                      </PaymentMethodsProvider>
+                    </BountiesProvider>
+                  </MembersProvider>
+                </WebSocketClientProvider>
+              </CurrentSpaceProvider>
             </SpacesProvider>
           </Web3AccountProvider>
         </Web3ConnectionManager>
       </Web3ReactProvider>
     </UserProvider>
   );
+}
+
+function CurrentSpaceSetter() {
+  const spaceFromPath = useSpaceFromPath();
+  const { setCurrentSpaceId } = useCurrentSpaceId();
+
+  useEffect(() => {
+    if (spaceFromPath) {
+      setCurrentSpaceId(spaceFromPath.id);
+    }
+  }, [spaceFromPath]);
+
+  return null;
 }
 
 function PageHead() {

@@ -115,6 +115,7 @@ function TransactionRow({
                       </Typography>
                       {action.to.user ? (
                         <UserDisplay
+                          showMiniProfile
                           sx={{
                             '.MuiTypography-root': {
                               fontSize: {
@@ -154,6 +155,7 @@ function TransactionRow({
                     <Box py={1} key={confirmation.address}>
                       {confirmation.user ? (
                         <UserDisplay
+                          showMiniProfile
                           sx={{
                             '.MuiTypography-root': {
                               fontSize: {
@@ -188,7 +190,7 @@ function TransactionRow({
                   ) : null}
                   {transaction.snoozedUsers.map((snoozedUser) => (
                     <Box key={snoozedUser.id} py={1} display='flex' justifyContent='space-between'>
-                      <UserDisplay avatarSize='small' user={snoozedUser} />
+                      <UserDisplay showMiniProfile avatarSize='small' user={snoozedUser} />
                       <Box display='flex' gap={1} alignItems='center'>
                         {snoozedUser.notificationState?.snoozeMessage && (
                           <Tooltip arrow placement='top' title={snoozedUser.notificationState.snoozeMessage}>

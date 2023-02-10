@@ -89,7 +89,7 @@ async function deletePostCommentHandler(req: NextApiRequest, res: NextApiRespons
   });
 
   if (permissions.delete_comments || postComment.createdBy === userId) {
-    await deletePostComment({ commentId });
+    await deletePostComment({ commentId, userId });
   } else {
     throw new ActionNotPermittedError('You do not have permission to delete this comment.');
   }

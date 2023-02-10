@@ -77,7 +77,7 @@ export function NFTNodeView({ deleteNode, readOnly, node, selected, updateAttrs 
   return (
     <div>
       <Script id='opensea-script' src={widgetJS} />
-      <BlockAligner onDelete={deleteNode}>
+      <BlockAligner readOnly={readOnly} onDelete={deleteNode}>
         <StyledContainer ref={ref}>
           {/* @ts-ignore nft-card element is from OpenSea */}
           <nft-card

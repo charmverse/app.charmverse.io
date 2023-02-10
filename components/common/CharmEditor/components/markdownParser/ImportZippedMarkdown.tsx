@@ -3,20 +3,20 @@ import SvgIcon from '@mui/material/SvgIcon';
 import { useState } from 'react';
 
 import charmClient from 'charmClient';
+import type { InputProps } from 'components/common/Button';
 import Button from 'components/common/Button';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useFilePicker } from 'hooks/useFilePicker';
-import useIsAdmin from 'hooks/useIsAdmin';
+import { useIsAdmin } from 'hooks/useIsAdmin';
 import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { PagesMap } from 'lib/pages';
-import { SystemError } from 'lib/utilities/errors';
 
-type Props = {
+type Props = InputProps & {
   onFile?: (file: File) => void;
 };
 
-export function ImportZippedMarkdown({ onFile }: Props) {
+export function ImportZippedMarkdown({ onFile, ...props }: Props) {
   const space = useCurrentSpace();
   const { mutatePagesList } = usePages();
   const [uploading, setIsUploading] = useState(false);
@@ -65,6 +65,7 @@ export function ImportZippedMarkdown({ onFile }: Props) {
         loading={uploading}
         variant='outlined'
         onClick={openFilePicker}
+        {...props}
       >
         {uploading ? 'Uploading...' : 'Import zipped Markdown files'}
       </Button>

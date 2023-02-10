@@ -6,7 +6,6 @@ import Script from 'next/script';
 import useSWRImmutable from 'swr/immutable';
 
 import charmClient from 'charmClient';
-import Image from 'components/common/Image';
 import Link from 'components/common/Link';
 import LoadingComponent from 'components/common/LoadingComponent';
 
@@ -99,7 +98,7 @@ export function BookmarkNodeView({
     return (
       <Box my={2}>
         <Script src={iframelyWidgetJs} onReady={onLoadScript} />
-        <BlockAligner onDelete={deleteNode}>
+        <BlockAligner readOnly={readOnly} onDelete={deleteNode}>
           <div dangerouslySetInnerHTML={{ __html: html }} />
         </BlockAligner>
       </Box>
@@ -108,25 +107,30 @@ export function BookmarkNodeView({
     const title = data.meta.title ?? new URL(data.meta.canonical).hostname;
 
     return (
-      <BlockAligner onDelete={deleteNode}>
+      <BlockAligner readOnly={readOnly} onDelete={deleteNode}>
         <Card variant='outlined'>
           <CardActionArea
             component={Link}
             color='inherit'
-            sx={{ p: 0, m: 0 }}
+            sx={{ p: 0, m: 0, backgroundColor: theme.palette.mode === 'dark' ? 'common.black' : 'inherit' }}
             href={data.meta.canonical}
             target='_blank'
           >
-            <Typography color='secondary' variant='body2' lineHeight='1.3em !important'>
-              {data.meta.description}
-            </Typography>
             <Box display='flex' alignItems='center' gap={2}>
               <Box display='flex' maxWidth='160px' maxHeight='140px' overflow='hidden'>
                 {data.links.icon?.[0] && <PreviewImage src={data.links.icon[0].href} />}
               </Box>
-              <Box display='flex' flexDirection='column' alignSelf='flex-start' gap={2} py={3}>
+              <Box
+                display='flex'
+                flexDirection='column'
+                flex={1}
+                gap={1}
+                py={3}
+                justifyContent='space-between'
+                alignSelf='stretch'
+              >
                 <Typography
-                  component='span'
+                  fontSize={17}
                   textOverflow='ellipsis'
                   overflow='hidden'
                   whiteSpace='nowrap'
@@ -135,12 +139,16 @@ export function BookmarkNodeView({
                 >
                   {title}
                 </Typography>
+                <Typography variant='body1' lineHeight='1.3em !important' textAlign='left'>
+                  {data.meta.description}
+                </Typography>
                 <Typography
-                  component='span'
+                  textAlign='left'
                   variant='body2'
                   textOverflow='ellipsis'
                   overflow='hidden'
                   whiteSpace='nowrap'
+                  color='secondary'
                 >
                   {data.meta.canonical}
                 </Typography>

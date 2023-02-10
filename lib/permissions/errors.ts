@@ -22,6 +22,16 @@ export class AssignmentNotPermittedError extends SystemError {
   }
 }
 
+export class AssignableToRolesOnlyError extends SystemError {
+  constructor(permissionName: string) {
+    super({
+      errorType: 'Invalid input',
+      message: `${permissionName} permission can only be assigned to roles`,
+      severity: 'warning'
+    });
+  }
+}
+
 export class SpaceMembershipRequiredError extends SystemError {
   constructor(message?: string) {
     super({

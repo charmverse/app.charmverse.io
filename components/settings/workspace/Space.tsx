@@ -1,11 +1,11 @@
 import { yupResolver } from '@hookform/resolvers/yup';
-import LaunchIcon from '@mui/icons-material/LaunchOutlined';
-import { Box, FormHelperText, Typography } from '@mui/material';
+import Box from '@mui/material/Box';
+import FormHelperText from '@mui/material/FormHelperText';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
+import type { Space } from '@prisma/client';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
-import type { ReactElement } from 'react';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
@@ -13,37 +13,36 @@ import * as yup from 'yup';
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import FieldLabel from 'components/common/form/FieldLabel';
-import Link from 'components/common/Link';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import ConnectSnapshot from 'components/common/PageLayout/components/Header/components/Snapshot/ConnectSnapshot';
 import PrimaryButton from 'components/common/PrimaryButton';
-import SettingsLayout from 'components/settings/Layout';
 import Legend from 'components/settings/Legend';
 import ImportNotionWorkspace from 'components/settings/workspace/ImportNotionWorkspace';
 import Avatar from 'components/settings/workspace/LargeAvatar';
-import { charmverseDiscordInvite } from 'config/constants';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useIsAdmin } from 'hooks/useIsAdmin';
 import { setTitle } from 'hooks/usePageTitle';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useSpaces } from 'hooks/useSpaces';
-import { useUser } from 'hooks/useUser';
-import isSpaceAdmin from 'lib/users/isSpaceAdmin';
 
 const schema = yup.object({
   name: yup.string().ensure().trim().min(3, 'Name must be at least 3 characters').required('Name is required'),
   spaceImage: yup.string().nullable(true),
-  domain: yup.string()
+  domain: yup
+    .string()
+    .ensure()
+    .trim()
+    .min(3, 'Domain must be at least 3 characters')
+    .matches(/^[^!?@#$%^&*+=<>(){}.'"\\[\]|~/]*$/, 'The symbols you entered are not allowed')
+    .matches(/^\S*$/, 'Space is not allowed')
 });
 
 type FormValues = yup.InferType<typeof schema>;
 
-export default function WorkspaceSettings() {
+export default function SpaceSettings({ space }: { space: Space }) {
   const router = useRouter();
-  const space = useCurrentSpace();
   const { spaces, setSpace, setSpaces } = useSpaces();
-  const { user } = useUser();
   const [error, setError] = useState<string | null>(null);
-  const isAdmin = isSpaceAdmin(user, space?.id);
+  const isAdmin = useIsAdmin();
   const workspaceRemoveModalState = usePopupState({ variant: 'popover', popupId: 'workspace-remove' });
   const workspaceLeaveModalState = usePopupState({ variant: 'popover', popupId: 'workspace-leave' });
   const unsavedChangesModalState = usePopupState({ variant: 'popover', popupId: 'unsaved-changes' });
@@ -109,7 +108,7 @@ export default function WorkspaceSettings() {
 
   return (
     <>
-      <Legend>Space Details</Legend>
+      <Legend marginTop={0}>Space Details</Legend>
       <form onSubmit={handleSubmit(onSubmit)}>
         <Grid container direction='column' spacing={3}>
           <Grid item>
@@ -170,12 +169,12 @@ export default function WorkspaceSettings() {
           )}
         </Grid>
       </form>
-      <Legend>Import Content</Legend>
+      <Legend mt={4}>Import Content</Legend>
       <Box sx={{ ml: 1 }} display='flex' flexDirection='column' gap={1}>
         <ImportNotionWorkspace />
       </Box>
 
-      <Legend>Snapshot.org Integration</Legend>
+      <Legend mt={4}>Snapshot.org Integration</Legend>
       <Box sx={{ ml: 1 }} display='flex' flexDirection='column' gap={1}>
         <ConnectSnapshot />
       </Box>
@@ -228,7 +227,3 @@ export default function WorkspaceSettings() {
     </>
   );
 }
-
-WorkspaceSettings.getLayout = (page: ReactElement) => {
-  return <SettingsLayout>{page}</SettingsLayout>;
-};

@@ -5,11 +5,10 @@ import FavoritedIcon from '@mui/icons-material/Star';
 import NotFavoritedIcon from '@mui/icons-material/StarBorder';
 import UndoIcon from '@mui/icons-material/Undo';
 import VerticalAlignBottomOutlinedIcon from '@mui/icons-material/VerticalAlignBottomOutlined';
-import { Divider, Tooltip, Typography } from '@mui/material';
+import { Divider, Tooltip, Typography, Box, Stack } from '@mui/material';
 import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
-import { Box, Stack } from '@mui/system';
 import { useRouter } from 'next/router';
 import Papa from 'papaparse';
 import type { ChangeEventHandler } from 'react';
@@ -19,7 +18,6 @@ import charmClient from 'charmClient';
 import { CsvExporter } from 'components/common/BoardEditor/focalboard/csvExporter/csvExporter';
 import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
 import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
-import type { CardPage } from 'components/common/BoardEditor/focalboard/src/store/cards';
 import {
   getViewCardsSortedFilteredAndGrouped,
   sortCards
@@ -34,6 +32,8 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import { useToggleFavorite } from 'hooks/useToggleFavorite';
 import { useUser } from 'hooks/useUser';
 import type { Board } from 'lib/focalboard/board';
+import type { BoardView } from 'lib/focalboard/boardView';
+import type { CardPage } from 'lib/focalboard/card';
 import { createCard } from 'lib/focalboard/card';
 import log from 'lib/log';
 import type { IPagePermissionFlags } from 'lib/permissions/pages';
@@ -80,14 +80,10 @@ export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: 
     }
   }
 
-  if (!board || !view) {
-    return null;
-  }
-
   const cards = useAppSelector(
     getViewCardsSortedFilteredAndGrouped({
-      boardId: board.id,
-      viewId: view.id
+      boardId: board?.id ?? '',
+      viewId: view?.id ?? ''
     })
   );
 
@@ -98,12 +94,12 @@ export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: 
     closeMenu();
   }
 
-  const exportCsv = () => {
+  const exportCsv = (_board: Board, _view: BoardView) => {
     const cardPages: CardPage[] = cards
       .map((card) => ({ card, page: pages[card.id] }))
       .filter((item): item is CardPage => !!item.page);
 
-    const sortedCardPages = sortCards(cardPages, board, view, members);
+    const sortedCardPages = sortCards(cardPages, _board, _view, members);
     const _cards = sortedCardPages.map(({ card, page }) => {
       return {
         ...card,
@@ -112,7 +108,7 @@ export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: 
       };
     });
     try {
-      CsvExporter.exportTableCsv(board, view, _cards, intl);
+      CsvExporter.exportTableCsv(_board, _view, _cards, intl);
       showMessage('Export complete!');
     } catch (error) {
       log.error('CSV export failed', error);
@@ -131,14 +127,14 @@ export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: 
     closeMenu();
   }
 
-  const addNewCards = async (results: Papa.ParseResult<Record<string, string>>) => {
+  const addNewCards = async (_board: Board, results: Papa.ParseResult<Record<string, string>>) => {
     const csvData = results.data;
     const headers = results.meta.fields || [];
 
     // Remove name property because it is not an option
     const allAvailableProperties = headers.filter((header) => header !== 'Name');
 
-    const mappedInitialBoardProperties = mapCardBoardProperties(board.fields.cardProperties);
+    const mappedInitialBoardProperties = mapCardBoardProperties(_board.fields.cardProperties);
 
     // Create card properties for the board
     const newBoardProperties = allAvailableProperties.map((prop) =>
@@ -149,13 +145,13 @@ export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: 
      * Merge the fields of both boards.
      * The order is important here. The old board should be last so it can overwrite the important properties.
      */
-    const mergedFields = deepMergeArrays(newBoardProperties, board.fields.cardProperties);
+    const mergedFields = deepMergeArrays(newBoardProperties, _board.fields.cardProperties);
 
     // Create the new board and update the db
     const newBoardBlock: Board = {
-      ...board,
+      ..._board,
       fields: {
-        ...board.fields,
+        ..._board.fields,
         cardProperties: mergedFields
       }
     };
@@ -166,7 +162,7 @@ export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: 
     // Create the new mapped board properties to know what are the ids of each property and option
     const mappedBoardProperties = mapCardBoardProperties(mergedFields);
 
-    if (!user || !currentSpace || !board) {
+    if (!user || !currentSpace) {
       throw new Error('An error occured while importing. Please verify you have a valid user, space and board.');
     }
 
@@ -180,8 +176,8 @@ export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: 
         const textName = text && typeof text === 'string' ? text : '';
 
         const card = createCard({
-          parentId: board.id,
-          rootId: board.id,
+          parentId: _board.id,
+          rootId: _board.id,
           createdBy: user.id,
           updatedBy: user.id,
           spaceId: currentSpace.id,
@@ -200,7 +196,7 @@ export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: 
   };
 
   const importCsv: ChangeEventHandler<HTMLInputElement> = (event) => {
-    if (event.target.files && event.target.files[0]) {
+    if (board && event.target.files && event.target.files[0]) {
       Papa.parse(event.target.files[0], {
         header: true,
         skipEmptyLines: true,
@@ -213,7 +209,7 @@ export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: 
             return;
           }
           if (isValidCsvResult(results)) {
-            await addNewCards(results);
+            await addNewCards(board, results);
 
             const spaceId = currentSpace?.id;
             if (spaceId) {
@@ -225,6 +221,10 @@ export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: 
       });
     }
   };
+
+  if (!board || !view) {
+    return null;
+  }
 
   return (
     <List dense>
@@ -270,9 +270,17 @@ export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: 
           </ListItemButton>
         </div>
       </Tooltip>
-      <Tooltip title={!mutator.canUndo ? 'Nothing to undo' : ''}>
+      <Tooltip
+        title={
+          !pagePermissions?.edit_content
+            ? "You don't have permission to undo changes"
+            : !mutator.canUndo
+            ? 'Nothing to undo'
+            : ''
+        }
+      >
         <div>
-          <ListItemButton disabled={!mutator.canUndo} onClick={undoChanges}>
+          <ListItemButton disabled={!mutator.canUndo || !pagePermissions?.edit_content} onClick={undoChanges}>
             <UndoIcon
               fontSize='small'
               sx={{
@@ -283,7 +291,7 @@ export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: 
           </ListItemButton>
         </div>
       </Tooltip>
-      <ListItemButton onClick={exportCsv}>
+      <ListItemButton onClick={() => exportCsv(board, view)}>
         <FormatListBulletedIcon
           fontSize='small'
           sx={{

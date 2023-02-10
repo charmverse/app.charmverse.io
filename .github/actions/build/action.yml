@@ -59,18 +59,17 @@ runs:
     #     GITHUB_CONTEXT: ${{ toJson(github) }}
     #   run: echo "$GITHUB_CONTEXT"
 
+    - run: echo '${{ env.GIT_DIFF }}'
+      shell: bash
     - name: Cache build
       id: cache_build
       uses: actions/cache@v3
       with:
-        path: .next
+        path: |
+          .next
+          .env.test.local
         # including the app_env helps make sure that deploy_staging.yml does not reuse values from test_and_deploy.yml which are meant for production
-        key: nextjs-build-${{ github.sha }}-${{ inputs.NEXT_PUBLIC_APP_ENV }}
-
-    # Re-build prisma types which are cached inside of node_modules
-    - name: Re-build Prisma types
-      shell: bash
-      run: npm run build:prisma
+        key: nextjs-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**/*.[jt]s', '**/*.[jt]sx', '**/*.scss', '!node_modules', '!.next', '!dont_cache') }}-${{ inputs.NEXT_PUBLIC_APP_ENV }}
 
     - name: Build
       shell: bash

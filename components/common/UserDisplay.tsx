@@ -74,7 +74,6 @@ export const AnonUserDisplay = memo(AnonUserDisplayComponent);
 interface UserDisplayProps extends StyleProps {
   user?: Omit<User, 'addresses'> | null;
   linkToProfile?: boolean;
-  showProfileOnClick?: boolean;
   showMiniProfile?: boolean;
 }
 

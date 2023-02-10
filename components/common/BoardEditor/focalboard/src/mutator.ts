@@ -549,6 +549,10 @@ class Mutator {
     if (oldValue === value) {
       return;
     }
+    // handle undefined vs empty string
+    if (!oldValue && !value) {
+      return;
+    }
 
     const newCard = createCard(card);
     if (value) {

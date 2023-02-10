@@ -1,16 +1,15 @@
-import { Prisma, SpaceOperation } from '@prisma/client';
+import { SpaceOperation } from '@prisma/client';
 
 import { prisma } from 'db';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { uniqueValues } from 'lib/utilities/array';
 import { InsecureOperationError, InvalidInputError, MissingDataError } from 'lib/utilities/errors';
 
-import { InvalidPermissionGranteeError } from '../errors';
+import { AssignableToRolesOnlyError, AssignmentNotPermittedError, InvalidPermissionGranteeError } from '../errors';
 import type { AssignablePermissionGroups } from '../interfaces';
 
 import { computeGroupSpacePermissions } from './computeGroupSpacePermissions';
 import type { SpacePermissionFlags, SpacePermissionModification } from './interfaces';
-import { SpacePermissionWithAssignee } from './interfaces';
 import { generateSpacePermissionQuery } from './utility';
 
 export async function addSpaceOperations<A extends AssignablePermissionGroups = 'any'>({
@@ -35,6 +34,8 @@ export async function addSpaceOperations<A extends AssignablePermissionGroups = 
   for (const op of operations) {
     if (!SpaceOperation[op]) {
       throw new InvalidInputError(`Operation ${op} is an invalid space operation.`);
+    } else if (op === 'moderateForums' && group !== 'role') {
+      throw new AssignableToRolesOnlyError(op);
     }
   }
 
@@ -103,27 +104,9 @@ export async function addSpaceOperations<A extends AssignablePermissionGroups = 
         }
       },
       operations: deduplicatedOperations,
-      role: roleId
-        ? {
-            connect: {
-              id: roleId
-            }
-          }
-        : undefined,
-      user: userId
-        ? {
-            connect: {
-              id: userId
-            }
-          }
-        : undefined,
-      space: spaceId
-        ? {
-            connect: {
-              id: spaceId
-            }
-          }
-        : undefined
+      role: group === 'role' ? { connect: { id: roleId as string } } : undefined,
+      user: group === 'user' ? { connect: { id: userId as string } } : undefined,
+      space: group === 'space' ? { connect: { id: spaceId as string } } : undefined
     },
     include: {
       role: true,
