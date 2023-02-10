@@ -4,6 +4,7 @@ import nc from 'next-connect';
 
 import { prisma } from 'db';
 import { InvalidStateError, onError, onNoMatch, requireApiKey, requireKeys, requireSuperApiKey } from 'lib/middleware';
+import { generateMarkdown } from 'lib/pages';
 import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -186,7 +187,21 @@ async function listProposals(req: NextApiRequest, res: NextApiResponse<PublicApi
     }
   });
 
-  const publicApiProposalList: PublicApiProposal[] = proposals.map((proposal) => {
+  const markdownTexts: string[] = [];
+
+  for (const proposal of proposals) {
+    try {
+      const markdownText = await generateMarkdown({
+        title: proposal.page?.title as string,
+        content: proposal.page?.content as any
+      });
+      markdownTexts.push(markdownText);
+    } catch (err) {
+      markdownTexts.push('markdown not available');
+    }
+  }
+
+  const publicApiProposalList: PublicApiProposal[] = proposals.map((proposal, index) => {
     const apiProposal: PublicApiProposal = {
       id: proposal.id,
       createdAt: proposal.page?.createdAt as any,
@@ -194,7 +209,7 @@ async function listProposals(req: NextApiRequest, res: NextApiResponse<PublicApi
       title: proposal.page?.title ?? '',
       description: {
         text: proposal.page?.contentText ?? '',
-        markdown: proposal.page?.contentText ?? ''
+        markdown: markdownTexts[index]
       },
       status: proposal.status,
       authors: proposal.authors.map((author) => ({
@@ -209,7 +224,6 @@ async function listProposals(req: NextApiRequest, res: NextApiResponse<PublicApi
     };
     return apiProposal;
   });
-
   return res.status(200).json(publicApiProposalList);
 }
 

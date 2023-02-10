@@ -108,8 +108,13 @@ beforeAll(async () => {
             type: 'doc',
             content: [
               {
-                content: proposalText,
-                type: 'text'
+                type: 'paragraph',
+                content: [
+                  {
+                    text: proposalText,
+                    type: 'text'
+                  }
+                ]
               }
             ]
           }
@@ -156,8 +161,18 @@ beforeAll(async () => {
             type: 'doc',
             content: [
               {
-                content: proposalText,
-                type: 'text'
+                type: 'heading',
+                attrs: {
+                  level: 2,
+                  collapseContent: null
+                },
+                text: proposalText
+                // content: [
+                //   {
+                //     text: proposalText,
+                //     type: 'text'
+                //   }
+                // ]
               }
             ]
           }
@@ -186,16 +201,7 @@ beforeAll(async () => {
           path: `proposal-${v4()}`,
           type: 'proposal',
           updatedBy: proposalAuthor.id,
-          contentText: proposalText,
-          content: {
-            type: 'doc',
-            content: [
-              {
-                content: proposalText,
-                type: 'text'
-              }
-            ]
-          }
+          contentText: proposalText
         }
       },
       authors: {
@@ -322,21 +328,6 @@ describe('GET /api/v1/proposals', () => {
       data: {
         token: v4(),
         name: `test-super-api-key-${v4()}`
-      }
-    });
-
-    const otherNormalApiToken = await prisma.spaceApiToken.create({
-      data: {
-        token: v4(),
-        space: {
-          create: {
-            domain: `test-space-${v4()}`,
-            name: `Different space`,
-            // Doesn't matter who created this API token
-            updatedBy: proposalAuthor.id,
-            author: { connect: { id: proposalAuthor.id } }
-          }
-        }
       }
     });
 
