@@ -8,7 +8,7 @@ import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireApiKey).post(searchUser);
+handler.use(requireApiKey).get(searchUser);
 
 /**
  * @example https://github.com/jellydn/next-swagger-doc/blob/main/example/models/organization.ts

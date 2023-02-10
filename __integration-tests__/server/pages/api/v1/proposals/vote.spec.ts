@@ -134,7 +134,7 @@ describe('POST /api/v1/proposals/vote', () => {
       .expect(401);
   });
 
-  it('should fail if incomplete or incorrect vte data is provided', async () => {
+  it('should fail if incomplete or incorrect vote data is provided', async () => {
     const superApiKey = await prisma.superApiToken.create({
       data: {
         token: v4(),

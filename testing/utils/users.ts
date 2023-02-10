@@ -24,3 +24,12 @@ export async function addUserGoogleAccount({
     }
   });
 }
+
+export function addUserWallet({ userId, address }: { userId: string; address: string }) {
+  return prisma.userWallet.create({
+    data: {
+      userId,
+      address
+    }
+  });
+}
