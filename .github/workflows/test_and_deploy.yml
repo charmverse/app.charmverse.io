@@ -37,7 +37,7 @@ jobs:
       matrix:
         include:
           - test_name: "Check types"
-            test_command: "npm run typecheck"
+            test_command: "npm run typecheck && npm run lint"
     steps:
       - uses: actions/checkout@v3
 

@@ -12,7 +12,7 @@
     "deploy:staging": "npx cdk deploy \"stg-charmverse-${STAGE}\" --outputs-file cdk.out.json",
     "postdeploy:staging": "node --eval \"console.log('env_url=' + require('./cdk.out.json')['stg-charmverse-${STAGE}'].DeploymentUrl)\"  >> $GITHUB_OUTPUT",
     "destroy:staging": "npx cdk destroy \"stg-charmverse-${STAGE}\" --force",
-    "lint": "eslint -c .eslintrc.json . --ext .ts --ext .tsx --quiet",
+    "lint": "npx next lint",
     "lint:prod": "npm run lint -- --quiet",
     "cron:staging": "npx react-env --path .env.staging -- node ./.next/server/cron.js",
     "cron:prod": "node ./.next/server/cron.js",
