@@ -253,7 +253,7 @@ export function PostPage({
                 disablePageSpecificFeatures
                 enableVoting={false}
                 isContentControlled
-                key={user?.id}
+                key={`${user?.id}.${post?.proposalId}.${canEdit}`}
                 content={formInputs.content as PageContent}
                 onContentChange={updatePostContent}
               >

@@ -167,13 +167,11 @@ export function Metadata({ creator, lastUpdatedAt }: { creator: string; lastUpda
 function PostHeader({
   setPageMenuOpen,
   undoEditorChanges,
-  forumPostInfo,
-  setConvertedProposalId
+  forumPostInfo
 }: {
   forumPostInfo: ReturnType<typeof usePostByPath>;
   setPageMenuOpen: Dispatch<SetStateAction<boolean>>;
   undoEditorChanges: VoidFunction;
-  setConvertedProposalId: Dispatch<SetStateAction<string | null>>;
 }) {
   const [userSpacePermissions] = useCurrentSpacePermissions();
   const { showMessage } = useSnackbar();
@@ -214,8 +212,8 @@ function PostHeader({
 
   async function convertToProposal(pageId: string) {
     setPageMenuOpen(false);
-    const { id } = await charmClient.forum.convertToProposal(pageId);
-    setConvertedProposalId(id);
+    const { path } = await charmClient.forum.convertToProposal(pageId);
+    router.push(`/${router.query.domain}/${path}`);
   }
 
   return (
@@ -306,7 +304,6 @@ export default function Header({ open, openSidebar }: HeaderProps) {
 
   const { onClick: clickToOpenSettingsModal } = useSettingsDialog();
   const isForumPost = router.route === '/[domain]/forum/post/[pagePath]';
-  const [convertedProposalId, setConvertedProposalId] = useState<string | null>(null);
 
   const pagePath = isForumPost ? (router.query.pagePath as string) : null;
   // Post permissions hook will not make an API call if post ID is null. Since we can't conditionally render hooks, we pass null as the post ID. This is the reason for the 'null as any' statement
@@ -314,14 +311,6 @@ export default function Header({ open, openSidebar }: HeaderProps) {
     postPath: isForumPost ? pagePath : isForumPost ? (pagePath as string) : (null as any),
     spaceDomain: router.query.domain as string
   });
-
-  useEffect(() => {
-    if (isForumPost && forumPostInfo.forumPost) {
-      setConvertedProposalId(forumPostInfo.forumPost.proposalId);
-    } else if (!isForumPost) {
-      setConvertedProposalId(null);
-    }
-  }, [forumPostInfo, isForumPost]);
 
   const isLargeScreen = useMediaQuery(theme.breakpoints.up('md'));
 
@@ -530,7 +519,6 @@ export default function Header({ open, openSidebar }: HeaderProps) {
   } else if (isForumPost) {
     pageOptionsList = (
       <PostHeader
-        setConvertedProposalId={setConvertedProposalId}
         forumPostInfo={forumPostInfo}
         setPageMenuOpen={setPageMenuOpen}
         undoEditorChanges={undoEditorChanges}
