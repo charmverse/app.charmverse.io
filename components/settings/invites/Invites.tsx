@@ -1,10 +1,10 @@
 import { Typography } from '@mui/material';
 import type { Space } from '@prisma/client';
 import { usePopupState } from 'material-ui-popup-state/hooks';
-import { useEffect, useContext, useRef } from 'react';
+import { useContext, useEffect, useRef } from 'react';
 
 import { Web3Connection } from 'components/_app/Web3ConnectionManager';
-import useIsAdmin from 'hooks/useIsAdmin';
+import { useIsAdmin } from 'hooks/useIsAdmin';
 import { usePendingLocalAction } from 'hooks/usePendingLocalAction';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 

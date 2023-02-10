@@ -26,7 +26,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
 
-import { headerHeight } from '../Header';
+import { headerHeight } from '../Header/Header';
 
 import SpaceListItem from './SpaceListItem';
 import WorkspaceAvatar from './WorkspaceAvatar';
@@ -78,9 +78,7 @@ export default function SidebarSubmenu({
   const { spaces, isCreatingSpace, setSpaces, isLoaded } = useSpaces();
   const [spaceFormOpen, setSpaceFormOpen] = useState(false);
   const { user } = useUser();
-  const { handleUserUpdate, isSaving } = useUserDetails({
-    user: user!
-  });
+  const { handleUserUpdate, isSaving } = useUserDetails({});
 
   function showSpaceForm() {
     setSpaceFormOpen(true);

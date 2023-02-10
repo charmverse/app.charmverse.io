@@ -198,15 +198,7 @@ export function PostComment({ post, comment, setPostComments, permissions }: Pro
             left: 10
           }}
         />
-        <Box
-          data-test={`post-comment-charmeditor-${comment.id}`}
-          ml={3}
-          sx={{
-            'div.ProseMirror.bangle-editor': {
-              paddingLeft: '10px !important'
-            }
-          }}
-        >
+        <Box data-test={`post-comment-charmeditor-${comment.id}`} ml={3}>
           {isEditingComment ? (
             <Stack>
               <CharmEditor

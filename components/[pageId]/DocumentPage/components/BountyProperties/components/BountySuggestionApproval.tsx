@@ -8,7 +8,7 @@ import { usePopupState } from 'material-ui-popup-state/hooks';
 import charmClient from 'charmClient';
 import { Modal } from 'components/common/Modal';
 import { useBounties } from 'hooks/useBounties';
-import useIsAdmin from 'hooks/useIsAdmin';
+import { useIsAdmin } from 'hooks/useIsAdmin';
 
 interface Props {
   bounty: Bounty;

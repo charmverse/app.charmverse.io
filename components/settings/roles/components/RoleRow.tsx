@@ -123,7 +123,7 @@ export default function RoleRow({
             {isEditable && (
               <div onClick={(e) => e.stopPropagation()}>
                 <IconButton size='small' {...bindTrigger(menuState)}>
-                  <MoreHorizIcon />
+                  <MoreHorizIcon data-test={`open-role-context-menu-${role.id}`} />
                 </IconButton>
               </div>
             )}
@@ -209,6 +209,7 @@ export default function RoleRow({
             rolePermissionsPopupState.open();
             menuState.close();
           }}
+          data-test={`open-role-permissions-popup-${role.id}`}
         >
           <ListItemIcon>
             <LockOpenIcon fontSize='small' />

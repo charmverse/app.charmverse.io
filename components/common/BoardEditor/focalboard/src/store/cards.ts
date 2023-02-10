@@ -3,13 +3,12 @@ import { createSelector, createSlice } from '@reduxjs/toolkit';
 
 import type { Board } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
-import type { Card } from 'lib/focalboard/card';
+import type { Card, CardPage } from 'lib/focalboard/card';
 import type { Member } from 'lib/members/interfaces';
 import type { PageMeta } from 'lib/pages';
 
 import { CardFilter } from '../cardFilter';
 import { Constants } from '../constants';
-import type { IUser } from '../user';
 import { Utils } from '../utils';
 
 import { getCurrentBoard, getBoard } from './boards';
@@ -24,11 +23,6 @@ type CardsState = {
   current: string;
   cards: { [key: string]: Card };
   templates: { [key: string]: Card };
-};
-
-export type CardPage = {
-  card: Card;
-  page: PageMeta;
 };
 
 const cardsSlice = createSlice({

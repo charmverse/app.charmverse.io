@@ -2,11 +2,11 @@ import { AvatarGroup, Box, Tooltip } from '@mui/material';
 import { useState } from 'react';
 
 import Avatar from 'components/common/Avatar';
-import { usePrimaryCharmEditor } from 'hooks/usePrimaryCharmEditor';
+import { useCharmEditor } from 'hooks/useCharmEditor';
 import { useUser } from 'hooks/useUser';
 
 export function DocumentParticipants() {
-  const { participants } = usePrimaryCharmEditor();
+  const { participants } = useCharmEditor();
   const { user } = useUser();
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);

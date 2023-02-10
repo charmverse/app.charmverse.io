@@ -10,7 +10,7 @@ import Modal from 'components/common/Modal';
 import ShareBountyBoard from 'components/common/PageLayout/components/Header/components/BountyShareButton/ShareBountyBoard';
 import Legend from 'components/settings/Legend';
 import ImportGuildRolesMenuItem from 'components/settings/roles/components/ImportGuildRolesMenuItem';
-import useIsAdmin from 'hooks/useIsAdmin';
+import { useIsAdmin } from 'hooks/useIsAdmin';
 import useRoles from 'hooks/useRoles';
 
 import ImportDiscordRolesMenuItem from './components/ImportDiscordRolesMenuItem';

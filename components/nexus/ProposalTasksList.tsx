@@ -1,11 +1,11 @@
 import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
+import { Box } from '@mui/material';
 import Alert from '@mui/material/Alert';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
-import { Box } from '@mui/system';
 import { useEffect } from 'react';
 import type { KeyedMutator } from 'swr';
 

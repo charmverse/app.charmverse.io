@@ -8,7 +8,7 @@ import type { SelectOptionType } from 'components/common/form/fields/Select/inte
 import { SelectOptionsList } from 'components/common/form/fields/Select/SelectOptionsList';
 import { isSelectType } from 'components/common/form/fields/utils';
 import Modal from 'components/common/Modal';
-import isAdmin from 'hooks/useIsAdmin';
+import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useMemberProperties } from 'hooks/useMemberProperties';
 import { useMembers } from 'hooks/useMembers';
 import { MEMBER_PROPERTY_CONFIG } from 'lib/members/constants';
@@ -17,7 +17,7 @@ import { MemberPropertyItem } from './MemberDirectoryProperties/MemberPropertyIt
 
 export function AddMemberPropertyButton() {
   const addMemberPropertyPopupState = usePopupState({ variant: 'popover', popupId: 'member-property' });
-  const admin = isAdmin();
+  const admin = useIsAdmin();
   const { mutateMembers } = useMembers();
   const propertyNamePopupState = usePopupState({ variant: 'popover', popupId: 'property-name-modal' });
   const [selectedPropertyType, setSelectedPropertyType] = useState<null | MemberPropertyType>(null);

@@ -9,6 +9,7 @@ import { isUUID } from 'lib/utilities/strings';
 import type { PermissionCompute } from '../interfaces';
 
 import { AvailablePostPermissions } from './availablePostPermissions.class';
+import { hasSpaceWideModerateForumsPermission } from './hasSpaceWideModerateForumsPermission';
 import type { AvailablePostPermissionFlags } from './interfaces';
 import { postPermissionsMapping } from './mapping';
 
@@ -21,7 +22,13 @@ export async function computePostPermissions({
   }
 
   const post = await prisma.post.findUnique({
-    where: { id: resourceId }
+    where: { id: resourceId },
+    select: {
+      categoryId: true,
+      spaceId: true,
+      createdBy: true,
+      proposalId: true
+    }
   });
 
   if (!post) {
@@ -60,6 +67,19 @@ export async function computePostPermissions({
   if (error || !userId) {
     whereQuery.public = true;
   } else {
+    const hasSpaceWideModerate = await hasSpaceWideModerateForumsPermission({
+      spaceId: post.spaceId,
+      userId
+    });
+
+    if (hasSpaceWideModerate) {
+      permissions.addPermissions(postPermissionsMapping.moderator);
+      return {
+        ...permissions.operationFlags,
+        edit_post: post.createdBy === userId
+      };
+    }
+
     whereQuery.OR = [
       {
         public: true
