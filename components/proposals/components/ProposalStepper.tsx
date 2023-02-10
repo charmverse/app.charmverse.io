@@ -1,7 +1,6 @@
 import styled from '@emotion/styled';
 import CheckIcon from '@mui/icons-material/Check';
-import { Divider, Grid, MenuItem, Select, Stack, Tooltip, Typography } from '@mui/material';
-import { Box } from '@mui/system';
+import { Divider, Grid, MenuItem, Select, Stack, Tooltip, Typography, Box } from '@mui/material';
 import type { ProposalStatus, ProposalReviewer } from '@prisma/client';
 import { Fragment, useState } from 'react';
 import type { KeyedMutator } from 'swr';

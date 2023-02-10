@@ -6,7 +6,7 @@ import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
 
 import Button from 'components/common/Button';
-import SettingsDialog from 'components/common/Modal/SettingsDialog';
+import { SpaceSettingsDialog } from 'components/common/Modal/SettingsDialog';
 import { PageDialogProvider } from 'components/common/PageDialog/hooks/usePageDialog';
 import PageDialogGlobalModal from 'components/common/PageDialog/PageDialogGlobal';
 import { PageActionDisplayProvider } from 'hooks/usePageActionDisplay';
@@ -68,7 +68,7 @@ function NexusLayout({ children }: NexusLayoutProps) {
           <PageContainer>
             <Box minHeight={`${headerHeight}px`} />
             {children}
-            <SettingsDialog />
+            <SpaceSettingsDialog />
           </PageContainer>
           <PageDialogGlobalModal />
         </PageActionDisplayProvider>

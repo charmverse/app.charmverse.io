@@ -1,5 +1,4 @@
 import styled from '@emotion/styled';
-import { SxProps } from '@mui/system';
 import type { CSSProperties, ReactNode } from 'react';
 
 import ScrollableWindow from './ScrollableWindow';

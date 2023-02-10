@@ -8,17 +8,17 @@ import BountyIcon from '@mui/icons-material/RequestPageOutlined';
 import SearchIcon from '@mui/icons-material/Search';
 import SettingsIcon from '@mui/icons-material/Settings';
 import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
+import type { BoxProps } from '@mui/material';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
-import type { BoxProps } from '@mui/system';
 import type { Page } from '@prisma/client';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
 import { useCallback, useMemo, useState } from 'react';
 
-import SettingsDialog from 'components/common/Modal/SettingsDialog';
+import { SpaceSettingsDialog } from 'components/common/Modal/SettingsDialog';
 import { charmverseDiscordInvite } from 'config/constants';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
@@ -310,7 +310,7 @@ export default function Sidebar({ closeSidebar, favorites, navAction }: SidebarP
           }}
         />
       )}
-      <SettingsDialog />
+      <SpaceSettingsDialog />
     </SidebarContainer>
   );
 }

@@ -3,6 +3,7 @@ import { getPostCategories } from 'lib/forums/categories/getPostCategories';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 
 import { filterAccessiblePostCategories } from './filterAccessiblePostCategories';
+import { hasSpaceWideModerateForumsPermission } from './hasSpaceWideModerateForumsPermission';
 
 type PostCategorySearchToMutate = {
   categoryId?: string | string[];
@@ -21,7 +22,18 @@ export async function mutatePostCategorySearch({
   });
   if (isAdmin) {
     return { categoryId };
-  } else if (!categoryId) {
+  }
+
+  const isSpaceWideModerator = await hasSpaceWideModerateForumsPermission({
+    spaceId,
+    userId
+  });
+
+  if (isSpaceWideModerator) {
+    return { categoryId };
+  }
+
+  if (!categoryId) {
     const spacePostCategories = await getPostCategories(spaceId);
     const accessibleCategories = await filterAccessiblePostCategories({
       postCategories: spacePostCategories,

@@ -1,8 +1,7 @@
 /* eslint-disable max-lines */
 // import Button from '../../widgets/buttons/button'
-import { Menu, TextField } from '@mui/material';
+import { Box, Menu, TextField } from '@mui/material';
 import Button from '@mui/material/Button';
-import { Box } from '@mui/system';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import React, { useCallback, useState } from 'react';
 import type { IntlShape } from 'react-intl';

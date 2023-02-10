@@ -1,5 +1,4 @@
-import { Chip, Typography } from '@mui/material';
-import { Stack } from '@mui/system';
+import { Chip, Typography, Stack } from '@mui/material';
 
 import { SelectPreview } from 'components/common/form/fields/Select/SelectPreview';
 import { useDateFormatter } from 'hooks/useDateFormatter';

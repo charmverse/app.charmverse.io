@@ -1,4 +1,4 @@
-import { darken, lighten } from '@mui/system';
+import { darken, lighten } from '@mui/material/styles';
 
 export const blackColor = '#111';
 export const yellowColor = '#EAD637';

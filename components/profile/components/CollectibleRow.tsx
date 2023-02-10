@@ -1,8 +1,7 @@
 import styled from '@emotion/styled';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
-import { IconButton, Link, Stack, Tooltip, Typography } from '@mui/material';
-import { Box } from '@mui/system';
+import { IconButton, Link, Stack, Tooltip, Typography, Box } from '@mui/material';
 
 import Avatar from 'components/common/Avatar';
 import { useDateFormatter } from 'hooks/useDateFormatter';

@@ -19,8 +19,7 @@ import {
   Tooltip,
   useMediaQuery
 } from '@mui/material';
-import type { ButtonProps, SxProps } from '@mui/material';
-import type { BoxProps, Theme } from '@mui/system';
+import type { ButtonProps, SxProps, Theme, BoxProps } from '@mui/material';
 import { DateTime } from 'luxon';
 import { usePopupState, bindMenu } from 'material-ui-popup-state/hooks';
 import type { MouseEvent } from 'react';
@@ -118,7 +117,7 @@ function AddCommentCharmEditor({
   readOnly: boolean;
   disabled: boolean;
   threadId: string;
-  sx: SxProps;
+  sx: SxProps<Theme>;
 }) {
   const [commentContent, setCommentContent] = useState<PageContent | null>(null);
   const isEmpty = checkIsContentEmpty(commentContent);

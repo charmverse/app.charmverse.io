@@ -9,9 +9,9 @@ import {
   Stack,
   TextField,
   Tooltip,
-  Typography
+  Typography,
+  Box
 } from '@mui/material';
-import { Box } from '@mui/system';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { VoteType } from '@prisma/client';
 import { DateTime } from 'luxon';

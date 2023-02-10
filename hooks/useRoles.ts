@@ -7,10 +7,8 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 
 import type { RoleupWithMembers } from '../lib/roles';
 
-export default function useRoles(externalSpace?: Space) {
-  const currentSpace = useCurrentSpace();
-
-  const space = externalSpace || currentSpace;
+export default function useRoles() {
+  const space = useCurrentSpace();
 
   const { data: roles } = useSWR(
     () => (space ? `roles/${space.id}` : null),
