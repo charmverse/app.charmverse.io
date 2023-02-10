@@ -28,6 +28,7 @@ import SpaceSettings from 'components/settings/workspace/Space';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { CurrentSpaceProvider, useCurrentSpaceId } from 'hooks/useCurrentSpaceId';
 import { useSmallScreen } from 'hooks/useMediaScreens';
+import { MembersProvider } from 'hooks/useMembers';
 import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useSpaceFromPath } from 'hooks/useSpaceFromPath';
 import { useSpaces } from 'hooks/useSpaces';
@@ -245,7 +246,9 @@ function SpaceSettingsModalComponent() {
 export function SpaceSettingsDialog() {
   return (
     <CurrentSpaceProvider>
-      <SpaceSettingsModalComponent />
+      <MembersProvider>
+        <SpaceSettingsModalComponent />
+      </MembersProvider>
     </CurrentSpaceProvider>
   );
 }
