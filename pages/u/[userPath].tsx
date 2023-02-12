@@ -32,7 +32,11 @@ export const getServerSideProps: GetServerSideProps<{ publicUser: PublicUser | n
 
       const user = await prisma.user.findFirst({
         where: condition,
-        include: {
+        select: {
+          id: true,
+          username: true,
+          avatar: true,
+          path: true,
           profile: true
         }
       });
