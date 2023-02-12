@@ -45,6 +45,7 @@ import { useSpaceFromPath } from 'hooks/useSpaceFromPath';
 import { SpacesProvider } from 'hooks/useSpaces';
 import { UserProvider } from 'hooks/useUser';
 import { useUserAcquisition } from 'hooks/useUserAcquisition';
+import { useUserPreferences } from 'hooks/useUserPreferences';
 import { Web3AccountProvider } from 'hooks/useWeb3AuthSig';
 import { WebSocketClientProvider } from 'hooks/useWebSocketClient';
 import { createThemeLightSensitive } from 'theme';
@@ -210,11 +211,11 @@ export default function App({ Component, emotionCache = clientSideEmotionCache, 
     <CacheProvider value={emotionCache}>
       <ColorModeContext.Provider value={colorModeContext}>
         <ThemeProvider theme={theme}>
-          <LocalizationProvider dateAdapter={AdapterLuxon as any}>
-            <SnackbarProvider>
-              <SettingsDialogProvider>
-                <ReactDndProvider>
-                  <DataProviders>
+          <SnackbarProvider>
+            <SettingsDialogProvider>
+              <ReactDndProvider>
+                <DataProviders>
+                  <LocaleProvider>
                     <OnboardingProvider>
                       <FocalBoardProvider>
                         <IntlProvider>
@@ -242,14 +243,23 @@ export default function App({ Component, emotionCache = clientSideEmotionCache, 
                         </IntlProvider>
                       </FocalBoardProvider>
                     </OnboardingProvider>
-                  </DataProviders>
-                </ReactDndProvider>
-              </SettingsDialogProvider>
-            </SnackbarProvider>
-          </LocalizationProvider>
+                  </LocaleProvider>
+                </DataProviders>
+              </ReactDndProvider>
+            </SettingsDialogProvider>
+          </SnackbarProvider>
         </ThemeProvider>
       </ColorModeContext.Provider>
     </CacheProvider>
+  );
+}
+
+function LocaleProvider({ children }: { children: ReactNode }) {
+  const { userPreferences } = useUserPreferences();
+  return (
+    <LocalizationProvider dateAdapter={AdapterLuxon as any} adapterLocale={userPreferences.locale ?? undefined}>
+      {children}
+    </LocalizationProvider>
   );
 }
 
