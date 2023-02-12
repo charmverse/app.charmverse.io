@@ -7,7 +7,7 @@ import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/boar
 import type { Card } from 'lib/focalboard/card';
 
 import mutator from '../mutator';
-import { OctoUtils } from '../octoUtils';
+import { OctoUtils, usePropertyDisplayValue } from '../octoUtils';
 import Switch from '../widgets/switch';
 import { TextInput } from '../widgets/TextInput';
 
@@ -33,11 +33,11 @@ type Props = {
 function PropertyValueElement(props: Props): JSX.Element {
   const [value, setValue] = useState(props.card.fields.properties[props.propertyTemplate.id] || '');
   const [serverValue, setServerValue] = useState(props.card.fields.properties[props.propertyTemplate.id] || '');
-
+  const { propertyDisplayValue } = usePropertyDisplayValue();
   const { card, propertyTemplate, readOnly, showEmptyPlaceholder, board, updatedBy, updatedAt, displayType } = props;
   const intl = useIntl();
   const propertyValue = card.fields.properties[propertyTemplate.id];
-  const displayValue = OctoUtils.propertyDisplayValue(card, propertyValue, propertyTemplate, intl);
+  const displayValue = propertyDisplayValue(card, propertyValue, propertyTemplate);
   const emptyDisplayValue = showEmptyPlaceholder
     ? intl.formatMessage({ id: 'PropertyValueElement.empty', defaultMessage: 'Empty' })
     : '';

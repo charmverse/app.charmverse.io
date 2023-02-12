@@ -10,7 +10,7 @@ import type { Card } from 'lib/focalboard/card';
 import { filterPropertyTemplates } from '../../../../utils/updateVisibilePropertyIds';
 import { Constants } from '../../constants';
 import mutator from '../../mutator';
-import { OctoUtils } from '../../octoUtils';
+import { OctoUtils, usePropertyDisplayValue } from '../../octoUtils';
 import { IDType, Utils } from '../../utils';
 import Button from '../../widgets/buttons/button';
 import Menu from '../../widgets/menu';
@@ -34,6 +34,7 @@ type Props = {
 function TableHeaders(props: Props): JSX.Element {
   const { board, cards, activeView, resizingColumn, views, offset, columnRefs } = props;
   const intl = useIntl();
+  const { propertyDisplayValue } = usePropertyDisplayValue();
   const onAutoSizeColumn = useCallback(
     (columnID: string, headerWidth: number) => {
       let longestSize = headerWidth;
@@ -79,12 +80,7 @@ function TableHeaders(props: Props): JSX.Element {
           thisLen = Utils.getTextWidth(card.title, columnFontPadding.fontDescriptor) + columnFontPadding.padding;
         } else if (template) {
           const displayValue =
-            OctoUtils.propertyDisplayValue(
-              card,
-              card.fields.properties[columnID],
-              template as IPropertyTemplate,
-              intl
-            ) || '';
+            propertyDisplayValue(card, card.fields.properties[columnID], template as IPropertyTemplate) || '';
           switch (template.type) {
             case 'select': {
               thisLen = Utils.getTextWidth(displayValue.toString().toUpperCase(), columnFontPadding.fontDescriptor);

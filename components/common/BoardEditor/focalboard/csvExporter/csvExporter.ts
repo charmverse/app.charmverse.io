@@ -76,7 +76,13 @@ class CsvExporter {
       _row.push(`"${this.encodeText(card.title)}"`);
       visibleProperties.forEach((template: IPropertyTemplate) => {
         const propertyValue = card.fields.properties[template.id];
-        const displayValue = (OctoUtils.propertyDisplayValue(card, propertyValue, template, intl) || '') as string;
+        const displayValue = (OctoUtils.propertyDisplayValue(
+          card,
+          propertyValue,
+          template,
+          (date) => Utils.displayDate(new Date(date), intl),
+          (date) => Utils.displayDateTime(new Date(date), intl)
+        ) || '') as string;
 
         if (template.type === 'number') {
           const numericValue = propertyValue ? Number(propertyValue).toString() : '';

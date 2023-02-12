@@ -7,6 +7,9 @@ import { DateUtils } from 'react-day-picker';
 import DayPicker from 'react-day-picker/DayPicker';
 import { useIntl } from 'react-intl';
 
+import { useDateFormatter } from 'hooks/useDateFormatter';
+import { useUserPreferences } from 'hooks/useUserPreferences';
+
 import { Utils } from '../../../utils';
 import Button from '../../../widgets/buttons/button';
 import Editable from '../../../widgets/editable';
@@ -50,11 +53,12 @@ function DateRange(props: Props): JSX.Element {
   const { className, value, showEmptyPlaceholder, onChange } = props;
   const intl = useIntl();
   const popupState = usePopupState({ variant: 'popover', popupId: 'dateRangePopup' });
+  const { formatDate } = useDateFormatter();
 
   const getDisplayDate = (date: Date | null | undefined) => {
     let displayDate = '';
     if (date) {
-      displayDate = Utils.displayDate(date, intl);
+      displayDate = formatDate(date);
     }
     return displayDate;
   };
@@ -64,7 +68,6 @@ function DateRange(props: Props): JSX.Element {
   };
 
   const [dateProperty, setDateProperty] = useState<DateProperty>(createDatePropertyFromString(value as string));
-  const [showDialog, setShowDialog] = useState(false);
 
   // Keep dateProperty as UTC,
   // dateFrom / dateTo will need converted to local time, to ensure date stays consistent
@@ -80,7 +83,8 @@ function DateRange(props: Props): JSX.Element {
 
   const isRange = dateTo !== undefined;
 
-  const locale = intl.locale.toLowerCase();
+  const { userPreferences } = useUserPreferences();
+  const locale = userPreferences.locale ?? intl.locale;
 
   const saveRangeValue = (range: DateProperty) => {
     const rangeUTC = { ...range };

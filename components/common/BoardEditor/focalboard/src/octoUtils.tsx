@@ -1,6 +1,7 @@
 import { DateUtils } from 'react-day-picker';
 import type { IntlShape } from 'react-intl';
 
+import { useDateFormatter } from 'hooks/useDateFormatter';
 import type { Block } from 'lib/focalboard/block';
 import { createBlock } from 'lib/focalboard/block';
 import type { IPropertyTemplate } from 'lib/focalboard/board';
@@ -23,8 +24,9 @@ class OctoUtils {
     block: Block,
     propertyValue: string | string[] | undefined,
     propertyTemplate: IPropertyTemplate,
-    intl: IntlShape
-  ): string | string[] | undefined {
+    formatDate: (date: Date | string) => string,
+    formatDateTime: (date: Date | string) => string
+  ) {
     let displayValue: string | string[] | undefined;
     switch (propertyTemplate.type) {
       case 'select': {
@@ -43,27 +45,27 @@ class OctoUtils {
         break;
       }
       case 'createdTime': {
-        displayValue = Utils.displayDateTime(new Date(block.createdAt), intl);
+        displayValue = formatDateTime(new Date(block.createdAt));
         break;
       }
       case 'updatedTime': {
-        displayValue = Utils.displayDateTime(new Date(block.updatedAt), intl);
+        displayValue = formatDateTime(new Date(block.updatedAt));
         break;
       }
       case 'date': {
         if (propertyValue) {
           const singleDate = new Date(parseInt(propertyValue as string, 10));
           if (singleDate && DateUtils.isDate(singleDate)) {
-            displayValue = Utils.displayDate(new Date(parseInt(propertyValue as string, 10)), intl);
+            displayValue = formatDate(new Date(parseInt(propertyValue as string, 10)));
           } else {
             try {
               const dateValue = JSON.parse(propertyValue as string);
               if (dateValue.from) {
-                displayValue = Utils.displayDate(new Date(dateValue.from), intl);
+                displayValue = formatDate(new Date(dateValue.from));
               }
               if (dateValue.to) {
                 displayValue += ' -> ';
-                displayValue += Utils.displayDate(new Date(dateValue.to), intl);
+                displayValue += formatDate(new Date(dateValue.to));
               }
             } catch {
               // do nothing
@@ -198,6 +200,20 @@ class OctoUtils {
       }
     }
   }
+}
+
+export function usePropertyDisplayValue() {
+  const { formatDateTime, formatDate } = useDateFormatter();
+
+  return {
+    propertyDisplayValue(
+      block: Block,
+      propertyValue: string | string[] | undefined,
+      propertyTemplate: IPropertyTemplate
+    ) {
+      return OctoUtils.propertyDisplayValue(block, propertyValue, propertyTemplate, formatDate, formatDateTime);
+    }
+  };
 }
 
 export { OctoUtils };

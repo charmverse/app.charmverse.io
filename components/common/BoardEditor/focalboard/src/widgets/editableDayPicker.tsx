@@ -1,11 +1,10 @@
 import { DateTime } from 'luxon';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import DayPickerInput from 'react-day-picker/DayPickerInput';
-import type { IntlShape } from 'react-intl';
 import { useIntl } from 'react-intl';
 
-import { Utils } from '../utils';
-
+import { useDateFormatter } from 'hooks/useDateFormatter';
+import { useUserPreferences } from 'hooks/useUserPreferences';
 import 'react-day-picker/lib/style.css';
 
 type Props = {
@@ -18,13 +17,6 @@ const parseValue = (value: string): Date | undefined => {
   return value ? new Date(parseInt(value, 10)) : undefined;
 };
 
-const displayDate = (date: Date | undefined, intl: IntlShape): string | undefined => {
-  if (date === undefined) {
-    return undefined;
-  }
-  return Utils.displayDate(date, intl);
-};
-
 const dateFormat = 'MM/DD/YYYY';
 
 function EditableDayPicker(props: Props): JSX.Element {
@@ -32,14 +24,15 @@ function EditableDayPicker(props: Props): JSX.Element {
   const intl = useIntl();
   const [value, setValue] = useState(() => parseValue(props.value));
   const [dayPickerVisible, setDayPickerVisible] = useState(false);
-
-  const locale = intl.locale.toLowerCase();
+  const { userPreferences } = useUserPreferences();
+  const { formatDate: formatLocaleDate } = useDateFormatter();
+  const locale = userPreferences.locale ?? intl.locale.toLowerCase();
 
   const saveSelection = () => {
     onChange(value?.getTime().toString());
   };
 
-  const inputValue = dayPickerVisible ? value : displayDate(value, intl);
+  const inputValue = dayPickerVisible ? value : value ? formatLocaleDate(value) : undefined;
 
   const parseDate = (str: string, format: string, withLocale: string) => {
     if (str === inputValue) {
