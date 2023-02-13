@@ -89,7 +89,7 @@ export function VideoNodeView({
                       const pos = getPos();
                       const newConfig = embeds[embedType] as Embed;
                       const width = attrs.width;
-                      let height = width * VIDEO_ASPECT_RATIO;
+                      let height = width / VIDEO_ASPECT_RATIO;
                       if (width && height && newConfig.heightRatio) {
                         height = width / newConfig.heightRatio;
                       }
