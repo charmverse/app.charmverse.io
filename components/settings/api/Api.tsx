@@ -53,7 +53,7 @@ export function ApiSettings({ space }: { space: Space }) {
     const data = {
       webhookUrl: spaceWebhook.webhookSubscriptionUrl,
       events: {
-        discussion: spaceWebhook.eventMap.get('forum') || false,
+        forum: spaceWebhook.eventMap.get('forum') || false,
         proposal: spaceWebhook.eventMap.get('proposal') || false,
         bounty: spaceWebhook.eventMap.get('bounty') || false,
         user: spaceWebhook.eventMap.get('user') || false
