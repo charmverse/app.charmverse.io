@@ -5,6 +5,8 @@ import React from 'react';
 
 import type { SubMenu } from './floating-menu';
 
+export const tooltipContainerClass = 'charm-tooltip-container';
+
 const StyledMenu = styled(Paper, { shouldForwardProp: (prop: string) => prop !== 'noScroll' })<{
   type?: SubMenu;
   noScroll?: boolean;
@@ -33,7 +35,7 @@ export function Menu({
   inline?: boolean;
 }) {
   return (
-    <StyledMenu elevation={8} type={type} noScroll={noScroll} inline={inline}>
+    <StyledMenu className={tooltipContainerClass} elevation={8} type={type} noScroll={noScroll} inline={inline}>
       {children}
     </StyledMenu>
   );

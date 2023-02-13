@@ -1,8 +1,14 @@
 import type { PluginKey } from '@bangle.dev/core';
 import type { EditorState, EditorView, Node, Plugin, ResolvedPos, Transaction } from '@bangle.dev/pm';
+import { selectionTooltip } from '@bangle.dev/tooltip';
 import type { NodeSelection } from 'prosemirror-state';
+import type { MouseEvent } from 'react';
 
 import { floatingMenu, toggleSubMenu } from './floating-menu';
+import { tooltipContainerClass } from './Menu';
+
+const { queryIsSelectionTooltipActive, querySelectionTooltipType, hideSelectionTooltip, updateSelectionTooltipType } =
+  selectionTooltip;
 
 // Components that should not trigger floating menu
 const blacklistedComponents =
@@ -76,9 +82,15 @@ export function plugins({
         ...controller.props,
         handleDOMEvents: {
           ...controller.spec.props?.handleDOMEvents,
-          blur: (view: EditorView) => {
+          blur: (view: EditorView, event: MouseEvent) => {
             if (view) {
-              toggleSubMenu(key, 'defaultMenu')(view.state, view.dispatch, view);
+              const isInsideEditorTooltip = Boolean(
+                (event.relatedTarget as HTMLElement)?.closest(`.${tooltipContainerClass}`)
+              );
+              if (!isInsideEditorTooltip) {
+                // const type = querySelectionTooltipType(floatingMenuPluginKey)(state);
+                toggleSubMenu(key, 'defaultMenu')(view.state, view.dispatch, view);
+              }
             }
           }
         }
