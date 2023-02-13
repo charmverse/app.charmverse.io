@@ -39,8 +39,12 @@ export function OrgsList({ memberId, readOnly = false }: Props) {
     setIsShowingOrgsGallery(false);
   }
 
+  if (currentUser?.id !== memberId && pinnedOrgs.length === 0) {
+    return null;
+  }
+
   return (
-    <Stack gap={1}>
+    <Stack gap={1} data-test='member-profile-org-list'>
       <Typography variant='h6'>Organizations</Typography>
       {error && (
         <Grid item>
@@ -85,8 +89,6 @@ export function OrgsList({ memberId, readOnly = false }: Props) {
                   />
                 </div>
               </Tooltip>
-            ) : pinnedOrgs.length === 0 ? (
-              <Typography color='secondary'>No pinned Organizations</Typography>
             ) : null}
 
             {showingOrgsGallery && (

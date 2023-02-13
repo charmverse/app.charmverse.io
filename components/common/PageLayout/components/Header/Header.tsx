@@ -48,11 +48,11 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import { useToggleFavorite } from 'hooks/useToggleFavorite';
 import { useUser } from 'hooks/useUser';
 
-import DocumentHistory from '../DocumentHistory';
 import NotificationsBadge from '../Sidebar/NotificationsBadge';
 
 import BountyShareButton from './components/BountyShareButton/BountyShareButton';
 import DatabasePageOptions from './components/DatabasePageOptions';
+import { DocumentHistory } from './components/DocumentHistory';
 import { DocumentParticipants } from './components/DocumentParticipants';
 import EditingModeToggle from './components/EditingModeToggle';
 import PageTitleWithBreadcrumbs from './components/PageTitleWithBreadcrumbs';
@@ -254,19 +254,6 @@ function PostHeader({
         </div>
       </Tooltip>
       <Divider />
-      <Tooltip title={!forumPostInfo.permissions?.delete_post ? "You don't have permission to delete this post" : ''}>
-        <div>
-          <ListItemButton disabled={!forumPostInfo.permissions?.delete_post} onClick={deletePost}>
-            <DeleteOutlineOutlinedIcon
-              fontSize='small'
-              sx={{
-                mr: 1
-              }}
-            />
-            <ListItemText primary='Delete' />
-          </ListItemButton>
-        </div>
-      </Tooltip>
       <Tooltip title={!forumPostInfo.permissions?.edit_post ? "You don't have permission to undo changes" : ''}>
         <div>
           <ListItemButton disabled={!forumPostInfo.permissions?.edit_post} onClick={undoEditorChanges}>
@@ -284,7 +271,7 @@ function PostHeader({
       {forumPostInfo.forumPost && postCreator ? (
         <>
           <Divider />
-          <Metadata creator={postCreator.username} lastUpdatedAt={forumPostInfo.forumPost.updatedAt} />
+          <DocumentHistory page={{ updatedBy: forumPostInfo.forumPost.createdBy, ...forumPostInfo.forumPost }} />
         </>
       ) : null}
     </List>
@@ -508,7 +495,7 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
       {charmversePage && basePage && (
         <>
           <Divider />
-          <Metadata creator={charmversePage.username} lastUpdatedAt={basePage.updatedAt} />
+          <DocumentHistory page={basePage} />
         </>
       )}
     </List>
@@ -567,7 +554,6 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
           {basePage && (
             <>
               {isBasePageDocument && <DocumentParticipants />}
-              <DocumentHistory page={basePage} />
               {isBasePageDocument && <EditingModeToggle />}
               {basePage?.deletedAt === null && <ShareButton headerHeight={headerHeight} pageId={basePage.id} />}
             </>

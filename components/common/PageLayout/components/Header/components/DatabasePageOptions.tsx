@@ -23,7 +23,7 @@ import {
   sortCards
 } from 'components/common/BoardEditor/focalboard/src/store/cards';
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
-import { getView } from 'components/common/BoardEditor/focalboard/src/store/views';
+import { getCurrentBoardViews, getView } from 'components/common/BoardEditor/focalboard/src/store/views';
 import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useDateFormatter } from 'hooks/useDateFormatter';
@@ -59,6 +59,7 @@ export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: 
   const { pages, deletePage } = usePages();
   const view = useAppSelector(getView(router.query.viewId as string));
   const boards = useAppSelector(getSortedBoards);
+  const boardViews = useAppSelector(getCurrentBoardViews);
   const { isFavorite, toggleFavorite } = useToggleFavorite({ pageId });
   const { showMessage } = useSnackbar();
   const { members } = useMembers();
@@ -128,7 +129,11 @@ export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: 
     closeMenu();
   }
 
-  const addNewCards = async (_board: Board, results: Papa.ParseResult<Record<string, string>>) => {
+  const addNewCards = async (
+    _board: Board,
+    _views: BoardView[] | null,
+    results: Papa.ParseResult<Record<string, string>>
+  ) => {
     const csvData = results.data;
     const headers = results.meta.fields || [];
 
@@ -159,6 +164,23 @@ export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: 
 
     // Update board with new cardProperties
     await charmClient.updateBlock(newBoardBlock);
+
+    // Update the view of the table to make all the cards visible
+    const allTableViews = (_views || [])
+      .filter((_view) => _view.type === 'view' && _view.fields.viewType === 'table')
+      .map(async (_view) => {
+        const allCardPropertyIds = newBoardBlock.fields.cardProperties.map((prop) => prop.id);
+        const newViewBlock: BoardView = {
+          ..._view,
+          fields: {
+            ..._view.fields,
+            visiblePropertyIds: allCardPropertyIds
+          }
+        };
+        return charmClient.updateBlock(newViewBlock);
+      });
+
+    await Promise.all(allTableViews);
 
     // Create the new mapped board properties to know what are the ids of each property and option
     const mappedBoardProperties = mapCardBoardProperties(mergedFields);
@@ -210,7 +232,7 @@ export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: 
             return;
           }
           if (isValidCsvResult(results)) {
-            await addNewCards(board, results);
+            await addNewCards(board, boardViews, results);
 
             const spaceId = currentSpace?.id;
             if (spaceId) {

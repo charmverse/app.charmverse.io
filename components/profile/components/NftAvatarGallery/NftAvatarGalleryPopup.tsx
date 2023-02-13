@@ -15,9 +15,17 @@ type Props = {
   onClose: () => void;
   isSaving?: boolean;
   hiddenNfts?: string[];
+  disableAutoSelectAvatarNft?: boolean;
 };
 
-export default function NftAvatarGalleryPopup({ onSelect, isVisible, onClose, isSaving, hiddenNfts = [] }: Props) {
+export default function NftAvatarGalleryPopup({
+  disableAutoSelectAvatarNft,
+  onSelect,
+  isVisible,
+  onClose,
+  isSaving,
+  hiddenNfts = []
+}: Props) {
   const { user } = useUser();
   const { nfts = [], isLoading } = useMyNfts(user?.id || '');
   const [searchedTerm, setSearchedTerm] = useState('');
@@ -51,6 +59,7 @@ export default function NftAvatarGalleryPopup({ onSelect, isVisible, onClose, is
           />
         )}
         <NftAvatarGallery
+          disableAutoSelectAvatarNft={disableAutoSelectAvatarNft}
           nfts={filteredNfts}
           isLoading={isLoading}
           onSelect={onSelect}

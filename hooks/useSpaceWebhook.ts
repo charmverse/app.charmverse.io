@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react';
+import { useMemo } from 'react';
 import useSWR, { mutate } from 'swr';
 
 import charmClient from 'charmClient';

@@ -19,8 +19,8 @@ export const schema = yup.object({
   webhookUrl: yup.string().nullable(true),
   events: yup
     .object({
-      discussion: yup.boolean().defined(),
-      comment: yup.boolean().defined(),
+      forum: yup.boolean().defined(),
+      user: yup.boolean().defined(),
       proposal: yup.boolean().defined(),
       bounty: yup.boolean().defined()
     })
@@ -53,10 +53,10 @@ export function ApiSettings({ space }: { space: Space }) {
     const data = {
       webhookUrl: spaceWebhook.webhookSubscriptionUrl,
       events: {
-        discussion: spaceWebhook.eventMap.get('discussion') || false,
-        comment: spaceWebhook.eventMap.get('comment') || false,
+        discussion: spaceWebhook.eventMap.get('forum') || false,
         proposal: spaceWebhook.eventMap.get('proposal') || false,
-        bounty: spaceWebhook.eventMap.get('bounty') || false
+        bounty: spaceWebhook.eventMap.get('bounty') || false,
+        user: spaceWebhook.eventMap.get('user') || false
       }
     };
 
@@ -140,22 +140,12 @@ export function ApiSettings({ space }: { space: Space }) {
               <FormControlLabel
                 control={
                   <Switch
-                    {...register('events.discussion', { required: true })}
-                    checked={events.discussion}
+                    {...register('events.forum', { required: true })}
+                    checked={events.forum}
                     disabled={!isAdmin}
                   />
                 }
-                label='Discussion'
-              />
-              <FormControlLabel
-                control={
-                  <Switch
-                    {...register('events.comment', { required: true })}
-                    checked={events.comment}
-                    disabled={!isAdmin}
-                  />
-                }
-                label='Comment'
+                label='Forum'
               />
               <FormControlLabel
                 control={
@@ -176,6 +166,12 @@ export function ApiSettings({ space }: { space: Space }) {
                   />
                 }
                 label='Bounty'
+              />
+              <FormControlLabel
+                control={
+                  <Switch {...register('events.user', { required: true })} checked={events.user} disabled={!isAdmin} />
+                }
+                label='Members'
               />
             </FormGroup>
           </Grid>

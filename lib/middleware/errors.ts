@@ -62,3 +62,12 @@ export class ApiError extends SystemError {
     this.severity = this.code >= 500 ? 'error' : 'warning';
   }
 }
+export class InvalidApiKeyError extends SystemError {
+  constructor() {
+    super({
+      message:
+        'Invalid API key. Please visit https://app.charmverse.io/api-docs to learn more about how to authenticate with our API.',
+      errorType: 'Access denied'
+    });
+  }
+}

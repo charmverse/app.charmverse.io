@@ -1,6 +1,6 @@
 import path from 'node:path';
 
-import type { PagePermissionLevel, Prisma, Space } from '@prisma/client';
+import type { Prisma, Space } from '@prisma/client';
 
 import { prisma } from 'db';
 import { generateDefaultPostCategories } from 'lib/forums/categories/generateDefaultPostCategories';
@@ -16,6 +16,7 @@ import { setupDefaultPaymentMethods } from 'lib/payment-methods/defaultPaymentMe
 import { updateSpacePermissionConfigurationMode } from 'lib/permissions/meta';
 import { generateDefaultCategoriesInput } from 'lib/proposal/generateDefaultCategoriesInput';
 import { importWorkspacePages } from 'lib/templates/importWorkspacePages';
+import { subscribeToAllEvents, createSigningSecret } from 'lib/webhook/subscribeToEvents';
 import { gettingStartedPage } from 'seedData/gettingStartedPage';
 
 import type { SpaceCreateTemplate } from './config';
@@ -41,9 +42,16 @@ export type CreateSpaceProps = {
   userId: string;
   extraAdmins?: string[];
   createSpaceOption?: SpaceCreateTemplate;
+  webhookUrl?: string;
 };
 
-export async function createWorkspace({ spaceData, userId, createSpaceOption, extraAdmins = [] }: CreateSpaceProps) {
+export async function createWorkspace({
+  spaceData,
+  webhookUrl,
+  userId,
+  createSpaceOption,
+  extraAdmins = []
+}: CreateSpaceProps) {
   let domain = spaceData.domain;
 
   if (!domain) {
@@ -56,6 +64,11 @@ export async function createWorkspace({ spaceData, userId, createSpaceOption, ex
   }
 
   const userList = [userId, ...extraAdmins];
+
+  let signingSecret: string | null = null;
+  if (webhookUrl) {
+    signingSecret = createSigningSecret();
+  }
 
   const space = await prisma.space.create({
     data: {
@@ -71,6 +84,8 @@ export async function createWorkspace({ spaceData, userId, createSpaceOption, ex
             }
           }
         : undefined,
+      webhookSubscriptionUrl: webhookUrl,
+      webhookSigningSecret: signingSecret,
       updatedBy: spaceData.updatedBy ?? userId,
       author: { connect: { id: userId } },
       spaceRoles: {
@@ -183,6 +198,11 @@ export async function createWorkspace({ spaceData, userId, createSpaceOption, ex
 
   // Add default stablecoin methods
   await setupDefaultPaymentMethods({ spaceIdOrSpace: space });
+
+  // Add default subscriptions
+  if (webhookUrl) {
+    await subscribeToAllEvents({ spaceId: space.id, userId });
+  }
 
   logSpaceCreation(space);
   updateTrackGroupProfile(space);
