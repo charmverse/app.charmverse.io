@@ -71,13 +71,15 @@ export function plugins({
     // @ts-ignore
     const viewUpdate = controller.spec.view().update;
     Object.assign(controller, {
+      // add listener to onBlur() to hide tooltip
       props: {
         ...controller.props,
         handleDOMEvents: {
           ...controller.spec.props?.handleDOMEvents,
-          blur: (view: EditorView, event: Event) => {
-            //  console.log('on blur', event);
-            toggleSubMenu(key, 'defaultMenu');
+          blur: (view: EditorView) => {
+            if (view) {
+              toggleSubMenu(key, 'defaultMenu')(view.state, view.dispatch, view);
+            }
           }
         }
       },
