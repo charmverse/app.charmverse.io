@@ -235,7 +235,7 @@ export function PostPage({
     <ScrollableWindow>
       <Stack>
         {post?.proposalId && (
-          <StyledPostProposalBanner>
+          <StyledPostProposalBanner data-test='post-proposal-banner'>
             <Typography>
               This post has been converted to a proposal and is read-only now. You can continue the conversation{' '}
               <Stack gap={0.5} flexDirection='row' alignItems='center' display='inline-flex'>

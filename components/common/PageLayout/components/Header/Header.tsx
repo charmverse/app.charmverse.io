@@ -239,6 +239,7 @@ function PostHeader({
       >
         <div>
           <ListItemButton
+            data-test='forum-post-convert-proposal-action'
             onClick={() => forumPostInfo.forumPost && convertToProposal(forumPostInfo.forumPost.id)}
             disabled={!canCreateProposal || !!forumPostInfo.forumPost?.proposalId}
           >
