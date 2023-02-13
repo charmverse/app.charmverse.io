@@ -5,22 +5,13 @@ import type { SpaceSettingsSection } from 'components/settings/pages';
 import { baseUrl } from 'config/constants';
 
 // capture actions on the pages in signup flow
-export class SpaceSettings {
+export class SettingsModal {
   readonly page: Page;
-
-  readonly spaceNameField: Locator;
-
-  readonly spaceDomainField: Locator;
-
-  readonly submitSpaceUpdateButton: Locator;
 
   readonly settingsBtn: Locator;
 
   constructor(page: Page) {
     this.page = page;
-    this.spaceNameField = page.locator('data-test=set-space-name >> input');
-    this.spaceDomainField = page.locator('data-test=set-space-domain >> input');
-    this.submitSpaceUpdateButton = page.locator('data-test=submit-space-update');
     this.settingsBtn = page.locator('data-test=sidebar-settings');
   }
 
@@ -38,6 +29,11 @@ export class SpaceSettings {
 
   getSpaceSettingsSectionLocator({ spaceId, section }: { spaceId: string; section: SpaceSettingsSection }): Locator {
     return this.page.locator(`data-test=space-settings-tab-${spaceId}-${section}`);
+  }
+
+  async goToTab({ spaceId, section }: { spaceId: string; section: SpaceSettingsSection }) {
+    const tab = this.getSpaceSettingsSectionLocator({ spaceId, section });
+    await tab.click();
   }
 
   async waitForSpaceSettingsURL(domain?: string) {
