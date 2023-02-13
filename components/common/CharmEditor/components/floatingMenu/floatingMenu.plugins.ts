@@ -84,6 +84,7 @@ export function plugins({
           ...controller.spec.props?.handleDOMEvents,
           blur: (view: EditorView, event: MouseEvent) => {
             if (view) {
+              // make sure user is not clicking inside a tooltip, which also triggers the 'blur' event
               const isInsideEditorTooltip = Boolean(
                 (event.relatedTarget as HTMLElement)?.closest(`.${tooltipContainerClass}`)
               );
