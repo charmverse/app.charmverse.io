@@ -1,19 +1,19 @@
-import { test as base } from '@playwright/test';
+import { test as base, expect } from '@playwright/test';
 import { v4 } from 'uuid';
 
-import { SpaceSettings } from '../po/spaceSettings.po';
+import { WebhookSettings } from '../po/webhookSettings.po';
 import { generateUserAndSpace } from '../utils/mocks';
 import { login } from '../utils/session';
 
 type Fixtures = {
-  spaceSettings: SpaceSettings;
+  spaceSettings: WebhookSettings;
 };
 
 const test = base.extend<Fixtures>({
-  spaceSettings: ({ page }, use) => use(new SpaceSettings(page))
+  spaceSettings: ({ page }, use) => use(new WebhookSettings(page))
 });
 
-test('Space settings - save API settings', async ({ page, spaceSettings }) => {
+test('Space settings - add a webhook and event namespace options', async ({ page, spaceSettings }) => {
   const { space, user: spaceUser } = await generateUserAndSpace({ spaceName: v4(), isAdmin: true, onboarded: true });
   // go to a page to which we don't have access
 
@@ -25,13 +25,25 @@ test('Space settings - save API settings', async ({ page, spaceSettings }) => {
 
   await spaceSettings.openSettingsModal();
 
-  const newName = `New space name ${v4()}`;
-  const newDomain = `new-space-domain-${v4()}`;
+  // Go to api section
+  await spaceSettings.goToTab({ spaceId: space.id, section: 'api' });
 
-  await spaceSettings.spaceNameField.fill(newName);
-  await spaceSettings.spaceDomainField.fill(newDomain);
+  await spaceSettings.webhookUrlInput.fill('https://example.com');
+  await spaceSettings.forEachNamespace(async (toggle, namespace) => {
+    await expect(toggle).not.toBeChecked();
+    await toggle.click();
+    await expect(toggle).toBeChecked();
+  });
+  // save form
+  await expect(spaceSettings.saveButton).toBeEnabled();
+  await spaceSettings.saveButton.click();
+  await expect(spaceSettings.webhookSigningSecret).toBeVisible();
 
-  await spaceSettings.submitSpaceUpdateButton.click();
+  // Refresh api section
+  // await spaceSettings.goToTab({ spaceId: space.id, section: 'space' });
+  // await spaceSettings.goToTab({ spaceId: space.id, section: 'api' });
 
-  await spaceSettings.waitForSpaceSettingsURL(newDomain);
+  // await spaceSettings.forEachNamespace(async (toggle) => {
+  //   await expect(toggle).toBeChecked();
+  // });
 });

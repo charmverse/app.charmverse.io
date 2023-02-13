@@ -13,7 +13,7 @@ const test = base.extend<Fixtures>({
   spaceSettings: ({ page }, use) => use(new SpaceSettings(page))
 });
 
-test('Space settings - update the webhook', async ({ page, spaceSettings }) => {
+test('Space settings - save API settings', async ({ page, spaceSettings }) => {
   const { space, user: spaceUser } = await generateUserAndSpace({ spaceName: v4(), isAdmin: true, onboarded: true });
   // go to a page to which we don't have access
 
@@ -25,10 +25,13 @@ test('Space settings - update the webhook', async ({ page, spaceSettings }) => {
 
   await spaceSettings.openSettingsModal();
 
-  // Go to api section
-  const apiTab = spaceSettings.getSpaceSettingsSectionLocator({ spaceId: space.id, section: 'api' });
+  const newName = `New space name ${v4()}`;
+  const newDomain = `new-space-domain-${v4()}`;
 
-  await expect(apiTab).toBeVisible();
+  await spaceSettings.spaceNameInput.fill(newName);
+  await spaceSettings.spaceDomainInput.fill(newDomain);
 
-  await apiTab.click();
+  await spaceSettings.submitSpaceUpdateButton.click();
+
+  await spaceSettings.waitForSpaceSettingsURL(newDomain);
 });

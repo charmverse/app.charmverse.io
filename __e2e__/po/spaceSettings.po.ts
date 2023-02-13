@@ -8,9 +8,9 @@ import { baseUrl } from 'config/constants';
 export class SpaceSettings {
   readonly page: Page;
 
-  readonly spaceNameField: Locator;
+  readonly spaceNameInput: Locator;
 
-  readonly spaceDomainField: Locator;
+  readonly spaceDomainInput: Locator;
 
   readonly submitSpaceUpdateButton: Locator;
 
@@ -18,8 +18,8 @@ export class SpaceSettings {
 
   constructor(page: Page) {
     this.page = page;
-    this.spaceNameField = page.locator('data-test=set-space-name >> input');
-    this.spaceDomainField = page.locator('data-test=set-space-domain >> input');
+    this.spaceNameInput = page.locator('data-test=space-name-input >> input');
+    this.spaceDomainInput = page.locator('data-test=space-domain-input >> input');
     this.submitSpaceUpdateButton = page.locator('data-test=submit-space-update');
     this.settingsBtn = page.locator('data-test=sidebar-settings');
   }
@@ -38,6 +38,11 @@ export class SpaceSettings {
 
   getSpaceSettingsSectionLocator({ spaceId, section }: { spaceId: string; section: SpaceSettingsSection }): Locator {
     return this.page.locator(`data-test=space-settings-tab-${spaceId}-${section}`);
+  }
+
+  async goToTab({ spaceId, section }: { spaceId: string; section: SpaceSettingsSection }) {
+    const tab = this.getSpaceSettingsSectionLocator({ spaceId, section });
+    await tab.click();
   }
 
   async waitForSpaceSettingsURL(domain?: string) {

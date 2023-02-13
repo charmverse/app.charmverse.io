@@ -44,7 +44,7 @@ export async function subscribeToEvents(events: Record<string, boolean>, spaceId
 }
 
 export function subscribeToAllEvents({ spaceId, userId }: { spaceId: string; userId: string }) {
-  const allEvents = Object.keys(WebhookNameSpaces).reduce((obj, cur) => {
+  const allEvents = Object.values(WebhookNameSpaces).reduce((obj, cur) => {
     obj[cur] = true;
     return obj;
   }, {} as Record<string, boolean>);
