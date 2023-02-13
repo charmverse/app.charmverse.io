@@ -322,9 +322,7 @@ describe('computePostPermissions - with proposal permission filtering policy', (
     });
 
     await convertPostToProposal({
-      postId: post.id,
-      spaceId: space.id,
-      title: post.title,
+      post,
       userId: authorUser.id
     });
 
@@ -351,9 +349,7 @@ describe('computePostPermissions - with proposal permission filtering policy', (
     });
 
     await convertPostToProposal({
-      postId: post.id,
-      spaceId: space.id,
-      title: post.title,
+      post,
       userId: authorUser.id
     });
 
@@ -397,9 +393,7 @@ describe('computePostPermissions - with proposal permission filtering policy', (
     });
 
     await convertPostToProposal({
-      postId: post.id,
-      spaceId: space.id,
-      title: post.title,
+      post,
       userId: authorUser.id
     });
 
@@ -446,9 +440,7 @@ describe('computePostPermissions - with proposal permission filtering policy', (
     });
 
     await convertPostToProposal({
-      postId: post.id,
-      spaceId: space.id,
-      title: post.title,
+      post,
       userId: authorUser.id
     });
 
@@ -482,9 +474,7 @@ describe('computePostPermissions - with proposal permission filtering policy', (
     });
 
     await convertPostToProposal({
-      postId: post.id,
-      spaceId: space.id,
-      title: post.title,
+      post,
       userId: authorUser.id
     });
 
