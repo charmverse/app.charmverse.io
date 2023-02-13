@@ -23,22 +23,18 @@ const StyledMenu = styled(Paper, { shouldForwardProp: (prop: string) => prop !==
 
 export function Menu({
   children,
-  hideMenu,
   type,
   noScroll,
   inline
 }: {
   children: React.ReactNode;
-  hideMenu: () => void;
   type?: SubMenu;
   noScroll?: boolean;
   inline?: boolean;
 }) {
   return (
-    <ClickAwayListener onClickAway={hideMenu}>
-      <StyledMenu elevation={8} type={type} noScroll={noScroll} inline={inline}>
-        {children}
-      </StyledMenu>
-    </ClickAwayListener>
+    <StyledMenu elevation={8} type={type} noScroll={noScroll} inline={inline}>
+      {children}
+    </StyledMenu>
   );
 }
