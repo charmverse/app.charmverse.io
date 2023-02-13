@@ -40,10 +40,10 @@ test('Space settings - add a webhook and event namespace options', async ({ page
   await expect(spaceSettings.webhookSigningSecret).toBeVisible();
 
   // Refresh api section
-  // await spaceSettings.goToTab({ spaceId: space.id, section: 'space' });
-  // await spaceSettings.goToTab({ spaceId: space.id, section: 'api' });
+  await spaceSettings.goToTab({ spaceId: space.id, section: 'space' });
+  await spaceSettings.goToTab({ spaceId: space.id, section: 'api' });
 
-  // await spaceSettings.forEachNamespace(async (toggle) => {
-  //   await expect(toggle).toBeChecked();
-  // });
+  await spaceSettings.forEachNamespace(async (toggle) => {
+    await expect(toggle).toBeChecked();
+  });
 });
