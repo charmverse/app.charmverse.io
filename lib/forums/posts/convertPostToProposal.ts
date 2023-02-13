@@ -1,31 +1,27 @@
-import type { Prisma } from '@prisma/client';
+import type { Post, Prisma } from '@prisma/client';
 
 import { prisma } from 'db';
 import { createProposal } from 'lib/proposal/createProposal';
 
 export async function convertPostToProposal({
   userId,
-  spaceId,
-  content,
-  title,
-  postId
+  post,
+  content
 }: {
-  title: string;
+  post: Pick<Post, 'spaceId' | 'title' | 'id'>;
   content?: Prisma.JsonValue;
-  spaceId: string;
   userId: string;
-  postId: string;
 }) {
   const { page: proposalPage } = await createProposal({
     createdBy: userId,
-    spaceId,
+    spaceId: post.spaceId,
     content: content ?? undefined,
-    title
+    title: post.title
   });
 
   await prisma.post.update({
     where: {
-      id: postId
+      id: post.id
     },
     data: {
       proposalId: proposalPage.id

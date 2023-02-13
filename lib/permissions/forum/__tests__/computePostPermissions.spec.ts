@@ -44,9 +44,7 @@ describe('computePostPermissions', () => {
     });
 
     await convertPostToProposal({
-      postId: post.id,
-      spaceId: space.id,
-      title: post.title,
+      post,
       userId: authorUser.id
     });
 
@@ -73,9 +71,7 @@ describe('computePostPermissions', () => {
     });
 
     await convertPostToProposal({
-      postId: post.id,
-      spaceId: space.id,
-      title: post.title,
+      post,
       userId: authorUser.id
     });
 
@@ -119,9 +115,7 @@ describe('computePostPermissions', () => {
     });
 
     await convertPostToProposal({
-      postId: post.id,
-      spaceId: space.id,
-      title: post.title,
+      post,
       userId: authorUser.id
     });
 
@@ -168,9 +162,7 @@ describe('computePostPermissions', () => {
     });
 
     await convertPostToProposal({
-      postId: post.id,
-      spaceId: space.id,
-      title: post.title,
+      post,
       userId: authorUser.id
     });
 
@@ -198,9 +190,7 @@ describe('computePostPermissions', () => {
     });
 
     await convertPostToProposal({
-      postId: post.id,
-      spaceId: space.id,
-      title: post.title,
+      post,
       userId: authorUser.id
     });
 

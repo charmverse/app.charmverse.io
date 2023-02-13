@@ -52,9 +52,7 @@ async function convertToProposal(req: NextApiRequest, res: NextApiResponse<PageM
   }
 
   const proposalPage = await convertPostToProposal({
-    postId: post.id,
-    spaceId: post.spaceId,
-    title: post.title,
+    post,
     userId,
     content: post.content
   });

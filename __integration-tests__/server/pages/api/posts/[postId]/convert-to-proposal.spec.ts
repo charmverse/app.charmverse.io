@@ -54,9 +54,7 @@ describe('POST /api/forums/posts/[postId]/convert-to-proposal - Convert post to 
     });
 
     await convertPostToProposal({
-      postId: posts[0].id,
-      spaceId: space.id,
-      title: posts[0].title,
+      post: posts[0],
       userId: nonAdminUser1.id
     });
 
