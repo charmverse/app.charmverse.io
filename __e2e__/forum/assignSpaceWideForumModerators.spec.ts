@@ -1,8 +1,7 @@
 import { expect, test as base } from '@playwright/test';
 import type { Space, User } from '@prisma/client';
 import { LoggedInPage } from '__e2e__/po/loggedIn.po';
-import { SpaceSettings } from '__e2e__/po/spaceSettings.po';
-import { SpaceSettingsTabRoles } from '__e2e__/po/spaceSettingsTabRoles.po';
+import { PermissionSettings } from '__e2e__/po/settings/spacePermissionSettings.po';
 
 import { prisma } from 'db';
 import { randomETHWalletAddress } from 'testing/generateStubs';
@@ -16,16 +15,14 @@ import { login } from '../utils/session';
 type Fixtures = {
   forumHomePage: ForumHomePage;
   forumPostPage: ForumPostPage;
-  spaceSettingsPage: SpaceSettings;
-  spaceSettingsTabRoles: SpaceSettingsTabRoles;
+  permissionSettings: PermissionSettings;
   loggedInPage: LoggedInPage;
 };
 
 const test = base.extend<Fixtures>({
   forumHomePage: ({ page }, use) => use(new ForumHomePage(page)),
   forumPostPage: ({ page }, use) => use(new ForumPostPage(page)),
-  spaceSettingsPage: ({ page }, use) => use(new SpaceSettings(page)),
-  spaceSettingsTabRoles: ({ page }, use) => use(new SpaceSettingsTabRoles(page)),
+  permissionSettings: ({ page }, use) => use(new PermissionSettings(page)),
   loggedInPage: ({ page }, use) => use(new LoggedInPage(page))
 });
 
@@ -36,9 +33,7 @@ test.describe.serial('Comment on forum posts', () => {
   test('assign space-wide forum moderators - admin can assign a user as a space-wide forum moderator', async ({
     page,
     forumHomePage,
-    forumPostPage,
-    spaceSettingsPage,
-    spaceSettingsTabRoles,
+    permissionSettings,
     loggedInPage
   }) => {
     const generated = await createUserAndSpace({
@@ -86,21 +81,21 @@ test.describe.serial('Comment on forum posts', () => {
 
     // Open the settings modal
 
-    await spaceSettingsPage.openSettingsModal();
+    await permissionSettings.openSettingsModal();
 
-    const spaceSettingsTab = spaceSettingsPage.getSpaceSettingsLocator(space.id);
+    const spaceSettingsTab = permissionSettings.getSpaceSettingsLocator(space.id);
 
     await expect(spaceSettingsTab).toBeVisible();
 
     // Go to roles section
-    const rolesTab = spaceSettingsPage.getSpaceSettingsSectionLocator({ spaceId: space.id, section: 'roles' });
+    const rolesTab = permissionSettings.getSpaceSettingsSectionLocator({ spaceId: space.id, section: 'roles' });
 
     await expect(rolesTab).toBeVisible();
 
     await rolesTab.click();
 
     // Make sure list of roles shows
-    const roleToUpdateContextMenu = spaceSettingsTabRoles.getExpandRoleContextMenuLocator(forumModeratorRole.id);
+    const roleToUpdateContextMenu = permissionSettings.getExpandRoleContextMenuLocator(forumModeratorRole.id);
 
     await expect(roleToUpdateContextMenu).toBeVisible();
 
@@ -108,7 +103,7 @@ test.describe.serial('Comment on forum posts', () => {
 
     await roleToUpdateContextMenu.click();
 
-    const openManageRoleSpacePermissionsModal = spaceSettingsTabRoles.getOpenManageRoleSpacePermissionsModalLocator(
+    const openManageRoleSpacePermissionsModal = permissionSettings.getOpenManageRoleSpacePermissionsModalLocator(
       forumModeratorRole.id
     );
 
@@ -117,18 +112,18 @@ test.describe.serial('Comment on forum posts', () => {
     await openManageRoleSpacePermissionsModal.click();
 
     // Interact with the form to add a permission, and make sure it's added
-    await expect(spaceSettingsTabRoles.spacePermissionsForm).toBeVisible();
+    await expect(permissionSettings.spacePermissionsForm).toBeVisible();
 
-    const managePermissionsToggle = spaceSettingsTabRoles.getRoleSpaceOperationSwitchLocator('moderateForums');
+    const managePermissionsToggle = permissionSettings.getRoleSpaceOperationSwitchLocator('moderateForums');
 
     await expect(managePermissionsToggle).toBeVisible();
 
     await managePermissionsToggle.click();
-    const isChecked = await spaceSettingsTabRoles.isOperationChecked('moderateForums');
+    const isChecked = await permissionSettings.isOperationChecked('moderateForums');
 
     expect(isChecked).toBe(true);
 
-    const newRolePermissions = await spaceSettingsTabRoles.submitSpacePermissionSettings();
+    const newRolePermissions = await permissionSettings.submitSpacePermissionSettings();
 
     expect(newRolePermissions.moderateForums).toBe(true);
   });

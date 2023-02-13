@@ -48,11 +48,11 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import { useToggleFavorite } from 'hooks/useToggleFavorite';
 import { useUser } from 'hooks/useUser';
 
-import DocumentHistory from '../DocumentHistory';
 import NotificationsBadge from '../Sidebar/NotificationsBadge';
 
 import BountyShareButton from './components/BountyShareButton/BountyShareButton';
 import DatabasePageOptions from './components/DatabasePageOptions';
+import { DocumentHistory } from './components/DocumentHistory';
 import { DocumentParticipants } from './components/DocumentParticipants';
 import EditingModeToggle from './components/EditingModeToggle';
 import PageTitleWithBreadcrumbs from './components/PageTitleWithBreadcrumbs';
@@ -148,26 +148,6 @@ export function ExportMarkdownMenuItem({ disabled = false, onClick }: { disabled
         </ListItemButton>
       </div>
     </Tooltip>
-  );
-}
-
-export function Metadata({ creator, lastUpdatedAt }: { creator: string; lastUpdatedAt: Date }) {
-  const { formatDateTime } = useDateFormatter();
-
-  return (
-    <Stack
-      sx={{
-        mx: 2,
-        my: 1
-      }}
-    >
-      <Typography variant='subtitle2'>
-        Last edited by <strong>{creator}</strong>
-      </Typography>
-      <Typography variant='subtitle2'>
-        at <strong>{formatDateTime(lastUpdatedAt)}</strong>
-      </Typography>
-    </Stack>
   );
 }
 
@@ -412,7 +392,7 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
       {charmversePage && basePage && (
         <>
           <Divider />
-          <Metadata creator={charmversePage.username} lastUpdatedAt={basePage.updatedAt} />
+          <DocumentHistory page={basePage} />
         </>
       )}
     </List>
@@ -440,7 +420,7 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
         {forumPostInfo.forumPost && postCreator && (
           <>
             <Divider />
-            <Metadata creator={postCreator.username} lastUpdatedAt={forumPostInfo.forumPost.updatedAt} />
+            <DocumentHistory page={{ updatedBy: forumPostInfo.forumPost.createdBy, ...forumPostInfo.forumPost }} />
           </>
         )}
       </List>
@@ -482,7 +462,6 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
           {basePage && (
             <>
               {isBasePageDocument && <DocumentParticipants />}
-              <DocumentHistory page={basePage} />
               {isBasePageDocument && <EditingModeToggle />}
               {basePage?.deletedAt === null && <ShareButton headerHeight={headerHeight} pageId={basePage.id} />}
             </>

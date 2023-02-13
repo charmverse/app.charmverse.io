@@ -45,6 +45,8 @@ export function ApiSettings({ space }: { space: Space }) {
     resolver: yupResolver(schema)
   });
 
+  const [webhookUrl, events] = watch(['webhookUrl', 'events']);
+
   useEffect(() => {
     if (spaceWebhook === undefined) {
       return; // loading
@@ -53,7 +55,7 @@ export function ApiSettings({ space }: { space: Space }) {
     const data = {
       webhookUrl: spaceWebhook.webhookSubscriptionUrl,
       events: {
-        discussion: spaceWebhook.eventMap.get('forum') || false,
+        forum: spaceWebhook.eventMap.get('forum') || false,
         proposal: spaceWebhook.eventMap.get('proposal') || false,
         bounty: spaceWebhook.eventMap.get('bounty') || false,
         user: spaceWebhook.eventMap.get('user') || false
@@ -62,9 +64,6 @@ export function ApiSettings({ space }: { space: Space }) {
 
     reset(data);
   }, [spaceWebhook]);
-
-  const [webhookUrl, events] = watch(['webhookUrl', 'events']);
-
   async function updateWebhookSubscription(subscription: FormValues) {
     if (!subscription.webhookUrl) {
       return;
@@ -92,108 +91,123 @@ export function ApiSettings({ space }: { space: Space }) {
           Discord Channel <LaunchIcon fontSize='small' />
         </Link>
       </Typography>
+      <br />
+      <br />
       <Legend>Webhook (beta)</Legend>
       <Typography variant='body1'>
         Subscribe to events in Charmverse using webhooks. You must provide us with an http endpoint which returns a 200
         response upon reception of the event.
       </Typography>
-      <form
-        onSubmit={(event) => {
-          // stop propagation so it doesnt submit parent forms, like bounty editor
-          event.stopPropagation();
-          event.preventDefault();
-          handleSubmit(updateWebhookSubscription as any)(event);
-        }}
-        style={{ margin: 'auto' }}
-      >
-        <Grid item container xs mt={2}>
-          <Grid item xs={10}>
-            <InputLabel>Events Webhook</InputLabel>
-            <TextField
-              {...register('webhookUrl', { required: true })}
-              type='text'
-              size='small'
-              disabled={!isAdmin}
-              fullWidth
-              error={!!errors.webhookUrl?.message}
-              helperText={errors.webhookUrl?.message}
-              placeholder='https://your-api.com/webhook'
-            />
-            {errors?.webhookUrl && <Alert severity='error'>Invalid webhook url</Alert>}
-          </Grid>
-          {spaceWebhook?.webhookSigningSecret && isAdmin && (
-            <Grid item xs={10} mt={2}>
-              <InputLabel>Webhook Signature Secret</InputLabel>
+      {spaceWebhook && events && (
+        <form
+          onSubmit={(event) => {
+            // stop propagation so it doesnt submit parent forms, like bounty editor
+            event.stopPropagation();
+            event.preventDefault();
+            handleSubmit(updateWebhookSubscription as any)(event);
+          }}
+          style={{ margin: 'auto' }}
+        >
+          <Grid item container xs mt={2}>
+            <Grid item xs={10}>
+              <InputLabel>Events Webhook</InputLabel>
               <TextField
+                {...register('webhookUrl', { required: true })}
                 type='text'
                 size='small'
-                disabled={true}
+                disabled={!isAdmin}
+                data-test='webhook-url-input'
                 fullWidth
-                value={spaceWebhook?.webhookSigningSecret}
+                error={!!errors.webhookUrl?.message}
+                helperText={errors.webhookUrl?.message}
+                placeholder='https://your-api.com/webhook'
               />
+              {errors?.webhookUrl && <Alert severity='error'>Invalid webhook url</Alert>}
+            </Grid>
+            {spaceWebhook?.webhookSigningSecret && isAdmin && (
+              <Grid item xs={10} mt={2}>
+                <InputLabel>Webhook Signature Secret</InputLabel>
+                <TextField
+                  data-test='webhook-signing-secret'
+                  type='text'
+                  size='small'
+                  disabled={true}
+                  fullWidth
+                  value={spaceWebhook?.webhookSigningSecret}
+                />
+              </Grid>
+            )}
+          </Grid>
+          {webhookUrl && (
+            <Grid item container xs mt={2}>
+              <FormGroup>
+                <FormControlLabel
+                  control={
+                    <Switch
+                      {...register('events.forum', { required: true })}
+                      data-test='enable-forum-switch'
+                      checked={events.forum}
+                      disabled={!isAdmin}
+                    />
+                  }
+                  label='Forum'
+                />
+                <FormControlLabel
+                  control={
+                    <Switch
+                      {...register('events.proposal', { required: true })}
+                      checked={events.proposal}
+                      data-test='enable-proposal-switch'
+                      disabled={!isAdmin}
+                    />
+                  }
+                  label='Proposal'
+                />
+                <FormControlLabel
+                  control={
+                    <Switch
+                      {...register('events.bounty', { required: true })}
+                      data-test='enable-bounty-switch'
+                      checked={events.bounty}
+                      disabled={!isAdmin}
+                    />
+                  }
+                  label='Bounty'
+                />
+                <FormControlLabel
+                  control={
+                    <Switch
+                      {...register('events.user', { required: true })}
+                      checked={events.user}
+                      disabled={!isAdmin}
+                      data-test='enable-user-switch'
+                    />
+                  }
+                  label='Members'
+                />
+              </FormGroup>
             </Grid>
           )}
-        </Grid>
-        {webhookUrl && (
-          <Grid item container xs mt={2}>
-            <FormGroup>
-              <FormControlLabel
-                control={
-                  <Switch
-                    {...register('events.forum', { required: true })}
-                    checked={events.forum}
-                    disabled={!isAdmin}
-                  />
-                }
-                label='Forum'
-              />
-              <FormControlLabel
-                control={
-                  <Switch
-                    {...register('events.proposal', { required: true })}
-                    checked={events.proposal}
-                    disabled={!isAdmin}
-                  />
-                }
-                label='Proposal'
-              />
-              <FormControlLabel
-                control={
-                  <Switch
-                    {...register('events.bounty', { required: true })}
-                    checked={events.bounty}
-                    disabled={!isAdmin}
-                  />
-                }
-                label='Bounty'
-              />
-              <FormControlLabel
-                control={
-                  <Switch {...register('events.user', { required: true })} checked={events.user} disabled={!isAdmin} />
-                }
-                label='Members'
-              />
-            </FormGroup>
-          </Grid>
-        )}
-        {isAdmin && (
-          <Grid item container xs mt={2}>
-            <Grid item xs mt={2}>
-              <Grid item mt={2}>
-                <Button
-                  type='submit'
-                  variant='contained'
-                  color='primary'
-                  sx={{ mr: 1 }}
-                  disabled={isLoading || !isDirty || isSubmitting}
-                >
-                  Save
-                </Button>
+          {isAdmin && (
+            <Grid item container xs mt={2}>
+              <Grid item xs mt={2}>
+                <Grid item mt={2}>
+                  <Button
+                    type='submit'
+                    data-test='submit'
+                    variant='contained'
+                    color='primary'
+                    sx={{ mr: 1 }}
+                    disabled={isLoading || !isDirty || isSubmitting}
+                  >
+                    Save
+                  </Button>
+                </Grid>
               </Grid>
             </Grid>
-          </Grid>
-        )}
-      </form>
+          )}
+        </form>
+      )}
     </>
   );
 }
