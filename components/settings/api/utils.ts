@@ -3,8 +3,8 @@ import * as yup from 'yup';
 import { WebhookEventNames, WebhookNameSpaces } from 'lib/webhook/interfaces';
 
 export type WebhookNamespaces = { [key: string]: string[] };
-const WEBHOOK_EVENT_NAMES = Object.keys(WebhookEventNames);
-const WEBHOOK_EVENT_NAMESPACES = Object.keys(WebhookNameSpaces);
+const WEBHOOK_EVENT_NAMES = Object.values(WebhookEventNames);
+const WEBHOOK_EVENT_NAMESPACES = Object.values(WebhookNameSpaces);
 
 // generate an object that contains every namespace and the event attached to them
 // Auto generated out of the types so the form is dynamic if we decide to add more events
