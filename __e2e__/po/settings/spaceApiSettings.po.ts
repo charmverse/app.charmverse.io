@@ -6,7 +6,7 @@ import { WebhookNameSpaces } from 'lib/webhook/interfaces';
 import { SettingsModal } from './settings.po';
 
 // capture actions on the pages in signup flow
-export class WebhookSettings extends SettingsModal {
+export class ApiSettings extends SettingsModal {
   readonly webhookUrlInput: Locator;
 
   readonly webhookSigningSecret: Locator;

@@ -1,16 +1,16 @@
 import { test as base, expect } from '@playwright/test';
 import { v4 } from 'uuid';
 
-import { WebhookSettings } from '../po/settings/webhookSettings.po';
+import { ApiSettings } from '../po/settings/spaceApiSettings.po';
 import { generateUserAndSpace } from '../utils/mocks';
 import { login } from '../utils/session';
 
 type Fixtures = {
-  spaceSettings: WebhookSettings;
+  spaceSettings: ApiSettings;
 };
 
 const test = base.extend<Fixtures>({
-  spaceSettings: ({ page }, use) => use(new WebhookSettings(page))
+  spaceSettings: ({ page }, use) => use(new ApiSettings(page))
 });
 
 test('Space settings - add a webhook and event namespace options', async ({ page, spaceSettings }) => {
