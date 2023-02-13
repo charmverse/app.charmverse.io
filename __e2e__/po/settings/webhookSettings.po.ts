@@ -3,10 +3,10 @@ import type { Locator, Page } from '@playwright/test';
 
 import { WebhookNameSpaces } from 'lib/webhook/interfaces';
 
-import { SpaceSettings } from './spaceSettings.po';
+import { SettingsModal } from './settings.po';
 
 // capture actions on the pages in signup flow
-export class WebhookSettings extends SpaceSettings {
+export class WebhookSettings extends SettingsModal {
   readonly webhookUrlInput: Locator;
 
   readonly webhookSigningSecret: Locator;

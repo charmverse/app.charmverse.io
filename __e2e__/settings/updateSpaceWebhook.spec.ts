@@ -1,7 +1,7 @@
 import { test as base, expect } from '@playwright/test';
 import { v4 } from 'uuid';
 
-import { WebhookSettings } from '../po/webhookSettings.po';
+import { WebhookSettings } from '../po/settings/webhookSettings.po';
 import { generateUserAndSpace } from '../utils/mocks';
 import { login } from '../utils/session';
 
