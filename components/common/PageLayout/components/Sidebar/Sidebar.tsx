@@ -210,6 +210,7 @@ export default function Sidebar({ closeSidebar, favorites, navAction }: SidebarP
             onClick={navAction}
           />
           <SidebarBox
+            data-test='sidebar--trash-toggle'
             onClick={() => {
               setShowingTrash(true);
             }}

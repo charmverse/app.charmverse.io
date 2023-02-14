@@ -25,13 +25,13 @@ export function generatePage(
       },
       space: {
         connect: {
-          id: options.spaceId as string
+          id: options.spaceId
         }
       },
       permissions: options.pagePermissions
         ? {
             createMany: {
-              data: options.pagePermissions
+              data: options.pagePermissions || [{ spaceId: options.spaceId, permissionLevel: 'full_access' }]
             }
           }
         : undefined,
