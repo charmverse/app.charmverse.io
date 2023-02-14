@@ -1,11 +1,8 @@
 import styled from '@emotion/styled';
-import { ClickAwayListener } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import React from 'react';
 
 import type { SubMenu } from './floating-menu';
-
-export const tooltipContainerClass = 'charm-tooltip-container';
 
 const StyledMenu = styled(Paper, { shouldForwardProp: (prop: string) => prop !== 'noScroll' })<{
   type?: SubMenu;
@@ -35,7 +32,7 @@ export function Menu({
   inline?: boolean;
 }) {
   return (
-    <StyledMenu className={tooltipContainerClass} elevation={8} type={type} noScroll={noScroll} inline={inline}>
+    <StyledMenu elevation={8} type={type} noScroll={noScroll} inline={inline}>
       {children}
     </StyledMenu>
   );

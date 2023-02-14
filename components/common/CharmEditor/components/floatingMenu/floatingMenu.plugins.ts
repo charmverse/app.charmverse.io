@@ -1,10 +1,8 @@
 import type { PluginKey } from '@bangle.dev/core';
 import type { EditorState, EditorView, Node, Plugin, ResolvedPos, Transaction } from '@bangle.dev/pm';
 import type { NodeSelection } from 'prosemirror-state';
-import type { MouseEvent } from 'react';
 
-import { floatingMenu, toggleSubMenu } from './floating-menu';
-import { tooltipContainerClass } from './Menu';
+import { floatingMenu } from './floating-menu';
 
 // Components that should not trigger floating menu
 const blacklistedComponents =
@@ -72,48 +70,27 @@ export function plugins({
     }
     // @ts-ignore
     const viewUpdate = controller.spec.view().update;
-    Object.assign(controller, {
-      // add listener to onBlur() to hide tooltip
-      props: {
-        ...controller.props,
-        handleDOMEvents: {
-          ...controller.spec.props?.handleDOMEvents,
-          blur: (view: EditorView, event: MouseEvent) => {
-            if (view) {
-              // make sure user is not clicking inside a tooltip, which also triggers the 'blur' event
-              const isInsideEditorTooltip = Boolean(
-                (event.relatedTarget as HTMLElement)?.closest(`.${tooltipContainerClass}`)
-              );
-              if (!isInsideEditorTooltip) {
-                // const type = querySelectionTooltipType(floatingMenuPluginKey)(state);
-                toggleSubMenu(key, 'defaultMenu')(view.state, view.dispatch, view);
-              }
-            }
-          }
+    Object.assign(controller.spec, {
+      ...controller.spec,
+      state: {
+        ...controller.spec.state,
+        init() {
+          return false;
+        },
+        // update state when row action plugin is dragging
+        apply(tr: Transaction) {
+          return tr.getMeta('row-handle-is-dragging');
         }
       },
-      spec: {
-        ...controller.spec,
-        state: {
-          ...controller.spec.state,
-          init() {
-            return false;
-          },
-          // update state when row action plugin is dragging
-          apply(tr: Transaction) {
-            return tr.getMeta('row-handle-is-dragging');
-          }
-        },
-        view: (_view: EditorView) => {
-          return {
-            update: (view: EditorView, lastState: EditorState) => {
-              const isDragging = controller.getState(view.state) || controller.getState(lastState);
-              if (viewUpdate && !isDragging) {
-                return viewUpdate(view, lastState);
-              }
+      view: (_view: EditorView) => {
+        return {
+          update: (view: EditorView, lastState: EditorState) => {
+            const isDragging = controller.getState(view.state) || controller.getState(lastState);
+            if (viewUpdate && !isDragging) {
+              return viewUpdate(view, lastState);
             }
-          };
-        }
+          }
+        };
       }
     });
     return selectionTooltipPlugins;

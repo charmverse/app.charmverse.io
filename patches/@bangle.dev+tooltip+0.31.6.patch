@@ -1,8 +1,48 @@
 diff --git a/node_modules/@bangle.dev/tooltip/dist/index.js b/node_modules/@bangle.dev/tooltip/dist/index.js
-index 6a5dbce..76ca940 100644
+index 6a5dbce..0b271a6 100644
 --- a/node_modules/@bangle.dev/tooltip/dist/index.js
 +++ b/node_modules/@bangle.dev/tooltip/dist/index.js
-@@ -274,7 +274,7 @@ function getSelectionReferenceElement(view) {
+@@ -238,18 +238,35 @@ function selectionTooltipState({ key, calculateType, tooltipDOMSpec, }) {
+ }
+ function selectionTooltipController({ stateKey }) {
+     let mouseDown = false;
++
+     return new Plugin$1({
+         props: {
+             handleDOMEvents: {
+                 mousedown: (_view, _event) => {
+                     mouseDown = true;
++                    function handleMouseUp () {
++                      mouseDown = false;
++                      _syncTooltipOnUpdate(stateKey)(_view.state, _view.dispatch, _view);
++                      // add listener to document to capture events outside of prosemirror DOM
++                      document.removeEventListener('mouseup', handleMouseUp);
++                      return false;
++                    }
++                    document.addEventListener('mouseup', handleMouseUp)
+                     return false;
+                 },
+-                mouseup: (view, _event) => {
++                // hide or show tooltip on blur based on selection
++                blur: (view, event) => {
++                  if (view) {
+                     mouseDown = false;
+-                    _syncTooltipOnUpdate(stateKey)(view.state, view.dispatch, view);
+-                    return false;
+-                },
++                    // make sure user is not clicking inside a tooltip, which also triggers the 'blur' event
++                    const isInsideEditorTooltip = Boolean(
++                      event.relatedTarget?.closest(`.bangle-tooltip`)
++                    );
++                    if (!isInsideEditorTooltip) {
++                      hideSelectionTooltip(stateKey)(view.state, view.dispatch, view);
++                    }
++                  }
++                }
+             },
+         },
+         view() {
+@@ -274,7 +291,7 @@ function getSelectionReferenceElement(view) {
      return {
          getBoundingClientRect: () => {
              const { selection } = view.state;
@@ -11,7 +51,7 @@ index 6a5dbce..76ca940 100644
              // since head is dependent on the users choice of direction,
              // it is not always equal to `from`.
              // For textSelections we want to show the tooltip at head of the
-@@ -282,7 +282,9 @@ function getSelectionReferenceElement(view) {
+@@ -282,7 +299,9 @@ function getSelectionReferenceElement(view) {
              // But for NodeSelection we always want `from` since, if we go with `head`
              // coordsAtPos(head) might get the position `to` in head, resulting in
              // incorrectly getting position of the node after the selected Node.
@@ -22,3 +62,11 @@ index 6a5dbce..76ca940 100644
              const start = view.coordsAtPos(pos);
              let { top, bottom, left, right } = start;
              let width = right - left;
+@@ -307,6 +326,7 @@ function _syncTooltipOnUpdate(key) {
+     return (state, dispatch, view) => {
+         const tooltipState = key.getState(state);
+         const newType = tooltipState.calculateType(state, tooltipState.type);
++        console.log('_syncTooltipOnUpdate', newType, tooltipState)
+         if (typeof newType === 'string') {
+             return updateSelectionTooltipType(key, newType)(state, dispatch, view);
+         }
