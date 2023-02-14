@@ -1,5 +1,5 @@
 diff --git a/node_modules/@bangle.dev/tooltip/dist/index.js b/node_modules/@bangle.dev/tooltip/dist/index.js
-index 6a5dbce..0b271a6 100644
+index 6a5dbce..000741d 100644
 --- a/node_modules/@bangle.dev/tooltip/dist/index.js
 +++ b/node_modules/@bangle.dev/tooltip/dist/index.js
 @@ -238,18 +238,35 @@ function selectionTooltipState({ key, calculateType, tooltipDOMSpec, }) {
@@ -62,11 +62,3 @@ index 6a5dbce..0b271a6 100644
              const start = view.coordsAtPos(pos);
              let { top, bottom, left, right } = start;
              let width = right - left;
-@@ -307,6 +326,7 @@ function _syncTooltipOnUpdate(key) {
-     return (state, dispatch, view) => {
-         const tooltipState = key.getState(state);
-         const newType = tooltipState.calculateType(state, tooltipState.type);
-+        console.log('_syncTooltipOnUpdate', newType, tooltipState)
-         if (typeof newType === 'string') {
-             return updateSelectionTooltipType(key, newType)(state, dispatch, view);
-         }
