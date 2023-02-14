@@ -10,8 +10,16 @@ import type { Card } from 'lib/focalboard/card';
 declare let window: IAppWindow;
 
 class CsvExporter {
-  static exportTableCsv(board: Board, view: BoardView, cards: Card[], intl: IntlShape): string {
-    const rows = CsvExporter.generateTableArray(board, cards, view, intl);
+  static exportTableCsv(
+    board: Board,
+    view: BoardView,
+    cards: Card[],
+    formatter: {
+      date: (date: Date | string) => string;
+      dateTime: (date: Date | string) => string;
+    }
+  ): string {
+    const rows = CsvExporter.generateTableArray(board, cards, view, formatter);
     let csvContent = 'data:text/csv;charset=utf-8,';
 
     rows.forEach((row) => {
@@ -45,7 +53,15 @@ class CsvExporter {
     return text.replace(/"/g, '""');
   }
 
-  private static generateTableArray(board: Board, cards: Card[], viewToExport: BoardView, intl: IntlShape): string[][] {
+  private static generateTableArray(
+    board: Board,
+    cards: Card[],
+    viewToExport: BoardView,
+    formatter: {
+      date: (date: Date | string) => string;
+      dateTime: (date: Date | string) => string;
+    }
+  ): string[][] {
     const rows: string[][] = [];
     const visibleProperties = board.fields.cardProperties.filter((template: IPropertyTemplate) =>
       viewToExport.fields.visiblePropertyIds.includes(template.id)
@@ -65,7 +81,7 @@ class CsvExporter {
     }
 
     // Header row
-    const row: string[] = [intl.formatMessage({ id: 'TableComponent.name', defaultMessage: 'Title' })];
+    const row: string[] = ['Title'];
     visibleProperties.forEach((template: IPropertyTemplate) => {
       row.push(template.name);
     });
@@ -76,7 +92,7 @@ class CsvExporter {
       _row.push(`"${this.encodeText(card.title)}"`);
       visibleProperties.forEach((template: IPropertyTemplate) => {
         const propertyValue = card.fields.properties[template.id];
-        const displayValue = (OctoUtils.propertyDisplayValue(card, propertyValue, template, intl) || '') as string;
+        const displayValue = (OctoUtils.propertyDisplayValue(card, propertyValue, template, formatter) || '') as string;
 
         if (template.type === 'number') {
           const numericValue = propertyValue ? Number(propertyValue).toString() : '';

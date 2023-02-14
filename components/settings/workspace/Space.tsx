@@ -129,7 +129,7 @@ export default function SpaceSettings({ space }: { space: Space }) {
               fullWidth
               error={!!errors.name}
               helperText={errors.name?.message}
-              data-test='set-space-name'
+              data-test='space-name-input'
             />
           </Grid>
           <Grid item>
@@ -141,7 +141,7 @@ export default function SpaceSettings({ space }: { space: Space }) {
               error={!!errors.domain}
               helperText={errors.domain?.message}
               sx={{ mb: 1 }}
-              data-test='set-space-domain'
+              data-test='space-domain-input'
             />
             {error && <FormHelperText error>{error}</FormHelperText>}
           </Grid>

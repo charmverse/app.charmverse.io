@@ -2,20 +2,18 @@
 import type { Locator, Page } from '@playwright/test';
 import type { SpaceOperation } from '@prisma/client';
 
-import type { SpaceSettingsSection } from 'components/settings/pages';
-import { baseUrl } from 'config/constants';
 import type { SpacePermissionFlags } from 'lib/permissions/spaces';
 
-// capture actions on the pages in signup flow
-export class SpaceSettingsTabRoles {
-  readonly page: Page;
+import { SettingsModal } from './settings.po';
 
+// capture actions on the pages in signup flow
+export class PermissionSettings extends SettingsModal {
   readonly spacePermissionsForm: Locator;
 
   readonly submitSpacePermissionSettingsButton: Locator;
 
   constructor(page: Page) {
-    this.page = page;
+    super(page);
     this.spacePermissionsForm = page.locator('data-test=space-permissions-form-role');
     this.submitSpacePermissionSettingsButton = page.locator(`data-test=submit-space-permission-settings`);
   }
