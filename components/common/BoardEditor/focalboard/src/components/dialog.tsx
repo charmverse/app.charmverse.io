@@ -23,7 +23,7 @@ function FBDialog(props: Props) {
 
   return (
     <Modal open={true}>
-      <div className={`Dialog dialog-back ${props.className}`}>
+      <div data-test='dialog' className={`Dialog dialog-back ${props.className}`}>
         <div
           className='wrapper'
           onClick={(e) => {
@@ -38,7 +38,7 @@ function FBDialog(props: Props) {
               {toolsMenu}
               {!props.hideCloseButton && (
                 <IconButton size='small' onClick={props.onClose}>
-                  <CloseIcon color='secondary' fontSize='small' />
+                  <CloseIcon data-test='close-dialog' color='secondary' fontSize='small' />
                 </IconButton>
               )}
             </div>

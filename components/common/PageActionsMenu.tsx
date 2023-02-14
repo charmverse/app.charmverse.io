@@ -8,6 +8,7 @@ import type { PageType } from '@prisma/client';
 import { useRouter } from 'next/router';
 import type { Dispatch, ReactNode, SetStateAction } from 'react';
 
+import { usePostPermissions } from 'components/forum/hooks/usePostPermissions';
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useMembers } from 'hooks/useMembers';
 import { usePages } from 'hooks/usePages';
@@ -50,6 +51,9 @@ export function PageActionsMenu({
   const open = Boolean(anchorEl);
   const { formatDateTime } = useDateFormatter();
   const pagePermissions = getPagePermissions(page.id);
+  const postPermissions = usePostPermissions({
+    postIdOrPath: router.pathname.startsWith('/[domain]/forum') ? page.id : (null as any)
+  });
   function getPageLink() {
     let link = window.location.href;
 
@@ -60,7 +64,6 @@ export function PageActionsMenu({
     }
     return link;
   }
-
   function onClickCopyLink() {
     Utils.copyTextToClipboard(getPageLink());
     showMessage(`Copied ${page.type} link to clipboard`, 'success');
@@ -92,7 +95,12 @@ export function PageActionsMenu({
           <ListItemText>Edit</ListItemText>
         </MenuItem>
       )}
-      <MenuItem dense onClick={onClickDelete} disabled={Boolean(readOnly || !pagePermissions.delete || page.deletedAt)}>
+      <MenuItem
+        dense
+        onClick={onClickDelete}
+        disabled={Boolean(readOnly || (!pagePermissions?.delete && !postPermissions?.delete_post))}
+        data-test='delete-page-from-context'
+      >
         <DeleteOutlineIcon fontSize='small' sx={{ mr: 1 }} />
         <ListItemText>Delete</ListItemText>
       </MenuItem>
