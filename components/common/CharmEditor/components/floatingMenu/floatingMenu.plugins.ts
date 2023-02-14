@@ -71,9 +71,7 @@ export function plugins({
     // @ts-ignore
     const viewUpdate = controller.spec.view().update;
     Object.assign(controller.spec, {
-      ...controller.spec,
       state: {
-        ...controller.spec.state,
         init() {
           return false;
         },
