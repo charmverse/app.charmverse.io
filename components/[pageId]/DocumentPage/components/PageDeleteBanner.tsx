@@ -57,7 +57,7 @@ export default function PageDeleteBanner({ pageId }: { pageId: string }) {
           This page is in Trash
         </div>
         <Button
-          data-test='banner--restore-archived'
+          data-test='banner--restore-archived-page'
           color={'white' as any}
           disabled={isMutating}
           onClick={async () => {

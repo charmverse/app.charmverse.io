@@ -50,4 +50,18 @@ test.describe.serial('Deleting a page', () => {
     await documentPage.restoreArchivedButton.click();
     await expect(documentPage.archivedBanner).not.toBeVisible();
   });
+
+  test('user can visit and delete a page permanently', async ({ page, documentPage }) => {
+    await login({ page, userId: mocked.user.id });
+    await documentPage.goToPage({
+      domain: mocked.space.domain,
+      path: mocked.page.path
+    });
+    await documentPage.header.pageTopLevelMenu.click();
+    await expect(documentPage.header.pageActionsMenu).toBeVisible();
+    await documentPage.header.deleteCurrentPage.click();
+    await expect(documentPage.header.pageActionsMenu).not.toBeVisible();
+    await expect(documentPage.archivedBanner).toBeVisible();
+    await documentPage.deletePermanentlyButton.click();
+  });
 });

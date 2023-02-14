@@ -9,7 +9,6 @@ import { useCurrentPage } from 'hooks/useCurrentPage';
 import { useCurrentSpaceId } from 'hooks/useCurrentSpaceId';
 import { usePages } from 'hooks/usePages';
 import { usePageTitle } from 'hooks/usePageTitle';
-import { useUser } from 'hooks/useUser';
 import type { PageMeta, PageUpdates } from 'lib/pages';
 import { findParentOfType } from 'lib/pages/findParentOfType';
 import debouncePromise from 'lib/utilities/debouncePromise';
@@ -38,6 +37,7 @@ export default function EditorPage({ pageId: pageIdOrPath }: { pageId: string })
       (page) => page?.id === pageIdOrPath || page?.path === pageIdOrPath
     );
     if (pageFromContext) {
+      setPageNotFound(false);
       setCurrentPage(pageFromContext);
       setCurrentPageId(pageFromContext.id);
     } else if (!loadingPages && currentSpaceId) {
@@ -64,41 +64,6 @@ export default function EditorPage({ pageId: pageIdOrPath }: { pageId: string })
       setCurrentPageId('');
     };
   }, [pageIdOrPath, pages, currentSpaceId, loadingPages]);
-
-  // useEffect(() => {
-  //   if (currentPage) {
-  //     setTitleState(currentPage.title);
-  //   }
-  //   async function main() {
-  //     setIsAccessDenied(false);
-  //     if (currentPage) {
-  //       try {
-  //         const page = await charmClient.pages.getPage(pageId, space.id);
-  //         if (page) {
-  //           setPageNotFound(false);
-  //           setCurrentPageId(page.id);
-  //           setTitleState(page.title);
-  //           charmClient.track.trackAction('page_view', { spaceId: page.spaceId, pageId: page.id, type: page.type });
-  //         } else {
-  //           setPageNotFound(true);
-  //         }
-  //       } catch (err: any) {
-  //         // An error will be thrown if page doesn't exist or if you dont have read permission for the page
-  //         if (err.errorType === 'Access denied') {
-  //           setIsAccessDenied(true);
-  //         }
-  //         // If the page doesn't exist an error will be thrown
-  //         setPageNotFound(true);
-  //       }
-  //     }
-  //   }
-
-  //   main();
-
-  //   return () => {
-  //     setCurrentPageId('');
-  //   };
-  // }, [currentPage]);
 
   // set page attributes of the primary charm editor
   useEffect(() => {
