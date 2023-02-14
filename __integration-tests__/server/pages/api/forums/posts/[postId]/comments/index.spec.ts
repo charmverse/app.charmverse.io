@@ -6,7 +6,7 @@ import { v4 } from 'uuid';
 import { prisma } from 'db';
 import { upsertPostCategoryPermission } from 'lib/permissions/forum/upsertPostCategoryPermission';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
-import { generateUserAndSpace } from 'testing/setupDatabase';
+import { generateSpaceUser, generateUserAndSpace } from 'testing/setupDatabase';
 import { generateForumPost, generatePostCategory } from 'testing/utils/forums';
 
 let space: Space;
@@ -20,13 +20,7 @@ let disallowedPostCategory: PostCategory;
 beforeAll(async () => {
   const { space: _space, user: _user } = await generateUserAndSpace({ isAdmin: false });
   const { user: _user2 } = await generateUserAndSpace({ isAdmin: false });
-
-  await prisma.spaceRole.create({
-    data: {
-      spaceId: _space.id,
-      userId: _user2.id
-    }
-  });
+  otherUser = await generateSpaceUser({ spaceId: _space.id, isAdmin: false });
 
   space = _space;
   user = _user;
