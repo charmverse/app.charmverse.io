@@ -166,47 +166,42 @@ function ResizableImage({
         </ImageSelector>
       );
     }
-  } else if (
-    imageSource.startsWith('data') &&
-    // not sure what to do with SVG, but the format throws an error. (For example, an image src from HTML in Notion's docs: data:image/svg+xml,%3csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20version=%271.1%27%20width=%27379%27%20height=%27820%27/%3e
-    !imageSource.includes('svg') &&
-    !uploadingImage &&
-    !readOnly &&
-    !uploadFailed
-  ) {
-    setUploadingImage(true);
-
+  } else if (imageSource.startsWith('data') && !uploadingImage && !readOnly && !uploadFailed) {
     const fileExtension = imageSource.split('image/')[1].split(';')[0];
     const fileName = `${v4()}.${fileExtension}`;
     const rawFileContent = imageSource.split(';base64,')[1];
-    const fileContent = Buffer.from(rawFileContent, 'base64');
+    // not all data sources are base64, like svg: data:image/svg+xml,%3csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20version=%271.1%27%20width=%27379%27%20height=%27820%27/%3e
+    if (rawFileContent) {
+      setUploadingImage(true);
+      const fileContent = Buffer.from(rawFileContent, 'base64');
 
-    // Break the buffer string into chunks of 1 kilobyte
-    const chunkSize = 1024 * 1;
+      // Break the buffer string into chunks of 1 kilobyte
+      const chunkSize = 1024 * 1;
 
-    const bufferLength = fileContent.length;
+      const bufferLength = fileContent.length;
 
-    const bufferChunks = [];
+      const bufferChunks = [];
 
-    for (let i = 0; i < bufferLength; i += chunkSize) {
-      const chunk = fileContent.slice(i, i + chunkSize);
-      bufferChunks.push(chunk);
-    }
+      for (let i = 0; i < bufferLength; i += chunkSize) {
+        const chunk = fileContent.slice(i, i + chunkSize);
+        bufferChunks.push(chunk);
+      }
 
-    const file: File = new File(bufferChunks, fileName, { type: `image/${fileExtension}` });
+      const file: File = new File(bufferChunks, fileName, { type: `image/${fileExtension}` });
 
-    uploadToS3(file)
-      .then(({ url }) => {
-        updateAttrs({
-          src: url
+      uploadToS3(file)
+        .then(({ url }) => {
+          updateAttrs({
+            src: url
+          });
+        })
+        .catch(() => {
+          setUploadFailed(true);
+        })
+        .finally(() => {
+          setUploadingImage(false);
         });
-      })
-      .catch(() => {
-        setUploadFailed(true);
-      })
-      .finally(() => {
-        setUploadingImage(false);
-      });
+    }
   }
   if (uploadFailed) {
     return <Alert severity='warning'>Image upload failed</Alert>;
