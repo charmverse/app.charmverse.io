@@ -137,52 +137,56 @@ async function listProposals(req: NextApiRequest, res: NextApiResponse<PublicApi
     }
   });
 
-  const proposals = await prisma.proposal.findMany({
-    where: {
-      spaceId: req.authorizedSpaceId,
-      status: {
-        notIn: ['draft', 'private_draft']
-      }
-    },
-    select: {
-      id: true,
-      status: true,
-      page: {
-        select: {
-          path: true,
-          createdAt: true,
-          title: true,
-          content: true,
-          contentText: true
+  const proposals = await prisma.proposal
+    .findMany({
+      where: {
+        spaceId: req.authorizedSpaceId,
+        status: {
+          notIn: ['draft', 'private_draft']
         }
       },
-      reviewers: {
-        include: {
-          role: {
-            select: {
-              id: true
+      select: {
+        id: true,
+        status: true,
+        page: {
+          select: {
+            path: true,
+            createdAt: true,
+            title: true,
+            content: true,
+            contentText: true,
+            deletedAt: true
+          }
+        },
+        reviewers: {
+          include: {
+            role: {
+              select: {
+                id: true
+              }
+            },
+            reviewer: {
+              select: {
+                id: true
+              }
             }
-          },
-          reviewer: {
-            select: {
-              id: true
+          }
+        },
+        authors: {
+          include: {
+            author: {
+              select: {
+                wallets: true,
+                id: true,
+                googleAccounts: true
+              }
             }
           }
         }
-      },
-      authors: {
-        include: {
-          author: {
-            select: {
-              wallets: true,
-              id: true,
-              googleAccounts: true
-            }
-          }
-        }
       }
-    }
-  });
+    })
+    // Make the API response faster by avoiding a join operation on the database, and filtering the results
+    .then((_proposalList) => _proposalList.filter((p) => !p.page?.deletedAt));
 
   const markdownTexts: string[] = [];
 
