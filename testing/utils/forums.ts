@@ -22,7 +22,15 @@ export async function generatePostCategory({
   });
 }
 
-export async function generatePostWithComment({ userId, spaceId }: { spaceId: string; userId: string }) {
+export async function generatePostWithComment({
+  userId,
+  spaceId,
+  categoryId
+}: {
+  spaceId: string;
+  userId: string;
+  categoryId?: string;
+}) {
   const commentInput: CreatePostCommentInput = {
     content: {
       type: ''
@@ -33,7 +41,8 @@ export async function generatePostWithComment({ userId, spaceId }: { spaceId: st
 
   const post = await generateForumPost({
     spaceId,
-    userId
+    userId,
+    categoryId
   });
 
   const postComment = await createPostComment({
