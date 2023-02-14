@@ -60,12 +60,19 @@ export class ForumHomePage {
     return this.page.locator(`data-test=forum-post-card-${postId}`);
   }
 
+  async waitForCategory({ domain, path }: { domain: string; path: string }) {
+    await this.page.waitForURL(`**/${domain}/forum/${path}`);
+  }
+
+  // Interact with post dialog ----------------
   getOpenPostAsPageLocator() {
     return this.page.locator('data-test=open-post-as-page');
   }
 
-  async waitForCategory({ domain, path }: { domain: string; path: string }) {
-    await this.page.waitForURL(`**/${domain}/forum/${path}`);
+  async isDeletePostButtonDisabled(): Promise<boolean> {
+    const button = this.postDialogDeleteButton;
+    const classes = await button.getAttribute('class');
+    return !!classes?.match('Mui-disabled');
   }
 
   // Interactions with categories sidebar ----------------

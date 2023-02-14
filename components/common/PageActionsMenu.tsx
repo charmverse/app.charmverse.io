@@ -52,7 +52,7 @@ export function PageActionsMenu({
   const { formatDateTime } = useDateFormatter();
   const pagePermissions = getPagePermissions(page.id);
   const postPermissions = usePostPermissions({
-    postIdOrPath: router.pathname.match('[domain]/forum') ? page.id : (null as any)
+    postIdOrPath: router.pathname.startsWith('/[domain]/forum') ? page.id : (null as any)
   });
   function getPageLink() {
     let link = window.location.href;
@@ -99,8 +99,9 @@ export function PageActionsMenu({
         dense
         onClick={onClickDelete}
         disabled={Boolean(readOnly || (!pagePermissions?.delete && !postPermissions?.delete_post))}
+        data-test='delete-page-from-context'
       >
-        <DeleteOutlineIcon data-test='delete-page-from-context' fontSize='small' sx={{ mr: 1 }} />
+        <DeleteOutlineIcon fontSize='small' sx={{ mr: 1 }} />
         <ListItemText>Delete</ListItemText>
       </MenuItem>
       {onClickDuplicate && (
