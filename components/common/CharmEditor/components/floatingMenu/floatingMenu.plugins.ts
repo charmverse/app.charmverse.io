@@ -1,9 +1,6 @@
-import { link } from '@bangle.dev/base-components';
 import type { PluginKey } from '@bangle.dev/core';
 import type { EditorState, EditorView, Node, Plugin, ResolvedPos, Transaction } from '@bangle.dev/pm';
 import type { NodeSelection } from 'prosemirror-state';
-
-import { hasComponentInSchema } from 'lib/prosemirror/hasComponentInSchema';
 
 import { floatingMenu } from './floating-menu';
 
@@ -64,6 +61,7 @@ export function plugins({
   // We need to override the selection tooltip plugin to not show up when the rowAction plugin is handling drag and drop.
   // They both work through pm's active selection, but since this plugin responds to mousedown events, we can safely remove the listener to view updates
   const selectionTooltipPluginFn = menuPlugins[0] as () => Plugin<any>[];
+
   menuPlugins[0] = () => {
     const selectionTooltipPlugins = selectionTooltipPluginFn();
     const controller = selectionTooltipPlugins[1] as Plugin<any>;
@@ -72,12 +70,12 @@ export function plugins({
     }
     // @ts-ignore
     const viewUpdate = controller.spec.view().update;
-
     Object.assign(controller.spec, {
       state: {
         init() {
           return false;
         },
+        // update state when row action plugin is dragging
         apply(tr: Transaction) {
           return tr.getMeta('row-handle-is-dragging');
         }
