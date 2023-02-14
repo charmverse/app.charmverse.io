@@ -286,24 +286,26 @@ export function items(props: ItemsProps): PaletteItemTypeNoGroup[] {
 
             if (_dispatch && range) {
               const tr = _state.tr;
+              const contentNode = range.$from.node();
 
-              if (tr?.wrap && state.schema.nodes.disclosureDetails) {
-                tr.wrap(range, [
-                  {
-                    type: _state.schema.nodes.disclosureDetails
-                  }
-                ]);
-                tr.insert(
-                  range.start + 1,
-                  _state.schema.nodes.disclosureSummary.createChecked(
+              if (state.schema.nodes.disclosureDetails) {
+                tr.replaceWith(
+                  range.start,
+                  range.end,
+                  _state.schema.nodes.disclosureDetails.createChecked(
                     null,
-                    Fragment.fromArray([_state.schema.nodes.paragraph.create(undefined, Fragment.fromArray([]))])
+                    Fragment.fromArray([
+                      _state.schema.nodes.disclosureSummary.create(
+                        undefined,
+                        Fragment.fromArray([contentNode.copy(contentNode.content)])
+                      ),
+                      _state.schema.nodes.paragraph.create(undefined, Fragment.fromArray([]))
+                    ])
                   )
                 );
                 const resolvedPos = tr.doc.resolve(range.start + 1);
 
                 tr.setSelection(TextSelection.near(resolvedPos));
-
                 _dispatch(tr);
               }
             }
