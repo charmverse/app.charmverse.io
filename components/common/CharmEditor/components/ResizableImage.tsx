@@ -6,7 +6,7 @@ import ImageIcon from '@mui/icons-material/Image';
 import { Box, ListItem, Typography } from '@mui/material';
 import Alert from '@mui/material/Alert';
 import type { HTMLAttributes } from 'react';
-import { memo, useState } from 'react';
+import { memo, useEffect, useState } from 'react';
 import { v4 } from 'uuid';
 
 import ImageSelector from 'components/common/ImageSelector/ImageSelector';
@@ -147,6 +147,27 @@ function ResizableImage({
     view.dispatch(view.state.tr.deleteRange(start, end));
   }
 
+  useEffect(() => {
+    if (imageSource && !readOnly) {
+      const file = getFileBinary(imageSource);
+      if (file) {
+        setUploadingImage(true);
+        uploadToS3(file)
+          .then(({ url }) => {
+            updateAttrs({
+              src: url
+            });
+          })
+          .catch(() => {
+            setUploadFailed(true);
+          })
+          .finally(() => {
+            setUploadingImage(false);
+          });
+      }
+    }
+  }, [imageSource, readOnly]);
+
   // If there are no source for the node, return the image select component
   if (!imageSource) {
     if (readOnly) {
@@ -166,44 +187,7 @@ function ResizableImage({
         </ImageSelector>
       );
     }
-  } else if (imageSource.startsWith('data') && !uploadingImage && !readOnly && !uploadFailed) {
-    const fileExtension = imageSource.split('image/')[1].split(';')[0];
-    const fileName = `${v4()}.${fileExtension}`;
-    const rawFileContent = imageSource.split(';base64,')[1];
-    // not all data sources are base64, like svg: data:image/svg+xml,%3csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20version=%271.1%27%20width=%27379%27%20height=%27820%27/%3e
-    if (rawFileContent) {
-      setUploadingImage(true);
-      const fileContent = Buffer.from(rawFileContent, 'base64');
-
-      // Break the buffer string into chunks of 1 kilobyte
-      const chunkSize = 1024 * 1;
-
-      const bufferLength = fileContent.length;
-
-      const bufferChunks = [];
-
-      for (let i = 0; i < bufferLength; i += chunkSize) {
-        const chunk = fileContent.slice(i, i + chunkSize);
-        bufferChunks.push(chunk);
-      }
-
-      const file: File = new File(bufferChunks, fileName, { type: `image/${fileExtension}` });
-
-      uploadToS3(file)
-        .then(({ url }) => {
-          updateAttrs({
-            src: url
-          });
-        })
-        .catch(() => {
-          setUploadFailed(true);
-        })
-        .finally(() => {
-          setUploadingImage(false);
-        });
-    }
-  }
-  if (uploadFailed) {
+  } else if (uploadFailed) {
     return <Alert severity='warning'>Image upload failed</Alert>;
   } else if (uploadingImage) {
     return <LoadingComponent isLoading label='Uploading' />;
@@ -220,6 +204,36 @@ function ResizableImage({
       </Resizable>
     );
   }
+}
+
+// example: <img src=”data:image/gif;base64, R0lGODlhCAAFAIABAMaAgP///yH5BAEAAAEALAAAAAAIAAUAAAIKBBKGebzqoJKtAAA7″ />
+// does not work for svg sources: data:image/svg+xml,%3csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20version=%271.1%27%20width=%27379%27%20height=%27820%27/%3e
+function getFileBinary(src: string): File | null {
+  if (src.startsWith('data')) {
+    const fileExtension = src.split('image/')[1].split(';')[0];
+    const fileName = `${v4()}.${fileExtension}`;
+    const rawFileContent = src.split(';base64,')[1];
+    // not all data sources are base64, like svg:
+    if (rawFileContent) {
+      const fileContent = Buffer.from(rawFileContent, 'base64');
+
+      // Break the buffer string into chunks of 1 kilobyte
+      const chunkSize = 1024 * 1;
+
+      const bufferLength = fileContent.length;
+
+      const bufferChunks = [];
+
+      for (let i = 0; i < bufferLength; i += chunkSize) {
+        const chunk = fileContent.slice(i, i + chunkSize);
+        bufferChunks.push(chunk);
+      }
+
+      const file: File = new File(bufferChunks, fileName, { type: `image/${fileExtension}` });
+      return file;
+    }
+  }
+  return null;
 }
 
 export function spec() {
