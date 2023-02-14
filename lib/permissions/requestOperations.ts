@@ -1,6 +1,7 @@
 import type { PostCategoryOperation, PostOperation } from '@prisma/client';
 
 import { ActionNotPermittedError } from 'lib/middleware';
+import type { SystemError } from 'lib/utilities/errors';
 import { InvalidInputError } from 'lib/utilities/errors';
 
 import { computePostCategoryPermissions } from './forum/computePostCategoryPermissions';
@@ -22,8 +23,9 @@ export async function requestOperations<R extends Resources = Resources>({
   resourceId,
   userId,
   operations,
-  resourceType
-}: OperationRequest<R>): Promise<true> {
+  resourceType,
+  customError
+}: OperationRequest<R> & { customError?: SystemError }): Promise<true> {
   if (resourceType === 'post_category') {
     const permissions = await computePostCategoryPermissions({
       resourceId,
@@ -32,7 +34,7 @@ export async function requestOperations<R extends Resources = Resources>({
 
     operations.forEach((op) => {
       if (!permissions[op as PostCategoryOperation]) {
-        throw new ActionNotPermittedError(`You do not have permissions to perform this action`);
+        throw customError ?? new ActionNotPermittedError(`You do not have permissions to perform this action`);
       }
     });
 
@@ -45,7 +47,7 @@ export async function requestOperations<R extends Resources = Resources>({
 
     operations.forEach((op) => {
       if (!permissions[op as PostOperation]) {
-        throw new ActionNotPermittedError(`You do not have permissions to perform this action`);
+        throw customError ?? new ActionNotPermittedError(`You do not have permissions to perform this action`);
       }
     });
 

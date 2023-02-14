@@ -7,7 +7,7 @@ import { deleteForumPost } from 'lib/forums/posts/deleteForumPost';
 import { getForumPost } from 'lib/forums/posts/getForumPost';
 import type { UpdateForumPostInput } from 'lib/forums/posts/updateForumPost';
 import { updateForumPost } from 'lib/forums/posts/updateForumPost';
-import { onError, onNoMatch, requireUser } from 'lib/middleware';
+import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { requestOperations } from 'lib/permissions/requestOperations';
 import { withSessionRoute } from 'lib/session/withSession';
 import { relay } from 'lib/websockets/relay';
@@ -101,7 +101,8 @@ async function getForumPostController(req: NextApiRequest, res: NextApiResponse<
     resourceType: 'post',
     resourceId: post.id,
     operations: ['view_post'],
-    userId
+    userId,
+    customError: new ActionNotPermittedError(`You do not have access to this post`)
   });
   res.status(200).json(post);
 }
