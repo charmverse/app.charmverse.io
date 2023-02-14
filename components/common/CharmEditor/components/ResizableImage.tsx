@@ -210,7 +210,7 @@ function ResizableImage({
 // does not work for svg sources: data:image/svg+xml,%3csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20version=%271.1%27%20width=%27379%27%20height=%27820%27/%3e
 function getFileBinary(src: string): File | null {
   if (src.startsWith('data')) {
-    const fileExtension = src.split('image/')[1].split(';')[0];
+    const fileExtension = src.split('image/')[1].split(';')[0].split('+')[0]; // handle svg+xml
     const fileName = `${v4()}.${fileExtension}`;
     const rawFileContent = src.split(';base64,')[1];
     // not all data sources are base64, like svg:
