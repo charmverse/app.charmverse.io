@@ -2,6 +2,7 @@ import AddIcon from '@mui/icons-material/Add';
 import React, { useCallback, useMemo } from 'react';
 import { useIntl } from 'react-intl';
 
+import { useDateFormatter } from 'hooks/useDateFormatter';
 import type { IPropertyTemplate, Board } from 'lib/focalboard/board';
 import type { BoardView, ISortOption } from 'lib/focalboard/boardView';
 import { createBoardView } from 'lib/focalboard/boardView';
@@ -10,7 +11,7 @@ import type { Card } from 'lib/focalboard/card';
 import { filterPropertyTemplates } from '../../../../utils/updateVisibilePropertyIds';
 import { Constants } from '../../constants';
 import mutator from '../../mutator';
-import { OctoUtils, usePropertyDisplayValue } from '../../octoUtils';
+import { OctoUtils } from '../../octoUtils';
 import { IDType, Utils } from '../../utils';
 import Button from '../../widgets/buttons/button';
 import Menu from '../../widgets/menu';
@@ -34,7 +35,7 @@ type Props = {
 function TableHeaders(props: Props): JSX.Element {
   const { board, cards, activeView, resizingColumn, views, offset, columnRefs } = props;
   const intl = useIntl();
-  const { propertyDisplayValue } = usePropertyDisplayValue();
+  const { formatDateTime, formatDate } = useDateFormatter();
   const onAutoSizeColumn = useCallback(
     (columnID: string, headerWidth: number) => {
       let longestSize = headerWidth;
@@ -80,7 +81,10 @@ function TableHeaders(props: Props): JSX.Element {
           thisLen = Utils.getTextWidth(card.title, columnFontPadding.fontDescriptor) + columnFontPadding.padding;
         } else if (template) {
           const displayValue =
-            propertyDisplayValue(card, card.fields.properties[columnID], template as IPropertyTemplate) || '';
+            OctoUtils.propertyDisplayValue(card, card.fields.properties[columnID], template as IPropertyTemplate, {
+              date: formatDate,
+              dateTime: formatDateTime
+            }) || '';
           switch (template.type) {
             case 'select': {
               thisLen = Utils.getTextWidth(displayValue.toString().toUpperCase(), columnFontPadding.fontDescriptor);

@@ -3,11 +3,12 @@ import { useIntl } from 'react-intl';
 
 import { SelectProperty } from 'components/common/BoardEditor/components/properties/SelectProperty/SelectProperty';
 import type { PropertyValueDisplayType } from 'components/common/BoardEditor/interfaces';
+import { useDateFormatter } from 'hooks/useDateFormatter';
 import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import type { Card } from 'lib/focalboard/card';
 
 import mutator from '../mutator';
-import { OctoUtils, usePropertyDisplayValue } from '../octoUtils';
+import { OctoUtils } from '../octoUtils';
 import Switch from '../widgets/switch';
 import { TextInput } from '../widgets/TextInput';
 
@@ -33,11 +34,15 @@ type Props = {
 function PropertyValueElement(props: Props): JSX.Element {
   const [value, setValue] = useState(props.card.fields.properties[props.propertyTemplate.id] || '');
   const [serverValue, setServerValue] = useState(props.card.fields.properties[props.propertyTemplate.id] || '');
-  const { propertyDisplayValue } = usePropertyDisplayValue();
+  const { formatDateTime, formatDate } = useDateFormatter();
+
   const { card, propertyTemplate, readOnly, showEmptyPlaceholder, board, updatedBy, updatedAt, displayType } = props;
   const intl = useIntl();
   const propertyValue = card.fields.properties[propertyTemplate.id];
-  const displayValue = propertyDisplayValue(card, propertyValue, propertyTemplate);
+  const displayValue = OctoUtils.propertyDisplayValue(card, propertyValue, propertyTemplate, {
+    date: formatDate,
+    dateTime: formatDateTime
+  });
   const emptyDisplayValue = showEmptyPlaceholder
     ? intl.formatMessage({ id: 'PropertyValueElement.empty', defaultMessage: 'Empty' })
     : '';

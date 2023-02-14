@@ -1,7 +1,6 @@
 import { DateUtils } from 'react-day-picker';
 import type { IntlShape } from 'react-intl';
 
-import { useDateFormatter } from 'hooks/useDateFormatter';
 import type { Block } from 'lib/focalboard/block';
 import { createBlock } from 'lib/focalboard/block';
 import type { IPropertyTemplate } from 'lib/focalboard/board';
@@ -24,9 +23,12 @@ class OctoUtils {
     block: Block,
     propertyValue: string | string[] | undefined,
     propertyTemplate: IPropertyTemplate,
-    formatDate: (date: Date | string) => string,
-    formatDateTime: (date: Date | string) => string
+    formatter: {
+      date: (date: Date | string) => string;
+      dateTime: (date: Date | string) => string;
+    }
   ) {
+    const { date: formatDate, dateTime: formatDateTime } = formatter;
     let displayValue: string | string[] | undefined;
     switch (propertyTemplate.type) {
       case 'select': {
@@ -200,20 +202,6 @@ class OctoUtils {
       }
     }
   }
-}
-
-export function usePropertyDisplayValue() {
-  const { formatDateTime, formatDate } = useDateFormatter();
-
-  return {
-    propertyDisplayValue(
-      block: Block,
-      propertyValue: string | string[] | undefined,
-      propertyTemplate: IPropertyTemplate
-    ) {
-      return OctoUtils.propertyDisplayValue(block, propertyValue, propertyTemplate, formatDate, formatDateTime);
-    }
-  };
 }
 
 export { OctoUtils };
