@@ -41,6 +41,8 @@ export type Member = Omit<User, 'addresses'> & {
   onboarded: boolean;
 };
 
+export type PublicMember = Pick<Member, 'id' | 'username'>;
+
 export type CreateMemberPropertyPayload = Pick<MemberProperty, 'index' | 'name' | 'options' | 'type'>;
 export type UpdateMemberPropertyValuePayload = Pick<MemberPropertyValue, 'memberPropertyId' | 'value'>;
 
