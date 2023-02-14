@@ -89,6 +89,9 @@ function Component({ menuState }: { menuState: PluginState }) {
       if (start === 1) {
         start = 0;
         end -= 1;
+      } else if (node.node.type.name === 'disclosureDetails') {
+        // This removes disclosureSummary node
+        start -= 2;
       }
       view.dispatch(view.state.tr.deleteRange(start, end));
       popupState.close();

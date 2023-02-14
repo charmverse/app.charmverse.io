@@ -7,8 +7,6 @@ import type { PaletteMode } from '@mui/material';
 import CssBaseline from '@mui/material/CssBaseline';
 import IconButton from '@mui/material/IconButton';
 import { ThemeProvider } from '@mui/material/styles';
-import { AdapterLuxon } from '@mui/x-date-pickers/AdapterLuxon';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { Web3ReactProvider } from '@web3-react/core';
 import type { NextPage } from 'next';
 import type { AppProps } from 'next/app';
@@ -19,6 +17,7 @@ import { useEffect, useMemo, useState } from 'react';
 
 import charmClient from 'charmClient';
 import GlobalComponents from 'components/_app/GlobalComponents';
+import { LocalizationProvider } from 'components/_app/LocalizationProvider';
 import { Web3ConnectionManager } from 'components/_app/Web3ConnectionManager';
 import { setTheme as setFocalBoardTheme } from 'components/common/BoardEditor/focalboard/src/theme';
 import FocalBoardProvider from 'components/common/BoardEditor/FocalBoardProvider';
@@ -107,7 +106,6 @@ import 'components/common/BoardEditor/focalboard/src/styles/_markdown.scss';
 import 'components/common/BoardEditor/focalboard/src/widgets/buttons/buttonWithMenu.scss';
 import 'components/common/BoardEditor/focalboard/src/widgets/buttons/iconButton.scss';
 import 'components/common/BoardEditor/focalboard/src/widgets/editable.scss';
-import 'components/common/BoardEditor/focalboard/src/widgets/editableDayPicker.scss';
 import 'components/common/BoardEditor/focalboard/src/widgets/emojiPicker.scss';
 import 'components/common/BoardEditor/focalboard/src/widgets/label.scss';
 import 'components/common/BoardEditor/focalboard/src/widgets/menu/colorOption.scss';
@@ -210,11 +208,11 @@ export default function App({ Component, emotionCache = clientSideEmotionCache, 
     <CacheProvider value={emotionCache}>
       <ColorModeContext.Provider value={colorModeContext}>
         <ThemeProvider theme={theme}>
-          <LocalizationProvider dateAdapter={AdapterLuxon as any}>
-            <SnackbarProvider>
-              <SettingsDialogProvider>
-                <ReactDndProvider>
-                  <DataProviders>
+          <SnackbarProvider>
+            <SettingsDialogProvider>
+              <ReactDndProvider>
+                <DataProviders>
+                  <LocalizationProvider>
                     <OnboardingProvider>
                       <FocalBoardProvider>
                         <IntlProvider>
@@ -242,11 +240,11 @@ export default function App({ Component, emotionCache = clientSideEmotionCache, 
                         </IntlProvider>
                       </FocalBoardProvider>
                     </OnboardingProvider>
-                  </DataProviders>
-                </ReactDndProvider>
-              </SettingsDialogProvider>
-            </SnackbarProvider>
-          </LocalizationProvider>
+                  </LocalizationProvider>
+                </DataProviders>
+              </ReactDndProvider>
+            </SettingsDialogProvider>
+          </SnackbarProvider>
         </ThemeProvider>
       </ColorModeContext.Provider>
     </CacheProvider>

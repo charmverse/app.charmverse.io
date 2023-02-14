@@ -182,7 +182,9 @@ function CardDetailProperties(props: Props) {
         return (
           <div key={`${propertyTemplate.id}-${propertyTemplate.type}-${propertyValue}`} className='octo-propertyrow'>
             {props.readOnly && (
-              <div className='octo-propertyname octo-propertyname--readonly'>{propertyTemplate.name}</div>
+              <div className='octo-propertyname octo-propertyname--readonly'>
+                <Button>{propertyTemplate.name}</Button>
+              </div>
             )}
             {!props.readOnly && (
               <MenuWrapper isOpen={propertyTemplate.id === newTemplateId}>

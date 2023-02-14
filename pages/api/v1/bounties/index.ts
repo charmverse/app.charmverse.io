@@ -136,26 +136,38 @@ async function getBounties(req: NextApiRequest, res: NextApiResponse) {
 
   const spaceId = req.authorizedSpaceId;
 
-  const bounties = await prisma.bounty.findMany({
-    where: {
-      spaceId,
-      status: statuses
-        ? {
-            in: statuses
-          }
-        : undefined
-    },
-    include: {
-      author: {
-        include: {
-          wallets: true
-        }
+  const bounties = await prisma.bounty
+    .findMany({
+      where: {
+        spaceId,
+        status: statuses
+          ? {
+              in: statuses
+            }
+          : undefined
       },
-      applications: true,
-      space: true,
-      page: true
-    }
-  });
+      include: {
+        author: {
+          include: {
+            wallets: true
+          }
+        },
+        applications: true,
+        space: true,
+        page: {
+          select: {
+            path: true,
+            createdAt: true,
+            title: true,
+            content: true,
+            contentText: true,
+            deletedAt: true
+          }
+        }
+      }
+    })
+    // Make the API response faster by avoiding a join operation on the database, and filtering the results
+    .then((_bounties) => _bounties.filter((b) => !b.page?.deletedAt));
 
   /**
    * Returns the wallet addresses that have received a payment for this bounty

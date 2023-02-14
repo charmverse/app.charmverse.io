@@ -1,4 +1,3 @@
-import type { Post } from '@prisma/client';
 import { useEffect, useState } from 'react';
 
 import charmClient from 'charmClient';
@@ -6,7 +5,7 @@ import type { PostWithVotes } from 'lib/forums/posts/interfaces';
 import log from 'lib/log';
 
 import { usePostDialog } from './hooks/usePostDialog';
-import PostDialog from './PostDialog';
+import { PostDialog } from './PostDialog';
 
 // a wrapper of page dialog that uses usePageDialogHook
 export default function PostDialogGlobal() {
