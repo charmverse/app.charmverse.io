@@ -1,4 +1,4 @@
-import type { PostOperation, Prisma } from '@prisma/client';
+import type { Post, PostOperation, Prisma } from '@prisma/client';
 
 import { prisma } from 'db';
 import { PostNotFoundError } from 'lib/forums/posts/errors';
@@ -102,10 +102,11 @@ export async function baseComputePostPermissions({
 
   return permissions.operationFlags;
 }
-async function convertedToProposalPfp({
-  resource,
-  flags
-}: PermissionFilteringPolicyFnInput<'post'>): Promise<AvailablePostPermissionFlags> {
+
+type PostResource = Pick<Post, 'id' | 'spaceId' | 'createdBy' | 'proposalId'>;
+type PostPfpInput = PermissionFilteringPolicyFnInput<PostResource, AvailablePostPermissionFlags>;
+
+async function convertedToProposalPfp({ resource, flags }: PostPfpInput): Promise<AvailablePostPermissionFlags> {
   const newPermissions = { ...flags };
 
   if (!resource.proposalId) {
@@ -123,11 +124,7 @@ async function convertedToProposalPfp({
   return newPermissions;
 }
 
-async function onlyEditableByAuthor({
-  resource,
-  flags,
-  userId
-}: PermissionFilteringPolicyFnInput<'post'>): Promise<AvailablePostPermissionFlags> {
+async function onlyEditableByAuthor({ resource, flags, userId }: PostPfpInput): Promise<AvailablePostPermissionFlags> {
   const newPermissions = {
     ...flags,
     edit_post: resource.createdBy === userId
@@ -135,9 +132,23 @@ async function onlyEditableByAuthor({
 
   return newPermissions;
 }
+function postResolver({ resourceId }: { resourceId: string }) {
+  return prisma.post.findUnique({
+    where: { id: resourceId },
+    select: {
+      id: true,
+      spaceId: true,
+      createdBy: true,
+      proposalId: true
+    }
+  }) as Promise<PostResource>;
+}
 
-export const computePostPermissions = buildComputePermissionsWithPermissionFilteringPolicies({
-  resourceType: 'post',
+export const computePostPermissions = buildComputePermissionsWithPermissionFilteringPolicies<
+  PostResource,
+  AvailablePostPermissionFlags
+>({
+  resolver: postResolver,
   computeFn: baseComputePostPermissions,
   pfps: [onlyEditableByAuthor, convertedToProposalPfp]
 });
