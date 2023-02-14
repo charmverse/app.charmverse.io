@@ -14,7 +14,7 @@ import { relay } from 'lib/websockets/relay';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireUser).get(getForumPostController).put(updateForumPostController).delete(deleteForumPostController);
+handler.get(getForumPostController).use(requireUser).put(updateForumPostController).delete(deleteForumPostController);
 
 async function updateForumPostController(req: NextApiRequest, res: NextApiResponse<Post>) {
   const { postId } = req.query as any as { postId: string };
@@ -93,7 +93,7 @@ async function deleteForumPostController(req: NextApiRequest, res: NextApiRespon
 
 async function getForumPostController(req: NextApiRequest, res: NextApiResponse<Post>) {
   const { postId, spaceDomain } = req.query as any as { postId: string; spaceDomain?: string };
-  const userId = req.session.user.id;
+  const userId = req.session.user?.id;
 
   const post = await getForumPost({ userId, postId, spaceDomain });
 
