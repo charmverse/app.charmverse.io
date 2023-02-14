@@ -54,7 +54,6 @@ interface Props {
 }
 
 export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: Props) {
-  const intl = useIntl();
   const router = useRouter();
   const { pages, deletePage } = usePages();
   const view = useAppSelector(getView(router.query.viewId as string));
@@ -64,7 +63,7 @@ export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: 
   const { members } = useMembers();
   const { user } = useUser();
   const currentSpace = useCurrentSpace();
-  const { formatDateTime } = useDateFormatter();
+  const { formatDateTime, formatDate } = useDateFormatter();
 
   const activeBoardId = view?.fields.sourceData?.boardId ?? view?.fields.linkedSourceId ?? view?.rootId;
   const board = boards.find((b) => b.id === activeBoardId);
@@ -109,7 +108,10 @@ export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: 
       };
     });
     try {
-      CsvExporter.exportTableCsv(_board, _view, _cards, intl);
+      CsvExporter.exportTableCsv(_board, _view, _cards, {
+        date: formatDate,
+        dateTime: formatDateTime
+      });
       showMessage('Export complete!');
     } catch (error) {
       log.error('CSV export failed', error);
