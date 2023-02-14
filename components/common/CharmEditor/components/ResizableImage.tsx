@@ -166,14 +166,19 @@ function ResizableImage({
         </ImageSelector>
       );
     }
-  } else if (imageSource.startsWith('data') && !uploadingImage && !readOnly && !uploadFailed) {
+  } else if (
+    imageSource.startsWith('data') &&
+    // not sure what to do with SVG, but the format throws an error. (For example, an image src from HTML in Notion's docs: data:image/svg+xml,%3csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20version=%271.1%27%20width=%27379%27%20height=%27820%27/%3e
+    !imageSource.includes('svg') &&
+    !uploadingImage &&
+    !readOnly &&
+    !uploadFailed
+  ) {
     setUploadingImage(true);
 
     const fileExtension = imageSource.split('image/')[1].split(';')[0];
     const fileName = `${v4()}.${fileExtension}`;
-
     const rawFileContent = imageSource.split(';base64,')[1];
-
     const fileContent = Buffer.from(rawFileContent, 'base64');
 
     // Break the buffer string into chunks of 1 kilobyte
