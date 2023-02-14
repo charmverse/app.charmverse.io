@@ -411,7 +411,7 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
     const postCreator = members.find((member) => member.id === forumPostInfo.forumPost?.createdBy);
 
     pageOptionsList = (
-      <List data-test='header-forum-post-actions' dense>
+      <List data-test='header--forum-post-actions' dense>
         <CopyLinkMenuItem closeMenu={closeMenu} />
         <Divider />
         <DeleteMenuItem onClick={deletePost} disabled={!forumPostInfo.permissions?.delete_post} />
