@@ -23,6 +23,14 @@ export class ForumHomePage {
 
   readonly closeModalButton: Locator;
 
+  readonly postDialog: Locator;
+
+  readonly postDialogCloseButton: Locator;
+
+  readonly postDialogContextMenu: Locator;
+
+  readonly postDialogDeleteButton: Locator;
+
   constructor(page: Page) {
     this.page = page;
     this.addCategoryButton = page.locator('data-test=add-category-button');
@@ -32,6 +40,10 @@ export class ForumHomePage {
     this.categoryPermissionsDialog = page.locator('data-test=category-permissions-dialog');
     this.spaceCategoryPermissionSelect = page.locator('data-test=category-space-permission >> input');
     this.closeModalButton = page.locator('data-test=close-modal');
+    this.postDialog = page.locator('data-test=dialog');
+    this.postDialogCloseButton = page.locator('data-test=close-dialog');
+    this.postDialogContextMenu = page.locator('data-test=page-actions-context-menu');
+    this.postDialogDeleteButton = page.locator('data-test=delete-page-from-context');
   }
 
   async goToForumHome(domain: string) {
