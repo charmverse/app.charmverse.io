@@ -23,8 +23,12 @@ class OctoUtils {
     block: Block,
     propertyValue: string | string[] | undefined,
     propertyTemplate: IPropertyTemplate,
-    intl: IntlShape
-  ): string | string[] | undefined {
+    formatter: {
+      date: (date: Date | string) => string;
+      dateTime: (date: Date | string) => string;
+    }
+  ) {
+    const { date: formatDate, dateTime: formatDateTime } = formatter;
     let displayValue: string | string[] | undefined;
     switch (propertyTemplate.type) {
       case 'select': {
@@ -43,27 +47,27 @@ class OctoUtils {
         break;
       }
       case 'createdTime': {
-        displayValue = Utils.displayDateTime(new Date(block.createdAt), intl);
+        displayValue = formatDateTime(new Date(block.createdAt));
         break;
       }
       case 'updatedTime': {
-        displayValue = Utils.displayDateTime(new Date(block.updatedAt), intl);
+        displayValue = formatDateTime(new Date(block.updatedAt));
         break;
       }
       case 'date': {
         if (propertyValue) {
           const singleDate = new Date(parseInt(propertyValue as string, 10));
           if (singleDate && DateUtils.isDate(singleDate)) {
-            displayValue = Utils.displayDate(new Date(parseInt(propertyValue as string, 10)), intl);
+            displayValue = formatDate(new Date(parseInt(propertyValue as string, 10)));
           } else {
             try {
               const dateValue = JSON.parse(propertyValue as string);
               if (dateValue.from) {
-                displayValue = Utils.displayDate(new Date(dateValue.from), intl);
+                displayValue = formatDate(new Date(dateValue.from));
               }
               if (dateValue.to) {
                 displayValue += ' -> ';
-                displayValue += Utils.displayDate(new Date(dateValue.to), intl);
+                displayValue += formatDate(new Date(dateValue.to));
               }
             } catch {
               // do nothing

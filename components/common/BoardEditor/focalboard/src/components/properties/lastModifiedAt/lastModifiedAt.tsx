@@ -1,20 +1,15 @@
 import React from 'react';
-import { useIntl } from 'react-intl';
 
-import { Utils } from '../../../utils';
+import { useDateFormatter } from 'hooks/useDateFormatter';
 
 type Props = {
   updatedAt: string;
 };
 
 function LastModifiedAt(props: Props): JSX.Element {
-  const intl = useIntl();
+  const { formatDateTime } = useDateFormatter();
 
-  return (
-    <div className='LastModifiedAt octo-propertyvalue readonly'>
-      {Utils.displayDateTime(new Date(props.updatedAt), intl)}
-    </div>
-  );
+  return <div className='LastModifiedAt octo-propertyvalue readonly'>{formatDateTime(new Date(props.updatedAt))}</div>;
 }
 
 export default LastModifiedAt;

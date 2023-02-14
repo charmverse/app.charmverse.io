@@ -1,12 +1,12 @@
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import { Box, Typography } from '@mui/material';
-import type { FC } from 'react';
+import { Box, Tooltip, Typography } from '@mui/material';
 import React from 'react';
 import { useIntl } from 'react-intl';
 
 import Avatar from 'components/common/Avatar';
 import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
+import { useDateFormatter } from 'hooks/useDateFormatter';
 import type { Block } from 'lib/focalboard/block';
 import type { Member } from 'lib/members/interfaces';
 
@@ -15,7 +15,6 @@ import { Utils } from '../../utils';
 import IconButton from '../../widgets/buttons/iconButton';
 import Menu from '../../widgets/menu';
 import MenuWrapper from '../../widgets/menuWrapper';
-import Tooltip from '../../widgets/tooltip';
 
 type Props = {
   comment: Block;
@@ -28,16 +27,16 @@ function Comment(props: Props) {
   const intl = useIntl();
   const html = comment.title && Utils.htmlFromMarkdown(comment.title);
   const date = new Date(comment.createdAt);
+  const { formatDateTime } = useDateFormatter();
 
   return (
     <div key={comment.id} className='Comment comment'>
       <div className='comment-header'>
         <Avatar size='xSmall' name={member?.username} avatar={member?.avatar} isNft={member?.hasNftAvatar} />
         <div className='comment-username'>{member?.username}</div>
-        <Tooltip title={Utils.displayDateTime(date, intl)}>
+        <Tooltip title={formatDateTime(date)}>
           <div className='comment-date'>{Utils.relativeDisplayDateTime(date, intl)}</div>
         </Tooltip>
-
         {!props.readOnly && (
           <MenuWrapper>
             <IconButton icon={<MoreHorizIcon />} />
