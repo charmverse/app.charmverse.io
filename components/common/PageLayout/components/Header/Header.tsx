@@ -101,7 +101,7 @@ function DeleteMenuItem({ disabled = false, onClick }: { disabled?: boolean; onC
   return (
     <Tooltip title={disabled ? "You don't have permission to delete this page" : ''}>
       <div>
-        <ListItemButton data-test='delete-current-page' disabled={disabled} onClick={onClick}>
+        <ListItemButton data-test='header--delete-current-page' disabled={disabled} onClick={onClick}>
           <DeleteOutlineOutlinedIcon
             fontSize='small'
             sx={{
@@ -224,7 +224,7 @@ function PostHeader({
   }
 
   return (
-    <List data-test='forum-post-actions' dense>
+    <List data-test='header--forum-post-actions' dense>
       <CopyLinkMenuItem closeMenu={closeMenu} />
       <Divider />
       <DeleteMenuItem onClick={deletePost} disabled={!forumPostInfo.permissions?.delete_post} />
@@ -339,6 +339,7 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
       await deletePage({
         pageId: basePage.id
       });
+      closeMenu();
       if (basePage.type === 'board') {
         await charmClient.deleteBlock(basePage.id, () => {});
       }
@@ -355,7 +356,6 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
         bangleEditorCoreElement.dispatchEvent(undoEvent as Event);
       }
     }
-    setPageMenuOpen(false);
   }
 
   const canCreateProposal = !!userSpacePermissions?.createVote;
@@ -363,6 +363,7 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
 
   function closeMenu() {
     setPageMenuOpen(false);
+    setPageMenuAnchorElement(null);
   }
 
   async function exportMarkdownPage() {
@@ -382,12 +383,12 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
   }
 
   async function convertToProposal(pageId: string) {
-    setPageMenuOpen(false);
     await charmClient.pages.convertToProposal(pageId);
+    closeMenu();
   }
 
   const documentOptions = (
-    <List dense>
+    <List data-test='header--page-actions' dense>
       <ListItemButton
         onClick={() => {
           setCurrentPageActionDisplay('comments');
@@ -570,7 +571,7 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
                       setPageMenuAnchorElement(pageMenuAnchor.current || null);
                     }}
                   >
-                    <MoreHorizIcon data-test='page-toplevel-menu' color='secondary' />
+                    <MoreHorizIcon data-test='header--show-page-actions' color='secondary' />
                   </IconButton>
                 </Tooltip>
               </div>
