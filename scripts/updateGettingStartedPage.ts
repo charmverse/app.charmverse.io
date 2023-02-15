@@ -1,7 +1,8 @@
 import { prisma } from "db";
 import { PageNotFoundError } from "lib/pages/server";
 import { InvalidInputError } from "lib/utilities/errors";
-import {GettingStartedPage, gettingStartedPage} from 'seedData/gettingStartedPage';
+import type { GettingStartedPage } from "seedData/gettingStartedPage";
+import { gettingStartedPage} from 'seedData/gettingStartedPage';
 import fs from 'node:fs/promises'
 import path from 'node:path'
 import {execSync} from 'node:child_process'
