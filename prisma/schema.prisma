@@ -901,6 +901,7 @@ model Proposal {
   categoryId             String?            @db.Uuid
   category               ProposalCategory?  @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   snapshotProposalExpiry DateTime?
+  Post                   Post[]
 
   @@index([spaceId])
   @@index([reviewedBy])
@@ -1026,12 +1027,12 @@ model MemberPropertyPermission {
 
 // Begin Forum models
 model PostCategory {
-  id                      String                    @id @default(uuid()) @db.Uuid
+  id                      String                   @id @default(uuid()) @db.Uuid
   name                    String
   path                    String?
-  defaultForSpace         Space?                    @relation(name: "defaultPostCategory")
-  spaceId                 String                    @db.Uuid
-  space                   Space                     @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  defaultForSpace         Space?                   @relation(name: "defaultPostCategory")
+  spaceId                 String                   @db.Uuid
+  space                   Space                    @relation(fields: [spaceId], references: [id], onDelete: Cascade)
   Post                    Post[]
   postCategoryPermissions PostCategoryPermission[]
 
@@ -1059,6 +1060,8 @@ model Post {
   comments           PostComment[]
   upDownVotes        PostUpDownVote[]
   commentUpDownVotes PostCommentUpDownVote[]
+  proposalId         String?                 @db.Uuid
+  proposal           Proposal?               @relation(fields: [proposalId], references: [id], onDelete: SetNull)
 
   @@index([categoryId])
   @@index([path])
@@ -1122,13 +1125,13 @@ model UnstoppableDomain {
 }
 
 model WebhookSubscription {
-	id        String    @id @default(uuid()) @db.Uuid
+  id        String    @id @default(uuid()) @db.Uuid
   createdBy String    @db.Uuid
   scope     String
-	spaceId   String    @db.Uuid
+  spaceId   String    @db.Uuid
   space     Space     @relation(fields: [spaceId], references: [id], onDelete: Cascade)
-	createdAt DateTime  @default(now())
-	updatedAt DateTime  @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
   deletedAt DateTime?
 
   @@unique([scope, spaceId])
@@ -1181,7 +1184,6 @@ enum PostOperation {
   downvote
 }
 
-
 enum PostCategoryPermissionLevel {
   category_admin
   moderator
@@ -1191,25 +1193,24 @@ enum PostCategoryPermissionLevel {
 }
 
 model PostCategoryPermission {
-  id              String                       @id @default(uuid()) @db.Uuid
-  permissionLevel PostCategoryPermissionLevel
-  postCategoryId  String                       @db.Uuid
-  postCategory    PostCategory                 @relation(fields: [postCategoryId], references: [id], onDelete: Cascade)
+  id                 String                      @id @default(uuid()) @db.Uuid
+  permissionLevel    PostCategoryPermissionLevel
+  postCategoryId     String                      @db.Uuid
+  postCategory       PostCategory                @relation(fields: [postCategoryId], references: [id], onDelete: Cascade)
   // These fields will only be used when the custom permission level is used
   categoryOperations PostCategoryOperation[]
   postOperations     PostOperation[]
 
   // Permission assignees
-  roleId          String?                      @db.Uuid
-  role            Role?                        @relation(fields: [roleId], references: [id], onDelete: Cascade)
-  spaceId         String?                      @db.Uuid
-  space           Space?                       @relation(fields: [spaceId], references: [id], onDelete: Cascade)
-  public          Boolean?
+  roleId  String?  @db.Uuid
+  role    Role?    @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  spaceId String?  @db.Uuid
+  space   Space?   @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  public  Boolean?
 
   @@unique([roleId, postCategoryId])
   @@unique([spaceId, postCategoryId])
   @@unique([public, postCategoryId])
-
   @@index([postCategoryId])
   @@index([postCategoryId, roleId])
   @@index([postCategoryId, spaceId])

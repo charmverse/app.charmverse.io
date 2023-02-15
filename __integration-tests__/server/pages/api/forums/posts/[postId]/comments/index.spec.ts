@@ -3,25 +3,32 @@ import type { PostCategory, Space, User } from '@prisma/client';
 import request from 'supertest';
 import { v4 } from 'uuid';
 
+import { prisma } from 'db';
 import { upsertPostCategoryPermission } from 'lib/permissions/forum/upsertPostCategoryPermission';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
-import { generateUserAndSpace } from 'testing/setupDatabase';
+import { generateSpaceUser, generateUserAndSpace } from 'testing/setupDatabase';
 import { generateForumPost, generatePostCategory } from 'testing/utils/forums';
 
 let space: Space;
 let user: User;
+let otherUser: User;
 let userCookie: string;
+let otherUserCookie: string;
 
 let accessiblePostCategory: PostCategory;
 let disallowedPostCategory: PostCategory;
 beforeAll(async () => {
   const { space: _space, user: _user } = await generateUserAndSpace({ isAdmin: false });
-  const { space: _space2, user: _user2 } = await generateUserAndSpace({ isAdmin: false });
+  const { user: _user2 } = await generateUserAndSpace({ isAdmin: false });
+  otherUser = await generateSpaceUser({ spaceId: _space.id, isAdmin: false });
 
   space = _space;
   user = _user;
 
+  otherUser = _user2;
+
   userCookie = await loginUser(user.id);
+  otherUserCookie = await loginUser(otherUser.id);
 
   accessiblePostCategory = await generatePostCategory({
     spaceId: space.id
@@ -60,7 +67,7 @@ describe('GET /api/forums/posts/[postId]/comments - Get comments of a post', () 
       categoryId: disallowedPostCategory.id
     });
 
-    await request(baseUrl).get(`/api/forums/posts/${post.id}/comments`).set('Cookie', userCookie).expect(401);
+    await request(baseUrl).get(`/api/forums/posts/${post.id}/comments`).set('Cookie', otherUserCookie).expect(401);
   });
 });
 describe('POST /api/forums/posts/[postId]/comments - Create a comment', () => {
