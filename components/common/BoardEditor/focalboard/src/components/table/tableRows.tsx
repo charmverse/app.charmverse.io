@@ -1,9 +1,10 @@
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import { Box, Typography } from '@mui/material';
-import React from 'react';
+import React, { useState } from 'react';
 
 import charmClient from 'charmClient';
-import { usePaginatedData } from 'hooks/usePaginatedData';
+import { PageSizeInputPopup } from 'components/PageSizeInputPopup';
+import { DEFAULT_PAGE_SIZE, usePaginatedData } from 'hooks/usePaginatedData';
 import type { Board } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card, CardPage } from 'lib/focalboard/card';
@@ -28,7 +29,13 @@ type Props = {
 
 function TableRows(props: Props): JSX.Element {
   const { board, cardPages: allCardPages, activeView } = props;
-  const { data: cardPages, hasNextPage, showNextPage, moreCount } = usePaginatedData(allCardPages as CardPage[]);
+  const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
+  const {
+    data: cardPages,
+    hasNextPage,
+    showNextPage,
+    moreCount
+  } = usePaginatedData(allCardPages as CardPage[], { pageSize });
 
   const saveTitle = React.useCallback(async (saveType: string, cardId: string, title: string, oldTitle: string) => {
     // ignore if title is unchanged
@@ -80,6 +87,7 @@ function TableRows(props: Props): JSX.Element {
             <Box display='flex' gap={1} alignItems='center'>
               <ArrowDownwardIcon fontSize='small' />
               <Typography fontSize='small'>Show {moreCount} more</Typography>
+              <PageSizeInputPopup onChange={setPageSize} pageSize={pageSize} />
             </Box>
           </div>
         </div>

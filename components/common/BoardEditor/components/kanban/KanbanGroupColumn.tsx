@@ -1,10 +1,12 @@
 import { Add } from '@mui/icons-material';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
-import { Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import Button from '@mui/material/Button';
+import { useState } from 'react';
 
 import KanbanCard from 'components/common/BoardEditor/focalboard/src/components/kanban/kanbanCard';
 import KanbanColumn from 'components/common/BoardEditor/focalboard/src/components/kanban/kanbanColumn';
+import { PageSizeInputPopup } from 'components/PageSizeInputPopup';
 import { usePaginatedData } from 'hooks/usePaginatedData';
 import type { Board, BoardGroup, IPropertyOption, IPropertyTemplate } from 'lib/focalboard/board';
 import type { Card } from 'lib/focalboard/card';
@@ -36,7 +38,8 @@ export function KanbanGroupColumn({
   showCard,
   isManualSort
 }: Props) {
-  const { data: cards, hasNextPage, showNextPage, moreCount } = usePaginatedData(group.cards);
+  const [pageSize, setPageSize] = useState(10);
+  const { data: cards, hasNextPage, showNextPage, moreCount } = usePaginatedData(group.cards, { pageSize });
 
   return (
     <KanbanColumn onDrop={(card: Card) => onDropToColumn(group.option, card)}>
@@ -66,7 +69,10 @@ export function KanbanGroupColumn({
           onClick={showNextPage}
           startIcon={<ArrowDownwardIcon fontSize='small' />}
         >
-          <Typography fontSize='small'>Show {moreCount} more</Typography>
+          <Box display='flex' justifyContent='space-between' gap={1} alignItems='center'>
+            <Typography fontSize='small'>Show {moreCount} more</Typography>
+            <PageSizeInputPopup onChange={setPageSize} pageSize={pageSize} />
+          </Box>
         </Button>
       )}
 

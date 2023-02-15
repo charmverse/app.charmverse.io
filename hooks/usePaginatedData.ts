@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from 'react';
 
-const DEFAULT_PAGE_SIZE = 100;
+export const DEFAULT_PAGE_SIZE = 10;
 
 type Config = {
   pageSize?: number;
