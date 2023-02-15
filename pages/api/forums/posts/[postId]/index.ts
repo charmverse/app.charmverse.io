@@ -2,31 +2,50 @@ import type { Post } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { canEditPost } from 'lib/forums/posts/canEditPost';
+import { prisma } from 'db';
 import { deleteForumPost } from 'lib/forums/posts/deleteForumPost';
 import { getForumPost } from 'lib/forums/posts/getForumPost';
+import type { UpdateForumPostInput } from 'lib/forums/posts/updateForumPost';
 import { updateForumPost } from 'lib/forums/posts/updateForumPost';
-import { onError, onNoMatch, requireUser } from 'lib/middleware';
+import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
+import { requestOperations } from 'lib/permissions/requestOperations';
 import { withSessionRoute } from 'lib/session/withSession';
-import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
-import { UnauthorisedActionError } from 'lib/utilities/errors';
 import { relay } from 'lib/websockets/relay';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireUser).get(getForumPostController).put(updateForumPostController).delete(deleteForumPostController);
+handler.get(getForumPostController).use(requireUser).put(updateForumPostController).delete(deleteForumPostController);
 
 async function updateForumPostController(req: NextApiRequest, res: NextApiResponse<Post>) {
   const { postId } = req.query as any as { postId: string };
   const userId = req.session.user.id;
 
-  const canEdit = await canEditPost({
-    postId,
+  await requestOperations({
+    resourceType: 'post',
+    operations: ['edit_post'],
+    resourceId: postId,
     userId
   });
 
-  if (!canEdit) {
-    throw new UnauthorisedActionError(`User ${userId} cannot edit post ${postId}`);
+  const existingPost = await prisma.post.findUnique({
+    where: {
+      id: postId
+    },
+    select: {
+      categoryId: true
+    }
+  });
+
+  const newCategoryId = (req.body as UpdateForumPostInput).categoryId;
+
+  // Don't allow an update to a new category ID if the user doesn't have permission to create posts in that category
+  if (typeof newCategoryId === 'string' && existingPost?.categoryId !== newCategoryId) {
+    await requestOperations({
+      resourceType: 'post_category',
+      operations: ['create_post'],
+      resourceId: newCategoryId,
+      userId
+    });
   }
 
   const post = await updateForumPost(postId, req.body);
@@ -49,14 +68,12 @@ async function deleteForumPostController(req: NextApiRequest, res: NextApiRespon
   const { postId } = req.query as any as { postId: string };
   const userId = req.session.user.id;
 
-  const canDelete = await canEditPost({
-    postId,
+  await requestOperations({
+    resourceType: 'post',
+    resourceId: postId,
+    operations: ['delete_post'],
     userId
   });
-
-  if (!canDelete) {
-    throw new UnauthorisedActionError(`User ${userId} cannot edit post ${postId}`);
-  }
 
   const post = await deleteForumPost(postId);
 
@@ -75,20 +92,18 @@ async function deleteForumPostController(req: NextApiRequest, res: NextApiRespon
 }
 
 async function getForumPostController(req: NextApiRequest, res: NextApiResponse<Post>) {
-  const { postId } = req.query as any as { postId: string };
-  const userId = req.session.user.id;
+  const { postId, spaceDomain } = req.query as any as { postId: string; spaceDomain?: string };
+  const userId = req.session.user?.id;
 
-  const post = await getForumPost({ userId, postId });
+  const post = await getForumPost({ userId, postId, spaceDomain });
 
-  const { error } = await hasAccessToSpace({
-    spaceId: post.spaceId,
-    userId
+  await requestOperations({
+    resourceType: 'post',
+    resourceId: post.id,
+    operations: ['view_post'],
+    userId,
+    customError: new ActionNotPermittedError(`You do not have access to this post`)
   });
-
-  if (error) {
-    throw error;
-  }
-
   res.status(200).json(post);
 }
 

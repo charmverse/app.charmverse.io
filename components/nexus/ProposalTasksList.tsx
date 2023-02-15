@@ -1,11 +1,11 @@
 import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
+import { Box } from '@mui/material';
 import Alert from '@mui/material/Alert';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
-import { Box } from '@mui/system';
 import { useEffect } from 'react';
 import type { KeyedMutator } from 'swr';
 
@@ -14,6 +14,7 @@ import Button from 'components/common/Button';
 import Link from 'components/common/Link';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { ProposalStatusChip } from 'components/proposals/components/ProposalStatusBadge';
+import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import type { ProposalTask, ProposalTaskAction } from 'lib/proposal/getProposalTasks';
 import type { GetTasksResponse } from 'pages/api/tasks/list';
 
@@ -35,9 +36,11 @@ const SMALL_TABLE_CELL_WIDTH = 150;
  * Page only needs to be provided for proposal type proposals
  */
 export function ProposalTasksListRow({
-  proposalTask: { spaceDomain, pagePath, spaceName, pageTitle, action, status }
+  proposalTask: { spaceDomain, pagePath, spaceName, pageTitle, action, status },
+  onClose
 }: {
   proposalTask: ProposalTask;
+  onClose: () => void;
 }) {
   const proposalLink = `/${spaceDomain}/${pagePath}`;
   const workspaceProposals = `/${spaceDomain}/proposals`;
@@ -81,6 +84,7 @@ export function ProposalTasksListRow({
             }
           }}
           href={proposalLink}
+          onClick={onClose}
           variant={action ? 'contained' : 'outlined'}
         >
           {action ? ProposalActionRecord[action] : 'View'}
@@ -100,6 +104,7 @@ export default function ProposalTasksList({
   tasks: GetTasksResponse | undefined;
 }) {
   const proposals = tasks?.proposals ? [...tasks.proposals.unmarked, ...tasks.proposals.marked] : [];
+  const { onClose } = useSettingsDialog();
 
   useEffect(() => {
     async function main() {
@@ -162,7 +167,7 @@ export default function ProposalTasksList({
         </TableHead>
         <TableBody>
           {proposals.map((proposal) => (
-            <ProposalTasksListRow key={proposal.id} proposalTask={proposal} />
+            <ProposalTasksListRow key={proposal.id} proposalTask={proposal} onClose={onClose} />
           ))}
         </TableBody>
       </Table>

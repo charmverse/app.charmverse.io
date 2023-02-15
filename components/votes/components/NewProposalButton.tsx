@@ -13,7 +13,7 @@ import { TemplatesMenu } from 'components/common/TemplatesMenu';
 import useTasks from 'components/nexus/hooks/useTasks';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
-import useIsAdmin from 'hooks/useIsAdmin';
+import { useIsAdmin } from 'hooks/useIsAdmin';
 import { usePages } from 'hooks/usePages';
 import { useUser } from 'hooks/useUser';
 import type { PageMeta } from 'lib/pages';

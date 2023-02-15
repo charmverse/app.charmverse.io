@@ -9,9 +9,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 
 const StyledPageDeleteBanner = styled(Box)<{ card?: boolean }>`
-  position: fixed;
-  top: ${({ card }) => (card ? '50px' : '55px')};
-  width: ${({ card }) => (card ? '100%' : 'calc(100% - 300px)')};
+  width: 100%;
   z-index: var(--z-index-appBar);
   display: flex;
   justify-content: center;
@@ -47,7 +45,7 @@ export default function PageDeleteBanner({ pageId }: { pageId: string }) {
 
   return (
     <StyledPageDeleteBanner card={isShowingCard ? isShowingCard !== 'undefined' && isShowingCard.length !== 0 : false}>
-      <Box display='flex' gap={1} alignItems='center'>
+      <Box display='flex' gap={1} alignItems='center' data-test='archived-page-banner'>
         <div
           style={{
             color: 'white',
@@ -57,6 +55,7 @@ export default function PageDeleteBanner({ pageId }: { pageId: string }) {
           This page is in Trash
         </div>
         <Button
+          data-test='banner--restore-archived-page'
           color={'white' as any}
           disabled={isMutating}
           onClick={async () => {
@@ -69,6 +68,7 @@ export default function PageDeleteBanner({ pageId }: { pageId: string }) {
           Restore Page
         </Button>
         <Button
+          data-test='banner--permanently-delete'
           color={'white' as any}
           disabled={isMutating}
           onClick={async () => {

@@ -15,8 +15,7 @@ export function mapBountyPermissions(bountyPermissions: BountyPermission[]): Bou
     const targetGroup: TargetPermissionGroup | null =
       permission.public === true
         ? {
-            group: 'public',
-            id: undefined
+            group: 'public'
           }
         : permission.userId
         ? {

@@ -26,13 +26,21 @@ type Props = {
   nfts: NftData[] | undefined;
   isLoading?: boolean;
   emptyMessage?: string;
+  disableAutoSelectAvatarNft?: boolean;
 };
 
-export default function NftAvatarGallery({ onSelect, isSaving, nfts, isLoading, emptyMessage }: Props) {
+export default function NftAvatarGallery({
+  onSelect,
+  isSaving,
+  nfts,
+  isLoading,
+  emptyMessage,
+  disableAutoSelectAvatarNft = false
+}: Props) {
   const { user } = useUser();
 
   const getIsSelected = (nft: NftData) => {
-    if (!user) {
+    if (!user || disableAutoSelectAvatarNft) {
       return false;
     }
 

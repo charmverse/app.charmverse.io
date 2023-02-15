@@ -6,6 +6,7 @@ import { createBoard } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import { createBoardView } from 'lib/focalboard/boardView';
 import { createCard } from 'lib/focalboard/card';
+import { formatDate, formatDateTime } from 'lib/utilities/dates';
 import { createBlock, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 import { CsvExporter } from '../csvExporter';
@@ -98,7 +99,10 @@ describe('CsvExporter', () => {
       fields: viewFields
     };
 
-    const rows = CsvExporter.exportTableCsv(board, view, cards, mockIntl as IntlShape);
+    const rows = CsvExporter.exportTableCsv(board, view, cards, {
+      date: (date) => formatDate(date),
+      dateTime: (date) => formatDateTime(date)
+    });
 
     const rowsDecoded = decodeURIComponent(rows);
 

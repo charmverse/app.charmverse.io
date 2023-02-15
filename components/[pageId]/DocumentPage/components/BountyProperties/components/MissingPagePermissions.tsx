@@ -4,8 +4,8 @@ import type { BountyPermissionLevel } from '@prisma/client';
 
 import { useMembers } from 'hooks/useMembers';
 import useRoles from 'hooks/useRoles';
-import type { BountyPermissions } from 'lib/bounties';
-import type { PagePermissionMeta, TargetPermissionGroup } from 'lib/permissions/interfaces';
+import type { BountyPermissionGroup, BountyPermissions } from 'lib/bounties';
+import type { PagePermissionMeta } from 'lib/permissions/interfaces';
 import { isTruthy } from 'lib/utilities/types';
 
 interface Props {
@@ -23,7 +23,7 @@ export default function MissingPagePermissions({ bountyPermissions, pagePermissi
   // Compare each existing assignee against page permissions
   const assigneesMissingPermissions = visibleToSpace
     ? []
-    : (bountyPermissions[target] ?? []).filter(
+    : ((bountyPermissions[target] ?? []).filter(
         (bountyPermissionAssignee) =>
           bountyPermissionAssignee.group !== 'public' &&
           !pagePermissions.some((pp) => {
@@ -38,13 +38,13 @@ export default function MissingPagePermissions({ bountyPermissions, pagePermissi
               return pp.roleId === bountyPermissionAssignee.id;
             }
           })
-      );
+      ) as BountyPermissionGroup[]);
 
   if (assigneesMissingPermissions.length === 0) {
     return null;
   }
 
-  const missingPermissionsWithName: (TargetPermissionGroup & { name: string })[] = assigneesMissingPermissions.map(
+  const missingPermissionsWithName: (BountyPermissionGroup & { name: string })[] = assigneesMissingPermissions.map(
     (assignee) => {
       return {
         ...assignee,

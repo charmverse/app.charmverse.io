@@ -7,16 +7,24 @@ import type { CreatePostCommentInput, PostCommentWithVote } from 'lib/forums/com
 import { listPostComments } from 'lib/forums/comments/listPostComments';
 import { PostNotFoundError } from 'lib/forums/posts/errors';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
+import { requestOperations } from 'lib/permissions/requestOperations';
 import { withSessionRoute } from 'lib/session/withSession';
-import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireUser).get(listPostCommentsHandler).post(createPostCommentHandler);
+handler.get(listPostCommentsHandler).use(requireUser).post(createPostCommentHandler);
 
 async function listPostCommentsHandler(req: NextApiRequest, res: NextApiResponse<PostCommentWithVote[]>) {
   const { postId } = req.query as any as { postId: string };
-  const userId = req.session.user.id;
+
+  const userId = req.session.user?.id;
+
+  await requestOperations({
+    resourceType: 'post',
+    operations: ['view_post'],
+    resourceId: postId,
+    userId
+  });
 
   const postCommentsWithVotes = await listPostComments({ postId, userId });
 
@@ -37,14 +45,12 @@ async function createPostCommentHandler(req: NextApiRequest, res: NextApiRespons
     throw new PostNotFoundError(postId);
   }
 
-  const { error } = await hasAccessToSpace({
-    spaceId: post.spaceId,
+  await requestOperations({
+    resourceType: 'post',
+    operations: ['add_comment'],
+    resourceId: postId,
     userId
   });
-
-  if (error) {
-    throw error;
-  }
 
   const postComment = await createPostComment({ postId, userId, ...body });
 

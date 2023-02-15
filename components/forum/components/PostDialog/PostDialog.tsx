@@ -10,6 +10,7 @@ import Dialog from 'components/common/BoardEditor/focalboard/src/components/dial
 import Button from 'components/common/Button';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { PageActions } from 'components/common/PageActions';
+import { usePostPermissions } from 'components/forum/hooks/usePostPermissions';
 import { useUser } from 'hooks/useUser';
 import type { PostWithVotes } from 'lib/forums/posts/interfaces';
 
@@ -24,14 +25,18 @@ interface Props {
   newPostCategory?: PostCategory | null;
 }
 
-export default function PostDialog({ post, spaceId, onClose, open, newPostCategory }: Props) {
+export function PostDialog({ post, spaceId, onClose, open, newPostCategory }: Props) {
   const mounted = useRef(false);
   const popupState = usePopupState({ variant: 'popover', popupId: 'post-dialog' });
   const router = useRouter();
   const [formInputs, setFormInputs] = useState<FormInputs>(post ?? { title: '', content: null, contentText: '' });
   const [contentUpdated, setContentUpdated] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
-  const { user } = useUser();
+
+  const permissions = usePostPermissions({
+    postIdOrPath: post?.id as string,
+    isNewPost: !post
+  });
 
   // keep track if charmeditor is mounted. There is a bug that it calls the update method on closing the modal, but content is empty
   useEffect(() => {
@@ -84,6 +89,7 @@ export default function PostDialog({ post, spaceId, onClose, open, newPostCatego
         post ? (
           <Box display='flex' justifyContent='space-between'>
             <Button
+              data-test='open-post-as-page'
               size='small'
               color='secondary'
               href={relativePath}
@@ -101,7 +107,7 @@ export default function PostDialog({ post, spaceId, onClose, open, newPostCatego
         post && (
           <PageActions
             page={{ ...post, relativePath }}
-            onClickDelete={post.createdBy === user?.id ? deletePost : undefined}
+            onClickDelete={permissions?.delete_post ? deletePost : undefined}
           />
         )
       }

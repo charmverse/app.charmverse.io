@@ -1,7 +1,6 @@
 import styled from '@emotion/styled';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
-import { Autocomplete, Popper, Stack, TextField, Typography } from '@mui/material';
-import { Box } from '@mui/system';
+import { Autocomplete, IconButton, Popper, Stack, TextField, Typography, Box } from '@mui/material';
 import type { Space } from '@prisma/client';
 import { debounce } from 'lodash';
 import { useRouter } from 'next/router';
@@ -68,8 +67,12 @@ export function JoinDynamicSpaceForm({ goBack }: Props) {
   return (
     <Box sx={{ minHeight: '200px' }}>
       <br />
-      <FieldLabel sx={{ display: 'flex', justifyContent: 'center', gap: 2, pb: 1 }}>
-        {goBack && <ArrowBackIosNewIcon onClick={goBack} />}
+      <FieldLabel sx={{ display: 'flex', alignItems: 'center', gap: 1, pb: 1 }}>
+        {goBack && (
+          <IconButton size='small' onClick={goBack}>
+            <ArrowBackIosNewIcon />
+          </IconButton>
+        )}
         Enter a CharmVerse space name
       </FieldLabel>
       <Autocomplete<Space>

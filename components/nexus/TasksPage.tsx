@@ -1,20 +1,21 @@
 import { useTheme } from '@emotion/react';
-import styled from '@emotion/styled';
 import CommentIcon from '@mui/icons-material/Comment';
 import ForumIcon from '@mui/icons-material/Forum';
 import HowToVoteIcon from '@mui/icons-material/HowToVote';
 import KeyIcon from '@mui/icons-material/Key';
 import BountyIcon from '@mui/icons-material/RequestPageOutlined';
 import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
-import { Badge, Box, Divider, Grid, Tab, Tabs, Typography } from '@mui/material';
+import { Badge, Box, Tab, Tabs, Typography } from '@mui/material';
 import { useRouter } from 'next/router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
+import charmClient from 'charmClient';
+import Legend from 'components/settings/Legend';
+import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useUser } from 'hooks/useUser';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
 import BountyTasksList from './BountyTasksList';
-import NexusPageTitle from './components/NexusPageTitle';
 import NotifyMeButton from './components/NotifyMeButton';
 import SnoozeButton from './components/SnoozeButton';
 import DiscussionTasksList from './DiscussionTasksList';
@@ -22,11 +23,10 @@ import ForumTasksList from './ForumTasksList';
 import { GnosisTasksList } from './GnosisTasksList';
 import useTasks from './hooks/useTasks';
 import ProposalTasksList from './ProposalTasksList';
-import TasksPageHeader from './TasksPageHeader';
 import { VoteTasksList } from './VoteTasksList';
 
 export const tabStyles = {
-  mb: 2,
+  my: 2,
   minHeight: {
     xs: '34px',
     sm: '48px'
@@ -47,11 +47,6 @@ export const tabStyles = {
   }
 };
 
-const StyledTypography = styled(Typography)`
-  font-size: 24px;
-  font-weight: bold;
-`;
-
 const TASK_TABS = [
   { icon: <KeyIcon />, label: 'Multisig', type: 'multisig' },
   { icon: <BountyIcon />, label: 'Bounty', type: 'bounty' },
@@ -63,12 +58,21 @@ const TASK_TABS = [
 
 type TaskType = (typeof TASK_TABS)[number]['type'];
 
+export type TasksPageProps = { taskType?: TaskType };
+
 export default function TasksPage() {
   const router = useRouter();
   const { user } = useUser();
-  const [currentTaskType, setCurrentTaskType] = useState<TaskType>((router.query?.task ?? 'multisig') as TaskType);
+  const { pathProps } = useSettingsDialog();
+  // check from list of tabs to make sure task type is valid
+  const defaultTab = TASK_TABS.find((taskTab) => taskTab.type === pathProps?.taskType);
+  const [currentTaskType, setCurrentTaskType] = useState<TaskType>(defaultTab?.type ?? TASK_TABS[0].type);
   const { error, mutate: mutateTasks, tasks, gnosisTasks, gnosisTasksServerError, mutateGnosisTasks } = useTasks();
   const theme = useTheme();
+
+  useEffect(() => {
+    charmClient.track.trackAction('page_view', { type: 'nexus' });
+  }, []);
 
   const userNotificationState = user?.notificationState;
   const hasSnoozedNotifications =
@@ -90,27 +94,21 @@ export default function TasksPage() {
 
   return (
     <>
-      <NexusPageTitle />
-      <TasksPageHeader />
-      <Grid container spacing={{ xs: 1, sm: 3 }} sx={{ pt: 6, pb: 2 }}>
-        <Grid item xs={12} sm={6}>
-          <Box>
-            <StyledTypography>My Tasks</StyledTypography>
-          </Box>
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <Box
-            display='flex'
-            alignItems='center'
-            justifyContent={{ sm: 'flex-end', xs: 'flex-start' }}
-            gap={{ sm: 2, xs: 1 }}
-          >
-            <NotifyMeButton />
-            {currentTaskType === 'multisig' ? <SnoozeButton /> : null}
-          </Box>
-        </Grid>
-      </Grid>
-      <Divider sx={{ mb: 2 }} />
+      <Legend variant='inherit' variantMapping={{ inherit: 'div' }} display='flex' justifyContent='space-between'>
+        <Typography variant='h2' fontSize='inherit' fontWeight={700}>
+          My Tasks
+        </Typography>
+        <Box
+          display='flex'
+          alignItems='center'
+          justifyContent={{ sm: 'flex-end', xs: 'flex-start' }}
+          mr={{ md: 6 }}
+          gap={{ sm: 2, xs: 1 }}
+        >
+          <NotifyMeButton />
+          {currentTaskType === 'multisig' ? <SnoozeButton /> : null}
+        </Box>
+      </Legend>
       <Tabs
         sx={tabStyles}
         indicatorColor='primary'

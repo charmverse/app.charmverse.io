@@ -11,9 +11,11 @@ import { Container } from 'components/[pageId]/DocumentPage/DocumentPage';
 import Button from 'components/common/Button';
 import CharmEditor from 'components/common/CharmEditor';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEditor';
+import ErrorPage from 'components/common/errors/ErrorPage';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { ScrollableWindow } from 'components/common/PageLayout';
 import UserDisplay from 'components/common/UserDisplay';
+import { usePostPermissions } from 'components/forum/hooks/usePostPermissions';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useForumCategories } from 'hooks/useForumCategories';
 import { useMembers } from 'hooks/useMembers';
@@ -32,6 +34,7 @@ import { PostCategoryInput } from './components/PostCategoryInput';
 import { PostComment } from './components/PostComment';
 import { PostCommentForm } from './components/PostCommentForm';
 import { PostCommentSort } from './components/PostCommentSort';
+import { PostProposalBanner } from './components/PostProposalBanner';
 
 type Props = {
   spaceId: string;
@@ -83,7 +86,6 @@ function sortComments({ comments, sort }: { comments: PostCommentWithVoteAndChil
   }
   return comments;
 }
-
 export function PostPage({
   shouldUpdateTitleState = false,
   post,
@@ -98,12 +100,24 @@ export function PostPage({
 }: Props) {
   const currentSpace = useCurrentSpace();
   const { user } = useUser();
-  const { categories } = useForumCategories();
+  const { categories, getForumCategoryById } = useForumCategories();
+
+  // We should only set writeable categories for new post
   const [categoryId, setCategoryId] = useState(
-    post?.categoryId ??
-      newPostCategory?.id ??
-      categories.find((category) => category.id === currentSpace?.defaultPostCategoryId)?.id ??
-      null
+    (() => {
+      if (post?.categoryId) {
+        return post.categoryId;
+      } else if (newPostCategory?.id && getForumCategoryById(newPostCategory.id)?.permissions.create_post) {
+        return newPostCategory?.id;
+      } else if (
+        currentSpace?.defaultPostCategoryId &&
+        getForumCategoryById(currentSpace?.defaultPostCategoryId)?.permissions.create_post
+      ) {
+        return currentSpace?.defaultPostCategoryId;
+      } else {
+        return categories.find((category) => category.permissions.create_post)?.id;
+      }
+    })()
   );
   const { members } = useMembers();
   const router = useRouter();
@@ -114,6 +128,9 @@ export function PostPage({
   } = useSWR(post ? `${post.id}/comments` : null, () =>
     post ? charmClient.forum.listPostComments(post.id) : undefined
   );
+
+  const permissions = usePostPermissions({ postIdOrPath: post?.id as string, isNewPost: !post });
+
   usePreventReload(contentUpdated);
   const [, setTitleState] = usePageTitle();
   const [commentSort, setCommentSort] = useState<PostCommentSort>('latest');
@@ -172,10 +189,6 @@ export function PostPage({
       contentText: rawText
     });
   }
-
-  const isMyPost = !post || post.createdBy === user?.id;
-  const readOnly = !isMyPost;
-
   let disabledTooltip = '';
   if (!formInputs.title) {
     disabledTooltip = 'Title is required';
@@ -197,98 +210,116 @@ export function PostPage({
     return [];
   }, [postComments, post, commentSort]);
 
+  const canEdit = !!permissions?.edit_post;
+
+  if (!permissions) {
+    return <LoadingComponent />;
+  } else if (!permissions.view_post) {
+    return <ErrorPage message='Post not found' />;
+  }
+
   return (
-    <ScrollableWindow>
-      <Stack flexDirection='row'>
-        <Container top={50}>
-          <Box minHeight={300}>
-            <CharmEditor
-              pageType='post'
-              autoFocus={false}
-              readOnly={readOnly}
-              pageActionDisplay={null}
-              pageId={post?.id}
-              disablePageSpecificFeatures
-              enableVoting={false}
-              isContentControlled
-              key={user?.id}
-              content={formInputs.content as PageContent}
-              onContentChange={updatePostContent}
-            >
-              <PageTitleInput readOnly={readOnly} value={formInputs.title} onChange={updateTitle} />
-              {createdBy && <UserDisplay user={createdBy} avatarSize='small' fontSize='medium' mt={2} mb={3} />}
-              <Box my={2}>
-                <PostCategoryInput
-                  readOnly={readOnly}
-                  spaceId={spaceId}
-                  setCategoryId={updateCategoryId}
-                  categoryId={categoryId}
-                />
+    <>
+      {post?.proposalId && <PostProposalBanner proposalId={post.proposalId} />}
+      <ScrollableWindow>
+        <Stack>
+          <Stack flexDirection='row'>
+            <Container top={50}>
+              <Box minHeight={300} data-test='post-charmeditor'>
+                <CharmEditor
+                  pageType='post'
+                  autoFocus={false}
+                  readOnly={!canEdit}
+                  pageActionDisplay={null}
+                  pageId={post?.id}
+                  disablePageSpecificFeatures
+                  enableVoting={false}
+                  isContentControlled
+                  key={`${user?.id}.${post?.proposalId}.${canEdit}`}
+                  content={formInputs.content as PageContent}
+                  onContentChange={updatePostContent}
+                >
+                  <PageTitleInput readOnly={!canEdit} value={formInputs.title} onChange={updateTitle} />
+                  {createdBy && (
+                    <UserDisplay showMiniProfile user={createdBy} avatarSize='small' fontSize='medium' mt={2} mb={3} />
+                  )}
+                  <Box my={2}>
+                    <PostCategoryInput readOnly={!canEdit} setCategoryId={updateCategoryId} categoryId={categoryId} />
+                  </Box>
+                </CharmEditor>
               </Box>
-            </CharmEditor>
-          </Box>
-          {isMyPost && (
-            <Box display='flex' flexDirection='row' justifyContent='right' my={2}>
-              <Button
-                disabled={Boolean(disabledTooltip) || !contentUpdated}
-                disabledTooltip={disabledTooltip}
-                onClick={publishForumPost}
+              {canEdit && (
+                <Box display='flex' flexDirection='row' justifyContent='right' my={2}>
+                  <Button
+                    disabled={Boolean(disabledTooltip) || !contentUpdated}
+                    disabledTooltip={disabledTooltip}
+                    onClick={publishForumPost}
+                  >
+                    {post ? 'Update' : 'Post'}
+                  </Button>
+                </Box>
+              )}
+              {post && !!permissions?.add_comment && (
+                <Box my={2} data-test='new-top-level-post-comment'>
+                  <PostCommentForm setPostComments={setPostComments} postId={post.id} />
+                </Box>
+              )}
+              <Divider
+                sx={{
+                  my: 2
+                }}
+              />
+              {isLoading ? (
+                <Box height={100}>
+                  <LoadingComponent size={24} isLoading label='Fetching comments' />
+                </Box>
+              ) : (
+                post && (
+                  <>
+                    {topLevelComments.length > 0 && (
+                      <Stack gap={1}>
+                        <PostCommentSort commentSort={commentSort} setCommentSort={setCommentSort} />
+                        {topLevelComments.map((comment) => (
+                          <PostComment
+                            post={post}
+                            permissions={permissions}
+                            setPostComments={setPostComments}
+                            comment={comment}
+                            key={comment.id}
+                          />
+                        ))}
+                      </Stack>
+                    )}
+                    {topLevelComments.length === 0 && (
+                      <Stack gap={1} alignItems='center' my={1}>
+                        <CommentIcon color='secondary' fontSize='large' />
+                        <Typography color='secondary' variant='h6'>
+                          No Comments Yet
+                        </Typography>
+                        {permissions?.add_comment && (
+                          <Typography color='secondary'>Be the first to share what you think!</Typography>
+                        )}
+                      </Stack>
+                    )}
+                  </>
+                )
+              )}
+            </Container>
+            {post && showOtherCategoryPosts && (
+              <Box
+                width='25%'
+                mr={8}
+                display={{
+                  xs: 'none',
+                  md: 'initial'
+                }}
               >
-                {post ? 'Update' : 'Post'}
-              </Button>
-            </Box>
-          )}
-          {post && (
-            <Box my={2}>
-              <PostCommentForm setPostComments={setPostComments} postId={post.id} />
-            </Box>
-          )}
-          <Divider
-            sx={{
-              my: 2
-            }}
-          />
-          {isLoading ? (
-            <Box height={100}>
-              <LoadingComponent size={24} isLoading label='Fetching comments' />
-            </Box>
-          ) : (
-            post && (
-              <>
-                {topLevelComments.length > 0 && (
-                  <Stack gap={1}>
-                    <PostCommentSort commentSort={commentSort} setCommentSort={setCommentSort} />
-                    {topLevelComments.map((comment) => (
-                      <PostComment setPostComments={setPostComments} comment={comment} key={comment.id} />
-                    ))}
-                  </Stack>
-                )}
-                {topLevelComments.length === 0 && (
-                  <Stack gap={1} alignItems='center' my={1}>
-                    <CommentIcon color='secondary' fontSize='large' />
-                    <Typography color='secondary' variant='h6'>
-                      No Comments Yet
-                    </Typography>
-                    <Typography color='secondary'>Be the first to share what you think!</Typography>
-                  </Stack>
-                )}
-              </>
-            )
-          )}
-        </Container>
-        {post && showOtherCategoryPosts && (
-          <Box
-            width='25%'
-            mr={8}
-            display={{
-              xs: 'none',
-              md: 'initial'
-            }}
-          >
-            <CategoryPosts postId={post.id} categoryId={post.categoryId} />
-          </Box>
-        )}
-      </Stack>
-    </ScrollableWindow>
+                <CategoryPosts postId={post.id} categoryId={post.categoryId} />
+              </Box>
+            )}
+          </Stack>
+        </Stack>
+      </ScrollableWindow>
+    </>
   );
 }

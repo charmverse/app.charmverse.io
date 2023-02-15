@@ -1,22 +1,5 @@
 import type { Role, Space, TokenGate, TokenGateToRole } from '@prisma/client';
-import type { AuthSig, Chain } from 'lit-js-sdk';
-
-/**
- * @extraData Contains the tokenGate Id as stringified JSON
- * @orgId The spaceId
- */
-export interface LitJwtPayload {
-  iss: 'LIT';
-  sub: string;
-  chain: Chain;
-  iat: number;
-  exp: number;
-  baseUrl: 'https://app.charmverse.io';
-  path: '0.5762676518678522';
-  orgId: '73ff04b5-6475-4291-a7c6-262f18598a1a';
-  role: 'member';
-  extraData: '{"tokenGateId":"bd177a2f-c980-4595-8079-d4bee95a7924"}';
-}
+import type { AuthSig } from 'lit-js-sdk';
 
 export type TokenGateJoinType = 'public_bounty_token_gate' | 'token_gate';
 

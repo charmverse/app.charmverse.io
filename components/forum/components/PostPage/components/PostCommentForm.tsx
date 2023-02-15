@@ -1,5 +1,4 @@
-import { Stack } from '@mui/material';
-import { Box } from '@mui/system';
+import { Stack, Box } from '@mui/material';
 import { useState } from 'react';
 import type { KeyedMutator } from 'swr';
 
@@ -52,17 +51,7 @@ export function PostCommentForm({
 
   return (
     <Stack gap={1}>
-      <Box
-        display='flex'
-        gap={1}
-        flexDirection='row'
-        alignItems='flex-start'
-        sx={{
-          'div.ProseMirror.bangle-editor': {
-            paddingLeft: '10px !important'
-          }
-        }}
-      >
+      <Box display='flex' gap={1} flexDirection='row' alignItems='flex-start'>
         <UserDisplay user={user} hideName={true} />
         <CharmEditor
           disableRowHandles
@@ -79,6 +68,7 @@ export function PostCommentForm({
         />
       </Box>
       <Button
+        data-test='post-comment-button'
         sx={{
           alignSelf: 'flex-end'
         }}

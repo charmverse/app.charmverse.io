@@ -1,6 +1,8 @@
+import type { PostCategory } from '@prisma/client';
 import { v4 } from 'uuid';
 
 import { prisma } from 'db';
+import { getPostCategoryPath } from 'lib/forums/categories/getPostCategoryPath';
 import { createPostComment } from 'lib/forums/comments/createPostComment';
 import type { CreatePostCommentInput } from 'lib/forums/comments/interface';
 
@@ -10,16 +12,25 @@ export async function generatePostCategory({
 }: {
   spaceId: string;
   name?: string;
-}) {
+}): Promise<Required<PostCategory>> {
   return prisma.postCategory.create({
     data: {
       name,
-      spaceId
+      spaceId,
+      path: getPostCategoryPath(name)
     }
   });
 }
 
-export async function generatePostWithComment({ userId, spaceId }: { spaceId: string; userId: string }) {
+export async function generatePostWithComment({
+  userId,
+  spaceId,
+  categoryId
+}: {
+  spaceId: string;
+  userId: string;
+  categoryId?: string;
+}) {
   const commentInput: CreatePostCommentInput = {
     content: {
       type: ''
@@ -30,7 +41,8 @@ export async function generatePostWithComment({ userId, spaceId }: { spaceId: st
 
   const post = await generateForumPost({
     spaceId,
-    userId
+    userId,
+    categoryId
   });
 
   const postComment = await createPostComment({
@@ -50,13 +62,17 @@ export async function generateForumPost({
   userId,
   spaceId,
   path = `post-${v4()}`,
-  title = 'Test post'
+  title = 'Test post',
+  content,
+  contentText
 }: {
   categoryId?: string;
   userId: string;
   spaceId: string;
   path?: string;
   title?: string;
+  content?: any;
+  contentText?: string;
 }) {
   if (!categoryId) {
     const category = await generatePostCategory({ spaceId });
@@ -66,8 +82,8 @@ export async function generateForumPost({
     data: {
       title,
       path,
-      contentText: '',
-      content: {
+      contentText: contentText ?? '',
+      content: content ?? {
         type: 'doc',
         content: []
       },

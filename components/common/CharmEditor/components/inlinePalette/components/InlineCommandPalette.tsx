@@ -8,7 +8,7 @@ import MenuItem from '@mui/material/MenuItem';
 import MenuList from '@mui/material/MenuList';
 import Paper from '@mui/material/Paper';
 import Popper from '@mui/material/Popper';
-import type { PopupState } from 'material-ui-popup-state/core';
+import type { PopupState } from 'material-ui-popup-state/hooks';
 import type { ReactNode } from 'react';
 import { useMemo, useCallback, useEffect, useState } from 'react';
 

@@ -24,6 +24,7 @@ import { useAppDispatch } from 'components/common/BoardEditor/focalboard/src/sto
 import { initialLoad } from 'components/common/BoardEditor/focalboard/src/store/initialLoad';
 import { ScrollableModal as Modal } from 'components/common/Modal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { usePageIdFromPath } from 'hooks/usePageFromPath';
 import { usePages } from 'hooks/usePages';
 import { fancyTrim } from 'lib/utilities/strings';
 
@@ -47,6 +48,7 @@ const ArchivedPageItem = memo<{
 
   return (
     <MenuItem
+      data-test={`archived-page-${archivedPage.id}`}
       component={Link}
       href={`/${space?.domain}/${archivedPage.path}`}
       key={archivedPage.id}
@@ -79,7 +81,8 @@ export default function TrashModal({ onClose, isOpen }: { onClose: () => void; i
   const [isMutating, setIsMutating] = useState(false);
   const [searchText, setSearchText] = useState('');
   const space = useCurrentSpace();
-  const { pages, getPagePermissions, mutatePagesRemove, currentPageId } = usePages();
+  const currentPageId = usePageIdFromPath();
+  const { pages, getPagePermissions, mutatePagesRemove } = usePages();
   const dispatch = useAppDispatch();
   const router = useRouter();
 
@@ -141,7 +144,7 @@ export default function TrashModal({ onClose, isOpen }: { onClose: () => void; i
 
     mutatePagesRemove(deletePageIds);
     // If the current page has been deleted permanently route to the first alive page
-    if (deletePageIds.includes(currentPageId)) {
+    if (currentPageId && deletePageIds.includes(currentPageId)) {
       router.push(
         `/${router.query.domain}/${
           Object.values(pages).find((page) => page?.type !== 'card' && page?.deletedAt === null)?.path
@@ -181,6 +184,7 @@ export default function TrashModal({ onClose, isOpen }: { onClose: () => void; i
   // Remove the pages you dont have delete access of
   return (
     <Modal
+      data-test='trash-modal'
       open={isOpen}
       onClose={onClose}
       title={

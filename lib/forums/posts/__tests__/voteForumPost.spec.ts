@@ -1,8 +1,7 @@
 import type { Space, User } from '@prisma/client';
 
-import { createPostCategory } from 'lib/forums/categories/createPostCategory';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { generateForumPost } from 'testing/utils/forums';
+import { generatePostCategory, generateForumPost } from 'testing/utils/forums';
 
 import { createForumPost } from '../createForumPost';
 import { getPostVote } from '../getPostVote';
@@ -19,7 +18,7 @@ beforeAll(async () => {
 
 describe('voteForumPost', () => {
   it('should create page vote if upvoted is true and return correct vote information', async () => {
-    const category1 = await createPostCategory({ name: 'First', spaceId: space.id });
+    const category1 = await generatePostCategory({ name: 'First', spaceId: space.id });
 
     const createdPost = await createForumPost({
       content: {},

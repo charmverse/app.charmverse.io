@@ -29,6 +29,10 @@ function IframeComponent({ readOnly, node, getPos, view, deleteNode, selected, u
 
   const config = embeds[attrs.type as EmbedType] || embeds.embed;
 
+  useEffect(() => {
+    setState({ ...attrs });
+  }, [attrs.height, attrs.width]);
+
   // If there are no source for the node, return the image select component
   if (!attrs.src) {
     if (readOnly) {
@@ -98,10 +102,6 @@ function IframeComponent({ readOnly, node, getPos, view, deleteNode, selected, u
     );
   }
 
-  useEffect(() => {
-    setState({ ...attrs });
-  }, [attrs.height, attrs.width]);
-
   const embeddableSrc = (config as Embed).convertURLToEmbed?.(attrs.src) || attrs.src;
 
   if (readOnly) {
@@ -117,7 +117,7 @@ function IframeComponent({ readOnly, node, getPos, view, deleteNode, selected, u
     );
   }
   return (
-    <BlockAligner onDelete={deleteNode}>
+    <BlockAligner readOnly={readOnly} onDelete={deleteNode}>
       <VerticalResizer
         onResizeStop={(_, data) => {
           // save to db

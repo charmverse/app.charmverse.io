@@ -8,6 +8,7 @@ import {
   generateUserAndSpaceWithApiToken
 } from 'testing/setupDatabase';
 
+import type { BountyPermissionGroup } from '../bounties';
 import { queryBountyPermissions } from '../bounties';
 import { compareBountyPagePermissions } from '../compareBountyPagePermissions';
 
@@ -88,12 +89,18 @@ describe('compareBountyPagePermissions', () => {
     });
 
     expect(intersection.missingPermissions.length).toBe(1);
-    expect(intersection.missingPermissions[0].id).toBe(firstUser.id);
+    expect((intersection.missingPermissions[0] as BountyPermissionGroup).id).toBe(firstUser.id);
 
     expect(intersection.hasPermissions.length).toBe(2);
-    expect(intersection.hasPermissions.some((assignee) => assignee.id === role.id)).toBe(true);
-    expect(intersection.hasPermissions.some((assignee) => assignee.id === secondUser.id)).toBe(true);
+    expect(intersection.hasPermissions.some((assignee) => (assignee as BountyPermissionGroup).id === role.id)).toBe(
+      true
+    );
+    expect(
+      intersection.hasPermissions.some((assignee) => (assignee as BountyPermissionGroup).id === secondUser.id)
+    ).toBe(true);
     // Third user was never explicitly assigned a permission, only via their role. So they shouldn't show up
-    expect(intersection.hasPermissions.every((assignee) => assignee.id !== thirdUser.id)).toBe(true);
+    expect(
+      intersection.hasPermissions.every((assignee) => (assignee as BountyPermissionGroup).id !== thirdUser.id)
+    ).toBe(true);
   });
 });

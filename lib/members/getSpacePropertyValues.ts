@@ -19,5 +19,5 @@ export async function getSpacePropertyValues({
 
   const groupedResults = await getSpacesPropertyValues({ memberId, requestingUserId, spaceId });
 
-  return groupedResults[0].properties || [];
+  return groupedResults[0]?.properties || [];
 }

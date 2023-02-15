@@ -1,4 +1,3 @@
-import type { Post } from '@prisma/client';
 import { useEffect, useState } from 'react';
 
 import charmClient from 'charmClient';
@@ -6,7 +5,7 @@ import type { PostWithVotes } from 'lib/forums/posts/interfaces';
 import log from 'lib/log';
 
 import { usePostDialog } from './hooks/usePostDialog';
-import PostDialog from './PostDialog';
+import { PostDialog } from './PostDialog';
 
 // a wrapper of page dialog that uses usePageDialogHook
 export default function PostDialogGlobal() {
@@ -21,7 +20,7 @@ export default function PostDialogGlobal() {
   useEffect(() => {
     if (postId) {
       charmClient.forum
-        .getForumPost(postId)
+        .getForumPost({ postIdOrPath: postId })
         .then((_post) => {
           setPost(_post);
         })

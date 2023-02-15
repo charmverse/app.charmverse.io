@@ -7,23 +7,22 @@ import Head from 'next/head';
 import * as React from 'react';
 import { useMemo, useState } from 'react';
 
+import { DocumentPageProviders } from 'components/[pageId]/DocumentPage/DocumentPageProviders';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { PageDialogProvider } from 'components/common/PageDialog/hooks/usePageDialog';
 import PageDialogGlobalModal from 'components/common/PageDialog/PageDialogGlobal';
 import { SharedPageLayout } from 'components/common/PageLayout/SharedPageLayout';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { FocalboardViewsProvider } from 'hooks/useFocalboardViews';
 import { useLocalStorage } from 'hooks/useLocalStorage';
-import { useMobileSidebar } from 'hooks/useMobileSidebar';
-import { PageActionDisplayProvider } from 'hooks/usePageActionDisplay';
+import { useSmallScreen } from 'hooks/useMediaScreens';
 import { useResize } from 'hooks/useResize';
 import { useSharedPage } from 'hooks/useSharedPage';
-import { ThreadsProvider } from 'hooks/useThreads';
 import { useUser } from 'hooks/useUser';
-import { VotesProvider } from 'hooks/useVotes';
 import { useWindowSize } from 'hooks/useWindowSize';
 
 import CurrentPageFavicon from './components/CurrentPageFavicon';
-import Header, { headerHeight } from './components/Header';
+import { Header, headerHeight } from './components/Header/Header';
 import PageContainer from './components/PageContainer';
 import Sidebar from './components/Sidebar';
 
@@ -64,7 +63,6 @@ export const AppBar = styled(MuiAppBar, {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen
     })};
-
   ${({ open, sidebarWidth, theme }) =>
     open
       ? `
@@ -118,7 +116,6 @@ const DraggableHandle = styled.div<{ isActive?: boolean; disabled?: boolean }>`
   border-right: 1px solid ${({ theme }) => theme.palette.divider};
   transition: all 0.2s ease-in-out;
   background: transparent;
-
   ${({ disabled, theme }) =>
     !disabled &&
     `&:hover {
@@ -126,27 +123,21 @@ const DraggableHandle = styled.div<{ isActive?: boolean; disabled?: boolean }>`
         }
       cursor: col-resize;
     `}
-
   ${({ isActive, theme }) => (isActive ? `border-right: 3px solid ${theme.palette.primary.main}` : '')}
 `;
 
 interface PageLayoutProps {
   children: React.ReactNode;
-  sidebar?: (p: { closeSidebar: () => void }) => JSX.Element;
-  sidebarWidth?: number;
 }
 
-function PageLayout({ sidebarWidth = 300, children, sidebar: SidebarOverride }: PageLayoutProps) {
+function PageLayout({ children }: PageLayoutProps) {
   const { width } = useWindowSize();
-  const isMobileSidebar = useMobileSidebar();
+  const isMobile = useSmallScreen();
 
-  let mobileSidebarWidth = width ? Math.min(width * 0.85, MAX_SIDEBAR_WIDTH) : sidebarWidth;
-  if (SidebarOverride) {
-    mobileSidebarWidth = sidebarWidth;
-  }
+  const mobileSidebarWidth = width ? Math.min(width * 0.85, MAX_SIDEBAR_WIDTH) : 0;
 
-  const [storageOpen, setStorageOpen] = useLocalStorage('leftSidebar', !isMobileSidebar);
-  const [sidebarStorageWidth, setSidebarStorageWidth] = useLocalStorage('leftSidebarWidth', sidebarWidth);
+  const [storageOpen, setStorageOpen] = useLocalStorage('leftSidebar', !isMobile);
+  const [sidebarStorageWidth, setSidebarStorageWidth] = useLocalStorage('leftSidebarWidth', 300);
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const {
@@ -160,42 +151,46 @@ function PageLayout({ sidebarWidth = 300, children, sidebar: SidebarOverride }: 
     onResize: setSidebarStorageWidth
   });
   const { user } = useUser();
-  const { hasSharedPageAccess, accessChecked, publicPage } = useSharedPage();
-  const open = isMobileSidebar ? mobileOpen : storageOpen;
+  const space = useCurrentSpace();
 
-  let displaySidebarWidth = SidebarOverride ? sidebarWidth : resizableSidebarWidth || sidebarWidth;
-  if (isMobileSidebar) {
+  const showSpaceMemberView = !!space && !!user && !!user?.spaceRoles.some((sr) => sr.spaceId === space.id);
+
+  const { accessChecked, publicPage } = useSharedPage();
+  const open = isMobile ? mobileOpen : storageOpen;
+
+  let displaySidebarWidth = resizableSidebarWidth;
+  if (isMobile || !user) {
     displaySidebarWidth = 0;
   }
 
   const handleDrawerOpen = React.useCallback(() => {
-    if (isMobileSidebar) {
+    if (isMobile) {
       setMobileOpen(true);
     } else {
       setStorageOpen(true);
     }
-  }, [isMobileSidebar]);
+  }, [isMobile]);
 
   const handleDrawerClose = React.useCallback(() => {
-    if (isMobileSidebar) {
+    if (isMobile) {
       setMobileOpen(false);
     } else {
       setStorageOpen(false);
     }
-  }, [isMobileSidebar]);
+  }, [isMobile]);
 
   const drawerContent = useMemo(
     () =>
-      SidebarOverride ? (
-        <SidebarOverride closeSidebar={handleDrawerClose} />
+      !user ? (
+        <div></div>
       ) : (
         <Sidebar
           closeSidebar={handleDrawerClose}
           favorites={user?.favorites || []}
-          navAction={isMobileSidebar ? handleDrawerClose : undefined}
+          navAction={isMobile ? handleDrawerClose : undefined}
         />
       ),
-    [handleDrawerClose, user?.favorites, isMobileSidebar]
+    [handleDrawerClose, !!user, isMobile]
   );
 
   if (!accessChecked) {
@@ -206,7 +201,7 @@ function PageLayout({ sidebarWidth = 300, children, sidebar: SidebarOverride }: 
     );
   }
 
-  if (hasSharedPageAccess) {
+  if (!showSpaceMemberView) {
     return <SharedPageLayout basePageId={publicPage?.page?.id}>{children || null}</SharedPageLayout>;
   }
 
@@ -217,56 +212,43 @@ function PageLayout({ sidebarWidth = 300, children, sidebar: SidebarOverride }: 
       </Head>
       <LayoutContainer data-test='space-page-layout'>
         <FocalboardViewsProvider>
-          <ThreadsProvider>
-            <VotesProvider>
-              <PageDialogProvider>
-                <PageActionDisplayProvider>
-                  {open !== null && (
-                    <>
-                      <AppBar open={open} sidebarWidth={displaySidebarWidth} position='fixed'>
-                        <Header open={open} openSidebar={handleDrawerOpen} />
-                      </AppBar>
-                      {isMobileSidebar ? (
-                        <MuiDrawer
-                          open={open}
-                          variant='temporary'
-                          onClose={handleDrawerClose}
-                          ModalProps={{
-                            keepMounted: true
-                          }}
-                        >
-                          <Box width={mobileSidebarWidth} minHeight='100vh'>
-                            {drawerContent}
-                          </Box>
-                        </MuiDrawer>
-                      ) : (
-                        <Drawer sidebarWidth={displaySidebarWidth} open={open} variant='permanent'>
-                          {drawerContent}
-
-                          <Tooltip
-                            title={!!SidebarOverride || isResizing ? '' : 'Drag to resize'}
-                            placement='right'
-                            followCursor
-                          >
-                            <DraggableHandle
-                              onMouseDown={(e) => enableResize(e)}
-                              isActive={isResizing}
-                              disabled={!!SidebarOverride}
-                            />
-                          </Tooltip>
-                        </Drawer>
-                      )}
-                    </>
+          <DocumentPageProviders>
+            <PageDialogProvider>
+              {open !== null && (
+                <>
+                  <AppBar open={open} sidebarWidth={displaySidebarWidth} position='fixed'>
+                    <Header open={open} openSidebar={handleDrawerOpen} />
+                  </AppBar>
+                  {isMobile ? (
+                    <MuiDrawer
+                      open={open}
+                      variant='temporary'
+                      onClose={handleDrawerClose}
+                      ModalProps={{
+                        keepMounted: true
+                      }}
+                    >
+                      <Box width={mobileSidebarWidth} minHeight='100vh'>
+                        {drawerContent}
+                      </Box>
+                    </MuiDrawer>
+                  ) : (
+                    <Drawer sidebarWidth={displaySidebarWidth} open={open} variant='permanent'>
+                      {drawerContent}
+                      <Tooltip title={!user || isResizing ? '' : 'Drag to resize'} placement='right' followCursor>
+                        <DraggableHandle onMouseDown={(e) => enableResize(e)} isActive={isResizing} disabled={!user} />
+                      </Tooltip>
+                    </Drawer>
                   )}
-                  <PageContainer>
-                    <HeaderSpacer />
-                    {children}
-                  </PageContainer>
-                  <PageDialogGlobalModal />
-                </PageActionDisplayProvider>
-              </PageDialogProvider>
-            </VotesProvider>
-          </ThreadsProvider>
+                </>
+              )}
+              <PageContainer>
+                <HeaderSpacer />
+                {children}
+              </PageContainer>
+              <PageDialogGlobalModal />
+            </PageDialogProvider>
+          </DocumentPageProviders>
         </FocalboardViewsProvider>
       </LayoutContainer>
     </>

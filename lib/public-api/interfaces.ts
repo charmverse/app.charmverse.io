@@ -318,6 +318,9 @@ export interface CreateWorkspaceRequestBody {
   adminDiscordUserId?: string;
   xpsEngineId?: string;
   adminWalletAddress?: string;
+  adminAvatar?: string;
+  adminUsername?: string;
+  webhookUrl?: string;
   avatar?: string;
 }
 
@@ -345,4 +348,13 @@ export interface CreateWorkspaceResponseBody {
   id: string;
   spaceUrl: string;
   joinUrl: string;
+  webhookSigningSecret?: string;
 }
+
+export type UserProfile = {
+  id: string;
+  avatar: string | null;
+  wallet: string;
+  username: string;
+  email: string;
+};

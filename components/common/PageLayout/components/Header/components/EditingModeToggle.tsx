@@ -5,8 +5,8 @@ import PopupState, { bindMenu, bindTrigger } from 'material-ui-popup-state';
 import { memo } from 'react';
 
 import Button from 'components/common/Button';
-import { usePrimaryCharmEditor, EDIT_MODE_CONFIG } from 'hooks/usePrimaryCharmEditor';
-import type { EditMode } from 'hooks/usePrimaryCharmEditor';
+import { useCharmEditor, EDIT_MODE_CONFIG } from 'hooks/useCharmEditor';
+import type { EditMode } from 'hooks/useCharmEditor';
 
 const editModeConfig = {
   editing: {
@@ -24,7 +24,7 @@ const editModeConfig = {
 } as const;
 
 function EditModeToggle() {
-  const { availableEditModes, editMode, setPageProps } = usePrimaryCharmEditor();
+  const { availableEditModes, editMode, setPageProps } = useCharmEditor();
   const isLargeScreen = useMediaQuery((theme: Theme) => theme.breakpoints.up('md'));
 
   function setMode(mode: EditMode) {

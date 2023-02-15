@@ -4,22 +4,11 @@ import { v4, validate } from 'uuid';
 import { prisma } from 'db';
 import type { PageNodeWithChildren, PageNodeWithPermissions } from 'lib/pages';
 import { multiResolvePageTree } from 'lib/pages/server/resolvePageTree';
-import { hasSameOrMorePermissions, IPagePermissionWithSource } from 'lib/permissions/pages';
-
-import { DataNotFoundError, InvalidInputError } from '../utilities/errors';
+import { hasSameOrMorePermissions } from 'lib/permissions/pages';
+import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
 
 import type { PublicBountyToggle } from './interfaces';
 
-async function generatePublicBountyPermissionArgs({
-  publicBountyBoard,
-  spaceId
-}: PublicBountyToggle<false>): Promise<[Prisma.PagePermissionDeleteManyArgs | null]>;
-async function generatePublicBountyPermissionArgs({
-  publicBountyBoard,
-  spaceId
-}: PublicBountyToggle<true>): Promise<
-  [Prisma.PagePermissionDeleteManyArgs | null, Prisma.PagePermissionCreateManyArgs, Prisma.PagePermissionCreateManyArgs]
->;
 async function generatePublicBountyPermissionArgs({
   publicBountyBoard,
   spaceId
@@ -150,6 +139,11 @@ export async function togglePublicBounties({ spaceId, publicBountyBoard }: Publi
     throw new InvalidInputError('Please provide a valid space ID.');
   }
 
+  const [deleteArgs, createArgs, childCreateArgs] = await generatePublicBountyPermissionArgs({
+    publicBountyBoard,
+    spaceId
+  });
+
   try {
     const spaceAfterUpdate = await prisma.$transaction(async (tx) => {
       const updatedSpace = await tx.space.update({
@@ -160,11 +154,6 @@ export async function togglePublicBounties({ spaceId, publicBountyBoard }: Publi
       });
 
       if (publicBountyBoard === true) {
-        const [deleteArgs, createArgs, childCreateArgs] = await generatePublicBountyPermissionArgs({
-          publicBountyBoard,
-          spaceId
-        });
-
         if (deleteArgs) {
           await tx.pagePermission.deleteMany(deleteArgs);
         }
@@ -172,19 +161,18 @@ export async function togglePublicBounties({ spaceId, publicBountyBoard }: Publi
         await tx.pagePermission.createMany(createArgs);
 
         await tx.pagePermission.createMany(childCreateArgs);
-      } else {
-        const [deleteArgs] = await generatePublicBountyPermissionArgs({ publicBountyBoard, spaceId });
-
-        if (deleteArgs) {
-          await tx.pagePermission.deleteMany(deleteArgs);
-        }
+      } else if (deleteArgs) {
+        await tx.pagePermission.deleteMany(deleteArgs);
       }
 
       return updatedSpace;
     });
 
     return spaceAfterUpdate;
-  } catch (err) {
-    throw new DataNotFoundError(`Space ${spaceId} not found.`);
+  } catch (error) {
+    if ((error as Prisma.PrismaClientKnownRequestError).code === 'P2025') {
+      throw new DataNotFoundError('Space not found.');
+    }
+    throw error;
   }
 }

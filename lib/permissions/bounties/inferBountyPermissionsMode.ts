@@ -1,5 +1,7 @@
 import { typedKeys } from 'lib/utilities/objects';
 
+import type { TargetPermissionGroup } from '../interfaces';
+
 import type { BountyPermissions, InferredBountyPermissionMode } from './interfaces';
 
 // Utility for inferring if a bounty is for a space or for roles
@@ -28,7 +30,7 @@ export function inferBountyPermissionsMode(permissions: Partial<BountyPermission
     const rolePermissions = permissions[permissionLevel]?.filter((p) => p.group === 'role') ?? [];
 
     rolePermissions.forEach((p) => {
-      foundRoles.push(p.id as string);
+      foundRoles.push((p as TargetPermissionGroup<'role'>).id as string);
     });
   }
 

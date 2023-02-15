@@ -27,7 +27,7 @@ jobs:
       - name: checkout the files
         uses: actions/checkout@v3
 
-      - name: Install dependencies and build app
+      - name: Install dependencies
         uses: ./.github/actions/install
 
       - name: destroy the stack on AWS

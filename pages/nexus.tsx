@@ -1,21 +1,21 @@
-import type { ReactElement } from 'react';
+import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 
-import charmClient from 'charmClient';
-import TasksList from 'components/nexus';
-import PageLayout from 'components/nexus/components/NexusLayout';
-import { setTitle } from 'hooks/usePageTitle';
+import type { PathProps } from 'hooks/useSettingsDialog';
+import { useSettingsDialog } from 'hooks/useSettingsDialog';
+import log from 'lib/log';
 
-export default function TasksPage() {
-  setTitle('My Nexus');
+export default function NexusRedirect() {
+  const { onClick } = useSettingsDialog();
+  const router = useRouter();
 
   useEffect(() => {
-    charmClient.track.trackAction('page_view', { type: 'nexus' });
-  }, []);
+    if (router.isReady) {
+      log.info('Show tasks to user');
+      router.push('/');
+      onClick('notifications', { taskType: router.query.task } as PathProps);
+    }
+  }, [router.isReady]);
 
-  return <TasksList />;
+  return null;
 }
-
-TasksPage.getLayout = (page: ReactElement) => {
-  return <PageLayout>{page}</PageLayout>;
-};

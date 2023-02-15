@@ -13,6 +13,7 @@ import { useState } from 'react';
 import charmClient from 'charmClient';
 import UserDisplay from 'components/common/UserDisplay';
 import { usePostDialog } from 'components/forum/components/PostDialog/hooks/usePostDialog';
+import { usePostPermissions } from 'components/forum/hooks/usePostPermissions';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { ForumPostMeta, ForumVotes } from 'lib/forums/posts/interfaces';
 import type { Member } from 'lib/members/interfaces';
@@ -41,6 +42,8 @@ export function PostCard({ post, user, category }: ForumPostProps) {
   const router = useRouter();
   const { showPost } = usePostDialog();
   const currentSpace = useCurrentSpace();
+
+  const permissions = usePostPermissions({ postIdOrPath: post.id });
 
   async function voteOnPost(newUpvotedStatus: boolean | null) {
     await charmClient.forum.voteOnPost({
@@ -79,7 +82,7 @@ export function PostCard({ post, user, category }: ForumPostProps) {
   }
 
   return (
-    <Card variant='outlined' sx={{ mb: '15px' }}>
+    <Card data-test={`forum-post-card-${post.id}`} variant='outlined' sx={{ mb: '15px' }}>
       <CardActionArea
         component='div'
         onClick={() => {
@@ -126,7 +129,7 @@ export function PostCard({ post, user, category }: ForumPostProps) {
                 <Typography variant='body2'>{totalComments}</Typography>
               </Stack>
             </Stack>
-            <ForumVote onVote={voteOnPost} votes={pagePost.votes} />
+            <ForumVote permissions={permissions} onVote={voteOnPost} votes={pagePost.votes} />
           </Box>
         </CardContent>
       </CardActionArea>

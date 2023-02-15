@@ -9,6 +9,7 @@ import { useIntl } from 'react-intl';
 
 import { PageIcon } from 'components/common/PageLayout/components/PageIcon';
 import { usePages } from 'hooks/usePages';
+import { useUserPreferences } from 'hooks/useUserPreferences';
 import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
@@ -63,6 +64,7 @@ function CalendarFullView(props: Props): JSX.Element | null {
   const intl = useIntl();
   const { board, cards, activeView, dateDisplayProperty, readOnly } = props;
   const isSelectable = !readOnly;
+  const { userPreferences } = useUserPreferences();
 
   const visiblePropertyTemplates = useMemo(
     () =>
@@ -265,6 +267,7 @@ function CalendarFullView(props: Props): JSX.Element | null {
         selectable={isSelectable}
         selectMirror={true}
         select={onNewEvent}
+        locale={userPreferences.locale ?? 'default'}
       />
     </div>
   );

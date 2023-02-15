@@ -16,6 +16,7 @@ import charmClient from 'charmClient';
 import Link from 'components/common/Link';
 import LoadingComponent from 'components/common/LoadingComponent';
 import UserDisplay from 'components/common/UserDisplay';
+import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import type { ForumTask } from 'lib/forums/comments/interface';
 import { isTruthy } from 'lib/utilities/types';
 import type { GetTasksResponse } from 'pages/api/tasks/list';
@@ -31,8 +32,9 @@ function ForumTaskRow({
   postPath,
   spaceDomain,
   spaceName,
-  postTitle
-}: ForumTask & { marked: boolean }) {
+  postTitle,
+  onClose
+}: ForumTask & { marked: boolean; onClose: () => void }) {
   const baseUrl = typeof window !== 'undefined' ? window.location.origin : null;
   const commentLink = `${baseUrl}/${spaceDomain}/forum/post/${postPath}`;
 
@@ -52,7 +54,7 @@ function ForumTaskRow({
             {createdBy && (
               <Tooltip title={createdBy.username}>
                 <div>
-                  <UserDisplay avatarSize='small' user={createdBy} hideName={true} marginRight='10px' />
+                  <UserDisplay showMiniProfile avatarSize='small' user={createdBy} hideName={true} marginRight='10px' />
                 </div>
               </Tooltip>
             )}
@@ -61,6 +63,7 @@ function ForumTaskRow({
               variant='body1'
               noWrap
               color='inherit'
+              onClick={onClose}
               sx={{
                 maxWidth: {
                   xs: '130px',
@@ -78,12 +81,12 @@ function ForumTaskRow({
         <Typography noWrap>{spaceName}</Typography>
       </TableCell>
       <TableCell>
-        <Link color='inherit' href={commentLink} variant='body1' noWrap>
+        <Link color='inherit' href={commentLink} variant='body1' noWrap onClick={onClose}>
           {postTitle}
         </Link>
       </TableCell>
       <TableCell align='center'>
-        <Link color='inherit' href={commentLink} variant='body1' noWrap>
+        <Link color='inherit' href={commentLink} variant='body1' noWrap onClick={onClose}>
           {DateTime.fromISO(createdAt).toRelative({ base: DateTime.now() })}
         </Link>
       </TableCell>
@@ -98,6 +101,8 @@ interface DiscussionTasksListProps {
 }
 
 export default function ForumTasksList({ tasks, error, mutateTasks }: DiscussionTasksListProps) {
+  const { onClose } = useSettingsDialog();
+
   useEffect(() => {
     async function main() {
       if (tasks?.forum && tasks.forum.unmarked.length !== 0) {
@@ -179,10 +184,10 @@ export default function ForumTasksList({ tasks, error, mutateTasks }: Discussion
         </TableHead>
         <TableBody>
           {tasks.forum.unmarked.map((forumTask) => (
-            <ForumTaskRow key={forumTask.commentId} {...forumTask} marked={false} />
+            <ForumTaskRow key={forumTask.commentId} {...forumTask} marked={false} onClose={onClose} />
           ))}
           {tasks.forum.marked.map((forumTask) => (
-            <ForumTaskRow key={forumTask.commentId} {...forumTask} marked />
+            <ForumTaskRow key={forumTask.commentId} {...forumTask} marked onClose={onClose} />
           ))}
         </TableBody>
       </Table>

@@ -8,6 +8,7 @@ import { useState } from 'react';
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import { WalletConnect } from 'components/login/WalletConnect';
+import Legend from 'components/settings/Legend';
 import { useFirebaseAuth } from 'hooks/useFirebaseAuth';
 import { useUser } from 'hooks/useUser';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
@@ -103,105 +104,108 @@ export default function IdentityProviders() {
   }
 
   return (
-    <GridContainer>
-      <ProviderRow>
-        <ImageIcon src='/images/walletLogos/metamask.png' />
-        <Typography color='secondary' variant='button'>
-          {user && user.wallets.length > 0 ? `Connected with ${connectorName(connector)}` : 'Connect your wallet'}
-        </Typography>
-        <WalletConnect onSuccess={() => null} />
-      </ProviderRow>
+    <>
+      <Legend>Integrations</Legend>
+      <GridContainer>
+        <ProviderRow>
+          <ImageIcon src='/images/walletLogos/metamask.png' />
+          <Typography color='secondary' variant='button'>
+            {user && user.wallets.length > 0 ? `Connected with ${connectorName(connector)}` : 'Connect your wallet'}
+          </Typography>
+          <WalletConnect onSuccess={() => null} />
+        </ProviderRow>
 
-      <DiscordProvider>
-        {({ isConnected, isLoading, connect, error }) => (
-          <ProviderRow>
-            <SvgIcon sx={{ color: '#5765f2', height: 48, width: 'auto' }}>
-              <DiscordIcon />
-            </SvgIcon>
-            <Typography color='secondary' variant='button'>
-              {isConnected ? 'Connected with Discord' : 'Connect with Discord'}
-            </Typography>
-            <Tooltip
-              arrow
-              placement='top'
-              title={
-                !!user?.discordUser && cannotDisconnect
-                  ? 'You must have at least one other identity you can login with to disconnect Discord'
-                  : ''
-              }
-            >
-              {/** div is used to make sure the tooltip is rendered as disabled button doesn't allow tooltip */}
-              <div>
-                <StyledButton
-                  variant='outlined'
-                  color={isConnected ? 'error' : 'primary'}
-                  disabled={(!!user?.discordUser && cannotDisconnect) || isLoggingOut || isLoading}
-                  onClick={connect}
-                  loading={isLoading}
-                >
-                  {isConnected ? 'Disconnect' : 'Connect'}
-                </StyledButton>
-              </div>
-            </Tooltip>
+        <DiscordProvider>
+          {({ isConnected, isLoading, connect, error }) => (
+            <ProviderRow>
+              <SvgIcon sx={{ color: '#5765f2', height: 48, width: 'auto' }}>
+                <DiscordIcon />
+              </SvgIcon>
+              <Typography color='secondary' variant='button'>
+                {isConnected ? 'Connected with Discord' : 'Connect with Discord'}
+              </Typography>
+              <Tooltip
+                arrow
+                placement='top'
+                title={
+                  !!user?.discordUser && cannotDisconnect
+                    ? 'You must have at least one other identity you can login with to disconnect Discord'
+                    : ''
+                }
+              >
+                {/** div is used to make sure the tooltip is rendered as disabled button doesn't allow tooltip */}
+                <div>
+                  <StyledButton
+                    variant='outlined'
+                    color={isConnected ? 'error' : 'primary'}
+                    disabled={(!!user?.discordUser && cannotDisconnect) || isLoggingOut || isLoading}
+                    onClick={connect}
+                    loading={isLoading}
+                  >
+                    {isConnected ? 'Disconnect' : 'Connect'}
+                  </StyledButton>
+                </div>
+              </Tooltip>
 
-            {error && <Alert severity='error'>{error}</Alert>}
-          </ProviderRow>
-        )}
-      </DiscordProvider>
+              {error && <Alert severity='error'>{error}</Alert>}
+            </ProviderRow>
+          )}
+        </DiscordProvider>
 
-      <ProviderRow>
-        <SvgIcon sx={{ height: 48, width: 'auto' }}>
-          <TelegramIcon />
-        </SvgIcon>
-        <Typography color='secondary' variant='button'>
-          {connectedWithTelegram ? 'Connected with Telegram' : 'Connect with Telegram'}
-        </Typography>
-        <StyledButton
-          variant='outlined'
-          sx={{ overflow: 'hidden' }}
-          color={connectedWithTelegram ? 'error' : 'primary'}
-          disabled={(connectedWithTelegram && cannotDisconnect) || isLoggingOut || isConnectingTelegram}
-          loading={isConnectingTelegram}
-          onClick={() => (connectedWithTelegram ? disconnectFromTelegram() : connectToTelegram())}
-        >
-          {connectedWithTelegram ? 'Disconnect' : 'Connect'}
-        </StyledButton>
-        <TelegramLoginIframe />
+        <ProviderRow>
+          <SvgIcon sx={{ height: 48, width: 'auto' }}>
+            <TelegramIcon />
+          </SvgIcon>
+          <Typography color='secondary' variant='button'>
+            {connectedWithTelegram ? 'Connected with Telegram' : 'Connect with Telegram'}
+          </Typography>
+          <StyledButton
+            variant='outlined'
+            sx={{ overflow: 'hidden' }}
+            color={connectedWithTelegram ? 'error' : 'primary'}
+            disabled={(connectedWithTelegram && cannotDisconnect) || isLoggingOut || isConnectingTelegram}
+            loading={isConnectingTelegram}
+            onClick={() => (connectedWithTelegram ? disconnectFromTelegram() : connectToTelegram())}
+          >
+            {connectedWithTelegram ? 'Disconnect' : 'Connect'}
+          </StyledButton>
+          <TelegramLoginIframe />
 
-        {telegramError && <Alert severity='error'>{telegramError}</Alert>}
-      </ProviderRow>
-      <ProviderRow>
-        <img src='images/Google_G.png' height={48} width='auto' />
-        <Typography color='secondary' variant='button'>
-          {connectedWithGoogle ? 'Connected with Google' : 'Connect with Google'}
-        </Typography>
+          {telegramError && <Alert severity='error'>{telegramError}</Alert>}
+        </ProviderRow>
+        <ProviderRow>
+          <img src='images/Google_G.png' height={48} width='auto' />
+          <Typography color='secondary' variant='button'>
+            {connectedWithGoogle ? 'Connected with Google' : 'Connect with Google'}
+          </Typography>
 
-        <Tooltip
-          arrow
-          placement='top'
-          title={
-            connectedWithGoogle && cannotDisconnect
-              ? 'You must have at least one other identity you can login with to disconnect Google'
-              : ''
-          }
-        >
-          <div>
-            <StyledButton
-              variant='outlined'
-              sx={{ overflow: 'hidden' }}
-              color={connectedWithGoogle ? 'error' : 'primary'}
-              disabled={(connectedWithGoogle && cannotDisconnect) || isLoggingOut || isConnectingGoogle}
-              loading={isConnectingGoogle}
-              onClick={connectedWithGoogle ? disconnectGoogleAccount : connectGoogleAccount}
-            >
-              {connectedWithGoogle ? 'Disconnect' : 'Connect'}
-            </StyledButton>
-          </div>
-        </Tooltip>
-        <TelegramLoginIframe />
+          <Tooltip
+            arrow
+            placement='top'
+            title={
+              connectedWithGoogle && cannotDisconnect
+                ? 'You must have at least one other identity you can login with to disconnect Google'
+                : ''
+            }
+          >
+            <div>
+              <StyledButton
+                variant='outlined'
+                sx={{ overflow: 'hidden' }}
+                color={connectedWithGoogle ? 'error' : 'primary'}
+                disabled={(connectedWithGoogle && cannotDisconnect) || isLoggingOut || isConnectingGoogle}
+                loading={isConnectingGoogle}
+                onClick={connectedWithGoogle ? disconnectGoogleAccount : connectGoogleAccount}
+              >
+                {connectedWithGoogle ? 'Disconnect' : 'Connect'}
+              </StyledButton>
+            </div>
+          </Tooltip>
+          <TelegramLoginIframe />
 
-        {telegramError && <Alert severity='error'>{telegramError}</Alert>}
-      </ProviderRow>
-    </GridContainer>
+          {telegramError && <Alert severity='error'>{telegramError}</Alert>}
+        </ProviderRow>
+      </GridContainer>
+    </>
   );
 }

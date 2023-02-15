@@ -13,6 +13,7 @@ import charmClient from 'charmClient';
 import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
 import { useAppDispatch, useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { initialLoad } from 'components/common/BoardEditor/focalboard/src/store/initialLoad';
+import { useCurrentPage } from 'hooks/useCurrentPage';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import log from 'lib/log';
@@ -33,7 +34,8 @@ const menuPosition: Partial<MenuProps> = {
 function Component({ menuState }: { menuState: PluginState }) {
   const popupState = usePopupState({ variant: 'popover', popupId: 'user-role' });
   const view = useEditorViewContext();
-  const { deletePage, currentPageId, pages } = usePages();
+  const { currentPageId } = useCurrentPage();
+  const { deletePage, pages } = usePages();
   const currentPage = pages[currentPageId];
   const currentSpace = useCurrentSpace();
   const dispatch = useAppDispatch();
@@ -87,6 +89,9 @@ function Component({ menuState }: { menuState: PluginState }) {
       if (start === 1) {
         start = 0;
         end -= 1;
+      } else if (node.node.type.name === 'disclosureDetails') {
+        // This removes disclosureSummary node
+        start -= 2;
       }
       view.dispatch(view.state.tr.deleteRange(start, end));
       popupState.close();

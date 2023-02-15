@@ -60,8 +60,10 @@ export function CryptoPrice({
   base,
   quote,
   onQuoteCurrencyChange,
-  onBaseCurrencyChange
+  onBaseCurrencyChange,
+  readOnly
 }: {
+  readOnly: boolean;
   base: CryptoCurrency | null;
   quote: FiatCurrency | null;
   onQuoteCurrencyChange: (currency: FiatCurrency) => void;
@@ -157,30 +159,43 @@ export function CryptoPrice({
       {baseCurrency === null && (
         <CardContent>
           <Box pt={1}>
-            <InputSearchCrypto cryptoList={cryptoList} onChange={changeBaseCurrency} />
+            <InputSearchCrypto
+              disabled={readOnly}
+              readOnly={readOnly}
+              cryptoList={cryptoList}
+              onChange={changeBaseCurrency}
+            />
           </Box>
         </CardContent>
       )}
       {baseCurrency && (
         <CardContent>
           <div>
-            <StyledButton active={selectionList === 'base'} onClick={() => toggleSelectionList('base')}>
+            <StyledButton
+              disabled={readOnly}
+              active={selectionList === 'base'}
+              onClick={() => toggleSelectionList('base')}
+            >
               <CoinLogoAndTicker {...getTokenInfo(paymentMethods, baseCurrency)} />
             </StyledButton>
             <Typography component='span' color='secondary'>
               /
             </Typography>
-            <StyledButton active={selectionList === 'quote'} onClick={() => toggleSelectionList('quote')}>
+            <StyledButton
+              disabled={readOnly}
+              active={selectionList === 'quote'}
+              onClick={() => toggleSelectionList('quote')}
+            >
               {getTokenInfo(paymentMethods, quoteCurrency)?.tokenSymbol}
             </StyledButton>
-            <IconButton size='small' onClick={() => refreshPrice()} sx={{ float: 'right' }}>
+            <IconButton disabled={readOnly} size='small' onClick={() => refreshPrice()} sx={{ float: 'right' }}>
               <Autorenew color='secondary' fontSize='small' />
             </IconButton>
           </div>
 
           {selectionList === 'base' && (
             <Box pt={1}>
-              <InputSearchCrypto cryptoList={cryptoList} onChange={changeBaseCurrency} />
+              <InputSearchCrypto readOnly={readOnly} cryptoList={cryptoList} onChange={changeBaseCurrency} />
             </Box>
           )}
 
@@ -228,9 +243,9 @@ export function CryptoPrice({
   );
 }
 
-type ButtonProps = { children: React.ReactNode; active: boolean; onClick: () => void };
+type ButtonProps = { disabled?: boolean; children: React.ReactNode; active: boolean; onClick: () => void };
 
-function StyledButton({ children, active, onClick }: ButtonProps) {
+function StyledButton({ disabled, children, active, onClick }: ButtonProps) {
   return (
     <Button
       color='secondary'
@@ -239,6 +254,7 @@ function StyledButton({ children, active, onClick }: ButtonProps) {
       variant='text'
       sx={{ color: active ? 'text.primary' : undefined, p: 0, px: 0.5 }}
       onClick={onClick}
+      disabled={disabled}
     >
       {children}
     </Button>

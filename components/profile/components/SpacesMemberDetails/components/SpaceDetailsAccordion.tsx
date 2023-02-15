@@ -1,15 +1,15 @@
 import styled from '@emotion/styled';
 import EditIcon from '@mui/icons-material/Edit';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { Accordion, AccordionDetails, AccordionSummary, Box, Chip, IconButton, Stack, Typography } from '@mui/material';
+import { Accordion, AccordionDetails, AccordionSummary, Box, IconButton, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 
-import { SelectPreview } from 'components/common/form/fields/Select/SelectPreview';
 import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
 import WorkspaceAvatar from 'components/common/PageLayout/components/Sidebar/WorkspaceAvatar';
 import type { PropertyValueWithDetails } from 'lib/members/interfaces';
 import { isTouchScreen } from 'lib/utilities/browser';
-import { humanFriendlyDate } from 'lib/utilities/dates';
+
+import { MemberPropertiesRenderer } from './MemberPropertiesRenderer';
 
 type Props = {
   spaceName: string;
@@ -46,7 +46,13 @@ export function SpaceDetailsAccordion({
     >
       <StyledAccordionSummary expandIcon={<ExpandMoreIcon />}>
         <WorkspaceAvatar name={spaceName} image={spaceImage} />
-        <Box display='flex' flex={1} alignItems='center' justifyContent='space-between'>
+        <Box
+          display='flex'
+          flex='0 1 auto'
+          alignItems='center'
+          justifyContent='space-between'
+          sx={{ wordBreak: 'break-word' }}
+        >
           <Typography ml={2} variant='h6'>
             {spaceName}
           </Typography>
@@ -66,76 +72,7 @@ export function SpaceDetailsAccordion({
         </Box>
       </StyledAccordionSummary>
       <AccordionDetails>
-        <Stack gap={2}>
-          {properties.map((property) => {
-            if (!property.enabledViews.includes('profile')) {
-              return null;
-            }
-            switch (property.type) {
-              case 'text':
-              case 'text_multiline':
-              case 'phone':
-              case 'name':
-              case 'url':
-              case 'email':
-              case 'number': {
-                return (
-                  property.value && (
-                    <Stack key={property.memberPropertyId}>
-                      <Typography fontWeight='bold'>{property.name}</Typography>
-                      <Typography
-                        sx={{
-                          wordBreak: 'break-word'
-                        }}
-                        whiteSpace={property.type === 'text_multiline' ? 'pre-wrap' : 'initial'}
-                      >
-                        {property.value as string}
-                      </Typography>
-                    </Stack>
-                  )
-                );
-              }
-              case 'multiselect':
-              case 'select': {
-                const propertyValue = property.value as string | undefined | string[];
-                if (!propertyValue || propertyValue?.length === 0) {
-                  return null;
-                }
-                return <SelectPreview value={propertyValue} name={property.name} options={property.options} />;
-              }
-              case 'join_date': {
-                return (
-                  <Stack key={property.memberPropertyId}>
-                    <Typography fontWeight='bold'>{property.name}</Typography>
-                    <Typography>
-                      {humanFriendlyDate(property.value as string, {
-                        withYear: true
-                      })}
-                    </Typography>
-                  </Stack>
-                );
-              }
-              case 'role': {
-                const roles = property.value as string[];
-                return (
-                  roles.length !== 0 && (
-                    <Stack key={property.memberPropertyId}>
-                      <Typography fontWeight='bold'>{property.name}</Typography>
-                      <Stack gap={1} flexDirection='row' flexWrap='wrap'>
-                        {roles.map((role) => (
-                          <Chip label={role} key={role} size='small' variant='outlined' />
-                        ))}
-                      </Stack>
-                    </Stack>
-                  )
-                );
-              }
-              default: {
-                return null;
-              }
-            }
-          })}
-        </Stack>
+        <MemberPropertiesRenderer properties={properties} />
       </AccordionDetails>
     </Accordion>
   );

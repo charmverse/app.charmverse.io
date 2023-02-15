@@ -1,47 +1,89 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import type { Post, PostCategory, Space, User } from '@prisma/client';
+import type { Post, Space, User } from '@prisma/client';
 import request from 'supertest';
 
-import { createPostCategory } from 'lib/forums/categories/createPostCategory';
 import type { CreateForumPostInput } from 'lib/forums/posts/createForumPost';
+import type { ListForumPostsRequest, PaginatedPostList } from 'lib/forums/posts/listForumPosts';
+import { upsertPostCategoryPermission } from 'lib/permissions/forum/upsertPostCategoryPermission';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
-import { generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { generateSpaceUser, generateUserAndSpace, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { generateForumPost, generatePostCategory } from 'testing/utils/forums';
 
-let firstSpace: Space;
-let firstSpaceUser: User;
-let firstSpacePostCategory: PostCategory;
-let secondSpace: Space;
-let secondSpaceUser: User;
-
+let space: Space;
+let user: User;
+let userCookie: string;
 beforeAll(async () => {
-  const { space: _firstSpace, user: _firstAdminUser } = await generateUserAndSpaceWithApiToken(undefined, false);
+  const { space: _space, user: _firstAdminUser } = await generateUserAndSpaceWithApiToken(undefined, false);
 
-  firstSpace = _firstSpace;
-  firstSpaceUser = _firstAdminUser;
-  firstSpaceUser = await generateSpaceUser({ isAdmin: false, spaceId: firstSpace.id });
+  space = _space;
+  user = _firstAdminUser;
+  user = await generateSpaceUser({ isAdmin: false, spaceId: space.id });
+  userCookie = await loginUser(user.id);
+});
 
-  const { space: _secondSpace, user: _secondUser } = await generateUserAndSpaceWithApiToken(undefined, false);
+describe('GET /api/forums/posts', () => {
+  it('should return posts belonging to public categories for anonymous users, and respond with a 200', async () => {
+    const { user: userInSpaceWithPublicCategory, space: spaceWithPublicCategory } = await generateUserAndSpace();
 
-  secondSpace = _secondSpace;
-  secondSpaceUser = _secondUser;
+    const publicCategory = await generatePostCategory({
+      spaceId: spaceWithPublicCategory.id,
+      name: 'Public Category'
+    });
 
-  firstSpacePostCategory = await createPostCategory({
-    name: 'Test Category',
-    spaceId: firstSpace.id
+    const publicPost = await generateForumPost({
+      spaceId: spaceWithPublicCategory.id,
+      categoryId: publicCategory.id,
+      userId: userInSpaceWithPublicCategory.id,
+      title: 'Public Post'
+    });
+
+    await upsertPostCategoryPermission({
+      assignee: { group: 'public' },
+      permissionLevel: 'view',
+      postCategoryId: publicCategory.id
+    });
+
+    const privateCategory = await generatePostCategory({
+      spaceId: spaceWithPublicCategory.id,
+      name: 'Private Category'
+    });
+
+    const privatePost = await generateForumPost({
+      spaceId: spaceWithPublicCategory.id,
+      categoryId: privateCategory.id,
+      userId: userInSpaceWithPublicCategory.id,
+      title: 'Private Post'
+    });
+
+    const query: ListForumPostsRequest = {
+      spaceId: spaceWithPublicCategory.id
+    };
+
+    const posts = (await request(baseUrl).get(`/api/forums/posts`).query(query).expect(200)).body as PaginatedPostList;
+
+    expect(posts.data).toHaveLength(1);
+    expect(posts.data[0].id).toBe(publicPost.id);
   });
 });
 
 describe('POST /api/forums/posts - Create a post', () => {
-  it('should create a draft post if the user is a space member (even if no space permissions to create pages exist), and return the post, responding with 201', async () => {
-    const userCookie = await loginUser(firstSpaceUser.id);
+  it('should create a post if the user can create posts in this category, responding with 201', async () => {
+    const postCategory = await generatePostCategory({
+      spaceId: space.id
+    });
 
+    await upsertPostCategoryPermission({
+      postCategoryId: postCategory.id,
+      permissionLevel: 'full_access',
+      assignee: { group: 'space', id: space.id }
+    });
     const createInput: CreateForumPostInput = {
       content: { type: 'doc' },
       contentText: 'Empty',
-      spaceId: firstSpace.id,
+      spaceId: space.id,
       title: 'Test Post',
-      createdBy: firstSpaceUser.id,
-      categoryId: firstSpacePostCategory.id
+      createdBy: user.id,
+      categoryId: postCategory.id
     };
 
     const post = (
@@ -58,16 +100,23 @@ describe('POST /api/forums/posts - Create a post', () => {
     );
   });
 
-  it('should fail to create the post if the user is not a space member, responding with 401', async () => {
-    const userCookie = await loginUser(secondSpaceUser.id);
+  it('should fail to create the post if the user does not have permissions to create a post in the category, responding with 401', async () => {
+    const postCategory = await generatePostCategory({
+      spaceId: space.id
+    });
 
+    await upsertPostCategoryPermission({
+      postCategoryId: postCategory.id,
+      permissionLevel: 'view',
+      assignee: { group: 'space', id: space.id }
+    });
     const createInput: CreateForumPostInput = {
       content: { type: 'doc' },
       contentText: 'Empty',
-      spaceId: firstSpace.id,
+      spaceId: space.id,
       title: 'Test Post',
-      createdBy: firstSpaceUser.id,
-      categoryId: firstSpacePostCategory.id
+      createdBy: user.id,
+      categoryId: postCategory.id
     };
 
     await request(baseUrl).post(`/api/forums/posts`).set('Cookie', userCookie).send(createInput).expect(401);

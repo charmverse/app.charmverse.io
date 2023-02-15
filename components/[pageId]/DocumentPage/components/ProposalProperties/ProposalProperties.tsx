@@ -1,7 +1,5 @@
-import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import { Divider, Grid, IconButton, Menu, MenuItem, Typography } from '@mui/material';
-import { Box } from '@mui/system';
-import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
+import { Divider, Grid, Typography, Box } from '@mui/material';
+import { usePopupState } from 'material-ui-popup-state/hooks';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
@@ -12,7 +10,7 @@ import UserDisplay from 'components/common/UserDisplay';
 import ProposalCategoryInput from 'components/proposals/components/ProposalCategoryInput';
 import ProposalStepper from 'components/proposals/components/ProposalStepper';
 import { useProposalCategories } from 'components/proposals/hooks/useProposalCategories';
-import useIsAdmin from 'hooks/useIsAdmin';
+import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useMembers } from 'hooks/useMembers';
 import useRoles from 'hooks/useRoles';
 import { useUser } from 'hooks/useUser';
@@ -85,7 +83,7 @@ export default function ProposalProperties({ pageId, proposalId, readOnly, isTem
     };
   });
 
-  roles.forEach((role) => {
+  (roles ?? []).forEach((role) => {
     reviewerOptionsRecord[role.id] = {
       ...role,
       group: 'role'
@@ -213,7 +211,7 @@ export default function ProposalProperties({ pageId, proposalId, readOnly, isTem
           </div>
           <div style={{ width: '100%' }}>
             {proposalStatus === 'reviewed' && proposalReviewer ? (
-              <UserDisplay user={proposalReviewer} avatarSize='small' />
+              <UserDisplay showMiniProfile user={proposalReviewer} avatarSize='small' />
             ) : (
               <InputSearchReviewers
                 disabled={readOnly || !canUpdateProposalProperties}

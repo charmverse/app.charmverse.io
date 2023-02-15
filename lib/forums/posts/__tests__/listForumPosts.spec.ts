@@ -1,8 +1,8 @@
 import type { Post, Space, User } from '@prisma/client';
 
-import { createPostCategory } from 'lib/forums/categories/createPostCategory';
 import { generateForumPosts } from 'testing/forums';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { generatePostCategory } from 'testing/utils/forums';
 
 import { defaultPostsPerResult } from '../constants';
 import { listForumPosts } from '../listForumPosts';
@@ -34,7 +34,7 @@ describe('listForumPosts', () => {
   it(`should return posts from all categories if no category is provided`, async () => {
     const { space: extraSpace, user: extraUser } = await generateUserAndSpaceWithApiToken();
 
-    const category = await createPostCategory({
+    const category = await generatePostCategory({
       spaceId: extraSpace.id,
       name: 'Test Category'
     });
@@ -92,9 +92,9 @@ describe('listForumPosts', () => {
   it(`should support paginated queries for a combination of categories, or only uncategorised posts`, async () => {
     const { space: extraSpace, user: extraUser } = await generateUserAndSpaceWithApiToken();
 
-    const category1 = await createPostCategory({ spaceId: space.id, name: 'Test Category 1' });
-    const category2 = await createPostCategory({ spaceId: space.id, name: 'Test Category 2' });
-    const category3 = await createPostCategory({ spaceId: space.id, name: 'Test Category 3' });
+    const category1 = await generatePostCategory({ spaceId: space.id, name: 'Test Category 1' });
+    const category2 = await generatePostCategory({ spaceId: space.id, name: 'Test Category 2' });
+    const category3 = await generatePostCategory({ spaceId: space.id, name: 'Test Category 3' });
 
     const postsInCategory1 = await generateForumPosts({
       spaceId: extraSpace.id,
@@ -223,5 +223,60 @@ describe('listForumPosts', () => {
     expect(postsOrderedByMostVoted.data[0].votes.upvotes).toBe(2);
     expect(postsOrderedByMostVoted.data[1].id === secondMostVotedPageId).toBeTruthy();
     expect(postsOrderedByMostVoted.data[1].votes.upvotes).toBe(1);
+  });
+
+  it('should support lookup of posts in multiple categories', async () => {
+    const { space: extraSpace, user: extraUser } = await generateUserAndSpaceWithApiToken();
+
+    const category1 = await generatePostCategory({ spaceId: extraSpace.id, name: 'Test Category 1' });
+    const category2 = await generatePostCategory({ spaceId: extraSpace.id, name: 'Test Category 2' });
+    const category3 = await generatePostCategory({ spaceId: extraSpace.id, name: 'Test Category 3' });
+
+    const postsInCategory1 = await generateForumPosts({
+      spaceId: extraSpace.id,
+      createdBy: extraUser.id,
+      count: 5,
+      categoryId: category1.id
+    });
+
+    const postsInCategory2 = await generateForumPosts({
+      spaceId: extraSpace.id,
+      createdBy: extraUser.id,
+      count: 5,
+      categoryId: category2.id
+    });
+
+    const postsInCategory3 = await generateForumPosts({
+      spaceId: extraSpace.id,
+      createdBy: extraUser.id,
+      count: 5,
+      categoryId: category3.id
+    });
+
+    const resultsPerQuery = 100;
+
+    const postsInCategory1And2 = await listForumPosts(
+      {
+        spaceId: extraSpace.id,
+        count: resultsPerQuery,
+        categoryId: [category1.id, category2.id]
+      },
+      user.id
+    );
+
+    expect(postsInCategory1And2.data).toHaveLength([postsInCategory1, postsInCategory2].flat().length);
+    expect(postsInCategory1And2.data.every((post) => !postsInCategory3.some((p) => p.id === post.id))).toBe(true);
+  });
+
+  it('should return empty results if categoryId is an empty array', async () => {
+    const results = await listForumPosts(
+      {
+        spaceId: space.id,
+        categoryId: []
+      },
+      user.id
+    );
+
+    expect(results.data).toHaveLength(0);
   });
 });

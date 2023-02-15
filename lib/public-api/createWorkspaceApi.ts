@@ -5,7 +5,7 @@ import { prisma } from 'db';
 import { upsertSpaceRolesFromDiscord } from 'lib/discord/upsertSpaceRolesFromDiscord';
 import { upsertUserForDiscordId } from 'lib/discord/upsertUserForDiscordId';
 import { upsertUserRolesFromDiscord } from 'lib/discord/upsertUserRolesFromDiscord';
-import type { CreateSpaceProps, SpaceCreateInput } from 'lib/spaces/createWorkspace';
+import type { SpaceCreateInput } from 'lib/spaces/createWorkspace';
 import { createWorkspace } from 'lib/spaces/createWorkspace';
 import { getAvailableDomainName } from 'lib/spaces/getAvailableDomainName';
 import { createUserFromWallet } from 'lib/users/createUser';
@@ -19,14 +19,17 @@ export async function createWorkspaceApi({
   discordServerId,
   adminDiscordUserId,
   adminWalletAddress,
+  adminUsername,
+  adminAvatar,
   xpsEngineId,
   avatar,
-  superApiToken
+  superApiToken,
+  webhookUrl
 }: CreateWorkspaceRequestBody & { superApiToken?: SuperApiToken | null }): Promise<CreateWorkspaceResponseBody> {
   // Retrieve an id for the admin user
   const adminUserId = adminDiscordUserId
-    ? await upsertUserForDiscordId(adminDiscordUserId)
-    : await createUserFromWallet({ address: adminWalletAddress }).then((user) => user.id);
+    ? await upsertUserForDiscordId({ discordId: adminDiscordUserId, username: adminUsername, avatar: adminAvatar })
+    : await createUserFromWallet({ address: adminWalletAddress, avatar: adminAvatar }).then((user) => user.id);
 
   if (!adminUserId) {
     throw new InvalidInputError('No admin user ID created.');
@@ -55,7 +58,7 @@ export async function createWorkspaceApi({
     superApiTokenId: superApiToken?.id
   };
 
-  const space = await createWorkspace({ spaceData, userId: adminUserId, extraAdmins: [botUser.id] });
+  const space = await createWorkspace({ spaceData, userId: adminUserId, webhookUrl, extraAdmins: [botUser.id] });
 
   // create roles from discord
   if (discordServerId) {
@@ -69,6 +72,7 @@ export async function createWorkspaceApi({
 
   return {
     id: space.id,
+    webhookSigningSecret: space.webhookSigningSecret ?? undefined,
     spaceUrl: `${baseUrl}/${space.domain}`,
     joinUrl: `${baseUrl}/join?domain=${space.domain}`
   };

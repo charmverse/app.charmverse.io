@@ -70,6 +70,7 @@ import { ForumApi } from './apis/forumApi';
 import { GoogleApi } from './apis/googleApi';
 import { IframelyApi } from './apis/iframelyApi';
 import { MembersApi } from './apis/membersApi';
+import { PermissionsApi } from './apis/permissionsApi';
 import { ProfileApi } from './apis/profileApi';
 import { ProposalsApi } from './apis/proposalsApi';
 import { TasksApi } from './apis/tasksApi';
@@ -113,6 +114,8 @@ class CharmClient {
   tasks = new TasksApi();
 
   track = new TrackApi();
+
+  permissions = new PermissionsApi();
 
   unstoppableDomains = new UnstoppableDomainsApi();
 
@@ -161,8 +164,8 @@ class CharmClient {
     return http.GET<UserDetails>('/api/profile/details');
   }
 
-  getUserPoaps() {
-    return http.GET<ExtendedPoap[]>('/api/profile/poaps');
+  getUserPoaps(userId: string) {
+    return http.GET<ExtendedPoap[]>(`/api/profile/poaps/${userId}`);
   }
 
   updateUserDetails(data: Partial<UserDetails>) {

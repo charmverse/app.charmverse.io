@@ -179,7 +179,9 @@ export function charmEditorPlugins({
     heading.plugins(),
     horizontalRule.plugins(),
     italic.plugins(),
-    listItem.plugins(),
+    listItem.plugins({
+      readOnly
+    }),
     orderedList.plugins(),
     columnLayout.plugins(),
     paragraph.plugins(),
@@ -278,6 +280,7 @@ export function charmEditorPlugins({
 const StyledReactBangleEditor = styled(ReactBangleEditor)<{
   colorMode?: 'dark';
   disablePageSpecificFeatures?: boolean;
+  disableRowHandles?: boolean;
 }>`
   position: relative;
 
@@ -295,11 +298,17 @@ const StyledReactBangleEditor = styled(ReactBangleEditor)<{
           }`
       : ''};
 
-  /** DONT REMOVE THIS STYLING */
-  div.ProseMirror.bangle-editor {
-    padding-left: 50px;
-    margin-right: -50px;
-  }
+  ${({ disableRowHandles }) =>
+    disableRowHandles
+      ? `
+      padding-left: 10px;
+      padding-right: 10px;
+    `
+      : `/** DONT REMOVE THIS STYLING */
+    div.ProseMirror.bangle-editor {
+      padding-left: 50px;
+      margin-right: -50px;
+    }`}
 
   code {
     border-radius: 2px !important;
@@ -557,6 +566,7 @@ function CharmEditor({
       pageId={pageId}
       focusOnInit={focusOnInit}
       disablePageSpecificFeatures={disablePageSpecificFeatures}
+      disableRowHandles={disableRowHandles}
       isContentControlled={isContentControlled}
       enableSuggestions={enableSuggestingMode}
       onParticipantUpdate={onParticipantUpdate}
@@ -603,6 +613,7 @@ function CharmEditor({
             const attrs = props.attrs as { base: null | CryptoCurrency; quote: null | FiatCurrency };
             return (
               <CryptoPrice
+                readOnly={readOnly}
                 base={attrs.base}
                 quote={attrs.quote}
                 onBaseCurrencyChange={(newBaseCurrency) => {
@@ -619,7 +630,7 @@ function CharmEditor({
             );
           }
           case 'blockquote': {
-            return <Callout {...props}>{_children}</Callout>;
+            return <Callout {...allProps}>{_children}</Callout>;
           }
           case 'horizontalRule': {
             return (

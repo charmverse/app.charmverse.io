@@ -1,7 +1,5 @@
 import styled from '@emotion/styled';
 import CloseIcon from '@mui/icons-material/Close';
-import type { Theme } from '@mui/material';
-import { useMediaQuery } from '@mui/material';
 import Box from '@mui/material/Box';
 import MuiDialogTitle from '@mui/material/DialogTitle';
 import IconButton from '@mui/material/IconButton';
@@ -9,6 +7,7 @@ import MuiModal from '@mui/material/Modal';
 import type { ComponentProps, ReactNode } from 'react';
 
 import { MobileDialog } from 'components/common/MobileDialog/MobileDialog';
+import { useMdScreen } from 'hooks/useMediaScreens';
 
 export type ModalSize = 'large' | 'fluid' | 'small' | string;
 
@@ -83,8 +82,8 @@ export function Modal({
   mobileDialog,
   ...props
 }: ModalProps) {
-  const isLargeScreen = useMediaQuery((theme: Theme) => theme.breakpoints.up('sm'));
-  const isMobileDialog = !isLargeScreen && mobileDialog;
+  const isMdScreen = useMdScreen();
+  const isMobileDialog = !isMdScreen && mobileDialog;
 
   if (isMobileDialog) {
     return (
@@ -132,7 +131,7 @@ export function DialogTitle({ children, onClose, sx }: { children: ReactNode; on
     <StyledDialogTitle sx={sx}>
       {children}
       {onClose && (
-        <CloseButton onClick={onClose}>
+        <CloseButton data-test='close-modal' onClick={onClose}>
           <CloseIcon color='secondary' />
         </CloseButton>
       )}

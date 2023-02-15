@@ -14,40 +14,45 @@ import NotFavoritedIcon from '@mui/icons-material/StarBorder';
 import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
 import UndoIcon from '@mui/icons-material/Undo';
 import SunIcon from '@mui/icons-material/WbSunny';
-import { Divider, FormControlLabel, Stack, Switch, Typography, useMediaQuery } from '@mui/material';
 import Box from '@mui/material/Box';
+import Divider from '@mui/material/Divider';
+import FormControlLabel from '@mui/material/FormControlLabel';
 import IconButton from '@mui/material/IconButton';
 import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import Popover from '@mui/material/Popover';
+import Stack from '@mui/material/Stack';
+import Switch from '@mui/material/Switch';
 import Toolbar from '@mui/material/Toolbar';
 import Tooltip from '@mui/material/Tooltip';
-import NextLink from 'next/link';
+import Typography from '@mui/material/Typography';
+import useMediaQuery from '@mui/material/useMediaQuery';
 import { useRouter } from 'next/router';
-import type { ReactNode } from 'react';
-import { useMemo, useRef, useState } from 'react';
-import useSWR from 'swr';
+import type { Dispatch, ReactNode, SetStateAction } from 'react';
+import { memo, useMemo, useRef, useState } from 'react';
 
 import charmClient from 'charmClient';
 import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
 import { undoEventName } from 'components/common/CharmEditor/utils';
+import { usePostByPath } from 'components/forum/hooks/usePostByPath';
 import { useColorMode } from 'context/darkMode';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
+import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useMembers } from 'hooks/useMembers';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
+import { usePageFromPath } from 'hooks/usePageFromPath';
 import { usePages } from 'hooks/usePages';
+import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useToggleFavorite } from 'hooks/useToggleFavorite';
 import { useUser } from 'hooks/useUser';
-import { humanFriendlyDate } from 'lib/utilities/dates';
 
-import DocumentHistory from '../DocumentHistory';
 import NotificationsBadge from '../Sidebar/NotificationsBadge';
 
 import BountyShareButton from './components/BountyShareButton/BountyShareButton';
 import DatabasePageOptions from './components/DatabasePageOptions';
+import { DocumentHistory } from './components/DocumentHistory';
 import { DocumentParticipants } from './components/DocumentParticipants';
 import EditingModeToggle from './components/EditingModeToggle';
 import PageTitleWithBreadcrumbs from './components/PageTitleWithBreadcrumbs';
@@ -96,7 +101,7 @@ function DeleteMenuItem({ disabled = false, onClick }: { disabled?: boolean; onC
   return (
     <Tooltip title={disabled ? "You don't have permission to delete this page" : ''}>
       <div>
-        <ListItemButton disabled={disabled} onClick={onClick}>
+        <ListItemButton data-test='header--delete-current-page' disabled={disabled} onClick={onClick}>
           <DeleteOutlineOutlinedIcon
             fontSize='small'
             sx={{
@@ -147,6 +152,8 @@ export function ExportMarkdownMenuItem({ disabled = false, onClick }: { disabled
 }
 
 export function Metadata({ creator, lastUpdatedAt }: { creator: string; lastUpdatedAt: Date }) {
+  const { formatDateTime } = useDateFormatter();
+
   return (
     <Stack
       sx={{
@@ -154,37 +161,150 @@ export function Metadata({ creator, lastUpdatedAt }: { creator: string; lastUpda
         my: 1
       }}
     >
-      <Typography variant='subtitle2'>Last edited by {creator}</Typography>
-      <Typography variant='subtitle2'>Last edited at {humanFriendlyDate(lastUpdatedAt)}</Typography>
+      <Typography variant='subtitle2'>
+        Last edited by <strong>{creator}</strong>
+      </Typography>
+      <Typography variant='subtitle2'>
+        at <strong>{formatDateTime(lastUpdatedAt)}</strong>
+      </Typography>
     </Stack>
   );
 }
 
-export default function Header({ open, openSidebar }: HeaderProps) {
+function PostHeader({
+  setPageMenuOpen,
+  undoEditorChanges,
+  forumPostInfo
+}: {
+  forumPostInfo: ReturnType<typeof usePostByPath>;
+  setPageMenuOpen: Dispatch<SetStateAction<boolean>>;
+  undoEditorChanges: VoidFunction;
+}) {
+  const [userSpacePermissions] = useCurrentSpacePermissions();
+  const { showMessage } = useSnackbar();
+  const { members } = useMembers();
+
+  const router = useRouter();
+
+  const canCreateProposal = !!userSpacePermissions?.createVote;
+
+  const postCreator = members.find((member) => member.id === forumPostInfo.forumPost?.createdBy);
+
+  function deletePost() {
+    if (forumPostInfo.forumPost) {
+      charmClient.forum.deleteForumPost(forumPostInfo.forumPost.id).then(() => {
+        router.push(`/${router.query.domain}/forum`);
+      });
+    }
+  }
+
+  async function exportMarkdownPage() {
+    if (forumPostInfo.forumPost) {
+      exportMarkdown({
+        content: forumPostInfo.forumPost.content,
+        id: forumPostInfo.forumPost.id,
+        members,
+        spaceId: forumPostInfo.forumPost.spaceId,
+        title: forumPostInfo.forumPost.title
+      }).catch(() => {
+        showMessage('Error exporting markdown', 'error');
+      });
+      setPageMenuOpen(false);
+    }
+  }
+
+  function closeMenu() {
+    setPageMenuOpen(false);
+  }
+
+  async function convertToProposal(pageId: string) {
+    setPageMenuOpen(false);
+    const { path } = await charmClient.forum.convertToProposal(pageId);
+    router.push(`/${router.query.domain}/${path}`);
+  }
+
+  return (
+    <List data-test='header--forum-post-actions' dense>
+      <CopyLinkMenuItem closeMenu={closeMenu} />
+      <Divider />
+      <DeleteMenuItem onClick={deletePost} disabled={!forumPostInfo.permissions?.delete_post} />
+      <UndoMenuItem onClick={undoEditorChanges} disabled={!forumPostInfo?.permissions?.edit_post} />
+      <ExportMarkdownMenuItem onClick={exportMarkdownPage} />
+      <Tooltip
+        title={
+          !canCreateProposal || forumPostInfo.forumPost?.proposalId
+            ? 'You do not have the permission to convert to proposal'
+            : ''
+        }
+      >
+        <div>
+          <ListItemButton
+            data-test='forum-post-convert-proposal-action'
+            onClick={() => forumPostInfo.forumPost && convertToProposal(forumPostInfo.forumPost.id)}
+            disabled={!canCreateProposal || !!forumPostInfo.forumPost?.proposalId}
+          >
+            <TaskOutlinedIcon
+              fontSize='small'
+              sx={{
+                mr: 1
+              }}
+            />
+            <ListItemText primary='Convert to proposal' />
+          </ListItemButton>
+        </div>
+      </Tooltip>
+      <Divider />
+      <Tooltip title={!forumPostInfo.permissions?.edit_post ? "You don't have permission to undo changes" : ''}>
+        <div>
+          <ListItemButton disabled={!forumPostInfo.permissions?.edit_post} onClick={undoEditorChanges}>
+            <UndoIcon
+              fontSize='small'
+              sx={{
+                mr: 1
+              }}
+            />
+            <ListItemText primary='Undo' />
+          </ListItemButton>
+        </div>
+      </Tooltip>
+      <Divider />
+      {forumPostInfo.forumPost && postCreator ? (
+        <>
+          <Divider />
+          <DocumentHistory page={{ updatedBy: forumPostInfo.forumPost.createdBy, ...forumPostInfo.forumPost }} />
+        </>
+      ) : null}
+    </List>
+  );
+}
+
+function HeaderComponent({ open, openSidebar }: HeaderProps) {
   const router = useRouter();
   const colorMode = useColorMode();
-  const { pages, updatePage, getPagePermissions, deletePage } = usePages();
-  const currentSpace = useCurrentSpace();
-
+  const { updatePage, getPagePermissions, deletePage } = usePages();
   const { user } = useUser();
   const theme = useTheme();
   const [pageMenuOpen, setPageMenuOpen] = useState(false);
   const [pageMenuAnchorElement, setPageMenuAnchorElement] = useState<null | Element>(null);
   const pageMenuAnchor = useRef();
   const { showMessage } = useSnackbar();
-  const basePageId = router.query.pageId as string;
-  const basePage = Object.values(pages).find((page) => page?.id === basePageId || page?.path === basePageId);
+  const basePage = usePageFromPath();
   const { isFavorite, toggleFavorite } = useToggleFavorite({ pageId: basePage?.id });
   const { members } = useMembers();
   const { setCurrentPageActionDisplay } = usePageActionDisplay();
   const [userSpacePermissions] = useCurrentSpacePermissions();
   const pagePermissions = basePage ? getPagePermissions(basePage.id) : null;
-  const isForumPost = router.route === '/[domain]/forum/post/[pagePath]';
-  const pagePath = isForumPost ? (router.query.pagePath as string) : null;
 
-  const { data: forumPost = null } = useSWR(currentSpace && pagePath ? `post-${pagePath}` : null, () =>
-    charmClient.forum.getForumPost(pagePath!)
-  );
+  const { onClick: clickToOpenSettingsModal } = useSettingsDialog();
+  const isForumPost = router.route === '/[domain]/forum/post/[pagePath]';
+
+  const pagePath = isForumPost ? (router.query.pagePath as string) : null;
+  // Post permissions hook will not make an API call if post ID is null. Since we can't conditionally render hooks, we pass null as the post ID. This is the reason for the 'null as any' statement
+  const forumPostInfo = usePostByPath({
+    postPath: isForumPost ? pagePath : isForumPost ? (pagePath as string) : (null as any),
+    spaceDomain: router.query.domain as string
+  });
+
   const isLargeScreen = useMediaQuery(theme.breakpoints.up('md'));
 
   const pageType = basePage?.type;
@@ -192,7 +312,7 @@ export default function Header({ open, openSidebar }: HeaderProps) {
     pageType === 'card' || pageType === 'page' || pageType === 'proposal' || pageType === 'bounty';
 
   const isBountyBoard = router.route === '/[domain]/bounties';
-  const currentPageOrPost = basePage ?? forumPost;
+  const currentPageOrPost = basePage ?? forumPostInfo.forumPost;
 
   const undoEvent = useMemo(() => {
     if (currentPageOrPost) {
@@ -208,7 +328,7 @@ export default function Header({ open, openSidebar }: HeaderProps) {
   const onSwitchChange = () => {
     if (basePage) {
       updatePage({
-        id: basePage?.id,
+        id: basePage.id,
         fullWidth: !isFullWidth
       });
     }
@@ -219,17 +339,10 @@ export default function Header({ open, openSidebar }: HeaderProps) {
       await deletePage({
         pageId: basePage.id
       });
+      closeMenu();
       if (basePage.type === 'board') {
         await charmClient.deleteBlock(basePage.id, () => {});
       }
-    }
-  }
-
-  function deletePost() {
-    if (forumPost) {
-      charmClient.forum.deleteForumPost(forumPost.id).then(() => {
-        router.push(`/${router.query.domain}/forum`);
-      });
     }
   }
 
@@ -243,19 +356,14 @@ export default function Header({ open, openSidebar }: HeaderProps) {
         bangleEditorCoreElement.dispatchEvent(undoEvent as Event);
       }
     }
-    setPageMenuOpen(false);
   }
 
   const canCreateProposal = !!userSpacePermissions?.createVote;
   const charmversePage = basePage ? members.find((member) => member.id === basePage.createdBy) : null;
 
-  async function convertToProposal(pageId: string) {
-    setPageMenuOpen(false);
-    await charmClient.pages.convertToProposal(pageId);
-  }
-
   function closeMenu() {
     setPageMenuOpen(false);
+    setPageMenuAnchorElement(null);
   }
 
   async function exportMarkdownPage() {
@@ -267,26 +375,20 @@ export default function Header({ open, openSidebar }: HeaderProps) {
         members,
         spaceId: page.spaceId,
         title: page.title
-      }).catch((err) => {
-        showMessage('Error exporting markdown', 'error');
-      });
-      setPageMenuOpen(false);
-    } else if (forumPost) {
-      exportMarkdown({
-        content: forumPost.content,
-        id: forumPost.id,
-        members,
-        spaceId: forumPost.spaceId,
-        title: forumPost.title
-      }).catch((err) => {
+      }).catch(() => {
         showMessage('Error exporting markdown', 'error');
       });
       setPageMenuOpen(false);
     }
   }
 
+  async function convertToProposal(pageId: string) {
+    await charmClient.pages.convertToProposal(pageId);
+    closeMenu();
+  }
+
   const documentOptions = (
-    <List dense>
+    <List data-test='header--page-actions' dense>
       <ListItemButton
         onClick={() => {
           setCurrentPageActionDisplay('comments');
@@ -301,7 +403,6 @@ export default function Header({ open, openSidebar }: HeaderProps) {
         />
         <ListItemText primary='View comments' />
       </ListItemButton>
-
       <ListItemButton
         onClick={() => {
           setCurrentPageActionDisplay('suggestions');
@@ -339,6 +440,7 @@ export default function Header({ open, openSidebar }: HeaderProps) {
         </ListItemButton>
       )}
       <CopyLinkMenuItem closeMenu={closeMenu} />
+
       <Divider />
       {(basePage?.type === 'card' || basePage?.type === 'page') && (
         <>
@@ -394,7 +496,7 @@ export default function Header({ open, openSidebar }: HeaderProps) {
       {charmversePage && basePage && (
         <>
           <Divider />
-          <Metadata creator={charmversePage.username} lastUpdatedAt={basePage.updatedAt} />
+          <DocumentHistory page={basePage} />
         </>
       )}
     </List>
@@ -408,25 +510,13 @@ export default function Header({ open, openSidebar }: HeaderProps) {
     pageOptionsList = (
       <DatabasePageOptions pagePermissions={pagePermissions ?? undefined} pageId={basePage.id} closeMenu={closeMenu} />
     );
-  } else if (isForumPost && forumPost) {
-    const postCreator = members.find((member) => member.id === forumPost.createdBy);
-
-    const isPostCreator = forumPost.createdBy === user?.id;
+  } else if (isForumPost) {
     pageOptionsList = (
-      <List dense>
-        <CopyLinkMenuItem closeMenu={closeMenu} />
-        <Divider />
-        <DeleteMenuItem onClick={deletePost} disabled={!isPostCreator} />
-        <UndoMenuItem onClick={undoEditorChanges} disabled={!isPostCreator} />
-        <ExportMarkdownMenuItem onClick={exportMarkdownPage} />
-        <Divider />
-        {forumPost && postCreator && (
-          <>
-            <Divider />
-            <Metadata creator={postCreator.username} lastUpdatedAt={forumPost.updatedAt} />
-          </>
-        )}
-      </List>
+      <PostHeader
+        forumPostInfo={forumPostInfo}
+        setPageMenuOpen={setPageMenuOpen}
+        undoEditorChanges={undoEditorChanges}
+      />
     );
   }
 
@@ -439,7 +529,7 @@ export default function Header({ open, openSidebar }: HeaderProps) {
         sx={{
           display: 'inline-flex',
           mr: 2,
-          ...(open && isLargeScreen && { display: 'none' })
+          ...(open && { display: 'none' })
         }}
       >
         <MenuIcon />
@@ -465,7 +555,6 @@ export default function Header({ open, openSidebar }: HeaderProps) {
           {basePage && (
             <>
               {isBasePageDocument && <DocumentParticipants />}
-              <DocumentHistory page={basePage} />
               {isBasePageDocument && <EditingModeToggle />}
               {basePage?.deletedAt === null && <ShareButton headerHeight={headerHeight} pageId={basePage.id} />}
             </>
@@ -482,7 +571,7 @@ export default function Header({ open, openSidebar }: HeaderProps) {
                       setPageMenuAnchorElement(pageMenuAnchor.current || null);
                     }}
                   >
-                    <MoreHorizIcon color='secondary' />
+                    <MoreHorizIcon data-test='header--show-page-actions' color='secondary' />
                   </IconButton>
                 </Tooltip>
               </div>
@@ -500,41 +589,35 @@ export default function Header({ open, openSidebar }: HeaderProps) {
             </Box>
           )}
           {/** End of CharmEditor page specific header content */}
-
-          {/** dark mode toggle */}
           {user && (
-            <>
-              <NotificationsBadge>
-                <IconButton
-                  size={isLargeScreen ? 'small' : 'medium'}
-                  LinkComponent={NextLink}
-                  href='/nexus'
-                  color='inherit'
-                >
-                  <NotificationsIcon fontSize='small' color='secondary' />
-                </IconButton>
-              </NotificationsBadge>
+            <NotificationsBadge>
               <IconButton
-                size='small'
-                sx={{ display: { xs: 'none', md: 'inline-flex' } }}
-                onClick={colorMode.toggleColorMode}
-                color='inherit'
+                size={isLargeScreen ? 'small' : 'medium'}
+                onClick={() => clickToOpenSettingsModal('notifications')}
               >
-                <Tooltip
-                  title={`Enable ${theme.palette.mode === 'dark' ? 'light mode' : 'dark mode'}`}
-                  arrow
-                  placement='top'
-                >
-                  {theme.palette.mode === 'dark' ? (
-                    <SunIcon fontSize='small' color='secondary' />
-                  ) : (
-                    <MoonIcon fontSize='small' color='secondary' />
-                  )}
-                </Tooltip>
+                <NotificationsIcon fontSize='small' color='secondary' />
               </IconButton>
-            </>
+            </NotificationsBadge>
           )}
-          {/* <NotificationsBadge /> */}
+          <IconButton
+            sx={{ display: { xs: 'none', md: 'inline-flex' } }}
+            size='small'
+            onClick={colorMode.toggleColorMode}
+            color='inherit'
+          >
+            <Tooltip
+              title={`Enable ${theme.palette.mode === 'dark' ? 'light mode' : 'dark mode'}`}
+              arrow
+              placement='top'
+            >
+              {theme.palette.mode === 'dark' ? (
+                <SunIcon fontSize='small' color='secondary' />
+              ) : (
+                <MoonIcon fontSize='small' color='secondary' />
+              )}
+            </Tooltip>
+          </IconButton>
+
           {/** user account */}
           {/* <Account /> */}
         </Box>
@@ -542,3 +625,5 @@ export default function Header({ open, openSidebar }: HeaderProps) {
     </StyledToolbar>
   );
 }
+
+export const Header = memo(HeaderComponent);
