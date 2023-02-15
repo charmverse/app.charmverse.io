@@ -11,7 +11,7 @@ describe('usePaginatedData', () => {
 
     expect(result.current.data).toEqual(sourceData.slice(0, testPageSize));
     expect(result.current.data.length).toEqual(testPageSize);
-    expect(result.current.currentPage).toEqual(1);
+    expect(result.current.visiblePagesCount).toEqual(1);
     expect(result.current.hasNextPage).toEqual(true);
     expect(result.current.moreCount).toEqual(testPageSize);
 
@@ -21,7 +21,7 @@ describe('usePaginatedData', () => {
 
     expect(result.current.data).toEqual(sourceData.slice(0, testPageSize * 2));
     expect(result.current.data.length).toEqual(testPageSize * 2);
-    expect(result.current.currentPage).toEqual(2);
+    expect(result.current.visiblePagesCount).toEqual(2);
     expect(result.current.hasNextPage).toEqual(true);
     expect(result.current.moreCount).toEqual(30);
 
@@ -31,7 +31,7 @@ describe('usePaginatedData', () => {
 
     expect(result.current.data).toEqual(sourceData.slice(0, testDataLength));
     expect(result.current.data.length).toEqual(testDataLength);
-    expect(result.current.currentPage).toEqual(3);
+    expect(result.current.visiblePagesCount).toEqual(3);
     expect(result.current.hasNextPage).toEqual(false);
     expect(result.current.moreCount).toEqual(0);
 
@@ -42,7 +42,7 @@ describe('usePaginatedData', () => {
 
     expect(result.current.data).toEqual(sourceData.slice(0, testDataLength));
     expect(result.current.data.length).toEqual(testDataLength);
-    expect(result.current.currentPage).toEqual(3);
+    expect(result.current.visiblePagesCount).toEqual(3);
     expect(result.current.hasNextPage).toEqual(false);
     expect(result.current.moreCount).toEqual(0);
   });

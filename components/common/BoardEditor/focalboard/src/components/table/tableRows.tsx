@@ -30,12 +30,7 @@ type Props = {
 function TableRows(props: Props): JSX.Element {
   const { board, cardPages: allCardPages, activeView } = props;
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
-  const {
-    data: cardPages,
-    hasNextPage,
-    showNextPage,
-    moreCount
-  } = usePaginatedData(allCardPages as CardPage[], { pageSize });
+  const { data: cardPages, hasNextPage, showNextPage } = usePaginatedData(allCardPages as CardPage[], { pageSize });
 
   const saveTitle = React.useCallback(async (saveType: string, cardId: string, title: string, oldTitle: string) => {
     // ignore if title is unchanged

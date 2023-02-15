@@ -48,7 +48,8 @@ export default function PopperPopup(props: PopperPopupProps) {
   };
 
   if (closeOnClick) {
-    popoverProps.onClick = () => {
+    popoverProps.onClick = (e) => {
+      e.stopPropagation();
       popupState.close();
     };
   }

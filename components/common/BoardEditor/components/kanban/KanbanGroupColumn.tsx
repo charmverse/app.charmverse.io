@@ -39,7 +39,7 @@ export function KanbanGroupColumn({
   isManualSort
 }: Props) {
   const [pageSize, setPageSize] = useState(10);
-  const { data: cards, hasNextPage, showNextPage, moreCount } = usePaginatedData(group.cards, { pageSize });
+  const { data: cards, hasNextPage, showNextPage } = usePaginatedData(group.cards, { pageSize });
 
   return (
     <KanbanColumn onDrop={(card: Card) => onDropToColumn(group.option, card)}>
