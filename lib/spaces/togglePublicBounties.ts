@@ -151,37 +151,42 @@ export async function togglePublicBounties({ spaceId, publicBountyBoard }: Publi
   }
 
   try {
-    const spaceAfterUpdate = await prisma.$transaction(async (tx) => {
-      const updatedSpace = await tx.space.update({
-        where: { id: spaceId },
-        data: {
-          publicBountyBoard
-        }
-      });
-
-      if (publicBountyBoard === true) {
-        const [deleteArgs, createArgs, childCreateArgs] = await generatePublicBountyPermissionArgs({
-          publicBountyBoard,
-          spaceId
+    const spaceAfterUpdate = await prisma.$transaction(
+      async (tx) => {
+        const updatedSpace = await tx.space.update({
+          where: { id: spaceId },
+          data: {
+            publicBountyBoard
+          }
         });
 
-        if (deleteArgs) {
-          await tx.pagePermission.deleteMany(deleteArgs);
+        if (publicBountyBoard === true) {
+          const [deleteArgs, createArgs, childCreateArgs] = await generatePublicBountyPermissionArgs({
+            publicBountyBoard,
+            spaceId
+          });
+
+          if (deleteArgs) {
+            await tx.pagePermission.deleteMany(deleteArgs);
+          }
+
+          await tx.pagePermission.createMany(createArgs);
+
+          await tx.pagePermission.createMany(childCreateArgs);
+        } else {
+          const [deleteArgs] = await generatePublicBountyPermissionArgs({ publicBountyBoard, spaceId });
+
+          if (deleteArgs) {
+            await tx.pagePermission.deleteMany(deleteArgs);
+          }
         }
 
-        await tx.pagePermission.createMany(createArgs);
-
-        await tx.pagePermission.createMany(childCreateArgs);
-      } else {
-        const [deleteArgs] = await generatePublicBountyPermissionArgs({ publicBountyBoard, spaceId });
-
-        if (deleteArgs) {
-          await tx.pagePermission.deleteMany(deleteArgs);
-        }
+        return updatedSpace;
+      },
+      {
+        timeout: 20000
       }
-
-      return updatedSpace;
-    });
+    );
 
     return spaceAfterUpdate;
   } catch (err) {
