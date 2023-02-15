@@ -4,10 +4,11 @@ import request from 'supertest';
 import { v4 } from 'uuid';
 
 import { prisma } from 'db';
+import type { PostCommentWithVote } from 'lib/forums/comments/interface';
 import { upsertPostCategoryPermission } from 'lib/permissions/forum/upsertPostCategoryPermission';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateSpaceUser, generateUserAndSpace } from 'testing/setupDatabase';
-import { generateForumPost, generatePostCategory } from 'testing/utils/forums';
+import { generateForumPost, generatePostCategory, generatePostWithComment } from 'testing/utils/forums';
 
 let space: Space;
 let user: User;
@@ -58,6 +59,38 @@ describe('GET /api/forums/posts/[postId]/comments - Get comments of a post', () 
     ).body;
 
     expect(comments).toBeInstanceOf(Array);
+  });
+
+  it('should return a list of post comments with vote information to a non logged in user if the post is in a public category, responding with 200', async () => {
+    await upsertPostCategoryPermission({
+      permissionLevel: 'view',
+      postCategoryId: accessiblePostCategory.id,
+      assignee: { group: 'public' }
+    });
+
+    const postWithComment = await generatePostWithComment({
+      userId: user.id,
+      spaceId: space.id,
+      categoryId: accessiblePostCategory.id
+    });
+
+    await prisma.postCommentUpDownVote.create({
+      data: {
+        createdBy: user.id,
+        upvoted: true,
+        comment: { connect: { id: postWithComment.comment.id } },
+        post: { connect: { id: postWithComment.post.id } }
+      }
+    });
+
+    const comments = (await request(baseUrl).get(`/api/forums/posts/${postWithComment.post.id}/comments`).expect(200))
+      .body as PostCommentWithVote[];
+
+    expect(comments.length).toBe(1);
+    expect(comments[0].id).toBe(postWithComment.comment.id);
+    expect(comments[0].content).toEqual(postWithComment.comment.content);
+    expect(comments[0].upvotes).toEqual(1);
+    expect(comments[0].downvotes).toEqual(0);
   });
 
   it('should throw an error if user does not have permissions to view this category, responding with 401', async () => {

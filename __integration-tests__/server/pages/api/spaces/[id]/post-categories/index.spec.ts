@@ -186,4 +186,12 @@ describe('GET /api/spaces/[id]/post-categories - Retrieve space post categories'
     expect(postCategories.length).toBe(1);
     expect(postCategories[0].id).toBe(publicCategoryPermissionId);
   });
+
+  it('should return only the public post categories for a user who is not logged in, responding with 200', async () => {
+    const postCategories = (
+      await request(baseUrl).get(`/api/spaces/${secondSpace.id}/post-categories`).send().expect(200)
+    ).body as PostCategory[];
+    expect(postCategories.length).toBe(1);
+    expect(postCategories[0].id).toBe(publicCategoryPermissionId);
+  });
 });

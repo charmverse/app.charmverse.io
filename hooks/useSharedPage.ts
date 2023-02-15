@@ -1,15 +1,17 @@
 import { useRouter } from 'next/router';
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 import { useSpaces } from 'hooks/useSpaces';
 
 const BOUNTIES_PATH = '/[domain]/bounties';
-const PUBLIC_PAGE_PATHS = [BOUNTIES_PATH, '/[domain]/[pageId]'];
+const DOCUMENT_PATH = '/[domain]/[pageId]';
+const FORUM_PATH = '/[domain]/forum';
+const PUBLIC_PAGE_PATHS = [BOUNTIES_PATH, DOCUMENT_PATH, FORUM_PATH];
 
 export const useSharedPage = () => {
-  const { pathname, query } = useRouter();
+  const { pathname, query, isReady: isRouterReady } = useRouter();
 
   const isPublicPath = isPublicPagePath(pathname);
   const isBountiesPath = isPublicPath && isBountiesPagePath(pathname);
@@ -33,21 +35,12 @@ export const useSharedPage = () => {
 
   // user does not have access to space and is page path, so we want to verify if it is a public page
   const shouldLoadPublicPage = useMemo(() => {
-    if (!spacesLoaded || !isPublicPath || isBountiesPath) {
+    if (!spacesLoaded || !isPublicPath) {
       return false;
     }
 
     return !loadedSpace;
   }, [spacesLoaded, isPublicPath, spaces, spaceDomain]);
-
-  const shouldLoadSpace = useMemo(() => {
-    if (!spacesLoaded || !isBountiesPath) {
-      return false;
-    }
-
-    return !loadedSpace;
-  }, [spacesLoaded, isPublicPath, spaces, spaceDomain]);
-
   const {
     data: publicPage,
     isLoading: isPublicPageLoading,
@@ -55,32 +48,37 @@ export const useSharedPage = () => {
   } = useSWR(shouldLoadPublicPage ? `public/${pageKey}` : null, () => charmClient.getPublicPage(pageKey || ''));
 
   const {
-    data: publicSpace,
+    data: space,
     isLoading: isSpaceLoading,
     error: spaceError
-  } = useSWR(shouldLoadSpace ? `space/${spaceDomain}` : null, () => charmClient.getSpaceByDomain(spaceDomain || ''));
+  } = useSWR(spaceDomain ? `space/${spaceDomain}` : null, () => charmClient.getSpaceByDomain(spaceDomain || ''));
 
-  const space = publicSpace || publicPage?.space;
   const hasError = !!publicPageError || !!spaceError;
   const hasPublicBounties = space?.publicBountyBoard;
-  const hasSharedPageAccess = !!publicPage || !!hasPublicBounties;
-  const accessChecked =
-    (spacesLoaded && (hasSharedPageAccess || (!shouldLoadSpace && !shouldLoadPublicPage) || !!space)) || hasError;
+  const hasSharedPageAccess = !!publicPage || !!hasPublicBounties || isForumPagePath(pathname);
+  const accessChecked = isRouterReady && !isSpaceLoading && !isPublicPageLoading;
 
   return {
-    isCheckingAccess: isPublicPageLoading || isSpaceLoading,
     accessChecked,
     hasError,
-    hasSharedPageAccess: !!publicPage || !!hasPublicBounties,
+    hasSharedPageAccess,
     publicSpace: space,
     publicPage
   };
 };
 
 export function isPublicPagePath(path: string): boolean {
-  return PUBLIC_PAGE_PATHS.includes(path);
+  return PUBLIC_PAGE_PATHS.some((p) => path.startsWith(p));
+}
+
+export function isPublicDocumentPath(path: string): boolean {
+  return path.startsWith(DOCUMENT_PATH);
 }
 
 export function isBountiesPagePath(path: string): boolean {
-  return path === BOUNTIES_PATH;
+  return path.startsWith(BOUNTIES_PATH);
+}
+
+export function isForumPagePath(path: string): boolean {
+  return path.startsWith(FORUM_PATH);
 }
