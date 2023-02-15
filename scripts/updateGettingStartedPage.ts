@@ -4,7 +4,7 @@ import { InvalidInputError } from "lib/utilities/errors";
 import {GettingStartedPage, gettingStartedPage} from 'seedData/gettingStartedPage';
 import fs from 'node:fs/promises'
 import path from 'node:path'
-
+import {execSync} from 'node:child_process'
 
 /**
  * Use this script to update the default Getting Started page for spaces.
@@ -52,11 +52,16 @@ async function updateGettingStartedPage({spaceDomain, pagePath}: {spaceDomain: s
   console.log('pageWithoutContent', pageWithoutContent)
 
   // Construct the updated code for this page
-  const newContent = `${fileContentPre}\r\nexport const gettingStartedPage: GettingStartedPage = ${JSON.stringify(newGettingStartedPage, null, 2).replace(/'/g, "\'").replace(/"/g, "'")};`
+  const newContent = `${fileContentPre}\r\n\r\nexport const gettingStartedPage: GettingStartedPage = ${JSON.stringify(newGettingStartedPage, null, 2)};`
 
   await fs.writeFile(gettingStartedFile, newContent, 'utf-8');
 
-  console.log('✅ Updated getting started page')
+  console.log('✅ Updated getting started page');
+
+  console.log('Running linter...');
+  execSync('npx eslint --fix seedData/gettingStartedPage.ts');
+
+  console.log('🚀 Done! Please commit the changes to the getting started page.');
 }
 
 updateGettingStartedPage({spaceDomain: 'encouraging-magenta-stoat', pagePath: 'getting-started'})

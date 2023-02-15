@@ -36,7 +36,51 @@ export const gettingStartedPage: GettingStartedPage = {
             type: 'text'
           },
           {
-            text: 'Welcome to CharmVerse!',
+            text: 'Welcome to ',
+            type: 'text',
+            marks: [
+              {
+                type: 'insertion',
+                attrs: {
+                  date: '2022-12-21T14:50:00.000Z',
+                  user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
+                  approved: true,
+                  username: 'Drea | CharmVerse'
+                }
+              },
+              {
+                type: 'text-color',
+                attrs: {
+                  color: 'blue',
+                  bgColor: ''
+                }
+              }
+            ]
+          },
+          {
+            text: 'MySpace',
+            type: 'text',
+            marks: [
+              {
+                type: 'insertion',
+                attrs: {
+                  date: '2023-02-15T12:40:00.000Z',
+                  user: 'fdcc4a76-6e83-4178-9684-ff64537fff62',
+                  approved: true,
+                  username: 'melboudi.eth'
+                }
+              },
+              {
+                type: 'text-color',
+                attrs: {
+                  color: 'blue',
+                  bgColor: ''
+                }
+              }
+            ]
+          },
+          {
+            text: '!',
             type: 'text',
             marks: [
               {
@@ -2706,5 +2750,5 @@ export const gettingStartedPage: GettingStartedPage = {
     ]
   },
   contentText:
-    " Welcome to CharmVerse!A web3 community platform. Powering the Future of Work through Web3. The solution for token communities to build relationships, work together and vote.Here are the basics:Click anywhere and just start typingHit / to see all the types of content you can add - headings, videos, tweets, sub pages, etc.Give it a go. Hit / and insert a new sub page here  Hit : to add an emoji. Go ahead and add your favorite emoji here  Highlight any text, and use the menu that pops up to style your writing however you likeHighlight this text and turn it into a Callout with a fire emoji.See the ⋮⋮ to the left of this checkbox on hover? Click and drag to move this line.Hover over SPACE in your sidebar and click the + button to add a new pageThis is a toggle block. Click the little triangle to see more useful tips!How it works : Learn about CharmVerse's cool web3 features like Forum, Proposal Builder, Bounties, and Member Directory. You will find shortcuts to these features at the top of your sidebar.Solutions : Find examples of how to use CharmVerse for your web3 community.FAQ : Any questions? Maybe we already answered them here  Collaborate in CharmVerseCharmVerse is better with friends, teammates, and collaborators  Add a teammateCreate a private linkAdd a token gateCheckout the Member DirectoryAdd a custom propertyComplete your workspace profileTry creating a proposalBuild a proposal templateStart your first proposalUseful LinksHow it works : Learn about CharmVerse's cool web3 features like Forum, Proposal Builder, Bounties, and Member Directory. You will find shortcuts to these features at the top of your sidebar.Solutions : Find examples of how to use CharmVerse for your web3 community.FAQ : Any questions? Maybe we already answered them here  Need more information? Click Support & Feedback in the left sidebar to join our Discord and chat with us."
+    " Welcome to MySpace!A web3 community platform. Powering the Future of Work through Web3. The solution for token communities to build relationships, work together and vote.Here are the basics:Click anywhere and just start typingHit / to see all the types of content you can add - headings, videos, tweets, sub pages, etc.Give it a go. Hit / and insert a new sub page here  Hit : to add an emoji. Go ahead and add your favorite emoji here  Highlight any text, and use the menu that pops up to style your writing however you likeHighlight this text and turn it into a Callout with a fire emoji.See the ⋮⋮ to the left of this checkbox on hover? Click and drag to move this line.Hover over SPACE in your sidebar and click the + button to add a new pageThis is a toggle block. Click the little triangle to see more useful tips!How it works : Learn about CharmVerse's cool web3 features like Forum, Proposal Builder, Bounties, and Member Directory. You will find shortcuts to these features at the top of your sidebar.Solutions : Find examples of how to use CharmVerse for your web3 community.FAQ : Any questions? Maybe we already answered them here  Collaborate in CharmVerseCharmVerse is better with friends, teammates, and collaborators  Add a teammateCreate a private linkAdd a token gateCheckout the Member DirectoryAdd a custom propertyComplete your workspace profileTry creating a proposalBuild a proposal templateStart your first proposalUseful LinksHow it works : Learn about CharmVerse's cool web3 features like Forum, Proposal Builder, Bounties, and Member Directory. You will find shortcuts to these features at the top of your sidebar.Solutions : Find examples of how to use CharmVerse for your web3 community.FAQ : Any questions? Maybe we already answered them here  Need more information? Click Support & Feedback in the left sidebar to join our Discord and chat with us."
 };
