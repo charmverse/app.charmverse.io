@@ -62,13 +62,17 @@ export async function generateForumPost({
   userId,
   spaceId,
   path = `post-${v4()}`,
-  title = 'Test post'
+  title = 'Test post',
+  content,
+  contentText
 }: {
   categoryId?: string;
   userId: string;
   spaceId: string;
   path?: string;
   title?: string;
+  content?: any;
+  contentText?: string;
 }) {
   if (!categoryId) {
     const category = await generatePostCategory({ spaceId });
@@ -78,8 +82,8 @@ export async function generateForumPost({
     data: {
       title,
       path,
-      contentText: '',
-      content: {
+      contentText: contentText ?? '',
+      content: content ?? {
         type: 'doc',
         content: []
       },
