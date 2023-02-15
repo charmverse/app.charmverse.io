@@ -11,6 +11,7 @@ import DialogContent from '@mui/material/DialogContent';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import type { Space } from '@prisma/client';
+import { usePopupState } from 'material-ui-popup-state/hooks';
 import type { ReactNode } from 'react';
 import { useEffect } from 'react';
 
@@ -112,7 +113,16 @@ function SpaceSettingsModalComponent() {
   const currentSpace = useCurrentSpace();
 
   const isMobile = useSmallScreen();
-  const { activePath, onClose, onClick, open } = useSettingsDialog();
+  const modalState = usePopupState({ variant: 'dialog', popupId: 'settings-dialog' });
+  const { activePath, onClose, onClick } = useSettingsDialog();
+
+  useEffect(() => {
+    if (activePath) {
+      modalState.open();
+    } else {
+      modalState.close();
+    }
+  }, [activePath]);
 
   return (
     <Dialog
@@ -121,10 +131,15 @@ function SpaceSettingsModalComponent() {
       fullScreen={isMobile}
       PaperProps={{ sx: { height: { md: '90vh' }, borderRadius: (theme) => theme.spacing(1) } }}
       onClose={onClose}
-      open={open}
+      open={modalState.isOpen}
     >
       <Box display='flex' flexDirection='row' flex='1' overflow='hidden'>
-        <Slide direction='right' in={isMobile ? open && !activePath : true} appear={isMobile} unmountOnExit>
+        <Slide
+          direction='right'
+          in={isMobile ? modalState.isOpen && !activePath : true}
+          appear={isMobile}
+          unmountOnExit
+        >
           <Box
             component='aside'
             maxWidth={{ xs: '100%', md: 350 }}
