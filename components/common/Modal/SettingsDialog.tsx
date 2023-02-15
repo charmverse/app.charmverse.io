@@ -133,7 +133,7 @@ function SpaceSettingsModalComponent() {
       onClose={onClose}
       open={modalState.isOpen}
     >
-      <Box display='flex' flexDirection='row' flex='1' overflow='hidden'>
+      <Box data-test-active-path={activePath} display='flex' flexDirection='row' flex='1' overflow='hidden'>
         <Slide
           direction='right'
           in={isMobile ? modalState.isOpen && !activePath : true}

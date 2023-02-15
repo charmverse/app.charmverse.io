@@ -23,6 +23,10 @@ export class SettingsModal {
     await this.settingsBtn.click();
   }
 
+  getActivePath({ activePath }: { activePath: string }): Locator {
+    return this.page.locator(`[data-test-active-path=${activePath}]`);
+  }
+
   getSpaceSettingsLocator(spaceId: string): Locator {
     return this.page.locator(`data-test=space-settings-tab-${spaceId}`);
   }

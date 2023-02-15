@@ -11,7 +11,7 @@ export default function NexusRedirect() {
 
   useEffect(() => {
     if (router.isReady) {
-      log.info('Show tasks to user', router.asPath, router.query.task);
+      log.info('Show tasks to user');
       router.push('/');
       onClick('notifications', { taskType: router.query.task } as PathProps);
     }
