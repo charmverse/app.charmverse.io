@@ -64,7 +64,9 @@ export default function TasksPage() {
   const router = useRouter();
   const { user } = useUser();
   const { pathProps } = useSettingsDialog();
-  const [currentTaskType, setCurrentTaskType] = useState<TaskType>(pathProps?.taskType ?? TASK_TABS[0].type);
+  // check from list of tabs to make sure task type is valid
+  const defaultTab = TASK_TABS.find((taskTab) => taskTab.type === pathProps?.taskType);
+  const [currentTaskType, setCurrentTaskType] = useState<TaskType>(defaultTab?.type ?? TASK_TABS[0].type);
   const { error, mutate: mutateTasks, tasks, gnosisTasks, gnosisTasksServerError, mutateGnosisTasks } = useTasks();
   const theme = useTheme();
 
