@@ -7,7 +7,7 @@ import type { SetSpaceWebhookBody, SetSpaceWebhookResponse } from 'pages/api/spa
 
 import { useCurrentSpace } from './useCurrentSpace';
 
-const convertToEventMap = (webhook: SetSpaceWebhookResponse | undefined) => {
+const convertToEventMap = (webhook: SetSpaceWebhookResponse | null | undefined) => {
   const eventMap = new Map<string, boolean>();
 
   if (!webhook) {

@@ -58,7 +58,7 @@ export default function MemberRow({ isAdmin, isSpaceOwner, member, onChange }: P
   const activeRoleAction = member.isAdmin ? 'makeAdmin' : 'makeMember';
 
   return (
-    <TableRow>
+    <TableRow data-test={`member-list-item-${member.id}`}>
       <TableCell>
         <Box display='flex' alignItems='center'>
           <Avatar name={member.username} avatar={member?.avatar} isNft={member?.hasNftAvatar} />
@@ -84,6 +84,7 @@ export default function MemberRow({ isAdmin, isSpaceOwner, member, onChange }: P
               variant='outlined'
               {...bindTrigger(popupState)}
               endIcon={<KeyboardArrowDownIcon fontSize='small' />}
+              data-test={`editable-member-level-${member.id}`}
             >
               {member.isAdmin ? 'admin' : 'member'}
             </Button>
