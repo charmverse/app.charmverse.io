@@ -13,6 +13,6 @@ export function useCurrentSpace() {
 
   if (accessChecked) {
     // IF we are viewing a public page, we want to return the public space as current one
-    return publicSpace || space;
+    return space ?? publicSpace;
   }
 }
