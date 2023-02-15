@@ -12,7 +12,7 @@ export function useCurrentSpace() {
   const space = spaces.find((w) => w.id === currentSpaceId);
 
   if (accessChecked) {
-    // IF we are viewing a public page, we want to return the public space as current one
+    // We always want to return the space as priority since it's not just set by the URL
     return space ?? publicSpace;
   }
 }
