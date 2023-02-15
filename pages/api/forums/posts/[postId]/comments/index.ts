@@ -6,11 +6,9 @@ import { createPostComment } from 'lib/forums/comments/createPostComment';
 import type { CreatePostCommentInput, PostCommentWithVote } from 'lib/forums/comments/interface';
 import { listPostComments } from 'lib/forums/comments/listPostComments';
 import { PostNotFoundError } from 'lib/forums/posts/errors';
-import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
-import { computePostPermissions } from 'lib/permissions/forum/computePostPermissions';
+import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { requestOperations } from 'lib/permissions/requestOperations';
 import { withSessionRoute } from 'lib/session/withSession';
-import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -19,7 +17,7 @@ handler.get(listPostCommentsHandler).use(requireUser).post(createPostCommentHand
 async function listPostCommentsHandler(req: NextApiRequest, res: NextApiResponse<PostCommentWithVote[]>) {
   const { postId } = req.query as any as { postId: string };
 
-  const userId = req.session.user.id;
+  const userId = req.session.user?.id;
 
   await requestOperations({
     resourceType: 'post',

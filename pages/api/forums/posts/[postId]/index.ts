@@ -7,14 +7,14 @@ import { deleteForumPost } from 'lib/forums/posts/deleteForumPost';
 import { getForumPost } from 'lib/forums/posts/getForumPost';
 import type { UpdateForumPostInput } from 'lib/forums/posts/updateForumPost';
 import { updateForumPost } from 'lib/forums/posts/updateForumPost';
-import { onError, onNoMatch, requireUser } from 'lib/middleware';
+import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { requestOperations } from 'lib/permissions/requestOperations';
 import { withSessionRoute } from 'lib/session/withSession';
 import { relay } from 'lib/websockets/relay';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireUser).get(getForumPostController).put(updateForumPostController).delete(deleteForumPostController);
+handler.get(getForumPostController).use(requireUser).put(updateForumPostController).delete(deleteForumPostController);
 
 async function updateForumPostController(req: NextApiRequest, res: NextApiResponse<Post>) {
   const { postId } = req.query as any as { postId: string };
@@ -93,7 +93,7 @@ async function deleteForumPostController(req: NextApiRequest, res: NextApiRespon
 
 async function getForumPostController(req: NextApiRequest, res: NextApiResponse<Post>) {
   const { postId, spaceDomain } = req.query as any as { postId: string; spaceDomain?: string };
-  const userId = req.session.user.id;
+  const userId = req.session.user?.id;
 
   const post = await getForumPost({ userId, postId, spaceDomain });
 
@@ -101,7 +101,8 @@ async function getForumPostController(req: NextApiRequest, res: NextApiResponse<
     resourceType: 'post',
     resourceId: post.id,
     operations: ['view_post'],
-    userId
+    userId,
+    customError: new ActionNotPermittedError(`You do not have access to this post`)
   });
   res.status(200).json(post);
 }

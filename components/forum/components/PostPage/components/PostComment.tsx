@@ -21,6 +21,7 @@ import type {
   PostCommentWithVote,
   PostCommentWithVoteAndChildren
 } from 'lib/forums/comments/interface';
+import type { PostWithVotes } from 'lib/forums/posts/interfaces';
 import type { AvailablePostPermissionFlags } from 'lib/permissions/forum/interfaces';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { getRelativeTimeInThePast } from 'lib/utilities/dates';
@@ -45,9 +46,10 @@ type Props = {
   comment: PostCommentWithVoteAndChildren;
   setPostComments: KeyedMutator<PostCommentWithVote[] | undefined>;
   permissions?: AvailablePostPermissionFlags;
+  post: PostWithVotes | null;
 };
 
-export function PostComment({ comment, setPostComments, permissions }: Props) {
+export function PostComment({ post, comment, setPostComments, permissions }: Props) {
   const [showCommentReply, setShowCommentReply] = useState(false);
   const theme = useTheme();
   const { user } = useUser();
@@ -145,7 +147,7 @@ export function PostComment({ comment, setPostComments, permissions }: Props) {
   }
 
   const isCommentAuthor = comment.createdBy === user?.id;
-  const canDeleteComment = permissions?.delete_comments || isCommentAuthor;
+  const canDeleteComment = (permissions?.delete_comments || isCommentAuthor) && !post?.proposalId;
 
   return (
     <Stack my={1} position='relative'>
@@ -281,6 +283,7 @@ export function PostComment({ comment, setPostComments, permissions }: Props) {
             setPostComments={setPostComments}
             comment={childComment}
             key={childComment.id}
+            post={post}
           />
         ))}
       </Box>
@@ -290,9 +293,13 @@ export function PostComment({ comment, setPostComments, permissions }: Props) {
         transformOrigin={{ vertical: 'top', horizontal: 'right' }}
         onClick={(e) => e.stopPropagation()}
       >
-        <Tooltip title={!isCommentAuthor ? "You cannot edit another user's comment" : ''}>
+        <Tooltip title={!canDeleteComment ? "You cannot edit another user's comment" : ''}>
           <div>
-            <MenuItem disabled={!isCommentAuthor} data-test={`edit-comment-${comment.id}`} onClick={onClickEditComment}>
+            <MenuItem
+              disabled={!canDeleteComment}
+              data-test={`edit-comment-${comment.id}`}
+              onClick={onClickEditComment}
+            >
               <ListItemIcon>
                 <EditIcon />
               </ListItemIcon>

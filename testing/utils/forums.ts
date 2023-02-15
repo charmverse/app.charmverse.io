@@ -22,7 +22,15 @@ export async function generatePostCategory({
   });
 }
 
-export async function generatePostWithComment({ userId, spaceId }: { spaceId: string; userId: string }) {
+export async function generatePostWithComment({
+  userId,
+  spaceId,
+  categoryId
+}: {
+  spaceId: string;
+  userId: string;
+  categoryId?: string;
+}) {
   const commentInput: CreatePostCommentInput = {
     content: {
       type: ''
@@ -33,7 +41,8 @@ export async function generatePostWithComment({ userId, spaceId }: { spaceId: st
 
   const post = await generateForumPost({
     spaceId,
-    userId
+    userId,
+    categoryId
   });
 
   const postComment = await createPostComment({
@@ -53,13 +62,17 @@ export async function generateForumPost({
   userId,
   spaceId,
   path = `post-${v4()}`,
-  title = 'Test post'
+  title = 'Test post',
+  content,
+  contentText
 }: {
   categoryId?: string;
   userId: string;
   spaceId: string;
   path?: string;
   title?: string;
+  content?: any;
+  contentText?: string;
 }) {
   if (!categoryId) {
     const category = await generatePostCategory({ spaceId });
@@ -69,8 +82,8 @@ export async function generateForumPost({
     data: {
       title,
       path,
-      contentText: '',
-      content: {
+      contentText: contentText ?? '',
+      content: content ?? {
         type: 'doc',
         content: []
       },
