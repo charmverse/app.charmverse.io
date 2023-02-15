@@ -9,9 +9,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 
 const StyledPageDeleteBanner = styled(Box)<{ card?: boolean }>`
-  position: fixed;
-  top: ${({ card }) => (card ? '50px' : '55px')};
-  width: ${({ card }) => (card ? '100%' : 'calc(100% - 300px)')};
+  width: 100%;
   z-index: var(--z-index-appBar);
   display: flex;
   justify-content: center;

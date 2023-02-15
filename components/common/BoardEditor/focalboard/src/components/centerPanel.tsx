@@ -443,7 +443,6 @@ function CenterPanel(props: Props) {
       }}
     >
       <Hotkeys keyName='ctrl+d,del,esc,backspace' onKeyDown={keydownHandler} />
-      {!!boardPage?.deletedAt && <PageDeleteBanner pageId={board.id} />}
       {!props.hideBanner && board.fields.headerImage && (
         <Box className='PageBanner' width='100%' mb={2}>
           <PageBanner
