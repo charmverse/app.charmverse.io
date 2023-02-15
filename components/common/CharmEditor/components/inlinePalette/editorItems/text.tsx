@@ -195,31 +195,33 @@ export function items(props: ItemsProps): PaletteItemTypeNoGroup[] {
       editorExecuteCommand: ({ palettePluginKey }) => {
         return (state, dispatch, view) => {
           rafCommandExec(view!, (_state, _dispatch) => {
-            return insertNode(
-              _state,
-              _dispatch,
-              _state.schema.nodes.table.create(
-                undefined,
-                Fragment.fromArray([
-                  _state.schema.nodes.table_row.create(
-                    undefined,
-                    Fragment.fromArray([
-                      createTableHeader(_state, 'Header 1'),
-                      createTableHeader(_state, 'Header 2'),
-                      createTableHeader(_state, 'Header 3')
-                    ])
-                  ),
-                  _state.schema.nodes.table_row.create(
-                    undefined,
-                    Fragment.fromArray([
-                      createTableCell(_state, 'Cell 1'),
-                      createTableCell(_state, 'Cell 2'),
-                      createTableCell(_state, 'Cell 3')
-                    ])
-                  )
-                ])
-              )
+            const node = _state.schema.nodes.table.create(
+              undefined,
+              Fragment.fromArray([
+                _state.schema.nodes.table_row.create(
+                  undefined,
+                  Fragment.fromArray([
+                    createTableHeader(_state, 'Header 1'),
+                    createTableHeader(_state, 'Header 2'),
+                    createTableHeader(_state, 'Header 3')
+                  ])
+                ),
+                _state.schema.nodes.table_row.create(
+                  undefined,
+                  Fragment.fromArray([
+                    createTableCell(_state, 'Cell 1'),
+                    createTableCell(_state, 'Cell 2'),
+                    createTableCell(_state, 'Cell 3')
+                  ])
+                )
+              ])
             );
+            if (_dispatch) {
+              _dispatch(_state.tr.replaceSelectionWith(node));
+              return true;
+            }
+
+            return insertNode(_state, _dispatch, node);
           });
           return replaceSuggestionMarkWith(palettePluginKey, '')(state, dispatch, view);
         };
@@ -363,7 +365,7 @@ export function items(props: ItemsProps): PaletteItemTypeNoGroup[] {
           // Execute the animation
           rafCommandExec(view!, (_state, _dispatch) => {
             const node = _state.schema.nodes.horizontalRule.create({ track: [] });
-            if (_dispatch && isAtBeginningOfLine(state)) {
+            if (_dispatch) {
               _dispatch(_state.tr.replaceSelectionWith(node));
               return true;
             }

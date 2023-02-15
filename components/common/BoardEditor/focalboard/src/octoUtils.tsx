@@ -13,7 +13,6 @@ import type { FilterCondition } from 'lib/focalboard/filterClause';
 
 import { createCheckboxBlock } from './blocks/checkboxBlock';
 import { createCommentBlock } from './blocks/commentBlock';
-import { createDividerBlock } from './blocks/dividerBlock';
 import { createImageBlock } from './blocks/imageBlock';
 import { createTextBlock } from './blocks/textBlock';
 import { Utils } from './utils';
@@ -99,9 +98,6 @@ class OctoUtils {
       }
       case 'image': {
         return createImageBlock(block);
-      }
-      case 'divider': {
-        return createDividerBlock(block);
       }
       case 'comment': {
         return createCommentBlock(block);
