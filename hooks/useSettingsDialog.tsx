@@ -1,43 +1,44 @@
-import { usePopupState } from 'material-ui-popup-state/hooks';
 import type { ReactNode } from 'react';
 import { useMemo, createContext, useContext, useState } from 'react';
 
+import type { TasksPageProps } from 'components/nexus/TasksPage';
+
+export type PathProps = TasksPageProps;
+
 type IContext = {
   activePath: string;
-  open: boolean;
+  pathProps?: PathProps | null;
   onClose: () => any;
-  onClick: (path?: string) => void;
+  onClick: (path?: string, props?: PathProps) => void;
 };
 
 export const SettingsDialogContext = createContext<Readonly<IContext>>({
   activePath: '',
-  open: false,
   onClose: () => {},
   onClick: () => undefined
 });
 
 export function SettingsDialogProvider({ children }: { children: ReactNode }) {
-  const settingsModalState = usePopupState({ variant: 'dialog', popupId: 'settings-dialog' });
   const [activePath, setActivePath] = useState('');
+  const [pathProps, setPathProps] = useState<PathProps | undefined>();
 
-  const onClick = (_path?: string) => {
+  const onClick = (_path?: string, props?: PathProps) => {
     setActivePath(_path ?? '');
-    settingsModalState.open(settingsModalState.anchorEl);
+    setPathProps(props);
   };
 
   const onClose = () => {
-    settingsModalState.close();
     setActivePath('');
   };
 
   const value = useMemo<IContext>(
     () => ({
       activePath,
+      pathProps,
       onClick,
-      onClose,
-      open: settingsModalState.isOpen
+      onClose
     }),
-    [settingsModalState.isOpen, activePath]
+    [activePath]
   );
 
   return <SettingsDialogContext.Provider value={value}>{children}</SettingsDialogContext.Provider>;
