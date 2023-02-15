@@ -1,9 +1,11 @@
 import type { Page } from '@prisma/client';
 
-export const gettingStartedPage: Pick<
+export type GettingStartedPage = Pick<
   Page,
   'title' | 'icon' | 'headerImage' | 'hasContent' | 'content' | 'contentText' | 'type' | 'index' | 'version'
-> = {
+>;
+
+export const gettingStartedPage: GettingStartedPage = {
   title: 'Getting Started',
   hasContent: true,
   headerImage:
