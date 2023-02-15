@@ -5,8 +5,7 @@ import { prisma } from 'db';
 import type { PageNodeWithChildren, PageNodeWithPermissions } from 'lib/pages';
 import { multiResolvePageTree } from 'lib/pages/server/resolvePageTree';
 import { hasSameOrMorePermissions } from 'lib/permissions/pages';
-
-import { InvalidInputError } from '../utilities/errors';
+import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
 
 import type { PublicBountyToggle } from './interfaces';
 
@@ -145,28 +144,35 @@ export async function togglePublicBounties({ spaceId, publicBountyBoard }: Publi
     spaceId
   });
 
-  const spaceAfterUpdate = await prisma.$transaction(async (tx) => {
-    const updatedSpace = await tx.space.update({
-      where: { id: spaceId },
-      data: {
-        publicBountyBoard
-      }
-    });
+  try {
+    const spaceAfterUpdate = await prisma.$transaction(async (tx) => {
+      const updatedSpace = await tx.space.update({
+        where: { id: spaceId },
+        data: {
+          publicBountyBoard
+        }
+      });
 
-    if (publicBountyBoard === true) {
-      if (deleteArgs) {
+      if (publicBountyBoard === true) {
+        if (deleteArgs) {
+          await tx.pagePermission.deleteMany(deleteArgs);
+        }
+
+        await tx.pagePermission.createMany(createArgs);
+
+        await tx.pagePermission.createMany(childCreateArgs);
+      } else if (deleteArgs) {
         await tx.pagePermission.deleteMany(deleteArgs);
       }
 
-      await tx.pagePermission.createMany(createArgs);
+      return updatedSpace;
+    });
 
-      await tx.pagePermission.createMany(childCreateArgs);
-    } else if (deleteArgs) {
-      await tx.pagePermission.deleteMany(deleteArgs);
+    return spaceAfterUpdate;
+  } catch (error) {
+    if ((error as Prisma.PrismaClientKnownRequestError).code === 'P2025') {
+      throw new DataNotFoundError('Space not found.');
     }
-
-    return updatedSpace;
-  });
-
-  return spaceAfterUpdate;
+    throw error;
+  }
 }
