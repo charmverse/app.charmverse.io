@@ -86,7 +86,7 @@ function TableRows(props: Props): JSX.Element {
           <div className='octo-table-cell' onClick={showNextPage}>
             <Box display='flex' gap={1} alignItems='center'>
               <ArrowDownwardIcon fontSize='small' />
-              <Typography fontSize='small'>Show {moreCount} more</Typography>
+              <Typography fontSize='small'>Load more</Typography>
               <PageSizeInputPopup onChange={setPageSize} pageSize={pageSize} />
             </Box>
           </div>

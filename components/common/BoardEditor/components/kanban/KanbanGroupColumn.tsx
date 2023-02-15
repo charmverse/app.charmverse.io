@@ -70,7 +70,7 @@ export function KanbanGroupColumn({
           startIcon={<ArrowDownwardIcon fontSize='small' />}
         >
           <Box display='flex' justifyContent='space-between' gap={1} alignItems='center'>
-            <Typography fontSize='small'>Show {moreCount} more</Typography>
+            <Typography fontSize='small'>Load more</Typography>
             <PageSizeInputPopup onChange={setPageSize} pageSize={pageSize} />
           </Box>
         </Button>
