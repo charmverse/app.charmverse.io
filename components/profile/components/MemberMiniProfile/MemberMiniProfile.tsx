@@ -51,7 +51,7 @@ function MemberProfile({
   const { updateSpaceValues } = useMemberPropertyValues(member.id);
 
   const username =
-    (member.properties.find((memberProperty) => memberProperty.memberPropertyId === propertiesRecord.name?.id)
+    (member.properties?.find((memberProperty) => memberProperty.memberPropertyId === propertiesRecord.name?.id)
       ?.value as string) ?? member.username;
 
   const { data: user, isLoading: isFetchingUser } = useSWR(`users/${member.path}`, () =>
