@@ -1,6 +1,6 @@
 import { test as base, expect } from '@playwright/test';
 import { ForumPostPage } from '__e2e__/po/forumPost.po';
-import { PageHeader } from '__e2e__/po/pageHeader';
+import { PageHeader } from '__e2e__/po/pageHeader.po';
 
 import { upsertPostCategoryPermission } from 'lib/permissions/forum/upsertPostCategoryPermission';
 import { randomETHWalletAddress } from 'testing/generateStubs';

@@ -31,6 +31,12 @@ export class SettingsModal {
     return this.page.locator(`data-test=space-settings-tab-${spaceId}-${section}`);
   }
 
+  async isSpaceSettingsExpanded(spaceId: string): Promise<boolean> {
+    const locator = this.getSpaceSettingsLocator(spaceId);
+    const expanded = await locator.getAttribute('aria-expanded');
+    return expanded === 'true';
+  }
+
   async goToTab({ spaceId, section }: { spaceId: string; section: SpaceSettingsSection }) {
     const tab = this.getSpaceSettingsSectionLocator({ spaceId, section });
     await tab.click();

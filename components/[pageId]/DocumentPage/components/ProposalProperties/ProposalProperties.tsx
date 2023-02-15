@@ -83,7 +83,7 @@ export default function ProposalProperties({ pageId, proposalId, readOnly, isTem
     };
   });
 
-  roles.forEach((role) => {
+  (roles ?? []).forEach((role) => {
     reviewerOptionsRecord[role.id] = {
       ...role,
       group: 'role'
