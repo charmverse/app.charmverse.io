@@ -1,4 +1,6 @@
 import type { NodeViewProps } from '@bangle.dev/core';
+import { TextSelection } from '@bangle.dev/pm';
+import { useEditorViewContext } from '@bangle.dev/react';
 import styled from '@emotion/styled';
 import { Typography } from '@mui/material';
 
@@ -42,8 +44,9 @@ const StyledTypography = styled(Typography, {
   `}
 `;
 
-export default function NestedPage({ node, currentPageId }: NodeViewProps & { currentPageId?: string }) {
+export default function NestedPage({ node, currentPageId, getPos }: NodeViewProps & { currentPageId?: string }) {
   const space = useCurrentSpace();
+  const view = useEditorViewContext();
   const { pages } = usePages();
   const nestedPage = pages[node.attrs.id];
   const parentPage = nestedPage?.parentId ? pages[nestedPage.parentId] : null;
@@ -62,6 +65,14 @@ export default function NestedPage({ node, currentPageId }: NodeViewProps & { cu
       data-id={`page-${nestedPage?.id}`}
       data-title={nestedPage?.title}
       data-path={fullPath}
+      onDragStart={() => {
+        const nodePos = getPos();
+        view.dispatch(
+          view.state.tr
+            .setMeta('row-handle-is-dragging', true)
+            .setSelection(new TextSelection(view.state.doc.resolve(nodePos), view.state.doc.resolve(nodePos + 1)))
+        );
+      }}
     >
       <div>
         {nestedPage && (

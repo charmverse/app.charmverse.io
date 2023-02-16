@@ -1,5 +1,6 @@
 import type { RawSpecs } from '@bangle.dev/core';
 import type { Node } from '@bangle.dev/pm';
+import { NodeSelection, TextSelection } from '@bangle.dev/pm';
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import ImageIcon from '@mui/icons-material/Image';
@@ -200,7 +201,18 @@ function ResizableImage({
   } else {
     return (
       <Resizable initialSize={node.attrs.size} minWidth={MIN_IMAGE_WIDTH} updateAttrs={updateAttrs} onDelete={onDelete}>
-        <StyledImage draggable={false} src={node.attrs.src} alt={node.attrs.alt} />
+        <StyledImage
+          onDragStart={() => {
+            const nodePos = getPos();
+            view.dispatch(
+              view.state.tr
+                .setMeta('row-handle-is-dragging', true)
+                .setSelection(new TextSelection(view.state.doc.resolve(nodePos), view.state.doc.resolve(nodePos + 1)))
+            );
+          }}
+          src={node.attrs.src}
+          alt={node.attrs.alt}
+        />
       </Resizable>
     );
   }
