@@ -1,0 +1,15 @@
+import type { Locator, Page } from '@playwright/test';
+
+export class GlobalPage {
+  readonly page: Page;
+
+  readonly dialog: Locator;
+
+  readonly openAsPageButton: Locator;
+
+  constructor(page: Page) {
+    this.page = page;
+    this.dialog = page.locator('data-test=dialog');
+    this.openAsPageButton = page.locator('data-test=open-as-page');
+  }
+}

@@ -195,6 +195,7 @@ export default function BountyProperties(props: {
         style={{
           height: 'fit-content'
         }}
+        data-test='bounty-configuration'
       >
         <div className='octo-propertyname octo-propertyname--readonly'>
           <Button>Chain</Button>
@@ -255,6 +256,7 @@ export default function BountyProperties(props: {
           <Button>Reward amount</Button>
         </div>
         <TextField
+          data-test='bounty-property-amount'
           required
           sx={{
             width: '100%'
@@ -502,7 +504,7 @@ export default function BountyProperties(props: {
       {
         // Bounty creator cannot apply to their own bounty
         permissions && isSpaceMember && currentBounty.createdBy !== user?.id && (
-          <>
+          <div data-test='bounty-applicant-form'>
             <BountyApplicantForm
               bounty={currentBounty}
               submissions={applications}
@@ -514,7 +516,7 @@ export default function BountyProperties(props: {
                 my: 3
               }}
             />
-          </>
+          </div>
         )
       }
 
