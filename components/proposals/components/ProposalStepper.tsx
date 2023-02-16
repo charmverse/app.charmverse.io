@@ -1,38 +1,24 @@
 import styled from '@emotion/styled';
 import CheckIcon from '@mui/icons-material/Check';
 import { Divider, Grid, MenuItem, Select, Stack, Tooltip, Typography, Box } from '@mui/material';
-import type { ProposalStatus, ProposalReviewer } from '@prisma/client';
-import { Fragment, useState } from 'react';
-import type { KeyedMutator } from 'swr';
+import type { ProposalStatus } from '@prisma/client';
+import { Fragment } from 'react';
 
-import charmClient from 'charmClient';
 import Button from 'components/common/BoardEditor/focalboard/src/widgets/buttons/button';
-import useTasks from 'components/nexus/hooks/useTasks';
-import CreateVoteModal from 'components/votes/components/CreateVoteModal';
+import { canChangeProposalStatus } from 'lib/proposal/canChangeProposalStatus';
 import type { ProposalWithUsers } from 'lib/proposal/interface';
 import type { ProposalUserGroup } from 'lib/proposal/proposalStatusTransition';
 import {
-  proposalStatusTransitionPermission,
-  proposalStatusTransitionRecord,
+  proposalStatusDetails,
+  PROPOSAL_STATUSES,
   PROPOSAL_STATUS_LABELS
 } from 'lib/proposal/proposalStatusTransition';
 
 type StepperContainerProps = {
-  refreshProposal: KeyedMutator<ProposalWithUsers>;
   proposalUserGroups: ProposalUserGroup[];
   proposal?: ProposalWithUsers;
-};
-
-const PROPOSAL_STATUSES = Object.keys(proposalStatusTransitionRecord) as ProposalStatus[];
-
-const proposalStatusTooltips: Record<ProposalStatus, string> = {
-  private_draft: 'Only authors can view and edit this proposal',
-  draft: 'Authors can edit and space member can view this proposal ',
-  discussion: 'Space members can comment on this proposal',
-  review: 'Reviewers can approve this proposal',
-  reviewed: 'Authors can move this proposal to vote',
-  vote_active: 'Space members are voting on this proposal',
-  vote_closed: 'The vote is complete'
+  openVoteModal: () => void;
+  updateProposalStatus: (newStatus: ProposalStatus) => Promise<void>;
 };
 
 const stepperSize = 25;
@@ -95,52 +81,29 @@ const StepperIcon = styled.div<{ isCurrent: boolean; isComplete: boolean; isEnab
 `
 );
 
-export default function ProposalStepper({ refreshProposal, proposal, proposalUserGroups }: StepperContainerProps) {
-  const { mutate: mutateTasks } = useTasks();
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
-  async function updateProposalStatus(newStatus: ProposalStatus) {
-    if (proposal && newStatus !== proposal.status) {
-      await charmClient.proposals.updateStatus(proposal.id, newStatus);
-      await refreshProposal();
-      mutateTasks();
-    }
-  }
-
-  function openVoteModal() {
-    setIsModalOpen(true);
-  }
+export default function ProposalStepper({
+  proposal,
+  proposalUserGroups,
+  openVoteModal,
+  updateProposalStatus
+}: StepperContainerProps) {
+  const canChangeStatus = (updatedStatus: ProposalStatus) => {
+    return canChangeProposalStatus({ proposal, updatedStatus, proposalUserGroups });
+  };
 
   return (
     <>
       <DesktopStepper
         currentStatus={proposal?.status}
-        reviewers={proposal?.reviewers || []}
         openVoteModal={openVoteModal}
-        proposalUserGroups={proposalUserGroups}
         updateProposalStatus={updateProposalStatus}
+        canChangeStatus={canChangeStatus}
       />
       <MobileStepper
         currentStatus={proposal?.status}
-        reviewers={proposal?.reviewers || []}
         openVoteModal={openVoteModal}
-        proposalUserGroups={proposalUserGroups}
         updateProposalStatus={updateProposalStatus}
-      />
-      <CreateVoteModal
-        proposal={proposal}
-        open={isModalOpen}
-        onCreateVote={() => {
-          setIsModalOpen(false);
-          updateProposalStatus('vote_active');
-        }}
-        onPublishToSnapshot={() => {
-          setIsModalOpen(false);
-          updateProposalStatus('vote_active');
-        }}
-        onClose={() => {
-          setIsModalOpen(false);
-        }}
+        canChangeStatus={canChangeStatus}
       />
     </>
   );
@@ -149,18 +112,11 @@ export default function ProposalStepper({ refreshProposal, proposal, proposalUse
 type StepperProps = {
   openVoteModal: () => void;
   currentStatus?: ProposalStatus;
-  reviewers: ProposalReviewer[];
-  proposalUserGroups: ProposalUserGroup[];
   updateProposalStatus: (newStatus: ProposalStatus) => Promise<void>;
+  canChangeStatus: (updatedStatus: ProposalStatus) => boolean;
 };
 
-function DesktopStepper({
-  openVoteModal,
-  currentStatus,
-  proposalUserGroups,
-  updateProposalStatus,
-  reviewers
-}: StepperProps) {
+function DesktopStepper({ openVoteModal, currentStatus, updateProposalStatus, canChangeStatus }: StepperProps) {
   const currentStatusIndex = currentStatus ? PROPOSAL_STATUSES.indexOf(currentStatus) : -1;
 
   return (
@@ -172,24 +128,17 @@ function DesktopStepper({
       }}
     >
       {PROPOSAL_STATUSES.map((status, statusIndex) => {
-        const canChangeStatus = currentStatus
-          ? (currentStatus === 'discussion' && status === 'review' ? reviewers.length !== 0 : true) &&
-            proposalUserGroups.some((proposalUserGroup) =>
-              proposalStatusTransitionPermission[currentStatus]?.[proposalUserGroup]?.includes(status)
-            )
-          : false;
-
         return (
           <Fragment key={status}>
             <Grid item md={12 / 13} display='flex' position='relative' alignItems='center' justifyContent='center'>
               <Stack alignItems='center' height='100%' gap={1}>
-                <Tooltip title={proposalStatusTooltips[status]}>
+                <Tooltip title={proposalStatusDetails[status]}>
                   <StepperIcon
                     isComplete={currentStatusIndex > statusIndex}
                     isCurrent={currentStatusIndex === statusIndex}
-                    isEnabled={canChangeStatus}
+                    isEnabled={canChangeStatus(status)}
                     onClick={() => {
-                      if (canChangeStatus) {
+                      if (canChangeStatus(status)) {
                         if (status === 'vote_active') {
                           openVoteModal();
                         } else {
@@ -232,13 +181,7 @@ function DesktopStepper({
   );
 }
 
-function MobileStepper({
-  openVoteModal,
-  currentStatus,
-  proposalUserGroups,
-  updateProposalStatus,
-  reviewers
-}: StepperProps) {
+function MobileStepper({ openVoteModal, currentStatus, updateProposalStatus, canChangeStatus }: StepperProps) {
   return (
     <Box
       width='100%'
@@ -258,16 +201,8 @@ function MobileStepper({
               value={currentStatus ?? ''}
               onChange={(e) => {
                 const status = e.target.value as ProposalStatus;
-                const canChangeStatus = currentStatus
-                  ? (currentStatus === 'discussion' && status === 'review' ? reviewers.length !== 0 : true) &&
-                    proposalUserGroups.some((proposalUserGroup) =>
-                      proposalStatusTransitionPermission[currentStatus]?.[proposalUserGroup]?.includes(
-                        status as ProposalStatus
-                      )
-                    )
-                  : false;
 
-                if (canChangeStatus) {
+                if (canChangeStatus(status)) {
                   if (status === 'vote_active') {
                     openVoteModal();
                   } else {
@@ -280,15 +215,6 @@ function MobileStepper({
               }}
             >
               {PROPOSAL_STATUSES.map((status) => {
-                const canChangeStatus = currentStatus
-                  ? (currentStatus === 'discussion' && status === 'review' ? reviewers.length !== 0 : true) &&
-                    proposalUserGroups.some((proposalUserGroup) =>
-                      proposalStatusTransitionPermission[currentStatus]?.[proposalUserGroup]?.includes(
-                        status as ProposalStatus
-                      )
-                    )
-                  : false;
-
                 return (
                   <MenuItem
                     key={status}
@@ -296,7 +222,7 @@ function MobileStepper({
                       p: 1
                     }}
                     value={status}
-                    disabled={!canChangeStatus}
+                    disabled={!canChangeStatus(status)}
                   >
                     <Stack>
                       <Typography>{PROPOSAL_STATUS_LABELS[status as ProposalStatus]}</Typography>
@@ -306,7 +232,7 @@ function MobileStepper({
                           whiteSpace: 'break-spaces'
                         }}
                       >
-                        {proposalStatusTooltips[status]}
+                        {proposalStatusDetails[status]}
                       </Typography>
                     </Stack>
                   </MenuItem>

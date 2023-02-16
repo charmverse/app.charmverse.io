@@ -10,6 +10,8 @@ export const proposalStatusTransitionRecord: Record<ProposalStatus, ProposalStat
   vote_closed: []
 };
 
+export const PROPOSAL_STATUSES = Object.keys(proposalStatusTransitionRecord) as ProposalStatus[];
+
 export const PROPOSAL_STATUS_LABELS: Record<ProposalStatus, string> = {
   private_draft: 'Private Draft',
   draft: 'Public Draft',
@@ -43,4 +45,14 @@ export const proposalStatusTransitionPermission: Partial<
   reviewed: {
     author: ['discussion', 'vote_active']
   }
+};
+
+export const proposalStatusDetails: Record<ProposalStatus, string> = {
+  private_draft: 'Only authors can view and edit this proposal',
+  draft: 'Authors can edit and space member can view this proposal ',
+  discussion: 'Space members can comment on this proposal',
+  review: 'Reviewers can approve this proposal',
+  reviewed: 'Authors can move this proposal to vote',
+  vote_active: 'Space members are voting on this proposal',
+  vote_closed: 'The vote is complete'
 };
