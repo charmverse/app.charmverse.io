@@ -4,7 +4,7 @@ import { proposalCategoryOperations, proposalOperations } from './interfaces';
 
 export const proposalCategoryPermissionsMapping: Record<ProposalCategoryPermissionLevel, ProposalCategoryOperation[]> =
   {
-    full_access: proposalCategoryOperations.slice(),
+    full_access: ['create_proposal'],
     view_comment_vote: [],
     view_comment: [],
     view: []

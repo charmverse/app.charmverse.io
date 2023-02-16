@@ -969,6 +969,7 @@ model WorkspaceEvent {
 
 
 enum ProposalCategoryOperation {
+  manage_permissions
   create_proposal
   edit
   delete
