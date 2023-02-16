@@ -57,6 +57,7 @@ function UserProperty(props: Props): JSX.Element | null {
           {...bindTrigger(popupState)}
           component='span'
           variant='subtitle2'
+          className='octo-propertyvalue'
           sx={{ opacity: 0.4, pl: '2px', width: '100%', height: '100%' }}
         >
           Empty
