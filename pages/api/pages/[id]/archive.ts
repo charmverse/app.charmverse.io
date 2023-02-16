@@ -2,6 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { prisma } from 'db';
+import log from 'lib/log';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import type { ModifyChildPagesResponse } from 'lib/pages';
@@ -89,6 +90,8 @@ async function togglePageArchiveStatus(req: NextApiRequest, res: NextApiResponse
   }
 
   trackUserAction(archive ? 'archive_page' : 'restore_page', { userId, spaceId: pageSpaceId.spaceId, pageId });
+
+  log.info(`User ${archive ? 'archived' : 'restored'} a page`, { pageId, spaceId: pageSpaceId.spaceId, userId });
 
   const deletedAt = archive ? new Date() : null;
 

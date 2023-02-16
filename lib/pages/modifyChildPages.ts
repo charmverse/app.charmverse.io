@@ -1,6 +1,7 @@
 import type { Prisma } from '@prisma/client';
 
 import { prisma } from 'db';
+import log from 'lib/log';
 
 import { resolvePageTree } from './server';
 
@@ -56,6 +57,7 @@ export async function modifyChildPages(parentId: string, userId: string, action:
         }
       })
     ]);
+    log.info('Deleted page and its children', { pageId: parentId, pageIds: modifiedChildPageIds, userId });
   } else {
     const data: Prisma.PageUncheckedUpdateManyInput = {};
     if (action === 'restore') {
@@ -91,6 +93,11 @@ export async function modifyChildPages(parentId: string, userId: string, action:
         ]
       },
       data: data as Prisma.BlockUncheckedUpdateManyInput
+    });
+    log.info(`${action === 'restore' ? 'Restored' : 'Archived'} pages`, {
+      pageId: parentId,
+      pageIds: modifiedChildPageIds,
+      userId
     });
   }
 

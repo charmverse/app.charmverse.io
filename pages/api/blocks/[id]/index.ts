@@ -4,9 +4,9 @@ import nc from 'next-connect';
 
 import { prisma } from 'db';
 import type { BlockTypes } from 'lib/focalboard/block';
+import log from 'lib/log';
 import { ApiError, ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { modifyChildPages } from 'lib/pages/modifyChildPages';
-import { resolvePageTree } from 'lib/pages/server';
 import { computeUserPagePermissions } from 'lib/permissions/pages/page-permission-compute';
 import { withSessionRoute } from 'lib/session/withSession';
 import { relay } from 'lib/websockets/relay';
@@ -121,6 +121,13 @@ async function deleteBlock(
       spaceId
     );
   }
+
+  log.info('User deleted a block', {
+    userId,
+    blockId,
+    pageId: rootBlock.type.includes('board') ? blockId : undefined,
+    spaceId: rootBlock.spaceId
+  });
 
   return res.status(200).json({ deletedCount, rootBlock });
 }
