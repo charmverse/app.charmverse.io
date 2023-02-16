@@ -148,7 +148,7 @@ async function getMembers(req: NextApiRequest, res: NextApiResponse<(Member | Pu
 
   const currentSpaceRole = spaceRoles.find((sr) => sr.spaceId === spaceId);
 
-  // Populate the user profile with the first 5 nft's he has only when it's his first time in the space
+  // If hte user is not onboarded, populate the user profile with the first 5 nfts he has
   if (!currentSpaceRole?.onboarded) {
     const profileItems = await prisma.profileItem.findMany({
       where: {
@@ -162,7 +162,7 @@ async function getMembers(req: NextApiRequest, res: NextApiResponse<(Member | Pu
       }
     });
 
-    if (profileItems.length > 0) {
+    if (profileItems.length > 0 && !profileItems.some((pi) => pi.isPinned)) {
       const profileIds = profileItems.map((pi) => pi.id).slice(0, 5);
       await prisma.profileItem.updateMany({
         where: {
