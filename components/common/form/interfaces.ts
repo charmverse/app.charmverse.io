@@ -25,4 +25,5 @@ export type FieldProps = {
   inline?: boolean;
   error?: string;
   disabled?: boolean;
+  customOnChange?: (value: any) => Promise<void>;
 } & SelectFieldProps;

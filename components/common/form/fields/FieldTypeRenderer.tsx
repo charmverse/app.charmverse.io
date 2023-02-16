@@ -4,7 +4,6 @@ import { NumberInputField } from 'components/common/form/fields/NumberInputField
 import { SelectField } from 'components/common/form/fields/SelectField';
 import { TextInputField } from 'components/common/form/fields/TextInputField';
 import type { ControlFieldProps, FieldProps, FieldType } from 'components/common/form/interfaces';
-import { MemberPropertyIcons } from 'components/members/components/MemberDirectoryProperties/MemberPropertyItem';
 
 type Props = {
   type: FieldType;
@@ -12,20 +11,20 @@ type Props = {
   ControlFieldProps;
 
 export const FieldTypeRenderer = forwardRef<HTMLDivElement, Props>(
-  ({ type, options, onCreateOption, onDeleteOption, onUpdateOption, ...fieldProps }: Props, ref) => {
+  ({ type, options, onCreateOption, onDeleteOption, onUpdateOption, customOnChange, ...fieldProps }: Props, ref) => {
     switch (type) {
       case 'text':
       case 'phone':
       case 'url':
       case 'name':
       case 'email': {
-        return <TextInputField {...fieldProps} ref={ref} iconLabel={MemberPropertyIcons[type]} />;
+        return <TextInputField {...fieldProps} customOnChange={customOnChange} ref={ref} />;
       }
       case 'text_multiline': {
-        return <TextInputField {...fieldProps} ref={ref} multiline rows={3} iconLabel={MemberPropertyIcons[type]} />;
+        return <TextInputField {...fieldProps} customOnChange={customOnChange} ref={ref} multiline rows={3} />;
       }
       case 'number': {
-        return <NumberInputField {...fieldProps} ref={ref} iconLabel={MemberPropertyIcons[type]} />;
+        return <NumberInputField {...fieldProps} customOnChange={customOnChange} ref={ref} />;
       }
 
       case 'select': {
@@ -33,11 +32,11 @@ export const FieldTypeRenderer = forwardRef<HTMLDivElement, Props>(
           <SelectField
             {...fieldProps}
             ref={ref}
-            iconLabel={MemberPropertyIcons[type]}
             options={options}
             onCreateOption={onCreateOption}
             onDeleteOption={onDeleteOption}
             onUpdateOption={onUpdateOption}
+            customOnChange={customOnChange}
           />
         );
       }
@@ -48,11 +47,11 @@ export const FieldTypeRenderer = forwardRef<HTMLDivElement, Props>(
             {...fieldProps}
             ref={ref}
             multiselect
-            iconLabel={MemberPropertyIcons[type]}
             options={options}
             onCreateOption={onCreateOption}
             onDeleteOption={onDeleteOption}
             onUpdateOption={onUpdateOption}
+            customOnChange={customOnChange}
           />
         );
       }

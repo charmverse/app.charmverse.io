@@ -1,6 +1,8 @@
 import { Typography, Box } from '@mui/material';
 import type { ReactNode } from 'react';
 
+import FieldLabel from '../FieldLabel';
+
 type Props = {
   children: ReactNode;
   label?: string;
@@ -18,18 +20,7 @@ export function FieldWrapper({ children, label, inline, iconLabel }: Props) {
       {(label || !!iconLabel) && (
         <Box maxWidth={150} width={150} alignItems='center' display='flex' gap={1}>
           {iconLabel ?? null}
-          {label && (
-            <Typography
-              component='span'
-              sx={{
-                wordBreak: 'break-word'
-              }}
-              variant='subtitle2'
-              fontWeight='bold'
-            >
-              {label}
-            </Typography>
-          )}
+          {label && <FieldLabel>{label}</FieldLabel>}
         </Box>
       )}
       {children}

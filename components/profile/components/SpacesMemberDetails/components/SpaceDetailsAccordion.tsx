@@ -4,8 +4,8 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Accordion, AccordionDetails, AccordionSummary, Box, IconButton, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 
+import Avatar from 'components/common/Avatar';
 import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
-import WorkspaceAvatar from 'components/common/PageLayout/components/Sidebar/WorkspaceAvatar';
 import type { PropertyValueWithDetails } from 'lib/members/interfaces';
 import { isTouchScreen } from 'lib/utilities/browser';
 
@@ -43,9 +43,18 @@ export function SpaceDetailsAccordion({
       onChange={() => {
         setExpanded(!expanded);
       }}
+      sx={{
+        boxShadow: 'none',
+        borderBottom: (theme) => ` 1px solid ${theme.palette.divider}`,
+        backgroundColor: 'transparent',
+        backgroundImage: 'none',
+        '&:before': { backgroundColor: 'transparent' },
+        '& .MuiAccordionSummary-root': { p: 0 },
+        '& .MuiAccordionDetails-root': { px: 0 }
+      }}
     >
       <StyledAccordionSummary expandIcon={<ExpandMoreIcon />}>
-        <WorkspaceAvatar name={spaceName} image={spaceImage} />
+        <Avatar className='hidden-on-visible' avatar={spaceImage} name={spaceName} variant='rounded' size='large' />
         <Box
           display='flex'
           flex='0 1 auto'

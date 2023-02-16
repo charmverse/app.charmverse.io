@@ -7,8 +7,9 @@ import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { DialogTitle } from 'components/common/Modal';
-import { UserDetails } from 'components/profile/components';
 import { MemberPropertiesRenderer } from 'components/profile/components/SpacesMemberDetails/components/MemberPropertiesRenderer';
+import UserDetails from 'components/profile/components/UserDetails/UserDetails';
+import Legend from 'components/settings/Legend';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMemberProperties } from 'hooks/useMemberProperties';
 import { useMemberPropertyValues } from 'hooks/useMemberPropertyValues';
@@ -33,7 +34,6 @@ function MemberProfile({
   member: Member;
   onClose: VoidFunction;
 }) {
-  const { mutateMembers } = useMembers();
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
   const { user: currentUser, setUser } = useUser();
@@ -68,15 +68,11 @@ function MemberProfile({
     return (
       <MemberPropertiesPopup
         title={title && title.length !== 0 ? title : 'Edit your profile'}
-        onClose={() => {
-          mutateMembers();
-          onClose();
-        }}
+        onClose={() => onClose()}
         isLoading={isLoading}
         memberId={currentUser.id}
         spaceId={currentSpace.id}
         updateMemberPropertyValues={updateSpaceValues}
-        cancelButtonText={cancelButtonText && cancelButtonText.length !== 0 ? cancelButtonText : 'Cancel'}
         postComponent={
           user && (
             <Stack gap={3}>
@@ -103,7 +99,7 @@ function MemberProfile({
             updateUser={setUser}
           />
         )}
-        <Typography fontWeight={600}>Member details</Typography>
+        <Legend mt={4}>Member details</Legend>
       </MemberPropertiesPopup>
     );
   }
@@ -137,6 +133,7 @@ function MemberProfile({
           </DialogTitle>
           <DialogContent dividers>
             <UserDetails user={user} readOnly />
+            <Legend mt={4}>Member details</Legend>
             {currentSpacePropertyValues && (
               <Box my={3}>
                 <MemberPropertiesRenderer properties={currentSpacePropertyValues.properties} />

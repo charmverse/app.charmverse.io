@@ -43,6 +43,7 @@ export const SelectField = forwardRef<HTMLDivElement, Props>(
       onDeleteOption,
       onUpdateOption,
       onCreateOption,
+      customOnChange,
       onBlur,
       placeholder,
       className,
@@ -79,6 +80,8 @@ export const SelectField = forwardRef<HTMLDivElement, Props>(
       }
 
       inputProps.onChange(newValue || '');
+
+      customOnChange?.(newValue);
     }
 
     useEffect(() => {
