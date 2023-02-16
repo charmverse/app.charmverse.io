@@ -44,8 +44,9 @@ export default function ProposalProperties({ pageId, proposalId, readOnly, isTem
   const { roles = [], roleups } = useRoles();
   const { user } = useUser();
   const isAdmin = useIsAdmin();
+
   const [detailsExpanded, setDetailsExpanded] = useState(
-    ['private_draft', 'public_draft'].includes(proposal?.status ?? '')
+    !proposal || ['private_draft', 'public_draft'].includes(proposal?.status ?? '')
   );
 
   const proposalMenuState = usePopupState({ popupId: 'proposal-info', variant: 'popover' });
