@@ -48,6 +48,7 @@ const StylesContainer = styled.div<{ containerWidth?: number }>`
   // remove extra padding on Table view
   .Table {
     margin-top: 0;
+    width: fit-content;
 
     // Hide calculations footer
     .CalculationRow {
