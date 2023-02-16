@@ -91,7 +91,7 @@ function SocialInputs(props: SocialInputsProps) {
           disabled={readOnly}
           error={!!errors.twitterURL}
           helperText={errors.twitterURL?.message}
-          placeholder='https://mobile.twitter.com/charmverse'
+          placeholder='https://twitter.com/charmverse'
           onChange={onChange}
         />
       </Grid>

@@ -66,12 +66,9 @@ export function MemberPropertiesPopup({
 
   const {
     control,
-    formState: { errors, isSubmitting, isDirty },
+    formState: { errors, isDirty },
     reset,
-    trigger,
-    register,
-    getValues,
-    setValue
+    getValues
   } = useForm({ mode: 'onChange' });
 
   const onSubmit = async (submitData: any) => {

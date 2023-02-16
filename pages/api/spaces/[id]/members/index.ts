@@ -6,7 +6,7 @@ import { prisma } from 'db';
 import { getAccessibleMemberPropertiesBySpace } from 'lib/members/getAccessibleMemberPropertiesBySpace';
 import type { Member, PublicMember } from 'lib/members/interfaces';
 import { getPropertiesWithValues } from 'lib/members/utils';
-import { onError, onNoMatch, requireUser } from 'lib/middleware';
+import { onError, onNoMatch } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { hasNftAvatar } from 'lib/users/hasNftAvatar';
@@ -145,6 +145,37 @@ async function getMembers(req: NextApiRequest, res: NextApiResponse<(Member | Pu
       }
     }
   });
+
+  const currentSpaceRole = spaceRoles.find((sr) => sr.spaceId === spaceId);
+
+  // Populate the user profile with the first 5 nft's he has only when it's his first time in the space
+  if (!currentSpaceRole?.onboarded) {
+    const profileItems = await prisma.profileItem.findMany({
+      where: {
+        userId,
+        type: 'nft'
+      },
+      select: {
+        id: true,
+        isHidden: true,
+        isPinned: true
+      }
+    });
+
+    if (profileItems.length > 0) {
+      const profileIds = profileItems.map((pi) => pi.id).slice(0, 5);
+      await prisma.profileItem.updateMany({
+        where: {
+          id: {
+            in: profileIds
+          }
+        },
+        data: {
+          isPinned: true
+        }
+      });
+    }
+  }
 
   const visibleProperties = await getAccessibleMemberPropertiesBySpace({ requestingUserId: userId, spaceId });
 

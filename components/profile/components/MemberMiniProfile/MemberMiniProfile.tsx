@@ -23,17 +23,7 @@ import { NftsList } from './BlockchainData/NftsList';
 import { OrgsList } from './BlockchainData/OrgsList';
 import { PoapsList } from './BlockchainData/PoapsList';
 
-function MemberProfile({
-  cancelButtonText,
-  title,
-  member,
-  onClose
-}: {
-  cancelButtonText?: string;
-  title?: string;
-  member: Member;
-  onClose: VoidFunction;
-}) {
+function MemberProfile({ title, member, onClose }: { title?: string; member: Member; onClose: VoidFunction }) {
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
   const { user: currentUser, setUser } = useUser();
@@ -155,10 +145,8 @@ function MemberProfile({
 export function MemberMiniProfile({
   memberId,
   onClose,
-  title,
-  cancelButtonText
+  title
 }: {
-  cancelButtonText?: string;
   title?: string;
   memberId: string;
   onClose: VoidFunction;
@@ -170,5 +158,5 @@ export function MemberMiniProfile({
     return null;
   }
 
-  return <MemberProfile title={title} cancelButtonText={cancelButtonText} member={member} onClose={onClose} />;
+  return <MemberProfile title={title} member={member} onClose={onClose} />;
 }
