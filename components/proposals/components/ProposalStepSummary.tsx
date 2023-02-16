@@ -41,7 +41,13 @@ export function ProposalStepSummary({ proposal, proposalUserGroups, openVoteModa
 
   return (
     <Stack flex={1}>
-      <Stack direction='row' alignItems='center' justifyContent='space-between' flex={1}>
+      <Stack
+        direction={{ xs: 'column', md: 'row' }}
+        alignItems={{ md: 'center' }}
+        justifyContent='space-between'
+        flex={1}
+        gap={1}
+      >
         <Stack gap={0.5}>
           <Typography variant='h5' fontWeight='bold'>
             {currentStatus ? PROPOSAL_STATUS_LABELS[currentStatus] : '-'}
@@ -54,6 +60,7 @@ export function ProposalStepSummary({ proposal, proposalUserGroups, openVoteModa
         {showActions && (
           <Stack gap={0.5} direction='row' fontSize='10px'>
             <Button
+              sx={{ whiteSpace: 'nowrap', flex: 1 }}
               size='small'
               color='secondary'
               startIcon={<ArrowBackIos fontSize='inherit' />}
@@ -64,11 +71,12 @@ export function ProposalStepSummary({ proposal, proposalUserGroups, openVoteModa
                 }
               }}
             >
-              Back
+              {prevStatus ? `${PROPOSAL_STATUS_LABELS[prevStatus]}` : 'Back'}
             </Button>
             <Button
               size='small'
               color='primary'
+              sx={{ whiteSpace: 'nowrap', flex: 1 }}
               endIcon={<ArrowForwardIos fontSize='inherit' />}
               disabled={!nextEnabled}
               onClick={() => {
@@ -81,7 +89,7 @@ export function ProposalStepSummary({ proposal, proposalUserGroups, openVoteModa
                 }
               }}
             >
-              Next
+              {nextStatus ? `${PROPOSAL_STATUS_LABELS[nextStatus]}` : 'Next'}
             </Button>
           </Stack>
         )}

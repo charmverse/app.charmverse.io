@@ -2,7 +2,7 @@ import { KeyboardArrowDown } from '@mui/icons-material';
 import { Divider, Grid, Typography, Box, Collapse, Stack, IconButton } from '@mui/material';
 import type { ProposalStatus } from '@prisma/client';
 import { usePopupState } from 'material-ui-popup-state/hooks';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
@@ -60,6 +60,12 @@ export default function ProposalProperties({ pageId, proposalId, readOnly, isTem
   const proposalReviewer = members?.find((member) => member.id === proposalReviewerId);
 
   const isProposalAuthor = user && proposalAuthors.some((author) => author.userId === user.id);
+
+  useEffect(() => {
+    if (proposal?.status === 'vote_active' && detailsExpanded) {
+      setDetailsExpanded(false);
+    }
+  }, [detailsExpanded, proposal?.status]);
 
   const isProposalReviewer =
     user &&
