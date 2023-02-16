@@ -91,7 +91,12 @@ async function togglePageArchiveStatus(req: NextApiRequest, res: NextApiResponse
 
   trackUserAction(archive ? 'archive_page' : 'restore_page', { userId, spaceId: pageSpaceId.spaceId, pageId });
 
-  log.info(`User ${archive ? 'archived' : 'restored'} a page`, { pageId, spaceId: pageSpaceId.spaceId, userId });
+  log.info(`User ${archive ? 'archived' : 'restored'} a page`, {
+    pageId,
+    pageIds: modifiedChildPageIds,
+    spaceId: pageSpaceId.spaceId,
+    userId
+  });
 
   const deletedAt = archive ? new Date() : null;
 

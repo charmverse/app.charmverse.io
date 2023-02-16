@@ -68,6 +68,13 @@ async function deleteBlock(
       },
       spaceId
     );
+
+    log.info('User deleted a page block', {
+      userId,
+      pageId: blockId,
+      pageIds: deletedChildPageIds,
+      spaceId: rootBlock.spaceId
+    });
   } else if (rootBlock.type === 'view') {
     if (!permissionsSet.edit_content) {
       throw new ActionNotPermittedError();
@@ -121,13 +128,6 @@ async function deleteBlock(
       spaceId
     );
   }
-
-  log.info('User deleted a block', {
-    userId,
-    blockId,
-    pageId: rootBlock.type.includes('board') ? blockId : undefined,
-    spaceId: rootBlock.spaceId
-  });
 
   return res.status(200).json({ deletedCount, rootBlock });
 }
