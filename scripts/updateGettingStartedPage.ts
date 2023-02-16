@@ -65,4 +65,4 @@ async function updateGettingStartedPage({spaceDomain, pagePath}: {spaceDomain: s
   console.log('🚀 Done! Please commit the changes to the getting started page.');
 }
 
-updateGettingStartedPage({spaceDomain: 'cvt-template-creator', pagePath: 'page-548810048920541'})
+// updateGettingStartedPage({spaceDomain: 'cvt-template-creator', pagePath: 'page-548810048920541'})
