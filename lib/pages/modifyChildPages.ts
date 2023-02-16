@@ -1,7 +1,6 @@
 import type { Prisma } from '@prisma/client';
 
 import { prisma } from 'db';
-import log from 'lib/log';
 
 import { resolvePageTree } from './server';
 
