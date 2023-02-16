@@ -73,5 +73,9 @@ export default function NewBountyButton() {
     }
   }
 
-  return <Button onClick={onClickCreate}>{suggestBounties ? 'Suggest Bounty' : 'Create Bounty'}</Button>;
+  return (
+    <Button data-test='create-suggest-bounty' onClick={onClickCreate}>
+      {suggestBounties ? 'Suggest Bounty' : 'Create Bounty'}
+    </Button>
+  );
 }

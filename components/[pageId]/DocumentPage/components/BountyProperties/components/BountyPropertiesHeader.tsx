@@ -73,7 +73,7 @@ export default function BountyPropertiesHeader({ bounty, bountyPermissions, page
             }}
           >
             {/* Provide the bounty menu options */}
-            <Box display='flex'>
+            <Box data-test='bounty-header-amount' display='flex'>
               <BountyStatusBadge bounty={bounty} truncate />
             </Box>
           </Box>
