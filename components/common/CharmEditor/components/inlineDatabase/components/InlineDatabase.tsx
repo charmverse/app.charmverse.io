@@ -49,6 +49,7 @@ const StylesContainer = styled.div<{ containerWidth?: number }>`
   .Table {
     margin-top: 0;
     width: fit-content;
+    min-width: 100%;
 
     // Hide calculations footer
     .CalculationRow {
