@@ -10,7 +10,7 @@ export default function BountyPage() {
   const { bounties, loadingBounties } = useBounties();
   const { accessChecked } = useSharedPage();
 
-  const isSpaceMember = useIsSpaceMember();
+  const { isSpaceMember } = useIsSpaceMember();
 
   setTitle('Bounties');
   if (loadingBounties || !bounties || !accessChecked) {

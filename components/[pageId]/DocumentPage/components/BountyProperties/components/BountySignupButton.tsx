@@ -27,7 +27,7 @@ export function BountySignupButton({ bountyPage }: Props) {
   const loginViaTokenGateModal = usePopupState({ variant: 'popover', popupId: 'login-via-token-gate' });
   const [loggingIn, setLoggingIn] = useState(false);
 
-  const isSpaceMember = useIsSpaceMember();
+  const { isSpaceMember } = useIsSpaceMember();
   const showSignup = isUserLoaded && (!user || !isSpaceMember);
 
   function loginUser() {

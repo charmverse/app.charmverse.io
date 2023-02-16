@@ -8,7 +8,7 @@ import { useSharedPage } from 'hooks/useSharedPage';
 export default function PageView() {
   const { publicPage } = useSharedPage();
   const basePageId = usePageIdFromPath();
-  const isSpaceMember = useIsSpaceMember();
+  const { isSpaceMember } = useIsSpaceMember();
 
   if (!isSpaceMember && publicPage) {
     return <SharedPage publicPage={publicPage} />;

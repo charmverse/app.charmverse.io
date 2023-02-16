@@ -64,7 +64,7 @@ export default function BountyProperties(props: {
     [isAmountInputEmpty, currentBounty]
   );
 
-  const isSpaceMember = useIsSpaceMember();
+  const { isSpaceMember } = useIsSpaceMember();
 
   const readOnly = parentReadOnly || !isSpaceMember;
 
