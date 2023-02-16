@@ -17,7 +17,7 @@ type Fixtures = {
 };
 let space: Space;
 let adminUser: User;
-let bounty: Bounty;
+let bounty: Bounty & { page: { path: string } };
 
 // This will be used in the test to update the bounty and check the displayed value
 const newBountyAmount = '123';
@@ -47,11 +47,18 @@ test.describe.serial('Create and Edit Bounty', () => {
     await page.waitForTimeout(1000);
 
     // There should be only 1 bounty in the space
-    bounty = await prisma.bounty.findFirstOrThrow({
+    bounty = (await prisma.bounty.findFirstOrThrow({
       where: {
         spaceId: space.id
+      },
+      include: {
+        page: {
+          select: {
+            path: true
+          }
+        }
       }
-    });
+    })) as Bounty & { page: { path: string } };
 
     await expect(bountyPage.bountyPropertiesConfiguration).toBeVisible();
     await expect(bountyPage.bountyPropertyAmount).toBeVisible();
@@ -63,8 +70,13 @@ test.describe.serial('Create and Edit Bounty', () => {
 
     await bountyPage.bountyPropertyAmount.fill(newBountyAmount);
 
-    // Make sure update happened automatically, and leave some time for action to be processed
-    await page.waitForTimeout(1000);
+    // Go to the bounty
+    await bountyPage.openAsPageButton.click();
+
+    await bountyPage.waitForDocumentPage({
+      domain: space.domain,
+      path: `${bounty.page.path}`
+    });
 
     await expect(bountyPage.bountyHeaderAmount).toBeVisible();
 
@@ -92,6 +104,8 @@ test.describe.serial('Create and Edit Bounty', () => {
 
     const bountyCard = bountyBoardPage.getBountyCardLocator(bounty.id);
     await expect(bountyCard).toBeVisible();
+
+    //    await page.pause();
 
     await bountyCard.click();
 
