@@ -16,6 +16,7 @@ import InputSearchReviewers from 'components/common/form/InputSearchReviewers';
 import { InputSearchRoleMultiple } from 'components/common/form/InputSearchRole';
 import { useBounties } from 'hooks/useBounties';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useIsSpaceMember } from 'hooks/useIsSpaceMember';
 import { usePages } from 'hooks/usePages';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import { useSharedPage } from 'hooks/useSharedPage';
@@ -62,9 +63,10 @@ export default function BountyProperties(props: {
     () => isAmountInputEmpty || Number(currentBounty?.rewardAmount) <= 0,
     [isAmountInputEmpty, currentBounty]
   );
-  const { hasSharedPageAccess } = useSharedPage();
 
-  const readOnly = parentReadOnly || hasSharedPageAccess;
+  const isSpaceMember = useIsSpaceMember();
+
+  const readOnly = parentReadOnly || !isSpaceMember;
 
   const bountyPage = pages[pageId];
 
@@ -499,7 +501,7 @@ export default function BountyProperties(props: {
 
       {
         // Bounty creator cannot apply to their own bounty
-        permissions && !hasSharedPageAccess && currentBounty.createdBy !== user?.id && (
+        permissions && isSpaceMember && currentBounty.createdBy !== user?.id && (
           <>
             <BountyApplicantForm
               bounty={currentBounty}
@@ -516,7 +518,7 @@ export default function BountyProperties(props: {
         )
       }
 
-      {hasSharedPageAccess && bountyPage && <BountySignupButton bountyPage={bountyPage} />}
+      {!isSpaceMember && bountyPage && <BountySignupButton bountyPage={bountyPage} />}
 
       {permissions?.userPermissions?.review && currentBounty.status !== 'suggestion' && !draftBounty && (
         <BountyApplicantsTable bounty={currentBounty} permissions={permissions} />

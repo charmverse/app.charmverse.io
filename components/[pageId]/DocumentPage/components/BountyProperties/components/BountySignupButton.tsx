@@ -9,6 +9,7 @@ import Modal from 'components/common/Modal';
 import TokenGateForm from 'components/common/TokenGateForm';
 import { WalletSign } from 'components/login/WalletSign';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useIsSpaceMember } from 'hooks/useIsSpaceMember';
 import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
@@ -22,15 +23,12 @@ interface Props {
 export function BountySignupButton({ bountyPage }: Props) {
   const { account, walletAuthSignature, loginFromWeb3Account } = useWeb3AuthSig();
   const { user, setUser, isLoaded: isUserLoaded } = useUser();
-  const router = useRouter();
-  const { members } = useMembers();
   const space = useCurrentSpace();
   const loginViaTokenGateModal = usePopupState({ variant: 'popover', popupId: 'login-via-token-gate' });
   const [loggingIn, setLoggingIn] = useState(false);
 
-  const isSpaceMember = Boolean(user && members.some((c) => c.id === user.id));
+  const isSpaceMember = useIsSpaceMember();
   const showSignup = isUserLoaded && (!user || !isSpaceMember);
-  const showSpaceRedirect = isUserLoaded && isSpaceMember;
 
   function loginUser() {
     if (
@@ -61,17 +59,6 @@ export function BountySignupButton({ bountyPage }: Props) {
         {showSignup && (
           <Button color='primary' onClick={loginViaTokenGateModal.open}>
             Join this space to apply
-          </Button>
-        )}
-
-        {showSpaceRedirect && (
-          <Button
-            color='primary'
-            onClick={() => {
-              router.push(`/${space?.domain}/${bountyPage.path}`);
-            }}
-          >
-            View this bounty inside the space
           </Button>
         )}
       </Box>
