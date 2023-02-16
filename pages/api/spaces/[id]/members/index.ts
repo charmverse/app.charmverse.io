@@ -3,10 +3,12 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { prisma } from 'db';
+import { getAllNFTs } from 'lib/blockchain/getNFTs';
 import { getAccessibleMemberPropertiesBySpace } from 'lib/members/getAccessibleMemberPropertiesBySpace';
 import type { Member, PublicMember } from 'lib/members/interfaces';
 import { getPropertiesWithValues } from 'lib/members/utils';
 import { onError, onNoMatch } from 'lib/middleware';
+import { updateProfileAvatar } from 'lib/profile/updateProfileAvatar';
 import { withSessionRoute } from 'lib/session/withSession';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { hasNftAvatar } from 'lib/users/hasNftAvatar';
@@ -148,32 +150,39 @@ async function getMembers(req: NextApiRequest, res: NextApiResponse<(Member | Pu
 
   const currentSpaceRole = spaceRoles.find((sr) => sr.spaceId === spaceId);
 
-  // If hte user is not onboarded, populate the user profile with the first 5 nfts he has
-  if (!currentSpaceRole?.onboarded) {
-    const profileItems = await prisma.profileItem.findMany({
-      where: {
-        userId,
-        type: 'nft'
-      },
-      select: {
-        id: true,
-        isHidden: true,
-        isPinned: true
-      }
-    });
+  // If the user is not onboarded, populate the user profile with one nft as a profile picture and the first 5 nfts he has as pinned
+  if (!currentSpaceRole?.onboarded && userId) {
+    const nfts = await getAllNFTs(userId);
+    if (nfts.length > 0) {
+      if (!currentSpaceRole?.user.avatar) {
+        for (const nft of nfts) {
+          const user = await updateProfileAvatar({
+            avatar: nft.image,
+            avatarContract: nft.contract,
+            avatarTokenId: nft.tokenId,
+            avatarChain: nft.chainId,
+            userId
+          });
 
-    if (profileItems.length > 0 && !profileItems.some((pi) => pi.isPinned)) {
-      const profileIds = profileItems.map((pi) => pi.id).slice(0, 5);
-      await prisma.profileItem.updateMany({
-        where: {
-          id: {
-            in: profileIds
+          // I need just the first avatar update that returns successfully
+          if (user?.avatar) {
+            break;
           }
-        },
-        data: {
-          isPinned: true
         }
-      });
+      }
+      if (!nfts.some((pi) => pi.isPinned)) {
+        const profileIds = nfts.map((pi) => pi.id).slice(0, 5);
+        await prisma.profileItem.updateMany({
+          where: {
+            id: {
+              in: profileIds
+            }
+          },
+          data: {
+            isPinned: true
+          }
+        });
+      }
     }
   }
 
