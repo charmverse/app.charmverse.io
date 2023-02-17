@@ -1,6 +1,6 @@
-import type { ProposalWithUsers } from 'lib/proposal/interface';
 import { generateUserAndSpace } from 'testing/setupDatabase';
 
+import type { ProposalWithUsersAndPageMeta } from '../proposals';
 import { generateProposal, generateProposalCategory } from '../proposals';
 
 describe('generateProposal', () => {
@@ -18,12 +18,16 @@ describe('generateProposal', () => {
     });
 
     expect(proposal).toMatchObject(
-      expect.objectContaining<Partial<ProposalWithUsers>>({
+      expect.objectContaining<Partial<ProposalWithUsersAndPageMeta>>({
         id: expect.any(String),
         categoryId: proposalCategory.id,
         status: 'draft',
         authors: [],
-        reviewers: []
+        reviewers: [],
+        page: {
+          path: expect.any(String),
+          title: expect.any(String)
+        }
       })
     );
   });

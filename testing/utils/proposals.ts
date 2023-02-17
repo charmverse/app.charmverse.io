@@ -21,6 +21,9 @@ export async function generateProposalCategory({
     }
   });
 }
+
+export type ProposalWithUsersAndPageMeta = ProposalWithUsers & { page: Pick<Page, 'title' | 'path'> };
+
 /**
  * Creates a proposal with the linked authors and reviewers
  */
@@ -40,7 +43,7 @@ export async function generateProposal({
   authors?: string[];
   reviewers?: ProposalReviewerInput[];
   proposalStatus?: ProposalStatus;
-}): Promise<ProposalWithUsers> {
+}): Promise<ProposalWithUsersAndPageMeta> {
   const proposalId = v4();
 
   const result = await createPageDb<{ proposal: ProposalWithUsers }>({
@@ -106,5 +109,5 @@ export async function generateProposal({
     }
   });
 
-  return result.proposal;
+  return { ...result.proposal, page: { title: result.title, path: result.path } };
 }
