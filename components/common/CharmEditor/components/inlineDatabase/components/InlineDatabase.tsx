@@ -126,7 +126,7 @@ export default function DatabaseView({ containerWidth, readOnly: readOnlyOverrid
   }
 
   const readOnly =
-    typeof readOnlyOverride === 'undefined' ? currentPagePermissions.edit_content !== true : readOnlyOverride;
+    typeof readOnlyOverride === 'undefined' ? currentPagePermissions?.edit_content !== true : readOnlyOverride;
 
   const readOnlySourceData = currentView?.fields?.sourceType === 'google_form'; // blocks that are synced cannot be edited
   const deleteView = useCallback(
