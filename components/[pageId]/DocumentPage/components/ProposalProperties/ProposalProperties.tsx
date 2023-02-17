@@ -216,11 +216,11 @@ export default function ProposalProperties({ pageId, proposalId, readOnly, isTem
             <Button>Reviewer</Button>
           </div>
           <div style={{ width: '100%' }}>
-            {proposalPermissions?.edit ? (
+            {!proposalPermissions?.edit ? (
               <UserDisplay showMiniProfile user={proposalReviewer} avatarSize='small' />
             ) : (
               <InputSearchReviewers
-                disabled={readOnly || !proposalPermissions?.edit}
+                disabled={readOnly}
                 readOnly={readOnly}
                 value={proposalReviewers.map(
                   (reviewer) => reviewerOptionsRecord[(reviewer.roleId ?? reviewer.userId) as string]

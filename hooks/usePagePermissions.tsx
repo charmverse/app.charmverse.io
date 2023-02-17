@@ -1,25 +1,34 @@
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
-import { AllowedPagePermissions } from 'lib/permissions/pages';
+import { AllowedPagePermissions } from 'lib/permissions/pages/available-page-permissions.class';
 
 type Props = {
-  pageIdOrPath: string;
+  // Provide value of null to skip fetching
+  pageIdOrPath: string | null;
   spaceDomain?: string;
   isNewPage?: boolean;
 };
 
-export function useProposalPermissions({ pageIdOrPath, spaceDomain, isNewPage }: Props) {
-  const { data } = useSWR(!pageIdOrPath ? null : `compute-page-permissions-${pageIdOrPath}${spaceDomain ?? ''}`, () =>
-    charmClient.permissions.pages.computePagePermissions({
-      pageIdOrPath,
-      spaceDomain
-    })
+export function usePagePermissions({ pageIdOrPath, spaceDomain, isNewPage }: Props) {
+  const { data, mutate } = useSWR(
+    !pageIdOrPath ? null : `compute-page-permissions-${pageIdOrPath}${spaceDomain ?? ''}`,
+    () =>
+      charmClient.permissions.pages.computePagePermissions({
+        pageIdOrPath: pageIdOrPath as string,
+        spaceDomain
+      })
   );
 
-  if (isNewPage) {
-    return new AllowedPagePermissions().full;
+  function refresh() {
+    charmClient.permissions.pages
+      .computePagePermissions({
+        pageIdOrPath: pageIdOrPath as string,
+        spaceDomain
+      })
+      .then((_newPermissions) => {
+        mutate(_newPermissions);
+      });
   }
-
-  return data;
+  return { permissions: isNewPage ? new AllowedPagePermissions().full : data, refresh };
 }

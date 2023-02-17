@@ -42,6 +42,7 @@ import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useMembers } from 'hooks/useMembers';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { usePageFromPath } from 'hooks/usePageFromPath';
+import { usePagePermissions } from 'hooks/usePagePermissions';
 import { usePages } from 'hooks/usePages';
 import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useSnackbar } from 'hooks/useSnackbar';
@@ -281,7 +282,7 @@ function PostHeader({
 function HeaderComponent({ open, openSidebar }: HeaderProps) {
   const router = useRouter();
   const colorMode = useColorMode();
-  const { updatePage, getPagePermissions, deletePage } = usePages();
+  const { updatePage, deletePage } = usePages();
   const { user } = useUser();
   const theme = useTheme();
   const [pageMenuOpen, setPageMenuOpen] = useState(false);
@@ -293,7 +294,9 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
   const { members } = useMembers();
   const { setCurrentPageActionDisplay } = usePageActionDisplay();
   const [userSpacePermissions] = useCurrentSpacePermissions();
-  const pagePermissions = basePage ? getPagePermissions(basePage.id) : null;
+  const { permissions: pagePermissions } = usePagePermissions({
+    pageIdOrPath: basePage ? basePage.id : (null as any)
+  });
 
   const { onClick: clickToOpenSettingsModal } = useSettingsDialog();
   const isForumPost = router.route === '/[domain]/forum/post/[pagePath]';

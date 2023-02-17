@@ -21,6 +21,7 @@ import ScrollableWindow from 'components/common/PageLayout/components/Scrollable
 import { useBounties } from 'hooks/useBounties';
 import { useCharmEditor } from 'hooks/useCharmEditor';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
+import { usePagePermissions } from 'hooks/usePagePermissions';
 import { usePages } from 'hooks/usePages';
 import { useVotes } from 'hooks/useVotes';
 import type { AssignedBountyPermissions } from 'lib/bounties';
@@ -82,10 +83,12 @@ export interface DocumentPageProps {
 }
 
 function DocumentPage({ page, setPage, insideModal, readOnly = false, parentProposalId }: DocumentPageProps) {
-  const { pages, getPagePermissions } = usePages();
+  const { pages } = usePages();
   const { cancelVote, castVote, deleteVote, updateDeadline, votes, isLoading } = useVotes();
   // For post we would artificially construct the permissions
-  const pagePermissions = getPagePermissions(page.id);
+  const { permissions: pagePermissions } = usePagePermissions({
+    pageIdOrPath: page.id
+  });
   const { draftBounty } = useBounties();
   const { currentPageActionDisplay } = usePageActionDisplay();
   const { editMode, setPageProps } = useCharmEditor();
@@ -194,13 +197,13 @@ function DocumentPage({ page, setPage, insideModal, readOnly = false, parentProp
             {page.headerImage && (
               <PageBanner
                 headerImage={page.headerImage}
-                readOnly={readOnly || enableSuggestingMode}
+                readOnly={readOnly || !!enableSuggestingMode}
                 setPage={setPage}
               />
             )}
             <Container top={pageTop} fullWidth={isSmallScreen || (page.fullWidth ?? false)}>
               <CharmEditor
-                key={page.id + editMode}
+                key={page.id + editMode + String(pagePermissions?.edit_content)}
                 // content={pageDetails?.content as PageContent}
                 // onContentChange={updatePageContent}
                 readOnly={readOnly}
@@ -223,7 +226,7 @@ function DocumentPage({ page, setPage, insideModal, readOnly = false, parentProp
                   icon={page.icon}
                   title={page.title}
                   updatedAt={page.updatedAt.toString()}
-                  readOnly={readOnly || enableSuggestingMode}
+                  readOnly={readOnly || !!enableSuggestingMode}
                   setPage={setPage}
                 />
                 {page.type === 'proposal' && !isLoading && page.snapshotProposalId && (

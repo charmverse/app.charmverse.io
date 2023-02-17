@@ -1,12 +1,13 @@
 import type { Page } from '@prisma/client';
 import log from 'loglevel';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import charmClient from 'charmClient';
 import ErrorPage from 'components/common/errors/ErrorPage';
 import { useCharmEditor } from 'hooks/useCharmEditor';
 import { useCurrentPage } from 'hooks/useCurrentPage';
 import { useCurrentSpaceId } from 'hooks/useCurrentSpaceId';
+import { usePagePermissions } from 'hooks/usePagePermissions';
 import { usePages } from 'hooks/usePages';
 import { usePageTitle } from 'hooks/usePageTitle';
 import type { PageMeta, PageUpdates } from 'lib/pages';
@@ -18,19 +19,15 @@ import DocumentPage from '../DocumentPage';
 
 export default function EditorPage({ pageId: pageIdOrPath }: { pageId: string }) {
   const { currentPageId, setCurrentPageId } = useCurrentPage();
-  const { pages, getPagePermissions, loadingPages, updatePage } = usePages();
+  const { pages, loadingPages, updatePage } = usePages();
   const { editMode, resetPageProps, setPageProps } = useCharmEditor();
   const [, setTitleState] = usePageTitle();
   const [pageNotFound, setPageNotFound] = useState(false);
   const { currentSpaceId } = useCurrentSpaceId();
   const [isAccessDenied, setIsAccessDenied] = useState(false);
   const [currentPage, setCurrentPage] = useState<PageMeta | null>(null);
-  const currentPagePermissions = useMemo(
-    () => currentPage && getPagePermissions(currentPage.id, currentPage),
-    [currentPage]
-  );
-  const readOnly =
-    (currentPagePermissions?.edit_content === false && editMode !== 'suggesting') || editMode === 'viewing';
+  const { permissions: pagePermissions } = usePagePermissions({ pageIdOrPath: currentPageId });
+  const readOnly = (pagePermissions?.edit_content === false && editMode !== 'suggesting') || editMode === 'viewing';
   const parentProposalId = findParentOfType({ pageId: currentPageId, pageType: 'proposal', pageMap: pages });
   useEffect(() => {
     const pageFromContext = Object.values(pages).find(
@@ -67,24 +64,24 @@ export default function EditorPage({ pageId: pageIdOrPath }: { pageId: string })
 
   // set page attributes of the primary charm editor
   useEffect(() => {
-    if (loadingPages || !currentPagePermissions) {
+    if (loadingPages || !pagePermissions) {
       // wait for pages loaded for permissions to be correct
       return;
     }
     if (!editMode) {
-      if (currentPagePermissions.edit_content) {
-        setPageProps({ permissions: currentPagePermissions, editMode: 'editing' });
+      if (pagePermissions.edit_content) {
+        setPageProps({ permissions: pagePermissions, editMode: 'editing' });
       } else {
-        setPageProps({ permissions: currentPagePermissions, editMode: 'viewing' });
+        setPageProps({ permissions: pagePermissions, editMode: 'viewing' });
       }
     } else {
       // pass editMode thru to fix hot-reloading which resets the prop
-      setPageProps({ permissions: currentPagePermissions, editMode });
+      setPageProps({ permissions: pagePermissions, editMode });
     }
     return () => {
       resetPageProps();
     };
-  }, [currentPagePermissions, currentPage, loadingPages]);
+  }, [pagePermissions, currentPage, loadingPages]);
 
   const debouncedPageUpdate = debouncePromise(async (updates: PageUpdates) => {
     setPageProps({ isSaving: true });
@@ -117,20 +114,20 @@ export default function EditorPage({ pageId: pageIdOrPath }: { pageId: string })
     return <ErrorPage message={"Sorry, that page doesn't exist"} />;
   }
   // Wait for permission load
-  else if (!currentPage || !currentPagePermissions) {
+  else if (!currentPage || !pagePermissions) {
     return null;
   }
   // Interpret page permission
-  else if (currentPagePermissions.read === false) {
+  else if (pagePermissions.read === false) {
     return <ErrorPage message={"Sorry, you don't have access to this page"} />;
-  } else if (currentPagePermissions.read === true) {
+  } else if (pagePermissions.read === true) {
     if (
       currentPage?.type === 'board' ||
       currentPage?.type === 'inline_board' ||
       currentPage?.type === 'inline_linked_board' ||
       currentPage?.type === 'linked_board'
     ) {
-      return <DatabasePage page={currentPage} setPage={setPage} pagePermissions={currentPagePermissions} />;
+      return <DatabasePage page={currentPage} setPage={setPage} pagePermissions={pagePermissions} />;
     } else {
       return (
         // Document page is used in a few places, so it is responsible for retrieving its own permissions

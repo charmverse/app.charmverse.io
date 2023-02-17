@@ -13,6 +13,7 @@ import Dialog from 'components/common/BoardEditor/focalboard/src/components/dial
 import Button from 'components/common/Button';
 import { useBounties } from 'hooks/useBounties';
 import { useCurrentPage } from 'hooks/useCurrentPage';
+import { usePagePermissions } from 'hooks/usePagePermissions';
 import { usePages } from 'hooks/usePages';
 import type { BountyWithDetails } from 'lib/bounties';
 import log from 'lib/log';
@@ -39,8 +40,11 @@ export default function PageDialog(props: Props) {
   const { refreshBounty, setBounties } = useBounties();
   const { currentPageId, setCurrentPageId } = useCurrentPage();
 
-  const { updatePage, getPagePermissions, deletePage, pages } = usePages();
-  const pagePermission = page ? getPagePermissions(page.id) : null;
+  const { updatePage, deletePage, pages } = usePages();
+  const { permissions: pagePermissions } = usePagePermissions({
+    pageIdOrPath: page?.id as string,
+    isNewPage: !page?.id
+  });
   const domain = router.query.domain as string;
   const fullPageUrl = `/${domain}/${page?.path}`;
 
@@ -48,7 +52,7 @@ export default function PageDialog(props: Props) {
 
   const parentProposalId = findParentOfType({ pageId: ogCurrentPageId, pageType: 'proposal', pageMap: pages });
 
-  const readOnlyPage = readOnly || !pagePermission?.edit_content;
+  const readOnlyPage = readOnly || !pagePermissions?.edit_content;
 
   // keep track if charmeditor is mounted. There is a bug that it calls the update method on closing the modal, but content is empty
   useEffect(() => {
