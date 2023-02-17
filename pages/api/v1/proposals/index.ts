@@ -4,7 +4,7 @@ import nc from 'next-connect';
 
 import { prisma } from 'db';
 import { InvalidStateError, onError, onNoMatch, requireApiKey } from 'lib/middleware';
-import { generateMarkdown } from 'lib/pages';
+import { generateMarkdown } from 'lib/prosemirror/plugins/markdown/generateMarkdown';
 import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -193,7 +193,6 @@ async function listProposals(req: NextApiRequest, res: NextApiResponse<PublicApi
   for (const proposal of proposals) {
     try {
       const markdownText = await generateMarkdown({
-        title: proposal.page?.title as string,
         content: proposal.page?.content as any
       });
       markdownTexts.push(markdownText);

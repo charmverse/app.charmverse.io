@@ -4,7 +4,7 @@ import nc from 'next-connect';
 
 import { prisma } from 'db';
 import { onError, onNoMatch, requireApiKey } from 'lib/middleware';
-import { generateMarkdown } from 'lib/pages';
+import { generateMarkdown } from 'lib/prosemirror/plugins/markdown/generateMarkdown';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -189,7 +189,6 @@ async function getBounties(req: NextApiRequest, res: NextApiResponse) {
   for (const bounty of bounties) {
     try {
       const markdownText = await generateMarkdown({
-        title: bounty.page?.title ?? 'Untitled',
         content: bounty.page?.content ?? { type: 'doc', content: [] }
       });
       markdown.push(markdownText);
