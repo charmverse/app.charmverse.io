@@ -2,7 +2,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import type { ChangeEvent } from 'react';
-import { useEffect } from 'react';
+import { useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
@@ -26,7 +26,6 @@ function UserDescription(props: UserDescriptionProps) {
 
   const {
     register,
-    reset,
     trigger,
     setValue,
     watch,
@@ -39,23 +38,19 @@ function UserDescription(props: UserDescriptionProps) {
     resolver: yupResolver(schema)
   });
 
-  useEffect(() => {
-    reset({
-      description: currentDescription || ''
-    });
-  }, [currentDescription]);
+  const onSave = useCallback(
+    debounce(async (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      if (!readOnly) {
+        const val = event.target.value;
+        const validate = await trigger();
 
-  const onSave = debounce(async (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    if (!readOnly) {
-      const val = event.target.value;
-      setValue('description', val.length > 500 ? event.target.value.substring(0, 500) : val);
-      const validate = await trigger();
-
-      if (validate && val.length <= 500) {
-        await save(event.target.value);
+        if (validate && val.length <= 500) {
+          await save(val);
+        }
       }
-    }
-  }, 300);
+    }, 300),
+    [readOnly]
+  );
 
   const watchDescription = watch('description');
 
@@ -72,7 +67,11 @@ function UserDescription(props: UserDescriptionProps) {
         placeholder='Tell the world a bit more about yourself ...'
         multiline
         minRows={2}
-        onChange={onSave}
+        onChange={async (event) => {
+          const val = event.target.value;
+          setValue('description', val.length > 500 ? val.substring(0, 500) : val);
+          await onSave(event);
+        }}
       />
       <Box justifyContent='end' display='flex'>
         {watchDescription.length}/500

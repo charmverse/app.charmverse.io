@@ -78,7 +78,7 @@ function MemberDirectoryGalleryCard({ member }: { member: Member }) {
       />
       <Stack p={2} gap={1}>
         {!isNameHidden && (
-          <Typography gutterBottom variant='h6' mb={0} component='div'>
+          <Typography gutterBottom variant='h6' mb={0} component='div' noWrap>
             {(member.properties.find((memberProperty) => memberProperty.memberPropertyId === propertiesRecord.name?.id)
               ?.value as string) ?? member.username}
           </Typography>
