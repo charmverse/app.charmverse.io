@@ -10,6 +10,7 @@ import UserDisplay from 'components/common/UserDisplay';
 import ProposalCategoryInput from 'components/proposals/components/ProposalCategoryInput';
 import ProposalStepper from 'components/proposals/components/ProposalStepper';
 import { useProposalCategories } from 'components/proposals/hooks/useProposalCategories';
+import { useProposalPermissions } from 'components/proposals/hooks/useProposalPermissions';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useMembers } from 'hooks/useMembers';
 import useRoles from 'hooks/useRoles';
@@ -31,6 +32,10 @@ export default function ProposalProperties({ pageId, proposalId, readOnly, isTem
     charmClient.proposals.getProposal(proposalId)
   );
   const { categories, canEditProposalCategories, addCategory, deleteCategory } = useProposalCategories();
+
+  const proposalPermissions = useProposalPermissions({
+    proposalIdOrPath: proposalId
+  });
 
   const { members } = useMembers();
   const { roles = [], roleups } = useRoles();
@@ -124,6 +129,7 @@ export default function ProposalProperties({ pageId, proposalId, readOnly, isTem
             proposalUserGroups={isAdmin ? ['author', 'reviewer'] : currentUserGroups}
             proposal={proposal}
             refreshProposal={refreshProposal}
+            permissions={proposalPermissions}
           />
         </Grid>
       )}
@@ -142,9 +148,9 @@ export default function ProposalProperties({ pageId, proposalId, readOnly, isTem
           </div>
           <Box display='flex' flex={1}>
             <ProposalCategoryInput
-              disabled={readOnly || !canUpdateProposalProperties || !proposal}
+              disabled={readOnly || !proposalPermissions?.edit}
               options={categories || []}
-              canEditCategories={canEditProposalCategories}
+              canEditCategories={isAdmin}
               value={proposalCategory ?? null}
               onChange={onChangeCategory}
               onDeleteCategory={deleteCategory}
@@ -187,7 +193,7 @@ export default function ProposalProperties({ pageId, proposalId, readOnly, isTem
                   refreshProposal();
                 }
               }}
-              disabled={readOnly || !canUpdateProposalProperties || !proposal}
+              disabled={readOnly || !proposalPermissions?.edit}
               readOnly={readOnly}
               options={members}
               sx={{
@@ -210,11 +216,11 @@ export default function ProposalProperties({ pageId, proposalId, readOnly, isTem
             <Button>Reviewer</Button>
           </div>
           <div style={{ width: '100%' }}>
-            {proposalStatus === 'reviewed' && proposalReviewer ? (
+            {proposalPermissions?.edit ? (
               <UserDisplay showMiniProfile user={proposalReviewer} avatarSize='small' />
             ) : (
               <InputSearchReviewers
-                disabled={readOnly || !canUpdateProposalProperties}
+                disabled={readOnly || !proposalPermissions?.edit}
                 readOnly={readOnly}
                 value={proposalReviewers.map(
                   (reviewer) => reviewerOptionsRecord[(reviewer.roleId ?? reviewer.userId) as string]

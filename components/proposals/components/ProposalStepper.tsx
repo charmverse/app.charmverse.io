@@ -9,6 +9,7 @@ import charmClient from 'charmClient';
 import Button from 'components/common/BoardEditor/focalboard/src/widgets/buttons/button';
 import useTasks from 'components/nexus/hooks/useTasks';
 import CreateVoteModal from 'components/votes/components/CreateVoteModal';
+import type { AvailableProposalPermissionFlags } from 'lib/permissions/proposals/interfaces';
 import type { ProposalWithUsers } from 'lib/proposal/interface';
 import type { ProposalUserGroup } from 'lib/proposal/proposalStatusTransition';
 import {
@@ -21,6 +22,7 @@ type StepperContainerProps = {
   refreshProposal: KeyedMutator<ProposalWithUsers>;
   proposalUserGroups: ProposalUserGroup[];
   proposal?: ProposalWithUsers;
+  permissions?: AvailableProposalPermissionFlags;
 };
 
 const PROPOSAL_STATUSES = Object.keys(proposalStatusTransitionRecord) as ProposalStatus[];
@@ -95,7 +97,12 @@ const StepperIcon = styled.div<{ isCurrent: boolean; isComplete: boolean; isEnab
 `
 );
 
-export default function ProposalStepper({ refreshProposal, proposal, proposalUserGroups }: StepperContainerProps) {
+export default function ProposalStepper({
+  refreshProposal,
+  proposal,
+  proposalUserGroups,
+  permissions
+}: StepperContainerProps) {
   const { mutate: mutateTasks } = useTasks();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
