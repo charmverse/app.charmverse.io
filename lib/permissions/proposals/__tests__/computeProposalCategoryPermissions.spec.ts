@@ -30,7 +30,7 @@ beforeAll(async () => {
 });
 
 describe('computeProposalCategoryPermissions', () => {
-  it('should return only create_proposal for someone with full access category admin', async () => {
+  it('should return only create_proposal for someone with full access', async () => {
     const role = await generateRole({
       createdBy: adminUser.id,
       spaceId: space.id,
@@ -88,36 +88,6 @@ describe('computeProposalCategoryPermissions', () => {
 
     proposalCategoryOperations.forEach((op) => {
       expect(permissions[op]).toBe(false);
-    });
-  });
-
-  it('should only allow a user with full access to create a proposal', async () => {
-    const role = await generateRole({
-      createdBy: adminUser.id,
-      spaceId: space.id,
-      assigneeUserIds: [spaceMemberUser.id]
-    });
-    const proposalCategory = await generateProposalCategory({ spaceId: space.id });
-
-    await prisma.proposalCategoryPermission.create({
-      data: {
-        permissionLevel: 'full_access',
-        proposalCategory: { connect: { id: proposalCategory.id } },
-        role: { connect: { id: role.id } }
-      }
-    });
-
-    const permissions = await computeProposalCategoryPermissions({
-      resourceId: proposalCategory.id,
-      userId: spaceMemberUser.id
-    });
-
-    proposalCategoryOperations.forEach((op) => {
-      if (op === 'create_proposal') {
-        expect(permissions[op]).toBe(true);
-      } else {
-        expect(permissions[op]).toBe(false);
-      }
     });
   });
 
