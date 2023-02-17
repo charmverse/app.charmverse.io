@@ -43,7 +43,14 @@ export function MemberPropertiesRenderer({ properties }: { properties: PropertyV
             if (!propertyValue || propertyValue?.length === 0) {
               return null;
             }
-            return <SelectPreview value={propertyValue} name={property.name} options={property.options} />;
+            return (
+              <SelectPreview
+                key={property.memberPropertyId}
+                value={propertyValue}
+                name={property.name}
+                options={property.options}
+              />
+            );
           }
           case 'join_date': {
             return (

@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router';
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
@@ -15,6 +15,7 @@ export const useSharedPage = () => {
 
   const isPublicPath = isPublicPagePath(pathname);
   const isBountiesPath = isPublicPath && isBountiesPagePath(pathname);
+  const isForumPath = isPublicPath && isForumPagePath(pathname);
 
   const { spaces, isLoaded: spacesLoaded } = useSpaces();
   const spaceDomain = isPublicPath ? (query.domain as string) : null;
@@ -30,8 +31,12 @@ export const useSharedPage = () => {
       return `${spaceDomain}/bounties`;
     }
 
+    if (isForumPath) {
+      return `${spaceDomain}/forum`;
+    }
+
     return `${spaceDomain}/${pagePath}`;
-  }, [isBountiesPagePath, isPublicPath, spaceDomain, pagePath]);
+  }, [isBountiesPagePath, isPublicPath, isForumPath, spaceDomain, pagePath]);
 
   // user does not have access to space and is page path, so we want to verify if it is a public page
   const shouldLoadPublicPage = useMemo(() => {

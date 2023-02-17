@@ -29,10 +29,39 @@ interface Props extends Omit<AutocompleteProps<Member, boolean, boolean, boolean
   filter?: IMembersFilter;
   options: Member[];
   disableCloseOnSelect?: boolean;
+  openOnFocus?: boolean;
 }
 
-export function InputSearchMemberBase({ filter, options, disableCloseOnSelect, placeholder, ...props }: Props) {
+export function InputSearchMemberBase({
+  filter,
+  options,
+  disableCloseOnSelect,
+  placeholder,
+  openOnFocus = false,
+  ...props
+}: Props) {
   const filteredOptions = filter ? filterMembers(options, filter) : options;
+  const [open, setOpen] = useState(false);
+
+  // delay showing autocomplete list to position it correctly for popper context
+  useEffect(() => {
+    if (openOnFocus) {
+      const timeout = setTimeout(() => {
+        setOpen(true);
+      }, 150);
+
+      return () => {
+        clearTimeout(timeout);
+      };
+    }
+  }, [openOnFocus]);
+
+  // Controlled open state
+  const autocompleteProps = openOnFocus
+    ? {
+        open
+      }
+    : {};
 
   return (
     <Autocomplete
@@ -52,11 +81,13 @@ export function InputSearchMemberBase({ filter, options, disableCloseOnSelect, p
           {...params}
           placeholder={filteredOptions.length > 0 ? placeholder : ''}
           size='small'
+          autoFocus={openOnFocus}
           inputProps={{
             ...params.inputProps
           }}
         />
       )}
+      {...autocompleteProps}
       {...props}
     />
   );
@@ -66,9 +97,11 @@ interface IInputSearchMemberProps {
   onChange: (id: string) => void;
   defaultValue?: string;
   filter?: IMembersFilter;
+  onClear?: VoidFunction;
+  openOnFocus?: boolean;
 }
 
-export function InputSearchMember({ defaultValue, onChange, ...props }: IInputSearchMemberProps) {
+export function InputSearchMember({ defaultValue, onChange, onClear, openOnFocus, ...props }: IInputSearchMemberProps) {
   const { members } = useMembers();
   const [value, setValue] = useState<Member | null>(null);
 
@@ -85,6 +118,9 @@ export function InputSearchMember({ defaultValue, onChange, ...props }: IInputSe
     if (selectedUser) {
       onChange(selectedUser.id);
     }
+    if (onClear && !selectedUser) {
+      onClear();
+    }
     setValue(selectedUser);
   }
 
@@ -94,6 +130,7 @@ export function InputSearchMember({ defaultValue, onChange, ...props }: IInputSe
       onChange={(e, _value) => emitValue(_value as Member)}
       placeholder='Select a user'
       value={value}
+      openOnFocus={openOnFocus}
       {...props}
     />
   );
