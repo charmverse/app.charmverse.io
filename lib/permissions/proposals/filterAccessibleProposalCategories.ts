@@ -14,7 +14,6 @@ type CategoriesToFilter = {
   proposalCategories: ProposalCategory[];
   userId?: string;
 };
-
 export async function filterAccessibleProposalCategories({
   proposalCategories,
   userId
