@@ -3,6 +3,7 @@ import type { ProposalStatus } from '@prisma/client';
 import * as http from 'adapters/http';
 import type { IPageWithPermissions } from 'lib/pages';
 import type { CreateProposalFromTemplateInput } from 'lib/proposal/createProposalFromTemplate';
+import type { ListProposalsRequest } from 'lib/proposal/getProposalsBySpace';
 import type { ProposalCategory, ProposalWithUsers } from 'lib/proposal/interface';
 import type { UpdateProposalRequest } from 'lib/proposal/updateProposal';
 
@@ -19,8 +20,8 @@ export class ProposalsApi {
     return http.PUT<ProposalWithUsers>(`/api/proposals/${proposalId}/status`, { newStatus });
   }
 
-  getProposalsBySpace(spaceId: string) {
-    return http.GET<ProposalWithUsers[]>(`/api/spaces/${spaceId}/proposals`);
+  getProposalsBySpace({ spaceId, categoryIds }: ListProposalsRequest) {
+    return http.POST<ProposalWithUsers[]>(`/api/spaces/${spaceId}/proposals`, { categoryIds });
   }
 
   getProposalCategories(spaceId: string) {

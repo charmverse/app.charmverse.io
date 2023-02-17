@@ -19,7 +19,7 @@ export default function ProposalsPage() {
   const currentSpace = useCurrentSpace();
   const { data, mutate: mutateProposals } = useSWR(
     () => (currentSpace ? `proposals/${currentSpace.id}` : null),
-    () => charmClient.proposals.getProposalsBySpace(currentSpace!.id)
+    () => charmClient.proposals.getProposalsBySpace({ spaceId: currentSpace!.id })
   );
   const {
     filteredProposals,
