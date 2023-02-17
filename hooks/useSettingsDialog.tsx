@@ -29,9 +29,7 @@ export function SettingsDialogProvider({ children }: { children: ReactNode }) {
   const onClick = (_path?: string, props?: PathProps) => {
     setActivePath(_path ?? '');
     settingsModalState.open();
-    if (props) {
-      setPathProps(props);
-    }
+    setPathProps(props);
   };
 
   const onClose = () => {
