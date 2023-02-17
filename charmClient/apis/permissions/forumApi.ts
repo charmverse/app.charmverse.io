@@ -7,7 +7,7 @@ import type {
 import type { PostCategoryPermissionInput } from 'lib/permissions/forum/upsertPostCategoryPermission';
 import type { PermissionCompute, PermissionToDelete } from 'lib/permissions/interfaces';
 
-export class PermissionsApi {
+export class ForumApi {
   computePostPermissions({ postIdOrPath, spaceDomain }: { postIdOrPath: string; spaceDomain?: string }) {
     return http.POST<AvailablePostPermissionFlags>(`/api/permissions/forum/compute-post-permissions`, {
       resourceId: !spaceDomain ? postIdOrPath : `${spaceDomain}/${postIdOrPath}`

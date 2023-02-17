@@ -13,7 +13,7 @@ export function usePostPermissions({ postIdOrPath, spaceDomain, isNewPost }: Pro
   const { data } = useSWR(
     !postIdOrPath ? null : `compute-post-category-permissions-${postIdOrPath}${spaceDomain ?? ''}`,
     () =>
-      charmClient.permissions.computePostPermissions({
+      charmClient.permissions.forum.computePostPermissions({
         postIdOrPath,
         spaceDomain
       })
