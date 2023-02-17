@@ -28,18 +28,18 @@ export async function generateProposal({
   categoryId,
   userId,
   spaceId,
-  proposalStatus,
-  authors,
-  reviewers,
+  proposalStatus = 'draft',
+  authors = [],
+  reviewers = [],
   deletedAt = null
 }: {
   deletedAt?: Page['deletedAt'];
   categoryId: string;
   userId: string;
   spaceId: string;
-  authors: string[];
-  reviewers: ProposalReviewerInput[];
-  proposalStatus: ProposalStatus;
+  authors?: string[];
+  reviewers?: ProposalReviewerInput[];
+  proposalStatus?: ProposalStatus;
 }): Promise<ProposalWithUsers> {
   const proposalId = v4();
 
@@ -73,21 +73,25 @@ export async function generateProposal({
               id: spaceId
             }
           },
-          authors: {
-            createMany: {
-              data: authors.map((authorId) => ({ userId: authorId }))
-            }
-          },
-          reviewers: {
-            createMany: {
-              data: (reviewers ?? []).map((r) => {
-                return {
-                  userId: r.group === 'user' ? r.id : undefined,
-                  roleId: r.group === 'role' ? r.id : undefined
-                };
-              })
-            }
-          }
+          authors: !authors.length
+            ? undefined
+            : {
+                createMany: {
+                  data: authors.map((authorId) => ({ userId: authorId }))
+                }
+              },
+          reviewers: !reviewers.length
+            ? undefined
+            : {
+                createMany: {
+                  data: (reviewers ?? []).map((r) => {
+                    return {
+                      userId: r.group === 'user' ? r.id : undefined,
+                      roleId: r.group === 'role' ? r.id : undefined
+                    };
+                  })
+                }
+              }
         }
       }
     },
@@ -99,18 +103,6 @@ export async function generateProposal({
           category: true
         }
       }
-    }
-  });
-
-  const workspaceEvent = await prisma.workspaceEvent.create({
-    data: {
-      type: 'proposal_status_change',
-      meta: {
-        newStatus: proposalStatus
-      },
-      actorId: userId,
-      pageId: proposalId,
-      spaceId
     }
   });
 
