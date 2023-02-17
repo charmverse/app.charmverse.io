@@ -2,6 +2,7 @@ import type { Prisma } from '@prisma/client';
 import { Page, PageOperations } from '@prisma/client';
 
 import { prisma } from 'db';
+import { PageNotFoundError } from 'lib/pages/server';
 
 import { AllowedPagePermissions } from './available-page-permissions.class';
 import type {
@@ -11,6 +12,7 @@ import type {
 } from './page-permission-interfaces';
 import { PageOperationType } from './page-permission-interfaces';
 import { permissionTemplates } from './page-permission-mapping';
+import { computePagePermissionsUsingProposalPermissions } from './pagePermissionsWithComputeProposalPermissions';
 
 /**
  * Nested query to get the space role a user has in the space that owns this page
@@ -91,6 +93,27 @@ export async function computeUserPagePermissions({
   allowAdminBypass = true,
   userId
 }: IPagePermissionUserRequest): Promise<IPagePermissionFlags> {
+  const pageInDb = await prisma.page.findUnique({
+    where: {
+      id: pageId
+    },
+    select: {
+      id: true,
+      proposalId: true
+    }
+  });
+
+  if (!pageInDb) {
+    throw new PageNotFoundError(pageId);
+  }
+
+  if (pageInDb.proposalId) {
+    return computePagePermissionsUsingProposalPermissions({
+      resourceId: pageId,
+      userId
+    });
+  }
+
   const [foundSpaceRole, permissions] = await Promise.all([
     // Check if user is a space admin for this page so they gain full rightss
     (
