@@ -2,7 +2,7 @@ import { KeyboardArrowDown } from '@mui/icons-material';
 import { Divider, Grid, Typography, Box, Collapse, Stack, IconButton } from '@mui/material';
 import type { ProposalStatus } from '@prisma/client';
 import { usePopupState } from 'material-ui-popup-state/hooks';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
@@ -36,6 +36,7 @@ export default function ProposalProperties({ pageId, proposalId, readOnly, isTem
   const { data: proposal, mutate: refreshProposal } = useSWR(`proposal/${proposalId}`, () =>
     charmClient.proposals.getProposal(proposalId)
   );
+
   const { categories, canEditProposalCategories, addCategory, deleteCategory } = useProposalCategories();
   const { mutate: mutateTasks } = useTasks();
   const [isVoteModalOpen, setIsVoteModalOpen] = useState(false);
@@ -45,9 +46,8 @@ export default function ProposalProperties({ pageId, proposalId, readOnly, isTem
   const { user } = useUser();
   const isAdmin = useIsAdmin();
 
-  const [detailsExpanded, setDetailsExpanded] = useState(
-    !proposal || ['private_draft', 'public_draft'].includes(proposal?.status ?? '')
-  );
+  const prevStatusRef = useRef(proposal?.status || '');
+  const [detailsExpanded, setDetailsExpanded] = useState(['private_draft', 'draft'].includes(proposal?.status ?? ''));
 
   const proposalMenuState = usePopupState({ popupId: 'proposal-info', variant: 'popover' });
 
@@ -65,6 +65,12 @@ export default function ProposalProperties({ pageId, proposalId, readOnly, isTem
     if (proposal?.status === 'vote_active' && detailsExpanded) {
       setDetailsExpanded(false);
     }
+
+    if (!prevStatusRef.current && ['private_draft', 'draft'].includes(proposal?.status || '')) {
+      setDetailsExpanded(true);
+    }
+
+    prevStatusRef.current = proposal?.status || '';
   }, [detailsExpanded, proposal?.status]);
 
   const isProposalReviewer =

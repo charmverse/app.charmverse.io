@@ -61,7 +61,7 @@ export function ProposalStepSummary({ proposal, proposalUserGroups, openVoteModa
           <Stack gap={0.5} direction='row' fontSize='10px'>
             {!!prevStatus && (
               <Button
-                sx={{ whiteSpace: 'nowrap', width: '50%' }}
+                sx={{ whiteSpace: 'nowrap' }}
                 size='small'
                 color='secondary'
                 startIcon={<ArrowBackIos fontSize='inherit' />}
@@ -79,7 +79,7 @@ export function ProposalStepSummary({ proposal, proposalUserGroups, openVoteModa
               <Button
                 size='small'
                 color='primary'
-                sx={{ whiteSpace: 'nowrap', width: '50%' }}
+                sx={{ whiteSpace: 'nowrap' }}
                 endIcon={<ArrowForwardIos fontSize='inherit' />}
                 disabled={!nextEnabled}
                 onClick={() => {
