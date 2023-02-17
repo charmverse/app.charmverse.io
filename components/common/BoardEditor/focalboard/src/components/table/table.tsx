@@ -1,6 +1,8 @@
+import { Add } from '@mui/icons-material';
+import { Typography } from '@mui/material';
+import { Box } from '@mui/system';
 import React, { useCallback } from 'react';
 import { useDrop } from 'react-dnd';
-import { FormattedMessage } from 'react-intl';
 
 import useEfficientDragLayer from 'hooks/useEffecientDragLayer';
 import type { IPropertyOption, IPropertyTemplate, Board, BoardGroup } from 'lib/focalboard/board';
@@ -283,7 +285,12 @@ function Table(props: Props): JSX.Element {
                 props.addCard('');
               }}
             >
-              <FormattedMessage id='TableComponent.plus-new' defaultMessage='+ New' />
+              <Box display='flex' gap={1} alignItems='center'>
+                <Add fontSize='small' />
+                <Typography fontSize='small' id='TableComponent.plus-new'>
+                  New
+                </Typography>
+              </Box>
             </div>
           )}
         </div>

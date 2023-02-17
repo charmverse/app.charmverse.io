@@ -7,6 +7,7 @@ import React, { useCallback, useState } from 'react';
 import type { IntlShape } from 'react-intl';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
+import { KanbanGroupColumn } from 'components/common/BoardEditor/components/kanban/KanbanGroupColumn';
 import type { Board, BoardGroup, IPropertyOption, IPropertyTemplate } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
@@ -325,39 +326,21 @@ function Kanban(props: Props) {
       <Box>
         <div className='octo-board-body' id='mainBoardBody'>
           {/* Columns */}
-
           {visibleGroups.map((group) => (
-            <KanbanColumn key={group.option.id || 'empty'} onDrop={(card: Card) => onDropToColumn(group.option, card)}>
-              {group.cards.map((card) => (
-                <KanbanCard
-                  card={card}
-                  board={board}
-                  visiblePropertyTemplates={visiblePropertyTemplates}
-                  key={card.id}
-                  readOnly={props.readOnly}
-                  isSelected={props.selectedCardIds.includes(card.id)}
-                  onClick={(e) => {
-                    props.onCardClicked(e, card);
-                  }}
-                  onDrop={onDropToCard}
-                  showCard={props.showCard}
-                  isManualSort={isManualSort}
-                />
-              ))}
-              {!props.readOnly && (
-                <Button
-                  size='small'
-                  variant='text'
-                  color='secondary'
-                  sx={{ justifyContent: 'flex-start' }}
-                  onClick={() => {
-                    props.addCard(group.option.id, true, {}, true);
-                  }}
-                >
-                  <FormattedMessage id='BoardComponent.new' defaultMessage='+ New' />
-                </Button>
-              )}
-            </KanbanColumn>
+            <KanbanGroupColumn
+              group={group}
+              board={board}
+              visiblePropertyTemplates={visiblePropertyTemplates}
+              key={group.option.id || 'empty'}
+              readOnly={props.readOnly}
+              onDropToCard={onDropToCard}
+              isManualSort={isManualSort}
+              selectedCardIds={props.selectedCardIds}
+              addCard={props.addCard}
+              onDropToColumn={onDropToColumn}
+              onCardClicked={props.onCardClicked}
+              showCard={props.showCard}
+            />
           ))}
 
           {/* Add whitespace underneath "Add a group" button */}
