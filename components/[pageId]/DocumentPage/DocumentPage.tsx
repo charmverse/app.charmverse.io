@@ -115,7 +115,7 @@ function DocumentPage({ page, setPage, insideModal, readOnly = false, parentProp
 
   const cannotComment = readOnly || !pagePermissions?.comment;
 
-  const enableSuggestingMode = editMode === 'suggesting' && !readOnly && pagePermissions?.comment;
+  const enableSuggestingMode = editMode === 'suggesting' && !readOnly && !!pagePermissions?.comment;
 
   const pageVote = Object.values(votes).find((v) => v.context === 'proposal');
 

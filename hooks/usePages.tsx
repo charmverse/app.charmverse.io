@@ -34,7 +34,7 @@ export type PagesContext = {
   mutatePage: (updates: PageUpdates, revalidate?: boolean) => void;
   mutatePagesRemove: (pageIds: string[], revalidate?: boolean) => void;
   deletePage: (data: { pageId: string; board?: Block }) => Promise<PageMeta | null | undefined>;
-  getPagePermissions: (pageId: string, page?: PageMeta) => IPagePermissionFlags;
+  getPagePermissions: (pageId: string, page?: PageMeta) => IPagePermissionFlags | null;
   mutatePagesList: KeyedMutator<PagesMap<PageMeta>>;
 };
 
@@ -58,7 +58,7 @@ export function PagesProvider({ children }: { children: ReactNode }) {
   const currentSpace = useCurrentSpace();
   const currentSpaceId = useRef<undefined | string>();
   const router = useRouter();
-  const { user } = useUser();
+  const { user, isLoaded: isUserLoaded } = useUser();
   const { subscribe } = useWebSocketClient();
 
   const { data, mutate: mutatePagesList } = useSWR(
@@ -100,14 +100,17 @@ export function PagesProvider({ children }: { children: ReactNode }) {
    * Will return permissions for the currently connected user
    * @param pageId
    */
-  function getPagePermissions(pageId: string, deletedPage?: PageMeta): IPagePermissionFlags {
+  function getPagePermissions(pageId: string, deletedPage?: PageMeta): IPagePermissionFlags | null {
     const computedPermissions = new AllowedPagePermissions();
 
     const targetPage = pages[pageId] ?? deletedPage;
 
     // Return empty permission set so this silently fails
-    if (!targetPage) {
+    if (!targetPage || !isUserLoaded) {
       return computedPermissions;
+    }
+    if (!isUserLoaded) {
+      return null;
     }
     const userSpaceRole = user?.spaceRoles.find((spaceRole) => spaceRole.spaceId === targetPage.spaceId);
 

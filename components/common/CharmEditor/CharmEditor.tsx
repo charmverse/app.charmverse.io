@@ -379,7 +379,7 @@ interface CharmEditorProps {
   pageId?: string;
   containerWidth?: number;
   pageType?: PageType | 'post';
-  pagePermissions?: IPagePermissionFlags;
+  pagePermissions?: IPagePermissionFlags | null;
   onParticipantUpdate?: (participants: FrontendParticipant[]) => void;
   placeholderText?: string;
   focusOnInit?: boolean;
