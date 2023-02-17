@@ -7,7 +7,7 @@ import { useState } from 'react';
 import KanbanCard from 'components/common/BoardEditor/focalboard/src/components/kanban/kanbanCard';
 import KanbanColumn from 'components/common/BoardEditor/focalboard/src/components/kanban/kanbanColumn';
 import { PageSizeInputPopup } from 'components/PageSizeInputPopup';
-import { usePaginatedData } from 'hooks/usePaginatedData';
+import { DEFAULT_PAGE_SIZE, usePaginatedData } from 'hooks/usePaginatedData';
 import type { Board, BoardGroup, IPropertyOption, IPropertyTemplate } from 'lib/focalboard/board';
 import type { Card } from 'lib/focalboard/card';
 
@@ -38,7 +38,7 @@ export function KanbanGroupColumn({
   showCard,
   isManualSort
 }: Props) {
-  const [pageSize, setPageSize] = useState(10);
+  const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
   const { data: cards, hasNextPage, showNextPage } = usePaginatedData(group.cards, { pageSize });
 
   return (
