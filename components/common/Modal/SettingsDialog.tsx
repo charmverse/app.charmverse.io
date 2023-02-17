@@ -11,7 +11,6 @@ import DialogContent from '@mui/material/DialogContent';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import type { Space } from '@prisma/client';
-import { usePopupState } from 'material-ui-popup-state/hooks';
 import type { ReactNode } from 'react';
 import { useEffect } from 'react';
 
@@ -113,8 +112,7 @@ function SpaceSettingsModalComponent() {
   const currentSpace = useCurrentSpace();
 
   const isMobile = useSmallScreen();
-  const modalState = usePopupState({ variant: 'dialog', popupId: 'settings-dialog' });
-  const { activePath, onClose, onClick, open, pathProps } = useSettingsDialog();
+  const { activePath, onClose, onClick, open } = useSettingsDialog();
 
   return (
     <Dialog
