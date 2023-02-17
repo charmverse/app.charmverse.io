@@ -21,7 +21,7 @@ export async function pfpStatusReviewedOnlyCreateVote({
   }
 
   const allowedAuthorOperations: ProposalOperation[] = ['view', 'create_vote'];
-  const allowedAdminOperations: ProposalOperation[] = [...allowedAuthorOperations, 'delete', 'edit'];
+  const allowedAdminOperations: ProposalOperation[] = [...allowedAuthorOperations, 'delete'];
 
   if (isAdmin) {
     typedKeys(flags).forEach((flag) => {

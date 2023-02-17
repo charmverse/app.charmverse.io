@@ -1,4 +1,4 @@
-import type { Proposal, ProposalCategory, Space, User } from '@prisma/client';
+import type { ProposalCategory, Space, User } from '@prisma/client';
 
 import type { ProposalWithUsers } from 'lib/proposal/interface';
 import { generateSpaceUser, generateUserAndSpace } from 'testing/setupDatabase';
@@ -86,7 +86,7 @@ describe('pfpStatusReviewedOnlyCreateVote', () => {
     });
   });
 
-  it('should allow the admin to view, edit, delete, create_vote', async () => {
+  it('should allow the admin to view, delete, create_vote', async () => {
     const permissions = await pfpStatusReviewedOnlyCreateVote({
       flags: fullPermissions,
       isAdmin: true,
@@ -96,9 +96,9 @@ describe('pfpStatusReviewedOnlyCreateVote', () => {
 
     expect(permissions).toMatchObject<AvailableProposalPermissionFlags>({
       view: true,
-      edit: true,
       delete: true,
       create_vote: true,
+      edit: false,
       review: false,
       comment: false,
       vote: false
