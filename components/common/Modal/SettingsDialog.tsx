@@ -114,15 +114,7 @@ function SpaceSettingsModalComponent() {
 
   const isMobile = useSmallScreen();
   const modalState = usePopupState({ variant: 'dialog', popupId: 'settings-dialog' });
-  const { activePath, onClose, onClick } = useSettingsDialog();
-
-  useEffect(() => {
-    if (activePath) {
-      modalState.open();
-    } else {
-      modalState.close();
-    }
-  }, [activePath]);
+  const { activePath, onClose, onClick, open, pathProps } = useSettingsDialog();
 
   return (
     <Dialog
@@ -131,15 +123,10 @@ function SpaceSettingsModalComponent() {
       fullScreen={isMobile}
       PaperProps={{ sx: { height: { md: '90vh' }, borderRadius: (theme) => theme.spacing(1) } }}
       onClose={onClose}
-      open={modalState.isOpen}
+      open={open}
     >
       <Box data-test-active-path={activePath} display='flex' flexDirection='row' flex='1' overflow='hidden'>
-        <Slide
-          direction='right'
-          in={isMobile ? modalState.isOpen && !activePath : true}
-          appear={isMobile}
-          unmountOnExit
-        >
+        <Slide direction='right' in={isMobile ? open && !activePath : true} appear={isMobile} unmountOnExit>
           <Box
             component='aside'
             maxWidth={{ xs: '100%', md: 350 }}
