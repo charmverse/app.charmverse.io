@@ -59,38 +59,42 @@ export function ProposalStepSummary({ proposal, proposalUserGroups, openVoteModa
 
         {showActions && (
           <Stack gap={0.5} direction='row' fontSize='10px'>
-            <Button
-              sx={{ whiteSpace: 'nowrap', flex: 1 }}
-              size='small'
-              color='secondary'
-              startIcon={<ArrowBackIos fontSize='inherit' />}
-              disabled={!backEnabled}
-              onClick={() => {
-                if (prevStatus) {
-                  updateProposalStatus(prevStatus);
-                }
-              }}
-            >
-              {prevStatus ? `${PROPOSAL_STATUS_LABELS[prevStatus]}` : 'Back'}
-            </Button>
-            <Button
-              size='small'
-              color='primary'
-              sx={{ whiteSpace: 'nowrap', flex: 1 }}
-              endIcon={<ArrowForwardIos fontSize='inherit' />}
-              disabled={!nextEnabled}
-              onClick={() => {
-                if (nextStatus) {
-                  if (nextStatus === 'vote_active') {
-                    openVoteModal();
-                  } else {
-                    updateProposalStatus(nextStatus);
+            {!!prevStatus && (
+              <Button
+                sx={{ whiteSpace: 'nowrap', width: '50%' }}
+                size='small'
+                color='secondary'
+                startIcon={<ArrowBackIos fontSize='inherit' />}
+                disabled={!backEnabled}
+                onClick={() => {
+                  if (prevStatus) {
+                    updateProposalStatus(prevStatus);
                   }
-                }
-              }}
-            >
-              {nextStatus ? `${PROPOSAL_STATUS_LABELS[nextStatus]}` : 'Next'}
-            </Button>
+                }}
+              >
+                {prevStatus ? `${PROPOSAL_STATUS_LABELS[prevStatus]}` : 'Back'}
+              </Button>
+            )}
+            {!!nextStatus && (
+              <Button
+                size='small'
+                color='primary'
+                sx={{ whiteSpace: 'nowrap', width: '50%' }}
+                endIcon={<ArrowForwardIos fontSize='inherit' />}
+                disabled={!nextEnabled}
+                onClick={() => {
+                  if (nextStatus) {
+                    if (nextStatus === 'vote_active') {
+                      openVoteModal();
+                    } else {
+                      updateProposalStatus(nextStatus);
+                    }
+                  }
+                }}
+              >
+                {nextStatus ? `${PROPOSAL_STATUS_LABELS[nextStatus]}` : 'Next'}
+              </Button>
+            )}
           </Stack>
         )}
       </Stack>
