@@ -1,8 +1,10 @@
+import type { ProposalCategory } from '@prisma/client';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
+import type { ProposalCategoryWithPermissions } from 'lib/permissions/proposals/interfaces';
 import type { NewProposalCategory } from 'lib/proposal/interface';
 
 export function useProposalCategories() {
@@ -31,5 +33,19 @@ export function useProposalCategories() {
     return categoryId;
   }
 
-  return { isLoading: !categories, categories, canEditProposalCategories, addCategory, deleteCategory };
+  function mutateCategory(category: ProposalCategoryWithPermissions) {
+    mutate((data) => {
+      const copied = data?.slice() ?? [];
+      const existingCategoryIndex = copied.findIndex((c) => c.id === category.id);
+
+      if (existingCategoryIndex) {
+        copied.push();
+      } else {
+        copied[existingCategoryIndex] = category;
+      }
+      return copied;
+    });
+  }
+
+  return { isLoading: !categories, categories, canEditProposalCategories, addCategory, deleteCategory, mutateCategory };
 }

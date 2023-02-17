@@ -2,9 +2,12 @@ import { Box, Chip, InputLabel, MenuItem, Select } from '@mui/material';
 import type { ProposalStatus } from '@prisma/client';
 
 import { ViewOptions } from 'components/common/ViewOptions';
+import type { ProposalCategoryWithPermissions } from 'lib/permissions/proposals/interfaces';
 import type { ProposalCategory } from 'lib/proposal/interface';
 import { PROPOSAL_STATUS_LABELS } from 'lib/proposal/proposalStatusTransition';
 import type { BrandColor } from 'theme/colors';
+
+import { CategoryContextMenu } from './ProposalCategoryContextMenu';
 
 export type ProposalSort = 'latest_created';
 export type ProposalFilter = ProposalStatus | 'all';
@@ -16,10 +19,10 @@ type Props = {
   setProposalSort: (proposalSort: ProposalSort) => void;
   categoryIdFilter: string | null;
   setCategoryIdFilter: (val: string) => void;
-  categories: ProposalCategory[];
+  categories: ProposalCategoryWithPermissions[];
 };
 
-export default function ProposalsViewOptions({
+export function ProposalsViewOptions({
   proposalSort,
   setProposalSort,
   proposalFilter,
@@ -62,9 +65,10 @@ export default function ProposalsViewOptions({
             onChange={(e) => setCategoryIdFilter(e.target.value)}
           >
             <MenuItem value='all'>All categories</MenuItem>
-            {categories.map(({ id, title, color }) => (
-              <MenuItem key={id} value={id}>
-                <Chip sx={{ cursor: 'pointer' }} color={color as BrandColor} label={title} />
+            {categories.map((category) => (
+              <MenuItem key={category.id} value={category.id}>
+                <Chip sx={{ cursor: 'pointer' }} color={category.color as BrandColor} label={category.title} />
+                <CategoryContextMenu category={category} key={category.id} />
               </MenuItem>
             ))}
           </Select>

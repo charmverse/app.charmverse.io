@@ -2,6 +2,7 @@ import type { ProposalStatus } from '@prisma/client';
 
 import * as http from 'adapters/http';
 import type { IPageWithPermissions } from 'lib/pages';
+import type { ProposalCategoryWithPermissions } from 'lib/permissions/proposals/interfaces';
 import type { CreateProposalFromTemplateInput } from 'lib/proposal/createProposalFromTemplate';
 import type { ListProposalsRequest } from 'lib/proposal/getProposalsBySpace';
 import type { ProposalCategory, ProposalWithUsers } from 'lib/proposal/interface';
@@ -25,7 +26,7 @@ export class ProposalsApi {
   }
 
   getProposalCategories(spaceId: string) {
-    return http.GET<ProposalCategory[]>(`/api/spaces/${spaceId}/proposal-categories`);
+    return http.GET<ProposalCategoryWithPermissions[]>(`/api/spaces/${spaceId}/proposal-categories`);
   }
 
   createProposalTemplate({ spaceId }: { spaceId: string }): Promise<IPageWithPermissions> {
@@ -44,11 +45,13 @@ export class ProposalsApi {
   }
 
   createProposalCategory(spaceId: string, category: Omit<ProposalCategory, 'id' | 'spaceId'>) {
-    return http.POST<ProposalCategory>(`/api/spaces/${spaceId}/proposal-categories`, { ...category });
+    return http.POST<ProposalCategoryWithPermissions>(`/api/spaces/${spaceId}/proposal-categories`, { ...category });
   }
 
   updateProposalCategory(spaceId: string, category: ProposalCategory) {
-    return http.PUT<ProposalCategory>(`/api/spaces/${spaceId}/proposal-categories/${category.id}`, { ...category });
+    return http.PUT<ProposalCategoryWithPermissions>(`/api/spaces/${spaceId}/proposal-categories/${category.id}`, {
+      ...category
+    });
   }
 
   deleteProposalCategory(spaceId: string, categoryId: string) {

@@ -12,7 +12,7 @@ import NewProposalButton from 'components/votes/components/NewProposalButton';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 
 import ProposalsTable from './components/ProposalsTable';
-import ProposalsViewOptions from './components/ProposalsViewOptions';
+import { ProposalsViewOptions } from './components/ProposalsViewOptions';
 
 export default function ProposalsPage() {
   const { categories = [] } = useProposalCategories();

@@ -20,6 +20,6 @@ export const proposalPermissionsMapping: Record<ProposalCategoryPermissionLevel,
 export const proposalCategoryPermissionLabels: Record<ProposalCategoryPermissionLevel, string> = {
   full_access: 'Full Access',
   view_comment_vote: 'View, comment & vote',
-  view_comment: 'View & comment & vote',
+  view_comment: 'View & comment',
   view: 'View'
 } as const;
