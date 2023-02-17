@@ -1,6 +1,6 @@
 import type { ProposalCategoryOperation, ProposalCategoryPermissionLevel, ProposalOperation } from '@prisma/client';
 
-import { proposalCategoryOperations, proposalOperations } from './interfaces';
+import { proposalOperations } from './interfaces';
 
 export const proposalCategoryPermissionsMapping: Record<ProposalCategoryPermissionLevel, ProposalCategoryOperation[]> =
   {
@@ -11,9 +11,9 @@ export const proposalCategoryPermissionsMapping: Record<ProposalCategoryPermissi
   };
 
 export const proposalPermissionsMapping: Record<ProposalCategoryPermissionLevel, Readonly<ProposalOperation[]>> = {
-  full_access: proposalOperations.slice(),
-  view_comment: ['view', 'comment', 'vote'],
-  view_comment_vote: [],
+  full_access: ['view', 'comment', 'vote'],
+  view_comment_vote: ['view', 'comment', 'vote'],
+  view_comment: ['view', 'comment'],
   view: []
 } as const;
 

@@ -843,6 +843,7 @@ export function createBlock(options: Partial<Block> & Pick<Block, 'createdBy' | 
  * Creates a proposal with the linked authors and reviewers
  */
 export async function generateProposal({
+  categoryId,
   userId,
   spaceId,
   proposalStatus,
@@ -851,6 +852,7 @@ export async function generateProposal({
   deletedAt = null
 }: {
   deletedAt?: Page['deletedAt'];
+  categoryId?: string;
   userId: string;
   spaceId: string;
   authors: string[];
