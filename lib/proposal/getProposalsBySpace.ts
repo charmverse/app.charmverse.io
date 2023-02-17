@@ -23,11 +23,7 @@ export async function getProposalsBySpace({
   return prisma.proposal.findMany({
     where: {
       spaceId,
-      categoryId: categoryIds
-        ? {
-            in: categoryIds
-          }
-        : undefined
+      categoryId: generateCategoryIdQuery(categoryIds)
     },
     include: {
       authors: true,

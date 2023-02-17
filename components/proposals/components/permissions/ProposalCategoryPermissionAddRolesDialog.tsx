@@ -7,7 +7,7 @@ import { SmallSelect } from 'components/common/form/InputEnumToOptions';
 import { InputSearchRoleMultiple } from 'components/common/form/InputSearchRole';
 
 import type { BulkRoleProposalCategoryPermissionUpsert } from './shared';
-import { forumMemberPermissionOptions } from './shared';
+import { permissionsWithRemove } from './shared';
 
 type Props = {
   onClose: () => void;
@@ -32,21 +32,20 @@ export function ProposalCategoryPermissionsAddRoles({ onClose, onSave, roleIdsTo
   return (
     <Grid container direction='column' spacing={3}>
       <Grid container item xs={12} justifyContent='space-between'>
-        <Grid item xs={8}>
+        <Grid item xs={6}>
           <SmallSelect
             sx={{
               textAlign: 'left'
             }}
             renderValue={(value) =>
-              (forumMemberPermissionOptions[value as keyof typeof forumMemberPermissionOptions] as string as any) ||
-              'No access'
+              (permissionsWithRemove[value as keyof typeof permissionsWithRemove] as string as any) || 'No access'
             }
             onChange={(newValue) => setNewRolesPermissionLevel(newValue as ProposalCategoryPermissionLevel)}
-            keyAndLabel={forumMemberPermissionOptions}
+            keyAndLabel={permissionsWithRemove}
             defaultValue={newRolesPermissionLevel}
           />
         </Grid>
-        <Grid item xs={4} justifyContent='flex-end'>
+        <Grid item xs={6} justifyContent='flex-end'>
           <Button disableElevation fullWidth disabled={newRoleIds.length === 0} onClick={addRolePermissions}>
             Add roles
           </Button>
