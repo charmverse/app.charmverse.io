@@ -20,15 +20,5 @@ export function usePagePermissions({ pageIdOrPath, spaceDomain, isNewPage }: Pro
       })
   );
 
-  function refresh() {
-    charmClient.permissions.pages
-      .computePagePermissions({
-        pageIdOrPath: pageIdOrPath as string,
-        spaceDomain
-      })
-      .then((_newPermissions) => {
-        mutate(_newPermissions);
-      });
-  }
-  return { permissions: isNewPage ? new AllowedPagePermissions().full : data, refresh };
+  return { permissions: isNewPage ? new AllowedPagePermissions().full : data, refresh: mutate };
 }

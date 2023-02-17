@@ -2,6 +2,7 @@ import type { Prisma } from '@prisma/client';
 import { ProposalCategoryPermissionLevel } from '@prisma/client';
 
 import { prisma } from 'db';
+import { ProposalCategoryNotFoundError } from 'lib/proposal/errors';
 import { DataNotFoundError, InsecureOperationError, InvalidInputError } from 'lib/utilities/errors';
 import { isUUID } from 'lib/utilities/strings';
 
@@ -51,7 +52,7 @@ export async function upsertProposalCategoryPermission<
   });
 
   if (!proposalCategory) {
-    throw new DataNotFoundError(`Proposal category with id ${proposalCategoryId} not found`);
+    throw new ProposalCategoryNotFoundError(proposalCategoryId);
   }
 
   // Apply security against the assignees

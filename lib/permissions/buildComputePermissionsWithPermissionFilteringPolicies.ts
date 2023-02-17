@@ -23,7 +23,7 @@ export type PermissionFilteringPolicyFnInput<R, F> = {
   // eslint-disable-next-line @typescript-eslint/ban-types
 } & (R extends ResourceWithSpaceId ? { isAdmin?: boolean } : {});
 
-export type PermissionFilteringPolicyFn<R, F> = (input: PermissionFilteringPolicyFnInput<R, F>) => Promise<F>;
+export type PermissionFilteringPolicyFn<R, F> = (input: PermissionFilteringPolicyFnInput<R, F>) => F | Promise<F>;
 
 /**
  * @pfps - permission filtering policy functions - each should be a pure function that returns a fresh set of flags rather than mutating the original flags

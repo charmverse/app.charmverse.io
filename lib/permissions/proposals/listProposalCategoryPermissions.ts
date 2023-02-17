@@ -12,9 +12,9 @@ import { mapProposalCategoryPermissionToAssignee } from './mapProposalCategoryPe
 export async function listProposalCategoryPermissions({
   resourceId,
   userId
-}: PermissionCompute): Promise<AssignedProposalCategoryPermission[]> {
+}: Required<PermissionCompute>): Promise<AssignedProposalCategoryPermission[]> {
   if (!userId) {
-    return [];
+    throw new InvalidInputError('Invalid user ID');
   }
 
   if (!isUUID(resourceId)) {

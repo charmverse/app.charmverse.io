@@ -8,12 +8,12 @@ import type { AvailableProposalPermissionFlags } from '../interfaces';
 import type { ProposalPfpInput } from './interfaces';
 import { isProposalAuthor } from './isProposalAuthor';
 
-export async function pfpStatusPrivateDraftVisibleOnlyByAuthor({
+export function pfpStatusPrivateDraftVisibleOnlyByAuthor({
   resource,
   flags,
   userId,
   isAdmin
-}: ProposalPfpInput): Promise<AvailableProposalPermissionFlags> {
+}: ProposalPfpInput): AvailableProposalPermissionFlags {
   const newPermissions = { ...flags };
 
   if (resource.status !== 'private_draft') {
