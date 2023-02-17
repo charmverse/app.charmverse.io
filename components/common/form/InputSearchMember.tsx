@@ -46,9 +46,13 @@ export function InputSearchMemberBase({
   // delay showing autocomplete list to position it correctly for popper context
   useEffect(() => {
     if (openOnFocus) {
-      setTimeout(() => {
+      const timeout = setTimeout(() => {
         setOpen(true);
       }, 150);
+
+      return () => {
+        clearTimeout(timeout);
+      };
     }
   }, [openOnFocus]);
 
