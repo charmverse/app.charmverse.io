@@ -32,6 +32,7 @@ import { ColorModeContext } from 'context/darkMode';
 import { BountiesProvider } from 'hooks/useBounties';
 import { CurrentSpaceProvider, useCurrentSpaceId } from 'hooks/useCurrentSpaceId';
 import { useInterval } from 'hooks/useInterval';
+import { IsSpaceMemberProvider } from 'hooks/useIsSpaceMember';
 import { useLocalStorage } from 'hooks/useLocalStorage';
 import { MembersProvider } from 'hooks/useMembers';
 import { OnboardingProvider } from 'hooks/useOnboarding';
@@ -260,19 +261,21 @@ function DataProviders({ children }: { children: ReactNode }) {
             <SpacesProvider>
               <CurrentSpaceProvider>
                 <CurrentSpaceSetter />
-                <WebSocketClientProvider>
-                  <MembersProvider>
-                    <BountiesProvider>
-                      <PaymentMethodsProvider>
-                        <PagesProvider>
-                          <MemberProfileProvider>
-                            <PageTitleProvider>{children}</PageTitleProvider>
-                          </MemberProfileProvider>
-                        </PagesProvider>
-                      </PaymentMethodsProvider>
-                    </BountiesProvider>
-                  </MembersProvider>
-                </WebSocketClientProvider>
+                <IsSpaceMemberProvider>
+                  <WebSocketClientProvider>
+                    <MembersProvider>
+                      <BountiesProvider>
+                        <PaymentMethodsProvider>
+                          <PagesProvider>
+                            <MemberProfileProvider>
+                              <PageTitleProvider>{children}</PageTitleProvider>
+                            </MemberProfileProvider>
+                          </PagesProvider>
+                        </PaymentMethodsProvider>
+                      </BountiesProvider>
+                    </MembersProvider>
+                  </WebSocketClientProvider>
+                </IsSpaceMemberProvider>
               </CurrentSpaceProvider>
             </SpacesProvider>
           </Web3AccountProvider>

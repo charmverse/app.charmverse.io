@@ -16,6 +16,7 @@ import InputSearchReviewers from 'components/common/form/InputSearchReviewers';
 import { InputSearchRoleMultiple } from 'components/common/form/InputSearchRole';
 import { useBounties } from 'hooks/useBounties';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useIsSpaceMember } from 'hooks/useIsSpaceMember';
 import { usePages } from 'hooks/usePages';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import { useSharedPage } from 'hooks/useSharedPage';
@@ -62,9 +63,10 @@ export default function BountyProperties(props: {
     () => isAmountInputEmpty || Number(currentBounty?.rewardAmount) <= 0,
     [isAmountInputEmpty, currentBounty]
   );
-  const { hasSharedPageAccess } = useSharedPage();
 
-  const readOnly = parentReadOnly || hasSharedPageAccess;
+  const { isSpaceMember } = useIsSpaceMember();
+
+  const readOnly = parentReadOnly || !isSpaceMember;
 
   const bountyPage = pages[pageId];
 
@@ -193,6 +195,7 @@ export default function BountyProperties(props: {
         style={{
           height: 'fit-content'
         }}
+        data-test='bounty-configuration'
       >
         <div className='octo-propertyname octo-propertyname--readonly'>
           <Button>Chain</Button>
@@ -253,6 +256,7 @@ export default function BountyProperties(props: {
           <Button>Reward amount</Button>
         </div>
         <TextField
+          data-test='bounty-property-amount'
           required
           sx={{
             width: '100%'
@@ -499,8 +503,8 @@ export default function BountyProperties(props: {
 
       {
         // Bounty creator cannot apply to their own bounty
-        permissions && !hasSharedPageAccess && currentBounty.createdBy !== user?.id && (
-          <>
+        permissions && isSpaceMember && currentBounty.createdBy !== user?.id && (
+          <div data-test='bounty-applicant-form'>
             <BountyApplicantForm
               bounty={currentBounty}
               submissions={applications}
@@ -512,11 +516,11 @@ export default function BountyProperties(props: {
                 my: 3
               }}
             />
-          </>
+          </div>
         )
       }
 
-      {hasSharedPageAccess && bountyPage && <BountySignupButton bountyPage={bountyPage} />}
+      {!isSpaceMember && bountyPage && <BountySignupButton bountyPage={bountyPage} />}
 
       {permissions?.userPermissions?.review && currentBounty.status !== 'suggestion' && !draftBounty && (
         <BountyApplicantsTable bounty={currentBounty} permissions={permissions} />

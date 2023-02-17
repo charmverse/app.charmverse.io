@@ -157,6 +157,7 @@ export default function PageDialog(props: Props) {
       toolbar={
         <Box display='flex' justifyContent='space-between'>
           <Button
+            data-test='open-as-page'
             size='small'
             color='secondary'
             href={fullPageUrl}
