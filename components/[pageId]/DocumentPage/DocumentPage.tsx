@@ -115,7 +115,7 @@ function DocumentPage({ page, setPage, insideModal, readOnly = false, parentProp
 
   const cannotComment = readOnly || !pagePermissions?.comment;
 
-  const enableSuggestingMode = editMode === 'suggesting' && !readOnly && pagePermissions?.comment;
+  const enableSuggestingMode = editMode === 'suggesting' && !readOnly && !!pagePermissions?.comment;
 
   const pageVote = Object.values(votes).find((v) => v.context === 'proposal');
 
@@ -212,7 +212,7 @@ function DocumentPage({ page, setPage, insideModal, readOnly = false, parentProp
                 enableVoting={true}
                 containerWidth={containerWidth}
                 pageType={page.type}
-                pagePermissions={pagePermissions}
+                pagePermissions={pagePermissions ?? undefined}
                 onParticipantUpdate={onParticipantUpdate}
               >
                 {/* temporary? disable editing of page title when in suggestion mode */}

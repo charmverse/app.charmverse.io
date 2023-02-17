@@ -29,6 +29,7 @@ export default function EditorPage({ pageId: pageIdOrPath }: { pageId: string })
     () => currentPage && getPagePermissions(currentPage.id, currentPage),
     [currentPage]
   );
+
   const readOnly =
     (currentPagePermissions?.edit_content === false && editMode !== 'suggesting') || editMode === 'viewing';
   const parentProposalId = findParentOfType({ pageId: currentPageId, pageType: 'proposal', pageMap: pages });
