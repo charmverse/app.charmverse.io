@@ -18,6 +18,8 @@ export const spaceContentTemplates = {
   templateCreator: 'Creator'
 };
 
+export type SpaceTemplate = keyof typeof spaceContentTemplates;
+
 const staticTemplateOptions = ['default', 'importNotion', 'importMarkdown'] as const;
 
 export const spaceCreateTemplates = [...typedKeys(spaceContentTemplates), ...staticTemplateOptions];
