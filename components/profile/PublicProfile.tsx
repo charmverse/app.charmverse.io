@@ -11,6 +11,7 @@ import type { Collectable, ExtendedPoap } from 'lib/blockchain/interfaces';
 import { transformNft } from 'lib/blockchain/transformNft';
 import { transformPoap } from 'lib/blockchain/transformPoap';
 
+import AggregatedData from './components/AggregatedData';
 import CollectableRow from './components/CollectibleRow';
 import type { CommunityDetails } from './components/CommunityRow';
 import CommunityRow from './components/CommunityRow';
@@ -196,6 +197,14 @@ export default function PublicProfile(props: UserDetailsProps) {
       {readOnly ? <UserDetailsMini {...props} /> : <UserDetails {...props} />}
       <SpacesMemberDetails memberId={user.id} />
       <LoadingComponent isLoading={isLoading} minHeight={300}>
+        {readOnly && (
+          <AggregatedData
+            totalBounties={data?.bounties || 0}
+            totalCommunities={communities.length}
+            totalProposals={data?.totalProposals || 0}
+            totalVotes={data?.totalVotes || 0}
+          />
+        )}
         {allCommunities.length > 0 ? (
           <>
             <SectionHeader title='My Organisations' count={allCommunities.length} />
