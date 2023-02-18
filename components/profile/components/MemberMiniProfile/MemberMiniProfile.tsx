@@ -18,6 +18,7 @@ import { useUser } from 'hooks/useUser';
 import type { Member } from 'lib/members/interfaces';
 
 import { MemberPropertiesPopup } from '../SpacesMemberDetails/components/MemberPropertiesPopup';
+import UserDetailsMini from '../UserDetails/UserDetailsMini';
 
 import { NftsList } from './BlockchainData/NftsList';
 import { OrgsList } from './BlockchainData/OrgsList';
@@ -85,7 +86,7 @@ function MemberProfile({ title, member, onClose }: { title?: string; member: Mem
             }}
             // currentUser doesn't have profile thus is not considered as publicUser inside UserDetails
             // giving the ability to update the profile properties
-            user={user.id === currentUser?.id ? currentUser : user}
+            user={user.id === currentUser.id ? currentUser : user}
             updateUser={setUser}
           />
         )}
@@ -122,7 +123,7 @@ function MemberProfile({ title, member, onClose }: { title?: string; member: Mem
             </Stack>
           </DialogTitle>
           <DialogContent dividers>
-            <UserDetails user={user} readOnly />
+            <UserDetailsMini user={user} readOnly />
             <Legend mt={4}>Member details</Legend>
             {currentSpacePropertyValues && (
               <Box my={3}>
