@@ -1,4 +1,4 @@
-import type { WebhookEventNames } from 'lib/webhook/interfaces';
+import type { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 
 import {
   getBountyEntity,
