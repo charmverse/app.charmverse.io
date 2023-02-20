@@ -47,6 +47,7 @@ type Props = {
   shouldUpdateTitleState?: boolean;
   showOtherCategoryPosts?: boolean;
   newPostCategory?: PostCategory | null;
+  insideModal?: boolean;
 };
 
 function processComments({ postComments }: { postComments: PostCommentWithVote[] }) {
@@ -96,7 +97,8 @@ export function PostPage({
   contentUpdated,
   setContentUpdated,
   showOtherCategoryPosts,
-  newPostCategory
+  newPostCategory,
+  insideModal = false
 }: Props) {
   const currentSpace = useCurrentSpace();
   const { user } = useUser();
@@ -141,16 +143,16 @@ export function PostPage({
   function updateTitle(updates: { title: string; updatedAt: any }) {
     setContentUpdated(true);
     setFormInputs({ title: updates.title });
-    if (shouldUpdateTitleState) {
+    if (shouldUpdateTitleState && !insideModal) {
       setTitleState(updates.title);
     }
   }
 
   useEffect(() => {
-    if (post) {
+    if (post && !insideModal) {
       setTitleState(post.title);
     }
-  }, [post]);
+  }, [post, insideModal]);
 
   async function publishForumPost() {
     if (checkIsContentEmpty(formInputs.content) || !categoryId) {

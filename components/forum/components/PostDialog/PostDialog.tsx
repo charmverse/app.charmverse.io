@@ -11,8 +11,6 @@ import Button from 'components/common/Button';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { PageActions } from 'components/common/PageActions';
 import { usePostPermissions } from 'components/forum/hooks/usePostPermissions';
-import { useForumCategories } from 'hooks/useForumCategories';
-import { usePageTitle } from 'hooks/usePageTitle';
 import type { PostWithVotes } from 'lib/forums/posts/interfaces';
 
 import type { FormInputs } from '../interfaces';
@@ -33,12 +31,6 @@ export function PostDialog({ post, spaceId, onClose, open, newPostCategory }: Pr
   const [formInputs, setFormInputs] = useState<FormInputs>(post ?? { title: '', content: null, contentText: '' });
   const [contentUpdated, setContentUpdated] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
-  const { categories } = useForumCategories();
-  const categoryPath = router.query.categoryPath as string | undefined;
-  const category = !categoryPath
-    ? null
-    : categories.find((_category) => _category.path === categoryPath || _category.name === categoryPath);
-  const [, setTitleState] = usePageTitle();
 
   const permissions = usePostPermissions({
     postIdOrPath: post?.id as string,
@@ -73,9 +65,6 @@ export function PostDialog({ post, spaceId, onClose, open, newPostCategory }: Pr
     setFormInputs({ title: '', content: null, contentText: '' });
     setContentUpdated(false);
     setShowConfirmDialog(false);
-    if (category) {
-      setTitleState(category.name);
-    }
   }
 
   function deletePost() {
@@ -135,6 +124,7 @@ export function PostDialog({ post, spaceId, onClose, open, newPostCategory }: Pr
           setContentUpdated(true);
           setFormInputs((__formInputs) => ({ ...__formInputs, ..._formInputs }));
         }}
+        insideModal
         post={post ?? null}
         spaceId={spaceId}
         onSave={close}
