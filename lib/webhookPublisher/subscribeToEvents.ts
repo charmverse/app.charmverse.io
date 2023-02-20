@@ -1,7 +1,7 @@
 import crypto from 'node:crypto';
 
 import { prisma } from 'db';
-import { WebhookNameSpaces } from 'lib/webhook/interfaces';
+import { WebhookNameSpaces } from 'lib/webhookPublisher/interfaces';
 
 export function createSigningSecret() {
   return crypto.randomBytes(160 / 8).toString('hex');

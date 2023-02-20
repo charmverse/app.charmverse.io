@@ -10,8 +10,8 @@ import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { mutatePostCategorySearch } from 'lib/permissions/forum/mutatePostCategorySearch';
 import { requestOperations } from 'lib/permissions/requestOperations';
 import { withSessionRoute } from 'lib/session/withSession';
-import { WebhookEventNames } from 'lib/webhook/interfaces';
-import { publishPostEvent } from 'lib/webhook/publishEvent';
+import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
+import { publishPostEvent } from 'lib/webhookPublisher/publishEvent';
 import { relay } from 'lib/websockets/relay';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });

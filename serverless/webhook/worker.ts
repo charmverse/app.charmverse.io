@@ -4,7 +4,7 @@ import { SignJWT } from 'jose';
 
 import log from 'lib/log';
 
-import type { WebhookPayload } from '../../lib/webhook/interfaces';
+import type { WebhookPayload } from '../../lib/webhookPublisher/interfaces';
 
 const signJwt = (subject: string, payload: Record<string, any>, secret: KeyLike | Uint8Array) => {
   return (

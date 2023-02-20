@@ -16,7 +16,7 @@ import { setupDefaultPaymentMethods } from 'lib/payment-methods/defaultPaymentMe
 import { updateSpacePermissionConfigurationMode } from 'lib/permissions/meta';
 import { generateDefaultCategoriesInput } from 'lib/proposal/generateDefaultCategoriesInput';
 import { importWorkspacePages } from 'lib/templates/importWorkspacePages';
-import { subscribeToAllEvents, createSigningSecret } from 'lib/webhook/subscribeToEvents';
+import { subscribeToAllEvents, createSigningSecret } from 'lib/webhookPublisher/subscribeToEvents';
 import { gettingStartedPage } from 'seedData/gettingStartedPage';
 
 import type { SpaceCreateTemplate } from './config';
