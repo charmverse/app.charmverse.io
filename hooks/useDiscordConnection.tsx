@@ -109,7 +109,8 @@ export function DiscordProvider({ children }: Props) {
       connect,
       error
     }),
-    [isConnected, isLoading, error]
+    // This connect deps is necessary otherwise setUser uses stale user
+    [isConnected, isLoading, error, connect]
   );
 
   return <DiscordConnectionContext.Provider value={value}>{children}</DiscordConnectionContext.Provider>;
