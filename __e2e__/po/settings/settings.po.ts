@@ -23,12 +23,22 @@ export class SettingsModal {
     await this.settingsBtn.click();
   }
 
+  getActivePath({ activePath }: { activePath: string }): Locator {
+    return this.page.locator(`[data-test-active-path=${activePath}]`);
+  }
+
   getSpaceSettingsLocator(spaceId: string): Locator {
     return this.page.locator(`data-test=space-settings-tab-${spaceId}`);
   }
 
   getSpaceSettingsSectionLocator({ spaceId, section }: { spaceId: string; section: SpaceSettingsSection }): Locator {
     return this.page.locator(`data-test=space-settings-tab-${spaceId}-${section}`);
+  }
+
+  async isSpaceSettingsExpanded(spaceId: string): Promise<boolean> {
+    const locator = this.getSpaceSettingsLocator(spaceId);
+    const expanded = await locator.getAttribute('aria-expanded');
+    return expanded === 'true';
   }
 
   async goToTab({ spaceId, section }: { spaceId: string; section: SpaceSettingsSection }) {

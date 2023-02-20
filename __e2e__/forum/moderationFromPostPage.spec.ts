@@ -2,7 +2,7 @@ import { expect, test as base } from '@playwright/test';
 import type { Post, PostCategory, Space, User } from '@prisma/client';
 import { ForumHomePage } from '__e2e__/po/forumHome.po';
 import { ForumPostPage } from '__e2e__/po/forumPost.po';
-import { PageHeader } from '__e2e__/po/pageHeader';
+import { PageHeader } from '__e2e__/po/pageHeader.po';
 import { createUserAndSpace, createUser, generateSpaceRole } from '__e2e__/utils/mocks';
 
 import { prisma } from 'db';
@@ -191,7 +191,7 @@ test.describe.serial('Moderate forum posts', () => {
     await header.click();
     const forumPostActions = pageHeader.forumPostActions;
     await expect(forumPostActions).toBeVisible();
-    const deleteOption = pageHeader.deleteCurentPage;
+    const deleteOption = pageHeader.deleteCurrentPage;
     await expect(deleteOption).toBeVisible();
     await deleteOption.click();
     // After deleting, user should be redirected to the forum home page
@@ -219,7 +219,7 @@ test.describe.serial('Moderate forum posts', () => {
     await header.click();
     const forumPostActions = pageHeader.forumPostActions;
     await expect(forumPostActions).toBeVisible();
-    const deleteOption = pageHeader.deleteCurentPage;
+    const deleteOption = pageHeader.deleteCurrentPage;
     await expect(deleteOption).toBeVisible();
     await deleteOption.click();
     // After deleting, user should be redirected to the forum home page
@@ -249,7 +249,7 @@ test.describe.serial('Moderate forum posts', () => {
     const forumPostActions = pageHeader.forumPostActions;
     await expect(forumPostActions).toBeVisible();
 
-    const deleteOption = pageHeader.deleteCurentPage;
+    const deleteOption = pageHeader.deleteCurrentPage;
     await expect(deleteOption).toBeVisible();
 
     // The mui lib renders this element as a div with a disabled css class, but no prop. We can check for the aria-disabled attribute instead as a workaround

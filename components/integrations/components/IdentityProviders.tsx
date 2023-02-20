@@ -174,7 +174,7 @@ export default function IdentityProviders() {
           {telegramError && <Alert severity='error'>{telegramError}</Alert>}
         </ProviderRow>
         <ProviderRow>
-          <img src='images/Google_G.png' height={48} width='auto' />
+          <img src='/images/Google_G.png' height={48} width='auto' />
           <Typography color='secondary' variant='button'>
             {connectedWithGoogle ? 'Connected with Google' : 'Connect with Google'}
           </Typography>

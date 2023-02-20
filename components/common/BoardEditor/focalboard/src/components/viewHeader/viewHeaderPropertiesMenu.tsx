@@ -1,7 +1,6 @@
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import AlternateEmailIcon from '@mui/icons-material/AlternateEmail';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
-import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import EventNoteIcon from '@mui/icons-material/EventNote';
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import LinkIcon from '@mui/icons-material/Link';
@@ -10,6 +9,7 @@ import NumbersIcon from '@mui/icons-material/Numbers';
 import PersonIcon from '@mui/icons-material/Person';
 import PhoneIcon from '@mui/icons-material/Phone';
 import SubjectIcon from '@mui/icons-material/Subject';
+import ToggleOnOutlinedIcon from '@mui/icons-material/ToggleOnOutlined';
 import type { SvgIconProps } from '@mui/material';
 
 import type { PropertyType } from 'lib/focalboard/board';
@@ -17,7 +17,7 @@ import type { PropertyType } from 'lib/focalboard/board';
 export const iconForPropertyType = (propertyType: PropertyType, props?: SvgIconProps) => {
   switch (propertyType) {
     case 'checkbox':
-      return <CheckBoxIcon fontSize='small' {...props} />;
+      return <ToggleOnOutlinedIcon fontSize='small' {...props} />;
     case 'createdBy':
       return <PersonIcon fontSize='small' {...props} />;
     case 'createdTime':

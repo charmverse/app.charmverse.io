@@ -5,7 +5,7 @@ import type { Space } from '@prisma/client';
 // If we use it, we will need to update the space-related hooks so they also use this subset. This way, we can guarantee consistent behaviour between logged-in and public mode.
 export type PublicSpaceInfo = Pick<Space, 'domain' | 'id'>;
 
-export interface PublicBountyToggle<T extends boolean = boolean> {
+export interface PublicBountyToggle {
   spaceId: string;
-  publicBountyBoard: T;
+  publicBountyBoard: boolean;
 }

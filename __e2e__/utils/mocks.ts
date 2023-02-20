@@ -362,3 +362,5 @@ export async function generateUserAndSpace({
     privateKey: wallet.privateKey
   };
 }
+
+export type UserAndSpaceContext = Awaited<ReturnType<typeof generateUserAndSpace>>;

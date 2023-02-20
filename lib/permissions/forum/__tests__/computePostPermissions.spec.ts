@@ -2,13 +2,15 @@ import type { Space, User } from '@prisma/client';
 import { v4 } from 'uuid';
 
 import { prisma } from 'db';
+import { convertPostToProposal } from 'lib/forums/posts/convertPostToProposal';
 import { PostNotFoundError } from 'lib/forums/posts/errors';
 import { addSpaceOperations } from 'lib/permissions/spaces';
 import { InvalidInputError } from 'lib/utilities/errors';
+import compute from 'pages/api/permissions/space/[spaceId]/compute';
 import { generateRole, generateSpaceUser, generateUserAndSpace } from 'testing/setupDatabase';
 import { generateForumPost, generatePostCategory } from 'testing/utils/forums';
 
-import { computePostPermissions } from '../computePostPermissions';
+import { baseComputePostPermissions, computePostPermissions } from '../computePostPermissions';
 import { postOperations, postOperationsWithoutEdit } from '../interfaces';
 import { postPermissionsMapping } from '../mapping';
 import { upsertPostCategoryPermission } from '../upsertPostCategoryPermission';
@@ -33,135 +35,21 @@ beforeAll(async () => {
   otherSpace = secondGenerated.space;
 });
 
-describe('computePostPermissions', () => {
-  it('should return full permissions for a category admin, except editing a post they did not create', async () => {
-    const role = await generateRole({
-      createdBy: adminUser.id,
-      spaceId: space.id,
-      assigneeUserIds: [spaceMemberUser.id]
-    });
+describe('computePostPermissions - base', () => {
+  it('should always allow the author to view, edit and delete the post', async () => {
     const postCategory = await generatePostCategory({ spaceId: space.id });
     const post = await generateForumPost({
       spaceId: space.id,
       categoryId: postCategory.id,
       userId: authorUser.id
     });
-    await prisma.postCategoryPermission.create({
-      data: {
-        permissionLevel: 'category_admin',
-        postCategory: { connect: { id: postCategory.id } },
-        role: { connect: { id: role.id } }
-      }
-    });
-
-    const permissions = await computePostPermissions({
-      resourceId: post.id,
-      userId: spaceMemberUser.id
-    });
-
-    postOperationsWithoutEdit.forEach((op) => {
-      expect(permissions[op]).toBe(true);
-    });
-
-    expect(permissions.edit_post).toBe(false);
-  });
-
-  it('should return full permissions for a moderator, except editing a post they did not create', async () => {
-    const role = await generateRole({
-      createdBy: adminUser.id,
-      spaceId: space.id,
-      assigneeUserIds: [spaceMemberUser.id]
-    });
-    const postCategory = await generatePostCategory({ spaceId: space.id });
-    const post = await generateForumPost({
-      spaceId: space.id,
-      categoryId: postCategory.id,
-      userId: authorUser.id
-    });
-    await prisma.postCategoryPermission.create({
-      data: {
-        permissionLevel: 'moderator',
-        postCategory: { connect: { id: postCategory.id } },
-        role: { connect: { id: role.id } }
-      }
-    });
-
-    const permissions = await computePostPermissions({
-      resourceId: post.id,
-      userId: spaceMemberUser.id
-    });
-    postOperationsWithoutEdit.forEach((op) => {
-      expect(permissions[op]).toBe(true);
-    });
-
-    expect(permissions.edit_post).toBe(false);
-  });
-
-  it('should always return full permissions for a space administrator, except editing a post they did not create', async () => {
-    const postCategory = await generatePostCategory({ spaceId: space.id });
-    const post = await generateForumPost({
-      spaceId: space.id,
-      categoryId: postCategory.id,
-      userId: authorUser.id
-    });
-    const permissions = await computePostPermissions({
-      resourceId: post.id,
-      userId: adminUser.id
-    });
-    postOperationsWithoutEdit.forEach((op) => {
-      expect(permissions[op]).toBe(true);
-    });
-    expect(permissions.edit_post).toBe(false);
-  });
-
-  it('should always return full permissions for a user with space-wide forum moderator permission, except editing a post they did not create', async () => {
-    const spaceWideForumModeratorUser = await generateSpaceUser({
-      spaceId: space.id,
-      isAdmin: false
-    });
-
-    const role = await generateRole({
-      createdBy: adminUser.id,
-      spaceId: space.id,
-      assigneeUserIds: [spaceWideForumModeratorUser.id]
-    });
-
-    await addSpaceOperations({
-      forSpaceId: space.id,
-      operations: ['moderateForums'],
-      roleId: role.id
-    });
-
-    const postCategory = await generatePostCategory({ spaceId: space.id });
-    const post = await generateForumPost({
-      spaceId: space.id,
-      categoryId: postCategory.id,
-      userId: authorUser.id
-    });
-    const permissions = await computePostPermissions({
-      resourceId: post.id,
-      userId: spaceWideForumModeratorUser.id
-    });
-    postOperationsWithoutEdit.forEach((op) => {
-      expect(permissions[op]).toBe(true);
-    });
-    expect(permissions.edit_post).toBe(false);
-  });
-
-  it('should always allow the author to edit and delete the post', async () => {
-    const postCategory = await generatePostCategory({ spaceId: space.id });
-    const post = await generateForumPost({
-      spaceId: space.id,
-      categoryId: postCategory.id,
-      userId: authorUser.id
-    });
-    const permissions = await computePostPermissions({
+    const permissions = await baseComputePostPermissions({
       resourceId: post.id,
       userId: authorUser.id
     });
 
     postOperations.forEach((op) => {
-      if (op === 'edit_post' || op === 'delete_post') {
+      if (op === 'edit_post' || op === 'delete_post' || op === 'view_post') {
         expect(permissions[op]).toBe(true);
       } else {
         expect(permissions[op]).toBe(false);
@@ -184,7 +72,43 @@ describe('computePostPermissions', () => {
       postCategoryId: postCategory.id
     });
 
-    const permissions = await computePostPermissions({
+    const permissions = await baseComputePostPermissions({
+      resourceId: post.id,
+      userId: spaceMemberUser.id
+    });
+
+    const memberPermissions = postPermissionsMapping.full_access;
+
+    postOperations.forEach((op) => {
+      if (memberPermissions.includes(op)) {
+        expect(permissions[op]).toBe(true);
+      } else {
+        expect(permissions[op]).toBe(false);
+      }
+    });
+  });
+
+  it('should take into account role-level permissions', async () => {
+    const postCategory = await generatePostCategory({ spaceId: space.id });
+    const post = await generateForumPost({
+      spaceId: space.id,
+      categoryId: postCategory.id,
+      userId: authorUser.id
+    });
+
+    const role = await generateRole({
+      createdBy: adminUser.id,
+      spaceId: space.id,
+      assigneeUserIds: [spaceMemberUser.id]
+    });
+
+    await upsertPostCategoryPermission({
+      assignee: { group: 'role', id: role.id },
+      permissionLevel: 'full_access',
+      postCategoryId: postCategory.id
+    });
+
+    const permissions = await baseComputePostPermissions({
       resourceId: post.id,
       userId: spaceMemberUser.id
     });
@@ -218,7 +142,7 @@ describe('computePostPermissions', () => {
       }
     });
 
-    const permissions = await computePostPermissions({
+    const permissions = await baseComputePostPermissions({
       resourceId: post.id,
       userId: spaceMemberUser.id
     });
@@ -259,7 +183,7 @@ describe('computePostPermissions', () => {
       }
     });
 
-    const permissions = await computePostPermissions({
+    const permissions = await baseComputePostPermissions({
       resourceId: post.id,
       userId: otherSpaceAdminUser.id
     });
@@ -275,7 +199,7 @@ describe('computePostPermissions', () => {
     });
 
     // Same as above, without a requesting user
-    const publicPermissions = await computePostPermissions({
+    const publicPermissions = await baseComputePostPermissions({
       resourceId: post.id,
       userId: undefined
     });
@@ -290,24 +214,321 @@ describe('computePostPermissions', () => {
 
   it('should throw an error if the post does not exist or postId is invalid', async () => {
     await expect(
-      computePostPermissions({
+      baseComputePostPermissions({
         resourceId: v4(),
         userId: spaceMemberUser.id
       })
     ).rejects.toBeInstanceOf(PostNotFoundError);
 
     await expect(
-      computePostPermissions({
+      baseComputePostPermissions({
         resourceId: null as any,
         userId: spaceMemberUser.id
       })
     ).rejects.toBeInstanceOf(InvalidInputError);
 
     await expect(
-      computePostPermissions({
+      baseComputePostPermissions({
         resourceId: 'text' as any,
         userId: spaceMemberUser.id
       })
     ).rejects.toBeInstanceOf(InvalidInputError);
+  });
+});
+
+describe('computePostPermissions - with editable by author only permission filtering policy', () => {
+  it('should always return full permissions for a space administrator, except editing a post they did not create', async () => {
+    const postCategory = await generatePostCategory({ spaceId: space.id });
+    const post = await generateForumPost({
+      spaceId: space.id,
+      categoryId: postCategory.id,
+      userId: authorUser.id
+    });
+    const permissions = await computePostPermissions({
+      resourceId: post.id,
+      userId: adminUser.id
+    });
+    postOperationsWithoutEdit.forEach((op) => {
+      expect(permissions[op]).toBe(true);
+    });
+    expect(permissions.edit_post).toBe(false);
+  });
+
+  it('should return full permissions for a category admin, except editing a post they did not create', async () => {
+    const role = await generateRole({
+      createdBy: adminUser.id,
+      spaceId: space.id,
+      assigneeUserIds: [spaceMemberUser.id]
+    });
+    const postCategory = await generatePostCategory({ spaceId: space.id });
+    const post = await generateForumPost({
+      spaceId: space.id,
+      categoryId: postCategory.id,
+      userId: authorUser.id
+    });
+    await prisma.postCategoryPermission.create({
+      data: {
+        permissionLevel: 'category_admin',
+        postCategory: { connect: { id: postCategory.id } },
+        role: { connect: { id: role.id } }
+      }
+    });
+
+    const permissions = await baseComputePostPermissions({
+      resourceId: post.id,
+      userId: spaceMemberUser.id
+    });
+
+    postOperationsWithoutEdit.forEach((op) => {
+      expect(permissions[op]).toBe(true);
+    });
+
+    expect(permissions.edit_post).toBe(false);
+  });
+
+  it('should return full permissions for a moderator, except editing a post they did not create', async () => {
+    const role = await generateRole({
+      createdBy: adminUser.id,
+      spaceId: space.id,
+      assigneeUserIds: [spaceMemberUser.id]
+    });
+    const postCategory = await generatePostCategory({ spaceId: space.id });
+    const post = await generateForumPost({
+      spaceId: space.id,
+      categoryId: postCategory.id,
+      userId: authorUser.id
+    });
+    await prisma.postCategoryPermission.create({
+      data: {
+        permissionLevel: 'moderator',
+        postCategory: { connect: { id: postCategory.id } },
+        role: { connect: { id: role.id } }
+      }
+    });
+
+    const permissions = await baseComputePostPermissions({
+      resourceId: post.id,
+      userId: spaceMemberUser.id
+    });
+    postOperationsWithoutEdit.forEach((op) => {
+      expect(permissions[op]).toBe(true);
+    });
+
+    expect(permissions.edit_post).toBe(false);
+  });
+
+  it('should always return full permissions for a user with space-wide forum moderator permission, except editing a post they did not create', async () => {
+    const spaceWideForumModeratorUser = await generateSpaceUser({
+      spaceId: space.id,
+      isAdmin: false
+    });
+
+    const role = await generateRole({
+      createdBy: adminUser.id,
+      spaceId: space.id,
+      assigneeUserIds: [spaceWideForumModeratorUser.id]
+    });
+
+    await addSpaceOperations({
+      forSpaceId: space.id,
+      operations: ['moderateForums'],
+      roleId: role.id
+    });
+
+    const postCategory = await generatePostCategory({ spaceId: space.id });
+    const post = await generateForumPost({
+      spaceId: space.id,
+      categoryId: postCategory.id,
+      userId: authorUser.id
+    });
+    const permissions = await baseComputePostPermissions({
+      resourceId: post.id,
+      userId: spaceWideForumModeratorUser.id
+    });
+    postOperationsWithoutEdit.forEach((op) => {
+      expect(permissions[op]).toBe(true);
+    });
+    expect(permissions.edit_post).toBe(false);
+  });
+});
+
+describe('computePostPermissions - with proposal permission filtering policy', () => {
+  it('should return delete_post and view_post permissions of a proposal converted post for admins', async () => {
+    const postCategory = await generatePostCategory({ spaceId: space.id });
+    const post = await generateForumPost({
+      spaceId: space.id,
+      categoryId: postCategory.id,
+      userId: authorUser.id
+    });
+
+    await convertPostToProposal({
+      post,
+      userId: authorUser.id
+    });
+
+    const permissions = await computePostPermissions({
+      resourceId: post.id,
+      userId: adminUser.id
+    });
+
+    postOperationsWithoutEdit.forEach((op) => {
+      if (op === 'delete_post' || op === 'view_post') {
+        expect(permissions[op]).toBe(true);
+      } else {
+        expect(permissions[op]).toBe(false);
+      }
+    });
+  });
+
+  it('should return delete_post and view_post permissions of a proposal converted post for author', async () => {
+    const postCategory = await generatePostCategory({ spaceId: space.id });
+    const post = await generateForumPost({
+      spaceId: space.id,
+      categoryId: postCategory.id,
+      userId: authorUser.id
+    });
+
+    await convertPostToProposal({
+      post,
+      userId: authorUser.id
+    });
+
+    const permissions = await computePostPermissions({
+      resourceId: post.id,
+      userId: authorUser.id
+    });
+
+    postOperationsWithoutEdit.forEach((op) => {
+      if (op === 'delete_post' || op === 'view_post') {
+        expect(permissions[op]).toBe(true);
+      } else {
+        expect(permissions[op]).toBe(false);
+      }
+    });
+  });
+
+  it('should return delete_post and view_post permissions of a proposal converted post for space-wide forum permission', async () => {
+    const spaceWideForumModeratorUser = await generateSpaceUser({
+      spaceId: space.id,
+      isAdmin: false
+    });
+
+    const role = await generateRole({
+      createdBy: adminUser.id,
+      spaceId: space.id,
+      assigneeUserIds: [spaceWideForumModeratorUser.id]
+    });
+
+    await addSpaceOperations({
+      forSpaceId: space.id,
+      operations: ['moderateForums'],
+      roleId: role.id
+    });
+
+    const postCategory = await generatePostCategory({ spaceId: space.id });
+    const post = await generateForumPost({
+      spaceId: space.id,
+      categoryId: postCategory.id,
+      userId: authorUser.id
+    });
+
+    await convertPostToProposal({
+      post,
+      userId: authorUser.id
+    });
+
+    const permissions = await computePostPermissions({
+      resourceId: post.id,
+      userId: spaceWideForumModeratorUser.id
+    });
+
+    postOperationsWithoutEdit.forEach((op) => {
+      if (op === 'delete_post' || op === 'view_post') {
+        expect(permissions[op]).toBe(true);
+      } else {
+        expect(permissions[op]).toBe(false);
+      }
+    });
+  });
+
+  it('should return delete_post and view_post permissions of a proposal converted post for category level admin', async () => {
+    const categoryLevelAdminUser = await generateSpaceUser({
+      spaceId: space.id,
+      isAdmin: false
+    });
+
+    const role = await generateRole({
+      createdBy: adminUser.id,
+      spaceId: space.id,
+      assigneeUserIds: [categoryLevelAdminUser.id]
+    });
+
+    const postCategory = await generatePostCategory({ spaceId: space.id });
+
+    const post = await generateForumPost({
+      spaceId: space.id,
+      categoryId: postCategory.id,
+      userId: authorUser.id
+    });
+
+    await prisma.postCategoryPermission.create({
+      data: {
+        permissionLevel: 'category_admin',
+        postCategory: { connect: { id: postCategory.id } },
+        role: { connect: { id: role.id } }
+      }
+    });
+
+    await convertPostToProposal({
+      post,
+      userId: authorUser.id
+    });
+
+    const permissions = await computePostPermissions({
+      resourceId: post.id,
+      userId: categoryLevelAdminUser.id
+    });
+
+    postOperationsWithoutEdit.forEach((op) => {
+      if (op === 'delete_post' || op === 'view_post') {
+        expect(permissions[op]).toBe(true);
+      } else {
+        expect(permissions[op]).toBe(false);
+      }
+    });
+  });
+
+  it('should return only view_post permissions of a proposal converted post for a regular user', async () => {
+    const postCategory = await generatePostCategory({ spaceId: space.id });
+
+    await upsertPostCategoryPermission({
+      assignee: { group: 'space', id: space.id },
+      permissionLevel: 'full_access',
+      postCategoryId: postCategory.id
+    });
+
+    const post = await generateForumPost({
+      spaceId: space.id,
+      categoryId: postCategory.id,
+      userId: authorUser.id
+    });
+
+    await convertPostToProposal({
+      post,
+      userId: authorUser.id
+    });
+
+    const permissions = await computePostPermissions({
+      resourceId: post.id,
+      userId: spaceMemberUser.id
+    });
+
+    postOperationsWithoutEdit.forEach((op) => {
+      if (op === 'view_post') {
+        expect(permissions[op]).toBe(true);
+      } else {
+        expect(permissions[op]).toBe(false);
+      }
+    });
   });
 });

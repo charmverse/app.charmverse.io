@@ -12,6 +12,7 @@ import LoadingComponent from 'components/common/LoadingComponent';
 import { PageDialogProvider } from 'components/common/PageDialog/hooks/usePageDialog';
 import PageDialogGlobalModal from 'components/common/PageDialog/PageDialogGlobal';
 import { SharedPageLayout } from 'components/common/PageLayout/SharedPageLayout';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { FocalboardViewsProvider } from 'hooks/useFocalboardViews';
 import { useLocalStorage } from 'hooks/useLocalStorage';
 import { useSmallScreen } from 'hooks/useMediaScreens';
@@ -150,7 +151,11 @@ function PageLayout({ children }: PageLayoutProps) {
     onResize: setSidebarStorageWidth
   });
   const { user } = useUser();
-  const { hasSharedPageAccess, accessChecked, publicPage } = useSharedPage();
+  const space = useCurrentSpace();
+
+  const showSpaceMemberView = !!space && !!user && !!user?.spaceRoles.some((sr) => sr.spaceId === space.id);
+
+  const { accessChecked, publicPage } = useSharedPage();
   const open = isMobile ? mobileOpen : storageOpen;
 
   let displaySidebarWidth = resizableSidebarWidth;
@@ -196,7 +201,7 @@ function PageLayout({ children }: PageLayoutProps) {
     );
   }
 
-  if (hasSharedPageAccess) {
+  if (!showSpaceMemberView) {
     return <SharedPageLayout basePageId={publicPage?.page?.id}>{children || null}</SharedPageLayout>;
   }
 

@@ -1,4 +1,5 @@
 import DriveFolderUploadIcon from '@mui/icons-material/DriveFolderUpload';
+import EmojiObjectsIcon from '@mui/icons-material/EmojiObjects';
 import { Divider, Typography } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import { MdOutlineBuild } from 'react-icons/md';
@@ -6,8 +7,10 @@ import { SiNotion } from 'react-icons/si';
 import { SlBadge } from 'react-icons/sl';
 
 import { spaceContentTemplates } from 'lib/spaces/config';
-import type { SpaceCreateTemplate } from 'lib/spaces/config';
+import type { SpaceCreateTemplate, SpaceTemplate } from 'lib/spaces/config';
 import { typedKeys } from 'lib/utilities/objects';
+
+import iconButton from '../BoardEditor/focalboard/src/widgets/buttons/iconButton';
 
 import { TemplateOption } from './TemplateOption';
 
@@ -16,6 +19,11 @@ type SelectNewSpaceTemplateProps = {
 };
 
 const fontSize = 24;
+
+const templateIcon: Record<SpaceTemplate, React.ReactNode> = {
+  templateCreator: <EmojiObjectsIcon htmlColor='var(--secondary-text)' sx={{ fontSize }} />,
+  templateNftCommunity: <SlBadge color='var(--secondary-text)' size={fontSize} />
+};
 
 export function SelectNewSpaceTemplate({ onSelect }: SelectNewSpaceTemplateProps) {
   return (
@@ -40,7 +48,7 @@ export function SelectNewSpaceTemplate({ onSelect }: SelectNewSpaceTemplateProps
             data-test={`space-template-${template}`}
             onClick={() => onSelect(template)}
             label={spaceContentTemplates[template]}
-            icon={<SlBadge color='var(--secondary-text)' size={fontSize} />}
+            icon={templateIcon[template]}
           />
         </Grid>
       ))}

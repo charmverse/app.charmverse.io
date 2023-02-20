@@ -46,7 +46,13 @@ export function SpaceDetailsAccordion({
     >
       <StyledAccordionSummary expandIcon={<ExpandMoreIcon />}>
         <WorkspaceAvatar name={spaceName} image={spaceImage} />
-        <Box display='flex' flex={1} alignItems='center' justifyContent='space-between'>
+        <Box
+          display='flex'
+          flex='0 1 auto'
+          alignItems='center'
+          justifyContent='space-between'
+          sx={{ wordBreak: 'break-word' }}
+        >
           <Typography ml={2} variant='h6'>
             {spaceName}
           </Typography>

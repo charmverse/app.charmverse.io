@@ -3,7 +3,7 @@ import { SQSClient, ReceiveMessageCommand, DeleteMessageCommand } from '@aws-sdk
 
 import { AWS_REGION, SQS_URL } from 'lib/aws/config';
 import { getLogger } from 'lib/log/prefix';
-import type { WebhookMessage, WebhookMessageProcessResult } from 'lib/webhooks/interfaces';
+import type { WebhookMessage, WebhookMessageProcessResult } from 'lib/webhookConsumer/interfaces';
 
 const log = getLogger('sqs');
 

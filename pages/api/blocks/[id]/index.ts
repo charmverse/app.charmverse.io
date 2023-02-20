@@ -4,9 +4,9 @@ import nc from 'next-connect';
 
 import { prisma } from 'db';
 import type { BlockTypes } from 'lib/focalboard/block';
+import log from 'lib/log';
 import { ApiError, ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { modifyChildPages } from 'lib/pages/modifyChildPages';
-import { resolvePageTree } from 'lib/pages/server';
 import { computeUserPagePermissions } from 'lib/permissions/pages/page-permission-compute';
 import { withSessionRoute } from 'lib/session/withSession';
 import { relay } from 'lib/websockets/relay';
@@ -68,6 +68,13 @@ async function deleteBlock(
       },
       spaceId
     );
+
+    log.info('User deleted a page block', {
+      userId,
+      pageId: blockId,
+      pageIds: deletedChildPageIds,
+      spaceId: rootBlock.spaceId
+    });
   } else if (rootBlock.type === 'view') {
     if (!permissionsSet.edit_content) {
       throw new ActionNotPermittedError();

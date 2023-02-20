@@ -11,8 +11,8 @@ import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { computeBountyPermissions } from 'lib/permissions/bounties';
 import { withSessionRoute } from 'lib/session/withSession';
 import { DataNotFoundError, UnauthorisedActionError } from 'lib/utilities/errors';
-import { WebhookEventNames } from 'lib/webhook/interfaces';
-import { publishBountyEvent } from 'lib/webhook/publishEvent';
+import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
+import { publishBountyEvent } from 'lib/webhookPublisher/publishEvent';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
