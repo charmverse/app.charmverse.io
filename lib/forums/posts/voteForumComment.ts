@@ -2,8 +2,8 @@ import type { PostCommentUpDownVote } from '@prisma/client';
 
 import { prisma } from 'db';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
-import { WebhookEventNames } from 'lib/webhook/interfaces';
-import { publishPostCommentVoteEvent } from 'lib/webhook/publishEvent';
+import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
+import { publishPostCommentVoteEvent } from 'lib/webhookPublisher/publishEvent';
 
 type CommentVote = {
   commentId: string;
