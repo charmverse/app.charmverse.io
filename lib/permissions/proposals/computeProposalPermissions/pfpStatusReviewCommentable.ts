@@ -1,14 +1,14 @@
 import type { ProposalOperation } from '@prisma/client';
 
 import { prisma } from 'db';
+import { isProposalAuthor } from 'lib/proposal/isProposalAuthor';
+import { isProposalReviewer } from 'lib/proposal/isProposalReviewer';
 import { typedKeys } from 'lib/utilities/objects';
 
 import { AvailableProposalPermissions } from '../availableProposalPermissions.class';
 import type { AvailableProposalPermissionFlags } from '../interfaces';
 
 import type { ProposalPfpInput } from './interfaces';
-import { isProposalAuthor } from './isProposalAuthor';
-import { isProposalReviewer } from './isProposalReviewer';
 
 const allowedAuthorOperations: ProposalOperation[] = ['view', 'comment', 'delete'];
 const allowedReviewerOperations: ProposalOperation[] = ['view', 'comment', 'review'];

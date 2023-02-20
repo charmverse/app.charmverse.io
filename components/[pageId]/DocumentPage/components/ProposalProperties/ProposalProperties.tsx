@@ -12,7 +12,7 @@ import InputSearchReviewers from 'components/common/form/InputSearchReviewers';
 import UserDisplay from 'components/common/UserDisplay';
 import useTasks from 'components/nexus/hooks/useTasks';
 import ProposalCategoryInput from 'components/proposals/components/ProposalCategoryInput';
-import ProposalStepper from 'components/proposals/components/ProposalStepper';
+import { ProposalStepper } from 'components/proposals/components/ProposalStepper';
 import { ProposalStepSummary } from 'components/proposals/components/ProposalStepSummary';
 import { useProposalCategories } from 'components/proposals/hooks/useProposalCategories';
 import { useProposalPermissions } from 'components/proposals/hooks/useProposalPermissions';
@@ -194,6 +194,8 @@ export default function ProposalProperties({ pageId, proposalId, readOnly, isTem
             <ProposalStepper
               proposalUserGroups={isAdmin ? ['author', 'reviewer'] : currentUserGroups}
               proposal={proposal}
+              openVoteModal={openVoteModal}
+              updateProposalStatus={updateProposalStatus}
             />
           </Grid>
         )}
@@ -213,9 +215,9 @@ export default function ProposalProperties({ pageId, proposalId, readOnly, isTem
             </div>
             <Box display='flex' flex={1}>
               <ProposalCategoryInput
-                disabled={readOnly || !canUpdateProposalProperties || !proposal}
+                disabled={!proposalPermissions?.edit}
                 options={categories || []}
-                canEditCategories={canEditProposalCategories}
+                canEditCategories={!proposalPermissions?.edit}
                 value={proposalCategory ?? null}
                 onChange={onChangeCategory}
                 onDeleteCategory={deleteCategory}

@@ -2,10 +2,12 @@ import type { Prisma } from '@prisma/client';
 
 import { prisma } from 'db';
 import { ProposalNotFoundError } from 'lib/proposal/errors';
+import { isProposalReviewer } from 'lib/proposal/isProposalReviewer';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { InvalidInputError } from 'lib/utilities/errors';
 import { isUUID } from 'lib/utilities/strings';
 
+import { isProposalAuthor } from '../../../proposal/isProposalAuthor';
 import { buildComputePermissionsWithPermissionFilteringPolicies } from '../../buildComputePermissionsWithPermissionFilteringPolicies';
 import type { PermissionCompute } from '../../interfaces';
 import { AvailableProposalPermissions } from '../availableProposalPermissions.class';
@@ -13,8 +15,6 @@ import type { AvailableProposalPermissionFlags } from '../interfaces';
 import { proposalPermissionsMapping } from '../mapping';
 
 import type { ProposalResource } from './interfaces';
-import { isProposalAuthor } from './isProposalAuthor';
-import { isProposalReviewer } from './isProposalReviewer';
 import { pfpStatusDiscussionEditableCommentable } from './pfpStatusDiscussionEditableCommentable';
 import { pfpStatusDraftOnlyViewable } from './pfpStatusDraftOnlyViewable';
 import { pfpStatusPrivateDraftVisibleOnlyByAuthor } from './pfpStatusPrivateDraftVisibleOnlyByAuthor';

@@ -5,6 +5,7 @@ import type { ProposalStatus } from '@prisma/client';
 import { Fragment } from 'react';
 
 import Button from 'components/common/BoardEditor/focalboard/src/widgets/buttons/button';
+import type { AvailableProposalPermissionFlags } from 'lib/permissions/proposals/interfaces';
 import { canChangeProposalStatus } from 'lib/proposal/canChangeProposalStatus';
 import type { ProposalWithUsers } from 'lib/proposal/interface';
 import type { ProposalUserGroup } from 'lib/proposal/proposalStatusTransition';
@@ -19,6 +20,7 @@ type StepperContainerProps = {
   proposal?: ProposalWithUsers;
   openVoteModal: () => void;
   updateProposalStatus: (newStatus: ProposalStatus) => Promise<void>;
+  proposalPermissions: AvailableProposalPermissionFlags;
 };
 
 const stepperSize = 25;
@@ -81,11 +83,12 @@ const StepperIcon = styled.div<{ isCurrent: boolean; isComplete: boolean; isEnab
 `
 );
 
-export default function ProposalStepper({
+export function ProposalStepper({
   proposal,
   proposalUserGroups,
   openVoteModal,
-  updateProposalStatus
+  updateProposalStatus,
+  proposalPermissions
 }: StepperContainerProps) {
   const canChangeStatus = (updatedStatus: ProposalStatus) => {
     return canChangeProposalStatus({ proposal, updatedStatus, proposalUserGroups });
@@ -98,12 +101,14 @@ export default function ProposalStepper({
         openVoteModal={openVoteModal}
         updateProposalStatus={updateProposalStatus}
         canChangeStatus={canChangeStatus}
+        proposalPermissions={proposalPermissions}
       />
       <MobileStepper
         currentStatus={proposal?.status}
         openVoteModal={openVoteModal}
         updateProposalStatus={updateProposalStatus}
         canChangeStatus={canChangeStatus}
+        proposalPermissions={proposalPermissions}
       />
     </>
   );
@@ -114,9 +119,16 @@ type StepperProps = {
   currentStatus?: ProposalStatus;
   updateProposalStatus: (newStatus: ProposalStatus) => Promise<void>;
   canChangeStatus: (updatedStatus: ProposalStatus) => boolean;
+  proposalPermissions: AvailableProposalPermissionFlags;
 };
 
-function DesktopStepper({ openVoteModal, currentStatus, updateProposalStatus, canChangeStatus }: StepperProps) {
+function DesktopStepper({
+  openVoteModal,
+  currentStatus,
+  updateProposalStatus,
+  canChangeStatus,
+  proposalPermissions
+}: StepperProps) {
   const currentStatusIndex = currentStatus ? PROPOSAL_STATUSES.indexOf(currentStatus) : -1;
 
   return (
@@ -181,7 +193,13 @@ function DesktopStepper({ openVoteModal, currentStatus, updateProposalStatus, ca
   );
 }
 
-function MobileStepper({ openVoteModal, currentStatus, updateProposalStatus, canChangeStatus }: StepperProps) {
+function MobileStepper({
+  openVoteModal,
+  currentStatus,
+  updateProposalStatus,
+  canChangeStatus,
+  proposalPermissions
+}: StepperProps) {
   return (
     <Box
       width='100%'

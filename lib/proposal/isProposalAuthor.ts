@@ -1,4 +1,4 @@
-import type { ProposalResource } from './interfaces';
+import type { ProposalResource } from '../permissions/proposals/computeProposalPermissions/interfaces';
 
 export function isProposalAuthor({
   userId,

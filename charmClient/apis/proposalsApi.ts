@@ -6,6 +6,7 @@ import type { ProposalCategoryWithPermissions } from 'lib/permissions/proposals/
 import type { CreateProposalFromTemplateInput } from 'lib/proposal/createProposalFromTemplate';
 import type { ListProposalsRequest } from 'lib/proposal/getProposalsBySpace';
 import type { ProposalCategory, ProposalWithUsers } from 'lib/proposal/interface';
+import type { ProposalFlowFlags } from 'lib/proposal/state/transition';
 import type { UpdateProposalRequest } from 'lib/proposal/updateProposal';
 
 export class ProposalsApi {
@@ -56,5 +57,9 @@ export class ProposalsApi {
 
   deleteProposalCategory(spaceId: string, categoryId: string) {
     return http.DELETE<{ ok: true }>(`/api/spaces/${spaceId}/proposal-categories/${categoryId}`);
+  }
+
+  computeProposalFlowFlags(proposalId: string) {
+    return http.GET<ProposalFlowFlags>(`/api/proposals/${proposalId}/compute-flow-flags`);
   }
 }

@@ -1,13 +1,13 @@
 import { prisma } from 'db';
 
-import type { ProposalResource } from './interfaces';
+import type { ProposalWithUsers } from './interface';
 
 export async function isProposalReviewer({
   userId,
   proposal
 }: {
   userId?: string;
-  proposal: ProposalResource;
+  proposal: Pick<ProposalWithUsers, 'authors' | 'createdBy' | 'reviewers'>;
 }): Promise<boolean> {
   if (!userId) {
     return false;

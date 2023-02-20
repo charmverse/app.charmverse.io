@@ -1,12 +1,12 @@
 import type { ProposalOperation } from '@prisma/client';
 
+import { isProposalAuthor } from 'lib/proposal/isProposalAuthor';
 import { typedKeys } from 'lib/utilities/objects';
 
 import { AvailableProposalPermissions } from '../availableProposalPermissions.class';
 import type { AvailableProposalPermissionFlags } from '../interfaces';
 
 import type { ProposalPfpInput } from './interfaces';
-import { isProposalAuthor } from './isProposalAuthor';
 
 export function pfpStatusPrivateDraftVisibleOnlyByAuthor({
   resource,
