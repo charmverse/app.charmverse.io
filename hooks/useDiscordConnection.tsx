@@ -76,23 +76,25 @@ export function DiscordProvider({ children }: Props) {
   // It can either be fail or success
   useEffect(() => {
     // Connection with discord
-    if (authCode && user && !user.discordUser) {
+    if (authCode && user) {
       deleteCookie(AUTH_CODE_COOKIE);
-      setIsConnectDiscordLoading(true);
+      if (!user.discordUser) {
+        setIsConnectDiscordLoading(true);
 
-      charmClient.discord
-        .connectDiscord({
-          code: authCode
-        })
-        .then((updatedUserFields) => {
-          setUser({ ...user, ...updatedUserFields });
-        })
-        .catch((err) => {
-          setDiscordError(err.message || err.error || 'Something went wrong. Please try again');
-        })
-        .finally(() => {
-          setIsConnectDiscordLoading(false);
-        });
+        charmClient.discord
+          .connectDiscord({
+            code: authCode
+          })
+          .then((updatedUserFields) => {
+            setUser({ ...user, ...updatedUserFields });
+          })
+          .catch((err) => {
+            setDiscordError(err.message || err.error || 'Something went wrong. Please try again');
+          })
+          .finally(() => {
+            setIsConnectDiscordLoading(false);
+          });
+      }
     }
   }, [user]);
 
