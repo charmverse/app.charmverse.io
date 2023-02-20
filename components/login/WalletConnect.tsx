@@ -25,12 +25,11 @@ type Props = {
  */
 export function WalletConnect({ onSuccess }: Props) {
   const { account, connectWallet } = useWeb3AuthSig();
-  const { updateUser } = useUser();
+  const { updateUser, user: currentUser } = useUser();
 
   async function signSuccess(signature: AuthSig) {
     const updatedUser = await charmClient.addUserWallets([signature]);
-
-    updateUser(updatedUser);
+    updateUser({ ...currentUser, ...updatedUser });
     onSuccess();
   }
 
