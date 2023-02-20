@@ -383,7 +383,7 @@ function PageActionsMenu({ closeMenu, pageId, pagePath }: { closeMenu: () => voi
   const permissions = getPagePermissions(pageId);
   const router = useRouter();
 
-  const deletePageDisabled = !permissions.delete;
+  const deletePageDisabled = !permissions?.delete;
 
   async function deletePageWithBoard() {
     if (deletePageDisabled) {

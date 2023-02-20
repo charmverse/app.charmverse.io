@@ -26,7 +26,7 @@ import charmClient from 'charmClient';
 import Avatar from 'components/common/Avatar';
 import Modal from 'components/common/Modal';
 import useTasks from 'components/nexus/hooks/useTasks';
-import VoteActionsMenu from 'components/votes/components/VoteActionsMenu';
+import { VoteActionsMenu } from 'components/votes/components/VoteActionsMenu';
 import VoteStatusChip from 'components/votes/components/VoteStatusChip';
 import { useUser } from 'hooks/useUser';
 import { removeInlineVoteMark } from 'lib/prosemirror/plugins/inlineVotes/removeInlineVoteMark';
@@ -62,7 +62,7 @@ export default function VoteDetail({
   updateDeadline,
   detailed = false,
   vote,
-  isProposal
+  isProposal = false
 }: VoteDetailProps) {
   const { deadline, totalVotes, description, id, title, userChoice, voteOptions, aggregatedResult } = vote;
   const { user } = useUser();
@@ -110,6 +110,7 @@ export default function VoteDetail({
         <VoteActionsMenu
           deleteVote={deleteVote}
           cancelVote={cancelVote}
+          isProposalVote={isProposal}
           vote={vote}
           removeFromPage={removeFromPage}
           updateDeadline={updateDeadline}

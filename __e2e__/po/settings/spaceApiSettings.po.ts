@@ -1,7 +1,7 @@
 // playwright-dev-page.ts
 import type { Locator, Page } from '@playwright/test';
 
-import { WebhookNameSpaces } from 'lib/webhook/interfaces';
+import { WebhookNameSpaces } from 'lib/webhookPublisher/interfaces';
 
 import { SettingsModal } from './settings.po';
 

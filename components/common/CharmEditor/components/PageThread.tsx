@@ -386,7 +386,7 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(
                       {commentIndex === 0 && !isSmallScreen && (
                         <ThreadHeaderButton
                           text={thread.resolved ? 'Un-resolve' : 'Resolve'}
-                          disabled={isMutating || !permissions.comment}
+                          disabled={isMutating || !permissions?.comment}
                           onClick={toggleResolved}
                         />
                       )}
@@ -479,7 +479,7 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(
             </MenuItem>
           </Menu>
         </div>
-        {permissions.comment && (
+        {permissions?.comment && (
           <AddCommentCharmEditor
             key={thread.comments[thread.comments.length - 1]?.id}
             readOnly={Boolean(editedCommentId)}

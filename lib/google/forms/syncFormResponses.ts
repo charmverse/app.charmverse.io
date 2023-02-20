@@ -39,6 +39,7 @@ export async function syncFormResponses({
       prisma.block.deleteMany({ where: { id: fields.sourceData.boardId } }),
       prisma.page.deleteMany({ where: { id: { in: pages.map((p) => p.id) } } })
     ]);
+    log.info('Reset Google responses board', { pageId: sourceData.boardId, userId: createdBy });
     delete sourceData.boardId;
   }
 

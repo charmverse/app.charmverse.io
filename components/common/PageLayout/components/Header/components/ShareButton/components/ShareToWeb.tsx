@@ -67,7 +67,7 @@ export default function ShareToWeb({ pageId, pagePermissions, refreshPermissions
 
   const currentPage = pages[pageId];
 
-  const disablePublicToggle = currentPagePermissions.edit_isPublic !== true || Boolean(proposalParentId);
+  const disablePublicToggle = currentPagePermissions?.edit_isPublic !== true || Boolean(proposalParentId);
 
   // Current values of the public permission
   const [shareLink, setShareLink] = useState<null | string>(null);
@@ -125,7 +125,7 @@ export default function ShareToWeb({ pageId, pagePermissions, refreshPermissions
         </Box>
         <Tooltip
           title={
-            currentPagePermissions.edit_isPublic && Boolean(proposalParentId)
+            currentPagePermissions?.edit_isPublic && Boolean(proposalParentId)
               ? 'You can only change this setting from the top proposal page.'
               : ''
           }
