@@ -80,7 +80,7 @@ test.describe.serial('Add a new space from sidebar and load it', async () => {
     await page.waitForURL(`**/${uniqueDomainName2}`);
 
     // Close the modal again
-    closePropertiesModalBtn = await page.locator('data-test=close-member-properties-modal');
+    closePropertiesModalBtn = await page.locator('data-test=close-modal');
     await expect(closePropertiesModalBtn).toBeVisible();
     await closePropertiesModalBtn.click();
 
