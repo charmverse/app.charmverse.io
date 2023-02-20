@@ -35,7 +35,6 @@ export function plugins() {
           } else {
             dom.innerHTML = md.render(str);
           }
-
           return parser.parseSlice(dom, { preserveWhitespace: true, context: $context });
         }
       }
