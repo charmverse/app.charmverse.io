@@ -229,6 +229,7 @@ function PostHeader({
       <Divider />
       <DeleteMenuItem onClick={deletePost} disabled={!forumPostInfo.permissions?.delete_post} />
       <UndoMenuItem onClick={undoEditorChanges} disabled={!forumPostInfo?.permissions?.edit_post} />
+      <Divider />
       <ExportMarkdownMenuItem onClick={exportMarkdownPage} />
       <Tooltip
         title={
@@ -253,21 +254,6 @@ function PostHeader({
           </ListItemButton>
         </div>
       </Tooltip>
-      <Divider />
-      <Tooltip title={!forumPostInfo.permissions?.edit_post ? "You don't have permission to undo changes" : ''}>
-        <div>
-          <ListItemButton disabled={!forumPostInfo.permissions?.edit_post} onClick={undoEditorChanges}>
-            <UndoIcon
-              fontSize='small'
-              sx={{
-                mr: 1
-              }}
-            />
-            <ListItemText primary='Undo' />
-          </ListItemButton>
-        </div>
-      </Tooltip>
-      <Divider />
       {forumPostInfo.forumPost && postCreator ? (
         <>
           <Divider />
@@ -325,6 +311,11 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
   const isBasePageDocument = documentTypes.includes(basePage?.type ?? '');
   const isBasePageDatabase = /board/.test(basePage?.type ?? '');
 
+  function closeMenu() {
+    setPageMenuOpen(false);
+    setPageMenuAnchorElement(null);
+  }
+
   const onSwitchChange = () => {
     if (basePage) {
       updatePage({
@@ -356,15 +347,11 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
         bangleEditorCoreElement.dispatchEvent(undoEvent as Event);
       }
     }
+    closeMenu();
   }
 
   const canCreateProposal = !!userSpacePermissions?.createVote;
   const charmversePage = basePage ? members.find((member) => member.id === basePage.createdBy) : null;
-
-  function closeMenu() {
-    setPageMenuOpen(false);
-    setPageMenuAnchorElement(null);
-  }
 
   async function exportMarkdownPage() {
     if (basePage) {
