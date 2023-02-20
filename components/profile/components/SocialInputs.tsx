@@ -2,6 +2,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
 import type { ChangeEvent } from 'react';
+import { useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
@@ -67,19 +68,22 @@ function SocialInputs(props: SocialInputsProps) {
     mode: 'onChange'
   });
 
-  const onChange = debounce(async (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    if (!readOnly) {
-      setValue(event.target.name as keyof Social, event.target.value);
-      const validation = await trigger();
+  const onChange = useCallback(
+    debounce(async (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      if (!readOnly) {
+        setValue(event.target.name as keyof Social, event.target.value);
+        const validation = await trigger();
 
-      if (validation) {
-        await save({
-          ...social,
-          [event.target.name]: event.target.value ?? ''
-        });
+        if (validation) {
+          await save({
+            ...social,
+            [event.target.name]: event.target.value ?? ''
+          });
+        }
       }
-    }
-  }, 300);
+    }, 300),
+    [readOnly, social]
+  );
 
   return (
     <>

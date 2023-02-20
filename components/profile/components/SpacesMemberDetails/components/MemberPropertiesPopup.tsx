@@ -90,6 +90,7 @@ export function MemberPropertiesPopup({
   };
 
   function onClickClose() {
+    mutateMembers();
     reset();
     onClose();
   }
@@ -103,7 +104,7 @@ export function MemberPropertiesPopup({
   }, [defaultValues, isDirty]);
 
   return (
-    <Dialog open={!!spaceId} onClose={onClose} fullScreen={fullScreen} fullWidth>
+    <Dialog open={!!spaceId} onClose={onClickClose} fullScreen={fullScreen} fullWidth>
       {!data || isFetchingSpaceProperties || isLoading ? (
         <DialogContent>
           <LoadingComponent isLoading />

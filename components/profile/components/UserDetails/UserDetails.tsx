@@ -19,6 +19,7 @@ import Link from 'components/common/Link';
 import { useUpdateProfileAvatar } from 'components/profile/components/UserDetails/hooks/useUpdateProfileAvatar';
 import { useUserDetails } from 'components/profile/components/UserDetails/hooks/useUserDetails';
 import Avatar from 'components/settings/workspace/LargeAvatar';
+import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
 import type { DiscordAccount } from 'lib/discord/getDiscordAccount';
 import { hasNftAvatar } from 'lib/users/hasNftAvatar';
@@ -69,6 +70,7 @@ function EditIconContainer({
 
 function UserDetails({ readOnly, user, updateUser, sx = {} }: UserDetailsProps) {
   const { user: currentUser } = useUser();
+  const { mutateMembers } = useMembers();
 
   const isPublic = isPublicUser(user, currentUser);
   const {
@@ -100,16 +102,19 @@ function UserDetails({ readOnly, user, updateUser, sx = {} }: UserDetailsProps) 
   const saveDescription = async (_description: string) => {
     await updateUserDetails({ description: _description });
     await mutate();
+    await mutateMembers();
   };
 
   const saveTimezone = async (_timezone: string | null = null) => {
     await updateUserDetails({ timezone: _timezone });
     await mutate();
+    await mutateMembers();
   };
 
   const saveSocial = async (social: Social) => {
     await updateUserDetails({ social });
     await mutate();
+    await mutateMembers();
   };
 
   const disabled = readOnly ?? isLoading ?? isPublic;
@@ -234,7 +239,7 @@ function UserDetails({ readOnly, user, updateUser, sx = {} }: UserDetailsProps) 
           <UserDescription currentDescription={userDetails?.description} save={saveDescription} readOnly={disabled} />
         </Grid>
         <Grid item>
-          <TimezoneAutocomplete save={saveTimezone} userTimezone={userDetails?.timezone} readOnly={disabled} />
+          <TimezoneAutocomplete userTimezone={userDetails?.timezone} save={saveTimezone} readOnly={disabled} />
         </Grid>
         <SocialInputs social={userDetails?.social as Social} save={saveSocial} readOnly={disabled} />
       </Grid>
