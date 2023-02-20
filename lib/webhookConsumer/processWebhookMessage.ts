@@ -4,7 +4,7 @@ import { removeSpaceMemberDiscord } from 'lib/discord/removeSpaceMemberDiscord';
 import { unassignRolesDiscord } from 'lib/discord/unassignRolesDiscord';
 import { getRequestApiKey } from 'lib/middleware/getRequestApiKey';
 import { verifyApiKeyForSpace } from 'lib/middleware/verifyApiKeyForSpace';
-import type { MessageType, WebhookMessage, WebhookMessageProcessResult } from 'lib/webhooks/interfaces';
+import type { MessageType, WebhookMessage, WebhookMessageProcessResult } from 'lib/webhookConsumer/interfaces';
 
 const messageHandlers: Record<MessageType, (message: WebhookMessage) => Promise<WebhookMessageProcessResult>> = {
   guildMemberUpdate: async (message: WebhookMessage) => {

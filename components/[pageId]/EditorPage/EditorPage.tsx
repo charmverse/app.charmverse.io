@@ -27,6 +27,7 @@ export default function EditorPage({ pageId: pageIdOrPath }: { pageId: string })
   const [isAccessDenied, setIsAccessDenied] = useState(false);
   const [currentPage, setCurrentPage] = useState<PageMeta | null>(null);
   const { permissions: pagePermissions } = usePagePermissions({ pageIdOrPath: currentPageId });
+
   const readOnly = (pagePermissions?.edit_content === false && editMode !== 'suggesting') || editMode === 'viewing';
   const parentProposalId = findParentOfType({ pageId: currentPageId, pageType: 'proposal', pageMap: pages });
   useEffect(() => {

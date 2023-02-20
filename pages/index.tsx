@@ -9,6 +9,8 @@ import { LoginPageContent } from 'components/login';
 import Footer from 'components/login/Footer';
 import { getKey } from 'hooks/useLocalStorage';
 import { usePageTitle } from 'hooks/usePageTitle';
+import type { PathProps } from 'hooks/useSettingsDialog';
+import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
 import { AUTH_CODE_COOKIE } from 'lib/discord/constants';
@@ -23,6 +25,7 @@ export default function LoginPage() {
   const { user, isLoaded } = useUser();
   const { spaces, isLoaded: isSpacesLoaded } = useSpaces();
   const discordCookie = getCookie(AUTH_CODE_COOKIE);
+  const { onClick: openSettingsModal, open: isSettingsDialogOpen } = useSettingsDialog();
   const [showLogin, setShowLogin] = useState(false); // capture isLoaded state to prevent render on route change
   const isLogInWithDiscord = Boolean(discordCookie);
   const isDataLoaded = triedEager && isSpacesLoaded && isLoaded;
@@ -48,6 +51,13 @@ export default function LoginPage() {
       router.push(defaultWorkspace);
     }
   }
+
+  useEffect(() => {
+    const task = router.query.task;
+    if (!isSettingsDialogOpen && task && router.isReady) {
+      openSettingsModal('notifications', { taskType: task } as PathProps);
+    }
+  }, [isSettingsDialogOpen, router.isReady, router.query.task]);
 
   useEffect(() => {
     setTitleState('Welcome');
@@ -83,9 +93,7 @@ export default function LoginPage() {
 
 export function getDefaultWorkspaceUrl(spaces: Space[]) {
   const defaultWorkspace = typeof window !== 'undefined' && localStorage.getItem(getKey('last-workspace'));
-  if (defaultWorkspace === '/nexus') {
-    return defaultWorkspace;
-  }
+
   const isValidDefaultWorkspace =
     !!defaultWorkspace && spaces.some((space) => defaultWorkspace.startsWith(`/${space.domain}`));
   return isValidDefaultWorkspace ? defaultWorkspace : `/${spaces[0].domain}`;

@@ -51,18 +51,18 @@ const config = {
         permanent: true
       },
       {
-        source: '/:domain(^(?!.*\bapi\b).*$)/nexus',
-        destination: '/:domain',
+        source: '/nexus',
+        destination: '/',
         permanent: true
       },
       {
-        source: '/:domain(^(?!.*\bapi\b).*$)/profile',
-        destination: '/:domain',
+        source: '/profile',
+        destination: '/',
         permanent: true
       },
       {
-        source: '/:domain(^(?!.*\bapi\b).*$)/integrations',
-        destination: '/:domain',
+        source: '/integrations',
+        destination: '/',
         permanent: true
       },
       {

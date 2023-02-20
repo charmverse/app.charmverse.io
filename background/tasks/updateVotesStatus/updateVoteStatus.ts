@@ -1,8 +1,8 @@
 import { prisma } from 'db';
 import { getVotesByState } from 'lib/votes/getVotesByState';
 import { VOTE_STATUS } from 'lib/votes/interfaces';
-import { WebhookEventNames } from 'lib/webhook/interfaces';
-import { publishProposalEvent } from 'lib/webhook/publishEvent';
+import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
+import { publishProposalEvent } from 'lib/webhookPublisher/publishEvent';
 
 const updateVoteStatus = async () => {
   const votesPassedDeadline = await prisma.vote.findMany({
