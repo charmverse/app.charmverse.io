@@ -86,10 +86,10 @@ export function MemberPropertiesPopup({
 
   const customOnChange = async (property: PropertyValueWithDetails, option: any) => {
     await onSubmit({ ...getValues(), [property.memberPropertyId]: option });
-    await mutateMembers();
   };
 
   function onClickClose() {
+    // refresh members only after all the editing is finished
     mutateMembers();
     reset();
     onClose();
