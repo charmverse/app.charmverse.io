@@ -55,8 +55,7 @@ async function discussionProposal({ proposal, userId }: GetFlagsInput): Promise<
 
 async function inReviewProposal({ proposal, userId }: GetFlagsInput): Promise<ProposalFlowFlags> {
   const flags = new TransitionFlags();
-
-  const hasReviewerAbility = await Promise.all([
+  const isReviewer = await Promise.all([
     isProposalReviewer({ proposal, userId }),
     hasSpaceWideProposalReviewerPermission({
       spaceId: proposal.spaceId,
@@ -64,12 +63,23 @@ async function inReviewProposal({ proposal, userId }: GetFlagsInput): Promise<Pr
     })
   ]);
 
-  if (hasReviewerAbility.some((value) => value === true)) {
+  const isAdmin = (
+    await hasAccessToSpace({
+      spaceId: proposal.spaceId,
+      userId
+    })
+  ).isAdmin;
+
+  if (isReviewer.some((v) => v === true) && proposal.reviewers.length > 0) {
     flags.addPermissions(['reviewed']);
   }
 
-  if (hasReviewerAbility[1] === true || isProposalAuthor({ proposal, userId })) {
+  if (isProposalAuthor({ proposal, userId })) {
     flags.addPermissions(['discussion']);
+  }
+
+  if (isAdmin) {
+    flags.addPermissions(['discussion', 'reviewed']);
   }
 
   return flags.operationFlags;
@@ -112,9 +122,9 @@ export async function computeProposalFlowFlags({
   }
 
   switch (proposal.status) {
-    case 'draft':
-      return privateDraftProposal({ proposal, userId });
     case 'private_draft':
+      return privateDraftProposal({ proposal, userId });
+    case 'draft':
       return draftProposal({ proposal, userId });
     case 'discussion':
       return discussionProposal({ proposal, userId });

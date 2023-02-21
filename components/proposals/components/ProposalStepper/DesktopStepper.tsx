@@ -30,7 +30,6 @@ export function DesktopStepper({
       }
     }
   }
-
   return (
     <Grid
       container
