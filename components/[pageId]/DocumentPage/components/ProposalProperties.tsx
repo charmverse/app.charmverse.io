@@ -232,8 +232,6 @@ export function ProposalProperties({ pageId, proposalId, readOnly, isTemplate }:
                 canEditCategories={!proposalPermissions?.edit}
                 value={proposalCategory ?? null}
                 onChange={onChangeCategory}
-                onDeleteCategory={deleteCategory}
-                onAddCategory={addCategory}
               />
             </Box>
           </Box>
