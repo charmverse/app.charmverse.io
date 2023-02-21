@@ -209,6 +209,7 @@ function CardDetailProperties(props: Props) {
               updatedAt={pageUpdatedAt}
               updatedBy={pageUpdatedBy}
               propertyTemplate={propertyTemplate}
+              showEmptyPlaceholder={true}
               displayType='details'
             />
           </div>
