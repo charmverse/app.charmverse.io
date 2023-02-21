@@ -12,9 +12,10 @@ import InputSearchReviewers from 'components/common/form/InputSearchReviewers';
 import UserDisplay from 'components/common/UserDisplay';
 import useTasks from 'components/nexus/hooks/useTasks';
 import ProposalCategoryInput from 'components/proposals/components/ProposalCategoryInput';
-import { ProposalStepper } from 'components/proposals/components/ProposalStepper';
+import { ProposalStepper } from 'components/proposals/components/ProposalStepper/ProposalStepper';
 import { ProposalStepSummary } from 'components/proposals/components/ProposalStepSummary';
 import { useProposalCategories } from 'components/proposals/hooks/useProposalCategories';
+import { useProposalFlowFlags } from 'components/proposals/hooks/useProposalFlowFlags';
 import { useProposalPermissions } from 'components/proposals/hooks/useProposalPermissions';
 import CreateVoteModal from 'components/votes/components/CreateVoteModal';
 import { useIsAdmin } from 'hooks/useIsAdmin';
@@ -33,18 +34,20 @@ interface ProposalPropertiesProps {
   isTemplate: boolean;
 }
 
-export default function ProposalProperties({ pageId, proposalId, readOnly, isTemplate }: ProposalPropertiesProps) {
+export function ProposalProperties({ pageId, proposalId, readOnly, isTemplate }: ProposalPropertiesProps) {
   const { data: proposal, mutate: refreshProposal } = useSWR(`proposal/${proposalId}`, () =>
     charmClient.proposals.getProposal(proposalId)
   );
 
-  const { categories, canEditProposalCategories, addCategory, deleteCategory } = useProposalCategories();
+  const { categories, addCategory, deleteCategory } = useProposalCategories();
   const { mutate: mutateTasks } = useTasks();
   const [isVoteModalOpen, setIsVoteModalOpen] = useState(false);
 
   const proposalPermissions = useProposalPermissions({
     proposalIdOrPath: proposalId
   });
+
+  const { permissions: proposalFlowFlags } = useProposalFlowFlags({ proposalId });
 
   const { members } = useMembers();
   const { roles = [], roleups } = useRoles();
@@ -163,7 +166,7 @@ export default function ProposalProperties({ pageId, proposalId, readOnly, isTem
         <>
           <Grid container mb={2}>
             <ProposalStepSummary
-              proposalUserGroups={isAdmin ? ['author', 'reviewer'] : currentUserGroups}
+              proposalFlowFlags={proposalFlowFlags}
               proposal={proposal}
               openVoteModal={openVoteModal}
               updateProposalStatus={updateProposalStatus}
@@ -192,7 +195,7 @@ export default function ProposalProperties({ pageId, proposalId, readOnly, isTem
         {!isTemplate && (
           <Grid container mb={2} mt={2}>
             <ProposalStepper
-              proposalUserGroups={isAdmin ? ['author', 'reviewer'] : currentUserGroups}
+              proposalFlowPermissions={proposalFlowFlags}
               proposal={proposal}
               openVoteModal={openVoteModal}
               updateProposalStatus={updateProposalStatus}

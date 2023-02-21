@@ -1,17 +1,13 @@
-import type { ProposalCategory } from '@prisma/client';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { useIsAdmin } from 'hooks/useIsAdmin';
 import type { ProposalCategoryWithPermissions } from 'lib/permissions/proposals/interfaces';
 import type { NewProposalCategory } from 'lib/proposal/interface';
 
 export function useProposalCategories() {
   const currentSpace = useCurrentSpace();
   // Might need better ACL in the future
-  const canEditProposalCategories = useIsAdmin();
-
   const { data: categories, mutate } = useSWR(
     () => (currentSpace ? `proposals/${currentSpace.id}/categories` : null),
     () => charmClient.proposals.getProposalCategories(currentSpace!.id)
@@ -47,5 +43,5 @@ export function useProposalCategories() {
     });
   }
 
-  return { isLoading: !categories, categories, canEditProposalCategories, addCategory, deleteCategory, mutateCategory };
+  return { isLoading: !categories, categories, addCategory, deleteCategory, mutateCategory };
 }

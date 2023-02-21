@@ -1,7 +1,6 @@
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
-import { AllowedPagePermissions } from 'lib/permissions/pages/available-page-permissions.class';
 
 type Props = {
   // Provide value of null to skip fetching
