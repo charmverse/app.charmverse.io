@@ -209,7 +209,7 @@ export function CreateVoteModal({
         )}
         <Box display='flex' gap={1}>
           <Box flexDirection='column' display='flex' flexGrow={1}>
-            <FieldLabel>Deadline</FieldLabel>
+            <FieldLabel>End date</FieldLabel>
             {/* This as any statement is to save time. We are providing an official adapter from MUI Library as outlined here https://mui.com/x/react-date-pickers/date-picker/#basic-usage */}
             <DateTimePicker
               minDate={DateTime.fromMillis(Date.now())}

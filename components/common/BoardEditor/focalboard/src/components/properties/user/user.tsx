@@ -12,6 +12,7 @@ type Props = {
   value: string;
   readOnly: boolean;
   onChange: (value: string) => void;
+  showEmptyPlaceholder?: boolean;
 };
 
 const StyledUserPropertyContainer = styled(Box)`
@@ -20,6 +21,7 @@ const StyledUserPropertyContainer = styled(Box)`
   text-overflow: ellipsis;
   width: 100%;
   height: 100%;
+  display: flex;
 `;
 
 function UserProperty(props: Props): JSX.Element | null {
@@ -60,7 +62,7 @@ function UserProperty(props: Props): JSX.Element | null {
           className='octo-propertyvalue'
           sx={{ opacity: 0.4, pl: '2px', width: '100%', height: '100%' }}
         >
-          Empty
+          {props.showEmptyPlaceholder ? 'Empty' : ''}
         </Typography>
       )}
       <Popover
