@@ -10,7 +10,7 @@ type Props = {
 };
 
 export function useProposalPermissions({ proposalIdOrPath, spaceDomain, isNewProposal }: Props) {
-  const { data } = useSWR(
+  const { data, mutate } = useSWR(
     !proposalIdOrPath ? null : `compute-proposal-category-permissions-${proposalIdOrPath}${spaceDomain ?? ''}`,
     () =>
       charmClient.permissions.proposals.computeProposalPermissions({
@@ -19,9 +19,5 @@ export function useProposalPermissions({ proposalIdOrPath, spaceDomain, isNewPro
       })
   );
 
-  if (isNewProposal) {
-    return new AvailableProposalPermissions().full;
-  }
-
-  return data;
+  return { permissions: isNewProposal ? new AvailableProposalPermissions().full : data, refresh: mutate };
 }

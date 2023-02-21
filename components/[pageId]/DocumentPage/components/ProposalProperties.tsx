@@ -44,12 +44,12 @@ export function ProposalProperties({ pageId, proposalId, readOnly, isTemplate }:
   const { mutate: mutateTasks } = useTasks();
   const [isVoteModalOpen, setIsVoteModalOpen] = useState(false);
 
-  const proposalPermissions = useProposalPermissions({
+  const { permissions: proposalPermissions, refresh: refreshProposalPermissions } = useProposalPermissions({
     proposalIdOrPath: proposalId
   });
 
   const { permissions: proposalFlowFlags, refresh: refreshProposalFlowFlags } = useProposalFlowFlags({ proposalId });
-  const { permissions: pagePermissions, refresh: refreshPagePermissions } = usePagePermissions({
+  const { refresh: refreshPagePermissions } = usePagePermissions({
     pageIdOrPath: pageId
   });
 
@@ -147,7 +147,12 @@ export function ProposalProperties({ pageId, proposalId, readOnly, isTemplate }:
   async function updateProposalStatus(newStatus: ProposalStatus) {
     if (proposal && newStatus !== proposal.status) {
       await charmClient.proposals.updateStatus(proposal.id, newStatus);
-      await Promise.all([refreshProposal(), refreshProposalFlowFlags(), refreshPagePermissions()]);
+      await Promise.all([
+        refreshProposal(),
+        refreshProposalFlowFlags(),
+        refreshPagePermissions(),
+        refreshProposalPermissions()
+      ]);
       mutateTasks();
     }
   }
