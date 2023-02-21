@@ -202,63 +202,63 @@ enum VisibilityView {
   profile
 }
 
-enum CategorySubscriptionMode {
+enum ForumCategorySubscriptionMode {
   whitelist
   blacklist
 }
 
 model Space {
-  id                          String                            @id @default(uuid()) @db.Uuid
-  deletedAt                   DateTime?
-  createdAt                   DateTime                          @default(now())
-  createdBy                   String                            @db.Uuid
-  updatedAt                   DateTime                          @updatedAt
-  updatedBy                   String                            @db.Uuid
-  name                        String
-  domain                      String                            @unique
-  discordServerId             String?
-  defaultVotingDuration       Int?
-  snapshotDomain              String?
-  spaceImage                  String?
-  defaultPostCategoryId       String?                           @unique @db.Uuid
-  defaultPostCategory         PostCategory?                     @relation(fields: [defaultPostCategoryId], references: [id], name: "defaultPostCategory", onDelete: SetNull)
-  defaultPagePermissionGroup  PagePermissionLevel?              @default(full_access)
-  defaultPublicPages          Boolean?                          @default(false)
-  permissionConfigurationMode SpacePermissionConfigurationMode? @default(custom)
-  publicBountyBoard           Boolean?                          @default(false)
-  xpsEngineId                 String?
-  author                      User                              @relation(fields: [createdBy], references: [id], onDelete: Cascade)
-  blocks                      Block[]
-  bounties                    Bounty[]
-  bountyPermissions           BountyPermission[]
-  comments                    Comment[]
-  inviteLinks                 InviteLink[]
-  pages                       Page[]
-  permissions                 PagePermission[]
-  paymentMethods              PaymentMethod[]
-  roles                       Role[]
-  apiToken                    SpaceApiToken?
-  superApiTokenId             String?                           @db.Uuid
-  superApiToken               SuperApiToken?                    @relation(fields: [superApiTokenId], references: [id], onDelete: SetNull)
-  permittedGroups             SpacePermission[]                 @relation("permittedGroups")
-  spacePermissions            SpacePermission[]                 @relation("spacePermissions")
-  spaceRoles                  SpaceRole[]
-  threads                     Thread[]
-  tokenGates                  TokenGate[]
-  votes                       Vote[]
-  proposals                   Proposal[]
-  workspaceEvents             WorkspaceEvent[]
-  proposalCategory            ProposalCategory[]
-  memberProperties            MemberProperty[]
-  memberPropertyValues        MemberPropertyValue[]
-  userTokenGates              UserTokenGate[]
-  postCategories              PostCategory[]
-  Post                        Post[]
-  userNotificationPreferences UserSpaceNotificationSettings[]
-  postCategoryPermissions     PostCategoryPermission[]
-  webhookSubscriptionUrl      String?
-  webhookSubscriptions        WebhookSubscription[]
-  webhookSigningSecret        String?
+  id                            String                            @id @default(uuid()) @db.Uuid
+  deletedAt                     DateTime?
+  createdAt                     DateTime                          @default(now())
+  createdBy                     String                            @db.Uuid
+  updatedAt                     DateTime                          @updatedAt
+  updatedBy                     String                            @db.Uuid
+  name                          String
+  domain                        String                            @unique
+  discordServerId               String?
+  defaultVotingDuration         Int?
+  snapshotDomain                String?
+  spaceImage                    String?
+  defaultPostCategoryId         String?                           @unique @db.Uuid
+  defaultPostCategory           PostCategory?                     @relation(fields: [defaultPostCategoryId], references: [id], name: "defaultPostCategory", onDelete: SetNull)
+  defaultPagePermissionGroup    PagePermissionLevel?              @default(full_access)
+  defaultPublicPages            Boolean?                          @default(false)
+  permissionConfigurationMode   SpacePermissionConfigurationMode? @default(custom)
+  publicBountyBoard             Boolean?                          @default(false)
+  xpsEngineId                   String?
+  author                        User                              @relation(fields: [createdBy], references: [id], onDelete: Cascade)
+  blocks                        Block[]
+  bounties                      Bounty[]
+  bountyPermissions             BountyPermission[]
+  comments                      Comment[]
+  inviteLinks                   InviteLink[]
+  pages                         Page[]
+  permissions                   PagePermission[]
+  paymentMethods                PaymentMethod[]
+  roles                         Role[]
+  apiToken                      SpaceApiToken?
+  superApiTokenId               String?                           @db.Uuid
+  superApiToken                 SuperApiToken?                    @relation(fields: [superApiTokenId], references: [id], onDelete: SetNull)
+  permittedGroups               SpacePermission[]                 @relation("permittedGroups")
+  spacePermissions              SpacePermission[]                 @relation("spacePermissions")
+  spaceRoles                    SpaceRole[]
+  threads                       Thread[]
+  tokenGates                    TokenGate[]
+  votes                         Vote[]
+  proposals                     Proposal[]
+  workspaceEvents               WorkspaceEvent[]
+  proposalCategory              ProposalCategory[]
+  memberProperties              MemberProperty[]
+  memberPropertyValues          MemberPropertyValue[]
+  userTokenGates                UserTokenGate[]
+  postCategories                PostCategory[]
+  Post                          Post[]
+  userSpaceNotificationSettings UserSpaceNotificationSettings[]
+  postCategoryPermissions       PostCategoryPermission[]
+  webhookSubscriptionUrl        String?
+  webhookSubscriptions          WebhookSubscription[]
+  webhookSigningSecret          String?
 
   @@index([createdBy])
 }
@@ -419,56 +419,56 @@ model Vote {
 }
 
 model User {
-  id                           String                          @id @default(uuid()) @db.Uuid
-  createdAt                    DateTime                        @default(now())
-  updatedAt                    DateTime                        @default(now())
-  deletedAt                    DateTime?
-  avatar                       String?
-  avatarContract               String?
-  avatarTokenId                String?
-  avatarChain                  Int?
-  username                     String
-  isBot                        Boolean?                        @default(false)
-  path                         String?                         @unique
-  identityType                 IdentityType?
-  email                        String?
-  applications                 Application[]
-  blocks                       Block[]
-  bounties                     Bounty[]
-  bountyPermissions            BountyPermission[]
-  comments                     Comment[]
-  discordUser                  DiscordUser?
-  favorites                    FavoritePage[]
-  inviteLinks                  InviteLink[]
-  posts                        Post[]
-  pages                        Page[]
-  permissions                  PagePermission[]
-  poaps                        Poap[]
-  spacesCreated                Space[]
-  spacePermissions             SpacePermission[]
-  spaceRoles                   SpaceRole[]
-  spacesOrder                  String[]
-  telegramUser                 TelegramUser?
-  threads                      Thread[]
-  profile                      UserDetails?
-  gnosisSafes                  UserGnosisSafe[]
-  userNotifications            UserNotification[]
-  notificationState            UserNotificationState?
-  userVotes                    UserVote[]
-  initiatedVotes               Vote[]
-  profileItems                 ProfileItem[]
-  proposalsAuthored            ProposalAuthor[]
-  proposalsReviewed            ProposalReviewer[]
-  reviewedProposals            Proposal[]
-  workspaceEvents              WorkspaceEvent[]
-  wallets                      UserWallet[]
-  memberPropertyValues         MemberPropertyValue[]
-  userTokenGates               UserTokenGate[]
-  unstoppableDomains           UnstoppableDomain[]
-  postComments                 PostComment[]
-  googleAccounts               GoogleAccount[]
-  googleCredentials            GoogleCredential[]
-  spaceNotificationPreferences UserSpaceNotificationSettings[]
+  id                        String                          @id @default(uuid()) @db.Uuid
+  createdAt                 DateTime                        @default(now())
+  updatedAt                 DateTime                        @default(now())
+  deletedAt                 DateTime?
+  avatar                    String?
+  avatarContract            String?
+  avatarTokenId             String?
+  avatarChain               Int?
+  username                  String
+  isBot                     Boolean?                        @default(false)
+  path                      String?                         @unique
+  identityType              IdentityType?
+  email                     String?
+  applications              Application[]
+  blocks                    Block[]
+  bounties                  Bounty[]
+  bountyPermissions         BountyPermission[]
+  comments                  Comment[]
+  discordUser               DiscordUser?
+  favorites                 FavoritePage[]
+  inviteLinks               InviteLink[]
+  posts                     Post[]
+  pages                     Page[]
+  permissions               PagePermission[]
+  poaps                     Poap[]
+  spacesCreated             Space[]
+  spacePermissions          SpacePermission[]
+  spaceRoles                SpaceRole[]
+  spacesOrder               String[]
+  telegramUser              TelegramUser?
+  threads                   Thread[]
+  profile                   UserDetails?
+  gnosisSafes               UserGnosisSafe[]
+  userNotifications         UserNotification[]
+  notificationState         UserNotificationState?
+  userVotes                 UserVote[]
+  initiatedVotes            Vote[]
+  profileItems              ProfileItem[]
+  proposalsAuthored         ProposalAuthor[]
+  proposalsReviewed         ProposalReviewer[]
+  reviewedProposals         Proposal[]
+  workspaceEvents           WorkspaceEvent[]
+  wallets                   UserWallet[]
+  memberPropertyValues      MemberPropertyValue[]
+  userTokenGates            UserTokenGate[]
+  unstoppableDomains        UnstoppableDomain[]
+  postComments              PostComment[]
+  googleAccounts            GoogleAccount[]
+  googleCredentials         GoogleCredential[]
+  spaceNotificationSettings UserSpaceNotificationSettings[]
 }
 
 model UserWallet {
@@ -1173,11 +1173,11 @@ model GoogleCredential {
 }
 
 model UserSpaceNotificationSettings {
-  userId              String                   @db.Uuid
-  user                User                     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  spaceId             String                   @db.Uuid
-  space               Space                    @relation(fields: [spaceId], references: [id], onDelete: Cascade)
-  forumCategoriesMode CategorySubscriptionMode @default(blacklist)
+  userId              String                        @db.Uuid
+  user                User                          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  spaceId             String                        @db.Uuid
+  space               Space                         @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  forumCategoriesMode ForumCategorySubscriptionMode @default(blacklist)
   // just keep a list of ids instead of another table, since we dont really care if they exist or not in the db
   forumCategories     String[]
 
