@@ -124,7 +124,6 @@ export function PostDialog({ post, spaceId, onClose, open, newPostCategory }: Pr
           setContentUpdated(true);
           setFormInputs((__formInputs) => ({ ...__formInputs, ..._formInputs }));
         }}
-        insideModal
         post={post ?? null}
         spaceId={spaceId}
         onSave={close}

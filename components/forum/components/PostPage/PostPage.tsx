@@ -19,7 +19,6 @@ import { usePostPermissions } from 'components/forum/hooks/usePostPermissions';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useForumCategories } from 'hooks/useForumCategories';
 import { useMembers } from 'hooks/useMembers';
-import { usePageTitle } from 'hooks/usePageTitle';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useUser } from 'hooks/useUser';
 import type { PostCommentWithVote, PostCommentWithVoteAndChildren } from 'lib/forums/comments/interface';
@@ -44,10 +43,9 @@ type Props = {
   formInputs: FormInputs;
   contentUpdated: boolean;
   setContentUpdated: (changed: boolean) => void;
-  shouldUpdateTitleState?: boolean;
   showOtherCategoryPosts?: boolean;
   newPostCategory?: PostCategory | null;
-  insideModal?: boolean;
+  onTitleChange?: (newTitle: string) => void;
 };
 
 function processComments({ postComments }: { postComments: PostCommentWithVote[] }) {
@@ -88,7 +86,7 @@ function sortComments({ comments, sort }: { comments: PostCommentWithVoteAndChil
   return comments;
 }
 export function PostPage({
-  shouldUpdateTitleState = false,
+  onTitleChange,
   post,
   spaceId,
   onSave,
@@ -97,8 +95,7 @@ export function PostPage({
   contentUpdated,
   setContentUpdated,
   showOtherCategoryPosts,
-  newPostCategory,
-  insideModal = false
+  newPostCategory
 }: Props) {
   const currentSpace = useCurrentSpace();
   const { user } = useUser();
@@ -134,7 +131,6 @@ export function PostPage({
   const permissions = usePostPermissions({ postIdOrPath: post?.id as string, isNewPost: !post });
 
   usePreventReload(contentUpdated);
-  const [, setTitleState] = usePageTitle();
   const [commentSort, setCommentSort] = useState<PostCommentSort>('latest');
   const isLoading = !postComments && isValidating;
 
@@ -143,16 +139,14 @@ export function PostPage({
   function updateTitle(updates: { title: string; updatedAt: any }) {
     setContentUpdated(true);
     setFormInputs({ title: updates.title });
-    if (shouldUpdateTitleState && !insideModal) {
-      setTitleState(updates.title);
-    }
+    onTitleChange?.(updates.title);
   }
 
   useEffect(() => {
-    if (post && !insideModal) {
-      setTitleState(post.title);
+    if (post && onTitleChange) {
+      onTitleChange(post.title);
     }
-  }, [post, insideModal]);
+  }, [post]);
 
   async function publishForumPost() {
     if (checkIsContentEmpty(formInputs.content) || !categoryId) {
