@@ -132,8 +132,8 @@ export function ForumPage() {
 
   return (
     <CenteredPageContent style={{ width: 1100 }}>
-      <Box display='flex' justifyContent='space-between' alignItems='center'>
-        <Typography variant='h1' mb={2}>
+      <Box display='flex' justifyContent='space-between' alignItems='center' mb={2}>
+        <Typography variant='h1' mb={0}>
           {currentCategory ? currentCategory?.name : 'All categories'}
         </Typography>
         {currentCategory && <CategoryNotificationToggle categoryId={currentCategory.id} />}

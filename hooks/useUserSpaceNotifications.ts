@@ -3,6 +3,7 @@ import useSWRImmutable from 'swr/immutable';
 
 import charmClient from 'charmClient';
 import { useCurrentSpaceId } from 'hooks/useCurrentSpaceId';
+import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 
 function useSpaceNotificationsData() {
@@ -14,12 +15,12 @@ function useSpaceNotificationsData() {
       return charmClient.profile.getSpaceNotifications({ spaceId: currentSpaceId });
     }
   );
-  return { settings: data, error, refresh: mutate, isLoading };
+  return { spaceId: currentSpaceId, settings: data, error, refresh: mutate, isLoading };
 }
 
 export function useForumCategoryNotification(categoryId: string) {
-  const { settings, refresh } = useSpaceNotificationsData();
-  const { currentSpaceId } = useCurrentSpaceId();
+  const { settings, spaceId, refresh } = useSpaceNotificationsData();
+  const { showMessage } = useSnackbar();
 
   return useMemo(() => {
     const enabled = settings?.forums.categories?.[categoryId] ?? false;
@@ -28,12 +29,16 @@ export function useForumCategoryNotification(categoryId: string) {
       isLoading: !settings,
       async toggle() {
         await charmClient.profile.setForumCategoryNotification({
-          spaceId: currentSpaceId,
+          spaceId,
           categoryId,
           enabled: !enabled
         });
+        const message = enabled
+          ? 'Unfollowed. You won’t get updates on new activity anymore.'
+          : 'Success! You will see notifications from this category in the future.';
+        showMessage(message, 'success');
         refresh();
       }
     };
-  }, [categoryId, currentSpaceId, refresh, settings]);
+  }, [categoryId, spaceId, refresh, settings]);
 }
