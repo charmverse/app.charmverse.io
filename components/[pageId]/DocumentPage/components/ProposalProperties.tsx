@@ -17,7 +17,7 @@ import { ProposalStepSummary } from 'components/proposals/components/ProposalSte
 import { useProposalCategories } from 'components/proposals/hooks/useProposalCategories';
 import { useProposalFlowFlags } from 'components/proposals/hooks/useProposalFlowFlags';
 import { useProposalPermissions } from 'components/proposals/hooks/useProposalPermissions';
-import CreateVoteModal from 'components/votes/components/CreateVoteModal';
+import { CreateVoteModal } from 'components/votes/components/CreateVoteModal';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useMembers } from 'hooks/useMembers';
 import { usePagePermissions } from 'hooks/usePagePermissions';

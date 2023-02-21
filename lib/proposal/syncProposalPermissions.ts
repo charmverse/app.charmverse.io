@@ -1,4 +1,4 @@
-import type { PagePermissionLevel, Prisma, ProposalStatus } from '@prisma/client';
+import type { PagePermissionLevel, Prisma, ProposalCategoryPermissionLevel, ProposalStatus } from '@prisma/client';
 import { v4 } from 'uuid';
 
 import type { OptionalTransaction, TransactionClient } from 'db';
@@ -12,6 +12,30 @@ type ProposalParticipant = 'author' | 'reviewer' | 'community';
 
 type ProposalStagePagePermissionMapping = Record<ProposalParticipant, PagePermissionLevel | null>;
 
+function mapProposalPermissionToPagePermission({
+  proposalPermission,
+  maxPermission
+}: {
+  proposalPermission: ProposalCategoryPermissionLevel;
+  maxPermission: PagePermissionLevel;
+}): PagePermissionLevel | null {
+  if (!proposalPermission || !maxPermission) {
+    return null;
+    // Lowest permission level is view. Assign to everyone
+  } else if (maxPermission === 'view') {
+    return 'view';
+    // Differentiate between view and view_comment
+    // Some people can view the proposal, but not comment it
+  } else if (maxPermission === 'view_comment') {
+    if (proposalPermission === 'view') {
+      return 'view';
+    } else {
+      return 'view_comment';
+    }
+  }
+  return null;
+}
+
 export const proposalPermissionMapping: Record<ProposalStatus, ProposalStagePagePermissionMapping> = {
   private_draft: {
     author: 'proposal_editor',
@@ -20,12 +44,12 @@ export const proposalPermissionMapping: Record<ProposalStatus, ProposalStagePage
   },
   draft: {
     author: 'proposal_editor',
-    reviewer: null,
+    reviewer: 'view',
     community: 'view'
   },
   discussion: {
     author: 'proposal_editor',
-    reviewer: null,
+    reviewer: 'view_comment',
     community: 'view_comment'
   },
   review: {
@@ -34,18 +58,18 @@ export const proposalPermissionMapping: Record<ProposalStatus, ProposalStagePage
     community: 'view'
   },
   reviewed: {
-    author: null,
-    reviewer: null,
+    author: 'view',
+    reviewer: 'view',
     community: 'view'
   },
   vote_active: {
-    author: null,
-    reviewer: null,
+    author: 'view',
+    reviewer: 'view',
     community: 'view'
   },
   vote_closed: {
-    author: null,
-    reviewer: null,
+    author: 'view',
+    reviewer: 'view',
     community: 'view'
   }
 };
@@ -208,88 +232,113 @@ export async function generateSyncProposalPermissions({
   }
 
   if (communityPermissionSetting !== null) {
-    const newId = v4();
+    const proposalCategoryPermissions = proposal.categoryId
+      ? await prisma.proposalCategoryPermission.findMany({
+          where: {
+            proposalCategoryId: proposal.categoryId as string
+          }
+        })
+      : [];
 
-    createProposalPermissionArgs.push({
-      data: {
-        id: newId,
-        permissionLevel: communityPermissionSetting,
-        space: {
-          connect: {
-            id: proposal.spaceId
+    proposalCategoryPermissions.forEach((permission) => {
+      const permissionLevel = mapProposalPermissionToPagePermission({
+        maxPermission: communityPermissionSetting,
+        proposalPermission: permission.permissionLevel
+      });
+
+      // Avoid readding duplicate permissions for reviewers
+      const ignore = createProposalPermissionArgs.some(
+        (arg) => !!permission.roleId && arg.data.role?.connect?.id === permission.roleId
+      );
+
+      if (permissionLevel && !ignore) {
+        createProposalPermissionArgs.push({
+          data: {
+            id: v4(),
+            permissionLevel,
+            space: permission.spaceId
+              ? {
+                  connect: {
+                    id: proposal.spaceId
+                  }
+                }
+              : undefined,
+            role: permission.roleId ? { connect: { id: permission.roleId } } : undefined,
+            page: {
+              connect: {
+                id: page.id
+              }
+            }
           }
-        },
-        page: {
-          connect: {
-            id: page.id
-          }
-        }
+        });
       }
     });
   }
 
   children.forEach((child) => {
     createProposalPermissionArgs.forEach((permission) => {
-      const assignee: 'user' | 'role' | 'space' = permission.data.user
+      const assignee: 'user' | 'role' | 'space' | null = permission.data.user
         ? 'user'
         : permission.data.role
         ? 'role'
-        : 'space';
+        : permission.data.space
+        ? 'space'
+        : null;
 
-      const assigneeId = (
-        assignee === 'user'
-          ? permission.data.user?.connect?.id
-          : assignee === 'role'
-          ? permission.data.role?.connect?.id
-          : permission.data.space?.connect?.id
-      ) as string;
+      if (assignee) {
+        const assigneeId = (
+          assignee === 'user'
+            ? permission.data.user?.connect?.id
+            : assignee === 'role'
+            ? permission.data.role?.connect?.id
+            : permission.data.space?.connect?.id
+        ) as string;
 
-      const permissionLevel = permission.data.permissionLevel as PagePermissionLevel;
+        const permissionLevel = permission.data.permissionLevel as PagePermissionLevel;
 
-      const newId = v4();
+        const inheritId = permission.data.id as string;
 
-      const inheritId = permission.data.id as string;
-
-      createChildProposalPermissionArgs.push({
-        data: {
-          id: newId,
-          permissionLevel,
-          role:
-            assignee === 'role'
-              ? {
-                  connect: {
-                    id: assigneeId
+        createChildProposalPermissionArgs.push({
+          data: {
+            id: v4(),
+            permissionLevel,
+            role:
+              assignee === 'role'
+                ? {
+                    connect: {
+                      id: assigneeId
+                    }
                   }
-                }
-              : undefined,
-          user:
-            assignee === 'user'
-              ? {
-                  connect: {
-                    id: assigneeId
+                : undefined,
+            user:
+              assignee === 'user'
+                ? {
+                    connect: {
+                      id: assigneeId
+                    }
                   }
-                }
-              : undefined,
-          space:
-            assignee === 'space'
-              ? {
-                  connect: {
-                    id: assigneeId
+                : undefined,
+            space:
+              assignee === 'space'
+                ? {
+                    connect: {
+                      id: assigneeId
+                    }
                   }
-                }
-              : undefined,
-          page: {
-            connect: {
-              id: child.id
-            }
-          },
-          sourcePermission: {
-            connect: {
-              id: inheritId
+                : undefined,
+            page: {
+              connect: {
+                id: child.id
+              }
+            },
+            sourcePermission: {
+              connect: {
+                id: inheritId
+              }
             }
           }
-        }
-      });
+        });
+      }
     });
   });
 

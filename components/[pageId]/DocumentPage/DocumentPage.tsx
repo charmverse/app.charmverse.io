@@ -18,6 +18,7 @@ import type { FrontendParticipant } from 'components/common/CharmEditor/componen
 import { SnapshotVoteDetails } from 'components/common/CharmEditor/components/inlineVote/components/SnapshotVoteDetails';
 import VoteDetail from 'components/common/CharmEditor/components/inlineVote/components/VoteDetail';
 import ScrollableWindow from 'components/common/PageLayout/components/ScrollableWindow';
+import { useProposalPermissions } from 'components/proposals/hooks/useProposalPermissions';
 import { useBounties } from 'hooks/useBounties';
 import { useCharmEditor } from 'hooks/useCharmEditor';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
@@ -99,6 +100,9 @@ function DocumentPage({ page, setPage, insideModal, readOnly = false, parentProp
   const [containerRef, { width: containerWidth }] = useElementSize();
 
   const proposalId = page.proposalId || parentProposalId;
+
+  const proposalPermissions = useProposalPermissions({ proposalIdOrPath: proposalId as string });
+
   // We can only edit the proposal from the top level
   const readonlyProposalProperties = !page.proposalId || Boolean(parentProposalId) || readOnly;
 
@@ -244,6 +248,7 @@ function DocumentPage({ page, setPage, insideModal, readOnly = false, parentProp
                       vote={pageVote}
                       detailed={false}
                       isProposal={true}
+                      disableVote={!proposalPermissions?.vote}
                     />
                   </Box>
                 )}

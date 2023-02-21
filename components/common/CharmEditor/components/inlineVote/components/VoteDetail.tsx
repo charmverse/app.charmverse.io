@@ -43,6 +43,7 @@ export interface VoteDetailProps {
   deleteVote: (voteId: string) => Promise<void>;
   cancelVote: (voteId: string) => Promise<void>;
   updateDeadline: (voteId: string, deadline: Date) => Promise<void>;
+  disableVote?: boolean;
 }
 
 const StyledFormControl = styled(FormControl)`
@@ -62,7 +63,8 @@ export default function VoteDetail({
   updateDeadline,
   detailed = false,
   vote,
-  isProposal
+  isProposal,
+  disableVote
 }: VoteDetailProps) {
   const { deadline, totalVotes, description, id, title, userChoice, voteOptions, aggregatedResult } = vote;
   const { user } = useUser();
@@ -154,7 +156,7 @@ export default function VoteDetail({
             <FormControlLabel
               key={voteOption.name}
               control={<Radio size='small' />}
-              disabled={isVotingClosed(vote) || !user}
+              disabled={isVotingClosed(vote) || !user || !!disableVote}
               value={voteOption.name}
               label={
                 <Box display='flex' justifyContent='space-between' flexGrow={1}>

@@ -2,6 +2,7 @@ import { ProposalStatus } from '@prisma/client';
 
 import { prisma } from 'db';
 import { BasePermissions } from 'lib/permissions/basePermissions.class';
+import { computeProposalPermissions } from 'lib/permissions/proposals/computeProposalPermissions';
 import { hasSpaceWideProposalReviewerPermission } from 'lib/permissions/proposals/hasSpaceWideProposalReviewerPermission';
 import { isProposalAuthor } from 'lib/proposal/isProposalAuthor';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
@@ -52,16 +53,23 @@ async function discussionProposal({ proposal, userId }: GetFlagsInput): Promise<
   }
   return flags.operationFlags;
 }
-
+// Currently coupled to proposal permissions for review action
+// In future, when reviewing action, and review status transition are decoupled, this will need to be updated
 async function inReviewProposal({ proposal, userId }: GetFlagsInput): Promise<ProposalFlowFlags> {
   const flags = new TransitionFlags();
-  const isReviewer = await Promise.all([
-    isProposalReviewer({ proposal, userId }),
-    hasSpaceWideProposalReviewerPermission({
-      spaceId: proposal.spaceId,
-      userId
-    })
-  ]);
+
+  const permissions = await computeProposalPermissions({
+    resourceId: proposal.id,
+    userId
+  });
+
+  if (permissions.review) {
+    flags.addPermissions(['reviewed']);
+  }
+
+  if (isProposalAuthor({ proposal, userId })) {
+    flags.addPermissions(['discussion']);
+  }
 
   const isAdmin = (
     await hasAccessToSpace({
@@ -70,14 +78,6 @@ async function inReviewProposal({ proposal, userId }: GetFlagsInput): Promise<Pr
     })
   ).isAdmin;
 
-  if (isReviewer.some((v) => v === true) && proposal.reviewers.length > 0) {
-    flags.addPermissions(['reviewed']);
-  }
-
-  if (isProposalAuthor({ proposal, userId })) {
-    flags.addPermissions(['discussion']);
-  }
-
   if (isAdmin) {
     flags.addPermissions(['discussion', 'reviewed']);
   }
@@ -85,14 +85,20 @@ async function inReviewProposal({ proposal, userId }: GetFlagsInput): Promise<Pr
   return flags.operationFlags;
 }
 
+// Currently coupled to proposal permissions for create_vote action
+// In future, when create_vote action, and vote_active status transition are decoupled, this will need to be updated
 async function reviewedProposal({ proposal, userId }: GetFlagsInput): Promise<ProposalFlowFlags> {
   const flags = new TransitionFlags();
-  if (
-    isProposalAuthor({ proposal, userId }) ||
-    (await hasAccessToSpace({ spaceId: proposal.spaceId, userId, adminOnly: true })).isAdmin
-  ) {
+
+  const permissions = await computeProposalPermissions({
+    resourceId: proposal.id,
+    userId
+  });
+
+  if (permissions.create_vote) {
     flags.addPermissions(['vote_active']);
   }
+
   return flags.operationFlags;
 }
 export async function computeProposalFlowFlags({
