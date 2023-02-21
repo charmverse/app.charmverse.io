@@ -56,19 +56,22 @@ async function discussionProposal({ proposal, userId }: GetFlagsInput): Promise<
 async function inReviewProposal({ proposal, userId }: GetFlagsInput): Promise<ProposalFlowFlags> {
   const flags = new TransitionFlags();
 
-  const hasReviewerAbility = (
-    await Promise.all([
-      isProposalReviewer({ proposal, userId }),
-      hasSpaceWideProposalReviewerPermission({
-        spaceId: proposal.spaceId,
-        userId
-      })
-    ])
-  ).some((value) => value === true);
+  const hasReviewerAbility = await Promise.all([
+    isProposalReviewer({ proposal, userId }),
+    hasSpaceWideProposalReviewerPermission({
+      spaceId: proposal.spaceId,
+      userId
+    })
+  ]);
 
-  if (hasReviewerAbility) {
+  if (hasReviewerAbility.some((value) => value === true)) {
     flags.addPermissions(['reviewed']);
   }
+
+  if (hasReviewerAbility[1] === true || isProposalAuthor({ proposal, userId })) {
+    flags.addPermissions(['discussion']);
+  }
+
   return flags.operationFlags;
 }
 

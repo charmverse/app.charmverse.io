@@ -20,6 +20,7 @@ import { useProposalPermissions } from 'components/proposals/hooks/useProposalPe
 import CreateVoteModal from 'components/votes/components/CreateVoteModal';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useMembers } from 'hooks/useMembers';
+import { usePagePermissions } from 'hooks/usePagePermissions';
 import useRoles from 'hooks/useRoles';
 import { useUser } from 'hooks/useUser';
 import type { Member } from 'lib/members/interfaces';
@@ -47,7 +48,10 @@ export function ProposalProperties({ pageId, proposalId, readOnly, isTemplate }:
     proposalIdOrPath: proposalId
   });
 
-  const { permissions: proposalFlowFlags } = useProposalFlowFlags({ proposalId });
+  const { permissions: proposalFlowFlags, refresh: refreshProposalFlowFlags } = useProposalFlowFlags({ proposalId });
+  const { permissions: pagePermissions, refresh: refreshPagePermissions } = usePagePermissions({
+    pageIdOrPath: pageId
+  });
 
   const { members } = useMembers();
   const { roles = [], roleups } = useRoles();
@@ -137,13 +141,13 @@ export function ProposalProperties({ pageId, proposalId, readOnly, isTemplate }:
       categoryId: updatedCategory?.id || null
     });
 
-    refreshProposal();
+    await refreshProposal();
   }
 
   async function updateProposalStatus(newStatus: ProposalStatus) {
     if (proposal && newStatus !== proposal.status) {
       await charmClient.proposals.updateStatus(proposal.id, newStatus);
-      await refreshProposal();
+      await Promise.all([refreshProposal(), refreshProposalFlowFlags(), refreshPagePermissions()]);
       mutateTasks();
     }
   }
