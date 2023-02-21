@@ -15,7 +15,7 @@ import charmClient from 'charmClient';
 import { useAppDispatch } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { initialLoad } from 'components/common/BoardEditor/focalboard/src/store/initialLoad';
 import Button from 'components/common/Button';
-import { ImportZippedMarkdown } from 'components/common/CharmEditor/components/markdownParser/ImportZippedMarkdown';
+import { ImportZippedMarkdown } from 'components/common/ImportZippedMarkdown';
 import Modal from 'components/common/Modal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
@@ -33,7 +33,7 @@ interface NotionResponseState {
   failedImports?: FailedImportsError[];
 }
 
-export default function ImportNotionWorkspace() {
+export default function ImportContent() {
   const [notionState, setNotionState] = useState<NotionResponseState>({ loading: false });
   const { showMessage } = useSnackbar();
   const router = useRouter();
@@ -102,31 +102,27 @@ export default function ImportNotionWorkspace() {
 
   return (
     <div>
-      <Grid container spacing={2}>
-        <Grid item md={4} xs={12}>
-          <Button
-            disabled={!isAdmin}
-            disabledTooltip='Only admins can import content from Notion'
-            loading={notionState.loading}
-            href={generateNotionImportRedirectUrl({
-              spaceDomain: space?.domain as string,
-              origin: window?.location.origin
-            })}
-            variant='outlined'
-            startIcon={
-              <SvgIcon sx={{ color: 'text.primary' }}>
-                <NotionIcon />
-              </SvgIcon>
-            }
-          >
-            {notionState.loading ? 'Importing pages from Notion' : 'Import pages from Notion'}
-          </Button>
-        </Grid>
-        <Grid item md={4} xs={12}>
-          {/** This button handles all logic for uploading the markdown files */}
-          <ImportZippedMarkdown />
-        </Grid>
-      </Grid>
+      <Box display='flex' flexDirection={{ xs: 'column', md: 'row' }} gap={2}>
+        <Button
+          disabled={!isAdmin}
+          disabledTooltip='Only admins can import content from Notion'
+          loading={notionState.loading}
+          href={generateNotionImportRedirectUrl({
+            spaceDomain: space?.domain as string,
+            origin: window?.location.origin
+          })}
+          variant='outlined'
+          startIcon={
+            <SvgIcon sx={{ color: 'text.primary' }}>
+              <NotionIcon />
+            </SvgIcon>
+          }
+        >
+          {notionState.loading ? 'Importing pages from Notion' : 'Import pages from Notion'}
+        </Button>
+        {/** This button handles all logic for uploading the markdown files */}
+        <ImportZippedMarkdown />
+      </Box>
 
       <Modal open={modalOpen} onClose={closeModal} size='fluid'>
         <Box display='flex' alignItems='center' gap={2} flexDirection='column'>

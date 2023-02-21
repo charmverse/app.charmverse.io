@@ -2,8 +2,7 @@ import type { Block } from '@prisma/client';
 import { validate } from 'uuid';
 
 import { prisma } from 'db';
-import { generateMarkdown } from 'lib/pages/generateMarkdown';
-import type { PageContent } from 'lib/prosemirror/interfaces';
+import { generateMarkdown } from 'lib/prosemirror/plugins/markdown/generateMarkdown';
 import { InvalidInputError } from 'lib/utilities/errors';
 import { filterObjectKeys } from 'lib/utilities/objects';
 
@@ -49,13 +48,10 @@ export async function getPageInBoard(pageId: string): Promise<Page> {
 
   const cardToReturn = new PageFromBlock(card, boardSchema);
 
-  cardToReturn.content.markdown = await generateMarkdown(
-    {
-      title: cardPage.title,
-      content: cardPage.content
-    },
-    true
-  );
+  cardToReturn.content.markdown = await generateMarkdown({
+    title: cardPage.title,
+    content: cardPage.content
+  });
 
   return cardToReturn;
 }
