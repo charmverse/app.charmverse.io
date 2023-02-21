@@ -34,7 +34,6 @@ import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useSpaceFromPath } from 'hooks/useSpaceFromPath';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
-import { shortWalletAddress } from 'lib/utilities/strings';
 
 import WorkspaceAvatar from '../PageLayout/components/Sidebar/WorkspaceAvatar';
 
@@ -137,7 +136,7 @@ function SpaceSettingsModalComponent() {
             sx={{ backgroundColor: (theme) => theme.palette.sidebar.background }}
           >
             <Typography p='10px' variant='body1'>
-              {shortWalletAddress(user?.username)}
+              {user?.username}
             </Typography>
             <TreeView
               aria-label='Profile settings tree view'
@@ -236,10 +235,9 @@ function SpaceSettingsModalComponent() {
             onClick={onClose}
             sx={{
               position: 'absolute',
-              right: 15,
-              top: 10,
-              zIndex: 1,
-              '&:hover': { backgroundColor: 'transparent' }
+              right: 10,
+              top: 5,
+              zIndex: 1
             }}
           >
             Close

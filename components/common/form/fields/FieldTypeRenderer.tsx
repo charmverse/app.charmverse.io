@@ -11,20 +11,20 @@ type Props = {
   ControlFieldProps;
 
 export const FieldTypeRenderer = forwardRef<HTMLDivElement, Props>(
-  ({ type, options, onCreateOption, onDeleteOption, onUpdateOption, customOnChange, ...fieldProps }: Props, ref) => {
+  ({ type, options, onCreateOption, onDeleteOption, onUpdateOption, ...fieldProps }: Props, ref) => {
     switch (type) {
       case 'text':
       case 'phone':
       case 'url':
       case 'name':
       case 'email': {
-        return <TextInputField {...fieldProps} customOnChange={customOnChange} ref={ref} />;
+        return <TextInputField {...fieldProps} ref={ref} />;
       }
       case 'text_multiline': {
-        return <TextInputField {...fieldProps} customOnChange={customOnChange} ref={ref} multiline rows={3} />;
+        return <TextInputField {...fieldProps} ref={ref} multiline rows={3} />;
       }
       case 'number': {
-        return <NumberInputField {...fieldProps} customOnChange={customOnChange} ref={ref} />;
+        return <NumberInputField {...fieldProps} ref={ref} />;
       }
 
       case 'select': {
@@ -36,7 +36,6 @@ export const FieldTypeRenderer = forwardRef<HTMLDivElement, Props>(
             onCreateOption={onCreateOption}
             onDeleteOption={onDeleteOption}
             onUpdateOption={onUpdateOption}
-            customOnChange={customOnChange}
           />
         );
       }
@@ -51,7 +50,6 @@ export const FieldTypeRenderer = forwardRef<HTMLDivElement, Props>(
             onCreateOption={onCreateOption}
             onDeleteOption={onDeleteOption}
             onUpdateOption={onUpdateOption}
-            customOnChange={customOnChange}
           />
         );
       }

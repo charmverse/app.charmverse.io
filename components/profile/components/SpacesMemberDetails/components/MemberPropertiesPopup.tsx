@@ -1,12 +1,13 @@
 import { useTheme } from '@emotion/react';
 import { Box, Dialog, DialogContent, useMediaQuery } from '@mui/material';
 import type { ReactNode } from 'react';
-import { useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
-import { getFieldRendererConfig } from 'components/common/form/fields/getFieldRendererConfig';
+import { FieldTypeRenderer } from 'components/common/form/fields/FieldTypeRenderer';
+import { getFieldTypeRules } from 'components/common/form/fields/util';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { DialogTitle } from 'components/common/Modal';
 import { useMutateMemberPropertyValues } from 'components/profile/components/SpacesMemberDetails/components/useMutateMemberPropertyValues';
@@ -16,6 +17,7 @@ import type {
   PropertyValueWithDetails,
   UpdateMemberPropertyValuePayload
 } from 'lib/members/interfaces';
+import debounce from 'lib/utilities/debounce';
 
 type Props = {
   spaceId: string | null;
@@ -84,9 +86,12 @@ export function MemberPropertiesPopup({
     await updateMemberPropertyValues(spaceId, updateData);
   };
 
-  const customOnChange = async (property: PropertyValueWithDetails, option: any) => {
-    await onSubmit({ ...getValues(), [property.memberPropertyId]: option });
-  };
+  const handleOnChange = useCallback(
+    debounce(async (propertyId: string, option: any) => {
+      await onSubmit({ ...getValues(), [propertyId]: option });
+    }, 300),
+    []
+  );
 
   function onClickClose() {
     // refresh members only after all the editing is finished
@@ -114,31 +119,33 @@ export function MemberPropertiesPopup({
           <DialogTitle sx={{ '&&': { px: 2, py: 2 } }} onClose={onClickClose}>
             {title}
           </DialogTitle>
-          <DialogContent dividers>
+          <DialogContent dividers sx={{ pb: 6 }}>
             {children}
             <Box display='flex' flexDirection='column'>
-              {data.map((property) => {
-                const fieldRendererConfig = getFieldRendererConfig({
-                  type: property.type,
-                  label: property.name,
-                  error: errors[property.memberPropertyId] as any,
-                  options: property.options,
-                  onCreateOption: (option) => createOption(property, option),
-                  onUpdateOption: (option) => updateOption(property, option),
-                  onDeleteOption: (option) => deleteOption(property, option),
-                  customOnChange: (option) => customOnChange(property, option)
-                });
-
-                return fieldRendererConfig.renderer ? (
-                  <Controller
-                    key={property.memberPropertyId}
-                    name={property.memberPropertyId}
-                    control={control}
-                    rules={fieldRendererConfig.rules}
-                    render={fieldRendererConfig.renderer}
-                  />
-                ) : null;
-              })}
+              {data.map((property) => (
+                <Controller
+                  key={property.memberPropertyId}
+                  name={property.memberPropertyId}
+                  control={control}
+                  rules={getFieldTypeRules(property.type)}
+                  render={({ field }) => (
+                    <FieldTypeRenderer
+                      {...field}
+                      type={property.type}
+                      label={property.name}
+                      options={property.options}
+                      error={errors[property.memberPropertyId] as any}
+                      onCreateOption={(option) => createOption(property, option)}
+                      onUpdateOption={(option) => updateOption(property, option)}
+                      onDeleteOption={(option) => deleteOption(property, option)}
+                      onChange={(e) => {
+                        field.onChange(e);
+                        handleOnChange(property.memberPropertyId, e?.target?.value ? e.target.value : e);
+                      }}
+                    />
+                  )}
+                />
+              ))}
             </Box>
             {postComponent}
           </DialogContent>

@@ -7,22 +7,10 @@ import type { ControlFieldProps, FieldProps } from 'components/common/form/inter
 type Props = ControlFieldProps & FieldProps & { multiline?: boolean; rows?: number };
 
 export const TextInputField = forwardRef<HTMLDivElement, Props>(
-  ({ label, iconLabel, inline, error, multiline = false, customOnChange, onChange, ...inputProps }, ref) => {
-    const onChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
-      onChange(event);
-      customOnChange?.(event.target.value);
-    };
-
+  ({ label, iconLabel, inline, error, multiline = false, ...inputProps }, ref) => {
     return (
       <FieldWrapper label={label} inline={inline} iconLabel={iconLabel}>
-        <TextField
-          fullWidth
-          error={!!error}
-          multiline={multiline}
-          onChange={onChangeHandler}
-          {...inputProps}
-          ref={ref}
-        />
+        <TextField fullWidth error={!!error} multiline={multiline} {...inputProps} ref={ref} />
       </FieldWrapper>
     );
   }

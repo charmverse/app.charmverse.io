@@ -1,27 +1,9 @@
-import type { JSXElementConstructor, ReactElement } from 'react';
 import type { RegisterOptions } from 'react-hook-form';
 
-import { FieldTypeRenderer } from 'components/common/form/fields/FieldTypeRenderer';
-import type { ControlFieldProps, FieldProps, FieldType } from 'components/common/form/interfaces';
+import type { FieldType } from 'components/common/form/interfaces';
 import { isValidUrl } from 'lib/utilities/isValidUrl';
 
-type Props = {
-  type: FieldType;
-} & FieldProps;
-
-type FieldRenderedConfig = {
-  rules: RegisterOptions;
-  renderer: (fieldProps: { field: ControlFieldProps }) => ReactElement<any, string | JSXElementConstructor<any>>;
-};
-
-export function getFieldRendererConfig({ type, ...fieldProps }: Props): FieldRenderedConfig {
-  return {
-    rules: getFieldTypeRules(type),
-    renderer: ({ field }: { field: ControlFieldProps }) => <FieldTypeRenderer {...field} {...fieldProps} type={type} />
-  };
-}
-
-function getFieldTypeRules(type: FieldType): RegisterOptions {
+export function getFieldTypeRules(type: FieldType): RegisterOptions {
   // return validation rules for field like email etc
   switch (type) {
     case 'number': {
