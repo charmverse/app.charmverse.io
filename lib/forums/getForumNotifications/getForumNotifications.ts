@@ -1,40 +1,88 @@
-import type { Space, User } from '@prisma/client';
+import type { Post, PostComment, Space, User } from '@prisma/client';
 
 import { prisma } from 'db';
+import { timeAgo } from 'lib/utilities/dates';
 import { shortenHex } from 'lib/utilities/strings';
 import { isTruthy } from 'lib/utilities/types';
 
-import type { ForumTask, ForumTasksGroup } from '../comments/interface';
-
+import { getNewPosts } from './getNewPosts';
 import { getPostCommentMentions } from './getPostCommentMentions';
 import { getPostComments } from './getPostComments';
 import { getPostMentions } from './getPostMentions';
+
+export type ForumTask = {
+  spaceId: string;
+  spaceDomain: string;
+  spaceName: string;
+  postId: string;
+  postPath: string;
+  postTitle: string;
+  createdAt: string;
+  commentId: string | null;
+  mentionId: string | null;
+  commentText: string;
+  createdBy: User | null;
+};
+
+export type ForumTasksGroup = {
+  marked: ForumTask[];
+  unmarked: ForumTask[];
+};
 
 type SpaceRecord = Record<string, Pick<Space, 'name' | 'domain' | 'id'>>;
 
 export type ForumNotificationsInput = {
   userId: string;
-  spaceIds: string[];
-  spaceRecord: SpaceRecord;
+  spacesRecord: SpaceRecord;
   username: string;
+  posts: (Post & {
+    comments: Pick<PostComment, 'id' | 'createdAt' | 'createdBy' | 'content' | 'contentText' | 'parentId' | 'postId'>[];
+  })[];
 };
 
-type ForumDiscussionTask = Omit<ForumTask, 'createdBy'> & { userId: string };
+export type UnpopulatedForumTask = Omit<ForumTask, 'createdBy'> & { userId: string };
 
 export type ForumNotifications = {
-  mentions: ForumDiscussionTask[];
+  mentions: UnpopulatedForumTask[];
   discussionUserIds: string[];
-  comments: ForumDiscussionTask[];
+  comments: UnpopulatedForumTask[];
 };
 
+const lookback = timeAgo({ months: 1 });
+
 export async function getForumNotifications(userId: string): Promise<ForumTasksGroup> {
-  // Get all the space the user is part of
-  const spaceRoles = await prisma.spaceRole.findMany({
+  // Get the user's spaces, posts and comments from those spaces. TODO: we should only get comments created by the user first
+  const forumDataBySpace = await prisma.spaceRole.findMany({
     where: {
       userId
     },
-    select: {
-      spaceId: true
+    include: {
+      space: {
+        include: {
+          posts: {
+            where: {
+              deletedAt: null
+            },
+            include: {
+              category: true,
+              comments: {
+                where: {
+                  deletedAt: null
+                },
+                select: {
+                  id: true,
+                  createdBy: true,
+                  content: true,
+                  parentId: true,
+                  postId: true,
+                  contentText: true,
+                  createdAt: true
+                }
+              }
+            }
+          }
+        }
+      }
     }
   });
 
@@ -50,23 +98,9 @@ export async function getForumNotifications(userId: string): Promise<ForumTasksG
 
   const username = user?.username ?? shortenHex(userId);
 
-  // Array of space ids the user is part of
-  const spaceIds = spaceRoles.map((spaceRole) => spaceRole.spaceId);
+  const spaces = forumDataBySpace.map(({ space }) => space);
 
-  const spaces = await prisma.space.findMany({
-    where: {
-      id: {
-        in: spaceIds
-      }
-    },
-    select: {
-      domain: true,
-      id: true,
-      name: true
-    }
-  });
-
-  const spaceRecord = spaces.reduce<SpaceRecord>((acc, space) => {
+  const spacesRecord = spaces.reduce<SpaceRecord>((acc, space) => {
     return {
       ...acc,
       [space.id]: space
@@ -75,6 +109,9 @@ export async function getForumNotifications(userId: string): Promise<ForumTasksG
 
   const notifications = await prisma.userNotification.findMany({
     where: {
+      createdAt: {
+        gte: lookback
+      },
       userId,
       type: {
         in: ['post_comment', 'mention']
@@ -87,26 +124,27 @@ export async function getForumNotifications(userId: string): Promise<ForumTasksG
 
   // Get the marked comment/mention task ids (all the discussion type tasks that exist in the db)
   const notifiedTaskIds = new Set(notifications.map((notification) => notification.taskId));
+  const posts = spaces.flatMap((space) => space.posts);
 
-  const context: ForumNotificationsInput = { userId, username, spaceRecord, spaceIds };
+  const context: ForumNotificationsInput = { userId, username, spacesRecord, posts };
 
-  const { mentions, discussionUserIds, comments } = await Promise.all([
+  const newPosts = await getNewPosts({ userId, posts, spacesRecord });
+
+  // aggregate the results
+  const { mentions, discussionUserIds, comments } = [
     getPostComments(context),
     getPostMentions(context),
     getPostCommentMentions(context)
-  ]).then((results) => {
-    // aggregate the results
-    return results.reduce(
-      (acc, result) => {
-        return {
-          mentions: acc.mentions.concat(result.mentions),
-          discussionUserIds: acc.discussionUserIds.concat(result.discussionUserIds),
-          comments: acc.comments.concat(result.comments)
-        };
-      },
-      { mentions: [], discussionUserIds: [], comments: [] }
-    );
-  });
+  ].reduce(
+    (acc, result) => {
+      return {
+        mentions: acc.mentions.concat(result.mentions),
+        discussionUserIds: acc.discussionUserIds.concat(result.discussionUserIds),
+        comments: acc.comments.concat(result.comments)
+      };
+    },
+    { mentions: [], discussionUserIds: [], comments: [] }
+  );
 
   const commentIdsFromMentions = Object.values(mentions)
     .map((item) => item.commentId)

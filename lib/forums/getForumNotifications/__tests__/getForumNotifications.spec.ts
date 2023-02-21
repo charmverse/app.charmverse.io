@@ -62,17 +62,17 @@ describe('getForumNotifications', () => {
       categoryId: newCategory.id
     });
 
-    const firstComment = await generateForumComment({
+    const topLevelComment = await generateForumComment({
       postId: post.id,
       createdBy: postCommenter.id,
-      parentId: v4(),
+      parentId: null,
       contentText: 'First comment'
     });
 
     const secondComment = await generateForumComment({
       postId: post.id,
       createdBy: postCommenter2.id,
-      parentId: firstComment.id,
+      parentId: topLevelComment.id,
       contentText: 'Second comment'
     });
 
@@ -81,14 +81,14 @@ describe('getForumNotifications', () => {
     );
 
     // Both comments should be unmarked
-    expect(
-      newNotifications.find((notif) => notif.commentId === firstComment.id && notif.postId === post.id)
-    ).toBeTruthy();
-    expect(
-      newNotifications.find((notif) => notif.commentId === secondComment.id && notif.postId === post.id)
-    ).toBeTruthy();
+    expect(newNotifications.some((notif) => notif.commentId === topLevelComment.id && notif.postId === post.id)).toBe(
+      true
+    );
+    expect(newNotifications.some((notif) => notif.commentId === secondComment.id && notif.postId === post.id)).toBe(
+      false
+    );
 
-    expect(newNotifications.length === 2).toBeTruthy();
-    expect(markedNotifications.length === 0).toBeTruthy();
+    expect(newNotifications.length).toBe(1);
+    expect(markedNotifications.length).toBe(0);
   });
 });

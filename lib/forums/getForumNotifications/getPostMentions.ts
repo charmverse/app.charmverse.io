@@ -1,34 +1,15 @@
-import { prisma } from 'db';
 import { extractMentions } from 'lib/prosemirror/extractMentions';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import type { ForumNotificationsInput, ForumNotifications } from './getForumNotifications';
 import { getPropertiesFromPost } from './utils';
 
-export async function getPostMentions({
+export function getPostMentions({
   userId,
   username,
-  spaceIds,
-  spaceRecord
-}: ForumNotificationsInput): Promise<ForumNotifications> {
-  // Get all the pages of all the spaces this user is part of
-  const posts = await prisma.post.findMany({
-    where: {
-      spaceId: {
-        in: spaceIds
-      },
-      deletedAt: null
-    },
-    select: {
-      content: true,
-      id: true,
-      path: true,
-      title: true,
-      createdBy: true,
-      spaceId: true
-    }
-  });
-
+  spacesRecord,
+  posts
+}: ForumNotificationsInput): ForumNotifications {
   const mentions: ForumNotifications['mentions'] = [];
   const discussionUserIds: string[] = [];
 
@@ -41,7 +22,7 @@ export async function getPostMentions({
         if (mention.value === userId && mention.createdBy !== userId) {
           discussionUserIds.push(mention.createdBy);
           mentions.push({
-            ...getPropertiesFromPost(post, spaceRecord),
+            ...getPropertiesFromPost(post, spacesRecord[post.spaceId]),
             mentionId: mention.id,
             createdAt: mention.createdAt,
             userId: mention.createdBy,

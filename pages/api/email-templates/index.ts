@@ -4,7 +4,7 @@ import { v4 } from 'uuid';
 import type { BountyTask } from 'lib/bounties/getBountyTasks';
 import type { DiscussionTask } from 'lib/discussion/interfaces';
 import * as emails from 'lib/emails/emails';
-import type { ForumTask } from 'lib/forums/comments/interface';
+import type { ForumTask } from 'lib/forums/getForumNotifications/getForumNotifications';
 import { onError, onNoMatch } from 'lib/middleware';
 import { getPagePath } from 'lib/pages/utils';
 import type { ProposalTask } from 'lib/proposal/getProposalTasksFromWorkspaceEvents';

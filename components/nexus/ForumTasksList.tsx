@@ -17,7 +17,7 @@ import Link from 'components/common/Link';
 import LoadingComponent from 'components/common/LoadingComponent';
 import UserDisplay from 'components/common/UserDisplay';
 import { useSettingsDialog } from 'hooks/useSettingsDialog';
-import type { ForumTask } from 'lib/forums/comments/interface';
+import type { ForumTask } from 'lib/forums/getForumNotifications/getForumNotifications';
 import { isTruthy } from 'lib/utilities/types';
 import type { GetTasksResponse } from 'pages/api/tasks/list';
 

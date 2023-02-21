@@ -253,7 +253,7 @@ model Space {
   memberPropertyValues          MemberPropertyValue[]
   userTokenGates                UserTokenGate[]
   postCategories                PostCategory[]
-  Post                          Post[]
+  posts                         Post[]
   userSpaceNotificationSettings UserSpaceNotificationSettings[]
   postCategoryPermissions       PostCategoryPermission[]
   webhookSubscriptionUrl        String?

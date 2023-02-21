@@ -6,7 +6,7 @@ import { BOUNTY_STATUS_COLORS, BOUNTY_STATUS_LABELS } from 'components/bounties/
 import { ProposalStatusColors } from 'components/proposals/components/ProposalStatusBadge';
 import type { BountyTask } from 'lib/bounties/getBountyTasks';
 import { DiscussionTask } from 'lib/discussion/interfaces';
-import { ForumTask } from 'lib/forums/comments/interface';
+import { ForumTask } from 'lib/forums/getForumNotifications/getForumNotifications';
 import type { GnosisSafeTasks } from 'lib/gnosis/gnosis.tasks';
 import log from 'lib/log';
 import type { ProposalTask } from 'lib/proposal/getProposalTasksFromWorkspaceEvents';
