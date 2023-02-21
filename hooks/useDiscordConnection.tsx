@@ -96,7 +96,7 @@ export function DiscordProvider({ children }: Props) {
           });
       }
     }
-  }, [user]);
+  }, [user, authCode]);
 
   const isConnected = connectedWithDiscord;
   const isLoading = !discordError && (!!authCode || isDisconnectingDiscord || isConnectDiscordLoading);
@@ -109,8 +109,7 @@ export function DiscordProvider({ children }: Props) {
       connect,
       error
     }),
-    // This connect deps is necessary otherwise setUser uses stale user
-    [isConnected, isLoading, error, connect]
+    [isConnected, isLoading, error]
   );
 
   return <DiscordConnectionContext.Provider value={value}>{children}</DiscordConnectionContext.Provider>;
