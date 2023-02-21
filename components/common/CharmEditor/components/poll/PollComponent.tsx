@@ -1,12 +1,12 @@
 import { FormatListBulleted } from '@mui/icons-material';
 import { useState } from 'react';
 
-import CreateVoteModal from 'components/votes/components/CreateVoteModal';
+import { CreateVoteModal } from 'components/votes/components/CreateVoteModal';
 import { useVotes } from 'hooks/useVotes';
 import type { ExtendedVote } from 'lib/votes/interfaces';
 
 import { EmptyEmbed } from '../common/EmptyEmbed';
-import VoteDetail from '../inlineVote/components/VoteDetail';
+import { VoteDetail } from '../inlineVote/components/VoteDetail';
 import type { CharmNodeViewProps } from '../nodeView/nodeView';
 
 export function PollNodeView({ node, readOnly, updateAttrs, selected, deleteNode }: CharmNodeViewProps) {

@@ -181,7 +181,7 @@ describe('computeProposalPermissions - base', () => {
 
     const permissions = await baseComputeProposalPermissions({
       resourceId: otherProposal.id,
-      userId: spaceMemberUser.id
+      userId: proposalReviewerByRole.id
     });
 
     const memberPermissions = proposalPermissionsMapping.full_access;

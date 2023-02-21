@@ -16,7 +16,7 @@ import { getCardComments } from 'components/common/BoardEditor/focalboard/src/st
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import type { FrontendParticipant } from 'components/common/CharmEditor/components/fiduswriter/collab';
 import { SnapshotVoteDetails } from 'components/common/CharmEditor/components/inlineVote/components/SnapshotVoteDetails';
-import VoteDetail from 'components/common/CharmEditor/components/inlineVote/components/VoteDetail';
+import { VoteDetail } from 'components/common/CharmEditor/components/inlineVote/components/VoteDetail';
 import ScrollableWindow from 'components/common/PageLayout/components/ScrollableWindow';
 import { useProposalPermissions } from 'components/proposals/hooks/useProposalPermissions';
 import { useBounties } from 'hooks/useBounties';
