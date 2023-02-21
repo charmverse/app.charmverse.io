@@ -32,7 +32,7 @@ export function SelectPreview({ value, options = [], name, size, emptyComponent 
                 size='small'
               />
             ))
-          : emptyComponent || 'N/A'}
+          : emptyComponent}
       </Stack>
     </Stack>
   );

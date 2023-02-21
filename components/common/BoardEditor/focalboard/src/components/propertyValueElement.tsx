@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { useIntl } from 'react-intl';
 
 import { SelectProperty } from 'components/common/BoardEditor/components/properties/SelectProperty/SelectProperty';
 import type { PropertyValueDisplayType } from 'components/common/BoardEditor/interfaces';
@@ -27,7 +26,6 @@ type Props = {
   updatedBy: string;
   updatedAt: string;
   propertyTemplate: IPropertyTemplate;
-  showEmptyPlaceholder: boolean;
   displayType?: PropertyValueDisplayType;
 };
 
@@ -36,17 +34,13 @@ function PropertyValueElement(props: Props): JSX.Element {
   const [serverValue, setServerValue] = useState(props.card.fields.properties[props.propertyTemplate.id] || '');
   const { formatDateTime, formatDate } = useDateFormatter();
 
-  const { card, propertyTemplate, readOnly, showEmptyPlaceholder, board, updatedBy, updatedAt, displayType } = props;
-  const intl = useIntl();
+  const { card, propertyTemplate, readOnly, board, updatedBy, updatedAt, displayType } = props;
   const propertyValue = card.fields.properties[propertyTemplate.id];
   const displayValue = OctoUtils.propertyDisplayValue(card, propertyValue, propertyTemplate, {
     date: formatDate,
     dateTime: formatDateTime
   });
-  const emptyDisplayValue = showEmptyPlaceholder
-    ? intl.formatMessage({ id: 'PropertyValueElement.empty', defaultMessage: 'Empty' })
-    : '';
-  const finalDisplayValue = displayValue || emptyDisplayValue;
+  const finalDisplayValue = displayValue;
 
   const editableFields: PropertyType[] = ['text', 'number', 'email', 'url', 'phone'];
   const latestUpdated = new Date(updatedAt).getTime() > new Date(card.updatedAt).getTime() ? 'page' : 'card';
@@ -126,7 +120,6 @@ function PropertyValueElement(props: Props): JSX.Element {
       <DateRange
         className='octo-propertyvalue'
         value={value.toString()}
-        showEmptyPlaceholder={showEmptyPlaceholder}
         onChange={(newValue) => {
           mutator.changePropertyValue(card, propertyTemplate.id, newValue);
         }}
@@ -137,7 +130,6 @@ function PropertyValueElement(props: Props): JSX.Element {
       <URLProperty
         value={value.toString()}
         readOnly={readOnly}
-        placeholder={emptyDisplayValue}
         onChange={setValue}
         onSave={() => {
           mutator.changePropertyValue(card, propertyTemplate.id, value);
@@ -172,7 +164,6 @@ function PropertyValueElement(props: Props): JSX.Element {
     return (
       <TextInput
         className='octo-propertyvalue'
-        placeholderText={emptyDisplayValue}
         readOnly={readOnly}
         value={value.toString()}
         autoExpand={false}

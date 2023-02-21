@@ -207,7 +207,6 @@ function TableRow(props: Props) {
               card={card}
               board={board}
               propertyTemplate={template}
-              showEmptyPlaceholder={true}
               updatedAt={pageUpdatedAt}
               updatedBy={pageUpdatedBy}
             />

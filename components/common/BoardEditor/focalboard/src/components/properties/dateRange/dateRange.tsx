@@ -19,7 +19,6 @@ import 'react-day-picker/lib/style.css';
 type Props = {
   className: string;
   value: string;
-  showEmptyPlaceholder?: boolean;
   onChange: (value: string) => void;
 };
 
@@ -48,7 +47,7 @@ export function createDatePropertyFromString(initialValue: string): DateProperty
 }
 
 function DateRange(props: Props): JSX.Element {
-  const { className, value, showEmptyPlaceholder, onChange } = props;
+  const { className, value, onChange } = props;
   const intl = useIntl();
   const popupState = usePopupState({ variant: 'popover', popupId: 'dateRangePopup' });
   const { formatDate } = useDateFormatter();
@@ -148,10 +147,7 @@ function DateRange(props: Props): JSX.Element {
     popupState.close();
   };
 
-  let buttonText = displayValue;
-  if (!buttonText && showEmptyPlaceholder) {
-    buttonText = intl.formatMessage({ id: 'DateRange.empty', defaultMessage: 'Empty' });
-  }
+  const buttonText = displayValue;
 
   return (
     <>

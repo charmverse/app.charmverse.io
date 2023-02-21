@@ -142,16 +142,7 @@ export function SelectProperty({
   if (!isOpened) {
     return (
       <SelectPreviewContainer onClick={onEdit} displayType={displayType}>
-        <SelectPreview
-          value={selectValue}
-          options={selectOptions}
-          size='small'
-          emptyComponent={
-            <Typography component='span' variant='subtitle2' sx={{ opacity: 0.4, pl: '2px' }}>
-              Empty
-            </Typography>
-          }
-        />
+        <SelectPreview value={selectValue} options={selectOptions} size='small' />
       </SelectPreviewContainer>
     );
   }
