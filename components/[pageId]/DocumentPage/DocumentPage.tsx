@@ -101,7 +101,7 @@ function DocumentPage({ page, setPage, insideModal, readOnly = false, parentProp
 
   const proposalId = page.proposalId || parentProposalId;
 
-  const proposalPermissions = useProposalPermissions({ proposalIdOrPath: proposalId as string });
+  const { permissions: proposalPermissions } = useProposalPermissions({ proposalIdOrPath: proposalId as string });
 
   // We can only edit the proposal from the top level
   const readonlyProposalProperties = !page.proposalId || Boolean(parentProposalId) || readOnly;
