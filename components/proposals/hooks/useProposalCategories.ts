@@ -43,5 +43,16 @@ export function useProposalCategories() {
     });
   }
 
-  return { isLoading: !categories, categories, addCategory, deleteCategory, mutateCategory };
+  function getCategoriesWithCreatePermission() {
+    return (categories ?? [])?.filter((c) => c.permissions.create_proposal);
+  }
+
+  return {
+    isLoading: !categories,
+    categories,
+    addCategory,
+    deleteCategory,
+    mutateCategory,
+    getCategoriesWithCreatePermission
+  };
 }

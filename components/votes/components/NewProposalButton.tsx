@@ -11,6 +11,7 @@ import Button from 'components/common/Button';
 import { usePageDialog } from 'components/common/PageDialog/hooks/usePageDialog';
 import { TemplatesMenu } from 'components/common/TemplatesMenu';
 import useTasks from 'components/nexus/hooks/useTasks';
+import { useProposalCategories } from 'components/proposals/hooks/useProposalCategories';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { useIsAdmin } from 'hooks/useIsAdmin';
@@ -27,6 +28,7 @@ export default function NewProposalButton({ mutateProposals }: { mutateProposals
   const currentSpace = useCurrentSpace();
   const [userSpacePermissions] = useCurrentSpacePermissions();
   const { showPage } = usePageDialog();
+  const { getCategoriesWithCreatePermission } = useProposalCategories();
   const isAdmin = useIsAdmin();
   const { mutatePagesRemove, mutatePage, pages } = usePages();
   const { mutate } = useTasks();
@@ -44,7 +46,7 @@ export default function NewProposalButton({ mutateProposals }: { mutateProposals
     }
   }, [pages]);
 
-  const canCreateProposal = !!userSpacePermissions?.createVote;
+  const canCreateProposal = getCategoriesWithCreatePermission().length > 0;
 
   async function deleteProposalTemplate(templateId: string) {
     await charmClient.deletePage(templateId);
