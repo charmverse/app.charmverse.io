@@ -8,9 +8,9 @@ import {
 } from 'testing/setupDatabase';
 import { generatePostCategory } from 'testing/utils/forums';
 
-import { getForumTasks } from '../getForumTasks';
+import { getForumNotifications } from '../getForumNotifications';
 
-describe('getForumTasks', () => {
+describe('getForumNotifications', () => {
   it('Should return new notifications from a user that replied directly to a comment', async () => {
     const postAuthorAndSpace = await generateUserAndSpaceWithApiToken();
     const postCommenter = await generateSpaceUser({ spaceId: postAuthorAndSpace.space.id, isAdmin: false });
@@ -37,7 +37,7 @@ describe('getForumTasks', () => {
       contentText: 'Second comment'
     });
 
-    const { unmarked: newNotifications, marked: markedNotifications } = await getForumTasks(postCommenter.id);
+    const { unmarked: newNotifications, marked: markedNotifications } = await getForumNotifications(postCommenter.id);
 
     // Second comment should have a parent and be a notification
     expect(
@@ -76,7 +76,9 @@ describe('getForumTasks', () => {
       contentText: 'Second comment'
     });
 
-    const { unmarked: newNotifications, marked: markedNotifications } = await getForumTasks(postAuthorAndSpace.user.id);
+    const { unmarked: newNotifications, marked: markedNotifications } = await getForumNotifications(
+      postAuthorAndSpace.user.id
+    );
 
     // Both comments should be unmarked
     expect(
