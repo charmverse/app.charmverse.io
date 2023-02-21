@@ -2,9 +2,9 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
-import type { ClientUserSpaceNotifications } from 'lib/profile/notifications/spaceNotifications';
-import { getUserSpaceNotifications } from 'lib/profile/notifications/spaceNotifications';
 import { withSessionRoute } from 'lib/session/withSession';
+import type { ClientUserSpaceNotifications } from 'lib/userNotifications/spaceNotifications';
+import { getUserSpaceNotifications } from 'lib/userNotifications/spaceNotifications';
 import { InvalidInputError } from 'lib/utilities/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });

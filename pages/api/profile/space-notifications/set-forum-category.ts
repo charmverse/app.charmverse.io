@@ -2,9 +2,9 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
-import type { SetForumCategoryNotificationInput } from 'lib/profile/notifications/setCategoryNotification';
-import { setForumCategoryNotification } from 'lib/profile/notifications/setCategoryNotification';
 import { withSessionRoute } from 'lib/session/withSession';
+import type { SetForumCategoryNotificationInput } from 'lib/userNotifications/setForumCategoryNotification';
+import { setForumCategoryNotification } from 'lib/userNotifications/setForumCategoryNotification';
 import { InvalidInputError } from 'lib/utilities/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });

@@ -2,8 +2,8 @@ import type { ProfileItem } from '@prisma/client';
 
 import * as http from 'adapters/http';
 import type { UserCommunity } from 'lib/profile';
-import type { SetForumCategoryNotificationInput } from 'lib/profile/notifications/setCategoryNotification';
-import type { ClientUserSpaceNotifications } from 'lib/profile/notifications/spaceNotifications';
+import type { SetForumCategoryNotificationInput } from 'lib/userNotifications/setForumCategoryNotification';
+import type { ClientUserSpaceNotifications } from 'lib/userNotifications/spaceNotifications';
 import type { UserAvatar } from 'lib/users/interfaces';
 import type { LoggedInUser } from 'models';
 
