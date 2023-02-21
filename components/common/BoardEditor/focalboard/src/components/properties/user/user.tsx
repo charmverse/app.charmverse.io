@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import { Popover } from '@mui/material';
+import { Popover, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import { bindPopover, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 
@@ -12,6 +12,7 @@ type Props = {
   value: string;
   readOnly: boolean;
   onChange: (value: string) => void;
+  showEmptyPlaceholder?: boolean;
 };
 
 const StyledUserPropertyContainer = styled(Box)`
@@ -19,8 +20,8 @@ const StyledUserPropertyContainer = styled(Box)`
   white-space: nowrap;
   text-overflow: ellipsis;
   width: 100%;
-  display: flex;
   height: 100%;
+  display: flex;
 `;
 
 function UserProperty(props: Props): JSX.Element | null {
@@ -47,13 +48,23 @@ function UserProperty(props: Props): JSX.Element | null {
 
   return (
     <>
-      <StyledUserPropertyContainer {...bindTrigger(popupState)}>
-        {memberMap[props.value] && (
+      {memberMap[props.value] ? (
+        <StyledUserPropertyContainer {...bindTrigger(popupState)}>
           <div className='UserProperty readonly octo-propertyvalue'>
             <UserDisplay user={memberMap[props.value]} avatarSize='xSmall' fontSize='small' />
           </div>
-        )}
-      </StyledUserPropertyContainer>
+        </StyledUserPropertyContainer>
+      ) : (
+        <Typography
+          {...bindTrigger(popupState)}
+          component='span'
+          variant='subtitle2'
+          className='octo-propertyvalue'
+          sx={{ opacity: 0.4, pl: '2px', width: '100%', height: '100%' }}
+        >
+          {props.showEmptyPlaceholder ? 'Empty' : ''}
+        </Typography>
+      )}
       <Popover
         {...bindPopover(popupState)}
         PaperProps={{
