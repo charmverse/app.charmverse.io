@@ -10,7 +10,7 @@ import { isTouchScreen } from 'lib/utilities/browser';
 import { lowerCaseEqual } from 'lib/utilities/strings';
 
 interface Props {
-  signSuccess: (authSig: AuthSig) => void | Promise<void>;
+  signSuccess: (authSig: AuthSig) => void | Promise<any>;
   buttonStyle?: SxProps<Theme>;
   ButtonComponent?: typeof PrimaryButton;
   buttonSize?: 'small' | 'medium' | 'large';
