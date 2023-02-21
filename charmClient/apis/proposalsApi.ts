@@ -1,8 +1,9 @@
 import type { ProposalStatus } from '@prisma/client';
 
 import * as http from 'adapters/http';
-import type { IPageWithPermissions } from 'lib/pages';
+import type { IPageWithPermissions, PageWithProposal } from 'lib/pages';
 import type { ProposalCategoryWithPermissions } from 'lib/permissions/proposals/interfaces';
+import type { CreateProposalInput } from 'lib/proposal/createProposal';
 import type { CreateProposalFromTemplateInput } from 'lib/proposal/createProposalFromTemplate';
 import type { ListProposalsRequest } from 'lib/proposal/getProposalsBySpace';
 import type { ProposalCategory, ProposalWithUsers } from 'lib/proposal/interface';
@@ -10,6 +11,10 @@ import type { ProposalFlowFlags } from 'lib/proposal/state/transition';
 import type { UpdateProposalRequest } from 'lib/proposal/updateProposal';
 
 export class ProposalsApi {
+  createProposal({ pageProps, proposalProps }: CreateProposalInput) {
+    return http.POST<PageWithProposal>('/api/proposals', { pageProps, proposalProps });
+  }
+
   updateProposal({ proposalId, authors, reviewers, categoryId }: UpdateProposalRequest) {
     return http.PUT(`/api/proposals/${proposalId}`, { authors, reviewers, categoryId });
   }

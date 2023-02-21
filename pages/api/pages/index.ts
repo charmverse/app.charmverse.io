@@ -34,6 +34,10 @@ async function createPageHandler(req: NextApiRequest, res: NextApiResponse<IPage
     throw new InvalidInputError('A space id is required to create a page');
   }
 
+  if (data.type.match('proposal')) {
+    throw new InvalidInputError('You cannot create a proposal using this endpoint');
+  }
+
   const { id: userId } = req.session.user;
 
   const permissions = await computeSpacePermissions({
@@ -42,9 +46,7 @@ async function createPageHandler(req: NextApiRequest, res: NextApiResponse<IPage
     userId
   });
 
-  if (data.type === 'proposal' && !permissions.createVote) {
-    throw new UnauthorisedActionError('You do not have permission to create a page in this space');
-  } else if (data.type !== 'proposal' && !permissions.createPage) {
+  if (!permissions.createPage) {
     throw new UnauthorisedActionError('You do not have permissions to create a page.');
   }
 
@@ -54,25 +56,13 @@ async function createPageHandler(req: NextApiRequest, res: NextApiResponse<IPage
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { createdBy, spaceId: droppedSpaceId, ...pageCreationData } = data;
 
-  let page: Page;
-
-  if (pageCreationData.type === 'proposal_template') {
-    throw new UnauthorisedActionError('You cannot create a proposal template using this endpoint.');
-  } else if (pageCreationData.type === 'proposal') {
-    ({ page } = await createProposal({
-      ...pageCreationData,
+  const page: Page = await createPage({
+    data: {
       spaceId,
-      createdBy
-    }));
-  } else {
-    page = await createPage({
-      data: {
-        spaceId,
-        createdBy,
-        ...pageCreationData
-      }
-    });
-  }
+      createdBy,
+      ...pageCreationData
+    }
+  });
 
   try {
     const proposalIdForPermissions = page.parentId

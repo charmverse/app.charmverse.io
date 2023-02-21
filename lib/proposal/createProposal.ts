@@ -16,9 +16,11 @@ type OptionalPageProps = 'content' | 'contentText' | 'id' | 'title';
 type ProposalPageInput = Pick<Prisma.PageUncheckedCreateInput, PageProps> &
   Partial<Pick<Prisma.PageUncheckedCreateInput, OptionalPageProps>>;
 
-type ProposalInput = { reviewers: { roleId?: string; userId?: string }[]; categoryId: string | null };
+type ProposalInput = { reviewers?: { roleId?: string; userId?: string }[]; categoryId: string };
 
-export async function createProposal(pageProps: ProposalPageInput, proposalProps?: ProposalInput) {
+export type CreateProposalInput = { pageProps: ProposalPageInput; proposalProps: ProposalInput };
+
+export async function createProposal({ pageProps, proposalProps }: CreateProposalInput) {
   const { createdBy, id: pageId, spaceId } = pageProps;
 
   const proposalId = pageId ?? uuid();
@@ -69,21 +71,28 @@ export async function createProposal(pageProps: ProposalPageInput, proposalProps
         // Add page creator as the proposal's first author
         createdBy,
         id: proposalId,
-        spaceId,
+        space: { connect: { id: spaceId } },
         status: proposalStatus,
-        categoryId: proposalProps?.categoryId || null,
+        category: { connect: { id: proposalProps.categoryId } },
         authors: {
           create: {
             userId: createdBy
           }
         },
-        ...(proposalProps?.reviewers && {
-          reviewers: {
-            createMany: {
-              data: proposalProps.reviewers
+        ...(proposalProps?.reviewers
+          ? {
+              reviewers: {
+                createMany: {
+                  data: proposalProps.reviewers
+                }
+              }
             }
-          }
-        })
+          : {})
+      },
+      include: {
+        authors: true,
+        reviewers: true,
+        category: true
       }
     }),
     upsertPage(),

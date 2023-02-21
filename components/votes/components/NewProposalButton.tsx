@@ -18,11 +18,10 @@ import { useIsAdmin } from 'hooks/useIsAdmin';
 import { usePages } from 'hooks/usePages';
 import { useUser } from 'hooks/useUser';
 import type { PageMeta } from 'lib/pages';
-import { addPage } from 'lib/pages/addPage';
 import type { ProposalWithUsers } from 'lib/proposal/interface';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
-export default function NewProposalButton({ mutateProposals }: { mutateProposals: KeyedMutator<ProposalWithUsers[]> }) {
+export function NewProposalButton({ mutateProposals }: { mutateProposals: KeyedMutator<ProposalWithUsers[]> }) {
   const router = useRouter();
   const { user } = useUser();
   const currentSpace = useCurrentSpace();
@@ -91,24 +90,29 @@ export default function NewProposalButton({ mutateProposals }: { mutateProposals
 
   async function onClickCreate() {
     if (currentSpace && user) {
-      const { page: newPage } = await addPage({
-        spaceId: currentSpace.id,
-        createdBy: user.id,
-        type: 'proposal'
+      const createdProposal = await charmClient.proposals.createProposal({
+        pageProps: {
+          spaceId: currentSpace.id,
+          createdBy: user.id
+        },
+        proposalProps: {
+          categoryId: getCategoriesWithCreatePermission()[0].id
+        }
       });
 
-      mutatePage(newPage);
+      const { proposal, ...page } = createdProposal;
+      mutatePage(page);
 
       mutateProposals();
       mutate();
       showPage({
-        pageId: newPage.id,
+        pageId: page.id,
         onClose() {
           setUrlWithoutRerender(router.pathname, { id: null });
           mutateProposals();
         }
       });
-      setUrlWithoutRerender(router.pathname, { id: newPage.id });
+      setUrlWithoutRerender(router.pathname, { id: page.id });
     }
   }
 
