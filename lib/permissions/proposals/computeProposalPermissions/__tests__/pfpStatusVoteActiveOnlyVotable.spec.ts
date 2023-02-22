@@ -6,7 +6,7 @@ import { generateProposal, generateProposalCategory } from 'testing/utils/propos
 
 import { AvailableProposalPermissions } from '../../availableProposalPermissions.class';
 import type { AvailableProposalPermissionFlags } from '../../interfaces';
-import { pfpStatusReviewedOnlyCreateVote } from '../pfpStatusReviewedOnlyCreateVote';
+import { pfpStatusVoteActiveOnlyVotable } from '../pfpStatusVoteActiveOnlyVotable';
 
 let proposal: ProposalWithUsers;
 let proposalCategory: ProposalCategory;
@@ -50,7 +50,7 @@ const fullPermissions = new AvailableProposalPermissions().full;
 
 describe('pfpStatusVoteActiveOnlyVotable', () => {
   it('should perform a no-op if the status is not vote_active', async () => {
-    const permissions = await pfpStatusReviewedOnlyCreateVote({
+    const permissions = await pfpStatusVoteActiveOnlyVotable({
       flags: fullPermissions,
       isAdmin: false,
       resource: { ...proposal, status: 'discussion' },
@@ -71,7 +71,7 @@ describe('pfpStatusVoteActiveOnlyVotable', () => {
     const users = [proposalAuthor, adminUser, proposalReviewer, spaceMember];
 
     for (const user of users) {
-      const permissions = await pfpStatusReviewedOnlyCreateVote({
+      const permissions = await pfpStatusVoteActiveOnlyVotable({
         flags: fullPermissions,
         isAdmin: false,
         resource: proposal,

@@ -90,7 +90,7 @@ describe('listProposalCategoryPermissions', () => {
 
     const foundPublicPermissions = await listProposalCategoryPermissions({
       resourceId: proposalCategory.id,
-      userId: undefined
+      userId: undefined as any
     });
 
     expect(foundPublicPermissions.length).toBe(0);

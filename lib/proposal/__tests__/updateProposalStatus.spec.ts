@@ -1,50 +1,60 @@
-import type { ProposalStatus, Role, Space, User } from '@prisma/client';
+import type { ProposalCategory, Role, Space, User } from '@prisma/client';
 
 import { prisma } from 'db';
 import { InvalidStateError } from 'lib/middleware';
-import type { IPageWithPermissions } from 'lib/pages';
-import { getPage } from 'lib/pages/server';
 import {
   createProposalWithUsers,
   generateRole,
   generateSpaceUser,
+  generateUserAndSpace,
   generateUserAndSpaceWithApiToken
 } from 'testing/setupDatabase';
+import { generateProposal, generateProposalCategory } from 'testing/utils/proposals';
 
-import { proposalPermissionMapping } from '../syncProposalPermissions';
 import { updateProposalStatus } from '../updateProposalStatus';
 
 let user: User;
 let reviewer: User;
 let reviewerRole: Role;
 let space: Space;
+let proposalCategory: ProposalCategory;
 
 beforeAll(async () => {
-  const generated = await generateUserAndSpaceWithApiToken();
+  const generated = await generateUserAndSpace({
+    isAdmin: false
+  });
   user = generated.user;
   space = generated.space;
   reviewer = await generateSpaceUser({ spaceId: space.id, isAdmin: false });
   reviewerRole = await generateRole({ createdBy: user.id, spaceId: space.id });
+  proposalCategory = await generateProposalCategory({
+    spaceId: space.id
+  });
 });
 
 describe('Updates the proposal of a page', () => {
   it('Move a review proposal to reviewed status and assign proposal reviewer and reviewed at fields', async () => {
-    const pageWithProposal = await createProposalWithUsers({
+    const proposal = await generateProposal({
       spaceId: space.id,
+      categoryId: proposalCategory.id,
       userId: user.id,
-      authors: [],
-      reviewers: [],
+      reviewers: [
+        {
+          group: 'user',
+          id: reviewer.id
+        }
+      ],
       proposalStatus: 'review'
     });
 
-    const { proposal } = await updateProposalStatus({
-      proposalId: pageWithProposal.proposal?.id as string,
+    const { proposal: updatedProposal } = await updateProposalStatus({
+      proposalId: proposal?.id as string,
       newStatus: 'reviewed',
-      userId: user.id
+      userId: reviewer.id
     });
-    expect(proposal.status).toBe('reviewed');
-    expect(proposal.reviewedBy).not.toBeNull();
-    expect(proposal.reviewedAt).not.toBeNull();
+    expect(updatedProposal.status).toBe('reviewed');
+    expect(updatedProposal.reviewedBy).not.toBeNull();
+    expect(updatedProposal.reviewedAt).not.toBeNull();
   });
 
   it('Move a reviewed proposal to discussion status and unassign proposal reviewer and reviewed at fields', async () => {
@@ -53,7 +63,7 @@ describe('Updates the proposal of a page', () => {
       userId: user.id,
       authors: [],
       reviewers: [],
-      proposalStatus: 'reviewed'
+      proposalStatus: 'review'
     });
 
     const { proposal } = await updateProposalStatus({
@@ -99,60 +109,6 @@ describe('Updates the proposal of a page', () => {
       })
     ).rejects.toBeInstanceOf(InvalidStateError);
   });
-
-  it('Should assign the correct permissions when updating proposal authors and reviewers', async () => {
-    const status: ProposalStatus = 'discussion';
-    const newStatus: ProposalStatus = 'review';
-
-    // Create a test proposal first
-    const pageWithProposal = await createProposalWithUsers({
-      spaceId: space.id,
-      proposalStatus: status,
-      userId: user.id,
-      authors: [],
-      reviewers: [reviewer.id, { type: 'role', roleId: reviewerRole.id }]
-    });
-
-    const { proposal } = await updateProposalStatus({
-      proposalId: pageWithProposal.proposalId as string,
-      newStatus,
-      userId: user.id
-    });
-
-    const { permissions } = (await getPage(proposal.id)) as IPageWithPermissions;
-
-    const permissionTemplate = proposalPermissionMapping[newStatus];
-
-    if (permissionTemplate.author) {
-      // Check all authors have a permission
-      proposal.authors.forEach((author) => {
-        if (author.userId) {
-          expect(
-            permissions.some((p) => p.userId === author.userId && p.permissionLevel === permissionTemplate.author)
-          ).toBe(true);
-        }
-      });
-    }
-
-    if (permissionTemplate.reviewer) {
-      proposal.reviewers.forEach((assignedReviewer) => {
-        expect(
-          permissions.some(
-            (p) =>
-              (assignedReviewer.userId ? p.userId === assignedReviewer.userId : p.roleId === assignedReviewer.roleId) &&
-              p.permissionLevel === permissionTemplate.author
-          )
-        ).toBe(true);
-      });
-    }
-
-    if (permissionTemplate.community) {
-      expect(
-        permissions.some((p) => p.spaceId === proposal.spaceId && p.permissionLevel === permissionTemplate.community)
-      ).toBe(true);
-    }
-  });
-
   it('should save the snapshot expiry date when changing the status of the proposal to vote active if it was exported to snapshot', async () => {
     const pageWithProposal = await createProposalWithUsers({
       spaceId: space.id,

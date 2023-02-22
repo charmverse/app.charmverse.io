@@ -111,7 +111,7 @@ export async function baseComputeProposalPermissions({
     });
 
     if (isProposalAuthor({ proposal, userId })) {
-      permissions.addPermissions(['edit', 'view', 'delete', 'vote', 'comment']);
+      permissions.addPermissions(['edit', 'view', 'create_vote', 'delete', 'vote', 'comment']);
     }
 
     const isReviewer = await isProposalReviewer({

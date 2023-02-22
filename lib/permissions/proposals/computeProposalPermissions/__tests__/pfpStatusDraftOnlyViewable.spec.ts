@@ -1,4 +1,4 @@
-import type { Proposal, ProposalCategory, Space, User } from '@prisma/client';
+import type { ProposalCategory, Space, User } from '@prisma/client';
 
 import type { ProposalWithUsers } from 'lib/proposal/interface';
 import { generateSpaceUser, generateUserAndSpace } from 'testing/setupDatabase';

@@ -2,7 +2,8 @@ import type { ProposalCategory, Space, User } from '@prisma/client';
 import { v4 } from 'uuid';
 
 import { AssignmentNotPermittedError } from 'lib/permissions/errors';
-import { DataNotFoundError, InsecureOperationError, InvalidInputError } from 'lib/utilities/errors';
+import { ProposalCategoryNotFoundError } from 'lib/proposal/errors';
+import { InsecureOperationError, InvalidInputError } from 'lib/utilities/errors';
 import { generateRole, generateUserAndSpace } from 'testing/setupDatabase';
 import { generateProposalCategory } from 'testing/utils/proposals';
 
@@ -147,7 +148,7 @@ describe('upsertProposalCategoryPermission', () => {
           id: space.id
         }
       })
-    ).rejects.toBeInstanceOf(DataNotFoundError);
+    ).rejects.toBeInstanceOf(ProposalCategoryNotFoundError);
   });
 
   it('should fail to create a new proposal category permission if permission level is not provided or is invalid', async () => {

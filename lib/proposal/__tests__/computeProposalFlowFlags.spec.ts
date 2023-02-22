@@ -146,4 +146,20 @@ describe('Validate if the user can update the status of the proposal', () => {
 
     expect(flowFlags.private_draft).toBe(false);
   });
+
+  it('should return false for the review status if the proposal is in discussion stage, but no reviewers exist', async () => {
+    const proposal = await generateProposal({
+      spaceId: space.id,
+      userId: author.id,
+      categoryId: proposalCategory.id,
+      proposalStatus: 'discussion'
+    });
+
+    const flowFlags = await computeProposalFlowFlags({
+      proposalId: proposal.id,
+      userId: author.id
+    });
+
+    expect(flowFlags.review).toBe(false);
+  });
 });

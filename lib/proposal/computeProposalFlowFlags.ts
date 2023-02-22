@@ -49,7 +49,11 @@ async function discussionProposal({ proposal, userId }: GetFlagsInput): Promise<
     isProposalAuthor({ proposal, userId }) ||
     (await hasAccessToSpace({ spaceId: proposal.spaceId, userId, adminOnly: true })).isAdmin
   ) {
-    flags.addPermissions(['private_draft', 'draft', 'review']);
+    flags.addPermissions(['private_draft', 'draft']);
+
+    if (proposal.reviewers.length > 0) {
+      flags.addPermissions(['review']);
+    }
   }
   return flags.operationFlags;
 }

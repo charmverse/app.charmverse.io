@@ -14,7 +14,7 @@ export async function listProposalCategoryPermissions({
   userId
 }: Required<PermissionCompute>): Promise<AssignedProposalCategoryPermission[]> {
   if (!userId) {
-    throw new InvalidInputError('Invalid user ID');
+    return [];
   }
 
   if (!isUUID(resourceId)) {

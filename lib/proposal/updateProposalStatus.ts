@@ -2,13 +2,13 @@ import type { WorkspaceEvent } from '@prisma/client';
 import { ProposalStatus } from '@prisma/client';
 
 import { prisma } from 'db';
+import { InvalidStateError } from 'lib/middleware';
 import { getSnapshotProposal } from 'lib/snapshot/getProposal';
 import { coerceToMilliseconds } from 'lib/utilities/dates';
 import { InvalidInputError } from 'lib/utilities/errors';
 
 import { computeProposalFlowFlags } from './computeProposalFlowFlags';
 import type { ProposalWithUsers } from './interface';
-import { generateSyncProposalPermissions } from './syncProposalPermissions';
 
 export async function updateProposalStatus({
   proposalId,
@@ -49,7 +49,7 @@ export async function updateProposalStatus({
   });
 
   if (!statusFlow[newStatus]) {
-    throw new InvalidInputError('Invalid proposal status transition');
+    throw new InvalidStateError('Invalid proposal status transition');
   }
 
   await prisma.proposal.update({
@@ -59,8 +59,9 @@ export async function updateProposalStatus({
     data: {
       status: newStatus,
       // Only record these if the new proposal status is reviewed
-      reviewedBy: newStatus === 'reviewed' ? userId : null,
-      reviewedAt: newStatus === 'reviewed' ? new Date() : null
+      // If moving back to discussion, remove the reviewer and reviewedAt
+      reviewedBy: newStatus === 'reviewed' ? userId : newStatus === 'discussion' ? null : undefined,
+      reviewedAt: newStatus === 'reviewed' ? new Date() : newStatus === 'discussion' ? null : undefined
     }
   });
 
@@ -111,13 +112,6 @@ export async function updateProposalStatus({
       }
     });
 
-    const [deleteArgs, createArgs] = await generateSyncProposalPermissions({ proposalId, tx });
-
-    await tx.pagePermission.deleteMany(deleteArgs);
-
-    for (const arg of createArgs) {
-      await tx.pagePermission.create(arg);
-    }
     return {
       workspaceEvent: createdWorkspaceEvent,
       proposal: updatedProposal

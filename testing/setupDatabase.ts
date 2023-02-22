@@ -872,6 +872,18 @@ export async function generateProposal({
 }): Promise<Page & { proposal: ProposalWithUsers; workspaceEvent: WorkspaceEvent }> {
   const proposalId = v4();
 
+  const categoryIdToLink =
+    categoryId ??
+    (
+      await prisma.proposalCategory.create({
+        data: {
+          title: `Category - ${v4()}`,
+          color: `#ffffff`,
+          space: { connect: { id: spaceId } }
+        }
+      })
+    ).id;
+
   const result = await createPageDb<{ proposal: ProposalWithUsers }>({
     data: {
       id: proposalId,
@@ -893,6 +905,7 @@ export async function generateProposal({
       deletedAt,
       proposal: {
         create: {
+          category: { connect: { id: categoryIdToLink } },
           id: proposalId,
           createdBy: userId,
           status: proposalStatus,
