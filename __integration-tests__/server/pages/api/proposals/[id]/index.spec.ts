@@ -1,4 +1,4 @@
-import type { Space, User } from '@prisma/client';
+import type { ProposalCategory, Space, User } from '@prisma/client';
 import request from 'supertest';
 import { v4 } from 'uuid';
 
@@ -23,6 +23,7 @@ let reviewer: LoggedInUser;
 let space: Space;
 let authorCookie: string;
 let reviewerCookie: string;
+let proposalCategory: ProposalCategory;
 
 beforeAll(async () => {
   const generated1 = await generateUserAndSpaceWithApiToken(undefined, false);
@@ -126,8 +127,9 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
     });
 
     const { page } = await createProposal({
-      createdBy: adminUser.id,
-      spaceId: adminSpace.id
+      userId: adminUser.id,
+      spaceId: adminSpace.id,
+      categoryId: proposalCategory.id
     });
 
     const updateContent: Partial<UpdateProposalRequest> = {
@@ -165,8 +167,9 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
     const proposalAuthor = await generateSpaceUser({ isAdmin: false, spaceId: adminSpace.id });
 
     const { page } = await createProposal({
-      createdBy: proposalAuthor.id,
-      spaceId: adminSpace.id
+      userId: proposalAuthor.id,
+      spaceId: adminSpace.id,
+      categoryId: proposalCategory.id
     });
 
     const updateContent: Partial<UpdateProposalRequest> = {

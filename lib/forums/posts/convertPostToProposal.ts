@@ -21,9 +21,7 @@ export async function convertPostToProposal({
       content: content ?? undefined,
       title: post.title
     },
-    proposalProps: {
-      categoryId
-    }
+    categoryId
   });
 
   await prisma.post.update({

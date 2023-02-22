@@ -1,26 +1,33 @@
-import type { Space, User } from '@prisma/client';
+import type { ProposalCategory, Space, User } from '@prisma/client';
 
 import { prisma } from 'db';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { generateProposalCategory } from 'testing/utils/proposals';
 
 import { createProposal } from '../createProposal';
-import { proposalPermissionMapping } from '../syncProposalPermissions';
 
 let user: User;
 let space: Space;
+let proposalCategory: ProposalCategory;
 
 beforeAll(async () => {
   const generated = await generateUserAndSpaceWithApiToken();
   user = generated.user;
   space = generated.space;
+  proposalCategory = await generateProposalCategory({
+    spaceId: space.id
+  });
 });
 
 describe('Creates a page and proposal with relevant configuration', () => {
   it('Create a page and proposal', async () => {
     const { page, workspaceEvent } = await createProposal({
-      contentText: '',
-      title: 'page-title',
-      createdBy: user.id,
+      pageProps: {
+        contentText: '',
+        title: 'page-title'
+      },
+      categoryId: proposalCategory.id,
+      userId: user.id,
       spaceId: space.id
     });
 
@@ -56,26 +63,5 @@ describe('Creates a page and proposal with relevant configuration', () => {
         type: 'proposal_status_change'
       })
     );
-  });
-
-  it('Should provision the proposal permissions', async () => {
-    const { page } = await createProposal({
-      createdBy: user.id,
-      contentText: '',
-      spaceId: space.id,
-      title: 'page-title'
-    });
-
-    const permissions = await prisma.pagePermission.findMany({
-      where: {
-        pageId: page.id
-      }
-    });
-
-    const privateDraftAuthorPermissionLevel = proposalPermissionMapping.private_draft.author;
-
-    expect(
-      permissions.some((p) => p.userId === user.id && p.permissionLevel === privateDraftAuthorPermissionLevel)
-    ).toBe(true);
   });
 });

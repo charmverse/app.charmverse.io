@@ -1,4 +1,4 @@
-import type { ProposalStatus, Page, PrismaPromise, Prisma } from '@prisma/client';
+import type { Page, PrismaPromise, ProposalStatus } from '@prisma/client';
 import { v4 as uuid } from 'uuid';
 
 import { prisma } from 'db';
@@ -8,22 +8,17 @@ import { createPage } from 'lib/pages/server/createPage';
 import type { IPageWithPermissions } from '../pages';
 import { getPagePath } from '../pages';
 
-import { generateSyncProposalPermissions } from './syncProposalPermissions';
-
-type ProposalPageInput = Partial<Pick<Page, 'content' | 'contentText' | 'id' | 'title'>>;
-
-type ProposalInput = { reviewers?: { roleId?: string; userId?: string }[]; categoryId: string };
+type PageProps = Partial<Pick<Page, 'title' | 'content' | 'contentText'>>;
 
 export type CreateProposalInput = {
-  pageProps: ProposalPageInput;
-  proposalProps: ProposalInput;
+  pageId?: string;
+  pageProps?: PageProps;
+  categoryId: string;
   userId: string;
   spaceId: string;
 };
 
-export async function createProposal({ pageProps, proposalProps, userId, spaceId }: CreateProposalInput) {
-  const { id: pageId } = pageProps;
-
+export async function createProposal({ userId, spaceId, categoryId, pageProps, pageId }: CreateProposalInput) {
   const proposalId = pageId ?? uuid();
   const proposalStatus: ProposalStatus = 'draft';
 
@@ -59,9 +54,9 @@ export async function createProposal({ pageProps, proposalProps, userId, spaceId
           updatedBy: userId,
           createdBy: userId,
           spaceId,
-          content: pageProps.content ?? { type: 'doc', content: [] },
-          contentText: pageProps.contentText ?? '',
-          title: pageProps.title ?? ''
+          content: pageProps?.content ?? { type: 'doc', content: [] },
+          contentText: pageProps?.contentText ?? '',
+          title: pageProps?.title ?? ''
         }
       });
     }
@@ -76,21 +71,12 @@ export async function createProposal({ pageProps, proposalProps, userId, spaceId
         id: proposalId,
         space: { connect: { id: spaceId } },
         status: proposalStatus,
-        category: { connect: { id: proposalProps.categoryId } },
+        category: { connect: { id: categoryId } },
         authors: {
           create: {
             userId
           }
-        },
-        ...(proposalProps?.reviewers
-          ? {
-              reviewers: {
-                createMany: {
-                  data: proposalProps.reviewers
-                }
-              }
-            }
-          : {})
+        }
       },
       include: {
         authors: true,
@@ -111,14 +97,6 @@ export async function createProposal({ pageProps, proposalProps, userId, spaceId
       }
     })
   ]);
-
-  const [deleteArgs, createArgs] = await generateSyncProposalPermissions({ proposalId, isNewProposal: true });
-
-  await prisma.$transaction([
-    prisma.pagePermission.deleteMany(deleteArgs),
-    ...createArgs.map((args) => prisma.pagePermission.create(args))
-  ]);
-
   trackUserAction('new_proposal_created', { userId, pageId: page.id, resourceId: proposal.id, spaceId });
 
   return { page: page as IPageWithPermissions, proposal, workspaceEvent };

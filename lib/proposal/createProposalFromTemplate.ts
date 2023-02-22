@@ -22,22 +22,14 @@ export async function createProposalFromTemplate({ createdBy, spaceId, templateI
 
   const title = `Copy of ${proposalTemplate.title}`;
 
-  return createProposal(
-    {
+  return createProposal({
+    pageProps: {
+      title,
       contentText: proposalTemplate?.contentText ?? '',
-      content: (proposalTemplate?.content as Prisma.InputJsonValue) ?? undefined,
-      createdBy,
-      spaceId,
-      title
+      content: proposalTemplate?.content as Prisma.JsonValue
     },
-    {
-      categoryId: proposalTemplate.proposal?.categoryId || null,
-      reviewers: (proposalTemplate.proposal?.reviewers ?? []).map((r) => {
-        return {
-          roleId: r.roleId ? r.roleId : undefined,
-          userId: r.userId ? r.userId : undefined
-        };
-      })
-    }
-  );
+    userId: createdBy,
+    spaceId,
+    categoryId: proposalTemplate.proposal?.categoryId as string
+  });
 }

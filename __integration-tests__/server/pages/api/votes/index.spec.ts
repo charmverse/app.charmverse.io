@@ -1,4 +1,4 @@
-import type { Page, Space, Vote } from '@prisma/client';
+import type { Page, ProposalCategory, Space, Vote } from '@prisma/client';
 import { SpaceOperation } from '@prisma/client';
 import request from 'supertest';
 import { v4 } from 'uuid';
@@ -9,11 +9,13 @@ import { typedKeys } from 'lib/utilities/objects';
 import type { LoggedInUser } from 'models';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { createPage, createVote, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { generateProposalCategory } from 'testing/utils/proposals';
 
 let page: Page;
 let space: Space;
 let user: LoggedInUser;
 let vote: Vote;
+let proposalCategory: ProposalCategory;
 
 let userCookie: string;
 
@@ -34,6 +36,9 @@ beforeAll(async () => {
   });
 
   userCookie = await loginUser(user.id);
+  proposalCategory = await generateProposalCategory({
+    spaceId: space.id
+  });
 });
 
 describe('GET /api/votes?id={id} - Get an individual vote', () => {
@@ -154,9 +159,12 @@ describe('POST /api/votes - Create a proposal vote', () => {
     const authorCookie = await loginUser(author.id);
 
     const { page: resultPage } = await createProposal({
-      createdBy: author.id,
+      userId: author.id,
       spaceId: authorSpace.id,
-      title: 'page-title'
+      pageProps: {
+        title: 'page-title'
+      },
+      categoryId: proposalCategory.id
     });
 
     await request(baseUrl)
@@ -188,8 +196,9 @@ describe('POST /api/votes - Create a proposal vote', () => {
     const adminCookie = await loginUser(adminUser.id);
 
     const { page: resultPage } = await createProposal({
-      createdBy: author.id,
-      spaceId: authorSpace.id
+      userId: author.id,
+      spaceId: authorSpace.id,
+      categoryId: proposalCategory.id
     });
 
     await request(baseUrl)
@@ -220,8 +229,9 @@ describe('POST /api/votes - Create a proposal vote', () => {
     });
 
     const { page: resultPage } = await createProposal({
-      createdBy: author.id,
-      spaceId: authorSpace.id
+      userId: author.id,
+      spaceId: authorSpace.id,
+      categoryId: proposalCategory.id
     });
 
     await request(baseUrl)
