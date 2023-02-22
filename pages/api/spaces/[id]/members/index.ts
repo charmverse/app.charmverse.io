@@ -7,8 +7,6 @@ import { getAccessibleMemberPropertiesBySpace } from 'lib/members/getAccessibleM
 import type { Member, PublicMember } from 'lib/members/interfaces';
 import { getPropertiesWithValues } from 'lib/members/utils';
 import { onError, onNoMatch } from 'lib/middleware';
-import { getUserNFTs } from 'lib/profile/getUserNFTs';
-import { updateProfileAvatar } from 'lib/profile/updateProfileAvatar';
 import { withSessionRoute } from 'lib/session/withSession';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { hasNftAvatar } from 'lib/users/hasNftAvatar';
@@ -147,44 +145,6 @@ async function getMembers(req: NextApiRequest, res: NextApiResponse<(Member | Pu
       }
     }
   });
-
-  const currentSpaceRole = spaceRoles.find((sr) => sr.spaceId === spaceId);
-
-  // If the user is not onboarded, populate the user profile with one nft as a profile picture and the first 5 nfts he has as pinned
-  if (!currentSpaceRole?.onboarded && userId) {
-    const nfts = await getUserNFTs(userId);
-    if (nfts.length > 0) {
-      if (!currentSpaceRole?.user.avatar) {
-        for (const nft of nfts) {
-          const user = await updateProfileAvatar({
-            avatar: nft.image,
-            avatarContract: nft.contract,
-            avatarTokenId: nft.tokenId,
-            avatarChain: nft.chainId,
-            userId
-          });
-
-          // I need just the first avatar update that returns successfully
-          if (user?.avatar) {
-            break;
-          }
-        }
-      }
-      if (!nfts.some((pi) => pi.isPinned)) {
-        const profileIds = nfts.map((pi) => pi.id).slice(0, 5);
-        await prisma.profileItem.updateMany({
-          where: {
-            id: {
-              in: profileIds
-            }
-          },
-          data: {
-            isPinned: true
-          }
-        });
-      }
-    }
-  }
 
   const visibleProperties = await getAccessibleMemberPropertiesBySpace({ requestingUserId: userId, spaceId });
 
