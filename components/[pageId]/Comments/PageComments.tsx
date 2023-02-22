@@ -39,7 +39,7 @@ export function PageComments({ pageId }: Props) {
               <CommentSort commentSort={commentSort} setCommentSort={setCommentSort} />
               {comments.map((comment) => (
                 <Comment
-                  permissions={{ upvote: true } as any}
+                  permissions={{ upvote: true, downvote: true, add_comment: true } as any}
                   comment={comment}
                   key={comment.id}
                   handleCreateComment={addComment}

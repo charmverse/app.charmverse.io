@@ -10,12 +10,14 @@ import { useState } from 'react';
 import Button from 'components/common/Button';
 import CharmEditor from 'components/common/CharmEditor/CharmEditor';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/InlineCharmEditor';
-import type { UpdateCommentPayload } from 'components/common/comments/interfaces';
+import { CommentReply } from 'components/common/comments/CommentReply';
+import { CommentVote } from 'components/common/comments/CommentVote';
+import type { CreateCommentPayload, UpdateCommentPayload } from 'components/common/comments/interfaces';
 import UserDisplay from 'components/common/UserDisplay';
 import { useMemberProfile } from 'components/profile/hooks/useMemberProfile';
 import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
-import type { CommentContent, CommentWithChildren } from 'lib/comments';
+import type { CommentWithChildren } from 'lib/comments';
 import type { AvailablePostPermissionFlags } from 'lib/permissions/forum/interfaces';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { getRelativeTimeInThePast } from 'lib/utilities/dates';
@@ -37,7 +39,7 @@ type Props = {
   permissions?: AvailablePostPermissionFlags;
   deletingDisabled?: boolean;
   handleUpdateComment: (comment: UpdateCommentPayload) => Promise<void>;
-  handleCreateComment: (comment: CommentContent) => Promise<void>;
+  handleCreateComment: (comment: CreateCommentPayload) => Promise<void>;
   handleDeleteComment: (commentId: string) => Promise<void>;
   handleVoteComment: (vote: { commentId: string; upvoted: boolean | null }) => Promise<void>;
 };
@@ -202,7 +204,7 @@ export function Comment({
           )}
           {!comment.deletedAt && (
             <Stack flexDirection='row' gap={1}>
-              {/* <ForumVote permissions={permissions} votes={comment} onVote={voteComment} /> */}
+              <CommentVote permissions={permissions} votes={comment} onVote={voteComment} />
               <Typography
                 sx={{
                   cursor: 'pointer'
@@ -221,14 +223,13 @@ export function Comment({
             </Stack>
           )}
           <Box mt={2}>
-            {/* {showCommentReply && (
-              <CommentReplyForm
+            {showCommentReply && (
+              <CommentReply
                 commentId={comment.id}
-                onCreateComment={onCreateComment}
+                handleCreateComment={handleCreateComment}
                 onCancelComment={() => setShowCommentReply(false)}
-                postId={comment.postId}
               />
-            )} */}
+            )}
           </Box>
         </Box>
       </StyledStack>

@@ -5,3 +5,9 @@ export type UpdateCommentPayload = {
   content: PageContent;
   contentText: string;
 };
+
+export type CreateCommentPayload = {
+  content: PageContent;
+  contentText: string;
+  parentId?: string;
+};

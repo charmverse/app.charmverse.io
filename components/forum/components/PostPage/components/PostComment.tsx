@@ -12,6 +12,7 @@ import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import CharmEditor from 'components/common/CharmEditor/CharmEditor';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/InlineCharmEditor';
+import { CommentVote } from 'components/common/comments/CommentVote';
 import { getUpdatedCommentVote } from 'components/common/comments/utils';
 import UserDisplay from 'components/common/UserDisplay';
 import { useMemberProfile } from 'components/profile/hooks/useMemberProfile';
@@ -22,8 +23,6 @@ import type { PostWithVotes } from 'lib/forums/posts/interfaces';
 import type { AvailablePostPermissionFlags } from 'lib/permissions/forum/interfaces';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { getRelativeTimeInThePast } from 'lib/utilities/dates';
-
-import { ForumVote } from '../../ForumVote';
 
 import { CommentReplyForm } from './CommentReplyForm';
 
@@ -223,7 +222,7 @@ export function PostComment({ post, comment, setPostComments, permissions }: Pro
           )}
           {!comment.deletedAt && (
             <Stack flexDirection='row' gap={1}>
-              <ForumVote permissions={permissions} votes={comment} onVote={voteComment} />
+              <CommentVote permissions={permissions} votes={comment} onVote={voteComment} />
               <Typography
                 sx={{
                   cursor: 'pointer'

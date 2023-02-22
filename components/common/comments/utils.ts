@@ -1,7 +1,7 @@
 import type { CommentSortType } from 'components/common/comments/CommentSort';
-import type { GenericCommentWithVote, GenericComment, CommentWithChildren, GenericCommentVote } from 'lib/comments';
+import type { GenericCommentWithVote, CommentWithChildren, GenericCommentVote } from 'lib/comments';
 
-export function processComments<T>(postComments: GenericComment<T>[]): CommentWithChildren<T>[] {
+export function processComments<T>(postComments: GenericCommentWithVote<T>[]): CommentWithChildren<T>[] {
   // Get top level comments
   const topLevelComments: CommentWithChildren<T>[] = [];
 

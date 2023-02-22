@@ -60,6 +60,6 @@ export class PagesApi {
   }
 
   voteComment({ pageId, upvoted, commentId }: { commentId: string; upvoted: boolean | null; pageId: string }) {
-    return http.PUT(`/api/pages/${pageId}/comments${commentId}/vote`, { upvoted });
+    return http.PUT(`/api/pages/${pageId}/comments/${commentId}/vote`, { upvoted });
   }
 }
