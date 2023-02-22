@@ -290,6 +290,8 @@ function DocumentPage({ page, setPage, insideModal, readOnly = false, parentProp
                   </div>
                 </div>
               </CharmEditor>
+
+              {proposalId && <div>proposal yo</div>}
             </Container>
           </div>
         </ScrollContainer>
