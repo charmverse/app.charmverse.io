@@ -80,18 +80,7 @@ export function SharedPage({ publicPage }: Props) {
     <DatabasePage page={currentPage} setPage={() => {}} readOnly={true} />
   ) : (
     <DocumentPage
-      bounty={
-        publicPage.bounty
-          ? {
-              ...publicPage.bounty,
-              applications: [],
-              page: {
-                ...currentPage,
-                permissions: []
-              }
-            }
-          : null
-      }
+      bounty={publicPage.bounty}
       page={currentPage}
       setPage={() => {}}
       readOnly={true}

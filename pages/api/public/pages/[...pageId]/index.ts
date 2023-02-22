@@ -1,8 +1,9 @@
-import type { Bounty, Page } from '@prisma/client';
+import type { Page } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { prisma } from 'db';
+import type { BountyWithDetails } from 'lib/bounties';
 import type { Board } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
@@ -192,7 +193,7 @@ async function getPublicPage(req: NextApiRequest, res: NextApiResponse<PublicPag
   let boards: Board[] = [];
   let cards: Card[] = [];
   let views: BoardView[] = [];
-  let bounty: Bounty | null = null;
+  let bounty: BountyWithDetails | null = null;
 
   if (page.type === 'card' && page.parentId) {
     const boardPage = await prisma.page.findFirst({
@@ -248,11 +249,28 @@ async function getPublicPage(req: NextApiRequest, res: NextApiResponse<PublicPag
     cards = linkedCards;
     views = linkedViews;
   } else if (page.type === 'bounty') {
-    bounty = await prisma.bounty.findUnique({
+    const tempBounty = await prisma.bounty.findUnique({
       where: {
         id: page.id
+      },
+      include: {
+        page: {
+          include: {
+            permissions: {
+              include: {
+                sourcePermission: true
+              }
+            }
+          }
+        }
       }
     });
+    bounty = tempBounty
+      ? ({
+          ...tempBounty,
+          applications: []
+        } as BountyWithDetails)
+      : null;
   }
 
   return res.status(200).json({

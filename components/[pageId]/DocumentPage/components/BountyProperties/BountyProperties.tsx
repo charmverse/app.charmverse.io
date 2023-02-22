@@ -391,7 +391,7 @@ export default function BountyProperties(props: {
             </div>
             <TextField
               required
-              defaultValue={currentBounty?.maxSubmissions}
+              defaultValue={currentBounty?.maxSubmissions ?? 1}
               type='number'
               size='small'
               inputProps={{ step: 1, min: 1 }}
@@ -428,8 +428,8 @@ export default function BountyProperties(props: {
         pagePermissions={bountyPagePermissions}
         pageId={pageId}
       />
-      <Box justifyContent='space-between' gap={2} alignItems='center'>
-        {!readOnly && (
+      {!readOnly && (
+        <Box justifyContent='space-between' gap={2} alignItems='center'>
           <div
             className='octo-propertyrow'
             style={{
@@ -479,10 +479,10 @@ export default function BountyProperties(props: {
               )}
             </div>
           </div>
-        )}
-      </Box>
+        </Box>
+      )}
 
-      {!readOnly && bountyProperties}
+      {bountyProperties}
 
       {draftBounty && (
         <Box display='flex' gap={2} my={2}>
