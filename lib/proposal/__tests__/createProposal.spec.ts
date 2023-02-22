@@ -1,6 +1,7 @@
 import type { ProposalCategory, Space, User } from '@prisma/client';
 
 import { prisma } from 'db';
+import { InvalidInputError } from 'lib/utilities/errors';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { generateProposalCategory } from 'testing/utils/proposals';
 
@@ -63,5 +64,19 @@ describe('Creates a page and proposal with relevant configuration', () => {
         type: 'proposal_status_change'
       })
     );
+  });
+
+  it('should throw an error if the category is not specified', async () => {
+    await expect(
+      createProposal({
+        pageProps: {
+          contentText: '',
+          title: 'page-title'
+        },
+        categoryId: null as any,
+        userId: user.id,
+        spaceId: space.id
+      })
+    ).rejects.toBeInstanceOf(InvalidInputError);
   });
 });

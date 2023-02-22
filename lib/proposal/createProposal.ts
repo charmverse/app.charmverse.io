@@ -4,6 +4,7 @@ import { v4 as uuid } from 'uuid';
 import { prisma } from 'db';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { createPage } from 'lib/pages/server/createPage';
+import { InvalidInputError } from 'lib/utilities/errors';
 
 import type { IPageWithPermissions } from '../pages';
 import { getPagePath } from '../pages';
@@ -19,6 +20,10 @@ export type CreateProposalInput = {
 };
 
 export async function createProposal({ userId, spaceId, categoryId, pageProps, pageId }: CreateProposalInput) {
+  if (!categoryId) {
+    throw new InvalidInputError('Proposal must be linked to a category');
+  }
+
   const proposalId = pageId ?? uuid();
   const proposalStatus: ProposalStatus = 'draft';
 

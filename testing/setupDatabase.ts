@@ -13,9 +13,9 @@ import type {
   ProposalStatus,
   Role,
   RoleSource,
-  User,
   Thread,
   Transaction,
+  User,
   Vote,
   WorkspaceEvent
 } from '@prisma/client';
@@ -32,7 +32,6 @@ import { getPagePath } from 'lib/pages/utils';
 import type { BountyPermissions } from 'lib/permissions/bounties';
 import type { TargetPermissionGroup } from 'lib/permissions/interfaces';
 import type { ProposalReviewerInput, ProposalWithUsers } from 'lib/proposal/interface';
-import { syncProposalPermissions } from 'lib/proposal/syncProposalPermissions';
 import { sessionUserRelations } from 'lib/session/config';
 import { createUserFromWallet } from 'lib/users/createUser';
 import { uniqueValues } from 'lib/utilities/array';
@@ -752,9 +751,6 @@ export async function createProposalWithUsers({
       }
     }
   });
-
-  // proposal authors will have full_access to the page
-  await syncProposalPermissions({ proposalId });
 
   return proposalPage;
 }
