@@ -37,7 +37,7 @@ export async function addDaylightAbility(tokenGate: TokenGate) {
   }
 
   const params = {
-    method: 'POST',
+    method: 'PUT',
     headers: HEADERS,
     body: JSON.stringify({
       requirements: requirementsData.requirements,

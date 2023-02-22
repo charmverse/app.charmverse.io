@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 
 import charmClient from 'charmClient';
 import { useSnackbar } from 'hooks/useSnackbar';
@@ -7,16 +7,23 @@ import { AUTH_CODE_COOKIE, AUTH_ERROR_COOKIE } from 'lib/discord/constants';
 import log from 'lib/log';
 import { getCookie, deleteCookie } from 'lib/utilities/browser';
 
-interface State {
-  isConnected: boolean;
-  isLoading: boolean;
-  connect: () => void;
-  error?: string;
+interface Props {
+  children: JSX.Element;
 }
 
-interface Props {
-  children: (state: State) => JSX.Element;
-}
+type IDiscordConnectionContext = {
+  isConnected: boolean;
+  isLoading: boolean;
+  connect: VoidFunction;
+  error?: string;
+};
+
+export const DiscordConnectionContext = createContext<Readonly<IDiscordConnectionContext>>({
+  connect: () => {},
+  error: undefined,
+  isConnected: false,
+  isLoading: false
+});
 
 export function DiscordProvider({ children }: Props) {
   const { user, setUser } = useUser();
@@ -71,28 +78,41 @@ export function DiscordProvider({ children }: Props) {
     // Connection with discord
     if (authCode && user) {
       deleteCookie(AUTH_CODE_COOKIE);
-      setIsConnectDiscordLoading(true);
+      if (!user.discordUser) {
+        setIsConnectDiscordLoading(true);
 
-      charmClient.discord
-        .connectDiscord({
-          code: authCode
-        })
-        .then((updatedUserFields) => {
-          setUser({ ...user, ...updatedUserFields });
-        })
-        .catch((err) => {
-          setDiscordError(err.message || err.error || 'Something went wrong. Please try again');
-        })
-        .finally(() => {
-          setIsConnectDiscordLoading(false);
-        });
+        charmClient.discord
+          .connectDiscord({
+            code: authCode
+          })
+          .then((updatedUserFields) => {
+            setUser({ ...user, ...updatedUserFields });
+          })
+          .catch((err) => {
+            setDiscordError(err.message || err.error || 'Something went wrong. Please try again');
+          })
+          .finally(() => {
+            setIsConnectDiscordLoading(false);
+          });
+      }
     }
-  }, [user]);
+  }, [user, authCode]);
 
-  return children({
-    isConnected: connectedWithDiscord,
-    isLoading: !discordError && (!!authCode || isDisconnectingDiscord || isConnectDiscordLoading),
-    connect,
-    error: discordError
-  });
+  const isConnected = connectedWithDiscord;
+  const isLoading = !discordError && (!!authCode || isDisconnectingDiscord || isConnectDiscordLoading);
+  const error = authError;
+
+  const value = useMemo<IDiscordConnectionContext>(
+    () => ({
+      isLoading,
+      isConnected,
+      connect,
+      error
+    }),
+    [isConnected, isLoading, error]
+  );
+
+  return <DiscordConnectionContext.Provider value={value}>{children}</DiscordConnectionContext.Provider>;
 }
+
+export const useDiscordConnection = () => useContext(DiscordConnectionContext);
