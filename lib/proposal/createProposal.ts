@@ -4,6 +4,7 @@ import { v4 as uuid } from 'uuid';
 import { prisma } from 'db';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { createPage } from 'lib/pages/server/createPage';
+import type { TargetPermissionGroup } from 'lib/permissions/interfaces';
 import { InvalidInputError } from 'lib/utilities/errors';
 
 import type { IPageWithPermissions } from '../pages';
@@ -15,11 +16,19 @@ export type CreateProposalInput = {
   pageId?: string;
   pageProps?: PageProps;
   categoryId: string;
+  reviewers?: TargetPermissionGroup<'role' | 'user'>[];
   userId: string;
   spaceId: string;
 };
 
-export async function createProposal({ userId, spaceId, categoryId, pageProps, pageId }: CreateProposalInput) {
+export async function createProposal({
+  userId,
+  spaceId,
+  categoryId,
+  pageProps,
+  pageId,
+  reviewers
+}: CreateProposalInput) {
   if (!categoryId) {
     throw new InvalidInputError('Proposal must be linked to a category');
   }
@@ -81,7 +90,17 @@ export async function createProposal({ userId, spaceId, categoryId, pageProps, p
           create: {
             userId
           }
-        }
+        },
+        reviewers: reviewers
+          ? {
+              createMany: {
+                data: reviewers.map((reviewer) => ({
+                  userId: reviewer.group === 'user' ? reviewer.id : undefined,
+                  roleId: reviewer.group === 'role' ? reviewer.id : undefined
+                }))
+              }
+            }
+          : undefined
       },
       include: {
         authors: true,

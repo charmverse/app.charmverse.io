@@ -2,10 +2,11 @@ import type { ProposalCategory, Space, User } from '@prisma/client';
 
 import { prisma } from 'db';
 import { InvalidInputError } from 'lib/utilities/errors';
-import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { generateProposalCategory } from 'testing/utils/proposals';
 
 import { createProposal } from '../createProposal';
+import type { ProposalWithUsers } from '../interface';
 
 let user: User;
 let space: Space;
@@ -22,14 +23,24 @@ beforeAll(async () => {
 
 describe('Creates a page and proposal with relevant configuration', () => {
   it('Create a page and proposal', async () => {
-    const { page, workspaceEvent } = await createProposal({
+    const reviewerUser = await generateSpaceUser({
+      isAdmin: false,
+      spaceId: space.id
+    });
+    const { page, workspaceEvent, proposal } = await createProposal({
       pageProps: {
         contentText: '',
         title: 'page-title'
       },
       categoryId: proposalCategory.id,
       userId: user.id,
-      spaceId: space.id
+      spaceId: space.id,
+      reviewers: [
+        {
+          group: 'user',
+          id: reviewerUser.id
+        }
+      ]
     });
 
     expect(page).toMatchObject(
@@ -39,21 +50,20 @@ describe('Creates a page and proposal with relevant configuration', () => {
       })
     );
 
-    const proposal = await prisma.proposal.findUnique({
-      where: {
-        id: page.proposalId as string
-      },
-      include: {
-        authors: true
-      }
-    });
-
     expect(proposal).toMatchObject(
-      expect.objectContaining({
+      expect.objectContaining<Partial<ProposalWithUsers>>({
         authors: [
           {
             proposalId: proposal?.id,
             userId: user.id
+          }
+        ],
+        reviewers: [
+          {
+            id: expect.any(String),
+            proposalId: proposal?.id as string,
+            userId: reviewerUser.id,
+            roleId: null
           }
         ]
       })

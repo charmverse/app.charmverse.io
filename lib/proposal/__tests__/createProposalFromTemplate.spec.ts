@@ -21,14 +21,20 @@ beforeAll(async () => {
   });
 });
 
-describe('Creates a page and proposal with relevant configuration', () => {
-  it('Should create a proposal from a template', async () => {
+describe('Creates a proposal from a template', () => {
+  it('Should create a proposal from a template and copy its reviewers', async () => {
     const reviewerUser = await generateSpaceUser({ isAdmin: false, spaceId: space.id });
 
     const { page: templatePage, proposal } = await createProposal({
       spaceId: space.id,
       userId: user.id,
       categoryId: proposalCategory.id,
+      reviewers: [
+        {
+          group: 'user',
+          id: reviewerUser.id
+        }
+      ],
       pageProps: {
         contentText: 'This is a document page',
         content: {

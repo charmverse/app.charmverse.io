@@ -30,6 +30,10 @@ export async function createProposalFromTemplate({ createdBy, spaceId, templateI
     },
     userId: createdBy,
     spaceId,
-    categoryId: proposalTemplate.proposal?.categoryId as string
+    categoryId: proposalTemplate.proposal?.categoryId as string,
+    reviewers: proposalTemplate.proposal?.reviewers.map((reviewer) => ({
+      group: reviewer.roleId ? 'role' : 'user',
+      id: (reviewer.roleId ?? reviewer.userId) as string
+    }))
   });
 }

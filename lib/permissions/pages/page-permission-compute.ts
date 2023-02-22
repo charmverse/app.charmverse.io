@@ -1,5 +1,4 @@
 import type { Prisma } from '@prisma/client';
-import { Page, PageOperations } from '@prisma/client';
 
 import { prisma } from 'db';
 import { PageNotFoundError } from 'lib/pages/server';
@@ -10,7 +9,6 @@ import type {
   IPagePermissionUserRequest,
   IPageWithNestedSpaceRole
 } from './page-permission-interfaces';
-import { PageOperationType } from './page-permission-interfaces';
 import { permissionTemplates } from './page-permission-mapping';
 import { computePagePermissionsUsingProposalPermissions } from './pagePermissionsWithComputeProposalPermissions';
 
