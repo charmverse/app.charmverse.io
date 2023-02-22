@@ -79,6 +79,23 @@ export function SharedPage({ publicPage }: Props) {
   return currentPage.type.match(/board/) ? (
     <DatabasePage page={currentPage} setPage={() => {}} readOnly={true} />
   ) : (
-    <DocumentPage page={currentPage} setPage={() => {}} readOnly={true} parentProposalId={parentProposalId} />
+    <DocumentPage
+      bounty={
+        publicPage.bounty
+          ? {
+              ...publicPage.bounty,
+              applications: [],
+              page: {
+                ...currentPage,
+                permissions: []
+              }
+            }
+          : null
+      }
+      page={currentPage}
+      setPage={() => {}}
+      readOnly={true}
+      parentProposalId={parentProposalId}
+    />
   );
 }

@@ -23,7 +23,7 @@ import { useCharmEditor } from 'hooks/useCharmEditor';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { usePages } from 'hooks/usePages';
 import { useVotes } from 'hooks/useVotes';
-import type { AssignedBountyPermissions } from 'lib/bounties';
+import type { AssignedBountyPermissions, BountyWithDetails } from 'lib/bounties';
 import type { PageMeta } from 'lib/pages';
 
 import BountyProperties from './components/BountyProperties';
@@ -79,9 +79,10 @@ export interface DocumentPageProps {
   readOnly?: boolean;
   insideModal?: boolean;
   parentProposalId?: string | null;
+  bounty?: BountyWithDetails | null;
 }
 
-function DocumentPage({ page, setPage, insideModal, readOnly = false, parentProposalId }: DocumentPageProps) {
+function DocumentPage({ bounty, page, setPage, insideModal, readOnly = false, parentProposalId }: DocumentPageProps) {
   const { pages, getPagePermissions } = usePages();
   const { cancelVote, castVote, deleteVote, updateDeadline, votes, isLoading } = useVotes();
   // For post we would artificially construct the permissions
@@ -272,6 +273,7 @@ function DocumentPage({ page, setPage, insideModal, readOnly = false, parentProp
                     )}
                     {(draftBounty || page.bountyId) && (
                       <BountyProperties
+                        bounty={bounty}
                         bountyId={page.bountyId}
                         pageId={page.id}
                         readOnly={readOnly}

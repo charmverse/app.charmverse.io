@@ -19,15 +19,14 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsSpaceMember } from 'hooks/useIsSpaceMember';
 import { usePages } from 'hooks/usePages';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
-import { useSharedPage } from 'hooks/useSharedPage';
 import { useUser } from 'hooks/useUser';
 import type { ApplicationWithTransactions } from 'lib/applications/interfaces';
 import type {
   AssignedBountyPermissions,
-  BountyPermissions,
-  UpdateableBountyFields,
   BountyCreationData,
-  BountyWithDetails
+  BountyPermissions,
+  BountyWithDetails,
+  UpdateableBountyFields
 } from 'lib/bounties';
 import type { TargetPermissionGroup } from 'lib/permissions/interfaces';
 import debouncePromise from 'lib/utilities/debouncePromise';
@@ -46,13 +45,14 @@ export default function BountyProperties(props: {
   pageId: string;
   permissions: AssignedBountyPermissions | null;
   refreshBountyPermissions: (bountyId: string) => void;
+  bounty?: BountyWithDetails | null;
 }) {
-  const { bountyId, pageId, readOnly: parentReadOnly = false, permissions, refreshBountyPermissions } = props;
+  const { bounty, bountyId, pageId, readOnly: parentReadOnly = false, permissions, refreshBountyPermissions } = props;
   const [paymentMethods] = usePaymentMethods();
   const { draftBounty, bounties, cancelDraftBounty, setBounties, updateBounty } = useBounties();
   const [availableCryptos, setAvailableCryptos] = useState<(string | CryptoCurrency)[]>(['ETH']);
   const [isShowingAdvancedSettings, setIsShowingAdvancedSettings] = useState(false);
-  const bountyFromContext = bounties.find((b) => b.id === bountyId);
+  const bountyFromContext = bounty ?? bounties.find((b) => b.id === bountyId);
   const [currentBounty, setCurrentBounty] = useState<(BountyCreationData & BountyWithDetails) | null>(null);
   const [isAmountInputEmpty, setIsAmountInputEmpty] = useState<boolean>(false);
   const [capSubmissions, setCapSubmissions] = useState(currentBounty?.maxSubmissions !== null);
