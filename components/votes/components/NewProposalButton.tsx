@@ -91,13 +91,9 @@ export function NewProposalButton({ mutateProposals }: { mutateProposals: KeyedM
   async function onClickCreate() {
     if (currentSpace && user) {
       const createdProposal = await charmClient.proposals.createProposal({
-        pageProps: {
-          spaceId: currentSpace.id,
-          createdBy: user.id
-        },
-        proposalProps: {
-          categoryId: getCategoriesWithCreatePermission()[0].id
-        }
+        spaceId: currentSpace.id,
+        userId: user.id,
+        categoryId: getCategoriesWithCreatePermission()[0].id
       });
 
       const { proposal, ...page } = createdProposal;

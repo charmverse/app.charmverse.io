@@ -1,8 +1,4 @@
-import type { Prisma } from '@prisma/client';
-
 import { prisma } from 'db';
-import { accessiblePagesByPermissionsQuery } from 'lib/pages/server';
-import { InvalidInputError } from 'lib/utilities/errors';
 
 import type { ProposalWithUsers } from './interface';
 import { generateCategoryIdQuery } from './utils';
@@ -19,11 +15,17 @@ export type ListProposalsRequest = {
 export async function getProposalsBySpace({
   spaceId,
   categoryIds
-}: ListProposalsRequest): Promise<ProposalWithUsers[]> {
+}: Pick<ListProposalsRequest, 'categoryIds' | 'spaceId'>): Promise<ProposalWithUsers[]> {
   return prisma.proposal.findMany({
     where: {
       spaceId,
-      categoryId: generateCategoryIdQuery(categoryIds)
+      categoryId: generateCategoryIdQuery(categoryIds),
+      status: {
+        notIn: ['draft', 'private_draft']
+      },
+      page: {
+        type: 'proposal'
+      }
     },
     include: {
       authors: true,
