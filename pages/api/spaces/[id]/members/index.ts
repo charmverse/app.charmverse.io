@@ -3,11 +3,11 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { prisma } from 'db';
-import { getAllNFTs } from 'lib/blockchain/getNFTs';
 import { getAccessibleMemberPropertiesBySpace } from 'lib/members/getAccessibleMemberPropertiesBySpace';
 import type { Member, PublicMember } from 'lib/members/interfaces';
 import { getPropertiesWithValues } from 'lib/members/utils';
 import { onError, onNoMatch } from 'lib/middleware';
+import { getUserNFTs } from 'lib/profile/getUserNFTs';
 import { updateProfileAvatar } from 'lib/profile/updateProfileAvatar';
 import { withSessionRoute } from 'lib/session/withSession';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
@@ -152,7 +152,7 @@ async function getMembers(req: NextApiRequest, res: NextApiResponse<(Member | Pu
 
   // If the user is not onboarded, populate the user profile with one nft as a profile picture and the first 5 nfts he has as pinned
   if (!currentSpaceRole?.onboarded && userId) {
-    const nfts = await getAllNFTs(userId);
+    const nfts = await getUserNFTs(userId);
     if (nfts.length > 0) {
       if (!currentSpaceRole?.user.avatar) {
         for (const nft of nfts) {

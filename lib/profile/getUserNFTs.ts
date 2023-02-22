@@ -3,7 +3,7 @@ import { getNFTs } from 'lib/blockchain/nfts';
 
 export const supportedMainnets = [1, 137, 42161] as const;
 
-export const getAllNFTs = async (userId: string) => {
+export const getUserNFTs = async (userId: string) => {
   const profileItems = await prisma.profileItem.findMany({
     where: {
       userId,
