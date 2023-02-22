@@ -1,12 +1,11 @@
 import { prisma } from 'db';
-
-import type { UpdatePageCommentInput } from './interface';
+import type { UpdateCommentInput } from 'lib/comments';
 
 export async function updatePageComment({
   content,
   contentText,
   commentId
-}: UpdatePageCommentInput & {
+}: UpdateCommentInput & {
   commentId: string;
 }) {
   return prisma.pageComment.update({

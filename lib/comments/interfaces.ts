@@ -1,5 +1,7 @@
 import type { Comment, User, Prisma } from '@prisma/client';
 
+import type { PageContent } from 'lib/prosemirror/interfaces';
+
 export type CommentCreate = Pick<Comment, 'content' | 'threadId' | 'userId'>;
 
 export type CommentUpdate = Pick<Comment, 'content' | 'id'>;
@@ -30,3 +32,16 @@ export type GenericCommentWithVote<T = Record<string, never>> = GenericComment<T
 export type CommentWithChildren<T> = GenericComment<T> & {
   children: CommentWithChildren<T>[];
 };
+
+export type CommentContent = {
+  content: PageContent;
+  contentText: string;
+};
+
+export type CreateCommentInput = {
+  content: PageContent;
+  contentText: string;
+  parentId?: string;
+};
+
+export type UpdateCommentInput = CommentContent;

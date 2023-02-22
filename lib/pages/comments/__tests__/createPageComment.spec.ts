@@ -1,10 +1,10 @@
 import type { PageComment, Space, User } from '@prisma/client';
 import { v4 } from 'uuid';
 
+import type { CreateCommentInput } from 'lib/comments';
 import { createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 import { createPageComment } from '../createPageComment';
-import type { CreatePageCommentInput } from '../interface';
 
 let space: Space;
 let user: User;
@@ -17,7 +17,7 @@ beforeAll(async () => {
 
 describe('createPageComment', () => {
   it('should create a page comment', async () => {
-    const commentInput: CreatePageCommentInput = {
+    const commentInput: CreateCommentInput = {
       content: {
         type: ''
       },

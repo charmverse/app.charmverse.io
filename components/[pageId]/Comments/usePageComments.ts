@@ -1,9 +1,10 @@
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 import type { CommentSortType } from 'components/common/comments/CommentSort';
 import { processComments, sortComments } from 'components/common/comments/utils';
+import type { CommentContent } from 'lib/comments';
 
 export function usePageComments(pageId: string) {
   const [commentSort, setCommentSort] = useState<CommentSortType>('latest');
@@ -22,10 +23,43 @@ export function usePageComments(pageId: string) {
     return [];
   }, [data, commentSort]);
 
+  const addComment = useCallback(
+    async (comment: CommentContent) => {
+      const newComment = await charmClient.pages.createComment({ pageId, comment });
+      mutate((existingComments) => (existingComments ? [...existingComments, newComment] : [newComment]));
+    },
+    [mutate, pageId]
+  );
+
+  const updateComment = useCallback(
+    async (comment: CommentContent & { id: string }) => {
+      const updatedComment = await charmClient.pages.updateComment({ pageId, ...comment });
+      mutate((existingComments) => {
+        if (!existingComments) {
+          return undefined;
+        }
+
+        return existingComments.map((c) => (c.id === updatedComment.id ? { ...c, ...updatedComment } : c));
+      });
+    },
+    [mutate, pageId]
+  );
+
+  const deleteComment = useCallback(
+    async (commentId: string) => {
+      await charmClient.pages.deleteComment({ pageId, commentId });
+      mutate((existingComments) => (existingComments ? existingComments.filter((c) => c.id !== commentId) : undefined));
+    },
+    [mutate, pageId]
+  );
+
   return {
     commentSort,
     setCommentSort,
     isLoadingComments,
-    comments
+    comments,
+    addComment,
+    deleteComment,
+    updateComment
   };
 }

@@ -2,9 +2,10 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { prisma } from 'db';
+import type { CreateCommentInput } from 'lib/comments';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { createPageComment } from 'lib/pages/comments/createPageComment';
-import type { CreatePageCommentInput, PageCommentWithVote } from 'lib/pages/comments/interface';
+import type { PageCommentWithVote } from 'lib/pages/comments/interface';
 import { listPageComments } from 'lib/pages/comments/listPageComments';
 import { PageNotFoundError } from 'lib/pages/server';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -27,7 +28,7 @@ async function listPageCommentsHandler(req: NextApiRequest, res: NextApiResponse
 
 async function createPageCommentHandler(req: NextApiRequest, res: NextApiResponse<PageCommentWithVote>) {
   const { id: pageId } = req.query as any as { id: string };
-  const body = req.body as CreatePageCommentInput;
+  const body = req.body as CreateCommentInput;
   const userId = req.session.user.id;
 
   const page = await prisma.page.findUnique({
