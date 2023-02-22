@@ -1,28 +1,12 @@
 import type { CommentSortType } from 'components/common/comments/CommentSort';
+import type { GenericCommentWithVote, GenericComment, CommentWithChildren } from 'lib/comments';
 
-type CommentVote = {
-  upvotes: number;
-  downvotes: number;
-  upvoted: null | boolean;
-};
-
-type CommentToProcess = {
-  id: string;
-  parentId: string | null;
-  createdAt: Date;
-} & CommentVote;
-
-export type CommentWithChildren<T> = T &
-  CommentToProcess & {
-    children: CommentWithChildren<T>[];
-  };
-
-export function processComments<T extends CommentToProcess>(postComments: T[]): (T & CommentWithChildren<T>)[] {
+export function processComments<T>(postComments: GenericComment<T>[]): CommentWithChildren<T>[] {
   // Get top level comments
-  const topLevelComments: (T & CommentWithChildren<T>)[] = [];
+  const topLevelComments: CommentWithChildren<T>[] = [];
 
   // Create the map
-  const postCommentsRecord: Record<string, T & CommentWithChildren<T>> = {};
+  const postCommentsRecord: Record<string, CommentWithChildren<T>> = {};
   postComments.forEach((postComment) => {
     postCommentsRecord[postComment.id] = {
       ...postComment,
@@ -45,20 +29,13 @@ export function processComments<T extends CommentToProcess>(postComments: T[]): 
 
   return topLevelComments;
 }
-
-type CommentToSort = {
-  createdAt: Date;
-  downvotes: number;
-  upvotes: number;
-};
-
-export function sortComments<T extends CommentToSort>({
+export function sortComments<T>({
   comments,
   sort
 }: {
-  comments: T[];
+  comments: GenericCommentWithVote<T>[];
   sort: CommentSortType;
-}): T[] {
+}): GenericCommentWithVote<T>[] {
   if (sort === 'latest') {
     return comments.sort((c1, c2) => (c1.createdAt > c2.createdAt ? -1 : 1));
   } else if (sort === 'top') {
