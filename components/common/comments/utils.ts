@@ -1,5 +1,5 @@
 import type { CommentSortType } from 'components/common/comments/CommentSort';
-import type { GenericCommentWithVote, GenericComment, CommentWithChildren } from 'lib/comments';
+import type { GenericCommentWithVote, GenericComment, CommentWithChildren, GenericCommentVote } from 'lib/comments';
 
 export function processComments<T>(postComments: GenericComment<T>[]): CommentWithChildren<T>[] {
   // Get top level comments
@@ -43,4 +43,30 @@ export function sortComments<T>({
   }
 
   return comments;
+}
+
+export function getUpdatedCommentVote(comment: GenericCommentVote, newUpvotedStatus: boolean | null) {
+  const voteStatus: GenericCommentVote = {
+    downvotes: comment.downvotes,
+    upvotes: comment.upvotes,
+    upvoted: newUpvotedStatus
+  };
+
+  if (newUpvotedStatus === true) {
+    voteStatus.upvotes += 1;
+    if (comment.upvoted === false) {
+      voteStatus.downvotes -= 1;
+    }
+  } else if (newUpvotedStatus === false) {
+    voteStatus.downvotes += 1;
+    if (comment.upvoted === true) {
+      voteStatus.upvotes -= 1;
+    }
+  } else if (comment.upvoted === true) {
+    voteStatus.upvotes -= 1;
+  } else {
+    voteStatus.downvotes -= 1;
+  }
+
+  return voteStatus;
 }

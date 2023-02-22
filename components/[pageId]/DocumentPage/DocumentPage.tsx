@@ -9,6 +9,7 @@ import { memo, useEffect, useState } from 'react';
 import { useElementSize } from 'usehooks-ts';
 
 import charmClient from 'charmClient';
+import { PageComments } from 'components/[pageId]/Comments/PageComments';
 import AddBountyButton from 'components/common/BoardEditor/focalboard/src/components/cardDetail/AddBountyButton';
 import CardDetailProperties from 'components/common/BoardEditor/focalboard/src/components/cardDetail/cardDetailProperties';
 import CommentsList from 'components/common/BoardEditor/focalboard/src/components/cardDetail/commentsList';
@@ -291,7 +292,7 @@ function DocumentPage({ page, setPage, insideModal, readOnly = false, parentProp
                 </div>
               </CharmEditor>
 
-              {proposalId && <div>proposal yo</div>}
+              {proposalId && <PageComments pageId={page.id} />}
             </Container>
           </div>
         </ScrollContainer>

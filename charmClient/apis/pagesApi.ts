@@ -2,7 +2,6 @@ import type { Page, PageComment, ProfileItem } from '@prisma/client';
 
 import * as http from 'adapters/http';
 import type { CreateCommentInput, UpdateCommentInput } from 'lib/comments';
-import { CreatePostCommentInput } from 'lib/forums/comments/interface';
 import type { IPageWithPermissions, PageDetails, PageMeta } from 'lib/pages';
 import type { PageCommentWithVote } from 'lib/pages/comments/interface';
 
@@ -53,10 +52,14 @@ export class PagesApi {
     content,
     contentText
   }: UpdateCommentInput & { pageId: string; id: string }): Promise<PageComment> {
-    return http.PUT(`/api/pages/${pageId}/comments${id}`, { content, contentText });
+    return http.PUT(`/api/pages/${pageId}/comments/${id}`, { content, contentText });
   }
 
   deleteComment({ commentId, pageId }: { pageId: string; commentId: string }): Promise<void> {
-    return http.DELETE(`/api/pages/${pageId}/comments${commentId}`);
+    return http.DELETE(`/api/pages/${pageId}/comments/${commentId}`);
+  }
+
+  voteComment({ pageId, upvoted, commentId }: { commentId: string; upvoted: boolean | null; pageId: string }) {
+    return http.PUT(`/api/pages/${pageId}/comments${commentId}/vote`, { upvoted });
   }
 }

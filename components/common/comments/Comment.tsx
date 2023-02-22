@@ -6,26 +6,19 @@ import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { Box, IconButton, ListItemIcon, ListItemText, Menu, MenuItem, Stack, Tooltip, Typography } from '@mui/material';
 import { bindMenu, usePopupState } from 'material-ui-popup-state/hooks';
 import { useState } from 'react';
-import type { KeyedMutator } from 'swr';
 
-import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import CharmEditor from 'components/common/CharmEditor/CharmEditor';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/InlineCharmEditor';
-import { getUpdatedCommentVote } from 'components/common/comments/utils';
+import type { UpdateCommentPayload } from 'components/common/comments/interfaces';
 import UserDisplay from 'components/common/UserDisplay';
 import { useMemberProfile } from 'components/profile/hooks/useMemberProfile';
 import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
-import type { PostCommentWithVote, PostCommentWithVoteAndChildren } from 'lib/forums/comments/interface';
-import type { PostWithVotes } from 'lib/forums/posts/interfaces';
+import type { CommentContent, CommentWithChildren } from 'lib/comments';
 import type { AvailablePostPermissionFlags } from 'lib/permissions/forum/interfaces';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { getRelativeTimeInThePast } from 'lib/utilities/dates';
-
-import { ForumVote } from '../../ForumVote';
-
-import { CommentReplyForm } from './CommentReplyForm';
 
 const StyledStack = styled(Stack)`
   &:hover .comment-actions {
@@ -40,13 +33,24 @@ const StyledStack = styled(Stack)`
 `;
 
 type Props = {
-  comment: PostCommentWithVoteAndChildren;
-  setPostComments: KeyedMutator<PostCommentWithVote[] | undefined>;
+  comment: CommentWithChildren;
   permissions?: AvailablePostPermissionFlags;
-  post: PostWithVotes | null;
+  deletingDisabled?: boolean;
+  handleUpdateComment: (comment: UpdateCommentPayload) => Promise<void>;
+  handleCreateComment: (comment: CommentContent) => Promise<void>;
+  handleDeleteComment: (commentId: string) => Promise<void>;
+  handleVoteComment: (vote: { commentId: string; upvoted: boolean | null }) => Promise<void>;
 };
 
-export function PostComment({ post, comment, setPostComments, permissions }: Props) {
+export function Comment({
+  deletingDisabled,
+  comment,
+  permissions,
+  handleCreateComment,
+  handleUpdateComment,
+  handleDeleteComment,
+  handleVoteComment
+}: Props) {
   const [showCommentReply, setShowCommentReply] = useState(false);
   const theme = useTheme();
   const { user } = useUser();
@@ -61,17 +65,13 @@ export function PostComment({ post, comment, setPostComments, permissions }: Pro
   const { showMemberProfile } = useMemberProfile();
 
   async function saveCommentContent() {
-    const updatedComment = await charmClient.forum.updatePostComment({
-      commentId: comment.id,
+    await handleUpdateComment({
+      id: comment.id,
       content: commentEditContent.doc,
-      contentText: commentEditContent.rawText,
-      postId: comment.postId
+      contentText: commentEditContent.rawText
     });
     setCommentContent(commentEditContent);
     setIsEditingComment(false);
-    setPostComments((comments) =>
-      comments?.map((_comment) => (_comment.id === comment.id ? { ..._comment, ...updatedComment } : _comment))
-    );
   }
 
   async function updateCommentContent(content: ICharmEditorOutput) {
@@ -83,31 +83,13 @@ export function PostComment({ post, comment, setPostComments, permissions }: Pro
     setCommentEditContent(commentContent);
   }
 
-  function onCreateComment(_comment: PostCommentWithVote) {
-    setPostComments((comments) => (comments ? [_comment, ...comments] : []));
-  }
-
   const menuState = usePopupState({ variant: 'popover', popupId: 'comment-action' });
 
   async function voteComment(newUpvotedStatus: boolean | null) {
-    await charmClient.forum.upOrDownVoteComment({
-      postId: comment.postId,
+    await handleVoteComment({
       commentId: comment.id,
       upvoted: newUpvotedStatus
     });
-
-    const postCommentVote = getUpdatedCommentVote(comment, newUpvotedStatus);
-
-    setPostComments((comments) =>
-      comments?.map((_comment) =>
-        _comment.id === comment.id
-          ? {
-              ...comment,
-              ...postCommentVote
-            }
-          : _comment
-      )
-    );
   }
 
   function onClickEditComment() {
@@ -117,14 +99,11 @@ export function PostComment({ post, comment, setPostComments, permissions }: Pro
 
   async function onClickDeleteComment() {
     menuState.close();
-    await charmClient.forum.deletePostComment({ commentId: comment.id, postId: comment.postId });
-    setPostComments((comments) =>
-      comments?.map((_comment) => (_comment.id === comment.id ? { ..._comment, deletedAt: new Date() } : _comment))
-    );
+    await handleDeleteComment(comment.id);
   }
 
   const isCommentAuthor = comment.createdBy === user?.id;
-  const canDeleteComment = (permissions?.delete_comments || isCommentAuthor) && !post?.proposalId;
+  const canDeleteComment = (permissions?.delete_comments || isCommentAuthor) && !deletingDisabled;
 
   return (
     <Stack my={1} position='relative'>
@@ -223,7 +202,7 @@ export function PostComment({ post, comment, setPostComments, permissions }: Pro
           )}
           {!comment.deletedAt && (
             <Stack flexDirection='row' gap={1}>
-              <ForumVote permissions={permissions} votes={comment} onVote={voteComment} />
+              {/* <ForumVote permissions={permissions} votes={comment} onVote={voteComment} /> */}
               <Typography
                 sx={{
                   cursor: 'pointer'
@@ -242,25 +221,28 @@ export function PostComment({ post, comment, setPostComments, permissions }: Pro
             </Stack>
           )}
           <Box mt={2}>
-            {showCommentReply && (
+            {/* {showCommentReply && (
               <CommentReplyForm
                 commentId={comment.id}
                 onCreateComment={onCreateComment}
                 onCancelComment={() => setShowCommentReply(false)}
                 postId={comment.postId}
               />
-            )}
+            )} */}
           </Box>
         </Box>
       </StyledStack>
       <Box ml={3} position='relative'>
         {comment.children.map((childComment) => (
-          <PostComment
+          <Comment
             permissions={permissions}
-            setPostComments={setPostComments}
             comment={childComment}
             key={childComment.id}
-            post={post}
+            deletingDisabled={deletingDisabled}
+            handleDeleteComment={handleDeleteComment}
+            handleVoteComment={handleVoteComment}
+            handleUpdateComment={handleUpdateComment}
+            handleCreateComment={handleCreateComment}
           />
         ))}
       </Box>

@@ -3,7 +3,7 @@ import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 import type { CommentSortType } from 'components/common/comments/CommentSort';
-import { processComments, sortComments } from 'components/common/comments/utils';
+import { getUpdatedCommentVote, processComments, sortComments } from 'components/common/comments/utils';
 import type { CommentContent } from 'lib/comments';
 
 export function usePageComments(pageId: string) {
@@ -53,6 +53,21 @@ export function usePageComments(pageId: string) {
     [mutate, pageId]
   );
 
+  const voteComment = useCallback(
+    async ({ commentId, upvoted }: { commentId: string; upvoted: boolean | null }) => {
+      await charmClient.pages.voteComment({ pageId, commentId, upvoted });
+
+      mutate((existingComments) => {
+        if (!existingComments) {
+          return undefined;
+        }
+
+        return existingComments.map((c) => (c.id === commentId ? { ...c, ...getUpdatedCommentVote(c, upvoted) } : c));
+      });
+    },
+    [mutate, pageId]
+  );
+
   return {
     commentSort,
     setCommentSort,
@@ -60,6 +75,7 @@ export function usePageComments(pageId: string) {
     comments,
     addComment,
     deleteComment,
-    updateComment
+    updateComment,
+    voteComment
   };
 }

@@ -1,21 +1,21 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { voteForumComment } from 'lib/forums/posts/voteForumComment';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
+import { votePageComment } from 'lib/pages/comments/votePageComment';
 import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireUser).put(commentUpDownVoteHandler);
+handler.use(requireUser).put(commentVoteHandler);
 
-async function commentUpDownVoteHandler(req: NextApiRequest, res: NextApiResponse) {
-  const { postId, commentId } = req.query as any as { postId: string; commentId: string };
+async function commentVoteHandler(req: NextApiRequest, res: NextApiResponse) {
+  const { id: pageId, commentId } = req.query as any as { id: string; commentId: string };
   const userId = req.session.user.id;
   const { upvoted } = req.body;
 
-  await voteForumComment({
-    postId,
+  await votePageComment({
+    pageId,
     userId,
     upvoted,
     commentId
