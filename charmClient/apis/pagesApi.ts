@@ -1,7 +1,8 @@
-import type { Page, ProfileItem } from '@prisma/client';
+import type { Page, PageComment, ProfileItem } from '@prisma/client';
 
 import * as http from 'adapters/http';
 import type { IPageWithPermissions, PageDetails, PageMeta } from 'lib/pages';
+import type { CreatePageCommentInput, PageCommentWithVote, UpdatePageCommentInput } from 'lib/pages/comments/interface';
 
 export interface UpdateProfileItemRequest {
   profileItems: Omit<ProfileItem, 'userId'>[];
@@ -34,5 +35,25 @@ export class PagesApi {
 
   convertToProposal(pageId: string) {
     return http.POST<PageDetails>(`/api/pages/${pageId}/convert-to-proposal`);
+  }
+
+  listComments(pageId: string): Promise<PageCommentWithVote[]> {
+    return http.GET(`/api/pages/${pageId}/comments`);
+  }
+
+  createComment(pageId: string, body: CreatePageCommentInput): Promise<PageCommentWithVote> {
+    return http.POST(`/api/pages/${pageId}/comments`, body);
+  }
+
+  updateComment({
+    pageId,
+    commentId,
+    ...body
+  }: UpdatePageCommentInput & { pageId: string; commentId: string }): Promise<PageComment> {
+    return http.PUT(`/api/pages/${pageId}/comments${commentId}`, body);
+  }
+
+  deleteComment({ commentId, pageId }: { pageId: string; commentId: string }): Promise<void> {
+    return http.DELETE(`/api/pages/${pageId}/comments${commentId}`);
   }
 }
