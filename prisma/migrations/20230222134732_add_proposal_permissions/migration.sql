@@ -1,11 +1,14 @@
 -- CreateEnum
-CREATE TYPE "ProposalCategoryOperation" AS ENUM ('create_proposal', 'edit', 'delete');
+CREATE TYPE "ProposalCategoryOperation" AS ENUM ('manage_permissions', 'create_proposal', 'edit', 'delete');
 
 -- CreateEnum
 CREATE TYPE "ProposalOperation" AS ENUM ('edit', 'view', 'delete', 'create_vote', 'vote', 'comment', 'review');
 
 -- CreateEnum
 CREATE TYPE "ProposalCategoryPermissionLevel" AS ENUM ('view', 'view_comment', 'view_comment_vote', 'full_access');
+
+-- AlterEnum
+ALTER TYPE "SpaceOperation" ADD VALUE 'reviewProposals';
 
 -- CreateTable
 CREATE TABLE "ProposalCategoryPermission" (
