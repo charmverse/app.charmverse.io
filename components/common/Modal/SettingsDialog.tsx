@@ -157,7 +157,7 @@ function SpaceSettingsModalComponent() {
                   isActive={activePath === tab.path}
                 />
               ))}
-              <StyledTreeItem nodeId='my-spaces' label='My spaces' icon={null} sx={{ mt: 1.5 }}>
+              <StyledTreeItem nodeId='my-spaces' label='My spaces' sx={{ mt: 1.5 }}>
                 {spaces.map((space) => (
                   <StyledTreeItem
                     data-test={`space-settings-tab-${space.id}`}
@@ -173,7 +173,6 @@ function SpaceSettingsModalComponent() {
                         <Typography noWrap>{space.name}</Typography>
                       </Box>
                     }
-                    icon={null}
                   >
                     {SETTINGS_TABS.map((tab) => (
                       <StyledTreeItem
