@@ -2,7 +2,6 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import type { SxProps, Theme } from '@mui/material';
 import { Box, Grid, Stack, Tooltip, Typography } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
-import type { IdentityType } from '@prisma/client';
 import { useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import useSWRImmutable from 'swr/immutable';
@@ -13,12 +12,10 @@ import { TimezoneDisplay } from 'components/members/components/TimezoneDisplay';
 import Avatar from 'components/settings/workspace/LargeAvatar';
 import { useUser } from 'hooks/useUser';
 import { hasNftAvatar } from 'lib/users/hasNftAvatar';
-import { shortWalletAddress } from 'lib/utilities/strings';
 import type { LoggedInUser } from 'models';
 import type { PublicUser } from 'pages/api/public/profile/[userId]';
 
 import type { Social } from '../../interfaces';
-import { getIdentityIcon } from '../IdentityModal';
 
 import { SocialIcons } from './SocialIcons';
 import { isPublicUser } from './utils';
@@ -51,7 +48,6 @@ function UserDetailsMini({ readOnly, user, sx = {} }: UserDetailsMiniProps) {
   };
 
   const hideSocials =
-    readOnly &&
     socialDetails.discordUsername?.length === 0 &&
     socialDetails.githubURL?.length === 0 &&
     socialDetails.twitterURL?.length === 0 &&
@@ -72,8 +68,7 @@ function UserDetailsMini({ readOnly, user, sx = {} }: UserDetailsMiniProps) {
       />
       <Grid container direction='column' spacing={0.5}>
         <Grid item>
-          {user && !isPublic && getIdentityIcon(user.identityType as IdentityType)}
-          <Typography variant='h1'>{shortWalletAddress(user.username)}</Typography>
+          <Typography variant='h1'>{user.username}</Typography>
         </Grid>
         {!readOnly && (
           <Grid item>
