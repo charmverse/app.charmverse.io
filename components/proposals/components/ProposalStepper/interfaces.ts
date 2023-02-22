@@ -1,7 +1,7 @@
 import type { ProposalStatus } from '@prisma/client';
 
+import type { ProposalFlowFlags } from 'lib/proposal/computeProposalFlowFlags';
 import type { ProposalWithUsers } from 'lib/proposal/interface';
-import type { ProposalFlowFlags } from 'lib/proposal/state/transition';
 
 export type StepperProps = {
   proposal?: ProposalWithUsers;

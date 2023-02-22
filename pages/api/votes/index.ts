@@ -8,7 +8,7 @@ import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { getPageMeta } from 'lib/pages/server/getPageMeta';
 import { computeUserPagePermissions } from 'lib/permissions/pages';
 import { computeProposalPermissions } from 'lib/permissions/proposals/computeProposalPermissions';
-import { computeProposalFlowFlags } from 'lib/proposal/state/transition';
+import { computeProposalFlowFlags } from 'lib/proposal/computeProposalFlowFlags';
 import { withSessionRoute } from 'lib/session/withSession';
 import { DataNotFoundError, UnauthorisedActionError } from 'lib/utilities/errors';
 import { createVote as createVoteService, getVote as getVoteService } from 'lib/votes';

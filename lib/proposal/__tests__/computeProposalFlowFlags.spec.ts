@@ -1,32 +1,40 @@
-import type { Space, User } from '@prisma/client';
-import { v4 } from 'uuid';
+import type { ProposalCategory, Space, User } from '@prisma/client';
 
 import { prisma } from 'db';
 import { assignRole } from 'lib/roles';
 import { createUserFromWallet } from 'lib/users/createUser';
 import { createProposalWithUsers, generateRole, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { generateProposalCategory, generateProposal } from 'testing/utils/proposals';
 
-import { validateProposalStatusTransition } from '../validateProposalStatusTransition';
+import { computeProposalFlowFlags } from '../computeProposalFlowFlags';
 
-let author1: User;
-let author2: User;
+let admin: User;
+let author: User;
 let reviewer1: User;
 let reviewer2: User;
 let space: Space;
+let proposalCategory: ProposalCategory;
 
 beforeAll(async () => {
   const { user: user1, space: generatedSpace } = await generateUserAndSpaceWithApiToken();
 
-  author1 = user1;
-  author2 = await createUserFromWallet();
+  admin = user1;
+  author = await createUserFromWallet();
   reviewer1 = await createUserFromWallet();
   reviewer2 = await createUserFromWallet();
 
   await prisma?.spaceRole.createMany({
-    data: [author2, reviewer1, reviewer2].map((user) => ({ spaceId: generatedSpace.id, userId: user.id }))
+    data: [author, reviewer1, reviewer2].map((user) => ({
+      spaceId: generatedSpace.id,
+      userId: user.id,
+      isAdmin: false
+    }))
   });
 
   space = generatedSpace;
+  proposalCategory = await generateProposalCategory({
+    spaceId: space.id
+  });
 });
 
 describe('Validate if the user can update the status of the proposal', () => {
@@ -34,43 +42,41 @@ describe('Validate if the user can update the status of the proposal', () => {
     // Create a test proposal first
     const pageWithProposal = await createProposalWithUsers({
       spaceId: space.id,
-      userId: author1.id,
+      userId: author.id,
       authors: [],
       reviewers: [reviewer1.id]
     });
 
-    const canChangeStatus = await validateProposalStatusTransition({
-      proposal: pageWithProposal.proposal!,
-      newStatus: 'draft',
-      userId: author1.id
+    const flowFlags = await computeProposalFlowFlags({
+      proposalId: pageWithProposal.proposal!.id,
+      userId: author.id
     });
 
-    expect(canChangeStatus).toBe(true);
+    expect(flowFlags.draft).toBe(true);
   });
 
   it('Proposal reviewer should be able to change the proposal status from review to reviewed', async () => {
     // Create a test proposal first
     const pageWithProposal = await createProposalWithUsers({
       spaceId: space.id,
-      userId: author1.id,
+      userId: author.id,
       authors: [],
       reviewers: [reviewer1.id],
       proposalStatus: 'review'
     });
 
-    const canChangeStatus = await validateProposalStatusTransition({
-      proposal: pageWithProposal.proposal!,
-      newStatus: 'reviewed',
+    const flowFlags = await computeProposalFlowFlags({
+      proposalId: pageWithProposal.proposal!.id,
       userId: reviewer1.id
     });
 
-    expect(canChangeStatus).toBe(true);
+    expect(flowFlags.reviewed).toBe(true);
   });
 
   it('Proposal reviewer with roleId should be able to change the proposal status from review to reviewed', async () => {
     const role = await generateRole({
       spaceId: space.id,
-      createdBy: author1.id
+      createdBy: author.id
     });
 
     await assignRole({
@@ -81,7 +87,7 @@ describe('Validate if the user can update the status of the proposal', () => {
     // Create a test proposal first
     const pageWithProposal = await createProposalWithUsers({
       spaceId: space.id,
-      userId: author1.id,
+      userId: author.id,
       authors: [],
       reviewers: [
         {
@@ -92,49 +98,52 @@ describe('Validate if the user can update the status of the proposal', () => {
       proposalStatus: 'review'
     });
 
-    const canChangeStatus = await validateProposalStatusTransition({
-      proposal: pageWithProposal.proposal!,
-      newStatus: 'reviewed',
+    const flowFlags = await computeProposalFlowFlags({
+      proposalId: pageWithProposal.proposal!.id,
       userId: reviewer1.id
     });
 
-    expect(canChangeStatus).toBe(true);
+    expect(flowFlags.reviewed).toBe(true);
   });
 
-  it("Proposal author shouldn't be able to change the proposal status from review to reviewed", async () => {
+  it('Proposal author should not be able to change the proposal status from review to reviewed', async () => {
     // Create a test proposal first
-    const pageWithProposal = await createProposalWithUsers({
+    const proposal = await generateProposal({
       spaceId: space.id,
-      userId: author1.id,
+      userId: author.id,
       authors: [],
-      reviewers: [reviewer1.id],
+      categoryId: proposalCategory.id,
+      reviewers: [
+        {
+          group: 'user',
+          id: reviewer1.id
+        }
+      ],
       proposalStatus: 'review'
     });
 
-    const canChangeStatus = await validateProposalStatusTransition({
-      proposal: pageWithProposal.proposal!,
-      newStatus: 'reviewed',
-      userId: author1.id
+    const flowFlags = await computeProposalFlowFlags({
+      proposalId: proposal.id,
+      userId: author.id
     });
 
-    expect(canChangeStatus).toBe(false);
+    expect(flowFlags.reviewed).toBe(false);
   });
 
   it("Proposal reviewer (userId) shouldn't be able to change the proposal status from private_draft to draft", async () => {
     // Create a test proposal first
     const pageWithProposal = await createProposalWithUsers({
       spaceId: space.id,
-      userId: author1.id,
+      userId: author.id,
       authors: [],
       reviewers: [reviewer1.id]
     });
 
-    const canChangeStatus = await validateProposalStatusTransition({
-      proposal: pageWithProposal.proposal!,
-      newStatus: 'draft',
+    const flowFlags = await computeProposalFlowFlags({
+      proposalId: pageWithProposal.proposal!.id,
       userId: reviewer1.id
     });
 
-    expect(canChangeStatus).toBe(false);
+    expect(flowFlags.private_draft).toBe(false);
   });
 });

@@ -8,9 +8,9 @@ import { isProposalAuthor } from 'lib/proposal/isProposalAuthor';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { typedKeys } from 'lib/utilities/objects';
 
-import { ProposalNotFoundError } from '../errors';
-import type { ProposalWithUsers } from '../interface';
-import { isProposalReviewer } from '../isProposalReviewer';
+import { ProposalNotFoundError } from './errors';
+import type { ProposalWithUsers } from './interface';
+import { isProposalReviewer } from './isProposalReviewer';
 
 export type ProposalFlowFlags = Record<ProposalStatus, boolean>;
 

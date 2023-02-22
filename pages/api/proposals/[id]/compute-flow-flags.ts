@@ -2,8 +2,8 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
-import type { ProposalFlowFlags } from 'lib/proposal/state/transition';
-import { computeProposalFlowFlags } from 'lib/proposal/state/transition';
+import type { ProposalFlowFlags } from 'lib/proposal/computeProposalFlowFlags';
+import { computeProposalFlowFlags } from 'lib/proposal/computeProposalFlowFlags';
 import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });

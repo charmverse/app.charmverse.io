@@ -5,8 +5,8 @@ import nc from 'next-connect';
 import { prisma } from 'db';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { InvalidStateError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
+import { computeProposalFlowFlags } from 'lib/proposal/computeProposalFlowFlags';
 import type { ProposalWithUsers } from 'lib/proposal/interface';
-import { computeProposalFlowFlags } from 'lib/proposal/state/transition';
 import { updateProposalStatus } from 'lib/proposal/updateProposalStatus';
 import { withSessionRoute } from 'lib/session/withSession';
 

@@ -668,6 +668,7 @@ export async function createProposalWithUsers({
   reviewers,
   userId,
   spaceId,
+  proposalCategoryId,
   ...pageCreateInput
 }: {
   authors: string[];
@@ -675,8 +676,21 @@ export async function createProposalWithUsers({
   spaceId: string;
   userId: string;
   proposalStatus?: ProposalStatus;
+  proposalCategoryId?: string;
 } & Partial<Prisma.PageCreateInput>): Promise<PageWithProposal> {
   const proposalId = v4();
+
+  const proposalCategoryIdToLink = !proposalCategoryId
+    ? (
+        await prisma.proposalCategory.create({
+          data: {
+            title: `Category - ${v4()}`,
+            color: `#ffffff`,
+            space: { connect: { id: spaceId } }
+          }
+        })
+      ).id
+    : proposalCategoryId;
 
   const proposalPage: PageWithProposal = await createPageDb({
     data: {
@@ -705,6 +719,7 @@ export async function createProposalWithUsers({
               id: spaceId
             }
           },
+          category: { connect: { id: proposalCategoryIdToLink } },
           createdBy: userId,
           status: proposalStatus,
           authors: {

@@ -6,8 +6,8 @@ import { getSnapshotProposal } from 'lib/snapshot/getProposal';
 import { coerceToMilliseconds } from 'lib/utilities/dates';
 import { InvalidInputError } from 'lib/utilities/errors';
 
+import { computeProposalFlowFlags } from './computeProposalFlowFlags';
 import type { ProposalWithUsers } from './interface';
-import { computeProposalFlowFlags } from './state/transition';
 import { generateSyncProposalPermissions } from './syncProposalPermissions';
 
 export async function updateProposalStatus({

@@ -63,55 +63,67 @@ export async function baseComputeProposalPermissions({
     throw new InvalidInputError(`Cannot compute permissions for proposal ${resourceId} without category`);
   }
 
-  const whereQuery: Prisma.ProposalCategoryPermissionWhereInput = {
-    proposalCategoryId: proposal.categoryId
-  };
-
   if (error || !userId) {
-    whereQuery.public = true;
-  } else {
-    whereQuery.OR = [
-      {
+    const assignedPermissions = await prisma.proposalCategoryPermission.findMany({
+      where: {
+        proposalCategoryId: proposal.categoryId,
         public: true
-      },
-      {
-        spaceId: proposal.spaceId
-      },
-      {
-        role: {
-          spaceRolesToRole: {
-            some: {
-              spaceRole: {
-                userId
+      }
+    });
+
+    assignedPermissions.forEach((perm) => {
+      if (perm.permissionLevel === 'view') {
+        permissions.addPermissions(proposalPermissionsMapping.view.slice());
+      }
+    });
+
+    return permissions.operationFlags;
+  } else {
+    const whereQuery: Prisma.ProposalCategoryPermissionWhereInput = {
+      proposalCategoryId: proposal.categoryId,
+      OR: [
+        {
+          public: true
+        },
+        {
+          spaceId: proposal.spaceId
+        },
+        {
+          role: {
+            spaceRolesToRole: {
+              some: {
+                spaceRole: {
+                  userId
+                }
               }
             }
           }
         }
-      }
-    ];
+      ]
+    };
+
+    const assignedPermissions = await prisma.proposalCategoryPermission.findMany({
+      where: whereQuery
+    });
+
+    assignedPermissions.forEach((permission) => {
+      permissions.addPermissions(proposalPermissionsMapping[permission.permissionLevel].slice());
+    });
+
+    if (isProposalAuthor({ proposal, userId })) {
+      permissions.addPermissions(['edit', 'view', 'delete', 'vote', 'comment']);
+    }
+
+    const isReviewer = await isProposalReviewer({
+      proposal,
+      userId
+    });
+    if (isReviewer) {
+      permissions.addPermissions(['view', 'comment', 'review']);
+    }
+
+    return permissions.operationFlags;
   }
-
-  const assignedPermissions = await prisma.proposalCategoryPermission.findMany({
-    where: whereQuery
-  });
-
-  assignedPermissions.forEach((permission) => {
-    permissions.addPermissions(proposalPermissionsMapping[permission.permissionLevel].slice());
-  });
-
-  if (isProposalAuthor({ proposal, userId })) {
-    permissions.addPermissions(['edit', 'view', 'delete', 'vote', 'comment']);
-  }
-
-  const isReviewer = await isProposalReviewer({
-    proposal,
-    userId
-  });
-  if (isReviewer) {
-    permissions.addPermissions(['view', 'comment', 'review']);
-  }
-
-  return permissions.operationFlags;
 }
 
 function proposalResolver({ resourceId }: { resourceId: string }) {

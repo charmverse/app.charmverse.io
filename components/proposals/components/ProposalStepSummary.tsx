@@ -3,13 +3,13 @@ import ArrowForwardIos from '@mui/icons-material/ArrowForwardIos';
 import { Button, Stack, Typography } from '@mui/material';
 import type { ProposalStatus } from '@prisma/client';
 
+import type { ProposalFlowFlags } from 'lib/proposal/computeProposalFlowFlags';
 import type { ProposalWithUsers } from 'lib/proposal/interface';
 import {
   proposalStatusDetails,
   PROPOSAL_STATUSES,
   PROPOSAL_STATUS_LABELS
 } from 'lib/proposal/proposalStatusTransition';
-import type { ProposalFlowFlags } from 'lib/proposal/state/transition';
 
 type Props = {
   proposalFlowFlags?: ProposalFlowFlags;
