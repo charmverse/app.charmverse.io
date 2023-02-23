@@ -14,11 +14,11 @@ import { UnauthorisedActionError } from 'lib/utilities/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireUser).put(updateProposalController).get(getProposalController);
+handler.put(updateProposalController).get(getProposalController);
 
 async function getProposalController(req: NextApiRequest, res: NextApiResponse<ProposalWithUsers>) {
   const proposalId = req.query.id as string;
-  const userId = req.session.user.id;
+  const userId = req.session.user?.id;
 
   const proposal = await prisma.proposal.findUnique({
     where: {
