@@ -44,13 +44,9 @@ const StyledSidebarLink = styled(Link, { shouldForwardProp: (prop) => prop !== '
 `;
 
 export function SidebarLink({
-  active,
-  href,
   icon,
   label,
-  target,
-  onClick,
-  className
+  ...props
 }: {
   active: boolean;
   href?: string;
@@ -61,7 +57,7 @@ export function SidebarLink({
   className?: string;
 }) {
   return (
-    <StyledSidebarLink href={href} active={active} target={target} onClick={onClick} className={className}>
+    <StyledSidebarLink {...props}>
       {icon}
       {label}
     </StyledSidebarLink>
