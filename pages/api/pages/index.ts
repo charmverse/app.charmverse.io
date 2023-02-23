@@ -32,7 +32,7 @@ async function createPageHandler(req: NextApiRequest, res: NextApiResponse<IPage
   }
 
   if (data.type.match('proposal')) {
-    throw new InvalidInputError('You cannot create a proposal using this endpoint');
+    throw new InvalidInputError('You cannot create a proposal or proposal template using this endpoint');
   }
 
   const { id: userId } = req.session.user;

@@ -296,6 +296,7 @@ export function ProposalProperties({ pageId, proposalId, readOnly, isTemplate }:
                 <UserDisplay showMiniProfile user={proposalReviewer} avatarSize='small' />
               ) : (
                 <InputSearchReviewers
+                  isProposal
                   disabled={readOnly || !canUpdateProposalProperties}
                   readOnly={readOnly}
                   value={proposalReviewers.map(

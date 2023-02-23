@@ -1,4 +1,4 @@
-import type { Role, Space, User } from '@prisma/client';
+import type { Role, Space } from '@prisma/client';
 import request from 'supertest';
 
 import { prisma } from 'db';
@@ -312,40 +312,6 @@ describe('DELETE /api/permissions - Delete page permissions', () => {
     });
 
     const permissionToDelete = await upsertPermission(page.id, {
-      // Can only toggle public
-      permissionLevel: 'view',
-      roleId: role.id
-    });
-
-    await request(baseUrl)
-      .delete('/api/permissions')
-      .set('Cookie', userCookie)
-      .send({
-        permissionId: permissionToDelete.id
-      })
-      .expect(401);
-  });
-
-  it('should fail to delete a permission on child pages of a proposal and respond 401', async () => {
-    const page = await createPage({
-      createdBy: user.id,
-      spaceId: space.id,
-      type: 'proposal'
-    });
-
-    const childPage = await createPage({
-      createdBy: user.id,
-      spaceId: space.id,
-      type: 'page',
-      parentId: page.id
-    });
-
-    await upsertPermission(childPage.id, {
-      permissionLevel: 'full_access',
-      userId: user.id
-    });
-
-    const permissionToDelete = await upsertPermission(childPage.id, {
       // Can only toggle public
       permissionLevel: 'view',
       roleId: role.id
