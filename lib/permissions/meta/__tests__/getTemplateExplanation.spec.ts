@@ -11,8 +11,8 @@ describe('getTemplateExplanation', () => {
     const cannot = [
       'Space members cannot create new bounties.',
       'Space members cannot create new pages.',
-      'Space members cannot create new proposals.',
       'Space members cannot create new forum categories.',
+      'Space members cannot be selected to review a proposal.',
       'Space members cannot comment on, edit, share or delete new top-level pages by default.',
       'Anyone outside the space cannot see new top-level pages by default.',
       'Anyone outside the space cannot see bounties and bounty suggestions.'
@@ -35,7 +35,7 @@ describe('getTemplateExplanation', () => {
     const can = [
       'Space members can create new pages.',
       'Space members can create new bounties.',
-      'Space members can create new proposals.',
+      'Space members can be selected to review a proposal.',
       'Space members can view, edit, comment on, share and delete new top-level pages by default.'
     ];
     const cannot = [
@@ -61,7 +61,7 @@ describe('getTemplateExplanation', () => {
     const can = [
       'Space members can create new pages.',
       'Space members can create new bounties.',
-      'Space members can create new proposals.',
+      'Space members can be selected to review a proposal.',
       'Space members can view, edit, comment on, share and delete new top-level pages by default.',
       'Anyone can see new top-level pages by default.',
       'Anyone can see bounties and bounty suggestions visible to space members.'

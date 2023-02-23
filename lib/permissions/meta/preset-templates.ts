@@ -10,7 +10,8 @@ const readOnly: SpacePermissionTemplate = {
     createPage: false,
     createVote: false,
     createForumCategory: false,
-    moderateForums: false
+    moderateForums: false,
+    reviewProposals: false
   },
   pagePermissionDefaults: {
     defaultPagePermissionGroup: 'view',
@@ -25,7 +26,8 @@ const collaborative: SpacePermissionTemplate = {
     createBounty: true,
     createVote: true,
     createForumCategory: false,
-    moderateForums: false
+    moderateForums: false,
+    reviewProposals: true
   },
   pagePermissionDefaults: {
     defaultPagePermissionGroup: 'full_access',
@@ -40,7 +42,8 @@ const open: SpacePermissionTemplate = {
     createBounty: true,
     createVote: true,
     createForumCategory: false,
-    moderateForums: false
+    moderateForums: false,
+    reviewProposals: true
   },
   pagePermissionDefaults: {
     defaultPagePermissionGroup: 'full_access',
@@ -82,7 +85,7 @@ export function getTemplateExplanation(template: SpacePermissionConfigurationMod
   const templateData = permissionTemplates[template];
 
   // eslint-disable-next-line camelcase
-  const { moderateForums, ...applicableOperations } = templateData.spaceOperations;
+  const { moderateForums, createVote, ...applicableOperations } = templateData.spaceOperations;
   // Handle space operations
   for (const [operation, can] of Object.entries(applicableOperations) as [SpaceOperation, boolean][]) {
     const qualifier = can ? 'can' : 'cannot';

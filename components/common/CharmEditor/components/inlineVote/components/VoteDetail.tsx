@@ -113,7 +113,7 @@ export function VoteDetail({
         <VoteActionsMenu
           deleteVote={deleteVote}
           cancelVote={cancelVote}
-          isProposalVote={isProposal}
+          isProposalVote={!!isProposal}
           vote={vote}
           removeFromPage={removeFromPage}
           updateDeadline={updateDeadline}

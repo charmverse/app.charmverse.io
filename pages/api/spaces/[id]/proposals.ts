@@ -24,7 +24,6 @@ async function getProposals(req: NextApiRequest, res: NextApiResponse<ProposalWi
 
   const viewableProposals = await getProposalsBySpace({
     spaceId,
-    userId,
     categoryIds: accessibleCategories.map((c) => c.id)
   });
 

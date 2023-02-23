@@ -8,7 +8,7 @@ export const spaceOperationLabels: Record<SpaceOperation, string> = {
   createVote: 'Create new proposals',
   createForumCategory: 'Create new forum categories',
   moderateForums: 'Moderate all forum categories',
-  reviewProposals: 'Be eligible to review proposals'
+  reviewProposals: 'Be selected to review a proposal'
 };
 
 export function spaceOperations() {

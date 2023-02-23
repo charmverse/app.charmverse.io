@@ -1,12 +1,8 @@
-import type { Post } from '@prisma/client';
-
-import { prisma } from 'db';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
-import { DataNotFoundError, InsecureOperationError } from 'lib/utilities/errors';
+import { DataNotFoundError } from 'lib/utilities/errors';
 import { typedKeys } from 'lib/utilities/objects';
 
-import type { AvailablePostPermissionFlags } from './forum/interfaces';
-import type { PermissionCompute, UserPermissionFlags } from './interfaces';
+import type { PermissionCompute } from './interfaces';
 /**
  * In these types, we use the following naming convention:
  * R - resource type such as a Post
@@ -56,10 +52,10 @@ export function buildComputePermissionsWithPermissionFilteringPolicies<R, F>({
     // If the resource has a spaceId, we can auto resolve admin status
     let isAdminStatus: boolean | undefined;
 
-    if ((resource as ResourceWithSpaceId).spaceId) {
+    if ((resource as any as ResourceWithSpaceId).spaceId) {
       isAdminStatus = (
         await hasAccessToSpace({
-          spaceId: (resource as ResourceWithSpaceId).spaceId,
+          spaceId: (resource as any as ResourceWithSpaceId).spaceId,
           userId: request.userId
         })
       ).isAdmin;
