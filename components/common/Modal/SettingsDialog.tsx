@@ -1,7 +1,9 @@
+import styled from '@emotion/styled';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import CloseIcon from '@mui/icons-material/Close';
 import MenuIcon from '@mui/icons-material/Menu';
+import { treeItemClasses } from '@mui/lab/TreeItem';
 import TreeView from '@mui/lab/TreeView';
 import { Slide } from '@mui/material';
 import type { BoxProps } from '@mui/material/Box';
@@ -124,78 +126,77 @@ function SpaceSettingsModalComponent() {
       open={open}
     >
       <Box data-test-active-path={activePath} display='flex' flexDirection='row' flex='1' overflow='hidden'>
-        <Slide direction='right' in={isMobile ? open && !activePath : true} appear={isMobile} unmountOnExit>
-          <Box
-            component='aside'
-            maxWidth={{ xs: '100%', md: 350 }}
-            minWidth={{ xs: '100%', md: 300 }}
-            borderRight='1px solid'
-            borderColor='divider'
-            overflow='auto'
-            sx={{ backgroundColor: (theme) => theme.palette.sidebar.background }}
+        <Box
+          component='aside'
+          width={{ xs: '100%', md: 300 }}
+          display={isMobile ? (open && !activePath && 'block') || 'none' : 'block'}
+          borderRight='1px solid'
+          borderColor='divider'
+          overflow='auto'
+          sx={{ backgroundColor: (theme) => theme.palette.sidebar.background }}
+        >
+          <Typography p='10px' variant='body1'>
+            {user?.username}
+          </Typography>
+          <TreeView
+            aria-label='Profile settings tree view'
+            defaultCollapseIcon={<ArrowDropDownIcon fontSize='large' />}
+            defaultExpandIcon={<ArrowRightIcon fontSize='large' />}
+            defaultExpanded={currentSpace?.name ? ['my-spaces', currentSpace?.name] : ['my-spaces']}
+            sx={{
+              '& .MuiTreeItem-content > .MuiTreeItem-label': { pl: 0.5 },
+              '& .MuiTreeItem-content': { py: 0.5 },
+              '& .MuiTreeItem-group .MuiTreeItem-content': { pl: 1 },
+              '& .MuiTreeItem-root[aria-expanded] > .MuiTreeItem-content': { py: 1 }
+            }}
           >
-            <Typography p='10px' variant='body1'>
-              {user?.username}
-            </Typography>
-            <TreeView
-              aria-label='Profile settings tree view'
-              defaultCollapseIcon={<ArrowDropDownIcon fontSize='large' />}
-              defaultExpandIcon={<ArrowRightIcon fontSize='large' />}
-              defaultExpanded={currentSpace?.name ? ['my-spaces', currentSpace?.name] : ['my-spaces']}
-              sx={{
-                '& .MuiTreeItem-content': { py: 0.5 },
-                '& .MuiTreeItem-root[aria-expanded] > .MuiTreeItem-content': { py: 1 }
-              }}
-            >
-              {ACCOUNT_TABS.map((tab) => (
+            {ACCOUNT_TABS.map((tab) => (
+              <StyledTreeItem
+                key={tab.path}
+                nodeId={tab.path}
+                label={tab.label}
+                icon={tab.icon}
+                onClick={() => onClick(tab.path)}
+                isActive={activePath === tab.path}
+              />
+            ))}
+            <StyledTreeItem nodeId='my-spaces' label='My spaces' sx={{ mt: 1.5 }}>
+              {spaces.map((space) => (
                 <StyledTreeItem
-                  key={tab.path}
-                  nodeId={tab.path}
-                  label={tab.label}
-                  icon={tab.icon}
-                  onClick={() => onClick(tab.path)}
-                  isActive={activePath === tab.path}
-                />
+                  data-test={`space-settings-tab-${space.id}`}
+                  key={space.id}
+                  onClick={() => {
+                    setCurrentSpaceId(space.id);
+                    onClick(`${space.name}-space`);
+                  }}
+                  nodeId={space.name}
+                  label={
+                    <Box display='flex' alignItems='center' gap={1}>
+                      <WorkspaceAvatar name={space.name} image={space.spaceImage} />
+                      <Typography noWrap>{space.name}</Typography>
+                    </Box>
+                  }
+                >
+                  {SETTINGS_TABS.map((tab) => (
+                    <StyledTreeItem
+                      data-test={`space-settings-tab-${space.id}-${tab.path}`}
+                      key={tab.path}
+                      nodeId={`${space.name}-${tab.path}`}
+                      label={tab.label}
+                      icon={tab.icon}
+                      onClick={() => {
+                        setCurrentSpaceId(space.id);
+                        onClick(`${space.name}-${tab.path}`);
+                      }}
+                      isActive={activePath === `${space.name}-${tab.path}`}
+                      ContentProps={{ style: { paddingLeft: 44 } }}
+                    />
+                  ))}
+                </StyledTreeItem>
               ))}
-              <StyledTreeItem nodeId='my-spaces' label='My spaces' icon={null} sx={{ mt: 1.5 }}>
-                {spaces.map((space) => (
-                  <StyledTreeItem
-                    data-test={`space-settings-tab-${space.id}`}
-                    key={space.id}
-                    onClick={() => {
-                      setCurrentSpaceId(space.id);
-                      onClick(`${space.name}-space`);
-                    }}
-                    nodeId={space.name}
-                    label={
-                      <Box display='flex' alignItems='center' gap={1}>
-                        <WorkspaceAvatar name={space.name} image={space.spaceImage} />
-                        <Typography noWrap>{space.name}</Typography>
-                      </Box>
-                    }
-                    icon={null}
-                  >
-                    {SETTINGS_TABS.map((tab) => (
-                      <StyledTreeItem
-                        data-test={`space-settings-tab-${space.id}-${tab.path}`}
-                        key={tab.path}
-                        nodeId={`${space.name}-${tab.path}`}
-                        label={tab.label}
-                        icon={tab.icon}
-                        onClick={() => {
-                          setCurrentSpaceId(space.id);
-                          onClick(`${space.name}-${tab.path}`);
-                        }}
-                        isActive={activePath === `${space.name}-${tab.path}`}
-                        ContentProps={{ style: { paddingLeft: 45 } }}
-                      />
-                    ))}
-                  </StyledTreeItem>
-                ))}
-              </StyledTreeItem>
-            </TreeView>
-          </Box>
-        </Slide>
+            </StyledTreeItem>
+          </TreeView>
+        </Box>
         <Box flex='1 1 auto' position='relative' overflow='auto'>
           {isMobile && !!activePath && (
             <Box
