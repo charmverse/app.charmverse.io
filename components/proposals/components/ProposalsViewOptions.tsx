@@ -1,5 +1,5 @@
 import AddIcon from '@mui/icons-material/Add';
-import { Box, Chip, InputLabel, MenuItem, Select, TextField } from '@mui/material';
+import { Box, Chip, MenuItem, Select, TextField } from '@mui/material';
 import type { ProposalStatus } from '@prisma/client';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useState } from 'react';
@@ -7,18 +7,16 @@ import { useState } from 'react';
 import Button from 'components/common/Button';
 import Modal from 'components/common/Modal';
 import { ViewOptions } from 'components/common/ViewOptions';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { ProposalCategoryWithPermissions } from 'lib/permissions/proposals/interfaces';
-import type { ProposalCategory } from 'lib/proposal/interface';
 import { PROPOSAL_STATUS_LABELS } from 'lib/proposal/proposalStatusTransition';
 import type { BrandColor } from 'theme/colors';
 import { getRandomThemeColor } from 'theme/utils/getRandomThemeColor';
 
 import { useProposalCategories } from '../hooks/useProposalCategories';
 
-import { CategoryContextMenu } from './ProposalCategoryContextMenu';
+import { ProposalCategoryContextMenu } from './ProposalCategoryContextMenu';
 
 export type ProposalSort = 'latest_created';
 export type ProposalFilter = ProposalStatus | 'all';
@@ -92,13 +90,33 @@ export function ProposalsViewOptions({
           <Select
             variant='outlined'
             value={categoryIdFilter || ''}
+            renderValue={(value) => {
+              if (value === 'all') {
+                return 'All categories';
+              }
+
+              const category = categories.find((c) => c.id === value);
+              if (category) {
+                return (
+                  <Chip
+                    sx={{ cursor: 'pointer', minWidth: '100px' }}
+                    color={category.color as BrandColor}
+                    label={category.title}
+                  />
+                );
+              }
+            }}
             onChange={(e) => setCategoryIdFilter(e.target.value)}
           >
             <MenuItem value='all'>All categories</MenuItem>
             {categories.map((category) => (
-              <MenuItem key={category.id} value={category.id}>
-                <Chip sx={{ cursor: 'pointer' }} color={category.color as BrandColor} label={category.title} />
-                <CategoryContextMenu category={category} key={category.id} />
+              <MenuItem key={category.id} value={category.id} sx={{ justifyContent: 'space-between' }}>
+                <Chip
+                  sx={{ cursor: 'pointer', minWidth: '100px' }}
+                  color={category.color as BrandColor}
+                  label={category.title}
+                />
+                <ProposalCategoryContextMenu category={category} key={category.id} />
               </MenuItem>
             ))}
             <MenuItem

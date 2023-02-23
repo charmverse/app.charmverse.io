@@ -3,18 +3,13 @@ import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { IconButton, ListItemIcon, MenuItem, MenuList, Stack, TextField, Typography } from '@mui/material';
 import Tooltip from '@mui/material/Tooltip';
-import type { ProposalCategory } from '@prisma/client';
 import { useEffect, useMemo, useState } from 'react';
 
 import charmClient from 'charmClient';
 import FieldLabel from 'components/common/form/FieldLabel';
 import PopperPopup from 'components/common/PopperPopup';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { useIsAdmin } from 'hooks/useIsAdmin';
-import type {
-  AvailableProposalCategoryPermissionFlags,
-  ProposalCategoryWithPermissions
-} from 'lib/permissions/proposals/interfaces';
+import type { ProposalCategoryWithPermissions } from 'lib/permissions/proposals/interfaces';
 
 import { useProposalCategories } from '../hooks/useProposalCategories';
 
@@ -24,7 +19,7 @@ type Props = {
   category: ProposalCategoryWithPermissions;
 };
 
-export function CategoryContextMenu({ category }: Props) {
+export function ProposalCategoryContextMenu({ category }: Props) {
   const [tempName, setTempName] = useState(category.title || '');
   const space = useCurrentSpace();
   const { mutateCategory, deleteCategory } = useProposalCategories();
