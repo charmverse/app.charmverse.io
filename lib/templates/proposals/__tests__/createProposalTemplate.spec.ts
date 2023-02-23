@@ -1,11 +1,23 @@
+import type { Space, User } from '@prisma/client';
+
+import { InvalidInputError } from 'lib/utilities/errors';
 import { generateRole, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { generateProposalCategory } from 'testing/utils/proposals';
 
 import { createProposalTemplate } from '../createProposalTemplate';
 
+let space: Space;
+let user: User;
+
+beforeAll(async () => {
+  const generated = await generateUserAndSpaceWithApiToken(undefined, false);
+
+  space = generated.space;
+  user = generated.user;
+});
+
 describe('createProposalTemplate', () => {
   it('should create a proposal template', async () => {
-    const { space, user } = await generateUserAndSpaceWithApiToken(undefined, false);
     const role = await generateRole({
       spaceId: space.id,
       createdBy: user.id
@@ -49,5 +61,15 @@ describe('createProposalTemplate', () => {
     expect(template.proposal?.reviewers.length).toBe(2);
     expect(template.proposal?.reviewers.some((r) => r.roleId === role.id && !r.userId)).toBe(true);
     expect(template.proposal?.reviewers.some((r) => r.userId === user.id && !r.roleId)).toBe(true);
+  });
+
+  it('should throw an error if categoryId is not provided', async () => {
+    await expect(
+      createProposalTemplate({
+        spaceId: space.id,
+        userId: user.id,
+        categoryId: undefined as any
+      })
+    ).rejects.toBeInstanceOf(InvalidInputError);
   });
 });

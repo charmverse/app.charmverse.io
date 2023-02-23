@@ -13,7 +13,6 @@ import { TemplatesMenu } from 'components/common/TemplatesMenu';
 import useTasks from 'components/nexus/hooks/useTasks';
 import { useProposalCategories } from 'components/proposals/hooks/useProposalCategories';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { usePages } from 'hooks/usePages';
 import { useUser } from 'hooks/useUser';
@@ -25,7 +24,6 @@ export function NewProposalButton({ mutateProposals }: { mutateProposals: KeyedM
   const router = useRouter();
   const { user } = useUser();
   const currentSpace = useCurrentSpace();
-  const [userSpacePermissions] = useCurrentSpacePermissions();
   const { showPage } = usePageDialog();
   const { getCategoriesWithCreatePermission } = useProposalCategories();
   const isAdmin = useIsAdmin();

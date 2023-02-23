@@ -90,7 +90,7 @@ export default function SpacePermissions({ targetGroup, id, callback = () => nul
   // We don't want to show the forum category moderate permission in context of the entire space
   const assignableOperations =
     targetGroup === 'space'
-      ? spaceOperationsWithoutForumCategory.filter((op) => op !== 'moderateForums')
+      ? spaceOperationsWithoutForumCategory.filter((op) => op !== 'moderateForums' && op !== 'createVote')
       : spaceOperationsWithoutForumCategory;
 
   async function submitted(formValues: FormValues) {

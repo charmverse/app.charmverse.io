@@ -62,16 +62,6 @@ async function convertToProposal(req: NextApiRequest, res: NextApiResponse<IPage
     throw new UnauthorisedActionError('You do not have permission to create a proposal in this category');
   }
 
-  const spacePermissions = await computeSpacePermissions({
-    allowAdminBypass: true,
-    resourceId: page.spaceId,
-    userId
-  });
-
-  if (!spacePermissions.createVote) {
-    throw new UnauthorisedActionError('You do not have permission to create a page in this space');
-  }
-
   const { page: updatedPage } = await createProposal({
     pageId: page.id,
     userId,

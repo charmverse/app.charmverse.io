@@ -3,6 +3,7 @@ import { v4 } from 'uuid';
 import type { IPageWithPermissions, PageWithProposal } from 'lib/pages';
 import { createPage } from 'lib/pages/server/createPage';
 import { getPagePath } from 'lib/pages/utils';
+import { InvalidInputError } from 'lib/utilities/errors';
 
 import type { ProposalReviewerInput } from '../../proposal/interface';
 
@@ -26,6 +27,10 @@ export async function createProposalTemplate({
   categoryId
 }: CreateProposalTemplateInput): Promise<IPageWithPermissions & PageWithProposal> {
   const proposalId = v4();
+
+  if (!categoryId) {
+    throw new InvalidInputError('Proposal category is required');
+  }
 
   return createPage({
     data: {
