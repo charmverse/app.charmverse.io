@@ -1,18 +1,23 @@
 import { useTheme } from '@emotion/react';
-import { Box, Dialog, DialogActions, DialogContent, useMediaQuery } from '@mui/material';
+import { Box, Dialog, DialogContent, useMediaQuery } from '@mui/material';
 import type { ReactNode } from 'react';
-import { useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
-import Button from 'components/common/Button';
-import { getFieldRendererConfig } from 'components/common/form/fields/getFieldRendererConfig';
+import { FieldTypeRenderer } from 'components/common/form/fields/FieldTypeRenderer';
+import { getFieldTypeRules } from 'components/common/form/fields/util';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { DialogTitle } from 'components/common/Modal';
 import { useMutateMemberPropertyValues } from 'components/profile/components/SpacesMemberDetails/components/useMutateMemberPropertyValues';
-import { useSnackbar } from 'hooks/useSnackbar';
-import type { MemberPropertyValueType, UpdateMemberPropertyValuePayload } from 'lib/members/interfaces';
+import { useMembers } from 'hooks/useMembers';
+import type {
+  MemberPropertyValueType,
+  PropertyValueWithDetails,
+  UpdateMemberPropertyValuePayload
+} from 'lib/members/interfaces';
+import debounce from 'lib/utilities/debounce';
 
 type Props = {
   spaceId: string | null;
@@ -20,14 +25,12 @@ type Props = {
   updateMemberPropertyValues: (spaceId: string, values: UpdateMemberPropertyValuePayload[]) => Promise<void>;
   onClose: VoidFunction;
   title?: string;
-  cancelButtonText?: string;
   children?: ReactNode;
   isLoading?: boolean;
   postComponent?: ReactNode;
 };
 
 export function MemberPropertiesPopup({
-  cancelButtonText = 'Cancel',
   children,
   memberId,
   spaceId,
@@ -49,9 +52,8 @@ export function MemberPropertiesPopup({
 
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
-
+  const { mutateMembers } = useMembers();
   const { createOption, deleteOption, updateOption } = useMutateMemberPropertyValues(mutate);
-  const { showMessage } = useSnackbar();
 
   const defaultValues = useMemo(() => {
     if (data) {
@@ -66,10 +68,10 @@ export function MemberPropertiesPopup({
 
   const {
     control,
-    handleSubmit,
-    formState: { errors, isSubmitting, isDirty },
-    reset
-  } = useForm();
+    formState: { errors, isDirty },
+    reset,
+    getValues
+  } = useForm({ mode: 'onChange' });
 
   const onSubmit = async (submitData: any) => {
     if (!spaceId) {
@@ -82,11 +84,18 @@ export function MemberPropertiesPopup({
     }));
 
     await updateMemberPropertyValues(spaceId, updateData);
-    showMessage('Profile updated successfully', 'success');
-    onClose();
   };
 
+  const handleOnChange = useCallback(
+    debounce(async (propertyId: string, option: any) => {
+      await onSubmit({ ...getValues(), [propertyId]: option });
+    }, 300),
+    []
+  );
+
   function onClickClose() {
+    // refresh members only after all the editing is finished
+    mutateMembers();
     reset();
     onClose();
   }
@@ -100,7 +109,7 @@ export function MemberPropertiesPopup({
   }, [defaultValues, isDirty]);
 
   return (
-    <Dialog open={!!spaceId} onClose={onClose} fullScreen={fullScreen} fullWidth>
+    <Dialog open={!!spaceId} onClose={onClickClose} fullScreen={fullScreen} fullWidth>
       {!data || isFetchingSpaceProperties || isLoading ? (
         <DialogContent>
           <LoadingComponent isLoading />
@@ -110,49 +119,35 @@ export function MemberPropertiesPopup({
           <DialogTitle sx={{ '&&': { px: 2, py: 2 } }} onClose={onClickClose}>
             {title}
           </DialogTitle>
-          <DialogContent dividers>
+          <DialogContent dividers sx={{ pb: 6 }}>
             {children}
-            <form onSubmit={handleSubmit(onSubmit)}>
-              <Box display='flex' flexDirection='column'>
-                {data.map((property) => {
-                  const fieldRendererConfig = getFieldRendererConfig({
-                    type: property.type,
-                    label: property.name,
-                    error: errors[property.memberPropertyId] as any,
-                    inline: true,
-                    options: property.options,
-                    onCreateOption: (option) => createOption(property, option),
-                    onUpdateOption: (option) => updateOption(property, option),
-                    onDeleteOption: (option) => deleteOption(property, option)
-                  });
-
-                  return fieldRendererConfig.renderer ? (
-                    <Controller
-                      key={property.memberPropertyId}
-                      name={property.memberPropertyId}
-                      control={control}
-                      rules={fieldRendererConfig.rules}
-                      render={fieldRendererConfig.renderer}
+            <Box display='flex' flexDirection='column'>
+              {data.map((property) => (
+                <Controller
+                  key={property.memberPropertyId}
+                  name={property.memberPropertyId}
+                  control={control}
+                  rules={getFieldTypeRules(property.type)}
+                  render={({ field }) => (
+                    <FieldTypeRenderer
+                      {...field}
+                      type={property.type}
+                      label={property.name}
+                      options={property.options}
+                      error={errors[property.memberPropertyId] as any}
+                      onCreateOption={(option) => createOption(property, option)}
+                      onUpdateOption={(option) => updateOption(property, option)}
+                      onDeleteOption={(option) => deleteOption(property, option)}
+                      onChange={(e) => {
+                        field.onChange(e);
+                        handleOnChange(property.memberPropertyId, e?.target?.value ? e.target.value : e);
+                      }}
                     />
-                  ) : null;
-                })}
-              </Box>
-            </form>
+                  )}
+                />
+              ))}
+            </Box>
             {postComponent}
-            <DialogActions>
-              <Button
-                data-test='close-member-properties-modal'
-                onClick={onClose}
-                variant='text'
-                color='secondary'
-                sx={{ px: 4 }}
-              >
-                {cancelButtonText}
-              </Button>
-              <Button onClick={handleSubmit(onSubmit)} disabled={isSubmitting} loading={isSubmitting} sx={{ px: 4 }}>
-                Save
-              </Button>
-            </DialogActions>
           </DialogContent>
         </>
       )}

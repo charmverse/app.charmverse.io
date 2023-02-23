@@ -7,6 +7,7 @@ import type { FormInputs } from 'components/forum/components/interfaces';
 import { PostPage } from 'components/forum/components/PostPage/PostPage';
 import { usePostByPath } from 'components/forum/hooks/usePostByPath';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { usePageTitle } from 'hooks/usePageTitle';
 import type { PostWithVotes } from 'lib/forums/posts/interfaces';
 
 export default function ForumPostPage() {
@@ -26,6 +27,7 @@ export default function ForumPostPage() {
 function WrapperPostPage({ post }: { post: PostWithVotes }) {
   const [formInputs, setFormInputs] = useState<FormInputs>(post);
   const [contentUpdated, setContentUpdated] = useState(false);
+  const [, setTitleState] = usePageTitle();
 
   return (
     <PostPage
@@ -36,9 +38,11 @@ function WrapperPostPage({ post }: { post: PostWithVotes }) {
       }}
       contentUpdated={contentUpdated}
       setContentUpdated={setContentUpdated}
-      shouldUpdateTitleState
       post={post}
       spaceId={post.spaceId}
+      onTitleChange={(newTitle) => {
+        setTitleState(newTitle);
+      }}
     />
   );
 }

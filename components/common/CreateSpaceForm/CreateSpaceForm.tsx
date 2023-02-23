@@ -28,7 +28,7 @@ import { spaceCreateTemplates } from 'lib/spaces/config';
 import type { SpaceCreateTemplate } from 'lib/spaces/config';
 import randomName from 'lib/utilities/randomName';
 
-import { ImportZippedMarkdown } from '../CharmEditor/components/markdownParser/ImportZippedMarkdown';
+import { ImportZippedMarkdown } from '../ImportZippedMarkdown';
 import { JoinDynamicSpaceForm } from '../TokenGateForm/JoinDynamicSpaceForm';
 
 import { SelectNewSpaceTemplate } from './SelectNewSpaceTemplate';

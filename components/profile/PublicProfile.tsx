@@ -1,10 +1,11 @@
-import { Chip, Divider, Stack, Typography } from '@mui/material';
+import { Box, Chip, Stack } from '@mui/material';
 import { useEffect } from 'react';
 import useSWRImmutable from 'swr/immutable';
 
 import charmClient from 'charmClient';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { SpacesMemberDetails } from 'components/profile/components/SpacesMemberDetails/SpacesMemberDetails';
+import Legend from 'components/settings/Legend';
 import { useUser } from 'hooks/useUser';
 import type { Collectable, ExtendedPoap } from 'lib/blockchain/interfaces';
 import { transformNft } from 'lib/blockchain/transformNft';
@@ -15,11 +16,13 @@ import CollectableRow from './components/CollectibleRow';
 import type { CommunityDetails } from './components/CommunityRow';
 import CommunityRow from './components/CommunityRow';
 import type { UserDetailsProps } from './components/UserDetails';
-import UserDetails, { isPublicUser } from './components/UserDetails';
+import UserDetails from './components/UserDetails/UserDetails';
+import UserDetailsMini from './components/UserDetails/UserDetailsMini';
+import { isPublicUser } from './components/UserDetails/utils';
 import { useCollablandCredentials } from './hooks/useCollablandCredentials';
 
 export default function PublicProfile(props: UserDetailsProps) {
-  const { user } = props;
+  const { user, readOnly } = props;
   const { user: currentUser } = useUser();
 
   const { aeToken, setAeToken } = useCollablandCredentials();
@@ -35,22 +38,22 @@ export default function PublicProfile(props: UserDetailsProps) {
   } = useSWRImmutable(user ? `userAggregatedData/${user.id}` : null, () => {
     return charmClient.getAggregatedData(user.id);
   });
-  const readOnly = isPublicUser(user, currentUser);
+  const isPublic = isPublicUser(user, currentUser);
 
   const {
     data: poapData,
     mutate: mutatePoaps,
     isValidating: isPoapDataValidating
-  } = useSWRImmutable(`/poaps/${user.id}/${readOnly}`, () => {
-    return readOnly ? Promise.resolve(user.visiblePoaps as ExtendedPoap[]) : charmClient.getUserPoaps(user.id);
+  } = useSWRImmutable(`/poaps/${user.id}/${isPublic}`, () => {
+    return isPublic ? Promise.resolve(user.visiblePoaps as ExtendedPoap[]) : charmClient.getUserPoaps(user.id);
   });
 
   const {
     data: nftData,
     mutate: mutateNfts,
     isValidating: isNftDataValidating
-  } = useSWRImmutable(`/nfts/${user.id}/${readOnly}`, () => {
-    return readOnly ? Promise.resolve(user.visibleNfts) : charmClient.blockchain.listNFTs(user.id);
+  } = useSWRImmutable(`/nfts/${user.id}/${isPublic}`, () => {
+    return isPublic ? Promise.resolve(user.visibleNfts) : charmClient.blockchain.listNFTs(user.id);
   });
 
   const isLoading =
@@ -155,7 +158,7 @@ export default function PublicProfile(props: UserDetailsProps) {
   const bountyEvents = credentials?.bountyEvents ?? [];
 
   const communities = (data?.communities ?? [])
-    .filter((community) => (readOnly ? !community.isHidden : true))
+    .filter((community) => (isPublic ? !community.isHidden : true))
     .map((community) => {
       community.bounties.forEach((bounty) => {
         bounty.hasCredential = bountyEvents.some((event) => event.subject.bountyId === bounty.bountyId);
@@ -190,20 +193,21 @@ export default function PublicProfile(props: UserDetailsProps) {
   }, [collabError]);
 
   return (
-    <Stack spacing={2}>
-      <UserDetails {...props} />
+    <Box>
+      {readOnly ? <UserDetailsMini {...props} /> : <UserDetails {...props} />}
       <SpacesMemberDetails memberId={user.id} />
-      <Divider />
       <LoadingComponent isLoading={isLoading} minHeight={300}>
-        <AggregatedData
-          totalBounties={data?.bounties || 0}
-          totalCommunities={communities.length}
-          totalProposals={data?.totalProposals || 0}
-          totalVotes={data?.totalVotes || 0}
-        />
+        {readOnly && (
+          <AggregatedData
+            totalBounties={data?.bounties || 0}
+            totalCommunities={communities.length}
+            totalProposals={data?.totalProposals || 0}
+            totalVotes={data?.totalVotes || 0}
+          />
+        )}
         {allCommunities.length > 0 ? (
           <>
-            <SectionHeader title='Communities' count={allCommunities.length} />
+            <SectionHeader title='My Organisations' count={allCommunities.length} />
             <Stack gap={2} mb={2}>
               {allCommunities.map((community) => (
                 <CommunityRow
@@ -240,24 +244,14 @@ export default function PublicProfile(props: UserDetailsProps) {
         ) : null}
         {/* <CollablandCredentials error={collabError} /> */}
       </LoadingComponent>
-    </Stack>
+    </Box>
   );
 }
 
 function SectionHeader({ title, count }: { title: string; count: number }) {
   return (
     <Stack flexDirection='row' justifyContent='space-between' alignItems='center' my={2}>
-      <Typography
-        sx={{
-          fontSize: {
-            sm: '2em',
-            xs: '1.2em'
-          },
-          fontWeight: 700
-        }}
-      >
-        {title}
-      </Typography>
+      <Legend noBorder>{title}</Legend>
       <Chip label={count} />
     </Stack>
   );

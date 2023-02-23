@@ -29,7 +29,6 @@ export function WalletConnect({ onSuccess }: Props) {
 
   async function signSuccess(signature: AuthSig) {
     const updatedUser = await charmClient.addUserWallets([signature]);
-
     updateUser(updatedUser);
     onSuccess();
   }

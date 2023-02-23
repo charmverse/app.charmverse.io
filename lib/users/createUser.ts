@@ -12,6 +12,7 @@ import { shortWalletAddress } from 'lib/utilities/strings';
 import type { LoggedInUser } from 'models';
 
 import { getUserProfile } from './getUser';
+import { prepopulateUserProfile } from './prepopulateUserProfile';
 
 type UserProps = { address?: string; email?: string; id?: string; avatar?: string };
 
@@ -46,6 +47,8 @@ export async function createUserFromWallet(
       },
       include: sessionUserRelations
     });
+
+    await prepopulateUserProfile(newUser.id);
 
     updateTrackUserProfile(newUser, prisma);
     trackUserAction('sign_up', { userId: newUser.id, identityType: 'Wallet', ...signupAnalytics });

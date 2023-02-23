@@ -206,8 +206,8 @@ function TableRow(props: Props) {
               readOnly={props.readOnly}
               card={card}
               board={board}
+              showEmptyPlaceholder={false}
               propertyTemplate={template}
-              showEmptyPlaceholder={true}
               updatedAt={pageUpdatedAt}
               updatedBy={pageUpdatedBy}
             />
