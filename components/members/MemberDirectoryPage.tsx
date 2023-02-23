@@ -30,7 +30,7 @@ const views = ['gallery', 'table'] as const;
 type View = (typeof views)[number];
 
 function memberNamePropertyValue(member: Member, nameProperty: MemberPropertyWithPermissions | null) {
-  const memberNameProperty = member.properties.find((prop) => prop.memberPropertyId === nameProperty?.id);
+  const memberNameProperty = member.properties?.find((prop) => prop.memberPropertyId === nameProperty?.id);
   const memberName = (memberNameProperty?.value ?? member.username).toString();
 
   return memberName.startsWith('0x') ? `zzzzzzzz${memberName}` : memberName;

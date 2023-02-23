@@ -1,7 +1,7 @@
 import { Divider, Typography } from '@mui/material';
 
-import { UserDetails } from 'components/profile/components';
 import { MemberPropertiesPopup } from 'components/profile/components/SpacesMemberDetails/components/MemberPropertiesPopup';
+import UserDetails from 'components/profile/components/UserDetails/UserDetails';
 import { useMemberPropertyValues } from 'hooks/useMemberPropertyValues';
 import { useUser } from 'hooks/useUser';
 
@@ -26,7 +26,6 @@ export function MemberOnboardingForm({
       memberId={userId}
       spaceId={spaceId}
       updateMemberPropertyValues={updateSpaceValues}
-      cancelButtonText='Set up later'
     >
       {user && (
         <>

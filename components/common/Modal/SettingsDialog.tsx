@@ -16,6 +16,7 @@ import type { Space } from '@prisma/client';
 import type { ReactNode } from 'react';
 import { useEffect } from 'react';
 
+import Button from 'components/common/Button';
 import { StyledTreeItem } from 'components/common/PageLayout/components/PageNavigation/components/PageTreeItem';
 import IntegrationSettings from 'components/integrations/IntegrationsPage';
 import TasksPage from 'components/nexus/TasksPage';
@@ -228,18 +229,34 @@ function SpaceSettingsModalComponent() {
             </TabPanel>
           ))}
         </Box>
-        <IconButton
-          aria-label='close the settings modal'
-          onClick={onClose}
-          sx={{
-            position: 'absolute',
-            right: 15,
-            top: 8,
-            zIndex: 1
-          }}
-        >
-          <CloseIcon color='secondary' fontSize='small' />
-        </IconButton>
+        {isMobile ? (
+          <Button
+            variant='text'
+            color='inherit'
+            onClick={onClose}
+            sx={{
+              position: 'absolute',
+              right: 10,
+              top: 5,
+              zIndex: 1
+            }}
+          >
+            Close
+          </Button>
+        ) : (
+          <IconButton
+            aria-label='close the settings modal'
+            onClick={onClose}
+            sx={{
+              position: 'absolute',
+              right: 15,
+              top: 15,
+              zIndex: 1
+            }}
+          >
+            <CloseIcon color='secondary' fontSize='small' />
+          </IconButton>
+        )}
       </Box>
     </Dialog>
   );

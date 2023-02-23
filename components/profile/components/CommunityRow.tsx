@@ -252,6 +252,7 @@ export default function CommunityRow({ community, showVisibilityIcon, visible, o
                   xs: '1.05rem'
                 }
               }}
+              noWrap
               fontWeight={500}
             >
               {community.name}
