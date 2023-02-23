@@ -80,7 +80,7 @@ test.describe.serial('Make a page public and visit it', async () => {
     expect(inputValue.match(shareUrl)).not.toBe(null);
   });
 
-  test.only('visit a public page with embedded poll', async () => {
+  test('visit a public page with embedded poll', async () => {
     // Arrange ------------------
     const userContext = await browser.newContext({ permissions: ['clipboard-read', 'clipboard-write'] });
     const page = await userContext.newPage();
