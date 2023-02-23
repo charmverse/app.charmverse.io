@@ -41,7 +41,7 @@ import { SidebarLink } from '../PageLayout/components/Sidebar/SidebarButton';
 import WorkspaceAvatar from '../PageLayout/components/Sidebar/WorkspaceAvatar';
 
 const SpaceSettingsLink = styled(SidebarLink)`
-  padding-left: 44px;
+  padding-left: 36px;
 `;
 
 interface TabPanelProps extends BoxProps {
