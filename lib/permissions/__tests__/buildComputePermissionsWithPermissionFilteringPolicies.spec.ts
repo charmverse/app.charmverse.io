@@ -86,7 +86,7 @@ describe('buildComputePermissionsWithPermissionFilteringPolicies', () => {
     expect(mockAllFalsePfp).toHaveBeenCalledTimes(1);
   });
 
-  it('should throw an error if any PFP adds new permission flags', async () => {
+  it('should not allow a PFP to add new permission flags', async () => {
     const mockPfpAddDelete = jest.fn(
       (props: PermissionFilteringPolicyFnInput<ExampleResource, ExampleResourceFlags>) => {
         return Promise.resolve({ ...props.flags, delete: true });
@@ -100,7 +100,9 @@ describe('buildComputePermissionsWithPermissionFilteringPolicies', () => {
       pfps: [mockPfpAddDelete]
     });
 
-    await expect(insecureCompute({ resourceId: v4(), userId: v4() })).rejects.toBeInstanceOf(InsecureOperationError);
+    const result = await insecureCompute({ resourceId: v4(), userId: v4() });
+
+    expect(result.delete).toBe(false);
   });
   it('should check for admin access if the resource has a spaceId and pass this to the PFPs', async () => {
     jest.resetModules();

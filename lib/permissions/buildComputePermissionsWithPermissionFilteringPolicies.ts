@@ -79,15 +79,14 @@ export function buildComputePermissionsWithPermissionFilteringPolicies<R, F>({
       typedKeys(newFlags).forEach((key) => {
         const flagValue = newFlags[key];
 
-        if (flagValue === true) {
-          hasTrueFlag = true;
-        }
-
         // Adding true and not true just in case a PFP returns a nullish value instead of false
         if (flagValue === true && applicableFlags[key] !== true) {
-          throw new InsecureOperationError(
-            `Permission filtering policy ${pfp.name} attempted to add a new permission flag: ${key.toString()}`
-          );
+          // Prevent any PFP from adding new flags
+          newFlags[key] = false as any;
+        }
+
+        if (newFlags[key] === true) {
+          hasTrueFlag = true;
         }
       });
 
