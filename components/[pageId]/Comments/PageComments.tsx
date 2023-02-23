@@ -1,5 +1,5 @@
 import CommentIcon from '@mui/icons-material/Comment';
-import { Typography } from '@mui/material';
+import { Divider, Typography } from '@mui/material';
 import { Box, Stack } from '@mui/system';
 
 import { usePageComments } from 'components/[pageId]/Comments/usePageComments';
@@ -26,6 +26,8 @@ export function PageComments({ pageId }: Props) {
 
   return (
     <>
+      <Divider sx={{ my: 3 }} />
+
       <CommentForm handleCreateComment={addComment} />
 
       {isLoadingComments ? (

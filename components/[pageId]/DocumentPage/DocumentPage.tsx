@@ -215,6 +215,9 @@ function DocumentPage({ page, setPage, insideModal, readOnly = false, parentProp
                 pageType={page.type}
                 pagePermissions={pagePermissions ?? undefined}
                 onParticipantUpdate={onParticipantUpdate}
+                style={{
+                  minHeight: proposalId ? '100px' : 'unset'
+                }}
               >
                 {/* temporary? disable editing of page title when in suggestion mode */}
                 <PageHeader
