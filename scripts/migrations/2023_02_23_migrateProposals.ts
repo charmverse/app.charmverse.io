@@ -1,9 +1,34 @@
 import { Proposal, ProposalCategory } from "@prisma/client";
 import { prisma } from "db";
+import { disconnectProposalChildren } from "lib/proposal/disconnectProposalChildren";
 import { getRandomThemeColor } from "theme/utils/getRandomThemeColor";
 
 
 const concurrent = 5;
+
+async function disconnectProposalsFromChildren() {
+  console.log('--- START --- Disconnecting proposals from children')
+  const proposals = await prisma.proposal.findMany({
+    select: {
+      page: {
+        select: {
+          id: true
+        }
+      }
+    }
+  });
+
+  let count = 0;
+  let total = proposals.length
+
+  for (const proposal of proposals) {
+    count += 1;
+    console.log('Processing proposal', count, '/', total, '...')
+    if (proposal.page?.id) {
+      await disconnectProposalChildren({pageId: proposal.page.id})
+    }
+  }
+}
 
 async function detectSpacesWithDuplicateCategories() {
   console.log('--- START --- Duplicate Detection')
@@ -71,6 +96,7 @@ async function provisionGeneralProposalCategory() {
 }
 
 async function assignProposalsToDefaultCategory() {
+  console.log('--- START --- Assigning proposals to default category')
   const uncategorised = await prisma.proposal.findMany({
     where: {
       categoryId: null
@@ -107,24 +133,33 @@ async function assignProposalsToDefaultCategory() {
       continue;
     }
 
+    const proposalsToProcess = bySpace[uniqueSpaces[i]]
+
     await prisma.proposal.updateMany({
       where: {
         // Add this as a safeguard
         spaceId: uniqueSpaces[i],
         id: {
-          in: bySpace[uniqueSpaces[i]].map(proposal => proposal.id)
+          in: proposalsToProcess.map(proposal => proposal.id)
         }
       },
       data: {
         categoryId: generalCategory.id
       }
     })
+
+    console.log('Processed: ', proposalsToProcess.length, 'proposals in space', i + 1, '/', uniqueSpaces.length);
   }
 }
 
 
 export function migrateProposals() {
-  detectSpacesWithDuplicateCategories();
+  // Ran this once, no duplicates detected
+  //detectSpacesWithDuplicateCategories();
+  
+  provisionGeneralProposalCategory();
+  assignProposalsToDefaultCategory();
+  disconnectProposalsFromChildren();
 }
 
-migrateProposals()
+// migrateProposals()
