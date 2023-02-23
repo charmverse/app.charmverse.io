@@ -6,9 +6,10 @@ import { prisma } from 'db';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { computeUserPagePermissions } from 'lib/permissions/pages/page-permission-compute';
+import { computeProposalPermissions } from 'lib/permissions/proposals/computeProposalPermissions';
 import { withSessionRoute } from 'lib/session/withSession';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
-import { DataNotFoundError } from 'lib/utilities/errors';
+import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
 import { castVote as castVoteService } from 'lib/votes';
 import type { UserVoteDTO } from 'lib/votes/interfaces';
 
@@ -37,14 +38,32 @@ async function castVote(req: NextApiRequest, res: NextApiResponse<UserVote | { e
     throw new DataNotFoundError(`A vote with id ${voteId} was not found.`);
   }
 
-  const permissions = await computeUserPagePermissions({
-    pageId: vote.pageId,
-    allowAdminBypass: true,
-    userId
-  });
+  if (vote.context === 'proposal') {
+    const pageData = await prisma.page.findUnique({
+      where: {
+        id: vote.pageId
+      }
+    });
 
-  if (!permissions.comment) {
-    throw new ActionNotPermittedError(`You do not have permission to cast a vote on this page.`);
+    if (!pageData?.proposalId) {
+      throw new InvalidInputError(`Proposal not found`);
+    }
+
+    const permissions = await computeProposalPermissions({
+      resourceId: pageData.proposalId,
+      userId
+    });
+    if (!permissions.vote) {
+      throw new ActionNotPermittedError(`You do not have permission to cast a vote on this proposal.`);
+    }
+  } else {
+    const permissions = await computeUserPagePermissions({
+      pageId: vote.pageId,
+      userId
+    });
+    if (!permissions.comment) {
+      throw new ActionNotPermittedError(`You do not have permission to cast a vote on this page.`);
+    }
   }
   const newUserVote: UserVote = await castVoteService(choice, vote, userId);
 

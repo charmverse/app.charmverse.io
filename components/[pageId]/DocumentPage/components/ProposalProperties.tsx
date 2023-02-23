@@ -311,6 +311,7 @@ export function ProposalProperties({ pageId, proposalId, readOnly, isTemplate }:
                       reviewers: options.map((option) => ({ group: option.group, id: option.id }))
                     });
                     refreshProposal();
+                    refreshProposalFlowFlags();
                   }}
                   sx={{
                     width: '100%'
