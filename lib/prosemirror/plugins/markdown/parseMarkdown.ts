@@ -1,8 +1,8 @@
 import markdownit from 'markdown-it/lib';
 import { MarkdownParser } from 'prosemirror-markdown';
 
-import { specRegistry } from '../../specRegistry';
-import { listIsTight } from '../listItem/listIsTight';
+import { listIsTight } from 'components/common/CharmEditor/components/listItem/listIsTight';
+import { specRegistry } from 'components/common/CharmEditor/specRegistry';
 
 const charmParser = new MarkdownParser(specRegistry.schema, markdownit('commonmark', { html: false }), {
   blockquote: { block: 'blockquote' },

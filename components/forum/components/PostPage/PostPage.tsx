@@ -23,7 +23,6 @@ import { usePostPermissions } from 'components/forum/hooks/usePostPermissions';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useForumCategories } from 'hooks/useForumCategories';
 import { useMembers } from 'hooks/useMembers';
-import { usePageTitle } from 'hooks/usePageTitle';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useUser } from 'hooks/useUser';
 import type { PostCommentWithVoteAndChildren } from 'lib/forums/comments/interface';
@@ -46,13 +45,13 @@ type Props = {
   formInputs: FormInputs;
   contentUpdated: boolean;
   setContentUpdated: (changed: boolean) => void;
-  shouldUpdateTitleState?: boolean;
   showOtherCategoryPosts?: boolean;
   newPostCategory?: PostCategory | null;
+  onTitleChange?: (newTitle: string) => void;
 };
 
 export function PostPage({
-  shouldUpdateTitleState = false,
+  onTitleChange,
   post,
   spaceId,
   onSave,
@@ -97,8 +96,8 @@ export function PostPage({
   const permissions = usePostPermissions({ postIdOrPath: post?.id as string, isNewPost: !post });
 
   usePreventReload(contentUpdated);
-  const [, setTitleState] = usePageTitle();
   const [commentSort, setCommentSort] = useState<CommentSortType>('latest');
+
   const isLoading = !postComments && isValidating;
 
   const createdBy = members.find((_member) => _member.id === post?.createdBy);
@@ -106,14 +105,12 @@ export function PostPage({
   function updateTitle(updates: { title: string; updatedAt: any }) {
     setContentUpdated(true);
     setFormInputs({ title: updates.title });
-    if (shouldUpdateTitleState) {
-      setTitleState(updates.title);
-    }
+    onTitleChange?.(updates.title);
   }
 
   useEffect(() => {
-    if (post) {
-      setTitleState(post.title);
+    if (post && onTitleChange) {
+      onTitleChange(post.title);
     }
   }, [post]);
 
