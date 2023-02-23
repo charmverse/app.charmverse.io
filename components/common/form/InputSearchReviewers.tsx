@@ -110,8 +110,7 @@ export function InputSearchReviewers({
       />
       {noReviewersAvailable && (
         <Alert severity='warning'>
-          No reviewers are available for this proposal. Please ask a space admin to allow the whole space or specific
-          roles to review proposals.
+          No reviewers found: an admin must assign specific role(s) or all members as reviewers.
         </Alert>
       )}
     </>
