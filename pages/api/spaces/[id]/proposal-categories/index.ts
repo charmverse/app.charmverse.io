@@ -32,7 +32,7 @@ async function createCategory(req: NextApiRequest, res: NextApiResponse<Proposal
   const spaceId = req.query.id as string;
   const categoryData = req.body as Omit<ProposalCategory, 'id' | 'spaceId'>;
 
-  const category = await createProposalCategory({ ...categoryData, spaceId });
+  const category = await createProposalCategory({ data: { ...categoryData, spaceId } });
 
   const permissions = await computeProposalCategoryPermissions({
     resourceId: category.id,
