@@ -35,7 +35,7 @@ type Props = {
 };
 function ProposalCategoryPermissions({ proposalCategory, permissions }: Props) {
   const { data, mutate: mutatePermissions } = useSWR(
-    `/api/proposals/list-proposal-category-permissions-${proposalCategory.id}`,
+    `/proposals/list-proposal-category-permissions-${proposalCategory.id}`,
     () => charmClient.permissions.proposals.listProposalCategoryPermissions(proposalCategory.id)
   );
 
