@@ -36,8 +36,14 @@ export class ProposalsApi {
     return http.GET<ProposalCategoryWithPermissions[]>(`/api/spaces/${spaceId}/proposal-categories`);
   }
 
-  createProposalTemplate({ spaceId }: { spaceId: string }): Promise<IPageWithPermissions> {
-    return http.POST('/api/proposals/templates', { spaceId });
+  createProposalTemplate({
+    spaceId,
+    categoryId
+  }: {
+    spaceId: string;
+    categoryId: string;
+  }): Promise<IPageWithPermissions> {
+    return http.POST('/api/proposals/templates', { spaceId, categoryId });
   }
 
   createProposalFromTemplate({

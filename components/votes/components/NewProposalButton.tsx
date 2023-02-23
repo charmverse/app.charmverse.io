@@ -73,7 +73,10 @@ export function NewProposalButton({ mutateProposals }: { mutateProposals: KeyedM
 
   async function createProposalTemplate() {
     if (currentSpace) {
-      const newTemplate = await charmClient.proposals.createProposalTemplate({ spaceId: currentSpace.id });
+      const newTemplate = await charmClient.proposals.createProposalTemplate({
+        spaceId: currentSpace.id,
+        categoryId: getDefaultCreateCategory()?.id as string
+      });
 
       mutatePage(newTemplate);
       setUrlWithoutRerender(router.pathname, { id: newTemplate.id });

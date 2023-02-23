@@ -92,7 +92,11 @@ export default function ProposalCategoryInput({ disabled, options, canEditCatego
       autoHighlight
       clearIcon={null}
       renderOption={(_props, category) => <ProposalCategoryOption category={category} props={_props} />}
-      ChipProps={{ color: (tempValue?.color || value?.color || 'gray') as BrandColor }}
+      ChipProps={{
+        color: (tempValue?.color || value?.color || 'gray') as BrandColor,
+        // Hack for preventing delete from showing
+        onDelete: null as any
+      }}
       noOptionsText='No categories available'
       renderInput={(params) => (
         <TextField

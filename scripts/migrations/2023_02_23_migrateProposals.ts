@@ -152,6 +152,44 @@ async function assignProposalsToDefaultCategory() {
   }
 }
 
+async function assignSpaceDefaultPermissions() {
+  console.log('--- START --- Assigning default permissions to spaces')
+  const spacesWithoutPermission = await prisma.space.findMany({
+    where: {
+      spacePermissions: {
+        some: {
+          spaceId: {
+            not: null
+          },
+          NOT: {
+            operations: {
+              has: 'reviewProposals'
+            }
+          }
+        }
+      }
+    },
+    select: {
+      id: true
+    }
+  });
+
+  console.log('Found ', spacesWithoutPermission.length, 'spaces without reviewProposals permission');
+
+  await prisma.spacePermission.updateMany({
+    where: {
+      spaceId: {
+        in: spacesWithoutPermission.map(space => space.id)
+      }
+    },
+    data: {
+      operations: {
+        push: 'reviewProposals'
+      }
+    }
+  })
+}
+
 
 export function migrateProposals() {
   // Ran this once, no duplicates detected
@@ -160,6 +198,8 @@ export function migrateProposals() {
   provisionGeneralProposalCategory();
   assignProposalsToDefaultCategory();
   disconnectProposalsFromChildren();
+
+  assignSpaceDefaultPermissions();
 }
 
 // migrateProposals()

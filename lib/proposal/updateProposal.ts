@@ -22,7 +22,7 @@ export async function updateProposal({
 
   await prisma.$transaction(async (tx) => {
     // Update category only when it is present in request payload
-    if (categoryId !== undefined) {
+    if (categoryId) {
       await tx.proposal.update({
         where: {
           id: proposalId
