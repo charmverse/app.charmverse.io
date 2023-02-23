@@ -3,9 +3,10 @@ import nc from 'next-connect';
 
 import { prisma } from 'db';
 import { updateTrackPageProfile } from 'lib/metrics/mixpanel/updateTrackPageProfile';
-import { ActionNotPermittedError, NotFoundError, onError, onNoMatch, requireUser } from 'lib/middleware';
+import { ActionNotPermittedError, NotFoundError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import type { IPageWithPermissions } from 'lib/pages';
 import { computeUserPagePermissions } from 'lib/permissions/pages';
+import { computeProposalCategoryPermissions } from 'lib/permissions/proposals/computeProposalCategoryPermissions';
 import { computeSpacePermissions } from 'lib/permissions/spaces';
 import { createProposal } from 'lib/proposal/createProposal';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -14,7 +15,10 @@ import { relay } from 'lib/websockets/relay';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireUser).post(convertToProposal);
+handler
+  .use(requireUser)
+  .use(requireKeys(['categoryId'], 'body'))
+  .post(convertToProposal);
 
 async function convertToProposal(req: NextApiRequest, res: NextApiResponse<IPageWithPermissions>) {
   const pageId = req.query.id as string;
@@ -47,6 +51,17 @@ async function convertToProposal(req: NextApiRequest, res: NextApiResponse<IPage
     throw new ActionNotPermittedError('You do not have permission to update this page');
   }
 
+  const categoryId = req.body.categoryId;
+
+  const proposalPermissions = await computeProposalCategoryPermissions({
+    resourceId: categoryId,
+    userId
+  });
+
+  if (!proposalPermissions.create_proposal) {
+    throw new UnauthorisedActionError('You do not have permission to create a proposal in this category');
+  }
+
   const spacePermissions = await computeSpacePermissions({
     allowAdminBypass: true,
     resourceId: page.spaceId,
@@ -58,11 +73,14 @@ async function convertToProposal(req: NextApiRequest, res: NextApiResponse<IPage
   }
 
   const { page: updatedPage } = await createProposal({
-    id: page.id,
-    createdBy: userId,
+    pageId: page.id,
+    userId,
     spaceId: page.spaceId,
-    content: page.content ?? undefined,
-    title: page.title
+    categoryId: req.body.categoryId as string,
+    pageProps: {
+      content: page.content ?? undefined,
+      title: page.title
+    }
   });
 
   updateTrackPageProfile(updatedPage.id);
