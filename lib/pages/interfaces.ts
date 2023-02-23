@@ -36,7 +36,7 @@ export interface PublicPageResponse {
   cards: Card[];
   boards: Board[];
   views: BoardView[];
-  bounty: BountyWithDetails | null;
+  bounty: Bounty | null;
 }
 
 // These 2 types are used for reducing a list of pages to a tree

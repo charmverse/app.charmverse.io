@@ -23,9 +23,16 @@ interface Props {
   bountyPermissions?: Partial<BountyPermissions>;
   pagePermissions?: PagePermissionMeta[];
   pageId: string;
+  readOnly?: boolean;
 }
 
-export default function BountyPropertiesHeader({ bounty, bountyPermissions, pagePermissions, pageId }: Props) {
+export default function BountyPropertiesHeader({
+  readOnly = false,
+  bounty,
+  bountyPermissions,
+  pagePermissions,
+  pageId
+}: Props) {
   const { roleups } = useRoles();
   const { mutatePage } = usePages();
   const { showMessage } = useSnackbar();
@@ -81,7 +88,7 @@ export default function BountyPropertiesHeader({ bounty, bountyPermissions, page
       </Grid>
 
       {/* Warning for applicants */}
-      {intersection.hasPermissions.length > 0 && (
+      {intersection.hasPermissions.length > 0 && !readOnly && (
         <Alert
           severity='info'
           sx={{ mb: 2 }}

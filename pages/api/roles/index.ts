@@ -11,9 +11,8 @@ import { withSessionRoute } from 'lib/session/withSession';
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
-  .use(requireUser)
-  .use(requireSpaceMembership({ adminOnly: false }))
   .get(listSpaceRoles)
+  .use(requireUser)
   .use(requireSpaceMembership({ adminOnly: true }))
   .use(requireKeys<Role>(['spaceId', 'name'], 'body'))
   .post(createRole);

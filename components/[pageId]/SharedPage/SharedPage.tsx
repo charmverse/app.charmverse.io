@@ -12,6 +12,7 @@ import LoadingComponent from 'components/common/LoadingComponent';
 import { useCurrentPage } from 'hooks/useCurrentPage';
 import { usePages } from 'hooks/usePages';
 import { usePageTitle } from 'hooks/usePageTitle';
+import type { BountyWithDetails } from 'lib/bounties';
 import type { PublicPageResponse } from 'lib/pages';
 import { findParentOfType } from 'lib/pages/findParentOfType';
 
@@ -80,7 +81,15 @@ export function SharedPage({ publicPage }: Props) {
     <DatabasePage page={currentPage} setPage={() => {}} readOnly={true} />
   ) : (
     <DocumentPage
-      bounty={publicPage.bounty}
+      bounty={
+        publicPage.bounty
+          ? {
+              ...publicPage.bounty,
+              page: currentPage as BountyWithDetails['page'],
+              applications: []
+            }
+          : null
+      }
       page={currentPage}
       setPage={() => {}}
       readOnly={true}
