@@ -1,5 +1,6 @@
 import type { Comment, User, Prisma } from '@prisma/client';
 
+import type { UserPermissionFlags } from 'lib/permissions/interfaces';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
 export type CommentCreate = Pick<Comment, 'content' | 'threadId' | 'userId'>;
@@ -45,3 +46,7 @@ export type CreateCommentInput = {
 };
 
 export type UpdateCommentInput = CommentContent;
+
+export type CommentOperations = 'add_comment' | 'delete_comments' | 'upvote' | 'downvote';
+
+export type CommentPermissions = UserPermissionFlags<CommentOperations>;

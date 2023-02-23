@@ -7,6 +7,8 @@ import { Comment } from 'components/common/comments/Comment';
 import { CommentForm } from 'components/common/comments/CommentForm';
 import { CommentSort } from 'components/common/comments/CommentSort';
 import LoadingComponent from 'components/common/LoadingComponent';
+import { usePages } from 'hooks/usePages';
+import type { CommentPermissions } from 'lib/comments';
 
 type Props = {
   pageId: string;
@@ -23,12 +25,21 @@ export function PageComments({ pageId }: Props) {
     deleteComment,
     voteComment
   } = usePageComments(pageId);
+  const { getPagePermissions } = usePages();
+  const pagePermissions = getPagePermissions(pageId);
+
+  const commentPermissions: CommentPermissions = {
+    add_comment: pagePermissions?.comment ?? false,
+    upvote: pagePermissions?.comment ?? false,
+    downvote: pagePermissions?.comment ?? false,
+    delete_comments: false
+  };
 
   return (
     <>
       <Divider sx={{ my: 3 }} />
 
-      <CommentForm handleCreateComment={addComment} />
+      {pagePermissions?.comment && <CommentForm handleCreateComment={addComment} />}
 
       {isLoadingComments ? (
         <Box height={100}>
@@ -41,7 +52,7 @@ export function PageComments({ pageId }: Props) {
               <CommentSort commentSort={commentSort} setCommentSort={setCommentSort} />
               {comments.map((comment) => (
                 <Comment
-                  permissions={{ upvote: true, downvote: true, add_comment: true } as any}
+                  permissions={commentPermissions}
                   comment={comment}
                   key={comment.id}
                   handleCreateComment={addComment}

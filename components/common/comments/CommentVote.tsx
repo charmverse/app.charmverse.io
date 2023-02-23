@@ -3,13 +3,12 @@ import { IconButton, Tooltip, Typography, Box } from '@mui/material';
 import type { MouseEvent } from 'react';
 import { ImArrowDown, ImArrowUp } from 'react-icons/im';
 
-import type { GenericCommentVote } from 'lib/comments';
-import type { AvailablePostPermissionFlags } from 'lib/permissions/forum/interfaces';
+import type { CommentPermissions, GenericCommentVote } from 'lib/comments';
 
 type Props = {
   votes: GenericCommentVote;
   onVote: (upvoted: boolean | null) => void;
-  permissions?: AvailablePostPermissionFlags;
+  permissions?: CommentPermissions;
 };
 
 export function CommentVote({ votes, onVote, permissions }: Props) {

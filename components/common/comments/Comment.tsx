@@ -17,8 +17,7 @@ import UserDisplay from 'components/common/UserDisplay';
 import { useMemberProfile } from 'components/profile/hooks/useMemberProfile';
 import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
-import type { CommentWithChildren } from 'lib/comments';
-import type { AvailablePostPermissionFlags } from 'lib/permissions/forum/interfaces';
+import type { CommentPermissions, CommentWithChildren } from 'lib/comments';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { getRelativeTimeInThePast } from 'lib/utilities/dates';
 
@@ -36,7 +35,7 @@ const StyledStack = styled(Stack)`
 
 type Props = {
   comment: CommentWithChildren;
-  permissions?: AvailablePostPermissionFlags;
+  permissions?: CommentPermissions;
   deletingDisabled?: boolean;
   handleUpdateComment: (comment: UpdateCommentPayload) => Promise<void>;
   handleCreateComment: (comment: CreateCommentPayload) => Promise<void>;
