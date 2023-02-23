@@ -46,7 +46,7 @@ export class InvalidStateError extends SystemError {
   constructor(message: string = 'Something went wrong') {
     super({
       message,
-      errorType: 'Unable to respond',
+      errorType: 'Invalid input',
       severity: 'error'
     });
   }

@@ -17,6 +17,7 @@ import {
   generateSpaceUser,
   generateUserAndSpaceWithApiToken
 } from 'testing/setupDatabase';
+import { generateProposalCategory } from 'testing/utils/proposals';
 
 let author: LoggedInUser;
 let reviewer: LoggedInUser;
@@ -41,6 +42,9 @@ beforeAll(async () => {
       spaceId: space.id,
       userId: reviewer.id
     }
+  });
+  proposalCategory = await generateProposalCategory({
+    spaceId: space.id
   });
 });
 
@@ -189,7 +193,7 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
       .expect(200);
   });
 
-  it('should update a proposal template if the user is a space admin', async () => {
+  it('should update a proposal templates settings if the user is a space admin', async () => {
     const { user: adminUser, space: adminSpace } = await generateUserAndSpaceWithApiToken(undefined, true);
     const adminCookie = await loginUser(adminUser.id);
 
@@ -197,7 +201,8 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
 
     const pageWithProposal = await createProposalTemplate({
       spaceId: adminSpace.id,
-      userId: adminUser.id
+      userId: adminUser.id,
+      categoryId: proposalCategory.id
     });
 
     const updateContent: Partial<UpdateProposalRequest> = {
@@ -237,6 +242,7 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
     const pageWithProposal = await createProposalTemplate({
       spaceId: adminSpace.id,
       userId: adminUser.id,
+      categoryId: proposalCategory.id,
       reviewers: [
         {
           group: 'user',

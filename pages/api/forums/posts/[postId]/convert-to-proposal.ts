@@ -4,8 +4,9 @@ import nc from 'next-connect';
 import { prisma } from 'db';
 import { convertPostToProposal } from 'lib/forums/posts/convertPostToProposal';
 import { updateTrackPageProfile } from 'lib/metrics/mixpanel/updateTrackPageProfile';
-import { ActionNotPermittedError, NotFoundError, onError, onNoMatch, requireUser } from 'lib/middleware';
+import { ActionNotPermittedError, NotFoundError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import type { PageMeta } from 'lib/pages';
+import { computeProposalCategoryPermissions } from 'lib/permissions/proposals/computeProposalCategoryPermissions';
 import { computeSpacePermissions } from 'lib/permissions/spaces';
 import { withSessionRoute } from 'lib/session/withSession';
 import { UnauthorisedActionError } from 'lib/utilities/errors';
@@ -13,7 +14,10 @@ import { relay } from 'lib/websockets/relay';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireUser).post(convertToProposal);
+handler
+  .use(requireUser)
+  .use(requireKeys(['categoryId'], 'body'))
+  .post(convertToProposal);
 
 async function convertToProposal(req: NextApiRequest, res: NextApiResponse<PageMeta>) {
   const postId = req.query.postId as string;
@@ -41,20 +45,22 @@ async function convertToProposal(req: NextApiRequest, res: NextApiResponse<PageM
     throw new ActionNotPermittedError("Post converted to proposal can't be edited");
   }
 
-  const spacePermissions = await computeSpacePermissions({
-    allowAdminBypass: true,
-    resourceId: post.spaceId,
+  const categoryId = req.body.categoryId;
+
+  const permissions = await computeProposalCategoryPermissions({
+    resourceId: categoryId,
     userId
   });
 
-  if (!spacePermissions.createVote) {
+  if (!permissions.create_proposal) {
     throw new UnauthorisedActionError('You do not have permission to create a page in this space');
   }
 
   const proposalPage = await convertPostToProposal({
     post,
     userId,
-    content: post.content
+    content: post.content,
+    categoryId
   });
 
   updateTrackPageProfile(proposalPage.id);

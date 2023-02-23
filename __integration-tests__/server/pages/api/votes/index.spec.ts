@@ -9,7 +9,7 @@ import { typedKeys } from 'lib/utilities/objects';
 import type { LoggedInUser } from 'models';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { createPage, createVote, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { generateProposalCategory } from 'testing/utils/proposals';
+import { generateProposal, generateProposalCategory } from 'testing/utils/proposals';
 
 let page: Page;
 let space: Space;
@@ -150,20 +150,12 @@ describe('POST /api/votes - Create a proposal vote', () => {
   it('should allow the user to create a proposal vote if they are a proposal author', async () => {
     const { user: author, space: authorSpace } = await generateUserAndSpaceWithApiToken(undefined, false);
 
-    await removeSpaceOperations({
-      forSpaceId: authorSpace.id,
-      operations: typedKeys(SpaceOperation),
-      spaceId: authorSpace.id
-    });
-
     const authorCookie = await loginUser(author.id);
 
-    const { page: resultPage } = await createProposal({
+    const proposal = await generateProposal({
       userId: author.id,
       spaceId: authorSpace.id,
-      pageProps: {
-        title: 'page-title'
-      },
+      proposalStatus: 'reviewed',
       categoryId: proposalCategory.id
     });
 
@@ -173,7 +165,7 @@ describe('POST /api/votes - Create a proposal vote', () => {
       .send({
         context: 'proposal',
         deadline: new Date(),
-        pageId: resultPage.id,
+        pageId: proposal.id,
         title: 'new vote',
         type: 'Approval',
         threshold: 50,
@@ -186,28 +178,21 @@ describe('POST /api/votes - Create a proposal vote', () => {
   it('should allow the user to create a proposal vote if they are a space admin who did not author the proposal', async () => {
     const { user: author, space: authorSpace } = await generateUserAndSpaceWithApiToken(undefined, false);
     const adminUser = await generateSpaceUser({ spaceId: authorSpace.id, isAdmin: true });
-
-    await removeSpaceOperations({
-      forSpaceId: authorSpace.id,
-      operations: typedKeys(SpaceOperation),
-      spaceId: authorSpace.id
-    });
-
     const adminCookie = await loginUser(adminUser.id);
 
-    const { page: resultPage } = await createProposal({
+    const proposal = await generateProposal({
       userId: author.id,
       spaceId: authorSpace.id,
+      proposalStatus: 'reviewed',
       categoryId: proposalCategory.id
     });
-
     await request(baseUrl)
       .post('/api/votes')
       .set('Cookie', adminCookie)
       .send({
         context: 'proposal',
         deadline: new Date(),
-        pageId: resultPage.id,
+        pageId: proposal.id,
         title: 'new vote',
         type: 'Approval',
         threshold: 50,

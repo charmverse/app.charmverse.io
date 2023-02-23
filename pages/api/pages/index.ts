@@ -12,11 +12,8 @@ import type { IPageWithPermissions } from 'lib/pages/server';
 import { createPage } from 'lib/pages/server/createPage';
 import { PageNotFoundError } from 'lib/pages/server/errors';
 import { getPage } from 'lib/pages/server/getPage';
-import { resolvePageTree } from 'lib/pages/server/resolvePageTree';
 import { setupPermissionsAfterPageCreated } from 'lib/permissions/pages';
 import { computeSpacePermissions } from 'lib/permissions/spaces';
-import { createProposal } from 'lib/proposal/createProposal';
-import { syncProposalPermissions } from 'lib/proposal/syncProposalPermissions';
 import { withSessionRoute } from 'lib/session/withSession';
 import { InvalidInputError, UnauthorisedActionError } from 'lib/utilities/errors';
 import { relay } from 'lib/websockets/relay';
@@ -65,21 +62,7 @@ async function createPageHandler(req: NextApiRequest, res: NextApiResponse<IPage
   });
 
   try {
-    const proposalIdForPermissions = page.parentId
-      ? (
-          await resolvePageTree({
-            pageId: page.id
-            // includeDeletedPages: true
-          })
-        ).parents.find((p) => p.type === 'proposal')?.id
-      : undefined;
-
-    // Create proposal method provisions proposal permissions, so we only need this operation for child pages of a proposal
-    if (proposalIdForPermissions) {
-      await syncProposalPermissions({ proposalId: proposalIdForPermissions as string });
-    } else if (page.type !== 'proposal') {
-      await setupPermissionsAfterPageCreated(page.id);
-    }
+    await setupPermissionsAfterPageCreated(page.id);
 
     const pageWithPermissions = await getPage(page.id);
 
