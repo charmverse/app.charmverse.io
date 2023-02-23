@@ -1029,6 +1029,7 @@ model ProposalCategory {
   proposalCategoryPermissions ProposalCategoryPermission[]
 
   @@index([spaceId])
+  @@unique([spaceId, title])
 }
 
 model MemberProperty {

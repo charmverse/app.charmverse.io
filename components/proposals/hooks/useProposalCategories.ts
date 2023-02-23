@@ -47,12 +47,22 @@ export function useProposalCategories() {
     return (categories ?? [])?.filter((c) => c.permissions.create_proposal);
   }
 
+  function getDefaultCreateCategory() {
+    const creatableCategories = getCategoriesWithCreatePermission();
+    const firstDefault = creatableCategories.find((c) => c.title === 'General');
+    if (firstDefault) {
+      return firstDefault;
+    }
+    return creatableCategories[0];
+  }
+
   return {
     isLoading: !categories,
     categories,
     addCategory,
     deleteCategory,
     mutateCategory,
-    getCategoriesWithCreatePermission
+    getCategoriesWithCreatePermission,
+    getDefaultCreateCategory
   };
 }

@@ -1,3 +1,9 @@
+/*
+  Warnings:
+
+  - A unique constraint covering the columns `[spaceId,title]` on the table `ProposalCategory` will be added. If there are existing duplicate values, this will fail.
+
+*/
 -- CreateEnum
 CREATE TYPE "ProposalCategoryOperation" AS ENUM ('manage_permissions', 'create_proposal', 'edit', 'delete');
 
@@ -44,6 +50,9 @@ CREATE UNIQUE INDEX "ProposalCategoryPermission_spaceId_proposalCategoryId_key" 
 
 -- CreateIndex
 CREATE UNIQUE INDEX "ProposalCategoryPermission_public_proposalCategoryId_key" ON "ProposalCategoryPermission"("public", "proposalCategoryId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "ProposalCategory_spaceId_title_key" ON "ProposalCategory"("spaceId", "title");
 
 -- AddForeignKey
 ALTER TABLE "ProposalCategoryPermission" ADD CONSTRAINT "ProposalCategoryPermission_proposalCategoryId_fkey" FOREIGN KEY ("proposalCategoryId") REFERENCES "ProposalCategory"("id") ON DELETE CASCADE ON UPDATE CASCADE;

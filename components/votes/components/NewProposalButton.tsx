@@ -25,7 +25,7 @@ export function NewProposalButton({ mutateProposals }: { mutateProposals: KeyedM
   const { user } = useUser();
   const currentSpace = useCurrentSpace();
   const { showPage } = usePageDialog();
-  const { getCategoriesWithCreatePermission } = useProposalCategories();
+  const { getCategoriesWithCreatePermission, getDefaultCreateCategory } = useProposalCategories();
   const isAdmin = useIsAdmin();
   const { mutatePagesRemove, mutatePage, pages } = usePages();
   const { mutate } = useTasks();
@@ -91,7 +91,7 @@ export function NewProposalButton({ mutateProposals }: { mutateProposals: KeyedM
       const createdProposal = await charmClient.proposals.createProposal({
         spaceId: currentSpace.id,
         userId: user.id,
-        categoryId: getCategoriesWithCreatePermission()[0].id
+        categoryId: getDefaultCreateCategory().id
       });
 
       const { proposal, ...page } = createdProposal;

@@ -187,7 +187,7 @@ function PostHeader({
 
   const router = useRouter();
 
-  const { getCategoriesWithCreatePermission } = useProposalCategories();
+  const { getCategoriesWithCreatePermission, getDefaultCreateCategory } = useProposalCategories();
   const proposalCategoriesWithCreateAllowed = getCategoriesWithCreatePermission();
 
   const canCreateProposal = proposalCategoriesWithCreateAllowed.length > 0;
@@ -225,7 +225,7 @@ function PostHeader({
     setPageMenuOpen(false);
     const { path } = await charmClient.forum.convertToProposal({
       postId: pageId,
-      categoryId: proposalCategoriesWithCreateAllowed[0].id
+      categoryId: getDefaultCreateCategory()?.id
     });
     router.push(`/${router.query.domain}/${path}`);
   }
@@ -320,7 +320,7 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
   const isBasePageDocument = documentTypes.includes(basePage?.type ?? '');
   const isBasePageDatabase = /board/.test(basePage?.type ?? '');
 
-  const { getCategoriesWithCreatePermission } = useProposalCategories();
+  const { getCategoriesWithCreatePermission, getDefaultCreateCategory } = useProposalCategories();
   const proposalCategoriesWithCreateAllowed = getCategoriesWithCreatePermission();
 
   const canCreateProposal = proposalCategoriesWithCreateAllowed.length > 0;
@@ -384,7 +384,7 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
 
   async function convertToProposal(pageId: string) {
     await charmClient.pages.convertToProposal({
-      categoryId: proposalCategoriesWithCreateAllowed[0].id,
+      categoryId: getDefaultCreateCategory().id,
       pageId
     });
     closeMenu();

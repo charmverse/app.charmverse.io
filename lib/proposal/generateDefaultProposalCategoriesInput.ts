@@ -4,6 +4,7 @@ import { v4 } from 'uuid';
 import { getRandomThemeColor } from 'theme/utils/getRandomThemeColor';
 
 export const defaultProposalCategories = [
+  'General',
   'Operational Budget',
   'Grants',
   'Investment',
