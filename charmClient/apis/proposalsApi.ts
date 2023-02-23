@@ -6,13 +6,14 @@ import type { ProposalCategoryWithPermissions } from 'lib/permissions/proposals/
 import type { ProposalFlowFlags } from 'lib/proposal/computeProposalFlowFlags';
 import type { CreateProposalInput } from 'lib/proposal/createProposal';
 import type { CreateProposalFromTemplateInput } from 'lib/proposal/createProposalFromTemplate';
+import type { ProposalReviewerPool } from 'lib/proposal/getProposalReviewerPool';
 import type { ListProposalsRequest } from 'lib/proposal/getProposalsBySpace';
 import type { ProposalCategory, ProposalWithUsers } from 'lib/proposal/interface';
 import type { UpdateProposalRequest } from 'lib/proposal/updateProposal';
 
 export class ProposalsApi {
-  createProposal({ pageProps, proposalProps }: CreateProposalInput) {
-    return http.POST<PageWithProposal>('/api/proposals', { pageProps, proposalProps });
+  createProposal(input: CreateProposalInput) {
+    return http.POST<PageWithProposal>('/api/proposals', input);
   }
 
   updateProposal({ proposalId, authors, reviewers, categoryId }: UpdateProposalRequest) {
@@ -66,5 +67,9 @@ export class ProposalsApi {
 
   computeProposalFlowFlags(proposalId: string) {
     return http.GET<ProposalFlowFlags>(`/api/proposals/${proposalId}/compute-flow-flags`);
+  }
+
+  getReviewerPool(spaceId: string) {
+    return http.GET<ProposalReviewerPool>(`/api/proposals/reviewer-pool?spaceId=${spaceId}`);
   }
 }

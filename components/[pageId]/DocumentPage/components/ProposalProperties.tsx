@@ -1,5 +1,5 @@
 import { KeyboardArrowDown } from '@mui/icons-material';
-import { Divider, Grid, Typography, Box, Collapse, Stack, IconButton } from '@mui/material';
+import { Box, Collapse, Divider, Grid, IconButton, Stack, Typography } from '@mui/material';
 import type { ProposalStatus } from '@prisma/client';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect, useRef, useState } from 'react';
@@ -8,7 +8,7 @@ import useSWR from 'swr';
 import charmClient from 'charmClient';
 import Button from 'components/common/BoardEditor/focalboard/src/widgets/buttons/button';
 import { InputSearchMemberBase } from 'components/common/form/InputSearchMember';
-import InputSearchReviewers from 'components/common/form/InputSearchReviewers';
+import { InputSearchReviewers } from 'components/common/form/InputSearchReviewers';
 import UserDisplay from 'components/common/UserDisplay';
 import useTasks from 'components/nexus/hooks/useTasks';
 import ProposalCategoryInput from 'components/proposals/components/ProposalCategoryInput';
@@ -39,7 +39,6 @@ export function ProposalProperties({ pageId, proposalId, readOnly, isTemplate }:
   const { data: proposal, mutate: refreshProposal } = useSWR(`proposal/${proposalId}`, () =>
     charmClient.proposals.getProposal(proposalId)
   );
-
   const { categories, addCategory, deleteCategory } = useProposalCategories();
   const { mutate: mutateTasks } = useTasks();
   const [isVoteModalOpen, setIsVoteModalOpen] = useState(false);
