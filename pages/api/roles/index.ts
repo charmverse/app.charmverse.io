@@ -29,6 +29,8 @@ export type ListSpaceRolesResponse = Pick<Role, 'id' | 'name' | 'source'> & {
 async function listSpaceRoles(req: NextApiRequest, res: NextApiResponse<ListSpaceRolesResponse[]>) {
   const { spaceId } = req.query;
 
+  const userId = req.session.user?.id;
+
   if (!spaceId) {
     throw new ApiError({
       message: 'Please provide a valid space ID',
@@ -62,7 +64,9 @@ async function listSpaceRoles(req: NextApiRequest, res: NextApiResponse<ListSpac
     }
   });
 
-  return res.status(200).json(roles);
+  return res
+    .status(200)
+    .json(roles.map((role) => ({ ...role, spaceRolesToRole: !userId ? [] : role.spaceRolesToRole })));
 }
 
 async function createRole(req: NextApiRequest, res: NextApiResponse<Role>) {
