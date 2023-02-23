@@ -2,6 +2,7 @@ import { FormatListBulleted } from '@mui/icons-material';
 import { useState } from 'react';
 
 import { CreateVoteModal } from 'components/votes/components/CreateVoteModal';
+import { usePagePermissions } from 'hooks/usePagePermissions';
 import { useVotes } from 'hooks/useVotes';
 import type { ExtendedVote } from 'lib/votes/interfaces';
 
@@ -14,6 +15,10 @@ export function PollNodeView({ node, readOnly, updateAttrs, selected, deleteNode
   const { votes, cancelVote, castVote, deleteVote, updateDeadline } = useVotes();
 
   const autoOpen = node.marks.some((mark) => mark.type.name === 'tooltip-marker');
+
+  const { permissions: pagePermissions } = usePagePermissions({
+    pageIdOrPath: pollId ? votes[pollId]?.pageId : (null as any)
+  });
 
   const [showModal, setShowModal] = useState(autoOpen);
 
@@ -60,6 +65,8 @@ export function PollNodeView({ node, readOnly, updateAttrs, selected, deleteNode
       castVote={castVote}
       deleteVote={deleteVote}
       detailed={false}
+      // This makes sure that if something goes wrong in loading state, we won't stop users who should be able to vote from voting
+      disableVote={pagePermissions && !pagePermissions.comment}
       vote={votes[pollId]}
       updateDeadline={updateDeadline}
     />

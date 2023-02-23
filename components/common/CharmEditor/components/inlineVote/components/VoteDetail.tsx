@@ -152,7 +152,10 @@ export function VoteDetail({
         </Box>
       )}
       {!detailed && voteCountLabel}
-      <Tooltip title={disableVote ? 'You do not have the permissions to participate in this vote' : ''}>
+      <Tooltip
+        placement='top-start'
+        title={disableVote ? 'You do not have the permissions to participate in this vote' : ''}
+      >
         <StyledFormControl>
           <RadioGroup name={vote.id} value={userVoteChoice}>
             {voteOptions.map((voteOption) => (
