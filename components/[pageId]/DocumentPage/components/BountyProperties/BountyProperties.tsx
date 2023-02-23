@@ -45,14 +45,13 @@ export default function BountyProperties(props: {
   pageId: string;
   permissions: AssignedBountyPermissions | null;
   refreshBountyPermissions: (bountyId: string) => void;
-  bounty?: BountyWithDetails | null;
 }) {
-  const { bounty, bountyId, pageId, readOnly: parentReadOnly = false, permissions, refreshBountyPermissions } = props;
+  const { bountyId, pageId, readOnly: parentReadOnly = false, permissions, refreshBountyPermissions } = props;
   const [paymentMethods] = usePaymentMethods();
   const { draftBounty, bounties, cancelDraftBounty, setBounties, updateBounty } = useBounties();
   const [availableCryptos, setAvailableCryptos] = useState<(string | CryptoCurrency)[]>(['ETH']);
   const [isShowingAdvancedSettings, setIsShowingAdvancedSettings] = useState(false);
-  const bountyFromContext = bounty ?? bounties.find((b) => b.id === bountyId);
+  const bountyFromContext = bounties.find((b) => b.id === bountyId);
   const [currentBounty, setCurrentBounty] = useState<(BountyCreationData & BountyWithDetails) | null>(null);
   const [isAmountInputEmpty, setIsAmountInputEmpty] = useState<boolean>(false);
   const [capSubmissions, setCapSubmissions] = useState(currentBounty?.maxSubmissions !== null);

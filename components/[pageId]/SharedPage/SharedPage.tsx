@@ -9,6 +9,7 @@ import { useAppDispatch } from 'components/common/BoardEditor/focalboard/src/sto
 import { addView, setCurrent } from 'components/common/BoardEditor/focalboard/src/store/views';
 import ErrorPage from 'components/common/errors/ErrorPage';
 import LoadingComponent from 'components/common/LoadingComponent';
+import { useBounties } from 'hooks/useBounties';
 import { useCurrentPage } from 'hooks/useCurrentPage';
 import { usePages } from 'hooks/usePages';
 import { usePageTitle } from 'hooks/usePageTitle';
@@ -27,6 +28,14 @@ export function SharedPage({ publicPage }: Props) {
   const [, setTitleState] = usePageTitle();
   // keep track of the pageId by path since currentPageId may change when a page is viewed inside a modal
   const basePageId = publicPage?.page?.id || '';
+
+  const { setBounties } = useBounties();
+
+  useEffect(() => {
+    if (publicPage.bounty) {
+      setBounties([publicPage.bounty]);
+    }
+  }, [publicPage.bounty]);
 
   async function onLoad() {
     if (!publicPage) {
@@ -80,20 +89,6 @@ export function SharedPage({ publicPage }: Props) {
   return currentPage.type.match(/board/) ? (
     <DatabasePage page={currentPage} setPage={() => {}} readOnly={true} />
   ) : (
-    <DocumentPage
-      bounty={
-        publicPage.bounty
-          ? {
-              ...publicPage.bounty,
-              page: currentPage as BountyWithDetails['page'],
-              applications: []
-            }
-          : null
-      }
-      page={currentPage}
-      setPage={() => {}}
-      readOnly={true}
-      parentProposalId={parentProposalId}
-    />
+    <DocumentPage page={currentPage} setPage={() => {}} readOnly={true} parentProposalId={parentProposalId} />
   );
 }

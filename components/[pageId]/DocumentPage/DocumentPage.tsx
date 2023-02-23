@@ -79,10 +79,9 @@ export interface DocumentPageProps {
   readOnly?: boolean;
   insideModal?: boolean;
   parentProposalId?: string | null;
-  bounty?: BountyWithDetails | null;
 }
 
-function DocumentPage({ bounty, page, setPage, insideModal, readOnly = false, parentProposalId }: DocumentPageProps) {
+function DocumentPage({ page, setPage, insideModal, readOnly = false, parentProposalId }: DocumentPageProps) {
   const { pages, getPagePermissions } = usePages();
   const { cancelVote, castVote, deleteVote, updateDeadline, votes, isLoading } = useVotes();
   // For post we would artificially construct the permissions
@@ -273,7 +272,6 @@ function DocumentPage({ bounty, page, setPage, insideModal, readOnly = false, pa
                     )}
                     {(draftBounty || page.bountyId) && (
                       <BountyProperties
-                        bounty={bounty}
                         bountyId={page.bountyId}
                         pageId={page.id}
                         readOnly={readOnly}

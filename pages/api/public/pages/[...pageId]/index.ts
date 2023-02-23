@@ -3,6 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { prisma } from 'db';
+import type { BountyWithDetails } from 'lib/bounties';
 import type { Board } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
@@ -256,7 +257,14 @@ async function getPublicPage(req: NextApiRequest, res: NextApiResponse<PublicPag
   }
 
   return res.status(200).json({
-    bounty,
+    bounty: {
+      ...bounty,
+      page: {
+        ...page,
+        permissions: []
+      },
+      applications: []
+    } as BountyWithDetails,
     page,
     boardPages,
     cards,
