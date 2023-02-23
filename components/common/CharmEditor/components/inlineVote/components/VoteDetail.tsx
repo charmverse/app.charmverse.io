@@ -206,7 +206,13 @@ export default function VoteDetail({
       </StyledFormControl>
       {!detailed && (
         <Box display='flex' justifyContent='flex-end'>
-          <Button color='secondary' variant='outlined' size='small' onClick={voteDetailsPopup.open}>
+          <Button
+            data-test='view-poll-details-button'
+            color='secondary'
+            variant='outlined'
+            size='small'
+            onClick={voteDetailsPopup.open}
+          >
             View details
           </Button>
         </Box>
