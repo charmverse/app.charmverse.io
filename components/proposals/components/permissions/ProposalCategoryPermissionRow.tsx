@@ -52,19 +52,27 @@ export function ProposalCategoryRolePermissionRow({
   return (
     <Box display='flex' justifyContent='space-between' alignItems='center'>
       <Typography variant='body2'>{assigneeName}</Typography>
-      <div style={{ width: '120px', textAlign: 'left' }}>
+      <div style={{ width: '160px', textAlign: 'left' }}>
         {canEdit ? (
-          <SmallSelect
-            data-test={assignee.group === 'space' ? 'category-space-permission' : null}
-            renderValue={(value) =>
-              (proposalCategoryPermissionOptions[
-                value as keyof typeof proposalCategoryPermissionOptions
-              ] as string as any) || 'No access'
+          <Tooltip
+            title={
+              defaultPermissionLevel === 'full_access'
+                ? 'Full access allows all assignees to create proposals in this category'
+                : ''
             }
-            onChange={handleUpdate as (opt: string) => void}
-            keyAndLabel={permissionsWithRemove}
-            defaultValue={defaultPermissionLevel ?? 'No access'}
-          />
+          >
+            <SmallSelect
+              data-test={assignee.group === 'space' ? 'category-space-permission' : null}
+              renderValue={(value) =>
+                (proposalCategoryPermissionOptions[
+                  value as keyof typeof proposalCategoryPermissionOptions
+                ] as string as any) || 'No access'
+              }
+              onChange={handleUpdate as (opt: string) => void}
+              keyAndLabel={permissionsWithRemove}
+              defaultValue={defaultPermissionLevel ?? 'No access'}
+            />
+          </Tooltip>
         ) : (
           <Tooltip title='You cannot edit permissions for this forum category.'>
             <Typography color='secondary' variant='caption'>

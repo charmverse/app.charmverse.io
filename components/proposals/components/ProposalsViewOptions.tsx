@@ -116,7 +116,7 @@ export function ProposalsViewOptions({
                   color={category.color as BrandColor}
                   label={category.title}
                 />
-                <ProposalCategoryContextMenu category={category} key={category.id} />
+                {isAdmin && <ProposalCategoryContextMenu category={category} key={category.id} />}
               </MenuItem>
             ))}
             <MenuItem
