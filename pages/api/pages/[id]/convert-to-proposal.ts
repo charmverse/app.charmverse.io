@@ -57,7 +57,7 @@ async function convertToProposal(req: NextApiRequest, res: NextApiResponse<IPage
     throw new UnauthorisedActionError('You do not have permission to create a page in this space');
   }
 
-  const { page: updatedPage } = await createProposal({
+  const proposalPage = await createProposal({
     id: page.id,
     createdBy: userId,
     spaceId: page.spaceId,
@@ -65,24 +65,17 @@ async function convertToProposal(req: NextApiRequest, res: NextApiResponse<IPage
     title: page.title
   });
 
-  updateTrackPageProfile(updatedPage.id);
-
-  const updatedPageData = {
-    id: updatedPage.id,
-    spaceId: updatedPage.spaceId,
-    proposalId: updatedPage.proposalId,
-    type: updatedPage.type
-  };
+  updateTrackPageProfile(proposalPage.page.id);
 
   relay.broadcast(
     {
-      type: 'pages_meta_updated',
-      payload: [updatedPageData]
+      type: 'pages_created',
+      payload: [proposalPage.page]
     },
-    page.spaceId
+    proposalPage.page.spaceId
   );
 
-  return res.status(200);
+  return res.status(200).json(proposalPage.page);
 }
 
 export default withSessionRoute(handler);

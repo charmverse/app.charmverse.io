@@ -370,8 +370,9 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
   }
 
   async function convertToProposal(pageId: string) {
-    await charmClient.pages.convertToProposal(pageId);
+    const convertedProposal = await charmClient.pages.convertToProposal(pageId);
     closeMenu();
+    router.push(`/${router.query.domain}/${convertedProposal.path}`);
   }
 
   const documentOptions = (

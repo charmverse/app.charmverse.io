@@ -1,4 +1,4 @@
-import type { ProposalStatus, Page, PrismaPromise, Prisma } from '@prisma/client';
+import type { Prisma, ProposalStatus } from '@prisma/client';
 import { v4 as uuid } from 'uuid';
 
 import { prisma } from 'db';
@@ -19,48 +19,10 @@ type ProposalPageInput = Pick<Prisma.PageUncheckedCreateInput, PageProps> &
 type ProposalInput = { reviewers: { roleId?: string; userId?: string }[]; categoryId: string | null };
 
 export async function createProposal(pageProps: ProposalPageInput, proposalProps?: ProposalInput) {
-  const { createdBy, id: pageId, spaceId } = pageProps;
+  const { createdBy, spaceId } = pageProps;
 
-  const proposalId = pageId ?? uuid();
+  const proposalId = uuid();
   const proposalStatus: ProposalStatus = 'private_draft';
-
-  const existingPage =
-    pageId &&
-    (await prisma.page.findUnique({
-      where: {
-        id: pageId
-      }
-    }));
-
-  function upsertPage(): PrismaPromise<Page> {
-    if (existingPage) {
-      return prisma.page.update({
-        where: {
-          id: pageId
-        },
-        data: {
-          parentId: null, // unset parentId if this page was a db card before
-          proposalId,
-          type: 'proposal',
-          updatedAt: new Date(),
-          updatedBy: createdBy
-        }
-      });
-    } else {
-      return createPage({
-        data: {
-          proposalId,
-          contentText: '',
-          path: getPagePath(),
-          title: '',
-          updatedBy: createdBy,
-          ...pageProps,
-          id: proposalId,
-          type: 'proposal'
-        }
-      });
-    }
-  }
 
   // Using a transaction to ensure both the proposal and page gets created together
   const [proposal, page, workspaceEvent] = await prisma.$transaction([
@@ -86,7 +48,18 @@ export async function createProposal(pageProps: ProposalPageInput, proposalProps
         })
       }
     }),
-    upsertPage(),
+    createPage({
+      data: {
+        proposalId,
+        contentText: '',
+        path: getPagePath(),
+        title: '',
+        ...pageProps,
+        updatedBy: createdBy,
+        id: proposalId,
+        type: 'proposal'
+      }
+    }),
     prisma.workspaceEvent.create({
       data: {
         type: 'proposal_status_change',
