@@ -1,8 +1,9 @@
 import { ArrowBackIos } from '@mui/icons-material';
 import ArrowForwardIos from '@mui/icons-material/ArrowForwardIos';
-import { Stack, Typography, Button } from '@mui/material';
+import { Stack, Typography } from '@mui/material';
 import type { ProposalStatus } from '@prisma/client';
 
+import Button from 'components/common/Button';
 import { canChangeProposalStatus } from 'lib/proposal/canChangeProposalStatus';
 import type { ProposalWithUsers } from 'lib/proposal/interface';
 import type { ProposalUserGroup } from 'lib/proposal/proposalStatusTransition';
@@ -43,7 +44,7 @@ export function ProposalStepSummary({ proposal, proposalUserGroups, openVoteModa
     <Stack flex={1}>
       <Stack
         direction={{ xs: 'column', md: 'row' }}
-        alignItems={{ md: 'center' }}
+        alignItems={{ md: 'flex-start' }}
         justifyContent='space-between'
         flex={1}
         gap={1}
@@ -66,6 +67,8 @@ export function ProposalStepSummary({ proposal, proposalUserGroups, openVoteModa
                 color='secondary'
                 startIcon={<ArrowBackIos fontSize='inherit' />}
                 disabled={!backEnabled}
+                disableElevation
+                variant='outlined'
                 onClick={() => {
                   if (prevStatus) {
                     updateProposalStatus(prevStatus);
@@ -79,6 +82,7 @@ export function ProposalStepSummary({ proposal, proposalUserGroups, openVoteModa
               <Button
                 size='small'
                 color='primary'
+                disableElevation
                 sx={{ whiteSpace: 'nowrap' }}
                 endIcon={<ArrowForwardIos fontSize='inherit' />}
                 disabled={!nextEnabled}
