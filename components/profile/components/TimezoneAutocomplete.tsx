@@ -1,6 +1,8 @@
 import { Autocomplete, Box, TextField } from '@mui/material';
 import { DateTime } from 'luxon';
+import { useEffect, useState } from 'react';
 
+import FieldLabel from 'components/common/form/FieldLabel';
 import { getTimezonesWithOffset, toHoursAndMinutes } from 'lib/utilities/dates';
 
 export interface Timezone {
@@ -11,41 +13,65 @@ export interface Timezone {
 const timezoneOptions = getTimezonesWithOffset();
 
 export function TimezoneAutocomplete({
-  setTimezone,
-  timezone
+  save,
+  userTimezone,
+  readOnly
 }: {
-  timezone?: Timezone | null;
-  setTimezone: (timezone: Timezone | null) => void;
+  userTimezone?: string | null;
+  save: (timezone?: string | null) => void;
+  readOnly?: boolean;
 }) {
+  const [tz, setTimezone] = useState<null | Timezone | undefined>(null);
+  function setInitialTimezone() {
+    setTimezone(
+      userTimezone
+        ? {
+            tz: userTimezone,
+            // luxon provides the offset in terms of minutes
+            offset: toHoursAndMinutes(DateTime.local().setZone(userTimezone).offset)
+          }
+        : null
+    );
+  }
+
+  useEffect(() => {
+    setInitialTimezone();
+  }, [userTimezone]);
+
   const currentTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
   const currentTzOffset = toHoursAndMinutes(DateTime.local().offset);
 
   return (
-    <Autocomplete<Timezone>
-      fullWidth
-      value={timezone}
-      onChange={(_, selectOption) => {
-        setTimezone(selectOption);
-      }}
-      options={timezoneOptions}
-      size='small'
-      renderOption={(props, option) => (
-        <Box component='li' sx={{ display: 'flex', gap: 1 }} {...props}>
-          <Box component='span'>
-            {option.tz} (GMT {option.offset})
+    <>
+      <FieldLabel>Timezone</FieldLabel>
+      <Autocomplete<Timezone>
+        fullWidth
+        disabled={readOnly}
+        value={tz}
+        onChange={(_, selectOption) => {
+          setTimezone(selectOption);
+          save(selectOption?.tz);
+        }}
+        options={timezoneOptions}
+        size='small'
+        renderOption={(props, option) => (
+          <Box component='li' sx={{ display: 'flex', gap: 1 }} {...props}>
+            <Box component='span'>
+              {option.tz} (GMT {option.offset})
+            </Box>
           </Box>
-        </Box>
-      )}
-      getOptionLabel={(option) => `${option.tz} (GMT ${option.offset})`}
-      renderInput={(params) => (
-        <TextField
-          {...params}
-          inputProps={{
-            ...params.inputProps
-          }}
-          placeholder={`${currentTz} (${currentTzOffset})`}
-        />
-      )}
-    />
+        )}
+        getOptionLabel={(option) => `${option.tz} (GMT ${option.offset})`}
+        renderInput={(params) => (
+          <TextField
+            {...params}
+            inputProps={{
+              ...params.inputProps
+            }}
+            placeholder={`${currentTz} (${currentTzOffset})`}
+          />
+        )}
+      />
+    </>
   );
 }
