@@ -101,7 +101,7 @@ describe('filterAccessibleProposalCategories', () => {
   });
 
   // No special category-level overrides apart from being able to see the category
-  it('returns all categories if user is a spacewide proposal reviewer, and applicable permissions for that category', async () => {
+  it('returns only categories user has access to if user is a spacewide proposal reviewer, and applicable permissions for that category', async () => {
     const spaceWideProposalReviewerUser = await generateSpaceUser({
       spaceId: space.id,
       isAdmin: false
@@ -125,8 +125,7 @@ describe('filterAccessibleProposalCategories', () => {
     });
 
     const spaceWideReviewerPermissions = new AvailableProposalCategoryPermissions();
-    expect(visibleCategories.length).toBe(proposalCategories.length);
-    expect(visibleCategories).toContainEqual({ ...adminOnlyCategory, permissions: spaceWideReviewerPermissions.empty });
+    expect(visibleCategories.length).toBe(2);
     // This should contain create_proposal, because the space has full access to the category
     expect(visibleCategories).toContainEqual({
       ...spaceOnlyCategory,

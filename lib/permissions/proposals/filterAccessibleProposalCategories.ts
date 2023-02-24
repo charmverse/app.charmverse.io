@@ -113,17 +113,15 @@ export async function filterAccessibleProposalCategories({
       userId
     });
 
-    const filteredProposalCategory = hasSpaceWideReviewer
-      ? proposalCategories
-      : proposalCategories.filter((category) => {
-          const relevantPermissions = mappedProposalCategoryPermissions[category.id];
+    const filteredProposalCategory = proposalCategories.filter((category) => {
+      const relevantPermissions = mappedProposalCategoryPermissions[category.id];
 
-          if (!relevantPermissions || relevantPermissions.length === 0) {
-            return false;
-          }
+      if (!relevantPermissions || relevantPermissions.length === 0) {
+        return false;
+      }
 
-          return true;
-        });
+      return true;
+    });
 
     return filteredProposalCategory.map((category) => {
       const permissions = new AvailableProposalCategoryPermissions();
