@@ -60,8 +60,8 @@ export default function NewBountyButton() {
         });
       }
       mutatePage(createdBounty.page);
+      router.push({ pathname: router.pathname, query: { ...router.query, bountyId: createdBounty.page.id } });
       setBounties((bounties) => [...bounties, createdBounty]);
-      router.push({ pathname: router.pathname, query: { bountyId: createdBounty.page.id } });
     }
   }
 
