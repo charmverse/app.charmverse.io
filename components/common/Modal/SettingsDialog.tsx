@@ -3,9 +3,7 @@ import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import CloseIcon from '@mui/icons-material/Close';
 import MenuIcon from '@mui/icons-material/Menu';
-import { treeItemClasses } from '@mui/lab/TreeItem';
 import TreeView from '@mui/lab/TreeView';
-import { Slide } from '@mui/material';
 import type { BoxProps } from '@mui/material/Box';
 import Box from '@mui/material/Box';
 import Dialog from '@mui/material/Dialog';
@@ -161,7 +159,8 @@ function SpaceSettingsModalComponent() {
             aria-label='Profile settings tree view'
             defaultCollapseIcon={<ArrowDropDownIcon fontSize='large' />}
             defaultExpandIcon={<ArrowRightIcon fontSize='large' />}
-            defaultExpanded={currentSpace?.name ? ['my-spaces', currentSpace?.name] : ['my-spaces']}
+            defaultExpanded={currentSpace?.name ? [currentSpace?.name] : []}
+            selected={activePath}
             sx={{
               '& .MuiTreeItem-content > .MuiTreeItem-label': { pl: 0.5 },
               '& .MuiTreeItem-content': { py: 0.5 },
