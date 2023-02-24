@@ -3,7 +3,7 @@ import { prisma } from "db";
 import { disconnectProposalChildren } from "lib/proposal/disconnectProposalChildren";
 import { getRandomThemeColor } from "theme/utils/getRandomThemeColor";
 
-
+// Comment
 const concurrent = 5;
 
 async function disconnectProposalsFromChildren() {
