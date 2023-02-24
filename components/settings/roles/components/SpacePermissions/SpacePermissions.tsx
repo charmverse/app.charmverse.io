@@ -19,6 +19,7 @@ import { usePreventReload } from 'hooks/usePreventReload';
 import type { AssignablePermissionGroups } from 'lib/permissions/interfaces';
 import type { SpacePermissionFlags } from 'lib/permissions/spaces/client';
 import {
+  spaceOperationDescriptions,
   AvailableSpacePermissions,
   spaceOperationLabels,
   spaceOperationsWithoutForumCategory
@@ -169,6 +170,7 @@ export default function SpacePermissions({ targetGroup, id, callback = () => nul
           {assignableOperations.map((operation) => {
             const userCanPerformAction = assignedPermissions[operation];
             const actionLabel = spaceOperationLabels[operation];
+            const actionDescription = spaceOperationDescriptions[operation];
 
             return (
               <Grid item container xs key={operation}>
@@ -196,16 +198,16 @@ export default function SpacePermissions({ targetGroup, id, callback = () => nul
                   >
                     {targetGroup === 'space' &&
                       (newValues[operation] === true
-                        ? `All members of your space can ${actionLabel.toLowerCase()}`
-                        : `Space members cannot ${actionLabel.toLowerCase()}`)}
+                        ? `All members of your space can ${actionDescription.toLowerCase()}`
+                        : `Space members cannot ${actionDescription.toLowerCase()}`)}
                     {targetGroup === 'role' &&
                       (newValues[operation] === true
-                        ? `Members with this role can ${actionLabel.toLowerCase()}`
-                        : `Members with this role cannot ${actionLabel.toLowerCase()}`)}
+                        ? `Members with this role can ${actionDescription.toLowerCase()}`
+                        : `Members with this role cannot ${actionDescription.toLowerCase()}`)}
                     {targetGroup === 'user' &&
                       (newValues[operation] === true
-                        ? `This user can ${actionLabel.toLowerCase()}`
-                        : `This user cannot ${actionLabel.toLowerCase()}`)}
+                        ? `This user can ${actionDescription.toLowerCase()}`
+                        : `This user cannot ${actionDescription.toLowerCase()}`)}
                   </Typography>
                 </Grid>
               </Grid>

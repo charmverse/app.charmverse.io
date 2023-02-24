@@ -1,6 +1,6 @@
 import type { SpaceOperation, SpacePermissionConfigurationMode } from '@prisma/client';
 
-import { spaceOperationLabels } from '../spaces/mapping';
+import { spaceOperationDescriptions, spaceOperationLabels } from '../spaces/mapping';
 
 import type { SpaceConfigurationPreset, SpacePermissionTemplate } from './interfaces';
 
@@ -90,7 +90,7 @@ export function getTemplateExplanation(template: SpacePermissionConfigurationMod
   for (const [operation, can] of Object.entries(applicableOperations) as [SpaceOperation, boolean][]) {
     const qualifier = can ? 'can' : 'cannot';
 
-    const sentence = `Space members ${qualifier} ${spaceOperationLabels[operation].toLowerCase()}.`;
+    const sentence = `Space members ${qualifier} ${spaceOperationDescriptions[operation].toLowerCase()}.`;
 
     if (can) {
       canAndCannot[0].push(sentence);
