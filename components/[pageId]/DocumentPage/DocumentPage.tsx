@@ -221,7 +221,7 @@ function DocumentPage({ page, setPage, insideModal, readOnly = false, parentProp
                 pageType={page.type}
                 pagePermissions={pagePermissions ?? undefined}
                 onParticipantUpdate={onParticipantUpdate}
-                disableNestedPages={page.type === 'proposal'}
+                disableNestedPages={page?.type === 'proposal' || page?.type === 'proposal_template'}
               >
                 {/* temporary? disable editing of page title when in suggestion mode */}
                 <PageHeader
