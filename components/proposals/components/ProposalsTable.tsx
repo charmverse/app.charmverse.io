@@ -58,6 +58,9 @@ export default function ProposalsTable({
     }
   }, [router.query.id]);
 
+  // Make sure not to show templates here
+  const filteredProposals = proposals?.filter((p) => pages[p.id]?.type === 'proposal');
+
   return (
     <>
       <GridHeader>
@@ -76,12 +79,12 @@ export default function ProposalsTable({
         <Grid item xs={1} display='flex' justifyContent='center'></Grid>
       </GridHeader>
       {!proposals && <LoadingComponent height='250px' isLoading={true} />}
-      {proposals?.length === 0 && (
+      {filteredProposals?.length === 0 && (
         <Box height='250px' mt={2}>
           <NoProposalsMessage message='There are no proposals yet. Create a proposal page to get started!' />
         </Box>
       )}
-      {proposals?.map((proposal) => {
+      {filteredProposals?.map((proposal) => {
         const { category } = proposal;
         const proposalPage = pages[proposal.id];
         return proposalPage ? (
