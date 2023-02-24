@@ -38,19 +38,15 @@ export default function PageDialog(props: Props) {
   const popupState = usePopupState({ variant: 'popover', popupId: 'page-dialog' });
   const router = useRouter();
   const { refreshBounty, setBounties } = useBounties();
-  const { currentPageId, setCurrentPageId } = useCurrentPage();
+  const { setCurrentPageId } = useCurrentPage();
 
-  const { updatePage, deletePage, pages } = usePages();
+  const { updatePage, deletePage } = usePages();
   const { permissions: pagePermissions } = usePagePermissions({
     pageIdOrPath: page?.id as string,
     isNewPage: !page?.id
   });
   const domain = router.query.domain as string;
   const fullPageUrl = `/${domain}/${page?.path}`;
-
-  const ogCurrentPageId = useMemo(() => currentPageId, []);
-
-  const parentProposalId = findParentOfType({ pageId: ogCurrentPageId, pageType: 'proposal', pageMap: pages });
 
   const readOnlyPage = readOnly || !pagePermissions?.edit_content;
 
@@ -176,15 +172,7 @@ export default function PageDialog(props: Props) {
       }
       onClose={onClose}
     >
-      {page && (
-        <DocumentPage
-          insideModal
-          page={page}
-          setPage={setPage}
-          readOnly={readOnlyPage}
-          parentProposalId={parentProposalId}
-        />
-      )}
+      {page && <DocumentPage insideModal page={page} setPage={setPage} readOnly={readOnlyPage} />}
     </Dialog>
   );
 }

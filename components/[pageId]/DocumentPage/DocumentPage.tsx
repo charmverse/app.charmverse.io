@@ -80,10 +80,9 @@ export interface DocumentPageProps {
   setPage: (p: Partial<Page>) => void;
   readOnly?: boolean;
   insideModal?: boolean;
-  parentProposalId?: string | null;
 }
 
-function DocumentPage({ page, setPage, insideModal, readOnly = false, parentProposalId }: DocumentPageProps) {
+function DocumentPage({ page, setPage, insideModal, readOnly = false }: DocumentPageProps) {
   const { pages } = usePages();
   const { cancelVote, castVote, deleteVote, updateDeadline, votes, isLoading } = useVotes();
   // For post we would artificially construct the permissions
@@ -99,12 +98,12 @@ function DocumentPage({ page, setPage, insideModal, readOnly = false, parentProp
   const [bountyPermissions, setBountyPermissions] = useState<AssignedBountyPermissions | null>(null);
   const [containerRef, { width: containerWidth }] = useElementSize();
 
-  const proposalId = page.proposalId || parentProposalId;
+  const proposalId = page.proposalId;
 
   const { permissions: proposalPermissions } = useProposalPermissions({ proposalIdOrPath: proposalId as string });
 
   // We can only edit the proposal from the top level
-  const readonlyProposalProperties = !page.proposalId || Boolean(parentProposalId) || readOnly;
+  const readonlyProposalProperties = !page.proposalId || readOnly;
 
   async function refreshBountyPermissions(bountyId: string) {
     setBountyPermissions(

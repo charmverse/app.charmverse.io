@@ -11,7 +11,6 @@ import { usePagePermissions } from 'hooks/usePagePermissions';
 import { usePages } from 'hooks/usePages';
 import { usePageTitle } from 'hooks/usePageTitle';
 import type { PageMeta, PageUpdates } from 'lib/pages';
-import { findParentOfType } from 'lib/pages/findParentOfType';
 import debouncePromise from 'lib/utilities/debouncePromise';
 
 import { DatabasePage } from '../DatabasePage';
@@ -29,7 +28,6 @@ export default function EditorPage({ pageId: pageIdOrPath }: { pageId: string })
   const { permissions: pagePermissions } = usePagePermissions({ pageIdOrPath: currentPageId });
 
   const readOnly = (pagePermissions?.edit_content === false && editMode !== 'suggesting') || editMode === 'viewing';
-  const parentProposalId = findParentOfType({ pageId: currentPageId, pageType: 'proposal', pageMap: pages });
   useEffect(() => {
     const pageFromContext = Object.values(pages).find(
       (page) => page?.id === pageIdOrPath || page?.path === pageIdOrPath
@@ -132,7 +130,7 @@ export default function EditorPage({ pageId: pageIdOrPath }: { pageId: string })
     } else {
       return (
         // Document page is used in a few places, so it is responsible for retrieving its own permissions
-        <DocumentPage page={currentPage} readOnly={readOnly} setPage={setPage} parentProposalId={parentProposalId} />
+        <DocumentPage page={currentPage} readOnly={readOnly} setPage={setPage} />
       );
     }
   }
