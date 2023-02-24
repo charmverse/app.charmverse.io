@@ -48,9 +48,6 @@ function MemberProfile({ title, member, onClose }: { title?: string; member: Mem
   const { data: user, isLoading: isFetchingUser } = useSWR(`users/${member.path}`, () =>
     charmClient.getUserByPath(member.path as string)
   );
-
-  const isLoading = isFetchingUser;
-
   if (!currentSpace || !currentUser) {
     return null;
   }
@@ -60,7 +57,7 @@ function MemberProfile({ title, member, onClose }: { title?: string; member: Mem
       <MemberPropertiesPopup
         title={title && title.length !== 0 ? title : 'Edit your profile'}
         onClose={() => onClose()}
-        isLoading={isLoading}
+        isLoading={isFetchingUser}
         memberId={currentUser.id}
         spaceId={currentSpace.id}
         updateMemberPropertyValues={updateSpaceValues}
@@ -97,7 +94,7 @@ function MemberProfile({ title, member, onClose }: { title?: string; member: Mem
 
   return (
     <Dialog open onClose={onClose} fullScreen={fullScreen}>
-      {isLoading || !user ? (
+      {isFetchingUser || !user ? (
         <DialogContent>
           <LoadingComponent isLoading />
         </DialogContent>
