@@ -9,6 +9,7 @@ import charmClient from 'charmClient';
 import FieldLabel from 'components/common/form/FieldLabel';
 import PopperPopup from 'components/common/PopperPopup';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useSnackbar } from 'hooks/useSnackbar';
 import type { ProposalCategoryWithPermissions } from 'lib/permissions/proposals/interfaces';
 
 import { useProposalCategories } from '../hooks/useProposalCategories';
@@ -23,6 +24,7 @@ export function ProposalCategoryContextMenu({ category }: Props) {
   const [tempName, setTempName] = useState(category.title || '');
   const space = useCurrentSpace();
   const { mutateCategory, deleteCategory } = useProposalCategories();
+  const { showMessage } = useSnackbar();
 
   const { permissions } = category;
 
@@ -38,7 +40,9 @@ export function ProposalCategoryContextMenu({ category }: Props) {
 
   function onDelete() {
     if (space) {
-      deleteCategory(category.id);
+      deleteCategory(category.id).catch((err) => {
+        showMessage(err.message ?? 'Something went wrong', 'warning');
+      });
     }
   }
 

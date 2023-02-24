@@ -7,12 +7,19 @@ export async function deleteProposalCategory(id: string) {
       categoryId: id
     },
     select: {
-      id: true
+      id: true,
+      category: {
+        select: {
+          title: true
+        }
+      }
     }
   });
 
   if (proposal) {
-    throw new UndesirableOperationError(`Proposal category cannot be deleted as it contains more than 1 proposal`);
+    throw new UndesirableOperationError(
+      `${proposal.category?.title} proposal category  cannot be deleted as it contains proposals.`
+    );
   }
 
   return prisma.proposalCategory.delete({
