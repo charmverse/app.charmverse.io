@@ -119,6 +119,7 @@ export default function PageDialog(props: Props) {
       refreshBounty(bountyId);
     }
   }
+
   if (!popupState.isOpen) {
     return null;
   }

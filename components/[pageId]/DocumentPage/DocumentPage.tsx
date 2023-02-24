@@ -265,7 +265,6 @@ function DocumentPage({ page, setPage, insideModal, readOnly = false, parentProp
                     )}
                     {proposalId && (
                       <ProposalProperties
-                        pageId={proposalId}
                         proposalId={proposalId}
                         readOnly={readonlyProposalProperties}
                         isTemplate={page.type === 'proposal_template'}
