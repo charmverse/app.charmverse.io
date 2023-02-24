@@ -1,17 +1,10 @@
 import type { ProposalCategory, ProposalOperation, Role, Space, User } from '@prisma/client';
-import { v4 } from 'uuid';
 
-import { prisma } from 'db';
-import { ProposalNotFoundError } from 'lib/proposal/errors';
 import type { ProposalWithUsers } from 'lib/proposal/interface';
-import { InvalidInputError } from 'lib/utilities/errors';
 import { generateRole, generateSpaceUser, generateUserAndSpace } from 'testing/setupDatabase';
 import { generateProposal, generateProposalCategory } from 'testing/utils/proposals';
 
 import type { AvailableProposalPermissionFlags } from '../../interfaces';
-import { proposalOperations } from '../../interfaces';
-import { proposalPermissionsMapping } from '../../mapping';
-import { upsertProposalCategoryPermission } from '../../upsertProposalCategoryPermission';
 import { computeProposalPermissions } from '../computeProposalPermissions';
 
 let adminUser: User;

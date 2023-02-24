@@ -1,3 +1,4 @@
+import { prisma } from 'db';
 import { computeProposalPermissions } from 'lib/permissions/proposals/computeProposalPermissions';
 
 import type { PermissionCompute } from '../interfaces';
@@ -33,6 +34,19 @@ export async function computePagePermissionsUsingProposalPermissions({
 
   if (proposalPermissions.delete) {
     permissions.addPermissions(['delete']);
+  }
+
+  if (!permissions.operationFlags.read) {
+    const publicPermission = await prisma.pagePermission.findFirst({
+      where: {
+        pageId: resourceId,
+        public: true
+      }
+    });
+
+    if (publicPermission) {
+      permissions.addPermissions(['read']);
+    }
   }
 
   return permissions.operationFlags;
