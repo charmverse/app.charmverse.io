@@ -84,19 +84,26 @@ export function ApiSettings({ space }: { space: Space }) {
 
   return (
     <>
-      <Legend>API Key</Legend>
-      <Typography variant='body1'>
-        Request access to the charmverse API in our{' '}
+      <Legend>API Settings</Legend>
+      <Typography variant='h6'>API Endpoints</Typography>
+      <Typography>
+        Our API endpoints enable you to access and create content in your space. View the{' '}
+        <Link href='/api-docs' target='_blank'>
+          documentation
+        </Link>{' '}
+        to see what is currently supported.
+        <br />
+        <br />
+        Get started by requesting an API key in our{' '}
         <Link href='https://discord.gg/ACYCzBGC2M' external target='_blank'>
           Discord Channel <LaunchIcon fontSize='small' />
         </Link>
       </Typography>
       <br />
-      <br />
-      <Legend>Webhook (beta)</Legend>
-      <Typography variant='body1'>
-        Subscribe to events in Charmverse using webhooks. You must provide us with an http endpoint which returns a 200
-        response upon reception of the event.
+      <Typography variant='h6'>Webhook (beta)</Typography>
+      <Typography>
+        Subscribe to user events in CharmVerse using webhooks. You must provide us with an http endpoint which returns a
+        200 response upon reception of the event.
       </Typography>
       {spaceWebhook && events && (
         <form

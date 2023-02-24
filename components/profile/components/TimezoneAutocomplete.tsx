@@ -26,9 +26,9 @@ export function TimezoneAutocomplete({
     setTimezone(
       userTimezone
         ? {
-            tz: userTimezone,
             // luxon provides the offset in terms of minutes
-            offset: toHoursAndMinutes(DateTime.local().setZone(userTimezone).offset)
+            offset: toHoursAndMinutes(DateTime.local().setZone(userTimezone).offset),
+            tz: userTimezone
           }
         : null
     );
@@ -48,6 +48,7 @@ export function TimezoneAutocomplete({
         fullWidth
         disabled={readOnly}
         value={tz}
+        isOptionEqualToValue={(option, value) => option.tz === value.tz && option.offset === value.offset}
         onChange={(_, selectOption) => {
           setTimezone(selectOption);
           save(selectOption?.tz);
