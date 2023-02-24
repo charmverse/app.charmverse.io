@@ -60,8 +60,6 @@ export function ProposalProperties({ pageId, proposalId, readOnly, isTemplate }:
   const prevStatusRef = useRef(proposal?.status || '');
   const [detailsExpanded, setDetailsExpanded] = useState(['private_draft', 'draft'].includes(proposal?.status ?? ''));
 
-  const proposalMenuState = usePopupState({ popupId: 'proposal-info', variant: 'popover' });
-
   const proposalStatus = proposal?.status;
   const proposalCategory = proposal?.category;
   const proposalAuthors = proposal?.authors ?? [];

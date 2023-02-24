@@ -40,7 +40,18 @@ export async function getUserProposalsBySpace({
   userId,
   categoryIds
 }: ListProposalsRequest): Promise<ProposalWithUsers[]> {
-  if (!userId) {
+  if (!userId || !spaceId) {
+    return [];
+  }
+
+  const userSpaceRole = await prisma.spaceRole.findFirst({
+    where: {
+      userId,
+      spaceId
+    }
+  });
+
+  if (!userSpaceRole) {
     return [];
   }
 
@@ -55,6 +66,26 @@ export async function getUserProposalsBySpace({
           authors: {
             some: {
               userId
+            }
+          }
+        },
+        {
+          reviewers: {
+            some: {
+              OR: [
+                {
+                  userId
+                },
+                {
+                  role: {
+                    spaceRolesToRole: {
+                      some: {
+                        spaceRoleId: userSpaceRole.id
+                      }
+                    }
+                  }
+                }
+              ]
             }
           }
         }
