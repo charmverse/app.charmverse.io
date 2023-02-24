@@ -7,7 +7,7 @@ import { ActionNotPermittedError, NotFoundError, onError, onNoMatch, requireUser
 import type { IPageWithPermissions } from 'lib/pages';
 import { computeUserPagePermissions } from 'lib/permissions/pages';
 import { computeSpacePermissions } from 'lib/permissions/spaces';
-import { createProposal } from 'lib/proposal/createProposal';
+import { convertPageToProposal } from 'lib/proposal/convertPageToProposal';
 import { withSessionRoute } from 'lib/session/withSession';
 import { UnauthorisedActionError } from 'lib/utilities/errors';
 import { relay } from 'lib/websockets/relay';
@@ -57,25 +57,23 @@ async function convertToProposal(req: NextApiRequest, res: NextApiResponse<IPage
     throw new UnauthorisedActionError('You do not have permission to create a page in this space');
   }
 
-  const proposalPage = await createProposal({
-    id: page.id,
-    createdBy: userId,
-    spaceId: page.spaceId,
-    content: page.content ?? undefined,
-    title: page.title
+  const proposalPage = await convertPageToProposal({
+    page,
+    userId,
+    content: page.content
   });
 
-  updateTrackPageProfile(proposalPage.page.id);
+  updateTrackPageProfile(proposalPage.id);
 
   relay.broadcast(
     {
       type: 'pages_created',
-      payload: [proposalPage.page]
+      payload: [proposalPage]
     },
-    proposalPage.page.spaceId
+    proposalPage.spaceId
   );
 
-  return res.status(200).json(proposalPage.page);
+  return res.status(200).json(proposalPage);
 }
 
 export default withSessionRoute(handler);

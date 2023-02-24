@@ -18,6 +18,7 @@ import type { FrontendParticipant } from 'components/common/CharmEditor/componen
 import { SnapshotVoteDetails } from 'components/common/CharmEditor/components/inlineVote/components/SnapshotVoteDetails';
 import VoteDetail from 'components/common/CharmEditor/components/inlineVote/components/VoteDetail';
 import ScrollableWindow from 'components/common/PageLayout/components/ScrollableWindow';
+import { PostProposalBanner } from 'components/forum/components/PostPage/components/PostProposalBanner';
 import { useBounties } from 'hooks/useBounties';
 import { useCharmEditor } from 'hooks/useCharmEditor';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
@@ -180,6 +181,7 @@ function DocumentPage({ page, setPage, insideModal, readOnly = false, parentProp
           <PageDeleteBanner pageId={page.id} />
         </StyledBannerContainer>
       )}
+      {page?.convertedProposalId && <PostProposalBanner proposalId={page.convertedProposalId} />}
       <ScrollableWindow
         sx={{
           overflow: {
