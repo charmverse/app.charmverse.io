@@ -2,7 +2,6 @@ import { prisma } from 'db';
 import { InvalidStateError } from 'lib/middleware';
 
 import type { ProposalReviewerInput, ProposalWithUsers } from './interface';
-import { generateSyncProposalPermissions } from './syncProposalPermissions';
 
 export interface UpdateProposalRequest {
   proposalId: string;
@@ -23,7 +22,7 @@ export async function updateProposal({
 
   await prisma.$transaction(async (tx) => {
     // Update category only when it is present in request payload
-    if (categoryId !== undefined) {
+    if (categoryId) {
       await tx.proposal.update({
         where: {
           id: proposalId
@@ -54,15 +53,6 @@ export async function updateProposal({
         roleId: reviewer.group === 'role' ? reviewer.id : null
       }))
     });
-
-    const [deleteArgs, createArgs] = await generateSyncProposalPermissions({ proposalId, tx });
-
-    await tx.pagePermission.deleteMany(deleteArgs);
-
-    // Replicate serial execution of a normal transaction as we must ensure the order of page permission creations for child inheritance
-    for (const arg of createArgs) {
-      await tx.pagePermission.create(arg);
-    }
   });
 
   return prisma.proposal.findUnique({

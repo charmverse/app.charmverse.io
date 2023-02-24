@@ -1,41 +1,96 @@
 import { prisma } from 'db';
-import { accessiblePagesByPermissionsQuery } from 'lib/pages/server';
 
 import type { ProposalWithUsers } from './interface';
+import { generateCategoryIdQuery } from './utils';
 
+export type ListProposalsRequest = {
+  spaceId: string;
+  userId?: string;
+  categoryIds?: string | string[];
+};
+/**
+ * If you want to secure listed categories, make sure to check if the user has access to the category
+ * @returns
+ */
 export async function getProposalsBySpace({
   spaceId,
-  userId
-}: {
-  spaceId: string;
-  userId: string;
-}): Promise<ProposalWithUsers[]> {
+  categoryIds
+}: Pick<ListProposalsRequest, 'categoryIds' | 'spaceId'>): Promise<ProposalWithUsers[]> {
   return prisma.proposal.findMany({
     where: {
       spaceId,
+      categoryId: generateCategoryIdQuery(categoryIds),
+      status: {
+        notIn: ['draft', 'private_draft']
+      },
       page: {
-        deletedAt: null,
-        type: 'proposal',
-        OR: [
-          {
-            permissions: accessiblePagesByPermissionsQuery({
-              spaceId,
+        type: 'proposal'
+      }
+    },
+    include: {
+      authors: true,
+      reviewers: true,
+      category: true
+    }
+  });
+}
+
+export async function getUserProposalsBySpace({
+  spaceId,
+  userId,
+  categoryIds
+}: ListProposalsRequest): Promise<ProposalWithUsers[]> {
+  if (!userId || !spaceId) {
+    return [];
+  }
+
+  const userSpaceRole = await prisma.spaceRole.findFirst({
+    where: {
+      userId,
+      spaceId
+    }
+  });
+
+  if (!userSpaceRole) {
+    return [];
+  }
+
+  return prisma.proposal.findMany({
+    where: {
+      spaceId,
+      OR: [
+        {
+          createdBy: userId
+        },
+        {
+          authors: {
+            some: {
               userId
-            })
-          },
-          {
-            space: {
-              spaceRoles: {
-                some: {
-                  spaceId,
-                  userId,
-                  isAdmin: true
-                }
-              }
             }
           }
-        ]
-      }
+        },
+        {
+          reviewers: {
+            some: {
+              OR: [
+                {
+                  userId
+                },
+                {
+                  role: {
+                    spaceRolesToRole: {
+                      some: {
+                        spaceRoleId: userSpaceRole.id
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      ],
+      categoryId: generateCategoryIdQuery(categoryIds)
     },
     include: {
       authors: true,

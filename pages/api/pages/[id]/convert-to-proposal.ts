@@ -3,18 +3,22 @@ import nc from 'next-connect';
 
 import { prisma } from 'db';
 import { updateTrackPageProfile } from 'lib/metrics/mixpanel/updateTrackPageProfile';
-import { ActionNotPermittedError, NotFoundError, onError, onNoMatch, requireUser } from 'lib/middleware';
+import { ActionNotPermittedError, NotFoundError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import type { IPageWithPermissions } from 'lib/pages';
 import { computeUserPagePermissions } from 'lib/permissions/pages';
-import { computeSpacePermissions } from 'lib/permissions/spaces';
+import { computeProposalCategoryPermissions } from 'lib/permissions/proposals/computeProposalCategoryPermissions';
 import { createProposal } from 'lib/proposal/createProposal';
+import { disconnectProposalChildren } from 'lib/proposal/disconnectProposalChildren';
 import { withSessionRoute } from 'lib/session/withSession';
 import { UnauthorisedActionError } from 'lib/utilities/errors';
 import { relay } from 'lib/websockets/relay';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireUser).post(convertToProposal);
+handler
+  .use(requireUser)
+  .use(requireKeys(['categoryId'], 'body'))
+  .post(convertToProposal);
 
 async function convertToProposal(req: NextApiRequest, res: NextApiResponse<IPageWithPermissions>) {
   const pageId = req.query.id as string;
@@ -47,22 +51,31 @@ async function convertToProposal(req: NextApiRequest, res: NextApiResponse<IPage
     throw new ActionNotPermittedError('You do not have permission to update this page');
   }
 
-  const spacePermissions = await computeSpacePermissions({
-    allowAdminBypass: true,
-    resourceId: page.spaceId,
+  const categoryId = req.body.categoryId;
+
+  const proposalPermissions = await computeProposalCategoryPermissions({
+    resourceId: categoryId,
     userId
   });
 
-  if (!spacePermissions.createVote) {
-    throw new UnauthorisedActionError('You do not have permission to create a page in this space');
+  if (!proposalPermissions.create_proposal) {
+    throw new UnauthorisedActionError('You do not have permission to create a proposal in this category');
   }
 
   const { page: updatedPage } = await createProposal({
-    id: page.id,
-    createdBy: userId,
+    pageId: page.id,
+    userId,
     spaceId: page.spaceId,
-    content: page.content ?? undefined,
-    title: page.title
+    categoryId: req.body.categoryId as string,
+    pageProps: {
+      content: page.content ?? undefined,
+      title: page.title
+    }
+  });
+
+  // Launch this job in the background
+  disconnectProposalChildren({
+    pageId: updatedPage.id
   });
 
   updateTrackPageProfile(updatedPage.id);

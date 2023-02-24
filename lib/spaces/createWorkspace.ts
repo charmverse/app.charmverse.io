@@ -14,7 +14,7 @@ import { convertJsonPagesToPrisma } from 'lib/pages/server/convertJsonPagesToPri
 import { createPage } from 'lib/pages/server/createPage';
 import { setupDefaultPaymentMethods } from 'lib/payment-methods/defaultPaymentMethods';
 import { updateSpacePermissionConfigurationMode } from 'lib/permissions/meta';
-import { generateDefaultCategoriesInput } from 'lib/proposal/generateDefaultCategoriesInput';
+import { generateDefaultProposalCategoriesInput } from 'lib/proposal/generateDefaultProposalCategoriesInput';
 import { importWorkspacePages } from 'lib/templates/importWorkspacePages';
 import { subscribeToAllEvents, createSigningSecret } from 'lib/webhookPublisher/subscribeToEvents';
 import { gettingStartedPage } from 'seedData/gettingStartedPage';
@@ -107,12 +107,12 @@ export async function createWorkspace({
 
   // ---------- Section for selecting template to create from ----------
 
-  const defaultCategories = generateDefaultCategoriesInput(space.id);
+  const defaultProposalCategories = generateDefaultProposalCategoriesInput(space.id);
   const defaultProperties = generateDefaultPropertiesInput({ userId, spaceId: space.id });
   const defaultPostCategories = generateDefaultPostCategories(space.id);
 
   await prisma.$transaction([
-    prisma.proposalCategory.createMany({ data: defaultCategories }),
+    prisma.proposalCategory.createMany({ data: defaultProposalCategories }),
     prisma.memberProperty.createMany({ data: defaultProperties }),
     prisma.postCategory.createMany({ data: defaultPostCategories }),
     prisma.postCategoryPermission.createMany({
@@ -123,6 +123,16 @@ export async function createWorkspace({
             postCategoryId: category.id,
             spaceId: space.id
           } as Prisma.PostCategoryPermissionCreateManyInput)
+      )
+    }),
+    prisma.proposalCategoryPermission.createMany({
+      data: defaultProposalCategories.map(
+        (category) =>
+          ({
+            permissionLevel: 'full_access',
+            proposalCategoryId: category.id,
+            spaceId: space.id
+          } as Prisma.ProposalCategoryPermissionCreateManyInput)
       )
     })
   ]);

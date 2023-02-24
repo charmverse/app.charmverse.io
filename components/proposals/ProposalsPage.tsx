@@ -10,18 +10,18 @@ import PageDialogGlobalModal from 'components/common/PageDialog/PageDialogGlobal
 import { CenteredPageContent } from 'components/common/PageLayout/components/PageContent';
 import { useProposalCategories } from 'components/proposals/hooks/useProposalCategories';
 import { useProposalSortAndFilters } from 'components/proposals/hooks/useProposalSortAndFilters';
-import NewProposalButton from 'components/votes/components/NewProposalButton';
+import { NewProposalButton } from 'components/votes/components/NewProposalButton';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 
 import ProposalsTable from './components/ProposalsTable';
-import ProposalsViewOptions from './components/ProposalsViewOptions';
+import { ProposalsViewOptions } from './components/ProposalsViewOptions';
 
-export default function ProposalsPage() {
+export function ProposalsPage() {
   const { categories = [] } = useProposalCategories();
   const currentSpace = useCurrentSpace();
   const { data, mutate: mutateProposals } = useSWR(
     () => (currentSpace ? `proposals/${currentSpace.id}` : null),
-    () => charmClient.proposals.getProposalsBySpace(currentSpace!.id)
+    () => charmClient.proposals.getProposalsBySpace({ spaceId: currentSpace!.id })
   );
   const {
     filteredProposals,
