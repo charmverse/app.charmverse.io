@@ -13,17 +13,18 @@ handler.get(getVotes);
 
 async function getVotes(req: NextApiRequest, res: NextApiResponse<ExtendedVote[]>) {
   const pageId = req.query.id as string;
+  const userId = req.session?.user?.id;
 
   const computed = await computeUserPagePermissions({
     pageId,
-    userId: req.session?.user?.id
+    userId
   });
 
   if (computed.read !== true) {
     throw new NotFoundError('Page not found');
   }
 
-  const votes = await getVotesByPage({ pageId, userId: req.session.user?.id });
+  const votes = await getVotesByPage({ pageId, userId });
 
   return res.status(200).json(votes);
 }

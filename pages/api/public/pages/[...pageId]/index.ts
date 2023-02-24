@@ -257,14 +257,16 @@ async function getPublicPage(req: NextApiRequest, res: NextApiResponse<PublicPag
   }
 
   return res.status(200).json({
-    bounty: {
-      ...bounty,
-      page: {
-        ...page,
-        permissions: []
-      },
-      applications: []
-    } as BountyWithDetails,
+    bounty: bounty
+      ? {
+          ...bounty,
+          page: {
+            ...page,
+            permissions: []
+          },
+          applications: []
+        }
+      : null,
     page,
     boardPages,
     cards,

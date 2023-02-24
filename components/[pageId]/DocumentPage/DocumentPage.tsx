@@ -23,7 +23,7 @@ import { useCharmEditor } from 'hooks/useCharmEditor';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { usePages } from 'hooks/usePages';
 import { useVotes } from 'hooks/useVotes';
-import type { AssignedBountyPermissions, BountyWithDetails } from 'lib/bounties';
+import type { AssignedBountyPermissions } from 'lib/bounties';
 import type { PageMeta } from 'lib/pages';
 
 import BountyProperties from './components/BountyProperties';
@@ -173,6 +173,7 @@ function DocumentPage({ page, setPage, insideModal, readOnly = false, parentProp
   function onParticipantUpdate(participants: FrontendParticipant[]) {
     setPageProps({ participants });
   }
+
   return (
     <>
       {!!page?.deletedAt && (

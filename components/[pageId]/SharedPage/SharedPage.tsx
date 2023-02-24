@@ -29,13 +29,14 @@ export function SharedPage({ publicPage }: Props) {
   // keep track of the pageId by path since currentPageId may change when a page is viewed inside a modal
   const basePageId = publicPage?.page?.id || '';
 
-  const { setBounties } = useBounties();
+  const { setBounties, loadingBounties } = useBounties();
 
+  // Pre-populate bounties state in place of prop drilling
   useEffect(() => {
-    if (publicPage.bounty) {
+    if (publicPage?.bounty && !loadingBounties) {
       setBounties([publicPage.bounty]);
     }
-  }, [publicPage.bounty]);
+  }, [publicPage, loadingBounties]);
 
   async function onLoad() {
     if (!publicPage) {

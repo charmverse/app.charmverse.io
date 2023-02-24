@@ -24,7 +24,7 @@ async function computeBountyGroupPermissionsController(
   const [permissions, groups] = await Promise.all([
     // !userId = publicly viewed
     !userId
-      ? new AvailableBountyPermissions()
+      ? new AvailableBountyPermissions().empty
       : computeBountyPermissions({
           allowAdminBypass: false,
           resourceId: bounty.id,

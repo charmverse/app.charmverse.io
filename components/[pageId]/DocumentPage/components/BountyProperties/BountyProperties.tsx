@@ -390,7 +390,7 @@ export default function BountyProperties(props: {
             </div>
             <TextField
               required
-              defaultValue={currentBounty?.maxSubmissions ?? 1}
+              defaultValue={currentBounty?.maxSubmissions}
               type='number'
               size='small'
               inputProps={{ step: 1, min: 1 }}
