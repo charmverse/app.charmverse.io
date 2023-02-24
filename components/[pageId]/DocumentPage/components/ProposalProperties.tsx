@@ -1,7 +1,6 @@
 import { KeyboardArrowDown } from '@mui/icons-material';
 import { Box, Collapse, Divider, Grid, IconButton, Stack, Typography } from '@mui/material';
 import type { ProposalStatus } from '@prisma/client';
-import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect, useRef, useState } from 'react';
 import useSWR from 'swr';
 
@@ -30,12 +29,11 @@ import type { ListSpaceRolesResponse } from 'pages/api/roles';
 
 interface ProposalPropertiesProps {
   readOnly?: boolean;
-  pageId: string;
   proposalId: string;
   isTemplate: boolean;
 }
 
-export function ProposalProperties({ pageId, proposalId, readOnly, isTemplate }: ProposalPropertiesProps) {
+export default function ProposalProperties({ proposalId, readOnly, isTemplate }: ProposalPropertiesProps) {
   const { data: proposal, mutate: refreshProposal } = useSWR(`proposal/${proposalId}`, () =>
     charmClient.proposals.getProposal(proposalId)
   );
@@ -49,7 +47,7 @@ export function ProposalProperties({ pageId, proposalId, readOnly, isTemplate }:
 
   const { permissions: proposalFlowFlags, refresh: refreshProposalFlowFlags } = useProposalFlowFlags({ proposalId });
   const { refresh: refreshPagePermissions } = usePagePermissions({
-    pageIdOrPath: pageId
+    pageIdOrPath: proposalId
   });
 
   const { members } = useMembers();

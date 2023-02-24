@@ -33,16 +33,15 @@ export default function ProposalsTable({
   const { formatDateTime, formatDate } = useDateFormatter();
 
   function onClose() {
-    setUrlWithoutRerender(router.pathname, { id: null });
+    router.push({ pathname: router.pathname, query: { domain: router.query.domain } });
     mutateProposals();
     mutateTasks();
   }
 
   function openPage(pageId: string) {
-    setUrlWithoutRerender(router.pathname, { id: pageId });
-    showPage({
-      pageId,
-      onClose
+    router.push({
+      pathname: router.pathname,
+      query: { ...router.query, id: pageId }
     });
   }
 
@@ -54,7 +53,10 @@ export default function ProposalsTable({
 
   useEffect(() => {
     if (typeof router.query.id === 'string') {
-      openPage(router.query.id);
+      showPage({
+        pageId: router.query.id,
+        onClose
+      });
     }
   }, [router.query.id]);
 
