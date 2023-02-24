@@ -33,7 +33,7 @@ import PageBanner from './components/PageBanner';
 import PageDeleteBanner from './components/PageDeleteBanner';
 import PageHeader from './components/PageHeader';
 import { PageTemplateBanner } from './components/PageTemplateBanner';
-import { ProposalProperties } from './components/ProposalProperties';
+import ProposalProperties from './components/ProposalProperties';
 
 const CharmEditor = dynamic(() => import('components/common/CharmEditor'), {
   ssr: false
