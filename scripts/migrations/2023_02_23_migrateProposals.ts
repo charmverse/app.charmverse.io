@@ -85,30 +85,26 @@ async function provisionGeneralProposalCategory() {
 
   for (let i = 0; i < totalSpaces; i+= concurrent) {
     console.log('Creating general categories for spaces', i + 1, '-', i + 1 + concurrent, ' / ', totalSpaces, '...')
-    await prisma.proposalCategory.upsert({
-      where: {
-        spaceId_title: {
-          spaceId: spacesWithoutGeneral[i].id,
-          title: 'Other'
-        }
-      },
-      create: {
-        color: getRandomThemeColor(),
-        title: 'General',
-        space: {connect: {id: spacesWithoutGeneral[i].id}}
-      },
-      update: {
-        title: 'General'
-      }
-    })
-    
-    await prisma.proposalCategory.createMany({
-      data: spacesWithoutGeneral.slice(i, i + concurrent).map(space => ({
-        color: getRandomThemeColor(),
-        title: 'General',
-        spaceId: space.id
-      }))
-    });
+
+    await Promise.all(spacesWithoutGeneral
+        .slice(i, i + concurrent)
+        .map(space => prisma.proposalCategory.upsert({
+          where: {
+            spaceId_title: {
+              spaceId: space.id,
+              title: 'Other'
+            }
+          },
+          create: {
+            color: getRandomThemeColor(),
+            title: 'General',
+            space: {connect: {id: spacesWithoutGeneral[i].id}}
+          },
+          update: {
+            title: 'General'
+          }
+        })));
+  
   }
 }
 
