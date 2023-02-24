@@ -29,6 +29,7 @@ import Modal from 'components/common/Modal';
 import useTasks from 'components/nexus/hooks/useTasks';
 import { VoteActionsMenu } from 'components/votes/components/VoteActionsMenu';
 import VoteStatusChip from 'components/votes/components/VoteStatusChip';
+import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
 import { removeInlineVoteMark } from 'lib/prosemirror/plugins/inlineVotes/removeInlineVoteMark';
 import type { ExtendedVote } from 'lib/votes/interfaces';
@@ -74,6 +75,7 @@ export function VoteDetail({
     charmClient.votes.getUserVotes(id)
   );
   const { mutate: refetchTasks } = useTasks();
+  const { members } = useMembers();
 
   const voteDetailsPopup = usePopupState({ variant: 'popover', popupId: 'inline-votes-detail' });
 
@@ -214,7 +216,13 @@ export function VoteDetail({
       </Tooltip>
       {!detailed && (
         <Box display='flex' justifyContent='flex-end'>
-          <Button disabled={!user} color='secondary' variant='outlined' size='small' onClick={voteDetailsPopup.open}>
+          <Button
+            data-test='view-poll-details-button'
+            color='secondary'
+            variant='outlined'
+            size='small'
+            onClick={voteDetailsPopup.open}
+          >
             View details
           </Button>
         </Box>
@@ -232,33 +240,36 @@ export function VoteDetail({
         ))}
       {detailed && userVotes && (
         <List>
-          {userVotes.map((userVote) => (
-            <React.Fragment key={userVote.userId}>
-              <ListItem
-                dense
-                sx={{
-                  px: 0,
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  gap: 1
-                }}
-              >
-                <Avatar avatar={userVote.user.avatar} name={userVote.user.username} />
-                <ListItemText
-                  primary={<Typography>{userVote.user.username}</Typography>}
-                  secondary={
-                    <Typography variant='subtitle1' color='secondary'>
-                      {DateTime.fromJSDate(new Date(userVote.updatedAt)).toRelative({ base: DateTime.now() })}
-                    </Typography>
-                  }
-                />
-                <Typography fontWeight={500} color='secondary'>
-                  {userVote.choice}
-                </Typography>
-              </ListItem>
-              <Divider />
-            </React.Fragment>
-          ))}
+          {userVotes.map((userVote) => {
+            const member = members.find((_member) => _member.id === userVote.user.id);
+            return (
+              <React.Fragment key={userVote.userId}>
+                <ListItem
+                  dense
+                  sx={{
+                    px: 0,
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    gap: 1
+                  }}
+                >
+                  <Avatar avatar={userVote.user.avatar} name={member?.username ?? userVote.user.username} />
+                  <ListItemText
+                    primary={<Typography>{member?.username ?? userVote.user.username}</Typography>}
+                    secondary={
+                      <Typography variant='subtitle1' color='secondary'>
+                        {DateTime.fromJSDate(new Date(userVote.updatedAt)).toRelative({ base: DateTime.now() })}
+                      </Typography>
+                    }
+                  />
+                  <Typography fontWeight={500} color='secondary'>
+                    {userVote.choice}
+                  </Typography>
+                </ListItem>
+                <Divider />
+              </React.Fragment>
+            );
+          })}
         </List>
       )}
       <Modal title='Poll details' size='large' open={voteDetailsPopup.isOpen} onClose={voteDetailsPopup.close}>

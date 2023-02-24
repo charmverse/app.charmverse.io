@@ -179,6 +179,7 @@ function DocumentPage({ page, setPage, insideModal, readOnly = false }: Document
   function onParticipantUpdate(participants: FrontendParticipant[]) {
     setPageProps({ participants });
   }
+
   return (
     <>
       {!!page?.deletedAt && (

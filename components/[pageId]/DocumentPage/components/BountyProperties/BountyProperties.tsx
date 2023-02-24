@@ -23,10 +23,10 @@ import { useUser } from 'hooks/useUser';
 import type { ApplicationWithTransactions } from 'lib/applications/interfaces';
 import type {
   AssignedBountyPermissions,
-  BountyPermissions,
-  UpdateableBountyFields,
   BountyCreationData,
-  BountyWithDetails
+  BountyPermissions,
+  BountyWithDetails,
+  UpdateableBountyFields
 } from 'lib/bounties';
 import type { TargetPermissionGroup } from 'lib/permissions/interfaces';
 import debouncePromise from 'lib/utilities/debouncePromise';
@@ -426,62 +426,61 @@ export default function BountyProperties(props: {
         bountyPermissions={bountyPermissions}
         pagePermissions={bountyPagePermissions}
         pageId={pageId}
+        readOnly={readOnly}
       />
       <Box justifyContent='space-between' gap={2} alignItems='center'>
-        {!readOnly && (
+        <div
+          className='octo-propertyrow'
+          style={{
+            display: 'flex',
+            height: 'fit-content',
+            flexGrow: 1
+          }}
+        >
           <div
-            className='octo-propertyrow'
-            style={{
-              display: 'flex',
-              height: 'fit-content',
-              flexGrow: 1
-            }}
+            className='octo-propertyname octo-propertyname--readonly'
+            style={{ alignSelf: 'baseline', paddingTop: 12 }}
           >
-            <div
-              className='octo-propertyname octo-propertyname--readonly'
-              style={{ alignSelf: 'baseline', paddingTop: 12 }}
-            >
-              <Button>Reviewer</Button>
-            </div>
-            <div style={{ width: '100%' }}>
-              <InputSearchReviewers
-                disabled={readOnly}
-                readOnly={readOnly}
-                value={bountyPermissions?.reviewer ?? []}
-                disableCloseOnSelect={true}
-                onChange={async (e, options) => {
-                  const roles = options.filter((option) => option.group === 'role');
-                  const members = options.filter((option) => option.group === 'user');
-                  await applyBountyUpdates({
-                    permissions: rollupPermissions({
-                      assignedRoleSubmitters,
-                      selectedReviewerRoles: roles.map((role) => role.id),
-                      selectedReviewerUsers: members.map((member) => member.id),
-                      spaceId: space!.id
-                    })
-                  });
-                  if (currentBounty?.id) {
-                    await refreshBountyPermissions(currentBounty.id);
-                  }
-                }}
-                excludedIds={[...selectedReviewerUsers, ...selectedReviewerRoles]}
-                sx={{
-                  width: '100%'
-                }}
-              />
-              {bountyPagePermissions && bountyPermissions && (
-                <MissingPagePermissions
-                  target='reviewer'
-                  bountyPermissions={bountyPermissions}
-                  pagePermissions={bountyPagePermissions}
-                />
-              )}
-            </div>
+            <Button>Reviewer</Button>
           </div>
-        )}
+          <div style={{ width: '100%' }}>
+            <InputSearchReviewers
+              disabled={readOnly}
+              readOnly={readOnly}
+              value={bountyPermissions?.reviewer ?? []}
+              disableCloseOnSelect={true}
+              onChange={async (e, options) => {
+                const roles = options.filter((option) => option.group === 'role');
+                const members = options.filter((option) => option.group === 'user');
+                await applyBountyUpdates({
+                  permissions: rollupPermissions({
+                    assignedRoleSubmitters,
+                    selectedReviewerRoles: roles.map((role) => role.id),
+                    selectedReviewerUsers: members.map((member) => member.id),
+                    spaceId: space!.id
+                  })
+                });
+                if (currentBounty?.id) {
+                  await refreshBountyPermissions(currentBounty.id);
+                }
+              }}
+              excludedIds={[...selectedReviewerUsers, ...selectedReviewerRoles]}
+              sx={{
+                width: '100%'
+              }}
+            />
+            {bountyPagePermissions && bountyPermissions && (
+              <MissingPagePermissions
+                target='reviewer'
+                bountyPermissions={bountyPermissions}
+                pagePermissions={bountyPagePermissions}
+              />
+            )}
+          </div>
+        </div>
       </Box>
 
-      {!readOnly && bountyProperties}
+      {bountyProperties}
 
       {draftBounty && (
         <Box display='flex' gap={2} my={2}>

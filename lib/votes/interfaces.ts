@@ -34,7 +34,7 @@ export type VoteTask = ExtendedVote & {
 };
 
 export type UserVoteExtendedDTO = UserVote & {
-  user: Pick<User, 'avatar' | 'username'>;
+  user: Pick<User, 'avatar' | 'username' | 'id'>;
 };
 
 export interface SpaceVotesRequest {
