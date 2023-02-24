@@ -3,9 +3,7 @@ import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import CloseIcon from '@mui/icons-material/Close';
 import MenuIcon from '@mui/icons-material/Menu';
-import { treeItemClasses } from '@mui/lab/TreeItem';
 import TreeView from '@mui/lab/TreeView';
-import { Slide } from '@mui/material';
 import type { BoxProps } from '@mui/material/Box';
 import Box from '@mui/material/Box';
 import Dialog from '@mui/material/Dialog';
@@ -37,7 +35,13 @@ import { useSpaceFromPath } from 'hooks/useSpaceFromPath';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
 
+import { SectionName } from '../PageLayout/components/Sidebar/Sidebar';
+import { SidebarLink } from '../PageLayout/components/Sidebar/SidebarButton';
 import WorkspaceAvatar from '../PageLayout/components/Sidebar/WorkspaceAvatar';
+
+const SpaceSettingsLink = styled(SidebarLink)`
+  padding-left: 36px;
+`;
 
 interface TabPanelProps extends BoxProps {
   children?: ReactNode;
@@ -130,20 +134,34 @@ function SpaceSettingsModalComponent() {
         <Box
           component='aside'
           width={{ xs: '100%', md: 300 }}
+          minWidth={{ xs: '100%', md: 300 }}
           display={isMobile ? (open && !activePath && 'block') || 'none' : 'block'}
           borderRight='1px solid'
           borderColor='divider'
           overflow='auto'
           sx={{ backgroundColor: (theme) => theme.palette.sidebar.background }}
         >
-          <Typography p='10px' variant='body1'>
-            {user?.username}
-          </Typography>
+          <Box mt={2} py={0.5}>
+            <SectionName>User settings</SectionName>
+          </Box>
+          {ACCOUNT_TABS.map((tab) => (
+            <SidebarLink
+              key={tab.path}
+              label={tab.label}
+              icon={tab.icon}
+              onClick={() => onClick(tab.path)}
+              active={activePath === tab.path}
+            />
+          ))}
+          <Box mt={2} py={0.5}>
+            <SectionName>Space settings</SectionName>
+          </Box>
           <TreeView
             aria-label='Profile settings tree view'
             defaultCollapseIcon={<ArrowDropDownIcon fontSize='large' />}
             defaultExpandIcon={<ArrowRightIcon fontSize='large' />}
-            defaultExpanded={currentSpace?.name ? ['my-spaces', currentSpace?.name] : ['my-spaces']}
+            defaultExpanded={currentSpace?.name ? [currentSpace?.name] : []}
+            selected={activePath}
             sx={{
               '& .MuiTreeItem-content > .MuiTreeItem-label': { pl: 0.5 },
               '& .MuiTreeItem-content': { py: 0.5 },
@@ -151,51 +169,37 @@ function SpaceSettingsModalComponent() {
               '& .MuiTreeItem-root[aria-expanded] > .MuiTreeItem-content': { py: 1 }
             }}
           >
-            {ACCOUNT_TABS.map((tab) => (
+            {spaces.map((space) => (
               <StyledTreeItem
-                key={tab.path}
-                nodeId={tab.path}
-                label={tab.label}
-                icon={tab.icon}
-                onClick={() => onClick(tab.path)}
-                isActive={activePath === tab.path}
-              />
+                data-test={`space-settings-tab-${space.id}`}
+                key={space.id}
+                onClick={() => {
+                  setCurrentSpaceId(space.id);
+                  onClick(`${space.name}-space`);
+                }}
+                nodeId={space.name}
+                label={
+                  <Box display='flex' alignItems='center' gap={1}>
+                    <WorkspaceAvatar name={space.name} image={space.spaceImage} />
+                    <Typography noWrap>{space.name}</Typography>
+                  </Box>
+                }
+              >
+                {SETTINGS_TABS.map((tab) => (
+                  <SpaceSettingsLink
+                    data-test={`space-settings-tab-${space.id}-${tab.path}`}
+                    key={tab.path}
+                    label={tab.label}
+                    icon={tab.icon}
+                    onClick={() => {
+                      setCurrentSpaceId(space.id);
+                      onClick(`${space.name}-${tab.path}`);
+                    }}
+                    active={activePath === `${space.name}-${tab.path}`}
+                  />
+                ))}
+              </StyledTreeItem>
             ))}
-            <StyledTreeItem nodeId='my-spaces' label='My spaces' sx={{ mt: 1.5 }}>
-              {spaces.map((space) => (
-                <StyledTreeItem
-                  data-test={`space-settings-tab-${space.id}`}
-                  key={space.id}
-                  onClick={() => {
-                    setCurrentSpaceId(space.id);
-                    onClick(`${space.name}-space`);
-                  }}
-                  nodeId={space.name}
-                  label={
-                    <Box display='flex' alignItems='center' gap={1}>
-                      <WorkspaceAvatar name={space.name} image={space.spaceImage} />
-                      <Typography noWrap>{space.name}</Typography>
-                    </Box>
-                  }
-                >
-                  {SETTINGS_TABS.map((tab) => (
-                    <StyledTreeItem
-                      data-test={`space-settings-tab-${space.id}-${tab.path}`}
-                      key={tab.path}
-                      nodeId={`${space.name}-${tab.path}`}
-                      label={tab.label}
-                      icon={tab.icon}
-                      onClick={() => {
-                        setCurrentSpaceId(space.id);
-                        onClick(`${space.name}-${tab.path}`);
-                      }}
-                      isActive={activePath === `${space.name}-${tab.path}`}
-                      ContentProps={{ style: { paddingLeft: 44 } }}
-                    />
-                  ))}
-                </StyledTreeItem>
-              ))}
-            </StyledTreeItem>
           </TreeView>
         </Box>
         <Box flex='1 1 auto' position='relative' overflow='auto'>
