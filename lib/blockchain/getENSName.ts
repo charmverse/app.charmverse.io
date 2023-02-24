@@ -19,3 +19,29 @@ export function getENSName(address: string) {
     return null;
   });
 }
+
+export async function getENSDetails(address?: string | null) {
+  if (!address) {
+    return null;
+  }
+
+  if (!provider) {
+    if (!isTestEnv) {
+      log.warn('No api key provided for Alchemy');
+    }
+    return null;
+  }
+
+  try {
+    const resolver = await provider.getResolver(address);
+    const avatar = await provider.getAvatar(address);
+    const [description, discord, github, twitter] = await Promise.all(
+      ['description', 'com.discord', 'com.github', 'com.twitter'].map((text) => resolver?.getText(text))
+    );
+
+    return { avatar, description, discord, github, twitter };
+  } catch (error) {
+    log.warn('Error looking up ENS details for address', { error });
+    return null;
+  }
+}
