@@ -9,8 +9,7 @@ export const defaultProposalCategories = [
   'Grants',
   'Investment',
   'Elections',
-  'Governance',
-  'Other'
+  'Governance'
 ];
 
 export function generateDefaultProposalCategoriesInput(spaceId: string): Prisma.ProposalCategoryCreateManyInput[] {
