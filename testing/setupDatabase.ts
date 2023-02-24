@@ -38,6 +38,7 @@ import { uniqueValues } from 'lib/utilities/array';
 import { InvalidInputError } from 'lib/utilities/errors';
 import { typedKeys } from 'lib/utilities/objects';
 import type { LoggedInUser } from 'models';
+import { getRandomThemeColor } from 'theme/utils/getRandomThemeColor';
 
 import { boardWithCardsArgs } from './generateBoardStub';
 
@@ -860,7 +861,8 @@ export async function generateProposal({
   proposalStatus,
   authors,
   reviewers,
-  deletedAt = null
+  deletedAt = null,
+  title = 'Proposal'
 }: {
   deletedAt?: Page['deletedAt'];
   categoryId?: string;
@@ -869,6 +871,7 @@ export async function generateProposal({
   authors: string[];
   reviewers: ProposalReviewerInput[];
   proposalStatus: ProposalStatus;
+  title?: string;
 }): Promise<Page & { proposal: ProposalWithUsers; workspaceEvent: WorkspaceEvent }> {
   const proposalId = v4();
 
@@ -878,7 +881,7 @@ export async function generateProposal({
       await prisma.proposalCategory.create({
         data: {
           title: `Category - ${v4()}`,
-          color: `#ffffff`,
+          color: getRandomThemeColor(),
           space: { connect: { id: spaceId } }
         }
       })
@@ -888,8 +891,12 @@ export async function generateProposal({
     data: {
       id: proposalId,
       contentText: '',
+      content: {
+        type: 'doc',
+        content: []
+      },
       path: `path-${v4()}`,
-      title: 'Proposal',
+      title,
       type: 'proposal',
       author: {
         connect: {
