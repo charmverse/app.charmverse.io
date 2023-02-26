@@ -54,6 +54,7 @@ const SelectPreviewContainer = styled(Stack, {
   }
 
   width: 100%;
+  height: 100%;
 `;
 
 const StyledSelect = styled(SelectField)`
@@ -147,9 +148,11 @@ export function SelectProperty({
           options={selectOptions}
           size='small'
           emptyComponent={
-            <Typography component='span' variant='subtitle2' sx={{ opacity: 0.4, pl: '2px' }}>
-              Empty
-            </Typography>
+            displayType === 'details' && (
+              <Typography component='span' variant='subtitle2' sx={{ opacity: 0.4, pl: '2px' }}>
+                Empty
+              </Typography>
+            )
           }
         />
       </SelectPreviewContainer>

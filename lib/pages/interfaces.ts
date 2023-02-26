@@ -1,5 +1,6 @@
-import type { Block, Page, PagePermission, Space } from '@prisma/client';
+import type { Block, Bounty, Page, PagePermission, Space } from '@prisma/client';
 
+import type { BountyWithDetails } from 'lib/bounties';
 import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
@@ -35,6 +36,7 @@ export interface PublicPageResponse {
   cards: Card[];
   boards: Board[];
   views: BoardView[];
+  bounty: BountyWithDetails | null;
 }
 
 // These 2 types are used for reducing a list of pages to a tree
@@ -113,3 +115,7 @@ export type FormResponseProperty = IPropertyTemplate & {
   description: string;
   isQuestion?: true;
 };
+
+export interface IPageMetaWithPermissions extends PageMeta {
+  permissions: (PagePermission & { sourcePermission: PagePermission | null })[];
+}

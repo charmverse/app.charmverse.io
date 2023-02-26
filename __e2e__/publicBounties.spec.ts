@@ -3,6 +3,7 @@ import { expect, test, chromium } from '@playwright/test';
 import type { Bounty, User } from '@prisma/client';
 
 import { baseUrl } from 'config/constants';
+import { generateRole } from 'testing/setupDatabase';
 
 import { generateUserAndSpace, generateBounty } from './utils/mocks';
 import { login } from './utils/session';
@@ -19,9 +20,21 @@ test.describe.serial('Make a bounties page public and visit it', async () => {
   let bountyBoard: string;
   let bounty: Bounty;
 
-  test('visit a public bounty page', async ({ page }) => {
+  test('visit a public bounty page', async () => {
+    const userContext = await browser.newContext({ permissions: ['clipboard-read', 'clipboard-write'] });
+
+    const page = await userContext.newPage();
+
     const { space, user } = await generateUserAndSpace({
       publicBountyBoard: true
+    });
+
+    const roleName = 'Bounty Reviewer Role';
+
+    const role = await generateRole({
+      spaceId: space.id,
+      createdBy: user.id,
+      roleName
     });
 
     spaceUser = user;
@@ -38,6 +51,12 @@ test.describe.serial('Make a bounties page public and visit it', async () => {
           {
             group: 'space',
             id: space.id
+          }
+        ],
+        reviewer: [
+          {
+            group: 'role',
+            id: role.id
           }
         ]
       },
@@ -86,6 +105,10 @@ test.describe.serial('Make a bounties page public and visit it', async () => {
     // 5. Make sure page is displayed using public layout
     const publicPageLayout = page.locator('data-test=public-page-layout');
     await expect(publicPageLayout).toBeVisible();
+
+    // Make sure bounty property reviewer role is visible
+    const roleChip = page.getByText(roleName);
+    await expect(roleChip).toBeVisible();
   });
 
   test('visit shared bounties page as logged in user', async () => {

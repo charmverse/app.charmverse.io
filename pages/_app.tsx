@@ -14,6 +14,7 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import type { ReactElement, ReactNode } from 'react';
 import { useEffect, useMemo, useState } from 'react';
+import { SWRConfig } from 'swr';
 
 import charmClient from 'charmClient';
 import GlobalComponents from 'components/_app/GlobalComponents';
@@ -31,7 +32,9 @@ import { isDevEnv } from 'config/constants';
 import { ColorModeContext } from 'context/darkMode';
 import { BountiesProvider } from 'hooks/useBounties';
 import { CurrentSpaceProvider, useCurrentSpaceId } from 'hooks/useCurrentSpaceId';
+import { DiscordProvider } from 'hooks/useDiscordConnection';
 import { useInterval } from 'hooks/useInterval';
+import { IsSpaceMemberProvider } from 'hooks/useIsSpaceMember';
 import { useLocalStorage } from 'hooks/useLocalStorage';
 import { MembersProvider } from 'hooks/useMembers';
 import { OnboardingProvider } from 'hooks/useOnboarding';
@@ -253,32 +256,44 @@ export default function App({ Component, emotionCache = clientSideEmotionCache, 
 
 function DataProviders({ children }: { children: ReactNode }) {
   return (
-    <UserProvider>
-      <Web3ReactProvider getLibrary={getLibrary}>
-        <Web3ConnectionManager>
-          <Web3AccountProvider>
-            <SpacesProvider>
-              <CurrentSpaceProvider>
-                <CurrentSpaceSetter />
-                <WebSocketClientProvider>
-                  <MembersProvider>
-                    <BountiesProvider>
-                      <PaymentMethodsProvider>
-                        <PagesProvider>
-                          <MemberProfileProvider>
-                            <PageTitleProvider>{children}</PageTitleProvider>
-                          </MemberProfileProvider>
-                        </PagesProvider>
-                      </PaymentMethodsProvider>
-                    </BountiesProvider>
-                  </MembersProvider>
-                </WebSocketClientProvider>
-              </CurrentSpaceProvider>
-            </SpacesProvider>
-          </Web3AccountProvider>
-        </Web3ConnectionManager>
-      </Web3ReactProvider>
-    </UserProvider>
+    <SWRConfig
+      value={{
+        shouldRetryOnError(err) {
+          return err.status >= 500;
+        }
+      }}
+    >
+      <UserProvider>
+        <DiscordProvider>
+          <Web3ReactProvider getLibrary={getLibrary}>
+            <Web3ConnectionManager>
+              <Web3AccountProvider>
+                <SpacesProvider>
+                  <CurrentSpaceProvider>
+                    <CurrentSpaceSetter />
+                    <IsSpaceMemberProvider>
+                      <WebSocketClientProvider>
+                        <MembersProvider>
+                          <BountiesProvider>
+                            <PaymentMethodsProvider>
+                              <PagesProvider>
+                                <MemberProfileProvider>
+                                  <PageTitleProvider>{children}</PageTitleProvider>
+                                </MemberProfileProvider>
+                              </PagesProvider>
+                            </PaymentMethodsProvider>
+                          </BountiesProvider>
+                        </MembersProvider>
+                      </WebSocketClientProvider>
+                    </IsSpaceMemberProvider>
+                  </CurrentSpaceProvider>
+                </SpacesProvider>
+              </Web3AccountProvider>
+            </Web3ConnectionManager>
+          </Web3ReactProvider>
+        </DiscordProvider>
+      </UserProvider>
+    </SWRConfig>
   );
 }
 

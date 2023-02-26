@@ -14,8 +14,11 @@ export const DOMAIN_BLACKLIST = [
 ];
 
 export const spaceContentTemplates = {
-  templateNftCommunity: 'NFT Community'
+  templateNftCommunity: 'NFT Community',
+  templateCreator: 'Creator'
 };
+
+export type SpaceTemplate = keyof typeof spaceContentTemplates;
 
 const staticTemplateOptions = ['default', 'importNotion', 'importMarkdown'] as const;
 

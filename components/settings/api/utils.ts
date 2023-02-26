@@ -1,6 +1,6 @@
 import * as yup from 'yup';
 
-import { WebhookEventNames, WebhookNameSpaces } from 'lib/webhook/interfaces';
+import { WebhookEventNames, WebhookNameSpaces } from 'lib/webhookPublisher/interfaces';
 
 export type WebhookNamespaces = { [key: string]: string[] };
 const WEBHOOK_EVENT_NAMES = Object.values(WebhookEventNames);

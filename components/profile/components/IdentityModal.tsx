@@ -6,7 +6,6 @@ import { Box, SvgIcon, Tooltip, Typography } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 import type { IdentityType } from '@prisma/client';
 import { utils } from 'ethers';
-import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { useState } from 'react';
 
@@ -14,6 +13,7 @@ import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { DialogTitle, Modal } from 'components/common/Modal';
+import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useUser } from 'hooks/useUser';
 import randomName from 'lib/utilities/randomName';
 import { shortWalletAddress } from 'lib/utilities/strings';
@@ -81,6 +81,8 @@ function IdentityModal(props: IdentityModalProps) {
   const { close, isOpen, save, identityTypes, identityType } = props;
 
   const { setUser, user } = useUser();
+
+  const { onClick } = useSettingsDialog();
 
   const [generatedName, setGeneratedName] = useState(
     user?.identityType === 'RandomName' && identityType === 'RandomName' ? user.username : randomName()
@@ -157,11 +159,17 @@ function IdentityModal(props: IdentityModalProps) {
           );
         })}
       </Box>
-      <Link href='/integrations'>
-        <Button variant='text' color='secondary' endIcon={<NavigateNextIcon />}>
-          Manage identities
-        </Button>
-      </Link>
+      <Button
+        variant='text'
+        color='secondary'
+        endIcon={<NavigateNextIcon />}
+        onClick={() => {
+          close();
+          onClick('account');
+        }}
+      >
+        Manage identities
+      </Button>
     </Modal>
   );
 }

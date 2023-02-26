@@ -46,6 +46,7 @@ function PropertyValueElement(props: Props): JSX.Element {
   const emptyDisplayValue = showEmptyPlaceholder
     ? intl.formatMessage({ id: 'PropertyValueElement.empty', defaultMessage: 'Empty' })
     : '';
+
   const finalDisplayValue = displayValue || emptyDisplayValue;
 
   const editableFields: PropertyType[] = ['text', 'number', 'email', 'url', 'phone'];
@@ -116,6 +117,7 @@ function PropertyValueElement(props: Props): JSX.Element {
         onChange={(newValue) => {
           mutator.changePropertyValue(card, propertyTemplate.id, newValue);
         }}
+        showEmptyPlaceholder={displayType === 'details'}
       />
     );
   } else if (propertyTemplate.type === 'date') {

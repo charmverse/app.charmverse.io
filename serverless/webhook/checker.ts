@@ -1,4 +1,5 @@
 import type { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
+import { jwtVerify } from 'jose';
 
 import log from 'lib/log';
 
@@ -7,11 +8,22 @@ export const webhookChecker = async (event: APIGatewayProxyEvent): Promise<APIGa
     const body = event?.body;
     const headers = event?.headers;
 
-    // eslint-disable-next-line no-console
-    log.debug('BODY', JSON.stringify(body));
+    log.debug('Webhook check: BODY', body);
+    log.debug('Webhook check: HEADERS', headers);
 
-    // eslint-disable-next-line no-console
-    log.debug('HEADERS', JSON.stringify(headers));
+    const signature = headers?.Signature;
+
+    if (!signature) {
+      throw new Error('No signature found');
+    }
+
+    try {
+      const tokenSecret = 'your_token_secret';
+      const secret = Buffer.from(tokenSecret, 'hex');
+      await jwtVerify(signature, secret);
+    } catch (e) {
+      throw new Error('Invalid signature');
+    }
 
     return {
       statusCode: 200,

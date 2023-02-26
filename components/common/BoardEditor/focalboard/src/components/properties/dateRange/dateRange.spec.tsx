@@ -43,9 +43,7 @@ describe('components/properties/dateRange', () => {
 
   test('handles calendar click event', () => {
     const callback = jest.fn();
-    const component = wrapIntl(
-      <DateRange className='octo-propertyvalue' value='' showEmptyPlaceholder={true} onChange={callback} />
-    );
+    const component = wrapIntl(<DateRange className='octo-propertyvalue' value='' onChange={callback} />);
 
     const date = new Date();
     const fifteenth = Date.UTC(date.getFullYear(), date.getMonth(), 15, 12);
@@ -65,9 +63,7 @@ describe('components/properties/dateRange', () => {
 
   test('handles setting range', () => {
     const callback = jest.fn();
-    const component = wrapIntl(
-      <DateRange className='octo-propertyvalue' value='' showEmptyPlaceholder={true} onChange={callback} />
-    );
+    const component = wrapIntl(<DateRange className='octo-propertyvalue' value='' onChange={callback} />);
 
     // open modal
     const { getByText, getByTitle } = render(component);
@@ -220,9 +216,7 @@ describe('components/properties/dateRange', () => {
 
   test('handles `Today` button click event', () => {
     const callback = jest.fn();
-    const component = wrapIntl(
-      <DateRange className='octo-propertyvalue' value='' showEmptyPlaceholder={true} onChange={callback} />
-    );
+    const component = wrapIntl(<DateRange className='octo-propertyvalue' value='' onChange={callback} />);
 
     // To see if 'Today' button correctly selects today's date,
     // we can check it against `new Date()`.

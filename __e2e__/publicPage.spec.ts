@@ -4,9 +4,11 @@ import type { Page, User } from '@prisma/client';
 
 import { baseUrl } from 'config/constants';
 import { prisma } from 'db';
-import { generateBoard } from 'testing/setupDatabase';
+import { upsertPermission } from 'lib/permissions/pages';
+import { createVote, generateBoard } from 'testing/setupDatabase';
 
 import { generateUserAndSpace } from './utils/mocks';
+import { generatePage } from './utils/pages';
 import { login } from './utils/session';
 
 let browser: Browser;
@@ -76,6 +78,61 @@ test.describe.serial('Make a page public and visit it', async () => {
     const inputValue = await shareLinkInput.inputValue();
 
     expect(inputValue.match(shareUrl)).not.toBe(null);
+  });
+
+  test('visit a public page with embedded poll', async () => {
+    // Arrange ------------------
+    const userContext = await browser.newContext({ permissions: ['clipboard-read', 'clipboard-write'] });
+    const page = await userContext.newPage();
+
+    const { space, user } = await generateUserAndSpace();
+
+    const createdPage = await generatePage({
+      content: [],
+      createdBy: user.id,
+      spaceId: space.id
+    });
+
+    const createdVote = await createVote({
+      pageId: createdPage.id,
+      createdBy: user.id,
+      spaceId: space.id,
+      voteOptions: ['1', '2'],
+      userVotes: ['1']
+    });
+
+    await prisma.page.update({
+      where: {
+        id: createdPage.id
+      },
+      data: {
+        content: {
+          type: 'doc',
+          content: [
+            {
+              type: 'poll',
+              attrs: {
+                track: [],
+                pollId: createdVote.id
+              }
+            }
+          ]
+        }
+      }
+    });
+
+    await upsertPermission(createdPage.id, {
+      permissionLevel: 'view',
+      public: true
+    });
+
+    const domain = space.domain;
+
+    const targetPage = `${baseUrl}/${domain}/${createdPage.path}`;
+
+    await page.goto(targetPage);
+
+    await expect(page.locator(`data-test=view-poll-details-button`).first()).not.toBeDisabled();
   });
 
   test('open a page with invalid domain and path', async () => {

@@ -94,7 +94,7 @@ export default function TrashModal({ onClose, isOpen }: { onClose: () => void; i
           if (
             archivedPage &&
             archivedPage.deletedAt !== null &&
-            getPagePermissions(archivedPage.id, archivedPage).delete
+            getPagePermissions(archivedPage.id, archivedPage)?.delete
           ) {
             const pageTitle = archivedPage.title || 'Untitled';
             _archivedPages.push({ ...archivedPage, title: pageTitle });

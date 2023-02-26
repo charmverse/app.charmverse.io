@@ -17,17 +17,19 @@ import { useUser } from 'hooks/useUser';
 interface VoteActionsProps {
   deleteVote?: (voteId: string) => Promise<void>;
   cancelVote: (voteId: string) => Promise<void>;
+  isProposalVote: boolean;
   removeFromPage?: (voteId: string) => void;
   updateDeadline?: (voteId: string, deadline: Date) => Promise<void>;
   vote: { createdBy: string; id: string; deadline?: Date; status: VoteStatus; title: string; context: VoteContext };
 }
 
-export default function VoteActionsMenu({
+export function VoteActionsMenu({
   cancelVote,
   deleteVote,
   removeFromPage,
   updateDeadline,
-  vote
+  vote,
+  isProposalVote
 }: VoteActionsProps) {
   const { user } = useUser();
   const actionsPopup = usePopupState({ variant: 'popover', popupId: 'inline-votes-action' });
@@ -65,7 +67,7 @@ export default function VoteActionsMenu({
         </IconButton>
       )}
       <ConfirmDeleteModal
-        title='Delete vote'
+        title={isProposalVote ? 'Delete vote' : 'Delete poll'}
         onClose={deletePopup.close}
         open={deletePopup.isOpen}
         buttonText='Delete'
@@ -93,19 +95,19 @@ export default function VoteActionsMenu({
             }}
           >
             <DoNotDisturbIcon fontSize='small' sx={{ mr: 1 }} />
-            <ListItemText>Cancel vote</ListItemText>
+            <ListItemText>{isProposalVote ? 'Cancel vote' : 'Cancel poll'}</ListItemText>
           </MenuItem>
         )}
         {deleteVote && vote.context === 'inline' && (
           <MenuItem dense onClick={deletePopup.open}>
             <DeleteOutlineIcon fontSize='small' sx={{ mr: 1 }} />
-            <ListItemText>Delete vote</ListItemText>
+            <ListItemText>{isProposalVote ? 'Delete vote' : 'Delete poll'}</ListItemText>
           </MenuItem>
         )}
         {vote.status === 'InProgress' && vote.deadline && !hasPassedDeadline && updateDeadline && (
           <MenuItem dense onClick={(event) => deadlinePopup.open(event)}>
             <DateRangeIcon fontSize='small' sx={{ mr: 1 }} />
-            <ListItemText>Change deadline</ListItemText>
+            <ListItemText>Change end date</ListItemText>
           </MenuItem>
         )}
       </Menu>

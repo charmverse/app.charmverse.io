@@ -3,9 +3,10 @@ import styled from '@emotion/styled';
 import type { TokenGate } from '@prisma/client';
 import type { ResourceId, SigningConditions } from 'lit-js-sdk';
 import LitShareModal from 'lit-share-modal-v3';
+import { debounce } from 'lodash';
 import type { PopupState } from 'material-ui-popup-state/hooks';
 import { usePopupState } from 'material-ui-popup-state/hooks';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import useSWR from 'swr';
 import { v4 as uuid } from 'uuid';
 
@@ -85,6 +86,8 @@ export default function TokenGates({ isAdmin, spaceId, popupState }: TokenGatesP
       });
   }
 
+  const throttledOnSubmit = useMemo(() => debounce(onSubmit, 200), [litClient]);
+
   function closeTokenGateDeleteModal() {
     setRemovedTokenGate(null);
     deletePopupState.close();
@@ -136,7 +139,7 @@ export default function TokenGates({ isAdmin, spaceId, popupState }: TokenGatesP
             injectCSS={false}
             permanentDefault={true}
             isModal={false}
-            onUnifiedAccessControlConditionsSelected={onSubmit}
+            onUnifiedAccessControlConditionsSelected={throttledOnSubmit}
           />
         </ShareModalContainer>
       </Modal>
