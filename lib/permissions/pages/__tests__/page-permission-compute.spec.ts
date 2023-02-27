@@ -4,7 +4,9 @@ import { v4 } from 'uuid';
 
 import { PageNotFoundError } from 'lib/pages/server';
 import { computeUserPagePermissions, permissionTemplates, upsertPermission } from 'lib/permissions/pages';
+import { convertPageToProposal } from 'lib/proposal/convertPageToProposal';
 import { createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { generateProposalCategory } from 'testing/utils/proposals';
 
 import type { PageOperationType } from '../page-permission-interfaces';
 
@@ -137,6 +139,52 @@ describe('computeUserPagePermissions', () => {
 
     const permissions = await computeUserPagePermissions({
       pageId: page.id
+    });
+
+    permissionTemplates.view.forEach((op) => {
+      expect(permissions[op]).toBe(true);
+    });
+
+    expect(permissions.grant_permissions).toBe(false);
+    expect(permissions.edit_content).toBe(false);
+  });
+
+  it('should return only read permissions if page has been converted to a proposal', async () => {
+    const { user: nonAdminUser, space: localSpace } = await generateUserAndSpaceWithApiToken(undefined, true);
+
+    const categoryName = 'Example category';
+
+    const category = await generateProposalCategory({
+      spaceId: localSpace.id,
+      title: categoryName
+    });
+
+    const page = await createPage({
+      createdBy: nonAdminUser.id,
+      spaceId: localSpace.id,
+      title: 'Page without permissions'
+    });
+
+    await Promise.all([
+      upsertPermission(page.id, {
+        spaceId: localSpace.id,
+        permissionLevel: 'full_access'
+      }),
+      upsertPermission(page.id, {
+        public: true,
+        permissionLevel: 'view'
+      })
+    ]);
+
+    await convertPageToProposal({
+      page,
+      categoryId: category.id,
+      userId: nonAdminUser.id
+    });
+
+    const permissions = await computeUserPagePermissions({
+      pageId: page.id,
+      userId: nonAdminUser.id
     });
 
     permissionTemplates.view.forEach((op) => {
