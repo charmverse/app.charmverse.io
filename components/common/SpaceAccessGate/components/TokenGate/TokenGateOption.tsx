@@ -10,7 +10,7 @@ import { useEffect, useState } from 'react';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import type { TokenGateWithRoles } from 'lib/token-gates/interfaces';
 
-import { VerifyCheckmark } from './VerifyCheckmark';
+import { VerifyCheckmark } from '../VerifyCheckmark';
 
 interface Props {
   tokenGate: TokenGateWithRoles;

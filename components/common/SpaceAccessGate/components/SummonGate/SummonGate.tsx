@@ -1,26 +1,32 @@
 import { Card, CardContent, Grid, Stack, Typography } from '@mui/material';
+import type { Space } from '@prisma/client';
+import { useEffect } from 'react';
 
 import Button from 'components/common/Button';
 import PrimaryButton from 'components/common/PrimaryButton';
-import type { CheckDiscordGateResult } from 'lib/discord/interface';
 
 import { VerifyCheckmark } from '../VerifyCheckmark';
 
+import { useSummonGate } from './hooks/useSummonGate';
+
 type Props = {
-  isLoadingGate: boolean;
-  isConnectedToDiscord: boolean;
-  discordGate?: CheckDiscordGateResult;
-  verifyDiscordGate: () => Promise<void>;
-  joiningSpace: boolean;
+  spaceDomain: string;
+  onLoad: () => void;
+  onSuccess: (space: Space) => void;
 };
 
-export function DiscordGate({
-  isConnectedToDiscord,
-  discordGate,
-  verifyDiscordGate,
-  joiningSpace,
-  isLoadingGate
-}: Props) {
+export function SummonGate({ onLoad, onSuccess, spaceDomain }: Props) {
+  const { discordGate, isConnectedToDiscord, isLoading, verify, joiningSpace } = useSummonGate({
+    spaceDomain,
+    onSuccess
+  });
+
+  useEffect(() => {
+    if (!isLoading) {
+      onLoad();
+    }
+  }, [isLoading]);
+
   if (!discordGate?.hasDiscordServer) {
     return null;
   }
@@ -57,7 +63,7 @@ export function DiscordGate({
               <Stack justifyContent='center' alignItems='center' height='100%'>
                 {isConnectedToDiscord ? (
                   <Stack justifyContent='end' direction='row' alignSelf='stretch' pr={3}>
-                    <VerifyCheckmark isLoading={isLoadingGate} isVerified={isEligible} />
+                    <VerifyCheckmark isLoading={isLoading} isVerified={isEligible} />
                   </Stack>
                 ) : (
                   <Button
@@ -77,7 +83,7 @@ export function DiscordGate({
       </Card>
 
       {isEligible && (
-        <PrimaryButton disabled={joiningSpace} onClick={verifyDiscordGate} loading={joiningSpace}>
+        <PrimaryButton disabled={joiningSpace} onClick={verify} loading={joiningSpace}>
           Join Space
         </PrimaryButton>
       )}

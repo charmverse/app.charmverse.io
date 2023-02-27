@@ -12,7 +12,7 @@ type Props = {
   onSuccess: (space: Space) => void;
 };
 
-export function useDiscordGate({ spaceDomain, onSuccess }: Props) {
+export function useSummonGate({ spaceDomain, onSuccess }: Props) {
   const { user, refreshUser } = useUser();
   const { showMessage } = useSnackbar();
   const discordUserId = user?.discordUser?.discordId;

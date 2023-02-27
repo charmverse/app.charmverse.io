@@ -6,6 +6,7 @@ import useSWR from 'swr';
 import charmClient from 'charmClient';
 import { DiscordGate } from 'components/common/SpaceAccessGate/components/DiscordGate/DiscordGate';
 import { useDiscordGate } from 'components/common/SpaceAccessGate/components/DiscordGate/hooks/useDiscordGate';
+import { SummonGate } from 'components/common/SpaceAccessGate/components/SummonGate/SummonGate';
 import WorkspaceAvatar from 'components/settings/workspace/LargeAvatar';
 import type { TokenGateJoinType } from 'lib/token-gates/interfaces';
 
@@ -42,10 +43,9 @@ export function SpaceAccessGate({
     discordGate,
     isConnectedToDiscord,
     isLoading: isLoadingDiscordGate,
-    verifyDiscordGate,
+    verify: verifyDiscordGate,
     joiningSpace
   } = useDiscordGate({ spaceDomain, onSuccess: onJoinSpace });
-
   if (!spaceInfo) {
     return isValidating ? (
       <LoadingComponent height='80px' isLoading={true} />
@@ -81,6 +81,7 @@ export function SpaceAccessGate({
             discordGate={discordGate}
             isConnectedToDiscord={isConnectedToDiscord}
           />
+          <SummonGate spaceDomain={spaceDomain} onLoad={onLoadSummonGate} onSuccess={onJoinSpace} />
           <TokenGate
             autoVerify
             joinType={joinType}
