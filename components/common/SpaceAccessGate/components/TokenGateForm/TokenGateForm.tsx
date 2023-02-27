@@ -7,7 +7,6 @@ import { useEffect, useRef, useState } from 'react';
 
 import charmClient from 'charmClient';
 import LoadingComponent from 'components/common/LoadingComponent';
-import { TokenGateContent } from 'components/common/TokenGateForm/TokenGateContent';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
@@ -15,6 +14,8 @@ import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import type { AuthSig } from 'lib/blockchain/interfaces';
 import type { TokenGateEvaluationResult, TokenGateJoinType, TokenGateWithRoles } from 'lib/token-gates/interfaces';
 import { lowerCaseEqual } from 'lib/utilities/strings';
+
+import { TokenGateContent } from './TokenGateContent';
 
 interface Props {
   onSuccess: (values: Space) => void;
@@ -25,7 +26,7 @@ interface Props {
   autoVerify?: boolean;
 }
 
-export default function TokenGateForm({
+export function TokenGateForm({
   onSuccess,
   spaceDomain,
   displayAccordion,

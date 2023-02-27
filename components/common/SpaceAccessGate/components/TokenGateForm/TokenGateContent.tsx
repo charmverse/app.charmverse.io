@@ -3,9 +3,10 @@ import type { AuthSig } from 'lit-js-sdk';
 
 import Link from 'components/common/Link';
 import PrimaryButton from 'components/common/PrimaryButton';
-import TokenGateOption from 'components/common/TokenGateForm/TokenGateOption';
 import { WalletSign } from 'components/login';
 import type { TokenGateEvaluationResult, TokenGateWithRoles } from 'lib/token-gates/interfaces';
+
+import { TokenGateOption } from './TokenGateOption';
 
 type Props = {
   tokenGates: TokenGateWithRoles[] | null;

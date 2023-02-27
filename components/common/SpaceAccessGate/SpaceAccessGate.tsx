@@ -4,25 +4,38 @@ import { useRouter } from 'next/router';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
-import { DiscordGate } from 'components/common/DiscordGate/DiscordGate';
-import { useDiscordGate } from 'components/common/DiscordGate/hooks/useDiscordGate';
+import { DiscordGate } from 'components/common/SpaceAccessGate/components/DiscordGate/DiscordGate';
+import { useDiscordGate } from 'components/common/SpaceAccessGate/components/DiscordGate/hooks/useDiscordGate';
 import WorkspaceAvatar from 'components/settings/workspace/LargeAvatar';
+import type { TokenGateEvaluationResult, TokenGateJoinType, TokenGateWithRoles } from 'lib/token-gates/interfaces';
 
 import LoadingComponent from '../LoadingComponent';
 
-import TokenGateForm from './TokenGateForm';
+import { TokenGateForm } from './components/TokenGateForm/TokenGateForm';
 
 function stripUrlParts(maybeUrl: string) {
   return maybeUrl.replace('https://app.charmverse.io/', '').replace('http://localhost:3000/', '').split('/')[0];
 }
 
-export function JoinPredefinedSpaceDomain({ spaceDomain }: { spaceDomain: string }) {
+export function SpaceAccessGate({
+  spaceDomain,
+  onSuccess,
+  joinType
+}: {
+  spaceDomain: string;
+  joinType?: TokenGateJoinType;
+  onSuccess?: (values: Space) => void;
+}) {
   const { isValidating, data: spaceInfo } = useSWR('workspace', () =>
     charmClient.getSpaceByDomain(stripUrlParts(spaceDomain))
   );
   const router = useRouter();
   async function onJoinSpace(joinedSpace: Space) {
-    router.push(`/${joinedSpace.domain}`);
+    if (onSuccess) {
+      onSuccess(joinedSpace);
+    } else {
+      router.push(`/${joinedSpace.domain}`);
+    }
   }
 
   const {
@@ -70,6 +83,7 @@ export function JoinPredefinedSpaceDomain({ spaceDomain }: { spaceDomain: string
           />
           <TokenGateForm
             autoVerify
+            joinType={joinType}
             onSuccess={onJoinSpace}
             spaceDomain={spaceDomain}
             displayAccordion={discordGate?.hasDiscordServer}
