@@ -9,7 +9,7 @@ import { useUser } from 'hooks/useUser';
 
 type Props = {
   spaceDomain: string;
-  onSuccess: (space: Space) => void;
+  onSuccess: () => void;
 };
 
 export function useDiscordGate({ spaceDomain, onSuccess }: Props) {
@@ -23,8 +23,8 @@ export function useDiscordGate({ spaceDomain, onSuccess }: Props) {
     charmClient.discord.checkDiscordGate(spaceDomain)
   );
 
-  async function verify() {
-    if (!data?.isEligible) {
+  async function joinSpace() {
+    if (!data?.isVerified) {
       showMessage('You are not eligible to join this space', 'error');
       return;
     }
@@ -43,7 +43,7 @@ export function useDiscordGate({ spaceDomain, onSuccess }: Props) {
         setSpaces([...spaces, space as Space]);
       }
 
-      onSuccess(space as Space);
+      onSuccess();
     } catch (err: any) {
       showMessage(err?.message ?? err ?? 'An unknown error occurred', 'error');
     }
@@ -55,7 +55,7 @@ export function useDiscordGate({ spaceDomain, onSuccess }: Props) {
     isLoading: !!discordUserId && !data,
     discordGate: data,
     isConnectedToDiscord: !!discordUserId,
-    verify,
+    joinSpace,
     joiningSpace
   };
 }

@@ -11,9 +11,9 @@ type Props = {
 
 export async function upsertUserRolesFromDiscord({ space, userId }: Props) {
   const user = await prisma.user.findFirst({ where: { id: userId }, include: { discordUser: true } });
-  const { isEligible, roles } = await verifyDiscordGateForSpace({ space, discordUserId: user?.discordUser?.discordId });
+  const { isVerified, roles } = await verifyDiscordGateForSpace({ space, discordUserId: user?.discordUser?.discordId });
 
-  if (isEligible) {
+  if (isVerified) {
     return createAndAssignRoles({ userId, spaceId: space.id, roles });
   }
 }

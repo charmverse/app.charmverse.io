@@ -1,4 +1,3 @@
-import type { Space } from '@prisma/client';
 import { useState } from 'react';
 import useSWR from 'swr';
 
@@ -6,25 +5,25 @@ import charmClient from 'charmClient';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
+import type { SpaceWithGates } from 'lib/spaces/interfaces';
 
 type Props = {
-  spaceDomain: string;
-  onSuccess: (space: Space) => void;
+  space: SpaceWithGates;
+  onSuccess: () => void;
 };
 
-export function useSummonGate({ spaceDomain, onSuccess }: Props) {
+export function useSummonGate({ space, onSuccess }: Props) {
   const { user, refreshUser } = useUser();
   const { showMessage } = useSnackbar();
-  const discordUserId = user?.discordUser?.discordId;
   const [joiningSpace, setJoiningSpace] = useState(false);
   const { spaces, setSpaces } = useSpaces();
 
-  const { data } = useSWR(spaceDomain ? `discord/gate/${spaceDomain}/${discordUserId || ''}` : null, () =>
-    charmClient.discord.checkDiscordGate(spaceDomain)
+  const { data, isLoading } = useSWR(space.xpsEngineId ? `discord/gate/${space.id}/${user?.id}` : null, () =>
+    charmClient.summon.verifyMembership({ spaceId: space.id })
   );
 
-  async function verify() {
-    if (!data?.isEligible) {
+  async function joinSpace() {
+    if (!data?.isVerified) {
       showMessage('You are not eligible to join this space', 'error');
       return;
     }
@@ -32,7 +31,7 @@ export function useSummonGate({ spaceDomain, onSuccess }: Props) {
     setJoiningSpace(true);
 
     try {
-      const space = await charmClient.discord.verifyDiscordGate(data.spaceId);
+      await charmClient.summon.joinVerifiedSpace({ spaceId: space.id });
 
       showMessage(`You have joined the ${space.name} space.`, 'success');
 
@@ -40,10 +39,10 @@ export function useSummonGate({ spaceDomain, onSuccess }: Props) {
 
       const spaceExists = spaces.some((s) => s.id === space.id);
       if (!spaceExists) {
-        setSpaces([...spaces, space as Space]);
+        setSpaces([...spaces, space]);
       }
 
-      onSuccess(space as Space);
+      onSuccess();
     } catch (err: any) {
       showMessage(err?.message ?? err ?? 'An unknown error occurred', 'error');
     }
@@ -52,10 +51,10 @@ export function useSummonGate({ spaceDomain, onSuccess }: Props) {
   }
 
   return {
-    isLoading: !!discordUserId && !data,
-    discordGate: data,
-    isConnectedToDiscord: !!discordUserId,
-    verify,
+    isLoading,
+    isSummonEnabled: !!space.xpsEngineId,
+    isVerified: data?.isVerified,
+    joinSpace,
     joiningSpace
   };
 }

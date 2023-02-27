@@ -10,21 +10,15 @@ type Props = {
   isLoadingGate: boolean;
   isConnectedToDiscord: boolean;
   discordGate?: CheckDiscordGateResult;
-  verifyDiscordGate: () => Promise<void>;
+  joinSpace: () => Promise<void>;
   joiningSpace: boolean;
 };
 
-export function DiscordGate({
-  isConnectedToDiscord,
-  discordGate,
-  verifyDiscordGate,
-  joiningSpace,
-  isLoadingGate
-}: Props) {
+export function DiscordGate({ isConnectedToDiscord, discordGate, joinSpace, joiningSpace, isLoadingGate }: Props) {
   if (!discordGate?.hasDiscordServer) {
     return null;
   }
-  const { isEligible } = discordGate;
+  const { isVerified } = discordGate;
 
   const returnUrl = encodeURIComponent(window.location.href);
 
@@ -32,23 +26,23 @@ export function DiscordGate({
     <Stack>
       <Card
         variant='outlined'
-        raised={isEligible === true}
-        color={isEligible === true ? 'success' : 'default'}
-        sx={{ my: 1, mt: 3, borderColor: isEligible ? 'success.main' : '' }}
+        raised={isVerified === true}
+        color={isVerified === true ? 'success' : 'default'}
+        sx={{ my: 1, mt: 3, borderColor: isVerified ? 'success.main' : '' }}
       >
         <CardContent>
           <Grid container direction={{ xs: 'column', sm: 'row' }} spacing={2}>
             <Grid item xs={12} sm={8}>
-              {isConnectedToDiscord && isEligible && (
-                <Typography>You are a part of this space discord community and you can join it.</Typography>
+              {isConnectedToDiscord && isVerified && (
+                <Typography>You are a part of this Discord community and you can join it</Typography>
               )}
-              {isConnectedToDiscord && !isEligible && (
-                <Typography>You are not a part of this space discord community.</Typography>
+              {isConnectedToDiscord && !isVerified && (
+                <Typography>You are not a part of this Discord community</Typography>
               )}
               {!isConnectedToDiscord && (
                 <Stack>
                   <Typography variant='body2'>
-                    Connect your Discord account to verify if you are eligible to join this space.
+                    Connect your Discord account to verify if you are eligible to join this space
                   </Typography>
                 </Stack>
               )}
@@ -57,7 +51,7 @@ export function DiscordGate({
               <Stack justifyContent='center' alignItems='center' height='100%'>
                 {isConnectedToDiscord ? (
                   <Stack justifyContent='end' direction='row' alignSelf='stretch' pr={3}>
-                    <VerifyCheckmark isLoading={isLoadingGate} isVerified={isEligible} />
+                    <VerifyCheckmark isLoading={isLoadingGate} isVerified={isVerified} />
                   </Stack>
                 ) : (
                   <Button
@@ -76,8 +70,8 @@ export function DiscordGate({
         </CardContent>
       </Card>
 
-      {isEligible && (
-        <PrimaryButton disabled={joiningSpace} onClick={verifyDiscordGate} loading={joiningSpace}>
+      {isVerified && (
+        <PrimaryButton disabled={joiningSpace} onClick={joinSpace} loading={joiningSpace}>
           Join Space
         </PrimaryButton>
       )}

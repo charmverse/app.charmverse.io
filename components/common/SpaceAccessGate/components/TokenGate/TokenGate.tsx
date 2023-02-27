@@ -27,9 +27,6 @@ interface Props {
 }
 
 export function TokenGate({ onSuccess, spaceDomain, displayAccordion, joinType = 'token_gate', autoVerify }: Props) {
-  const renders = useRef(0);
-  renders.current += 1;
-  //  console.log('Renders', renders.current);
   const { showMessage } = useSnackbar();
   const { spaces, setSpaces } = useSpaces();
   const { getStoredSignature, loginFromWeb3Account } = useWeb3AuthSig();
