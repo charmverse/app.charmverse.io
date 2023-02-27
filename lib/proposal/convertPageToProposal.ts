@@ -1,4 +1,4 @@
-import type { Post, Prisma } from '@prisma/client';
+import type { Post } from '@prisma/client';
 
 import { prisma } from 'db';
 import { createProposal } from 'lib/proposal/createProposal';
@@ -6,17 +6,21 @@ import { createProposal } from 'lib/proposal/createProposal';
 export async function convertPageToProposal({
   userId,
   page,
-  content
+  categoryId
 }: {
-  page: Pick<Post, 'spaceId' | 'title' | 'id'>;
-  content?: Prisma.JsonValue;
+  categoryId: string;
+  page: Pick<Post, 'content' | 'contentText' | 'spaceId' | 'title' | 'id'>;
   userId: string;
 }) {
   const { page: proposalPage } = await createProposal({
-    createdBy: userId,
+    userId,
     spaceId: page.spaceId,
-    content: content ?? undefined,
-    title: page.title
+    categoryId,
+    pageProps: {
+      content: page.content,
+      contentText: page.contentText,
+      title: page.title
+    }
   });
 
   await prisma.page.update({

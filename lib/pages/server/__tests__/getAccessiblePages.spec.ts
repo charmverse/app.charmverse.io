@@ -2,6 +2,7 @@ import { prisma } from 'db';
 import type { IPagePermissionWithSource } from 'lib/permissions/pages';
 import { setupPermissionsAfterPagePermissionAdded, upsertPermission } from 'lib/permissions/pages';
 import { createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { generateProposalCategory } from 'testing/utils/proposals';
 
 import { createProposalTemplate } from '../../../templates/proposals/createProposalTemplate';
 import type { IPageWithPermissions } from '../../interfaces';
@@ -52,10 +53,15 @@ describe('getAccessiblePages', () => {
     const proposalPage = await createPage({ createdBy: nonAdminUser.id, spaceId: space.id });
     await prisma.page.update({ where: { id: proposalPage.id }, data: { type: 'proposal_template' } });
 
+    const proposalTemplateCategory = await generateProposalCategory({
+      spaceId: space.id
+    });
+
     // SHouldn't show up
     await createProposalTemplate({
       spaceId: secondSpace.id,
       userId: secondUser.id,
+      categoryId: proposalTemplateCategory.id,
       pageContent: {
         title: 'Test',
         content: {},

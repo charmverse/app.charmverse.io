@@ -1,14 +1,17 @@
-import type { Space } from '@prisma/client';
+import type { ProposalCategory, Space } from '@prisma/client';
 import request from 'supertest';
 
+import { prisma } from 'db';
 import { createProposalTemplate } from 'lib/templates/proposals/createProposalTemplate';
 import type { LoggedInUser } from 'models';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { generateProposalCategory } from 'testing/utils/proposals';
 
 let adminUser: LoggedInUser;
 let nonAdminUser: LoggedInUser;
 let space: Space;
+let proposalCategory: ProposalCategory;
 
 beforeAll(async () => {
   const generated = await generateUserAndSpaceWithApiToken(undefined, true);
@@ -17,6 +20,15 @@ beforeAll(async () => {
   space = generated.space;
 
   nonAdminUser = await generateSpaceUser({ isAdmin: false, spaceId: space.id });
+  proposalCategory = await generateProposalCategory({ spaceId: space.id });
+  // Add this to ensure the user has access to the proposal category, but admin level is required
+  await prisma.proposalCategoryPermission.create({
+    data: {
+      permissionLevel: 'full_access',
+      space: { connect: { id: space.id } },
+      proposalCategory: { connect: { id: proposalCategory.id } }
+    }
+  });
 });
 
 describe('DELETE /api/proposals/templates/{templateId} - Delete a proposal template', () => {
@@ -25,7 +37,8 @@ describe('DELETE /api/proposals/templates/{templateId} - Delete a proposal templ
 
     const proposalTemplate = await createProposalTemplate({
       spaceId: space.id,
-      userId: adminUser.id
+      userId: adminUser.id,
+      categoryId: proposalCategory.id
     });
 
     await request(baseUrl)
@@ -39,7 +52,8 @@ describe('DELETE /api/proposals/templates/{templateId} - Delete a proposal templ
 
     const proposalTemplate = await createProposalTemplate({
       spaceId: space.id,
-      userId: adminUser.id
+      userId: adminUser.id,
+      categoryId: proposalCategory.id
     });
 
     await request(baseUrl)

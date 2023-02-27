@@ -2,6 +2,7 @@ import type { PagePermissionLevel, User } from '@prisma/client';
 import { PageOperations } from '@prisma/client';
 import { v4 } from 'uuid';
 
+import { PageNotFoundError } from 'lib/pages/server';
 import { computeUserPagePermissions, permissionTemplates, upsertPermission } from 'lib/permissions/pages';
 import { createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
@@ -103,17 +104,15 @@ describe('computeUserPagePermissions', () => {
     });
   });
 
-  it('should return empty permissions if the page does not exist', async () => {
+  it('should throw an error if the page does not exist', async () => {
     const inexistentPageId = v4();
 
-    const permissions = await computeUserPagePermissions({
-      pageId: inexistentPageId,
-      userId: user.id
-    });
-
-    (Object.keys(PageOperations) as PageOperationType[]).forEach((op) => {
-      expect(permissions[op]).toBe(false);
-    });
+    await expect(
+      computeUserPagePermissions({
+        pageId: inexistentPageId,
+        userId: user.id
+      })
+    ).rejects.toBeInstanceOf(PageNotFoundError);
   });
 
   it('should return only public permissions if no user is provided', async () => {

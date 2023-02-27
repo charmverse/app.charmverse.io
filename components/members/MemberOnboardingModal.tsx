@@ -18,7 +18,6 @@ export function MemberOnboardingModal({ userId }: { userId?: string }) {
         memberId={userId ?? user.id}
         onClose={completeOnboarding}
         title={`Welcome to ${space.name}. Set up your profile`}
-        cancelButtonText='Set up later'
       />
     </div>
   );

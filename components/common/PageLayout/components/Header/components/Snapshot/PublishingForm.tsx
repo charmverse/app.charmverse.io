@@ -24,8 +24,7 @@ import { usePages } from 'hooks/usePages';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import log from 'lib/log';
 import type { PageMeta } from 'lib/pages';
-import { generateMarkdown } from 'lib/pages/generateMarkdown';
-import type { PageContent } from 'lib/prosemirror/interfaces';
+import { generateMarkdown } from 'lib/prosemirror/plugins/markdown/generateMarkdown';
 import type { SnapshotReceipt, SnapshotSpace, SnapshotVotingModeType, SnapshotVotingStrategy } from 'lib/snapshot';
 import { getSnapshotSpace, SnapshotVotingMode } from 'lib/snapshot';
 import { ExternalServiceError, SystemError, UnknownError } from 'lib/utilities/errors';
@@ -112,14 +111,12 @@ export default function PublishingForm({ onSubmit, page }: Props) {
   async function checkMarkdownLength(): Promise<string | null> {
     try {
       const pageWithDetails = await charmClient.pages.getPage(page.id);
-      const content = await generateMarkdown(
-        {
-          title: pageWithDetails.title,
-          content: pageWithDetails.content
-        },
-        false,
-        { members }
-      );
+      const content = await generateMarkdown({
+        content: pageWithDetails.content,
+        generatorOptions: {
+          members
+        }
+      });
 
       const markdownCharacterLength = content.length;
 
@@ -203,14 +200,10 @@ export default function PublishingForm({ onSubmit, page }: Props) {
     try {
       const pageWithDetails = await charmClient.pages.getPage(page.id);
 
-      const content = await generateMarkdown(
-        {
-          content: pageWithDetails.content,
-          title: pageWithDetails.title
-        },
-        false,
-        { members }
-      );
+      const content = await generateMarkdown({
+        content: pageWithDetails.content,
+        generatorOptions: { members }
+      });
 
       if (!account) {
         throw new SystemError({

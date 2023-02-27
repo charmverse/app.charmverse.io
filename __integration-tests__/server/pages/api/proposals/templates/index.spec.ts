@@ -1,14 +1,17 @@
-import type { Space } from '@prisma/client';
+import type { ProposalCategory, Space } from '@prisma/client';
 import request from 'supertest';
 
+import { prisma } from 'db';
 import type { PageWithProposal } from 'lib/pages';
 import type { LoggedInUser } from 'models';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { generateProposalCategory } from 'testing/utils/proposals';
 
 let adminUser: LoggedInUser;
 let nonAdminUser: LoggedInUser;
 let space: Space;
+let proposalCategory: ProposalCategory;
 
 beforeAll(async () => {
   const generated = await generateUserAndSpaceWithApiToken(undefined, true);
@@ -17,6 +20,15 @@ beforeAll(async () => {
   space = generated.space;
 
   nonAdminUser = await generateSpaceUser({ isAdmin: false, spaceId: space.id });
+  proposalCategory = await generateProposalCategory({ spaceId: space.id });
+  // Add this to ensure the user has access to the proposal category, but admin level is required
+  await prisma.proposalCategoryPermission.create({
+    data: {
+      permissionLevel: 'full_access',
+      space: { connect: { id: space.id } },
+      proposalCategory: { connect: { id: proposalCategory.id } }
+    }
+  });
 });
 
 describe('POST /api/proposals/templates - Create a proposal from a template', () => {
@@ -28,7 +40,8 @@ describe('POST /api/proposals/templates - Create a proposal from a template', ()
         .post('/api/proposals/templates')
         .set('Cookie', adminCookie)
         .send({
-          spaceId: space.id
+          spaceId: space.id,
+          categoryId: proposalCategory.id
         })
         .expect(201)
     ).body as PageWithProposal;

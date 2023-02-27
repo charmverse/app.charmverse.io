@@ -246,7 +246,6 @@ function PageLayout({ children }: PageLayoutProps) {
                 <HeaderSpacer />
                 {children}
               </PageContainer>
-              <PageDialogGlobalModal />
             </PageDialogProvider>
           </DocumentPageProviders>
         </FocalboardViewsProvider>

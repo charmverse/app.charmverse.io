@@ -9,7 +9,6 @@ import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { usePages } from 'hooks/usePages';
 import { useUser } from 'hooks/useUser';
 import type { BountyWithDetails } from 'lib/bounties';
-import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
 export default function NewBountyButton() {
   const { user } = useUser();
@@ -61,15 +60,8 @@ export default function NewBountyButton() {
         });
       }
       mutatePage(createdBounty.page);
+      router.push({ pathname: router.pathname, query: { ...router.query, bountyId: createdBounty.page.id } });
       setBounties((bounties) => [...bounties, createdBounty]);
-      showPage({
-        pageId: createdBounty.page.id,
-        hideToolsMenu: suggestBounties,
-        onClose() {
-          setUrlWithoutRerender(router.pathname, { bountyId: null });
-        }
-      });
-      setUrlWithoutRerender(router.pathname, { bountyId: createdBounty.page.id });
     }
   }
 

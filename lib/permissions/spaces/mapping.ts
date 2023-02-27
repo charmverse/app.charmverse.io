@@ -7,7 +7,17 @@ export const spaceOperationLabels: Record<SpaceOperation, string> = {
   createBounty: 'Create new bounties',
   createVote: 'Create new proposals',
   createForumCategory: 'Create new forum categories',
-  moderateForums: 'Moderate all forum categories'
+  moderateForums: 'Moderate all forum categories',
+  reviewProposals: 'Review proposals'
+};
+
+export const spaceOperationDescriptions: Record<SpaceOperation, string> = {
+  createPage: 'Create new pages',
+  createBounty: 'Create new bounties',
+  createVote: 'Create new proposals',
+  createForumCategory: 'Create new forum categories',
+  moderateForums: 'Moderate all forum categories',
+  reviewProposals: 'Be selected to review proposals'
 };
 
 export function spaceOperations() {

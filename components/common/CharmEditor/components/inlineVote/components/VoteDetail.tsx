@@ -16,6 +16,7 @@ import {
   RadioGroup,
   Typography
 } from '@mui/material';
+import Tooltip from '@mui/material/Tooltip';
 import type { UserVote } from '@prisma/client';
 import { DateTime } from 'luxon';
 import { usePopupState } from 'material-ui-popup-state/hooks';
@@ -28,6 +29,7 @@ import Modal from 'components/common/Modal';
 import useTasks from 'components/nexus/hooks/useTasks';
 import { VoteActionsMenu } from 'components/votes/components/VoteActionsMenu';
 import VoteStatusChip from 'components/votes/components/VoteStatusChip';
+import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
 import { removeInlineVoteMark } from 'lib/prosemirror/plugins/inlineVotes/removeInlineVoteMark';
 import type { ExtendedVote } from 'lib/votes/interfaces';
@@ -43,6 +45,7 @@ export interface VoteDetailProps {
   deleteVote: (voteId: string) => Promise<void>;
   cancelVote: (voteId: string) => Promise<void>;
   updateDeadline: (voteId: string, deadline: Date) => Promise<void>;
+  disableVote?: boolean;
 }
 
 const StyledFormControl = styled(FormControl)`
@@ -55,14 +58,15 @@ const StyledFormControl = styled(FormControl)`
 
 const MAX_DESCRIPTION_LENGTH = 200;
 
-export default function VoteDetail({
+export function VoteDetail({
   cancelVote,
   castVote,
   deleteVote,
   updateDeadline,
   detailed = false,
   vote,
-  isProposal = false
+  isProposal,
+  disableVote
 }: VoteDetailProps) {
   const { deadline, totalVotes, description, id, title, userChoice, voteOptions, aggregatedResult } = vote;
   const { user } = useUser();
@@ -71,6 +75,7 @@ export default function VoteDetail({
     charmClient.votes.getUserVotes(id)
   );
   const { mutate: refetchTasks } = useTasks();
+  const { members } = useMembers();
 
   const voteDetailsPopup = usePopupState({ variant: 'popover', popupId: 'inline-votes-detail' });
 
@@ -110,7 +115,7 @@ export default function VoteDetail({
         <VoteActionsMenu
           deleteVote={deleteVote}
           cancelVote={cancelVote}
-          isProposalVote={isProposal}
+          isProposalVote={!!isProposal}
           vote={vote}
           removeFromPage={removeFromPage}
           updateDeadline={updateDeadline}
@@ -149,62 +154,75 @@ export default function VoteDetail({
         </Box>
       )}
       {!detailed && voteCountLabel}
-      <StyledFormControl>
-        <RadioGroup name={vote.id} value={userVoteChoice}>
-          {voteOptions.map((voteOption) => (
-            <FormControlLabel
-              key={voteOption.name}
-              control={<Radio size='small' />}
-              disabled={isVotingClosed(vote) || !user}
-              value={voteOption.name}
-              label={
-                <Box display='flex' justifyContent='space-between' flexGrow={1}>
-                  <span>{voteOption.name}</span>
-                  <Typography variant='subtitle1' color='secondary' component='span'>
-                    {((totalVotes === 0 ? 0 : (aggregatedResult?.[voteOption.name] ?? 0) / totalVotes) * 100).toFixed(
-                      2
-                    )}
-                    %
-                  </Typography>
-                </Box>
-              }
-              disableTypography
-              onChange={async () => {
-                if (user) {
-                  const userVote = await castVote(id, voteOption.name);
-                  refetchTasks();
-                  mutate(
-                    (_userVotes) => {
-                      if (_userVotes) {
-                        const existingUserVoteIndex = _userVotes.findIndex((_userVote) => _userVote.userId === user.id);
-                        // User already voted
-                        if (existingUserVoteIndex !== -1) {
-                          _userVotes.splice(existingUserVoteIndex, 1);
-                        }
-
-                        return [
-                          {
-                            ...userVote,
-                            user
-                          },
-                          ..._userVotes
-                        ];
-                      }
-                      return undefined;
-                    },
-                    {
-                      revalidate: false
-                    }
-                  );
+      <Tooltip
+        placement='top-start'
+        title={disableVote ? 'You do not have the permissions to participate in this vote' : ''}
+      >
+        <StyledFormControl>
+          <RadioGroup name={vote.id} value={userVoteChoice}>
+            {voteOptions.map((voteOption) => (
+              <FormControlLabel
+                key={voteOption.name}
+                control={<Radio size='small' />}
+                disabled={isVotingClosed(vote) || !user || !!disableVote}
+                value={voteOption.name}
+                label={
+                  <Box display='flex' justifyContent='space-between' flexGrow={1}>
+                    <span>{voteOption.name}</span>
+                    <Typography variant='subtitle1' color='secondary' component='span'>
+                      {((totalVotes === 0 ? 0 : (aggregatedResult?.[voteOption.name] ?? 0) / totalVotes) * 100).toFixed(
+                        2
+                      )}
+                      %
+                    </Typography>
+                  </Box>
                 }
-              }}
-            />
-          ))}
-        </RadioGroup>
-      </StyledFormControl>
+                disableTypography
+                onChange={async () => {
+                  if (user) {
+                    const userVote = await castVote(id, voteOption.name);
+                    refetchTasks();
+                    mutate(
+                      (_userVotes) => {
+                        if (_userVotes) {
+                          const existingUserVoteIndex = _userVotes.findIndex(
+                            (_userVote) => _userVote.userId === user.id
+                          );
+                          // User already voted
+                          if (existingUserVoteIndex !== -1) {
+                            _userVotes.splice(existingUserVoteIndex, 1);
+                          }
+
+                          return [
+                            {
+                              ...userVote,
+                              user
+                            },
+                            ..._userVotes
+                          ];
+                        }
+                        return undefined;
+                      },
+                      {
+                        revalidate: false
+                      }
+                    );
+                  }
+                }}
+              />
+            ))}
+          </RadioGroup>
+        </StyledFormControl>
+      </Tooltip>
       {!detailed && (
         <Box display='flex' justifyContent='flex-end'>
-          <Button disabled={!user} color='secondary' variant='outlined' size='small' onClick={voteDetailsPopup.open}>
+          <Button
+            data-test='view-poll-details-button'
+            color='secondary'
+            variant='outlined'
+            size='small'
+            onClick={voteDetailsPopup.open}
+          >
             View details
           </Button>
         </Box>
@@ -222,33 +240,36 @@ export default function VoteDetail({
         ))}
       {detailed && userVotes && (
         <List>
-          {userVotes.map((userVote) => (
-            <React.Fragment key={userVote.userId}>
-              <ListItem
-                dense
-                sx={{
-                  px: 0,
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  gap: 1
-                }}
-              >
-                <Avatar avatar={userVote.user.avatar} name={userVote.user.username} />
-                <ListItemText
-                  primary={<Typography>{userVote.user.username}</Typography>}
-                  secondary={
-                    <Typography variant='subtitle1' color='secondary'>
-                      {DateTime.fromJSDate(new Date(userVote.updatedAt)).toRelative({ base: DateTime.now() })}
-                    </Typography>
-                  }
-                />
-                <Typography fontWeight={500} color='secondary'>
-                  {userVote.choice}
-                </Typography>
-              </ListItem>
-              <Divider />
-            </React.Fragment>
-          ))}
+          {userVotes.map((userVote) => {
+            const member = members.find((_member) => _member.id === userVote.user.id);
+            return (
+              <React.Fragment key={userVote.userId}>
+                <ListItem
+                  dense
+                  sx={{
+                    px: 0,
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    gap: 1
+                  }}
+                >
+                  <Avatar avatar={userVote.user.avatar} name={member?.username ?? userVote.user.username} />
+                  <ListItemText
+                    primary={<Typography>{member?.username ?? userVote.user.username}</Typography>}
+                    secondary={
+                      <Typography variant='subtitle1' color='secondary'>
+                        {DateTime.fromJSDate(new Date(userVote.updatedAt)).toRelative({ base: DateTime.now() })}
+                      </Typography>
+                    }
+                  />
+                  <Typography fontWeight={500} color='secondary'>
+                    {userVote.choice}
+                  </Typography>
+                </ListItem>
+                <Divider />
+              </React.Fragment>
+            );
+          })}
         </List>
       )}
       <Modal title='Poll details' size='large' open={voteDetailsPopup.isOpen} onClose={voteDetailsPopup.close}>

@@ -6,7 +6,6 @@ import { usePages } from 'hooks/usePages';
 import type { Card } from 'lib/focalboard/card';
 import log from 'lib/log';
 import type { PageUpdates } from 'lib/pages';
-import { findParentOfType } from 'lib/pages/findParentOfType';
 import debouncePromise from 'lib/utilities/debouncePromise';
 
 type Props = {
@@ -44,13 +43,11 @@ function CardDetail(props: Props): JSX.Element | null {
     [card]
   );
 
-  const parentProposalId = findParentOfType({ pageId: card.id, pageType: 'proposal', pageMap: pages });
-
   const page = pages[card?.id];
   if (!card || !page) {
     return null;
   }
-  return <DocumentPage page={page} setPage={setPage} readOnly={readOnly} parentProposalId={parentProposalId} />;
+  return <DocumentPage page={page} setPage={setPage} readOnly={readOnly} />;
 }
 
 export default CardDetail;

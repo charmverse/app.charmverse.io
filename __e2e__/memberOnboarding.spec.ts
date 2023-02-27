@@ -26,7 +26,7 @@ test.describe.serial('Add a new space from sidebar and load it', async () => {
     await expect(memberProfileOrgList).toBeVisible();
     await expect(memberProfilePoapList).toBeVisible();
 
-    const closePropertiesModalBtn = await page.locator('data-test=close-member-properties-modal');
+    const closePropertiesModalBtn = await page.locator('data-test=close-modal');
     await expect(closePropertiesModalBtn).toBeVisible();
     await closePropertiesModalBtn.click();
   });
