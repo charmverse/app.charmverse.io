@@ -36,12 +36,14 @@ import charmClient from 'charmClient';
 import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
 import { undoEventName } from 'components/common/CharmEditor/utils';
 import { usePostByPath } from 'components/forum/hooks/usePostByPath';
+import { useProposalCategories } from 'components/proposals/hooks/useProposalCategories';
 import { useColorMode } from 'context/darkMode';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useMembers } from 'hooks/useMembers';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { usePageFromPath } from 'hooks/usePageFromPath';
+import { usePagePermissions } from 'hooks/usePagePermissions';
 import { usePages } from 'hooks/usePages';
 import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useSnackbar } from 'hooks/useSnackbar';
@@ -180,13 +182,15 @@ function PostHeader({
   setPageMenuOpen: Dispatch<SetStateAction<boolean>>;
   undoEditorChanges: VoidFunction;
 }) {
-  const [userSpacePermissions] = useCurrentSpacePermissions();
   const { showMessage } = useSnackbar();
   const { members } = useMembers();
 
   const router = useRouter();
 
-  const canCreateProposal = !!userSpacePermissions?.createVote;
+  const { getCategoriesWithCreatePermission, getDefaultCreateCategory } = useProposalCategories();
+  const proposalCategoriesWithCreateAllowed = getCategoriesWithCreatePermission();
+
+  const canCreateProposal = proposalCategoriesWithCreateAllowed.length > 0;
 
   const postCreator = members.find((member) => member.id === forumPostInfo.forumPost?.createdBy);
 
@@ -219,7 +223,10 @@ function PostHeader({
 
   async function convertToProposal(pageId: string) {
     setPageMenuOpen(false);
-    const { path } = await charmClient.forum.convertToProposal(pageId);
+    const { path } = await charmClient.forum.convertToProposal({
+      postId: pageId,
+      categoryId: getDefaultCreateCategory()?.id
+    });
     router.push(`/${router.query.domain}/${path}`);
   }
 
@@ -267,7 +274,7 @@ function PostHeader({
 function HeaderComponent({ open, openSidebar }: HeaderProps) {
   const router = useRouter();
   const colorMode = useColorMode();
-  const { updatePage, getPagePermissions, deletePage } = usePages();
+  const { updatePage, deletePage } = usePages();
   const { user } = useUser();
   const theme = useTheme();
   const [pageMenuOpen, setPageMenuOpen] = useState(false);
@@ -279,7 +286,9 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
   const { members } = useMembers();
   const { setCurrentPageActionDisplay } = usePageActionDisplay();
   const [userSpacePermissions] = useCurrentSpacePermissions();
-  const pagePermissions = basePage ? getPagePermissions(basePage.id) : null;
+  const { permissions: pagePermissions } = usePagePermissions({
+    pageIdOrPath: basePage ? basePage.id : (null as any)
+  });
 
   const { onClick: clickToOpenSettingsModal } = useSettingsDialog();
   const isForumPost = router.route === '/[domain]/forum/post/[pagePath]';
@@ -310,6 +319,11 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
   const isFullWidth = !isLargeScreen || (basePage?.fullWidth ?? false);
   const isBasePageDocument = documentTypes.includes(basePage?.type ?? '');
   const isBasePageDatabase = /board/.test(basePage?.type ?? '');
+
+  const { getCategoriesWithCreatePermission, getDefaultCreateCategory } = useProposalCategories();
+  const proposalCategoriesWithCreateAllowed = getCategoriesWithCreatePermission();
+
+  const canCreateProposal = proposalCategoriesWithCreateAllowed.length > 0;
 
   function closeMenu() {
     setPageMenuOpen(false);
@@ -350,7 +364,6 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
     closeMenu();
   }
 
-  const canCreateProposal = !!userSpacePermissions?.createVote;
   const charmversePage = basePage ? members.find((member) => member.id === basePage.createdBy) : null;
 
   async function exportMarkdownPage() {
@@ -370,7 +383,10 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
   }
 
   async function convertToProposal(pageId: string) {
-    await charmClient.pages.convertToProposal(pageId);
+    await charmClient.pages.convertToProposal({
+      categoryId: getDefaultCreateCategory().id,
+      pageId
+    });
     closeMenu();
   }
 

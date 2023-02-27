@@ -385,6 +385,7 @@ interface CharmEditorProps {
   placeholderText?: string;
   focusOnInit?: boolean;
   disableRowHandles?: boolean;
+  disableNestedPages?: boolean;
 }
 
 function CharmEditor({
@@ -407,7 +408,8 @@ function CharmEditor({
   placeholderText,
   focusOnInit,
   onParticipantUpdate,
-  disableRowHandles = false
+  disableRowHandles = false,
+  disableNestedPages = false
 }: CharmEditorProps) {
   const router = useRouter();
   const { showMessage } = useSnackbar();
@@ -416,7 +418,7 @@ function CharmEditor({
   const { setCurrentPageActionDisplay } = usePageActionDisplay();
   const { user } = useUser();
   const isTemplate = pageType ? pageType.includes('template') : false;
-  const disableNestedPage = disablePageSpecificFeatures || enableSuggestingMode || isTemplate;
+  const disableNestedPage = disablePageSpecificFeatures || enableSuggestingMode || isTemplate || disableNestedPages;
   const onThreadResolveDebounced = debounce((_pageId: string, doc: EditorState['doc'], prevDoc: EditorState['doc']) => {
     const deletedThreadIds = extractDeletedThreadIds(specRegistry.schema, doc, prevDoc);
     if (deletedThreadIds.length) {

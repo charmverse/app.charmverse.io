@@ -8,6 +8,8 @@ import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { updateTrackUserProfileById } from 'lib/metrics/mixpanel/updateTrackUserProfileById';
 import { updateUserTokenGates } from 'lib/token-gates/updateUserTokenGates';
 import { DataNotFoundError, InsecureOperationError, InvalidInputError } from 'lib/utilities/errors';
+import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
+import { publishMemberEvent } from 'lib/webhookPublisher/publishEvent';
 
 import type {
   TokenGateJwtResult,
@@ -127,7 +129,6 @@ export async function applyTokenGates({
     userId,
     roles: assignedRoles.map((r) => r.name)
   });
-  trackUserAction('join_a_workspace', { spaceId, userId, source: joinType });
 
   if (!commit) {
     return returnValue;
@@ -194,6 +195,13 @@ export async function applyTokenGates({
           }
         }
       }
+    });
+
+    trackUserAction('join_a_workspace', { spaceId, userId, source: joinType });
+    publishMemberEvent({
+      scope: WebhookEventNames.UserJoined,
+      spaceId,
+      userId
     });
 
     updateTrackUserProfileById(userId);

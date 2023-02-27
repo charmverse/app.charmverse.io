@@ -6,17 +6,22 @@ import { createProposal } from 'lib/proposal/createProposal';
 export async function convertPostToProposal({
   userId,
   post,
-  content
+  content,
+  categoryId
 }: {
   post: Pick<Post, 'spaceId' | 'title' | 'id'>;
   content?: Prisma.JsonValue;
   userId: string;
+  categoryId: string;
 }) {
   const { page: proposalPage } = await createProposal({
-    createdBy: userId,
+    userId,
     spaceId: post.spaceId,
-    content: content ?? undefined,
-    title: post.title
+    pageProps: {
+      content: content ?? undefined,
+      title: post.title
+    },
+    categoryId
   });
 
   await prisma.post.update({

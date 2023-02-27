@@ -1,6 +1,7 @@
 import type { Browser } from '@playwright/test';
 import { chromium, expect, test } from '@playwright/test';
 import type { Page, WorkspaceEvent } from '@prisma/client';
+import { v4 } from 'uuid';
 
 import { baseUrl } from 'config/constants';
 import { upsertPermission } from 'lib/permissions/pages';
@@ -28,6 +29,8 @@ test.describe.serial('Make a proposals page public and visit it', async () => {
       publicBountyBoard: true
     });
 
+    //    await logout({ page });
+
     const roleName = 'Proposal Reviewer Role';
 
     const role = await generateRole({
@@ -36,9 +39,11 @@ test.describe.serial('Make a proposals page public and visit it', async () => {
       roleName
     });
 
+    const title = `Proposal ${v4()}`;
+
     proposal = await generateProposal({
       spaceId: space.id,
-      proposalStatus: 'private_draft',
+      proposalStatus: 'draft',
       reviewers: [
         {
           group: 'role',
@@ -46,7 +51,8 @@ test.describe.serial('Make a proposals page public and visit it', async () => {
         }
       ],
       authors: [user.id],
-      userId: user.id
+      userId: user.id,
+      title
     });
 
     await upsertPermission(proposal.id, {
@@ -60,6 +66,12 @@ test.describe.serial('Make a proposals page public and visit it', async () => {
     await page.goto(`${baseUrl}/${space.domain}/${proposal.path}`);
 
     // Make sure proposal property reviewer role is visible
+    const titleLocator = await page.locator('data-test=editor-page-title');
+
+    await expect(titleLocator).toBeVisible();
+    await expect(titleLocator).toHaveText(title);
+
+    // Uncomment when bug is fixed
     const roleChip = page.getByText(roleName);
     await expect(roleChip).toBeVisible();
   });

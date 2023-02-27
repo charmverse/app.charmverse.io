@@ -11,22 +11,21 @@ import Button from 'components/common/Button';
 import { usePageDialog } from 'components/common/PageDialog/hooks/usePageDialog';
 import { TemplatesMenu } from 'components/common/TemplatesMenu';
 import useTasks from 'components/nexus/hooks/useTasks';
+import { useProposalCategories } from 'components/proposals/hooks/useProposalCategories';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { usePages } from 'hooks/usePages';
 import { useUser } from 'hooks/useUser';
 import type { PageMeta } from 'lib/pages';
-import { addPage } from 'lib/pages/addPage';
 import type { ProposalWithUsers } from 'lib/proposal/interface';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
-export default function NewProposalButton({ mutateProposals }: { mutateProposals: KeyedMutator<ProposalWithUsers[]> }) {
+export function NewProposalButton({ mutateProposals }: { mutateProposals: KeyedMutator<ProposalWithUsers[]> }) {
   const router = useRouter();
   const { user } = useUser();
   const currentSpace = useCurrentSpace();
-  const [userSpacePermissions] = useCurrentSpacePermissions();
   const { showPage } = usePageDialog();
+  const { getCategoriesWithCreatePermission, getDefaultCreateCategory } = useProposalCategories();
   const isAdmin = useIsAdmin();
   const { mutatePagesRemove, mutatePage, pages } = usePages();
   const { mutate } = useTasks();
@@ -44,7 +43,7 @@ export default function NewProposalButton({ mutateProposals }: { mutateProposals
     }
   }, [pages]);
 
-  const canCreateProposal = !!userSpacePermissions?.createVote;
+  const canCreateProposal = getCategoriesWithCreatePermission().length > 0;
 
   async function deleteProposalTemplate(templateId: string) {
     await charmClient.deletePage(templateId);
@@ -74,7 +73,10 @@ export default function NewProposalButton({ mutateProposals }: { mutateProposals
 
   async function createProposalTemplate() {
     if (currentSpace) {
-      const newTemplate = await charmClient.proposals.createProposalTemplate({ spaceId: currentSpace.id });
+      const newTemplate = await charmClient.proposals.createProposalTemplate({
+        spaceId: currentSpace.id,
+        categoryId: getDefaultCreateCategory()?.id as string
+      });
 
       mutatePage(newTemplate);
       setUrlWithoutRerender(router.pathname, { id: newTemplate.id });
@@ -89,24 +91,25 @@ export default function NewProposalButton({ mutateProposals }: { mutateProposals
 
   async function onClickCreate() {
     if (currentSpace && user) {
-      const { page: newPage } = await addPage({
+      const createdProposal = await charmClient.proposals.createProposal({
         spaceId: currentSpace.id,
-        createdBy: user.id,
-        type: 'proposal'
+        userId: user.id,
+        categoryId: getDefaultCreateCategory().id
       });
 
-      mutatePage(newPage);
+      const { proposal, ...page } = createdProposal;
+      mutatePage(page);
 
       mutateProposals();
       mutate();
       showPage({
-        pageId: newPage.id,
+        pageId: page.id,
         onClose() {
           setUrlWithoutRerender(router.pathname, { id: null });
           mutateProposals();
         }
       });
-      setUrlWithoutRerender(router.pathname, { id: newPage.id });
+      setUrlWithoutRerender(router.pathname, { id: page.id });
     }
   }
 

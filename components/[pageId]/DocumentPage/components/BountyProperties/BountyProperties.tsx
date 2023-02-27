@@ -12,7 +12,7 @@ import Switch from 'components/common/BoardEditor/focalboard/src/widgets/switch'
 import CharmButton from 'components/common/Button';
 import InputSearchBlockchain from 'components/common/form/InputSearchBlockchain';
 import { InputSearchCrypto } from 'components/common/form/InputSearchCrypto';
-import InputSearchReviewers from 'components/common/form/InputSearchReviewers';
+import { InputSearchReviewers } from 'components/common/form/InputSearchReviewers';
 import { InputSearchRoleMultiple } from 'components/common/form/InputSearchRole';
 import { useBounties } from 'hooks/useBounties';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';

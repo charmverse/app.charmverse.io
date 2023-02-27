@@ -70,7 +70,7 @@ import { ForumApi } from './apis/forumApi';
 import { GoogleApi } from './apis/googleApi';
 import { IframelyApi } from './apis/iframelyApi';
 import { MembersApi } from './apis/membersApi';
-import { PermissionsApi } from './apis/permissionsApi';
+import { PermissionsApi } from './apis/permissions';
 import { ProfileApi } from './apis/profileApi';
 import { ProposalsApi } from './apis/proposalsApi';
 import { TasksApi } from './apis/tasksApi';

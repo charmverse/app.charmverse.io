@@ -1,6 +1,7 @@
 import type { SuperApiToken } from '@prisma/client';
 import { Wallet } from 'ethers';
 import request from 'supertest';
+import { v4 } from 'uuid';
 
 import { prisma } from 'db';
 import { getSpaceDomainFromName } from 'lib/spaces/utils';
@@ -12,11 +13,11 @@ let apiToken: SuperApiToken;
 
 const defaultSpaceData = {
   name: `Test Space`,
-  adminDiscordUserId: '1337'
+  adminDiscordUserId: `1337-${v4()}`
 };
 
 beforeAll(async () => {
-  const superToken = await generateSuperApiToken({ name: 'test 1' });
+  const superToken = await generateSuperApiToken({ name: `test 1-${v4()}` });
   apiToken = superToken;
 });
 

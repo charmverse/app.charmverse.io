@@ -17,6 +17,8 @@ export class AvailableSpacePermissions
 
   moderateForums: boolean = false;
 
+  reviewProposals: boolean = false;
+
   constructor(operations: SpaceOperation[] = []) {
     super({ allowedOperations: Object.keys(SpaceOperation) as SpaceOperation[] });
 
