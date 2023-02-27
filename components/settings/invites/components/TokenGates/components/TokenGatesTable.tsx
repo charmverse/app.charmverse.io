@@ -69,7 +69,7 @@ export default function TokenGatesTable({ isAdmin, onDelete, tokenGates }: Props
   const space = useCurrentSpace();
   const router = useRouter();
   const { showMessage } = useSnackbar();
-  const shareLink = `${window.location.origin}/join?domain=${router.query.domain}`;
+  const shareLink = `${window.location.origin}/join?domain=${space.domain}`;
   const { openWalletSelectorModal } = useContext(Web3Connection);
 
   function onCopy() {
