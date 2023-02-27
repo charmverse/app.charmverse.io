@@ -10,6 +10,8 @@ import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { DataNotFoundError } from 'lib/utilities/errors';
+import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
+import { publishMemberEvent } from 'lib/webhookPublisher/publishEvent';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -54,6 +56,11 @@ async function acceptInvite(req: NextApiRequest, res: NextApiResponse) {
 
     updateTrackUserProfileById(userId);
     trackUserAction('join_a_workspace', { userId, source: 'invite_link', spaceId: invite.spaceId });
+    publishMemberEvent({
+      scope: WebhookEventNames.UserJoined,
+      spaceId: invite.spaceId,
+      userId
+    });
 
     const roleIdsToAssign: string[] = (
       await prisma.inviteLinkToRole.findMany({
