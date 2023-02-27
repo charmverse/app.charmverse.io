@@ -26,13 +26,7 @@ interface Props {
   autoVerify?: boolean;
 }
 
-export function TokenGateForm({
-  onSuccess,
-  spaceDomain,
-  displayAccordion,
-  joinType = 'token_gate',
-  autoVerify
-}: Props) {
+export function TokenGate({ onSuccess, spaceDomain, displayAccordion, joinType = 'token_gate', autoVerify }: Props) {
   const renders = useRef(0);
   renders.current += 1;
   //  console.log('Renders', renders.current);

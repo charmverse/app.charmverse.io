@@ -7,11 +7,11 @@ import charmClient from 'charmClient';
 import { DiscordGate } from 'components/common/SpaceAccessGate/components/DiscordGate/DiscordGate';
 import { useDiscordGate } from 'components/common/SpaceAccessGate/components/DiscordGate/hooks/useDiscordGate';
 import WorkspaceAvatar from 'components/settings/workspace/LargeAvatar';
-import type { TokenGateEvaluationResult, TokenGateJoinType, TokenGateWithRoles } from 'lib/token-gates/interfaces';
+import type { TokenGateJoinType } from 'lib/token-gates/interfaces';
 
 import LoadingComponent from '../LoadingComponent';
 
-import { TokenGateForm } from './components/TokenGateForm/TokenGateForm';
+import { TokenGate } from './components/TokenGate/TokenGate';
 
 function stripUrlParts(maybeUrl: string) {
   return maybeUrl.replace('https://app.charmverse.io/', '').replace('http://localhost:3000/', '').split('/')[0];
@@ -81,7 +81,7 @@ export function SpaceAccessGate({
             discordGate={discordGate}
             isConnectedToDiscord={isConnectedToDiscord}
           />
-          <TokenGateForm
+          <TokenGate
             autoVerify
             joinType={joinType}
             onSuccess={onJoinSpace}

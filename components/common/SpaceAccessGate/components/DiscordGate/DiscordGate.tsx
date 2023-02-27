@@ -2,7 +2,7 @@ import { Card, CardContent, Grid, Stack, Typography } from '@mui/material';
 
 import Button from 'components/common/Button';
 import PrimaryButton from 'components/common/PrimaryButton';
-import { VerifyCheckmark } from 'components/common/SpaceAccessGate/components/TokenGateForm/VerifyCheckmark';
+import { VerifyCheckmark } from 'components/common/SpaceAccessGate/components/TokenGate/VerifyCheckmark';
 import type { CheckDiscordGateResult } from 'lib/discord/interface';
 
 type Props = {
