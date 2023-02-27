@@ -86,7 +86,7 @@ test('convert post to proposal - create a post, convert that post to proposal an
 
   expect(isEditable).toBe(false);
 
-  const postProposalBanner = await page.locator('data-test=post-proposal-banner');
+  const postProposalBanner = await page.locator('data-test=proposal-banner');
 
   await expect(postProposalBanner).toBeVisible();
 });

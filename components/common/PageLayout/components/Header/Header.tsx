@@ -450,7 +450,11 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
         <>
           <Tooltip title={!canCreateProposal ? 'You do not have the permission to convert to proposal' : ''}>
             <div>
-              <ListItemButton onClick={() => convertToProposal(basePage.id)} disabled={!canCreateProposal}>
+              <ListItemButton
+                data-test='page-convert-proposal-action'
+                onClick={() => convertToProposal(basePage.id)}
+                disabled={!canCreateProposal}
+              >
                 <TaskOutlinedIcon
                   fontSize='small'
                   sx={{
