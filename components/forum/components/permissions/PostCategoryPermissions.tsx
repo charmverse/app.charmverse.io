@@ -36,7 +36,7 @@ type Props = {
 function PostCategoryPermissions({ postCategory, permissions }: Props) {
   const { data, mutate: mutatePermissions } = useSWR(
     `/api/forum/list-post-category-permissions-${postCategory.id}`,
-    () => charmClient.permissions.listPostCategoryPermissions(postCategory.id)
+    () => charmClient.permissions.forum.listPostCategoryPermissions(postCategory.id)
   );
 
   const { roles } = useRoles();
@@ -44,7 +44,7 @@ function PostCategoryPermissions({ postCategory, permissions }: Props) {
 
   const space = useCurrentSpace();
   async function deletePermission(id: string) {
-    await charmClient.permissions.deletePostCategoryPermission(id);
+    await charmClient.permissions.forum.deletePostCategoryPermission(id);
     mutatePermissions((list) => list?.filter((p) => p.id !== id));
   }
 
@@ -76,7 +76,7 @@ function PostCategoryPermissions({ postCategory, permissions }: Props) {
   async function addMultiplePermissions(input: BulkRolePostCategoryPermissionUpsert) {
     const newPermissions = await Promise.all(
       input.roleIds.map((id) =>
-        charmClient.permissions.upsertPostCategoryPermission({
+        charmClient.permissions.forum.upsertPostCategoryPermission({
           permissionLevel: input.permissionLevel,
           postCategoryId: postCategory.id,
           assignee: { group: 'role', id }
@@ -88,7 +88,7 @@ function PostCategoryPermissions({ postCategory, permissions }: Props) {
   }
 
   async function updatePermission(input: PostCategoryPermissionInput) {
-    const newPermission = await charmClient.permissions.upsertPostCategoryPermission(input);
+    const newPermission = await charmClient.permissions.forum.upsertPostCategoryPermission(input);
     mutatePermissions((list) => getMutatedPermissionsList([newPermission], list));
   }
 
@@ -130,11 +130,11 @@ function PostCategoryPermissions({ postCategory, permissions }: Props) {
 
   async function togglePublic() {
     if (publicPermission) {
-      charmClient.permissions
+      charmClient.permissions.forum
         .deletePostCategoryPermission(publicPermission.id)
         .then(() => mutatePermissions((list) => list?.filter((p) => p.id !== publicPermission.id)));
     } else {
-      charmClient.permissions
+      charmClient.permissions.forum
         .upsertPostCategoryPermission({
           permissionLevel: 'view',
           postCategoryId: postCategory.id,

@@ -1,10 +1,22 @@
-import { Box, Chip, InputLabel, MenuItem, Select } from '@mui/material';
+import AddIcon from '@mui/icons-material/Add';
+import { Box, Chip, MenuItem, Select, TextField } from '@mui/material';
 import type { ProposalStatus } from '@prisma/client';
+import { usePopupState } from 'material-ui-popup-state/hooks';
+import { useState } from 'react';
 
+import Button from 'components/common/Button';
+import Modal from 'components/common/Modal';
 import { ViewOptions } from 'components/common/ViewOptions';
-import type { ProposalCategory } from 'lib/proposal/interface';
+import { useIsAdmin } from 'hooks/useIsAdmin';
+import { useSnackbar } from 'hooks/useSnackbar';
+import type { ProposalCategoryWithPermissions } from 'lib/permissions/proposals/interfaces';
 import { PROPOSAL_STATUS_LABELS } from 'lib/proposal/proposalStatusTransition';
 import type { BrandColor } from 'theme/colors';
+import { getRandomThemeColor } from 'theme/utils/getRandomThemeColor';
+
+import { useProposalCategories } from '../hooks/useProposalCategories';
+
+import { ProposalCategoryContextMenu } from './ProposalCategoryContextMenu';
 
 export type ProposalSort = 'latest_created';
 export type ProposalFilter = ProposalStatus | 'all';
@@ -16,10 +28,10 @@ type Props = {
   setProposalSort: (proposalSort: ProposalSort) => void;
   categoryIdFilter: string | null;
   setCategoryIdFilter: (val: string) => void;
-  categories: ProposalCategory[];
+  categories: ProposalCategoryWithPermissions[];
 };
 
-export default function ProposalsViewOptions({
+export function ProposalsViewOptions({
   proposalSort,
   setProposalSort,
   proposalFilter,
@@ -28,6 +40,25 @@ export default function ProposalsViewOptions({
   categoryIdFilter,
   setCategoryIdFilter
 }: Props) {
+  const addCategoryPopupState = usePopupState({ variant: 'popover', popupId: 'add-category' });
+
+  const isAdmin = useIsAdmin();
+
+  const { showMessage } = useSnackbar();
+  const [newCategoryName, setNewCategoryName] = useState('');
+  const { addCategory } = useProposalCategories();
+
+  async function createCategory() {
+    addCategory({ title: newCategoryName, color: getRandomThemeColor() })
+      .then(() => {
+        setNewCategoryName('');
+        addCategoryPopupState.close();
+      })
+      .catch((err) => {
+        showMessage(err.message ?? 'Something went wrong', 'error');
+      });
+  }
+
   return (
     <>
       <ViewOptions label='Sort'>
@@ -59,16 +90,93 @@ export default function ProposalsViewOptions({
           <Select
             variant='outlined'
             value={categoryIdFilter || ''}
+            renderValue={(value) => {
+              if (value === 'all') {
+                return 'All categories';
+              }
+
+              const category = categories.find((c) => c.id === value);
+              if (category) {
+                return (
+                  <Chip
+                    sx={{ cursor: 'pointer', minWidth: '100px' }}
+                    color={category.color as BrandColor}
+                    label={category.title}
+                  />
+                );
+              }
+            }}
             onChange={(e) => setCategoryIdFilter(e.target.value)}
           >
             <MenuItem value='all'>All categories</MenuItem>
-            {categories.map(({ id, title, color }) => (
-              <MenuItem key={id} value={id}>
-                <Chip sx={{ cursor: 'pointer' }} color={color as BrandColor} label={title} />
+            {categories.map((category) => (
+              <MenuItem key={category.id} value={category.id} sx={{ justifyContent: 'space-between' }}>
+                <Chip
+                  sx={{ cursor: 'pointer', minWidth: '100px' }}
+                  color={category.color as BrandColor}
+                  label={category.title}
+                />
+                {isAdmin && <ProposalCategoryContextMenu category={category} key={category.id} />}
               </MenuItem>
             ))}
+            <MenuItem
+              onClick={(e) => {
+                e.stopPropagation();
+                e.preventDefault();
+              }}
+              value=''
+            >
+              <Button
+                data-test='add-category-button'
+                sx={{
+                  ml: 2
+                }}
+                disabled={!isAdmin}
+                startIcon={<AddIcon />}
+                onClick={addCategoryPopupState.open}
+                variant='outlined'
+                color='secondary'
+                size='small'
+                disabledTooltip="You don't have the permissions to add new forum categories"
+              >
+                Add category
+              </Button>
+            </MenuItem>
           </Select>
         </Box>
+
+        <Modal
+          open={addCategoryPopupState.isOpen}
+          onClose={() => {
+            addCategoryPopupState.close();
+          }}
+          title='Add proposal category'
+        >
+          <TextField
+            data-test='add-category-input'
+            sx={{
+              mb: 1
+            }}
+            autoFocus
+            fullWidth
+            value={newCategoryName}
+            onChange={(e) => {
+              setNewCategoryName(e.target.value);
+            }}
+            onKeyPress={(e) => {
+              if (e.key === 'Enter') {
+                createCategory();
+              }
+            }}
+          />
+          <Button
+            data-test='confirm-new-category-button'
+            disabled={categories.find((category) => category.title === newCategoryName)}
+            onClick={createCategory}
+          >
+            Add
+          </Button>
+        </Modal>
       </ViewOptions>
     </>
   );

@@ -12,7 +12,7 @@ import type { KeyedMutator } from 'swr';
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import type { VoteDetailProps } from 'components/common/CharmEditor/components/inlineVote/components/VoteDetail';
-import VoteDetail from 'components/common/CharmEditor/components/inlineVote/components/VoteDetail';
+import { VoteDetail } from 'components/common/CharmEditor/components/inlineVote/components/VoteDetail';
 import Link from 'components/common/Link';
 import LoadingComponent from 'components/common/LoadingComponent';
 import Modal from 'components/common/Modal';

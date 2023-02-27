@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import request from 'supertest';
-import { v4 } from 'uuid';
 
 import type { IPageWithPermissions } from 'lib/pages';
 import { addSpaceOperations } from 'lib/permissions/spaces';
@@ -70,7 +69,7 @@ describe('POST /api/pages - create page', () => {
     await request(baseUrl).post('/api/pages').set('Cookie', userCookie).send(pageToCreate).expect(401);
   });
 
-  it('should prevent creation of proposal templates', async () => {
+  it('should prevent creation of proposal templates and proposals', async () => {
     const { user, space } = await generateUserAndSpaceWithApiToken(undefined, true);
 
     const userCookie = await loginUser(user.id);
@@ -78,7 +77,7 @@ describe('POST /api/pages - create page', () => {
     await addSpaceOperations({
       forSpaceId: space.id,
       spaceId: space.id,
-      operations: ['createPage', 'createVote']
+      operations: ['createPage']
     });
 
     const pageToCreate = generatePageToCreateStub({
@@ -87,72 +86,11 @@ describe('POST /api/pages - create page', () => {
       type: 'proposal_template'
     });
 
-    await request(baseUrl).post('/api/pages').set('Cookie', userCookie).send(pageToCreate).expect(401);
-  });
-});
-
-describe('POST /api/pages - create proposal page', () => {
-  it('should create a proposal page if the non-admin user has the permission and return it, responding with 201', async () => {
-    const { user, space } = await generateUserAndSpaceWithApiToken(undefined, false);
-
-    await addSpaceOperations({
-      forSpaceId: space.id,
-      spaceId: space.id,
-      operations: ['createVote']
-    });
-
-    const userCookie = await loginUser(user.id);
-
-    const pageToCreate = generatePageToCreateStub({
-      userId: user.id,
-      spaceId: space.id,
-      type: 'proposal'
-    });
-
-    const { body: createdPage } = (await request(baseUrl)
+    await request(baseUrl).post('/api/pages').set('Cookie', userCookie).send(pageToCreate).expect(400);
+    await request(baseUrl)
       .post('/api/pages')
       .set('Cookie', userCookie)
-      .send(pageToCreate)
-      .expect(201)) as { body: IPageWithPermissions };
-
-    expect(createdPage.spaceId).toBe(pageToCreate.spaceId as string);
-    expect(createdPage.path).toBe(pageToCreate.path);
-    expect(createdPage.createdBy).toBe(pageToCreate.createdBy as string);
-  });
-
-  it('should allow admins to create a page even if no permission exists, and return it, responding with 201', async () => {
-    const { user, space } = await generateUserAndSpaceWithApiToken(undefined, true);
-
-    const userCookie = await loginUser(user.id);
-
-    const pageToCreate = generatePageToCreateStub({
-      userId: user.id,
-      spaceId: space.id,
-      type: 'proposal'
-    });
-
-    const { body: createdPage } = (await request(baseUrl)
-      .post('/api/pages')
-      .set('Cookie', userCookie)
-      .send(pageToCreate)
-      .expect(201)) as { body: IPageWithPermissions };
-
-    expect(createdPage.spaceId).toBe(pageToCreate.spaceId as string);
-    expect(createdPage.path).toBe(pageToCreate.path);
-    expect(createdPage.createdBy).toBe(pageToCreate.createdBy);
-  });
-
-  it('should fail to create a page if the non-admin user does not have the permission and return it, responding with 401', async () => {
-    const { user, space } = await generateUserAndSpaceWithApiToken(undefined, false);
-
-    const userCookie = await loginUser(user.id);
-
-    const pageToCreate = generatePageToCreateStub({
-      userId: user.id,
-      spaceId: space.id,
-      type: 'proposal'
-    });
-
-    await request(baseUrl).post('/api/pages').set('Cookie', userCookie).send(pageToCreate).expect(401);
+      .send({ ...pageToCreate, type: 'proposal' })
+      .expect(400);
   });
 });

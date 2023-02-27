@@ -6,6 +6,8 @@ import { CSVLink } from 'react-csv';
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import { EmptyStateVideo } from 'components/common/EmptyStateVideo';
+import { PageDialogProvider } from 'components/common/PageDialog/hooks/usePageDialog';
+import PageDialogGlobalModal from 'components/common/PageDialog/PageDialogGlobal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { BountyWithDetails } from 'lib/bounties';
 import { sortArrayByObjectProperty } from 'lib/utilities/array';
@@ -59,48 +61,51 @@ export default function BountiesPage({ publicMode = false, bounties }: Props) {
   }
 
   return (
-    <div className='focalboard-body full-page'>
-      <div className='BoardComponent'>
-        <div className='top-head'>
-          <Grid container display='flex' justifyContent='space-between' alignContent='center' mb={3} mt={10}>
-            <Grid display='flex' justifyContent='space-between' item xs={12} mb={2}>
-              <Typography variant='h1' display='flex' alignItems='center' sx={{ height: '100%' }}>
-                Bounties
-              </Typography>
+    <PageDialogProvider>
+      <div className='focalboard-body full-page'>
+        <div className='BoardComponent'>
+          <div className='top-head'>
+            <Grid container display='flex' justifyContent='space-between' alignContent='center' mb={3} mt={10}>
+              <Grid display='flex' justifyContent='space-between' item xs={12} mb={2}>
+                <Typography variant='h1' display='flex' alignItems='center' sx={{ height: '100%' }}>
+                  Bounties
+                </Typography>
 
-              {!publicMode && (
-                <Box width='fit-content' display='flex' gap={1}>
-                  {!!csvData.length && (
-                    <CSVLink
-                      data={csvData}
-                      onClick={recordExportEvent}
-                      filename='Gnosis Safe Airdrop.csv'
-                      style={{ textDecoration: 'none' }}
-                    >
-                      <Button color='secondary' variant='outlined'>
-                        Export to CSV
-                      </Button>
-                    </CSVLink>
-                  )}
-                  <MultiPaymentModal bounties={bounties} />
-                  <NewBountyButton />
-                </Box>
-              )}
+                {!publicMode && (
+                  <Box width='fit-content' display='flex' gap={1}>
+                    {!!csvData.length && (
+                      <CSVLink
+                        data={csvData}
+                        onClick={recordExportEvent}
+                        filename='Gnosis Safe Airdrop.csv'
+                        style={{ textDecoration: 'none' }}
+                      >
+                        <Button color='secondary' variant='outlined'>
+                          Export to CSV
+                        </Button>
+                      </CSVLink>
+                    )}
+                    <MultiPaymentModal bounties={bounties} />
+                    <NewBountyButton />
+                  </Box>
+                )}
+              </Grid>
             </Grid>
-          </Grid>
-        </div>
-        <div className='container-container'>
-          {bounties.length === 0 ? (
-            <EmptyStateVideo
-              description='Getting started with bounties'
-              videoTitle='Bounties | Getting started with Charmverse'
-              videoUrl='https://tiny.charmverse.io/bounties'
-            />
-          ) : (
-            <BountiesKanbanView publicMode={publicMode} bounties={bounties} />
-          )}
+          </div>
+          <div className='container-container'>
+            {bounties.length === 0 ? (
+              <EmptyStateVideo
+                description='Getting started with bounties'
+                videoTitle='Bounties | Getting started with Charmverse'
+                videoUrl='https://tiny.charmverse.io/bounties'
+              />
+            ) : (
+              <BountiesKanbanView publicMode={publicMode} bounties={bounties} />
+            )}
+          </div>
         </div>
       </div>
-    </div>
+      <PageDialogGlobalModal />
+    </PageDialogProvider>
   );
 }

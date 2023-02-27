@@ -1,11 +1,10 @@
 import { ArrowBackIos } from '@mui/icons-material';
 import ArrowForwardIos from '@mui/icons-material/ArrowForwardIos';
-import { Stack, Typography, Button } from '@mui/material';
+import { Button, Stack, Typography } from '@mui/material';
 import type { ProposalStatus } from '@prisma/client';
 
-import { canChangeProposalStatus } from 'lib/proposal/canChangeProposalStatus';
+import type { ProposalFlowFlags } from 'lib/proposal/computeProposalFlowFlags';
 import type { ProposalWithUsers } from 'lib/proposal/interface';
-import type { ProposalUserGroup } from 'lib/proposal/proposalStatusTransition';
 import {
   proposalStatusDetails,
   PROPOSAL_STATUSES,
@@ -13,37 +12,25 @@ import {
 } from 'lib/proposal/proposalStatusTransition';
 
 type Props = {
-  proposalUserGroups: ProposalUserGroup[];
+  proposalFlowFlags?: ProposalFlowFlags;
   proposal?: ProposalWithUsers;
   openVoteModal: () => void;
   updateProposalStatus: (newStatus: ProposalStatus) => Promise<void>;
 };
 
-export function ProposalStepSummary({ proposal, proposalUserGroups, openVoteModal, updateProposalStatus }: Props) {
+export function ProposalStepSummary({ proposal, proposalFlowFlags, openVoteModal, updateProposalStatus }: Props) {
   const currentStatus = proposal?.status;
   const currentStatusIndex = currentStatus ? PROPOSAL_STATUSES.indexOf(currentStatus) : -1;
-  const hasNext = currentStatusIndex < PROPOSAL_STATUSES.length - 1;
-  const hasPrev = currentStatusIndex > 0;
-  const showActions = proposalUserGroups.length > 0;
+  const nextStatus = PROPOSAL_STATUSES[currentStatusIndex + 1];
+  const previousStatus = PROPOSAL_STATUSES[currentStatusIndex - 1];
 
-  const nextStatus = hasNext ? PROPOSAL_STATUSES[currentStatusIndex + 1] : null;
-  let prevStatus = hasPrev ? PROPOSAL_STATUSES[currentStatusIndex - 1] : null;
-  if (prevStatus === 'review') {
-    prevStatus = 'discussion';
-  }
-
-  const nextEnabled = nextStatus
-    ? canChangeProposalStatus({ proposal, updatedStatus: nextStatus, proposalUserGroups })
-    : false;
-  const backEnabled = prevStatus
-    ? canChangeProposalStatus({ proposal, updatedStatus: prevStatus, proposalUserGroups })
-    : false;
-
+  const showActions =
+    (nextStatus && proposalFlowFlags?.[nextStatus]) || (previousStatus && proposalFlowFlags?.[previousStatus]);
   return (
     <Stack flex={1}>
       <Stack
         direction={{ xs: 'column', md: 'row' }}
-        alignItems={{ md: 'center' }}
+        alignItems={{ md: 'flex-start' }}
         justifyContent='space-between'
         flex={1}
         gap={1}
@@ -59,29 +46,32 @@ export function ProposalStepSummary({ proposal, proposalUserGroups, openVoteModa
 
         {showActions && (
           <Stack gap={0.5} direction='row' fontSize='10px'>
-            {!!prevStatus && (
+            {!!previousStatus && (
               <Button
                 sx={{ whiteSpace: 'nowrap' }}
                 size='small'
                 color='secondary'
                 startIcon={<ArrowBackIos fontSize='inherit' />}
-                disabled={!backEnabled}
+                disabled={!proposalFlowFlags?.[previousStatus]}
+                disableElevation
+                variant='outlined'
                 onClick={() => {
-                  if (prevStatus) {
-                    updateProposalStatus(prevStatus);
+                  if (previousStatus) {
+                    updateProposalStatus(previousStatus);
                   }
                 }}
               >
-                {prevStatus ? `${PROPOSAL_STATUS_LABELS[prevStatus]}` : 'Back'}
+                {PROPOSAL_STATUS_LABELS[previousStatus]}
               </Button>
             )}
             {!!nextStatus && (
               <Button
                 size='small'
                 color='primary'
+                disableElevation
                 sx={{ whiteSpace: 'nowrap' }}
                 endIcon={<ArrowForwardIos fontSize='inherit' />}
-                disabled={!nextEnabled}
+                disabled={!proposalFlowFlags?.[nextStatus]}
                 onClick={() => {
                   if (nextStatus) {
                     if (nextStatus === 'vote_active') {
@@ -92,7 +82,7 @@ export function ProposalStepSummary({ proposal, proposalUserGroups, openVoteModa
                   }
                 }}
               >
-                {nextStatus ? `${PROPOSAL_STATUS_LABELS[nextStatus]}` : 'Next'}
+                {PROPOSAL_STATUS_LABELS[nextStatus]}
               </Button>
             )}
           </Stack>

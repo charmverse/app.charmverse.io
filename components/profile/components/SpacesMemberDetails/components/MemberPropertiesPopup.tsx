@@ -12,11 +12,7 @@ import LoadingComponent from 'components/common/LoadingComponent';
 import { DialogTitle } from 'components/common/Modal';
 import { useMutateMemberPropertyValues } from 'components/profile/components/SpacesMemberDetails/components/useMutateMemberPropertyValues';
 import { useMembers } from 'hooks/useMembers';
-import type {
-  MemberPropertyValueType,
-  PropertyValueWithDetails,
-  UpdateMemberPropertyValuePayload
-} from 'lib/members/interfaces';
+import type { MemberPropertyValueType, UpdateMemberPropertyValuePayload } from 'lib/members/interfaces';
 import debounce from 'lib/utilities/debounce';
 
 type Props = {
@@ -55,16 +51,14 @@ export function MemberPropertiesPopup({
   const { mutateMembers } = useMembers();
   const { createOption, deleteOption, updateOption } = useMutateMemberPropertyValues(mutate);
 
-  const defaultValues = useMemo(() => {
-    if (data) {
-      return data.reduce((acc, prop) => {
+  const defaultValues = useMemo(
+    () =>
+      data?.reduce<Record<string, MemberPropertyValueType>>((acc, prop) => {
         acc[prop.memberPropertyId] = prop.value;
         return acc;
-      }, {} as Record<string, MemberPropertyValueType>);
-    }
-
-    return undefined;
-  }, [data]);
+      }, {}),
+    [data]
+  );
 
   const {
     control,
@@ -73,31 +67,35 @@ export function MemberPropertiesPopup({
     getValues
   } = useForm({ mode: 'onChange' });
 
-  const onSubmit = async (submitData: any) => {
-    if (!spaceId) {
-      return;
-    }
+  const onSubmit = useCallback(
+    async (submitData: any) => {
+      if (!spaceId) {
+        return;
+      }
 
-    const updateData: UpdateMemberPropertyValuePayload[] = Object.keys(submitData).map((key) => ({
-      memberPropertyId: key,
-      value: submitData[key]
-    }));
+      const updateData: UpdateMemberPropertyValuePayload[] = Object.keys(submitData).map((key) => ({
+        memberPropertyId: key,
+        value: submitData[key]
+      }));
 
-    await updateMemberPropertyValues(spaceId, updateData);
-  };
+      await updateMemberPropertyValues(spaceId, updateData);
+    },
+    [spaceId]
+  );
 
   const handleOnChange = useCallback(
     debounce(async (propertyId: string, option: any) => {
       await onSubmit({ ...getValues(), [propertyId]: option });
     }, 300),
-    []
+    [onSubmit]
   );
 
   function onClickClose() {
     // refresh members only after all the editing is finished
-    mutateMembers();
-    reset();
     onClose();
+    mutateMembers();
+    mutate();
+    reset(defaultValues);
   }
 
   useEffect(() => {
@@ -110,7 +108,7 @@ export function MemberPropertiesPopup({
 
   return (
     <Dialog open={!!spaceId} onClose={onClickClose} fullScreen={fullScreen} fullWidth>
-      {!data || isFetchingSpaceProperties || isLoading ? (
+      {!data || isFetchingSpaceProperties || isLoading || isFetchingSpaceProperties ? (
         <DialogContent>
           <LoadingComponent isLoading />
         </DialogContent>
@@ -140,7 +138,10 @@ export function MemberPropertiesPopup({
                       onDeleteOption={(option) => deleteOption(property, option)}
                       onChange={(e) => {
                         field.onChange(e);
-                        handleOnChange(property.memberPropertyId, e?.target?.value ? e.target.value : e);
+                        handleOnChange(
+                          property.memberPropertyId,
+                          typeof e?.target?.value === 'string' ? e.target.value : e
+                        );
                       }}
                     />
                   )}

@@ -1,123 +1,86 @@
-import type { Space, User } from '@prisma/client';
-import { v4 } from 'uuid';
+import type { Proposal, ProposalCategory, Space, User } from '@prisma/client';
 
 import { prisma } from 'db';
 import { createUserFromWallet } from 'lib/users/createUser';
-import { createProposalWithUsers, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { createProposalWithUsers, generateUserAndSpace, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { generateProposal, generateProposalCategory } from 'testing/utils/proposals';
 
 import { createProposalTemplate } from '../../templates/proposals/createProposalTemplate';
 import { createProposal } from '../createProposal';
 import { getProposalsBySpace } from '../getProposalsBySpace';
-import { syncProposalPermissions } from '../syncProposalPermissions';
 
-let accessibleSpaceUser1: User;
-let accessibleSpaceAdminUser: User;
-let accessibleSpaceUser2: User;
-let accessibleSpace: Space;
-let inaccessibleSpace: Space;
-let inaccessibleSpaceUser: User;
+let user: User;
+let space: Space;
+let proposalCategory: ProposalCategory;
+let proposal: Proposal;
+let secondProposalCategory: ProposalCategory;
+let secondProposal: Proposal;
 
 beforeAll(async () => {
   // Not a space admin
-  const generated1 = await generateUserAndSpaceWithApiToken(undefined, false);
-  accessibleSpaceUser1 = generated1.user;
-  accessibleSpace = generated1.space;
-  accessibleSpaceUser2 = await createUserFromWallet();
-  accessibleSpaceAdminUser = await createUserFromWallet();
-
-  const generated2 = await generateUserAndSpaceWithApiToken();
-  inaccessibleSpace = generated2.space;
-  inaccessibleSpaceUser = generated2.user;
-
-  await prisma.spaceRole.create({
-    data: {
-      userId: accessibleSpaceUser2.id,
-      spaceId: accessibleSpace.id
-    }
+  const generated = await generateUserAndSpace();
+  user = generated.user;
+  space = generated.space;
+  proposalCategory = await generateProposalCategory({
+    spaceId: space.id
   });
-
-  await prisma.spaceRole.create({
-    data: {
-      userId: accessibleSpaceAdminUser.id,
-      spaceId: accessibleSpace.id,
-      isAdmin: true
-    }
+  secondProposalCategory = await generateProposalCategory({
+    spaceId: space.id
+  });
+  proposal = await generateProposal({
+    spaceId: space.id,
+    userId: user.id,
+    categoryId: proposalCategory.id,
+    proposalStatus: 'discussion'
+  });
+  secondProposal = await generateProposal({
+    spaceId: space.id,
+    userId: user.id,
+    categoryId: secondProposalCategory.id,
+    proposalStatus: 'discussion'
   });
 });
 
-describe('Get all proposals of a space', () => {
-  it('Get proposals of a space that the user has either created or has the permission to view', async () => {
-    const accessibleSpacePageProposal1 = await createProposalWithUsers({
-      spaceId: accessibleSpace.id,
-      userId: accessibleSpaceUser1.id,
-      authors: [],
-      reviewers: []
+describe('getProposalsBySpace', () => {
+  it('Get all proposals of a space in given categories, excluding draft proposals', async () => {
+    const allProposals = await getProposalsBySpace({
+      spaceId: space.id,
+      categoryIds: undefined
     });
 
-    await createProposalWithUsers({
-      spaceId: inaccessibleSpace.id,
-      userId: inaccessibleSpaceUser.id,
-      authors: [],
-      reviewers: []
+    const draftProposal = await generateProposal({
+      categoryId: proposalCategory.id,
+      spaceId: space.id,
+      userId: user.id,
+      proposalStatus: 'draft'
     });
 
-    // Only user 2 should have access to view the proposal
-    const accessibleSpacePageProposal2 = await createProposalWithUsers({
-      spaceId: accessibleSpace.id,
-      userId: accessibleSpaceUser2.id,
-      authors: [],
-      reviewers: []
+    expect(allProposals.length).toBe(2);
+    expect(allProposals.some((p) => p.id === proposal.id)).toBe(true);
+    expect(allProposals.some((p) => p.id === secondProposal.id)).toBe(true);
+
+    const proposalsInCategory = await getProposalsBySpace({
+      spaceId: space.id,
+      categoryIds: proposalCategory.id
     });
 
-    const userAccessibleProposals = await getProposalsBySpace({
-      userId: accessibleSpaceUser1.id,
-      spaceId: accessibleSpace.id
-    });
-
-    expect(userAccessibleProposals).toMatchObject([
-      expect.objectContaining({
-        id: accessibleSpacePageProposal1.id
-      })
-    ]);
-
-    // Checking if the admin has access to view all the proposals
-    const adminAccessibleProposals = await getProposalsBySpace({
-      userId: accessibleSpaceAdminUser.id,
-      spaceId: accessibleSpace.id
-    });
-
-    expect(adminAccessibleProposals.length).toBe(2);
-
-    expect(adminAccessibleProposals.some((p) => p.id === accessibleSpacePageProposal1.id)).toBe(true);
-    expect(adminAccessibleProposals.some((p) => p.id === accessibleSpacePageProposal2.id)).toBe(true);
+    expect(proposalsInCategory.length).toBe(1);
+    expect(proposalsInCategory.some((p) => p.id === proposal.id)).toBe(true);
   });
 
   it('should not return proposal templates', async () => {
-    const { user, space } = await generateUserAndSpaceWithApiToken(undefined, false);
-
-    const { page: proposalPage } = await createProposal({
+    const template = await createProposalTemplate({
       spaceId: space.id,
-      createdBy: user.id,
-      contentText: '',
-      content: {},
-      title: 'Example proposal'
-    });
-
-    await syncProposalPermissions({
-      proposalId: proposalPage.id
-    });
-
-    await createProposalTemplate({
-      spaceId: space.id,
-      userId: user.id
+      userId: user.id,
+      categoryId: proposalCategory.id
     });
 
     const proposals = await getProposalsBySpace({
-      userId: user.id,
-      spaceId: space.id
+      spaceId: space.id,
+      categoryIds: [proposalCategory.id]
     });
 
     expect(proposals.length).toBe(1);
-    expect(proposals[0].id).toBe(proposalPage.id);
+    expect(proposals[0].id).toBe(proposal.id);
   });
 });

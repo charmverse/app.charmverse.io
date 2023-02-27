@@ -1,7 +1,6 @@
 import styled from '@emotion/styled';
 import { Box } from '@mui/material';
 import MuiAppBar from '@mui/material/AppBar';
-import Head from 'next/head';
 import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
 
@@ -10,12 +9,10 @@ import { SpaceSettingsDialog } from 'components/common/Modal/SettingsDialog';
 import { PageDialogProvider } from 'components/common/PageDialog/hooks/usePageDialog';
 import PageDialogGlobalModal from 'components/common/PageDialog/PageDialogGlobal';
 import { PageActionDisplayProvider } from 'hooks/usePageActionDisplay';
-import { usePageIdFromPath } from 'hooks/usePageFromPath';
 import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useUser } from 'hooks/useUser';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 
-import CurrentPageFavicon from './components/CurrentPageFavicon';
 import { Header, headerHeight } from './components/Header/Header';
 import PageContainer from './components/PageContainer';
 import SidebarSubmenu from './components/Sidebar/SidebarSubmenu';

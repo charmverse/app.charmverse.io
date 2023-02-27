@@ -36,7 +36,7 @@ import PageNavigation from '../PageNavigation';
 import SearchInWorkspaceModal from '../SearchInWorkspaceModal';
 import TrashModal from '../TrashModal';
 
-import { sidebarItemStyles, SidebarLink } from './SidebarBtn';
+import { sidebarItemStyles, SidebarLink } from './SidebarButton';
 import SidebarSubmenu from './SidebarSubmenu';
 
 const WorkspaceLabel = styled.div`
@@ -91,12 +91,13 @@ const SidebarContainer = styled.div`
   }
 `;
 
-const SectionName = styled(Typography)`
+export const SectionName = styled(Typography)`
   padding-left: ${({ theme }) => theme.spacing(2)};
   padding-right: ${({ theme }) => theme.spacing(2)};
   color: ${({ theme }) => theme.palette.secondary.main};
   font-size: 11.5px;
   font-weight: 600;
+  text-transform: uppercase;
   letter-spacing: 0.03em;
 `;
 
