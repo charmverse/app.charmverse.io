@@ -1,8 +1,6 @@
 import type { Theme } from '@emotion/react';
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
-import type { BoxProps } from '@mui/material/Box';
-import Box from '@mui/material/Box';
 
 import Link from 'components/common/Link';
 
@@ -16,6 +14,8 @@ export const sidebarItemStyles = ({ theme }: { theme: Theme }) => css`
   font-weight: 500;
   padding-top: 4px;
   padding-bottom: 4px;
+  margin-top: 1px;
+  margin-bottom: 1px;
   &:hover {
     background-color: ${theme.palette.action.hover};
     color: inherit;
@@ -26,20 +26,6 @@ export const sidebarItemStyles = ({ theme }: { theme: Theme }) => css`
   }
 `;
 
-const StyledSidebarBox = styled(Box)`
-  cursor: pointer;
-  ${sidebarItemStyles}
-`;
-
-export function SidebarBtn({ icon, label, ...props }: { icon: any; label: string } & BoxProps) {
-  return (
-    <StyledSidebarBox {...props}>
-      {icon}
-      {label}
-    </StyledSidebarBox>
-  );
-}
-
 const StyledSidebarLink = styled(Link, { shouldForwardProp: (prop) => prop !== 'active' })<{ active: boolean }>`
   ${sidebarItemStyles}
   ${({ active, theme }) =>
@@ -49,25 +35,29 @@ const StyledSidebarLink = styled(Link, { shouldForwardProp: (prop) => prop !== '
     color: ${theme.palette.text.primary};
   `
       : ''}
+  // disable hover UX on ios which converts first click to a hover event
+  @media (pointer: fine) {
+    &:hover {
+      cursor: pointer;
+    }
+  }
 `;
 
 export function SidebarLink({
-  active,
-  href,
   icon,
   label,
-  target,
-  onClick
+  ...props
 }: {
   active: boolean;
-  href: string;
+  href?: string;
   icon: any;
   label: string;
   target?: string;
   onClick?: () => void;
+  className?: string;
 }) {
   return (
-    <StyledSidebarLink href={href} active={active} target={target} onClick={onClick}>
+    <StyledSidebarLink {...props}>
       {icon}
       {label}
     </StyledSidebarLink>
