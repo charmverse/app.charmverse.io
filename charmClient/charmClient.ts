@@ -8,7 +8,6 @@ import type {
   Role,
   Space,
   TelegramUser,
-  TokenGate,
   TokenGateToRole,
   User,
   UserDetails,
@@ -20,6 +19,7 @@ import * as http from 'adapters/http';
 import { DiscordApi } from 'charmClient/apis/discordApi';
 import { MuxApi } from 'charmClient/apis/muxApi';
 import { PagesApi } from 'charmClient/apis/pagesApi';
+import { TokenGatesApi } from 'charmClient/apis/tokenGates';
 import { TrackApi } from 'charmClient/apis/trackApi';
 import type { IUser } from 'components/common/BoardEditor/focalboard/src/user';
 import type { AuthSig, ExtendedPoap } from 'lib/blockchain/interfaces';
@@ -42,12 +42,6 @@ import type {
 import type { SpacePermissionFlags, SpacePermissionModification } from 'lib/permissions/spaces';
 import type { AggregatedProfileData } from 'lib/profile';
 import type { CreateSpaceProps } from 'lib/spaces/createWorkspace';
-import type {
-  TokenGateEvaluationAttempt,
-  TokenGateEvaluationResult,
-  TokenGateVerification,
-  TokenGateWithRoles
-} from 'lib/token-gates/interfaces';
 import type { ITokenMetadata, ITokenMetadataRequest } from 'lib/tokens/tokenData';
 import { encodeFilename } from 'lib/utilities/encodeFilename';
 import type { SocketAuthReponse } from 'lib/websockets/interfaces';
@@ -120,6 +114,8 @@ class CharmClient {
   unstoppableDomains = new UnstoppableDomainsApi();
 
   votes = new VotesApi();
+
+  tokenGates = new TokenGatesApi();
 
   async socket() {
     return http.GET<SocketAuthReponse>('/api/socket');
@@ -451,34 +447,6 @@ class CharmClient {
 
   deleteFromS3(src: string) {
     return http.DELETE('/api/aws/s3-delete', { src });
-  }
-
-  // Token Gates
-  getTokenGates(query: { spaceId: string }) {
-    return http.GET<TokenGateWithRoles[]>('/api/token-gates', query);
-  }
-
-  getTokenGatesForSpace(query: { spaceDomain: string }) {
-    return http.GET<TokenGateWithRoles[]>('/api/token-gates', query);
-  }
-
-  saveTokenGate(tokenGate: Partial<TokenGate>): Promise<TokenGate> {
-    return http.POST<TokenGate>('/api/token-gates', tokenGate);
-  }
-
-  deleteTokenGate(id: string) {
-    return http.DELETE<TokenGate>(`/api/token-gates/${id}`);
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  verifyTokenGate(verification: Omit<TokenGateVerification, 'userId'>): Promise<{ error?: string; success?: boolean }> {
-    return http.POST('/api/token-gates/verify', verification);
-  }
-
-  evalueTokenGateEligibility(
-    verification: Omit<TokenGateEvaluationAttempt, 'userId'>
-  ): Promise<TokenGateEvaluationResult> {
-    return http.POST('/api/token-gates/evaluate', verification);
   }
 
   // evaluate ({ , jwt }: { id: string, jwt: string }): Promise<{ error?: string, success?: boolean }> {

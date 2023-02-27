@@ -126,7 +126,7 @@ export default function TokenGatesTable({ isAdmin, onDelete, tokenGates }: Props
         ...(tokenGate.conditions as any)
       });
 
-      await charmClient.verifyTokenGate({
+      await charmClient.tokenGates.verifyTokenGate({
         commit: false,
         spaceId: space?.id as string,
         tokens: [{ signedToken: jwt, tokenGateId: tokenGate.id }]

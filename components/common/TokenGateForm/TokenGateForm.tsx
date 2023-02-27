@@ -67,7 +67,7 @@ export default function TokenGateForm({
     } else {
       setIsLoading(true);
 
-      charmClient
+      charmClient.tokenGates
         .getTokenGatesForSpace({ spaceDomain })
         .then((gates) => {
           setTokenGates(gates);
@@ -95,7 +95,7 @@ export default function TokenGateForm({
       }
     }
 
-    charmClient
+    charmClient.tokenGates
       .evalueTokenGateEligibility({
         authSig,
         spaceIdOrDomain: spaceDomain
@@ -116,7 +116,7 @@ export default function TokenGateForm({
     setJoiningSpace(true);
 
     try {
-      await charmClient.verifyTokenGate({
+      await charmClient.tokenGates.verifyTokenGate({
         commit: true,
         spaceId: tokenGateResult?.space.id as string,
         tokens:

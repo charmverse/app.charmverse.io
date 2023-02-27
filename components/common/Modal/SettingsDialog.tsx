@@ -27,7 +27,7 @@ import { SETTINGS_TABS, ACCOUNT_TABS } from 'components/settings/pages';
 import RoleSettings from 'components/settings/roles/RoleSettings';
 import SpaceSettings from 'components/settings/workspace/Space';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { CurrentSpaceProvider, useCurrentSpaceId } from 'hooks/useCurrentSpaceId';
+import { useCurrentSpaceId } from 'hooks/useCurrentSpaceId';
 import { useSmallScreen } from 'hooks/useMediaScreens';
 import { MembersProvider } from 'hooks/useMembers';
 import { useSettingsDialog } from 'hooks/useSettingsDialog';
@@ -267,10 +267,8 @@ function SpaceSettingsModalComponent() {
 }
 export function SpaceSettingsDialog() {
   return (
-    <CurrentSpaceProvider>
-      <MembersProvider>
-        <SpaceSettingsModalComponent />
-      </MembersProvider>
-    </CurrentSpaceProvider>
+    <MembersProvider>
+      <SpaceSettingsModalComponent />
+    </MembersProvider>
   );
 }

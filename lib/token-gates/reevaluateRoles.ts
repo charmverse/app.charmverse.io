@@ -1,5 +1,6 @@
 import type { AuthSig } from 'lit-js-sdk';
 
+import log from 'lib/log';
 import { getSpaceMembershipWithRoles } from 'lib/spaces/getSpaceMembershipWithRoles';
 import { applyTokenGates } from 'lib/token-gates/applyTokenGates';
 import { evalueTokenGateEligibility } from 'lib/token-gates/evaluateEligibility';
@@ -51,6 +52,7 @@ export async function reevaluateRoles({
 
     return newRoles;
   } catch (e) {
+    log.warn('Error reevaluating roles', e);
     return [];
   }
 }
