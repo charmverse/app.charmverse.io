@@ -2,12 +2,14 @@ import type { Prisma } from '@prisma/client';
 
 import { prisma } from 'db';
 import { PageNotFoundError } from 'lib/pages/server';
+import { typedKeys } from 'lib/utilities/objects';
 
 import { AllowedPagePermissions } from './available-page-permissions.class';
 import type {
   IPagePermissionFlags,
   IPagePermissionUserRequest,
-  IPageWithNestedSpaceRole
+  IPageWithNestedSpaceRole,
+  PageOperationType
 } from './page-permission-interfaces';
 import { permissionTemplates } from './page-permission-mapping';
 import { computePagePermissionsUsingProposalPermissions } from './pagePermissionsWithComputeProposalPermissions';
@@ -97,7 +99,8 @@ export async function computeUserPagePermissions({
     },
     select: {
       id: true,
-      proposalId: true
+      proposalId: true,
+      convertedProposalId: true
     }
   });
 
@@ -121,6 +124,20 @@ export async function computeUserPagePermissions({
     }),
     prisma.pagePermission.findMany(permissionsQuery({ pageId, userId }))
   ]);
+
+  if (pageInDb.convertedProposalId) {
+    const computedPermissions = new AllowedPagePermissions();
+    const newPermissions = { ...computedPermissions.operationFlags };
+    const allowedOperations: PageOperationType[] = ['read'];
+
+    typedKeys(computedPermissions.operationFlags).forEach((flag) => {
+      if (allowedOperations.includes(flag)) {
+        newPermissions[flag] = true;
+      }
+    });
+
+    return newPermissions;
+  }
 
   // TODO DELETE LATER when we remove admin access to workspace
   if (foundSpaceRole && foundSpaceRole.isAdmin === true && allowAdminBypass) {

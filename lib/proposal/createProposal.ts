@@ -63,12 +63,11 @@ export async function createProposal({ userId, spaceId, categoryId, pageProps, r
     }),
     createPage({
       data: {
-        ...pageProps,
         content: pageProps?.content ?? undefined,
         proposalId,
-        contentText: '',
+        contentText: pageProps?.contentText ?? '',
         path: getPagePath(),
-        title: '',
+        title: pageProps?.title ?? '',
         updatedBy: userId,
         createdBy: userId,
         spaceId,

@@ -4,7 +4,7 @@ import nc from 'next-connect';
 import { prisma } from 'db';
 import { updateTrackPageProfile } from 'lib/metrics/mixpanel/updateTrackPageProfile';
 import { ActionNotPermittedError, NotFoundError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
-import type { IPageWithPermissions } from 'lib/pages';
+import type { IPageWithPermissions, PageMeta } from 'lib/pages';
 import { computeUserPagePermissions } from 'lib/permissions/pages';
 import { computeProposalCategoryPermissions } from 'lib/permissions/proposals/computeProposalCategoryPermissions';
 import { convertPageToProposal } from 'lib/proposal/convertPageToProposal';
@@ -20,7 +20,7 @@ handler
   .use(requireKeys(['categoryId'], 'body'))
   .post(convertToProposal);
 
-async function convertToProposal(req: NextApiRequest, res: NextApiResponse<IPageWithPermissions>) {
+async function convertToProposal(req: NextApiRequest, res: NextApiResponse<PageMeta>) {
   const pageId = req.query.id as string;
   const userId = req.session.user.id;
 
