@@ -1,12 +1,12 @@
 import type { User } from '@prisma/client';
 
 import { prisma } from 'db';
-import { getUserS3FilePath, uploadUrlToS3 } from 'lib/aws/uploadToS3Server';
 import { getENSDetails } from 'lib/blockchain';
 import log from 'lib/log';
 import { getUserNFTs } from 'lib/profile/getUserNFTs';
 import { updateProfileAvatar } from 'lib/profile/updateProfileAvatar';
-import { getFilenameWithExtension } from 'lib/utilities/getFilenameWithExtension';
+
+const acceptedImageFormats = ['.jpg', '.jpeg', '.png', '.webp'];
 
 /**
  * Populate the user profile with:
@@ -19,20 +19,18 @@ import { getFilenameWithExtension } from 'lib/utilities/getFilenameWithExtension
  */
 export async function prepopulateUserProfile(user: User, ens: string | null) {
   const ensDetails = await getENSDetails(ens);
-  const pathInS3 = getUserS3FilePath({ userId: user.id, url: getFilenameWithExtension(ensDetails?.avatar ?? '') });
 
-  if (!user.avatar && ensDetails?.avatar) {
+  if (!user.avatar && ensDetails?.avatar && acceptedImageFormats.some((ext) => ensDetails?.avatar?.endsWith(ext))) {
     try {
-      const { url } = await uploadUrlToS3({ pathInS3, url: ensDetails.avatar });
       await updateProfileAvatar({
-        avatar: url,
+        avatar: ensDetails.avatar,
         avatarContract: null,
         avatarTokenId: null,
         avatarChain: null,
         userId: user.id
       });
-    } catch (e) {
-      log.error('Failed to save avatar', { error: e, pathInS3, url: ensDetails?.avatar, userId: user.id });
+    } catch (error) {
+      log.error('Failed to save avatar from ens', { error, url: ensDetails.avatar, userId: user.id });
     }
   }
 
@@ -50,7 +48,7 @@ export async function prepopulateUserProfile(user: User, ens: string | null) {
         }
       });
     } catch (error) {
-      log.error('Failed to update user details', { userId: user.id, error });
+      log.error('Failed to update user details from ens', { userId: user.id, error });
     }
   }
 
@@ -59,22 +57,29 @@ export async function prepopulateUserProfile(user: User, ens: string | null) {
   if (nfts.length > 0) {
     if (!user.avatar && !ensDetails?.avatar) {
       for (const nft of nfts) {
-        const updatedUser = await updateProfileAvatar({
-          avatar: nft.image,
-          avatarContract: nft.contract,
-          avatarTokenId: nft.tokenId,
-          avatarChain: nft.chainId,
-          userId: user.id
-        });
+        if (acceptedImageFormats.some((ext) => nft.image.endsWith(ext))) {
+          try {
+            const updatedUser = await updateProfileAvatar({
+              avatar: nft.image,
+              avatarContract: nft.contract,
+              avatarTokenId: nft.tokenId,
+              avatarChain: nft.chainId,
+              userId: user.id
+            });
 
-        // I need just the first avatar update that returns successfully
-        if (updatedUser?.avatar) {
-          break;
+            // I need just the first avatar update that returns successfully
+            if (updatedUser?.avatar) {
+              break;
+            }
+          } catch (error) {
+            log.error('Failed to save nft avatar', { error, url: nft.image, userId: user.id });
+          }
         }
       }
     }
 
     const fiveNFTs = nfts.slice(0, 5);
+
     try {
       await Promise.all(
         fiveNFTs.map(async (nft) => {
