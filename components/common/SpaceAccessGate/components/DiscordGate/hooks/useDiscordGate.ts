@@ -44,7 +44,7 @@ export function useDiscordGate({ joinType, spaceDomain, onSuccess }: Props): Dis
     setJoiningSpace(true);
 
     try {
-      const space = await charmClient.discord.verifyDiscordGate(data.spaceId);
+      const space = await charmClient.discord.verifyDiscordGate({ spaceId: data.spaceId, joinType });
 
       showMessage(`You have joined the ${space.name} space.`, 'success');
 
