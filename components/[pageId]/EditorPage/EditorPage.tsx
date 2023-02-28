@@ -107,6 +107,10 @@ export default function EditorPage({ pageId: pageIdOrPath }: { pageId: string })
     [currentPage]
   );
 
+  useEffect(() => {
+    setTitleState(currentPage?.title || 'Untitled');
+  }, [currentPage?.title]);
+
   if (isAccessDenied) {
     return <ErrorPage message={"Sorry, you don't have access to this page"} />;
   } else if (pageNotFound) {
