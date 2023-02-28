@@ -69,10 +69,6 @@ export default function ProposalProperties({ proposalId, readOnly, isTemplate }:
   const isProposalAuthor = user && proposalAuthors.some((author) => author.userId === user.id);
 
   useEffect(() => {
-    if (proposal?.status === 'vote_active' && detailsExpanded) {
-      setDetailsExpanded(false);
-    }
-
     if (!prevStatusRef.current && ['private_draft', 'draft'].includes(proposal?.status || '')) {
       setDetailsExpanded(true);
     }
@@ -194,7 +190,6 @@ export default function ProposalProperties({ proposalId, readOnly, isTemplate }:
           </Stack>
         </>
       )}
-
       <Collapse in={isTemplate ? true : detailsExpanded} timeout='auto' unmountOnExit>
         {!isTemplate && (
           <Grid container mb={2} mt={2}>

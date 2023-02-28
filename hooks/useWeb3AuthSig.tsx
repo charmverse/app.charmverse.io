@@ -66,6 +66,7 @@ export const Web3Context = createContext<Readonly<IContext>>({
 // a wrapper around account and library from web3react
 export function Web3AccountProvider({ children }: { children: ReactNode }) {
   const { account, library, chainId, connector } = useWeb3React();
+
   const {
     triedEager,
     openWalletSelectorModal,

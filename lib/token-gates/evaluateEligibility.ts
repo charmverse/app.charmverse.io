@@ -50,10 +50,6 @@ export async function evalueTokenGateEligibility({
     throw new DataNotFoundError(`Space with ${validUuid ? 'id' : 'domain'} ${spaceIdOrDomain} not found.`);
   }
 
-  if (space.tokenGates.length === 0) {
-    throw new MissingDataError('There are no token gates available in this space.');
-  }
-
   if (!litClient.ready) {
     throw new InvalidStateError('Lit client is not available');
   }
