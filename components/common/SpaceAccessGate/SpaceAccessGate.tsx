@@ -114,9 +114,11 @@ export function SpaceAccessGate({
       {tokenGate.isEnabled && <TokenGate {...tokenGate} displayAccordion={discordGate.isEnabled} />}
 
       {isVerified && (
-        <PrimaryButton fullWidth loading={isJoiningSpace} disabled={isJoiningSpace} onClick={joinSpace}>
-          Join Space
-        </PrimaryButton>
+        <Box mb={2}>
+          <PrimaryButton fullWidth loading={isJoiningSpace} disabled={isJoiningSpace} onClick={joinSpace}>
+            Join Space
+          </PrimaryButton>
+        </Box>
       )}
 
       {walletGateEnabled && !isVerified && (

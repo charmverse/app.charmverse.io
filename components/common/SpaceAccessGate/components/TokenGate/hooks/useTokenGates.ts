@@ -63,9 +63,6 @@ export function useTokenGates({
       })
       .then((verifyResult) => {
         setTokenGateResult(verifyResult);
-        if (verifyResult.canJoinSpace) {
-          showMessage('Verification succeeded.', 'success');
-        }
       })
       .catch((err: any) => {
         showMessage(err?.message ?? 'An unknown error occurred', err?.severity ?? 'error');
