@@ -112,12 +112,13 @@ export default function BountiesPage({ publicMode = false, bounties }: Props) {
                 )}
               </Grid>
             </Grid>
-            <Stack flexDirection='row' justifyContent='space-between' mb={1}>
+            <Stack className='ViewHeader' flexDirection='row' justifyContent='space-between' mb={1}>
               <Tabs
                 textColor='primary'
                 indicatorColor='secondary'
-                value={currentView}
+                value={currentView.view}
                 sx={{ minHeight: 0, height: 'fit-content' }}
+                key={currentView.label}
               >
                 {views.map(({ label, view }) => (
                   <Tab
@@ -133,12 +134,13 @@ export default function BountiesPage({ publicMode = false, bounties }: Props) {
                         }}
                         variant='text'
                         size='small'
+                        sx={{ p: 0, mb: '5px' }}
                         color={currentView.label === label ? 'textPrimary' : 'secondary'}
                       >
                         {label[0].toUpperCase() + label.slice(1)}
                       </StyledButton>
                     }
-                    sx={{ p: 0, mb: '5px' }}
+                    sx={{ p: 0 }}
                     value={view}
                   />
                 ))}
