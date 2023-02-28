@@ -19,6 +19,11 @@ const StyledBox = styled(Box)`
   border: none;
   background-color: var(--background-paper);
   transition: background 100ms ease-out 0s;
+  box-shadow: rgba(15, 15, 15, 0.1) 0px 0px 0px 1px, rgba(15, 15, 15, 0.1) 0px 2px 4px;
+
+  .gallery-title {
+    border: none;
+  }
 
   @media (pointer: fine) {
     &:hover {
