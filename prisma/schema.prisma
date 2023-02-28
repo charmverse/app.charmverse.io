@@ -227,7 +227,7 @@ model Space {
   defaultPublicPages          Boolean?                          @default(false)
   permissionConfigurationMode SpacePermissionConfigurationMode? @default(custom)
   publicBountyBoard           Boolean?                          @default(false)
-  xpsEngineId                 String?
+  xpsEngineId                 String?                           @unique
   author                      User                              @relation(fields: [createdBy], references: [id], onDelete: Cascade)
   blocks                      Block[]
   bounties                    Bounty[]
@@ -434,6 +434,7 @@ model User {
   path                      String?                         @unique
   identityType              IdentityType?
   email                     String?
+  xpsEngineId               String?                         @unique
   applications              Application[]
   blocks                    Block[]
   bounties                  Bounty[]
@@ -462,6 +463,7 @@ model User {
   proposalsAuthored         ProposalAuthor[]
   proposalsReviewed         ProposalReviewer[]
   reviewedProposals         Proposal[]
+  spaceNotificationSettings UserSpaceNotificationSettings[]
   workspaceEvents           WorkspaceEvent[]
   wallets                   UserWallet[]
   memberPropertyValues      MemberPropertyValue[]
@@ -469,8 +471,7 @@ model User {
   unstoppableDomains        UnstoppableDomain[]
   postComments              PostComment[]
   googleAccounts            GoogleAccount[]
-  googleCredentials         GoogleCredential[]
-  spaceNotificationSettings UserSpaceNotificationSettings[]
+  GoogleCredential          GoogleCredential[]
 }
 
 model UserWallet {

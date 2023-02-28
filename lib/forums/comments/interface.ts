@@ -1,6 +1,8 @@
-import type { PostComment } from '@prisma/client';
+import type { PostComment, User } from '@prisma/client';
 
 import type { PageContent } from 'lib/prosemirror/interfaces';
+
+export type TaskUser = Pick<User, 'id' | 'username' | 'path' | 'avatar' | 'avatarTokenId'>;
 
 export type PostCommentWithVote = PostComment & {
   upvotes: number;
@@ -24,3 +26,22 @@ export type UpdatePostCommentInput = {
 };
 
 export type PostCommentVote = { upvotes: number; downvotes: number; upvoted: boolean | null };
+
+export type ForumTask = {
+  spaceId: string;
+  spaceDomain: string;
+  spaceName: string;
+  postId: string;
+  postPath: string;
+  postTitle: string;
+  createdAt: string;
+  commentId: string | null;
+  mentionId: string | null;
+  commentText: string;
+  createdBy: TaskUser | null;
+};
+
+export type ForumTasksGroup = {
+  marked: ForumTask[];
+  unmarked: ForumTask[];
+};
