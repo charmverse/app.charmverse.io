@@ -1,16 +1,14 @@
 import { Box } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
-import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import Modal from 'components/common/Modal';
-import TokenGateForm from 'components/common/TokenGateForm';
+import { SpaceAccessGate } from 'components/common/SpaceAccessGate/SpaceAccessGate';
 import { WalletSign } from 'components/login/WalletSign';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsSpaceMember } from 'hooks/useIsSpaceMember';
-import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import type { PageMeta } from 'lib/pages';
@@ -74,7 +72,7 @@ export function BountySignupButton({ bountyPage }: Props) {
             <WalletSign signSuccess={loginFromWeb3Account} />
           </Box>
         ) : (
-          <TokenGateForm
+          <SpaceAccessGate
             onSuccess={() => {
               window.location.href = `${window.location.origin}/${space?.domain}/${bountyPage.path}`;
             }}

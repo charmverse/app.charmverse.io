@@ -9,8 +9,8 @@ import { useEffect } from 'react';
 import getBaseLayout from 'components/common/BaseLayout/BaseLayout';
 import Button from 'components/common/Button';
 import { DialogTitle } from 'components/common/Modal';
-import { JoinDynamicSpaceForm } from 'components/common/TokenGateForm/JoinDynamicSpaceForm';
-import { JoinPredefinedSpaceDomain } from 'components/common/TokenGateForm/JoinPredefinedSpaceDomain';
+import { SpaceAccessGate } from 'components/common/SpaceAccessGate/SpaceAccessGate';
+import { SpaceAccessGateWithSearch } from 'components/common/SpaceAccessGate/SpaceAccessGateWithSearch';
 import { useSpaces } from 'hooks/useSpaces';
 
 export function AlternateRouteButton({ href, children }: { href: string; children: ReactNode }) {
@@ -47,7 +47,7 @@ export default function JoinWorkspace() {
       <Card sx={{ p: 4, mb: 3 }} variant='outlined'>
         <DialogTitle>Join a space</DialogTitle>
         <Divider />
-        {domain ? <JoinPredefinedSpaceDomain spaceDomain={domain} /> : <JoinDynamicSpaceForm />}
+        {domain ? <SpaceAccessGate spaceDomain={domain} /> : <SpaceAccessGateWithSearch />}
       </Card>
       <AlternateRouteButton href='/createWorkspace'>Create a space</AlternateRouteButton>
     </Box>

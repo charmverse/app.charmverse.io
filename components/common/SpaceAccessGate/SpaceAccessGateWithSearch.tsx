@@ -12,7 +12,7 @@ import charmClient from 'charmClient';
 import AvatarWithIcons from '../AvatarWithIcons';
 import FieldLabel from '../form/FieldLabel';
 
-import TokenGateForm from './TokenGateForm';
+import { SpaceAccessGate } from './SpaceAccessGate';
 
 function stripUrlParts(maybeUrl: string) {
   return maybeUrl.replace('https://app.charmverse.io/', '').replace('http://localhost:3000/', '').split('/')[0];
@@ -29,7 +29,7 @@ type Props = {
   goBack?: () => void;
 };
 
-export function JoinDynamicSpaceForm({ goBack }: Props) {
+export function SpaceAccessGateWithSearch({ goBack }: Props) {
   const router = useRouter();
   const [spaceDomain, setSpaceDomain] = useState<string>(router.query.domain as string);
   const [spacesInfo, setSpacesInfo] = useState<Space[]>([]);
@@ -114,7 +114,7 @@ export function JoinDynamicSpaceForm({ goBack }: Props) {
           />
         )}
       />
-      {selectedSpace && <TokenGateForm onSuccess={onJoinSpace} spaceDomain={selectedSpace.domain} />}
+      {selectedSpace && <SpaceAccessGate onSuccess={onJoinSpace} spaceDomain={selectedSpace.domain} />}
     </Box>
   );
 }

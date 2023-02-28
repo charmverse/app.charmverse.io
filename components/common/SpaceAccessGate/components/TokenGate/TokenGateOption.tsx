@@ -7,9 +7,10 @@ import Typography from '@mui/material/Typography';
 import { humanizeAccessControlConditions } from 'lit-js-sdk';
 import { useEffect, useState } from 'react';
 
-import { VerifyCheckmark } from 'components/common/TokenGateForm/VerifyCheckmark';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import type { TokenGateWithRoles } from 'lib/token-gates/interfaces';
+
+import { VerifyCheckmark } from './VerifyCheckmark';
 
 interface Props {
   tokenGate: TokenGateWithRoles;
@@ -17,7 +18,7 @@ interface Props {
   isVerifying: boolean;
 }
 
-export default function TokenGateOption({ tokenGate, validGate, isVerifying }: Props) {
+export function TokenGateOption({ tokenGate, validGate, isVerifying }: Props) {
   const { account } = useWeb3AuthSig();
   const [description, setDescription] = useState<string>('');
 
