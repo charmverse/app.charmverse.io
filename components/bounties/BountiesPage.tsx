@@ -46,7 +46,9 @@ const views: { label: string; view: 'gallery' | 'board' }[] = [
 export default function BountiesPage({ publicMode = false, bounties }: Props) {
   const space = useCurrentSpace();
   const router = useRouter();
-  const [currentView, setCurrentView] = useState<(typeof views)[0]>(views[0]);
+  const [currentView, setCurrentView] = useState<(typeof views)[0]>(
+    views.find((view) => view.view === router.query.view) ?? views[0]
+  );
 
   useEffect(() => {
     charmClient.track.trackAction('page_view', { spaceId: space?.id, type: 'bounties_list' });
@@ -113,49 +115,52 @@ export default function BountiesPage({ publicMode = false, bounties }: Props) {
                 )}
               </Grid>
             </Grid>
-            <Stack className='ViewHeader' flexDirection='row' justifyContent='space-between' mb={1}>
-              <Tabs
-                textColor='primary'
-                indicatorColor='secondary'
-                value={currentView.view}
-                sx={{ minHeight: 0, height: 'fit-content' }}
-                key={currentView.label}
-              >
-                {views.map(({ label, view }) => (
-                  <Tab
-                    component='div'
-                    disableRipple
-                    key={label}
-                    label={
-                      <StyledButton
-                        startIcon={
-                          view === 'board' ? (
-                            <BountyIcon fontSize='small' />
-                          ) : (
-                            <ModeStandbyOutlinedIcon fontSize='small' />
-                          )
-                        }
-                        onClick={() => {
-                          setCurrentView({ label, view });
-                          setUrlWithoutRerender(router.pathname, { view });
-                        }}
-                        variant='text'
-                        size='small'
-                        sx={{ p: 0, mb: '5px', width: '100%' }}
-                        color={currentView.label === label ? 'textPrimary' : 'secondary'}
-                      >
-                        {label[0].toUpperCase() + label.slice(1)}
-                      </StyledButton>
-                    }
-                    sx={{ p: 0 }}
-                    value={view}
-                  />
-                ))}
-              </Tabs>
-            </Stack>
+            {bounties.length !== 0 && (
+              <Stack className='ViewHeader' flexDirection='row' justifyContent='space-between' mb={1}>
+                <Tabs
+                  textColor='primary'
+                  indicatorColor='secondary'
+                  value={currentView.view}
+                  sx={{ minHeight: 0, height: 'fit-content' }}
+                  key={currentView.label}
+                >
+                  {views.map(({ label, view }) => (
+                    <Tab
+                      component='div'
+                      disableRipple
+                      key={label}
+                      label={
+                        <StyledButton
+                          startIcon={
+                            view === 'board' ? (
+                              <BountyIcon fontSize='small' />
+                            ) : (
+                              <ModeStandbyOutlinedIcon fontSize='small' />
+                            )
+                          }
+                          onClick={() => {
+                            setCurrentView({ label, view });
+                            setUrlWithoutRerender(router.pathname, { view });
+                          }}
+                          variant='text'
+                          size='small'
+                          sx={{ p: 0, mb: '5px', width: '100%' }}
+                          color={currentView.label === label ? 'textPrimary' : 'secondary'}
+                        >
+                          {label[0].toUpperCase() + label.slice(1)}
+                        </StyledButton>
+                      }
+                      sx={{ p: 0 }}
+                      value={view}
+                    />
+                  ))}
+                </Tabs>
+              </Stack>
+            )}
           </div>
           <div className='container-container'>
-            {bounties.length === 0 ? (
+            {bounties.length === 0 ||
+            (currentView.view === 'gallery' && bounties.filter((bounty) => bounty.status === 'open').length === 0) ? (
               <EmptyStateVideo
                 description='Getting started with bounties'
                 videoTitle='Bounties | Getting started with Charmverse'
