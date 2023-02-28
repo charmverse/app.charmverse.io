@@ -1,5 +1,4 @@
-import type { Browser } from '@playwright/test';
-import { test as base, chromium, expect } from '@playwright/test';
+import { test as base, expect } from '@playwright/test';
 import { PageHeader } from '__e2e__/po/pageHeader.po';
 
 import { generateProposalCategory } from 'testing/utils/proposals';
@@ -19,14 +18,13 @@ const test = base.extend<Fixtures>({
 });
 
 test('convert page to proposal - create a page, convert that page to proposal and assert editor is readonly with proposal banner', async ({
-  page,
   documentPage,
   pageHeader
 }) => {
   const { space, user, page: generatedPage } = await generateUserAndSpace({ isAdmin: true });
 
   await login({
-    page,
+    page: documentPage.page,
     userId: user.id
   });
 
@@ -42,10 +40,7 @@ test('convert page to proposal - create a page, convert that page to proposal an
     path: generatedPage.path
   });
 
-  await pageHeader.pageTopLevelMenu.click();
-
-  const pageConvertProposalAction = page.locator('data-test=page-convert-proposal-action');
-  await pageConvertProposalAction.click();
+  await pageHeader.convertToProposal();
 
   // Go back to page to assert that we have the proposal conversion banner and editor is readonly
   await documentPage.goToPage({
@@ -53,11 +48,9 @@ test('convert page to proposal - create a page, convert that page to proposal an
     path: generatedPage.path
   });
 
+  await expect(documentPage.proposalBanner).toBeVisible();
+
   const isEditable = await documentPage.isPageEditable();
 
   expect(isEditable).toBe(false);
-
-  const postProposalBanner = page.locator('data-test=proposal-banner');
-
-  await expect(postProposalBanner).toBeVisible();
 });

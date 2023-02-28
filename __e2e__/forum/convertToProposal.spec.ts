@@ -20,15 +20,14 @@ const test = base.extend<Fixtures>({
 });
 
 test('convert post to proposal - create a post, convert that post to proposal and assert editor is readonly with proposal banner', async ({
-  page,
+  pageHeader,
   forumPostPage,
-  pageHeader
+  page
 }) => {
   const { space, user } = await createUserAndSpace({
     browserPage: page,
     permissionConfigurationMode: 'collaborative'
   });
-
   await login({
     page,
     userId: user.id
@@ -66,10 +65,7 @@ test('convert post to proposal - create a post, convert that post to proposal an
     path: post.path
   });
 
-  await pageHeader.pageTopLevelMenu.click();
-
-  const forumPostConvertProposalAction = page.locator('data-test=forum-post-convert-proposal-action');
-  await forumPostConvertProposalAction.click();
+  await pageHeader.convertToProposal();
 
   // Go back to post page to assert that we have the proposal conversion banner and editor is readonly
   await forumPostPage.goToPostPage({
@@ -92,9 +88,9 @@ test('convert post to proposal - create a post, convert that post to proposal an
 });
 
 test('convert post to proposal - disabled convert proposal action for readOnly workspaces', async ({
-  page,
+  forumPostPage,
   pageHeader,
-  forumPostPage
+  page
 }) => {
   const { space, user } = await createUserAndSpace({
     browserPage: page,
@@ -149,7 +145,5 @@ test('convert post to proposal - disabled convert proposal action for readOnly w
   });
 
   await pageHeader.pageTopLevelMenu.click();
-
-  const forumPostConvertProposalAction = page.locator('data-test=forum-post-convert-proposal-action');
-  expect(forumPostConvertProposalAction.isDisabled()).toBeTruthy();
+  await expect(pageHeader.convertProposalAction).toBeDisabled();
 });

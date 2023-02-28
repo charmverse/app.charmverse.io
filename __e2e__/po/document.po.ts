@@ -23,6 +23,8 @@ export class DocumentPage {
 
   charmEditor: Locator;
 
+  proposalBanner: Locator;
+
   constructor(page: Page) {
     this.page = page;
     this.header = new PageHeader(page);
@@ -31,7 +33,8 @@ export class DocumentPage {
     this.deletePermanentlyButton = this.page.locator('data-test=banner--permanently-delete');
     this.restoreArchivedButton = this.page.locator('data-test=banner--restore-archived-page');
     this.trashModal = this.page.locator('data-test=trash-modal');
-    this.charmEditor = this.page.locator('data-test=page-charmeditor').locator('div[contenteditable]').first();
+    this.charmEditor = this.page.locator('data-test=page-charmeditor >> div[contenteditable]').first();
+    this.proposalBanner = this.page.locator('data-test=proposal-banner');
   }
 
   async goToPage({ domain, path }: { domain: string; path: string }) {
