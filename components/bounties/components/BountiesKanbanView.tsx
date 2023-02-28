@@ -9,7 +9,7 @@ import { usePages } from 'hooks/usePages';
 import type { BountyWithDetails } from 'lib/bounties';
 import type { PageMeta } from 'lib/pages';
 
-import BountyCard from './BountyCard';
+import BountyKanbanCard from './BountyKanbanCard';
 import { BountyStatusChip } from './BountyStatusBadge';
 
 const bountyStatuses: BountyStatus[] = ['open', 'inProgress', 'complete', 'paid', 'suggestion'];
@@ -85,7 +85,7 @@ export default function BountiesKanbanView({ bounties, publicMode }: Props) {
             {bountiesGroupedByStatus[bountyStatus]
               .filter((bounty) => Boolean(pages[bounty.page?.id]) && pages[bounty.page.id]?.deletedAt === null)
               .map((bounty) => (
-                <BountyCard
+                <BountyKanbanCard
                   onDelete={onClickDelete}
                   readOnly={!!publicMode}
                   key={bounty.id}

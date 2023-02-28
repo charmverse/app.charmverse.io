@@ -1,9 +1,12 @@
-import { Box, Grid, Typography } from '@mui/material';
+import styled from '@emotion/styled';
+import { Box, Grid, Stack, Tab, Tabs, Typography } from '@mui/material';
 import { BountyStatus } from '@prisma/client';
-import { useEffect, useMemo } from 'react';
+import { useRouter } from 'next/router';
+import { useEffect, useMemo, useState } from 'react';
 import { CSVLink } from 'react-csv';
 
 import charmClient from 'charmClient';
+import { iconForViewType } from 'components/common/BoardEditor/focalboard/src/components/viewMenu';
 import Button from 'components/common/Button';
 import { EmptyStateVideo } from 'components/common/EmptyStateVideo';
 import { PageDialogProvider } from 'components/common/PageDialog/hooks/usePageDialog';
@@ -11,8 +14,10 @@ import PageDialogGlobalModal from 'components/common/PageDialog/PageDialogGlobal
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { BountyWithDetails } from 'lib/bounties';
 import { sortArrayByObjectProperty } from 'lib/utilities/array';
+import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
 import BountiesKanbanView from './components/BountiesKanbanView';
+import BountiesGalleryView from './components/BountyGalleryView';
 import MultiPaymentModal from './components/MultiPaymentModal';
 import NewBountyButton from './components/NewBountyButton';
 
@@ -23,8 +28,24 @@ interface Props {
   bounties: BountyWithDetails[];
 }
 
+const StyledButton = styled(Button)`
+  padding: ${({ theme }) => theme.spacing(0.5, 1)};
+
+  .Icon {
+    width: 20px;
+    height: 20px;
+  }
+`;
+
+const views: { label: string; view: 'gallery' | 'board' }[] = [
+  { label: 'Ongoing', view: 'gallery' },
+  { label: 'All', view: 'board' }
+];
+
 export default function BountiesPage({ publicMode = false, bounties }: Props) {
   const space = useCurrentSpace();
+  const router = useRouter();
+  const [currentView, setCurrentView] = useState<(typeof views)[0]>(views[0]);
 
   useEffect(() => {
     charmClient.track.trackAction('page_view', { spaceId: space?.id, type: 'bounties_list' });
@@ -91,6 +112,38 @@ export default function BountiesPage({ publicMode = false, bounties }: Props) {
                 )}
               </Grid>
             </Grid>
+            <Stack flexDirection='row' justifyContent='space-between' mb={1}>
+              <Tabs
+                textColor='primary'
+                indicatorColor='secondary'
+                value={currentView}
+                sx={{ minHeight: 0, height: 'fit-content' }}
+              >
+                {views.map(({ label, view }) => (
+                  <Tab
+                    component='div'
+                    disableRipple
+                    key={label}
+                    label={
+                      <StyledButton
+                        startIcon={iconForViewType(view)}
+                        onClick={() => {
+                          setCurrentView({ label, view });
+                          setUrlWithoutRerender(router.pathname, { view });
+                        }}
+                        variant='text'
+                        size='small'
+                        color={currentView.label === label ? 'textPrimary' : 'secondary'}
+                      >
+                        {label[0].toUpperCase() + label.slice(1)}
+                      </StyledButton>
+                    }
+                    sx={{ p: 0, mb: '5px' }}
+                    value={view}
+                  />
+                ))}
+              </Tabs>
+            </Stack>
           </div>
           <div className='container-container'>
             {bounties.length === 0 ? (
@@ -99,6 +152,8 @@ export default function BountiesPage({ publicMode = false, bounties }: Props) {
                 videoTitle='Bounties | Getting started with Charmverse'
                 videoUrl='https://tiny.charmverse.io/bounties'
               />
+            ) : currentView.view === 'gallery' ? (
+              <BountiesGalleryView bounties={bounties} publicMode={publicMode} />
             ) : (
               <BountiesKanbanView publicMode={publicMode} bounties={bounties} />
             )}
