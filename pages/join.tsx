@@ -56,7 +56,7 @@ export default function JoinWorkspace() {
         {domain && isSpaceLoading && <LoadingComponent height='80px' isLoading={true} />}
         {domain && !isSpaceLoading && spaceError && <Alert severity='error'>No space found</Alert>}
         {domain && space && <SpaceAccessGate space={space} />}
-        {!domain && <SpaceAccessGateWithSearch />}
+        {router.isReady && !domain && <SpaceAccessGateWithSearch />}
       </Card>
       <AlternateRouteButton href='/createWorkspace'>Create a space</AlternateRouteButton>
     </Box>
