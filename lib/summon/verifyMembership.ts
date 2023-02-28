@@ -47,8 +47,8 @@ export async function verifyMembership({
     });
     const discordAccount = user.discordUser?.account as unknown as DiscordAccount;
     const summonUserId = await findUserByIdentity({
-      walletAddress: '0x91d76d31080ca88339a4e506affb4ded4b192bcb',
-      // walletAddress: user.wallets[0]?.address,
+      // walletAddress: '0x91d76d31080ca88339a4e506affb4ded4b192bcb',
+      walletAddress: user.wallets[0]?.address,
       email: user.googleAccounts[0]?.email,
       discordHandle: discordAccount?.username
     });
