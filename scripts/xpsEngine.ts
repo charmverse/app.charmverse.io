@@ -1,5 +1,5 @@
 
-import * as xps from 'lib/xpsEngine/client';
+import * as xps from 'lib/summon/api';
 
 const walletAddress = '0x91d76d31080ca88339a4e506affb4ded4b192bcb'
 const discordHandle = 'playerx#2240'

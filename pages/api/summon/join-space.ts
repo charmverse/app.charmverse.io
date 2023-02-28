@@ -1,16 +1,16 @@
-import type { Space } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { applyDiscordGate } from 'lib/discord/applyDiscordGate';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { updateTrackUserProfileById } from 'lib/metrics/mixpanel/updateTrackUserProfileById';
 import { logWorkspaceJoinedViaTokenGate } from 'lib/metrics/postToDiscord';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { requireKeys } from 'lib/middleware/requireKeys';
 import { withSessionRoute } from 'lib/session/withSession';
+import { addUserToSpace } from 'lib/summon/addUserToSpace';
+import { verifyMembership } from 'lib/summon/verifyMembership';
 import type { TokenGateJoinType } from 'lib/token-gates/interfaces';
-import { UnauthorisedActionError } from 'lib/utilities/errors';
+import { InvalidInputError } from 'lib/utilities/errors';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 import { publishMemberEvent } from 'lib/webhookPublisher/publishEvent';
 
@@ -18,23 +18,25 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
   .use(requireUser)
-  .use(requireKeys([{ key: 'spaceId', truthy: true }], 'body'))
-  .post(verifyDiscordGateEndpoint);
+  .use(requireKeys([{ key: 'spaceId', truthy: true }], 'query'))
+  .get(joinSpaceEndpoint);
 
-async function verifyDiscordGateEndpoint(req: NextApiRequest, res: NextApiResponse<Space>) {
-  const { spaceId, joinType } = req.body as { spaceId: string; joinType: TokenGateJoinType };
-  const userId = req.session.user?.id;
+async function joinSpaceEndpoint(req: NextApiRequest, res: NextApiResponse) {
+  const spaceId = req.query.spaceId as string;
+  const userId = req.session?.user?.id;
 
-  const space = await applyDiscordGate({ spaceId, userId });
+  const result = await verifyMembership({ spaceId, userId });
 
-  if (!space) {
-    throw new UnauthorisedActionError('You do not have access to this space');
+  if (!result.isVerified) {
+    throw new InvalidInputError('You are not a member of this space');
   }
+
+  await addUserToSpace({ spaceId, userId });
 
   trackUserAction('join_a_workspace', {
     spaceId,
     userId,
-    source: joinType ?? 'token_gate'
+    source: (req.query.joinType as TokenGateJoinType) ?? 'token_gate'
   });
 
   publishMemberEvent({
@@ -47,7 +49,7 @@ async function verifyDiscordGateEndpoint(req: NextApiRequest, res: NextApiRespon
 
   logWorkspaceJoinedViaTokenGate(spaceId);
 
-  return res.status(201).json(space);
+  return res.status(201).json(result);
 }
 
 export default withSessionRoute(handler);

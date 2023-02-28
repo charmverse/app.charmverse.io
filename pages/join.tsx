@@ -1,13 +1,14 @@
 import NavigateNextIcon from '@mui/icons-material/ArrowRightAlt';
-import Box from '@mui/material/Box';
-import Card from '@mui/material/Card';
-import Divider from '@mui/material/Divider';
+import { Alert, Box, Card, Divider } from '@mui/material';
 import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
 import { useEffect } from 'react';
+import useSWR from 'swr';
 
+import charmClient from 'charmClient';
 import getBaseLayout from 'components/common/BaseLayout/BaseLayout';
 import Button from 'components/common/Button';
+import LoadingComponent from 'components/common/LoadingComponent';
 import { DialogTitle } from 'components/common/Modal';
 import { SpaceAccessGate } from 'components/common/SpaceAccessGate/SpaceAccessGate';
 import { SpaceAccessGateWithSearch } from 'components/common/SpaceAccessGate/SpaceAccessGateWithSearch';
@@ -34,11 +35,16 @@ export default function JoinWorkspace() {
   const router = useRouter();
   const domain = router.query.domain as string;
   const { spaces } = useSpaces();
+  const {
+    data: space,
+    isLoading: isSpaceLoading,
+    error: spaceError
+  } = useSWR(domain ? `space/${domain}` : null, () => charmClient.spaces.searchByDomain(stripUrlParts(domain || '')));
 
   useEffect(() => {
-    const space = spaces.find((_space) => _space.domain === router.query.domain);
-    if (space) {
-      router.push(`/${router.query.domain}`);
+    const connectedSpace = spaces.find((_space) => _space.domain === router.query.domain);
+    if (connectedSpace) {
+      router.push(`/${connectedSpace.domain}`);
     }
   }, [spaces]);
 
@@ -47,11 +53,18 @@ export default function JoinWorkspace() {
       <Card sx={{ p: 4, mb: 3 }} variant='outlined'>
         <DialogTitle>Join a space</DialogTitle>
         <Divider />
-        {domain ? <SpaceAccessGate spaceDomain={domain} /> : <SpaceAccessGateWithSearch />}
+        {domain && isSpaceLoading && <LoadingComponent height='80px' isLoading={true} />}
+        {domain && !isSpaceLoading && spaceError && <Alert severity='error'>No space found</Alert>}
+        {domain && space && <SpaceAccessGate space={space} />}
+        {router.isReady && !domain && <SpaceAccessGateWithSearch />}
       </Card>
       <AlternateRouteButton href='/createWorkspace'>Create a space</AlternateRouteButton>
     </Box>
   );
+}
+
+function stripUrlParts(maybeUrl: string) {
+  return maybeUrl.replace('https://app.charmverse.io/', '').replace('http://localhost:3000/', '').split('/')[0];
 }
 
 JoinWorkspace.getLayout = getBaseLayout;

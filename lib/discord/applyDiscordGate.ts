@@ -2,11 +2,8 @@ import type { Space } from '@prisma/client';
 
 import { prisma } from 'db';
 import { verifyDiscordGateForSpace } from 'lib/discord/verifyDiscordGateForSpace';
-import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { createAndAssignRoles } from 'lib/roles/createAndAssignRoles';
 import { InvalidInputError } from 'lib/utilities/errors';
-import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
-import { publishMemberEvent } from 'lib/webhookPublisher/publishEvent';
 
 type Props = {
   spaceId: string;
@@ -25,9 +22,9 @@ export async function applyDiscordGate({ spaceId, userId }: Props): Promise<Spac
     throw new InvalidInputError('User not found');
   }
 
-  const { isEligible, roles } = await verifyDiscordGateForSpace({ space, discordUserId: user?.discordUser?.discordId });
+  const { isVerified, roles } = await verifyDiscordGateForSpace({ space, discordUserId: user?.discordUser?.discordId });
 
-  if (!isEligible) {
+  if (!isVerified) {
     return null;
   }
 
@@ -53,12 +50,6 @@ export async function applyDiscordGate({ spaceId, userId }: Props): Promise<Spac
           }
         }
       }
-    });
-    trackUserAction('join_a_workspace', { userId, source: 'invite_link', spaceId: space.id });
-    publishMemberEvent({
-      scope: WebhookEventNames.UserJoined,
-      spaceId: space.id,
-      userId
     });
   }
 

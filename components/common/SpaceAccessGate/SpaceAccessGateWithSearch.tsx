@@ -1,13 +1,13 @@
 import styled from '@emotion/styled';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import { Autocomplete, IconButton, Popper, Stack, TextField, Typography, Box } from '@mui/material';
-import type { Space } from '@prisma/client';
 import { debounce } from 'lodash';
 import { useRouter } from 'next/router';
 import type { ChangeEvent } from 'react';
 import { useEffect, useMemo, useState } from 'react';
 
 import charmClient from 'charmClient';
+import type { SpaceWithGates } from 'lib/spaces/interfaces';
 
 import AvatarWithIcons from '../AvatarWithIcons';
 import FieldLabel from '../form/FieldLabel';
@@ -32,17 +32,17 @@ type Props = {
 export function SpaceAccessGateWithSearch({ goBack }: Props) {
   const router = useRouter();
   const [spaceDomain, setSpaceDomain] = useState<string>(router.query.domain as string);
-  const [spacesInfo, setSpacesInfo] = useState<Space[]>([]);
-  const [selectedSpace, setSelectedSpace] = useState<null | Space>(null);
+  const [spacesInfo, setSpacesInfo] = useState<SpaceWithGates[]>([]);
+  const [selectedSpace, setSelectedSpace] = useState<null | SpaceWithGates>(null);
 
-  async function onJoinSpace(joinedSpace: Space) {
-    router.push(`/${joinedSpace.domain}`);
+  async function goToSpace(domain: string) {
+    router.push(`/${domain}`);
   }
 
   const debouncedGetPublicSpaces = useMemo(() => {
     return debounce((spaceName: string) => {
-      charmClient
-        .getSpacesByName(spaceName)
+      charmClient.spaces
+        .searchByName(spaceName)
         .then((_spaces) => {
           setSpacesInfo(_spaces);
         })
@@ -75,7 +75,7 @@ export function SpaceAccessGateWithSearch({ goBack }: Props) {
         )}
         Enter a CharmVerse space name
       </FieldLabel>
-      <Autocomplete<Space>
+      <Autocomplete<SpaceWithGates>
         disablePortal
         options={spacesInfo}
         placeholder='my-space'
@@ -114,7 +114,7 @@ export function SpaceAccessGateWithSearch({ goBack }: Props) {
           />
         )}
       />
-      {selectedSpace && <SpaceAccessGate onSuccess={onJoinSpace} spaceDomain={selectedSpace.domain} />}
+      {selectedSpace && <SpaceAccessGate onSuccess={() => goToSpace(selectedSpace.domain)} space={selectedSpace} />}
     </Box>
   );
 }

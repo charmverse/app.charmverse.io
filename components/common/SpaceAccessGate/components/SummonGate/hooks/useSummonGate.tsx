@@ -1,4 +1,3 @@
-import type { Space } from '@prisma/client';
 import { useState } from 'react';
 import useSWR from 'swr';
 
@@ -6,33 +5,34 @@ import charmClient from 'charmClient';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
-import type { CheckDiscordGateResult } from 'lib/discord/interface';
+import type { SpaceWithGates } from 'lib/spaces/interfaces';
+import type { VerificationResponse } from 'lib/summon/verifyMembership';
 import type { TokenGateJoinType } from 'lib/token-gates/interfaces';
 
 type Props = {
   joinType?: TokenGateJoinType;
-  spaceDomain: string;
+  space: SpaceWithGates;
   onSuccess: () => void;
 };
 
-export type DiscordGateState = {
+export type SummonGateState = {
   isEnabled: boolean;
   isVerifying: boolean;
-  isConnectedToDiscord: boolean;
-  discordGate?: CheckDiscordGateResult;
-  joinSpace: () => Promise<void>;
+  isVerified: boolean;
+  verifyResult?: VerificationResponse;
+  joinSpace: () => void;
   joiningSpace: boolean;
 };
 
-export function useDiscordGate({ joinType, spaceDomain, onSuccess }: Props): DiscordGateState {
+export function useSummonGate({ joinType = 'token_gate', space, onSuccess }: Props): SummonGateState {
   const { user, refreshUser } = useUser();
   const { showMessage } = useSnackbar();
-  const discordUserId = user?.discordUser?.discordId;
   const [joiningSpace, setJoiningSpace] = useState(false);
   const { spaces, setSpaces } = useSpaces();
 
-  const { data } = useSWR(spaceDomain ? `discord/gate/${spaceDomain}/${discordUserId || ''}` : null, () =>
-    charmClient.discord.checkDiscordGate(spaceDomain)
+  const { data, isLoading: isVerifying } = useSWR(
+    space.xpsEngineId ? `discord/gate/${space.id}/${user?.id}` : null,
+    () => charmClient.summon.verifyMembership({ spaceId: space.id })
   );
 
   async function joinSpace() {
@@ -44,7 +44,7 @@ export function useDiscordGate({ joinType, spaceDomain, onSuccess }: Props): Dis
     setJoiningSpace(true);
 
     try {
-      const space = await charmClient.discord.verifyDiscordGate({ spaceId: data.spaceId, joinType });
+      await charmClient.summon.joinVerifiedSpace({ joinType, spaceId: space.id });
 
       showMessage(`You have joined the ${space.name} space.`, 'success');
 
@@ -52,7 +52,7 @@ export function useDiscordGate({ joinType, spaceDomain, onSuccess }: Props): Dis
 
       const spaceExists = spaces.some((s) => s.id === space.id);
       if (!spaceExists) {
-        setSpaces([...spaces, space as Space]);
+        setSpaces([...spaces, space]);
       }
 
       onSuccess();
@@ -64,10 +64,10 @@ export function useDiscordGate({ joinType, spaceDomain, onSuccess }: Props): Dis
   }
 
   return {
-    isEnabled: !!data?.hasDiscordServer,
-    isVerifying: !!discordUserId && !data,
-    discordGate: data,
-    isConnectedToDiscord: !!discordUserId,
+    isVerifying,
+    isEnabled: !!space.xpsEngineId,
+    verifyResult: data,
+    isVerified: !!data?.isVerified,
     joinSpace,
     joiningSpace
   };
