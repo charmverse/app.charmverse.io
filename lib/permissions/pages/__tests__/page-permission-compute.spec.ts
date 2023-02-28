@@ -41,7 +41,7 @@ describe('computeUserPagePermissions', () => {
     ]);
 
     const permissions = await computeUserPagePermissions({
-      pageId: page.id,
+      resourceId: page.id,
       userId: adminUser.id
     });
 
@@ -67,7 +67,7 @@ describe('computeUserPagePermissions', () => {
     });
 
     const permissions = await computeUserPagePermissions({
-      pageId: page.id,
+      resourceId: page.id,
       userId: adminUser.id
     });
 
@@ -92,9 +92,8 @@ describe('computeUserPagePermissions', () => {
     });
 
     const permissions = await computeUserPagePermissions({
-      pageId: page.id,
-      userId: adminUser.id,
-      allowAdminBypass: false
+      resourceId: page.id,
+      userId: adminUser.id
     });
 
     (Object.keys(PageOperations) as PageOperationType[]).forEach((op) => {
@@ -111,7 +110,7 @@ describe('computeUserPagePermissions', () => {
 
     await expect(
       computeUserPagePermissions({
-        pageId: inexistentPageId,
+        resourceId: inexistentPageId,
         userId: user.id
       })
     ).rejects.toBeInstanceOf(PageNotFoundError);
@@ -138,7 +137,7 @@ describe('computeUserPagePermissions', () => {
     ]);
 
     const permissions = await computeUserPagePermissions({
-      pageId: page.id
+      resourceId: page.id
     });
 
     permissionTemplates.view.forEach((op) => {
@@ -183,7 +182,7 @@ describe('computeUserPagePermissions', () => {
     });
 
     const permissions = await computeUserPagePermissions({
-      pageId: page.id,
+      resourceId: page.id,
       userId: nonAdminUser.id
     });
 
