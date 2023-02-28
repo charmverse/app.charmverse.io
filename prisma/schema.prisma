@@ -222,7 +222,7 @@ model Space {
   defaultPublicPages          Boolean?                          @default(false)
   permissionConfigurationMode SpacePermissionConfigurationMode? @default(custom)
   publicBountyBoard           Boolean?                          @default(false)
-  xpsEngineId                 String?
+  xpsEngineId                 String?                           @unique
   author                      User                              @relation(fields: [createdBy], references: [id], onDelete: Cascade)
   blocks                      Block[]
   bounties                    Bounty[]
