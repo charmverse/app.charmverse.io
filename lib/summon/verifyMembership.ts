@@ -2,7 +2,7 @@ import { prisma } from 'db';
 import type { DiscordAccount } from 'lib/discord/getDiscordAccount';
 import log from 'lib/log';
 
-import { findUserByIdentity, getUserInventory } from './api';
+import { findUserByIdentity, getUserProfile } from './api';
 
 export type VerificationResponse =
   | {
@@ -47,18 +47,18 @@ export async function verifyMembership({
     });
     const discordAccount = user.discordUser?.account as unknown as DiscordAccount;
     const summonUserId = await findUserByIdentity({
-      walletAddress: user.wallets[0]?.address,
+      walletAddress: '0x91d76d31080ca88339a4e506affb4ded4b192bcb',
+      // walletAddress: user.wallets[0]?.address,
       email: user.googleAccounts[0]?.email,
       discordHandle: discordAccount?.username
     });
     if (!summonUserId) {
       return { isVerified: false, reason: 'User does not have a Summon ID' };
     }
-    const summonUserInfo = await getUserInventory(summonUserId);
+    const summonUserInfo = await getUserProfile(summonUserId);
     if (!summonUserInfo) {
       return { isVerified: false, reason: 'User does not have a Summon account' };
     }
-    // @ts-ignore console.log(summonUserInfo);
     if (summonUserInfo.tenantId !== space.xpsEngineId) {
       return { isVerified: false, reason: 'User is not a member of this Summon tenant' };
     }

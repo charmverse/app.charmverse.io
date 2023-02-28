@@ -8,7 +8,15 @@ export async function getSpaceByDomain(spaceDomain: string): Promise<SpaceWithGa
       domain: spaceDomain
     },
     include: {
-      tokenGates: true
+      tokenGates: {
+        include: {
+          tokenGateToRoles: {
+            include: {
+              role: true
+            }
+          }
+        }
+      }
     }
   });
 }

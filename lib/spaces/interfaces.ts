@@ -1,4 +1,6 @@
-import type { Space, TokenGate } from '@prisma/client';
+import type { Space } from '@prisma/client';
+
+import type { TokenGateWithRoles } from 'lib/token-gates/interfaces';
 
 // This type is unused for now. We are returning the full space document to the user.
 // This should either be deleted, or picked up again in the future.
@@ -11,5 +13,5 @@ export interface PublicBountyToggle {
 }
 
 export type SpaceWithGates = Space & {
-  tokenGates: TokenGate[];
+  tokenGates: TokenGateWithRoles[];
 };

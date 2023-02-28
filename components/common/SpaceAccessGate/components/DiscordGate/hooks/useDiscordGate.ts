@@ -6,13 +6,25 @@ import charmClient from 'charmClient';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
+import type { CheckDiscordGateResult } from 'lib/discord/interface';
+import type { TokenGateJoinType } from 'lib/token-gates/interfaces';
 
 type Props = {
+  joinType?: TokenGateJoinType;
   spaceDomain: string;
   onSuccess: () => void;
 };
 
-export function useDiscordGate({ spaceDomain, onSuccess }: Props) {
+export type DiscordGateState = {
+  isEnabled: boolean;
+  isVerifying: boolean;
+  isConnectedToDiscord: boolean;
+  discordGate?: CheckDiscordGateResult;
+  joinSpace: () => Promise<void>;
+  joiningSpace: boolean;
+};
+
+export function useDiscordGate({ joinType, spaceDomain, onSuccess }: Props): DiscordGateState {
   const { user, refreshUser } = useUser();
   const { showMessage } = useSnackbar();
   const discordUserId = user?.discordUser?.discordId;
@@ -52,7 +64,8 @@ export function useDiscordGate({ spaceDomain, onSuccess }: Props) {
   }
 
   return {
-    isLoading: !!discordUserId && !data,
+    isEnabled: !!data?.hasDiscordServer,
+    isVerifying: !!discordUserId && !data,
     discordGate: data,
     isConnectedToDiscord: !!discordUserId,
     joinSpace,

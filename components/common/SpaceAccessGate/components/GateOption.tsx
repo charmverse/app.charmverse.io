@@ -2,19 +2,17 @@ import type { SxProps, Theme } from '@mui/material';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Grid from '@mui/material/Grid';
-import Typography from '@mui/material/Typography';
 import type { ReactNode } from 'react';
 
 import { VerifyCheckmark } from './VerifyCheckmark';
 
 interface Props {
-  description: string;
   isVerified: boolean | null; // null means we have not checked yet
   isVerifying?: boolean;
   children?: ReactNode;
 }
 
-export function GateOption({ children, description, isVerified, isVerifying }: Props) {
+export function GateOption({ children, isVerified, isVerifying }: Props) {
   // Extra styling if the user was able to verify with the gate
   const isVerifiedBorderProps: SxProps<Theme> = isVerified
     ? {
@@ -27,19 +25,15 @@ export function GateOption({ children, description, isVerified, isVerifying }: P
   return (
     <Card
       variant='outlined'
-      raised={isVerified === true}
       color={isVerified === true ? 'success' : 'default'}
-      sx={{ my: 1, ...isVerifiedBorderProps }}
+      sx={{ mb: 2, ...isVerifiedBorderProps }}
     >
       <CardContent>
         <Grid container spacing={2}>
           <Grid item xs={10}>
-            <Typography>{description}</Typography>
+            {children}
           </Grid>
-
           <VerifyCheckmark isLoading={isVerifying} isVerified={isVerified} />
-
-          {children}
         </Grid>
       </CardContent>
     </Card>

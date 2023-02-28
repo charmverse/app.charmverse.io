@@ -15,7 +15,7 @@ handler
 
 async function checkDiscordGateEndpoint(req: NextApiRequest, res: NextApiResponse) {
   const spaceId = req.query.spaceId as string;
-  const userId = req.session?.user?.id;
+  const userId = req.session.user?.id;
 
   const result = await verifyMembership({ spaceId, userId });
 

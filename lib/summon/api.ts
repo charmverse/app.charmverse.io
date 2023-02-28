@@ -44,6 +44,27 @@ export function getUserInventory(userId: string) {
     .then(({ data }) => data);
 }
 
+type XPSUserProfile = {
+  id: string;
+  tenantId: string;
+  // avatar: string;
+  // username: string;
+  meta: XPSUserInventory['meta'];
+};
+
+export async function getUserProfile(userId: string): Promise<XPSUserProfile | null> {
+  const inventory = await getUserInventory(userId);
+  if (inventory) {
+    const { user, tenant, meta, achievements, ...profile } = inventory;
+    return {
+      id: user,
+      tenantId: tenant,
+      meta
+    };
+  }
+  return null;
+}
+
 // ### User achievements
 // `/v1/xps/achievement/{achievementId}`
 export function getAchievementById(achievementId: string) {

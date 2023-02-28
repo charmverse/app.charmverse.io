@@ -8,8 +8,6 @@ import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { updateTrackUserProfileById } from 'lib/metrics/mixpanel/updateTrackUserProfileById';
 import { updateUserTokenGates } from 'lib/token-gates/updateUserTokenGates';
 import { DataNotFoundError, InsecureOperationError, InvalidInputError } from 'lib/utilities/errors';
-import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
-import { publishMemberEvent } from 'lib/webhookPublisher/publishEvent';
 
 import type {
   TokenGateJwtResult,
@@ -22,15 +20,11 @@ export async function applyTokenGates({
   spaceId,
   userId,
   tokens,
-  commit,
-  joinType = 'token_gate'
+  commit
 }: TokenGateVerification): Promise<TokenGateVerificationResult> {
   if (!spaceId || !userId) {
     throw new InvalidInputError(`Please provide a valid ${!spaceId ? 'space' : 'user'} id.`);
   }
-
-  // Try to apply disocrd gate first
-  await applyDiscordGate({ spaceId, userId });
 
   const space = await prisma.space.findUnique({
     where: {
@@ -134,6 +128,9 @@ export async function applyTokenGates({
     return returnValue;
   }
 
+  // Try to apply discord gate first
+  await applyDiscordGate({ spaceId, userId });
+
   await updateUserTokenGates({ tokenGates: verifiedTokenGates, spaceId, userId });
 
   if (spaceMembership && roleIdsToAssign.length === 0) {
@@ -196,15 +193,6 @@ export async function applyTokenGates({
         }
       }
     });
-
-    trackUserAction('join_a_workspace', { spaceId, userId, source: joinType });
-    publishMemberEvent({
-      scope: WebhookEventNames.UserJoined,
-      spaceId,
-      userId
-    });
-
-    updateTrackUserProfileById(userId);
 
     return returnValue;
   }

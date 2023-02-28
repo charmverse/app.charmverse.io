@@ -1,5 +1,5 @@
+import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
-import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import { humanizeAccessControlConditions } from 'lit-js-sdk';
 import { useEffect, useState } from 'react';
@@ -29,9 +29,10 @@ export function TokenGateOption({ tokenGate, isVerified, isVerifying }: Props) {
   }, [tokenGate]);
 
   return (
-    <GateOption description={description} isVerified={isVerified} isVerifying={isVerifying}>
+    <GateOption isVerified={isVerified} isVerifying={isVerifying}>
+      <Typography>{description}</Typography>
       {tokenGate.tokenGateToRoles.length > 0 && (
-        <Grid item xs spacing={1}>
+        <Box mt={1}>
           <Typography sx={{ mr: 1 }} variant='caption'>
             Roles
           </Typography>
@@ -45,7 +46,7 @@ export function TokenGateOption({ tokenGate, isVerified, isVerifying }: Props) {
               label={role.role.name}
             />
           ))}
-        </Grid>
+        </Box>
       )}
     </GateOption>
   );

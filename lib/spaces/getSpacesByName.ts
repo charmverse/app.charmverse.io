@@ -17,7 +17,15 @@ export async function getSpacesByName(spaceName: string): Promise<SpaceWithGates
       }
     },
     include: {
-      tokenGates: true
+      tokenGates: {
+        include: {
+          tokenGateToRoles: {
+            include: {
+              role: true
+            }
+          }
+        }
+      }
     }
   });
 }

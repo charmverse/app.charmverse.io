@@ -2,23 +2,19 @@ import { Card, CardContent, Grid, Stack, Typography } from '@mui/material';
 
 import Button from 'components/common/Button';
 import PrimaryButton from 'components/common/PrimaryButton';
-import type { CheckDiscordGateResult } from 'lib/discord/interface';
 
 import { VerifyCheckmark } from '../VerifyCheckmark';
 
-type Props = {
-  isLoadingGate: boolean;
-  isConnectedToDiscord: boolean;
-  discordGate?: CheckDiscordGateResult;
-  joinSpace: () => Promise<void>;
-  joiningSpace: boolean;
-};
+import type { DiscordGateState } from './hooks/useDiscordGate';
 
-export function DiscordGate({ isConnectedToDiscord, discordGate, joinSpace, joiningSpace, isLoadingGate }: Props) {
-  if (!discordGate?.hasDiscordServer) {
-    return null;
-  }
-  const { isVerified } = discordGate;
+export function DiscordGate({
+  isConnectedToDiscord,
+  discordGate,
+  joinSpace,
+  joiningSpace,
+  isVerifying
+}: DiscordGateState) {
+  const isVerified = discordGate?.isVerified;
 
   const returnUrl = encodeURIComponent(window.location.href);
 
@@ -51,7 +47,7 @@ export function DiscordGate({ isConnectedToDiscord, discordGate, joinSpace, join
               <Stack justifyContent='center' alignItems='center' height='100%'>
                 {isConnectedToDiscord ? (
                   <Stack justifyContent='end' direction='row' alignSelf='stretch' pr={3}>
-                    <VerifyCheckmark isLoading={isLoadingGate} isVerified={isVerified} />
+                    <VerifyCheckmark isLoading={isVerifying} isVerified={isVerified} />
                   </Stack>
                 ) : (
                   <Button

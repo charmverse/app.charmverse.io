@@ -6,20 +6,33 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
 import type { SpaceWithGates } from 'lib/spaces/interfaces';
+import type { VerificationResponse } from 'lib/summon/verifyMembership';
+import type { TokenGateJoinType } from 'lib/token-gates/interfaces';
 
 type Props = {
+  joinType?: TokenGateJoinType;
   space: SpaceWithGates;
   onSuccess: () => void;
 };
 
-export function useSummonGate({ space, onSuccess }: Props) {
+export type SummonGateState = {
+  isEnabled: boolean;
+  isVerifying: boolean;
+  isVerified: boolean;
+  verifyResult?: VerificationResponse;
+  joinSpace: () => void;
+  joiningSpace: boolean;
+};
+
+export function useSummonGate({ joinType = 'token_gate', space, onSuccess }: Props): SummonGateState {
   const { user, refreshUser } = useUser();
   const { showMessage } = useSnackbar();
   const [joiningSpace, setJoiningSpace] = useState(false);
   const { spaces, setSpaces } = useSpaces();
 
-  const { data, isLoading } = useSWR(space.xpsEngineId ? `discord/gate/${space.id}/${user?.id}` : null, () =>
-    charmClient.summon.verifyMembership({ spaceId: space.id })
+  const { data, isLoading: isVerifying } = useSWR(
+    space.xpsEngineId ? `discord/gate/${space.id}/${user?.id}` : null,
+    () => charmClient.summon.verifyMembership({ spaceId: space.id })
   );
 
   async function joinSpace() {
@@ -31,7 +44,7 @@ export function useSummonGate({ space, onSuccess }: Props) {
     setJoiningSpace(true);
 
     try {
-      await charmClient.summon.joinVerifiedSpace({ spaceId: space.id });
+      await charmClient.summon.joinVerifiedSpace({ joinType, spaceId: space.id });
 
       showMessage(`You have joined the ${space.name} space.`, 'success');
 
@@ -51,9 +64,10 @@ export function useSummonGate({ space, onSuccess }: Props) {
   }
 
   return {
-    isLoading,
-    isSummonEnabled: !!space.xpsEngineId,
-    isVerified: data?.isVerified,
+    isVerifying,
+    isEnabled: !!space.xpsEngineId,
+    verifyResult: data,
+    isVerified: !!data?.isVerified,
     joinSpace,
     joiningSpace
   };

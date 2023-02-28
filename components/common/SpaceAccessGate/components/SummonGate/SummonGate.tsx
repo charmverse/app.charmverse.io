@@ -1,36 +1,21 @@
-import { Card, CardContent, Grid, Stack, Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
+import Image from 'next/image';
 
-import PrimaryButton from 'components/common/PrimaryButton';
-import type { SpaceWithGates } from 'lib/spaces/interfaces';
+import game7LogoImage from 'public/images/game7_logo.png';
 
 import { GateOption } from '../GateOption';
 
-import { useSummonGate } from './hooks/useSummonGate';
+import type { SummonGateState } from './hooks/useSummonGate';
 
-type Props = {
-  space: SpaceWithGates;
-  onSuccess: () => void;
-};
-
-export function SummonGate({ space, onSuccess }: Props) {
-  const { isSummonEnabled, isVerified, isLoading, joinSpace, joiningSpace } = useSummonGate({
-    space,
-    onSuccess
-  });
-
-  if (!isSummonEnabled) {
-    return null;
-  }
+export function SummonGate({ isVerifying, verifyResult }: SummonGateState) {
+  const isVerified = verifyResult?.isVerified ?? null;
 
   return (
-    <Stack>
-      <GateOption description='Belongs to Summon community' isVerifying={isLoading} isVerified={!!isVerified} />
-
-      {isVerified && (
-        <PrimaryButton disabled={joiningSpace} onClick={joinSpace} loading={joiningSpace}>
-          Join Space
-        </PrimaryButton>
-      )}
-    </Stack>
+    <GateOption isVerifying={isVerifying} isVerified={isVerified}>
+      <Box display='flex' gap={2} alignItems='center'>
+        <Image width={20} alt='Game 7' src={game7LogoImage} />
+        <Typography>Belong to a Summon community</Typography>
+      </Box>
+    </GateOption>
   );
 }
