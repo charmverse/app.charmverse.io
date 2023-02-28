@@ -45,13 +45,27 @@ export async function verifyMembership({
         wallets: true
       }
     });
-    const discordAccount = user.discordUser?.account as unknown as DiscordAccount;
-    const summonUserId = await findUserByIdentity({
-      // walletAddress: '0x91d76d31080ca88339a4e506affb4ded4b192bcb',
-      walletAddress: user.wallets[0]?.address,
-      email: user.googleAccounts[0]?.email,
-      discordHandle: discordAccount?.username
-    });
+    let summonUserId = user.xpsEngineId;
+    if (!summonUserId) {
+      const discordAccount = user.discordUser?.account as unknown as DiscordAccount;
+      summonUserId = await findUserByIdentity({
+        // walletAddress: '0x91d76d31080ca88339a4e506affb4ded4b192bcb',
+        walletAddress: user.wallets[0]?.address,
+        email: user.googleAccounts[0]?.email,
+        discordHandle: discordAccount?.username
+      });
+      // check another user isnt already using this Summon account
+      if (summonUserId) {
+        const existing = await prisma.user.findUnique({
+          where: {
+            xpsEngineId: summonUserId
+          }
+        });
+        if (existing) {
+          return { isVerified: false, reason: 'User is already registered to another account' };
+        }
+      }
+    }
     if (!summonUserId) {
       return { isVerified: false, reason: 'User does not have a Summon ID' };
     }
