@@ -44,7 +44,7 @@ async function convertToProposal(req: NextApiRequest, res: NextApiResponse<PageM
   }
 
   const permissions = await computeUserPagePermissions({
-    pageId,
+    resourceId: pageId,
     userId
   });
 
