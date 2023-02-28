@@ -1,4 +1,6 @@
 import styled from '@emotion/styled';
+import ModeStandbyOutlinedIcon from '@mui/icons-material/ModeStandbyOutlined';
+import BountyIcon from '@mui/icons-material/RequestPageOutlined';
 import { Box, Grid, Stack, Tab, Tabs, Typography } from '@mui/material';
 import { BountyStatus } from '@prisma/client';
 import { useRouter } from 'next/router';
@@ -6,7 +8,6 @@ import { useEffect, useMemo, useState } from 'react';
 import { CSVLink } from 'react-csv';
 
 import charmClient from 'charmClient';
-import { iconForViewType } from 'components/common/BoardEditor/focalboard/src/components/viewMenu';
 import Button from 'components/common/Button';
 import { EmptyStateVideo } from 'components/common/EmptyStateVideo';
 import { PageDialogProvider } from 'components/common/PageDialog/hooks/usePageDialog';
@@ -38,7 +39,7 @@ const StyledButton = styled(Button)`
 `;
 
 const views: { label: string; view: 'gallery' | 'board' }[] = [
-  { label: 'Ongoing', view: 'gallery' },
+  { label: 'Open', view: 'gallery' },
   { label: 'All', view: 'board' }
 ];
 
@@ -127,14 +128,20 @@ export default function BountiesPage({ publicMode = false, bounties }: Props) {
                     key={label}
                     label={
                       <StyledButton
-                        startIcon={iconForViewType(view)}
+                        startIcon={
+                          view === 'board' ? (
+                            <BountyIcon fontSize='small' />
+                          ) : (
+                            <ModeStandbyOutlinedIcon fontSize='small' />
+                          )
+                        }
                         onClick={() => {
                           setCurrentView({ label, view });
                           setUrlWithoutRerender(router.pathname, { view });
                         }}
                         variant='text'
                         size='small'
-                        sx={{ p: 0, mb: '5px' }}
+                        sx={{ p: 0, mb: '5px', width: '100%' }}
                         color={currentView.label === label ? 'textPrimary' : 'secondary'}
                       >
                         {label[0].toUpperCase() + label.slice(1)}

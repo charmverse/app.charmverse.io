@@ -8,14 +8,23 @@ import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
 import { PageActions } from 'components/common/PageActions';
 import { PageIcon } from 'components/common/PageLayout/components/PageIcon';
 import { usePageDetails } from 'hooks/usePageDetails';
-import { usePages } from 'hooks/usePages';
 import type { PageMeta } from 'lib/pages';
 import { fancyTrim } from 'lib/utilities/strings';
 
 import BountyStatusBadge from './BountyStatusBadge';
 
 const StyledBox = styled(Box)`
-  ${hoverIconsStyle({ absolutePositioning: true })}
+  ${hoverIconsStyle({ absolutePositioning: true })};
+
+  border: none;
+  background-color: var(--background-paper);
+  transition: background 100ms ease-out 0s;
+
+  @media (pointer: fine) {
+    &:hover {
+      background-color: rgba(var(--center-channel-color-rgb), 0.1);
+    }
+  }
 `;
 
 interface Props {
@@ -27,7 +36,6 @@ interface Props {
 }
 
 export function BountyGalleryCard({ page: bountyPage, bounty, readOnly, onClick, onDelete }: Props) {
-  const galleryImageUrl: null | string | undefined = bountyPage?.headerImage || bountyPage?.galleryImage;
   const { pageDetails } = usePageDetails(bountyPage?.id);
 
   return bountyPage ? (
@@ -41,12 +49,6 @@ export function BountyGalleryCard({ page: bountyPage, bounty, readOnly, onClick,
       }}
     >
       {!readOnly && <PageActions page={bountyPage} onClickDelete={() => onDelete(bounty.id)} />}
-      {galleryImageUrl && (
-        <div className='gallery-image'>
-          <img className='ImageElement' src={galleryImageUrl} alt='Gallery item' />
-        </div>
-      )}
-      {!galleryImageUrl && <div className='gallery-item' />}
       <div className='gallery-title'>
         {bountyPage?.icon ? (
           <PageIcon isEditorEmpty={!bountyPage?.hasContent} pageType='card' icon={bountyPage.icon} />

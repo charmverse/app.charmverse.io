@@ -20,7 +20,9 @@ export default function BountiesGalleryView({ bounties, publicMode }: Props) {
   const { setBounties } = useBounties();
   const router = useRouter();
 
-  const filteredBounties = bounties.filter((bounty) => ['inProgress', 'open'].includes(bounty.status));
+  const filteredBounties = bounties
+    .filter((bounty) => bounty.status === 'open')
+    .sort((b1, b2) => (b1.updatedAt > b2.updatedAt ? -1 : 1));
   function onClickDelete(bountyId: string) {
     setBounties((_bounties) => _bounties.filter((_bounty) => _bounty.id !== bountyId));
     deletePage({ pageId: bountyId });
