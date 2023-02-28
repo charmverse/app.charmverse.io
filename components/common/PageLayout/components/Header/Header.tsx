@@ -453,7 +453,7 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
               <ListItemButton
                 data-test='convert-proposal-action'
                 onClick={() => convertToProposal(basePage.id)}
-                disabled={!canCreateProposal}
+                disabled={!canCreateProposal || !!basePage.convertedProposalId}
               >
                 <TaskOutlinedIcon
                   fontSize='small'
