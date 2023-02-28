@@ -99,7 +99,7 @@ interface CreateVoteModalProps {
   proposal?: ProposalWithUsers;
 }
 
-export default function CreateVoteModal({
+export function CreateVoteModal({
   open = true,
   onClose = () => null,
   onCreateVote = () => null,

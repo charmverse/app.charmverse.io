@@ -126,6 +126,7 @@ enum SpaceOperation {
   createVote
   createForumCategory
   moderateForums
+  reviewProposals
 }
 
 enum ProfileItemType {
@@ -208,57 +209,58 @@ enum BlacklistOrWhitelist {
 }
 
 model Space {
-  id                            String                            @id @default(uuid()) @db.Uuid
-  deletedAt                     DateTime?
-  createdAt                     DateTime                          @default(now())
-  createdBy                     String                            @db.Uuid
-  updatedAt                     DateTime                          @updatedAt
-  updatedBy                     String                            @db.Uuid
-  name                          String
-  domain                        String                            @unique
-  discordServerId               String?
-  defaultVotingDuration         Int?
-  snapshotDomain                String?
-  spaceImage                    String?
-  defaultPostCategoryId         String?                           @unique @db.Uuid
-  defaultPostCategory           PostCategory?                     @relation(fields: [defaultPostCategoryId], references: [id], name: "defaultPostCategory", onDelete: SetNull)
-  defaultPagePermissionGroup    PagePermissionLevel?              @default(full_access)
-  defaultPublicPages            Boolean?                          @default(false)
-  permissionConfigurationMode   SpacePermissionConfigurationMode? @default(custom)
-  publicBountyBoard             Boolean?                          @default(false)
-  xpsEngineId                   String?
-  author                        User                              @relation(fields: [createdBy], references: [id], onDelete: Cascade)
-  blocks                        Block[]
-  bounties                      Bounty[]
-  bountyPermissions             BountyPermission[]
-  comments                      Comment[]
-  inviteLinks                   InviteLink[]
-  pages                         Page[]
-  permissions                   PagePermission[]
-  paymentMethods                PaymentMethod[]
-  roles                         Role[]
-  apiToken                      SpaceApiToken?
-  superApiTokenId               String?                           @db.Uuid
-  superApiToken                 SuperApiToken?                    @relation(fields: [superApiTokenId], references: [id], onDelete: SetNull)
-  permittedGroups               SpacePermission[]                 @relation("permittedGroups")
-  spacePermissions              SpacePermission[]                 @relation("spacePermissions")
-  spaceRoles                    SpaceRole[]
-  threads                       Thread[]
-  tokenGates                    TokenGate[]
-  votes                         Vote[]
-  proposals                     Proposal[]
-  workspaceEvents               WorkspaceEvent[]
-  proposalCategory              ProposalCategory[]
-  memberProperties              MemberProperty[]
-  memberPropertyValues          MemberPropertyValue[]
-  userTokenGates                UserTokenGate[]
-  postCategories                PostCategory[]
-  posts                         Post[]
-  userSpaceNotificationSettings UserSpaceNotificationSettings[]
-  postCategoryPermissions       PostCategoryPermission[]
-  webhookSubscriptionUrl        String?
-  webhookSubscriptions          WebhookSubscription[]
-  webhookSigningSecret          String?
+  id                          String                            @id @default(uuid()) @db.Uuid
+  deletedAt                   DateTime?
+  createdAt                   DateTime                          @default(now())
+  createdBy                   String                            @db.Uuid
+  updatedAt                   DateTime                          @updatedAt
+  updatedBy                   String                            @db.Uuid
+  name                        String
+  domain                      String                            @unique
+  discordServerId             String?
+  defaultVotingDuration       Int?
+  snapshotDomain              String?
+  spaceImage                  String?
+  defaultPostCategoryId       String?                           @unique @db.Uuid
+  defaultPostCategory         PostCategory?                     @relation(fields: [defaultPostCategoryId], references: [id], name: "defaultPostCategory", onDelete: SetNull)
+  defaultPagePermissionGroup  PagePermissionLevel?              @default(full_access)
+  defaultPublicPages          Boolean?                          @default(false)
+  permissionConfigurationMode SpacePermissionConfigurationMode? @default(custom)
+  publicBountyBoard           Boolean?                          @default(false)
+  xpsEngineId                 String?
+  author                      User                              @relation(fields: [createdBy], references: [id], onDelete: Cascade)
+  blocks                      Block[]
+  bounties                    Bounty[]
+  bountyPermissions           BountyPermission[]
+  comments                    Comment[]
+  inviteLinks                 InviteLink[]
+  pages                       Page[]
+  permissions                 PagePermission[]
+  paymentMethods              PaymentMethod[]
+  roles                       Role[]
+  apiToken                    SpaceApiToken?
+  superApiTokenId             String?                           @db.Uuid
+  superApiToken               SuperApiToken?                    @relation(fields: [superApiTokenId], references: [id], onDelete: SetNull)
+  permittedGroups             SpacePermission[]                 @relation("permittedGroups")
+  spacePermissions            SpacePermission[]                 @relation("spacePermissions")
+  spaceRoles                  SpaceRole[]
+  threads                     Thread[]
+  tokenGates                  TokenGate[]
+  votes                       Vote[]
+  proposals                   Proposal[]
+  workspaceEvents             WorkspaceEvent[]
+  proposalCategory            ProposalCategory[]
+  memberProperties            MemberProperty[]
+  memberPropertyValues        MemberPropertyValue[]
+  userTokenGates              UserTokenGate[]
+  postCategories              PostCategory[]
+  Post                        Post[]
+  postCategoryPermissions     PostCategoryPermission[]
+  proposalCategoryPermissions ProposalCategoryPermission[]
+  spaceNotificationSettings   UserSpaceNotificationSettings[]
+  webhookSubscriptionUrl      String?
+  webhookSubscriptions        WebhookSubscription[]
+  webhookSigningSecret        String?
 
   @@index([createdBy])
 }
@@ -755,24 +757,25 @@ model UserGnosisSafe {
 }
 
 model Role {
-  id                        String                     @id @default(uuid()) @db.Uuid
-  createdAt                 DateTime                   @default(now())
-  createdBy                 String                     @db.Uuid
-  externalId                String?
-  name                      String
-  spaceId                   String                     @db.Uuid
-  source                    RoleSource?
-  sourceId                  String?
-  space                     Space                      @relation(fields: [spaceId], references: [id], onDelete: Cascade)
-  bountyPermissions         BountyPermission[]
-  permissions               PagePermission[]
-  spacePermissions          SpacePermission[]
-  spaceRolesToRole          SpaceRoleToRole[]
-  tokenGateToRoles          TokenGateToRole[]
-  proposalReviewer          ProposalReviewer[]
-  inviteLinkToRoles         InviteLinkToRole[]
-  memberPropertyPermissions MemberPropertyPermission[]
-  postCategoryPermissions   PostCategoryPermission[]
+  id                          String                       @id @default(uuid()) @db.Uuid
+  createdAt                   DateTime                     @default(now())
+  createdBy                   String                       @db.Uuid
+  externalId                  String?
+  name                        String
+  spaceId                     String                       @db.Uuid
+  source                      RoleSource?
+  sourceId                    String?
+  space                       Space                        @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  bountyPermissions           BountyPermission[]
+  permissions                 PagePermission[]
+  spacePermissions            SpacePermission[]
+  spaceRolesToRole            SpaceRoleToRole[]
+  tokenGateToRoles            TokenGateToRole[]
+  proposalReviewer            ProposalReviewer[]
+  inviteLinkToRoles           InviteLinkToRole[]
+  memberPropertyPermissions   MemberPropertyPermission[]
+  postCategoryPermissions     PostCategoryPermission[]
+  proposalCategoryPermissions ProposalCategoryPermission[]
 
   @@unique([spaceId, name])
   @@index([spaceId])
@@ -984,14 +987,66 @@ model WorkspaceEvent {
   @@index([pageId])
 }
 
-model ProposalCategory {
-  id       String     @id @default(uuid()) @db.Uuid
-  spaceId  String     @db.Uuid
-  space    Space      @relation(fields: [spaceId], references: [id], onDelete: Cascade)
-  title    String
-  color    String
-  proposal Proposal[]
+enum ProposalCategoryOperation {
+  manage_permissions
+  create_proposal
+  edit
+  delete
+}
 
+enum ProposalOperation {
+  edit
+  view
+  delete
+  create_vote
+  vote
+  comment
+  review
+}
+
+enum ProposalCategoryPermissionLevel {
+  view
+  view_comment
+  view_comment_vote
+  full_access
+}
+
+model ProposalCategoryPermission {
+  id                 String                          @id @default(uuid()) @db.Uuid
+  permissionLevel    ProposalCategoryPermissionLevel
+  proposalCategoryId String                          @db.Uuid
+  proposalCategory   ProposalCategory                @relation(fields: [proposalCategoryId], references: [id], onDelete: Cascade)
+  // These fields will only be used when the custom permission level is used
+  // For now adding these to the schema so that Prisma Client doesn't drop the enums at generator stage
+  categoryOperations ProposalCategoryOperation[]
+  proposalOperations ProposalOperation[]
+
+  // Permission assignees
+  roleId  String?  @db.Uuid
+  role    Role?    @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  spaceId String?  @db.Uuid
+  space   Space?   @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  public  Boolean?
+
+  @@unique([roleId, proposalCategoryId])
+  @@unique([spaceId, proposalCategoryId])
+  @@unique([public, proposalCategoryId])
+  @@index([proposalCategoryId])
+  @@index([proposalCategoryId, roleId])
+  @@index([proposalCategoryId, spaceId])
+  @@index([proposalCategoryId, public])
+}
+
+model ProposalCategory {
+  id                          String                       @id @default(uuid()) @db.Uuid
+  spaceId                     String                       @db.Uuid
+  space                       Space                        @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  title                       String
+  color                       String
+  proposal                    Proposal[]
+  proposalCategoryPermissions ProposalCategoryPermission[]
+
+  @@unique([spaceId, title])
   @@index([spaceId])
 }
 

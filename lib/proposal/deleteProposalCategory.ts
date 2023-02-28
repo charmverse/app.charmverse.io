@@ -1,6 +1,27 @@
 import { prisma } from 'db';
+import { UndesirableOperationError } from 'lib/utilities/errors';
 
-export function deleteProposalCategory(id: string) {
+export async function deleteProposalCategory(id: string) {
+  const proposal = await prisma.proposal.findFirst({
+    where: {
+      categoryId: id
+    },
+    select: {
+      id: true,
+      category: {
+        select: {
+          title: true
+        }
+      }
+    }
+  });
+
+  if (proposal) {
+    throw new UndesirableOperationError(
+      `${proposal.category?.title} proposal category  cannot be deleted as it contains proposals.`
+    );
+  }
+
   return prisma.proposalCategory.delete({
     where: {
       id

@@ -97,7 +97,7 @@ export class ForumApi {
     return http.DELETE(`/api/forums/posts/${postId}/comments/${commentId}`);
   }
 
-  convertToProposal(postId: string) {
-    return http.POST<PageMeta>(`/api/forums/posts/${postId}/convert-to-proposal`);
+  convertToProposal({ postId, categoryId }: { postId: string; categoryId: string }) {
+    return http.POST<PageMeta>(`/api/forums/posts/${postId}/convert-to-proposal`, { categoryId });
   }
 }

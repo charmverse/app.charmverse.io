@@ -15,7 +15,6 @@ import { usePages } from 'hooks/usePages';
 import { usePageTitle } from 'hooks/usePageTitle';
 import type { BountyWithDetails } from 'lib/bounties';
 import type { PublicPageResponse } from 'lib/pages';
-import { findParentOfType } from 'lib/pages/findParentOfType';
 
 type Props = {
   publicPage: PublicPageResponse;
@@ -77,7 +76,6 @@ export function SharedPage({ publicPage }: Props) {
   }, [publicPage]);
 
   const currentPage = pages?.[basePageId];
-  const parentProposalId = findParentOfType({ pageId: basePageId, pageType: 'proposal', pageMap: pages || {} });
 
   if (!currentPage && publicPage) {
     return <LoadingComponent isLoading />;
@@ -90,6 +88,6 @@ export function SharedPage({ publicPage }: Props) {
   return currentPage.type.match(/board/) ? (
     <DatabasePage page={currentPage} setPage={() => {}} readOnly={true} />
   ) : (
-    <DocumentPage page={currentPage} setPage={() => {}} readOnly={true} parentProposalId={parentProposalId} />
+    <DocumentPage page={currentPage} setPage={() => {}} readOnly={true} />
   );
 }

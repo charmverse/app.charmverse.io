@@ -16,6 +16,7 @@ import {
   RadioGroup,
   Typography
 } from '@mui/material';
+import Tooltip from '@mui/material/Tooltip';
 import type { UserVote } from '@prisma/client';
 import { DateTime } from 'luxon';
 import { usePopupState } from 'material-ui-popup-state/hooks';
@@ -44,6 +45,7 @@ export interface VoteDetailProps {
   deleteVote: (voteId: string) => Promise<void>;
   cancelVote: (voteId: string) => Promise<void>;
   updateDeadline: (voteId: string, deadline: Date) => Promise<void>;
+  disableVote?: boolean;
 }
 
 const StyledFormControl = styled(FormControl)`
@@ -56,14 +58,15 @@ const StyledFormControl = styled(FormControl)`
 
 const MAX_DESCRIPTION_LENGTH = 200;
 
-export default function VoteDetail({
+export function VoteDetail({
   cancelVote,
   castVote,
   deleteVote,
   updateDeadline,
   detailed = false,
   vote,
-  isProposal = false
+  isProposal,
+  disableVote
 }: VoteDetailProps) {
   const { deadline, totalVotes, description, id, title, userChoice, voteOptions, aggregatedResult } = vote;
   const { user } = useUser();
@@ -112,7 +115,7 @@ export default function VoteDetail({
         <VoteActionsMenu
           deleteVote={deleteVote}
           cancelVote={cancelVote}
-          isProposalVote={isProposal}
+          isProposalVote={!!isProposal}
           vote={vote}
           removeFromPage={removeFromPage}
           updateDeadline={updateDeadline}
@@ -151,59 +154,66 @@ export default function VoteDetail({
         </Box>
       )}
       {!detailed && voteCountLabel}
-      <StyledFormControl>
-        <RadioGroup name={vote.id} value={userVoteChoice}>
-          {voteOptions.map((voteOption) => (
-            <FormControlLabel
-              key={voteOption.name}
-              control={<Radio size='small' />}
-              disabled={isVotingClosed(vote) || !user}
-              value={voteOption.name}
-              label={
-                <Box display='flex' justifyContent='space-between' flexGrow={1}>
-                  <span>{voteOption.name}</span>
-                  <Typography variant='subtitle1' color='secondary' component='span'>
-                    {((totalVotes === 0 ? 0 : (aggregatedResult?.[voteOption.name] ?? 0) / totalVotes) * 100).toFixed(
-                      2
-                    )}
-                    %
-                  </Typography>
-                </Box>
-              }
-              disableTypography
-              onChange={async () => {
-                if (user) {
-                  const userVote = await castVote(id, voteOption.name);
-                  refetchTasks();
-                  mutate(
-                    (_userVotes) => {
-                      if (_userVotes) {
-                        const existingUserVoteIndex = _userVotes.findIndex((_userVote) => _userVote.userId === user.id);
-                        // User already voted
-                        if (existingUserVoteIndex !== -1) {
-                          _userVotes.splice(existingUserVoteIndex, 1);
-                        }
-
-                        return [
-                          {
-                            ...userVote,
-                            user
-                          },
-                          ..._userVotes
-                        ];
-                      }
-                      return undefined;
-                    },
-                    {
-                      revalidate: false
-                    }
-                  );
+      <Tooltip
+        placement='top-start'
+        title={disableVote ? 'You do not have the permissions to participate in this vote' : ''}
+      >
+        <StyledFormControl>
+          <RadioGroup name={vote.id} value={userVoteChoice}>
+            {voteOptions.map((voteOption) => (
+              <FormControlLabel
+                key={voteOption.name}
+                control={<Radio size='small' />}
+                disabled={isVotingClosed(vote) || !user || !!disableVote}
+                value={voteOption.name}
+                label={
+                  <Box display='flex' justifyContent='space-between' flexGrow={1}>
+                    <span>{voteOption.name}</span>
+                    <Typography variant='subtitle1' color='secondary' component='span'>
+                      {((totalVotes === 0 ? 0 : (aggregatedResult?.[voteOption.name] ?? 0) / totalVotes) * 100).toFixed(
+                        2
+                      )}
+                      %
+                    </Typography>
+                  </Box>
                 }
-              }}
-            />
-          ))}
-        </RadioGroup>
-      </StyledFormControl>
+                disableTypography
+                onChange={async () => {
+                  if (user) {
+                    const userVote = await castVote(id, voteOption.name);
+                    refetchTasks();
+                    mutate(
+                      (_userVotes) => {
+                        if (_userVotes) {
+                          const existingUserVoteIndex = _userVotes.findIndex(
+                            (_userVote) => _userVote.userId === user.id
+                          );
+                          // User already voted
+                          if (existingUserVoteIndex !== -1) {
+                            _userVotes.splice(existingUserVoteIndex, 1);
+                          }
+
+                          return [
+                            {
+                              ...userVote,
+                              user
+                            },
+                            ..._userVotes
+                          ];
+                        }
+                        return undefined;
+                      },
+                      {
+                        revalidate: false
+                      }
+                    );
+                  }
+                }}
+              />
+            ))}
+          </RadioGroup>
+        </StyledFormControl>
+      </Tooltip>
       {!detailed && (
         <Box display='flex' justifyContent='flex-end'>
           <Button

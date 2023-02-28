@@ -37,6 +37,7 @@ import { useInterval } from 'hooks/useInterval';
 import { IsSpaceMemberProvider } from 'hooks/useIsSpaceMember';
 import { useLocalStorage } from 'hooks/useLocalStorage';
 import { MembersProvider } from 'hooks/useMembers';
+import { NotionProvider } from 'hooks/useNotionImport';
 import { OnboardingProvider } from 'hooks/useOnboarding';
 import { PagesProvider } from 'hooks/usePages';
 import { PageTitleProvider, usePageTitle } from 'hooks/usePageTitle';
@@ -218,29 +219,31 @@ export default function App({ Component, emotionCache = clientSideEmotionCache, 
                   <LocalizationProvider>
                     <OnboardingProvider>
                       <FocalBoardProvider>
-                        <IntlProvider>
-                          <PageHead />
-                          <CssBaseline enableColorScheme={true} />
-                          <Global styles={cssVariables} />
-                          <RouteGuard>
-                            <ErrorBoundary>
-                              <Snackbar
-                                isOpen={isOldBuild}
-                                message='New CharmVerse platform update available. Please refresh.'
-                                actions={[
-                                  <IconButton key='reload' onClick={() => window.location.reload()} color='inherit'>
-                                    <RefreshIcon fontSize='small' />
-                                  </IconButton>
-                                ]}
-                                origin={{ vertical: 'top', horizontal: 'center' }}
-                                severity='warning'
-                                handleClose={() => setIsOldBuild(false)}
-                              />
-                              {getLayout(<Component {...pageProps} />)}
-                              <GlobalComponents />
-                            </ErrorBoundary>
-                          </RouteGuard>
-                        </IntlProvider>
+                        <NotionProvider>
+                          <IntlProvider>
+                            <PageHead />
+                            <CssBaseline enableColorScheme={true} />
+                            <Global styles={cssVariables} />
+                            <RouteGuard>
+                              <ErrorBoundary>
+                                <Snackbar
+                                  isOpen={isOldBuild}
+                                  message='New CharmVerse platform update available. Please refresh.'
+                                  actions={[
+                                    <IconButton key='reload' onClick={() => window.location.reload()} color='inherit'>
+                                      <RefreshIcon fontSize='small' />
+                                    </IconButton>
+                                  ]}
+                                  origin={{ vertical: 'top', horizontal: 'center' }}
+                                  severity='warning'
+                                  handleClose={() => setIsOldBuild(false)}
+                                />
+                                {getLayout(<Component {...pageProps} />)}
+                                <GlobalComponents />
+                              </ErrorBoundary>
+                            </RouteGuard>
+                          </IntlProvider>
+                        </NotionProvider>
                       </FocalBoardProvider>
                     </OnboardingProvider>
                   </LocalizationProvider>
@@ -302,10 +305,8 @@ function CurrentSpaceSetter() {
   const { setCurrentSpaceId } = useCurrentSpaceId();
 
   useEffect(() => {
-    if (spaceFromPath) {
-      setCurrentSpaceId(spaceFromPath.id);
-    }
-  }, [spaceFromPath]);
+    setCurrentSpaceId(spaceFromPath?.id ?? '');
+  }, [spaceFromPath?.id]);
 
   return null;
 }
@@ -316,7 +317,7 @@ function PageHead() {
 
   return (
     <Head>
-      <title>{title ? `${prefix}${title} | CharmVerse` : `${prefix}CharmVerse - the all-in-one web3 space'}`}</title>
+      <title>{title ? `${prefix}${title} | CharmVerse` : `${prefix}CharmVerse - the all-in-one web3 space`}</title>
       {/* viewport meta tag goes in _app.tsx - https://nextjs.org/docs/messages/no-document-viewport-meta */}
       <meta name='viewport' content='minimum-scale=1, initial-scale=1, width=device-width' />
       {/* Verification required by google */}

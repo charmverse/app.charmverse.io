@@ -3,7 +3,7 @@ import { v4 } from 'uuid';
 import type { IPageWithPermissions, PageWithProposal } from 'lib/pages';
 import { createPage } from 'lib/pages/server/createPage';
 import { getPagePath } from 'lib/pages/utils';
-import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
+import { InvalidInputError } from 'lib/utilities/errors';
 
 import type { ProposalReviewerInput } from '../../proposal/interface';
 
@@ -16,15 +16,21 @@ export interface CreateProposalTemplateInput {
     content?: any;
   };
   reviewers?: ProposalReviewerInput[];
+  categoryId: string;
 }
 
 export async function createProposalTemplate({
   spaceId,
   userId,
   pageContent,
-  reviewers
+  reviewers,
+  categoryId
 }: CreateProposalTemplateInput): Promise<IPageWithPermissions & PageWithProposal> {
   const proposalId = v4();
+
+  if (!categoryId) {
+    throw new InvalidInputError('Proposal category is required');
+  }
 
   return createPage({
     data: {
@@ -50,7 +56,8 @@ export async function createProposalTemplate({
           createdBy: userId,
           id: proposalId,
           spaceId,
-          status: 'private_draft',
+          status: 'draft',
+          categoryId,
           // Add page creator as the proposal's first author
           authors: {
             create: {
