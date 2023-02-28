@@ -305,10 +305,8 @@ function CurrentSpaceSetter() {
   const { setCurrentSpaceId } = useCurrentSpaceId();
 
   useEffect(() => {
-    if (spaceFromPath) {
-      setCurrentSpaceId(spaceFromPath.id);
-    }
-  }, [spaceFromPath]);
+    setCurrentSpaceId(spaceFromPath?.id ?? '');
+  }, [spaceFromPath?.id]);
 
   return null;
 }
