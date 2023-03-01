@@ -18,6 +18,7 @@ type Props = {
 export type DiscordGateState = {
   isEnabled: boolean;
   isVerifying: boolean;
+  isVerified: boolean;
   isConnectedToDiscord: boolean;
   discordGate?: CheckDiscordGateResult;
   joinSpace: () => Promise<void>;
@@ -36,15 +37,10 @@ export function useDiscordGate({ joinType, spaceDomain, onSuccess }: Props): Dis
   );
 
   async function joinSpace() {
-    if (!data?.isVerified) {
-      showMessage('You are not eligible to join this space', 'error');
-      return;
-    }
-
     setJoiningSpace(true);
 
     try {
-      const space = await charmClient.discord.verifyDiscordGate({ spaceId: data.spaceId, joinType });
+      const space = await charmClient.discord.verifyDiscordGate({ spaceId: data!.spaceId, joinType });
 
       showMessage(`You have joined the ${space.name} space.`, 'success');
 
@@ -66,6 +62,7 @@ export function useDiscordGate({ joinType, spaceDomain, onSuccess }: Props): Dis
   return {
     isEnabled: !!data?.hasDiscordServer,
     isVerifying: !!discordUserId && !data,
+    isVerified: !!data?.isVerified,
     discordGate: data,
     isConnectedToDiscord: !!discordUserId,
     joinSpace,
