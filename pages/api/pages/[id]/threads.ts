@@ -13,7 +13,7 @@ handler.use(requireUser).get(getThreads);
 async function getThreads(req: NextApiRequest, res: NextApiResponse) {
   const pageId = req.query.id as string;
   const computed = await computeUserPagePermissions({
-    pageId,
+    resourceId: pageId,
     userId: req.session?.user?.id
   });
 

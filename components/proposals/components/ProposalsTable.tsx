@@ -61,7 +61,9 @@ export default function ProposalsTable({
   }, [router.query.id]);
 
   // Make sure not to show templates here
-  const filteredProposals = proposals?.filter((p) => pages[p.id]?.type === 'proposal');
+  const filteredProposals = proposals?.filter(
+    (p) => !!pages[p.id] && pages[p.id]?.type === 'proposal' && !pages[p.id]?.deletedAt
+  );
 
   return (
     <>

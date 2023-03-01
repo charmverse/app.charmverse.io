@@ -10,6 +10,17 @@ jest.mock('lib/blockchain/getENSName', () => {
         return `testname-${address}.eth`;
       }
       return null;
+    },
+    getENSDetails: (address?: string | null) => {
+      if (address?.match('include')) {
+        return {
+          description: 'New guy in town',
+          discord: 'VVV#1234',
+          github: 'https://github.com/charmverse',
+          twitter: 'https://twitter.com/charmverse'
+        };
+      }
+      return null;
     }
   };
 });

@@ -48,7 +48,7 @@ export async function createUserFromWallet(
       include: sessionUserRelations
     });
 
-    await prepopulateUserProfile(newUser.id);
+    await prepopulateUserProfile(newUser, ens);
 
     updateTrackUserProfile(newUser, prisma);
     trackUserAction('sign_up', { userId: newUser.id, identityType: 'Wallet', ...signupAnalytics });

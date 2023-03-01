@@ -32,6 +32,7 @@ export function pageMetaSelect() {
     updatedAt: true,
     updatedBy: true,
     type: true,
+    convertedProposalId: true,
     permissions: {
       select: {
         id: true,

@@ -47,7 +47,7 @@ async function addPagePermission(req: NextApiRequest, res: NextApiResponse<IPage
   const { pageId, permissionLevel } = req.body as Required<IPagePermissionToCreate>;
 
   const computedPermissions = await computeUserPagePermissions({
-    pageId,
+    resourceId: pageId,
     userId: req.session.user.id
   });
 
@@ -124,7 +124,7 @@ async function removePagePermission(req: NextApiRequest, res: NextApiResponse) {
   }
 
   const computedPermissions = await computeUserPagePermissions({
-    pageId: permission.pageId,
+    resourceId: permission.pageId,
     userId: req.session.user.id
   });
 

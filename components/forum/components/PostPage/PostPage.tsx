@@ -17,6 +17,7 @@ import { processComments, sortComments } from 'components/common/comments/utils'
 import ErrorPage from 'components/common/errors/ErrorPage';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { ScrollableWindow } from 'components/common/PageLayout';
+import { ProposalBanner } from 'components/common/ProposalBanner';
 import UserDisplay from 'components/common/UserDisplay';
 import { PostCommentForm } from 'components/forum/components/PostPage/components/PostCommentForm';
 import { usePostPermissions } from 'components/forum/hooks/usePostPermissions';
@@ -35,7 +36,6 @@ import type { FormInputs } from '../interfaces';
 import { CategoryPosts } from './components/CategoryPosts';
 import { PostCategoryInput } from './components/PostCategoryInput';
 import { PostComment } from './components/PostComment';
-import { PostProposalBanner } from './components/PostProposalBanner';
 
 type Props = {
   spaceId: string;
@@ -180,7 +180,7 @@ export function PostPage({
 
   return (
     <>
-      {post?.proposalId && <PostProposalBanner proposalId={post.proposalId} />}
+      {post?.proposalId && <ProposalBanner type='post' proposalId={post.proposalId} />}
       <ScrollableWindow>
         <Stack>
           <Stack flexDirection='row'>

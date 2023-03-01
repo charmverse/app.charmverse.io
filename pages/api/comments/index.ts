@@ -33,9 +33,8 @@ async function addCommentController(req: NextApiRequest, res: NextApiResponse) {
   }
 
   const permissionSet = await computeUserPagePermissions({
-    pageId: thread.pageId,
-    userId,
-    allowAdminBypass: false
+    resourceId: thread.pageId,
+    userId
   });
 
   if (!permissionSet.comment) {

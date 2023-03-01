@@ -38,7 +38,7 @@ async function togglePageArchiveStatus(req: NextApiRequest, res: NextApiResponse
   }
 
   const permissions = await computeUserPagePermissions({
-    pageId,
+    resourceId: pageId,
     userId
   });
 

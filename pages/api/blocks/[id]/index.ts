@@ -42,7 +42,7 @@ async function deleteBlock(
   const isPageBlock = rootBlock.type === 'card' || rootBlock.type === 'card_template' || rootBlock.type === 'board';
 
   const permissionsSet = await computeUserPagePermissions({
-    pageId: isPageBlock ? rootBlock.id : rootBlock.rootId,
+    resourceId: isPageBlock ? rootBlock.id : rootBlock.rootId,
     userId: req.session.user.id as string
   });
 

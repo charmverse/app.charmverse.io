@@ -28,7 +28,7 @@ async function getPageByBlockViewId(req: NextApiRequest, res: NextApiResponse<Pa
   }
 
   const computed = await computeUserPagePermissions({
-    pageId: id as string,
+    resourceId: id as string,
     userId: req.session?.user?.id
   });
 

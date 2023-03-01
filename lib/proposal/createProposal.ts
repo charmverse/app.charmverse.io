@@ -1,4 +1,4 @@
-import type { Page, PrismaPromise, ProposalStatus } from '@prisma/client';
+import type { Page, ProposalStatus } from '@prisma/client';
 import { v4 as uuid } from 'uuid';
 
 import { prisma } from 'db';
@@ -21,60 +21,13 @@ export type CreateProposalInput = {
   spaceId: string;
 };
 
-export async function createProposal({
-  userId,
-  spaceId,
-  categoryId,
-  pageProps,
-  pageId,
-  reviewers
-}: CreateProposalInput) {
+export async function createProposal({ userId, spaceId, categoryId, pageProps, reviewers }: CreateProposalInput) {
   if (!categoryId) {
     throw new InvalidInputError('Proposal must be linked to a category');
   }
 
-  const proposalId = pageId ?? uuid();
-  const proposalStatus: ProposalStatus = 'draft';
-
-  const existingPage =
-    pageId &&
-    (await prisma.page.findUnique({
-      where: {
-        id: pageId
-      }
-    }));
-
-  function upsertPage(): PrismaPromise<Page> {
-    if (existingPage) {
-      return prisma.page.update({
-        where: {
-          id: pageId
-        },
-        data: {
-          parentId: null, // unset parentId if this page was a db card before
-          proposalId,
-          type: 'proposal',
-          updatedAt: new Date(),
-          updatedBy: userId
-        }
-      });
-    } else {
-      return createPage({
-        data: {
-          id: proposalId,
-          type: 'proposal',
-          proposalId,
-          path: getPagePath(),
-          updatedBy: userId,
-          createdBy: userId,
-          spaceId,
-          content: pageProps?.content ?? { type: 'doc', content: [] },
-          contentText: pageProps?.contentText ?? '',
-          title: pageProps?.title ?? ''
-        }
-      });
-    }
-  }
+  const proposalId = uuid();
+  const proposalStatus: ProposalStatus = 'private_draft';
 
   // Using a transaction to ensure both the proposal and page gets created together
   const [proposal, page, workspaceEvent] = await prisma.$transaction([
@@ -108,7 +61,20 @@ export async function createProposal({
         category: true
       }
     }),
-    upsertPage(),
+    createPage({
+      data: {
+        content: pageProps?.content ?? undefined,
+        proposalId,
+        contentText: pageProps?.contentText ?? '',
+        path: getPagePath(),
+        title: pageProps?.title ?? '',
+        updatedBy: userId,
+        createdBy: userId,
+        spaceId,
+        id: proposalId,
+        type: 'proposal'
+      }
+    }),
     prisma.workspaceEvent.create({
       data: {
         type: 'proposal_status_change',
