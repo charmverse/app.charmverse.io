@@ -56,7 +56,7 @@ export const useSharedPage = () => {
     data: space,
     isLoading: isSpaceLoading,
     error: spaceError
-  } = useSWR(spaceDomain ? `space/${spaceDomain}` : null, () => charmClient.getSpaceByDomain(spaceDomain || ''));
+  } = useSWR(spaceDomain ? `space/${spaceDomain}` : null, () => charmClient.spaces.searchByDomain(spaceDomain || ''));
 
   const hasError = !!publicPageError || !!spaceError;
   const hasPublicBounties = space?.publicBountyBoard;

@@ -208,16 +208,18 @@ function UserDetails({ readOnly, user, updateUser, sx = {} }: UserDetailsProps) 
             isNft={hasNftAvatar(user)}
           />
         </Grid>
-        <Grid item>
+        <Grid item width='100%'>
           <EditIconContainer data-testid='edit-identity' readOnly={readOnly} onClick={identityModalState.open}>
             {user && !isPublic && getIdentityIcon(user.identityType as IdentityType)}
-            <Typography variant='h1'>{shortWalletAddress(user.username)}</Typography>
+            <Typography variant='h1' noWrap>
+              {shortWalletAddress(user.username)}
+            </Typography>
           </EditIconContainer>
         </Grid>
         {!readOnly && (
-          <Grid item>
+          <Grid item width='100%'>
             <EditIconContainer readOnly={readOnly} onClick={userPathModalState.open}>
-              <Typography>
+              <Typography noWrap>
                 {hostname}/u/
                 <Link external href={userLink} target='_blank'>
                   {userPath}

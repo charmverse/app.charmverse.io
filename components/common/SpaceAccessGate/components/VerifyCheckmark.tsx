@@ -1,4 +1,4 @@
-import CancelIcon from '@mui/icons-material/Cancel';
+import CancelIcon from '@mui/icons-material/CancelOutlined';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { Grid } from '@mui/material';
 

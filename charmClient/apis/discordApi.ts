@@ -22,7 +22,7 @@ export class DiscordApi {
     return http.GET<CheckDiscordGateResult>(`/api/discord/gate?spaceDomain=${spaceDomain}`);
   }
 
-  verifyDiscordGate(spaceId: string) {
-    return http.POST<Space>('/api/discord/gate/verify', { spaceId });
+  verifyDiscordGate(body: { joinType?: string; spaceId: string }) {
+    return http.POST<Space>('/api/discord/gate/verify', body);
   }
 }

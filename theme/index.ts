@@ -165,7 +165,7 @@ export const createThemeLightSensitive = (mode: PaletteMode) => {
         main: '#3b5998'
       },
       discord: {
-        contrastText,
+        contrastText: '#fff',
         dark: darken('#5765f2', 0.1),
         main: '#5765f2'
       },

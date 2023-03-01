@@ -23,7 +23,7 @@ const StyledBox = styled(Box)`
   ${hoverIconsStyle({ absolutePositioning: true })}
 `;
 
-function BountyCard({ onDelete, bounty, page, onClick, readOnly }: Props) {
+function BountyKanbanCard({ onDelete, bounty, page, onClick, readOnly }: Props) {
   const { pageDetails } = usePageDetails(page?.id);
   return (
     <StyledBox
@@ -59,4 +59,4 @@ function BountyCard({ onDelete, bounty, page, onClick, readOnly }: Props) {
   );
 }
 
-export default memo(BountyCard);
+export default memo(BountyKanbanCard);
