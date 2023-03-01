@@ -14,7 +14,7 @@ export async function verifyDiscordGateForSpace({ discordUserId, space }: Props)
   if (!discordServerId || !discordUserId || !space.superApiTokenId) {
     return {
       isVerified: false,
-      hasDiscordServer: !!(discordServerId && !space.superApiTokenId),
+      hasDiscordServer: !!(discordServerId && space.superApiTokenId),
       roles: []
     };
   }
