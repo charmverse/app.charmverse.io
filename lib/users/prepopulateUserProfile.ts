@@ -35,21 +35,17 @@ export async function prepopulateUserProfile(user: User, ens: string | null) {
   }
 
   if (ensDetails?.description || ensDetails?.discord || ensDetails?.github || ensDetails?.twitter) {
-    try {
-      await prisma.userDetails.create({
-        data: {
-          id: user.id,
-          ...(ensDetails?.description ? { description: ensDetails?.description } : undefined),
-          social: {
-            ...(ensDetails?.discord ? { discordUsername: ensDetails?.discord } : undefined),
-            ...(ensDetails?.github ? { githubURL: ensDetails?.github } : undefined),
-            ...(ensDetails?.twitter ? { twitterURL: ensDetails?.twitter } : undefined)
-          }
+    await prisma.userDetails.create({
+      data: {
+        id: user.id,
+        ...(ensDetails?.description ? { description: ensDetails?.description } : undefined),
+        social: {
+          ...(ensDetails?.discord ? { discordUsername: ensDetails?.discord } : undefined),
+          ...(ensDetails?.github ? { githubURL: ensDetails?.github } : undefined),
+          ...(ensDetails?.twitter ? { twitterURL: ensDetails?.twitter } : undefined)
         }
-      });
-    } catch (error) {
-      log.error('Failed to update user details from ens', { userId: user.id, error });
-    }
+      }
+    });
   }
 
   const nfts = await getUserNFTs(user.id);
@@ -80,22 +76,18 @@ export async function prepopulateUserProfile(user: User, ens: string | null) {
 
     const fiveNFTs = nfts.slice(0, 5);
 
-    try {
-      await Promise.all(
-        fiveNFTs.map(async (nft) => {
-          await prisma.profileItem.create({
-            data: {
-              id: nft.id,
-              userId: user.id,
-              isHidden: true,
-              isPinned: true,
-              type: 'nft'
-            }
-          });
-        })
-      );
-    } catch (error) {
-      log.error('Failed to update user profile items with max 5 nfts', { userId: user.id, error });
-    }
+    await Promise.all(
+      fiveNFTs.map(async (nft) => {
+        await prisma.profileItem.create({
+          data: {
+            id: nft.id,
+            userId: user.id,
+            isHidden: true,
+            isPinned: true,
+            type: 'nft'
+          }
+        });
+      })
+    );
   }
 }
