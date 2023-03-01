@@ -86,7 +86,7 @@ export function SpaceFeatureSettings() {
               <Switch
                 data-test={`space-feature-toggle-${feature}`}
                 disabled={!isAdmin}
-                defaultChecked={!space?.hiddenFeatures.includes(feature)}
+                checked={!space?.hiddenFeatures.includes(feature)}
                 onChange={(ev) => {
                   const { checked } = ev.target;
                   setValue(feature, !!checked);

@@ -265,7 +265,7 @@ export default function Sidebar({ closeSidebar, favorites, navAction }: SidebarP
               />
               <Divider sx={{ mx: 2, my: 1 }} />
 
-              {!space?.featureBlacklist.includes('member_directory') && (
+              {!space.hiddenFeatures.includes('member_directory') && (
                 <SidebarLink
                   href={`/${space.domain}/members`}
                   active={router.pathname.startsWith('/[domain]/members')}
@@ -275,7 +275,7 @@ export default function Sidebar({ closeSidebar, favorites, navAction }: SidebarP
                 />
               )}
 
-              {!space?.featureBlacklist.includes('proposals') && (
+              {!space.hiddenFeatures.includes('proposals') && (
                 <SidebarLink
                   data-test='sidebar-link-proposals'
                   href={`/${space.domain}/proposals`}
@@ -286,7 +286,7 @@ export default function Sidebar({ closeSidebar, favorites, navAction }: SidebarP
                 />
               )}
 
-              {!space?.featureBlacklist.includes('bounties') && (
+              {!space.hiddenFeatures.includes('bounties') && (
                 <SidebarLink
                   href={`/${space.domain}/bounties`}
                   active={router.pathname.startsWith('/[domain]/bounties')}
@@ -296,7 +296,7 @@ export default function Sidebar({ closeSidebar, favorites, navAction }: SidebarP
                 />
               )}
 
-              {!space?.featureBlacklist.includes('forum') && (
+              {!space.hiddenFeatures.includes('forum') && (
                 <SidebarLink
                   href={`/${space.domain}/forum`}
                   data-test='sidebar-link-forum'

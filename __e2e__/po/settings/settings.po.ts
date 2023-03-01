@@ -4,8 +4,10 @@ import type { Locator, Page } from '@playwright/test';
 import type { SpaceSettingsSection } from 'components/settings/pages';
 import { baseUrl } from 'config/constants';
 
+import { GlobalPage } from '../global.po';
+
 // capture actions on the pages in signup flow
-export class SettingsModal {
+export class SettingsModal extends GlobalPage {
   readonly page: Page;
 
   readonly settingsBtn: Locator;
@@ -13,6 +15,7 @@ export class SettingsModal {
   readonly closeModalButton: Locator;
 
   constructor(page: Page) {
+    super(page);
     this.page = page;
     this.settingsBtn = page.locator('data-test=sidebar-settings');
     this.closeModalButton = page.locator('data-test=close-settings-modal');

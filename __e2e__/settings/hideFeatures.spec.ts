@@ -1,5 +1,4 @@
-import { test as base, expect } from '@playwright/test';
-import { GlobalPage } from '__e2e__/po/global.po';
+import { expect, test as base } from '@playwright/test';
 import { v4 } from 'uuid';
 
 import { SpaceProfileSettings } from '../po/settings/spaceProfileSettings.po';
@@ -8,26 +7,24 @@ import { login } from '../utils/session';
 
 type Fixtures = {
   spaceSettings: SpaceProfileSettings;
-  globalPage: GlobalPage;
 };
 
 const test = base.extend<Fixtures>({
-  spaceSettings: ({ page }, use) => use(new SpaceProfileSettings(page)),
-  globalPage: ({ page }, use) => use(new GlobalPage(page))
+  spaceSettings: ({ page }, use) => use(new SpaceProfileSettings(page))
 });
 
-test('Space settings - toggle feature visibility', async ({ page, spaceSettings, globalPage }) => {
+test('Space settings - toggle feature visibility', async ({ spaceSettings }) => {
   const { space, user: spaceUser } = await generateUserAndSpace({ spaceName: v4(), isAdmin: true, onboarded: true });
   // go to a page to which we don't have access
 
-  await login({ page, userId: spaceUser.id });
+  await login({ page: spaceSettings.page, userId: spaceUser.id });
 
   await spaceSettings.goTo(space.domain);
 
   await spaceSettings.waitForSpaceSettingsURL();
 
   // Make sure link is visible by default
-  await expect(globalPage.sidebarProposalsLink).toBeVisible();
+  await expect(spaceSettings.sidebarProposalsLink).toBeVisible();
 
   await spaceSettings.openSettingsModal();
   await expect(spaceSettings.proposalsVisibilityToggle).toBeVisible();
@@ -41,13 +38,13 @@ test('Space settings - toggle feature visibility', async ({ page, spaceSettings,
   expect(!!classes?.match('Mui-checked')).toBe(false);
 
   // Give some time for API response
-  await page.waitForTimeout(500);
+  await spaceSettings.page.waitForTimeout(500);
 
-  await expect(globalPage.sidebarProposalsLink).not.toBeVisible();
+  await expect(spaceSettings.sidebarProposalsLink).not.toBeVisible();
 
   await spaceSettings.closeModalButton.click();
 
   // Make sure modal is closed before evaluating the sidebar
   await expect(spaceSettings.closeModalButton).not.toBeVisible();
-  await expect(globalPage.sidebarProposalsLink).not.toBeVisible();
+  await expect(spaceSettings.sidebarProposalsLink).not.toBeVisible();
 });

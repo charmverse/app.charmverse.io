@@ -14,6 +14,6 @@ export class SpacesApi {
   }
 
   async setHiddenFeatures({ hiddenFeatures, spaceId }: SpaceHiddenFeatures) {
-    return http.POST<Space>(`/api/spaces/${spaceId}/set-feature-blacklist`, { hiddenFeatures });
+    return http.POST<Space>(`/api/spaces/${spaceId}/set-hidden-features`, { hiddenFeatures });
   }
 }
