@@ -33,7 +33,7 @@ type Props = {
   readOnlySourceData: boolean;
   cardIdToFocusOnRender: string;
   showCard: (cardId: string | null) => void;
-  addCard: (groupByOptionId?: string) => Promise<void>;
+  addCard: (groupByOptionId?: string, show?: boolean) => Promise<void>;
   onCardClicked: (e: React.MouseEvent, card: Card) => void;
 };
 
@@ -282,7 +282,7 @@ function Table(props: Props): JSX.Element {
             <div
               className='octo-table-cell'
               onClick={() => {
-                props.addCard('');
+                props.addCard('', true);
               }}
             >
               <Box display='flex' gap={1} alignItems='center'>
