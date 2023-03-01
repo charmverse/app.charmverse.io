@@ -2,7 +2,6 @@ import type { Prisma } from '@prisma/client';
 import { IdentityType } from '@prisma/client';
 
 import { prisma } from 'db';
-import { getENSName } from 'lib/blockchain/getENSName';
 import { sessionUserRelations } from 'lib/session/config';
 import { InsecureOperationError, InvalidInputError } from 'lib/utilities/errors';
 import { matchWalletAddress, shortWalletAddress } from 'lib/utilities/strings';
@@ -65,7 +64,7 @@ export async function updateUsedIdentity(userId: string, identityUpdate?: Identi
 
   // Priority of identities: [wallet, discord, unstoppable domain, google account]
   if (user.wallets.length) {
-    updateContent.username = user.wallets[0].address;
+    updateContent.username = shortWalletAddress(user.wallets[0].address);
     updateContent.identityType = 'Wallet';
   } else if (user.discordUser) {
     updateContent.username = (user.discordUser.account as any).username;

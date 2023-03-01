@@ -213,6 +213,11 @@ function DocumentPage({ page, setPage, insideModal, readOnly = false }: Document
               fullWidth={isSmallScreen || (page.fullWidth ?? false)}
             >
               <CharmEditor
+                placeholderText={
+                  page.type === 'bounty' || page.type === 'bounty_template'
+                    ? `Describe the bounty. Type '/' to see the list of available commands`
+                    : undefined
+                }
                 key={page.id + editMode + String(pagePermissions?.edit_content)}
                 // content={pageDetails?.content as PageContent}
                 // onContentChange={updatePageContent}

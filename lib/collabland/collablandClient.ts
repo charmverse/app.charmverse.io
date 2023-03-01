@@ -121,12 +121,12 @@ export async function canJoinSpaceViaDiscord({
     });
 
     return {
-      isEligible: !res.is_pending && !res.pending,
+      isVerified: !res.is_pending && !res.pending,
       roles: userRoles || []
     };
   } catch (e) {
     return {
-      isEligible: false,
+      isVerified: false,
       roles: []
     };
   }

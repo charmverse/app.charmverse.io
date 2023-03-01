@@ -1,16 +1,15 @@
 import { Box } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
-import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
+import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import Modal from 'components/common/Modal';
-import TokenGateForm from 'components/common/TokenGateForm';
+import { SpaceAccessGate } from 'components/common/SpaceAccessGate/SpaceAccessGate';
 import { WalletSign } from 'components/login/WalletSign';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsSpaceMember } from 'hooks/useIsSpaceMember';
-import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import type { PageMeta } from 'lib/pages';
@@ -24,6 +23,9 @@ export function BountySignupButton({ bountyPage }: Props) {
   const { account, walletAuthSignature, loginFromWeb3Account } = useWeb3AuthSig();
   const { user, setUser, isLoaded: isUserLoaded } = useUser();
   const space = useCurrentSpace();
+  const { data: spaceWithGates } = useSWR(space ? `spaceByDomain/${space.domain}` : null, () =>
+    charmClient.spaces.searchByDomain(space!.domain)
+  );
   const loginViaTokenGateModal = usePopupState({ variant: 'popover', popupId: 'login-via-token-gate' });
   const [loggingIn, setLoggingIn] = useState(false);
 
@@ -74,13 +76,15 @@ export function BountySignupButton({ bountyPage }: Props) {
             <WalletSign signSuccess={loginFromWeb3Account} />
           </Box>
         ) : (
-          <TokenGateForm
-            onSuccess={() => {
-              window.location.href = `${window.location.origin}/${space?.domain}/${bountyPage.path}`;
-            }}
-            spaceDomain={space?.domain ?? ''}
-            joinType='public_bounty_token_gate'
-          />
+          spaceWithGates && (
+            <SpaceAccessGate
+              onSuccess={() => {
+                window.location.href = `${window.location.origin}/${space?.domain}/${bountyPage.path}`;
+              }}
+              space={spaceWithGates}
+              joinType='public_bounty_token_gate'
+            />
+          )
         )}
       </Modal>
     </>

@@ -29,7 +29,7 @@ import type { SpaceCreateTemplate } from 'lib/spaces/config';
 import randomName from 'lib/utilities/randomName';
 
 import { ImportZippedMarkdown } from '../ImportZippedMarkdown';
-import { JoinDynamicSpaceForm } from '../TokenGateForm/JoinDynamicSpaceForm';
+import { SpaceAccessGateWithSearch } from '../SpaceAccessGate/SpaceAccessGateWithSearch';
 
 import { SelectNewSpaceTemplate } from './SelectNewSpaceTemplate';
 
@@ -179,7 +179,7 @@ export function CreateSpaceForm({ defaultValues, onCancel, submitText }: Props) 
   if (step === 'join_space') {
     return (
       <Box>
-        <JoinDynamicSpaceForm goBack={goToSelectTemplate} />
+        <SpaceAccessGateWithSearch goBack={goToSelectTemplate} />
       </Box>
     );
   }
