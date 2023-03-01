@@ -2,6 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { prisma } from 'db';
+import log from 'lib/log';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { requireCustomPermissionMode } from 'lib/middleware/requireCustomPermissionMode';
@@ -41,6 +42,8 @@ async function addSpacePermissionsController(req: NextApiRequest, res: NextApiRe
     // Unwind operations and assigned group
     ...req.body
   });
+
+  log.debug('Adding space permissions', { spaceId: req.body.spaceId, operations: req.body.operations });
 
   // tracking
   if (req.body.roleId) {
