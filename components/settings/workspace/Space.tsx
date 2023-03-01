@@ -17,10 +17,9 @@ import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import ConnectSnapshot from 'components/common/PageLayout/components/Header/components/Snapshot/ConnectSnapshot';
 import PrimaryButton from 'components/common/PrimaryButton';
 import Legend from 'components/settings/Legend';
-import ImportNotionWorkspace from 'components/settings/workspace/ImportNotionWorkspace';
+import ImportContent from 'components/settings/workspace/ImportContent';
 import Avatar from 'components/settings/workspace/LargeAvatar';
 import { useIsAdmin } from 'hooks/useIsAdmin';
-import { setTitle } from 'hooks/usePageTitle';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useSpaces } from 'hooks/useSpaces';
 
@@ -103,7 +102,6 @@ export default function SpaceSettings({ space }: { space: Space }) {
     workspaceRemoveModalState.open();
   }
 
-  setTitle('Space Options');
   usePreventReload(isDirty);
 
   return (
@@ -129,7 +127,7 @@ export default function SpaceSettings({ space }: { space: Space }) {
               fullWidth
               error={!!errors.name}
               helperText={errors.name?.message}
-              data-test='set-space-name'
+              data-test='space-name-input'
             />
           </Grid>
           <Grid item>
@@ -141,7 +139,7 @@ export default function SpaceSettings({ space }: { space: Space }) {
               error={!!errors.domain}
               helperText={errors.domain?.message}
               sx={{ mb: 1 }}
-              data-test='set-space-domain'
+              data-test='space-domain-input'
             />
             {error && <FormHelperText error>{error}</FormHelperText>}
           </Grid>
@@ -171,7 +169,7 @@ export default function SpaceSettings({ space }: { space: Space }) {
       </form>
       <Legend mt={4}>Import Content</Legend>
       <Box sx={{ ml: 1 }} display='flex' flexDirection='column' gap={1}>
-        <ImportNotionWorkspace />
+        <ImportContent />
       </Box>
 
       <Legend mt={4}>Snapshot.org Integration</Legend>

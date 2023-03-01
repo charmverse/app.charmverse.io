@@ -1,1 +1,1 @@
-export { default } from './PostDialog';
+export { PostDialog } from './PostDialog';

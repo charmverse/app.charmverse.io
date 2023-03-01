@@ -23,6 +23,14 @@ export class ForumHomePage {
 
   readonly closeModalButton: Locator;
 
+  readonly postDialog: Locator;
+
+  readonly postDialogCloseButton: Locator;
+
+  readonly postDialogContextMenu: Locator;
+
+  readonly postDialogDeleteButton: Locator;
+
   constructor(page: Page) {
     this.page = page;
     this.addCategoryButton = page.locator('data-test=add-category-button');
@@ -32,6 +40,10 @@ export class ForumHomePage {
     this.categoryPermissionsDialog = page.locator('data-test=category-permissions-dialog');
     this.spaceCategoryPermissionSelect = page.locator('data-test=category-space-permission >> input');
     this.closeModalButton = page.locator('data-test=close-modal');
+    this.postDialog = page.locator('data-test=dialog');
+    this.postDialogCloseButton = page.locator('data-test=close-dialog');
+    this.postDialogContextMenu = page.locator('data-test=page-actions-context-menu');
+    this.postDialogDeleteButton = page.locator('data-test=delete-page-from-context');
   }
 
   async goToForumHome(domain: string) {
@@ -48,12 +60,19 @@ export class ForumHomePage {
     return this.page.locator(`data-test=forum-post-card-${postId}`);
   }
 
+  async waitForCategory({ domain, path }: { domain: string; path: string }) {
+    await this.page.waitForURL(`**/${domain}/forum/${path}`);
+  }
+
+  // Interact with post dialog ----------------
   getOpenPostAsPageLocator() {
     return this.page.locator('data-test=open-post-as-page');
   }
 
-  async waitForCategory({ domain, path }: { domain: string; path: string }) {
-    await this.page.waitForURL(`**/${domain}/forum/${path}`);
+  async isDeletePostButtonDisabled(): Promise<boolean> {
+    const button = this.postDialogDeleteButton;
+    const classes = await button.getAttribute('class');
+    return !!classes?.match('Mui-disabled');
   }
 
   // Interactions with categories sidebar ----------------

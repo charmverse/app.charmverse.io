@@ -8,10 +8,12 @@ import type { PageType } from '@prisma/client';
 import { useRouter } from 'next/router';
 import type { Dispatch, ReactNode, SetStateAction } from 'react';
 
+import { usePostPermissions } from 'components/forum/hooks/usePostPermissions';
+import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useMembers } from 'hooks/useMembers';
+import { usePagePermissions } from 'hooks/usePagePermissions';
 import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
-import { humanFriendlyDate } from 'lib/utilities/dates';
 
 import { Utils } from './BoardEditor/focalboard/src/utils';
 
@@ -42,14 +44,16 @@ export function PageActionsMenu({
   };
   readOnly?: boolean;
 }) {
-  const { getPagePermissions } = usePages();
   const { members } = useMembers();
   const router = useRouter();
   const { showMessage } = useSnackbar();
   const charmversePage = members.find((member) => member.id === page.createdBy);
   const open = Boolean(anchorEl);
-  const pagePermissions = getPagePermissions(page.id);
-
+  const { formatDateTime } = useDateFormatter();
+  const { permissions: pagePermissions } = usePagePermissions({ pageIdOrPath: page.id });
+  const postPermissions = usePostPermissions({
+    postIdOrPath: router.pathname.startsWith('/[domain]/forum') ? page.id : (null as any)
+  });
   function getPageLink() {
     let link = window.location.href;
 
@@ -60,7 +64,6 @@ export function PageActionsMenu({
     }
     return link;
   }
-
   function onClickCopyLink() {
     Utils.copyTextToClipboard(getPageLink());
     showMessage(`Copied ${page.type} link to clipboard`, 'success');
@@ -92,7 +95,12 @@ export function PageActionsMenu({
           <ListItemText>Edit</ListItemText>
         </MenuItem>
       )}
-      <MenuItem dense onClick={onClickDelete} disabled={Boolean(readOnly || !pagePermissions.delete || page.deletedAt)}>
+      <MenuItem
+        dense
+        onClick={onClickDelete}
+        disabled={Boolean(readOnly || (!pagePermissions?.delete && !postPermissions?.delete_post))}
+        data-test='delete-page-from-context'
+      >
         <DeleteOutlineIcon fontSize='small' sx={{ mr: 1 }} />
         <ListItemText>Delete</ListItemText>
       </MenuItem>
@@ -119,10 +127,10 @@ export function PageActionsMenu({
           }}
         >
           <Typography variant='caption' color='secondary'>
-            Last edited by {charmversePage.username}
+            Last edited by <strong>{charmversePage.username}</strong>
           </Typography>
           <Typography variant='caption' color='secondary'>
-            Last edited at {humanFriendlyDate(page.updatedAt)}
+            at <strong>{formatDateTime(page.updatedAt)}</strong>
           </Typography>
         </Stack>
       )}

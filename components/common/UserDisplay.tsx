@@ -72,7 +72,7 @@ export const AnonUserDisplay = memo(AnonUserDisplayComponent);
  * @linkToProfile Whether we show a link to user's public profile. Defaults to false.
  */
 interface UserDisplayProps extends StyleProps {
-  user?: Omit<User, 'addresses'> | null;
+  user?: Pick<User, 'avatar' | 'username' | 'path' | 'id'> | null;
   linkToProfile?: boolean;
   showMiniProfile?: boolean;
 }
@@ -107,11 +107,15 @@ function UserDisplay({ showMiniProfile = false, user, linkToProfile = false, ...
 
   return (
     <BaseComponent
-      onClick={() => {
-        if (showMiniProfile) {
-          showMemberProfile(user.id);
-        }
-      }}
+      onClick={
+        showMiniProfile
+          ? () => {
+              if (showMiniProfile) {
+                showMemberProfile(user.id);
+              }
+            }
+          : undefined
+      }
       username={user.username}
       avatar={user.avatar}
       isNft={isNft}

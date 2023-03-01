@@ -9,6 +9,7 @@ import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import { WalletConnect } from 'components/login/WalletConnect';
 import Legend from 'components/settings/Legend';
+import { useDiscordConnection } from 'hooks/useDiscordConnection';
 import { useFirebaseAuth } from 'hooks/useFirebaseAuth';
 import { useUser } from 'hooks/useUser';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
@@ -18,7 +19,6 @@ import type { TelegramAccount } from 'pages/api/telegram/connect';
 import DiscordIcon from 'public/images/discord_logo.svg';
 import TelegramIcon from 'public/images/telegram_logo.svg';
 
-import { DiscordProvider } from './DiscordProvider';
 import TelegramLoginIframe, { loginWithTelegram } from './TelegramLoginIframe';
 
 const StyledButton = styled(Button)`
@@ -56,6 +56,8 @@ export default function IdentityProviders() {
 
   const connectedWithTelegram = Boolean(user?.telegramUser);
   const connectedWithGoogle = !!user?.googleAccounts.length;
+
+  const { connect, isConnected, isLoading, error } = useDiscordConnection();
 
   // Don't allow a user to remove their last identity
   const cannotDisconnect = !user || countConnectableIdentities(user) <= 1;
@@ -115,42 +117,38 @@ export default function IdentityProviders() {
           <WalletConnect onSuccess={() => null} />
         </ProviderRow>
 
-        <DiscordProvider>
-          {({ isConnected, isLoading, connect, error }) => (
-            <ProviderRow>
-              <SvgIcon sx={{ color: '#5765f2', height: 48, width: 'auto' }}>
-                <DiscordIcon />
-              </SvgIcon>
-              <Typography color='secondary' variant='button'>
-                {isConnected ? 'Connected with Discord' : 'Connect with Discord'}
-              </Typography>
-              <Tooltip
-                arrow
-                placement='top'
-                title={
-                  !!user?.discordUser && cannotDisconnect
-                    ? 'You must have at least one other identity you can login with to disconnect Discord'
-                    : ''
-                }
+        <ProviderRow>
+          <SvgIcon sx={{ color: '#5765f2', height: 48, width: 'auto' }}>
+            <DiscordIcon />
+          </SvgIcon>
+          <Typography color='secondary' variant='button'>
+            {isConnected ? 'Connected with Discord' : 'Connect with Discord'}
+          </Typography>
+          <Tooltip
+            arrow
+            placement='top'
+            title={
+              !!user?.discordUser && cannotDisconnect
+                ? 'You must have at least one other identity you can login with to disconnect Discord'
+                : ''
+            }
+          >
+            {/** div is used to make sure the tooltip is rendered as disabled button doesn't allow tooltip */}
+            <div>
+              <StyledButton
+                variant='outlined'
+                color={isConnected ? 'error' : 'primary'}
+                disabled={(!!user?.discordUser && cannotDisconnect) || isLoggingOut || isLoading}
+                onClick={connect}
+                loading={isLoading}
               >
-                {/** div is used to make sure the tooltip is rendered as disabled button doesn't allow tooltip */}
-                <div>
-                  <StyledButton
-                    variant='outlined'
-                    color={isConnected ? 'error' : 'primary'}
-                    disabled={(!!user?.discordUser && cannotDisconnect) || isLoggingOut || isLoading}
-                    onClick={connect}
-                    loading={isLoading}
-                  >
-                    {isConnected ? 'Disconnect' : 'Connect'}
-                  </StyledButton>
-                </div>
-              </Tooltip>
+                {isConnected ? 'Disconnect' : 'Connect'}
+              </StyledButton>
+            </div>
+          </Tooltip>
 
-              {error && <Alert severity='error'>{error}</Alert>}
-            </ProviderRow>
-          )}
-        </DiscordProvider>
+          {error && <Alert severity='error'>{error}</Alert>}
+        </ProviderRow>
 
         <ProviderRow>
           <SvgIcon sx={{ height: 48, width: 'auto' }}>
@@ -174,7 +172,7 @@ export default function IdentityProviders() {
           {telegramError && <Alert severity='error'>{telegramError}</Alert>}
         </ProviderRow>
         <ProviderRow>
-          <img src='images/Google_G.png' height={48} width='auto' />
+          <img src='/images/Google_G.png' height={48} width='auto' />
           <Typography color='secondary' variant='button'>
             {connectedWithGoogle ? 'Connected with Google' : 'Connect with Google'}
           </Typography>

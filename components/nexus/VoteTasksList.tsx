@@ -12,11 +12,12 @@ import type { KeyedMutator } from 'swr';
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import type { VoteDetailProps } from 'components/common/CharmEditor/components/inlineVote/components/VoteDetail';
-import VoteDetail from 'components/common/CharmEditor/components/inlineVote/components/VoteDetail';
+import { VoteDetail } from 'components/common/CharmEditor/components/inlineVote/components/VoteDetail';
 import Link from 'components/common/Link';
 import LoadingComponent from 'components/common/LoadingComponent';
 import Modal from 'components/common/Modal';
 import VoteIcon from 'components/votes/components/VoteIcon';
+import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import type { VoteTask } from 'lib/votes/interfaces';
 import type { GetTasksResponse } from 'pages/api/tasks/list';
 
@@ -34,10 +35,12 @@ interface VoteTasksListProps {
  */
 export function VoteTasksListRow({
   voteTask,
-  handleVoteId
+  handleVoteId,
+  onClose
 }: {
   voteTask: VoteTask;
   handleVoteId: (voteId: string) => void;
+  onClose: () => void;
 }) {
   const {
     page: { path: pagePath, title: pageTitle },
@@ -65,7 +68,7 @@ export function VoteTasksListRow({
         </Box>
       </TableCell>
       <TableCell>
-        <Link href={voteLink} variant='body1' color='inherit'>
+        <Link href={voteLink} variant='body1' color='inherit' onClick={onClose}>
           {voteLocation}
         </Link>
       </TableCell>
@@ -96,6 +99,7 @@ export function VoteTasksListRow({
 
 export function VoteTasksList({ error, tasks, mutateTasks }: VoteTasksListProps) {
   const [selectedVoteId, setSelectedVoteId] = useState<string | undefined>();
+  const { onClose } = useSettingsDialog();
 
   const closeModal = () => setSelectedVoteId(undefined);
 
@@ -172,7 +176,7 @@ export function VoteTasksList({ error, tasks, mutateTasks }: VoteTasksListProps)
         </TableHead>
         <TableBody>
           {tasks.votes.map((vote) => (
-            <VoteTasksListRow handleVoteId={handleVoteId} key={vote.id} voteTask={vote} />
+            <VoteTasksListRow handleVoteId={handleVoteId} key={vote.id} voteTask={vote} onClose={onClose} />
           ))}
         </TableBody>
       </Table>

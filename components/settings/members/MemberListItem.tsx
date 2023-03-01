@@ -10,9 +10,9 @@ import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/ho
 import Avatar from 'components/common/Avatar';
 import Button from 'components/common/Button';
 import { StyledListItemText } from 'components/common/StyledListItemText';
+import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useMembers } from 'hooks/useMembers';
 import type { Member } from 'lib/members/interfaces';
-import { humanFriendlyDate } from 'lib/utilities/dates';
 
 export const StyledRow = styled(Box)`
   border-bottom: 1px solid ${({ theme }) => theme.palette.divider};
@@ -34,6 +34,7 @@ interface Props {
 export default function MemberRow({ isAdmin, isSpaceOwner, member, onChange }: Props) {
   const popupState = usePopupState({ variant: 'popover', popupId: 'user-role' });
   const { members } = useMembers();
+  const { formatDate } = useDateFormatter();
   const totalAdmins = members.filter((_member) => _member.isAdmin).length;
   function handleMenuItemClick(action: RoleAction) {
     onChange(action, member);
@@ -57,7 +58,7 @@ export default function MemberRow({ isAdmin, isSpaceOwner, member, onChange }: P
   const activeRoleAction = member.isAdmin ? 'makeAdmin' : 'makeMember';
 
   return (
-    <TableRow>
+    <TableRow data-test={`member-list-item-${member.id}`}>
       <TableCell>
         <Box display='flex' alignItems='center'>
           <Avatar name={member.username} avatar={member?.avatar} isNft={member?.hasNftAvatar} />
@@ -71,7 +72,7 @@ export default function MemberRow({ isAdmin, isSpaceOwner, member, onChange }: P
       </TableCell>
       <TableCell>
         <Typography minWidth={80} variant='body2'>
-          {humanFriendlyDate(member.createdAt)}
+          {formatDate(member.createdAt)}
         </Typography>
       </TableCell>
       <TableCell>
@@ -83,6 +84,7 @@ export default function MemberRow({ isAdmin, isSpaceOwner, member, onChange }: P
               variant='outlined'
               {...bindTrigger(popupState)}
               endIcon={<KeyboardArrowDownIcon fontSize='small' />}
+              data-test={`editable-member-level-${member.id}`}
             >
               {member.isAdmin ? 'admin' : 'member'}
             </Button>

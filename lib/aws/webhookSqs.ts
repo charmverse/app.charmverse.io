@@ -1,9 +1,9 @@
 import type { SQSClientConfig } from '@aws-sdk/client-sqs';
 import { SQSClient, ReceiveMessageCommand, DeleteMessageCommand } from '@aws-sdk/client-sqs';
 
-import { AWS_REGION, SQS_URL } from 'lib/aws/config';
+import { AWS_REGION } from 'lib/aws/config';
 import { getLogger } from 'lib/log/prefix';
-import type { WebhookMessage, WebhookMessageProcessResult } from 'lib/webhooks/interfaces';
+import type { WebhookMessage, WebhookMessageProcessResult } from 'lib/webhookConsumer/interfaces';
 
 const log = getLogger('sqs');
 
@@ -15,6 +15,9 @@ type ProcessMssagesInput = {
 const AWS_API_KEY = process.env.AWS_ACCESS_KEY_ID as string;
 const AWS_API_SECRET = process.env.AWS_SECRET_ACCESS_KEY as string;
 const SQS_REGION = (process.env.AWS_REGION as string) || AWS_REGION;
+const SQS_URL = process.env.SQS_WEBHOOK_COLLABLAND_QUEUE_NAME;
+
+log.info('Queue url:', SQS_URL);
 
 const config: SQSClientConfig = { region: SQS_REGION };
 if (AWS_API_KEY && AWS_API_SECRET) {

@@ -1,7 +1,6 @@
 import { bold, code, hardBreak, italic, strike, underline } from '@bangle.dev/base-components';
 import type { RawPlugins } from '@bangle.dev/core';
-import { BangleEditorState, NodeView, Plugin } from '@bangle.dev/core';
-import { markdownSerializer } from '@bangle.dev/markdown';
+import { NodeView, Plugin } from '@bangle.dev/core';
 import type { EditorState, EditorView } from '@bangle.dev/pm';
 import { Node, PluginKey } from '@bangle.dev/pm';
 import { useEditorState } from '@bangle.dev/react';
@@ -62,6 +61,7 @@ import * as inlineVote from './components/inlineVote';
 import { plugins as linkPlugins } from './components/link/link.plugins';
 import { LinksPopup } from './components/link/LinksPopup';
 import * as listItem from './components/listItem/listItem';
+import { plugins as markdownPlugins } from './components/markdown/markdown.plugins';
 import Mention, { mentionPluginKeyName, mentionPlugins, MentionSuggest } from './components/mention';
 import NestedPage, { nestedPagePluginKeyName, nestedPagePlugins, NestedPagesList } from './components/nestedPage';
 import * as nft from './components/nft/nft';
@@ -243,7 +243,8 @@ export function charmEditorPlugins({
     tweet.plugins(),
     trailingNode.plugins(),
     videoPlugins(),
-    iframe.plugins()
+    iframe.plugins(),
+    markdownPlugins()
   ];
 
   if (!readOnly) {
@@ -384,25 +385,7 @@ interface CharmEditorProps {
   placeholderText?: string;
   focusOnInit?: boolean;
   disableRowHandles?: boolean;
-}
-
-export function convertPageContentToMarkdown(content: PageContent, title?: string): string {
-  const serializer = markdownSerializer(specRegistry);
-
-  const state = new BangleEditorState({
-    specRegistry,
-    initialValue: Node.fromJSON(specRegistry.schema, content) ?? ''
-  });
-
-  let markdown = serializer.serialize(state.pmState.doc);
-
-  if (title) {
-    const pageTitleAsMarkdown = `# ${title}`;
-
-    markdown = `${pageTitleAsMarkdown}\r\n\r\n${markdown}`;
-  }
-
-  return markdown;
+  disableNestedPages?: boolean;
 }
 
 function CharmEditor({
@@ -425,7 +408,8 @@ function CharmEditor({
   placeholderText,
   focusOnInit,
   onParticipantUpdate,
-  disableRowHandles = false
+  disableRowHandles = false,
+  disableNestedPages = false
 }: CharmEditorProps) {
   const router = useRouter();
   const { showMessage } = useSnackbar();
@@ -434,7 +418,7 @@ function CharmEditor({
   const { setCurrentPageActionDisplay } = usePageActionDisplay();
   const { user } = useUser();
   const isTemplate = pageType ? pageType.includes('template') : false;
-  const disableNestedPage = disablePageSpecificFeatures || enableSuggestingMode || isTemplate;
+  const disableNestedPage = disablePageSpecificFeatures || enableSuggestingMode || isTemplate || disableNestedPages;
   const onThreadResolveDebounced = debounce((_pageId: string, doc: EditorState['doc'], prevDoc: EditorState['doc']) => {
     const deletedThreadIds = extractDeletedThreadIds(specRegistry.schema, doc, prevDoc);
     if (deletedThreadIds.length) {

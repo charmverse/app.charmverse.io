@@ -1,8 +1,7 @@
-import { WebhookEventNames } from 'serverless/webhook/interfaces';
-
 import { prisma } from 'db';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
-import { publishWebhookEvent } from 'lib/webhook';
+import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
+import { publishPostCommentEvent } from 'lib/webhookPublisher/publishEvent';
 
 import type { CreatePostCommentInput } from './interface';
 
@@ -16,7 +15,7 @@ export async function createPostComment({
   postId: string;
   userId: string;
 }) {
-  const post = await prisma.post.findUnique({
+  const post = await prisma.post.findUniqueOrThrow({
     where: { id: postId },
     include: {
       category: true
@@ -38,19 +37,10 @@ export async function createPostComment({
           id: postId
         }
       }
-    },
-    include: {
-      user: {
-        select: {
-          id: true,
-          avatar: true,
-          username: true
-        }
-      }
     }
   });
 
-  const category = post?.category;
+  const category = post.category;
 
   if (category) {
     trackUserAction('create_comment', {
@@ -63,24 +53,13 @@ export async function createPostComment({
     });
   }
 
-  if (post) {
-    // Publish webhook event if needed
-    await publishWebhookEvent(post.spaceId, {
-      scope: WebhookEventNames.CommentCreated,
-      comment: {
-        createdAt: comment.createdAt.toISOString(),
-        id: comment.id,
-        threadId: postId,
-        parentId: parentId ?? null,
-        author: {
-          wallet: '',
-          avatar: comment.user.avatar,
-          username: comment.user.username
-        }
-      },
-      discussion: null
-    });
-  }
+  // Publish webhook event if needed
+  await publishPostCommentEvent({
+    scope: WebhookEventNames.CommentCreated,
+    spaceId: post.spaceId,
+    commentId: comment.id,
+    postId
+  });
 
   return comment;
 }

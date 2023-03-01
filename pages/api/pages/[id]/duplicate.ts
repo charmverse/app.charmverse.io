@@ -19,7 +19,7 @@ async function duplicatePageRoute(req: NextApiRequest, res: NextApiResponse<IPag
   const { parentId } = req.body as { parentId: string };
 
   const permissions = await computeUserPagePermissions({
-    pageId,
+    resourceId: pageId,
     userId
   });
 

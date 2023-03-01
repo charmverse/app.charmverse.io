@@ -3,6 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { prisma } from 'db';
+import log from 'lib/log';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { updateTrackPageProfile } from 'lib/metrics/mixpanel/updateTrackPageProfile';
 import { ActionNotPermittedError, NotFoundError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
@@ -39,7 +40,7 @@ async function getPageRoute(req: NextApiRequest, res: NextApiResponse<IPageWithP
 
   // Page ID might be a path now, so first we fetch the page and if found, can pass the id from the found page to check if we should actually send it to the requester
   const permissions = await computeUserPagePermissions({
-    pageId: page.id,
+    resourceId: page.id,
     userId
   });
 
@@ -55,7 +56,7 @@ async function updatePageHandler(req: NextApiRequest, res: NextApiResponse<IPage
   const userId = req.session.user.id;
 
   const permissions = await computeUserPagePermissions({
-    pageId,
+    resourceId: pageId,
     userId
   });
 
@@ -148,7 +149,7 @@ async function deletePage(req: NextApiRequest, res: NextApiResponse<ModifyChildP
   const pageId = req.query.id as string;
   const userId = req.session.user.id;
 
-  const pageToDelete = await prisma.page.findUnique({
+  const pageToDelete = await prisma.page.findUniqueOrThrow({
     where: {
       id: pageId
     },
@@ -158,7 +159,7 @@ async function deletePage(req: NextApiRequest, res: NextApiResponse<ModifyChildP
   });
 
   const permissions = await computeUserPagePermissions({
-    pageId,
+    resourceId: pageId,
     userId
   });
 
@@ -176,16 +177,21 @@ async function deletePage(req: NextApiRequest, res: NextApiResponse<ModifyChildP
 
   updateTrackPageProfile(pageId);
 
-  if (pageToDelete) {
-    relay.broadcast(
-      {
-        type: 'pages_deleted',
-        payload: modifiedChildPageIds.map((id) => ({ id }))
-      },
-      pageToDelete.spaceId
-    );
-    trackUserAction('delete_page', { userId, pageId, spaceId: pageToDelete.spaceId });
-  }
+  relay.broadcast(
+    {
+      type: 'pages_deleted',
+      payload: modifiedChildPageIds.map((id) => ({ id }))
+    },
+    pageToDelete.spaceId
+  );
+  trackUserAction('delete_page', { userId, pageId, spaceId: pageToDelete.spaceId });
+
+  log.info('User deleted a page', {
+    userId,
+    pageId,
+    pageIds: modifiedChildPageIds,
+    spaceId: pageToDelete.spaceId
+  });
 
   return res.status(200).json({ pageIds: modifiedChildPageIds, rootBlock });
 }

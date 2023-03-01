@@ -91,16 +91,10 @@ interface Props {
   pageType: PageType;
   refreshPermissions: () => void;
   pagePermissions: IPagePermissionWithAssignee[];
-  proposalParentId?: string | null;
+  proposalId?: string;
 }
 
-export default function PagePermissions({
-  pageId,
-  pagePermissions,
-  refreshPermissions,
-  pageType,
-  proposalParentId
-}: Props) {
+export default function PagePermissions({ pageId, pagePermissions, refreshPermissions, pageType }: Props) {
   const { pages, getPagePermissions } = usePages();
   const space = useCurrentSpace();
   const popupState = usePopupState({ variant: 'popover', popupId: 'add-a-permission' });
@@ -153,10 +147,7 @@ export default function PagePermissions({
   const { custom, proposal_editor, ...permissionsWithoutCustom } = permissionLevels as Record<string, string>;
   const permissionsWithRemove = { ...permissionsWithoutCustom, delete: 'Remove' };
 
-  const canEdit =
-    userPagePermissions?.grant_permissions === true &&
-    canReceiveManualPermissionUpdates({ pageType }) &&
-    !proposalParentId;
+  const canEdit = userPagePermissions?.grant_permissions === true && canReceiveManualPermissionUpdates({ pageType });
 
   return (
     <Box p={1}>
@@ -189,7 +180,7 @@ export default function PagePermissions({
             ) : (
               <Tooltip
                 title={
-                  userPagePermissions?.edit_isPublic && Boolean(proposalParentId)
+                  userPagePermissions?.edit_isPublic
                     ? 'You can only change this setting from the top proposal page.'
                     : ''
                 }
@@ -230,17 +221,9 @@ export default function PagePermissions({
                     defaultValue={permission.permissionLevel}
                   />
                 ) : (
-                  <Tooltip
-                    title={
-                      userPagePermissions?.edit_isPublic && Boolean(proposalParentId)
-                        ? 'You can only change this setting from the top proposal page.'
-                        : ''
-                    }
-                  >
-                    <Typography color='secondary' variant='caption'>
-                      {permissionLevels[permission.permissionLevel]}
-                    </Typography>
-                  </Tooltip>
+                  <Typography color='secondary' variant='caption'>
+                    {permissionLevels[permission.permissionLevel]}
+                  </Typography>
                 )}
               </div>
             </Box>

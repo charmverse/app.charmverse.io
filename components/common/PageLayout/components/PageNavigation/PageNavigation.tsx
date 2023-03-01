@@ -211,8 +211,8 @@ function PageNavigation({ deletePage, isFavorites, rootPageIds, onClick }: PageN
       aria-label='items navigator'
       defaultCollapseIcon={
         <NavIconHover
-          width={{ xs: 30, md: 24 }}
-          height={{ xs: 30, md: 24 }}
+          width={{ xs: 30, md: 20 }}
+          height={{ xs: 30, md: 20 }}
           display='flex'
           alignItems='center'
           justifyContent='center'
@@ -222,8 +222,8 @@ function PageNavigation({ deletePage, isFavorites, rootPageIds, onClick }: PageN
       }
       defaultExpandIcon={
         <NavIconHover
-          width={{ xs: 30, md: 24 }}
-          height={{ xs: 30, md: 24 }}
+          width={{ xs: 30, md: 20 }}
+          height={{ xs: 30, md: 20 }}
           display='flex'
           alignItems='center'
           justifyContent='center'

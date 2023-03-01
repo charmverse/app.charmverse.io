@@ -11,6 +11,8 @@ import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { computeBountyPermissions } from 'lib/permissions/bounties';
 import { withSessionRoute } from 'lib/session/withSession';
 import { DataNotFoundError, UnauthorisedActionError } from 'lib/utilities/errors';
+import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
+import { publishBountyEvent } from 'lib/webhookPublisher/publishEvent';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -64,6 +66,12 @@ async function reviewSubmissionController(req: NextApiRequest, res: NextApiRespo
   const { spaceId, rewardAmount, rewardToken, id, page } = submission.bounty;
   if (decision === 'approve') {
     trackUserAction('bounty_submission_reviewed', { userId, spaceId, pageId: page?.id || '', resourceId: id });
+    await publishBountyEvent({
+      scope: WebhookEventNames.BountyCompleted,
+      bountyId: submission.bounty.id,
+      spaceId,
+      userId
+    });
   } else {
     if (submission.status === 'applied') {
       trackUserAction('bounty_application_rejected', {

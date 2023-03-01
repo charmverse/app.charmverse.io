@@ -6,22 +6,21 @@ import nc from 'next-connect';
 import { prisma } from 'db';
 import { updateTrackPageProfile } from 'lib/metrics/mixpanel/updateTrackPageProfile';
 import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
-import { findParentOfType } from 'lib/pages/findParentOfType';
-import { PageNotFoundError, resolvePageTree } from 'lib/pages/server';
+import { PageNotFoundError } from 'lib/pages/server';
 import type {
   IPagePermissionRequest,
+  IPagePermissionToCreate,
   IPagePermissionToDelete,
   IPagePermissionWithAssignee,
-  IPagePermissionWithSource,
-  IPagePermissionToCreate
+  IPagePermissionWithSource
 } from 'lib/permissions/pages';
 import {
+  computeUserPagePermissions,
   deletePagePermission,
+  getPagePermission,
   listPagePermissions,
   setupPermissionsAfterPagePermissionAdded,
-  upsertPermission,
-  computeUserPagePermissions,
-  getPagePermission
+  upsertPermission
 } from 'lib/permissions/pages';
 import { PermissionNotFoundError } from 'lib/permissions/pages/errors';
 import { boardPagePermissionUpdated } from 'lib/permissions/pages/triggers';
@@ -49,7 +48,7 @@ async function addPagePermission(req: NextApiRequest, res: NextApiResponse<IPage
   const { pageId, permissionLevel } = req.body as Required<IPagePermissionToCreate>;
 
   const computedPermissions = await computeUserPagePermissions({
-    pageId,
+    resourceId: pageId,
     userId: req.session.user.id
   });
 
@@ -86,20 +85,7 @@ async function addPagePermission(req: NextApiRequest, res: NextApiResponse<IPage
           pageId
         }
       });
-
-      const pageTree = await resolvePageTree({
-        pageId: page.id,
-        flattenChildren: true,
-        tx
-      });
-
-      const proposalParentId = findParentOfType({ targetPageTree: pageTree, pageType: 'proposal' });
-
-      if (proposalParentId) {
-        throw new ActionNotPermittedError('You cannot manually update permissions for child pages of proposals.');
-      }
-
-      const newPermission = await upsertPermission(pageId, req.body, pageTree, tx);
+      const newPermission = await upsertPermission(pageId, req.body, undefined, tx);
 
       // Override behaviour, we always cascade board permissions downwards
       if (page.type.match(/board/)) {
@@ -140,7 +126,7 @@ async function removePagePermission(req: NextApiRequest, res: NextApiResponse) {
   }
 
   const computedPermissions = await computeUserPagePermissions({
-    pageId: permission.pageId,
+    resourceId: permission.pageId,
     userId: req.session.user.id
   });
 
@@ -148,17 +134,6 @@ async function removePagePermission(req: NextApiRequest, res: NextApiResponse) {
     throw new ActionNotPermittedError('You cannot manage permissions for this page');
   } else if (!permission.public && computedPermissions.grant_permissions !== true) {
     throw new ActionNotPermittedError('You cannot manage permissions for this page');
-  }
-
-  const pageTree = await resolvePageTree({
-    pageId: permission.pageId,
-    flattenChildren: true
-  });
-
-  const proposalParentId = findParentOfType({ targetPageTree: pageTree, pageType: 'proposal' });
-
-  if (proposalParentId) {
-    throw new ActionNotPermittedError('You cannot manually update permissions for child pages of proposals.');
   }
 
   await deletePagePermission(permissionId);

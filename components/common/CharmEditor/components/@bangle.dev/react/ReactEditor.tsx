@@ -190,7 +190,7 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
             plugins: _editor.view.state.plugins
           };
           // Set document in prosemirror
-          _editor.view.setProps({ state: EditorState.create(stateConfig) });
+          _editor.view?.setProps({ state: EditorState.create(stateConfig) });
         }
       });
     }

@@ -9,3 +9,6 @@ export function login({ page, userId }: { userId: string; page: Page }) {
     }
   });
 }
+export function logout({ page }: { page: Page }) {
+  return page.request.post(`${baseUrl}/api/session/logout`);
+}

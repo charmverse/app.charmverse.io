@@ -36,5 +36,6 @@ export async function getUserProfile(
   if (!profile) {
     throw new MissingDataError(`User with ${key} ${value} not found`);
   }
+
   return profile;
 }

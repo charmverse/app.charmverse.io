@@ -4,10 +4,11 @@ import nc from 'next-connect';
 
 import { prisma } from 'db';
 import { onError, onNoMatch, requireApiKey } from 'lib/middleware';
+import { generateMarkdown } from 'lib/prosemirror/plugins/markdown/generateMarkdown';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireApiKey).use(getBounties);
+handler.use(requireApiKey).get(getBounties);
 
 /**
  * @swagger
@@ -30,9 +31,13 @@ handler.use(requireApiKey).use(getBounties);
  *          type: string
  *          format: date-time
  *          example: 2022-04-04T21:32:38.317Z
- *        description:
- *          type: string
- *          example: Create a story on Instagram
+ *        content:
+ *          type: object
+ *          properties:
+ *            text:
+ *              type: string
+ *            markdown:
+ *              type: string
  *        issuer:
  *          type: object
  *          $ref: '#/components/schemas/UserWallet'
@@ -73,7 +78,10 @@ handler.use(requireApiKey).use(getBounties);
 export interface PublicApiBounty {
   id: string;
   createdAt: string;
-  description: string;
+  content: {
+    text: string;
+    markdown: string;
+  };
   issuer: {
     address: string;
   };
@@ -128,26 +136,38 @@ async function getBounties(req: NextApiRequest, res: NextApiResponse) {
 
   const spaceId = req.authorizedSpaceId;
 
-  const bounties = await prisma.bounty.findMany({
-    where: {
-      spaceId,
-      status: statuses
-        ? {
-            in: statuses
-          }
-        : undefined
-    },
-    include: {
-      author: {
-        include: {
-          wallets: true
-        }
+  const bounties = await prisma.bounty
+    .findMany({
+      where: {
+        spaceId,
+        status: statuses
+          ? {
+              in: statuses
+            }
+          : undefined
       },
-      applications: true,
-      space: true,
-      page: true
-    }
-  });
+      include: {
+        author: {
+          include: {
+            wallets: true
+          }
+        },
+        applications: true,
+        space: true,
+        page: {
+          select: {
+            path: true,
+            createdAt: true,
+            title: true,
+            content: true,
+            contentText: true,
+            deletedAt: true
+          }
+        }
+      }
+    })
+    // Make the API response faster by avoiding a join operation on the database, and filtering the results
+    .then((_bounties) => _bounties.filter((b) => !b.page?.deletedAt));
 
   /**
    * Returns the wallet addresses that have received a payment for this bounty
@@ -164,10 +184,26 @@ async function getBounties(req: NextApiRequest, res: NextApiResponse) {
     return `${process.env.DOMAIN}/${bounty.space.domain}/bounties/${bounty.id}`;
   }
 
+  const markdown: string[] = [];
+
+  for (const bounty of bounties) {
+    try {
+      const markdownText = await generateMarkdown({
+        content: bounty.page?.content ?? { type: 'doc', content: [] }
+      });
+      markdown.push(markdownText);
+    } catch {
+      markdown.push('markdown not available');
+    }
+  }
+
   const bountiesResponse = bounties.map(
-    (bounty): PublicApiBounty => ({
+    (bounty, index): PublicApiBounty => ({
       createdAt: bounty.createdAt.toISOString(),
-      description: bounty.page?.contentText || '',
+      content: {
+        text: bounty.page?.contentText ?? '',
+        markdown: markdown[index]
+      },
       id: bounty.id,
       issuer: {
         address: bounty.author.wallets[0]?.address
@@ -178,7 +214,7 @@ async function getBounties(req: NextApiRequest, res: NextApiResponse) {
         chain: bounty.chainId,
         token: bounty.rewardToken
       },
-      title: bounty.page?.title || 'Untitled',
+      title: bounty.page?.title ?? 'Untitled',
       status: bounty.status,
       url: getUrl(bounty)
     })

@@ -1,39 +1,54 @@
-import type { Page, Space, Vote } from '@prisma/client';
+import type { Page, Space, User, Vote } from '@prisma/client';
 import request from 'supertest';
 import { v4 } from 'uuid';
 
+import { upsertProposalCategoryPermission } from 'lib/permissions/proposals/upsertProposalCategoryPermission';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
-import { createPage, createVote, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { createPage, createVote, generateSpaceUser, generateUserAndSpace } from 'testing/setupDatabase';
+import { generateProposal, generateProposalCategory } from 'testing/utils/proposals';
 
-let page1: Page;
-let page2: Page;
+let page: Page;
+
 let space1: Space;
-let space2: Space;
+let proposalAuthor: User;
+let space1User: User;
 let cancelledVote: Vote;
 let inProgressVote: Vote;
+
+// ------------
+let space2: Space;
+let space2User: User;
+let space2Page: Page;
 let space2Vote: Vote;
 
 let userCookie: string;
 
 beforeAll(async () => {
-  const { space: generatedSpace1, user: generatedUser1 } = await generateUserAndSpaceWithApiToken(undefined, true);
-  const { space: generatedSpace2, user: generatedUser2 } = await generateUserAndSpaceWithApiToken(undefined, true);
+  const { space: generatedSpace1, user: generatedUser1 } = await generateUserAndSpace({ isAdmin: false });
+  const { space: generatedSpace2, user: generatedUser2 } = await generateUserAndSpace({ isAdmin: false });
+  proposalAuthor = await generateSpaceUser({
+    isAdmin: false,
+    spaceId: generatedSpace1.id
+  });
   space1 = generatedSpace1;
   space2 = generatedSpace2;
 
-  page1 = await createPage({
+  space1User = generatedUser1 as User;
+  space2User = generatedUser2 as User;
+
+  page = await createPage({
     createdBy: generatedUser1.id,
-    spaceId: space1.id
+    spaceId: space1.id,
+    pagePermissions: [
+      {
+        permissionLevel: 'view_comment',
+        spaceId: space1.id
+      }
+    ]
   });
-
-  page2 = await createPage({
-    createdBy: generatedUser2.id,
-    spaceId: space1.id
-  });
-
   cancelledVote = await createVote({
     createdBy: generatedUser1.id,
-    pageId: page1.id,
+    pageId: page.id,
     spaceId: space1.id,
     status: 'Cancelled',
     voteOptions: ['3', '4']
@@ -41,14 +56,25 @@ beforeAll(async () => {
 
   inProgressVote = await createVote({
     createdBy: generatedUser1.id,
-    pageId: page1.id,
+    pageId: page.id,
     spaceId: space1.id,
     voteOptions: ['1', '2']
   });
 
+  space2Page = await createPage({
+    createdBy: space2User.id,
+    spaceId: space2.id,
+    pagePermissions: [
+      {
+        permissionLevel: 'view_comment',
+        spaceId: space2.id
+      }
+    ]
+  });
+
   space2Vote = await createVote({
-    createdBy: generatedUser1.id,
-    pageId: page2.id,
+    createdBy: space2User.id,
+    pageId: space2Page.id,
     spaceId: space2.id,
     voteOptions: ['1', '2']
   });
@@ -56,7 +82,7 @@ beforeAll(async () => {
   userCookie = await loginUser(generatedUser1.id);
 });
 
-describe('POST /api/votes/[id]/cast - Cast a vote using one of the provided options', () => {
+describe('POST /api/votes/[id]/cast - Cast a vote on a page poll', () => {
   it('Should cast vote and respond 200', async () => {
     await request(baseUrl)
       .post(`/api/votes/${inProgressVote.id}/cast`)
@@ -106,7 +132,121 @@ describe('POST /api/votes/[id]/cast - Cast a vote using one of the provided opti
       .post(`/api/votes/${space2Vote.id}/cast`)
       .set('Cookie', userCookie)
       .send({
-        choice: ['1']
+        choice: '1'
+      })
+      .expect(401);
+  });
+});
+describe('POST /api/votes/[id]/cast - Cast a vote on a proposal', () => {
+  it('Should allow voting if the proposal is in vote_active stage and user has permission', async () => {
+    // Setup proposal content
+    const proposalCategory = await generateProposalCategory({
+      spaceId: space1.id
+    });
+
+    await upsertProposalCategoryPermission({
+      assignee: {
+        group: 'space',
+        id: space1.id
+      },
+      permissionLevel: 'full_access',
+      proposalCategoryId: proposalCategory.id
+    });
+
+    const proposal = await generateProposal({
+      categoryId: proposalCategory.id,
+      spaceId: space1.id,
+      userId: proposalAuthor.id as string,
+      proposalStatus: 'vote_active'
+    });
+
+    const proposalVote = await createVote({
+      createdBy: space1User.id,
+      context: 'proposal',
+      type: 'Approval',
+      pageId: proposal.id,
+      spaceId: space1.id,
+      voteOptions: ['Yes', 'No']
+    });
+
+    const result = await request(baseUrl)
+      .post(`/api/votes/${proposalVote.id}/cast`)
+      .set('Cookie', userCookie)
+      .send({
+        choice: 'Yes'
+      })
+      .expect(200);
+
+    expect(result.body).toMatchObject({});
+  });
+
+  it('Should not allow voting if the proposal is not in vote_active stage', async () => {
+    // Setup proposal content
+    const proposalCategory = await generateProposalCategory({
+      spaceId: space1.id
+    });
+
+    await upsertProposalCategoryPermission({
+      assignee: {
+        group: 'space',
+        id: space1.id
+      },
+      permissionLevel: 'full_access',
+      proposalCategoryId: proposalCategory.id
+    });
+
+    const proposal = await generateProposal({
+      categoryId: proposalCategory.id,
+      spaceId: space1.id,
+      userId: proposalAuthor.id as string,
+      proposalStatus: 'reviewed'
+    });
+
+    const proposalVote = await createVote({
+      createdBy: space1User.id,
+      context: 'proposal',
+      type: 'Approval',
+      pageId: proposal.id,
+      spaceId: space1.id,
+      voteOptions: ['Yes', 'No']
+    });
+
+    await request(baseUrl)
+      .post(`/api/votes/${proposalVote.id}/cast`)
+      .set('Cookie', userCookie)
+      .send({
+        choice: 'Yes'
+      })
+      .expect(401);
+  });
+
+  it('Should not allow voting if the user does not have permission to vote in this category', async () => {
+    // Setup proposal category with no permissions
+    const proposalCategory = await generateProposalCategory({
+      spaceId: space1.id
+    });
+
+    const proposal = await generateProposal({
+      categoryId: proposalCategory.id,
+      spaceId: space1.id,
+      userId: proposalAuthor.id as string,
+      proposalStatus: 'reviewed'
+    });
+
+    const proposalVote = await createVote({
+      createdBy: space1User.id,
+      context: 'proposal',
+      type: 'Approval',
+      pageId: proposal.id,
+      spaceId: space1.id,
+      voteOptions: ['Yes', 'No']
+    });
+
+    await request(baseUrl)
+      .post(`/api/votes/${proposalVote.id}/cast`)
+      .set('Cookie', userCookie)
+      .send({
+        choice: 'Yes'
       })
       .expect(401);
   });

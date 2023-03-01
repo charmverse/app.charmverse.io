@@ -1,6 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
-import { WebhookEventNames } from 'serverless/webhook/interfaces';
 
 import { prisma } from 'db';
 import type { CommentCreate } from 'lib/comments';
@@ -10,7 +9,6 @@ import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser }
 import { computeUserPagePermissions } from 'lib/permissions/pages/page-permission-compute';
 import { withSessionRoute } from 'lib/session/withSession';
 import { DataNotFoundError } from 'lib/utilities/errors';
-import { publishWebhookEvent } from 'lib/webhook';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -35,9 +33,8 @@ async function addCommentController(req: NextApiRequest, res: NextApiResponse) {
   }
 
   const permissionSet = await computeUserPagePermissions({
-    pageId: thread.pageId,
-    userId,
-    allowAdminBypass: false
+    resourceId: thread.pageId,
+    userId
   });
 
   if (!permissionSet.comment) {
@@ -48,23 +45,6 @@ async function addCommentController(req: NextApiRequest, res: NextApiResponse) {
     threadId,
     userId,
     content
-  });
-
-  // Publish webhook event if needed
-  await publishWebhookEvent(thread.spaceId, {
-    scope: WebhookEventNames.CommentCreated,
-    comment: {
-      createdAt: createdComment.createdAt.toISOString(),
-      id: createdComment.id,
-      threadId: createdComment.threadId,
-      parentId: null,
-      author: {
-        wallet: '',
-        avatar: createdComment.user.avatar,
-        username: createdComment.user.username
-      }
-    },
-    discussion: null
   });
 
   trackUserAction('page_comment_created', {

@@ -1,24 +1,8 @@
 import type { SQSBatchItemFailure, SQSBatchResponse, SQSEvent, SQSRecord } from 'aws-lambda';
-import type { KeyLike } from 'jose';
-import { SignJWT } from 'jose';
 
 import log from 'lib/log';
-
-import type { WebhookPayload } from './interfaces';
-
-const signJwt = (subject: string, payload: Record<string, any>, secret: KeyLike | Uint8Array) => {
-  return (
-    new SignJWT(payload)
-      .setProtectedHeader({ alg: 'HS256' })
-      // subject
-      .setSubject(subject)
-      .setIssuedAt()
-      .setIssuer('https://www.charmverse.io/')
-      // change it
-      .setExpirationTime('15m')
-      .sign(secret)
-  );
-};
+import { signJwt } from 'lib/webhookPublisher/authentication';
+import type { WebhookPayload } from 'lib/webhookPublisher/interfaces';
 
 /**
  * SQS worker, message are executed one by one

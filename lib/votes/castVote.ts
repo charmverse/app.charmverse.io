@@ -2,6 +2,8 @@ import type { UserVote, Vote, VoteOptions } from '@prisma/client';
 
 import { prisma } from 'db';
 import { InvalidInputError, UndesirableOperationError } from 'lib/utilities/errors';
+import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
+import { publishUserProposalEvent } from 'lib/webhookPublisher/publishEvent';
 
 import { isVotingClosed } from './utils';
 
@@ -19,6 +21,15 @@ export async function castVote(
     throw new InvalidInputError('Voting choice is not a valid option.');
   }
 
+  const isFirstVote = !(await prisma.userVote.findUnique({
+    where: {
+      voteId_userId: {
+        voteId,
+        userId
+      }
+    }
+  }));
+
   const userVote = await prisma.userVote.upsert({
     where: {
       voteId_userId: {
@@ -34,8 +45,20 @@ export async function castVote(
     update: {
       choice,
       updatedAt: new Date()
+    },
+    include: {
+      vote: true
     }
   });
+
+  if (isFirstVote && userVote.vote.context === 'proposal') {
+    await publishUserProposalEvent({
+      scope: WebhookEventNames.ProposalUserVoted,
+      userId,
+      proposalId: userVote.vote.pageId,
+      spaceId: userVote.vote.spaceId
+    });
+  }
 
   return userVote;
 }

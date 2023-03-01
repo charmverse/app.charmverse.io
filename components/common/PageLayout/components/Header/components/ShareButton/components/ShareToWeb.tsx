@@ -47,16 +47,15 @@ interface Props {
   pageId: string;
   pagePermissions: IPagePermissionWithAssignee[];
   refreshPermissions: () => void;
-  proposalParentId?: string | null;
 }
 
 const alerts: Partial<Record<PageType, string>> = {
   board: "Updates to this board's permissions, including whether it is public, will also apply to its cards.",
   card_template: ' This template inherits permissions from its parent board.',
-  proposal: 'Proposal permissions update automatically based on the proposal stage and authors / reviewers.'
+  proposal: 'Proposal permissions are managed at the category level.'
 };
 
-export default function ShareToWeb({ pageId, pagePermissions, refreshPermissions, proposalParentId }: Props) {
+export default function ShareToWeb({ pageId, pagePermissions, refreshPermissions }: Props) {
   const router = useRouter();
   const { pages, getPagePermissions } = usePages();
   const [copied, setCopied] = useState<boolean>(false);
@@ -67,12 +66,12 @@ export default function ShareToWeb({ pageId, pagePermissions, refreshPermissions
 
   const currentPage = pages[pageId];
 
-  const disablePublicToggle = currentPagePermissions.edit_isPublic !== true || Boolean(proposalParentId);
+  const disablePublicToggle = currentPagePermissions?.edit_isPublic !== true;
 
   // Current values of the public permission
   const [shareLink, setShareLink] = useState<null | string>(null);
 
-  const shareAlertMessage = currentPage ? alerts[proposalParentId ? 'proposal' : currentPage.type] : undefined;
+  const shareAlertMessage = currentPage ? alerts[currentPage.type] : undefined;
 
   async function togglePublic() {
     if (publicPermission) {
@@ -124,11 +123,7 @@ export default function ShareToWeb({ pageId, pagePermissions, refreshPermissions
           </Typography>
         </Box>
         <Tooltip
-          title={
-            currentPagePermissions.edit_isPublic && Boolean(proposalParentId)
-              ? 'You can only change this setting from the top proposal page.'
-              : ''
-          }
+          title={!currentPagePermissions?.edit_isPublic ? 'You do not have permissions to make this page public' : ''}
         >
           <Box>
             <Switch

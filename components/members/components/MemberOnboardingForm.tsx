@@ -1,8 +1,8 @@
 import { Divider, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 
-import { UserDetails } from 'components/profile/components';
 import { MemberPropertiesPopup } from 'components/profile/components/SpacesMemberDetails/components/MemberPropertiesPopup';
+import UserDetails from 'components/profile/components/UserDetails/UserDetails';
 import { useMemberPropertyValues } from 'hooks/useMemberPropertyValues';
 import { useUser } from 'hooks/useUser';
 
@@ -12,14 +12,12 @@ export function MemberOnboardingForm({
   userId,
   spaceId,
   spaceName,
-  onClose,
-  title
+  onClose
 }: {
   onClose: () => void;
   spaceName: string;
   spaceId: string;
   userId: string;
-  title?: string;
 }) {
   const { updateSpaceValues } = useMemberPropertyValues(userId);
   const { setUser, user } = useUser();
@@ -35,12 +33,11 @@ export function MemberOnboardingForm({
     <MemberEmailForm onNext={() => setShowEmailForm(false)} />
   ) : (
     <MemberPropertiesPopup
-      title={title ?? `Welcome to ${spaceName}. Set up your profile`}
+      title={`Welcome to ${spaceName}. Set up your profile`}
       onClose={onClose}
       memberId={userId}
       spaceId={spaceId}
       updateMemberPropertyValues={updateSpaceValues}
-      cancelButtonText='Set up later'
     >
       {user && (
         <>

@@ -23,9 +23,10 @@ import {
   sortCards
 } from 'components/common/BoardEditor/focalboard/src/store/cards';
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
-import { getView } from 'components/common/BoardEditor/focalboard/src/store/views';
+import { getCurrentBoardViews, getView } from 'components/common/BoardEditor/focalboard/src/store/views';
 import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useMembers } from 'hooks/useMembers';
 import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
@@ -37,7 +38,6 @@ import type { CardPage } from 'lib/focalboard/card';
 import { createCard } from 'lib/focalboard/card';
 import log from 'lib/log';
 import type { IPagePermissionFlags } from 'lib/permissions/pages';
-import { humanFriendlyDate } from 'lib/utilities/dates';
 
 import {
   createCardFieldProperties,
@@ -54,16 +54,17 @@ interface Props {
 }
 
 export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: Props) {
-  const intl = useIntl();
   const router = useRouter();
   const { pages, deletePage } = usePages();
   const view = useAppSelector(getView(router.query.viewId as string));
   const boards = useAppSelector(getSortedBoards);
+  const boardViews = useAppSelector(getCurrentBoardViews);
   const { isFavorite, toggleFavorite } = useToggleFavorite({ pageId });
   const { showMessage } = useSnackbar();
   const { members } = useMembers();
   const { user } = useUser();
   const currentSpace = useCurrentSpace();
+  const { formatDateTime, formatDate } = useDateFormatter();
 
   const activeBoardId = view?.fields.sourceData?.boardId ?? view?.fields.linkedSourceId ?? view?.rootId;
   const board = boards.find((b) => b.id === activeBoardId);
@@ -108,7 +109,10 @@ export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: 
       };
     });
     try {
-      CsvExporter.exportTableCsv(_board, _view, _cards, intl);
+      CsvExporter.exportTableCsv(_board, _view, _cards, {
+        date: formatDate,
+        dateTime: formatDateTime
+      });
       showMessage('Export complete!');
     } catch (error) {
       log.error('CSV export failed', error);
@@ -127,7 +131,11 @@ export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: 
     closeMenu();
   }
 
-  const addNewCards = async (_board: Board, results: Papa.ParseResult<Record<string, string>>) => {
+  const addNewCards = async (
+    _board: Board,
+    _views: BoardView[] | null,
+    results: Papa.ParseResult<Record<string, string>>
+  ) => {
     const csvData = results.data;
     const headers = results.meta.fields || [];
 
@@ -158,6 +166,23 @@ export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: 
 
     // Update board with new cardProperties
     await charmClient.updateBlock(newBoardBlock);
+
+    // Update the view of the table to make all the cards visible
+    const allTableViews = (_views || [])
+      .filter((_view) => _view.type === 'view' && _view.fields.viewType === 'table')
+      .map(async (_view) => {
+        const allCardPropertyIds = newBoardBlock.fields.cardProperties.map((prop) => prop.id);
+        const newViewBlock: BoardView = {
+          ..._view,
+          fields: {
+            ..._view.fields,
+            visiblePropertyIds: allCardPropertyIds
+          }
+        };
+        return charmClient.updateBlock(newViewBlock);
+      });
+
+    await Promise.all(allTableViews);
 
     // Create the new mapped board properties to know what are the ids of each property and option
     const mappedBoardProperties = mapCardBoardProperties(mergedFields);
@@ -209,7 +234,7 @@ export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: 
             return;
           }
           if (isValidCsvResult(results)) {
-            await addNewCards(board, results);
+            await addNewCards(board, boardViews, results);
 
             const spaceId = currentSpace?.id;
             if (spaceId) {
@@ -319,8 +344,12 @@ export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: 
               my: 1
             }}
           >
-            <Typography variant='subtitle2'>Last edited by {lastUpdatedBy.username}</Typography>
-            <Typography variant='subtitle2'>Last edited at {humanFriendlyDate(board.updatedAt)}</Typography>
+            <Typography variant='subtitle2'>
+              Last edited by <strong>{lastUpdatedBy.username}</strong>
+            </Typography>
+            <Typography variant='subtitle2'>
+              at <strong>{formatDateTime(new Date(board.updatedAt))}</strong>
+            </Typography>
           </Stack>
         </>
       )}

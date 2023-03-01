@@ -12,21 +12,21 @@ import Switch from 'components/common/BoardEditor/focalboard/src/widgets/switch'
 import CharmButton from 'components/common/Button';
 import InputSearchBlockchain from 'components/common/form/InputSearchBlockchain';
 import { InputSearchCrypto } from 'components/common/form/InputSearchCrypto';
-import InputSearchReviewers from 'components/common/form/InputSearchReviewers';
+import { InputSearchReviewers } from 'components/common/form/InputSearchReviewers';
 import { InputSearchRoleMultiple } from 'components/common/form/InputSearchRole';
 import { useBounties } from 'hooks/useBounties';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useIsSpaceMember } from 'hooks/useIsSpaceMember';
 import { usePages } from 'hooks/usePages';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
-import { useSharedPage } from 'hooks/useSharedPage';
 import { useUser } from 'hooks/useUser';
 import type { ApplicationWithTransactions } from 'lib/applications/interfaces';
 import type {
   AssignedBountyPermissions,
-  BountyPermissions,
-  UpdateableBountyFields,
   BountyCreationData,
-  BountyWithDetails
+  BountyPermissions,
+  BountyWithDetails,
+  UpdateableBountyFields
 } from 'lib/bounties';
 import type { TargetPermissionGroup } from 'lib/permissions/interfaces';
 import debouncePromise from 'lib/utilities/debouncePromise';
@@ -62,9 +62,10 @@ export default function BountyProperties(props: {
     () => isAmountInputEmpty || Number(currentBounty?.rewardAmount) <= 0,
     [isAmountInputEmpty, currentBounty]
   );
-  const { hasSharedPageAccess } = useSharedPage();
 
-  const readOnly = parentReadOnly || hasSharedPageAccess;
+  const { isSpaceMember } = useIsSpaceMember();
+
+  const readOnly = parentReadOnly || !isSpaceMember;
 
   const bountyPage = pages[pageId];
 
@@ -193,6 +194,7 @@ export default function BountyProperties(props: {
         style={{
           height: 'fit-content'
         }}
+        data-test='bounty-configuration'
       >
         <div className='octo-propertyname octo-propertyname--readonly'>
           <Button>Chain</Button>
@@ -253,6 +255,7 @@ export default function BountyProperties(props: {
           <Button>Reward amount</Button>
         </div>
         <TextField
+          data-test='bounty-property-amount'
           required
           sx={{
             width: '100%'
@@ -423,62 +426,61 @@ export default function BountyProperties(props: {
         bountyPermissions={bountyPermissions}
         pagePermissions={bountyPagePermissions}
         pageId={pageId}
+        readOnly={readOnly}
       />
       <Box justifyContent='space-between' gap={2} alignItems='center'>
-        {!readOnly && (
+        <div
+          className='octo-propertyrow'
+          style={{
+            display: 'flex',
+            height: 'fit-content',
+            flexGrow: 1
+          }}
+        >
           <div
-            className='octo-propertyrow'
-            style={{
-              display: 'flex',
-              height: 'fit-content',
-              flexGrow: 1
-            }}
+            className='octo-propertyname octo-propertyname--readonly'
+            style={{ alignSelf: 'baseline', paddingTop: 12 }}
           >
-            <div
-              className='octo-propertyname octo-propertyname--readonly'
-              style={{ alignSelf: 'baseline', paddingTop: 12 }}
-            >
-              <Button>Reviewer</Button>
-            </div>
-            <div style={{ width: '100%' }}>
-              <InputSearchReviewers
-                disabled={readOnly}
-                readOnly={readOnly}
-                value={bountyPermissions?.reviewer ?? []}
-                disableCloseOnSelect={true}
-                onChange={async (e, options) => {
-                  const roles = options.filter((option) => option.group === 'role');
-                  const members = options.filter((option) => option.group === 'user');
-                  await applyBountyUpdates({
-                    permissions: rollupPermissions({
-                      assignedRoleSubmitters,
-                      selectedReviewerRoles: roles.map((role) => role.id),
-                      selectedReviewerUsers: members.map((member) => member.id),
-                      spaceId: space!.id
-                    })
-                  });
-                  if (currentBounty?.id) {
-                    await refreshBountyPermissions(currentBounty.id);
-                  }
-                }}
-                excludedIds={[...selectedReviewerUsers, ...selectedReviewerRoles]}
-                sx={{
-                  width: '100%'
-                }}
-              />
-              {bountyPagePermissions && bountyPermissions && (
-                <MissingPagePermissions
-                  target='reviewer'
-                  bountyPermissions={bountyPermissions}
-                  pagePermissions={bountyPagePermissions}
-                />
-              )}
-            </div>
+            <Button>Reviewer</Button>
           </div>
-        )}
+          <div style={{ width: '100%' }}>
+            <InputSearchReviewers
+              disabled={readOnly}
+              readOnly={readOnly}
+              value={bountyPermissions?.reviewer ?? []}
+              disableCloseOnSelect={true}
+              onChange={async (e, options) => {
+                const roles = options.filter((option) => option.group === 'role');
+                const members = options.filter((option) => option.group === 'user');
+                await applyBountyUpdates({
+                  permissions: rollupPermissions({
+                    assignedRoleSubmitters,
+                    selectedReviewerRoles: roles.map((role) => role.id),
+                    selectedReviewerUsers: members.map((member) => member.id),
+                    spaceId: space!.id
+                  })
+                });
+                if (currentBounty?.id) {
+                  await refreshBountyPermissions(currentBounty.id);
+                }
+              }}
+              excludedIds={[...selectedReviewerUsers, ...selectedReviewerRoles]}
+              sx={{
+                width: '100%'
+              }}
+            />
+            {bountyPagePermissions && bountyPermissions && (
+              <MissingPagePermissions
+                target='reviewer'
+                bountyPermissions={bountyPermissions}
+                pagePermissions={bountyPagePermissions}
+              />
+            )}
+          </div>
+        </div>
       </Box>
 
-      {!readOnly && bountyProperties}
+      {bountyProperties}
 
       {draftBounty && (
         <Box display='flex' gap={2} my={2}>
@@ -499,8 +501,8 @@ export default function BountyProperties(props: {
 
       {
         // Bounty creator cannot apply to their own bounty
-        permissions && !hasSharedPageAccess && currentBounty.createdBy !== user?.id && (
-          <>
+        permissions && isSpaceMember && currentBounty.createdBy !== user?.id && (
+          <div data-test='bounty-applicant-form'>
             <BountyApplicantForm
               bounty={currentBounty}
               submissions={applications}
@@ -512,11 +514,11 @@ export default function BountyProperties(props: {
                 my: 3
               }}
             />
-          </>
+          </div>
         )
       }
 
-      {hasSharedPageAccess && bountyPage && <BountySignupButton bountyPage={bountyPage} />}
+      {!isSpaceMember && bountyPage && <BountySignupButton bountyPage={bountyPage} />}
 
       {permissions?.userPermissions?.review && currentBounty.status !== 'suggestion' && !draftBounty && (
         <BountyApplicantsTable bounty={currentBounty} permissions={permissions} />

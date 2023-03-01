@@ -21,7 +21,7 @@ import { setUrlWithoutRerender } from 'lib/utilities/browser';
 import { CategoryMenu } from './components/CategoryMenu';
 import { CategorySelect } from './components/CategorySelect';
 import { CreateForumPost } from './components/CreateForumPost';
-import PostDialog from './components/PostDialog';
+import { PostDialog } from './components/PostDialog';
 import { PostSkeleton } from './components/PostList/components/PostSkeleton';
 import { ForumPostList } from './components/PostList/PostList';
 

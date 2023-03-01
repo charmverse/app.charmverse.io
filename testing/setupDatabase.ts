@@ -1,4 +1,4 @@
-import crypto from 'node:crypto';
+import crypto, { randomUUID } from 'node:crypto';
 
 import type {
   ApplicationStatus,
@@ -13,9 +13,9 @@ import type {
   ProposalStatus,
   Role,
   RoleSource,
-  User,
   Thread,
   Transaction,
+  User,
   Vote,
   WorkspaceEvent
 } from '@prisma/client';
@@ -32,13 +32,13 @@ import { getPagePath } from 'lib/pages/utils';
 import type { BountyPermissions } from 'lib/permissions/bounties';
 import type { TargetPermissionGroup } from 'lib/permissions/interfaces';
 import type { ProposalReviewerInput, ProposalWithUsers } from 'lib/proposal/interface';
-import { syncProposalPermissions } from 'lib/proposal/syncProposalPermissions';
 import { sessionUserRelations } from 'lib/session/config';
 import { createUserFromWallet } from 'lib/users/createUser';
 import { uniqueValues } from 'lib/utilities/array';
 import { InvalidInputError } from 'lib/utilities/errors';
 import { typedKeys } from 'lib/utilities/objects';
 import type { LoggedInUser } from 'models';
+import { getRandomThemeColor } from 'theme/utils/getRandomThemeColor';
 
 import { boardWithCardsArgs } from './generateBoardStub';
 
@@ -381,7 +381,9 @@ export async function generateBountyWithSingleApplication({
   bountyCap,
   userId,
   spaceId,
-  bountyStatus
+  bountyStatus,
+  bountyTitle = 'Bounty',
+  bountyDescription = 'Bounty description'
 }: {
   applicationStatus: ApplicationStatus;
   bountyCap: number | null;
@@ -390,6 +392,8 @@ export async function generateBountyWithSingleApplication({
   bountyStatus?: BountyStatus;
   // This should be deleted on future PR. Left for backwards compatibility for now
   reviewer?: string;
+  bountyTitle?: string;
+  bountyDescription?: string;
 }): Promise<BountyWithDetails> {
   const createdBounty = (await prisma.bounty.create({
     data: {
@@ -401,12 +405,40 @@ export async function generateBountyWithSingleApplication({
       spaceId,
       approveSubmitters: false,
       // Important variable
-      maxSubmissions: bountyCap
+      maxSubmissions: bountyCap,
+      page: {
+        create: {
+          title: bountyTitle,
+          path: `bounty-${randomUUID()}`,
+          type: 'bounty',
+          updatedBy: userId,
+          space: { connect: { id: spaceId } },
+          author: { connect: { id: userId } },
+          contentText: bountyDescription,
+          content: {
+            type: 'doc',
+            content: bountyDescription
+              ? [
+                  {
+                    type: 'paragraph',
+                    content: [
+                      {
+                        text: bountyDescription,
+                        type: 'text'
+                      }
+                    ]
+                  }
+                ]
+              : []
+          }
+        }
+      }
     },
     include: {
-      applications: true
+      applications: true,
+      page: true
     }
-  })) as BountyWithDetails;
+  })) as BountyWithDetails & { page: Page };
 
   const user = await prisma.user.findUnique({ where: { id: userId }, include: { wallets: true } });
 
@@ -636,6 +668,7 @@ export async function createProposalWithUsers({
   reviewers,
   userId,
   spaceId,
+  proposalCategoryId,
   ...pageCreateInput
 }: {
   authors: string[];
@@ -643,8 +676,21 @@ export async function createProposalWithUsers({
   spaceId: string;
   userId: string;
   proposalStatus?: ProposalStatus;
+  proposalCategoryId?: string;
 } & Partial<Prisma.PageCreateInput>): Promise<PageWithProposal> {
   const proposalId = v4();
+
+  const proposalCategoryIdToLink = !proposalCategoryId
+    ? (
+        await prisma.proposalCategory.create({
+          data: {
+            title: `Category - ${v4()}`,
+            color: `#ffffff`,
+            space: { connect: { id: spaceId } }
+          }
+        })
+      ).id
+    : proposalCategoryId;
 
   const proposalPage: PageWithProposal = await createPageDb({
     data: {
@@ -673,6 +719,7 @@ export async function createProposalWithUsers({
               id: spaceId
             }
           },
+          category: { connect: { id: proposalCategoryIdToLink } },
           createdBy: userId,
           status: proposalStatus,
           authors: {
@@ -705,9 +752,6 @@ export async function createProposalWithUsers({
       }
     }
   });
-
-  // proposal authors will have full_access to the page
-  await syncProposalPermissions({ proposalId });
 
   return proposalPage;
 }
@@ -811,28 +855,48 @@ export function createBlock(options: Partial<Block> & Pick<Block, 'createdBy' | 
  * Creates a proposal with the linked authors and reviewers
  */
 export async function generateProposal({
+  categoryId,
   userId,
   spaceId,
   proposalStatus,
   authors,
   reviewers,
-  deletedAt = null
+  deletedAt = null,
+  title = 'Proposal'
 }: {
   deletedAt?: Page['deletedAt'];
+  categoryId?: string;
   userId: string;
   spaceId: string;
   authors: string[];
   reviewers: ProposalReviewerInput[];
   proposalStatus: ProposalStatus;
+  title?: string;
 }): Promise<Page & { proposal: ProposalWithUsers; workspaceEvent: WorkspaceEvent }> {
   const proposalId = v4();
+
+  const categoryIdToLink =
+    categoryId ??
+    (
+      await prisma.proposalCategory.create({
+        data: {
+          title: `Category - ${v4()}`,
+          color: getRandomThemeColor(),
+          space: { connect: { id: spaceId } }
+        }
+      })
+    ).id;
 
   const result = await createPageDb<{ proposal: ProposalWithUsers }>({
     data: {
       id: proposalId,
       contentText: '',
+      content: {
+        type: 'doc',
+        content: []
+      },
       path: `path-${v4()}`,
-      title: 'Proposal',
+      title,
       type: 'proposal',
       author: {
         connect: {
@@ -848,6 +912,7 @@ export async function generateProposal({
       deletedAt,
       proposal: {
         create: {
+          category: { connect: { id: categoryIdToLink } },
           id: proposalId,
           createdBy: userId,
           status: proposalStatus,

@@ -37,7 +37,7 @@ export function PageActions({
   };
 
   return (
-    <>
+    <div data-test='page-actions-context-menu'>
       <IconButton size='small' className='icons' onClick={handleClick}>
         <MoreHorizIcon color='secondary' fontSize='small' />
       </IconButton>
@@ -52,6 +52,6 @@ export function PageActions({
       >
         {children}
       </PageActionsMenu>
-    </>
+    </div>
   );
 }

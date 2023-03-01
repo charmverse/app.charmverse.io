@@ -7,8 +7,9 @@ import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { getPageMeta } from 'lib/pages/server/getPageMeta';
 import { computeUserPagePermissions } from 'lib/permissions/pages';
+import { computeProposalPermissions } from 'lib/permissions/proposals/computeProposalPermissions';
+import { computeProposalFlowFlags } from 'lib/proposal/computeProposalFlowFlags';
 import { withSessionRoute } from 'lib/session/withSession';
-import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { DataNotFoundError, UnauthorisedActionError } from 'lib/utilities/errors';
 import { createVote as createVoteService, getVote as getVoteService } from 'lib/votes';
 import type { ExtendedVote, VoteDTO } from 'lib/votes/interfaces';
@@ -59,25 +60,20 @@ async function createVote(req: NextApiRequest, res: NextApiResponse<ExtendedVote
 
   // User must be proposal author or a space admin to create a poll
   if (existingPage.type === 'proposal' && newVote.context === 'proposal') {
-    if (
-      existingPage.proposal?.authors.every((a) => a.userId !== userId) &&
-      (
-        await hasAccessToSpace({
-          userId,
-          spaceId: existingPage.spaceId,
-          adminOnly: true
-        })
-      ).error
-    ) {
+    const permissions = await computeProposalPermissions({
+      resourceId: existingPage.proposal!.id,
+      userId
+    });
+
+    if (!permissions.create_vote) {
       throw new UnauthorisedActionError(
         `Cannot create poll as user ${userId} is not an author of the linked proposal.`
       );
     }
   } else {
     const userPagePermissions = await computeUserPagePermissions({
-      pageId,
-      userId,
-      allowAdminBypass: true
+      resourceId: pageId,
+      userId
     });
 
     if (!userPagePermissions.create_poll) {

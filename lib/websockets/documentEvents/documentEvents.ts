@@ -227,7 +227,7 @@ export class DocumentEventHandler {
         throw new Error(`Invalid page id: ${pageId}`);
       }
       const permissions = await computeUserPagePermissions({
-        pageId,
+        resourceId: pageId,
         userId
       });
 

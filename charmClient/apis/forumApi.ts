@@ -1,4 +1,4 @@
-import type { PostComment, PostCategory, Post, Space } from '@prisma/client';
+import type { Post, PostCategory, PostComment, Space } from '@prisma/client';
 
 import * as http from 'adapters/http';
 import type { CreatePostCategoryInput } from 'lib/forums/categories/createPostCategory';
@@ -13,7 +13,7 @@ import type { PostWithVotes } from 'lib/forums/posts/interfaces';
 import type { ListForumPostsRequest, PaginatedPostList } from 'lib/forums/posts/listForumPosts';
 import type { SearchForumPostsRequest } from 'lib/forums/posts/searchForumPosts';
 import type { UpdateForumPostInput } from 'lib/forums/posts/updateForumPost';
-import type { PageDetails, PageMeta } from 'lib/pages';
+import type { PageMeta } from 'lib/pages';
 import type { PostCategoryWithPermissions } from 'lib/permissions/forum/interfaces';
 
 export class ForumApi {
@@ -95,5 +95,9 @@ export class ForumApi {
 
   deletePostComment({ commentId, postId }: { postId: string; commentId: string }): Promise<void> {
     return http.DELETE(`/api/forums/posts/${postId}/comments/${commentId}`);
+  }
+
+  convertToProposal({ postId, categoryId }: { postId: string; categoryId: string }) {
+    return http.POST<PageMeta>(`/api/forums/posts/${postId}/convert-to-proposal`, { categoryId });
   }
 }

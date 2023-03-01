@@ -18,16 +18,17 @@ const StyledInput = styled(InputBase)`
   padding: 0; // disable padding added for multi-line input
 `;
 
-function Editable({ maxRows, ..._props }: TextInputProps, ref: React.Ref<Focusable>): JSX.Element {
+function Editable({ maxRows, multiline, ..._props }: TextInputProps, ref: React.Ref<Focusable>): JSX.Element {
   const elementRef = useRef<HTMLTextAreaElement>(null);
   const { className, ...props } = useEditable(_props, ref, elementRef);
   return (
     <StyledInput
-      {...props}
       inputProps={{
         className,
         maxRows
       }}
+      {...props}
+      multiline={multiline}
       // props from Editable that are not implemented
       // saveOnEsc
       //   autoExpand?: boolean;

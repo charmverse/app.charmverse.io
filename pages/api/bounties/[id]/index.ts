@@ -24,8 +24,7 @@ async function getBountyController(req: NextApiRequest, res: NextApiResponse<Bou
     !bounty.page ||
     (
       await computeUserPagePermissions({
-        allowAdminBypass: true,
-        pageId: bounty.page.id,
+        resourceId: bounty.page.id,
         userId: req.session.user.id
       })
     ).read !== true
@@ -60,8 +59,7 @@ async function updateBounty(req: NextApiRequest, res: NextApiResponse<BountyWith
   }
 
   const bountyPagePermissions = await computeUserPagePermissions({
-    allowAdminBypass: true,
-    pageId: bounty.page.id,
+    resourceId: bounty.page.id,
     userId
   });
 

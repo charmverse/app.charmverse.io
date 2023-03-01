@@ -1,10 +1,12 @@
 import { Chip, Typography, Stack } from '@mui/material';
 
 import { SelectPreview } from 'components/common/form/fields/Select/SelectPreview';
+import { useDateFormatter } from 'hooks/useDateFormatter';
 import type { PropertyValueWithDetails } from 'lib/members/interfaces';
-import { humanFriendlyDate } from 'lib/utilities/dates';
 
 export function MemberPropertiesRenderer({ properties }: { properties: PropertyValueWithDetails[] }) {
+  const { formatDate } = useDateFormatter();
+
   return (
     <Stack gap={2}>
       {properties.map((property) => {
@@ -41,17 +43,20 @@ export function MemberPropertiesRenderer({ properties }: { properties: PropertyV
             if (!propertyValue || propertyValue?.length === 0) {
               return null;
             }
-            return <SelectPreview value={propertyValue} name={property.name} options={property.options} />;
+            return (
+              <SelectPreview
+                key={property.memberPropertyId}
+                value={propertyValue}
+                name={property.name}
+                options={property.options}
+              />
+            );
           }
           case 'join_date': {
             return (
               <Stack key={property.memberPropertyId}>
                 <Typography fontWeight='bold'>{property.name}</Typography>
-                <Typography>
-                  {humanFriendlyDate(property.value as string, {
-                    withYear: true
-                  })}
-                </Typography>
+                <Typography>{formatDate(property.value as string, { withYear: true })}</Typography>
               </Stack>
             );
           }

@@ -41,19 +41,10 @@ const createDiscussionTask = ({
     type: 'page',
     createdBy: {
       id: v4(),
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      email: '',
       username: '',
       avatar: '',
       path: '',
-      isBot: false,
-      identityType: 'Discord',
-      avatarContract: null,
-      avatarTokenId: null,
-      avatarChain: null,
-      deletedAt: null,
-      spacesOrder: []
+      avatarTokenId: null
     }
   };
 };
@@ -80,19 +71,10 @@ const createForumTask = ({
     mentionId: v4(),
     createdBy: {
       id: v4(),
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      email: '',
       username: '',
       avatar: '',
       path: '',
-      isBot: false,
-      identityType: 'Discord',
-      avatarContract: null,
-      avatarTokenId: null,
-      avatarChain: null,
-      deletedAt: null,
-      spacesOrder: []
+      avatarTokenId: null
     }
   };
 };

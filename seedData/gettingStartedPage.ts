@@ -1,9 +1,11 @@
 import type { Page } from '@prisma/client';
 
-export const gettingStartedPage: Pick<
+export type GettingStartedPage = Pick<
   Page,
   'title' | 'icon' | 'headerImage' | 'hasContent' | 'content' | 'contentText' | 'type' | 'index' | 'version'
-> = {
+>;
+
+export const gettingStartedPage: GettingStartedPage = {
   title: 'Getting Started',
   hasContent: true,
   headerImage:
@@ -1525,6 +1527,59 @@ export const gettingStartedPage: Pick<
                     ]
                   }
                 ]
+              },
+              {
+                type: 'listItem',
+                attrs: {
+                  track: [],
+                  todoChecked: null
+                },
+                content: [
+                  {
+                    type: 'paragraph',
+                    attrs: {
+                      track: []
+                    },
+                    content: [
+                      {
+                        text: 'User Manual',
+                        type: 'text',
+                        marks: [
+                          {
+                            type: 'link',
+                            attrs: {
+                              href: 'https://app.charmverse.io/charmverse-community/page-649263016636265'
+                            }
+                          },
+                          {
+                            type: 'insertion',
+                            attrs: {
+                              date: '2023-02-12T14:50:00.000Z',
+                              user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
+                              approved: true,
+                              username: 'Drea | CharmVerse'
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        text: ' : Our User Manual is under construction. We will be adding content and updating regularly!',
+                        type: 'text',
+                        marks: [
+                          {
+                            type: 'insertion',
+                            attrs: {
+                              date: '2023-02-12T14:50:00.000Z',
+                              user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
+                              approved: true,
+                              username: 'Drea | CharmVerse'
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
               }
             ]
           },
@@ -1618,6 +1673,329 @@ export const gettingStartedPage: Pick<
               {
                 text: ' ',
                 type: 'text'
+              },
+              {
+                text: ' ',
+                type: 'text',
+                marks: [
+                  {
+                    type: 'insertion',
+                    attrs: {
+                      date: '2023-02-11T13:00:00.000Z',
+                      user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
+                      approved: true,
+                      username: 'Drea | CharmVerse'
+                    }
+                  }
+                ]
+              },
+              {
+                text: 'C',
+                type: 'text',
+                marks: [
+                  {
+                    type: 'insertion',
+                    attrs: {
+                      date: '2023-02-11T13:10:00.000Z',
+                      user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
+                      approved: true,
+                      username: 'Drea | CharmVerse'
+                    }
+                  }
+                ]
+              },
+              {
+                text: 'ustomize the permission settings to create the',
+                type: 'text',
+                marks: [
+                  {
+                    type: 'insertion',
+                    attrs: {
+                      date: '2023-02-11T13:00:00.000Z',
+                      user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
+                      approved: true,
+                      username: 'Drea | CharmVerse'
+                    }
+                  }
+                ]
+              },
+              {
+                text: ' perfect space for your community.',
+                type: 'text',
+                marks: [
+                  {
+                    type: 'insertion',
+                    attrs: {
+                      date: '2023-02-11T13:10:00.000Z',
+                      user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
+                      approved: true,
+                      username: 'Drea | CharmVerse'
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            type: 'disclosureDetails',
+            content: [
+              {
+                type: 'disclosureSummary',
+                content: [
+                  {
+                    type: 'paragraph',
+                    attrs: {
+                      track: []
+                    },
+                    content: [
+                      {
+                        text: 'Set space permissions',
+                        type: 'text',
+                        marks: [
+                          {
+                            type: 'insertion',
+                            attrs: {
+                              date: '2023-02-11T13:10:00.000Z',
+                              user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
+                              approved: true,
+                              username: 'Drea | CharmVerse'
+                            }
+                          },
+                          {
+                            type: 'text-color',
+                            attrs: {
+                              color: 'red',
+                              bgColor: ''
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                type: 'paragraph',
+                attrs: {
+                  track: []
+                },
+                content: [
+                  {
+                    text: 'Space admins may manage space permissions. Access space permissions by clicking ',
+                    type: 'text',
+                    marks: [
+                      {
+                        type: 'insertion',
+                        attrs: {
+                          date: '2023-02-11T13:10:00.000Z',
+                          user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
+                          approved: true,
+                          username: 'Drea | CharmVerse'
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    text: 'Settings',
+                    type: 'text',
+                    marks: [
+                      {
+                        type: 'insertion',
+                        attrs: {
+                          date: '2023-02-11T13:10:00.000Z',
+                          user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
+                          approved: true,
+                          username: 'Drea | CharmVerse'
+                        }
+                      },
+                      {
+                        type: 'text-color',
+                        attrs: {
+                          color: '',
+                          bgColor: 'gray'
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    text: ' in the left side bar and selecting ',
+                    type: 'text',
+                    marks: [
+                      {
+                        type: 'insertion',
+                        attrs: {
+                          date: '2023-02-11T13:10:00.000Z',
+                          user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
+                          approved: true,
+                          username: 'Drea | CharmVerse'
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    text: 'Roles & Permissions',
+                    type: 'text',
+                    marks: [
+                      {
+                        type: 'insertion',
+                        attrs: {
+                          date: '2023-02-11T13:10:00.000Z',
+                          user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
+                          approved: true,
+                          username: 'Drea | CharmVerse'
+                        }
+                      },
+                      {
+                        type: 'text-color',
+                        attrs: {
+                          color: '',
+                          bgColor: 'gray'
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    text: '.',
+                    type: 'text',
+                    marks: [
+                      {
+                        type: 'insertion',
+                        attrs: {
+                          date: '2023-02-11T13:10:00.000Z',
+                          user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
+                          approved: true,
+                          username: 'Drea | CharmVerse'
+                        }
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                type: 'paragraph',
+                attrs: {
+                  track: []
+                },
+                content: [
+                  {
+                    type: 'emoji',
+                    attrs: {
+                      emoji: '❗'
+                    }
+                  },
+                  {
+                    text: ' ',
+                    type: 'text'
+                  },
+                  {
+                    text: 'Default permissions for the starting pages in a new space are ',
+                    type: 'text',
+                    marks: [
+                      {
+                        type: 'insertion',
+                        attrs: {
+                          date: '2023-02-11T13:10:00.000Z',
+                          user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
+                          approved: true,
+                          username: 'Drea | CharmVerse'
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    text: 'full access',
+                    type: 'text',
+                    marks: [
+                      {
+                        type: 'bold'
+                      },
+                      {
+                        type: 'insertion',
+                        attrs: {
+                          date: '2023-02-11T14:00:00.000Z',
+                          user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
+                          approved: true,
+                          username: 'Drea | CharmVerse'
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    text: '.',
+                    type: 'text',
+                    marks: [
+                      {
+                        type: 'insertion',
+                        attrs: {
+                          date: '2023-02-11T13:10:00.000Z',
+                          user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
+                          approved: true,
+                          username: 'Drea | CharmVerse'
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    text: ' ',
+                    type: 'text',
+                    marks: [
+                      {
+                        type: 'insertion',
+                        attrs: {
+                          date: '2023-02-11T14:00:00.000Z',
+                          user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
+                          approved: true,
+                          username: 'Drea | CharmVerse'
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    text: 'Members may create pages, view, edit and share ',
+                    type: 'text',
+                    marks: [
+                      {
+                        type: 'insertion',
+                        attrs: {
+                          date: '2023-02-11T13:10:00.000Z',
+                          user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
+                          approved: true,
+                          username: 'Drea | CharmVerse'
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    text: 'all',
+                    type: 'text',
+                    marks: [
+                      {
+                        type: 'insertion',
+                        attrs: {
+                          date: '2023-02-11T14:00:00.000Z',
+                          user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
+                          approved: true,
+                          username: 'Drea | CharmVerse'
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    text: ' top-level pages.',
+                    type: 'text',
+                    marks: [
+                      {
+                        type: 'insertion',
+                        attrs: {
+                          date: '2023-02-11T13:10:00.000Z',
+                          user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
+                          approved: true,
+                          username: 'Drea | CharmVerse'
+                        }
+                      }
+                    ]
+                  }
+                ]
               }
             ]
           }
@@ -2025,12 +2403,6 @@ export const gettingStartedPage: Pick<
       },
       {
         type: 'paragraph',
-        attrs: {
-          track: []
-        }
-      },
-      {
-        type: 'horizontalRule',
         attrs: {
           track: []
         }
@@ -2507,6 +2879,59 @@ export const gettingStartedPage: Pick<
                     ]
                   }
                 ]
+              },
+              {
+                type: 'listItem',
+                attrs: {
+                  track: [],
+                  todoChecked: null
+                },
+                content: [
+                  {
+                    type: 'paragraph',
+                    attrs: {
+                      track: []
+                    },
+                    content: [
+                      {
+                        text: 'User Manual',
+                        type: 'text',
+                        marks: [
+                          {
+                            type: 'link',
+                            attrs: {
+                              href: 'https://app.charmverse.io/charmverse-community/page-649263016636265'
+                            }
+                          },
+                          {
+                            type: 'insertion',
+                            attrs: {
+                              date: '2023-02-12T14:40:00.000Z',
+                              user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
+                              approved: true,
+                              username: 'Drea | CharmVerse'
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        text: ' : Our User Manual is under construction. We will be adding content and updating regularly!',
+                        type: 'text',
+                        marks: [
+                          {
+                            type: 'insertion',
+                            attrs: {
+                              date: '2023-02-12T14:40:00.000Z',
+                              user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
+                              approved: true,
+                              username: 'Drea | CharmVerse'
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
               }
             ]
           }
@@ -2538,7 +2963,7 @@ export const gettingStartedPage: Pick<
       {
         type: 'blockquote',
         attrs: {
-          emoji: '👉',
+          emoji: '👇',
           track: []
         },
         content: [
@@ -2599,7 +3024,7 @@ export const gettingStartedPage: Pick<
                 ]
               },
               {
-                text: ' Click ',
+                text: ' ',
                 type: 'text',
                 marks: [
                   {
@@ -2614,12 +3039,9 @@ export const gettingStartedPage: Pick<
                 ]
               },
               {
-                text: 'Support & Feedback',
+                text: ' ',
                 type: 'text',
                 marks: [
-                  {
-                    type: 'bold'
-                  },
                   {
                     type: 'insertion',
                     attrs: {
@@ -2628,18 +3050,26 @@ export const gettingStartedPage: Pick<
                       approved: true,
                       username: 'Drea | CharmVerse'
                     }
-                  },
+                  }
+                ]
+              },
+              {
+                text: 'J',
+                type: 'text',
+                marks: [
                   {
-                    type: 'text-color',
+                    type: 'insertion',
                     attrs: {
-                      color: '',
-                      bgColor: 'gray'
+                      date: '2023-02-12T15:00:00.000Z',
+                      user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
+                      approved: true,
+                      username: 'Drea | CharmVerse'
                     }
                   }
                 ]
               },
               {
-                text: ' in the left sidebar to join our Discord and chat with us',
+                text: 'oin our Discord and chat with us',
                 type: 'text',
                 marks: [
                   {
@@ -2667,6 +3097,21 @@ export const gettingStartedPage: Pick<
                     }
                   }
                 ]
+              },
+              {
+                text: ' We are a friendly bunch!',
+                type: 'text',
+                marks: [
+                  {
+                    type: 'insertion',
+                    attrs: {
+                      date: '2023-02-12T15:00:00.000Z',
+                      user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
+                      approved: true,
+                      username: 'Drea | CharmVerse'
+                    }
+                  }
+                ]
               }
             ]
           }
@@ -2684,14 +3129,9 @@ export const gettingStartedPage: Pick<
         ]
       },
       {
-        type: 'paragraph',
+        type: 'bookmark',
         attrs: {
-          track: []
-        }
-      },
-      {
-        type: 'paragraph',
-        attrs: {
+          url: 'https://discord.gg/ACYCzBGC2M',
           track: []
         }
       },
@@ -2704,5 +3144,5 @@ export const gettingStartedPage: Pick<
     ]
   },
   contentText:
-    " Welcome to CharmVerse!A web3 community platform. Powering the Future of Work through Web3. The solution for token communities to build relationships, work together and vote.Here are the basics:Click anywhere and just start typingHit / to see all the types of content you can add - headings, videos, tweets, sub pages, etc.Give it a go. Hit / and insert a new sub page here  Hit : to add an emoji. Go ahead and add your favorite emoji here  Highlight any text, and use the menu that pops up to style your writing however you likeHighlight this text and turn it into a Callout with a fire emoji.See the ⋮⋮ to the left of this checkbox on hover? Click and drag to move this line.Hover over SPACE in your sidebar and click the + button to add a new pageThis is a toggle block. Click the little triangle to see more useful tips!How it works : Learn about CharmVerse's cool web3 features like Forum, Proposal Builder, Bounties, and Member Directory. You will find shortcuts to these features at the top of your sidebar.Solutions : Find examples of how to use CharmVerse for your web3 community.FAQ : Any questions? Maybe we already answered them here  Collaborate in CharmVerseCharmVerse is better with friends, teammates, and collaborators  Add a teammateCreate a private linkAdd a token gateCheckout the Member DirectoryAdd a custom propertyComplete your workspace profileTry creating a proposalBuild a proposal templateStart your first proposalUseful LinksHow it works : Learn about CharmVerse's cool web3 features like Forum, Proposal Builder, Bounties, and Member Directory. You will find shortcuts to these features at the top of your sidebar.Solutions : Find examples of how to use CharmVerse for your web3 community.FAQ : Any questions? Maybe we already answered them here  Need more information? Click Support & Feedback in the left sidebar to join our Discord and chat with us."
+    " Welcome to CharmVerse!A web3 community platform. Powering the Future of Work through Web3. The solution for token communities to build relationships, work together and vote.Here are the basics:Click anywhere and just start typingHit / to see all the types of content you can add - headings, videos, tweets, sub pages, etc.Give it a go. Hit / and insert a new sub page here  Hit : to add an emoji. Go ahead and add your favorite emoji here  Highlight any text, and use the menu that pops up to style your writing however you likeHighlight this text and turn it into a Callout with a fire emoji.See the ⋮⋮ to the left of this checkbox on hover? Click and drag to move this line.Hover over SPACE in your sidebar and click the + button to add a new pageThis is a toggle block. Click the little triangle to see more useful tips!How it works : Learn about CharmVerse's cool web3 features like Forum, Proposal Builder, Bounties, and Member Directory. You will find shortcuts to these features at the top of your sidebar.Solutions : Find examples of how to use CharmVerse for your web3 community.FAQ : Any questions? Maybe we already answered them here  User Manual : Our User Manual is under construction. We will be adding content and updating regularly!Collaborate in CharmVerseCharmVerse is better with friends, teammates, and collaborators   Customize the permission settings to create the perfect space for your community.Set space permissionsSpace admins may manage space permissions. Access space permissions by clicking Settings in the left side bar and selecting Roles & Permissions. Default permissions for the starting pages in a new space are full access. Members may create pages, view, edit and share all top-level pages.Add a teammateCreate a private linkAdd a token gateCheckout the Member DirectoryAdd a custom propertyComplete your workspace profileTry creating a proposalBuild a proposal templateStart your first proposalUseful LinksHow it works : Learn about CharmVerse's cool web3 features like Forum, Proposal Builder, Bounties, and Member Directory. You will find shortcuts to these features at the top of your sidebar.Solutions : Find examples of how to use CharmVerse for your web3 community.FAQ : Any questions? Maybe we already answered them here  User Manual : Our User Manual is under construction. We will be adding content and updating regularly!Need more information?  Join our Discord and chat with us. We are a friendly bunch!"
 };

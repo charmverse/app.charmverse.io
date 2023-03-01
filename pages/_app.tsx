@@ -7,8 +7,6 @@ import type { PaletteMode } from '@mui/material';
 import CssBaseline from '@mui/material/CssBaseline';
 import IconButton from '@mui/material/IconButton';
 import { ThemeProvider } from '@mui/material/styles';
-import { AdapterLuxon } from '@mui/x-date-pickers/AdapterLuxon';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { Web3ReactProvider } from '@web3-react/core';
 import type { NextPage } from 'next';
 import type { AppProps } from 'next/app';
@@ -16,9 +14,11 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import type { ReactElement, ReactNode } from 'react';
 import { useEffect, useMemo, useState } from 'react';
+import { SWRConfig } from 'swr';
 
 import charmClient from 'charmClient';
 import GlobalComponents from 'components/_app/GlobalComponents';
+import { LocalizationProvider } from 'components/_app/LocalizationProvider';
 import { Web3ConnectionManager } from 'components/_app/Web3ConnectionManager';
 import { setTheme as setFocalBoardTheme } from 'components/common/BoardEditor/focalboard/src/theme';
 import FocalBoardProvider from 'components/common/BoardEditor/FocalBoardProvider';
@@ -32,9 +32,12 @@ import { isDevEnv } from 'config/constants';
 import { ColorModeContext } from 'context/darkMode';
 import { BountiesProvider } from 'hooks/useBounties';
 import { CurrentSpaceProvider, useCurrentSpaceId } from 'hooks/useCurrentSpaceId';
+import { DiscordProvider } from 'hooks/useDiscordConnection';
 import { useInterval } from 'hooks/useInterval';
+import { IsSpaceMemberProvider } from 'hooks/useIsSpaceMember';
 import { useLocalStorage } from 'hooks/useLocalStorage';
 import { MembersProvider } from 'hooks/useMembers';
+import { NotionProvider } from 'hooks/useNotionImport';
 import { OnboardingProvider } from 'hooks/useOnboarding';
 import { PagesProvider } from 'hooks/usePages';
 import { PageTitleProvider, usePageTitle } from 'hooks/usePageTitle';
@@ -107,7 +110,6 @@ import 'components/common/BoardEditor/focalboard/src/styles/_markdown.scss';
 import 'components/common/BoardEditor/focalboard/src/widgets/buttons/buttonWithMenu.scss';
 import 'components/common/BoardEditor/focalboard/src/widgets/buttons/iconButton.scss';
 import 'components/common/BoardEditor/focalboard/src/widgets/editable.scss';
-import 'components/common/BoardEditor/focalboard/src/widgets/editableDayPicker.scss';
 import 'components/common/BoardEditor/focalboard/src/widgets/emojiPicker.scss';
 import 'components/common/BoardEditor/focalboard/src/widgets/label.scss';
 import 'components/common/BoardEditor/focalboard/src/widgets/menu/colorOption.scss';
@@ -210,43 +212,45 @@ export default function App({ Component, emotionCache = clientSideEmotionCache, 
     <CacheProvider value={emotionCache}>
       <ColorModeContext.Provider value={colorModeContext}>
         <ThemeProvider theme={theme}>
-          <LocalizationProvider dateAdapter={AdapterLuxon as any}>
-            <SnackbarProvider>
-              <SettingsDialogProvider>
-                <ReactDndProvider>
-                  <DataProviders>
+          <SnackbarProvider>
+            <SettingsDialogProvider>
+              <ReactDndProvider>
+                <DataProviders>
+                  <LocalizationProvider>
                     <OnboardingProvider>
                       <FocalBoardProvider>
-                        <IntlProvider>
-                          <PageHead />
-                          <CssBaseline enableColorScheme={true} />
-                          <Global styles={cssVariables} />
-                          <RouteGuard>
-                            <ErrorBoundary>
-                              <Snackbar
-                                isOpen={isOldBuild}
-                                message='New CharmVerse platform update available. Please refresh.'
-                                actions={[
-                                  <IconButton key='reload' onClick={() => window.location.reload()} color='inherit'>
-                                    <RefreshIcon fontSize='small' />
-                                  </IconButton>
-                                ]}
-                                origin={{ vertical: 'top', horizontal: 'center' }}
-                                severity='warning'
-                                handleClose={() => setIsOldBuild(false)}
-                              />
-                              {getLayout(<Component {...pageProps} />)}
-                              <GlobalComponents />
-                            </ErrorBoundary>
-                          </RouteGuard>
-                        </IntlProvider>
+                        <NotionProvider>
+                          <IntlProvider>
+                            <PageHead />
+                            <CssBaseline enableColorScheme={true} />
+                            <Global styles={cssVariables} />
+                            <RouteGuard>
+                              <ErrorBoundary>
+                                <Snackbar
+                                  isOpen={isOldBuild}
+                                  message='New CharmVerse platform update available. Please refresh.'
+                                  actions={[
+                                    <IconButton key='reload' onClick={() => window.location.reload()} color='inherit'>
+                                      <RefreshIcon fontSize='small' />
+                                    </IconButton>
+                                  ]}
+                                  origin={{ vertical: 'top', horizontal: 'center' }}
+                                  severity='warning'
+                                  handleClose={() => setIsOldBuild(false)}
+                                />
+                                {getLayout(<Component {...pageProps} />)}
+                                <GlobalComponents />
+                              </ErrorBoundary>
+                            </RouteGuard>
+                          </IntlProvider>
+                        </NotionProvider>
                       </FocalBoardProvider>
                     </OnboardingProvider>
-                  </DataProviders>
-                </ReactDndProvider>
-              </SettingsDialogProvider>
-            </SnackbarProvider>
-          </LocalizationProvider>
+                  </LocalizationProvider>
+                </DataProviders>
+              </ReactDndProvider>
+            </SettingsDialogProvider>
+          </SnackbarProvider>
         </ThemeProvider>
       </ColorModeContext.Provider>
     </CacheProvider>
@@ -255,32 +259,44 @@ export default function App({ Component, emotionCache = clientSideEmotionCache, 
 
 function DataProviders({ children }: { children: ReactNode }) {
   return (
-    <UserProvider>
-      <Web3ReactProvider getLibrary={getLibrary}>
-        <Web3ConnectionManager>
-          <Web3AccountProvider>
-            <SpacesProvider>
-              <CurrentSpaceProvider>
-                <CurrentSpaceSetter />
-                <WebSocketClientProvider>
-                  <MembersProvider>
-                    <BountiesProvider>
-                      <PaymentMethodsProvider>
-                        <PagesProvider>
-                          <MemberProfileProvider>
-                            <PageTitleProvider>{children}</PageTitleProvider>
-                          </MemberProfileProvider>
-                        </PagesProvider>
-                      </PaymentMethodsProvider>
-                    </BountiesProvider>
-                  </MembersProvider>
-                </WebSocketClientProvider>
-              </CurrentSpaceProvider>
-            </SpacesProvider>
-          </Web3AccountProvider>
-        </Web3ConnectionManager>
-      </Web3ReactProvider>
-    </UserProvider>
+    <SWRConfig
+      value={{
+        shouldRetryOnError(err) {
+          return err.status >= 500;
+        }
+      }}
+    >
+      <UserProvider>
+        <DiscordProvider>
+          <Web3ReactProvider getLibrary={getLibrary}>
+            <Web3ConnectionManager>
+              <Web3AccountProvider>
+                <SpacesProvider>
+                  <CurrentSpaceProvider>
+                    <CurrentSpaceSetter />
+                    <IsSpaceMemberProvider>
+                      <WebSocketClientProvider>
+                        <MembersProvider>
+                          <BountiesProvider>
+                            <PaymentMethodsProvider>
+                              <PagesProvider>
+                                <MemberProfileProvider>
+                                  <PageTitleProvider>{children}</PageTitleProvider>
+                                </MemberProfileProvider>
+                              </PagesProvider>
+                            </PaymentMethodsProvider>
+                          </BountiesProvider>
+                        </MembersProvider>
+                      </WebSocketClientProvider>
+                    </IsSpaceMemberProvider>
+                  </CurrentSpaceProvider>
+                </SpacesProvider>
+              </Web3AccountProvider>
+            </Web3ConnectionManager>
+          </Web3ReactProvider>
+        </DiscordProvider>
+      </UserProvider>
+    </SWRConfig>
   );
 }
 
@@ -289,10 +305,8 @@ function CurrentSpaceSetter() {
   const { setCurrentSpaceId } = useCurrentSpaceId();
 
   useEffect(() => {
-    if (spaceFromPath) {
-      setCurrentSpaceId(spaceFromPath.id);
-    }
-  }, [spaceFromPath]);
+    setCurrentSpaceId(spaceFromPath?.id ?? '');
+  }, [spaceFromPath?.id]);
 
   return null;
 }
@@ -303,7 +317,7 @@ function PageHead() {
 
   return (
     <Head>
-      <title>{title ? `${prefix}${title} | CharmVerse` : `${prefix}CharmVerse - the all-in-one web3 space'}`}</title>
+      <title>{title ? `${prefix}${title} | CharmVerse` : `${prefix}CharmVerse - the all-in-one web3 space`}</title>
       {/* viewport meta tag goes in _app.tsx - https://nextjs.org/docs/messages/no-document-viewport-meta */}
       <meta name='viewport' content='minimum-scale=1, initial-scale=1, width=device-width' />
       {/* Verification required by google */}

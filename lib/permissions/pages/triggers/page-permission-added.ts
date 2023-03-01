@@ -36,7 +36,7 @@ export async function setupPermissionsAfterPagePermissionAdded(
     const permissionsToCompare = updatedPage.permissions.filter((permission) => permission.id !== permissionId);
 
     // We cannot do upsert many currently on Prisma. To keep the number of operations down, we will delete all relevant permissions and recreate them in 2 bulk operations. See https://stackoverflow.com/a/70824192
-    const permissionsToDelete: Prisma.PagePermissionWhereInput[] = [];
+    const permissionsToDelete: string[] = [];
     const permissionsToCreate: Prisma.PagePermissionCreateManyInput[] = [];
 
     function findChildPagesToCreatePermissionsFor(node: PageNodeWithChildren<PageNodeWithPermissions>): void {
@@ -46,13 +46,7 @@ export async function setupPermissionsAfterPagePermissionAdded(
         const canInherit = hasSameOrMorePermissions(permissionsToCompare, childPermissions);
 
         if (canInherit) {
-          permissionsToDelete.push(
-            ...childPermissions.map((p) => {
-              return {
-                id: p.id
-              };
-            })
-          );
+          permissionsToDelete.push(...childPermissions.map((p) => p.id));
 
           const copied = copyAllPagePermissions({
             permissions: permissionsToCopy,
@@ -71,9 +65,7 @@ export async function setupPermissionsAfterPagePermissionAdded(
     findChildPagesToCreatePermissionsFor(updatedPage);
     console.timeEnd('01-tx-----');
     if (permissionsToDelete.length > 0) {
-      console.time('02-delete');
-      await tx.pagePermission.deleteMany({ where: { OR: permissionsToDelete } });
-      console.timeEnd('02-delete');
+      await tx.pagePermission.deleteMany({ where: { id: { in: permissionsToDelete } } });
     }
 
     await tx.pagePermission.createMany({ data: permissionsToCreate });

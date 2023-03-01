@@ -48,6 +48,8 @@ const StylesContainer = styled.div<{ containerWidth?: number }>`
   // remove extra padding on Table view
   .Table {
     margin-top: 0;
+    width: fit-content;
+    min-width: 100%;
 
     // Hide calculations footer
     .CalculationRow {
@@ -124,7 +126,7 @@ export default function DatabaseView({ containerWidth, readOnly: readOnlyOverrid
   }
 
   const readOnly =
-    typeof readOnlyOverride === 'undefined' ? currentPagePermissions.edit_content !== true : readOnlyOverride;
+    typeof readOnlyOverride === 'undefined' ? currentPagePermissions?.edit_content !== true : readOnlyOverride;
 
   const readOnlySourceData = currentView?.fields?.sourceType === 'google_form'; // blocks that are synced cannot be edited
   const deleteView = useCallback(

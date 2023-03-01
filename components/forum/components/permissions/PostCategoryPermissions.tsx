@@ -1,7 +1,9 @@
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import Grid from '@mui/material/Grid';
+import Switch from '@mui/material/Switch';
 import Tooltip from '@mui/material/Tooltip';
+import Typography from '@mui/material/Typography';
 import type { PostCategory } from '@prisma/client';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import useSWR from 'swr';
@@ -34,7 +36,7 @@ type Props = {
 function PostCategoryPermissions({ postCategory, permissions }: Props) {
   const { data, mutate: mutatePermissions } = useSWR(
     `/api/forum/list-post-category-permissions-${postCategory.id}`,
-    () => charmClient.permissions.listPostCategoryPermissions(postCategory.id)
+    () => charmClient.permissions.forum.listPostCategoryPermissions(postCategory.id)
   );
 
   const { roles } = useRoles();
@@ -42,7 +44,7 @@ function PostCategoryPermissions({ postCategory, permissions }: Props) {
 
   const space = useCurrentSpace();
   async function deletePermission(id: string) {
-    await charmClient.permissions.deletePostCategoryPermission(id);
+    await charmClient.permissions.forum.deletePostCategoryPermission(id);
     mutatePermissions((list) => list?.filter((p) => p.id !== id));
   }
 
@@ -74,7 +76,7 @@ function PostCategoryPermissions({ postCategory, permissions }: Props) {
   async function addMultiplePermissions(input: BulkRolePostCategoryPermissionUpsert) {
     const newPermissions = await Promise.all(
       input.roleIds.map((id) =>
-        charmClient.permissions.upsertPostCategoryPermission({
+        charmClient.permissions.forum.upsertPostCategoryPermission({
           permissionLevel: input.permissionLevel,
           postCategoryId: postCategory.id,
           assignee: { group: 'role', id }
@@ -86,7 +88,7 @@ function PostCategoryPermissions({ postCategory, permissions }: Props) {
   }
 
   async function updatePermission(input: PostCategoryPermissionInput) {
-    const newPermission = await charmClient.permissions.upsertPostCategoryPermission(input);
+    const newPermission = await charmClient.permissions.forum.upsertPostCategoryPermission(input);
     mutatePermissions((list) => getMutatedPermissionsList([newPermission], list));
   }
 
@@ -124,9 +126,44 @@ function PostCategoryPermissions({ postCategory, permissions }: Props) {
     permissions.manage_permissions &&
     (roles?.length ?? 0) > mappedPermissions.roles.length;
 
+  const publicPermission = mappedPermissions.public;
+
+  async function togglePublic() {
+    if (publicPermission) {
+      charmClient.permissions.forum
+        .deletePostCategoryPermission(publicPermission.id)
+        .then(() => mutatePermissions((list) => list?.filter((p) => p.id !== publicPermission.id)));
+    } else {
+      charmClient.permissions.forum
+        .upsertPostCategoryPermission({
+          permissionLevel: 'view',
+          postCategoryId: postCategory.id,
+          assignee: { group: 'public' }
+        })
+        .then((newPermission) => mutatePermissions((list) => getMutatedPermissionsList([newPermission], list)));
+    }
+  }
+
   return (
     <Box data-test='category-permissions-dialog'>
       <Grid container spacing={2}>
+        <Grid item xs={12}>
+          <Box display='flex' justifyContent='space-between' alignItems='center'>
+            <Typography variant='body2'>Public category</Typography>
+            <Switch
+              data-test='toggle-public-page'
+              checked={!!publicPermission}
+              disabled={!permissions.manage_permissions}
+              onChange={togglePublic}
+            />
+          </Box>
+          <Typography variant='caption'>
+            {!publicPermission
+              ? 'Only space members with relevant permissions can view this category.'
+              : 'Anyone on the web can view this category.'}
+          </Typography>
+        </Grid>
+        <Divider sx={{ my: 2 }} />
         <Grid item xs={12}>
           <PostCategoryRolePermissionRow
             canEdit={permissions.manage_permissions}

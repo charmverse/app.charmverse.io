@@ -36,7 +36,7 @@ import PageNavigation from '../PageNavigation';
 import SearchInWorkspaceModal from '../SearchInWorkspaceModal';
 import TrashModal from '../TrashModal';
 
-import { sidebarItemStyles, SidebarLink } from './SidebarBtn';
+import { sidebarItemStyles, SidebarLink } from './SidebarButton';
 import SidebarSubmenu from './SidebarSubmenu';
 
 const WorkspaceLabel = styled.div`
@@ -91,12 +91,13 @@ const SidebarContainer = styled.div`
   }
 `;
 
-const SectionName = styled(Typography)`
+export const SectionName = styled(Typography)`
   padding-left: ${({ theme }) => theme.spacing(2)};
   padding-right: ${({ theme }) => theme.spacing(2)};
   color: ${({ theme }) => theme.palette.secondary.main};
   font-size: 11.5px;
   font-weight: 600;
+  text-transform: uppercase;
   letter-spacing: 0.03em;
 `;
 
@@ -196,6 +197,21 @@ export default function Sidebar({ closeSidebar, favorites, navAction }: SidebarP
         </Box>
         <Box mb={2}>
           <SidebarBox
+            onClick={() => handleModalClick(isMobile ? '' : `${space?.name}-space`)}
+            icon={<SettingsIcon color='secondary' fontSize='small' />}
+            label='Settings'
+            data-test='sidebar-settings'
+          />
+          <SidebarLink
+            active={false}
+            href={charmverseDiscordInvite}
+            icon={<QuestionMarkIcon color='secondary' fontSize='small' />}
+            label='Support & Feedback'
+            target='_blank'
+            onClick={navAction}
+          />
+          <SidebarBox
+            data-test='sidebar--trash-toggle'
             onClick={() => {
               setShowingTrash(true);
             }}
@@ -218,36 +234,6 @@ export default function Sidebar({ closeSidebar, favorites, navAction }: SidebarP
         {space && (
           <>
             <Box mb={2}>
-              <SidebarLink
-                href={`/${space.domain}/members`}
-                active={router.pathname.startsWith('/[domain]/members')}
-                icon={<AccountCircleIcon fontSize='small' />}
-                label='Member Directory'
-                onClick={navAction}
-              />
-              <SidebarLink
-                href={`/${space.domain}/proposals`}
-                active={router.pathname.startsWith('/[domain]/proposals')}
-                icon={<TaskOutlinedIcon fontSize='small' />}
-                label='Proposals'
-                onClick={navAction}
-              />
-              <SidebarLink
-                href={`/${space.domain}/bounties`}
-                active={router.pathname.startsWith('/[domain]/bounties')}
-                icon={<BountyIcon fontSize='small' />}
-                label='Bounties'
-                onClick={navAction}
-              />
-              <SidebarLink
-                href={`/${space.domain}/forum`}
-                data-test='sidebar-link-forum'
-                active={router.pathname.startsWith('/[domain]/forum')}
-                icon={<MessageOutlinedIcon fontSize='small' />}
-                label='Forum'
-                onClick={navAction}
-              />
-              <Divider sx={{ mx: 2, my: 1 }} />
               <Tooltip
                 title={
                   <>
@@ -277,18 +263,34 @@ export default function Sidebar({ closeSidebar, favorites, navAction }: SidebarP
                 icon={<GroupAddOutlinedIcon color='secondary' fontSize='small' />}
                 label='Invites'
               />
-              <SidebarBox
-                onClick={() => handleModalClick(isMobile ? '' : `${space.name}-space`)}
-                icon={<SettingsIcon color='secondary' fontSize='small' />}
-                label='Settings'
-                data-test='sidebar-settings'
+              <Divider sx={{ mx: 2, my: 1 }} />
+              <SidebarLink
+                href={`/${space.domain}/members`}
+                active={router.pathname.startsWith('/[domain]/members')}
+                icon={<AccountCircleIcon fontSize='small' />}
+                label='Member Directory'
+                onClick={navAction}
               />
               <SidebarLink
-                active={false}
-                href={charmverseDiscordInvite}
-                icon={<QuestionMarkIcon color='secondary' fontSize='small' />}
-                label='Support & Feedback'
-                target='_blank'
+                href={`/${space.domain}/proposals`}
+                active={router.pathname.startsWith('/[domain]/proposals')}
+                icon={<TaskOutlinedIcon fontSize='small' />}
+                label='Proposals'
+                onClick={navAction}
+              />
+              <SidebarLink
+                href={`/${space.domain}/bounties`}
+                active={router.pathname.startsWith('/[domain]/bounties')}
+                icon={<BountyIcon fontSize='small' />}
+                label='Bounties'
+                onClick={navAction}
+              />
+              <SidebarLink
+                href={`/${space.domain}/forum`}
+                data-test='sidebar-link-forum'
+                active={router.pathname.startsWith('/[domain]/forum')}
+                icon={<MessageOutlinedIcon fontSize='small' />}
+                label='Forum'
                 onClick={navAction}
               />
             </Box>

@@ -5,6 +5,7 @@ import React from 'react';
 
 import Button from 'components/common/Button';
 import { TemplatesMenu } from 'components/common/TemplatesMenu';
+import { usePagePermissions } from 'hooks/usePagePermissions';
 import { usePages } from 'hooks/usePages';
 import type { Card } from 'lib/focalboard/card';
 import type { PageMeta } from 'lib/pages';
@@ -34,7 +35,7 @@ const NewCardButton = React.memo(
   }: Props): JSX.Element => {
     const cardTemplates: Card[] = useAppSelector(getCurrentBoardTemplates);
     const buttonRef = React.useRef<HTMLDivElement>(null);
-    const { pages, getPagePermissions } = usePages();
+    const { pages } = usePages();
 
     const cardTemplatesPages = cardTemplates.map((c) => pages[c.id]).filter((p) => p !== undefined) as PageMeta[];
 
@@ -42,7 +43,7 @@ const NewCardButton = React.memo(
 
     const boardTitle = boardId ? pages[boardId]?.title || 'Untitled' : undefined;
 
-    const pagePermissions = getPagePermissions(boardId);
+    const { permissions: pagePermissions } = usePagePermissions({ pageIdOrPath: boardId });
 
     return (
       <>

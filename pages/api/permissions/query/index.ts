@@ -16,7 +16,10 @@ handler
 async function queryPagePermissions(req: NextApiRequest, res: NextApiResponse) {
   const request = req.query as unknown as IPagePermissionUserRequest;
 
-  const userPermissions = await computeUserPagePermissions(request);
+  const userPermissions = await computeUserPagePermissions({
+    resourceId: request.pageId,
+    userId: request.userId
+  });
 
   return res.status(200).json(userPermissions);
 }

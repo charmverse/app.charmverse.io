@@ -36,6 +36,7 @@ function InputSearchRoleBase({
   filter,
   showWarningOnNoRoles = false,
   placeholder,
+  readOnly,
   ...props
 }: Partial<ComponentProps<typeof Autocomplete>> & { filter?: IRolesFilter } & { showWarningOnNoRoles?: boolean }) {
   const { roles } = useRoles();
@@ -53,7 +54,7 @@ function InputSearchRoleBase({
 
   const filteredRoles = !!filter && !!roles ? filterRoles(roles as any, filter as IRolesFilter) : roles ?? [];
 
-  if (roles?.length === 0 && showWarningOnNoRoles) {
+  if (roles?.length === 0 && showWarningOnNoRoles && !readOnly) {
     return (
       <Alert severity='warning'>
         There are no roles in this space. Space admins can create roles in the{' '}

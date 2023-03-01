@@ -1,8 +1,7 @@
+import { MemberMiniProfile } from 'components/profile/components/MemberMiniProfile/MemberMiniProfile';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useOnboarding } from 'hooks/useOnboarding';
 import { useUser } from 'hooks/useUser';
-
-import { MemberOnboardingForm } from './components/MemberOnboardingForm';
 
 export function MemberOnboardingModal({ userId }: { userId?: string }) {
   const space = useCurrentSpace();
@@ -15,11 +14,10 @@ export function MemberOnboardingModal({ userId }: { userId?: string }) {
 
   return (
     <div data-test='member-onboarding-form'>
-      <MemberOnboardingForm
-        userId={userId ?? user.id}
-        spaceName={space.name}
-        spaceId={space.id}
+      <MemberMiniProfile
+        memberId={userId ?? user.id}
         onClose={completeOnboarding}
+        title={`Welcome to ${space.name}. Set up your profile`}
       />
     </div>
   );

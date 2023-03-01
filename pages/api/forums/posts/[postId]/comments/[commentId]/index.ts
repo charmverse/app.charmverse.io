@@ -32,6 +32,10 @@ async function updatePostCommentHandler(req: NextApiRequest, res: NextApiRespons
     throw new PostNotFoundError(postId);
   }
 
+  if (post.proposalId) {
+    throw new ActionNotPermittedError('You do not have permission to edit this comment.');
+  }
+
   const spaceRole = await hasAccessToSpace({
     spaceId: post.spaceId,
     userId
@@ -66,6 +70,10 @@ async function deletePostCommentHandler(req: NextApiRequest, res: NextApiRespons
 
   if (!post) {
     throw new PostNotFoundError(postId);
+  }
+
+  if (post.proposalId) {
+    throw new ActionNotPermittedError('You do not have permission to delete this comment.');
   }
 
   const postComment = await prisma.postComment.findUnique({

@@ -15,6 +15,7 @@ import charmClient from 'charmClient';
 import Link from 'components/common/Link';
 import LoadingComponent from 'components/common/LoadingComponent';
 import UserDisplay from 'components/common/UserDisplay';
+import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import type { DiscussionTask } from 'lib/discussion/interfaces';
 import type { GetTasksResponse } from 'pages/api/tasks/list';
 
@@ -33,8 +34,9 @@ function DiscussionTaskRow({
   text,
   bountyId,
   type,
-  commentId
-}: DiscussionTask & { marked: boolean }) {
+  commentId,
+  onClose
+}: DiscussionTask & { marked: boolean; onClose: () => void }) {
   const { discussionLink, discussionTitle } = useMemo(() => {
     const baseUrl = typeof window !== 'undefined' ? window.location.origin : null;
 
@@ -95,12 +97,12 @@ function DiscussionTaskRow({
         <Typography noWrap>{spaceName}</Typography>
       </TableCell>
       <TableCell>
-        <Link color='inherit' href={discussionLink} variant='body1' noWrap>
+        <Link color='inherit' href={discussionLink} variant='body1' noWrap onClick={onClose}>
           {discussionTitle}
         </Link>
       </TableCell>
       <TableCell align='center'>
-        <Link color='inherit' href={discussionLink} variant='body1' noWrap>
+        <Link color='inherit' href={discussionLink} variant='body1' noWrap onClick={onClose}>
           {DateTime.fromISO(createdAt).toRelative({ base: DateTime.now() })}
         </Link>
       </TableCell>
@@ -112,14 +114,43 @@ interface DiscussionTasksListProps {
   tasks: GetTasksResponse | undefined;
   error: any;
   mutateTasks: KeyedMutator<GetTasksResponse>;
+  skippedDiscussions?: ('page' | 'bounty')[];
 }
 
-export default function DiscussionTasksList({ tasks, error, mutateTasks }: DiscussionTasksListProps) {
+export default function DiscussionTasksList({
+  skippedDiscussions = [],
+  tasks,
+  error,
+  mutateTasks
+}: DiscussionTasksListProps) {
+  const { onClose } = useSettingsDialog();
+
+  const [markedDiscussions, unmarkedDiscussions, unmarkedSkippedDiscussions] = useMemo(() => {
+    const _markedDiscussions: DiscussionTask[] = [];
+    const _unmarkedDiscussions: DiscussionTask[] = [];
+    const _unmarkedSkippedDiscussions: DiscussionTask[] = [];
+
+    (tasks?.discussions ? tasks.discussions.marked : []).forEach((discussion) => {
+      if (!skippedDiscussions.includes(discussion.type)) {
+        _markedDiscussions.push(discussion);
+      }
+    });
+    (tasks?.discussions ? tasks.discussions.unmarked : []).forEach((discussion) => {
+      if (!skippedDiscussions.includes(discussion.type)) {
+        _unmarkedDiscussions.push(discussion);
+      } else {
+        _unmarkedSkippedDiscussions.push(discussion);
+      }
+    });
+
+    return [_markedDiscussions, _unmarkedDiscussions, _unmarkedSkippedDiscussions] as const;
+  }, [tasks?.discussions]);
+
   useEffect(() => {
     async function main() {
-      if (tasks?.discussions && tasks.discussions.unmarked.length !== 0) {
+      if (unmarkedDiscussions.length !== 0) {
         await charmClient.tasks.markTasks(
-          tasks.discussions.unmarked.map((unmarkedDiscussion) => ({
+          unmarkedDiscussions.map((unmarkedDiscussion) => ({
             id: unmarkedDiscussion.mentionId ?? unmarkedDiscussion.commentId ?? '',
             type: 'mention'
           }))
@@ -130,16 +161,15 @@ export default function DiscussionTasksList({ tasks, error, mutateTasks }: Discu
     main();
 
     return () => {
-      if (tasks?.discussions && tasks.discussions.unmarked.length !== 0) {
+      if (unmarkedDiscussions.length !== 0) {
         mutateTasks(
           (_tasks) => {
-            const unmarked = _tasks?.discussions.unmarked ?? [];
             return _tasks
               ? {
                   ..._tasks,
                   discussions: {
-                    marked: [...unmarked, ..._tasks.discussions.marked],
-                    unmarked: []
+                    marked: [...unmarkedDiscussions, ...markedDiscussions],
+                    unmarked: [...unmarkedSkippedDiscussions]
                   }
                 }
               : undefined;
@@ -150,7 +180,7 @@ export default function DiscussionTasksList({ tasks, error, mutateTasks }: Discu
         );
       }
     };
-  }, [tasks]);
+  }, [markedDiscussions, unmarkedDiscussions, unmarkedSkippedDiscussions]);
 
   if (error) {
     return (
@@ -162,7 +192,7 @@ export default function DiscussionTasksList({ tasks, error, mutateTasks }: Discu
     return <LoadingComponent height='200px' isLoading={true} />;
   }
 
-  const totalMentions = (tasks.discussions.unmarked.length ?? 0) + (tasks.discussions.marked.length ?? 0);
+  const totalMentions = (unmarkedDiscussions.length ?? 0) + (markedDiscussions.length ?? 0);
 
   if (totalMentions === 0) {
     return <EmptyTaskState taskType='discussions' />;
@@ -182,18 +212,20 @@ export default function DiscussionTasksList({ tasks, error, mutateTasks }: Discu
           </TableRow>
         </TableHead>
         <TableBody>
-          {tasks.discussions.unmarked.map((discussionTask) => (
+          {unmarkedDiscussions.map((discussionTask) => (
             <DiscussionTaskRow
               key={discussionTask.commentId ?? discussionTask.mentionId ?? ''}
               {...discussionTask}
               marked={false}
+              onClose={onClose}
             />
           ))}
-          {tasks.discussions.marked.map((discussionTask) => (
+          {markedDiscussions.map((discussionTask) => (
             <DiscussionTaskRow
               key={discussionTask.commentId ?? discussionTask.mentionId ?? ''}
               {...discussionTask}
               marked
+              onClose={onClose}
             />
           ))}
         </TableBody>

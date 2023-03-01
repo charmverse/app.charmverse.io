@@ -11,15 +11,18 @@ import type { KeyedMutator } from 'swr';
 import charmClient from 'charmClient';
 import { BountyStatusNexusChip } from 'components/bounties/components/BountyStatusBadge';
 import Button from 'components/common/Button';
+import FieldLabel from 'components/common/form/FieldLabel';
 import Link from 'components/common/Link';
 import LoadingComponent from 'components/common/LoadingComponent';
+import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import type { BountyTask } from 'lib/bounties/getBountyTasks';
 import type { GetTasksResponse } from 'pages/api/tasks/list';
 
 import { EmptyTaskState } from './components/EmptyTaskState';
 import Table from './components/NexusTable';
+import DiscussionTasksList from './DiscussionTasksList';
 
-function BountiesTasksListRow({ bountyTask }: { bountyTask: BountyTask }) {
+function BountiesTasksListRow({ bountyTask, onClose }: { bountyTask: BountyTask; onClose: () => void }) {
   const { pageTitle, spaceName, spaceDomain, pagePath, action } = bountyTask;
   const bountyLink = `/${spaceDomain}/${pagePath}`;
   const workspaceBounties = `/${spaceDomain}/bounties`;
@@ -27,14 +30,14 @@ function BountiesTasksListRow({ bountyTask }: { bountyTask: BountyTask }) {
   return (
     <TableRow>
       <TableCell>
-        <Link color='inherit' href={bountyLink}>
+        <Link color='inherit' href={bountyLink} onClick={onClose}>
           <Typography variant='body1' noWrap>
             {pageTitle || 'Untitled'}
           </Typography>
         </Link>
       </TableCell>
       <TableCell>
-        <Link color='inherit' href={workspaceBounties}>
+        <Link color='inherit' href={workspaceBounties} onClick={onClose}>
           <Typography variant='body1'>{spaceName}</Typography>
         </Link>
       </TableCell>
@@ -50,6 +53,7 @@ function BountiesTasksListRow({ bountyTask }: { bountyTask: BountyTask }) {
           }}
           href={bountyLink}
           disabled={!action}
+          onClick={onClose}
         >
           Review
         </Button>
@@ -67,6 +71,7 @@ function BountiesTasksList({
   error: any;
   tasks: GetTasksResponse | undefined;
 }) {
+  const { onClose } = useSettingsDialog();
   const bounties = tasks?.bounties ? [...tasks.bounties.unmarked, ...tasks.bounties.marked] : [];
 
   useEffect(() => {
@@ -129,10 +134,15 @@ function BountiesTasksList({
         </TableHead>
         <TableBody>
           {filteredBounties.map((bounty) => (
-            <BountiesTasksListRow key={bounty.id} bountyTask={bounty} />
+            <BountiesTasksListRow key={bounty.id} bountyTask={bounty} onClose={onClose} />
           ))}
         </TableBody>
       </Table>
+
+      <Box my={3}>
+        <Typography fontWeight='bold'>Bounty discussions</Typography>
+        <DiscussionTasksList error={error} mutateTasks={mutateTasks} tasks={tasks} skippedDiscussions={['page']} />
+      </Box>
     </Box>
   );
 }

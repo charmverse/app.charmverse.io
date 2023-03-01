@@ -3,11 +3,11 @@ import type { Post, Space, User } from '@prisma/client';
 import request from 'supertest';
 
 import type { CreateForumPostInput } from 'lib/forums/posts/createForumPost';
-import type { ListForumPostsRequest } from 'lib/forums/posts/listForumPosts';
+import type { ListForumPostsRequest, PaginatedPostList } from 'lib/forums/posts/listForumPosts';
 import { upsertPostCategoryPermission } from 'lib/permissions/forum/upsertPostCategoryPermission';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
-import { generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { generatePostCategory } from 'testing/utils/forums';
+import { generateSpaceUser, generateUserAndSpace, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { generateForumPost, generatePostCategory } from 'testing/utils/forums';
 
 let space: Space;
 let user: User;
@@ -22,12 +22,47 @@ beforeAll(async () => {
 });
 
 describe('GET /api/forums/posts', () => {
-  it('should return a 200 for anonymous users', async () => {
+  it('should return posts belonging to public categories for anonymous users, and respond with a 200', async () => {
+    const { user: userInSpaceWithPublicCategory, space: spaceWithPublicCategory } = await generateUserAndSpace();
+
+    const publicCategory = await generatePostCategory({
+      spaceId: spaceWithPublicCategory.id,
+      name: 'Public Category'
+    });
+
+    const publicPost = await generateForumPost({
+      spaceId: spaceWithPublicCategory.id,
+      categoryId: publicCategory.id,
+      userId: userInSpaceWithPublicCategory.id,
+      title: 'Public Post'
+    });
+
+    await upsertPostCategoryPermission({
+      assignee: { group: 'public' },
+      permissionLevel: 'view',
+      postCategoryId: publicCategory.id
+    });
+
+    const privateCategory = await generatePostCategory({
+      spaceId: spaceWithPublicCategory.id,
+      name: 'Private Category'
+    });
+
+    const privatePost = await generateForumPost({
+      spaceId: spaceWithPublicCategory.id,
+      categoryId: privateCategory.id,
+      userId: userInSpaceWithPublicCategory.id,
+      title: 'Private Post'
+    });
+
     const query: ListForumPostsRequest = {
-      spaceId: space.id
+      spaceId: spaceWithPublicCategory.id
     };
 
-    await request(baseUrl).get(`/api/forums/posts`).query(query).expect(200);
+    const posts = (await request(baseUrl).get(`/api/forums/posts`).query(query).expect(200)).body as PaginatedPostList;
+
+    expect(posts.data).toHaveLength(1);
+    expect(posts.data[0].id).toBe(publicPost.id);
   });
 });
 

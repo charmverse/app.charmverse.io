@@ -25,6 +25,7 @@ import EmojiPicker from 'components/common/BoardEditor/focalboard/src/widgets/em
 import TreeItemContent from 'components/common/TreeItemContent';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { usePageFromPath } from 'hooks/usePageFromPath';
+import { usePagePermissions } from 'hooks/usePagePermissions';
 import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { isTouchScreen } from 'lib/utilities/browser';
@@ -56,9 +57,17 @@ export const StyledTreeItem = styled(TreeItem, { shouldForwardProp: (prop) => pr
 }>(({ isActive, theme }) => ({
   position: 'relative',
   backgroundColor: isActive ? theme.palette.action.focus : 'unset',
+  marginLeft: 3,
+  marginRight: 3,
+  // unset margin on child tree items
+  '.MuiTreeItem-root': {
+    marginLeft: 0,
+    marginRight: 0
+  },
 
   [`& .${treeItemClasses.content}`]: {
     color: theme.palette.text.secondary,
+    marginBottom: 1,
     // paddingRight: theme.spacing(1),
     // fontWeight: theme.typography.fontWeightMedium,
     '.MuiTypography-root': {
@@ -89,11 +98,12 @@ export const StyledTreeItem = styled(TreeItem, { shouldForwardProp: (prop) => pr
     },
     [`& .${treeItemClasses.label}`]: {
       fontWeight: 'inherit',
+      paddingLeft: 0,
       color: 'inherit'
     },
     [`& .${treeItemClasses.iconContainer}`]: {
       marginRight: 0,
-      width: '28px'
+      width: '24px'
     },
     [`& .${treeItemClasses.iconContainer} svg`]: {
       color: greyColor2
@@ -378,12 +388,12 @@ const PageTreeItem = forwardRef<any, PageTreeItemProps>((props, ref) => {
 function PageActionsMenu({ closeMenu, pageId, pagePath }: { closeMenu: () => void; pageId: string; pagePath: string }) {
   const boards = useAppSelector(getSortedBoards);
   const currentPage = usePageFromPath();
-  const { deletePage, getPagePermissions, pages } = usePages();
+  const { deletePage, pages } = usePages();
   const { showMessage } = useSnackbar();
-  const permissions = getPagePermissions(pageId);
+  const { permissions: pagePermissions } = usePagePermissions({ pageIdOrPath: pageId });
   const router = useRouter();
 
-  const deletePageDisabled = !permissions.delete;
+  const deletePageDisabled = !pagePermissions?.delete;
 
   async function deletePageWithBoard() {
     if (deletePageDisabled) {

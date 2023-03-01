@@ -255,6 +255,7 @@ export function BountyAmount({
               }}
               variant='h6'
               fontSize={18}
+              data-test='bounty-amount'
             >
               {truncate ? truncatedAmount() : bounty.rewardAmount}
             </Typography>

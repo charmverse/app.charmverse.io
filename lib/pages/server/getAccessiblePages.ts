@@ -87,6 +87,7 @@ function selectPageFields(meta: boolean) {
       bountyId: true,
       hasContent: true,
       galleryImage: true,
+      convertedProposalId: true,
       ...includePagePermissionsMeta()
     }
   };
@@ -285,7 +286,7 @@ export async function getAccessiblePages(input: PagesRequest): Promise<IPageWith
   }
 
   const filteredPages = pages.filter((page) => {
-    if (spaceRole && page.type === 'proposal_template') {
+    if (spaceRole && (page.type === 'proposal_template' || page.type === 'proposal')) {
       return true;
     }
 

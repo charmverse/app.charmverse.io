@@ -2,6 +2,8 @@ import type { PostCommentUpDownVote } from '@prisma/client';
 
 import { prisma } from 'db';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
+import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
+import { publishPostCommentVoteEvent } from 'lib/webhookPublisher/publishEvent';
 
 type CommentVote = {
   commentId: string;
@@ -32,14 +34,14 @@ export async function voteForumComment({
 
     return null;
   } else {
-    const post = await prisma.post.findUnique({
+    const post = await prisma.post.findUniqueOrThrow({
       where: { id: postId },
       include: {
         category: true
       }
     });
 
-    const category = post?.category;
+    const category = post.category;
 
     if (category) {
       trackUserAction(upvoted ? 'upvote_comment' : 'downvote_comment', {
@@ -67,6 +69,15 @@ export async function voteForumComment({
           commentId
         }
       }
+    });
+
+    // Publish webhook event if needed
+    await publishPostCommentVoteEvent({
+      scope: upvoted ? WebhookEventNames.CommentUpvoted : WebhookEventNames.CommentDownvoted,
+      spaceId: post.spaceId,
+      commentId,
+      postId,
+      voterId: userId
     });
 
     return commentVote;

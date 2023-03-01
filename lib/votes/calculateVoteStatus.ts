@@ -26,7 +26,9 @@ export function calculateVoteStatus({
   const totalVotes = userVotes.length;
   let voteStatus = status;
 
-  if (status !== VoteStatus.Cancelled && new Date(deadline) < new Date()) {
+  if (new Date(deadline) < new Date() && Object.values(userVoteFrequencyRecord).length === 0) {
+    voteStatus = VoteStatus.Cancelled;
+  } else if (status !== VoteStatus.Cancelled && new Date(deadline) < new Date()) {
     if (type === VoteType.Approval) {
       voteStatus =
         (userVoteFrequencyRecord.Yes * 100) / totalVotes >= threshold ? VoteStatus.Passed : VoteStatus.Rejected;

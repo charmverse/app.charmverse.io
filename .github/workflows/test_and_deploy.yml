@@ -36,8 +36,8 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - test_name: "Typecheck tests"
-            test_command: "test:typecheck"
+          - test_name: "Type check and lint"
+            test_command: "npm run typecheck && npm run lint"
     steps:
       - uses: actions/checkout@v3
 
@@ -50,7 +50,7 @@ jobs:
           NEXT_PUBLIC_APP_ENV: 'test'
 
       - name: Run ${{matrix.test_name}}
-        run: npm run ${{matrix.test_command}}
+        run: ${{matrix.test_command}}
 
   integration-test:
     name: Tests
@@ -76,8 +76,10 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - test_name: "Basic tests"
-            test_command: "npm run test:ci"
+          - test_name: "Basic tests #1"
+            test_command: "npm run test:ci -- --shard 1/2"
+          - test_name: "Basic tests #2"
+            test_command: "npm run test:ci -- --shard 2/2"
           - test_name: "Server integration tests"
             test_command: "npm run start:test:ci & npm run test:server:ci"
           - test_name: "Browser tests"
