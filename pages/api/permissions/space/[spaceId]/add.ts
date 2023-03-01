@@ -43,7 +43,7 @@ async function addSpacePermissionsController(req: NextApiRequest, res: NextApiRe
     ...req.body
   });
 
-  log.debug('Adding space permissions', { spaceId: req.body.spaceId, operations: req.body.operations });
+  log.debug('Adding space permissions', { spaceId: req.body.spaceId, operations: req.body.operations, userId });
 
   // tracking
   if (req.body.roleId) {

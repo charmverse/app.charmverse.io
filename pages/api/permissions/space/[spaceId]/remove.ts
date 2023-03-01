@@ -35,7 +35,7 @@ async function removeSpacePermissionsController(req: NextApiRequest, res: NextAp
     throw error;
   }
 
-  log.debug('Removing space permissions', { spaceId: req.body.spaceId, operations: req.body.operations });
+  log.debug('Removing space permissions', { spaceId: req.body.spaceId, operations: req.body.operations, userId });
 
   const result = await removeSpaceOperations({
     forSpaceId: spaceId as string,
