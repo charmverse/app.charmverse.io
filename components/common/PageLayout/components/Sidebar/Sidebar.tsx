@@ -277,6 +277,7 @@ export default function Sidebar({ closeSidebar, favorites, navAction }: SidebarP
 
               {!space?.featureBlacklist.includes('proposals') && (
                 <SidebarLink
+                  data-test='sidebar-link-proposals'
                   href={`/${space.domain}/proposals`}
                   active={router.pathname.startsWith('/[domain]/proposals')}
                   icon={<TaskOutlinedIcon fontSize='small' />}

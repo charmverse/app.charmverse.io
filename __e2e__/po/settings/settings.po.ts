@@ -10,9 +10,12 @@ export class SettingsModal {
 
   readonly settingsBtn: Locator;
 
+  readonly closeModalButton: Locator;
+
   constructor(page: Page) {
     this.page = page;
     this.settingsBtn = page.locator('data-test=sidebar-settings');
+    this.closeModalButton = page.locator('data-test=close-settings-modal');
   }
 
   async goTo(domain: string) {
