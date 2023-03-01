@@ -21,7 +21,7 @@ async function listPageCommentsHandler(req: NextApiRequest, res: NextApiResponse
   const userId = req.session.user?.id;
 
   const permissions = await computeUserPagePermissions({
-    pageId,
+    resourceId: pageId,
     userId
   });
 
@@ -49,7 +49,7 @@ async function createPageCommentHandler(req: NextApiRequest, res: NextApiRespons
   }
 
   const permissions = await computeUserPagePermissions({
-    pageId,
+    resourceId: pageId,
     userId
   });
 

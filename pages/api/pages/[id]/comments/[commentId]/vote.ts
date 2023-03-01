@@ -16,7 +16,7 @@ async function commentVoteHandler(req: NextApiRequest, res: NextApiResponse) {
   const { upvoted } = req.body;
 
   const permissions = await computeUserPagePermissions({
-    pageId,
+    resourceId: pageId,
     userId
   });
 
