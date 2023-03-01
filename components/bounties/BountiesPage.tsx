@@ -1,6 +1,10 @@
-import { Box, Grid, Typography } from '@mui/material';
+import styled from '@emotion/styled';
+import ModeStandbyOutlinedIcon from '@mui/icons-material/ModeStandbyOutlined';
+import BountyIcon from '@mui/icons-material/RequestPageOutlined';
+import { Box, Grid, Stack, Tab, Tabs, Typography } from '@mui/material';
 import { BountyStatus } from '@prisma/client';
-import { useEffect, useMemo } from 'react';
+import { useRouter } from 'next/router';
+import { useEffect, useMemo, useState } from 'react';
 import { CSVLink } from 'react-csv';
 
 import charmClient from 'charmClient';
@@ -11,8 +15,10 @@ import PageDialogGlobalModal from 'components/common/PageDialog/PageDialogGlobal
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { BountyWithDetails } from 'lib/bounties';
 import { sortArrayByObjectProperty } from 'lib/utilities/array';
+import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
 import BountiesKanbanView from './components/BountiesKanbanView';
+import BountiesGalleryView from './components/BountyGalleryView';
 import MultiPaymentModal from './components/MultiPaymentModal';
 import NewBountyButton from './components/NewBountyButton';
 
@@ -23,8 +29,26 @@ interface Props {
   bounties: BountyWithDetails[];
 }
 
+const StyledButton = styled(Button)`
+  padding: ${({ theme }) => theme.spacing(0.5, 1)};
+
+  .Icon {
+    width: 20px;
+    height: 20px;
+  }
+`;
+
+const views: { label: string; view: 'gallery' | 'board' }[] = [
+  { label: 'Open', view: 'gallery' },
+  { label: 'All', view: 'board' }
+];
+
 export default function BountiesPage({ publicMode = false, bounties }: Props) {
   const space = useCurrentSpace();
+  const router = useRouter();
+  const [currentView, setCurrentView] = useState<(typeof views)[0]>(
+    views.find((view) => view.view === router.query.view) ?? views[0]
+  );
 
   useEffect(() => {
     charmClient.track.trackAction('page_view', { spaceId: space?.id, type: 'bounties_list' });
@@ -91,14 +115,59 @@ export default function BountiesPage({ publicMode = false, bounties }: Props) {
                 )}
               </Grid>
             </Grid>
+            {bounties.length !== 0 && (
+              <Stack className='ViewHeader' flexDirection='row' justifyContent='space-between' mb={1}>
+                <Tabs
+                  textColor='primary'
+                  indicatorColor='secondary'
+                  value={currentView.view}
+                  sx={{ minHeight: 0, height: 'fit-content' }}
+                  key={currentView.label}
+                >
+                  {views.map(({ label, view }) => (
+                    <Tab
+                      component='div'
+                      disableRipple
+                      key={label}
+                      label={
+                        <StyledButton
+                          startIcon={
+                            view === 'board' ? (
+                              <BountyIcon fontSize='small' />
+                            ) : (
+                              <ModeStandbyOutlinedIcon fontSize='small' />
+                            )
+                          }
+                          onClick={() => {
+                            setCurrentView({ label, view });
+                            setUrlWithoutRerender(router.pathname, { view });
+                          }}
+                          variant='text'
+                          size='small'
+                          sx={{ p: 0, mb: '5px', width: '100%' }}
+                          color={currentView.label === label ? 'textPrimary' : 'secondary'}
+                        >
+                          {label[0].toUpperCase() + label.slice(1)}
+                        </StyledButton>
+                      }
+                      sx={{ p: 0 }}
+                      value={view}
+                    />
+                  ))}
+                </Tabs>
+              </Stack>
+            )}
           </div>
           <div className='container-container'>
-            {bounties.length === 0 ? (
+            {bounties.length === 0 ||
+            (currentView.view === 'gallery' && bounties.filter((bounty) => bounty.status === 'open').length === 0) ? (
               <EmptyStateVideo
                 description='Getting started with bounties'
                 videoTitle='Bounties | Getting started with Charmverse'
                 videoUrl='https://tiny.charmverse.io/bounties'
               />
+            ) : currentView.view === 'gallery' ? (
+              <BountiesGalleryView bounties={bounties} publicMode={publicMode} />
             ) : (
               <BountiesKanbanView publicMode={publicMode} bounties={bounties} />
             )}

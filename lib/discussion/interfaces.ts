@@ -1,5 +1,7 @@
 import type { User } from '@prisma/client';
 
+export type TaskUser = Pick<User, 'id' | 'username' | 'path' | 'avatar' | 'avatarTokenId'>;
+
 export interface DiscussionTask {
   spaceId: string;
   spaceDomain: string;
@@ -12,7 +14,7 @@ export interface DiscussionTask {
   commentId: string | null;
   mentionId: string | null;
   createdAt: string;
-  createdBy: User | null;
+  createdBy: TaskUser | null;
   text: string;
   type: 'bounty' | 'page';
 }

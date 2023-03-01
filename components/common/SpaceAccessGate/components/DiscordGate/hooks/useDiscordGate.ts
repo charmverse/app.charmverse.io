@@ -6,13 +6,25 @@ import charmClient from 'charmClient';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
+import type { CheckDiscordGateResult } from 'lib/discord/interface';
+import type { TokenGateJoinType } from 'lib/token-gates/interfaces';
 
 type Props = {
+  joinType?: TokenGateJoinType;
   spaceDomain: string;
-  onSuccess: (space: Space) => void;
+  onSuccess: () => void;
 };
 
-export function useDiscordGate({ spaceDomain, onSuccess }: Props) {
+export type DiscordGateState = {
+  isEnabled: boolean;
+  isVerifying: boolean;
+  isConnectedToDiscord: boolean;
+  discordGate?: CheckDiscordGateResult;
+  joinSpace: () => Promise<void>;
+  joiningSpace: boolean;
+};
+
+export function useDiscordGate({ joinType, spaceDomain, onSuccess }: Props): DiscordGateState {
   const { user, refreshUser } = useUser();
   const { showMessage } = useSnackbar();
   const discordUserId = user?.discordUser?.discordId;
@@ -23,8 +35,8 @@ export function useDiscordGate({ spaceDomain, onSuccess }: Props) {
     charmClient.discord.checkDiscordGate(spaceDomain)
   );
 
-  async function verifyDiscordGate() {
-    if (!data?.isEligible) {
+  async function joinSpace() {
+    if (!data?.isVerified) {
       showMessage('You are not eligible to join this space', 'error');
       return;
     }
@@ -32,7 +44,7 @@ export function useDiscordGate({ spaceDomain, onSuccess }: Props) {
     setJoiningSpace(true);
 
     try {
-      const space = await charmClient.discord.verifyDiscordGate(data.spaceId);
+      const space = await charmClient.discord.verifyDiscordGate({ spaceId: data.spaceId, joinType });
 
       showMessage(`You have joined the ${space.name} space.`, 'success');
 
@@ -43,7 +55,7 @@ export function useDiscordGate({ spaceDomain, onSuccess }: Props) {
         setSpaces([...spaces, space as Space]);
       }
 
-      onSuccess(space as Space);
+      onSuccess();
     } catch (err: any) {
       showMessage(err?.message ?? err ?? 'An unknown error occurred', 'error');
     }
@@ -52,10 +64,11 @@ export function useDiscordGate({ spaceDomain, onSuccess }: Props) {
   }
 
   return {
-    isLoading: !!discordUserId && !data,
+    isEnabled: !!data?.hasDiscordServer,
+    isVerifying: !!discordUserId && !data,
     discordGate: data,
     isConnectedToDiscord: !!discordUserId,
-    verifyDiscordGate,
+    joinSpace,
     joiningSpace
   };
 }

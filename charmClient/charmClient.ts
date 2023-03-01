@@ -16,11 +16,6 @@ import type {
 import type { FiatCurrency, IPairQuote } from 'connectors';
 
 import * as http from 'adapters/http';
-import { DiscordApi } from 'charmClient/apis/discordApi';
-import { MuxApi } from 'charmClient/apis/muxApi';
-import { PagesApi } from 'charmClient/apis/pagesApi';
-import { TokenGatesApi } from 'charmClient/apis/tokenGates';
-import { TrackApi } from 'charmClient/apis/trackApi';
 import type { IUser } from 'components/common/BoardEditor/focalboard/src/user';
 import type { AuthSig, ExtendedPoap } from 'lib/blockchain/interfaces';
 import type { Block as FBBlock, BlockPatch } from 'lib/focalboard/block';
@@ -59,15 +54,22 @@ import { BlockchainApi } from './apis/blockchainApi';
 import { BountiesApi } from './apis/bountiesApi';
 import { CollablandApi } from './apis/collablandApi';
 import { CommentsApi } from './apis/commentsApi';
+import { DiscordApi } from './apis/discordApi';
 import { FileApi } from './apis/fileApi';
 import { ForumApi } from './apis/forumApi';
 import { GoogleApi } from './apis/googleApi';
 import { IframelyApi } from './apis/iframelyApi';
 import { MembersApi } from './apis/membersApi';
+import { MuxApi } from './apis/muxApi';
+import { PagesApi } from './apis/pagesApi';
 import { PermissionsApi } from './apis/permissions';
 import { ProfileApi } from './apis/profileApi';
 import { ProposalsApi } from './apis/proposalsApi';
+import { SpacesApi } from './apis/spacesApi';
+import { SummonApi } from './apis/summonApi';
 import { TasksApi } from './apis/tasksApi';
+import { TokenGatesApi } from './apis/tokenGates';
+import { TrackApi } from './apis/trackApi';
 import { UnstoppableDomainsApi } from './apis/unstoppableApi';
 import { VotesApi } from './apis/votesApi';
 
@@ -104,6 +106,10 @@ class CharmClient {
   profile = new ProfileApi();
 
   proposals = new ProposalsApi();
+
+  spaces = new SpacesApi();
+
+  summon = new SummonApi();
 
   tasks = new TasksApi();
 
@@ -325,14 +331,6 @@ class CharmClient {
       update_at: new Date(member.updatedAt).getTime(),
       is_bot: false
     }));
-  }
-
-  async getSpaceByDomain(search: string): Promise<Space | null> {
-    return http.GET<Space | null>('/api/spaces/search-domain', { search });
-  }
-
-  async getSpacesByName(search: string): Promise<Space[]> {
-    return http.GET<Space[]>('/api/spaces/search-name', { search });
   }
 
   async getAllBlocks(spaceId: string): Promise<FBBlock[]> {

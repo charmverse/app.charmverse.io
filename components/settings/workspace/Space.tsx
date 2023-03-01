@@ -20,7 +20,6 @@ import Legend from 'components/settings/Legend';
 import ImportContent from 'components/settings/workspace/ImportContent';
 import Avatar from 'components/settings/workspace/LargeAvatar';
 import { useIsAdmin } from 'hooks/useIsAdmin';
-import { setTitle } from 'hooks/usePageTitle';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useSpaces } from 'hooks/useSpaces';
 
@@ -103,7 +102,6 @@ export default function SpaceSettings({ space }: { space: Space }) {
     workspaceRemoveModalState.open();
   }
 
-  setTitle('Space Options');
   usePreventReload(isDirty);
 
   return (

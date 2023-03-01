@@ -13,7 +13,7 @@ import { task as verifyTokenGateMembershipsTask } from './tasks/verifyTokenGateM
 log.info('Starting cron jobs');
 
 // Start processing webhook messages
-// processWebhookMessages();
+processWebhookMessages();
 
 // Delete archived pages once an hour
 cron.schedule('0 * * * *', archiveTask);

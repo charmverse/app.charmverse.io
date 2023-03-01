@@ -21,15 +21,11 @@ export async function applyTokenGates({
   userId,
   tokens,
   commit,
-  joinType = 'token_gate',
   reevaluate = false
 }: TokenGateVerification): Promise<TokenGateVerificationResult> {
   if (!spaceId || !userId) {
     throw new InvalidInputError(`Please provide a valid ${!spaceId ? 'space' : 'user'} id.`);
   }
-
-  // Try to apply disocrd gate first
-  await applyDiscordGate({ spaceId, userId });
 
   const space = await prisma.space.findUnique({
     where: {
@@ -133,12 +129,14 @@ export async function applyTokenGates({
       userId,
       roles: assignedRoles.map((r) => r.name)
     });
-    trackUserAction('join_a_workspace', { spaceId, userId, source: joinType });
   }
 
   if (!commit) {
     return returnValue;
   }
+
+  // Try to apply discord gate first
+  await applyDiscordGate({ spaceId, userId });
 
   await updateUserTokenGates({ tokenGates: verifiedTokenGates, spaceId, userId });
 
@@ -202,8 +200,6 @@ export async function applyTokenGates({
         }
       }
     });
-
-    updateTrackUserProfileById(userId);
 
     return returnValue;
   }

@@ -37,7 +37,7 @@ export type TokenGateVerificationEvent = BaseEvent & {
 };
 
 export type SpaceJoined = BaseEvent & {
-  source: 'invite_link' | TokenGateJoinType;
+  source: 'invite_link' | TokenGateJoinType | 'charmverse_api';
 };
 
 export type CreateNewSpace = BaseEvent & {
