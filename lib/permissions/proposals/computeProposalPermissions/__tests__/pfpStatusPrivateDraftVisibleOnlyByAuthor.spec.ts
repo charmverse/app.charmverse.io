@@ -34,7 +34,7 @@ beforeAll(async () => {
   proposal = await generateProposal({
     categoryId: proposalCategory.id,
     authors: [proposalAuthor.id],
-    proposalStatus: 'private_draft',
+    proposalStatus: 'draft',
     spaceId: space.id,
     userId: proposalAuthor.id,
     reviewers: [
@@ -49,7 +49,7 @@ beforeAll(async () => {
 const fullPermissions = new AvailableProposalPermissions().full;
 
 describe('pfpStatusPrivateDraftVisibleOnlyByAuthor', () => {
-  it('should perform a no-op if the status is not private_draft', async () => {
+  it('should perform a no-op if the status is not draft', async () => {
     const permissions = await pfpStatusPrivateDraftVisibleOnlyByAuthor({
       flags: fullPermissions,
       isAdmin: false,

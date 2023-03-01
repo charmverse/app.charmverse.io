@@ -137,7 +137,6 @@ enum ProfileItemType {
 }
 
 enum ProposalStatus {
-  private_draft
   draft
   discussion
   review

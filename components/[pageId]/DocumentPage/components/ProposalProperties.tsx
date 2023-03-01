@@ -56,7 +56,7 @@ export default function ProposalProperties({ proposalId, readOnly, isTemplate }:
   const isAdmin = useIsAdmin();
 
   const prevStatusRef = useRef(proposal?.status || '');
-  const [detailsExpanded, setDetailsExpanded] = useState(['private_draft', 'draft'].includes(proposal?.status ?? ''));
+  const [detailsExpanded, setDetailsExpanded] = useState(() => proposal?.status === 'draft');
 
   const proposalStatus = proposal?.status;
   const proposalCategory = proposal?.category;
@@ -69,7 +69,7 @@ export default function ProposalProperties({ proposalId, readOnly, isTemplate }:
   const isProposalAuthor = user && proposalAuthors.some((author) => author.userId === user.id);
 
   useEffect(() => {
-    if (!prevStatusRef.current && ['private_draft', 'draft'].includes(proposal?.status || '')) {
+    if (!prevStatusRef.current && proposal?.status === 'draft') {
       setDetailsExpanded(true);
     }
 
@@ -86,8 +86,7 @@ export default function ProposalProperties({ proposalId, readOnly, isTemplate }:
     });
 
   const canUpdateProposalProperties =
-    (proposalStatus === 'draft' || proposalStatus === 'private_draft' || proposalStatus === 'discussion') &&
-    (isProposalAuthor || isAdmin);
+    (proposalStatus === 'draft' || proposalStatus === 'discussion') && (isProposalAuthor || isAdmin);
 
   const reviewerOptionsRecord: Record<
     string,

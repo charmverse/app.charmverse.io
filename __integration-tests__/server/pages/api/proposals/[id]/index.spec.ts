@@ -75,7 +75,7 @@ describe('GET /api/proposals/[id] - Get proposal', () => {
         id: expect.any(String),
         spaceId: space.id,
         createdBy: author.id,
-        status: 'private_draft',
+        status: 'draft',
         authors: expect.arrayContaining([
           expect.objectContaining({
             proposalId: pageWithProposal.proposalId,
