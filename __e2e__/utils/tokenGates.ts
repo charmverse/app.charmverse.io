@@ -51,13 +51,17 @@ export async function generateAndMockTokenGateRequests({
   if (canJoinSpace) {
     await page.route('**/api/token-gates/verify', async (route) => {
       // Joining a workspace creates a spaceRole
-      await prisma.spaceRole.create({
-        data: {
-          isAdmin: false,
-          spaceId: space.id,
-          userId
-        }
-      });
+      try {
+        await prisma.spaceRole.create({
+          data: {
+            isAdmin: false,
+            spaceId: space.id,
+            userId
+          }
+        });
+      } catch (e) {
+        // ignore duplicate role
+      }
       await route.fulfill({
         status: 200,
         contentType: 'application/json',
