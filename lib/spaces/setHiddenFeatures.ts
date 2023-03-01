@@ -2,18 +2,18 @@ import type { Feature, Space } from '@prisma/client';
 
 import { prisma } from 'db';
 
-export type SpaceFeatureBlacklist = {
+export type SpaceHiddenFeatures = {
   spaceId: string;
-  featureBlacklist: Feature[];
+  hiddenFeatures: Feature[];
 };
 
-export function setFeatureBlacklist({ featureBlacklist, spaceId }: SpaceFeatureBlacklist): Promise<Space> {
+export function setHiddenFeatures({ hiddenFeatures, spaceId }: SpaceHiddenFeatures): Promise<Space> {
   return prisma.space.update({
     where: {
       id: spaceId
     },
     data: {
-      featureBlacklist
+      hiddenFeatures
     }
   });
 }

@@ -4,9 +4,7 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import Stack from '@mui/material/Stack';
 import Switch from '@mui/material/Switch';
 import Typography from '@mui/material/Typography';
-import { getValue } from '@mui/system';
 import { Feature } from '@prisma/client';
-import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import type { BooleanSchema } from 'yup';
 import * as yup from 'yup';
@@ -44,10 +42,10 @@ export function SpaceFeatureSettings() {
   const { setValue, getValues } = useForm<FormValues>({
     mode: 'onChange',
     defaultValues: {
-      bounties: !space?.featureBlacklist.includes('bounties'),
-      forum: !space?.featureBlacklist.includes('forum'),
-      member_directory: !space?.featureBlacklist.includes('member_directory'),
-      proposals: !space?.featureBlacklist.includes('proposals')
+      bounties: !space?.hiddenFeatures.includes('bounties'),
+      forum: !space?.hiddenFeatures.includes('forum'),
+      member_directory: !space?.hiddenFeatures.includes('member_directory'),
+      proposals: !space?.hiddenFeatures.includes('proposals')
     } as FormValues,
     resolver: yupResolver(schema)
   });
@@ -64,12 +62,12 @@ export function SpaceFeatureSettings() {
       }, [] as Feature[]);
 
       const settingsChanged =
-        uniqueValues(toSet).length !== space.featureBlacklist.length ||
-        toSet.some((feature) => !space.featureBlacklist.includes(feature)) ||
-        space.featureBlacklist.some((feature) => !toSet.includes(feature));
+        uniqueValues(toSet).length !== space.hiddenFeatures.length ||
+        toSet.some((feature) => !space.hiddenFeatures.includes(feature)) ||
+        space.hiddenFeatures.some((feature) => !toSet.includes(feature));
 
       if (settingsChanged) {
-        charmClient.spaces.setFeatureBlacklist({ featureBlacklist: toSet, spaceId: space.id }).then(setSpace);
+        charmClient.spaces.setHiddenFeatures({ hiddenFeatures: toSet, spaceId: space.id }).then(setSpace);
       }
     }
   }
@@ -88,7 +86,7 @@ export function SpaceFeatureSettings() {
               <Switch
                 data-test={`space-feature-toggle-${feature}`}
                 disabled={!isAdmin}
-                defaultChecked={!space?.featureBlacklist.includes(feature)}
+                defaultChecked={!space?.hiddenFeatures.includes(feature)}
                 onChange={(ev) => {
                   const { checked } = ev.target;
                   setValue(feature, !!checked);

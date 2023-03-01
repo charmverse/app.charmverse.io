@@ -2,7 +2,7 @@ import type { Space } from '@prisma/client';
 
 import * as http from 'adapters/http';
 import type { SpaceWithGates } from 'lib/spaces/interfaces';
-import type { SpaceFeatureBlacklist } from 'lib/spaces/setFeatureBlacklist';
+import type { SpaceHiddenFeatures } from 'lib/spaces/setHiddenFeatures';
 
 export class SpacesApi {
   async searchByDomain(search: string) {
@@ -13,7 +13,7 @@ export class SpacesApi {
     return http.GET<SpaceWithGates[]>('/api/spaces/search-name', { search });
   }
 
-  async setFeatureBlacklist({ featureBlacklist, spaceId }: SpaceFeatureBlacklist) {
-    return http.POST<Space>(`/api/spaces/${spaceId}/set-feature-blacklist`, { featureBlacklist });
+  async setHiddenFeatures({ hiddenFeatures, spaceId }: SpaceHiddenFeatures) {
+    return http.POST<Space>(`/api/spaces/${spaceId}/set-feature-blacklist`, { hiddenFeatures });
   }
 }

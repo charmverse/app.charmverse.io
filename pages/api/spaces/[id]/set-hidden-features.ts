@@ -4,7 +4,7 @@ import nc from 'next-connect';
 
 import { onError, onNoMatch, requireSpaceMembership, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import { setFeatureBlacklist } from 'lib/spaces/setFeatureBlacklist';
+import { setHiddenFeatures } from 'lib/spaces/setHiddenFeatures';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -16,13 +16,13 @@ handler
       spaceIdKey: 'id'
     })
   )
-  .post(setFeatureBlacklistController);
+  .post(setHiddenFeaturesController);
 
-async function setFeatureBlacklistController(req: NextApiRequest, res: NextApiResponse<Space>) {
+async function setHiddenFeaturesController(req: NextApiRequest, res: NextApiResponse<Space>) {
   const { id: spaceId } = req.query;
 
-  const updatedSpace = await setFeatureBlacklist({
-    featureBlacklist: req.body.featureBlacklist,
+  const updatedSpace = await setHiddenFeatures({
+    hiddenFeatures: req.body.hiddenFeatures,
     spaceId: spaceId as string
   });
   return res.status(200).json(updatedSpace);

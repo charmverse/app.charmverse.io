@@ -2,11 +2,11 @@
 import type { Space } from '@prisma/client';
 import request from 'supertest';
 
-import type { SpaceFeatureBlacklist } from 'lib/spaces/setFeatureBlacklist';
+import type { SpaceHiddenFeatures } from 'lib/spaces/setHiddenFeatures';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
-describe('POST /api/spaces/[id]/set-feature-blacklist - Set feature blacklist for the space', () => {
+describe('POST /api/spaces/[id]/set-hidden-features - Set hidden features for the space', () => {
   it('should update the feature blacklist if user is admin, and return the space, responding with 200', async () => {
     const { space, user: adminUser } = await generateUserAndSpaceWithApiToken(undefined, true);
 
@@ -14,16 +14,16 @@ describe('POST /api/spaces/[id]/set-feature-blacklist - Set feature blacklist fo
 
     const updatedSpace = (
       await request(baseUrl)
-        .post(`/api/spaces/${space.id}/set-feature-blacklist`)
+        .post(`/api/spaces/${space.id}/set-hidden-features`)
         .set('Cookie', userCookie)
         .send({
-          featureBlacklist: ['member_directory']
-        } as Pick<SpaceFeatureBlacklist, 'featureBlacklist'>)
+          hiddenFeatures: ['member_directory']
+        } as Pick<SpaceHiddenFeatures, 'hiddenFeatures'>)
         .expect(200)
     ).body as Space;
 
-    expect(updatedSpace.featureBlacklist).toHaveLength(1);
-    expect(updatedSpace.featureBlacklist[0]).toBe('member_directory');
+    expect(updatedSpace.hiddenFeatures).toHaveLength(1);
+    expect(updatedSpace.hiddenFeatures[0]).toBe('member_directory');
   });
 
   it('should fail if the user is not an admin of the space, and respond 401', async () => {
@@ -32,11 +32,11 @@ describe('POST /api/spaces/[id]/set-feature-blacklist - Set feature blacklist fo
     const userCookie = await loginUser(nonAdminUser.id);
 
     await request(baseUrl)
-      .post(`/api/spaces/${space.id}/set-feature-blacklist`)
+      .post(`/api/spaces/${space.id}/set-hidden-features`)
       .set('Cookie', userCookie)
       .send({
-        featureBlacklist: ['member_directory']
-      } as Pick<SpaceFeatureBlacklist, 'featureBlacklist'>)
+        hiddenFeatures: ['member_directory']
+      } as Pick<SpaceHiddenFeatures, 'hiddenFeatures'>)
       .expect(401);
   });
 });

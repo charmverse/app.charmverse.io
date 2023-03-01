@@ -263,7 +263,7 @@ model Space {
   webhookSubscriptions        WebhookSubscription[]
   webhookSigningSecret        String?
 
-  featureBlacklist            Feature[]
+  hiddenFeatures            Feature[]
 
   @@index([createdBy])
 }
