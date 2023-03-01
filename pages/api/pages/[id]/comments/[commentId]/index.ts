@@ -1,17 +1,14 @@
-import type { PageComment, PostComment } from '@prisma/client';
+import type { PageComment } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { prisma } from 'db';
-import { deletePostComment } from 'lib/forums/comments/deletePostComment';
 import type { UpdatePostCommentInput } from 'lib/forums/comments/interface';
-import { updatePostComment } from 'lib/forums/comments/updatePostComment';
 import { PostNotFoundError } from 'lib/forums/posts/errors';
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { deletePageComment } from 'lib/pages/comments/deletePageComment';
 import { getPageComment } from 'lib/pages/comments/getPageComment';
 import { updatePageComment } from 'lib/pages/comments/updatePageComment';
-import { computePostPermissions } from 'lib/permissions/forum/computePostPermissions';
 import { withSessionRoute } from 'lib/session/withSession';
 import { UserIsNotSpaceMemberError } from 'lib/users/errors';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
@@ -31,7 +28,7 @@ async function updatePageCommentHandler(req: NextApiRequest, res: NextApiRespons
   });
 
   if (!page) {
-    throw new PostNotFoundError(pageId);
+    throw new DataNotFoundError(pageId);
   }
 
   const spaceRole = await hasAccessToSpace({

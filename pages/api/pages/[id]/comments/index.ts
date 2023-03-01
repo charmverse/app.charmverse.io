@@ -3,11 +3,12 @@ import nc from 'next-connect';
 
 import { prisma } from 'db';
 import type { CreateCommentInput } from 'lib/comments';
-import { onError, onNoMatch, requireUser } from 'lib/middleware';
+import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { createPageComment } from 'lib/pages/comments/createPageComment';
 import type { PageCommentWithVote } from 'lib/pages/comments/interface';
 import { listPageComments } from 'lib/pages/comments/listPageComments';
 import { PageNotFoundError } from 'lib/pages/server';
+import { computeUserPagePermissions } from 'lib/permissions/pages';
 import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -19,7 +20,14 @@ async function listPageCommentsHandler(req: NextApiRequest, res: NextApiResponse
 
   const userId = req.session.user?.id;
 
-  // TODO: permissions
+  const permissions = await computeUserPagePermissions({
+    pageId,
+    userId
+  });
+
+  if (permissions.read !== true) {
+    throw new ActionNotPermittedError('You do not have permission to view this page');
+  }
 
   const pageCommentsWithVotes = await listPageComments({ pageId, userId });
 
@@ -40,7 +48,14 @@ async function createPageCommentHandler(req: NextApiRequest, res: NextApiRespons
     throw new PageNotFoundError(pageId);
   }
 
-  // TODO: permissions
+  const permissions = await computeUserPagePermissions({
+    pageId,
+    userId
+  });
+
+  if (permissions.comment !== true) {
+    throw new ActionNotPermittedError('You do not have permission to comment on this page');
+  }
 
   const pageComment = await createPageComment({ pageId, userId, ...body });
 
