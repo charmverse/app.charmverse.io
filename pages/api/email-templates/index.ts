@@ -19,8 +19,10 @@ const handler = nc({
 const createDiscussionTask = ({
   pageTitle,
   spaceName,
-  mentionText
+  mentionText,
+  type = 'page'
 }: {
+  type?: DiscussionTask['type'];
   spaceName: string;
   mentionText: string;
   pageTitle: string;
@@ -38,7 +40,7 @@ const createDiscussionTask = ({
     bountyId: null,
     bountyTitle: null,
     commentId: null,
-    type: 'page',
+    type,
     createdBy: {
       id: v4(),
       username: '',
@@ -179,12 +181,14 @@ const templates = {
         createDiscussionTask({
           mentionText: 'Hey there, please respond to this message.',
           pageTitle: 'Attention please',
-          spaceName: 'CharmVerse'
+          spaceName: 'CharmVerse',
+          type: 'bounty'
         }),
         createDiscussionTask({
           mentionText: 'cc @ghostpepper',
           pageTitle: 'Product Road Map',
-          spaceName: 'CharmVerse'
+          spaceName: 'CharmVerse',
+          type: 'bounty'
         }),
         createDiscussionTask({
           mentionText: "Let's have a meeting @ghostpepper",
@@ -199,6 +203,11 @@ const templates = {
         createDiscussionTask({
           mentionText: 'We should discuss about this @ghostpepper',
           pageTitle: 'Product Road Map',
+          spaceName: 'CharmVerse'
+        }),
+        createDiscussionTask({
+          mentionText: 'We are facing issues @ghostpepper',
+          pageTitle: 'Product Discussion',
           spaceName: 'CharmVerse'
         })
       ],
