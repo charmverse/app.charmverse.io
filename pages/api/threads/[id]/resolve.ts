@@ -39,7 +39,7 @@ async function resolveThread(req: NextApiRequest, res: NextApiResponse<ThreadWit
   }
 
   const permissionSet = await computeUserPagePermissions({
-    pageId: thread.pageId,
+    resourceId: thread.pageId,
     userId
   });
 

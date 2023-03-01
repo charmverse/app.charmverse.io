@@ -38,7 +38,7 @@ async function getProposalController(req: NextApiRequest, res: NextApiResponse<P
 
   const computed = await computeUserPagePermissions({
     // Proposal id is the same as page
-    pageId: proposal?.id,
+    resourceId: proposal?.id,
     userId
   });
 

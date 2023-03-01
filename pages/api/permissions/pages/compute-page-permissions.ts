@@ -46,7 +46,7 @@ async function computePagePermissions(req: NextApiRequest, res: NextApiResponse<
   }
 
   const permissions = await computeUserPagePermissions({
-    pageId: resourceId,
+    resourceId,
     userId: req.session.user?.id
   });
   res.status(200).json(permissions);

@@ -48,8 +48,7 @@ async function updateVote(req: NextApiRequest, res: NextApiResponse<Vote | { err
 
   const pagePermissions = await computeUserPagePermissions({
     userId,
-    pageId: vote.pageId,
-    allowAdminBypass: true
+    resourceId: vote.pageId
   });
 
   if (!pagePermissions.create_poll) {
@@ -94,8 +93,7 @@ async function deleteVote(req: NextApiRequest, res: NextApiResponse<Vote | null 
 
   const pagePermissions = await computeUserPagePermissions({
     userId,
-    pageId: vote.pageId,
-    allowAdminBypass: true
+    resourceId: vote.pageId
   });
 
   if (!pagePermissions.create_poll) {

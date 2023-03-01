@@ -247,7 +247,7 @@ function PostHeader({
       >
         <div>
           <ListItemButton
-            data-test='forum-post-convert-proposal-action'
+            data-test='convert-proposal-action'
             onClick={() => forumPostInfo.forumPost && convertToProposal(forumPostInfo.forumPost.id)}
             disabled={!canCreateProposal || !!forumPostInfo.forumPost?.proposalId}
           >
@@ -383,11 +383,12 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
   }
 
   async function convertToProposal(pageId: string) {
-    await charmClient.pages.convertToProposal({
+    const convertedProposal = await charmClient.pages.convertToProposal({
       categoryId: getDefaultCreateCategory().id,
       pageId
     });
     closeMenu();
+    router.push(`/${router.query.domain}/${convertedProposal.path}`);
   }
 
   const documentOptions = (
@@ -449,7 +450,11 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
         <>
           <Tooltip title={!canCreateProposal ? 'You do not have the permission to convert to proposal' : ''}>
             <div>
-              <ListItemButton onClick={() => convertToProposal(basePage.id)} disabled={!canCreateProposal}>
+              <ListItemButton
+                data-test='convert-proposal-action'
+                onClick={() => convertToProposal(basePage.id)}
+                disabled={!canCreateProposal || !!basePage.convertedProposalId}
+              >
                 <TaskOutlinedIcon
                   fontSize='small'
                   sx={{

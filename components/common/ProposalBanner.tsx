@@ -6,7 +6,7 @@ import { useRouter } from 'next/router';
 
 import Link from 'components/common/Link';
 
-const StyledPostProposalBanner = styled(Box)<{ card?: boolean }>`
+const StyledProposalBanner = styled(Box)<{ card?: boolean }>`
   width: 100%;
   z-index: var(--z-index-appBar);
   display: flex;
@@ -16,12 +16,12 @@ const StyledPostProposalBanner = styled(Box)<{ card?: boolean }>`
   padding: ${({ theme }) => theme.spacing(1.4)};
 `;
 
-export function PostProposalBanner({ proposalId }: { proposalId: string }) {
+export function ProposalBanner({ type, proposalId }: { type: 'page' | 'post'; proposalId: string }) {
   const router = useRouter();
   return (
-    <StyledPostProposalBanner data-test='post-proposal-banner'>
+    <StyledProposalBanner data-test='proposal-banner'>
       <Typography>
-        This post has been converted to a proposal and is read-only now. You can continue the conversation{' '}
+        This {type} has been converted to a proposal and is read-only now. You can continue the conversation{' '}
         <Stack gap={0.5} flexDirection='row' alignItems='center' display='inline-flex'>
           <Link
             color='inherit'
@@ -35,6 +35,6 @@ export function PostProposalBanner({ proposalId }: { proposalId: string }) {
           <EastIcon sx={{ position: 'relative', top: 1.5, fontSize: 16 }} />
         </Stack>
       </Typography>
-    </StyledPostProposalBanner>
+    </StyledProposalBanner>
   );
 }

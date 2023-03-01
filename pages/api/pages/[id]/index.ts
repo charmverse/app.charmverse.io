@@ -40,7 +40,7 @@ async function getPageRoute(req: NextApiRequest, res: NextApiResponse<IPageWithP
 
   // Page ID might be a path now, so first we fetch the page and if found, can pass the id from the found page to check if we should actually send it to the requester
   const permissions = await computeUserPagePermissions({
-    pageId: page.id,
+    resourceId: page.id,
     userId
   });
 
@@ -56,7 +56,7 @@ async function updatePageHandler(req: NextApiRequest, res: NextApiResponse<IPage
   const userId = req.session.user.id;
 
   const permissions = await computeUserPagePermissions({
-    pageId,
+    resourceId: pageId,
     userId
   });
 
@@ -159,7 +159,7 @@ async function deletePage(req: NextApiRequest, res: NextApiResponse<ModifyChildP
   });
 
   const permissions = await computeUserPagePermissions({
-    pageId,
+    resourceId: pageId,
     userId
   });
 
