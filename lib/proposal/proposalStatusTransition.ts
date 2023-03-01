@@ -1,7 +1,7 @@
 import type { ProposalStatus } from '@prisma/client';
 
 export const proposalStatusTransitionRecord: Record<ProposalStatus, ProposalStatus[]> = {
-  draft: ['draft', 'discussion'],
+  draft: ['discussion'],
   discussion: ['draft', 'draft', 'review'],
   review: ['discussion', 'reviewed'],
   reviewed: ['vote_active', 'discussion'],
@@ -28,10 +28,10 @@ export const proposalStatusTransitionPermission: Partial<
   draft: {
     // Author of the proposal can move draft proposal to both draft and discussion
     // Reviewer of the proposal can't update the status of the proposal
-    author: ['draft', 'discussion']
+    author: ['discussion']
   },
   discussion: {
-    author: ['draft', 'draft', 'review']
+    author: ['draft', 'review']
   },
   review: {
     author: ['discussion'],
