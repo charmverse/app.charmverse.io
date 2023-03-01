@@ -16,8 +16,7 @@ import { proposalPermissionsMapping } from '../mapping';
 
 import type { ProposalResource } from './interfaces';
 import { pfpStatusDiscussionEditableCommentable } from './pfpStatusDiscussionEditableCommentable';
-import { pfpStatusDraftOnlyViewable } from './pfpStatusDraftOnlyViewable';
-import { pfpStatusPrivateDraftVisibleOnlyByAuthor } from './pfpStatusPrivateDraftVisibleOnlyByAuthor';
+import { pfpStatusDraftNotViewable } from './pfpStatusDraftNotViewable';
 import { pfpStatusReviewCommentable } from './pfpStatusReviewCommentable';
 import { pfpStatusReviewedOnlyCreateVote } from './pfpStatusReviewedOnlyCreateVote';
 import { pfpStatusVoteActiveOnlyVotable } from './pfpStatusVoteActiveOnlyVotable';
@@ -148,8 +147,7 @@ export const computeProposalPermissions = buildComputePermissionsWithPermissionF
   resolver: proposalResolver,
   computeFn: baseComputeProposalPermissions,
   pfps: [
-    pfpStatusPrivateDraftVisibleOnlyByAuthor,
-    pfpStatusDraftOnlyViewable,
+    pfpStatusDraftNotViewable,
     pfpStatusDiscussionEditableCommentable,
     pfpStatusReviewCommentable,
     pfpStatusReviewedOnlyCreateVote,
