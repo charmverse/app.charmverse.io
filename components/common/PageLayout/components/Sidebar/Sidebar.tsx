@@ -264,35 +264,47 @@ export default function Sidebar({ closeSidebar, favorites, navAction }: SidebarP
                 label='Invites'
               />
               <Divider sx={{ mx: 2, my: 1 }} />
-              <SidebarLink
-                href={`/${space.domain}/members`}
-                active={router.pathname.startsWith('/[domain]/members')}
-                icon={<AccountCircleIcon fontSize='small' />}
-                label='Member Directory'
-                onClick={navAction}
-              />
-              <SidebarLink
-                href={`/${space.domain}/proposals`}
-                active={router.pathname.startsWith('/[domain]/proposals')}
-                icon={<TaskOutlinedIcon fontSize='small' />}
-                label='Proposals'
-                onClick={navAction}
-              />
-              <SidebarLink
-                href={`/${space.domain}/bounties`}
-                active={router.pathname.startsWith('/[domain]/bounties')}
-                icon={<BountyIcon fontSize='small' />}
-                label='Bounties'
-                onClick={navAction}
-              />
-              <SidebarLink
-                href={`/${space.domain}/forum`}
-                data-test='sidebar-link-forum'
-                active={router.pathname.startsWith('/[domain]/forum')}
-                icon={<MessageOutlinedIcon fontSize='small' />}
-                label='Forum'
-                onClick={navAction}
-              />
+
+              {!space?.featureBlacklist.includes('member_directory') && (
+                <SidebarLink
+                  href={`/${space.domain}/members`}
+                  active={router.pathname.startsWith('/[domain]/members')}
+                  icon={<AccountCircleIcon fontSize='small' />}
+                  label='Member Directory'
+                  onClick={navAction}
+                />
+              )}
+
+              {!space?.featureBlacklist.includes('proposals') && (
+                <SidebarLink
+                  href={`/${space.domain}/proposals`}
+                  active={router.pathname.startsWith('/[domain]/proposals')}
+                  icon={<TaskOutlinedIcon fontSize='small' />}
+                  label='Proposals'
+                  onClick={navAction}
+                />
+              )}
+
+              {!space?.featureBlacklist.includes('bounties') && (
+                <SidebarLink
+                  href={`/${space.domain}/bounties`}
+                  active={router.pathname.startsWith('/[domain]/bounties')}
+                  icon={<BountyIcon fontSize='small' />}
+                  label='Bounties'
+                  onClick={navAction}
+                />
+              )}
+
+              {!space?.featureBlacklist.includes('forum') && (
+                <SidebarLink
+                  href={`/${space.domain}/forum`}
+                  data-test='sidebar-link-forum'
+                  active={router.pathname.startsWith('/[domain]/forum')}
+                  icon={<MessageOutlinedIcon fontSize='small' />}
+                  label='Forum'
+                  onClick={navAction}
+                />
+              )}
             </Box>
             {isMobile ? (
               <div>{pagesNavigation}</div>
