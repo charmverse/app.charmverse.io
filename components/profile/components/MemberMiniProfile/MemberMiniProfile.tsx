@@ -7,6 +7,7 @@ import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { DialogTitle } from 'components/common/Modal';
+import { MemberEmailForm } from 'components/members/MemberEmailForm';
 import { MemberPropertiesRenderer } from 'components/profile/components/SpacesMemberDetails/components/MemberPropertiesRenderer';
 import UserDetails from 'components/profile/components/UserDetails/UserDetails';
 import Legend from 'components/settings/Legend';
@@ -77,15 +78,18 @@ function MemberProfile({ title, member, onClose }: { title?: string; member: Mem
         }
       >
         {user && (
-          <UserDetails
-            sx={{
-              mt: 0
-            }}
-            // currentUser doesn't have profile thus is not considered as publicUser inside UserDetails
-            // giving the ability to update the profile properties
-            user={user.id === currentUser.id ? currentUser : user}
-            updateUser={setUser}
-          />
+          <>
+            <UserDetails
+              sx={{
+                mt: 0
+              }}
+              // currentUser doesn't have profile thus is not considered as publicUser inside UserDetails
+              // giving the ability to update the profile properties
+              user={user.id === currentUser.id ? currentUser : user}
+              updateUser={setUser}
+            />
+            <MemberEmailForm />
+          </>
         )}
         <Legend mt={4}>Member details</Legend>
       </MemberPropertiesPopup>
