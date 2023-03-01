@@ -11,6 +11,7 @@ import type { Dispatch, ReactNode, SetStateAction } from 'react';
 import { usePostPermissions } from 'components/forum/hooks/usePostPermissions';
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useMembers } from 'hooks/useMembers';
+import { usePagePermissions } from 'hooks/usePagePermissions';
 import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
 
@@ -43,14 +44,13 @@ export function PageActionsMenu({
   };
   readOnly?: boolean;
 }) {
-  const { getPagePermissions } = usePages();
   const { members } = useMembers();
   const router = useRouter();
   const { showMessage } = useSnackbar();
   const charmversePage = members.find((member) => member.id === page.createdBy);
   const open = Boolean(anchorEl);
   const { formatDateTime } = useDateFormatter();
-  const pagePermissions = getPagePermissions(page.id);
+  const { permissions: pagePermissions } = usePagePermissions({ pageIdOrPath: page.id });
   const postPermissions = usePostPermissions({
     postIdOrPath: router.pathname.startsWith('/[domain]/forum') ? page.id : (null as any)
   });

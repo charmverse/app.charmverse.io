@@ -1,4 +1,4 @@
-import { TextField } from '@mui/material';
+import TextField from '@mui/material/TextField';
 import { forwardRef } from 'react';
 
 import { FieldWrapper } from 'components/common/form/fields/FieldWrapper';

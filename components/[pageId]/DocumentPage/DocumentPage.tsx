@@ -17,11 +17,13 @@ import { getCardComments } from 'components/common/BoardEditor/focalboard/src/st
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import type { FrontendParticipant } from 'components/common/CharmEditor/components/fiduswriter/collab';
 import { SnapshotVoteDetails } from 'components/common/CharmEditor/components/inlineVote/components/SnapshotVoteDetails';
-import VoteDetail from 'components/common/CharmEditor/components/inlineVote/components/VoteDetail';
+import { VoteDetail } from 'components/common/CharmEditor/components/inlineVote/components/VoteDetail';
 import ScrollableWindow from 'components/common/PageLayout/components/ScrollableWindow';
+import { useProposalPermissions } from 'components/proposals/hooks/useProposalPermissions';
 import { useBounties } from 'hooks/useBounties';
 import { useCharmEditor } from 'hooks/useCharmEditor';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
+import { usePagePermissions } from 'hooks/usePagePermissions';
 import { usePages } from 'hooks/usePages';
 import { useVotes } from 'hooks/useVotes';
 import type { AssignedBountyPermissions } from 'lib/bounties';
@@ -32,7 +34,7 @@ import PageBanner from './components/PageBanner';
 import PageDeleteBanner from './components/PageDeleteBanner';
 import PageHeader from './components/PageHeader';
 import { PageTemplateBanner } from './components/PageTemplateBanner';
-import { ProposalProperties } from './components/ProposalProperties';
+import ProposalProperties from './components/ProposalProperties';
 
 const CharmEditor = dynamic(() => import('components/common/CharmEditor'), {
   ssr: false
@@ -79,14 +81,15 @@ export interface DocumentPageProps {
   setPage: (p: Partial<Page>) => void;
   readOnly?: boolean;
   insideModal?: boolean;
-  parentProposalId?: string | null;
 }
 
-function DocumentPage({ page, setPage, insideModal, readOnly = false, parentProposalId }: DocumentPageProps) {
-  const { pages, getPagePermissions } = usePages();
+function DocumentPage({ page, setPage, insideModal, readOnly = false }: DocumentPageProps) {
+  const { pages } = usePages();
   const { cancelVote, castVote, deleteVote, updateDeadline, votes, isLoading } = useVotes();
   // For post we would artificially construct the permissions
-  const pagePermissions = getPagePermissions(page.id);
+  const { permissions: pagePermissions } = usePagePermissions({
+    pageIdOrPath: page.id
+  });
   const { draftBounty } = useBounties();
   const { currentPageActionDisplay } = usePageActionDisplay();
   const { editMode, setPageProps } = useCharmEditor();
@@ -96,9 +99,12 @@ function DocumentPage({ page, setPage, insideModal, readOnly = false, parentProp
   const [bountyPermissions, setBountyPermissions] = useState<AssignedBountyPermissions | null>(null);
   const [containerRef, { width: containerWidth }] = useElementSize();
 
-  const proposalId = page.proposalId || parentProposalId;
+  const proposalId = page.proposalId;
+
+  const { permissions: proposalPermissions } = useProposalPermissions({ proposalIdOrPath: proposalId as string });
+
   // We can only edit the proposal from the top level
-  const readonlyProposalProperties = !page.proposalId || Boolean(parentProposalId) || readOnly;
+  const readonlyProposalProperties = !page.proposalId || readOnly;
 
   async function refreshBountyPermissions(bountyId: string) {
     setBountyPermissions(
@@ -174,6 +180,7 @@ function DocumentPage({ page, setPage, insideModal, readOnly = false, parentProp
   function onParticipantUpdate(participants: FrontendParticipant[]) {
     setPageProps({ participants });
   }
+
   return (
     <>
       {!!page?.deletedAt && (
@@ -195,13 +202,18 @@ function DocumentPage({ page, setPage, insideModal, readOnly = false, parentProp
             {page.headerImage && (
               <PageBanner
                 headerImage={page.headerImage}
-                readOnly={readOnly || enableSuggestingMode}
+                readOnly={readOnly || !!enableSuggestingMode}
                 setPage={setPage}
               />
             )}
             <Container top={pageTop} fullWidth={isSmallScreen || (page.fullWidth ?? false)}>
               <CharmEditor
-                key={page.id + editMode}
+                placeholderText={
+                  page.type === 'bounty' || page.type === 'bounty_template'
+                    ? `Describe the bounty. Type '/' to see the list of available commands`
+                    : undefined
+                }
+                key={page.id + editMode + String(pagePermissions?.edit_content)}
                 // content={pageDetails?.content as PageContent}
                 // onContentChange={updatePageContent}
                 readOnly={readOnly}
@@ -218,6 +230,7 @@ function DocumentPage({ page, setPage, insideModal, readOnly = false, parentProp
                 style={{
                   minHeight: proposalId ? '100px' : 'unset'
                 }}
+                disableNestedPages={page?.type === 'proposal' || page?.type === 'proposal_template'}
               >
                 {/* temporary? disable editing of page title when in suggestion mode */}
                 <PageHeader
@@ -227,7 +240,7 @@ function DocumentPage({ page, setPage, insideModal, readOnly = false, parentProp
                   icon={page.icon}
                   title={page.title}
                   updatedAt={page.updatedAt.toString()}
-                  readOnly={readOnly || enableSuggestingMode}
+                  readOnly={readOnly || !!enableSuggestingMode}
                   setPage={setPage}
                 />
                 {page.type === 'proposal' && !isLoading && page.snapshotProposalId && (
@@ -245,6 +258,7 @@ function DocumentPage({ page, setPage, insideModal, readOnly = false, parentProp
                       vote={pageVote}
                       detailed={false}
                       isProposal={true}
+                      disableVote={!proposalPermissions?.vote}
                     />
                   </Box>
                 )}
@@ -268,7 +282,6 @@ function DocumentPage({ page, setPage, insideModal, readOnly = false, parentProp
                     )}
                     {proposalId && (
                       <ProposalProperties
-                        pageId={proposalId}
                         proposalId={proposalId}
                         readOnly={readonlyProposalProperties}
                         isTemplate={page.type === 'proposal_template'}

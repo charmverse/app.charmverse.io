@@ -1,4 +1,4 @@
-import { IosShare, Share } from '@mui/icons-material';
+import { IosShare } from '@mui/icons-material';
 import type { Theme } from '@mui/material';
 import { Box, Divider, IconButton, Popover, Tooltip, useMediaQuery } from '@mui/material';
 import type { PageType } from '@prisma/client';
@@ -10,9 +10,9 @@ import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import Loader from 'components/common/Loader';
 import { usePages } from 'hooks/usePages';
-import { findParentOfType } from 'lib/pages/findParentOfType';
 
 import PagePermissions from './components/PagePermissions';
+import { ProposalPagePermissions } from './components/PagePermissions/ProposalPagePermissions';
 import ShareToWeb from './components/ShareToWeb';
 
 function ShareButton({ headerHeight, pageId }: { headerHeight: number; pageId: string }) {
@@ -24,7 +24,7 @@ function ShareButton({ headerHeight, pageId }: { headerHeight: number; pageId: s
   );
   const isLargeScreen = useMediaQuery((theme: Theme) => theme.breakpoints.up('md'));
 
-  const proposalParentId = findParentOfType({ pageId, pageType: 'proposal', pageMap: pages });
+  const isProposal = pages[pageId]?.type === 'proposal';
 
   // watch changes to the page in case permissions get updated
   useEffect(() => {
@@ -86,20 +86,19 @@ function ShareButton({ headerHeight, pageId }: { headerHeight: number; pageId: s
           </Box>
         ) : (
           <>
-            <ShareToWeb
-              pageId={pageId}
-              pagePermissions={pagePermissions}
-              refreshPermissions={refreshPermissions}
-              proposalParentId={proposalParentId}
-            />
+            <ShareToWeb pageId={pageId} pagePermissions={pagePermissions} refreshPermissions={refreshPermissions} />
             <Divider />
-            <PagePermissions
-              pageId={pageId}
-              refreshPermissions={refreshPermissions}
-              pagePermissions={pagePermissions}
-              pageType={pages[pageId]?.type as PageType}
-              proposalParentId={proposalParentId}
-            />
+            {pages[pageId]?.type === 'proposal' && (
+              <ProposalPagePermissions proposalId={pages[pageId]?.proposalId as string} />
+            )}
+            {pages[pageId]?.type !== 'proposal' && (
+              <PagePermissions
+                pageId={pageId}
+                refreshPermissions={refreshPermissions}
+                pagePermissions={pagePermissions}
+                pageType={pages[pageId]?.type as PageType}
+              />
+            )}
           </>
         )}
       </Popover>

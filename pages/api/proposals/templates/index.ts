@@ -21,9 +21,9 @@ handler.use(requireUser).post(
 async function createProposalTemplateController(req: NextApiRequest, res: NextApiResponse<IPageWithPermissions>) {
   const userId = req.session.user.id;
 
-  const { spaceId } = req.body as CreateProposalTemplateInput;
+  const { spaceId, categoryId, pageContent, reviewers } = req.body as CreateProposalTemplateInput;
 
-  const proposal = await createProposalTemplate({ spaceId, userId });
+  const proposal = await createProposalTemplate({ spaceId, userId, categoryId, pageContent, reviewers });
 
   logFirstProposalTemplate({ userId, spaceId });
 

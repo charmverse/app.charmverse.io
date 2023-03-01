@@ -34,8 +34,8 @@ export class PagesApi {
     return http.GET<PageDetails>(`/api/pages/${pageIdOrPath}/details${query}`);
   }
 
-  convertToProposal(pageId: string) {
-    return http.POST<PageDetails>(`/api/pages/${pageId}/convert-to-proposal`);
+  convertToProposal({ pageId, categoryId }: { pageId: string; categoryId: string }) {
+    return http.POST<PageDetails>(`/api/pages/${pageId}/convert-to-proposal`, { categoryId });
   }
 
   listComments(pageId: string): Promise<PageCommentWithVote[]> {

@@ -3,7 +3,7 @@ import { TextSelection } from '@bangle.dev/pm';
 import { useEditorViewContext } from '@bangle.dev/react';
 import { selectionTooltip } from '@bangle.dev/tooltip';
 
-import CreateVoteModal from 'components/votes/components/CreateVoteModal';
+import { CreateVoteModal } from 'components/votes/components/CreateVoteModal';
 
 import { updateInlineVote } from '../inlineVote.utils';
 

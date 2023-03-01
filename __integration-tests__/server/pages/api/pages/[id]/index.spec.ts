@@ -9,6 +9,7 @@ import { createProposalTemplate } from 'lib/templates/proposals/createProposalTe
 import { generatePageNode } from 'testing/generateStubs';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateUserAndSpace, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { generateProposalCategory } from 'testing/utils/proposals';
 
 const updateContent = {
   content: {
@@ -107,10 +108,14 @@ describe('PUT /api/pages/{id} - update page', () => {
 
   it('should update proposal template page content if the user is an admin and respond 200', async () => {
     const { user: adminUser, space } = await generateUserAndSpaceWithApiToken(undefined, true);
+    const proposalCategory = await generateProposalCategory({
+      spaceId: space.id
+    });
 
     const template = await createProposalTemplate({
       spaceId: space.id,
-      userId: adminUser.id
+      userId: adminUser.id,
+      categoryId: proposalCategory.id
     });
 
     const adminCookie = await loginUser(adminUser.id);
@@ -123,9 +128,14 @@ describe('PUT /api/pages/{id} - update page', () => {
   it('should to fail update proposal template page content if the user is not a space admin and respond 401', async () => {
     const { user: nonAdminUser, space } = await generateUserAndSpaceWithApiToken(undefined, false);
 
+    const proposalCategory = await generateProposalCategory({
+      spaceId: space.id
+    });
+
     const template = await createProposalTemplate({
       spaceId: space.id,
-      userId: nonAdminUser.id
+      userId: nonAdminUser.id,
+      categoryId: proposalCategory.id
     });
 
     const adminCookie = await loginUser(nonAdminUser.id);
