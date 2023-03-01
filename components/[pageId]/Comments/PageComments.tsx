@@ -7,7 +7,7 @@ import { Comment } from 'components/common/comments/Comment';
 import { CommentForm } from 'components/common/comments/CommentForm';
 import { CommentSort } from 'components/common/comments/CommentSort';
 import LoadingComponent from 'components/common/LoadingComponent';
-import { usePages } from 'hooks/usePages';
+import { usePagePermissions } from 'hooks/usePagePermissions';
 import type { CommentPermissions } from 'lib/comments';
 
 type Props = {
@@ -25,13 +25,15 @@ export function PageComments({ pageId }: Props) {
     deleteComment,
     voteComment
   } = usePageComments(pageId);
-  const { getPagePermissions } = usePages();
-  const pagePermissions = getPagePermissions(pageId);
+
+  const { permissions } = usePagePermissions({
+    pageIdOrPath: pageId
+  });
 
   const commentPermissions: CommentPermissions = {
-    add_comment: pagePermissions?.comment ?? false,
-    upvote: pagePermissions?.comment ?? false,
-    downvote: pagePermissions?.comment ?? false,
+    add_comment: permissions?.comment ?? false,
+    upvote: permissions?.comment ?? false,
+    downvote: permissions?.comment ?? false,
     delete_comments: false
   };
 
@@ -39,7 +41,7 @@ export function PageComments({ pageId }: Props) {
     <>
       <Divider sx={{ my: 3 }} />
 
-      {pagePermissions?.comment && <CommentForm handleCreateComment={addComment} />}
+      {permissions?.comment && <CommentForm handleCreateComment={addComment} />}
 
       {isLoadingComments ? (
         <Box height={100}>
@@ -70,8 +72,8 @@ export function PageComments({ pageId }: Props) {
               <Typography color='secondary' variant='h6'>
                 No Comments Yet
               </Typography>
-              {/* TODO: permissions! */}
-              <Typography color='secondary'>Be the first to share what you think!</Typography>
+
+              {permissions?.comment && <Typography color='secondary'>Be the first to share what you think!</Typography>}
             </Stack>
           )}
         </>
