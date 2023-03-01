@@ -72,8 +72,12 @@ export function SpaceAccessGate({
   }
 
   function joinSpace() {
-    if (summonGate.verifyResult?.isVerified) {
+    if (summonGate.isVerified) {
       summonGate.joinSpace();
+    } else if (tokenGate.isVerified) {
+      tokenGate.joinSpace();
+    } else if (discordGate.isVerified) {
+      discordGate.joinSpace();
     } else {
       showMessage('You are not eligible to join this space', 'error');
     }

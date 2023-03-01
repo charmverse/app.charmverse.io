@@ -10,7 +10,7 @@ type Props = {
 export async function verifyDiscordGateForSpace({ discordUserId, space }: Props) {
   const discordServerId = space.discordServerId;
 
-  if (!discordServerId || !discordUserId) {
+  if (!discordServerId || !discordUserId || !space.superApiTokenId) {
     return {
       isVerified: false,
       hasDiscordServer: !!discordServerId,
