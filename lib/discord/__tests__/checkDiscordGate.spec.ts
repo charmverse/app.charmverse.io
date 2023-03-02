@@ -15,7 +15,10 @@ describe('checkDiscordGate', () => {
     const discordServerId = `discord-${v4()}`;
     const discordUserId = `discord-user-${v4()}`;
 
-    await prisma.space.update({ where: { id: space.id }, data: { discordServerId } });
+    const token = await prisma.superApiToken.create({
+      data: { name: v4(), token: v4() }
+    });
+    await prisma.space.update({ where: { id: space.id }, data: { discordServerId, superApiTokenId: token.id } });
     await prisma.user.update({
       where: { id: user.id },
       data: { discordUser: { create: { discordId: discordUserId, account: {} } } }
@@ -57,7 +60,10 @@ describe('checkDiscordGate', () => {
 
     const { user, space } = await generateUserAndSpaceWithApiToken(undefined, true);
 
-    await prisma.space.update({ where: { id: space.id }, data: { discordServerId } });
+    const token = await prisma.superApiToken.create({
+      data: { name: v4(), token: v4() }
+    });
+    await prisma.space.update({ where: { id: space.id }, data: { discordServerId, superApiTokenId: token.id } });
 
     const canJoinSpaceMock = jest.fn().mockResolvedValueOnce({ isVerified: true, roles: [] });
     jest.mock('lib/collabland/collablandClient', () => ({

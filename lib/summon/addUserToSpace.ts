@@ -5,9 +5,10 @@ import { prisma } from 'db';
 type Props = {
   spaceId: string;
   userId: string;
+  userXpsEngineId: string;
 };
 
-export async function addUserToSpace({ spaceId, userId }: Props): Promise<Space | null> {
+export async function addUserToSpace({ spaceId, userId, userXpsEngineId }: Props): Promise<Space | null> {
   const space = await prisma.space.findFirstOrThrow({ where: { id: spaceId } });
 
   const spaceMembership = await prisma.spaceRole.findFirst({
@@ -34,6 +35,14 @@ export async function addUserToSpace({ spaceId, userId }: Props): Promise<Space 
       }
     });
   }
+  await prisma.user.update({
+    where: {
+      id: userId
+    },
+    data: {
+      xpsEngineId: userXpsEngineId
+    }
+  });
 
   return space;
 }

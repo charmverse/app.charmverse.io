@@ -23,7 +23,7 @@ async function getBlockSubtree(req: NextApiRequest, res: NextApiResponse<Block[]
   });
 
   const computed = await computeUserPagePermissions({
-    pageId: publicPage?.id as string,
+    resourceId: publicPage?.id as string,
     userId: req.session.user?.id
   });
 

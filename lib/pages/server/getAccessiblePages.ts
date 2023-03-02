@@ -87,6 +87,7 @@ function selectPageFields(meta: boolean) {
       bountyId: true,
       hasContent: true,
       galleryImage: true,
+      convertedProposalId: true,
       ...includePagePermissionsMeta()
     }
   };

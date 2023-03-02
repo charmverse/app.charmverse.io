@@ -36,11 +36,6 @@ export function useSummonGate({ joinType = 'token_gate', space, onSuccess }: Pro
   );
 
   async function joinSpace() {
-    if (!data?.isVerified) {
-      showMessage('You are not eligible to join this space', 'error');
-      return;
-    }
-
     setJoiningSpace(true);
 
     try {

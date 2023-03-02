@@ -14,6 +14,7 @@ import type { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEdit
 import ErrorPage from 'components/common/errors/ErrorPage';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { ScrollableWindow } from 'components/common/PageLayout';
+import { ProposalBanner } from 'components/common/ProposalBanner';
 import UserDisplay from 'components/common/UserDisplay';
 import { usePostPermissions } from 'components/forum/hooks/usePostPermissions';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -33,7 +34,6 @@ import { PostCategoryInput } from './components/PostCategoryInput';
 import { PostComment } from './components/PostComment';
 import { PostCommentForm } from './components/PostCommentForm';
 import { PostCommentSort } from './components/PostCommentSort';
-import { PostProposalBanner } from './components/PostProposalBanner';
 
 type Props = {
   spaceId: string;
@@ -216,7 +216,7 @@ export function PostPage({
 
   return (
     <>
-      {post?.proposalId && <PostProposalBanner proposalId={post.proposalId} />}
+      {post?.proposalId && <ProposalBanner type='post' proposalId={post.proposalId} />}
       <ScrollableWindow>
         <Stack>
           <Stack flexDirection='row'>
