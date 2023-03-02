@@ -1,7 +1,7 @@
 import { prisma } from 'db';
 
 export async function updateProposlsDraftStatus() {
-  await prisma.proposal.updateMany({
+  const updated = await prisma.proposal.updateMany({
     where: {
       status: 'private_draft' as any
     },
@@ -10,6 +10,7 @@ export async function updateProposlsDraftStatus() {
     },
   });
 
+  console.log('🔥 udpated:', updated);
 }
 
 updateProposlsDraftStatus();
