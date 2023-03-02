@@ -105,18 +105,21 @@ describe('GET /api/proposals/[id] - Get proposal', () => {
     await request(baseUrl).get(`/api/proposals/${v4()}`).set('Cookie', authorCookie).expect(404);
   });
 
+  // Users should not be able to access draft proposals that they are not authors or reviewers of
   it("should throw error if user doesn't have read access to proposal page", async () => {
+    const normalSpaceUser = await generateSpaceUser({ isAdmin: false, spaceId: space.id });
+
+    const cookie = await loginUser(normalSpaceUser.id);
+
     const pageWithProposal = await createProposalWithUsers({
       spaceId: space.id,
       userId: author.id,
+      proposalStatus: 'draft',
       authors: [],
       reviewers: [reviewer.id]
     });
 
-    await request(baseUrl)
-      .get(`/api/proposals/${pageWithProposal.proposalId}`)
-      .set('Cookie', reviewerCookie)
-      .expect(404);
+    await request(baseUrl).get(`/api/proposals/${pageWithProposal.proposalId}`).set('Cookie', cookie).expect(404);
   });
 });
 
