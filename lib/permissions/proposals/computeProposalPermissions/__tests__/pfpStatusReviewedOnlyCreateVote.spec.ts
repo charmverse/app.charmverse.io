@@ -53,7 +53,7 @@ describe('pfpStatusReviewedOnlyCreateVote', () => {
     const permissions = await pfpStatusReviewedOnlyCreateVote({
       flags: fullPermissions,
       isAdmin: false,
-      resource: { ...proposal, status: 'private_draft' },
+      resource: { ...proposal, status: 'draft' },
       userId: proposalAuthor.id
     });
 

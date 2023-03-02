@@ -21,7 +21,7 @@ export async function getProposalsBySpace({
       spaceId,
       categoryId: generateCategoryIdQuery(categoryIds),
       status: {
-        notIn: ['draft', 'private_draft']
+        not: 'draft'
       },
       page: {
         type: 'proposal'

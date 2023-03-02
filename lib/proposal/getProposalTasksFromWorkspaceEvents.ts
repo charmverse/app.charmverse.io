@@ -44,7 +44,7 @@ export async function getProposalTasksFromWorkspaceEvents(userId: string, worksp
       },
       proposal: {
         status: {
-          notIn: ['draft', 'private_draft']
+          not: 'draft'
         }
       }
     },

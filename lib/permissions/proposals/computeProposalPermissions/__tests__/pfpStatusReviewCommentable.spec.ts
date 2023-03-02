@@ -53,7 +53,7 @@ describe('pfpStatusReviewCommentable', () => {
     const permissions = await pfpStatusReviewCommentable({
       flags: fullPermissions,
       isAdmin: false,
-      resource: { ...proposal, status: 'private_draft' },
+      resource: { ...proposal, status: 'draft' },
       userId: proposalAuthor.id
     });
 

@@ -3,14 +3,12 @@ import { ProposalStatus } from '@prisma/client';
 import { prisma } from 'db';
 import { BasePermissions } from 'lib/permissions/basePermissions.class';
 import { computeProposalPermissions } from 'lib/permissions/proposals/computeProposalPermissions';
-import { hasSpaceWideProposalReviewerPermission } from 'lib/permissions/proposals/hasSpaceWideProposalReviewerPermission';
 import { isProposalAuthor } from 'lib/proposal/isProposalAuthor';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { typedKeys } from 'lib/utilities/objects';
 
 import { ProposalNotFoundError } from './errors';
 import type { ProposalWithUsers } from './interface';
-import { isProposalReviewer } from './isProposalReviewer';
 
 export type ProposalFlowFlags = Record<ProposalStatus, boolean>;
 
@@ -32,16 +30,6 @@ async function privateDraftProposal({ proposal, userId }: GetFlagsInput): Promis
   }
   return flags.operationFlags;
 }
-async function draftProposal({ proposal, userId }: GetFlagsInput): Promise<ProposalFlowFlags> {
-  const flags = new TransitionFlags();
-  if (
-    isProposalAuthor({ proposal, userId }) ||
-    (await hasAccessToSpace({ spaceId: proposal.spaceId, userId, adminOnly: true })).isAdmin
-  ) {
-    flags.addPermissions(['private_draft', 'discussion']);
-  }
-  return flags.operationFlags;
-}
 
 async function discussionProposal({ proposal, userId }: GetFlagsInput): Promise<ProposalFlowFlags> {
   const flags = new TransitionFlags();
@@ -49,7 +37,7 @@ async function discussionProposal({ proposal, userId }: GetFlagsInput): Promise<
     isProposalAuthor({ proposal, userId }) ||
     (await hasAccessToSpace({ spaceId: proposal.spaceId, userId, adminOnly: true })).isAdmin
   ) {
-    flags.addPermissions(['private_draft', 'draft']);
+    flags.addPermissions(['draft']);
 
     if (proposal.reviewers.length > 0) {
       flags.addPermissions(['review']);
@@ -132,10 +120,8 @@ export async function computeProposalFlowFlags({
   }
 
   switch (proposal.status) {
-    case 'private_draft':
-      return privateDraftProposal({ proposal, userId });
     case 'draft':
-      return draftProposal({ proposal, userId });
+      return privateDraftProposal({ proposal, userId });
     case 'discussion':
       return discussionProposal({ proposal, userId });
     case 'review':

@@ -37,7 +37,7 @@ export default function ProposalProperties({ proposalId, readOnly, isTemplate }:
   const { data: proposal, mutate: refreshProposal } = useSWR(`proposal/${proposalId}`, () =>
     charmClient.proposals.getProposal(proposalId)
   );
-  const { categories, addCategory, deleteCategory } = useProposalCategories();
+  const { categories } = useProposalCategories();
   const { mutate: mutateTasks } = useTasks();
   const [isVoteModalOpen, setIsVoteModalOpen] = useState(false);
 
@@ -46,7 +46,7 @@ export default function ProposalProperties({ proposalId, readOnly, isTemplate }:
   });
 
   const { permissions: proposalFlowFlags, refresh: refreshProposalFlowFlags } = useProposalFlowFlags({ proposalId });
-  const { refresh: refreshPagePermissions } = usePagePermissions({
+  const { refresh: refreshPagePermissions, permissions } = usePagePermissions({
     pageIdOrPath: proposalId
   });
 
@@ -56,7 +56,7 @@ export default function ProposalProperties({ proposalId, readOnly, isTemplate }:
   const isAdmin = useIsAdmin();
 
   const prevStatusRef = useRef(proposal?.status || '');
-  const [detailsExpanded, setDetailsExpanded] = useState(['private_draft', 'draft'].includes(proposal?.status ?? ''));
+  const [detailsExpanded, setDetailsExpanded] = useState(() => proposal?.status === 'draft');
 
   const proposalStatus = proposal?.status;
   const proposalCategory = proposal?.category;
@@ -69,7 +69,7 @@ export default function ProposalProperties({ proposalId, readOnly, isTemplate }:
   const isProposalAuthor = user && proposalAuthors.some((author) => author.userId === user.id);
 
   useEffect(() => {
-    if (!prevStatusRef.current && ['private_draft', 'draft'].includes(proposal?.status || '')) {
+    if (!prevStatusRef.current && proposal?.status === 'draft') {
       setDetailsExpanded(true);
     }
 
@@ -85,9 +85,7 @@ export default function ProposalProperties({ proposalId, readOnly, isTemplate }:
       return roleups.some((role) => role.id === reviewer.roleId && role.users.some((_user) => _user.id === user.id));
     });
 
-  const canUpdateProposalProperties =
-    (proposalStatus === 'draft' || proposalStatus === 'private_draft' || proposalStatus === 'discussion') &&
-    (isProposalAuthor || isAdmin);
+  const canUpdateProposalProperties = permissions?.edit_content || isAdmin;
 
   const reviewerOptionsRecord: Record<
     string,

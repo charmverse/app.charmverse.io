@@ -16,7 +16,7 @@ export function pfpStatusPrivateDraftVisibleOnlyByAuthor({
 }: ProposalPfpInput): AvailableProposalPermissionFlags {
   const newPermissions = { ...flags };
 
-  if (resource.status !== 'private_draft') {
+  if (resource.status !== 'draft') {
     return newPermissions;
   }
 
