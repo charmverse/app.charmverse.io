@@ -12,6 +12,7 @@ import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useMembers } from 'hooks/useMembers';
 import { usePagePermissions } from 'hooks/usePagePermissions';
 import { useSnackbar } from 'hooks/useSnackbar';
+import type { DuplicatePageResponse } from 'lib/pages';
 
 import { Utils } from './BoardEditor/focalboard/src/utils';
 import { DuplicatePageAction } from './DuplicatePageAction';
@@ -24,8 +25,10 @@ export function PageActionsMenu({
   anchorEl,
   page,
   setAnchorEl,
-  readOnly
+  readOnly,
+  onDuplicate
 }: {
+  onDuplicate?: (duplicatePageResponse: DuplicatePageResponse) => void;
   onClickDelete?: VoidFunction;
   onClickEdit?: VoidFunction;
   children?: ReactNode;
@@ -104,7 +107,9 @@ export function PageActionsMenu({
         <DeleteOutlineIcon fontSize='small' sx={{ mr: 1 }} />
         <ListItemText>Delete</ListItemText>
       </MenuItem>
-      {!hideDuplicateAction && <DuplicatePageAction page={page} pagePermissions={pagePermissions} />}
+      {!hideDuplicateAction && (
+        <DuplicatePageAction postDuplication={onDuplicate} page={page} pagePermissions={pagePermissions} />
+      )}
       <MenuItem dense onClick={onClickCopyLink}>
         <LinkIcon fontSize='small' sx={{ mr: 1 }} />
         <ListItemText>Copy link</ListItemText>

@@ -5,7 +5,7 @@ import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { updateTrackPageProfile } from 'lib/metrics/mixpanel/updateTrackPageProfile';
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { duplicatePage } from 'lib/pages/duplicatePage';
-import type { PageMeta } from 'lib/pages/server';
+import type { DuplicatePageResponse, PageMeta } from 'lib/pages/server';
 import { computeUserPagePermissions } from 'lib/permissions/pages';
 import { withSessionRoute } from 'lib/session/withSession';
 
@@ -13,10 +13,7 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.use(requireUser).post(duplicatePageRoute);
 
-async function duplicatePageRoute(
-  req: NextApiRequest,
-  res: NextApiResponse<{ rootPageIds: string[]; pages: PageMeta[] }>
-) {
+async function duplicatePageRoute(req: NextApiRequest, res: NextApiResponse<DuplicatePageResponse>) {
   const pageId = req.query.id as string;
   const userId = req.session.user.id;
   const { parentId } = req.body as { parentId: string | undefined | null };
@@ -30,7 +27,8 @@ async function duplicatePageRoute(
     throw new ActionNotPermittedError('You are not allowed to edit this page.');
   }
 
-  const { pages, rootPageIds } = await duplicatePage({ pageId, parentId });
+  const duplicatePageResponse = await duplicatePage({ pageId, parentId });
+  const { pages, rootPageIds } = duplicatePageResponse;
   await Promise.all(pages.map((page) => updateTrackPageProfile(page.id)));
 
   const pagesMap: Record<string, PageMeta> = {};
@@ -50,7 +48,7 @@ async function duplicatePageRoute(
     }
   });
 
-  return res.status(200).send({ pages, rootPageIds });
+  return res.status(200).send(duplicatePageResponse);
 }
 
 export default withSessionRoute(handler);

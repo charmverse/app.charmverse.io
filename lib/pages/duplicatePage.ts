@@ -2,9 +2,16 @@ import { prisma } from 'db';
 import { exportWorkspacePages } from 'lib/templates/exportWorkspacePages';
 import { importWorkspacePages } from 'lib/templates/importWorkspacePages';
 
+import type { DuplicatePageResponse } from './server';
 import { PageNotFoundError } from './server';
 
-export async function duplicatePage({ pageId, parentId }: { parentId?: string | null; pageId: string }) {
+export async function duplicatePage({
+  pageId,
+  parentId
+}: {
+  parentId?: string | null;
+  pageId: string;
+}): Promise<DuplicatePageResponse> {
   const page = await prisma.page.findUnique({
     where: {
       id: pageId
@@ -25,7 +32,7 @@ export async function duplicatePage({ pageId, parentId }: { parentId?: string | 
     rootPageIds: [pageId]
   });
 
-  const { pages, rootPageIds } = await importWorkspacePages({
+  const { pages, rootPageIds, bounties } = await importWorkspacePages({
     targetSpaceIdOrDomain: spaceId,
     exportData: data,
     parentId,
@@ -34,6 +41,7 @@ export async function duplicatePage({ pageId, parentId }: { parentId?: string | 
 
   return {
     pages,
-    rootPageIds
+    rootPageIds,
+    bounties
   };
 }

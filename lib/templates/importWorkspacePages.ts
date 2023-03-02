@@ -5,8 +5,10 @@ import type { Page, Prisma } from '@prisma/client';
 import { v4, validate } from 'uuid';
 
 import { prisma } from 'db';
+import type { BountyWithDetails } from 'lib/bounties';
 import log from 'lib/log';
 import type { PageMeta } from 'lib/pages';
+import { includePagePermissions } from 'lib/pages/server';
 import { createPage } from 'lib/pages/server/createPage';
 import { getPagePath } from 'lib/pages/utils';
 import type { PageContent, TextContent, TextMark } from 'lib/prosemirror/interfaces';
@@ -73,6 +75,7 @@ interface WorkspaceImportResult {
   totalBlocks: number;
   totalPages: number;
   rootPageIds: string[];
+  bounties: BountyWithDetails[];
 }
 
 export async function generateImportWorkspacePages({
@@ -472,10 +475,31 @@ export async function importWorkspacePages({
   //  const blocks = await prisma.block.createMany(blockArgs);
 
   const createdPages = createdData.filter((data) => 'id' in data) as PageMeta[];
+  const createdPagesRecord: Record<string, PageMeta> = {};
+  createdPages.forEach((createdPage) => {
+    createdPagesRecord[createdPage.id] = createdPage;
+  });
+
+  const createdBounties = await prisma.bounty.findMany({
+    where: {
+      id: {
+        in: createdPages
+          .filter((createdPage) => createdPage.bountyId && createdPage.type === 'bounty')
+          .map((createdPage) => createdPage.bountyId as string)
+      }
+    },
+    include: {
+      applications: true,
+      page: {
+        include: includePagePermissions()
+      }
+    }
+  });
 
   return {
     totalPages: createdPages.length,
     pages: createdPages,
+    bounties: createdBounties as BountyWithDetails[],
     totalBlocks: createdBlocks,
     rootPageIds: createdPages.filter((page) => page.parentId === parentId).map((p) => p.id)
   };

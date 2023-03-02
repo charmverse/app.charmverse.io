@@ -1,7 +1,7 @@
 import type { Page, ProfileItem } from '@prisma/client';
 
 import * as http from 'adapters/http';
-import type { IPageWithPermissions, PageDetails, PageMeta } from 'lib/pages';
+import type { DuplicatePageResponse, IPageWithPermissions, PageDetails, PageMeta } from 'lib/pages';
 
 export interface UpdateProfileItemRequest {
   profileItems: Omit<ProfileItem, 'userId'>[];
@@ -37,6 +37,6 @@ export class PagesApi {
   }
 
   duplicatePage({ pageId, parentId }: { pageId: string; parentId?: string | null }) {
-    return http.POST<{ rootPageIds: string[]; pages: PageMeta[] }>(`/api/pages/${pageId}/duplicate`, { parentId });
+    return http.POST<DuplicatePageResponse>(`/api/pages/${pageId}/duplicate`, { parentId });
   }
 }

@@ -4,6 +4,8 @@ import type { PageType } from '@prisma/client';
 import type { MouseEvent, ReactNode } from 'react';
 import { useState } from 'react';
 
+import type { DuplicatePageResponse } from 'lib/pages';
+
 import { PageActionsMenu } from './PageActionsMenu';
 
 export function PageActions({
@@ -12,8 +14,10 @@ export function PageActions({
   hideDuplicateAction,
   onClickEdit,
   readOnly,
-  children
+  children,
+  onDuplicate
 }: {
+  onDuplicate?: (duplicatePageResponse: DuplicatePageResponse) => void;
   page: {
     createdBy: string;
     type: PageType;
@@ -50,6 +54,7 @@ export function PageActions({
         hideDuplicateAction={hideDuplicateAction}
         onClickEdit={onClickEdit}
         readOnly={readOnly}
+        onDuplicate={onDuplicate}
       >
         {children}
       </PageActionsMenu>
