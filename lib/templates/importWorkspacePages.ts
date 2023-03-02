@@ -20,12 +20,13 @@ interface UpdateRefs {
   pages: Page[];
 }
 
+const commentRefRegex =
+  /{"type":"inline-comment","attrs":{"id":"((\d|[a-f]){1,}-){1,}(\d|[a-f]){1,}","resolved":(true|false)}},?/g;
+
 /**
  * Mutates the provided content to replace nested page refs
  */
 function updateReferences({ oldNewHashMap, pages }: UpdateRefs) {
-  let foundPageRefs = 0;
-
   pages.forEach((p) => {
     const prosemirrorNodes = (p.content as PageContent)?.content;
     if (prosemirrorNodes) {
@@ -36,9 +37,8 @@ function updateReferences({ oldNewHashMap, pages }: UpdateRefs) {
         /{"type":"page","attrs":{"id":"((\d|[a-f]){1,}-){1,}(\d|[a-f]){1,}"/g
       );
 
+      prosemirrorNodesAsText = prosemirrorNodesAsText.replaceAll(commentRefRegex, '');
       nestedPageRefs?.forEach((pageLinkNode) => {
-        foundPageRefs += 1;
-
         const oldPageId = pageLinkNode.match(/((\d|[a-f]){1,}-){1,}(\d|[a-f]){1,}/)?.[0];
         const newPageId = oldPageId ? oldNewHashMap[oldPageId] : undefined;
 
