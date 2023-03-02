@@ -20,7 +20,7 @@ export function PageActionsMenu({
   children,
   onClickDelete,
   onClickEdit,
-  showDuplicateAction,
+  hideDuplicateAction,
   anchorEl,
   page,
   setAnchorEl,
@@ -29,7 +29,7 @@ export function PageActionsMenu({
   onClickDelete?: VoidFunction;
   onClickEdit?: VoidFunction;
   children?: ReactNode;
-  showDuplicateAction?: boolean;
+  hideDuplicateAction?: boolean;
   setAnchorEl: Dispatch<SetStateAction<HTMLElement | null>>;
   anchorEl: HTMLElement | null;
   page: {
@@ -104,7 +104,7 @@ export function PageActionsMenu({
         <DeleteOutlineIcon fontSize='small' sx={{ mr: 1 }} />
         <ListItemText>Delete</ListItemText>
       </MenuItem>
-      {showDuplicateAction && <DuplicatePageAction page={page} pagePermissions={pagePermissions} />}
+      {!hideDuplicateAction && <DuplicatePageAction page={page} pagePermissions={pagePermissions} />}
       <MenuItem dense onClick={onClickCopyLink}>
         <LinkIcon fontSize='small' sx={{ mr: 1 }} />
         <ListItemText>Copy link</ListItemText>

@@ -201,7 +201,6 @@ function TableRow(props: Props) {
       })}
       {cardPage && !props.readOnly && (
         <PageActionsMenu
-          showDuplicateAction
           onClickDelete={handleDeleteCard}
           anchorEl={anchorEl}
           setAnchorEl={setAnchorEl}

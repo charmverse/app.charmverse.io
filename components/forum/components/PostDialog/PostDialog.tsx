@@ -105,7 +105,7 @@ export function PostDialog({ post, spaceId, onClose, open, newPostCategory }: Pr
       toolsMenu={
         post && (
           <PageActions
-            page={{ ...post, relativePath }}
+            page={{ ...post, relativePath, type: 'proposal', parentId: null }}
             onClickDelete={permissions?.delete_post ? deletePost : undefined}
           />
         )

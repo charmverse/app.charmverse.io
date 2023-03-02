@@ -9,7 +9,7 @@ import { PageActionsMenu } from './PageActionsMenu';
 export function PageActions({
   page,
   onClickDelete,
-  showDuplicateAction,
+  hideDuplicateAction,
   onClickEdit,
   readOnly,
   children
@@ -27,7 +27,7 @@ export function PageActions({
   readOnly?: boolean;
   onClickDelete?: VoidFunction;
   onClickEdit?: VoidFunction;
-  showDuplicateAction?: boolean;
+  hideDuplicateAction?: boolean;
   children?: ReactNode;
 }) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -47,7 +47,7 @@ export function PageActions({
         setAnchorEl={setAnchorEl}
         page={page}
         onClickDelete={onClickDelete}
-        showDuplicateAction={showDuplicateAction}
+        hideDuplicateAction={hideDuplicateAction}
         onClickEdit={onClickEdit}
         readOnly={readOnly}
       >

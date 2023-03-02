@@ -131,9 +131,7 @@ const KanbanCard = React.memo((props: Props) => {
           }}
           data-test={`kanban-card-${card.id}`}
         >
-          {!props.readOnly && cardPage && (
-            <PageActions page={cardPage} onClickDelete={deleteCard} showDuplicateAction />
-          )}
+          {!props.readOnly && cardPage && <PageActions page={cardPage} onClickDelete={deleteCard} />}
 
           <div className='octo-icontitle'>
             <div>
