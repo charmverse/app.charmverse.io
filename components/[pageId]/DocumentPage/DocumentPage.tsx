@@ -126,13 +126,6 @@ function DocumentPage({ page, setPage, insideModal, readOnly = false }: Document
 
   const pageVote = Object.values(votes).find((v) => v.context === 'proposal');
 
-  // const cards = useAppSelector((state) => {
-  //   return board
-  //     ? [...Object.values(state.cards.cards), ...Object.values(state.cards.templates)].filter(
-  //         (card) => card.parentId === board.id
-  //       )
-  //     : [];
-  // });
   const card = useAppSelector((state) => {
     if (page.cardId) {
       return state.cards.cards[page.cardId] ?? state.cards.templates[page.cardId] ?? null;
