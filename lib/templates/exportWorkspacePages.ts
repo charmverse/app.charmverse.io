@@ -14,13 +14,15 @@ import type { ExportedPage, WorkspaceExport } from './interfaces';
 export interface ExportWorkspacePage {
   sourceSpaceIdOrDomain: string;
   exportName?: string;
+  rootPageIds?: string[];
 }
 
 const excludedPageTypes: PageType[] = ['bounty', 'bounty_template', 'proposal', 'proposal_template'];
 
 export async function exportWorkspacePages({
   sourceSpaceIdOrDomain,
-  exportName
+  exportName,
+  rootPageIds
 }: ExportWorkspacePage): Promise<{ data: WorkspaceExport; path?: string }> {
   const isUuid = validate(sourceSpaceIdOrDomain);
 
@@ -34,9 +36,8 @@ export async function exportWorkspacePages({
 
   const rootPages = await prisma.page.findMany({
     where: {
-      spaceId: space.id,
+      ...(rootPageIds ? { id: { in: rootPageIds } } : { spaceId: space.id, parentId: null }),
       deletedAt: null,
-      parentId: null,
       type: {
         notIn: excludedPageTypes
       }
@@ -113,14 +114,6 @@ export async function exportWorkspacePages({
     })
   );
 
-  const exportFolder = path.join(__dirname, 'exports');
-
-  try {
-    await fs.readdir(exportFolder);
-  } catch (err) {
-    await fs.mkdir(exportFolder);
-  }
-
   const exportData: WorkspaceExport = {
     pages: mappedTrees.map((t) => t.targetPage)
   };
@@ -129,6 +122,14 @@ export async function exportWorkspacePages({
     return {
       data: exportData
     };
+  }
+
+  const exportFolder = path.join(__dirname, 'exports');
+
+  try {
+    await fs.readdir(exportFolder);
+  } catch (err) {
+    await fs.mkdir(exportFolder);
   }
 
   // Continue writing only if an export name was provided
