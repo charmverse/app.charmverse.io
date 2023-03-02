@@ -15,13 +15,13 @@ import type { AvailableProposalPermissionFlags } from '../interfaces';
 import { proposalPermissionsMapping } from '../mapping';
 
 import type { ProposalResource } from './interfaces';
-import { pfpStatusDiscussionEditableCommentable } from './pfpStatusDiscussionEditableCommentable';
-import { pfpStatusDraftOnlyViewable } from './pfpStatusDraftOnlyViewable';
-import { pfpStatusPrivateDraftVisibleOnlyByAuthor } from './pfpStatusPrivateDraftVisibleOnlyByAuthor';
-import { pfpStatusReviewCommentable } from './pfpStatusReviewCommentable';
-import { pfpStatusReviewedOnlyCreateVote } from './pfpStatusReviewedOnlyCreateVote';
-import { pfpStatusVoteActiveOnlyVotable } from './pfpStatusVoteActiveOnlyVotable';
-import { pfpStatusVoteClosedViewOnly } from './pfpStatusVoteClosedViewOnly';
+import { policyStatusDiscussionEditableCommentable } from './policyStatusDiscussionEditableCommentable';
+import { policyStatusDraftOnlyViewable } from './policyStatusDraftOnlyViewable';
+import { policyStatusPrivateDraftVisibleOnlyByAuthor } from './policyStatusPrivateDraftVisibleOnlyByAuthor';
+import { policyStatusReviewCommentable } from './policyStatusReviewCommentable';
+import { policyStatusReviewedOnlyCreateVote } from './policyStatusReviewedOnlyCreateVote';
+import { policyStatusVoteActiveOnlyVotable } from './policyStatusVoteActiveOnlyVotable';
+import { policyStatusVoteClosedViewOnly } from './policyStatusVoteClosedViewOnly';
 
 export async function baseComputeProposalPermissions({
   resourceId,
@@ -147,13 +147,13 @@ export const computeProposalPermissions = buildComputePermissionsWithPermissionF
 >({
   resolver: proposalResolver,
   computeFn: baseComputeProposalPermissions,
-  pfps: [
-    pfpStatusPrivateDraftVisibleOnlyByAuthor,
-    pfpStatusDraftOnlyViewable,
-    pfpStatusDiscussionEditableCommentable,
-    pfpStatusReviewCommentable,
-    pfpStatusReviewedOnlyCreateVote,
-    pfpStatusVoteActiveOnlyVotable,
-    pfpStatusVoteClosedViewOnly
+  policies: [
+    policyStatusPrivateDraftVisibleOnlyByAuthor,
+    policyStatusDraftOnlyViewable,
+    policyStatusDiscussionEditableCommentable,
+    policyStatusReviewCommentable,
+    policyStatusReviewedOnlyCreateVote,
+    policyStatusVoteActiveOnlyVotable,
+    policyStatusVoteClosedViewOnly
   ]
 });
