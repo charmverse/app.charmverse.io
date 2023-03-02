@@ -1,6 +1,7 @@
 import styled from '@emotion/styled';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
+import FileCopyIcon from '@mui/icons-material/FileCopy';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import type { TreeItemContentProps } from '@mui/lab/TreeItem';
 import TreeItem, { treeItemClasses } from '@mui/lab/TreeItem';
@@ -467,9 +468,9 @@ function PageActionsMenu({ closeMenu, pageId, pagePath }: { closeMenu: () => voi
         title={duplicatePageDisabled ? 'You do not have permission to duplicate this page' : ''}
       >
         <div>
-          <PageMenuItem dense disabled={deletePageDisabled} onClick={duplicatePage}>
+          <PageMenuItem dense disabled={duplicatePageDisabled} onClick={duplicatePage}>
             <ListItemIcon>
-              <ContentCopyIcon fontSize='small' />
+              <FileCopyIcon fontSize='small' />
             </ListItemIcon>
             <ListItemText>Duplicate</ListItemText>
           </PageMenuItem>

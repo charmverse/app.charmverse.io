@@ -1,18 +1,19 @@
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
+import FileCopyIcon from '@mui/icons-material/FileCopy';
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import FavoritedIcon from '@mui/icons-material/Star';
 import NotFavoritedIcon from '@mui/icons-material/StarBorder';
 import UndoIcon from '@mui/icons-material/Undo';
 import VerticalAlignBottomOutlinedIcon from '@mui/icons-material/VerticalAlignBottomOutlined';
-import { Divider, Tooltip, Typography, Box, Stack } from '@mui/material';
+import { Divider, Tooltip, Typography, Box, Stack, ListItemIcon } from '@mui/material';
 import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import { useRouter } from 'next/router';
 import Papa from 'papaparse';
 import type { ChangeEventHandler } from 'react';
-import { useIntl } from 'react-intl';
+import { mutate } from 'swr';
 
 import charmClient from 'charmClient';
 import { CsvExporter } from 'components/common/BoardEditor/focalboard/csvExporter/csvExporter';
@@ -22,7 +23,8 @@ import {
   getViewCardsSortedFilteredAndGrouped,
   sortCards
 } from 'components/common/BoardEditor/focalboard/src/store/cards';
-import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
+import { useAppDispatch, useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
+import { initialLoad } from 'components/common/BoardEditor/focalboard/src/store/initialLoad';
 import { getCurrentBoardViews, getView } from 'components/common/BoardEditor/focalboard/src/store/views';
 import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -37,6 +39,7 @@ import type { BoardView } from 'lib/focalboard/boardView';
 import type { CardPage } from 'lib/focalboard/card';
 import { createCard } from 'lib/focalboard/card';
 import log from 'lib/log';
+import type { PagesMap } from 'lib/pages';
 import type { IPagePermissionFlags } from 'lib/permissions/pages';
 
 import {
@@ -69,6 +72,8 @@ export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: 
   const activeBoardId = view?.fields.sourceData?.boardId ?? view?.fields.linkedSourceId ?? view?.rootId;
   const board = boards.find((b) => b.id === activeBoardId);
   const lastUpdatedBy = members.find((member) => member.id === board?.createdBy);
+  const duplicatePageDisabled = !pagePermissions?.edit_content;
+  const boardPage = pages[pageId];
 
   function undoChanges() {
     if (mutator.canUndo) {
@@ -124,11 +129,35 @@ export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: 
       charmClient.track.trackAction('export_page_csv', { pageId, spaceId });
     }
   };
+  const dispatch = useAppDispatch();
 
   function onCopyLink() {
     Utils.copyTextToClipboard(window.location.href);
     showMessage('Copied link to clipboard', 'success');
     closeMenu();
+  }
+
+  async function duplicatePage() {
+    if (boardPage && currentSpace) {
+      const { pages: createdPages, rootPageIds } = await charmClient.pages.duplicatePage({
+        pageId: boardPage.id,
+        parentId: boardPage.parentId
+      });
+      const duplicatedRootPage = createdPages.find((page) => page.id === rootPageIds[0]);
+      dispatch(initialLoad({ spaceId: currentSpace.id }));
+      await mutate(
+        `pages/${currentSpace.id}`,
+        (_pages: PagesMap | undefined) => {
+          return _pages ?? {};
+        },
+        {
+          revalidate: true
+        }
+      );
+      if (duplicatedRootPage) {
+        router.push(`/${router.query.domain}/${duplicatedRootPage.path}`);
+      }
+    }
   }
 
   const addNewCards = async (
@@ -272,6 +301,20 @@ export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: 
         </Box>
         <ListItemText primary={isFavorite ? 'Remove from Favorites' : 'Add to Favorites'} />
       </ListItemButton>
+      <Tooltip
+        arrow
+        placement='top'
+        title={duplicatePageDisabled ? 'You do not have permission to duplicate this page' : ''}
+      >
+        <div>
+          <ListItemButton dense disabled={duplicatePageDisabled} onClick={duplicatePage}>
+            <ListItemIcon>
+              <FileCopyIcon fontSize='small' />
+            </ListItemIcon>
+            <ListItemText>Duplicate</ListItemText>
+          </ListItemButton>
+        </div>
+      </Tooltip>
       <ListItemButton onClick={onCopyLink}>
         <ContentCopyIcon
           fontSize='small'

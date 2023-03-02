@@ -3,6 +3,7 @@ import styled from '@emotion/styled';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import MoonIcon from '@mui/icons-material/DarkMode';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
+import FileCopyIcon from '@mui/icons-material/FileCopy';
 import GetAppOutlinedIcon from '@mui/icons-material/GetAppOutlined';
 import MenuIcon from '@mui/icons-material/Menu';
 import MessageOutlinedIcon from '@mui/icons-material/MessageOutlined';
@@ -14,6 +15,7 @@ import NotFavoritedIcon from '@mui/icons-material/StarBorder';
 import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
 import UndoIcon from '@mui/icons-material/Undo';
 import SunIcon from '@mui/icons-material/WbSunny';
+import { ListItemIcon } from '@mui/material';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import FormControlLabel from '@mui/material/FormControlLabel';
@@ -31,13 +33,17 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import { useRouter } from 'next/router';
 import type { Dispatch, ReactNode, SetStateAction } from 'react';
 import { memo, useMemo, useRef, useState } from 'react';
+import { mutate } from 'swr';
 
 import charmClient from 'charmClient';
+import { useAppDispatch } from 'components/common/BoardEditor/focalboard/src/store/hooks';
+import { initialLoad } from 'components/common/BoardEditor/focalboard/src/store/initialLoad';
 import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
 import { undoEventName } from 'components/common/CharmEditor/utils';
 import { usePostByPath } from 'components/forum/hooks/usePostByPath';
 import { useProposalCategories } from 'components/proposals/hooks/useProposalCategories';
 import { useColorMode } from 'context/darkMode';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useMembers } from 'hooks/useMembers';
@@ -49,6 +55,7 @@ import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useToggleFavorite } from 'hooks/useToggleFavorite';
 import { useUser } from 'hooks/useUser';
+import type { PagesMap } from 'lib/pages';
 
 import NotificationsBadge from '../Sidebar/NotificationsBadge';
 
@@ -289,6 +296,9 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
   const { permissions: pagePermissions } = usePagePermissions({
     pageIdOrPath: basePage ? basePage.id : (null as any)
   });
+  const dispatch = useAppDispatch();
+
+  const duplicatePageDisabled = !pagePermissions?.edit_content;
 
   const { onClick: clickToOpenSettingsModal } = useSettingsDialog();
   const isForumPost = router.route === '/[domain]/forum/post/[pagePath]';
@@ -300,6 +310,7 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
     spaceDomain: router.query.domain as string
   });
 
+  const currentSpace = useCurrentSpace();
   const isLargeScreen = useMediaQuery(theme.breakpoints.up('md'));
 
   const pageType = basePage?.type;
@@ -382,6 +393,29 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
     }
   }
 
+  async function duplicatePage() {
+    if (basePage && currentSpace) {
+      const { pages, rootPageIds } = await charmClient.pages.duplicatePage({
+        pageId: basePage.id,
+        parentId: basePage.parentId
+      });
+      const duplicatedRootPage = pages.find((page) => page.id === rootPageIds[0]);
+      dispatch(initialLoad({ spaceId: currentSpace.id }));
+      await mutate(
+        `pages/${currentSpace.id}`,
+        (_pages: PagesMap | undefined) => {
+          return _pages ?? {};
+        },
+        {
+          revalidate: true
+        }
+      );
+      if (duplicatedRootPage) {
+        router.push(`/${router.query.domain}/${duplicatedRootPage.path}`);
+      }
+    }
+  }
+
   async function convertToProposal(pageId: string) {
     const convertedProposal = await charmClient.pages.convertToProposal({
       categoryId: getDefaultCreateCategory().id,
@@ -443,6 +477,20 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
           <ListItemText primary={isFavorite ? 'Remove from Favorites' : 'Add to Favorites'} />
         </ListItemButton>
       )}
+      <Tooltip
+        arrow
+        placement='top'
+        title={duplicatePageDisabled ? 'You do not have permission to duplicate this page' : ''}
+      >
+        <div>
+          <ListItemButton dense disabled={duplicatePageDisabled} onClick={duplicatePage}>
+            <ListItemIcon>
+              <FileCopyIcon fontSize='small' />
+            </ListItemIcon>
+            <ListItemText>Duplicate</ListItemText>
+          </ListItemButton>
+        </div>
+      </Tooltip>
       <CopyLinkMenuItem closeMenu={closeMenu} />
 
       <Divider />
