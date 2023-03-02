@@ -15,15 +15,18 @@ export interface ExportWorkspacePage {
   sourceSpaceIdOrDomain: string;
   exportName?: string;
   rootPageIds?: string[];
+  skipBounties?: boolean;
+  skipProposals?: boolean;
 }
 
-// TODO: Remember to exclude bounty and proposals when duplicating spaces
 const excludedPageTypes: PageType[] = ['bounty_template', 'proposal_template'];
 
 export async function exportWorkspacePages({
   sourceSpaceIdOrDomain,
   exportName,
-  rootPageIds
+  rootPageIds,
+  skipBounties = false,
+  skipProposals = false
 }: ExportWorkspacePage): Promise<{ data: WorkspaceExport; path?: string }> {
   const isUuid = validate(sourceSpaceIdOrDomain);
 
@@ -64,8 +67,6 @@ export async function exportWorkspacePages({
     return acc;
   }, {} as Record<string, number>);
 
-  const totalPages = Object.keys(pageIndexes).length;
-
   /**
    * Mutates the given node to provision its block data
    */
@@ -98,6 +99,27 @@ export async function exportWorkspacePages({
       node.blocks = {
         card: cardBlock as Block
       };
+    } else if (node.bountyId && node.type === 'bounty' && !skipBounties) {
+      node.bounty =
+        (await prisma.bounty.findUnique({
+          where: {
+            id: node.bountyId
+          },
+          include: {
+            permissions: true
+          }
+        })) ?? undefined;
+    } else if (node.proposalId && node.type === 'proposal' && !skipProposals) {
+      node.proposal =
+        (await prisma.proposal.findUnique({
+          where: {
+            id: node.proposalId
+          },
+          include: {
+            authors: true,
+            reviewers: true
+          }
+        })) ?? undefined;
     }
 
     node.children = node.children?.filter((child) => !excludedPageTypes.includes(child.type)) ?? [];

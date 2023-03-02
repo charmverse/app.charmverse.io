@@ -1,9 +1,10 @@
 import { prisma } from 'db';
+import type { BountyWithDetails } from 'lib/bounties';
 import { exportWorkspacePages } from 'lib/templates/exportWorkspacePages';
 import { importWorkspacePages } from 'lib/templates/importWorkspacePages';
 
 import type { DuplicatePageResponse } from './server';
-import { PageNotFoundError } from './server';
+import { includePagePermissions, PageNotFoundError } from './server';
 
 export async function duplicatePage({
   pageId,
@@ -32,16 +33,32 @@ export async function duplicatePage({
     rootPageIds: [pageId]
   });
 
-  const { pages, rootPageIds, bounties } = await importWorkspacePages({
+  const { pages, rootPageIds } = await importWorkspacePages({
     targetSpaceIdOrDomain: spaceId,
     exportData: data,
     parentId,
     updateTitle: true
   });
 
+  const bounties = await prisma.bounty.findMany({
+    where: {
+      id: {
+        in: pages
+          .filter((createdPage) => createdPage.bountyId && createdPage.type === 'bounty')
+          .map((createdPage) => createdPage.bountyId as string)
+      }
+    },
+    include: {
+      applications: true,
+      page: {
+        include: includePagePermissions()
+      }
+    }
+  });
+
   return {
     pages,
     rootPageIds,
-    bounties
+    bounties: bounties as BountyWithDetails[]
   };
 }

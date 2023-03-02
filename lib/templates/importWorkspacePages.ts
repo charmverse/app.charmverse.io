@@ -93,9 +93,7 @@ export async function generateImportWorkspacePages({
   exportData,
   exportName,
   parentId: rootParentId,
-  updateTitle,
-  skipBounties,
-  skipProposals
+  updateTitle
 }: WorkspaceImport): Promise<{
   pageArgs: Prisma.PageCreateArgs[];
   blockArgs: Prisma.BlockCreateManyArgs;
@@ -130,12 +128,14 @@ export async function generateImportWorkspacePages({
   const pageArgs: Prisma.PageCreateArgs[] = [];
 
   const blockArgs: Prisma.BlockCreateManyInput[] = [];
+  const bountyArgs: Prisma.BountyCreateManyInput[] = [];
+  const bountyPermissionArgs: Prisma.BountyPermissionCreateManyInput[] = [];
+  const proposalArgs: Prisma.ProposalCreateManyInput[] = [];
+  const proposalAuthorsArgs: Prisma.ProposalAuthorCreateManyInput[] = [];
+  const proposalReviewersArgs: Prisma.ProposalReviewerCreateManyInput[] = [];
 
   // 2 way hashmap to find link between new and old page ids
   const oldNewHashmap: Record<string, string> = {};
-
-  const oldBountyIds: string[] = [];
-  const oldProposalIds: string[] = [];
 
   /**
    * Mutates the pages, updating their ids
@@ -169,6 +169,7 @@ export async function generateImportWorkspacePages({
       parentId,
       bountyId,
       blocks,
+      votes,
       ...pageWithoutJoins
     } = node;
 
@@ -306,11 +307,29 @@ export async function generateImportWorkspacePages({
       node.children?.forEach((child) => {
         recursivePagePrep({ node: child, newParentId: newId, rootSpacePermissionId });
       });
-    } else if (node.type === 'bounty' && node.bountyId) {
-      oldBountyIds.push(node.bountyId);
+    } else if (node.type === 'bounty' && node.bounty) {
       pageArgs.push(newPageContent);
-    } else if (node.type === 'proposal' && node.proposalId) {
-      oldProposalIds.push(node.proposalId);
+      const { createdAt, updatedAt, createdBy: bountyCreatedBy, permissions, ...bounty } = node.bounty;
+      bountyArgs.push({
+        ...bounty,
+        createdBy: space!.createdBy,
+        id: oldNewHashmap[node.id]
+      });
+      permissions.forEach(({ id, ...bountyPermission }) => {
+        bountyPermissionArgs.push({
+          ...bountyPermission,
+          bountyId: oldNewHashmap[node.id]
+        });
+      });
+    } else if (node.type === 'proposal' && node.proposal) {
+      const { createdBy: proposalCreatedBy, authors, reviewers, ...proposal } = node.proposal;
+      proposalArgs.push({
+        ...proposal,
+        createdBy: space!.createdBy,
+        id: oldNewHashmap[node.id]
+      });
+      authors.forEach((author) => proposalAuthorsArgs.push({ ...author, proposalId: oldNewHashmap[node.id] }));
+      reviewers.forEach((reviewer) => proposalReviewersArgs.push({ ...reviewer, proposalId: oldNewHashmap[node.id] }));
       pageArgs.push(newPageContent);
     }
   }
@@ -358,43 +377,6 @@ export async function generateImportWorkspacePages({
     }
   });
 
-  const oldBounties = !skipBounties
-    ? await prisma.bounty.findMany({
-        where: {
-          id: {
-            in: oldBountyIds
-          }
-        },
-        include: {
-          page: {
-            select: {
-              id: true
-            }
-          },
-          permissions: true
-        }
-      })
-    : [];
-
-  const oldProposals = !skipProposals
-    ? await prisma.proposal.findMany({
-        where: {
-          id: {
-            in: oldProposalIds
-          }
-        },
-        include: {
-          page: {
-            select: {
-              id: true
-            }
-          },
-          authors: true,
-          reviewers: true
-        }
-      })
-    : [];
-
   return {
     pageArgs,
     blockArgs: {
@@ -419,49 +401,19 @@ export async function generateImportWorkspacePages({
         .flat()
     },
     bountyArgs: {
-      data: oldBounties.map(({ createdBy, updatedAt, createdAt, page, permissions, ...oldBounty }) => ({
-        ...oldBounty,
-        createdBy: space.createdBy,
-        id: oldNewHashmap[(page as Page).id]
-      }))
+      data: bountyArgs
     },
     bountyPermissionArgs: {
-      data: oldBounties
-        .map((oldBounty) =>
-          oldBounty.permissions.map(({ id, ...permission }) => ({
-            ...permission,
-            bountyId: oldNewHashmap[(oldBounty.page as Page).id]
-          }))
-        )
-        .flat()
+      data: bountyPermissionArgs
     },
     proposalArgs: {
-      data: oldProposals.map(({ createdBy, authors, reviewers, page, ...oldProposal }) => ({
-        ...oldProposal,
-        createdBy: space.createdBy,
-        id: oldNewHashmap[(page as Page).id]
-      }))
+      data: proposalArgs
     },
     proposalAuthorsArgs: {
-      data: oldProposals
-        .map((oldProposal) =>
-          oldProposal.authors.map((author) => ({
-            proposalId: oldNewHashmap[(oldProposal.page as Page).id],
-            userId: author.userId
-          }))
-        )
-        .flat()
+      data: proposalAuthorsArgs
     },
     proposalReviewersArgs: {
-      data: oldProposals
-        .map((oldProposal) =>
-          oldProposal.reviewers.map((reviewer) => ({
-            proposalId: oldNewHashmap[(oldProposal.page as Page).id],
-            roleId: reviewer.roleId,
-            userId: reviewer.userId
-          }))
-        )
-        .flat()
+      data: proposalReviewersArgs
     }
   };
 }
@@ -471,10 +423,8 @@ export async function importWorkspacePages({
   exportData,
   exportName,
   parentId,
-  updateTitle,
-  skipBounties = false,
-  skipProposals = false
-}: WorkspaceImport): Promise<WorkspaceImportResult> {
+  updateTitle
+}: WorkspaceImport): Promise<Omit<WorkspaceImportResult, 'bounties'>> {
   const {
     pageArgs,
     blockArgs,
@@ -490,9 +440,7 @@ export async function importWorkspacePages({
     exportData,
     exportName,
     parentId,
-    updateTitle,
-    skipBounties,
-    skipProposals
+    updateTitle
   });
 
   const pagesToCreate = pageArgs.length;
@@ -517,34 +465,15 @@ export async function importWorkspacePages({
     prisma.voteOptions.createMany(voteOptionsArgs)
   ]);
 
-  //  const blocks = await prisma.block.createMany(blockArgs);
-
   const createdPages = createdData.filter((data) => 'id' in data) as PageMeta[];
   const createdPagesRecord: Record<string, PageMeta> = {};
   createdPages.forEach((createdPage) => {
     createdPagesRecord[createdPage.id] = createdPage;
   });
 
-  const createdBounties = await prisma.bounty.findMany({
-    where: {
-      id: {
-        in: createdPages
-          .filter((createdPage) => createdPage.bountyId && createdPage.type === 'bounty')
-          .map((createdPage) => createdPage.bountyId as string)
-      }
-    },
-    include: {
-      applications: true,
-      page: {
-        include: includePagePermissions()
-      }
-    }
-  });
-
   return {
     totalPages: createdPages.length,
     pages: createdPages,
-    bounties: createdBounties as BountyWithDetails[],
     totalBlocks: createdBlocks,
     rootPageIds: createdPages.filter((page) => page.parentId === parentId).map((p) => p.id)
   };
