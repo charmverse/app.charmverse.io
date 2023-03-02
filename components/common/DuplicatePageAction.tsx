@@ -1,6 +1,7 @@
 import FileCopyIcon from '@mui/icons-material/FileCopy';
 import type { SxProps } from '@mui/material';
 import { ListItemButton, ListItemIcon, ListItemText, Tooltip } from '@mui/material';
+import type { PageType } from '@prisma/client';
 import { useRouter } from 'next/router';
 import { mutate } from 'swr';
 
@@ -11,6 +12,8 @@ import type { PageMeta, PagesMap } from 'lib/pages';
 import type { IPagePermissionFlags } from 'lib/permissions/pages';
 
 import { useAppDispatch } from './BoardEditor/focalboard/src/store/hooks';
+
+const excludedPageTypes: PageType[] = ['bounty', 'bounty_template', 'proposal', 'proposal_template'];
 
 export function DuplicatePageAction({
   page,
@@ -55,10 +58,21 @@ export function DuplicatePageAction({
     <Tooltip
       arrow
       placement='top'
-      title={duplicatePageDisabled ? 'You do not have permission to duplicate this page' : ''}
+      title={
+        excludedPageTypes.includes(page.type)
+          ? "Page can't be duplicated"
+          : !duplicatePageDisabled
+          ? 'You do not have permission to duplicate this page'
+          : ''
+      }
     >
       <div>
-        <ListItemButton sx={sx} dense disabled={duplicatePageDisabled} onClick={duplicatePage}>
+        <ListItemButton
+          sx={sx}
+          dense
+          disabled={excludedPageTypes.includes(page.type) || duplicatePageDisabled}
+          onClick={duplicatePage}
+        >
           <ListItemIcon>
             <FileCopyIcon fontSize='small' />
           </ListItemIcon>
