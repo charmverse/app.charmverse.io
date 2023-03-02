@@ -19,7 +19,7 @@ async function duplicatePageRoute(
 ) {
   const pageId = req.query.id as string;
   const userId = req.session.user.id;
-  const { parentId } = req.body as { parentId: string };
+  const { parentId } = req.body as { parentId: string | undefined | null };
 
   const permissions = await computeUserPagePermissions({
     resourceId: pageId,

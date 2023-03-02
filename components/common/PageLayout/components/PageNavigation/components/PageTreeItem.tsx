@@ -17,17 +17,21 @@ import { useRouter } from 'next/router';
 import type { ReactNode, SyntheticEvent } from 'react';
 import React, { forwardRef, memo, useCallback, useMemo } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
+import { mutate } from 'swr';
 
 import charmClient from 'charmClient';
 import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
-import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
+import { useAppDispatch, useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
+import { initialLoad } from 'components/common/BoardEditor/focalboard/src/store/initialLoad';
 import EmojiPicker from 'components/common/BoardEditor/focalboard/src/widgets/emojiPicker';
 import TreeItemContent from 'components/common/TreeItemContent';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { usePageFromPath } from 'hooks/usePageFromPath';
 import { usePagePermissions } from 'hooks/usePagePermissions';
 import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
+import type { PagesMap } from 'lib/pages';
 import { isTouchScreen } from 'lib/utilities/browser';
 import { greyColor2 } from 'theme/colors';
 
@@ -392,14 +396,16 @@ function PageActionsMenu({ closeMenu, pageId, pagePath }: { closeMenu: () => voi
   const { showMessage } = useSnackbar();
   const { permissions: pagePermissions } = usePagePermissions({ pageIdOrPath: pageId });
   const router = useRouter();
-
+  const dispatch = useAppDispatch();
+  const currentSpace = useCurrentSpace();
   const deletePageDisabled = !pagePermissions?.delete;
+  const duplicatePageDisabled = !pagePermissions?.edit_content;
+  const page = pages[pageId];
 
   async function deletePageWithBoard() {
     if (deletePageDisabled) {
       return;
     }
-    const page = pages[pageId];
     const board = boards.find((b) => b.id === page?.id);
     const newPage = await deletePage({
       board,
@@ -409,6 +415,25 @@ function PageActionsMenu({ closeMenu, pageId, pagePath }: { closeMenu: () => voi
     if (!currentPage && newPage) {
       // If we are in a page that doesn't exist, redirect user to the created page
       router.push(`/${router.query.domain}/${newPage.id}`);
+    }
+  }
+
+  async function duplicatePage() {
+    if (page && currentSpace) {
+      await charmClient.pages.duplicatePage({
+        pageId,
+        parentId: page.parentId
+      });
+      dispatch(initialLoad({ spaceId: currentSpace.id }));
+      await mutate(
+        `pages/${currentSpace.id}`,
+        (_pages: PagesMap | undefined) => {
+          return _pages ?? {};
+        },
+        {
+          revalidate: true
+        }
+      );
     }
   }
 
@@ -433,6 +458,20 @@ function PageActionsMenu({ closeMenu, pageId, pagePath }: { closeMenu: () => voi
               <DeleteOutlinedIcon />
             </ListItemIcon>
             <ListItemText>Delete</ListItemText>
+          </PageMenuItem>
+        </div>
+      </Tooltip>
+      <Tooltip
+        arrow
+        placement='top'
+        title={duplicatePageDisabled ? 'You do not have permission to duplicate this page' : ''}
+      >
+        <div>
+          <PageMenuItem dense disabled={deletePageDisabled} onClick={duplicatePage}>
+            <ListItemIcon>
+              <ContentCopyIcon fontSize='small' />
+            </ListItemIcon>
+            <ListItemText>Duplicate</ListItemText>
           </PageMenuItem>
         </div>
       </Tooltip>

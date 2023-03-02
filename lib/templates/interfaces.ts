@@ -21,5 +21,5 @@ export interface WorkspaceImport {
   exportName?: string;
   targetSpaceIdOrDomain: string;
   // Parent id of root pages, could be another page or null if space is parent
-  parentId: string;
+  parentId?: string | null;
 }

@@ -36,7 +36,7 @@ export class PagesApi {
     return http.POST<PageMeta>(`/api/pages/${pageId}/convert-to-proposal`, { categoryId });
   }
 
-  duplicatePage({ pageId, parentId }: { pageId: string; parentId?: string }) {
+  duplicatePage({ pageId, parentId }: { pageId: string; parentId?: string | null }) {
     return http.POST<{ rootPageIds: string[]; pages: PageMeta[] }>(`/api/pages/${pageId}/duplicate`, { parentId });
   }
 }
