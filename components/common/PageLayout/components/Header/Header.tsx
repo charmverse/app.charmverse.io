@@ -39,7 +39,6 @@ import { DuplicatePageAction } from 'components/common/DuplicatePageAction';
 import { usePostByPath } from 'components/forum/hooks/usePostByPath';
 import { useProposalCategories } from 'components/proposals/hooks/useProposalCategories';
 import { useColorMode } from 'context/darkMode';
-import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useMembers } from 'hooks/useMembers';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
@@ -442,7 +441,9 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
           <ListItemText primary={isFavorite ? 'Remove from Favorites' : 'Add to Favorites'} />
         </ListItemButton>
       )}
-      {basePage && <DuplicatePageAction page={basePage} pagePermissions={pagePermissions} />}
+      {basePage && (
+        <DuplicatePageAction postDuplication={closeMenu} page={basePage} pagePermissions={pagePermissions} />
+      )}
       <CopyLinkMenuItem closeMenu={closeMenu} />
 
       <Divider />

@@ -35,7 +35,6 @@ type Props = {
   onClick?: (e: React.MouseEvent<HTMLDivElement>) => void;
   readOnly: boolean;
   onDrop: (srcCard: Card, dstCard: Card) => void;
-  showCard: (cardId: string | null) => void;
   isManualSort: boolean;
 };
 
@@ -116,23 +115,6 @@ const KanbanCard = React.memo((props: Props) => {
     setShowConfirmationDialogBox(true);
   };
 
-  const duplicateCard = () => {
-    if (space && cardPage) {
-      mutator.duplicateCard({
-        cardId: card.id,
-        board,
-        cardPage,
-        afterRedo: async (newCardId) => {
-          props.showCard(newCardId);
-          mutate(`pages/${space.id}`);
-        },
-        beforeUndo: async () => {
-          props.showCard(null);
-        }
-      });
-    }
-  };
-
   return (
     <>
       <Link href={fullPageUrl} draggable={false}>
@@ -150,7 +132,7 @@ const KanbanCard = React.memo((props: Props) => {
           data-test={`kanban-card-${card.id}`}
         >
           {!props.readOnly && cardPage && (
-            <PageActions page={cardPage} onClickDelete={deleteCard} onClickDuplicate={duplicateCard} />
+            <PageActions page={cardPage} onClickDelete={deleteCard} showDuplicateAction />
           )}
 
           <div className='octo-icontitle'>

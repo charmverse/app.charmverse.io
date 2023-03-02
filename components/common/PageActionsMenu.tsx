@@ -1,5 +1,4 @@
 import { EditOutlined } from '@mui/icons-material';
-import DuplicateIcon from '@mui/icons-material/ContentCopy';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import LaunchIcon from '@mui/icons-material/Launch';
 import LinkIcon from '@mui/icons-material/Link';
@@ -12,16 +11,16 @@ import { usePostPermissions } from 'components/forum/hooks/usePostPermissions';
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useMembers } from 'hooks/useMembers';
 import { usePagePermissions } from 'hooks/usePagePermissions';
-import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
 
 import { Utils } from './BoardEditor/focalboard/src/utils';
+import { DuplicatePageAction } from './DuplicatePageAction';
 
 export function PageActionsMenu({
   children,
   onClickDelete,
   onClickEdit,
-  onClickDuplicate,
+  showDuplicateAction,
   anchorEl,
   page,
   setAnchorEl,
@@ -30,12 +29,13 @@ export function PageActionsMenu({
   onClickDelete?: VoidFunction;
   onClickEdit?: VoidFunction;
   children?: ReactNode;
-  onClickDuplicate?: VoidFunction;
+  showDuplicateAction?: boolean;
   setAnchorEl: Dispatch<SetStateAction<HTMLElement | null>>;
   anchorEl: HTMLElement | null;
   page: {
+    parentId: string | null;
     createdBy: string;
-    type?: PageType;
+    type: PageType;
     id: string;
     updatedAt: Date;
     relativePath?: string;
@@ -104,12 +104,7 @@ export function PageActionsMenu({
         <DeleteOutlineIcon fontSize='small' sx={{ mr: 1 }} />
         <ListItemText>Delete</ListItemText>
       </MenuItem>
-      {onClickDuplicate && (
-        <MenuItem dense onClick={onClickDuplicate}>
-          <DuplicateIcon fontSize='small' sx={{ mr: 1 }} />
-          <ListItemText>Duplicate</ListItemText>
-        </MenuItem>
-      )}
+      {showDuplicateAction && <DuplicatePageAction page={page} pagePermissions={pagePermissions} />}
       <MenuItem dense onClick={onClickCopyLink}>
         <LinkIcon fontSize='small' sx={{ mr: 1 }} />
         <ListItemText>Copy link</ListItemText>

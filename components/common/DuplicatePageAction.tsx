@@ -1,14 +1,14 @@
-import FileCopyIcon from '@mui/icons-material/FileCopy';
+import FileCopyOutlinedIcon from '@mui/icons-material/FileCopyOutlined';
 import type { SxProps } from '@mui/material';
 import { ListItemButton, ListItemIcon, ListItemText, Tooltip } from '@mui/material';
-import type { PageType } from '@prisma/client';
+import type { Page, PageType } from '@prisma/client';
 import { useRouter } from 'next/router';
 import { mutate } from 'swr';
 
 import charmClient from 'charmClient';
 import { initialLoad } from 'components/common/BoardEditor/focalboard/src/store/initialLoad';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import type { PageMeta, PagesMap } from 'lib/pages';
+import type { PagesMap } from 'lib/pages';
 import type { IPagePermissionFlags } from 'lib/permissions/pages';
 
 import { useAppDispatch } from './BoardEditor/focalboard/src/store/hooks';
@@ -19,14 +19,17 @@ export function DuplicatePageAction({
   page,
   pagePermissions,
   skipRedirection = false,
-  sx
+  sx,
+  postDuplication
 }: {
   sx?: SxProps;
-  page: PageMeta;
+  page: Pick<Page, 'id' | 'parentId' | 'type'>;
   pagePermissions?: IPagePermissionFlags;
   skipRedirection?: boolean;
+  postDuplication?: VoidFunction;
 }) {
   const duplicatePageDisabled = !pagePermissions?.edit_content;
+
   const currentSpace = useCurrentSpace();
   const dispatch = useAppDispatch();
   const router = useRouter();
@@ -51,6 +54,7 @@ export function DuplicatePageAction({
       if (duplicatedRootPage && !skipRedirection) {
         router.push(`/${router.query.domain}/${duplicatedRootPage.path}`);
       }
+      postDuplication?.();
     }
   }
 
@@ -61,7 +65,7 @@ export function DuplicatePageAction({
       title={
         excludedPageTypes.includes(page.type)
           ? "Page can't be duplicated"
-          : !duplicatePageDisabled
+          : duplicatePageDisabled
           ? 'You do not have permission to duplicate this page'
           : ''
       }
@@ -74,7 +78,7 @@ export function DuplicatePageAction({
           onClick={duplicatePage}
         >
           <ListItemIcon>
-            <FileCopyIcon fontSize='small' />
+            <FileCopyOutlinedIcon fontSize='small' />
           </ListItemIcon>
           <ListItemText>Duplicate</ListItemText>
         </ListItemButton>

@@ -272,7 +272,9 @@ export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: 
         </Box>
         <ListItemText primary={isFavorite ? 'Remove from Favorites' : 'Add to Favorites'} />
       </ListItemButton>
-      {boardPage && <DuplicatePageAction page={boardPage} pagePermissions={pagePermissions} />}
+      {boardPage && (
+        <DuplicatePageAction postDuplication={closeMenu} page={boardPage} pagePermissions={pagePermissions} />
+      )}
       <ListItemButton onClick={onCopyLink}>
         <ContentCopyIcon
           fontSize='small'

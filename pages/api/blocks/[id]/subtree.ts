@@ -21,8 +21,8 @@ async function getBlockSubtree(req: NextApiRequest, res: NextApiResponse<Block[]
       boardId: blockId
     }
   });
-
   const computed = await computeUserPagePermissions({
+    // TODO: might be undefined
     resourceId: publicPage?.id as string,
     userId: req.session.user?.id
   });
