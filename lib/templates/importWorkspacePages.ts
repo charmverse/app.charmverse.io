@@ -15,6 +15,7 @@ import type { PageContent, TextContent, TextMark } from 'lib/prosemirror/interfa
 import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
 import { typedKeys } from 'lib/utilities/objects';
 
+import { exportWorkspacePages } from './exportWorkspacePages';
 import type { ExportedPage, WorkspaceExport, WorkspaceImport } from './interfaces';
 
 interface UpdateRefs {
@@ -38,6 +39,7 @@ function recurse(node: PageContent, cb: (node: PageContent | TextContent) => voi
  */
 function updateReferences({ oldNewHashMap, pages }: UpdateRefs) {
   const extractedPolls: Map<string, { pageId: string; newPollId: string }> = new Map();
+  const inlineDatabases: Map<string, { pageId: string; inlineDatabaseId: string }> = new Map();
 
   for (const page of pages) {
     recurse(page.content as PageContent, (node) => {
@@ -55,6 +57,13 @@ function updateReferences({ oldNewHashMap, pages }: UpdateRefs) {
         if (oldPageId && newPageId) {
           attrs.id = newPageId;
         }
+      } else if (node.type === 'inlineDatabase') {
+        const attrs = node.attrs as { pageId: string };
+        const oldPageId = attrs.pageId;
+        const newPageId = oldPageId ? oldNewHashMap[oldPageId] : undefined;
+        if (oldPageId && newPageId) {
+          attrs.pageId = newPageId;
+        }
       }
 
       const marks: TextMark[] = node.marks;
@@ -66,7 +75,8 @@ function updateReferences({ oldNewHashMap, pages }: UpdateRefs) {
   }
 
   return {
-    extractedPolls
+    extractedPolls,
+    inlineDatabases
   };
 }
 
@@ -133,13 +143,16 @@ export async function generateImportWorkspacePages({
   function recursivePagePrep({
     node,
     newParentId,
-    rootSpacePermissionId
+    rootSpacePermissionId,
+    rootPageId
   }: {
+    // This is required for inline databases
+    rootPageId?: string;
     node: ExportedPage;
     newParentId: string | null;
     rootSpacePermissionId?: string;
   }) {
-    const newId = v4();
+    const newId = rootPageId ?? v4();
 
     oldNewHashmap[newId] = node.id;
     oldNewHashmap[node.id] = newId;
@@ -148,7 +161,6 @@ export async function generateImportWorkspacePages({
 
     const {
       children,
-      permissions,
       createdBy,
       updatedBy,
       spaceId,
@@ -307,10 +319,33 @@ export async function generateImportWorkspacePages({
     recursivePagePrep({ node: page, newParentId: null });
   });
 
-  const { extractedPolls } = updateReferences({
+  const { extractedPolls, inlineDatabases } = updateReferences({
     oldNewHashMap: oldNewHashmap,
     pages: flatPages
   });
+
+  for (const inlineDatabase of inlineDatabases.entries()) {
+    const [oldInlineDatabaseId, { inlineDatabaseId: newInlineDatabaseId, pageId: parentPageId }] = inlineDatabase;
+    const inlineBoardPage = await prisma.page.findUnique({
+      where: {
+        id: oldInlineDatabaseId
+      }
+    });
+    if (inlineBoardPage) {
+      const { data } = await exportWorkspacePages({
+        sourceSpaceIdOrDomain: space.id,
+        rootPageIds: [oldInlineDatabaseId]
+      });
+
+      data.pages.forEach((page) => {
+        recursivePagePrep({
+          node: page,
+          newParentId: page.id === oldInlineDatabaseId ? parentPageId : null,
+          rootPageId: page.id === oldInlineDatabaseId ? newInlineDatabaseId : undefined
+        });
+      });
+    }
+  }
 
   const polls = await prisma.vote.findMany({
     where: {
