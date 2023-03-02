@@ -20,7 +20,9 @@ async function exportImport({
 
   const result = await importWorkspacePages({
     targetSpaceIdOrDomain,
-    exportData: data
+    exportData: data,
+    skipBounties: true,
+    skipProposals: true
   });
 
   console.log('Success ! Imported ', result.pages);

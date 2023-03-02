@@ -23,4 +23,6 @@ export interface WorkspaceImport {
   // Parent id of root pages, could be another page or null if space is parent
   parentId?: string | null;
   updateTitle?: boolean;
+  skipBounties?: boolean;
+  skipProposals?: boolean;
 }

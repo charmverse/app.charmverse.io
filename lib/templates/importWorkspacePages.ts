@@ -83,7 +83,9 @@ export async function generateImportWorkspacePages({
   exportData,
   exportName,
   parentId: rootParentId,
-  updateTitle
+  updateTitle,
+  skipBounties,
+  skipProposals
 }: WorkspaceImport): Promise<{
   pageArgs: Prisma.PageCreateArgs[];
   blockArgs: Prisma.BlockCreateManyArgs;
@@ -321,38 +323,42 @@ export async function generateImportWorkspacePages({
     }
   });
 
-  const oldBounties = await prisma.bounty.findMany({
-    where: {
-      id: {
-        in: oldBountyIds
-      }
-    },
-    include: {
-      page: {
-        select: {
-          id: true
+  const oldBounties = !skipBounties
+    ? await prisma.bounty.findMany({
+        where: {
+          id: {
+            in: oldBountyIds
+          }
+        },
+        include: {
+          page: {
+            select: {
+              id: true
+            }
+          },
+          permissions: true
         }
-      },
-      permissions: true
-    }
-  });
+      })
+    : [];
 
-  const oldProposals = await prisma.proposal.findMany({
-    where: {
-      id: {
-        in: oldProposalIds
-      }
-    },
-    include: {
-      page: {
-        select: {
-          id: true
+  const oldProposals = !skipProposals
+    ? await prisma.proposal.findMany({
+        where: {
+          id: {
+            in: oldProposalIds
+          }
+        },
+        include: {
+          page: {
+            select: {
+              id: true
+            }
+          },
+          authors: true,
+          reviewers: true
         }
-      },
-      authors: true,
-      reviewers: true
-    }
-  });
+      })
+    : [];
 
   return {
     pageArgs,
@@ -430,7 +436,9 @@ export async function importWorkspacePages({
   exportData,
   exportName,
   parentId,
-  updateTitle
+  updateTitle,
+  skipBounties = false,
+  skipProposals = false
 }: WorkspaceImport): Promise<WorkspaceImportResult> {
   const {
     pageArgs,
@@ -447,7 +455,9 @@ export async function importWorkspacePages({
     exportData,
     exportName,
     parentId,
-    updateTitle
+    updateTitle,
+    skipBounties,
+    skipProposals
   });
 
   const pagesToCreate = pageArgs.length;
