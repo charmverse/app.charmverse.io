@@ -72,9 +72,8 @@ async function createVote(req: NextApiRequest, res: NextApiResponse<ExtendedVote
     }
   } else {
     const userPagePermissions = await computeUserPagePermissions({
-      pageId,
-      userId,
-      allowAdminBypass: true
+      resourceId: pageId,
+      userId
     });
 
     if (!userPagePermissions.create_poll) {

@@ -33,6 +33,6 @@ export class PagesApi {
   }
 
   convertToProposal({ pageId, categoryId }: { pageId: string; categoryId: string }) {
-    return http.POST<PageDetails>(`/api/pages/${pageId}/convert-to-proposal`, { categoryId });
+    return http.POST<PageMeta>(`/api/pages/${pageId}/convert-to-proposal`, { categoryId });
   }
 }

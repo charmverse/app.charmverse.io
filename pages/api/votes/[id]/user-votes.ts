@@ -32,7 +32,7 @@ async function getUserVotes(req: NextApiRequest, res: NextApiResponse<UserVoteEx
   }
 
   const computed = await computeUserPagePermissions({
-    pageId: vote.page.id,
+    resourceId: vote.page.id,
     userId: req.session?.user?.id
   });
 

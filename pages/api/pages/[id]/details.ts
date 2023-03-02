@@ -23,7 +23,7 @@ async function getPageDetailsHandler(req: NextApiRequest, res: NextApiResponse<P
 
   // Page ID might be a path now, so first we fetch the page and if found, can pass the id from the found page to check if we should actually send it to the requester
   const permissions = await computeUserPagePermissions({
-    pageId: pageDetails.id,
+    resourceId: pageDetails.id,
     userId
   });
 

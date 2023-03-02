@@ -142,6 +142,7 @@ export async function generateImportWorkspacePages({
         parentId: newParentId ?? undefined,
         content: (node.content as Prisma.InputJsonValue) ?? undefined,
         path: getPagePath(),
+        convertedProposalId: undefined,
         space: {
           connect: {
             // eslint-disable @typescript-eslint/no-non-null-assertion
