@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
+import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { updateTrackPageProfile } from 'lib/metrics/mixpanel/updateTrackPageProfile';
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { duplicatePage } from 'lib/pages/duplicatePage';
@@ -32,12 +33,22 @@ async function duplicatePageRoute(
   const { pages, rootPageIds } = await duplicatePage({ pageId, parentId });
   await Promise.all(pages.map((page) => updateTrackPageProfile(page.id)));
 
-  // trackUserAction('create_page', {
-  //   userId,
-  //   spaceId: pageWithPermissions.spaceId,
-  //   pageId: pageWithPermissions.id,
-  //   type: pageWithPermissions.type
-  // });
+  const pagesMap: Record<string, PageMeta> = {};
+  Object.entries(pages).forEach(([_pageId, page]) => {
+    pagesMap[_pageId] = page;
+  });
+
+  rootPageIds.forEach((rootPageId) => {
+    const page = pagesMap[rootPageId];
+    if (page) {
+      trackUserAction('duplicate_page', {
+        userId,
+        spaceId: page.spaceId,
+        pageId: page.id,
+        type: page.type
+      });
+    }
+  });
 
   return res.status(200).send({ pages, rootPageIds });
 }
