@@ -28,7 +28,8 @@ export async function duplicatePage({ pageId, parentId }: { parentId?: string | 
   const { pages, rootPageIds } = await importWorkspacePages({
     targetSpaceIdOrDomain: spaceId,
     exportData: data,
-    parentId
+    parentId,
+    updateTitle: true
   });
 
   return {
