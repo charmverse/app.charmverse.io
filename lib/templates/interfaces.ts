@@ -18,7 +18,7 @@ export interface PageWithBlocks {
     views?: Block[];
     card?: Block;
   };
-  votes?: (Vote & { voteOptions: VoteOptions })[];
+  votes?: (Vote & { voteOptions: VoteOptions[] })[];
   proposal?: Proposal & { authors: ProposalAuthor[]; reviewers: ProposalReviewer[] };
   bounty?: Bounty & { permissions: BountyPermission[] };
 }

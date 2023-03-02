@@ -8,7 +8,6 @@ import { prisma } from 'db';
 import type { BountyWithDetails } from 'lib/bounties';
 import log from 'lib/log';
 import type { PageMeta } from 'lib/pages';
-import { includePagePermissions } from 'lib/pages/server';
 import { createPage } from 'lib/pages/server/createPage';
 import { getPagePath } from 'lib/pages/utils';
 import type { PageContent, TextContent, TextMark } from 'lib/prosemirror/interfaces';
@@ -19,7 +18,7 @@ import { exportWorkspacePages } from './exportWorkspacePages';
 import type { ExportedPage, WorkspaceExport, WorkspaceImport } from './interfaces';
 
 interface UpdateRefs {
-  oldNewHashMap: Record<string, string>;
+  oldNewPageIdHashMap: Record<string, string>;
   pages: Page[];
 }
 
@@ -37,8 +36,8 @@ function recurse(node: PageContent, cb: (node: PageContent | TextContent) => voi
 /**
  * Mutates the provided content to replace nested page refs
  */
-function updateReferences({ oldNewHashMap, pages }: UpdateRefs) {
-  const extractedPolls: Map<string, { pageId: string; newPollId: string }> = new Map();
+function updateReferences({ oldNewPageIdHashMap, pages }: UpdateRefs) {
+  const extractedPolls: Map<string, { pageId: string; newPollId: string; originalId: string }> = new Map();
   const inlineDatabases: Map<string, { pageId: string; inlineDatabaseId: string }> = new Map();
 
   for (const page of pages) {
@@ -47,20 +46,20 @@ function updateReferences({ oldNewHashMap, pages }: UpdateRefs) {
         const attrs = node.attrs as { pollId: string };
         if (attrs.pollId) {
           const newPollId = v4();
-          extractedPolls.set(attrs.pollId, { newPollId, pageId: page.id });
+          extractedPolls.set(attrs.pollId, { newPollId, pageId: page.id, originalId: attrs.pollId });
           attrs.pollId = newPollId;
         }
       } else if (node.type === 'page') {
         const attrs = node.attrs as { id: string };
         const oldPageId = attrs.id;
-        const newPageId = oldPageId ? oldNewHashMap[oldPageId] : undefined;
+        const newPageId = oldPageId ? oldNewPageIdHashMap[oldPageId] : undefined;
         if (oldPageId && newPageId) {
           attrs.id = newPageId;
         }
       } else if (node.type === 'inlineDatabase') {
         const attrs = node.attrs as { pageId: string };
         const oldPageId = attrs.pageId;
-        const newPageId = oldPageId ? oldNewHashMap[oldPageId] : undefined;
+        const newPageId = oldPageId ? oldNewPageIdHashMap[oldPageId] : undefined;
         if (oldPageId && newPageId) {
           attrs.pageId = newPageId;
         }
@@ -127,6 +126,8 @@ export async function generateImportWorkspacePages({
 
   const pageArgs: Prisma.PageCreateArgs[] = [];
 
+  const voteArgs: Prisma.VoteCreateManyInput[] = [];
+  const voteOptionsArgs: Prisma.VoteOptionsCreateManyInput[] = [];
   const blockArgs: Prisma.BlockCreateManyInput[] = [];
   const bountyArgs: Prisma.BountyCreateManyInput[] = [];
   const bountyPermissionArgs: Prisma.BountyPermissionCreateManyInput[] = [];
@@ -135,7 +136,7 @@ export async function generateImportWorkspacePages({
   const proposalReviewersArgs: Prisma.ProposalReviewerCreateManyInput[] = [];
 
   // 2 way hashmap to find link between new and old page ids
-  const oldNewHashmap: Record<string, string> = {};
+  const oldNewPageIdHashMap: Record<string, string> = {};
 
   /**
    * Mutates the pages, updating their ids
@@ -154,8 +155,8 @@ export async function generateImportWorkspacePages({
   }) {
     const newId = rootPageId ?? v4();
 
-    oldNewHashmap[newId] = node.id;
-    oldNewHashmap[node.id] = newId;
+    oldNewPageIdHashMap[newId] = node.id;
+    oldNewPageIdHashMap[node.id] = newId;
 
     flatPages.push(node);
 
@@ -313,12 +314,12 @@ export async function generateImportWorkspacePages({
       bountyArgs.push({
         ...bounty,
         createdBy: space!.createdBy,
-        id: oldNewHashmap[node.id]
+        id: oldNewPageIdHashMap[node.id]
       });
       permissions.forEach(({ id, ...bountyPermission }) => {
         bountyPermissionArgs.push({
           ...bountyPermission,
-          bountyId: oldNewHashmap[node.id]
+          bountyId: oldNewPageIdHashMap[node.id]
         });
       });
     } else if (node.type === 'proposal' && node.proposal) {
@@ -326,11 +327,42 @@ export async function generateImportWorkspacePages({
       proposalArgs.push({
         ...proposal,
         createdBy: space!.createdBy,
-        id: oldNewHashmap[node.id]
+        id: oldNewPageIdHashMap[node.id]
       });
-      authors.forEach((author) => proposalAuthorsArgs.push({ ...author, proposalId: oldNewHashmap[node.id] }));
-      reviewers.forEach((reviewer) => proposalReviewersArgs.push({ ...reviewer, proposalId: oldNewHashmap[node.id] }));
+      authors.forEach((author) => proposalAuthorsArgs.push({ ...author, proposalId: oldNewPageIdHashMap[node.id] }));
+      reviewers.forEach((reviewer) =>
+        proposalReviewersArgs.push({ ...reviewer, proposalId: oldNewPageIdHashMap[node.id] })
+      );
       pageArgs.push(newPageContent);
+    }
+
+    const { extractedPolls } = updateReferences({
+      oldNewPageIdHashMap,
+      pages: [node]
+    });
+
+    const pageVotes = node.votes;
+    if (pageVotes) {
+      extractedPolls.forEach((extractedPoll) => {
+        const pageVote = pageVotes.find((_pageVote) => _pageVote.id === extractedPoll.originalId);
+
+        if (pageVote) {
+          const { voteOptions, ...vote } = pageVote;
+          voteArgs.push({
+            ...vote,
+            createdBy: space!.createdBy,
+            pageId: oldNewPageIdHashMap[pageVote.pageId],
+            id: extractedPoll.newPollId as string
+          });
+
+          voteOptions.forEach((voteOption) => {
+            voteOptionsArgs.push({
+              name: voteOption.name,
+              voteId: extractedPoll.newPollId as string
+            });
+          });
+        }
+      });
     }
   }
 
@@ -338,44 +370,33 @@ export async function generateImportWorkspacePages({
     recursivePagePrep({ node: page, newParentId: null });
   });
 
-  const { extractedPolls, inlineDatabases } = updateReferences({
-    oldNewHashMap: oldNewHashmap,
-    pages: flatPages
-  });
+  // const { inlineDatabases } = updateReferences({
+  //   oldNewPageIdHashMap,
+  //   pages: flatPages
+  // });
 
-  for (const inlineDatabase of inlineDatabases.entries()) {
-    const [oldInlineDatabaseId, { inlineDatabaseId: newInlineDatabaseId, pageId: parentPageId }] = inlineDatabase;
-    const inlineBoardPage = await prisma.page.findUnique({
-      where: {
-        id: oldInlineDatabaseId
-      }
-    });
-    if (inlineBoardPage) {
-      const { data } = await exportWorkspacePages({
-        sourceSpaceIdOrDomain: space.id,
-        rootPageIds: [oldInlineDatabaseId]
-      });
+  // for (const inlineDatabase of inlineDatabases.entries()) {
+  //   const [oldInlineDatabaseId, { inlineDatabaseId: newInlineDatabaseId, pageId: parentPageId }] = inlineDatabase;
+  //   const inlineBoardPage = await prisma.page.findUnique({
+  //     where: {
+  //       id: oldInlineDatabaseId
+  //     }
+  //   });
+  //   if (inlineBoardPage) {
+  //     const { data } = await exportWorkspacePages({
+  //       sourceSpaceIdOrDomain: space.id,
+  //       rootPageIds: [oldInlineDatabaseId]
+  //     });
 
-      data.pages.forEach((page) => {
-        recursivePagePrep({
-          node: page,
-          newParentId: page.id === oldInlineDatabaseId ? parentPageId : null,
-          rootPageId: page.id === oldInlineDatabaseId ? newInlineDatabaseId : undefined
-        });
-      });
-    }
-  }
-
-  const polls = await prisma.vote.findMany({
-    where: {
-      id: {
-        in: Array.from(extractedPolls.keys())
-      }
-    },
-    include: {
-      voteOptions: true
-    }
-  });
+  //     data.pages.forEach((page) => {
+  //       recursivePagePrep({
+  //         node: page,
+  //         newParentId: page.id === oldInlineDatabaseId ? parentPageId : null,
+  //         rootPageId: page.id === oldInlineDatabaseId ? newInlineDatabaseId : undefined
+  //       });
+  //     });
+  //   }
+  // }
 
   return {
     pageArgs,
@@ -383,22 +404,10 @@ export async function generateImportWorkspacePages({
       data: blockArgs
     },
     voteArgs: {
-      data: polls.map(({ voteOptions, ...poll }) => ({
-        ...poll,
-        createdBy: space.createdBy,
-        pageId: oldNewHashmap[poll.pageId],
-        id: extractedPolls.get(poll.id)?.newPollId as string
-      }))
+      data: voteArgs
     },
     voteOptionsArgs: {
-      data: polls
-        .map((poll) =>
-          poll.voteOptions.map((voteOption) => ({
-            name: voteOption.name,
-            voteId: extractedPolls.get(voteOption.voteId)?.newPollId as string
-          }))
-        )
-        .flat()
+      data: voteOptionsArgs
     },
     bountyArgs: {
       data: bountyArgs

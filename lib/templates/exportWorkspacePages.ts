@@ -7,6 +7,8 @@ import { validate } from 'uuid';
 import { prisma } from 'db';
 import type { PageNodeWithChildren } from 'lib/pages';
 import { resolvePageTree } from 'lib/pages/server/resolvePageTree';
+import type { PageContent, TextContent } from 'lib/prosemirror/interfaces';
+import { TextMark } from 'lib/prosemirror/interfaces';
 import { DataNotFoundError } from 'lib/utilities/errors';
 
 import type { ExportedPage, WorkspaceExport } from './interfaces';
@@ -20,6 +22,17 @@ export interface ExportWorkspacePage {
 }
 
 const excludedPageTypes: PageType[] = ['bounty_template', 'proposal_template'];
+
+function recurse(node: PageContent, cb: (node: PageContent | TextContent) => void) {
+  if (node?.content) {
+    node?.content.forEach((childNode) => {
+      recurse(childNode, cb);
+    });
+  }
+  if (node) {
+    cb(node);
+  }
+}
 
 export async function exportWorkspacePages({
   sourceSpaceIdOrDomain,
@@ -129,6 +142,28 @@ export async function exportWorkspacePages({
         await recursiveResolveBlocks({ node: child });
       })
     );
+    const pollIds: string[] = [];
+    recurse(node.content as PageContent, (_node) => {
+      if (_node.type === 'poll') {
+        const attrs = _node.attrs as { pollId: string };
+        if (attrs.pollId) {
+          pollIds.push(attrs.pollId);
+        }
+      }
+    });
+
+    if (pollIds.length) {
+      node.votes = await prisma.vote.findMany({
+        where: {
+          id: {
+            in: pollIds
+          }
+        },
+        include: {
+          voteOptions: true
+        }
+      });
+    }
   }
 
   await Promise.all(
