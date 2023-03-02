@@ -17,7 +17,8 @@ export interface ExportWorkspacePage {
   rootPageIds?: string[];
 }
 
-const excludedPageTypes: PageType[] = ['bounty', 'bounty_template', 'proposal', 'proposal_template'];
+// TODO: Remember to exclude bounty and proposals when duplicating spaces
+const excludedPageTypes: PageType[] = ['bounty_template', 'proposal_template'];
 
 export async function exportWorkspacePages({
   sourceSpaceIdOrDomain,

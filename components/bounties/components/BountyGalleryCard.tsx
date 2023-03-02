@@ -53,7 +53,7 @@ export function BountyGalleryCard({ page: bountyPage, bounty, readOnly, onClick,
       }}
       data-test={`bounty-card-${bounty.id}`}
     >
-      {!readOnly && <PageActions page={bountyPage} onClickDelete={() => onDelete(bounty.id)} />}
+      {!readOnly && <PageActions showDuplicateAction page={bountyPage} onClickDelete={() => onDelete(bounty.id)} />}
       <div className='gallery-title'>
         {bountyPage?.icon ? (
           <PageIcon isEditorEmpty={!bountyPage?.hasContent} pageType='card' icon={bountyPage.icon} />

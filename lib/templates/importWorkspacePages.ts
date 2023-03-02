@@ -86,6 +86,7 @@ export async function generateImportWorkspacePages({
   blockArgs: Prisma.BlockCreateManyArgs;
   voteArgs: Prisma.VoteCreateManyArgs;
   voteOptionsArgs: Prisma.VoteOptionsCreateManyArgs;
+  bountyArgs: Prisma.BountyCreateManyArgs;
 }> {
   const isUuid = validate(targetSpaceIdOrDomain);
 
@@ -113,6 +114,8 @@ export async function generateImportWorkspacePages({
 
   // 2 way hashmap to find link between new and old page ids
   const oldNewHashmap: Record<string, string> = {};
+
+  const oldBountyIds: string[] = [];
 
   /**
    * Mutates the pages, updating their ids
@@ -174,6 +177,14 @@ export async function generateImportWorkspacePages({
         card: {
           connect:
             node.type === 'card'
+              ? {
+                  id: newId
+                }
+              : undefined
+        },
+        bounty: {
+          connect:
+            node.type === 'bounty'
               ? {
                   id: newId
                 }
@@ -265,6 +276,9 @@ export async function generateImportWorkspacePages({
       node.children?.forEach((child) => {
         recursivePagePrep({ node: child, newParentId: newId, rootSpacePermissionId });
       });
+    } else if (node.type === 'bounty' && node.bountyId) {
+      oldBountyIds.push(node.bountyId);
+      pageArgs.push(newPageContent);
     }
   }
 
@@ -285,6 +299,21 @@ export async function generateImportWorkspacePages({
     },
     include: {
       voteOptions: true
+    }
+  });
+
+  const oldBounties = await prisma.bounty.findMany({
+    where: {
+      id: {
+        in: oldBountyIds
+      }
+    },
+    include: {
+      page: {
+        select: {
+          id: true
+        }
+      }
     }
   });
 
@@ -317,6 +346,21 @@ export async function generateImportWorkspacePages({
           }))
         )
         .flat()
+    },
+    bountyArgs: {
+      data: oldBounties.map((oldBounty) => ({
+        chainId: oldBounty.chainId,
+        createdBy: space.createdBy,
+        rewardAmount: oldBounty.rewardAmount,
+        rewardToken: oldBounty.rewardToken,
+        spaceId: oldBounty.spaceId,
+        approveSubmitters: oldBounty.approveSubmitters,
+        maxSubmissions: oldBounty.maxSubmissions,
+        status: oldBounty.status,
+        submissionsLocked: oldBounty.submissionsLocked,
+        suggestedBy: oldBounty.suggestedBy,
+        id: oldNewHashmap[(oldBounty.page as Page).id]
+      }))
     }
   };
 }
@@ -328,7 +372,7 @@ export async function importWorkspacePages({
   parentId,
   updateTitle
 }: WorkspaceImport): Promise<WorkspaceImportResult> {
-  const { pageArgs, blockArgs, voteArgs, voteOptionsArgs } = await generateImportWorkspacePages({
+  const { pageArgs, blockArgs, bountyArgs, voteArgs, voteOptionsArgs } = await generateImportWorkspacePages({
     targetSpaceIdOrDomain,
     exportData,
     exportName,
@@ -344,6 +388,7 @@ export async function importWorkspacePages({
   const createdData = await prisma.$transaction([
     // The blocks needs to be created first before the page can connect with them
     prisma.block.createMany(blockArgs),
+    prisma.bounty.createMany(bountyArgs),
     ...pageArgs.map((p) => {
       totalCreatedPages += 1;
       log.debug(`Creating page ${totalCreatedPages}/${pagesToCreate}: ${p.data.type} // ${p.data.title}`);

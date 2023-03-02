@@ -54,7 +54,9 @@ function BountyKanbanCard({ onDelete, bounty, page, onClick, readOnly }: Props) 
           <BountyStatusBadge bounty={bounty} hideStatus={true} truncate />
         </Box>
       </Box>
-      {onDelete && <PageActions page={page} readOnly={readOnly} onClickDelete={() => onDelete(bounty.id)} />}
+      {onDelete && (
+        <PageActions showDuplicateAction page={page} readOnly={readOnly} onClickDelete={() => onDelete(bounty.id)} />
+      )}
     </StyledBox>
   );
 }

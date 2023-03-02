@@ -13,7 +13,7 @@ import type { IPagePermissionFlags } from 'lib/permissions/pages';
 
 import { useAppDispatch } from './BoardEditor/focalboard/src/store/hooks';
 
-const excludedPageTypes: PageType[] = ['bounty', 'bounty_template', 'proposal', 'proposal_template'];
+const excludedPageTypes: PageType[] = ['bounty_template', 'proposal_template'];
 
 export function DuplicatePageAction({
   page,
