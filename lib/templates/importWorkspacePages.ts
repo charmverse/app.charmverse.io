@@ -87,6 +87,7 @@ export async function generateImportWorkspacePages({
   voteArgs: Prisma.VoteCreateManyArgs;
   voteOptionsArgs: Prisma.VoteOptionsCreateManyArgs;
   bountyArgs: Prisma.BountyCreateManyArgs;
+  bountyPermissionArgs: Prisma.BountyPermissionCreateManyArgs;
   proposalArgs: Prisma.ProposalCreateManyArgs;
   proposalAuthorsArgs: Prisma.ProposalAuthorCreateManyArgs;
   proposalReviewersArgs: Prisma.ProposalReviewerCreateManyArgs;
@@ -328,7 +329,8 @@ export async function generateImportWorkspacePages({
         select: {
           id: true
         }
-      }
+      },
+      permissions: true
     }
   });
 
@@ -373,11 +375,21 @@ export async function generateImportWorkspacePages({
         .flat()
     },
     bountyArgs: {
-      data: oldBounties.map(({ createdBy, updatedAt, createdAt, page, ...oldBounty }) => ({
+      data: oldBounties.map(({ createdBy, updatedAt, createdAt, page, permissions, ...oldBounty }) => ({
         ...oldBounty,
         createdBy: space.createdBy,
         id: oldNewHashmap[(page as Page).id]
       }))
+    },
+    bountyPermissionArgs: {
+      data: oldBounties
+        .map((oldBounty) =>
+          oldBounty.permissions.map(({ id, ...permission }) => ({
+            ...permission,
+            bountyId: oldNewHashmap[(oldBounty.page as Page).id]
+          }))
+        )
+        .flat()
     },
     proposalArgs: {
       data: oldProposals.map(({ createdBy, authors, reviewers, page, ...oldProposal }) => ({
@@ -425,7 +437,8 @@ export async function importWorkspacePages({
     voteOptionsArgs,
     proposalArgs,
     proposalAuthorsArgs,
-    proposalReviewersArgs
+    proposalReviewersArgs,
+    bountyPermissionArgs
   } = await generateImportWorkspacePages({
     targetSpaceIdOrDomain,
     exportData,
@@ -443,6 +456,7 @@ export async function importWorkspacePages({
     // The blocks needs to be created first before the page can connect with them
     prisma.block.createMany(blockArgs),
     prisma.bounty.createMany(bountyArgs),
+    prisma.bountyPermission.createMany(bountyPermissionArgs),
     prisma.proposal.createMany(proposalArgs),
     prisma.proposalAuthor.createMany(proposalAuthorsArgs),
     prisma.proposalReviewer.createMany(proposalReviewersArgs),
