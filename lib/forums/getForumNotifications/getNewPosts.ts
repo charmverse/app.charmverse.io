@@ -1,9 +1,4 @@
-import type { Post, Space, User } from '@prisma/client';
-
-import { prisma } from 'db';
-import { extractMentions } from 'lib/prosemirror/extractMentions';
-import type { PageContent } from 'lib/prosemirror/interfaces';
-import { isTruthy } from 'lib/utilities/types';
+import type { Post } from '@prisma/client';
 
 import type { UnpopulatedForumTask } from './getForumNotifications';
 import { getPropertiesFromPost } from './utils';
@@ -25,6 +20,7 @@ export async function getNewPosts({
     commentId: null,
     mentionId: null,
     commentText: '',
-    userId: post.createdBy
+    userId: post.createdBy,
+    taskId: post.id
   }));
 }

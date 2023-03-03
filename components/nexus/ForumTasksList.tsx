@@ -174,7 +174,7 @@ export default function ForumTasksList({ tasks, error, mutateTasks }: Discussion
       <Table size='medium' aria-label='Nexus forum table'>
         <TableHead>
           <TableRow>
-            <TableCell>Comment</TableCell>
+            <TableCell></TableCell>
             <TableCell width={200}>Space</TableCell>
             <TableCell width={200}>Post</TableCell>
             <TableCell width={140} align='center'>

@@ -1,12 +1,12 @@
-import type { ForumNotificationsInput, ForumNotifications } from './getForumNotifications';
+import type { ForumNotificationsQuery, ForumNotifications } from './getForumNotifications';
 import { getPropertiesFromPost } from './utils';
 /**
  * Get all comments that match these 2:
  * 1. My page, but not my comments
  * 2. Not my page, just comments that are direct replies after my comment
  */
-export function getPostComments({ userId, spacesRecord, posts }: ForumNotificationsInput): ForumNotifications {
-  const postsRecord = posts.reduce<Record<string, ForumNotificationsInput['posts'][number]>>((acc, post) => {
+export function getPostComments({ userId, spacesRecord, posts }: ForumNotificationsQuery): ForumNotifications {
+  const postsRecord = posts.reduce<Record<string, ForumNotificationsQuery['posts'][number]>>((acc, post) => {
     acc[post.id] = post;
     return acc;
   }, {});
@@ -35,7 +35,8 @@ export function getPostComments({ userId, spacesRecord, posts }: ForumNotificati
       userId: comment.createdBy,
       commentText: comment.contentText,
       commentId: comment.id,
-      mentionId: null
+      mentionId: null,
+      taskId: comment.id
     };
   });
 

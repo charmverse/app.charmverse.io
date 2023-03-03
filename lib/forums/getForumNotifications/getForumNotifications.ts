@@ -3,7 +3,6 @@ import type { Post, PostComment, Space, User } from '@prisma/client';
 import { prisma } from 'db';
 import type { TaskUser } from 'lib/discussion/interfaces';
 import { timeAgo } from 'lib/utilities/dates';
-import { shortenHex } from 'lib/utilities/strings';
 import { isTruthy } from 'lib/utilities/types';
 
 import { getNewPosts } from './getNewPosts';
@@ -12,6 +11,7 @@ import { getPostComments } from './getPostComments';
 import { getPostMentions } from './getPostMentions';
 
 export type ForumTask = {
+  taskId: string;
   spaceId: string;
   spaceDomain: string;
   spaceName: string;
@@ -32,7 +32,7 @@ export type ForumTasksGroup = {
 
 type SpaceRecord = Record<string, Pick<Space, 'name' | 'domain' | 'id'>>;
 
-export type ForumNotificationsInput = {
+export type ForumNotificationsQuery = {
   userId: string;
   spacesRecord: SpaceRecord;
   username: string;
@@ -41,7 +41,7 @@ export type ForumNotificationsInput = {
   })[];
 };
 
-export type UnpopulatedForumTask = Omit<ForumTask, 'createdBy'> & { userId: string };
+export type UnpopulatedForumTask = Omit<ForumTask, 'createdBy'> & { taskId: string; userId: string };
 
 export type ForumNotifications = {
   mentions: UnpopulatedForumTask[];
@@ -88,7 +88,7 @@ export async function getForumNotifications(userId: string): Promise<ForumTasksG
   });
 
   // Get the username of the user, its required when constructing the mention message text
-  const user = await prisma.user.findUnique({
+  const user = await prisma.user.findUniqueOrThrow({
     where: {
       id: userId
     },
@@ -97,7 +97,7 @@ export async function getForumNotifications(userId: string): Promise<ForumTasksG
     }
   });
 
-  const username = user?.username ?? shortenHex(userId);
+  const username = user.username;
 
   const spaces = forumDataBySpace.map(({ space }) => space);
 
@@ -127,7 +127,7 @@ export async function getForumNotifications(userId: string): Promise<ForumTasksG
   const notifiedTaskIds = new Set(notifications.map((notification) => notification.taskId));
   const posts = spaces.flatMap((space) => space.posts);
 
-  const context: ForumNotificationsInput = { userId, username, spacesRecord, posts };
+  const context: ForumNotificationsQuery = { userId, username, spacesRecord, posts };
 
   const newPosts = await getNewPosts({ userId, posts, spacesRecord });
 
@@ -167,14 +167,14 @@ export async function getForumNotifications(userId: string): Promise<ForumTasksG
   const usersRecord = users.reduce<Record<string, User>>((acc, cur) => ({ ...acc, [cur.id]: cur }), {});
 
   // Loop through each mentioned task and attach the user data using usersRecord
-  const mentionedTasks = Object.values(mentions).reduce<ForumTasksGroup>(
+  const forumTasks = mentions.concat(uniqueComments, newPosts).reduce<ForumTasksGroup>(
     (acc, mentionedTaskWithoutUser) => {
       const mentionedTask = {
         ...mentionedTaskWithoutUser,
         createdBy: usersRecord[mentionedTaskWithoutUser.userId]
       } as ForumTask;
 
-      const taskList = notifiedTaskIds.has(mentionedTask.mentionId ?? '') ? acc.marked : acc.unmarked;
+      const taskList = notifiedTaskIds.has(mentionedTask.taskId) ? acc.marked : acc.unmarked;
       taskList.push(mentionedTask);
 
       return acc;
@@ -182,30 +182,9 @@ export async function getForumNotifications(userId: string): Promise<ForumTasksG
     { marked: [], unmarked: [] }
   );
 
-  // Loop through each comment task and attach the user data using usersRecord
-  const commentTasks = uniqueComments.reduce<ForumTasksGroup>(
-    (acc, commentTaskWithoutUser) => {
-      const commentTask = {
-        ...commentTaskWithoutUser,
-        createdBy: usersRecord[commentTaskWithoutUser.userId]
-      } as ForumTask;
-
-      const taskList = notifiedTaskIds.has(commentTask.commentId ?? '') ? acc.marked : acc.unmarked;
-      taskList.push(commentTask);
-
-      return acc;
-    },
-    { marked: [], unmarked: [] }
-  );
-
-  const allTasks = {
-    marked: [...mentionedTasks.marked, ...commentTasks.marked],
-    unmarked: [...mentionedTasks.unmarked, ...commentTasks.unmarked]
-  };
-
   return {
-    marked: allTasks.marked.sort(sortByDate),
-    unmarked: allTasks.unmarked.sort(sortByDate)
+    marked: forumTasks.marked.sort(sortByDate),
+    unmarked: forumTasks.unmarked.sort(sortByDate)
   };
 }
 
