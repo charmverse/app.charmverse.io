@@ -1,13 +1,16 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { Block, prismaToBlock } from 'lib/focalboard/block';
+import { prisma } from 'db';
+import { prismaToBlock } from 'lib/focalboard/block';
+import log from 'lib/log';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { updateTrackPageProfile } from 'lib/metrics/mixpanel/updateTrackPageProfile';
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { duplicatePage } from 'lib/pages/duplicatePage';
 import type { DuplicatePageResponse, PageMeta } from 'lib/pages/server';
 import { computeUserPagePermissions } from 'lib/permissions/pages';
+import { PageNotFoundError } from 'lib/public-api';
 import { withSessionRoute } from 'lib/session/withSession';
 import { relay } from 'lib/websockets/relay';
 
@@ -18,7 +21,20 @@ handler.use(requireUser).post(duplicatePageRoute);
 async function duplicatePageRoute(req: NextApiRequest, res: NextApiResponse<DuplicatePageResponse>) {
   const pageId = req.query.id as string;
   const userId = req.session.user.id;
-  const { parentId } = req.body as { parentId: string | undefined | null };
+
+  const duplicatedPage = await prisma.page.findUnique({
+    where: {
+      id: pageId
+    },
+    select: {
+      parentId: true,
+      spaceId: true
+    }
+  });
+
+  if (!duplicatedPage) {
+    throw new PageNotFoundError(pageId);
+  }
 
   const permissions = await computeUserPagePermissions({
     resourceId: pageId,
@@ -29,7 +45,7 @@ async function duplicatePageRoute(req: NextApiRequest, res: NextApiResponse<Dupl
     throw new ActionNotPermittedError('You are not allowed to edit this page.');
   }
 
-  const duplicatePageResponse = await duplicatePage({ pageId, parentId });
+  const duplicatePageResponse = await duplicatePage({ pageId, parentId: duplicatedPage.parentId });
   const { pages, rootPageIds, blocks } = duplicatePageResponse;
   await Promise.all(pages.map((page) => updateTrackPageProfile(page.id)));
 
@@ -39,6 +55,15 @@ async function duplicatePageRoute(req: NextApiRequest, res: NextApiResponse<Dupl
   });
 
   const rootPageId = rootPageIds[0];
+
+  if (rootPageIds.length > 1) {
+    log.info(`[duplicate]: Found multiple rootPageIds for a single page duplication`, {
+      pageId,
+      totalRootPageIds: rootPageIds.length,
+      spaceId: duplicatedPage.spaceId
+    });
+  }
+
   const page = pagesMap[rootPageId];
   if (page) {
     trackUserAction('duplicate_page', {

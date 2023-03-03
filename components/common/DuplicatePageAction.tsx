@@ -8,36 +8,32 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { DuplicatePageResponse } from 'lib/pages';
 import type { IPagePermissionFlags } from 'lib/permissions/pages';
 
-import { useAppDispatch } from './BoardEditor/focalboard/src/store/hooks';
-
 const excludedPageTypes: PageType[] = ['bounty_template', 'proposal_template'];
 
 export function DuplicatePageAction({
   page,
   pagePermissions,
-  skipRedirection = false,
+  redirect = false,
   postDuplication
 }: {
   page: Pick<Page, 'id' | 'type'> & { parentId?: string | null };
   pagePermissions?: IPagePermissionFlags;
-  skipRedirection?: boolean;
+  redirect?: boolean;
   postDuplication?: (duplicatePageResponse: DuplicatePageResponse) => void;
 }) {
   const duplicatePageDisabled = !pagePermissions?.edit_content;
 
   const currentSpace = useCurrentSpace();
-  const dispatch = useAppDispatch();
   const router = useRouter();
 
   async function duplicatePage() {
     if (currentSpace) {
       const duplicatePageResponse = await charmClient.pages.duplicatePage({
-        pageId: page.id,
-        parentId: page.parentId
+        pageId: page.id
       });
       const { pages, rootPageIds } = duplicatePageResponse;
       const duplicatedRootPage = pages.find((_page) => _page.id === rootPageIds[0]);
-      if (duplicatedRootPage && !skipRedirection) {
+      if (duplicatedRootPage && redirect) {
         router.push(`/${router.query.domain}/${duplicatedRootPage.path}`);
       }
       postDuplication?.(duplicatePageResponse);

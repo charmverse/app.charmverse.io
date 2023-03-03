@@ -10,7 +10,7 @@ import { mutate } from 'swr';
 
 import charmClient from 'charmClient';
 import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
-import { useAppDispatch, useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
+import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { useCurrentPage } from 'hooks/useCurrentPage';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
@@ -37,7 +37,6 @@ function Component({ menuState }: { menuState: PluginState }) {
   const { deletePage, pages } = usePages();
   const currentPage = pages[currentPageId];
   const currentSpace = useCurrentSpace();
-  const dispatch = useAppDispatch();
   const boards = useAppSelector(getSortedBoards);
 
   function _getNode() {
@@ -113,8 +112,7 @@ function Component({ menuState }: { menuState: PluginState }) {
     if (node?.node.type.name === 'page' && currentPage) {
       if (currentSpace && node?.node.attrs.id) {
         const { rootPageIds } = await charmClient.pages.duplicatePage({
-          pageId: node?.node.attrs.id,
-          parentId: currentPage.id
+          pageId: node?.node.attrs.id
         });
         if (rootPageIds.length !== 0) {
           const newNode = view.state.schema.nodes.page.create({
