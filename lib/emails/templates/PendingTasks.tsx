@@ -32,7 +32,7 @@ const buttonStyle = {
   background: '#009Fb7'
 };
 const h2Style = { lineHeight: '1.2em', fontSize: '24px', fontWeight: 'bold', marginTop: '10px' };
-const h3Style = { lineHeight: '1em', fontSize: '20px', fontWeight: 'bold', marginTop: '8px' };
+const h3Style = { lineHeight: '1em', fontSize: '20px', fontWeight: 'bold', marginTop: '8px', marginBottom: '5px' };
 
 export interface PendingTasksProps {
   gnosisSafeTasks: GnosisSafeTasks[];
@@ -168,7 +168,7 @@ export default function PendingTasks(props: PendingTasksProps) {
         ))}
         {bountyDiscussions.length > 0 && (
           <MjmlText>
-            <div style={{ ...h3Style, fontWeight: 'bold', marginBottom: 5 }}>Bounty Discussions</div>
+            <div style={h3Style}>Bounty Discussions</div>
           </MjmlText>
         )}
         {bountyDiscussions.slice(0, MAX_ITEMS_PER_TASK).map((discussionTask) => (
