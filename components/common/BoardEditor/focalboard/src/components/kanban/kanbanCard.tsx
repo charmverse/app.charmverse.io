@@ -35,6 +35,8 @@ type Props = {
   onClick?: (e: React.MouseEvent<HTMLDivElement>) => void;
   readOnly: boolean;
   onDrop: (srcCard: Card, dstCard: Card) => void;
+  // eslint-disable-next-line
+  showCard: (cardId: string | null) => void;
   isManualSort: boolean;
 };
 

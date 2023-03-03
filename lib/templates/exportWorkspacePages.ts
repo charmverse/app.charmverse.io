@@ -10,7 +10,7 @@ import { resolvePageTree } from 'lib/pages/server/resolvePageTree';
 import type { PageContent, TextContent } from 'lib/prosemirror/interfaces';
 import { DataNotFoundError } from 'lib/utilities/errors';
 
-import type { ExportedPage, PageWithBlocks, WorkspaceExport } from './interfaces';
+import type { ExportedPage, WorkspaceExport } from './interfaces';
 
 export interface ExportWorkspacePage {
   sourceSpaceIdOrDomain: string;
@@ -50,7 +50,6 @@ export async function exportWorkspacePages({
     throw new DataNotFoundError(`Space not found: ${sourceSpaceIdOrDomain}`);
   }
 
-  const inlineDatabasePages: PageWithBlocks[] = [];
   const rootPages = await prisma.page.findMany({
     where: {
       ...(rootPageIds ? { id: { in: rootPageIds } } : { spaceId: space.id, parentId: null }),

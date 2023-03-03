@@ -6,7 +6,7 @@ import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
 import { PageActions } from 'components/common/PageActions';
 import { usePageDetails } from 'hooks/usePageDetails';
 import type { BountyWithDetails } from 'lib/bounties';
-import type { PageMeta } from 'lib/pages';
+import type { DuplicatePageResponse, PageMeta } from 'lib/pages';
 import { fancyTrim } from 'lib/utilities/strings';
 
 import BountyStatusBadge from './BountyStatusBadge';
@@ -17,7 +17,7 @@ interface Props {
   onClick: () => void;
   onDelete: (bountyId: string) => void;
   readOnly: boolean;
-  onDuplicate?: VoidFunction;
+  onDuplicate?: (duplicatePageResponse: DuplicatePageResponse) => void;
 }
 
 const StyledBox = styled(Box)`
