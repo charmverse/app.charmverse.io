@@ -49,11 +49,11 @@ describe('getForumNotifications', () => {
     expect(
       newNotifications.find((notif) => notif.commentId === secondComment.id && notif.postId === post.id)
     ).toBeTruthy();
-    expect(newNotifications.length === 1).toBeTruthy();
+    expect(newNotifications.length).toBe(2);
 
     // First comment should not be part of marked/unmarked array because it's not the descendent of any comment
     expect(newNotifications.find((notif) => notif.commentId === firstComment.id)).toBeFalsy();
-    expect(markedNotifications.length === 0).toBeTruthy();
+    expect(markedNotifications.length).toBe(0);
   });
 
   it('Should return new notifications to a page author when someone else comments', async () => {
