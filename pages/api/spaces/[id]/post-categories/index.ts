@@ -2,12 +2,10 @@ import type { PostCategory } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { prisma } from 'db';
 import type { CreatePostCategoryInput } from 'lib/forums/categories/createPostCategory';
 import { createPostCategory } from 'lib/forums/categories/createPostCategory';
 import { getPostCategories } from 'lib/forums/categories/getPostCategories';
 import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
-import { assignDefaultPostCategoryPermissions } from 'lib/permissions/forum/assignDefaultPostCategoryPermission';
 import { computePostCategoryPermissions } from 'lib/permissions/forum/computePostCategoryPermissions';
 import { filterAccessiblePostCategories } from 'lib/permissions/forum/filterAccessiblePostCategories';
 import type { PostCategoryWithPermissions } from 'lib/permissions/forum/interfaces';

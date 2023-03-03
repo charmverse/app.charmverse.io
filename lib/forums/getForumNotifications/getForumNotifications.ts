@@ -2,6 +2,8 @@ import type { Post, PostCategory, PostComment, Space, User } from '@prisma/clien
 
 import { prisma } from 'db';
 import type { TaskUser } from 'lib/discussion/interfaces';
+import { getPostCategories } from 'lib/forums/categories/getPostCategories';
+import { filterAccessiblePostCategories } from 'lib/permissions/forum/filterAccessiblePostCategories';
 import { timeAgo } from 'lib/utilities/dates';
 import { isTruthy } from 'lib/utilities/types';
 
@@ -72,12 +74,21 @@ export async function getForumNotifications(userId: string): Promise<ForumTasksG
   let posts: ForumNotificationsContext['posts'] = [];
 
   for (const spaceRole of spaceRoles) {
-    const latestDate = new Date(Math.max(lookback.getTime(), spaceRole.createdAt.getTime()));
+    const postCategories = await getPostCategories(spaceRole.space.id);
+    const visiblePostCategories = await filterAccessiblePostCategories({
+      postCategories,
+      userId
+    });
+
     const _posts = await prisma.post.findMany({
       where: {
         deletedAt: null,
+        // only get posts created after a user has joined the space
         createdAt: {
-          gt: latestDate
+          gt: spaceRole.createdAt
+        },
+        categoryId: {
+          in: visiblePostCategories.map((category) => category.id)
         }
       },
       include: {

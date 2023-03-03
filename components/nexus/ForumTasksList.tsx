@@ -107,23 +107,10 @@ export default function ForumTasksList({ tasks, error, mutateTasks }: Discussion
     async function main() {
       if (tasks?.forum && tasks.forum.unmarked.length !== 0) {
         await charmClient.tasks.markTasks(
-          tasks.forum.unmarked
-            .map((unmarkedComment) => {
-              if (unmarkedComment.commentId) {
-                return {
-                  id: unmarkedComment.commentId,
-                  type: 'post_comment' as NotificationType
-                };
-              } else if (unmarkedComment.mentionId) {
-                return {
-                  id: unmarkedComment.mentionId,
-                  type: 'mention' as NotificationType
-                };
-              }
-
-              return null;
-            })
-            .filter(isTruthy)
+          tasks.forum.unmarked.map((task) => ({
+            id: task.taskId,
+            type: 'forum' as NotificationType
+          }))
         );
       }
     }
