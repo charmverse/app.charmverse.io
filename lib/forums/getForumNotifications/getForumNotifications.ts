@@ -1,4 +1,4 @@
-import type { Post, PostComment, Space, User } from '@prisma/client';
+import type { Post, PostCategory, PostComment, Space, User } from '@prisma/client';
 
 import { prisma } from 'db';
 import type { TaskUser } from 'lib/discussion/interfaces';
@@ -12,6 +12,7 @@ import { getPostMentions } from './getPostMentions';
 
 export type ForumTask = {
   taskId: string;
+  taskType: 'forum_post' | 'post_mention' | 'post_comment' | 'post_comment_mention';
   spaceId: string;
   spaceDomain: string;
   spaceName: string;
@@ -32,7 +33,7 @@ export type ForumTasksGroup = {
 
 type SpaceRecord = Record<string, Pick<Space, 'name' | 'domain' | 'id'>>;
 
-export type ForumNotificationsQuery = {
+export type ForumNotificationsContext = {
   userId: string;
   spacesRecord: SpaceRecord;
   username: string;
@@ -53,39 +54,52 @@ const lookback = timeAgo({ months: 1 });
 
 export async function getForumNotifications(userId: string): Promise<ForumTasksGroup> {
   // Get the user's spaces, posts and comments from those spaces. TODO: we should only get comments created by the user first
-  const forumDataBySpace = await prisma.spaceRole.findMany({
+  const spaceRoles = await prisma.spaceRole.findMany({
     where: {
       userId
     },
     include: {
       space: {
-        include: {
-          posts: {
-            where: {
-              deletedAt: null
-            },
-            include: {
-              category: true,
-              comments: {
-                where: {
-                  deletedAt: null
-                },
-                select: {
-                  id: true,
-                  createdBy: true,
-                  content: true,
-                  parentId: true,
-                  postId: true,
-                  contentText: true,
-                  createdAt: true
-                }
-              }
-            }
-          }
+        select: {
+          id: true,
+          name: true,
+          domain: true
         }
       }
     }
   });
+
+  let posts: ForumNotificationsContext['posts'] = [];
+
+  for (const spaceRole of spaceRoles) {
+    const latestDate = new Date(Math.max(lookback.getTime(), spaceRole.createdAt.getTime()));
+    const _posts = await prisma.post.findMany({
+      where: {
+        deletedAt: null,
+        createdAt: {
+          gt: latestDate
+        }
+      },
+      include: {
+        category: true,
+        comments: {
+          where: {
+            deletedAt: null
+          },
+          select: {
+            id: true,
+            createdBy: true,
+            content: true,
+            parentId: true,
+            postId: true,
+            contentText: true,
+            createdAt: true
+          }
+        }
+      }
+    });
+    posts = [...posts, ..._posts];
+  }
 
   // Get the username of the user, its required when constructing the mention message text
   const user = await prisma.user.findUniqueOrThrow({
@@ -99,7 +113,7 @@ export async function getForumNotifications(userId: string): Promise<ForumTasksG
 
   const username = user.username;
 
-  const spaces = forumDataBySpace.map(({ space }) => space);
+  const spaces = spaceRoles.map(({ space }) => space);
 
   const spacesRecord = spaces.reduce<SpaceRecord>((acc, space) => {
     return {
@@ -115,7 +129,8 @@ export async function getForumNotifications(userId: string): Promise<ForumTasksG
       },
       userId,
       type: {
-        in: ['post_comment', 'mention']
+        // TODO: we only need to look for forum tasks once we pass the lookback, added Mar 3, 2023
+        in: ['post_comment', 'mention', 'forum']
       }
     },
     select: {
@@ -125,9 +140,8 @@ export async function getForumNotifications(userId: string): Promise<ForumTasksG
 
   // Get the marked comment/mention task ids (all the discussion type tasks that exist in the db)
   const notifiedTaskIds = new Set(notifications.map((notification) => notification.taskId));
-  const posts = spaces.flatMap((space) => space.posts);
 
-  const context: ForumNotificationsQuery = { userId, username, spacesRecord, posts };
+  const context: ForumNotificationsContext = { userId, username, spacesRecord, posts };
 
   const newPosts = await getNewPosts({ userId, posts, spacesRecord });
 

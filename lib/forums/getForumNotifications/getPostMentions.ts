@@ -1,7 +1,7 @@
 import { extractMentions } from 'lib/prosemirror/extractMentions';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
-import type { ForumNotificationsQuery, ForumNotifications } from './getForumNotifications';
+import type { ForumNotificationsContext, ForumNotifications } from './getForumNotifications';
 import { getPropertiesFromPost } from './utils';
 
 export function getPostMentions({
@@ -9,7 +9,7 @@ export function getPostMentions({
   username,
   spacesRecord,
   posts
-}: ForumNotificationsQuery): ForumNotifications {
+}: ForumNotificationsContext): ForumNotifications {
   const mentions: ForumNotifications['mentions'] = [];
   const discussionUserIds: string[] = [];
 
@@ -31,7 +31,8 @@ export function getPostMentions({
             postId: post.id,
             postPath: post.path,
             postTitle: post.title,
-            taskId: mention.id
+            taskId: mention.id,
+            taskType: 'post_mention'
           });
         }
       });

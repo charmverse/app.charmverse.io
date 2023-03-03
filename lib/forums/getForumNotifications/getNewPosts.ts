@@ -21,6 +21,7 @@ export async function getNewPosts({
     mentionId: null,
     commentText: '',
     userId: post.createdBy,
-    taskId: post.id
+    taskId: post.id,
+    taskType: 'forum_post'
   }));
 }

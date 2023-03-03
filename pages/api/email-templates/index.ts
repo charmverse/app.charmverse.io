@@ -63,6 +63,8 @@ const createForumTask = ({
   return {
     spaceId: v4(),
     spaceDomain: randomName(),
+    taskId: v4(),
+    taskType: 'forum_post',
     spaceName,
     postId: v4(),
     postTitle,
