@@ -35,10 +35,10 @@ import { memo, useMemo, useRef, useState } from 'react';
 import charmClient from 'charmClient';
 import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
 import { undoEventName } from 'components/common/CharmEditor/utils';
+import { DuplicatePageAction } from 'components/common/DuplicatePageAction';
 import { usePostByPath } from 'components/forum/hooks/usePostByPath';
 import { useProposalCategories } from 'components/proposals/hooks/useProposalCategories';
 import { useColorMode } from 'context/darkMode';
-import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useMembers } from 'hooks/useMembers';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
@@ -247,7 +247,7 @@ function PostHeader({
       >
         <div>
           <ListItemButton
-            data-test='forum-post-convert-proposal-action'
+            data-test='convert-proposal-action'
             onClick={() => forumPostInfo.forumPost && convertToProposal(forumPostInfo.forumPost.id)}
             disabled={!canCreateProposal || !!forumPostInfo.forumPost?.proposalId}
           >
@@ -285,11 +285,9 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
   const { isFavorite, toggleFavorite } = useToggleFavorite({ pageId: basePage?.id });
   const { members } = useMembers();
   const { setCurrentPageActionDisplay } = usePageActionDisplay();
-  const [userSpacePermissions] = useCurrentSpacePermissions();
   const { permissions: pagePermissions } = usePagePermissions({
     pageIdOrPath: basePage ? basePage.id : (null as any)
   });
-
   const { onClick: clickToOpenSettingsModal } = useSettingsDialog();
   const isForumPost = router.route === '/[domain]/forum/post/[pagePath]';
 
@@ -383,11 +381,12 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
   }
 
   async function convertToProposal(pageId: string) {
-    await charmClient.pages.convertToProposal({
+    const convertedProposal = await charmClient.pages.convertToProposal({
       categoryId: getDefaultCreateCategory().id,
       pageId
     });
     closeMenu();
+    router.push(`/${router.query.domain}/${convertedProposal.path}`);
   }
 
   const documentOptions = (
@@ -442,6 +441,9 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
           <ListItemText primary={isFavorite ? 'Remove from Favorites' : 'Add to Favorites'} />
         </ListItemButton>
       )}
+      {basePage && (
+        <DuplicatePageAction postDuplication={closeMenu} page={basePage} pagePermissions={pagePermissions} />
+      )}
       <CopyLinkMenuItem closeMenu={closeMenu} />
 
       <Divider />
@@ -449,7 +451,11 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
         <>
           <Tooltip title={!canCreateProposal ? 'You do not have the permission to convert to proposal' : ''}>
             <div>
-              <ListItemButton onClick={() => convertToProposal(basePage.id)} disabled={!canCreateProposal}>
+              <ListItemButton
+                data-test='convert-proposal-action'
+                onClick={() => convertToProposal(basePage.id)}
+                disabled={!canCreateProposal || !!basePage.convertedProposalId}
+              >
                 <TaskOutlinedIcon
                   fontSize='small'
                   sx={{

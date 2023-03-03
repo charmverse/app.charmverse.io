@@ -192,7 +192,7 @@ beforeAll(async () => {
   privateDraftProposal = (await prisma.proposal.create({
     data: {
       createdBy: proposalAuthor.id,
-      status: 'private_draft',
+      status: 'draft',
       space: { connect: { id: space.id } },
       page: {
         create: {

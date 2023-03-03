@@ -22,6 +22,7 @@ import charmClient from 'charmClient';
 import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import EmojiPicker from 'components/common/BoardEditor/focalboard/src/widgets/emojiPicker';
+import { DuplicatePageAction } from 'components/common/DuplicatePageAction';
 import TreeItemContent from 'components/common/TreeItemContent';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { usePageFromPath } from 'hooks/usePageFromPath';
@@ -283,12 +284,6 @@ const TreeItemComponent = React.forwardRef<React.Ref<HTMLDivElement>, TreeItemCo
   )
 );
 
-const PageMenuItem = styled(ListItemButton)`
-  .MuiTypography-root {
-    font-weight: 600;
-  }
-`;
-
 // eslint-disable-next-line react/function-component-definition
 const PageTreeItem = forwardRef<any, PageTreeItemProps>((props, ref) => {
   const {
@@ -392,14 +387,13 @@ function PageActionsMenu({ closeMenu, pageId, pagePath }: { closeMenu: () => voi
   const { showMessage } = useSnackbar();
   const { permissions: pagePermissions } = usePagePermissions({ pageIdOrPath: pageId });
   const router = useRouter();
-
   const deletePageDisabled = !pagePermissions?.delete;
+  const page = pages[pageId];
 
   async function deletePageWithBoard() {
     if (deletePageDisabled) {
       return;
     }
-    const page = pages[pageId];
     const board = boards.find((b) => b.id === page?.id);
     const newPage = await deletePage({
       board,
@@ -428,21 +422,22 @@ function PageActionsMenu({ closeMenu, pageId, pagePath }: { closeMenu: () => voi
     <>
       <Tooltip arrow placement='top' title={deletePageDisabled ? 'You do not have permission to delete this page' : ''}>
         <div>
-          <PageMenuItem dense disabled={deletePageDisabled} onClick={deletePageWithBoard}>
+          <ListItemButton dense disabled={deletePageDisabled} onClick={deletePageWithBoard}>
             <ListItemIcon>
               <DeleteOutlinedIcon />
             </ListItemIcon>
             <ListItemText>Delete</ListItemText>
-          </PageMenuItem>
+          </ListItemButton>
         </div>
       </Tooltip>
+      {page && <DuplicatePageAction page={page} pagePermissions={pagePermissions} />}
       <CopyToClipboard text={getAbsolutePath()} onCopy={() => onCopy()}>
-        <PageMenuItem dense>
+        <ListItemButton dense>
           <ListItemIcon>
             <ContentCopyIcon fontSize='small' />
           </ListItemIcon>
           <ListItemText>Copy link</ListItemText>
-        </PageMenuItem>
+        </ListItemButton>
       </CopyToClipboard>
     </>
   );

@@ -42,6 +42,7 @@ export interface TokenGateVerification {
   tokens: (Pick<TokenGateJwt, 'signedToken'> & { tokenGateId: string })[];
   commit: boolean;
   joinType?: TokenGateJoinType;
+  reevaluate?: boolean;
 }
 
 export interface TokenGateVerificationResult {

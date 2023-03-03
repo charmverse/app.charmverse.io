@@ -2,9 +2,8 @@ import { test as base, expect } from '@playwright/test';
 import type { Bounty, Space, User } from '@prisma/client';
 import { BountyBoardPage } from '__e2e__/po/bountyBoard.po';
 import { BountyPage } from '__e2e__/po/bountyPage.po';
-import type { ForumPostPage } from '__e2e__/po/forumPost.po';
 import type { PageHeader } from '__e2e__/po/pageHeader.po';
-import { createUser, createUserAndSpace, generateSpaceRole, generateUserAndSpace } from '__e2e__/utils/mocks';
+import { createUser, createUserAndSpace, generateSpaceRole } from '__e2e__/utils/mocks';
 import { login } from '__e2e__/utils/session';
 
 import { prisma } from 'db';
@@ -83,7 +82,7 @@ test.describe.serial('Create and Edit Bounty', () => {
     await expect(bountyPage.bountyHeaderAmount).toHaveText(newBountyAmount);
   });
 
-  test('space member can view and apply to the bounty', async ({ bountyBoardPage, bountyPage, page }) => {
+  test('space member can view and apply to the bounty', async ({ page, bountyBoardPage, bountyPage }) => {
     const user = await createUser({
       address: randomETHWalletAddress(),
       browserPage: page

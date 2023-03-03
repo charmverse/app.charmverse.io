@@ -9,6 +9,7 @@ import { memo, useEffect, useState } from 'react';
 import { useElementSize } from 'usehooks-ts';
 
 import charmClient from 'charmClient';
+import { PageComments } from 'components/[pageId]/Comments/PageComments';
 import AddBountyButton from 'components/common/BoardEditor/focalboard/src/components/cardDetail/AddBountyButton';
 import CardDetailProperties from 'components/common/BoardEditor/focalboard/src/components/cardDetail/cardDetailProperties';
 import CommentsList from 'components/common/BoardEditor/focalboard/src/components/cardDetail/commentsList';
@@ -18,6 +19,7 @@ import type { FrontendParticipant } from 'components/common/CharmEditor/componen
 import { SnapshotVoteDetails } from 'components/common/CharmEditor/components/inlineVote/components/SnapshotVoteDetails';
 import { VoteDetail } from 'components/common/CharmEditor/components/inlineVote/components/VoteDetail';
 import ScrollableWindow from 'components/common/PageLayout/components/ScrollableWindow';
+import { ProposalBanner } from 'components/common/ProposalBanner';
 import { useProposalPermissions } from 'components/proposals/hooks/useProposalPermissions';
 import { useBounties } from 'hooks/useBounties';
 import { useCharmEditor } from 'hooks/useCharmEditor';
@@ -125,13 +127,6 @@ function DocumentPage({ page, setPage, insideModal, readOnly = false }: Document
 
   const pageVote = Object.values(votes).find((v) => v.context === 'proposal');
 
-  // const cards = useAppSelector((state) => {
-  //   return board
-  //     ? [...Object.values(state.cards.cards), ...Object.values(state.cards.templates)].filter(
-  //         (card) => card.parentId === board.id
-  //       )
-  //     : [];
-  // });
   const card = useAppSelector((state) => {
     if (page.cardId) {
       return state.cards.cards[page.cardId] ?? state.cards.templates[page.cardId] ?? null;
@@ -187,6 +182,7 @@ function DocumentPage({ page, setPage, insideModal, readOnly = false }: Document
           <PageDeleteBanner pageId={page.id} />
         </StyledBannerContainer>
       )}
+      {page?.convertedProposalId && <ProposalBanner type='page' proposalId={page.convertedProposalId} />}
       <ScrollableWindow
         sx={{
           overflow: {
@@ -205,7 +201,11 @@ function DocumentPage({ page, setPage, insideModal, readOnly = false }: Document
                 setPage={setPage}
               />
             )}
-            <Container top={pageTop} fullWidth={isSmallScreen || (page.fullWidth ?? false)}>
+            <Container
+              data-test='page-charmeditor'
+              top={pageTop}
+              fullWidth={isSmallScreen || (page.fullWidth ?? false)}
+            >
               <CharmEditor
                 placeholderText={
                   page.type === 'bounty' || page.type === 'bounty_template'
@@ -226,6 +226,9 @@ function DocumentPage({ page, setPage, insideModal, readOnly = false }: Document
                 pageType={page.type}
                 pagePermissions={pagePermissions ?? undefined}
                 onParticipantUpdate={onParticipantUpdate}
+                style={{
+                  minHeight: proposalId ? '100px' : 'unset'
+                }}
                 disableNestedPages={page?.type === 'proposal' || page?.type === 'proposal_template'}
               >
                 {/* temporary? disable editing of page title when in suggestion mode */}
@@ -303,6 +306,8 @@ function DocumentPage({ page, setPage, insideModal, readOnly = false }: Document
                   </div>
                 </div>
               </CharmEditor>
+
+              {proposalId && <PageComments page={page} />}
             </Container>
           </div>
         </ScrollContainer>

@@ -9,7 +9,7 @@ import { usePages } from 'hooks/usePages';
 import type { BountyWithDetails } from 'lib/bounties';
 import type { PageMeta } from 'lib/pages';
 
-import BountyCard from './BountyCard';
+import BountyKanbanCard from './BountyKanbanCard';
 import { BountyStatusChip } from './BountyStatusBadge';
 
 const bountyStatuses: BountyStatus[] = ['open', 'inProgress', 'complete', 'paid', 'suggestion'];
@@ -68,7 +68,6 @@ export default function BountiesKanbanView({ bounties, publicMode }: Props) {
   return (
     <div className='Kanban'>
       {/* include ViewHeader to include the horizontal line */}
-      <div className='ViewHeader' />
       <div className='octo-board-header'>
         {bountyStatuses.map((bountyStatus) => (
           <Box className='octo-board-header-cell' key={bountyStatus}>
@@ -85,7 +84,10 @@ export default function BountiesKanbanView({ bounties, publicMode }: Props) {
             {bountiesGroupedByStatus[bountyStatus]
               .filter((bounty) => Boolean(pages[bounty.page?.id]) && pages[bounty.page.id]?.deletedAt === null)
               .map((bounty) => (
-                <BountyCard
+                <BountyKanbanCard
+                  onDuplicate={(duplicatePageResponse) => {
+                    setBounties((_bounties) => [..._bounties, ...duplicatePageResponse.bounties]);
+                  }}
                   onDelete={onClickDelete}
                   readOnly={!!publicMode}
                   key={bounty.id}

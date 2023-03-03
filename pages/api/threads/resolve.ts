@@ -18,9 +18,8 @@ async function resolveThreads(req: NextApiRequest, res: NextApiResponse) {
   const userId = req.session.user.id;
 
   const permissionSet = await computeUserPagePermissions({
-    pageId,
-    userId,
-    allowAdminBypass: false
+    resourceId: pageId,
+    userId
   });
 
   if (!permissionSet.comment) {

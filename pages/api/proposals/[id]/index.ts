@@ -38,7 +38,7 @@ async function getProposalController(req: NextApiRequest, res: NextApiResponse<P
 
   const computed = await computeUserPagePermissions({
     // Proposal id is the same as page
-    pageId: proposal?.id,
+    resourceId: proposal?.id,
     userId
   });
 
@@ -88,7 +88,7 @@ async function updateProposalController(req: NextApiRequest, res: NextApiRespons
   if (proposal.page?.type === 'proposal_template' && !isAdmin) {
     throw new AdministratorOnlyError();
   }
-  // A proposal can only be updated when its in private_draft, draft or discussion status and only the proposal author can update it
+  // A proposal can only be updated when its in draft or discussion status and only the proposal author can update it
   const proposalPermissions = await computeProposalPermissions({
     resourceId: proposal.id,
     userId

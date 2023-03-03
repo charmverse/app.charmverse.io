@@ -142,7 +142,7 @@ async function listProposals(req: NextApiRequest, res: NextApiResponse<PublicApi
       where: {
         spaceId: req.authorizedSpaceId,
         status: {
-          notIn: ['draft', 'private_draft']
+          not: 'draft'
         }
       },
       select: {

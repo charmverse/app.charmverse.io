@@ -70,7 +70,9 @@ export default function TokenGates({ isAdmin, spaceId, popupState }: TokenGatesP
   const { walletAuthSignature, sign } = useWeb3AuthSig();
   const errorPopupState = usePopupState({ variant: 'popover', popupId: 'token-gate-error' });
   const [apiError, setApiError] = useState<string>('');
-  const { data = [], mutate } = useSWR(`tokenGates/${spaceId}`, () => charmClient.getTokenGates({ spaceId }));
+  const { data = [], mutate } = useSWR(`tokenGates/${spaceId}`, () =>
+    charmClient.tokenGates.getTokenGates({ spaceId })
+  );
 
   const { isOpen: isOpenTokenGateModal, close: closeTokenGateModal } = popupState;
 
@@ -115,7 +117,7 @@ export default function TokenGates({ isAdmin, spaceId, popupState }: TokenGatesP
       authSig,
       resourceId
     });
-    await charmClient.saveTokenGate({
+    await charmClient.tokenGates.saveTokenGate({
       conditions: conditions as any,
       resourceId,
       spaceId,
@@ -152,7 +154,7 @@ export default function TokenGates({ isAdmin, spaceId, popupState }: TokenGatesP
           buttonText='Delete token gate'
           question='Are you sure you want to delete this invite link?'
           onConfirm={async () => {
-            await charmClient.deleteTokenGate(removedTokenGate.id);
+            await charmClient.tokenGates.deleteTokenGate(removedTokenGate.id);
             // update the list of links
             await mutate();
             setRemovedTokenGate(null);

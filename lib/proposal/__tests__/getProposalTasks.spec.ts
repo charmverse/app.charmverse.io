@@ -60,7 +60,7 @@ describe('getProposalTasks', () => {
     });
 
     await generateProposal({
-      proposalStatus: 'private_draft',
+      proposalStatus: 'draft',
       spaceId: space.id,
       authors: [user.id],
       reviewers: [],
@@ -179,7 +179,7 @@ describe('getProposalTasks', () => {
 
     // This shouldn't be fetched as its private draft
     await generateProposal({
-      proposalStatus: 'private_draft',
+      proposalStatus: 'draft',
       spaceId: space.id,
       authors: [user.id],
       reviewers: [],
@@ -268,7 +268,7 @@ describe('getProposalTasks', () => {
     expect(proposalTasks.unmarked).toEqual(
       expect.not.arrayContaining([
         expect.objectContaining({
-          status: 'private_draft'
+          status: 'draft'
         })
       ])
     );

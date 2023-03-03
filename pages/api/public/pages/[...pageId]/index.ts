@@ -180,7 +180,7 @@ async function getPublicPage(req: NextApiRequest, res: NextApiResponse<PublicPag
   }
 
   const computed = await computeUserPagePermissions({
-    pageId: page.id
+    resourceId: page.id
   });
 
   if (computed.read !== true && page.type !== 'bounty') {

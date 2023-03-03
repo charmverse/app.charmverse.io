@@ -147,10 +147,10 @@ describe('exportWorkspacePages', () => {
     expect(data.pages[0].id).toBe(returnedPage.id);
   });
 
-  it('should ignore bounties', async () => {
+  it('should not ignore bounties', async () => {
     const { space: spaceWithDeletedPage, user: _user } = await generateUserAndSpaceWithApiToken();
 
-    await createBounty({
+    const bounty = await createBounty({
       createdBy: _user.id,
       spaceId: spaceWithDeletedPage.id
     });
@@ -167,14 +167,17 @@ describe('exportWorkspacePages', () => {
       sourceSpaceIdOrDomain: spaceWithDeletedPage.id
     });
 
-    expect(data.pages.length).toBe(1);
-    expect(data.pages[0].id).toBe(returnedPage.id);
+    const pageIds = [bounty.id, returnedPage.id];
+
+    expect(data.pages.length).toBe(2);
+    expect(pageIds.includes(data.pages[0].id)).toBeTruthy();
+    expect(pageIds.includes(data.pages[1].id)).toBeTruthy();
   });
 
-  it('should ignore proposals', async () => {
+  it('should not ignore proposals', async () => {
     const { space: spaceWithDeletedPage, user: _user } = await generateUserAndSpaceWithApiToken();
 
-    await generateProposal({
+    const generatedProposal = await generateProposal({
       authors: [_user.id],
       spaceId: spaceWithDeletedPage.id,
       proposalStatus: 'discussion',
@@ -194,8 +197,10 @@ describe('exportWorkspacePages', () => {
       sourceSpaceIdOrDomain: spaceWithDeletedPage.id
     });
 
-    expect(data.pages.length).toBe(1);
-    expect(data.pages[0].id).toBe(returnedPage.id);
+    const pageIds = [generatedProposal.id, returnedPage.id];
+    expect(data.pages.length).toBe(2);
+    expect(pageIds.includes(data.pages[0].id)).toBeTruthy();
+    expect(pageIds.includes(data.pages[1].id)).toBeTruthy();
   });
 
   it('should write the export to the given filename if provided', async () => {

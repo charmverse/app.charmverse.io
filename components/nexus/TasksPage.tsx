@@ -176,7 +176,7 @@ export default function TasksPage() {
         <GnosisTasksList error={gnosisTasksServerError} mutateTasks={mutateGnosisTasks} tasks={gnosisTasks} />
       )}
       {currentTaskType === 'discussion' && (
-        <DiscussionTasksList mutateTasks={mutateTasks} error={error} tasks={tasks} />
+        <DiscussionTasksList skippedDiscussions={['bounty']} mutateTasks={mutateTasks} error={error} tasks={tasks} />
       )}
       {currentTaskType === 'vote' && <VoteTasksList mutateTasks={mutateTasks} error={error} tasks={tasks} />}
       {currentTaskType === 'proposal' && <ProposalTasksList error={error} tasks={tasks} mutateTasks={mutateTasks} />}

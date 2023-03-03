@@ -11,6 +11,7 @@ import { useRouter } from 'next/router';
 import { useState } from 'react';
 
 import charmClient from 'charmClient';
+import { CommentVote } from 'components/common/comments/CommentVote';
 import UserDisplay from 'components/common/UserDisplay';
 import { usePostDialog } from 'components/forum/components/PostDialog/hooks/usePostDialog';
 import { usePostPermissions } from 'components/forum/hooks/usePostPermissions';
@@ -20,8 +21,6 @@ import type { Member } from 'lib/members/interfaces';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
 import { getRelativeTimeInThePast } from 'lib/utilities/dates';
 import { fancyTrim } from 'lib/utilities/strings';
-
-import { ForumVote } from '../../ForumVote';
 
 import { PostSummary } from './PostSummary';
 
@@ -129,7 +128,7 @@ export function PostCard({ post, user, category }: ForumPostProps) {
                 <Typography variant='body2'>{totalComments}</Typography>
               </Stack>
             </Stack>
-            <ForumVote permissions={permissions} onVote={voteOnPost} votes={pagePost.votes} />
+            <CommentVote permissions={permissions} onVote={voteOnPost} votes={pagePost.votes} />
           </Box>
         </CardContent>
       </CardActionArea>

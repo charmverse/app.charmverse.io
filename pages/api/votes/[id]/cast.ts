@@ -58,7 +58,7 @@ async function castVote(req: NextApiRequest, res: NextApiResponse<UserVote | { e
     }
   } else {
     const permissions = await computeUserPagePermissions({
-      pageId: vote.pageId,
+      resourceId: vote.pageId,
       userId
     });
     if (!permissions.comment) {

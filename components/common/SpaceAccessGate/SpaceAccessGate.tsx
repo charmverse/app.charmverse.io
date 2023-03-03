@@ -72,16 +72,20 @@ export function SpaceAccessGate({
   }
 
   function joinSpace() {
-    if (summonGate.verifyResult?.isVerified) {
+    if (summonGate.isVerified) {
       summonGate.joinSpace();
+    } else if (tokenGate.isVerified) {
+      tokenGate.joinSpace();
+    } else if (discordGate.isVerified) {
+      discordGate.joinSpace();
     } else {
       showMessage('You are not eligible to join this space', 'error');
     }
   }
 
   const walletGateEnabled = summonGate.isEnabled || tokenGate.isEnabled;
-  const isVerified = summonGate.isVerified || tokenGate.isVerified;
-  const isJoiningSpace = summonGate.joiningSpace || tokenGate.joiningSpace;
+  const isVerified = summonGate.isVerified || tokenGate.isVerified || discordGate.isVerified;
+  const isJoiningSpace = summonGate.joiningSpace || tokenGate.joiningSpace || discordGate.joiningSpace;
 
   const noGateConditions = !discordGate.isEnabled && !summonGate.isEnabled && !tokenGate.isEnabled;
 
@@ -115,7 +119,13 @@ export function SpaceAccessGate({
 
       {isVerified && (
         <Box mb={2}>
-          <PrimaryButton fullWidth loading={isJoiningSpace} disabled={isJoiningSpace} onClick={joinSpace}>
+          <PrimaryButton
+            data-test='join-space-button'
+            fullWidth
+            loading={isJoiningSpace}
+            disabled={isJoiningSpace}
+            onClick={joinSpace}
+          >
             Join Space
           </PrimaryButton>
         </Box>
@@ -130,7 +140,8 @@ export function SpaceAccessGate({
           />
         </Box>
       )}
-      {tokenGate.tokenGateResult &&
+      {walletGateEnabled &&
+        tokenGate.tokenGateResult &&
         (!tokenGate.isVerified && !summonGate.isVerified ? (
           <Alert severity='warning' data-test='token-gate-failure-alert'>
             Your wallet does not meet any of the conditions to access this space. You can try with another wallet.
