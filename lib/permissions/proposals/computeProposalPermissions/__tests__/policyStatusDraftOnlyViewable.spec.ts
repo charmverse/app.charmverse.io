@@ -6,7 +6,7 @@ import { generateProposal, generateProposalCategory } from 'testing/utils/propos
 
 import { AvailableProposalPermissions } from '../../availableProposalPermissions.class';
 import type { AvailableProposalPermissionFlags } from '../../interfaces';
-import { pfpStatusDraftOnlyViewable } from '../pfpStatusDraftOnlyViewable';
+import { policyStatusDraftOnlyViewable } from '../policyStatusDraftOnlyViewable';
 
 let proposal: ProposalWithUsers;
 let proposalCategory: ProposalCategory;
@@ -48,9 +48,9 @@ beforeAll(async () => {
 
 const fullPermissions = new AvailableProposalPermissions().full;
 
-describe('pfpStatusDraftOnlyViewable', () => {
+describe('policyStatusDraftOnlyViewable', () => {
   it('should perform a no-op if the status is not draft', async () => {
-    const permissions = await pfpStatusDraftOnlyViewable({
+    const permissions = await policyStatusDraftOnlyViewable({
       flags: fullPermissions,
       isAdmin: false,
       resource: { ...proposal, status: 'discussion' },
@@ -68,7 +68,7 @@ describe('pfpStatusDraftOnlyViewable', () => {
     });
   });
   it('should allow the author to view, edit, comment, delete', async () => {
-    const permissions = await pfpStatusDraftOnlyViewable({
+    const permissions = await policyStatusDraftOnlyViewable({
       flags: fullPermissions,
       isAdmin: false,
       resource: proposal,
@@ -87,7 +87,7 @@ describe('pfpStatusDraftOnlyViewable', () => {
   });
 
   it('should return same level of permissions as the author for an admin', async () => {
-    const permissions = await pfpStatusDraftOnlyViewable({
+    const permissions = await policyStatusDraftOnlyViewable({
       flags: fullPermissions,
       isAdmin: true,
       resource: proposal,
@@ -106,7 +106,7 @@ describe('pfpStatusDraftOnlyViewable', () => {
   });
 
   it('should only provide view permissions for the reviewer', async () => {
-    const permissions = await pfpStatusDraftOnlyViewable({
+    const permissions = await policyStatusDraftOnlyViewable({
       flags: fullPermissions,
       isAdmin: false,
       resource: proposal,
@@ -125,7 +125,7 @@ describe('pfpStatusDraftOnlyViewable', () => {
   });
 
   it('should return only view permissions for the space members', async () => {
-    const permissions = await pfpStatusDraftOnlyViewable({
+    const permissions = await policyStatusDraftOnlyViewable({
       flags: fullPermissions,
       isAdmin: false,
       resource: proposal,

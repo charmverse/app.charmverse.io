@@ -1,6 +1,5 @@
 import type { ProposalOperation } from '@prisma/client';
 
-import { prisma } from 'db';
 import { isProposalAuthor } from 'lib/proposal/isProposalAuthor';
 import { isProposalReviewer } from 'lib/proposal/isProposalReviewer';
 import { typedKeys } from 'lib/utilities/objects';
@@ -8,18 +7,18 @@ import { typedKeys } from 'lib/utilities/objects';
 import { AvailableProposalPermissions } from '../availableProposalPermissions.class';
 import type { AvailableProposalPermissionFlags } from '../interfaces';
 
-import type { ProposalPfpInput } from './interfaces';
+import type { ProposalPolicyInput } from './interfaces';
 
 const allowedAuthorOperations: ProposalOperation[] = ['view', 'comment', 'delete'];
 const allowedReviewerOperations: ProposalOperation[] = ['view', 'comment', 'review'];
 const allowedAdminOperations: ProposalOperation[] = ['view', 'comment', 'delete', 'review', 'edit'];
 
-export async function pfpStatusReviewCommentable({
+export async function policyStatusReviewCommentable({
   resource,
   flags,
   userId,
   isAdmin
-}: ProposalPfpInput): Promise<AvailableProposalPermissionFlags> {
+}: ProposalPolicyInput): Promise<AvailableProposalPermissionFlags> {
   const newPermissions = { ...flags };
 
   if (resource.status !== 'review') {

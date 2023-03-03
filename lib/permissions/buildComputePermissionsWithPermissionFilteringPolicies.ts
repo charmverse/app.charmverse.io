@@ -22,12 +22,12 @@ export type PermissionFilteringPolicyFnInput<R, F> = {
 export type PermissionFilteringPolicyFn<R, F> = (input: PermissionFilteringPolicyFnInput<R, F>) => F | Promise<F>;
 
 /**
- * @pfps - permission filtering policy functions - each should be a pure function that returns a fresh set of flags rather than mutating the original flags
+ * @policies - permission filtering policy functions - each should be a pure function that returns a fresh set of flags rather than mutating the original flags
  */
-type PfpBuilderInput<R, F> = {
+type PolicyBuilderInput<R, F> = {
   resolver: (input: { resourceId: string }) => Promise<R | null>;
   computeFn: (input: PermissionCompute) => Promise<F>;
-  pfps: PermissionFilteringPolicyFn<R, F>[];
+  policies: PermissionFilteringPolicyFn<R, F>[];
 };
 
 /**
@@ -37,8 +37,8 @@ type PfpBuilderInput<R, F> = {
 export function buildComputePermissionsWithPermissionFilteringPolicies<R, F>({
   computeFn,
   resolver,
-  pfps
-}: PfpBuilderInput<R, F>): PermissionComputeFn<F> {
+  policies
+}: PolicyBuilderInput<R, F>): PermissionComputeFn<F> {
   return async (request: PermissionCompute): Promise<F> => {
     const flags = await computeFn(request);
     const resource = await resolver({ resourceId: request.resourceId });
@@ -46,7 +46,7 @@ export function buildComputePermissionsWithPermissionFilteringPolicies<R, F>({
       throw new DataNotFoundError(`Could not find resource with ID ${request.resourceId}`);
     }
 
-    // After each PFP run, we assign the new set of flag to this variable. Flags should never become true after being false as the compute function assigns the max permissions available
+    // After each policy run, we assign the new set of flag to this variable. Flags should never become true after being false as the compute function assigns the max permissions available
     let applicableFlags = flags;
 
     // If the resource has a spaceId, we can auto resolve admin status
@@ -61,23 +61,23 @@ export function buildComputePermissionsWithPermissionFilteringPolicies<R, F>({
       ).isAdmin;
     }
 
-    for (const pfp of pfps) {
+    for (const policy of policies) {
       let hasTrueFlag = false;
 
-      const newFlags = await pfp({
+      const newFlags = await policy({
         flags: applicableFlags,
         resource,
         userId: request.userId,
         isAdmin: isAdminStatus
       } as PermissionFilteringPolicyFnInput<R & ResourceWithSpaceId, F>);
-      // Check the PFP did not add any new flags as true
+      // Check the policy did not add any new flags as true
       // eslint-disable-next-line no-loop-func
       typedKeys(newFlags).forEach((key) => {
         const flagValue = newFlags[key];
 
-        // Adding true and not true just in case a PFP returns a nullish value instead of false
+        // Adding true and not true just in case a policy returns a nullish value instead of false
         if (flagValue === true && applicableFlags[key] !== true) {
-          // Prevent any PFP from adding new flags
+          // Prevent any policy from adding new flags
           newFlags[key] = false as any;
         }
 
@@ -88,7 +88,7 @@ export function buildComputePermissionsWithPermissionFilteringPolicies<R, F>({
 
       applicableFlags = newFlags;
 
-      // Perform an early return if a PFP results in fully empty permissions
+      // Perform an early return if a policy results in fully empty permissions
       if (!hasTrueFlag) {
         return applicableFlags;
       }

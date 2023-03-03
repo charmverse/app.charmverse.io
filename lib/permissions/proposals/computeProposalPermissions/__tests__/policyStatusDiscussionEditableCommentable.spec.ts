@@ -6,7 +6,7 @@ import { generateProposal, generateProposalCategory } from 'testing/utils/propos
 
 import { AvailableProposalPermissions } from '../../availableProposalPermissions.class';
 import type { AvailableProposalPermissionFlags } from '../../interfaces';
-import { pfpStatusPrivateDraftVisibleOnlyByAuthor } from '../pfpStatusPrivateDraftVisibleOnlyByAuthor';
+import { policyStatusDiscussionEditableCommentable } from '../policyStatusDiscussionEditableCommentable';
 
 let proposal: ProposalWithUsers;
 let proposalCategory: ProposalCategory;
@@ -34,7 +34,7 @@ beforeAll(async () => {
   proposal = await generateProposal({
     categoryId: proposalCategory.id,
     authors: [proposalAuthor.id],
-    proposalStatus: 'private_draft',
+    proposalStatus: 'discussion',
     spaceId: space.id,
     userId: proposalAuthor.id,
     reviewers: [
@@ -48,12 +48,12 @@ beforeAll(async () => {
 
 const fullPermissions = new AvailableProposalPermissions().full;
 
-describe('pfpStatusPrivateDraftVisibleOnlyByAuthor', () => {
-  it('should perform a no-op if the status is not private_draft', async () => {
-    const permissions = await pfpStatusPrivateDraftVisibleOnlyByAuthor({
+describe('policyStatusDiscussionEditableCommentable', () => {
+  it('should perform a no-op if the status is not discussion', async () => {
+    const permissions = await policyStatusDiscussionEditableCommentable({
       flags: fullPermissions,
       isAdmin: false,
-      resource: { ...proposal, status: 'discussion' },
+      resource: { ...proposal, status: 'private_draft' },
       userId: proposalAuthor.id
     });
 
@@ -67,8 +67,9 @@ describe('pfpStatusPrivateDraftVisibleOnlyByAuthor', () => {
       vote: true
     });
   });
+
   it('should allow the author to view, edit, comment, delete', async () => {
-    const permissions = await pfpStatusPrivateDraftVisibleOnlyByAuthor({
+    const permissions = await policyStatusDiscussionEditableCommentable({
       flags: fullPermissions,
       isAdmin: false,
       resource: proposal,
@@ -87,7 +88,7 @@ describe('pfpStatusPrivateDraftVisibleOnlyByAuthor', () => {
   });
 
   it('should return same level of permissions as the author for an admin', async () => {
-    const permissions = await pfpStatusPrivateDraftVisibleOnlyByAuthor({
+    const permissions = await policyStatusDiscussionEditableCommentable({
       flags: fullPermissions,
       isAdmin: true,
       resource: proposal,
@@ -105,8 +106,8 @@ describe('pfpStatusPrivateDraftVisibleOnlyByAuthor', () => {
     });
   });
 
-  it('should return empty permissions for the reviewer', async () => {
-    const permissions = await pfpStatusPrivateDraftVisibleOnlyByAuthor({
+  it('should only provide view and comment permissions for the reviewer', async () => {
+    const permissions = await policyStatusDiscussionEditableCommentable({
       flags: fullPermissions,
       isAdmin: false,
       resource: proposal,
@@ -114,18 +115,18 @@ describe('pfpStatusPrivateDraftVisibleOnlyByAuthor', () => {
     });
 
     expect(permissions).toMatchObject<AvailableProposalPermissionFlags>({
-      view: false,
+      view: true,
+      comment: true,
       edit: false,
       delete: false,
-      comment: false,
       create_vote: false,
       review: false,
       vote: false
     });
   });
 
-  it('should return empty permissions for the space members', async () => {
-    const permissions = await pfpStatusPrivateDraftVisibleOnlyByAuthor({
+  it('should return only view and comment permissions for the space members', async () => {
+    const permissions = await policyStatusDiscussionEditableCommentable({
       flags: fullPermissions,
       isAdmin: false,
       resource: proposal,
@@ -133,10 +134,10 @@ describe('pfpStatusPrivateDraftVisibleOnlyByAuthor', () => {
     });
 
     expect(permissions).toMatchObject<AvailableProposalPermissionFlags>({
-      view: false,
+      view: true,
+      comment: true,
       edit: false,
       delete: false,
-      comment: false,
       create_vote: false,
       review: false,
       vote: false
