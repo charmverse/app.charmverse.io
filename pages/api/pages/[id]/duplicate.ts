@@ -28,7 +28,7 @@ async function duplicatePageRoute(req: NextApiRequest, res: NextApiResponse<Dupl
   }
 
   const duplicatePageResponse = await duplicatePage({ pageId, parentId });
-  const { pages } = duplicatePageResponse;
+  const { pages, rootPageIds } = duplicatePageResponse;
   await Promise.all(pages.map((page) => updateTrackPageProfile(page.id)));
 
   const pagesMap: Record<string, PageMeta> = {};
@@ -36,12 +36,13 @@ async function duplicatePageRoute(req: NextApiRequest, res: NextApiResponse<Dupl
     pagesMap[_pageId] = page;
   });
 
-  const page = pagesMap[pageId];
+  const rootPageId = rootPageIds[0];
+  const page = pagesMap[rootPageId];
   if (page) {
     trackUserAction('duplicate_page', {
       userId,
       spaceId: page.spaceId,
-      pageId,
+      pageId: page.id,
       type: page.type
     });
   }

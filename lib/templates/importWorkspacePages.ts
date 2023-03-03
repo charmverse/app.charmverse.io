@@ -14,7 +14,6 @@ import type { PageContent, TextContent, TextMark } from 'lib/prosemirror/interfa
 import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
 import { typedKeys } from 'lib/utilities/objects';
 
-import { exportWorkspacePages } from './exportWorkspacePages';
 import type { ExportedPage, WorkspaceExport, WorkspaceImport } from './interfaces';
 
 interface UpdateRefs {
@@ -324,6 +323,7 @@ export async function generateImportWorkspacePages({
         });
       });
     } else if (node.type === 'proposal' && node.proposal) {
+      // TODO: Handle cross space reviewers and authors
       const { createdBy: proposalCreatedBy, authors, reviewers, ...proposal } = node.proposal;
       proposalArgs.push({
         ...proposal,
