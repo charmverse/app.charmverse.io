@@ -31,6 +31,12 @@ export class ForumHomePage {
 
   readonly postDialogDeleteButton: Locator;
 
+  readonly categoryDescriptionInput: Locator;
+
+  readonly saveCategoryDescription: Locator;
+
+  readonly currentCategoryDescription: Locator;
+
   constructor(page: Page) {
     this.page = page;
     this.addCategoryButton = page.locator('data-test=add-category-button');
@@ -44,6 +50,9 @@ export class ForumHomePage {
     this.postDialogCloseButton = page.locator('data-test=close-dialog');
     this.postDialogContextMenu = page.locator('data-test=page-actions-context-menu');
     this.postDialogDeleteButton = page.locator('data-test=delete-page-from-context');
+    this.categoryDescriptionInput = page.locator('data-test=category-description-input').locator('textarea').first();
+    this.saveCategoryDescription = page.locator('data-test=save-category-description');
+    this.currentCategoryDescription = page.locator('data-test=current-category-description');
   }
 
   async goToForumHome(domain: string) {
@@ -82,6 +91,10 @@ export class ForumHomePage {
 
   getCategoryContextMenuLocator(categoryId: string) {
     return this.page.locator(`data-test=open-category-context-menu-${categoryId}`);
+  }
+
+  getCategoryEditDescriptionLocator(categoryId: string) {
+    return this.page.locator(`data-test=open-category-description-dialog-${categoryId}`);
   }
 
   getCategoryManagePermissionsLocator(categoryId: string) {

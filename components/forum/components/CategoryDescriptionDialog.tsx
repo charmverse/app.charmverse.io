@@ -40,6 +40,7 @@ export function CategoryDescriptionDialog({ category, onClose, onSave, open }: P
       <Stack>
         <TextField
           value={tempDescription}
+          data-test='category-description-input'
           onChange={(e) => setTempDescription(e.target.value)}
           autoFocus
           multiline
@@ -47,7 +48,9 @@ export function CategoryDescriptionDialog({ category, onClose, onSave, open }: P
           fullWidth
         />
         <Box mt={2}>
-          <Button onClick={handleSave}>Save</Button>
+          <Button data-test='save-category-description' onClick={handleSave}>
+            Save
+          </Button>
         </Box>
       </Stack>
     </Modal>

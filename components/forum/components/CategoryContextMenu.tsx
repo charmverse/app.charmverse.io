@@ -88,6 +88,7 @@ export function CategoryContextMenu({ category, onChange, onDelete, onSetNewDefa
         <Tooltip title={!permissions.edit_category ? 'You do not have permissions to edit this category' : ''}>
           <div>
             <MenuItem
+              data-test={`open-category-description-dialog-${category.id}`}
               disabled={!permissions.edit_category}
               onClick={editDescriptionDialog.open}
               sx={{

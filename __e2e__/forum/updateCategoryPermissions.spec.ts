@@ -22,7 +22,7 @@ let memberUser: User;
 let hiddenCategory: PostCategory;
 let hiddenPost: Post;
 
-test.describe.serial('Manage post permissions', () => {
+test.describe.serial('Update category permissions', () => {
   test('hidden category - member user cannot view a category without correct permissions', async ({
     page,
     forumHomePage

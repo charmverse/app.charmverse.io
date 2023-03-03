@@ -135,7 +135,7 @@ export function ForumPage() {
         {currentCategory ? currentCategory?.name : 'All categories'}
       </Typography>
       {currentCategory?.description && (
-        <Typography variant='body1' mb={2}>
+        <Typography data-test='current-category-description' variant='body1' mb={2}>
           {currentCategory.description}
         </Typography>
       )}
