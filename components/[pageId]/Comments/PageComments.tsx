@@ -7,15 +7,17 @@ import { Comment } from 'components/common/comments/Comment';
 import { CommentForm } from 'components/common/comments/CommentForm';
 import { CommentSort } from 'components/common/comments/CommentSort';
 import LoadingComponent from 'components/common/LoadingComponent';
+import { useProposalDetails } from 'components/proposals/hooks/useProposalDetails';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { usePagePermissions } from 'hooks/usePagePermissions';
 import type { CommentPermissions } from 'lib/comments';
+import type { PageMeta } from 'lib/pages';
 
 type Props = {
-  pageId: string;
+  page: PageMeta;
 };
 
-export function PageComments({ pageId }: Props) {
+export function PageComments({ page }: Props) {
   const {
     comments,
     commentSort,
@@ -25,11 +27,14 @@ export function PageComments({ pageId }: Props) {
     updateComment,
     deleteComment,
     voteComment
-  } = usePageComments(pageId);
+  } = usePageComments(page.id);
   const isAdmin = useIsAdmin();
+  const isProposal = page.type === 'proposal';
+
+  const { proposal } = useProposalDetails(isProposal ? page.id : null);
 
   const { permissions } = usePagePermissions({
-    pageIdOrPath: pageId
+    pageIdOrPath: page.id
   });
 
   const commentPermissions: CommentPermissions = {
@@ -38,6 +43,10 @@ export function PageComments({ pageId }: Props) {
     downvote: permissions?.comment ?? false,
     delete_comments: isAdmin
   };
+
+  const hideComments = isProposal && (!proposal || proposal.status === 'draft');
+
+  if (hideComments) return null;
 
   return (
     <>

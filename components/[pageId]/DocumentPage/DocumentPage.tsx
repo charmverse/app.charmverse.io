@@ -314,7 +314,7 @@ function DocumentPage({ page, setPage, insideModal, readOnly = false }: Document
                 </div>
               </CharmEditor>
 
-              {proposalId && <PageComments pageId={page.id} />}
+              {proposalId && <PageComments page={page} />}
             </Container>
           </div>
         </ScrollContainer>

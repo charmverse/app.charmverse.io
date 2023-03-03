@@ -2,7 +2,6 @@ import { KeyboardArrowDown } from '@mui/icons-material';
 import { Box, Collapse, Divider, Grid, IconButton, Stack, Typography } from '@mui/material';
 import type { ProposalStatus } from '@prisma/client';
 import { useEffect, useRef, useState } from 'react';
-import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 import Button from 'components/common/BoardEditor/focalboard/src/widgets/buttons/button';
@@ -14,6 +13,7 @@ import ProposalCategoryInput from 'components/proposals/components/ProposalCateg
 import { ProposalStepper } from 'components/proposals/components/ProposalStepper/ProposalStepper';
 import { ProposalStepSummary } from 'components/proposals/components/ProposalStepSummary';
 import { useProposalCategories } from 'components/proposals/hooks/useProposalCategories';
+import { useProposalDetails } from 'components/proposals/hooks/useProposalDetails';
 import { useProposalFlowFlags } from 'components/proposals/hooks/useProposalFlowFlags';
 import { useProposalPermissions } from 'components/proposals/hooks/useProposalPermissions';
 import { CreateVoteModal } from 'components/votes/components/CreateVoteModal';
@@ -34,9 +34,7 @@ interface ProposalPropertiesProps {
 }
 
 export default function ProposalProperties({ proposalId, readOnly, isTemplate }: ProposalPropertiesProps) {
-  const { data: proposal, mutate: refreshProposal } = useSWR(`proposal/${proposalId}`, () =>
-    charmClient.proposals.getProposal(proposalId)
-  );
+  const { proposal, refreshProposal } = useProposalDetails(proposalId);
   const { categories } = useProposalCategories();
   const { mutate: mutateTasks } = useTasks();
   const [isVoteModalOpen, setIsVoteModalOpen] = useState(false);
