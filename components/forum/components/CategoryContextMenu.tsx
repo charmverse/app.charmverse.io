@@ -1,10 +1,11 @@
 import { Edit } from '@mui/icons-material';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
+import LockIcon from '@mui/icons-material/Lock';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import TaskIcon from '@mui/icons-material/Task';
 import { IconButton, ListItemIcon, MenuItem, MenuList, Stack, TextField, Typography } from '@mui/material';
 import Tooltip from '@mui/material/Tooltip';
-import type { PostCategory, Space } from '@prisma/client';
+import type { PostCategory } from '@prisma/client';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect, useMemo, useState } from 'react';
 
@@ -108,13 +109,14 @@ export function CategoryContextMenu({ category, onChange, onDelete, onSetNewDefa
               disabled={!permissions.manage_permissions}
               onClick={() => setPermissionsDialogIsOpen(true)}
               sx={{
-                py: 1
+                py: 1,
+                justifyContent: 'flex-start'
               }}
             >
-              <ListItemIcon>
-                <Edit fontSize='small' />
-              </ListItemIcon>
-              <Typography variant='subtitle1'>Manage permissions</Typography>
+              <LockIcon sx={{ ml: -0.2 }} />
+              <Typography sx={{ pl: 1 }} variant='subtitle1'>
+                Manage permissions
+              </Typography>
             </MenuItem>
           </div>
         </Tooltip>
