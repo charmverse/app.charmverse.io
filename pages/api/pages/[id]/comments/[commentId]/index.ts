@@ -10,8 +10,6 @@ import { getPageComment } from 'lib/pages/comments/getPageComment';
 import { updatePageComment } from 'lib/pages/comments/updatePageComment';
 import { isSpaceAdmin } from 'lib/permissions/isSpaceAdmin';
 import { withSessionRoute } from 'lib/session/withSession';
-import { UserIsNotSpaceMemberError } from 'lib/users/errors';
-import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { DataNotFoundError, UndesirableOperationError } from 'lib/utilities/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -29,15 +27,6 @@ async function updatePageCommentHandler(req: NextApiRequest, res: NextApiRespons
 
   if (!page) {
     throw new DataNotFoundError(pageId);
-  }
-
-  const spaceRole = await hasAccessToSpace({
-    spaceId: page.spaceId,
-    userId
-  });
-
-  if (!spaceRole.success) {
-    throw new UserIsNotSpaceMemberError();
   }
 
   const comment = await getPageComment(commentId);
