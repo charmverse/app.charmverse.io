@@ -1,5 +1,6 @@
 import { v4 } from 'uuid';
 
+import { upsertPostCategoryPermission } from 'lib/permissions/forum/upsertPostCategoryPermission';
 import {
   createPost,
   generateForumComment,
@@ -16,6 +17,11 @@ describe('getForumNotifications', () => {
     const postCommenter = await generateSpaceUser({ spaceId: postAuthorAndSpace.space.id, isAdmin: false });
     const postCommenter2 = await generateSpaceUser({ spaceId: postAuthorAndSpace.space.id, isAdmin: false });
     const newCategory = await generatePostCategory({ spaceId: postAuthorAndSpace.space.id });
+    await upsertPostCategoryPermission({
+      assignee: { group: 'space', id: postAuthorAndSpace.space.id },
+      permissionLevel: 'full_access',
+      postCategoryId: newCategory.id
+    });
     const post = await createPost({
       spaceId: postAuthorAndSpace.space.id,
       createdBy: postAuthorAndSpace.user.id,
@@ -55,6 +61,11 @@ describe('getForumNotifications', () => {
     const postCommenter = await generateSpaceUser({ spaceId: postAuthorAndSpace.space.id, isAdmin: false });
     const postCommenter2 = await generateSpaceUser({ spaceId: postAuthorAndSpace.space.id, isAdmin: false });
     const newCategory = await generatePostCategory({ spaceId: postAuthorAndSpace.space.id });
+    await upsertPostCategoryPermission({
+      assignee: { group: 'space', id: postAuthorAndSpace.space.id },
+      permissionLevel: 'full_access',
+      postCategoryId: newCategory.id
+    });
     const post = await createPost({
       spaceId: postAuthorAndSpace.space.id,
       createdBy: postAuthorAndSpace.user.id,
