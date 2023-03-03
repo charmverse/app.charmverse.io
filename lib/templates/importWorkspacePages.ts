@@ -331,7 +331,7 @@ export async function generateImportWorkspacePages({
         id: oldNewPageIdHashMap[node.id]
       });
       authors.forEach((author) => proposalAuthorsArgs.push({ ...author, proposalId: oldNewPageIdHashMap[node.id] }));
-      reviewers.forEach((reviewer) =>
+      reviewers.forEach(({ id, ...reviewer }) =>
         proposalReviewersArgs.push({ ...reviewer, proposalId: oldNewPageIdHashMap[node.id] })
       );
       pageArgs.push(newPageContent);
