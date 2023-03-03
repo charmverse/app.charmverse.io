@@ -21,6 +21,8 @@ export interface PageWithBlocks {
   votes?: (Vote & { voteOptions: VoteOptions[] })[];
   proposal?: Proposal & { authors: ProposalAuthor[]; reviewers: ProposalReviewer[] };
   bounty?: Bounty & { permissions: BountyPermission[] };
+  // eslint-disable-next-line
+  inlineDatabases?: ExportedPage[];
 }
 
 export type ExportedPage = PageNodeWithChildren<Page & Partial<PageWithBlocks>>;

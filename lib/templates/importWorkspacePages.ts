@@ -38,7 +38,7 @@ function recurse(node: PageContent, cb: (node: PageContent | TextContent) => voi
  */
 function updateReferences({ oldNewPageIdHashMap, pages }: UpdateRefs) {
   const extractedPolls: Map<string, { pageId: string; newPollId: string; originalId: string }> = new Map();
-  const inlineDatabases: Map<string, { pageId: string; inlineDatabaseId: string }> = new Map();
+  const extractedInlineDatabases: Map<string, { pageId: string; inlineDatabaseId: string }> = new Map();
 
   for (const page of pages) {
     recurse(page.content as PageContent, (node) => {
@@ -58,10 +58,10 @@ function updateReferences({ oldNewPageIdHashMap, pages }: UpdateRefs) {
         }
       } else if (node.type === 'inlineDatabase') {
         const attrs = node.attrs as { pageId: string };
-        const oldPageId = attrs.pageId;
-        const newPageId = oldPageId ? oldNewPageIdHashMap[oldPageId] : undefined;
-        if (oldPageId && newPageId) {
-          attrs.pageId = newPageId;
+        if (attrs.pageId) {
+          const newInlineDatabaseId = v4();
+          extractedInlineDatabases.set(attrs.pageId, { pageId: page.id, inlineDatabaseId: newInlineDatabaseId });
+          attrs.pageId = newInlineDatabaseId;
         }
       }
 
@@ -75,7 +75,7 @@ function updateReferences({ oldNewPageIdHashMap, pages }: UpdateRefs) {
 
   return {
     extractedPolls,
-    inlineDatabases
+    extractedInlineDatabases
   };
 }
 
@@ -170,7 +170,8 @@ export async function generateImportWorkspacePages({
       parentId,
       bountyId,
       blocks,
-      votes,
+      votes: pageVotes,
+      inlineDatabases: pageInlineDatabases,
       ...pageWithoutJoins
     } = node;
 
@@ -336,12 +337,11 @@ export async function generateImportWorkspacePages({
       pageArgs.push(newPageContent);
     }
 
-    const { extractedPolls } = updateReferences({
+    const { extractedPolls, extractedInlineDatabases } = updateReferences({
       oldNewPageIdHashMap,
       pages: [node]
     });
 
-    const pageVotes = node.votes;
     if (pageVotes) {
       extractedPolls.forEach((extractedPoll) => {
         const pageVote = pageVotes.find((_pageVote) => _pageVote.id === extractedPoll.originalId);
@@ -364,39 +364,24 @@ export async function generateImportWorkspacePages({
         }
       });
     }
+
+    if (pageInlineDatabases) {
+      pageInlineDatabases.forEach((pageInlineDatabase) => {
+        const extractedInlineDatabase = extractedInlineDatabases.get(pageInlineDatabase.id);
+        if (extractedInlineDatabase) {
+          recursivePagePrep({
+            node: pageInlineDatabase,
+            newParentId: newId,
+            rootPageId: extractedInlineDatabase.inlineDatabaseId
+          });
+        }
+      });
+    }
   }
 
   dataToImport.pages.forEach((page) => {
     recursivePagePrep({ node: page, newParentId: null });
   });
-
-  // const { inlineDatabases } = updateReferences({
-  //   oldNewPageIdHashMap,
-  //   pages: flatPages
-  // });
-
-  // for (const inlineDatabase of inlineDatabases.entries()) {
-  //   const [oldInlineDatabaseId, { inlineDatabaseId: newInlineDatabaseId, pageId: parentPageId }] = inlineDatabase;
-  //   const inlineBoardPage = await prisma.page.findUnique({
-  //     where: {
-  //       id: oldInlineDatabaseId
-  //     }
-  //   });
-  //   if (inlineBoardPage) {
-  //     const { data } = await exportWorkspacePages({
-  //       sourceSpaceIdOrDomain: space.id,
-  //       rootPageIds: [oldInlineDatabaseId]
-  //     });
-
-  //     data.pages.forEach((page) => {
-  //       recursivePagePrep({
-  //         node: page,
-  //         newParentId: page.id === oldInlineDatabaseId ? parentPageId : null,
-  //         rootPageId: page.id === oldInlineDatabaseId ? newInlineDatabaseId : undefined
-  //       });
-  //     });
-  //   }
-  // }
 
   return {
     pageArgs,

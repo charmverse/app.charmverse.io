@@ -8,10 +8,9 @@ import { prisma } from 'db';
 import type { PageNodeWithChildren } from 'lib/pages';
 import { resolvePageTree } from 'lib/pages/server/resolvePageTree';
 import type { PageContent, TextContent } from 'lib/prosemirror/interfaces';
-import { TextMark } from 'lib/prosemirror/interfaces';
 import { DataNotFoundError } from 'lib/utilities/errors';
 
-import type { ExportedPage, WorkspaceExport } from './interfaces';
+import type { ExportedPage, PageWithBlocks, WorkspaceExport } from './interfaces';
 
 export interface ExportWorkspacePage {
   sourceSpaceIdOrDomain: string;
@@ -51,6 +50,7 @@ export async function exportWorkspacePages({
     throw new DataNotFoundError(`Space not found: ${sourceSpaceIdOrDomain}`);
   }
 
+  const inlineDatabasePages: PageWithBlocks[] = [];
   const rootPages = await prisma.page.findMany({
     where: {
       ...(rootPageIds ? { id: { in: rootPageIds } } : { spaceId: space.id, parentId: null }),
@@ -61,6 +61,10 @@ export async function exportWorkspacePages({
     }
   });
 
+  const exportData: WorkspaceExport = {
+    pages: []
+  };
+
   // Replace by multi resolve page tree in future
   const mappedTrees = await Promise.all(
     rootPages.map(async (page) => {
@@ -69,16 +73,16 @@ export async function exportWorkspacePages({
   );
 
   // Console reporting for manual exports
-  const pageIndexes = mappedTrees.reduce((acc, val) => {
-    let pageCount = Object.keys(acc).length;
+  // const pageIndexes = mappedTrees.reduce((acc, val) => {
+  //   let pageCount = Object.keys(acc).length;
 
-    [val.targetPage, ...val.flatChildren].forEach((p) => {
-      pageCount += 1;
-      acc[p.id] = pageCount;
-    });
+  //   [val.targetPage, ...val.flatChildren].forEach((p) => {
+  //     pageCount += 1;
+  //     acc[p.id] = pageCount;
+  //   });
 
-    return acc;
-  }, {} as Record<string, number>);
+  //   return acc;
+  // }, {} as Record<string, number>);
 
   /**
    * Mutates the given node to provision its block data
@@ -143,11 +147,17 @@ export async function exportWorkspacePages({
       })
     );
     const pollIds: string[] = [];
+    const inlineDatabasePageIds: string[] = [];
     recurse(node.content as PageContent, (_node) => {
       if (_node.type === 'poll') {
         const attrs = _node.attrs as { pollId: string };
         if (attrs.pollId) {
           pollIds.push(attrs.pollId);
+        }
+      } else if (_node.type === 'inlineDatabase') {
+        const attrs = _node.attrs as { pageId: string };
+        if (attrs.pageId) {
+          inlineDatabasePageIds.push(attrs.pageId);
         }
       }
     });
@@ -164,6 +174,24 @@ export async function exportWorkspacePages({
         }
       });
     }
+
+    if (inlineDatabasePageIds.length) {
+      const inlineDatabasesData = await exportWorkspacePages({
+        sourceSpaceIdOrDomain,
+        exportName,
+        rootPageIds: inlineDatabasePageIds,
+        skipBounties,
+        skipProposals
+      });
+      // Only store the inline database in this field
+      node.inlineDatabases = inlineDatabasesData.data.pages.filter((page) => inlineDatabasePageIds.includes(page.id));
+      // Rest of the pages will be added to the top level pages array
+      inlineDatabasesData.data.pages.forEach((page) => {
+        if (!inlineDatabasePageIds.includes(page.id)) {
+          exportData.pages.push(page);
+        }
+      });
+    }
   }
 
   await Promise.all(
@@ -172,9 +200,9 @@ export async function exportWorkspacePages({
     })
   );
 
-  const exportData: WorkspaceExport = {
-    pages: mappedTrees.map((t) => t.targetPage)
-  };
+  mappedTrees.forEach((t) => {
+    exportData.pages.push(t.targetPage);
+  });
 
   if (!exportName) {
     return {
