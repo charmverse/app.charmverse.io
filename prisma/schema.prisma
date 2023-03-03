@@ -202,7 +202,7 @@ enum VisibilityView {
   profile
 }
 
-enum BlacklistOrWhitelist {
+enum CategorySubscriptionMode {
   whitelist
   blacklist
 }
@@ -526,13 +526,13 @@ model UserWallet {
 }
 
 model UserSpaceNotificationSettings {
-  userId              String               @db.Uuid
-  user                User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
-  spaceId             String               @db.Uuid
-  space               Space                @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  userId              String                   @db.Uuid
+  user                User                     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  spaceId             String                   @db.Uuid
+  space               Space                    @relation(fields: [spaceId], references: [id], onDelete: Cascade)
   // just keep a list of ids instead of another table, since we dont really care if they exist or not in the db
   forumCategories     String[]
-  forumCategoriesMode BlacklistOrWhitelist @default(blacklist)
+  forumCategoriesMode CategorySubscriptionMode @default(blacklist)
 
   @@unique([userId, spaceId])
   @@index([userId, spaceId])

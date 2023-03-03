@@ -5,8 +5,8 @@ CREATE TYPE "CategorySubscriptionMode" AS ENUM ('whitelist', 'blacklist');
 CREATE TABLE "UserSpaceNotificationSettings" (
     "userId" UUID NOT NULL,
     "spaceId" UUID NOT NULL,
-    "forumCategoriesMode" "CategorySubscriptionMode" NOT NULL DEFAULT 'blacklist',
-    "forumCategories" TEXT[]
+    "forumCategories" TEXT[],
+    "forumCategoriesMode" "CategorySubscriptionMode" NOT NULL DEFAULT 'blacklist'
 );
 
 -- CreateIndex
