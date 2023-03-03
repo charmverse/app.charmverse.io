@@ -33,7 +33,7 @@ export async function duplicatePage({
     rootPageIds: [pageId]
   });
 
-  const { pages, rootPageIds } = await importWorkspacePages({
+  const { pages, rootPageIds, blockIds } = await importWorkspacePages({
     targetSpaceIdOrDomain: spaceId,
     exportData: data,
     parentId,
@@ -56,9 +56,18 @@ export async function duplicatePage({
     }
   });
 
+  const blocks = await prisma.block.findMany({
+    where: {
+      id: {
+        in: blockIds
+      }
+    }
+  });
+
   return {
     pages,
     rootPageIds,
-    bounties: bounties as BountyWithDetails[]
+    bounties: bounties as BountyWithDetails[],
+    blocks
   };
 }

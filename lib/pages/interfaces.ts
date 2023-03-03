@@ -124,4 +124,5 @@ export type DuplicatePageResponse = {
   pages: PageMeta[];
   rootPageIds: string[];
   bounties: BountyWithDetails[];
+  blocks: Block[];
 };

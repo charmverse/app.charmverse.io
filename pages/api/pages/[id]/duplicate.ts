@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
+import { Block, prismaToBlock } from 'lib/focalboard/block';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { updateTrackPageProfile } from 'lib/metrics/mixpanel/updateTrackPageProfile';
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
@@ -8,6 +9,7 @@ import { duplicatePage } from 'lib/pages/duplicatePage';
 import type { DuplicatePageResponse, PageMeta } from 'lib/pages/server';
 import { computeUserPagePermissions } from 'lib/permissions/pages';
 import { withSessionRoute } from 'lib/session/withSession';
+import { relay } from 'lib/websockets/relay';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -28,12 +30,12 @@ async function duplicatePageRoute(req: NextApiRequest, res: NextApiResponse<Dupl
   }
 
   const duplicatePageResponse = await duplicatePage({ pageId, parentId });
-  const { pages, rootPageIds } = duplicatePageResponse;
+  const { pages, rootPageIds, blocks } = duplicatePageResponse;
   await Promise.all(pages.map((page) => updateTrackPageProfile(page.id)));
 
   const pagesMap: Record<string, PageMeta> = {};
-  Object.entries(pages).forEach(([_pageId, page]) => {
-    pagesMap[_pageId] = page;
+  pages.forEach((page) => {
+    pagesMap[page.id] = page;
   });
 
   const rootPageId = rootPageIds[0];
@@ -46,6 +48,22 @@ async function duplicatePageRoute(req: NextApiRequest, res: NextApiResponse<Dupl
       type: page.type
     });
   }
+
+  relay.broadcast(
+    {
+      type: 'pages_created',
+      payload: pages
+    },
+    page.spaceId
+  );
+
+  relay.broadcast(
+    {
+      type: 'blocks_created',
+      payload: blocks.map((block) => prismaToBlock(block))
+    },
+    page.spaceId
+  );
 
   return res.status(200).send(duplicatePageResponse);
 }

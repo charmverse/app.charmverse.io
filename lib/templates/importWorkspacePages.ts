@@ -84,6 +84,7 @@ interface WorkspaceImportResult {
   totalPages: number;
   rootPageIds: string[];
   bounties: BountyWithDetails[];
+  blockIds: string[];
 }
 
 export async function generateImportWorkspacePages({
@@ -440,7 +441,6 @@ export async function importWorkspacePages({
   const pagesToCreate = pageArgs.length;
 
   let totalCreatedPages = 0;
-  const createdBlocks = 0;
 
   const createdData = await prisma.$transaction([
     // The blocks needs to be created first before the page can connect with them
@@ -465,10 +465,12 @@ export async function importWorkspacePages({
     createdPagesRecord[createdPage.id] = createdPage;
   });
 
+  const blockIds = Array.isArray(blockArgs.data) ? blockArgs.data.map((blockArg) => blockArg.id) : [blockArgs.data.id];
   return {
+    blockIds,
     totalPages: createdPages.length,
     pages: createdPages,
-    totalBlocks: createdBlocks,
+    totalBlocks: blockIds.length,
     rootPageIds: createdPages.filter((page) => page.parentId === parentId).map((p) => p.id)
   };
 }

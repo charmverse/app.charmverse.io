@@ -2,12 +2,11 @@ import FileCopyOutlinedIcon from '@mui/icons-material/FileCopyOutlined';
 import { ListItemButton, ListItemIcon, ListItemText, Tooltip } from '@mui/material';
 import type { Page, PageType } from '@prisma/client';
 import { useRouter } from 'next/router';
-import { mutate } from 'swr';
 
 import charmClient from 'charmClient';
 import { initialLoad } from 'components/common/BoardEditor/focalboard/src/store/initialLoad';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import type { DuplicatePageResponse, PagesMap } from 'lib/pages';
+import type { DuplicatePageResponse } from 'lib/pages';
 import type { IPagePermissionFlags } from 'lib/permissions/pages';
 
 import { useAppDispatch } from './BoardEditor/focalboard/src/store/hooks';
@@ -40,15 +39,6 @@ export function DuplicatePageAction({
       const { pages, rootPageIds } = duplicatePageResponse;
       const duplicatedRootPage = pages.find((_page) => _page.id === rootPageIds[0]);
       dispatch(initialLoad({ spaceId: currentSpace.id }));
-      await mutate(
-        `pages/${currentSpace.id}`,
-        (_pages: PagesMap | undefined) => {
-          return _pages ?? {};
-        },
-        {
-          revalidate: true
-        }
-      );
       if (duplicatedRootPage && !skipRedirection) {
         router.push(`/${router.query.domain}/${duplicatedRootPage.path}`);
       }
