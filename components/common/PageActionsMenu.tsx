@@ -53,7 +53,7 @@ export function PageActionsMenu({
   const charmversePage = members.find((member) => member.id === page.createdBy);
   const open = Boolean(anchorEl);
   const { formatDateTime } = useDateFormatter();
-  const { permissions: pagePermissions } = usePagePermissions({ pageIdOrPath: page.id });
+  const { permissions: pagePermissions } = usePagePermissions({ pageIdOrPath: open ? page.id : null });
   const postPermissions = usePostPermissions({
     postIdOrPath: router.pathname.startsWith('/[domain]/forum') ? page.id : (null as any)
   });
