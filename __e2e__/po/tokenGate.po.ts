@@ -25,7 +25,7 @@ export class TokenGatePage {
     this.connectWalletButton = page.locator('data-test=connect-wallet-button');
     this.tokenGateForm = page.locator('data-test=token-gate-form');
     this.verifyWalletButton = page.locator('data-test=verify-wallet-button');
-    this.joinWorkspaceButton = page.locator('text=Join space');
+    this.joinWorkspaceButton = page.locator('data-test=join-space-button');
     this.tokenGateFailureState = page.locator('data-test=token-gate-failure-alert');
     this.joinWorkspaceTextField = page.locator('[data-test=join-workspace-textfield] input');
   }

@@ -58,16 +58,6 @@ test('tokenGateSuccess - join workspace after meeting conditions in a token gate
 
   await expect(tokenGatePage.joinWorkspaceButton).toBeVisible();
   await tokenGatePage.joinWorkspaceButton.click();
-  // Joining a workspace creates a spaceRole
-  await prisma.$transaction([
-    prisma.spaceRole.create({
-      data: {
-        isAdmin: false,
-        spaceId: space.id,
-        userId: user.id
-      }
-    })
-  ]);
   await page.goto(`${baseUrl}${workspacePath}`);
   await page.locator(`text=${pageDoc.title}`).first().waitFor({ state: 'visible' });
 });

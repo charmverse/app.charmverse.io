@@ -249,6 +249,7 @@ function SpaceSettingsModalComponent() {
           </Button>
         ) : (
           <IconButton
+            data-test='close-settings-modal'
             aria-label='close the settings modal'
             onClick={onClose}
             sx={{

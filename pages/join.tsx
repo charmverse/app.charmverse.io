@@ -36,7 +36,7 @@ export default function JoinWorkspace() {
   const domain = router.query.domain as string;
   const { spaces } = useSpaces();
   const {
-    data: space,
+    data: spaceFromPath,
     isLoading: isSpaceLoading,
     error: spaceError
   } = useSWR(domain ? `space/${domain}` : null, () => charmClient.spaces.searchByDomain(stripUrlParts(domain || '')));
@@ -48,6 +48,8 @@ export default function JoinWorkspace() {
     }
   }, [spaces]);
 
+  const spaceFromPathNotFound = domain && !isSpaceLoading && !spaceFromPath;
+
   return (
     <Box sx={{ width: 600, maxWidth: '100%', mx: 'auto', mb: 6, px: 2 }}>
       <Card sx={{ p: 4, mb: 3 }} variant='outlined'>
@@ -55,8 +57,8 @@ export default function JoinWorkspace() {
         <Divider />
         {domain && isSpaceLoading && <LoadingComponent height='80px' isLoading={true} />}
         {domain && !isSpaceLoading && spaceError && <Alert severity='error'>No space found</Alert>}
-        {domain && space && <SpaceAccessGate space={space} />}
-        {router.isReady && !domain && <SpaceAccessGateWithSearch />}
+        {domain && spaceFromPath && <SpaceAccessGate space={spaceFromPath} />}
+        {router.isReady && (spaceFromPathNotFound || !domain) && <SpaceAccessGateWithSearch defaultValue={domain} />}
       </Card>
       <AlternateRouteButton href='/createWorkspace'>Create a space</AlternateRouteButton>
     </Box>
