@@ -111,16 +111,14 @@ function Component({ menuState }: { menuState: PluginState }) {
     const tr = view.state.tr;
     if (node?.node.type.name === 'page' && currentPage) {
       if (currentSpace && node?.node.attrs.id) {
-        const { rootPageIds } = await charmClient.pages.duplicatePage({
+        const { rootPageId } = await charmClient.pages.duplicatePage({
           pageId: node?.node.attrs.id
         });
-        if (rootPageIds.length !== 0) {
-          const newNode = view.state.schema.nodes.page.create({
-            id: rootPageIds[0]
-          });
-          const newTr = safeInsert(newNode, node.nodeEnd)(tr);
-          view.dispatch(newTr.scrollIntoView());
-        }
+        const newNode = view.state.schema.nodes.page.create({
+          id: rootPageId
+        });
+        const newTr = safeInsert(newNode, node.nodeEnd)(tr);
+        view.dispatch(newTr.scrollIntoView());
         await mutate(
           `pages/${currentSpace.id}`,
           (_pages: PagesMap | undefined) => {

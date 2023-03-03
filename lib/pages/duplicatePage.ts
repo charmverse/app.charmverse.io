@@ -1,5 +1,6 @@
 import { prisma } from 'db';
 import type { BountyWithDetails } from 'lib/bounties';
+import log from 'lib/log';
 import { exportWorkspacePages } from 'lib/templates/exportWorkspacePages';
 import { importWorkspacePages } from 'lib/templates/importWorkspacePages';
 
@@ -40,6 +41,14 @@ export async function duplicatePage({
     updateTitle: true
   });
 
+  if (rootPageIds.length > 1) {
+    log.info(`[duplicate]: Found multiple rootPageIds for a single page duplication`, {
+      pageId,
+      totalRootPageIds: rootPageIds.length,
+      spaceId
+    });
+  }
+
   const bounties = await prisma.bounty.findMany({
     where: {
       id: {
@@ -66,7 +75,7 @@ export async function duplicatePage({
 
   return {
     pages,
-    rootPageIds,
+    rootPageId: rootPageIds[0],
     bounties: bounties as BountyWithDetails[],
     blocks
   };

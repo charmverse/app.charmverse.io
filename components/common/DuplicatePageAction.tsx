@@ -31,8 +31,8 @@ export function DuplicatePageAction({
       const duplicatePageResponse = await charmClient.pages.duplicatePage({
         pageId: page.id
       });
-      const { pages, rootPageIds } = duplicatePageResponse;
-      const duplicatedRootPage = pages.find((_page) => _page.id === rootPageIds[0]);
+      const { pages, rootPageId } = duplicatePageResponse;
+      const duplicatedRootPage = pages.find((_page) => _page.id === rootPageId);
       if (duplicatedRootPage && redirect) {
         router.push(`/${router.query.domain}/${duplicatedRootPage.path}`);
       }

@@ -46,23 +46,13 @@ async function duplicatePageRoute(req: NextApiRequest, res: NextApiResponse<Dupl
   }
 
   const duplicatePageResponse = await duplicatePage({ pageId, parentId: duplicatedPage.parentId });
-  const { pages, rootPageIds, blocks } = duplicatePageResponse;
+  const { pages, rootPageId, blocks } = duplicatePageResponse;
   await Promise.all(pages.map((page) => updateTrackPageProfile(page.id)));
 
   const pagesMap: Record<string, PageMeta> = {};
   pages.forEach((page) => {
     pagesMap[page.id] = page;
   });
-
-  const rootPageId = rootPageIds[0];
-
-  if (rootPageIds.length > 1) {
-    log.info(`[duplicate]: Found multiple rootPageIds for a single page duplication`, {
-      pageId,
-      totalRootPageIds: rootPageIds.length,
-      spaceId: duplicatedPage.spaceId
-    });
-  }
 
   const page = pagesMap[rootPageId];
   if (page) {
