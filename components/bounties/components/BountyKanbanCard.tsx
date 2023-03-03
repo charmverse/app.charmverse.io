@@ -6,7 +6,7 @@ import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
 import { PageActions } from 'components/common/PageActions';
 import { usePageDetails } from 'hooks/usePageDetails';
 import type { BountyWithDetails } from 'lib/bounties';
-import type { PageMeta } from 'lib/pages';
+import type { DuplicatePageResponse, PageMeta } from 'lib/pages';
 import { fancyTrim } from 'lib/utilities/strings';
 
 import BountyStatusBadge from './BountyStatusBadge';
@@ -17,13 +17,14 @@ interface Props {
   onClick: () => void;
   onDelete: (bountyId: string) => void;
   readOnly: boolean;
+  onDuplicate?: (duplicatePageResponse: DuplicatePageResponse) => void;
 }
 
 const StyledBox = styled(Box)`
   ${hoverIconsStyle({ absolutePositioning: true })}
 `;
 
-function BountyKanbanCard({ onDelete, bounty, page, onClick, readOnly }: Props) {
+function BountyKanbanCard({ onDelete, bounty, page, onDuplicate, onClick, readOnly }: Props) {
   const { pageDetails } = usePageDetails(page?.id);
   return (
     <StyledBox
@@ -54,7 +55,14 @@ function BountyKanbanCard({ onDelete, bounty, page, onClick, readOnly }: Props) 
           <BountyStatusBadge bounty={bounty} hideStatus={true} truncate />
         </Box>
       </Box>
-      {onDelete && <PageActions page={page} readOnly={readOnly} onClickDelete={() => onDelete(bounty.id)} />}
+      {onDelete && (
+        <PageActions
+          page={page}
+          onDuplicate={onDuplicate}
+          readOnly={readOnly}
+          onClickDelete={() => onDelete(bounty.id)}
+        />
+      )}
     </StyledBox>
   );
 }

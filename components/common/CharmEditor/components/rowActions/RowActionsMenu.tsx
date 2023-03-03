@@ -4,7 +4,6 @@ import { safeInsert } from '@bangle.dev/utils';
 import { ContentCopy as DuplicateIcon, DragIndicator as DragIndicatorIcon, DeleteOutlined } from '@mui/icons-material';
 import type { MenuProps } from '@mui/material';
 import { ListItemIcon, ListItemText, Menu, ListItemButton } from '@mui/material';
-import type { Page } from '@prisma/client';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import reactDOM from 'react-dom';
 import { mutate } from 'swr';
@@ -12,11 +11,11 @@ import { mutate } from 'swr';
 import charmClient from 'charmClient';
 import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
 import { useAppDispatch, useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
-import { initialLoad } from 'components/common/BoardEditor/focalboard/src/store/initialLoad';
 import { useCurrentPage } from 'hooks/useCurrentPage';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import log from 'lib/log';
+import type { PagesMap } from 'lib/pages';
 
 import type { PluginState } from './rowActions';
 
@@ -113,17 +112,21 @@ function Component({ menuState }: { menuState: PluginState }) {
     const tr = view.state.tr;
     if (node?.node.type.name === 'page' && currentPage) {
       if (currentSpace && node?.node.attrs.id) {
-        const duplicatedPage = await charmClient.duplicatePage(node?.node.attrs.id, currentPage.id);
-        const newNode = view.state.schema.nodes.page.create({
-          id: duplicatedPage.id
+        const { rootPageIds } = await charmClient.pages.duplicatePage({
+          pageId: node?.node.attrs.id,
+          parentId: currentPage.id
         });
-        const newTr = safeInsert(newNode, node.nodeEnd)(tr);
-        view.dispatch(newTr.scrollIntoView());
-        dispatch(initialLoad({ spaceId: currentSpace.id }));
+        if (rootPageIds.length !== 0) {
+          const newNode = view.state.schema.nodes.page.create({
+            id: rootPageIds[0]
+          });
+          const newTr = safeInsert(newNode, node.nodeEnd)(tr);
+          view.dispatch(newTr.scrollIntoView());
+        }
         await mutate(
           `pages/${currentSpace.id}`,
-          (_pages: Page[] | undefined) => {
-            return [...(_pages ?? []), duplicatedPage];
+          (_pages: PagesMap | undefined) => {
+            return _pages ?? {};
           },
           {
             revalidate: true

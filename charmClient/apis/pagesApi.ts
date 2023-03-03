@@ -2,7 +2,7 @@ import type { Page, PageComment, ProfileItem } from '@prisma/client';
 
 import * as http from 'adapters/http';
 import type { CreateCommentInput, UpdateCommentInput } from 'lib/comments';
-import type { IPageWithPermissions, PageDetails, PageMeta } from 'lib/pages';
+import type { DuplicatePageResponse, IPageWithPermissions, PageDetails, PageMeta } from 'lib/pages';
 import type { PageCommentWithVote } from 'lib/pages/comments/interface';
 
 export interface UpdateProfileItemRequest {
@@ -36,6 +36,10 @@ export class PagesApi {
 
   convertToProposal({ pageId, categoryId }: { pageId: string; categoryId: string }) {
     return http.POST<PageMeta>(`/api/pages/${pageId}/convert-to-proposal`, { categoryId });
+  }
+
+  duplicatePage({ pageId, parentId }: { pageId: string; parentId?: string | null }) {
+    return http.POST<DuplicatePageResponse>(`/api/pages/${pageId}/duplicate`, { parentId });
   }
 
   listComments(pageId: string): Promise<PageCommentWithVote[]> {

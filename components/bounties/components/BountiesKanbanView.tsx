@@ -85,6 +85,9 @@ export default function BountiesKanbanView({ bounties, publicMode }: Props) {
               .filter((bounty) => Boolean(pages[bounty.page?.id]) && pages[bounty.page.id]?.deletedAt === null)
               .map((bounty) => (
                 <BountyKanbanCard
+                  onDuplicate={(duplicatePageResponse) => {
+                    setBounties((_bounties) => [..._bounties, ...duplicatePageResponse.bounties]);
+                  }}
                   onDelete={onClickDelete}
                   readOnly={!!publicMode}
                   key={bounty.id}

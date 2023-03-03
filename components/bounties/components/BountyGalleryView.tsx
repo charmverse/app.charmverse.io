@@ -54,6 +54,9 @@ export default function BountiesGalleryView({ bounties, publicMode }: Props) {
       {filteredBounties.map((bounty) => {
         return (
           <BountyGalleryCard
+            onDuplicate={(duplicatePageResponse) => {
+              setBounties((_bounties) => [..._bounties, ...duplicatePageResponse.bounties]);
+            }}
             key={bounty.id}
             bounty={bounty}
             onClick={() => {

@@ -1,5 +1,4 @@
 import { EditOutlined } from '@mui/icons-material';
-import DuplicateIcon from '@mui/icons-material/ContentCopy';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import LaunchIcon from '@mui/icons-material/Launch';
 import LinkIcon from '@mui/icons-material/Link';
@@ -12,28 +11,32 @@ import { usePostPermissions } from 'components/forum/hooks/usePostPermissions';
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useMembers } from 'hooks/useMembers';
 import { usePagePermissions } from 'hooks/usePagePermissions';
-import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
+import type { DuplicatePageResponse } from 'lib/pages';
 
 import { Utils } from './BoardEditor/focalboard/src/utils';
+import { DuplicatePageAction } from './DuplicatePageAction';
 
 export function PageActionsMenu({
   children,
   onClickDelete,
   onClickEdit,
-  onClickDuplicate,
+  hideDuplicateAction,
   anchorEl,
   page,
   setAnchorEl,
-  readOnly
+  readOnly,
+  onDuplicate
 }: {
+  onDuplicate?: (duplicatePageResponse: DuplicatePageResponse) => void;
   onClickDelete?: VoidFunction;
   onClickEdit?: VoidFunction;
   children?: ReactNode;
-  onClickDuplicate?: VoidFunction;
+  hideDuplicateAction?: boolean;
   setAnchorEl: Dispatch<SetStateAction<HTMLElement | null>>;
   anchorEl: HTMLElement | null;
   page: {
+    parentId?: string | null;
     createdBy: string;
     type?: PageType;
     id: string;
@@ -104,11 +107,12 @@ export function PageActionsMenu({
         <DeleteOutlineIcon fontSize='small' sx={{ mr: 1 }} />
         <ListItemText>Delete</ListItemText>
       </MenuItem>
-      {onClickDuplicate && (
-        <MenuItem dense onClick={onClickDuplicate}>
-          <DuplicateIcon fontSize='small' sx={{ mr: 1 }} />
-          <ListItemText>Duplicate</ListItemText>
-        </MenuItem>
+      {!hideDuplicateAction && page.type && (
+        <DuplicatePageAction
+          postDuplication={onDuplicate}
+          page={{ ...page, type: page.type }}
+          pagePermissions={pagePermissions}
+        />
       )}
       <MenuItem dense onClick={onClickCopyLink}>
         <LinkIcon fontSize='small' sx={{ mr: 1 }} />
