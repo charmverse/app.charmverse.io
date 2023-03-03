@@ -104,6 +104,7 @@ export function Comment({
   }
 
   const isCommentAuthor = comment.createdBy === user?.id;
+  const canEditComment = isCommentAuthor;
   const canDeleteComment = (permissions?.delete_comments || isCommentAuthor) && !deletingDisabled;
 
   return (
@@ -252,13 +253,9 @@ export function Comment({
         transformOrigin={{ vertical: 'top', horizontal: 'right' }}
         onClick={(e) => e.stopPropagation()}
       >
-        <Tooltip title={!canDeleteComment ? "You cannot edit another user's comment" : ''}>
+        <Tooltip title={!canEditComment ? "You cannot edit another user's comment" : ''}>
           <div>
-            <MenuItem
-              disabled={!canDeleteComment}
-              data-test={`edit-comment-${comment.id}`}
-              onClick={onClickEditComment}
-            >
+            <MenuItem disabled={!canEditComment} data-test={`edit-comment-${comment.id}`} onClick={onClickEditComment}>
               <ListItemIcon>
                 <EditIcon />
               </ListItemIcon>

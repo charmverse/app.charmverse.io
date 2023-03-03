@@ -4,11 +4,11 @@ import nc from 'next-connect';
 
 import { prisma } from 'db';
 import type { UpdatePostCommentInput } from 'lib/forums/comments/interface';
-import { PostNotFoundError } from 'lib/forums/posts/errors';
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { deletePageComment } from 'lib/pages/comments/deletePageComment';
 import { getPageComment } from 'lib/pages/comments/getPageComment';
 import { updatePageComment } from 'lib/pages/comments/updatePageComment';
+import { isSpaceAdmin } from 'lib/permissions/isSpaceAdmin';
 import { withSessionRoute } from 'lib/session/withSession';
 import { UserIsNotSpaceMemberError } from 'lib/users/errors';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
@@ -59,12 +59,12 @@ async function deletePageCommentHandler(req: NextApiRequest, res: NextApiRespons
   const { commentId, id: pageId } = req.query as any as { id: string; commentId: string };
   const userId = req.session.user.id;
 
-  const page = await prisma.post.findUnique({
+  const page = await prisma.page.findUnique({
     where: { id: pageId }
   });
 
   if (!page) {
-    throw new PostNotFoundError(pageId);
+    throw new DataNotFoundError(pageId);
   }
 
   const pageComment = await prisma.pageComment.findUnique({
@@ -82,7 +82,9 @@ async function deletePageCommentHandler(req: NextApiRequest, res: NextApiRespons
     throw new DataNotFoundError(`Comment with id ${commentId} not found`);
   }
 
-  if (pageComment.createdBy === userId) {
+  const isAdmin = await isSpaceAdmin({ userId, spaceId: page.spaceId });
+
+  if (pageComment.createdBy === userId || isAdmin) {
     await deletePageComment({ commentId, userId });
   } else {
     throw new ActionNotPermittedError('You do not have permission to delete this comment.');

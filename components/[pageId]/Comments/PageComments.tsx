@@ -7,6 +7,7 @@ import { Comment } from 'components/common/comments/Comment';
 import { CommentForm } from 'components/common/comments/CommentForm';
 import { CommentSort } from 'components/common/comments/CommentSort';
 import LoadingComponent from 'components/common/LoadingComponent';
+import { useIsAdmin } from 'hooks/useIsAdmin';
 import { usePagePermissions } from 'hooks/usePagePermissions';
 import type { CommentPermissions } from 'lib/comments';
 
@@ -25,6 +26,7 @@ export function PageComments({ pageId }: Props) {
     deleteComment,
     voteComment
   } = usePageComments(pageId);
+  const isAdmin = useIsAdmin();
 
   const { permissions } = usePagePermissions({
     pageIdOrPath: pageId
@@ -34,7 +36,7 @@ export function PageComments({ pageId }: Props) {
     add_comment: permissions?.comment ?? false,
     upvote: permissions?.comment ?? false,
     downvote: permissions?.comment ?? false,
-    delete_comments: false
+    delete_comments: isAdmin
   };
 
   return (

@@ -12,7 +12,8 @@ export async function createPageComment({
   userId: string;
 }) {
   const page = await prisma.page.findUniqueOrThrow({
-    where: { id: pageId }
+    where: { id: pageId },
+    select: { id: true }
   });
 
   const comment = await prisma.pageComment.create({
