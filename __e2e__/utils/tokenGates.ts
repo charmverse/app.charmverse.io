@@ -1,6 +1,7 @@
 import type { Page } from '@playwright/test';
 import type { Space } from '@prisma/client';
 
+import { prisma } from 'db';
 import { generateTokenGate } from 'testing/utils/tokenGates';
 
 export async function generateAndMockTokenGateRequests({
@@ -49,6 +50,14 @@ export async function generateAndMockTokenGateRequests({
   // Only mock this endpoint response if the user can join the workspace (ie token gate success)
   if (canJoinSpace) {
     await page.route('**/api/token-gates/verify', async (route) => {
+      // Joining a workspace creates a spaceRole
+      await prisma.spaceRole.create({
+        data: {
+          isAdmin: false,
+          spaceId: space.id,
+          userId
+        }
+      });
       await route.fulfill({
         status: 200,
         contentType: 'application/json',

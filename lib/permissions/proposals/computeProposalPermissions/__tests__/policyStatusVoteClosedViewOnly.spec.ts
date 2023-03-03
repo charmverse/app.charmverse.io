@@ -6,7 +6,7 @@ import { generateProposal, generateProposalCategory } from 'testing/utils/propos
 
 import { AvailableProposalPermissions } from '../../availableProposalPermissions.class';
 import type { AvailableProposalPermissionFlags } from '../../interfaces';
-import { pfpStatusVoteActiveOnlyVotable } from '../pfpStatusVoteActiveOnlyVotable';
+import { policyStatusVoteClosedViewOnly } from '../policyStatusVoteClosedViewOnly';
 
 let proposal: ProposalWithUsers;
 let proposalCategory: ProposalCategory;
@@ -34,7 +34,7 @@ beforeAll(async () => {
   proposal = await generateProposal({
     categoryId: proposalCategory.id,
     authors: [proposalAuthor.id],
-    proposalStatus: 'vote_active',
+    proposalStatus: 'vote_closed',
     spaceId: space.id,
     userId: proposalAuthor.id,
     reviewers: [
@@ -48,9 +48,9 @@ beforeAll(async () => {
 
 const fullPermissions = new AvailableProposalPermissions().full;
 
-describe('pfpStatusVoteActiveOnlyVotable', () => {
-  it('should perform a no-op if the status is not vote_active', async () => {
-    const permissions = await pfpStatusVoteActiveOnlyVotable({
+describe('policyStatusVoteClosedViewOnly', () => {
+  it('should perform a no-op if the status is not vote_closed', async () => {
+    const permissions = await policyStatusVoteClosedViewOnly({
       flags: fullPermissions,
       isAdmin: false,
       resource: { ...proposal, status: 'discussion' },
@@ -67,11 +67,11 @@ describe('pfpStatusVoteActiveOnlyVotable', () => {
       vote: true
     });
   });
-  it('should only allow users to view and vote', async () => {
+  it('should only allow users to view', async () => {
     const users = [proposalAuthor, adminUser, proposalReviewer, spaceMember];
 
     for (const user of users) {
-      const permissions = await pfpStatusVoteActiveOnlyVotable({
+      const permissions = await policyStatusVoteClosedViewOnly({
         flags: fullPermissions,
         isAdmin: false,
         resource: proposal,
@@ -80,7 +80,7 @@ describe('pfpStatusVoteActiveOnlyVotable', () => {
 
       expect(permissions).toMatchObject<AvailableProposalPermissionFlags>({
         view: true,
-        vote: true,
+        vote: false,
         create_vote: false,
         comment: false,
         delete: false,

@@ -74,11 +74,11 @@ export async function prepopulateUserProfile(user: User, ens: string | null) {
       }
     }
 
-    const fiveNFTs = nfts.slice(0, 5);
+    const fiveNFTs = nfts.filter((nft) => !!nft.id).slice(0, 5);
 
     await Promise.all(
-      fiveNFTs.map(async (nft) => {
-        await prisma.profileItem.create({
+      fiveNFTs.map((nft) =>
+        prisma.profileItem.create({
           data: {
             id: nft.id,
             userId: user.id,
@@ -86,8 +86,8 @@ export async function prepopulateUserProfile(user: User, ens: string | null) {
             isPinned: true,
             type: 'nft'
           }
-        });
-      })
+        })
+      )
     );
   }
 }

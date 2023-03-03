@@ -202,6 +202,13 @@ enum VisibilityView {
   profile
 }
 
+enum Feature {
+  member_directory
+  proposals
+  forum
+  bounties
+}
+
 model Space {
   id                          String                            @id @default(uuid()) @db.Uuid
   deletedAt                   DateTime?
@@ -254,6 +261,8 @@ model Space {
   webhookSubscriptionUrl      String?
   webhookSubscriptions        WebhookSubscription[]
   webhookSigningSecret        String?
+
+  hiddenFeatures            Feature[]
 
   @@index([createdBy])
 }

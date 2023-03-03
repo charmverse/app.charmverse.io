@@ -6,7 +6,7 @@ import { generateProposal, generateProposalCategory } from 'testing/utils/propos
 
 import { AvailableProposalPermissions } from '../../availableProposalPermissions.class';
 import type { AvailableProposalPermissionFlags } from '../../interfaces';
-import { pfpStatusReviewCommentable } from '../pfpStatusReviewCommentable';
+import { policyStatusReviewCommentable } from '../policyStatusReviewCommentable';
 
 let proposal: ProposalWithUsers;
 let proposalCategory: ProposalCategory;
@@ -48,9 +48,9 @@ beforeAll(async () => {
 
 const fullPermissions = new AvailableProposalPermissions().full;
 
-describe('pfpStatusReviewCommentable', () => {
+describe('policyStatusReviewCommentable', () => {
   it('should perform a no-op if the status is not review', async () => {
-    const permissions = await pfpStatusReviewCommentable({
+    const permissions = await policyStatusReviewCommentable({
       flags: fullPermissions,
       isAdmin: false,
       resource: { ...proposal, status: 'draft' },
@@ -68,7 +68,7 @@ describe('pfpStatusReviewCommentable', () => {
     });
   });
   it('should allow the author to view, comment, delete', async () => {
-    const permissions = await pfpStatusReviewCommentable({
+    const permissions = await policyStatusReviewCommentable({
       flags: fullPermissions,
       isAdmin: false,
       resource: proposal,
@@ -101,7 +101,7 @@ describe('pfpStatusReviewCommentable', () => {
       ]
     });
 
-    const permissions = await pfpStatusReviewCommentable({
+    const permissions = await policyStatusReviewCommentable({
       flags: fullPermissions,
       isAdmin: false,
       resource: proposalWithSameAuthorReviewer,
@@ -120,7 +120,7 @@ describe('pfpStatusReviewCommentable', () => {
   });
 
   it('should allow the admin to view, comment, edit, delete, review', async () => {
-    const permissions = await pfpStatusReviewCommentable({
+    const permissions = await policyStatusReviewCommentable({
       flags: fullPermissions,
       isAdmin: true,
       resource: proposal,
@@ -139,7 +139,7 @@ describe('pfpStatusReviewCommentable', () => {
   });
 
   it('should allow reviewer to view, comment and review', async () => {
-    const permissions = await pfpStatusReviewCommentable({
+    const permissions = await policyStatusReviewCommentable({
       flags: fullPermissions,
       isAdmin: false,
       resource: proposal,
@@ -158,7 +158,7 @@ describe('pfpStatusReviewCommentable', () => {
   });
 
   it('should allow space members to view', async () => {
-    const permissions = await pfpStatusReviewCommentable({
+    const permissions = await policyStatusReviewCommentable({
       flags: fullPermissions,
       isAdmin: false,
       resource: proposal,

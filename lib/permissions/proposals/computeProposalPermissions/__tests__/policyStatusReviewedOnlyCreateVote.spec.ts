@@ -6,7 +6,7 @@ import { generateProposal, generateProposalCategory } from 'testing/utils/propos
 
 import { AvailableProposalPermissions } from '../../availableProposalPermissions.class';
 import type { AvailableProposalPermissionFlags } from '../../interfaces';
-import { pfpStatusDiscussionEditableCommentable } from '../pfpStatusDiscussionEditableCommentable';
+import { policyStatusReviewedOnlyCreateVote } from '../policyStatusReviewedOnlyCreateVote';
 
 let proposal: ProposalWithUsers;
 let proposalCategory: ProposalCategory;
@@ -34,7 +34,7 @@ beforeAll(async () => {
   proposal = await generateProposal({
     categoryId: proposalCategory.id,
     authors: [proposalAuthor.id],
-    proposalStatus: 'discussion',
+    proposalStatus: 'reviewed',
     spaceId: space.id,
     userId: proposalAuthor.id,
     reviewers: [
@@ -48,9 +48,9 @@ beforeAll(async () => {
 
 const fullPermissions = new AvailableProposalPermissions().full;
 
-describe('pfpStatusDiscussionEditableCommentable', () => {
-  it('should perform a no-op if the status is not discussion', async () => {
-    const permissions = await pfpStatusDiscussionEditableCommentable({
+describe('policyStatusReviewedOnlyCreateVote', () => {
+  it('should perform a no-op if the status is not reviewed', async () => {
+    const permissions = await policyStatusReviewedOnlyCreateVote({
       flags: fullPermissions,
       isAdmin: false,
       resource: { ...proposal, status: 'draft' },
@@ -67,9 +67,8 @@ describe('pfpStatusDiscussionEditableCommentable', () => {
       vote: true
     });
   });
-
-  it('should allow the author to view, edit, comment, delete', async () => {
-    const permissions = await pfpStatusDiscussionEditableCommentable({
+  it('should allow the author to view, create_vote', async () => {
+    const permissions = await policyStatusReviewedOnlyCreateVote({
       flags: fullPermissions,
       isAdmin: false,
       resource: proposal,
@@ -77,18 +76,18 @@ describe('pfpStatusDiscussionEditableCommentable', () => {
     });
 
     expect(permissions).toMatchObject<AvailableProposalPermissionFlags>({
+      create_vote: true,
       view: true,
-      edit: true,
-      delete: true,
-      comment: true,
-      create_vote: false,
+      comment: false,
+      delete: false,
+      edit: false,
       review: false,
       vote: false
     });
   });
 
-  it('should return same level of permissions as the author for an admin', async () => {
-    const permissions = await pfpStatusDiscussionEditableCommentable({
+  it('should allow the admin to view, delete, create_vote', async () => {
+    const permissions = await policyStatusReviewedOnlyCreateVote({
       flags: fullPermissions,
       isAdmin: true,
       resource: proposal,
@@ -97,17 +96,17 @@ describe('pfpStatusDiscussionEditableCommentable', () => {
 
     expect(permissions).toMatchObject<AvailableProposalPermissionFlags>({
       view: true,
-      edit: true,
       delete: true,
-      comment: true,
-      create_vote: false,
+      create_vote: true,
+      edit: false,
       review: false,
+      comment: false,
       vote: false
     });
   });
 
-  it('should only provide view and comment permissions for the reviewer', async () => {
-    const permissions = await pfpStatusDiscussionEditableCommentable({
+  it('should allow reviewer to view', async () => {
+    const permissions = await policyStatusReviewedOnlyCreateVote({
       flags: fullPermissions,
       isAdmin: false,
       resource: proposal,
@@ -116,17 +115,17 @@ describe('pfpStatusDiscussionEditableCommentable', () => {
 
     expect(permissions).toMatchObject<AvailableProposalPermissionFlags>({
       view: true,
-      comment: true,
+      comment: false,
+      review: false,
       edit: false,
       delete: false,
       create_vote: false,
-      review: false,
       vote: false
     });
   });
 
-  it('should return only view and comment permissions for the space members', async () => {
-    const permissions = await pfpStatusDiscussionEditableCommentable({
+  it('should allow space members to view', async () => {
+    const permissions = await policyStatusReviewedOnlyCreateVote({
       flags: fullPermissions,
       isAdmin: false,
       resource: proposal,
@@ -135,7 +134,7 @@ describe('pfpStatusDiscussionEditableCommentable', () => {
 
     expect(permissions).toMatchObject<AvailableProposalPermissionFlags>({
       view: true,
-      comment: true,
+      comment: false,
       edit: false,
       delete: false,
       create_vote: false,

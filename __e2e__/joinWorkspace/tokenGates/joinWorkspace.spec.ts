@@ -59,11 +59,6 @@ test('joinWorkspace - search for a workspace and join a token gated workspace af
   await expect(tokenGatePage.tokenGateForm).toBeVisible();
   await expect(tokenGatePage.joinWorkspaceButton).toBeVisible();
   await tokenGatePage.joinWorkspaceButton.click();
-  // Joining a workspace creates a spaceRole
-  await generateSpaceRole({
-    spaceId: space.id,
-    userId: user.id
-  });
   await page.goto(`${baseUrl}/${space.domain}/${pageDoc.path}`);
   await page.locator(`text=${pageDoc.title}`).first().waitFor({ state: 'visible' });
 });

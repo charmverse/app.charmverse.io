@@ -26,12 +26,13 @@ const StyledPopper = styled(Popper)`
  * @goBack - function to go back to the previous step. Used in context of CreateSpaceForm
  */
 type Props = {
+  defaultValue?: string;
   goBack?: () => void;
 };
 
-export function SpaceAccessGateWithSearch({ goBack }: Props) {
+export function SpaceAccessGateWithSearch({ defaultValue, goBack }: Props) {
   const router = useRouter();
-  const [spaceDomain, setSpaceDomain] = useState<string>(router.query.domain as string);
+  const [spaceDomain, setSpaceDomain] = useState<string>(defaultValue || '');
   const [spacesInfo, setSpacesInfo] = useState<SpaceWithGates[]>([]);
   const [selectedSpace, setSelectedSpace] = useState<null | SpaceWithGates>(null);
 
@@ -77,6 +78,7 @@ export function SpaceAccessGateWithSearch({ goBack }: Props) {
       </FieldLabel>
       <Autocomplete<SpaceWithGates>
         disablePortal
+        inputValue={spaceDomain}
         options={spacesInfo}
         placeholder='my-space'
         value={selectedSpace}

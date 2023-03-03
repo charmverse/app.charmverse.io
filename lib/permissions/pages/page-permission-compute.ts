@@ -111,9 +111,9 @@ function pageResolver({ resourceId }: { resourceId: string }) {
   }) as Promise<PageInDb>;
 }
 
-type PagePfpInput = PermissionFilteringPolicyFnInput<PageInDb, IPagePermissionFlags>;
+type PagePolicyInput = PermissionFilteringPolicyFnInput<PageInDb, IPagePermissionFlags>;
 
-async function convertedToProposalPfp({ flags, resource }: PagePfpInput): Promise<IPagePermissionFlags> {
+async function convertedToProposalPolicy({ flags, resource }: PagePolicyInput): Promise<IPagePermissionFlags> {
   const newPermissions = { ...flags };
 
   if (!resource.convertedProposalId) {
@@ -193,5 +193,5 @@ export const computeUserPagePermissions = buildComputePermissionsWithPermissionF
 >({
   resolver: pageResolver,
   computeFn: baseComputeUserPagePermissions,
-  pfps: [convertedToProposalPfp]
+  policies: [convertedToProposalPolicy]
 });
