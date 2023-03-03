@@ -1,6 +1,7 @@
 import type { ProposalOperation } from '@prisma/client';
 
 import { isProposalAuthor } from 'lib/proposal/isProposalAuthor';
+import { isProposalReviewer } from 'lib/proposal/isProposalReviewer';
 import { typedKeys } from 'lib/utilities/objects';
 
 import { AvailableProposalPermissions } from '../availableProposalPermissions.class';
@@ -8,7 +9,7 @@ import type { AvailableProposalPermissionFlags } from '../interfaces';
 
 import type { ProposalPolicyInput } from './interfaces';
 
-export async function policyStatusDraftOnlyViewable({
+export async function policyStatusDraftNotViewable({
   resource,
   flags,
   userId,
@@ -31,6 +32,12 @@ export async function policyStatusDraftOnlyViewable({
     return newPermissions;
   }
 
-  // At most allow a non author to view the proposal
-  return { ...new AvailableProposalPermissions().empty, view: newPermissions.view === true };
+  const isReviewer = await isProposalReviewer({ proposal: resource, userId });
+
+  if (isReviewer) {
+    // At most allow a non author to view the proposal
+    return { ...new AvailableProposalPermissions().empty, view: newPermissions.view === true };
+  }
+
+  return new AvailableProposalPermissions().empty;
 }

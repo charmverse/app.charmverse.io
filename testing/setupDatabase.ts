@@ -663,7 +663,7 @@ export async function createVote({
 }
 
 export async function createProposalWithUsers({
-  proposalStatus = 'private_draft',
+  proposalStatus = 'draft',
   authors,
   reviewers,
   userId,

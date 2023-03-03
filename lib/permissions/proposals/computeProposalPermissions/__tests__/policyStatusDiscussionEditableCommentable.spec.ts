@@ -53,7 +53,7 @@ describe('policyStatusDiscussionEditableCommentable', () => {
     const permissions = await policyStatusDiscussionEditableCommentable({
       flags: fullPermissions,
       isAdmin: false,
-      resource: { ...proposal, status: 'private_draft' },
+      resource: { ...proposal, status: 'draft' },
       userId: proposalAuthor.id
     });
 

@@ -6,7 +6,7 @@ import { generateProposal, generateProposalCategory } from 'testing/utils/propos
 
 import { AvailableProposalPermissions } from '../../availableProposalPermissions.class';
 import type { AvailableProposalPermissionFlags } from '../../interfaces';
-import { policyStatusPrivateDraftVisibleOnlyByAuthor } from '../policyStatusPrivateDraftVisibleOnlyByAuthor';
+import { policyStatusDraftNotViewable } from '../policyStatusDraftNotViewable';
 
 let proposal: ProposalWithUsers;
 let proposalCategory: ProposalCategory;
@@ -34,7 +34,7 @@ beforeAll(async () => {
   proposal = await generateProposal({
     categoryId: proposalCategory.id,
     authors: [proposalAuthor.id],
-    proposalStatus: 'private_draft',
+    proposalStatus: 'draft',
     spaceId: space.id,
     userId: proposalAuthor.id,
     reviewers: [
@@ -48,9 +48,9 @@ beforeAll(async () => {
 
 const fullPermissions = new AvailableProposalPermissions().full;
 
-describe('policyStatusPrivateDraftVisibleOnlyByAuthor', () => {
-  it('should perform a no-op if the status is not private_draft', async () => {
-    const permissions = await policyStatusPrivateDraftVisibleOnlyByAuthor({
+describe('policyStatusDraftOnlyViewable', () => {
+  it('should perform a no-op if the status is not draft', async () => {
+    const permissions = await policyStatusDraftNotViewable({
       flags: fullPermissions,
       isAdmin: false,
       resource: { ...proposal, status: 'discussion' },
@@ -68,7 +68,7 @@ describe('policyStatusPrivateDraftVisibleOnlyByAuthor', () => {
     });
   });
   it('should allow the author to view, edit, comment, delete', async () => {
-    const permissions = await policyStatusPrivateDraftVisibleOnlyByAuthor({
+    const permissions = await policyStatusDraftNotViewable({
       flags: fullPermissions,
       isAdmin: false,
       resource: proposal,
@@ -87,7 +87,7 @@ describe('policyStatusPrivateDraftVisibleOnlyByAuthor', () => {
   });
 
   it('should return same level of permissions as the author for an admin', async () => {
-    const permissions = await policyStatusPrivateDraftVisibleOnlyByAuthor({
+    const permissions = await policyStatusDraftNotViewable({
       flags: fullPermissions,
       isAdmin: true,
       resource: proposal,
@@ -105,8 +105,8 @@ describe('policyStatusPrivateDraftVisibleOnlyByAuthor', () => {
     });
   });
 
-  it('should return empty permissions for the reviewer', async () => {
-    const permissions = await policyStatusPrivateDraftVisibleOnlyByAuthor({
+  it('should only provide view permissions for the reviewer', async () => {
+    const permissions = await policyStatusDraftNotViewable({
       flags: fullPermissions,
       isAdmin: false,
       resource: proposal,
@@ -114,7 +114,7 @@ describe('policyStatusPrivateDraftVisibleOnlyByAuthor', () => {
     });
 
     expect(permissions).toMatchObject<AvailableProposalPermissionFlags>({
-      view: false,
+      view: true,
       edit: false,
       delete: false,
       comment: false,
@@ -124,8 +124,8 @@ describe('policyStatusPrivateDraftVisibleOnlyByAuthor', () => {
     });
   });
 
-  it('should return empty permissions for the space members', async () => {
-    const permissions = await policyStatusPrivateDraftVisibleOnlyByAuthor({
+  it('should return only view permissions for the space members', async () => {
+    const permissions = await policyStatusDraftNotViewable({
       flags: fullPermissions,
       isAdmin: false,
       resource: proposal,

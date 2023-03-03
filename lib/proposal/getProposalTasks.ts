@@ -103,7 +103,7 @@ export async function getProposalTasks(userId: string): Promise<{
       type: 'proposal',
       proposal: {
         status: {
-          notIn: ['draft', 'private_draft']
+          not: 'draft'
         }
       }
     },

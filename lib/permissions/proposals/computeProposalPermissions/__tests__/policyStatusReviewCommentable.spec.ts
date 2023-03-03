@@ -53,7 +53,7 @@ describe('policyStatusReviewCommentable', () => {
     const permissions = await policyStatusReviewCommentable({
       flags: fullPermissions,
       isAdmin: false,
-      resource: { ...proposal, status: 'private_draft' },
+      resource: { ...proposal, status: 'draft' },
       userId: proposalAuthor.id
     });
 

@@ -16,7 +16,7 @@ import { proposalPermissionsMapping } from '../mapping';
 
 import type { ProposalResource } from './interfaces';
 import { policyStatusDiscussionEditableCommentable } from './policyStatusDiscussionEditableCommentable';
-import { policyStatusDraftOnlyViewable } from './policyStatusDraftOnlyViewable';
+import { policyStatusDraftNotViewable } from './policyStatusDraftNotViewable';
 import { policyStatusPrivateDraftVisibleOnlyByAuthor } from './policyStatusPrivateDraftVisibleOnlyByAuthor';
 import { policyStatusReviewCommentable } from './policyStatusReviewCommentable';
 import { policyStatusReviewedOnlyCreateVote } from './policyStatusReviewedOnlyCreateVote';
@@ -149,7 +149,7 @@ export const computeProposalPermissions = buildComputePermissionsWithPermissionF
   computeFn: baseComputeProposalPermissions,
   policies: [
     policyStatusPrivateDraftVisibleOnlyByAuthor,
-    policyStatusDraftOnlyViewable,
+    policyStatusDraftNotViewable,
     policyStatusDiscussionEditableCommentable,
     policyStatusReviewCommentable,
     policyStatusReviewedOnlyCreateVote,
