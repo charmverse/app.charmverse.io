@@ -1,6 +1,7 @@
 import type { Post, PostComment, Space, User } from '@prisma/client';
 
 import { prisma } from 'db';
+import type { TaskUser } from 'lib/discussion/interfaces';
 import { timeAgo } from 'lib/utilities/dates';
 import { shortenHex } from 'lib/utilities/strings';
 import { isTruthy } from 'lib/utilities/types';
@@ -21,7 +22,7 @@ export type ForumTask = {
   commentId: string | null;
   mentionId: string | null;
   commentText: string;
-  createdBy: User | null;
+  createdBy: TaskUser | null;
 };
 
 export type ForumTasksGroup = {

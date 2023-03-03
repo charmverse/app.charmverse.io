@@ -260,7 +260,7 @@ model Space {
   memberPropertyValues        MemberPropertyValue[]
   userTokenGates              UserTokenGate[]
   postCategories              PostCategory[]
-  Post                        Post[]
+  posts                       Post[]
   postCategoryPermissions     PostCategoryPermission[]
   proposalCategoryPermissions ProposalCategoryPermission[]
   spaceNotificationSettings   UserSpaceNotificationSettings[]
