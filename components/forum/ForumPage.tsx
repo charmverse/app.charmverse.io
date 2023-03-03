@@ -134,6 +134,11 @@ export function ForumPage() {
       <Typography variant='h1' mb={2}>
         {currentCategory ? currentCategory?.name : 'All categories'}
       </Typography>
+      {currentCategory?.description && (
+        <Typography variant='body1' mb={2}>
+          {currentCategory.description}
+        </Typography>
+      )}
 
       <TextField
         variant='outlined'

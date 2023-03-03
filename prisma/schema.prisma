@@ -1097,6 +1097,7 @@ model MemberPropertyPermission {
 model PostCategory {
   id                      String                   @id @default(uuid()) @db.Uuid
   name                    String
+  description             String?
   path                    String?
   defaultForSpace         Space?                   @relation(name: "defaultPostCategory")
   spaceId                 String                   @db.Uuid
