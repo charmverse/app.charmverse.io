@@ -116,26 +116,24 @@ export async function exportWorkspacePages({
         card: cardBlock as Block
       };
     } else if (node.bountyId && node.type === 'bounty' && !skipBounties) {
-      node.bounty =
-        (await prisma.bounty.findUnique({
-          where: {
-            id: node.bountyId
-          },
-          include: {
-            permissions: true
-          }
-        })) ?? undefined;
+      node.bounty = await prisma.bounty.findUnique({
+        where: {
+          id: node.bountyId
+        },
+        include: {
+          permissions: true
+        }
+      });
     } else if (node.proposalId && node.type === 'proposal' && !skipProposals) {
-      node.proposal =
-        (await prisma.proposal.findUnique({
-          where: {
-            id: node.proposalId
-          },
-          include: {
-            authors: true,
-            reviewers: true
-          }
-        })) ?? undefined;
+      node.proposal = await prisma.proposal.findUnique({
+        where: {
+          id: node.proposalId
+        },
+        include: {
+          authors: true,
+          reviewers: true
+        }
+      });
     }
 
     node.children = node.children?.filter((child) => !excludedPageTypes.includes(child.type)) ?? [];

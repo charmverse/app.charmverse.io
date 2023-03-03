@@ -36,9 +36,9 @@ export function PageActionsMenu({
   setAnchorEl: Dispatch<SetStateAction<HTMLElement | null>>;
   anchorEl: HTMLElement | null;
   page: {
-    parentId: string | null;
+    parentId?: string | null;
     createdBy: string;
-    type: PageType;
+    type?: PageType;
     id: string;
     updatedAt: Date;
     relativePath?: string;
@@ -107,8 +107,12 @@ export function PageActionsMenu({
         <DeleteOutlineIcon fontSize='small' sx={{ mr: 1 }} />
         <ListItemText>Delete</ListItemText>
       </MenuItem>
-      {!hideDuplicateAction && (
-        <DuplicatePageAction postDuplication={onDuplicate} page={page} pagePermissions={pagePermissions} />
+      {!hideDuplicateAction && page.type && (
+        <DuplicatePageAction
+          postDuplication={onDuplicate}
+          page={{ ...page, type: page.type }}
+          pagePermissions={pagePermissions}
+        />
       )}
       <MenuItem dense onClick={onClickCopyLink}>
         <LinkIcon fontSize='small' sx={{ mr: 1 }} />

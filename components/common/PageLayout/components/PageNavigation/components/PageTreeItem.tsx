@@ -284,12 +284,6 @@ const TreeItemComponent = React.forwardRef<React.Ref<HTMLDivElement>, TreeItemCo
   )
 );
 
-const PageMenuItem = styled(ListItemButton)`
-  .MuiTypography-root {
-    font-weight: 600;
-  }
-`;
-
 // eslint-disable-next-line react/function-component-definition
 const PageTreeItem = forwardRef<any, PageTreeItemProps>((props, ref) => {
   const {
@@ -428,32 +422,22 @@ function PageActionsMenu({ closeMenu, pageId, pagePath }: { closeMenu: () => voi
     <>
       <Tooltip arrow placement='top' title={deletePageDisabled ? 'You do not have permission to delete this page' : ''}>
         <div>
-          <PageMenuItem dense disabled={deletePageDisabled} onClick={deletePageWithBoard}>
+          <ListItemButton dense disabled={deletePageDisabled} onClick={deletePageWithBoard}>
             <ListItemIcon>
               <DeleteOutlinedIcon />
             </ListItemIcon>
             <ListItemText>Delete</ListItemText>
-          </PageMenuItem>
+          </ListItemButton>
         </div>
       </Tooltip>
-      {page && (
-        <DuplicatePageAction
-          page={page}
-          sx={{
-            '.MuiTypography-root': {
-              fontWeight: 600
-            }
-          }}
-          pagePermissions={pagePermissions}
-        />
-      )}
+      {page && <DuplicatePageAction page={page} pagePermissions={pagePermissions} />}
       <CopyToClipboard text={getAbsolutePath()} onCopy={() => onCopy()}>
-        <PageMenuItem dense>
+        <ListItemButton dense>
           <ListItemIcon>
             <ContentCopyIcon fontSize='small' />
           </ListItemIcon>
           <ListItemText>Copy link</ListItemText>
-        </PageMenuItem>
+        </ListItemButton>
       </CopyToClipboard>
     </>
   );

@@ -1,5 +1,4 @@
 import FileCopyOutlinedIcon from '@mui/icons-material/FileCopyOutlined';
-import type { SxProps } from '@mui/material';
 import { ListItemButton, ListItemIcon, ListItemText, Tooltip } from '@mui/material';
 import type { Page, PageType } from '@prisma/client';
 import { useRouter } from 'next/router';
@@ -19,11 +18,9 @@ export function DuplicatePageAction({
   page,
   pagePermissions,
   skipRedirection = false,
-  sx,
   postDuplication
 }: {
-  sx?: SxProps;
-  page: Pick<Page, 'id' | 'parentId' | 'type'>;
+  page: Pick<Page, 'id' | 'type'> & { parentId?: string | null };
   pagePermissions?: IPagePermissionFlags;
   skipRedirection?: boolean;
   postDuplication?: (duplicatePageResponse: DuplicatePageResponse) => void;
@@ -73,7 +70,6 @@ export function DuplicatePageAction({
     >
       <div>
         <ListItemButton
-          sx={sx}
           dense
           disabled={excludedPageTypes.includes(page.type) || duplicatePageDisabled}
           onClick={duplicatePage}

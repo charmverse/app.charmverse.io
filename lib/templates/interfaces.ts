@@ -19,8 +19,8 @@ export interface PageWithBlocks {
     card?: Block;
   };
   votes?: (Vote & { voteOptions: VoteOptions[] })[];
-  proposal?: Proposal & { authors: ProposalAuthor[]; reviewers: ProposalReviewer[] };
-  bounty?: Bounty & { permissions: BountyPermission[] };
+  proposal?: (Proposal & { authors: ProposalAuthor[]; reviewers: ProposalReviewer[] }) | null;
+  bounty?: (Bounty & { permissions: BountyPermission[] }) | null;
   // eslint-disable-next-line
   inlineDatabases?: ExportedPage[];
 }

@@ -20,13 +20,13 @@ export function PageActions({
   onDuplicate?: (duplicatePageResponse: DuplicatePageResponse) => void;
   page: {
     createdBy: string;
-    type: PageType;
+    type?: PageType;
     id: string;
     updatedAt: Date;
     relativePath?: string;
     path: string;
     deletedAt: Date | null;
-    parentId: string | null;
+    parentId?: string | null;
   };
   readOnly?: boolean;
   onClickDelete?: VoidFunction;
