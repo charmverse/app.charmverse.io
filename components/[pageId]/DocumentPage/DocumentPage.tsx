@@ -9,6 +9,7 @@ import { memo, useEffect, useState } from 'react';
 import { useElementSize } from 'usehooks-ts';
 
 import charmClient from 'charmClient';
+import { PageComments } from 'components/[pageId]/Comments/PageComments';
 import AddBountyButton from 'components/common/BoardEditor/focalboard/src/components/cardDetail/AddBountyButton';
 import CardDetailProperties from 'components/common/BoardEditor/focalboard/src/components/cardDetail/cardDetailProperties';
 import CommentsList from 'components/common/BoardEditor/focalboard/src/components/cardDetail/commentsList';
@@ -232,6 +233,9 @@ function DocumentPage({ page, setPage, insideModal, readOnly = false }: Document
                 pageType={page.type}
                 pagePermissions={pagePermissions ?? undefined}
                 onParticipantUpdate={onParticipantUpdate}
+                style={{
+                  minHeight: proposalId ? '100px' : 'unset'
+                }}
                 disableNestedPages={page?.type === 'proposal' || page?.type === 'proposal_template'}
               >
                 {/* temporary? disable editing of page title when in suggestion mode */}
@@ -309,6 +313,8 @@ function DocumentPage({ page, setPage, insideModal, readOnly = false }: Document
                   </div>
                 </div>
               </CharmEditor>
+
+              {proposalId && <PageComments page={page} />}
             </Container>
           </div>
         </ScrollContainer>

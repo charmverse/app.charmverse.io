@@ -3,16 +3,15 @@ import { IconButton, Tooltip, Typography, Box } from '@mui/material';
 import type { MouseEvent } from 'react';
 import { ImArrowDown, ImArrowUp } from 'react-icons/im';
 
-import type { ForumVotes } from 'lib/forums/posts/interfaces';
-import type { AvailablePostPermissionFlags } from 'lib/permissions/forum/interfaces';
+import type { CommentPermissions, GenericCommentVote } from 'lib/comments';
 
 type Props = {
-  votes: ForumVotes;
+  votes: GenericCommentVote;
   onVote: (upvoted: boolean | null) => void;
-  permissions?: AvailablePostPermissionFlags;
+  permissions?: CommentPermissions;
 };
 
-export function ForumVote({ votes, onVote, permissions }: Props) {
+export function CommentVote({ votes, onVote, permissions }: Props) {
   const theme = useTheme();
   const { downvotes, upvotes, upvoted } = votes;
 
