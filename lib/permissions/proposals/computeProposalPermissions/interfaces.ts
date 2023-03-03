@@ -7,4 +7,4 @@ export type ProposalResource = Pick<
   ProposalWithUsers,
   'id' | 'spaceId' | 'status' | 'createdBy' | 'categoryId' | 'authors' | 'reviewers'
 >;
-export type ProposalPfpInput = PermissionFilteringPolicyFnInput<ProposalResource, AvailableProposalPermissionFlags>;
+export type ProposalPolicyInput = PermissionFilteringPolicyFnInput<ProposalResource, AvailableProposalPermissionFlags>;

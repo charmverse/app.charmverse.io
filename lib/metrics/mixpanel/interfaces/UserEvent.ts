@@ -42,6 +42,7 @@ export type SpaceJoined = BaseEvent & {
 
 export type CreateNewSpace = BaseEvent & {
   template: SpaceCreateTemplate;
+  source?: string;
 };
 
 export interface UserEventMap {

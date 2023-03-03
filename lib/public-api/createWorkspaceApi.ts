@@ -72,7 +72,15 @@ export async function createWorkspaceApi({
   if (adminDiscordUserId) {
     await upsertUserRolesFromDiscord({ space, userId: adminUserId });
   }
+
   trackUserAction('join_a_workspace', { spaceId: space.id, userId: adminUserId, source: 'charmverse_api' });
+  trackUserAction('create_new_workspace', {
+    userId: botUser.id,
+    spaceId: space.id,
+    template: 'default',
+    source: superApiToken?.name || 'charmverse_api'
+  });
+
   publishMemberEvent({
     scope: WebhookEventNames.UserJoined,
     spaceId: space.id,

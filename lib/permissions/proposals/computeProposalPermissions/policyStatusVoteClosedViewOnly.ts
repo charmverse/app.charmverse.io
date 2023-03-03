@@ -4,19 +4,19 @@ import { typedKeys } from 'lib/utilities/objects';
 
 import type { AvailableProposalPermissionFlags } from '../interfaces';
 
-import type { ProposalPfpInput } from './interfaces';
+import type { ProposalPolicyInput } from './interfaces';
 
-export async function pfpStatusVoteActiveOnlyVotable({
+export async function policyStatusVoteClosedViewOnly({
   resource,
   flags
-}: ProposalPfpInput): Promise<AvailableProposalPermissionFlags> {
+}: ProposalPolicyInput): Promise<AvailableProposalPermissionFlags> {
   const newPermissions = { ...flags };
 
-  if (resource.status !== 'vote_active') {
+  if (resource.status !== 'vote_closed') {
     return newPermissions;
   }
 
-  const allowedOperations: ProposalOperation[] = ['view', 'vote'];
+  const allowedOperations: ProposalOperation[] = ['view'];
 
   typedKeys(flags).forEach((flag) => {
     if (!allowedOperations.includes(flag)) {
