@@ -172,7 +172,7 @@ const templates = {
           action: 'start_discussion',
           pageTitle: 'Proposal to add XSTUSD-3CRV to the Gauge Controller',
           spaceName: 'Curve Finance',
-          status: 'private_draft'
+          status: 'draft'
         })
       ],
       discussionTasks: [

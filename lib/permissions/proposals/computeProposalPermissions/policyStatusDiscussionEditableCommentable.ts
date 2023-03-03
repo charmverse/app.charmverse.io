@@ -6,14 +6,14 @@ import { typedKeys } from 'lib/utilities/objects';
 import { AvailableProposalPermissions } from '../availableProposalPermissions.class';
 import type { AvailableProposalPermissionFlags } from '../interfaces';
 
-import type { ProposalPfpInput } from './interfaces';
+import type { ProposalPolicyInput } from './interfaces';
 
-export async function pfpStatusDiscussionEditableCommentable({
+export async function policyStatusDiscussionEditableCommentable({
   resource,
   flags,
   userId,
   isAdmin
-}: ProposalPfpInput): Promise<AvailableProposalPermissionFlags> {
+}: ProposalPolicyInput): Promise<AvailableProposalPermissionFlags> {
   const newPermissions = { ...flags };
 
   if (resource.status !== 'discussion') {

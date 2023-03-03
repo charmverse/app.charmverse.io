@@ -65,12 +65,6 @@ export function DiscordGate({
           </Grid>
         </CardContent>
       </Card>
-
-      {isVerified && (
-        <PrimaryButton disabled={joiningSpace} onClick={joinSpace} loading={joiningSpace}>
-          Join Space
-        </PrimaryButton>
-      )}
     </Stack>
   );
 }
