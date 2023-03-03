@@ -11,7 +11,6 @@ import { mutate } from 'swr';
 import charmClient from 'charmClient';
 import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
 import { useAppDispatch, useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
-import { initialLoad } from 'components/common/BoardEditor/focalboard/src/store/initialLoad';
 import { useCurrentPage } from 'hooks/useCurrentPage';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
@@ -123,7 +122,6 @@ function Component({ menuState }: { menuState: PluginState }) {
           });
           const newTr = safeInsert(newNode, node.nodeEnd)(tr);
           view.dispatch(newTr.scrollIntoView());
-          dispatch(initialLoad({ spaceId: currentSpace.id }));
         }
         await mutate(
           `pages/${currentSpace.id}`,
