@@ -51,8 +51,8 @@ export async function reevaluateRoles({
     const newRoles = updatedUserRoles.filter((r) => !userRoles.includes(r)) || [];
 
     return newRoles;
-  } catch (e) {
-    log.warn('Error reevaluating roles', e);
+  } catch (error) {
+    log.warn('Error reevaluating roles', { error, userId, spaceId });
     return [];
   }
 }
