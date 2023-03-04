@@ -9,15 +9,16 @@ import { CommentSort } from 'components/common/comments/CommentSort';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { useProposalDetails } from 'components/proposals/hooks/useProposalDetails';
 import { useIsAdmin } from 'hooks/useIsAdmin';
-import { usePagePermissions } from 'hooks/usePagePermissions';
 import type { CommentPermissions } from 'lib/comments';
 import type { PageMeta } from 'lib/pages';
+import type { IPagePermissionFlags } from 'lib/permissions/pages';
 
 type Props = {
   page: PageMeta;
+  permissions?: IPagePermissionFlags;
 };
 
-export function PageComments({ page }: Props) {
+export function PageComments({ page, permissions }: Props) {
   const {
     comments,
     commentSort,
@@ -32,10 +33,6 @@ export function PageComments({ page }: Props) {
   const isProposal = page.type === 'proposal';
 
   const { proposal } = useProposalDetails(isProposal ? page.id : null);
-
-  const { permissions } = usePagePermissions({
-    pageIdOrPath: page.id
-  });
 
   const commentPermissions: CommentPermissions = {
     add_comment: permissions?.comment ?? false,

@@ -88,7 +88,7 @@ function DocumentPage({ page, setPage, insideModal, readOnly = false }: Document
   const { pages } = usePages();
   const { cancelVote, castVote, deleteVote, updateDeadline, votes, isLoading } = useVotes();
   // For post we would artificially construct the permissions
-  const { permissions: pagePermissions } = usePagePermissions({
+  const { permissions: pagePermissions, refresh: refreshPagePermissions } = usePagePermissions({
     pageIdOrPath: page.id
   });
   const { draftBounty } = useBounties();
@@ -282,6 +282,8 @@ function DocumentPage({ page, setPage, insideModal, readOnly = false }: Document
                     {proposalId && (
                       <ProposalProperties
                         proposalId={proposalId}
+                        pagePermissions={pagePermissions}
+                        refreshPagePermissions={refreshPagePermissions}
                         readOnly={readonlyProposalProperties}
                         isTemplate={page.type === 'proposal_template'}
                       />
@@ -307,7 +309,7 @@ function DocumentPage({ page, setPage, insideModal, readOnly = false }: Document
                 </div>
               </CharmEditor>
 
-              {proposalId && <PageComments page={page} />}
+              {proposalId && <PageComments page={page} permissions={pagePermissions} />}
             </Container>
           </div>
         </ScrollContainer>

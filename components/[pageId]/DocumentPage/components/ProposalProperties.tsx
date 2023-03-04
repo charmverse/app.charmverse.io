@@ -19,10 +19,10 @@ import { useProposalPermissions } from 'components/proposals/hooks/useProposalPe
 import { CreateVoteModal } from 'components/votes/components/CreateVoteModal';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useMembers } from 'hooks/useMembers';
-import { usePagePermissions } from 'hooks/usePagePermissions';
 import useRoles from 'hooks/useRoles';
 import { useUser } from 'hooks/useUser';
 import type { Member } from 'lib/members/interfaces';
+import type { IPagePermissionFlags } from 'lib/permissions/pages';
 import type { ProposalCategory } from 'lib/proposal/interface';
 import type { ProposalUserGroup } from 'lib/proposal/proposalStatusTransition';
 import type { ListSpaceRolesResponse } from 'pages/api/roles';
@@ -31,9 +31,17 @@ interface ProposalPropertiesProps {
   readOnly?: boolean;
   proposalId: string;
   isTemplate: boolean;
+  pagePermissions?: IPagePermissionFlags;
+  refreshPagePermissions?: () => void;
 }
 
-export default function ProposalProperties({ proposalId, readOnly, isTemplate }: ProposalPropertiesProps) {
+export default function ProposalProperties({
+  pagePermissions,
+  refreshPagePermissions = () => null,
+  proposalId,
+  readOnly,
+  isTemplate
+}: ProposalPropertiesProps) {
   const { proposal, refreshProposal } = useProposalDetails(proposalId);
   const { categories } = useProposalCategories();
   const { mutate: mutateTasks } = useTasks();
@@ -44,9 +52,6 @@ export default function ProposalProperties({ proposalId, readOnly, isTemplate }:
   });
 
   const { permissions: proposalFlowFlags, refresh: refreshProposalFlowFlags } = useProposalFlowFlags({ proposalId });
-  const { refresh: refreshPagePermissions, permissions } = usePagePermissions({
-    pageIdOrPath: proposalId
-  });
 
   const { members } = useMembers();
   const { roles = [], roleups } = useRoles();
@@ -83,7 +88,7 @@ export default function ProposalProperties({ proposalId, readOnly, isTemplate }:
       return roleups.some((role) => role.id === reviewer.roleId && role.users.some((_user) => _user.id === user.id));
     });
 
-  const canUpdateProposalProperties = permissions?.edit_content || isAdmin;
+  const canUpdateProposalProperties = pagePermissions?.edit_content || isAdmin;
 
   const reviewerOptionsRecord: Record<
     string,
