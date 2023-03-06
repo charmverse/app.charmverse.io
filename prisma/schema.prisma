@@ -468,6 +468,7 @@ model User {
   isBot                Boolean?               @default(false)
   path                 String?                @unique
   identityType         IdentityType?
+  primaryEmail         String?                @unique
   email                String?
   xpsEngineId          String?                @unique
   applications         Application[]
