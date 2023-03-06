@@ -1,10 +1,20 @@
 import fetch from 'adapters/http/fetch.server';
 import type { CollablandUserResult } from 'lib/collabland/interfaces';
-import log from 'lib/log';
+import { getLogger } from 'lib/log/prefix';
 import type { ExternalRole } from 'lib/roles';
 
-const DOMAIN = 'https://api-qa.collab.land';
+const log = getLogger('collabland-client');
+
+const DOMAIN = process.env.COLLAB_API_URL as string;
 const API_KEY = process.env.COLLAB_API_KEY as string;
+
+const DEFAULT_HEADERS = {
+  Accept: 'application/json',
+  'Content-Type': 'application/json',
+  'X-API-KEY': API_KEY
+};
+
+log.info('Using collabland API URL:', DOMAIN);
 
 export interface BountyEventSubject {
   id: string; // discord user id
@@ -60,6 +70,13 @@ export type CollablandDiscordRole = CollablandCredential<DiscordRoleSubject>;
 
 export type AnyCredentialType = CollablandBountyEvent | CollablandDiscordRole;
 
+function getHeaders(customHeaders: HeadersInit = {}) {
+  return {
+    ...DEFAULT_HEADERS,
+    ...customHeaders
+  };
+}
+
 export function getCredentials({ aeToken }: { aeToken: string }) {
   if (!API_KEY) {
     log.warn('No API Key provided for collab.land');
@@ -68,12 +85,9 @@ export function getCredentials({ aeToken }: { aeToken: string }) {
 
   return fetch<AnyCredentialType[]>(`${DOMAIN}/veramo/vcs`, {
     method: 'GET',
-    headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-      'X-API-KEY': API_KEY,
+    headers: getHeaders({
       Authorization: `AE ${aeToken}`
-    }
+    })
   });
 }
 
@@ -86,11 +100,7 @@ export function createCredential<T = BountyEventSubject>({ subject }: { subject:
 
   return fetch<CollablandCredential<T>>(`${DOMAIN}/veramo/vcreds`, {
     method: 'POST',
-    headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-      'X-API-KEY': API_KEY
-    },
+    headers: getHeaders(),
     body: JSON.stringify({ credentialSubjects: [subject] })
   });
 }
@@ -104,11 +114,7 @@ export async function canJoinSpaceViaDiscord({
 }) {
   try {
     const res = await fetch<CollablandUserResult>(`${DOMAIN}/discord/${discordServerId}/member/${discordUserId}`, {
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-        'X-API-KEY': API_KEY
-      }
+      headers: getHeaders()
     });
 
     const serverRoles = await getGuildRoles(discordServerId);
@@ -124,7 +130,9 @@ export async function canJoinSpaceViaDiscord({
       isVerified: !res.is_pending && !res.pending,
       roles: userRoles || []
     };
-  } catch (e) {
+  } catch (error) {
+    log.error(`Failed to verify user join conditions ${discordServerId}`, { error, apiDomain: DOMAIN });
+
     return {
       isVerified: false,
       roles: []
@@ -133,13 +141,16 @@ export async function canJoinSpaceViaDiscord({
 }
 
 export async function getGuildRoles(discordServerId: string) {
-  const allRoles = await fetch<ExternalRole[]>(`${DOMAIN}/discord/${discordServerId}/roles`, {
-    headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-      'X-API-KEY': API_KEY
-    }
-  });
-  // filter out irrelevant roles
-  return allRoles.filter((role) => role.name !== '@everyone' && !role.managed);
+  try {
+    const allRoles = await fetch<ExternalRole[]>(`${DOMAIN}/discord/${discordServerId}/roles`, {
+      headers: getHeaders()
+    });
+
+    // filter out irrelevant roles
+    return allRoles.filter((role) => role.name !== '@everyone' && !role.managed);
+  } catch (error) {
+    log.error(`Failed to fetch roles for server ${discordServerId}`, { error, apiDomain: DOMAIN });
+
+    return [];
+  }
 }
