@@ -76,18 +76,16 @@ export async function prepopulateUserProfile(user: User, ens: string | null) {
 
     const fiveNFTs = nfts.filter((nft) => !!nft.id).slice(0, 5);
 
-    await Promise.all(
-      fiveNFTs.map((nft) =>
-        prisma.profileItem.create({
-          data: {
-            id: nft.id,
-            userId: user.id,
-            isHidden: true,
-            isPinned: true,
-            type: 'nft'
-          }
-        })
-      )
-    );
+    await prisma.profileItem
+      .createMany({
+        data: fiveNFTs.map((nft) => ({
+          id: nft.id,
+          userId: user.id,
+          isHidden: true,
+          isPinned: true,
+          type: 'nft'
+        }))
+      })
+      .catch((err) => log.error('Failed to save nft profile item', { error: err, userId: user?.id, nfts: fiveNFTs }));
   }
 }
