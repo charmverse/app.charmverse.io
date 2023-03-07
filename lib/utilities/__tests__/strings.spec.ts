@@ -9,7 +9,8 @@ import {
   sanitizeForRegex,
   shortenHex,
   shortWalletAddress,
-  isUrl
+  isUrl,
+  isValidEmail
 } from '../strings';
 
 describe('strings', () => {
@@ -145,5 +146,24 @@ describe('isUrl()', () => {
     it(`should return false for ${url}`, () => {
       expect(isUrl(url)).toBe(false);
     });
+  });
+});
+describe('isValidEmail', () => {
+  it('should return true for a corporate email', () => {
+    expect(isValidEmail('hello@charmverse.io')).toBe(true);
+  });
+
+  it('should return true for a free email', () => {
+    expect(isValidEmail('test@gmail.com')).toBe(true);
+  });
+
+  // TBC - If we do this
+  // it('should return true when email contains non-latin characters', () => {
+  //   expect(isValidEmail('アシッシュ@ビジネス.コム')).toBe(true);
+  // });
+
+  it('should return false for an invalid email', () => {
+    expect(isValidEmail('hello')).toBe(false);
+    expect(isValidEmail('charmverse.io')).toBe(false);
   });
 });

@@ -1,10 +1,18 @@
 import type { FirebaseApp } from 'firebase/app';
 import { initializeApp } from 'firebase/app';
-import { getAuth, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import {
+  getAuth,
+  GoogleAuthProvider,
+  signInWithPopup,
+  sendSignInLinkToEmail,
+  isSignInWithEmailLink,
+  signInWithEmailLink
+} from 'firebase/auth';
 import { useEffect, useState } from 'react';
 
 import charmClient from 'charmClient';
 import { googleWebClientConfig } from 'config/constants';
+import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import type { LoginWithGoogleRequest } from 'lib/google/loginWithGoogle';
 import log from 'lib/log';
@@ -12,11 +20,16 @@ import { ExternalServiceError, InvalidInputError, SystemError } from 'lib/utilit
 
 import type { AnyIdLogin } from '../components/login/Login';
 
+import { useLocalStorage } from './useLocalStorage';
+
 export function useFirebaseAuth() {
   const [firebaseApp] = useState<FirebaseApp>(initializeApp(googleWebClientConfig));
   // Google client setup start
   const [provider] = useState(new GoogleAuthProvider());
   const { user, setUser } = useUser();
+  const [emailForSignIn, setEmailForSignIn] = useLocalStorage('emailForSignIn', '');
+
+  const { showMessage } = useSnackbar();
 
   const [isConnectingGoogle, setIsConnectingGoogle] = useState(false);
   useEffect(() => {
@@ -109,11 +122,52 @@ export function useFirebaseAuth() {
     auth.languageCode = 'en';
 
     const actionCodeSettings = {
-      url: `${window.location.origin}?param=123`,
+      url: `${window.location.origin}/authenticate?strategy=email`,
       handleCodeInApp: true
     };
 
-    // console.log('OUT', { auth });
+    // Always set this, so a prevuous email is overwritten
+    setEmailForSignIn(email);
+
+    sendSignInLinkToEmail(auth, email, actionCodeSettings)
+      // .then((success) => {
+      //   // The link was successfully sent. Inform the user.
+      //   // Save the email locally so you don't need to ask the user for it again
+      //   // if they open the link on the same device.
+      //   // ...
+      // })
+      .catch((error) => {
+        const errorMessage = error.message;
+        showMessage(errorMessage, 'error');
+        // ...
+      });
+  }
+
+  async function validateMagicLink() {
+    const email = emailForSignIn;
+
+    // console.log('Signing in with email', email);
+
+    if (!email) {
+      throw new InvalidInputError(`No email found in local storage`);
+    }
+
+    const auth = getAuth(firebaseApp);
+    auth.languageCode = 'en';
+
+    if (isSignInWithEmailLink(auth, window.location.href)) {
+      signInWithEmailLink(auth, email, window.location.href)
+        .then((result) => {
+          // This is where we should make a call to API to login the profile
+          // console.log('Login result', result);
+        })
+        .catch((error) => {
+          // console.log('Login error', error);
+        });
+
+      // The client SDK will parse the code from the link for you.
+    }
+    // The client SDK will parse the code from the link for you.
   }
 
   return {
@@ -121,6 +175,7 @@ export function useFirebaseAuth() {
     connectGoogleAccount,
     disconnectGoogleAccount,
     isConnectingGoogle,
-    requestMagicLinkViaFirebase
+    requestMagicLinkViaFirebase,
+    validateMagicLink
   };
 }

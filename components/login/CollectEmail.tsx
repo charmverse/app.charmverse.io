@@ -1,8 +1,6 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import { TextField } from '@mui/material';
 import InputLabel from '@mui/material/InputLabel';
-import { stubFalse } from 'lodash';
-import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
@@ -23,7 +21,7 @@ type Props = {
 
 export function CollectEmailDialog({ handleSubmit, isOpen, onClose }: Props) {
   const { register, getValues, getFieldState, formState, reset } = useForm<FormValues>({
-    mode: 'onBlur',
+    mode: 'onChange',
     resolver: yupResolver(schema)
   });
   // Return actual email or null

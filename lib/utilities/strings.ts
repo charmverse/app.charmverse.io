@@ -215,3 +215,10 @@ export function matchWalletAddress(
 
   return shortWalletAddress(address1) === shortWalletAddress(baseAddress);
 }
+const emailRegexp =
+  // eslint-disable-next-line max-len
+  /[a-z0-9!#$%&'*+/=?^_‘{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_‘{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/i;
+
+export function isValidEmail(email: string) {
+  return !!email && !!email.match(emailRegexp);
+}
