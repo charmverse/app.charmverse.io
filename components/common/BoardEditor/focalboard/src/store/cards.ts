@@ -244,16 +244,16 @@ export function sortCards(cardPages: CardPage[], board: Board, activeView: Board
         if (template.type === 'number' || template.type === 'date') {
           // Always put empty values at the bottom
           if (aValue && !bValue) {
-            result = -1;
+            return -1;
           }
           if (bValue && !aValue) {
-            result = 1;
+            return 1;
           }
           if (!aValue && !bValue) {
             result = titleOrCreatedOrder(a.page, b.page);
+          } else {
+            result = Number(aValue) - Number(bValue);
           }
-
-          result = Number(aValue) - Number(bValue);
         } else if (template.type === 'createdTime') {
           result = a.card.createdAt - b.card.createdAt;
         } else if (template.type === 'updatedTime') {
@@ -271,10 +271,10 @@ export function sortCards(cardPages: CardPage[], board: Board, activeView: Board
           // Text-based sort
 
           if (aValue.length > 0 && bValue.length <= 0) {
-            result = -1;
+            return -1;
           }
           if (bValue.length > 0 && aValue.length <= 0) {
-            result = 1;
+            return 1;
           }
           if (aValue.length <= 0 && bValue.length <= 0) {
             result = titleOrCreatedOrder(a.page, b.page);

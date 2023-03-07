@@ -1,3 +1,5 @@
+import { RateLimit } from 'async-sema';
+
 import fetch from 'adapters/http/fetch.server';
 import { COLLABLAND_API_URL } from 'lib/collabland/config';
 import type { CollablandUserResult } from 'lib/collabland/interfaces';
@@ -13,7 +15,9 @@ const DEFAULT_HEADERS = {
   'X-API-KEY': API_KEY
 };
 
-log.info('Using collabland API URL:', COLLABLAND_API_URL);
+log.debug('Using collabland API URL:', COLLABLAND_API_URL);
+
+const rateLimiter = RateLimit(1); // requests per second
 
 export interface BountyEventSubject {
   id: string; // discord user id
@@ -112,6 +116,7 @@ export async function canJoinSpaceViaDiscord({
   discordUserId: string;
 }) {
   try {
+    await rateLimiter();
     const res = await fetch<CollablandUserResult>(
       `${COLLABLAND_API_URL}/discord/${discordServerId}/member/${discordUserId}`,
       {
@@ -143,6 +148,7 @@ export async function canJoinSpaceViaDiscord({
 }
 
 export async function getGuildRoles(discordServerId: string) {
+  await rateLimiter();
   const allRoles = await fetch<ExternalRole[]>(`${COLLABLAND_API_URL}/discord/${discordServerId}/roles`, {
     headers: getHeaders()
   });
