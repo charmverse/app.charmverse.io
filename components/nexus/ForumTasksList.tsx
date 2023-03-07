@@ -153,7 +153,7 @@ export default function ForumTasksList({ tasks, error, mutateTasks }: Discussion
   const totalMentions = tasks.forum.unmarked.length + tasks.forum.marked.length;
 
   if (totalMentions === 0) {
-    return <EmptyTaskState taskType='forum comments' />;
+    return <EmptyTaskState taskType='forum events' />;
   }
 
   return (
