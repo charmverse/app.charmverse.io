@@ -12,17 +12,13 @@ export async function assignRolesCollabland({
   roles: string[] | string;
 }) {
   const roleIdsToAdd = Array.isArray(roles) ? roles : [roles];
+  const spacesData = await getSpacesAndUserFromDiscord({ discordUserId, discordServerId });
 
-  try {
-    const spacesData = await getSpacesAndUserFromDiscord({ discordUserId, discordServerId });
-    return Promise.allSettled(
-      spacesData.map(({ space, user }) =>
-        createAndAssignCollablanRoles({ userId: user.id, spaceId: space.id, roles: roleIdsToAdd })
-      )
-    );
-  } catch (e) {
-    return null;
-  }
+  return Promise.allSettled(
+    spacesData.map(({ space, user }) =>
+      createAndAssignCollablanRoles({ userId: user.id, spaceId: space.id, roles: roleIdsToAdd })
+    )
+  );
 }
 
 async function createAndAssignCollablanRoles({
