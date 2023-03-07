@@ -1,5 +1,4 @@
 import { Box, Chip, Stack } from '@mui/material';
-import { useEffect } from 'react';
 import useSWRImmutable from 'swr/immutable';
 
 import charmClient from 'charmClient';
@@ -19,17 +18,10 @@ import type { UserDetailsProps } from './components/UserDetails';
 import UserDetails from './components/UserDetails/UserDetails';
 import UserDetailsMini from './components/UserDetails/UserDetailsMini';
 import { isPublicUser } from './components/UserDetails/utils';
-import { useCollablandCredentials } from './hooks/useCollablandCredentials';
 
 export default function PublicProfile(props: UserDetailsProps) {
   const { user, readOnly } = props;
   const { user: currentUser } = useUser();
-
-  const { aeToken, setAeToken } = useCollablandCredentials();
-  const { data: credentials, error: collabError } = useSWRImmutable(
-    () => !!aeToken,
-    () => charmClient.collabland.importCredentials(aeToken as string)
-  );
 
   const {
     data,
@@ -154,44 +146,9 @@ export default function PublicProfile(props: UserDetailsProps) {
       );
     }
   }
+  const communities = (data?.communities ?? []).filter((community) => (isPublic ? !community.isHidden : true));
 
-  const bountyEvents = credentials?.bountyEvents ?? [];
-
-  const communities = (data?.communities ?? [])
-    .filter((community) => (isPublic ? !community.isHidden : true))
-    .map((community) => {
-      community.bounties.forEach((bounty) => {
-        bounty.hasCredential = bountyEvents.some((event) => event.subject.bountyId === bounty.bountyId);
-      });
-      return community;
-    });
-
-  const discordCommunities = (credentials?.discordEvents ?? []).map(
-    (credential): CommunityDetails => ({
-      isHidden: false,
-      joinDate: credential.createdAt,
-      id: credential.subject.discordGuildId,
-      name: credential.subject.discordGuildName,
-      logo: credential.subject.discordGuildAvatar,
-      votes: [],
-      proposals: [],
-      bounties: [],
-      isPinned: false
-      // roles: credential.subject.discordRoles.map((role, i) => <><strong>{role.name} </strong>{i < credential.subject.discordRoles.length - 1 && ' and '}</>)} issued on {toMonthDate(credential.createdAt)
-    })
-  );
-
-  const allCommunities = communities
-    .concat(discordCommunities)
-    .sort((commA, commB) => (commB.joinDate > commA.joinDate ? 1 : -1));
-
-  // clear the  api token if it fails once
-  useEffect(() => {
-    if (collabError) {
-      setAeToken('');
-    }
-  }, [collabError]);
-
+  const allCommunities = communities.sort((commA, commB) => (commB.joinDate > commA.joinDate ? 1 : -1));
   return (
     <Box>
       {readOnly ? <UserDetailsMini {...props} /> : <UserDetails {...props} />}
@@ -242,7 +199,6 @@ export default function PublicProfile(props: UserDetailsProps) {
             </Stack>
           </>
         ) : null}
-        {/* <CollablandCredentials error={collabError} /> */}
       </LoadingComponent>
     </Box>
   );
