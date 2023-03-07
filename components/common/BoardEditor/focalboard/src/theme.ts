@@ -125,7 +125,6 @@ export function setTheme(theme: Theme | null): Theme {
     document.documentElement.style.setProperty('--button-color-rgb', consolidatedTheme.buttonFg);
     document.documentElement.style.setProperty('--sidebar-bg-rgb', consolidatedTheme.sidebarBg);
     document.documentElement.style.setProperty('--sidebar-text-rgb', consolidatedTheme.sidebarFg);
-    document.documentElement.style.setProperty('--link-color-rgb', consolidatedTheme.link);
     document.documentElement.style.setProperty(
       '--sidebar-text-active-border-rgb',
       consolidatedTheme.sidebarTextActiveBorder
