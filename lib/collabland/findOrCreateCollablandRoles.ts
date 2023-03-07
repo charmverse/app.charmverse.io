@@ -20,7 +20,7 @@ export async function findOrCreateCollablandRoles({
   discordServerId: string;
 }): Promise<RolesRecord> {
   const rolesRecord: RolesRecord = {};
-  let discordRoles: ExternalRole[] | null = await getGuildRoles(discordServerId);
+  let discordRoles: ExternalRole[] | null = null;
 
   for (const externalRoleId of externalRoleIds) {
     // First check if discord role already exists in db
