@@ -13,7 +13,10 @@ type SettingsQuery = { userId: string; spaceId: string };
 
 // return a map of which categories the user is subscribed to
 export async function getUserSpaceNotifications(query: SettingsQuery): Promise<ClientUserSpaceNotifications> {
-  const [settings, categoryIds] = await Promise.all([getSavedOrDefaultSettings(query), _getCategoryIds(query.spaceId)]);
+  const [settings, categoryIds] = await Promise.all([
+    getSavedOrDefaultSettings(query),
+    _getSpaceCategoryIds(query.spaceId)
+  ]);
   const subscriptionMap = categoryIds.reduce<Record<string, boolean>>((acc, categoryId) => {
     const existsInList = settings.forumCategories.includes(categoryId);
     acc[categoryId] = settings.forumCategoriesMode === 'whitelist' ? existsInList : !existsInList;
@@ -46,7 +49,7 @@ function _getDefaultSettings(spaceId: string, userId: string): UserSpaceNotifica
   };
 }
 
-function _getCategoryIds(spaceId: string) {
+function _getSpaceCategoryIds(spaceId: string) {
   return prisma.postCategory
     .findMany({ where: { spaceId }, select: { id: true } })
     .then((categories) => categories.map((c) => c.id));

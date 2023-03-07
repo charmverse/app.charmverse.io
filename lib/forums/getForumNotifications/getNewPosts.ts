@@ -1,21 +1,26 @@
 import type { Post } from '@prisma/client';
 
+import type { ClientUserSpaceNotifications } from 'lib/userNotifications/spaceNotifications';
+
 import type { UnpopulatedForumTask } from './getForumNotifications';
 import { getPropertiesFromPost } from './utils';
 
-export async function getNewPosts({
+export function getNewPosts({
   userId,
   posts,
-  spacesRecord
+  space,
+  settings
 }: {
   userId: string;
   posts: Post[];
-  spacesRecord: Record<string, { name: string; domain: string }>;
-}): Promise<UnpopulatedForumTask[]> {
-  const postsFromOthers = posts.filter((post) => post.createdBy !== userId);
+  space: { name: string; domain: string };
+  settings: ClientUserSpaceNotifications;
+}): UnpopulatedForumTask[] {
+  const subscriptions = settings.forums.categories;
+  const postsFromOthers = posts.filter((post) => post.createdBy !== userId && subscriptions[post.categoryId]);
 
   return postsFromOthers.map((post) => ({
-    ...getPropertiesFromPost(post, spacesRecord[post.spaceId]),
+    ...getPropertiesFromPost(post, space),
     createdAt: post.createdAt.toISOString(),
     commentId: null,
     mentionId: null,

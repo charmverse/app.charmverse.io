@@ -1,9 +1,10 @@
-import type { Post, PostCategory, PostComment, Space, User } from '@prisma/client';
+import type { Post, PostComment, Space, User } from '@prisma/client';
 
 import { prisma } from 'db';
 import type { TaskUser } from 'lib/discussion/interfaces';
 import { getPostCategories } from 'lib/forums/categories/getPostCategories';
 import { filterAccessiblePostCategories } from 'lib/permissions/forum/filterAccessiblePostCategories';
+import { getUserSpaceNotifications } from 'lib/userNotifications/spaceNotifications';
 import { timeAgo } from 'lib/utilities/dates';
 import { isTruthy } from 'lib/utilities/types';
 
@@ -73,8 +74,11 @@ export async function getForumNotifications(userId: string): Promise<ForumTasksG
 
   let posts: ForumNotificationsContext['posts'] = [];
 
+  let newPosts: UnpopulatedForumTask[] = [];
+
   for (const spaceRole of spaceRoles) {
     const postCategories = await getPostCategories(spaceRole.space.id);
+    const spaceNotifications = await getUserSpaceNotifications({ spaceId: spaceRole.space.id, userId });
     const visiblePostCategories = await filterAccessiblePostCategories({
       postCategories,
       userId
@@ -109,6 +113,11 @@ export async function getForumNotifications(userId: string): Promise<ForumTasksG
         }
       }
     });
+
+    const _newPosts = getNewPosts({ userId, posts, space: spaceRole.space, settings: spaceNotifications });
+
+    newPosts = [...newPosts, ..._newPosts];
+
     posts = [...posts, ..._posts];
   }
 
@@ -153,8 +162,6 @@ export async function getForumNotifications(userId: string): Promise<ForumTasksG
   const notifiedTaskIds = new Set(notifications.map((notification) => notification.taskId));
 
   const context: ForumNotificationsContext = { userId, username, spacesRecord, posts };
-
-  const newPosts = await getNewPosts({ userId, posts, spacesRecord });
 
   // aggregate the results
   const { mentions, discussionUserIds, comments } = [
