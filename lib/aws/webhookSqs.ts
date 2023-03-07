@@ -68,15 +68,15 @@ export async function processMessages({ processorFn }: ProcessMssagesInput) {
 
     try {
       // process message
-      log.debug('Processing message', msgBody);
+      log.debug('Processing message', { message: msgBody, receiptHandle: message.ReceiptHandle });
       const result = await processorFn(msgBody as WebhookMessage);
 
-      log.debug('Message process successful:', result.success);
-      if (result.message) {
-        log.debug(result.message);
+      log.debug('Message process successful:', { message: result.message, receiptHandle: message.ReceiptHandle });
+      try {
+        await deleteMessage(message.ReceiptHandle || '');
+      } catch (e) {
+        log.error('Could not delete message', { receiptHandle: message.ReceiptHandle, error: e });
       }
-      log.debug('Deleting message', message.ReceiptHandle);
-      await deleteMessage(message.ReceiptHandle || '');
     } catch (e) {
       log.error('Failed to process webhook message', e);
     }
