@@ -114,7 +114,7 @@ export async function getForumNotifications(userId: string): Promise<ForumTasksG
       }
     });
 
-    const _newPosts = getNewPosts({ userId, posts, space: spaceRole.space, settings: spaceNotifications });
+    const _newPosts = getNewPosts({ userId, posts: _posts, space: spaceRole.space, settings: spaceNotifications });
 
     newPosts = [...newPosts, ..._newPosts];
 
