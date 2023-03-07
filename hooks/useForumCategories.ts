@@ -52,7 +52,8 @@ export function useForumCategories() {
       const updatedCategory = await charmClient.forum.updatePostCategory({
         spaceId: currentSpace.id,
         id: option.id,
-        name: option.name
+        name: option.name,
+        description: option.description
       });
 
       mutateForumCategories(

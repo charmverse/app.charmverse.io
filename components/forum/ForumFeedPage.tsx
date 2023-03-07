@@ -133,12 +133,18 @@ export function ForumPage() {
   return (
     <CenteredPageContent style={{ width: 1100 }}>
       <Box display='flex' justifyContent='space-between' alignItems='center' mb={2}>
-        <Typography variant='h1' mb={0}>
-          {currentCategory ? currentCategory?.name : 'All categories'}
-        </Typography>
+        <span>
+          <Typography variant='h1' mb={2}>
+            {currentCategory ? currentCategory?.name : 'All categories'}
+          </Typography>
+          {currentCategory?.description && (
+            <Typography data-test='current-category-description' variant='body1' mt={2}>
+              {currentCategory.description}
+            </Typography>
+          )}
+        </span>
         {currentCategory && <CategoryNotificationToggle categoryId={currentCategory.id} />}
       </Box>
-
       <TextField
         variant='outlined'
         placeholder='Search posts'

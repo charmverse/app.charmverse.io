@@ -9,15 +9,16 @@ import { CommentSort } from 'components/common/comments/CommentSort';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { useProposalDetails } from 'components/proposals/hooks/useProposalDetails';
 import { useIsAdmin } from 'hooks/useIsAdmin';
-import { usePagePermissions } from 'hooks/usePagePermissions';
 import type { CommentPermissions } from 'lib/comments';
 import type { PageMeta } from 'lib/pages';
+import type { IPagePermissionFlags } from 'lib/permissions/pages';
 
 type Props = {
   page: PageMeta;
+  permissions: IPagePermissionFlags;
 };
 
-export function PageComments({ page }: Props) {
+export function PageComments({ page, permissions }: Props) {
   const {
     comments,
     commentSort,
@@ -33,14 +34,10 @@ export function PageComments({ page }: Props) {
 
   const { proposal } = useProposalDetails(isProposal ? page.id : null);
 
-  const { permissions } = usePagePermissions({
-    pageIdOrPath: page.id
-  });
-
   const commentPermissions: CommentPermissions = {
-    add_comment: permissions?.comment ?? false,
-    upvote: permissions?.comment ?? false,
-    downvote: permissions?.comment ?? false,
+    add_comment: permissions.comment ?? false,
+    upvote: permissions.comment ?? false,
+    downvote: permissions.comment ?? false,
     delete_comments: isAdmin
   };
 
@@ -52,7 +49,7 @@ export function PageComments({ page }: Props) {
     <>
       <Divider sx={{ my: 3 }} />
 
-      {permissions?.comment && <CommentForm handleCreateComment={addComment} />}
+      {permissions.comment && <CommentForm handleCreateComment={addComment} />}
 
       {isLoadingComments ? (
         <Box height={100}>
@@ -84,7 +81,7 @@ export function PageComments({ page }: Props) {
                 No Comments Yet
               </Typography>
 
-              {permissions?.comment && <Typography color='secondary'>Be the first to share what you think!</Typography>}
+              {permissions.comment && <Typography color='secondary'>Be the first to share what you think!</Typography>}
             </Stack>
           )}
         </>
