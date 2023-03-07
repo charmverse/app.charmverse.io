@@ -4,10 +4,10 @@ import { createSelector, createSlice } from '@reduxjs/toolkit';
 import type { Board } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card, CardPage } from 'lib/focalboard/card';
+import { CardFilter } from 'lib/focalboard/cardFilter';
 import type { Member } from 'lib/members/interfaces';
 import type { PageMeta } from 'lib/pages';
 
-import { CardFilter } from '../cardFilter';
 import { Constants } from '../constants';
 import { Utils } from '../utils';
 
