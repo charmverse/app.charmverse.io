@@ -75,11 +75,10 @@ export async function processMessages({ processorFn }: ProcessMssagesInput) {
       if (result.message) {
         log.debug(result.message);
       }
-    } catch (e) {
-      log.error('Failed to process webhook message', e);
-    } finally {
       log.debug('Deleting message', message.ReceiptHandle);
       await deleteMessage(message.ReceiptHandle || '');
+    } catch (e) {
+      log.error('Failed to process webhook message', e);
     }
   } else {
     log.debug('No messages');
