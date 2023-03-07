@@ -79,7 +79,7 @@ export async function processWebhookMessage(message: WebhookMessage): Promise<We
     // we cannot process this message, just remove from queue
     return {
       success: false,
-      message: 'Unsupported message type or payload.'
+      message: `Unsupported message type or payload: ${data?.event || 'undefined'}`
     };
   }
 
