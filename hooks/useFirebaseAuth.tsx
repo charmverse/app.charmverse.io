@@ -19,7 +19,6 @@ export function useFirebaseAuth() {
   const { user, setUser } = useUser();
 
   const [isConnectingGoogle, setIsConnectingGoogle] = useState(false);
-
   useEffect(() => {
     provider.addScope('email');
     provider.addScope('openid');
@@ -104,10 +103,24 @@ export function useFirebaseAuth() {
     setUser(loggedInUser);
   }
 
+  async function requestMagicLinkViaFirebase({ email }: { email: string }) {
+    // console.log('IN', { email });
+    const auth = getAuth(firebaseApp);
+    auth.languageCode = 'en';
+
+    const actionCodeSettings = {
+      url: `${window.location.origin}?param=123`,
+      handleCodeInApp: true
+    };
+
+    // console.log('OUT', { auth });
+  }
+
   return {
     loginWithGoogle,
     connectGoogleAccount,
     disconnectGoogleAccount,
-    isConnectingGoogle
+    isConnectingGoogle,
+    requestMagicLinkViaFirebase
   };
 }
