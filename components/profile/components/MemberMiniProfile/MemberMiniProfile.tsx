@@ -7,8 +7,9 @@ import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { DialogTitle } from 'components/common/Modal';
-import { UserDetails } from 'components/profile/components';
 import { MemberPropertiesRenderer } from 'components/profile/components/SpacesMemberDetails/components/MemberPropertiesRenderer';
+import UserDetails from 'components/profile/components/UserDetails/UserDetails';
+import Legend from 'components/settings/Legend';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMemberProperties } from 'hooks/useMemberProperties';
 import { useMemberPropertyValues } from 'hooks/useMemberPropertyValues';
@@ -17,23 +18,13 @@ import { useUser } from 'hooks/useUser';
 import type { Member } from 'lib/members/interfaces';
 
 import { MemberPropertiesPopup } from '../SpacesMemberDetails/components/MemberPropertiesPopup';
+import UserDetailsMini from '../UserDetails/UserDetailsMini';
 
 import { NftsList } from './BlockchainData/NftsList';
 import { OrgsList } from './BlockchainData/OrgsList';
 import { PoapsList } from './BlockchainData/PoapsList';
 
-function MemberProfile({
-  cancelButtonText,
-  title,
-  member,
-  onClose
-}: {
-  cancelButtonText?: string;
-  title?: string;
-  member: Member;
-  onClose: VoidFunction;
-}) {
-  const { mutateMembers } = useMembers();
+function MemberProfile({ title, member, onClose }: { title?: string; member: Member; onClose: VoidFunction }) {
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
   const { user: currentUser, setUser } = useUser();
@@ -51,15 +42,12 @@ function MemberProfile({
   const { updateSpaceValues } = useMemberPropertyValues(member.id);
 
   const username =
-    (member.properties.find((memberProperty) => memberProperty.memberPropertyId === propertiesRecord.name?.id)
+    (member.properties?.find((memberProperty) => memberProperty.memberPropertyId === propertiesRecord.name?.id)
       ?.value as string) ?? member.username;
 
   const { data: user, isLoading: isFetchingUser } = useSWR(`users/${member.path}`, () =>
     charmClient.getUserByPath(member.path as string)
   );
-
-  const isLoading = isFetchingUser;
-
   if (!currentSpace || !currentUser) {
     return null;
   }
@@ -68,15 +56,11 @@ function MemberProfile({
     return (
       <MemberPropertiesPopup
         title={title && title.length !== 0 ? title : 'Edit your profile'}
-        onClose={() => {
-          mutateMembers();
-          onClose();
-        }}
-        isLoading={isLoading}
+        onClose={() => onClose()}
+        isLoading={isFetchingUser}
         memberId={currentUser.id}
         spaceId={currentSpace.id}
         updateMemberPropertyValues={updateSpaceValues}
-        cancelButtonText={cancelButtonText && cancelButtonText.length !== 0 ? cancelButtonText : 'Cancel'}
         postComponent={
           user && (
             <Stack gap={3}>
@@ -99,18 +83,18 @@ function MemberProfile({
             }}
             // currentUser doesn't have profile thus is not considered as publicUser inside UserDetails
             // giving the ability to update the profile properties
-            user={user.id === currentUser?.id ? currentUser : user}
+            user={user.id === currentUser.id ? currentUser : user}
             updateUser={setUser}
           />
         )}
-        <Typography fontWeight={600}>Member details</Typography>
+        <Legend mt={4}>Member details</Legend>
       </MemberPropertiesPopup>
     );
   }
 
   return (
     <Dialog open onClose={onClose} fullScreen={fullScreen}>
-      {isLoading || !user ? (
+      {isFetchingUser || !user ? (
         <DialogContent>
           <LoadingComponent isLoading />
         </DialogContent>
@@ -136,7 +120,8 @@ function MemberProfile({
             </Stack>
           </DialogTitle>
           <DialogContent dividers>
-            <UserDetails user={user} readOnly />
+            <UserDetailsMini user={user} readOnly />
+            <Legend mt={4}>Member details</Legend>
             {currentSpacePropertyValues && (
               <Box my={3}>
                 <MemberPropertiesRenderer properties={currentSpacePropertyValues.properties} />
@@ -158,10 +143,8 @@ function MemberProfile({
 export function MemberMiniProfile({
   memberId,
   onClose,
-  title,
-  cancelButtonText
+  title
 }: {
-  cancelButtonText?: string;
   title?: string;
   memberId: string;
   onClose: VoidFunction;
@@ -173,5 +156,5 @@ export function MemberMiniProfile({
     return null;
   }
 
-  return <MemberProfile title={title} cancelButtonText={cancelButtonText} member={member} onClose={onClose} />;
+  return <MemberProfile title={title} member={member} onClose={onClose} />;
 }

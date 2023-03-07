@@ -116,7 +116,7 @@ export function InlineCommentSubMenu({ pluginKey }: { pluginKey: PluginKey }) {
       const threadWithComment = await charmClient.comments.startThread({
         comment: commentContent,
         context: extractTextFromSelection(),
-        pageId: cardId ?? currentPageId
+        pageId: cardId || currentPageId
       });
       setThreads((_threads) => ({ ..._threads, [threadWithComment.id]: threadWithComment }));
       updateInlineComment(threadWithComment.id)(view.state, view.dispatch);

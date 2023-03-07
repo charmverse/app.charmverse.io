@@ -11,6 +11,7 @@ import { useEffect, useState } from 'react';
 
 import charmClient from 'charmClient';
 import Legend from 'components/settings/Legend';
+import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useUser } from 'hooks/useUser';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
@@ -57,10 +58,15 @@ const TASK_TABS = [
 
 type TaskType = (typeof TASK_TABS)[number]['type'];
 
+export type TasksPageProps = { taskType?: TaskType };
+
 export default function TasksPage() {
   const router = useRouter();
   const { user } = useUser();
-  const [currentTaskType, setCurrentTaskType] = useState<TaskType>((router.query?.task ?? 'multisig') as TaskType);
+  const { pathProps } = useSettingsDialog();
+  // check from list of tabs to make sure task type is valid
+  const defaultTab = TASK_TABS.find((taskTab) => taskTab.type === pathProps?.taskType);
+  const [currentTaskType, setCurrentTaskType] = useState<TaskType>(defaultTab?.type ?? TASK_TABS[0].type);
   const { error, mutate: mutateTasks, tasks, gnosisTasks, gnosisTasksServerError, mutateGnosisTasks } = useTasks();
   const theme = useTheme();
 
@@ -170,7 +176,7 @@ export default function TasksPage() {
         <GnosisTasksList error={gnosisTasksServerError} mutateTasks={mutateGnosisTasks} tasks={gnosisTasks} />
       )}
       {currentTaskType === 'discussion' && (
-        <DiscussionTasksList mutateTasks={mutateTasks} error={error} tasks={tasks} />
+        <DiscussionTasksList skippedDiscussions={['bounty']} mutateTasks={mutateTasks} error={error} tasks={tasks} />
       )}
       {currentTaskType === 'vote' && <VoteTasksList mutateTasks={mutateTasks} error={error} tasks={tasks} />}
       {currentTaskType === 'proposal' && <ProposalTasksList error={error} tasks={tasks} mutateTasks={mutateTasks} />}

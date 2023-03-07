@@ -24,6 +24,8 @@ import type { PageMeta } from 'lib/pages';
 import type { IPagePermissionFlags } from 'lib/permissions/pages';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
+import PageDeleteBanner from '../DocumentPage/components/PageDeleteBanner';
+
 /**
  *
  * For the original version of this file, see src/boardPage.tsx in focalboard
@@ -83,7 +85,7 @@ export function DatabasePage({ page, setPage, readOnly = false, pagePermissions 
       dispatch(setCurrentView(urlViewId || ''));
       setFocalboardViewsRecord((focalboardViewsRecord) => ({ ...focalboardViewsRecord, [boardId]: urlViewId }));
     }
-  }, [page.boardId, router.query.viewId, boardViews]);
+  }, [page.boardId, boardViews]);
 
   // load initial data for readonly boards - otherwise its loaded in _app.tsx
   // inline linked board will be loaded manually

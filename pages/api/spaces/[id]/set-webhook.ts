@@ -5,7 +5,7 @@ import nc from 'next-connect';
 import { prisma } from 'db';
 import { ApiError, onError, onNoMatch, requireSpaceMembership, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import { subscribeToEvents, createSigningSecret } from 'lib/webhook/subscribeToEvents';
+import { subscribeToEvents, createSigningSecret } from 'lib/webhookPublisher/subscribeToEvents';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

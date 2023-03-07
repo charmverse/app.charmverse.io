@@ -22,9 +22,11 @@ import charmClient from 'charmClient';
 import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import EmojiPicker from 'components/common/BoardEditor/focalboard/src/widgets/emojiPicker';
+import { DuplicatePageAction } from 'components/common/DuplicatePageAction';
 import TreeItemContent from 'components/common/TreeItemContent';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { usePageFromPath } from 'hooks/usePageFromPath';
+import { usePagePermissions } from 'hooks/usePagePermissions';
 import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { isTouchScreen } from 'lib/utilities/browser';
@@ -56,9 +58,17 @@ export const StyledTreeItem = styled(TreeItem, { shouldForwardProp: (prop) => pr
 }>(({ isActive, theme }) => ({
   position: 'relative',
   backgroundColor: isActive ? theme.palette.action.focus : 'unset',
+  marginLeft: 3,
+  marginRight: 3,
+  // unset margin on child tree items
+  '.MuiTreeItem-root': {
+    marginLeft: 0,
+    marginRight: 0
+  },
 
   [`& .${treeItemClasses.content}`]: {
     color: theme.palette.text.secondary,
+    marginBottom: 1,
     // paddingRight: theme.spacing(1),
     // fontWeight: theme.typography.fontWeightMedium,
     '.MuiTypography-root': {
@@ -89,11 +99,12 @@ export const StyledTreeItem = styled(TreeItem, { shouldForwardProp: (prop) => pr
     },
     [`& .${treeItemClasses.label}`]: {
       fontWeight: 'inherit',
+      paddingLeft: 0,
       color: 'inherit'
     },
     [`& .${treeItemClasses.iconContainer}`]: {
       marginRight: 0,
-      width: '28px'
+      width: '24px'
     },
     [`& .${treeItemClasses.iconContainer} svg`]: {
       color: greyColor2
@@ -273,12 +284,6 @@ const TreeItemComponent = React.forwardRef<React.Ref<HTMLDivElement>, TreeItemCo
   )
 );
 
-const PageMenuItem = styled(ListItemButton)`
-  .MuiTypography-root {
-    font-weight: 600;
-  }
-`;
-
 // eslint-disable-next-line react/function-component-definition
 const PageTreeItem = forwardRef<any, PageTreeItemProps>((props, ref) => {
   const {
@@ -378,18 +383,17 @@ const PageTreeItem = forwardRef<any, PageTreeItemProps>((props, ref) => {
 function PageActionsMenu({ closeMenu, pageId, pagePath }: { closeMenu: () => void; pageId: string; pagePath: string }) {
   const boards = useAppSelector(getSortedBoards);
   const currentPage = usePageFromPath();
-  const { deletePage, getPagePermissions, pages } = usePages();
+  const { deletePage, pages } = usePages();
   const { showMessage } = useSnackbar();
-  const permissions = getPagePermissions(pageId);
+  const { permissions: pagePermissions } = usePagePermissions({ pageIdOrPath: pageId });
   const router = useRouter();
-
-  const deletePageDisabled = !permissions.delete;
+  const deletePageDisabled = !pagePermissions?.delete;
+  const page = pages[pageId];
 
   async function deletePageWithBoard() {
     if (deletePageDisabled) {
       return;
     }
-    const page = pages[pageId];
     const board = boards.find((b) => b.id === page?.id);
     const newPage = await deletePage({
       board,
@@ -418,21 +422,22 @@ function PageActionsMenu({ closeMenu, pageId, pagePath }: { closeMenu: () => voi
     <>
       <Tooltip arrow placement='top' title={deletePageDisabled ? 'You do not have permission to delete this page' : ''}>
         <div>
-          <PageMenuItem dense disabled={deletePageDisabled} onClick={deletePageWithBoard}>
+          <ListItemButton dense disabled={deletePageDisabled} onClick={deletePageWithBoard}>
             <ListItemIcon>
               <DeleteOutlinedIcon />
             </ListItemIcon>
             <ListItemText>Delete</ListItemText>
-          </PageMenuItem>
+          </ListItemButton>
         </div>
       </Tooltip>
+      {page && <DuplicatePageAction page={page} pagePermissions={pagePermissions} />}
       <CopyToClipboard text={getAbsolutePath()} onCopy={() => onCopy()}>
-        <PageMenuItem dense>
+        <ListItemButton dense>
           <ListItemIcon>
             <ContentCopyIcon fontSize='small' />
           </ListItemIcon>
           <ListItemText>Copy link</ListItemText>
-        </PageMenuItem>
+        </ListItemButton>
       </CopyToClipboard>
     </>
   );

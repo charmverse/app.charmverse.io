@@ -39,7 +39,7 @@ export async function canCreate({ resourceId, userId, spaceId }: VideoPermission
     });
   } else if (page) {
     const pagePermissions = await computeUserPagePermissions({
-      pageId: resourceId,
+      resourceId,
       userId
     });
 
@@ -76,7 +76,7 @@ export async function canView({ resourceId, userId }: VideoPermissionComputeRequ
     });
   } else if (page) {
     const pagePermissions = await computeUserPagePermissions({
-      pageId: resourceId,
+      resourceId,
       userId
     });
 

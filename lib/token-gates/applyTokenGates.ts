@@ -21,14 +21,11 @@ export async function applyTokenGates({
   userId,
   tokens,
   commit,
-  joinType = 'token_gate'
+  reevaluate = false
 }: TokenGateVerification): Promise<TokenGateVerificationResult> {
   if (!spaceId || !userId) {
     throw new InvalidInputError(`Please provide a valid ${!spaceId ? 'space' : 'user'} id.`);
   }
-
-  // Try to apply disocrd gate first
-  await applyDiscordGate({ spaceId, userId });
 
   const space = await prisma.space.findUnique({
     where: {
@@ -51,6 +48,17 @@ export async function applyTokenGates({
   if (!space) {
     trackUserAction('token_gate_verification', { result: 'fail', spaceId, userId });
     throw new DataNotFoundError(`Could not find space with id ${spaceId}.`);
+  }
+
+  const spaceMembership = await prisma.spaceRole.findFirst({
+    where: {
+      spaceId,
+      userId
+    }
+  });
+
+  if (!spaceMembership && reevaluate) {
+    throw new InvalidInputError('User is not a member of this space.');
   }
 
   const { tokenGates } = space;
@@ -108,30 +116,27 @@ export async function applyTokenGates({
 
   const assignedRoles = roleIdsToAssign.map((roleId) => space.roles.find((role) => role.id === roleId) as Role);
 
-  const spaceMembership = await prisma.spaceRole.findFirst({
-    where: {
-      spaceId,
-      userId
-    }
-  });
-
   const returnValue: TokenGateVerificationResult = {
     userId,
     space,
     roles: assignedRoles
   };
 
-  trackUserAction('token_gate_verification', {
-    result: 'pass',
-    spaceId,
-    userId,
-    roles: assignedRoles.map((r) => r.name)
-  });
-  trackUserAction('join_a_workspace', { spaceId, userId, source: joinType });
+  if (!reevaluate) {
+    trackUserAction('token_gate_verification', {
+      result: 'pass',
+      spaceId,
+      userId,
+      roles: assignedRoles.map((r) => r.name)
+    });
+  }
 
   if (!commit) {
     return returnValue;
   }
+
+  // Try to apply discord gate first
+  await applyDiscordGate({ spaceId, userId });
 
   await updateUserTokenGates({ tokenGates: verifiedTokenGates, spaceId, userId });
 
@@ -170,7 +175,7 @@ export async function applyTokenGates({
     return returnValue;
   } else {
     const spaceRoleId = v4();
-    const createdSpaceRole = await prisma.spaceRole.create({
+    await prisma.spaceRole.create({
       data: {
         id: spaceRoleId,
         spaceRoleToRole: {
@@ -195,8 +200,6 @@ export async function applyTokenGates({
         }
       }
     });
-
-    updateTrackUserProfileById(userId);
 
     return returnValue;
   }

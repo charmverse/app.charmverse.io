@@ -22,9 +22,9 @@ export async function applyDiscordGate({ spaceId, userId }: Props): Promise<Spac
     throw new InvalidInputError('User not found');
   }
 
-  const { isEligible, roles } = await verifyDiscordGateForSpace({ space, discordUserId: user?.discordUser?.discordId });
+  const { isVerified, roles } = await verifyDiscordGateForSpace({ space, discordUserId: user?.discordUser?.discordId });
 
-  if (!isEligible) {
+  if (!isVerified) {
     return null;
   }
 

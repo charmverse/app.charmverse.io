@@ -4,7 +4,7 @@ import nc from 'next-connect';
 
 import { prisma } from 'db';
 import { onError, onNoMatch, requireApiKey } from 'lib/middleware';
-import { generateMarkdown } from 'lib/pages';
+import { generateMarkdown } from 'lib/prosemirror/plugins/markdown/generateMarkdown';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -136,26 +136,38 @@ async function getBounties(req: NextApiRequest, res: NextApiResponse) {
 
   const spaceId = req.authorizedSpaceId;
 
-  const bounties = await prisma.bounty.findMany({
-    where: {
-      spaceId,
-      status: statuses
-        ? {
-            in: statuses
-          }
-        : undefined
-    },
-    include: {
-      author: {
-        include: {
-          wallets: true
-        }
+  const bounties = await prisma.bounty
+    .findMany({
+      where: {
+        spaceId,
+        status: statuses
+          ? {
+              in: statuses
+            }
+          : undefined
       },
-      applications: true,
-      space: true,
-      page: true
-    }
-  });
+      include: {
+        author: {
+          include: {
+            wallets: true
+          }
+        },
+        applications: true,
+        space: true,
+        page: {
+          select: {
+            path: true,
+            createdAt: true,
+            title: true,
+            content: true,
+            contentText: true,
+            deletedAt: true
+          }
+        }
+      }
+    })
+    // Make the API response faster by avoiding a join operation on the database, and filtering the results
+    .then((_bounties) => _bounties.filter((b) => !b.page?.deletedAt));
 
   /**
    * Returns the wallet addresses that have received a payment for this bounty
@@ -177,7 +189,6 @@ async function getBounties(req: NextApiRequest, res: NextApiResponse) {
   for (const bounty of bounties) {
     try {
       const markdownText = await generateMarkdown({
-        title: bounty.page?.title ?? 'Untitled',
         content: bounty.page?.content ?? { type: 'doc', content: [] }
       });
       markdown.push(markdownText);

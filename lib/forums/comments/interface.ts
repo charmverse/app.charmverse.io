@@ -2,6 +2,8 @@ import type { PostComment, User } from '@prisma/client';
 
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
+export type TaskUser = Pick<User, 'id' | 'username' | 'path' | 'avatar' | 'avatarTokenId'>;
+
 export type PostCommentWithVote = PostComment & {
   upvotes: number;
   downvotes: number;
@@ -36,7 +38,7 @@ export type ForumTask = {
   commentId: string | null;
   mentionId: string | null;
   commentText: string;
-  createdBy: User | null;
+  createdBy: TaskUser | null;
 };
 
 export type ForumTasksGroup = {

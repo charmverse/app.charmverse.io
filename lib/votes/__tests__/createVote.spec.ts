@@ -15,12 +15,6 @@ describe('createVote', () => {
       spaceId: space.id
     });
 
-    await addSpaceOperations({
-      forSpaceId: space.id,
-      operations: ['createVote'],
-      spaceId: space.id
-    });
-
     const createdVote = await createVoteService({
       createdBy: user.id,
       deadline: new Date(),
@@ -55,12 +49,6 @@ describe('createVote', () => {
 
     const page = await createPage({
       createdBy: user.id,
-      spaceId: space.id
-    });
-
-    await addSpaceOperations({
-      forSpaceId: space.id,
-      operations: ['createVote'],
       spaceId: space.id
     });
 

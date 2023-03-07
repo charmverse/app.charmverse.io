@@ -125,16 +125,6 @@ export async function createUserAndSpace({
   };
 }
 
-export async function createDiscordUser({ userId, discordUserId }: { userId: string; discordUserId: string }) {
-  return prisma.discordUser.create({
-    data: {
-      account: {},
-      discordId: discordUserId,
-      userId
-    }
-  });
-}
-
 export async function generateBounty({
   content = undefined,
   contentText = '',
@@ -362,3 +352,5 @@ export async function generateUserAndSpace({
     privateKey: wallet.privateKey
   };
 }
+
+export type UserAndSpaceContext = Awaited<ReturnType<typeof generateUserAndSpace>>;

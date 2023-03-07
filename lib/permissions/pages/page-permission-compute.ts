@@ -1,16 +1,22 @@
 import type { Prisma } from '@prisma/client';
-import { Page, PageOperations } from '@prisma/client';
 
 import { prisma } from 'db';
+import { PageNotFoundError } from 'lib/pages/server';
+import { typedKeys } from 'lib/utilities/objects';
+
+import type { PermissionFilteringPolicyFnInput } from '../buildComputePermissionsWithPermissionFilteringPolicies';
+import { buildComputePermissionsWithPermissionFilteringPolicies } from '../buildComputePermissionsWithPermissionFilteringPolicies';
+import type { PermissionCompute } from '../interfaces';
 
 import { AllowedPagePermissions } from './available-page-permissions.class';
 import type {
   IPagePermissionFlags,
   IPagePermissionUserRequest,
-  IPageWithNestedSpaceRole
+  IPageWithNestedSpaceRole,
+  PageOperationType
 } from './page-permission-interfaces';
-import { PageOperationType } from './page-permission-interfaces';
 import { permissionTemplates } from './page-permission-mapping';
+import { computePagePermissionsUsingProposalPermissions } from './pagePermissionsWithComputeProposalPermissions';
 
 /**
  * Nested query to get the space role a user has in the space that owns this page
@@ -86,11 +92,71 @@ function permissionsQuery(request: IPagePermissionUserRequest): Prisma.PagePermi
   };
 }
 
-export async function computeUserPagePermissions({
-  pageId,
-  allowAdminBypass = true,
+type PageInDb = {
+  id: string;
+  proposalId: string | null;
+  convertedProposalId: string | null;
+};
+
+function pageResolver({ resourceId }: { resourceId: string }) {
+  return prisma.page.findUnique({
+    where: {
+      id: resourceId
+    },
+    select: {
+      id: true,
+      proposalId: true,
+      convertedProposalId: true
+    }
+  }) as Promise<PageInDb>;
+}
+
+type PagePolicyInput = PermissionFilteringPolicyFnInput<PageInDb, IPagePermissionFlags>;
+
+async function convertedToProposalPolicy({ flags, resource }: PagePolicyInput): Promise<IPagePermissionFlags> {
+  const newPermissions = { ...flags };
+
+  if (!resource.convertedProposalId) {
+    return newPermissions;
+  }
+
+  const allowedOperations: PageOperationType[] = ['read'];
+
+  typedKeys(flags).forEach((flag) => {
+    if (!allowedOperations.includes(flag)) {
+      newPermissions[flag] = false;
+    }
+  });
+
+  return newPermissions;
+}
+
+async function baseComputeUserPagePermissions({
+  resourceId,
   userId
-}: IPagePermissionUserRequest): Promise<IPagePermissionFlags> {
+}: PermissionCompute): Promise<IPagePermissionFlags> {
+  const pageInDb = await prisma.page.findUnique({
+    where: { id: resourceId },
+    select: {
+      id: true,
+      proposalId: true,
+      convertedProposalId: true
+    }
+  });
+
+  const pageId = resourceId;
+
+  if (!pageInDb) {
+    throw new PageNotFoundError(`${resourceId}`);
+  }
+
+  if (pageInDb.proposalId) {
+    return computePagePermissionsUsingProposalPermissions({
+      resourceId: pageId,
+      userId
+    });
+  }
+
   const [foundSpaceRole, permissions] = await Promise.all([
     // Check if user is a space admin for this page so they gain full rightss
     (
@@ -102,7 +168,7 @@ export async function computeUserPagePermissions({
   ]);
 
   // TODO DELETE LATER when we remove admin access to workspace
-  if (foundSpaceRole && foundSpaceRole.isAdmin === true && allowAdminBypass) {
+  if (foundSpaceRole && foundSpaceRole.isAdmin === true) {
     return new AllowedPagePermissions().full;
   }
 
@@ -120,3 +186,12 @@ export async function computeUserPagePermissions({
 
   return computedPermissions.operationFlags;
 }
+
+export const computeUserPagePermissions = buildComputePermissionsWithPermissionFilteringPolicies<
+  PageInDb,
+  IPagePermissionFlags
+>({
+  resolver: pageResolver,
+  computeFn: baseComputeUserPagePermissions,
+  policies: [convertedToProposalPolicy]
+});

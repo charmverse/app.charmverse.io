@@ -4,19 +4,48 @@ import nc from 'next-connect';
 
 import { prisma } from 'db';
 import { getAccessibleMemberPropertiesBySpace } from 'lib/members/getAccessibleMemberPropertiesBySpace';
-import type { Member } from 'lib/members/interfaces';
+import type { Member, PublicMember } from 'lib/members/interfaces';
 import { getPropertiesWithValues } from 'lib/members/utils';
-import { onError, onNoMatch, requireUser } from 'lib/middleware';
+import { onError, onNoMatch } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
+import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { hasNftAvatar } from 'lib/users/hasNftAvatar';
+import { deterministicRandomName } from 'lib/utilities/randomName';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireUser).get(getMembers);
+handler.get(getMembers);
 
-async function getMembers(req: NextApiRequest, res: NextApiResponse<Member[]>) {
+async function getMembers(req: NextApiRequest, res: NextApiResponse<(Member | PublicMember)[]>) {
   const spaceId = req.query.id as string;
-  const userId = req.session.user.id;
+  const userId = req.session.user?.id as string | undefined;
+
+  const { error } = await hasAccessToSpace({ userId, spaceId });
+
+  // Cleanup in future when we simplify members endpoint
+  // User has no access, return a subset of users
+  if (error) {
+    const spaceRoles = await prisma.spaceRole.findMany({
+      where: {
+        spaceId
+      },
+      select: {
+        user: {
+          select: {
+            id: true
+          }
+        }
+      }
+    });
+
+    const mappedUsers: PublicMember[] = spaceRoles.map((sr) => ({
+      id: sr.user.id,
+      username: deterministicRandomName(sr.user.id)
+    }));
+
+    return res.status(200).json(mappedUsers);
+  }
+  // Proceed as normal
   const search = (req.query.search as string) ?? '';
 
   const whereOr: Prisma.Enumerable<Prisma.SpaceRoleWhereInput> = [];

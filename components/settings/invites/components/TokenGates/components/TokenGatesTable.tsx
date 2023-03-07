@@ -67,9 +67,8 @@ export default function TokenGatesTable({ isAdmin, onDelete, tokenGates }: Props
   const litClient = useLitProtocol();
   const [descriptions, setDescriptions] = useState<(string | null)[]>([]);
   const space = useCurrentSpace();
-  const router = useRouter();
   const { showMessage } = useSnackbar();
-  const shareLink = `${window.location.origin}/join?domain=${router.query.domain}`;
+  const shareLink = `${window.location.origin}/join?domain=${space?.domain}`;
   const { openWalletSelectorModal } = useContext(Web3Connection);
 
   function onCopy() {
@@ -126,7 +125,7 @@ export default function TokenGatesTable({ isAdmin, onDelete, tokenGates }: Props
         ...(tokenGate.conditions as any)
       });
 
-      await charmClient.verifyTokenGate({
+      await charmClient.tokenGates.verifyTokenGate({
         commit: false,
         spaceId: space?.id as string,
         tokens: [{ signedToken: jwt, tokenGateId: tokenGate.id }]

@@ -15,7 +15,7 @@ async function restrictPermissions(req: NextApiRequest, res: NextApiResponse<IPa
   const pageId = req.query.id as string;
 
   const computed = await computeUserPagePermissions({
-    pageId,
+    resourceId: pageId,
     userId: req.session?.user?.id
   });
 

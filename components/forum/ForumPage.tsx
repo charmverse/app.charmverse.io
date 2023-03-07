@@ -21,7 +21,7 @@ import { setUrlWithoutRerender } from 'lib/utilities/browser';
 import { CategoryMenu } from './components/CategoryMenu';
 import { CategorySelect } from './components/CategorySelect';
 import { CreateForumPost } from './components/CreateForumPost';
-import PostDialog from './components/PostDialog';
+import { PostDialog } from './components/PostDialog';
 import { PostSkeleton } from './components/PostList/components/PostSkeleton';
 import { ForumPostList } from './components/PostList/PostList';
 
@@ -134,6 +134,11 @@ export function ForumPage() {
       <Typography variant='h1' mb={2}>
         {currentCategory ? currentCategory?.name : 'All categories'}
       </Typography>
+      {currentCategory?.description && (
+        <Typography data-test='current-category-description' variant='body1' mb={2}>
+          {currentCategory.description}
+        </Typography>
+      )}
 
       <TextField
         variant='outlined'

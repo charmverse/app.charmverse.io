@@ -18,7 +18,7 @@ async function startThread(req: NextApiRequest, res: NextApiResponse<ThreadWithC
   const userId = req.session.user.id;
 
   const permissionSet = await computeUserPagePermissions({
-    pageId,
+    resourceId: pageId,
     userId
   });
 

@@ -17,6 +17,7 @@ export function generateDefaultPostCategories(spaceId: string): Required<Prisma.
     id: v4(),
     name: category,
     spaceId,
-    path: getPostCategoryPath(category)
+    path: getPostCategoryPath(category),
+    description: ''
   }));
 }

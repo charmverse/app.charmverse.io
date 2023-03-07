@@ -11,9 +11,8 @@ import { withSessionRoute } from 'lib/session/withSession';
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
-  .use(requireUser)
-  .use(requireSpaceMembership({ adminOnly: false }))
   .get(listSpaceRoles)
+  .use(requireUser)
   .use(requireSpaceMembership({ adminOnly: true }))
   .use(requireKeys<Role>(['spaceId', 'name'], 'body'))
   .post(createRole);
@@ -29,6 +28,8 @@ export type ListSpaceRolesResponse = Pick<Role, 'id' | 'name' | 'source'> & {
 
 async function listSpaceRoles(req: NextApiRequest, res: NextApiResponse<ListSpaceRolesResponse[]>) {
   const { spaceId } = req.query;
+
+  const userId = req.session.user?.id;
 
   if (!spaceId) {
     throw new ApiError({
@@ -63,7 +64,9 @@ async function listSpaceRoles(req: NextApiRequest, res: NextApiResponse<ListSpac
     }
   });
 
-  return res.status(200).json(roles);
+  return res
+    .status(200)
+    .json(roles.map((role) => ({ ...role, spaceRolesToRole: !userId ? [] : role.spaceRolesToRole })));
 }
 
 async function createRole(req: NextApiRequest, res: NextApiResponse<Role>) {

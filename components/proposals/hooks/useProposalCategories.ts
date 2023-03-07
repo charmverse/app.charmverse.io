@@ -2,14 +2,12 @@ import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { useIsAdmin } from 'hooks/useIsAdmin';
+import type { ProposalCategoryWithPermissions } from 'lib/permissions/proposals/interfaces';
 import type { NewProposalCategory } from 'lib/proposal/interface';
 
 export function useProposalCategories() {
   const currentSpace = useCurrentSpace();
   // Might need better ACL in the future
-  const canEditProposalCategories = useIsAdmin();
-
   const { data: categories, mutate } = useSWR(
     () => (currentSpace ? `proposals/${currentSpace.id}/categories` : null),
     () => charmClient.proposals.getProposalCategories(currentSpace!.id)
@@ -31,5 +29,40 @@ export function useProposalCategories() {
     return categoryId;
   }
 
-  return { isLoading: !categories, categories, canEditProposalCategories, addCategory, deleteCategory };
+  function mutateCategory(category: ProposalCategoryWithPermissions) {
+    mutate((data) => {
+      const copied = data?.slice() ?? [];
+      const existingCategoryIndex = copied.findIndex((c) => c.id === category.id);
+
+      if (existingCategoryIndex) {
+        copied.push();
+      } else {
+        copied[existingCategoryIndex] = category;
+      }
+      return copied;
+    });
+  }
+
+  function getCategoriesWithCreatePermission() {
+    return (categories ?? [])?.filter((c) => c.permissions.create_proposal);
+  }
+
+  function getDefaultCreateCategory() {
+    const creatableCategories = getCategoriesWithCreatePermission();
+    const firstDefault = creatableCategories.find((c) => c.title === 'General');
+    if (firstDefault) {
+      return firstDefault;
+    }
+    return creatableCategories[0];
+  }
+
+  return {
+    isLoading: !categories,
+    categories,
+    addCategory,
+    deleteCategory,
+    mutateCategory,
+    getCategoriesWithCreatePermission,
+    getDefaultCreateCategory
+  };
 }

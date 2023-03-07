@@ -4,16 +4,20 @@ import type { PageType } from '@prisma/client';
 import type { MouseEvent, ReactNode } from 'react';
 import { useState } from 'react';
 
+import type { DuplicatePageResponse } from 'lib/pages';
+
 import { PageActionsMenu } from './PageActionsMenu';
 
 export function PageActions({
   page,
   onClickDelete,
+  hideDuplicateAction,
   onClickEdit,
-  onClickDuplicate,
   readOnly,
-  children
+  children,
+  onDuplicate
 }: {
+  onDuplicate?: (duplicatePageResponse: DuplicatePageResponse) => void;
   page: {
     createdBy: string;
     type?: PageType;
@@ -22,11 +26,12 @@ export function PageActions({
     relativePath?: string;
     path: string;
     deletedAt: Date | null;
+    parentId?: string | null;
   };
   readOnly?: boolean;
   onClickDelete?: VoidFunction;
   onClickEdit?: VoidFunction;
-  onClickDuplicate?: VoidFunction;
+  hideDuplicateAction?: boolean;
   children?: ReactNode;
 }) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -37,7 +42,7 @@ export function PageActions({
   };
 
   return (
-    <>
+    <div data-test='page-actions-context-menu'>
       <IconButton size='small' className='icons' onClick={handleClick}>
         <MoreHorizIcon color='secondary' fontSize='small' />
       </IconButton>
@@ -46,12 +51,13 @@ export function PageActions({
         setAnchorEl={setAnchorEl}
         page={page}
         onClickDelete={onClickDelete}
-        onClickDuplicate={onClickDuplicate}
+        hideDuplicateAction={hideDuplicateAction}
         onClickEdit={onClickEdit}
         readOnly={readOnly}
+        onDuplicate={onDuplicate}
       >
         {children}
       </PageActionsMenu>
-    </>
+    </div>
   );
 }

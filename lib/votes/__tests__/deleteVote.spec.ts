@@ -1,8 +1,7 @@
 import { v4 } from 'uuid';
 
 import { prisma } from 'db';
-import { addSpaceOperations } from 'lib/permissions/spaces';
-import { UnauthorisedActionError, UndesirableOperationError } from 'lib/utilities/errors';
+import { UndesirableOperationError } from 'lib/utilities/errors';
 import { createPage, createVote, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 import { deleteVote } from '../deleteVote';
@@ -19,13 +18,6 @@ describe('deleteVote', () => {
       createdBy: user.id,
       spaceId: space.id
     });
-
-    await addSpaceOperations({
-      forSpaceId: space.id,
-      spaceId: space.id,
-      operations: ['createVote']
-    });
-
     const vote = await createVote({
       pageId: page.id,
       createdBy: user.id,
@@ -47,12 +39,6 @@ describe('deleteVote', () => {
     const page = await createPage({
       createdBy: user.id,
       spaceId: space.id
-    });
-
-    await addSpaceOperations({
-      forSpaceId: space.id,
-      spaceId: space.id,
-      operations: ['createVote']
     });
 
     const vote = await createVote({

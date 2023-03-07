@@ -4,15 +4,21 @@ import type { Locator, Page } from '@playwright/test';
 import type { SpaceSettingsSection } from 'components/settings/pages';
 import { baseUrl } from 'config/constants';
 
+import { GlobalPage } from '../global.po';
+
 // capture actions on the pages in signup flow
-export class SettingsModal {
+export class SettingsModal extends GlobalPage {
   readonly page: Page;
 
   readonly settingsBtn: Locator;
 
+  readonly closeModalButton: Locator;
+
   constructor(page: Page) {
+    super(page);
     this.page = page;
     this.settingsBtn = page.locator('data-test=sidebar-settings');
+    this.closeModalButton = page.locator('data-test=close-settings-modal');
   }
 
   async goTo(domain: string) {
@@ -23,12 +29,22 @@ export class SettingsModal {
     await this.settingsBtn.click();
   }
 
+  getActivePath({ activePath }: { activePath: string }): Locator {
+    return this.page.locator(`[data-test-active-path=${activePath}]`);
+  }
+
   getSpaceSettingsLocator(spaceId: string): Locator {
     return this.page.locator(`data-test=space-settings-tab-${spaceId}`);
   }
 
   getSpaceSettingsSectionLocator({ spaceId, section }: { spaceId: string; section: SpaceSettingsSection }): Locator {
     return this.page.locator(`data-test=space-settings-tab-${spaceId}-${section}`);
+  }
+
+  async isSpaceSettingsExpanded(spaceId: string): Promise<boolean> {
+    const locator = this.getSpaceSettingsLocator(spaceId);
+    const expanded = await locator.getAttribute('aria-expanded');
+    return expanded === 'true';
   }
 
   async goToTab({ spaceId, section }: { spaceId: string; section: SpaceSettingsSection }) {

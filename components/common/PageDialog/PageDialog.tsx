@@ -13,6 +13,7 @@ import Dialog from 'components/common/BoardEditor/focalboard/src/components/dial
 import Button from 'components/common/Button';
 import { useBounties } from 'hooks/useBounties';
 import { useCurrentPage } from 'hooks/useCurrentPage';
+import { usePagePermissions } from 'hooks/usePagePermissions';
 import { usePages } from 'hooks/usePages';
 import type { BountyWithDetails } from 'lib/bounties';
 import log from 'lib/log';
@@ -37,18 +38,17 @@ export default function PageDialog(props: Props) {
   const popupState = usePopupState({ variant: 'popover', popupId: 'page-dialog' });
   const router = useRouter();
   const { refreshBounty, setBounties } = useBounties();
-  const { currentPageId, setCurrentPageId } = useCurrentPage();
+  const { setCurrentPageId } = useCurrentPage();
 
-  const { updatePage, getPagePermissions, deletePage, pages } = usePages();
-  const pagePermission = page ? getPagePermissions(page.id) : null;
+  const { updatePage, deletePage } = usePages();
+  const { permissions: pagePermissions } = usePagePermissions({
+    pageIdOrPath: page?.id as string,
+    isNewPage: !page?.id
+  });
   const domain = router.query.domain as string;
   const fullPageUrl = `/${domain}/${page?.path}`;
 
-  const ogCurrentPageId = useMemo(() => currentPageId, []);
-
-  const parentProposalId = findParentOfType({ pageId: ogCurrentPageId, pageType: 'proposal', pageMap: pages });
-
-  const readOnlyPage = readOnly || !pagePermission?.edit_content;
+  const readOnlyPage = readOnly || !pagePermissions?.edit_content;
 
   // keep track if charmeditor is mounted. There is a bug that it calls the update method on closing the modal, but content is empty
   useEffect(() => {
@@ -119,6 +119,7 @@ export default function PageDialog(props: Props) {
       refreshBounty(bountyId);
     }
   }
+
   if (!popupState.isOpen) {
     return null;
   }
@@ -134,6 +135,9 @@ export default function PageDialog(props: Props) {
             onClickDelete={() => {
               onClickDelete();
               onClose();
+            }}
+            onDuplicate={(pageDuplicateResponse) => {
+              setBounties((_bounties) => [..._bounties, ...pageDuplicateResponse.bounties]);
             }}
           >
             {bounty && (
@@ -157,6 +161,7 @@ export default function PageDialog(props: Props) {
       toolbar={
         <Box display='flex' justifyContent='space-between'>
           <Button
+            data-test='open-as-page'
             size='small'
             color='secondary'
             href={fullPageUrl}
@@ -171,15 +176,7 @@ export default function PageDialog(props: Props) {
       }
       onClose={onClose}
     >
-      {page && (
-        <DocumentPage
-          insideModal
-          page={page}
-          setPage={setPage}
-          readOnly={readOnlyPage}
-          parentProposalId={parentProposalId}
-        />
-      )}
+      {page && <DocumentPage insideModal page={page} setPage={setPage} readOnly={readOnlyPage} />}
     </Dialog>
   );
 }

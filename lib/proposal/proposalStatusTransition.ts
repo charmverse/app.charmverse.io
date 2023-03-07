@@ -1,18 +1,18 @@
 import type { ProposalStatus } from '@prisma/client';
 
 export const proposalStatusTransitionRecord: Record<ProposalStatus, ProposalStatus[]> = {
-  private_draft: ['draft', 'discussion'],
-  draft: ['private_draft', 'discussion'],
-  discussion: ['private_draft', 'draft', 'review'],
+  draft: ['discussion'],
+  discussion: ['draft', 'draft', 'review'],
   review: ['discussion', 'reviewed'],
   reviewed: ['vote_active', 'discussion'],
   vote_active: [],
   vote_closed: []
 };
 
+export const PROPOSAL_STATUSES = Object.keys(proposalStatusTransitionRecord) as ProposalStatus[];
+
 export const PROPOSAL_STATUS_LABELS: Record<ProposalStatus, string> = {
-  private_draft: 'Private Draft',
-  draft: 'Public Draft',
+  draft: 'Draft',
   discussion: 'Discussion',
   review: 'In Review',
   reviewed: 'Reviewed',
@@ -25,16 +25,13 @@ export type ProposalUserGroup = 'reviewer' | 'author';
 export const proposalStatusTransitionPermission: Partial<
   Record<ProposalStatus, Partial<Record<ProposalUserGroup, ProposalStatus[]>>>
 > = {
-  private_draft: {
-    // Author of the proposal can move private_draft proposal to both draft and discussion
-    // Reviewer of the proposal can't update the status of the proposal
-    author: ['draft', 'discussion']
-  },
   draft: {
-    author: ['private_draft', 'discussion']
+    // Author of the proposal can move draft proposal to both draft and discussion
+    // Reviewer of the proposal can't update the status of the proposal
+    author: ['discussion']
   },
   discussion: {
-    author: ['private_draft', 'draft', 'review']
+    author: ['draft', 'review']
   },
   review: {
     author: ['discussion'],
@@ -43,4 +40,13 @@ export const proposalStatusTransitionPermission: Partial<
   reviewed: {
     author: ['discussion', 'vote_active']
   }
+};
+
+export const proposalStatusDetails: Record<ProposalStatus, string> = {
+  draft: 'Only authors can view and edit this proposal',
+  discussion: 'Space members can comment on this proposal',
+  review: 'Reviewers can approve this proposal',
+  reviewed: 'Authors can move this proposal to vote',
+  vote_active: 'Space members are voting on this proposal',
+  vote_closed: 'The vote is complete'
 };

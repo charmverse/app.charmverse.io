@@ -1,10 +1,14 @@
+import type { Prisma } from '@prisma/client';
 import request from 'supertest';
+import { v4 } from 'uuid';
 
+import { prisma } from 'db';
 import type { PublicApiBounty } from 'pages/api/v1/bounties/index';
 import { baseUrl } from 'testing/mockApiCall';
 import {
   generateBountyWithSingleApplication,
   generateSpaceUser,
+  generateUserAndSpace,
   generateUserAndSpaceWithApiToken
 } from 'testing/setupDatabase';
 
@@ -100,5 +104,55 @@ describe('GET /api/v1/bounties', () => {
         url: `${baseUrl}/${space.domain}/bounties/${bountyWithInProgressWork.id}`
       })
     );
+  });
+
+  it('should ignore bounties whose page has been soft deleted', async () => {
+    const { space: space2, user: space2User } = await generateUserAndSpace();
+
+    const space2SuperApiToken = await prisma.superApiToken.create({
+      data: {
+        name: `Test super API key for space ${space2.id}`,
+        token: v4(),
+        spaces: { connect: { id: space2.id } }
+      }
+    });
+
+    const bountyCreateInput: Prisma.BountyCreateInput = {
+      author: { connect: { id: space2User.id } },
+      chainId: 1,
+      rewardAmount: 10,
+      rewardToken: 'DAI',
+      status: 'open',
+      space: { connect: { id: space2.id } },
+      page: {
+        create: {
+          // This is the important part
+          deletedAt: new Date(),
+          title: 'Bounty marked as deleted',
+          author: { connect: { id: space2User.id } },
+          space: { connect: { id: space2.id } },
+          path: `bounty-${v4()}`,
+          type: 'bounty',
+          updatedBy: space2User.id,
+          contentText: 'Bounty content',
+          content: {}
+        }
+      }
+    };
+
+    const deletedBounty = await prisma.bounty.create({
+      data: bountyCreateInput
+    });
+
+    const response = (
+      await request(baseUrl)
+        .get(`/api/v1/bounties?spaceId=${space2.id}`)
+        .set({ authorization: `Bearer ${space2SuperApiToken.token}` })
+        .send()
+        .expect(200)
+    ).body as PublicApiBounty[];
+
+    // No data should be returned
+    expect(response.length).toEqual(0);
   });
 });

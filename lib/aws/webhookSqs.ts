@@ -1,9 +1,10 @@
 import type { SQSClientConfig } from '@aws-sdk/client-sqs';
 import { SQSClient, ReceiveMessageCommand, DeleteMessageCommand } from '@aws-sdk/client-sqs';
 
-import { AWS_REGION, SQS_URL } from 'lib/aws/config';
+import { AWS_REGION } from 'lib/aws/config';
+import { SQS_WEBHOOK_COLLABLAND_QUEUE_NAME } from 'lib/collabland/config';
 import { getLogger } from 'lib/log/prefix';
-import type { WebhookMessage, WebhookMessageProcessResult } from 'lib/webhooks/interfaces';
+import type { WebhookMessage, WebhookMessageProcessResult } from 'lib/webhookConsumer/interfaces';
 
 const log = getLogger('sqs');
 
@@ -15,6 +16,7 @@ type ProcessMssagesInput = {
 const AWS_API_KEY = process.env.AWS_ACCESS_KEY_ID as string;
 const AWS_API_SECRET = process.env.AWS_SECRET_ACCESS_KEY as string;
 const SQS_REGION = (process.env.AWS_REGION as string) || AWS_REGION;
+log.info('Queue url:', SQS_WEBHOOK_COLLABLAND_QUEUE_NAME);
 
 const config: SQSClientConfig = { region: SQS_REGION };
 if (AWS_API_KEY && AWS_API_SECRET) {
@@ -22,7 +24,7 @@ if (AWS_API_KEY && AWS_API_SECRET) {
 }
 
 const client = new SQSClient(config);
-const queueUrl = SQS_URL || '';
+const queueUrl = SQS_WEBHOOK_COLLABLAND_QUEUE_NAME || '';
 
 export async function getNextMessage() {
   try {
@@ -66,18 +68,21 @@ export async function processMessages({ processorFn }: ProcessMssagesInput) {
 
     try {
       // process message
-      log.debug('Processing message', msgBody);
+      log.debug('Processing message', { message: msgBody, receiptHandle: message.ReceiptHandle });
       const result = await processorFn(msgBody as WebhookMessage);
 
-      log.debug('Message process successful:', result.success);
-      if (result.message) {
-        log.debug(result.message);
+      if (result.success) {
+        log.info('Message process successful:', { message: result.message, receiptHandle: message.ReceiptHandle });
+        try {
+          await deleteMessage(message.ReceiptHandle || '');
+        } catch (e) {
+          log.error('Could not delete message', { receiptHandle: message.ReceiptHandle, error: e });
+        }
+      } else {
+        log.warn('Message process failed:', { message: result.message, receiptHandle: message.ReceiptHandle });
       }
     } catch (e) {
       log.error('Failed to process webhook message', e);
-    } finally {
-      log.debug('Deleting message', message.ReceiptHandle);
-      await deleteMessage(message.ReceiptHandle || '');
     }
   } else {
     log.debug('No messages');

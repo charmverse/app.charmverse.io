@@ -19,8 +19,10 @@ const handler = nc({
 const createDiscussionTask = ({
   pageTitle,
   spaceName,
-  mentionText
+  mentionText,
+  type = 'page'
 }: {
+  type?: DiscussionTask['type'];
   spaceName: string;
   mentionText: string;
   pageTitle: string;
@@ -38,22 +40,13 @@ const createDiscussionTask = ({
     bountyId: null,
     bountyTitle: null,
     commentId: null,
-    type: 'page',
+    type,
     createdBy: {
       id: v4(),
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      email: '',
       username: '',
       avatar: '',
       path: '',
-      isBot: false,
-      identityType: 'Discord',
-      avatarContract: null,
-      avatarTokenId: null,
-      avatarChain: null,
-      deletedAt: null,
-      spacesOrder: []
+      avatarTokenId: null
     }
   };
 };
@@ -80,19 +73,10 @@ const createForumTask = ({
     mentionId: v4(),
     createdBy: {
       id: v4(),
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      email: '',
       username: '',
       avatar: '',
       path: '',
-      isBot: false,
-      identityType: 'Discord',
-      avatarContract: null,
-      avatarTokenId: null,
-      avatarChain: null,
-      deletedAt: null,
-      spacesOrder: []
+      avatarTokenId: null
     }
   };
 };
@@ -190,19 +174,21 @@ const templates = {
           action: 'start_discussion',
           pageTitle: 'Proposal to add XSTUSD-3CRV to the Gauge Controller',
           spaceName: 'Curve Finance',
-          status: 'private_draft'
+          status: 'draft'
         })
       ],
       discussionTasks: [
         createDiscussionTask({
           mentionText: 'Hey there, please respond to this message.',
           pageTitle: 'Attention please',
-          spaceName: 'CharmVerse'
+          spaceName: 'CharmVerse',
+          type: 'bounty'
         }),
         createDiscussionTask({
           mentionText: 'cc @ghostpepper',
           pageTitle: 'Product Road Map',
-          spaceName: 'CharmVerse'
+          spaceName: 'CharmVerse',
+          type: 'bounty'
         }),
         createDiscussionTask({
           mentionText: "Let's have a meeting @ghostpepper",
@@ -217,6 +203,11 @@ const templates = {
         createDiscussionTask({
           mentionText: 'We should discuss about this @ghostpepper',
           pageTitle: 'Product Road Map',
+          spaceName: 'CharmVerse'
+        }),
+        createDiscussionTask({
+          mentionText: 'We are facing issues @ghostpepper',
+          pageTitle: 'Product Discussion',
           spaceName: 'CharmVerse'
         })
       ],

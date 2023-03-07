@@ -7,6 +7,7 @@ import { verifyTokenGateMembership } from 'lib/token-gates/verifyTokenGateMember
 import type { UserToVerifyMembership } from 'lib/token-gates/verifyTokenGateMemberships';
 import type { LoggedInUser } from 'models';
 import { generateRole, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { verifiedJWTResponse } from 'testing/utils/litProtocol';
 import { addRoleToTokenGate, deleteTokenGate, generateTokenGate } from 'testing/utils/tokenGates';
 
 jest.mock('lit-js-sdk');
@@ -458,29 +459,3 @@ describe('verifyTokenGateMembership', () => {
     // );
   });
 });
-
-type LitResponse = Awaited<ReturnType<typeof litSDK.verifyJwt>>;
-
-function verifiedJWTResponse(
-  response: Partial<Omit<LitResponse, 'payload'> & { payload: Partial<LitResponse['payload']> }>
-): LitResponse {
-  return {
-    header: '',
-    verified: true,
-    signature: new Uint8Array(),
-    ...response,
-    payload: {
-      iss: 'LIT',
-      sub: 'user',
-      chain: 'ethereum',
-      iat: 1,
-      exp: 1,
-      baseUrl: 'https://app.charmverse.io',
-      path: '',
-      orgId: '',
-      role: 'member',
-      extraData: `{ "tokenGateId": "id" }`,
-      ...(response.payload || {})
-    }
-  };
-}

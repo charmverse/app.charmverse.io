@@ -3,8 +3,6 @@ import nc from 'next-connect';
 
 import { closeOutBounty, getBountyOrThrow } from 'lib/bounties';
 import type { BountyWithDetails } from 'lib/bounties';
-import * as collabland from 'lib/collabland';
-import log from 'lib/log';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { computeBountyPermissions } from 'lib/permissions/bounties';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -32,19 +30,6 @@ async function closeBountyController(req: NextApiRequest, res: NextApiResponse<B
   }
 
   const completeBounty = await closeOutBounty(bountyId);
-
-  const completedApplications = completeBounty.applications.filter((application) => application.status === 'complete');
-
-  for (const application of completedApplications) {
-    collabland
-      .createBountyCompletedCredential({
-        bountyId,
-        userId: application.createdBy
-      })
-      .catch((error) => {
-        log.error('Error creating a collabland VC for completing bounty', error);
-      });
-  }
 
   return res.status(200).json(completeBounty);
 }

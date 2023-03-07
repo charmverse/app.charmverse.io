@@ -48,6 +48,7 @@ const ArchivedPageItem = memo<{
 
   return (
     <MenuItem
+      data-test={`archived-page-${archivedPage.id}`}
       component={Link}
       href={`/${space?.domain}/${archivedPage.path}`}
       key={archivedPage.id}
@@ -93,7 +94,7 @@ export default function TrashModal({ onClose, isOpen }: { onClose: () => void; i
           if (
             archivedPage &&
             archivedPage.deletedAt !== null &&
-            getPagePermissions(archivedPage.id, archivedPage).delete
+            getPagePermissions(archivedPage.id, archivedPage)?.delete
           ) {
             const pageTitle = archivedPage.title || 'Untitled';
             _archivedPages.push({ ...archivedPage, title: pageTitle });
@@ -183,6 +184,7 @@ export default function TrashModal({ onClose, isOpen }: { onClose: () => void; i
   // Remove the pages you dont have delete access of
   return (
     <Modal
+      data-test='trash-modal'
       open={isOpen}
       onClose={onClose}
       title={

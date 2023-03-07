@@ -1,10 +1,11 @@
-import { Box } from '@mui/material';
+import Box from '@mui/material/Box';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 
 import LoadingComponent from 'components/common/LoadingComponent';
 import { MemberPropertiesPopup } from 'components/profile/components/SpacesMemberDetails/components/MemberPropertiesPopup';
 import { SpaceDetailsAccordion } from 'components/profile/components/SpacesMemberDetails/components/SpaceDetailsAccordion';
+import Legend from 'components/settings/Legend';
 import { useMemberPropertyValues } from 'hooks/useMemberPropertyValues';
 import { useUser } from 'hooks/useUser';
 
@@ -40,7 +41,8 @@ export function SpacesMemberDetails({ memberId }: Props) {
       : memberPropertyValues;
 
   return (
-    <Box mt={2}>
+    <Box mt={4} mb={2}>
+      <Legend noBorder>My Charmverse Spaces</Legend>
       {propertyValues.map((pv) => (
         <SpaceDetailsAccordion
           key={pv.spaceId}

@@ -18,12 +18,16 @@ async function getBlockSubtree(req: NextApiRequest, res: NextApiResponse<Block[]
   const blockId = req.query.id as string;
   const publicPage = await prisma.page.findFirst({
     where: {
-      boardId: blockId
+      OR: [{ boardId: blockId }, { cardId: blockId }]
     }
   });
 
+  if (!publicPage) {
+    return res.status(404).json({ error: 'page not found' });
+  }
+
   const computed = await computeUserPagePermissions({
-    pageId: publicPage?.id as string,
+    resourceId: publicPage.id,
     userId: req.session.user?.id
   });
 

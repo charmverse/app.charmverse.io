@@ -1,5 +1,4 @@
 import { EditOutlined } from '@mui/icons-material';
-import DuplicateIcon from '@mui/icons-material/ContentCopy';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import LaunchIcon from '@mui/icons-material/Launch';
 import LinkIcon from '@mui/icons-material/Link';
@@ -8,30 +7,36 @@ import type { PageType } from '@prisma/client';
 import { useRouter } from 'next/router';
 import type { Dispatch, ReactNode, SetStateAction } from 'react';
 
+import { usePostPermissions } from 'components/forum/hooks/usePostPermissions';
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useMembers } from 'hooks/useMembers';
-import { usePages } from 'hooks/usePages';
+import { usePagePermissions } from 'hooks/usePagePermissions';
 import { useSnackbar } from 'hooks/useSnackbar';
+import type { DuplicatePageResponse } from 'lib/pages';
 
 import { Utils } from './BoardEditor/focalboard/src/utils';
+import { DuplicatePageAction } from './DuplicatePageAction';
 
 export function PageActionsMenu({
   children,
   onClickDelete,
   onClickEdit,
-  onClickDuplicate,
+  hideDuplicateAction,
   anchorEl,
   page,
   setAnchorEl,
-  readOnly
+  readOnly,
+  onDuplicate
 }: {
+  onDuplicate?: (duplicatePageResponse: DuplicatePageResponse) => void;
   onClickDelete?: VoidFunction;
   onClickEdit?: VoidFunction;
   children?: ReactNode;
-  onClickDuplicate?: VoidFunction;
+  hideDuplicateAction?: boolean;
   setAnchorEl: Dispatch<SetStateAction<HTMLElement | null>>;
   anchorEl: HTMLElement | null;
   page: {
+    parentId?: string | null;
     createdBy: string;
     type?: PageType;
     id: string;
@@ -42,14 +47,16 @@ export function PageActionsMenu({
   };
   readOnly?: boolean;
 }) {
-  const { getPagePermissions } = usePages();
   const { members } = useMembers();
   const router = useRouter();
   const { showMessage } = useSnackbar();
   const charmversePage = members.find((member) => member.id === page.createdBy);
   const open = Boolean(anchorEl);
   const { formatDateTime } = useDateFormatter();
-  const pagePermissions = getPagePermissions(page.id);
+  const { permissions: pagePermissions } = usePagePermissions({ pageIdOrPath: open ? page.id : null });
+  const postPermissions = usePostPermissions({
+    postIdOrPath: router.pathname.startsWith('/[domain]/forum') ? page.id : (null as any)
+  });
   function getPageLink() {
     let link = window.location.href;
 
@@ -60,7 +67,6 @@ export function PageActionsMenu({
     }
     return link;
   }
-
   function onClickCopyLink() {
     Utils.copyTextToClipboard(getPageLink());
     showMessage(`Copied ${page.type} link to clipboard`, 'success');
@@ -92,15 +98,21 @@ export function PageActionsMenu({
           <ListItemText>Edit</ListItemText>
         </MenuItem>
       )}
-      <MenuItem dense onClick={onClickDelete} disabled={Boolean(readOnly || !pagePermissions.delete || page.deletedAt)}>
+      <MenuItem
+        dense
+        onClick={onClickDelete}
+        disabled={Boolean(readOnly || (!pagePermissions?.delete && !postPermissions?.delete_post))}
+        data-test='delete-page-from-context'
+      >
         <DeleteOutlineIcon fontSize='small' sx={{ mr: 1 }} />
         <ListItemText>Delete</ListItemText>
       </MenuItem>
-      {onClickDuplicate && (
-        <MenuItem dense onClick={onClickDuplicate}>
-          <DuplicateIcon fontSize='small' sx={{ mr: 1 }} />
-          <ListItemText>Duplicate</ListItemText>
-        </MenuItem>
+      {!hideDuplicateAction && page.type && (
+        <DuplicatePageAction
+          postDuplication={onDuplicate}
+          page={{ ...page, type: page.type }}
+          pagePermissions={pagePermissions}
+        />
       )}
       <MenuItem dense onClick={onClickCopyLink}>
         <LinkIcon fontSize='small' sx={{ mr: 1 }} />

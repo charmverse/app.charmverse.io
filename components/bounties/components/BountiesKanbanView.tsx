@@ -1,16 +1,15 @@
 import { Box, Typography } from '@mui/material';
 import type { BountyStatus } from '@prisma/client';
 import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 
 import { usePageDialog } from 'components/common/PageDialog/hooks/usePageDialog';
 import { useBounties } from 'hooks/useBounties';
 import { usePages } from 'hooks/usePages';
 import type { BountyWithDetails } from 'lib/bounties';
 import type { PageMeta } from 'lib/pages';
-import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
-import BountyCard from './BountyCard';
+import BountyKanbanCard from './BountyKanbanCard';
 import { BountyStatusChip } from './BountyStatusBadge';
 
 const bountyStatuses: BountyStatus[] = ['open', 'inProgress', 'complete', 'paid', 'suggestion'];
@@ -25,7 +24,7 @@ export default function BountiesKanbanView({ bounties, publicMode }: Props) {
   const { showPage } = usePageDialog();
   const { setBounties } = useBounties();
   const router = useRouter();
-  const [initialBountyId, setInitialBountyId] = useState((router.query.bountyId as string) || '');
+
   function onClickDelete(bountyId: string) {
     setBounties((_bounties) => _bounties.filter((_bounty) => _bounty.id !== bountyId));
     deletePage({ pageId: bountyId });
@@ -46,32 +45,29 @@ export default function BountiesKanbanView({ bounties, publicMode }: Props) {
   );
 
   function onClose() {
-    setUrlWithoutRerender(router.pathname, { bountyId: null });
+    router.push({ pathname: router.pathname, query: { domain: router.query.domain } });
   }
 
-  function showBounty(bounty: BountyWithDetails) {
-    setUrlWithoutRerender(router.pathname, { bountyId: bounty.id });
-    if (bounty?.id) {
+  function openPage(bountyId: string) {
+    router.push({
+      pathname: router.pathname,
+      query: { ...router.query, bountyId }
+    });
+  }
+
+  useEffect(() => {
+    if (typeof router.query.bountyId === 'string') {
       showPage({
-        bountyId: bounty.id,
+        bountyId: router.query.bountyId,
         readOnly: publicMode,
         onClose
       });
     }
-  }
-
-  useEffect(() => {
-    const bounty = bounties.find((b) => b.id === initialBountyId) ?? null;
-    if (bounty) {
-      showBounty(bounty);
-      setInitialBountyId('');
-    }
-  }, [bounties]);
+  }, [router.query.bountyId]);
 
   return (
     <div className='Kanban'>
       {/* include ViewHeader to include the horizontal line */}
-      <div className='ViewHeader' />
       <div className='octo-board-header'>
         {bountyStatuses.map((bountyStatus) => (
           <Box className='octo-board-header-cell' key={bountyStatus}>
@@ -88,14 +84,17 @@ export default function BountiesKanbanView({ bounties, publicMode }: Props) {
             {bountiesGroupedByStatus[bountyStatus]
               .filter((bounty) => Boolean(pages[bounty.page?.id]) && pages[bounty.page.id]?.deletedAt === null)
               .map((bounty) => (
-                <BountyCard
+                <BountyKanbanCard
+                  onDuplicate={(duplicatePageResponse) => {
+                    setBounties((_bounties) => [..._bounties, ...duplicatePageResponse.bounties]);
+                  }}
                   onDelete={onClickDelete}
                   readOnly={!!publicMode}
                   key={bounty.id}
                   bounty={bounty}
                   page={pages[bounty.page.id] as PageMeta}
                   onClick={() => {
-                    showBounty(bounty);
+                    openPage(bounty.id);
                   }}
                 />
               ))}

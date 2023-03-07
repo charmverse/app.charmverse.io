@@ -1,11 +1,12 @@
 import { Divider, Popover } from '@mui/material';
-import { DateTime } from 'luxon';
 import { bindPopover, bindTrigger } from 'material-ui-popup-state';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useState } from 'react';
 import { DateUtils } from 'react-day-picker';
 import DayPicker from 'react-day-picker/DayPicker';
 import { useIntl } from 'react-intl';
+
+import { useDateFormatter } from 'hooks/useDateFormatter';
 
 import { Utils } from '../../../utils';
 import Button from '../../../widgets/buttons/button';
@@ -50,11 +51,12 @@ function DateRange(props: Props): JSX.Element {
   const { className, value, showEmptyPlaceholder, onChange } = props;
   const intl = useIntl();
   const popupState = usePopupState({ variant: 'popover', popupId: 'dateRangePopup' });
+  const { formatDate } = useDateFormatter();
 
   const getDisplayDate = (date: Date | null | undefined) => {
     let displayDate = '';
     if (date) {
-      displayDate = Utils.displayDate(date, intl);
+      displayDate = formatDate(date, { withYear: true });
     }
     return displayDate;
   };
@@ -64,7 +66,6 @@ function DateRange(props: Props): JSX.Element {
   };
 
   const [dateProperty, setDateProperty] = useState<DateProperty>(createDatePropertyFromString(value as string));
-  const [showDialog, setShowDialog] = useState(false);
 
   // Keep dateProperty as UTC,
   // dateFrom / dateTo will need converted to local time, to ensure date stays consistent
@@ -79,8 +80,6 @@ function DateRange(props: Props): JSX.Element {
   const [toInput, setToInput] = useState<string>(getDisplayDate(dateTo));
 
   const isRange = dateTo !== undefined;
-
-  const locale = intl.locale.toLowerCase();
 
   const saveRangeValue = (range: DateProperty) => {
     const rangeUTC = { ...range };
@@ -167,7 +166,7 @@ function DateRange(props: Props): JSX.Element {
             <div className='inputContainer'>
               <Editable
                 value={fromInput}
-                placeholderText={DateTime.local().setLocale(locale).toFormat('DD/MM/YYYY')}
+                placeholderText={formatDate(new Date(), { withYear: true })}
                 onFocus={() => {
                   if (dateFrom) {
                     return setFromInput(Utils.inputDate(dateFrom, intl));
@@ -176,7 +175,7 @@ function DateRange(props: Props): JSX.Element {
                 }}
                 onChange={setFromInput}
                 onSave={() => {
-                  const newDate = DateTime.fromFormat(fromInput, 'DD/MM/YYYY', { locale: intl.locale }).toJSDate();
+                  const newDate = new Date(formatDate(fromInput, { withYear: true }));
                   if (newDate && DateUtils.isDate(newDate)) {
                     newDate.setHours(12);
                     const range: DateProperty = {
@@ -195,7 +194,7 @@ function DateRange(props: Props): JSX.Element {
               {dateTo && (
                 <Editable
                   value={toInput}
-                  placeholderText={DateTime.local().setLocale(locale).toFormat('DD/MM/YYYY')}
+                  placeholderText={formatDate(new Date(), { withYear: true })}
                   onFocus={() => {
                     if (dateTo) {
                       return setToInput(Utils.inputDate(dateTo, intl));
@@ -204,9 +203,7 @@ function DateRange(props: Props): JSX.Element {
                   }}
                   onChange={setToInput}
                   onSave={() => {
-                    const newDate = DateTime.fromFormat(fromInput, 'DD/MM/YYYY', {
-                      locale: intl.locale
-                    }).toJSDate();
+                    const newDate = new Date(formatDate(fromInput, { withYear: true }));
                     if (newDate && DateUtils.isDate(newDate)) {
                       newDate.setHours(12);
                       const range: DateProperty = {
@@ -228,7 +225,6 @@ function DateRange(props: Props): JSX.Element {
               onDayClick={handleDayClick}
               initialMonth={dateFrom || new Date()}
               showOutsideDays={false}
-              locale={locale}
               todayButton={intl.formatMessage({ id: 'DateRange.today', defaultMessage: 'Today' })}
               onTodayButtonClick={handleDayClick}
               month={dateFrom}

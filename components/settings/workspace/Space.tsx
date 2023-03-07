@@ -17,12 +17,13 @@ import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import ConnectSnapshot from 'components/common/PageLayout/components/Header/components/Snapshot/ConnectSnapshot';
 import PrimaryButton from 'components/common/PrimaryButton';
 import Legend from 'components/settings/Legend';
-import ImportNotionWorkspace from 'components/settings/workspace/ImportNotionWorkspace';
+import ImportContent from 'components/settings/workspace/ImportContent';
 import Avatar from 'components/settings/workspace/LargeAvatar';
 import { useIsAdmin } from 'hooks/useIsAdmin';
-import { setTitle } from 'hooks/usePageTitle';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useSpaces } from 'hooks/useSpaces';
+
+import { SpaceFeatureSettings } from './SpaceFeatureSettings';
 
 const schema = yup.object({
   name: yup.string().ensure().trim().min(3, 'Name must be at least 3 characters').required('Name is required'),
@@ -103,7 +104,6 @@ export default function SpaceSettings({ space }: { space: Space }) {
     workspaceRemoveModalState.open();
   }
 
-  setTitle('Space Options');
   usePreventReload(isDirty);
 
   return (
@@ -171,8 +171,11 @@ export default function SpaceSettings({ space }: { space: Space }) {
       </form>
       <Legend mt={4}>Import Content</Legend>
       <Box sx={{ ml: 1 }} display='flex' flexDirection='column' gap={1}>
-        <ImportNotionWorkspace />
+        <ImportContent />
       </Box>
+
+      <Legend mt={4}>Sidebar Module Visibility</Legend>
+      <SpaceFeatureSettings />
 
       <Legend mt={4}>Snapshot.org Integration</Legend>
       <Box sx={{ ml: 1 }} display='flex' flexDirection='column' gap={1}>

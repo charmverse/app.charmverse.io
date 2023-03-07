@@ -185,6 +185,35 @@ describe('GET /api/forums/posts/[postId] - Get a post', () => {
       })
     );
   });
+
+  it('should return the post if a user is not logged in, but the post belongs to a public category, responding with 200', async () => {
+    const publicCategory = await generatePostCategory({
+      spaceId: space.id,
+      name: 'Public category'
+    });
+    await upsertPostCategoryPermission({
+      assignee: { group: 'public' },
+      permissionLevel: 'view',
+      postCategoryId: publicCategory.id
+    });
+    const publicPost = await generateForumPost({
+      spaceId: space.id,
+      categoryId: publicCategory.id,
+      userId: user.id
+    });
+
+    const postFromApi = (await request(baseUrl).get(`/api/forums/posts/${publicPost.id}`).send().expect(200))
+      .body as Post;
+
+    expect(postFromApi).toMatchObject(
+      expect.objectContaining<Partial<Post>>({
+        id: publicPost.id,
+        categoryId: publicPost.categoryId,
+        content: publicPost.content
+      })
+    );
+  });
+
   it('should fail to return the post if the user does not have permissions for this category, responding with 401', async () => {
     const { user: externalUser } = await generateUserAndSpaceWithApiToken();
     const externalUserCookie = await loginUser(externalUser.id);

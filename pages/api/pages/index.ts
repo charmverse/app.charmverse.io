@@ -12,11 +12,8 @@ import type { IPageWithPermissions } from 'lib/pages/server';
 import { createPage } from 'lib/pages/server/createPage';
 import { PageNotFoundError } from 'lib/pages/server/errors';
 import { getPage } from 'lib/pages/server/getPage';
-import { resolvePageTree } from 'lib/pages/server/resolvePageTree';
 import { setupPermissionsAfterPageCreated } from 'lib/permissions/pages';
 import { computeSpacePermissions } from 'lib/permissions/spaces';
-import { createProposal } from 'lib/proposal/createProposal';
-import { syncProposalPermissions } from 'lib/proposal/syncProposalPermissions';
 import { withSessionRoute } from 'lib/session/withSession';
 import { InvalidInputError, UnauthorisedActionError } from 'lib/utilities/errors';
 import { relay } from 'lib/websockets/relay';
@@ -34,6 +31,10 @@ async function createPageHandler(req: NextApiRequest, res: NextApiResponse<IPage
     throw new InvalidInputError('A space id is required to create a page');
   }
 
+  if (data.type.match('proposal')) {
+    throw new InvalidInputError('You cannot create a proposal or proposal template using this endpoint');
+  }
+
   const { id: userId } = req.session.user;
 
   const permissions = await computeSpacePermissions({
@@ -42,9 +43,7 @@ async function createPageHandler(req: NextApiRequest, res: NextApiResponse<IPage
     userId
   });
 
-  if (data.type === 'proposal' && !permissions.createVote) {
-    throw new UnauthorisedActionError('You do not have permission to create a page in this space');
-  } else if (data.type !== 'proposal' && !permissions.createPage) {
+  if (!permissions.createPage) {
     throw new UnauthorisedActionError('You do not have permissions to create a page.');
   }
 
@@ -54,42 +53,16 @@ async function createPageHandler(req: NextApiRequest, res: NextApiResponse<IPage
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { createdBy, spaceId: droppedSpaceId, ...pageCreationData } = data;
 
-  let page: Page;
-
-  if (pageCreationData.type === 'proposal_template') {
-    throw new UnauthorisedActionError('You cannot create a proposal template using this endpoint.');
-  } else if (pageCreationData.type === 'proposal') {
-    ({ page } = await createProposal({
-      ...pageCreationData,
+  const page: Page = await createPage({
+    data: {
       spaceId,
-      createdBy
-    }));
-  } else {
-    page = await createPage({
-      data: {
-        spaceId,
-        createdBy,
-        ...pageCreationData
-      }
-    });
-  }
+      createdBy,
+      ...pageCreationData
+    }
+  });
 
   try {
-    const proposalIdForPermissions = page.parentId
-      ? (
-          await resolvePageTree({
-            pageId: page.id
-            // includeDeletedPages: true
-          })
-        ).parents.find((p) => p.type === 'proposal')?.id
-      : undefined;
-
-    // Create proposal method provisions proposal permissions, so we only need this operation for child pages of a proposal
-    if (proposalIdForPermissions) {
-      await syncProposalPermissions({ proposalId: proposalIdForPermissions as string });
-    } else if (page.type !== 'proposal') {
-      await setupPermissionsAfterPageCreated(page.id);
-    }
+    await setupPermissionsAfterPageCreated(page.id);
 
     const pageWithPermissions = await getPage(page.id);
 

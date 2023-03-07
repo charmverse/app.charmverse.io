@@ -1,4 +1,4 @@
-import type { Space, User } from '@prisma/client';
+import type { ProposalCategory, Space, User } from '@prisma/client';
 import request from 'supertest';
 import { v4 } from 'uuid';
 
@@ -17,12 +17,14 @@ import {
   generateSpaceUser,
   generateUserAndSpaceWithApiToken
 } from 'testing/setupDatabase';
+import { generateProposalCategory } from 'testing/utils/proposals';
 
 let author: LoggedInUser;
 let reviewer: LoggedInUser;
 let space: Space;
 let authorCookie: string;
 let reviewerCookie: string;
+let proposalCategory: ProposalCategory;
 
 beforeAll(async () => {
   const generated1 = await generateUserAndSpaceWithApiToken(undefined, false);
@@ -40,6 +42,9 @@ beforeAll(async () => {
       spaceId: space.id,
       userId: reviewer.id
     }
+  });
+  proposalCategory = await generateProposalCategory({
+    spaceId: space.id
   });
 });
 
@@ -70,7 +75,7 @@ describe('GET /api/proposals/[id] - Get proposal', () => {
         id: expect.any(String),
         spaceId: space.id,
         createdBy: author.id,
-        status: 'private_draft',
+        status: 'draft',
         authors: expect.arrayContaining([
           expect.objectContaining({
             proposalId: pageWithProposal.proposalId,
@@ -100,18 +105,21 @@ describe('GET /api/proposals/[id] - Get proposal', () => {
     await request(baseUrl).get(`/api/proposals/${v4()}`).set('Cookie', authorCookie).expect(404);
   });
 
+  // Users should not be able to access draft proposals that they are not authors or reviewers of
   it("should throw error if user doesn't have read access to proposal page", async () => {
+    const normalSpaceUser = await generateSpaceUser({ isAdmin: false, spaceId: space.id });
+
+    const cookie = await loginUser(normalSpaceUser.id);
+
     const pageWithProposal = await createProposalWithUsers({
       spaceId: space.id,
       userId: author.id,
+      proposalStatus: 'draft',
       authors: [],
       reviewers: [reviewer.id]
     });
 
-    await request(baseUrl)
-      .get(`/api/proposals/${pageWithProposal.proposalId}`)
-      .set('Cookie', reviewerCookie)
-      .expect(404);
+    await request(baseUrl).get(`/api/proposals/${pageWithProposal.proposalId}`).set('Cookie', cookie).expect(404);
   });
 });
 
@@ -126,8 +134,9 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
     });
 
     const { page } = await createProposal({
-      createdBy: adminUser.id,
-      spaceId: adminSpace.id
+      userId: adminUser.id,
+      spaceId: adminSpace.id,
+      categoryId: proposalCategory.id
     });
 
     const updateContent: Partial<UpdateProposalRequest> = {
@@ -165,8 +174,9 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
     const proposalAuthor = await generateSpaceUser({ isAdmin: false, spaceId: adminSpace.id });
 
     const { page } = await createProposal({
-      createdBy: proposalAuthor.id,
-      spaceId: adminSpace.id
+      userId: proposalAuthor.id,
+      spaceId: adminSpace.id,
+      categoryId: proposalCategory.id
     });
 
     const updateContent: Partial<UpdateProposalRequest> = {
@@ -186,7 +196,7 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
       .expect(200);
   });
 
-  it('should update a proposal template if the user is a space admin', async () => {
+  it('should update a proposal templates settings if the user is a space admin', async () => {
     const { user: adminUser, space: adminSpace } = await generateUserAndSpaceWithApiToken(undefined, true);
     const adminCookie = await loginUser(adminUser.id);
 
@@ -194,7 +204,8 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
 
     const pageWithProposal = await createProposalTemplate({
       spaceId: adminSpace.id,
-      userId: adminUser.id
+      userId: adminUser.id,
+      categoryId: proposalCategory.id
     });
 
     const updateContent: Partial<UpdateProposalRequest> = {
@@ -234,6 +245,7 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
     const pageWithProposal = await createProposalTemplate({
       spaceId: adminSpace.id,
       userId: adminUser.id,
+      categoryId: proposalCategory.id,
       reviewers: [
         {
           group: 'user',
