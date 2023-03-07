@@ -24,6 +24,10 @@ import NewBountyButton from './components/NewBountyButton';
 
 const bountyStatuses: BountyStatus[] = ['open', 'inProgress', 'complete', 'paid', 'suggestion'];
 
+function isNullish(value: any) {
+  return value === null || value === undefined;
+}
+
 interface Props {
   publicMode?: boolean;
   bounties: BountyWithDetails[];
@@ -57,7 +61,13 @@ export default function BountiesPage({ publicMode = false, bounties }: Props) {
   const bountiesSorted = bounties ? sortArrayByObjectProperty(bounties, 'status', bountyStatuses) : [];
 
   const csvData = useMemo(() => {
-    const completedBounties = bountiesSorted.filter((bounty) => bounty.status === BountyStatus.complete);
+    const completedBounties = bountiesSorted.filter(
+      (bounty) =>
+        bounty.status === BountyStatus.complete &&
+        !isNullish(bounty.rewardAmount) &&
+        !isNullish(bounty.rewardToken) &&
+        !isNullish(bounty.chainId)
+    );
     if (!completedBounties.length) {
       return [];
     }
@@ -70,7 +80,7 @@ export default function BountiesPage({ publicMode = false, bounties }: Props) {
     return [
       ['token_address', 'receiver', 'amount', 'chainId'],
       ...completedBounties.map((bounty) => [
-        bounty.rewardToken.startsWith('0x') ? bounty.rewardToken : '', // for native token it should be empty
+        bounty.rewardToken?.startsWith('0x') ? bounty.rewardToken : '', // for native token it should be empty
         bounty.applications.find((application) => application.status === 'complete')?.walletAddress,
         bounty.rewardAmount,
         bounty.chainId

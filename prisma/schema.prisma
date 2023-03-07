@@ -262,7 +262,7 @@ model Space {
   webhookSubscriptions        WebhookSubscription[]
   webhookSigningSecret        String?
 
-  hiddenFeatures            Feature[]
+  hiddenFeatures Feature[]
 
   @@index([createdBy])
 }
@@ -344,12 +344,12 @@ model Page {
 }
 
 model PageComment {
-  id          String    @id @default(uuid()) @db.Uuid
-  createdAt   DateTime  @default(now())
-  createdBy   String    @db.Uuid
+  id          String            @id @default(uuid()) @db.Uuid
+  createdAt   DateTime          @default(now())
+  createdBy   String            @db.Uuid
   content     Json
   contentText String
-  updatedAt   DateTime  @updatedAt
+  updatedAt   DateTime          @updatedAt
   deletedAt   DateTime?
   deletedBy   String?
   parentId    String?
@@ -651,11 +651,11 @@ model Bounty {
   spaceId           String             @db.Uuid
   createdAt         DateTime           @default(now())
   updatedAt         DateTime           @default(now())
-  rewardAmount      Float
-  rewardToken       String
+  rewardAmount      Float?
+  rewardToken       String?
   status            BountyStatus       @default(open)
   id                String             @id @default(uuid()) @db.Uuid
-  chainId           Int
+  chainId           Int?
   suggestedBy       String?            @db.Uuid
   approveSubmitters Boolean            @default(false)
   submissionsLocked Boolean            @default(false)
@@ -665,6 +665,7 @@ model Bounty {
   applications      Application[]
   permissions       BountyPermission[]
   page              Page?
+  reward            String?
 
   @@index([createdBy])
   @@index([spaceId])

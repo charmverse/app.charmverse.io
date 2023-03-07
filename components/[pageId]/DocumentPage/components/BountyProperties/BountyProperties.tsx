@@ -1,6 +1,8 @@
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { Box, Collapse, Divider, IconButton, Stack, TextField, Tooltip } from '@mui/material';
+import Tab from '@mui/material/Tab';
+import Tabs from '@mui/material/Tabs';
 import type { PaymentMethod } from '@prisma/client';
 import type { CryptoCurrency } from 'connectors';
 import { getChainById } from 'connectors';
@@ -39,6 +41,9 @@ import { BountySignupButton } from './components/BountySignupButton';
 import BountySuggestionApproval from './components/BountySuggestionApproval';
 import MissingPagePermissions from './components/MissingPagePermissions';
 
+const RewardTypes = ['Token', 'Custom'] as const;
+type RewardType = (typeof RewardTypes)[number];
+
 export default function BountyProperties(props: {
   readOnly?: boolean;
   bountyId: string | null;
@@ -62,6 +67,8 @@ export default function BountyProperties(props: {
     () => isAmountInputEmpty || Number(currentBounty?.rewardAmount) <= 0,
     [isAmountInputEmpty, currentBounty]
   );
+
+  const [rewardType, setRewardType] = useState<RewardType>('Token');
 
   const { isSpaceMember } = useIsSpaceMember();
 
@@ -152,6 +159,12 @@ export default function BountyProperties(props: {
     });
   }, []);
 
+  const updateBountyReward = useCallback((e: any) => {
+    applyBountyUpdatesDebounced({
+      reward: e.target.value
+    });
+  }, []);
+
   const updateBountyMaxSubmissions = useCallback((e: any) => {
     applyBountyUpdatesDebounced({
       maxSubmissions: Number(e.target.value)
@@ -174,7 +187,7 @@ export default function BountyProperties(props: {
   }, [currentBounty?.id]);
 
   useEffect(() => {
-    if (currentBounty?.chainId) {
+    if (currentBounty?.chainId && currentBounty.rewardToken) {
       refreshCryptoList(currentBounty.chainId, currentBounty.rewardToken);
     }
   }, [currentBounty?.chainId, currentBounty?.rewardToken]);
@@ -197,81 +210,135 @@ export default function BountyProperties(props: {
         data-test='bounty-configuration'
       >
         <div className='octo-propertyname octo-propertyname--readonly'>
-          <Button>Chain</Button>
+          <Button>Reward</Button>
         </div>
-        <InputSearchBlockchain
-          disabled={readOnly}
-          readOnly={readOnly}
-          chainId={currentBounty?.chainId}
-          sx={{
-            width: '100%'
-          }}
-          onChange={async (chainId) => {
-            const newNativeCurrency = refreshCryptoList(chainId);
-            applyBountyUpdates({
-              chainId,
-              rewardToken: newNativeCurrency
-            });
-          }}
-        />
+        <Tabs
+          indicatorColor={readOnly ? 'secondary' : 'primary'}
+          value={RewardTypes.indexOf(rewardType)}
+          onChange={(_, newRewardType) => setRewardType(RewardTypes[newRewardType])}
+          aria-label='multi tabs'
+          sx={{ minHeight: 0 }}
+        >
+          {RewardTypes.map((_rewardType) => (
+            <Tab
+              disabled={readOnly}
+              sx={{
+                textTransform: 'initial'
+              }}
+              key={_rewardType}
+              label={_rewardType}
+            />
+          ))}
+        </Tabs>
       </div>
 
-      <div
-        className='octo-propertyrow'
-        style={{
-          height: 'fit-content'
-        }}
-      >
-        <div className='octo-propertyname octo-propertyname--readonly'>
-          <Button>Reward token</Button>
-        </div>
-        <InputSearchCrypto
-          disabled={readOnly}
-          readOnly={readOnly}
-          cryptoList={availableCryptos}
-          chainId={currentBounty?.chainId}
-          defaultValue={currentBounty?.rewardToken}
-          value={currentBounty?.rewardToken}
-          hideBackdrop={true}
-          onChange={(newToken) => {
-            applyBountyUpdates({
-              rewardToken: newToken
-            });
-          }}
-          onNewPaymentMethod={onNewPaymentMethod}
-          sx={{
-            width: '100%'
-          }}
-        />
-      </div>
+      {rewardType === 'Token' && (
+        <>
+          <div
+            className='octo-propertyrow'
+            style={{
+              height: 'fit-content'
+            }}
+          >
+            <div className='octo-propertyname octo-propertyname--readonly'>
+              <Button>Chain</Button>
+            </div>
+            <InputSearchBlockchain
+              disabled={readOnly}
+              readOnly={readOnly}
+              chainId={currentBounty?.chainId ?? undefined}
+              sx={{
+                width: '100%'
+              }}
+              onChange={async (chainId) => {
+                const newNativeCurrency = refreshCryptoList(chainId);
+                applyBountyUpdates({
+                  chainId,
+                  rewardToken: newNativeCurrency
+                });
+              }}
+            />
+          </div>
+          <div
+            className='octo-propertyrow'
+            style={{
+              height: 'fit-content'
+            }}
+          >
+            <div className='octo-propertyname octo-propertyname--readonly'>
+              <Button>Token</Button>
+            </div>
+            <InputSearchCrypto
+              disabled={readOnly}
+              readOnly={readOnly}
+              cryptoList={availableCryptos}
+              chainId={currentBounty?.chainId ?? undefined}
+              defaultValue={currentBounty?.rewardToken ?? undefined}
+              value={currentBounty?.rewardToken ?? undefined}
+              hideBackdrop={true}
+              onChange={(newToken) => {
+                applyBountyUpdates({
+                  rewardToken: newToken
+                });
+              }}
+              onNewPaymentMethod={onNewPaymentMethod}
+              sx={{
+                width: '100%'
+              }}
+            />
+          </div>
 
-      <div
-        className='octo-propertyrow'
-        style={{
-          height: 'fit-content'
-        }}
-      >
-        <div className='octo-propertyname octo-propertyname--readonly'>
-          <Button>Reward amount</Button>
+          <div
+            className='octo-propertyrow'
+            style={{
+              height: 'fit-content'
+            }}
+          >
+            <div className='octo-propertyname octo-propertyname--readonly'>
+              <Button>Amount</Button>
+            </div>
+            <TextField
+              data-test='bounty-property-amount'
+              sx={{
+                width: '100%'
+              }}
+              disabled={readOnly}
+              value={isAmountInputEmpty ? '' : currentBounty?.rewardAmount}
+              type='number'
+              size='small'
+              onChange={updateBountyAmount}
+              inputProps={{
+                step: 0.01
+              }}
+              error={isRewardAmountInvalid}
+              helperText={isRewardAmountInvalid && 'Bounty amount should be a number greater than 0'}
+            />
+          </div>
+        </>
+      )}
+
+      {rewardType === 'Custom' && (
+        <div
+          className='octo-propertyrow'
+          style={{
+            height: 'fit-content'
+          }}
+        >
+          <TextField
+            sx={{
+              width: '100%'
+            }}
+            disabled={readOnly}
+            value={currentBounty?.reward ?? ''}
+            type='text'
+            size='small'
+            multiline
+            rows={5}
+            onChange={updateBountyReward}
+            placeholder='A CharmVerse hat ...'
+          />
         </div>
-        <TextField
-          data-test='bounty-property-amount'
-          required
-          sx={{
-            width: '100%'
-          }}
-          disabled={readOnly}
-          value={isAmountInputEmpty ? '' : currentBounty?.rewardAmount}
-          type='number'
-          size='small'
-          onChange={updateBountyAmount}
-          inputProps={{
-            step: 0.01
-          }}
-          error={isRewardAmountInvalid}
-          helperText={isRewardAmountInvalid && 'Bounty amount should be a number greater than 0'}
-        />
-      </div>
+      )}
       <Stack
         gap={0.5}
         flexDirection='row'
