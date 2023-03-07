@@ -122,7 +122,7 @@ export interface IPageMetaWithPermissions extends PageMeta {
 
 export type DuplicatePageResponse = {
   pages: PageMeta[];
-  rootPageIds: string[];
+  rootPageId: string;
   bounties: BountyWithDetails[];
   blocks: Block[];
 };
