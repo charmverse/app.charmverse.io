@@ -1,9 +1,9 @@
-import { createDiscordUser } from '__e2e__/utils/mocks';
 import { v4 } from 'uuid';
 
 import { prisma } from 'db';
 import { createAndAssignRolesDiscord } from 'lib/discord/createAndAssignRolesDiscord';
 import { generateRole, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { createDiscordUser } from 'testing/utils/discord';
 
 describe('createAndAssignRolesDiscord', () => {
   it('should create new roles and assign to user', async () => {

@@ -1,11 +1,12 @@
+import { RateLimit } from 'async-sema';
+
 import fetch from 'adapters/http/fetch.server';
+import { COLLABLAND_API_URL } from 'lib/collabland/config';
 import type { CollablandUserResult } from 'lib/collabland/interfaces';
 import { getLogger } from 'lib/log/prefix';
 import type { ExternalRole } from 'lib/roles';
 
 const log = getLogger('collabland-client');
-
-const DOMAIN = process.env.COLLAB_API_URL as string;
 const API_KEY = process.env.COLLAB_API_KEY as string;
 
 const DEFAULT_HEADERS = {
@@ -14,7 +15,9 @@ const DEFAULT_HEADERS = {
   'X-API-KEY': API_KEY
 };
 
-log.info('Using collabland API URL:', DOMAIN);
+log.debug('Using collabland API URL:', COLLABLAND_API_URL);
+
+const rateLimiter = RateLimit(1); // requests per second
 
 export interface BountyEventSubject {
   id: string; // discord user id
@@ -83,7 +86,7 @@ export function getCredentials({ aeToken }: { aeToken: string }) {
     return [];
   }
 
-  return fetch<AnyCredentialType[]>(`${DOMAIN}/veramo/vcs`, {
+  return fetch<AnyCredentialType[]>(`${COLLABLAND_API_URL}/veramo/vcs`, {
     method: 'GET',
     headers: getHeaders({
       Authorization: `AE ${aeToken}`
@@ -98,7 +101,7 @@ export function createCredential<T = BountyEventSubject>({ subject }: { subject:
     return null;
   }
 
-  return fetch<CollablandCredential<T>>(`${DOMAIN}/veramo/vcreds`, {
+  return fetch<CollablandCredential<T>>(`${COLLABLAND_API_URL}/veramo/vcreds`, {
     method: 'POST',
     headers: getHeaders(),
     body: JSON.stringify({ credentialSubjects: [subject] })
@@ -113,9 +116,13 @@ export async function canJoinSpaceViaDiscord({
   discordUserId: string;
 }) {
   try {
-    const res = await fetch<CollablandUserResult>(`${DOMAIN}/discord/${discordServerId}/member/${discordUserId}`, {
-      headers: getHeaders()
-    });
+    await rateLimiter();
+    const res = await fetch<CollablandUserResult>(
+      `${COLLABLAND_API_URL}/discord/${discordServerId}/member/${discordUserId}`,
+      {
+        headers: getHeaders()
+      }
+    );
 
     const serverRoles = await getGuildRoles(discordServerId);
     const userRoles: ExternalRole[] = [];
@@ -131,7 +138,7 @@ export async function canJoinSpaceViaDiscord({
       roles: userRoles || []
     };
   } catch (error) {
-    log.error(`Failed to verify user join conditions ${discordServerId}`, { error, apiDomain: DOMAIN });
+    log.error(`Failed to verify user join conditions ${discordServerId}`, { error, apiDomain: COLLABLAND_API_URL });
 
     return {
       isVerified: false,
@@ -141,16 +148,11 @@ export async function canJoinSpaceViaDiscord({
 }
 
 export async function getGuildRoles(discordServerId: string) {
-  try {
-    const allRoles = await fetch<ExternalRole[]>(`${DOMAIN}/discord/${discordServerId}/roles`, {
-      headers: getHeaders()
-    });
+  await rateLimiter();
+  const allRoles = await fetch<ExternalRole[]>(`${COLLABLAND_API_URL}/discord/${discordServerId}/roles`, {
+    headers: getHeaders()
+  });
 
-    // filter out irrelevant roles
-    return allRoles.filter((role) => role.name !== '@everyone' && !role.managed);
-  } catch (error) {
-    log.error(`Failed to fetch roles for server ${discordServerId}`, { error, apiDomain: DOMAIN });
-
-    return [];
-  }
+  // filter out irrelevant roles
+  return allRoles.filter((role) => role.name !== '@everyone' && !role.managed);
 }
