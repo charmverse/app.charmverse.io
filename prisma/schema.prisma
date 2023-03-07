@@ -137,7 +137,6 @@ enum ProfileItemType {
 }
 
 enum ProposalStatus {
-  private_draft
   draft
   discussion
   review
@@ -333,6 +332,7 @@ model Page {
   diffs               PageDiff[]
   convertedProposalId String?          @unique @db.Uuid
   convertedProposal   Proposal?        @relation(fields: [convertedProposalId], references: [id], onDelete: SetNull, onUpdate: Cascade, name: "convertedProposal")
+  comments            PageComment[]
 
   @@index([bountyId])
   @@index([cardId])
@@ -341,6 +341,36 @@ model Page {
   @@index([proposalId])
   @@index([spaceId])
   @@index([title])
+}
+
+model PageComment {
+  id          String    @id @default(uuid()) @db.Uuid
+  createdAt   DateTime  @default(now())
+  createdBy   String    @db.Uuid
+  content     Json
+  contentText String
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+  deletedBy   String?
+  parentId    String?
+  pageId      String            @db.Uuid
+  page        Page              @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  user        User              @relation(fields: [createdBy], references: [id], onDelete: Cascade)
+  votes       PageCommentVote[]
+
+  @@index([pageId])
+}
+
+model PageCommentVote {
+  createdAt DateTime @default(now())
+  createdBy String   @db.Uuid
+  upvoted   Boolean
+
+  commentId String      @db.Uuid
+  comment   PageComment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+
+  @@unique([createdBy, commentId])
+  @@index([commentId])
 }
 
 model PageDiff {
@@ -476,6 +506,7 @@ model User {
   postComments         PostComment[]
   googleAccounts       GoogleAccount[]
   GoogleCredential     GoogleCredential[]
+  PageComment          PageComment[]
 }
 
 model UserWallet {
@@ -1097,6 +1128,7 @@ model MemberPropertyPermission {
 model PostCategory {
   id                      String                   @id @default(uuid()) @db.Uuid
   name                    String
+  description             String?
   path                    String?
   defaultForSpace         Space?                   @relation(name: "defaultPostCategory")
   spaceId                 String                   @db.Uuid

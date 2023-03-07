@@ -5,14 +5,13 @@ import FavoritedIcon from '@mui/icons-material/Star';
 import NotFavoritedIcon from '@mui/icons-material/StarBorder';
 import UndoIcon from '@mui/icons-material/Undo';
 import VerticalAlignBottomOutlinedIcon from '@mui/icons-material/VerticalAlignBottomOutlined';
-import { Divider, Tooltip, Typography, Box, Stack } from '@mui/material';
+import { Box, Divider, Stack, Tooltip, Typography } from '@mui/material';
 import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import { useRouter } from 'next/router';
 import Papa from 'papaparse';
 import type { ChangeEventHandler } from 'react';
-import { useIntl } from 'react-intl';
 
 import charmClient from 'charmClient';
 import { CsvExporter } from 'components/common/BoardEditor/focalboard/csvExporter/csvExporter';
@@ -25,6 +24,7 @@ import {
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { getCurrentBoardViews, getView } from 'components/common/BoardEditor/focalboard/src/store/views';
 import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
+import { DuplicatePageAction } from 'components/common/DuplicatePageAction';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useMembers } from 'hooks/useMembers';
@@ -69,6 +69,7 @@ export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: 
   const activeBoardId = view?.fields.sourceData?.boardId ?? view?.fields.linkedSourceId ?? view?.rootId;
   const board = boards.find((b) => b.id === activeBoardId);
   const lastUpdatedBy = members.find((member) => member.id === board?.createdBy);
+  const boardPage = pages[pageId];
 
   function undoChanges() {
     if (mutator.canUndo) {
@@ -124,7 +125,6 @@ export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: 
       charmClient.track.trackAction('export_page_csv', { pageId, spaceId });
     }
   };
-
   function onCopyLink() {
     Utils.copyTextToClipboard(window.location.href);
     showMessage('Copied link to clipboard', 'success');
@@ -272,6 +272,9 @@ export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: 
         </Box>
         <ListItemText primary={isFavorite ? 'Remove from Favorites' : 'Add to Favorites'} />
       </ListItemButton>
+      {boardPage && (
+        <DuplicatePageAction postDuplication={closeMenu} page={boardPage} pagePermissions={pagePermissions} />
+      )}
       <ListItemButton onClick={onCopyLink}>
         <ContentCopyIcon
           fontSize='small'

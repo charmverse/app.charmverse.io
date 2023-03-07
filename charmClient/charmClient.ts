@@ -8,7 +8,6 @@ import type {
   Role,
   Space,
   TelegramUser,
-  TokenGate,
   TokenGateToRole,
   User,
   UserDetails,
@@ -38,12 +37,6 @@ import type {
 import type { SpacePermissionFlags, SpacePermissionModification } from 'lib/permissions/spaces';
 import type { AggregatedProfileData } from 'lib/profile';
 import type { CreateSpaceProps } from 'lib/spaces/createWorkspace';
-import type {
-  TokenGateEvaluationAttempt,
-  TokenGateEvaluationResult,
-  TokenGateVerification,
-  TokenGateWithRoles
-} from 'lib/token-gates/interfaces';
 import type { ITokenMetadata, ITokenMetadataRequest } from 'lib/tokens/tokenData';
 import { encodeFilename } from 'lib/utilities/encodeFilename';
 import type { SocketAuthReponse } from 'lib/websockets/interfaces';
@@ -59,7 +52,6 @@ import type { TelegramAccount } from 'pages/api/telegram/connect';
 
 import { BlockchainApi } from './apis/blockchainApi';
 import { BountiesApi } from './apis/bountiesApi';
-import { CollablandApi } from './apis/collablandApi';
 import { CommentsApi } from './apis/commentsApi';
 import { DiscordApi } from './apis/discordApi';
 import { FileApi } from './apis/fileApi';
@@ -75,6 +67,7 @@ import { ProposalsApi } from './apis/proposalsApi';
 import { SpacesApi } from './apis/spacesApi';
 import { SummonApi } from './apis/summonApi';
 import { TasksApi } from './apis/tasksApi';
+import { TokenGatesApi } from './apis/tokenGates';
 import { TrackApi } from './apis/trackApi';
 import { UnstoppableDomainsApi } from './apis/unstoppableApi';
 import { VotesApi } from './apis/votesApi';
@@ -88,8 +81,6 @@ class CharmClient {
   blockchain = new BlockchainApi();
 
   bounties = new BountiesApi();
-
-  collabland = new CollablandApi();
 
   comments = new CommentsApi();
 
@@ -126,6 +117,8 @@ class CharmClient {
   unstoppableDomains = new UnstoppableDomainsApi();
 
   votes = new VotesApi();
+
+  tokenGates = new TokenGatesApi();
 
   async socket() {
     return http.GET<SocketAuthReponse>('/api/socket');
@@ -225,10 +218,6 @@ class CharmClient {
 
   getPublicPageByViewId(viewId: string) {
     return http.GET<Page>(`/api/public/view/${viewId}`);
-  }
-
-  duplicatePage(pageId: string, parentId: string) {
-    return http.POST<IPageWithPermissions>(`/api/pages/${pageId}/duplicate`, { parentId });
   }
 
   getBlockViewsByPageId(pageId: string) {
@@ -449,34 +438,6 @@ class CharmClient {
 
   deleteFromS3(src: string) {
     return http.DELETE('/api/aws/s3-delete', { src });
-  }
-
-  // Token Gates
-  getTokenGates(query: { spaceId: string }) {
-    return http.GET<TokenGateWithRoles[]>('/api/token-gates', query);
-  }
-
-  getTokenGatesForSpace(query: { spaceDomain: string }) {
-    return http.GET<TokenGateWithRoles[]>('/api/token-gates', query);
-  }
-
-  saveTokenGate(tokenGate: Partial<TokenGate>): Promise<TokenGate> {
-    return http.POST<TokenGate>('/api/token-gates', tokenGate);
-  }
-
-  deleteTokenGate(id: string) {
-    return http.DELETE<TokenGate>(`/api/token-gates/${id}`);
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  verifyTokenGate(verification: Omit<TokenGateVerification, 'userId'>): Promise<{ error?: string; success?: boolean }> {
-    return http.POST('/api/token-gates/verify', verification);
-  }
-
-  evalueTokenGateEligibility(
-    verification: Omit<TokenGateEvaluationAttempt, 'userId'>
-  ): Promise<TokenGateEvaluationResult> {
-    return http.POST('/api/token-gates/evaluate', verification);
   }
 
   // evaluate ({ , jwt }: { id: string, jwt: string }): Promise<{ error?: string, success?: boolean }> {

@@ -1,5 +1,6 @@
 import type { Dispatch, ReactNode, SetStateAction } from 'react';
 import { createContext, useContext, useMemo, useState } from 'react';
+
 // keep track of the focused page (may be different from what's in the URL or header)
 
 type ICurrentSpaceContext = {

@@ -56,7 +56,7 @@ export function useTokenGates({
     setTokenGateResult(null);
     setIsVerifying(true);
 
-    charmClient
+    charmClient.tokenGates
       .evalueTokenGateEligibility({
         authSig,
         spaceIdOrDomain: space.id
@@ -74,7 +74,7 @@ export function useTokenGates({
     setJoiningSpace(true);
 
     try {
-      await charmClient.verifyTokenGate({
+      await charmClient.tokenGates.verifyTokenGate({
         commit: true,
         spaceId: tokenGateResult?.space.id as string,
         tokens:

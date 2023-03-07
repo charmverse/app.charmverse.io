@@ -136,6 +136,9 @@ export default function PageDialog(props: Props) {
               onClickDelete();
               onClose();
             }}
+            onDuplicate={(pageDuplicateResponse) => {
+              setBounties((_bounties) => [..._bounties, ...pageDuplicateResponse.bounties]);
+            }}
           >
             {bounty && (
               <MenuItem

@@ -107,6 +107,7 @@ export function PostDialog({ post, spaceId, onClose, open, newPostCategory }: Pr
           <PageActions
             page={{ ...post, relativePath }}
             onClickDelete={permissions?.delete_post ? deletePost : undefined}
+            hideDuplicateAction
           />
         )
       }

@@ -3,7 +3,6 @@ import BarChartOutlinedIcon from '@mui/icons-material/BarChartOutlined';
 import ChatOutlinedIcon from '@mui/icons-material/ChatOutlined';
 import CheckOutlinedIcon from '@mui/icons-material/CheckOutlined';
 import HowToVoteOutlinedIcon from '@mui/icons-material/HowToVoteOutlined';
-import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import ModeEditOutlineOutlinedIcon from '@mui/icons-material/ModeEditOutlineOutlined';
 import ReviewsOutlinedIcon from '@mui/icons-material/ReviewsOutlined';
 import type { ChipProps } from '@mui/material';
@@ -15,7 +14,6 @@ import { PROPOSAL_STATUS_LABELS } from 'lib/proposal/proposalStatusTransition';
 import type { BrandColor } from 'theme/colors';
 
 const PROPOSAL_STATUS_ICONS: Record<ProposalStatus, ReactNode> = {
-  private_draft: <LockOutlinedIcon />,
   draft: <ModeEditOutlineOutlinedIcon />,
   discussion: <ChatOutlinedIcon />,
   review: <ReviewsOutlinedIcon />,
@@ -25,7 +23,6 @@ const PROPOSAL_STATUS_ICONS: Record<ProposalStatus, ReactNode> = {
 };
 
 export const ProposalStatusColors: Record<ProposalStatus, BrandColor> = {
-  private_draft: 'gray',
   draft: 'gray',
   discussion: 'teal',
   review: 'yellow',
