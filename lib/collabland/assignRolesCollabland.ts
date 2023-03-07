@@ -17,7 +17,7 @@ export async function assignRolesCollabland({
     const spacesData = await getSpacesAndUserFromDiscord({ discordUserId, discordServerId });
     return Promise.allSettled(
       spacesData.map(({ space, user }) =>
-        createAndAssignCollablanRoles({ userId: user.id, spaceId: space.id, roles: roleIdsToAdd, discordServerId })
+        createAndAssignCollablanRoles({ userId: user.id, spaceId: space.id, roles: roleIdsToAdd })
       )
     );
   } catch (e) {
@@ -28,13 +28,11 @@ export async function assignRolesCollabland({
 async function createAndAssignCollablanRoles({
   userId,
   spaceId,
-  roles,
-  discordServerId
+  roles
 }: {
   userId: string;
   spaceId: string;
   roles: string[];
-  discordServerId: string;
 }) {
   if (!roles.length) {
     return;
@@ -54,8 +52,7 @@ async function createAndAssignCollablanRoles({
   const rolesRecord = await findOrCreateCollablandRoles({
     externalRoleIds: roles,
     spaceId,
-    userId,
-    discordServerId
+    userId
   });
 
   const roleIdsToAssign: string[] = [];

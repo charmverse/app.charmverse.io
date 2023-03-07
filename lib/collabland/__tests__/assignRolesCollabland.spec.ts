@@ -40,7 +40,7 @@ describe('assignRolesCollabland', () => {
     expect(getGuildRolesMock).toHaveBeenCalledWith(discordServerId);
   });
 
-  it('should assign existing roles without fetchin from collabland api', async () => {
+  it('should assign existing roles without fetching from collabland api', async () => {
     const discordServerId = v4();
     const discordUserId = v4();
     const discordRoles: ExternalRole[] = [
