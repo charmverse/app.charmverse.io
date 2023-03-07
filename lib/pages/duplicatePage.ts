@@ -42,7 +42,7 @@ export async function duplicatePage({
   });
 
   if (rootPageIds.length > 1) {
-    log.info(`[duplicate]: Found multiple rootPageIds for a single page duplication`, {
+    log.error(`[duplicate]: Found multiple rootPageIds for a single page duplication`, {
       pageId,
       totalRootPageIds: rootPageIds.length,
       spaceId
