@@ -1,6 +1,17 @@
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import { Alert, Box, Collapse, FormLabel, IconButton, TableCell, TableRow, Tooltip, Typography } from '@mui/material';
+import {
+  Alert,
+  Box,
+  Collapse,
+  Divider,
+  FormLabel,
+  IconButton,
+  TableCell,
+  TableRow,
+  Tooltip,
+  Typography
+} from '@mui/material';
 import { useEffect, useState } from 'react';
 import { v4 as uuid } from 'uuid';
 
@@ -21,8 +32,8 @@ import type { SystemError } from 'lib/utilities/errors';
 import ApplicationInput from '../BountyApplicantForm/components/ApplicationInput';
 import SubmissionInput from '../BountyApplicantForm/components/SubmissionInput';
 import BountyApplicantStatus from '../BountyApplicantStatus';
-import { BountyCommentForm } from '../BountyComment/BountyCommentForm';
 
+import { ApplicationCommentForm } from './ApplicationCommentForm';
 import { ApplicationComments } from './ApplicationComments';
 import BountyApplicantActions from './BountyApplicantActions';
 
@@ -245,11 +256,17 @@ export default function BountyApplicantTableRow({
               <ApplicationComments applicationId={submission.id} />
               {submission.status !== 'rejected' && submission.createdBy !== user?.id && (
                 <>
+                  <Divider
+                    style={{
+                      marginBottom: 24,
+                      marginTop: 24
+                    }}
+                  />
                   <FormLabel>
                     <strong>Send a message (optional)</strong>
                   </FormLabel>
                   <div className='CommentsList' style={{ padding: 0 }}>
-                    <BountyCommentForm
+                    <ApplicationCommentForm
                       $key={editorKey}
                       key={editorKey}
                       initialValue={

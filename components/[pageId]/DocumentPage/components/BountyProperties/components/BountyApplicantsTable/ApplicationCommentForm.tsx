@@ -1,5 +1,6 @@
+import styled from '@emotion/styled';
+import { Box } from '@mui/system';
 import { useState } from 'react';
-import { FormattedMessage } from 'react-intl';
 
 import Avatar from 'components/common/Avatar';
 import Button from 'components/common/Button';
@@ -14,32 +15,58 @@ interface NewCommentProps {
   username?: string;
   avatar?: string | null;
   onSubmit: (editorOutput: ICharmEditorOutput) => void;
+  disabled?: boolean;
+  buttonText?: string;
 }
 
-export function BountyCommentForm({ initialValue, $key, username, avatar, onSubmit }: NewCommentProps) {
+const StyleContainer = styled(Box)`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+`;
+
+export function ApplicationCommentForm({
+  disabled = false,
+  initialValue,
+  $key,
+  username,
+  avatar,
+  onSubmit,
+  buttonText = 'Send'
+}: NewCommentProps) {
   const [newComment, setNewComment] = useState<ICharmEditorOutput | null | undefined>(initialValue);
+  const [touched, setTouched] = useState(false);
 
   return (
-    <div className='CommentsList__new'>
+    <StyleContainer>
       <Avatar size='xSmall' name={username} avatar={avatar} />
       <InlineCharmEditor
         content={newComment?.doc}
         key={$key} // use the size of comments so it resets when the new one is added
         onContentChange={({ doc, rawText }) => {
+          setTouched(true);
           setNewComment({ doc, rawText });
         }}
         placeholderText='Add a comment...'
         style={{ fontSize: '14px' }}
         focusOnInit={false}
+        readOnly={disabled}
       />
 
       <Button
-        disabled={!isTruthy(newComment) && checkIsContentEmpty(newComment)}
+        disabled={!touched || (!isTruthy(newComment) && checkIsContentEmpty(newComment))}
         filled={true}
-        onClick={() => newComment && onSubmit(newComment)}
+        onClick={() => {
+          if (newComment) {
+            onSubmit(newComment);
+            setTouched(false);
+          }
+        }}
       >
-        <FormattedMessage id='CommentsList.send' defaultMessage='Send' />
+        {buttonText}
       </Button>
-    </div>
+    </StyleContainer>
   );
 }
