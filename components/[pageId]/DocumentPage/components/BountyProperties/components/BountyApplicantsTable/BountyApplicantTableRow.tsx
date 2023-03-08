@@ -1,15 +1,12 @@
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import { Alert, Collapse, FormLabel, IconButton, Box, Tooltip, TableCell, TableRow, Typography } from '@mui/material';
+import { Alert, Box, Collapse, FormLabel, IconButton, TableCell, TableRow, Tooltip, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { v4 as uuid } from 'uuid';
 
 import charmClient from 'charmClient';
-import type { CommentBlock } from 'components/common/BoardEditor/focalboard/src/blocks/commentBlock';
-import { createCommentBlock } from 'components/common/BoardEditor/focalboard/src/blocks/commentBlock';
-import { NewCommentInput } from 'components/common/BoardEditor/focalboard/src/components/cardDetail/commentsList';
-import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
 import Button from 'components/common/Button';
+import type { ICharmEditorOutput } from 'components/common/CharmEditor/InlineCharmEditor';
 import Modal from 'components/common/Modal';
 import UserDisplay from 'components/common/UserDisplay';
 import { useBounties } from 'hooks/useBounties';
@@ -24,7 +21,9 @@ import type { SystemError } from 'lib/utilities/errors';
 import ApplicationInput from '../BountyApplicantForm/components/ApplicationInput';
 import SubmissionInput from '../BountyApplicantForm/components/SubmissionInput';
 import BountyApplicantStatus from '../BountyApplicantStatus';
+import { BountyCommentForm } from '../BountyComment/BountyCommentForm';
 
+import { ApplicationComments } from './ApplicationComments';
 import BountyApplicantActions from './BountyApplicantActions';
 
 interface Props {
@@ -50,7 +49,6 @@ export default function BountyApplicantTableRow({
   const [editorKey, setEditorKey] = useState(0); // a key to allow us to reset charmeditor contents
   const { formatDateTime } = useDateFormatter();
 
-  const [defaultComment, setDefaultComment] = useState<CommentBlock['fields'] | null>(null);
   const [reviewDecision, setReviewDecision] = useState<SubmissionReview | null>(null);
   const [apiError, setApiError] = useState<SystemError | null>();
 
@@ -60,24 +58,15 @@ export default function BountyApplicantTableRow({
   const showAcceptSubmission =
     !showAcceptApplication && submission.status === 'review' && submission.createdBy !== user?.id;
 
-  function onSendClicked(newComment: CommentBlock['fields']) {
-    const comment = createCommentBlock();
-    const { content, contentText } = newComment;
-    comment.parentId = bounty.page.id;
-    comment.rootId = bounty.page.id;
-    comment.title = contentText || '';
-    comment.fields = { content };
-    mutator.insertBlock(comment, 'add comment');
+  async function onSendClicked(applicationComment: ICharmEditorOutput) {
     resetInput();
+    await charmClient.applicationComments.addComment(submission.id, {
+      content: applicationComment.doc,
+      contentText: applicationComment.rawText
+    });
   }
 
   function resetInput() {
-    if (user && member) {
-      const content = getContentWithMention({ myUserId: user?.id, targetUserId: member?.id });
-      setDefaultComment({ content });
-    } else {
-      setDefaultComment(null);
-    }
     setEditorKey((key) => key + 1);
   }
 
@@ -253,16 +242,24 @@ export default function BountyApplicantTableRow({
                 </Box>
               )}
 
+              <ApplicationComments applicationId={submission.id} />
               {submission.status !== 'rejected' && submission.createdBy !== user?.id && (
                 <>
                   <FormLabel>
                     <strong>Send a message (optional)</strong>
                   </FormLabel>
                   <div className='CommentsList' style={{ padding: 0 }}>
-                    <NewCommentInput
+                    <BountyCommentForm
                       $key={editorKey}
                       key={editorKey}
-                      initialValue={defaultComment}
+                      initialValue={
+                        user?.id
+                          ? {
+                              doc: getContentWithMention({ myUserId: user.id, targetUserId: submission.createdBy }),
+                              rawText: ''
+                            }
+                          : null
+                      }
                       username={user?.username}
                       avatar={user?.avatar}
                       onSubmit={onSendClicked}

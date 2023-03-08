@@ -50,6 +50,7 @@ import type { SetSpaceWebhookBody, SetSpaceWebhookResponse } from 'pages/api/spa
 import type { Response as CheckDomainResponse } from 'pages/api/spaces/checkDomain';
 import type { TelegramAccount } from 'pages/api/telegram/connect';
 
+import { ApplicationCommentsApi } from './apis/applicationCommentsApi';
 import { BlockchainApi } from './apis/blockchainApi';
 import { BountiesApi } from './apis/bountiesApi';
 import { CommentsApi } from './apis/commentsApi';
@@ -119,6 +120,8 @@ class CharmClient {
   votes = new VotesApi();
 
   tokenGates = new TokenGatesApi();
+
+  applicationComments = new ApplicationCommentsApi();
 
   async socket() {
     return http.GET<SocketAuthReponse>('/api/socket');

@@ -298,7 +298,7 @@ function DocumentPage({ page, setPage, insideModal, readOnly = false }: Document
                           refreshBountyPermissions={refreshBountyPermissions}
                         />
                       )}
-                      {(page.type === 'bounty' || page.type === 'card') && (
+                      {page.type === 'card' && (
                         <CommentsList
                           comments={comments}
                           rootId={card?.rootId ?? page.id}
