@@ -1,13 +1,13 @@
+import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import PersonIcon from '@mui/icons-material/Person';
 import TelegramIcon from '@mui/icons-material/Telegram';
-import WalletIcon from '@mui/icons-material/Wallet';
 import type { IdentityType } from '@prisma/client';
 import { SiDiscord } from 'react-icons/si';
 
 export function IdentityIcon({ type }: { type: IdentityType | null }) {
   switch (type) {
     case 'Wallet':
-      return <WalletIcon color='primary' sx={{ height: '40px', width: '40px' }} />;
+      return <AccountBalanceWalletIcon color='primary' sx={{ height: '40px', width: '40px' }} />;
 
     case 'Discord':
       return <SiDiscord color='#5865F2' size={40} />;
