@@ -32,7 +32,6 @@ import type {
   UpdateableBountyFields
 } from 'lib/bounties';
 import type { TargetPermissionGroup } from 'lib/permissions/interfaces';
-import debouncePromise from 'lib/utilities/debouncePromise';
 import { isTruthy } from 'lib/utilities/types';
 
 import BountyApplicantForm from './components/BountyApplicantForm';
@@ -69,7 +68,13 @@ export default function BountyProperties(props: {
     [isAmountInputEmpty, currentBounty]
   );
 
-  const [rewardType, setRewardType] = useState<RewardType>('Token');
+  const [rewardType, setRewardType] = useState<RewardType>(isTruthy(currentBounty?.customReward) ? 'Custom' : 'Token');
+
+  useEffect(() => {
+    if (rewardType !== 'Custom' && isTruthy(currentBounty?.customReward)) {
+      setRewardType('Custom');
+    }
+  }, [currentBounty, rewardType]);
 
   const { isSpaceMember } = useIsSpaceMember();
 
@@ -156,6 +161,25 @@ export default function BountyProperties(props: {
   }, [updateBountyDebounced]);
 
   async function applyBountyUpdatesDebounced(updates: Partial<BountyWithDetails>) {
+    const customReward = updates.customReward;
+    const isBountyTokenRewardFieldsEmpty =
+      !isTruthy(currentBounty?.rewardToken) &&
+      !isTruthy(currentBounty?.rewardAmount) &&
+      !isTruthy(currentBounty?.chainId);
+    if (isTruthy(customReward) && !isBountyTokenRewardFieldsEmpty) {
+      await applyBountyUpdates({
+        rewardAmount: null,
+        chainId: null,
+        rewardToken: null
+      });
+    } else if (!isTruthy(customReward) && isBountyTokenRewardFieldsEmpty) {
+      await applyBountyUpdates({
+        rewardAmount: 1,
+        chainId: 1,
+        rewardToken: 'ETH'
+      });
+    }
+
     setCurrentBounty((_currentBounty) => ({ ...(_currentBounty as BountyWithDetails), ...updates }));
     if (bountyId) {
       updateBountyDebounced(bountyId, updates);
@@ -170,7 +194,7 @@ export default function BountyProperties(props: {
     });
   }, []);
 
-  const updateBountyReward = useCallback((e: any) => {
+  const updateBountyCustomReward = useCallback((e: any) => {
     applyBountyUpdatesDebounced({
       customReward: e.target.value
     });
@@ -220,13 +244,28 @@ export default function BountyProperties(props: {
         }}
         data-test='bounty-configuration'
       >
-        <div className='octo-propertyname octo-propertyname--readonly'>
+        <div
+          className='octo-propertyname octo-propertyname--readonly'
+          style={{
+            alignSelf: 'center'
+          }}
+        >
           <Button>Reward</Button>
         </div>
         <Tabs
           indicatorColor={readOnly ? 'secondary' : 'primary'}
           value={RewardTypes.indexOf(rewardType)}
-          onChange={(_, newRewardType) => setRewardType(RewardTypes[newRewardType])}
+          onChange={async (_, newRewardType) => {
+            setRewardType(RewardTypes[newRewardType]);
+            if (RewardTypes[newRewardType] === 'Token') {
+              await applyBountyUpdates({
+                customReward: null,
+                rewardAmount: 1,
+                chainId: 1,
+                rewardToken: 'ETH'
+              });
+            }
+          }}
           aria-label='multi tabs'
           sx={{ minHeight: 0 }}
         >
@@ -345,7 +384,9 @@ export default function BountyProperties(props: {
             size='small'
             multiline
             rows={5}
-            onChange={updateBountyReward}
+            onChange={async (e) => {
+              updateBountyCustomReward(e);
+            }}
             placeholder='A CharmVerse hat ...'
           />
         </div>
