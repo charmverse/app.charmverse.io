@@ -112,8 +112,7 @@ export function IdentityProviders() {
     connectTelegramError?.message ||
     disconnectTelegramError?.message ||
     connectTelegramError?.error ||
-    disconnectTelegramError?.error ||
-    'Something went wrong. Please try again';
+    disconnectTelegramError?.error;
 
   async function connectTelegram() {
     loginWithTelegram(async (_telegramAccount: TelegramAccount) => {
