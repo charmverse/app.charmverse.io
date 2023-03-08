@@ -2,6 +2,7 @@
 
 import styled from '@emotion/styled';
 import { Typography } from '@mui/material';
+import { NodeSelection } from 'prosemirror-state';
 import { useCallback, useEffect, useState } from 'react';
 
 import Link from 'components/common/Link';
@@ -12,6 +13,7 @@ import type { CharmNodeViewProps } from '../nodeView/nodeView';
 
 type HeadingItem = {
   id: string;
+  pos: number;
   text: string;
   level: number;
 };
@@ -91,6 +93,7 @@ export function TableOfContents({ view }: CharmNodeViewProps) {
 
         headings.push({
           level: node.attrs.level,
+          pos,
           text: node.textContent,
           id
         });
@@ -105,7 +108,10 @@ export function TableOfContents({ view }: CharmNodeViewProps) {
     setItems(headings);
   }, [view.state.doc]);
 
-  // useEffect(handleUpdate, []);
+  function highlightHeading(item: HeadingItem) {
+    const transaction = view.state.tr.setSelection(NodeSelection.create(view.state.doc, item.pos));
+    view.dispatch(transaction);
+  }
 
   useEffect(() => {
     handleUpdate();
@@ -118,6 +124,7 @@ export function TableOfContents({ view }: CharmNodeViewProps) {
           color='inherit'
           key={item.id}
           href={`#${item.id}`}
+          onClick={() => highlightHeading(item)}
           external
           className={`toc-item--${item.level}`}
         >
