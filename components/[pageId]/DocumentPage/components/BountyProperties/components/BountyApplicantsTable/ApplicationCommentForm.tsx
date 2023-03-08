@@ -62,6 +62,7 @@ export function ApplicationCommentForm({
           if (newComment) {
             onSubmit(newComment);
             setTouched(false);
+            setNewComment(null);
           }
         }}
       >

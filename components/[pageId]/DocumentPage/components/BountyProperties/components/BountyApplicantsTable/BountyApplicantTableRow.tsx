@@ -265,23 +265,21 @@ export default function BountyApplicantTableRow({
                   <FormLabel>
                     <strong>Send a message (optional)</strong>
                   </FormLabel>
-                  <div className='CommentsList' style={{ padding: 0 }}>
-                    <ApplicationCommentForm
-                      $key={editorKey}
-                      key={editorKey}
-                      initialValue={
-                        user?.id
-                          ? {
-                              doc: getContentWithMention({ myUserId: user.id, targetUserId: submission.createdBy }),
-                              rawText: ''
-                            }
-                          : null
-                      }
-                      username={user?.username}
-                      avatar={user?.avatar}
-                      onSubmit={onSendClicked}
-                    />
-                  </div>
+                  <ApplicationCommentForm
+                    $key={editorKey}
+                    key={editorKey}
+                    initialValue={
+                      user?.id
+                        ? {
+                            doc: getContentWithMention({ myUserId: user.id, targetUserId: submission.createdBy }),
+                            rawText: ''
+                          }
+                        : null
+                    }
+                    username={user?.username}
+                    avatar={user?.avatar}
+                    onSubmit={onSendClicked}
+                  />
                 </>
               )}
             </Box>
@@ -339,7 +337,7 @@ export default function BountyApplicantTableRow({
   );
 }
 
-function getContentWithMention({ myUserId, targetUserId }: { myUserId: string; targetUserId: string }) {
+export function getContentWithMention({ myUserId, targetUserId }: { myUserId: string; targetUserId: string }) {
   return {
     type: 'doc',
     content: [

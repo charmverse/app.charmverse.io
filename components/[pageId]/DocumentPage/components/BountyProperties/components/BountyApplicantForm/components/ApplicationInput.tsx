@@ -1,7 +1,7 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import { Box, Collapse, FormLabel, IconButton, Stack } from '@mui/material';
+import { Box, Collapse, Divider, FormLabel, IconButton, Stack } from '@mui/material';
 import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
@@ -12,11 +12,15 @@ import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
 import charmClient from 'charmClient';
+import type { ICharmEditorOutput } from 'components/common/CharmEditor/InlineCharmEditor';
 import { useBounties } from 'hooks/useBounties';
 import { useLocalStorage } from 'hooks/useLocalStorage';
 import { useUser } from 'hooks/useUser';
 import { MINIMUM_APPLICATION_MESSAGE_CHARACTERS } from 'lib/applications/shared';
+import { emptyDocument } from 'lib/prosemirror/constants';
 
+import { ApplicationCommentForm } from '../../BountyApplicantsTable/ApplicationCommentForm';
+import { ApplicationComments } from '../../BountyApplicantsTable/ApplicationComments';
 import BountyApplicantStatus from '../../BountyApplicantStatus';
 
 /**
@@ -74,6 +78,15 @@ export default function ApplicationInput({
     },
     resolver: yupResolver(schema)
   });
+
+  async function onSendClicked(applicationComment: ICharmEditorOutput) {
+    if (proposal) {
+      await charmClient.applicationComments.addComment(proposal.id, {
+        content: applicationComment.doc,
+        contentText: applicationComment.rawText
+      });
+    }
+  }
 
   const applicationExample = 'Explain why you are the right person or team to work on this bounty.';
 
@@ -182,6 +195,37 @@ export default function ApplicationInput({
             )}
           </Grid>
         </form>
+        {proposal && proposal.createdBy === user?.id && (
+          <Stack gap={1} mt={2}>
+            <ApplicationComments applicationId={proposal.id} />
+            {proposal.status !== 'rejected' && (
+              <>
+                <Divider
+                  style={{
+                    marginBottom: 24,
+                    marginTop: 24
+                  }}
+                />
+                <FormLabel>
+                  <strong>Send a message (optional)</strong>
+                </FormLabel>
+                <ApplicationCommentForm
+                  initialValue={
+                    user?.id
+                      ? {
+                          doc: emptyDocument,
+                          rawText: ''
+                        }
+                      : null
+                  }
+                  username={user?.username}
+                  avatar={user?.avatar}
+                  onSubmit={onSendClicked}
+                />
+              </>
+            )}
+          </Stack>
+        )}
       </Collapse>
     </Stack>
   );
