@@ -5,7 +5,7 @@ import { IdentityIcon } from 'components/profile/components/IdentityIcon';
 import { useUser } from 'hooks/useUser';
 import type { DiscordAccount } from 'lib/discord/getDiscordAccount';
 import randomName from 'lib/utilities/randomName';
-import { matchWalletAddress } from 'lib/utilities/strings';
+import { matchWalletAddress, shortWalletAddress } from 'lib/utilities/strings';
 import type { TelegramAccount } from 'pages/api/telegram/connect';
 
 export function useIdentityTypes() {
@@ -19,11 +19,11 @@ export function useIdentityTypes() {
     const types: IntegrationModel[] = [];
 
     user.wallets?.forEach((wallet) => {
-      const address = wallet.address;
+      const address = shortWalletAddress(wallet.address);
 
       types.push({
         type: 'Wallet',
-        username: wallet.ensname ?? wallet.address,
+        username: wallet.ensname ?? address,
         secondaryUserName: address,
         isInUse: user.identityType === 'Wallet' && matchWalletAddress(user.username, wallet),
         icon: <IdentityIcon type='Wallet' />
