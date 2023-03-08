@@ -115,7 +115,7 @@ export function IdentityProviders() {
     disconnectTelegramError?.error ||
     'Something went wrong. Please try again';
 
-  async function connectTelegramm() {
+  async function connectTelegram() {
     loginWithTelegram(async (_telegramAccount: TelegramAccount) => {
       if (_telegramAccount) {
         await connectToTelegramm(_telegramAccount);
@@ -259,21 +259,25 @@ export function IdentityProviders() {
           )}
           {!isConnected && (
             <IdentityProviderItem type='Discord'>
-              <PrimaryButton size='small' onClick={connect}>
+              <PrimaryButton size='small' onClick={connect} disabled={isDiscordLoading}>
                 Connect
               </PrimaryButton>
             </IdentityProviderItem>
           )}
           {!telegramAccount && (
             <IdentityProviderItem type='Telegram'>
-              <PrimaryButton size='small' onClick={connectTelegramm}>
+              <PrimaryButton
+                size='small'
+                onClick={connectTelegram}
+                disabled={isConnectingToTelegram || isDisconnectingTelegram}
+              >
                 Connect
               </PrimaryButton>
             </IdentityProviderItem>
           )}
           {(!user?.googleAccounts || user.googleAccounts.length === 0) && (
             <IdentityProviderItem type='Google'>
-              <PrimaryButton size='small' onClick={connectGoogleAccount}>
+              <PrimaryButton size='small' onClick={connectGoogleAccount} disabled={isConnectingGoogle}>
                 Connect
               </PrimaryButton>
             </IdentityProviderItem>
