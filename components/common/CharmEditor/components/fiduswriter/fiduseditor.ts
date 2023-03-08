@@ -280,13 +280,15 @@ export class FidusEditor {
     view.setProps({
       dispatchTransaction: (tr) => {
         // console.log('dispatchTransaction', tr.meta);
-        const trackedTr = amendTransaction(tr, view.state, this, this.enableSuggestionMode);
-        const { state: newState } = view.state.applyTransaction(trackedTr);
-        view.updateState(newState);
-        if (tr.steps.length) {
-          this.docInfo.updated = new Date();
+        if (!view.isDestroyed) {
+          const trackedTr = amendTransaction(tr, view.state, this, this.enableSuggestionMode);
+          const { state: newState } = view.state.applyTransaction(trackedTr);
+          view.updateState(newState);
+          if (tr.steps.length) {
+            this.docInfo.updated = new Date();
+          }
+          this.mod.collab.doc.sendToCollaborators();
         }
-        this.mod.collab.doc.sendToCollaborators();
       }
     });
     this.view = view;
