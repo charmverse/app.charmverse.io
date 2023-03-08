@@ -250,7 +250,10 @@ export function IdentityProviders() {
               {account ? null : (
                 <WalletSign
                   buttonSize='small'
-                  signSuccess={signSuccess}
+                  signSuccess={async (authSig) => {
+                    await signSuccess(authSig);
+                    accountsPopupState.close();
+                  }}
                   loading={isVerifyingWallet || isSigning || isConnectingIdentity}
                   enableAutosign={false}
                 />
@@ -259,7 +262,14 @@ export function IdentityProviders() {
           )}
           {!isConnected && (
             <IdentityProviderItem type='Discord'>
-              <PrimaryButton size='small' onClick={connect} disabled={isDiscordLoading}>
+              <PrimaryButton
+                size='small'
+                onClick={() => {
+                  connect();
+                  accountsPopupState.close();
+                }}
+                disabled={isDiscordLoading}
+              >
                 Connect
               </PrimaryButton>
             </IdentityProviderItem>
@@ -268,7 +278,10 @@ export function IdentityProviders() {
             <IdentityProviderItem type='Telegram'>
               <PrimaryButton
                 size='small'
-                onClick={connectTelegram}
+                onClick={async () => {
+                  await connectTelegram();
+                  accountsPopupState.close();
+                }}
                 disabled={isConnectingToTelegram || isDisconnectingTelegram}
               >
                 Connect
@@ -277,7 +290,14 @@ export function IdentityProviders() {
           )}
           {(!user?.googleAccounts || user.googleAccounts.length === 0) && (
             <IdentityProviderItem type='Google'>
-              <PrimaryButton size='small' onClick={connectGoogleAccount} disabled={isConnectingGoogle}>
+              <PrimaryButton
+                size='small'
+                onClick={async () => {
+                  await connectGoogleAccount();
+                  accountsPopupState.close();
+                }}
+                disabled={isConnectingGoogle}
+              >
                 Connect
               </PrimaryButton>
             </IdentityProviderItem>
