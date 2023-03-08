@@ -85,7 +85,7 @@ export function IdentityProviders() {
   };
 
   const {
-    trigger: disconnectFromTelegramm,
+    trigger: disconnectFromTelegram,
     isMutating: isDisconnectingTelegram,
     error: disconnectTelegramError
   } = useSWRMutation(telegramAccount ? '/telegram/disconnect' : null, () => charmClient.disconnectTelegram(), {
@@ -95,15 +95,15 @@ export function IdentityProviders() {
   });
 
   const {
-    trigger: connectToTelegramm,
+    trigger: connectToTelegram,
     isMutating: isConnectingToTelegram,
     error: connectTelegramError
   } = useSWRMutation(
-    telegramAccount ? '/telegram/connect' : null,
-    () => charmClient.connectTelegram(telegramAccount as TelegramAccount),
+    '/telegram/connect',
+    (_url, { arg }: Readonly<{ arg: TelegramAccount }>) => charmClient.connectTelegram(arg),
     {
       onSuccess(data) {
-        setUser((_user: LoggedInUser) => ({ ..._user, ...data, telegramUser: null }));
+        setUser((_user: LoggedInUser) => ({ ..._user, telegramUser: data }));
       }
     }
   );
@@ -118,7 +118,7 @@ export function IdentityProviders() {
   async function connectTelegram() {
     loginWithTelegram(async (_telegramAccount: TelegramAccount) => {
       if (_telegramAccount) {
-        await connectToTelegramm(_telegramAccount);
+        await connectToTelegram(_telegramAccount);
       }
     });
   }
@@ -216,7 +216,7 @@ export function IdentityProviders() {
             loading={isConnectingToTelegram || isDisconnectingTelegram}
             disabled={cannotDisconnect}
             connected={true}
-            actions={<MenuItem onClick={disconnectFromTelegramm}>Disconnect</MenuItem>}
+            actions={<MenuItem onClick={disconnectFromTelegram}>Disconnect</MenuItem>}
             error={telegramError && <Alert severity='error'>{telegramError}</Alert>}
           />
         )}
