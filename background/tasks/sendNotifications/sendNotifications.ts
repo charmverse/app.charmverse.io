@@ -40,7 +40,7 @@ export async function getNotifications(): Promise<(PendingTasksProps & { unmarke
   const usersWithSafes = await prisma.user.findMany({
     where: {
       deletedAt: null,
-      AND: [{ email: { not: null } }, { email: { not: '' } }]
+      AND: [{ email: { not: null } }, { email: { not: '' } }, { emailNotifications: true }]
     },
     // select only the fields that are needed
     select: {

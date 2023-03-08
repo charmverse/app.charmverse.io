@@ -8,7 +8,7 @@ import IconButton from '@mui/material/IconButton';
 import type { IdentityType, UserDetails as UserDetailsType } from '@prisma/client';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import type { Dispatch, ReactNode, SetStateAction } from 'react';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import useSWRImmutable from 'swr/immutable';
 import useSWRMutation from 'swr/mutation';
@@ -16,22 +16,20 @@ import useSWRMutation from 'swr/mutation';
 import charmClient from 'charmClient';
 import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
 import Link from 'components/common/Link';
+import { useIdentityTypes } from 'components/integrations/components/useIdentityTypes';
 import { useUpdateProfileAvatar } from 'components/profile/components/UserDetails/hooks/useUpdateProfileAvatar';
 import { useUserDetails } from 'components/profile/components/UserDetails/hooks/useUserDetails';
 import Avatar from 'components/settings/workspace/LargeAvatar';
 import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
-import type { DiscordAccount } from 'lib/discord/getDiscordAccount';
 import { hasNftAvatar } from 'lib/users/hasNftAvatar';
-import randomName from 'lib/utilities/randomName';
-import { matchWalletAddress, shortWalletAddress } from 'lib/utilities/strings';
+import { shortWalletAddress } from 'lib/utilities/strings';
 import type { LoggedInUser } from 'models';
 import type { PublicUser } from 'pages/api/public/profile/[userId]';
-import type { TelegramAccount } from 'pages/api/telegram/connect';
 
 import type { Social } from '../../interfaces';
-import type { IntegrationModel } from '../IdentityModal';
-import IdentityModal, { getIdentityIcon } from '../IdentityModal';
+import { IdentityIcon } from '../IdentityIcon';
+import IdentityModal from '../IdentityModal';
 import SocialInputs from '../SocialInputs';
 import { TimezoneAutocomplete } from '../TimezoneAutocomplete';
 import UserDescription from '../UserDescription';
@@ -86,6 +84,8 @@ function UserDetails({ readOnly, user, updateUser, sx = {} }: UserDetailsProps) 
     (_url, { arg }: Readonly<{ arg: Partial<UserDetailsType> }>) => charmClient.updateUserDetails(arg)
   );
 
+  const identityTypes = useIdentityTypes();
+
   const [isPersonalLinkCopied, setIsPersonalLinkCopied] = useState(false);
 
   const userPathModalState = usePopupState({ variant: 'popover', popupId: 'path-modal' });
@@ -119,76 +119,6 @@ function UserDetails({ readOnly, user, updateUser, sx = {} }: UserDetailsProps) 
 
   const disabled = readOnly ?? isLoading ?? isPublic;
 
-  const identityTypes: IntegrationModel[] = useMemo(() => {
-    if (isPublic) {
-      return [];
-    }
-
-    const types: IntegrationModel[] = [];
-    user.wallets?.forEach((wallet) => {
-      const address = wallet.address;
-
-      types.push({
-        type: 'Wallet',
-        username: wallet.ensname ?? wallet.address,
-        secondaryUserName: address,
-        isInUse: user.identityType === 'Wallet' && matchWalletAddress(user.username, wallet),
-        icon: getIdentityIcon('Wallet')
-      });
-    });
-
-    if (user?.discordUser && user.discordUser.account) {
-      const discordAccount = user.discordUser.account as Partial<DiscordAccount>;
-      types.push({
-        type: 'Discord',
-        username: discordAccount.username || '',
-        secondaryUserName: `${discordAccount.username} #${discordAccount.discriminator}`,
-        isInUse: user.identityType === 'Discord',
-        icon: getIdentityIcon('Discord')
-      });
-    }
-
-    if (user?.telegramUser && user.telegramUser.account) {
-      const telegramAccount = user.telegramUser.account as Partial<TelegramAccount>;
-      types.push({
-        type: 'Telegram',
-        username: telegramAccount.username || `${telegramAccount.first_name} ${telegramAccount.last_name}`,
-        isInUse: user.identityType === 'Telegram',
-        icon: getIdentityIcon('Telegram')
-      });
-    }
-
-    if (user) {
-      types.push({
-        type: 'RandomName',
-        username: user.identityType === 'RandomName' && user.username ? user.username : randomName(),
-        isInUse: user.identityType === 'RandomName',
-        icon: getIdentityIcon('RandomName')
-      });
-    }
-
-    user?.googleAccounts?.forEach((acc) => {
-      types.push({
-        type: 'Google',
-        username: acc.name,
-        secondaryUserName: acc.email,
-        icon: getIdentityIcon('Google'),
-        isInUse: user.identityType === 'Google' && user.username === acc.name
-      });
-    });
-
-    user.unstoppableDomains?.forEach(({ domain }) => {
-      types.push({
-        type: 'UnstoppableDomain',
-        username: domain,
-        isInUse: user.identityType === 'UnstoppableDomain' && user.username === domain,
-        icon: getIdentityIcon('UnstoppableDomain')
-      });
-    });
-
-    return types;
-  }, [user]);
-
   const hostname = typeof window !== 'undefined' ? window.location.origin : '';
   const userPath = user.path || user.id;
   const userLink = `${hostname}/u/${userPath}`;
@@ -210,7 +140,7 @@ function UserDetails({ readOnly, user, updateUser, sx = {} }: UserDetailsProps) 
         </Grid>
         <Grid item width='100%'>
           <EditIconContainer data-testid='edit-identity' readOnly={readOnly} onClick={identityModalState.open}>
-            {user && !isPublic && getIdentityIcon(user.identityType as IdentityType)}
+            {user && !isPublic && <IdentityIcon type={user.identityType as IdentityType} />}
             <Typography variant='h1' noWrap>
               {shortWalletAddress(user.username)}
             </Typography>
@@ -253,7 +183,7 @@ function UserDetails({ readOnly, user, updateUser, sx = {} }: UserDetailsProps) 
             save={(username: string, identityType: IdentityType) => {
               handleUserUpdate({ username, identityType });
             }}
-            identityTypes={identityTypes}
+            identityTypes={isPublic ? [] : identityTypes}
             identityType={(user?.identityType || 'Wallet') as IdentityType}
           />
           <UserPathModal

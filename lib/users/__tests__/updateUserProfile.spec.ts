@@ -78,4 +78,21 @@ describe('updateUserProfile', () => {
     expect(updatedUser.identityType).toBe('Google');
     expect(updatedUser.avatar).toBe(googleAccount.avatarUrl);
   });
+
+  it('should update the user email preferences', async () => {
+    const { user } = await generateUserAndSpaceWithApiToken();
+
+    const update: Partial<User> = {
+      email: 'user@charmverse.io',
+      emailNewsletter: true,
+      emailNotifications: false
+    };
+
+    const updatedUser = await updateUserProfile(user.id, update);
+
+    // Preserved values
+    expect(updatedUser.email).toBe(update.email);
+    expect(updatedUser.emailNewsletter).toBe(update.emailNewsletter);
+    expect(updatedUser.emailNotifications).toBe(update.emailNotifications);
+  });
 });
