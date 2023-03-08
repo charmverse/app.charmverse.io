@@ -9,7 +9,6 @@ import {
   List,
   ListItem,
   ListItemButton,
-  ListItemIcon,
   MenuItem,
   Select,
   Tooltip,
@@ -39,7 +38,7 @@ import type { LoggedInUser } from 'models';
 import type { TelegramAccount } from 'pages/api/telegram/connect';
 
 import IdentityProviderItem from './IdentityProviderItem';
-import TelegramLoginIframe, { loginWithTelegram } from './TelegramLoginIframe';
+import { TelegramLoginIframe, loginWithTelegram } from './TelegramLoginIframe';
 import { useIdentityTypes } from './useIdentityTypes';
 
 export default function IdentityProviders() {

@@ -36,7 +36,7 @@ jobs:
           NEXT_PUBLIC_GOOGLE_APP_ID: ${{ secrets.NEXT_PUBLIC_GOOGLE_APP_ID_STG }}
           NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_ID_SENSITIVE: ${{ secrets.NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_ID_SENSITIVE_STG }}
           NEXT_PUBLIC_IFRAMELY_API_KEY: ${{ secrets.NEXT_PUBLIC_IFRAMELY_API_KEY }}
-          NEXT_PUBLIC_TELEGRAM_BOT_ID: ${{ secrets.NEXT_PUBLIC_TELEGRAM_BOT_ID }}
+          NEXT_PUBLIC_TELEGRAM_BOT_ID: ${{ secrets.NEXT_PUBLIC_TELEGRAM_BOT_ID_STG }}
 
       - name: Build and Push Docker image
         uses: ./.github/actions/build_docker_image
