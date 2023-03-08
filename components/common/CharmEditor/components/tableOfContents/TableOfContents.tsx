@@ -1,6 +1,7 @@
 // import './Component.scss';
 
 import styled from '@emotion/styled';
+import { Typography } from '@mui/material';
 import { useCallback, useEffect, useState } from 'react';
 
 import Link from 'components/common/Link';
@@ -16,44 +17,56 @@ type HeadingItem = {
 };
 
 const StyledComponent = styled.div`
-  background: rgba(black, 0.1);
-  border-radius: 0.5rem;
   opacity: 0.75;
-  padding: 0.75rem;
-
-  .toc-list {
-    list-style: none;
-    padding: 0;
-
-    &::before {
-      content: 'Table of Contents';
-      display: block;
-      font-size: 0.75rem;
-      font-weight: 700;
-      letter-spacing: 0.025rem;
-      opacity: 0.5;
-      text-transform: uppercase;
-    }
-  }
+  font-size: 0.9rem;
 
   .toc-item {
     &--2 {
-      padding-left: 1rem;
-    }
-    &--3 {
       padding-left: 2rem;
     }
-
-    &--4 {
-      padding-left: 3rem;
-    }
-
-    &--5 {
+    &--3 {
       padding-left: 4rem;
     }
 
+    &--4 {
+      padding-left: 6rem;
+    }
+
+    &--5 {
+      padding-left: 8rem;
+    }
+
     &--6 {
-      padding-left: 5rem;
+      padding-left: 10rem;
+    }
+  }
+`;
+
+const NestedPageContainer = styled(Link)`
+  align-items: center;
+  cursor: pointer;
+  display: flex;
+  font-weight: 600;
+  padding: 3px 3px 3px 2px;
+  position: relative;
+  transition: background 20ms ease-in 0s;
+
+  span {
+    border-bottom: 0.05em solid var(--link-underline);
+  }
+
+  // disable hover UX on ios which converts first click to a hover event
+  @media (pointer: fine) {
+    .actions-menu {
+      opacity: 0;
+    }
+
+    &:hover {
+      background-color: ${({ theme }) => theme.palette.background.light};
+
+      .actions-menu {
+        opacity: 1;
+      }
     }
   }
 `;
@@ -100,16 +113,18 @@ export function TableOfContents({ view }: CharmNodeViewProps) {
 
   return (
     <StyledComponent>
-      <ul className='toc-list'>
-        {items.map((item) => (
-          <li key={item.id} className={`toc-item toc-item--${item.level}`}>
-            <Link color='inherit' href={`#${item.id}`} external>
-              {item.text}
-            </Link>
-          </li>
-        ))}
-        {items.length === 0 && <li>Add headings to create a table of contents</li>}
-      </ul>
+      {items.map((item) => (
+        <NestedPageContainer
+          color='inherit'
+          key={item.id}
+          href={`#${item.id}`}
+          external
+          className={`toc-item--${item.level}`}
+        >
+          <span>{item.text}</span>
+        </NestedPageContainer>
+      ))}
+      {items.length === 0 && <NestedPageContainer>Add headings to create a table of contents</NestedPageContainer>}
     </StyledComponent>
   );
 }

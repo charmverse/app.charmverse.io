@@ -14,7 +14,6 @@ export function spec(): RawSpecs {
           }
         },
         group: 'block',
-        // draggable: false,
         parseDOM: [{ tag: 'toc' }],
         toDOM: (): DOMOutputSpec => {
           return ['toc'];
