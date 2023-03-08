@@ -233,7 +233,6 @@ export default function IdentityProviders() {
           />
         ))}
         <ListItem disablePadding>
-          <ListItemIcon />
           <ListItemButton sx={{ flexGrow: 0 }} {...bindTrigger(accountsPopupState)}>
             + Add an account
           </ListItemButton>
