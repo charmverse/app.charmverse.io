@@ -95,7 +95,6 @@ function specFactory({ levels = defaultLevels } = {}): RawSpecs {
           getAttrs: (dom: any) => {
             const result = { level: parseLevel(level) };
             const attrs = dom.getAttribute('data-bangle-attrs');
-
             if (!attrs) {
               return result;
             }

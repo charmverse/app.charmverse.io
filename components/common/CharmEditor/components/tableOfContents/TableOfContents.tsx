@@ -74,7 +74,7 @@ const NestedPageContainer = styled(Link)`
 `;
 
 export function TableOfContents({ view }: CharmNodeViewProps) {
-  const [items, setItems] = useState<HeadingItem[]>([]);
+  const [items, setItems] = useState<HeadingItem[] | null>(null);
 
   const handleUpdate = useCallback(() => {
     const headings: HeadingItem[] = [];
@@ -83,7 +83,6 @@ export function TableOfContents({ view }: CharmNodeViewProps) {
     view.state.doc.descendants((node, pos) => {
       if (node.type.name === 'heading') {
         const id = `heading-${headings.length + 1}`;
-
         if (node.attrs.id !== id) {
           transaction.setNodeMarkup(pos, undefined, {
             ...node.attrs,
@@ -119,9 +118,10 @@ export function TableOfContents({ view }: CharmNodeViewProps) {
 
   return (
     <StyledComponent>
-      {items.map((item) => (
+      {items?.map((item) => (
         <NestedPageContainer
           color='inherit'
+          draggable={false}
           key={item.id}
           href={`#${item.id}`}
           onClick={() => highlightHeading(item)}
@@ -131,7 +131,7 @@ export function TableOfContents({ view }: CharmNodeViewProps) {
           <span>{item.text}</span>
         </NestedPageContainer>
       ))}
-      {items.length === 0 && <NestedPageContainer>Add headings to create a table of contents</NestedPageContainer>}
+      {items?.length === 0 && <NestedPageContainer>Add headings to create a table of contents</NestedPageContainer>}
     </StyledComponent>
   );
 }
