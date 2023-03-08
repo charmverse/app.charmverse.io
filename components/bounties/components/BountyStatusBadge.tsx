@@ -21,6 +21,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import type { BountyTaskAction } from 'lib/bounties/getBountyTasks';
 import { getTokenAndChainInfoFromPayments } from 'lib/tokens/tokenData';
+import { fancyTrim } from 'lib/utilities/strings';
 import { isTruthy } from 'lib/utilities/types';
 import type { BrandColor } from 'theme/colors';
 
@@ -198,10 +199,18 @@ export function BountyAmount({
   bounty,
   truncate = false
 }: {
-  bounty: Pick<Bounty, 'rewardAmount' | 'rewardToken' | 'chainId'>;
+  bounty: Pick<Bounty, 'rewardAmount' | 'rewardToken' | 'chainId' | 'customReward'>;
   truncate?: boolean;
 }) {
   const [paymentMethods] = usePaymentMethods();
+
+  if (bounty.customReward) {
+    return (
+      <Tooltip title={bounty.customReward}>
+        <Typography>{fancyTrim(bounty.customReward, 15)}</Typography>
+      </Tooltip>
+    );
+  }
 
   if (!isTruthy(bounty.rewardAmount) || !isTruthy(bounty.rewardToken) || !isTruthy(bounty.chainId)) {
     return null;
