@@ -7,7 +7,7 @@ import type { PaymentMethod } from '@prisma/client';
 import type { CryptoCurrency } from 'connectors';
 import { getChainById } from 'connectors';
 import debounce from 'lodash/debounce';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import charmClient from 'charmClient';
 import Button from 'components/common/BoardEditor/focalboard/src/widgets/buttons/button';
@@ -69,14 +69,15 @@ export default function BountyProperties(props: {
   );
 
   const [rewardType, setRewardType] = useState<RewardType>(isTruthy(currentBounty?.customReward) ? 'Custom' : 'Token');
+  const rewardTypeTabChangeRef = useRef<number>(0);
+  const { isSpaceMember } = useIsSpaceMember();
 
   useEffect(() => {
-    if (rewardType !== 'Custom' && isTruthy(currentBounty?.customReward)) {
+    if (rewardType !== 'Custom' && isTruthy(currentBounty?.customReward) && rewardTypeTabChangeRef.current === 0) {
       setRewardType('Custom');
+      rewardTypeTabChangeRef.current += 1;
     }
-  }, [currentBounty, rewardType]);
-
-  const { isSpaceMember } = useIsSpaceMember();
+  }, [currentBounty, rewardType, rewardTypeTabChangeRef]);
 
   const readOnly = parentReadOnly || !isSpaceMember;
 
@@ -167,17 +168,13 @@ export default function BountyProperties(props: {
       !isTruthy(currentBounty?.rewardAmount) &&
       !isTruthy(currentBounty?.chainId);
     if (isTruthy(customReward) && !isBountyTokenRewardFieldsEmpty) {
-      await applyBountyUpdates({
-        rewardAmount: null,
-        chainId: null,
-        rewardToken: null
-      });
+      updates.rewardAmount = null;
+      updates.chainId = null;
+      updates.rewardToken = null;
     } else if (!isTruthy(customReward) && isBountyTokenRewardFieldsEmpty) {
-      await applyBountyUpdates({
-        rewardAmount: 1,
-        chainId: 1,
-        rewardToken: 'ETH'
-      });
+      updates.rewardAmount = 1;
+      updates.chainId = 1;
+      updates.rewardToken = 'ETH';
     }
 
     setCurrentBounty((_currentBounty) => ({ ...(_currentBounty as BountyWithDetails), ...updates }));
@@ -257,14 +254,6 @@ export default function BountyProperties(props: {
           value={RewardTypes.indexOf(rewardType)}
           onChange={async (_, newRewardType) => {
             setRewardType(RewardTypes[newRewardType]);
-            if (RewardTypes[newRewardType] === 'Token') {
-              await applyBountyUpdates({
-                customReward: null,
-                rewardAmount: 1,
-                chainId: 1,
-                rewardToken: 'ETH'
-              });
-            }
           }}
           aria-label='multi tabs'
           sx={{ minHeight: 0 }}
@@ -304,7 +293,9 @@ export default function BountyProperties(props: {
                 const newNativeCurrency = refreshCryptoList(chainId);
                 applyBountyUpdates({
                   chainId,
-                  rewardToken: newNativeCurrency
+                  rewardToken: newNativeCurrency,
+                  rewardAmount: 1,
+                  customReward: null
                 });
               }}
             />
@@ -319,7 +310,7 @@ export default function BountyProperties(props: {
               <Button>Token</Button>
             </div>
             <InputSearchCrypto
-              disabled={readOnly}
+              disabled={readOnly || !isTruthy(currentBounty?.chainId)}
               readOnly={readOnly}
               cryptoList={availableCryptos}
               chainId={currentBounty?.chainId ?? undefined}
@@ -352,8 +343,8 @@ export default function BountyProperties(props: {
               sx={{
                 width: '100%'
               }}
-              disabled={readOnly}
-              value={isAmountInputEmpty ? '' : currentBounty?.rewardAmount}
+              disabled={readOnly || !isTruthy(currentBounty?.chainId)}
+              value={isAmountInputEmpty ? '' : currentBounty?.rewardAmount ?? ''}
               type='number'
               size='small'
               onChange={updateBountyAmount}
@@ -361,7 +352,11 @@ export default function BountyProperties(props: {
                 step: 0.01
               }}
               error={isRewardAmountInvalid}
-              helperText={isRewardAmountInvalid && 'Bounty amount should be a number greater than 0'}
+              helperText={
+                isTruthy(currentBounty?.rewardAmount) &&
+                isRewardAmountInvalid &&
+                'Bounty amount should be a number greater than 0'
+              }
             />
           </div>
         </>

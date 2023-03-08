@@ -52,17 +52,6 @@ async function approveUserApplication(req: NextApiRequest, res: NextApiResponse<
   });
 
   await rollupBountyStatus(approvedApplication.bountyId);
-
-  // dont wait for API response
-  collabland
-    .createBountyStartedCredential({
-      bountyId: approvedApplication.bountyId,
-      userId: approvedApplication.createdBy
-    })
-    .catch((error) => {
-      log.error('Error creating collabland VC', error);
-    });
-
   const { id: bountyId, rewardAmount, rewardToken, spaceId, page, customReward } = application.bounty;
   trackUserAction('bounty_application_accepted', {
     userId,

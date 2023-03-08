@@ -67,9 +67,6 @@ async function createBountyController(req: NextApiRequest, res: NextApiResponse<
   // add a little delay to capture the full bounty title after user has edited it
   setTimeout(() => {
     const { id, rewardAmount, rewardToken, page, customReward } = createdBounty;
-    collabland.createBountyCreatedCredential({ bountyId: id }).catch((err) => {
-      log.error('Error creating bounty created credential', err);
-    });
 
     trackUserAction('bounty_created', {
       userId,
