@@ -16,6 +16,7 @@ interface IdentityProviderItemProps extends ListItemProps {
   connected?: boolean;
   error?: ReactNode;
   actions?: ReactNode;
+  children?: ReactNode;
 }
 
 export default function IdentityProviderItem({
@@ -25,7 +26,8 @@ export default function IdentityProviderItem({
   disabled = false,
   connected = false,
   error,
-  actions
+  actions,
+  children
 }: IdentityProviderItemProps) {
   const identityMenuState = usePopupState({ variant: 'popover', popupId: `identity-menu-${type}` });
 
@@ -33,22 +35,27 @@ export default function IdentityProviderItem({
     <ListItem
       disableGutters
       secondaryAction={
-        <IconButton
-          aria-label={`Open ${type} identity options`}
-          disabled={disabled || loading}
-          {...bindTrigger(identityMenuState)}
-        >
-          <MoreHoriz />
-        </IconButton>
+        !!actions && (
+          <IconButton
+            aria-label={`Open ${type} identity options`}
+            disabled={disabled || loading}
+            {...bindTrigger(identityMenuState)}
+          >
+            <MoreHoriz />
+          </IconButton>
+        )
       }
     >
       <ListItemIcon>
         <IdentityIcon type={type} />
       </ListItemIcon>
       <ListItemText
-        primaryTypographyProps={{ ml: 1, noWrap: true }}
+        primaryTypographyProps={{ ml: 1 }}
         primary={connected ? text || `Connected with ${type}` : `Connect with ${type}`}
       />
+      <LoadingComponent isLoading={loading} size={15} />
+      {error}
+      {children}
       <Menu
         {...bindMenu(identityMenuState)}
         anchorOrigin={{
@@ -63,8 +70,6 @@ export default function IdentityProviderItem({
       >
         {actions}
       </Menu>
-      <LoadingComponent isLoading={loading} size={15} />
-      {error}
     </ListItem>
   );
 }

@@ -17,12 +17,11 @@ import {
 } from '@mui/material';
 import type { User } from '@prisma/client';
 import { bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
-import type { ReactNode } from 'react';
-import { useEffect } from 'react';
 import useSWRMutation from 'swr/mutation';
 
 import charmClient from 'charmClient';
 import Modal from 'components/common/Modal';
+import PrimaryButton from 'components/common/PrimaryButton';
 import { WalletSign } from 'components/login';
 import Legend from 'components/settings/Legend';
 import { useDiscordConnection } from 'hooks/useDiscordConnection';
@@ -44,13 +43,12 @@ import TelegramLoginIframe, { loginWithTelegram } from './TelegramLoginIframe';
 import { useIdentityTypes } from './useIdentityTypes';
 
 export default function IdentityProviders() {
-  const { account, connectWallet, isConnectingIdentity, sign, isSigning, verifiableWalletDetected } = useWeb3AuthSig();
+  const { account, isConnectingIdentity, sign, isSigning, verifiableWalletDetected } = useWeb3AuthSig();
   const { user, setUser, updateUser } = useUser();
   const { showMessage } = useSnackbar();
   const { connectGoogleAccount, disconnectGoogleAccount, isConnectingGoogle } = useFirebaseAuth();
   const identityTypes = useIdentityTypes();
   const accountsPopupState = usePopupState({ variant: 'popover', popupId: 'accountsModal' });
-  const verifyWalletPopupState = usePopupState({ variant: 'popover', popupId: 'verifyWalletModal' });
   const discordAccount = user?.discordUser?.account as Partial<DiscordAccount> | undefined;
   const telegramAccount = user?.telegramUser?.account as Partial<TelegramAccount> | undefined;
 
@@ -142,20 +140,6 @@ export default function IdentityProviders() {
   // Don't allow a user to remove their last identity
   const cannotDisconnect = !user || countConnectableIdentities(user) <= 1;
 
-  const walletActionBtn: ReactNode = account ? (
-    <MenuItem onClick={connectWallet}>Switch</MenuItem>
-  ) : !verifiableWalletDetected || isConnectingIdentity ? (
-    <MenuItem onClick={connectWallet}>Connect Wallet</MenuItem>
-  ) : (
-    <MenuItem onClick={generateWalletAuth}>Verify Wallet</MenuItem>
-  );
-
-  useEffect(() => {
-    if (verifiableWalletDetected && !account) {
-      verifyWalletPopupState.open();
-    }
-  }, [verifiableWalletDetected, account]);
-
   return (
     <>
       <Box mb={2}>
@@ -175,7 +159,7 @@ export default function IdentityProviders() {
               <MenuItem key={identity.username} value={identity.username}>
                 <Box display='flex' justifyContent='space-between' alignItems='center' width='100%'>
                   {identity.username}
-                  <Chip variant='filled' label={identity.type} sx={{ ml: 2 }} />
+                  <Chip variant='filled' label={identity.type.replace(/([A-Z])/g, ' $1').trim()} sx={{ ml: 2 }} />
                 </Box>
               </MenuItem>
             ))}
@@ -208,7 +192,11 @@ export default function IdentityProviders() {
             loading={isConnectingIdentity || isVerifyingWallet || isSigning}
             disabled={cannotDisconnect}
             connected={true}
-            actions={walletActionBtn}
+            actions={
+              verifiableWalletDetected &&
+              !account &&
+              !isConnectingIdentity && <MenuItem onClick={generateWalletAuth}>Verify Wallet</MenuItem>
+            }
           />
         ))}
         {isConnected && (
@@ -256,44 +244,43 @@ export default function IdentityProviders() {
         onClose={accountsPopupState.close}
         title='Add an account'
         aria-labelledby='Conect an account modal'
+        size='600px'
       >
-        {(!user?.wallets || user.wallets.length === 0) && (
-          <IdentityProviderItem
-            type='Wallet'
-            actions={walletActionBtn}
-            loading={isConnectingIdentity || isVerifyingWallet || isSigning}
-          />
-        )}
-        {!isConnected && (
-          <IdentityProviderItem type='Discord' actions={<MenuItem onClick={connect}>Connect</MenuItem>} />
-        )}
-        {!telegramAccount && (
-          <IdentityProviderItem
-            type='Telegram'
-            actions={<MenuItem onClick={connectTelegramm}>Connect Wallet</MenuItem>}
-          />
-        )}
-        {(!user?.googleAccounts || user.googleAccounts.length === 0) && (
-          <IdentityProviderItem type='Google' actions={<MenuItem onClick={connectGoogleAccount}>Connect</MenuItem>} />
-        )}
-        <Modal
-          open={verifyWalletPopupState.isOpen}
-          onClose={verifyWalletPopupState.close}
-          title='Verify wallet'
-          aria-labelledby='Verify wallet modal'
-        >
-          <Typography mb={2}>
-            You need to verify your wallet in order to add it to your list of connected accounts.
-          </Typography>
-          <WalletSign
-            signSuccess={async (authSig) => {
-              await signSuccess(authSig);
-              verifyWalletPopupState.close();
-            }}
-            loading={isVerifyingWallet || isSigning || isConnectingIdentity}
-            enableAutosign={false}
-          />
-        </Modal>
+        <List disablePadding aria-label='Connect accounts' sx={{ '& .MuiButton-root': { width: '140px' } }}>
+          {(!user?.wallets || user.wallets.length === 0) && (
+            <IdentityProviderItem type='Wallet' loading={isConnectingIdentity || isVerifyingWallet || isSigning}>
+              {account ? null : (
+                <WalletSign
+                  buttonSize='small'
+                  signSuccess={signSuccess}
+                  loading={isVerifyingWallet || isSigning || isConnectingIdentity}
+                  enableAutosign={false}
+                />
+              )}
+            </IdentityProviderItem>
+          )}
+          {!isConnected && (
+            <IdentityProviderItem type='Discord'>
+              <PrimaryButton size='small' onClick={connect}>
+                Connect
+              </PrimaryButton>
+            </IdentityProviderItem>
+          )}
+          {!telegramAccount && (
+            <IdentityProviderItem type='Telegram'>
+              <PrimaryButton size='small' onClick={connectTelegramm}>
+                Connect
+              </PrimaryButton>
+            </IdentityProviderItem>
+          )}
+          {(!user?.googleAccounts || user.googleAccounts.length === 0) && (
+            <IdentityProviderItem type='Google'>
+              <PrimaryButton size='small' onClick={connectGoogleAccount}>
+                Connect
+              </PrimaryButton>
+            </IdentityProviderItem>
+          )}
+        </List>
       </Modal>
     </>
   );
