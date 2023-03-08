@@ -7,6 +7,8 @@ import Link from 'components/common/Link';
 
 import type { CharmNodeViewProps } from '../nodeView/nodeView';
 
+// Table Of Contents inspiration: https://tiptap.dev/guide/node-views/examples#table-of-contents
+
 type HeadingItem = {
   id: string;
   text: string;
@@ -88,32 +90,25 @@ export function TableOfContents({ view }: CharmNodeViewProps) {
     view.dispatch(transaction);
 
     setItems(headings);
-  }, [view.state]);
+  }, [view.state.doc]);
 
-  useEffect(handleUpdate, []);
+  // useEffect(handleUpdate, []);
 
-  // useEffect(() => {
-  //   if (!view.state) {
-  //     return null;
-  //   }
-
-  //   view.on('update', handleUpdate);
-
-  //   return () => {
-  //     editor.off('update', handleUpdate);
-  //   };
-  // }, [view.state]);
+  useEffect(() => {
+    handleUpdate();
+  }, [view.state.doc]);
 
   return (
     <StyledComponent>
       <ul className='toc-list'>
         {items.map((item) => (
           <li key={item.id} className={`toc-item toc-item--${item.level}`}>
-            <Link href={`#${item.id}`} external>
+            <Link color='inherit' href={`#${item.id}`} external>
               {item.text}
             </Link>
           </li>
         ))}
+        {items.length === 0 && <li>Add headings to create a table of contents</li>}
       </ul>
     </StyledComponent>
   );
