@@ -20,7 +20,12 @@ const acceptedImageFormats = ['.jpg', '.jpeg', '.png', '.webp'];
 export async function prepopulateUserProfile(user: User, ens: string | null) {
   const ensDetails = await getENSDetails(ens);
 
-  if (!user.avatar && ensDetails?.avatar && acceptedImageFormats.some((ext) => ensDetails?.avatar?.endsWith(ext))) {
+  if (
+    !user.avatar &&
+    ensDetails?.avatar &&
+    acceptedImageFormats.some((ext) => ensDetails?.avatar?.endsWith(ext)) &&
+    !ensDetails.avatar.includes('?')
+  ) {
     try {
       await updateProfileAvatar({
         avatar: ensDetails.avatar,
@@ -53,7 +58,7 @@ export async function prepopulateUserProfile(user: User, ens: string | null) {
   if (nfts.length > 0) {
     if (!user.avatar && !ensDetails?.avatar) {
       for (const nft of nfts) {
-        if (acceptedImageFormats.some((ext) => nft.image.endsWith(ext))) {
+        if (acceptedImageFormats.some((ext) => nft.image.endsWith(ext)) && !nft.image.includes('?')) {
           try {
             const updatedUser = await updateProfileAvatar({
               avatar: nft.image,
