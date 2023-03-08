@@ -5,7 +5,7 @@ import { AccountSettings } from 'components/settings/AccountSettings';
 import Legend from 'components/settings/Legend';
 
 import MultiSigList from './components/GnosisSafes';
-import IdentityProviders from './components/IdentityProviders';
+import { IdentityProviders } from './components/IdentityProviders';
 
 export default function IntegrationSettings() {
   useEffect(() => {

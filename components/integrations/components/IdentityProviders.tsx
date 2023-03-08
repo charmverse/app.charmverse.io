@@ -41,7 +41,7 @@ import IdentityProviderItem from './IdentityProviderItem';
 import { TelegramLoginIframe, loginWithTelegram } from './TelegramLoginIframe';
 import { useIdentityTypes } from './useIdentityTypes';
 
-export default function IdentityProviders() {
+export function IdentityProviders() {
   const { account, isConnectingIdentity, sign, isSigning, verifiableWalletDetected } = useWeb3AuthSig();
   const { user, setUser, updateUser } = useUser();
   const { showMessage } = useSnackbar();
