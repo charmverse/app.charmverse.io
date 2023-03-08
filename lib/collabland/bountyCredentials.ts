@@ -134,6 +134,7 @@ function getBountySubject({
     bountyUrl: `${DOMAIN}/${space.domain}/${page.id}`,
     workspaceId: space.id,
     workspaceUrl: `${DOMAIN}/${space.domain}`,
-    workspaceName: space.name
+    workspaceName: space.name,
+    bountyCustomReward: bounty.customReward
   };
 }

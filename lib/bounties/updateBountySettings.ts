@@ -31,6 +31,7 @@ export async function updateBountySettings({ bountyId, updateContent }: BountyUp
         id: bountyId
       },
       data: {
+        customReward: updateContent.customReward,
         updatedAt: new Date(),
         chainId: updateContent.chainId,
         rewardAmount: updateContent.rewardAmount,

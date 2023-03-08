@@ -64,14 +64,15 @@ async function approveUserApplication(req: NextApiRequest, res: NextApiResponse<
       log.error('Error creating collabland VC', error);
     });
 
-  const { id: bountyId, rewardAmount, rewardToken, spaceId, page } = application.bounty;
+  const { id: bountyId, rewardAmount, rewardToken, spaceId, page, customReward } = application.bounty;
   trackUserAction('bounty_application_accepted', {
     userId,
     spaceId,
     rewardAmount,
     pageId: page?.id || '',
     rewardToken,
-    resourceId: bountyId
+    resourceId: bountyId,
+    customReward
   });
 
   return res.status(200).json(approvedApplication);

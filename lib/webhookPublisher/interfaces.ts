@@ -43,9 +43,10 @@ export type BountyEntity = {
   id: string;
   title: string;
   url: string;
-  rewardToken: string;
-  rewardChain: number;
-  rewardAmount: number;
+  rewardToken: string | null;
+  rewardChain: number | null;
+  rewardAmount: number | null;
+  customReward: string | null;
 };
 
 export enum WebhookNameSpaces {

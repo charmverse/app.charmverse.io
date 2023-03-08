@@ -25,14 +25,15 @@ export interface BountyEventSubject {
   eventDate: string;
   eventName: 'bounty_created' | 'bounty_started' | 'bounty_completed'; // created, started, completed
   bountyDescription: string;
-  bountyRewardAmount: number;
-  bountyRewardChain: number;
-  bountyRewardToken: string;
+  bountyRewardAmount: number | null;
+  bountyRewardChain: number | null;
+  bountyRewardToken: string | null;
   bountyTitle: string;
   bountyUrl: string;
   workspaceId: string;
   workspaceName: string;
   workspaceUrl: string;
+  bountyCustomReward: string | null;
 }
 
 export interface DiscordRoleSubject {

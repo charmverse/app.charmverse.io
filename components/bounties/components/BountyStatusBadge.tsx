@@ -21,6 +21,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import type { BountyTaskAction } from 'lib/bounties/getBountyTasks';
 import { getTokenAndChainInfoFromPayments } from 'lib/tokens/tokenData';
+import { isTruthy } from 'lib/utilities/types';
 import type { BrandColor } from 'theme/colors';
 
 export const BOUNTY_STATUS_LABELS: Record<BountyStatus, string> = {
@@ -202,17 +203,25 @@ export function BountyAmount({
 }) {
   const [paymentMethods] = usePaymentMethods();
 
+  if (!isTruthy(bounty.rewardAmount) || !isTruthy(bounty.rewardToken) || !isTruthy(bounty.chainId)) {
+    return null;
+  }
+
+  const rewardAmount = bounty.rewardAmount;
+  const rewardToken = bounty.rewardToken;
+  const chainId = bounty.chainId;
+
   const tokenInfo = getTokenAndChainInfoFromPayments({
-    chainId: bounty.chainId,
+    chainId,
     methods: paymentMethods,
-    symbolOrAddress: bounty.rewardToken
+    symbolOrAddress: rewardToken
   });
 
-  const formattedAmount = Intl.NumberFormat(undefined, { maximumSignificantDigits: 3 }).format(bounty.rewardAmount);
+  const formattedAmount = Intl.NumberFormat(undefined, { maximumSignificantDigits: 3 }).format(rewardAmount);
 
   const truncatedAmount = () => {
     try {
-      return millify(bounty.rewardAmount, { precision: 4 });
+      return millify(rewardAmount, { precision: 4 });
     } catch (error) {
       return 'Invalid number';
     }
@@ -221,9 +230,9 @@ export function BountyAmount({
   const tooltip = `${formattedAmount} ${tokenInfo.tokenName} (${tokenInfo.tokenSymbol})`;
 
   return (
-    <Tooltip arrow placement='top' title={bounty.rewardAmount === 0 ? '' : tooltip}>
+    <Tooltip arrow placement='top' title={rewardAmount === 0 ? '' : tooltip}>
       <Box sx={{ display: 'inline-flex', alignItems: 'center', verticalAlign: 'middle' }}>
-        {bounty.rewardAmount === 0 ? (
+        {rewardAmount === 0 ? (
           <Box sx={{ display: 'flex', verticalAlign: 'middle' }}>
             <Typography
               component='span'
@@ -257,7 +266,7 @@ export function BountyAmount({
               fontSize={18}
               data-test='bounty-amount'
             >
-              {truncate ? truncatedAmount() : bounty.rewardAmount}
+              {truncate ? truncatedAmount() : rewardAmount}
             </Typography>
           </>
         )}

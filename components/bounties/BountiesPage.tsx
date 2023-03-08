@@ -16,6 +16,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { BountyWithDetails } from 'lib/bounties';
 import { sortArrayByObjectProperty } from 'lib/utilities/array';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
+import { isTruthy } from 'lib/utilities/types';
 
 import BountiesKanbanView from './components/BountiesKanbanView';
 import BountiesGalleryView from './components/BountyGalleryView';
@@ -23,10 +24,6 @@ import MultiPaymentModal from './components/MultiPaymentModal';
 import NewBountyButton from './components/NewBountyButton';
 
 const bountyStatuses: BountyStatus[] = ['open', 'inProgress', 'complete', 'paid', 'suggestion'];
-
-function isNullish(value: any) {
-  return value === null || value === undefined;
-}
 
 interface Props {
   publicMode?: boolean;
@@ -64,10 +61,11 @@ export default function BountiesPage({ publicMode = false, bounties }: Props) {
     const completedBounties = bountiesSorted.filter(
       (bounty) =>
         bounty.status === BountyStatus.complete &&
-        !isNullish(bounty.rewardAmount) &&
-        !isNullish(bounty.rewardToken) &&
-        !isNullish(bounty.chainId)
+        isTruthy(bounty.rewardAmount) &&
+        isTruthy(bounty.rewardToken) &&
+        isTruthy(bounty.chainId)
     );
+
     if (!completedBounties.length) {
       return [];
     }

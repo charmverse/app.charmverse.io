@@ -6,6 +6,7 @@ import Tabs from '@mui/material/Tabs';
 import type { PaymentMethod } from '@prisma/client';
 import type { CryptoCurrency } from 'connectors';
 import { getChainById } from 'connectors';
+import debounce from 'lodash/debounce';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import charmClient from 'charmClient';
@@ -140,9 +141,19 @@ export default function BountyProperties(props: {
     }
   }
 
-  const updateBountyDebounced = debouncePromise(async (_bountyId: string, updates: Partial<UpdateableBountyFields>) => {
-    updateBounty(_bountyId, updates);
-  }, 2500);
+  const updateBountyDebounced = useMemo(
+    () =>
+      debounce((_bountyId: string, updates: Partial<UpdateableBountyFields>) => {
+        updateBounty(_bountyId, updates);
+      }, 1500),
+    []
+  );
+
+  useEffect(() => {
+    return () => {
+      updateBountyDebounced.cancel();
+    };
+  }, [updateBountyDebounced]);
 
   async function applyBountyUpdatesDebounced(updates: Partial<BountyWithDetails>) {
     setCurrentBounty((_currentBounty) => ({ ...(_currentBounty as BountyWithDetails), ...updates }));
@@ -161,7 +172,7 @@ export default function BountyProperties(props: {
 
   const updateBountyReward = useCallback((e: any) => {
     applyBountyUpdatesDebounced({
-      reward: e.target.value
+      customReward: e.target.value
     });
   }, []);
 
@@ -329,7 +340,7 @@ export default function BountyProperties(props: {
               width: '100%'
             }}
             disabled={readOnly}
-            value={currentBounty?.reward ?? ''}
+            value={currentBounty?.customReward ?? ''}
             type='text'
             size='small'
             multiline
