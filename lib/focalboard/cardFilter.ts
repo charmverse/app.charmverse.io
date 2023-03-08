@@ -1,10 +1,9 @@
+import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
 import type { IPropertyTemplate } from 'lib/focalboard/board';
 import type { Card } from 'lib/focalboard/card';
 import type { FilterClause } from 'lib/focalboard/filterClause';
 import type { FilterGroup } from 'lib/focalboard/filterGroup';
 import { isAFilterGroupInstance } from 'lib/focalboard/filterGroup';
-
-import { Utils } from './utils';
 
 class CardFilter {
   static applyFilterGroup(filterGroup: FilterGroup, templates: readonly IPropertyTemplate[], cards: Card[]): Card[] {
@@ -136,7 +135,7 @@ class CardFilter {
         return { id: filterClause.propertyId };
       }
       case 'isNotEmpty': {
-        if (template.type === 'select') {
+        if (template.type === 'select' || template.type === 'multiSelect') {
           if (template.options.length > 0) {
             const option = template.options[0];
             return { id: filterClause.propertyId, value: option.id };
