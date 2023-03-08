@@ -162,19 +162,17 @@ export default function BountyProperties(props: {
   }, [updateBountyDebounced]);
 
   async function applyBountyUpdatesDebounced(updates: Partial<BountyWithDetails>) {
-    const customReward = updates.customReward;
-    const isBountyTokenRewardFieldsEmpty =
-      !isTruthy(currentBounty?.rewardToken) &&
-      !isTruthy(currentBounty?.rewardAmount) &&
-      !isTruthy(currentBounty?.chainId);
-    if (isTruthy(customReward) && !isBountyTokenRewardFieldsEmpty) {
-      updates.rewardAmount = null;
-      updates.chainId = null;
-      updates.rewardToken = null;
-    } else if (!isTruthy(customReward) && isBountyTokenRewardFieldsEmpty) {
-      updates.rewardAmount = 1;
-      updates.chainId = 1;
-      updates.rewardToken = 'ETH';
+    if ('customReward' in updates) {
+      const customReward = updates.customReward;
+      if (isTruthy(customReward)) {
+        updates.rewardAmount = null;
+        updates.chainId = null;
+        updates.rewardToken = null;
+      } else {
+        updates.rewardAmount = 1;
+        updates.chainId = 1;
+        updates.rewardToken = 'ETH';
+      }
     }
 
     setCurrentBounty((_currentBounty) => ({ ...(_currentBounty as BountyWithDetails), ...updates }));
