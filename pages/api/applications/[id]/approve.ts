@@ -5,7 +5,6 @@ import nc from 'next-connect';
 import { prisma } from 'db';
 import { approveApplication } from 'lib/applications/actions';
 import { rollupBountyStatus } from 'lib/bounties/rollupBountyStatus';
-import * as collabland from 'lib/collabland';
 import log from 'lib/log';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';

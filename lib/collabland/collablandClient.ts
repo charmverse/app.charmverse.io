@@ -149,17 +149,11 @@ export async function canJoinSpaceViaDiscord({
 }
 
 export async function getGuildRoles(discordServerId: string) {
-  try {
-    await rateLimiter();
-    const allRoles = await fetch<ExternalRole[]>(`${COLLABLAND_API_URL}/discord/${discordServerId}/roles`, {
-      headers: getHeaders()
-    });
+  await rateLimiter();
+  const allRoles = await fetch<ExternalRole[]>(`${COLLABLAND_API_URL}/discord/${discordServerId}/roles`, {
+    headers: getHeaders()
+  });
 
-    // filter out irrelevant roles
-    return allRoles.filter((role) => role.name !== '@everyone' && !role.managed);
-  } catch (error) {
-    log.error(`Failed to fetch roles for server ${discordServerId}`, { error, apiDomain: COLLABLAND_API_URL });
-
-    return [];
-  }
+  // filter out irrelevant roles
+  return allRoles.filter((role) => role.name !== '@everyone' && !role.managed);
 }

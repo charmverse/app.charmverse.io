@@ -52,7 +52,6 @@ import type { TelegramAccount } from 'pages/api/telegram/connect';
 
 import { BlockchainApi } from './apis/blockchainApi';
 import { BountiesApi } from './apis/bountiesApi';
-import { CollablandApi } from './apis/collablandApi';
 import { CommentsApi } from './apis/commentsApi';
 import { DiscordApi } from './apis/discordApi';
 import { FileApi } from './apis/fileApi';
@@ -82,8 +81,6 @@ class CharmClient {
   blockchain = new BlockchainApi();
 
   bounties = new BountiesApi();
-
-  collabland = new CollablandApi();
 
   comments = new CommentsApi();
 

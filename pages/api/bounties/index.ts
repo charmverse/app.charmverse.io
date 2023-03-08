@@ -4,7 +4,6 @@ import nc from 'next-connect';
 
 import type { BountyCreationData, BountyWithDetails } from 'lib/bounties';
 import { createBounty, listAvailableBounties } from 'lib/bounties';
-import * as collabland from 'lib/collabland';
 import log from 'lib/log';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { logUserFirstBountyEvents, logWorkspaceFirstBountyEvents } from 'lib/metrics/postToDiscord';

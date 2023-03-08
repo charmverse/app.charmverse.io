@@ -56,6 +56,9 @@ const globalCSS = css`
 
     --charmeditor-active: rgba(46, 170, 220, 0.2);
 
+    /* fullcalendar styles */
+    --fc-event-text-color: var(--text-primary);
+
     --page-layout-pb: 180px;
   }
 

@@ -38,8 +38,8 @@ export class PagesApi {
     return http.POST<PageMeta>(`/api/pages/${pageId}/convert-to-proposal`, { categoryId });
   }
 
-  duplicatePage({ pageId, parentId }: { pageId: string; parentId?: string | null }) {
-    return http.POST<DuplicatePageResponse>(`/api/pages/${pageId}/duplicate`, { parentId });
+  duplicatePage({ pageId }: { pageId: string }) {
+    return http.POST<DuplicatePageResponse>(`/api/pages/${pageId}/duplicate`);
   }
 
   listComments(pageId: string): Promise<PageCommentWithVote[]> {
