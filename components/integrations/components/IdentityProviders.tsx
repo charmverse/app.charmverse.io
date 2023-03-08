@@ -118,6 +118,8 @@ export function IdentityProviders() {
     loginWithTelegram(async (_telegramAccount: TelegramAccount) => {
       if (_telegramAccount) {
         await connectToTelegram(_telegramAccount);
+      } else {
+        showMessage('Something went wrong. Please try again', 'warning');
       }
     });
   }
