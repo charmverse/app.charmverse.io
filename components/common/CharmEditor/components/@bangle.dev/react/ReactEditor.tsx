@@ -202,7 +202,7 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
       fEditor?.close();
       _editor.destroy();
     };
-  }, [user, pageId, useSockets, authResponse, authResponse, ref]);
+  }, [user?.id, pageId, useSockets, authResponse, authResponse, ref]);
 
   useEffect(() => {
     const timer = setTimeout(() => setShowLoader(true), 300);
