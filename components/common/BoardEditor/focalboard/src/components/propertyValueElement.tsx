@@ -112,7 +112,7 @@ function PropertyValueElement(props: Props): JSX.Element {
   } else if (propertyTemplate.type === 'person') {
     return (
       <UserProperty
-        value={propertyValue?.toString()}
+        memberIds={propertyValue as string[]}
         readOnly={readOnly}
         onChange={(newValue) => {
           mutator.changePropertyValue(card, propertyTemplate.id, newValue);

@@ -3,15 +3,15 @@ import { Popover, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import { bindPopover, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 
-import { InputSearchMember } from 'components/common/form/InputSearchMember';
+import { InputSearchMemberMultiple } from 'components/common/form/InputSearchMember';
 import UserDisplay from 'components/common/UserDisplay';
 import { useMembers } from 'hooks/useMembers';
 import type { Member } from 'lib/members/interfaces';
 
 type Props = {
-  value: string;
+  memberIds: string[];
   readOnly: boolean;
-  onChange: (value: string) => void;
+  onChange: (memberIds: string[]) => void;
   showEmptyPlaceholder?: boolean;
 };
 
@@ -22,11 +22,13 @@ const StyledUserPropertyContainer = styled(Box)`
   width: 100%;
   height: 100%;
   display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
 `;
 
 function UserProperty(props: Props): JSX.Element | null {
   const popupState = usePopupState({ variant: 'popover', popupId: `user-property-members` });
-
+  const { memberIds = [] } = props;
   const { members } = useMembers();
   const memberMap = members.reduce<Record<string, Member>>((acc, member) => {
     acc[member.id] = member;
@@ -34,25 +36,34 @@ function UserProperty(props: Props): JSX.Element | null {
   }, {});
 
   if (props.readOnly) {
-    if (memberMap[props.value]) {
-      return (
-        <StyledUserPropertyContainer>
-          <div className='UserProperty readonly octo-propertyvalue'>
-            <UserDisplay user={memberMap[props.value]} avatarSize='xSmall' fontSize='small' />
-          </div>
-        </StyledUserPropertyContainer>
-      );
+    if (memberIds.length === 0) {
+      return null;
     }
-    return null;
+
+    return (
+      <StyledUserPropertyContainer>
+        {memberIds.map((memberId) =>
+          memberMap[memberId] ? (
+            <div key={memberId} style={{ width: 'fit-content' }} className='UserProperty readonly octo-propertyvalue'>
+              <UserDisplay user={memberMap[memberId]} avatarSize='xSmall' fontSize='small' />
+            </div>
+          ) : null
+        )}
+      </StyledUserPropertyContainer>
+    );
   }
 
   return (
     <>
-      {memberMap[props.value] ? (
+      {memberIds.length !== 0 ? (
         <StyledUserPropertyContainer {...bindTrigger(popupState)}>
-          <div className='UserProperty readonly octo-propertyvalue'>
-            <UserDisplay user={memberMap[props.value]} avatarSize='xSmall' fontSize='small' />
-          </div>
+          {memberIds.map((memberId) =>
+            memberMap[memberId] ? (
+              <div key={memberId} style={{ width: 'fit-content' }} className='UserProperty readonly octo-propertyvalue'>
+                <UserDisplay user={memberMap[memberId]} avatarSize='xSmall' fontSize='small' />
+              </div>
+            ) : null
+          )}
         </StyledUserPropertyContainer>
       ) : (
         <Typography
@@ -71,15 +82,12 @@ function UserProperty(props: Props): JSX.Element | null {
           sx: { width: 300 }
         }}
       >
-        <InputSearchMember
-          defaultValue={memberMap[props.value]?.id ?? null}
-          onChange={(memberId) => {
-            props.onChange(memberId);
+        <InputSearchMemberMultiple
+          defaultValue={memberIds}
+          onChange={(_memberIds) => {
+            props.onChange(_memberIds);
           }}
           openOnFocus
-          onClear={() => {
-            props.onChange('');
-          }}
         />
       </Popover>
     </>
