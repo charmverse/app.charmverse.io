@@ -151,15 +151,9 @@ export default function BountyProperties(props: {
     () =>
       debounce((_bountyId: string, updates: Partial<UpdateableBountyFields>) => {
         updateBounty(_bountyId, updates);
-      }, 1500),
+      }, 1000),
     []
   );
-
-  useEffect(() => {
-    return () => {
-      updateBountyDebounced.cancel();
-    };
-  }, [updateBountyDebounced]);
 
   async function applyBountyUpdatesDebounced(updates: Partial<BountyWithDetails>) {
     if ('customReward' in updates) {
