@@ -8,11 +8,13 @@ import Tooltip from '@mui/material/Tooltip';
 import type { PostCategory } from '@prisma/client';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect, useMemo, useState } from 'react';
+import { MdOutlineNotificationsNone, MdOutlineNotificationsOff } from 'react-icons/md';
 
 import FieldLabel from 'components/common/form/FieldLabel';
 import PopperPopup from 'components/common/PopperPopup';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
+import { useForumCategoryNotification } from 'hooks/useUserSpaceNotifications';
 import type { AvailablePostCategoryPermissionFlags } from 'lib/permissions/forum/interfaces';
 
 import { CategoryDescriptionDialog } from './CategoryDescriptionDialog';
@@ -30,6 +32,8 @@ export function CategoryContextMenu({ category, onChange, onDelete, onSetNewDefa
   const [tempName, setTempName] = useState(category.name || '');
   const space = useCurrentSpace();
   const isAdmin = useIsAdmin();
+
+  const notifications = useForumCategoryNotification(category.id);
 
   const editDescriptionDialog = usePopupState({ variant: 'popover', popupId: 'add-roles-dialog' });
 
@@ -86,40 +90,47 @@ export function CategoryContextMenu({ category, onChange, onDelete, onSetNewDefa
           </MenuItem>
         )}
         <Tooltip title={!permissions.edit_category ? 'You do not have permissions to edit this category' : ''}>
-          <div>
-            <MenuItem
-              data-test={`open-category-description-dialog-${category.id}`}
-              disabled={!permissions.edit_category}
-              onClick={editDescriptionDialog.open}
-              sx={{
-                py: 1
-              }}
-            >
-              <ListItemIcon>
-                <Edit fontSize='small' />
-              </ListItemIcon>
-              <Typography variant='subtitle1'>{!category.description ? 'Add' : 'Edit'} description</Typography>
-            </MenuItem>
-          </div>
+          <MenuItem
+            data-test={`open-category-description-dialog-${category.id}`}
+            disabled={!permissions.edit_category}
+            onClick={editDescriptionDialog.open}
+            sx={{
+              py: 1
+            }}
+          >
+            <ListItemIcon>
+              <Edit fontSize='small' />
+            </ListItemIcon>
+            <Typography variant='subtitle1'>{!category.description ? 'Add' : 'Edit'} description</Typography>
+          </MenuItem>
         </Tooltip>
-
-        <Tooltip title={!permissions.manage_permissions ? 'Only forum administrators can manage permisions' : ''}>
-          <div>
-            <MenuItem
-              data-test={`open-category-permissions-dialog-${category.id}`}
-              disabled={!permissions.manage_permissions}
-              onClick={() => setPermissionsDialogIsOpen(true)}
-              sx={{
-                py: 1,
-                justifyContent: 'flex-start'
-              }}
-            >
-              <LockIcon sx={{ ml: -0.2 }} />
-              <Typography sx={{ pl: 1 }} variant='subtitle1'>
-                Manage permissions
-              </Typography>
-            </MenuItem>
-          </div>
+        <MenuItem
+          data-test={`open-category-permissions-dialog-${category.id}`}
+          disabled={!permissions.manage_permissions}
+          onClick={() => setPermissionsDialogIsOpen(true)}
+          sx={{
+            py: 1,
+            justifyContent: 'flex-start'
+          }}
+        >
+          <ListItemIcon>
+            <LockIcon />
+          </ListItemIcon>
+          <Typography variant='subtitle1'>Manage permissions</Typography>
+        </MenuItem>
+        <Tooltip title='Receive notifications when new posts are created in this category'>
+          <MenuItem
+            sx={{
+              py: 1,
+              justifyContent: 'flex-start'
+            }}
+            onClick={notifications.toggle}
+          >
+            <ListItemIcon>
+              {notifications.enabled ? <MdOutlineNotificationsNone /> : <MdOutlineNotificationsOff />}
+            </ListItemIcon>
+            <Typography variant='subtitle1'>{notifications.enabled ? 'Disable' : 'Enable'} notifications</Typography>
+          </MenuItem>
         </Tooltip>
 
         {!!onDelete && (
@@ -132,27 +143,25 @@ export function CategoryContextMenu({ category, onChange, onDelete, onSetNewDefa
                 : ''
             }
           >
-            <div>
-              <MenuItem
-                disabled={isDefaultSpacePostCategory || !permissions.delete_category}
-                onClick={() => {
-                  onDelete(category);
-                }}
-                sx={{
-                  py: 1
-                }}
-              >
-                <ListItemIcon>
-                  <DeleteOutlinedIcon fontSize='small' />
-                </ListItemIcon>
-                <Typography variant='subtitle1'>Delete</Typography>
-              </MenuItem>
-            </div>
+            <MenuItem
+              disabled={isDefaultSpacePostCategory || !permissions.delete_category}
+              onClick={() => {
+                onDelete(category);
+              }}
+              sx={{
+                py: 1
+              }}
+            >
+              <ListItemIcon>
+                <DeleteOutlinedIcon fontSize='small' />
+              </ListItemIcon>
+              <Typography variant='subtitle1'>Delete</Typography>
+            </MenuItem>
           </Tooltip>
         )}
       </MenuList>
     ),
-    [category, tempName, space?.defaultPostCategoryId]
+    [category, tempName, space?.defaultPostCategoryId, notifications]
   );
 
   return (

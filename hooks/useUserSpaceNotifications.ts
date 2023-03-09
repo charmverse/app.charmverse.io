@@ -21,12 +21,13 @@ function useSpaceNotificationsData() {
 export function useForumCategoryNotification(categoryId: string) {
   const { settings, spaceId, refresh } = useSpaceNotificationsData();
   const { showMessage } = useSnackbar();
+  const enabled = settings?.forums.categories?.[categoryId] ?? false;
+  const isLoading = !settings;
 
   return useMemo(() => {
-    const enabled = settings?.forums.categories?.[categoryId] ?? false;
     return {
       enabled,
-      isLoading: !settings,
+      isLoading,
       async toggle() {
         await charmClient.profile.setForumCategoryNotification({
           spaceId,
@@ -40,5 +41,5 @@ export function useForumCategoryNotification(categoryId: string) {
         refresh();
       }
     };
-  }, [categoryId, spaceId, refresh, settings]);
+  }, [categoryId, enabled, spaceId, refresh, isLoading]);
 }

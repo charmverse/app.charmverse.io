@@ -5,6 +5,9 @@ import type { ClientUserSpaceNotifications } from 'lib/userNotifications/spaceNo
 import type { UnpopulatedForumTask } from './getForumNotifications';
 import { getPropertiesFromPost } from './utils';
 
+// Prevent sending notifications from before we added this feature. TODO: Create notification records so we can remove this hack
+const featureStartDate = new Date(2023, 2, 9);
+
 export function getNewPosts({
   userId,
   posts,
@@ -17,7 +20,9 @@ export function getNewPosts({
   settings: ClientUserSpaceNotifications;
 }): UnpopulatedForumTask[] {
   const subscriptions = settings.forums.categories;
-  const postsFromOthers = posts.filter((post) => post.createdBy !== userId && subscriptions[post.categoryId]);
+  const postsFromOthers = posts
+    .filter((post) => post.createdBy !== userId && subscriptions[post.categoryId])
+    .filter((post) => post.createdAt > featureStartDate);
 
   return postsFromOthers.map((post) => ({
     ...getPropertiesFromPost(post, space),
