@@ -43,7 +43,7 @@ export function ApplicationCommentForm({
 
   return (
     <StyleContainer>
-      <Avatar size='xSmall' name={username} avatar={avatar} />
+      {avatar && username && <Avatar size='xSmall' name={username} avatar={avatar} />}
       <InlineCharmEditor
         content={newComment?.doc}
         key={$key} // use the size of comments so it resets when the new one is added

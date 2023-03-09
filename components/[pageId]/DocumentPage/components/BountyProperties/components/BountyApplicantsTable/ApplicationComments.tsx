@@ -1,18 +1,20 @@
 import { uuid } from '@bangle.dev/utils';
-import { Divider, FormLabel } from '@mui/material';
+import { Divider, FormLabel, Typography } from '@mui/material';
 import { Box, Stack } from '@mui/system';
 import type { Application } from '@prisma/client';
 import { useEffect, useState } from 'react';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
-import { RelativeDate } from 'components/common/CharmEditor/components/PageThread';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/InlineCharmEditor';
 import LoadingComponent from 'components/common/LoadingComponent';
+import UserDisplay from 'components/common/UserDisplay';
+import { useMemberProfile } from 'components/profile/hooks/useMemberProfile';
 import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
 import { emptyDocument } from 'lib/prosemirror/constants';
 import type { PageContent } from 'lib/prosemirror/interfaces';
+import { getRelativeTimeInThePast } from 'lib/utilities/dates';
 
 import { ApplicationCommentForm } from './ApplicationCommentForm';
 
@@ -38,6 +40,7 @@ export function ApplicationComments({
     charmClient.applicationComments.getComments(applicationId)
   );
   const member = members.find((c) => c.id === createdBy);
+  const { showMemberProfile } = useMemberProfile();
 
   function resetInput() {
     setEditorKey((key) => key + 1);
@@ -97,7 +100,27 @@ export function ApplicationComments({
 
           return (
             <Stack key={applicationComment.id}>
-              <RelativeDate createdAt={applicationComment.createdAt} updatedAt={applicationComment.updatedAt} />
+              <Stack flexDirection='row' alignItems='center'>
+                <Box mr={1}>
+                  <UserDisplay showMiniProfile avatarSize='small' user={commentCreator} hideName={true} />
+                </Box>
+                <Typography
+                  mr={1}
+                  onClick={() => {
+                    if (commentCreator) {
+                      showMemberProfile(commentCreator.id);
+                    }
+                  }}
+                >
+                  {commentCreator?.username}
+                </Typography>
+                <Typography variant='subtitle1' mr={0.5}>
+                  {getRelativeTimeInThePast(new Date(applicationComment.createdAt))}
+                </Typography>
+                {applicationComment.createdAt !== applicationComment.updatedAt && !applicationComment.deletedAt && (
+                  <Typography variant='subtitle2'>(Edited)</Typography>
+                )}
+              </Stack>
               <ApplicationCommentForm
                 hideButton={applicationComment.createdBy !== user?.id}
                 buttonText='Edit'
@@ -105,8 +128,6 @@ export function ApplicationComments({
                   doc: applicationComment.content as PageContent,
                   rawText: applicationComment.contentText
                 }}
-                avatar={commentCreator?.avatar}
-                username={commentCreator?.username}
                 onSubmit={async (editorOutput) => {
                   await updateComment(applicationComment.id, editorOutput);
                 }}
