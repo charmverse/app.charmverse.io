@@ -6,7 +6,7 @@ import { BOUNTY_STATUS_COLORS, BOUNTY_STATUS_LABELS } from 'components/bounties/
 import { ProposalStatusColors } from 'components/proposals/components/ProposalStatusBadge';
 import type { BountyTask } from 'lib/bounties/getBountyTasks';
 import { DiscussionTask } from 'lib/discussion/interfaces';
-import { ForumTask } from 'lib/forums/comments/interface';
+import { ForumTask } from 'lib/forums/getForumNotifications/getForumNotifications';
 import type { GnosisSafeTasks } from 'lib/gnosis/gnosis.tasks';
 import log from 'lib/log';
 import type { ProposalTask } from 'lib/proposal/getProposalTasksFromWorkspaceEvents';
@@ -255,7 +255,7 @@ export default function PendingTasks(props: PendingTasksProps) {
               }}
             >
               <span style={h2Style}>
-                {totalForumTasks} Forum Comment{totalForumTasks > 1 ? 's' : ''}
+                {totalForumTasks} Forum Event{totalForumTasks > 1 ? 's' : ''}
               </span>
             </a>
             <a href={nexusForumLink} style={buttonStyle}>
@@ -427,7 +427,7 @@ function ForumTask({ task: { commentText, spaceName, postTitle } }: { task: Foru
   return (
     <MjmlText>
       <div style={{ fontWeight: 'bold', marginBottom: 5 }}>
-        {commentText.length > MAX_CHAR ? `${commentText.slice(0, MAX_CHAR)}...` : commentText}
+        {commentText.length > MAX_CHAR ? `${commentText.slice(0, MAX_CHAR)}...` : commentText || 'New Post'}
       </div>
       <div
         style={{

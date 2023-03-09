@@ -3,7 +3,7 @@ import { getBountyTasks } from 'lib/bounties/getBountyTasks';
 import { getDiscussionTasks } from 'lib/discussion/getDiscussionTasks';
 import * as emails from 'lib/emails';
 import type { PendingTasksProps } from 'lib/emails/templates/PendingTasks';
-import { getForumTasks } from 'lib/forums/comments/getForumTasks';
+import { getForumNotifications } from 'lib/forums/getForumNotifications/getForumNotifications';
 import type { GnosisSafeTasks } from 'lib/gnosis/gnosis.tasks';
 import { getPendingGnosisTasks } from 'lib/gnosis/gnosis.tasks';
 import log from 'lib/log';
@@ -65,7 +65,7 @@ export async function getNotifications(): Promise<(PendingTasksProps & { unmarke
     const discussionTasks = await getDiscussionTasks(user.id);
     const voteTasks = await getVoteTasks(user.id);
     const bountyTasks = await getBountyTasks(user.id);
-    const forumTasks = await getForumTasks(user.id);
+    const forumTasks = await getForumNotifications(user.id);
 
     const sentTasks = await prisma.userNotification.findMany({
       where: {
@@ -209,30 +209,16 @@ async function sendNotification(
           }
         })
       ),
-      ...notification.forumTasks
-        .filter((forumTask) => forumTask.commentId)
-        .map((forumTask) =>
-          prisma.userNotification.create({
-            data: {
-              userId: notification.user.id,
-              taskId: forumTask.commentId as string,
-              channel: 'email',
-              type: 'post_comment'
-            }
-          })
-        ),
-      ...notification.forumTasks
-        .filter((forumTask) => forumTask.mentionId)
-        .map((forumTask) =>
-          prisma.userNotification.create({
-            data: {
-              userId: notification.user.id,
-              taskId: forumTask.mentionId as string,
-              channel: 'email',
-              type: 'mention'
-            }
-          })
-        )
+      ...notification.forumTasks.map((forumTask) =>
+        prisma.userNotification.create({
+          data: {
+            userId: notification.user.id,
+            taskId: forumTask.taskId,
+            channel: 'email',
+            type: 'forum'
+          }
+        })
+      )
     ]);
   } catch (error) {
     log.error(`Updating notifications failed for the user ${notification.user.id}`, { error });

@@ -1,10 +1,20 @@
 import type { MemberProperty, PrismaPromise } from '@prisma/client';
 
 import { prisma } from 'db';
-import type { ExistingSelectOption } from 'lib/forms/Interfaces';
 import { NotFoundError } from 'lib/middleware';
 import { UserIsNotSpaceMemberError } from 'lib/users/errors';
 import { InvalidInputError } from 'lib/utilities/errors';
+
+type NewSelectOptionType = {
+  id?: string;
+  index?: number;
+  name: string;
+  color: string;
+};
+
+type ExistingSelectOption = NewSelectOptionType & {
+  id: string;
+};
 
 type UpdatePropertyInput = {
   data: Partial<MemberProperty>;

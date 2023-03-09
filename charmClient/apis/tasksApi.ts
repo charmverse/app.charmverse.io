@@ -1,6 +1,6 @@
 import * as http from 'adapters/http';
 import type { GnosisSafeTasks } from 'lib/gnosis/gnosis.tasks';
-import type { MarkTask } from 'lib/tasks/markTasks';
+import type { MarkTask } from 'lib/userNotifications/markTasks';
 import type { GetTasksResponse } from 'pages/api/tasks/list';
 import type { GetTasksStateResponse, UpdateTasksState } from 'pages/api/tasks/state';
 
