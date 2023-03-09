@@ -17,8 +17,7 @@ declare module 'lit-js-sdk' {
     | 'goerli'
     | 'ropsten'
     | 'rinkeby'
-    | 'cronos'
-    | 'optimism';
+    | 'cronos';
   export type Chain = EVMChain | SolanaChain;
 
   type ChainConfig = {

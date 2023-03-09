@@ -476,6 +476,8 @@ model User {
   path                      String?                         @unique
   identityType              IdentityType?
   email                     String?
+  emailNotifications        Boolean?                        @default(true)
+  emailNewsletter           Boolean?                        @default(false)
   xpsEngineId               String?                         @unique
   applications              Application[]
   blocks                    Block[]
@@ -508,13 +510,13 @@ model User {
   workspaceEvents           WorkspaceEvent[]
   wallets                   UserWallet[]
   memberPropertyValues      MemberPropertyValue[]
+  spaceNotificationSettings UserSpaceNotificationSettings[]
   userTokenGates            UserTokenGate[]
   unstoppableDomains        UnstoppableDomain[]
   postComments              PostComment[]
   googleAccounts            GoogleAccount[]
-  googleCredentials         GoogleCredential[]
-  pageComments              PageComment[]
-  spaceNotificationSettings UserSpaceNotificationSettings[]
+  GoogleCredential          GoogleCredential[]
+  PageComment               PageComment[]
 }
 
 model UserWallet {
