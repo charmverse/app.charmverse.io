@@ -27,7 +27,7 @@ async function updateApplicationCommentController(req: NextApiRequest, res: Next
   });
 
   if (!application) {
-    throw new NotFoundError(`Application not found`);
+    throw new NotFoundError(`Application with id ${applicationId} not found`);
   }
 
   const bounty = await prisma.bounty.findUnique({
@@ -44,7 +44,7 @@ async function updateApplicationCommentController(req: NextApiRequest, res: Next
   const bountyId = bounty?.id;
 
   if (!bounty || !bounty.page) {
-    throw new DataNotFoundError(`Application with id ${bountyId} not found.`);
+    throw new DataNotFoundError(`Bounty with id ${bountyId} not found`);
   }
 
   const pagePermissions = await computeUserPagePermissions({
@@ -52,11 +52,24 @@ async function updateApplicationCommentController(req: NextApiRequest, res: Next
     userId
   });
 
-  if (pagePermissions.comment !== true) {
+  const pageComment = await prisma.pageComment.findUnique({
+    where: {
+      id: commentId
+    },
+    select: {
+      createdBy: true
+    }
+  });
+
+  if (!pageComment) {
+    throw new DataNotFoundError(`Comment with id ${commentId} not found`);
+  }
+
+  if (pagePermissions.comment !== true || pageComment.createdBy !== userId) {
     throw new ActionNotPermittedError();
   }
 
-  const pageComment = await prisma.pageComment.update({
+  const updatedPageComment = await prisma.pageComment.update({
     where: {
       id: commentId
     },
@@ -66,7 +79,7 @@ async function updateApplicationCommentController(req: NextApiRequest, res: Next
     }
   });
 
-  return res.status(201).json(pageComment);
+  return res.status(201).json(updatedPageComment);
 }
 
 export default withSessionRoute(handler);

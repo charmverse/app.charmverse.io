@@ -122,6 +122,7 @@ export function ApplicationComments({
                 )}
               </Stack>
               <ApplicationCommentForm
+                hideAvatar
                 hideButton={applicationComment.createdBy !== user?.id}
                 buttonText='Edit'
                 initialValue={{

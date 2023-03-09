@@ -5,7 +5,7 @@ import nc from 'next-connect';
 
 import { prisma } from 'db';
 import type { CreateApplicationCommentPayload } from 'lib/applications/interfaces';
-import { NotFoundError, onError, onNoMatch, requireUser } from 'lib/middleware';
+import { ActionNotPermittedError, NotFoundError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { computeUserPagePermissions } from 'lib/permissions/pages';
 import { withSessionRoute } from 'lib/session/withSession';
 import { DataNotFoundError } from 'lib/utilities/errors';
@@ -26,7 +26,7 @@ async function createApplicationCommentController(req: NextApiRequest, res: Next
   });
 
   if (!application) {
-    throw new NotFoundError(`Application not found`);
+    throw new NotFoundError(`Application with id ${applicationId} not found`);
   }
 
   const bounty = await prisma.bounty.findUnique({
@@ -43,7 +43,7 @@ async function createApplicationCommentController(req: NextApiRequest, res: Next
   const bountyId = bounty?.id;
 
   if (!bounty || !bounty.page) {
-    throw new DataNotFoundError(`Application with id ${bountyId} not found.`);
+    throw new DataNotFoundError(`Bounty with id ${bountyId} not found`);
   }
 
   const pagePermissions = await computeUserPagePermissions({
@@ -51,8 +51,8 @@ async function createApplicationCommentController(req: NextApiRequest, res: Next
     userId: req.session.user.id
   });
 
-  if (pagePermissions.read !== true) {
-    throw new DataNotFoundError(`Application with id ${bountyId} not found.`);
+  if (pagePermissions.comment !== true && application.createdBy !== userId) {
+    throw new ActionNotPermittedError();
   }
 
   const pageComment = await prisma.pageComment.create({
@@ -79,7 +79,7 @@ async function getApplicationCommentsController(req: NextApiRequest, res: NextAp
   });
 
   if (!application) {
-    throw new NotFoundError(`Application not found`);
+    throw new NotFoundError(`Application with id ${applicationId} not found`);
   }
 
   const bounty = await prisma.bounty.findUnique({
@@ -96,7 +96,7 @@ async function getApplicationCommentsController(req: NextApiRequest, res: NextAp
   const bountyId = bounty?.id;
 
   if (!bounty || !bounty.page) {
-    throw new DataNotFoundError(`Application with id ${bountyId} not found.`);
+    throw new DataNotFoundError(`Bounty with id ${bountyId} not found`);
   }
 
   const pagePermissions = await computeUserPagePermissions({
@@ -105,7 +105,7 @@ async function getApplicationCommentsController(req: NextApiRequest, res: NextAp
   });
 
   if (pagePermissions.read !== true) {
-    throw new DataNotFoundError(`Application with id ${bountyId} not found.`);
+    throw new ActionNotPermittedError();
   }
 
   const pageComment = await prisma.pageComment.findMany({

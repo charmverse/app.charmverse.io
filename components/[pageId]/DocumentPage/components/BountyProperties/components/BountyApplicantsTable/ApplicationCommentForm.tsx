@@ -18,6 +18,7 @@ interface NewCommentProps {
   disabled?: boolean;
   buttonText?: string;
   hideButton?: boolean;
+  hideAvatar?: boolean;
 }
 
 const StyleContainer = styled(Box)`
@@ -36,14 +37,15 @@ export function ApplicationCommentForm({
   avatar,
   onSubmit,
   buttonText = 'Send',
-  hideButton = false
+  hideButton = false,
+  hideAvatar = false
 }: NewCommentProps) {
   const [newComment, setNewComment] = useState<ICharmEditorOutput | null | undefined>(initialValue);
   const [touched, setTouched] = useState(false);
 
   return (
     <StyleContainer>
-      {avatar && username && <Avatar size='xSmall' name={username} avatar={avatar} />}
+      {!hideAvatar && <Avatar size='xSmall' name={username} avatar={avatar} />}
       <InlineCharmEditor
         content={newComment?.doc}
         key={$key} // use the size of comments so it resets when the new one is added
