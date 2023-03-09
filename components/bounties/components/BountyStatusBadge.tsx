@@ -5,12 +5,14 @@ import LaunchIcon from '@mui/icons-material/LaunchOutlined';
 import LightbulbIcon from '@mui/icons-material/Lightbulb';
 import ModeStandbyIcon from '@mui/icons-material/ModeStandby';
 import PaidIcon from '@mui/icons-material/Paid';
+import BountyIcon from '@mui/icons-material/RequestPageOutlined';
 import { IconButton, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
 import type { ChipProps } from '@mui/material/Chip';
 import Chip from '@mui/material/Chip';
 import Grid from '@mui/material/Grid';
 import Tooltip from '@mui/material/Tooltip';
+import { Stack } from '@mui/system';
 import type { Bounty, BountyStatus } from '@prisma/client';
 import millify from 'millify';
 import Link from 'next/link';
@@ -207,7 +209,10 @@ export function BountyAmount({
   if (bounty.customReward) {
     return (
       <Tooltip title={bounty.customReward}>
-        <Typography>{fancyTrim(bounty.customReward, 15)}</Typography>
+        <Stack flexDirection='row' gap={0.5} alignItems='center'>
+          <BountyIcon fontSize='small' color='secondary' />
+          <Typography>{fancyTrim(bounty.customReward, 15)}</Typography>
+        </Stack>
       </Tooltip>
     );
   }

@@ -370,11 +370,11 @@ export default function BountyProperties(props: {
             type='text'
             size='small'
             multiline
-            rows={5}
+            rows={1}
             onChange={async (e) => {
               updateBountyCustomReward(e);
             }}
-            placeholder='A CharmVerse hat ...'
+            placeholder='Custom NFT'
           />
         </div>
       )}
