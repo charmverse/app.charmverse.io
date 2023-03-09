@@ -144,9 +144,10 @@ export async function getForumNotifications(userId: string): Promise<ForumTasksG
 
   const notifications = await prisma.userNotification.findMany({
     where: {
-      createdAt: {
-        gte: lookback
-      },
+      // not sure what lookback should be on notifications - maybe instead we should query by taskId
+      // createdAt: {
+      //   gte: lookback
+      // },
       userId,
       type: {
         // TODO: we only need to look for forum tasks once we pass the lookback, added Mar 3, 2023
