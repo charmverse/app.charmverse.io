@@ -1,23 +1,10 @@
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import {
-  Alert,
-  Box,
-  Collapse,
-  Divider,
-  FormLabel,
-  IconButton,
-  TableCell,
-  TableRow,
-  Tooltip,
-  Typography
-} from '@mui/material';
-import { useEffect, useState } from 'react';
-import { v4 as uuid } from 'uuid';
+import { Alert, Box, Collapse, IconButton, TableCell, TableRow, Tooltip, Typography } from '@mui/material';
+import { useState } from 'react';
 
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
-import type { ICharmEditorOutput } from 'components/common/CharmEditor/InlineCharmEditor';
 import Modal from 'components/common/Modal';
 import UserDisplay from 'components/common/UserDisplay';
 import { useBounties } from 'hooks/useBounties';
@@ -33,7 +20,6 @@ import ApplicationInput from '../BountyApplicantForm/components/ApplicationInput
 import SubmissionInput from '../BountyApplicantForm/components/SubmissionInput';
 import BountyApplicantStatus from '../BountyApplicantStatus';
 
-import { ApplicationCommentForm } from './ApplicationCommentForm';
 import { ApplicationComments } from './ApplicationComments';
 import BountyApplicantActions from './BountyApplicantActions';
 
@@ -57,7 +43,6 @@ export default function BountyApplicantTableRow({
   const [isExpandedRow, setIsExpandedRow] = useState(false);
   const member = members.find((c) => c.id === submission.createdBy);
   const { refreshBounty } = useBounties();
-  const [editorKey, setEditorKey] = useState(0); // a key to allow us to reset charmeditor contents
   const { formatDateTime } = useDateFormatter();
 
   const [reviewDecision, setReviewDecision] = useState<SubmissionReview | null>(null);
@@ -68,18 +53,6 @@ export default function BountyApplicantTableRow({
   // We can only review or accept application. These are mutually exclusive.
   const showAcceptSubmission =
     !showAcceptApplication && submission.status === 'review' && submission.createdBy !== user?.id;
-
-  async function onSendClicked(applicationComment: ICharmEditorOutput) {
-    resetInput();
-    await charmClient.applicationComments.addComment(submission.id, {
-      content: applicationComment.doc,
-      contentText: applicationComment.rawText
-    });
-  }
-
-  function resetInput() {
-    setEditorKey((key) => key + 1);
-  }
 
   async function approveApplication(applicationId: string) {
     if (!submissionsCapReached) {
@@ -106,10 +79,6 @@ export default function BountyApplicantTableRow({
     setReviewDecision(null);
     setApiError(null);
   }
-
-  useEffect(() => {
-    resetInput();
-  }, [user, member]);
 
   return (
     <>
@@ -253,35 +222,12 @@ export default function BountyApplicantTableRow({
                 </Box>
               )}
 
-              <ApplicationComments applicationId={submission.id} />
-              {submission.status !== 'rejected' && submission.createdBy !== user?.id && (
-                <>
-                  <Divider
-                    style={{
-                      marginBottom: 24,
-                      marginTop: 24
-                    }}
-                  />
-                  <FormLabel>
-                    <strong>Send a message (optional)</strong>
-                  </FormLabel>
-                  <ApplicationCommentForm
-                    $key={editorKey}
-                    key={editorKey}
-                    initialValue={
-                      user?.id
-                        ? {
-                            doc: getContentWithMention({ myUserId: user.id, targetUserId: submission.createdBy }),
-                            rawText: ''
-                          }
-                        : null
-                    }
-                    username={user?.username}
-                    avatar={user?.avatar}
-                    onSubmit={onSendClicked}
-                  />
-                </>
-              )}
+              <ApplicationComments
+                context='reviewer'
+                createdBy={submission.createdBy}
+                applicationId={submission.id}
+                status={submission.status}
+              />
             </Box>
 
             {/* Modal which provides review confirmation */}
@@ -335,31 +281,4 @@ export default function BountyApplicantTableRow({
       </TableRow>
     </>
   );
-}
-
-export function getContentWithMention({ myUserId, targetUserId }: { myUserId: string; targetUserId: string }) {
-  return {
-    type: 'doc',
-    content: [
-      {
-        type: 'paragraph',
-        content: [
-          {
-            type: 'mention',
-            attrs: {
-              id: uuid(),
-              type: 'user',
-              value: targetUserId,
-              createdAt: new Date().toISOString(),
-              createdBy: myUserId
-            }
-          },
-          {
-            type: 'text',
-            text: ' '
-          }
-        ]
-      }
-    ]
-  };
 }
