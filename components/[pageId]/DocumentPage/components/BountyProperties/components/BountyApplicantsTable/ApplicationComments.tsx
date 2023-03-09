@@ -132,6 +132,7 @@ export function ApplicationComments({
                 onSubmit={async (editorOutput) => {
                   await updateComment(applicationComment.id, editorOutput);
                 }}
+                disabled={applicationComment.createdBy !== user?.id}
               />
             </Stack>
           );
