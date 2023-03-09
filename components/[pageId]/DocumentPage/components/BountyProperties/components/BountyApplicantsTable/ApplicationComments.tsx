@@ -30,7 +30,11 @@ export function ApplicationComments({
   const { members } = useMembers();
   const { user } = useUser();
   const [editorKey, setEditorKey] = useState(0); // a key to allow us to reset charmeditor contents
-  const { data: applicationComments = [], isLoading } = useSWR(`/application/${applicationId}/comments`, () =>
+  const {
+    data: applicationComments = [],
+    isLoading,
+    mutate: refetchApplicationComments
+  } = useSWR(`/application/${applicationId}/comments`, () =>
     charmClient.applicationComments.getComments(applicationId)
   );
   const member = members.find((c) => c.id === createdBy);
@@ -43,19 +47,37 @@ export function ApplicationComments({
     resetInput();
   }, [user, member]);
 
-  async function onSendClicked(applicationComment: ICharmEditorOutput) {
+  async function onSendClicked(editorOutput: ICharmEditorOutput) {
     resetInput();
-    await charmClient.applicationComments.addComment(applicationId, {
-      content: applicationComment.doc,
-      contentText: applicationComment.rawText
-    });
-  }
-
-  function updateComment(pageCommentId: string, editorOutput: ICharmEditorOutput) {
-    charmClient.applicationComments.editComment(applicationId, pageCommentId, {
+    const applicationComment = await charmClient.applicationComments.addComment(applicationId, {
       content: editorOutput.doc,
       contentText: editorOutput.rawText
     });
+    refetchApplicationComments(
+      (_applicationComments) => (_applicationComments ? [applicationComment, ..._applicationComments] : []),
+      {
+        revalidate: false
+      }
+    );
+  }
+
+  async function updateComment(pageCommentId: string, editorOutput: ICharmEditorOutput) {
+    const updatedComment = await charmClient.applicationComments.editComment(applicationId, pageCommentId, {
+      content: editorOutput.doc,
+      contentText: editorOutput.rawText
+    });
+
+    refetchApplicationComments(
+      (_applicationComments) =>
+        _applicationComments
+          ? _applicationComments.map((_applicationComment) =>
+              _applicationComment.id === pageCommentId ? updatedComment : _applicationComment
+            )
+          : [],
+      {
+        revalidate: false
+      }
+    );
   }
 
   if (isLoading) {
@@ -77,16 +99,16 @@ export function ApplicationComments({
             <Stack key={applicationComment.id}>
               <RelativeDate createdAt={applicationComment.createdAt} updatedAt={applicationComment.updatedAt} />
               <ApplicationCommentForm
+                hideButton={applicationComment.createdBy !== user?.id}
                 buttonText='Edit'
                 initialValue={{
                   doc: applicationComment.content as PageContent,
                   rawText: applicationComment.contentText
                 }}
-                disabled={user?.id !== applicationComment.createdBy}
                 avatar={commentCreator?.avatar}
                 username={commentCreator?.username}
-                onSubmit={(editorOutput) => {
-                  updateComment(applicationComment.id, editorOutput);
+                onSubmit={async (editorOutput) => {
+                  await updateComment(applicationComment.id, editorOutput);
                 }}
               />
             </Stack>

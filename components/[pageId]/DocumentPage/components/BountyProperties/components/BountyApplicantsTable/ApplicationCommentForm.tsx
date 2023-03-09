@@ -17,6 +17,7 @@ interface NewCommentProps {
   onSubmit: (editorOutput: ICharmEditorOutput) => void;
   disabled?: boolean;
   buttonText?: string;
+  hideButton?: boolean;
 }
 
 const StyleContainer = styled(Box)`
@@ -34,7 +35,8 @@ export function ApplicationCommentForm({
   username,
   avatar,
   onSubmit,
-  buttonText = 'Send'
+  buttonText = 'Send',
+  hideButton = false
 }: NewCommentProps) {
   const [newComment, setNewComment] = useState<ICharmEditorOutput | null | undefined>(initialValue);
   const [touched, setTouched] = useState(false);
@@ -55,19 +57,21 @@ export function ApplicationCommentForm({
         readOnly={disabled}
       />
 
-      <Button
-        disabled={!touched || (!isTruthy(newComment) && checkIsContentEmpty(newComment))}
-        filled={true}
-        onClick={() => {
-          if (newComment) {
-            onSubmit(newComment);
-            setTouched(false);
-            setNewComment(null);
-          }
-        }}
-      >
-        {buttonText}
-      </Button>
+      {!hideButton && (
+        <Button
+          disabled={!touched || (!isTruthy(newComment) && checkIsContentEmpty(newComment))}
+          filled={true}
+          onClick={() => {
+            if (newComment) {
+              onSubmit(newComment);
+              setTouched(false);
+              setNewComment(null);
+            }
+          }}
+        >
+          {buttonText}
+        </Button>
+      )}
     </StyleContainer>
   );
 }

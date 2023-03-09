@@ -12,7 +12,6 @@ import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
 import charmClient from 'charmClient';
-import type { ICharmEditorOutput } from 'components/common/CharmEditor/InlineCharmEditor';
 import { useBounties } from 'hooks/useBounties';
 import { useLocalStorage } from 'hooks/useLocalStorage';
 import { useUser } from 'hooks/useUser';
