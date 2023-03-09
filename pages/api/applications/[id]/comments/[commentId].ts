@@ -4,6 +4,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { prisma } from 'db';
+import { getApplicationDetails } from 'lib/applications/getApplicationDetails';
 import type { CreateApplicationCommentPayload } from 'lib/applications/interfaces';
 import { ActionNotPermittedError, NotFoundError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { computeUserPagePermissions } from 'lib/permissions/pages';
@@ -20,31 +21,16 @@ async function updateApplicationCommentController(req: NextApiRequest, res: Next
   const applicationId = req.query.id as string;
   const commentId = req.query.commentId as string;
 
-  const application = await prisma.application.findUnique({
-    where: {
-      id: applicationId
-    }
-  });
+  const application = await getApplicationDetails(applicationId);
 
   if (!application) {
     throw new NotFoundError(`Application with id ${applicationId} not found`);
   }
 
-  const bounty = await prisma.bounty.findUnique({
-    where: {
-      id: application.bountyId
-    },
-    select: {
-      page: true,
-      permissions: true,
-      id: true
-    }
-  });
-
-  const bountyId = bounty?.id;
+  const bounty = application?.bounty;
 
   if (!bounty || !bounty.page) {
-    throw new DataNotFoundError(`Bounty with id ${bountyId} not found`);
+    throw new DataNotFoundError(`Bounty not found`);
   }
 
   const pagePermissions = await computeUserPagePermissions({
@@ -83,6 +69,3 @@ async function updateApplicationCommentController(req: NextApiRequest, res: Next
 }
 
 export default withSessionRoute(handler);
-
-// --------- Add logging events
-// These events assume the entity has been created

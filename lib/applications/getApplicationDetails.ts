@@ -1,8 +1,6 @@
 import { prisma } from 'db';
 
-import type { ApplicationWithBounty } from './interfaces';
-
-export function getApplication(applicationId: string): Promise<ApplicationWithBounty | null> {
+export function getApplicationDetails(applicationId: string) {
   return prisma.application.findUnique({
     where: {
       id: applicationId
