@@ -73,7 +73,7 @@ export function InputSearchMemberBase({
       options={filteredOptions}
       autoHighlight
       // user can also be a string if freeSolo=true
-      getOptionLabel={(user) => (user as Member).username}
+      getOptionLabel={(user) => (user as Member)?.username}
       renderOption={(_props, user) => <UserDisplay {...(_props as any)} user={user} />}
       noOptionsText='No options available'
       renderInput={(params) => (
