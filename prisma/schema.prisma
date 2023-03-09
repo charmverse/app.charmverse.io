@@ -469,6 +469,8 @@ model User {
   path                 String?                @unique
   identityType         IdentityType?
   email                String?
+  emailNotifications   Boolean?               @default(true)
+  emailNewsletter      Boolean?               @default(false)
   xpsEngineId          String?                @unique
   applications         Application[]
   blocks               Block[]

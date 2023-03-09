@@ -19,7 +19,6 @@ export type LinkPluginState = {
 
 export function plugins({ key }: { key: PluginKey }) {
   const tooltipDOMSpec = createTooltipDOM();
-
   let tooltipTimer: null | NodeJS.Timer = null;
 
   return [
@@ -73,6 +72,13 @@ export function plugins({ key }: { key: PluginKey }) {
         },
         handleDOMEvents: {
           mouseover: (view, event) => {
+            function hideWithTimeout() {
+              if (tooltipTimer) clearTimeout(tooltipTimer);
+              tooltipTimer = setTimeout(() => {
+                hideSuggestionsTooltip(key)(view.state, view.dispatch, view);
+              }, 750);
+            }
+
             const target = event.target as HTMLAnchorElement; // span for link
             const parentElement = target?.parentElement; // anchor for link
             const hrefElement = parentElement?.classList.contains('charm-link')
@@ -99,12 +105,18 @@ export function plugins({ key }: { key: PluginKey }) {
                       ev.clientY < boundingRect.bottom + BUFFER &&
                       ev.clientX > boundingRect.left &&
                       ev.clientX < boundingRect.right;
+
                     if (!isWithinBufferRegion) {
-                      if (tooltipTimer) clearTimeout(tooltipTimer);
-                      tooltipTimer = setTimeout(() => {
-                        hideSuggestionsTooltip(key)(view.state, view.dispatch, view);
-                      }, 750);
+                      hideWithTimeout();
                     }
+                  };
+
+                  // do not hide when hovering over tooltip
+                  tooltipDOMSpec.contentDOM.onmouseenter = () => {
+                    if (tooltipTimer) clearTimeout(tooltipTimer);
+                  };
+                  tooltipDOMSpec.contentDOM.onmouseleave = () => {
+                    hideWithTimeout();
                   };
                 }, 400);
               }

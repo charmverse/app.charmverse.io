@@ -1,12 +1,12 @@
+import { TestBlockFactory } from 'components/common/BoardEditor/focalboard/src/test/testBlockFactory';
+import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
 import type { IPropertyTemplate } from 'lib/focalboard/board';
 import { createFilterClause } from 'lib/focalboard/filterClause';
 import { createFilterGroup } from 'lib/focalboard/filterGroup';
 
-import { CardFilter } from './cardFilter';
-import { TestBlockFactory } from './test/testBlockFactory';
-import { Utils } from './utils';
+import { CardFilter } from '../cardFilter';
 
-jest.mock('./utils');
+jest.mock('components/common/BoardEditor/focalboard/src/utils');
 const mockedUtils = jest.mocked(Utils, true);
 describe('src/cardFilter', () => {
   const board = TestBlockFactory.createBoard();
@@ -293,6 +293,33 @@ describe('src/cardFilter', () => {
       const result = CardFilter.propertyThatMeetsFilterClause(filterClauseIsEmpty, [templateFilter]);
       expect(result.id).toEqual(filterClauseIsEmpty.propertyId);
       expect(result.value).toBeFalsy();
+    });
+
+    test('should return a result with filterGroup for isNotEmpty', () => {
+      const filterClauseIsNotEmpty = createFilterClause({
+        propertyId: 'propertyId',
+        condition: 'isNotEmpty',
+        values: ['Status']
+      });
+      const filterGroup = createFilterGroup({
+        operation: 'and',
+        filters: [filterClauseIsNotEmpty]
+      });
+      const templateFilter: IPropertyTemplate = {
+        id: filterClause.propertyId,
+        name: 'template',
+        type: 'multiSelect',
+        options: [
+          {
+            id: 'idOption',
+            value: '',
+            color: ''
+          }
+        ]
+      };
+      const result = CardFilter.propertiesThatMeetFilterGroup(filterGroup, [templateFilter]);
+      expect(result).toBeDefined();
+      expect(result.propertyId).toEqual(templateFilter.options[0].id);
     });
   });
   describe('verify propertiesThatMeetFilterGroup method', () => {
