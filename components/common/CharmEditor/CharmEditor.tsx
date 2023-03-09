@@ -49,6 +49,8 @@ import EmojiSuggest, * as emoji from './components/emojiSuggest';
 import { getSelectedChanges } from './components/fiduswriter/state_plugins/track';
 import fiduswriterStyles from './components/fiduswriter/styles';
 import { rejectAll } from './components/fiduswriter/track/rejectAll';
+import { File } from './components/file/File';
+import { plugins as filePlugins } from './components/file/file.plugins';
 import * as floatingMenu from './components/floatingMenu';
 import * as heading from './components/heading';
 import * as horizontalRule from './components/horizontalRule';
@@ -244,7 +246,8 @@ export function charmEditorPlugins({
     trailingNode.plugins(),
     videoPlugins(),
     iframe.plugins(),
-    markdownPlugins()
+    markdownPlugins(),
+    filePlugins()
   ];
 
   if (!readOnly) {
@@ -641,6 +644,9 @@ function CharmEditor({
           }
           case 'pdf': {
             return <ResizablePDF {...allProps} />;
+          }
+          case 'file': {
+            return <File {...allProps} />;
           }
           case 'bookmark': {
             return <BookmarkNodeView {...allProps} />;

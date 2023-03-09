@@ -13,6 +13,7 @@ import * as disclosure from './components/disclosure';
 import * as doc from './components/doc';
 import * as emoji from './components/emojiSuggest';
 import { deletion, formatChange, insertion } from './components/fiduswriter/schema/common/track';
+import { specs as fileSpecs } from './components/file/file.specs';
 import * as heading from './components/heading';
 import * as horizontalRule from './components/horizontalRule';
 import * as iframe from './components/iframe';
@@ -90,5 +91,6 @@ export const specRegistry = new SpecRegistry([
   textColor.spec(),
   nft.spec(),
   poll.spec(),
-  bookmarkSpec()
+  bookmarkSpec(),
+  fileSpecs() // NO
 ]);
