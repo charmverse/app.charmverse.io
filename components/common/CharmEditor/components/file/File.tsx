@@ -44,19 +44,13 @@ export function File({ node, readOnly, selected, deleteNode, updateAttrs }: Char
   }
 
   return (
-    <BlockNodeContainer readOnly={readOnly} onDelete={deleteNode} isSelected={selected}>
-      <Link
-        href={url}
-        external
-        target='_blank'
-        sx={{ overflow: 'hidden', display: 'inline-flex', alignItems: 'center', width: '100%' }}
-      >
+    <Link href={url} external target='_blank'>
+      <BlockNodeContainer readOnly={readOnly} onDelete={deleteNode} isSelected={selected}>
         <UploadFileIcon fontSize='small' color='secondary' sx={{ mr: 1.5 }} />
-
         <Typography color='secondary' alignItems='center' noWrap>
           {url}
         </Typography>
-      </Link>
-    </BlockNodeContainer>
+      </BlockNodeContainer>
+    </Link>
   );
 }
