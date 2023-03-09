@@ -283,7 +283,6 @@ const supportedChains: Blockchain[] = [
   'HARMONY',
   'HARMONY_DEVNET',
   'BSC',
-  'OPTIMISM',
   'GOERLI',
   'MUMBAI'
 ];

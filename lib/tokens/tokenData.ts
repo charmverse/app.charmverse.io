@@ -4,6 +4,7 @@ import { TokenLogoPaths, CryptoCurrencyList, getChainById } from 'connectors';
 
 import * as http from 'adapters/http';
 import { getAlchemyBaseUrl } from 'lib/blockchain/provider/alchemy';
+import log from 'lib/log';
 
 import type { SupportedChainId } from '../blockchain/provider/alchemy';
 
@@ -98,7 +99,15 @@ export function getTokenAndChainInfoFromPayments({
   } else {
     const chain = getChainById(chainId);
     if (!chain) {
-      throw new Error(`No chain found for chainId: ${chainId}`);
+      log.error(`No chain found for chainId: ${chainId}, returning ETH defaults`);
+      return {
+        chain: getChainById(1)!,
+        canonicalLogo: TokenLogoPaths.ETH,
+        tokenName: CryptoCurrencyList.ETH,
+        tokenSymbol: symbolOrAddress,
+        tokenLogo: TokenLogoPaths.ETH,
+        isContract: false
+      };
     }
     return {
       chain,
