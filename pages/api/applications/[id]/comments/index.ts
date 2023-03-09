@@ -7,7 +7,7 @@ import { prisma } from 'db';
 import { getApplicationDetails } from 'lib/applications/getApplicationDetails';
 import type { CreateApplicationCommentPayload } from 'lib/applications/interfaces';
 import { ActionNotPermittedError, NotFoundError, onError, onNoMatch, requireUser } from 'lib/middleware';
-import { computeUserPagePermissions } from 'lib/permissions/pages';
+import { computeBountyPermissions } from 'lib/permissions/bounties';
 import { withSessionRoute } from 'lib/session/withSession';
 import { DataNotFoundError } from 'lib/utilities/errors';
 
@@ -32,26 +32,22 @@ async function createApplicationCommentController(req: NextApiRequest, res: Next
     throw new DataNotFoundError(`Bounty not found`);
   }
 
-  const pagePermissions = await computeUserPagePermissions({
-    resourceId: bounty.page.id,
-    userId: req.session.user.id
-  });
+  const bountyPermissions = await computeBountyPermissions({ resourceId: bounty.id, userId, allowAdminBypass: false });
 
-  if (pagePermissions.comment !== true && application.createdBy !== userId) {
+  if (application.createdBy === userId || bountyPermissions.review) {
+    const pageComment = await prisma.pageComment.create({
+      data: {
+        content: content ?? Prisma.JsonNull,
+        parentId: applicationId,
+        pageId: bounty.page.id,
+        contentText,
+        createdBy: userId
+      }
+    });
+    return res.status(201).json(pageComment);
+  } else {
     throw new ActionNotPermittedError();
   }
-
-  const pageComment = await prisma.pageComment.create({
-    data: {
-      content: content ?? Prisma.JsonNull,
-      parentId: applicationId,
-      pageId: bounty.page.id,
-      contentText,
-      createdBy: userId
-    }
-  });
-
-  return res.status(201).json(pageComment);
 }
 
 async function getApplicationCommentsController(req: NextApiRequest, res: NextApiResponse<PageComment[]>) {
@@ -70,25 +66,22 @@ async function getApplicationCommentsController(req: NextApiRequest, res: NextAp
     throw new DataNotFoundError(`Bounty not found`);
   }
 
-  const pagePermissions = await computeUserPagePermissions({
-    resourceId: bounty.page.id,
-    userId
-  });
+  const bountyPermissions = await computeBountyPermissions({ resourceId: bounty.id, userId, allowAdminBypass: false });
 
-  if (pagePermissions.read !== true) {
+  if (application.createdBy === userId || bountyPermissions.review) {
+    const pageComments = await prisma.pageComment.findMany({
+      where: {
+        parentId: applicationId
+      },
+      orderBy: {
+        createdAt: 'desc'
+      }
+    });
+
+    return res.status(200).json(pageComments);
+  } else {
     throw new ActionNotPermittedError();
   }
-
-  const pageComments = await prisma.pageComment.findMany({
-    where: {
-      parentId: applicationId
-    },
-    orderBy: {
-      createdAt: 'desc'
-    }
-  });
-
-  return res.status(201).json(pageComments);
 }
 
 export default withSessionRoute(handler);

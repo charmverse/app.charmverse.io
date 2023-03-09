@@ -32,6 +32,7 @@ import { getPagePath } from 'lib/pages/utils';
 import type { BountyPermissions } from 'lib/permissions/bounties';
 import type { TargetPermissionGroup } from 'lib/permissions/interfaces';
 import type { ProposalReviewerInput, ProposalWithUsers } from 'lib/proposal/interface';
+import { emptyDocument } from 'lib/prosemirror/constants';
 import { sessionUserRelations } from 'lib/session/config';
 import { createUserFromWallet } from 'lib/users/createUser';
 import { uniqueValues } from 'lib/utilities/array';
@@ -442,7 +443,33 @@ export async function generateBountyWithSingleApplication({
 
   const user = await prisma.user.findUnique({ where: { id: userId }, include: { wallets: true } });
 
-  const createdApp = await prisma.application.create({
+  const createdApp = await generateBountyApplication({
+    applicationStatus,
+    bountyId: createdBounty.id,
+    spaceId,
+    userId,
+    walletAddress: user?.wallets[0]?.address
+  });
+
+  createdBounty.applications = [createdApp];
+
+  return createdBounty;
+}
+
+export async function generateBountyApplication({
+  applicationStatus,
+  bountyId,
+  spaceId,
+  userId,
+  walletAddress
+}: {
+  spaceId: string;
+  userId: string;
+  bountyId: string;
+  applicationStatus: ApplicationStatus;
+  walletAddress?: string;
+}) {
+  const createdApplication = await prisma.application.create({
     data: {
       spaceId,
       applicant: {
@@ -452,19 +479,17 @@ export async function generateBountyWithSingleApplication({
       },
       bounty: {
         connect: {
-          id: createdBounty.id
+          id: bountyId
         }
       },
-      walletAddress: user?.wallets[0]?.address,
+      walletAddress,
       message: 'I can do this!',
       // Other important variable
       status: applicationStatus
     }
   });
 
-  createdBounty.applications = [createdApp];
-
-  return createdBounty;
+  return createdApplication;
 }
 
 /**
@@ -1053,4 +1078,24 @@ export async function createPost(
     }
   });
   return forumPost;
+}
+
+export async function generateApplicationComment({
+  userId,
+  applicationId,
+  bountyId
+}: {
+  bountyId: string;
+  applicationId: string;
+  userId: string;
+}) {
+  return prisma.pageComment.create({
+    data: {
+      content: emptyDocument,
+      contentText: '',
+      createdBy: userId,
+      parentId: applicationId,
+      pageId: bountyId
+    }
+  });
 }

@@ -7,7 +7,6 @@ import { prisma } from 'db';
 import { getApplicationDetails } from 'lib/applications/getApplicationDetails';
 import type { CreateApplicationCommentPayload } from 'lib/applications/interfaces';
 import { ActionNotPermittedError, NotFoundError, onError, onNoMatch, requireUser } from 'lib/middleware';
-import { computeUserPagePermissions } from 'lib/permissions/pages';
 import { withSessionRoute } from 'lib/session/withSession';
 import { DataNotFoundError } from 'lib/utilities/errors';
 
@@ -27,17 +26,6 @@ async function updateApplicationCommentController(req: NextApiRequest, res: Next
     throw new NotFoundError(`Application with id ${applicationId} not found`);
   }
 
-  const bounty = application?.bounty;
-
-  if (!bounty || !bounty.page) {
-    throw new DataNotFoundError(`Bounty not found`);
-  }
-
-  const pagePermissions = await computeUserPagePermissions({
-    resourceId: bounty.page.id,
-    userId
-  });
-
   const pageComment = await prisma.pageComment.findUnique({
     where: {
       id: commentId
@@ -51,7 +39,7 @@ async function updateApplicationCommentController(req: NextApiRequest, res: Next
     throw new DataNotFoundError(`Comment with id ${commentId} not found`);
   }
 
-  if (pagePermissions.comment !== true || pageComment.createdBy !== userId) {
+  if (pageComment.createdBy !== userId) {
     throw new ActionNotPermittedError();
   }
 
@@ -65,7 +53,7 @@ async function updateApplicationCommentController(req: NextApiRequest, res: Next
     }
   });
 
-  return res.status(201).json(updatedPageComment);
+  return res.status(200).json(updatedPageComment);
 }
 
 export default withSessionRoute(handler);
