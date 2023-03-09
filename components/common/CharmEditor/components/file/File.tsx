@@ -1,17 +1,20 @@
 import UploadFileIcon from '@mui/icons-material/UploadFile';
+import { Typography } from '@mui/material';
 import { useMemo } from 'react';
 
+import { BlockNodeContainer } from 'components/common/CharmEditor/components/common/BlockNodeContainer';
 import { EmptyEmbed } from 'components/common/CharmEditor/components/common/EmptyEmbed';
 import { MediaSelectionPopup } from 'components/common/CharmEditor/components/common/MediaSelectionPopup';
 import { FileUploadForm } from 'components/common/CharmEditor/components/file/FileUploadForm';
 import type { CharmNodeViewProps } from 'components/common/CharmEditor/components/nodeView/nodeView';
+import Link from 'components/common/Link';
 import MultiTabs from 'components/common/MultiTabs';
 
-export function File({ node, readOnly, selected, deleteNode }: CharmNodeViewProps) {
+export function File({ node, readOnly, selected, deleteNode, updateAttrs }: CharmNodeViewProps) {
   const url: string = useMemo(() => node.attrs.src, [node.attrs.src]);
 
   const onUploadComplete = (uploadedUrl: string) => {
-    // add file url to node
+    updateAttrs({ src: uploadedUrl });
   };
 
   if (!url) {
@@ -40,5 +43,20 @@ export function File({ node, readOnly, selected, deleteNode }: CharmNodeViewProp
     }
   }
 
-  return <div>file</div>;
+  return (
+    <BlockNodeContainer readOnly={readOnly} onDelete={deleteNode} isSelected={selected}>
+      <Link
+        href={url}
+        external
+        target='_blank'
+        sx={{ overflow: 'hidden', display: 'inline-flex', alignItems: 'center', width: '100%' }}
+      >
+        <UploadFileIcon fontSize='small' color='secondary' sx={{ mr: 1.5 }} />
+
+        <Typography color='secondary' alignItems='center' noWrap>
+          {url}
+        </Typography>
+      </Link>
+    </BlockNodeContainer>
+  );
 }
