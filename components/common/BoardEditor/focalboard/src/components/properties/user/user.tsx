@@ -15,6 +15,7 @@ type Props = {
 
 const StyledUserPropertyContainer = styled(Box)`
   width: 100%;
+  overflow: hidden;
   & .MuiInputBase-root,
   & input.MuiInputBase-input {
     background: inherit;
@@ -45,6 +46,7 @@ function arrayEquals<T>(a: T[], b: T[]) {
 
 function UserProperty(props: Props): JSX.Element | null {
   const [memberIds, setMemberIds] = useState(props.memberIds);
+
   const [isOpen, setIsOpen] = useState(false);
   return (
     <StyledUserPropertyContainer onClick={() => setIsOpen(true)}>

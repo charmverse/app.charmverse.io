@@ -1,6 +1,6 @@
-import type { AutocompleteChangeReason, AutocompleteProps } from '@mui/material';
-import { Popper, Autocomplete, TextField } from '@mui/material';
-import { useEffect, useState } from 'react';
+import type { AutocompleteChangeReason, AutocompleteProps, PopperProps } from '@mui/material';
+import { Autocomplete, Popper, TextField } from '@mui/material';
+import { useCallback, useEffect, useState } from 'react';
 
 import UserDisplay from 'components/common/UserDisplay';
 import { useMembers } from 'hooks/useMembers';
@@ -41,6 +41,10 @@ export function InputSearchMemberBase({
   ...props
 }: Props) {
   const filteredOptions = filter ? filterMembers(options, filter) : options;
+  const PopperComponent = useCallback((popperProps: PopperProps) => {
+    return <Popper {...popperProps} sx={{ ...popperProps.sx, minWidth: 300 }} />;
+  }, []);
+
   return (
     <Autocomplete
       disabled={options.length === 0}
@@ -54,6 +58,7 @@ export function InputSearchMemberBase({
       getOptionLabel={(user) => (user as Member)?.username}
       renderOption={(_props, user) => <UserDisplay {...(_props as any)} user={user} />}
       noOptionsText='No options available'
+      PopperComponent={PopperComponent}
       renderInput={(params) => (
         <TextField
           {...params}
