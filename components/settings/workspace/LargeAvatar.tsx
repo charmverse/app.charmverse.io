@@ -78,7 +78,7 @@ export default function LargeAvatar(props: LargeAvatarProps) {
     updateAvatar?.(userAvatar);
   }
 
-  function updateImageAvatar(url: string) {
+  function updateImageAvatar({ url }: { url: string }) {
     if (updateImage) {
       updateImage(url);
       return;
@@ -123,7 +123,7 @@ export default function LargeAvatar(props: LargeAvatarProps) {
                 <EditIcon fontSize='small' />
               </StyledIconButton>
               {image && (
-                <StyledIconButton key='delete-avatar' onClick={() => updateImageAvatar('')}>
+                <StyledIconButton key='delete-avatar' onClick={() => updateImageAvatar({ url: '' })}>
                   <DeleteOutlinedIcon fontSize='small' />
                 </StyledIconButton>
               )}
