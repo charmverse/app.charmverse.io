@@ -5,7 +5,7 @@ import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import type { IdentityType } from '@prisma/client';
 import { usePopupState } from 'material-ui-popup-state/hooks';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 
 import { WalletSelector } from 'components/_app/Web3ConnectionManager/components/WalletSelectorModal';
 import { ConnectorButton } from 'components/_app/Web3ConnectionManager/components/WalletSelectorModal/components/ConnectorButton';
@@ -41,7 +41,7 @@ function LoginHandler(props: DialogProps) {
 
   const { showMessage } = useSnackbar();
 
-  const [magicLinkSent, setMagicLinkSent] = useState(false);
+  const sendingMagicLink = useRef(false);
 
   const magicLinkPopup = usePopupState({ variant: 'popover', popupId: 'email-magic-link' });
 
@@ -66,13 +66,18 @@ function LoginHandler(props: DialogProps) {
   }
 
   async function handleMagicLinkRequest(email: string) {
-    // console.log('Handling magic link request');
-    try {
-      await requestMagicLinkViaFirebase({ email });
-      setMagicLinkSent(true);
-      showMessage('Magic link sent!', 'success');
-    } catch (err) {
-      handleLoginError(err);
+    if (sendingMagicLink.current === false) {
+      sendingMagicLink.current = true;
+      // console.log('Handling magic link request');
+      try {
+        await requestMagicLinkViaFirebase({ email });
+        showMessage(`Magic link sent. Please check your inbox for ${email}`, 'success');
+        magicLinkPopup.close();
+      } catch (err) {
+        handleLoginError(err);
+      } finally {
+        sendingMagicLink.current = false;
+      }
     }
   }
 
@@ -132,7 +137,7 @@ function LoginHandler(props: DialogProps) {
             onClick={magicLinkPopup.open}
             name='Connect with email'
             icon={<EmailIcon />}
-            disabled={magicLinkSent}
+            disabled={false}
             isActive={false}
             isLoading={false}
           />
