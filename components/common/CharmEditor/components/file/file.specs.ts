@@ -28,7 +28,15 @@ export function specs(): BaseRawNodeSpec {
       }
     },
     markdown: {
-      toMarkdown: () => null
+      toMarkdown: (state, node) => {
+        const { src, name } = node.attrs;
+
+        if (src) {
+          const toWrite = `![${name || ''}](${src})`;
+          state.text(toWrite, false);
+          state.ensureNewLine();
+        }
+      }
     }
   };
 }
