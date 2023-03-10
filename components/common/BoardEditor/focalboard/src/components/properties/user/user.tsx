@@ -1,7 +1,8 @@
 import styled from '@emotion/styled';
-import { Popover, Typography } from '@mui/material';
-import { Box } from '@mui/system';
-import { bindPopover, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
+import { Menu, Typography } from '@mui/material';
+import { Box, Stack } from '@mui/system';
+import type { MouseEvent } from 'react';
+import { useState } from 'react';
 
 import { InputSearchMemberMultiple } from 'components/common/form/InputSearchMember';
 import UserDisplay from 'components/common/UserDisplay';
@@ -27,13 +28,23 @@ const StyledUserPropertyContainer = styled(Box)`
 `;
 
 function UserProperty(props: Props): JSX.Element | null {
-  const popupState = usePopupState({ variant: 'popover', popupId: `user-property-members` });
-  const { memberIds = [] } = props;
+  // Using a local state to not close the dropdown after selecting an option
+  const [memberIds, setMemberIds] = useState(props.memberIds ?? []);
   const { members } = useMembers();
   const memberMap = members.reduce<Record<string, Member>>((acc, member) => {
     acc[member.id] = member;
     return acc;
   }, {});
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(() => {
+    return null;
+  });
+  const open = Boolean(anchorEl);
+  const handleClick = (event: MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
 
   if (props.readOnly) {
     if (memberIds.length === 0) {
@@ -54,9 +65,9 @@ function UserProperty(props: Props): JSX.Element | null {
   }
 
   return (
-    <>
+    <Stack onClick={handleClick}>
       {memberIds.length !== 0 ? (
-        <StyledUserPropertyContainer {...bindTrigger(popupState)}>
+        <StyledUserPropertyContainer>
           {memberIds.map((memberId) =>
             memberMap[memberId] ? (
               <div key={memberId} style={{ width: 'fit-content' }} className='UserProperty readonly octo-propertyvalue'>
@@ -67,7 +78,6 @@ function UserProperty(props: Props): JSX.Element | null {
         </StyledUserPropertyContainer>
       ) : (
         <Typography
-          {...bindTrigger(popupState)}
           component='span'
           variant='subtitle2'
           className='octo-propertyvalue'
@@ -76,21 +86,32 @@ function UserProperty(props: Props): JSX.Element | null {
           {props.showEmptyPlaceholder ? 'Empty' : ''}
         </Typography>
       )}
-      <Popover
-        {...bindPopover(popupState)}
+      <Menu
+        anchorEl={anchorEl}
+        open={open}
         PaperProps={{
           sx: { width: 300 }
         }}
+        onClose={(...a) => {
+          props.onChange(memberIds);
+          handleClose();
+        }}
       >
         <InputSearchMemberMultiple
+          disableCloseOnSelect
           defaultValue={memberIds}
+          onInputChange={(_, __, reason) => {
+            if (reason === 'clear') {
+              setMemberIds([]);
+            }
+          }}
           onChange={(_memberIds) => {
-            props.onChange(_memberIds);
+            setMemberIds(_memberIds);
           }}
           openOnFocus
         />
-      </Popover>
-    </>
+      </Menu>
+    </Stack>
   );
 }
 
