@@ -19,7 +19,7 @@ const StyledUserPropertyContainer = styled(Box)`
   }
 
   & .MuiAutocomplete-inputRoot.MuiInputBase-root.MuiOutlinedInput-root {
-    padding: 4px;
+    padding: 2px;
   }
 
   & fieldset.MuiOutlinedInput-notchedOutline {
@@ -31,7 +31,15 @@ const StyledUserPropertyContainer = styled(Box)`
   & button.MuiButtonBase-root[title='Close'] {
     display: none;
   }
+
+  & .MuiAutocomplete-tag {
+    margin: 2px;
+  }
 `;
+
+function arrayEquals<T>(a: T[], b: T[]) {
+  return a.length === b.length && a.every((val, index) => val === b[index]);
+}
 
 function UserProperty(props: Props): JSX.Element | null {
   const [memberIds, setMemberIds] = useState(props.memberIds);
@@ -49,7 +57,10 @@ function UserProperty(props: Props): JSX.Element | null {
           setMemberIds(_memberIds);
         }}
         onClose={() => {
-          props.onChange(memberIds);
+          // Reduce less flicker in the ui
+          if (!arrayEquals(memberIds, props.memberIds)) {
+            props.onChange(memberIds);
+          }
           setIsOpen(false);
         }}
         readOnly={props.readOnly}
