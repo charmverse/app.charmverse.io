@@ -161,7 +161,7 @@ function PropertyValueElement(props: Props): JSX.Element {
       />
     );
   } else if (propertyTemplate.type === 'createdBy') {
-    return <CreatedBy userID={card.createdBy} />;
+    return <CreatedBy userId={card.createdBy} />;
   } else if (propertyTemplate.type === 'updatedBy') {
     return <LastModifiedBy updatedBy={latestUpdated === 'card' ? card.updatedBy : updatedBy} />;
   } else if (propertyTemplate.type === 'createdTime') {
