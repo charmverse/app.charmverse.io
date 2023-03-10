@@ -40,7 +40,7 @@ async function multiPersonProperty() {
       const cardFields = (card.fields as CardFields);
       const currentPersonPropertyValue = cardFields.properties[boardPersonProperty.personPropertyId];
       if (typeof currentPersonPropertyValue === "string") {
-        cardFields.properties[boardPersonProperty.personPropertyId] = currentPersonPropertyValue ? [currentPersonPropertyValue as string] : []
+        cardFields.properties[boardPersonProperty.personPropertyId] = currentPersonPropertyValue ? [currentPersonPropertyValue] : []
         await prisma.block.update({
           where: {
             id: card.id
