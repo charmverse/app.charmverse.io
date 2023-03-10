@@ -37,9 +37,9 @@ import type { Board, BoardGroup, IPropertyOption, IPropertyTemplate } from 'lib/
 import type { BoardView, BoardViewFields } from 'lib/focalboard/boardView';
 import { createCard } from 'lib/focalboard/card';
 import type { Card, CardPage } from 'lib/focalboard/card';
+import { CardFilter } from 'lib/focalboard/cardFilter';
 import { createNewDataSource } from 'lib/pages/createNewDataSource';
 
-import { CardFilter } from '../cardFilter';
 import mutator from '../mutator';
 import { addCard as _addCard, addTemplate } from '../store/cards';
 import { updateView } from '../store/views';
@@ -224,6 +224,7 @@ function CenterPanel(props: Props) {
       activeView.fields.filter,
       activeBoard.fields.cardProperties
     );
+
     if ((activeView.fields.viewType === 'board' || activeView.fields.viewType === 'table') && groupByProperty) {
       if (groupByOptionId) {
         propertiesThatMeetFilters[groupByProperty.id] = groupByOptionId;

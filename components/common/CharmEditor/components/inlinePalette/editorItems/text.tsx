@@ -166,6 +166,7 @@ export function items(props: ItemsProps): PaletteItemTypeNoGroup[] {
           </svg>
         ),
         title: `Heading ${level}`,
+        keywords: [`h${level}`],
         description: `Create a heading level ${level}`,
         showInFloatingMenu: true,
         disabled: (state) => {

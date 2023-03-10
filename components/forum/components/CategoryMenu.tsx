@@ -22,10 +22,6 @@ import { postSortOptions } from 'lib/forums/posts/constants';
 import type { FilterProps } from './CategorySelect';
 import { ForumFilterListLink } from './ForumFilterListLink';
 
-const StyledBox = styled(Box)`
-  ${hoverIconsStyle({ marginForIcons: false })}
-`;
-
 export function CategoryMenu({ handleCategory, handleSort, selectedCategoryId, selectedSort = 'new' }: FilterProps) {
   const { categories, error, createForumCategory } = useForumCategories();
   const addCategoryPopupState = usePopupState({ variant: 'popover', popupId: 'add-category' });
@@ -51,28 +47,26 @@ export function CategoryMenu({ handleCategory, handleSort, selectedCategoryId, s
         }}
       >
         {postSortOptions.map((_sort) => (
-          <StyledBox key={_sort}>
-            <ForumFilterListLink
-              label={startCase(_sort.replace('_', ' '))}
-              isSelected={_sort === selectedSort}
-              value={_sort}
-              handleSelect={handleSort as (value?: string | PostSortOption) => void}
-            />
-          </StyledBox>
+          <ForumFilterListLink
+            key={_sort}
+            label={startCase(_sort.replace('_', ' '))}
+            isSelected={_sort === selectedSort}
+            value={_sort}
+            handleSelect={handleSort as (value?: string | PostSortOption) => void}
+          />
         ))}
 
         <Divider sx={{ my: 2 }} />
         <Stack mb={2}>
           <ForumFilterListLink label='All categories' isSelected={!selectedCategoryId} handleSelect={handleCategory} />
           {categories.map((category) => (
-            <StyledBox key={category.id}>
-              <ForumFilterListLink
-                label={category.name}
-                value={category.id}
-                isSelected={selectedCategoryId === category.id}
-                handleSelect={handleCategory}
-              />
-            </StyledBox>
+            <ForumFilterListLink
+              key={category.id}
+              label={category.name}
+              value={category.id}
+              isSelected={selectedCategoryId === category.id}
+              handleSelect={handleCategory}
+            />
           ))}
         </Stack>
         <Button

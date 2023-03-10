@@ -15,7 +15,7 @@ import type { IPagePermissionFlags } from 'lib/permissions/pages';
 
 type Props = {
   page: PageMeta;
-  permissions?: IPagePermissionFlags;
+  permissions: IPagePermissionFlags;
 };
 
 export function PageComments({ page, permissions }: Props) {
@@ -35,9 +35,9 @@ export function PageComments({ page, permissions }: Props) {
   const { proposal } = useProposalDetails(isProposal ? page.id : null);
 
   const commentPermissions: CommentPermissions = {
-    add_comment: permissions?.comment ?? false,
-    upvote: permissions?.comment ?? false,
-    downvote: permissions?.comment ?? false,
+    add_comment: permissions.comment ?? false,
+    upvote: permissions.comment ?? false,
+    downvote: permissions.comment ?? false,
     delete_comments: isAdmin
   };
 
@@ -49,7 +49,7 @@ export function PageComments({ page, permissions }: Props) {
     <>
       <Divider sx={{ my: 3 }} />
 
-      {permissions?.comment && <CommentForm handleCreateComment={addComment} />}
+      {permissions.comment && <CommentForm handleCreateComment={addComment} />}
 
       {isLoadingComments ? (
         <Box height={100}>
@@ -81,7 +81,7 @@ export function PageComments({ page, permissions }: Props) {
                 No Comments Yet
               </Typography>
 
-              {permissions?.comment && <Typography color='secondary'>Be the first to share what you think!</Typography>}
+              {permissions.comment && <Typography color='secondary'>Be the first to share what you think!</Typography>}
             </Stack>
           )}
         </>

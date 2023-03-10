@@ -1,6 +1,6 @@
-import { ListItem, Typography } from '@mui/material';
+import { Typography } from '@mui/material';
 
-import BlockAligner from '../BlockAligner';
+import { BlockNodeContainer } from 'components/common/CharmEditor/components/common/BlockNodeContainer';
 
 export type EmptyContentProps = {
   onDelete: () => void;
@@ -10,24 +10,13 @@ export type EmptyContentProps = {
   readOnly?: boolean;
 };
 
-export function EmptyEmbed(props: EmptyContentProps) {
+export function EmptyEmbed({ buttonText, icon, ...containerProps }: EmptyContentProps) {
   return (
-    <BlockAligner readOnly={props.readOnly} onDelete={props.onDelete}>
-      <ListItem
-        button
-        sx={{
-          backgroundColor: props.isSelected ? 'var(--charmeditor-active)' : 'background.light',
-          p: 2,
-          display: 'flex',
-          borderRadius: 0.5,
-          my: 0.5
-        }}
-      >
-        <Typography color='secondary' display='flex' gap={1.5} width='100%' alignItems='center'>
-          {props.icon}
-          <span>{props.buttonText}</span>
-        </Typography>
-      </ListItem>
-    </BlockAligner>
+    <BlockNodeContainer {...containerProps}>
+      <Typography color='secondary' display='flex' gap={1.5} width='100%' alignItems='center'>
+        {icon}
+        <span>{buttonText}</span>
+      </Typography>
+    </BlockNodeContainer>
   );
 }

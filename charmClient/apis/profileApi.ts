@@ -2,6 +2,8 @@ import type { ProfileItem } from '@prisma/client';
 
 import * as http from 'adapters/http';
 import type { UserCommunity } from 'lib/profile';
+import type { SetForumCategoryNotificationInput } from 'lib/userNotifications/setForumCategoryNotification';
+import type { ClientUserSpaceNotifications } from 'lib/userNotifications/spaceNotifications';
 import type { UserAvatar } from 'lib/users/interfaces';
 import type { LoggedInUser } from 'models';
 
@@ -20,5 +22,13 @@ export class ProfileApi {
 
   getOrgs(userId: string) {
     return http.GET<UserCommunity[]>(`/api/profile/orgs/${userId}`);
+  }
+
+  getSpaceNotifications(input: { spaceId: string }) {
+    return http.GET<ClientUserSpaceNotifications>('/api/profile/space-notifications', input);
+  }
+
+  setForumCategoryNotification(input: Omit<SetForumCategoryNotificationInput, 'userId'>) {
+    return http.PUT('/api/profile/space-notifications/set-forum-category', input);
   }
 }

@@ -117,7 +117,7 @@ function imageSpec(): RawSpecs {
         const { src } = node.attrs;
 
         if (src) {
-          const toWrite = `![](${src})`;
+          const toWrite = `[](${src})`;
           state.text(toWrite, false);
           state.ensureNewLine();
         }
