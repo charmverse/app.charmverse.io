@@ -1,8 +1,9 @@
-import type { Application, Space } from '@prisma/client';
+import type { Application, PageComment, Space } from '@prisma/client';
 
 import * as http from 'adapters/http';
 import type {
   ApplicationWithTransactions,
+  CreateApplicationCommentPayload,
   ReviewDecision,
   SubmissionContent,
   SubmissionCreationData
@@ -106,5 +107,21 @@ export class BountiesApi {
     return http.POST<Space>(`/api/spaces/${spaceId}/set-public-bounty-board`, {
       publicBountyBoard
     });
+  }
+
+  addApplicationComment(applicationId: string, payload: CreateApplicationCommentPayload) {
+    return http.POST<PageComment>(`/api/applications/${applicationId}/comments`, payload);
+  }
+
+  deleteApplicationComment(applicationId: string, pageCommentId: string) {
+    return http.DELETE(`/api/applications/${applicationId}/comments/${pageCommentId}`);
+  }
+
+  editApplicationComment(applicationId: string, pageCommentId: string, payload: CreateApplicationCommentPayload) {
+    return http.PUT<PageComment>(`/api/applications/${applicationId}/comments/${pageCommentId}`, payload);
+  }
+
+  getApplicationComments(applicationId: string) {
+    return http.GET<PageComment[]>(`/api/applications/${applicationId}/comments`);
   }
 }

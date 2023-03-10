@@ -12,7 +12,7 @@ import { DataNotFoundError } from 'lib/utilities/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireUser).put(updateApplicationCommentController);
+handler.use(requireUser).put(updateApplicationCommentController).delete(deleteApplicationCommentController);
 
 async function updateApplicationCommentController(req: NextApiRequest, res: NextApiResponse<PageComment>) {
   const { contentText, content } = req.body as CreateApplicationCommentPayload;
@@ -54,6 +54,43 @@ async function updateApplicationCommentController(req: NextApiRequest, res: Next
   });
 
   return res.status(200).json(updatedPageComment);
+}
+
+async function deleteApplicationCommentController(req: NextApiRequest, res: NextApiResponse) {
+  const { id: userId } = req.session.user;
+  const applicationId = req.query.id as string;
+  const commentId = req.query.commentId as string;
+
+  const application = await getApplicationDetails(applicationId);
+
+  if (!application) {
+    throw new NotFoundError(`Application with id ${applicationId} not found`);
+  }
+
+  const pageComment = await prisma.pageComment.findUnique({
+    where: {
+      id: commentId
+    },
+    select: {
+      createdBy: true
+    }
+  });
+
+  if (!pageComment) {
+    throw new DataNotFoundError(`Comment with id ${commentId} not found`);
+  }
+
+  if (pageComment.createdBy !== userId) {
+    throw new ActionNotPermittedError();
+  }
+
+  await prisma.pageComment.delete({
+    where: {
+      id: commentId
+    }
+  });
+
+  return res.end();
 }
 
 export default withSessionRoute(handler);

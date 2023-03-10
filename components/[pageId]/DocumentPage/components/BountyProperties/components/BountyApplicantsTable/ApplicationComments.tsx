@@ -37,7 +37,7 @@ export function ApplicationComments({
     isLoading,
     mutate: refetchApplicationComments
   } = useSWR(`/application/${applicationId}/comments`, () =>
-    charmClient.applicationComments.getComments(applicationId)
+    charmClient.bounties.getApplicationComments(applicationId)
   );
   const member = members.find((c) => c.id === createdBy);
   const { showMemberProfile } = useMemberProfile();
@@ -52,7 +52,7 @@ export function ApplicationComments({
 
   async function onSendClicked(editorOutput: ICharmEditorOutput) {
     resetInput();
-    const applicationComment = await charmClient.applicationComments.addComment(applicationId, {
+    const applicationComment = await charmClient.bounties.addApplicationComment(applicationId, {
       content: editorOutput.doc,
       contentText: editorOutput.rawText
     });
@@ -65,7 +65,7 @@ export function ApplicationComments({
   }
 
   async function updateComment(pageCommentId: string, editorOutput: ICharmEditorOutput) {
-    const updatedComment = await charmClient.applicationComments.editComment(applicationId, pageCommentId, {
+    const updatedComment = await charmClient.bounties.editApplicationComment(applicationId, pageCommentId, {
       content: editorOutput.doc,
       contentText: editorOutput.rawText
     });
