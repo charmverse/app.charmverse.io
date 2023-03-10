@@ -11,7 +11,6 @@ import { isTruthy } from 'lib/utilities/types';
 
 interface NewCommentProps {
   initialValue?: ICharmEditorOutput | null;
-  $key?: string | number;
   username?: string;
   avatar?: string | null;
   onSubmit: (editorOutput: ICharmEditorOutput) => void;
@@ -32,7 +31,6 @@ const StyleContainer = styled(Box)`
 export function ApplicationCommentForm({
   disabled = false,
   initialValue,
-  $key,
   username,
   avatar,
   onSubmit,
@@ -48,7 +46,6 @@ export function ApplicationCommentForm({
       {!hideAvatar && <Avatar size='xSmall' name={username} avatar={avatar} />}
       <InlineCharmEditor
         content={newComment?.doc}
-        key={$key} // use the size of comments so it resets when the new one is added
         onContentChange={({ doc, rawText }) => {
           setTouched(true);
           setNewComment({ doc, rawText });

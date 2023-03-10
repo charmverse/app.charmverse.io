@@ -151,7 +151,6 @@ export function ApplicationComments({
             <strong>Send a message (optional)</strong>
           </FormLabel>
           <ApplicationCommentForm
-            $key={editorKey}
             key={editorKey}
             initialValue={
               user?.id
