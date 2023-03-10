@@ -9,7 +9,7 @@ type Props = {
 function CreatedBy(props: Props): JSX.Element {
   return (
     <UserProperty
-      value={props.userID}
+      memberIds={[props.userID]}
       readOnly={true} // created by is an immutable property, so will always be readonly
       onChange={() => {}}
     />
