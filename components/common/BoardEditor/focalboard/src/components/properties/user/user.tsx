@@ -1,5 +1,4 @@
 import styled from '@emotion/styled';
-import { ClickAwayListener } from '@mui/material';
 import { Box } from '@mui/system';
 import { useState } from 'react';
 
@@ -36,20 +35,27 @@ const StyledUserPropertyContainer = styled(Box)`
 
 function UserProperty(props: Props): JSX.Element | null {
   const [memberIds, setMemberIds] = useState(props.memberIds);
+  const [isOpen, setIsOpen] = useState(false);
   return (
-    <ClickAwayListener onClickAway={() => props.onChange(memberIds)}>
-      <StyledUserPropertyContainer>
-        <InputSearchMemberMultiple
-          disableCloseOnSelect
-          defaultValue={memberIds}
-          onChange={(_memberIds) => {
-            setMemberIds(_memberIds);
-          }}
-          readOnly={props.readOnly}
-          placeholder={props.showEmptyPlaceholder && memberIds.length === 0 ? 'Empty' : ''}
-        />
-      </StyledUserPropertyContainer>
-    </ClickAwayListener>
+    <StyledUserPropertyContainer onClick={() => setIsOpen(true)}>
+      <InputSearchMemberMultiple
+        open={isOpen}
+        disableCloseOnSelect
+        defaultValue={memberIds}
+        onChange={(_memberIds, reason) => {
+          if (reason === 'removeOption' && !isOpen) {
+            props.onChange(_memberIds);
+          }
+          setMemberIds(_memberIds);
+        }}
+        onClose={() => {
+          props.onChange(memberIds);
+          setIsOpen(false);
+        }}
+        readOnly={props.readOnly}
+        placeholder={props.showEmptyPlaceholder && memberIds.length === 0 ? 'Empty' : ''}
+      />
+    </StyledUserPropertyContainer>
   );
 }
 

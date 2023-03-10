@@ -1,5 +1,5 @@
-import type { AutocompleteProps } from '@mui/material';
-import { Autocomplete, TextField } from '@mui/material';
+import type { AutocompleteChangeReason, AutocompleteProps } from '@mui/material';
+import { Popper, Autocomplete, TextField } from '@mui/material';
 import { useEffect, useState } from 'react';
 
 import UserDisplay from 'components/common/UserDisplay';
@@ -41,28 +41,6 @@ export function InputSearchMemberBase({
   ...props
 }: Props) {
   const filteredOptions = filter ? filterMembers(options, filter) : options;
-  const [open, setOpen] = useState(false);
-
-  // delay showing autocomplete list to position it correctly for popper context
-  useEffect(() => {
-    if (openOnFocus) {
-      const timeout = setTimeout(() => {
-        setOpen(true);
-      }, 125);
-
-      return () => {
-        clearTimeout(timeout);
-      };
-    }
-  }, [openOnFocus]);
-
-  // Controlled open state
-  const autocompleteProps = openOnFocus
-    ? {
-        open
-      }
-    : {};
-
   return (
     <Autocomplete
       disabled={options.length === 0}
@@ -87,7 +65,6 @@ export function InputSearchMemberBase({
           }}
         />
       )}
-      {...autocompleteProps}
       {...props}
     />
   );
@@ -138,7 +115,7 @@ export function InputSearchMember({ defaultValue, onChange, onClear, openOnFocus
 
 interface IInputSearchMemberMultipleProps
   extends Partial<Omit<AutocompleteProps<Member, boolean, boolean, boolean>, 'onChange'>> {
-  onChange: (id: string[]) => void;
+  onChange: (id: string[], reason: AutocompleteChangeReason) => void;
   defaultValue?: string[];
   filter?: IMembersFilter;
   disableCloseOnSelect?: boolean;
@@ -153,8 +130,11 @@ export function InputSearchMemberMultiple({
   const { members } = useMembers();
   const [value, setValue] = useState<Member[]>([]);
 
-  function emitValue(users: Member[]) {
-    onChange(users.map((user) => user.id));
+  function emitValue(users: Member[], reason: AutocompleteChangeReason) {
+    onChange(
+      users.map((user) => user.id),
+      reason
+    );
     setValue(users);
   }
 
@@ -174,7 +154,7 @@ export function InputSearchMemberMultiple({
       placeholder='Select users'
       value={value}
       disableCloseOnSelect={disableCloseOnSelect}
-      onChange={(e, _value) => emitValue(_value as Member[])}
+      onChange={(e, _value, reason) => emitValue(_value as Member[], reason)}
       {...props}
       options={members}
     />
