@@ -37,7 +37,7 @@ interface IPropertyTemplate {
   options: IPropertyOption[];
 }
 
-type BoardFields = {
+export type BoardFields = {
   icon: string;
   description: PageContent;
   showDescription?: boolean;

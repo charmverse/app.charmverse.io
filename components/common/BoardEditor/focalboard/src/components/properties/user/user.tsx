@@ -1,88 +1,77 @@
 import styled from '@emotion/styled';
-import { Popover, Typography } from '@mui/material';
 import { Box } from '@mui/system';
-import { bindPopover, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
+import { useState } from 'react';
 
-import { InputSearchMember } from 'components/common/form/InputSearchMember';
+import { InputSearchMemberMultiple } from 'components/common/form/InputSearchMember';
 import UserDisplay from 'components/common/UserDisplay';
-import { useMembers } from 'hooks/useMembers';
 import type { Member } from 'lib/members/interfaces';
 
 type Props = {
-  value: string;
+  memberIds: string[];
   readOnly: boolean;
-  onChange: (value: string) => void;
+  onChange: (memberIds: string[]) => void;
   showEmptyPlaceholder?: boolean;
 };
 
 const StyledUserPropertyContainer = styled(Box)`
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
   width: 100%;
-  height: 100%;
-  display: flex;
-`;
-
-function UserProperty(props: Props): JSX.Element | null {
-  const popupState = usePopupState({ variant: 'popover', popupId: `user-property-members` });
-
-  const { members } = useMembers();
-  const memberMap = members.reduce<Record<string, Member>>((acc, member) => {
-    acc[member.id] = member;
-    return acc;
-  }, {});
-
-  if (props.readOnly) {
-    if (memberMap[props.value]) {
-      return (
-        <StyledUserPropertyContainer>
-          <div className='UserProperty readonly octo-propertyvalue'>
-            <UserDisplay user={memberMap[props.value]} avatarSize='xSmall' fontSize='small' />
-          </div>
-        </StyledUserPropertyContainer>
-      );
-    }
-    return null;
+  overflow: hidden;
+  & .MuiInputBase-root,
+  & input.MuiInputBase-input {
+    background: inherit;
   }
 
+  & .MuiAutocomplete-inputRoot.MuiInputBase-root.MuiOutlinedInput-root {
+    padding: 2px;
+  }
+
+  & fieldset.MuiOutlinedInput-notchedOutline {
+    border: none;
+    outline: none;
+  }
+
+  & button.MuiButtonBase-root[title='Open'],
+  & button.MuiButtonBase-root[title='Close'] {
+    display: none;
+  }
+
+  & .MuiAutocomplete-tag {
+    margin: 2px;
+  }
+`;
+
+function arrayEquals<T>(a: T[], b: T[]) {
+  return a.length === b.length && a.every((val, index) => val === b[index]);
+}
+
+function UserProperty(props: Props): JSX.Element | null {
+  const [memberIds, setMemberIds] = useState(props.memberIds);
+
+  const [isOpen, setIsOpen] = useState(false);
   return (
-    <>
-      {memberMap[props.value] ? (
-        <StyledUserPropertyContainer {...bindTrigger(popupState)}>
-          <div className='UserProperty readonly octo-propertyvalue'>
-            <UserDisplay user={memberMap[props.value]} avatarSize='xSmall' fontSize='small' />
-          </div>
-        </StyledUserPropertyContainer>
-      ) : (
-        <Typography
-          {...bindTrigger(popupState)}
-          component='span'
-          variant='subtitle2'
-          className='octo-propertyvalue'
-          sx={{ opacity: 0.4, pl: '2px', width: '100%', height: '100%' }}
-        >
-          {props.showEmptyPlaceholder ? 'Empty' : ''}
-        </Typography>
-      )}
-      <Popover
-        {...bindPopover(popupState)}
-        PaperProps={{
-          sx: { width: 300 }
+    <StyledUserPropertyContainer onClick={() => setIsOpen(true)}>
+      <InputSearchMemberMultiple
+        open={isOpen}
+        disableCloseOnSelect
+        defaultValue={memberIds}
+        onChange={(_memberIds, reason) => {
+          if (reason === 'removeOption' && !isOpen) {
+            props.onChange(_memberIds);
+          }
+          setMemberIds(_memberIds);
         }}
-      >
-        <InputSearchMember
-          defaultValue={memberMap[props.value]?.id ?? null}
-          onChange={(memberId) => {
-            props.onChange(memberId);
-          }}
-          openOnFocus
-          onClear={() => {
-            props.onChange('');
-          }}
-        />
-      </Popover>
-    </>
+        onClose={() => {
+          // Reduce less flicker in the ui
+          if (!arrayEquals(memberIds, props.memberIds)) {
+            props.onChange(memberIds);
+          }
+          setIsOpen(false);
+        }}
+        getOptionLabel={(user) => (<UserDisplay avatarSize='xSmall' user={user as Member} />) as any}
+        readOnly={props.readOnly}
+        placeholder={props.showEmptyPlaceholder && memberIds.length === 0 ? 'Empty' : ''}
+      />
+    </StyledUserPropertyContainer>
   );
 }
 
