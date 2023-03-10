@@ -31,15 +31,9 @@ const NestedPageContainer = styled(Link)`
   }
 `;
 
-const StyledTypography = styled(Typography, {
-  shouldForwardProp: (prop) => prop !== 'showBorderBottom'
-})<{ showBorderBottom?: boolean }>`
+const StyledTypography = styled(Typography)`
   font-weight: 600;
-  ${({ showBorderBottom }) =>
-    showBorderBottom &&
-    `
-    border-bottom: 0.05em solid var(--link-underline);
-  `}
+  border-bottom: 0.05em solid var(--link-underline);
 `;
 
 export default function NestedPage({ node, currentPageId }: NodeViewProps & { currentPageId?: string }) {
@@ -73,9 +67,7 @@ export default function NestedPage({ node, currentPageId }: NodeViewProps & { cu
           />
         )}
       </div>
-      <StyledTypography showBorderBottom={isLinkedPage}>
-        {nestedPage ? nestedPage.title || 'Untitled' : 'Page not found'}
-      </StyledTypography>
+      <StyledTypography>{nestedPage ? nestedPage.title || 'Untitled' : 'Page not found'}</StyledTypography>
     </NestedPageContainer>
   );
 }
