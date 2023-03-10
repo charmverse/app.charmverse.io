@@ -3,16 +3,15 @@ import { initializeApp } from 'firebase/app';
 import {
   getAuth,
   GoogleAuthProvider,
-  signInWithPopup,
-  sendSignInLinkToEmail,
   isSignInWithEmailLink,
-  signInWithEmailLink
+  sendSignInLinkToEmail,
+  signInWithEmailLink,
+  signInWithPopup
 } from 'firebase/auth';
 import { useEffect, useState } from 'react';
 
 import charmClient from 'charmClient';
 import { googleWebClientConfig } from 'config/constants';
-import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import type { LoginWithGoogleRequest } from 'lib/google/loginWithGoogle';
 import log from 'lib/log';
@@ -28,8 +27,6 @@ export function useFirebaseAuth() {
   const [provider] = useState(new GoogleAuthProvider());
   const { user, setUser } = useUser();
   const [emailForSignIn, setEmailForSignIn] = useLocalStorage('emailForSignIn', '');
-
-  const { showMessage } = useSnackbar();
 
   const [isConnectingGoogle, setIsConnectingGoogle] = useState(false);
   useEffect(() => {
@@ -122,52 +119,42 @@ export function useFirebaseAuth() {
     auth.languageCode = 'en';
 
     const actionCodeSettings = {
-      url: `${window.location.origin}/authenticate?strategy=email`,
+      url: `${window.location.origin}/authenticate`,
       handleCodeInApp: true
     };
 
-    // Always set this, so a prevuous email is overwritten
+    // Always set this, so a previous email is overwritten
     setEmailForSignIn(email);
 
-    sendSignInLinkToEmail(auth, email, actionCodeSettings)
-      // .then((success) => {
-      //   // The link was successfully sent. Inform the user.
-      //   // Save the email locally so you don't need to ask the user for it again
-      //   // if they open the link on the same device.
-      //   // ...
-      // })
-      .catch((error) => {
-        const errorMessage = error.message;
-        showMessage(errorMessage, 'error');
-        // ...
-      });
+    await sendSignInLinkToEmail(auth, email, actionCodeSettings);
   }
 
+  /**
+   * Validate the data from a magic link, and login the user
+   */
   async function validateMagicLink() {
     const email = emailForSignIn;
 
-    // console.log('Signing in with email', email);
-
     if (!email) {
-      throw new InvalidInputError(`No email found in local storage`);
+      throw new InvalidInputError(`Could not login`);
     }
 
     const auth = getAuth(firebaseApp);
     auth.languageCode = 'en';
 
     if (isSignInWithEmailLink(auth, window.location.href)) {
-      signInWithEmailLink(auth, email, window.location.href)
-        .then((result) => {
-          // This is where we should make a call to API to login the profile
-          // console.log('Login result', result);
-        })
-        .catch((error) => {
-          // console.log('Login error', error);
-        });
+      const result = await signInWithEmailLink(auth, email, window.location.href);
 
-      // The client SDK will parse the code from the link for you.
+      const token = await result.user.getIdToken();
+
+      const loggedInUser = await charmClient.google.authenticateMagicLink({
+        accessToken: token,
+        avatarUrl: result.user.photoURL as string,
+        displayName: result.user.displayName as string
+      });
+
+      setUser(loggedInUser);
     }
-    // The client SDK will parse the code from the link for you.
   }
 
   return {

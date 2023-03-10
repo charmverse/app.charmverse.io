@@ -1,51 +1,62 @@
 import Box from '@mui/material/Box';
-import { getAuth, isSignInWithEmailLink, signInWithEmailLink } from 'firebase/auth';
-import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 
 import ErrorPage from 'components/common/errors/ErrorPage';
+import Link from 'components/common/Link';
 import LoadingComponent from 'components/common/LoadingComponent';
-import { CollectEmailDialog } from 'components/login/CollectEmail';
 import { useFirebaseAuth } from 'hooks/useFirebaseAuth';
+import { useSnackbar } from 'hooks/useSnackbar';
+import { useUser } from 'hooks/useUser';
+import type { SystemError } from 'lib/utilities/errors';
 
 export default function Authenticate() {
-  const [error, setError] = useState(null);
-  const emailDialog = usePopupState({ variant: 'popover', popupId: 'email-magic-link' });
+  const [error, setError] = useState<SystemError | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const { user, isLoaded } = useUser();
   const { validateMagicLink } = useFirebaseAuth();
+  const { showMessage } = useSnackbar();
 
   const router = useRouter();
 
-  async function handleEmailAuth() {
-    setIsLoading(true);
-
-    try {
-      await validateMagicLink();
-    } catch (err) {
-      setError(err as any);
-    } finally {
-      setIsLoading(false);
+  useEffect(() => {
+    if (isLoaded) {
+      validateMagicLink()
+        .then(() => {
+          showMessage('Logged in with email. Redirecting you now', 'success');
+        })
+        .catch((err) => {
+          setError(err as any);
+        })
+        .finally(() => {
+          setIsLoading(false);
+        });
     }
-  }
+  }, [isLoaded]);
 
   useEffect(() => {
-    const { strategy } = router.query;
-    if (strategy === 'email') {
-      handleEmailAuth();
+    if (user) {
+      router.push('/');
     }
-  }, [router.query.strategy]);
+  }, [user]);
+
+  if (!isLoaded) {
+    return null;
+  }
 
   if (error) {
-    return <ErrorPage message='Login failed' />;
+    return (
+      <ErrorPage message={error.message ?? 'Login failed'}>
+        <Box sx={{ mt: 3 }}>
+          <Link href='/'>Request new magic link</Link>
+        </Box>
+      </ErrorPage>
+    );
   }
 
   return (
-    <Box>
-      {isLoading && <LoadingComponent />}
-      {/** <CollectEmailDialog isOpen={emailDialog.isOpen} onClose={emailDialog.close} handleSubmit={handleEmailAuth} /> */}
+    <Box height='100%' display='flex' flexDirection='column'>
+      {isLoading && <LoadingComponent label='Logging you in' />}
     </Box>
   );
-
-  //  return;
 }

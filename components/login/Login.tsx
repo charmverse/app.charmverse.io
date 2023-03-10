@@ -41,6 +41,8 @@ function LoginHandler(props: DialogProps) {
 
   const { showMessage } = useSnackbar();
 
+  const [magicLinkSent, setMagicLinkSent] = useState(false);
+
   const magicLinkPopup = usePopupState({ variant: 'popover', popupId: 'email-magic-link' });
 
   const { loginWithGoogle, requestMagicLinkViaFirebase } = useFirebaseAuth();
@@ -67,6 +69,7 @@ function LoginHandler(props: DialogProps) {
     // console.log('Handling magic link request');
     try {
       await requestMagicLinkViaFirebase({ email });
+      setMagicLinkSent(true);
       showMessage('Magic link sent!', 'success');
     } catch (err) {
       handleLoginError(err);
@@ -129,7 +132,7 @@ function LoginHandler(props: DialogProps) {
             onClick={magicLinkPopup.open}
             name='Connect with email'
             icon={<EmailIcon />}
-            disabled={false}
+            disabled={magicLinkSent}
             isActive={false}
             isLoading={false}
           />
