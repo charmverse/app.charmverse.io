@@ -21,7 +21,7 @@ export function useProposalSortAndFilters(proposals: ProposalWithUsers[]) {
   }
 
   filteredProposals = filteredProposals
-    // filter out tempaltes as they might break sorting
+    // filter proposals with no according page as they might break sorting
     .filter((p) => !!pages[p.id])
     .sort((p1, p2) => {
       const page1 = pages[p1.id];
