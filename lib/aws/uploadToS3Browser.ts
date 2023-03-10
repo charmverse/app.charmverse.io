@@ -4,11 +4,17 @@
 import type { PutObjectCommandInput } from '@aws-sdk/client-s3';
 import { S3Client } from '@aws-sdk/client-s3';
 import { Upload } from '@aws-sdk/lib-storage';
+import { XhrHttpHandler } from '@aws-sdk/xhr-http-handler';
 
 import charmClient from 'charmClient';
 
-export async function uploadToS3(file: File) {
+type Config = {
+  onUploadPercentageProgress?: (progress: number) => void;
+};
+
+export async function uploadToS3(file: File, config?: Config) {
   const data = await charmClient.uploadToS3(file);
+  const trackProgress = !!config?.onUploadPercentageProgress;
 
   const client = new S3Client({
     credentials: {
@@ -16,7 +22,8 @@ export async function uploadToS3(file: File) {
       secretAccessKey: data.token.Credentials.SecretAccessKey,
       sessionToken: data.token.Credentials.SessionToken
     },
-    region: data.region
+    region: data.region,
+    requestHandler: trackProgress ? new XhrHttpHandler() : undefined
   });
 
   const params: PutObjectCommandInput = {
@@ -31,6 +38,13 @@ export async function uploadToS3(file: File) {
   const s3Upload = new Upload({
     client,
     params
+  });
+
+  s3Upload.on('httpUploadProgress', ({ loaded, total }) => {
+    if (loaded && total) {
+      const progressPercentage = Math.min(Math.round((loaded / total) * 100), 100);
+      config?.onUploadPercentageProgress?.(progressPercentage);
+    }
   });
 
   await s3Upload.done();
