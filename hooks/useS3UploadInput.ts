@@ -6,7 +6,10 @@ import { uploadToS3 } from 'lib/aws/uploadToS3Browser';
 
 const DEFAULT_MAX_FILE_SIZE_MB = 20;
 
-export const useS3UploadInput = (onFileUpload: (url: string) => void) => {
+export type UploadedFileInfo = { url: string; fileName: string; size?: number };
+export type UploadedFileCallback = (info: UploadedFileInfo) => void;
+
+export const useS3UploadInput = (onFileUpload: UploadedFileCallback) => {
   const { showMessage } = useSnackbar();
   const [isUploading, setIsUploading] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -24,7 +27,7 @@ export const useS3UploadInput = (onFileUpload: (url: string) => void) => {
 
     try {
       const { url } = await uploadToS3(file, { onUploadPercentageProgress: setProgress });
-      onFileUpload(url);
+      onFileUpload({ url, fileName: file.name || '', size: file.size });
     } catch (e) {
       showMessage('Failed to upload file. Please try again.', 'error');
     } finally {

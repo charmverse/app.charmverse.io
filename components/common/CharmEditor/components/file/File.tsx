@@ -1,6 +1,5 @@
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import { Typography } from '@mui/material';
-import { useMemo } from 'react';
 
 import { BlockNodeContainer } from 'components/common/CharmEditor/components/common/BlockNodeContainer';
 import { EmptyEmbed } from 'components/common/CharmEditor/components/common/EmptyEmbed';
@@ -9,12 +8,13 @@ import { FileUploadForm } from 'components/common/CharmEditor/components/file/Fi
 import type { CharmNodeViewProps } from 'components/common/CharmEditor/components/nodeView/nodeView';
 import Link from 'components/common/Link';
 import MultiTabs from 'components/common/MultiTabs';
+import type { UploadedFileInfo } from 'hooks/useS3UploadInput';
 
 export function File({ node, readOnly, selected, deleteNode, updateAttrs }: CharmNodeViewProps) {
-  const url: string = useMemo(() => node.attrs.src, [node.attrs.src]);
+  const { src: url, size, name } = node.attrs;
 
-  const onUploadComplete = (uploadedUrl: string) => {
-    updateAttrs({ src: uploadedUrl });
+  const onUploadComplete = ({ url: uploadedUrl, fileName, size: fileSize }: UploadedFileInfo) => {
+    updateAttrs({ src: uploadedUrl, name: fileName, size: fileSize || null });
   };
 
   if (!url) {
@@ -48,8 +48,13 @@ export function File({ node, readOnly, selected, deleteNode, updateAttrs }: Char
       <BlockNodeContainer readOnly={readOnly} onDelete={deleteNode} isSelected={selected}>
         <UploadFileIcon fontSize='small' color='secondary' sx={{ mr: 1.5 }} />
         <Typography color='secondary' alignItems='center' noWrap>
-          {url}
+          {name || url}
         </Typography>
+        {size && (
+          <Typography color='secondary' alignItems='center' variant='caption' sx={{ ml: 0.5 }}>
+            ({(size / 1024).toFixed()}&nbsp;KB)
+          </Typography>
+        )}
       </BlockNodeContainer>
     </Link>
   );

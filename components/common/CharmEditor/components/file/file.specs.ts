@@ -10,6 +10,12 @@ export function specs(): BaseRawNodeSpec {
         src: {
           default: null
         },
+        name: {
+          default: ''
+        },
+        size: {
+          default: null
+        },
         track: {
           default: []
         }
