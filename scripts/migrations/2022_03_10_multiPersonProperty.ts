@@ -1,12 +1,7 @@
-/* eslint-disable no-console */
-import { Block } from '@prisma/client';
 import { prisma } from 'db';
-import { Board, BoardFields } from 'lib/focalboard/board';
+import { BoardFields } from 'lib/focalboard/board';
 import { CardFields } from 'lib/focalboard/card';
 
-/**
- * Publish or unpublish all cards in a board, and the board itself
- */
 async function multiPersonProperty() {
   const boardPersonPropertyRecord: Record<string, {
     boardId: string
@@ -15,6 +10,10 @@ async function multiPersonProperty() {
   const boards = await prisma.block.findMany({
     where: {
       type: "board"
+    },
+    select: {
+      fields: true,
+      id: true
     }
   });
 
@@ -31,6 +30,11 @@ async function multiPersonProperty() {
   const cards = await prisma.block.findMany({
     where: {
       type: "card"
+    },
+    select: {
+      parentId: true,
+      fields: true,
+      id: true
     }
   })
 
@@ -40,7 +44,7 @@ async function multiPersonProperty() {
       const cardFields = (card.fields as CardFields);
       const currentPersonPropertyValue = cardFields.properties[boardPersonProperty.personPropertyId];
       if (typeof currentPersonPropertyValue === "string") {
-        cardFields.properties[boardPersonProperty.personPropertyId] = currentPersonPropertyValue ? [currentPersonPropertyValue] : []
+        cardFields.properties[boardPersonProperty.personPropertyId] = [currentPersonPropertyValue]
         await prisma.block.update({
           where: {
             id: card.id
