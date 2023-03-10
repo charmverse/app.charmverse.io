@@ -48,7 +48,7 @@ export function InputSearchMemberBase({
     if (openOnFocus) {
       const timeout = setTimeout(() => {
         setOpen(true);
-      }, 150);
+      }, 125);
 
       return () => {
         clearTimeout(timeout);

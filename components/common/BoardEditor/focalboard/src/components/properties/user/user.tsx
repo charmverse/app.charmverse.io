@@ -1,8 +1,7 @@
 import styled from '@emotion/styled';
 import { Menu, Typography } from '@mui/material';
 import { Box, Stack } from '@mui/system';
-import type { MouseEvent } from 'react';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 
 import { InputSearchMemberMultiple } from 'components/common/form/InputSearchMember';
 import UserDisplay from 'components/common/UserDisplay';
@@ -28,22 +27,18 @@ const StyledUserPropertyContainer = styled(Box)`
 `;
 
 function UserProperty(props: Props): JSX.Element | null {
-  // Using a local state to not close the dropdown after selecting an option
+  // Using a local state to not close the menu after selecting an option
   const [memberIds, setMemberIds] = useState(props.memberIds ?? []);
   const { members } = useMembers();
   const memberMap = members.reduce<Record<string, Member>>((acc, member) => {
     acc[member.id] = member;
     return acc;
   }, {});
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(() => {
-    return null;
-  });
-  const open = Boolean(anchorEl);
-  const handleClick = (event: MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
-  const handleClose = () => {
-    setAnchorEl(null);
+  const ref = useRef<HTMLDivElement>(null);
+  const [open, setOpen] = useState(false);
+
+  const handleClick = () => {
+    setOpen(true);
   };
 
   if (props.readOnly) {
@@ -65,36 +60,50 @@ function UserProperty(props: Props): JSX.Element | null {
   }
 
   return (
-    <Stack onClick={handleClick}>
-      {memberIds.length !== 0 ? (
-        <StyledUserPropertyContainer>
-          {memberIds.map((memberId) =>
-            memberMap[memberId] ? (
-              <div key={memberId} style={{ width: 'fit-content' }} className='UserProperty readonly octo-propertyvalue'>
-                <UserDisplay user={memberMap[memberId]} avatarSize='xSmall' fontSize='small' />
-              </div>
-            ) : null
-          )}
-        </StyledUserPropertyContainer>
-      ) : (
-        <Typography
-          component='span'
-          variant='subtitle2'
-          className='octo-propertyvalue'
-          sx={{ opacity: 0.4, pl: '2px', width: '100%', height: '100%' }}
-        >
-          {props.showEmptyPlaceholder ? 'Empty' : ''}
-        </Typography>
-      )}
+    <>
+      <Stack
+        onClick={handleClick}
+        ref={ref}
+        // Take the full width of the table cell
+        sx={{
+          width: '100%',
+          height: '100%'
+        }}
+      >
+        {memberIds.length !== 0 ? (
+          <StyledUserPropertyContainer>
+            {memberIds.map((memberId) =>
+              memberMap[memberId] ? (
+                <div
+                  key={memberId}
+                  style={{ width: 'fit-content' }}
+                  className='UserProperty readonly octo-propertyvalue'
+                >
+                  <UserDisplay user={memberMap[memberId]} avatarSize='xSmall' fontSize='small' />
+                </div>
+              ) : null
+            )}
+          </StyledUserPropertyContainer>
+        ) : (
+          <Typography
+            component='span'
+            variant='subtitle2'
+            className='octo-propertyvalue'
+            sx={{ opacity: 0.4, pl: '2px', width: '100%', height: '100%' }}
+          >
+            {props.showEmptyPlaceholder ? 'Empty' : ''}
+          </Typography>
+        )}
+      </Stack>
       <Menu
-        anchorEl={anchorEl}
+        anchorEl={ref.current}
         open={open}
         PaperProps={{
           sx: { width: 300 }
         }}
-        onClose={(...a) => {
+        onClose={() => {
           props.onChange(memberIds);
-          handleClose();
+          setOpen(false);
         }}
       >
         <InputSearchMemberMultiple
@@ -111,7 +120,7 @@ function UserProperty(props: Props): JSX.Element | null {
           openOnFocus
         />
       </Menu>
-    </Stack>
+    </>
   );
 }
 
