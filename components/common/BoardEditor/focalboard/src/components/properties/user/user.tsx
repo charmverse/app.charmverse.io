@@ -3,6 +3,8 @@ import { Box } from '@mui/system';
 import { useState } from 'react';
 
 import { InputSearchMemberMultiple } from 'components/common/form/InputSearchMember';
+import UserDisplay from 'components/common/UserDisplay';
+import type { Member } from 'lib/members/interfaces';
 
 type Props = {
   memberIds: string[];
@@ -63,6 +65,7 @@ function UserProperty(props: Props): JSX.Element | null {
           }
           setIsOpen(false);
         }}
+        getOptionLabel={(user) => (<UserDisplay avatarSize='xSmall' user={user as Member} />) as any}
         readOnly={props.readOnly}
         placeholder={props.showEmptyPlaceholder && memberIds.length === 0 ? 'Empty' : ''}
       />
