@@ -41,7 +41,7 @@ export function DesktopStepper({
       {PROPOSAL_STATUSES.map((status, statusIndex) => {
         return (
           <Fragment key={status}>
-            <Grid item md={12 / 13} display='flex' position='relative' alignItems='center' justifyContent='center'>
+            <Grid item xs display='flex' position='relative' alignItems='center' justifyContent='center'>
               <Stack alignItems='center' height='100%' gap={1}>
                 <Tooltip title={proposalStatusDetails[status]}>
                   <StepperIcon
@@ -68,7 +68,7 @@ export function DesktopStepper({
               </Stack>
             </Grid>
             {statusIndex !== PROPOSAL_STATUSES.length - 1 && (
-              <Grid item md={12 / 13}>
+              <Grid item xs>
                 <Divider
                   sx={{
                     position: 'relative',
