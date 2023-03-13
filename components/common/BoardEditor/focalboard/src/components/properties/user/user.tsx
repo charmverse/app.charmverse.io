@@ -1,5 +1,6 @@
 import styled from '@emotion/styled';
 import CloseIcon from '@mui/icons-material/Close';
+import { IconButton } from '@mui/material';
 import { Box, Stack } from '@mui/system';
 import { useMemo, useState } from 'react';
 
@@ -70,6 +71,7 @@ function UserProperty(props: Props): JSX.Element | null {
         open={isOpen}
         disableCloseOnSelect
         defaultValue={memberIds}
+        value={memberIds.map((memberId) => membersRecord[memberId])}
         onChange={(_memberIds, reason) => {
           if (reason === 'removeOption' && !isOpen) {
             props.onChange(_memberIds);
@@ -96,14 +98,19 @@ function UserProperty(props: Props): JSX.Element | null {
               }
               return (
                 <Stack alignItems='center' flexDirection='row' key={user.id} gap={0.5}>
-                  <UserDisplay avatarSize='xSmall' user={user} />
-                  {clicked && (
-                    <CloseIcon
-                      cursor='pointer'
-                      fontSize='small'
-                      color='secondary'
-                      onClick={() => setMemberIds(memberIds.filter((_memberId) => _memberId !== user.id))}
-                    />
+                  <UserDisplay fontSize={14} avatarSize='xSmall' user={user} />
+                  {!props.readOnly && clicked && (
+                    <IconButton size='small'>
+                      <CloseIcon
+                        sx={{
+                          fontSize: 14
+                        }}
+                        cursor='pointer'
+                        fontSize='small'
+                        color='secondary'
+                        onClick={() => setMemberIds(memberIds.filter((_memberId) => _memberId !== user.id))}
+                      />
+                    </IconButton>
                   )}
                 </Stack>
               );
