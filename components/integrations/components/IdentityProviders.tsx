@@ -252,6 +252,16 @@ export function IdentityProviders() {
             actions={<MenuItem onClick={disconnectGoogleAccount}>Disconnect</MenuItem>}
           />
         ))}
+        {user?.verifiedEmails?.map((verifiedEmail) => (
+          <IdentityProviderItem
+            key={verifiedEmail.email}
+            text={verifiedEmail.email}
+            type='VerifiedEmail'
+            loading={false}
+            disabled={false}
+            connected={true}
+          />
+        ))}
         <ListItem disablePadding>
           <ListItemButton sx={{ flexGrow: 0 }} {...bindTrigger(accountsPopupState)}>
             + Add an account

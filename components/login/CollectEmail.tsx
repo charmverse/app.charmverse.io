@@ -20,7 +20,7 @@ type Props = {
 };
 
 export function CollectEmailDialog({ handleSubmit, isOpen, onClose }: Props) {
-  const { register, getValues, getFieldState, formState, reset } = useForm<FormValues>({
+  const { register, getValues, getFieldState, formState, reset, trigger } = useForm<FormValues>({
     mode: 'onChange',
     resolver: yupResolver(schema)
   });
@@ -50,11 +50,10 @@ export function CollectEmailDialog({ handleSubmit, isOpen, onClose }: Props) {
     <Modal open={isOpen} onClose={closeForm}>
       <InputLabel>Email</InputLabel>
       <TextField
-        {...register('email')}
+        {...register('email', { onChange: (value) => trigger('email') })}
         type='text'
         fullWidth
         sx={{ mb: 2 }}
-        helperText={formState.errors.email && 'Please enter a valid email'}
       />
       <Button disabled={!validEmail()} onClick={submitEmail}>
         Submit
