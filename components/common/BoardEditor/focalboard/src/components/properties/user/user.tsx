@@ -1,9 +1,11 @@
 import styled from '@emotion/styled';
-import { Box } from '@mui/system';
-import { useState } from 'react';
+import CloseIcon from '@mui/icons-material/Close';
+import { Box, Stack } from '@mui/system';
+import { useMemo, useState } from 'react';
 
 import { InputSearchMemberMultiple } from 'components/common/form/InputSearchMember';
 import UserDisplay from 'components/common/UserDisplay';
+import { useMembers } from 'hooks/useMembers';
 import type { Member } from 'lib/members/interfaces';
 
 type Props = {
@@ -46,10 +48,24 @@ function arrayEquals<T>(a: T[], b: T[]) {
 
 function UserProperty(props: Props): JSX.Element | null {
   const [memberIds, setMemberIds] = useState(props.memberIds);
+  const [clicked, setClicked] = useState(false);
+  const { members } = useMembers();
+
+  const membersRecord = useMemo(() => {
+    return members.reduce<Record<string, Member>>((cur, member) => {
+      cur[member.id] = member;
+      return cur;
+    }, {});
+  }, [members]);
 
   const [isOpen, setIsOpen] = useState(false);
   return (
-    <StyledUserPropertyContainer onClick={() => setIsOpen(true)}>
+    <StyledUserPropertyContainer
+      onClick={() => {
+        setIsOpen(true);
+        setClicked(true);
+      }}
+    >
       <InputSearchMemberMultiple
         open={isOpen}
         disableCloseOnSelect
@@ -61,15 +77,39 @@ function UserProperty(props: Props): JSX.Element | null {
           setMemberIds(_memberIds);
         }}
         onClose={() => {
-          // Reduce less flicker in the ui
+          // Reduce flicker in the ui
           if (!arrayEquals(memberIds, props.memberIds)) {
             props.onChange(memberIds);
           }
           setIsOpen(false);
+          setClicked(false);
         }}
-        getOptionLabel={(user) => (<UserDisplay avatarSize='xSmall' user={user as Member} />) as any}
+        getOptionLabel={(user) => (typeof user === 'string' ? user : user?.username)}
         readOnly={props.readOnly}
         placeholder={props.showEmptyPlaceholder && memberIds.length === 0 ? 'Empty' : ''}
+        renderTags={() => (
+          <Stack flexDirection='row' flexWrap='wrap' gap={1}>
+            {memberIds.map((memberId) => {
+              const user = membersRecord[memberId];
+              if (!user) {
+                return null;
+              }
+              return (
+                <Stack alignItems='center' flexDirection='row' key={user.id} gap={0.5}>
+                  <UserDisplay avatarSize='xSmall' user={user} />
+                  {clicked && (
+                    <CloseIcon
+                      cursor='pointer'
+                      fontSize='small'
+                      color='secondary'
+                      onClick={() => setMemberIds(memberIds.filter((_memberId) => _memberId !== user.id))}
+                    />
+                  )}
+                </Stack>
+              );
+            })}
+          </Stack>
+        )}
       />
     </StyledUserPropertyContainer>
   );
