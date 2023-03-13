@@ -7,8 +7,8 @@ import { prisma } from 'db';
 import { getApplicationDetails } from 'lib/applications/getApplicationDetails';
 import type { CreateApplicationCommentPayload } from 'lib/applications/interfaces';
 import { ActionNotPermittedError, NotFoundError, onError, onNoMatch, requireUser } from 'lib/middleware';
+import { getPageComment } from 'lib/pages/comments/getPageComment';
 import { withSessionRoute } from 'lib/session/withSession';
-import { DataNotFoundError } from 'lib/utilities/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -26,18 +26,7 @@ async function updateApplicationCommentController(req: NextApiRequest, res: Next
     throw new NotFoundError(`Application with id ${applicationId} not found`);
   }
 
-  const pageComment = await prisma.pageComment.findUnique({
-    where: {
-      id: commentId
-    },
-    select: {
-      createdBy: true
-    }
-  });
-
-  if (!pageComment) {
-    throw new DataNotFoundError(`Comment with id ${commentId} not found`);
-  }
+  const pageComment = await getPageComment(commentId);
 
   if (pageComment.createdBy !== userId) {
     throw new ActionNotPermittedError();
@@ -67,18 +56,7 @@ async function deleteApplicationCommentController(req: NextApiRequest, res: Next
     throw new NotFoundError(`Application with id ${applicationId} not found`);
   }
 
-  const pageComment = await prisma.pageComment.findUnique({
-    where: {
-      id: commentId
-    },
-    select: {
-      createdBy: true
-    }
-  });
-
-  if (!pageComment) {
-    throw new DataNotFoundError(`Comment with id ${commentId} not found`);
-  }
+  const pageComment = await getPageComment(commentId);
 
   if (pageComment.createdBy !== userId) {
     throw new ActionNotPermittedError();

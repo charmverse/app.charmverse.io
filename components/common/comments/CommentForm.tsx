@@ -17,14 +17,18 @@ const defaultCharmEditorOutput: ICharmEditorOutput = {
 };
 
 export function CommentForm({
-  handleCreateComment
+  handleCreateComment,
+  initialValue
 }: {
+  initialValue?: ICharmEditorOutput;
   handleCreateComment: (comment: CommentContent) => Promise<void>;
 }) {
   const { user } = useUser();
-  const [postContent, setPostContent] = useState<ICharmEditorOutput>({
-    ...defaultCharmEditorOutput
-  });
+  const [postContent, setPostContent] = useState<ICharmEditorOutput>(
+    initialValue ?? {
+      ...defaultCharmEditorOutput
+    }
+  );
   const [editorKey, setEditorKey] = useState(0); // a key to allow us to reset charmeditor contents
 
   function updatePostContent(updatedContent: ICharmEditorOutput) {

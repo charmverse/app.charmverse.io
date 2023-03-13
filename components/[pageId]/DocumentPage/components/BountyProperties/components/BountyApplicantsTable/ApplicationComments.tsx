@@ -1,21 +1,17 @@
 import CommentIcon from '@mui/icons-material/Comment';
-import { Divider, FormLabel, Typography } from '@mui/material';
+import { FormLabel, Typography } from '@mui/material';
 import { Box, Stack } from '@mui/system';
 import type { Application } from '@prisma/client';
-import { useEffect, useState } from 'react';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 import { Comment } from 'components/common/comments/Comment';
+import { CommentForm } from 'components/common/comments/CommentForm';
 import type { CreateCommentPayload, UpdateCommentPayload } from 'components/common/comments/interfaces';
 import LoadingComponent from 'components/common/LoadingComponent';
-import { useMemberProfile } from 'components/profile/hooks/useMemberProfile';
-import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
 import { getContentWithMention } from 'lib/pages/getContentWithMention';
 import { emptyDocument } from 'lib/prosemirror/constants';
-
-import { ApplicationCommentForm } from './ApplicationCommentForm';
 
 export function ApplicationComments({
   createdBy,
@@ -28,9 +24,7 @@ export function ApplicationComments({
   applicationId: string;
   context: 'applicant' | 'reviewer';
 }) {
-  const { members } = useMembers();
   const { user } = useUser();
-  const [editorKey, setEditorKey] = useState(0); // a key to allow us to reset charmeditor contents
   const {
     data: applicationComments = [],
     isLoading,
@@ -38,19 +32,8 @@ export function ApplicationComments({
   } = useSWR(`/application/${applicationId}/comments`, () =>
     charmClient.bounties.getApplicationComments(applicationId)
   );
-  const member = members.find((c) => c.id === createdBy);
-  const { showMemberProfile } = useMemberProfile();
-
-  function resetInput() {
-    setEditorKey((key) => key + 1);
-  }
-
-  useEffect(() => {
-    resetInput();
-  }, [user, member]);
 
   async function onSendClicked(comment: Omit<CreateCommentPayload, 'parentId'>) {
-    resetInput();
     const applicationComment = await charmClient.bounties.addApplicationComment(applicationId, {
       content: comment.content,
       contentText: comment.contentText
@@ -139,18 +122,12 @@ export function ApplicationComments({
       </Stack>
 
       {status !== 'rejected' && (
-        <>
-          <Divider
-            style={{
-              marginBottom: 24,
-              marginTop: 24
-            }}
-          />
+        <Stack gap={1}>
           <FormLabel>
             <strong>Send a message (optional)</strong>
           </FormLabel>
-          <ApplicationCommentForm
-            key={editorKey}
+          <CommentForm
+            handleCreateComment={onSendClicked}
             initialValue={
               user?.id
                 ? {
@@ -160,15 +137,10 @@ export function ApplicationComments({
                         : emptyDocument,
                     rawText: ''
                   }
-                : null
-            }
-            username={user?.username}
-            avatar={user?.avatar}
-            onSubmit={(createCommentPayload) =>
-              onSendClicked({ content: createCommentPayload.doc, contentText: createCommentPayload.rawText })
+                : undefined
             }
           />
-        </>
+        </Stack>
       )}
     </Stack>
   );
