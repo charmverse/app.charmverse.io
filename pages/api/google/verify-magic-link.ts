@@ -49,7 +49,7 @@ async function verifyMagicLink(req: NextApiRequest, res: NextApiResponse<LoggedI
           create: {
             email: verificationResult.email,
             avatarUrl: verificationResult.picture ?? '',
-            name: verificationResult.name ?? verificationResult.email
+            name: verificationResult.name || verificationResult.email
           }
         }
       },
