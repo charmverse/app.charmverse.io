@@ -13,11 +13,14 @@ import type { SystemError } from 'lib/utilities/errors';
 export default function Authenticate() {
   const [error, setError] = useState<SystemError | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const { user, isLoaded } = useUser();
+  const { isLoaded } = useUser();
   const { validateMagicLink } = useFirebaseAuth();
   const { showMessage } = useSnackbar();
 
   const router = useRouter();
+
+  // Case where existing user is adding an email to their account
+  const isConnectingAccount = router.query.connectToExistingAccount === 'true';
 
   useEffect(() => {
     if (isLoaded) {
@@ -41,9 +44,13 @@ export default function Authenticate() {
 
   if (error) {
     return (
-      <ErrorPage message={error.message ?? 'Login failed'}>
+      <ErrorPage message={isConnectingAccount ? 'Failed to connect email to your account' : 'Login failed'}>
         <Box sx={{ mt: 3 }}>
-          <Link href='/'>Request new magic link</Link>
+          <Link href='/'>
+            {isConnectingAccount
+              ? 'Request new magic link from your profile settings'
+              : 'Request magic link from login page'}
+          </Link>
         </Box>
       </ErrorPage>
     );

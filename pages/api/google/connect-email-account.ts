@@ -26,6 +26,7 @@ async function connectEmailAccount(req: NextApiRequest, res: NextApiResponse<Log
   if (!verificationResult.email) {
     throw new InvalidInputError(`No email found in verification result`);
   }
+  throw new InvalidInputError(`TEST ERROR`);
 
   const existingAccount = await prisma.verifiedEmail.findUnique({
     where: {

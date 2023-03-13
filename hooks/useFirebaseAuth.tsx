@@ -169,6 +169,8 @@ export function useFirebaseAuth() {
           }));
 
       setUser(loggedInUser);
+    } else {
+      throw new InvalidInputError(`Could not login`);
     }
   }
 
