@@ -8,6 +8,7 @@ import {
   signInWithEmailLink,
   signInWithPopup
 } from 'firebase/auth';
+import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 
 import charmClient from 'charmClient';
@@ -20,6 +21,7 @@ import { ExternalServiceError, InvalidInputError, SystemError } from 'lib/utilit
 import type { AnyIdLogin } from '../components/login/Login';
 
 import { useLocalStorage } from './useLocalStorage';
+import { useSnackbar } from './useSnackbar';
 
 export function useFirebaseAuth() {
   const [firebaseApp] = useState<FirebaseApp>(initializeApp(googleWebClientConfig));
@@ -27,6 +29,9 @@ export function useFirebaseAuth() {
   const [provider] = useState(new GoogleAuthProvider());
   const { user, setUser } = useUser();
   const [emailForSignIn, setEmailForSignIn] = useLocalStorage('emailForSignIn', '');
+  const router = useRouter();
+
+  const { showMessage } = useSnackbar();
 
   const [isConnectingGoogle, setIsConnectingGoogle] = useState(false);
   useEffect(() => {
@@ -113,13 +118,19 @@ export function useFirebaseAuth() {
     setUser(loggedInUser);
   }
 
-  async function requestMagicLinkViaFirebase({ email }: { email: string }) {
+  async function requestMagicLinkViaFirebase({
+    email,
+    connectToExistingAccount
+  }: {
+    email: string;
+    connectToExistingAccount?: boolean;
+  }) {
     // console.log('IN', { email });
     const auth = getAuth(firebaseApp);
     auth.languageCode = 'en';
 
     const actionCodeSettings = {
-      url: `${window.location.origin}/authenticate`,
+      url: `${window.location.origin}/authenticate${connectToExistingAccount ? '?connectToExistingAccount=true' : ''}`,
       handleCodeInApp: true
     };
 
@@ -127,6 +138,8 @@ export function useFirebaseAuth() {
     setEmailForSignIn(email);
 
     await sendSignInLinkToEmail(auth, email, actionCodeSettings);
+
+    showMessage(`Magic link sent. Please check your inbox for ${email}`, 'success');
   }
 
   /**
@@ -147,11 +160,13 @@ export function useFirebaseAuth() {
 
       const token = await result.user.getIdToken();
 
-      const loggedInUser = await charmClient.google.authenticateMagicLink({
-        accessToken: token,
-        avatarUrl: result.user.photoURL as string,
-        displayName: result.user.displayName as string
-      });
+      const loggedInUser = await (router.query.connectToExistingAccount === 'true'
+        ? charmClient.google.connectEmailAccount({
+            accessToken: token
+          })
+        : charmClient.google.authenticateMagicLink({
+            accessToken: token
+          }));
 
       setUser(loggedInUser);
     }

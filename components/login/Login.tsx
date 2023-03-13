@@ -71,7 +71,6 @@ function LoginHandler(props: DialogProps) {
       // console.log('Handling magic link request');
       try {
         await requestMagicLinkViaFirebase({ email });
-        showMessage(`Magic link sent. Please check your inbox for ${email}`, 'success');
         magicLinkPopup.close();
       } catch (err) {
         handleLoginError(err);

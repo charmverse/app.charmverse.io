@@ -1,10 +1,9 @@
-import firebase from 'firebase-admin';
 // import firebase from 'firebase-admin';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { googleWebClientConfig } from 'config/constants';
 import { prisma } from 'db';
+import { firebaseApp } from 'lib/google/firebaseApp';
 import type { LoginWithGoogleRequest } from 'lib/google/loginWithGoogle';
 import { onError, onNoMatch } from 'lib/middleware';
 import { sessionUserRelations } from 'lib/session/config';
@@ -12,9 +11,6 @@ import { withSessionRoute } from 'lib/session/withSession';
 import { InvalidInputError } from 'lib/utilities/errors';
 import randomName from 'lib/utilities/randomName';
 import type { LoggedInUser } from 'models';
-
-// const firebaseApp = firebase.initializeApp(googleWebClientConfig, 'google-authenticate');
-const firebaseApp = firebase.initializeApp(googleWebClientConfig, 'google-authenticate');
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

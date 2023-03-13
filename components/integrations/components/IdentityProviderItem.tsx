@@ -31,6 +31,8 @@ export default function IdentityProviderItem({
 }: IdentityProviderItemProps) {
   const identityMenuState = usePopupState({ variant: 'popover', popupId: `identity-menu-${type}` });
 
+  const typeLabel = type !== 'VerifiedEmail' ? type : 'Email';
+
   return (
     <ListItem
       disableGutters
@@ -51,7 +53,7 @@ export default function IdentityProviderItem({
       </ListItemIcon>
       <ListItemText
         primaryTypographyProps={{ ml: 1 }}
-        primary={connected ? text || `Connected with ${type}` : `Connect with ${type}`}
+        primary={connected ? text || `Connected with ${typeLabel}` : `Connect with ${typeLabel}`}
       />
       <LoadingComponent isLoading={loading} size={15} />
       {error}

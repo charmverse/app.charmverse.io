@@ -24,6 +24,7 @@ export default function Authenticate() {
       validateMagicLink()
         .then(() => {
           showMessage('Logged in with email. Redirecting you now', 'success');
+          router.push('/');
         })
         .catch((err) => {
           setError(err as any);
@@ -33,12 +34,6 @@ export default function Authenticate() {
         });
     }
   }, [isLoaded]);
-
-  useEffect(() => {
-    if (user) {
-      router.push('/');
-    }
-  }, [user]);
 
   if (!isLoaded) {
     return null;

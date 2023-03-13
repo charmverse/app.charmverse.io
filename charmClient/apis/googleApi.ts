@@ -26,8 +26,12 @@ export class GoogleApi {
     return http.POST<LoggedInUser>('/api/google/disconnect-account', params);
   }
 
-  authenticateMagicLink(data: LoginWithGoogleRequest) {
+  authenticateMagicLink(data: Pick<LoginWithGoogleRequest, 'accessToken'>) {
     return http.POST<LoggedInUser>('/api/google/verify-magic-link', data);
+  }
+
+  connectEmailAccount(data: Pick<LoginWithGoogleRequest, 'accessToken'>) {
+    return http.POST<LoggedInUser>('/api/google/connect-email-account', data);
   }
 
   forms = {
