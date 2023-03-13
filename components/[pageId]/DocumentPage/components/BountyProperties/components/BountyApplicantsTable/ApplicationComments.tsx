@@ -1,4 +1,4 @@
-import { uuid } from '@bangle.dev/utils';
+import CommentIcon from '@mui/icons-material/Comment';
 import { Divider, FormLabel, Typography } from '@mui/material';
 import { Box, Stack } from '@mui/system';
 import type { Application } from '@prisma/client';
@@ -6,15 +6,14 @@ import { useEffect, useState } from 'react';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
-import type { ICharmEditorOutput } from 'components/common/CharmEditor/InlineCharmEditor';
+import { Comment } from 'components/common/comments/Comment';
+import type { CreateCommentPayload, UpdateCommentPayload } from 'components/common/comments/interfaces';
 import LoadingComponent from 'components/common/LoadingComponent';
-import UserDisplay from 'components/common/UserDisplay';
 import { useMemberProfile } from 'components/profile/hooks/useMemberProfile';
 import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
+import { getContentWithMention } from 'lib/pages/getContentWithMention';
 import { emptyDocument } from 'lib/prosemirror/constants';
-import type { PageContent } from 'lib/prosemirror/interfaces';
-import { getRelativeTimeInThePast } from 'lib/utilities/dates';
 
 import { ApplicationCommentForm } from './ApplicationCommentForm';
 
@@ -50,11 +49,11 @@ export function ApplicationComments({
     resetInput();
   }, [user, member]);
 
-  async function onSendClicked(editorOutput: ICharmEditorOutput) {
+  async function onSendClicked(comment: Omit<CreateCommentPayload, 'parentId'>) {
     resetInput();
     const applicationComment = await charmClient.bounties.addApplicationComment(applicationId, {
-      content: editorOutput.doc,
-      contentText: editorOutput.rawText
+      content: comment.content,
+      contentText: comment.contentText
     });
     refetchApplicationComments(
       (_applicationComments) => (_applicationComments ? [applicationComment, ..._applicationComments] : []),
@@ -64,10 +63,10 @@ export function ApplicationComments({
     );
   }
 
-  async function updateComment(pageCommentId: string, editorOutput: ICharmEditorOutput) {
+  async function updateComment(pageCommentId: string, comment: UpdateCommentPayload) {
     const updatedComment = await charmClient.bounties.editApplicationComment(applicationId, pageCommentId, {
-      content: editorOutput.doc,
-      contentText: editorOutput.rawText
+      content: comment.content,
+      contentText: comment.contentText
     });
 
     refetchApplicationComments(
@@ -83,11 +82,17 @@ export function ApplicationComments({
     );
   }
 
-  if (isLoading) {
-    return (
-      <Box my={5}>
-        <LoadingComponent isLoading />
-      </Box>
+  async function deleteComment(commentId: string) {
+    await charmClient.bounties.deleteApplicationComment(applicationId, commentId);
+
+    refetchApplicationComments(
+      (_applicationComments) =>
+        _applicationComments
+          ? _applicationComments.filter((_applicationComment) => _applicationComment.id !== commentId)
+          : [],
+      {
+        revalidate: false
+      }
     );
   }
 
@@ -95,48 +100,42 @@ export function ApplicationComments({
     <Stack>
       <Stack gap={2}>
         <FormLabel sx={{ fontWeight: 'bold' }}>Comments</FormLabel>
-        {applicationComments.map((applicationComment) => {
-          const commentCreator = members.find((_member) => _member.id === applicationComment.createdBy);
-
-          return (
-            <Stack key={applicationComment.id}>
-              <Stack flexDirection='row' alignItems='center'>
-                <Box mr={1}>
-                  <UserDisplay showMiniProfile avatarSize='small' user={commentCreator} hideName={true} />
-                </Box>
-                <Typography
-                  mr={1}
-                  onClick={() => {
-                    if (commentCreator) {
-                      showMemberProfile(commentCreator.id);
-                    }
-                  }}
-                >
-                  {commentCreator?.username}
-                </Typography>
-                <Typography variant='subtitle1' mr={0.5}>
-                  {getRelativeTimeInThePast(new Date(applicationComment.createdAt))}
-                </Typography>
-                {applicationComment.createdAt !== applicationComment.updatedAt && !applicationComment.deletedAt && (
-                  <Typography variant='subtitle2'>(Edited)</Typography>
-                )}
-              </Stack>
-              <ApplicationCommentForm
-                hideAvatar
-                hideButton={applicationComment.createdBy !== user?.id}
-                buttonText='Edit'
-                initialValue={{
-                  doc: applicationComment.content as PageContent,
-                  rawText: applicationComment.contentText
+        {isLoading ? (
+          <Box height={100}>
+            <LoadingComponent size={24} isLoading label='Fetching comments' />
+          </Box>
+        ) : (
+          <>
+            {applicationComments.map((comment) => (
+              <Comment
+                replyingDisabled
+                permissions={{ add_comment: true, delete_comments: true, downvote: false, upvote: false }}
+                comment={{
+                  ...comment,
+                  upvoted: false,
+                  upvotes: 0,
+                  downvotes: 0,
+                  children: []
                 }}
-                onSubmit={async (editorOutput) => {
-                  await updateComment(applicationComment.id, editorOutput);
-                }}
-                disabled={applicationComment.createdBy !== user?.id}
+                key={comment.id}
+                handleCreateComment={onSendClicked}
+                handleUpdateComment={(commentUpdatePayload) => updateComment(comment.id, commentUpdatePayload)}
+                handleDeleteComment={deleteComment}
               />
-            </Stack>
-          );
-        })}
+            ))}
+
+            {applicationComments.length === 0 && (
+              <Stack gap={1} alignItems='center' my={1}>
+                <CommentIcon color='secondary' fontSize='large' />
+                <Typography color='secondary' variant='h6'>
+                  No Comments Yet
+                </Typography>
+
+                <Typography color='secondary'>Be the first to share what you think!</Typography>
+              </Stack>
+            )}
+          </>
+        )}
       </Stack>
 
       {status !== 'rejected' && (
@@ -165,37 +164,12 @@ export function ApplicationComments({
             }
             username={user?.username}
             avatar={user?.avatar}
-            onSubmit={onSendClicked}
+            onSubmit={(createCommentPayload) =>
+              onSendClicked({ content: createCommentPayload.doc, contentText: createCommentPayload.rawText })
+            }
           />
         </>
       )}
     </Stack>
   );
-}
-
-export function getContentWithMention({ myUserId, targetUserId }: { myUserId: string; targetUserId: string }) {
-  return {
-    type: 'doc',
-    content: [
-      {
-        type: 'paragraph',
-        content: [
-          {
-            type: 'mention',
-            attrs: {
-              id: uuid(),
-              type: 'user',
-              value: targetUserId,
-              createdAt: new Date().toISOString(),
-              createdBy: myUserId
-            }
-          },
-          {
-            type: 'text',
-            text: ' '
-          }
-        ]
-      }
-    ]
-  };
 }
