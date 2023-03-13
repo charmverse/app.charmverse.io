@@ -143,6 +143,7 @@
     "emoji-mart": "^3.0.1",
     "ethers": "^5.5.4",
     "firebase": "^9.14.0",
+    "firebase-admin": "^11.5.0",
     "form-data": "^4.0.0",
     "gaxios": "^5.0.2",
     "google-auth-library": "^8.7.0",

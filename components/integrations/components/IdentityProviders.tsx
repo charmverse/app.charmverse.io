@@ -16,12 +16,14 @@ import {
 } from '@mui/material';
 import type { User } from '@prisma/client';
 import { bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
+import { useRef } from 'react';
 import useSWRMutation from 'swr/mutation';
 
 import charmClient from 'charmClient';
 import Modal from 'components/common/Modal';
 import PrimaryButton from 'components/common/PrimaryButton';
 import { WalletSign } from 'components/login';
+import { CollectEmailDialog } from 'components/login/CollectEmail';
 import Legend from 'components/settings/Legend';
 import { useDiscordConnection } from 'hooks/useDiscordConnection';
 import { useFirebaseAuth } from 'hooks/useFirebaseAuth';
@@ -45,9 +47,12 @@ export function IdentityProviders() {
   const { account, isConnectingIdentity, sign, isSigning, verifiableWalletDetected } = useWeb3AuthSig();
   const { user, setUser, updateUser } = useUser();
   const { showMessage } = useSnackbar();
-  const { connectGoogleAccount, disconnectGoogleAccount, isConnectingGoogle } = useFirebaseAuth();
+  const { connectGoogleAccount, disconnectGoogleAccount, isConnectingGoogle, requestMagicLinkViaFirebase } =
+    useFirebaseAuth();
+  const sendingMagicLink = useRef(false);
   const identityTypes = useIdentityTypes();
   const accountsPopupState = usePopupState({ variant: 'popover', popupId: 'accountsModal' });
+  const emailPopupState = usePopupState({ variant: 'popover', popupId: 'emailModal' });
   const discordAccount = user?.discordUser?.account as Partial<DiscordAccount> | undefined;
   const telegramAccount = user?.telegramUser?.account as Partial<TelegramAccount> | undefined;
 
@@ -136,6 +141,21 @@ export function IdentityProviders() {
   };
 
   const { connect, isConnected, isLoading: isDiscordLoading, error } = useDiscordConnection();
+
+  async function handleConnectEmailRequest(email: string) {
+    if (sendingMagicLink.current === false) {
+      sendingMagicLink.current = true;
+      // console.log('Handling magic link request');
+      try {
+        await requestMagicLinkViaFirebase({ email, connectToExistingAccount: true });
+        emailPopupState.close();
+      } catch (err) {
+        showMessage((err as any).message ?? 'Something went wrong', 'error');
+      } finally {
+        sendingMagicLink.current = false;
+      }
+    }
+  }
 
   // Don't allow a user to remove their last identity
   const cannotDisconnect = !user || countConnectableIdentities(user) <= 1;
@@ -303,7 +323,20 @@ export function IdentityProviders() {
               </PrimaryButton>
             </IdentityProviderItem>
           )}
+          {user?.verifiedEmails.length === 0 && (
+            <IdentityProviderItem type='VerifiedEmail'>
+              <PrimaryButton size='small' onClick={emailPopupState.open} disabled={isConnectingGoogle}>
+                Connect
+              </PrimaryButton>
+            </IdentityProviderItem>
+          )}
         </List>
+
+        <CollectEmailDialog
+          handleSubmit={handleConnectEmailRequest}
+          isOpen={emailPopupState.isOpen}
+          onClose={emailPopupState.close}
+        />
       </Modal>
     </>
   );

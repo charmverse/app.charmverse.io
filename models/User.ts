@@ -8,7 +8,8 @@ import type {
   UnstoppableDomain,
   User,
   UserNotificationState,
-  UserWallet
+  UserWallet,
+  VerifiedEmail
 } from '@prisma/client';
 
 interface NestedMemberships {
@@ -21,6 +22,7 @@ export interface LoggedInUser extends User {
   wallets: Pick<UserWallet, 'address' | 'ensname'>[];
   unstoppableDomains: Pick<UnstoppableDomain, 'domain'>[];
   googleAccounts: Pick<GoogleAccount, 'email' | 'name'>[];
+  verifiedEmails: Pick<VerifiedEmail, 'email' | 'name'>[];
   ensName?: string;
   discordUser?: DiscordUser | null;
   telegramUser?: TelegramUser | null;

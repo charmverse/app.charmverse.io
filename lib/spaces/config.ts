@@ -3,6 +3,7 @@ import { typedKeys } from 'lib/utilities/objects';
 export const DOMAIN_BLACKLIST = [
   'api',
   'api-docs',
+  'authenticate',
   'createWorkspace',
   'invite',
   'login',

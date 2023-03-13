@@ -1,9 +1,11 @@
+import EmailIcon from '@mui/icons-material/Email';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import type { IdentityType } from '@prisma/client';
-import { useState } from 'react';
+import { usePopupState } from 'material-ui-popup-state/hooks';
+import { useRef, useState } from 'react';
 
 import { WalletSelector } from 'components/_app/Web3ConnectionManager/components/WalletSelectorModal';
 import { ConnectorButton } from 'components/_app/Web3ConnectionManager/components/WalletSelectorModal/components/ConnectorButton';
@@ -15,6 +17,7 @@ import type { AuthSig } from 'lib/blockchain/interfaces';
 import type { SystemError } from 'lib/utilities/errors';
 import type { LoggedInUser } from 'models/User';
 
+import { CollectEmailDialog } from './CollectEmail';
 import { LoginErrorModal } from './LoginErrorModal';
 import { WalletSign } from './WalletSign';
 
@@ -38,7 +41,11 @@ function LoginHandler(props: DialogProps) {
 
   const { showMessage } = useSnackbar();
 
-  const { loginWithGoogle } = useFirebaseAuth();
+  const sendingMagicLink = useRef(false);
+
+  const magicLinkPopup = usePopupState({ variant: 'popover', popupId: 'email-magic-link' });
+
+  const { loginWithGoogle, requestMagicLinkViaFirebase } = useFirebaseAuth();
   const { verifiableWalletDetected } = useWeb3AuthSig();
   async function handleLogin(loggedInUser: AnyIdLogin) {
     showMessage(`Logged in with ${loggedInUser?.identityType}. Redirecting you now`, 'success');
@@ -55,6 +62,21 @@ function LoginHandler(props: DialogProps) {
       handleLogin(googleLoginResult);
     } catch (err) {
       handleLoginError(err);
+    }
+  }
+
+  async function handleMagicLinkRequest(email: string) {
+    if (sendingMagicLink.current === false) {
+      sendingMagicLink.current = true;
+      // console.log('Handling magic link request');
+      try {
+        await requestMagicLinkViaFirebase({ email });
+        magicLinkPopup.close();
+      } catch (err) {
+        handleLoginError(err);
+      } finally {
+        sendingMagicLink.current = false;
+      }
     }
   }
 
@@ -107,8 +129,25 @@ function LoginHandler(props: DialogProps) {
             isLoading={false}
           />
         </ListItem>
+
+        {/** Connect with email address */}
+        <ListItem>
+          <ConnectorButton
+            onClick={magicLinkPopup.open}
+            name='Connect with email'
+            icon={<EmailIcon />}
+            disabled={false}
+            isActive={false}
+            isLoading={false}
+          />
+        </ListItem>
       </List>
       <LoginErrorModal open={showLoginError} onClose={() => setShowLoginError(false)} />
+      <CollectEmailDialog
+        onClose={magicLinkPopup.close}
+        isOpen={magicLinkPopup.isOpen}
+        handleSubmit={handleMagicLinkRequest}
+      />
     </Dialog>
   );
 }

@@ -70,14 +70,22 @@ export function useIdentityTypes() {
       });
     });
 
-    if (user) {
+    user.verifiedEmails.forEach((verifiedEmail) => {
       types.push({
-        type: 'RandomName',
-        username: user.identityType === 'RandomName' && user.username ? user.username : randomName(),
-        isInUse: user.identityType === 'RandomName',
-        icon: <IdentityIcon type='RandomName' />
+        type: 'VerifiedEmail',
+        username: verifiedEmail.name ?? verifiedEmail.email,
+        isInUse:
+          user.identityType === 'VerifiedEmail' && [verifiedEmail.email, verifiedEmail.name].includes(user.username),
+        icon: <IdentityIcon type='VerifiedEmail' />
       });
-    }
+    });
+
+    types.push({
+      type: 'RandomName',
+      username: user.identityType === 'RandomName' && user.username ? user.username : randomName(),
+      isInUse: user.identityType === 'RandomName',
+      icon: <IdentityIcon type='RandomName' />
+    });
 
     return types;
   }, [user]);
