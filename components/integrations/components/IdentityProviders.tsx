@@ -166,7 +166,7 @@ export function IdentityProviders() {
         <InputLabel sx={{ mb: 1 }}>
           Select your identity
           <br />
-          <Typography variant='caption'>This is how you'll be references throughout CharmVerse</Typography>
+          <Typography variant='caption'>This is how you'll be referred to throughout CharmVerse</Typography>
         </InputLabel>
         <Box display='flex' alignItems='center'>
           <Select

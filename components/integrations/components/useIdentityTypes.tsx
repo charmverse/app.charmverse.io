@@ -73,7 +73,7 @@ export function useIdentityTypes() {
     user.verifiedEmails.forEach((verifiedEmail) => {
       types.push({
         type: 'VerifiedEmail',
-        username: verifiedEmail.name ?? verifiedEmail.email,
+        username: verifiedEmail.email,
         isInUse:
           user.identityType === 'VerifiedEmail' && [verifiedEmail.email, verifiedEmail.name].includes(user.username),
         icon: <IdentityIcon type='VerifiedEmail' />
