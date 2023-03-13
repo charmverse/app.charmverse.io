@@ -7,7 +7,7 @@ import type { PaymentMethod } from '@prisma/client';
 import type { CryptoCurrency } from 'connectors';
 import { getChainById } from 'connectors';
 import debounce from 'lodash/debounce';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import charmClient from 'charmClient';
 import Button from 'components/common/BoardEditor/focalboard/src/widgets/buttons/button';
@@ -67,17 +67,18 @@ export default function BountyProperties(props: {
     () => isAmountInputEmpty || Number(currentBounty?.rewardAmount) <= 0,
     [isAmountInputEmpty, currentBounty]
   );
+  const [autoTabSwitchDone, setAutoTabSwitchDone] = useState(false);
 
   const [rewardType, setRewardType] = useState<RewardType>(isTruthy(currentBounty?.customReward) ? 'Custom' : 'Token');
-  const rewardTypeTabChangeRef = useRef<number>(0);
+  // Using ref to make sure we don't keep redirecting to custom reward tab
   const { isSpaceMember } = useIsSpaceMember();
 
   useEffect(() => {
-    if (rewardType !== 'Custom' && isTruthy(currentBounty?.customReward) && rewardTypeTabChangeRef.current === 0) {
+    if (rewardType !== 'Custom' && isTruthy(currentBounty?.customReward) && !autoTabSwitchDone) {
       setRewardType('Custom');
-      rewardTypeTabChangeRef.current += 1;
+      setAutoTabSwitchDone(true);
     }
-  }, [currentBounty, rewardType, rewardTypeTabChangeRef]);
+  }, [currentBounty?.customReward, rewardType, autoTabSwitchDone]);
 
   const readOnly = parentReadOnly || !isSpaceMember;
 

@@ -28,7 +28,7 @@ export default function BountySuggestionApproval({ bounty }: Props) {
   // All conditions fulfilled to approve the bounty
   const approvableBounty =
     userCanDecideOnSuggestion &&
-    ((isTruthy(bounty.rewardAmount) && bounty.rewardAmount > 0) || bounty.customReward?.length !== 0);
+    ((isTruthy(bounty.rewardAmount) && bounty.rewardAmount > 0) || isTruthy(bounty.customReward));
 
   async function approveBountySuggestion() {
     await charmClient.bounties.reviewSuggestion({
