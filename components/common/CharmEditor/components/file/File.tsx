@@ -1,5 +1,5 @@
 import UploadFileIcon from '@mui/icons-material/UploadFile';
-import { Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 
 import { BlockNodeContainer } from 'components/common/CharmEditor/components/common/BlockNodeContainer';
 import { EmptyEmbed } from 'components/common/CharmEditor/components/common/EmptyEmbed';
@@ -44,18 +44,20 @@ export function File({ node, readOnly, selected, deleteNode, updateAttrs }: Char
   }
 
   return (
-    <Link href={url} external target='_blank'>
-      <BlockNodeContainer readOnly={readOnly} onDelete={deleteNode} isSelected={selected}>
-        <UploadFileIcon fontSize='small' color='secondary' sx={{ mr: 1.5 }} />
-        <Typography color='secondary' alignItems='center' noWrap>
-          {name || url}
-        </Typography>
-        {size && (
-          <Typography color='secondary' alignItems='center' variant='caption' sx={{ ml: 0.5 }}>
-            ({(size / 1024).toFixed()}&nbsp;KB)
+    <BlockNodeContainer readOnly={readOnly} onDelete={deleteNode} isSelected={selected} sx={{ p: 0 }}>
+      <Link href={url} external target='_blank'>
+        <Box display='flex' alignItems='center' p={0.75}>
+          <UploadFileIcon fontSize='small' color='secondary' sx={{ mr: 1.5 }} />
+          <Typography color='secondary' alignItems='center' noWrap>
+            {name || url}
           </Typography>
-        )}
-      </BlockNodeContainer>
-    </Link>
+          {size && (
+            <Typography color='secondary' alignItems='center' variant='caption' sx={{ ml: 0.5 }}>
+              ({(size / 1024).toFixed()}&nbsp;KB)
+            </Typography>
+          )}
+        </Box>
+      </Link>
+    </BlockNodeContainer>
   );
 }

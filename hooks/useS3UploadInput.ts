@@ -4,7 +4,7 @@ import { useFilePicker } from 'hooks/useFilePicker';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { uploadToS3 } from 'lib/aws/uploadToS3Browser';
 
-const DEFAULT_MAX_FILE_SIZE_MB = 20;
+export const DEFAULT_MAX_FILE_SIZE_MB = 20;
 
 export type UploadedFileInfo = { url: string; fileName: string; size?: number };
 export type UploadedFileCallback = (info: UploadedFileInfo) => void;
@@ -35,5 +35,5 @@ export const useS3UploadInput = (onFileUpload: UploadedFileCallback) => {
     }
   }
 
-  return { ...useFilePicker(uploadFile), isUploading, progress, fileName };
+  return { ...useFilePicker(uploadFile), isUploading, progress, fileName, sizeLimit: DEFAULT_MAX_FILE_SIZE_MB };
 };

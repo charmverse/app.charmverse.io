@@ -1,3 +1,4 @@
+import type { SxProps, Theme } from '@mui/material';
 import { ListItem } from '@mui/material';
 
 import BlockAligner from '../BlockAligner';
@@ -7,9 +8,10 @@ export type EmptyContentProps = {
   isSelected: boolean;
   readOnly?: boolean;
   children: React.ReactNode;
+  sx?: SxProps<Theme>;
 };
 
-export function BlockNodeContainer({ readOnly, onDelete, isSelected, children }: EmptyContentProps) {
+export function BlockNodeContainer({ readOnly, onDelete, isSelected, children, sx = {} }: EmptyContentProps) {
   return (
     <BlockAligner readOnly={readOnly} onDelete={onDelete}>
       <ListItem
@@ -19,7 +21,8 @@ export function BlockNodeContainer({ readOnly, onDelete, isSelected, children }:
           p: 2,
           display: 'flex',
           borderRadius: 0.5,
-          my: 0.5
+          my: 0.5,
+          ...sx
         }}
       >
         {children}
