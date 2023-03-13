@@ -92,7 +92,13 @@ export function ApplicationComments({
             {applicationComments.map((comment) => (
               <Comment
                 replyingDisabled
-                permissions={{ add_comment: true, delete_comments: true, downvote: false, upvote: false }}
+                enableInlineCharmEditor
+                permissions={{
+                  add_comment: true,
+                  delete_comments: comment.createdBy === user?.id,
+                  downvote: false,
+                  upvote: false
+                }}
                 comment={{
                   ...comment,
                   upvoted: false,

@@ -5,10 +5,11 @@ import EditIcon from '@mui/icons-material/Edit';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { Box, IconButton, ListItemIcon, ListItemText, Menu, MenuItem, Stack, Tooltip, Typography } from '@mui/material';
 import { bindMenu, usePopupState } from 'material-ui-popup-state/hooks';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import Button from 'components/common/Button';
 import CharmEditor from 'components/common/CharmEditor/CharmEditor';
+import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/InlineCharmEditor';
 import { CommentReply } from 'components/common/comments/CommentReply';
 import { CommentVote } from 'components/common/comments/CommentVote';
@@ -42,9 +43,11 @@ type Props = {
   handleCreateComment: (comment: CreateCommentPayload) => Promise<void>;
   handleDeleteComment: (commentId: string) => Promise<void>;
   handleVoteComment?: (vote: { commentId: string; upvoted: boolean | null }) => Promise<void>;
+  enableInlineCharmEditor?: boolean;
 };
 
 export function Comment({
+  enableInlineCharmEditor,
   deletingDisabled,
   replyingDisabled = false,
   comment,
@@ -111,6 +114,45 @@ export function Comment({
   const canEditComment = isCommentAuthor;
   const canDeleteComment = (permissions?.delete_comments || isCommentAuthor) && !deletingDisabled;
 
+  const editor = useMemo(() => {
+    if (!enableInlineCharmEditor) {
+      return (
+        <CharmEditor
+          colorMode='dark'
+          style={{
+            paddingTop: 0,
+            paddingBottom: 0,
+            marginLeft: 8,
+            minHeight: 100,
+            left: 0
+          }}
+          disableRowHandles
+          focusOnInit
+          placeholderText='What are your thoughts?'
+          onContentChange={updateCommentContent}
+          content={commentEditContent.doc}
+        />
+      );
+    }
+
+    return (
+      <InlineCharmEditor
+        colorMode='dark'
+        style={{
+          paddingTop: 0,
+          paddingBottom: 0,
+          marginLeft: 8,
+          minHeight: 100,
+          left: 0
+        }}
+        focusOnInit
+        placeholderText='What are your thoughts?'
+        onContentChange={updateCommentContent}
+        content={commentEditContent.doc}
+      />
+    );
+  }, [enableInlineCharmEditor, commentEditContent, updateCommentContent]);
+
   return (
     <Stack my={1} position='relative'>
       {/** test marker is here to avoid accidentally loading comments from recursive post comment components */}
@@ -163,21 +205,7 @@ export function Comment({
         <Box data-test={`post-comment-charmeditor-${comment.id}`} ml={3}>
           {isEditingComment ? (
             <Stack>
-              <CharmEditor
-                colorMode='dark'
-                style={{
-                  paddingTop: 0,
-                  paddingBottom: 0,
-                  marginLeft: 8,
-                  minHeight: 100,
-                  left: 0
-                }}
-                disableRowHandles
-                focusOnInit
-                placeholderText='What are your thoughts?'
-                onContentChange={updateCommentContent}
-                content={commentEditContent.doc}
-              />
+              {editor}
               <Stack flexDirection='row' my={1} ml={1} gap={1}>
                 <Button data-test={`save-comment-${comment.id}`} size='small' onClick={saveCommentContent}>
                   Save
