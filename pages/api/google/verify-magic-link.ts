@@ -38,7 +38,7 @@ async function verifyMagicLink(req: NextApiRequest, res: NextApiResponse<LoggedI
   if (!user) {
     user = await prisma.user.create({
       data: {
-        username: (verificationResult as any).name ?? randomName(),
+        username: verificationResult.email,
         identityType: 'VerifiedEmail',
         verifiedEmails: {
           create: {

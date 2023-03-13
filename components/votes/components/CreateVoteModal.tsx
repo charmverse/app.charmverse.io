@@ -173,8 +173,6 @@ export function CreateVoteModal({
     (voteType === VoteType.SingleChoice && options.findIndex((option) => option.name.length === 0) !== -1) ||
     new Set(options.map((option) => option.name)).size !== options.length;
 
-  const isProposalAuthor = proposal?.authors.find((author) => author.userId === user?.id) ?? false;
-
   return (
     <Modal
       title={proposal ? 'Create a vote' : 'Create a poll'}
