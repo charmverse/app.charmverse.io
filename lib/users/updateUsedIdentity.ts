@@ -1,6 +1,5 @@
 import type { Prisma } from '@prisma/client';
 import { IdentityType } from '@prisma/client';
-import { use } from 'react';
 
 import { prisma } from 'db';
 import { sessionUserRelations } from 'lib/session/config';

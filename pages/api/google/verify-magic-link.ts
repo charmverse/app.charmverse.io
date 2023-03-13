@@ -1,4 +1,3 @@
-// import firebase from 'firebase-admin';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
