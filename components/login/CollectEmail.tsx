@@ -20,7 +20,7 @@ type Props = {
 };
 
 export function CollectEmailDialog({ handleSubmit, isOpen, onClose }: Props) {
-  const { register, getValues, getFieldState, formState, reset, trigger, watch } = useForm<FormValues>({
+  const { register, getValues, getFieldState, reset, watch } = useForm<FormValues>({
     mode: 'onChange',
     resolver: yupResolver(schema)
   });
