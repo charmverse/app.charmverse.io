@@ -9,6 +9,7 @@ import type { LoginWithGoogleRequest } from 'lib/google/loginWithGoogle';
 import { onError, onNoMatch } from 'lib/middleware';
 import { sessionUserRelations } from 'lib/session/config';
 import { withSessionRoute } from 'lib/session/withSession';
+import { InvalidInputError } from 'lib/utilities/errors';
 import randomName from 'lib/utilities/randomName';
 import type { LoggedInUser } from 'models';
 
@@ -23,22 +24,18 @@ async function verifyMagicLink(req: NextApiRequest, res: NextApiResponse<LoggedI
   const toVerify: LoginWithGoogleRequest = req.body;
 
   const verificationResult = await firebaseApp.auth().verifyIdToken(toVerify.accessToken);
-  //  const token = await firebaseApp.appCheck().verifyToken(oobCode as string);
+
+  if (!verificationResult.email) {
+    throw new InvalidInputError(`No email found in verification result`);
+  }
 
   let user = await prisma.user.findFirst({
     where: {
-      OR: [
-        {
-          primaryEmail: verificationResult.email
-        },
-        {
-          googleAccounts: {
-            some: {
-              email: verificationResult.email
-            }
-          }
+      verifiedEmails: {
+        some: {
+          email: verificationResult.email
         }
-      ]
+      }
     },
     include: sessionUserRelations
   });
@@ -47,7 +44,14 @@ async function verifyMagicLink(req: NextApiRequest, res: NextApiResponse<LoggedI
     user = await prisma.user.create({
       data: {
         username: (verificationResult as any).name ?? randomName(),
-        primaryEmail: verificationResult.email
+        identityType: 'VerifiedEmail',
+        verifiedEmails: {
+          create: {
+            email: verificationResult.email,
+            avatarUrl: verificationResult.picture ?? '',
+            name: verificationResult.name ?? verificationResult.email
+          }
+        }
       },
       include: sessionUserRelations
     });

@@ -30,6 +30,7 @@ enum IdentityType {
   RandomName
   UnstoppableDomain
   Google
+  VerifiedEmail
 }
 
 enum VoteStatus {
@@ -475,7 +476,6 @@ model User {
   isBot                     Boolean?                        @default(false)
   path                      String?                         @unique
   identityType              IdentityType?
-  primaryEmail              String?                         @unique
   email                     String?
   emailNotifications        Boolean?                        @default(true)
   emailNewsletter           Boolean?                        @default(false)
@@ -518,7 +518,21 @@ model User {
   googleAccounts            GoogleAccount[]
   GoogleCredential          GoogleCredential[]
   PageComment               PageComment[]
+  verifiedEmails            VerifiedEmail[]
 }
+
+model VerifiedEmail {
+  id        String @id @default(uuid()) @db.Uuid
+  email     String @unique
+  name      String
+  avatarUrl String
+  userId    String @db.Uuid
+  user      User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([email])
+  @@index([userId])
+}
+
 
 model UserWallet {
   address String  @unique
