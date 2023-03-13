@@ -322,6 +322,7 @@ export default function ProposalProperties({
       />
 
       <CreateVoteModal
+        proposalFlowFlags={proposalFlowFlags}
         proposal={proposal}
         open={isVoteModalOpen}
         onCreateVote={() => {
