@@ -27,7 +27,7 @@ export async function createProposal({ userId, spaceId, categoryId, pageProps, r
   }
 
   const proposalId = uuid();
-  const proposalStatus: ProposalStatus = 'private_draft';
+  const proposalStatus: ProposalStatus = 'draft';
 
   // Using a transaction to ensure both the proposal and page gets created together
   const [proposal, page, workspaceEvent] = await prisma.$transaction([

@@ -1,4 +1,4 @@
-import type { BaseRawNodeSpec, NodeViewProps } from '@bangle.dev/core';
+import type { BaseRawNodeSpec } from '@bangle.dev/core';
 import { Plugin } from '@bangle.dev/core';
 import type { DOMOutputSpec, EditorState, EditorView, Slice, Transaction } from '@bangle.dev/pm';
 import { useTheme } from '@emotion/react';
@@ -12,6 +12,8 @@ import dynamic from 'next/dynamic';
 import type { HTMLAttributes } from 'react';
 import { memo, useMemo, useState } from 'react';
 
+import BlockAligner from 'components/common/CharmEditor/components/BlockAligner';
+import type { CharmNodeViewProps } from 'components/common/CharmEditor/components/nodeView/nodeView';
 import PdfSelector from 'components/common/PdfSelector';
 import { MIN_PDF_WIDTH, MAX_PDF_WIDTH } from 'lib/prosemirror/plugins/image/constants';
 
@@ -169,8 +171,9 @@ function ResizablePDF({
   onResizeStop,
   node,
   updateAttrs,
-  selected
-}: NodeViewProps & { readOnly?: boolean; onResizeStop?: (view: EditorView) => void }) {
+  selected,
+  deleteNode
+}: CharmNodeViewProps & { readOnly?: boolean; onResizeStop?: (view: EditorView) => void }) {
   readOnly = readOnly ?? false;
 
   const url: string = useMemo(() => node.attrs.src, [node.attrs.src]);
@@ -183,16 +186,18 @@ function ResizablePDF({
       return <EmptyPDFContainer readOnly={readOnly} isSelected={selected} />;
     } else {
       return (
-        <PdfSelector
-          autoOpen={autoOpen}
-          onPdfSelect={async (pdfSrc) => {
-            updateAttrs({
-              src: pdfSrc
-            });
-          }}
-        >
-          <EmptyPDFContainer readOnly={readOnly} isSelected={selected} />
-        </PdfSelector>
+        <BlockAligner onDelete={deleteNode}>
+          <PdfSelector
+            autoOpen={autoOpen}
+            onPdfSelect={async (pdfSrc) => {
+              updateAttrs({
+                src: pdfSrc
+              });
+            }}
+          >
+            <EmptyPDFContainer readOnly={readOnly} isSelected={selected} />
+          </PdfSelector>
+        </BlockAligner>
       );
     }
   }

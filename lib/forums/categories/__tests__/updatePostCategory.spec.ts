@@ -13,7 +13,7 @@ beforeAll(async () => {
   space = (await generateUserAndSpaceWithApiToken()).space;
 });
 describe('updatePostCategory', () => {
-  it('should only update a post category name', async () => {
+  it('should only update the post category name and description', async () => {
     const createInput: CreatePostCategoryInput = {
       name: 'Test Category',
       spaceId: space.id
@@ -26,13 +26,15 @@ describe('updatePostCategory', () => {
     const update: Partial<PostCategory> = {
       name: 'Updated Category',
       spaceId: secondSpace.id,
-      path: 'updated_category_manually_set_path'
+      path: 'updated_category_manually_set_path',
+      description: 'Updated category description'
     };
 
     const updatedPostCategory = await updatePostCategory(postCategory.id, update);
 
     expect(updatedPostCategory.id).toBe(postCategory.id);
     expect(updatedPostCategory.name).toBe(update.name);
+    expect(updatedPostCategory.description).toBe(update.description);
     // Check invalid changes were dropped
     expect(updatedPostCategory.spaceId).toBe(postCategory.spaceId);
     expect(updatedPostCategory.path).not.toBe(update.path);

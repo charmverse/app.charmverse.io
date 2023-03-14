@@ -19,16 +19,16 @@ processWebhookMessages();
 cron.schedule('0 * * * *', archiveTask);
 
 // Send user task notifications by email
-cron.schedule('0 * * * *', notificationTask);
+cron.schedule('*/30 * * * *', notificationTask);
 
 // Update votes status
-cron.schedule('0 */30 * * * *', voteTask);
+cron.schedule('*/30 * * * *', voteTask);
 
 // Close out snapshot proposals
-cron.schedule('0 */15 * * * *', proposalTask);
+cron.schedule('*/15 * * * *', proposalTask);
 
 // Verify token gates and remove users who no longer meet the conditions
-cron.schedule('0 */30 * * * *', verifyTokenGateMembershipsTask);
+cron.schedule('*/30 * * * *', verifyTokenGateMembershipsTask);
 
 const port = process.env.PORT || 4000;
 

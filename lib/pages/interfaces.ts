@@ -119,3 +119,10 @@ export type FormResponseProperty = IPropertyTemplate & {
 export interface IPageMetaWithPermissions extends PageMeta {
   permissions: (PagePermission & { sourcePermission: PagePermission | null })[];
 }
+
+export type DuplicatePageResponse = {
+  pages: PageMeta[];
+  rootPageId: string;
+  bounties: BountyWithDetails[];
+  blocks: Block[];
+};

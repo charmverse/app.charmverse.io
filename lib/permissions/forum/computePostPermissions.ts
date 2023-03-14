@@ -104,9 +104,9 @@ export async function baseComputePostPermissions({
 }
 
 type PostResource = Pick<Post, 'id' | 'spaceId' | 'createdBy' | 'proposalId'>;
-type PostPfpInput = PermissionFilteringPolicyFnInput<PostResource, AvailablePostPermissionFlags>;
+type PostPolicyInput = PermissionFilteringPolicyFnInput<PostResource, AvailablePostPermissionFlags>;
 
-async function convertedToProposalPfp({ resource, flags }: PostPfpInput): Promise<AvailablePostPermissionFlags> {
+async function convertedToProposalPolicy({ resource, flags }: PostPolicyInput): Promise<AvailablePostPermissionFlags> {
   const newPermissions = { ...flags };
 
   if (!resource.proposalId) {
@@ -124,7 +124,11 @@ async function convertedToProposalPfp({ resource, flags }: PostPfpInput): Promis
   return newPermissions;
 }
 
-async function onlyEditableByAuthor({ resource, flags, userId }: PostPfpInput): Promise<AvailablePostPermissionFlags> {
+async function onlyEditableByAuthor({
+  resource,
+  flags,
+  userId
+}: PostPolicyInput): Promise<AvailablePostPermissionFlags> {
   const newPermissions = {
     ...flags,
     edit_post: resource.createdBy === userId
@@ -150,5 +154,5 @@ export const computePostPermissions = buildComputePermissionsWithPermissionFilte
 >({
   resolver: postResolver,
   computeFn: baseComputePostPermissions,
-  pfps: [onlyEditableByAuthor, convertedToProposalPfp]
+  policies: [onlyEditableByAuthor, convertedToProposalPolicy]
 });

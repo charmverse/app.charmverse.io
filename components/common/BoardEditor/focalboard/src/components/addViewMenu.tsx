@@ -21,12 +21,13 @@ import { createBoardView } from 'lib/focalboard/boardView';
 
 import { Constants } from '../constants';
 import mutator from '../mutator';
-import { Utils } from '../utils';
+import { IDType, Utils } from '../utils';
 import IconButton from '../widgets/buttons/iconButton';
 import BoardIcon from '../widgets/icons/board';
 import CalendarIcon from '../widgets/icons/calendar';
 import GalleryIcon from '../widgets/icons/gallery';
 import TableIcon from '../widgets/icons/table';
+import { typeDisplayName } from '../widgets/propertyMenu';
 
 type AddViewProps = {
   board: Board;
@@ -166,6 +167,18 @@ function AddViewMenu(props: AddViewProps) {
     view.fields.dateDisplayPropertyId = board.fields.cardProperties.find(
       (o: IPropertyTemplate) => o.type === 'date'
     )?.id;
+
+    // Create one if it doesn't exist
+    if (!view.fields.dateDisplayPropertyId) {
+      const template: IPropertyTemplate = {
+        id: Utils.createGuid(IDType.BlockID),
+        name: typeDisplayName(intl, 'date'),
+        type: 'date',
+        options: []
+      };
+      mutator.insertPropertyTemplate(board, view, -1, template);
+      view.fields.dateDisplayPropertyId = template.id;
+    }
 
     mutator.insertBlock(
       view,

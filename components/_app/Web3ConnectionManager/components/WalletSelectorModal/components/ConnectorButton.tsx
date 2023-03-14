@@ -1,4 +1,5 @@
 import styled from '@emotion/styled';
+import type { ReactNode } from 'react';
 
 import Button from 'components/common/Button';
 import { greyColor2 } from 'theme/colors';
@@ -18,13 +19,14 @@ const ButtonContent = styled.div`
 type Props = {
   name: string;
   onClick: () => void;
-  iconUrl: string;
+  iconUrl?: string;
+  icon?: ReactNode;
   disabled: boolean;
   isActive: boolean;
   isLoading: boolean;
 };
 
-export function ConnectorButton({ name, onClick, iconUrl, disabled, isActive, isLoading }: Props) {
+export function ConnectorButton({ name, onClick, iconUrl, icon, disabled, isActive, isLoading }: Props) {
   return (
     <Button
       color='secondary'
@@ -43,7 +45,9 @@ export function ConnectorButton({ name, onClick, iconUrl, disabled, isActive, is
     >
       <ButtonContent>
         {`${name} ${isActive ? ' - connected' : ''}`}
-        <ImageIcon style={{ marginLeft: 3 }} src={`/images/walletLogos/${iconUrl}`} />
+        {iconUrl && <ImageIcon style={{ marginLeft: 3 }} src={`/images/walletLogos/${iconUrl}`} />}
+        {/** Allow switching between icon */}
+        {!iconUrl && icon}
       </ButtonContent>
     </Button>
   );

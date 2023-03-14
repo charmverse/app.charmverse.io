@@ -16,7 +16,7 @@ import { useEffect } from 'react';
 
 import Button from 'components/common/Button';
 import { StyledTreeItem } from 'components/common/PageLayout/components/PageNavigation/components/PageTreeItem';
-import IntegrationSettings from 'components/integrations/IntegrationsPage';
+import { IntegrationSettings } from 'components/integrations/IntegrationsPage';
 import TasksPage from 'components/nexus/TasksPage';
 import ProfileSettings from 'components/profile/ProfileSettings';
 import { ApiSettings } from 'components/settings/api/Api';
@@ -249,6 +249,7 @@ function SpaceSettingsModalComponent() {
           </Button>
         ) : (
           <IconButton
+            data-test='close-settings-modal'
             aria-label='close the settings modal'
             onClick={onClose}
             sx={{

@@ -80,7 +80,7 @@ const GalleryCard = React.memo((props: Props) => {
       ref={cardRef}
       data-test={`gallery-card-${card.id}`}
     >
-      {!props.readOnly && <PageActions page={cardPage} onClickDuplicate={duplicateCard} onClickDelete={deleteCard} />}
+      {!props.readOnly && <PageActions page={cardPage} onClickDelete={deleteCard} />}
       {galleryImageUrl && (
         <div className='gallery-image'>
           <img className='ImageElement' src={galleryImageUrl} alt='Gallery item' />

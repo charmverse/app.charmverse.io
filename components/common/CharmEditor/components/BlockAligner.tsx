@@ -1,3 +1,4 @@
+import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import { ListItemButton } from '@mui/material';
@@ -37,6 +38,7 @@ const Controls = styled.div`
 
 const BlockAligner = forwardRef<HTMLDivElement, BlockAlignerProps>((props, ref) => {
   const { children, onDelete, readOnly } = props;
+  const theme = useTheme();
 
   function handleDelete(e: MouseEvent) {
     onDelete();
@@ -49,13 +51,18 @@ const BlockAligner = forwardRef<HTMLDivElement, BlockAlignerProps>((props, ref) 
       {!readOnly && (
         <Controls className='controls'>
           <ListItemButton
-            onClick={handleDelete}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              handleDelete(e);
+            }}
             sx={{
               padding: 1,
-              backgroundColor: 'inherit'
+              backgroundColor: 'inherit',
+              color: 'secondary'
             }}
           >
-            <DeleteOutlinedIcon sx={{ fontSize: 14 }} />
+            <DeleteOutlinedIcon sx={{ fontSize: 14, color: theme.palette.text.primary }} />
           </ListItemButton>
         </Controls>
       )}

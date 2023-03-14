@@ -1,3 +1,5 @@
+import { v4 } from 'uuid';
+
 import { prisma } from 'db';
 import { sessionUserRelations } from 'lib/session/config';
 
@@ -126,6 +128,52 @@ describe('countConnectableIdentities', () => {
     });
     count = countConnectableIdentities(userWithFiveIdentities);
     expect(count).toBe(5);
+    // 6 ID
+    const userWithSixIdentities = await prisma.user.create({
+      data: {
+        username: 'userWithSixIdentities',
+        wallets: {
+          create: {
+            address: '0x6'
+          }
+        },
+        googleAccounts: {
+          create: {
+            email: 'test6@example.com',
+            name: 'test user',
+            avatarUrl: 'https://example.com/avatar.png'
+          }
+        },
+        unstoppableDomains: {
+          createMany: {
+            data: [
+              {
+                domain: 'example6a.nft'
+              },
+              {
+                domain: 'example6b.nft'
+              }
+            ]
+          }
+        },
+        discordUser: {
+          create: {
+            discordId: '1234567890.6',
+            account: {}
+          }
+        },
+        verifiedEmails: {
+          create: {
+            avatarUrl: '',
+            email: `test-${v4()}@example.com`,
+            name: 'test user'
+          }
+        }
+      },
+      include: sessionUserRelations
+    });
+    count = countConnectableIdentities(userWithSixIdentities);
+    expect(count).toBe(6);
   });
 
   it('should ignore Telegram as we cannot login with this identity', async () => {

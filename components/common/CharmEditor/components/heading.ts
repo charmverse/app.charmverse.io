@@ -71,6 +71,10 @@ function specFactory({ levels = defaultLevels } = {}): RawSpecs {
     name,
     schema: {
       attrs: {
+        id: {
+          // id is used for linking from table of contents
+          default: null
+        },
         level: {
           default: 1
         },
@@ -91,7 +95,6 @@ function specFactory({ levels = defaultLevels } = {}): RawSpecs {
           getAttrs: (dom: any) => {
             const result = { level: parseLevel(level) };
             const attrs = dom.getAttribute('data-bangle-attrs');
-
             if (!attrs) {
               return result;
             }
@@ -103,7 +106,7 @@ function specFactory({ levels = defaultLevels } = {}): RawSpecs {
         };
       }),
       toDOM: (node: Node) => {
-        const result: any = [`h${node.attrs.level}`, {}, 0];
+        const result: any = [`h${node.attrs.level}`, { id: node.attrs.id }, 0];
 
         if (node.attrs.collapseContent) {
           result[1]['data-bangle-attrs'] = JSON.stringify({

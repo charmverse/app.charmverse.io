@@ -1,7 +1,6 @@
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
-import MoonIcon from '@mui/icons-material/DarkMode';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import GetAppOutlinedIcon from '@mui/icons-material/GetAppOutlined';
 import MenuIcon from '@mui/icons-material/Menu';
@@ -13,7 +12,6 @@ import FavoritedIcon from '@mui/icons-material/Star';
 import NotFavoritedIcon from '@mui/icons-material/StarBorder';
 import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
 import UndoIcon from '@mui/icons-material/Undo';
-import SunIcon from '@mui/icons-material/WbSunny';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import FormControlLabel from '@mui/material/FormControlLabel';
@@ -35,10 +33,9 @@ import { memo, useMemo, useRef, useState } from 'react';
 import charmClient from 'charmClient';
 import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
 import { undoEventName } from 'components/common/CharmEditor/utils';
+import { DuplicatePageAction } from 'components/common/DuplicatePageAction';
 import { usePostByPath } from 'components/forum/hooks/usePostByPath';
 import { useProposalCategories } from 'components/proposals/hooks/useProposalCategories';
-import { useColorMode } from 'context/darkMode';
-import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useMembers } from 'hooks/useMembers';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
@@ -273,7 +270,6 @@ function PostHeader({
 
 function HeaderComponent({ open, openSidebar }: HeaderProps) {
   const router = useRouter();
-  const colorMode = useColorMode();
   const { updatePage, deletePage } = usePages();
   const { user } = useUser();
   const theme = useTheme();
@@ -285,11 +281,9 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
   const { isFavorite, toggleFavorite } = useToggleFavorite({ pageId: basePage?.id });
   const { members } = useMembers();
   const { setCurrentPageActionDisplay } = usePageActionDisplay();
-  const [userSpacePermissions] = useCurrentSpacePermissions();
   const { permissions: pagePermissions } = usePagePermissions({
     pageIdOrPath: basePage ? basePage.id : (null as any)
   });
-
   const { onClick: clickToOpenSettingsModal } = useSettingsDialog();
   const isForumPost = router.route === '/[domain]/forum/post/[pagePath]';
 
@@ -442,6 +436,9 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
           </Box>
           <ListItemText primary={isFavorite ? 'Remove from Favorites' : 'Add to Favorites'} />
         </ListItemButton>
+      )}
+      {basePage && (
+        <DuplicatePageAction postDuplication={closeMenu} page={basePage} pagePermissions={pagePermissions} />
       )}
       <CopyLinkMenuItem closeMenu={closeMenu} />
 
@@ -607,27 +604,6 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
               </IconButton>
             </NotificationsBadge>
           )}
-          <IconButton
-            sx={{ display: { xs: 'none', md: 'inline-flex' } }}
-            size='small'
-            onClick={colorMode.toggleColorMode}
-            color='inherit'
-          >
-            <Tooltip
-              title={`Enable ${theme.palette.mode === 'dark' ? 'light mode' : 'dark mode'}`}
-              arrow
-              placement='top'
-            >
-              {theme.palette.mode === 'dark' ? (
-                <SunIcon fontSize='small' color='secondary' />
-              ) : (
-                <MoonIcon fontSize='small' color='secondary' />
-              )}
-            </Tooltip>
-          </IconButton>
-
-          {/** user account */}
-          {/* <Account /> */}
         </Box>
       </Box>
     </StyledToolbar>

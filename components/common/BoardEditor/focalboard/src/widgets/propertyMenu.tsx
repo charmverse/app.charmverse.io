@@ -14,6 +14,7 @@ type Props = {
   propertyType: PropertyType;
   onTypeAndNameChanged: (newType: PropertyType, newName: string) => void;
   onDelete: (id: string) => void;
+  deleteDisabled?: string;
 };
 
 export function typeDisplayName(intl: IntlShape, type: PropertyType): string {
@@ -145,7 +146,12 @@ const PropertyMenu = React.memo((props: Props) => {
           onTypeSelected={(type: PropertyType) => props.onTypeAndNameChanged(type, name)}
         />
       </Menu.SubMenu>
-      <Menu.Text id='delete' name={deleteText} onClick={() => props.onDelete(props.propertyId)} />
+      <Menu.Text
+        disabled={props.deleteDisabled}
+        id='delete'
+        name={deleteText}
+        onClick={() => props.onDelete(props.propertyId)}
+      />
     </Menu>
   );
 });

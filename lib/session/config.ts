@@ -51,6 +51,12 @@ export const sessionUserRelations = {
   discordUser: true,
   telegramUser: true,
   notificationState: true,
+  verifiedEmails: {
+    select: {
+      email: true,
+      name: true
+    }
+  },
   wallets: {
     select: {
       address: true,

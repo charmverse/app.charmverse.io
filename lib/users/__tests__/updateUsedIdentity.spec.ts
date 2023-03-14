@@ -257,6 +257,31 @@ describe('updateUsedIdentity', () => {
     expect(userAfterUpdate.identityType).toBe(`Telegram`);
   });
 
+  it('should update a user identity to their Verified Email username', async () => {
+    const user = await prisma.user.create({
+      data: {
+        username: 'random-name',
+        identityType: 'RandomName',
+        verifiedEmails: {
+          create: {
+            name: 'John Doe Email',
+            email: `test-${v4()}@example.com`,
+            avatarUrl: 'https://example.com/avatar.png'
+          }
+        }
+      },
+      include: sessionUserRelations
+    });
+
+    const userAfterUpdate = await updateUsedIdentity(user.id, {
+      identityType: 'VerifiedEmail',
+      displayName: user.verifiedEmails[0].name
+    });
+
+    expect(userAfterUpdate.username).toBe(user.verifiedEmails[0].name);
+    expect(userAfterUpdate.identityType).toBe(`VerifiedEmail`);
+  });
+
   it('should throw an error if user does not exist', async () => {
     await expect(updateUsedIdentity(v4())).rejects.toBeInstanceOf(MissingDataError);
   });

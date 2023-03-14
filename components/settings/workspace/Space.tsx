@@ -23,6 +23,8 @@ import { useIsAdmin } from 'hooks/useIsAdmin';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useSpaces } from 'hooks/useSpaces';
 
+import { SpaceFeatureSettings } from './SpaceFeatureSettings';
+
 const schema = yup.object({
   name: yup.string().ensure().trim().min(3, 'Name must be at least 3 characters').required('Name is required'),
   spaceImage: yup.string().nullable(true),
@@ -171,6 +173,9 @@ export default function SpaceSettings({ space }: { space: Space }) {
       <Box sx={{ ml: 1 }} display='flex' flexDirection='column' gap={1}>
         <ImportContent />
       </Box>
+
+      <Legend mt={4}>Sidebar Module Visibility</Legend>
+      <SpaceFeatureSettings />
 
       <Legend mt={4}>Snapshot.org Integration</Legend>
       <Box sx={{ ml: 1 }} display='flex' flexDirection='column' gap={1}>

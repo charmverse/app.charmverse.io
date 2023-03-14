@@ -8,7 +8,7 @@ import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
 import { PageActions } from 'components/common/PageActions';
 import { PageIcon } from 'components/common/PageLayout/components/PageIcon';
 import { usePageDetails } from 'hooks/usePageDetails';
-import type { PageMeta } from 'lib/pages';
+import type { DuplicatePageResponse, PageMeta } from 'lib/pages';
 import { fancyTrim } from 'lib/utilities/strings';
 
 import BountyStatusBadge from './BountyStatusBadge';
@@ -38,9 +38,10 @@ interface Props {
   readOnly?: boolean;
   bounty: Bounty;
   page: PageMeta;
+  onDuplicate?: (duplicatePageResponse: DuplicatePageResponse) => void;
 }
 
-export function BountyGalleryCard({ page: bountyPage, bounty, readOnly, onClick, onDelete }: Props) {
+export function BountyGalleryCard({ page: bountyPage, bounty, readOnly, onClick, onDelete, onDuplicate }: Props) {
   const { pageDetails } = usePageDetails(bountyPage?.id);
 
   return bountyPage ? (
@@ -53,7 +54,9 @@ export function BountyGalleryCard({ page: bountyPage, bounty, readOnly, onClick,
       }}
       data-test={`bounty-card-${bounty.id}`}
     >
-      {!readOnly && <PageActions page={bountyPage} onClickDelete={() => onDelete(bounty.id)} />}
+      {!readOnly && (
+        <PageActions onDuplicate={onDuplicate} page={bountyPage} onClickDelete={() => onDelete(bounty.id)} />
+      )}
       <div className='gallery-title'>
         {bountyPage?.icon ? (
           <PageIcon isEditorEmpty={!bountyPage?.hasContent} pageType='card' icon={bountyPage.icon} />

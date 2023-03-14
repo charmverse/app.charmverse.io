@@ -17,6 +17,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { SWRConfig } from 'swr';
 
 import charmClient from 'charmClient';
+import { CurrentSpaceSetter } from 'components/_app/CurrentSpaceSetter';
 import GlobalComponents from 'components/_app/GlobalComponents';
 import { LocalizationProvider } from 'components/_app/LocalizationProvider';
 import { Web3ConnectionManager } from 'components/_app/Web3ConnectionManager';
@@ -31,7 +32,7 @@ import { MemberProfileProvider } from 'components/profile/hooks/useMemberProfile
 import { isDevEnv } from 'config/constants';
 import { ColorModeContext } from 'context/darkMode';
 import { BountiesProvider } from 'hooks/useBounties';
-import { CurrentSpaceProvider, useCurrentSpaceId } from 'hooks/useCurrentSpaceId';
+import { CurrentSpaceProvider } from 'hooks/useCurrentSpaceId';
 import { DiscordProvider } from 'hooks/useDiscordConnection';
 import { useInterval } from 'hooks/useInterval';
 import { IsSpaceMemberProvider } from 'hooks/useIsSpaceMember';
@@ -44,7 +45,6 @@ import { PageTitleProvider, usePageTitle } from 'hooks/usePageTitle';
 import { PaymentMethodsProvider } from 'hooks/usePaymentMethods';
 import { SettingsDialogProvider } from 'hooks/useSettingsDialog';
 import { SnackbarProvider } from 'hooks/useSnackbar';
-import { useSpaceFromPath } from 'hooks/useSpaceFromPath';
 import { SpacesProvider } from 'hooks/useSpaces';
 import { UserProvider } from 'hooks/useUser';
 import { useUserAcquisition } from 'hooks/useUserAcquisition';
@@ -298,17 +298,6 @@ function DataProviders({ children }: { children: ReactNode }) {
       </UserProvider>
     </SWRConfig>
   );
-}
-
-function CurrentSpaceSetter() {
-  const spaceFromPath = useSpaceFromPath();
-  const { setCurrentSpaceId } = useCurrentSpaceId();
-
-  useEffect(() => {
-    setCurrentSpaceId(spaceFromPath?.id ?? '');
-  }, [spaceFromPath?.id]);
-
-  return null;
 }
 
 function PageHead() {

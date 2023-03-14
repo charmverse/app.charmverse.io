@@ -21,6 +21,7 @@ type PageTypeEvent = PageEvent & {
 export interface PageEventMap {
   page_view: PageTypeEvent | CustomPageViewEvent;
   archive_page: PageEvent;
+  duplicate_page: PageTypeEvent;
   delete_page: PageEvent;
   restore_page: PageEvent;
   edit_page: PageEvent;

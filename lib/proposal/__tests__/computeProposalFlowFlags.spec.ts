@@ -38,7 +38,7 @@ beforeAll(async () => {
 });
 
 describe('Validate if the user can update the status of the proposal', () => {
-  it('Proposal author should be able to change the proposal status from private_draft to draft', async () => {
+  it('Proposal author should be able to change the proposal status from draft to discussion', async () => {
     // Create a test proposal first
     const pageWithProposal = await createProposalWithUsers({
       spaceId: space.id,
@@ -130,7 +130,7 @@ describe('Validate if the user can update the status of the proposal', () => {
     expect(flowFlags.reviewed).toBe(false);
   });
 
-  it("Proposal reviewer (userId) shouldn't be able to change the proposal status from private_draft to draft", async () => {
+  it("Proposal reviewer (userId) shouldn't be able to change the proposal status from draft to discussion", async () => {
     // Create a test proposal first
     const pageWithProposal = await createProposalWithUsers({
       spaceId: space.id,
@@ -144,7 +144,7 @@ describe('Validate if the user can update the status of the proposal', () => {
       userId: reviewer1.id
     });
 
-    expect(flowFlags.private_draft).toBe(false);
+    expect(flowFlags.discussion).toBe(false);
   });
 
   it('should return false for the review status if the proposal is in discussion stage, but no reviewers exist', async () => {

@@ -30,6 +30,7 @@ enum IdentityType {
   RandomName
   UnstoppableDomain
   Google
+  VerifiedEmail
 }
 
 enum VoteStatus {
@@ -56,6 +57,7 @@ enum NotificationType {
   proposal
   bounty
   post_comment
+  forum
 }
 
 enum BountyStatus {
@@ -137,7 +139,6 @@ enum ProfileItemType {
 }
 
 enum ProposalStatus {
-  private_draft
   draft
   discussion
   review
@@ -203,6 +204,18 @@ enum VisibilityView {
   profile
 }
 
+enum CategorySubscriptionMode {
+  whitelist
+  blacklist
+}
+
+enum Feature {
+  member_directory
+  proposals
+  forum
+  bounties
+}
+
 model Space {
   id                          String                            @id @default(uuid()) @db.Uuid
   deletedAt                   DateTime?
@@ -249,12 +262,15 @@ model Space {
   memberPropertyValues        MemberPropertyValue[]
   userTokenGates              UserTokenGate[]
   postCategories              PostCategory[]
-  Post                        Post[]
+  posts                       Post[]
   postCategoryPermissions     PostCategoryPermission[]
   proposalCategoryPermissions ProposalCategoryPermission[]
+  spaceNotificationSettings   UserSpaceNotificationSettings[]
   webhookSubscriptionUrl      String?
   webhookSubscriptions        WebhookSubscription[]
   webhookSigningSecret        String?
+
+  hiddenFeatures Feature[]
 
   @@index([createdBy])
 }
@@ -324,6 +340,7 @@ model Page {
   diffs               PageDiff[]
   convertedProposalId String?          @unique @db.Uuid
   convertedProposal   Proposal?        @relation(fields: [convertedProposalId], references: [id], onDelete: SetNull, onUpdate: Cascade, name: "convertedProposal")
+  comments            PageComment[]
 
   @@index([bountyId])
   @@index([cardId])
@@ -332,6 +349,36 @@ model Page {
   @@index([proposalId])
   @@index([spaceId])
   @@index([title])
+}
+
+model PageComment {
+  id          String            @id @default(uuid()) @db.Uuid
+  createdAt   DateTime          @default(now())
+  createdBy   String            @db.Uuid
+  content     Json
+  contentText String
+  updatedAt   DateTime          @updatedAt
+  deletedAt   DateTime?
+  deletedBy   String?
+  parentId    String?
+  pageId      String            @db.Uuid
+  page        Page              @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  user        User              @relation(fields: [createdBy], references: [id], onDelete: Cascade)
+  votes       PageCommentVote[]
+
+  @@index([pageId])
+}
+
+model PageCommentVote {
+  createdAt DateTime @default(now())
+  createdBy String   @db.Uuid
+  upvoted   Boolean
+
+  commentId String      @db.Uuid
+  comment   PageComment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+
+  @@unique([createdBy, commentId])
+  @@index([commentId])
 }
 
 model PageDiff {
@@ -417,57 +464,75 @@ model Vote {
 }
 
 model User {
-  id                   String                 @id @default(uuid()) @db.Uuid
-  createdAt            DateTime               @default(now())
-  updatedAt            DateTime               @default(now())
-  deletedAt            DateTime?
-  avatar               String?
-  avatarContract       String?
-  avatarTokenId        String?
-  avatarChain          Int?
-  username             String
-  isBot                Boolean?               @default(false)
-  path                 String?                @unique
-  identityType         IdentityType?
-  email                String?
-  xpsEngineId          String?                @unique
-  applications         Application[]
-  blocks               Block[]
-  bounties             Bounty[]
-  bountyPermissions    BountyPermission[]
-  comments             Comment[]
-  discordUser          DiscordUser?
-  favorites            FavoritePage[]
-  inviteLinks          InviteLink[]
-  posts                Post[]
-  pages                Page[]
-  permissions          PagePermission[]
-  poaps                Poap[]
-  spacesCreated        Space[]
-  spacePermissions     SpacePermission[]
-  spaceRoles           SpaceRole[]
-  spacesOrder          String[]
-  telegramUser         TelegramUser?
-  threads              Thread[]
-  profile              UserDetails?
-  gnosisSafes          UserGnosisSafe[]
-  userNotifications    UserNotification[]
-  notificationState    UserNotificationState?
-  userVotes            UserVote[]
-  initiatedVotes       Vote[]
-  profileItems         ProfileItem[]
-  proposalsAuthored    ProposalAuthor[]
-  proposalsReviewed    ProposalReviewer[]
-  reviewedProposals    Proposal[]
-  workspaceEvents      WorkspaceEvent[]
-  wallets              UserWallet[]
-  memberPropertyValues MemberPropertyValue[]
-  userTokenGates       UserTokenGate[]
-  unstoppableDomains   UnstoppableDomain[]
-  postComments         PostComment[]
-  googleAccounts       GoogleAccount[]
-  GoogleCredential     GoogleCredential[]
+  id                        String                          @id @default(uuid()) @db.Uuid
+  createdAt                 DateTime                        @default(now())
+  updatedAt                 DateTime                        @default(now())
+  deletedAt                 DateTime?
+  avatar                    String?
+  avatarContract            String?
+  avatarTokenId             String?
+  avatarChain               Int?
+  username                  String
+  isBot                     Boolean?                        @default(false)
+  path                      String?                         @unique
+  identityType              IdentityType?
+  email                     String?
+  emailNotifications        Boolean?                        @default(true)
+  emailNewsletter           Boolean?                        @default(false)
+  xpsEngineId               String?                         @unique
+  applications              Application[]
+  blocks                    Block[]
+  bounties                  Bounty[]
+  bountyPermissions         BountyPermission[]
+  comments                  Comment[]
+  discordUser               DiscordUser?
+  favorites                 FavoritePage[]
+  inviteLinks               InviteLink[]
+  posts                     Post[]
+  pages                     Page[]
+  permissions               PagePermission[]
+  poaps                     Poap[]
+  spacesCreated             Space[]
+  spacePermissions          SpacePermission[]
+  spaceRoles                SpaceRole[]
+  spacesOrder               String[]
+  telegramUser              TelegramUser?
+  threads                   Thread[]
+  profile                   UserDetails?
+  gnosisSafes               UserGnosisSafe[]
+  userNotifications         UserNotification[]
+  notificationState         UserNotificationState?
+  userVotes                 UserVote[]
+  initiatedVotes            Vote[]
+  profileItems              ProfileItem[]
+  proposalsAuthored         ProposalAuthor[]
+  proposalsReviewed         ProposalReviewer[]
+  reviewedProposals         Proposal[]
+  workspaceEvents           WorkspaceEvent[]
+  wallets                   UserWallet[]
+  memberPropertyValues      MemberPropertyValue[]
+  spaceNotificationSettings UserSpaceNotificationSettings[]
+  userTokenGates            UserTokenGate[]
+  unstoppableDomains        UnstoppableDomain[]
+  postComments              PostComment[]
+  googleAccounts            GoogleAccount[]
+  GoogleCredential          GoogleCredential[]
+  PageComment               PageComment[]
+  verifiedEmails            VerifiedEmail[]
 }
+
+model VerifiedEmail {
+  id        String @id @default(uuid()) @db.Uuid
+  email     String @unique
+  name      String
+  avatarUrl String
+  userId    String @db.Uuid
+  user      User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([email])
+  @@index([userId])
+}
+
 
 model UserWallet {
   address String  @unique
@@ -476,6 +541,19 @@ model UserWallet {
   user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+}
+
+model UserSpaceNotificationSettings {
+  userId              String                   @db.Uuid
+  user                User                     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  spaceId             String                   @db.Uuid
+  space               Space                    @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  // just keep a list of ids instead of another table, since we dont really care if they exist or not in the db
+  forumCategories     String[]
+  forumCategoriesMode CategorySubscriptionMode @default(blacklist)
+
+  @@unique([userId, spaceId])
+  @@index([userId, spaceId])
 }
 
 model UserNotificationState {
@@ -1088,6 +1166,7 @@ model MemberPropertyPermission {
 model PostCategory {
   id                      String                   @id @default(uuid()) @db.Uuid
   name                    String
+  description             String?
   path                    String?
   defaultForSpace         Space?                   @relation(name: "defaultPostCategory")
   spaceId                 String                   @db.Uuid

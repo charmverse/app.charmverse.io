@@ -20,7 +20,12 @@ const acceptedImageFormats = ['.jpg', '.jpeg', '.png', '.webp'];
 export async function prepopulateUserProfile(user: User, ens: string | null) {
   const ensDetails = await getENSDetails(ens);
 
-  if (!user.avatar && ensDetails?.avatar && acceptedImageFormats.some((ext) => ensDetails?.avatar?.endsWith(ext))) {
+  if (
+    !user.avatar &&
+    ensDetails?.avatar &&
+    acceptedImageFormats.some((ext) => ensDetails?.avatar?.endsWith(ext)) &&
+    !ensDetails.avatar.includes('?')
+  ) {
     try {
       await updateProfileAvatar({
         avatar: ensDetails.avatar,
@@ -53,7 +58,7 @@ export async function prepopulateUserProfile(user: User, ens: string | null) {
   if (nfts.length > 0) {
     if (!user.avatar && !ensDetails?.avatar) {
       for (const nft of nfts) {
-        if (acceptedImageFormats.some((ext) => nft.image.endsWith(ext))) {
+        if (acceptedImageFormats.some((ext) => nft.image.endsWith(ext)) && !nft.image.includes('?')) {
           try {
             const updatedUser = await updateProfileAvatar({
               avatar: nft.image,
@@ -74,11 +79,11 @@ export async function prepopulateUserProfile(user: User, ens: string | null) {
       }
     }
 
-    const fiveNFTs = nfts.slice(0, 5);
+    const fiveNFTs = nfts.filter((nft) => !!nft.id).slice(0, 5);
 
     await Promise.all(
-      fiveNFTs.map(async (nft) => {
-        await prisma.profileItem.create({
+      fiveNFTs.map((nft) =>
+        prisma.profileItem.create({
           data: {
             id: nft.id,
             userId: user.id,
@@ -86,8 +91,8 @@ export async function prepopulateUserProfile(user: User, ens: string | null) {
             isPinned: true,
             type: 'nft'
           }
-        });
-      })
+        })
+      )
     );
   }
 }
