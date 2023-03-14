@@ -116,6 +116,7 @@ function PropertyValueElement(props: Props) {
   } else if (propertyTemplate.type === 'person') {
     propertyValueElement = (
       <UserProperty
+        displayType={displayType}
         memberIds={typeof propertyValue === 'string' ? [propertyValue] : propertyValue ?? []}
         readOnly={readOnly || (displayType !== 'details' && displayType !== 'table')}
         onChange={(newValue) => {
