@@ -43,7 +43,7 @@ export function IdentityProviders() {
   const { account, isConnectingIdentity, sign, isSigning, verifiableWalletDetected } = useWeb3AuthSig();
   const { user, setUser, updateUser } = useUser();
   const { showMessage } = useSnackbar();
-  const { disconnectGoogleAccount, isConnectingGoogle, requestMagicLinkViaFirebase } = useFirebaseAuth();
+  const { disconnectGoogleAccount, isConnectingGoogle, disconnectVerifiedEmailAccount } = useFirebaseAuth();
   const identityTypes = useIdentityTypes();
   const accountsPopupState = usePopupState({ variant: 'popover', popupId: 'accountsModal' });
   const discordAccount = user?.discordUser?.account as Partial<DiscordAccount> | undefined;
@@ -220,8 +220,11 @@ export function IdentityProviders() {
             text={verifiedEmail.email}
             type='VerifiedEmail'
             loading={false}
-            disabled={false}
+            disabled={cannotDisconnect}
             connected={true}
+            actions={
+              <MenuItem onClick={() => disconnectVerifiedEmailAccount(verifiedEmail.email)}>Disconnect</MenuItem>
+            }
           />
         ))}
         <ListItem disablePadding>
