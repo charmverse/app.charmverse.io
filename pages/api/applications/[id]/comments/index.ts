@@ -74,7 +74,7 @@ async function getApplicationCommentsController(req: NextApiRequest, res: NextAp
         parentId: applicationId
       },
       orderBy: {
-        createdAt: 'desc'
+        createdAt: 'asc'
       }
     });
 
