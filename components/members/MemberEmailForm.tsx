@@ -11,7 +11,7 @@ import { useUser } from 'hooks/useUser';
 import debounce from 'lib/utilities/debounce';
 
 export const schema = yup.object({
-  email: yup.string().ensure().trim().email().max(50)
+  email: yup.string().ensure().trim().email()
 });
 
 export type FormValues = yup.InferType<typeof schema>;
@@ -59,11 +59,11 @@ export function MemberEmailForm({ readOnly = false }: { readOnly?: boolean }) {
       <TextField
         {...register('email')}
         disabled={readOnly}
-        data-testid='edit-email'
+        data-test='member-email-input'
         fullWidth
         error={!!errors.email}
         helperText={errors.email?.message}
-        placeholder=''
+        placeholder='me@gmail.com'
         onChange={async (event) => {
           const val = event.target.value;
           setValue('email', val);

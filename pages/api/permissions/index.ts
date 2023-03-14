@@ -64,7 +64,6 @@ async function addPagePermission(req: NextApiRequest, res: NextApiResponse<IPage
 
   const createdPermission = await prisma.$transaction(
     async (tx) => {
-      console.time('01-tx-----');
       const page = await tx.page.findUnique({
         where: {
           id: pageId
