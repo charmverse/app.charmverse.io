@@ -36,7 +36,7 @@ async function detectSpacesWithDuplicateCategories() {
     select: {
       id: true,
       domain: true,
-      proposalCategory: {
+      proposalCategories: {
         select: {
           id: true,
           title: true
@@ -50,8 +50,8 @@ async function detectSpacesWithDuplicateCategories() {
   const spacesWithDuplicates: {spaceId: string, domain: string, duplicates: Pick<ProposalCategory, 'id' | 'title'>[]}[] = [];
 
   for (const space of spaces) {
-    space.proposalCategory.forEach((category) => {
-      const duplicates = space.proposalCategory.filter(c => c.title === category.title);
+    space.proposalCategories.forEach((category) => {
+      const duplicates = space.proposalCategories.filter(c => c.title === category.title);
       if (duplicates.length > 1) {
         spacesWithDuplicates.push({spaceId: space.id, domain: space.domain, duplicates});
       }
@@ -68,7 +68,7 @@ async function provisionGeneralProposalCategory() {
   console.log('--- START --- Provision general categories')
   const spacesWithoutGeneral = await prisma.space.findMany({
     where: {
-      proposalCategory: {
+      proposalCategories: {
         none: {
           title: 'General'
         }
@@ -104,7 +104,7 @@ async function provisionGeneralProposalCategory() {
             title: 'General'
           }
         })));
-  
+
   }
 }
 
@@ -207,7 +207,7 @@ async function assignSpaceDefaultPermissions() {
 export function migrateProposals() {
   // Ran this once, no duplicates detected
   //detectSpacesWithDuplicateCategories();
-  
+
   provisionGeneralProposalCategory();
   assignProposalsToDefaultCategory();
   disconnectProposalsFromChildren();

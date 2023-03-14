@@ -16,7 +16,10 @@ export const DOMAIN_BLACKLIST = [
 
 export const spaceContentTemplates = {
   templateNftCommunity: 'NFT Community',
-  templateCreator: 'Creator'
+  templateCreator: 'Creator',
+  templateHackathon: 'Hackathon',
+  templateNounishDAO: 'Nounish DAO',
+  templateImpactCommunity: 'Impact Community'
 };
 
 export type SpaceTemplate = keyof typeof spaceContentTemplates;
