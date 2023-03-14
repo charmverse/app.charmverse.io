@@ -1,4 +1,5 @@
 import EmailIcon from '@mui/icons-material/Email';
+import Box from '@mui/material/Box';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import List from '@mui/material/List';
@@ -30,12 +31,14 @@ export type AnyIdLogin<I extends IdentityType = IdentityType> = {
 export interface DialogProps {
   isOpen: boolean;
   onClose: () => void;
-  open: () => void;
 }
 
 function LoginHandler(props: DialogProps) {
-  const { onClose, isOpen, open } = props;
+  const { onClose, isOpen } = props;
   const { loginFromWeb3Account } = useWeb3AuthSig();
+
+  // Governs whether we should auto-request a signature. Should only happen on first login.
+  const [enableAutosign, setEnableAutoSign] = useState(true);
 
   const [loginMethod, setLoginMethod] = useState<'email' | null>(null);
 
@@ -104,9 +107,17 @@ function LoginHandler(props: DialogProps) {
     }
   }
 
+  function close() {
+    if (loginMethod) {
+      setLoginMethod(null);
+    } else {
+      onClose();
+    }
+  }
+
   return (
     <>
-      <Dialog onClose={loginMethod ? () => setLoginMethod(null) : onClose} open={isOpen}>
+      <Dialog open={isOpen} onClose={close}>
         {!loginMethod && (
           <List sx={{ pt: 0, maxWidth: '400px' }}>
             <DialogTitle textAlign='left'>Connect Wallet</DialogTitle>
@@ -117,7 +128,12 @@ function LoginHandler(props: DialogProps) {
             </ListItem>
             {verifiableWalletDetected && (
               <ListItem>
-                <WalletSign buttonStyle={{ width: '100%' }} signSuccess={handleWeb3Login} enableAutosign />
+                <WalletSign
+                  buttonStyle={{ width: '100%' }}
+                  signSuccess={handleWeb3Login}
+                  enableAutosign={enableAutosign}
+                  onError={() => setEnableAutoSign(false)}
+                />
               </ListItem>
             )}
 
@@ -151,12 +167,15 @@ function LoginHandler(props: DialogProps) {
           </List>
         )}
         {loginMethod === 'email' && (
-          <CollectEmail
-            loading={sendingMagicLink.current === true}
-            title='Connect with email'
-            description="Enter your email address and we'll email you a login link"
-            handleSubmit={handleMagicLinkRequest}
-          />
+          <Box m={2}>
+            <CollectEmail
+              loading={sendingMagicLink.current === true}
+              title='Connect with email'
+              description="Enter your email address and we'll email you a login link"
+              handleSubmit={handleMagicLinkRequest}
+              onClose={close}
+            />
+          </Box>
         )}
       </Dialog>
       <LoginErrorModal open={showLoginError} onClose={() => setShowLoginError(false)} />
@@ -188,7 +207,7 @@ export function Login() {
       >
         Connect
       </Button>
-      <LoginHandler isOpen={loginDialog.isOpen} open={loginDialog.open} onClose={handleClose} />
+      <LoginHandler isOpen={loginDialog.isOpen} onClose={handleClose} />
     </div>
   );
 }

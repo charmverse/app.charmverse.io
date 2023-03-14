@@ -1,9 +1,9 @@
 import RefreshIcon from '@mui/icons-material/Refresh';
 import type { SelectChangeEvent } from '@mui/material';
 import {
-  Chip,
   Alert,
   Box,
+  Chip,
   IconButton,
   InputLabel,
   List,
@@ -16,14 +16,9 @@ import {
 } from '@mui/material';
 import type { User } from '@prisma/client';
 import { bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
-import { useRef } from 'react';
 import useSWRMutation from 'swr/mutation';
 
 import charmClient from 'charmClient';
-import Modal from 'components/common/Modal';
-import PrimaryButton from 'components/common/PrimaryButton';
-import { WalletSign } from 'components/login';
-import { CollectEmailDialog } from 'components/login/CollectEmail';
 import Legend from 'components/settings/Legend';
 import { useDiscordConnection } from 'hooks/useDiscordConnection';
 import { useFirebaseAuth } from 'hooks/useFirebaseAuth';
@@ -40,19 +35,17 @@ import type { LoggedInUser } from 'models';
 import type { TelegramAccount } from 'pages/api/telegram/connect';
 
 import IdentityProviderItem from './IdentityProviderItem';
-import { TelegramLoginIframe, loginWithTelegram } from './TelegramLoginIframe';
+import { NewIdentityModal } from './NewIdentityModal';
+import { TelegramLoginIframe } from './TelegramLoginIframe';
 import { useIdentityTypes } from './useIdentityTypes';
 
 export function IdentityProviders() {
   const { account, isConnectingIdentity, sign, isSigning, verifiableWalletDetected } = useWeb3AuthSig();
   const { user, setUser, updateUser } = useUser();
   const { showMessage } = useSnackbar();
-  const { connectGoogleAccount, disconnectGoogleAccount, isConnectingGoogle, requestMagicLinkViaFirebase } =
-    useFirebaseAuth();
-  const sendingMagicLink = useRef(false);
+  const { disconnectGoogleAccount, isConnectingGoogle, requestMagicLinkViaFirebase } = useFirebaseAuth();
   const identityTypes = useIdentityTypes();
   const accountsPopupState = usePopupState({ variant: 'popover', popupId: 'accountsModal' });
-  const emailPopupState = usePopupState({ variant: 'popover', popupId: 'emailModal' });
   const discordAccount = user?.discordUser?.account as Partial<DiscordAccount> | undefined;
   const telegramAccount = user?.telegramUser?.account as Partial<TelegramAccount> | undefined;
 
@@ -99,11 +92,7 @@ export function IdentityProviders() {
     }
   });
 
-  const {
-    trigger: connectToTelegram,
-    isMutating: isConnectingToTelegram,
-    error: connectTelegramError
-  } = useSWRMutation(
+  const { error: connectTelegramError, isMutating: isConnectingToTelegram } = useSWRMutation(
     '/telegram/connect',
     (_url, { arg }: Readonly<{ arg: TelegramAccount }>) => charmClient.connectTelegram(arg),
     {
@@ -118,17 +107,6 @@ export function IdentityProviders() {
     disconnectTelegramError?.message ||
     connectTelegramError?.error ||
     disconnectTelegramError?.error;
-
-  async function connectTelegram() {
-    loginWithTelegram(async (_telegramAccount: TelegramAccount) => {
-      if (_telegramAccount) {
-        await connectToTelegram(_telegramAccount);
-      } else {
-        showMessage('Something went wrong. Please try again', 'warning');
-      }
-    });
-  }
-
   const onIdentityChange = async (event: SelectChangeEvent<string>) => {
     const val = identityTypes.find((t) => t.username === event.target.value);
 
@@ -141,22 +119,6 @@ export function IdentityProviders() {
   };
 
   const { connect, isConnected, isLoading: isDiscordLoading, error } = useDiscordConnection();
-
-  async function handleConnectEmailRequest(email: string) {
-    if (sendingMagicLink.current === false) {
-      sendingMagicLink.current = true;
-      // console.log('Handling magic link request');
-      try {
-        await requestMagicLinkViaFirebase({ email, connectToExistingAccount: true });
-        emailPopupState.close();
-      } catch (err) {
-        showMessage((err as any).message ?? 'Something went wrong', 'error');
-      } finally {
-        sendingMagicLink.current = false;
-      }
-    }
-  }
-
   // Don't allow a user to remove their last identity
   const cannotDisconnect = !user || countConnectableIdentities(user) <= 1;
 
@@ -268,86 +230,7 @@ export function IdentityProviders() {
           </ListItemButton>
         </ListItem>
       </List>
-      <Modal
-        open={accountsPopupState.isOpen}
-        onClose={accountsPopupState.close}
-        title='Add an account'
-        aria-labelledby='Conect an account modal'
-        size='600px'
-      >
-        <List disablePadding aria-label='Connect accounts' sx={{ '& .MuiButton-root': { width: '140px' } }}>
-          {(!user?.wallets || user.wallets.length === 0) && (
-            <IdentityProviderItem type='Wallet' loading={isConnectingIdentity || isVerifyingWallet || isSigning}>
-              {account ? null : (
-                <WalletSign
-                  buttonSize='small'
-                  signSuccess={async (authSig) => {
-                    await signSuccess(authSig);
-                    accountsPopupState.close();
-                  }}
-                  loading={isVerifyingWallet || isSigning || isConnectingIdentity}
-                  enableAutosign={false}
-                />
-              )}
-            </IdentityProviderItem>
-          )}
-          {!isConnected && (
-            <IdentityProviderItem type='Discord'>
-              <PrimaryButton
-                size='small'
-                onClick={() => {
-                  connect();
-                  accountsPopupState.close();
-                }}
-                disabled={isDiscordLoading}
-              >
-                Connect
-              </PrimaryButton>
-            </IdentityProviderItem>
-          )}
-          {!telegramAccount && (
-            <IdentityProviderItem type='Telegram'>
-              <PrimaryButton
-                size='small'
-                onClick={async () => {
-                  await connectTelegram();
-                  accountsPopupState.close();
-                }}
-                disabled={isConnectingToTelegram || isDisconnectingTelegram}
-              >
-                Connect
-              </PrimaryButton>
-            </IdentityProviderItem>
-          )}
-          {(!user?.googleAccounts || user.googleAccounts.length === 0) && (
-            <IdentityProviderItem type='Google'>
-              <PrimaryButton
-                size='small'
-                onClick={async () => {
-                  await connectGoogleAccount();
-                  accountsPopupState.close();
-                }}
-                disabled={isConnectingGoogle}
-              >
-                Connect
-              </PrimaryButton>
-            </IdentityProviderItem>
-          )}
-          {user?.verifiedEmails.length === 0 && (
-            <IdentityProviderItem type='VerifiedEmail'>
-              <PrimaryButton size='small' onClick={emailPopupState.open} disabled={isConnectingGoogle}>
-                Connect
-              </PrimaryButton>
-            </IdentityProviderItem>
-          )}
-        </List>
-
-        <CollectEmailDialog
-          handleSubmit={handleConnectEmailRequest}
-          isOpen={emailPopupState.isOpen}
-          onClose={emailPopupState.close}
-        />
-      </Modal>
+      <NewIdentityModal isOpen={accountsPopupState.isOpen} onClose={accountsPopupState.close} />
     </>
   );
 }
