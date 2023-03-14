@@ -5,7 +5,6 @@ import type {
   Page,
   Proposal,
   ProposalCategory,
-  ProposalCategoryPermission,
   Vote,
   VoteOptions
 } from '@prisma/client';
@@ -21,7 +20,7 @@ export interface PageWithBlocks {
   votes?: (Vote & { voteOptions: VoteOptions[] })[];
   proposal?:
     | (Proposal & {
-        category: null | (ProposalCategory & { proposalCategoryPermissions: ProposalCategoryPermission[] });
+        category: null | ProposalCategory;
       })
     | null;
   bounty?: (Bounty & { permissions: BountyPermission[] }) | null;

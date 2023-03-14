@@ -130,11 +130,7 @@ export async function exportWorkspacePages({
           id: node.proposalId
         },
         include: {
-          category: {
-            include: {
-              proposalCategoryPermissions: true
-            }
-          }
+          category: true
         }
       });
     }

@@ -57,19 +57,7 @@
           "id": "d58fbcc1-3ae6-4944-bba6-ae7a8c29e548",
           "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
           "title": "NFT Design",
-          "color": "red",
-          "proposalCategoryPermissions": [
-            {
-              "id": "92d29d0c-74fd-4e9c-87fd-2e5d0320befe",
-              "permissionLevel": "full_access",
-              "proposalCategoryId": "d58fbcc1-3ae6-4944-bba6-ae7a8c29e548",
-              "categoryOperations": [],
-              "proposalOperations": [],
-              "roleId": null,
-              "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
-              "public": null
-            }
-          ]
+          "color": "red"
         }
       }
     },
@@ -130,19 +118,7 @@
           "id": "67f004c9-ff0f-459a-a9d0-d02fd563158c",
           "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
           "title": "Grants",
-          "color": "pink",
-          "proposalCategoryPermissions": [
-            {
-              "id": "f59434b4-f8f5-4f56-99ea-720556bcbc26",
-              "permissionLevel": "full_access",
-              "proposalCategoryId": "67f004c9-ff0f-459a-a9d0-d02fd563158c",
-              "categoryOperations": [],
-              "proposalOperations": [],
-              "roleId": null,
-              "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
-              "public": null
-            }
-          ]
+          "color": "pink"
         }
       }
     },
@@ -227,19 +203,7 @@
           "id": "037cac71-c4c7-4355-83dc-577a4cc30a08",
           "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
           "title": "Partnerships",
-          "color": "blue",
-          "proposalCategoryPermissions": [
-            {
-              "id": "4df9c277-3a26-481c-ad0d-98c809453f14",
-              "permissionLevel": "full_access",
-              "proposalCategoryId": "037cac71-c4c7-4355-83dc-577a4cc30a08",
-              "categoryOperations": [],
-              "proposalOperations": [],
-              "roleId": null,
-              "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
-              "public": null
-            }
-          ]
+          "color": "blue"
         }
       }
     },
@@ -287,19 +251,7 @@
           "id": "56af92d2-b109-44d2-8f67-977e1bc55667",
           "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
           "title": "General",
-          "color": "gray",
-          "proposalCategoryPermissions": [
-            {
-              "id": "4d121f0b-493b-47cf-86de-25fa78781a94",
-              "permissionLevel": "full_access",
-              "proposalCategoryId": "56af92d2-b109-44d2-8f67-977e1bc55667",
-              "categoryOperations": [],
-              "proposalOperations": [],
-              "roleId": null,
-              "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
-              "public": null
-            }
-          ]
+          "color": "gray"
         }
       }
     },
