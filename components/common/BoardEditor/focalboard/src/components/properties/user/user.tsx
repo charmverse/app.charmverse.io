@@ -4,7 +4,6 @@ import { IconButton } from '@mui/material';
 import { Box, Stack } from '@mui/system';
 import { useEffect, useState } from 'react';
 
-import type { PropertyValueDisplayType } from 'components/common/BoardEditor/interfaces';
 import { InputSearchMemberMultiple } from 'components/common/form/InputSearchMember';
 import UserDisplay from 'components/common/UserDisplay';
 import { useMembers } from 'hooks/useMembers';
@@ -15,18 +14,15 @@ type Props = {
   readOnly: boolean;
   onChange: (memberIds: string[]) => void;
   showEmptyPlaceholder?: boolean;
-  displayType?: PropertyValueDisplayType;
 };
 
-const StyledUserPropertyContainer = styled(Box)<{ hideInput?: boolean }>`
+const StyledUserPropertyContainer = styled(Box)`
   width: 100%;
   height: 100%;
   overflow: hidden;
   & .MuiInputBase-root,
   & input.MuiInputBase-input {
     background: inherit;
-    /** this overflows to the next line on smaller width*/
-    position: ${({ hideInput }) => (!hideInput ? `initial` : 'absolute')};
   }
 
   & .MuiAutocomplete-inputRoot.MuiInputBase-root.MuiOutlinedInput-root {
@@ -76,7 +72,6 @@ function UserProperty(props: Props): JSX.Element | null {
           setClicked(true);
         }
       }}
-      hideInput={props.readOnly && !clicked && props.displayType === 'table'}
     >
       <InputSearchMemberMultiple
         open={isOpen}

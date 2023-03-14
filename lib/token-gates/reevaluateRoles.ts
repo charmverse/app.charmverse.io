@@ -22,7 +22,8 @@ export async function reevaluateRoles({
     }
 
     if (!spaceMembership.space.tokenGates.length) {
-      throw new InvalidInputError('Space does not have any token gates.');
+      log.debug('Space does not have any token gates to reevaluate.', { spaceId });
+      return [];
     }
 
     const userRoles = spaceMembership?.spaceRoleToRole.map((r) => r.roleId) ?? [];

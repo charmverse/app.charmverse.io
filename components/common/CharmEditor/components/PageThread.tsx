@@ -239,9 +239,9 @@ interface PageThreadProps {
   showFindButton?: boolean;
 }
 
-export const RelativeDate = memo<{ createdAt: string; prefix?: string; updatedAt?: string | null }>(
+export const RelativeDate = memo<{ createdAt: string | Date; prefix?: string; updatedAt?: string | Date | null }>(
   ({ createdAt, updatedAt }) => {
-    const getDateTime = () => DateTime.fromISO(createdAt);
+    const getDateTime = () => DateTime.fromISO(createdAt.toString());
     const { formatDateTime } = useDateFormatter();
 
     const [dateTime, setTime] = useState(getDateTime());

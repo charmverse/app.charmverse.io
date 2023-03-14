@@ -101,19 +101,17 @@ export async function generateImportWorkspacePages({
   bountyArgs: Prisma.BountyCreateManyArgs;
   bountyPermissionArgs: Prisma.BountyPermissionCreateManyArgs;
   proposalArgs: Prisma.ProposalCreateManyArgs;
-  proposalAuthorsArgs: Prisma.ProposalAuthorCreateManyArgs;
-  proposalReviewersArgs: Prisma.ProposalReviewerCreateManyArgs;
+  proposalCategoryArgs: Prisma.ProposalCategoryCreateManyArgs;
+  proposalCategoryPermissionArgs: Prisma.ProposalCategoryPermissionCreateManyArgs;
 }> {
   const isUuid = validate(targetSpaceIdOrDomain);
 
-  const space = await prisma.space.findUnique({
-    where: isUuid ? { id: targetSpaceIdOrDomain } : { domain: targetSpaceIdOrDomain }
+  const space = await prisma.space.findUniqueOrThrow({
+    where: isUuid ? { id: targetSpaceIdOrDomain } : { domain: targetSpaceIdOrDomain },
+    include: {
+      proposalCategories: true
+    }
   });
-
-  if (!space) {
-    throw new DataNotFoundError(`Space not found: ${targetSpaceIdOrDomain}`);
-  }
-
   const resolvedPath = path.resolve(path.join('lib', 'templates', 'exports', `${exportName}.json`));
   const dataToImport: WorkspaceExport = exportData ?? JSON.parse(await fs.readFile(resolvedPath, 'utf-8'));
 
@@ -132,8 +130,8 @@ export async function generateImportWorkspacePages({
   const bountyArgs: Prisma.BountyCreateManyInput[] = [];
   const bountyPermissionArgs: Prisma.BountyPermissionCreateManyInput[] = [];
   const proposalArgs: Prisma.ProposalCreateManyInput[] = [];
-  const proposalAuthorsArgs: Prisma.ProposalAuthorCreateManyInput[] = [];
-  const proposalReviewersArgs: Prisma.ProposalReviewerCreateManyInput[] = [];
+  const proposalCategoryArgs: Prisma.ProposalCategoryCreateManyInput[] = [];
+  const proposalCategoryPermissionArgs: Prisma.ProposalCategoryPermissionCreateManyInput[] = [];
 
   // 2 way hashmap to find link between new and old page ids
   const oldNewPageIdHashMap: Record<string, string> = {};
@@ -228,8 +226,7 @@ export async function generateImportWorkspacePages({
         convertedProposalId: undefined,
         space: {
           connect: {
-            // eslint-disable @typescript-eslint/no-non-null-assertion
-            id: space!.id
+            id: space.id
           }
         },
         permissions: {
@@ -238,18 +235,16 @@ export async function generateImportWorkspacePages({
               {
                 id: newPermissionId,
                 permissionLevel: space?.defaultPagePermissionGroup ?? 'full_access',
-                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                spaceId: space!.id,
+                spaceId: space.id,
                 inheritedFromPermission: rootSpacePermissionId === newPermissionId ? undefined : rootSpacePermissionId
               }
             ]
           }
         },
-        updatedBy: space!.createdBy,
+        updatedBy: space.createdBy,
         author: {
           connect: {
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            id: space!.createdBy
+            id: space.createdBy
           }
         }
       }
@@ -262,12 +257,11 @@ export async function generateImportWorkspacePages({
         cardBlock.id = newId;
         cardBlock.rootId = currentParentId as string;
         cardBlock.parentId = currentParentId as string;
-        // eslint-disable @typescript-eslint/no-non-null-assertion
         cardBlock.updatedAt = undefined as any;
         cardBlock.createdAt = undefined as any;
-        cardBlock.updatedBy = space!.createdBy;
-        cardBlock.createdBy = space!.createdBy;
-        cardBlock.spaceId = space!.id;
+        cardBlock.updatedBy = space.createdBy;
+        cardBlock.createdBy = space.createdBy;
+        cardBlock.spaceId = space.id;
 
         pageArgs.push(newPageContent);
         blockArgs.push(cardBlock as Prisma.BlockCreateManyInput);
@@ -293,9 +287,9 @@ export async function generateImportWorkspacePages({
           // eslint-disable @typescript-eslint/no-non-null-assertion
           block.updatedAt = undefined as any;
           block.createdAt = undefined as any;
-          block.createdBy = space!.createdBy;
-          block.updatedBy = space!.updatedBy;
-          block.spaceId = space!.id;
+          block.createdBy = space.createdBy;
+          block.updatedBy = space.updatedBy;
+          block.spaceId = space.id;
           blockArgs.push(block as Prisma.BlockCreateManyInput);
         });
         pageArgs.push(newPageContent);
@@ -314,27 +308,47 @@ export async function generateImportWorkspacePages({
       const { createdAt, updatedAt, createdBy: bountyCreatedBy, permissions, ...bounty } = node.bounty;
       bountyArgs.push({
         ...bounty,
-        createdBy: space!.createdBy,
+        spaceId: space.id,
+        createdBy: space.createdBy,
         id: oldNewPageIdHashMap[node.id]
       });
       permissions.forEach(({ id, ...bountyPermission }) => {
         bountyPermissionArgs.push({
           ...bountyPermission,
+          spaceId: space.id,
           bountyId: oldNewPageIdHashMap[node.id]
         });
       });
     } else if (node.type === 'proposal' && node.proposal) {
       // TODO: Handle cross space reviewers and authors
-      const { createdBy: proposalCreatedBy, authors, reviewers, ...proposal } = node.proposal;
+      const { category, ...proposal } = node.proposal;
+      let categoryId: string | undefined;
+      if (category) {
+        categoryId = space.proposalCategories.find((cat) => cat.title === category.title)?.id;
+        if (!categoryId) {
+          categoryId = v4();
+          proposalCategoryArgs.push({
+            id: categoryId,
+            title: category.title,
+            color: category.color,
+            spaceId: space.id
+          });
+          proposalCategoryPermissionArgs.push({
+            permissionLevel: 'full_access',
+            proposalCategoryId: categoryId,
+            spaceId: space.id
+          });
+        }
+      }
       proposalArgs.push({
         ...proposal,
-        createdBy: space!.createdBy,
+        categoryId,
+        reviewedBy: undefined,
+        spaceId: space.id,
+        createdBy: space.createdBy,
+        status: 'draft',
         id: oldNewPageIdHashMap[node.id]
       });
-      authors.forEach((author) => proposalAuthorsArgs.push({ ...author, proposalId: oldNewPageIdHashMap[node.id] }));
-      reviewers.forEach(({ id, ...reviewer }) =>
-        proposalReviewersArgs.push({ ...reviewer, proposalId: oldNewPageIdHashMap[node.id] })
-      );
       pageArgs.push(newPageContent);
     }
 
@@ -351,7 +365,7 @@ export async function generateImportWorkspacePages({
           const { voteOptions, ...vote } = pageVote;
           voteArgs.push({
             ...vote,
-            createdBy: space!.createdBy,
+            createdBy: space.createdBy,
             pageId: oldNewPageIdHashMap[pageVote.pageId],
             id: extractedPoll.newPollId as string
           });
@@ -404,11 +418,11 @@ export async function generateImportWorkspacePages({
     proposalArgs: {
       data: proposalArgs
     },
-    proposalAuthorsArgs: {
-      data: proposalAuthorsArgs
+    proposalCategoryArgs: {
+      data: proposalCategoryArgs
     },
-    proposalReviewersArgs: {
-      data: proposalReviewersArgs
+    proposalCategoryPermissionArgs: {
+      data: proposalCategoryPermissionArgs
     }
   };
 }
@@ -427,8 +441,8 @@ export async function importWorkspacePages({
     voteArgs,
     voteOptionsArgs,
     proposalArgs,
-    proposalAuthorsArgs,
-    proposalReviewersArgs,
+    proposalCategoryArgs,
+    proposalCategoryPermissionArgs,
     bountyPermissionArgs
   } = await generateImportWorkspacePages({
     targetSpaceIdOrDomain,
@@ -447,9 +461,9 @@ export async function importWorkspacePages({
     prisma.block.createMany(blockArgs),
     prisma.bounty.createMany(bountyArgs),
     prisma.bountyPermission.createMany(bountyPermissionArgs),
+    prisma.proposalCategory.createMany(proposalCategoryArgs),
+    prisma.proposalCategoryPermission.createMany(proposalCategoryPermissionArgs),
     prisma.proposal.createMany(proposalArgs),
-    prisma.proposalAuthor.createMany(proposalAuthorsArgs),
-    prisma.proposalReviewer.createMany(proposalReviewersArgs),
     ...pageArgs.map((p) => {
       totalCreatedPages += 1;
       log.debug(`Creating page ${totalCreatedPages}/${pagesToCreate}: ${p.data.type} // ${p.data.title}`);

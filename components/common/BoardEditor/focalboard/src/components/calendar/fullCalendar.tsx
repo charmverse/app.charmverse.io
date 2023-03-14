@@ -15,7 +15,6 @@ import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
 
 import mutator from '../../mutator';
-import Tooltip from '../../widgets/tooltip';
 import type { DateProperty } from '../properties/dateRange/dateRange';
 import { createDatePropertyFromString } from '../properties/dateRange/dateRange';
 import PropertyValueElement from '../propertyValueElement';
@@ -149,18 +148,17 @@ function CalendarFullView(props: Props): JSX.Element | null {
           </div>
         </div>
         {visiblePropertyTemplates.map((template) => (
-          <Tooltip key={template.id} title={template.name}>
-            <PropertyValueElement
-              board={board}
-              readOnly={true}
-              card={cards.find((o) => o.id === event.id) || cards[0]}
-              updatedAt={page?.updatedAt.toString() ?? ''}
-              updatedBy={page?.updatedBy ?? ''}
-              propertyTemplate={template}
-              showEmptyPlaceholder={true}
-              displayType='calendar'
-            />
-          </Tooltip>
+          <PropertyValueElement
+            board={board}
+            key={template.id}
+            readOnly={true}
+            card={cards.find((o) => o.id === event.id) || cards[0]}
+            updatedAt={page?.updatedAt.toString() ?? ''}
+            updatedBy={page?.updatedBy ?? ''}
+            propertyTemplate={template}
+            showEmptyPlaceholder={true}
+            showTooltip
+          />
         ))}
       </div>
     );

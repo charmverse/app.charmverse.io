@@ -16,6 +16,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { BountyWithDetails } from 'lib/bounties';
 import { sortArrayByObjectProperty } from 'lib/utilities/array';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
+import { isTruthy } from 'lib/utilities/types';
 
 import BountiesKanbanView from './components/BountiesKanbanView';
 import BountiesGalleryView from './components/BountyGalleryView';
@@ -57,7 +58,14 @@ export default function BountiesPage({ publicMode = false, bounties }: Props) {
   const bountiesSorted = bounties ? sortArrayByObjectProperty(bounties, 'status', bountyStatuses) : [];
 
   const csvData = useMemo(() => {
-    const completedBounties = bountiesSorted.filter((bounty) => bounty.status === BountyStatus.complete);
+    const completedBounties = bountiesSorted.filter(
+      (bounty) =>
+        bounty.status === BountyStatus.complete &&
+        isTruthy(bounty.rewardAmount) &&
+        isTruthy(bounty.rewardToken) &&
+        isTruthy(bounty.chainId)
+    );
+
     if (!completedBounties.length) {
       return [];
     }
@@ -70,7 +78,7 @@ export default function BountiesPage({ publicMode = false, bounties }: Props) {
     return [
       ['token_address', 'receiver', 'amount', 'chainId'],
       ...completedBounties.map((bounty) => [
-        bounty.rewardToken.startsWith('0x') ? bounty.rewardToken : '', // for native token it should be empty
+        bounty.rewardToken?.startsWith('0x') ? bounty.rewardToken : '', // for native token it should be empty
         bounty.applications.find((application) => application.status === 'complete')?.walletAddress,
         bounty.rewardAmount,
         bounty.chainId

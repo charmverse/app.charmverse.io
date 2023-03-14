@@ -5,8 +5,9 @@ import type { ResourceEvent } from './ResourceEvent';
 type BountyEvent = ResourceEvent & PageEvent;
 
 type BountyRewardEvent = BountyEvent & {
-  rewardToken: string;
-  rewardAmount: string | number;
+  rewardToken: string | null;
+  rewardAmount: string | number | null;
+  customReward: string | null;
 };
 
 type BountyCreatedEvent = BountyRewardEvent & {

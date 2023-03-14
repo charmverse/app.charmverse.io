@@ -1,7 +1,9 @@
-import type { Bounty, PageType, Application } from '@prisma/client';
+import type { Bounty, PageType, Application, PageComment } from '@prisma/client';
 
+import type { CommentBlock } from 'components/common/BoardEditor/focalboard/src/blocks/commentBlock';
 import type { IPageMetaWithPermissions } from 'lib/pages/interfaces';
 import type { BountyPermissions, BountySubmitter } from 'lib/permissions/bounties';
+import type { PageContent } from 'lib/prosemirror/interfaces';
 import type { Roleup } from 'lib/roles/interfaces';
 
 import type { Resource } from '../permissions/interfaces';
@@ -13,11 +15,14 @@ export type BountyWithDetails = Bounty & { applications: Application[]; page: IP
 
 export type BountyCreationData = Pick<Bounty, 'spaceId' | 'createdBy'> &
   Partial<
-    Pick<Bounty, 'status' | 'chainId' | 'approveSubmitters' | 'maxSubmissions' | 'rewardAmount' | 'rewardToken'>
+    Pick<
+      Bounty,
+      'status' | 'chainId' | 'approveSubmitters' | 'maxSubmissions' | 'rewardAmount' | 'rewardToken' | 'customReward'
+    >
   > & { permissions?: Partial<BountyPermissions>; pageType?: PageType; linkedPageId?: string };
 
 export type UpdateableBountyFields = Partial<
-  Pick<Bounty, 'chainId' | 'rewardAmount' | 'rewardToken' | 'approveSubmitters' | 'maxSubmissions'>
+  Pick<Bounty, 'chainId' | 'rewardAmount' | 'rewardToken' | 'approveSubmitters' | 'maxSubmissions' | 'customReward'>
 > & { permissions?: Partial<BountyPermissions> };
 
 export interface BountyUpdate {

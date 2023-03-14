@@ -20,7 +20,8 @@ export async function getBountyEntity(id: string): Promise<BountyEntity> {
     rewardToken: bounty.rewardToken,
     rewardChain: bounty.chainId,
     rewardAmount: bounty.rewardAmount,
-    url: `${baseUrl}/${bounty.space.domain}/bounties/${bounty.id}`
+    url: `${baseUrl}/${bounty.space.domain}/bounties/${bounty.id}`,
+    customReward: bounty.customReward
   };
 }
 

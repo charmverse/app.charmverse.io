@@ -86,9 +86,10 @@ export interface PublicApiBounty {
     address: string;
   };
   reward: {
-    amount: number;
-    chain: number;
-    token: string;
+    amount: number | null;
+    chain: number | null;
+    token: string | null;
+    custom: string | null;
   };
   status: BountyStatus;
   title: string;
@@ -212,7 +213,8 @@ async function getBounties(req: NextApiRequest, res: NextApiResponse) {
       reward: {
         amount: bounty.rewardAmount,
         chain: bounty.chainId,
-        token: bounty.rewardToken
+        token: bounty.rewardToken,
+        custom: bounty.customReward
       },
       title: bounty.page?.title ?? 'Untitled',
       status: bounty.status,

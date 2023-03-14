@@ -1,5 +1,3 @@
-import { log } from 'console';
-
 import type { BoxProps } from '@mui/material';
 import { Box, Typography } from '@mui/material';
 import type { User } from '@prisma/client';
