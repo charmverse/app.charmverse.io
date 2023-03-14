@@ -5,10 +5,11 @@ import EditIcon from '@mui/icons-material/Edit';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { Box, IconButton, ListItemIcon, ListItemText, Menu, MenuItem, Stack, Tooltip, Typography } from '@mui/material';
 import { bindMenu, usePopupState } from 'material-ui-popup-state/hooks';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import Button from 'components/common/Button';
 import CharmEditor from 'components/common/CharmEditor/CharmEditor';
+import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/InlineCharmEditor';
 import { CommentReply } from 'components/common/comments/CommentReply';
 import { CommentVote } from 'components/common/comments/CommentVote';
@@ -34,17 +35,21 @@ const StyledStack = styled(Stack)`
 `;
 
 type Props = {
+  replyingDisabled?: boolean;
   comment: CommentWithChildren;
   permissions?: CommentPermissions;
   deletingDisabled?: boolean;
   handleUpdateComment: (comment: UpdateCommentPayload) => Promise<void>;
   handleCreateComment: (comment: CreateCommentPayload) => Promise<void>;
   handleDeleteComment: (commentId: string) => Promise<void>;
-  handleVoteComment: (vote: { commentId: string; upvoted: boolean | null }) => Promise<void>;
+  handleVoteComment?: (vote: { commentId: string; upvoted: boolean | null }) => Promise<void>;
+  inlineCharmEditor?: boolean;
 };
 
 export function Comment({
+  inlineCharmEditor,
   deletingDisabled,
+  replyingDisabled = false,
   comment,
   permissions,
   handleCreateComment,
@@ -87,10 +92,12 @@ export function Comment({
   const menuState = usePopupState({ variant: 'popover', popupId: 'comment-action' });
 
   async function voteComment(newUpvotedStatus: boolean | null) {
-    await handleVoteComment({
-      commentId: comment.id,
-      upvoted: newUpvotedStatus
-    });
+    if (handleVoteComment) {
+      await handleVoteComment({
+        commentId: comment.id,
+        upvoted: newUpvotedStatus
+      });
+    }
   }
 
   function onClickEditComment() {
@@ -106,6 +113,30 @@ export function Comment({
   const isCommentAuthor = comment.createdBy === user?.id;
   const canEditComment = isCommentAuthor;
   const canDeleteComment = (permissions?.delete_comments || isCommentAuthor) && !deletingDisabled;
+
+  const editor = useMemo(() => {
+    const editorCommentProps = {
+      colorMode: 'dark' as const,
+      style: {
+        paddingTop: 0,
+        paddingBottom: 0,
+        marginLeft: 8,
+        minHeight: 100,
+        left: 0
+      },
+      disableRowHandles: true,
+      focusOnInit: true,
+      placeholderText: 'What are your thoughts?',
+      onContentChange: updateCommentContent,
+      content: commentEditContent.doc
+    };
+
+    if (!inlineCharmEditor) {
+      return <CharmEditor {...editorCommentProps} />;
+    }
+
+    return <InlineCharmEditor {...editorCommentProps} />;
+  }, [inlineCharmEditor, commentEditContent, updateCommentContent]);
 
   return (
     <Stack my={1} position='relative'>
@@ -159,21 +190,7 @@ export function Comment({
         <Box data-test={`post-comment-charmeditor-${comment.id}`} ml={3}>
           {isEditingComment ? (
             <Stack>
-              <CharmEditor
-                colorMode='dark'
-                style={{
-                  paddingTop: 0,
-                  paddingBottom: 0,
-                  marginLeft: 8,
-                  minHeight: 100,
-                  left: 0
-                }}
-                disableRowHandles
-                focusOnInit
-                placeholderText='What are your thoughts?'
-                onContentChange={updateCommentContent}
-                content={commentEditContent.doc}
-              />
+              {editor}
               <Stack flexDirection='row' my={1} ml={1} gap={1}>
                 <Button data-test={`save-comment-${comment.id}`} size='small' onClick={saveCommentContent}>
                   Save
@@ -202,9 +219,9 @@ export function Comment({
               content={commentContent.doc}
             />
           )}
-          {!comment.deletedAt && (
+          {!comment.deletedAt && !replyingDisabled && (
             <Stack flexDirection='row' gap={1}>
-              <CommentVote permissions={permissions} votes={comment} onVote={voteComment} />
+              {handleVoteComment && <CommentVote permissions={permissions} votes={comment} onVote={voteComment} />}
               <Typography
                 sx={{
                   cursor: 'pointer'

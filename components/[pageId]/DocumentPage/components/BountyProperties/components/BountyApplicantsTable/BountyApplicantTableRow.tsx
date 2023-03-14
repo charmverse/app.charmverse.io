@@ -1,14 +1,9 @@
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import { Alert, Collapse, FormLabel, IconButton, Box, Tooltip, TableCell, TableRow, Typography } from '@mui/material';
-import { useEffect, useState } from 'react';
-import { v4 as uuid } from 'uuid';
+import { Alert, Box, Collapse, IconButton, TableCell, TableRow, Tooltip, Typography } from '@mui/material';
+import { useState } from 'react';
 
 import charmClient from 'charmClient';
-import type { CommentBlock } from 'components/common/BoardEditor/focalboard/src/blocks/commentBlock';
-import { createCommentBlock } from 'components/common/BoardEditor/focalboard/src/blocks/commentBlock';
-import { NewCommentInput } from 'components/common/BoardEditor/focalboard/src/components/cardDetail/commentsList';
-import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
 import Button from 'components/common/Button';
 import Modal from 'components/common/Modal';
 import UserDisplay from 'components/common/UserDisplay';
@@ -25,6 +20,7 @@ import ApplicationInput from '../BountyApplicantForm/components/ApplicationInput
 import SubmissionInput from '../BountyApplicantForm/components/SubmissionInput';
 import BountyApplicantStatus from '../BountyApplicantStatus';
 
+import { ApplicationComments } from './ApplicationComments';
 import BountyApplicantActions from './BountyApplicantActions';
 
 interface Props {
@@ -47,10 +43,8 @@ export default function BountyApplicantTableRow({
   const [isExpandedRow, setIsExpandedRow] = useState(false);
   const member = members.find((c) => c.id === submission.createdBy);
   const { refreshBounty } = useBounties();
-  const [editorKey, setEditorKey] = useState(0); // a key to allow us to reset charmeditor contents
   const { formatDateTime } = useDateFormatter();
 
-  const [defaultComment, setDefaultComment] = useState<CommentBlock['fields'] | null>(null);
   const [reviewDecision, setReviewDecision] = useState<SubmissionReview | null>(null);
   const [apiError, setApiError] = useState<SystemError | null>();
 
@@ -59,27 +53,6 @@ export default function BountyApplicantTableRow({
   // We can only review or accept application. These are mutually exclusive.
   const showAcceptSubmission =
     !showAcceptApplication && submission.status === 'review' && submission.createdBy !== user?.id;
-
-  function onSendClicked(newComment: CommentBlock['fields']) {
-    const comment = createCommentBlock();
-    const { content, contentText } = newComment;
-    comment.parentId = bounty.page.id;
-    comment.rootId = bounty.page.id;
-    comment.title = contentText || '';
-    comment.fields = { content };
-    mutator.insertBlock(comment, 'add comment');
-    resetInput();
-  }
-
-  function resetInput() {
-    if (user && member) {
-      const content = getContentWithMention({ myUserId: user?.id, targetUserId: member?.id });
-      setDefaultComment({ content });
-    } else {
-      setDefaultComment(null);
-    }
-    setEditorKey((key) => key + 1);
-  }
 
   async function approveApplication(applicationId: string) {
     if (!submissionsCapReached) {
@@ -106,10 +79,6 @@ export default function BountyApplicantTableRow({
     setReviewDecision(null);
     setApiError(null);
   }
-
-  useEffect(() => {
-    resetInput();
-  }, [user, member]);
 
   return (
     <>
@@ -253,23 +222,7 @@ export default function BountyApplicantTableRow({
                 </Box>
               )}
 
-              {submission.status !== 'rejected' && submission.createdBy !== user?.id && (
-                <>
-                  <FormLabel>
-                    <strong>Send a message (optional)</strong>
-                  </FormLabel>
-                  <div className='CommentsList' style={{ padding: 0 }}>
-                    <NewCommentInput
-                      $key={editorKey}
-                      key={editorKey}
-                      initialValue={defaultComment}
-                      username={user?.username}
-                      avatar={user?.avatar}
-                      onSubmit={onSendClicked}
-                    />
-                  </div>
-                </>
-              )}
+              <ApplicationComments applicationId={submission.id} status={submission.status} />
             </Box>
 
             {/* Modal which provides review confirmation */}
@@ -323,31 +276,4 @@ export default function BountyApplicantTableRow({
       </TableRow>
     </>
   );
-}
-
-function getContentWithMention({ myUserId, targetUserId }: { myUserId: string; targetUserId: string }) {
-  return {
-    type: 'doc',
-    content: [
-      {
-        type: 'paragraph',
-        content: [
-          {
-            type: 'mention',
-            attrs: {
-              id: uuid(),
-              type: 'user',
-              value: targetUserId,
-              createdAt: new Date().toISOString(),
-              createdBy: myUserId
-            }
-          },
-          {
-            type: 'text',
-            text: ' '
-          }
-        ]
-      }
-    ]
-  };
 }
