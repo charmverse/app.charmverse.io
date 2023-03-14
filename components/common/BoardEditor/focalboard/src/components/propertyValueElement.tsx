@@ -1,15 +1,11 @@
-import { Stack } from '@mui/system';
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
 
 import { SelectProperty } from 'components/common/BoardEditor/components/properties/SelectProperty/SelectProperty';
 import type { PropertyValueDisplayType } from 'components/common/BoardEditor/interfaces';
-import UserDisplay from 'components/common/UserDisplay';
 import { useDateFormatter } from 'hooks/useDateFormatter';
-import { useMembers } from 'hooks/useMembers';
 import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import type { Card } from 'lib/focalboard/card';
-import type { Member } from 'lib/members/interfaces';
 
 import mutator from '../mutator';
 import { OctoUtils } from '../octoUtils';
@@ -39,12 +35,6 @@ function PropertyValueElement(props: Props): JSX.Element {
   const [value, setValue] = useState(props.card.fields.properties[props.propertyTemplate.id] || '');
   const [serverValue, setServerValue] = useState(props.card.fields.properties[props.propertyTemplate.id] || '');
   const { formatDateTime, formatDate } = useDateFormatter();
-  const { members } = useMembers();
-
-  const membersRecord = members.reduce<Record<string, Member>>((cur, member) => {
-    cur[member.id] = member;
-    return cur;
-  }, {});
   const { card, propertyTemplate, readOnly, showEmptyPlaceholder, board, updatedBy, updatedAt, displayType } = props;
   const intl = useIntl();
   const propertyValue = card.fields.properties[propertyTemplate.id];
@@ -122,7 +112,7 @@ function PropertyValueElement(props: Props): JSX.Element {
     return (
       <UserProperty
         memberIds={propertyValue as string[]}
-        readOnly={readOnly || (displayType !== 'details' && displayType !== 'table')}
+        readOnly={readOnly}
         onChange={(newValue) => {
           mutator.changePropertyValue(card, propertyTemplate.id, newValue);
         }}

@@ -2,7 +2,7 @@ import styled from '@emotion/styled';
 import CloseIcon from '@mui/icons-material/Close';
 import { IconButton } from '@mui/material';
 import { Box, Stack } from '@mui/system';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import type { PropertyValueDisplayType } from 'components/common/BoardEditor/interfaces';
 import { InputSearchMemberMultiple } from 'components/common/form/InputSearchMember';
@@ -57,6 +57,10 @@ function UserProperty(props: Props): JSX.Element | null {
   const [clicked, setClicked] = useState(false);
   const { members } = useMembers();
 
+  useEffect(() => {
+    setMemberIds(props.memberIds);
+  }, [props.memberIds]);
+
   const membersRecord = members.reduce<Record<string, Member>>((cur, member) => {
     cur[member.id] = member;
     return cur;
@@ -66,7 +70,8 @@ function UserProperty(props: Props): JSX.Element | null {
   return (
     <StyledUserPropertyContainer
       onClick={() => {
-        if (!props.readOnly) {
+        // Only register click if display type is details or table
+        if (!props.readOnly && (props.displayType === 'details' || props.displayType === 'table')) {
           setIsOpen(true);
           setClicked(true);
         }
