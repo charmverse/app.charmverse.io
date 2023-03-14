@@ -213,7 +213,6 @@ const RPC = {
     },
     rpcUrls: ['https://ethereum-sepolia.blockpi.network/v1/rpc/public'],
     blockExplorerUrls: ['https://sepolia.etherscan.io/'],
-    gnosisUrl: 'https://safe-transaction.goerli.gnosis.io',
     iconUrl: '/images/cryptoLogos/eth-diamond-purple.png',
     testnet: true,
     shortName: 'sep'
