@@ -161,7 +161,7 @@ export default function PublicProfile(props: UserDetailsProps) {
           totalVotes={data?.totalVotes}
         />
       )}
-      <SectionHeader title='My Organisations' count={allCommunities.length} />
+      <SectionHeader title='My Organizations' count={data ? allCommunities.length : undefined} />
       <LoadingComponent isLoading={isLoading} minHeight={300}>
         {allCommunities.length > 0 ? (
           <Stack gap={2} mb={2}>
@@ -202,11 +202,11 @@ export default function PublicProfile(props: UserDetailsProps) {
   );
 }
 
-function SectionHeader({ title, count }: { title: string; count: number }) {
+function SectionHeader({ title, count }: { title: string; count?: number }) {
   return (
     <Stack flexDirection='row' justifyContent='space-between' alignItems='center' my={2}>
       <Legend noBorder>{title}</Legend>
-      <Chip label={count} />
+      {typeof count !== 'undefined' && <Chip label={count} />}
     </Stack>
   );
 }
