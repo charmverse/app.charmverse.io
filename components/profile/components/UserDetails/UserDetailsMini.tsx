@@ -59,13 +59,7 @@ function UserDetailsMini({ readOnly, user, sx = {} }: UserDetailsMiniProps) {
 
   return (
     <Stack direction={{ xs: 'column', md: 'row' }} mt={5} spacing={3} sx={sx}>
-      <Avatar
-        name={user?.username || ''}
-        image={user?.avatar}
-        variant='circular'
-        canSetNft
-        isNft={hasNftAvatar(user)}
-      />
+      <Avatar name={user.username} image={user.avatar} variant='circular' canSetNft isNft={hasNftAvatar(user)} />
       <Grid container direction='column' spacing={0.5}>
         <Grid item>
           <Typography variant='h1'>{user.username}</Typography>
@@ -100,14 +94,21 @@ function UserDetailsMini({ readOnly, user, sx = {} }: UserDetailsMiniProps) {
             />
           </Grid>
         )}
-        <Grid item container alignItems='center' width='fit-content'>
-          <Typography variant='body1' sx={{ wordBreak: 'break-word' }}>
-            {userDetails?.description || (readOnly ? '' : 'Tell the world a bit more about yourself ...')}
-          </Typography>
-        </Grid>
-        <Grid item container alignItems='center' sx={{ width: 'fit-content', flexWrap: 'initial' }}>
-          <TimezoneDisplay timezone={userDetails?.timezone} defaultValue={readOnly ? 'N/A' : 'Update your timezone'} />
-        </Grid>
+        {userDetails && (
+          <>
+            <Grid item container alignItems='center' width='fit-content'>
+              <Typography variant='body1' sx={{ wordBreak: 'break-word' }}>
+                {userDetails.description || (readOnly ? '' : 'Tell the world a bit more about yourself ...')}
+              </Typography>
+            </Grid>
+            <Grid item container alignItems='center' sx={{ width: 'fit-content', flexWrap: 'initial' }}>
+              <TimezoneDisplay
+                timezone={userDetails.timezone}
+                defaultValue={readOnly ? 'N/A' : 'Update your timezone'}
+              />
+            </Grid>
+          </>
+        )}
       </Grid>
     </Stack>
   );
