@@ -359,7 +359,8 @@ export default function BountyProperties(props: {
         <div
           className='octo-propertyrow'
           style={{
-            height: 'fit-content'
+            height: 'fit-content',
+            marginLeft: 155
           }}
         >
           <TextField
