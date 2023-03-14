@@ -71,12 +71,12 @@ function UserProperty(props: Props): JSX.Element | null {
     <StyledUserPropertyContainer
       onClick={() => {
         // Only register click if display type is details or table
-        if (!props.readOnly && (props.displayType === 'details' || props.displayType === 'table')) {
+        if (!props.readOnly) {
           setIsOpen(true);
           setClicked(true);
         }
       }}
-      hideInput={(props.readOnly || !clicked) && props.displayType === 'table'}
+      hideInput={props.readOnly && !clicked && props.displayType === 'table'}
     >
       <InputSearchMemberMultiple
         open={isOpen}
