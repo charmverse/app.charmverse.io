@@ -176,7 +176,7 @@ export default function PublishingForm({ onSubmit, page }: Props) {
         (snapshotSpace.filters.onlyMembers &&
           account &&
           [...snapshotSpace.admins, ...snapshotSpace.members, ...snapshotSpace.moderators].some((val) =>
-            lowerCaseEqual(val, account as string)
+            lowerCaseEqual(val, account)
           ));
       if (userCanPost === false) {
         setConfigurationError(
