@@ -66,8 +66,10 @@ function UserProperty(props: Props): JSX.Element | null {
   return (
     <StyledUserPropertyContainer
       onClick={() => {
-        setIsOpen(true);
-        setClicked(true);
+        if (!props.readOnly) {
+          setIsOpen(true);
+          setClicked(true);
+        }
       }}
       hideInput={(props.readOnly || !clicked) && props.displayType === 'table'}
     >
@@ -83,12 +85,14 @@ function UserProperty(props: Props): JSX.Element | null {
           setMemberIds(_memberIds);
         }}
         onClose={() => {
-          // Reduce flicker in the ui
-          if (!arrayEquals(memberIds, props.memberIds)) {
-            props.onChange(memberIds);
+          if (isOpen) {
+            // Reduce flicker in the ui
+            if (!arrayEquals(memberIds, props.memberIds)) {
+              props.onChange(memberIds);
+            }
+            setIsOpen(false);
+            setClicked(false);
           }
-          setIsOpen(false);
-          setClicked(false);
         }}
         getOptionLabel={(user) => (typeof user === 'string' ? user : user?.username)}
         readOnly={props.readOnly}
