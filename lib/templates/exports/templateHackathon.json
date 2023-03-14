@@ -5,7 +5,7 @@
       "deletedAt": null,
       "createdAt": "2023-03-09T21:57:40.324Z",
       "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
-      "updatedAt": "2023-03-10T18:49:16.962Z",
+      "updatedAt": "2023-03-14T19:32:18.309Z",
       "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
       "title": "Hackathon HQ",
       "content": {
@@ -758,7 +758,7 @@
                   {
                     "type": "page",
                     "attrs": {
-                      "id": "3d158dec-0ae1-404d-ad2a-6c3617dee736",
+                      "id": "9311f152-4a33-41ad-bc18-573abfdd5cdf",
                       "track": []
                     }
                   },
@@ -1035,7 +1035,7 @@
       "proposalId": null,
       "snapshotProposalId": null,
       "fullWidth": false,
-      "version": 461,
+      "version": 471,
       "bountyId": null,
       "convertedProposalId": null,
       "permissions": [
