@@ -1,4 +1,5 @@
 import { rafCommandExec } from '@bangle.dev/utils';
+import AttachFileIcon from '@mui/icons-material/AttachFile';
 import BookmarkIcon from '@mui/icons-material/Bookmark';
 import ImageIcon from '@mui/icons-material/Image';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
@@ -66,6 +67,34 @@ export function items(): PaletteItemTypeNoGroup[] {
             return replaceSuggestionMarkWith(palettePluginKey, '')(state, dispatch, view);
           }
           return false;
+        };
+      }
+    },
+    {
+      uid: 'file',
+      title: 'File',
+      icon: <AttachFileIcon sx={{ fontSize: iconSize }} />,
+      description: 'Upload a file',
+      editorExecuteCommand: ({ palettePluginKey }) => {
+        return (state, dispatch, view) => {
+          rafCommandExec(view!, (_state, _dispatch) => {
+            // let the node view know to show the tooltip by default
+            const tooltipMark = _state.schema.mark('tooltip-marker');
+            const node = _state.schema.nodes.file.create(
+              {
+                src: null
+              },
+              undefined,
+              [tooltipMark]
+            );
+
+            if (_dispatch && isAtBeginningOfLine(_state)) {
+              _dispatch(_state.tr.replaceSelectionWith(node, false));
+              return true;
+            }
+            return insertNode(_state, _dispatch, node);
+          });
+          return replaceSuggestionMarkWith(palettePluginKey, '')(state, dispatch, view);
         };
       }
     },

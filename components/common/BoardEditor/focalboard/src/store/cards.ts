@@ -286,7 +286,9 @@ export function sortCards(cardPages: CardPage[], board: Board, activeView: Board
           }
 
           if (result === 0) {
-            result = (aValue as string).localeCompare(bValue as string);
+            const aValueString = aValue instanceof Array ? aValue[0] || '' : aValue;
+            const bValueString = bValue instanceof Array ? bValue[0] || '' : bValue;
+            result = aValueString.localeCompare(bValueString);
           }
         }
 

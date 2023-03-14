@@ -28,6 +28,7 @@ import { generateMarkdown } from 'lib/prosemirror/plugins/markdown/generateMarkd
 import type { SnapshotReceipt, SnapshotSpace, SnapshotVotingModeType, SnapshotVotingStrategy } from 'lib/snapshot';
 import { getSnapshotSpace, SnapshotVotingMode } from 'lib/snapshot';
 import { ExternalServiceError, SystemError, UnknownError } from 'lib/utilities/errors';
+import { lowerCaseEqual } from 'lib/utilities/strings';
 
 import ConnectSnapshot from './ConnectSnapshot';
 import InputVotingStrategies from './InputVotingStrategies';
@@ -172,8 +173,11 @@ export default function PublishingForm({ onSubmit, page }: Props) {
 
       const userCanPost =
         snapshotSpace.filters.onlyMembers === false ||
-        (snapshotSpace.filters.onlyMembers && snapshotSpace.members.indexOf(account as string) > -1);
-
+        (snapshotSpace.filters.onlyMembers &&
+          account &&
+          [...snapshotSpace.admins, ...snapshotSpace.members, ...snapshotSpace.moderators].some((val) =>
+            lowerCaseEqual(val, account as string)
+          ));
       if (userCanPost === false) {
         setConfigurationError(
           new SystemError({

@@ -1,7 +1,9 @@
-import type { Bounty, PageType, Application } from '@prisma/client';
+import type { Bounty, PageType, Application, PageComment } from '@prisma/client';
 
+import type { CommentBlock } from 'components/common/BoardEditor/focalboard/src/blocks/commentBlock';
 import type { IPageMetaWithPermissions } from 'lib/pages/interfaces';
 import type { BountyPermissions, BountySubmitter } from 'lib/permissions/bounties';
+import type { PageContent } from 'lib/prosemirror/interfaces';
 import type { Roleup } from 'lib/roles/interfaces';
 
 import type { Resource } from '../permissions/interfaces';

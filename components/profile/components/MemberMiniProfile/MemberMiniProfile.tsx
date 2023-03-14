@@ -46,7 +46,7 @@ function MemberProfile({ title, member, onClose }: { title?: string; member: Mem
       ?.value as string) ?? member.username;
 
   const { data: user, isLoading: isFetchingUser } = useSWR(`users/${member.path}`, () =>
-    charmClient.getUserByPath(member.path as string)
+    charmClient.getUserByPath(member.path ?? member.id)
   );
   if (!currentSpace || !currentUser) {
     return null;
@@ -94,7 +94,7 @@ function MemberProfile({ title, member, onClose }: { title?: string; member: Mem
 
   return (
     <Dialog open onClose={onClose} fullScreen={fullScreen}>
-      {isFetchingUser || !user ? (
+      {isFetchingUser || !user || member.id !== user.id ? (
         <DialogContent>
           <LoadingComponent isLoading />
         </DialogContent>

@@ -133,5 +133,34 @@ export function items({ enableVoting }: AdvancedItemsProps = {}): PaletteItemTyp
     });
   }
 
+  editorItems.push({
+    uid: 'table-of-contents',
+    title: 'Table of contents',
+    icon: (
+      <FormatListBulleted
+        sx={{
+          fontSize: iconSize
+        }}
+      />
+    ),
+    description: 'Show an outline of your page',
+    editorExecuteCommand: ({ palettePluginKey }) => {
+      return (state, dispatch, view) => {
+        if (view) {
+          rafCommandExec(view!, (_state, _dispatch) => {
+            const node = _state.schema.nodes.tableOfContents.create();
+
+            if (_dispatch && isAtBeginningOfLine(_state)) {
+              _dispatch(_state.tr.replaceSelectionWith(node, false));
+              return true;
+            }
+            return insertNode(_state, _dispatch, node);
+          });
+        }
+        return replaceSuggestionMarkWith(palettePluginKey, '')(state, dispatch, view);
+      };
+    }
+  });
+
   return editorItems;
 }

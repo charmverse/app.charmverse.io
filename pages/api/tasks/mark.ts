@@ -3,8 +3,8 @@ import nc from 'next-connect';
 
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import type { MarkTask } from 'lib/tasks/markTasks';
-import { markTasks } from 'lib/tasks/markTasks';
+import type { MarkTask } from 'lib/userNotifications/markTasks';
+import { markTasks } from 'lib/userNotifications/markTasks';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

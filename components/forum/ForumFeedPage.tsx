@@ -19,6 +19,7 @@ import type { PostSortOption } from 'lib/forums/posts/constants';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
 import { CategoryMenu } from './components/CategoryMenu';
+import { CategoryNotificationToggle } from './components/CategoryNotificationToggle';
 import { CategorySelect } from './components/CategorySelect';
 import { CreateForumPost } from './components/CreateForumPost';
 import { PostDialog } from './components/PostDialog';
@@ -131,15 +132,19 @@ export function ForumPage() {
 
   return (
     <CenteredPageContent style={{ width: 1100 }}>
-      <Typography variant='h1' mb={2}>
-        {currentCategory ? currentCategory?.name : 'All categories'}
-      </Typography>
-      {currentCategory?.description && (
-        <Typography data-test='current-category-description' variant='body1' mb={2}>
-          {currentCategory.description}
-        </Typography>
-      )}
-
+      <Box display='flex' justifyContent='space-between' alignItems='center' mb={2}>
+        <span>
+          <Typography variant='h1' mb={2}>
+            {currentCategory ? currentCategory?.name : 'All categories'}
+          </Typography>
+          {currentCategory?.description && (
+            <Typography data-test='current-category-description' variant='body1' mt={2}>
+              {currentCategory.description}
+            </Typography>
+          )}
+        </span>
+        {currentCategory && <CategoryNotificationToggle categoryId={currentCategory.id} />}
+      </Box>
       <TextField
         variant='outlined'
         placeholder='Search posts'

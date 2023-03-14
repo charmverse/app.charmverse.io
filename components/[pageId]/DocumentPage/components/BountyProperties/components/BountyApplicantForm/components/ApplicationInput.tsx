@@ -17,6 +17,7 @@ import { useLocalStorage } from 'hooks/useLocalStorage';
 import { useUser } from 'hooks/useUser';
 import { MINIMUM_APPLICATION_MESSAGE_CHARACTERS } from 'lib/applications/shared';
 
+import { ApplicationComments } from '../../BountyApplicantsTable/ApplicationComments';
 import BountyApplicantStatus from '../../BountyApplicantStatus';
 
 /**

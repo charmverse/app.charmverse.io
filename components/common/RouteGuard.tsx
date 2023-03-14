@@ -12,7 +12,7 @@ import log from 'lib/log';
 import { isSpaceDomain } from 'lib/spaces/utils';
 
 // Pages shared to the public that don't require user login
-const publicPages = ['/', 'share', 'api-docs', 'u', 'join', 'invite'];
+const publicPages = ['/', 'share', 'api-docs', 'u', 'join', 'invite', 'authenticate'];
 const accountPages = ['profile'];
 
 export default function RouteGuard({ children }: { children: ReactNode }) {

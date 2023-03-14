@@ -48,7 +48,7 @@ export default function Link({ external, href, onClick, children, color = 'prima
   }
 
   return external ? (
-    <StyledMuiLink href={href} color={color} rel='noreferrer' underline='none' {...restProps}>
+    <StyledMuiLink href={href} color={color} onClick={onClick} rel='noreferrer' underline='none' {...restProps}>
       {children}
     </StyledMuiLink>
   ) : (
