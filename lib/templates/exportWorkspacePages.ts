@@ -130,8 +130,11 @@ export async function exportWorkspacePages({
           id: node.proposalId
         },
         include: {
-          authors: true,
-          reviewers: true
+          category: {
+            include: {
+              proposalCategoryPermissions: true
+            }
+          }
         }
       });
     }

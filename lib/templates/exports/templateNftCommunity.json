@@ -53,17 +53,24 @@
         "reviewedAt": "2022-11-15T20:59:19.643Z",
         "categoryId": "d58fbcc1-3ae6-4944-bba6-ae7a8c29e548",
         "snapshotProposalExpiry": null,
-        "authors": [
-          {
-            "proposalId": "90a6fb8e-de12-4767-9f2b-32b108c91d34",
-            "userId": "c4421d10-3765-4c58-9f46-b8648ffea350"
-          },
-          {
-            "proposalId": "90a6fb8e-de12-4767-9f2b-32b108c91d34",
-            "userId": "a742727c-4d1f-43d6-9005-249fe08c93cd"
-          }
-        ],
-        "reviewers": []
+        "category": {
+          "id": "d58fbcc1-3ae6-4944-bba6-ae7a8c29e548",
+          "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
+          "title": "NFT Design",
+          "color": "red",
+          "proposalCategoryPermissions": [
+            {
+              "id": "92d29d0c-74fd-4e9c-87fd-2e5d0320befe",
+              "permissionLevel": "full_access",
+              "proposalCategoryId": "d58fbcc1-3ae6-4944-bba6-ae7a8c29e548",
+              "categoryOperations": [],
+              "proposalOperations": [],
+              "roleId": null,
+              "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
+              "public": null
+            }
+          ]
+        }
       }
     },
     {
@@ -119,13 +126,24 @@
         "reviewedAt": "2022-11-15T20:59:48.726Z",
         "categoryId": "67f004c9-ff0f-459a-a9d0-d02fd563158c",
         "snapshotProposalExpiry": null,
-        "authors": [
-          {
-            "proposalId": "ddb11df1-76c1-4aa1-bbbe-7630b6c296b5",
-            "userId": "e5dba747-be62-49be-a7ba-71cf27b17174"
-          }
-        ],
-        "reviewers": []
+        "category": {
+          "id": "67f004c9-ff0f-459a-a9d0-d02fd563158c",
+          "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
+          "title": "Grants",
+          "color": "pink",
+          "proposalCategoryPermissions": [
+            {
+              "id": "f59434b4-f8f5-4f56-99ea-720556bcbc26",
+              "permissionLevel": "full_access",
+              "proposalCategoryId": "67f004c9-ff0f-459a-a9d0-d02fd563158c",
+              "categoryOperations": [],
+              "proposalOperations": [],
+              "roleId": null,
+              "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
+              "public": null
+            }
+          ]
+        }
       }
     },
     {
@@ -205,17 +223,24 @@
         "reviewedAt": null,
         "categoryId": "037cac71-c4c7-4355-83dc-577a4cc30a08",
         "snapshotProposalExpiry": null,
-        "authors": [
-          {
-            "proposalId": "eefd7719-c802-4990-b8a0-8b962a7e9240",
-            "userId": "ffcfb108-398d-4e0f-bd78-4c6cabf9e86f"
-          },
-          {
-            "proposalId": "eefd7719-c802-4990-b8a0-8b962a7e9240",
-            "userId": "d5b4e5db-868d-47b0-bc78-ebe9b5b2c835"
-          }
-        ],
-        "reviewers": []
+        "category": {
+          "id": "037cac71-c4c7-4355-83dc-577a4cc30a08",
+          "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
+          "title": "Partnerships",
+          "color": "blue",
+          "proposalCategoryPermissions": [
+            {
+              "id": "4df9c277-3a26-481c-ad0d-98c809453f14",
+              "permissionLevel": "full_access",
+              "proposalCategoryId": "037cac71-c4c7-4355-83dc-577a4cc30a08",
+              "categoryOperations": [],
+              "proposalOperations": [],
+              "roleId": null,
+              "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
+              "public": null
+            }
+          ]
+        }
       }
     },
     {
@@ -258,13 +283,24 @@
         "reviewedAt": null,
         "categoryId": "56af92d2-b109-44d2-8f67-977e1bc55667",
         "snapshotProposalExpiry": null,
-        "authors": [
-          {
-            "proposalId": "5fd04504-510e-4616-905f-f9f853be056f",
-            "userId": "c4421d10-3765-4c58-9f46-b8648ffea350"
-          }
-        ],
-        "reviewers": []
+        "category": {
+          "id": "56af92d2-b109-44d2-8f67-977e1bc55667",
+          "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
+          "title": "General",
+          "color": "gray",
+          "proposalCategoryPermissions": [
+            {
+              "id": "4d121f0b-493b-47cf-86de-25fa78781a94",
+              "permissionLevel": "full_access",
+              "proposalCategoryId": "56af92d2-b109-44d2-8f67-977e1bc55667",
+              "categoryOperations": [],
+              "proposalOperations": [],
+              "roleId": null,
+              "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
+              "public": null
+            }
+          ]
+        }
       }
     },
     {

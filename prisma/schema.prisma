@@ -257,7 +257,7 @@ model Space {
   votes                       Vote[]
   proposals                   Proposal[]
   workspaceEvents             WorkspaceEvent[]
-  proposalCategory            ProposalCategory[]
+  proposalCategories          ProposalCategory[]
   memberProperties            MemberProperty[]
   memberPropertyValues        MemberPropertyValue[]
   userTokenGates              UserTokenGate[]
@@ -532,7 +532,6 @@ model VerifiedEmail {
   @@index([email])
   @@index([userId])
 }
-
 
 model UserWallet {
   address String  @unique

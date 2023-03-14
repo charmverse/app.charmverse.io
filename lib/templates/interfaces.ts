@@ -4,8 +4,8 @@ import type {
   BountyPermission,
   Page,
   Proposal,
-  ProposalAuthor,
-  ProposalReviewer,
+  ProposalCategory,
+  ProposalCategoryPermission,
   Vote,
   VoteOptions
 } from '@prisma/client';
@@ -19,7 +19,11 @@ export interface PageWithBlocks {
     card?: Block;
   };
   votes?: (Vote & { voteOptions: VoteOptions[] })[];
-  proposal?: (Proposal & { authors: ProposalAuthor[]; reviewers: ProposalReviewer[] }) | null;
+  proposal?:
+    | (Proposal & {
+        category: null | (ProposalCategory & { proposalCategoryPermissions: ProposalCategoryPermission[] });
+      })
+    | null;
   bounty?: (Bounty & { permissions: BountyPermission[] }) | null;
   // eslint-disable-next-line
   inlineDatabases?: ExportedPage[];
