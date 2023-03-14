@@ -1,10 +1,13 @@
 import { yupResolver } from '@hookform/resolvers/yup';
-import { TextField } from '@mui/material';
-import InputLabel from '@mui/material/InputLabel';
+import Box from '@mui/material/Box';
+import DialogTitle from '@mui/material/DialogTitle';
+import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
 import Button from 'components/common/Button';
+import LoadingComponent from 'components/common/LoadingComponent';
 import { Modal } from 'components/common/Modal';
 
 export const schema = yup.object({
@@ -15,6 +18,9 @@ type FormValues = yup.InferType<typeof schema>;
 
 type Props = {
   handleSubmit: (email: string) => void;
+  loading?: boolean;
+  description?: string;
+  title?: string;
 };
 
 type DialogProps = Props & {
@@ -22,7 +28,7 @@ type DialogProps = Props & {
   onClose: () => void;
 };
 
-export function CollectEmail({ handleSubmit }: Props) {
+export function CollectEmail({ handleSubmit, description, title, loading }: Props) {
   const { register, getValues, getFieldState, watch } = useForm<FormValues>({
     mode: 'onChange',
     resolver: yupResolver(schema)
@@ -47,17 +53,29 @@ export function CollectEmail({ handleSubmit }: Props) {
   const values = watch();
 
   return (
-    <div>
-      <InputLabel>Email</InputLabel>
-      <TextField {...register('email')} placeholder='me@gmail.com' type='text' fullWidth sx={{ mb: 2 }} />
-      <Button disabled={!validEmail()} onClick={submitEmail}>
-        Submit
-      </Button>
-    </div>
+    <Box mb={2}>
+      {title && <DialogTitle>{title}</DialogTitle>}
+      <Box px={3}>
+        {description && (
+          <Typography pl={0.2} mb={2}>
+            {description}
+          </Typography>
+        )}
+        <TextField {...register('email')} placeholder='email@charmverse.io' type='text' fullWidth sx={{ mb: 2 }} />
+        <Button disabled={!validEmail() || loading} onClick={submitEmail}>
+          Submit
+          {loading && (
+            <span style={{ marginLeft: '6px' }}>
+              <LoadingComponent size={14} />
+            </span>
+          )}
+        </Button>
+      </Box>
+    </Box>
   );
 }
 
-export function CollectEmailDialog({ handleSubmit, isOpen, onClose }: DialogProps) {
+export function CollectEmailDialog({ handleSubmit, isOpen, onClose, title, description, loading }: DialogProps) {
   const { reset } = useForm<FormValues>({
     mode: 'onChange',
     resolver: yupResolver(schema)
@@ -69,8 +87,8 @@ export function CollectEmailDialog({ handleSubmit, isOpen, onClose }: DialogProp
   }
 
   return (
-    <Modal open={isOpen} onClose={closeForm}>
-      <CollectEmail handleSubmit={handleSubmit} />
+    <Modal title={title} open={isOpen} onClose={closeForm}>
+      <CollectEmail description={description} handleSubmit={handleSubmit} loading={loading} />
     </Modal>
   );
 }

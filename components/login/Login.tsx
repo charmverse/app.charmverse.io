@@ -4,7 +4,6 @@ import DialogTitle from '@mui/material/DialogTitle';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import type { IdentityType } from '@prisma/client';
-import { login } from '__e2e__/utils/session';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRef, useState } from 'react';
 
@@ -18,7 +17,7 @@ import type { AuthSig } from 'lib/blockchain/interfaces';
 import type { SystemError } from 'lib/utilities/errors';
 import type { LoggedInUser } from 'models/User';
 
-import { CollectEmailDialog } from './CollectEmail';
+import { CollectEmail } from './CollectEmail';
 import { LoginErrorModal } from './LoginErrorModal';
 import { WalletSign } from './WalletSign';
 
@@ -38,13 +37,13 @@ function LoginHandler(props: DialogProps) {
   const { onClose, isOpen, open } = props;
   const { loginFromWeb3Account } = useWeb3AuthSig();
 
+  const [loginMethod, setLoginMethod] = useState<'email' | null>(null);
+
   const [showLoginError, setShowLoginError] = useState(false);
 
   const { showMessage } = useSnackbar();
 
   const sendingMagicLink = useRef(false);
-
-  const magicLinkPopup = usePopupState({ variant: 'popover', popupId: 'email-magic-link' });
 
   const { loginWithGoogle, requestMagicLinkViaFirebase } = useFirebaseAuth();
   const { verifiableWalletDetected } = useWeb3AuthSig();
@@ -68,7 +67,8 @@ function LoginHandler(props: DialogProps) {
       // console.log('Handling magic link request');
       try {
         await requestMagicLinkViaFirebase({ email });
-        magicLinkPopup.close();
+        onClose();
+        setLoginMethod(null);
       } catch (err) {
         handleLoginError(err);
       } finally {
@@ -98,65 +98,68 @@ function LoginHandler(props: DialogProps) {
 
   function toggleEmailDialog(position: 'open' | 'close') {
     if (position === 'open') {
-      onClose();
-      magicLinkPopup.open();
+      setLoginMethod('email');
     } else {
-      magicLinkPopup.close();
-      open();
+      setLoginMethod(null);
     }
   }
 
   return (
     <>
-      <Dialog onClose={onClose} open={isOpen}>
-        <List sx={{ pt: 0, maxWidth: '400px' }}>
-          <DialogTitle textAlign='left'>Connect Wallet</DialogTitle>
+      <Dialog onClose={loginMethod ? () => setLoginMethod(null) : onClose} open={isOpen}>
+        {!loginMethod && (
+          <List sx={{ pt: 0, maxWidth: '400px' }}>
+            <DialogTitle textAlign='left'>Connect Wallet</DialogTitle>
 
-          {/** Web 3 login methods */}
-          <ListItem>
-            <WalletSelector loginSuccess={handleLogin} onError={handleLoginError} />
-          </ListItem>
-          {verifiableWalletDetected && (
+            {/** Web 3 login methods */}
             <ListItem>
-              <WalletSign buttonStyle={{ width: '100%' }} signSuccess={handleWeb3Login} enableAutosign />
+              <WalletSelector loginSuccess={handleLogin} onError={handleLoginError} />
             </ListItem>
-          )}
+            {verifiableWalletDetected && (
+              <ListItem>
+                <WalletSign buttonStyle={{ width: '100%' }} signSuccess={handleWeb3Login} enableAutosign />
+              </ListItem>
+            )}
 
-          <DialogTitle sx={{ mt: -1 }} textAlign='left'>
-            Connect Account
-          </DialogTitle>
+            <DialogTitle sx={{ mt: -1 }} textAlign='left'>
+              Connect Account
+            </DialogTitle>
 
-          {/* Google login method */}
-          <ListItem>
-            <ConnectorButton
-              onClick={handleGoogleLogin}
-              name='Connect with Google'
-              iconUrl='Google_G.png'
-              disabled={false}
-              isActive={false}
-              isLoading={false}
-            />
-          </ListItem>
+            {/* Google login method */}
+            <ListItem>
+              <ConnectorButton
+                onClick={handleGoogleLogin}
+                name='Connect with Google'
+                iconUrl='Google_G.png'
+                disabled={false}
+                isActive={false}
+                isLoading={false}
+              />
+            </ListItem>
 
-          {/** Connect with email address */}
-          <ListItem>
-            <ConnectorButton
-              onClick={() => toggleEmailDialog('open')}
-              name='Connect with email'
-              icon={<EmailIcon />}
-              disabled={false}
-              isActive={false}
-              isLoading={false}
-            />
-          </ListItem>
-        </List>
+            {/** Connect with email address */}
+            <ListItem>
+              <ConnectorButton
+                onClick={() => toggleEmailDialog('open')}
+                name='Connect with email'
+                icon={<EmailIcon />}
+                disabled={false}
+                isActive={false}
+                isLoading={false}
+              />
+            </ListItem>
+          </List>
+        )}
+        {loginMethod === 'email' && (
+          <CollectEmail
+            loading={sendingMagicLink.current === true}
+            title='Connect with email'
+            description="Enter your email address and we'll email you a login link"
+            handleSubmit={handleMagicLinkRequest}
+          />
+        )}
       </Dialog>
       <LoginErrorModal open={showLoginError} onClose={() => setShowLoginError(false)} />
-      <CollectEmailDialog
-        onClose={() => toggleEmailDialog('close')}
-        isOpen={magicLinkPopup.isOpen}
-        handleSubmit={handleMagicLinkRequest}
-      />
     </>
   );
 }
