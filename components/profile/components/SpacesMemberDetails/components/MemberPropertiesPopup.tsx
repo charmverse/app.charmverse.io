@@ -108,7 +108,7 @@ export function MemberPropertiesPopup({
 
   return (
     <Dialog open={!!spaceId} onClose={onClickClose} fullScreen={fullScreen} fullWidth>
-      {!data || isFetchingSpaceProperties || isLoading || isFetchingSpaceProperties ? (
+      {!data || isFetchingSpaceProperties || isLoading ? (
         <DialogContent>
           <LoadingComponent isLoading />
         </DialogContent>

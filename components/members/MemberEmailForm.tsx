@@ -7,7 +7,6 @@ import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
 import charmClient from 'charmClient';
-import FieldLabel from 'components/common/form/FieldLabel';
 import { useUser } from 'hooks/useUser';
 import debounce from 'lib/utilities/debounce';
 
