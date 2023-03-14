@@ -1,5 +1,4 @@
 import { Box, Tooltip } from '@mui/material';
-import type { Bounty } from '@prisma/client';
 
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
@@ -8,6 +7,7 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import type { ApplicationWithTransactions } from 'lib/applications/actions';
 import type { BountyWithDetails } from 'lib/bounties';
 import { eToNumber } from 'lib/utilities/numbers';
+import { isTruthy } from 'lib/utilities/types';
 
 import BountyPaymentButton from './BountyPaymentButton';
 
@@ -49,28 +49,31 @@ export default function BountyApplicantActions({ bounty, isExpanded, submission,
         </Button>
       )}
 
-      {submission.status === 'complete' && (
-        <Box>
-          {submission.walletAddress && (
-            <BountyPaymentButton
-              onSuccess={recordTransaction}
-              onError={(errorMessage, level) => showMessage(errorMessage, level || 'error')}
-              receiver={submission.walletAddress}
-              amount={eToNumber(bounty.rewardAmount)}
-              tokenSymbolOrAddress={bounty.rewardToken}
-              chainIdToUse={bounty.chainId}
-              bounty={bounty}
-            />
-          )}
-          {!submission.walletAddress && (
-            <Tooltip title='Applicant must provide a wallet address'>
-              <Button color='primary' disabled={true}>
-                Send Payment
-              </Button>
-            </Tooltip>
-          )}
-        </Box>
-      )}
+      {submission.status === 'complete' &&
+        isTruthy(bounty.rewardAmount) &&
+        isTruthy(bounty.rewardToken) &&
+        isTruthy(bounty.chainId) && (
+          <Box>
+            {submission.walletAddress && (
+              <BountyPaymentButton
+                onSuccess={recordTransaction}
+                onError={(errorMessage, level) => showMessage(errorMessage, level || 'error')}
+                receiver={submission.walletAddress}
+                amount={eToNumber(bounty.rewardAmount)}
+                tokenSymbolOrAddress={bounty.rewardToken}
+                chainIdToUse={bounty.chainId}
+                bounty={bounty}
+              />
+            )}
+            {!submission.walletAddress && (
+              <Tooltip title='Applicant must provide a wallet address'>
+                <Button color='primary' disabled={true}>
+                  Send Payment
+                </Button>
+              </Tooltip>
+            )}
+          </Box>
+        )}
     </Box>
   );
 }

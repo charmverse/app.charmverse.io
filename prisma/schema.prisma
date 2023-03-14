@@ -688,11 +688,11 @@ model Bounty {
   spaceId           String             @db.Uuid
   createdAt         DateTime           @default(now())
   updatedAt         DateTime           @default(now())
-  rewardAmount      Float
-  rewardToken       String
+  rewardAmount      Float?
+  rewardToken       String?
   status            BountyStatus       @default(open)
   id                String             @id @default(uuid()) @db.Uuid
-  chainId           Int
+  chainId           Int?
   suggestedBy       String?            @db.Uuid
   approveSubmitters Boolean            @default(false)
   submissionsLocked Boolean            @default(false)
@@ -702,6 +702,7 @@ model Bounty {
   applications      Application[]
   permissions       BountyPermission[]
   page              Page?
+  customReward      String?
 
   @@index([createdBy])
   @@index([spaceId])
