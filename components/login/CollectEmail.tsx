@@ -15,12 +15,15 @@ type FormValues = yup.InferType<typeof schema>;
 
 type Props = {
   handleSubmit: (email: string) => void;
+};
+
+type DialogProps = Props & {
   isOpen: boolean;
   onClose: () => void;
 };
 
-export function CollectEmailDialog({ handleSubmit, isOpen, onClose }: Props) {
-  const { register, getValues, getFieldState, reset, watch } = useForm<FormValues>({
+export function CollectEmail({ handleSubmit }: Props) {
+  const { register, getValues, getFieldState, watch } = useForm<FormValues>({
     mode: 'onChange',
     resolver: yupResolver(schema)
   });
@@ -34,11 +37,6 @@ export function CollectEmailDialog({ handleSubmit, isOpen, onClose }: Props) {
     return false;
   }
 
-  function closeForm() {
-    reset();
-    onClose();
-  }
-
   function submitEmail() {
     const validValue = validEmail();
     if (validValue) {
@@ -49,12 +47,30 @@ export function CollectEmailDialog({ handleSubmit, isOpen, onClose }: Props) {
   const values = watch();
 
   return (
-    <Modal open={isOpen} onClose={closeForm}>
+    <div>
       <InputLabel>Email</InputLabel>
-      <TextField {...register('email')} type='text' fullWidth sx={{ mb: 2 }} />
+      <TextField {...register('email')} placeholder='me@gmail.com' type='text' fullWidth sx={{ mb: 2 }} />
       <Button disabled={!validEmail()} onClick={submitEmail}>
         Submit
       </Button>
+    </div>
+  );
+}
+
+export function CollectEmailDialog({ handleSubmit, isOpen, onClose }: DialogProps) {
+  const { reset } = useForm<FormValues>({
+    mode: 'onChange',
+    resolver: yupResolver(schema)
+  });
+
+  function closeForm() {
+    reset();
+    onClose();
+  }
+
+  return (
+    <Modal open={isOpen} onClose={closeForm}>
+      <CollectEmail handleSubmit={handleSubmit} />
     </Modal>
   );
 }
