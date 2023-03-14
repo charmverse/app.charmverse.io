@@ -52,12 +52,10 @@ function UserProperty(props: Props): JSX.Element | null {
   const [clicked, setClicked] = useState(false);
   const { members } = useMembers();
 
-  const membersRecord = useMemo(() => {
-    return members.reduce<Record<string, Member>>((cur, member) => {
-      cur[member.id] = member;
-      return cur;
-    }, {});
-  }, [members]);
+  const membersRecord = members.reduce<Record<string, Member>>((cur, member) => {
+    cur[member.id] = member;
+    return cur;
+  }, {});
 
   const [isOpen, setIsOpen] = useState(false);
   return (
