@@ -1,3 +1,5 @@
+import { Tooltip } from '@mui/material';
+import type { ReactNode } from 'react';
 import { useState, useEffect } from 'react';
 import { useIntl } from 'react-intl';
 
@@ -29,9 +31,10 @@ type Props = {
   propertyTemplate: IPropertyTemplate;
   showEmptyPlaceholder: boolean;
   displayType?: PropertyValueDisplayType;
+  showTooltip?: boolean;
 };
 
-function PropertyValueElement(props: Props): JSX.Element {
+function PropertyValueElement(props: Props) {
   const [value, setValue] = useState(props.card.fields.properties[props.propertyTemplate.id] || '');
   const [serverValue, setServerValue] = useState(props.card.fields.properties[props.propertyTemplate.id] || '');
   const { formatDateTime, formatDate } = useDateFormatter();
@@ -87,8 +90,10 @@ function PropertyValueElement(props: Props): JSX.Element {
     }
   };
 
+  let propertyValueElement: ReactNode = null;
+
   if (propertyTemplate.type === 'select' || propertyTemplate.type === 'multiSelect') {
-    return (
+    propertyValueElement = (
       <SelectProperty
         multiselect={propertyTemplate.type === 'multiSelect'}
         readOnly={readOnly || !board}
@@ -110,7 +115,7 @@ function PropertyValueElement(props: Props): JSX.Element {
       />
     );
   } else if (propertyTemplate.type === 'person') {
-    return (
+    propertyValueElement = (
       <UserProperty
         memberIds={typeof propertyValue === 'string' ? [propertyValue] : propertyValue ?? []}
         readOnly={readOnly}
@@ -122,20 +127,21 @@ function PropertyValueElement(props: Props): JSX.Element {
     );
   } else if (propertyTemplate.type === 'date') {
     if (readOnly) {
-      return <div className='octo-propertyvalue'>{displayValue}</div>;
+      propertyValueElement = <div className='octo-propertyvalue'>{displayValue}</div>;
+    } else {
+      propertyValueElement = (
+        <DateRange
+          className='octo-propertyvalue'
+          value={value.toString()}
+          showEmptyPlaceholder={showEmptyPlaceholder}
+          onChange={(newValue) => {
+            mutator.changePropertyValue(card, propertyTemplate.id, newValue);
+          }}
+        />
+      );
     }
-    return (
-      <DateRange
-        className='octo-propertyvalue'
-        value={value.toString()}
-        showEmptyPlaceholder={showEmptyPlaceholder}
-        onChange={(newValue) => {
-          mutator.changePropertyValue(card, propertyTemplate.id, newValue);
-        }}
-      />
-    );
   } else if (propertyTemplate.type === 'url') {
-    return (
+    propertyValueElement = (
       <URLProperty
         value={value.toString()}
         readOnly={readOnly}
@@ -150,7 +156,7 @@ function PropertyValueElement(props: Props): JSX.Element {
       />
     );
   } else if (propertyTemplate.type === 'checkbox') {
-    return (
+    propertyValueElement = (
       <Switch
         isOn={Boolean(propertyValue)}
         onChanged={(newBool) => {
@@ -161,17 +167,19 @@ function PropertyValueElement(props: Props): JSX.Element {
       />
     );
   } else if (propertyTemplate.type === 'createdBy') {
-    return <CreatedBy userId={card.createdBy} />;
+    propertyValueElement = <CreatedBy userId={card.createdBy} />;
   } else if (propertyTemplate.type === 'updatedBy') {
-    return <LastModifiedBy updatedBy={latestUpdated === 'card' ? card.updatedBy : updatedBy} />;
+    propertyValueElement = <LastModifiedBy updatedBy={latestUpdated === 'card' ? card.updatedBy : updatedBy} />;
   } else if (propertyTemplate.type === 'createdTime') {
-    return <CreatedAt createdAt={card.createdAt} />;
+    propertyValueElement = <CreatedAt createdAt={card.createdAt} />;
   } else if (propertyTemplate.type === 'updatedTime') {
-    return <LastModifiedAt updatedAt={new Date(latestUpdated === 'card' ? card.updatedAt : updatedAt).toString()} />;
+    propertyValueElement = (
+      <LastModifiedAt updatedAt={new Date(latestUpdated === 'card' ? card.updatedAt : updatedAt).toString()} />
+    );
   }
 
   if (editableFields.includes(propertyTemplate.type)) {
-    return (
+    propertyValueElement = (
       <TextInput
         className='octo-propertyvalue'
         placeholderText={emptyDisplayValue}
@@ -189,8 +197,25 @@ function PropertyValueElement(props: Props): JSX.Element {
         spellCheck={propertyTemplate.type === 'text'}
       />
     );
+  } else if (propertyValueElement === null) {
+    propertyValueElement = <div className='octo-propertyvalue'>{finalDisplayValue}</div>;
   }
-  return <div className='octo-propertyvalue'>{finalDisplayValue}</div>;
+
+  const hasValue = !!value && (typeof value === 'string' || Array.isArray(value) ? value.length !== 0 : value);
+
+  if (!hasValue && props.readOnly && displayType !== 'details') {
+    return null;
+  }
+
+  if (props.showTooltip) {
+    return (
+      <Tooltip title={props.propertyTemplate.name}>
+        <div>{propertyValueElement}</div>
+      </Tooltip>
+    );
+  }
+
+  return propertyValueElement;
 }
 
 export default PropertyValueElement;
