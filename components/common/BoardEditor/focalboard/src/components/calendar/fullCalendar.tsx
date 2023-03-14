@@ -158,6 +158,7 @@ function CalendarFullView(props: Props): JSX.Element | null {
               updatedBy={page?.updatedBy ?? ''}
               propertyTemplate={template}
               showEmptyPlaceholder={true}
+              displayType='calendar'
             />
           </Tooltip>
         ))}

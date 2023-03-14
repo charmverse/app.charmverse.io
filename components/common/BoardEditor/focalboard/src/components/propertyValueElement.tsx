@@ -112,12 +112,13 @@ function PropertyValueElement(props: Props): JSX.Element {
   } else if (propertyTemplate.type === 'person') {
     return (
       <UserProperty
-        memberIds={typeof propertyValue === 'string' ? [propertyValue] : propertyValue ?? []}
+        memberIds={(propertyValue ?? []) as string[]}
         readOnly={readOnly}
         onChange={(newValue) => {
           mutator.changePropertyValue(card, propertyTemplate.id, newValue);
         }}
         showEmptyPlaceholder={displayType === 'details'}
+        displayType={displayType}
       />
     );
   } else if (propertyTemplate.type === 'date') {
