@@ -183,11 +183,6 @@ export default function ApplicationInput({
             )}
           </Grid>
         </form>
-        {proposal && proposal.createdBy === user?.id && (
-          <Stack gap={1} mt={2}>
-            <ApplicationComments status={proposal.status} applicationId={proposal.id} />
-          </Stack>
-        )}
       </Collapse>
     </Stack>
   );

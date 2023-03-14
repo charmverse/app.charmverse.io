@@ -75,8 +75,8 @@ export function ApplicationComments({
 
   return (
     <Stack>
-      <Stack gap={2}>
-        <FormLabel sx={{ fontWeight: 'bold' }}>Messages</FormLabel>
+      <Stack>
+        <FormLabel sx={{ fontWeight: 'bold', my: 1 }}>Messages</FormLabel>
         {isLoading ? (
           <Box height={100}>
             <LoadingComponent size={24} isLoading label='Fetching comments' />
