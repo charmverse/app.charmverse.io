@@ -201,6 +201,23 @@ const RPC = {
     testnet: true,
     shortName: 'gor'
   },
+  SEPOLIA: {
+    chainId: 11155111,
+    chainName: 'Ethereum - Sepolia',
+    nativeCurrency: {
+      name: 'Ether',
+      symbol: 'ETH',
+      decimals: 18,
+      address: '0x0000000000000000000000000000000000000000', // needed for proper form handling in the TokenFormCard component
+      logoURI: 'https://assets.coingecko.com/coins/images/279/small/ethereum.png?1595348880'
+    },
+    rpcUrls: ['https://ethereum-sepolia.blockpi.network/v1/rpc/public'],
+    blockExplorerUrls: ['https://sepolia.etherscan.io/'],
+    gnosisUrl: 'https://safe-transaction.goerli.gnosis.io',
+    iconUrl: '/images/cryptoLogos/eth-diamond-purple.png',
+    testnet: true,
+    shortName: 'sep'
+  },
   MUMBAI: {
     chainId: 80001,
     chainName: 'Polygon - Mumbai',
