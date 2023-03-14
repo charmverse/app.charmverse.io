@@ -23,7 +23,7 @@ export const schema = yup.object({
     .notRequired()
     .ensure()
     .trim()
-    .matches(/^$|^http(?:s)?:\/\/(?:www\.)?github\.([a-z])+\/([A-Za-z0-9]{1,})+\/?$/i, 'Invalid GitHub link'),
+    .matches(/^$|^http(?:s)?:\/\/(?:www\.)?github\.([a-z])+\/([^\s\\]{1,})+\/?$/i, 'Invalid GitHub link'),
   discordUsername: yup
     .string()
     .notRequired()
