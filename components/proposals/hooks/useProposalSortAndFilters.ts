@@ -20,15 +20,12 @@ export function useProposalSortAndFilters(proposals: ProposalWithUsers[]) {
     filteredProposals = filteredProposals.filter((proposal) => proposal.categoryId === categoryIdFilter);
   }
 
-  filteredProposals = filteredProposals
-    // filter proposals with no according page as they might break sorting
-    .filter((p) => !!pages[p.id])
-    .sort((p1, p2) => {
-      const page1 = pages[p1.id];
-      const page2 = pages[p2.id];
+  filteredProposals = filteredProposals.sort((p1, p2) => {
+    const page1 = pages[p1.id];
+    const page2 = pages[p2.id];
 
-      return (page1?.createdAt ?? 0) > (page2?.createdAt ?? 0) ? -1 : 1;
-    });
+    return (page1?.createdAt ?? 0) > (page2?.createdAt ?? 0) ? -1 : 1;
+  });
 
   return {
     filteredProposals,
