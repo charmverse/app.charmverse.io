@@ -43,11 +43,11 @@ type Props = {
   handleCreateComment: (comment: CreateCommentPayload) => Promise<void>;
   handleDeleteComment: (commentId: string) => Promise<void>;
   handleVoteComment?: (vote: { commentId: string; upvoted: boolean | null }) => Promise<void>;
-  enableInlineCharmEditor?: boolean;
+  inlineCharmEditor?: boolean;
 };
 
 export function Comment({
-  enableInlineCharmEditor,
+  inlineCharmEditor,
   deletingDisabled,
   replyingDisabled = false,
   comment,
@@ -115,43 +115,28 @@ export function Comment({
   const canDeleteComment = (permissions?.delete_comments || isCommentAuthor) && !deletingDisabled;
 
   const editor = useMemo(() => {
-    if (!enableInlineCharmEditor) {
-      return (
-        <CharmEditor
-          colorMode='dark'
-          style={{
-            paddingTop: 0,
-            paddingBottom: 0,
-            marginLeft: 8,
-            minHeight: 100,
-            left: 0
-          }}
-          disableRowHandles
-          focusOnInit
-          placeholderText='What are your thoughts?'
-          onContentChange={updateCommentContent}
-          content={commentEditContent.doc}
-        />
-      );
+    const editorCommentProps = {
+      colorMode: 'dark' as const,
+      style: {
+        paddingTop: 0,
+        paddingBottom: 0,
+        marginLeft: 8,
+        minHeight: 100,
+        left: 0
+      },
+      disableRowHandles: true,
+      focusOnInit: true,
+      placeholderText: 'What are your thoughts?',
+      onContentChange: updateCommentContent,
+      content: commentEditContent.doc
+    };
+
+    if (!inlineCharmEditor) {
+      return <CharmEditor {...editorCommentProps} />;
     }
 
-    return (
-      <InlineCharmEditor
-        colorMode='dark'
-        style={{
-          paddingTop: 0,
-          paddingBottom: 0,
-          marginLeft: 8,
-          minHeight: 100,
-          left: 0
-        }}
-        focusOnInit
-        placeholderText='What are your thoughts?'
-        onContentChange={updateCommentContent}
-        content={commentEditContent.doc}
-      />
-    );
-  }, [enableInlineCharmEditor, commentEditContent, updateCommentContent]);
+    return <InlineCharmEditor {...editorCommentProps} />;
+  }, [inlineCharmEditor, commentEditContent, updateCommentContent]);
 
   return (
     <Stack my={1} position='relative'>

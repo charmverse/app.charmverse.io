@@ -185,12 +185,7 @@ export default function ApplicationInput({
         </form>
         {proposal && proposal.createdBy === user?.id && (
           <Stack gap={1} mt={2}>
-            <ApplicationComments
-              context='applicant'
-              status={proposal.status}
-              createdBy={proposal.createdBy}
-              applicationId={proposal.id}
-            />
+            <ApplicationComments status={proposal.status} applicationId={proposal.id} />
           </Stack>
         )}
       </Collapse>

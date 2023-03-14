@@ -1,9 +1,10 @@
 import { Stack, Box } from '@mui/material';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import Button from 'components/common/Button';
 import CharmEditor from 'components/common/CharmEditor';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/InlineCharmEditor';
+import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
 import UserDisplay from 'components/common/UserDisplay';
 import { useUser } from 'hooks/useUser';
 import type { CommentContent } from 'lib/comments';
@@ -18,8 +19,10 @@ const defaultCharmEditorOutput: ICharmEditorOutput = {
 
 export function CommentForm({
   handleCreateComment,
-  initialValue
+  initialValue,
+  inlineCharmEditor
 }: {
+  inlineCharmEditor?: boolean;
   initialValue?: ICharmEditorOutput;
   handleCreateComment: (comment: CommentContent) => Promise<void>;
 }) {
@@ -45,6 +48,31 @@ export function CommentForm({
     setEditorKey((key) => key + 1);
   }
 
+  const editor = useMemo(() => {
+    const editorCommentProps = {
+      colorMode: 'dark' as const,
+      style: {
+        paddingTop: 0,
+        paddingBottom: 0,
+        marginLeft: 8,
+        minHeight: 100,
+        left: 0
+      },
+      key: editorKey,
+      disableRowHandles: true,
+      focusOnInit: true,
+      placeholderText: 'What are your thoughts?',
+      onContentChange: updatePostContent,
+      content: postContent.doc
+    };
+
+    if (!inlineCharmEditor) {
+      return <CharmEditor {...editorCommentProps} />;
+    }
+
+    return <InlineCharmEditor {...editorCommentProps} />;
+  }, [inlineCharmEditor, postContent, updatePostContent]);
+
   if (!user) {
     return null;
   }
@@ -53,19 +81,7 @@ export function CommentForm({
     <Stack gap={1}>
       <Box display='flex' gap={1} flexDirection='row' alignItems='flex-start'>
         <UserDisplay user={user} hideName={true} />
-        <CharmEditor
-          disableRowHandles
-          disablePageSpecificFeatures
-          colorMode='dark'
-          style={{
-            minHeight: 100,
-            left: 0
-          }}
-          key={editorKey}
-          content={postContent.doc}
-          onContentChange={updatePostContent}
-          placeholderText='What are your thoughts?'
-        />
+        {editor}
       </Box>
       <Button
         data-test='post-comment-button'

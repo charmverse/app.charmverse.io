@@ -222,12 +222,7 @@ export default function BountyApplicantTableRow({
                 </Box>
               )}
 
-              <ApplicationComments
-                context='reviewer'
-                createdBy={submission.createdBy}
-                applicationId={submission.id}
-                status={submission.status}
-              />
+              <ApplicationComments applicationId={submission.id} status={submission.status} />
             </Box>
 
             {/* Modal which provides review confirmation */}

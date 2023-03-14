@@ -1,5 +1,4 @@
-import CommentIcon from '@mui/icons-material/Comment';
-import { FormLabel, Typography } from '@mui/material';
+import { FormLabel } from '@mui/material';
 import { Box, Stack } from '@mui/system';
 import type { Application } from '@prisma/client';
 import useSWR from 'swr';
@@ -10,19 +9,14 @@ import { CommentForm } from 'components/common/comments/CommentForm';
 import type { CreateCommentPayload, UpdateCommentPayload } from 'components/common/comments/interfaces';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { useUser } from 'hooks/useUser';
-import { getContentWithMention } from 'lib/pages/getContentWithMention';
 import { emptyDocument } from 'lib/prosemirror/constants';
 
 export function ApplicationComments({
-  createdBy,
   applicationId,
-  status,
-  context
+  status
 }: {
-  createdBy: string;
   status: Application['status'];
   applicationId: string;
-  context: 'applicant' | 'reviewer';
 }) {
   const { user } = useUser();
   const {
@@ -82,7 +76,7 @@ export function ApplicationComments({
   return (
     <Stack>
       <Stack gap={2}>
-        <FormLabel sx={{ fontWeight: 'bold' }}>Comments</FormLabel>
+        <FormLabel sx={{ fontWeight: 'bold' }}>Messages</FormLabel>
         {isLoading ? (
           <Box height={100}>
             <LoadingComponent size={24} isLoading label='Fetching comments' />
@@ -92,7 +86,7 @@ export function ApplicationComments({
             {applicationComments.map((comment) => (
               <Comment
                 replyingDisabled
-                enableInlineCharmEditor
+                inlineCharmEditor
                 permissions={{
                   add_comment: true,
                   delete_comments: comment.createdBy === user?.id,
@@ -112,17 +106,6 @@ export function ApplicationComments({
                 handleDeleteComment={deleteComment}
               />
             ))}
-
-            {applicationComments.length === 0 && (
-              <Stack gap={1} alignItems='center' my={1}>
-                <CommentIcon color='secondary' fontSize='large' />
-                <Typography color='secondary' variant='h6'>
-                  No Comments Yet
-                </Typography>
-
-                <Typography color='secondary'>Be the first to share what you think!</Typography>
-              </Stack>
-            )}
           </>
         )}
       </Stack>
@@ -130,17 +113,15 @@ export function ApplicationComments({
       {status !== 'rejected' && (
         <Stack gap={1}>
           <FormLabel>
-            <strong>Send a message (optional)</strong>
+            <strong>Send a message</strong>
           </FormLabel>
           <CommentForm
+            inlineCharmEditor
             handleCreateComment={onSendClicked}
             initialValue={
               user?.id
                 ? {
-                    doc:
-                      context === 'reviewer'
-                        ? getContentWithMention({ myUserId: user.id, targetUserId: createdBy })
-                        : emptyDocument,
+                    doc: emptyDocument,
                     rawText: ''
                   }
                 : undefined
