@@ -11,7 +11,8 @@ type Props = {
 };
 
 export function FileUploadForm({ onComplete }: Props) {
-  const { inputRef, openFilePicker, onFileChange, isUploading, progress, fileName } = useS3UploadInput(onComplete);
+  const { inputRef, openFilePicker, onFileChange, isUploading, progress, fileName, sizeLimit } =
+    useS3UploadInput(onComplete);
 
   return (
     <Box
@@ -35,9 +36,14 @@ export function FileUploadForm({ onComplete }: Props) {
             <CircularProgressWithLabel progress={progress} />
           </Box>
         ) : (
-          <Typography color='secondary' variant='subtitle1'>
-            Select a file to upload
-          </Typography>
+          <Box display='flex' alignItems='center' gap={1}>
+            <Typography color='secondary' variant='subtitle1'>
+              Select a file to upload
+            </Typography>
+            <Typography color='secondary' variant='caption'>
+              (max {sizeLimit}MB)
+            </Typography>
+          </Box>
         )}
       </Box>
 
