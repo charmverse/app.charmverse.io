@@ -15,7 +15,6 @@ import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
 
 import mutator from '../../mutator';
-import Tooltip from '../../widgets/tooltip';
 import type { DateProperty } from '../properties/dateRange/dateRange';
 import { createDatePropertyFromString } from '../properties/dateRange/dateRange';
 import PropertyValueElement from '../propertyValueElement';
