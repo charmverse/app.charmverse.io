@@ -4,7 +4,7 @@ import { TextField, Typography } from '@mui/material';
 import type { ChangeEvent } from 'react';
 import { useContext, useEffect, useRef, useState } from 'react';
 
-import { insertAndFocusFirstLine } from 'components/common/CharmEditor/utils';
+import { insertAndFocusFirstLine } from 'lib/prosemirror/insertAndFocusFirstLine';
 import { isTouchScreen } from 'lib/utilities/browser';
 
 const StyledPageTitle = styled(TextField)`
