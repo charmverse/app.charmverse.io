@@ -5,10 +5,10 @@ import log from 'lib/log';
 import { mixpanel } from './mixpanel';
 
 type MixPanelSpaceProfile = {
-  $created: string;
+  $created: string | Date;
   $name: string;
   'Space Created By': string;
-  'Space Updated At': string;
+  'Space Updated At': string | Date;
   'Space Origin'?: string;
 };
 
@@ -25,7 +25,7 @@ export function getTrackGroupProfile(space: Space, spaceOrigin?: string) {
     $created: String(space.createdAt),
     $name: space.name,
     'Space Created By': space.createdBy,
-    'Space Updated At': String(space.updatedAt)
+    'Space Updated At': space.updatedAt
   };
 
   if (spaceOrigin) {
