@@ -1,7 +1,12 @@
 import { prisma } from 'db';
 import type { IPagePermissionWithSource } from 'lib/permissions/pages';
 import { setupPermissionsAfterPagePermissionAdded, upsertPermission } from 'lib/permissions/pages';
-import { createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import {
+  createPage,
+  generateSpaceUser,
+  generateUserAndSpace,
+  generateUserAndSpaceWithApiToken
+} from 'testing/setupDatabase';
 import { generateProposalCategory } from 'testing/utils/proposals';
 
 import { createProposalTemplate } from '../../../templates/proposals/createProposalTemplate';
@@ -36,6 +41,32 @@ describe('getAccessiblePages', () => {
 
     expect(pages.length).toBe(1);
     expect(pages[0].id).toBe(page1.id);
+  });
+
+  it('should return only the pages a guest user has individual access to as well as public pages', async () => {
+    const { space, user: nonAdminUser } = await generateUserAndSpace();
+    const guestUser = await generateSpaceUser({
+      spaceId: space.id,
+      isGuest: true
+    });
+
+    const page1 = await createPage({ createdBy: nonAdminUser.id, spaceId: space.id });
+    const page2 = await createPage({ createdBy: nonAdminUser.id, spaceId: space.id });
+
+    await upsertPermission(page1.id, {
+      permissionLevel: 'view',
+      spaceId: space.id
+    });
+
+    await upsertPermission(page2.id, {
+      permissionLevel: 'view',
+      userId: guestUser.id
+    });
+
+    const pages = await getAccessiblePages({ userId: guestUser.id, spaceId: space.id });
+
+    expect(pages.length).toBe(1);
+    expect(pages[0].id).toBe(page2.id);
   });
 
   it('should return proposal templates independent of their permissions the pages the user has access to in the target space', async () => {

@@ -23,7 +23,10 @@ import {
 } from 'lib/permissions/pages';
 import { PermissionNotFoundError } from 'lib/permissions/pages/errors';
 import { boardPagePermissionUpdated } from 'lib/permissions/pages/triggers';
+import { addGuest } from 'lib/roles/addGuest';
 import { withSessionRoute } from 'lib/session/withSession';
+import { DataNotFoundError } from 'lib/utilities/errors';
+import { isUUID, isValidEmail } from 'lib/utilities/strings';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -61,6 +64,34 @@ async function addPagePermission(req: NextApiRequest, res: NextApiResponse<IPage
     throw new ActionNotPermittedError('Only view permissions can be provided to public.');
   }
 
+  const permissionData = { ...req.body } as IPagePermissionToCreate;
+
+  // Usually a userId, but can be an email
+  const userIdAsEmail = req.body.userId;
+
+  // Handle case where we are sharing a page
+  if (isValidEmail(userIdAsEmail)) {
+    const page = await prisma.page.findUnique({
+      where: {
+        id: pageId
+      },
+      select: {
+        spaceId: true
+      }
+    });
+
+    if (!page) {
+      throw new DataNotFoundError('Page not found');
+    }
+
+    const addGuestResult = await addGuest({
+      spaceId: page.spaceId,
+      userIdOrEmail: userIdAsEmail
+    });
+
+    permissionData.userId = addGuestResult.user.id;
+  }
+
   const createdPermission = await prisma.$transaction(
     async (tx) => {
       const page = await tx.page.findUnique({
@@ -73,7 +104,7 @@ async function addPagePermission(req: NextApiRequest, res: NextApiResponse<IPage
         throw new PageNotFoundError(pageId);
       }
 
-      if (page.type === 'proposal' && req.body.public !== true) {
+      if (page.type === 'proposal' && typeof req.body.public !== 'boolean') {
         throw new ActionNotPermittedError('You cannot manually update permissions for proposals.');
       }
 
@@ -83,7 +114,7 @@ async function addPagePermission(req: NextApiRequest, res: NextApiResponse<IPage
           pageId
         }
       });
-      const newPermission = await upsertPermission(pageId, req.body, undefined, tx);
+      const newPermission = await upsertPermission(pageId, permissionData, undefined, tx);
 
       // Override behaviour, we always cascade board permissions downwards
       if (page.type.match(/board/)) {

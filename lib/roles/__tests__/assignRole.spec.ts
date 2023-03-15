@@ -1,10 +1,14 @@
 import type { Space, User } from '@prisma/client';
-import { SpacePermission } from '@prisma/client';
 import { v4 } from 'uuid';
 
-import { prisma } from 'db';
+import { InvalidStateError } from 'lib/middleware';
 import { assignRole } from 'lib/roles';
-import { generateRole, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import {
+  generateRole,
+  generateSpaceUser,
+  generateUserAndSpace,
+  generateUserAndSpaceWithApiToken
+} from 'testing/setupDatabase';
 
 import { ExpectedAnError } from '../../../testing/errors';
 import { DataNotFoundError, InsecureOperationError } from '../../utilities/errors';
@@ -64,6 +68,29 @@ describe('assignRole', () => {
     } catch (err) {
       expect(err).toBeInstanceOf(InsecureOperationError);
     }
+  });
+
+  it('should fail if the user is a guest of the target space', async () => {
+    const { user: adminUser, space: spaceWithGuest } = await generateUserAndSpace({
+      isAdmin: true
+    });
+
+    const guestUser = await generateSpaceUser({
+      spaceId: spaceWithGuest.id,
+      isGuest: true
+    });
+
+    const role = await generateRole({
+      spaceId: spaceWithGuest.id,
+      createdBy: adminUser.id
+    });
+
+    await expect(
+      assignRole({
+        roleId: role.id,
+        userId: guestUser.id
+      })
+    ).rejects.toBeInstanceOf(InvalidStateError);
   });
 
   it('should fail if the role does not exist', async () => {
