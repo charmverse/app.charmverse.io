@@ -57,7 +57,6 @@ export function InputSearchMemberBase({
       disableCloseOnSelect={disableCloseOnSelect}
       loading={options.length === 0}
       sx={{ minWidth: 150 }}
-      placeholder={filteredOptions.length > 0 ? placeholder : ''}
       options={filteredOptions}
       autoHighlight
       // freeSolo={props.allowEmail}
@@ -89,7 +88,7 @@ export function InputSearchMemberBase({
         <TextField
           {...params}
           //          ref={inputRef}
-          placeholder={filteredOptions.length > 0 ? placeholder : ''}
+          placeholder={placeholder ?? ''}
           size='small'
           autoFocus={openOnFocus}
           inputProps={{

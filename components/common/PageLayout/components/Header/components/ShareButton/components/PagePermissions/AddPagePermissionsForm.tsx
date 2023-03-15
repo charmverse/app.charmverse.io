@@ -1,7 +1,6 @@
 import Alert from '@mui/material/Alert';
 import Grid from '@mui/material/Grid';
 import InputLabel from '@mui/material/InputLabel';
-import type { PagePermissionLevel } from '@prisma/client';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
@@ -12,7 +11,6 @@ import InputEnumToOptions from 'components/common/form/InputEnumToOptions';
 import { InputSearchMemberMultiple } from 'components/common/form/InputSearchMember';
 import { InputSearchRoleMultiple } from 'components/common/form/InputSearchRole';
 import Loader from 'components/common/Loader';
-import { CollectEmail } from 'components/login/CollectEmail';
 import useRoles from 'hooks/useRoles';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type {
@@ -185,6 +183,7 @@ export default function AddPagePermissionsForm({
             <InputSearchMemberMultiple
               allowEmail
               onChange={setSelectedUserIds}
+              placeholder='Search for users or invite by email'
               filter={{
                 mode: 'exclude',
                 userIds: userIdsToHide
