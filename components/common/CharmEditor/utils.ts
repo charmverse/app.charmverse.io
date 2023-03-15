@@ -1,6 +1,8 @@
+import type { EditorView } from '@bangle.dev/pm';
 import { safeInsert } from '@bangle.dev/utils';
 import type { Node } from 'prosemirror-model';
 import type { EditorState, Transaction } from 'prosemirror-state';
+import { TextSelection } from 'prosemirror-state';
 
 export const undoEventName = 'editor-undo';
 
