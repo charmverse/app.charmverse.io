@@ -1,7 +1,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
-import type { Block, PageType } from '@prisma/client';
+import type { Block } from '@prisma/client';
 import { validate } from 'uuid';
 
 import { prisma } from 'db';
@@ -21,8 +21,6 @@ export interface ExportWorkspacePage {
   skipBountyTemplates?: boolean;
   skipProposalTemplates?: boolean;
 }
-
-const excludedPageTypes: PageType[] = ['bounty_template', 'proposal_template'];
 
 function recurse(node: PageContent, cb: (node: PageContent | TextContent) => void) {
   if (node?.content) {
@@ -57,10 +55,10 @@ export async function exportWorkspacePages({
   const rootPages = await prisma.page.findMany({
     where: {
       ...(rootPageIds ? { id: { in: rootPageIds } } : { spaceId: space.id, parentId: null }),
-      deletedAt: null,
-      type: {
+      deletedAt: null
+      /* type: {
         notIn: excludedPageTypes
-      }
+      } */
     }
   });
 
@@ -145,7 +143,7 @@ export async function exportWorkspacePages({
       });
     }
 
-    node.children = node.children?.filter((child) => !excludedPageTypes.includes(child.type)) ?? [];
+    // node.children = node.children?.filter((child) => !excludedPageTypes.includes(child.type)) ?? [];
 
     await Promise.all(
       (node.children ?? []).map(async (child) => {

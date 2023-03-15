@@ -199,7 +199,7 @@ export async function generateImportWorkspacePages({
         parentId: currentParentId,
         proposal: {
           connect:
-            node.type === 'proposal'
+            node.type === 'proposal' || node.type === 'proposal_template'
               ? {
                   id: newId
                 }
@@ -215,7 +215,7 @@ export async function generateImportWorkspacePages({
         },
         bounty: {
           connect:
-            node.type === 'bounty'
+            node.type === 'bounty' || node.type === 'bounty_template'
               ? {
                   id: newId
                 }
