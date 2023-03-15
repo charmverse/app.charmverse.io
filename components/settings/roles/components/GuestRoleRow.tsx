@@ -1,39 +1,17 @@
 import styled from '@emotion/styled';
-import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import DoneIcon from '@mui/icons-material/Done';
-import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import LockOpenIcon from '@mui/icons-material/LockOpen';
-import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import { Accordion, AccordionSummary, AccordionDetails, Tooltip, Typography } from '@mui/material';
+import { Accordion, AccordionDetails, AccordionSummary, Tooltip, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
 import Divider from '@mui/material/Divider';
-import Grid from '@mui/material/Grid';
-import IconButton from '@mui/material/IconButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import Menu from '@mui/material/Menu';
-import MenuItem from '@mui/material/MenuItem';
-import { bindMenu, bindPopover, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
-import { useState } from 'react';
 
-import Button from 'components/common/Button';
-import { InputSearchMemberMultiple } from 'components/common/form/InputSearchMember';
-import Modal from 'components/common/Modal';
-import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMembers } from 'hooks/useMembers';
-import { spaceOperationLabels } from 'lib/permissions/spaces/client';
-import type { ListSpaceRolesResponse } from 'pages/api/roles';
-import GuildXYZIcon from 'public/images/guild_logo.svg';
 
-import RoleForm from './RoleForm';
 import RoleMemberRow from './RoleMemberRow';
-import SpacePermissions from './SpacePermissions';
 
 interface RoleRowProps {
   isEditable: boolean;
-  removeGuest: (userId: string) => void;
 }
 
 const ScrollableBox = styled.div<{ rows: number }>`
@@ -42,12 +20,8 @@ const ScrollableBox = styled.div<{ rows: number }>`
   ${({ theme, rows }) => rows > 5 && `border-bottom: 1px solid ${theme.palette.divider}`};
 `;
 
-export function GuestRoleRow({ isEditable, removeGuest }: RoleRowProps) {
-  const menuState = usePopupState({ variant: 'popover', popupId: `role-guests` });
-  const userPopupState = usePopupState({ variant: 'popover', popupId: `role-guest-users` });
-  const confirmDeletePopupState = usePopupState({ variant: 'popover', popupId: 'role-delete' });
-  const [newMembers, setNewMembers] = useState<string[]>([]);
-  const { members, guests } = useMembers();
+export function GuestRoleRow({ isEditable }: RoleRowProps) {
+  const { guests, removeGuest } = useMembers();
 
   return (
     <Box mb={3}>
