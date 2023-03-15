@@ -305,6 +305,7 @@ model Page {
   createdBy           String           @db.Uuid
   updatedAt           DateTime         @default(now())
   updatedBy           String           @db.Uuid
+  deletedBy           String?          @db.Uuid
   title               String
   content             Json?
   contentText         String

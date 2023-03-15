@@ -183,6 +183,7 @@ export function PagesProvider({ children }: { children: ReactNode }) {
         pageIds.forEach((_pageId) => {
           _pages[_pageId] = {
             ..._pages[_pageId],
+            deletedBy: user.id,
             deletedAt: new Date()
           } as PageMeta;
         });
