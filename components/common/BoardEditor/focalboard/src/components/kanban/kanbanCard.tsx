@@ -63,7 +63,6 @@ const StyledBox = styled(Box)`
 const KanbanCard = React.memo((props: Props) => {
   const { card, board } = props;
   const intl = useIntl();
-
   const [isDragging, isOver, cardRef] = useSortable('card', card, !props.readOnly, props.onDrop);
   const visiblePropertyTemplates = props.visiblePropertyTemplates || [];
   let className = props.isSelected ? 'KanbanCard selected' : 'KanbanCard';

@@ -15,7 +15,7 @@ async function init() {
       }
     }
   })
-  let counts = { views: views.length, needsDate: 0 };
+  let counts = { views: views.length, needsDate: 0, boardHasDate: 0 };
   for (let view of views) {
     if (!(view.fields as any)?.dateDisplayPropertyId) {
         counts.needsDate++;
@@ -31,20 +31,13 @@ async function init() {
           id: view.parentId
         }
       }) as unknown as Board;
-      const boardFields = board.fields as any;
-      boardFields.cardProperties.push(template);
-      const viewFields = view.fields as any;
-      viewFields.dateDisplayPropertyId = template.id;
-      await prisma.$transaction([
-          prisma.block.update({
-          where: {
-            id: board.id
-          },
-          data: {
-            fields: boardFields
-          }
-        }),
-        prisma.block.update({
+      const boardFields = board.fields;
+      const dateProperty = boardFields.cardProperties.find((p: IPropertyTemplate) => p.type === 'date');
+      if (dateProperty) {
+        counts.boardHasDate++;
+        const viewFields = view.fields as any;
+        viewFields.dateDisplayPropertyId = dateProperty.id;
+        await prisma.block.update({
           where: {
             id: view.id
           },
@@ -52,7 +45,31 @@ async function init() {
             fields: viewFields
           }
         })
-      ])
+      }
+      // make a new date property
+      else {
+        boardFields.cardProperties.push(template);
+        const viewFields = view.fields as any;
+        viewFields.dateDisplayPropertyId = template.id;
+        await prisma.$transaction([
+            prisma.block.update({
+            where: {
+              id: board.id
+            },
+            data: {
+              fields: boardFields
+            }
+          }),
+          prisma.block.update({
+            where: {
+              id: view.id
+            },
+            data: {
+              fields: viewFields
+            }
+          })
+        ])
+      }
     }
   }
   console.log('complete', counts)

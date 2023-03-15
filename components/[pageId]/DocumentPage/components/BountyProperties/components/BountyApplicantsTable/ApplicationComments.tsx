@@ -33,7 +33,7 @@ export function ApplicationComments({
       contentText: comment.contentText
     });
     refetchApplicationComments(
-      (_applicationComments) => (_applicationComments ? [applicationComment, ..._applicationComments] : []),
+      (_applicationComments) => (_applicationComments ? [..._applicationComments, applicationComment] : []),
       {
         revalidate: false
       }
@@ -76,7 +76,7 @@ export function ApplicationComments({
   return (
     <Stack>
       <Stack>
-        <FormLabel sx={{ fontWeight: 'bold', my: 1 }}>Messages</FormLabel>
+        {applicationComments.length !== 0 && <FormLabel sx={{ fontWeight: 'bold', my: 1 }}>Messages</FormLabel>}
         {isLoading ? (
           <Box height={100}>
             <LoadingComponent size={24} isLoading label='Fetching comments' />

@@ -52,7 +52,8 @@ export default function InputSearchBlockchain({
     <Autocomplete
       defaultValue={defaultValueToAssign}
       // @ts-ignore - autocomplete types are a mess
-      value={value}
+      // dummy bounty object with chainName to show N/A for empty value
+      value={value ?? { chainName: 'N/A' }}
       onChange={(_, _value: IChainDetails) => {
         if (_value?.chainId) {
           onChange(_value.chainId);

@@ -19,8 +19,6 @@ import { IDType, Utils } from '../../utils';
 import { typeDisplayName } from '../../widgets/propertyMenu';
 import { dragAndDropRearrange } from '../cardDetail/cardDetailContentsUtility';
 
-import KanbanCard from './kanbanCard';
-import KanbanColumn from './kanbanColumn';
 import KanbanColumnHeader from './kanbanColumnHeader';
 import KanbanHiddenColumnItem from './kanbanHiddenColumnItem';
 
@@ -82,7 +80,6 @@ function Kanban(props: Props) {
     .map((id) => board.fields.cardProperties.find((t) => t.id === id))
     .filter((i) => i) as IPropertyTemplate[];
   const isManualSort = activeView.fields.sortOptions.length === 0;
-  const visibleBadges = activeView.fields.visiblePropertyIds.includes(Constants.badgesColumnId);
 
   const propertyNameChanged = useCallback(
     async (option: IPropertyOption, text: string): Promise<void> => {

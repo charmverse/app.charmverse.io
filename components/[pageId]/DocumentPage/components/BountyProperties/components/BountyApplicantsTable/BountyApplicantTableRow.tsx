@@ -58,6 +58,7 @@ export default function BountyApplicantTableRow({
     if (!submissionsCapReached) {
       await charmClient.bounties.approveApplication(applicationId);
       refreshBounty(bounty.id);
+      refreshSubmissions();
     }
   }
 

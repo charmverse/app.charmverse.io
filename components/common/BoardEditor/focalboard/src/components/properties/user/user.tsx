@@ -2,8 +2,9 @@ import styled from '@emotion/styled';
 import CloseIcon from '@mui/icons-material/Close';
 import { IconButton } from '@mui/material';
 import { Box, Stack } from '@mui/system';
-import { useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 
+import type { PropertyValueDisplayType } from 'components/common/BoardEditor/interfaces';
 import { InputSearchMemberMultiple } from 'components/common/form/InputSearchMember';
 import UserDisplay from 'components/common/UserDisplay';
 import { useMembers } from 'hooks/useMembers';
@@ -14,14 +15,18 @@ type Props = {
   readOnly: boolean;
   onChange: (memberIds: string[]) => void;
   showEmptyPlaceholder?: boolean;
+  displayType?: PropertyValueDisplayType;
 };
 
-const StyledUserPropertyContainer = styled(Box)`
+const StyledUserPropertyContainer = styled(Box)<{ hideInput?: boolean }>`
   width: 100%;
+  height: 100%;
   overflow: hidden;
   & .MuiInputBase-root,
   & input.MuiInputBase-input {
     background: inherit;
+    /** this overflows to the next line on smaller width */
+    position: ${({ hideInput }) => (!hideInput ? `inherit` : 'absolute')};
   }
 
   & .MuiAutocomplete-inputRoot.MuiInputBase-root.MuiOutlinedInput-root {
@@ -52,6 +57,10 @@ function UserProperty(props: Props): JSX.Element | null {
   const [clicked, setClicked] = useState(false);
   const { members } = useMembers();
 
+  useEffect(() => {
+    setMemberIds(props.memberIds);
+  }, [props.memberIds]);
+
   const membersRecord = members.reduce<Record<string, Member>>((cur, member) => {
     cur[member.id] = member;
     return cur;
@@ -61,9 +70,13 @@ function UserProperty(props: Props): JSX.Element | null {
   return (
     <StyledUserPropertyContainer
       onClick={() => {
-        setIsOpen(true);
-        setClicked(true);
+        // Only register click if display type is details or table
+        if (!props.readOnly) {
+          setIsOpen(true);
+          setClicked(true);
+        }
       }}
+      hideInput={props.readOnly || (props.displayType !== 'details' && !clicked)}
     >
       <InputSearchMemberMultiple
         open={isOpen}
@@ -77,12 +90,14 @@ function UserProperty(props: Props): JSX.Element | null {
           setMemberIds(_memberIds);
         }}
         onClose={() => {
-          // Reduce flicker in the ui
-          if (!arrayEquals(memberIds, props.memberIds)) {
-            props.onChange(memberIds);
+          if (isOpen) {
+            // Reduce flicker in the ui
+            if (!arrayEquals(memberIds, props.memberIds)) {
+              props.onChange(memberIds);
+            }
+            setIsOpen(false);
+            setClicked(false);
           }
-          setIsOpen(false);
-          setClicked(false);
         }}
         getOptionLabel={(user) => (typeof user === 'string' ? user : user?.username)}
         readOnly={props.readOnly}
