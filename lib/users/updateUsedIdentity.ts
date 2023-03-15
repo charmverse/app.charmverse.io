@@ -69,7 +69,7 @@ export async function updateUsedIdentity(userId: string, identityUpdate?: Identi
 
   // Priority of identities: [wallet, discord, unstoppable domain, google account]
   if (user.wallets.length) {
-    updateContent.username = shortWalletAddress(user.wallets[0].address);
+    updateContent.username = shortWalletAddress(user.wallets[0].ensname ?? user.wallets[0].address);
     updateContent.identityType = 'Wallet';
   } else if (user.discordUser) {
     updateContent.username = (user.discordUser.account as any).username;
