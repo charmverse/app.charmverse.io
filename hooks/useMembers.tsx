@@ -11,12 +11,14 @@ import { useCurrentSpace } from './useCurrentSpace';
 
 type Context = {
   members: Member[];
+  guests: Member[];
   mutateMembers: KeyedMutator<Member[]>;
   isLoading: boolean;
 };
 
 const MembersContext = createContext<Readonly<Context>>({
   members: [],
+  guests: [],
   isLoading: false,
   mutateMembers: () => Promise.resolve(undefined)
 });
@@ -42,7 +44,16 @@ export function MembersProvider({ children }: { children: ReactNode }) {
     }
   );
 
-  const value = useMemo(() => ({ members: members || [], mutateMembers, isLoading } as Context), [members]);
+  const value = useMemo(
+    () =>
+      ({
+        members: members || [],
+        guests: members?.filter((member) => member.isGuest) || [],
+        mutateMembers,
+        isLoading
+      } as Context),
+    [members]
+  );
 
   return <MembersContext.Provider value={value}>{children}</MembersContext.Provider>;
 }

@@ -45,10 +45,12 @@ import { boardWithCardsArgs } from './generateBoardStub';
 
 export async function generateSpaceUser({
   spaceId,
-  isAdmin
+  isAdmin,
+  isGuest
 }: {
   spaceId: string;
-  isAdmin: boolean;
+  isAdmin?: boolean;
+  isGuest?: boolean;
 }): Promise<LoggedInUser> {
   return prisma.user.create({
     data: {
@@ -66,7 +68,8 @@ export async function generateSpaceUser({
               id: spaceId
             }
           },
-          isAdmin
+          isAdmin,
+          isGuest: !isAdmin && isGuest
         }
       }
     },
@@ -138,6 +141,7 @@ export async function generateUserAndSpaceWithApiToken(
 type CreateUserAndSpaceInput = {
   user?: Partial<User>;
   isAdmin?: boolean;
+  isGuest?: boolean;
   onboarded?: boolean;
   spaceName?: string;
   publicBountyBoard?: boolean;
@@ -146,6 +150,7 @@ type CreateUserAndSpaceInput = {
 export async function generateUserAndSpace({
   user,
   isAdmin,
+  isGuest,
   onboarded = true,
   spaceName = 'Example Space',
   publicBountyBoard
@@ -159,6 +164,7 @@ export async function generateUserAndSpace({
       spaceRoles: {
         create: {
           isAdmin,
+          isGuest: !isAdmin && isGuest,
           onboarded,
           space: {
             create: {
