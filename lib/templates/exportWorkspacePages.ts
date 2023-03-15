@@ -18,6 +18,8 @@ export interface ExportWorkspacePage {
   rootPageIds?: string[];
   skipBounties?: boolean;
   skipProposals?: boolean;
+  skipBountyTemplates?: boolean;
+  skipProposalTemplates?: boolean;
 }
 
 const excludedPageTypes: PageType[] = ['bounty_template', 'proposal_template'];
@@ -38,7 +40,9 @@ export async function exportWorkspacePages({
   exportName,
   rootPageIds,
   skipBounties = false,
-  skipProposals = false
+  skipProposals = false,
+  skipBountyTemplates = false,
+  skipProposalTemplates = false
 }: ExportWorkspacePage): Promise<{ data: WorkspaceExport; path?: string }> {
   const isUuid = validate(sourceSpaceIdOrDomain);
 
@@ -115,7 +119,10 @@ export async function exportWorkspacePages({
       node.blocks = {
         card: cardBlock as Block
       };
-    } else if (node.bountyId && node.type === 'bounty' && !skipBounties) {
+    } else if (
+      node.bountyId &&
+      ((node.type === 'bounty' && !skipBounties) || (node.type === 'bounty_template' && !skipBountyTemplates))
+    ) {
       node.bounty = await prisma.bounty.findUnique({
         where: {
           id: node.bountyId
@@ -124,7 +131,10 @@ export async function exportWorkspacePages({
           permissions: true
         }
       });
-    } else if (node.proposalId && node.type === 'proposal' && !skipProposals) {
+    } else if (
+      node.proposalId &&
+      ((node.type === 'proposal' && !skipProposals) || (node.type === 'proposal_template' && !skipProposalTemplates))
+    ) {
       node.proposal = await prisma.proposal.findUnique({
         where: {
           id: node.proposalId
