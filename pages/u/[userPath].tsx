@@ -11,7 +11,7 @@ import charmClient from 'charmClient';
 import ErrorPage from 'components/common/errors/ErrorPage';
 import { CenteredPageContent } from 'components/common/PageLayout/components/PageContent';
 import NexusLayout from 'components/common/PageLayout/NexusLayout';
-import PublicProfile from 'components/profile/PublicProfile';
+import { PublicProfile } from 'components/profile/PublicProfile';
 import { prisma } from 'db';
 import { usePageTitle } from 'hooks/usePageTitle';
 import { isUUID } from 'lib/utilities/strings';
@@ -36,6 +36,7 @@ export const getServerSideProps: GetServerSideProps<{ publicUser: PublicUser | n
           id: true,
           username: true,
           avatar: true,
+          avatarTokenId: true, // used to determine if user has an NFT avatar
           path: true,
           profile: true
         }
