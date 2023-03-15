@@ -11,7 +11,7 @@ import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { createDatabase, createDatabaseCardPage } from '../createDatabaseCardPage';
 import { DatabasePageNotFoundError, PageNotFoundError } from '../errors';
 import { getDatabaseRoot, getPageInBoard } from '../getPageInBoard';
-import type { DatabasePage, Page } from '../interfaces';
+import type { DatabasePage, CardPage } from '../interfaces';
 
 let user: User;
 let space: Space;
@@ -45,8 +45,8 @@ describe('getPageInBoard', () => {
     const foundCard = await getPageInBoard(card.id);
 
     // Add in actual assertions here
-    expect(foundCard).toEqual<Page>(
-      expect.objectContaining<Page>({
+    expect(foundCard).toEqual<CardPage>(
+      expect.objectContaining<CardPage>({
         content: expect.any(Object),
         createdAt: expect.any(String),
         updatedAt: expect.any(String),

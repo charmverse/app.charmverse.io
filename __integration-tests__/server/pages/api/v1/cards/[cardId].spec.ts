@@ -5,7 +5,7 @@ import { v4 } from 'uuid';
 
 import type {
   InvalidCustomPropertyValueError,
-  Page as ApiPage,
+  CardPage as ApiPage,
   PageProperty,
   UnsupportedKeysError
 } from 'lib/public-api';

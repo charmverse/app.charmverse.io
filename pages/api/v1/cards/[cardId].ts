@@ -5,27 +5,27 @@ import nc from 'next-connect';
 import { prisma } from 'db';
 import { onError, onNoMatch, requireApiKey, SpaceAccessDeniedError } from 'lib/middleware';
 import { generateMarkdown } from 'lib/prosemirror/plugins/markdown/generateMarkdown';
-import type { Page, PageProperty } from 'lib/public-api';
+import type { CardPage, PageProperty } from 'lib/public-api';
 import { getPageInBoard, mapProperties, PageFromBlock, validateUpdateData } from 'lib/public-api';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireApiKey).get(getPage).patch(updatePage);
+handler.use(requireApiKey).get(getCard).patch(updateCard);
 
 /**
  * @swagger
- * /pages/{pageId}:
+ * /cards/{cardId}:
  *   get:
- *     summary: Find page by ID
+ *     summary: Find card page by ID
  *     responses:
  *       200:
- *         description: Page with content and properties
+ *         description: Card page with content and properties
  *         content:
  *            application/json:
  *              schema:
- *                $ref: '#/components/schemas/Page'
+ *                $ref: '#/components/schemas/CardPage'
  */
-export async function getPage(req: NextApiRequest, res: NextApiResponse) {
+export async function getCard(req: NextApiRequest, res: NextApiResponse) {
   const { pageId } = req.query;
 
   const page = await getPageInBoard(pageId as string);
@@ -58,7 +58,7 @@ export async function getPage(req: NextApiRequest, res: NextApiResponse) {
  *              schema:
  *                $ref: '#/components/schemas/Page'
  */
-async function updatePage(req: NextApiRequest, res: NextApiResponse) {
+async function updateCard(req: NextApiRequest, res: NextApiResponse) {
   const { pageId } = req.query;
 
   const spaceId = req.authorizedSpaceId;
@@ -89,7 +89,7 @@ async function updatePage(req: NextApiRequest, res: NextApiResponse) {
 
   const boardSchema: PageProperty[] = (board.fields as any).cardProperties;
 
-  const requestBodyUpdate = req.body as Pick<Page, 'properties' | 'title'>;
+  const requestBodyUpdate = req.body as Pick<CardPage, 'properties' | 'title'>;
 
   try {
     validateUpdateData(requestBodyUpdate);
