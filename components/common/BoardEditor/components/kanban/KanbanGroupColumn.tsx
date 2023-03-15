@@ -40,7 +40,6 @@ export function KanbanGroupColumn({
 }: Props) {
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
   const { data: cards, hasNextPage, showNextPage } = usePaginatedData(group.cards, { pageSize });
-
   return (
     <KanbanColumn onDrop={(card: Card) => onDropToColumn(group.option, card)}>
       {cards.map((card) => (

@@ -8,7 +8,11 @@ export function getApplication(applicationId: string): Promise<ApplicationWithBo
       id: applicationId
     },
     include: {
-      bounty: true
+      bounty: {
+        include: {
+          page: true
+        }
+      }
     }
   });
 }

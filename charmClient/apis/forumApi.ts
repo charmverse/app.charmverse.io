@@ -68,9 +68,10 @@ export class ForumApi {
   updatePostCategory({
     spaceId,
     id,
-    name
+    name,
+    description
   }: PostCategoryUpdate & Pick<PostCategory, 'spaceId' | 'id'>): Promise<PostCategoryWithPermissions> {
-    return http.PUT(`/api/spaces/${spaceId}/post-categories/${id}`, { name });
+    return http.PUT(`/api/spaces/${spaceId}/post-categories/${id}`, { name, description });
   }
 
   updatePostComment({
@@ -97,7 +98,7 @@ export class ForumApi {
     return http.DELETE(`/api/forums/posts/${postId}/comments/${commentId}`);
   }
 
-  convertToProposal(postId: string) {
-    return http.POST<PageMeta>(`/api/forums/posts/${postId}/convert-to-proposal`);
+  convertToProposal({ postId, categoryId }: { postId: string; categoryId: string }) {
+    return http.POST<PageMeta>(`/api/forums/posts/${postId}/convert-to-proposal`, { categoryId });
   }
 }

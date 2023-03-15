@@ -1,7 +1,7 @@
 import { prisma } from 'db';
 import { getUserProfile } from 'lib/users/getUser';
 import { InvalidInputError, MissingDataError } from 'lib/utilities/errors';
-import { matchWalletAddress, shortWalletAddress } from 'lib/utilities/strings';
+import { matchWalletAddress } from 'lib/utilities/strings';
 import type { LoggedInUser } from 'models';
 
 import { getENSName } from './getENSName';

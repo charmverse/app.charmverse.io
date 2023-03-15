@@ -1,77 +1,137 @@
 import styled from '@emotion/styled';
-import { Popover } from '@mui/material';
-import { Box } from '@mui/system';
-import { bindPopover, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
+import CloseIcon from '@mui/icons-material/Close';
+import { IconButton } from '@mui/material';
+import { Box, Stack } from '@mui/system';
+import { useEffect, useState } from 'react';
 
-import { InputSearchMember } from 'components/common/form/InputSearchMember';
+import type { PropertyValueDisplayType } from 'components/common/BoardEditor/interfaces';
+import { InputSearchMemberMultiple } from 'components/common/form/InputSearchMember';
 import UserDisplay from 'components/common/UserDisplay';
 import { useMembers } from 'hooks/useMembers';
 import type { Member } from 'lib/members/interfaces';
 
 type Props = {
-  value: string;
+  memberIds: string[];
   readOnly: boolean;
-  onChange: (value: string) => void;
+  onChange: (memberIds: string[]) => void;
+  showEmptyPlaceholder?: boolean;
+  displayType?: PropertyValueDisplayType;
 };
 
-const StyledUserPropertyContainer = styled(Box)`
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
+const StyledUserPropertyContainer = styled(Box)<{ hideInput?: boolean }>`
   width: 100%;
-  display: flex;
   height: 100%;
-`;
-
-function UserProperty(props: Props): JSX.Element | null {
-  const popupState = usePopupState({ variant: 'popover', popupId: `user-property-members` });
-
-  const { members } = useMembers();
-  const memberMap = members.reduce<Record<string, Member>>((acc, member) => {
-    acc[member.id] = member;
-    return acc;
-  }, {});
-
-  if (props.readOnly) {
-    if (memberMap[props.value]) {
-      return (
-        <StyledUserPropertyContainer>
-          <div className='UserProperty readonly octo-propertyvalue'>
-            <UserDisplay user={memberMap[props.value]} avatarSize='xSmall' fontSize='small' />
-          </div>
-        </StyledUserPropertyContainer>
-      );
-    }
-    return null;
+  overflow: hidden;
+  & .MuiInputBase-root,
+  & input.MuiInputBase-input {
+    background: inherit;
+    /** this overflows to the next line on smaller width */
+    position: ${({ hideInput }) => (!hideInput ? `inherit` : 'absolute')};
   }
 
+  & .MuiAutocomplete-inputRoot.MuiInputBase-root.MuiOutlinedInput-root {
+    padding: 2px;
+  }
+
+  & fieldset.MuiOutlinedInput-notchedOutline {
+    border: none;
+    outline: none;
+  }
+
+  & button.MuiButtonBase-root[title='Open'],
+  & button.MuiButtonBase-root[title='Close'] {
+    display: none;
+  }
+
+  & .MuiAutocomplete-tag {
+    margin: 2px;
+  }
+`;
+
+function arrayEquals<T>(a: T[], b: T[]) {
+  return a.length === b.length && a.every((val, index) => val === b[index]);
+}
+
+function UserProperty(props: Props): JSX.Element | null {
+  const [memberIds, setMemberIds] = useState(props.memberIds);
+  const [clicked, setClicked] = useState(false);
+  const { members } = useMembers();
+
+  useEffect(() => {
+    setMemberIds(props.memberIds);
+  }, [props.memberIds]);
+
+  const membersRecord = members.reduce<Record<string, Member>>((cur, member) => {
+    cur[member.id] = member;
+    return cur;
+  }, {});
+
+  const [isOpen, setIsOpen] = useState(false);
   return (
-    <>
-      <StyledUserPropertyContainer {...bindTrigger(popupState)}>
-        {memberMap[props.value] && (
-          <div className='UserProperty readonly octo-propertyvalue'>
-            <UserDisplay user={memberMap[props.value]} avatarSize='xSmall' fontSize='small' />
-          </div>
-        )}
-      </StyledUserPropertyContainer>
-      <Popover
-        {...bindPopover(popupState)}
-        PaperProps={{
-          sx: { width: 300 }
+    <StyledUserPropertyContainer
+      onClick={() => {
+        // Only register click if display type is details or table
+        if (!props.readOnly) {
+          setIsOpen(true);
+          setClicked(true);
+        }
+      }}
+      hideInput={props.readOnly || (props.displayType !== 'details' && !clicked)}
+    >
+      <InputSearchMemberMultiple
+        open={isOpen}
+        disableCloseOnSelect
+        defaultValue={memberIds}
+        value={memberIds.map((memberId) => membersRecord[memberId])}
+        onChange={(_memberIds, reason) => {
+          if (reason === 'removeOption' && !isOpen) {
+            props.onChange(_memberIds);
+          }
+          setMemberIds(_memberIds);
         }}
-      >
-        <InputSearchMember
-          defaultValue={memberMap[props.value]?.id ?? null}
-          onChange={(memberId) => {
-            props.onChange(memberId);
-          }}
-          openOnFocus
-          onClear={() => {
-            props.onChange('');
-          }}
-        />
-      </Popover>
-    </>
+        onClose={() => {
+          if (isOpen) {
+            // Reduce flicker in the ui
+            if (!arrayEquals(memberIds, props.memberIds)) {
+              props.onChange(memberIds);
+            }
+            setIsOpen(false);
+            setClicked(false);
+          }
+        }}
+        getOptionLabel={(user) => (typeof user === 'string' ? user : user?.username)}
+        readOnly={props.readOnly}
+        placeholder={props.showEmptyPlaceholder && memberIds.length === 0 ? 'Empty' : ''}
+        renderTags={() => (
+          <Stack flexDirection='row' flexWrap='wrap' gap={1}>
+            {memberIds.map((memberId) => {
+              const user = membersRecord[memberId];
+              if (!user) {
+                return null;
+              }
+              return (
+                <Stack alignItems='center' flexDirection='row' key={user.id} gap={0.5}>
+                  <UserDisplay fontSize={14} avatarSize='xSmall' user={user} />
+                  {!props.readOnly && clicked && (
+                    <IconButton size='small'>
+                      <CloseIcon
+                        sx={{
+                          fontSize: 14
+                        }}
+                        cursor='pointer'
+                        fontSize='small'
+                        color='secondary'
+                        onClick={() => setMemberIds(memberIds.filter((_memberId) => _memberId !== user.id))}
+                      />
+                    </IconButton>
+                  )}
+                </Stack>
+              );
+            })}
+          </Stack>
+        )}
+      />
+    </StyledUserPropertyContainer>
   );
 }
 

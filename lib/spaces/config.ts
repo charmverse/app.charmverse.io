@@ -3,6 +3,7 @@ import { typedKeys } from 'lib/utilities/objects';
 export const DOMAIN_BLACKLIST = [
   'api',
   'api-docs',
+  'authenticate',
   'createWorkspace',
   'invite',
   'login',
@@ -15,7 +16,10 @@ export const DOMAIN_BLACKLIST = [
 
 export const spaceContentTemplates = {
   templateNftCommunity: 'NFT Community',
-  templateCreator: 'Creator'
+  templateCreator: 'Creator',
+  templateHackathon: 'Hackathon',
+  templateNounishDAO: 'Nounish DAO',
+  templateImpactCommunity: 'Impact Community'
 };
 
 export type SpaceTemplate = keyof typeof spaceContentTemplates;

@@ -1,4 +1,4 @@
-import type { PostComment, User } from '@prisma/client';
+import type { PostComment } from '@prisma/client';
 
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
@@ -24,22 +24,3 @@ export type UpdatePostCommentInput = {
 };
 
 export type PostCommentVote = { upvotes: number; downvotes: number; upvoted: boolean | null };
-
-export type ForumTask = {
-  spaceId: string;
-  spaceDomain: string;
-  spaceName: string;
-  postId: string;
-  postPath: string;
-  postTitle: string;
-  createdAt: string;
-  commentId: string | null;
-  mentionId: string | null;
-  commentText: string;
-  createdBy: User | null;
-};
-
-export type ForumTasksGroup = {
-  marked: ForumTask[];
-  unmarked: ForumTask[];
-};

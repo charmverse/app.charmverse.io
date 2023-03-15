@@ -13,9 +13,9 @@ handler.get(getMemberValuesHandler);
 
 async function getMemberValuesHandler(req: NextApiRequest, res: NextApiResponse<MemberPropertyValuesBySpace[]>) {
   const userId = req.session.user?.id;
-  const memberId = req.query.memberId as string;
+  const memberId = req.query.memberId;
 
-  if (!memberId) {
+  if (!memberId || typeof memberId !== 'string') {
     throw new InvalidInputError('Please provide proper member and worspace information');
   }
 

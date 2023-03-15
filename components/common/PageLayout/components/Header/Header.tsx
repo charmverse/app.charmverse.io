@@ -1,7 +1,6 @@
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
-import MoonIcon from '@mui/icons-material/DarkMode';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import GetAppOutlinedIcon from '@mui/icons-material/GetAppOutlined';
 import MenuIcon from '@mui/icons-material/Menu';
@@ -13,7 +12,6 @@ import FavoritedIcon from '@mui/icons-material/Star';
 import NotFavoritedIcon from '@mui/icons-material/StarBorder';
 import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
 import UndoIcon from '@mui/icons-material/Undo';
-import SunIcon from '@mui/icons-material/WbSunny';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import FormControlLabel from '@mui/material/FormControlLabel';
@@ -35,13 +33,14 @@ import { memo, useMemo, useRef, useState } from 'react';
 import charmClient from 'charmClient';
 import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
 import { undoEventName } from 'components/common/CharmEditor/utils';
+import { DuplicatePageAction } from 'components/common/DuplicatePageAction';
 import { usePostByPath } from 'components/forum/hooks/usePostByPath';
-import { useColorMode } from 'context/darkMode';
-import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
+import { useProposalCategories } from 'components/proposals/hooks/useProposalCategories';
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useMembers } from 'hooks/useMembers';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { usePageFromPath } from 'hooks/usePageFromPath';
+import { usePagePermissions } from 'hooks/usePagePermissions';
 import { usePages } from 'hooks/usePages';
 import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useSnackbar } from 'hooks/useSnackbar';
@@ -180,13 +179,15 @@ function PostHeader({
   setPageMenuOpen: Dispatch<SetStateAction<boolean>>;
   undoEditorChanges: VoidFunction;
 }) {
-  const [userSpacePermissions] = useCurrentSpacePermissions();
   const { showMessage } = useSnackbar();
   const { members } = useMembers();
 
   const router = useRouter();
 
-  const canCreateProposal = !!userSpacePermissions?.createVote;
+  const { getCategoriesWithCreatePermission, getDefaultCreateCategory } = useProposalCategories();
+  const proposalCategoriesWithCreateAllowed = getCategoriesWithCreatePermission();
+
+  const canCreateProposal = proposalCategoriesWithCreateAllowed.length > 0;
 
   const postCreator = members.find((member) => member.id === forumPostInfo.forumPost?.createdBy);
 
@@ -219,7 +220,10 @@ function PostHeader({
 
   async function convertToProposal(pageId: string) {
     setPageMenuOpen(false);
-    const { path } = await charmClient.forum.convertToProposal(pageId);
+    const { path } = await charmClient.forum.convertToProposal({
+      postId: pageId,
+      categoryId: getDefaultCreateCategory()?.id
+    });
     router.push(`/${router.query.domain}/${path}`);
   }
 
@@ -240,7 +244,7 @@ function PostHeader({
       >
         <div>
           <ListItemButton
-            data-test='forum-post-convert-proposal-action'
+            data-test='convert-proposal-action'
             onClick={() => forumPostInfo.forumPost && convertToProposal(forumPostInfo.forumPost.id)}
             disabled={!canCreateProposal || !!forumPostInfo.forumPost?.proposalId}
           >
@@ -266,8 +270,7 @@ function PostHeader({
 
 function HeaderComponent({ open, openSidebar }: HeaderProps) {
   const router = useRouter();
-  const colorMode = useColorMode();
-  const { updatePage, getPagePermissions, deletePage } = usePages();
+  const { updatePage, deletePage } = usePages();
   const { user } = useUser();
   const theme = useTheme();
   const [pageMenuOpen, setPageMenuOpen] = useState(false);
@@ -278,9 +281,9 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
   const { isFavorite, toggleFavorite } = useToggleFavorite({ pageId: basePage?.id });
   const { members } = useMembers();
   const { setCurrentPageActionDisplay } = usePageActionDisplay();
-  const [userSpacePermissions] = useCurrentSpacePermissions();
-  const pagePermissions = basePage ? getPagePermissions(basePage.id) : null;
-
+  const { permissions: pagePermissions } = usePagePermissions({
+    pageIdOrPath: basePage ? basePage.id : (null as any)
+  });
   const { onClick: clickToOpenSettingsModal } = useSettingsDialog();
   const isForumPost = router.route === '/[domain]/forum/post/[pagePath]';
 
@@ -310,6 +313,11 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
   const isFullWidth = !isLargeScreen || (basePage?.fullWidth ?? false);
   const isBasePageDocument = documentTypes.includes(basePage?.type ?? '');
   const isBasePageDatabase = /board/.test(basePage?.type ?? '');
+
+  const { getCategoriesWithCreatePermission, getDefaultCreateCategory } = useProposalCategories();
+  const proposalCategoriesWithCreateAllowed = getCategoriesWithCreatePermission();
+
+  const canCreateProposal = proposalCategoriesWithCreateAllowed.length > 0;
 
   function closeMenu() {
     setPageMenuOpen(false);
@@ -350,7 +358,6 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
     closeMenu();
   }
 
-  const canCreateProposal = !!userSpacePermissions?.createVote;
   const charmversePage = basePage ? members.find((member) => member.id === basePage.createdBy) : null;
 
   async function exportMarkdownPage() {
@@ -370,8 +377,12 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
   }
 
   async function convertToProposal(pageId: string) {
-    await charmClient.pages.convertToProposal(pageId);
+    const convertedProposal = await charmClient.pages.convertToProposal({
+      categoryId: getDefaultCreateCategory().id,
+      pageId
+    });
     closeMenu();
+    router.push(`/${router.query.domain}/${convertedProposal.path}`);
   }
 
   const documentOptions = (
@@ -426,6 +437,9 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
           <ListItemText primary={isFavorite ? 'Remove from Favorites' : 'Add to Favorites'} />
         </ListItemButton>
       )}
+      {basePage && (
+        <DuplicatePageAction postDuplication={closeMenu} page={basePage} pagePermissions={pagePermissions} />
+      )}
       <CopyLinkMenuItem closeMenu={closeMenu} />
 
       <Divider />
@@ -433,7 +447,11 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
         <>
           <Tooltip title={!canCreateProposal ? 'You do not have the permission to convert to proposal' : ''}>
             <div>
-              <ListItemButton onClick={() => convertToProposal(basePage.id)} disabled={!canCreateProposal}>
+              <ListItemButton
+                data-test='convert-proposal-action'
+                onClick={() => convertToProposal(basePage.id)}
+                disabled={!canCreateProposal || !!basePage.convertedProposalId}
+              >
                 <TaskOutlinedIcon
                   fontSize='small'
                   sx={{
@@ -586,27 +604,6 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
               </IconButton>
             </NotificationsBadge>
           )}
-          <IconButton
-            sx={{ display: { xs: 'none', md: 'inline-flex' } }}
-            size='small'
-            onClick={colorMode.toggleColorMode}
-            color='inherit'
-          >
-            <Tooltip
-              title={`Enable ${theme.palette.mode === 'dark' ? 'light mode' : 'dark mode'}`}
-              arrow
-              placement='top'
-            >
-              {theme.palette.mode === 'dark' ? (
-                <SunIcon fontSize='small' color='secondary' />
-              ) : (
-                <MoonIcon fontSize='small' color='secondary' />
-              )}
-            </Tooltip>
-          </IconButton>
-
-          {/** user account */}
-          {/* <Account /> */}
         </Box>
       </Box>
     </StyledToolbar>

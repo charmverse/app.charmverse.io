@@ -1,4 +1,4 @@
-import type { Space, User } from '@prisma/client';
+import type { ProposalCategory, Space, User } from '@prisma/client';
 import { v4 } from 'uuid';
 
 import { prisma } from 'db';
@@ -6,9 +6,9 @@ import { convertPostToProposal } from 'lib/forums/posts/convertPostToProposal';
 import { PostNotFoundError } from 'lib/forums/posts/errors';
 import { addSpaceOperations } from 'lib/permissions/spaces';
 import { InvalidInputError } from 'lib/utilities/errors';
-import compute from 'pages/api/permissions/space/[spaceId]/compute';
 import { generateRole, generateSpaceUser, generateUserAndSpace } from 'testing/setupDatabase';
 import { generateForumPost, generatePostCategory } from 'testing/utils/forums';
+import { generateProposalCategory } from 'testing/utils/proposals';
 
 import { baseComputePostPermissions, computePostPermissions } from '../computePostPermissions';
 import { postOperations, postOperationsWithoutEdit } from '../interfaces';
@@ -23,6 +23,8 @@ let space: Space;
 let otherSpace: Space;
 let otherSpaceAdminUser: User;
 
+let proposalCategory: ProposalCategory;
+
 beforeAll(async () => {
   const generated = await generateUserAndSpace({ isAdmin: true });
   adminUser = generated.user;
@@ -33,6 +35,9 @@ beforeAll(async () => {
   const secondGenerated = await generateUserAndSpace({ isAdmin: true });
   otherSpaceAdminUser = secondGenerated.user;
   otherSpace = secondGenerated.space;
+  proposalCategory = await generateProposalCategory({
+    spaceId: space.id
+  });
 });
 
 describe('computePostPermissions - base', () => {
@@ -363,7 +368,8 @@ describe('computePostPermissions - with proposal permission filtering policy', (
 
     await convertPostToProposal({
       post,
-      userId: authorUser.id
+      userId: authorUser.id,
+      categoryId: proposalCategory.id
     });
 
     const permissions = await computePostPermissions({
@@ -390,7 +396,8 @@ describe('computePostPermissions - with proposal permission filtering policy', (
 
     await convertPostToProposal({
       post,
-      userId: authorUser.id
+      userId: authorUser.id,
+      categoryId: proposalCategory.id
     });
 
     const permissions = await computePostPermissions({
@@ -434,7 +441,8 @@ describe('computePostPermissions - with proposal permission filtering policy', (
 
     await convertPostToProposal({
       post,
-      userId: authorUser.id
+      userId: authorUser.id,
+      categoryId: proposalCategory.id
     });
 
     const permissions = await computePostPermissions({
@@ -481,7 +489,8 @@ describe('computePostPermissions - with proposal permission filtering policy', (
 
     await convertPostToProposal({
       post,
-      userId: authorUser.id
+      userId: authorUser.id,
+      categoryId: proposalCategory.id
     });
 
     const permissions = await computePostPermissions({
@@ -515,7 +524,8 @@ describe('computePostPermissions - with proposal permission filtering policy', (
 
     await convertPostToProposal({
       post,
-      userId: authorUser.id
+      userId: authorUser.id,
+      categoryId: proposalCategory.id
     });
 
     const permissions = await computePostPermissions({

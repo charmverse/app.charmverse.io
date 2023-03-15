@@ -17,7 +17,7 @@ import Link from 'components/common/Link';
 import LoadingComponent from 'components/common/LoadingComponent';
 import UserDisplay from 'components/common/UserDisplay';
 import { useSettingsDialog } from 'hooks/useSettingsDialog';
-import type { ForumTask } from 'lib/forums/comments/interface';
+import type { ForumTask } from 'lib/forums/getForumNotifications/getForumNotifications';
 import { isTruthy } from 'lib/utilities/types';
 import type { GetTasksResponse } from 'pages/api/tasks/list';
 
@@ -107,23 +107,10 @@ export default function ForumTasksList({ tasks, error, mutateTasks }: Discussion
     async function main() {
       if (tasks?.forum && tasks.forum.unmarked.length !== 0) {
         await charmClient.tasks.markTasks(
-          tasks.forum.unmarked
-            .map((unmarkedComment) => {
-              if (unmarkedComment.commentId) {
-                return {
-                  id: unmarkedComment.commentId,
-                  type: 'post_comment' as NotificationType
-                };
-              } else if (unmarkedComment.mentionId) {
-                return {
-                  id: unmarkedComment.mentionId,
-                  type: 'mention' as NotificationType
-                };
-              }
-
-              return null;
-            })
-            .filter(isTruthy)
+          tasks.forum.unmarked.map((task) => ({
+            id: task.taskId,
+            type: 'forum' as NotificationType
+          }))
         );
       }
     }
@@ -166,7 +153,7 @@ export default function ForumTasksList({ tasks, error, mutateTasks }: Discussion
   const totalMentions = tasks.forum.unmarked.length + tasks.forum.marked.length;
 
   if (totalMentions === 0) {
-    return <EmptyTaskState taskType='forum comments' />;
+    return <EmptyTaskState taskType='forum events' />;
   }
 
   return (
@@ -174,7 +161,7 @@ export default function ForumTasksList({ tasks, error, mutateTasks }: Discussion
       <Table size='medium' aria-label='Nexus forum table'>
         <TableHead>
           <TableRow>
-            <TableCell>Comment</TableCell>
+            <TableCell></TableCell>
             <TableCell width={200}>Space</TableCell>
             <TableCell width={200}>Post</TableCell>
             <TableCell width={140} align='center'>

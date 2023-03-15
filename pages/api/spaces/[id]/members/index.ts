@@ -6,7 +6,7 @@ import { prisma } from 'db';
 import { getAccessibleMemberPropertiesBySpace } from 'lib/members/getAccessibleMemberPropertiesBySpace';
 import type { Member, PublicMember } from 'lib/members/interfaces';
 import { getPropertiesWithValues } from 'lib/members/utils';
-import { onError, onNoMatch, requireUser } from 'lib/middleware';
+import { onError, onNoMatch } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { hasNftAvatar } from 'lib/users/hasNftAvatar';

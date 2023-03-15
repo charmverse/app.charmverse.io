@@ -1,6 +1,7 @@
 import type { User } from '@prisma/client';
 
 import { prisma } from 'db';
+import log from 'lib/log';
 import { sessionUserRelations } from 'lib/session/config';
 import { MissingDataError } from 'lib/utilities/errors';
 import type { LoggedInUser } from 'models';
@@ -33,10 +34,14 @@ export async function updateUserProfile(userId: string, update: Partial<User>): 
         avatarTokenId: update.avatarTokenId,
         path: update.path,
         email: update.email,
-        spacesOrder: update.spacesOrder
+        spacesOrder: update.spacesOrder,
+        emailNewsletter: update.emailNewsletter,
+        emailNotifications: update.emailNotifications
       }
     });
   }
+
+  log.info('Updated user information', { userId, update });
 
   return getUserProfile('id', userId);
 }

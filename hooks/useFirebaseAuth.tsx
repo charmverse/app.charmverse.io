@@ -1,6 +1,14 @@
 import type { FirebaseApp } from 'firebase/app';
 import { initializeApp } from 'firebase/app';
-import { getAuth, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import {
+  getAuth,
+  GoogleAuthProvider,
+  isSignInWithEmailLink,
+  sendSignInLinkToEmail,
+  signInWithEmailLink,
+  signInWithPopup
+} from 'firebase/auth';
+import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 
 import charmClient from 'charmClient';
@@ -12,14 +20,20 @@ import { ExternalServiceError, InvalidInputError, SystemError } from 'lib/utilit
 
 import type { AnyIdLogin } from '../components/login/Login';
 
+import { useLocalStorage } from './useLocalStorage';
+import { useSnackbar } from './useSnackbar';
+
 export function useFirebaseAuth() {
   const [firebaseApp] = useState<FirebaseApp>(initializeApp(googleWebClientConfig));
   // Google client setup start
   const [provider] = useState(new GoogleAuthProvider());
   const { user, setUser } = useUser();
+  const [emailForSignIn, setEmailForSignIn] = useLocalStorage('emailForSignIn', '');
+  const router = useRouter();
+
+  const { showMessage } = useSnackbar();
 
   const [isConnectingGoogle, setIsConnectingGoogle] = useState(false);
-
   useEffect(() => {
     provider.addScope('email');
     provider.addScope('openid');
@@ -104,10 +118,75 @@ export function useFirebaseAuth() {
     setUser(loggedInUser);
   }
 
+  async function requestMagicLinkViaFirebase({
+    email,
+    connectToExistingAccount
+  }: {
+    email: string;
+    connectToExistingAccount?: boolean;
+  }) {
+    // console.log('IN', { email });
+    const auth = getAuth(firebaseApp);
+    auth.languageCode = 'en';
+
+    const actionCodeSettings = {
+      url: `${window.location.origin}/authenticate${connectToExistingAccount ? '?connectToExistingAccount=true' : ''}`,
+      handleCodeInApp: true
+    };
+
+    // Always set this, so a previous email is overwritten
+    setEmailForSignIn(email);
+
+    await sendSignInLinkToEmail(auth, email, actionCodeSettings);
+
+    showMessage(`Magic link sent. Please check your inbox for ${email}`, 'success');
+  }
+
+  /**
+   * Validate the data from a magic link, and login the user
+   */
+  async function validateMagicLink() {
+    const email = emailForSignIn;
+
+    if (!email) {
+      throw new InvalidInputError(`Could not login`);
+    }
+
+    const auth = getAuth(firebaseApp);
+    auth.languageCode = 'en';
+
+    if (isSignInWithEmailLink(auth, window.location.href)) {
+      const result = await signInWithEmailLink(auth, email, window.location.href);
+
+      const token = await result.user.getIdToken();
+
+      const loggedInUser = await (router.query.connectToExistingAccount === 'true'
+        ? charmClient.google.connectEmailAccount({
+            accessToken: token
+          })
+        : charmClient.google.authenticateMagicLink({
+            accessToken: token
+          }));
+
+      setUser(loggedInUser);
+    } else {
+      throw new InvalidInputError(`Could not login`);
+    }
+  }
+
+  function disconnectVerifiedEmailAccount(email: string) {
+    charmClient.google.disconnectEmailAccount({ email }).then((loggedInUser) => {
+      setUser(loggedInUser);
+    });
+  }
+
   return {
     loginWithGoogle,
     connectGoogleAccount,
     disconnectGoogleAccount,
-    isConnectingGoogle
+    isConnectingGoogle,
+    requestMagicLinkViaFirebase,
+    validateMagicLink,
+    disconnectVerifiedEmailAccount
   };
 }

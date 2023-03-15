@@ -5,12 +5,16 @@ import { prisma } from 'db';
 import { upsertSpaceRolesFromDiscord } from 'lib/discord/upsertSpaceRolesFromDiscord';
 import { upsertUserForDiscordId } from 'lib/discord/upsertUserForDiscordId';
 import { upsertUserRolesFromDiscord } from 'lib/discord/upsertUserRolesFromDiscord';
+import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
+import { updateTrackGroupProfile } from 'lib/metrics/mixpanel/updateTrackGroupProfile';
 import type { SpaceCreateInput } from 'lib/spaces/createWorkspace';
 import { createWorkspace } from 'lib/spaces/createWorkspace';
 import { getAvailableDomainName } from 'lib/spaces/getAvailableDomainName';
 import { createUserFromWallet } from 'lib/users/createUser';
 import { InvalidInputError } from 'lib/utilities/errors';
 import { isValidUrl } from 'lib/utilities/isValidUrl';
+import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
+import { publishMemberEvent } from 'lib/webhookPublisher/publishEvent';
 
 import type { CreateWorkspaceRequestBody, CreateWorkspaceResponseBody } from './interfaces';
 
@@ -69,6 +73,21 @@ export async function createWorkspaceApi({
   if (adminDiscordUserId) {
     await upsertUserRolesFromDiscord({ space, userId: adminUserId });
   }
+
+  trackUserAction('join_a_workspace', { spaceId: space.id, userId: adminUserId, source: 'charmverse_api' });
+  trackUserAction('create_new_workspace', {
+    userId: adminUserId,
+    spaceId: space.id,
+    template: 'default',
+    source: superApiToken?.name || 'charmverse_api'
+  });
+  updateTrackGroupProfile(space, superApiToken?.name);
+
+  publishMemberEvent({
+    scope: WebhookEventNames.UserJoined,
+    spaceId: space.id,
+    userId: adminUserId
+  });
 
   return {
     id: space.id,

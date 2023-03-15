@@ -14,6 +14,7 @@ import type { BountyWithDetails } from 'lib/bounties';
 import type { SafeData } from 'lib/gnosis';
 import { getSafesForAddress } from 'lib/gnosis';
 import { eToNumber } from 'lib/utilities/numbers';
+import { isTruthy } from 'lib/utilities/types';
 
 import { useBounties } from './useBounties';
 import { useCurrentSpace } from './useCurrentSpace';
@@ -63,7 +64,12 @@ export function useMultiBountyPayment({
     () =>
       bounties
         .filter((bounty) => {
-          return gnosisSafes?.some((safe) => bounty.chainId === safe.chainId);
+          return (
+            gnosisSafes?.some((safe) => bounty.chainId === safe.chainId) &&
+            isTruthy(bounty.rewardAmount) &&
+            isTruthy(bounty.rewardToken) &&
+            isTruthy(bounty.chainId)
+          );
         })
         .map((bounty) => {
           return bounty.applications
@@ -72,20 +78,20 @@ export function useMultiBountyPayment({
               return (safeAddress?: string) => {
                 let data = '0x';
                 let to = application.walletAddress as string;
-                let value = ethers.utils.parseUnits(eToNumber(bounty.rewardAmount), 18).toString();
+                let value = ethers.utils.parseUnits(eToNumber(bounty.rewardAmount as number), 18).toString();
 
                 // assume this is ERC20 if its not a native token
                 const isERC20Token =
-                  safeAddress && bounty.rewardToken !== getChainById(bounty.chainId)?.nativeCurrency.symbol;
+                  safeAddress && bounty.rewardToken !== getChainById(bounty.chainId as number)?.nativeCurrency.symbol;
                 if (isERC20Token) {
                   const paymentMethod = paymentMethods.find((method) => method.contractAddress === bounty.rewardToken);
                   const erc20 = new ethers.utils.Interface(ERC20_ABI);
                   const parsedAmount = ethers.utils
-                    .parseUnits(eToNumber(bounty.rewardAmount), paymentMethod?.tokenDecimals)
+                    .parseUnits(eToNumber(bounty.rewardAmount as number), paymentMethod?.tokenDecimals)
                     .toString();
                   data = erc20.encodeFunctionData('transfer', [application.walletAddress, parsedAmount]);
                   // send the request to the token contract
-                  to = bounty.rewardToken;
+                  to = bounty.rewardToken as string;
                   value = '0';
                 }
 

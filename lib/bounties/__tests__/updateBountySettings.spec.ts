@@ -1,5 +1,4 @@
 import type { Bounty, Space, User } from '@prisma/client';
-import { v4 } from 'uuid';
 
 import { ExpectedAnError } from 'testing/errors';
 import { generateBountyWithSingleApplication, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
@@ -78,20 +77,8 @@ describe('updateBountySettings', () => {
     });
 
     const newContent: Partial<Bounty> = {
-      rewardAmount: null as any
+      rewardAmount: 0
     };
-
-    try {
-      await updateBountySettings({
-        bountyId: bounty.id,
-        updateContent: newContent
-      });
-      throw new ExpectedAnError();
-    } catch (err) {
-      expect(err).toBeInstanceOf(PositiveNumbersOnlyError);
-    }
-
-    newContent.rewardAmount = 0;
 
     try {
       await updateBountySettings({

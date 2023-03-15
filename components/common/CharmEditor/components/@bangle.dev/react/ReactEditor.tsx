@@ -189,8 +189,10 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
             doc,
             plugins: _editor.view.state.plugins
           };
-          // Set document in prosemirror
-          _editor.view.setProps({ state: EditorState.create(stateConfig) });
+          if (_editor.view && !_editor.view.isDestroyed) {
+            // Set document in prosemirror
+            _editor.view.setProps({ state: EditorState.create(stateConfig) });
+          }
         }
       });
     }
@@ -200,7 +202,7 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
       fEditor?.close();
       _editor.destroy();
     };
-  }, [user, pageId, useSockets, authResponse, authResponse, ref]);
+  }, [user?.id, pageId, useSockets, authResponse, authResponse, ref]);
 
   useEffect(() => {
     const timer = setTimeout(() => setShowLoader(true), 300);
@@ -217,7 +219,8 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
         ref={editorRef}
         className='bangle-editor-core'
         data-page-id={pageId}
-        style={{ minHeight: showLoader && isLoading ? '200px' : undefined }}
+        style={{ minHeight: showLoader && isLoading ? '200px' : undefined, cursor: readOnly ? 'default' : 'text' }}
+        onClick={() => !readOnly && editor?.view.focus()}
       >
         <StyledLoadingComponent isLoading={showLoader && isLoading} />
         <div ref={renderRef} id={pageId} className={className} style={style} />

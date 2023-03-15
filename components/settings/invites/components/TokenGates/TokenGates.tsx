@@ -3,9 +3,10 @@ import styled from '@emotion/styled';
 import type { TokenGate } from '@prisma/client';
 import type { ResourceId, SigningConditions } from 'lit-js-sdk';
 import LitShareModal from 'lit-share-modal-v3';
+import { debounce } from 'lodash';
 import type { PopupState } from 'material-ui-popup-state/hooks';
 import { usePopupState } from 'material-ui-popup-state/hooks';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import useSWR from 'swr';
 import { v4 as uuid } from 'uuid';
 
@@ -69,7 +70,9 @@ export default function TokenGates({ isAdmin, spaceId, popupState }: TokenGatesP
   const { walletAuthSignature, sign } = useWeb3AuthSig();
   const errorPopupState = usePopupState({ variant: 'popover', popupId: 'token-gate-error' });
   const [apiError, setApiError] = useState<string>('');
-  const { data = [], mutate } = useSWR(`tokenGates/${spaceId}`, () => charmClient.getTokenGates({ spaceId }));
+  const { data = [], mutate } = useSWR(`tokenGates/${spaceId}`, () =>
+    charmClient.tokenGates.getTokenGates({ spaceId })
+  );
 
   const { isOpen: isOpenTokenGateModal, close: closeTokenGateModal } = popupState;
 
@@ -84,6 +87,8 @@ export default function TokenGates({ isAdmin, spaceId, popupState }: TokenGatesP
         errorPopupState.open();
       });
   }
+
+  const throttledOnSubmit = useMemo(() => debounce(onSubmit, 200), [litClient]);
 
   function closeTokenGateDeleteModal() {
     setRemovedTokenGate(null);
@@ -112,7 +117,7 @@ export default function TokenGates({ isAdmin, spaceId, popupState }: TokenGatesP
       authSig,
       resourceId
     });
-    await charmClient.saveTokenGate({
+    await charmClient.tokenGates.saveTokenGate({
       conditions: conditions as any,
       resourceId,
       spaceId,
@@ -136,7 +141,7 @@ export default function TokenGates({ isAdmin, spaceId, popupState }: TokenGatesP
             injectCSS={false}
             permanentDefault={true}
             isModal={false}
-            onUnifiedAccessControlConditionsSelected={onSubmit}
+            onUnifiedAccessControlConditionsSelected={throttledOnSubmit}
           />
         </ShareModalContainer>
       </Modal>
@@ -149,7 +154,7 @@ export default function TokenGates({ isAdmin, spaceId, popupState }: TokenGatesP
           buttonText='Delete token gate'
           question='Are you sure you want to delete this invite link?'
           onConfirm={async () => {
-            await charmClient.deleteTokenGate(removedTokenGate.id);
+            await charmClient.tokenGates.deleteTokenGate(removedTokenGate.id);
             // update the list of links
             await mutate();
             setRemovedTokenGate(null);

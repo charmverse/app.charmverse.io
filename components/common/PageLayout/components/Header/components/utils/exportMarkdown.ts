@@ -2,8 +2,8 @@ import type { Prisma } from '@prisma/client';
 
 import charmClient from 'charmClient';
 import type { Member } from 'lib/members/interfaces';
-import { generateMarkdown } from 'lib/pages';
 import type { PageContent } from 'lib/prosemirror/interfaces';
+import { generateMarkdown } from 'lib/prosemirror/plugins/markdown/generateMarkdown';
 
 export async function exportMarkdown({
   content,
@@ -19,8 +19,11 @@ export async function exportMarkdown({
   members: Member[];
 }) {
   // getPage to get content
-  const markdownContent = await generateMarkdown({ content, title: title ?? 'Untitled' }, undefined, {
-    members
+  const markdownContent = await generateMarkdown({
+    content,
+    generatorOptions: {
+      members
+    }
   });
   if (markdownContent) {
     const data = new Blob([markdownContent], { type: 'text/plain' });

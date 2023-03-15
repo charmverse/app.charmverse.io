@@ -13,6 +13,7 @@ import * as disclosure from './components/disclosure';
 import * as doc from './components/doc';
 import * as emoji from './components/emojiSuggest';
 import { deletion, formatChange, insertion } from './components/fiduswriter/schema/common/track';
+import { specs as fileSpecs } from './components/file/file.specs';
 import * as heading from './components/heading';
 import * as horizontalRule from './components/horizontalRule';
 import * as iframe from './components/iframe';
@@ -33,6 +34,7 @@ import * as image from './components/ResizableImage';
 import { pdfSpec } from './components/ResizablePDF';
 import * as tabIndent from './components/tabIndent';
 import * as table from './components/table';
+import { spec as tableOfContentSpec } from './components/tableOfContents/tableOfContents.specs';
 import * as textColor from './components/textColor/textColorSpec';
 import * as tweet from './components/tweet/tweetSpec';
 import * as video from './components/video/videoSpec';
@@ -90,5 +92,7 @@ export const specRegistry = new SpecRegistry([
   textColor.spec(),
   nft.spec(),
   poll.spec(),
-  bookmarkSpec()
+  bookmarkSpec(),
+  tableOfContentSpec(),
+  fileSpecs()
 ]);

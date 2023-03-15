@@ -11,6 +11,12 @@ const useEagerConnect = (): boolean => {
     injected
       .isAuthorized()
       .then((isAuthorized) => {
+        if (isAuthorized) {
+          setTimeout(() => {
+            activate(injected, undefined, true);
+          }, 1000);
+        }
+
         return isAuthorized ? activate(injected, undefined, true) : Promise.resolve();
       })
       .catch((e) => {

@@ -1,5 +1,6 @@
-import type { Application, ApplicationStatus, Bounty, Transaction } from '@prisma/client';
+import type { Application, ApplicationStatus, Bounty, PageComment, Transaction } from '@prisma/client';
 
+import type { PageContent } from 'lib/prosemirror/interfaces';
 import type { RequiredNotNull } from 'lib/utilities/types';
 
 export interface ApplicationCreationData {
@@ -46,4 +47,9 @@ export interface SubmissionUpdateData {
 
 export interface ApplicationWithTransactions extends Application {
   transactions: Transaction[];
+}
+
+export interface CreateApplicationCommentPayload {
+  content: PageContent | null;
+  contentText: string;
 }

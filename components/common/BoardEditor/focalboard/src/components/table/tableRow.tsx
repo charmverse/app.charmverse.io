@@ -91,21 +91,6 @@ function TableRow(props: Props) {
     mutate(`pages/${space?.id}`);
   };
 
-  const duplicateCard = () => {
-    if (space && cardPage) {
-      mutator.duplicateCard({
-        cardId: card.id,
-        board,
-        cardPage,
-        afterRedo: async (newCardId) => {
-          props.showCard(newCardId);
-          mutate(`pages/${space.id}`);
-        },
-        beforeUndo: async () => {}
-      });
-    }
-  };
-
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
@@ -206,16 +191,17 @@ function TableRow(props: Props) {
               readOnly={props.readOnly}
               card={card}
               board={board}
+              showEmptyPlaceholder={false}
               propertyTemplate={template}
               updatedAt={pageUpdatedAt}
               updatedBy={pageUpdatedBy}
+              displayType='table'
             />
           </div>
         );
       })}
       {cardPage && !props.readOnly && (
         <PageActionsMenu
-          onClickDuplicate={duplicateCard}
           onClickDelete={handleDeleteCard}
           anchorEl={anchorEl}
           setAnchorEl={setAnchorEl}

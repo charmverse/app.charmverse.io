@@ -51,10 +51,10 @@ export default function NotifyMeModal(props: Props) {
   }
 
   return (
-    <Modal open={isOpen} onClose={close} title='Receive daily notifications (beta)'>
+    <Modal open={isOpen} onClose={close} title='Receive notifications'>
       <form onSubmit={handleSubmit(onSubmit)}>
         <FormHelperText sx={{ mb: 1 }}>
-          Input your email to receive daily notifications.
+          Input your email to receive CharmVerse notifications.
           <br />
           Note: Your email is private and not used for anything else
         </FormHelperText>

@@ -25,6 +25,7 @@ import PublishToSnapshot from 'components/common/PageLayout/components/Header/co
 import { useCurrentPage } from 'hooks/useCurrentPage';
 import { useUser } from 'hooks/useUser';
 import { useVotes } from 'hooks/useVotes';
+import type { ProposalFlowFlags } from 'lib/proposal/computeProposalFlowFlags';
 import type { ProposalWithUsers } from 'lib/proposal/interface';
 import type { ExtendedVote } from 'lib/votes/interfaces';
 
@@ -97,14 +98,16 @@ interface CreateVoteModalProps {
   onPublishToSnapshot?: () => void;
   open?: boolean;
   proposal?: ProposalWithUsers;
+  proposalFlowFlags?: ProposalFlowFlags;
 }
 
-export default function CreateVoteModal({
+export function CreateVoteModal({
   open = true,
   onClose = () => null,
   onCreateVote = () => null,
   onPublishToSnapshot = () => null,
-  proposal
+  proposal,
+  proposalFlowFlags
 }: CreateVoteModalProps) {
   const [voteTitle, setVoteTitle] = useState('');
   const [voteDescription, setVoteDescription] = useState('');
@@ -169,8 +172,6 @@ export default function CreateVoteModal({
     (!proposal && voteTitle.length === 0) ||
     (voteType === VoteType.SingleChoice && options.findIndex((option) => option.name.length === 0) !== -1) ||
     new Set(options.map((option) => option.name)).size !== options.length;
-
-  const isProposalAuthor = proposal?.authors.find((author) => author.userId === user?.id) ?? false;
 
   return (
     <Modal
@@ -289,11 +290,17 @@ export default function CreateVoteModal({
           {proposal?.status === 'reviewed' && (
             <>
               or
-              <Tooltip title={!isProposalAuthor ? 'Only proposal authors can publish to snapshot' : ''}>
+              <Tooltip
+                title={
+                  !proposalFlowFlags?.vote_active
+                    ? 'Only proposal authors and space admins can publish this proposal to snapshot'
+                    : ''
+                }
+              >
                 <div>
                   <PublishToSnapshot
                     renderContent={({ label, onClick, icon }) => (
-                      <Button disabled={!isProposalAuthor} onClick={onClick}>
+                      <Button disabled={!proposalFlowFlags?.vote_active} onClick={onClick}>
                         {icon}
                         <Typography>{label}</Typography>
                       </Button>

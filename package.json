@@ -67,6 +67,7 @@
     "@aws-sdk/client-sqs": "^3.223.0",
     "@aws-sdk/client-sts": "^3.67.0",
     "@aws-sdk/lib-storage": "^3.67.0",
+    "@aws-sdk/xhr-http-handler": "^3.282.0",
     "@bangle.dev/base-components": "^0.31.6",
     "@bangle.dev/core": "^0.31.6",
     "@bangle.dev/markdown": "^0.31.6",
@@ -142,6 +143,7 @@
     "emoji-mart": "^3.0.1",
     "ethers": "^5.5.4",
     "firebase": "^9.14.0",
+    "firebase-admin": "^11.5.0",
     "form-data": "^4.0.0",
     "gaxios": "^5.0.2",
     "google-auth-library": "^8.7.0",
@@ -298,7 +300,7 @@
     "sass": "^1.49.0",
     "serverless-esbuild": "^1.37.0",
     "supertest": "^6.3.3",
-    "webpack": "^5.73.0"
+    "webpack": "^5.76.0"
   },
   "overrides": {
     "@types/react": "^18.0.26",

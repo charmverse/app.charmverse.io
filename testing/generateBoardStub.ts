@@ -319,6 +319,9 @@ export function boardWithCardsArgs({
       createdBy: droppedCreatedBy,
       children,
       content,
+      bounty,
+      proposal,
+      votes,
       ...pageWithoutExtraProps
     } = page as any as Page & PageWithBlocks & { children: any };
 

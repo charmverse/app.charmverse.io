@@ -201,6 +201,22 @@ const RPC = {
     testnet: true,
     shortName: 'gor'
   },
+  SEPOLIA: {
+    chainId: 11155111,
+    chainName: 'Ethereum - Sepolia',
+    nativeCurrency: {
+      name: 'Ether',
+      symbol: 'ETH',
+      decimals: 18,
+      address: '0x0000000000000000000000000000000000000000', // needed for proper form handling in the TokenFormCard component
+      logoURI: 'https://assets.coingecko.com/coins/images/279/small/ethereum.png?1595348880'
+    },
+    rpcUrls: ['https://ethereum-sepolia.blockpi.network/v1/rpc/public'],
+    blockExplorerUrls: ['https://sepolia.etherscan.io/'],
+    iconUrl: '/images/cryptoLogos/eth-diamond-purple.png',
+    testnet: true,
+    shortName: 'sep'
+  },
   MUMBAI: {
     chainId: 80001,
     chainName: 'Polygon - Mumbai',
@@ -216,22 +232,6 @@ const RPC = {
     iconUrl: '/images/cryptoLogos/polygon-matic-logo.svg',
     testnet: true,
     shortName: 'maticmum'
-  },
-  OPTIMISM: {
-    chainId: 10,
-    chainName: 'Optimism',
-    nativeCurrency: {
-      name: 'Optimism',
-      symbol: 'OP',
-      decimals: 18,
-      address: '0x0000000000000000000000000000000000000000',
-      logoURI: 'https://assets.coingecko.com/coins/images/4713/small/matic-token-icon.png?1624446912'
-    },
-    rpcUrls: ['https://mainnet.optimism.io'],
-    blockExplorerUrls: ['https://optimistic.etherscan.io/'],
-    iconUrl: '/images/cryptoLogos/optimism.svg',
-    testnet: true,
-    shortName: 'oeth'
   }
 } as const;
 
@@ -299,8 +299,8 @@ const supportedChains: Blockchain[] = [
   'HARMONY',
   'HARMONY_DEVNET',
   'BSC',
-  'OPTIMISM',
   'GOERLI',
+  'SEPOLIA',
   'MUMBAI'
 ];
 

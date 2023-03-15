@@ -4,7 +4,6 @@
 
   a {
     text-decoration: none;
-    color: var(--link-color-rgb);
 
     &:hover {
       background-color: unset !important;
@@ -182,10 +181,6 @@
   .Label {
     font-size: 12px;
     padding: 2px 6px;
-  }
-
-  .fc-event-main {
-    color: rgb(var(--center-channel-color-rgb));
   }
 
   .fc-event-title {

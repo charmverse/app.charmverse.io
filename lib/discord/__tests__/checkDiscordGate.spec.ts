@@ -15,13 +15,16 @@ describe('checkDiscordGate', () => {
     const discordServerId = `discord-${v4()}`;
     const discordUserId = `discord-user-${v4()}`;
 
-    await prisma.space.update({ where: { id: space.id }, data: { discordServerId } });
+    const token = await prisma.superApiToken.create({
+      data: { name: v4(), token: v4() }
+    });
+    await prisma.space.update({ where: { id: space.id }, data: { discordServerId, superApiTokenId: token.id } });
     await prisma.user.update({
       where: { id: user.id },
       data: { discordUser: { create: { discordId: discordUserId, account: {} } } }
     });
 
-    const canJoinSpaceMock = jest.fn().mockResolvedValue({ isEligible: true, roles: [] });
+    const canJoinSpaceMock = jest.fn().mockResolvedValue({ isVerified: true, roles: [] });
     jest.mock('lib/collabland/collablandClient', () => ({
       canJoinSpaceViaDiscord: canJoinSpaceMock
     }));
@@ -30,7 +33,7 @@ describe('checkDiscordGate', () => {
 
     const res = await checkDiscordGate({ spaceDomain: space.domain, userId: user.id });
     expect(res.hasDiscordServer).toBe(true);
-    expect(res.isEligible).toBe(true);
+    expect(res.isVerified).toBe(true);
     expect(res.spaceId).toBe(space.id);
     expect(canJoinSpaceMock).toHaveBeenCalledWith({ discordServerId, discordUserId });
   });
@@ -38,7 +41,7 @@ describe('checkDiscordGate', () => {
   it('should not make user eligible to join space that does not have discord server id', async () => {
     const { user, space } = await generateUserAndSpaceWithApiToken(undefined, true);
 
-    const canJoinSpaceMock = jest.fn().mockResolvedValueOnce({ isEligible: true, roles: [] });
+    const canJoinSpaceMock = jest.fn().mockResolvedValueOnce({ isVerified: true, roles: [] });
     jest.mock('lib/collabland/collablandClient', () => ({
       canJoinSpaceViaDiscord: canJoinSpaceMock
     }));
@@ -47,7 +50,7 @@ describe('checkDiscordGate', () => {
 
     const res = await checkDiscordGate({ spaceDomain: space.domain, userId: user.id });
     expect(res.hasDiscordServer).toBe(false);
-    expect(res.isEligible).toBe(false);
+    expect(res.isVerified).toBe(false);
     expect(res.spaceId).toBe(space.id);
     expect(canJoinSpaceMock).not.toHaveBeenCalled();
   });
@@ -57,9 +60,12 @@ describe('checkDiscordGate', () => {
 
     const { user, space } = await generateUserAndSpaceWithApiToken(undefined, true);
 
-    await prisma.space.update({ where: { id: space.id }, data: { discordServerId } });
+    const token = await prisma.superApiToken.create({
+      data: { name: v4(), token: v4() }
+    });
+    await prisma.space.update({ where: { id: space.id }, data: { discordServerId, superApiTokenId: token.id } });
 
-    const canJoinSpaceMock = jest.fn().mockResolvedValueOnce({ isEligible: true, roles: [] });
+    const canJoinSpaceMock = jest.fn().mockResolvedValueOnce({ isVerified: true, roles: [] });
     jest.mock('lib/collabland/collablandClient', () => ({
       canJoinSpaceViaDiscord: canJoinSpaceMock
     }));
@@ -68,7 +74,7 @@ describe('checkDiscordGate', () => {
 
     const res = await checkDiscordGate({ spaceDomain: space.domain, userId: user.id });
     expect(res.hasDiscordServer).toBe(true);
-    expect(res.isEligible).toBe(false);
+    expect(res.isVerified).toBe(false);
     expect(res.spaceId).toBe(space.id);
     expect(canJoinSpaceMock).not.toHaveBeenCalled();
   });

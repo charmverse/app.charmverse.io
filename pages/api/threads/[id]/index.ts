@@ -29,7 +29,7 @@ async function deleteThreadController(req: NextApiRequest, res: NextApiResponse)
   }
 
   const permissionSet = await computeUserPagePermissions({
-    pageId: thread.pageId,
+    resourceId: thread.pageId,
     userId
   });
 

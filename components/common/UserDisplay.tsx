@@ -1,5 +1,3 @@
-import { log } from 'console';
-
 import type { BoxProps } from '@mui/material';
 import { Box, Typography } from '@mui/material';
 import type { User } from '@prisma/client';
@@ -72,7 +70,7 @@ export const AnonUserDisplay = memo(AnonUserDisplayComponent);
  * @linkToProfile Whether we show a link to user's public profile. Defaults to false.
  */
 interface UserDisplayProps extends StyleProps {
-  user?: Omit<User, 'addresses'> | null;
+  user?: Pick<User, 'avatar' | 'username' | 'path' | 'id'> | null;
   linkToProfile?: boolean;
   showMiniProfile?: boolean;
 }

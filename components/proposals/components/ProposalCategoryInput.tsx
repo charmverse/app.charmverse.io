@@ -19,10 +19,9 @@ const filter = createFilterOptions<OptionType>();
 type ProposalCategoryOptionProps = {
   category: OptionType;
   props: HTMLAttributes<HTMLLIElement>;
-  onDelete?: (id: string) => void;
 };
 
-function ProposalCategoryOption({ props, category, onDelete }: ProposalCategoryOptionProps) {
+function ProposalCategoryOption({ props, category }: ProposalCategoryOptionProps) {
   if ('inputValue' in category) {
     return <li {...props}>{category.title}</li>;
   }
@@ -39,23 +38,9 @@ function ProposalCategoryOption({ props, category, onDelete }: ProposalCategoryO
         <Chip
           variant='filled'
           color={category.color as BrandColor}
-          label={category.title}
+          label={`${category.title}`}
           sx={{ maxWidth: 150, flex: 1, display: 'flex', cursor: 'pointer' }}
         />
-
-        {!!onDelete && (
-          <IconButton
-            color='secondary'
-            size='small'
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              onDelete(category.id);
-            }}
-          >
-            <DeleteOutlinedIcon />
-          </IconButton>
-        )}
       </Box>
     </Box>
   );
@@ -67,19 +52,9 @@ type Props = {
   value: ProposalCategory | null;
   canEditCategories?: boolean;
   onChange: (value: ProposalCategory | null) => void;
-  onAddCategory?: (category: NewProposalCategory) => Promise<ProposalCategory>;
-  onDeleteCategory?: (categoryId: string) => void;
 };
 
-export default function ProposalCategoryInput({
-  disabled,
-  options,
-  canEditCategories,
-  value,
-  onChange,
-  onAddCategory,
-  onDeleteCategory
-}: Props) {
+export default function ProposalCategoryInput({ disabled, options, canEditCategories, value, onChange }: Props) {
   const internalValue = useMemo(() => (value ? [value] : []), [value]);
   const newCategoryColorRef = useRef(getRandomThemeColor());
   const [tempValue, setTempValue] = useState<TempOption | null>(null);
@@ -95,17 +70,6 @@ export default function ProposalCategoryInput({
 
     if (newValue === undefined) {
       onChange(null);
-      return;
-    }
-
-    if ('inputValue' in newValue && onAddCategory) {
-      // Create a new value from the user input
-      setTempValue(newValue);
-
-      const newCategory = await onAddCategory({ color: newValue.color, title: newValue.inputValue });
-
-      onChange(newCategory);
-      newCategoryColorRef.current = getRandomThemeColor();
       return;
     }
 
@@ -127,14 +91,12 @@ export default function ProposalCategoryInput({
       options={options}
       autoHighlight
       clearIcon={null}
-      renderOption={(_props, category) => (
-        <ProposalCategoryOption
-          category={category}
-          props={_props}
-          onDelete={canEditCategories ? onDeleteCategory : undefined}
-        />
-      )}
-      ChipProps={{ color: (tempValue?.color || value?.color || 'gray') as BrandColor }}
+      renderOption={(_props, category) => <ProposalCategoryOption category={category} props={_props} />}
+      ChipProps={{
+        color: (tempValue?.color || value?.color || 'gray') as BrandColor,
+        // Hack for preventing delete from showing
+        onDelete: null as any
+      }}
       noOptionsText='No categories available'
       renderInput={(params) => (
         <TextField
@@ -149,28 +111,8 @@ export default function ProposalCategoryInput({
         />
       )}
       getOptionLabel={(option: OptionType) => {
-        // Add "xxx" option created dynamically
-        if ('inputValue' in option) {
-          return option.inputValue;
-        }
         // Regular option
-        return option.title;
-      }}
-      filterOptions={(allOptions: OptionType[], params) => {
-        const filtered = filter(allOptions, params);
-
-        const { inputValue } = params;
-        // Suggest the creation of a new value
-        const isExisting = options.some((option) => inputValue === option.title);
-        if (inputValue !== '' && !isExisting && canEditCategories && onAddCategory) {
-          filtered.push({
-            inputValue,
-            title: `Add "${inputValue}"`,
-            color: newCategoryColorRef.current
-          });
-        }
-
-        return filtered;
+        return option?.title;
       }}
       isOptionEqualToValue={(option, checkValue) => {
         if ('inputValue' in option) {

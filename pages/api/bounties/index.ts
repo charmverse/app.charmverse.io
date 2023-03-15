@@ -4,7 +4,6 @@ import nc from 'next-connect';
 
 import type { BountyCreationData, BountyWithDetails } from 'lib/bounties';
 import { createBounty, listAvailableBounties } from 'lib/bounties';
-import * as collabland from 'lib/collabland';
 import log from 'lib/log';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { logUserFirstBountyEvents, logWorkspaceFirstBountyEvents } from 'lib/metrics/postToDiscord';
@@ -67,12 +66,17 @@ async function createBountyController(req: NextApiRequest, res: NextApiResponse<
 
   // add a little delay to capture the full bounty title after user has edited it
   setTimeout(() => {
-    const { id, rewardAmount, rewardToken, page } = createdBounty;
-    collabland.createBountyCreatedCredential({ bountyId: id }).catch((err) => {
-      log.error('Error creating bounty created credential', err);
-    });
+    const { id, rewardAmount, rewardToken, page, customReward } = createdBounty;
 
-    trackUserAction('bounty_created', { userId, spaceId, resourceId: id, rewardToken, rewardAmount, pageId: page.id });
+    trackUserAction('bounty_created', {
+      userId,
+      spaceId,
+      resourceId: id,
+      rewardToken,
+      rewardAmount,
+      pageId: page.id,
+      customReward
+    });
   }, 60 * 1000);
 
   logWorkspaceFirstBountyEvents(createdBounty);

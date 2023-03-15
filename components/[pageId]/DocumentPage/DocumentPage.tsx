@@ -9,6 +9,7 @@ import { memo, useEffect, useState } from 'react';
 import { useElementSize } from 'usehooks-ts';
 
 import charmClient from 'charmClient';
+import { PageComments } from 'components/[pageId]/Comments/PageComments';
 import AddBountyButton from 'components/common/BoardEditor/focalboard/src/components/cardDetail/AddBountyButton';
 import CardDetailProperties from 'components/common/BoardEditor/focalboard/src/components/cardDetail/cardDetailProperties';
 import CommentsList from 'components/common/BoardEditor/focalboard/src/components/cardDetail/commentsList';
@@ -16,11 +17,14 @@ import { getCardComments } from 'components/common/BoardEditor/focalboard/src/st
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import type { FrontendParticipant } from 'components/common/CharmEditor/components/fiduswriter/collab';
 import { SnapshotVoteDetails } from 'components/common/CharmEditor/components/inlineVote/components/SnapshotVoteDetails';
-import VoteDetail from 'components/common/CharmEditor/components/inlineVote/components/VoteDetail';
+import { VoteDetail } from 'components/common/CharmEditor/components/inlineVote/components/VoteDetail';
 import ScrollableWindow from 'components/common/PageLayout/components/ScrollableWindow';
+import { ProposalBanner } from 'components/common/ProposalBanner';
+import { useProposalPermissions } from 'components/proposals/hooks/useProposalPermissions';
 import { useBounties } from 'hooks/useBounties';
 import { useCharmEditor } from 'hooks/useCharmEditor';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
+import { usePagePermissions } from 'hooks/usePagePermissions';
 import { usePages } from 'hooks/usePages';
 import { useVotes } from 'hooks/useVotes';
 import type { AssignedBountyPermissions } from 'lib/bounties';
@@ -31,7 +35,7 @@ import PageBanner from './components/PageBanner';
 import PageDeleteBanner from './components/PageDeleteBanner';
 import PageHeader from './components/PageHeader';
 import { PageTemplateBanner } from './components/PageTemplateBanner';
-import { ProposalProperties } from './components/ProposalProperties';
+import ProposalProperties from './components/ProposalProperties';
 
 const CharmEditor = dynamic(() => import('components/common/CharmEditor'), {
   ssr: false
@@ -78,14 +82,15 @@ export interface DocumentPageProps {
   setPage: (p: Partial<Page>) => void;
   readOnly?: boolean;
   insideModal?: boolean;
-  parentProposalId?: string | null;
 }
 
-function DocumentPage({ page, setPage, insideModal, readOnly = false, parentProposalId }: DocumentPageProps) {
-  const { pages, getPagePermissions } = usePages();
+function DocumentPage({ page, setPage, insideModal, readOnly = false }: DocumentPageProps) {
+  const { pages } = usePages();
   const { cancelVote, castVote, deleteVote, updateDeadline, votes, isLoading } = useVotes();
   // For post we would artificially construct the permissions
-  const pagePermissions = getPagePermissions(page.id);
+  const { permissions: pagePermissions, refresh: refreshPagePermissions } = usePagePermissions({
+    pageIdOrPath: page.id
+  });
   const { draftBounty } = useBounties();
   const { currentPageActionDisplay } = usePageActionDisplay();
   const { editMode, setPageProps } = useCharmEditor();
@@ -95,9 +100,12 @@ function DocumentPage({ page, setPage, insideModal, readOnly = false, parentProp
   const [bountyPermissions, setBountyPermissions] = useState<AssignedBountyPermissions | null>(null);
   const [containerRef, { width: containerWidth }] = useElementSize();
 
-  const proposalId = page.proposalId || parentProposalId;
+  const proposalId = page.proposalId;
+
+  const { permissions: proposalPermissions } = useProposalPermissions({ proposalIdOrPath: proposalId as string });
+
   // We can only edit the proposal from the top level
-  const readonlyProposalProperties = !page.proposalId || Boolean(parentProposalId) || readOnly;
+  const readonlyProposalProperties = !page.proposalId || readOnly;
 
   async function refreshBountyPermissions(bountyId: string) {
     setBountyPermissions(
@@ -119,13 +127,6 @@ function DocumentPage({ page, setPage, insideModal, readOnly = false, parentProp
 
   const pageVote = Object.values(votes).find((v) => v.context === 'proposal');
 
-  // const cards = useAppSelector((state) => {
-  //   return board
-  //     ? [...Object.values(state.cards.cards), ...Object.values(state.cards.templates)].filter(
-  //         (card) => card.parentId === board.id
-  //       )
-  //     : [];
-  // });
   const card = useAppSelector((state) => {
     if (page.cardId) {
       return state.cards.cards[page.cardId] ?? state.cards.templates[page.cardId] ?? null;
@@ -173,6 +174,7 @@ function DocumentPage({ page, setPage, insideModal, readOnly = false, parentProp
   function onParticipantUpdate(participants: FrontendParticipant[]) {
     setPageProps({ participants });
   }
+
   return (
     <>
       {!!page?.deletedAt && (
@@ -180,6 +182,7 @@ function DocumentPage({ page, setPage, insideModal, readOnly = false, parentProp
           <PageDeleteBanner pageId={page.id} />
         </StyledBannerContainer>
       )}
+      {page?.convertedProposalId && <ProposalBanner type='page' proposalId={page.convertedProposalId} />}
       <ScrollableWindow
         sx={{
           overflow: {
@@ -194,102 +197,121 @@ function DocumentPage({ page, setPage, insideModal, readOnly = false, parentProp
             {page.headerImage && (
               <PageBanner
                 headerImage={page.headerImage}
-                readOnly={readOnly || enableSuggestingMode}
+                readOnly={readOnly || !!enableSuggestingMode}
                 setPage={setPage}
               />
             )}
-            <Container top={pageTop} fullWidth={isSmallScreen || (page.fullWidth ?? false)}>
-              <CharmEditor
-                key={page.id + editMode}
-                // content={pageDetails?.content as PageContent}
-                // onContentChange={updatePageContent}
-                readOnly={readOnly}
-                autoFocus={false}
-                pageActionDisplay={!insideModal ? currentPageActionDisplay : null}
-                pageId={page.id}
-                disablePageSpecificFeatures={isSharedPage}
-                enableSuggestingMode={enableSuggestingMode}
-                enableVoting={true}
-                containerWidth={containerWidth}
-                pageType={page.type}
-                pagePermissions={pagePermissions ?? undefined}
-                onParticipantUpdate={onParticipantUpdate}
-              >
-                {/* temporary? disable editing of page title when in suggestion mode */}
-                <PageHeader
-                  headerImage={page.headerImage}
-                  // Commented for now, as we need to preserve cursor position between re-renders caused by updating this
-                  // key={page.title}
-                  icon={page.icon}
-                  title={page.title}
-                  updatedAt={page.updatedAt.toString()}
-                  readOnly={readOnly || enableSuggestingMode}
-                  setPage={setPage}
-                />
-                {page.type === 'proposal' && !isLoading && page.snapshotProposalId && (
-                  <Box my={2}>
-                    <SnapshotVoteDetails snapshotProposalId={page.snapshotProposalId} />
-                  </Box>
-                )}
-                {page.type === 'proposal' && !isLoading && pageVote && (
-                  <Box my={2}>
-                    <VoteDetail
-                      cancelVote={cancelVote}
-                      deleteVote={deleteVote}
-                      castVote={castVote}
-                      updateDeadline={updateDeadline}
-                      vote={pageVote}
-                      detailed={false}
-                      isProposal={true}
-                    />
-                  </Box>
-                )}
-                <div className='focalboard-body'>
-                  <div className='CardDetail content'>
-                    {/* Property list */}
-                    {card && board && (
-                      <>
-                        <CardDetailProperties
-                          board={board}
-                          card={card}
-                          cards={cards}
-                          activeView={activeView}
-                          views={boardViews}
-                          readOnly={readOnly}
-                          pageUpdatedAt={page.updatedAt.toString()}
-                          pageUpdatedBy={page.updatedBy}
+            <Container
+              data-test='page-charmeditor'
+              top={pageTop}
+              fullWidth={isSmallScreen || (page.fullWidth ?? false)}
+            >
+              {pagePermissions && (
+                <CharmEditor
+                  placeholderText={
+                    page.type === 'bounty' || page.type === 'bounty_template'
+                      ? `Describe the bounty. Type '/' to see the list of available commands`
+                      : undefined
+                  }
+                  key={page.id + editMode + String(pagePermissions?.edit_content)}
+                  // content={pageDetails?.content as PageContent}
+                  // onContentChange={updatePageContent}
+                  readOnly={readOnly}
+                  autoFocus={false}
+                  pageActionDisplay={!insideModal ? currentPageActionDisplay : null}
+                  pageId={page.id}
+                  disablePageSpecificFeatures={isSharedPage}
+                  enableSuggestingMode={enableSuggestingMode}
+                  enableVoting={true}
+                  containerWidth={containerWidth}
+                  pageType={page.type}
+                  pagePermissions={pagePermissions ?? undefined}
+                  onParticipantUpdate={onParticipantUpdate}
+                  style={{
+                    minHeight: proposalId ? '100px' : 'unset'
+                  }}
+                  disableNestedPages={page?.type === 'proposal' || page?.type === 'proposal_template'}
+                >
+                  {/* temporary? disable editing of page title when in suggestion mode */}
+                  <PageHeader
+                    headerImage={page.headerImage}
+                    // Commented for now, as we need to preserve cursor position between re-renders caused by updating this
+                    // key={page.title}
+                    icon={page.icon}
+                    title={page.title}
+                    updatedAt={page.updatedAt.toString()}
+                    readOnly={readOnly || !!enableSuggestingMode}
+                    setPage={setPage}
+                  />
+                  {page.type === 'proposal' && !isLoading && page.snapshotProposalId && (
+                    <Box my={2}>
+                      <SnapshotVoteDetails snapshotProposalId={page.snapshotProposalId} />
+                    </Box>
+                  )}
+                  {page.type === 'proposal' && !isLoading && pageVote && (
+                    <Box my={2}>
+                      <VoteDetail
+                        cancelVote={cancelVote}
+                        deleteVote={deleteVote}
+                        castVote={castVote}
+                        updateDeadline={updateDeadline}
+                        vote={pageVote}
+                        detailed={false}
+                        isProposal={true}
+                        disableVote={!proposalPermissions?.vote}
+                      />
+                    </Box>
+                  )}
+                  <div className='focalboard-body'>
+                    <div className='CardDetail content'>
+                      {/* Property list */}
+                      {card && board && (
+                        <>
+                          <CardDetailProperties
+                            board={board}
+                            card={card}
+                            cards={cards}
+                            activeView={activeView}
+                            views={boardViews}
+                            readOnly={readOnly}
+                            pageUpdatedAt={page.updatedAt.toString()}
+                            pageUpdatedBy={page.updatedBy}
+                          />
+                          <AddBountyButton readOnly={readOnly} cardId={page.id} />
+                        </>
+                      )}
+                      {proposalId && (
+                        <ProposalProperties
+                          proposalId={proposalId}
+                          pagePermissions={pagePermissions}
+                          refreshPagePermissions={refreshPagePermissions}
+                          readOnly={readonlyProposalProperties}
+                          isTemplate={page.type === 'proposal_template'}
                         />
-                        <AddBountyButton readOnly={readOnly} cardId={page.id} />
-                      </>
-                    )}
-                    {proposalId && (
-                      <ProposalProperties
-                        pageId={proposalId}
-                        proposalId={proposalId}
-                        readOnly={readonlyProposalProperties}
-                        isTemplate={page.type === 'proposal_template'}
-                      />
-                    )}
-                    {(draftBounty || page.bountyId) && (
-                      <BountyProperties
-                        bountyId={page.bountyId}
-                        pageId={page.id}
-                        readOnly={readOnly}
-                        permissions={bountyPermissions}
-                        refreshBountyPermissions={refreshBountyPermissions}
-                      />
-                    )}
-                    {(page.type === 'bounty' || page.type === 'card') && (
-                      <CommentsList
-                        comments={comments}
-                        rootId={card?.rootId ?? page.id}
-                        cardId={card?.id ?? page.id}
-                        readOnly={cannotComment}
-                      />
-                    )}
+                      )}
+                      {(draftBounty || page.bountyId) && (
+                        <BountyProperties
+                          bountyId={page.bountyId}
+                          pageId={page.id}
+                          readOnly={readOnly}
+                          permissions={bountyPermissions}
+                          refreshBountyPermissions={refreshBountyPermissions}
+                        />
+                      )}
+                      {page.type === 'card' && (
+                        <CommentsList
+                          comments={comments}
+                          rootId={card?.rootId ?? page.id}
+                          cardId={card?.id ?? page.id}
+                          readOnly={cannotComment}
+                        />
+                      )}
+                    </div>
                   </div>
-                </div>
-              </CharmEditor>
+                </CharmEditor>
+              )}
+
+              {pagePermissions && proposalId && <PageComments page={page} permissions={pagePermissions} />}
             </Container>
           </div>
         </ScrollContainer>

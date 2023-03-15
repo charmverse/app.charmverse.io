@@ -175,6 +175,14 @@ function CardDetailProperties(props: Props) {
     setShowConfirmationDialog(true);
   }
 
+  function getDeleteDisabled(template: IPropertyTemplate) {
+    if (
+      views.some((view) => view.fields.viewType === 'calendar' && view.fields.dateDisplayPropertyId === template.id)
+    ) {
+      return 'Date property is used in calendar view';
+    }
+  }
+
   return (
     <div className='octo-propertylist'>
       {board.fields.cardProperties.map((propertyTemplate: IPropertyTemplate) => {
@@ -192,6 +200,7 @@ function CardDetailProperties(props: Props) {
                   <Button>{propertyTemplate.name}</Button>
                 </div>
                 <PropertyMenu
+                  deleteDisabled={getDeleteDisabled(propertyTemplate)}
                   propertyId={propertyTemplate.id}
                   propertyName={propertyTemplate.name}
                   propertyType={propertyTemplate.type}
@@ -209,6 +218,7 @@ function CardDetailProperties(props: Props) {
               updatedAt={pageUpdatedAt}
               updatedBy={pageUpdatedBy}
               propertyTemplate={propertyTemplate}
+              showEmptyPlaceholder={true}
               displayType='details'
             />
           </div>

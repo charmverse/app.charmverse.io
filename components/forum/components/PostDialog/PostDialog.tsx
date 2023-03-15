@@ -11,7 +11,6 @@ import Button from 'components/common/Button';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { PageActions } from 'components/common/PageActions';
 import { usePostPermissions } from 'components/forum/hooks/usePostPermissions';
-import { useUser } from 'hooks/useUser';
 import type { PostWithVotes } from 'lib/forums/posts/interfaces';
 
 import type { FormInputs } from '../interfaces';
@@ -108,6 +107,7 @@ export function PostDialog({ post, spaceId, onClose, open, newPostCategory }: Pr
           <PageActions
             page={{ ...post, relativePath }}
             onClickDelete={permissions?.delete_post ? deletePost : undefined}
+            hideDuplicateAction
           />
         )
       }

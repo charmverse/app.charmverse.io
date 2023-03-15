@@ -3,10 +3,9 @@ import { ForumPostPage } from '__e2e__/po/forumPost.po';
 import { PageHeader } from '__e2e__/po/pageHeader.po';
 
 import { upsertPostCategoryPermission } from 'lib/permissions/forum/upsertPostCategoryPermission';
-import { randomETHWalletAddress } from 'testing/generateStubs';
 import { generateForumPost, generatePostCategory } from 'testing/utils/forums';
 
-import { createUser, createUserAndSpace, generateSpaceRole } from '../utils/mocks';
+import { createUserAndSpace } from '../utils/mocks';
 import { login } from '../utils/session';
 
 type Fixtures = {
@@ -20,15 +19,14 @@ const test = base.extend<Fixtures>({
 });
 
 test('convert post to proposal - create a post, convert that post to proposal and assert editor is readonly with proposal banner', async ({
-  page,
+  pageHeader,
   forumPostPage,
-  pageHeader
+  page
 }) => {
   const { space, user } = await createUserAndSpace({
     browserPage: page,
     permissionConfigurationMode: 'collaborative'
   });
-
   await login({
     page,
     userId: user.id
@@ -66,10 +64,7 @@ test('convert post to proposal - create a post, convert that post to proposal an
     path: post.path
   });
 
-  await pageHeader.pageTopLevelMenu.click();
-
-  const forumPostConvertProposalAction = page.locator('data-test=forum-post-convert-proposal-action');
-  await forumPostConvertProposalAction.click();
+  await pageHeader.convertToProposal();
 
   // Go back to post page to assert that we have the proposal conversion banner and editor is readonly
   await forumPostPage.goToPostPage({
@@ -86,70 +81,7 @@ test('convert post to proposal - create a post, convert that post to proposal an
 
   expect(isEditable).toBe(false);
 
-  const postProposalBanner = await page.locator('data-test=post-proposal-banner');
+  const postProposalBanner = await page.locator('data-test=proposal-banner');
 
   await expect(postProposalBanner).toBeVisible();
-});
-
-test('convert post to proposal - disabled convert proposal action for readOnly workspaces', async ({
-  page,
-  pageHeader,
-  forumPostPage
-}) => {
-  const { space, user } = await createUserAndSpace({
-    browserPage: page,
-    permissionConfigurationMode: 'readOnly'
-  });
-
-  const postName = 'Example post';
-  const categoryName = 'Example category';
-
-  const category = await generatePostCategory({
-    spaceId: space.id,
-    name: categoryName
-  });
-
-  await upsertPostCategoryPermission({
-    assignee: { group: 'space', id: space.id },
-    permissionLevel: 'full_access',
-    postCategoryId: category.id
-  });
-
-  const post = await generateForumPost({
-    spaceId: space.id,
-    userId: user.id,
-    categoryId: category.id,
-    title: postName
-  });
-
-  const memberUser = await createUser({
-    browserPage: page,
-    address: randomETHWalletAddress()
-  });
-
-  await generateSpaceRole({
-    spaceId: space.id,
-    userId: memberUser.id,
-    isAdmin: false
-  });
-
-  await login({
-    page,
-    userId: memberUser.id
-  });
-
-  await forumPostPage.goToPostPage({
-    domain: space.domain,
-    path: post.path
-  });
-
-  await forumPostPage.waitForPostLoad({
-    domain: space.domain,
-    path: post.path
-  });
-
-  await pageHeader.pageTopLevelMenu.click();
-
-  const forumPostConvertProposalAction = page.locator('data-test=forum-post-convert-proposal-action');
-  expect(forumPostConvertProposalAction.isDisabled()).toBeTruthy();
 });

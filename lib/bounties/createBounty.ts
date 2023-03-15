@@ -24,7 +24,8 @@ export async function createBounty({
   maxSubmissions,
   rewardAmount = 0,
   rewardToken = 'ETH',
-  permissions
+  permissions,
+  customReward
 }: BountyCreationData) {
   const validCreationStatuses: BountyStatus[] = ['suggestion', 'open'];
 
@@ -36,12 +37,14 @@ export async function createBounty({
     );
   }
 
-  if (rewardAmount === 0 && status === 'open') {
-    throw new InvalidInputError('An open bounty must have a reward amount assigned');
-  }
+  if (rewardAmount !== null) {
+    if (rewardAmount === 0 && status === 'open') {
+      throw new InvalidInputError('An open bounty must have a reward amount assigned');
+    }
 
-  if (rewardAmount < 0) {
-    throw new PositiveNumbersOnlyError();
+    if (rewardAmount < 0) {
+      throw new PositiveNumbersOnlyError();
+    }
   }
 
   const space = await prisma.space.findUnique({
@@ -77,7 +80,8 @@ export async function createBounty({
     approveSubmitters,
     maxSubmissions,
     rewardAmount,
-    rewardToken
+    rewardToken,
+    customReward
   };
 
   const isSuggestion = status === 'suggestion';

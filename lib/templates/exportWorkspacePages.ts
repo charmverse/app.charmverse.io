@@ -7,6 +7,7 @@ import { validate } from 'uuid';
 import { prisma } from 'db';
 import type { PageNodeWithChildren } from 'lib/pages';
 import { resolvePageTree } from 'lib/pages/server/resolvePageTree';
+import type { PageContent, TextContent } from 'lib/prosemirror/interfaces';
 import { DataNotFoundError } from 'lib/utilities/errors';
 
 import type { ExportedPage, WorkspaceExport } from './interfaces';
@@ -14,13 +15,30 @@ import type { ExportedPage, WorkspaceExport } from './interfaces';
 export interface ExportWorkspacePage {
   sourceSpaceIdOrDomain: string;
   exportName?: string;
+  rootPageIds?: string[];
+  skipBounties?: boolean;
+  skipProposals?: boolean;
 }
 
-const excludedPageTypes: PageType[] = ['bounty', 'bounty_template', 'proposal', 'proposal_template'];
+const excludedPageTypes: PageType[] = ['bounty_template', 'proposal_template'];
+
+function recurse(node: PageContent, cb: (node: PageContent | TextContent) => void) {
+  if (node?.content) {
+    node?.content.forEach((childNode) => {
+      recurse(childNode, cb);
+    });
+  }
+  if (node) {
+    cb(node);
+  }
+}
 
 export async function exportWorkspacePages({
   sourceSpaceIdOrDomain,
-  exportName
+  exportName,
+  rootPageIds,
+  skipBounties = false,
+  skipProposals = false
 }: ExportWorkspacePage): Promise<{ data: WorkspaceExport; path?: string }> {
   const isUuid = validate(sourceSpaceIdOrDomain);
 
@@ -34,14 +52,17 @@ export async function exportWorkspacePages({
 
   const rootPages = await prisma.page.findMany({
     where: {
-      spaceId: space.id,
+      ...(rootPageIds ? { id: { in: rootPageIds } } : { spaceId: space.id, parentId: null }),
       deletedAt: null,
-      parentId: null,
       type: {
         notIn: excludedPageTypes
       }
     }
   });
+
+  const exportData: WorkspaceExport = {
+    pages: []
+  };
 
   // Replace by multi resolve page tree in future
   const mappedTrees = await Promise.all(
@@ -51,18 +72,16 @@ export async function exportWorkspacePages({
   );
 
   // Console reporting for manual exports
-  const pageIndexes = mappedTrees.reduce((acc, val) => {
-    let pageCount = Object.keys(acc).length;
+  // const pageIndexes = mappedTrees.reduce((acc, val) => {
+  //   let pageCount = Object.keys(acc).length;
 
-    [val.targetPage, ...val.flatChildren].forEach((p) => {
-      pageCount += 1;
-      acc[p.id] = pageCount;
-    });
+  //   [val.targetPage, ...val.flatChildren].forEach((p) => {
+  //     pageCount += 1;
+  //     acc[p.id] = pageCount;
+  //   });
 
-    return acc;
-  }, {} as Record<string, number>);
-
-  const totalPages = Object.keys(pageIndexes).length;
+  //   return acc;
+  // }, {} as Record<string, number>);
 
   /**
    * Mutates the given node to provision its block data
@@ -96,6 +115,24 @@ export async function exportWorkspacePages({
       node.blocks = {
         card: cardBlock as Block
       };
+    } else if (node.bountyId && node.type === 'bounty' && !skipBounties) {
+      node.bounty = await prisma.bounty.findUnique({
+        where: {
+          id: node.bountyId
+        },
+        include: {
+          permissions: true
+        }
+      });
+    } else if (node.proposalId && node.type === 'proposal' && !skipProposals) {
+      node.proposal = await prisma.proposal.findUnique({
+        where: {
+          id: node.proposalId
+        },
+        include: {
+          category: true
+        }
+      });
     }
 
     node.children = node.children?.filter((child) => !excludedPageTypes.includes(child.type)) ?? [];
@@ -105,6 +142,52 @@ export async function exportWorkspacePages({
         await recursiveResolveBlocks({ node: child });
       })
     );
+    const pollIds: string[] = [];
+    const inlineDatabasePageIds: string[] = [];
+    recurse(node.content as PageContent, (_node) => {
+      if (_node.type === 'poll') {
+        const attrs = _node.attrs as { pollId: string };
+        if (attrs.pollId) {
+          pollIds.push(attrs.pollId);
+        }
+      } else if (_node.type === 'inlineDatabase') {
+        const attrs = _node.attrs as { pageId: string };
+        if (attrs.pageId) {
+          inlineDatabasePageIds.push(attrs.pageId);
+        }
+      }
+    });
+
+    if (pollIds.length) {
+      node.votes = await prisma.vote.findMany({
+        where: {
+          id: {
+            in: pollIds
+          }
+        },
+        include: {
+          voteOptions: true
+        }
+      });
+    }
+
+    if (inlineDatabasePageIds.length) {
+      const inlineDatabasesData = await exportWorkspacePages({
+        sourceSpaceIdOrDomain,
+        exportName,
+        rootPageIds: inlineDatabasePageIds,
+        skipBounties,
+        skipProposals
+      });
+      // Only store the inline database in this field
+      node.inlineDatabases = inlineDatabasesData.data.pages.filter((page) => inlineDatabasePageIds.includes(page.id));
+      // Rest of the pages will be added to the top level pages array
+      inlineDatabasesData.data.pages.forEach((page) => {
+        if (!inlineDatabasePageIds.includes(page.id)) {
+          exportData.pages.push(page);
+        }
+      });
+    }
   }
 
   await Promise.all(
@@ -113,22 +196,22 @@ export async function exportWorkspacePages({
     })
   );
 
+  mappedTrees.forEach((t) => {
+    exportData.pages.push(t.targetPage);
+  });
+
+  if (!exportName) {
+    return {
+      data: exportData
+    };
+  }
+
   const exportFolder = path.join(__dirname, 'exports');
 
   try {
     await fs.readdir(exportFolder);
   } catch (err) {
     await fs.mkdir(exportFolder);
-  }
-
-  const exportData: WorkspaceExport = {
-    pages: mappedTrees.map((t) => t.targetPage)
-  };
-
-  if (!exportName) {
-    return {
-      data: exportData
-    };
   }
 
   // Continue writing only if an export name was provided

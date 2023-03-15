@@ -26,12 +26,6 @@ export function plugins() {
             return false;
           }
           const text = event.clipboardData.getData('text/plain');
-          const html = event.clipboardData.getData('text/html');
-          const isPlainText = text && !html;
-
-          if (!isPlainText) {
-            return false;
-          }
           const props = extractIframeProps(text);
           if (props) {
             const { src, height, width } = props;

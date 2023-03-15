@@ -1,4 +1,4 @@
-import type { DateTimeUnit as LuxonTimeUnit } from 'luxon';
+import type { DateTimeUnit as LuxonTimeUnit, DurationLikeObject } from 'luxon';
 import { Duration, DateTime } from 'luxon';
 
 export type DateInput = DateTime | Date | string | number;
@@ -21,6 +21,10 @@ const SystemToLuxonUnitMapping: { [key in TimeUnit]: LuxonTimeUnit } = {
   month: 'month',
   year: 'year'
 };
+
+export function timeAgo(duration: DurationLikeObject): Date {
+  return DateTime.local().minus(Duration.fromObject(duration)).toJSDate();
+}
 
 export function convertToLuxonDate(date: DateInput): DateTime {
   if (date instanceof DateTime) {

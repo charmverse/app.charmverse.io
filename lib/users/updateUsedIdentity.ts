@@ -2,7 +2,6 @@ import type { Prisma } from '@prisma/client';
 import { IdentityType } from '@prisma/client';
 
 import { prisma } from 'db';
-import { getENSName } from 'lib/blockchain/getENSName';
 import { sessionUserRelations } from 'lib/session/config';
 import { InsecureOperationError, InvalidInputError } from 'lib/utilities/errors';
 import { matchWalletAddress, shortWalletAddress } from 'lib/utilities/strings';
@@ -47,6 +46,11 @@ export async function updateUsedIdentity(userId: string, identityUpdate?: Identi
       }
     } else if (identityType === 'Telegram' && (user.telegramUser?.account as any)?.username !== displayName) {
       throw new InsecureOperationError(`User ${userId} does not have a Telegram account with name ${displayName}`);
+    } else if (
+      identityType === 'VerifiedEmail' &&
+      !user.verifiedEmails.some((email) => email.email === displayName || email.name === displayName)
+    ) {
+      throw new InsecureOperationError(`User ${userId} does not have a verified email with address ${displayName}`);
     }
 
     return prisma.user.update({
@@ -65,7 +69,7 @@ export async function updateUsedIdentity(userId: string, identityUpdate?: Identi
 
   // Priority of identities: [wallet, discord, unstoppable domain, google account]
   if (user.wallets.length) {
-    updateContent.username = user.wallets[0].address;
+    updateContent.username = shortWalletAddress(user.wallets[0].ensname ?? user.wallets[0].address);
     updateContent.identityType = 'Wallet';
   } else if (user.discordUser) {
     updateContent.username = (user.discordUser.account as any).username;
@@ -76,6 +80,9 @@ export async function updateUsedIdentity(userId: string, identityUpdate?: Identi
   } else if (user.googleAccounts.length) {
     updateContent.username = user.googleAccounts[0].name;
     updateContent.identityType = 'Google';
+  } else if (user.verifiedEmails.length) {
+    updateContent.username = user.verifiedEmails[0].name;
+    updateContent.identityType = 'VerifiedEmail';
   }
 
   return prisma.user.update({

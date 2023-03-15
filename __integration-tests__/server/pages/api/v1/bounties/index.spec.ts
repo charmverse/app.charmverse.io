@@ -71,7 +71,8 @@ describe('GET /api/v1/bounties', () => {
         reward: {
           amount: bountyWithPaidApplication.rewardAmount,
           chain: bountyWithPaidApplication.chainId,
-          token: bountyWithPaidApplication.rewardToken
+          token: bountyWithPaidApplication.rewardToken,
+          custom: null
         },
         title: bountyWithPaidApplication.page.title,
         status: bountyWithPaidApplication.status,
@@ -97,7 +98,8 @@ describe('GET /api/v1/bounties', () => {
         reward: {
           amount: bountyWithInProgressWork.rewardAmount,
           chain: bountyWithInProgressWork.chainId,
-          token: bountyWithInProgressWork.rewardToken
+          token: bountyWithInProgressWork.rewardToken,
+          custom: null
         },
         title: bountyWithInProgressWork.page.title,
         status: bountyWithInProgressWork.status,

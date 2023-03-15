@@ -1,7 +1,6 @@
 import { bold, code, hardBreak, italic, strike, underline } from '@bangle.dev/base-components';
 import type { RawPlugins } from '@bangle.dev/core';
-import { BangleEditorState, NodeView, Plugin } from '@bangle.dev/core';
-import { markdownSerializer } from '@bangle.dev/markdown';
+import { NodeView, Plugin } from '@bangle.dev/core';
 import type { EditorState, EditorView } from '@bangle.dev/pm';
 import { Node, PluginKey } from '@bangle.dev/pm';
 import { useEditorState } from '@bangle.dev/react';
@@ -19,11 +18,6 @@ import { useSWRConfig } from 'swr';
 import charmClient from 'charmClient';
 import { CommentsSidebar } from 'components/[pageId]/DocumentPage/components/CommentsSidebar';
 import { SuggestionsSidebar } from 'components/[pageId]/DocumentPage/components/SuggestionsSidebar';
-import * as codeBlock from 'components/common/CharmEditor/components/@bangle.dev/base-components/code-block';
-import { plugins as imagePlugins } from 'components/common/CharmEditor/components/@bangle.dev/base-components/image';
-import { BangleEditor as ReactBangleEditor } from 'components/common/CharmEditor/components/@bangle.dev/react/ReactEditor';
-import type { FrontendParticipant } from 'components/common/CharmEditor/components/fiduswriter/collab';
-import * as poll from 'components/common/CharmEditor/components/poll';
 import ErrorBoundary from 'components/common/errors/ErrorBoundary';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { IPageActionDisplayContext } from 'hooks/usePageActionDisplay';
@@ -36,6 +30,9 @@ import type { PageContent } from 'lib/prosemirror/interfaces';
 import { extractDeletedThreadIds } from 'lib/prosemirror/plugins/inlineComments/extractDeletedThreadIds';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
+import * as codeBlock from './components/@bangle.dev/base-components/code-block';
+import { plugins as imagePlugins } from './components/@bangle.dev/base-components/image';
+import { BangleEditor as ReactBangleEditor } from './components/@bangle.dev/react/ReactEditor';
 import { BookmarkNodeView } from './components/bookmark/BookmarkNodeView';
 import { plugins as bookmarkPlugins } from './components/bookmark/bookmarkPlugins';
 import * as bulletList from './components/bulletList';
@@ -47,9 +44,12 @@ import LayoutRow from './components/columnLayout/Row';
 import { CryptoPrice } from './components/CryptoPrice';
 import * as disclosure from './components/disclosure';
 import EmojiSuggest, * as emoji from './components/emojiSuggest';
+import type { FrontendParticipant } from './components/fiduswriter/collab';
 import { getSelectedChanges } from './components/fiduswriter/state_plugins/track';
 import fiduswriterStyles from './components/fiduswriter/styles';
 import { rejectAll } from './components/fiduswriter/track/rejectAll';
+import { File } from './components/file/File';
+import { plugins as filePlugins } from './components/file/file.plugins';
 import * as floatingMenu from './components/floatingMenu';
 import * as heading from './components/heading';
 import * as horizontalRule from './components/horizontalRule';
@@ -62,6 +62,7 @@ import * as inlineVote from './components/inlineVote';
 import { plugins as linkPlugins } from './components/link/link.plugins';
 import { LinksPopup } from './components/link/LinksPopup';
 import * as listItem from './components/listItem/listItem';
+import { plugins as markdownPlugins } from './components/markdown/markdown.plugins';
 import Mention, { mentionPluginKeyName, mentionPlugins, MentionSuggest } from './components/mention';
 import NestedPage, { nestedPagePluginKeyName, nestedPagePlugins, NestedPagesList } from './components/nestedPage';
 import * as nft from './components/nft/nft';
@@ -71,6 +72,7 @@ import * as orderedList from './components/orderedList';
 import paragraph from './components/paragraph';
 import * as pasteChecker from './components/pasteChecker/pasteChecker';
 import { placeholderPlugin } from './components/placeholder/index';
+import * as poll from './components/poll';
 import Quote from './components/quote';
 import ResizableImage from './components/ResizableImage';
 import ResizablePDF from './components/ResizablePDF';
@@ -80,6 +82,8 @@ import SuggestionsPopup from './components/suggestions/SuggestionPopup';
 import { plugins as trackPlugins } from './components/suggestions/suggestions.plugins';
 import * as tabIndent from './components/tabIndent';
 import * as table from './components/table';
+import { TableOfContents } from './components/tableOfContents/TableOfContents';
+import { plugins as tableOfContentPlugins } from './components/tableOfContents/tableOfContents.plugins';
 import * as trailingNode from './components/trailingNode';
 import * as tweet from './components/tweet/tweet';
 import { TweetNodeView } from './components/tweet/TweetNodeView';
@@ -243,7 +247,10 @@ export function charmEditorPlugins({
     tweet.plugins(),
     trailingNode.plugins(),
     videoPlugins(),
-    iframe.plugins()
+    iframe.plugins(),
+    markdownPlugins(),
+    tableOfContentPlugins(),
+    filePlugins()
   ];
 
   if (!readOnly) {
@@ -384,25 +391,7 @@ interface CharmEditorProps {
   placeholderText?: string;
   focusOnInit?: boolean;
   disableRowHandles?: boolean;
-}
-
-export function convertPageContentToMarkdown(content: PageContent, title?: string): string {
-  const serializer = markdownSerializer(specRegistry);
-
-  const state = new BangleEditorState({
-    specRegistry,
-    initialValue: Node.fromJSON(specRegistry.schema, content) ?? ''
-  });
-
-  let markdown = serializer.serialize(state.pmState.doc);
-
-  if (title) {
-    const pageTitleAsMarkdown = `# ${title}`;
-
-    markdown = `${pageTitleAsMarkdown}\r\n\r\n${markdown}`;
-  }
-
-  return markdown;
+  disableNestedPages?: boolean;
 }
 
 function CharmEditor({
@@ -425,7 +414,8 @@ function CharmEditor({
   placeholderText,
   focusOnInit,
   onParticipantUpdate,
-  disableRowHandles = false
+  disableRowHandles = false,
+  disableNestedPages = false
 }: CharmEditorProps) {
   const router = useRouter();
   const { showMessage } = useSnackbar();
@@ -434,7 +424,7 @@ function CharmEditor({
   const { setCurrentPageActionDisplay } = usePageActionDisplay();
   const { user } = useUser();
   const isTemplate = pageType ? pageType.includes('template') : false;
-  const disableNestedPage = disablePageSpecificFeatures || enableSuggestingMode || isTemplate;
+  const disableNestedPage = disablePageSpecificFeatures || enableSuggestingMode || isTemplate || disableNestedPages;
   const onThreadResolveDebounced = debounce((_pageId: string, doc: EditorState['doc'], prevDoc: EditorState['doc']) => {
     const deletedThreadIds = extractDeletedThreadIds(specRegistry.schema, doc, prevDoc);
     if (deletedThreadIds.length) {
@@ -658,6 +648,9 @@ function CharmEditor({
           case 'pdf': {
             return <ResizablePDF {...allProps} />;
           }
+          case 'file': {
+            return <File {...allProps} />;
+          }
           case 'bookmark': {
             return <BookmarkNodeView {...allProps} />;
           }
@@ -666,6 +659,9 @@ function CharmEditor({
           }
           case 'inlineDatabase': {
             return <InlineDatabase containerWidth={containerWidth} {...allProps} />;
+          }
+          case 'tableOfContents': {
+            return <TableOfContents {...allProps} />;
           }
           case 'tweet': {
             return <TweetNodeView {...allProps} />;
