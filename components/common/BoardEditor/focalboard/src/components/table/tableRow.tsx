@@ -195,6 +195,7 @@ function TableRow(props: Props) {
               propertyTemplate={template}
               updatedAt={pageUpdatedAt}
               updatedBy={pageUpdatedBy}
+              displayType='table'
             />
           </div>
         );

@@ -1,6 +1,5 @@
 import { Dialog, DialogContent, Divider, Typography, useMediaQuery, Box, Stack } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import type { MemberProperty, MemberPropertyType } from '@prisma/client';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
@@ -11,7 +10,6 @@ import { MemberPropertiesRenderer } from 'components/profile/components/SpacesMe
 import UserDetails from 'components/profile/components/UserDetails/UserDetails';
 import Legend from 'components/settings/Legend';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { useMemberProperties } from 'hooks/useMemberProperties';
 import { useMemberPropertyValues } from 'hooks/useMemberPropertyValues';
 import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
@@ -29,21 +27,12 @@ function MemberProfile({ title, member, onClose }: { title?: string; member: Mem
   const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
   const { user: currentUser, setUser } = useUser();
   const currentSpace = useCurrentSpace();
-  const { properties = [] } = useMemberProperties();
-  const propertiesRecord = properties.reduce((record, prop) => {
-    record[prop.type] = prop;
-    return record;
-  }, {} as Record<MemberPropertyType, MemberProperty>);
 
   const { memberPropertyValues = [] } = useMemberPropertyValues(member.id);
   const currentSpacePropertyValues = memberPropertyValues.find(
     (memberPropertyValue) => memberPropertyValue.spaceId === currentSpace?.id
   );
   const { updateSpaceValues } = useMemberPropertyValues(member.id);
-
-  const username =
-    (member.properties?.find((memberProperty) => memberProperty.memberPropertyId === propertiesRecord.name?.id)
-      ?.value as string) ?? member.username;
 
   const { data: user, isLoading: isFetchingUser } = useSWR(`users/${member.path}`, () =>
     charmClient.getUserByPath(member.path ?? member.id)
@@ -105,7 +94,7 @@ function MemberProfile({ title, member, onClose }: { title?: string; member: Mem
             onClose={onClose}
           >
             <Stack display='flex' flexDirection='row' width='100%' alignItems='center' justifyContent='space-between'>
-              <Typography variant='h6'>{username}'s profile</Typography>
+              <Typography variant='h6'>{member.username}'s profile</Typography>
               <Button
                 onClick={onClose}
                 href={`/u/${user.path}`}

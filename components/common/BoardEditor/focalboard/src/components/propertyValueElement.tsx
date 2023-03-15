@@ -1,6 +1,6 @@
 import { Tooltip } from '@mui/material';
 import type { ReactNode } from 'react';
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
 
 import { SelectProperty } from 'components/common/BoardEditor/components/properties/SelectProperty/SelectProperty';
@@ -38,7 +38,6 @@ function PropertyValueElement(props: Props) {
   const [value, setValue] = useState(props.card.fields.properties[props.propertyTemplate.id] || '');
   const [serverValue, setServerValue] = useState(props.card.fields.properties[props.propertyTemplate.id] || '');
   const { formatDateTime, formatDate } = useDateFormatter();
-
   const { card, propertyTemplate, readOnly, showEmptyPlaceholder, board, updatedBy, updatedAt, displayType } = props;
   const intl = useIntl();
   const propertyValue = card.fields.properties[propertyTemplate.id];
@@ -117,8 +116,9 @@ function PropertyValueElement(props: Props) {
   } else if (propertyTemplate.type === 'person') {
     propertyValueElement = (
       <UserProperty
+        displayType={displayType}
         memberIds={typeof propertyValue === 'string' ? [propertyValue] : propertyValue ?? []}
-        readOnly={readOnly}
+        readOnly={readOnly || (displayType !== 'details' && displayType !== 'table')}
         onChange={(newValue) => {
           mutator.changePropertyValue(card, propertyTemplate.id, newValue);
         }}

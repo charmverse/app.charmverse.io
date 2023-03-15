@@ -154,7 +154,8 @@ export default function MultiPaymentModal({ bounties }: { bounties: BountyWithDe
                           bounty={{
                             chainId: _chainId,
                             rewardAmount,
-                            rewardToken
+                            rewardToken,
+                            customReward: null
                           }}
                         />
                       </Box>

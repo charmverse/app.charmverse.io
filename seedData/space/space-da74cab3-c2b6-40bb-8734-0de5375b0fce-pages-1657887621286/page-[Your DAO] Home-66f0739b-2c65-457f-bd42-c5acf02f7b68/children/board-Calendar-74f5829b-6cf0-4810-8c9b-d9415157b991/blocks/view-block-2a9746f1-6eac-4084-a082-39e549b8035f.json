@@ -23,6 +23,7 @@
       "c0efaa87-465e-4c04-beef-2e2063970f12",
       "007b3eb5-6b27-4828-bb7b-b6a3557b0501"
     ],
+    "dateDisplayPropertyId": "ebf1aa9b-886c-41cc-81d1-1454e0780234",
     "sortOptions": [],
     "columnWidths": {},
     "hiddenOptionIds": [],
@@ -31,6 +32,9 @@
     "collapsedOptionIds": [],
     "columnCalculations": {},
     "kanbanCalculations": {},
-    "visiblePropertyIds": ["__title", "e32ee08c-f8ba-4bae-b824-fc17deaf7c44"]
+    "visiblePropertyIds": [
+      "__title",
+      "e32ee08c-f8ba-4bae-b824-fc17deaf7c44"
+    ]
   }
 }

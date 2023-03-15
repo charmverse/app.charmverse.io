@@ -174,12 +174,19 @@ export function useFirebaseAuth() {
     }
   }
 
+  function disconnectVerifiedEmailAccount(email: string) {
+    charmClient.google.disconnectEmailAccount({ email }).then((loggedInUser) => {
+      setUser(loggedInUser);
+    });
+  }
+
   return {
     loginWithGoogle,
     connectGoogleAccount,
     disconnectGoogleAccount,
     isConnectingGoogle,
     requestMagicLinkViaFirebase,
-    validateMagicLink
+    validateMagicLink,
+    disconnectVerifiedEmailAccount
   };
 }

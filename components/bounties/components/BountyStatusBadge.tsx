@@ -5,12 +5,14 @@ import LaunchIcon from '@mui/icons-material/LaunchOutlined';
 import LightbulbIcon from '@mui/icons-material/Lightbulb';
 import ModeStandbyIcon from '@mui/icons-material/ModeStandby';
 import PaidIcon from '@mui/icons-material/Paid';
+import BountyIcon from '@mui/icons-material/RequestPageOutlined';
 import { IconButton, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
 import type { ChipProps } from '@mui/material/Chip';
 import Chip from '@mui/material/Chip';
 import Grid from '@mui/material/Grid';
 import Tooltip from '@mui/material/Tooltip';
+import { Stack } from '@mui/system';
 import type { Bounty, BountyStatus } from '@prisma/client';
 import millify from 'millify';
 import Link from 'next/link';
@@ -21,6 +23,8 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import type { BountyTaskAction } from 'lib/bounties/getBountyTasks';
 import { getTokenAndChainInfoFromPayments } from 'lib/tokens/tokenData';
+import { fancyTrim } from 'lib/utilities/strings';
+import { isTruthy } from 'lib/utilities/types';
 import type { BrandColor } from 'theme/colors';
 
 export const BOUNTY_STATUS_LABELS: Record<BountyStatus, string> = {
@@ -197,22 +201,41 @@ export function BountyAmount({
   bounty,
   truncate = false
 }: {
-  bounty: Pick<Bounty, 'rewardAmount' | 'rewardToken' | 'chainId'>;
+  bounty: Pick<Bounty, 'rewardAmount' | 'rewardToken' | 'chainId' | 'customReward'>;
   truncate?: boolean;
 }) {
   const [paymentMethods] = usePaymentMethods();
 
+  if (bounty.customReward) {
+    return (
+      <Tooltip title={bounty.customReward}>
+        <Stack flexDirection='row' gap={0.5} alignItems='center'>
+          <BountyIcon fontSize='small' color='secondary' />
+          <Typography>{fancyTrim(bounty.customReward, 15)}</Typography>
+        </Stack>
+      </Tooltip>
+    );
+  }
+
+  if (!isTruthy(bounty.rewardAmount) || !isTruthy(bounty.rewardToken) || !isTruthy(bounty.chainId)) {
+    return null;
+  }
+
+  const rewardAmount = bounty.rewardAmount;
+  const rewardToken = bounty.rewardToken;
+  const chainId = bounty.chainId;
+
   const tokenInfo = getTokenAndChainInfoFromPayments({
-    chainId: bounty.chainId,
+    chainId,
     methods: paymentMethods,
-    symbolOrAddress: bounty.rewardToken
+    symbolOrAddress: rewardToken
   });
 
-  const formattedAmount = Intl.NumberFormat(undefined, { maximumSignificantDigits: 3 }).format(bounty.rewardAmount);
+  const formattedAmount = Intl.NumberFormat(undefined, { maximumSignificantDigits: 3 }).format(rewardAmount);
 
   const truncatedAmount = () => {
     try {
-      return millify(bounty.rewardAmount, { precision: 4 });
+      return millify(rewardAmount, { precision: 4 });
     } catch (error) {
       return 'Invalid number';
     }
@@ -221,9 +244,9 @@ export function BountyAmount({
   const tooltip = `${formattedAmount} ${tokenInfo.tokenName} (${tokenInfo.tokenSymbol})`;
 
   return (
-    <Tooltip arrow placement='top' title={bounty.rewardAmount === 0 ? '' : tooltip}>
+    <Tooltip arrow placement='top' title={rewardAmount === 0 ? '' : tooltip}>
       <Box sx={{ display: 'inline-flex', alignItems: 'center', verticalAlign: 'middle' }}>
-        {bounty.rewardAmount === 0 ? (
+        {rewardAmount === 0 ? (
           <Box sx={{ display: 'flex', verticalAlign: 'middle' }}>
             <Typography
               component='span'
@@ -257,7 +280,7 @@ export function BountyAmount({
               fontSize={18}
               data-test='bounty-amount'
             >
-              {truncate ? truncatedAmount() : bounty.rewardAmount}
+              {truncate ? truncatedAmount() : rewardAmount}
             </Typography>
           </>
         )}

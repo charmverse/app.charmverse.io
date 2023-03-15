@@ -1,4 +1,5 @@
 import EmailIcon from '@mui/icons-material/Email';
+import Box from '@mui/material/Box';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import List from '@mui/material/List';
@@ -17,7 +18,7 @@ import type { AuthSig } from 'lib/blockchain/interfaces';
 import type { SystemError } from 'lib/utilities/errors';
 import type { LoggedInUser } from 'models/User';
 
-import { CollectEmailDialog } from './CollectEmail';
+import { CollectEmail } from './CollectEmail';
 import { LoginErrorModal } from './LoginErrorModal';
 import { WalletSign } from './WalletSign';
 
@@ -28,14 +29,18 @@ export type AnyIdLogin<I extends IdentityType = IdentityType> = {
 };
 
 export interface DialogProps {
-  open: boolean;
-  selectedValue: string;
-  onClose: (value: string) => void;
+  isOpen: boolean;
+  onClose: () => void;
 }
 
 function LoginHandler(props: DialogProps) {
-  const { onClose, selectedValue, open } = props;
+  const { onClose, isOpen } = props;
   const { loginFromWeb3Account } = useWeb3AuthSig();
+
+  // Governs whether we should auto-request a signature. Should only happen on first login.
+  const [enableAutosign, setEnableAutoSign] = useState(true);
+
+  const [loginMethod, setLoginMethod] = useState<'email' | null>(null);
 
   const [showLoginError, setShowLoginError] = useState(false);
 
@@ -43,18 +48,12 @@ function LoginHandler(props: DialogProps) {
 
   const sendingMagicLink = useRef(false);
 
-  const magicLinkPopup = usePopupState({ variant: 'popover', popupId: 'email-magic-link' });
-
   const { loginWithGoogle, requestMagicLinkViaFirebase } = useFirebaseAuth();
   const { verifiableWalletDetected } = useWeb3AuthSig();
   async function handleLogin(loggedInUser: AnyIdLogin) {
     showMessage(`Logged in with ${loggedInUser?.identityType}. Redirecting you now`, 'success');
     window.location.reload();
   }
-
-  const handleClose = () => {
-    onClose(selectedValue);
-  };
 
   async function handleGoogleLogin() {
     try {
@@ -71,7 +70,8 @@ function LoginHandler(props: DialogProps) {
       // console.log('Handling magic link request');
       try {
         await requestMagicLinkViaFirebase({ email });
-        magicLinkPopup.close();
+        onClose();
+        setLoginMethod(null);
       } catch (err) {
         handleLoginError(err);
       } finally {
@@ -99,72 +99,100 @@ function LoginHandler(props: DialogProps) {
     }
   }
 
+  function toggleEmailDialog(position: 'open' | 'close') {
+    if (position === 'open') {
+      setLoginMethod('email');
+    } else {
+      setLoginMethod(null);
+    }
+  }
+
+  function close() {
+    if (loginMethod) {
+      setLoginMethod(null);
+    } else {
+      onClose();
+    }
+  }
+
   return (
-    <Dialog onClose={handleClose} open={open}>
-      <List sx={{ pt: 0, maxWidth: '400px' }}>
-        <DialogTitle textAlign='left'>Connect Wallet</DialogTitle>
+    <>
+      <Dialog open={isOpen} onClose={close}>
+        {!loginMethod && (
+          <List sx={{ pt: 0, maxWidth: '400px' }}>
+            <DialogTitle textAlign='left'>Connect Wallet</DialogTitle>
 
-        {/** Web 3 login methods */}
-        <ListItem>
-          <WalletSelector loginSuccess={handleLogin} onError={handleLoginError} />
-        </ListItem>
-        {verifiableWalletDetected && (
-          <ListItem>
-            <WalletSign buttonStyle={{ width: '100%' }} signSuccess={handleWeb3Login} enableAutosign />
-          </ListItem>
+            {/** Web 3 login methods */}
+            <ListItem>
+              <WalletSelector loginSuccess={handleLogin} onError={handleLoginError} />
+            </ListItem>
+            {verifiableWalletDetected && (
+              <ListItem>
+                <WalletSign
+                  buttonStyle={{ width: '100%' }}
+                  signSuccess={handleWeb3Login}
+                  enableAutosign={enableAutosign}
+                  onError={() => setEnableAutoSign(false)}
+                />
+              </ListItem>
+            )}
+
+            <DialogTitle sx={{ mt: -1 }} textAlign='left'>
+              Connect Account
+            </DialogTitle>
+
+            {/* Google login method */}
+            <ListItem>
+              <ConnectorButton
+                onClick={handleGoogleLogin}
+                name='Connect with Google'
+                iconUrl='Google_G.png'
+                disabled={false}
+                isActive={false}
+                isLoading={false}
+              />
+            </ListItem>
+
+            {/** Connect with email address */}
+            <ListItem>
+              <ConnectorButton
+                onClick={() => toggleEmailDialog('open')}
+                name='Connect with email'
+                icon={<EmailIcon />}
+                disabled={false}
+                isActive={false}
+                isLoading={false}
+              />
+            </ListItem>
+          </List>
         )}
-
-        <DialogTitle sx={{ mt: -1 }} textAlign='left'>
-          Connect Account
-        </DialogTitle>
-
-        {/* Google login method */}
-        <ListItem>
-          <ConnectorButton
-            onClick={handleGoogleLogin}
-            name='Connect with Google'
-            iconUrl='Google_G.png'
-            disabled={false}
-            isActive={false}
-            isLoading={false}
-          />
-        </ListItem>
-
-        {/** Connect with email address */}
-        <ListItem>
-          <ConnectorButton
-            onClick={magicLinkPopup.open}
-            name='Connect with email'
-            icon={<EmailIcon />}
-            disabled={false}
-            isActive={false}
-            isLoading={false}
-          />
-        </ListItem>
-      </List>
+        {loginMethod === 'email' && (
+          <Box m={2}>
+            <CollectEmail
+              loading={sendingMagicLink.current === true}
+              title='Connect with email'
+              description="Enter your email address and we'll email you a login link"
+              handleSubmit={handleMagicLinkRequest}
+              onClose={close}
+            />
+          </Box>
+        )}
+      </Dialog>
       <LoginErrorModal open={showLoginError} onClose={() => setShowLoginError(false)} />
-      <CollectEmailDialog
-        onClose={magicLinkPopup.close}
-        isOpen={magicLinkPopup.isOpen}
-        handleSubmit={handleMagicLinkRequest}
-      />
-    </Dialog>
+    </>
   );
 }
 
 export function Login() {
-  const [open, setOpen] = useState(false);
+  const loginDialog = usePopupState({ variant: 'popover', popupId: 'login-dialog' });
   const { resetSigning } = useWeb3AuthSig();
 
-  const [selectedValue, setSelectedValue] = useState('');
-
   const handleClickOpen = () => {
-    setOpen(true);
+    loginDialog.open();
   };
 
-  const handleClose = (value: string) => {
-    setOpen(false);
-    setSelectedValue(value);
+  const handleClose = () => {
+    loginDialog.close();
     resetSigning();
   };
 
@@ -179,7 +207,7 @@ export function Login() {
       >
         Connect
       </Button>
-      <LoginHandler selectedValue={selectedValue} open={open} onClose={handleClose} />
+      <LoginHandler isOpen={loginDialog.isOpen} onClose={handleClose} />
     </div>
   );
 }
