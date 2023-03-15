@@ -24,7 +24,7 @@ import Invites from 'components/settings/invites/Invites';
 import MemberSettings from 'components/settings/members/MemberSettings';
 import type { SpaceSettingsTab, UserSettingsTab } from 'components/settings/pages';
 import { SETTINGS_TABS, ACCOUNT_TABS } from 'components/settings/pages';
-import RoleSettings from 'components/settings/roles/RoleSettings';
+import { RoleSettings } from 'components/settings/roles/RoleSettings';
 import SpaceSettings from 'components/settings/workspace/Space';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { CurrentSpaceProvider, useCurrentSpaceId } from 'hooks/useCurrentSpaceId';

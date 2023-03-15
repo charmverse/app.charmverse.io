@@ -18,16 +18,12 @@ handler
   .post(createRole);
 
 export type ListSpaceRolesResponse = Pick<Role, 'id' | 'name' | 'source'> & {
-  spaceRolesToRole: {
-    spaceRole: {
-      user: User;
-    };
-  }[];
   spacePermissions: SpacePermission[];
+  isMemberLevel?: boolean;
 };
 
 async function listSpaceRoles(req: NextApiRequest, res: NextApiResponse<ListSpaceRolesResponse[]>) {
-  const { spaceId } = req.query;
+  const { spaceId, includeMemberLevels } = req.query;
 
   const userId = req.session.user?.id;
 
@@ -47,15 +43,6 @@ async function listSpaceRoles(req: NextApiRequest, res: NextApiResponse<ListSpac
       id: true,
       name: true,
       source: true,
-      spaceRolesToRole: {
-        select: {
-          spaceRole: {
-            select: {
-              user: true
-            }
-          }
-        }
-      },
       spacePermissions: {
         where: {
           forSpaceId: spaceId as string
@@ -64,9 +51,26 @@ async function listSpaceRoles(req: NextApiRequest, res: NextApiResponse<ListSpac
     }
   });
 
-  return res
-    .status(200)
-    .json(roles.map((role) => ({ ...role, spaceRolesToRole: !userId ? [] : role.spaceRolesToRole })));
+  const response: ListSpaceRolesResponse[] = roles;
+
+  if (includeMemberLevels) {
+    response.unshift(
+      {
+        id: '__member__',
+        name: 'Member',
+        source: null,
+        spacePermissions: []
+      },
+      {
+        id: '__admin__',
+        name: 'Admin',
+        source: null,
+        spacePermissions: []
+      }
+    );
+  }
+
+  return res.status(200).json(response);
 }
 
 async function createRole(req: NextApiRequest, res: NextApiResponse<Role>) {

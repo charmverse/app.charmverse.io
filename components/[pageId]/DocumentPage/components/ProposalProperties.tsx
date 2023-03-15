@@ -19,7 +19,7 @@ import { useProposalPermissions } from 'components/proposals/hooks/useProposalPe
 import { CreateVoteModal } from 'components/votes/components/CreateVoteModal';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useMembers } from 'hooks/useMembers';
-import useRoles from 'hooks/useRoles';
+import { useRoles } from 'hooks/useRoles';
 import { useUser } from 'hooks/useUser';
 import type { Member } from 'lib/members/interfaces';
 import type { IPagePermissionFlags } from 'lib/permissions/pages';
@@ -54,7 +54,7 @@ export default function ProposalProperties({
   const { permissions: proposalFlowFlags, refresh: refreshProposalFlowFlags } = useProposalFlowFlags({ proposalId });
 
   const { members } = useMembers();
-  const { roles = [], roleups } = useRoles();
+  const { roles = [] } = useRoles();
   const { user } = useUser();
   const isAdmin = useIsAdmin();
 
@@ -85,7 +85,9 @@ export default function ProposalProperties({
       if (reviewer.userId) {
         return reviewer.userId === user.id;
       }
-      return roleups.some((role) => role.id === reviewer.roleId && role.users.some((_user) => _user.id === user.id));
+      return user.spaceRoles.some((spaceRole) =>
+        spaceRole.spaceRoleToRole.some(({ roleId }) => roleId === reviewer.roleId)
+      );
     });
 
   const canUpdateProposalProperties = pagePermissions?.edit_content || isAdmin;

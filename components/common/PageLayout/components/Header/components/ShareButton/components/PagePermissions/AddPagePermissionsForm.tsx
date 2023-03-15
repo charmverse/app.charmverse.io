@@ -11,7 +11,7 @@ import InputEnumToOptions from 'components/common/form/InputEnumToOptions';
 import { InputSearchMemberMultiple } from 'components/common/form/InputSearchMember';
 import { InputSearchRoleMultiple } from 'components/common/form/InputSearchRole';
 import Loader from 'components/common/Loader';
-import useRoles from 'hooks/useRoles';
+import { useRoles } from 'hooks/useRoles';
 import type {
   IPagePermissionToCreate,
   IPagePermissionWithAssignee,

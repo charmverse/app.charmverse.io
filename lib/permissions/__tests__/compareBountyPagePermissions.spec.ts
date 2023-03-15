@@ -85,7 +85,8 @@ describe('compareBountyPagePermissions', () => {
       pageOperations: ['edit_content'],
       bountyPermissions,
       pagePermissions: bounty.page.permissions,
-      roleups: [roleinfo]
+      members: []
+      // roleups: [roleinfo]
     });
 
     expect(intersection.missingPermissions.length).toBe(1);
