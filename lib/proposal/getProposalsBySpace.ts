@@ -18,11 +18,25 @@ export async function getProposalsBySpace({
 }: Pick<ListProposalsRequest, 'categoryIds' | 'spaceId'>): Promise<ProposalWithUsers[]> {
   return prisma.proposal.findMany({
     where: {
+      OR: [
+        {
+          status: {
+            not: 'draft'
+          }
+        },
+        {
+          space: {
+            spaceRoles: {
+              some: {
+                spaceId,
+                isAdmin: true
+              }
+            }
+          }
+        }
+      ],
       spaceId,
       categoryId: generateCategoryIdQuery(categoryIds),
-      status: {
-        not: 'draft'
-      },
       page: {
         type: 'proposal'
       }

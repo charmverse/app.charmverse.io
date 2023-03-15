@@ -19,7 +19,11 @@ import { ProposalsViewOptions } from './components/ProposalsViewOptions';
 export function ProposalsPage() {
   const { categories = [] } = useProposalCategories();
   const currentSpace = useCurrentSpace();
-  const { data, mutate: mutateProposals } = useSWR(
+  const {
+    data,
+    mutate: mutateProposals,
+    isLoading
+  } = useSWR(
     () => (currentSpace ? `proposals/${currentSpace.id}` : null),
     () => charmClient.proposals.getProposalsBySpace({ spaceId: currentSpace!.id })
   );
@@ -102,7 +106,9 @@ export function ProposalsPage() {
                   videoUrl='https://tiny.charmverse.io/proposal-builder'
                 />
               )}
-              {data?.length > 0 && <ProposalsTable proposals={filteredProposals} mutateProposals={mutateProposals} />}
+              {data?.length > 0 && (
+                <ProposalsTable isLoading={isLoading} proposals={filteredProposals} mutateProposals={mutateProposals} />
+              )}
             </Grid>
           )}
         </Grid>
