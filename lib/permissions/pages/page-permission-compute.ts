@@ -139,6 +139,7 @@ async function baseComputeUserPagePermissions({
     where: { id: resourceId },
     select: {
       id: true,
+      spaceId: true,
       proposalId: true,
       convertedProposalId: true
     }
@@ -148,13 +149,6 @@ async function baseComputeUserPagePermissions({
 
   if (!pageInDb) {
     throw new PageNotFoundError(`${resourceId}`);
-  }
-
-  if (pageInDb.proposalId) {
-    return computePagePermissionsUsingProposalPermissions({
-      resourceId: pageId,
-      userId
-    });
   }
 
   const [foundSpaceRole, permissions] = await Promise.all([
@@ -170,6 +164,13 @@ async function baseComputeUserPagePermissions({
   // TODO DELETE LATER when we remove admin access to workspace
   if (foundSpaceRole && foundSpaceRole.isAdmin === true) {
     return new AllowedPagePermissions().full;
+  }
+
+  if (pageInDb.proposalId) {
+    return computePagePermissionsUsingProposalPermissions({
+      resourceId: pageId,
+      userId
+    });
   }
 
   const computedPermissions = new AllowedPagePermissions();

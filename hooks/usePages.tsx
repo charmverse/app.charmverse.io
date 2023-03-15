@@ -2,7 +2,7 @@ import type { Page, Role } from '@prisma/client';
 import { PageOperations } from '@prisma/client';
 import { useRouter } from 'next/router';
 import type { Dispatch, ReactNode, SetStateAction } from 'react';
-import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef } from 'react';
 import type { KeyedMutator } from 'swr';
 import useSWR, { mutate } from 'swr';
 
