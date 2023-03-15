@@ -19,7 +19,7 @@ import UserDetails from './components/UserDetails/UserDetails';
 import UserDetailsMini from './components/UserDetails/UserDetailsMini';
 import { isPublicUser } from './components/UserDetails/utils';
 
-export default function PublicProfile(props: UserDetailsProps) {
+export function PublicProfile(props: UserDetailsProps) {
   const { user, readOnly } = props;
   const { user: currentUser } = useUser();
 
