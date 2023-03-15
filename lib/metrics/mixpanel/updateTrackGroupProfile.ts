@@ -22,7 +22,7 @@ export async function updateTrackGroupProfile(space: Space, spaceOrigin?: string
 
 export function getTrackGroupProfile(space: Space, spaceOrigin?: string) {
   const spaceProfile: MixPanelSpaceProfile = {
-    $created: String(space.createdAt),
+    $created: space.createdAt,
     $name: space.name,
     'Space Created By': space.createdBy,
     'Space Updated At': space.updatedAt
