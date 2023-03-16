@@ -1,5 +1,5 @@
 import { useTheme } from '@emotion/react';
-import { Box, Dialog, DialogContent, useMediaQuery } from '@mui/material';
+import { Box, Dialog, DialogContent, Divider, Stack, useMediaQuery } from '@mui/material';
 import type { ReactNode } from 'react';
 import { useCallback, useEffect, useMemo } from 'react';
 import { Controller, useForm } from 'react-hook-form';
@@ -15,6 +15,10 @@ import { useMembers } from 'hooks/useMembers';
 import type { MemberPropertyValueType, UpdateMemberPropertyValuePayload } from 'lib/members/interfaces';
 import debounce from 'lib/utilities/debounce';
 
+import { NftsList } from '../../MemberMiniProfile/BlockchainData/NftsList';
+import { OrgsList } from '../../MemberMiniProfile/BlockchainData/OrgsList';
+import { PoapsList } from '../../MemberMiniProfile/BlockchainData/PoapsList';
+
 type Props = {
   spaceId: string | null;
   memberId: string;
@@ -24,6 +28,8 @@ type Props = {
   children?: ReactNode;
   isLoading?: boolean;
   postComponent?: ReactNode;
+  showBlockchainData?: boolean;
+  isOnboarding?: boolean;
 };
 
 export function MemberPropertiesPopup({
@@ -34,7 +40,8 @@ export function MemberPropertiesPopup({
   onClose,
   title = 'Edit space profile',
   isLoading = false,
-  postComponent = null
+  showBlockchainData = false,
+  isOnboarding
 }: Props) {
   const {
     data,
@@ -148,7 +155,18 @@ export function MemberPropertiesPopup({
                 />
               ))}
             </Box>
-            {postComponent}
+            {showBlockchainData && (
+              <Stack gap={3}>
+                <Divider
+                  sx={{
+                    mt: 3
+                  }}
+                />
+                <NftsList memberId={memberId} />
+                <OrgsList memberId={memberId} />
+                <PoapsList memberId={memberId} />
+              </Stack>
+            )}
           </DialogContent>
         </>
       )}

@@ -1,4 +1,4 @@
-import { Dialog, DialogContent, Divider, Typography, useMediaQuery, Box, Stack } from '@mui/material';
+import { Box, Dialog, DialogContent, Stack, Typography, useMediaQuery } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import type { MemberProperty, MemberPropertyType } from '@prisma/client';
 import useSWR from 'swr';
@@ -62,20 +62,7 @@ function MemberProfile({ title, member, onClose }: { title?: string; member: Mem
         memberId={currentUser.id}
         spaceId={currentSpace.id}
         updateMemberPropertyValues={updateSpaceValues}
-        postComponent={
-          user && (
-            <Stack gap={3}>
-              <Divider
-                sx={{
-                  mt: 3
-                }}
-              />
-              <NftsList memberId={user.id} />
-              <OrgsList memberId={user.id} />
-              <PoapsList memberId={user.id} />
-            </Stack>
-          )
-        }
+        showBlockchainData
       >
         {user && (
           <>
