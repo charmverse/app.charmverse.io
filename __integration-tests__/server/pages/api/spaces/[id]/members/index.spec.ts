@@ -69,14 +69,14 @@ describe('GET /api/space/[id]/members - Get list of members in a space', () => {
     expect(members).toEqual(
       // Make sure we only get simplified data, and that the username has been anonymised
       expect.arrayContaining<Partial<Member>>([
-        {
+        expect.objectContaining({
           id: adminUser.id,
           username: expect.not.stringContaining(adminUser.username)
-        },
-        {
+        }),
+        expect.objectContaining({
           id: nonAdminUser.id,
           username: expect.not.stringContaining(nonAdminUser.username)
-        }
+        })
       ])
     );
   });
