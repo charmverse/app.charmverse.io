@@ -7,9 +7,8 @@ import { useState } from 'react';
 import { iconForViewType } from 'components/common/BoardEditor/focalboard/src/components/viewMenu';
 import Button from 'components/common/Button';
 import { CenteredPageContent } from 'components/common/PageLayout/components/PageContent';
-import { useMemberProperties } from 'hooks/useMemberProperties';
 import { useMembers } from 'hooks/useMembers';
-import type { Member, MemberPropertyWithPermissions } from 'lib/members/interfaces';
+import type { Member } from 'lib/members/interfaces';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
 import { MemberDirectoryGalleryView } from './components/MemberDirectoryGalleryView';
@@ -29,24 +28,19 @@ const StyledButton = styled(Button)`
 const views = ['gallery', 'table'] as const;
 type View = (typeof views)[number];
 
-function memberNamePropertyValue(member: Member, nameProperty: MemberPropertyWithPermissions | null) {
-  const memberNameProperty = member.properties?.find((prop) => prop.memberPropertyId === nameProperty?.id);
-  const memberName = (memberNameProperty?.value ?? member.username).toString();
-
-  return memberName.startsWith('0x') ? `zzzzzzzz${memberName}` : memberName;
+function memberNamePropertyValue(member: Member) {
+  return member.username.startsWith('0x') ? `zzzzzzzz${member.username}` : member.username;
 }
 
 export default function MemberDirectoryPage() {
   const router = useRouter();
   const { members } = useMembers();
   const [searchedMembers, setSearchedMembers] = useState<Member[]>(members);
-  const { properties = [] } = useMemberProperties();
   const [currentView, setCurrentView] = useState<View>((router.query.view as View) ?? 'gallery');
   const [isPropertiesDrawerVisible, setIsPropertiesDrawerVisible] = useState(false);
-  const nameProperty = properties.find((property) => property.type === 'name') ?? null;
 
   const sortedMembers = searchedMembers.sort((mem1, mem2) =>
-    memberNamePropertyValue(mem1, nameProperty) > memberNamePropertyValue(mem2, nameProperty) ? 1 : -1
+    memberNamePropertyValue(mem1) > memberNamePropertyValue(mem2) ? 1 : -1
   );
 
   return (

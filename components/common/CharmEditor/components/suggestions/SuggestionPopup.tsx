@@ -14,7 +14,7 @@ import { getEventsFromDoc } from './getEvents';
 import { SuggestionCard } from './SuggestionCard';
 import type { SuggestionPluginState } from './suggestions.plugins';
 
-export default function SuggestionsPopup({
+export function SuggestionsPopup({
   pluginKey,
   readOnly,
   pageId,

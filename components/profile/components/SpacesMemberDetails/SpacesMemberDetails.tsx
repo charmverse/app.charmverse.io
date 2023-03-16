@@ -3,7 +3,10 @@ import { useRouter } from 'next/router';
 import { useState } from 'react';
 
 import LoadingComponent from 'components/common/LoadingComponent';
-import { MemberPropertiesPopup } from 'components/profile/components/SpacesMemberDetails/components/MemberPropertiesPopup';
+import {
+  MemberProperties,
+  MemberPropertiesPopup
+} from 'components/profile/components/SpacesMemberDetails/components/MemberPropertiesPopup';
 import { SpaceDetailsAccordion } from 'components/profile/components/SpacesMemberDetails/components/SpaceDetailsAccordion';
 import Legend from 'components/settings/Legend';
 import { useMemberPropertyValues } from 'hooks/useMemberPropertyValues';
@@ -20,14 +23,6 @@ export function SpacesMemberDetails({ memberId }: Props) {
   const { user } = useUser();
   const readOnly = memberId !== user?.id;
 
-  if (isLoading) {
-    return <LoadingComponent isLoading />;
-  }
-
-  if (!memberPropertyValues?.length) {
-    return null;
-  }
-
   const expandedWorkspaceIndex = memberPropertyValues.findIndex((mpv) => mpv.spaceId === query.workspace);
 
   // make sure the expanded workspace is always at the top
@@ -43,6 +38,7 @@ export function SpacesMemberDetails({ memberId }: Props) {
   return (
     <Box mt={4} mb={2}>
       <Legend noBorder>My Charmverse Spaces</Legend>
+      <LoadingComponent minHeight={100} isLoading={isLoading} />
       {propertyValues.map((pv) => (
         <SpaceDetailsAccordion
           key={pv.spaceId}
@@ -55,12 +51,16 @@ export function SpacesMemberDetails({ memberId }: Props) {
         />
       ))}
 
-      <MemberPropertiesPopup
-        onClose={() => setEditSpaceId(null)}
-        memberId={memberId}
-        spaceId={editSpaceId}
-        updateMemberPropertyValues={updateSpaceValues}
-      />
+      {editSpaceId && (
+        <MemberPropertiesPopup
+          title='Edit space profile'
+          onClose={() => setEditSpaceId(null)}
+          memberId={memberId}
+          spaceId={editSpaceId}
+        >
+          <MemberProperties memberId={memberId} spaceId={editSpaceId} updateMemberPropertyValues={updateSpaceValues} />
+        </MemberPropertiesPopup>
+      )}
     </Box>
   );
 }

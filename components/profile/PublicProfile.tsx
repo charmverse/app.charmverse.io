@@ -19,7 +19,7 @@ import UserDetails from './components/UserDetails/UserDetails';
 import UserDetailsMini from './components/UserDetails/UserDetailsMini';
 import { isPublicUser } from './components/UserDetails/utils';
 
-export default function PublicProfile(props: UserDetailsProps) {
+export function PublicProfile(props: UserDetailsProps) {
   const { user, readOnly } = props;
   const { user: currentUser } = useUser();
 
@@ -153,32 +153,30 @@ export default function PublicProfile(props: UserDetailsProps) {
     <Box>
       {readOnly ? <UserDetailsMini {...props} /> : <UserDetails {...props} />}
       <SpacesMemberDetails memberId={user.id} />
+      {readOnly && (
+        <AggregatedData
+          totalBounties={data?.bounties}
+          totalCommunities={data ? communities.length : undefined}
+          totalProposals={data?.totalProposals}
+          totalVotes={data?.totalVotes}
+        />
+      )}
+      <SectionHeader title='My Organizations' count={data ? allCommunities.length : undefined} />
       <LoadingComponent isLoading={isLoading} minHeight={300}>
-        {readOnly && (
-          <AggregatedData
-            totalBounties={data?.bounties || 0}
-            totalCommunities={communities.length}
-            totalProposals={data?.totalProposals || 0}
-            totalVotes={data?.totalVotes || 0}
-          />
-        )}
         {allCommunities.length > 0 ? (
-          <>
-            <SectionHeader title='My Organisations' count={allCommunities.length} />
-            <Stack gap={2} mb={2}>
-              {allCommunities.map((community) => (
-                <CommunityRow
-                  key={community.id}
-                  onClick={() => {
-                    toggleCommunityVisibility(community);
-                  }}
-                  visible={!community.isHidden}
-                  showVisibilityIcon={!readOnly}
-                  community={community}
-                />
-              ))}
-            </Stack>
-          </>
+          <Stack gap={2} mb={2}>
+            {allCommunities.map((community) => (
+              <CommunityRow
+                key={community.id}
+                onClick={() => {
+                  toggleCommunityVisibility(community);
+                }}
+                visible={!community.isHidden}
+                showVisibilityIcon={!readOnly}
+                community={community}
+              />
+            ))}
+          </Stack>
         ) : null}
 
         {collectables.length > 0 ? (
@@ -204,11 +202,11 @@ export default function PublicProfile(props: UserDetailsProps) {
   );
 }
 
-function SectionHeader({ title, count }: { title: string; count: number }) {
+function SectionHeader({ title, count }: { title: string; count?: number }) {
   return (
     <Stack flexDirection='row' justifyContent='space-between' alignItems='center' my={2}>
       <Legend noBorder>{title}</Legend>
-      <Chip label={count} />
+      {typeof count !== 'undefined' && <Chip label={count} />}
     </Stack>
   );
 }

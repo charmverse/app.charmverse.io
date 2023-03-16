@@ -45,9 +45,7 @@ test('login - allows user to logout even with a connected wallet', async ({ logi
     page: { path: 'getting-started', title: 'Getting started' }
   });
 
-  await spacesDropdown.spaceMenuBtn.click();
-
-  await spacesDropdown.logoutButton.click();
+  await spacesDropdown.signOut();
 
   // should auto redirect to workspace
   await loginPage.waitForURL();

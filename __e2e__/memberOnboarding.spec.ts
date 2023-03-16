@@ -19,14 +19,14 @@ test.describe.serial('Add a new space from sidebar and load it', async () => {
     await page.goto(targetPage);
     await page.waitForNavigation({ waitUntil: 'networkidle' });
 
-    const memberProfileNftList = await page.locator('data-test=member-profile-nft-list');
-    const memberProfileOrgList = await page.locator('data-test=member-profile-org-list');
-    const memberProfilePoapList = await page.locator('data-test=member-profile-poap-list');
+    const memberProfileNftList = page.locator('data-test=member-profile-nft-list');
+    const memberProfileOrgList = page.locator('data-test=member-profile-org-list');
+    const memberProfilePoapList = page.locator('data-test=member-profile-poap-list');
     await expect(memberProfileNftList).toBeVisible();
     await expect(memberProfileOrgList).toBeVisible();
     await expect(memberProfilePoapList).toBeVisible();
 
-    const closePropertiesModalBtn = await page.locator('data-test=close-modal');
+    const closePropertiesModalBtn = page.locator('data-test=close-modal');
     await expect(closePropertiesModalBtn).toBeVisible();
     await closePropertiesModalBtn.click();
   });

@@ -1,49 +1,113 @@
-import { Dialog, DialogContent, Divider, Typography, useMediaQuery, Box, Stack } from '@mui/material';
+import { Box, Dialog, DialogContent, Stack, Typography, useMediaQuery } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import type { MemberProperty, MemberPropertyType } from '@prisma/client';
+import { useState } from 'react';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { DialogTitle } from 'components/common/Modal';
+import { MemberEmailForm } from 'components/members/MemberEmailForm';
 import { MemberPropertiesRenderer } from 'components/profile/components/SpacesMemberDetails/components/MemberPropertiesRenderer';
 import UserDetails from 'components/profile/components/UserDetails/UserDetails';
 import Legend from 'components/settings/Legend';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { useMemberProperties } from 'hooks/useMemberProperties';
 import { useMemberPropertyValues } from 'hooks/useMemberPropertyValues';
 import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
 import type { Member } from 'lib/members/interfaces';
+import type { LoggedInUser } from 'models';
 
-import { MemberPropertiesPopup } from '../SpacesMemberDetails/components/MemberPropertiesPopup';
+import { MemberProperties, MemberPropertiesPopup } from '../SpacesMemberDetails/components/MemberPropertiesPopup';
 import UserDetailsMini from '../UserDetails/UserDetailsMini';
 
 import { NftsList } from './BlockchainData/NftsList';
 import { OrgsList } from './BlockchainData/OrgsList';
 import { PoapsList } from './BlockchainData/PoapsList';
 
-function MemberProfile({ title, member, onClose }: { title?: string; member: Member; onClose: VoidFunction }) {
+type Step = 'email_step' | 'profile_step';
+
+function CurrentMemberProfile({
+  currentUser,
+  title = 'Edit your profile',
+  onClose,
+  isOnboarding = false
+}: {
+  title?: string;
+  onClose: VoidFunction;
+  currentUser: LoggedInUser;
+  isOnboarding?: boolean;
+}) {
+  const { setUser } = useUser();
+  const currentSpace = useCurrentSpace();
+  const { updateSpaceValues } = useMemberPropertyValues(currentUser.id);
+
+  const [currentStep, setCurrentStep] = useState<Step>(isOnboarding ? 'email_step' : 'profile_step');
+
+  function goNextStep() {
+    setCurrentStep('profile_step');
+  }
+
+  if (!currentSpace) {
+    return null;
+  }
+
+  let customTitle = title;
+
+  if (isOnboarding) {
+    if (currentStep === 'email_step') {
+      customTitle = 'Welcome to CharmVerse';
+    } else if (currentStep === 'profile_step') {
+      customTitle = `Welcome to ${currentSpace.domain}. Set up your profile`;
+    }
+  }
+
+  return (
+    <MemberPropertiesPopup memberId={currentUser.id} onClose={onClose} spaceId={currentSpace.id} title={customTitle}>
+      {currentStep === 'email_step' ? (
+        <MemberEmailForm onClick={goNextStep} />
+      ) : currentStep === 'profile_step' ? (
+        <>
+          <UserDetails
+            sx={{
+              mt: 0
+            }}
+            user={currentUser}
+            updateUser={setUser}
+          />
+          <Legend mt={4}>Member details</Legend>
+          <MemberProperties
+            memberId={currentUser.id}
+            spaceId={currentSpace.id}
+            updateMemberPropertyValues={updateSpaceValues}
+            showBlockchainData
+          />
+        </>
+      ) : null}
+    </MemberPropertiesPopup>
+  );
+}
+
+function MemberProfile({
+  isOnboarding,
+  title,
+  member,
+  onClose
+}: {
+  isOnboarding?: boolean;
+  title?: string;
+  member: Member;
+  onClose: VoidFunction;
+}) {
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
-  const { user: currentUser, setUser } = useUser();
+  const { user: currentUser } = useUser();
   const currentSpace = useCurrentSpace();
-  const { properties = [] } = useMemberProperties();
-  const propertiesRecord = properties.reduce((record, prop) => {
-    record[prop.type] = prop;
-    return record;
-  }, {} as Record<MemberPropertyType, MemberProperty>);
 
   const { memberPropertyValues = [] } = useMemberPropertyValues(member.id);
   const currentSpacePropertyValues = memberPropertyValues.find(
     (memberPropertyValue) => memberPropertyValue.spaceId === currentSpace?.id
   );
-  const { updateSpaceValues } = useMemberPropertyValues(member.id);
-
-  const username =
-    (member.properties?.find((memberProperty) => memberProperty.memberPropertyId === propertiesRecord.name?.id)
-      ?.value as string) ?? member.username;
 
   const { data: user, isLoading: isFetchingUser } = useSWR(`users/${member.path}`, () =>
     charmClient.getUserByPath(member.path ?? member.id)
@@ -54,41 +118,7 @@ function MemberProfile({ title, member, onClose }: { title?: string; member: Mem
 
   if (member.id === currentUser.id) {
     return (
-      <MemberPropertiesPopup
-        title={title && title.length !== 0 ? title : 'Edit your profile'}
-        onClose={() => onClose()}
-        isLoading={isFetchingUser}
-        memberId={currentUser.id}
-        spaceId={currentSpace.id}
-        updateMemberPropertyValues={updateSpaceValues}
-        postComponent={
-          user && (
-            <Stack gap={3}>
-              <Divider
-                sx={{
-                  mt: 3
-                }}
-              />
-              <NftsList memberId={user.id} />
-              <OrgsList memberId={user.id} />
-              <PoapsList memberId={user.id} />
-            </Stack>
-          )
-        }
-      >
-        {user && (
-          <UserDetails
-            sx={{
-              mt: 0
-            }}
-            // currentUser doesn't have profile thus is not considered as publicUser inside UserDetails
-            // giving the ability to update the profile properties
-            user={user.id === currentUser.id ? currentUser : user}
-            updateUser={setUser}
-          />
-        )}
-        <Legend mt={4}>Member details</Legend>
-      </MemberPropertiesPopup>
+      <CurrentMemberProfile isOnboarding={isOnboarding} currentUser={currentUser} onClose={onClose} title={title} />
     );
   }
 
@@ -105,7 +135,7 @@ function MemberProfile({ title, member, onClose }: { title?: string; member: Mem
             onClose={onClose}
           >
             <Stack display='flex' flexDirection='row' width='100%' alignItems='center' justifyContent='space-between'>
-              <Typography variant='h6'>{username}'s profile</Typography>
+              <Typography variant='h6'>{member.username}'s profile</Typography>
               <Button
                 onClick={onClose}
                 href={`/u/${user.path}`}
@@ -143,11 +173,13 @@ function MemberProfile({ title, member, onClose }: { title?: string; member: Mem
 export function MemberMiniProfile({
   memberId,
   onClose,
-  title
+  title,
+  isOnboarding
 }: {
   title?: string;
   memberId: string;
   onClose: VoidFunction;
+  isOnboarding?: boolean;
 }) {
   const { members } = useMembers();
   const member = members.find((_member) => _member.id === memberId);
@@ -156,5 +188,5 @@ export function MemberMiniProfile({
     return null;
   }
 
-  return <MemberProfile title={title} member={member} onClose={onClose} />;
+  return <MemberProfile isOnboarding={isOnboarding} title={title} member={member} onClose={onClose} />;
 }

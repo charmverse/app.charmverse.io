@@ -1,7 +1,6 @@
 // playwright-dev-page.ts
 import type { Locator, Page } from '@playwright/test';
 
-import { baseUrl } from 'config/constants';
 // Generic selectors that appear across the app independent of the features
 export class LoggedInPage {
   // A utility to close any modal that uses DialogTitle from components/common/Modal/Modal.tsx
@@ -11,10 +10,13 @@ export class LoggedInPage {
 
   readonly memberOnboardingSkipEmailLocator: Locator;
 
+  readonly memberEmailInputLocator: Locator;
+
   constructor(page: Page) {
     this.page = page;
     this.closeModalLocator = this.page.locator('data-test=close-modal');
     this.memberOnboardingSkipEmailLocator = this.page.locator('data-test=member-email-skip');
+    this.memberEmailInputLocator = this.page.locator('data-test=member-email-input >> input');
   }
 
   // Utility method for not having the onboarding modal
@@ -24,5 +26,9 @@ export class LoggedInPage {
     await memberEmailInput.click();
 
     await this.closeModalLocator.click();
+  }
+
+  async getEmailInputValue() {
+    return this.memberEmailInputLocator.inputValue();
   }
 }

@@ -18,6 +18,7 @@ interface Props {
   // Verify Wallet will trigger signature as soon as a wallet is detected
   enableAutosign?: boolean;
   loading?: boolean;
+  onError?: (err: any) => void;
 }
 
 export function WalletSign({
@@ -27,7 +28,8 @@ export function WalletSign({
   ButtonComponent = PrimaryButton,
   buttonOutlined,
   enableAutosign,
-  loading
+  loading,
+  onError
 }: Props) {
   const {
     account,
@@ -60,6 +62,7 @@ export function WalletSign({
         .catch((error) => {
           log.error('Error requesting wallet signature in login page', error);
           showMessage('Wallet signature cancelled', 'info');
+          onError?.(error);
         })
         .finally(() => {
           setIsVerifyingWallet(false);
