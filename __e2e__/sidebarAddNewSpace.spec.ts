@@ -12,7 +12,9 @@ test.describe.serial('Add a new space from sidebar and load it', async () => {
     // const userContext = await browser.newContext();
     // const page = await userContext.newPage();
 
-    const { space, user } = await generateUserAndSpace();
+    const { space, user } = await generateUserAndSpace({
+      email: undefined
+    });
 
     await login({ page, userId: user.id });
 

@@ -292,7 +292,7 @@ export async function generateUserAndSpace({
   spaceName = 'Example Space',
   publicBountyBoard,
   skipOnboarding = true,
-  email
+  email = `${v4()}@gmail.com`
 }: UserAndSpaceInput = {}) {
   const wallet = Wallet.createRandom();
   const address = wallet.address;

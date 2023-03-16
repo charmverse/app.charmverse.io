@@ -1,5 +1,4 @@
 import { expect, test } from '@playwright/test';
-import { v4 } from 'uuid';
 
 import { baseUrl } from 'config/constants';
 
@@ -9,9 +8,7 @@ import { login } from './utils/session';
 test.describe.serial('Add a new space from sidebar and load it', async () => {
   test('Fill the form and create a new space', async ({ page }) => {
     const { space, user } = await generateUserAndSpace({
-      skipOnboarding: false,
-      // Adding email to skip the email step in onboarding
-      email: `${v4()}@gmail.com`
+      skipOnboarding: false
     });
 
     await login({ page, userId: user.id });

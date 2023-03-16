@@ -7,7 +7,9 @@ import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.post(login);
+if (isTestEnv) {
+  handler.post(login);
+}
 
 export type TestLoginRequest = {
   userId: string;
