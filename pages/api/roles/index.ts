@@ -25,7 +25,7 @@ export type ListSpaceRolesResponse = Pick<Role, 'id' | 'name' | 'source'> & {
 async function listSpaceRoles(req: NextApiRequest, res: NextApiResponse<ListSpaceRolesResponse[]>) {
   const { spaceId } = req.query;
 
-  if (typeof spaceId !== 'string') {
+  if (!spaceId || typeof spaceId !== 'string') {
     throw new ApiError({
       message: 'Please provide a valid space ID',
       errorType: 'Invalid input'
