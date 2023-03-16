@@ -18,6 +18,10 @@ export class BountyBoardPage {
     await this.page.goto(`${baseUrl}/${domain}/bounties`);
   }
 
+  async goToBountyBoardWithCard(domain: string, cardId: string) {
+    await this.page.goto(`${baseUrl}/${domain}/bounties?bountyId=${cardId}`);
+  }
+
   getBountyCardLocator(bountyId: string) {
     return this.page.locator(`data-test=bounty-card-${bountyId}`);
   }
