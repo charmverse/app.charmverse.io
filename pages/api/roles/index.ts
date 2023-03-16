@@ -23,9 +23,7 @@ export type ListSpaceRolesResponse = Pick<Role, 'id' | 'name' | 'source'> & {
 };
 
 async function listSpaceRoles(req: NextApiRequest, res: NextApiResponse<ListSpaceRolesResponse[]>) {
-  const { spaceId, includeMemberLevels } = req.query;
-
-  const userId = req.session.user?.id;
+  const { spaceId } = req.query;
 
   if (!spaceId) {
     throw new ApiError({
@@ -51,26 +49,7 @@ async function listSpaceRoles(req: NextApiRequest, res: NextApiResponse<ListSpac
     }
   });
 
-  const response: ListSpaceRolesResponse[] = roles;
-
-  if (includeMemberLevels) {
-    response.unshift(
-      {
-        id: '__member__',
-        name: 'Member',
-        source: null,
-        spacePermissions: []
-      },
-      {
-        id: '__admin__',
-        name: 'Admin',
-        source: null,
-        spacePermissions: []
-      }
-    );
-  }
-
-  return res.status(200).json(response);
+  return res.status(200).json(roles);
 }
 
 async function createRole(req: NextApiRequest, res: NextApiResponse<Role>) {
