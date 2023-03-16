@@ -1,6 +1,6 @@
 import { prisma } from 'db';
 import { InvalidStateError } from 'lib/middleware';
-import { InvalidInputError } from 'lib/utilities/errors';
+import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
 import { isUUID } from 'lib/utilities/strings';
 
 export type GuestToRemove = {
@@ -8,7 +8,7 @@ export type GuestToRemove = {
   spaceId: string;
 };
 
-export async function removeGuest({ spaceId, userId }: GuestToRemove): Promise<true> {
+export async function removeMember({ spaceId, userId }: GuestToRemove): Promise<true> {
   if (!isUUID(spaceId) || !isUUID(userId)) {
     throw new InvalidInputError('spaceId and userId must be valid UUIDs');
   }
@@ -20,8 +20,21 @@ export async function removeGuest({ spaceId, userId }: GuestToRemove): Promise<t
     }
   });
 
-  if (!existingSpaceRole?.isGuest) {
-    throw new InvalidStateError('User is not a guest of this space');
+  if (!existingSpaceRole) {
+    throw new DataNotFoundError(`User ${userId} is not a member of space ${spaceId}`);
+  }
+
+  if (existingSpaceRole?.isAdmin) {
+    const admins = await prisma.spaceRole.count({
+      where: {
+        spaceId,
+        isAdmin: true
+      }
+    });
+
+    if (admins <= 1) {
+      throw new InvalidStateError('There must be at least one admin left in the space');
+    }
   }
 
   const pagePermissionsToDelete = await prisma.pagePermission.findMany({
