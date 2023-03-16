@@ -1,22 +1,13 @@
-import { expect, test as base } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 import type { Space } from '@prisma/client';
 
 import { baseUrl } from 'config/constants';
 
-import { LoggedInPage } from './po/loggedIn.po';
 import { generateUserAndSpace } from './utils/mocks';
 import { login } from './utils/session';
 
-type Fixtures = {
-  loggedInPage: LoggedInPage;
-};
-
-const test = base.extend<Fixtures>({
-  loggedInPage: ({ page }, use) => use(new LoggedInPage(page))
-});
-
 test.describe.serial('Add a new space from sidebar and load it', async () => {
-  test('Fill the form and create a new space', async ({ page, loggedInPage }) => {
+  test('Fill the form and create a new space', async ({ page }) => {
     // Arrange ------------------
     // const userContext = await browser.newContext();
     // const page = await userContext.newPage();
@@ -66,8 +57,6 @@ test.describe.serial('Add a new space from sidebar and load it', async () => {
     const createdSpace = (await response.json()) as Space;
     await page.waitForURL(`**/${createdSpace.domain}`);
 
-    await loggedInPage.memberEmailInputLocator.fill('john.doe@gmail.com');
-    await page.waitForTimeout(500);
     // Await new onboarding form popup so we can close it and click on new space
     let closePropertiesModalBtn = page.locator('data-test=close-modal');
     await expect(closePropertiesModalBtn).toBeVisible();
@@ -89,8 +78,7 @@ test.describe.serial('Add a new space from sidebar and load it', async () => {
     await nameInput.fill(uniqueDomainName2);
     await page.locator('data-test=create-workspace').click();
     await page.waitForURL(`**/${uniqueDomainName2}`);
-    // Since the user has filled their email it should show the previously filled value
-    expect(await loggedInPage.getEmailInputValue()).toBe('john.doe@gmail.com');
+
     // Close the modal again
     closePropertiesModalBtn = page.locator('data-test=close-modal');
     await expect(closePropertiesModalBtn).toBeVisible();

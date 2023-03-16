@@ -73,6 +73,7 @@ export function MemberEmailForm({ onClick, readOnly = false }: { onClick: VoidFu
           Skip
         </Button>
         <Button
+          data-test='member-email-next'
           onClick={() => {
             onSave(getValues('email'));
             onClick();
