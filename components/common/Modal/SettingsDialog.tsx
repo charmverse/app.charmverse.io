@@ -106,25 +106,22 @@ function TabPanel(props: TabPanelProps) {
 }
 
 function SpaceSettingsModalComponent() {
-  const { setCurrentSpaceId, currentSpaceId } = useCurrentSpaceId();
+  const { setCurrentSpaceId } = useCurrentSpaceId();
   const { memberSpaces } = useSpaces();
   const currentSpace = useCurrentSpace();
 
-  const canSeeSpaceSettings = useHasMemberLevel('member');
   const isMobile = useSmallScreen();
   const { activePath, onClose, onClick, open } = useSettingsDialog();
 
   // This is only ever used for setting the current space as the target space, on the initial popup of the dialog
   const spaceByPath = useSpaceFromPath();
   useEffect(() => {
-    if (!canSeeSpaceSettings && open) {
-      if (memberSpaces.length === 0) {
+    if (spaceByPath) {
+      if (memberSpaces.some((s) => s.id === spaceByPath.id)) {
+        setCurrentSpaceId(spaceByPath.id);
+      } else if (open) {
         onClick('account');
-      } else {
-        setCurrentSpaceId(memberSpaces[0].id);
       }
-    } else if (canSeeSpaceSettings && !currentSpaceId && spaceByPath) {
-      setCurrentSpaceId(spaceByPath.id);
     }
   }, [spaceByPath]);
   return (

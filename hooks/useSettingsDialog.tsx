@@ -62,7 +62,7 @@ export function SettingsDialogProvider({ children }: { children: ReactNode }) {
       onClick,
       onClose
     }),
-    [activePath, pathProps, settingsModalState.isOpen]
+    [activePath, pathProps, settingsModalState.isOpen, memberSpaces]
   );
 
   return <SettingsDialogContext.Provider value={value}>{children}</SettingsDialogContext.Provider>;
