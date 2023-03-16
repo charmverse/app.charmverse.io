@@ -83,10 +83,10 @@ test.describe.serial('Create and Edit Bounty', () => {
     await bountyPage.bountyCommentArea.click();
     await page.keyboard.type('My new comment', { delay: 100 });
     await bountyPage.bountyCommentButton.click();
-    await expect(page.getByText('My new comment')).toBeVisible();
 
     // Give time for coment to be created
     await page.waitForTimeout(1000);
+    await expect(page.getByText('My new comment')).toBeVisible();
 
     bounty = await prisma.bounty.findFirstOrThrow({
       where: {
