@@ -40,6 +40,7 @@ async function verifyMagicLink(req: NextApiRequest, res: NextApiResponse<LoggedI
       data: {
         username: verificationResult.email,
         identityType: 'VerifiedEmail',
+        email: verificationResult.email,
         verifiedEmails: {
           create: {
             email: verificationResult.email,
