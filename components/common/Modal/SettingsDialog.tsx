@@ -117,17 +117,16 @@ function SpaceSettingsModalComponent() {
   // This is only ever used for setting the current space as the target space, on the initial popup of the dialog
   const spaceByPath = useSpaceFromPath();
   useEffect(() => {
-    if (!canSeeSpaceSettings) {
+    if (!canSeeSpaceSettings && open) {
       if (memberSpaces.length === 0) {
         onClick('account');
       } else {
         setCurrentSpaceId(memberSpaces[0].id);
       }
-    } else if (!currentSpaceId && spaceByPath) {
+    } else if (canSeeSpaceSettings && !currentSpaceId && spaceByPath) {
       setCurrentSpaceId(spaceByPath.id);
     }
   }, [spaceByPath]);
-
   return (
     <Dialog
       fullWidth

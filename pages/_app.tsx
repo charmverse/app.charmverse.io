@@ -212,9 +212,9 @@ export default function App({ Component, emotionCache = clientSideEmotionCache, 
       <ColorModeContext.Provider value={colorModeContext}>
         <ThemeProvider theme={theme}>
           <SnackbarProvider>
-            <SettingsDialogProvider>
-              <ReactDndProvider>
-                <DataProviders>
+            <ReactDndProvider>
+              <DataProviders>
+                <SettingsDialogProvider>
                   <LocalizationProvider>
                     <OnboardingProvider>
                       <FocalBoardProvider>
@@ -246,9 +246,9 @@ export default function App({ Component, emotionCache = clientSideEmotionCache, 
                       </FocalBoardProvider>
                     </OnboardingProvider>
                   </LocalizationProvider>
-                </DataProviders>
-              </ReactDndProvider>
-            </SettingsDialogProvider>
+                </SettingsDialogProvider>
+              </DataProviders>
+            </ReactDndProvider>
           </SnackbarProvider>
         </ThemeProvider>
       </ColorModeContext.Provider>

@@ -2,6 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { prisma } from 'db';
+import { removeMember } from 'lib/members/removeMember';
 import { onError, onNoMatch, requireKeys, requireSpaceMembership } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { MinimumOneSpaceAdminRequiredError } from 'lib/spaces/errors';
@@ -75,29 +76,11 @@ async function deleteMember(req: NextApiRequest, res: NextApiResponse) {
   // Non admin user trying to delete another user
   if (requesterRole.isAdmin !== true && userId !== requestingUserId) {
     throw new AdministratorOnlyError();
-  } else if (requesterRole.isAdmin && userId === requestingUserId) {
-    const otherAdmins = await prisma.spaceRole.count({
-      where: {
-        isAdmin: true,
-        spaceId,
-        userId: {
-          not: requestingUserId
-        }
-      }
-    });
-
-    if (otherAdmins === 0) {
-      throw new MinimumOneSpaceAdminRequiredError();
-    }
   }
 
-  await prisma.spaceRole.delete({
-    where: {
-      spaceUser: {
-        spaceId,
-        userId
-      }
-    }
+  await removeMember({
+    spaceId,
+    userId
   });
   res.status(200).json({ ok: true });
 }
