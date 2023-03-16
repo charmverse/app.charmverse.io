@@ -25,7 +25,7 @@ export type ListSpaceRolesResponse = Pick<Role, 'id' | 'name' | 'source'> & {
 async function listSpaceRoles(req: NextApiRequest, res: NextApiResponse<ListSpaceRolesResponse[]>) {
   const { spaceId } = req.query;
 
-  if (!spaceId) {
+  if (typeof spaceId !== 'string') {
     throw new ApiError({
       message: 'Please provide a valid space ID',
       errorType: 'Invalid input'
@@ -35,7 +35,7 @@ async function listSpaceRoles(req: NextApiRequest, res: NextApiResponse<ListSpac
   const roles = await prisma.role.findMany({
     orderBy: { createdAt: 'asc' },
     where: {
-      spaceId: spaceId as string
+      spaceId
     },
     select: {
       id: true,
@@ -43,7 +43,7 @@ async function listSpaceRoles(req: NextApiRequest, res: NextApiResponse<ListSpac
       source: true,
       spacePermissions: {
         where: {
-          forSpaceId: spaceId as string
+          forSpaceId: spaceId
         }
       }
     }
