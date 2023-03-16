@@ -56,9 +56,6 @@ export async function exportWorkspacePages({
     where: {
       ...(rootPageIds ? { id: { in: rootPageIds } } : { spaceId: space.id, parentId: null }),
       deletedAt: null
-      /* type: {
-        notIn: excludedPageTypes
-      } */
     }
   });
 
