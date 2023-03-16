@@ -1,3 +1,5 @@
+import { Divider } from '@mui/material';
+
 import { useMembers } from 'hooks/useMembers';
 
 import DefaultPagePermissions from './RolePermissions/components/DefaultPagePermissions';
@@ -23,7 +25,7 @@ export function MemberRoleRow({ readOnly, spaceId }: { readOnly: boolean; spaceI
       permissions={
         <>
           <DefaultPagePermissions />
-          <br />
+          <Divider sx={{ my: 2 }} />
           <RolePermissions targetGroup='space' id={spaceId} />
         </>
       }
