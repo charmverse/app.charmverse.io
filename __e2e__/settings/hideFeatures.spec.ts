@@ -32,6 +32,7 @@ test('Space settings - toggle feature visibility', async ({ spaceSettings }) => 
 
   expect(!!classes?.match('Mui-checked')).toBe(true);
   await spaceSettings.proposalsVisibilityToggle.click();
+  await spaceSettings.page.waitForTimeout(500);
 
   classes = (await spaceSettings.proposalsVisibilityToggle.getAttribute('class')) ?? '';
 
