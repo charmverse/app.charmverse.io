@@ -105,6 +105,7 @@ export async function setRequestSpaceFromApiKey(req: NextApiRequest): Promise<Sp
 
     req.authorizedSpaceId = superApiKeyData.authorizedSpace.id;
     req.spaceIdRange = superApiKeyData.spaceIdRange;
+    req.superApiToken = superApiKeyData.superApiKey;
 
     return superApiKeyData.authorizedSpace;
   }
