@@ -35,6 +35,12 @@ export default function MemberSettings({ space }: { space: Space }) {
     switch (action) {
       case 'makeAdmin':
         await charmClient.updateMember({ spaceId, userId: member.id, isAdmin: true });
+        if (members) {
+          mutateMembers(
+            members.map((c) => (c.id === member.id ? { ...c, isAdmin: true } : c)),
+            { revalidate: false }
+          );
+        }
         break;
 
       case 'makeMember':
