@@ -1,4 +1,4 @@
-import type { Prisma, SpaceRole, User, VerifiedEmail } from '@prisma/client';
+import type { Prisma, Space, SpaceRole, User, VerifiedEmail } from '@prisma/client';
 
 import { prisma } from 'db';
 import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
@@ -21,6 +21,7 @@ type GuestAddedResult = {
   user: UserFromGuest;
   isNewUser: boolean;
   isNewSpaceRole: boolean;
+  spaceDomain: string;
 };
 
 export async function addGuest({ userIdOrEmail, spaceId }: GuestToAdd) {
@@ -33,6 +34,16 @@ export async function addGuest({ userIdOrEmail, spaceId }: GuestToAdd) {
 
   if (!userIdIsUiid && !userIdIsEmail) {
     throw new InvalidInputError(`Invalid userIdOrEmail: ${userIdOrEmail}`);
+  }
+
+  const spaceWithDomain = await prisma.space.findUnique({
+    where: {
+      id: spaceId
+    }
+  });
+
+  if (!spaceWithDomain) {
+    throw new DataNotFoundError(`Space not found: ${spaceId}`);
   }
 
   const query: Prisma.UserWhereInput = userIdIsUiid
@@ -105,7 +116,8 @@ export async function addGuest({ userIdOrEmail, spaceId }: GuestToAdd) {
       spaceRoles: [existingSpaceRole ?? (newSpaceRole as SpaceRole)]
     },
     isNewUser: !userExists,
-    isNewSpaceRole: !existingSpaceRole
+    isNewSpaceRole: !existingSpaceRole,
+    spaceDomain: spaceWithDomain.domain
   };
 
   return result;

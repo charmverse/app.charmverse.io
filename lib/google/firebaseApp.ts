@@ -1,4 +1,5 @@
 import firebase from 'firebase-admin';
+import { v4 } from 'uuid';
 
 import { googleWebClientConfig } from 'config/constants';
 
@@ -6,7 +7,7 @@ class FirebaseApp {
   app: firebase.app.App;
 
   constructor() {
-    this.app = firebase.initializeApp(googleWebClientConfig, 'google-verify');
+    this.app = firebase.initializeApp(googleWebClientConfig, v4());
   }
 }
 

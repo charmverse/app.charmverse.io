@@ -58,7 +58,7 @@ function Web3ConnectionManager({ children }: PropsWithChildren<any>) {
   useInactiveListener(!triedEager || !!activatingConnector);
 
   useEffect(() => {
-    if (triedEager && !active && (router.query.discordId || router.query.redirectUrl)) openWalletSelectorModal();
+    //    if (triedEager && !active && (router.query.discordId || router.query.redirectUrl)) openWalletSelectorModal();
   }, [triedEager, active, router.query]);
 
   return (

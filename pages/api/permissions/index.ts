@@ -3,6 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { prisma } from 'db';
+import { sendMagicLink } from 'lib/google/sendMagicLink';
 import { updateTrackPageProfile } from 'lib/metrics/mixpanel/updateTrackPageProfile';
 import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { PageNotFoundError } from 'lib/pages/server';
@@ -65,45 +66,43 @@ async function addPagePermission(req: NextApiRequest, res: NextApiResponse<IPage
   }
 
   const permissionData = { ...req.body } as IPagePermissionToCreate;
+  const page = await prisma.page.findUnique({
+    where: {
+      id: pageId
+    },
+    select: {
+      type: true,
+      spaceId: true,
+      path: true
+    }
+  });
+
+  if (!page) {
+    throw new DataNotFoundError('Page not found');
+  }
 
   // Usually a userId, but can be an email
   const userIdAsEmail = req.body.userId;
 
+  // Store these in top level scope, so we can send an email to the user after the page permission is created
+  let isNewSpaceMember = false;
+  let spaceDomain: string = '';
+
   // Handle case where we are sharing a page
   if (isValidEmail(userIdAsEmail)) {
-    const page = await prisma.page.findUnique({
-      where: {
-        id: pageId
-      },
-      select: {
-        spaceId: true
-      }
-    });
-
-    if (!page) {
-      throw new DataNotFoundError('Page not found');
-    }
-
     const addGuestResult = await addGuest({
       spaceId: page.spaceId,
       userIdOrEmail: userIdAsEmail
     });
+
+    isNewSpaceMember = addGuestResult.isNewSpaceRole;
+    spaceDomain = addGuestResult.spaceDomain;
 
     permissionData.userId = addGuestResult.user.id;
   }
 
   const createdPermission = await prisma.$transaction(
     async (tx) => {
-      const page = await tx.page.findUnique({
-        where: {
-          id: pageId
-        }
-      });
-
-      if (!page) {
-        throw new PageNotFoundError(pageId);
-      }
-
       if (page.type === 'proposal' && typeof req.body.public !== 'boolean') {
         throw new ActionNotPermittedError('You cannot manually update permissions for proposals.');
       }
@@ -141,6 +140,10 @@ async function addPagePermission(req: NextApiRequest, res: NextApiResponse<IPage
       timeout: 20000
     }
   );
+
+  if (isNewSpaceMember) {
+    await sendMagicLink({ email: userIdAsEmail, redirectUrl: `/${spaceDomain}/${page.path}` });
+  }
 
   return res.status(201).json(createdPermission);
 }

@@ -12,11 +12,21 @@ handler.use(requireUser).post(leaveWorkspace);
 async function leaveWorkspace(req: NextApiRequest, res: NextApiResponse<{ ok: boolean }>) {
   const spaceId = req.query.id as string;
   const userId = req.session.user.id;
+
   await prisma.spaceRole.delete({
     where: {
       spaceUser: {
         spaceId,
         userId
+      }
+    }
+  });
+
+  await prisma.pagePermission.deleteMany({
+    where: {
+      userId,
+      page: {
+        spaceId
       }
     }
   });
