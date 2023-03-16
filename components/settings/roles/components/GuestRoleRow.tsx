@@ -5,8 +5,12 @@ import { Accordion, AccordionDetails, AccordionSummary, Tooltip, Typography } fr
 import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
 import Divider from '@mui/material/Divider';
+import { usePopupState } from 'material-ui-popup-state/hooks';
+import { useState } from 'react';
 
+import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { useMembers } from 'hooks/useMembers';
+import type { Member } from 'lib/members/interfaces';
 
 import RoleMemberRow from './RoleMemberRow';
 
@@ -22,6 +26,17 @@ const ScrollableBox = styled.div<{ rows: number }>`
 
 export function GuestRoleRow({ isEditable }: RoleRowProps) {
   const { guests, removeGuest } = useMembers();
+
+  const confirmDeletePopup = usePopupState({ variant: 'popover', popupId: 'confirm-delete' });
+
+  const [memberToDelete, setMemberToDelete] = useState<Member | null>(null);
+
+  async function deleteGuest() {
+    if (memberToDelete) {
+      await removeGuest(memberToDelete.id);
+      setMemberToDelete(null);
+    }
+  }
 
   return (
     <Box mb={3}>
@@ -65,8 +80,9 @@ export function GuestRoleRow({ isEditable }: RoleRowProps) {
                 key={guest.id}
                 member={guest}
                 isEditable={isEditable}
-                onRemove={(userId) => {
-                  removeGuest(userId);
+                onRemove={() => {
+                  setMemberToDelete(guest);
+                  confirmDeletePopup.open();
                 }}
               />
             ))}
@@ -76,6 +92,18 @@ export function GuestRoleRow({ isEditable }: RoleRowProps) {
       <Box px={2} pb={1}>
         <Typography variant='caption'>To add a guest, share a page with them via email</Typography>
       </Box>
+
+      <ConfirmDeleteModal
+        title='Remove guest'
+        onClose={() => {
+          confirmDeletePopup.close();
+          setMemberToDelete(null);
+        }}
+        open={confirmDeletePopup.isOpen}
+        buttonText='Remove guest'
+        onConfirm={deleteGuest}
+        question={`Are you sure you want to remove ${memberToDelete?.username} from space?`}
+      />
     </Box>
   );
 }

@@ -54,7 +54,6 @@ export function SettingsDialogProvider({ children }: { children: ReactNode }) {
     settingsModalState.close();
     setActivePath('');
   };
-
   const value = useMemo<IContext>(
     () => ({
       open: settingsModalState.isOpen,
