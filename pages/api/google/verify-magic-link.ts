@@ -40,6 +40,7 @@ async function verifyMagicLink(req: NextApiRequest, res: NextApiResponse<LoggedI
       data: {
         username: verificationResult.email,
         identityType: 'VerifiedEmail',
+        email: verificationResult.email,
         verifiedEmails: {
           create: {
             email: verificationResult.email,
@@ -50,7 +51,18 @@ async function verifyMagicLink(req: NextApiRequest, res: NextApiResponse<LoggedI
       },
       include: sessionUserRelations
     });
+  } else if (user && !user.email) {
+    user = await prisma.user.update({
+      where: {
+        id: user.id
+      },
+      data: {
+        email: verificationResult.email
+      },
+      include: sessionUserRelations
+    });
   }
+
   req.session.user = { id: user.id };
 
   await req.session.save();

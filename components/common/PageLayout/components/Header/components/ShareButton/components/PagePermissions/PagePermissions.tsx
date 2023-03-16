@@ -154,7 +154,7 @@ export default function PagePermissions({ pageId, pagePermissions, refreshPermis
       {canEdit && (
         <Box mb={1} onClick={() => popupState.open()}>
           <StyledInput
-            placeholder='Add people and roles'
+            placeholder='Add people, roles or emails'
             fullWidth
             readOnly
             endAdornment={

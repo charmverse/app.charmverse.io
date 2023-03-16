@@ -22,6 +22,7 @@ import { SpaceSettingsDialog } from 'components/common/Modal/SettingsDialog';
 import { charmverseDiscordInvite } from 'config/constants';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
+import { useHasMemberLevel } from 'hooks/useHasMemberLevel';
 import useKeydownPress from 'hooks/useKeydownPress';
 import { useSmallScreen } from 'hooks/useMediaScreens';
 import { useSettingsDialog } from 'hooks/useSettingsDialog';
@@ -138,6 +139,8 @@ export default function Sidebar({ closeSidebar, favorites, navAction }: SidebarP
   const [showingTrash, setShowingTrash] = useState(false);
   const { disconnectWallet } = useWeb3AuthSig();
   const isMobile = useSmallScreen();
+
+  const showMemberFeatures = useHasMemberLevel('member');
 
   const { onClick } = useSettingsDialog();
   const handleModalClick = (path?: string) => {
@@ -258,53 +261,59 @@ export default function Sidebar({ closeSidebar, favorites, navAction }: SidebarP
                 isOpen={searchInWorkspaceModalState.isOpen}
                 close={searchInWorkspaceModalState.close}
               />
-              <SidebarBox
-                onClick={() => handleModalClick(`${space.name}-invites`)}
-                icon={<GroupAddOutlinedIcon color='secondary' fontSize='small' />}
-                label='Invites'
-              />
+              {showMemberFeatures && (
+                <SidebarBox
+                  onClick={() => handleModalClick(`${space.name}-invites`)}
+                  icon={<GroupAddOutlinedIcon color='secondary' fontSize='small' />}
+                  label='Invites'
+                />
+              )}
               <Divider sx={{ mx: 2, my: 1 }} />
 
-              {!space.hiddenFeatures.includes('member_directory') && (
-                <SidebarLink
-                  href={`/${space.domain}/members`}
-                  active={router.pathname.startsWith('/[domain]/members')}
-                  icon={<AccountCircleIcon fontSize='small' />}
-                  label='Member Directory'
-                  onClick={navAction}
-                />
-              )}
+              {showMemberFeatures && (
+                <>
+                  {!space.hiddenFeatures.includes('member_directory') && (
+                    <SidebarLink
+                      href={`/${space.domain}/members`}
+                      active={router.pathname.startsWith('/[domain]/members')}
+                      icon={<AccountCircleIcon fontSize='small' />}
+                      label='Member Directory'
+                      onClick={navAction}
+                    />
+                  )}
 
-              {!space.hiddenFeatures.includes('proposals') && (
-                <SidebarLink
-                  data-test='sidebar-link-proposals'
-                  href={`/${space.domain}/proposals`}
-                  active={router.pathname.startsWith('/[domain]/proposals')}
-                  icon={<TaskOutlinedIcon fontSize='small' />}
-                  label='Proposals'
-                  onClick={navAction}
-                />
-              )}
+                  {!space.hiddenFeatures.includes('proposals') && (
+                    <SidebarLink
+                      data-test='sidebar-link-proposals'
+                      href={`/${space.domain}/proposals`}
+                      active={router.pathname.startsWith('/[domain]/proposals')}
+                      icon={<TaskOutlinedIcon fontSize='small' />}
+                      label='Proposals'
+                      onClick={navAction}
+                    />
+                  )}
 
-              {!space.hiddenFeatures.includes('bounties') && (
-                <SidebarLink
-                  href={`/${space.domain}/bounties`}
-                  active={router.pathname.startsWith('/[domain]/bounties')}
-                  icon={<BountyIcon fontSize='small' />}
-                  label='Bounties'
-                  onClick={navAction}
-                />
-              )}
+                  {!space.hiddenFeatures.includes('bounties') && (
+                    <SidebarLink
+                      href={`/${space.domain}/bounties`}
+                      active={router.pathname.startsWith('/[domain]/bounties')}
+                      icon={<BountyIcon fontSize='small' />}
+                      label='Bounties'
+                      onClick={navAction}
+                    />
+                  )}
 
-              {!space.hiddenFeatures.includes('forum') && (
-                <SidebarLink
-                  href={`/${space.domain}/forum`}
-                  data-test='sidebar-link-forum'
-                  active={router.pathname.startsWith('/[domain]/forum')}
-                  icon={<MessageOutlinedIcon fontSize='small' />}
-                  label='Forum'
-                  onClick={navAction}
-                />
+                  {!space.hiddenFeatures.includes('forum') && (
+                    <SidebarLink
+                      href={`/${space.domain}/forum`}
+                      data-test='sidebar-link-forum'
+                      active={router.pathname.startsWith('/[domain]/forum')}
+                      icon={<MessageOutlinedIcon fontSize='small' />}
+                      label='Forum'
+                      onClick={navAction}
+                    />
+                  )}
+                </>
               )}
             </Box>
             {isMobile ? (

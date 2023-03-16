@@ -11,6 +11,7 @@ import type {
   UpdateMemberPropertyValuePayload,
   UpdateMemberPropertyVisibilityPayload
 } from 'lib/members/interfaces';
+import type { GuestToRemove } from 'lib/members/removeMember';
 
 export class MembersApi {
   getMembers(spaceId: string, search?: string) {
@@ -58,5 +59,9 @@ export class MembersApi {
 
   updateMemberPropertyVisibility(spaceId: string, payload: UpdateMemberPropertyVisibilityPayload) {
     return http.PUT<{ success: 'ok' }>(`/api/spaces/${spaceId}/members/properties/visibility`, payload);
+  }
+
+  removeGuest({ spaceId, userId }: GuestToRemove) {
+    return http.POST<{ success: true }>(`/api/spaces/${spaceId}/members/remove-guest`, { userId });
   }
 }
