@@ -7,8 +7,12 @@ import type { CreateSpaceProps } from 'lib/spaces/createWorkspace';
 
 import { useUser } from './useUser';
 
+/**
+ * @memberSpaces - Subset of spaces where user is not a guest (ie. they are normal member or admin)
+ */
 type IContext = {
   spaces: Space[];
+  memberSpaces: Space[];
   setSpace: (spaces: Space) => void;
   setSpaces: (spaces: Space[]) => void;
   isLoaded: boolean;
@@ -18,6 +22,7 @@ type IContext = {
 
 export const SpacesContext = createContext<Readonly<IContext>>({
   spaces: [],
+  memberSpaces: [],
   setSpace: () => undefined,
   setSpaces: () => undefined,
   isLoaded: false,
@@ -71,10 +76,15 @@ export function SpacesProvider({ children }: { children: ReactNode }) {
     [spaces, setSpaces]
   );
 
+  const memberSpaces = !user
+    ? []
+    : spaces.filter((s) => !!user?.spaceRoles.find((sr) => sr.spaceId === s.id && !sr.isGuest));
+
   const value = useMemo(
     () =>
       ({
         spaces,
+        memberSpaces,
         setSpace,
         setSpaces,
         isLoaded,
