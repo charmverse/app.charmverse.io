@@ -10,7 +10,6 @@ import charmClient from 'charmClient';
 import Link from 'components/common/Link';
 import { TimezoneDisplay } from 'components/members/components/TimezoneDisplay';
 import Avatar from 'components/settings/workspace/LargeAvatar';
-import { useUser } from 'hooks/useUser';
 import { hasNftAvatar } from 'lib/users/hasNftAvatar';
 import type { LoggedInUser } from 'models';
 import type { PublicUser } from 'pages/api/public/profile/[userId]';
@@ -18,7 +17,6 @@ import type { PublicUser } from 'pages/api/public/profile/[userId]';
 import type { Social } from '../../interfaces';
 
 import { SocialIcons } from './SocialIcons';
-import { isPublicUser } from './utils';
 
 interface UserDetailsMiniProps {
   readOnly?: boolean;
@@ -27,10 +25,8 @@ interface UserDetailsMiniProps {
 }
 
 function UserDetailsMini({ readOnly, user, sx = {} }: UserDetailsMiniProps) {
-  const { user: currentUser } = useUser();
-  const isPublic = isPublicUser(user, currentUser);
-  const { data: userDetails } = useSWRImmutable(`/userDetails/${user.id}/${isPublic}`, () => {
-    return isPublic ? user.profile : charmClient.getUserDetails();
+  const { data: userDetails } = useSWRImmutable(`/userDetails/${user.id}`, () => {
+    return charmClient.getUserDetails();
   });
 
   const [isPersonalLinkCopied, setIsPersonalLinkCopied] = useState(false);
@@ -59,13 +55,7 @@ function UserDetailsMini({ readOnly, user, sx = {} }: UserDetailsMiniProps) {
 
   return (
     <Stack direction={{ xs: 'column', md: 'row' }} mt={5} spacing={3} sx={sx}>
-      <Avatar
-        name={user?.username || ''}
-        image={user?.avatar}
-        variant='circular'
-        canSetNft
-        isNft={hasNftAvatar(user)}
-      />
+      <Avatar name={user.username} image={user.avatar} variant='circular' canSetNft isNft={hasNftAvatar(user)} />
       <Grid container direction='column' spacing={0.5}>
         <Grid item>
           <Typography variant='h1'>{user.username}</Typography>
@@ -100,14 +90,24 @@ function UserDetailsMini({ readOnly, user, sx = {} }: UserDetailsMiniProps) {
             />
           </Grid>
         )}
-        <Grid item container alignItems='center' width='fit-content'>
-          <Typography variant='body1' sx={{ wordBreak: 'break-word' }}>
-            {userDetails?.description || (readOnly ? '' : 'Tell the world a bit more about yourself ...')}
-          </Typography>
-        </Grid>
-        <Grid item container alignItems='center' sx={{ width: 'fit-content', flexWrap: 'initial' }}>
-          <TimezoneDisplay timezone={userDetails?.timezone} defaultValue={readOnly ? 'N/A' : 'Update your timezone'} />
-        </Grid>
+        {userDetails && (
+          <>
+            <Grid item container alignItems='center' width='fit-content'>
+              <Typography variant='body1' sx={{ wordBreak: 'break-word' }}>
+                {userDetails.description || (readOnly ? '' : 'Tell the world a bit more about yourself ...')}
+              </Typography>
+            </Grid>
+            {!readOnly ||
+              (userDetails.timezone && (
+                <Grid item container alignItems='center' sx={{ width: 'fit-content', flexWrap: 'initial' }}>
+                  <TimezoneDisplay
+                    timezone={userDetails.timezone}
+                    defaultValue={readOnly ? 'N/A' : 'Update your timezone'}
+                  />
+                </Grid>
+              ))}
+          </>
+        )}
       </Grid>
     </Stack>
   );

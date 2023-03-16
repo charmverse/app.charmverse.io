@@ -17,10 +17,15 @@ export async function getAggregatedData(userId: string, apiToken?: string): Prom
     apiToken
   });
 
-  const proposals = profiles.reduce<DeepDaoProfile['proposals']>(
-    (_proposals, profile) => [..._proposals, ...profile.data.proposals],
-    []
-  );
+  const proposals = profiles
+    .map((profile) =>
+      profile.data.proposals.map((proposal) => ({
+        ...proposal,
+        // sometimes the title includes the whole body of the proposal with "&&" as a separator
+        title: proposal.title?.split('&&')[0]
+      }))
+    )
+    .flat();
 
   const [bountiesCreated, bountyApplications, userProposalsCount] = await Promise.all([
     prisma.bounty.findMany({
