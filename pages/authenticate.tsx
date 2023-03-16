@@ -72,8 +72,8 @@ export default function Authenticate() {
       {isAuthenticating && <LoadingComponent label='Logging you in' />}
 
       <CollectEmailDialog
-        title='Please confirm your email'
-        description='This should be the same email address as the one where you received the link to this page.'
+        title='Login with your email'
+        description='Please enter the email address on which you received the login link.'
         isOpen={emailPopup.isOpen}
         // We don't want to allow the user to close the email popup
         onClose={() => null}

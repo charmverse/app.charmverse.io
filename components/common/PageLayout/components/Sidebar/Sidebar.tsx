@@ -261,11 +261,13 @@ export default function Sidebar({ closeSidebar, favorites, navAction }: SidebarP
                 isOpen={searchInWorkspaceModalState.isOpen}
                 close={searchInWorkspaceModalState.close}
               />
-              <SidebarBox
-                onClick={() => handleModalClick(`${space.name}-invites`)}
-                icon={<GroupAddOutlinedIcon color='secondary' fontSize='small' />}
-                label='Invites'
-              />
+              {showMemberFeatures && (
+                <SidebarBox
+                  onClick={() => handleModalClick(`${space.name}-invites`)}
+                  icon={<GroupAddOutlinedIcon color='secondary' fontSize='small' />}
+                  label='Invites'
+                />
+              )}
               <Divider sx={{ mx: 2, my: 1 }} />
 
               {showMemberFeatures && (

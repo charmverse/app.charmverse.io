@@ -5,15 +5,15 @@ import { InvalidStateError } from 'lib/middleware';
 import { InvalidInputError } from 'lib/utilities/errors';
 import { generateSpaceUser, generateUserAndSpace } from 'testing/setupDatabase';
 
-import { removeGuest } from '../removeGuest';
+import { removeMember } from '../removeMember';
 
-describe('removeGuest', () => {
+describe('removeMember', () => {
   it('should remove a guest by userId', async () => {
     const { user, space } = await generateUserAndSpace({
       isGuest: true
     });
 
-    await removeGuest({
+    await removeMember({
       spaceId: space.id,
       userId: user.id
     });
@@ -24,6 +24,47 @@ describe('removeGuest', () => {
       }
     });
     expect(spaceRoles).toHaveLength(0);
+  });
+
+  it('should remove a member by userId', async () => {
+    const { user, space } = await generateUserAndSpace({
+      isAdmin: false
+    });
+
+    await removeMember({
+      spaceId: space.id,
+      userId: user.id
+    });
+
+    const spaceRoles = await prisma.spaceRole.findMany({
+      where: {
+        spaceId: space.id
+      }
+    });
+    expect(spaceRoles).toHaveLength(0);
+  });
+
+  it('should remove an admin by userId', async () => {
+    const { user, space } = await generateUserAndSpace({
+      isAdmin: true
+    });
+
+    const secondAdmin = await generateSpaceUser({
+      spaceId: space.id,
+      isAdmin: true
+    });
+
+    await removeMember({
+      spaceId: space.id,
+      userId: user.id
+    });
+
+    const spaceRoles = await prisma.spaceRole.findMany({
+      where: {
+        spaceId: space.id
+      }
+    });
+    expect(spaceRoles).toHaveLength(1);
   });
 
   // This is a very important test - It prevents us accidentally deleting all page permissions for a space when removing a guest
@@ -81,7 +122,7 @@ describe('removeGuest', () => {
     // 2 permissions for user + 1 for space
     expect(pagePermissions).toHaveLength(3);
 
-    await removeGuest({
+    await removeMember({
       spaceId: space.id,
       userId: guest.id
     });
@@ -109,13 +150,13 @@ describe('removeGuest', () => {
     expect(pagePermissionsAfterRemove[0].spaceId).toBe(space.id);
   });
 
-  it('should throw an error if the user is not a guest', async () => {
+  it('should throw an error if the user is the last admin in the space', async () => {
     const { user, space } = await generateUserAndSpace({
-      isGuest: false
+      isAdmin: true
     });
 
     await expect(
-      removeGuest({
+      removeMember({
         userId: user.id,
         spaceId: space.id
       })
@@ -128,14 +169,14 @@ describe('removeGuest', () => {
     });
 
     await expect(
-      removeGuest({
+      removeMember({
         userId: 'test-id',
         spaceId: space.id
       })
     ).rejects.toBeInstanceOf(InvalidInputError);
 
     await expect(
-      removeGuest({
+      removeMember({
         userId: user.id,
         spaceId: 'test-id'
       })

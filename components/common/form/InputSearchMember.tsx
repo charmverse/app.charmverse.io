@@ -1,3 +1,4 @@
+import EmailIcon from '@mui/icons-material/Email';
 import type { AutocompleteChangeReason, AutocompleteProps, PopperProps } from '@mui/material';
 import { Autocomplete, Popper, TextField } from '@mui/material';
 import type { User } from '@prisma/client';
@@ -81,7 +82,13 @@ export function InputSearchMemberBase({
       }}
       // user can also be a string if freeSolo=true
       getOptionLabel={(user) => (user as Member)?.username}
-      renderOption={(_props, user) => <UserDisplay {...(_props as any)} user={user} />}
+      renderOption={(_props, user) => (
+        <UserDisplay
+          {...(_props as any)}
+          user={user}
+          avatarIcon={user.id === 'email' ? <EmailIcon fontSize='large' /> : undefined}
+        />
+      )}
       noOptionsText='No options available'
       PopperComponent={PopperComponent}
       renderInput={(params) => (

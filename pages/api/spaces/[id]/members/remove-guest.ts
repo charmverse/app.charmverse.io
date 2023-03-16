@@ -1,8 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
+import { removeMember } from 'lib/members/removeMember';
 import { onError, onNoMatch, requireSpaceMembership } from 'lib/middleware';
-import { removeGuest } from 'lib/roles/removeGuest';
 import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -14,13 +14,13 @@ handler
       spaceIdKey: 'id'
     })
   )
-  .post(removeGuestController);
+  .post(removeMemberController);
 
-async function removeGuestController(req: NextApiRequest, res: NextApiResponse) {
+async function removeMemberController(req: NextApiRequest, res: NextApiResponse) {
   const spaceId = req.query.id as string;
   const userId = req.body.userId;
 
-  await removeGuest({
+  await removeMember({
     spaceId,
     userId
   });

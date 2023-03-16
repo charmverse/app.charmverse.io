@@ -28,12 +28,14 @@ import RoleSettings from 'components/settings/roles/RoleSettings';
 import SpaceSettings from 'components/settings/workspace/Space';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { CurrentSpaceProvider, useCurrentSpaceId } from 'hooks/useCurrentSpaceId';
+import { useHasMemberLevel } from 'hooks/useHasMemberLevel';
 import { useSmallScreen } from 'hooks/useMediaScreens';
 import { MembersProvider } from 'hooks/useMembers';
 import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useSpaceFromPath } from 'hooks/useSpaceFromPath';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
+import members from 'pages/api/spaces/[id]/members';
 
 import { SectionName } from '../PageLayout/components/Sidebar/Sidebar';
 import { SidebarLink } from '../PageLayout/components/Sidebar/SidebarButton';
@@ -105,21 +107,26 @@ function TabPanel(props: TabPanelProps) {
 
 function SpaceSettingsModalComponent() {
   const { setCurrentSpaceId, currentSpaceId } = useCurrentSpaceId();
+  const { memberSpaces } = useSpaces();
+  const currentSpace = useCurrentSpace();
+
+  const canSeeSpaceSettings = useHasMemberLevel('member');
+  const isMobile = useSmallScreen();
+  const { activePath, onClose, onClick, open } = useSettingsDialog();
 
   // This is only ever used for setting the current space as the target space, on the initial popup of the dialog
   const spaceByPath = useSpaceFromPath();
   useEffect(() => {
-    if (!currentSpaceId && spaceByPath) {
+    if (!canSeeSpaceSettings) {
+      if (memberSpaces.length === 0) {
+        onClick('account');
+      } else {
+        setCurrentSpaceId(memberSpaces[0].id);
+      }
+    } else if (!currentSpaceId && spaceByPath) {
       setCurrentSpaceId(spaceByPath.id);
     }
   }, [spaceByPath]);
-
-  const { user } = useUser();
-  const { spaces } = useSpaces();
-  const currentSpace = useCurrentSpace();
-
-  const isMobile = useSmallScreen();
-  const { activePath, onClose, onClick, open } = useSettingsDialog();
 
   return (
     <Dialog
@@ -153,9 +160,11 @@ function SpaceSettingsModalComponent() {
               active={activePath === tab.path}
             />
           ))}
-          <Box mt={2} py={0.5}>
-            <SectionName>Space settings</SectionName>
-          </Box>
+          {memberSpaces.length > 0 && (
+            <Box mt={2} py={0.5}>
+              <SectionName>Space settings</SectionName>
+            </Box>
+          )}
           <TreeView
             aria-label='Profile settings tree view'
             defaultCollapseIcon={<ArrowDropDownIcon fontSize='large' />}
@@ -169,7 +178,7 @@ function SpaceSettingsModalComponent() {
               '& .MuiTreeItem-root[aria-expanded] > .MuiTreeItem-content': { py: 1 }
             }}
           >
-            {spaces.map((space) => (
+            {memberSpaces.map((space) => (
               <StyledTreeItem
                 data-test={`space-settings-tab-${space.id}`}
                 key={space.id}
@@ -220,7 +229,7 @@ function SpaceSettingsModalComponent() {
               </IconButton>
             </Box>
           )}
-          {spaces.map((space) =>
+          {memberSpaces.map((space) =>
             SETTINGS_TABS.map((tab) => (
               <TabPanel key={`${space.name}-${tab.path}`} value={activePath} index={`${space.name}-${tab.path}`}>
                 <TabView space={space} tab={tab} />

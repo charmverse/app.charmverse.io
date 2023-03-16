@@ -11,7 +11,7 @@ import type {
   UpdateMemberPropertyValuePayload,
   UpdateMemberPropertyVisibilityPayload
 } from 'lib/members/interfaces';
-import type { GuestToRemove } from 'lib/roles/removeGuest';
+import type { GuestToRemove } from 'lib/members/removeMember';
 
 export class MembersApi {
   getMembers(spaceId: string, search?: string) {
