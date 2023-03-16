@@ -1,8 +1,10 @@
 import { useMembers } from 'hooks/useMembers';
 
+import DefaultPagePermissions from './RolePermissions/components/DefaultPagePermissions';
+import { RolePermissions } from './RolePermissions/RolePermissions';
 import { RoleRowBase } from './RoleRowBase';
 
-export function MemberRoleRow({ readOnly }: { readOnly: boolean }) {
+export function MemberRoleRow({ readOnly, spaceId }: { readOnly: boolean; spaceId: string }) {
   const { members, removeGuest } = useMembers();
 
   return (
@@ -18,6 +20,13 @@ export function MemberRoleRow({ readOnly }: { readOnly: boolean }) {
       readOnlyMembers={readOnly}
       members={members.filter((member) => !member.isAdmin && !member.isGuest)}
       removeMember={removeGuest}
+      permissions={
+        <>
+          <DefaultPagePermissions />
+          <br />
+          <RolePermissions targetGroup='space' id={spaceId} />
+        </>
+      }
     />
   );
 }

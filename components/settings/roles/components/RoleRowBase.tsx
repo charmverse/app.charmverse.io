@@ -28,7 +28,7 @@ type RoleRowProps = {
   members: Member[];
   removeMember: (userId: string) => void;
   addMemberButton?: ReactNode;
-  permissions?: ReactNode; // [string, boolean][];
+  permissions?: ReactNode;
   roleActions?: ReactNode;
 };
 
@@ -82,20 +82,6 @@ export function RoleRowBase({
                 </Box>
               )}
               {permissions}
-              {/* {permissions?.map(([operation, isAllowed]) => (
-                <div
-                  key={operation}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    flexWrap: 'wrap',
-                    flexDirection: 'row'
-                  }}
-                >
-                  <DoneIcon sx={{ fontSize: '18px', mr: 0.5 }} />
-                  <Typography variant='caption'>{operation}</Typography>
-                </div>
-              ))} */}
             </TabPanel>
             <TabPanel value={value} index={1}>
               <ScrollableBox rows={members.length}>

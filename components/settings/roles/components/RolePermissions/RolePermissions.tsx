@@ -46,7 +46,7 @@ interface Props {
   callback?: () => void;
 }
 
-export default function SpacePermissions({ targetGroup, id, callback = () => null }: Props) {
+export function RolePermissions({ targetGroup, id, callback = () => null }: Props) {
   const [assignedPermissions, setAssignedPermissions] = useState<SpacePermissionFlags | null>(null);
 
   const space = useCurrentSpace();
@@ -151,22 +151,6 @@ export default function SpacePermissions({ targetGroup, id, callback = () => nul
     <div data-test={`space-permissions-form-${targetGroup}`}>
       <form onSubmit={handleSubmit((formValue) => submitted(formValue))} style={{ margin: 'auto' }}>
         <Grid container direction='column' gap={2}>
-          <Grid item xs>
-            <Typography variant='body2' fontWeight='bold'>
-              Space permissions
-            </Typography>
-            <Typography variant='caption'>
-              {targetGroup === 'space' &&
-                'Enabling permissions here will allow every space member to perform the relevant action, whatever their roles and permissions.'}
-
-              {targetGroup === 'role' &&
-                'Space members with this role can perform all enabled actions, even if these actions are disabled at the space level.'}
-
-              {targetGroup === 'user' &&
-                'This user can perform all enabled actions, even if these actions are disabled at the space level.'}
-            </Typography>
-          </Grid>
-
           {assignableOperations.map((operation) => {
             const userCanPerformAction = assignedPermissions[operation];
             const actionLabel = spaceOperationLabels[operation];

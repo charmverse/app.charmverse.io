@@ -1,19 +1,7 @@
-import styled from '@emotion/styled';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
-import DoneIcon from '@mui/icons-material/Done';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import LockOpenIcon from '@mui/icons-material/LockOpen';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import { Accordion, AccordionSummary, AccordionDetails, Tooltip, Typography } from '@mui/material';
-import Box from '@mui/material/Box';
-import Chip from '@mui/material/Chip';
-import Divider from '@mui/material/Divider';
-import Grid from '@mui/material/Grid';
-import IconButton from '@mui/material/IconButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import Menu from '@mui/material/Menu';
-import MenuItem from '@mui/material/MenuItem';
+import { Box, Grid, IconButton, ListItemIcon, Menu, MenuItem, Typography } from '@mui/material';
 import { bindMenu, bindTrigger, usePopupState, bindPopover } from 'material-ui-popup-state/hooks';
 import { useState } from 'react';
 
@@ -27,8 +15,8 @@ import type { ListSpaceRolesResponse } from 'pages/api/roles';
 import GuildXYZIcon from 'public/images/guild_logo.svg';
 
 import RoleForm from './RoleForm';
+import { RolePermissions } from './RolePermissions/RolePermissions';
 import { RoleRowBase } from './RoleRowBase';
-import SpacePermissions from './SpacePermissions';
 
 type RoleRowProps = {
   readOnly: boolean;
@@ -55,7 +43,7 @@ const syncedRoleProps = {
   }
 };
 
-export default function RoleRow({ readOnly, role, assignRoles, unassignRole, deleteRole, refreshRoles }: RoleRowProps) {
+export function RoleRow({ readOnly, role, assignRoles, unassignRole, deleteRole, refreshRoles }: RoleRowProps) {
   const menuState = usePopupState({ variant: 'popover', popupId: `role-${role.id}` });
   const userPopupState = usePopupState({ variant: 'popover', popupId: `role-${role.id}-users` });
   const rolePermissionsPopupState = usePopupState({ variant: 'popover', popupId: `role-permissions-${role.id}` });
@@ -63,8 +51,6 @@ export default function RoleRow({ readOnly, role, assignRoles, unassignRole, del
   const [newMembers, setNewMembers] = useState<string[]>([]);
   const { members } = useMembers();
   const popupState = usePopupState({ variant: 'popover', popupId: 'add-a-role' });
-
-  const currentSpace = useCurrentSpace();
 
   function showMembersPopup() {
     setNewMembers([]);
@@ -104,7 +90,7 @@ export default function RoleRow({ readOnly, role, assignRoles, unassignRole, del
       title={role.name}
       {...((role.source && syncedRoleProps[role.source]) || {})}
       permissions={
-        <SpacePermissions
+        <RolePermissions
           targetGroup='role'
           id={role.id}
           callback={() => {

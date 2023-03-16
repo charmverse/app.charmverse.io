@@ -1,7 +1,7 @@
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import { CircularProgress, Menu, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
-import type { Space, SpacePermissionConfigurationMode } from '@prisma/client';
+import type { Space } from '@prisma/client';
 import { bindPopover, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import { useRef, useState } from 'react';
 
@@ -10,7 +10,6 @@ import Modal from 'components/common/Modal';
 import Legend from 'components/settings/Legend';
 import ImportGuildRolesMenuItem from 'components/settings/roles/components/ImportGuildRolesMenuItem';
 import { useIsAdmin } from 'hooks/useIsAdmin';
-import { useMembers } from 'hooks/useMembers';
 import useRoles from 'hooks/useRoles';
 
 import { AdminRoleRow } from './components/AdminRoleRow';
@@ -18,13 +17,12 @@ import { GuestRoleRow } from './components/GuestRoleRow';
 import ImportDiscordRolesMenuItem from './components/ImportDiscordRolesMenuItem';
 import { MemberRoleRow } from './components/MemberRoleRow';
 import RoleForm from './components/RoleForm';
-import RoleRow from './components/RoleRow';
+import { RoleRow } from './components/RoleRow';
 import { useImportDiscordRoles } from './hooks/useImportDiscordRoles';
 
 export default function RoleSettings({ space }: { space: Space }) {
   const { assignRoles, deleteRole, refreshRoles, unassignRole, roles } = useRoles();
   const isAdmin = useIsAdmin();
-  const { members } = useMembers();
   const popupState = usePopupState({ variant: 'popover', popupId: 'add-a-role' });
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
   const open = Boolean(anchorEl);
@@ -36,31 +34,10 @@ export default function RoleSettings({ space }: { space: Space }) {
 
   const { isValidating } = useImportDiscordRoles();
 
-  const [selectedPermissionMode, setSelectedPermissionMode] = useState<SpacePermissionConfigurationMode>(
-    space?.permissionConfigurationMode ?? 'custom'
-  );
-
   return (
     <>
       <Legend sx={{ display: 'flex', justifyContent: 'space-between' }}>Roles & Permissions</Legend>
 
-      {/* <PermissionConfigurationMode permissionModeSelected={setSelectedPermissionMode} />
-
-      {space?.permissionConfigurationMode === 'custom' && selectedPermissionMode === 'custom' && (
-        <>
-          <br />
-          <SpacePermissions targetGroup='space' id={space?.id as string} />
-
-          <br />
-
-          <ShareBountyBoard padding={0} />
-
-          <br />
-          <DefaultPagePermissions />
-        </>
-      )} */}
-
-      {/* Roles */}
       <Legend noBorder display='flex' justifyContent='space-between' mt={4} mb={0}>
         Roles
         {isAdmin && (
@@ -83,7 +60,7 @@ export default function RoleSettings({ space }: { space: Space }) {
         )}
       </Legend>
       <AdminRoleRow readOnly={!isAdmin} />
-      <MemberRoleRow readOnly={!isAdmin} />
+      <MemberRoleRow readOnly={!isAdmin} spaceId={space.id} />
 
       {roles?.map((role) => (
         <RoleRow

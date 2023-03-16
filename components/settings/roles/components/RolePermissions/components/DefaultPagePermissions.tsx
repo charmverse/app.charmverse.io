@@ -86,7 +86,7 @@ export default function DefaultSpacePagePermissions() {
     <Grid container direction='column' gap={2}>
       <Grid item xs>
         <Typography variant='body2' fontWeight='bold'>
-          Default page permissions
+          New page permissions
         </Typography>
         <Typography variant='caption'>
           These apply only to new top-level pages. You can still control access to each page individually.
@@ -169,7 +169,7 @@ export default function DefaultSpacePagePermissions() {
         </Grid>
       </Grid>
 
-      {isAdmin && (
+      {/* {isAdmin && (
         <Grid item xs>
           <Button
             onClick={() => updateSpaceDefaults()}
@@ -182,7 +182,7 @@ export default function DefaultSpacePagePermissions() {
             Save
           </Button>
         </Grid>
-      )}
+      )} */}
     </Grid>
   );
 }
