@@ -12,7 +12,7 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 handler
   .use(requireApiKey)
   .use(requireKeys<CardPage>(['title'], 'body'))
-  .post(createPage);
+  .post(createCard);
 
 /**
  * @swagger
@@ -33,9 +33,8 @@ handler
  *              schema:
  *                $ref: '#/components/schemas/CardPage'
  */
-export async function createPage(req: NextApiRequest, res: NextApiResponse) {
+export async function createCard(req: NextApiRequest, res: NextApiResponse) {
   const { id } = req.query;
-
   const spaceId = req.authorizedSpaceId;
 
   const board = await prisma.block.findFirst({
