@@ -28,7 +28,7 @@ import type { ListSpaceRolesResponse } from 'pages/api/roles';
 import GuildXYZIcon from 'public/images/guild_logo.svg';
 
 import RoleForm from './RoleForm';
-import RoleMemberRow from './RoleMemberRow';
+import { RoleMemberRow } from './RoleMemberRow';
 import SpacePermissions from './SpacePermissions';
 
 interface RoleRowProps {

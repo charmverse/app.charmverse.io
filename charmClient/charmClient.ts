@@ -316,7 +316,7 @@ class CharmClient {
   async getWorkspaceUsers(spaceId: string): Promise<IUser[]> {
     const members = await this.members.getMembers(spaceId);
 
-    return members.map((member: Member) => ({
+    return members.map((member) => ({
       id: member.id,
       username: member.username,
       email: '',

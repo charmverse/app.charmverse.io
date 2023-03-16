@@ -4,7 +4,7 @@ import nc from 'next-connect';
 
 import { prisma } from 'db';
 import { getSpaceMembers } from 'lib/members/getSpaceMembers';
-import type { Member, PublicMember } from 'lib/members/interfaces';
+import type { Member } from 'lib/members/interfaces';
 import { onError, onNoMatch } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
@@ -14,7 +14,7 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.get(getMembers);
 
-async function getMembers(req: NextApiRequest, res: NextApiResponse<(Member | PublicMember)[]>) {
+async function getMembers(req: NextApiRequest, res: NextApiResponse<Member[]>) {
   const spaceId = req.query.id as string;
   const userId = req.session.user?.id as string | undefined;
 
@@ -36,8 +36,13 @@ async function getMembers(req: NextApiRequest, res: NextApiResponse<(Member | Pu
       }
     });
 
-    const mappedUsers: PublicMember[] = spaceRoles.map((sr) => ({
+    const mappedUsers: Member[] = spaceRoles.map((sr) => ({
       id: sr.user.id,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      joinDate: new Date().toISOString(),
+      properties: [],
+      roles: [],
       username: deterministicRandomName(sr.user.id)
     }));
 
