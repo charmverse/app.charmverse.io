@@ -3,24 +3,22 @@ import { CircularProgress, Menu, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
 import type { Space, SpacePermissionConfigurationMode } from '@prisma/client';
 import { bindPopover, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
-import { useMemo, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 
 import Button from 'components/common/Button';
 import Modal from 'components/common/Modal';
-import ShareBountyBoard from 'components/common/PageLayout/components/Header/components/BountyShareButton/ShareBountyBoard';
 import Legend from 'components/settings/Legend';
 import ImportGuildRolesMenuItem from 'components/settings/roles/components/ImportGuildRolesMenuItem';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useMembers } from 'hooks/useMembers';
 import useRoles from 'hooks/useRoles';
 
+import { AdminRoleRow } from './components/AdminRoleRow';
 import { GuestRoleRow } from './components/GuestRoleRow';
 import ImportDiscordRolesMenuItem from './components/ImportDiscordRolesMenuItem';
+import { MemberRoleRow } from './components/MemberRoleRow';
 import RoleForm from './components/RoleForm';
 import RoleRow from './components/RoleRow';
-import SpacePermissions from './components/SpacePermissions';
-import DefaultPagePermissions from './components/SpacePermissions/components/DefaultPagePermissions';
-import PermissionConfigurationMode from './components/SpacePermissions/components/PermissionConfigurationMode';
 import { useImportDiscordRoles } from './hooks/useImportDiscordRoles';
 
 export default function RoleSettings({ space }: { space: Space }) {
@@ -44,9 +42,9 @@ export default function RoleSettings({ space }: { space: Space }) {
 
   return (
     <>
-      <Legend sx={{ display: 'flex', justifyContent: 'space-between' }}>Permissions</Legend>
+      <Legend sx={{ display: 'flex', justifyContent: 'space-between' }}>Roles & Permissions</Legend>
 
-      <PermissionConfigurationMode permissionModeSelected={setSelectedPermissionMode} />
+      {/* <PermissionConfigurationMode permissionModeSelected={setSelectedPermissionMode} />
 
       {space?.permissionConfigurationMode === 'custom' && selectedPermissionMode === 'custom' && (
         <>
@@ -58,13 +56,12 @@ export default function RoleSettings({ space }: { space: Space }) {
           <ShareBountyBoard padding={0} />
 
           <br />
-          {/* Default page permissions */}
           <DefaultPagePermissions />
         </>
-      )}
+      )} */}
 
       {/* Roles */}
-      <Legend display='flex' justifyContent='space-between' mt={4}>
+      <Legend noBorder display='flex' justifyContent='space-between' mt={4} mb={0}>
         Roles
         {isAdmin && (
           <Box component='span' display='flex' gap={1}>
@@ -85,30 +82,31 @@ export default function RoleSettings({ space }: { space: Space }) {
           </Box>
         )}
       </Legend>
-      {isValidating ? (
+      <AdminRoleRow readOnly={!isAdmin} />
+      <MemberRoleRow readOnly={!isAdmin} />
+
+      {roles?.map((role) => (
+        <RoleRow
+          readOnly={!isAdmin}
+          assignRoles={assignRoles}
+          unassignRole={unassignRole}
+          deleteRole={deleteRole}
+          refreshRoles={refreshRoles}
+          role={role}
+          key={role.id}
+        />
+      ))}
+
+      <GuestRoleRow readOnly={!isAdmin} />
+
+      {isValidating && (
         <Box display='flex' alignItems='center' gap={1}>
           <CircularProgress size={24} />
           <Typography variant='subtitle1' color='secondary'>
             Importing roles from discord server
           </Typography>
         </Box>
-      ) : (
-        roles?.map((role) => (
-          <RoleRow
-            isEditable={isAdmin}
-            assignRoles={assignRoles}
-            unassignRole={unassignRole}
-            deleteRole={deleteRole}
-            refreshRoles={refreshRoles}
-            role={role}
-            key={role.id}
-          />
-        ))
       )}
-
-      <GuestRoleRow isEditable={isAdmin} />
-
-      {roles?.length === 0 && <Typography color='secondary'>No roles yet</Typography>}
 
       <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
         <ImportDiscordRolesMenuItem />

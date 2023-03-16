@@ -28,11 +28,11 @@ export const StyledRow = styled(Box)`
 
 interface Props {
   member: User;
-  isEditable: boolean;
+  readOnly?: boolean;
   onRemove: (id: string) => void;
 }
 
-export default function MemberRow({ member, isEditable, onRemove }: Props) {
+export function UserRow({ member, readOnly, onRemove }: Props) {
   function removeMember() {
     onRemove(member.id);
   }
@@ -45,7 +45,7 @@ export default function MemberRow({ member, isEditable, onRemove }: Props) {
           <Typography variant='body1'>{member.username}</Typography>
         </Box>
       </Box>
-      {isEditable && <ElementDeleteIcon onClick={removeMember} tooltip='Remove member' />}
+      {!readOnly && <ElementDeleteIcon onClick={removeMember} tooltip='Remove member' />}
     </StyledRow>
   );
 }
