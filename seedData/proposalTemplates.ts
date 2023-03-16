@@ -7,7 +7,6 @@ export const proposalTemplates: ExportedPage[] = [
     createdAt: new Date('2022-09-24T12:30:31.978Z'),
     createdBy: 'dc521ceb-495e-40cc-940e-3b1cafc7a2e1',
     updatedAt: new Date('2023-01-23T21:24:28.704Z'),
-    deletedBy: null,
     updatedBy: 'dc521ceb-495e-40cc-940e-3b1cafc7a2e1',
     title: 'Grants',
     content: {
@@ -492,7 +491,7 @@ export const proposalTemplates: ExportedPage[] = [
     createdAt: new Date('2022-09-29T11:12:44.774Z'),
     createdBy: 'dc521ceb-495e-40cc-940e-3b1cafc7a2e1',
     updatedAt: new Date('2023-01-23T21:23:56.289Z'),
-    deletedBy: null,
+
     updatedBy: 'dc521ceb-495e-40cc-940e-3b1cafc7a2e1',
     title: 'Budget',
     content: {
@@ -1631,7 +1630,7 @@ export const proposalTemplates: ExportedPage[] = [
     createdAt: new Date('2023-01-23T21:03:23.337Z'),
     createdBy: 'dc521ceb-495e-40cc-940e-3b1cafc7a2e1',
     updatedAt: new Date('2023-01-23T21:23:25.148Z'),
-    deletedBy: null,
+
     updatedBy: 'dc521ceb-495e-40cc-940e-3b1cafc7a2e1',
     title: 'Investments',
     content: {
@@ -2055,7 +2054,7 @@ export const proposalTemplates: ExportedPage[] = [
     createdAt: new Date('2023-01-24T20:23:50.129Z'),
     createdBy: 'dc521ceb-495e-40cc-940e-3b1cafc7a2e1',
     updatedAt: new Date('2023-01-24T20:30:21.872Z'),
-    deletedBy: null,
+
     updatedBy: 'dc521ceb-495e-40cc-940e-3b1cafc7a2e1',
     title: 'Protocol Changes',
     content: {
@@ -2405,7 +2404,7 @@ export const proposalTemplates: ExportedPage[] = [
     createdAt: new Date('2023-01-24T22:12:16.694Z'),
     createdBy: 'dc521ceb-495e-40cc-940e-3b1cafc7a2e1',
     updatedAt: new Date('2023-01-24T22:34:14.470Z'),
-    deletedBy: null,
+
     updatedBy: 'dc521ceb-495e-40cc-940e-3b1cafc7a2e1',
     title: 'Metagov Changes',
     content: {
@@ -3099,7 +3098,7 @@ export const proposalTemplates: ExportedPage[] = [
     createdAt: new Date('2023-01-24T22:49:33.350Z'),
     createdBy: 'dc521ceb-495e-40cc-940e-3b1cafc7a2e1',
     updatedAt: new Date('2023-01-24T22:57:45.859Z'),
-    deletedBy: null,
+
     updatedBy: 'dc521ceb-495e-40cc-940e-3b1cafc7a2e1',
     title: 'Delegate Governance',
     content: {
