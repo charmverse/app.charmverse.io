@@ -78,7 +78,7 @@ import ResizableImage from './components/ResizableImage';
 import ResizablePDF from './components/ResizablePDF';
 import RowActionsMenu, * as rowActions from './components/rowActions';
 import { SIDEBAR_VIEWS, SidebarDrawer } from './components/SidebarDrawer';
-import SuggestionsPopup from './components/suggestions/SuggestionPopup';
+import { SuggestionsPopup } from './components/suggestions/SuggestionPopup';
 import { plugins as trackPlugins } from './components/suggestions/suggestions.plugins';
 import * as tabIndent from './components/tabIndent';
 import * as table from './components/table';
@@ -722,7 +722,7 @@ function CharmEditor({
               pageId={pageId}
               spaceId={currentSpace.id}
               pluginKey={suggestionsPluginKey}
-              readOnly={readOnly}
+              readOnly={!pagePermissions?.edit_content}
             />
           )}
           {currentSpace && pageId && <LinksPopup pluginKey={linksPluginKey} readOnly={readOnly} />}
