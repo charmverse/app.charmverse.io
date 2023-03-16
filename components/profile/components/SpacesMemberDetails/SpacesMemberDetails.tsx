@@ -3,7 +3,10 @@ import { useRouter } from 'next/router';
 import { useState } from 'react';
 
 import LoadingComponent from 'components/common/LoadingComponent';
-import { MemberPropertiesPopup } from 'components/profile/components/SpacesMemberDetails/components/MemberPropertiesPopup';
+import {
+  MemberProperties,
+  MemberPropertiesPopup
+} from 'components/profile/components/SpacesMemberDetails/components/MemberPropertiesPopup';
 import { SpaceDetailsAccordion } from 'components/profile/components/SpacesMemberDetails/components/SpaceDetailsAccordion';
 import Legend from 'components/settings/Legend';
 import { useMemberPropertyValues } from 'hooks/useMemberPropertyValues';
@@ -55,12 +58,16 @@ export function SpacesMemberDetails({ memberId }: Props) {
         />
       ))}
 
-      <MemberPropertiesPopup
-        onClose={() => setEditSpaceId(null)}
-        memberId={memberId}
-        spaceId={editSpaceId}
-        updateMemberPropertyValues={updateSpaceValues}
-      />
+      {editSpaceId && (
+        <MemberPropertiesPopup
+          title='Edit space profile'
+          onClose={() => setEditSpaceId(null)}
+          memberId={memberId}
+          spaceId={editSpaceId}
+        >
+          <MemberProperties memberId={memberId} spaceId={editSpaceId} updateMemberPropertyValues={updateSpaceValues} />
+        </MemberPropertiesPopup>
+      )}
     </Box>
   );
 }

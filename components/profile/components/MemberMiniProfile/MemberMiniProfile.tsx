@@ -18,7 +18,7 @@ import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
 import type { Member } from 'lib/members/interfaces';
 
-import { MemberPropertiesPopup } from '../SpacesMemberDetails/components/MemberPropertiesPopup';
+import { MemberProperties, MemberPropertiesPopup } from '../SpacesMemberDetails/components/MemberPropertiesPopup';
 import UserDetailsMini from '../UserDetails/UserDetailsMini';
 
 import { NftsList } from './BlockchainData/NftsList';
@@ -56,13 +56,11 @@ function MemberProfile({ title, member, onClose }: { title?: string; member: Mem
   if (member.id === currentUser.id) {
     return (
       <MemberPropertiesPopup
-        title={title && title.length !== 0 ? title : 'Edit your profile'}
-        onClose={() => onClose()}
-        isLoading={isFetchingUser}
         memberId={currentUser.id}
+        onClose={onClose}
         spaceId={currentSpace.id}
-        updateMemberPropertyValues={updateSpaceValues}
-        showBlockchainData
+        title={title && title.length !== 0 ? title : 'Edit your profile'}
+        isLoading={isFetchingUser}
       >
         {user && (
           <>
@@ -79,6 +77,12 @@ function MemberProfile({ title, member, onClose }: { title?: string; member: Mem
           </>
         )}
         <Legend mt={4}>Member details</Legend>
+        <MemberProperties
+          memberId={currentUser.id}
+          spaceId={currentSpace.id}
+          updateMemberPropertyValues={updateSpaceValues}
+          showBlockchainData
+        />
       </MemberPropertiesPopup>
     );
   }
