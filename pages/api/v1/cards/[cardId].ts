@@ -26,9 +26,9 @@ handler.use(requireApiKey).get(getCard).patch(updateCard);
  *                $ref: '#/components/schemas/CardPage'
  */
 export async function getCard(req: NextApiRequest, res: NextApiResponse) {
-  const { pageId } = req.query;
+  const { cardId } = req.query;
 
-  const page = await getPageInBoard(pageId as string);
+  const page = await getPageInBoard(cardId as string);
 
   const spaceId = req.authorizedSpaceId;
 
@@ -41,7 +41,7 @@ export async function getCard(req: NextApiRequest, res: NextApiResponse) {
 
 /**
  * @swagger
- * /pages/{pageId}:
+ * /pages/{cardId}:
  *   patch:
  *     summary: Update an existing page in the database
  *     description: Update a page's title and / or its custom properties.
@@ -59,14 +59,14 @@ export async function getCard(req: NextApiRequest, res: NextApiResponse) {
  *                $ref: '#/components/schemas/Page'
  */
 async function updateCard(req: NextApiRequest, res: NextApiResponse) {
-  const { pageId } = req.query;
+  const { cardId } = req.query;
 
   const spaceId = req.authorizedSpaceId;
 
   const card = await prisma.block.findFirst({
     where: {
       type: 'card',
-      id: pageId as string,
+      id: cardId as string,
       spaceId
     }
   });
@@ -127,7 +127,7 @@ async function updateCard(req: NextApiRequest, res: NextApiResponse) {
 
   const updatedPage = await prisma.block.update({
     where: {
-      id: pageId as string
+      id: cardId as string
     },
     data: updateContent
   });
