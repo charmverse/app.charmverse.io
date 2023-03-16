@@ -1,12 +1,12 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import { TextField, Typography } from '@mui/material';
-import { Box } from '@mui/system';
-import type { ChangeEvent } from 'react';
+import { Stack } from '@mui/system';
 import { useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
 import charmClient from 'charmClient';
+import Button from 'components/common/Button';
 import { useUser } from 'hooks/useUser';
 import debounce from 'lib/utilities/debounce';
 
@@ -16,13 +16,14 @@ export const schema = yup.object({
 
 export type FormValues = yup.InferType<typeof schema>;
 
-export function MemberEmailForm({ readOnly = false }: { readOnly?: boolean }) {
+export function MemberEmailForm({ onClick, readOnly = false }: { onClick: VoidFunction; readOnly?: boolean }) {
   const { user, setUser } = useUser();
 
   const {
     register,
     trigger,
     setValue,
+    getValues,
     formState: { errors }
   } = useForm<FormValues>({
     defaultValues: {
@@ -33,9 +34,8 @@ export function MemberEmailForm({ readOnly = false }: { readOnly?: boolean }) {
   });
 
   const onSave = useCallback(
-    debounce(async (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    debounce(async (emailValue: string) => {
       if (!readOnly) {
-        const emailValue = event.target.value;
         const validate = await trigger();
 
         if (validate) {
@@ -50,9 +50,8 @@ export function MemberEmailForm({ readOnly = false }: { readOnly?: boolean }) {
   );
 
   return (
-    <Box mt={2}>
-      <Typography fontWeight='bold'>Email</Typography>
-      <Typography variant='subtitle2' mb={1}>
+    <Stack gap={1}>
+      <Typography>
         CharmVerse can use your email address to let you know when there is a conversation or activity you should be
         part of.
       </Typography>
@@ -67,9 +66,21 @@ export function MemberEmailForm({ readOnly = false }: { readOnly?: boolean }) {
         onChange={async (event) => {
           const val = event.target.value;
           setValue('email', val);
-          await onSave(event);
         }}
       />
-    </Box>
+      <Stack flexDirection='row' gap={1} justifyContent='flex-end'>
+        <Button onClick={onClick} variant='outlined' color='secondary'>
+          Skip
+        </Button>
+        <Button
+          onClick={() => {
+            onSave(getValues('email'));
+            onClick();
+          }}
+        >
+          Next
+        </Button>
+      </Stack>
+    </Stack>
   );
 }

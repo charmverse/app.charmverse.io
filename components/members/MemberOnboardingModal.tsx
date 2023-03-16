@@ -15,6 +15,7 @@ export function MemberOnboardingModal({ userId }: { userId?: string }) {
   return (
     <div data-test='member-onboarding-form'>
       <MemberMiniProfile
+        isOnboarding={!user.email}
         memberId={userId ?? user.id}
         onClose={completeOnboarding}
         title={`Welcome to ${space.name}. Set up your profile`}
