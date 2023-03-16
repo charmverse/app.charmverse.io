@@ -65,8 +65,19 @@ export function BountyGalleryCard({ page: bountyPage, bounty, readOnly, onClick,
           {bountyPage?.title || <FormattedMessage id='GalleryCard.untitled' defaultMessage='Untitled' />}
         </div>
       </div>
-      <Box width='100%' display='flex' flex={1} flexDirection='column' px={1} mb={1} justifyContent='space-between'>
-        <Typography paragraph={true}>{fancyTrim(pageDetails?.contentText, 50)}</Typography>
+      <Box
+        minWidth='0'
+        width='100%'
+        display='flex'
+        flex={1}
+        flexDirection='column'
+        px={1}
+        mb={1}
+        justifyContent='space-between'
+      >
+        <Typography paragraph={true} noWrap>
+          {fancyTrim(pageDetails?.contentText, 50)}
+        </Typography>
         <BountyStatusBadge bounty={bounty} truncate />
       </Box>
     </StyledBox>
