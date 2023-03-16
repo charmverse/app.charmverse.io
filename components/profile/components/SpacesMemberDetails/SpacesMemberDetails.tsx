@@ -23,14 +23,6 @@ export function SpacesMemberDetails({ memberId }: Props) {
   const { user } = useUser();
   const readOnly = memberId !== user?.id;
 
-  if (isLoading) {
-    return <LoadingComponent isLoading />;
-  }
-
-  if (!memberPropertyValues?.length) {
-    return null;
-  }
-
   const expandedWorkspaceIndex = memberPropertyValues.findIndex((mpv) => mpv.spaceId === query.workspace);
 
   // make sure the expanded workspace is always at the top
@@ -46,6 +38,7 @@ export function SpacesMemberDetails({ memberId }: Props) {
   return (
     <Box mt={4} mb={2}>
       <Legend noBorder>My Charmverse Spaces</Legend>
+      <LoadingComponent minHeight={100} isLoading={isLoading} />
       {propertyValues.map((pv) => (
         <SpaceDetailsAccordion
           key={pv.spaceId}

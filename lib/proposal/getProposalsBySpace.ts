@@ -58,6 +58,9 @@ export async function getUserProposalsBySpace({
   return prisma.proposal.findMany({
     where: {
       spaceId,
+      page: {
+        type: 'proposal'
+      },
       OR: [
         {
           createdBy: userId

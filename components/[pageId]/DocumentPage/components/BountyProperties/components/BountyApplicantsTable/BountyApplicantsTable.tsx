@@ -49,7 +49,7 @@ export default function BountySubmissionsTable({ bounty, permissions }: Props) {
 
   useEffect(() => {
     refreshSubmissions();
-  }, [bounty]);
+  }, [bounty?.id]);
 
   async function lockBountySubmissions() {
     const updatedBounty = await charmClient.bounties.lockSubmissions(bounty!.id, !bounty.submissionsLocked);

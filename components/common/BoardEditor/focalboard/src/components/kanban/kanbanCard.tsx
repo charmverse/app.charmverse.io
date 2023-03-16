@@ -17,12 +17,10 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
 import type { Card } from 'lib/focalboard/card';
-import { isTouchScreen } from 'lib/utilities/browser';
 
 import { useSortable } from '../../hooks/sortable';
 import mutator from '../../mutator';
 import { Utils } from '../../utils';
-import Tooltip from '../../widgets/tooltip';
 import type { ConfirmationDialogBoxProps } from '../confirmationDialogBox';
 import ConfirmationDialogBox from '../confirmationDialogBox';
 import PropertyValueElement from '../propertyValueElement';
@@ -65,7 +63,6 @@ const StyledBox = styled(Box)`
 const KanbanCard = React.memo((props: Props) => {
   const { card, board } = props;
   const intl = useIntl();
-
   const [isDragging, isOver, cardRef] = useSortable('card', card, !props.readOnly, props.onDrop);
   const visiblePropertyTemplates = props.visiblePropertyTemplates || [];
   let className = props.isSelected ? 'KanbanCard selected' : 'KanbanCard';
@@ -146,18 +143,18 @@ const KanbanCard = React.memo((props: Props) => {
             </div>
           </div>
           {visiblePropertyTemplates.map((template) => (
-            <Tooltip key={template.id} title={template.name}>
-              <PropertyValueElement
-                board={board}
-                readOnly={true}
-                card={card}
-                updatedAt={cardPage?.updatedAt.toString() || ''}
-                updatedBy={cardPage?.updatedBy || ''}
-                propertyTemplate={template}
-                showEmptyPlaceholder={false}
-                displayType='kanban'
-              />
-            </Tooltip>
+            <PropertyValueElement
+              key={template.id}
+              board={board}
+              readOnly={true}
+              card={card}
+              updatedAt={cardPage?.updatedAt.toString() || ''}
+              updatedBy={cardPage?.updatedBy || ''}
+              propertyTemplate={template}
+              showEmptyPlaceholder={false}
+              displayType='kanban'
+              showTooltip
+            />
           ))}
           {linkedBounty && (
             <BountyFooter>

@@ -176,7 +176,9 @@ function CardDetailProperties(props: Props) {
   }
 
   function getDeleteDisabled(template: IPropertyTemplate) {
-    if (views.some((view) => view.fields.dateDisplayPropertyId === template.id)) {
+    if (
+      views.some((view) => view.fields.viewType === 'calendar' && view.fields.dateDisplayPropertyId === template.id)
+    ) {
       return 'Date property is used in calendar view';
     }
   }

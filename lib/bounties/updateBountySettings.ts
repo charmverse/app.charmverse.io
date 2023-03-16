@@ -9,10 +9,7 @@ import { getBountyOrThrow } from './getBounty';
 import type { BountyUpdate } from './interfaces';
 
 export async function updateBountySettings({ bountyId, updateContent }: BountyUpdate): Promise<BountyWithDetails> {
-  if (
-    updateContent.rewardAmount === null ||
-    (typeof updateContent.rewardAmount === 'number' && updateContent.rewardAmount <= 0)
-  ) {
+  if (typeof updateContent.rewardAmount === 'number' && updateContent.rewardAmount <= 0) {
     throw new PositiveNumbersOnlyError();
   }
 
@@ -31,6 +28,7 @@ export async function updateBountySettings({ bountyId, updateContent }: BountyUp
         id: bountyId
       },
       data: {
+        customReward: updateContent.customReward,
         updatedAt: new Date(),
         chainId: updateContent.chainId,
         rewardAmount: updateContent.rewardAmount,

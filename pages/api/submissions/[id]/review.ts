@@ -63,7 +63,7 @@ async function reviewSubmissionController(req: NextApiRequest, res: NextApiRespo
 
   await rollupBountyStatus(updatedSubmission.bountyId);
 
-  const { spaceId, rewardAmount, rewardToken, id, page } = submission.bounty;
+  const { spaceId, rewardAmount, rewardToken, id, page, customReward } = submission.bounty;
   if (decision === 'approve') {
     trackUserAction('bounty_submission_reviewed', { userId, spaceId, pageId: page?.id || '', resourceId: id });
     await publishBountyEvent({
@@ -80,7 +80,8 @@ async function reviewSubmissionController(req: NextApiRequest, res: NextApiRespo
         pageId: page?.id || '',
         rewardToken,
         rewardAmount,
-        resourceId: id
+        resourceId: id,
+        customReward
       });
     }
 

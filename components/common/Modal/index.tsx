@@ -1,9 +1,9 @@
 import ErrorModal from './ErrorModal';
-import Modal from './Modal';
+import Modal, { DialogTitle } from './Modal';
 import SuccessModal from './SuccessModal';
 
 export * from './Modal';
 
-export { ErrorModal, SuccessModal };
+export { ErrorModal, SuccessModal, DialogTitle };
 
 export default Modal;

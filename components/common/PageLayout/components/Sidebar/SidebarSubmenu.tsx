@@ -25,6 +25,7 @@ import { useUserDetails } from 'components/profile/components/UserDetails/hooks/
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
+import { hasNftAvatar } from 'lib/users/hasNftAvatar';
 
 import { headerHeight } from '../Header/Header';
 
@@ -122,7 +123,7 @@ export default function SidebarSubmenu({
             </Typography>
           </>
         ) : user ? (
-          <Avatar name={user.username} avatar={user.avatar ?? null} />
+          <Avatar name={user.username} avatar={user.avatar ?? null} isNft={hasNftAvatar(user)} />
         ) : null}
       </StyledButton>
       <Menu onClick={menuPopupState.close} {...bindMenu(menuPopupState)} sx={{ maxWidth: '330px' }}>
