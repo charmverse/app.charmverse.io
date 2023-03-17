@@ -2671,7 +2671,7 @@
                 "headerImage": null,
                 "cardProperties": [
                   {
-                    "id": "__title",
+                    "id": "44fab0f0-9a43-47ae-9ead-d477ba2267fd",
                     "name": "Event",
                     "type": "text",
                     "options": []
@@ -2747,6 +2747,7 @@
                   "sortOptions": [],
                   "columnWidths": {
                     "__title": 228,
+                    "44fab0f0-9a43-47ae-9ead-d477ba2267fd": 190,
                     "01541c8f-5213-40a5-9cdd-86b27b9d4350": 172,
                     "274b4d5f-b1a1-4049-8209-20294237f19b": 113,
                     "618e7fb8-ccf4-423d-a4f8-dd9293d3ed09": 149,

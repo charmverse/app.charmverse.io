@@ -4348,7 +4348,7 @@
                         "icon": "",
                         "isTemplate": false,
                         "properties": {
-                          "__title": "Founder of Regen Network ",
+                          "effdb9ad-5179-4f91-b4c9-238423793959": "Founder of Regen Network ",
                           "2a2f8e47-1389-406d-ba4b-22b035219f79": "https://www.linkedin.com/in/gregory-landua-4953b29/"
                         },
                         "headerImage": null,
@@ -4606,7 +4606,7 @@
                         "icon": "",
                         "isTemplate": false,
                         "properties": {
-                          "__title": "KlimaDAO Core Team Member",
+                          "effdb9ad-5179-4f91-b4c9-238423793959": "KlimaDAO Core Team Member",
                           "2a2f8e47-1389-406d-ba4b-22b035219f79": "https://twitter.com/0xKlimaurelius"
                         },
                         "headerImage": null,
@@ -4765,7 +4765,7 @@
                         "icon": "",
                         "isTemplate": false,
                         "properties": {
-                          "__title": "Co-founder of Gitcoin",
+                          "effdb9ad-5179-4f91-b4c9-238423793959": "Co-founder of Gitcoin",
                           "2a2f8e47-1389-406d-ba4b-22b035219f79": "https://twitter.com/notscottmoore"
                         },
                         "headerImage": null,
@@ -4796,7 +4796,7 @@
                     "headerImage": null,
                     "cardProperties": [
                       {
-                        "id": "__title",
+                        "id": "effdb9ad-5179-4f91-b4c9-238423793959",
                         "name": "Project",
                         "type": "text",
                         "options": []
@@ -4846,9 +4846,7 @@
                       "collapsedOptionIds": [],
                       "columnCalculations": {},
                       "kanbanCalculations": {},
-                      "visiblePropertyIds": [
-                        "__title"
-                      ]
+                      "visiblePropertyIds": ["__title", "effdb9ad-5179-4f91-b4c9-238423793959"]
                     }
                   }
                 ]
@@ -4997,7 +4995,7 @@
                         "icon": "",
                         "isTemplate": false,
                         "properties": {
-                          "__title": "Web3 Real Estate"
+                          "cbd472f1-1c6d-46d6-bdb2-06f30da59a95": "Web3 Real Estate"
                         },
                         "headerImage": null,
                         "contentOrder": []
@@ -5111,7 +5109,7 @@
                         "icon": "",
                         "isTemplate": false,
                         "properties": {
-                          "__title": "Yellowstone"
+                          "cbd472f1-1c6d-46d6-bdb2-06f30da59a95": "Yellowstone"
                         },
                         "headerImage": null,
                         "contentOrder": []
@@ -5261,7 +5259,7 @@
                         "icon": "",
                         "isTemplate": false,
                         "properties": {
-                          "__title": "CharmVerse",
+                          "cbd472f1-1c6d-46d6-bdb2-06f30da59a95": "CharmVerse",
                           "2a2f8e47-1389-406d-ba4b-22b035219f79": "https://twitter.com/alexpoon_hk"
                         },
                         "headerImage": null,
@@ -5406,7 +5404,7 @@
                         "icon": "",
                         "isTemplate": false,
                         "properties": {
-                          "__title": "Handmaids Tale"
+                          "cbd472f1-1c6d-46d6-bdb2-06f30da59a95": "Handmaids Tale"
                         },
                         "headerImage": null,
                         "contentOrder": []
@@ -5436,7 +5434,7 @@
                     "headerImage": null,
                     "cardProperties": [
                       {
-                        "id": "__title",
+                        "id": "effdb9ad-5179-4f91-b4c9-238423793959",
                         "name": "Project",
                         "type": "text",
                         "options": []
@@ -5486,9 +5484,7 @@
                       "collapsedOptionIds": [],
                       "columnCalculations": {},
                       "kanbanCalculations": {},
-                      "visiblePropertyIds": [
-                        "__title"
-                      ]
+                      "visiblePropertyIds": ["__title", "cbd472f1-1c6d-46d6-bdb2-06f30da59a95"]
                     }
                   }
                 ]
@@ -6680,9 +6676,7 @@
                       "collapsedOptionIds": [],
                       "columnCalculations": {},
                       "kanbanCalculations": {},
-                      "visiblePropertyIds": [
-                        "__title"
-                      ]
+                      "visiblePropertyIds": ["__title"]
                     }
                   }
                 ]
@@ -7630,9 +7624,7 @@
                       "collapsedOptionIds": [],
                       "columnCalculations": {},
                       "kanbanCalculations": {},
-                      "visiblePropertyIds": [
-                        "__title"
-                      ]
+                      "visiblePropertyIds": ["__title"]
                     }
                   }
                 ]
@@ -7783,7 +7775,7 @@
                         "icon": "",
                         "isTemplate": false,
                         "properties": {
-                          "__title": "Web3 Real Estate"
+                          "69d7eb62-0b05-48eb-954f-c8bebd62a6b3": "Web3 Real Estate"
                         },
                         "headerImage": null,
                         "contentOrder": []
@@ -7897,7 +7889,7 @@
                         "icon": "",
                         "isTemplate": false,
                         "properties": {
-                          "__title": "Yellowstone"
+                          "69d7eb62-0b05-48eb-954f-c8bebd62a6b3": "Yellowstone"
                         },
                         "headerImage": null,
                         "contentOrder": []
@@ -8047,7 +8039,7 @@
                         "icon": "",
                         "isTemplate": false,
                         "properties": {
-                          "__title": "CharmVerse",
+                          "69d7eb62-0b05-48eb-954f-c8bebd62a6b3": "CharmVerse",
                           "2a2f8e47-1389-406d-ba4b-22b035219f79": "https://twitter.com/alexpoon_hk"
                         },
                         "headerImage": null,
@@ -8192,7 +8184,7 @@
                         "icon": "",
                         "isTemplate": false,
                         "properties": {
-                          "__title": "Handmaids Tale"
+                          "69d7eb62-0b05-48eb-954f-c8bebd62a6b3": "Handmaids Tale"
                         },
                         "headerImage": null,
                         "contentOrder": []
@@ -8222,7 +8214,7 @@
                     "headerImage": null,
                     "cardProperties": [
                       {
-                        "id": "__title",
+                        "id": "69d7eb62-0b05-48eb-954f-c8bebd62a6b3",
                         "name": "Project",
                         "type": "text",
                         "options": []
@@ -8272,9 +8264,7 @@
                       "collapsedOptionIds": [],
                       "columnCalculations": {},
                       "kanbanCalculations": {},
-                      "visiblePropertyIds": [
-                        "__title"
-                      ]
+                      "visiblePropertyIds": ["__title", "69d7eb62-0b05-48eb-954f-c8bebd62a6b3"]
                     }
                   }
                 ]
@@ -9222,9 +9212,7 @@
                       "collapsedOptionIds": [],
                       "columnCalculations": {},
                       "kanbanCalculations": {},
-                      "visiblePropertyIds": [
-                        "__title"
-                      ]
+                      "visiblePropertyIds": ["__title"]
                     }
                   }
                 ]
@@ -9593,7 +9581,7 @@
                     "icon": "",
                     "isTemplate": false,
                     "properties": {
-                      "__title": [
+                      "fe3abf09-dc25-4483-8253-b00183573b44": [
                         "e56af877-edfc-4a6c-878c-56a894981fb4",
                         "083ae264-62d7-4de0-8170-dfefae763667"
                       ],
@@ -9809,7 +9797,7 @@
                     "icon": "",
                     "isTemplate": false,
                     "properties": {
-                      "__title": [
+                      "fe3abf09-dc25-4483-8253-b00183573b44": [
                         "e56af877-edfc-4a6c-878c-56a894981fb4",
                         "083ae264-62d7-4de0-8170-dfefae763667"
                       ],
@@ -10126,9 +10114,7 @@
                     "icon": "",
                     "isTemplate": false,
                     "properties": {
-                      "__title": [
-                        "083ae264-62d7-4de0-8170-dfefae763667"
-                      ],
+                      "fe3abf09-dc25-4483-8253-b00183573b44": ["083ae264-62d7-4de0-8170-dfefae763667"],
                       "42f851d4-5db2-482a-b6df-a8f50ae5915f": "6ebd1311-7854-4d4d-bed8-fc8dd57fdfdd",
                       "a42c9a70-7e98-4dcb-84f3-6d0051cee41a": "www.convocase.xyz"
                     },
@@ -10176,7 +10162,7 @@
                 "headerImage": null,
                 "cardProperties": [
                   {
-                    "id": "__title",
+                    "id": "fe3abf09-dc25-4483-8253-b00183573b44",
                     "name": "Track",
                     "type": "multiSelect",
                     "options": [
@@ -10281,6 +10267,7 @@
                   "kanbanCalculations": {},
                   "visiblePropertyIds": [
                     "__title",
+                    "fe3abf09-dc25-4483-8253-b00183573b44",
                     "a42c9a70-7e98-4dcb-84f3-6d0051cee41a",
                     "42f851d4-5db2-482a-b6df-a8f50ae5915f"
                   ]
@@ -11384,9 +11371,7 @@
                     "isTemplate": false,
                     "properties": {
                       "0a286876-371d-47d4-98bb-cee117949048": "0731cd9e-c4d3-4c60-b55c-dff4d6ecd4e0",
-                      "0c3e1c0c-c81d-4e15-b0d7-b4d1785eafbb": [
-                        "6eddf525-fd3f-447e-aa7d-0289c3965f50"
-                      ],
+                      "0c3e1c0c-c81d-4e15-b0d7-b4d1785eafbb": ["6eddf525-fd3f-447e-aa7d-0289c3965f50"],
                       "6d7f0697-20b7-48c5-b970-006a3395a274": "www.convocase.xyz",
                       "839513de-888f-4843-9f04-a7084d5867d9": "Marcus Marvin\nLeidianne Rosalie\nSarah Tuku\nPedro Manus"
                     },
@@ -11531,7 +11516,7 @@
                 "headerImage": null,
                 "cardProperties": [
                   {
-                    "id": "__title",
+                    "id": "6e6ba196-bf98-4c5b-86a3-d1f5a7ee10c8",
                     "name": "Project",
                     "type": "text",
                     "options": []
@@ -11685,10 +11670,11 @@
                   "columnCalculations": {},
                   "kanbanCalculations": {},
                   "visiblePropertyIds": [
+                    "__title",
                     "0a286876-371d-47d4-98bb-cee117949048",
                     "6d7f0697-20b7-48c5-b970-006a3395a274",
                     "0c3e1c0c-c81d-4e15-b0d7-b4d1785eafbb",
-                    "__title"
+                    "6e6ba196-bf98-4c5b-86a3-d1f5a7ee10c8"
                   ]
                 }
               }
