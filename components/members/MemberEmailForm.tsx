@@ -1,11 +1,9 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Checkbox, FormControlLabel, FormGroup, TextField, Typography } from '@mui/material';
 import { Stack } from '@mui/system';
-import type { User } from '@prisma/client';
 import type { ChangeEvent } from 'react';
 import { useCallback } from 'react';
 import { useForm } from 'react-hook-form';
-import useSWRMutation from 'swr/mutation';
 import * as yup from 'yup';
 
 import charmClient from 'charmClient';
@@ -23,20 +21,6 @@ export type FormValues = yup.InferType<typeof schema>;
 export function MemberEmailForm({ onClick }: { onClick: VoidFunction }) {
   const { updateUser, user } = useUser();
 
-  const { isMutating } = useSWRMutation(
-    '/api/profile',
-    (_url, { arg }: Readonly<{ arg: Partial<User> }>) => charmClient.updateUser(arg),
-    {
-      onSuccess: (data) => {
-        updateUser({
-          emailNewsletter: data.emailNewsletter,
-          emailNotifications: data.emailNotifications,
-          email: data.email
-        });
-      }
-    }
-  );
-
   const {
     register,
     trigger,
@@ -46,8 +30,8 @@ export function MemberEmailForm({ onClick }: { onClick: VoidFunction }) {
   } = useForm<FormValues>({
     defaultValues: {
       email: user?.email || '',
-      emailNewsletter: user?.emailNewsletter ?? false,
-      emailNotifications: user?.emailNotifications ?? false
+      emailNewsletter: false,
+      emailNotifications: false
     },
     mode: 'onChange',
     resolver: yupResolver(schema)
@@ -93,12 +77,12 @@ export function MemberEmailForm({ onClick }: { onClick: VoidFunction }) {
       />
       <FormGroup>
         <FormControlLabel
-          disabled={!!errors.email || email.length === 0 || isMutating}
+          disabled={!!errors.email || email.length === 0}
           control={<Checkbox {...register('emailNotifications')} checked={emailNotifications} onChange={onChange} />}
           label='Receive email updates on mentions, comments, post and other things in CharmVerse.'
         />
         <FormControlLabel
-          disabled={!!errors.email || email.length === 0 || isMutating}
+          disabled={!!errors.email || email.length === 0}
           control={<Checkbox {...register('emailNewsletter')} checked={emailNewsletter} onChange={onChange} />}
           label='Keep me up to date on whats new with CharmVerse'
         />
