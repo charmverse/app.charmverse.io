@@ -166,7 +166,7 @@ describe('computePostCategoryPermissions', () => {
     });
   });
 
-  it('should ignore permissions in the database for users who are not members of the space as well as members of the public, and return empty post category permissions', async () => {
+  it('should ignore permissions in the database for users who are not members of the space, and return empty post category permissions', async () => {
     const postCategory = await generatePostCategory({ spaceId: space.id });
 
     // This should never usually happen, but if it somehow does, we want the compute operation to act as a failsafe
@@ -185,6 +185,19 @@ describe('computePostCategoryPermissions', () => {
     postCategoryOperations.forEach((op) => {
       expect(permissions[op]).toBe(false);
     });
+  });
+
+  it('should ignore permissions in the database for members of the public, and return empty post category permissions', async () => {
+    const postCategory = await generatePostCategory({ spaceId: space.id });
+
+    // This should never usually happen, but if it somehow does, we want the compute operation to act as a failsafe
+    await prisma.postCategoryPermission.create({
+      data: {
+        permissionLevel: 'category_admin',
+        postCategory: { connect: { id: postCategory.id } },
+        space: { connect: { id: otherSpace.id } }
+      }
+    });
 
     const publicPermissions = await computePostCategoryPermissions({
       resourceId: postCategory.id,
@@ -192,6 +205,31 @@ describe('computePostCategoryPermissions', () => {
     });
     postCategoryOperations.forEach((op) => {
       expect(publicPermissions[op]).toBe(false);
+    });
+  });
+
+  it('should ignore permissions in the database for users who are only guest-level space members, and return empty post category permissions', async () => {
+    const guestUser = await generateSpaceUser({
+      spaceId: space.id,
+      isGuest: true
+    });
+    const postCategory = await generatePostCategory({ spaceId: space.id });
+
+    // This should never usually happen, but if it somehow does, we want the compute operation to act as a failsafe
+    await prisma.postCategoryPermission.create({
+      data: {
+        permissionLevel: 'category_admin',
+        postCategory: { connect: { id: postCategory.id } },
+        space: { connect: { id: space.id } }
+      }
+    });
+
+    const guestPermissions = await computePostCategoryPermissions({
+      resourceId: postCategory.id,
+      userId: guestUser.id
+    });
+    postCategoryOperations.forEach((op) => {
+      expect(guestPermissions[op]).toBe(false);
     });
   });
 
