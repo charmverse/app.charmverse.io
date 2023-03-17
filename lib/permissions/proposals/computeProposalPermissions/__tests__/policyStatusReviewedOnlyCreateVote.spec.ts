@@ -67,7 +67,7 @@ describe('policyStatusReviewedOnlyCreateVote', () => {
       vote: true
     });
   });
-  it('should allow the author to view, create_vote', async () => {
+  it('should allow the author to view, create_vote and delete_vote', async () => {
     const permissions = await policyStatusReviewedOnlyCreateVote({
       flags: fullPermissions,
       isAdmin: false,
@@ -79,7 +79,7 @@ describe('policyStatusReviewedOnlyCreateVote', () => {
       create_vote: true,
       view: true,
       comment: false,
-      delete: false,
+      delete: true,
       edit: false,
       review: false,
       vote: false

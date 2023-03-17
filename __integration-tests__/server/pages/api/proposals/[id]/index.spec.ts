@@ -1,4 +1,4 @@
-import type { ProposalCategory, Space, User } from '@prisma/client';
+import type { ProposalCategory, Space } from '@prisma/client';
 import request from 'supertest';
 import { v4 } from 'uuid';
 
@@ -167,35 +167,6 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
     expect(updated.proposal?.reviewers.some((r) => r.userId === adminUser.id)).toBe(true);
   });
 
-  it('should update a proposal if the user is an admin', async () => {
-    const { user: adminUser, space: adminSpace } = await generateUserAndSpaceWithApiToken(undefined, true);
-    const adminCookie = await loginUser(adminUser.id);
-
-    const proposalAuthor = await generateSpaceUser({ isAdmin: false, spaceId: adminSpace.id });
-
-    const { page } = await createProposal({
-      userId: proposalAuthor.id,
-      spaceId: adminSpace.id,
-      categoryId: proposalCategory.id
-    });
-
-    const updateContent: Partial<UpdateProposalRequest> = {
-      authors: [adminUser.id],
-      reviewers: [
-        {
-          group: 'user',
-          id: adminUser.id
-        }
-      ]
-    };
-
-    await request(baseUrl)
-      .put(`/api/proposals/${page.proposalId}`)
-      .set('Cookie', adminCookie)
-      .send(updateContent)
-      .expect(200);
-  });
-
   it('should update a proposal templates settings if the user is a space admin', async () => {
     const { user: adminUser, space: adminSpace } = await generateUserAndSpaceWithApiToken(undefined, true);
     const adminCookie = await loginUser(adminUser.id);
@@ -234,6 +205,35 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
     expect(updated.proposal?.reviewers).toHaveLength(2);
     expect(updated.proposal?.reviewers.some((r) => r.roleId === role.id)).toBe(true);
     expect(updated.proposal?.reviewers.some((r) => r.userId === adminUser.id)).toBe(true);
+  });
+
+  it('should fail to update a proposal if the user is an admin', async () => {
+    const { user: adminUser, space: adminSpace } = await generateUserAndSpaceWithApiToken(undefined, true);
+    const adminCookie = await loginUser(adminUser.id);
+
+    const proposalAuthor = await generateSpaceUser({ isAdmin: false, spaceId: adminSpace.id });
+
+    const { page } = await createProposal({
+      userId: proposalAuthor.id,
+      spaceId: adminSpace.id,
+      categoryId: proposalCategory.id
+    });
+
+    const updateContent: Partial<UpdateProposalRequest> = {
+      authors: [adminUser.id],
+      reviewers: [
+        {
+          group: 'user',
+          id: adminUser.id
+        }
+      ]
+    };
+
+    await request(baseUrl)
+      .put(`/api/proposals/${page.proposalId}`)
+      .set('Cookie', adminCookie)
+      .send(updateContent)
+      .expect(401);
   });
 
   it('should fail to update a proposal template if the user is not a space admin', async () => {
