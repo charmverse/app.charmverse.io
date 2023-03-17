@@ -57,9 +57,19 @@ const SelectPreviewContainer = styled(Stack, {
   height: 100%;
 `;
 
-const StyledSelect = styled(SelectField)`
+const StyledSelect = styled(SelectField)<ContainerProps>`
   .MuiInputBase-root {
-    background: transparent;
+    background-color: ${({ theme }) => theme.palette.background.paper};
+
+    .MuiAutocomplete-input {
+      ${({ displayType, theme }) =>
+        displayType === 'table'
+          ? `
+      width: 100%;
+      border-top: 1px solid ${theme.palette.divider};
+    `
+          : ''}
+    }
   }
 
   .MuiOutlinedInput-root.MuiInputBase-sizeSmall {
@@ -172,6 +182,8 @@ export function SelectProperty({
       onDeleteOption={onDelete}
       onCreateOption={onCreate}
       onBlur={() => setIsOpened(false)}
+      forcePopupIcon={false}
+      displayType={displayType}
     />
   );
 }
