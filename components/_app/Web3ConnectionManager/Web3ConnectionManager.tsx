@@ -57,10 +57,6 @@ function Web3ConnectionManager({ children }: PropsWithChildren<any>) {
   // handle logic to connect in reaction to certain events on the injected ethereum provider, if it exists
   useInactiveListener(!triedEager || !!activatingConnector);
 
-  useEffect(() => {
-    if (triedEager && !active && (router.query.discordId || router.query.redirectUrl)) openWalletSelectorModal();
-  }, [triedEager, active, router.query]);
-
   return (
     <Web3Connection.Provider
       // eslint-disable-next-line react/jsx-no-constructed-context-values

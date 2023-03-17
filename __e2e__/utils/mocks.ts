@@ -284,18 +284,20 @@ type UserAndSpaceInput = {
   spaceName?: string;
   publicBountyBoard?: boolean;
   skipOnboarding?: boolean;
+  email?: string;
 };
 
 export async function generateUserAndSpace({
   isAdmin,
   spaceName = 'Example Space',
   publicBountyBoard,
-  skipOnboarding = true
+  skipOnboarding = true,
+  email = `${v4()}@gmail.com`
 }: UserAndSpaceInput = {}) {
   const wallet = Wallet.createRandom();
   const address = wallet.address;
 
-  const user = await createUserFromWallet({ address });
+  const user = await createUserFromWallet({ address, email });
 
   const existingSpaceId = user.spaceRoles?.[0]?.spaceId;
 

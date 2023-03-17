@@ -12,7 +12,6 @@ import useTasks from 'components/nexus/hooks/useTasks';
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import { usePages } from 'hooks/usePages';
 import type { ProposalWithUsers } from 'lib/proposal/interface';
-import { setUrlWithoutRerender } from 'lib/utilities/browser';
 import type { BrandColor } from 'theme/colors';
 
 import NoProposalsMessage from './NoProposalsMessage';
@@ -21,8 +20,10 @@ import { ProposalStatusChip } from './ProposalStatusBadge';
 
 export default function ProposalsTable({
   proposals,
-  mutateProposals
+  mutateProposals,
+  isLoading
 }: {
+  isLoading?: boolean;
   proposals?: ProposalWithUsers[];
   mutateProposals: () => void;
 }) {
@@ -82,7 +83,7 @@ export default function ProposalsTable({
         </Grid>
         <Grid item xs={1} display='flex' justifyContent='center'></Grid>
       </GridHeader>
-      {!proposals && <LoadingComponent height='250px' isLoading={true} />}
+      {(!proposals || isLoading) && <LoadingComponent height='250px' isLoading />}
       {filteredProposals?.length === 0 && (
         <Box height='250px' mt={2}>
           <NoProposalsMessage message='There are no proposals yet. Create a proposal page to get started!' />

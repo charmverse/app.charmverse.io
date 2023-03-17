@@ -3,7 +3,7 @@ import { CircularProgress, Menu, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
 import type { Space, SpacePermissionConfigurationMode } from '@prisma/client';
 import { bindPopover, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
-import { useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 
 import Button from 'components/common/Button';
 import Modal from 'components/common/Modal';
@@ -11,8 +11,10 @@ import ShareBountyBoard from 'components/common/PageLayout/components/Header/com
 import Legend from 'components/settings/Legend';
 import ImportGuildRolesMenuItem from 'components/settings/roles/components/ImportGuildRolesMenuItem';
 import { useIsAdmin } from 'hooks/useIsAdmin';
+import { useMembers } from 'hooks/useMembers';
 import { useRoles } from 'hooks/useRoles';
 
+import { GuestRoleRow } from './components/GuestRoleRow';
 import ImportDiscordRolesMenuItem from './components/ImportDiscordRolesMenuItem';
 import RoleForm from './components/RoleForm';
 import { RoleRow } from './components/RoleRow';
@@ -24,12 +26,14 @@ import { useImportDiscordRoles } from './hooks/useImportDiscordRoles';
 export function RoleSettings({ space }: { space: Space }) {
   const { assignRoles, deleteRole, refreshRoles, unassignRole, roles } = useRoles();
   const isAdmin = useIsAdmin();
+  const { members } = useMembers();
   const popupState = usePopupState({ variant: 'popover', popupId: 'add-a-role' });
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
   const open = Boolean(anchorEl);
   const handleClose = () => {
     setAnchorEl(null);
   };
+
   const buttonRef = useRef<HTMLButtonElement>(null);
 
   const { isValidating } = useImportDiscordRoles();
@@ -100,6 +104,8 @@ export function RoleSettings({ space }: { space: Space }) {
           />
         ))
       )}
+
+      <GuestRoleRow isEditable={isAdmin} />
 
       <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
         <ImportDiscordRolesMenuItem />

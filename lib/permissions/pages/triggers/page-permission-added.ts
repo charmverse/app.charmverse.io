@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import type { Prisma } from '@prisma/client';
 
 import type { TransactionClient } from 'db';
@@ -62,7 +63,7 @@ export async function setupPermissionsAfterPagePermissionAdded(
     }
 
     findChildPagesToCreatePermissionsFor(updatedPage);
-
+    console.timeEnd('01-tx-----');
     if (permissionsToDelete.length > 0) {
       await tx.pagePermission.deleteMany({ where: { id: { in: permissionsToDelete } } });
     }

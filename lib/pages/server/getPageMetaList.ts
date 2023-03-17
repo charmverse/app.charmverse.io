@@ -18,6 +18,7 @@ export function getPageMetaList(pageIds: string[]): Promise<PageMeta[]> {
       createdAt: true,
       createdBy: true,
       deletedAt: true,
+      deletedBy: true,
       fullWidth: true,
       galleryImage: true,
       hasContent: true,

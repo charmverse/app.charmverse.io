@@ -38,6 +38,7 @@ export type Member = Pick<User, 'id' | 'createdAt' | 'updatedAt' | 'username'> &
   deletedAt?: Date;
   avatarTokenId?: string;
   isAdmin?: boolean;
+  isGuest?: boolean;
   joinDate: string;
   hasNftAvatar?: boolean;
   profile?: UserDetails;

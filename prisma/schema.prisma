@@ -305,6 +305,7 @@ model Page {
   createdBy           String           @db.Uuid
   updatedAt           DateTime         @default(now())
   updatedBy           String           @db.Uuid
+  deletedBy           String?          @db.Uuid
   title               String
   content             Json?
   contentText         String
@@ -652,6 +653,7 @@ model SpaceRole {
   userId          String            @db.Uuid
   id              String            @id @default(uuid()) @db.Uuid
   isAdmin         Boolean           @default(false)
+  isGuest         Boolean           @default(false)
   createdAt       DateTime          @default(now())
   space           Space             @relation(fields: [spaceId], references: [id], onDelete: Cascade)
   user            User              @relation(fields: [userId], references: [id], onDelete: Cascade)

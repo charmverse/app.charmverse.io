@@ -64,6 +64,8 @@ export function useForumCategories() {
         },
         { revalidate: false }
       );
+
+      return updatedCategory;
     }
   }
 

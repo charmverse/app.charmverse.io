@@ -156,20 +156,28 @@ export function useFirebaseAuth() {
     auth.languageCode = 'en';
 
     if (isSignInWithEmailLink(auth, window.location.href)) {
-      const result = await signInWithEmailLink(auth, email, window.location.href);
+      try {
+        const result = await signInWithEmailLink(auth, email, window.location.href);
 
-      const token = await result.user.getIdToken();
+        const token = await result.user.getIdToken();
 
-      const loggedInUser = await (router.query.connectToExistingAccount === 'true'
-        ? charmClient.google.connectEmailAccount({
-            accessToken: token
-          })
-        : charmClient.google.authenticateMagicLink({
-            accessToken: token
-          }));
+        const loggedInUser = await (router.query.connectToExistingAccount === 'true'
+          ? charmClient.google.connectEmailAccount({
+              accessToken: token
+            })
+          : charmClient.google.authenticateMagicLink({
+              accessToken: token
+            }));
 
-      setUser(loggedInUser);
+        setUser(loggedInUser);
+        setEmailForSignIn('');
+        // We want to bubble up the error, so we can show a relevant message, but always clear the email
+      } catch (err) {
+        setEmailForSignIn('');
+        throw err;
+      }
     } else {
+      setEmailForSignIn('');
       throw new InvalidInputError(`Could not login`);
     }
   }
@@ -187,6 +195,8 @@ export function useFirebaseAuth() {
     isConnectingGoogle,
     requestMagicLinkViaFirebase,
     validateMagicLink,
-    disconnectVerifiedEmailAccount
+    disconnectVerifiedEmailAccount,
+    emailForSignIn,
+    setEmailForSignIn
   };
 }

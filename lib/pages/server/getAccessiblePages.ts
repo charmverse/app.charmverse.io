@@ -88,6 +88,7 @@ function selectPageFields(meta: boolean) {
       hasContent: true,
       galleryImage: true,
       convertedProposalId: true,
+      deletedBy: true,
       ...includePagePermissionsMeta()
     }
   };
@@ -239,7 +240,7 @@ export async function getAccessiblePages(input: PagesRequest): Promise<IPageWith
   }
 
   const availableRoles: { id: string; spaceRolesToRole: SpaceRoleToRole[] }[] =
-    input.userId && spaceRole
+    input.userId && spaceRole && !spaceRole.isGuest
       ? await prisma.role.findMany({
           where: {
             spaceId: input.spaceId,
@@ -290,6 +291,12 @@ export async function getAccessiblePages(input: PagesRequest): Promise<IPageWith
       return true;
     }
 
+    // Guest users
+    if (spaceRole?.isGuest) {
+      return page.permissions.some((permission) => permission.public === true || permission.userId === input.userId);
+    }
+
+    // Normal member users
     return page.permissions.some((permission) => {
       if (permission.public) {
         return true;

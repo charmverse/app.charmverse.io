@@ -25,7 +25,7 @@ type Props = {
 
 type DialogProps = Props & {
   isOpen: boolean;
-  onClose: () => void;
+  onClose?: () => void;
 };
 
 export function CollectEmail({ handleSubmit, description, title, loading, onClose }: Props) {
@@ -80,14 +80,18 @@ export function CollectEmailDialog({ handleSubmit, isOpen, onClose, title, descr
     resolver: yupResolver(schema)
   });
 
+  // Close form only used if there is an external close function
   function closeForm() {
     reset();
-    onClose();
+    onClose?.();
   }
 
   return (
-    <Modal title={title} open={isOpen} onClose={closeForm}>
-      <CollectEmail description={description} handleSubmit={handleSubmit} loading={loading} />
+    <Modal title={title} open={isOpen} onClose={onClose ? closeForm : undefined}>
+      {/** Align the title of modal with the dialog */}
+      <Box sx={{ mx: -1 }}>
+        <CollectEmail description={description} handleSubmit={handleSubmit} loading={loading} />
+      </Box>
     </Modal>
   );
 }

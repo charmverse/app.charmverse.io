@@ -3,6 +3,7 @@ import type {
   Bounty,
   BountyPermission,
   Page,
+  PagePermission,
   Proposal,
   ProposalCategory,
   Vote,
@@ -28,7 +29,9 @@ export interface PageWithBlocks {
   inlineDatabases?: ExportedPage[];
 }
 
-export type ExportedPage = PageNodeWithChildren<Page & Partial<PageWithBlocks>>;
+export type ExportedPage = PageNodeWithChildren<
+  Page & Partial<PageWithBlocks> & { permissions: (PagePermission & { sourcePermission?: PagePermission | null })[] }
+>;
 
 export interface WorkspaceExport {
   pages: ExportedPage[];

@@ -1,6 +1,6 @@
 import type { UnsupportedKeyDetails } from './errors';
 import { UnsupportedKeysError } from './errors';
-import type { PageQuery, PaginatedQuery, Page } from './interfaces';
+import type { CardPageQuery, PaginatedQuery, CardPage } from './interfaces';
 
 /**
  * Use this in the api to throw an error when an unsupported field is provided
@@ -8,13 +8,13 @@ import type { PageQuery, PaginatedQuery, Page } from './interfaces';
  * @returns true if this is valid
  * @throws An error indicating the invalid fields
  */
-export function validatePageQuery(query: PageQuery): true {
+export function validatePageQuery(query: CardPageQuery): true {
   // Empty queries are allowed
   if (query === undefined || query === null) {
     return true;
   }
 
-  const supportedKeys: (keyof PageQuery)[] = ['properties', 'title'];
+  const supportedKeys: (keyof CardPageQuery)[] = ['properties', 'title'];
 
   const queryKeys = Object.keys(query);
 
@@ -56,12 +56,12 @@ export function validatePageQuery(query: PageQuery): true {
  * @returns true if this is valid
  * @throws An error indicating the invalid fields
  */
-export function validateCreationData(creationData: PageQuery): true {
+export function validateCreationData(creationData: CardPageQuery): true {
   try {
     validatePageQuery(creationData);
     return true;
   } catch (error) {
-    const modifiedError = error as UnsupportedKeysError<Pick<Page, 'title' | 'properties'>>;
+    const modifiedError = error as UnsupportedKeysError<Pick<CardPage, 'title' | 'properties'>>;
 
     modifiedError.error.example = {
       title: 'Page title',
@@ -83,7 +83,7 @@ export function validateCreationData(creationData: PageQuery): true {
  * @returns true if this is valid
  * @throws An error indicating the invalid fields
  */
-export function validateUpdateData(creationData: PageQuery): true {
+export function validateUpdateData(creationData: CardPageQuery): true {
   try {
     validatePageQuery(creationData);
     return true;
@@ -103,13 +103,13 @@ export function validateUpdateData(creationData: PageQuery): true {
   }
 }
 
-export function validatePaginationQuery(query: PaginatedQuery<PageQuery>): true {
+export function validatePaginationQuery(query: PaginatedQuery<CardPageQuery>): true {
   // Empty queries are allowed
   if (query === undefined || query === null) {
     return true;
   }
 
-  const supportedKeys: (keyof PaginatedQuery<PageQuery>)[] = ['cursor', 'limit', 'query'];
+  const supportedKeys: (keyof PaginatedQuery<CardPageQuery>)[] = ['cursor', 'limit', 'query'];
 
   const queryKeys = Object.keys(query);
 

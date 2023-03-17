@@ -71,6 +71,7 @@ export async function getSpaceMembers({
           username,
           onboarded: spaceRole.onboarded,
           isAdmin: spaceRole.isAdmin,
+          isGuest: !!spaceRole.isGuest && !spaceRole.isAdmin,
           joinDate: spaceRole.createdAt.toISOString(),
           hasNftAvatar: hasNftAvatar(spaceRole.user),
           properties: getPropertiesWithValues(visibleProperties, memberPropertyValues),

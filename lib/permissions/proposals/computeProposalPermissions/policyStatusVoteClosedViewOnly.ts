@@ -8,6 +8,7 @@ import type { ProposalPolicyInput } from './interfaces';
 
 export async function policyStatusVoteClosedViewOnly({
   resource,
+  isAdmin,
   flags
 }: ProposalPolicyInput): Promise<AvailableProposalPermissionFlags> {
   const newPermissions = { ...flags };
@@ -17,6 +18,10 @@ export async function policyStatusVoteClosedViewOnly({
   }
 
   const allowedOperations: ProposalOperation[] = ['view'];
+
+  if (isAdmin) {
+    allowedOperations.push('delete');
+  }
 
   typedKeys(flags).forEach((flag) => {
     if (!allowedOperations.includes(flag)) {

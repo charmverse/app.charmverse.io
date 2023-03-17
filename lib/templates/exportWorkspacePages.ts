@@ -1,7 +1,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
-import type { Block, PageType } from '@prisma/client';
+import type { Block } from '@prisma/client';
 import { validate } from 'uuid';
 
 import { prisma } from 'db';
@@ -18,9 +18,9 @@ export interface ExportWorkspacePage {
   rootPageIds?: string[];
   skipBounties?: boolean;
   skipProposals?: boolean;
+  skipBountyTemplates?: boolean;
+  skipProposalTemplates?: boolean;
 }
-
-const excludedPageTypes: PageType[] = ['bounty_template', 'proposal_template'];
 
 function recurse(node: PageContent, cb: (node: PageContent | TextContent) => void) {
   if (node?.content) {
@@ -38,7 +38,9 @@ export async function exportWorkspacePages({
   exportName,
   rootPageIds,
   skipBounties = false,
-  skipProposals = false
+  skipProposals = false,
+  skipBountyTemplates = false,
+  skipProposalTemplates = false
 }: ExportWorkspacePage): Promise<{ data: WorkspaceExport; path?: string }> {
   const isUuid = validate(sourceSpaceIdOrDomain);
 
@@ -53,10 +55,7 @@ export async function exportWorkspacePages({
   const rootPages = await prisma.page.findMany({
     where: {
       ...(rootPageIds ? { id: { in: rootPageIds } } : { spaceId: space.id, parentId: null }),
-      deletedAt: null,
-      type: {
-        notIn: excludedPageTypes
-      }
+      deletedAt: null
     }
   });
 
@@ -115,7 +114,10 @@ export async function exportWorkspacePages({
       node.blocks = {
         card: cardBlock as Block
       };
-    } else if (node.bountyId && node.type === 'bounty' && !skipBounties) {
+    } else if (
+      node.bountyId &&
+      ((node.type === 'bounty' && !skipBounties) || (node.type === 'bounty_template' && !skipBountyTemplates))
+    ) {
       node.bounty = await prisma.bounty.findUnique({
         where: {
           id: node.bountyId
@@ -124,7 +126,10 @@ export async function exportWorkspacePages({
           permissions: true
         }
       });
-    } else if (node.proposalId && node.type === 'proposal' && !skipProposals) {
+    } else if (
+      node.proposalId &&
+      ((node.type === 'proposal' && !skipProposals) || (node.type === 'proposal_template' && !skipProposalTemplates))
+    ) {
       node.proposal = await prisma.proposal.findUnique({
         where: {
           id: node.proposalId
@@ -135,7 +140,7 @@ export async function exportWorkspacePages({
       });
     }
 
-    node.children = node.children?.filter((child) => !excludedPageTypes.includes(child.type)) ?? [];
+    // node.children = node.children?.filter((child) => !excludedPageTypes.includes(child.type)) ?? [];
 
     await Promise.all(
       (node.children ?? []).map(async (child) => {
