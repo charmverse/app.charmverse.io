@@ -25,6 +25,7 @@ type SelectProps = {
   autoOpen?: boolean;
   placeholder?: string;
   className?: string;
+  forcePopupIcon?: boolean | 'auto';
 };
 
 type Props = Omit<ControlFieldProps, 'value'> & FieldProps & SelectProps;
@@ -46,6 +47,7 @@ export const SelectField = forwardRef<HTMLDivElement, Props>(
       onBlur,
       placeholder,
       className,
+      forcePopupIcon = 'auto',
       ...inputProps
     },
     ref
@@ -120,6 +122,7 @@ export const SelectField = forwardRef<HTMLDivElement, Props>(
           options={options}
           autoHighlight
           clearIcon={null}
+          forcePopupIcon={forcePopupIcon}
           renderOption={(selectProps, option) => {
             if (option.temp) {
               return <MenuItem {...selectProps}>Add {option.name}</MenuItem>;
