@@ -14,8 +14,9 @@ export type ListProposalsRequest = {
  */
 export async function getProposalsBySpace({
   spaceId,
-  categoryIds
-}: Pick<ListProposalsRequest, 'categoryIds' | 'spaceId'>): Promise<ProposalWithUsers[]> {
+  categoryIds,
+  userId
+}: ListProposalsRequest): Promise<ProposalWithUsers[]> {
   return prisma.proposal.findMany({
     where: {
       OR: [
@@ -29,7 +30,8 @@ export async function getProposalsBySpace({
             spaceRoles: {
               some: {
                 spaceId,
-                isAdmin: true
+                isAdmin: true,
+                userId
               }
             }
           }
