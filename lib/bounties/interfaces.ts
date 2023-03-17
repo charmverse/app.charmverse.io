@@ -1,12 +1,7 @@
-import type { Bounty, PageType, Application, PageComment } from '@prisma/client';
+import type { Bounty, PageType, Application } from '@prisma/client';
 
-import type { CommentBlock } from 'components/common/BoardEditor/focalboard/src/blocks/commentBlock';
 import type { IPageMetaWithPermissions } from 'lib/pages/interfaces';
-import type { BountyPermissions, BountySubmitter } from 'lib/permissions/bounties';
-import type { PageContent } from 'lib/prosemirror/interfaces';
-import type { Roleup } from 'lib/roles/interfaces';
-
-import type { Resource } from '../permissions/interfaces';
+import type { BountyPermissions } from 'lib/permissions/bounties';
 
 // Re-export bounty permissions interfaces for convenience
 export * from 'lib/permissions/bounties/interfaces';
@@ -42,25 +37,6 @@ export interface SuggestionRejectAction {
 }
 
 export type SuggestionAction = SuggestionApproveAction | SuggestionRejectAction;
-
-/**
- * Calculate pool for resource permissions as is, or pass simulated permissions to calculate pool
- */
-export type BountySubmitterPoolCalculation = Partial<Resource & { permissions: Partial<BountyPermissions> }>;
-
-/**
- * Used to represent how many potential applicants exist.
- * @mode - whether this bounty is accessible to the space or roles
- */
-export interface BountySubmitterPoolSize {
-  mode: BountySubmitter;
-  // Breakdown of roles and members in each
-  // Subset of all roles when in roles mode
-  // TBC - Undefined in space mode?
-  roleups: Roleup[];
-  // Rollup that always exists (counts all space members, including roles, who can apply)
-  total: number;
-}
 
 export interface BountyPagePermissionSetRequest {
   createdBy: string;

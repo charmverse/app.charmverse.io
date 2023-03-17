@@ -1,6 +1,6 @@
-import type { Bounty } from '@prisma/client';
+import type { Bounty, Role } from '@prisma/client';
 
-import type { RoleupWithMembers } from 'lib/roles/interfaces';
+import type { Member } from 'lib/members/interfaces';
 
 import { humaniseList, capitalize } from '../../utilities/strings';
 import type { TargetPermissionGroup } from '../interfaces';
@@ -14,6 +14,7 @@ export function humaniseBountyAccessConditions({
   permissionLevel,
   assignees,
   roles,
+  members,
   bounty
 }: {
   permissionLevel: SupportedHumanisedAccessConditions;
@@ -21,7 +22,8 @@ export function humaniseBountyAccessConditions({
   // For submitters, we currently only support roles or whole space
   assignees: TargetPermissionGroup[];
   // Full list of roles in space (or at least role data for assigned roles)
-  roles: RoleupWithMembers[];
+  roles: Role[];
+  members: Member[];
   bounty: Bounty;
 }): HumanisedBountyAccessSummary {
   const hasSpacePermission = assignees.some(({ group }) => group === 'space');
@@ -33,10 +35,12 @@ export function humaniseBountyAccessConditions({
   // No need to calculate roles if the target level is allowed for the whole space
   const assignedRoleNames = assignedRoles.map((r) => {
     const matchingRole = roles.find((role) => role.id === (r as TargetPermissionGroup<'role'>).id);
-
-    totalRoleMembers += matchingRole?.members ?? 0;
-
-    return matchingRole?.name ?? '';
+    if (matchingRole) {
+      const memberCount = members.filter((m) => m.roles.some((role) => role.id === matchingRole.id)).length;
+      totalRoleMembers += memberCount;
+      return matchingRole.name;
+    }
+    return '';
   });
 
   const humanisedRoleNames = humaniseList({
@@ -65,9 +69,9 @@ export function humaniseBountyAccessConditions({
           const isDuplicateReviewer =
             shouldCheckForDuplicates &&
             assignedRoles.some((reviewerRole) =>
-              roles.some((roleInSpace) => {
-                return roleInSpace.users.some((u) => u.id === (reviewerRole as TargetPermissionGroup<'role'>).id);
-              })
+              members.some((m) =>
+                m.roles.some((role) => role.id === (reviewerRole as TargetPermissionGroup<'role'>).id)
+              )
             );
 
           return count + (isDuplicateReviewer ? 1 : 0);

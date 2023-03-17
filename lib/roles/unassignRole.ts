@@ -3,10 +3,10 @@ import type { SpaceRole } from '@prisma/client';
 import { prisma } from 'db';
 import { InvalidInputError, UndesirableOperationError } from 'lib/utilities/errors';
 
-import type { RoleAssignment, RoleWithMembers } from './interfaces';
+import type { RoleAssignment } from './interfaces';
 import { listRoleMembers } from './listRoleMembers';
 
-export async function unassignRole({ roleId, userId }: RoleAssignment): Promise<RoleWithMembers> {
+export async function unassignRole({ roleId, userId }: RoleAssignment) {
   const role = await listRoleMembers({ roleId });
 
   if (role.users.every((u) => u.id !== userId)) {
@@ -36,8 +36,4 @@ export async function unassignRole({ roleId, userId }: RoleAssignment): Promise<
       }
     }
   });
-
-  const roleAfterUpdate = await listRoleMembers({ roleId });
-
-  return roleAfterUpdate;
 }

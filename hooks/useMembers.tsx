@@ -5,7 +5,6 @@ import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 import type { Member } from 'lib/members/interfaces';
-import { shortWalletAddress } from 'lib/utilities/strings';
 
 import { useCurrentSpace } from './useCurrentSpace';
 
@@ -35,14 +34,7 @@ export function MembersProvider({ children }: { children: ReactNode }) {
   } = useSWR(
     () => (space ? `members/${space?.id}` : null),
     () => {
-      return charmClient.members.getMembers(space!.id).then((_members) =>
-        _members.map((m) => {
-          if (m.identityType === 'Wallet') {
-            m.username = shortWalletAddress(m.username);
-          }
-          return m;
-        })
-      );
+      return charmClient.members.getMembers(space!.id);
     }
   );
 

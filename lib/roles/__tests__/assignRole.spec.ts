@@ -2,7 +2,7 @@ import type { Space, User } from '@prisma/client';
 import { v4 } from 'uuid';
 
 import { InvalidStateError } from 'lib/middleware';
-import { assignRole } from 'lib/roles';
+import { assignRole, listRoleMembers } from 'lib/roles';
 import {
   generateRole,
   generateSpaceUser,
@@ -29,10 +29,12 @@ describe('assignRole', () => {
       createdBy: user.id
     });
 
-    let roleAfterAssignment = await assignRole({
+    await assignRole({
       roleId: role.id,
       userId: user.id
     });
+
+    let roleAfterAssignment = await listRoleMembers({ roleId: role.id });
 
     expect(roleAfterAssignment.users.length).toBe(1);
     expect(roleAfterAssignment.users[0].id).toBe(user.id);
@@ -42,10 +44,12 @@ describe('assignRole', () => {
       isAdmin: false
     });
 
-    roleAfterAssignment = await assignRole({
+    await assignRole({
       roleId: role.id,
       userId: extraUser.id
     });
+
+    roleAfterAssignment = await listRoleMembers({ roleId: role.id });
 
     expect(roleAfterAssignment.users.length).toBe(2);
     expect(roleAfterAssignment.users.some((u) => u.id === extraUser.id));

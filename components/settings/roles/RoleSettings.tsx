@@ -12,18 +12,18 @@ import Legend from 'components/settings/Legend';
 import ImportGuildRolesMenuItem from 'components/settings/roles/components/ImportGuildRolesMenuItem';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useMembers } from 'hooks/useMembers';
-import useRoles from 'hooks/useRoles';
+import { useRoles } from 'hooks/useRoles';
 
 import { GuestRoleRow } from './components/GuestRoleRow';
 import ImportDiscordRolesMenuItem from './components/ImportDiscordRolesMenuItem';
 import RoleForm from './components/RoleForm';
-import RoleRow from './components/RoleRow';
+import { RoleRow } from './components/RoleRow';
 import SpacePermissions from './components/SpacePermissions';
 import DefaultPagePermissions from './components/SpacePermissions/components/DefaultPagePermissions';
 import PermissionConfigurationMode from './components/SpacePermissions/components/PermissionConfigurationMode';
 import { useImportDiscordRoles } from './hooks/useImportDiscordRoles';
 
-export default function RoleSettings({ space }: { space: Space }) {
+export function RoleSettings({ space }: { space: Space }) {
   const { assignRoles, deleteRole, refreshRoles, unassignRole, roles } = useRoles();
   const isAdmin = useIsAdmin();
   const { members } = useMembers();
@@ -58,7 +58,6 @@ export default function RoleSettings({ space }: { space: Space }) {
           <ShareBountyBoard padding={0} />
 
           <br />
-          {/* Default page permissions */}
           <DefaultPagePermissions />
         </>
       )}
@@ -107,8 +106,6 @@ export default function RoleSettings({ space }: { space: Space }) {
       )}
 
       <GuestRoleRow isEditable={isAdmin} />
-
-      {roles?.length === 0 && <Typography color='secondary'>No roles yet</Typography>}
 
       <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
         <ImportDiscordRolesMenuItem />
