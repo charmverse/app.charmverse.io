@@ -26,7 +26,6 @@ import { useImportDiscordRoles } from './hooks/useImportDiscordRoles';
 export function RoleSettings({ space }: { space: Space }) {
   const { assignRoles, deleteRole, refreshRoles, unassignRole, roles } = useRoles();
   const isAdmin = useIsAdmin();
-  const { members } = useMembers();
   const popupState = usePopupState({ variant: 'popover', popupId: 'add-a-role' });
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
   const open = Boolean(anchorEl);

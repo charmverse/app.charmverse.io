@@ -3,9 +3,11 @@ import useSWR, { mutate } from 'swr';
 
 import charmClient from 'charmClient';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useMembers } from 'hooks/useMembers';
 
 export function useRoles() {
   const space = useCurrentSpace();
+  const { mutateMembers } = useMembers();
 
   const { data: roles } = useSWR(
     () => (space ? `roles/${space.id}` : null),
@@ -43,6 +45,7 @@ export function useRoles() {
         )
       );
       refreshRoles();
+      mutateMembers();
     }
   }
 
@@ -54,6 +57,7 @@ export function useRoles() {
         spaceId: space.id
       });
       refreshRoles();
+      mutateMembers();
     }
   }
 
