@@ -4,6 +4,7 @@ import { useContext, createContext, useMemo } from 'react';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
+import type { PostCategoryWithPermissions } from 'lib/permissions/forum/interfaces';
 
 import { useCurrentSpace } from './useCurrentSpace';
 import { useSpaces } from './useSpaces';
@@ -11,12 +12,12 @@ import { useSpaces } from './useSpaces';
 type IContext = {
   createForumCategory: (categoryName: string) => Promise<void>;
   deleteForumCategory: (option: PostCategory) => Promise<void>;
-  updateForumCategory: (option: PostCategory) => Promise<PostCategory | undefined>;
+  updateForumCategory: (option: PostCategory) => Promise<PostCategoryWithPermissions | undefined>;
   setDefaultPostCategory: (option: PostCategory) => Promise<void>;
-  getForumCategoryById: (id: string) => PostCategory | undefined;
-  getPostableCategories: () => PostCategory[];
+  getForumCategoryById: (id: string) => PostCategoryWithPermissions | undefined;
+  getPostableCategories: () => PostCategoryWithPermissions[];
   isCategoriesLoaded: boolean;
-  categories: PostCategory[];
+  categories: PostCategoryWithPermissions[];
   error: any;
   disabled: boolean;
 };
