@@ -64,12 +64,25 @@ export function DocumentHistory({
       }
     >
       <Box mx={2} my={1}>
-        <Typography variant='subtitle2'>
-          Last edited by <strong>{updatedBy}</strong>
-        </Typography>
-        <Typography variant='subtitle2'>
-          at <strong>{formatDateTime(page.updatedAt)}</strong>
-        </Typography>
+        {deletedBy && page.deletedAt ? (
+          <>
+            <Typography variant='subtitle2'>
+              Deleted by <strong>{deletedBy}</strong>
+            </Typography>
+            <Typography variant='subtitle2'>
+              at <strong>{formatDateTime(page.deletedAt)}</strong>
+            </Typography>
+          </>
+        ) : (
+          <>
+            <Typography variant='subtitle2'>
+              Last edited by <strong>{updatedBy}</strong>
+            </Typography>
+            <Typography variant='subtitle2'>
+              at <strong>{formatDateTime(page.updatedAt)}</strong>
+            </Typography>
+          </>
+        )}
         {/* <Typography color='secondary' fontSize={12.8} variant='caption' fontWeight={500}>Edited {updatedAt}</Typography> */}
       </Box>
     </Tooltip>
