@@ -99,11 +99,12 @@ async function togglePageArchiveStatus(req: NextApiRequest, res: NextApiResponse
   });
 
   const deletedAt = archive ? new Date() : null;
+  const deletedBy = archive ? userId : null;
 
   relay.broadcast(
     {
       type: 'pages_meta_updated',
-      payload: modifiedChildPageIds.map((id) => ({ id, deletedAt, spaceId: pageSpaceId.spaceId }))
+      payload: modifiedChildPageIds.map((id) => ({ id, deletedAt, spaceId: pageSpaceId.spaceId, deletedBy }))
     },
     pageSpaceId.spaceId
   );

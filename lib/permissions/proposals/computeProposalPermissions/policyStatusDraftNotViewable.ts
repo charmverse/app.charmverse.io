@@ -22,10 +22,18 @@ export async function policyStatusDraftNotViewable({
   }
 
   const allowedAuthorOperations: ProposalOperation[] = ['view', 'edit', 'delete', 'comment'];
+  const allowedAdminOperations: ProposalOperation[] = ['view', 'delete', 'comment'];
 
-  if (isProposalAuthor({ proposal: resource, userId }) || isAdmin) {
+  if (isProposalAuthor({ proposal: resource, userId })) {
     typedKeys(flags).forEach((flag) => {
       if (!allowedAuthorOperations.includes(flag)) {
+        newPermissions[flag] = false;
+      }
+    });
+    return newPermissions;
+  } else if (isAdmin) {
+    typedKeys(flags).forEach((flag) => {
+      if (!allowedAdminOperations.includes(flag)) {
         newPermissions[flag] = false;
       }
     });

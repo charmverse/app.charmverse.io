@@ -150,26 +150,6 @@ export function ExportMarkdownMenuItem({ disabled = false, onClick }: { disabled
   );
 }
 
-export function Metadata({ creator, lastUpdatedAt }: { creator: string; lastUpdatedAt: Date }) {
-  const { formatDateTime } = useDateFormatter();
-
-  return (
-    <Stack
-      sx={{
-        mx: 2,
-        my: 1
-      }}
-    >
-      <Typography variant='subtitle2'>
-        Last edited by <strong>{creator}</strong>
-      </Typography>
-      <Typography variant='subtitle2'>
-        at <strong>{formatDateTime(lastUpdatedAt)}</strong>
-      </Typography>
-    </Stack>
-  );
-}
-
 function PostHeader({
   setPageMenuOpen,
   undoEditorChanges,

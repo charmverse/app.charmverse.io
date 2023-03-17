@@ -20,7 +20,7 @@ export async function policyStatusReviewedOnlyCreateVote({
     return newPermissions;
   }
 
-  const allowedAuthorOperations: ProposalOperation[] = ['view', 'create_vote'];
+  const allowedAuthorOperations: ProposalOperation[] = ['view', 'create_vote', 'delete'];
   const allowedAdminOperations: ProposalOperation[] = [...allowedAuthorOperations, 'delete'];
 
   if (isAdmin) {

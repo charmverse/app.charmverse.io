@@ -139,6 +139,7 @@ async function baseComputeUserPagePermissions({
     where: { id: resourceId },
     select: {
       id: true,
+      spaceId: true,
       proposalId: true,
       convertedProposalId: true
     }
