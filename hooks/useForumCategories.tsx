@@ -1,5 +1,6 @@
 import type { PostCategory } from '@prisma/client';
-import { useMemo } from 'react';
+import type { ReactNode } from 'react';
+import { useContext, createContext, useMemo } from 'react';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
@@ -7,7 +8,33 @@ import charmClient from 'charmClient';
 import { useCurrentSpace } from './useCurrentSpace';
 import { useSpaces } from './useSpaces';
 
-export function useForumCategories() {
+type IContext = {
+  createForumCategory: (categoryName: string) => Promise<void>;
+  deleteForumCategory: (option: PostCategory) => Promise<void>;
+  updateForumCategory: (option: PostCategory) => Promise<PostCategory | undefined>;
+  setDefaultPostCategory: (option: PostCategory) => Promise<void>;
+  getForumCategoryById: (id: string) => PostCategory | undefined;
+  getPostableCategories: () => PostCategory[];
+  isCategoriesLoaded: boolean;
+  categories: PostCategory[];
+  error: any;
+  disabled: boolean;
+};
+
+export const PostCategoriesContext = createContext<Readonly<IContext>>({
+  createForumCategory: () => Promise.resolve(undefined as any),
+  deleteForumCategory: () => Promise.resolve(undefined),
+  updateForumCategory: () => Promise.resolve(undefined),
+  setDefaultPostCategory: () => Promise.resolve(undefined),
+  getForumCategoryById: () => undefined,
+  getPostableCategories: () => [],
+  isCategoriesLoaded: false,
+  categories: [],
+  error: undefined,
+  disabled: false
+});
+
+export function PostCategoriesProvider({ children }: { children: ReactNode }) {
   const currentSpace = useCurrentSpace();
   const { setSpace } = useSpaces();
 
@@ -99,16 +126,25 @@ export function useForumCategories() {
     return (categories ?? []).filter((c) => c.permissions.create_post);
   }
 
-  return {
-    createForumCategory,
-    deleteForumCategory,
-    updateForumCategory,
-    setDefaultPostCategory,
-    getForumCategoryById,
-    getPostableCategories,
-    isCategoriesLoaded: !!categories,
-    categories: categories || [],
-    error,
-    disabled: isValidating
-  };
+  const isCategoriesLoaded = !!categories;
+
+  const value = useMemo<IContext>(
+    () => ({
+      createForumCategory,
+      deleteForumCategory,
+      updateForumCategory,
+      setDefaultPostCategory,
+      getForumCategoryById,
+      getPostableCategories,
+      isCategoriesLoaded,
+      categories: categories || [],
+      error,
+      disabled: isValidating
+    }),
+    [isCategoriesLoaded, error, categories, isValidating, currentSpace]
+  );
+
+  return <PostCategoriesContext.Provider value={value}>{children}</PostCategoriesContext.Provider>;
 }
+
+export const useForumCategories = () => useContext(PostCategoriesContext);
