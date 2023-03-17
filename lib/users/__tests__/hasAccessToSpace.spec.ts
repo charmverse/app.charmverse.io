@@ -6,12 +6,13 @@ import { prisma } from 'db';
 import { InvalidInputError } from 'lib/utilities/errors';
 import { generateUserAndSpace, generateSpaceUser } from 'testing/setupDatabase';
 
-import { AdministratorOnlyError, UserIsNotSpaceMemberError } from '../errors';
+import { AdministratorOnlyError, UserIsGuestError, UserIsNotSpaceMemberError } from '../errors';
 import { hasAccessToSpace } from '../hasAccessToSpace';
 
 let space: Space;
 let adminUser: User;
 let memberUser: User;
+let guestUser: User;
 
 let outsideUser: User;
 
@@ -24,6 +25,10 @@ beforeAll(async () => {
     data: {
       username: 'Test user'
     }
+  });
+  guestUser = await generateSpaceUser({
+    spaceId: space.id,
+    isGuest: true
   });
 });
 
@@ -64,6 +69,41 @@ describe('hasAccessToSpace', () => {
     expect(error).toBeUndefined();
     expect(success).toBe(true);
     expect(isAdmin).toBe(false);
+  });
+
+  it('should return success if user is a guest and disallow guest is undefined', async () => {
+    const { success, isAdmin, error } = await hasAccessToSpace({
+      spaceId: space.id,
+      userId: guestUser.id
+    });
+
+    expect(error).toBeUndefined();
+    expect(success).toBe(true);
+    expect(isAdmin).toBe(false);
+  });
+
+  it('should return success if user is a guest and disallow guest is false', async () => {
+    const { success, isAdmin, error } = await hasAccessToSpace({
+      spaceId: space.id,
+      userId: guestUser.id,
+      disallowGuest: false
+    });
+
+    expect(error).toBeUndefined();
+    expect(success).toBe(true);
+    expect(isAdmin).toBe(false);
+  });
+
+  it('should return an error if user is a guest and disallow guest is true', async () => {
+    const { success, isAdmin, error } = await hasAccessToSpace({
+      spaceId: space.id,
+      userId: guestUser.id,
+      disallowGuest: true
+    });
+
+    expect(error).toBeInstanceOf(UserIsGuestError);
+    expect(success).toBeUndefined();
+    expect(isAdmin).toBeUndefined();
   });
 
   it('should return an error if user is a space member, but not an admin', async () => {
