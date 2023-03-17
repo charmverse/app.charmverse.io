@@ -26,12 +26,12 @@ export type RoleAction = (typeof roleActions)[number];
 
 interface Props {
   member: Member;
-  isAdmin?: boolean;
+  editable?: boolean;
   isSpaceOwner?: boolean;
   onChange: (action: RoleAction, member: Member) => void;
 }
 
-export default function MemberRow({ isAdmin, isSpaceOwner, member, onChange }: Props) {
+export function MemberListItem({ editable, isSpaceOwner, member, onChange }: Props) {
   const popupState = usePopupState({ variant: 'popover', popupId: 'user-role' });
   const { members } = useMembers();
   const { formatDate } = useDateFormatter();
@@ -40,20 +40,21 @@ export default function MemberRow({ isAdmin, isSpaceOwner, member, onChange }: P
     onChange(action, member);
     popupState.close();
   }
-
-  const actions = roleActions.filter((action) => {
-    switch (action) {
-      case 'makeAdmin':
-        return isAdmin;
-      case 'makeMember':
-        return isAdmin;
-      case 'removeFromSpace': {
-        return isAdmin && !isSpaceOwner;
-      }
-      default:
-        return false;
-    }
-  });
+  const actions = member.isGuest
+    ? roleActions.filter((action) => action === 'removeFromSpace')
+    : roleActions.filter((action) => {
+        switch (action) {
+          case 'makeAdmin':
+            return editable;
+          case 'makeMember':
+            return editable;
+          case 'removeFromSpace': {
+            return editable && !isSpaceOwner;
+          }
+          default:
+            return false;
+        }
+      });
 
   const activeRoleAction = member.isAdmin ? 'makeAdmin' : 'makeMember';
 
@@ -86,7 +87,7 @@ export default function MemberRow({ isAdmin, isSpaceOwner, member, onChange }: P
               endIcon={<KeyboardArrowDownIcon fontSize='small' />}
               data-test={`editable-member-level-${member.id}`}
             >
-              {member.isAdmin ? 'admin' : 'member'}
+              {member.isAdmin ? 'admin' : member.isGuest ? 'guest' : 'member'}
             </Button>
             <Menu
               {...bindMenu(popupState)}
@@ -128,7 +129,7 @@ export default function MemberRow({ isAdmin, isSpaceOwner, member, onChange }: P
             </Menu>
           </>
         ) : (
-          <Typography color='secondary'>{member.isAdmin ? 'admin' : 'member'}</Typography>
+          <Typography color='secondary'>{member.isAdmin ? 'admin' : member.isGuest ? 'guest' : 'member'}</Typography>
         )}
       </TableCell>
     </TableRow>

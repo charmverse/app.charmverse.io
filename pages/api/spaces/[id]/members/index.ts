@@ -153,12 +153,16 @@ async function getMembers(req: NextApiRequest, res: NextApiResponse<(Member | Pu
       const { memberPropertyValues = [], id, ...userData } = spaceRole.user;
       const roles = spaceRole.spaceRoleToRole?.map((sr) => sr.role);
 
+      const nameProperty = visibleProperties.find((property) => property.type === 'name') ?? null;
+      const memberNameProperty = memberPropertyValues.find((prop) => prop.memberPropertyId === nameProperty?.id);
       return {
         id,
         ...userData,
+        username: memberNameProperty?.value || userData.username,
         addresses: [],
         onboarded: spaceRole.onboarded,
-        isAdmin: spaceRole.isAdmin,
+        isAdmin: !!spaceRole.isAdmin,
+        isGuest: !!spaceRole.isGuest && !spaceRole.isAdmin,
         joinDate: spaceRole.createdAt.toISOString(),
         hasNftAvatar: hasNftAvatar(spaceRole.user),
         properties: getPropertiesWithValues(visibleProperties, memberPropertyValues),

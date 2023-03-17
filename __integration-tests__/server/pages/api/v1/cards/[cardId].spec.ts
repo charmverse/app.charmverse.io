@@ -5,7 +5,7 @@ import { v4 } from 'uuid';
 
 import type {
   InvalidCustomPropertyValueError,
-  Page as ApiPage,
+  CardPage as ApiPage,
   PageProperty,
   UnsupportedKeysError
 } from 'lib/public-api';
@@ -64,7 +64,7 @@ beforeAll(async () => {
   );
 });
 
-describe('GET /api/v1/pages/{pageId}', () => {
+describe('GET /api/v1/cards/{cardId}', () => {
   it('should respond with 200 and return the page', async () => {
     const card = await createDatabaseCardPage({
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -75,7 +75,7 @@ describe('GET /api/v1/pages/{pageId}', () => {
       title: 'Example card'
     });
 
-    const response = await request(baseUrl).get(`/api/v1/pages/${card.id}`).set('Authorization', apiToken.token).send();
+    const response = await request(baseUrl).get(`/api/v1/cards/${card.id}`).set('Authorization', apiToken.token).send();
 
     expect(response.statusCode).toBe(200);
 
@@ -108,7 +108,7 @@ describe('GET /api/v1/pages/{pageId}', () => {
     });
 
     const response = await request(baseUrl)
-      .get(`/api/v1/pages/${card.id}`)
+      .get(`/api/v1/cards/${card.id}`)
       .set('Authorization', secondSpace.apiToken.token)
       .send();
 
@@ -116,7 +116,7 @@ describe('GET /api/v1/pages/{pageId}', () => {
   });
 });
 
-describe('PATCH /api/v1/pages/{pageId}', () => {
+describe('PATCH /api/v1/cards/{cardId}', () => {
   it('should respond with 200 and return the page', async () => {
     const card = await createDatabaseCardPage({
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -128,7 +128,7 @@ describe('PATCH /api/v1/pages/{pageId}', () => {
     });
 
     const response = await request(baseUrl)
-      .patch(`/api/v1/pages/${card.id}`)
+      .patch(`/api/v1/cards/${card.id}`)
       .set('Authorization', apiToken.token)
       .send({});
 
@@ -163,7 +163,7 @@ describe('PATCH /api/v1/pages/{pageId}', () => {
     });
 
     const response = await request(baseUrl)
-      .patch(`/api/v1/pages/${card.id}`)
+      .patch(`/api/v1/cards/${card.id}`)
       .set('Authorization', secondSpace.apiToken.token)
       .send();
 
@@ -181,7 +181,7 @@ describe('PATCH /api/v1/pages/{pageId}', () => {
     });
 
     const response = await request(baseUrl)
-      .patch(`/api/v1/pages/${card.id}`)
+      .patch(`/api/v1/cards/${card.id}`)
       .set('Authorization', apiToken.token)
       .send({
         title: 'New title'
@@ -201,7 +201,7 @@ describe('PATCH /api/v1/pages/{pageId}', () => {
     });
 
     const response = await request(baseUrl)
-      .patch(`/api/v1/pages/${card.id}`)
+      .patch(`/api/v1/cards/${card.id}`)
       .set('Authorization', apiToken.token)
       .send({
         title: 'New title',
@@ -222,7 +222,7 @@ describe('PATCH /api/v1/pages/{pageId}', () => {
     });
 
     const response = await request(baseUrl)
-      .patch(`/api/v1/pages/${card.id}`)
+      .patch(`/api/v1/cards/${card.id}`)
       .set('Authorization', apiToken.token)
       .send({
         title: 'New title',
@@ -243,7 +243,7 @@ describe('PATCH /api/v1/pages/{pageId}', () => {
     });
 
     const response = await request(baseUrl)
-      .patch(`/api/v1/pages/${card.id}`)
+      .patch(`/api/v1/cards/${card.id}`)
       .set('Authorization', apiToken.token)
       .send({
         title: 'New title',
@@ -266,7 +266,7 @@ describe('PATCH /api/v1/pages/{pageId}', () => {
     });
 
     const response = await request(baseUrl)
-      .patch(`/api/v1/pages/${card.id}`)
+      .patch(`/api/v1/cards/${card.id}`)
       .set('Authorization', apiToken.token)
       .send({
         title: 'New title',
@@ -291,7 +291,7 @@ describe('PATCH /api/v1/pages/{pageId}', () => {
     });
 
     const response = await request(baseUrl)
-      .patch(`/api/v1/pages/${card.id}`)
+      .patch(`/api/v1/cards/${card.id}`)
       .set('Authorization', apiToken.token)
       .send({
         title: 'New title',

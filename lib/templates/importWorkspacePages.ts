@@ -11,7 +11,7 @@ import type { PageMeta } from 'lib/pages';
 import { createPage } from 'lib/pages/server/createPage';
 import { getPagePath } from 'lib/pages/utils';
 import type { PageContent, TextContent, TextMark } from 'lib/prosemirror/interfaces';
-import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
+import { InvalidInputError } from 'lib/utilities/errors';
 import { typedKeys } from 'lib/utilities/objects';
 
 import type { ExportedPage, WorkspaceExport, WorkspaceImport } from './interfaces';
@@ -199,7 +199,7 @@ export async function generateImportWorkspacePages({
         parentId: currentParentId,
         proposal: {
           connect:
-            node.type === 'proposal'
+            node.type === 'proposal' || node.type === 'proposal_template'
               ? {
                   id: newId
                 }
@@ -215,7 +215,7 @@ export async function generateImportWorkspacePages({
         },
         bounty: {
           connect:
-            node.type === 'bounty'
+            node.type === 'bounty' || node.type === 'bounty_template'
               ? {
                   id: newId
                 }
@@ -303,7 +303,7 @@ export async function generateImportWorkspacePages({
       node.children?.forEach((child) => {
         recursivePagePrep({ node: child, newParentId: newId, rootSpacePermissionId });
       });
-    } else if (node.type === 'bounty' && node.bounty) {
+    } else if ((node.type === 'bounty' || node.type === 'bounty_template') && node.bounty) {
       pageArgs.push(newPageContent);
       const { createdAt, updatedAt, createdBy: bountyCreatedBy, permissions, ...bounty } = node.bounty;
       bountyArgs.push({
@@ -319,12 +319,14 @@ export async function generateImportWorkspacePages({
           bountyId: oldNewPageIdHashMap[node.id]
         });
       });
-    } else if (node.type === 'proposal' && node.proposal) {
+    } else if ((node.type === 'proposal' || node.type === 'proposal_template') && node.proposal) {
       // TODO: Handle cross space reviewers and authors
       const { category, ...proposal } = node.proposal;
       let categoryId: string | undefined;
       if (category) {
-        categoryId = space.proposalCategories.find((cat) => cat.title === category.title)?.id;
+        categoryId =
+          space.proposalCategories.find((cat) => cat.title === category.title)?.id ||
+          proposalCategoryArgs.find((proposalCategoryArg) => proposalCategoryArg.title === category.title)?.id;
         if (!categoryId) {
           categoryId = v4();
           proposalCategoryArgs.push({

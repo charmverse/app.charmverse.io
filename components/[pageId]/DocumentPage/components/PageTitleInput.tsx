@@ -1,10 +1,10 @@
 import { EditorViewContext } from '@bangle.dev/react';
 import styled from '@emotion/styled';
 import { TextField, Typography } from '@mui/material';
-import { TextSelection } from 'prosemirror-state';
 import type { ChangeEvent } from 'react';
 import { useContext, useEffect, useRef, useState } from 'react';
 
+import { insertAndFocusFirstLine } from 'lib/prosemirror/insertAndFocusFirstLine';
 import { isTouchScreen } from 'lib/utilities/browser';
 
 const StyledPageTitle = styled(TextField)`
@@ -83,12 +83,10 @@ export function PageTitleInput({ value, updatedAt: updatedAtExternal, onChange, 
       variant='standard'
       onKeyDown={(e) => {
         if (e.code === 'Enter') {
-          // prevent inserting a new line into the editor
+          // prevent inserting a new line in title input
           e.preventDefault();
-          const { tr } = view.state;
-          // set cursor at beginning of first line
-          view.dispatch(tr.setSelection(TextSelection.atStart(tr.doc)));
-          view.focus();
+
+          insertAndFocusFirstLine(view);
         }
       }}
     />

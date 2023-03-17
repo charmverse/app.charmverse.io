@@ -1,6 +1,7 @@
 import type { SpaceRole } from '@prisma/client';
 
 import { prisma } from 'db';
+import { InvalidStateError } from 'lib/middleware';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { DataNotFoundError, InsecureOperationError } from 'lib/utilities/errors';
 
@@ -36,6 +37,10 @@ export async function assignRole({ roleId, userId }: RoleAssignment): Promise<Ro
 
   if (error) {
     throw new InsecureOperationError('Roles cannot be assigned to users from outside this space');
+  }
+
+  if (spaceRole?.isGuest) {
+    throw new InvalidStateError('Guests cannot be assigned roles');
   }
 
   await prisma.spaceRoleToRole.create({

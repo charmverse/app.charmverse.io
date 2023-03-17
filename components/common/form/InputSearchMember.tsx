@@ -1,10 +1,13 @@
+import EmailIcon from '@mui/icons-material/Email';
 import type { AutocompleteChangeReason, AutocompleteProps, PopperProps } from '@mui/material';
 import { Autocomplete, Popper, TextField } from '@mui/material';
-import { useCallback, useEffect, useState } from 'react';
+import type { User } from '@prisma/client';
+import { createRef, useCallback, useEffect, useState } from 'react';
 
 import UserDisplay from 'components/common/UserDisplay';
 import { useMembers } from 'hooks/useMembers';
 import type { Member } from 'lib/members/interfaces';
+import { isValidEmail } from 'lib/utilities/strings';
 
 interface IMembersFilter {
   mode: 'include' | 'exclude';
@@ -30,6 +33,7 @@ interface Props extends Omit<AutocompleteProps<Member, boolean, boolean, boolean
   options: Member[];
   disableCloseOnSelect?: boolean;
   openOnFocus?: boolean;
+  allowEmail?: boolean;
 }
 
 export function InputSearchMemberBase({
@@ -40,34 +44,64 @@ export function InputSearchMemberBase({
   openOnFocus = false,
   ...props
 }: Props) {
+  const inputRef = createRef<HTMLInputElement>();
+
   const filteredOptions = filter ? filterMembers(options, filter) : options;
+
   const PopperComponent = useCallback((popperProps: PopperProps) => {
     return <Popper {...popperProps} sx={{ ...popperProps.sx, minWidth: 300 }} />;
   }, []);
 
   return (
     <Autocomplete
-      disabled={options.length === 0}
+      disabled={options.length === 0 && !props.allowEmail}
       disableCloseOnSelect={disableCloseOnSelect}
       loading={options.length === 0}
       sx={{ minWidth: 150 }}
-      placeholder={filteredOptions.length > 0 ? placeholder : ''}
       options={filteredOptions}
       autoHighlight
+      // freeSolo={props.allowEmail}
+      getOptionDisabled={(option) => option.id === 'email' && !isValidEmail(option.username)}
+      onInputChange={(_event, value) => {
+        if (props.allowEmail) {
+          const emailOption = filteredOptions.find((opt) => opt.id === 'email');
+
+          if (emailOption && !value) {
+            filteredOptions.pop();
+          } else if (emailOption && value) {
+            emailOption.username = value;
+          } else if (!emailOption && value) {
+            filteredOptions.push({
+              id: 'email',
+              username: inputRef.current?.value,
+              isBot: false,
+              avatar: '/images/Google_G-grayscale.png'
+            } as any);
+          }
+        }
+      }}
       // user can also be a string if freeSolo=true
       getOptionLabel={(user) => (user as Member)?.username}
-      renderOption={(_props, user) => <UserDisplay {...(_props as any)} user={user} />}
+      renderOption={(_props, user) => (
+        <UserDisplay
+          {...(_props as any)}
+          user={user}
+          avatarIcon={user.id === 'email' ? <EmailIcon fontSize='large' /> : undefined}
+        />
+      )}
       noOptionsText='No options available'
       PopperComponent={PopperComponent}
       renderInput={(params) => (
         <TextField
           {...params}
-          placeholder={filteredOptions.length > 0 ? placeholder : ''}
+          //          ref={inputRef}
+          placeholder={placeholder ?? ''}
           size='small'
           autoFocus={openOnFocus}
           inputProps={{
             ...params.inputProps
           }}
+          inputRef={inputRef}
         />
       )}
       {...props}
@@ -98,7 +132,7 @@ export function InputSearchMember({ defaultValue, onChange, onClear, openOnFocus
 
   function emitValue(selectedUser: Member) {
     if (selectedUser) {
-      onChange(selectedUser.id);
+      onChange(selectedUser.id === 'email' ? selectedUser.username : selectedUser.id);
     }
     if (onClear && !selectedUser) {
       onClear();
@@ -124,6 +158,7 @@ interface IInputSearchMemberMultipleProps
   defaultValue?: string[];
   filter?: IMembersFilter;
   disableCloseOnSelect?: boolean;
+  allowEmail?: boolean;
 }
 
 export function InputSearchMemberMultiple({
@@ -137,7 +172,7 @@ export function InputSearchMemberMultiple({
 
   function emitValue(users: Member[], reason: AutocompleteChangeReason) {
     onChange(
-      users.map((user) => user.id),
+      users.map((user) => (user.id === 'email' ? user.username : user.id)),
       reason
     );
     setValue(users);
@@ -151,7 +186,6 @@ export function InputSearchMemberMultiple({
       setValue(defaultMembers);
     }
   }, [defaultValue, members]);
-
   return (
     <InputSearchMemberBase
       filterSelectedOptions

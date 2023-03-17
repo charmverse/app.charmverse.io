@@ -4,7 +4,6 @@ import { bindMenu, usePopupState } from 'material-ui-popup-state/hooks';
 import { useState } from 'react';
 
 import charmClient from 'charmClient';
-import Loader from 'components/common/Loader';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useMembers } from 'hooks/useMembers';
@@ -13,7 +12,7 @@ import type { Member } from 'lib/members/interfaces';
 import Legend from '../Legend';
 
 import type { RoleAction } from './MemberListItem';
-import MemberListItem from './MemberListItem';
+import { MemberListItem } from './MemberListItem';
 
 export default function MemberSettings({ space }: { space: Space }) {
   const isAdmin = useIsAdmin();
@@ -35,6 +34,12 @@ export default function MemberSettings({ space }: { space: Space }) {
     switch (action) {
       case 'makeAdmin':
         await charmClient.updateMember({ spaceId, userId: member.id, isAdmin: true });
+        if (members) {
+          mutateMembers(
+            members.map((c) => (c.id === member.id ? { ...c, isAdmin: true } : c)),
+            { revalidate: false }
+          );
+        }
         break;
 
       case 'makeMember':
@@ -86,7 +91,7 @@ export default function MemberSettings({ space }: { space: Space }) {
               ?.filter((member) => !member.isBot)
               .map((member) => (
                 <MemberListItem
-                  isAdmin={isAdmin}
+                  editable={isAdmin}
                   key={member.id}
                   isSpaceOwner={spaceOwner === member.id}
                   member={member}
@@ -101,7 +106,7 @@ export default function MemberSettings({ space }: { space: Space }) {
           title='Remove member'
           onClose={popupState.close}
           open={menuState.open}
-          buttonText={`Remove ${removedMember.username}`}
+          buttonText={`Remove ${removedMember.isAdmin ? 'admin' : removedMember.isGuest ? 'guest' : 'member'}`}
           onConfirm={removeMember}
           question={`Are you sure you want to remove ${removedMember.username} from space?`}
         />

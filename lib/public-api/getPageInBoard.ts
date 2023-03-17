@@ -7,10 +7,10 @@ import { InvalidInputError } from 'lib/utilities/errors';
 import { filterObjectKeys } from 'lib/utilities/objects';
 
 import { DatabasePageNotFoundError, PageNotFoundError, SpaceNotFoundError } from './errors';
-import type { DatabasePage, Page, PageProperty } from './interfaces';
+import type { DatabasePage, CardPage, PageProperty } from './interfaces';
 import { PageFromBlock } from './pageFromBlock.class';
 
-export async function getPageInBoard(pageId: string): Promise<Page> {
+export async function getPageInBoard(pageId: string): Promise<CardPage> {
   const card = await prisma.block.findFirst({
     where: {
       type: 'card',

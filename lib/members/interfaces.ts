@@ -33,6 +33,7 @@ export type PropertyValueWithDetails = PropertyValue & PropertyValueDetails;
 
 export type Member = Omit<User, 'addresses'> & {
   isAdmin: boolean;
+  isGuest: boolean;
   joinDate: string;
   hasNftAvatar?: boolean;
   profile: UserDetails | null;

@@ -3,6 +3,7 @@ import type { ProfileItem } from '@prisma/client';
 import * as http from 'adapters/http';
 import type { ConnectGoogleAccountRequest } from 'lib/google/connectGoogleAccount';
 import type { DisconnectGoogleAccountRequest } from 'lib/google/disconnectGoogleAccount';
+import type { EmailAccountDisconnect } from 'lib/google/disconnectVerifiedEmail';
 import type { LoginWithGoogleRequest } from 'lib/google/loginWithGoogle';
 import type { LoggedInUser } from 'models';
 import type { CreateCredentialRequest, CredentialRequest, CredentialItem } from 'pages/api/google/credentials';
@@ -32,6 +33,10 @@ export class GoogleApi {
 
   connectEmailAccount(data: Pick<LoginWithGoogleRequest, 'accessToken'>) {
     return http.POST<LoggedInUser>('/api/google/connect-email-account', data);
+  }
+
+  disconnectEmailAccount(data: Pick<EmailAccountDisconnect, 'email'>) {
+    return http.POST<LoggedInUser>('/api/google/disconnect-email-account', data);
   }
 
   forms = {
