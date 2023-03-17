@@ -3,9 +3,10 @@ import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 
+import getLayout from 'components/common/BaseLayout/BaseLayout';
 import ErrorPage from 'components/common/errors/ErrorPage';
 import Link from 'components/common/Link';
-import LoadingComponent from 'components/common/LoadingComponent';
+import { LoginPageContent } from 'components/login';
 import { CollectEmailDialog } from 'components/login/CollectEmail';
 import { useFirebaseAuth } from 'hooks/useFirebaseAuth';
 import { useSnackbar } from 'hooks/useSnackbar';
@@ -67,16 +68,16 @@ export default function Authenticate() {
     );
   }
 
-  return (
+  return getLayout(
     <Box height='100%' display='flex' flexDirection='column'>
-      {isAuthenticating && <LoadingComponent label='Logging you in' />}
+      <LoginPageContent hideLoginOptions isLoggingIn={isAuthenticating} />
 
       <CollectEmailDialog
         title='Login with your email'
         description='Please enter the email address on which you received the login link.'
         isOpen={emailPopup.isOpen}
         // We don't want to allow the user to close the email popup
-        onClose={() => null}
+        onClose={undefined}
         handleSubmit={submitEmail}
       />
     </Box>
