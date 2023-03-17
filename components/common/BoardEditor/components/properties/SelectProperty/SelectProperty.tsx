@@ -61,13 +61,15 @@ const StyledSelect = styled(SelectField)<ContainerProps>`
   .MuiInputBase-root {
     background-color: ${({ theme }) => theme.palette.background.paper};
 
-    ${({ displayType, theme }) =>
-      displayType === 'table'
-        ? `
+    .MuiAutocomplete-input {
+      ${({ displayType, theme }) =>
+        displayType === 'table'
+          ? `
       width: 100%;
       border-top: 1px solid ${theme.palette.divider};
     `
-        : ''}
+          : ''}
+    }
   }
 
   .MuiOutlinedInput-root.MuiInputBase-sizeSmall {
