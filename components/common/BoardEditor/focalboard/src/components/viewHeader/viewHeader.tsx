@@ -1,6 +1,6 @@
 import OpenInFullIcon from '@mui/icons-material/OpenInFull';
-import { Box, Popover, Tooltip } from '@mui/material';
-import PopupState, { bindTrigger, bindPopover } from 'material-ui-popup-state';
+import { Box, Menu, Popover, Tooltip } from '@mui/material';
+import PopupState, { bindTrigger, bindPopover, bindMenu } from 'material-ui-popup-state';
 import { useRouter } from 'next/router';
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
@@ -174,11 +174,45 @@ function ViewHeader(props: Props) {
             {/* Sort */}
 
             {withSortBy && (
-              <ViewHeaderSortMenu
-                properties={activeBoard?.fields.cardProperties ?? []}
-                activeView={activeView}
-                orderedCards={cards}
-              />
+              <PopupState variant='popover' popupId='view-sort'>
+                {(popupState) => (
+                  <>
+                    <Button
+                      color={activeView.fields.sortOptions?.length > 0 ? 'primary' : 'secondary'}
+                      variant='text'
+                      size='small'
+                      sx={{ minWidth: 0 }}
+                      {...bindTrigger(popupState)}
+                    >
+                      <FormattedMessage id='ViewHeader.sort' defaultMessage='Sort' />
+                    </Button>
+                    <Menu
+                      {...bindMenu(popupState)}
+                      disablePortal
+                      PaperProps={{
+                        sx: {
+                          overflow: 'visible'
+                        }
+                      }}
+                      anchorOrigin={{
+                        vertical: 'bottom',
+                        horizontal: 'right'
+                      }}
+                      transformOrigin={{
+                        vertical: 'top',
+                        horizontal: 'right'
+                      }}
+                      onClick={() => popupState.close()}
+                    >
+                      <ViewHeaderSortMenu
+                        properties={activeBoard?.fields.cardProperties ?? []}
+                        activeView={activeView}
+                        orderedCards={cards}
+                      />
+                    </Menu>
+                  </>
+                )}
+              </PopupState>
             )}
           </>
         )}
