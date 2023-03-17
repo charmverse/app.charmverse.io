@@ -170,11 +170,14 @@ export function useFirebaseAuth() {
             }));
 
         setUser(loggedInUser);
-        // We want to bubble up the error, so we can show a relevant message, but always clear the email
-      } finally {
         setEmailForSignIn('');
+        // We want to bubble up the error, so we can show a relevant message, but always clear the email
+      } catch (err) {
+        setEmailForSignIn('');
+        throw err;
       }
     } else {
+      setEmailForSignIn('');
       throw new InvalidInputError(`Could not login`);
     }
   }
