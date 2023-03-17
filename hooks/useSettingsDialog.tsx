@@ -1,8 +1,7 @@
-import path from 'path';
-
 import { usePopupState } from 'material-ui-popup-state/hooks';
+import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
-import { useMemo, createContext, useContext, useState } from 'react';
+import { useEffect, useMemo, createContext, useContext, useState } from 'react';
 
 import type { TasksPageProps } from 'components/nexus/TasksPage';
 
@@ -29,7 +28,7 @@ export function SettingsDialogProvider({ children }: { children: ReactNode }) {
   const settingsModalState = usePopupState({ variant: 'dialog', popupId: 'settings-dialog' });
   const [activePath, setActivePath] = useState('');
   const [pathProps, setPathProps] = useState<PathProps | undefined>();
-
+  const router = useRouter();
   const { memberSpaces } = useSpaces();
 
   const onClick = (_path?: string, props?: PathProps) => {
@@ -54,6 +53,21 @@ export function SettingsDialogProvider({ children }: { children: ReactNode }) {
     settingsModalState.close();
     setActivePath('');
   };
+
+  useEffect(() => {
+    const close = () => {
+      if (!router.route.endsWith('/[domain]')) {
+        onClose();
+      }
+    };
+    // If the user clicks a link inside the modal, close the modal only
+    router.events.on('routeChangeStart', close);
+
+    return () => {
+      router.events.off('routeChangeStart', close);
+    };
+  }, [router]);
+
   const value = useMemo<IContext>(
     () => ({
       open: settingsModalState.isOpen,
