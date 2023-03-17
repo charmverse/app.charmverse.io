@@ -6,13 +6,7 @@ import { prisma } from 'db';
 import type { PublicApiProposal } from 'pages/api/v1/proposals';
 import { randomETHWalletAddress } from 'testing/generateStubs';
 import { baseUrl } from 'testing/mockApiCall';
-import {
-  generateBountyWithSingleApplication,
-  generateSpaceUser,
-  generateUserAndSpaceWithApiToken,
-  generateUserAndSpace,
-  generateRole
-} from 'testing/setupDatabase';
+import { generateSpaceUser, generateUserAndSpace, generateRole } from 'testing/setupDatabase';
 
 type ProposalWithDetails = Proposal & {
   page: Page;
