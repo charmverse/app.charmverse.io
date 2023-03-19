@@ -9,7 +9,9 @@ import useSWRImmutable from 'swr/immutable';
 import charmClient from 'charmClient';
 import Link from 'components/common/Link';
 import { TimezoneDisplay } from 'components/members/components/TimezoneDisplay';
+import { isPublicUser } from 'components/profile/components/UserDetails/utils';
 import Avatar from 'components/settings/workspace/LargeAvatar';
+import { useUser } from 'hooks/useUser';
 import { hasNftAvatar } from 'lib/users/hasNftAvatar';
 import type { LoggedInUser } from 'models';
 import type { PublicUser } from 'pages/api/public/profile/[userId]';
@@ -25,8 +27,11 @@ interface UserDetailsMiniProps {
 }
 
 function UserDetailsMini({ readOnly, user, sx = {} }: UserDetailsMiniProps) {
+  const { user: currentUser } = useUser();
+  const isPublic = isPublicUser(user, currentUser);
+
   const { data: userDetails } = useSWRImmutable(`/userDetails/${user.id}`, () => {
-    return charmClient.getUserDetails();
+    return isPublic ? user.profile : charmClient.getUserDetails();
   });
 
   const [isPersonalLinkCopied, setIsPersonalLinkCopied] = useState(false);
