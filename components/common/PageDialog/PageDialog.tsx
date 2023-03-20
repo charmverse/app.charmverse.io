@@ -150,21 +150,23 @@ export default function PageDialog(props: Props) {
           >
             {bounty && (
               <>
-                {bounty.customReward !== null && (
-                  <MenuItem
-                    dense
-                    onClick={() => markBountyAsPaid(bounty.id)}
-                    disabled={bounty.status !== 'inProgress' && bounty.status !== 'open'}
-                  >
-                    <PaidIcon
-                      sx={{
-                        mr: 1
-                      }}
-                      fontSize='small'
-                    />
-                    <ListItemText primary='Mark paid' />
-                  </MenuItem>
-                )}
+                <MenuItem
+                  dense
+                  onClick={() => markBountyAsPaid(bounty.id)}
+                  disabled={
+                    bounty.applications.length === 0 ||
+                    bounty.applications.some((application) => application.status !== 'paid') ||
+                    (bounty.status !== 'inProgress' && bounty.status !== 'open')
+                  }
+                >
+                  <PaidIcon
+                    sx={{
+                      mr: 1
+                    }}
+                    fontSize='small'
+                  />
+                  <ListItemText primary='Mark paid' />
+                </MenuItem>
                 <MenuItem
                   dense
                   onClick={() => closeBounty(bounty.id)}
