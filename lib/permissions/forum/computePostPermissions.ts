@@ -39,7 +39,9 @@ export async function baseComputePostPermissions({
 
   const { error, isAdmin } = await hasAccessToSpace({
     spaceId: post.spaceId,
-    userId
+    userId,
+    // Provide guest same permission level as public
+    disallowGuest: true
   });
 
   const permissions = new AvailablePostPermissions();

@@ -5,7 +5,6 @@ import type {
   PagePermissionLevel,
   PaymentMethod,
   Prisma,
-  Role,
   Space,
   TelegramUser,
   TokenGateToRole,
@@ -45,7 +44,6 @@ import type { ServerBlockFields } from 'pages/api/blocks';
 import type { ImportGuildRolesPayload } from 'pages/api/guild-xyz/importRoles';
 import type { InviteLinkPopulated } from 'pages/api/invites/index';
 import type { PublicUser } from 'pages/api/public/profile/[userId]';
-import type { ListSpaceRolesResponse } from 'pages/api/roles';
 import type { SetSpaceWebhookBody, SetSpaceWebhookResponse } from 'pages/api/spaces/[id]/set-webhook';
 import type { Response as CheckDomainResponse } from 'pages/api/spaces/checkDomain';
 import type { TelegramAccount } from 'pages/api/telegram/connect';
@@ -64,6 +62,7 @@ import { PagesApi } from './apis/pagesApi';
 import { PermissionsApi } from './apis/permissions';
 import { ProfileApi } from './apis/profileApi';
 import { ProposalsApi } from './apis/proposalsApi';
+import { RolesApi } from './apis/rolesApi';
 import { SpacesApi } from './apis/spacesApi';
 import { SummonApi } from './apis/summonApi';
 import { TasksApi } from './apis/tasksApi';
@@ -103,6 +102,8 @@ class CharmClient {
   profile = new ProfileApi();
 
   proposals = new ProposalsApi();
+
+  roles = new RolesApi();
 
   spaces = new SpacesApi();
 
@@ -315,7 +316,7 @@ class CharmClient {
   async getWorkspaceUsers(spaceId: string): Promise<IUser[]> {
     const members = await this.members.getMembers(spaceId);
 
-    return members.map((member: Member) => ({
+    return members.map((member) => ({
       id: member.id,
       username: member.username,
       email: '',
@@ -473,30 +474,6 @@ class CharmClient {
 
   deletePaymentMethod(paymentMethodId: string) {
     return http.DELETE(`/api/payment-methods/${paymentMethodId}`);
-  }
-
-  createRole(role: Partial<Role>): Promise<Role> {
-    return http.POST('/api/roles', role);
-  }
-
-  updateRole(role: Partial<Role>): Promise<Role> {
-    return http.PUT(`/api/roles/${role.id}`, role);
-  }
-
-  deleteRole(roleId: string): Promise<Role> {
-    return http.DELETE(`/api/roles/${roleId}`);
-  }
-
-  listRoles(spaceId: string): Promise<ListSpaceRolesResponse[]> {
-    return http.GET('/api/roles', { spaceId });
-  }
-
-  assignRole(data: { spaceId: string; roleId: string; userId: string }): Promise<Role[]> {
-    return http.POST('/api/roles/assignment', data);
-  }
-
-  unassignRole(data: { spaceId: string; roleId: string; userId: string }): Promise<Role[]> {
-    return http.DELETE('/api/roles/assignment', data);
   }
 
   /**

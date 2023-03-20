@@ -1,6 +1,7 @@
 import { getBounty } from 'lib/bounties';
 import type { BountyWithDetails } from 'lib/bounties';
-import { assignRole, listRoleMembers } from 'lib/roles';
+import { getSpaceMembers } from 'lib/members/getSpaceMembers';
+import { assignRole } from 'lib/roles';
 import {
   generateBounty,
   generateRole,
@@ -72,7 +73,8 @@ describe('compareBountyPagePermissions', () => {
       ]
     });
 
-    const roleinfo = await listRoleMembers({ roleId: role.id });
+    const members = await getSpaceMembers({ spaceId: space.id });
+    const roleMembers = members.filter((member) => member.roles.some((r) => r.id === role.id));
 
     const bountyPermissions = await queryBountyPermissions({
       bountyId: createdBounty.id
@@ -85,7 +87,7 @@ describe('compareBountyPagePermissions', () => {
       pageOperations: ['edit_content'],
       bountyPermissions,
       pagePermissions: bounty.page.permissions,
-      roleups: [roleinfo]
+      members: roleMembers
     });
 
     expect(intersection.missingPermissions.length).toBe(1);

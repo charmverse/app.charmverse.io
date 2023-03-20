@@ -7,7 +7,7 @@ import { useMemo } from 'react';
 
 import { SmallSelect } from 'components/common/form/InputEnumToOptions';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import useRoles from 'hooks/useRoles';
+import { useRoles } from 'hooks/useRoles';
 import { postCategoryPermissionLabels } from 'lib/permissions/forum/mapping';
 import type { PostCategoryPermissionInput } from 'lib/permissions/forum/upsertPostCategoryPermission';
 import type { TargetPermissionGroup } from 'lib/permissions/interfaces';

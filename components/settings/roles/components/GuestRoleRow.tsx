@@ -12,7 +12,7 @@ import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { useMembers } from 'hooks/useMembers';
 import type { Member } from 'lib/members/interfaces';
 
-import RoleMemberRow from './RoleMemberRow';
+import { RoleMemberRow } from './RoleMemberRow';
 
 interface RoleRowProps {
   isEditable: boolean;

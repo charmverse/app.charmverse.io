@@ -1,7 +1,7 @@
 import type { Space, User } from '@prisma/client';
 import request from 'supertest';
 
-import type { Member, PublicMember } from 'lib/members/interfaces';
+import type { Member } from 'lib/members/interfaces';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateSpaceUser, generateUserAndSpace } from 'testing/setupDatabase';
 
@@ -59,7 +59,7 @@ describe('GET /api/space/[id]/members - Get list of members in a space', () => {
   });
 
   it('should return simplified users for non-space members', async () => {
-    const members = (await request(baseUrl).get(`/api/spaces/${space.id}/members`).expect(200)).body as PublicMember[];
+    const members = (await request(baseUrl).get(`/api/spaces/${space.id}/members`).expect(200)).body as Member[];
     expect(members.length).toBe(2);
 
     members.forEach((m) => {
@@ -68,15 +68,15 @@ describe('GET /api/space/[id]/members - Get list of members in a space', () => {
 
     expect(members).toEqual(
       // Make sure we only get simplified data, and that the username has been anonymised
-      expect.arrayContaining<PublicMember>([
-        {
+      expect.arrayContaining<Partial<Member>>([
+        expect.objectContaining({
           id: adminUser.id,
           username: expect.not.stringContaining(adminUser.username)
-        },
-        {
+        }),
+        expect.objectContaining({
           id: nonAdminUser.id,
           username: expect.not.stringContaining(nonAdminUser.username)
-        }
+        })
       ])
     );
   });

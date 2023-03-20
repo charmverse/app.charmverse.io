@@ -36,10 +36,10 @@ import { isTruthy } from 'lib/utilities/types';
 
 import BountyApplicantForm from './components/BountyApplicantForm';
 import BountyApplicantsTable from './components/BountyApplicantsTable';
-import BountyPropertiesHeader from './components/BountyPropertiesHeader';
+import { BountyPropertiesHeader } from './components/BountyPropertiesHeader';
 import { BountySignupButton } from './components/BountySignupButton';
 import BountySuggestionApproval from './components/BountySuggestionApproval';
-import MissingPagePermissions from './components/MissingPagePermissions';
+import { MissingPagePermissions } from './components/MissingPagePermissions';
 
 const RewardTypes = ['Token', 'Custom'] as const;
 type RewardType = (typeof RewardTypes)[number];
