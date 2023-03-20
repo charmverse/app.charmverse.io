@@ -110,6 +110,7 @@ export default function BountyApplicantTableRow({
             isExpanded={isExpandedRow}
             submission={submission}
             expandRow={() => setIsExpandedRow(true)}
+            refreshSubmissions={refreshSubmissions}
           />
         </TableCell>
       </TableRow>

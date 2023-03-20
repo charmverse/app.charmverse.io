@@ -8,8 +8,8 @@ import { getBountyOrThrow } from './getBounty';
 export async function markBountyAsPaid(bountyId: string): Promise<BountyWithDetails> {
   const bounty = await getBountyOrThrow(bountyId);
 
-  if (bounty.customReward === null) {
-    throw new InvalidInputError('Only bounties with custom rewards can be marked as paid manually');
+  if (bounty.applications.some((application) => application.status !== 'paid')) {
+    throw new InvalidInputError('All applicants need to be paid in order to mark bounty as paid');
   }
 
   return prisma.bounty.update({

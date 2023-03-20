@@ -26,7 +26,7 @@ async function markBountyAsPaidController(req: NextApiRequest, res: NextApiRespo
     userId
   });
 
-  if (!permissions.lock) {
+  if (!permissions.mark_paid) {
     throw new UnauthorisedActionError('You do not have the permission to mark this bounty as paid');
   }
 
