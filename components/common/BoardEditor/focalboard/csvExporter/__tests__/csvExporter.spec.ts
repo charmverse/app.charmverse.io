@@ -1,4 +1,4 @@
-import type { IntlShape } from 'react-intl';
+import type { Block } from '@prisma/client';
 import { v4 as uuid } from 'uuid';
 
 import { prismaToBlock } from 'lib/focalboard/block';
@@ -7,29 +7,24 @@ import type { BoardView } from 'lib/focalboard/boardView';
 import { createBoardView } from 'lib/focalboard/boardView';
 import { createCard } from 'lib/focalboard/card';
 import { formatDate, formatDateTime } from 'lib/utilities/dates';
-import { createBlock, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 import { CsvExporter } from '../csvExporter';
 
-import { generateFields, mockIntl } from './mocks';
+import { generateFields, mockBoardBlock, mockCardBlock } from './mocks';
 
 describe('CsvExporter', () => {
   test('should generate rows to help export easyar the csv', async () => {
-    const { user, space } = await generateUserAndSpaceWithApiToken();
+    const spaceId = uuid();
+    const userId = uuid();
 
     const boardId = uuid();
-    const boardBlock = await createBlock({
-      type: 'board',
+    const boardBlock = {
+      ...mockBoardBlock,
       id: boardId,
-      createdBy: user.id,
-      spaceId: space.id,
-      rootId: boardId,
-      fields: {
-        cardProperties: []
-      },
-      parentId: '',
-      title: 'Board'
-    });
+      createdBy: userId,
+      spaceId,
+      rootId: boardId
+    };
     const blockBoardFromPrismaToBlock = prismaToBlock(boardBlock);
     const board = createBoard({ block: blockBoardFromPrismaToBlock, addDefaultProperty: true });
     const cardPropertyOptions = board.fields.cardProperties[0].options;
@@ -42,11 +37,16 @@ describe('CsvExporter', () => {
     const chineseTitle = '日本';
     const japaneseTitle = 'こんにちは';
 
-    const cardBlock1 = await createBlock({
-      type: 'card',
+    const cardBlock1: Block = {
+      ...mockCardBlock,
       id: uuid(),
-      createdBy: user.id,
-      spaceId: space.id,
+      createdBy: userId,
+      deletedAt: null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      updatedBy: userId,
+      schema: 1,
+      spaceId,
       rootId: boardId,
       parentId: boardId,
       title: englishTitle,
@@ -55,13 +55,18 @@ describe('CsvExporter', () => {
           [optionId]: firstPropertyId as unknown as string
         }
       }
-    });
+    };
 
-    const cardBlock2 = await createBlock({
-      type: 'card',
+    const cardBlock2: Block = {
+      ...mockCardBlock,
       id: uuid(),
-      createdBy: user.id,
-      spaceId: space.id,
+      createdBy: userId,
+      deletedAt: null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      updatedBy: userId,
+      schema: 1,
+      spaceId,
       rootId: boardId,
       parentId: boardId,
       title: chineseTitle,
@@ -70,13 +75,18 @@ describe('CsvExporter', () => {
           [optionId]: secondPropertyId as unknown as string
         }
       }
-    });
+    };
 
-    const cardBlock3 = await createBlock({
-      type: 'card',
+    const cardBlock3: Block = {
+      ...mockCardBlock,
       id: uuid(),
-      createdBy: user.id,
-      spaceId: space.id,
+      createdBy: userId,
+      deletedAt: null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      updatedBy: userId,
+      schema: 1,
+      spaceId,
       rootId: boardId,
       parentId: boardId,
       title: japaneseTitle,
@@ -85,7 +95,7 @@ describe('CsvExporter', () => {
           [optionId]: ''
         }
       }
-    });
+    };
 
     const cards = [cardBlock1, cardBlock2, cardBlock3].map((c) => prismaToBlock(c)).map((c) => createCard(c));
     const simpleBoardView = createBoardView();

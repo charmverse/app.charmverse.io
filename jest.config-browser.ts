@@ -21,6 +21,8 @@ export const jestConfig = {
   // The test environment that will be used for testing
   testEnvironment: 'jsdom',
 
+  setupFilesAfterEnv: ['jest-prosemirror/environment'],
+
   // The glob patterns Jest uses to detect test files
   testMatch: ['**/components/**/?(*.)+(spec).[tj]s?(x)', '**/hooks/**/*.spec.ts'],
   modulePathIgnorePatterns: ['focalboard/src'],
