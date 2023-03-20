@@ -1,8 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { closeOutBounty, getBountyOrThrow } from 'lib/bounties';
 import type { BountyWithDetails } from 'lib/bounties';
+import { getBountyOrThrow } from 'lib/bounties';
 import { markBountyAsPaid } from 'lib/bounties/markBountyAsPaid';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { computeBountyPermissions } from 'lib/permissions/bounties';

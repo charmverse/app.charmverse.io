@@ -390,8 +390,10 @@ export async function generateBountyWithSingleApplication({
   spaceId,
   bountyStatus,
   bountyTitle = 'Bounty',
-  bountyDescription = 'Bounty description'
+  bountyDescription = 'Bounty description',
+  customReward
 }: {
+  customReward?: string;
   applicationStatus: ApplicationStatus;
   bountyCap: number | null;
   userId: string;
@@ -405,9 +407,10 @@ export async function generateBountyWithSingleApplication({
   const createdBounty = (await prisma.bounty.create({
     data: {
       createdBy: userId,
-      chainId: 1,
-      rewardAmount: 1,
-      rewardToken: 'ETH',
+      chainId: customReward ? null : 1,
+      rewardAmount: customReward ? null : 1,
+      rewardToken: customReward ? null : 'ETH',
+      customReward,
       status: bountyStatus ?? 'open',
       spaceId,
       approveSubmitters: false,

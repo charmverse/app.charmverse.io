@@ -16,7 +16,7 @@ class BountyPermissionLevelOperationMapping implements OperationGroupMapping<Bou
 
   constructor() {
     this.creator = ['lock', 'approve_applications', 'grant_permissions', 'review', 'mark_paid'];
-    this.reviewer = ['review', 'approve_applications', 'mark_paid'];
+    this.reviewer = ['review', 'approve_applications'];
     this.submitter = ['work'];
   }
 }
