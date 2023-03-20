@@ -1,13 +1,15 @@
 import { test as base, expect } from '@playwright/test';
-import type { Bounty, Space, User } from '@prisma/client';
-import { BountyBoardPage } from '__e2e__/po/bountyBoard.po';
+import type { Space, User } from '@prisma/client';
+import type { BountyBoardPage } from '__e2e__/po/bountyBoard.po';
 import { BountyPage } from '__e2e__/po/bountyPage.po';
 import type { PageHeader } from '__e2e__/po/pageHeader.po';
 import { createUserAndSpace } from '__e2e__/utils/mocks';
 import { login } from '__e2e__/utils/session';
 
+import { baseUrl } from 'config/constants';
 import { prisma } from 'db';
 import { createApplication } from 'lib/applications/actions';
+import { createBounty } from 'lib/bounties';
 import { generateSpaceUser } from 'testing/setupDatabase';
 
 type Fixtures = {
@@ -17,14 +19,11 @@ type Fixtures = {
 };
 let space: Space;
 let adminUser: User;
-let bounty: Bounty & { page?: { comments?: { id?: string }[] } | null };
-
 const test = base.extend<Fixtures>({
-  bountyBoardPage: ({ page }, use) => use(new BountyBoardPage(page)),
   bountyPage: ({ page }, use) => use(new BountyPage(page))
 });
-test.describe.serial('Create and Edit Bounty', () => {
-  test('send a message to the bounty applicant', async ({ bountyBoardPage, page, bountyPage }) => {
+test.describe('Create and Edit Bounty', () => {
+  test('send a message to the bounty applicant', async ({ page, bountyPage }) => {
     const generated = await createUserAndSpace({
       browserPage: page
     });
@@ -32,23 +31,11 @@ test.describe.serial('Create and Edit Bounty', () => {
     space = generated.space;
     adminUser = generated.user;
     const extraUser = await generateSpaceUser({ spaceId: space.id, isAdmin: false });
-
-    await login({ page, userId: adminUser.id });
-
-    await bountyBoardPage.goToBountyBoard(space.domain);
-
-    await expect(bountyBoardPage.createBountyButton).toBeVisible();
-
-    await bountyBoardPage.createBountyButton.click();
-
-    // Give time for bounty to create
-    await page.waitForTimeout(1000);
-
-    // There should be only 1 bounty in the space
-    bounty = await prisma.bounty.findFirstOrThrow({
-      where: {
-        spaceId: space.id
-      }
+    const bounty = await createBounty({
+      spaceId: space.id,
+      createdBy: adminUser.id,
+      status: 'open',
+      rewardAmount: 1
     });
 
     // Another user is applying for the bounty
@@ -58,9 +45,9 @@ test.describe.serial('Create and Edit Bounty', () => {
       userId: extraUser.id
     });
 
-    // Need to close and open the modal again to see the new application
-    await page.locator('data-test=close-dialog').click();
-    await page.locator(`data-test=bounty-card-${bounty.id}`).click();
+    await login({ page, userId: adminUser.id });
+
+    await bountyPage.page.goto(`${baseUrl}/${space.domain}/${bounty.page.path}`);
 
     // Review button appears and the reviewer is clicking it
     await expect(bountyPage.bountyReviewButton).toBeVisible();
@@ -88,7 +75,7 @@ test.describe.serial('Create and Edit Bounty', () => {
     await page.waitForTimeout(1000);
     await expect(page.getByText('My new comment')).toBeVisible();
 
-    bounty = await prisma.bounty.findFirstOrThrow({
+    const updatedBounty = await prisma.bounty.findFirstOrThrow({
       where: {
         id: bounty.id
       },
@@ -105,7 +92,7 @@ test.describe.serial('Create and Edit Bounty', () => {
       }
     });
 
-    const firstCommentId = bounty.page?.comments?.[0]?.id || '';
+    const firstCommentId = updatedBounty.page?.comments?.[0]?.id || '';
 
     // Edit a comment
     await bountyPage.getCommentMenuIcon(firstCommentId).hover();
