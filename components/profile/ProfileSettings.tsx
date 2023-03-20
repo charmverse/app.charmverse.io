@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 
 import charmClient from 'charmClient';
-import PublicProfile from 'components/profile';
+import { PublicProfile } from 'components/profile/PublicProfile';
 import Legend from 'components/settings/Legend';
 import { useUser } from 'hooks/useUser';
 

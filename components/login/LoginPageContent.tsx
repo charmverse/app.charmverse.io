@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react';
 
 import Button from 'components/common/Button';
 import Image from 'components/common/Image';
+import LoadingComponent from 'components/common/LoadingComponent';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
 import type { ErrorType } from 'lib/utilities/errors';
@@ -20,7 +21,13 @@ export const Container = styled(Box)`
   width: 1170px;
   margin: 0 auto;
 `;
-export function LoginPageContent() {
+
+type Props = {
+  hideLoginOptions?: boolean;
+  isLoggingIn?: boolean;
+};
+
+export function LoginPageContent({ hideLoginOptions, isLoggingIn }: Props) {
   const returnUrl = new URLSearchParams(decodeURIComponent(window.location.search)).get('returnUrl');
   const { showMessage } = useSnackbar();
   const router = useRouter();
@@ -79,19 +86,24 @@ export function LoginPageContent() {
               work together and vote
             </Typography>
             <Box display={{ sm: 'flex' }} gap={2} alignItems='center'>
-              <Login />
-              <Typography color='secondary' variant='body2' sx={{ lineHeight: '40px' }}>
-                or
-              </Typography>
-              <Button
-                data-test='connect-discord'
-                sx={{ width: '100%' }}
-                variant='outlined'
-                size='large'
-                href={`/api/discord/oauth?type=login&redirect=${returnUrl ?? '/'}`}
-              >
-                Connect Discord
-              </Button>
+              {isLoggingIn && <LoadingComponent label='Logging you in' />}
+              {!hideLoginOptions && (
+                <>
+                  <Login />
+                  <Typography color='secondary' variant='body2' sx={{ lineHeight: '40px' }}>
+                    or
+                  </Typography>
+                  <Button
+                    data-test='connect-discord'
+                    sx={{ width: '100%' }}
+                    variant='outlined'
+                    size='large'
+                    href={`/api/discord/oauth?type=login&redirect=${returnUrl ?? '/'}`}
+                  >
+                    Connect Discord
+                  </Button>
+                </>
+              )}
             </Box>
           </Box>
         </Grid>

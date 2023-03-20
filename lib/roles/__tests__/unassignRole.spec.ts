@@ -6,6 +6,7 @@ import { DataNotFoundError, InvalidInputError, UndesirableOperationError } from 
 import { ExpectedAnError } from 'testing/errors';
 import { generateRole, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
+import { listRoleMembers } from '../listRoleMembers';
 import { unassignRole } from '../unassignRole';
 
 let user: User;
@@ -29,10 +30,12 @@ describe('unassignRole', () => {
       userId: user.id
     });
 
-    const roleAfterUserRemoved = await unassignRole({
+    await unassignRole({
       roleId: role.id,
       userId: user.id
     });
+
+    const roleAfterUserRemoved = await listRoleMembers({ roleId: role.id });
 
     expect(roleAfterUserRemoved.users.length).toBe(0);
   });

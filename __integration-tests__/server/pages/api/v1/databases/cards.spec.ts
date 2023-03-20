@@ -4,7 +4,7 @@ import request from 'supertest';
 import { v4 } from 'uuid';
 
 import { prisma } from 'db';
-import type { Page as ApiPage, UnsupportedKeyDetails, UnsupportedKeysError } from 'lib/public-api';
+import type { CardPage as ApiPage, UnsupportedKeyDetails, UnsupportedKeysError } from 'lib/public-api';
 import { createDatabase } from 'lib/public-api/createDatabaseCardPage';
 import { baseUrl } from 'testing/mockApiCall';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
@@ -19,7 +19,7 @@ let failedCreateResponse: { body: UnsupportedKeysError };
 
 function invalidCreateRequest(): Promise<Response> {
   return request(baseUrl)
-    .post(`/api/v1/databases/${database.boardId}/pages`)
+    .post(`/api/v1/databases/${database.boardId}/cards`)
     .set('Authorization', `Bearer ${apiToken.token}`)
     .send({
       title: 'Example',
@@ -45,7 +45,7 @@ beforeAll(async () => {
 describe('POST /databases/{id}/pages', () => {
   it('should create a new card in the database', async () => {
     const response = await request(baseUrl)
-      .post(`/api/v1/databases/${database.boardId}/pages`)
+      .post(`/api/v1/databases/${database.boardId}/cards`)
       .set('Authorization', `Bearer ${apiToken.token}`)
       .send({
         title: 'Example',
@@ -79,7 +79,7 @@ describe('POST /databases/{id}/pages', () => {
 
   it('should create a new card in the database without needing custom properties', async () => {
     const response = await request(baseUrl)
-      .post(`/api/v1/databases/${database.boardId}/pages`)
+      .post(`/api/v1/databases/${database.boardId}/cards`)
       .set('Authorization', `Bearer ${apiToken.token}`)
       .send({
         title: 'Example'
@@ -104,7 +104,7 @@ describe('POST /databases/{id}/pages', () => {
 
   it('should fail with 400 error code when a title is not provided', async () => {
     const response = await request(baseUrl)
-      .post(`/api/v1/databases/${database.boardId}/pages`)
+      .post(`/api/v1/databases/${database.boardId}/cards`)
       .set('Authorization', `Bearer ${apiToken.token}`)
       .send({});
 

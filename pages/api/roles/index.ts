@@ -18,20 +18,14 @@ handler
   .post(createRole);
 
 export type ListSpaceRolesResponse = Pick<Role, 'id' | 'name' | 'source'> & {
-  spaceRolesToRole: {
-    spaceRole: {
-      user: User;
-    };
-  }[];
   spacePermissions: SpacePermission[];
+  isMemberLevel?: boolean;
 };
 
 async function listSpaceRoles(req: NextApiRequest, res: NextApiResponse<ListSpaceRolesResponse[]>) {
   const { spaceId } = req.query;
 
-  const userId = req.session.user?.id;
-
-  if (!spaceId) {
+  if (!spaceId || typeof spaceId !== 'string') {
     throw new ApiError({
       message: 'Please provide a valid space ID',
       errorType: 'Invalid input'
@@ -41,32 +35,21 @@ async function listSpaceRoles(req: NextApiRequest, res: NextApiResponse<ListSpac
   const roles = await prisma.role.findMany({
     orderBy: { createdAt: 'asc' },
     where: {
-      spaceId: spaceId as string
+      spaceId
     },
     select: {
       id: true,
       name: true,
       source: true,
-      spaceRolesToRole: {
-        select: {
-          spaceRole: {
-            select: {
-              user: true
-            }
-          }
-        }
-      },
       spacePermissions: {
         where: {
-          forSpaceId: spaceId as string
+          forSpaceId: spaceId
         }
       }
     }
   });
 
-  return res
-    .status(200)
-    .json(roles.map((role) => ({ ...role, spaceRolesToRole: !userId ? [] : role.spaceRolesToRole })));
+  return res.status(200).json(roles);
 }
 
 async function createRole(req: NextApiRequest, res: NextApiResponse<Role>) {

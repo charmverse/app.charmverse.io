@@ -7,6 +7,7 @@ import type { NextHandler } from 'next-connect';
 import { prisma } from 'db';
 import log from 'lib/log';
 import { ApiError, InvalidApiKeyError } from 'lib/middleware/errors';
+import { getVerifiedSuperApiToken } from 'lib/middleware/requireSuperApiKey';
 
 declare module 'http' {
   /**
@@ -94,45 +95,36 @@ export async function setRequestSpaceFromApiKey(req: NextApiRequest): Promise<Sp
   if (!apiKey || apiKey.length < 1) {
     throw new InvalidApiKeyError();
   }
+  const superApiKeyData = await getVerifiedSuperApiToken(apiKey, req.query?.spaceId as string);
 
-  if (req.query?.spaceId && typeof req.query?.spaceId === 'string') {
-    const superApiKey = await prisma.superApiToken.findFirst({
-      where: {
-        token: apiKey,
-        spaces: {
-          some: {
-            id: req.query.spaceId as string
-          }
-        }
-      },
-      include: {
-        spaces: true
-      }
-    });
-
-    if (!superApiKey) {
+  if (superApiKeyData) {
+    // super api key without spaceId param
+    if (!superApiKeyData.authorizedSpace) {
       throw new InvalidApiKeyError();
     }
 
-    req.authorizedSpaceId = req.query?.spaceId as string;
-    req.spaceIdRange = superApiKey.spaces.map((space) => space.id);
-    return superApiKey.spaces.find((s) => s.id === (req.query.spaceId as string)) as Space;
-  } else {
-    const spaceToken = await prisma.spaceApiToken.findFirst({
-      where: {
-        token: apiKey
-      },
-      include: {
-        space: true
-      }
-    });
+    req.authorizedSpaceId = superApiKeyData.authorizedSpace.id;
+    req.spaceIdRange = superApiKeyData.spaceIdRange;
+    req.superApiToken = superApiKeyData.superApiKey;
 
-    if (!spaceToken) {
-      throw new InvalidApiKeyError();
-    }
-    req.authorizedSpaceId = spaceToken.spaceId;
-    return spaceToken.space;
+    return superApiKeyData.authorizedSpace;
   }
+
+  const spaceToken = await prisma.spaceApiToken.findFirst({
+    where: {
+      token: apiKey
+    },
+    include: {
+      space: true
+    }
+  });
+
+  if (!spaceToken) {
+    throw new InvalidApiKeyError();
+  }
+
+  req.authorizedSpaceId = spaceToken.spaceId;
+  return spaceToken.space;
 }
 
 /**

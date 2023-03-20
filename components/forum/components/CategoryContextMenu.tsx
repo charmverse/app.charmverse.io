@@ -3,21 +3,20 @@ import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import LockIcon from '@mui/icons-material/Lock';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import TaskIcon from '@mui/icons-material/Task';
-import { IconButton, ListItemIcon, MenuItem, MenuList, Stack, TextField, Typography } from '@mui/material';
+import { IconButton, ListItemIcon, MenuItem, MenuList, Typography } from '@mui/material';
 import Tooltip from '@mui/material/Tooltip';
 import type { PostCategory } from '@prisma/client';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect, useMemo, useState } from 'react';
 import { MdOutlineNotificationsNone, MdOutlineNotificationsOff } from 'react-icons/md';
 
-import FieldLabel from 'components/common/form/FieldLabel';
 import PopperPopup from 'components/common/PopperPopup';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useForumCategoryNotification } from 'hooks/useUserSpaceNotifications';
 import type { AvailablePostCategoryPermissionFlags } from 'lib/permissions/forum/interfaces';
 
-import { CategoryDescriptionDialog } from './CategoryDescriptionDialog';
+import { EditCategoryDialog } from './EditCategoryDialog';
 import { PostCategoryPermissionsDialog } from './permissions/PostCategoryPermissions';
 
 type Props = {
@@ -58,21 +57,13 @@ export function CategoryContextMenu({ category, onChange, onDelete, onSetNewDefa
   const popupContent = useMemo(
     () => (
       <MenuList>
-        <Stack p={1}>
-          <FieldLabel variant='subtitle2'>Category name</FieldLabel>
-          <TextField
-            disabled={!permissions.edit_category}
-            value={tempName}
-            onChange={(e) => setTempName(e.target.value)}
-            autoFocus
-            onKeyDown={(e) => {
-              e.stopPropagation();
-              if (e.code === 'Enter') {
-                onSave();
-              }
-            }}
-          />
-        </Stack>
+        <MenuItem
+          sx={{
+            py: 1
+          }}
+        >
+          <Typography variant='subtitle1'>{category.name}</Typography>
+        </MenuItem>
         {!isDefaultSpacePostCategory && (
           <MenuItem
             disabled={isDefaultSpacePostCategory || !isAdmin}
@@ -101,7 +92,7 @@ export function CategoryContextMenu({ category, onChange, onDelete, onSetNewDefa
             <ListItemIcon>
               <Edit fontSize='small' />
             </ListItemIcon>
-            <Typography variant='subtitle1'>{!category.description ? 'Add' : 'Edit'} description</Typography>
+            <Typography variant='subtitle1'>Edit category</Typography>
           </MenuItem>
         </Tooltip>
         <MenuItem
@@ -177,8 +168,8 @@ export function CategoryContextMenu({ category, onChange, onDelete, onSetNewDefa
         open={permissionsDialogIsOpen}
         postCategory={category}
       />
-      <CategoryDescriptionDialog
-        onSave={(text) => onChange({ ...category, description: text })}
+      <EditCategoryDialog
+        onSave={(newValues) => onChange({ ...category, description: newValues.description, name: newValues.name })}
         category={category}
         onClose={editDescriptionDialog.close}
         open={editDescriptionDialog.isOpen}

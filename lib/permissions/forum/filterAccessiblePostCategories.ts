@@ -34,7 +34,8 @@ export async function filterAccessiblePostCategories({
 
   const { error, isAdmin, spaceRole } = await hasAccessToSpace({
     spaceId,
-    userId
+    userId,
+    disallowGuest: true
   });
 
   if (isAdmin) {

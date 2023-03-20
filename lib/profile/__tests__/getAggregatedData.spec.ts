@@ -41,11 +41,13 @@ describe('GET /api/public/profile/[userPath]', () => {
 
     const proposal1 = {
       organizationId: '1',
-      createdAt: new Date().toString()
+      createdAt: new Date().toString(),
+      title: undefined
     };
     const proposal2 = {
       organizationId: '1',
-      createdAt: new Date().toString()
+      createdAt: new Date().toString(),
+      title: undefined
     };
 
     const vote1 = {

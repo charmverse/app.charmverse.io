@@ -17,7 +17,9 @@ async function exportImport({
   const { data } = await exportWorkspacePages({
     sourceSpaceIdOrDomain,
     skipBounties: true,
-    skipProposals: true
+    skipProposals: true,
+    skipBountyTemplates: true,
+    skipProposalTemplates: true
   });
 
   const result = await importWorkspacePages({

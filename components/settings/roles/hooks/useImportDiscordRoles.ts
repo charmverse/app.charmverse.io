@@ -6,7 +6,7 @@ import useSWRImmutable from 'swr/immutable';
 import charmClient from 'charmClient';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
-import useRoles from 'hooks/useRoles';
+import { useRoles } from 'hooks/useRoles';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
 

@@ -88,6 +88,7 @@ function selectPageFields(meta: boolean) {
       hasContent: true,
       galleryImage: true,
       convertedProposalId: true,
+      deletedBy: true,
       ...includePagePermissionsMeta()
     }
   };

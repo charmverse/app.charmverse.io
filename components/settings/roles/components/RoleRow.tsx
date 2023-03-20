@@ -9,7 +9,6 @@ import Button from 'components/common/Button';
 import { InputSearchMemberMultiple } from 'components/common/form/InputSearchMember';
 import Modal from 'components/common/Modal';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMembers } from 'hooks/useMembers';
 import type { ListSpaceRolesResponse } from 'pages/api/roles';
 import GuildXYZIcon from 'public/images/guild_logo.svg';
@@ -66,27 +65,21 @@ export function RoleRow({ readOnly, role, assignRoles, unassignRole, deleteRole,
     userPopupState.close();
   }
 
-  const assignedMembers = role.spaceRolesToRole.map((r) => r.spaceRole.user);
+  const assignedMembers = members.filter((member) => member.roles.some((r) => r.id === role.id));
+  // role.spaceRolesToRole.map((r) => r.spaceRole.user);
 
-  let userIdsToHide =
-    role.spaceRolesToRole
-      ?.map((spaceRoleToRole) => {
-        return spaceRoleToRole?.spaceRole?.user?.id;
-      })
-      .filter((id) => typeof id === 'string') ?? [];
+  let assignedMemberIds = assignedMembers.map((m) => m.id);
 
   function removeMember(userId: string) {
     unassignRole(role.id, userId);
-    userIdsToHide = userIdsToHide.filter((id) => id !== userId);
+    assignedMemberIds = assignedMemberIds.filter((id) => id !== userId);
   }
 
   return (
     <RoleRowBase
-      // @ts-ignore
       members={assignedMembers}
       removeMember={removeMember}
       readOnlyMembers={!!role.source}
-      readOnly={readOnly}
       title={role.name}
       {...((role.source && syncedRoleProps[role.source]) || {})}
       permissions={
@@ -181,7 +174,7 @@ export function RoleRow({ readOnly, role, assignRoles, unassignRole, deleteRole,
               <Grid container direction='column' spacing={3}>
                 <Grid item>
                   <InputSearchMemberMultiple
-                    filter={{ mode: 'exclude', userIds: userIdsToHide }}
+                    filter={{ mode: 'exclude', userIds: assignedMemberIds }}
                     onChange={onChangeNewMembers}
                   />
                 </Grid>

@@ -24,18 +24,15 @@ import Invites from 'components/settings/invites/Invites';
 import MemberSettings from 'components/settings/members/MemberSettings';
 import type { SpaceSettingsTab, UserSettingsTab } from 'components/settings/pages';
 import { SETTINGS_TABS, ACCOUNT_TABS } from 'components/settings/pages';
-import RoleSettings from 'components/settings/roles/RoleSettings';
+import { RoleSettings } from 'components/settings/roles/RoleSettings';
 import SpaceSettings from 'components/settings/workspace/Space';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { CurrentSpaceProvider, useCurrentSpaceId } from 'hooks/useCurrentSpaceId';
-import { useHasMemberLevel } from 'hooks/useHasMemberLevel';
 import { useSmallScreen } from 'hooks/useMediaScreens';
 import { MembersProvider } from 'hooks/useMembers';
 import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useSpaceFromPath } from 'hooks/useSpaceFromPath';
 import { useSpaces } from 'hooks/useSpaces';
-import { useUser } from 'hooks/useUser';
-import members from 'pages/api/spaces/[id]/members';
 
 import { SectionName } from '../PageLayout/components/Sidebar/Sidebar';
 import { SidebarLink } from '../PageLayout/components/Sidebar/SidebarButton';
@@ -106,27 +103,25 @@ function TabPanel(props: TabPanelProps) {
 }
 
 function SpaceSettingsModalComponent() {
-  const { setCurrentSpaceId, currentSpaceId } = useCurrentSpaceId();
+  const { setCurrentSpaceId } = useCurrentSpaceId();
   const { memberSpaces } = useSpaces();
   const currentSpace = useCurrentSpace();
 
-  const canSeeSpaceSettings = useHasMemberLevel('member');
   const isMobile = useSmallScreen();
   const { activePath, onClose, onClick, open } = useSettingsDialog();
 
   // This is only ever used for setting the current space as the target space, on the initial popup of the dialog
   const spaceByPath = useSpaceFromPath();
   useEffect(() => {
-    if (!canSeeSpaceSettings && open) {
-      if (memberSpaces.length === 0) {
+    if (spaceByPath) {
+      if (memberSpaces.some((s) => s.id === spaceByPath.id)) {
+        setCurrentSpaceId(spaceByPath.id);
+      } else if (open) {
         onClick('account');
-      } else {
-        setCurrentSpaceId(memberSpaces[0].id);
       }
-    } else if (canSeeSpaceSettings && !currentSpaceId && spaceByPath) {
-      setCurrentSpaceId(spaceByPath.id);
     }
   }, [spaceByPath]);
+
   return (
     <Dialog
       fullWidth

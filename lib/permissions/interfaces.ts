@@ -1,8 +1,4 @@
-import type { BountyOperation, PageOperations, PagePermission, Role, Space, User } from '@prisma/client';
-
-import type { RoleupWithMembers, RoleWithMembers } from 'lib/roles';
-
-import type { BountyPermissions } from './bounties';
+import type { PagePermission, Role, Space, User } from '@prisma/client';
 
 export type Resource = {
   resourceId: string;
@@ -98,19 +94,6 @@ export interface AvailableResourcesRequest {
 }
 
 export type PagePermissionMeta = Omit<PagePermission, 'inheritedFromPermission'>;
-
-export interface BountyPagePermissionIntersectionQuery {
-  bountyOperations: BountyOperation[];
-  bountyPermissions: Partial<BountyPermissions>;
-  pageOperations: PageOperations[];
-  pagePermissions: PagePermissionMeta[];
-  roleups: (RoleupWithMembers | RoleWithMembers)[];
-}
-
-export interface BountyPagePermissionIntersection {
-  hasPermissions: TargetPermissionGroup[];
-  missingPermissions: TargetPermissionGroup[];
-}
 
 export interface AbstractPermissions<O extends string> {
   get empty(): UserPermissionFlags<O, false>;

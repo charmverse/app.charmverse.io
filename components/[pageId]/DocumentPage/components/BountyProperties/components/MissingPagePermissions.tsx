@@ -3,7 +3,7 @@ import Typography from '@mui/material/Typography';
 import type { BountyPermissionLevel } from '@prisma/client';
 
 import { useMembers } from 'hooks/useMembers';
-import useRoles from 'hooks/useRoles';
+import { useRoles } from 'hooks/useRoles';
 import type { BountyPermissionGroup, BountyPermissions } from 'lib/bounties';
 import type { PagePermissionMeta } from 'lib/permissions/interfaces';
 import { isTruthy } from 'lib/utilities/types';
@@ -14,8 +14,8 @@ interface Props {
   target: Extract<BountyPermissionLevel, 'reviewer' | 'submitter'>;
 }
 
-export default function MissingPagePermissions({ bountyPermissions, pagePermissions, target }: Props) {
-  const { roleups } = useRoles();
+export function MissingPagePermissions({ bountyPermissions, pagePermissions, target }: Props) {
+  const { roles } = useRoles();
   const { members } = useMembers();
 
   const visibleToSpace = pagePermissions.some((p) => isTruthy(p.spaceId) || p.public === true);
@@ -30,7 +30,10 @@ export default function MissingPagePermissions({ bountyPermissions, pagePermissi
             // Make sure there are no individual user permissions, or roles through which they can see this page
             if (bountyPermissionAssignee.group === 'user') {
               const canSeePageViaRole = pp.roleId
-                ? roleups?.find((r) => r.id === pp.roleId)?.users.find((u) => u.id === bountyPermissionAssignee.id)
+                ? members.some(
+                    (member) =>
+                      member.id === bountyPermissionAssignee.id && member.roles.some((role) => role.id === pp.roleId)
+                  )
                 : false;
 
               return pp.userId === bountyPermissionAssignee.id || !!canSeePageViaRole;
@@ -48,9 +51,10 @@ export default function MissingPagePermissions({ bountyPermissions, pagePermissi
     (assignee) => {
       return {
         ...assignee,
-        name: (assignee.group === 'user'
-          ? members.find((c) => c.id === assignee.id)?.username
-          : roleups?.find((r) => r.id === assignee.id)?.name) as string
+        name:
+          (assignee.group === 'user'
+            ? members.find((c) => c.id === assignee.id)?.username
+            : roles?.find((r) => r.id === assignee.id)?.name) || ''
       };
     }
   );

@@ -1,20 +1,33 @@
+import type { BountyOperation, PageOperations } from '@prisma/client';
+
+import type { Member } from 'lib/members/interfaces';
 import { AvailableBountyPermissions, bountyPermissionMapping } from 'lib/permissions/bounties/client';
 import { typedKeys } from 'lib/utilities/objects';
 
-import type {
-  AssignablePermissionGroupsWithPublic,
-  BountyPagePermissionIntersection,
-  BountyPagePermissionIntersectionQuery
-} from './interfaces';
+import type { BountyPermissions } from './bounties';
+import type { AssignablePermissionGroupsWithPublic, TargetPermissionGroup, PagePermissionMeta } from './interfaces';
 import { AllowedPagePermissions } from './pages/available-page-permissions.class';
 import { permissionTemplates } from './pages/page-permission-mapping';
+
+export interface BountyPagePermissionIntersectionQuery {
+  bountyOperations: BountyOperation[];
+  bountyPermissions: Partial<BountyPermissions>;
+  pageOperations: PageOperations[];
+  pagePermissions: PagePermissionMeta[];
+  members: Member[];
+}
+
+export interface BountyPagePermissionIntersection {
+  hasPermissions: TargetPermissionGroup[];
+  missingPermissions: TargetPermissionGroup[];
+}
 
 export function compareBountyPagePermissions({
   bountyOperations,
   bountyPermissions,
   pageOperations,
   pagePermissions,
-  roleups
+  members
 }: BountyPagePermissionIntersectionQuery): BountyPagePermissionIntersection {
   const permissionsMap: Record<
     string,
@@ -28,7 +41,7 @@ export function compareBountyPagePermissions({
   // Populate each bounty assignee
   typedKeys(bountyPermissions).forEach((bountyPermissionLevel) => {
     bountyPermissions[bountyPermissionLevel]?.forEach((assignee) => {
-      const mapKey = assignee.group === 'public' ? 'public' : (assignee.id as string);
+      const mapKey = assignee.group === 'public' ? 'public' : assignee.id;
 
       if (!permissionsMap[mapKey]) {
         permissionsMap[mapKey] = {
@@ -74,15 +87,13 @@ export function compareBountyPagePermissions({
   };
 
   // Add role permissions to any user already in the map with this role
-  roleups.forEach((roleWithMembers) => {
-    const rolePermissions = permissionsMap[roleWithMembers.id];
-
-    if (rolePermissions) {
-      roleWithMembers.users.forEach((u) => {
-        const roleUserPermissions = permissionsMap[u.id];
-
-        roleUserPermissions?.bountyPermissions.addPermissions(rolePermissions.bountyPermissions.operationFlags);
-        roleUserPermissions?.pagePermissions.addPermissions(rolePermissions.pagePermissions.operationFlags);
+  members.forEach((member) => {
+    const userPermissions = permissionsMap[member.id];
+    if (userPermissions) {
+      const userRolePermissions = member.roles.map((role) => permissionsMap[role.id]).filter(Boolean);
+      userRolePermissions.forEach((rolePermissions) => {
+        userPermissions.bountyPermissions.addPermissions(rolePermissions.bountyPermissions.operationFlags);
+        userPermissions.pagePermissions.addPermissions(rolePermissions.pagePermissions.operationFlags);
       });
     }
   });

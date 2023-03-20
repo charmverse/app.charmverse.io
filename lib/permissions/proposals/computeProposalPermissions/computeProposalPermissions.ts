@@ -50,7 +50,8 @@ export async function baseComputeProposalPermissions({
 
   const { error, isAdmin } = await hasAccessToSpace({
     spaceId: proposal.spaceId,
-    userId
+    userId,
+    disallowGuest: true
   });
 
   const permissions = new AvailableProposalPermissions();

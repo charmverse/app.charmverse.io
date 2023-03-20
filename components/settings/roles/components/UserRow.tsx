@@ -1,10 +1,10 @@
 import styled from '@emotion/styled';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import type { User } from '@prisma/client';
 
 import Avatar from 'components/common/Avatar';
 import ElementDeleteIcon from 'components/common/form/ElementDeleteIcon';
+import type { Member } from 'lib/members/interfaces';
 import { hasNftAvatar } from 'lib/users/hasNftAvatar';
 
 export const StyledRow = styled(Box)`
@@ -27,7 +27,7 @@ export const StyledRow = styled(Box)`
 `;
 
 interface Props {
-  member: User;
+  member: Member;
   readOnly?: boolean;
   onRemove: (id: string) => void;
 }

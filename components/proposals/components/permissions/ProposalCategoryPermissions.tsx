@@ -11,7 +11,7 @@ import Button from 'components/common/Button';
 import Loader from 'components/common/LoadingComponent';
 import Modal from 'components/common/Modal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import useRoles from 'hooks/useRoles';
+import { useRoles } from 'hooks/useRoles';
 import type {
   AssignedProposalCategoryPermission,
   AvailableProposalCategoryPermissionFlags
@@ -146,7 +146,7 @@ function ProposalCategoryPermissions({ proposalCategory, permissions }: Props) {
     <Box data-test='category-permissions-dialog'>
       <Grid container spacing={2}>
         {/** Leaving this here as it will already work for making proposal categories public
-           
+
         <Grid item xs={12}>
           <Box display='flex' justifyContent='space-between' alignItems='center'>
             <Typography variant='body2'>Public category</Typography>

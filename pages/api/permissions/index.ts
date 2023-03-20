@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import type { PagePermission } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';

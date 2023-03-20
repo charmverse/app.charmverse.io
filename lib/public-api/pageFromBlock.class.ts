@@ -1,11 +1,11 @@
 import type { Block } from '@prisma/client';
 
-import type { Page, PageContentFormats, PageProperty } from './interfaces';
+import type { CardPage, PageContentFormats, PageProperty } from './interfaces';
 
 /**
  * @content markdown - Should be generated externally and assigned to the key
  */
-export class PageFromBlock implements Page {
+export class PageFromBlock implements CardPage {
   id: string;
 
   createdAt: string;

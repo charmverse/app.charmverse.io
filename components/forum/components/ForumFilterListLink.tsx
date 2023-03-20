@@ -2,8 +2,10 @@ import styled from '@emotion/styled';
 import MenuItem from '@mui/material/MenuItem';
 import Typography from '@mui/material/Typography';
 import type { PostCategory } from '@prisma/client';
+import { useRouter } from 'next/router';
 
 import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useForumCategories } from 'hooks/useForumCategories';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { PostSortOption } from 'lib/forums/posts/constants';
@@ -36,6 +38,16 @@ export function ForumFilterListLink({ label, value, isSelected, handleSelect }: 
 
   const category = value ? categories.find((c) => c.id === value) : null;
   const { permissions } = usePostCategoryPermissions(category?.id as string);
+
+  function handleChange(updatedCategory: PostCategory) {
+    updateForumCategory(updatedCategory)
+      .then(() => {
+        showMessage('Category updated');
+      })
+      .catch((err) => {
+        showMessage(err?.message || 'An error occurred while updating the category');
+      });
+  }
 
   function deleteCategory() {
     if (category) {
@@ -81,7 +93,7 @@ export function ForumFilterListLink({ label, value, isSelected, handleSelect }: 
           <CategoryContextMenu
             permissions={permissions}
             category={category as PostCategory}
-            onChange={updateForumCategory}
+            onChange={handleChange}
             onDelete={deleteCategory}
             onSetNewDefaultCategory={setDefaultPostCategory}
           />
