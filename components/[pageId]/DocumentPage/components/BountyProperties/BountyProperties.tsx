@@ -74,9 +74,11 @@ export default function BountyProperties(props: {
   const { isSpaceMember } = useIsSpaceMember();
 
   useEffect(() => {
-    if (rewardType !== 'Custom' && isTruthy(currentBounty?.customReward) && !autoTabSwitchDone) {
-      setRewardType('Custom');
+    if (!autoTabSwitchDone && currentBounty) {
       setAutoTabSwitchDone(true);
+      if (rewardType !== 'Custom' && isTruthy(currentBounty.customReward)) {
+        setRewardType('Custom');
+      }
     }
   }, [currentBounty?.customReward, rewardType, autoTabSwitchDone]);
 
@@ -376,7 +378,7 @@ export default function BountyProperties(props: {
             onChange={async (e) => {
               updateBountyCustomReward(e);
             }}
-            placeholder='Custom NFT'
+            placeholder='T-shirt'
           />
         </div>
       )}
