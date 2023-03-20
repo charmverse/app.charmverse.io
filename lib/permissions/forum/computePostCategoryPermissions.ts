@@ -29,7 +29,8 @@ export async function computePostCategoryPermissions({
 
   const { error, isAdmin } = await hasAccessToSpace({
     spaceId: postCategory.spaceId,
-    userId
+    userId,
+    disallowGuest: true
   });
 
   const permissions = new AvailablePostCategoryPermissions();

@@ -22,6 +22,7 @@ import { SpaceSettingsDialog } from 'components/common/Modal/SettingsDialog';
 import { charmverseDiscordInvite } from 'config/constants';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
+import { useForumCategories } from 'hooks/useForumCategories';
 import { useHasMemberLevel } from 'hooks/useHasMemberLevel';
 import useKeydownPress from 'hooks/useKeydownPress';
 import { useSmallScreen } from 'hooks/useMediaScreens';
@@ -134,6 +135,7 @@ export default function Sidebar({ closeSidebar, favorites, navAction }: SidebarP
   const router = useRouter();
   const { user, logoutUser } = useUser();
   const space = useCurrentSpace();
+  const { categories } = useForumCategories();
   const [userSpacePermissions] = useCurrentSpacePermissions();
   const [isScrolled, setIsScrolled] = useState(false);
   const [showingTrash, setShowingTrash] = useState(false);
@@ -270,51 +272,49 @@ export default function Sidebar({ closeSidebar, favorites, navAction }: SidebarP
               )}
               <Divider sx={{ mx: 2, my: 1 }} />
 
-              {showMemberFeatures && (
-                <>
-                  {!space.hiddenFeatures.includes('member_directory') && (
-                    <SidebarLink
-                      href={`/${space.domain}/members`}
-                      active={router.pathname.startsWith('/[domain]/members')}
-                      icon={<AccountCircleIcon fontSize='small' />}
-                      label='Member Directory'
-                      onClick={navAction}
-                    />
-                  )}
-
-                  {!space.hiddenFeatures.includes('proposals') && (
-                    <SidebarLink
-                      data-test='sidebar-link-proposals'
-                      href={`/${space.domain}/proposals`}
-                      active={router.pathname.startsWith('/[domain]/proposals')}
-                      icon={<TaskOutlinedIcon fontSize='small' />}
-                      label='Proposals'
-                      onClick={navAction}
-                    />
-                  )}
-
-                  {!space.hiddenFeatures.includes('bounties') && (
-                    <SidebarLink
-                      href={`/${space.domain}/bounties`}
-                      active={router.pathname.startsWith('/[domain]/bounties')}
-                      icon={<BountyIcon fontSize='small' />}
-                      label='Bounties'
-                      onClick={navAction}
-                    />
-                  )}
-
-                  {!space.hiddenFeatures.includes('forum') && (
-                    <SidebarLink
-                      href={`/${space.domain}/forum`}
-                      data-test='sidebar-link-forum'
-                      active={router.pathname.startsWith('/[domain]/forum')}
-                      icon={<MessageOutlinedIcon fontSize='small' />}
-                      label='Forum'
-                      onClick={navAction}
-                    />
-                  )}
-                </>
+              {!space.hiddenFeatures.includes('member_directory') && showMemberFeatures && (
+                <SidebarLink
+                  href={`/${space.domain}/members`}
+                  active={router.pathname.startsWith('/[domain]/members')}
+                  icon={<AccountCircleIcon fontSize='small' />}
+                  label='Member Directory'
+                  onClick={navAction}
+                />
               )}
+
+              {!space.hiddenFeatures.includes('proposals') && showMemberFeatures && (
+                <SidebarLink
+                  data-test='sidebar-link-proposals'
+                  href={`/${space.domain}/proposals`}
+                  active={router.pathname.startsWith('/[domain]/proposals')}
+                  icon={<TaskOutlinedIcon fontSize='small' />}
+                  label='Proposals'
+                  onClick={navAction}
+                />
+              )}
+
+              {!space.hiddenFeatures.includes('bounties') && showMemberFeatures && (
+                <SidebarLink
+                  href={`/${space.domain}/bounties`}
+                  active={router.pathname.startsWith('/[domain]/bounties')}
+                  icon={<BountyIcon fontSize='small' />}
+                  label='Bounties'
+                  onClick={navAction}
+                />
+              )}
+
+              {!space.hiddenFeatures.includes('forum') &&
+                // Always show forum to space members. Show it to guests if they have access to at least 1 category
+                (showMemberFeatures || categories.length > 0) && (
+                  <SidebarLink
+                    href={`/${space.domain}/forum`}
+                    data-test='sidebar-link-forum'
+                    active={router.pathname.startsWith('/[domain]/forum')}
+                    icon={<MessageOutlinedIcon fontSize='small' />}
+                    label='Forum'
+                    onClick={navAction}
+                  />
+                )}
             </Box>
             {isMobile ? (
               <div>{pagesNavigation}</div>

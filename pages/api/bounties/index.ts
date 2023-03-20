@@ -4,7 +4,6 @@ import nc from 'next-connect';
 
 import type { BountyCreationData, BountyWithDetails } from 'lib/bounties';
 import { createBounty, listAvailableBounties } from 'lib/bounties';
-import log from 'lib/log';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { logUserFirstBountyEvents, logWorkspaceFirstBountyEvents } from 'lib/metrics/postToDiscord';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
@@ -42,7 +41,8 @@ async function createBountyController(req: NextApiRequest, res: NextApiResponse<
     const { error } = await hasAccessToSpace({
       spaceId,
       userId,
-      adminOnly: false
+      adminOnly: false,
+      disallowGuest: true
     });
 
     if (error) {
