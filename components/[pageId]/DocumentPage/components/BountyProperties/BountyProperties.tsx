@@ -374,6 +374,7 @@ export default function BountyProperties(props: {
             type='text'
             size='small'
             multiline
+            autoFocus
             rows={1}
             onChange={async (e) => {
               updateBountyCustomReward(e);

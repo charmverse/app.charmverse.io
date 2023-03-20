@@ -90,6 +90,7 @@ export default function BountyApplicantForm(props: BountyApplicationFormProps) {
         />
         {userApplication?.status !== 'applied' && (
           <SubmissionInput
+            hasCustomReward={bounty.customReward !== null}
             bountyId={bounty.id}
             onSubmit={submitApplication}
             submission={userApplication}
@@ -133,6 +134,7 @@ export default function BountyApplicantForm(props: BountyApplicationFormProps) {
         onCancel={() => {
           setShowApplication(false);
         }}
+        hasCustomReward={bounty.customReward !== null}
         readOnly={userApplication?.status === 'rejected'}
         submission={userApplication}
         permissions={permissions}

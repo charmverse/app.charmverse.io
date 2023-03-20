@@ -46,6 +46,7 @@ interface Props {
   permissions: AssignedBountyPermissions;
   expandedOnLoad?: boolean;
   alwaysExpanded?: boolean;
+  hasCustomReward: boolean;
 }
 
 export default function SubmissionInput({
@@ -56,6 +57,7 @@ export default function SubmissionInput({
   bountyId,
   alwaysExpanded,
   expandedOnLoad,
+  hasCustomReward,
   onCancel = () => null
 }: Props) {
   const { user } = useUser();
@@ -169,7 +171,7 @@ export default function SubmissionInput({
               />
             </Grid>
 
-            {!readOnly && (
+            {!readOnly && !hasCustomReward && (
               <Grid item>
                 <InputLabel>Address to get paid for this bounty</InputLabel>
                 <TextField

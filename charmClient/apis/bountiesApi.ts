@@ -59,6 +59,10 @@ export class BountiesApi {
     return http.POST<BountyWithDetails>(`/api/bounties/${bountyId}/close`);
   }
 
+  markBountyAsPaid(bountyId: string): Promise<BountyWithDetails> {
+    return http.POST<BountyWithDetails>(`/api/bounties/${bountyId}/mark-paid`);
+  }
+
   approveApplication(applicationId: string): Promise<Application> {
     return http.POST<Application>(`/api/applications/${applicationId}/approve`);
   }

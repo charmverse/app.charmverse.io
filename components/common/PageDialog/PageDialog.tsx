@@ -1,5 +1,6 @@
 import CheckCircleOutlinedIcon from '@mui/icons-material/CheckCircleOutlined';
 import OpenInFullIcon from '@mui/icons-material/OpenInFull';
+import PaidIcon from '@mui/icons-material/Paid';
 import { Box, ListItemText, MenuItem } from '@mui/material';
 import type { Page } from '@prisma/client';
 import { usePopupState } from 'material-ui-popup-state/hooks';
@@ -120,6 +121,13 @@ export default function PageDialog(props: Props) {
     }
   }
 
+  async function markBountyAsPaid(bountyId: string) {
+    await charmClient.bounties.markBountyAsPaid(bountyId);
+    if (refreshBounty) {
+      refreshBounty(bountyId);
+    }
+  }
+
   if (!popupState.isOpen) {
     return null;
   }
@@ -141,19 +149,38 @@ export default function PageDialog(props: Props) {
             }}
           >
             {bounty && (
-              <MenuItem
-                dense
-                onClick={() => closeBounty(bounty.id)}
-                disabled={bounty.status === 'complete' || (bounty.status !== 'inProgress' && bounty.status !== 'open')}
-              >
-                <CheckCircleOutlinedIcon
-                  sx={{
-                    mr: 1
-                  }}
-                  fontSize='small'
-                />
-                <ListItemText primary='Mark complete' />
-              </MenuItem>
+              <>
+                {bounty.customReward !== null && (
+                  <MenuItem
+                    dense
+                    onClick={() => markBountyAsPaid(bounty.id)}
+                    disabled={bounty.status !== 'inProgress' && bounty.status !== 'open'}
+                  >
+                    <PaidIcon
+                      sx={{
+                        mr: 1
+                      }}
+                      fontSize='small'
+                    />
+                    <ListItemText primary='Mark paid' />
+                  </MenuItem>
+                )}
+                <MenuItem
+                  dense
+                  onClick={() => closeBounty(bounty.id)}
+                  disabled={
+                    bounty.status === 'complete' || (bounty.status !== 'inProgress' && bounty.status !== 'open')
+                  }
+                >
+                  <CheckCircleOutlinedIcon
+                    sx={{
+                      mr: 1
+                    }}
+                    fontSize='small'
+                  />
+                  <ListItemText primary='Mark complete' />
+                </MenuItem>
+              </>
             )}
           </PageActions>
         )

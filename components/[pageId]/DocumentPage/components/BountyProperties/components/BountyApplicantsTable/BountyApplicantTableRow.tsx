@@ -70,6 +70,7 @@ export default function BountyApplicantTableRow({
         // Closes the modal
         setReviewDecision(null);
         refreshBounty(bounty.id);
+        refreshSubmissions();
       })
       .catch((err) => {
         setApiError(err);
@@ -159,6 +160,7 @@ export default function BountyApplicantTableRow({
               {submission.submission && (
                 <Box mb={2}>
                   <SubmissionInput
+                    hasCustomReward={bounty.customReward !== null}
                     bountyId={bounty.id}
                     readOnly={
                       user?.id !== submission.createdBy ||

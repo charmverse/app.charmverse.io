@@ -74,6 +74,7 @@ enum BountyOperation {
   lock
   approve_applications
   grant_permissions
+  mark_paid
 }
 
 enum BountyPermissionLevel {
