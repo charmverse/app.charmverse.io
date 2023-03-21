@@ -132,6 +132,7 @@ function TableHeaders(props: Props): JSX.Element {
       ? visiblePropertyIds
       : [Constants.titleColumnId, ...visiblePropertyIds];
     const destIndex = visiblePropertyIds.indexOf(destinationProperty.id);
+
     await mutator.changeViewVisiblePropertiesOrder(
       activeView.id,
       visiblePropertyIds,
