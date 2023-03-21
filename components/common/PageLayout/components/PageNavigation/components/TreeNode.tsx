@@ -33,6 +33,7 @@ type NodeProps = {
   deletePage?: (id: string) => void;
   selectedNodeId: string | null;
   onClick?: () => void;
+  isFavorites?: boolean;
   validateTarget?: ({ droppedItem, targetItem }: { droppedItem: MenuNode; targetItem: MenuNode }) => boolean;
 };
 
@@ -45,7 +46,8 @@ function DraggableTreeNode({
   addPage,
   deletePage,
   selectedNodeId,
-  validateTarget
+  validateTarget,
+  isFavorites
 }: NodeProps) {
   const ref = useRef<HTMLDivElement>(null);
   const [isAdjacent, isAdjacentRef, setIsAdjacent] = useRefState(false);
@@ -57,7 +59,7 @@ function DraggableTreeNode({
     })
   }));
 
-  const dndEnabled = !!onDropAdjacent && !!onDropChild;
+  const dndEnabled = (!!onDropAdjacent && !!onDropChild) || (isFavorites && !!onDropAdjacent);
 
   const [{ canDrop, isOverCurrent }, drop] = useDrop<ParentMenuNode, any, { canDrop: boolean; isOverCurrent: boolean }>(
     () => ({
@@ -137,7 +139,7 @@ function DraggableTreeNode({
     [drag]
   );
 
-  const isActive = !isAdjacent && canDrop && isOverCurrent && item.type !== 'board';
+  const isActive = !isAdjacent && canDrop && !isFavorites && isOverCurrent && item.type !== 'board';
   const isAdjacentActive = isAdjacent && canDrop && isOverCurrent;
 
   const addSubPage = useCallback(

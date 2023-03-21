@@ -38,6 +38,10 @@ type PageNavigationProps = {
   deletePage?: (id: string) => void;
   isFavorites?: boolean;
   rootPageIds?: string[];
+  //   {
+  //     pageId: string;
+  //     index: number;
+  // }[]
   onClick?: () => void;
 };
 
@@ -238,7 +242,7 @@ function PageNavigation({ deletePage, isFavorites, rootPageIds, onClick }: PageN
           key={item.id}
           item={item}
           onDropChild={isFavorites ? null : onDropChild}
-          onDropAdjacent={isFavorites ? null : onDropAdjacent}
+          onDropAdjacent={onDropAdjacent}
           pathPrefix={`/${router.query.domain}`}
           // pass down so parent databases can highlight themselves
           selectedNodeId={selectedNodeId}
@@ -246,6 +250,7 @@ function PageNavigation({ deletePage, isFavorites, rootPageIds, onClick }: PageN
           deletePage={deletePage}
           onClick={onClick}
           validateTarget={isValidDropTarget}
+          isFavorites={isFavorites}
         />
       ))}
     </TreeRoot>
