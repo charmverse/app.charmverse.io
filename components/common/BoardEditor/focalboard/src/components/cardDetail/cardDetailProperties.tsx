@@ -1,7 +1,7 @@
 import { Box, Menu, Stack } from '@mui/material';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import React, { useEffect, useState } from 'react';
-import { useIntl } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 
 import charmClient from 'charmClient';
 import { useSnackbar } from 'hooks/useSnackbar';
@@ -11,9 +11,10 @@ import type { Card } from 'lib/focalboard/card';
 
 import { useSortable } from '../../hooks/sortable';
 import mutator from '../../mutator';
-import { Utils } from '../../utils';
+import { IDType, Utils } from '../../utils';
 import Button from '../../widgets/buttons/button';
-import PropertyMenu from '../../widgets/propertyMenu';
+import PropertyMenu, { typeDisplayName } from '../../widgets/propertyMenu';
+import { PropertyTypes } from '../../widgets/propertyTypes';
 import Calculations from '../calculations/calculations';
 import type { ConfirmationDialogBoxProps } from '../confirmationDialogBox';
 import ConfirmationDialogBox from '../confirmationDialogBox';
@@ -109,6 +110,7 @@ function CardDetailProperties(props: Props) {
   const { board, card, cards, views, activeView, pageUpdatedAt, pageUpdatedBy } = props;
   const [newTemplateId, setNewTemplateId] = useState('');
   const intl = useIntl();
+  const addPropertyPopupState = usePopupState({ variant: 'popover', popupId: 'add-property' });
   const { showMessage } = useSnackbar();
   useEffect(() => {
     const newProperty = board.fields.cardProperties.find((property) => property.id === newTemplateId);
@@ -299,26 +301,40 @@ function CardDetailProperties(props: Props) {
 
       {!props.readOnly && activeView && (
         <div className='octo-propertyname add-property'>
-          {/* <MenuWrapper>
-            <Button>
-              <FormattedMessage id='CardDetail.add-property' defaultMessage='+ Add a property' />
-            </Button>
-            <Menu position='bottom-start' disablePortal={false}>
-              <PropertyTypes
-                label={intl.formatMessage({ id: 'PropertyMenu.selectType', defaultMessage: 'Select property type' })}
-                onTypeSelected={async (type) => {
-                  const template: IPropertyTemplate = {
-                    id: Utils.createGuid(IDType.BlockID),
-                    name: typeDisplayName(intl, type),
-                    type,
-                    options: []
-                  };
-                  const templateId = await mutator.insertPropertyTemplate(board, activeView, -1, template);
-                  setNewTemplateId(templateId);
-                }}
-              />
-            </Menu>
-          </MenuWrapper> */}
+          <Button {...bindTrigger(addPropertyPopupState)}>
+            <FormattedMessage id='CardDetail.add-property' defaultMessage='+ Add a property' />
+          </Button>
+
+          <Menu
+            {...bindMenu(addPropertyPopupState)}
+            anchorOrigin={{
+              vertical: 'bottom',
+              horizontal: 'right'
+            }}
+            transformOrigin={{
+              vertical: 'center',
+              horizontal: 'left'
+            }}
+          >
+            <PropertyTypes
+              onClick={async (type) => {
+                const template: IPropertyTemplate = {
+                  id: Utils.createGuid(IDType.BlockID),
+                  name: typeDisplayName(intl, type),
+                  type,
+                  options: []
+                };
+                const templateId = await mutator.insertPropertyTemplate(board, activeView, -1, template);
+                await charmClient.patchBlock(
+                  board.id,
+                  { updatedFields: { visibleCardPropertyIds: [...board.fields.visibleCardPropertyIds, template.id] } },
+                  () => {}
+                );
+                setNewTemplateId(templateId);
+                addPropertyPopupState.close();
+              }}
+            />
+          </Menu>
         </div>
       )}
     </div>

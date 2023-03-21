@@ -1,15 +1,16 @@
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
-import { Divider, ListItemIcon, Menu, MenuItem, TextField, Typography } from '@mui/material';
+import { ListItemIcon, Menu, MenuItem, TextField, Typography } from '@mui/material';
 import { Stack } from '@mui/system';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import React, { useRef, useState } from 'react';
 import type { IntlShape } from 'react-intl';
-import { useIntl } from 'react-intl';
 
 import type { IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 
 import { Utils } from '../utils';
+
+import { PropertyTypes } from './propertyTypes';
 
 type Props = {
   onTypeAndNameChanged: (newType: PropertyType, newName: string) => void;
@@ -81,7 +82,6 @@ const PropertyMenu = React.memo((props: Props) => {
   const propertyName = props.property.name;
   const [name, setName] = useState(propertyName);
   const changePropertyTypePopupState = usePopupState({ variant: 'popover', popupId: 'card-property-type' });
-  const intl = useIntl();
   return (
     <Stack gap={1}>
       <TextField
@@ -137,23 +137,8 @@ const PropertyMenu = React.memo((props: Props) => {
           vertical: 'center',
           horizontal: 'left'
         }}
-        sx={{
-          width: '100%'
-        }}
       >
-        <Stack gap={0.5}>
-          <Typography px={1} color='secondary' variant='subtitle1'>
-            Change property type
-          </Typography>
-          <Divider />
-          {propertyTypesList.map((type) => (
-            <MenuItem key={type}>
-              <Typography onClick={() => props.onTypeAndNameChanged(type, name)}>
-                {typeDisplayName(intl, type)}
-              </Typography>
-            </MenuItem>
-          ))}
-        </Stack>
+        <PropertyTypes onClick={(type) => props.onTypeAndNameChanged(type, name)} />
       </Menu>
     </Stack>
   );
