@@ -107,7 +107,7 @@ function PropertyOptions(props: LayoutOptionsProps) {
     };
   }, [visiblePropertyIdsWithTitle, properties]);
 
-  const onDropToColumn = async (sourceProperty: IPropertyTemplate, destinationProperty: IPropertyTemplate) => {
+  const onDrop = async (sourceProperty: IPropertyTemplate, destinationProperty: IPropertyTemplate) => {
     const isDestinationPropertyVisible = visiblePropertyIdsWithTitle.includes(destinationProperty.id);
     const isSourcePropertyVisible = visiblePropertyIdsWithTitle.includes(sourceProperty.id);
 
@@ -168,7 +168,7 @@ function PropertyOptions(props: LayoutOptionsProps) {
           <Stack>
             {visibleProperties.map((property) => (
               <PropertyMenuItem
-                onDrop={onDropToColumn}
+                onDrop={onDrop}
                 visibilityToggleDisabled={property.id === Constants.titleColumnId}
                 isVisible
                 property={property}
@@ -193,7 +193,7 @@ function PropertyOptions(props: LayoutOptionsProps) {
           <Stack>
             {hiddenProperties.map((property) => (
               <PropertyMenuItem
-                onDrop={onDropToColumn}
+                onDrop={onDrop}
                 isVisible={false}
                 property={property}
                 toggleVisibility={toggleVisibility}

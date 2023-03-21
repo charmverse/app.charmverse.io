@@ -1,11 +1,14 @@
+import { Stack } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
+import charmClient from 'charmClient';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
 
+import { useSortable } from '../../hooks/sortable';
 import mutator from '../../mutator';
 import { IDType, Utils } from '../../utils';
 import Button from '../../widgets/buttons/button';
@@ -28,12 +31,85 @@ type Props = {
   pageUpdatedAt: string;
 };
 
+function CardDetailProperty({
+  readOnly,
+  property,
+  onTypeAndNameChanged,
+  board,
+  card,
+  onDelete,
+  isOpen,
+  pageUpdatedBy,
+  pageUpdatedAt,
+  deleteDisabledMessage,
+  onDrop
+}: {
+  isOpen: boolean;
+  readOnly: boolean;
+  property: IPropertyTemplate;
+  card: Card;
+  board: Board;
+  onTypeAndNameChanged: (newType: PropertyType, newName: string) => void;
+  onDelete: VoidFunction;
+  pageUpdatedAt: string;
+  pageUpdatedBy: string;
+  deleteDisabledMessage?: string;
+  onDrop: (template: IPropertyTemplate, container: IPropertyTemplate) => void;
+}) {
+  const [isDragging, isOver, columnRef] = useSortable('column', property, !readOnly, onDrop);
+
+  return (
+    <Stack
+      ref={columnRef}
+      sx={{
+        minWidth: 250,
+        overflow: 'unset',
+        opacity: isDragging ? 0.5 : 1,
+        transition: `background-color 150ms ease-in-out`,
+        backgroundColor: isOver ? 'var(--charmeditor-active)' : 'initial',
+        flexDirection: 'row'
+      }}
+      className='octo-propertyrow'
+    >
+      {readOnly && (
+        <div className='octo-propertyname octo-propertyname--readonly'>
+          <Button>{property.name}</Button>
+        </div>
+      )}
+      {!readOnly && (
+        <MenuWrapper isOpen={isOpen}>
+          <div className='octo-propertyname'>
+            <Button>{property.name}</Button>
+          </div>
+          <PropertyMenu
+            deleteDisabled={deleteDisabledMessage}
+            propertyId={property.id}
+            propertyName={property.name}
+            propertyType={property.type}
+            onTypeAndNameChanged={onTypeAndNameChanged}
+            onDelete={onDelete}
+          />
+        </MenuWrapper>
+      )}
+      <PropertyValueElement
+        readOnly={readOnly}
+        card={card}
+        board={board}
+        updatedAt={pageUpdatedAt}
+        updatedBy={pageUpdatedBy}
+        propertyTemplate={property}
+        showEmptyPlaceholder={true}
+        displayType='details'
+      />
+    </Stack>
+  );
+}
+
 function CardDetailProperties(props: Props) {
   const { board, card, cards, views, activeView, pageUpdatedAt, pageUpdatedBy } = props;
   const [newTemplateId, setNewTemplateId] = useState('');
   const intl = useIntl();
   const { showMessage } = useSnackbar();
-
   useEffect(() => {
     const newProperty = board.fields.cardProperties.find((property) => property.id === newTemplateId);
     if (newProperty) {
@@ -47,6 +123,15 @@ function CardDetailProperties(props: Props) {
     onClose: () => {}
   });
   const [showConfirmationDialog, setShowConfirmationDialog] = useState<boolean>(false);
+
+  const onDrop = async (sourceProperty: IPropertyTemplate, destinationProperty: IPropertyTemplate) => {
+    const visibleCardPropertyIds = [...board.fields.visibleCardPropertyIds];
+    const destIndex = visibleCardPropertyIds.indexOf(destinationProperty.id);
+    const srcIndex = visibleCardPropertyIds.indexOf(sourceProperty.id);
+    visibleCardPropertyIds.splice(srcIndex, 1);
+    visibleCardPropertyIds.splice(destIndex, 0, sourceProperty.id);
+    await charmClient.patchBlock(board.id, { updatedFields: { visibleCardPropertyIds } }, () => {});
+  };
 
   function onPropertyChangeSetAndOpenConfirmationDialog(
     newType: PropertyType,
@@ -185,43 +270,28 @@ function CardDetailProperties(props: Props) {
 
   return (
     <div className='octo-propertylist'>
-      {board.fields.cardProperties.map((propertyTemplate: IPropertyTemplate) => {
-        const propertyValue = card.fields.properties[propertyTemplate.id];
+      {board.fields.visibleCardPropertyIds.map((cardPropertyId) => {
+        const propertyTemplate = board.fields.cardProperties.find((cardProperty) => cardProperty.id === cardPropertyId);
+        if (!propertyTemplate) {
+          return null;
+        }
         return (
-          <div key={`${propertyTemplate.id}-${propertyTemplate.type}-${propertyValue}`} className='octo-propertyrow'>
-            {props.readOnly && (
-              <div className='octo-propertyname octo-propertyname--readonly'>
-                <Button>{propertyTemplate.name}</Button>
-              </div>
-            )}
-            {!props.readOnly && (
-              <MenuWrapper isOpen={propertyTemplate.id === newTemplateId}>
-                <div className='octo-propertyname'>
-                  <Button>{propertyTemplate.name}</Button>
-                </div>
-                <PropertyMenu
-                  deleteDisabled={getDeleteDisabled(propertyTemplate)}
-                  propertyId={propertyTemplate.id}
-                  propertyName={propertyTemplate.name}
-                  propertyType={propertyTemplate.type}
-                  onTypeAndNameChanged={(newType: PropertyType, newName: string) => {
-                    onPropertyChangeSetAndOpenConfirmationDialog(newType, newName, propertyTemplate);
-                  }}
-                  onDelete={() => onPropertyDeleteSetAndOpenConfirmationDialog(propertyTemplate)}
-                />
-              </MenuWrapper>
-            )}
-            <PropertyValueElement
-              readOnly={props.readOnly}
-              card={card}
-              board={board}
-              updatedAt={pageUpdatedAt}
-              updatedBy={pageUpdatedBy}
-              propertyTemplate={propertyTemplate}
-              showEmptyPlaceholder={true}
-              displayType='details'
-            />
-          </div>
+          <CardDetailProperty
+            onDrop={onDrop}
+            key={propertyTemplate.id}
+            board={board}
+            card={card}
+            deleteDisabledMessage={getDeleteDisabled(propertyTemplate)}
+            isOpen={propertyTemplate.id === newTemplateId}
+            onDelete={() => onPropertyDeleteSetAndOpenConfirmationDialog(propertyTemplate)}
+            onTypeAndNameChanged={(newType: PropertyType, newName: string) => {
+              onPropertyChangeSetAndOpenConfirmationDialog(newType, newName, propertyTemplate);
+            }}
+            pageUpdatedAt={pageUpdatedAt}
+            pageUpdatedBy={pageUpdatedBy}
+            property={propertyTemplate}
+            readOnly={props.readOnly}
+          />
         );
       })}
 

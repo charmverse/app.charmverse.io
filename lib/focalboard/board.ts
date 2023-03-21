@@ -44,6 +44,7 @@ export type BoardFields = {
   isTemplate?: boolean;
   cardProperties: IPropertyTemplate[];
   columnCalculations: Record<string, string>;
+  visibleCardPropertyIds: string[];
 };
 
 type Board = Block & {
@@ -96,6 +97,7 @@ function createBoard({
     ...createBlock(block),
     type: 'board',
     fields: {
+      visibleCardPropertyIds: block?.fields?.visibleCardPropertyIds ?? [],
       showDescription: block?.fields?.showDescription ?? false,
       description: block?.fields?.description ?? '',
       icon: block?.fields?.icon ?? '',
