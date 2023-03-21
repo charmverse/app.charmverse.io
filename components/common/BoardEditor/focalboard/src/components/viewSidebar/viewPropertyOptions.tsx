@@ -1,3 +1,4 @@
+import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import { IconButton, ListItemIcon, ListItemText, MenuItem, Typography } from '@mui/material';
@@ -8,10 +9,10 @@ import Button from 'components/common/Button';
 import type { IPropertyTemplate } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 
+import { Constants } from '../../constants';
+import { useSortable } from '../../hooks/sortable';
 import mutator from '../../mutator';
 import { iconForPropertyType } from '../viewHeader/viewHeaderPropertiesMenu';
-
-const titlePropertyId = '__title';
 
 interface LayoutOptionsProps {
   properties: readonly IPropertyTemplate[];
@@ -22,38 +23,54 @@ function PropertyMenuItem({
   isVisible,
   property,
   visibilityToggleDisabled,
-  toggleVisibility
+  toggleVisibility,
+  onDrop
 }: {
   property: IPropertyTemplate;
   isVisible: boolean;
   toggleVisibility: (propertyId: string) => void;
   visibilityToggleDisabled?: boolean;
+  onDrop: (template: IPropertyTemplate, container: IPropertyTemplate) => void;
 }) {
+  const [isDragging, isOver, columnRef] = useSortable('column', property, true, onDrop);
+
   return (
-    <MenuItem
-      dense
+    <Stack
+      ref={columnRef}
       sx={{
-        minWidth: 250
+        minWidth: 250,
+        overflow: 'unset',
+        opacity: isDragging ? 0.5 : 1,
+        transition: `background-color 150ms ease-in-out`,
+        backgroundColor: isOver ? 'var(--charmeditor-active)' : 'initial',
+        flexDirection: 'row'
       }}
     >
-      <ListItemIcon>{iconForPropertyType(property.type)}</ListItemIcon>
-      <ListItemText>{property.name}</ListItemText>
-      <IconButton
-        disabled={visibilityToggleDisabled}
-        size='small'
-        onClick={() => {
-          toggleVisibility(property.id);
-        }}
-      >
-        {isVisible ? <VisibilityIcon fontSize='small' /> : <VisibilityOffIcon fontSize='small' color='secondary' />}
-      </IconButton>
-    </MenuItem>
+      <MenuItem dense className={isOver ? 'dragover' : ''} sx={{ width: '100%' }}>
+        <DragIndicatorIcon color='secondary' fontSize='small' sx={{ mr: 1 }} />
+        <ListItemIcon>{iconForPropertyType(property.type)}</ListItemIcon>
+        <ListItemText>{property.name}</ListItemText>
+        <IconButton
+          disabled={visibilityToggleDisabled}
+          size='small'
+          onClick={() => {
+            toggleVisibility(property.id);
+          }}
+        >
+          {isVisible ? <VisibilityIcon fontSize='small' /> : <VisibilityOffIcon fontSize='small' color='secondary' />}
+        </IconButton>
+      </MenuItem>
+    </Stack>
   );
 }
 
 function PropertyOptions(props: LayoutOptionsProps) {
   const { properties, view } = props;
+
   const { visiblePropertyIds } = view.fields;
+  const titlePropertyIndex = visiblePropertyIds.indexOf(Constants.titleColumnId);
+  const visiblePropertyIdsWithTitle =
+    titlePropertyIndex === -1 ? [Constants.titleColumnId, ...visiblePropertyIds] : visiblePropertyIds;
 
   const { hiddenProperties, visibleProperties } = useMemo(() => {
     const propertyIds = properties.map((property) => property.id);
@@ -61,7 +78,16 @@ function PropertyOptions(props: LayoutOptionsProps) {
       __propertiesRecord[property.id] = property;
       return __propertiesRecord;
     }, {});
-    const visiblePropertyIdsWithTitle = visiblePropertyIds.length === 0 ? [titlePropertyId] : visiblePropertyIds;
+
+    // Manually add __title column as its not present by default
+    if (!_propertiesRecord[Constants.titleColumnId]) {
+      _propertiesRecord[Constants.titleColumnId] = {
+        id: Constants.titleColumnId,
+        name: 'Title',
+        options: [],
+        type: 'text'
+      };
+    }
 
     const _visibleProperties = visiblePropertyIdsWithTitle.map(
       (visiblePropertyId) => _propertiesRecord[visiblePropertyId]
@@ -79,26 +105,50 @@ function PropertyOptions(props: LayoutOptionsProps) {
       visibleProperties: _visibleProperties,
       hiddenProperties: _hiddenProperties
     };
-  }, [visiblePropertyIds, properties]);
+  }, [visiblePropertyIdsWithTitle, properties]);
+
+  const onDropToColumn = async (sourceProperty: IPropertyTemplate, destinationProperty: IPropertyTemplate) => {
+    const isDestinationPropertyVisible = visiblePropertyIdsWithTitle.includes(destinationProperty.id);
+    const isSourcePropertyVisible = visiblePropertyIdsWithTitle.includes(sourceProperty.id);
+
+    if (!isDestinationPropertyVisible) {
+      mutator.changeViewVisibleProperties(
+        view.id,
+        visiblePropertyIdsWithTitle,
+        visiblePropertyIdsWithTitle.filter((visiblePropertyId) => visiblePropertyId !== sourceProperty.id)
+      );
+    } else {
+      const destIndex = visiblePropertyIdsWithTitle.indexOf(destinationProperty.id);
+      const srcIndex = visiblePropertyIdsWithTitle.indexOf(sourceProperty.id);
+      const oldPropertyIds = [...visiblePropertyIdsWithTitle];
+
+      if (isSourcePropertyVisible) {
+        visiblePropertyIdsWithTitle.splice(destIndex, 0, visiblePropertyIdsWithTitle.splice(srcIndex, 1)[0]);
+      } else {
+        visiblePropertyIdsWithTitle.splice(destIndex, 0, sourceProperty.id);
+      }
+      mutator.changeViewVisibleProperties(view.id, oldPropertyIds, visiblePropertyIdsWithTitle);
+    }
+  };
 
   const toggleVisibility = (propertyId: string) => {
     let newVisiblePropertyIds = [];
-    if (visiblePropertyIds.includes(propertyId)) {
-      newVisiblePropertyIds = visiblePropertyIds.filter((o: string) => o !== propertyId);
+    if (visiblePropertyIdsWithTitle.includes(propertyId)) {
+      newVisiblePropertyIds = visiblePropertyIdsWithTitle.filter((o: string) => o !== propertyId);
     } else {
-      newVisiblePropertyIds = [...visiblePropertyIds, propertyId];
+      newVisiblePropertyIds = [...visiblePropertyIdsWithTitle, propertyId];
     }
-    mutator.changeViewVisibleProperties(view.id, visiblePropertyIds, newVisiblePropertyIds);
+    mutator.changeViewVisibleProperties(view.id, visiblePropertyIdsWithTitle, newVisiblePropertyIds);
   };
 
   const hideAllProperties = () => {
-    mutator.changeViewVisibleProperties(view.id, visiblePropertyIds, [titlePropertyId]);
+    mutator.changeViewVisibleProperties(view.id, visiblePropertyIdsWithTitle, [Constants.titleColumnId]);
   };
 
   const showAllProperties = () => {
     mutator.changeViewVisibleProperties(
       view.id,
-      visiblePropertyIds,
+      visiblePropertyIdsWithTitle,
       properties.map((property) => property.id)
     );
   };
@@ -118,7 +168,8 @@ function PropertyOptions(props: LayoutOptionsProps) {
           <Stack>
             {visibleProperties.map((property) => (
               <PropertyMenuItem
-                visibilityToggleDisabled={property.id === titlePropertyId}
+                onDrop={onDropToColumn}
+                visibilityToggleDisabled={property.id === Constants.titleColumnId}
                 isVisible
                 property={property}
                 toggleVisibility={toggleVisibility}
@@ -142,6 +193,7 @@ function PropertyOptions(props: LayoutOptionsProps) {
           <Stack>
             {hiddenProperties.map((property) => (
               <PropertyMenuItem
+                onDrop={onDropToColumn}
                 isVisible={false}
                 property={property}
                 toggleVisibility={toggleVisibility}
