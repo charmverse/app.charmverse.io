@@ -22,6 +22,8 @@ import { SpaceSettingsDialog } from 'components/common/Modal/SettingsDialog';
 import { charmverseDiscordInvite } from 'config/constants';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
+import { useForumCategories } from 'hooks/useForumCategories';
+import { useHasMemberLevel } from 'hooks/useHasMemberLevel';
 import useKeydownPress from 'hooks/useKeydownPress';
 import { useSmallScreen } from 'hooks/useMediaScreens';
 import { useSettingsDialog } from 'hooks/useSettingsDialog';
@@ -133,11 +135,14 @@ export default function Sidebar({ closeSidebar, favorites, navAction }: SidebarP
   const router = useRouter();
   const { user, logoutUser } = useUser();
   const space = useCurrentSpace();
+  const { categories } = useForumCategories();
   const [userSpacePermissions] = useCurrentSpacePermissions();
   const [isScrolled, setIsScrolled] = useState(false);
   const [showingTrash, setShowingTrash] = useState(false);
   const { disconnectWallet } = useWeb3AuthSig();
   const isMobile = useSmallScreen();
+
+  const showMemberFeatures = useHasMemberLevel('member');
 
   const { onClick } = useSettingsDialog();
   const handleModalClick = (path?: string) => {
@@ -258,14 +263,16 @@ export default function Sidebar({ closeSidebar, favorites, navAction }: SidebarP
                 isOpen={searchInWorkspaceModalState.isOpen}
                 close={searchInWorkspaceModalState.close}
               />
-              <SidebarBox
-                onClick={() => handleModalClick(`${space.name}-invites`)}
-                icon={<GroupAddOutlinedIcon color='secondary' fontSize='small' />}
-                label='Invites'
-              />
+              {showMemberFeatures && (
+                <SidebarBox
+                  onClick={() => handleModalClick(`${space.name}-invites`)}
+                  icon={<GroupAddOutlinedIcon color='secondary' fontSize='small' />}
+                  label='Invites'
+                />
+              )}
               <Divider sx={{ mx: 2, my: 1 }} />
 
-              {!space.hiddenFeatures.includes('member_directory') && (
+              {!space.hiddenFeatures.includes('member_directory') && showMemberFeatures && (
                 <SidebarLink
                   href={`/${space.domain}/members`}
                   active={router.pathname.startsWith('/[domain]/members')}
@@ -275,7 +282,7 @@ export default function Sidebar({ closeSidebar, favorites, navAction }: SidebarP
                 />
               )}
 
-              {!space.hiddenFeatures.includes('proposals') && (
+              {!space.hiddenFeatures.includes('proposals') && showMemberFeatures && (
                 <SidebarLink
                   data-test='sidebar-link-proposals'
                   href={`/${space.domain}/proposals`}
@@ -286,7 +293,7 @@ export default function Sidebar({ closeSidebar, favorites, navAction }: SidebarP
                 />
               )}
 
-              {!space.hiddenFeatures.includes('bounties') && (
+              {!space.hiddenFeatures.includes('bounties') && showMemberFeatures && (
                 <SidebarLink
                   href={`/${space.domain}/bounties`}
                   active={router.pathname.startsWith('/[domain]/bounties')}
@@ -296,16 +303,18 @@ export default function Sidebar({ closeSidebar, favorites, navAction }: SidebarP
                 />
               )}
 
-              {!space.hiddenFeatures.includes('forum') && (
-                <SidebarLink
-                  href={`/${space.domain}/forum`}
-                  data-test='sidebar-link-forum'
-                  active={router.pathname.startsWith('/[domain]/forum')}
-                  icon={<MessageOutlinedIcon fontSize='small' />}
-                  label='Forum'
-                  onClick={navAction}
-                />
-              )}
+              {!space.hiddenFeatures.includes('forum') &&
+                // Always show forum to space members. Show it to guests if they have access to at least 1 category
+                (showMemberFeatures || categories.length > 0) && (
+                  <SidebarLink
+                    href={`/${space.domain}/forum`}
+                    data-test='sidebar-link-forum'
+                    active={router.pathname.startsWith('/[domain]/forum')}
+                    icon={<MessageOutlinedIcon fontSize='small' />}
+                    label='Forum'
+                    onClick={navAction}
+                  />
+                )}
             </Box>
             {isMobile ? (
               <div>{pagesNavigation}</div>

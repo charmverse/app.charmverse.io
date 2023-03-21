@@ -11,7 +11,8 @@ import InputEnumToOptions from 'components/common/form/InputEnumToOptions';
 import { InputSearchMemberMultiple } from 'components/common/form/InputSearchMember';
 import { InputSearchRoleMultiple } from 'components/common/form/InputSearchRole';
 import Loader from 'components/common/Loader';
-import useRoles from 'hooks/useRoles';
+import { useRoles } from 'hooks/useRoles';
+import { useSnackbar } from 'hooks/useSnackbar';
 import type {
   IPagePermissionToCreate,
   IPagePermissionWithAssignee,
@@ -42,6 +43,7 @@ export default function AddPagePermissionsForm({
   const { roles } = useRoles();
 
   const [availableRoles, setAvailableRoles] = useState<ListSpaceRolesResponse[]>([]);
+  const { showMessage } = useSnackbar();
 
   const [permissionLevelToAssign, setPermissionLevelToAssign] = useState<PagePermissionLevelType>('full_access');
 
@@ -118,15 +120,21 @@ export default function AddPagePermissionsForm({
       return recursivePermissionAssign({ currentIndex, total, permissions });
     }
 
-    await recursivePermissionAssign({
-      total: permissionsToCreate.length,
-      permissions: permissionsToCreate
-    });
+    try {
+      await recursivePermissionAssign({
+        total: permissionsToCreate.length,
+        permissions: permissionsToCreate
+      });
 
-    permissionsAdded();
+      permissionsAdded();
+    } catch (err) {
+      showMessage((err as any).message ?? 'Something went wrong', 'error');
+      setPermissionBeingAdded(null);
+    }
   }
 
-  const { custom, ...permissionsWithoutCustom } = permissionLevels as Record<string, string>;
+  // eslint-disable-next-line camelcase
+  const { custom, proposal_editor, ...permissionsWithoutCustom } = permissionLevels;
 
   return (
     <div>
@@ -173,7 +181,9 @@ export default function AddPagePermissionsForm({
           <Grid item>
             <InputLabel>Users</InputLabel>
             <InputSearchMemberMultiple
+              allowEmail
               onChange={setSelectedUserIds}
+              placeholder='Search for users or invite by email'
               filter={{
                 mode: 'exclude',
                 userIds: userIdsToHide

@@ -6,7 +6,7 @@ import { useMemo } from 'react';
 
 import { SmallSelect } from 'components/common/form/InputEnumToOptions';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import useRoles from 'hooks/useRoles';
+import { useRoles } from 'hooks/useRoles';
 import type { TargetPermissionGroup } from 'lib/permissions/interfaces';
 import { proposalCategoryPermissionLabels } from 'lib/permissions/proposals/mapping';
 import type { ProposalCategoryPermissionInput } from 'lib/permissions/proposals/upsertProposalCategoryPermission';

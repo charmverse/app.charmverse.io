@@ -34,6 +34,7 @@ import { ColorModeContext } from 'context/darkMode';
 import { BountiesProvider } from 'hooks/useBounties';
 import { CurrentSpaceProvider } from 'hooks/useCurrentSpaceId';
 import { DiscordProvider } from 'hooks/useDiscordConnection';
+import { PostCategoriesProvider } from 'hooks/useForumCategories';
 import { useInterval } from 'hooks/useInterval';
 import { IsSpaceMemberProvider } from 'hooks/useIsSpaceMember';
 import { useLocalStorage } from 'hooks/useLocalStorage';
@@ -212,9 +213,9 @@ export default function App({ Component, emotionCache = clientSideEmotionCache, 
       <ColorModeContext.Provider value={colorModeContext}>
         <ThemeProvider theme={theme}>
           <SnackbarProvider>
-            <SettingsDialogProvider>
-              <ReactDndProvider>
-                <DataProviders>
+            <ReactDndProvider>
+              <DataProviders>
+                <SettingsDialogProvider>
                   <LocalizationProvider>
                     <OnboardingProvider>
                       <FocalBoardProvider>
@@ -246,9 +247,9 @@ export default function App({ Component, emotionCache = clientSideEmotionCache, 
                       </FocalBoardProvider>
                     </OnboardingProvider>
                   </LocalizationProvider>
-                </DataProviders>
-              </ReactDndProvider>
-            </SettingsDialogProvider>
+                </SettingsDialogProvider>
+              </DataProviders>
+            </ReactDndProvider>
           </SnackbarProvider>
         </ThemeProvider>
       </ColorModeContext.Provider>
@@ -273,21 +274,23 @@ function DataProviders({ children }: { children: ReactNode }) {
                 <SpacesProvider>
                   <CurrentSpaceProvider>
                     <CurrentSpaceSetter />
-                    <IsSpaceMemberProvider>
-                      <WebSocketClientProvider>
-                        <MembersProvider>
-                          <BountiesProvider>
-                            <PaymentMethodsProvider>
-                              <PagesProvider>
-                                <MemberProfileProvider>
-                                  <PageTitleProvider>{children}</PageTitleProvider>
-                                </MemberProfileProvider>
-                              </PagesProvider>
-                            </PaymentMethodsProvider>
-                          </BountiesProvider>
-                        </MembersProvider>
-                      </WebSocketClientProvider>
-                    </IsSpaceMemberProvider>
+                    <PostCategoriesProvider>
+                      <IsSpaceMemberProvider>
+                        <WebSocketClientProvider>
+                          <MembersProvider>
+                            <BountiesProvider>
+                              <PaymentMethodsProvider>
+                                <PagesProvider>
+                                  <MemberProfileProvider>
+                                    <PageTitleProvider>{children}</PageTitleProvider>
+                                  </MemberProfileProvider>
+                                </PagesProvider>
+                              </PaymentMethodsProvider>
+                            </BountiesProvider>
+                          </MembersProvider>
+                        </WebSocketClientProvider>
+                      </IsSpaceMemberProvider>
+                    </PostCategoriesProvider>
                   </CurrentSpaceProvider>
                 </SpacesProvider>
               </Web3AccountProvider>

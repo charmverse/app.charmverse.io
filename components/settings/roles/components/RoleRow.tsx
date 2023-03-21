@@ -28,7 +28,7 @@ import type { ListSpaceRolesResponse } from 'pages/api/roles';
 import GuildXYZIcon from 'public/images/guild_logo.svg';
 
 import RoleForm from './RoleForm';
-import RoleMemberRow from './RoleMemberRow';
+import { RoleMemberRow } from './RoleMemberRow';
 import SpacePermissions from './SpacePermissions';
 
 interface RoleRowProps {
@@ -46,14 +46,7 @@ const ScrollableBox = styled.div<{ rows: number }>`
   ${({ theme, rows }) => rows > 5 && `border-bottom: 1px solid ${theme.palette.divider}`};
 `;
 
-export default function RoleRow({
-  isEditable,
-  role,
-  assignRoles,
-  unassignRole,
-  deleteRole,
-  refreshRoles
-}: RoleRowProps) {
+export function RoleRow({ isEditable, role, assignRoles, unassignRole, deleteRole, refreshRoles }: RoleRowProps) {
   const menuState = usePopupState({ variant: 'popover', popupId: `role-${role.id}` });
   const userPopupState = usePopupState({ variant: 'popover', popupId: `role-${role.id}-users` });
   const rolePermissionsPopupState = usePopupState({ variant: 'popover', popupId: `role-permissions-${role.id}` });
@@ -79,7 +72,8 @@ export default function RoleRow({
     userPopupState.close();
   }
 
-  const assignedMembers = role.spaceRolesToRole.map((r) => r.spaceRole.user);
+  const assignedMembers = members.filter((member) => member.roles.some((r) => r.id === role.id));
+  // role.spaceRolesToRole.map((r) => r.spaceRole.user);
 
   function removeMember(userId: string) {
     unassignRole(role.id, userId);
@@ -87,12 +81,7 @@ export default function RoleRow({
 
   const popupState = usePopupState({ variant: 'popover', popupId: 'add-a-role' });
 
-  let userIdsToHide =
-    role.spaceRolesToRole
-      ?.map((spaceRoleToRole) => {
-        return spaceRoleToRole?.spaceRole?.user?.id;
-      })
-      .filter((id) => typeof id === 'string') ?? [];
+  let assignedMemberIds = assignedMembers.map((m) => m.id);
 
   return (
     <Box mb={3}>
@@ -117,7 +106,7 @@ export default function RoleRow({
                     </span>
                   </Tooltip>
                 ) : null}{' '}
-                {role.spaceRolesToRole.length > 0 && <Chip size='small' label={role.spaceRolesToRole.length} />}
+                <Chip size='small' label={assignedMembers.length} />
               </Typography>
             </Box>
             {isEditable && (
@@ -158,7 +147,7 @@ export default function RoleRow({
                 isEditable={isEditable && role.source !== 'guild_xyz'}
                 onRemove={(userId) => {
                   removeMember(userId);
-                  userIdsToHide = userIdsToHide.filter((id) => id !== userId);
+                  assignedMemberIds = assignedMemberIds.filter((id) => id !== userId);
                 }}
               />
             ))}
@@ -236,7 +225,7 @@ export default function RoleRow({
         <Grid container direction='column' spacing={3}>
           <Grid item>
             <InputSearchMemberMultiple
-              filter={{ mode: 'exclude', userIds: userIdsToHide }}
+              filter={{ mode: 'exclude', userIds: assignedMemberIds }}
               onChange={onChangeNewMembers}
             />
           </Grid>

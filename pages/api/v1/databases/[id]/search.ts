@@ -4,7 +4,7 @@ import nc from 'next-connect';
 
 import { prisma } from 'db';
 import { onError, onNoMatch, requireApiKey } from 'lib/middleware';
-import type { Page, PageProperty, PageQuery, PaginatedQuery, PaginatedResponse } from 'lib/public-api';
+import type { CardPage, PageProperty, CardPageQuery, PaginatedQuery, PaginatedResponse } from 'lib/public-api';
 import {
   DatabasePageNotFoundError,
   mapProperties,
@@ -80,7 +80,7 @@ async function searchDatabase(req: NextApiRequest, res: NextApiResponse) {
     throw new DatabasePageNotFoundError(id as string);
   }
 
-  const searchQuery = req.body as PaginatedQuery<PageQuery>;
+  const searchQuery = req.body as PaginatedQuery<CardPageQuery>;
 
   validatePaginationQuery(searchQuery);
 
@@ -181,7 +181,7 @@ async function searchDatabase(req: NextApiRequest, res: NextApiResponse) {
     }
   }
 
-  const paginatedResponse: PaginatedResponse<Page> = {
+  const paginatedResponse: PaginatedResponse<CardPage> = {
     hasNext,
     cursor,
     data: cardsWithContent

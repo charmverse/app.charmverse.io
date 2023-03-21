@@ -2,7 +2,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import type { ChangeEvent } from 'react';
-import { useCallback } from 'react';
+import { useEffect, useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
@@ -37,6 +37,12 @@ function UserDescription(props: UserDescriptionProps) {
     mode: 'onChange',
     resolver: yupResolver(schema)
   });
+
+  useEffect(() => {
+    if (currentDescription && currentDescription !== watch('description')) {
+      setValue('description', currentDescription || '');
+    }
+  }, [currentDescription]);
 
   const onSave = useCallback(
     debounce(async (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {

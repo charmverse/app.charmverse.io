@@ -8,7 +8,7 @@ import charmClient from 'charmClient';
 import UserDisplay from 'components/common/UserDisplay';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMembers } from 'hooks/useMembers';
-import useRoles from 'hooks/useRoles';
+import { useRoles } from 'hooks/useRoles';
 import type { Member } from 'lib/members/interfaces';
 import type { ListSpaceRolesResponse } from 'pages/api/roles';
 

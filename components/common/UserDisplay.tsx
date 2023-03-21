@@ -1,6 +1,7 @@
 import type { BoxProps } from '@mui/material';
 import { Box, Typography } from '@mui/material';
 import type { User } from '@prisma/client';
+import type { ReactNode } from 'react';
 import { memo } from 'react';
 
 import type { InitialAvatarProps } from 'components/common/Avatar';
@@ -10,11 +11,15 @@ import { useMemberProfile } from 'components/profile/hooks/useMemberProfile';
 import useENSName from 'hooks/useENSName';
 import { hasNftAvatar } from 'lib/users/hasNftAvatar';
 
+/**
+ * @avatarIcon Pass this to override the user avatar with a custom icon
+ */
 interface StyleProps extends BoxProps {
   fontSize?: string | number;
   fontWeight?: number | string;
   avatarSize?: InitialAvatarProps['size'];
   hideName?: boolean;
+  avatarIcon?: ReactNode;
 }
 
 interface BaseComponentProps extends StyleProps {
@@ -44,7 +49,11 @@ function BaseComponent({
         cursor: props.onClick ? 'pointer' : 'initial'
       }}
     >
-      <Avatar size={avatarSize} name={username} avatar={avatar} isNft={isNft} />
+      {props.avatarIcon ? (
+        <Box sx={{ ml: 0.5, mt: 1 }}>{props.avatarIcon}</Box>
+      ) : (
+        <Avatar size={avatarSize} name={username} avatar={avatar} isNft={isNft} />
+      )}
       {!hideName && (
         <Typography whiteSpace='nowrap' fontSize={fontSize} fontWeight={fontWeight}>
           {username}
@@ -70,7 +79,12 @@ export const AnonUserDisplay = memo(AnonUserDisplayComponent);
  * @linkToProfile Whether we show a link to user's public profile. Defaults to false.
  */
 interface UserDisplayProps extends StyleProps {
-  user?: Pick<User, 'avatar' | 'username' | 'path' | 'id'> | null;
+  user?: {
+    avatar?: string | null;
+    username: string;
+    path?: string | null;
+    id: string;
+  } | null;
   linkToProfile?: boolean;
   showMiniProfile?: boolean;
 }

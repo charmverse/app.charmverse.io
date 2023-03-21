@@ -28,7 +28,8 @@ export async function computeProposalCategoryPermissions({
 
   const { error, isAdmin } = await hasAccessToSpace({
     spaceId: proposalCategory.spaceId,
-    userId
+    userId,
+    disallowGuest: true
   });
 
   const permissions = new AvailableProposalCategoryPermissions();

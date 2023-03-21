@@ -13,7 +13,7 @@ const useInactiveListener = (suppress = false): void => {
   useEffect((): any => {
     const { ethereum } = window as WindowType;
 
-    if (ethereum && !active && !suppress) {
+    if (ethereum?.on && !active && !suppress) {
       const handleChainChanged = (_chainId: string | number) => {
         activate(injected).catch((err) => {
           log.warn('Failed to activate after chain changed', err);

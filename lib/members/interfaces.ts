@@ -31,17 +31,21 @@ export type PropertyValueDetails = {
 
 export type PropertyValueWithDetails = PropertyValue & PropertyValueDetails;
 
-export type Member = Omit<User, 'addresses'> & {
-  isAdmin: boolean;
+export type Member = Pick<User, 'id' | 'createdAt' | 'updatedAt' | 'username'> & {
+  avatar?: string;
+  isBot?: boolean;
+  path?: string;
+  deletedAt?: Date;
+  avatarTokenId?: string;
+  isAdmin?: boolean;
+  isGuest?: boolean;
   joinDate: string;
   hasNftAvatar?: boolean;
-  profile: UserDetails | null;
+  profile?: UserDetails;
   properties: PropertyValueWithDetails[];
   roles: Pick<Role, 'name' | 'id'>[];
-  onboarded: boolean;
+  onboarded?: boolean;
 };
-
-export type PublicMember = Pick<Member, 'id' | 'username'>;
 
 export type CreateMemberPropertyPayload = Pick<MemberProperty, 'index' | 'name' | 'options' | 'type'>;
 export type UpdateMemberPropertyValuePayload = Pick<MemberPropertyValue, 'memberPropertyId' | 'value'>;

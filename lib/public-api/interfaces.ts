@@ -116,7 +116,7 @@ export interface PageContentFormats {
  * @swagger
  * components:
  *  schemas:
- *    Page:
+ *    CardPage:
  *      type: object
  *      properties:
  *        id:
@@ -155,7 +155,7 @@ export interface PageContentFormats {
  *                example: Medium
  *
  */
-export interface Page {
+export interface CardPage {
   id: string;
   createdAt: string;
   updatedAt: string;
@@ -173,7 +173,7 @@ export interface Page {
  * @swagger
  * components:
  *  schemas:
- *    PageQuery:
+ *    CardPageQuery:
  *      type: object
  *      properties:
  *        title:
@@ -194,7 +194,7 @@ export interface Page {
  *              required: false
  *
  */
-export type PageQuery = Partial<Pick<Page, 'title' | 'properties'>>;
+export type CardPageQuery = Partial<Pick<CardPage, 'title' | 'properties'>>;
 
 /**
  *

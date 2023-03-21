@@ -5,20 +5,23 @@ import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 import type { Member } from 'lib/members/interfaces';
-import { shortWalletAddress } from 'lib/utilities/strings';
 
 import { useCurrentSpace } from './useCurrentSpace';
 
 type Context = {
   members: Member[];
+  guests: Member[];
   mutateMembers: KeyedMutator<Member[]>;
+  removeGuest: (userId: string) => Promise<void>;
   isLoading: boolean;
 };
 
 const MembersContext = createContext<Readonly<Context>>({
   members: [],
+  guests: [],
   isLoading: false,
-  mutateMembers: () => Promise.resolve(undefined)
+  mutateMembers: () => Promise.resolve(undefined),
+  removeGuest: () => Promise.resolve(undefined)
 });
 
 export function MembersProvider({ children }: { children: ReactNode }) {
@@ -31,18 +34,30 @@ export function MembersProvider({ children }: { children: ReactNode }) {
   } = useSWR(
     () => (space ? `members/${space?.id}` : null),
     () => {
-      return charmClient.members.getMembers(space!.id).then((_members) =>
-        _members.map((m) => {
-          if (m.identityType === 'Wallet') {
-            m.username = shortWalletAddress(m.username);
-          }
-          return m;
-        })
-      );
+      return charmClient.members.getMembers(space!.id);
     }
   );
 
-  const value = useMemo(() => ({ members: members || [], mutateMembers, isLoading } as Context), [members]);
+  async function removeGuest(userId: string) {
+    if (space) {
+      await charmClient.members.removeGuest({
+        spaceId: space.id,
+        userId
+      });
+      mutateMembers();
+    }
+  }
+
+  const value = useMemo(
+    () => ({
+      members: members || [],
+      guests: members?.filter((member) => member.isGuest) || [],
+      mutateMembers,
+      removeGuest,
+      isLoading
+    }),
+    [members]
+  );
 
   return <MembersContext.Provider value={value}>{children}</MembersContext.Provider>;
 }

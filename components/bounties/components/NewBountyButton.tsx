@@ -10,7 +10,7 @@ import { usePages } from 'hooks/usePages';
 import { useUser } from 'hooks/useUser';
 import type { BountyWithDetails } from 'lib/bounties';
 
-export default function NewBountyButton() {
+export function NewBountyButton() {
   const { user } = useUser();
   const router = useRouter();
   const currentSpace = useCurrentSpace();

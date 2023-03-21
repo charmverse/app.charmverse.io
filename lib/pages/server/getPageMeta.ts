@@ -16,6 +16,7 @@ export function pageMetaSelect() {
     createdAt: true,
     createdBy: true,
     deletedAt: true,
+    deletedBy: true,
     fullWidth: true,
     galleryImage: true,
     hasContent: true,

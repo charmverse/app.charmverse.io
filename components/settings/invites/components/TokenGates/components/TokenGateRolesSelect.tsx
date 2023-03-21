@@ -4,7 +4,7 @@ import { Box, Chip, FormControl, MenuItem, Select, Tooltip, Typography } from '@
 import type { SelectChangeEvent } from '@mui/material/Select';
 import { useMemo } from 'react';
 
-import useRoles from 'hooks/useRoles';
+import { useRoles } from 'hooks/useRoles';
 import { isTruthy } from 'lib/utilities/types';
 import type { ListSpaceRolesResponse } from 'pages/api/roles';
 

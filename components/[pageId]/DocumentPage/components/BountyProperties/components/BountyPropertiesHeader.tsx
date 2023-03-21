@@ -8,12 +8,13 @@ import { useState } from 'react';
 import charmClient from 'charmClient';
 import BountyStatusBadge from 'components/bounties/components/BountyStatusBadge';
 import Button from 'components/common/Button';
+import { useMembers } from 'hooks/useMembers';
 import { usePages } from 'hooks/usePages';
-import useRoles from 'hooks/useRoles';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { BountyWithDetails, BountyPermissions } from 'lib/bounties';
+import type { BountyPagePermissionIntersection } from 'lib/permissions/compareBountyPagePermissions';
 import { compareBountyPagePermissions } from 'lib/permissions/compareBountyPagePermissions';
-import type { BountyPagePermissionIntersection, PagePermissionMeta } from 'lib/permissions/interfaces';
+import type { PagePermissionMeta } from 'lib/permissions/interfaces';
 
 /**
  * Permissions left optional so this component can initialise without them
@@ -26,28 +27,28 @@ interface Props {
   readOnly?: boolean;
 }
 
-export default function BountyPropertiesHeader({
+export function BountyPropertiesHeader({
   readOnly = false,
   bounty,
   bountyPermissions,
   pagePermissions,
   pageId
 }: Props) {
-  const { roleups } = useRoles();
+  const { members } = useMembers();
   const { mutatePage } = usePages();
   const { showMessage } = useSnackbar();
 
   const [updatingPermissions, setUpdatingPermissions] = useState(false);
 
   const intersection: BountyPagePermissionIntersection =
-    !bountyPermissions || !pagePermissions || !roleups
+    !bountyPermissions || !pagePermissions
       ? { hasPermissions: [], missingPermissions: [] }
       : compareBountyPagePermissions({
           bountyPermissions,
           pagePermissions,
           bountyOperations: ['work'],
           pageOperations: ['edit_content'],
-          roleups
+          members
         });
 
   function restrictPermissions() {
