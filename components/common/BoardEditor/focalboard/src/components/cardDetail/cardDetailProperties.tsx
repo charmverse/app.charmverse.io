@@ -1,6 +1,7 @@
-import { Stack } from '@mui/material';
+import { Box, Menu, Stack } from '@mui/material';
+import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import React, { useEffect, useState } from 'react';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { useIntl } from 'react-intl';
 
 import charmClient from 'charmClient';
 import { useSnackbar } from 'hooks/useSnackbar';
@@ -10,11 +11,9 @@ import type { Card } from 'lib/focalboard/card';
 
 import { useSortable } from '../../hooks/sortable';
 import mutator from '../../mutator';
-import { IDType, Utils } from '../../utils';
+import { Utils } from '../../utils';
 import Button from '../../widgets/buttons/button';
-import Menu from '../../widgets/menu';
-import MenuWrapper from '../../widgets/menuWrapper';
-import PropertyMenu, { PropertyTypes, typeDisplayName } from '../../widgets/propertyMenu';
+import PropertyMenu from '../../widgets/propertyMenu';
 import Calculations from '../calculations/calculations';
 import type { ConfirmationDialogBoxProps } from '../confirmationDialogBox';
 import ConfirmationDialogBox from '../confirmationDialogBox';
@@ -57,6 +56,7 @@ function CardDetailProperty({
   onDrop: (template: IPropertyTemplate, container: IPropertyTemplate) => void;
 }) {
   const [isDragging, isOver, columnRef] = useSortable('column', property, !readOnly, onDrop);
+  const changePropertyPopupState = usePopupState({ variant: 'popover', popupId: 'card-property' });
 
   return (
     <Stack
@@ -77,19 +77,19 @@ function CardDetailProperty({
         </div>
       )}
       {!readOnly && (
-        <MenuWrapper isOpen={isOpen}>
+        <Box>
           <div className='octo-propertyname'>
-            <Button>{property.name}</Button>
+            <Button {...bindTrigger(changePropertyPopupState)}>{property.name}</Button>
           </div>
-          <PropertyMenu
-            deleteDisabled={deleteDisabledMessage}
-            propertyId={property.id}
-            propertyName={property.name}
-            propertyType={property.type}
-            onTypeAndNameChanged={onTypeAndNameChanged}
-            onDelete={onDelete}
-          />
-        </MenuWrapper>
+          <Menu {...bindMenu(changePropertyPopupState)}>
+            <PropertyMenu
+              onDelete={onDelete}
+              deleteDisabled={deleteDisabledMessage?.length !== 0}
+              property={property}
+              onTypeAndNameChanged={onTypeAndNameChanged}
+            />
+          </Menu>
+        </Box>
       )}
       <PropertyValueElement
         readOnly={readOnly}
@@ -299,7 +299,7 @@ function CardDetailProperties(props: Props) {
 
       {!props.readOnly && activeView && (
         <div className='octo-propertyname add-property'>
-          <MenuWrapper>
+          {/* <MenuWrapper>
             <Button>
               <FormattedMessage id='CardDetail.add-property' defaultMessage='+ Add a property' />
             </Button>
@@ -318,7 +318,7 @@ function CardDetailProperties(props: Props) {
                 }}
               />
             </Menu>
-          </MenuWrapper>
+          </MenuWrapper> */}
         </div>
       )}
     </div>
