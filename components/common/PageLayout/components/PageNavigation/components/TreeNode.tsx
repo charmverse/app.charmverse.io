@@ -124,7 +124,8 @@ function DraggableTreeNode({
 
         return true;
       }
-    })
+    }),
+    [onDropAdjacent]
   );
 
   const focusListener = useCallback(

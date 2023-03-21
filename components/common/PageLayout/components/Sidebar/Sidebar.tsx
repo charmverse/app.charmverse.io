@@ -22,6 +22,7 @@ import { SpaceSettingsDialog } from 'components/common/Modal/SettingsDialog';
 import { charmverseDiscordInvite } from 'config/constants';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
+import { useFavoritePages } from 'hooks/useFavoritePages';
 import { useHasMemberLevel } from 'hooks/useHasMemberLevel';
 import useKeydownPress from 'hooks/useKeydownPress';
 import { useSmallScreen } from 'hooks/useMediaScreens';
@@ -139,6 +140,7 @@ export default function Sidebar({ closeSidebar, navAction }: SidebarProps) {
   const { disconnectWallet } = useWeb3AuthSig();
   const isMobile = useSmallScreen();
   const showMemberFeatures = useHasMemberLevel('member');
+  const { favoritePageIds } = useFavoritePages();
 
   const { onClick } = useSettingsDialog();
   const handleModalClick = (path?: string) => {
@@ -148,9 +150,6 @@ export default function Sidebar({ closeSidebar, navAction }: SidebarProps) {
   const searchInWorkspaceModalState = usePopupState({ variant: 'popover', popupId: 'search-in-workspace-modal' });
 
   const openSearchLabel = useKeydownPress(searchInWorkspaceModalState.toggle, { key: 'p', ctrl: true });
-
-  const favoritePageIds = user?.favorites.map((f) => f.pageId) || [];
-
   function onScroll(e: React.UIEvent<HTMLDivElement>) {
     setIsScrolled(e.currentTarget?.scrollTop > 0);
   }
