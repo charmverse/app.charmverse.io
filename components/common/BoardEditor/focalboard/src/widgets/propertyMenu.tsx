@@ -99,7 +99,6 @@ const PropertyMenu = React.memo((props: Props) => {
           setName(e.target.value);
         }}
         value={name}
-        onBlur={() => props.onTypeAndNameChanged(propertyType, name)}
         onKeyDown={(e) => {
           if (e.key === 'Enter' || e.key === 'Escape') {
             props.onTypeAndNameChanged(propertyType, name);
@@ -138,7 +137,12 @@ const PropertyMenu = React.memo((props: Props) => {
           horizontal: 'left'
         }}
       >
-        <PropertyTypes onClick={(type) => props.onTypeAndNameChanged(type, name)} />
+        <PropertyTypes
+          onClick={(type) => {
+            props.onTypeAndNameChanged(type, name);
+            changePropertyTypePopupState.close();
+          }}
+        />
       </Menu>
     </Stack>
   );

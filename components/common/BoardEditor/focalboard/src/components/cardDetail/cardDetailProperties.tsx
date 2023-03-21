@@ -87,7 +87,10 @@ function CardDetailProperty({
               onDelete={onDelete}
               deleteDisabled={deleteDisabledMessage?.length !== 0}
               property={property}
-              onTypeAndNameChanged={onTypeAndNameChanged}
+              onTypeAndNameChanged={(newType, newName) => {
+                onTypeAndNameChanged(newType, newName);
+                changePropertyPopupState.close();
+              }}
             />
           </Menu>
         </Box>
@@ -327,7 +330,7 @@ function CardDetailProperties(props: Props) {
                 const templateId = await mutator.insertPropertyTemplate(board, activeView, -1, template);
                 await charmClient.patchBlock(
                   board.id,
-                  { updatedFields: { visibleCardPropertyIds: [...board.fields.visibleCardPropertyIds, template.id] } },
+                  { updatedFields: { visibleCardPropertyIds: [...board.fields.visibleCardPropertyIds, templateId] } },
                   () => {}
                 );
                 setNewTemplateId(templateId);
