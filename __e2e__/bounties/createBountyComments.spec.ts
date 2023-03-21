@@ -94,13 +94,16 @@ test.describe('Create and Edit Bounty', () => {
 
     const firstCommentId = updatedBounty.page?.comments?.[0]?.id || '';
 
+    expect(firstCommentId).not.toBe('');
+
     // Edit a comment
     await bountyPage.getCommentMenuIcon(firstCommentId).hover();
     expect(bountyPage.getCommentMenuIcon(firstCommentId)).toBeVisible();
     await bountyPage.getCommentMenuIcon(firstCommentId).click();
     await bountyPage.getEditCommentButton(firstCommentId).click();
     await bountyPage.getEditCommentArea(firstCommentId).click();
-    await page.keyboard.press('Meta+A');
+    await page.keyboard.press('Control+A'); // linux/windows
+    await page.keyboard.press('Meta+A'); // macOs
     await page.keyboard.press('Backspace');
     await expect(bountyPage.getSaveCommentButton(firstCommentId)).toBeDisabled();
     await page.keyboard.type('Second comment', { delay: 100 });
