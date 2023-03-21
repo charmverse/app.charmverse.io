@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import charmClient from 'charmClient';
+import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
@@ -16,8 +17,6 @@ import Button from '../../widgets/buttons/button';
 import PropertyMenu, { typeDisplayName } from '../../widgets/propertyMenu';
 import { PropertyTypes } from '../../widgets/propertyTypes';
 import Calculations from '../calculations/calculations';
-import type { ConfirmationDialogBoxProps } from '../confirmationDialogBox';
-import ConfirmationDialogBox from '../confirmationDialogBox';
 import PropertyValueElement from '../propertyValueElement';
 
 type Props = {
@@ -122,11 +121,18 @@ function CardDetailProperties(props: Props) {
     }
   }, [newTemplateId, board.fields.cardProperties]);
 
-  const [confirmationDialogBox, setConfirmationDialogBox] = useState<ConfirmationDialogBoxProps>({
+  const [confirmationDialogBox, setConfirmationDialogBox] = useState<{
+    heading: string;
+    subText?: string;
+    confirmButtonText?: string;
+    onConfirm: () => void;
+    onClose: () => void;
+  }>({
     heading: '',
     onConfirm: () => {},
     onClose: () => {}
   });
+
   const [showConfirmationDialog, setShowConfirmationDialog] = useState<boolean>(false);
 
   const onDrop = async (sourceProperty: IPropertyTemplate, destinationProperty: IPropertyTemplate) => {
@@ -300,7 +306,16 @@ function CardDetailProperties(props: Props) {
         );
       })}
 
-      {showConfirmationDialog && <ConfirmationDialogBox dialogBox={confirmationDialogBox} />}
+      {showConfirmationDialog && (
+        <ConfirmDeleteModal
+          title={confirmationDialogBox.heading}
+          onClose={confirmationDialogBox.onClose}
+          open
+          buttonText={confirmationDialogBox.confirmButtonText}
+          question={confirmationDialogBox.subText}
+          onConfirm={confirmationDialogBox.onConfirm}
+        />
+      )}
 
       {!props.readOnly && activeView && (
         <div className='octo-propertyname add-property'>

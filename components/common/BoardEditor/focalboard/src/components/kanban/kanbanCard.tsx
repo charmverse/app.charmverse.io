@@ -10,6 +10,7 @@ import { mutate } from 'swr';
 
 import { BountyStatusChip } from 'components/bounties/components/BountyStatusBadge';
 import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
+import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { PageActions } from 'components/common/PageActions';
 import { PageIcon } from 'components/common/PageLayout/components/PageIcon';
 import { useBounties } from 'hooks/useBounties';
@@ -21,8 +22,6 @@ import type { Card } from 'lib/focalboard/card';
 import { useSortable } from '../../hooks/sortable';
 import mutator from '../../mutator';
 import { Utils } from '../../utils';
-import type { ConfirmationDialogBoxProps } from '../confirmationDialogBox';
-import ConfirmationDialogBox from '../confirmationDialogBox';
 import PropertyValueElement from '../propertyValueElement';
 
 type Props = {
@@ -89,7 +88,13 @@ const KanbanCard = React.memo((props: Props) => {
     await mutator.deleteBlock(card, 'delete card');
     mutate(`pages/${space?.id}`);
   };
-  const confirmDialogProps: ConfirmationDialogBoxProps = {
+  const confirmDialogProps: {
+    heading: string;
+    subText?: string;
+    confirmButtonText?: string;
+    onConfirm: () => void;
+    onClose: () => void;
+  } = {
     heading: intl.formatMessage({
       id: 'CardDialog.delete-confirmation-dialog-heading',
       defaultMessage: 'Confirm card delete?'
@@ -183,7 +188,16 @@ const KanbanCard = React.memo((props: Props) => {
           )}
         </StyledBox>
       </Link>
-      {showConfirmationDialogBox && <ConfirmationDialogBox dialogBox={confirmDialogProps} />}
+      {showConfirmationDialogBox && (
+        <ConfirmDeleteModal
+          title={confirmDialogProps.heading}
+          onClose={confirmDialogProps.onClose}
+          open
+          buttonText={confirmDialogProps.confirmButtonText}
+          question={confirmDialogProps.subText}
+          onConfirm={confirmDialogProps.onConfirm}
+        />
+      )}
     </>
   );
 });
