@@ -87,8 +87,6 @@ export function RoleSettings({ space }: { space: Space }) {
         </Box>
       )}
 
-      <GuestRoleRow readOnly={!isAdmin} />
-
       <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
         <ImportDiscordRolesMenuItem />
         <ImportGuildRolesMenuItem onClose={handleClose} />
