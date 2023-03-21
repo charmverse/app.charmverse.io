@@ -192,7 +192,12 @@ export function Comment({
             <Stack>
               {editor}
               <Stack flexDirection='row' my={1} ml={1} gap={1}>
-                <Button data-test={`save-comment-${comment.id}`} size='small' onClick={saveCommentContent}>
+                <Button
+                  data-test={`save-comment-${comment.id}`}
+                  size='small'
+                  onClick={saveCommentContent}
+                  disabled={!commentEditContent.rawText}
+                >
                   Save
                 </Button>
                 <Button size='small' variant='outlined' color='secondary' onClick={cancelEditingComment}>
