@@ -1,17 +1,14 @@
 import ArrowDownwardOutlinedIcon from '@mui/icons-material/ArrowDownwardOutlined';
 import ArrowUpwardOutlinedIcon from '@mui/icons-material/ArrowUpwardOutlined';
+import { Divider, ListItemIcon, ListItemText, MenuItem } from '@mui/material';
 import React, { useCallback } from 'react';
-import { FormattedMessage } from 'react-intl';
 
-import Button from 'components/common/Button';
 import type { IPropertyTemplate } from 'lib/focalboard/board';
 import type { BoardView, ISortOption } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
 
 import { Constants } from '../../constants';
 import mutator from '../../mutator';
-import Menu from '../../widgets/menu';
-import MenuWrapper from '../../widgets/menuWrapper';
 
 type Props = {
   properties: readonly IPropertyTemplate[];
@@ -20,7 +17,6 @@ type Props = {
 };
 const ViewHeaderSortMenu = React.memo((props: Props) => {
   const { properties, activeView, orderedCards } = props;
-  const hasSort = activeView.fields.sortOptions?.length > 0;
   const sortDisplayOptions = properties?.map((o) => ({ id: o.id, name: o.name }));
   sortDisplayOptions?.unshift({ id: Constants.titleColumnId, name: 'Name' });
 
@@ -56,39 +52,39 @@ const ViewHeaderSortMenu = React.memo((props: Props) => {
   }, [activeView.id, activeView.fields.sortOptions]);
 
   return (
-    <MenuWrapper>
-      <Button color={hasSort ? 'primary' : 'secondary'} variant='text' size='small' sx={{ minWidth: 0 }}>
-        <FormattedMessage id='ViewHeader.sort' defaultMessage='Sort' />
-      </Button>
-      <Menu>
-        {activeView.fields.sortOptions?.length > 0 && (
-          <>
-            <Menu.Text id='manual' name='Manual' onClick={onManualSort} />
+    <>
+      {activeView.fields.sortOptions?.length > 0 && (
+        <>
+          <MenuItem id='manual' onClick={onManualSort}>
+            Manual
+          </MenuItem>
+          <MenuItem id='revert' onClick={onRevertSort}>
+            Revert
+          </MenuItem>
+          <Divider />
+        </>
+      )}
 
-            <Menu.Text id='revert' name='Revert' onClick={onRevertSort} />
-
-            <Menu.Separator />
-          </>
-        )}
-
-        {sortDisplayOptions?.map((option) => {
-          let rightIcon: JSX.Element | undefined;
-          if (activeView.fields.sortOptions?.length > 0) {
-            const sortOption = activeView.fields.sortOptions[0];
-            if (sortOption.propertyId === option.id) {
-              rightIcon = sortOption.reversed ? (
-                <ArrowDownwardOutlinedIcon fontSize='small' />
-              ) : (
-                <ArrowUpwardOutlinedIcon fontSize='small' />
-              );
-            }
+      {sortDisplayOptions?.map((option) => {
+        let rightIcon: JSX.Element | undefined;
+        if (activeView.fields.sortOptions?.length > 0) {
+          const sortOption = activeView.fields.sortOptions[0];
+          if (sortOption.propertyId === option.id) {
+            rightIcon = sortOption.reversed ? (
+              <ArrowDownwardOutlinedIcon fontSize='small' />
+            ) : (
+              <ArrowUpwardOutlinedIcon fontSize='small' />
+            );
           }
-          return (
-            <Menu.Text key={option.id} id={option.id} name={option.name} rightIcon={rightIcon} onClick={sortChanged} />
-          );
-        })}
-      </Menu>
-    </MenuWrapper>
+        }
+        return (
+          <MenuItem key={option.id} id={option.id} onClick={() => sortChanged(option.id)}>
+            <ListItemText>{option.name}</ListItemText>
+            <ListItemIcon>{rightIcon}</ListItemIcon>
+          </MenuItem>
+        );
+      })}
+    </>
   );
 });
 

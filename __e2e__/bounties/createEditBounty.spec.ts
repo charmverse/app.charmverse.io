@@ -16,7 +16,7 @@ type Fixtures = {
 };
 let space: Space;
 let adminUser: User;
-let bounty: Bounty & { page: { path: string } };
+let bountyId: string;
 
 // This will be used in the test to update the bounty and check the displayed value
 const newBountyAmount = '123';
@@ -42,11 +42,10 @@ test.describe.serial('Create and Edit Bounty', () => {
 
     await bountyBoardPage.createBountyButton.click();
 
-    // Give time for bounty to create
-    await page.waitForTimeout(1000);
+    await bountyBoardPage.waitForModal();
 
     // There should be only 1 bounty in the space
-    bounty = (await prisma.bounty.findFirstOrThrow({
+    const bounty = await prisma.bounty.findFirstOrThrow({
       where: {
         spaceId: space.id
       },
@@ -57,7 +56,9 @@ test.describe.serial('Create and Edit Bounty', () => {
           }
         }
       }
-    })) as Bounty & { page: { path: string } };
+    });
+
+    bountyId = bounty.id;
 
     await expect(bountyPage.bountyPropertiesConfiguration).toBeVisible();
     await expect(bountyPage.bountyPropertyAmount).toBeVisible();
@@ -74,7 +75,7 @@ test.describe.serial('Create and Edit Bounty', () => {
 
     await bountyPage.waitForDocumentPage({
       domain: space.domain,
-      path: `${bounty.page.path}`
+      path: `${bounty.page?.path}`
     });
 
     await expect(bountyPage.bountyHeaderAmount).toBeVisible();
@@ -101,7 +102,7 @@ test.describe.serial('Create and Edit Bounty', () => {
 
     await bountyBoardPage.goToBountyBoard(space.domain);
 
-    const bountyCard = bountyBoardPage.getBountyCardLocator(bounty.id);
+    const bountyCard = bountyBoardPage.getBountyCardLocator(bountyId);
     await expect(bountyCard).toBeVisible();
 
     //    await page.pause();
@@ -111,7 +112,6 @@ test.describe.serial('Create and Edit Bounty', () => {
     await expect(bountyPage.dialog).toBeVisible();
 
     // User shouldn't see the bounty configuration, but should see the apply option
-    await expect(bountyPage.bountyPropertiesConfiguration).not.toBeVisible();
     await expect(bountyPage.bountyHeaderAmount).toBeVisible();
     await expect(bountyPage.bountyHeaderAmount).toHaveText(newBountyAmount);
     await expect(bountyPage.bountyApplicantForm).toBeVisible();

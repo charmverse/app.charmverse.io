@@ -29,7 +29,7 @@ export async function handleDiscordResponse<T>(
       data: response
     };
   } catch (err: any) {
-    log.warn('Error from Discord', err);
+    log.warn('Error from Discord', { error: err, endpoint });
     // The bot token is invalid
     if (err.code === 0) {
       return {

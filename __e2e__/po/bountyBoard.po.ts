@@ -2,6 +2,7 @@
 import type { Locator, Page } from '@playwright/test';
 
 import { baseUrl } from 'config/constants';
+import { prisma } from 'db';
 
 // capture actions on the pages in signup flow
 export class BountyBoardPage {
@@ -9,16 +10,27 @@ export class BountyBoardPage {
 
   readonly createBountyButton: Locator;
 
+  readonly pageDialog: Locator;
+
   constructor(page: Page) {
     this.page = page;
     this.createBountyButton = page.locator('data-test=create-suggest-bounty');
+    this.pageDialog = page.locator('data-test=dialog');
   }
 
   async goToBountyBoard(domain: string) {
     await this.page.goto(`${baseUrl}/${domain}/bounties`);
   }
 
+  async goToBountyBoardWithCard(domain: string, cardId: string) {
+    await this.page.goto(`${baseUrl}/${domain}/bounties?bountyId=${cardId}`);
+  }
+
   getBountyCardLocator(bountyId: string) {
     return this.page.locator(`data-test=bounty-card-${bountyId}`);
+  }
+
+  waitForModal() {
+    return this.page.waitForSelector('data-test=dialog');
   }
 }
