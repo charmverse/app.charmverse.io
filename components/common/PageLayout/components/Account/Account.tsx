@@ -112,7 +112,7 @@ function Account(): JSX.Element {
           </Tooltip>
         )}
         <AccountButton
-          href='/profile'
+          href='/'
           sx={
             isConnectedWithWallet
               ? {
