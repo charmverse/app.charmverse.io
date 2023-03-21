@@ -622,6 +622,7 @@ model Poap {
 model FavoritePage {
   pageId String @db.Uuid
   userId String @db.Uuid
+  index  Int    @default(-1)
   page   Page   @relation(fields: [pageId], references: [id], onDelete: Cascade)
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 

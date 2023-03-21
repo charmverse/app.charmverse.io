@@ -38,10 +38,6 @@ type PageNavigationProps = {
   deletePage?: (id: string) => void;
   isFavorites?: boolean;
   rootPageIds?: string[];
-  //   {
-  //     pageId: string;
-  //     index: number;
-  // }[]
   onClick?: () => void;
 };
 
@@ -53,6 +49,7 @@ function PageNavigation({ deletePage, isFavorites, rootPageIds, onClick }: PageN
   const { user } = useUser();
   const [expanded, setExpanded] = useLocalStorage<string[]>(`${space?.id}.expanded-pages`, []);
   const { showMessage } = useSnackbar();
+
   const pagesArray: MenuNode[] = filterVisiblePages(Object.values(pages)).map(
     (page): MenuNode => ({
       id: page.id,
@@ -103,6 +100,7 @@ function PageNavigation({ deletePage, isFavorites, rootPageIds, onClick }: PageN
         if (!droppedPage) {
           throw new Error('cannot find dropped page');
         }
+
         const originIndex: number = siblings.findIndex((sibling) => sibling.id === containerItem.id);
         siblings.splice(originIndex, 0, droppedPage);
         siblings.forEach((page, _index) => {
@@ -124,6 +122,7 @@ function PageNavigation({ deletePage, isFavorites, rootPageIds, onClick }: PageN
             };
           }
         });
+
         return { ..._pages };
       });
     },

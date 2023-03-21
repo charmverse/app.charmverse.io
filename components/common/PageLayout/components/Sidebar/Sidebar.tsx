@@ -140,11 +140,6 @@ export default function Sidebar({ closeSidebar, navAction }: SidebarProps) {
   const isMobile = useSmallScreen();
   const showMemberFeatures = useHasMemberLevel('member');
 
-  const sortableFavorites =
-    user?.favorites.map((f, index) => {
-      return { pageId: f.pageId, index };
-    }) || [];
-
   const { onClick } = useSettingsDialog();
   const handleModalClick = (path?: string) => {
     onClick(path);
@@ -154,7 +149,7 @@ export default function Sidebar({ closeSidebar, navAction }: SidebarProps) {
 
   const openSearchLabel = useKeydownPress(searchInWorkspaceModalState.toggle, { key: 'p', ctrl: true });
 
-  const favoritePageIds = sortableFavorites.sort((f) => f.index).map((f) => f.pageId);
+  const favoritePageIds = user?.favorites.map((f) => f.pageId) || [];
 
   function onScroll(e: React.UIEvent<HTMLDivElement>) {
     setIsScrolled(e.currentTarget?.scrollTop > 0);
