@@ -1,6 +1,6 @@
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
-import { Box, IconButton, ListItemIcon, ListItemText, MenuItem, Typography } from '@mui/material';
+import { IconButton, ListItemIcon, ListItemText, MenuItem, Typography } from '@mui/material';
 import { Stack } from '@mui/system';
 import { useMemo } from 'react';
 
@@ -11,6 +11,8 @@ import type { BoardView } from 'lib/focalboard/boardView';
 import mutator from '../../mutator';
 import { iconForPropertyType } from '../viewHeader/viewHeaderPropertiesMenu';
 
+const titlePropertyId = '__title';
+
 interface LayoutOptionsProps {
   properties: readonly IPropertyTemplate[];
   view: BoardView;
@@ -19,11 +21,13 @@ interface LayoutOptionsProps {
 function PropertyMenuItem({
   isVisible,
   property,
+  visibilityToggleDisabled,
   toggleVisibility
 }: {
   property: IPropertyTemplate;
   isVisible: boolean;
   toggleVisibility: (propertyId: string) => void;
+  visibilityToggleDisabled?: boolean;
 }) {
   return (
     <MenuItem
@@ -35,6 +39,7 @@ function PropertyMenuItem({
       <ListItemIcon>{iconForPropertyType(property.type)}</ListItemIcon>
       <ListItemText>{property.name}</ListItemText>
       <IconButton
+        disabled={visibilityToggleDisabled}
         size='small'
         onClick={() => {
           toggleVisibility(property.id);
@@ -56,7 +61,7 @@ function PropertyOptions(props: LayoutOptionsProps) {
       __propertiesRecord[property.id] = property;
       return __propertiesRecord;
     }, {});
-    const visiblePropertyIdsWithTitle = visiblePropertyIds.length === 0 ? ['__title'] : visiblePropertyIds;
+    const visiblePropertyIdsWithTitle = visiblePropertyIds.length === 0 ? [titlePropertyId] : visiblePropertyIds;
 
     const _visibleProperties = visiblePropertyIdsWithTitle.map(
       (visiblePropertyId) => _propertiesRecord[visiblePropertyId]
@@ -87,7 +92,7 @@ function PropertyOptions(props: LayoutOptionsProps) {
   };
 
   const hideAllProperties = () => {
-    mutator.changeViewVisibleProperties(view.id, visiblePropertyIds, ['__title']);
+    mutator.changeViewVisibleProperties(view.id, visiblePropertyIds, [titlePropertyId]);
   };
 
   const showAllProperties = () => {
@@ -112,7 +117,13 @@ function PropertyOptions(props: LayoutOptionsProps) {
           </Stack>
           <Stack>
             {visibleProperties.map((property) => (
-              <PropertyMenuItem isVisible property={property} toggleVisibility={toggleVisibility} key={property.id} />
+              <PropertyMenuItem
+                visibilityToggleDisabled={property.id === titlePropertyId}
+                isVisible
+                property={property}
+                toggleVisibility={toggleVisibility}
+                key={property.id}
+              />
             ))}
           </Stack>
         </Stack>
