@@ -12,6 +12,7 @@ import log from 'lib/log';
 import { isSpaceDomain } from 'lib/spaces/utils';
 
 // Pages shared to the public that don't require user login
+// When adding a page here or any new top-level pages, please also add this page to DOMAIN_BLACKLIST in lib/spaces/config.ts
 const publicPages = ['/', 'share', 'api-docs', 'u', 'join', 'invite', 'authenticate'];
 const accountPages = ['profile'];
 
