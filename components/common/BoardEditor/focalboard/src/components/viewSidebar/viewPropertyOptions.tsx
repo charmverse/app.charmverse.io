@@ -56,11 +56,14 @@ function PropertyOptions(props: LayoutOptionsProps) {
       __propertiesRecord[property.id] = property;
       return __propertiesRecord;
     }, {});
+    const visiblePropertyIdsWithTitle = visiblePropertyIds.length === 0 ? ['__title'] : visiblePropertyIds;
 
-    const _visibleProperties = visiblePropertyIds.map((visiblePropertyId) => _propertiesRecord[visiblePropertyId]);
+    const _visibleProperties = visiblePropertyIdsWithTitle.map(
+      (visiblePropertyId) => _propertiesRecord[visiblePropertyId]
+    );
 
     const _hiddenProperties = propertyIds
-      .filter((propertyId) => !visiblePropertyIds.includes(propertyId))
+      .filter((propertyId) => !visiblePropertyIdsWithTitle.includes(propertyId))
       .map((propertyId) => _propertiesRecord[propertyId])
       .sort((p1, p2) => {
         return p1.name > p2.name ? 1 : -1;
