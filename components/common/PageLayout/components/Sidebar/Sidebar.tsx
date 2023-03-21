@@ -281,7 +281,6 @@ export default function Sidebar({ closeSidebar, favorites, navAction }: SidebarP
                   onClick={navAction}
                 />
               )}
-              <Divider sx={{ mx: 2, my: 1 }} />
 
               {!space.hiddenFeatures.includes('proposals') && showMemberFeatures && (
                 <SidebarLink
