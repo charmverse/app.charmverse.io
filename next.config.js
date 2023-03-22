@@ -82,7 +82,7 @@ const config = {
   webpack(_config, { buildId, nextRuntime }) {
     // Fix for: "Module not found: Can't resolve 'canvas'"
     _config.resolve.alias.canvas = false;
-    // add aliases used by module-alias module
+    // add aliases defined in package.json
     Object.assign(_config.resolve.alias, npmPackage.imports);
 
     _config.module.rules.push({
