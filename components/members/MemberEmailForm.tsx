@@ -2,7 +2,6 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { Checkbox, FormControlLabel, FormGroup, TextField, Typography } from '@mui/material';
 import { Stack } from '@mui/system';
 import type { ChangeEvent } from 'react';
-import { useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
@@ -41,11 +40,11 @@ export function MemberEmailForm({ onClick }: { onClick: VoidFunction }) {
   const emailNewsletter = getValues('emailNewsletter');
   const emailNotifications = getValues('emailNotifications');
 
-  const onChange = useCallback(async (event: ChangeEvent<HTMLInputElement>) => {
+  const onChange = async (event: ChangeEvent<HTMLInputElement>) => {
     const value = event.target.type === 'checkbox' ? event.target.checked : event.target.value;
     setValue(event.target.name as keyof FormValues, value);
     await trigger();
-  }, []);
+  };
 
   const onSave = async () => {
     const validate = await trigger();
