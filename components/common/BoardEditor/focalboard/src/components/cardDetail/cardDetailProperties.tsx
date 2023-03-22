@@ -85,10 +85,11 @@ function CardDetailProperty({
       sx={{
         minWidth: 250,
         overflow: 'unset',
-        opacity: isDragging ? 0.5 : 1,
-        transition: `background-color 150ms ease-in-out`,
-        backgroundColor: isOver ? 'var(--charmeditor-active)' : 'initial',
-        flexDirection: 'row'
+        flexDirection: 'row',
+        // Allow dragging past left border
+        paddingLeft: 150,
+        position: 'relative',
+        right: 150
       }}
       className='octo-propertyrow'
     >
@@ -99,7 +100,14 @@ function CardDetailProperty({
       )}
       {!readOnly && (
         <Box>
-          <PropertyNameContainer className='octo-propertyname'>
+          <PropertyNameContainer
+            className='octo-propertyname'
+            sx={{
+              opacity: isDragging ? 0.5 : 1,
+              transition: `background-color 150ms ease-in-out`,
+              backgroundColor: isOver ? 'var(--charmeditor-active)' : 'initial'
+            }}
+          >
             <DragIndicatorIcon className='icons' fontSize='small' color='secondary' />
             <Button {...bindTrigger(changePropertyPopupState)}>{property.name}</Button>
           </PropertyNameContainer>
