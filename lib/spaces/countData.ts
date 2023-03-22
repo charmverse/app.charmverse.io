@@ -1,15 +1,31 @@
-import { prisma } from 'db';
-import log from 'lib/log';
-import { getNodeFromJson } from 'lib/prosemirror/getNodeFromJson';
+import type { PageType } from '@prisma/client';
 
+import { prisma } from 'db';
+import { countBlocks } from 'lib/prosemirror/countBlocks';
+
+const PAGE_TYPES_TO_IGNORE_DOCUMENT_BLOCKS: PageType[] = ['bounty', 'bounty_template'];
 // a function that queries the database for the number of blocks, proposals, pages, and bounties in a space
 export async function countData({ spaceId }: { spaceId: string }) {
-  const [boards, views, blockComments, pages, posts, postComments, pageComments] = await Promise.all([
-    prisma.block.count({
+  const [
+    boardBlocks,
+    views,
+    blockComments,
+    allPages,
+    posts,
+    postComments,
+    pageComments,
+    memberProperties,
+    proposalCategories,
+    forumCategories
+  ] = await Promise.all([
+    prisma.block.findMany({
       where: {
         deletedAt: null,
         spaceId,
         type: 'board'
+      },
+      select: {
+        fields: true
       }
     }),
     prisma.block.count({
@@ -30,12 +46,19 @@ export async function countData({ spaceId }: { spaceId: string }) {
       where: {
         deletedAt: null,
         spaceId
+      },
+      select: {
+        type: true,
+        content: true
       }
     }),
     prisma.post.findMany({
       where: {
         deletedAt: null,
         spaceId
+      },
+      select: {
+        content: true
       }
     }),
     prisma.postComment.count({
@@ -53,57 +76,88 @@ export async function countData({ spaceId }: { spaceId: string }) {
           spaceId
         }
       }
+    }),
+    prisma.memberProperty.count({
+      where: {
+        spaceId
+      }
+    }),
+    prisma.proposalCategory.count({
+      where: {
+        spaceId
+      }
+    }),
+    prisma.postCategory.count({
+      where: {
+        spaceId
+      }
     })
   ]);
 
-  // Should we count all status of bounty and proposal?
-  // is a bounty/proposal category a "block"?
-  const bounties = pages.filter((page) => page.type === 'bounty');
-  const proposals = pages.filter((page) => page.type === 'proposal');
-  const templates = pages.filter((page) => page.type.includes('template'));
+  // Organize pages by type
+  const { boards, bounties, proposals, cards, pages } = allPages.reduce(
+    (result, page) => {
+      if (page.type.includes('bounty')) {
+        result.bounties.push(page);
+      } else if (page.type.includes('proposal')) {
+        result.proposals.push(page);
+      } else if (page.type.includes('board')) {
+        result.boards.push(page);
+      } else if (page.type.includes('card')) {
+        result.cards.push(page);
+      } else {
+        result.pages.push(page);
+      }
+      return result;
+    },
+    { boards: [], bounties: [], cards: [], pages: [], proposals: [] } as {
+      boards: (typeof allPages)[number][];
+      bounties: (typeof allPages)[number][];
+      cards: (typeof allPages)[number][];
+      pages: (typeof allPages)[number][];
+      proposals: (typeof allPages)[number][];
+    }
+  );
 
-  // should we count template doc blocks?
-  const documentBlocks = pages
-    .filter((page) => page.type === 'page' && page.content)
-    .map((page) => countProsemirrorBlocks(page.content as any, page.spaceId))
+  const documentBlocks = allPages
+    .filter((page) => !PAGE_TYPES_TO_IGNORE_DOCUMENT_BLOCKS.includes(page.type))
+    .map((page) => countBlocks(page.content, spaceId))
     .reduce((a, b) => a + b, 0);
+
+  const boardDescriptionBlocks = boardBlocks
+    .map((board) => countBlocks((board.fields as any)?.description, spaceId))
+    .reduce((a, b) => a + b, 0);
+
+  const forumPostBlocks = posts.map((post) => countBlocks(post.content, spaceId)).reduce((a, b) => a + b, 0);
 
   const comments = blockComments + pageComments + postComments;
 
-  const total = pages.length + boards + views + posts.length + comments + templates.length + documentBlocks;
+  const counts = {
+    boards: boards.length,
+    boardDescriptionBlocks,
+    bounties: bounties.length,
+    cards: cards.length,
+    comments,
+    documentBlocks,
+    forumCategories,
+    forumPostBlocks,
+    forumPosts: posts.length,
+    memberProperties,
+    proposalCategories,
+    proposals: proposals.length,
+    pages: pages.length,
+    views
+  };
 
   return {
-    counts: {
-      boards,
-      bounties: bounties.length,
-      documentBlocks,
-      comments,
-      proposals: proposals.length,
-      pages: pages.length,
-      posts: posts.length,
-      views,
-      templates: templates.length
-    },
+    counts,
     spaceId,
-    total
+    total: getTotal(counts)
   };
 }
 
-function countProsemirrorBlocks(pageContent: any, spaceId?: string) {
-  let count = 0;
-  if (pageContent) {
-    try {
-      const doc = getNodeFromJson(pageContent);
-      if (doc) {
-        doc.nodesBetween(0, doc.nodeSize, (node) => {
-          if (node.type) {
-            count += 1;
-          }
-        });
-      }
-    } catch (error) {
-      log.error('Error counting prosemirror blocks', { error, pageContent, spaceId });
-    }
-  }
-  return count;
+function getTotal(counts: Record<string, number>): number {
+  return Object.entries(counts).reduce((count, [blockType, value]) => {
+    return count + value;
+  }, 0);
 }
