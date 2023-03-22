@@ -1,7 +1,12 @@
 import type { Space, User } from '@prisma/client';
 
 import { InvalidInputError } from 'lib/utilities/errors';
-import { generateBountyWithSingleApplication, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import {
+  generateBountyApplication,
+  generateBountyWithSingleApplication,
+  generateSpaceUser,
+  generateUserAndSpaceWithApiToken
+} from 'testing/setupDatabase';
 
 import { markBountyAsPaid } from '../markBountyAsPaid';
 
@@ -19,19 +24,29 @@ describe('markBountyAsPaid', () => {
   it('should update the bounty status to paid', async () => {
     const bounty = await generateBountyWithSingleApplication({
       bountyStatus: 'open',
-      applicationStatus: 'inProgress',
+      applicationStatus: 'paid',
       bountyCap: 2,
       spaceId: space.id,
       userId: nonAdminUser.id,
       customReward: 'Custom NFT'
     });
 
+    const member = await generateSpaceUser({ spaceId: space.id });
+
+    await generateBountyApplication({
+      applicationStatus: 'complete',
+      bountyId: bounty.id,
+      spaceId: space.id,
+      userId: member.id
+    });
+
     const updatedBounty = await markBountyAsPaid(bounty.id);
 
     expect(updatedBounty.status).toBe('paid');
+    expect(updatedBounty.applications.every((application) => application.status === 'paid')).toBeTruthy();
   });
 
-  it("should fail if the bounty doesn't have custom reward", async () => {
+  it('should fail if the atleast one bounty submission is neither complete nor paid', async () => {
     const bounty = await generateBountyWithSingleApplication({
       bountyStatus: 'open',
       applicationStatus: 'inProgress',
@@ -41,7 +56,7 @@ describe('markBountyAsPaid', () => {
     });
 
     await expect(() => markBountyAsPaid(bounty.id)).rejects.toThrow(
-      new InvalidInputError('Only bounties with custom rewards can be marked as paid manually')
+      new InvalidInputError('All applications need to be either completed or paid in order to mark bounty as paid')
     );
   });
 });

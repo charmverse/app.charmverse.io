@@ -29,7 +29,7 @@ describe('POST /api/bounties/{submissionId}/mark-paid - marking bounty as paid',
     const bounty = await generateBountyWithSingleApplication({
       userId: nonAdminUser.id,
       spaceId: nonAdminUserSpace.id,
-      applicationStatus: 'review',
+      applicationStatus: 'complete',
       bountyCap: null,
       bountyStatus: 'open',
       customReward: 'Custom NFT'
@@ -66,7 +66,7 @@ describe('POST /api/bounties/{submissionId}/mark-paid - marking bounty as paid',
     const bounty = await generateBountyWithSingleApplication({
       userId: nonAdminUser.id,
       spaceId: nonAdminUserSpace.id,
-      applicationStatus: 'review',
+      applicationStatus: 'paid',
       bountyCap: null,
       bountyStatus: 'open',
       customReward: 'Custom NFT'
@@ -83,7 +83,7 @@ describe('POST /api/bounties/{submissionId}/mark-paid - marking bounty as paid',
     expect(result.status).toBe('paid');
   });
 
-  it("should fail if the bounty in question doesn't have any custom reward and respond with 400", async () => {
+  it("should fail if the bounty doesn't have all of its applications either completed or paid status", async () => {
     const bounty = await generateBountyWithSingleApplication({
       userId: nonAdminUser.id,
       spaceId: nonAdminUserSpace.id,

@@ -8,9 +8,22 @@ import { getBountyOrThrow } from './getBounty';
 export async function markBountyAsPaid(bountyId: string): Promise<BountyWithDetails> {
   const bounty = await getBountyOrThrow(bountyId);
 
-  if (bounty.applications.some((application) => application.status !== 'paid')) {
-    throw new InvalidInputError('All applicants need to be paid in order to mark bounty as paid');
+  if (bounty.applications.some((application) => application.status !== 'paid' && application.status !== 'complete')) {
+    throw new InvalidInputError('All applications need to be either completed or paid in order to mark bounty as paid');
   }
+
+  const completedApplications = bounty.applications.filter((app) => app.status === 'complete');
+
+  await prisma.application.updateMany({
+    where: {
+      id: {
+        in: completedApplications.map((completedApplication) => completedApplication.id)
+      }
+    },
+    data: {
+      status: 'paid'
+    }
+  });
 
   return prisma.bounty.update({
     where: {

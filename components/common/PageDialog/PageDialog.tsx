@@ -155,8 +155,9 @@ export default function PageDialog(props: Props) {
                   onClick={() => markBountyAsPaid(bounty.id)}
                   disabled={
                     bounty.applications.length === 0 ||
-                    bounty.applications.some((application) => application.status !== 'paid') ||
-                    (bounty.status !== 'inProgress' && bounty.status !== 'open')
+                    bounty.applications.some(
+                      (application) => application.status !== 'paid' && application.status !== 'complete'
+                    )
                   }
                 >
                   <PaidIcon
