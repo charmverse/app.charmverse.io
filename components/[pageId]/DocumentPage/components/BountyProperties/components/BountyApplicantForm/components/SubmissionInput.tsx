@@ -27,12 +27,9 @@ import BountyApplicantStatus from '../../BountyApplicantStatus';
 const schema = yup.object({
   submission: yup.string().required(),
   submissionNodes: yup.mixed().required(),
-  walletAddress: yup
-    .string()
-    .required('Please provide a valid wallet address.')
-    .test('verifyContractFormat', 'Invalid wallet address', (value) => {
-      return !value || isValidChainAddress(value);
-    })
+  walletAddress: yup.string().test('verifyContractFormat', 'Invalid wallet address', (value) => {
+    return !value || isValidChainAddress(value);
+  })
 });
 
 type FormValues = yup.InferType<typeof schema>;

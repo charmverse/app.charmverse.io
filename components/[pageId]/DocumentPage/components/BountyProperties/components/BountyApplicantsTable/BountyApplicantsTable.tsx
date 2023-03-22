@@ -35,7 +35,8 @@ export default function BountySubmissionsTable({ bounty, permissions }: Props) {
     {
       fallbackData: [],
       // Refresh applicant info for the creator every 20 seconds
-      refreshInterval: 20000
+      refreshInterval: 20000,
+      refreshWhenHidden: false
     }
   );
 
