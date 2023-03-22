@@ -4,11 +4,14 @@ import nc from 'next-connect';
 import { prisma } from 'db';
 import { firebaseApp } from 'lib/google/firebaseApp';
 import type { LoginWithGoogleRequest } from 'lib/google/loginWithGoogle';
+import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
+import { updateTrackUserProfile } from 'lib/metrics/mixpanel/updateTrackUserProfile';
+import { extractSignupAnalytics } from 'lib/metrics/mixpanel/utilsSignup';
+import type { SignupCookieType } from 'lib/metrics/userAcquisition/interfaces';
 import { onError, onNoMatch } from 'lib/middleware';
 import { sessionUserRelations } from 'lib/session/config';
 import { withSessionRoute } from 'lib/session/withSession';
 import { InvalidInputError } from 'lib/utilities/errors';
-import randomName from 'lib/utilities/randomName';
 import type { LoggedInUser } from 'models';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -51,6 +54,11 @@ async function verifyMagicLink(req: NextApiRequest, res: NextApiResponse<LoggedI
       },
       include: sessionUserRelations
     });
+
+    const cookiesToParse = req.cookies as Record<SignupCookieType, string>;
+    const signupAnalytics = extractSignupAnalytics(cookiesToParse);
+    updateTrackUserProfile(user);
+    trackUserAction('sign_up', { userId: user.id, identityType: 'VerifiedEmail', ...signupAnalytics });
   } else if (user && !user.email) {
     user = await prisma.user.update({
       where: {
