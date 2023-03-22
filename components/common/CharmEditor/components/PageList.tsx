@@ -4,12 +4,14 @@ import { PageIcon } from 'components/common/PageLayout/components/PageIcon';
 import PageTitle from 'components/common/PageLayout/components/PageTitle';
 import type { StaticPagesList } from 'components/common/PageLayout/components/Sidebar/utils/staticPages';
 import type { PageMeta } from 'lib/pages';
+import type { PostCategoryWithPermissions } from 'lib/permissions/forum/interfaces';
 
 interface Props {
   activeItemIndex?: number;
   activePageId?: string;
   pages: PageMeta[];
   staticPages?: StaticPagesList[];
+  forumCategories?: PostCategoryWithPermissions[];
   onSelectPage: (pageId: string) => void;
   emptyText?: string;
   style?: React.CSSProperties;
@@ -21,6 +23,7 @@ export default function PagesList({
   activePageId,
   pages,
   staticPages,
+  forumCategories,
   onSelectPage,
   style
 }: Props) {
@@ -28,7 +31,7 @@ export default function PagesList({
     return pageId === activePageId || index === activeItemIndex;
   }
 
-  return pages.length === 0 ? (
+  return pages.length === 0 && staticPages?.length === 0 && forumCategories?.length === 0 ? (
     <Typography
       style={{
         marginLeft: 16,
@@ -41,22 +44,6 @@ export default function PagesList({
     </Typography>
   ) : (
     <div style={style}>
-      {staticPages?.map((page) => (
-        <MenuItem
-          key={page.path}
-          data-value={page.path}
-          data-type='page'
-          onClick={() => onSelectPage(page.path)}
-          selected={false}
-        >
-          <ListItemIcon>
-            <PageIcon icon={null} isEditorEmpty={false} pageType={page.path} />
-          </ListItemIcon>
-          <PageTitle hasContent={true} sx={{ fontWeight: 'bold' }}>
-            {page.title}
-          </PageTitle>
-        </MenuItem>
-      ))}
       {pages.map((page, pageIndex) => {
         return (
           <MenuItem
@@ -80,6 +67,33 @@ export default function PagesList({
                 {page.title.length > 0 ? page.title : 'Untitled'}
               </PageTitle>
             </>
+          </MenuItem>
+        );
+      })}
+      {staticPages?.map((page) => (
+        <MenuItem key={page.path} data-value={page.path} data-type='page' onClick={() => onSelectPage(page.path)}>
+          <ListItemIcon>
+            <PageIcon icon={null} isEditorEmpty={false} pageType={page.path} />
+          </ListItemIcon>
+          <PageTitle hasContent={true} sx={{ fontWeight: 'bold' }}>
+            {page.title}
+          </PageTitle>
+        </MenuItem>
+      ))}
+      {forumCategories?.map((page) => {
+        return (
+          <MenuItem
+            key={page.path}
+            data-value={page.path}
+            data-type='page'
+            onClick={() => onSelectPage(page.path || '')}
+          >
+            <ListItemIcon>
+              <PageIcon icon={null} isEditorEmpty={false} pageType='forum' />
+            </ListItemIcon>
+            <PageTitle hasContent={true} sx={{ fontWeight: 'bold' }}>
+              {page.name}
+            </PageTitle>
           </MenuItem>
         );
       })}

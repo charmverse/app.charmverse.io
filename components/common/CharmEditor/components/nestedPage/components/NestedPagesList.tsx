@@ -4,6 +4,7 @@ import type { PluginKey } from 'prosemirror-state';
 import { useCallback, memo, useEffect, useMemo } from 'react';
 
 import { STATIC_PAGES } from 'components/common/PageLayout/components/Sidebar/utils/staticPages';
+import { useForumCategories } from 'hooks/useForumCategories';
 import { usePages } from 'hooks/usePages';
 import { insertNestedPage } from 'lib/prosemirror/insertNestedPage';
 import { safeScrollIntoViewIfNeeded } from 'lib/utilities/browser';
@@ -19,6 +20,7 @@ const linkablePageTypes: PageType[] = ['card', 'board', 'page', 'bounty', 'propo
 
 function NestedPagesList({ pluginKey }: { pluginKey: PluginKey<NestedPagePluginState> }) {
   const { pages } = usePages();
+  const { categories } = useForumCategories();
   const view = useEditorViewContext();
   const { tooltipContentDOM, suggestTooltipKey } = usePluginState(pluginKey) as NestedPagePluginState;
   const { triggerText, counter, show: isVisible } = usePluginState(suggestTooltipKey) as SuggestTooltipPluginState;
@@ -47,11 +49,23 @@ function NestedPagesList({ pluginKey }: { pluginKey: PluginKey<NestedPagePluginS
     );
   }, [triggerText, listPages]);
 
-  const filteredStaticPages = useMemo(() => {
-    return STATIC_PAGES.filter((page) =>
-      triggerText.length > 0 ? page.title.toLowerCase().startsWith(triggerText.toLowerCase().trim()) : true
-    );
-  }, [triggerText]);
+  const filteredStaticPages = useMemo(
+    () =>
+      STATIC_PAGES.filter((page) =>
+        triggerText.length > 0 ? page.title.toLowerCase().startsWith(triggerText.toLowerCase().trim()) : true
+      ),
+    [triggerText]
+  );
+
+  const filteredForumCategories = useMemo(() => {
+    if (triggerText) {
+      return categories.filter((page) =>
+        triggerText.length > 0 ? page.name.toLowerCase().startsWith(triggerText.toLowerCase().trim()) : true
+      );
+    }
+
+    return [];
+  }, [triggerText, categories]);
 
   const totalItems = filteredPages.length;
   const activeItemIndex = (counter < 0 ? (counter % totalItems) + totalItems : counter) % totalItems;
@@ -77,6 +91,7 @@ function NestedPagesList({ pluginKey }: { pluginKey: PluginKey<NestedPagePluginS
         activeItemIndex={activeItemIndex}
         pages={filteredPages}
         staticPages={filteredStaticPages}
+        forumCategories={filteredForumCategories}
         onSelectPage={onSelectPage}
       />
     </PopoverMenu>

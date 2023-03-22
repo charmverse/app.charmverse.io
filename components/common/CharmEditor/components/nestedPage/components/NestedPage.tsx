@@ -6,6 +6,7 @@ import Link from 'components/common/Link';
 import { PageIcon } from 'components/common/PageLayout/components/PageIcon';
 import { STATIC_PAGES } from 'components/common/PageLayout/components/Sidebar/utils/staticPages';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useForumCategories } from 'hooks/useForumCategories';
 import { usePages } from 'hooks/usePages';
 
 const NestedPageContainer = styled(Link)`
@@ -40,16 +41,21 @@ const StyledTypography = styled(Typography)`
 export default function NestedPage({ node, currentPageId }: NodeViewProps & { currentPageId?: string }) {
   const space = useCurrentSpace();
   const { pages } = usePages();
+  const { categories } = useForumCategories();
   const nestedPage = pages[node.attrs.id];
   const nestedStaticPage = STATIC_PAGES.find((c) => c.path === node.attrs.id);
+  const nestedCategories = categories.find((c) => c.id === node.attrs.id);
 
   const parentPage = nestedPage?.parentId ? pages[nestedPage.parentId] : null;
 
-  const pageTitle = (nestedPage || nestedStaticPage)?.title;
+  const pageTitle = (nestedPage || nestedStaticPage)?.title || nestedCategories?.name;
 
-  const pageId = nestedPage?.id || nestedStaticPage?.path;
+  const pageId = nestedPage?.id || nestedStaticPage?.path || nestedCategories?.id;
 
-  const appPath = nestedPage || nestedStaticPage ? `${space?.domain}/${(nestedPage || nestedStaticPage)?.path}` : '';
+  const appPath =
+    nestedPage || nestedStaticPage
+      ? `${space?.domain}/${(nestedPage || nestedStaticPage || nestedCategories)?.path}`
+      : '';
 
   const fullPath = `${window.location.origin}/${appPath}`;
 
@@ -73,9 +79,8 @@ export default function NestedPage({ node, currentPageId }: NodeViewProps & { cu
             pageType={nestedPage.type}
           />
         )}
-        {nestedStaticPage && (
-          <PageIcon isLinkedPage={false} isEditorEmpty={false} icon={null} pageType={nestedStaticPage.path} />
-        )}
+        {nestedStaticPage && <PageIcon icon={null} pageType={nestedStaticPage.path} />}
+        {nestedCategories && <PageIcon icon={null} pageType='forum' />}
       </div>
       <StyledTypography>{(pageTitle ? pageTitle || 'Untitled' : null) || 'Page not found'}</StyledTypography>
     </NestedPageContainer>
