@@ -1,9 +1,6 @@
-import type { PageType } from '@prisma/client';
-
 import { prisma } from 'db';
 import { countBlocks } from 'lib/prosemirror/countBlocks';
 
-const PAGE_TYPES_TO_IGNORE_DOCUMENT_BLOCKS: PageType[] = ['bounty', 'bounty_template'];
 // a function that queries the database for the number of blocks, proposals, pages, and bounties in a space
 export async function countData({ spaceId }: { spaceId: string }) {
   const [
@@ -119,10 +116,7 @@ export async function countData({ spaceId }: { spaceId: string }) {
     }
   );
 
-  const documentBlocks = allPages
-    .filter((page) => !PAGE_TYPES_TO_IGNORE_DOCUMENT_BLOCKS.includes(page.type))
-    .map((page) => countBlocks(page.content, spaceId))
-    .reduce((a, b) => a + b, 0);
+  const documentBlocks = allPages.map((page) => countBlocks(page.content, spaceId)).reduce((a, b) => a + b, 0);
 
   const boardDescriptionBlocks = boardBlocks
     .map((board) => countBlocks((board.fields as any)?.description, spaceId))
