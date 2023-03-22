@@ -1,4 +1,5 @@
 import styled from '@emotion/styled';
+import Box from '@mui/material/Box';
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 
@@ -19,10 +20,14 @@ type Props = {
   activeView: BoardView;
 };
 
-const StyledFilterComponent = styled.div`
+const StyledFilterComponent = styled(Box)`
   color: var(--secondary-text);
   min-width: 430px;
   padding: 10px;
+
+  ${({ theme }) => theme.breakpoints.down('sm')} {
+    min-width: 350px;
+  }
 `;
 
 const FilterComponent = React.memo((props: Props): JSX.Element => {
