@@ -198,6 +198,7 @@ function TableHeaders(props: Props): JSX.Element {
             >
               <PropertyTypes
                 onClick={async (type) => {
+                  addPropertyPopupState.close();
                   const template: IPropertyTemplate = {
                     id: Utils.createGuid(IDType.BlockID),
                     name: typeDisplayName(intl, type),
@@ -212,7 +213,6 @@ function TableHeaders(props: Props): JSX.Element {
                     },
                     () => {}
                   );
-                  addPropertyPopupState.close();
                 }}
               />
             </Menu>

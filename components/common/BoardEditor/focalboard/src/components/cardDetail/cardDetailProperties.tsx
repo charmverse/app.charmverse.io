@@ -1,3 +1,5 @@
+import styled from '@emotion/styled';
+import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import { Box, Menu, Stack } from '@mui/material';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import React, { useEffect, useState } from 'react';
@@ -30,6 +32,26 @@ type Props = {
   pageUpdatedAt: string;
 };
 
+export const PropertyNameContainer = styled(Stack)`
+  position: relative;
+  flex-direction: row;
+  align-items: center;
+
+  &:hover .icons {
+    opacity: 1;
+    transition: opacity 150ms ease-in-out;
+  }
+
+  & .icons {
+    position: absolute;
+    opacity: 0;
+    z-index: 1;
+    left: -25px;
+    cursor: pointer;
+    transition: opacity 150ms ease-in-out;
+  }
+`;
+
 function CardDetailProperty({
   readOnly,
   property,
@@ -37,13 +59,11 @@ function CardDetailProperty({
   board,
   card,
   onDelete,
-  isOpen,
   pageUpdatedBy,
   pageUpdatedAt,
   deleteDisabledMessage,
   onDrop
 }: {
-  isOpen: boolean;
   readOnly: boolean;
   property: IPropertyTemplate;
   card: Card;
@@ -78,9 +98,10 @@ function CardDetailProperty({
       )}
       {!readOnly && (
         <Box>
-          <div className='octo-propertyname'>
+          <PropertyNameContainer className='octo-propertyname'>
+            <DragIndicatorIcon className='icons' fontSize='small' color='secondary' />
             <Button {...bindTrigger(changePropertyPopupState)}>{property.name}</Button>
-          </div>
+          </PropertyNameContainer>
           <Menu {...bindMenu(changePropertyPopupState)}>
             <PropertyMenu
               onDelete={onDelete}
@@ -293,7 +314,6 @@ function CardDetailProperties(props: Props) {
             board={board}
             card={card}
             deleteDisabledMessage={getDeleteDisabled(propertyTemplate)}
-            isOpen={propertyTemplate.id === newTemplateId}
             onDelete={() => onPropertyDeleteSetAndOpenConfirmationDialog(propertyTemplate)}
             onTypeAndNameChanged={(newType: PropertyType, newName: string) => {
               onPropertyChangeSetAndOpenConfirmationDialog(newType, newName, propertyTemplate);
