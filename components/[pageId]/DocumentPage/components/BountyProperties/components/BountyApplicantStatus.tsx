@@ -47,26 +47,24 @@ export default function BountyApplicantActions({ submission }: Props) {
       )}
 
       {submission.status === 'paid' &&
-      transaction &&
-      isTruthy(transaction.chainId) &&
-      isTruthy(transaction.transactionId) ? (
-        <Link
-          external
-          href={transaction ? getChainExplorerLink(transaction.chainId, transaction.transactionId) : ''}
-          target='_blank'
-        >
-          <Tooltip title={transaction ? 'View transaction' : ''} placement='top' arrow>
-            <Typography color='success' variant='body2'>
-              {'Paid '}
-              <LaunchIcon sx={{ fontSize: 14 }} />
-            </Typography>
-          </Tooltip>
-        </Link>
-      ) : (
-        <Typography color='success' variant='body2'>
-          {'Paid '}
-        </Typography>
-      )}
+        (transaction && isTruthy(transaction.chainId) && isTruthy(transaction.transactionId) ? (
+          <Link
+            external
+            href={transaction ? getChainExplorerLink(transaction.chainId, transaction.transactionId) : ''}
+            target='_blank'
+          >
+            <Tooltip title={transaction ? 'View transaction' : ''} placement='top' arrow>
+              <Typography color='success' variant='body2'>
+                {'Paid '}
+                <LaunchIcon sx={{ fontSize: 14 }} />
+              </Typography>
+            </Tooltip>
+          </Link>
+        ) : (
+          <Typography color='success' variant='body2'>
+            {'Paid '}
+          </Typography>
+        ))}
     </>
   );
 }
