@@ -1,31 +1,32 @@
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import RestoreIcon from '@mui/icons-material/Restore';
 import {
+  Box,
   IconButton,
   List,
-  MenuItem,
-  ListItemText,
   ListItemIcon,
-  Tooltip,
-  Typography,
+  ListItemText,
+  MenuItem,
   TextField,
-  Box
+  Tooltip,
+  Typography
 } from '@mui/material';
-import type { Page } from '@prisma/client';
 import { DateTime } from 'luxon';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { memo, useMemo, useState, useCallback, useEffect } from 'react';
 import type { MouseEvent } from 'react';
-import { mutate } from 'swr';
+import { memo, useCallback, useMemo, useState } from 'react';
+import useSWR, { mutate } from 'swr';
 
 import charmClient from 'charmClient';
 import { useAppDispatch } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { initialLoad } from 'components/common/BoardEditor/focalboard/src/store/initialLoad';
+import LoadingComponent from 'components/common/LoadingComponent';
 import { ScrollableModal as Modal } from 'components/common/Modal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePageIdFromPath } from 'hooks/usePageFromPath';
 import { usePages } from 'hooks/usePages';
+import type { PageMeta, PagesMap } from 'lib/pages';
 import { fancyTrim } from 'lib/utilities/strings';
 
 import { PageIcon } from './PageIcon';
@@ -39,7 +40,7 @@ const PageArchivedDate = memo<{ date: Date; title: string }>(({ date, title }) =
 });
 
 const ArchivedPageItem = memo<{
-  archivedPage: Page;
+  archivedPage: PageMeta;
   disabled: boolean;
   onRestore: (e: MouseEvent<HTMLButtonElement, MouseEvent>, pageId: string) => void;
   onDelete: (e: MouseEvent<HTMLButtonElement, MouseEvent>, pageId: string) => void;
@@ -77,47 +78,33 @@ const ArchivedPageItem = memo<{
 });
 
 export default function TrashModal({ onClose, isOpen }: { onClose: () => void; isOpen: boolean }) {
-  const [archivedPages, setArchivedPages] = useState<Record<string, Page>>({});
   const [isMutating, setIsMutating] = useState(false);
   const [searchText, setSearchText] = useState('');
   const space = useCurrentSpace();
-  const currentPageId = usePageIdFromPath();
-  const { pages, getPagePermissions, mutatePagesRemove } = usePages();
+  const currentPagePath = usePageIdFromPath();
+  const { mutatePagesRemove, pages, getPageByPath } = usePages();
   const dispatch = useAppDispatch();
   const router = useRouter();
 
-  useEffect(() => {
-    async function main() {
-      if (space) {
-        const _archivedPages: Page[] = [];
-        (await charmClient.getArchivedPages(space.id)).forEach((archivedPage) => {
-          if (
-            archivedPage &&
-            archivedPage.deletedAt !== null &&
-            getPagePermissions(archivedPage.id, archivedPage)?.delete
-          ) {
-            const pageTitle = archivedPage.title || 'Untitled';
-            _archivedPages.push({ ...archivedPage, title: pageTitle });
-          }
-        });
-        setArchivedPages(
-          _archivedPages
-            .sort((deletedPageA, deletedPageB) =>
-              deletedPageA.deletedAt && deletedPageB.deletedAt
-                ? new Date(deletedPageB.deletedAt).getTime() - new Date(deletedPageA.deletedAt).getTime()
-                : 0
-            )
-            .reduce((obj, cur) => ({ ...obj, [cur.id]: cur }), {})
-        );
-      }
+  const { data: archivedPages, mutate: setArchivedPages } = useSWR<PagesMap>(
+    !space ? null : `deletable-pages-${space?.id}`,
+    () => {
+      return charmClient.pages.getDeletablePages(space?.id as string).then((deletablePages) => {
+        return deletablePages.reduce((pageMap, page) => {
+          pageMap[page.id] = page;
+          return pageMap;
+        }, {} as PagesMap);
+      });
     }
-    main();
-  }, [space]);
+  );
 
   async function restorePage(pageId: string) {
     if (space) {
       const { pageIds: restoredPageIds } = await charmClient.restorePage(pageId);
       setArchivedPages((_archivedPages) => {
+        if (!_archivedPages) {
+          return {};
+        }
         restoredPageIds.forEach((restoredPageId) => {
           if (_archivedPages[restoredPageId]) {
             delete _archivedPages[restoredPageId];
@@ -132,8 +119,13 @@ export default function TrashModal({ onClose, isOpen }: { onClose: () => void; i
   }
 
   async function deletePage(pageId: string) {
+    const currentPage = currentPagePath ? getPageByPath(currentPagePath) : null;
+
     const { pageIds: deletePageIds } = await charmClient.deletePage(pageId);
     setArchivedPages((_archivedPages) => {
+      if (!_archivedPages) {
+        return {};
+      }
       deletePageIds.forEach((deletePageId) => {
         if (_archivedPages[deletePageId]) {
           delete _archivedPages[deletePageId];
@@ -143,20 +135,18 @@ export default function TrashModal({ onClose, isOpen }: { onClose: () => void; i
     });
 
     mutatePagesRemove(deletePageIds);
+
     // If the current page has been deleted permanently route to the first alive page
-    if (currentPageId && deletePageIds.includes(currentPageId)) {
-      router.push(
-        `/${router.query.domain}/${
-          Object.values(pages).find((page) => page?.type !== 'card' && page?.deletedAt === null)?.path
-        }`
-      );
+    if (currentPage && deletePageIds.includes(currentPage.id)) {
+      const firstPage = Object.values(pages).find((page) => page?.type !== 'card' && page?.deletedAt === null)?.path;
+      router.push(`/${router.query.domain}/${firstPage}`);
     }
   }
 
   const searchTextMatchedPages = useMemo(() => {
-    return Object.values(archivedPages).filter((archivedPage) =>
-      archivedPage.title.toLowerCase().includes(searchText.toLowerCase())
-    );
+    return Object.values(archivedPages ?? {}).filter(
+      (archivedPage) => archivedPage && archivedPage.title.toLowerCase().includes(searchText.toLowerCase())
+    ) as PageMeta[];
   }, [archivedPages, searchText]);
 
   const onRestorePage = useCallback(
@@ -179,7 +169,8 @@ export default function TrashModal({ onClose, isOpen }: { onClose: () => void; i
     [isMutating]
   );
 
-  const archivedPagesExist = Object.keys(archivedPages).length !== 0;
+  const isLoading = !archivedPages;
+  const archivedPagesExist = archivedPages && Object.keys(archivedPages).length > 0;
 
   // Remove the pages you dont have delete access of
   return (
@@ -192,7 +183,7 @@ export default function TrashModal({ onClose, isOpen }: { onClose: () => void; i
           <Box mb={1} display='flex' justifyContent='space-between'>
             Trash
             <Typography variant='body2' color='secondary'>
-              {Object.keys(archivedPages).length} pages
+              {!isLoading && `${Object.keys(archivedPages ?? {}).length} pages`}
             </Typography>
           </Box>
           {archivedPagesExist && (
@@ -206,11 +197,17 @@ export default function TrashModal({ onClose, isOpen }: { onClose: () => void; i
         </Box>
       }
     >
-      {!archivedPagesExist ? (
+      {isLoading && (
+        <Box my={2}>
+          <LoadingComponent />
+        </Box>
+      )}
+      {!archivedPagesExist && !isLoading && (
         <Typography sx={{ pl: 4 }} variant='subtitle1' color='secondary'>
           No archived pages
         </Typography>
-      ) : (
+      )}
+      {archivedPagesExist && !isLoading && (
         <List>
           {searchTextMatchedPages.map((archivedPage) => {
             return (
