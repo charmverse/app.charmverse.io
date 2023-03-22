@@ -63,17 +63,21 @@ export async function countData({ spaceId }: { spaceId: string }) {
   };
 }
 
-function countProsemirrorBlocks(pageContent: any, spaceId?: string) {
+function countProsemirrorBlocks(pageContent: any | null, spaceId?: string) {
   let count = 0;
-  try {
-    const doc = getNodeFromJson(pageContent);
-    doc.nodesBetween(0, doc.nodeSize, (node) => {
-      if (node.type) {
-        count += 1;
+  if (pageContent) {
+    try {
+      const doc = getNodeFromJson(pageContent);
+      if (doc) {
+        doc.nodesBetween(0, doc.nodeSize, (node) => {
+          if (node.type) {
+            count += 1;
+          }
+        });
       }
-    });
-  } catch (error) {
-    log.error('Error counting prosemirror blocks', { error, spaceId });
+    } catch (error) {
+      log.error('Error counting prosemirror blocks', { error, spaceId });
+    }
   }
   return count;
 }
