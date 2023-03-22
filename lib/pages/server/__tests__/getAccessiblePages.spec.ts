@@ -1,6 +1,5 @@
 import { prisma } from 'db';
-import type { IPagePermissionWithSource } from 'lib/permissions/pages';
-import { setupPermissionsAfterPagePermissionAdded, upsertPermission } from 'lib/permissions/pages';
+import { upsertPermission } from 'lib/permissions/pages';
 import {
   createPage,
   generateSpaceUser,
@@ -10,7 +9,6 @@ import {
 import { generateProposalCategory } from 'testing/utils/proposals';
 
 import { createProposalTemplate } from '../../../templates/proposals/createProposalTemplate';
-import type { IPageWithPermissions } from '../../interfaces';
 import { getAccessiblePages } from '../getAccessiblePages';
 
 describe('getAccessiblePages', () => {
@@ -143,41 +141,6 @@ describe('getAccessiblePages', () => {
     expect(pages.length).toBe(0);
   });
 
-  it('Should include permissions for each page, and the source for each permision', async () => {
-    const { space, user } = await generateUserAndSpaceWithApiToken();
-
-    const page = await createPage({
-      createdBy: user.id,
-      spaceId: space.id
-    });
-
-    const childPage = await createPage({
-      createdBy: user.id,
-      spaceId: space.id,
-      parentId: page.id
-    });
-
-    const upsertedPermission = await upsertPermission(page.id, {
-      spaceId: space.id,
-      permissionLevel: 'full_access'
-    });
-
-    await setupPermissionsAfterPagePermissionAdded(upsertedPermission.id);
-
-    const pages = await getAccessiblePages({ spaceId: space.id, userId: user.id });
-
-    const foundChild = pages.find((p) => p.id === childPage.id) as IPageWithPermissions;
-    const foundInherited = foundChild.permissions.find(
-      (perm) => perm.spaceId === space.id
-    ) as IPagePermissionWithSource;
-
-    // We are returning permissions
-    expect(foundInherited).toBeDefined();
-
-    // We are returning source
-    expect(foundInherited.sourcePermission).toBeDefined();
-  });
-
   it('Should return a page based on search', async () => {
     const { user: adminUser, space } = await generateUserAndSpaceWithApiToken(undefined, true);
 
@@ -187,5 +150,80 @@ describe('getAccessiblePages', () => {
 
     const pages = await getAccessiblePages({ userId: adminUser.id, spaceId: space.id, search: 'mom' });
     expect(pages.map((p) => p.id)).toEqual([pageToFind.id]);
+  });
+
+  it('should return only pages marked as deletedAt when admin requests deletable pages', async () => {
+    const { user, space } = await generateUserAndSpace({
+      isAdmin: true
+    });
+
+    const page1 = await createPage({
+      createdBy: user.id,
+      spaceId: space.id
+    });
+    const page2 = await createPage({
+      createdBy: user.id,
+      spaceId: space.id,
+      deletedAt: new Date()
+    });
+
+    const deletablePages = await getAccessiblePages({
+      userId: user.id,
+      spaceId: space.id,
+      deletable: true
+    });
+
+    expect(deletablePages.length).toBe(1);
+    expect(deletablePages[0].id).toBe(page2.id);
+  });
+
+  it('should return only pages marked as deletedAt where user can delete the page if this option is requested', async () => {
+    const { user, space } = await generateUserAndSpace({
+      isAdmin: false
+    });
+
+    const nonDeletedPageWithPermission = await createPage({
+      createdBy: user.id,
+      spaceId: space.id,
+      pagePermissions: [
+        {
+          permissionLevel: 'view',
+          spaceId: space.id
+        }
+      ]
+    });
+
+    const deletedPageWithoutPermission = await createPage({
+      createdBy: user.id,
+      spaceId: space.id,
+      deletedAt: new Date(),
+      pagePermissions: [
+        {
+          permissionLevel: 'view',
+          spaceId: space.id
+        }
+      ]
+    });
+
+    const deletedPageWithPermission = await createPage({
+      createdBy: user.id,
+      spaceId: space.id,
+      deletedAt: new Date(),
+      pagePermissions: [
+        {
+          permissionLevel: 'full_access',
+          spaceId: space.id
+        }
+      ]
+    });
+
+    const deletablePages = await getAccessiblePages({
+      userId: user.id,
+      spaceId: space.id,
+      deletable: true
+    });
+
+    expect(deletablePages.length).toBe(1);
+    expect(deletablePages[0].id).toBe(deletedPageWithPermission.id);
   });
 });

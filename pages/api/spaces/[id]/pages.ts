@@ -21,13 +21,15 @@ async function getPages(req: NextApiRequest, res: NextApiResponse<IPageWithPermi
   const userId = req.session?.user?.id;
   const meta = req.query.meta === 'true';
   const search = typeof req.query.search === 'string' ? req.query.search : undefined;
+  const deletable = req.query.deletable === 'true';
 
   const accessiblePages = await getAccessiblePages({
     spaceId,
     userId,
     archived,
     meta,
-    search
+    search,
+    deletable
   });
 
   const createdPages: IPageWithPermissions[] = [];
