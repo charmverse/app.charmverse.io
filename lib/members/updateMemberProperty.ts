@@ -1,4 +1,4 @@
-import type { MemberProperty, PrismaPromise } from '@prisma/client';
+import type { MemberProperty, Prisma } from '@prisma/client';
 
 import { prisma } from 'db';
 import { NotFoundError } from 'lib/middleware';
@@ -56,7 +56,7 @@ export async function updateMemberProperty({
     updateData = { options: data.options };
   }
 
-  const transactions: PrismaPromise<any>[] = [];
+  const transactions: Prisma.PrismaPromise<any>[] = [];
   const newIndex = data.index;
   const updateOptions = (data.options as ExistingSelectOption[]) || [];
   const hasDuplicatedOptions = updateOptions.some(

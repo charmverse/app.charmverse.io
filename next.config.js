@@ -84,7 +84,6 @@ const config = {
     _config.resolve.alias.canvas = false;
     // add aliases defined in package.json
     Object.assign(_config.resolve.alias, npmPackage.imports);
-
     _config.module.rules.push({
       test: /\.svg$/,
       use: [

@@ -1,4 +1,4 @@
-import type { PagePermission, Prisma, PrismaPromise } from '@prisma/client';
+import type { PagePermission, Prisma } from '@prisma/client';
 
 import type { OptionalTransaction } from 'db';
 import { prisma } from 'db';
@@ -136,7 +136,7 @@ export async function boardPagePermissionUpdated({
       [
         args.updateManyArgs ? prisma.pagePermission.updateMany(args.updateManyArgs) : null,
         args.createManyArgs ? prisma.pagePermission.createMany(args.createManyArgs) : null
-      ].filter((a) => isTruthy(a)) as PrismaPromise<any>[]
+      ].filter((a) => isTruthy(a)) as Prisma.PrismaPromise<any>[]
     );
   }
 
