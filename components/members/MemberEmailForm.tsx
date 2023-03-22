@@ -83,7 +83,7 @@ export function MemberEmailForm({ onClick }: { onClick: VoidFunction }) {
         <FormControlLabel
           disabled={!!errors.email || email.length === 0}
           control={<Checkbox {...register('emailNewsletter')} checked={emailNewsletter} onChange={onChange} />}
-          label='Keep me up to date on whats new with CharmVerse'
+          label='Keep me up to date on whats new with CharmVerse.'
         />
       </FormGroup>
       <Stack flexDirection='row' gap={1} justifyContent='flex-end'>
