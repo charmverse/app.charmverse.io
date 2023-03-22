@@ -28,7 +28,7 @@ interface Props {
   submission: ApplicationWithTransactions;
   permissions: AssignedBountyPermissions;
   bounty: BountyWithDetails;
-  refreshSubmissions: () => Promise<void>;
+  refreshSubmissions: () => void;
 }
 
 export default function BountyApplicantTableRow({

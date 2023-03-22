@@ -16,7 +16,7 @@ interface Props {
   submission: ApplicationWithTransactions;
   isExpanded: boolean;
   expandRow: () => void;
-  refreshSubmissions: () => Promise<void>;
+  refreshSubmissions: () => void;
 }
 
 export default function BountyApplicantActions({

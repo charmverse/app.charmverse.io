@@ -16,7 +16,7 @@ interface BountyApplicationFormProps {
   permissions: AssignedBountyPermissions;
   bounty: Bounty;
   submissions: Application[];
-  refreshSubmissions: () => Promise<void>;
+  refreshSubmissions: () => void;
 }
 
 export default function BountyApplicantForm(props: BountyApplicationFormProps) {
