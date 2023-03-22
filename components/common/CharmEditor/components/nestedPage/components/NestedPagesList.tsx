@@ -67,7 +67,7 @@ function NestedPagesList({ pluginKey }: { pluginKey: PluginKey<NestedPagePluginS
     return [];
   }, [triggerText, categories]);
 
-  const totalItems = filteredPages.length;
+  const totalItems = filteredPages.length + filteredStaticPages.length + filteredForumCategories.length;
   const activeItemIndex = (counter < 0 ? (counter % totalItems) + totalItems : counter) % totalItems;
 
   const onSelectPage = useCallback(
