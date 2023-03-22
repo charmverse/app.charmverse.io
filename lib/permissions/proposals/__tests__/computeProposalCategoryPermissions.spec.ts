@@ -132,6 +132,40 @@ describe('computeProposalCategoryPermissions', () => {
     });
   });
 
+  it('should treat a user with guest-level membership in space as a public user and return empty proposal category permissions', async () => {
+    const proposalCategory = await generateProposalCategory({ spaceId: space.id });
+
+    // This should never usually happen, but if it somehow does, we want the compute operation to act as a failsafe
+    await prisma.proposalCategoryPermission.create({
+      data: {
+        permissionLevel: 'full_access',
+        proposalCategory: { connect: { id: proposalCategory.id } },
+        space: { connect: { id: space.id } }
+      }
+    });
+
+    await prisma.proposalCategoryPermission.create({
+      data: {
+        permissionLevel: 'view',
+        proposalCategory: { connect: { id: proposalCategory.id } },
+        public: true
+      }
+    });
+
+    const guestUser = await generateSpaceUser({
+      spaceId: space.id,
+      isGuest: true
+    });
+
+    const guestPermissions = await computeProposalCategoryPermissions({
+      resourceId: proposalCategory.id,
+      userId: guestUser.id
+    });
+    proposalCategoryOperations.forEach((op) => {
+      expect(guestPermissions[op]).toBe(false);
+    });
+  });
+
   it('should throw an error if the proposal category does not exist or is invalid', async () => {
     await expect(
       computeProposalCategoryPermissions({

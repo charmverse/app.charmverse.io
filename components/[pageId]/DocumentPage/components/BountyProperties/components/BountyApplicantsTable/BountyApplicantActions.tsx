@@ -44,6 +44,7 @@ export default function BountyApplicantActions({ bounty, isExpanded, submission,
           size='small'
           onClick={expandRow}
           sx={{ opacity: isExpanded ? 0 : 1, transition: 'opacity .2s' }}
+          data-test='review-bounty-button'
         >
           Review
         </Button>

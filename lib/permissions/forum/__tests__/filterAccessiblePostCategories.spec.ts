@@ -133,20 +133,41 @@ describe('filterAccessiblePostCategories', () => {
     expect(visibleCategories).toContainEqual({ ...publicCategory, permissions: moderatorPermissionFlags });
   });
 
-  it('returns only categories accessible to the public if there is no user, or user is not a space member, and create_post set to false', async () => {
+  it('returns only categories accessible to the public if there is no user', async () => {
     const permissions = new AvailablePostCategoryPermissions().empty;
 
-    let visibleCategories = await filterAccessiblePostCategories({
+    const visibleCategories = await filterAccessiblePostCategories({
+      postCategories,
+      userId: undefined
+    });
+
+    expect(visibleCategories.length).toBe(1);
+    expect(visibleCategories).toContainEqual({ ...publicCategory, permissions });
+  });
+
+  it('returns only categories accessible to the public if user is not a space member', async () => {
+    const permissions = new AvailablePostCategoryPermissions().empty;
+
+    const visibleCategories = await filterAccessiblePostCategories({
       postCategories,
       userId: otherSpaceAdminUser.id
     });
 
     expect(visibleCategories.length).toBe(1);
     expect(visibleCategories).toContainEqual({ ...publicCategory, permissions });
+  });
 
-    visibleCategories = await filterAccessiblePostCategories({
+  it('returns only categories accessible to the public if user is a guest of the space', async () => {
+    const guestUser = await generateSpaceUser({
+      spaceId: space.id,
+      isGuest: true
+    });
+
+    const permissions = new AvailablePostCategoryPermissions().empty;
+
+    const visibleCategories = await filterAccessiblePostCategories({
       postCategories,
-      userId: undefined
+      userId: guestUser.id
     });
 
     expect(visibleCategories.length).toBe(1);

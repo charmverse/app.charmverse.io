@@ -12,8 +12,8 @@ import log from 'lib/log';
 import { isSpaceDomain } from 'lib/spaces/utils';
 
 // Pages shared to the public that don't require user login
+// When adding a page here or any new top-level pages, please also add this page to DOMAIN_BLACKLIST in lib/spaces/config.ts
 const publicPages = ['/', 'share', 'api-docs', 'u', 'join', 'invite', 'authenticate'];
-const accountPages = ['profile'];
 
 export default function RouteGuard({ children }: { children: ReactNode }) {
   const router = useRouter();
@@ -95,10 +95,6 @@ export default function RouteGuard({ children }: { children: ReactNode }) {
           query: { returnUrl: router.asPath }
         }
       };
-    }
-    // condition: user accesses account pages (profile, tasks)
-    else if (accountPages.some((basePath) => firstPathSegment === basePath)) {
-      return { authorized: true };
     }
     // condition: trying to access a space without access
     else if (isSpaceDomain(spaceDomain) && !spaces.some((s) => s.domain === spaceDomain)) {
