@@ -59,7 +59,15 @@ const PimpedButtonWithNextLink = forwardRef<HTMLButtonElement, InputProps<Elemen
     // @ts-ignore
     const mouseOnClick = onClick as MouseEventHandler<HTMLAnchorElement>;
     return (
-      <MuiLink component={NextLink} href={href} target={target} id={id} onClick={mouseOnClick} data-test={dataTest}>
+      <MuiLink
+        component={NextLink}
+        color={props.color === 'inherit' ? 'inherit !important' : undefined}
+        href={href}
+        target={target}
+        id={id}
+        onClick={mouseOnClick}
+        data-test={dataTest}
+      >
         <PimpedButton {...props}>{children}</PimpedButton>
       </MuiLink>
     );
