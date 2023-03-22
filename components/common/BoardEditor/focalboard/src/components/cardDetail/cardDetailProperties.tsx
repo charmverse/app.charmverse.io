@@ -87,9 +87,9 @@ function CardDetailProperty({
         overflow: 'unset',
         flexDirection: 'row',
         // Allow dragging past left border
-        paddingLeft: 150,
+        paddingLeft: '150px',
         position: 'relative',
-        right: 150
+        right: '150px'
       }}
       className='octo-propertyrow'
     >
