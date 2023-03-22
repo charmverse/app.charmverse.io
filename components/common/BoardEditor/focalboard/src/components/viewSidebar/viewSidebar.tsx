@@ -49,8 +49,11 @@ export const StyledSidebar = styled.div`
   height: 300px;
   min-height: 100%;
   width: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+
   ${({ theme }) => theme.breakpoints.up('md')} {
-    width: 250px;
+    width: 275px;
   }
 `;
 
