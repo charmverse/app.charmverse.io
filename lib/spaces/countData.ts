@@ -4,7 +4,7 @@ import { getNodeFromJson } from 'lib/prosemirror/getNodeFromJson';
 
 // a function that queries the database for the number of blocks, proposals, pages, and bounties in a space
 export async function countData({ spaceId }: { spaceId: string }) {
-  const [boards, views, pages, posts] = await Promise.all([
+  const [boards, views, blockComments, pages, posts, postComments, pageComments] = await Promise.all([
     prisma.block.count({
       where: {
         deletedAt: null,
@@ -19,6 +19,13 @@ export async function countData({ spaceId }: { spaceId: string }) {
         type: 'view'
       }
     }),
+    prisma.block.count({
+      where: {
+        deletedAt: null,
+        spaceId,
+        type: 'comment'
+      }
+    }),
     prisma.page.findMany({
       where: {
         deletedAt: null,
@@ -29,6 +36,22 @@ export async function countData({ spaceId }: { spaceId: string }) {
       where: {
         deletedAt: null,
         spaceId
+      }
+    }),
+    prisma.postComment.count({
+      where: {
+        deletedAt: null,
+        post: {
+          spaceId
+        }
+      }
+    }),
+    prisma.pageComment.count({
+      where: {
+        deletedAt: null,
+        page: {
+          spaceId
+        }
       }
     })
   ]);
@@ -41,17 +64,20 @@ export async function countData({ spaceId }: { spaceId: string }) {
 
   // should we count template doc blocks?
   const documentBlocks = pages
-    .filter((page) => page.type === 'page')
-    .map((page) => countProsemirrorBlocks(page.content as any))
+    .filter((page) => page.type === 'page' && page.content)
+    .map((page) => countProsemirrorBlocks(page.content as any, page.spaceId))
     .reduce((a, b) => a + b, 0);
 
-  const total = pages.length + boards + views + posts.length + templates.length + documentBlocks;
+  const comments = blockComments + pageComments + postComments;
+
+  const total = pages.length + boards + views + posts.length + comments + templates.length + documentBlocks;
 
   return {
     counts: {
       boards,
       bounties: bounties.length,
       documentBlocks,
+      comments,
       proposals: proposals.length,
       pages: pages.length,
       posts: posts.length,
@@ -63,7 +89,7 @@ export async function countData({ spaceId }: { spaceId: string }) {
   };
 }
 
-function countProsemirrorBlocks(pageContent: any | null, spaceId?: string) {
+function countProsemirrorBlocks(pageContent: any, spaceId?: string) {
   let count = 0;
   if (pageContent) {
     try {
@@ -76,7 +102,7 @@ function countProsemirrorBlocks(pageContent: any | null, spaceId?: string) {
         });
       }
     } catch (error) {
-      log.error('Error counting prosemirror blocks', { error, spaceId });
+      log.error('Error counting prosemirror blocks', { error, pageContent, spaceId });
     }
   }
   return count;
