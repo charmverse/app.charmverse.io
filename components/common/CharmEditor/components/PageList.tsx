@@ -1,15 +1,16 @@
 import { ListItemIcon, MenuItem, Typography } from '@mui/material';
-import type { Page } from '@prisma/client';
 
 import { PageIcon } from 'components/common/PageLayout/components/PageIcon';
 import PageTitle from 'components/common/PageLayout/components/PageTitle';
+import type { StaticPagesList } from 'components/common/PageLayout/components/Sidebar/utils/staticPages';
 import type { PageMeta } from 'lib/pages';
 
 interface Props {
   activeItemIndex?: number;
   activePageId?: string;
   pages: PageMeta[];
-  onSelectPage: (page: PageMeta) => void;
+  staticPages?: StaticPagesList[];
+  onSelectPage: (pageId: string) => void;
   emptyText?: string;
   style?: React.CSSProperties;
 }
@@ -19,6 +20,7 @@ export default function PagesList({
   activeItemIndex = -1,
   activePageId,
   pages,
+  staticPages,
   onSelectPage,
   style
 }: Props) {
@@ -39,13 +41,29 @@ export default function PagesList({
     </Typography>
   ) : (
     <div style={style}>
+      {staticPages?.map((page) => (
+        <MenuItem
+          key={page.path}
+          data-value={page.path}
+          data-type='page'
+          onClick={() => onSelectPage(page.path)}
+          selected={false}
+        >
+          <ListItemIcon>
+            <PageIcon icon={null} isEditorEmpty={false} pageType={page.path} />
+          </ListItemIcon>
+          <PageTitle hasContent={true} sx={{ fontWeight: 'bold' }}>
+            {page.title}
+          </PageTitle>
+        </MenuItem>
+      ))}
       {pages.map((page, pageIndex) => {
         return (
           <MenuItem
             data-value={page.id}
             data-type='page'
             className={isActive(page.id, pageIndex) ? 'mention-selected' : ''}
-            onClick={() => onSelectPage(page)}
+            onClick={() => onSelectPage(page.id)}
             key={page.id}
             selected={isActive(page.id, pageIndex)}
           >

@@ -137,7 +137,7 @@ function MentionSuggestMenu({ pluginKey }: { pluginKey: PluginKey }) {
         <PagesList
           activeItemIndex={selectedGroup === 'pages' ? activeItemIndex : -1}
           pages={filteredPages as PageMeta[]}
-          onSelectPage={(page) => onSelectMention(page.id, 'page')}
+          onSelectPage={(pageId) => onSelectMention(pageId, 'page')}
         />
       </Box>
     </PopoverMenu>
