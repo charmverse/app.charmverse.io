@@ -44,7 +44,7 @@ export function GoogleDataSource(props: Props) {
     return (
       <>
         <Script src={googleIdentityServiceScript} onReady={onLoadScript} />
-        <ConnectButton onClick={() => loginWithGoogle()} label='Connect Google Account' />
+        <ConnectButton onClick={() => loginWithGoogle()} />
         <ListItem>
           <Typography variant='caption'>Find and embed your Google forms</Typography>
         </ListItem>
@@ -97,20 +97,15 @@ function GoogleAuthWarning() {
   );
 }
 
-function ConnectButton({
-  label = 'Connect Google Account',
-  onClick
-}: {
-  label?: string;
-  onClick?: MouseEventHandler<HTMLLIElement>;
-}) {
+function ConnectButton({ onClick }: { onClick?: MouseEventHandler<HTMLLIElement> }) {
   return (
     <MenuItem onClick={onClick}>
       <ListItemIcon>
         <FcGoogle fontSize='large' />
       </ListItemIcon>
       <Typography color='primary' variant='body2' fontWeight='bold'>
-        {label}
+        {/* {label} */}
+        Sign-in with Google
       </Typography>
     </MenuItem>
   );
@@ -145,7 +140,7 @@ function GoogleFormSelect({
     if (error.status === 401) {
       return (
         <>
-          <ConnectButton label='Reconnect Account' onClick={() => loginWithGoogle({ hint: credential.name })} />
+          <ConnectButton onClick={() => loginWithGoogle({ hint: credential.name })} />
           <ListItem>
             <Box display='flex' gap={2} justifyContent='center'>
               <ReportProblemIcon sx={{ color: 'var(--danger-text)' }} fontSize='small' />
