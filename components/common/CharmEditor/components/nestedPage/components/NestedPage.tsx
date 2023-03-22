@@ -52,10 +52,10 @@ export default function NestedPage({ node, currentPageId }: NodeViewProps & { cu
 
   const pageId = nestedPage?.id || nestedStaticPage?.path || nestedCategories?.id;
 
-  const appPath =
-    nestedPage || nestedStaticPage || nestedCategories
-      ? `${space?.domain}/${(nestedPage || nestedStaticPage || nestedCategories)?.path}`
-      : '';
+  const pagePath = nestedPage ? `${space?.domain}/${nestedPage.path}` : '';
+  const staticPath = nestedStaticPage ? `${space?.domain}/${nestedStaticPage.path}` : '';
+  const categoriesPath = nestedCategories ? `${space?.domain}/forum/${nestedCategories.path}` : '';
+  const appPath = pagePath || staticPath || categoriesPath;
 
   const fullPath = `${window.location.origin}/${appPath}`;
 

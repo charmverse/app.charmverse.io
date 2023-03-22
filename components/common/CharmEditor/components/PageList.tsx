@@ -82,12 +82,7 @@ export default function PagesList({
       ))}
       {forumCategories?.map((page) => {
         return (
-          <MenuItem
-            key={page.path}
-            data-value={page.path}
-            data-type='page'
-            onClick={() => onSelectPage(page.path || '')}
-          >
+          <MenuItem key={page.path} data-value={page.path} data-type='page' onClick={() => onSelectPage(page.id)}>
             <ListItemIcon>
               <PageIcon icon={null} isEditorEmpty={false} pageType='forum' />
             </ListItemIcon>
