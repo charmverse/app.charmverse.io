@@ -110,7 +110,8 @@ const config = {
           return {
             ..._entry,
             cron: './background/cron.ts',
-            websockets: './background/websockets.ts'
+            websockets: './background/websockets.ts',
+            countSpaceData: './scripts/countSpaceData.ts'
           };
         });
       };
