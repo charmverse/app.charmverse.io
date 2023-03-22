@@ -53,7 +53,7 @@ export default function NestedPage({ node, currentPageId }: NodeViewProps & { cu
   const pageId = nestedPage?.id || nestedStaticPage?.path || nestedCategories?.id;
 
   const appPath =
-    nestedPage || nestedStaticPage
+    nestedPage || nestedStaticPage || nestedCategories
       ? `${space?.domain}/${(nestedPage || nestedStaticPage || nestedCategories)?.path}`
       : '';
 
