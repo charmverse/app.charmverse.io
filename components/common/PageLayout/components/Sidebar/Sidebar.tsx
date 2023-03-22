@@ -284,6 +284,7 @@ export default function Sidebar({ closeSidebar, favorites, navAction }: SidebarP
                       icon={<PageIcon icon={null} pageType={page.path} />}
                       label={page.title}
                       onClick={navAction}
+                      data-test={`sidebar-link-${page.path}`}
                     />
                   );
                 }
