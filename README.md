@@ -73,8 +73,8 @@ Chrome / Prosemirror Dev Tools
 Get access to the document structure of all our editor content
 
 
-Chrome / UseSWR Dec Tools
-[Use SWR Dev Tools](https://chrome.google.com/webstore/detail/swr-devtools/liidbicegefhheghhjbomajjaehnjned)
+Chrome / SWR DevTools
+[SWR DevTools](https://chrome.google.com/webstore/detail/swr-devtools/liidbicegefhheghhjbomajjaehnjned)
 
 Inspect SWR cache data and results
 
