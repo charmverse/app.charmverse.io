@@ -28,7 +28,7 @@ import debounce from 'lib/utilities/debounce';
 import Legend from './Legend';
 
 export const schema = yup.object({
-  email: yup.string().ensure().trim().email().max(50),
+  email: yup.string().ensure().trim().email(),
   emailNotifications: yup.boolean(),
   emailNewsletter: yup.boolean()
 });
