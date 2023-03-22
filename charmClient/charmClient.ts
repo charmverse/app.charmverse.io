@@ -259,7 +259,7 @@ class CharmClient {
   }
 
   updateFavoritePages(favorites: Omit<FavoritePage, 'userId'>[]) {
-    return http.PUT<FavoritePage[]>('/api/profile/favorites', { ...favorites });
+    return http.PUT<FavoritePage[]>('/api/profile/favorites', favorites);
   }
 
   setMyGnosisSafes(wallets: Partial<UserGnosisSafe>[]): Promise<UserGnosisSafe[]> {
