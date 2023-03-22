@@ -6,13 +6,14 @@ import { prisma } from 'db';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { sessionUserRelations } from 'lib/session/config';
 import { withSessionRoute } from 'lib/session/withSession';
+import { updateFavoritePages } from 'lib/users/updateFavoritePages';
 import type { LoggedInUser } from 'models';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
   .use(requireUser)
-  .put(updateFavoritePages)
+  .put(updateFavoritePagesHandler)
   .use((req, res, next) => {
     if (!req.body.pageId) {
       return res.status(400).json({ error: 'pageId is required' });
@@ -69,24 +70,11 @@ async function unFavoritePage(req: NextApiRequest, res: NextApiResponse<Partial<
   return res.status(200).json(user);
 }
 
-async function updateFavoritePages(req: NextApiRequest, res: NextApiResponse<FavoritePage[]>) {
-  const favorites = req.body.favorites as FavoritePage[];
+async function updateFavoritePagesHandler(req: NextApiRequest, res: NextApiResponse<FavoritePage[]>) {
+  const favoritePages = req.body as FavoritePage[];
   const userId = req.session.user.id;
-  const updatedFavorites = await prisma.$transaction(
-    favorites.map((favorite) =>
-      prisma.favoritePage.update({
-        where: {
-          pageId_userId: {
-            userId,
-            pageId: favorite.pageId
-          }
-        },
-        data: {
-          ...favorite
-        }
-      })
-    )
-  );
+
+  const updatedFavorites = await updateFavoritePages({ favoritePages, userId });
 
   return res.status(200).json(updatedFavorites);
 }
