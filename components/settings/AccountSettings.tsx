@@ -128,7 +128,7 @@ export function AccountSettings() {
               control={
                 <Checkbox {...register('emailNewsletter')} checked={!!user?.emailNewsletter} onChange={onChange} />
               }
-              label='Keep me up to date on whats new with CharmVerse.'
+              label="Keep me up to date on what's new with CharmVerse."
             />
           </FormGroup>
         </Box>
