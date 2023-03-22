@@ -1,5 +1,6 @@
 import type {
   Block,
+  FavoritePage,
   InviteLink,
   Page,
   PagePermissionLevel,
@@ -255,6 +256,10 @@ class CharmClient {
 
   unfavoritePage(pageId: string) {
     return http.DELETE<Partial<LoggedInUser>>('/api/profile/favorites', { pageId });
+  }
+
+  updateFavoritePages(favorites: Omit<FavoritePage, 'userId'>[]) {
+    return http.PUT<FavoritePage[]>('/api/profile/favorites', { favorites });
   }
 
   setMyGnosisSafes(wallets: Partial<UserGnosisSafe>[]): Promise<UserGnosisSafe[]> {
