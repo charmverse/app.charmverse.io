@@ -7,7 +7,7 @@ export enum StaticPagesPath {
   proposals = 'proposals'
 }
 
-export type StaticPagesType = `${StaticPagesPath}`;
+export type StaticPagesType = keyof typeof StaticPagesPath;
 
 export type StaticPagesList = {
   path: StaticPagesType;
