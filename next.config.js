@@ -5,6 +5,7 @@ const next = require('next/dist/lib/is-serializable-props');
 const webpack = require('webpack');
 
 const esmModules = require('./next.base').esmModules;
+const npmPackage = require('./package.json');
 
 // we can save time and skip code checks, which are handle in a special step by the CI
 const skipCodeChecks = process.env.CI === 'true';
@@ -81,6 +82,9 @@ const config = {
   webpack(_config, { buildId, nextRuntime }) {
     // Fix for: "Module not found: Can't resolve 'canvas'"
     _config.resolve.alias.canvas = false;
+    // add aliases used by module-alias module
+    Object.assign(_config.resolve.alias, npmPackage.imports);
+
     _config.module.rules.push({
       test: /\.svg$/,
       use: [

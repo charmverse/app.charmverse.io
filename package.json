@@ -302,6 +302,9 @@
     "supertest": "^6.3.3",
     "webpack": "^5.76.0"
   },
+  "imports": {
+    "prosemirror-tables": "@skiff-org/prosemirror-tables"
+  },
   "overrides": {
     "@types/react": "^18.0.26",
     "react": "^18.2.0",
