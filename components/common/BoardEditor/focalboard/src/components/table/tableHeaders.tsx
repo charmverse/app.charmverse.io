@@ -205,14 +205,7 @@ function TableHeaders(props: Props): JSX.Element {
                     type,
                     options: []
                   };
-                  const templateId = await mutator.insertPropertyTemplate(board, activeView, -1, template);
-                  await charmClient.patchBlock(
-                    board.id,
-                    {
-                      updatedFields: { visibleCardPropertyIds: [...board.fields.visibleCardPropertyIds, templateId] }
-                    },
-                    () => {}
-                  );
+                  await mutator.insertPropertyTemplate(board, activeView, -1, template);
                 }}
               />
             </Menu>

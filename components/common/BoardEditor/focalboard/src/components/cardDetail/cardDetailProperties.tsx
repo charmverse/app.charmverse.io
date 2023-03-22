@@ -11,6 +11,7 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
+import { isTruthy } from 'lib/utilities/types';
 
 import { useSortable } from '../../hooks/sortable';
 import mutator from '../../mutator';
@@ -157,12 +158,24 @@ function CardDetailProperties(props: Props) {
   const [showConfirmationDialog, setShowConfirmationDialog] = useState<boolean>(false);
 
   const onDrop = async (sourceProperty: IPropertyTemplate, destinationProperty: IPropertyTemplate) => {
-    const visibleCardPropertyIds = [...board.fields.visibleCardPropertyIds];
-    const destIndex = visibleCardPropertyIds.indexOf(destinationProperty.id);
-    const srcIndex = visibleCardPropertyIds.indexOf(sourceProperty.id);
-    visibleCardPropertyIds.splice(srcIndex, 1);
-    visibleCardPropertyIds.splice(destIndex, 0, sourceProperty.id);
-    await charmClient.patchBlock(board.id, { updatedFields: { visibleCardPropertyIds } }, () => {});
+    const cardPropertyIds = [...board.fields.cardProperties.map((cardProperty) => cardProperty.id)];
+    const destIndex = cardPropertyIds.indexOf(destinationProperty.id);
+    const srcIndex = cardPropertyIds.indexOf(sourceProperty.id);
+    cardPropertyIds.splice(srcIndex, 1);
+    cardPropertyIds.splice(destIndex, 0, sourceProperty.id);
+    await charmClient.patchBlock(
+      board.id,
+      {
+        updatedFields: {
+          cardProperties: cardPropertyIds
+            .map((cardPropertyId) =>
+              board.fields.cardProperties.find((cardProperty) => cardProperty.id === cardPropertyId)
+            )
+            .filter(isTruthy)
+        }
+      },
+      () => {}
+    );
   };
 
   function onPropertyChangeSetAndOpenConfirmationDialog(
@@ -302,11 +315,7 @@ function CardDetailProperties(props: Props) {
 
   return (
     <div className='octo-propertylist'>
-      {board.fields.visibleCardPropertyIds.map((cardPropertyId) => {
-        const propertyTemplate = board.fields.cardProperties.find((cardProperty) => cardProperty.id === cardPropertyId);
-        if (!propertyTemplate) {
-          return null;
-        }
+      {board.fields.cardProperties.map((propertyTemplate) => {
         return (
           <CardDetailProperty
             onDrop={onDrop}
@@ -363,11 +372,6 @@ function CardDetailProperties(props: Props) {
                   options: []
                 };
                 const templateId = await mutator.insertPropertyTemplate(board, activeView, -1, template);
-                await charmClient.patchBlock(
-                  board.id,
-                  { updatedFields: { visibleCardPropertyIds: [...board.fields.visibleCardPropertyIds, templateId] } },
-                  () => {}
-                );
                 setNewTemplateId(templateId);
                 addPropertyPopupState.close();
               }}
