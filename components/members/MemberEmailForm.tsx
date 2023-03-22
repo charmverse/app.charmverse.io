@@ -78,7 +78,7 @@ export function MemberEmailForm({ onClick }: { onClick: VoidFunction }) {
         <FormControlLabel
           disabled={!!errors.email || email.length === 0}
           control={<Checkbox {...register('emailNotifications')} checked={emailNotifications} onChange={onChange} />}
-          label='Receive email updates on mentions, comments, post and other things in CharmVerse.'
+          label='Receive email updates on mentions, comments, post and other things.'
         />
         <FormControlLabel
           disabled={!!errors.email || email.length === 0}
