@@ -3,7 +3,6 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
-import { requireCustomPermissionMode } from 'lib/middleware/requireCustomPermissionMode';
 import type { SpaceDefaultPublicPageToggle } from 'lib/permissions/pages';
 import { toggleSpaceDefaultPublicPage } from 'lib/permissions/pages/actions/toggleSpaceDefaultPublicPage';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -11,15 +10,7 @@ import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler
-  .use(requireUser)
-  .use(
-    requireCustomPermissionMode({
-      keyLocation: 'query',
-      spaceIdKey: 'id'
-    })
-  )
-  .post(setSpaceDefaultPublicPage);
+handler.use(requireUser).post(setSpaceDefaultPublicPage);
 
 async function setSpaceDefaultPublicPage(req: NextApiRequest, res: NextApiResponse<Space>) {
   const { id: spaceId } = req.query;

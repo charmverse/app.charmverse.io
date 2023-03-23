@@ -3,7 +3,6 @@ import nc from 'next-connect';
 
 import log from 'lib/log';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
-import { requireCustomPermissionMode } from 'lib/middleware/requireCustomPermissionMode';
 import type { SpacePermissionFlags } from 'lib/permissions/spaces';
 import { removeSpaceOperations } from 'lib/permissions/spaces';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -11,15 +10,7 @@ import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler
-  .use(requireUser)
-  .use(
-    requireCustomPermissionMode({
-      keyLocation: 'query',
-      spaceIdKey: 'spaceId'
-    })
-  )
-  .post(removeSpacePermissionsController);
+handler.use(requireUser).post(removeSpacePermissionsController);
 
 async function removeSpacePermissionsController(req: NextApiRequest, res: NextApiResponse<SpacePermissionFlags>) {
   const { spaceId } = req.query;
