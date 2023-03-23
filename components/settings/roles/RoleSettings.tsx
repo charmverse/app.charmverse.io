@@ -2,7 +2,7 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import { Box, CircularProgress, Divider, Menu, Typography } from '@mui/material';
 import type { Space } from '@prisma/client';
 import { bindPopover, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
-import { useMemo, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 
 import Button from 'components/common/Button';
 import Modal from 'components/common/Modal';
@@ -21,7 +21,7 @@ import { RoleRow } from './components/RoleRow';
 import { useImportDiscordRoles } from './hooks/useImportDiscordRoles';
 
 export function RoleSettings({ space }: { space: Space }) {
-  const { assignRoles, deleteRole, refreshRoles, unassignRole, roles } = useRoles();
+  const { assignRoles, deleteRole, refreshRoles, roles } = useRoles();
   const isAdmin = useIsAdmin();
   const popupState = usePopupState({ variant: 'popover', popupId: 'add-a-role' });
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);

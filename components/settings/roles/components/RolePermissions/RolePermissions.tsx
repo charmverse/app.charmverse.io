@@ -9,7 +9,6 @@ import * as yup from 'yup';
 
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
-import Loader from 'components/common/Loader';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { usePreventReload } from 'hooks/usePreventReload';
@@ -50,15 +49,13 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
   const isAdmin = useIsAdmin();
   // custom onChange is used for switches so isDirty from useForm doesn't change it value
   const [touched, setTouched] = useState<boolean>(false);
-  const { handleSubmit, setValue, watch } = useForm<FormValues>({
+  const { handleSubmit, setValue } = useForm<FormValues>({
     mode: 'onChange',
     defaultValues: assignedPermissions ?? new AvailableSpacePermissions().empty,
     resolver: yupResolver(schema)
   });
 
   usePreventReload(touched);
-
-  const newValues = watch();
 
   useEffect(() => {
     if (space) {
@@ -77,12 +74,7 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
     });
     setAssignedPermissions(permissionFlags);
   }
-  const settingsChanged =
-    assignedPermissions !== null &&
-    (Object.entries(assignedPermissions) as [SpaceOperation, boolean][]).some(([operation, hasAccess]) => {
-      const newValue = newValues[operation];
-      return newValue !== hasAccess;
-    });
+
   async function submitted(formValues: FormValues) {
     // Make sure we have existing permission set to compare against
     if (assignedPermissions && space) {
@@ -128,14 +120,6 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
     }
   }
 
-  if (!assignedPermissions) {
-    return (
-      <Box sx={{ height: 100 }}>
-        <Loader size={20} sx={{ height: 600 }} />
-      </Box>
-    );
-  }
-
   return (
     <div data-test={`space-permissions-form-${targetGroup}`}>
       <form onSubmit={handleSubmit((formValue) => submitted(formValue))} style={{ margin: 'auto' }}>
@@ -147,7 +131,7 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
             <PermissionToggle
               data-test={`space-operation-${targetGroup}-createPage`}
               label='Create new pages'
-              defaultChecked={assignedPermissions.createPage}
+              defaultChecked={assignedPermissions?.createPage}
               disabled={!isAdmin}
               onChange={(ev) => {
                 const { checked: nowHasAccess } = ev.target;
@@ -162,7 +146,7 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
             <PermissionToggle
               data-test={`space-operation-${targetGroup}-createBounty`}
               label='Create new bounties'
-              defaultChecked={assignedPermissions.createBounty}
+              defaultChecked={assignedPermissions?.createBounty}
               disabled={!isAdmin}
               onChange={(ev) => {
                 const { checked: nowHasAccess } = ev.target;
@@ -177,7 +161,7 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
             <PermissionToggle
               data-test={`space-operation-${targetGroup}-reviewProposals`}
               label='Review proposals'
-              defaultChecked={assignedPermissions.reviewProposals}
+              defaultChecked={assignedPermissions?.reviewProposals}
               disabled={!isAdmin}
               onChange={(ev) => {
                 const { checked: nowHasAccess } = ev.target;
@@ -194,7 +178,7 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
                 <PermissionToggle
                   data-test={`space-operation-${targetGroup}-moderateForums`}
                   label='Moderate all forum categories'
-                  defaultChecked={assignedPermissions.moderateForums}
+                  defaultChecked={assignedPermissions?.moderateForums}
                   disabled={!isAdmin}
                   onChange={(ev) => {
                     const { checked: nowHasAccess } = ev.target;
@@ -210,7 +194,7 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
                 <Button
                   size='small'
                   data-test='submit-space-permission-settings'
-                  disabled={!settingsChanged}
+                  disabled={!touched}
                   type='submit'
                   variant='contained'
                   color='primary'
@@ -228,7 +212,7 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
 
 function PermissionToggle(props: {
   label: string;
-  defaultChecked: boolean;
+  defaultChecked?: boolean;
   disabled: boolean;
   disabledTooltip?: string;
   ['data-test']?: string;
@@ -242,14 +226,19 @@ function PermissionToggle(props: {
         margin: 0
       }}
       control={
-        <Tooltip title={props.disabledTooltip || ''}>
-          <Switch
-            data-test={props['data-test']}
-            disabled={props.disabled}
-            defaultChecked={props.defaultChecked}
-            onChange={props.onChange}
-          />
-        </Tooltip>
+        typeof props.defaultChecked === 'boolean' ? (
+          <Tooltip title={props.disabledTooltip || ''}>
+            <Switch
+              data-test={props['data-test']}
+              disabled={props.disabled}
+              defaultChecked={props.defaultChecked}
+              onChange={props.onChange}
+            />
+          </Tooltip>
+        ) : (
+          // placeholder element while loading
+          <Switch sx={{ visibility: 'hidden' }} disabled={true} />
+        )
       }
       label={props.label}
       labelPlacement='start'

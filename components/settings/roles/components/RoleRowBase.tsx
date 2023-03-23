@@ -88,14 +88,12 @@ export function RoleRowBase({
             </TabPanel>
             <TabPanel value={value} index={1}>
               {description && (
-                <>
-                  <Box mb={2} display='flex' gap={1} alignItems='center'>
-                    <LockIcon />
-                    <Typography variant='caption'>{description}</Typography>
-                  </Box>
-                  <Divider sx={{ mb: 2 }} />
-                </>
+                <Box mb={2} display='flex' gap={1} alignItems='center'>
+                  <LockIcon />
+                  <Typography variant='caption'>{description}</Typography>
+                </Box>
               )}
+              {description && permissions && <Divider sx={{ mb: 2 }} />}
               {permissions}
             </TabPanel>
           </AccordionDetails>

@@ -1,5 +1,3 @@
-import { Divider } from '@mui/material';
-
 import { useMembers } from 'hooks/useMembers';
 
 import { RolePermissions } from './RolePermissions/RolePermissions';
