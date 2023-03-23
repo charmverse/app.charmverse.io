@@ -25,10 +25,7 @@ async function getMembers(req: NextApiRequest, res: NextApiResponse<Member[]>) {
   if (error) {
     const spaceRoles = await prisma.spaceRole.findMany({
       where: {
-        spaceId,
-        user: {
-          isBot: false
-        }
+        spaceId
       },
       select: {
         user: {
