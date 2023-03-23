@@ -22,7 +22,6 @@ type RoleRowProps = {
   role: ListSpaceRolesResponse;
   assignRoles: (roleId: string, userIds: string[]) => void;
   deleteRole: (roleId: string) => void;
-  unassignRole: (roleId: string, userId: string) => void;
   refreshRoles: () => void;
 };
 
@@ -42,7 +41,7 @@ const syncedRoleProps = {
   }
 };
 
-export function RoleRow({ readOnly, role, assignRoles, unassignRole, deleteRole, refreshRoles }: RoleRowProps) {
+export function RoleRow({ readOnly, role, assignRoles, deleteRole, refreshRoles }: RoleRowProps) {
   const menuState = usePopupState({ variant: 'popover', popupId: `role-${role.id}` });
   const userPopupState = usePopupState({ variant: 'popover', popupId: `role-${role.id}-users` });
   const rolePermissionsPopupState = usePopupState({ variant: 'popover', popupId: `role-permissions-${role.id}` });
@@ -66,20 +65,14 @@ export function RoleRow({ readOnly, role, assignRoles, unassignRole, deleteRole,
   }
 
   const assignedMembers = members.filter((member) => member.roles.some((r) => r.id === role.id));
-  // role.spaceRolesToRole.map((r) => r.spaceRole.user);
 
-  let assignedMemberIds = assignedMembers.map((m) => m.id);
-
-  function removeMember(userId: string) {
-    unassignRole(role.id, userId);
-    assignedMemberIds = assignedMemberIds.filter((id) => id !== userId);
-  }
+  const assignedMemberIds = assignedMembers.map((m) => m.id);
 
   return (
     <RoleRowBase
       members={assignedMembers}
-      removeMember={removeMember}
       readOnlyMembers={!!role.source}
+      memberRoleId={role.id}
       title={role.name}
       {...((role.source && syncedRoleProps[role.source]) || {})}
       permissions={

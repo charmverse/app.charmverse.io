@@ -1,5 +1,4 @@
 import styled from '@emotion/styled';
-import DoneIcon from '@mui/icons-material/Done';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import LockIcon from '@mui/icons-material/LockOutlined';
 import {
@@ -19,17 +18,17 @@ import type { ReactNode } from 'react';
 
 import type { Member } from 'lib/members/interfaces';
 
-import { UserRow } from './UserRow';
+import { MemberRow } from './MemberRow';
 
 type RoleRowProps = {
   readOnlyMembers?: boolean;
   title: string;
   description?: string | ReactNode;
   members: Member[];
-  removeMember: (userId: string) => void;
   addMemberButton?: ReactNode;
   permissions?: ReactNode;
   roleActions?: ReactNode;
+  memberRoleId?: string;
 };
 
 const ScrollableBox = styled.div<{ rows: number }>`
@@ -41,10 +40,10 @@ const ScrollableBox = styled.div<{ rows: number }>`
 export function RoleRowBase({
   description,
   roleActions,
+  memberRoleId,
   readOnlyMembers,
   title,
   permissions,
-  removeMember,
   addMemberButton,
   members
 }: RoleRowProps) {
@@ -86,7 +85,7 @@ export function RoleRowBase({
             <TabPanel value={value} index={1}>
               <ScrollableBox rows={members.length}>
                 {members.map((member) => (
-                  <UserRow key={member.id} member={member} readOnly={readOnlyMembers} onRemove={removeMember} />
+                  <MemberRow key={member.id} member={member} readOnly={!!readOnlyMembers} memberRoleId={memberRoleId} />
                 ))}
               </ScrollableBox>
               {members.length === 0 && (

@@ -7,7 +7,7 @@ import { RolePermissions } from './RolePermissions/RolePermissions';
 import { RoleRowBase } from './RoleRowBase';
 
 export function MemberRoleRow({ readOnly, spaceId }: { readOnly: boolean; spaceId: string }) {
-  const { members, removeGuest } = useMembers();
+  const { members } = useMembers();
 
   return (
     <RoleRowBase
@@ -20,8 +20,7 @@ export function MemberRoleRow({ readOnly, spaceId }: { readOnly: boolean; spaceI
         </>
       }
       readOnlyMembers={readOnly}
-      members={members.filter((member) => !member.isAdmin && !member.isGuest)}
-      removeMember={removeGuest}
+      members={members.filter((member) => !member.isBot && !member.isAdmin && !member.isGuest)}
       permissions={
         <>
           <DefaultPagePermissions />

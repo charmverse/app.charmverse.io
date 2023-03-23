@@ -3,7 +3,7 @@ import { useMembers } from 'hooks/useMembers';
 import { RoleRowBase } from './RoleRowBase';
 
 export function AdminRoleRow({ readOnly }: { readOnly: boolean }) {
-  const { members, removeGuest } = useMembers();
+  const { members } = useMembers();
 
   return (
     <RoleRowBase
@@ -17,7 +17,6 @@ export function AdminRoleRow({ readOnly }: { readOnly: boolean }) {
       }
       readOnlyMembers={readOnly}
       members={members.filter((member) => member.isAdmin)}
-      removeMember={removeGuest}
     />
   );
 }
