@@ -1,6 +1,7 @@
 import { prisma } from 'db';
 import type { BountyWithDetails } from 'lib/bounties';
-import { accessiblePagesByPermissionsQuery, includePagePermissions } from 'lib/pages/server';
+import { includePagePermissions } from 'lib/pages/server';
+import { accessiblePagesByPermissionsQuery } from 'lib/permissions/pages/accessiblePagesByPermissionsQuery';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 
 import type { AvailableResourcesRequest } from '../permissions/interfaces';
