@@ -1,9 +1,5 @@
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import { Box, Menu, MenuItem } from '@mui/material';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Grid from '@mui/material/Grid';
-import Switch from '@mui/material/Switch';
-import Typography from '@mui/material/Typography';
+import { Box, FormControlLabel, Grid, Switch, Typography, Menu, MenuItem } from '@mui/material';
 import type { PagePermissionLevel } from '@prisma/client';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import { useState } from 'react';
@@ -93,9 +89,9 @@ export default function DefaultSpacePagePermissions() {
         </Typography>
       </Grid>
       <Grid item container xs>
-        <Grid item xs={6}>
+        <Grid item xs={8}>
           <Box display='flex' alignItems='center' justifyContent='space-between'>
-            <Typography>Access to Members</Typography>
+            <Typography>Default access to Members</Typography>
             <Button
               color='secondary'
               variant='outlined'
@@ -137,7 +133,7 @@ export default function DefaultSpacePagePermissions() {
       </Grid>
 
       <Grid container item xs>
-        <Grid item xs={6}>
+        <Grid item xs={8}>
           <FormControlLabel
             sx={{
               margin: 0,
@@ -161,7 +157,7 @@ export default function DefaultSpacePagePermissions() {
         </Grid>
       </Grid>
 
-      {/* {isAdmin && (
+      {isAdmin && (
         <Grid item xs>
           <Button
             onClick={() => updateSpaceDefaults()}
@@ -169,12 +165,12 @@ export default function DefaultSpacePagePermissions() {
             type='submit'
             variant='contained'
             color='primary'
-            sx={{ mr: 1 }}
+            size='small'
           >
             Save
           </Button>
         </Grid>
-      )} */}
+      )}
     </Grid>
   );
 }

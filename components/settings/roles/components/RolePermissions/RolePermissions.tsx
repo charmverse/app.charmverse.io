@@ -159,7 +159,7 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
     <div data-test={`space-permissions-form-${targetGroup}`}>
       <form onSubmit={handleSubmit((formValue) => submitted(formValue))} style={{ margin: 'auto' }}>
         <Grid container gap={2}>
-          <Grid item xs={6}>
+          <Grid item xs={8}>
             {assignableOperations.map((operation) => {
               const userCanPerformAction = assignedPermissions[operation];
               const actionLabel = spaceOperationLabels[operation];
@@ -170,7 +170,8 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
                   sx={{
                     display: 'flex',
                     justifyContent: 'space-between',
-                    margin: 0
+                    margin: 0,
+                    borderBottom: '1px solid var(--input-border)'
                   }}
                   control={
                     <Switch
@@ -193,12 +194,12 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
             {isAdmin && (
               <Box mt={2}>
                 <Button
+                  size='small'
                   data-test='submit-space-permission-settings'
                   disabled={!settingsChanged}
                   type='submit'
                   variant='contained'
                   color='primary'
-                  sx={{ mr: 1 }}
                 >
                   Save
                 </Button>
