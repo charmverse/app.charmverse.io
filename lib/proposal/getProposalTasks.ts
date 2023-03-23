@@ -1,8 +1,17 @@
 import type { ProposalStatus, WorkspaceEvent } from '@prisma/client';
 
 import { prisma } from 'db';
+import type {
+  Discussion,
+  GetDiscussionsResponse,
+  ProposalDiscussionNotificationsContext
+} from 'lib/discussion/getDiscussionTasks';
+import { getPropertiesFromPage } from 'lib/discussion/getPropertiesFromPage';
+import { extractMentions } from 'lib/prosemirror/extractMentions';
+import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import { getProposalAction } from './getProposalAction';
+import type { ProposalWithCommentsAndUsers } from './interface';
 
 export type ProposalTaskAction = 'start_discussion' | 'start_vote' | 'review' | 'discuss' | 'vote' | 'start_review';
 
@@ -163,4 +172,90 @@ export async function getProposalTasks(userId: string): Promise<{
   sortProposals(proposalsRecord.unmarked);
 
   return proposalsRecord;
+}
+
+export function getProposalComments({
+  proposals,
+  userId,
+  spaceRecord
+}: ProposalDiscussionNotificationsContext): GetDiscussionsResponse {
+  const proposalRecord = proposals.reduce<Record<string, ProposalWithCommentsAndUsers>>((acc, proposal) => {
+    acc[proposal.id] = proposal;
+    return acc;
+  }, {});
+  const allComments = proposals.flatMap((proposal) => proposal.page.comments);
+
+  const commentIdsFromUser = allComments.filter((comment) => comment.createdBy === userId).map((comment) => comment.id);
+  const commentsFromOthers = allComments.filter((comment) => comment.createdBy !== userId);
+
+  // Comments that are not created by the user but are on a proposal page created by the user
+  const commentsOnTheUserPage = proposals
+    .filter((proposal) => proposal.createdBy === userId)
+    .flatMap((proposal) => proposal.page.comments)
+    // only top-level comments
+    .filter((comment) => comment.createdBy !== userId && !comment.parentId);
+
+  const repliesToUserComments = commentsFromOthers.filter((comment) =>
+    commentIdsFromUser.includes(comment.parentId ?? '')
+  );
+
+  const commentReplies = [...commentsOnTheUserPage, ...repliesToUserComments];
+
+  const commentTasks = commentReplies.map((comment) => {
+    return {
+      ...getPropertiesFromPage(
+        proposalRecord[comment.pageId].page,
+        spaceRecord[proposalRecord[comment.pageId].page.spaceId]
+      ),
+      createdAt: new Date(comment.createdAt).toISOString(),
+      userId: comment.createdBy,
+      text: comment.contentText,
+      commentId: comment.id,
+      mentionId: null
+    } as Discussion;
+  });
+
+  return {
+    mentions: [],
+    discussionUserIds: commentTasks.map((comm) => comm.userId).concat([userId]),
+    comments: commentTasks
+  };
+}
+
+export function getProposalCommentMentions({
+  userId,
+  username,
+  spaceRecord,
+  proposals
+}: ProposalDiscussionNotificationsContext): GetDiscussionsResponse {
+  const mentions: Discussion[] = [];
+  const discussionUserIds: string[] = [];
+
+  for (const proposal of proposals) {
+    for (const comment of proposal.page.comments) {
+      const content = comment.content as PageContent;
+      if (content) {
+        const extractedMentions = extractMentions(content, username);
+        extractedMentions.forEach((mention) => {
+          if (mention.value === userId && mention.createdBy !== userId && comment.createdBy !== userId) {
+            discussionUserIds.push(mention.createdBy);
+            mentions.push({
+              ...getPropertiesFromPage(proposal.page, spaceRecord[proposal.spaceId]),
+              mentionId: mention.id,
+              createdAt: mention.createdAt,
+              userId: mention.createdBy,
+              text: mention.text,
+              commentId: comment.id
+            });
+          }
+        });
+      }
+    }
+  }
+
+  return {
+    comments: [],
+    mentions,
+    discussionUserIds
+  };
 }
