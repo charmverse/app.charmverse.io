@@ -98,7 +98,6 @@ function selectPageFields(meta: boolean) {
 
 type AvailableRole = { id: string; spaceRolesToRole: SpaceRoleToRole[] };
 
-// Assumes the user is a space member - External caller should check the user is a space member and null out userId if not
 function isAccessible({
   page,
   availableRoles,
