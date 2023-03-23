@@ -1,5 +1,5 @@
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import { Menu, MenuItem } from '@mui/material';
+import { Box, Menu, MenuItem } from '@mui/material';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Grid from '@mui/material/Grid';
 import Switch from '@mui/material/Switch';
@@ -94,16 +94,19 @@ export default function DefaultSpacePagePermissions() {
       </Grid>
       <Grid item container xs>
         <Grid item xs={6}>
-          <Button
-            color='secondary'
-            variant='outlined'
-            disabled={isUpdatingPagePermission || !isAdmin}
-            loading={isUpdatingPagePermission}
-            endIcon={!isUpdatingPagePermission && <KeyboardArrowDownIcon fontSize='small' />}
-            {...bindTrigger(popupState)}
-          >
-            {permissionLevels[selectedPagePermission]}
-          </Button>
+          <Box display='flex' alignItems='center' justifyContent='space-between'>
+            <Typography>Access to Members</Typography>
+            <Button
+              color='secondary'
+              variant='outlined'
+              disabled={isUpdatingPagePermission || !isAdmin}
+              loading={isUpdatingPagePermission}
+              endIcon={!isUpdatingPagePermission && <KeyboardArrowDownIcon fontSize='small' />}
+              {...bindTrigger(popupState)}
+            >
+              {permissionLevels[selectedPagePermission]}
+            </Button>
+          </Box>
           <Menu
             {...bindMenu(popupState)}
             PaperProps={{
@@ -131,19 +134,16 @@ export default function DefaultSpacePagePermissions() {
             })}
           </Menu>
         </Grid>
-        <Grid item xs={6}>
-          <Typography
-            variant='body2'
-            sx={{ height: '100%', justifyContent: 'center', display: 'flex', flexDirection: 'column' }}
-          >
-            {pagePermissionDescriptions[selectedPagePermission]}
-          </Typography>
-        </Grid>
       </Grid>
 
       <Grid container item xs>
         <Grid item xs={6}>
           <FormControlLabel
+            sx={{
+              margin: 0,
+              display: 'flex',
+              justifyContent: 'space-between'
+            }}
             control={
               <Switch
                 disabled={!isAdmin}
@@ -156,16 +156,8 @@ export default function DefaultSpacePagePermissions() {
               />
             }
             label='Accessible to public'
+            labelPlacement='start'
           />
-        </Grid>
-        <Grid item xs={6}>
-          <Typography
-            sx={{ height: '100%', justifyContent: 'center', display: 'flex', flexDirection: 'column' }}
-            variant='body2'
-          >
-            {defaultPublicPages === true && 'New top-level pages will be viewable by the public.'}
-            {defaultPublicPages === false && 'New top-level pages can only be seen by space members.'}
-          </Typography>
         </Grid>
       </Grid>
 
