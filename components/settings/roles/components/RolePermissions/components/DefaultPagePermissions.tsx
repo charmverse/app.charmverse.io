@@ -1,5 +1,5 @@
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import { Box, FormControlLabel, Grid, Switch, Typography, Menu, MenuItem } from '@mui/material';
+import { Box, Divider, FormControlLabel, Grid, Switch, Typography, Menu, MenuItem } from '@mui/material';
 import type { PagePermissionLevel } from '@prisma/client';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import { useState } from 'react';
@@ -80,17 +80,16 @@ export default function DefaultSpacePagePermissions() {
 
   return (
     <Grid container direction='column' gap={2}>
-      <Grid item xs>
-        <Typography variant='body2' fontWeight='bold'>
-          New page permissions
-        </Typography>
-        <Typography variant='caption'>
-          These apply only to new top-level pages. You can still control access to each page individually.
-        </Typography>
-      </Grid>
       <Grid item container xs>
-        <Grid item xs={8}>
-          <Box display='flex' alignItems='center' justifyContent='space-between'>
+        <Grid item xs={12} md={8}>
+          <Divider sx={{ mb: 2, mt: 0 }} />
+          <Typography variant='body2' fontWeight='bold'>
+            New page permissions
+          </Typography>
+          <Typography variant='caption'>
+            These apply only to new top-level pages. You can still control access to each page individually.
+          </Typography>
+          <Box display='flex' alignItems='center' justifyContent='space-between' mt={2}>
             <Typography>Default access to Members</Typography>
             <Button
               color='secondary'
@@ -133,7 +132,7 @@ export default function DefaultSpacePagePermissions() {
       </Grid>
 
       <Grid container item xs>
-        <Grid item xs={8}>
+        <Grid item xs={12} md={8}>
           <FormControlLabel
             sx={{
               margin: 0,
@@ -154,6 +153,7 @@ export default function DefaultSpacePagePermissions() {
             label='Accessible to public'
             labelPlacement='start'
           />
+          <Divider sx={{ my: 2 }} />
         </Grid>
       </Grid>
 

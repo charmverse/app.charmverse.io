@@ -159,7 +159,7 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
     <div data-test={`space-permissions-form-${targetGroup}`}>
       <form onSubmit={handleSubmit((formValue) => submitted(formValue))} style={{ margin: 'auto' }}>
         <Grid container gap={2}>
-          <Grid item xs={8}>
+          <Grid item xs={12} md={8}>
             {assignableOperations.map((operation) => {
               const userCanPerformAction = assignedPermissions[operation];
               const actionLabel = spaceOperationLabels[operation];
