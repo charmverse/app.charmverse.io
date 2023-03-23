@@ -70,19 +70,10 @@ export function RoleRowBase({
           </AccordionSummary>
           <AccordionDetails sx={{ py: 0 }}>
             <Tabs value={value} onChange={handleChange}>
-              <Tab label='Permissions' />
               <Tab label='Users' />
+              <Tab label='Permissions' />
             </Tabs>
             <TabPanel value={value} index={0}>
-              {description && (
-                <Box mb={2} display='flex' gap={1} alignItems='center'>
-                  <LockIcon />
-                  <Typography variant='caption'>{description}</Typography>
-                </Box>
-              )}
-              {permissions}
-            </TabPanel>
-            <TabPanel value={value} index={1}>
               <ScrollableBox rows={members.length}>
                 {members.map((member) => (
                   <MemberRow key={member.id} member={member} readOnly={!!readOnlyMembers} memberRoleId={memberRoleId} />
@@ -94,6 +85,15 @@ export function RoleRowBase({
                 </Typography>
               )}
               {addMemberButton}
+            </TabPanel>
+            <TabPanel value={value} index={1}>
+              {description && (
+                <Box mb={2} display='flex' gap={1} alignItems='center'>
+                  <LockIcon />
+                  <Typography variant='caption'>{description}</Typography>
+                </Box>
+              )}
+              {permissions}
             </TabPanel>
           </AccordionDetails>
         </Accordion>

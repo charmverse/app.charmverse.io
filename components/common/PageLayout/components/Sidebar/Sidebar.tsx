@@ -191,7 +191,7 @@ export default function Sidebar({ closeSidebar, favorites, navAction }: SidebarP
         <WorkspaceLabel>
           <SectionName>SPACE</SectionName>
           {/** Test component */}
-          {userSpacePermissions?.createPage && (
+          {userSpacePermissions?.createPage && showMemberFeatures && (
             <div className='add-a-page'>
               <NewPageMenu tooltip='Add a page' addPage={addPage} />
             </div>

@@ -1,5 +1,5 @@
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import { Box, Divider, FormControlLabel, Grid, Switch, Typography, Menu, MenuItem } from '@mui/material';
+import { Box, FormControlLabel, Grid, Switch, Typography, Menu, MenuItem } from '@mui/material';
 import type { PagePermissionLevel } from '@prisma/client';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import { useState } from 'react';
@@ -22,7 +22,7 @@ const pagePermissionDescriptions: Record<PagePermissionLevelWithoutCustomAndProp
   view: 'Space members can only view pages.'
 };
 
-export default function DefaultSpacePagePermissions() {
+export function DefaultPagePermissions() {
   const space = useCurrentSpace();
   const { setSpace } = useSpaces();
 
@@ -79,96 +79,85 @@ export default function DefaultSpacePagePermissions() {
   }
 
   return (
-    <Grid container direction='column' gap={2}>
-      <Grid item container xs>
-        <Grid item xs={12} md={8}>
-          <Divider sx={{ mb: 2, mt: 0 }} />
-          <Typography variant='body2' fontWeight='bold'>
-            New page permissions
-          </Typography>
-          <Typography variant='caption'>
-            These apply only to new top-level pages. You can still control access to each page individually.
-          </Typography>
-          <Box display='flex' alignItems='center' justifyContent='space-between' mt={2}>
-            <Typography>Default access to Members</Typography>
-            <Button
-              color='secondary'
-              variant='outlined'
-              disabled={isUpdatingPagePermission || !isAdmin}
-              loading={isUpdatingPagePermission}
-              endIcon={!isUpdatingPagePermission && <KeyboardArrowDownIcon fontSize='small' />}
-              {...bindTrigger(popupState)}
-            >
-              {permissionLevels[selectedPagePermission]}
-            </Button>
-          </Box>
-          <Menu
-            {...bindMenu(popupState)}
-            PaperProps={{
-              sx: { width: 300 }
+    <>
+      <Box mb={2}>
+        <Typography fontWeight='bold'>New page permissions</Typography>
+        <Typography variant='caption'>
+          These apply only to new top-level pages. You can still control access to each page individually.
+        </Typography>
+      </Box>
+      <Box mb={2} display='flex' alignItems='center' justifyContent='space-between'>
+        <Typography>Default access level for Members</Typography>
+        <Button
+          color='secondary'
+          variant='outlined'
+          disabled={isUpdatingPagePermission || !isAdmin}
+          loading={isUpdatingPagePermission}
+          endIcon={!isUpdatingPagePermission && <KeyboardArrowDownIcon fontSize='small' />}
+          {...bindTrigger(popupState)}
+        >
+          {permissionLevels[selectedPagePermission]}
+        </Button>
+      </Box>
+      <FormControlLabel
+        sx={{
+          margin: 0,
+          display: 'flex',
+          justifyContent: 'space-between'
+        }}
+        control={
+          <Switch
+            disabled={!isAdmin}
+            onChange={(ev) => {
+              const { checked: publiclyAccessible } = ev.target;
+              setDefaultPublicPages(publiclyAccessible);
+              setTouched(true);
             }}
-          >
-            {typedKeys(pagePermissionDescriptions).map((permissionLevel) => {
-              const permissionLevelLabel = permissionLevels[permissionLevel];
-              const isSelected = selectedPagePermission === permissionLevel;
-              const description = pagePermissionDescriptions[permissionLevel];
-
-              return (
-                <MenuItem
-                  key={permissionLevel}
-                  selected={isSelected}
-                  onClick={() => {
-                    setSelectedPagePermission(permissionLevel);
-                    popupState.close();
-                    setTouched(true);
-                  }}
-                >
-                  <StyledListItemText primary={permissionLevelLabel} secondary={description} />
-                </MenuItem>
-              );
-            })}
-          </Menu>
-        </Grid>
-      </Grid>
-
-      <Grid container item xs>
-        <Grid item xs={12} md={8}>
-          <FormControlLabel
-            sx={{
-              margin: 0,
-              display: 'flex',
-              justifyContent: 'space-between'
-            }}
-            control={
-              <Switch
-                disabled={!isAdmin}
-                onChange={(ev) => {
-                  const { checked: publiclyAccessible } = ev.target;
-                  setDefaultPublicPages(publiclyAccessible);
-                  setTouched(true);
-                }}
-                defaultChecked={defaultPublicPages}
-              />
-            }
-            label='Accessible to public'
-            labelPlacement='start'
+            defaultChecked={defaultPublicPages}
           />
-          {isAdmin && (
-            <Button
-              onClick={() => updateSpaceDefaults()}
-              disabled={!settingsChanged || isUpdatingPagePermission}
-              type='submit'
-              variant='contained'
-              color='primary'
-              size='small'
-              sx={{ mt: 2 }}
+        }
+        label='Accessible to public'
+        labelPlacement='start'
+      />
+      {isAdmin && (
+        <Button
+          onClick={() => updateSpaceDefaults()}
+          disabled={!settingsChanged || isUpdatingPagePermission}
+          type='submit'
+          variant='contained'
+          color='primary'
+          size='small'
+          sx={{ mt: 2 }}
+        >
+          Save
+        </Button>
+      )}
+      <Menu
+        {...bindMenu(popupState)}
+        PaperProps={{
+          sx: { width: 300 }
+        }}
+      >
+        {typedKeys(pagePermissionDescriptions).map((permissionLevel) => {
+          const permissionLevelLabel = permissionLevels[permissionLevel];
+          const isSelected = selectedPagePermission === permissionLevel;
+          const description = pagePermissionDescriptions[permissionLevel];
+
+          return (
+            <MenuItem
+              key={permissionLevel}
+              selected={isSelected}
+              onClick={() => {
+                setSelectedPagePermission(permissionLevel);
+                popupState.close();
+                setTouched(true);
+              }}
             >
-              Save
-            </Button>
-          )}
-          <Divider sx={{ my: 2 }} />
-        </Grid>
-      </Grid>
-    </Grid>
+              <StyledListItemText primary={permissionLevelLabel} secondary={description} />
+            </MenuItem>
+          );
+        })}
+      </Menu>
+    </>
   );
 }

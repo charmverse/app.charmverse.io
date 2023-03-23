@@ -2,7 +2,6 @@ import { Divider } from '@mui/material';
 
 import { useMembers } from 'hooks/useMembers';
 
-import DefaultPagePermissions from './RolePermissions/components/DefaultPagePermissions';
 import { RolePermissions } from './RolePermissions/RolePermissions';
 import { RoleRowBase } from './RoleRowBase';
 
@@ -21,12 +20,7 @@ export function MemberRoleRow({ readOnly, spaceId }: { readOnly: boolean; spaceI
       }
       readOnlyMembers={readOnly}
       members={members.filter((member) => !member.isBot && !member.isAdmin && !member.isGuest)}
-      permissions={
-        <>
-          <DefaultPagePermissions />
-          <RolePermissions targetGroup='space' id={spaceId} />
-        </>
-      }
+      permissions={<RolePermissions targetGroup='space' id={spaceId} />}
     />
   );
 }

@@ -26,11 +26,6 @@ type RoleRowProps = {
 };
 
 const syncedRoleProps = {
-  /* <GuildXYZIcon
-      style={{
-        transform: 'scale(0.75)'
-      }}
-    /> */
   guild_xyz: {
     descriptionIcon: <GuildXYZIcon />,
     description: <>This role is managed by Guild XYZ. Visit https://guild.xyz/ to modify this role</>

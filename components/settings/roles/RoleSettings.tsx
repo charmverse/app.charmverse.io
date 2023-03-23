@@ -1,6 +1,5 @@
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import { CircularProgress, Menu, Typography } from '@mui/material';
-import Box from '@mui/material/Box';
+import { Box, CircularProgress, Divider, Menu, Typography } from '@mui/material';
 import type { Space } from '@prisma/client';
 import { bindPopover, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import { useMemo, useRef, useState } from 'react';
@@ -10,7 +9,6 @@ import Modal from 'components/common/Modal';
 import Legend from 'components/settings/Legend';
 import ImportGuildRolesMenuItem from 'components/settings/roles/components/ImportGuildRolesMenuItem';
 import { useIsAdmin } from 'hooks/useIsAdmin';
-import { useMembers } from 'hooks/useMembers';
 import { useRoles } from 'hooks/useRoles';
 
 import { AdminRoleRow } from './components/AdminRoleRow';
@@ -18,7 +16,7 @@ import { GuestRoleRow } from './components/GuestRoleRow';
 import ImportDiscordRolesMenuItem from './components/ImportDiscordRolesMenuItem';
 import { MemberRoleRow } from './components/MemberRoleRow';
 import RoleForm from './components/RoleForm';
-import DefaultPagePermissions from './components/RolePermissions/components/DefaultPagePermissions';
+import { DefaultPagePermissions } from './components/RolePermissions/components/DefaultPagePermissions';
 import { RoleRow } from './components/RoleRow';
 import { useImportDiscordRoles } from './hooks/useImportDiscordRoles';
 
@@ -39,7 +37,8 @@ export function RoleSettings({ space }: { space: Space }) {
   return (
     <>
       <Legend sx={{ display: 'flex', justifyContent: 'space-between' }}>Roles & Permissions</Legend>
-
+      <DefaultPagePermissions />
+      <Divider sx={{ my: 2 }} />
       <Legend noBorder display='flex' justifyContent='space-between' mt={4} mb={0}>
         Roles
         {isAdmin && (
