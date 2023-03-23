@@ -245,7 +245,7 @@ function PermissionToggle(props: {
           <Tooltip title={props.memberChecked ? 'This permission is inherited from the Member role' : ''}>
             <span>
               <Switch
-                key={`${label}-${defaultChecked}`}
+                key={`${props.label}-${defaultChecked}`}
                 data-test={props['data-test']}
                 disabled={disabled}
                 defaultChecked={defaultChecked}
