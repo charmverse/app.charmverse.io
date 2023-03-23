@@ -8,14 +8,18 @@ import { iconForPropertyType } from '../components/viewHeader/viewHeaderProperti
 
 import { propertyTypesList, typeDisplayName } from './propertyMenu';
 
-export function PropertyTypes({ onClick }: { onClick: (type: PropertyType) => void }) {
+export function PropertyTypes({ onClick, isMobile }: { onClick: (type: PropertyType) => void; isMobile?: boolean }) {
   const intl = useIntl();
   return (
-    <Stack gap={0.5}>
-      <Typography px={1} color='secondary' variant='subtitle1'>
-        Select property type
-      </Typography>
-      <Divider />
+    <Stack gap={isMobile ? 0 : 0.5}>
+      {!isMobile && (
+        <>
+          <Typography px={1} color='secondary' variant='subtitle1'>
+            Select property type
+          </Typography>
+          <Divider />
+        </>
+      )}
       {propertyTypesList.map((type) => (
         <MenuItem onClick={() => onClick(type)} key={type}>
           <ListItemIcon>{iconForPropertyType(type)}</ListItemIcon>
