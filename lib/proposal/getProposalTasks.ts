@@ -211,7 +211,8 @@ export function getProposalComments({
       userId: comment.createdBy,
       text: comment.contentText,
       commentId: comment.id,
-      mentionId: null
+      mentionId: null,
+      type: 'proposal'
     } as Discussion;
   });
 
@@ -245,7 +246,8 @@ export function getProposalCommentMentions({
               createdAt: mention.createdAt,
               userId: mention.createdBy,
               text: mention.text,
-              commentId: comment.id
+              commentId: comment.id,
+              type: 'proposal'
             });
           }
         });

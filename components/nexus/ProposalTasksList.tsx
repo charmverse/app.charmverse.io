@@ -20,6 +20,7 @@ import type { GetTasksResponse } from 'pages/api/tasks/list';
 
 import { EmptyTaskState } from './components/EmptyTaskState';
 import Table from './components/NexusTable';
+import DiscussionTasksList from './DiscussionTasksList';
 
 const ProposalActionRecord: Record<ProposalTaskAction, string> = {
   discuss: 'Discuss',
@@ -171,6 +172,11 @@ export default function ProposalTasksList({
           ))}
         </TableBody>
       </Table>
+
+      <Box my={3}>
+        <Typography fontWeight='bold'>Proposal discussions</Typography>
+        <DiscussionTasksList error={error} mutateTasks={mutateTasks} tasks={tasks} includedDiscussions={['proposal']} />
+      </Box>
     </Box>
   );
 }
