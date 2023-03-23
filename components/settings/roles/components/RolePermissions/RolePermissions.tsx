@@ -1,16 +1,14 @@
 import { yupResolver } from '@hookform/resolvers/yup';
-import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Grid from '@mui/material/Grid';
-import Switch from '@mui/material/Switch';
-import type { SpaceOperation } from '@prisma/client';
+import { Box, Divider, FormControlLabel, Grid, Switch, Tooltip, Typography } from '@mui/material';
+import { SpaceOperation } from '@prisma/client';
+import type { ChangeEvent } from 'react';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import type { BooleanSchema } from 'yup';
 import * as yup from 'yup';
 
 import charmClient from 'charmClient';
+import Button from 'components/common/Button';
 import Loader from 'components/common/Loader';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
@@ -18,22 +16,12 @@ import { usePreventReload } from 'hooks/usePreventReload';
 import type { AssignablePermissionGroups } from 'lib/permissions/interfaces';
 import type { SpacePermissionFlags } from 'lib/permissions/spaces/client';
 import { AvailableSpacePermissions } from 'lib/permissions/spaces/client';
-import { typedKeys } from 'lib/utilities/objects';
 
-const spaceOperationLabels: Record<Exclude<SpaceOperation, 'createVote'>, string> = {
-  createPage: 'Create new pages',
-  createBounty: 'Create new bounties',
-  createForumCategory: 'Create new forum categories',
-  moderateForums: 'Moderate all forum categories',
-  reviewProposals: 'Review proposals'
-};
+const spaceOperations = Object.keys(SpaceOperation).filter(
+  (op) => op !== 'createVote' && op !== 'createForumCategory'
+) as Exclude<SpaceOperation, 'createVote' | 'createForumCategory'>[];
 
-// We don't want to have explicit support for forum categories in space permissions config yet
-const spaceOperationsWithoutForumCategory = typedKeys(spaceOperationLabels).filter(
-  (key) => key !== 'createForumCategory'
-);
-
-const fields: Record<SpaceOperation, BooleanSchema> = spaceOperationsWithoutForumCategory.reduce(
+const fields: Record<SpaceOperation, BooleanSchema> = spaceOperations.reduce(
   (_schema: Record<SpaceOperation, BooleanSchema>, op) => {
     _schema[op] = yup.boolean();
     return _schema;
@@ -84,7 +72,7 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
       id,
       resourceId: space?.id as string
     });
-    spaceOperationsWithoutForumCategory.forEach((op) => {
+    spaceOperations.forEach((op) => {
       setValue(op, permissionFlags[op]);
     });
     setAssignedPermissions(permissionFlags);
@@ -95,13 +83,6 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
       const newValue = newValues[operation];
       return newValue !== hasAccess;
     });
-
-  // We don't want to show the forum category moderate permission in context of the entire space
-  const assignableOperations =
-    targetGroup === 'space'
-      ? spaceOperationsWithoutForumCategory.filter((op) => op !== 'moderateForums')
-      : spaceOperationsWithoutForumCategory;
-
   async function submitted(formValues: FormValues) {
     // Make sure we have existing permission set to compare against
     if (assignedPermissions && space) {
@@ -159,37 +140,70 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
     <div data-test={`space-permissions-form-${targetGroup}`}>
       <form onSubmit={handleSubmit((formValue) => submitted(formValue))} style={{ margin: 'auto' }}>
         <Grid container gap={2}>
-          <Grid item xs={12} md={8}>
-            {assignableOperations.map((operation) => {
-              const userCanPerformAction = assignedPermissions[operation];
-              const actionLabel = spaceOperationLabels[operation];
-
-              return (
-                <FormControlLabel
-                  key={operation}
-                  sx={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    margin: 0,
-                    borderBottom: '1px solid var(--input-border)'
+          <Grid item xs={12} md={12}>
+            <Typography variant='body2' fontWeight='bold'>
+              Pages
+            </Typography>
+            <PermissionToggle
+              data-test={`space-operation-${targetGroup}-createPage`}
+              label='Create new pages'
+              defaultChecked={assignedPermissions.createPage}
+              disabled={!isAdmin}
+              onChange={(ev) => {
+                const { checked: nowHasAccess } = ev.target;
+                setValue('createPage', nowHasAccess);
+                setTouched(true);
+              }}
+            />
+            <Divider sx={{ mt: 1, mb: 2 }} />
+            <Typography variant='body2' fontWeight='bold'>
+              Bounties
+            </Typography>
+            <PermissionToggle
+              data-test={`space-operation-${targetGroup}-createBounty`}
+              label='Create new bounties'
+              defaultChecked={assignedPermissions.createBounty}
+              disabled={!isAdmin}
+              onChange={(ev) => {
+                const { checked: nowHasAccess } = ev.target;
+                setValue('createBounty', nowHasAccess);
+                setTouched(true);
+              }}
+            />
+            <Divider sx={{ mt: 1, mb: 2 }} />
+            <Typography variant='body2' fontWeight='bold'>
+              Proposals
+            </Typography>
+            <PermissionToggle
+              data-test={`space-operation-${targetGroup}-reviewProposals`}
+              label='Review proposals'
+              defaultChecked={assignedPermissions.reviewProposals}
+              disabled={!isAdmin}
+              onChange={(ev) => {
+                const { checked: nowHasAccess } = ev.target;
+                setValue('reviewProposals', nowHasAccess);
+                setTouched(true);
+              }}
+            />
+            {targetGroup !== 'space' && (
+              <>
+                <Divider sx={{ mt: 1, mb: 2 }} />
+                <Typography variant='body2' fontWeight='bold'>
+                  Forums
+                </Typography>
+                <PermissionToggle
+                  data-test={`space-operation-${targetGroup}-moderateForums`}
+                  label='Moderate all forum categories'
+                  defaultChecked={assignedPermissions.moderateForums}
+                  disabled={!isAdmin}
+                  onChange={(ev) => {
+                    const { checked: nowHasAccess } = ev.target;
+                    setValue('moderateForums', nowHasAccess);
+                    setTouched(true);
                   }}
-                  control={
-                    <Switch
-                      data-test={`space-operation-${targetGroup}-${operation}`}
-                      disabled={!isAdmin}
-                      defaultChecked={userCanPerformAction}
-                      onChange={(ev) => {
-                        const { checked: nowHasAccess } = ev.target;
-                        setValue(operation, nowHasAccess);
-                        setTouched(true);
-                      }}
-                    />
-                  }
-                  label={actionLabel}
-                  labelPlacement='start'
                 />
-              );
-            })}
+              </>
+            )}
 
             {isAdmin && (
               <Box mt={2}>
@@ -209,5 +223,36 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
         </Grid>
       </form>
     </div>
+  );
+}
+
+function PermissionToggle(props: {
+  label: string;
+  defaultChecked: boolean;
+  disabled: boolean;
+  disabledTooltip?: string;
+  ['data-test']?: string;
+  onChange: (ev: ChangeEvent<HTMLInputElement>) => void;
+}) {
+  return (
+    <FormControlLabel
+      sx={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        margin: 0
+      }}
+      control={
+        <Tooltip title={props.disabledTooltip || ''}>
+          <Switch
+            data-test={props['data-test']}
+            disabled={props.disabled}
+            defaultChecked={props.defaultChecked}
+            onChange={props.onChange}
+          />
+        </Tooltip>
+      }
+      label={props.label}
+      labelPlacement='start'
+    />
   );
 }

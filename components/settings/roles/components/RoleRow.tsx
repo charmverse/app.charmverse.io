@@ -173,36 +173,5 @@ export function RoleRow({ readOnly, role, assignRoles, deleteRole, refreshRoles 
         )
       }
     />
-    // <Box px={2} pb={1}>
-    //   {role.source !== 'guild_xyz' ? (
-    //     assignedMembers.length < members.length ? (
-    //       isEditable && (
-    //         <Button onClick={showMembersPopup} variant='text' color='secondary'>
-    //           + Add members
-    //         </Button>
-    //       )
-    //     ) : (
-    //       <Typography variant='caption'>All space members have been added to this role</Typography>
-    //     )
-    //   ) : null}
-    // </Box>
-    // <Divider />
   );
 }
-
-// function RolePermissions({ roleId }: { roleId: string }) {
-//   const pageOptions = {
-//     createPage
-//   };
-//   const bountyOptions = {};
-//   const proposalOptions = {};
-//   const forumOptions = {};
-//   return (
-//     <>
-//       <RolePermissionSelect label='Pages' options={pageOptions} />
-//       <RolePermissionSelect label='Bounties' options={bountyOptions} />
-//       <RolePermissionSelect label='Proposals' options={proposalOptions} />
-//       <RolePermissionSelect label='Forums' options={forumOptions} />
-//     </>
-//   );
-// }
