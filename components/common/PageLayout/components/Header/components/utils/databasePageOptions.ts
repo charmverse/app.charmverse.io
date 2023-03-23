@@ -104,7 +104,10 @@ export function createNewPropertiesForBoard(
     return { ...defaultProps, options, type: existingBoardProp.type };
   }
 
-  if (propValues.some((p) => p.includes('|'))) {
+  const possibleMultiSelect = propValues.filter((p) => p.includes('|'));
+
+  // if more than a third of the values are multiSelect, create a multiSelect property
+  if (possibleMultiSelect.length > propValues.length / 3) {
     const allMultiSelectValues = csvData.map((result) => result[prop].split('|')).flat();
     const uniqueMultiSelectValues = [...new Set(allMultiSelectValues)];
     const options = createBoardPropertyOptions(uniqueMultiSelectValues);
