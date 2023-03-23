@@ -153,24 +153,22 @@ export default function DefaultSpacePagePermissions() {
             label='Accessible to public'
             labelPlacement='start'
           />
+          {isAdmin && (
+            <Button
+              onClick={() => updateSpaceDefaults()}
+              disabled={!settingsChanged || isUpdatingPagePermission}
+              type='submit'
+              variant='contained'
+              color='primary'
+              size='small'
+              sx={{ mt: 2 }}
+            >
+              Save
+            </Button>
+          )}
           <Divider sx={{ my: 2 }} />
         </Grid>
       </Grid>
-
-      {isAdmin && (
-        <Grid item xs>
-          <Button
-            onClick={() => updateSpaceDefaults()}
-            disabled={!settingsChanged || isUpdatingPagePermission}
-            type='submit'
-            variant='contained'
-            color='primary'
-            size='small'
-          >
-            Save
-          </Button>
-        </Grid>
-      )}
     </Grid>
   );
 }
