@@ -146,7 +146,7 @@ export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: 
                   'An error occured while importing. Please verify you have a valid user, space and board.'
                 );
               }
-
+              showMessage('Importing your csv file...', 'info');
               await addNewCards({
                 board,
                 members,

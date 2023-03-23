@@ -350,8 +350,8 @@ export async function addNewCards({
     })
     .flat();
 
-  // Add new cards, 50 at a time
-  const cardChunks = chunk(blocks, 50);
+  // Add new cards, chunked to avoid hitting 1mb POST limit
+  const cardChunks = chunk(blocks, 100);
   for (const cards of cardChunks) {
     await charmClient.insertBlocks(cards, () => null);
   }
