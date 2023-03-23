@@ -56,7 +56,7 @@ export function RoleRowBase({
     <>
       <Divider />
       <Paper sx={{ my: 1 }}>
-        <Accordion style={{ boxShadow: 'none' }}>
+        <Accordion style={{ boxShadow: 'none' }} data-test={`role-row-${title}`}>
           <AccordionSummary expandIcon={<ExpandMoreIcon />}>
             <Box display='flex' justifyContent='space-between' sx={{ width: '100%' }}>
               <Box display='flex' justifyContent='space-between'>
@@ -71,7 +71,7 @@ export function RoleRowBase({
           <AccordionDetails sx={{ py: 0 }}>
             <Tabs value={value} onChange={handleChange}>
               <Tab label='Users' />
-              <Tab label='Permissions' />
+              <Tab label='Permissions' data-test='role-settings-permissions-tab' />
             </Tabs>
             <TabPanel value={value} index={0}>
               <ScrollableBox rows={members.length}>

@@ -129,7 +129,7 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
               Pages
             </Typography>
             <PermissionToggle
-              data-test={`space-operation-${targetGroup}-createPage`}
+              data-test='space-operation-createPage'
               label='Create new pages'
               defaultChecked={assignedPermissions?.createPage}
               disabled={!isAdmin}
@@ -144,7 +144,7 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
               Bounties
             </Typography>
             <PermissionToggle
-              data-test={`space-operation-${targetGroup}-createBounty`}
+              data-test='space-operation-createBounty'
               label='Create new bounties'
               defaultChecked={assignedPermissions?.createBounty}
               disabled={!isAdmin}
@@ -159,7 +159,7 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
               Proposals
             </Typography>
             <PermissionToggle
-              data-test={`space-operation-${targetGroup}-reviewProposals`}
+              data-test='space-operation-reviewProposals'
               label='Review proposals'
               defaultChecked={assignedPermissions?.reviewProposals}
               disabled={!isAdmin}
@@ -176,7 +176,7 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
                   Forums
                 </Typography>
                 <PermissionToggle
-                  data-test={`space-operation-${targetGroup}-moderateForums`}
+                  data-test='space-operation-moderateForums'
                   label='Moderate all forum categories'
                   defaultChecked={assignedPermissions?.moderateForums}
                   disabled={!isAdmin}

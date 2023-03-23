@@ -6,7 +6,7 @@ import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import SettingsIcon from '@mui/icons-material/WorkOutline';
 
-export const spaceSettingsSections = ['space', 'members', 'roles', 'invites', 'api'] as const;
+export const spaceSettingsSections = ['space', 'roles', 'invites', 'api'] as const;
 
 export type SpaceSettingsSection = (typeof spaceSettingsSections)[number];
 type SettingsTab<T extends string> = {

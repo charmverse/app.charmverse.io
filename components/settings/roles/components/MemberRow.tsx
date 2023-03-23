@@ -11,13 +11,12 @@ import ElementDeleteIcon from 'components/common/form/ElementDeleteIcon';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { StyledListItemText } from 'components/common/StyledListItemText';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useMembers } from 'hooks/useMembers';
 import { useRoles } from 'hooks/useRoles';
 import type { Member } from 'lib/members/interfaces';
 import { hasNftAvatar } from 'lib/users/hasNftAvatar';
 
-const roleActions = ['makeAdmin', 'makeMember', 'removeFromSpace'] as const;
+const roleActions = ['makeAdmin', 'makeMember', 'makeGuest', 'removeFromSpace'] as const;
 export type RoleAction = (typeof roleActions)[number];
 
 export const StyledRow = styled(Box)`
@@ -47,7 +46,7 @@ interface Props {
 
 export function MemberRow({ member, readOnly, memberRoleId }: Props) {
   return (
-    <StyledRow py={2}>
+    <StyledRow py={2} data-test={`member-row-${member.id}`}>
       <Box display='flex' alignItems='center'>
         <Avatar name={member.username} avatar={member?.avatar} size='small' isNft={hasNftAvatar(member)} />
         <Box pl={2}>
@@ -68,7 +67,6 @@ function MemberActions({
   memberRoleId?: string;
   readOnly: boolean;
 }) {
-  const isAdmin = useIsAdmin();
   const space = useCurrentSpace();
   const { unassignRole } = useRoles();
   const { members, mutateMembers } = useMembers();
@@ -94,7 +92,7 @@ function MemberActions({
 
     switch (action) {
       case 'makeAdmin':
-        await charmClient.updateMember({ spaceId: space.id, userId: member.id, isAdmin: true });
+        await charmClient.updateMemberRole({ spaceId: space.id, userId: member.id, isAdmin: true, isGuest: false });
         if (members) {
           mutateMembers(
             members.map((c) => (c.id === member.id ? { ...c, isAdmin: true } : c)),
@@ -104,7 +102,17 @@ function MemberActions({
         break;
 
       case 'makeMember':
-        await charmClient.updateMember({ spaceId: space.id, userId: member.id, isAdmin: false });
+        await charmClient.updateMemberRole({ spaceId: space.id, userId: member.id, isAdmin: false, isGuest: false });
+        if (members) {
+          mutateMembers(
+            members.map((c) => (c.id === member.id ? { ...c, isAdmin: false } : c)),
+            { revalidate: false }
+          );
+        }
+        break;
+
+      case 'makeGuest':
+        await charmClient.updateMemberRole({ spaceId: space.id, userId: member.id, isAdmin: false, isGuest: true });
         if (members) {
           mutateMembers(
             members.map((c) => (c.id === member.id ? { ...c, isAdmin: false } : c)),
@@ -123,21 +131,19 @@ function MemberActions({
     }
     popupState.close();
   }
-  const actions = member.isGuest
-    ? roleActions.filter((action) => action === 'removeFromSpace')
-    : roleActions.filter((action) => {
-        switch (action) {
-          case 'makeAdmin':
-            return !readOnly;
-          case 'makeMember':
-            return !readOnly;
-          case 'removeFromSpace': {
-            return !readOnly && spaceOwner !== member.id;
-          }
-          default:
-            return false;
-        }
-      });
+  const actions = roleActions.filter((action) => {
+    switch (action) {
+      case 'makeAdmin':
+        return !readOnly;
+      case 'makeMember':
+        return !readOnly;
+      case 'removeFromSpace': {
+        return !readOnly && spaceOwner !== member.id;
+      }
+      default:
+        return false;
+    }
+  });
 
   const activeRoleAction = member.isAdmin ? 'makeAdmin' : 'makeMember';
   async function removeFromSpace() {

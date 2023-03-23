@@ -84,7 +84,7 @@ export function RoleRow({ readOnly, role, assignRoles, deleteRole, refreshRoles 
           <>
             <div onClick={(e) => e.stopPropagation()}>
               <IconButton size='small' {...bindTrigger(menuState)}>
-                <MoreHorizIcon data-test={`open-role-context-menu-${role.id}`} />
+                <MoreHorizIcon />
               </IconButton>
             </div>
 
