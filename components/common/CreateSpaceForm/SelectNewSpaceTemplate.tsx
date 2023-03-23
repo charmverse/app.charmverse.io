@@ -1,15 +1,16 @@
 import styled from '@emotion/styled';
 import DriveFolderUploadIcon from '@mui/icons-material/DriveFolderUpload';
 import EmojiObjectsIcon from '@mui/icons-material/EmojiObjects';
-import { Divider, Typography } from '@mui/material';
+import { Divider, Typography, SvgIcon } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import { MdOutlineBuild } from 'react-icons/md';
 import { SiHackthebox, SiNotion } from 'react-icons/si';
 import { SlBadge, SlTrophy } from 'react-icons/sl';
 
 import { spaceContentTemplates } from 'lib/spaces/config';
-import type { SpaceCreateTemplate, SpaceTemplate } from 'lib/spaces/config';
+import type { SpaceCreateTemplate, SpaceTemplateType } from 'lib/spaces/config';
 import { typedKeys } from 'lib/utilities/objects';
+import NounsIcon from 'public/images/logos/noggles/noggles.svg';
 
 import { TemplateOption } from './TemplateOption';
 
@@ -32,11 +33,11 @@ const ScrollContainer = styled.div`
   }
 `;
 
-const templateIcon: Record<SpaceTemplate, React.ReactNode> = {
+const templateIcon: Record<SpaceTemplateType, React.ReactNode> = {
   templateCreator: <EmojiObjectsIcon htmlColor='var(--secondary-text)' sx={{ fontSize }} />,
   templateNftCommunity: <SlBadge color='var(--secondary-text)' size={fontSize} />,
   templateHackathon: <SlTrophy color='var(--secondary-text)' size={fontSize} />,
-  templateNounishDAO: <SiHackthebox color='var(--secondary-text)' size={fontSize} />,
+  templateNounishDAO: <SvgIcon component={NounsIcon} inheritViewBox />, // <SiHackthebox color='var(--secondary-text)' size={fontSize} />,
   templateImpactCommunity: <SiHackthebox color='var(--secondary-text)' size={fontSize} />
 };
 

@@ -16,6 +16,7 @@ import { CopyToClipboard } from 'react-copy-to-clipboard';
 import charmClient from 'charmClient';
 import Link from 'components/common/Link';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { usePagePermissions } from 'hooks/usePagePermissions';
 import { usePages } from 'hooks/usePages';
 import type { IPagePermissionWithAssignee } from 'lib/permissions/pages/page-permission-interfaces';
 
@@ -57,13 +58,12 @@ const alerts: Partial<Record<PageType, string>> = {
 
 export default function ShareToWeb({ pageId, pagePermissions, refreshPermissions }: Props) {
   const router = useRouter();
-  const { pages, getPagePermissions } = usePages();
+  const { pages } = usePages();
   const [copied, setCopied] = useState<boolean>(false);
   const space = useCurrentSpace();
   const publicPermission = pagePermissions.find((publicPerm) => publicPerm.public === true) ?? null;
 
-  const currentPagePermissions = getPagePermissions(pageId);
-
+  const { permissions: currentPagePermissions } = usePagePermissions({ pageIdOrPath: pageId });
   const currentPage = pages[pageId];
 
   const disablePublicToggle = currentPagePermissions?.edit_isPublic !== true;
