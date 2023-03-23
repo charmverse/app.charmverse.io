@@ -38,9 +38,9 @@ export function requireCustomPermissionMode({
     const { roleId, userId } = req.body as PermissionAssigneeId<'user'> | PermissionAssigneeId<'role'>;
 
     // We can still assign permissions to roles and users. We should only block space-level assignment
-    if (space.permissionConfigurationMode !== 'custom' && !roleId && !userId) {
-      throw new UnauthorisedActionError('This space must be in custom permissions mode in order to use this endpoint');
-    }
+    // if (space.permissionConfigurationMode !== 'custom' && !roleId && !userId) {
+    //   throw new UnauthorisedActionError('This space must be in custom permissions mode in order to use this endpoint');
+    // }
 
     next();
   };

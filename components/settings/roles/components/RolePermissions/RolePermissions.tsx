@@ -4,6 +4,7 @@ import { SpaceOperation } from '@prisma/client';
 import type { ChangeEvent } from 'react';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
+import useSWR from 'swr';
 import type { BooleanSchema } from 'yup';
 import * as yup from 'yup';
 
@@ -55,19 +56,27 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
     resolver: yupResolver(schema)
   });
 
+  const { data: memberPermissionFlags } = useSWR(targetGroup !== 'space' && space ? 'member-permissions' : null, () =>
+    charmClient.queryGroupSpacePermissions({
+      group: 'space',
+      id: space?.id as string,
+      resourceId: space?.id as string
+    })
+  );
+
   usePreventReload(touched);
 
   useEffect(() => {
     if (space) {
-      refreshGroupPermissions();
+      refreshGroupPermissions(space.id);
     }
   }, [space]);
 
-  async function refreshGroupPermissions() {
+  async function refreshGroupPermissions(resourceId: string) {
     const permissionFlags = await charmClient.queryGroupSpacePermissions({
       group: targetGroup,
       id,
-      resourceId: space?.id as string
+      resourceId
     });
     spaceOperations.forEach((op) => {
       setValue(op, permissionFlags[op]);
@@ -133,6 +142,7 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
               label='Create new pages'
               defaultChecked={assignedPermissions?.createPage}
               disabled={!isAdmin}
+              memberChecked={targetGroup !== 'space' ? memberPermissionFlags?.createPage : false}
               onChange={(ev) => {
                 const { checked: nowHasAccess } = ev.target;
                 setValue('createPage', nowHasAccess);
@@ -148,6 +158,7 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
               label='Create new bounties'
               defaultChecked={assignedPermissions?.createBounty}
               disabled={!isAdmin}
+              memberChecked={targetGroup !== 'space' ? memberPermissionFlags?.createBounty : false}
               onChange={(ev) => {
                 const { checked: nowHasAccess } = ev.target;
                 setValue('createBounty', nowHasAccess);
@@ -162,6 +173,7 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
               data-test='space-operation-reviewProposals'
               label='Review proposals'
               defaultChecked={assignedPermissions?.reviewProposals}
+              memberChecked={targetGroup !== 'space' ? memberPermissionFlags?.createBounty : false}
               disabled={!isAdmin}
               onChange={(ev) => {
                 const { checked: nowHasAccess } = ev.target;
@@ -179,6 +191,7 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
                   data-test='space-operation-moderateForums'
                   label='Moderate all forum categories'
                   defaultChecked={assignedPermissions?.moderateForums}
+                  memberChecked={memberPermissionFlags?.moderateForums}
                   disabled={!isAdmin}
                   onChange={(ev) => {
                     const { checked: nowHasAccess } = ev.target;
@@ -214,10 +227,12 @@ function PermissionToggle(props: {
   label: string;
   defaultChecked?: boolean;
   disabled: boolean;
-  disabledTooltip?: string;
+  memberChecked?: boolean; // if this permission is inherited from the Member role
   ['data-test']?: string;
   onChange: (ev: ChangeEvent<HTMLInputElement>) => void;
 }) {
+  const disabled = props.disabled || props.memberChecked === true;
+  const defaultChecked = props.memberChecked || props.defaultChecked;
   return (
     <FormControlLabel
       sx={{
@@ -226,14 +241,17 @@ function PermissionToggle(props: {
         margin: 0
       }}
       control={
-        typeof props.defaultChecked === 'boolean' ? (
-          <Tooltip title={props.disabledTooltip || ''}>
-            <Switch
-              data-test={props['data-test']}
-              disabled={props.disabled}
-              defaultChecked={props.defaultChecked}
-              onChange={props.onChange}
-            />
+        typeof props.defaultChecked === 'boolean' && typeof props.memberChecked === 'boolean' ? (
+          <Tooltip title={props.memberChecked ? 'This permission is inherited from the Member role' : ''}>
+            <span>
+              <Switch
+                key={defaultChecked}
+                data-test={props['data-test']}
+                disabled={disabled}
+                defaultChecked={defaultChecked}
+                onChange={props.onChange}
+              />
+            </span>
           </Tooltip>
         ) : (
           // placeholder element while loading
