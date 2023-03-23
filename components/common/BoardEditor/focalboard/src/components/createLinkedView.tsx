@@ -31,7 +31,7 @@ export function CreateLinkedView(props: CreateLinkedViewProps) {
   return (
     <Box display='flex'>
       <Box flexGrow={1} display='flex' justifyContent='center' alignItems='center'>
-        <Stack alignItems='center' spacing={0}>
+        <Stack alignItems='center' spacing={0} mt={{ xs: 3, md: 0 }}>
           <HelpOutlineIcon color='secondary' fontSize='large' />
           <Typography color='secondary'>
             <strong>No data source</strong>
