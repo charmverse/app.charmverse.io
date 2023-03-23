@@ -57,7 +57,7 @@ function ViewAllText({ href }: { href: string }) {
 }
 
 export default function PendingTasks(props: PendingTasksProps) {
-  const totalDiscussionTasks = props.discussionTasks.filter((discussion) => discussion.type === 'page').length;
+  const totalDiscussionTasks = props.discussionTasks.length;
   const totalVoteTasks = props.voteTasks.length;
   const totalGnosisSafeTasks = props.gnosisSafeTasks.length;
   const totalProposalTasks = props.proposalTasks.length;
@@ -95,12 +95,9 @@ export default function PendingTasks(props: PendingTasksProps) {
             </a>
           </div>
         </MjmlText>
-        {props.discussionTasks
-          .filter((discussion) => discussion.type === 'page')
-          .slice(0, MAX_ITEMS_PER_TASK)
-          .map((discussionTask) => (
-            <DiscussionTask key={discussionTask.mentionId} task={discussionTask} />
-          ))}
+        {props.discussionTasks.slice(0, MAX_ITEMS_PER_TASK).map((discussionTask) => (
+          <DiscussionTask key={discussionTask.mentionId} task={discussionTask} />
+        ))}
         {totalDiscussionTasks > MAX_ITEMS_PER_TASK ? <ViewAllText href={nexusDiscussionLink} /> : null}
         <MjmlDivider />
       </>
