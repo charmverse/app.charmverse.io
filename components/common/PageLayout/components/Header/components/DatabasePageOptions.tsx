@@ -35,18 +35,11 @@ import { useUser } from 'hooks/useUser';
 import type { Board } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { CardPage } from 'lib/focalboard/card';
-import { createCard } from 'lib/focalboard/card';
 import log from 'lib/log';
 import type { IPagePermissionFlags } from 'lib/permissions/pages';
 
 import { DocumentHistory } from './DocumentHistory';
-import {
-  createCardFieldProperties,
-  createNewPropertiesForBoard,
-  deepMergeArrays,
-  isValidCsvResult,
-  mapCardBoardProperties
-} from './utils/databasePageOptions';
+import { isValidCsvResult, addNewCards } from './utils/databasePageOptions';
 
 interface Props {
   closeMenu: () => void;
@@ -132,95 +125,6 @@ export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: 
     closeMenu();
   }
 
-  const addNewCards = async (
-    _board: Board,
-    _views: BoardView[] | null,
-    results: Papa.ParseResult<Record<string, string>>
-  ) => {
-    const csvData = results.data;
-    const headers = results.meta.fields || [];
-
-    // Remove name property because it is not an option
-    const allAvailableProperties = headers.filter((header) => header !== 'Name');
-
-    const mappedInitialBoardProperties = mapCardBoardProperties(_board.fields.cardProperties);
-
-    // Create card properties for the board
-    const newBoardProperties = allAvailableProperties.map((prop) =>
-      createNewPropertiesForBoard(csvData, prop, mappedInitialBoardProperties[prop])
-    );
-
-    /**
-     * Merge the fields of both boards.
-     * The order is important here. The old board should be last so it can overwrite the important properties.
-     */
-    const mergedFields = deepMergeArrays(newBoardProperties, _board.fields.cardProperties);
-
-    // Create the new board and update the db
-    const newBoardBlock: Board = {
-      ..._board,
-      fields: {
-        ..._board.fields,
-        cardProperties: mergedFields
-      }
-    };
-
-    // Update board with new cardProperties
-    await charmClient.updateBlock(newBoardBlock);
-
-    // Update the view of the table to make all the cards visible
-    const allTableViews = (_views || [])
-      .filter((_view) => _view.type === 'view' && _view.fields.viewType === 'table')
-      .map(async (_view) => {
-        const allCardPropertyIds = newBoardBlock.fields.cardProperties.map((prop) => prop.id);
-        const newViewBlock: BoardView = {
-          ..._view,
-          fields: {
-            ..._view.fields,
-            visiblePropertyIds: allCardPropertyIds
-          }
-        };
-        return charmClient.updateBlock(newViewBlock);
-      });
-
-    await Promise.all(allTableViews);
-
-    // Create the new mapped board properties to know what are the ids of each property and option
-    const mappedBoardProperties = mapCardBoardProperties(mergedFields);
-
-    if (!user || !currentSpace) {
-      throw new Error('An error occured while importing. Please verify you have a valid user, space and board.');
-    }
-
-    // Create the new card blocks from the csv data
-    const blocks = csvData
-      .map((csvRow) => {
-        // Show the first text column as a title if no Name column is in the csv
-        const firstTextId = newBoardBlock.fields.cardProperties.find((prop) => prop.type === 'text')?.id;
-        const fieldProperties = createCardFieldProperties(csvRow, mappedBoardProperties, members);
-        const text = firstTextId ? fieldProperties[firstTextId] : undefined;
-        const textName = text && typeof text === 'string' ? text : '';
-
-        const card = createCard({
-          parentId: _board.id,
-          rootId: _board.id,
-          createdBy: user.id,
-          updatedBy: user.id,
-          spaceId: currentSpace.id,
-          title: csvRow.Name || textName,
-          fields: {
-            properties: fieldProperties
-          }
-        });
-
-        return card;
-      })
-      .flat();
-
-    // Add new cards
-    await charmClient.insertBlocks(blocks, () => null);
-  };
-
   const importCsv: ChangeEventHandler<HTMLInputElement> = (event) => {
     if (board && event.target.files && event.target.files[0]) {
       Papa.parse(event.target.files[0], {
@@ -231,17 +135,36 @@ export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: 
         complete: async (results) => {
           closeMenu();
           if (results.errors && results.errors[0]) {
+            log.warn('CSV import failed', { spaceId: currentSpace?.id, pageId, error: results.errors[0] });
             showMessage(results.errors[0].message ?? 'There was an error importing your csv file.', 'warning');
             return;
           }
           if (isValidCsvResult(results)) {
-            await addNewCards(board, boardViews, results);
+            try {
+              if (!user || !currentSpace) {
+                throw new Error(
+                  'An error occured while importing. Please verify you have a valid user, space and board.'
+                );
+              }
 
-            const spaceId = currentSpace?.id;
-            if (spaceId) {
-              charmClient.track.trackAction('import_page_csv', { pageId, spaceId });
+              await addNewCards({
+                board,
+                members,
+                results,
+                spaceId: currentSpace.id,
+                userId: user.id,
+                views: boardViews
+              });
+
+              const spaceId = currentSpace?.id;
+              if (spaceId) {
+                charmClient.track.trackAction('import_page_csv', { pageId, spaceId });
+              }
+              showMessage('Your csv file was imported successfully', 'success');
+            } catch (error) {
+              log.error('CSV import failed', { spaceId: currentSpace?.id, pageId, error });
+              showMessage((error as Error).message || 'Import failed', 'error');
             }
-            showMessage('Your csv file was imported successfully', 'success');
           }
         }
       });
