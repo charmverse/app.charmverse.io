@@ -23,6 +23,7 @@ export function MemberRoleRow({ readOnly, spaceId }: { readOnly: boolean; spaceI
       members={members.filter((member) => !member.isBot && !member.isAdmin && !member.isGuest)}
       permissions={
         <>
+          <Divider sx={{ my: 2 }} />
           <DefaultPagePermissions />
           <Divider sx={{ my: 2 }} />
           <RolePermissions targetGroup='space' id={spaceId} />
