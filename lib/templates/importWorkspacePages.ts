@@ -118,10 +118,6 @@ export async function generateImportWorkspacePages({
   if (!dataToImport) {
     throw new InvalidInputError('Please provide the source export data, or export path');
   }
-
-  // List of page object references which we will mutate
-  const flatPages: Page[] = [];
-
   const pageArgs: Prisma.PageCreateArgs[] = [];
 
   const voteArgs: Prisma.VoteCreateManyInput[] = [];
@@ -155,9 +151,6 @@ export async function generateImportWorkspacePages({
 
     oldNewPageIdHashMap[newId] = node.id;
     oldNewPageIdHashMap[node.id] = newId;
-
-    flatPages.push(node);
-
     const {
       children,
       createdBy,

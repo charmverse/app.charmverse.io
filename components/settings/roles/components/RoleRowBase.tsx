@@ -13,7 +13,7 @@ import {
   Tab,
   Tabs
 } from '@mui/material';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import type { ReactNode } from 'react';
 
 import type { Member } from 'lib/members/interfaces';
