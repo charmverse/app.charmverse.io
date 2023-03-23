@@ -64,6 +64,20 @@ Start the app from the dotenv CLI, which you can download [here](https://www.npm
 
 For further information about environment variables in Next.js, see the [docs](https://nextjs.org/docs/basic-features/environment-variables).
 
+
+### Useful Plugins
+
+Chrome / Prosemirror Dev Tools
+[Prosemirror Dev Tools](https://chrome.google.com/webstore/detail/prosemirror-developer-too/gkgbmhfgcpfnogoeclbaiencdjkefonj)
+
+Get access to the document structure of all our editor content
+
+
+Chrome / SWR DevTools
+[SWR DevTools](https://chrome.google.com/webstore/detail/swr-devtools/liidbicegefhheghhjbomajjaehnjned)
+
+Inspect SWR cache data and results
+
 ### Access your local server via https
 
 You may want to access your local development server using https from another device (such as in the case of mobile testing).

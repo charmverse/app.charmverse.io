@@ -39,6 +39,7 @@ import { createCard } from 'lib/focalboard/card';
 import log from 'lib/log';
 import type { IPagePermissionFlags } from 'lib/permissions/pages';
 
+import { DocumentHistory } from './DocumentHistory';
 import {
   createCardFieldProperties,
   createNewPropertiesForBoard,
@@ -338,24 +339,15 @@ export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: 
         />
         <ListItemText primary='Import CSV' />
       </ListItemButton>
-      {lastUpdatedBy && (
-        <>
-          <Divider />
-          <Stack
-            sx={{
-              mx: 2,
-              my: 1
-            }}
-          >
-            <Typography variant='subtitle2'>
-              Last edited by <strong>{lastUpdatedBy.username}</strong>
-            </Typography>
-            <Typography variant='subtitle2'>
-              at <strong>{formatDateTime(new Date(board.updatedAt))}</strong>
-            </Typography>
-          </Stack>
-        </>
-      )}
+      <Divider />
+      <DocumentHistory
+        page={{
+          createdAt: new Date(board.createdAt),
+          createdBy: board.createdBy,
+          updatedAt: new Date(board.updatedAt),
+          updatedBy: board.updatedBy
+        }}
+      />
     </List>
   );
 }

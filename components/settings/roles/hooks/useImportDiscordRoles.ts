@@ -1,12 +1,13 @@
 import type { Space } from '@prisma/client';
 import { useRouter } from 'next/router';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import useSWRImmutable from 'swr/immutable';
 
 import charmClient from 'charmClient';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
-import useRoles from 'hooks/useRoles';
+import { useRoles } from 'hooks/useRoles';
+import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
@@ -16,36 +17,58 @@ export function useImportDiscordRoles() {
   const router = useRouter();
   const space = useCurrentSpace();
   const { refreshRoles } = useRoles();
+  const { onClick } = useSettingsDialog();
 
-  const shouldImportDiscordRoles =
-    typeof router.query.guild_id === 'string' && router.query.discord === '1' && router.query.type === 'server';
-  const serverConnectFailed = router.query.discord === '2' && router.query.type === 'server';
+  const [importDiscordRoles, setImportDiscordRoles] = useState(false);
 
   const guildId = router.query.guild_id as string;
   // Using immutable version as otherwise its called twice
   const { data, isValidating, error } = useSWRImmutable(
-    isAdmin && shouldImportDiscordRoles && space ? 'discord-roles-import' : null,
+    importDiscordRoles ? 'discord-roles-import' : null,
     async () => {
-      return charmClient.discord.importRolesFromDiscordServer({
-        guildId,
-        spaceId: (space as Space).id
-      });
+      onClick(`${space?.name}-roles`);
+      return charmClient.discord
+        .importRolesFromDiscordServer({
+          guildId,
+          spaceId: (space as Space).id
+        })
+        .then((_data) => {
+          setImportDiscordRoles(false);
+          showMessage(`Successfully imported ${_data.importedRoleCount} discord roles`, 'success');
+          refreshRoles();
+          setTimeout(() => {
+            setUrlWithoutRerender(router.asPath, { guild_id: null, discord: null, type: null });
+          }, 0);
+          return _data;
+        })
+        .catch((err) => {
+          showMessage(err.message || err.error || 'Something went wrong. Please try again', 'error');
+          setTimeout(() => {
+            setUrlWithoutRerender(router.pathname, { guild_id: null, discord: null, type: null });
+          }, 0);
+          return null;
+        });
     }
   );
 
   useEffect(() => {
-    if (data && !isValidating) {
-      showMessage(`Successfully imported ${data.importedRoleCount} discord roles`, 'success');
-      refreshRoles();
-      setTimeout(() => {
-        setUrlWithoutRerender(router.pathname, { guild_id: null, discord: null, type: null });
-      }, 0);
-    } else if (error) {
+    if (
+      isAdmin &&
+      space &&
+      !isValidating &&
+      typeof router.query.guild_id === 'string' &&
+      !!router.query.guild_id &&
+      router.query.type === 'import-roles'
+    ) {
+      setImportDiscordRoles(true);
+    }
+  }, [router.query, space]);
+
+  const serverConnectFailed = router.query.discord === '2' && router.query.type === 'server';
+
+  useEffect(() => {
+    if (error) {
       // Major failure while trying to import discord server role
-      showMessage(error.message || error.error || 'Something went wrong. Please try again', 'error');
-      setTimeout(() => {
-        setUrlWithoutRerender(router.pathname, { guild_id: null, discord: null, type: null });
-      }, 0);
     } else if (serverConnectFailed) {
       showMessage('Failed to connect to Discord', 'warning');
     }

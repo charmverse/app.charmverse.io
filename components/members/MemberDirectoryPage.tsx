@@ -6,7 +6,9 @@ import { useState } from 'react';
 
 import { iconForViewType } from 'components/common/BoardEditor/focalboard/src/components/viewMenu';
 import Button from 'components/common/Button';
+import ErrorPage from 'components/common/errors/ErrorPage';
 import { CenteredPageContent } from 'components/common/PageLayout/components/PageContent';
+import { useHasMemberLevel } from 'hooks/useHasMemberLevel';
 import { useMembers } from 'hooks/useMembers';
 import type { Member } from 'lib/members/interfaces';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
@@ -39,9 +41,15 @@ export default function MemberDirectoryPage() {
   const [currentView, setCurrentView] = useState<View>((router.query.view as View) ?? 'gallery');
   const [isPropertiesDrawerVisible, setIsPropertiesDrawerVisible] = useState(false);
 
+  const showDirectory = useHasMemberLevel('member');
+
   const sortedMembers = searchedMembers.sort((mem1, mem2) =>
     memberNamePropertyValue(mem1) > memberNamePropertyValue(mem2) ? 1 : -1
   );
+
+  if (!showDirectory) {
+    return <ErrorPage message='Guests cannot access the member directory' />;
+  }
 
   return (
     <CenteredPageContent>

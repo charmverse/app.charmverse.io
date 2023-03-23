@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import request from 'supertest';
 
+import { prisma } from 'db';
 import type { RoleAssignment, RoleWithMembers } from 'lib/roles';
 import { assignRole } from 'lib/roles';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
@@ -26,11 +27,17 @@ describe('POST /api/roles/assignment - Assign a user to a role', () => {
 
     const adminCookie = await loginUser(adminUser.id);
 
-    const updatedRole = (
-      await request(baseUrl).post('/api/roles/assignment').set('Cookie', adminCookie).send(roleAssignment).expect(201)
-    ).body as RoleWithMembers;
+    await request(baseUrl).post('/api/roles/assignment').set('Cookie', adminCookie).send(roleAssignment).expect(201);
 
-    expect(updatedRole.users[0].id).toBe(extraUser.id);
+    const userRoleRecord = await prisma.spaceRoleToRole.count({
+      where: {
+        roleId: role.id,
+        spaceRole: {
+          userId: extraUser.id
+        }
+      }
+    });
+    expect(userRoleRecord).toBe(1);
   });
 
   it('should fail if the requesting user is not a space admin, and respond 401', async () => {
@@ -78,11 +85,16 @@ describe('DELETE /api/roles/assignment - Unassign a user from a role', () => {
 
     const adminCookie = await loginUser(adminUser.id);
 
-    const updatedRole = (
-      await request(baseUrl).delete('/api/roles/assignment').set('Cookie', adminCookie).send(roleAssignment).expect(200)
-    ).body as RoleWithMembers;
-
-    expect(updatedRole.users.length).toBe(0);
+    await request(baseUrl).delete('/api/roles/assignment').set('Cookie', adminCookie).send(roleAssignment).expect(200);
+    const userRoleRecord = await prisma.spaceRoleToRole.count({
+      where: {
+        roleId: role.id,
+        spaceRole: {
+          userId: extraUser.id
+        }
+      }
+    });
+    expect(userRoleRecord).toBe(0);
   });
 
   it('should fail if the requesting user is not a space admin, and respond 401', async () => {

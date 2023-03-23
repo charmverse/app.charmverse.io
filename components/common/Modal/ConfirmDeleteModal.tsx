@@ -12,6 +12,7 @@ type Props = Pick<ModalProps, 'onClose' | 'open' | 'size'> & {
   title?: string;
   onConfirm: () => void;
   secondaryButtonText?: string;
+  onClose: () => void;
 };
 
 export default function ConfirmDeleteModal({

@@ -22,7 +22,7 @@ export const spaceContentTemplates = {
   templateImpactCommunity: 'Impact Community'
 };
 
-export type SpaceTemplate = keyof typeof spaceContentTemplates;
+export type SpaceTemplateType = keyof typeof spaceContentTemplates;
 
 const staticTemplateOptions = ['default', 'importNotion', 'importMarkdown'] as const;
 

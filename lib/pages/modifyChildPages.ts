@@ -72,7 +72,10 @@ export async function modifyChildPages(parentId: string, userId: string, action:
           in: modifiedChildPageIds
         }
       },
-      data: data as Prisma.PageUncheckedUpdateManyInput
+      data: {
+        ...data,
+        deletedBy: action === 'restore' ? null : userId
+      }
     });
 
     await prisma.block.updateMany({

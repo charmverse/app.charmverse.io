@@ -305,6 +305,7 @@ model Page {
   createdBy           String           @db.Uuid
   updatedAt           DateTime         @default(now())
   updatedBy           String           @db.Uuid
+  deletedBy           String?          @db.Uuid
   title               String
   content             Json?
   contentText         String
@@ -621,6 +622,7 @@ model Poap {
 model FavoritePage {
   pageId String @db.Uuid
   userId String @db.Uuid
+  index  Int    @default(-1)
   page   Page   @relation(fields: [pageId], references: [id], onDelete: Cascade)
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 

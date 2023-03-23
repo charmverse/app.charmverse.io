@@ -14,16 +14,25 @@ const StyledTypography = styled(Typography)`
 export function DocumentHistory({
   page
 }: {
-  page: { createdAt: Date; createdBy: string; updatedAt: Date; updatedBy: string };
+  page: {
+    createdAt: Date;
+    createdBy: string;
+    updatedAt: Date;
+    updatedBy: string;
+    deletedAt?: Date | null;
+    deletedBy?: string | null;
+  };
 }) {
   const { members } = useMembers();
   const { formatDateTime } = useDateFormatter();
 
   const createdBy = members.find((member) => member.id === page.createdBy)?.username ?? 'Unknown user';
   const updatedBy = members.find((member) => member.id === page.updatedBy)?.username ?? createdBy;
+  const deletedBy = members.find((member) => member.id === page.deletedBy)?.username ?? null;
 
   const tooltipCreatedAt = getRelativeTimeInThePast(new Date(page.createdAt));
   const tooltipUpdatedAt = getRelativeTimeInThePast(new Date(page.updatedAt));
+  const tooltipDeletedAt = page.deletedAt && getRelativeTimeInThePast(new Date(page.deletedAt));
 
   return (
     <Tooltip
@@ -39,6 +48,13 @@ export function DocumentHistory({
       }}
       title={
         <>
+          {deletedBy && (
+            <>
+              <StyledTypography variant='caption'>Deleted by</StyledTypography> {deletedBy}{' '}
+              <StyledTypography variant='caption'>{tooltipDeletedAt}</StyledTypography>
+              <br />
+            </>
+          )}
           <StyledTypography variant='caption'>Edited by</StyledTypography> {updatedBy}{' '}
           <StyledTypography variant='caption'>{tooltipUpdatedAt}</StyledTypography>
           <br />
@@ -48,12 +64,25 @@ export function DocumentHistory({
       }
     >
       <Box mx={2} my={1}>
-        <Typography variant='subtitle2'>
-          Last edited by <strong>{updatedBy}</strong>
-        </Typography>
-        <Typography variant='subtitle2'>
-          at <strong>{formatDateTime(page.updatedAt)}</strong>
-        </Typography>
+        {deletedBy && page.deletedAt ? (
+          <>
+            <Typography variant='subtitle2'>
+              Deleted by <strong>{deletedBy}</strong>
+            </Typography>
+            <Typography variant='subtitle2'>
+              at <strong>{formatDateTime(page.deletedAt)}</strong>
+            </Typography>
+          </>
+        ) : (
+          <>
+            <Typography variant='subtitle2'>
+              Last edited by <strong>{updatedBy}</strong>
+            </Typography>
+            <Typography variant='subtitle2'>
+              at <strong>{formatDateTime(page.updatedAt)}</strong>
+            </Typography>
+          </>
+        )}
         {/* <Typography color='secondary' fontSize={12.8} variant='caption' fontWeight={500}>Edited {updatedAt}</Typography> */}
       </Box>
     </Tooltip>

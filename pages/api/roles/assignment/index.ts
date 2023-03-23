@@ -47,7 +47,7 @@ async function unassignRoleController(req: NextApiRequest, res: NextApiResponse<
     throw error;
   }
 
-  const roleAfterUpdate = await unassignRole({
+  await unassignRole({
     roleId,
     userId
   });
@@ -57,7 +57,7 @@ async function unassignRoleController(req: NextApiRequest, res: NextApiResponse<
     userId: requestingUserId
   });
 
-  return res.status(200).json(roleAfterUpdate);
+  return res.status(200).end();
 }
 
 async function assignRoleController(req: NextApiRequest, res: NextApiResponse<RoleWithMembers>) {
@@ -88,7 +88,7 @@ async function assignRoleController(req: NextApiRequest, res: NextApiResponse<Ro
     throw error;
   }
 
-  const roleAfterUpdate = await assignRole({
+  await assignRole({
     roleId,
     userId
   });
@@ -98,7 +98,7 @@ async function assignRoleController(req: NextApiRequest, res: NextApiResponse<Ro
     userId: requestingUserId
   });
 
-  return res.status(201).json(roleAfterUpdate);
+  return res.status(201).end();
 }
 
 export default withSessionRoute(handler);

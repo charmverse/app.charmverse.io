@@ -5,7 +5,7 @@ import type { ComponentProps } from 'react';
 
 import Button from 'components/common/Button';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import useRoles from 'hooks/useRoles';
+import { useRoles } from 'hooks/useRoles';
 import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import type { ListSpaceRolesResponse } from 'pages/api/roles';
 

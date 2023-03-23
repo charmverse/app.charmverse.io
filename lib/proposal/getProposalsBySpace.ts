@@ -14,15 +14,31 @@ export type ListProposalsRequest = {
  */
 export async function getProposalsBySpace({
   spaceId,
-  categoryIds
-}: Pick<ListProposalsRequest, 'categoryIds' | 'spaceId'>): Promise<ProposalWithUsers[]> {
+  categoryIds,
+  userId
+}: ListProposalsRequest): Promise<ProposalWithUsers[]> {
   return prisma.proposal.findMany({
     where: {
+      OR: [
+        {
+          status: {
+            not: 'draft'
+          }
+        },
+        {
+          space: {
+            spaceRoles: {
+              some: {
+                spaceId,
+                isAdmin: true,
+                userId
+              }
+            }
+          }
+        }
+      ],
       spaceId,
       categoryId: generateCategoryIdQuery(categoryIds),
-      status: {
-        not: 'draft'
-      },
       page: {
         type: 'proposal'
       }
