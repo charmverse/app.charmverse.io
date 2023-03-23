@@ -44,7 +44,6 @@ const syncedRoleProps = {
 export function RoleRow({ readOnly, role, assignRoles, deleteRole, refreshRoles }: RoleRowProps) {
   const menuState = usePopupState({ variant: 'popover', popupId: `role-${role.id}` });
   const userPopupState = usePopupState({ variant: 'popover', popupId: `role-${role.id}-users` });
-  const rolePermissionsPopupState = usePopupState({ variant: 'popover', popupId: `role-permissions-${role.id}` });
   const confirmDeletePopupState = usePopupState({ variant: 'popover', popupId: 'role-delete' });
   const [newMembers, setNewMembers] = useState<string[]>([]);
   const { members } = useMembers();
@@ -81,7 +80,6 @@ export function RoleRow({ readOnly, role, assignRoles, deleteRole, refreshRoles 
           id={role.id}
           callback={() => {
             refreshRoles();
-            rolePermissionsPopupState.close();
           }}
         />
       }
@@ -196,3 +194,20 @@ export function RoleRow({ readOnly, role, assignRoles, deleteRole, refreshRoles 
     // <Divider />
   );
 }
+
+// function RolePermissions({ roleId }: { roleId: string }) {
+//   const pageOptions = {
+//     createPage
+//   };
+//   const bountyOptions = {};
+//   const proposalOptions = {};
+//   const forumOptions = {};
+//   return (
+//     <>
+//       <RolePermissionSelect label='Pages' options={pageOptions} />
+//       <RolePermissionSelect label='Bounties' options={bountyOptions} />
+//       <RolePermissionSelect label='Proposals' options={proposalOptions} />
+//       <RolePermissionSelect label='Forums' options={forumOptions} />
+//     </>
+//   );
+// }

@@ -68,7 +68,6 @@ export function RoleSettings({ space }: { space: Space }) {
         <RoleRow
           readOnly={!isAdmin}
           assignRoles={assignRoles}
-          unassignRole={unassignRole}
           deleteRole={deleteRole}
           refreshRoles={refreshRoles}
           role={role}

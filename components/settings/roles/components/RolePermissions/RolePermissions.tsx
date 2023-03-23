@@ -4,7 +4,6 @@ import Button from '@mui/material/Button';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Grid from '@mui/material/Grid';
 import Switch from '@mui/material/Switch';
-import Typography from '@mui/material/Typography';
 import type { SpaceOperation } from '@prisma/client';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -18,12 +17,21 @@ import { useIsAdmin } from 'hooks/useIsAdmin';
 import { usePreventReload } from 'hooks/usePreventReload';
 import type { AssignablePermissionGroups } from 'lib/permissions/interfaces';
 import type { SpacePermissionFlags } from 'lib/permissions/spaces/client';
-import {
-  spaceOperationDescriptions,
-  AvailableSpacePermissions,
-  spaceOperationLabels,
-  spaceOperationsWithoutForumCategory
-} from 'lib/permissions/spaces/client';
+import { AvailableSpacePermissions } from 'lib/permissions/spaces/client';
+import { typedKeys } from 'lib/utilities/objects';
+
+const spaceOperationLabels: Record<Exclude<SpaceOperation, 'createVote'>, string> = {
+  createPage: 'Create new pages',
+  createBounty: 'Create new bounties',
+  createForumCategory: 'Create new forum categories',
+  moderateForums: 'Moderate all forum categories',
+  reviewProposals: 'Review proposals'
+};
+
+// We don't want to have explicit support for forum categories in space permissions config yet
+const spaceOperationsWithoutForumCategory = typedKeys(spaceOperationLabels).filter(
+  (key) => key !== 'createForumCategory'
+);
 
 const fields: Record<SpaceOperation, BooleanSchema> = spaceOperationsWithoutForumCategory.reduce(
   (_schema: Record<SpaceOperation, BooleanSchema>, op) => {
@@ -91,7 +99,7 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
   // We don't want to show the forum category moderate permission in context of the entire space
   const assignableOperations =
     targetGroup === 'space'
-      ? spaceOperationsWithoutForumCategory.filter((op) => op !== 'moderateForums' && op !== 'createVote')
+      ? spaceOperationsWithoutForumCategory.filter((op) => op !== 'moderateForums')
       : spaceOperationsWithoutForumCategory;
 
   async function submitted(formValues: FormValues) {
@@ -150,68 +158,53 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
   return (
     <div data-test={`space-permissions-form-${targetGroup}`}>
       <form onSubmit={handleSubmit((formValue) => submitted(formValue))} style={{ margin: 'auto' }}>
-        <Grid container direction='column' gap={2}>
-          {assignableOperations.map((operation) => {
-            const userCanPerformAction = assignedPermissions[operation];
-            const actionLabel = spaceOperationLabels[operation];
-            const actionDescription = spaceOperationDescriptions[operation];
+        <Grid container gap={2}>
+          <Grid item xs={6}>
+            {assignableOperations.map((operation) => {
+              const userCanPerformAction = assignedPermissions[operation];
+              const actionLabel = spaceOperationLabels[operation];
 
-            return (
-              <Grid item container xs key={operation}>
-                <Grid item xs={6}>
-                  <FormControlLabel
-                    control={
-                      <Switch
-                        data-test={`space-operation-${targetGroup}-${operation}`}
-                        disabled={!isAdmin}
-                        defaultChecked={userCanPerformAction}
-                        onChange={(ev) => {
-                          const { checked: nowHasAccess } = ev.target;
-                          setValue(operation, nowHasAccess);
-                          setTouched(true);
-                        }}
-                      />
-                    }
-                    label={actionLabel}
-                  />
-                </Grid>
-                <Grid item xs={6}>
-                  <Typography
-                    sx={{ height: '100%', justifyContent: 'center', display: 'flex', flexDirection: 'column' }}
-                    variant='body2'
-                  >
-                    {targetGroup === 'space' &&
-                      (newValues[operation] === true
-                        ? `All members of your space can ${actionDescription.toLowerCase()}`
-                        : `Space members cannot ${actionDescription.toLowerCase()}`)}
-                    {targetGroup === 'role' &&
-                      (newValues[operation] === true
-                        ? `Members with this role can ${actionDescription.toLowerCase()}`
-                        : `Members with this role cannot ${actionDescription.toLowerCase()}`)}
-                    {targetGroup === 'user' &&
-                      (newValues[operation] === true
-                        ? `This user can ${actionDescription.toLowerCase()}`
-                        : `This user cannot ${actionDescription.toLowerCase()}`)}
-                  </Typography>
-                </Grid>
-              </Grid>
-            );
-          })}
+              return (
+                <FormControlLabel
+                  key={operation}
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    margin: 0
+                  }}
+                  control={
+                    <Switch
+                      data-test={`space-operation-${targetGroup}-${operation}`}
+                      disabled={!isAdmin}
+                      defaultChecked={userCanPerformAction}
+                      onChange={(ev) => {
+                        const { checked: nowHasAccess } = ev.target;
+                        setValue(operation, nowHasAccess);
+                        setTouched(true);
+                      }}
+                    />
+                  }
+                  label={actionLabel}
+                  labelPlacement='start'
+                />
+              );
+            })}
 
-          {isAdmin && (
-            <Grid item xs>
-              <Button
-                data-test='submit-space-permission-settings'
-                disabled={!settingsChanged}
-                type='submit'
-                variant='contained'
-                color='primary'
-                sx={{ mr: 1 }}
-              >
-                Save
-              </Button>
-            </Grid>
-          )}
+            {isAdmin && (
+              <Box mt={2}>
+                <Button
+                  data-test='submit-space-permission-settings'
+                  disabled={!settingsChanged}
+                  type='submit'
+                  variant='contained'
+                  color='primary'
+                  sx={{ mr: 1 }}
+                >
+                  Save
+                </Button>
+              </Box>
+            )}
+          </Grid>
         </Grid>
       </form>
     </div>
