@@ -64,12 +64,12 @@ export default function PendingTasks(props: PendingTasksProps) {
   const totalBountyTasks = props.bountyTasks.length;
   const totalForumTasks = props.forumTasks.length;
 
-  const nexusDiscussionLink = `${charmverseUrl}/nexus?task=discussion`;
-  const nexusVoteLink = `${charmverseUrl}/nexus?task=vote`;
-  const nexusMultisigLink = `${charmverseUrl}/nexus?task=multisig`;
-  const nexusProposalLink = `${charmverseUrl}/nexus?task=proposal`;
-  const nexusBountyLink = `${charmverseUrl}/nexus?task=bounty`;
-  const nexusForumLink = `${charmverseUrl}/nexus?task=forum`;
+  const nexusDiscussionLink = `${charmverseUrl}/?task=discussion`;
+  const nexusVoteLink = `${charmverseUrl}/?task=vote`;
+  const nexusMultisigLink = `${charmverseUrl}/?task=multisig`;
+  const nexusProposalLink = `${charmverseUrl}/?task=proposal`;
+  const nexusBountyLink = `${charmverseUrl}/?task=bounty`;
+  const nexusForumLink = `${charmverseUrl}/?task=forum`;
 
   const discussionSection =
     totalDiscussionTasks > 0 ? (

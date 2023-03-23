@@ -56,7 +56,7 @@ export function SettingsDialogProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const close = () => {
-      if (!router.route.endsWith('/[domain]')) {
+      if (router.query.pageId) {
         onClose();
       }
     };

@@ -31,7 +31,7 @@ test('Space settings -  opens modal when coming from a notification email and cl
 
   await login({ page, userId: spaceUser.id });
 
-  await spaceSettings.goTo('nexus?task=proposal');
+  await spaceSettings.goTo('?task=proposal');
 
   // wait for a bit while redirect happens
   await expect(spaceSettings.getActivePath({ activePath: 'notifications' })).toBeVisible({ timeout: 20000 });
