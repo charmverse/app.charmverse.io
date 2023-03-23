@@ -1,14 +1,22 @@
 import { MemberMiniProfile } from 'components/profile/components/MemberMiniProfile/MemberMiniProfile';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useOnboarding } from 'hooks/useOnboarding';
+import { useSharedPage } from 'hooks/useSharedPage';
 import { useUser } from 'hooks/useUser';
 
 export function MemberOnboardingModal({ userId }: { userId?: string }) {
   const space = useCurrentSpace();
   const { user } = useUser();
   const { onboarded, completeOnboarding } = useOnboarding();
+  const { accessChecked } = useSharedPage();
 
-  if (!space || onboarded !== false || !user || !user.spaceRoles.some((sr) => sr.spaceId === space.id)) {
+  if (
+    !accessChecked ||
+    !space ||
+    onboarded !== false ||
+    !user ||
+    !user.spaceRoles.some((sr) => sr.spaceId === space.id)
+  ) {
     return null;
   }
 

@@ -184,11 +184,7 @@ function PageLayout({ children }: PageLayoutProps) {
       !user ? (
         <div></div>
       ) : (
-        <Sidebar
-          closeSidebar={handleDrawerClose}
-          favorites={user?.favorites || []}
-          navAction={isMobile ? handleDrawerClose : undefined}
-        />
+        <Sidebar closeSidebar={handleDrawerClose} navAction={isMobile ? handleDrawerClose : undefined} />
       ),
     [handleDrawerClose, !!user, isMobile]
   );

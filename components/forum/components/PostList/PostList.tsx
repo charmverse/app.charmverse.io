@@ -66,7 +66,8 @@ export function ForumPostList({ search, categoryId, sort }: ForumPostsProps) {
         count: resultsPerQuery,
         page: args.arguments.page,
         sort: args.arguments.sort
-      })
+      }),
+    { revalidateOnFocus: !morePostsAvailable }
   );
 
   const {
@@ -191,7 +192,6 @@ export function ForumPostList({ search, categoryId, sort }: ForumPostsProps) {
       <Stack spacing={2} sx={{ width: '100%', position: 'fixed', zIndex: 5000 }}>
         <Snackbar
           open={morePostsAvailable && !search}
-          autoHideDuration={10000}
           anchorOrigin={{
             horizontal: 'center',
             vertical: 'top'

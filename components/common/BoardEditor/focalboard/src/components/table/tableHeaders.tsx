@@ -1,7 +1,10 @@
 import AddIcon from '@mui/icons-material/Add';
+import { Menu } from '@mui/material';
+import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import React, { useCallback, useMemo } from 'react';
-import { useIntl } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 
+import charmClient from 'charmClient';
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import type { IPropertyTemplate, Board } from 'lib/focalboard/board';
 import type { BoardView, ISortOption } from 'lib/focalboard/boardView';
@@ -14,9 +17,8 @@ import mutator from '../../mutator';
 import { OctoUtils } from '../../octoUtils';
 import { IDType, Utils } from '../../utils';
 import Button from '../../widgets/buttons/button';
-import Menu from '../../widgets/menu';
-import MenuWrapper from '../../widgets/menuWrapper';
-import { PropertyTypes, typeDisplayName } from '../../widgets/propertyMenu';
+import { typeDisplayName } from '../../widgets/propertyMenu';
+import { PropertyTypes } from '../../widgets/propertyTypes';
 
 import TableHeader from './tableHeader';
 
@@ -36,6 +38,8 @@ function TableHeaders(props: Props): JSX.Element {
   const { board, cards, activeView, resizingColumn, views, offset, columnRefs } = props;
   const intl = useIntl();
   const { formatDateTime, formatDate } = useDateFormatter();
+  const addPropertyPopupState = usePopupState({ variant: 'popover', popupId: 'add-property' });
+
   const onAutoSizeColumn = useCallback(
     (columnID: string, headerWidth: number) => {
       let longestSize = headerWidth;
@@ -132,6 +136,7 @@ function TableHeaders(props: Props): JSX.Element {
       ? visiblePropertyIds
       : [Constants.titleColumnId, ...visiblePropertyIds];
     const destIndex = visiblePropertyIds.indexOf(destinationProperty.id);
+
     await mutator.changeViewVisiblePropertiesOrder(
       activeView.id,
       visiblePropertyIds,
@@ -176,26 +181,35 @@ function TableHeaders(props: Props): JSX.Element {
       {/* empty column for actions */}
       <div className='octo-table-cell header-cell' style={{ flexGrow: 1, borderRight: '0 none' }}>
         {!props.readOnly && !props.readOnlySourceData && (
-          <MenuWrapper>
-            <Button>
+          <>
+            <Button {...bindTrigger(addPropertyPopupState)}>
               <AddIcon fontSize='small' />
             </Button>
-            <Menu disablePortal={false}>
+            <Menu
+              {...bindMenu(addPropertyPopupState)}
+              anchorOrigin={{
+                vertical: 'bottom',
+                horizontal: 'left'
+              }}
+              transformOrigin={{
+                vertical: 'top',
+                horizontal: 'left'
+              }}
+            >
               <PropertyTypes
-                label={intl.formatMessage({ id: 'PropertyMenu.selectType', defaultMessage: 'Select property type' })}
-                onTypeSelected={async (type) => {
+                onClick={async (type) => {
+                  addPropertyPopupState.close();
                   const template: IPropertyTemplate = {
                     id: Utils.createGuid(IDType.BlockID),
                     name: typeDisplayName(intl, type),
                     type,
                     options: []
                   };
-                  const templateId = await mutator.insertPropertyTemplate(board, activeView, -1, template);
-                  // setNewTemplateId(templateId)
+                  await mutator.insertPropertyTemplate(board, activeView, -1, template);
                 }}
               />
             </Menu>
-          </MenuWrapper>
+          </>
         )}
       </div>
     </div>
