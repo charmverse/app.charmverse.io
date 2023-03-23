@@ -36,7 +36,8 @@ export const sessionUserRelations = {
       }
     },
     select: {
-      pageId: true
+      pageId: true,
+      index: true
     }
   },
   spaceRoles: {
