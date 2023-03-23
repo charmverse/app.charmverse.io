@@ -153,7 +153,6 @@
     "immutability-helper": "^3.1.1",
     "immutable": "^4.0.0",
     "iron-session": "^6.0.5",
-    "jest-prosemirror": "^2.1.2",
     "jose": "^4.11.2",
     "jszip": "^3.10.1",
     "koa": "^2.13.4",
