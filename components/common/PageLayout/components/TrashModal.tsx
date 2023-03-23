@@ -87,9 +87,9 @@ export default function TrashModal({ onClose, isOpen }: { onClose: () => void; i
   const router = useRouter();
 
   const { data: archivedPages, mutate: setArchivedPages } = useSWR<PagesMap>(
-    !space ? null : `deletable-pages-${space?.id}`,
+    !space ? null : `archived-pages-${space?.id}`,
     () => {
-      return charmClient.pages.getDeletablePages(space?.id as string).then((deletablePages) => {
+      return charmClient.pages.getArchivedPages(space?.id as string).then((deletablePages) => {
         return deletablePages.reduce((pageMap, page) => {
           pageMap[page.id] = page;
           return pageMap;

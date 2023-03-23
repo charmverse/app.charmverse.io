@@ -1,4 +1,4 @@
-import type { Page, PageOperations, Prisma, SpaceRole, SpaceRoleToRole } from '@prisma/client';
+import type { PageOperations, Prisma, SpaceRole, SpaceRoleToRole } from '@prisma/client';
 
 import { prisma } from 'db';
 import type { PagePermissionMeta } from 'lib/permissions/interfaces';
@@ -12,7 +12,6 @@ type PagesRequest = {
   spaceId: string;
   userId?: string;
   archived?: boolean;
-  deletable?: boolean;
   pageIds?: string[];
   meta?: boolean;
   search?: string;
@@ -104,22 +103,22 @@ function isAccessible({
   page,
   availableRoles,
   userId,
-  isGuest,
-  isAdmin,
-  operation
+  operation,
+  spaceRole
 }: {
   page: PageNodeWithPermissions;
   availableRoles: AvailableRole[];
   userId?: string;
-  isGuest: boolean;
-  isAdmin: boolean;
+  spaceRole: SpaceRole | null;
   operation: PageOperations;
 }): boolean {
-  if (isAdmin) {
+  const spaceRoleToUse = spaceRole && spaceRole.spaceId === page.spaceId ? spaceRole : null;
+
+  if (spaceRoleToUse?.isAdmin) {
     return true;
-  } else if (!userId) {
+  } else if (!userId || !spaceRoleToUse) {
     return page.permissions.some((p) => (operation === 'read' ? p.public : false));
-  } else if (isGuest) {
+  } else if (spaceRoleToUse?.isGuest) {
     return page.permissions.some(
       (p) =>
         (operation === 'read' ? p.public : false) ||
@@ -191,7 +190,7 @@ export async function getAccessiblePages(input: PagesRequest): Promise<IPageWith
   const pages = (await prisma.page.findMany({
     where: {
       spaceId: input.spaceId,
-      deletedAt: input.archived || input.deletable ? { not: null } : null,
+      deletedAt: input.archived ? { not: null } : null,
       ...searchQuery
     },
     ...selectPageFields(input.meta || false)
@@ -213,10 +212,9 @@ export async function getAccessiblePages(input: PagesRequest): Promise<IPageWith
 
       return isAccessible({
         userId: input.userId,
-        isGuest: !!spaceRole?.isGuest,
+        spaceRole,
         availableRoles,
-        isAdmin: !!spaceRole?.isAdmin,
-        operation: input.deletable ? 'delete' : 'read',
+        operation: input.archived ? 'delete' : 'read',
         page
       });
     })

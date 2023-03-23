@@ -152,7 +152,7 @@ describe('getAccessiblePages', () => {
     expect(pages.map((p) => p.id)).toEqual([pageToFind.id]);
   });
 
-  it('should return only pages marked as deletedAt when admin requests deletable pages', async () => {
+  it('should return only pages marked as deletedAt when admin requests archived pages', async () => {
     const { user, space } = await generateUserAndSpace({
       isAdmin: true
     });
@@ -170,14 +170,14 @@ describe('getAccessiblePages', () => {
     const deletablePages = await getAccessiblePages({
       userId: user.id,
       spaceId: space.id,
-      deletable: true
+      archived: true
     });
 
     expect(deletablePages.length).toBe(1);
     expect(deletablePages[0].id).toBe(page2.id);
   });
 
-  it('should return only pages marked as deletedAt where user can delete the page if this option is requested', async () => {
+  it('should return only pages marked as deletedAt where user can delete the page if user requests archived pages', async () => {
     const { user, space } = await generateUserAndSpace({
       isAdmin: false
     });
@@ -220,7 +220,7 @@ describe('getAccessiblePages', () => {
     const deletablePages = await getAccessiblePages({
       userId: user.id,
       spaceId: space.id,
-      deletable: true
+      archived: true
     });
 
     expect(deletablePages.length).toBe(1);

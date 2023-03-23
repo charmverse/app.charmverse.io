@@ -15,9 +15,9 @@ export class PagesApi {
     return http.GET<PageMeta[]>(`/api/spaces/${spaceId}/pages`, { meta: true });
   }
 
-  getDeletablePages(spaceId: string) {
+  getArchivedPages(spaceId: string) {
     // meta=true - TEMP param to keep backward compatibility with old clients
-    return http.GET<PageMeta[]>(`/api/spaces/${spaceId}/pages`, { meta: true, deletable: true });
+    return http.GET<PageMeta[]>(`/api/spaces/${spaceId}/pages`, { meta: true, archived: true });
   }
 
   searchPages(spaceId: string, search: string) {
