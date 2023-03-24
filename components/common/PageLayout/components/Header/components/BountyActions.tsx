@@ -1,13 +1,14 @@
 import CheckCircleOutlinedIcon from '@mui/icons-material/CheckCircleOutlined';
 import PaidIcon from '@mui/icons-material/Paid';
 import { ListItemButton, ListItemText, Tooltip } from '@mui/material';
+import { useSWRConfig } from 'swr';
 
 import charmClient from 'charmClient';
 import { useBounties } from 'hooks/useBounties';
 
 export function BountyActions({ bountyId, onClick }: { bountyId: string; onClick?: VoidFunction }) {
   const { refreshBounty, bounties } = useBounties();
-
+  const { mutate } = useSWRConfig();
   const bounty = bounties.find((_bounty) => _bounty.id === bountyId);
 
   if (!bounty) {
@@ -16,7 +17,7 @@ export function BountyActions({ bountyId, onClick }: { bountyId: string; onClick
 
   const isMarkBountyPaidButtonDisabled =
     (bounty?.applications.length === 0 ||
-      bounty?.applications.every(
+      !bounty?.applications.every(
         (application) => application.status === 'paid' || application.status === 'complete'
       )) ??
     true;
@@ -29,6 +30,7 @@ export function BountyActions({ bountyId, onClick }: { bountyId: string; onClick
     if (refreshBounty) {
       refreshBounty(bountyId);
     }
+    await mutate(`/bounties/${bountyId}/applications`);
     onClick?.();
   }
 

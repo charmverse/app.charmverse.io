@@ -1,7 +1,5 @@
-import CheckCircleOutlinedIcon from '@mui/icons-material/CheckCircleOutlined';
 import OpenInFullIcon from '@mui/icons-material/OpenInFull';
-import PaidIcon from '@mui/icons-material/Paid';
-import { Box, ListItemText, MenuItem } from '@mui/material';
+import { Box } from '@mui/material';
 import type { Page } from '@prisma/client';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
@@ -38,7 +36,7 @@ export default function PageDialog(props: Props) {
   const mounted = useRef(false);
   const popupState = usePopupState({ variant: 'popover', popupId: 'page-dialog' });
   const router = useRouter();
-  const { refreshBounty, setBounties } = useBounties();
+  const { setBounties } = useBounties();
   const { setCurrentPageId } = useCurrentPage();
 
   const { updatePage, deletePage } = usePages();
@@ -114,20 +112,6 @@ export default function PageDialog(props: Props) {
     [page]
   );
 
-  async function closeBounty(bountyId: string) {
-    await charmClient.bounties.closeBounty(bountyId);
-    if (refreshBounty) {
-      refreshBounty(bountyId);
-    }
-  }
-
-  async function markBountyAsPaid(bountyId: string) {
-    await charmClient.bounties.markBountyAsPaid(bountyId);
-    if (refreshBounty) {
-      refreshBounty(bountyId);
-    }
-  }
-
   if (!popupState.isOpen) {
     return null;
   }
@@ -148,7 +132,7 @@ export default function PageDialog(props: Props) {
               setBounties((_bounties) => [..._bounties, ...pageDuplicateResponse.bounties]);
             }}
           >
-            {bounty && <BountyActions bountyId={bounty.id} onClick={onClose} />}
+            {bounty && <BountyActions bountyId={bounty.id} />}
           </PageActions>
         )
       }
