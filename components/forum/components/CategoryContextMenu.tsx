@@ -4,6 +4,7 @@ import LockIcon from '@mui/icons-material/Lock';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import TaskIcon from '@mui/icons-material/Task';
 import { IconButton, ListItemIcon, MenuItem, MenuList, Typography } from '@mui/material';
+import Box from '@mui/material/Box';
 import Tooltip from '@mui/material/Tooltip';
 import type { PostCategory } from '@prisma/client';
 import { usePopupState } from 'material-ui-popup-state/hooks';
@@ -157,7 +158,7 @@ export function CategoryContextMenu({ category, onChange, onDelete, onSetNewDefa
 
   return (
     <>
-      <PopperPopup popupContent={popupContent} onClose={onSave}>
+      <PopperPopup width={250} popupContent={popupContent} onClose={onSave}>
         <IconButton data-test={`open-category-context-menu-${category.id}`} size='small'>
           <MoreHorizIcon fontSize='small' />
         </IconButton>

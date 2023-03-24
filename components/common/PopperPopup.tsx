@@ -7,6 +7,7 @@ import { useEffect, useRef } from 'react';
 
 interface PopperPopupProps {
   popupContent: React.ReactNode;
+  width?: number;
   children?: React.ReactNode | null;
   autoOpen?: boolean;
   closeOnClick?: boolean;
@@ -78,7 +79,17 @@ export default function PopperPopup(props: PopperPopupProps) {
         </div>
       )}
       <Popover disableRestoreFocus {...popoverProps}>
-        <Paper sx={{ width: { xs: '90vw', md: 500, lg: 750 } }}>{popupContent}</Paper>
+        <Paper
+          sx={{
+            width: {
+              xs: '90vw',
+              md: props.width ?? 500,
+              lg: props.width ?? 750
+            }
+          }}
+        >
+          {popupContent}
+        </Paper>
       </Popover>
     </div>
   );
