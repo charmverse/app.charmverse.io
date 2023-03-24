@@ -31,4 +31,4 @@ export async function seedUsers({ spaceDomainOrId, amount }: { spaceDomainOrId: 
   });
 }
 
-// seedUsers({spaceDomainOrId: 'estimated-defi-mollusk', amount: 10}).then(() => console.log('done'));
+seedUsers({spaceDomainOrId: 'intense-roadmap-loon', amount: 10}).then(() => console.log('done'));

@@ -1,5 +1,5 @@
 import { test as base, expect } from '@playwright/test';
-import { SpaceMembersSettings } from '__e2e__/po/settings/spaceMembersSettings.po';
+import { PermissionSettings } from '__e2e__/po/settings/spacePermissionSettings.po';
 import { v4 } from 'uuid';
 
 import { baseUrl } from 'config/constants';
@@ -8,11 +8,11 @@ import { generateSpaceRole, generateUserAndSpace } from '../utils/mocks';
 import { login } from '../utils/session';
 
 type Fixtures = {
-  spaceSettings: SpaceMembersSettings;
+  spaceSettings: PermissionSettings;
 };
 
 const test = base.extend<Fixtures>({
-  spaceSettings: ({ page }, use) => use(new SpaceMembersSettings(page))
+  spaceSettings: ({ page }, use) => use(new PermissionSettings(page))
 });
 
 // We have had a bug where the incorrect space was being used in the space settings page, which meant you'd always see the same members whatever the space
@@ -38,19 +38,12 @@ test('User has correct access in the space settings', async ({ page, spaceSettin
 
   await spaceSettings.openSettingsModal();
 
-  await spaceSettings.getSpaceSettingsLocator(isAdminSpace.id).click();
-
-  // Expand the tabs. We might not always get the admin space as first expanded, so we need to be smart enough to expand it if it's not already expanded
-  const isAdminTabExpanded = await spaceSettings.isSpaceSettingsExpanded(isAdminSpace.id);
-
-  if (!isAdminTabExpanded) {
-    await spaceSettings.getSpaceSettingsLocator(isAdminSpace.id).click();
-  }
-
   await spaceSettings.goToTab({
-    section: 'members',
+    section: 'roles',
     spaceId: isAdminSpace.id
   });
+
+  await spaceSettings.clickRoleRowByTitle('Admin');
 
   // Make sure admin user shows up and they can edit the admin level
   const memberRow = spaceSettings.getSpaceMemberRowLocator(user.id);
@@ -63,16 +56,13 @@ test('User has correct access in the space settings', async ({ page, spaceSettin
   await expect(invisibleMemberRow).not.toBeVisible();
 
   // Go to second space where current user will not be an admin
-  const isMemberTabExpanded = await spaceSettings.isSpaceSettingsExpanded(isMemberSpace.id);
-
-  if (!isMemberTabExpanded) {
-    await spaceSettings.getSpaceSettingsLocator(isMemberSpace.id).click();
-  }
+  await spaceSettings.getSpaceSettingsLocator(isMemberSpace.id).click();
 
   await spaceSettings.goToTab({
-    section: 'members',
+    section: 'roles',
     spaceId: isMemberSpace.id
   });
+  await spaceSettings.clickRoleRowByTitle('Member');
 
   // Verify both members now show up, and user now only has read access
 
@@ -83,6 +73,7 @@ test('User has correct access in the space settings', async ({ page, spaceSettin
   expect(isCurrentUserRowEditable).toBe(false);
 
   // Make sure other user shows up (we changed current space by selecting a different space, so this should cascade to useMembers)
+  await spaceSettings.clickRoleRowByTitle('Admin');
   const otherSpaceAdminRow = spaceSettings.getSpaceMemberRowLocator(otherSpaceAdmin.id);
   await expect(otherSpaceAdminRow).toBeVisible();
 });

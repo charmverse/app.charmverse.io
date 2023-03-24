@@ -5,7 +5,6 @@ import { prisma } from 'db';
 import log from 'lib/log';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
-import { requireCustomPermissionMode } from 'lib/middleware/requireCustomPermissionMode';
 import type { SpacePermissionFlags } from 'lib/permissions/spaces';
 import { addSpaceOperations } from 'lib/permissions/spaces';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -13,15 +12,7 @@ import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler
-  .use(requireUser)
-  .use(
-    requireCustomPermissionMode({
-      keyLocation: 'query',
-      spaceIdKey: 'spaceId'
-    })
-  )
-  .post(addSpacePermissionsController);
+handler.use(requireUser).post(addSpacePermissionsController);
 
 async function addSpacePermissionsController(req: NextApiRequest, res: NextApiResponse<SpacePermissionFlags>) {
   const { spaceId } = req.query;

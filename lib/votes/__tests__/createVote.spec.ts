@@ -1,6 +1,5 @@
 import { VoteStatus } from '@prisma/client';
 
-import { addSpaceOperations } from 'lib/permissions/spaces';
 import { DuplicateDataError } from 'lib/utilities/errors';
 import { createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 

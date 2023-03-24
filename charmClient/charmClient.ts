@@ -210,8 +210,18 @@ class CharmClient {
     return http.GET<CheckDomainResponse>('/api/spaces/checkDomain', params);
   }
 
-  updateMember({ spaceId, userId, isAdmin }: { spaceId: string; userId: string; isAdmin: boolean }) {
-    return http.PUT<Member[]>(`/api/spaces/${spaceId}/members/${userId}`, { isAdmin });
+  updateMemberRole({
+    spaceId,
+    userId,
+    isAdmin,
+    isGuest
+  }: {
+    spaceId: string;
+    userId: string;
+    isAdmin: boolean;
+    isGuest: boolean;
+  }) {
+    return http.PUT<Member[]>(`/api/spaces/${spaceId}/members/${userId}`, { isAdmin, isGuest });
   }
 
   removeMember({ spaceId, userId }: { spaceId: string; userId: string }) {

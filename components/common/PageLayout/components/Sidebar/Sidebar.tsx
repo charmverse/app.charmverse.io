@@ -189,7 +189,7 @@ export default function Sidebar({ closeSidebar, navAction }: SidebarProps) {
         <WorkspaceLabel>
           <SectionName>SPACE</SectionName>
           {/** Test component */}
-          {userSpacePermissions?.createPage && (
+          {userSpacePermissions?.createPage && showMemberFeatures && (
             <div className='add-a-page'>
               <NewPageMenu tooltip='Add a page' addPage={addPage} />
             </div>

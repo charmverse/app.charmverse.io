@@ -12,18 +12,17 @@ export class PermissionSettings extends SettingsModal {
 
   readonly submitSpacePermissionSettingsButton: Locator;
 
+  readonly permissionsTab: Locator;
+
   constructor(page: Page) {
     super(page);
     this.spacePermissionsForm = page.locator('data-test=space-permissions-form-role');
     this.submitSpacePermissionSettingsButton = page.locator(`data-test=submit-space-permission-settings`);
-  }
-
-  getExpandRoleContextMenuLocator(roleId: string): Locator {
-    return this.page.locator(`data-test=open-role-context-menu-${roleId}`);
+    this.permissionsTab = page.locator('data-test=role-settings-permissions-tab');
   }
 
   getRoleSpaceOperationSwitchLocator(operation: Exclude<SpaceOperation, 'createForumCategory'>): Locator {
-    return this.page.locator(`data-test=space-operation-role-${operation} >> input`);
+    return this.page.locator(`data-test=space-operation-${operation} >> input`);
   }
 
   async submitSpacePermissionSettings(): Promise<SpacePermissionFlags> {
@@ -41,14 +40,30 @@ export class PermissionSettings extends SettingsModal {
   }
 
   async isOperationChecked(operation: Exclude<SpaceOperation, 'createForumCategory'>): Promise<boolean> {
-    const toggleWrapper = this.page.locator(`data-test=space-operation-role-${operation}`);
+    const toggleWrapper = this.page.locator(`data-test=space-operation-${operation}`);
     const operationToggleChecked = await toggleWrapper.getAttribute('class');
 
     // Couldn't target the input element directly, so had to use the wrapper, and check the class
     return !!operationToggleChecked?.match('Mui-checked');
   }
 
-  getOpenManageRoleSpacePermissionsModalLocator(roleId: string): Locator {
-    return this.page.locator(`data-test=open-role-permissions-popup-${roleId}`);
+  clickRoleRowByTitle(title: string) {
+    return this.page.click(`data-test=role-row-${title}`);
+  }
+
+  goToRowTab(title: string, tab: 'permissions') {
+    return this.page.click(`data-test=role-row-${title} >> data-test=role-settings-${tab}-tab`);
+  }
+
+  getSpaceMemberRowLocator(userId: string): Locator {
+    return this.page.locator(`data-test=member-row-${userId}`);
+  }
+
+  hasEditableMemberLevel(userId: string): Promise<boolean> {
+    return this.getEditableMemberLevelLocator(userId).isVisible();
+  }
+
+  getEditableMemberLevelLocator(userId: string): Locator {
+    return this.page.locator(`data-test=editable-member-level-${userId}`);
   }
 }
