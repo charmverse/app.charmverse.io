@@ -11,6 +11,7 @@ import type { KeyedMutator } from 'swr';
 import charmClient from 'charmClient';
 import { BountyStatusNexusChip } from 'components/bounties/components/BountyStatusBadge';
 import Button from 'components/common/Button';
+import FieldLabel from 'components/common/form/FieldLabel';
 import Link from 'components/common/Link';
 import LoadingComponent from 'components/common/LoadingComponent';
 import type { BountyTask } from 'lib/bounties/getBountyTasks';
