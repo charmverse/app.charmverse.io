@@ -246,7 +246,7 @@ export default function PagePermissions({ pageId, pagePermissions, refreshPermis
         );
       })}
 
-      <Modal {...bindPopover(popupState)} title='Invite people to this page'>
+      <Modal {...bindPopover(popupState)} title='Invite people to this page' size='420px'>
         <AddPagePermissionsForm
           existingPermissions={pagePermissions}
           pageId={pageId}
