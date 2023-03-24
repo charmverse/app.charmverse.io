@@ -22,6 +22,7 @@ import { SpaceSettingsDialog } from 'components/common/Modal/SettingsDialog';
 import { charmverseDiscordInvite } from 'config/constants';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
+import { useFavoritePages } from 'hooks/useFavoritePages';
 import { useForumCategories } from 'hooks/useForumCategories';
 import { useHasMemberLevel } from 'hooks/useHasMemberLevel';
 import useKeydownPress from 'hooks/useKeydownPress';
@@ -127,11 +128,10 @@ function SidebarBox({ icon, label, ...props }: { icon: any; label: string } & Bo
 
 interface SidebarProps {
   closeSidebar: () => void;
-  favorites: LoggedInUser['favorites'];
   navAction?: () => void;
 }
 
-export default function Sidebar({ closeSidebar, favorites, navAction }: SidebarProps) {
+export default function Sidebar({ closeSidebar, navAction }: SidebarProps) {
   const router = useRouter();
   const { user, logoutUser } = useUser();
   const space = useCurrentSpace();
@@ -141,8 +141,8 @@ export default function Sidebar({ closeSidebar, favorites, navAction }: SidebarP
   const [showingTrash, setShowingTrash] = useState(false);
   const { disconnectWallet } = useWeb3AuthSig();
   const isMobile = useSmallScreen();
-
   const showMemberFeatures = useHasMemberLevel('member');
+  const { favoritePageIds } = useFavoritePages();
 
   const { onClick } = useSettingsDialog();
   const handleModalClick = (path?: string) => {
@@ -152,8 +152,6 @@ export default function Sidebar({ closeSidebar, favorites, navAction }: SidebarP
   const searchInWorkspaceModalState = usePopupState({ variant: 'popover', popupId: 'search-in-workspace-modal' });
 
   const openSearchLabel = useKeydownPress(searchInWorkspaceModalState.toggle, { key: 'p', ctrl: true });
-
-  const favoritePageIds = favorites.map((f) => f.pageId);
   function onScroll(e: React.UIEvent<HTMLDivElement>) {
     setIsScrolled(e.currentTarget?.scrollTop > 0);
   }
@@ -185,7 +183,7 @@ export default function Sidebar({ closeSidebar, favorites, navAction }: SidebarP
         {favoritePageIds.length > 0 && (
           <Box mb={2}>
             <SectionName mb={1}>FAVORITES</SectionName>
-            <PageNavigation isFavorites={true} rootPageIds={favoritePageIds} />
+            <PageNavigation isFavorites rootPageIds={favoritePageIds} />
           </Box>
         )}
         <WorkspaceLabel>

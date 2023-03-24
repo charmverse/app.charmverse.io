@@ -9,12 +9,13 @@ import charmClient from 'charmClient';
 import { NavIconHover } from 'components/common/PageLayout/components/PageNavigation/components/NavIconHover';
 import { TreeRoot } from 'components/common/PageLayout/components/PageNavigation/components/TreeRoot';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useFavoritePages } from 'hooks/useFavoritePages';
 import { useLocalStorage } from 'hooks/useLocalStorage';
 import { usePageFromPath } from 'hooks/usePageFromPath';
 import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
-import type { IPageWithPermissions, NewPageInput, PageMeta } from 'lib/pages';
+import type { IPageWithPermissions, NewPageInput, PageMeta, PageNodeWithChildren } from 'lib/pages';
 import { addPageAndRedirect } from 'lib/pages';
 import { isParentNode, mapPageTree, sortNodes } from 'lib/pages/mapPageTree';
 import { isTruthy } from 'lib/utilities/types';
@@ -44,11 +45,14 @@ type PageNavigationProps = {
 function PageNavigation({ deletePage, isFavorites, rootPageIds, onClick }: PageNavigationProps) {
   const router = useRouter();
   const { pages, setPages, mutatePage } = usePages();
+
   const currentPage = usePageFromPath();
   const space = useCurrentSpace();
   const { user } = useUser();
   const [expanded, setExpanded] = useLocalStorage<string[]>(`${space?.id}.expanded-pages`, []);
   const { showMessage } = useSnackbar();
+  const { reorderFavorites } = useFavoritePages();
+
   const pagesArray: MenuNode[] = filterVisiblePages(Object.values(pages)).map(
     (page): MenuNode => ({
       id: page.id,
@@ -70,7 +74,14 @@ function PageNavigation({ deletePage, isFavorites, rootPageIds, onClick }: PageN
   const pageHash = JSON.stringify(pagesArray);
 
   const mappedItems = useMemo(() => {
-    return mapPageTree<MenuNode>({ items: pagesArray, rootPageIds });
+    const mappedPages = mapPageTree<MenuNode>({ items: pagesArray, rootPageIds });
+    if (isFavorites) {
+      return rootPageIds
+        ?.map((id) => mappedPages.find((page) => page.id === id))
+        .filter(Boolean) as PageNodeWithChildren<MenuNode>[];
+    }
+
+    return mappedPages;
   }, [pageHash, rootPageIds]);
 
   const isValidDropTarget = useCallback(
@@ -87,6 +98,10 @@ function PageNavigation({ deletePage, isFavorites, rootPageIds, onClick }: PageN
         return;
       }
 
+      if (isFavorites) {
+        reorderFavorites({ reorderId: droppedItem.id, nextSiblingId: containerItem.id });
+        return;
+      }
       const parentId = containerItem.parentId;
 
       setPages((_pages) => {
@@ -99,6 +114,7 @@ function PageNavigation({ deletePage, isFavorites, rootPageIds, onClick }: PageN
         if (!droppedPage) {
           throw new Error('cannot find dropped page');
         }
+
         const originIndex: number = siblings.findIndex((sibling) => sibling.id === containerItem.id);
         siblings.splice(originIndex, 0, droppedPage);
         siblings.forEach((page, _index) => {
@@ -120,10 +136,11 @@ function PageNavigation({ deletePage, isFavorites, rootPageIds, onClick }: PageN
             };
           }
         });
+
         return { ..._pages };
       });
     },
-    [isValidDropTarget]
+    [isValidDropTarget, rootPageIds]
   );
 
   const onDropChild = useCallback(
@@ -238,7 +255,7 @@ function PageNavigation({ deletePage, isFavorites, rootPageIds, onClick }: PageN
           key={item.id}
           item={item}
           onDropChild={isFavorites ? null : onDropChild}
-          onDropAdjacent={isFavorites ? null : onDropAdjacent}
+          onDropAdjacent={onDropAdjacent}
           pathPrefix={`/${router.query.domain}`}
           // pass down so parent databases can highlight themselves
           selectedNodeId={selectedNodeId}
@@ -246,6 +263,7 @@ function PageNavigation({ deletePage, isFavorites, rootPageIds, onClick }: PageN
           deletePage={deletePage}
           onClick={onClick}
           validateTarget={isValidDropTarget}
+          isFavorites={isFavorites}
         />
       ))}
     </TreeRoot>
