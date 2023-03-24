@@ -63,7 +63,7 @@ export async function getDiscussionTasks(userId: string): Promise<DiscussionTask
     where: {
       userId,
       type: {
-        in: ['proposal_comment', 'mention']
+        in: ['page_comment', 'mention']
       }
     },
     select: {

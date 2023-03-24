@@ -57,7 +57,7 @@ enum NotificationType {
   proposal
   bounty
   post_comment
-  proposal_comment
+  page_comment
   forum
 }
 
