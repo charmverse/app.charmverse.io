@@ -87,6 +87,7 @@ function DiscussionTaskRow({
                   md: '400px'
                 }
               }}
+              onClick={onClose}
             >
               {text}
             </Link>
