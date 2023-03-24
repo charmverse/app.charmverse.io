@@ -5,6 +5,8 @@ import MultiTabs from 'components/common/MultiTabs';
 import PopperPopup from 'components/common/PopperPopup';
 import { uploadToS3 } from 'lib/aws/uploadToS3Browser';
 
+import { selectorPopupSizeConfig } from '../CharmEditor/components/common/selectorPopupSizeConfig';
+
 interface PdfSelectorProps {
   autoOpen?: boolean;
   onPdfSelect: (pdfSrc: string) => void;
@@ -17,6 +19,7 @@ export default function PdfSelector({ autoOpen = false, children, onPdfSelect }:
   return (
     <PopperPopup
       autoOpen={autoOpen}
+      sx={selectorPopupSizeConfig}
       popupContent={
         <Box>
           <MultiTabs
