@@ -8,7 +8,12 @@ import { getBountyOrThrow } from './getBounty';
 export async function markBountyAsPaid(bountyId: string): Promise<BountyWithDetails> {
   const bounty = await getBountyOrThrow(bountyId);
 
-  if (bounty.applications.some((application) => application.status !== 'paid' && application.status !== 'complete')) {
+  if (
+    bounty.applications.some(
+      (application) =>
+        application.status !== 'paid' && application.status !== 'complete' && application.status !== 'rejected'
+    )
+  ) {
     throw new InvalidInputError('All applications need to be either completed or paid in order to mark bounty as paid');
   }
 

@@ -18,7 +18,8 @@ export function BountyActions({ bountyId, onClick }: { bountyId: string; onClick
   const isMarkBountyPaidButtonDisabled =
     (bounty?.applications.length === 0 ||
       !bounty?.applications.every(
-        (application) => application.status === 'paid' || application.status === 'complete'
+        (application) =>
+          application.status === 'paid' || application.status === 'complete' || application.status !== 'rejected'
       )) ??
     true;
 
