@@ -20,9 +20,9 @@ export class PagesApi {
     return http.GET<PageMeta[]>(`/api/spaces/${spaceId}/pages`, { meta: true, archived: true });
   }
 
-  searchPages(spaceId: string, search: string) {
+  searchPages(spaceId: string, search: string, limit?: number) {
     // meta=true - TEMP param to keep backward compatibility with old clients
-    return http.GET<PageMeta[]>(`/api/spaces/${spaceId}/pages`, { meta: true, search });
+    return http.GET<PageMeta[]>(`/api/spaces/${spaceId}/pages`, { meta: true, search, limit });
   }
 
   getPage(pageIdOrPath: string, spaceId?: string) {

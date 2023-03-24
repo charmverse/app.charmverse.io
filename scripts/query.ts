@@ -21,7 +21,6 @@ async function search() {
   }
 
   getAccessiblePages({
-    meta: false,
     search: 'forum',
     spaceId: 'bc9e8464-4166-4f7c-8a14-bb293cc30d2a',
     userId: user.id
