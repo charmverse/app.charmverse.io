@@ -30,7 +30,8 @@ beforeAll(async () => {
       submissionNodes:
         '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"My submission"}]}]}',
       walletAddress: '0x123456789'
-    }
+    },
+    customReward: false
   });
 });
 
