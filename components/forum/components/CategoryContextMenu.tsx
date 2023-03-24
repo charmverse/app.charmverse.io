@@ -158,7 +158,7 @@ export function CategoryContextMenu({ category, onChange, onDelete, onSetNewDefa
 
   return (
     <>
-      <PopperPopup width={250} popupContent={popupContent} onClose={onSave}>
+      <PopperPopup popupContent={popupContent} onClose={onSave}>
         <IconButton data-test={`open-category-context-menu-${category.id}`} size='small'>
           <MoreHorizIcon fontSize='small' />
         </IconButton>
