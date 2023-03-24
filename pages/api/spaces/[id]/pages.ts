@@ -19,14 +19,12 @@ async function getPages(req: NextApiRequest, res: NextApiResponse<IPageWithPermi
   const spaceId = req.query.id as string;
   const archived = req.query.archived === 'true';
   const userId = req.session?.user?.id;
-  const meta = req.query.meta === 'true';
   const search = typeof req.query.search === 'string' ? req.query.search : undefined;
 
   const accessiblePages = await getAccessiblePages({
     spaceId,
     userId,
     archived,
-    meta,
     search
   });
 

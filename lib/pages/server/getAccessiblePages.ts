@@ -13,7 +13,6 @@ type PagesRequest = {
   userId?: string;
   archived?: boolean;
   pageIds?: string[];
-  meta?: boolean;
   search?: string;
 };
 
@@ -54,13 +53,7 @@ export function includePagePermissionsMeta(): { permissions: { select: Permissio
   };
 }
 
-function selectPageFields(meta: boolean) {
-  if (!meta) {
-    return {
-      include: includePagePermissions()
-    };
-  }
-
+function selectPageFields() {
   const select: { select: PageFieldsWithoutContent } = {
     select: {
       id: true,
@@ -139,89 +132,6 @@ export function accessiblePagesByPermissionsQuery({
   };
 }
 
-export function generateAccessiblePagesQuery(input: PagesRequest): Prisma.PageFindManyArgs {
-  const { spaceId, userId, archived = false, meta = false, search } = input;
-
-  // Return only pages with public permissions
-  if (!userId) {
-    return {
-      where: {
-        spaceId,
-        permissions: {
-          some: {
-            public: true
-          }
-        }
-      }
-    };
-  }
-
-  const archivedQuery = archived
-    ? {
-        deletedAt: {
-          not: null
-        }
-      }
-    : {
-        deletedAt: null
-      };
-
-  const formattedSearch = search
-    ? `${search
-        .split(/\s/)
-        .filter((s) => s)
-        .join(' & ')}:*`
-    : undefined;
-
-  const searchQuery = search
-    ? {
-        title: { search: formattedSearch },
-        contentText: { search: formattedSearch }
-      }
-    : {};
-
-  return {
-    where: {
-      OR: [
-        {
-          spaceId,
-          permissions: accessiblePagesByPermissionsQuery({
-            spaceId,
-            userId
-          })
-        },
-        // Override for proposal templates so any user can instantiate them
-        {
-          type: 'proposal_template',
-          space: {
-            id: spaceId,
-            spaceRoles: {
-              some: {
-                userId
-              }
-            }
-          }
-        },
-        // Admin override to always return all pages
-        {
-          space: {
-            id: spaceId,
-            spaceRoles: {
-              some: {
-                userId,
-                isAdmin: true
-              }
-            }
-          }
-        }
-      ],
-      ...archivedQuery,
-      ...searchQuery
-    },
-    ...selectPageFields(meta || false)
-  };
-}
-
 export async function getAccessiblePages(input: PagesRequest): Promise<IPageWithPermissions[]> {
   let spaceRole: SpaceRole | null = null;
 
@@ -273,31 +183,36 @@ export async function getAccessiblePages(input: PagesRequest): Promise<IPageWith
 
   if (input.search) {
     // Search by title and content, prioritize matches by title - TODO: use raw queries to improve performance
-    const pagesByTitle = (await prisma.page.findMany({
-      where: {
-        title: { search: formattedSearch },
-        spaceId: input.spaceId,
-        deletedAt: input.archived ? { not: null } : null
-      },
-      ...selectPageFields(input.meta || false)
-    } as any)) as IPageWithPermissions[];
-    const pagesByContent = (await prisma.page.findMany({
-      where: {
-        contentText: { search: formattedSearch },
-        spaceId: input.spaceId,
-        deletedAt: input.archived ? { not: null } : null
-      },
-      ...selectPageFields(input.meta || false)
-    } as any)) as IPageWithPermissions[];
-    pages = [...pagesByTitle, ...pagesByContent.filter((page) => !pagesByTitle.some((p) => p.id === page.id))];
+    const [pagesByTitle, pagesByContent] = await Promise.all([
+      prisma.page.findMany({
+        where: {
+          title: { search: formattedSearch },
+          spaceId: input.spaceId,
+          deletedAt: input.archived ? { not: null } : null
+        },
+        ...selectPageFields()
+      }),
+      prisma.page.findMany({
+        where: {
+          contentText: { search: formattedSearch },
+          spaceId: input.spaceId,
+          deletedAt: input.archived ? { not: null } : null
+        },
+        ...selectPageFields()
+      })
+    ]);
+    pages = [
+      ...pagesByTitle,
+      ...pagesByContent.filter((page) => !pagesByTitle.some((p) => p.id === page.id))
+    ] as IPageWithPermissions[];
   } else {
     pages = (await prisma.page.findMany({
       where: {
         spaceId: input.spaceId,
         deletedAt: input.archived ? { not: null } : null
       },
-      ...selectPageFields(input.meta || false)
-    } as any)) as IPageWithPermissions[];
+      ...selectPageFields()
+    })) as IPageWithPermissions[];
   }
 
   if (spaceRole?.isAdmin) {

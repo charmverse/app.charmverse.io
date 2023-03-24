@@ -11,7 +11,7 @@ import match from 'autosuggest-highlight/match';
 import parse from 'autosuggest-highlight/parse';
 import { useRouter } from 'next/router';
 import type { SyntheticEvent } from 'react';
-import { useEffect, useMemo, useState } from 'react';
+import { useState } from 'react';
 
 import charmClient from 'charmClient';
 import { Modal, DialogTitle, ModalPosition } from 'components/common/Modal';
@@ -109,7 +109,6 @@ export function SearchInWorkspaceModal(props: SearchInWorkspaceModalProps) {
   const space = useCurrentSpace();
   const [expandPageList, setExpandPageList] = useState(false);
   const [options, setOptions] = useState<SearchResultItem[]>([]);
-  const [debouncedInputValue, setDebouncedInputValue] = useState('');
 
   // const debouncedSearch = useMemo(() => debouncePromise(getSearchResults, 200), []);
 
@@ -135,7 +134,6 @@ export function SearchInWorkspaceModal(props: SearchInWorkspaceModalProps) {
       .then((results) => {
         if (results) {
           setOptions(results);
-          setDebouncedInputValue(newInputValue);
         }
       })
       .catch((err) => {
@@ -145,7 +143,7 @@ export function SearchInWorkspaceModal(props: SearchInWorkspaceModalProps) {
 
   return (
     <Modal open={isOpen} onClose={close} position={ModalPosition.top} style={{ height: '100%' }} size='large'>
-      <DialogTitle onClose={close}>Quick Find: {debouncedInputValue}</DialogTitle>
+      <DialogTitle onClose={close}>Quick Find</DialogTitle>
       <StyledAutocomplete
         options={options}
         noOptionsText='No search results'
