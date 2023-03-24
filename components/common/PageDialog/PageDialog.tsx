@@ -22,6 +22,7 @@ import type { PageMeta, PageUpdates } from 'lib/pages';
 import debouncePromise from 'lib/utilities/debouncePromise';
 
 import { PageActions } from '../PageActions';
+import { BountyActions } from '../PageLayout/components/Header/components/BountyActions';
 
 interface Props {
   page?: PageMeta | null;
@@ -147,43 +148,7 @@ export default function PageDialog(props: Props) {
               setBounties((_bounties) => [..._bounties, ...pageDuplicateResponse.bounties]);
             }}
           >
-            {bounty && (
-              <>
-                <MenuItem
-                  dense
-                  onClick={() => markBountyAsPaid(bounty.id)}
-                  disabled={
-                    bounty.applications.length === 0 ||
-                    bounty.applications.some(
-                      (application) => application.status !== 'paid' && application.status !== 'complete'
-                    )
-                  }
-                >
-                  <PaidIcon
-                    sx={{
-                      mr: 1
-                    }}
-                    fontSize='small'
-                  />
-                  <ListItemText primary='Mark paid' />
-                </MenuItem>
-                <MenuItem
-                  dense
-                  onClick={() => closeBounty(bounty.id)}
-                  disabled={
-                    bounty.status === 'complete' || (bounty.status !== 'inProgress' && bounty.status !== 'open')
-                  }
-                >
-                  <CheckCircleOutlinedIcon
-                    sx={{
-                      mr: 1
-                    }}
-                    fontSize='small'
-                  />
-                  <ListItemText primary='Mark complete' />
-                </MenuItem>
-              </>
-            )}
+            {bounty && <BountyActions bountyId={bounty.id} onClick={onClose} />}
           </PageActions>
         )
       }

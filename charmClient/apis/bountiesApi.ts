@@ -79,7 +79,7 @@ export class BountiesApi {
     return http.GET('/api/applications', { bountyId });
   }
 
-  createSubmission(content: Omit<SubmissionCreationData, 'userId'>): Promise<Application> {
+  createSubmission(content: Omit<SubmissionCreationData, 'userId' | 'customReward'>): Promise<Application> {
     return http.POST<Application>('/api/submissions', content);
   }
 

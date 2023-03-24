@@ -1,6 +1,5 @@
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
-import CheckCircleOutlinedIcon from '@mui/icons-material/CheckCircleOutlined';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import GetAppOutlinedIcon from '@mui/icons-material/GetAppOutlined';
@@ -8,7 +7,6 @@ import MenuIcon from '@mui/icons-material/Menu';
 import MessageOutlinedIcon from '@mui/icons-material/MessageOutlined';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import NotificationsIcon from '@mui/icons-material/Notifications';
-import PaidIcon from '@mui/icons-material/Paid';
 import RateReviewOutlinedIcon from '@mui/icons-material/RateReviewOutlined';
 import FavoritedIcon from '@mui/icons-material/Star';
 import NotFavoritedIcon from '@mui/icons-material/StarBorder';
@@ -50,6 +48,7 @@ import { useUser } from 'hooks/useUser';
 
 import NotificationsBadge from '../Sidebar/NotificationsBadge';
 
+import { BountyActions } from './components/BountyActions';
 import BountyShareButton from './components/BountyShareButton/BountyShareButton';
 import DatabasePageOptions from './components/DatabasePageOptions';
 import { DocumentHistory } from './components/DocumentHistory';
@@ -368,34 +367,6 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
     router.push(`/${router.query.domain}/${convertedProposal.path}`);
   }
 
-  async function closeBounty(bountyId: string) {
-    await charmClient.bounties.closeBounty(bountyId);
-    if (refreshBounty) {
-      refreshBounty(bountyId);
-    }
-    setPageMenuOpen(false);
-  }
-
-  async function markBountyAsPaid(bountyId: string) {
-    await charmClient.bounties.markBountyAsPaid(bountyId);
-    if (refreshBounty) {
-      refreshBounty(bountyId);
-    }
-    setPageMenuOpen(false);
-  }
-
-  const isMarkBountyPaidButtonDisabled =
-    (basePageBounty?.applications.length === 0 ||
-      basePageBounty?.applications.some(
-        (application) => application.status !== 'paid' && application.status !== 'complete'
-      )) ??
-    true;
-
-  const isMarkBountyCompletedButtonDisabled =
-    (basePageBounty?.status === 'complete' ||
-      (basePageBounty?.status !== 'inProgress' && basePageBounty?.status !== 'open')) ??
-    true;
-
   const documentOptions = (
     <List data-test='header--page-actions' dense>
       <ListItemButton
@@ -494,46 +465,7 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
       {pageType === 'bounty' && basePageBounty && (
         <>
           <Divider />
-          <Tooltip
-            title={isMarkBountyPaidButtonDisabled ? `You don't have permission to mark this bounty as paid` : ''}
-          >
-            <div>
-              <ListItemButton
-                dense
-                onClick={() => markBountyAsPaid(basePageBounty.id)}
-                disabled={isMarkBountyPaidButtonDisabled}
-              >
-                <PaidIcon
-                  sx={{
-                    mr: 1
-                  }}
-                  fontSize='small'
-                />
-                <ListItemText primary='Mark paid' />
-              </ListItemButton>
-            </div>
-          </Tooltip>
-          <Tooltip
-            title={
-              isMarkBountyCompletedButtonDisabled ? `You don't have permission to mark this bounty as complete` : ''
-            }
-          >
-            <div>
-              <ListItemButton
-                dense
-                onClick={() => closeBounty(basePageBounty.id)}
-                disabled={isMarkBountyCompletedButtonDisabled}
-              >
-                <CheckCircleOutlinedIcon
-                  sx={{
-                    mr: 1
-                  }}
-                  fontSize='small'
-                />
-                <ListItemText primary='Mark complete' />
-              </ListItemButton>
-            </div>
-          </Tooltip>
+          <BountyActions bountyId={basePageBounty.id} onClick={closeMenu} />
         </>
       )}
       {isLargeScreen && (

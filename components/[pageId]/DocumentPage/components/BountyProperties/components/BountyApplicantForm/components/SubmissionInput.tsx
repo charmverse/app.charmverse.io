@@ -59,6 +59,7 @@ export default function SubmissionInput({
 }: Props) {
   const { user } = useUser();
   const [isVisible, setIsVisible] = useState(expandedOnLoad ?? alwaysExpanded ?? false);
+
   const [isEditorTouched, setIsEditorTouched] = useState(false);
   const {
     register,
