@@ -110,8 +110,6 @@ export function SearchInWorkspaceModal(props: SearchInWorkspaceModalProps) {
   const [expandPageList, setExpandPageList] = useState(false);
   const [options, setOptions] = useState<SearchResultItem[]>([]);
 
-  // const debouncedSearch = useMemo(() => debouncePromise(getSearchResults, 200), []);
-
   function onChange(event: SyntheticEvent<Element>, newInputValue: string) {
     if (!space) {
       setExpandPageList(false);
