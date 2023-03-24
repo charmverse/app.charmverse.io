@@ -79,7 +79,7 @@ export function CommentForm({
 
   return (
     <Stack gap={1}>
-      <Box display='flex' gap={1} flexDirection='row' alignItems='flex-start'>
+      <Box display='flex' gap={1} flexDirection='row' alignItems='flex-start' data-test='comment-form'>
         <UserDisplay user={user} hideName={true} />
         {editor}
       </Box>

@@ -292,6 +292,48 @@ describe('computeProposalPermissions - base', () => {
       }
     });
   });
+  it('should only apply public-level permissions to guest-level members of the space, and return only proposal permissions assigned to the public level', async () => {
+    const otherProposalCategory = await generateProposalCategory({ spaceId: space.id });
+    const otherProposal = await generateProposal({
+      spaceId: space.id,
+      categoryId: otherProposalCategory.id,
+      userId: proposalAuthor.id,
+      authors: [proposalAuthor.id],
+      proposalStatus: 'discussion',
+      reviewers: []
+    });
+
+    // This should be ignored as user is only a guest
+    await prisma.proposalCategoryPermission.create({
+      data: {
+        permissionLevel: 'full_access',
+        proposalCategory: { connect: { id: otherProposalCategory.id } },
+        space: { connect: { id: space.id } }
+      }
+    });
+    await prisma.proposalCategoryPermission.create({
+      data: {
+        permissionLevel: 'view',
+        proposalCategory: { connect: { id: otherProposalCategory.id } },
+        public: true
+      }
+    });
+    const guestOperations = proposalPermissionsMapping.view;
+
+    // ------- Guest
+    const guestUser = await generateSpaceUser({ spaceId: space.id, isGuest: true });
+    const guestPermissions = await baseComputeProposalPermissions({
+      resourceId: otherProposal.id,
+      userId: guestUser.id
+    });
+    proposalOperations.forEach((op) => {
+      if (guestOperations.includes(op)) {
+        expect(guestPermissions[op]).toBe(true);
+      } else {
+        expect(guestPermissions[op]).toBe(false);
+      }
+    });
+  });
 
   it('should throw an error if the proposal does not exist or proposalId is invalid', async () => {
     await expect(

@@ -71,7 +71,9 @@ handler.get(async (req, res) => {
   }
 
   // When login with discord ?returnUrl is passed after oauth flow, that messes up the whole url
-  res.redirect(`${redirect.split('?')[0]}${req.query.guild_id ? `?guild_id=${req.query.guild_id}` : ''}`);
+  res.redirect(
+    `${redirect.split('?')[0]}${req.query.guild_id ? `?guild_id=${req.query.guild_id}&type=import-roles` : ''}`
+  );
 });
 
 export default withSessionRoute(handler);

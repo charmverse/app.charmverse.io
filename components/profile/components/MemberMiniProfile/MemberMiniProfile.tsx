@@ -109,9 +109,10 @@ function MemberProfile({
     (memberPropertyValue) => memberPropertyValue.spaceId === currentSpace?.id
   );
 
-  const { data: user, isLoading: isFetchingUser } = useSWR(`users/${member.path}`, () =>
-    charmClient.getUserByPath(member.path ?? member.id)
+  const { data: user, isLoading: isFetchingUser } = useSWR(`users/${member.id}`, () =>
+    charmClient.getUserByPath(member.id)
   );
+
   if (!currentSpace || !currentUser) {
     return null;
   }

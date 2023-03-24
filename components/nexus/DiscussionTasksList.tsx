@@ -114,11 +114,11 @@ interface DiscussionTasksListProps {
   tasks: GetTasksResponse | undefined;
   error: any;
   mutateTasks: KeyedMutator<GetTasksResponse>;
-  skippedDiscussions?: ('page' | 'bounty')[];
+  includedDiscussions?: ('page' | 'bounty' | 'proposal')[];
 }
 
 export default function DiscussionTasksList({
-  skippedDiscussions = [],
+  includedDiscussions = [],
   tasks,
   error,
   mutateTasks
@@ -131,12 +131,12 @@ export default function DiscussionTasksList({
     const _unmarkedSkippedDiscussions: DiscussionTask[] = [];
 
     (tasks?.discussions ? tasks.discussions.marked : []).forEach((discussion) => {
-      if (!skippedDiscussions.includes(discussion.type)) {
+      if (includedDiscussions.includes(discussion.type)) {
         _markedDiscussions.push(discussion);
       }
     });
     (tasks?.discussions ? tasks.discussions.unmarked : []).forEach((discussion) => {
-      if (!skippedDiscussions.includes(discussion.type)) {
+      if (includedDiscussions.includes(discussion.type)) {
         _unmarkedDiscussions.push(discussion);
       } else {
         _unmarkedSkippedDiscussions.push(discussion);

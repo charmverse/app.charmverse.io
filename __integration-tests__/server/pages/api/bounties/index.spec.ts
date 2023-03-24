@@ -7,7 +7,7 @@ import { createBounty } from 'lib/bounties';
 import { addSpaceOperations } from 'lib/permissions/spaces';
 import type { LoggedInUser } from 'models';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
-import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 let nonAdminUser: LoggedInUser;
 let nonAdminUserSpace: Space;
@@ -322,6 +322,26 @@ describe('POST /api/bounties - create a bounty', () => {
     };
 
     await request(baseUrl).post('/api/bounties').set('Cookie', nonAdminCookie).send(creationContent).expect(401);
+  });
+
+  it('should not allow users to create a bounty in a space where they are only a guest, and respond 401', async () => {
+    const guestUser = await generateSpaceUser({
+      spaceId: nonAdminUserSpace.id,
+      isGuest: true
+    });
+
+    const guestCookie = await loginUser(guestUser.id);
+
+    const creationContent: Partial<Bounty> = {
+      createdBy: guestUser.id,
+      spaceId: nonAdminUserSpace.id,
+      status: 'open',
+      rewardAmount: 5,
+      chainId: 1,
+      rewardToken: 'ETH'
+    };
+
+    await request(baseUrl).post('/api/bounties').set('Cookie', guestCookie).send(creationContent).expect(401);
   });
 
   it('should not allow users to create a bounty in a space they are not a member of, and respond 401', async () => {

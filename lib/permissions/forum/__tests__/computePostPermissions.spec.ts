@@ -355,6 +355,78 @@ describe('computePostPermissions - with editable by author only permission filte
     });
     expect(permissions.edit_post).toBe(false);
   });
+
+  it('should always return at most the view permissions if user is public member', async () => {
+    const postCategory = await generatePostCategory({ spaceId: space.id });
+    const post = await generateForumPost({
+      spaceId: space.id,
+      categoryId: postCategory.id,
+      userId: authorUser.id
+    });
+
+    await upsertPostCategoryPermission({
+      assignee: {
+        group: 'public'
+      },
+      permissionLevel: 'view',
+      postCategoryId: postCategory.id
+    });
+
+    const permissions = await baseComputePostPermissions({
+      resourceId: post.id
+    });
+    postOperationsWithoutEdit.forEach((op) => {
+      if (op === 'view_post') {
+        expect(permissions[op]).toBe(true);
+      } else {
+        expect(permissions.edit_post).toBe(false);
+      }
+    });
+  });
+
+  it('should always return at most the view permissions if user is a guest-level member in the space', async () => {
+    const postCategory = await generatePostCategory({ spaceId: space.id });
+    const post = await generateForumPost({
+      spaceId: space.id,
+      categoryId: postCategory.id,
+      userId: authorUser.id
+    });
+
+    const guestUser = await generateSpaceUser({
+      spaceId: space.id,
+      isGuest: true
+    });
+
+    // This permission should not be used because the user is a guest
+    await upsertPostCategoryPermission({
+      assignee: {
+        group: 'space',
+        id: space.id
+      },
+      permissionLevel: 'full_access',
+      postCategoryId: postCategory.id
+    });
+
+    await upsertPostCategoryPermission({
+      assignee: {
+        group: 'public'
+      },
+      permissionLevel: 'view',
+      postCategoryId: postCategory.id
+    });
+
+    const permissions = await baseComputePostPermissions({
+      resourceId: post.id,
+      userId: guestUser.id
+    });
+    postOperationsWithoutEdit.forEach((op) => {
+      if (op === 'view_post') {
+        expect(permissions[op]).toBe(true);
+      } else {
+        expect(permissions.edit_post).toBe(false);
+      }
+    });
+  });
 });
 
 describe('computePostPermissions - with proposal permission filtering policy', () => {

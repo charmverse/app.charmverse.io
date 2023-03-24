@@ -1,7 +1,7 @@
 // playwright-dev-page.ts
 import type { Locator, Page } from '@playwright/test';
 
-import type { SpaceSettingsSection } from 'components/settings/pages';
+import type { SpaceSettingsSection } from 'components/settings/config';
 import { baseUrl } from 'config/constants';
 
 import { GlobalPage } from '../global.po';

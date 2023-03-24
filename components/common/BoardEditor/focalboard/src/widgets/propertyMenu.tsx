@@ -1,20 +1,22 @@
-import React, { useState, useRef, useEffect } from 'react';
+import ArrowRightIcon from '@mui/icons-material/ArrowRight';
+import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
+import { ListItemIcon, Menu, MenuItem, TextField, Typography } from '@mui/material';
+import { Stack } from '@mui/system';
+import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
+import React, { useRef, useState } from 'react';
 import type { IntlShape } from 'react-intl';
-import { useIntl } from 'react-intl';
 
-import type { PropertyType } from 'lib/focalboard/board';
+import type { IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 
 import { Utils } from '../utils';
 
-import Menu from './menu';
+import { PropertyTypes } from './propertyTypes';
 
 type Props = {
-  propertyId: string;
-  propertyName: string;
-  propertyType: PropertyType;
   onTypeAndNameChanged: (newType: PropertyType, newName: string) => void;
   onDelete: (id: string) => void;
-  deleteDisabled?: string;
+  deleteDisabled?: boolean;
+  property: IPropertyTemplate;
 };
 
 export function typeDisplayName(intl: IntlShape, type: PropertyType): string {
@@ -55,12 +57,6 @@ export function typeDisplayName(intl: IntlShape, type: PropertyType): string {
     }
   }
 }
-function typeMenuTitle(intl: IntlShape, type: PropertyType): string {
-  return `${intl.formatMessage({ id: 'PropertyMenu.typeTitle', defaultMessage: 'Type' })}: ${typeDisplayName(
-    intl,
-    type
-  )}`;
-}
 
 export const propertyTypesList: PropertyType[] = [
   'text',
@@ -79,80 +75,76 @@ export const propertyTypesList: PropertyType[] = [
   'updatedBy'
 ];
 
-type TypesProps = {
-  label: string;
-  onTypeSelected: (type: PropertyType) => void;
-};
-
-export function PropertyTypes(props: TypesProps): JSX.Element {
-  const intl = useIntl();
-  return (
-    <>
-      <Menu.Label>
-        <b>{props.label}</b>
-      </Menu.Label>
-
-      <Menu.Separator />
-
-      {propertyTypesList.map((type) => (
-        <Menu.Text key={type} id={type} name={typeDisplayName(intl, type)} onClick={() => props.onTypeSelected(type)} />
-      ))}
-    </>
-  );
-}
-
 const PropertyMenu = React.memo((props: Props) => {
-  const intl = useIntl();
   const nameTextbox = useRef<HTMLInputElement>(null);
-  const [name, setName] = useState(props.propertyName);
-
-  const deleteText = intl.formatMessage({
-    id: 'PropertyMenu.Delete',
-    defaultMessage: 'Delete'
-  });
-
-  useEffect(() => {
-    nameTextbox.current?.focus();
-    nameTextbox.current?.setSelectionRange(0, name.length);
-  }, []);
-
+  const propertyType = props.property.type;
+  const propertyId = props.property.id;
+  const propertyName = props.property.name;
+  const [name, setName] = useState(propertyName);
+  const changePropertyTypePopupState = usePopupState({ variant: 'popover', popupId: 'card-property-type' });
   return (
-    <Menu>
-      <input
-        ref={nameTextbox}
+    <Stack gap={1}>
+      <TextField
+        sx={{
+          mx: 1,
+          my: 1
+        }}
+        inputProps={{
+          ref: nameTextbox
+        }}
+        className='PropertyMenu'
         type='text'
-        className='PropertyMenu menu-textbox'
-        onClick={(e) => e.stopPropagation()}
+        autoFocus
         onChange={(e) => {
           setName(e.target.value);
         }}
-        title={name}
         value={name}
-        onBlur={() => props.onTypeAndNameChanged(props.propertyType, name)}
         onKeyDown={(e) => {
           if (e.key === 'Enter' || e.key === 'Escape') {
-            props.onTypeAndNameChanged(props.propertyType, name);
+            props.onTypeAndNameChanged(propertyType, name);
             e.stopPropagation();
             if (e.key === 'Enter') {
               e.target.dispatchEvent(new Event('menuItemClicked'));
             }
           }
         }}
-        spellCheck={true}
       />
-      <Menu.SubMenu id='type' name={typeMenuTitle(intl, props.propertyType)}>
+      <MenuItem onClick={() => props.onDelete(propertyId)}>
+        <ListItemIcon>
+          <DeleteOutlinedIcon fontSize='small' />
+        </ListItemIcon>
+        <Typography variant='subtitle1'>Delete</Typography>
+      </MenuItem>
+      <MenuItem
+        {...bindTrigger(changePropertyTypePopupState)}
+        sx={{
+          display: 'flex',
+          flexDirection: 'row',
+          justifyContent: 'space-between'
+        }}
+      >
+        <Typography variant='subtitle1'>Type: {propertyName}</Typography>
+        <ArrowRightIcon fontSize='small' />
+      </MenuItem>
+      <Menu
+        {...bindMenu(changePropertyTypePopupState)}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'right'
+        }}
+        transformOrigin={{
+          vertical: 'center',
+          horizontal: 'left'
+        }}
+      >
         <PropertyTypes
-          label={intl.formatMessage({ id: 'PropertyMenu.changeType', defaultMessage: 'Change property type' })}
-          onTypeSelected={(type: PropertyType) => props.onTypeAndNameChanged(type, name)}
+          onClick={(type) => {
+            props.onTypeAndNameChanged(type, name);
+            changePropertyTypePopupState.close();
+          }}
         />
-      </Menu.SubMenu>
-      <Menu.Text
-        disabled={props.deleteDisabled}
-        id='delete'
-        name={deleteText}
-        onClick={() => props.onDelete(props.propertyId)}
-      />
-    </Menu>
+      </Menu>
+    </Stack>
   );
 });
 

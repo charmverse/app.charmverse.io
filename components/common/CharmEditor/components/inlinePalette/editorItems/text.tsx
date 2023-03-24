@@ -387,7 +387,7 @@ export function items(props: ItemsProps): PaletteItemTypeNoGroup[] {
           }}
         />
       ),
-      description: 'Link to a new page',
+      description: 'Link to an existing page',
       editorExecuteCommand: ({ palettePluginKey }) => {
         return (async (state, dispatch, view) => {
           if (nestedPagePluginKey) {

@@ -4,6 +4,7 @@ import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 import { EmptyStateVideo } from 'components/common/EmptyStateVideo';
+import ErrorPage from 'components/common/errors/ErrorPage';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { PageDialogProvider } from 'components/common/PageDialog/hooks/usePageDialog';
 import PageDialogGlobalModal from 'components/common/PageDialog/PageDialogGlobal';
@@ -12,6 +13,7 @@ import { useProposalCategories } from 'components/proposals/hooks/useProposalCat
 import { useProposalSortAndFilters } from 'components/proposals/hooks/useProposalSortAndFilters';
 import { NewProposalButton } from 'components/votes/components/NewProposalButton';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useHasMemberLevel } from 'hooks/useHasMemberLevel';
 
 import ProposalsTable from './components/ProposalsTable';
 import { ProposalsViewOptions } from './components/ProposalsViewOptions';
@@ -42,6 +44,12 @@ export function ProposalsPage() {
   }, []);
 
   const loadingData = !data;
+
+  const canSeeProposals = useHasMemberLevel('member');
+
+  if (!canSeeProposals) {
+    return <ErrorPage message='Guests cannot access proposals' />;
+  }
 
   return (
     <CenteredPageContent>

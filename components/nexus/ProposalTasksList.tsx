@@ -11,6 +11,7 @@ import type { KeyedMutator } from 'swr';
 
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
+import FieldLabel from 'components/common/form/FieldLabel';
 import Link from 'components/common/Link';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { ProposalStatusChip } from 'components/proposals/components/ProposalStatusBadge';
@@ -20,6 +21,7 @@ import type { GetTasksResponse } from 'pages/api/tasks/list';
 
 import { EmptyTaskState } from './components/EmptyTaskState';
 import Table from './components/NexusTable';
+import DiscussionTasksList from './DiscussionTasksList';
 
 const ProposalActionRecord: Record<ProposalTaskAction, string> = {
   discuss: 'Discuss',
@@ -171,6 +173,11 @@ export default function ProposalTasksList({
           ))}
         </TableBody>
       </Table>
+
+      <Box my={3}>
+        <FieldLabel>Proposal discussions</FieldLabel>
+        <DiscussionTasksList error={error} mutateTasks={mutateTasks} tasks={tasks} includedDiscussions={['proposal']} />
+      </Box>
     </Box>
   );
 }

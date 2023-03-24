@@ -6,7 +6,7 @@ import { useRouter } from 'next/router';
 import type { Dispatch, PropsWithChildren, SetStateAction } from 'react';
 import { createContext, useEffect, useState } from 'react';
 
-import NetworkModal from 'components/common/PageLayout/components/Account/components/NetworkModal/NetworkModal';
+import NetworkModal from 'components/_app/Web3ConnectionManager/components/NetworkModal/NetworkModal';
 
 import WalletSelectorModal from './components/WalletSelectorModal';
 import useEagerConnect from './hooks/useEagerConnect';
