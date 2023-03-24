@@ -6,7 +6,7 @@ import type { Page } from '@prisma/client';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
-import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 
 import charmClient from 'charmClient';
 import DocumentPage from 'components/[pageId]/DocumentPage';
@@ -19,7 +19,6 @@ import { usePages } from 'hooks/usePages';
 import type { BountyWithDetails } from 'lib/bounties';
 import log from 'lib/log';
 import type { PageMeta, PageUpdates } from 'lib/pages';
-import { findParentOfType } from 'lib/pages/findParentOfType';
 import debouncePromise from 'lib/utilities/debouncePromise';
 
 import { PageActions } from '../PageActions';

@@ -1,5 +1,6 @@
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
+import CheckCircleOutlinedIcon from '@mui/icons-material/CheckCircleOutlined';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import GetAppOutlinedIcon from '@mui/icons-material/GetAppOutlined';
@@ -7,6 +8,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import MessageOutlinedIcon from '@mui/icons-material/MessageOutlined';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import NotificationsIcon from '@mui/icons-material/Notifications';
+import PaidIcon from '@mui/icons-material/Paid';
 import RateReviewOutlinedIcon from '@mui/icons-material/RateReviewOutlined';
 import FavoritedIcon from '@mui/icons-material/Star';
 import NotFavoritedIcon from '@mui/icons-material/StarBorder';
@@ -20,7 +22,6 @@ import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import Popover from '@mui/material/Popover';
-import Stack from '@mui/material/Stack';
 import Switch from '@mui/material/Switch';
 import Toolbar from '@mui/material/Toolbar';
 import Tooltip from '@mui/material/Tooltip';
@@ -36,7 +37,7 @@ import { undoEventName } from 'components/common/CharmEditor/utils';
 import { DuplicatePageAction } from 'components/common/DuplicatePageAction';
 import { usePostByPath } from 'components/forum/hooks/usePostByPath';
 import { useProposalCategories } from 'components/proposals/hooks/useProposalCategories';
-import { useDateFormatter } from 'hooks/useDateFormatter';
+import { useBounties } from 'hooks/useBounties';
 import { useMembers } from 'hooks/useMembers';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { usePageFromPath } from 'hooks/usePageFromPath';
@@ -251,6 +252,7 @@ function PostHeader({
 function HeaderComponent({ open, openSidebar }: HeaderProps) {
   const router = useRouter();
   const { updatePage, deletePage } = usePages();
+  const { refreshBounty, bounties } = useBounties();
   const { user } = useUser();
   const theme = useTheme();
   const [pageMenuOpen, setPageMenuOpen] = useState(false);
@@ -298,6 +300,7 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
   const proposalCategoriesWithCreateAllowed = getCategoriesWithCreatePermission();
 
   const canCreateProposal = proposalCategoriesWithCreateAllowed.length > 0;
+  const basePageBounty = bounties.find((bounty) => bounty.id === basePage?.id);
 
   function closeMenu() {
     setPageMenuOpen(false);
@@ -364,6 +367,34 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
     closeMenu();
     router.push(`/${router.query.domain}/${convertedProposal.path}`);
   }
+
+  async function closeBounty(bountyId: string) {
+    await charmClient.bounties.closeBounty(bountyId);
+    if (refreshBounty) {
+      refreshBounty(bountyId);
+    }
+    setPageMenuOpen(false);
+  }
+
+  async function markBountyAsPaid(bountyId: string) {
+    await charmClient.bounties.markBountyAsPaid(bountyId);
+    if (refreshBounty) {
+      refreshBounty(bountyId);
+    }
+    setPageMenuOpen(false);
+  }
+
+  const isMarkBountyPaidButtonDisabled =
+    (basePageBounty?.applications.length === 0 ||
+      basePageBounty?.applications.some(
+        (application) => application.status !== 'paid' && application.status !== 'complete'
+      )) ??
+    true;
+
+  const isMarkBountyCompletedButtonDisabled =
+    (basePageBounty?.status === 'complete' ||
+      (basePageBounty?.status !== 'inProgress' && basePageBounty?.status !== 'open')) ??
+    true;
 
   const documentOptions = (
     <List data-test='header--page-actions' dense>
@@ -460,6 +491,51 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
         />
       )}
       <ExportMarkdownMenuItem disabled={!isExportablePage} onClick={exportMarkdownPage} />
+      {pageType === 'bounty' && basePageBounty && (
+        <>
+          <Divider />
+          <Tooltip
+            title={isMarkBountyPaidButtonDisabled ? `You don't have permission to mark this bounty as paid` : ''}
+          >
+            <div>
+              <ListItemButton
+                dense
+                onClick={() => markBountyAsPaid(basePageBounty.id)}
+                disabled={isMarkBountyPaidButtonDisabled}
+              >
+                <PaidIcon
+                  sx={{
+                    mr: 1
+                  }}
+                  fontSize='small'
+                />
+                <ListItemText primary='Mark paid' />
+              </ListItemButton>
+            </div>
+          </Tooltip>
+          <Tooltip
+            title={
+              isMarkBountyCompletedButtonDisabled ? `You don't have permission to mark this bounty as complete` : ''
+            }
+          >
+            <div>
+              <ListItemButton
+                dense
+                onClick={() => closeBounty(basePageBounty.id)}
+                disabled={isMarkBountyCompletedButtonDisabled}
+              >
+                <CheckCircleOutlinedIcon
+                  sx={{
+                    mr: 1
+                  }}
+                  fontSize='small'
+                />
+                <ListItemText primary='Mark complete' />
+              </ListItemButton>
+            </div>
+          </Tooltip>
+        </>
+      )}
       {isLargeScreen && (
         <>
           <Divider />
