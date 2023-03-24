@@ -11,6 +11,7 @@ import type { KeyedMutator } from 'swr';
 
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
+import FieldLabel from 'components/common/form/FieldLabel';
 import Link from 'components/common/Link';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { ProposalStatusChip } from 'components/proposals/components/ProposalStatusBadge';
@@ -174,7 +175,7 @@ export default function ProposalTasksList({
       </Table>
 
       <Box my={3}>
-        <Typography fontWeight='bold'>Proposal discussions</Typography>
+        <FieldLabel>Proposal discussions</FieldLabel>
         <DiscussionTasksList error={error} mutateTasks={mutateTasks} tasks={tasks} includedDiscussions={['proposal']} />
       </Box>
     </Box>
