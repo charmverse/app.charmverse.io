@@ -140,8 +140,8 @@ function BountiesTasksList({
       </Table>
 
       <Box my={3}>
-        <Typography fontWeight='bold'>Bounty discussions</Typography>
-        <DiscussionTasksList error={error} mutateTasks={mutateTasks} tasks={tasks} skippedDiscussions={['page']} />
+        <FieldLabel>Bounty discussions</FieldLabel>
+        <DiscussionTasksList error={error} mutateTasks={mutateTasks} tasks={tasks} includedDiscussions={['bounty']} />
       </Box>
     </Box>
   );
