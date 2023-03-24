@@ -51,7 +51,14 @@ function updateReferences({ oldNewPageIdHashMap, pages }: UpdateRefs) {
       } else if (node.type === 'page') {
         const attrs = node.attrs as { id: string };
         const oldPageId = attrs.id;
-        const newPageId = oldPageId ? oldNewPageIdHashMap[oldPageId] : undefined;
+        let newPageId = oldPageId ? oldNewPageIdHashMap[oldPageId] : undefined;
+
+        if (oldPageId && !newPageId) {
+          newPageId = v4();
+          oldNewPageIdHashMap[oldPageId] = newPageId;
+          oldNewPageIdHashMap[newPageId] = oldPageId;
+        }
+
         if (oldPageId && newPageId) {
           attrs.id = newPageId;
         }
@@ -151,7 +158,9 @@ export async function generateImportWorkspacePages({
     newParentId: string | null;
     rootSpacePermissionId?: string;
   }) {
-    const newId = rootPageId ?? v4();
+    const existingNewPageId = node.type === 'page' ? oldNewPageIdHashMap[node.id] : undefined;
+
+    const newId = rootPageId ?? existingNewPageId ?? v4();
 
     oldNewPageIdHashMap[newId] = node.id;
     oldNewPageIdHashMap[node.id] = newId;
