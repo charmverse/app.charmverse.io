@@ -174,7 +174,7 @@ export default function TokenGatesTable({ isAdmin, onDelete, tokenGates }: Props
           <TableHead>
             <StyledTableRow>
               <TableCell sx={{ padding: '20px 16px' }}>
-                <Typography variant='body1' fontWeight='600' mr={1} display='inline-flex'>
+                <Typography variant='body1' fontWeight='600' mr={6} display='inline-flex'>
                   Token Gated Link
                 </Typography>
                 {isMobile && copyLink}
