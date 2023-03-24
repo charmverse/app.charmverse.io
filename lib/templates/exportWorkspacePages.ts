@@ -8,9 +8,21 @@ import { prisma } from 'db';
 import type { PageNodeWithChildren } from 'lib/pages';
 import { isBoardPageType } from 'lib/pages/isBoardPageType';
 import { resolvePageTree } from 'lib/pages/server/resolvePageTree';
+import type { PageContent, TextContent } from 'lib/prosemirror/interfaces';
 import { DataNotFoundError } from 'lib/utilities/errors';
 
 import type { ExportedPage, WorkspaceExport } from './interfaces';
+
+function recurse(node: PageContent, cb: (node: PageContent | TextContent) => void) {
+  if (node?.content) {
+    node?.content.forEach((childNode) => {
+      recurse(childNode, cb);
+    });
+  }
+  if (node) {
+    cb(node);
+  }
+}
 
 export interface ExportWorkspacePage {
   sourceSpaceIdOrDomain: string;
@@ -136,6 +148,15 @@ export async function exportWorkspacePages({
       })
     );
     const pollIds: string[] = [];
+
+    recurse(node.content as PageContent, (_node) => {
+      if (_node.type === 'poll') {
+        const attrs = _node.attrs as { pollId: string };
+        if (attrs.pollId) {
+          pollIds.push(attrs.pollId);
+        }
+      }
+    });
 
     if (pollIds.length) {
       node.votes = await prisma.vote.findMany({
