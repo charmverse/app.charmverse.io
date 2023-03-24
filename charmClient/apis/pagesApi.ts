@@ -11,18 +11,15 @@ export interface UpdateProfileItemRequest {
 
 export class PagesApi {
   getPages(spaceId: string) {
-    // meta=true - TEMP param to keep backward compatibility with old clients
-    return http.GET<PageMeta[]>(`/api/spaces/${spaceId}/pages`, { meta: true });
+    return http.GET<PageMeta[]>(`/api/spaces/${spaceId}/pages`);
   }
 
   getArchivedPages(spaceId: string) {
-    // meta=true - TEMP param to keep backward compatibility with old clients
-    return http.GET<PageMeta[]>(`/api/spaces/${spaceId}/pages`, { meta: true, archived: true });
+    return http.GET<PageMeta[]>(`/api/spaces/${spaceId}/pages`, { archived: true });
   }
 
   searchPages(spaceId: string, search: string, limit?: number) {
-    // meta=true - TEMP param to keep backward compatibility with old clients
-    return http.GET<PageMeta[]>(`/api/spaces/${spaceId}/pages`, { meta: true, search, limit });
+    return http.GET<PageMeta[]>(`/api/spaces/${spaceId}/pages`, { search, limit });
   }
 
   getPage(pageIdOrPath: string, spaceId?: string) {
