@@ -14,6 +14,7 @@ type PagesRequest = {
   archived?: boolean;
   pageIds?: string[];
   search?: string;
+  limit?: number;
 };
 
 /**
@@ -201,10 +202,10 @@ export async function getAccessiblePages(input: PagesRequest): Promise<IPageWith
         ...selectPageFields()
       })
     ]);
-    pages = [
-      ...pagesByTitle,
-      ...pagesByContent.filter((page) => !pagesByTitle.some((p) => p.id === page.id))
-    ] as IPageWithPermissions[];
+    pages = [...pagesByTitle, ...pagesByContent.filter((page) => !pagesByTitle.some((p) => p.id === page.id))].slice(
+      0,
+      input.limit
+    ) as IPageWithPermissions[];
   } else {
     pages = (await prisma.page.findMany({
       where: {

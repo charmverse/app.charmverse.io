@@ -224,19 +224,14 @@ function getSearchResults(params: {
   query: string;
   pages: Record<string, PageMeta | undefined>;
 }): Promise<SearchResultItem[]> {
-  return charmClient.pages.searchPages(params.spaceId, params.query).then((pages) => {
-    return (
-      pages
-        // probably never need to show more than 50 results
-        .slice(0, 50)
-        .map((page) => ({
-          name: page.title || 'Untitled',
-          path: getPagePath(page, params.pages),
-          link: `/${params.spaceDomain}/${page.path}`,
-          type: ResultType.page,
-          id: page.id
-        }))
-    );
+  return charmClient.pages.searchPages(params.spaceId, params.query, 50).then((pages) => {
+    return pages.map((page) => ({
+      name: page.title || 'Untitled',
+      path: getPagePath(page, params.pages),
+      link: `/${params.spaceDomain}/${page.path}`,
+      type: ResultType.page,
+      id: page.id
+    }));
   });
 }
 
