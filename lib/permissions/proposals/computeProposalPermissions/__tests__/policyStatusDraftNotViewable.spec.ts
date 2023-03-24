@@ -64,10 +64,11 @@ describe('policyStatusDraftOnlyViewable', () => {
       comment: true,
       create_vote: true,
       review: true,
-      vote: true
+      vote: true,
+      make_public: true
     });
   });
-  it('should allow the author to view, edit, comment, delete', async () => {
+  it('should allow the author to view, edit, comment, delete and make public', async () => {
     const permissions = await policyStatusDraftNotViewable({
       flags: fullPermissions,
       isAdmin: false,
@@ -80,6 +81,7 @@ describe('policyStatusDraftOnlyViewable', () => {
       edit: true,
       delete: true,
       comment: true,
+      make_public: true,
       create_vote: false,
       review: false,
       vote: false
@@ -99,6 +101,7 @@ describe('policyStatusDraftOnlyViewable', () => {
       edit: false,
       delete: true,
       comment: true,
+      make_public: true,
       create_vote: false,
       review: false,
       vote: false
@@ -118,6 +121,7 @@ describe('policyStatusDraftOnlyViewable', () => {
       edit: false,
       delete: false,
       comment: false,
+      make_public: false,
       create_vote: false,
       review: false,
       vote: false
@@ -139,7 +143,8 @@ describe('policyStatusDraftOnlyViewable', () => {
       comment: false,
       create_vote: false,
       review: false,
-      vote: false
+      vote: false,
+      make_public: false
     });
   });
 });

@@ -21,8 +21,8 @@ export async function policyStatusDraftNotViewable({
     return newPermissions;
   }
 
-  const allowedAuthorOperations: ProposalOperation[] = ['view', 'edit', 'delete', 'comment'];
-  const allowedAdminOperations: ProposalOperation[] = ['view', 'delete', 'comment'];
+  const allowedAuthorOperations: ProposalOperation[] = ['view', 'edit', 'delete', 'comment', 'make_public'];
+  const allowedAdminOperations: ProposalOperation[] = ['view', 'delete', 'comment', 'make_public'];
 
   if (isProposalAuthor({ proposal: resource, userId })) {
     typedKeys(flags).forEach((flag) => {

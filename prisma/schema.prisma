@@ -1069,6 +1069,7 @@ enum ProposalOperation {
   vote
   comment
   review
+  make_public
 }
 
 enum ProposalCategoryPermissionLevel {
