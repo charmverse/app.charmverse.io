@@ -1,8 +1,7 @@
 import type { RawPlugins, RawSpecs } from '@bangle.dev/core';
 import { createElement } from '@bangle.dev/core';
 import type { DOMOutputSpec } from '@bangle.dev/pm';
-import { Plugin, PluginKey, keymap, TextSelection } from '@bangle.dev/pm';
-import { hasParentNodeOfType } from '@bangle.dev/utils';
+import { Plugin, PluginKey, keymap } from '@bangle.dev/pm';
 
 import { backspaceCmd } from './commands';
 
@@ -55,7 +54,7 @@ export function plugins(): RawPlugins {
         // Enter: moveDownCmd
       }),
       ContainerPlugin({ type: 'disclosureSummary', contentDOM: ['summary'] }),
-      ContainerPlugin({ type: 'disclosureDetails', contentDOM: ['details'] })
+      ContainerPlugin({ type: 'disclosureDetails', contentDOM: ['div', { class: 'disclosure-details' }] })
     ];
   };
 }
@@ -72,33 +71,33 @@ function ContainerPlugin({ type, contentDOM }: { type: string; contentDOM: DOMOu
             return true;
           }
           return false;
-        },
-        // disable toggle effect unelss user is clicking the toggle element
-        click: (view, event) => {
-          const coordinates = view.posAtCoords({
-            left: event.clientX,
-            top: event.clientY
-          });
-          if (!coordinates || !(event.target instanceof Element)) {
-            return false;
-          }
-          const selection = new TextSelection(view.state.doc.resolve(coordinates.pos));
-          const isInsideSummary = hasParentNodeOfType(view.state.schema.nodes.disclosureSummary)(selection);
-          const targetEdge = event.target.getBoundingClientRect().left;
-          const distanceFromEdge = event.clientX - targetEdge;
-          if (isInsideSummary && distanceFromEdge > 20) {
-            event.stopPropagation();
-            event.preventDefault();
-            return true;
-          }
-
-          return false;
         }
       },
       nodeViews: {
-        [type]: function nodeView(node, view, getPos, decorations) {
+        [type]: function nodeView(node, view) {
           // @ts-ignore
           const element = createElement(contentDOM);
+          if (type === 'disclosureSummary') {
+            // Toggle on summary icon click
+            element.addEventListener('click', (event) => {
+              if (!(event.target instanceof Element)) {
+                return;
+              }
+
+              const targetEdge = element.getBoundingClientRect().left;
+              const distanceFromEdge = event.clientX - targetEdge;
+
+              if (distanceFromEdge > 20) {
+                return;
+              }
+
+              const parentContainer = element.closest('.disclosure-details');
+              if (parentContainer) {
+                parentContainer.toggleAttribute('open');
+              }
+            });
+          }
+
           return {
             contentDOM: element,
             dom: element,
