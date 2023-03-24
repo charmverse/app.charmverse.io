@@ -9,6 +9,7 @@ import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { requireKeys } from 'lib/middleware/requireKeys';
 import { withSessionRoute } from 'lib/session/withSession';
 import { DataNotFoundError, UnauthorisedActionError } from 'lib/utilities/errors';
+import { isTruthy } from 'lib/utilities/types';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -25,7 +26,12 @@ async function updateSubmissionController(req: NextApiRequest, res: NextApiRespo
       id: submissionId as string
     },
     select: {
-      createdBy: true
+      createdBy: true,
+      bounty: {
+        select: {
+          customReward: true
+        }
+      }
     }
   });
 
@@ -41,7 +47,8 @@ async function updateSubmissionController(req: NextApiRequest, res: NextApiRespo
 
   const updated = await updateSubmission({
     submissionId: submissionId as string,
-    submissionContent: req.body
+    submissionContent: req.body,
+    customReward: isTruthy(existingSubmission.bounty.customReward)
   });
 
   return res.status(200).json(updated);
