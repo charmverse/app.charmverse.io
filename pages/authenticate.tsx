@@ -71,7 +71,6 @@ export default function Authenticate() {
 
   return getLayout(
     <Box height='100%' display='flex' flexDirection='column'>
-      {isAuthenticating && <LoadingComponent label='Logging you in' />}
       <LoginPageContent hideLoginOptions isLoggingIn={isAuthenticating} />
 
       <CollectEmailDialog
