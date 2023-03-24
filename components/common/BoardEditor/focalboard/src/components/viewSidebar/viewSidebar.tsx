@@ -219,9 +219,9 @@ export function SidebarHeader({
   goBack,
   title
 }: {
-  closeSidebar: () => void;
+  closeSidebar?: () => void;
   goBack?: () => void;
-  title: string;
+  title?: string;
 }) {
   return (
     <Box px={2} pt={1} pb={1} display='flex' justifyContent='space-between' alignItems='center'>
@@ -231,13 +231,17 @@ export function SidebarHeader({
             <BackIcon fontSize='small' color='secondary' />
           </IconButton>
         )}
-        <Typography fontWeight='bold' variant='body2'>
-          {title}
-        </Typography>
+        {title && (
+          <Typography fontWeight='bold' variant='body2'>
+            {title}
+          </Typography>
+        )}
       </Box>
-      <IconButton onClick={closeSidebar} size='small'>
-        <CloseIcon fontSize='small' />
-      </IconButton>
+      {closeSidebar && (
+        <IconButton onClick={closeSidebar} size='small'>
+          <CloseIcon fontSize='small' />
+        </IconButton>
+      )}
     </Box>
   );
 }

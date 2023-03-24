@@ -32,17 +32,20 @@ export interface ApplicationWithBounty extends Application {
   bounty: Bounty;
 }
 
-export type SubmissionContent = RequiredNotNull<Pick<Application, 'submission' | 'submissionNodes' | 'walletAddress'>>;
+export type SubmissionContent = RequiredNotNull<Pick<Application, 'submission' | 'submissionNodes'>> &
+  Partial<Pick<Application, 'walletAddress'>>;
 
 export interface SubmissionCreationData {
   bountyId: string;
   userId: string;
   submissionContent: SubmissionContent;
+  customReward: boolean;
 }
 
 export interface SubmissionUpdateData {
   submissionId: string;
   submissionContent: Partial<SubmissionContent>;
+  customReward: boolean;
 }
 
 export interface ApplicationWithTransactions extends Application {

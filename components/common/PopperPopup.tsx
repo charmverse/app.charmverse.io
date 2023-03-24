@@ -78,7 +78,7 @@ export default function PopperPopup(props: PopperPopupProps) {
         </div>
       )}
       <Popover disableRestoreFocus {...popoverProps}>
-        <Paper>{popupContent}</Paper>
+        <Paper sx={{ width: { xs: '90vw', md: 500, lg: 750 } }}>{popupContent}</Paper>
       </Popover>
     </div>
   );

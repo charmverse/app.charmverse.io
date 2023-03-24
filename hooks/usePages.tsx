@@ -30,11 +30,11 @@ export type PagesContext = {
   pages: PagesMap;
   setPages: Dispatch<SetStateAction<PagesMap>>;
   refreshPage: (pageId: string) => Promise<PageMeta>;
+  getPageByPath: (pageId: string) => PageMeta | undefined;
   updatePage: PageUpdater;
   mutatePage: (updates: PageUpdates, revalidate?: boolean) => void;
   mutatePagesRemove: (pageIds: string[], revalidate?: boolean) => void;
   deletePage: (data: { pageId: string; board?: Block }) => Promise<PageMeta | null | undefined>;
-  getPagePermissions: (pageId: string, page?: PageMeta) => IPagePermissionFlags | null;
   mutatePagesList: KeyedMutator<PagesMap<PageMeta>>;
 };
 
@@ -44,7 +44,7 @@ export const PagesContext = createContext<Readonly<PagesContext>>({
   loadingPages: true,
   pages: {},
   setPages: () => undefined,
-  getPagePermissions: () => new AllowedPagePermissions(),
+  getPageByPath: () => undefined,
   refreshPage: () => Promise.resolve({} as any),
   updatePage: () => Promise.resolve({} as any),
   mutatePage: () => {},
@@ -96,57 +96,6 @@ export function PagesProvider({ children }: { children: ReactNode }) {
 
     return updatedData;
   };
-  /**
-   * Will return permissions for the currently connected user
-   * @param pageId
-   */
-  function getPagePermissions(pageId: string, deletedPage?: PageMeta): IPagePermissionFlags | null {
-    const computedPermissions = new AllowedPagePermissions();
-
-    const targetPage = pages[pageId] ?? deletedPage;
-
-    // Return empty permission set so this silently fails
-    if (!targetPage || !isUserLoaded) {
-      return computedPermissions;
-    }
-    if (!isUserLoaded) {
-      return null;
-    }
-    const userSpaceRole = user?.spaceRoles.find((spaceRole) => spaceRole.spaceId === targetPage.spaceId);
-
-    if (targetPage.type === 'card_synced') {
-      computedPermissions.addPermissions(permissionTemplates.view);
-    } else {
-      // For now, we allow admin users to override explicitly assigned permissions
-      if (isAdmin) {
-        computedPermissions.addPermissions(Object.keys(PageOperations) as PageOperationType[]);
-        return computedPermissions;
-      }
-
-      const applicableRoles: Role[] =
-        userSpaceRole?.spaceRoleToRole?.map((spaceRoleToRole) => spaceRoleToRole.role) ?? [];
-
-      targetPage.permissions?.forEach((permission) => {
-        // User gets permission via role or as an individual
-        const shouldApplyPermission =
-          (permission.userId && permission.userId === user?.id) ||
-          (permission.roleId && applicableRoles.some((role) => role.id === permission.roleId)) ||
-          (userSpaceRole && permission.spaceId === userSpaceRole.spaceId) ||
-          permission.public === true;
-        if (shouldApplyPermission) {
-          const permissionsToEnable =
-            permission.permissionLevel === 'custom'
-              ? permission.permissions
-              : permissionTemplates[permission.permissionLevel];
-
-          computedPermissions.addPermissions(permissionsToEnable);
-        }
-      });
-    }
-
-    return computedPermissions;
-  }
-
   async function deletePage({ pageId, board }: { pageId: string; board?: Block }) {
     const page = pages[pageId];
     const totalNonArchivedPages = Object.values(pages).filter(
@@ -233,6 +182,13 @@ export function PagesProvider({ children }: { children: ReactNode }) {
   const updatePage = useCallback((updates: PageUpdates) => {
     return charmClient.pages.updatePage(updates);
   }, []);
+
+  const getPageByPath = useCallback(
+    (pagePath: string) => {
+      return Object.values(pages).find((p) => p?.path === pagePath);
+    },
+    [pages]
+  );
 
   async function refreshPage(pageId: string): Promise<PageMeta> {
     const freshPageVersion = await charmClient.pages.getPage(pageId);
@@ -328,8 +284,8 @@ export function PagesProvider({ children }: { children: ReactNode }) {
       deletePage,
       loadingPages: !data,
       pages,
+      getPageByPath,
       setPages: _setPages,
-      getPagePermissions,
       refreshPage,
       updatePage,
       mutatePage,

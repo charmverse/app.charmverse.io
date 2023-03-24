@@ -5,36 +5,35 @@ import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import EditIcon from '@mui/icons-material/Edit';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import SettingsBackupRestoreIcon from '@mui/icons-material/SettingsBackupRestore';
+import type { BoxProps, ButtonProps, SxProps, Theme } from '@mui/material';
 import {
   Box,
   Collapse,
+  IconButton,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
   Menu,
   MenuItem,
-  ListItemText,
-  ListItemIcon,
   Paper,
-  Typography,
-  ListItem,
-  IconButton,
   Tooltip,
+  Typography,
   useMediaQuery
 } from '@mui/material';
-import type { ButtonProps, SxProps, Theme, BoxProps } from '@mui/material';
 import { DateTime } from 'luxon';
-import { usePopupState, bindMenu } from 'material-ui-popup-state/hooks';
+import { bindMenu, usePopupState } from 'material-ui-popup-state/hooks';
 import type { MouseEvent } from 'react';
-import { forwardRef, memo, useRef, useEffect, useState } from 'react';
+import { forwardRef, memo, useEffect, useRef, useState } from 'react';
 
 import Button from 'components/common/Button';
 import UserDisplay from 'components/common/UserDisplay';
 import { useCurrentPage } from 'hooks/useCurrentPage';
 import { useDateFormatter } from 'hooks/useDateFormatter';
-import { usePages } from 'hooks/usePages';
+import { usePagePermissions } from 'hooks/usePagePermissions';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useThreads } from 'hooks/useThreads';
 import { useUser } from 'hooks/useUser';
 import type { CommentWithUser } from 'lib/comments/interfaces';
-import { AllowedPagePermissions } from 'lib/permissions/pages/available-page-permissions.class';
 import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { removeInlineCommentMark } from 'lib/prosemirror/plugins/inlineComments/removeInlineCommentMark';
@@ -286,11 +285,10 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(
     const [isMutating, setIsMutating] = useState(false);
     const [editedCommentId, setEditedCommentId] = useState<null | string>(null);
     const { currentPageId } = useCurrentPage();
-    const { getPagePermissions } = usePages();
     const menuState = usePopupState({ variant: 'popover', popupId: 'comment-action' });
     const [actionComment, setActionComment] = useState<null | CommentWithUser>(null);
 
-    const permissions = currentPageId ? getPagePermissions(currentPageId) : new AllowedPagePermissions();
+    const { permissions } = usePagePermissions({ pageIdOrPath: currentPageId });
     const view = useEditorViewContext();
     const thread = threadId ? (threads[threadId] as ThreadWithCommentsAndAuthors) : null;
     const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'));

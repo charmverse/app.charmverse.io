@@ -392,33 +392,42 @@ ol li {
 }
 
 /** Disclosure component **/
-details {
+.disclosure-details {
   padding-left: 20px;
 
-  &[open] > summary::before {
-    content: '▼';
-    transform: rotate(0);
-    top: 6px;
+  &> :not(:first-child) {
+    display: none;
+  }
+
+  &[open] {
+    & > summary::before {
+      transform: rotate(0);
+    }
+
+    & > :not(:first-child) {
+      display: block;
+    }
   }
 
   summary {
     outline: 0 none;
     list-style: none;
     display: flex;
-    margin-left: -20px;
+    margin-left: -22px;
 
     &::before {
       content: '▼';
       cursor: pointer;
       transform: rotate(-90deg);
       position: relative;
-      width: 17px;
+      width: 19px;
       top: 6px;
       height: 13px;
       margin-right: 2px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
+      transition: transform 0.1s ease-in-out;
     }
 
     &::-webkit-details-marker,

@@ -10,7 +10,6 @@ import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import type { TokenGate } from '@prisma/client';
 import { humanizeAccessControlConditions } from 'lit-js-sdk';
-import { useRouter } from 'next/router';
 import { useContext, useEffect, useState } from 'react';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import { mutate } from 'swr';
@@ -21,6 +20,7 @@ import { Web3Connection } from 'components/_app/Web3ConnectionManager';
 import ButtonChip from 'components/common/ButtonChip';
 import TableRow from 'components/common/Table/TableRow';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useSmallScreen } from 'hooks/useMediaScreens';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import log from 'lib/log';
@@ -63,6 +63,7 @@ function CopyLinkButton({ clickable = false }: { clickable?: boolean }) {
 
 export default function TokenGatesTable({ isAdmin, onDelete, tokenGates }: Props) {
   const { account, walletAuthSignature, sign } = useWeb3AuthSig();
+  const isMobile = useSmallScreen();
   const [testResult, setTestResult] = useState<TestResult>({});
   const litClient = useLitProtocol();
   const [descriptions, setDescriptions] = useState<(string | null)[]>([]);
@@ -151,6 +152,21 @@ export default function TokenGatesTable({ isAdmin, onDelete, tokenGates }: Props
 
   const padding = 32;
 
+  const copyLink =
+    sortedTokenGates.length === 0 ? (
+      <Tooltip title='Add a token gate to use this link'>
+        <span>
+          <CopyLinkButton />
+        </span>
+      </Tooltip>
+    ) : (
+      <CopyToClipboard text={shareLink} onCopy={onCopy}>
+        <span>
+          <CopyLinkButton clickable />
+        </span>
+      </CopyToClipboard>
+    );
+
   return (
     <>
       <Box overflow='auto'>
@@ -158,25 +174,14 @@ export default function TokenGatesTable({ isAdmin, onDelete, tokenGates }: Props
           <TableHead>
             <StyledTableRow>
               <TableCell sx={{ padding: '20px 16px' }}>
-                <Typography variant='body1' fontWeight='600'>
+                <Typography variant='body1' fontWeight='600' mr={1} display='inline-flex'>
                   Token Gated Link
                 </Typography>
+                {isMobile && copyLink}
               </TableCell>
               <TableCell sx={{ width: 150 }}></TableCell>
               <TableCell sx={{ width: 90 + padding }} align='center'>
-                {sortedTokenGates.length === 0 ? (
-                  <Tooltip title='Add a token gate to use this link'>
-                    <span>
-                      <CopyLinkButton />
-                    </span>
-                  </Tooltip>
-                ) : (
-                  <CopyToClipboard text={shareLink} onCopy={onCopy}>
-                    <span>
-                      <CopyLinkButton clickable />
-                    </span>
-                  </CopyToClipboard>
-                )}
+                {!isMobile && copyLink}
               </TableCell>
               <TableCell sx={{ width: 30 + padding }}>{/** Delete */}</TableCell>
             </StyledTableRow>

@@ -1,11 +1,13 @@
+import { useTheme } from '@emotion/react';
 import AddIcon from '@mui/icons-material/Add';
-import { Menu } from '@mui/material';
+import { Box, Menu } from '@mui/material';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
-import React, { useCallback, useMemo } from 'react';
-import { FormattedMessage, useIntl } from 'react-intl';
+import React, { useCallback, useMemo, useState } from 'react';
+import { useIntl } from 'react-intl';
 
-import charmClient from 'charmClient';
+import { MobileDialog } from 'components/common/MobileDialog/MobileDialog';
 import { useDateFormatter } from 'hooks/useDateFormatter';
+import { useSmallScreen } from 'hooks/useMediaScreens';
 import type { IPropertyTemplate, Board } from 'lib/focalboard/board';
 import type { BoardView, ISortOption } from 'lib/focalboard/boardView';
 import { createBoardView } from 'lib/focalboard/boardView';
@@ -39,7 +41,8 @@ function TableHeaders(props: Props): JSX.Element {
   const intl = useIntl();
   const { formatDateTime, formatDate } = useDateFormatter();
   const addPropertyPopupState = usePopupState({ variant: 'popover', popupId: 'add-property' });
-
+  const isSmallScreen = useSmallScreen();
+  const theme = useTheme();
   const onAutoSizeColumn = useCallback(
     (columnID: string, headerWidth: number) => {
       let longestSize = headerWidth;
@@ -151,6 +154,26 @@ function TableHeaders(props: Props): JSX.Element {
     titleSorted = titleSortOption.reversed ? 'down' : 'up';
   }
 
+  const propertyTypes = useMemo(
+    () =>
+      activeView && (
+        <PropertyTypes
+          isMobile={isSmallScreen}
+          onClick={async (type) => {
+            addPropertyPopupState.close();
+            const template: IPropertyTemplate = {
+              id: Utils.createGuid(IDType.BlockID),
+              name: typeDisplayName(intl, type),
+              type,
+              options: []
+            };
+            await mutator.insertPropertyTemplate(board, activeView, -1, template);
+          }}
+        />
+      ),
+    [mutator, board, activeView, isSmallScreen]
+  );
+
   return (
     <div className='octo-table-header TableHeaders' id='mainBoardHeader'>
       {visiblePropertyTemplates.map((template) => {
@@ -185,30 +208,33 @@ function TableHeaders(props: Props): JSX.Element {
             <Button {...bindTrigger(addPropertyPopupState)}>
               <AddIcon fontSize='small' />
             </Button>
-            <Menu
-              {...bindMenu(addPropertyPopupState)}
-              anchorOrigin={{
-                vertical: 'bottom',
-                horizontal: 'left'
-              }}
-              transformOrigin={{
-                vertical: 'top',
-                horizontal: 'left'
-              }}
-            >
-              <PropertyTypes
-                onClick={async (type) => {
-                  addPropertyPopupState.close();
-                  const template: IPropertyTemplate = {
-                    id: Utils.createGuid(IDType.BlockID),
-                    name: typeDisplayName(intl, type),
-                    type,
-                    options: []
-                  };
-                  await mutator.insertPropertyTemplate(board, activeView, -1, template);
+            {isSmallScreen ? (
+              <MobileDialog
+                title={intl.formatMessage({ id: 'PropertyMenu.selectType', defaultMessage: 'Select property type' })}
+                open={addPropertyPopupState.isOpen}
+                onClose={addPropertyPopupState.close}
+                PaperProps={{ sx: { background: theme.palette.background.light } }}
+                contentSx={{ pr: 0, pb: 0, pl: 1 }}
+              >
+                <Box display='flex' gap={1} flexDirection='column' flex={1} height='100%'>
+                  {propertyTypes}
+                </Box>
+              </MobileDialog>
+            ) : (
+              <Menu
+                {...bindMenu(addPropertyPopupState)}
+                anchorOrigin={{
+                  vertical: 'bottom',
+                  horizontal: 'left'
                 }}
-              />
-            </Menu>
+                transformOrigin={{
+                  vertical: 'top',
+                  horizontal: 'left'
+                }}
+              >
+                {propertyTypes}
+              </Menu>
+            )}
           </>
         )}
       </div>

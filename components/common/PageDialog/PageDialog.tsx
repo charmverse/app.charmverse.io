@@ -1,11 +1,10 @@
-import CheckCircleOutlinedIcon from '@mui/icons-material/CheckCircleOutlined';
 import OpenInFullIcon from '@mui/icons-material/OpenInFull';
-import { Box, ListItemText, MenuItem } from '@mui/material';
+import { Box } from '@mui/material';
 import type { Page } from '@prisma/client';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
-import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 
 import charmClient from 'charmClient';
 import DocumentPage from 'components/[pageId]/DocumentPage';
@@ -18,10 +17,10 @@ import { usePages } from 'hooks/usePages';
 import type { BountyWithDetails } from 'lib/bounties';
 import log from 'lib/log';
 import type { PageMeta, PageUpdates } from 'lib/pages';
-import { findParentOfType } from 'lib/pages/findParentOfType';
 import debouncePromise from 'lib/utilities/debouncePromise';
 
 import { PageActions } from '../PageActions';
+import { BountyActions } from '../PageLayout/components/Header/components/BountyActions';
 
 interface Props {
   page?: PageMeta | null;
@@ -37,7 +36,7 @@ export default function PageDialog(props: Props) {
   const mounted = useRef(false);
   const popupState = usePopupState({ variant: 'popover', popupId: 'page-dialog' });
   const router = useRouter();
-  const { refreshBounty, setBounties } = useBounties();
+  const { setBounties } = useBounties();
   const { setCurrentPageId } = useCurrentPage();
 
   const { updatePage, deletePage } = usePages();
@@ -113,13 +112,6 @@ export default function PageDialog(props: Props) {
     [page]
   );
 
-  async function closeBounty(bountyId: string) {
-    await charmClient.bounties.closeBounty(bountyId);
-    if (refreshBounty) {
-      refreshBounty(bountyId);
-    }
-  }
-
   if (!popupState.isOpen) {
     return null;
   }
@@ -140,21 +132,7 @@ export default function PageDialog(props: Props) {
               setBounties((_bounties) => [..._bounties, ...pageDuplicateResponse.bounties]);
             }}
           >
-            {bounty && (
-              <MenuItem
-                dense
-                onClick={() => closeBounty(bounty.id)}
-                disabled={bounty.status === 'complete' || (bounty.status !== 'inProgress' && bounty.status !== 'open')}
-              >
-                <CheckCircleOutlinedIcon
-                  sx={{
-                    mr: 1
-                  }}
-                  fontSize='small'
-                />
-                <ListItemText primary='Mark complete' />
-              </MenuItem>
-            )}
+            {bounty && <BountyActions bountyId={bounty.id} />}
           </PageActions>
         )
       }

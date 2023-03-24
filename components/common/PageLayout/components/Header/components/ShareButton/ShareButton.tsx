@@ -9,6 +9,7 @@ import useSWRImmutable from 'swr/immutable';
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import Loader from 'components/common/Loader';
+import { usePagePermissionsList } from 'hooks/usePagePermissionsList';
 import { usePages } from 'hooks/usePages';
 
 import PagePermissions from './components/PagePermissions';
@@ -18,14 +19,10 @@ import ShareToWeb from './components/ShareToWeb';
 function ShareButton({ headerHeight, pageId }: { headerHeight: number; pageId: string }) {
   const { refreshPage, pages } = usePages();
   const popupState = usePopupState({ variant: 'popover', popupId: 'share-menu' });
-  const { data: pagePermissions, mutate: refreshPermissions } = useSWRImmutable(
-    pageId ? `/api/pages/${pageId}/permissions` : null,
-    () => charmClient.listPagePermissions(pageId)
-  );
+  const { pagePermissions, refreshPermissions } = usePagePermissionsList({
+    pageId
+  });
   const isLargeScreen = useMediaQuery((theme: Theme) => theme.breakpoints.up('md'));
-
-  const isProposal = pages[pageId]?.type === 'proposal';
-
   // watch changes to the page in case permissions get updated
   useEffect(() => {
     if (pageId) {

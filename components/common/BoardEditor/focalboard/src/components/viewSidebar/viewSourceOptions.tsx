@@ -23,9 +23,9 @@ export type DatabaseSourceProps = {
 };
 
 type ViewSourceOptionsProps = DatabaseSourceProps & {
-  closeSidebar: () => void;
+  closeSidebar?: () => void;
   goBack?: () => void;
-  title: string;
+  title?: string;
   view?: BoardView;
 };
 
