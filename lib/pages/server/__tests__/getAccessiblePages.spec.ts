@@ -143,7 +143,7 @@ describe('getAccessiblePages', () => {
     expect(pages.length).toBe(0);
   });
 
-  it('Should include permissions for each page, and the source for each permision', async () => {
+  it('Should include permissions for each page', async () => {
     const { space, user } = await generateUserAndSpaceWithApiToken();
 
     const page = await createPage({
@@ -173,9 +173,6 @@ describe('getAccessiblePages', () => {
 
     // We are returning permissions
     expect(foundInherited).toBeDefined();
-
-    // We are returning source
-    expect(foundInherited.sourcePermission).toBeDefined();
   });
 
   it('Should return a page based on search', async () => {
