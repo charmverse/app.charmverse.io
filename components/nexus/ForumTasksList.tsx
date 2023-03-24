@@ -16,9 +16,7 @@ import charmClient from 'charmClient';
 import Link from 'components/common/Link';
 import LoadingComponent from 'components/common/LoadingComponent';
 import UserDisplay from 'components/common/UserDisplay';
-import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import type { ForumTask } from 'lib/forums/getForumNotifications/getForumNotifications';
-import { isTruthy } from 'lib/utilities/types';
 import type { GetTasksResponse } from 'pages/api/tasks/list';
 
 import { EmptyTaskState } from './components/EmptyTaskState';
@@ -32,9 +30,8 @@ function ForumTaskRow({
   postPath,
   spaceDomain,
   spaceName,
-  postTitle,
-  onClose
-}: ForumTask & { marked: boolean; onClose: () => void }) {
+  postTitle
+}: ForumTask & { marked: boolean }) {
   const baseUrl = typeof window !== 'undefined' ? window.location.origin : null;
   const commentLink = `${baseUrl}/${spaceDomain}/forum/post/${postPath}`;
 
@@ -63,7 +60,6 @@ function ForumTaskRow({
               variant='body1'
               noWrap
               color='inherit'
-              onClick={onClose}
               sx={{
                 maxWidth: {
                   xs: '130px',
@@ -81,12 +77,12 @@ function ForumTaskRow({
         <Typography noWrap>{spaceName}</Typography>
       </TableCell>
       <TableCell>
-        <Link color='inherit' href={commentLink} variant='body1' noWrap onClick={onClose}>
+        <Link color='inherit' href={commentLink} variant='body1' noWrap>
           {postTitle}
         </Link>
       </TableCell>
       <TableCell align='center'>
-        <Link color='inherit' href={commentLink} variant='body1' noWrap onClick={onClose}>
+        <Link color='inherit' href={commentLink} variant='body1' noWrap>
           {DateTime.fromISO(createdAt).toRelative({ base: DateTime.now() })}
         </Link>
       </TableCell>
@@ -101,8 +97,6 @@ interface DiscussionTasksListProps {
 }
 
 export default function ForumTasksList({ tasks, error, mutateTasks }: DiscussionTasksListProps) {
-  const { onClose } = useSettingsDialog();
-
   useEffect(() => {
     async function main() {
       if (tasks?.forum && tasks.forum.unmarked.length !== 0) {
@@ -171,10 +165,10 @@ export default function ForumTasksList({ tasks, error, mutateTasks }: Discussion
         </TableHead>
         <TableBody>
           {tasks.forum.unmarked.map((forumTask) => (
-            <ForumTaskRow key={forumTask.commentId} {...forumTask} marked={false} onClose={onClose} />
+            <ForumTaskRow key={forumTask.commentId} {...forumTask} marked={false} />
           ))}
           {tasks.forum.marked.map((forumTask) => (
-            <ForumTaskRow key={forumTask.commentId} {...forumTask} marked onClose={onClose} />
+            <ForumTaskRow key={forumTask.commentId} {...forumTask} marked />
           ))}
         </TableBody>
       </Table>
