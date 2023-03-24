@@ -54,10 +54,17 @@ export default function LoginPage() {
 
   useEffect(() => {
     const task = router.query.task;
-    if (!isSettingsDialogOpen && task && router.isReady) {
-      openSettingsModal('notifications', { taskType: task } as PathProps);
+    const account = router.query.account;
+
+    if (!isSettingsDialogOpen && router.isReady) {
+      if (task) {
+        openSettingsModal('notifications', { taskType: task } as PathProps);
+      }
+      if (account) {
+        openSettingsModal('account');
+      }
     }
-  }, [isSettingsDialogOpen, router.isReady, router.query.task]);
+  }, [isSettingsDialogOpen, router.isReady, router.query.task, router.query.account]);
 
   useEffect(() => {
     setTitleState('Welcome');

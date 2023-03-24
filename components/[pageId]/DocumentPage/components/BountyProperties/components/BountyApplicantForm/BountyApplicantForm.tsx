@@ -16,7 +16,7 @@ interface BountyApplicationFormProps {
   permissions: AssignedBountyPermissions;
   bounty: Bounty;
   submissions: Application[];
-  refreshSubmissions: () => Promise<void>;
+  refreshSubmissions: () => void;
 }
 
 export default function BountyApplicantForm(props: BountyApplicationFormProps) {
@@ -67,6 +67,8 @@ export default function BountyApplicantForm(props: BountyApplicationFormProps) {
       </Box>
     ) : (
       <ApplicationInput
+        permissions={permissions}
+        refreshSubmissions={refreshSubmissions}
         bountyId={bounty.id}
         mode='create'
         onSubmit={submitApplication}
@@ -80,8 +82,10 @@ export default function BountyApplicantForm(props: BountyApplicationFormProps) {
     return (
       <>
         <ApplicationInput
+          permissions={permissions}
+          refreshSubmissions={refreshSubmissions}
           bountyId={bounty.id}
-          proposal={userApplication}
+          application={userApplication}
           mode='update'
           readOnly={userApplication?.status !== 'applied'}
           onSubmit={() => {
@@ -90,6 +94,7 @@ export default function BountyApplicantForm(props: BountyApplicationFormProps) {
         />
         {userApplication?.status !== 'applied' && (
           <SubmissionInput
+            hasCustomReward={bounty.customReward !== null}
             bountyId={bounty.id}
             onSubmit={submitApplication}
             submission={userApplication}
@@ -98,8 +103,8 @@ export default function BountyApplicantForm(props: BountyApplicationFormProps) {
             onCancel={() => {
               setShowApplication(false);
             }}
-            readOnly={userApplication?.status !== 'inProgress'}
-            alwaysExpanded={true}
+            readOnly={userApplication?.status !== 'inProgress' && userApplication?.status !== 'review'}
+            alwaysExpanded
           />
         )}
         {userApplication && userApplication.createdBy === user?.id && (
@@ -133,10 +138,11 @@ export default function BountyApplicantForm(props: BountyApplicationFormProps) {
         onCancel={() => {
           setShowApplication(false);
         }}
+        hasCustomReward={bounty.customReward !== null}
         readOnly={userApplication?.status === 'rejected'}
         submission={userApplication}
         permissions={permissions}
-        alwaysExpanded={true}
+        alwaysExpanded
       />
     );
   } else {

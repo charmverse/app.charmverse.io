@@ -37,7 +37,34 @@ describe('updateSubmission', () => {
 
     const updated = await updateSubmission({
       submissionId: bountyWithSubmission.applications[0].id,
-      submissionContent: submissionUpdate
+      submissionContent: submissionUpdate,
+      customReward: false
+    });
+
+    expect(updated.submission).toBe(submissionUpdate.submission);
+    expect(updated.submissionNodes).toBe(submissionUpdate.submissionNodes);
+  });
+
+  it('should return the updated submission if wallet address is not provided but bounty has custom reward', async () => {
+    const bountyWithSubmission = await generateBountyWithSingleApplication({
+      userId: user.id,
+      spaceId: space.id,
+      bountyStatus: 'open',
+      applicationStatus: 'inProgress',
+      bountyCap: null
+    });
+
+    const submissionUpdate: SubmissionContent = {
+      submission: 'New content',
+      submissionNodes:
+        '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"New content"}]}]}',
+      walletAddress: ''
+    };
+
+    const updated = await updateSubmission({
+      submissionId: bountyWithSubmission.applications[0].id,
+      submissionContent: submissionUpdate,
+      customReward: true
     });
 
     expect(updated.submission).toBe(submissionUpdate.submission);
@@ -62,7 +89,8 @@ describe('updateSubmission', () => {
 
     const updated = await updateSubmission({
       submissionId: bountyWithSubmission.applications[0].id,
-      submissionContent: submissionUpdate
+      submissionContent: submissionUpdate,
+      customReward: false
     });
 
     expect(updated.status).toBe('review');
@@ -72,7 +100,8 @@ describe('updateSubmission', () => {
     try {
       await updateSubmission({
         submissionId: v4(),
-        submissionContent: generateSubmissionContent()
+        submissionContent: generateSubmissionContent(),
+        customReward: false
       });
       throw new ExpectedAnError();
     } catch (error) {
@@ -98,7 +127,8 @@ describe('updateSubmission', () => {
     try {
       await updateSubmission({
         submissionId: bountyWithSubmission.applications[0].id,
-        submissionContent: submissionUpdate
+        submissionContent: submissionUpdate,
+        customReward: false
       });
       throw new ExpectedAnError();
     } catch (err) {
@@ -120,7 +150,8 @@ describe('updateSubmission', () => {
     try {
       await updateSubmission({
         submissionId: bountyWithSubmission.applications[0].id,
-        submissionContent: submissionUpdate
+        submissionContent: submissionUpdate,
+        customReward: false
       });
       throw new ExpectedAnError();
     } catch (err) {
@@ -142,7 +173,8 @@ describe('updateSubmission', () => {
     try {
       await updateSubmission({
         submissionId: bountyWithSubmission.applications[0].id,
-        submissionContent: submissionUpdate
+        submissionContent: submissionUpdate,
+        customReward: false
       });
       throw new ExpectedAnError();
     } catch (err) {

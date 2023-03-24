@@ -1,4 +1,4 @@
-import type { Proposal, ProposalAuthor, ProposalReviewer } from '@prisma/client';
+import type { Page, PageComment, Proposal, ProposalAuthor, ProposalReviewer } from '@prisma/client';
 
 import type { AssignablePermissionGroups } from 'lib/permissions/interfaces';
 
@@ -24,4 +24,8 @@ export interface ProposalWithCategory extends Proposal {
 export interface ProposalWithUsers extends Proposal, ProposalWithCategory {
   authors: ProposalAuthor[];
   reviewers: ProposalReviewer[];
+}
+
+export interface ProposalWithCommentsAndUsers extends ProposalWithUsers {
+  page: Page & { comments: PageComment[] };
 }

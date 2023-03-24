@@ -17,7 +17,7 @@ interface NestedMemberships {
 }
 
 export interface LoggedInUser extends User {
-  favorites: { pageId: string }[];
+  favorites: { pageId: string; index?: number }[];
   spaceRoles: (SpaceRole & NestedMemberships)[];
   wallets: Pick<UserWallet, 'address' | 'ensname'>[];
   unstoppableDomains: Pick<UnstoppableDomain, 'domain'>[];

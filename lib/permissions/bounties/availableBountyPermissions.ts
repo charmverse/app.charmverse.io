@@ -21,6 +21,8 @@ export class AvailableBountyPermissions extends Permissions<BountyOperation> imp
 
   approve_applications: boolean = false;
 
+  mark_paid: boolean = false;
+
   constructor(operations: BountyOperation[] = []) {
     super({ allowedOperations: Object.keys(BountyOperation) as BountyOperation[] });
 

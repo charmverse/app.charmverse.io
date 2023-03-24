@@ -8,6 +8,7 @@ import type { CryptoCurrency } from 'connectors';
 import { getChainById } from 'connectors';
 import debounce from 'lodash/debounce';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 import Button from 'components/common/BoardEditor/focalboard/src/widgets/buttons/button';
@@ -23,7 +24,6 @@ import { useIsSpaceMember } from 'hooks/useIsSpaceMember';
 import { usePages } from 'hooks/usePages';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import { useUser } from 'hooks/useUser';
-import type { ApplicationWithTransactions } from 'lib/applications/interfaces';
 import type {
   AssignedBountyPermissions,
   BountyCreationData,
@@ -74,9 +74,11 @@ export default function BountyProperties(props: {
   const { isSpaceMember } = useIsSpaceMember();
 
   useEffect(() => {
-    if (rewardType !== 'Custom' && isTruthy(currentBounty?.customReward) && !autoTabSwitchDone) {
-      setRewardType('Custom');
+    if (!autoTabSwitchDone && currentBounty) {
       setAutoTabSwitchDone(true);
+      if (rewardType !== 'Custom' && isTruthy(currentBounty.customReward)) {
+        setRewardType('Custom');
+      }
     }
   }, [currentBounty?.customReward, rewardType, autoTabSwitchDone]);
 
@@ -100,13 +102,13 @@ export default function BountyProperties(props: {
       .map((p) => (p as TargetPermissionGroup<'role'>).id as string) ?? [];
 
   // Copied from BountyApplicantsTable
-  const [applications, setListApplications] = useState<ApplicationWithTransactions[]>([]);
-  async function refreshSubmissions() {
-    if (bountyId) {
-      const listApplicationsResponse = await charmClient.bounties.listApplications(bountyId);
-      setListApplications(listApplicationsResponse);
+  const { data: applications, mutate: refreshSubmissions } = useSWR(
+    !bountyId ? null : `/bounties/${bountyId}/applications`,
+    () => charmClient.bounties.listApplications(bountyId as string),
+    {
+      fallbackData: []
     }
-  }
+  );
 
   function refreshCryptoList(chainId: number, rewardToken?: string) {
     // Set the default chain currency
@@ -372,11 +374,12 @@ export default function BountyProperties(props: {
             type='text'
             size='small'
             multiline
+            autoFocus
             rows={1}
             onChange={async (e) => {
               updateBountyCustomReward(e);
             }}
-            placeholder='Custom NFT'
+            placeholder='T-shirt'
           />
         </div>
       )}

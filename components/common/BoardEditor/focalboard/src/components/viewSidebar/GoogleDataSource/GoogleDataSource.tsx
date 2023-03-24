@@ -80,9 +80,10 @@ export function GoogleDataSource(props: Props) {
           </span>
         </MenuItem>
       ))}
-      <MenuItem dense sx={{ color: 'text.secondary' }} onClick={() => loginWithGoogle()} color='secondary'>
-        Connect another account
+      <MenuItem disabled>
+        <Typography variant='caption'>Connect another account</Typography>
       </MenuItem>
+      <ConnectButton onClick={() => loginWithGoogle()} />
       <GoogleAuthWarning />
     </>
   );

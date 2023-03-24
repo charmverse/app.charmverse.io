@@ -1,8 +1,13 @@
+import { chunk } from 'lodash';
 import unionBy from 'lodash/unionBy';
 import type { ParseResult } from 'papaparse';
+import type Papa from 'papaparse';
 import { v4 as uuidv4, validate as uuidValidate } from 'uuid';
 
-import type { IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
+import charmClient from 'charmClient';
+import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
+import type { BoardView } from 'lib/focalboard/boardView';
+import { createCard } from 'lib/focalboard/card';
 import type { Member } from 'lib/members/interfaces';
 import { focalboardColorsMap } from 'theme/colors';
 
@@ -99,7 +104,10 @@ export function createNewPropertiesForBoard(
     return { ...defaultProps, options, type: existingBoardProp.type };
   }
 
-  if (propValues.some((p) => p.includes('|'))) {
+  const possibleMultiSelect = propValues.filter((p) => p.includes('|'));
+
+  // if more than a third of the values are multiSelect, create a multiSelect property
+  if (possibleMultiSelect.length > propValues.length / 3) {
     const allMultiSelectValues = csvData.map((result) => result[prop].split('|')).flat();
     const uniqueMultiSelectValues = [...new Set(allMultiSelectValues)];
     const options = createBoardPropertyOptions(uniqueMultiSelectValues);
@@ -252,4 +260,102 @@ export function deepMergeArrays(arr1: IPropertyTemplate[], arr2: IPropertyTempla
       }, new Map())
       .values()
   ];
+}
+
+export async function addNewCards({
+  board,
+  views,
+  results,
+  spaceId,
+  userId,
+  members
+}: {
+  board: Board;
+  views: BoardView[] | null;
+  results: Papa.ParseResult<Record<string, string>>;
+  spaceId: string;
+  userId: string;
+  members: Member[];
+}) {
+  const csvData = results.data;
+  const headers = results.meta.fields || [];
+
+  // Remove name property because it is not an option
+  const allAvailableProperties = headers.filter((header) => header !== 'Name');
+
+  const mappedInitialBoardProperties = mapCardBoardProperties(board.fields.cardProperties);
+
+  // Create card properties for the board
+  const newBoardProperties = allAvailableProperties.map((prop) =>
+    createNewPropertiesForBoard(csvData, prop, mappedInitialBoardProperties[prop])
+  );
+
+  /**
+   * Merge the fields of both boards.
+   * The order is important here. The old board should be last so it can overwrite the important properties.
+   */
+  const mergedFields = deepMergeArrays(newBoardProperties, board.fields.cardProperties);
+
+  // Create the new board and update the db
+  const newBoardBlock: Board = {
+    ...board,
+    fields: {
+      ...board.fields,
+      cardProperties: mergedFields
+    }
+  };
+
+  // Update board with new cardProperties
+  await charmClient.updateBlock(newBoardBlock);
+
+  // Update the view of the table to make all the cards visible
+  const allTableViews = (views || [])
+    .filter((_view) => _view.type === 'view' && _view.fields.viewType === 'table')
+    .map(async (_view) => {
+      const allCardPropertyIds = newBoardBlock.fields.cardProperties.map((prop) => prop.id);
+      const newViewBlock: BoardView = {
+        ..._view,
+        fields: {
+          ..._view.fields,
+          visiblePropertyIds: allCardPropertyIds
+        }
+      };
+      return charmClient.updateBlock(newViewBlock);
+    });
+
+  await Promise.all(allTableViews);
+
+  // Create the new mapped board properties to know what are the ids of each property and option
+  const mappedBoardProperties = mapCardBoardProperties(mergedFields);
+
+  // Create the new card blocks from the csv data
+  const blocks = csvData
+    .map((csvRow) => {
+      // Show the first text column as a title if no Name column is in the csv
+      const firstTextId = newBoardBlock.fields.cardProperties.find((prop) => prop.type === 'text')?.id;
+      const fieldProperties = createCardFieldProperties(csvRow, mappedBoardProperties, members);
+      const text = firstTextId ? fieldProperties[firstTextId] : undefined;
+      const textName = text && typeof text === 'string' ? text : '';
+
+      const card = createCard({
+        parentId: board.id,
+        rootId: board.id,
+        createdBy: userId,
+        updatedBy: userId,
+        spaceId,
+        title: csvRow.Name || textName,
+        fields: {
+          properties: fieldProperties
+        }
+      });
+
+      return card;
+    })
+    .flat();
+
+  // Add new cards, chunked to avoid hitting 1mb POST limit
+  const cardChunks = chunk(blocks, 100);
+  for (const cards of cardChunks) {
+    await charmClient.insertBlocks(cards, () => null);
+  }
 }

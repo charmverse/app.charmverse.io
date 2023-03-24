@@ -1,20 +1,28 @@
-import React, { useEffect, useState } from 'react';
+import { useTheme } from '@emotion/react';
+import styled from '@emotion/styled';
+import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
+import { Box, Menu, Stack } from '@mui/material';
+import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
+import React, { useEffect, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
+import charmClient from 'charmClient';
+import { MobileDialog } from 'components/common/MobileDialog/MobileDialog';
+import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
+import { useSmallScreen } from 'hooks/useMediaScreens';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
+import { isTruthy } from 'lib/utilities/types';
 
+import { useSortable } from '../../hooks/sortable';
 import mutator from '../../mutator';
 import { IDType, Utils } from '../../utils';
 import Button from '../../widgets/buttons/button';
-import Menu from '../../widgets/menu';
-import MenuWrapper from '../../widgets/menuWrapper';
-import PropertyMenu, { PropertyTypes, typeDisplayName } from '../../widgets/propertyMenu';
+import PropertyMenu, { typeDisplayName } from '../../widgets/propertyMenu';
+import { PropertyTypes } from '../../widgets/propertyTypes';
 import Calculations from '../calculations/calculations';
-import type { ConfirmationDialogBoxProps } from '../confirmationDialogBox';
-import ConfirmationDialogBox from '../confirmationDialogBox';
 import PropertyValueElement from '../propertyValueElement';
 
 type Props = {
@@ -28,11 +36,120 @@ type Props = {
   pageUpdatedAt: string;
 };
 
+export const PropertyNameContainer = styled(Stack)`
+  position: relative;
+  flex-direction: row;
+  align-items: center;
+
+  &:hover .icons {
+    opacity: 1;
+    transition: opacity 150ms ease-in-out;
+  }
+
+  & .icons {
+    position: absolute;
+    opacity: 0;
+    z-index: 1;
+    left: -25px;
+    cursor: pointer;
+    transition: opacity 150ms ease-in-out;
+  }
+`;
+
+function CardDetailProperty({
+  readOnly,
+  property,
+  onTypeAndNameChanged,
+  board,
+  card,
+  onDelete,
+  pageUpdatedBy,
+  pageUpdatedAt,
+  deleteDisabledMessage,
+  onDrop
+}: {
+  readOnly: boolean;
+  property: IPropertyTemplate;
+  card: Card;
+  board: Board;
+  onTypeAndNameChanged: (newType: PropertyType, newName: string) => void;
+  onDelete: VoidFunction;
+  pageUpdatedAt: string;
+  pageUpdatedBy: string;
+  deleteDisabledMessage?: string;
+  onDrop: (template: IPropertyTemplate, container: IPropertyTemplate) => void;
+}) {
+  const [isDragging, isOver, columnRef] = useSortable('column', property, !readOnly, onDrop);
+  const changePropertyPopupState = usePopupState({ variant: 'popover', popupId: 'card-property' });
+
+  return (
+    <Stack
+      ref={columnRef}
+      sx={{
+        minWidth: 250,
+        overflow: 'unset',
+        flexDirection: 'row',
+        // Allow dragging past left border
+        paddingLeft: '150px',
+        position: 'relative',
+        right: '150px'
+      }}
+      className='octo-propertyrow'
+    >
+      {readOnly && (
+        <div className='octo-propertyname octo-propertyname--readonly'>
+          <Button>{property.name}</Button>
+        </div>
+      )}
+      {!readOnly && (
+        <Box>
+          <PropertyNameContainer
+            className='octo-propertyname'
+            sx={{
+              opacity: isDragging ? 0.5 : 1,
+              transition: `background-color 150ms ease-in-out`,
+              backgroundColor: isOver ? 'var(--charmeditor-active)' : 'initial'
+            }}
+          >
+            <DragIndicatorIcon className='icons' fontSize='small' color='secondary' />
+            <Button {...bindTrigger(changePropertyPopupState)}>{property.name}</Button>
+          </PropertyNameContainer>
+          <Menu {...bindMenu(changePropertyPopupState)}>
+            <PropertyMenu
+              onDelete={onDelete}
+              deleteDisabled={deleteDisabledMessage?.length !== 0}
+              property={property}
+              onTypeAndNameChanged={(newType, newName) => {
+                onTypeAndNameChanged(newType, newName);
+                changePropertyPopupState.close();
+              }}
+            />
+          </Menu>
+        </Box>
+      )}
+      <PropertyValueElement
+        readOnly={readOnly}
+        card={card}
+        board={board}
+        updatedAt={pageUpdatedAt}
+        updatedBy={pageUpdatedBy}
+        propertyTemplate={property}
+        showEmptyPlaceholder={true}
+        displayType='details'
+      />
+    </Stack>
+  );
+}
+
 function CardDetailProperties(props: Props) {
   const { board, card, cards, views, activeView, pageUpdatedAt, pageUpdatedBy } = props;
   const [newTemplateId, setNewTemplateId] = useState('');
   const intl = useIntl();
+  const addPropertyPopupState = usePopupState({ variant: 'popover', popupId: 'add-property' });
+
   const { showMessage } = useSnackbar();
+  const theme = useTheme();
+  const isSmallScreen = useSmallScreen();
 
   useEffect(() => {
     const newProperty = board.fields.cardProperties.find((property) => property.id === newTemplateId);
@@ -41,12 +158,40 @@ function CardDetailProperties(props: Props) {
     }
   }, [newTemplateId, board.fields.cardProperties]);
 
-  const [confirmationDialogBox, setConfirmationDialogBox] = useState<ConfirmationDialogBoxProps>({
+  const [confirmationDialogBox, setConfirmationDialogBox] = useState<{
+    heading: string;
+    subText?: string;
+    confirmButtonText?: string;
+    onConfirm: () => void;
+    onClose: () => void;
+  }>({
     heading: '',
     onConfirm: () => {},
     onClose: () => {}
   });
+
   const [showConfirmationDialog, setShowConfirmationDialog] = useState<boolean>(false);
+
+  const onDrop = async (sourceProperty: IPropertyTemplate, destinationProperty: IPropertyTemplate) => {
+    const cardPropertyIds = [...board.fields.cardProperties.map((cardProperty) => cardProperty.id)];
+    const destIndex = cardPropertyIds.indexOf(destinationProperty.id);
+    const srcIndex = cardPropertyIds.indexOf(sourceProperty.id);
+    cardPropertyIds.splice(srcIndex, 1);
+    cardPropertyIds.splice(destIndex, 0, sourceProperty.id);
+    await charmClient.patchBlock(
+      board.id,
+      {
+        updatedFields: {
+          cardProperties: cardPropertyIds
+            .map((cardPropertyId) =>
+              board.fields.cardProperties.find((cardProperty) => cardProperty.id === cardPropertyId)
+            )
+            .filter(isTruthy)
+        }
+      },
+      () => {}
+    );
+  };
 
   function onPropertyChangeSetAndOpenConfirmationDialog(
     newType: PropertyType,
@@ -183,73 +328,96 @@ function CardDetailProperties(props: Props) {
     }
   }
 
+  const propertyTypes = useMemo(
+    () =>
+      activeView && (
+        <PropertyTypes
+          isMobile={isSmallScreen}
+          onClick={async (type) => {
+            const template: IPropertyTemplate = {
+              id: Utils.createGuid(IDType.BlockID),
+              name: typeDisplayName(intl, type),
+              type,
+              options: []
+            };
+            const templateId = await mutator.insertPropertyTemplate(board, activeView, -1, template);
+            setNewTemplateId(templateId);
+            addPropertyPopupState.close();
+          }}
+        />
+      ),
+    [mutator, board, activeView, isSmallScreen]
+  );
+
   return (
     <div className='octo-propertylist'>
-      {board.fields.cardProperties.map((propertyTemplate: IPropertyTemplate) => {
-        const propertyValue = card.fields.properties[propertyTemplate.id];
+      {board.fields.cardProperties.map((propertyTemplate) => {
         return (
-          <div key={`${propertyTemplate.id}-${propertyTemplate.type}-${propertyValue}`} className='octo-propertyrow'>
-            {props.readOnly && (
-              <div className='octo-propertyname octo-propertyname--readonly'>
-                <Button>{propertyTemplate.name}</Button>
-              </div>
-            )}
-            {!props.readOnly && (
-              <MenuWrapper isOpen={propertyTemplate.id === newTemplateId}>
-                <div className='octo-propertyname'>
-                  <Button>{propertyTemplate.name}</Button>
-                </div>
-                <PropertyMenu
-                  deleteDisabled={getDeleteDisabled(propertyTemplate)}
-                  propertyId={propertyTemplate.id}
-                  propertyName={propertyTemplate.name}
-                  propertyType={propertyTemplate.type}
-                  onTypeAndNameChanged={(newType: PropertyType, newName: string) => {
-                    onPropertyChangeSetAndOpenConfirmationDialog(newType, newName, propertyTemplate);
-                  }}
-                  onDelete={() => onPropertyDeleteSetAndOpenConfirmationDialog(propertyTemplate)}
-                />
-              </MenuWrapper>
-            )}
-            <PropertyValueElement
-              readOnly={props.readOnly}
-              card={card}
-              board={board}
-              updatedAt={pageUpdatedAt}
-              updatedBy={pageUpdatedBy}
-              propertyTemplate={propertyTemplate}
-              showEmptyPlaceholder={true}
-              displayType='details'
-            />
-          </div>
+          <CardDetailProperty
+            onDrop={onDrop}
+            key={propertyTemplate.id}
+            board={board}
+            card={card}
+            deleteDisabledMessage={getDeleteDisabled(propertyTemplate)}
+            onDelete={() => onPropertyDeleteSetAndOpenConfirmationDialog(propertyTemplate)}
+            onTypeAndNameChanged={(newType: PropertyType, newName: string) => {
+              onPropertyChangeSetAndOpenConfirmationDialog(newType, newName, propertyTemplate);
+            }}
+            pageUpdatedAt={pageUpdatedAt}
+            pageUpdatedBy={pageUpdatedBy}
+            property={propertyTemplate}
+            readOnly={props.readOnly}
+          />
         );
       })}
 
-      {showConfirmationDialog && <ConfirmationDialogBox dialogBox={confirmationDialogBox} />}
+      {showConfirmationDialog && (
+        <ConfirmDeleteModal
+          title={confirmationDialogBox.heading}
+          onClose={confirmationDialogBox.onClose}
+          open
+          buttonText={confirmationDialogBox.confirmButtonText}
+          question={confirmationDialogBox.subText}
+          onConfirm={confirmationDialogBox.onConfirm}
+        />
+      )}
 
       {!props.readOnly && activeView && (
-        <div className='octo-propertyname add-property'>
-          <MenuWrapper>
-            <Button>
+        <>
+          <div className='octo-propertyname add-property'>
+            <Button {...bindTrigger(addPropertyPopupState)}>
               <FormattedMessage id='CardDetail.add-property' defaultMessage='+ Add a property' />
             </Button>
-            <Menu position='bottom-start' disablePortal={false}>
-              <PropertyTypes
-                label={intl.formatMessage({ id: 'PropertyMenu.selectType', defaultMessage: 'Select property type' })}
-                onTypeSelected={async (type) => {
-                  const template: IPropertyTemplate = {
-                    id: Utils.createGuid(IDType.BlockID),
-                    name: typeDisplayName(intl, type),
-                    type,
-                    options: []
-                  };
-                  const templateId = await mutator.insertPropertyTemplate(board, activeView, -1, template);
-                  setNewTemplateId(templateId);
+            {!isSmallScreen && (
+              <Menu
+                {...bindMenu(addPropertyPopupState)}
+                anchorOrigin={{
+                  vertical: 'bottom',
+                  horizontal: 'right'
                 }}
-              />
-            </Menu>
-          </MenuWrapper>
-        </div>
+                transformOrigin={{
+                  vertical: 'center',
+                  horizontal: 'left'
+                }}
+              >
+                {propertyTypes}
+              </Menu>
+            )}
+          </div>
+          {isSmallScreen && (
+            <MobileDialog
+              title={intl.formatMessage({ id: 'PropertyMenu.selectType', defaultMessage: 'Select property type' })}
+              open={addPropertyPopupState.isOpen}
+              onClose={addPropertyPopupState.close}
+              PaperProps={{ sx: { background: theme.palette.background.light } }}
+              contentSx={{ pr: 0, pb: 0, pl: 1 }}
+            >
+              <Box display='flex' gap={1} flexDirection='column' flex={1} height='100%'>
+                {propertyTypes}
+              </Box>
+            </MobileDialog>
+          )}
+        </>
       )}
     </div>
   );

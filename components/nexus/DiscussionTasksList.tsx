@@ -15,7 +15,6 @@ import charmClient from 'charmClient';
 import Link from 'components/common/Link';
 import LoadingComponent from 'components/common/LoadingComponent';
 import UserDisplay from 'components/common/UserDisplay';
-import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import type { DiscussionTask } from 'lib/discussion/interfaces';
 import type { GetTasksResponse } from 'pages/api/tasks/list';
 
@@ -34,9 +33,8 @@ function DiscussionTaskRow({
   text,
   bountyId,
   type,
-  commentId,
-  onClose
-}: DiscussionTask & { marked: boolean; onClose: () => void }) {
+  commentId
+}: DiscussionTask & { marked: boolean }) {
   const { discussionLink, discussionTitle } = useMemo(() => {
     const baseUrl = typeof window !== 'undefined' ? window.location.origin : null;
 
@@ -97,12 +95,12 @@ function DiscussionTaskRow({
         <Typography noWrap>{spaceName}</Typography>
       </TableCell>
       <TableCell>
-        <Link color='inherit' href={discussionLink} variant='body1' noWrap onClick={onClose}>
+        <Link color='inherit' href={discussionLink} variant='body1' noWrap>
           {discussionTitle}
         </Link>
       </TableCell>
       <TableCell align='center'>
-        <Link color='inherit' href={discussionLink} variant='body1' noWrap onClick={onClose}>
+        <Link color='inherit' href={discussionLink} variant='body1' noWrap>
           {DateTime.fromISO(createdAt).toRelative({ base: DateTime.now() })}
         </Link>
       </TableCell>
@@ -114,29 +112,27 @@ interface DiscussionTasksListProps {
   tasks: GetTasksResponse | undefined;
   error: any;
   mutateTasks: KeyedMutator<GetTasksResponse>;
-  skippedDiscussions?: ('page' | 'bounty')[];
+  includedDiscussions?: ('page' | 'bounty' | 'proposal')[];
 }
 
 export default function DiscussionTasksList({
-  skippedDiscussions = [],
+  includedDiscussions = [],
   tasks,
   error,
   mutateTasks
 }: DiscussionTasksListProps) {
-  const { onClose } = useSettingsDialog();
-
   const [markedDiscussions, unmarkedDiscussions, unmarkedSkippedDiscussions] = useMemo(() => {
     const _markedDiscussions: DiscussionTask[] = [];
     const _unmarkedDiscussions: DiscussionTask[] = [];
     const _unmarkedSkippedDiscussions: DiscussionTask[] = [];
 
     (tasks?.discussions ? tasks.discussions.marked : []).forEach((discussion) => {
-      if (!skippedDiscussions.includes(discussion.type)) {
+      if (includedDiscussions.includes(discussion.type)) {
         _markedDiscussions.push(discussion);
       }
     });
     (tasks?.discussions ? tasks.discussions.unmarked : []).forEach((discussion) => {
-      if (!skippedDiscussions.includes(discussion.type)) {
+      if (includedDiscussions.includes(discussion.type)) {
         _unmarkedDiscussions.push(discussion);
       } else {
         _unmarkedSkippedDiscussions.push(discussion);
@@ -217,7 +213,6 @@ export default function DiscussionTasksList({
               key={discussionTask.commentId ?? discussionTask.mentionId ?? ''}
               {...discussionTask}
               marked={false}
-              onClose={onClose}
             />
           ))}
           {markedDiscussions.map((discussionTask) => (
@@ -225,7 +220,6 @@ export default function DiscussionTasksList({
               key={discussionTask.commentId ?? discussionTask.mentionId ?? ''}
               {...discussionTask}
               marked
-              onClose={onClose}
             />
           ))}
         </TableBody>

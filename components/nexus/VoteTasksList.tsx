@@ -17,7 +17,6 @@ import Link from 'components/common/Link';
 import LoadingComponent from 'components/common/LoadingComponent';
 import Modal from 'components/common/Modal';
 import VoteIcon from 'components/votes/components/VoteIcon';
-import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import type { VoteTask } from 'lib/votes/interfaces';
 import type { GetTasksResponse } from 'pages/api/tasks/list';
 
@@ -35,12 +34,10 @@ interface VoteTasksListProps {
  */
 export function VoteTasksListRow({
   voteTask,
-  handleVoteId,
-  onClose
+  handleVoteId
 }: {
   voteTask: VoteTask;
   handleVoteId: (voteId: string) => void;
-  onClose: () => void;
 }) {
   const {
     page: { path: pagePath, title: pageTitle },
@@ -68,7 +65,7 @@ export function VoteTasksListRow({
         </Box>
       </TableCell>
       <TableCell>
-        <Link href={voteLink} variant='body1' color='inherit' onClick={onClose}>
+        <Link href={voteLink} variant='body1' color='inherit'>
           {voteLocation}
         </Link>
       </TableCell>
@@ -99,7 +96,6 @@ export function VoteTasksListRow({
 
 export function VoteTasksList({ error, tasks, mutateTasks }: VoteTasksListProps) {
   const [selectedVoteId, setSelectedVoteId] = useState<string | undefined>();
-  const { onClose } = useSettingsDialog();
 
   const closeModal = () => setSelectedVoteId(undefined);
 
@@ -176,7 +172,7 @@ export function VoteTasksList({ error, tasks, mutateTasks }: VoteTasksListProps)
         </TableHead>
         <TableBody>
           {tasks.votes.map((vote) => (
-            <VoteTasksListRow handleVoteId={handleVoteId} key={vote.id} voteTask={vote} onClose={onClose} />
+            <VoteTasksListRow handleVoteId={handleVoteId} key={vote.id} voteTask={vote} />
           ))}
         </TableBody>
       </Table>

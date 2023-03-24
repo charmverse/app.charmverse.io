@@ -1,12 +1,13 @@
 import { prisma } from 'db';
 
-import type { ProposalWithUsers } from './interface';
+import type { ProposalWithCommentsAndUsers, ProposalWithUsers } from './interface';
 import { generateCategoryIdQuery } from './utils';
 
 export type ListProposalsRequest = {
   spaceId: string;
   userId?: string;
   categoryIds?: string | string[];
+  includePage?: boolean;
 };
 /**
  * If you want to secure listed categories, make sure to check if the user has access to the category
@@ -15,8 +16,9 @@ export type ListProposalsRequest = {
 export async function getProposalsBySpace({
   spaceId,
   categoryIds,
-  userId
-}: ListProposalsRequest): Promise<ProposalWithUsers[]> {
+  userId,
+  includePage
+}: ListProposalsRequest): Promise<(ProposalWithUsers | ProposalWithCommentsAndUsers)[]> {
   return prisma.proposal.findMany({
     where: {
       OR: [
@@ -46,7 +48,16 @@ export async function getProposalsBySpace({
     include: {
       authors: true,
       reviewers: true,
-      category: true
+      category: true,
+      ...(includePage
+        ? {
+            page: {
+              include: {
+                comments: true
+              }
+            }
+          }
+        : {})
     }
   });
 }
@@ -54,8 +65,9 @@ export async function getProposalsBySpace({
 export async function getUserProposalsBySpace({
   spaceId,
   userId,
-  categoryIds
-}: ListProposalsRequest): Promise<ProposalWithUsers[]> {
+  categoryIds,
+  includePage
+}: ListProposalsRequest): Promise<(ProposalWithUsers | ProposalWithCommentsAndUsers)[]> {
   if (!userId || !spaceId) {
     return [];
   }
@@ -114,7 +126,16 @@ export async function getUserProposalsBySpace({
     include: {
       authors: true,
       reviewers: true,
-      category: true
+      category: true,
+      ...(includePage
+        ? {
+            page: {
+              include: {
+                comments: true
+              }
+            }
+          }
+        : {})
     }
   });
 }
