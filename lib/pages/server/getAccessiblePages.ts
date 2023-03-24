@@ -1,13 +1,13 @@
-import type { Page, Prisma, SpaceRole, SpaceRoleToRole } from '@prisma/client';
+import type { PageOperations, Prisma, SpaceRole, SpaceRoleToRole } from '@prisma/client';
 
 import { prisma } from 'db';
 import type { PagePermissionMeta } from 'lib/permissions/interfaces';
+import { permissionTemplates } from 'lib/permissions/pages';
 
-import type { IPageWithPermissions } from '../interfaces';
+import type { IPageWithPermissions, PageMeta, PageNodeWithPermissions } from '../interfaces';
 
 type PermissionsSelect = Record<keyof PagePermissionMeta, true>;
-type PageFieldsWithoutContent = Record<keyof Omit<Page, 'content' | 'contentText' | 'version'>, true>;
-
+type PageFieldsWithoutContent = Record<keyof PageMeta, true>;
 type PagesRequest = {
   spaceId: string;
   userId?: string;
@@ -96,130 +96,43 @@ function selectPageFields(meta: boolean) {
   return select;
 }
 
-export function accessiblePagesByPermissionsQuery({
-  spaceId,
-  userId
+type AvailableRole = { id: string; spaceRolesToRole: SpaceRoleToRole[] };
+
+function isAccessible({
+  page,
+  availableRoles,
+  userId,
+  operation,
+  spaceRole
 }: {
-  spaceId: string;
-  userId: string;
-}): Prisma.PagePermissionListRelationFilter {
-  return {
-    some: {
-      OR: [
-        {
-          role: {
-            spaceRolesToRole: {
-              some: {
-                spaceRole: {
-                  userId,
-                  spaceId
-                }
-              }
-            }
-          }
-        },
-        {
-          userId
-        },
-        {
-          space: {
-            spaceRoles: {
-              some: {
-                userId,
-                spaceId
-              }
-            }
-          }
-        },
-        {
-          public: true
-        }
-      ]
-    }
-  };
-}
+  page: PageNodeWithPermissions;
+  availableRoles: AvailableRole[];
+  userId?: string;
+  spaceRole: SpaceRole | null;
+  operation: PageOperations;
+}): boolean {
+  const spaceRoleToUse = spaceRole && spaceRole.spaceId === page.spaceId ? spaceRole : null;
 
-export function generateAccessiblePagesQuery(input: PagesRequest): Prisma.PageFindManyArgs {
-  const { spaceId, userId, archived = false, meta = false, search } = input;
-
-  // Return only pages with public permissions
-  if (!userId) {
-    return {
-      where: {
-        spaceId,
-        permissions: {
-          some: {
-            public: true
-          }
-        }
-      }
-    };
+  if (spaceRoleToUse?.isAdmin) {
+    return true;
+  } else if (!userId || !spaceRoleToUse) {
+    return page.permissions.some((p) => (operation === 'read' ? p.public : false));
+  } else if (spaceRoleToUse?.isGuest) {
+    return page.permissions.some(
+      (p) =>
+        (operation === 'read' ? p.public : false) ||
+        (p.userId === userId && permissionTemplates[p.permissionLevel].includes(operation))
+    );
+  } else {
+    return page.permissions.some(
+      (p) =>
+        (operation === 'read' ? p.public : false) ||
+        (p.userId === userId && permissionTemplates[p.permissionLevel].includes(operation)) ||
+        (p.spaceId === page.spaceId && permissionTemplates[p.permissionLevel].includes(operation)) ||
+        (p.roleId &&
+          availableRoles.some((r) => r.id === p.roleId && permissionTemplates[p.permissionLevel].includes(operation)))
+    );
   }
-
-  const archivedQuery = archived
-    ? {
-        deletedAt: {
-          not: null
-        }
-      }
-    : {
-        deletedAt: null
-      };
-
-  const formattedSearch = search
-    ? `${search
-        .split(/\s/)
-        .filter((s) => s)
-        .join(' & ')}:*`
-    : undefined;
-
-  const searchQuery = search
-    ? {
-        title: { search: formattedSearch },
-        contentText: { search: formattedSearch }
-      }
-    : {};
-
-  return {
-    where: {
-      OR: [
-        {
-          spaceId,
-          permissions: accessiblePagesByPermissionsQuery({
-            spaceId,
-            userId
-          })
-        },
-        // Override for proposal templates so any user can instantiate them
-        {
-          type: 'proposal_template',
-          space: {
-            id: spaceId,
-            spaceRoles: {
-              some: {
-                userId
-              }
-            }
-          }
-        },
-        // Admin override to always return all pages
-        {
-          space: {
-            id: spaceId,
-            spaceRoles: {
-              some: {
-                userId,
-                isAdmin: true
-              }
-            }
-          }
-        }
-      ],
-      ...archivedQuery,
-      ...searchQuery
-    },
-    ...selectPageFields(meta || false)
-  };
 }
 
 export async function getAccessiblePages(input: PagesRequest): Promise<IPageWithPermissions[]> {
@@ -239,7 +152,7 @@ export async function getAccessiblePages(input: PagesRequest): Promise<IPageWith
     }
   }
 
-  const availableRoles: { id: string; spaceRolesToRole: SpaceRoleToRole[] }[] =
+  const availableRoles: AvailableRole[] =
     input.userId && spaceRole && !spaceRole.isGuest
       ? await prisma.role.findMany({
           where: {
@@ -283,38 +196,31 @@ export async function getAccessiblePages(input: PagesRequest): Promise<IPageWith
   } as any)) as IPageWithPermissions[];
 
   if (spaceRole?.isAdmin) {
-    return pages as IPageWithPermissions[];
+    const pagesWithoutPermissions = pages.map((p) => {
+      delete (p as any).permissions;
+      return p;
+    });
+    return pagesWithoutPermissions as IPageWithPermissions[];
   }
 
-  const filteredPages = pages.filter((page) => {
-    if (spaceRole && (page.type === 'proposal_template' || page.type === 'proposal')) {
-      return true;
-    }
-
-    // Guest users
-    if (spaceRole?.isGuest) {
-      return page.permissions.some((permission) => permission.public === true || permission.userId === input.userId);
-    }
-
-    // Normal member users
-    return page.permissions.some((permission) => {
-      if (permission.public) {
+  const filteredPages = pages
+    .filter((page) => {
+      if (spaceRole && (page.type === 'proposal_template' || page.type === 'proposal')) {
         return true;
-      } else if (input.userId && spaceRole) {
-        return (
-          permission.userId === input.userId ||
-          (permission.roleId &&
-            spaceRole &&
-            availableRoles.some((r) =>
-              r.spaceRolesToRole.some((s) => s.spaceRoleId === spaceRole?.id && r.id === permission.roleId)
-            )) ||
-          permission.spaceId === input.spaceId
-        );
-      } else {
-        return false;
       }
+
+      return isAccessible({
+        userId: input.userId,
+        spaceRole,
+        availableRoles,
+        operation: input.archived ? 'delete' : 'read',
+        page
+      });
+    })
+    .map((p) => {
+      delete (p as any).permissions;
+      return p;
     });
-  });
 
   return filteredPages as IPageWithPermissions[];
 }

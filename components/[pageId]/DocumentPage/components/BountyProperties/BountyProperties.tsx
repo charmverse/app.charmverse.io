@@ -21,6 +21,7 @@ import { InputSearchRoleMultiple } from 'components/common/form/InputSearchRole'
 import { useBounties } from 'hooks/useBounties';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsSpaceMember } from 'hooks/useIsSpaceMember';
+import { usePagePermissionsList } from 'hooks/usePagePermissionsList';
 import { usePages } from 'hooks/usePages';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import { useUser } from 'hooks/useUser';
@@ -68,6 +69,10 @@ export default function BountyProperties(props: {
     [isAmountInputEmpty, currentBounty]
   );
   const [autoTabSwitchDone, setAutoTabSwitchDone] = useState(false);
+
+  const { pagePermissions: bountyPagePermissions, refreshPermissions } = usePagePermissionsList({
+    pageId
+  });
 
   const [rewardType, setRewardType] = useState<RewardType>(isTruthy(currentBounty?.customReward) ? 'Custom' : 'Token');
   // Using ref to make sure we don't keep redirecting to custom reward tab
@@ -222,11 +227,6 @@ export default function BountyProperties(props: {
   useEffect(() => {
     setCurrentBounty((draftBounty as BountyWithDetails) || bountyFromContext);
   }, [draftBounty, bountyFromContext]);
-
-  const bountyPagePermissions = useMemo(() => {
-    return pages[pageId]?.permissions;
-  }, [pages[pageId]?.permissions]);
-
   const bountyProperties = (
     <>
       <div
