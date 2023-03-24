@@ -29,6 +29,6 @@ export class SpaceProfileSettings extends SettingsModal {
     this.bountyVisibilityToggle = page.locator(`data-test=space-feature-toggle-bounties`);
     this.forumVisibilityToggle = page.locator(`data-test=space-feature-toggle-forum`);
     this.memberDirectoryVisibilityToggle = page.locator(`data-test=space-feature-toggle-member_directory`);
-    this.proposalsVisibilityToggle = page.locator(`data-test=space-feature-toggle-proposals`);
+    this.proposalsVisibilityToggle = page.locator(`data-test=space-feature-toggle-proposals >> input`);
   }
 }
