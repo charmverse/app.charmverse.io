@@ -175,7 +175,7 @@ export default function BountyApplicantTableRow({
                     }}
                     permissions={permissions}
                     expandedOnLoad={submission.status === 'review'}
-                    alwaysExpanded={false}
+                    alwaysExpanded
                   />
                   {/* disabled - maybe we dont need to show address here? <Box mb={3}>
                     <Typography variant='body2'>

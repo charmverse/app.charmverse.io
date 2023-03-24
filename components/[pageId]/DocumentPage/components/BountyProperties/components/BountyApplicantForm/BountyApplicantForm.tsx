@@ -99,8 +99,8 @@ export default function BountyApplicantForm(props: BountyApplicationFormProps) {
             onCancel={() => {
               setShowApplication(false);
             }}
-            readOnly={userApplication?.status !== 'inProgress'}
-            alwaysExpanded={true}
+            readOnly={userApplication?.status !== 'inProgress' && userApplication?.status !== 'review'}
+            alwaysExpanded
           />
         )}
         {userApplication && userApplication.createdBy === user?.id && (
@@ -138,7 +138,7 @@ export default function BountyApplicantForm(props: BountyApplicationFormProps) {
         readOnly={userApplication?.status === 'rejected'}
         submission={userApplication}
         permissions={permissions}
-        alwaysExpanded={true}
+        alwaysExpanded
       />
     );
   } else {

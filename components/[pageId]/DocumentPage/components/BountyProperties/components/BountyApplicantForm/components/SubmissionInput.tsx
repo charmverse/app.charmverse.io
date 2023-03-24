@@ -59,7 +59,7 @@ export default function SubmissionInput({
 }: Props) {
   const { user } = useUser();
   const [isVisible, setIsVisible] = useState(expandedOnLoad ?? alwaysExpanded ?? false);
-
+  const [isEditorTouched, setIsEditorTouched] = useState(false);
   const {
     register,
     handleSubmit,
@@ -96,10 +96,10 @@ export default function SubmissionInput({
           submissionContent: values
         });
       }
+      setIsEditorTouched(false);
       if (onSubmitProp) {
         onSubmitProp(application);
       }
-      setIsVisible(false);
     } catch (err: any) {
       setFormError(err);
     }
@@ -152,6 +152,7 @@ export default function SubmissionInput({
                   setValue('submissionNodes', content.doc, {
                     shouldValidate: true
                   });
+                  setIsEditorTouched(true);
                 }}
                 style={{
                   backgroundColor: 'var(--input-bg)',
@@ -165,6 +166,7 @@ export default function SubmissionInput({
                     ? 'No submission yet'
                     : 'Enter the content of your submission here.'
                 }
+                key={`${readOnly}.${submission?.status}`}
               />
             </Grid>
 
@@ -184,13 +186,12 @@ export default function SubmissionInput({
 
             {!readOnly && (
               <Grid item display='flex' gap={1}>
-                <Button disabled={!isValid && submission?.status === 'inProgress'} type='submit'>
+                <Button disabled={(!isValid && submission?.status === 'inProgress') || !isEditorTouched} type='submit'>
                   {submission?.submission ? 'Update' : 'Submit'}
                 </Button>
                 {!submission?.submission && !alwaysExpanded && (
                   <Button
                     onClick={() => {
-                      setIsVisible(false);
                       onCancel();
                     }}
                     variant='outlined'
