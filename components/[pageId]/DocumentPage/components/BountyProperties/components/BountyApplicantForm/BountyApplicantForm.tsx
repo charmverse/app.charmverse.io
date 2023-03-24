@@ -67,6 +67,8 @@ export default function BountyApplicantForm(props: BountyApplicationFormProps) {
       </Box>
     ) : (
       <ApplicationInput
+        permissions={permissions}
+        refreshSubmissions={refreshSubmissions}
         bountyId={bounty.id}
         mode='create'
         onSubmit={submitApplication}
@@ -80,8 +82,10 @@ export default function BountyApplicantForm(props: BountyApplicationFormProps) {
     return (
       <>
         <ApplicationInput
+          permissions={permissions}
+          refreshSubmissions={refreshSubmissions}
           bountyId={bounty.id}
-          proposal={userApplication}
+          application={userApplication}
           mode='update'
           readOnly={userApplication?.status !== 'applied'}
           onSubmit={() => {

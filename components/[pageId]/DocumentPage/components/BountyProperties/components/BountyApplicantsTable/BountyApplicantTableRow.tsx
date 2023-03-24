@@ -121,9 +121,11 @@ export default function BountyApplicantTableRow({
               {bounty.approveSubmitters && (
                 <Box mb={2}>
                   <ApplicationInput
+                    permissions={permissions}
+                    refreshSubmissions={refreshSubmissions}
                     bountyId={bounty.id}
                     alwaysExpanded={!submission.submission}
-                    proposal={submission}
+                    application={submission}
                     readOnly={user?.id !== submission.createdBy || submission.status !== 'applied'}
                     mode='update'
                   />
