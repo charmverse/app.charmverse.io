@@ -9,9 +9,9 @@ import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 import match from 'autosuggest-highlight/match';
 import parse from 'autosuggest-highlight/parse';
-import throttle from 'lodash/throttle';
 import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+import type { SyntheticEvent } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import charmClient from 'charmClient';
 import { Modal, DialogTitle, ModalPosition } from 'components/common/Modal';
@@ -19,7 +19,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import log from 'lib/log';
 import type { PageMeta } from 'lib/pages';
-import { isTruthy } from 'lib/utilities/types';
+import debouncePromise from 'lib/utilities/debouncePromise';
 
 enum ResultType {
   page = 'page',
@@ -100,60 +100,59 @@ type SearchInWorkspaceModalProps = {
   isOpen: boolean;
 };
 
-function SearchInWorkspaceModal(props: SearchInWorkspaceModalProps) {
+const debouncedSearch = debouncePromise(getSearchResults, 200);
+
+export function SearchInWorkspaceModal(props: SearchInWorkspaceModalProps) {
   const { close, isOpen } = props;
   const router = useRouter();
   const { pages } = usePages();
   const space = useCurrentSpace();
-  const [isSearching, setIsSearching] = useState(false);
-  const [inputValue, setInputValue] = useState('');
+  const [expandPageList, setExpandPageList] = useState(false);
   const [options, setOptions] = useState<SearchResultItem[]>([]);
+  const [debouncedInputValue, setDebouncedInputValue] = useState('');
 
-  const throttledSearch = throttle(getSearchResults, 200);
+  // const debouncedSearch = useMemo(() => debouncePromise(getSearchResults, 200), []);
 
-  useEffect(() => {
+  function onChange(event: SyntheticEvent<Element>, newInputValue: string) {
     if (!space) {
+      setExpandPageList(false);
       return;
     }
 
-    if (inputValue.replace(/\s/, '') === '') {
+    if (newInputValue.trim() === '') {
       setOptions([]);
-      return undefined;
+      setExpandPageList(false);
+      return;
     }
 
-    const allPages = Object.values(pages).filter(isTruthy);
-
-    throttledSearch({
-      query: inputValue,
+    setExpandPageList(true);
+    debouncedSearch({
+      query: newInputValue,
       spaceId: space.id,
       spaceDomain: router.query.domain as string,
-      allPages
+      pages
     })
-      ?.then((results) => {
-        setOptions(results);
+      .then((results) => {
+        if (results) {
+          setOptions(results);
+          setDebouncedInputValue(newInputValue);
+        }
       })
       .catch((err) => {
         log.error('Error searching for pages', err);
       });
-
-    return () => {
-      throttledSearch.cancel();
-    };
-  }, [!!space, inputValue]);
+  }
 
   return (
     <Modal open={isOpen} onClose={close} position={ModalPosition.top} style={{ height: '100%' }} size='large'>
-      <DialogTitle onClose={close}>Quick Find</DialogTitle>
+      <DialogTitle onClose={close}>Quick Find: {debouncedInputValue}</DialogTitle>
       <StyledAutocomplete
         options={options}
         noOptionsText='No search results'
         autoComplete
         clearOnBlur={false}
         fullWidth
-        onInputChange={(_event, newInputValue) => {
-          setIsSearching(!!newInputValue);
-          setInputValue(newInputValue);
-        }}
+        onInputChange={onChange}
         onChange={(_e, item) => {
           if (item) {
             router.push((item as SearchResultItem).link);
@@ -161,14 +160,14 @@ function SearchInWorkspaceModal(props: SearchInWorkspaceModalProps) {
           }
         }}
         getOptionLabel={(option) => (typeof option === 'object' ? option.name : option)}
-        open={isSearching}
+        open={expandPageList}
         disablePortal
         disableClearable
         // disable filtering when doing async search (see MUI docs)
         filterOptions={(x) => x}
         PopperComponent={StyledPopper}
         renderOption={(listItemProps, option: SearchResultItem, state) => {
-          const matches = match(option.name, state.inputValue, { insideWords: true, findAllOccurrences: true });
+          const matches = match(option.name, state.inputValue, { insideWords: true });
           const parts = parse(option.name, matches);
 
           return (
@@ -184,7 +183,7 @@ function SearchInWorkspaceModal(props: SearchInWorkspaceModalProps) {
                     {parts.map((part: { text: string; highlight: boolean }) => {
                       return (
                         <span
-                          key={`${part.text}${part.highlight}`}
+                          key={`${option.id}-${part.text}${part.highlight}`}
                           style={{
                             fontWeight: part.highlight ? 700 : 400
                           }}
@@ -227,34 +226,38 @@ function getSearchResults(params: {
   spaceDomain: string;
   spaceId: string;
   query: string;
-  allPages: PageMeta[];
+  pages: Record<string, PageMeta | undefined>;
 }): Promise<SearchResultItem[]> {
-  return charmClient.pages.searchPages(params.spaceId, params.query).then((pages) =>
-    pages
-      .map((page) => ({
-        name: page.title || 'Untitled',
-        path: getPagePath(page, params.allPages),
-        link: `/${params.spaceDomain}/${page.path}`,
-        type: ResultType.page,
-        id: page.id
-      }))
-      .sort((item1, item2) => (item1.name > item2.name ? 1 : -1))
-  );
+  return charmClient.pages.searchPages(params.spaceId, params.query).then((pages) => {
+    return (
+      pages
+        // probably never need to show more than 50 results
+        .slice(0, 50)
+        .map((page) => ({
+          name: page.title || 'Untitled',
+          path: getPagePath(page, params.pages),
+          link: `/${params.spaceDomain}/${page.path}`,
+          type: ResultType.page,
+          id: page.id
+        }))
+    );
+  });
 }
 
-function getPagePath(page: PageMeta, pageList: PageMeta[] = []): string {
+function getPagePath(
+  page: PageMeta,
+  pages: { [id: string]: { parentId?: string | null; title: string } | undefined }
+): string {
   const pathElements: string[] = [];
-  let currentPage: PageMeta | undefined = { ...page };
+  let currentPage: { parentId?: string | null; title: string } | undefined = { ...page };
 
   while (currentPage && currentPage.parentId) {
     const pageId: string = currentPage.parentId;
-    currentPage = pageList.find((p) => p && p.id === pageId);
+    currentPage = pages[pageId];
     if (currentPage) {
-      pathElements.unshift(currentPage.title);
+      pathElements.unshift(currentPage.title || 'Untitled');
     }
   }
 
   return pathElements.join(' / ');
 }
-
-export default SearchInWorkspaceModal;

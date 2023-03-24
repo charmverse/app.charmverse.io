@@ -32,11 +32,10 @@ import { useUser } from 'hooks/useUser';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import type { NewPageInput } from 'lib/pages';
 import { addPageAndRedirect } from 'lib/pages';
-import type { LoggedInUser } from 'models';
 
 import NewPageMenu from '../NewPageMenu';
 import PageNavigation from '../PageNavigation';
-import SearchInWorkspaceModal from '../SearchInWorkspaceModal';
+import { SearchInWorkspaceModal } from '../SearchInWorkspaceModal';
 import TrashModal from '../TrashModal';
 
 import { sidebarItemStyles, SidebarLink } from './SidebarButton';
