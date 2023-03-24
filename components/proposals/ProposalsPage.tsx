@@ -45,7 +45,11 @@ export function ProposalsPage() {
 
   const loadingData = !data;
 
-  const canSeeProposals = useHasMemberLevel('member');
+  const { hasAccess: canSeeProposals, isLoadingAccess } = useHasMemberLevel('member');
+
+  if (isLoadingAccess) {
+    return null;
+  }
 
   if (!canSeeProposals) {
     return <ErrorPage message='Guests cannot access proposals' />;

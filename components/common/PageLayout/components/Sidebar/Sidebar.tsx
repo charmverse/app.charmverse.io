@@ -138,7 +138,7 @@ export default function Sidebar({ closeSidebar, navAction }: SidebarProps) {
   const [showingTrash, setShowingTrash] = useState(false);
   const { disconnectWallet } = useWeb3AuthSig();
   const isMobile = useSmallScreen();
-  const showMemberFeatures = useHasMemberLevel('member');
+  const { hasAccess: showMemberFeatures, isLoadingAccess } = useHasMemberLevel('member');
   const { favoritePageIds } = useFavoritePages();
 
   const { onClick } = useSettingsDialog();
@@ -221,7 +221,11 @@ export default function Sidebar({ closeSidebar, navAction }: SidebarProps) {
         </Box>
       </>
     );
-  }, [favoritePageIds, userSpacePermissions, navAction, addPage]);
+  }, [favoritePageIds, userSpacePermissions, navAction, addPage, isLoadingAccess]);
+
+  if (isLoadingAccess) {
+    return null;
+  }
 
   return (
     <SidebarContainer>
