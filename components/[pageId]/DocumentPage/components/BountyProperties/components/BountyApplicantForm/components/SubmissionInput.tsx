@@ -24,15 +24,21 @@ import type { SystemError } from 'lib/utilities/errors';
 
 import BountyApplicantStatus from '../../BountyApplicantStatus';
 
-const schema = yup.object({
-  submission: yup.string().required(),
-  submissionNodes: yup.mixed().required(),
-  walletAddress: yup.string().test('verifyContractFormat', 'Invalid wallet address', (value) => {
-    return !value || isValidChainAddress(value);
-  })
-});
+const schema = (customReward?: boolean) => {
+  return yup.object({
+    submission: yup.string().required(),
+    submissionNodes: yup.mixed().required(),
+    walletAddress: (customReward ? yup.string() : yup.string().required()).test(
+      'verifyContractFormat',
+      'Invalid wallet address',
+      (value) => {
+        return !value || isValidChainAddress(value);
+      }
+    )
+  });
+};
 
-type FormValues = yup.InferType<typeof schema>;
+type FormValues = yup.InferType<ReturnType<typeof schema>>;
 
 interface Props {
   submission?: Application;
@@ -73,7 +79,7 @@ export default function SubmissionInput({
       submissionNodes: submission?.submissionNodes as any as JSON,
       walletAddress: submission?.walletAddress ?? user?.wallets[0]?.address
     },
-    resolver: yupResolver(schema)
+    resolver: yupResolver(schema(hasCustomReward))
   });
 
   const [formError, setFormError] = useState<SystemError | null>(null);
