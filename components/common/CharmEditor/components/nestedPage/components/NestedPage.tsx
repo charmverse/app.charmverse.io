@@ -43,12 +43,12 @@ export default function NestedPage({ node, currentPageId }: NodeViewProps & { cu
   const { pages } = usePages();
   const { categories } = useForumCategories();
   const nestedPage = pages[node.attrs.id];
-  const nestedStaticPage = STATIC_PAGES.find((c) => c.path === node.attrs.id);
-  const nestedCategories = categories.find((c) => c.id === node.attrs.id);
+  const nestedStaticPage = STATIC_PAGES.find((c) => c.path === node.attrs.path && node.attrs.type === c.path);
+  const nestedCategories = categories.find((c) => c.id === node.attrs.id && node.attrs.type === 'forum_category');
 
   const parentPage = nestedPage?.parentId ? pages[nestedPage.parentId] : null;
 
-  const pageTitle = (nestedPage || nestedStaticPage)?.title || nestedCategories?.name;
+  const pageTitle = (nestedPage || nestedStaticPage)?.title || `Forum > ${nestedCategories?.name}`;
 
   const pageId = nestedPage?.id || nestedStaticPage?.path || nestedCategories?.id;
 
@@ -69,6 +69,7 @@ export default function NestedPage({ node, currentPageId }: NodeViewProps & { cu
       data-id={`page-${pageId}`}
       data-title={pageTitle}
       data-path={fullPath}
+      data-type={node.attrs.type}
     >
       <div>
         {nestedPage && (
@@ -80,7 +81,7 @@ export default function NestedPage({ node, currentPageId }: NodeViewProps & { cu
           />
         )}
         {nestedStaticPage && <PageIcon icon={null} pageType={nestedStaticPage.path} />}
-        {nestedCategories && <PageIcon icon={null} pageType='forum' />}
+        {nestedCategories && <PageIcon icon={null} pageType='forum_category' />}
       </div>
       <StyledTypography>{(pageTitle ? pageTitle || 'Untitled' : null) || 'Page not found'}</StyledTypography>
     </NestedPageContainer>

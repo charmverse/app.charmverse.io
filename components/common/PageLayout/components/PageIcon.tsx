@@ -8,13 +8,11 @@ import BountyIcon from '@mui/icons-material/RequestPageOutlined';
 import DatabaseIcon from '@mui/icons-material/TableChart';
 import ProposalIcon from '@mui/icons-material/TaskOutlined';
 import { Box } from '@mui/material';
-import type { Page } from '@prisma/client';
 import type { ComponentProps, ReactNode } from 'react';
 
+import type { AllPagesProp } from 'components/common/CharmEditor/components/PageList';
 import EmojiIcon from 'components/common/Emoji';
 import { greyColor2 } from 'theme/colors';
-
-import type { StaticPagesType } from './Sidebar/utils/staticPages';
 
 export const StyledDatabaseIcon = styled(DatabaseIcon)`
   color: ${greyColor2};
@@ -61,7 +59,7 @@ function LinkedIcon({ children }: { children: ReactNode }) {
 
 type PageIconProps = ComponentProps<typeof StyledPageIcon> & {
   icon?: ReactNode;
-  pageType?: Page['type'] | StaticPagesType;
+  pageType?: AllPagesProp['type'];
   isEditorEmpty?: boolean;
   isLinkedPage?: boolean;
 };
@@ -87,7 +85,7 @@ export function PageIcon({ icon, isEditorEmpty, isLinkedPage = false, pageType, 
       icon = <BountyIcon />;
     } else if (pageType === 'members') {
       icon = <AccountCircleIcon />;
-    } else if (pageType === 'forum') {
+    } else if (pageType === 'forum' || pageType === 'forum_category') {
       icon = <MessageOutlinedIcon />;
     } else if (isEditorEmpty) {
       icon = <EmptyPageIcon />;

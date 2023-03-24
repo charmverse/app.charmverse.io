@@ -34,20 +34,12 @@ test('Space settings - toggle feature visibility', async ({ spaceSettings }) => 
 
   // Proposal visibility toggle should be on by default
   await expect(spaceSettings.proposalsVisibilityToggle).toBeVisible();
-  let classes = (await spaceSettings.proposalsVisibilityToggle.getAttribute('class')) ?? '';
+  await expect(spaceSettings.proposalsVisibilityToggle).toBeChecked();
 
-  expect(!!classes?.match('Mui-checked')).toBe(true);
   await spaceSettings.proposalsVisibilityToggle.click();
-  await spaceSettings.page.waitForTimeout(2000);
 
+  await expect(spaceSettings.proposalsVisibilityToggle).not.toBeChecked();
   // Proposal visibility toggle should now be off
-  classes = (await spaceSettings.proposalsVisibilityToggle.getAttribute('class')) ?? '';
-
-  expect(!!classes?.match('Mui-checked')).toBe(false);
-
-  // Give some time for API response
-  await spaceSettings.page.waitForTimeout(500);
-
   await spaceSettings.closeModalButton.click();
 
   // Make sure modal is closed before evaluating the sidebar

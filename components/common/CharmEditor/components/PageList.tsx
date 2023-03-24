@@ -1,4 +1,6 @@
-import { ListItemIcon, MenuItem, Typography } from '@mui/material';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import MenuItem from '@mui/material/MenuItem';
+import Typography from '@mui/material/Typography';
 import type { Page } from '@prisma/client';
 import { useMemo } from 'react';
 
@@ -11,8 +13,8 @@ import type {
 import type { PageMeta } from 'lib/pages';
 import type { PostCategoryWithPermissions } from 'lib/permissions/forum/interfaces';
 
-type AllPagesProp = Pick<Page, 'id' | 'title' | 'path' | 'hasContent' | 'icon'> & {
-  type: Page['type'] | StaticPagesType;
+export type AllPagesProp = Pick<Page, 'id' | 'title' | 'path' | 'hasContent' | 'icon'> & {
+  type: Page['type'] | StaticPagesType | 'forum_category';
 };
 
 interface Props {
@@ -21,7 +23,7 @@ interface Props {
   pages: PageMeta[];
   staticPages?: StaticPagesList[];
   forumCategories?: PostCategoryWithPermissions[];
-  onSelectPage: (pageId: string) => void;
+  onSelectPage: (pageId: string, type: AllPagesProp['type'], path: string) => void;
   emptyText?: string;
   style?: React.CSSProperties;
 }
@@ -49,13 +51,12 @@ export default function PagesList({
       type: page.type,
       icon: page.icon
     }));
-
     const memoForumCategories: AllPagesProp[] = (forumCategories || []).map((page) => ({
       id: page.id,
       path: page.path || '',
       hasContent: true,
-      title: page.name,
-      type: 'forum',
+      title: `Forum > ${page.name}`,
+      type: 'forum_category',
       icon: null
     }));
 
@@ -91,9 +92,10 @@ export default function PagesList({
       {allPages.map((page, pageIndex) => (
         <MenuItem
           data-value={page.id}
-          data-type='page'
+          data-type={page.type}
+          data-path={page.path}
           className={isActive(page.id, pageIndex) ? 'mention-selected' : ''}
-          onClick={() => onSelectPage(page.id)}
+          onClick={() => onSelectPage(page.id, page.type, page.path)}
           key={page.id}
           selected={isActive(page.id, pageIndex)}
         >

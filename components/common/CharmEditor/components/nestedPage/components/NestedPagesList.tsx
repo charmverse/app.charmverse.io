@@ -12,6 +12,7 @@ import { isTruthy } from 'lib/utilities/types';
 
 import type { PluginState as SuggestTooltipPluginState } from '../../@bangle.dev/tooltip/suggest-tooltip';
 import { hideSuggestionsTooltip } from '../../@bangle.dev/tooltip/suggest-tooltip';
+import type { AllPagesProp } from '../../PageList';
 import PagesList from '../../PageList';
 import PopoverMenu, { GroupLabel } from '../../PopoverMenu';
 import type { NestedPagePluginState } from '../nestedPage.interfaces';
@@ -71,8 +72,8 @@ function NestedPagesList({ pluginKey }: { pluginKey: PluginKey<NestedPagePluginS
   const activeItemIndex = (counter < 0 ? (counter % totalItems) + totalItems : counter) % totalItems;
 
   const onSelectPage = useCallback(
-    (pageId: string) => {
-      insertNestedPage(pluginKey, view, pageId);
+    (pageId: string, type: AllPagesProp['type'], path: string) => {
+      insertNestedPage(pluginKey, view, pageId, type, path);
     },
     [view]
   );
