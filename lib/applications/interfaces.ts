@@ -39,11 +39,13 @@ export interface SubmissionCreationData {
   bountyId: string;
   userId: string;
   submissionContent: SubmissionContent;
+  customReward: boolean;
 }
 
 export interface SubmissionUpdateData {
   submissionId: string;
   submissionContent: Partial<SubmissionContent>;
+  customReward: boolean;
 }
 
 export interface ApplicationWithTransactions extends Application {

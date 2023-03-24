@@ -1,7 +1,7 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import { Box, FormLabel, Typography } from '@mui/material';
+import { Box, FormLabel } from '@mui/material';
 import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 import Collapse from '@mui/material/Collapse';
@@ -17,10 +17,7 @@ import * as yup from 'yup';
 
 import charmClient from 'charmClient';
 import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
-import Modal from 'components/common/Modal';
-import { useBounties } from 'hooks/useBounties';
 import { useUser } from 'hooks/useUser';
-import type { ReviewDecision, SubmissionReview } from 'lib/applications/interfaces';
 import type { AssignedBountyPermissions } from 'lib/bounties';
 import { isValidChainAddress } from 'lib/tokens/validation';
 import type { SystemError } from 'lib/utilities/errors';
