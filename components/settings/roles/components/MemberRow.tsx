@@ -123,7 +123,7 @@ function MemberActions({
 
       case 'removeFromSpace':
         setRemovedMemberId(member.id);
-        popupState.open();
+        deletePopupState.open();
         break;
 
       default:
@@ -164,17 +164,14 @@ function MemberActions({
     return (
       <>
         <ElementDeleteIcon onClick={() => unassignRole(memberRoleId, member.id)} tooltip='Remove member' />
-
-        {removedMember && (
-          <ConfirmDeleteModal
-            title='Remove member'
-            onClose={deletePopupState.close}
-            open={deletePopupState.isOpen}
-            buttonText={`Remove ${removedMember.isAdmin ? 'admin' : removedMember.isGuest ? 'guest' : 'member'}`}
-            onConfirm={removeFromSpace}
-            question={`Are you sure you want to remove ${removedMember.username} from space?`}
-          />
-        )}
+        <ConfirmDeleteModal
+          title='Remove member'
+          onClose={deletePopupState.close}
+          open={deletePopupState.isOpen}
+          buttonText={`Remove ${removedMember?.isAdmin ? 'admin' : removedMember?.isGuest ? 'guest' : 'member'}`}
+          onConfirm={removeFromSpace}
+          question={`Are you sure you want to remove ${removedMember?.username} from space?`}
+        />
       </>
     );
   }
@@ -183,6 +180,14 @@ function MemberActions({
       <IconButton size='small' {...bindTrigger(popupState)} data-test={`editable-member-level-${member.id}`}>
         <MoreHoriz />
       </IconButton>
+      <ConfirmDeleteModal
+        title='Remove member'
+        onClose={deletePopupState.close}
+        open={deletePopupState.isOpen}
+        buttonText={`Remove ${removedMember?.isAdmin ? 'admin' : removedMember?.isGuest ? 'guest' : 'member'}`}
+        onConfirm={removeFromSpace}
+        question={`Are you sure you want to remove ${removedMember?.username} from space?`}
+      />
       <Menu
         {...bindMenu(popupState)}
         PaperProps={{
