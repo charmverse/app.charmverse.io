@@ -36,7 +36,7 @@ export default function ImageSelector({
     <PopperPopup
       autoOpen={autoOpen}
       popupContent={
-        <Box>
+        <Box sx={{ width: { xs: '90vw', md: 500, lg: 750 } }}>
           <MultiTabs
             disabled={isUploading}
             tabs={[
