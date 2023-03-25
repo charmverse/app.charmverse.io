@@ -13,7 +13,7 @@ interface PopperPopupProps {
   onClose?: () => void;
   onOpen?: () => void;
   onClick?: () => void;
-  sx?: SxProps<Theme>;
+  paperSx?: SxProps<Theme>;
 }
 
 export default function PopperPopup(props: PopperPopupProps) {
@@ -79,7 +79,7 @@ export default function PopperPopup(props: PopperPopupProps) {
         </div>
       )}
       <Popover disableRestoreFocus {...popoverProps}>
-        <Paper sx={props.sx}>{popupContent}</Paper>
+        <Paper sx={props.paperSx}>{popupContent}</Paper>
       </Popover>
     </div>
   );

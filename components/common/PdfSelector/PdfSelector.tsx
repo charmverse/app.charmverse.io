@@ -19,7 +19,7 @@ export default function PdfSelector({ autoOpen = false, children, onPdfSelect }:
   return (
     <PopperPopup
       autoOpen={autoOpen}
-      sx={selectorPopupSizeConfig}
+      paperSx={selectorPopupSizeConfig}
       popupContent={
         <Box>
           <MultiTabs

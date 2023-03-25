@@ -16,7 +16,7 @@ export function MediaSelectionPopup(props: InputProps) {
   const autoOpen = props.node.marks.some((mark) => mark.type.name === 'tooltip-marker');
 
   return (
-    <PopperPopup sx={selectorPopupSizeConfig} autoOpen={autoOpen} popupContent={<Box>{props.children}</Box>}>
+    <PopperPopup paperSx={selectorPopupSizeConfig} autoOpen={autoOpen} popupContent={<Box>{props.children}</Box>}>
       <EmptyEmbed {...props} />
     </PopperPopup>
   );

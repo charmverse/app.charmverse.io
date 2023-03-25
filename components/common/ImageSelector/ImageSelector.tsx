@@ -36,7 +36,7 @@ export default function ImageSelector({
   return (
     <PopperPopup
       autoOpen={autoOpen}
-      sx={selectorPopupSizeConfig}
+      paperSx={selectorPopupSizeConfig}
       popupContent={
         <Box>
           <MultiTabs
