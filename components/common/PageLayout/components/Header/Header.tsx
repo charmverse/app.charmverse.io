@@ -54,6 +54,7 @@ import DatabasePageOptions from './components/DatabasePageOptions';
 import { DocumentHistory } from './components/DocumentHistory';
 import { DocumentParticipants } from './components/DocumentParticipants';
 import EditingModeToggle from './components/EditingModeToggle';
+import NotificationButton from './components/NotificationPreview/NotificationButton';
 import PageTitleWithBreadcrumbs from './components/PageTitleWithBreadcrumbs';
 import ShareButton from './components/ShareButton';
 import PublishToSnapshot from './components/Snapshot/PublishToSnapshot';
@@ -575,14 +576,9 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
           )}
           {/** End of CharmEditor page specific header content */}
           {user && (
-            <NotificationsBadge>
-              <IconButton
-                size={isLargeScreen ? 'small' : 'medium'}
-                onClick={() => clickToOpenSettingsModal('notifications')}
-              >
-                <NotificationsIcon fontSize='small' color='secondary' />
-              </IconButton>
-            </NotificationsBadge>
+            <Box>
+              <NotificationButton onSeeAllClick={() => clickToOpenSettingsModal('notifications')} />
+            </Box>
           )}
         </Box>
       </Box>
