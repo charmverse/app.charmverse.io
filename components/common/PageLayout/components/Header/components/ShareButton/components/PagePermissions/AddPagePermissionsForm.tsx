@@ -183,7 +183,7 @@ export default function AddPagePermissionsForm({
             <InputSearchMemberMultiple
               allowEmail
               onChange={setSelectedUserIds}
-              placeholder='Search for users or invite by email'
+              placeholder='Search for user or invite guests by email'
               filter={{
                 mode: 'exclude',
                 userIds: userIdsToHide
