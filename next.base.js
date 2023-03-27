@@ -7,6 +7,7 @@ const esmModules = [
   '@fullcalendar/daygrid',
   '@fullcalendar/interaction',
   '@fullcalendar/react',
+  'dnd-core',
   'react-dnd',
   '@react-dnd/invariant',
   '@react-dnd/asap',
