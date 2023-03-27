@@ -6,6 +6,7 @@ import { useUser } from 'hooks/useUser';
 import { AUTH_CODE_COOKIE, AUTH_ERROR_COOKIE } from 'lib/discord/constants';
 import log from 'lib/log';
 import { getCookie, deleteCookie } from 'lib/utilities/browser';
+import type { LoggedInUser } from 'models';
 
 interface Props {
   children: JSX.Element;
@@ -50,13 +51,13 @@ export function DiscordProvider({ children }: Props) {
     setIsDisconnectingDiscord(false);
   }
 
-  function disconnect() {
+  async function disconnect() {
     setIsDisconnectingDiscord(true);
 
     return charmClient.discord
       .disconnectDiscord()
       .then(() => {
-        setUser({ ...user, discordUser: null });
+        setUser((_user: LoggedInUser) => ({ ..._user, discordUser: null }));
       })
       .catch((error) => {
         log.warn('Error disconnecting from discord', error);
@@ -86,7 +87,7 @@ export function DiscordProvider({ children }: Props) {
             code: authCode
           })
           .then((updatedUserFields) => {
-            setUser({ ...user, ...updatedUserFields });
+            setUser((_user: LoggedInUser) => ({ ..._user, ...updatedUserFields }));
           })
           .catch((err) => {
             setDiscordError(err.message || err.error || 'Something went wrong. Please try again');
