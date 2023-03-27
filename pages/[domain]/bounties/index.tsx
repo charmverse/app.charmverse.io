@@ -10,10 +10,10 @@ export default function BountyPage() {
   const { bounties, loadingBounties } = useBounties();
   const { accessChecked } = useSharedPage();
 
-  const isSpaceMember = useHasMemberLevel('member');
+  const { hasAccess: isSpaceMember, isLoadingAccess } = useHasMemberLevel('member');
 
   setTitle('Bounties');
-  if (loadingBounties || !bounties || !accessChecked) {
+  if (loadingBounties || !bounties || !accessChecked || isLoadingAccess) {
     return <LoadingComponent isLoading />;
   }
   return <BountiesPage bounties={bounties} publicMode={!isSpaceMember} />;
