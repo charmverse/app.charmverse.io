@@ -11,6 +11,7 @@ import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/st
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { getSortedViews, getView } from 'components/common/BoardEditor/focalboard/src/store/views';
 import FocalBoardPortal from 'components/common/BoardEditor/FocalBoardPortal';
+import { usePagePermissions } from 'hooks/usePagePermissions';
 import { usePages } from 'hooks/usePages';
 import debouncePromise from 'lib/utilities/debouncePromise';
 
@@ -103,15 +104,14 @@ export default function DatabaseView({ containerWidth, readOnly: readOnlyOverrid
   const views = useMemo(() => allViews.filter((view) => view.parentId === pageId), [pageId, allViews]);
   const [currentViewId, setCurrentViewId] = useState<string | null>(views[0]?.id || null);
   const currentView = useAppSelector(getView(currentViewId || '')) ?? undefined;
-  const { pages, updatePage, getPagePermissions } = usePages();
+  const { pages, updatePage } = usePages();
 
   const [shownCardId, setShownCardId] = useState<string | null>(null);
 
   const boards = useAppSelector(getSortedBoards);
   const board = boards.find((b) => b.id === pageId);
 
-  // TODO: Handle for other sources in future like workspace users
-  const currentPagePermissions = getPagePermissions(pageId || '');
+  const { permissions: currentPagePermissions } = usePagePermissions({ pageIdOrPath: pageId });
 
   const debouncedPageUpdate = useCallback(() => {
     return debouncePromise(async (updates: Partial<Page>) => {

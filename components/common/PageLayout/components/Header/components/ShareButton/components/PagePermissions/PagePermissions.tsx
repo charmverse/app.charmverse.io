@@ -14,6 +14,7 @@ import Link from 'components/common/Link';
 import Modal from 'components/common/Modal';
 import { Typography } from 'components/common/Typography';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { usePagePermissions } from 'hooks/usePagePermissions';
 import { usePages } from 'hooks/usePages';
 import { canReceiveManualPermissionUpdates } from 'lib/pages';
 import type {
@@ -95,12 +96,14 @@ interface Props {
 }
 
 export default function PagePermissions({ pageId, pagePermissions, refreshPermissions, pageType }: Props) {
-  const { pages, getPagePermissions } = usePages();
+  const { pages } = usePages();
   const space = useCurrentSpace();
   const popupState = usePopupState({ variant: 'popover', popupId: 'add-a-permission' });
 
   const spaceLevelPermission = pagePermissions.find((permission) => space && permission.spaceId === space?.id);
-  const userPagePermissions = getPagePermissions(pageId);
+  const { permissions: userPagePermissions } = usePagePermissions({
+    pageIdOrPath: pageId
+  });
 
   useEffect(() => {
     refreshPermissions();

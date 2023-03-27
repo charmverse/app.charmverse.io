@@ -15,7 +15,6 @@ import FieldLabel from 'components/common/form/FieldLabel';
 import Link from 'components/common/Link';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { ProposalStatusChip } from 'components/proposals/components/ProposalStatusBadge';
-import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import type { ProposalTask, ProposalTaskAction } from 'lib/proposal/getProposalTasks';
 import type { GetTasksResponse } from 'pages/api/tasks/list';
 
@@ -38,11 +37,9 @@ const SMALL_TABLE_CELL_WIDTH = 150;
  * Page only needs to be provided for proposal type proposals
  */
 export function ProposalTasksListRow({
-  proposalTask: { spaceDomain, pagePath, spaceName, pageTitle, action, status },
-  onClose
+  proposalTask: { spaceDomain, pagePath, spaceName, pageTitle, action, status }
 }: {
   proposalTask: ProposalTask;
-  onClose: () => void;
 }) {
   const proposalLink = `/${spaceDomain}/${pagePath}`;
   const workspaceProposals = `/${spaceDomain}/proposals`;
@@ -86,8 +83,8 @@ export function ProposalTasksListRow({
             }
           }}
           href={proposalLink}
-          onClick={onClose}
           variant={action ? 'contained' : 'outlined'}
+          data-test={`goto-${pagePath}`}
         >
           {action ? ProposalActionRecord[action] : 'View'}
         </Button>
@@ -106,7 +103,6 @@ export default function ProposalTasksList({
   tasks: GetTasksResponse | undefined;
 }) {
   const proposals = tasks?.proposals ? [...tasks.proposals.unmarked, ...tasks.proposals.marked] : [];
-  const { onClose } = useSettingsDialog();
 
   useEffect(() => {
     async function main() {
@@ -169,7 +165,7 @@ export default function ProposalTasksList({
         </TableHead>
         <TableBody>
           {proposals.map((proposal) => (
-            <ProposalTasksListRow key={proposal.id} proposalTask={proposal} onClose={onClose} />
+            <ProposalTasksListRow key={proposal.id} proposalTask={proposal} />
           ))}
         </TableBody>
       </Table>

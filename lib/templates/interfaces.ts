@@ -25,8 +25,6 @@ export interface PageWithBlocks {
       })
     | null;
   bounty?: (Bounty & { permissions: BountyPermission[] }) | null;
-  // eslint-disable-next-line
-  inlineDatabases?: ExportedPage[];
 }
 
 export type ExportedPage = PageNodeWithChildren<

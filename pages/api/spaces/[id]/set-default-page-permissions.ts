@@ -3,22 +3,13 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
-import { requireCustomPermissionMode } from 'lib/middleware/requireCustomPermissionMode';
 import { withSessionRoute } from 'lib/session/withSession';
 import { setSpaceDefaultPagePermission } from 'lib/spaces/setSpaceDefaultPagePermission';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler
-  .use(requireUser)
-  .use(
-    requireCustomPermissionMode({
-      keyLocation: 'query',
-      spaceIdKey: 'id'
-    })
-  )
-  .post(setDefaultPagePermission);
+handler.use(requireUser).post(setDefaultPagePermission);
 
 async function setDefaultPagePermission(req: NextApiRequest, res: NextApiResponse<Space>) {
   const { id: spaceId } = req.query;

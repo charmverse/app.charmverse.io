@@ -1,6 +1,5 @@
 import { expect, test as base } from '@playwright/test';
 import type { Space, User } from '@prisma/client';
-import { LoggedInPage } from '__e2e__/po/loggedIn.po';
 import { PermissionSettings } from '__e2e__/po/settings/spacePermissionSettings.po';
 
 import { prisma } from 'db';
@@ -16,14 +15,12 @@ type Fixtures = {
   forumHomePage: ForumHomePage;
   forumPostPage: ForumPostPage;
   permissionSettings: PermissionSettings;
-  loggedInPage: LoggedInPage;
 };
 
 const test = base.extend<Fixtures>({
   forumHomePage: ({ page }, use) => use(new ForumHomePage(page)),
   forumPostPage: ({ page }, use) => use(new ForumPostPage(page)),
-  permissionSettings: ({ page }, use) => use(new PermissionSettings(page)),
-  loggedInPage: ({ page }, use) => use(new LoggedInPage(page))
+  permissionSettings: ({ page }, use) => use(new PermissionSettings(page))
 });
 
 let adminUser: User;
@@ -33,8 +30,7 @@ test.describe.serial('Comment on forum posts', () => {
   test('assign space-wide forum moderators - admin can assign a user as a space-wide forum moderator', async ({
     page,
     forumHomePage,
-    permissionSettings,
-    loggedInPage
+    permissionSettings
   }) => {
     const generated = await createUserAndSpace({
       browserPage: page,
@@ -88,28 +84,10 @@ test.describe.serial('Comment on forum posts', () => {
     await expect(spaceSettingsTab).toBeVisible();
 
     // Go to roles section
-    const rolesTab = permissionSettings.getSpaceSettingsSectionLocator({ spaceId: space.id, section: 'roles' });
+    await permissionSettings.goToTab({ spaceId: space.id, section: 'roles' });
+    await permissionSettings.clickRoleRowByTitle(moderatorRoleName);
 
-    await expect(rolesTab).toBeVisible();
-
-    await rolesTab.click();
-
-    // Make sure list of roles shows
-    const roleToUpdateContextMenu = permissionSettings.getExpandRoleContextMenuLocator(forumModeratorRole.id);
-
-    await expect(roleToUpdateContextMenu).toBeVisible();
-
-    // Open context menu and access the space-permissions modal for the role
-
-    await roleToUpdateContextMenu.click();
-
-    const openManageRoleSpacePermissionsModal = permissionSettings.getOpenManageRoleSpacePermissionsModalLocator(
-      forumModeratorRole.id
-    );
-
-    await expect(openManageRoleSpacePermissionsModal).toBeVisible();
-
-    await openManageRoleSpacePermissionsModal.click();
+    await permissionSettings.goToRowTab(moderatorRoleName, 'permissions');
 
     // Interact with the form to add a permission, and make sure it's added
     await expect(permissionSettings.spacePermissionsForm).toBeVisible();

@@ -4,7 +4,9 @@ import { Typography } from '@mui/material';
 
 import Link from 'components/common/Link';
 import { PageIcon } from 'components/common/PageLayout/components/PageIcon';
+import { STATIC_PAGES } from 'components/common/PageLayout/components/Sidebar/utils/staticPages';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useForumCategories } from 'hooks/useForumCategories';
 import { usePages } from 'hooks/usePages';
 
 const NestedPageContainer = styled(Link)`
@@ -39,10 +41,21 @@ const StyledTypography = styled(Typography)`
 export default function NestedPage({ node, currentPageId }: NodeViewProps & { currentPageId?: string }) {
   const space = useCurrentSpace();
   const { pages } = usePages();
+  const { categories } = useForumCategories();
   const nestedPage = pages[node.attrs.id];
+  const nestedStaticPage = STATIC_PAGES.find((c) => c.path === node.attrs.path && node.attrs.type === c.path);
+  const nestedCategories = categories.find((c) => c.id === node.attrs.id && node.attrs.type === 'forum_category');
+
   const parentPage = nestedPage?.parentId ? pages[nestedPage.parentId] : null;
 
-  const appPath = `${space?.domain}/${nestedPage?.path}`;
+  const pageTitle = (nestedPage || nestedStaticPage)?.title || `Forum > ${nestedCategories?.name}`;
+
+  const pageId = nestedPage?.id || nestedStaticPage?.path || nestedCategories?.id;
+
+  const pagePath = nestedPage ? `${space?.domain}/${nestedPage.path}` : '';
+  const staticPath = nestedStaticPage ? `${space?.domain}/${nestedStaticPage.path}` : '';
+  const categoriesPath = nestedCategories ? `${space?.domain}/forum/${nestedCategories.path}` : '';
+  const appPath = pagePath || staticPath || categoriesPath;
 
   const fullPath = `${window.location.origin}/${appPath}`;
 
@@ -50,12 +63,13 @@ export default function NestedPage({ node, currentPageId }: NodeViewProps & { cu
 
   return (
     <NestedPageContainer
-      data-test={`nested-page-${nestedPage?.id}`}
-      href={nestedPage ? `/${appPath}` : ''}
+      data-test={`nested-page-${pageId}`}
+      href={`/${appPath}`}
       color='inherit'
-      data-id={`page-${nestedPage?.id}`}
-      data-title={nestedPage?.title}
+      data-id={`page-${pageId}`}
+      data-title={pageTitle}
       data-path={fullPath}
+      data-type={node.attrs.type}
     >
       <div>
         {nestedPage && (
@@ -66,8 +80,10 @@ export default function NestedPage({ node, currentPageId }: NodeViewProps & { cu
             pageType={nestedPage.type}
           />
         )}
+        {nestedStaticPage && <PageIcon icon={null} pageType={nestedStaticPage.path} />}
+        {nestedCategories && <PageIcon icon={null} pageType='forum_category' />}
       </div>
-      <StyledTypography>{nestedPage ? nestedPage.title || 'Untitled' : 'Page not found'}</StyledTypography>
+      <StyledTypography>{(pageTitle ? pageTitle || 'Untitled' : null) || 'Page not found'}</StyledTypography>
     </NestedPageContainer>
   );
 }

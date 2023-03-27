@@ -28,7 +28,7 @@ interface Props {
   submission: ApplicationWithTransactions;
   permissions: AssignedBountyPermissions;
   bounty: BountyWithDetails;
-  refreshSubmissions: () => Promise<void>;
+  refreshSubmissions: () => void;
 }
 
 export default function BountyApplicantTableRow({
@@ -70,6 +70,7 @@ export default function BountyApplicantTableRow({
         // Closes the modal
         setReviewDecision(null);
         refreshBounty(bounty.id);
+        refreshSubmissions();
       })
       .catch((err) => {
         setApiError(err);
@@ -109,6 +110,7 @@ export default function BountyApplicantTableRow({
             isExpanded={isExpandedRow}
             submission={submission}
             expandRow={() => setIsExpandedRow(true)}
+            refreshSubmissions={refreshSubmissions}
           />
         </TableCell>
       </TableRow>
@@ -119,9 +121,11 @@ export default function BountyApplicantTableRow({
               {bounty.approveSubmitters && (
                 <Box mb={2}>
                   <ApplicationInput
+                    permissions={permissions}
+                    refreshSubmissions={refreshSubmissions}
                     bountyId={bounty.id}
                     alwaysExpanded={!submission.submission}
-                    proposal={submission}
+                    application={submission}
                     readOnly={user?.id !== submission.createdBy || submission.status !== 'applied'}
                     mode='update'
                   />
@@ -159,6 +163,7 @@ export default function BountyApplicantTableRow({
               {submission.submission && (
                 <Box mb={2}>
                   <SubmissionInput
+                    hasCustomReward={bounty.customReward !== null}
                     bountyId={bounty.id}
                     readOnly={
                       user?.id !== submission.createdBy ||
@@ -171,8 +176,8 @@ export default function BountyApplicantTableRow({
                       setIsExpandedRow(false);
                     }}
                     permissions={permissions}
-                    expandedOnLoad={submission.status === 'review'}
-                    alwaysExpanded={false}
+                    expandedOnLoad
+                    alwaysExpanded
                   />
                   {/* disabled - maybe we dont need to show address here? <Box mb={3}>
                     <Typography variant='body2'>

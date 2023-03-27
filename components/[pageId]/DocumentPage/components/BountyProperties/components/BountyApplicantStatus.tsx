@@ -1,10 +1,11 @@
 import LaunchIcon from '@mui/icons-material/LaunchOutlined';
-import { Box, Tooltip, Typography } from '@mui/material';
+import { Tooltip, Typography } from '@mui/material';
 import type { Application } from '@prisma/client';
 import { getChainExplorerLink } from 'connectors';
 
 import Link from 'components/common/Link';
 import type { ApplicationWithTransactions } from 'lib/applications/actions';
+import { isTruthy } from 'lib/utilities/types';
 
 interface Props {
   submission: ApplicationWithTransactions | Application;
@@ -45,20 +46,25 @@ export default function BountyApplicantActions({ submission }: Props) {
         </Typography>
       )}
 
-      {submission.status === 'paid' && (
-        <Link
-          external
-          href={transaction ? getChainExplorerLink(transaction.chainId, transaction.transactionId) : ''}
-          target='_blank'
-        >
-          <Tooltip title={transaction ? 'View transaction' : ''} placement='top' arrow>
-            <Typography color='success' variant='body2'>
-              {'Paid '}
-              <LaunchIcon sx={{ fontSize: 14 }} />
-            </Typography>
-          </Tooltip>
-        </Link>
-      )}
+      {submission.status === 'paid' &&
+        (transaction && isTruthy(transaction.chainId) && isTruthy(transaction.transactionId) ? (
+          <Link
+            external
+            href={transaction ? getChainExplorerLink(transaction.chainId, transaction.transactionId) : ''}
+            target='_blank'
+          >
+            <Tooltip title={transaction ? 'View transaction' : ''} placement='top' arrow>
+              <Typography color='success' variant='body2'>
+                {'Paid '}
+                <LaunchIcon sx={{ fontSize: 14 }} />
+              </Typography>
+            </Tooltip>
+          </Link>
+        ) : (
+          <Typography color='success' variant='body2'>
+            {'Paid '}
+          </Typography>
+        ))}
     </>
   );
 }

@@ -1,5 +1,5 @@
 import { prisma } from 'db';
-import { accessiblePagesByPermissionsQuery } from 'lib/pages/server';
+import { accessiblePagesByPermissionsQuery } from 'lib/permissions/pages/accessiblePagesByPermissionsQuery';
 
 import { aggregateVoteResult } from './aggregateVoteResult';
 import { calculateVoteStatus } from './calculateVoteStatus';

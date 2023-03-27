@@ -9,8 +9,6 @@ const StyledBox = styled(Box, {
 })<{ noBorder?: boolean }>`
   white-space: nowrap;
   border-bottom: ${({ noBorder, theme }) => (noBorder ? '0' : `1px solid ${theme.palette.divider}`)};
-  padding-bottom: ${({ theme }) => theme.spacing(2)};
-  margin-bottom: ${({ theme }) => theme.spacing(2)};
 `;
 
 const StyledTypography = styled(Typography)`
@@ -22,11 +20,13 @@ interface LegendProps extends TypographyProps {
   children: string | ReactNode;
   helperText?: string | ReactNode;
   noBorder?: boolean;
+  mb?: number;
+  pb?: number;
 }
 
-function Legend({ children, helperText, noBorder, ...props }: LegendProps) {
+function Legend({ children, helperText, noBorder, mb = 2, pb = 2, ...props }: LegendProps) {
   return (
-    <StyledBox noBorder={noBorder}>
+    <StyledBox noBorder={noBorder} mb={mb} pb={pb}>
       <StyledTypography noWrap {...props}>
         {children}
       </StyledTypography>

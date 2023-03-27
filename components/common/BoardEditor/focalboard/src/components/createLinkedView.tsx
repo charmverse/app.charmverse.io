@@ -1,8 +1,11 @@
+import { useTheme } from '@emotion/react';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import { Box, Collapse, Stack, Typography } from '@mui/material';
 import { useState } from 'react';
 
 import Button from 'components/common/Button';
+import { MobileDialog } from 'components/common/MobileDialog/MobileDialog';
+import { useSmallScreen } from 'hooks/useMediaScreens';
 
 import { StyledSidebar } from './viewSidebar/viewSidebar';
 import type { DatabaseSourceProps } from './viewSidebar/viewSourceOptions';
@@ -14,6 +17,9 @@ type SidebarState = 'select-source' | null;
 
 export function CreateLinkedView(props: CreateLinkedViewProps) {
   const [sidebarState, setSidebarState] = useState<SidebarState>('select-source');
+  const isSmallScreen = useSmallScreen();
+  const theme = useTheme();
+
   function openSidebar() {
     setSidebarState(!sidebarState ? 'select-source' : null);
   }
@@ -25,7 +31,7 @@ export function CreateLinkedView(props: CreateLinkedViewProps) {
   return (
     <Box display='flex'>
       <Box flexGrow={1} display='flex' justifyContent='center' alignItems='center'>
-        <Stack alignItems='center' spacing={0}>
+        <Stack alignItems='center' spacing={0} mt={{ xs: 3, md: 0 }}>
           <HelpOutlineIcon color='secondary' fontSize='large' />
           <Typography color='secondary'>
             <strong>No data source</strong>
@@ -45,15 +51,27 @@ export function CreateLinkedView(props: CreateLinkedViewProps) {
           </Typography>
         </Stack>
       </Box>
-      <Collapse in={props.readOnly === true ? false : Boolean(sidebarState)} orientation='horizontal'>
-        <StyledSidebar
-          style={{
-            height: 'fit-content'
-          }}
+      {isSmallScreen ? (
+        <MobileDialog
+          title='Select data source'
+          onClose={closeSidebar}
+          open={props.readOnly === true ? false : Boolean(sidebarState)}
+          PaperProps={{ sx: { background: theme.palette.background.light } }}
+          contentSx={{ pr: 0, pb: 0, pl: 1 }}
         >
-          <ViewSourceOptions {...props} title='Select data source' closeSidebar={closeSidebar} />
-        </StyledSidebar>
-      </Collapse>
+          <ViewSourceOptions {...props} />
+        </MobileDialog>
+      ) : (
+        <Collapse in={props.readOnly === true ? false : Boolean(sidebarState)} orientation='horizontal'>
+          <StyledSidebar
+            style={{
+              height: 'fit-content'
+            }}
+          >
+            <ViewSourceOptions {...props} title='Select data source' closeSidebar={closeSidebar} />
+          </StyledSidebar>
+        </Collapse>
+      )}
     </Box>
   );
 }

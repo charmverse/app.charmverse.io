@@ -1,6 +1,4 @@
-import type { SpaceOperation, SpacePermissionConfigurationMode } from '@prisma/client';
-
-import { spaceOperationDescriptions, spaceOperationLabels } from '../spaces/mapping';
+import type { SpacePermissionConfigurationMode } from '@prisma/client';
 
 import type { SpaceConfigurationPreset, SpacePermissionTemplate } from './interfaces';
 
@@ -71,67 +69,3 @@ export const configurationModeDescription: Record<SpacePermissionConfigurationMo
   collaborative: 'Members can create and edit content.',
   open: 'Content created by members is available to the public by default.'
 };
-
-/**
- * Returns a tuple with what the user can and cannot do as a list of strings
- */
-export function getTemplateExplanation(template: SpacePermissionConfigurationMode): [string[], string[]] {
-  const canAndCannot: [string[], string[]] = [[], []];
-
-  if (template === 'custom') {
-    return canAndCannot;
-  }
-
-  const templateData = permissionTemplates[template];
-
-  // eslint-disable-next-line camelcase
-  const { moderateForums, createVote, ...applicableOperations } = templateData.spaceOperations;
-  // Handle space operations
-  for (const [operation, can] of Object.entries(applicableOperations) as [SpaceOperation, boolean][]) {
-    const qualifier = can ? 'can' : 'cannot';
-
-    const sentence = `Space members ${qualifier} ${spaceOperationDescriptions[operation].toLowerCase()}.`;
-
-    if (can) {
-      canAndCannot[0].push(sentence);
-    } else {
-      canAndCannot[1].push(sentence);
-    }
-  }
-
-  // Explain the default page permission
-  const { defaultPagePermissionGroup } = templateData.pagePermissionDefaults;
-
-  if (defaultPagePermissionGroup === 'full_access') {
-    canAndCannot[0].push('Space members can view, edit, comment on, share and delete new top-level pages by default.');
-  } else if (defaultPagePermissionGroup === 'editor') {
-    canAndCannot[0].push('Space members can view, edit and comment on new top-level pages by default.');
-    canAndCannot[1].push('Space members cannot share or delete new top-level pages by default.');
-  } else if (defaultPagePermissionGroup === 'view_comment') {
-    canAndCannot[0].push('Space members can view and comment on new top-level pages by default.');
-    canAndCannot[1].push('Space members cannot edit, share or delete new top-level pages by default.');
-  } else if (templateData.pagePermissionDefaults.defaultPagePermissionGroup === 'view') {
-    canAndCannot[0].push('Space members can view new top-level pages by default.');
-    canAndCannot[1].push('Space members cannot comment on, edit, share or delete new top-level pages by default.');
-  }
-
-  // Explain if new top level pages will be public
-  const { defaultPublicPages } = templateData.pagePermissionDefaults;
-
-  if (defaultPublicPages) {
-    canAndCannot[0].push('Anyone can see new top-level pages by default.');
-  } else {
-    canAndCannot[1].push('Anyone outside the space cannot see new top-level pages by default.');
-  }
-
-  // Explain the status of the bounty board
-  const { publicBountyBoard } = templateData.pagePermissionDefaults;
-
-  if (publicBountyBoard) {
-    canAndCannot[0].push('Anyone can see bounties and bounty suggestions visible to space members.');
-  } else {
-    canAndCannot[1].push('Anyone outside the space cannot see bounties and bounty suggestions.');
-  }
-
-  return canAndCannot;
-}

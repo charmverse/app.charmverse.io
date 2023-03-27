@@ -14,7 +14,6 @@ import Button from 'components/common/Button';
 import FieldLabel from 'components/common/form/FieldLabel';
 import Link from 'components/common/Link';
 import LoadingComponent from 'components/common/LoadingComponent';
-import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import type { BountyTask } from 'lib/bounties/getBountyTasks';
 import type { GetTasksResponse } from 'pages/api/tasks/list';
 
@@ -22,7 +21,7 @@ import { EmptyTaskState } from './components/EmptyTaskState';
 import Table from './components/NexusTable';
 import DiscussionTasksList from './DiscussionTasksList';
 
-function BountiesTasksListRow({ bountyTask, onClose }: { bountyTask: BountyTask; onClose: () => void }) {
+function BountiesTasksListRow({ bountyTask }: { bountyTask: BountyTask }) {
   const { pageTitle, spaceName, spaceDomain, pagePath, action } = bountyTask;
   const bountyLink = `/${spaceDomain}/${pagePath}`;
   const workspaceBounties = `/${spaceDomain}/bounties`;
@@ -30,14 +29,14 @@ function BountiesTasksListRow({ bountyTask, onClose }: { bountyTask: BountyTask;
   return (
     <TableRow>
       <TableCell>
-        <Link color='inherit' href={bountyLink} onClick={onClose}>
+        <Link color='inherit' href={bountyLink}>
           <Typography variant='body1' noWrap>
             {pageTitle || 'Untitled'}
           </Typography>
         </Link>
       </TableCell>
       <TableCell>
-        <Link color='inherit' href={workspaceBounties} onClick={onClose}>
+        <Link color='inherit' href={workspaceBounties}>
           <Typography variant='body1'>{spaceName}</Typography>
         </Link>
       </TableCell>
@@ -53,7 +52,6 @@ function BountiesTasksListRow({ bountyTask, onClose }: { bountyTask: BountyTask;
           }}
           href={bountyLink}
           disabled={!action}
-          onClick={onClose}
         >
           Review
         </Button>
@@ -71,7 +69,6 @@ function BountiesTasksList({
   error: any;
   tasks: GetTasksResponse | undefined;
 }) {
-  const { onClose } = useSettingsDialog();
   const bounties = tasks?.bounties ? [...tasks.bounties.unmarked, ...tasks.bounties.marked] : [];
 
   useEffect(() => {
@@ -134,7 +131,7 @@ function BountiesTasksList({
         </TableHead>
         <TableBody>
           {filteredBounties.map((bounty) => (
-            <BountiesTasksListRow key={bounty.id} bountyTask={bounty} onClose={onClose} />
+            <BountiesTasksListRow key={bounty.id} bountyTask={bounty} />
           ))}
         </TableBody>
       </Table>
