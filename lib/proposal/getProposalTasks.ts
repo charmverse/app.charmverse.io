@@ -1,4 +1,4 @@
-import type { ProposalStatus, WorkspaceEvent } from '@prisma/client';
+import type { ProposalStatus, User, WorkspaceEvent } from '@prisma/client';
 
 import { prisma } from 'db';
 import type {
@@ -7,6 +7,8 @@ import type {
   ProposalDiscussionNotificationsContext
 } from 'lib/discussion/getDiscussionTasks';
 import { getPropertiesFromPage } from 'lib/discussion/getPropertiesFromPage';
+import type { NotificationActor } from 'lib/notifications/mapNotificationActor';
+import { mapNotificationActor } from 'lib/notifications/mapNotificationActor';
 import { extractMentions } from 'lib/prosemirror/extractMentions';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
@@ -25,6 +27,7 @@ export interface ProposalTask {
   pageTitle: string;
   pagePath: string;
   status: ProposalStatus;
+  createdBy: NotificationActor | null;
 }
 
 export interface ProposalTasksGroup {
@@ -32,7 +35,8 @@ export interface ProposalTasksGroup {
   unmarked: ProposalTask[];
 }
 
-type WorkspaceEventRecord = Record<string, Pick<WorkspaceEvent, 'id' | 'pageId' | 'createdAt' | 'meta'> | null>;
+type WorkspaceNotificationEvent = { actor: User | null } & Pick<WorkspaceEvent, 'id' | 'pageId' | 'createdAt' | 'meta'>;
+type WorkspaceEventRecord = Record<string, WorkspaceNotificationEvent | null>;
 
 function sortProposals(proposals: ProposalTask[]) {
   proposals.sort((proposalA, proposalB) => {
@@ -58,7 +62,8 @@ export async function getProposalTasks(userId: string): Promise<{
       pageId: true,
       createdAt: true,
       meta: true,
-      id: true
+      id: true,
+      actor: true
     },
     orderBy: {
       createdAt: 'desc'
@@ -157,7 +162,8 @@ export async function getProposalTasks(userId: string): Promise<{
           spaceDomain: page.space.domain,
           spaceName: page.space.name,
           status: proposal.status,
-          action
+          action,
+          createdBy: mapNotificationActor(workspaceEvent.actor)
         };
         if (!userNotificationIds.has(workspaceEvent.id)) {
           proposalsRecord.unmarked.push(proposalTask);
