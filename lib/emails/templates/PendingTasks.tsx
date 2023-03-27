@@ -57,19 +57,19 @@ function ViewAllText({ href }: { href: string }) {
 }
 
 export default function PendingTasks(props: PendingTasksProps) {
-  const totalDiscussionTasks = props.discussionTasks.filter((discussion) => discussion.type === 'page').length;
+  const totalDiscussionTasks = props.discussionTasks.length;
   const totalVoteTasks = props.voteTasks.length;
   const totalGnosisSafeTasks = props.gnosisSafeTasks.length;
   const totalProposalTasks = props.proposalTasks.length;
   const totalBountyTasks = props.bountyTasks.length;
   const totalForumTasks = props.forumTasks.length;
 
-  const nexusDiscussionLink = `${charmverseUrl}/nexus?task=discussion`;
-  const nexusVoteLink = `${charmverseUrl}/nexus?task=vote`;
-  const nexusMultisigLink = `${charmverseUrl}/nexus?task=multisig`;
-  const nexusProposalLink = `${charmverseUrl}/nexus?task=proposal`;
-  const nexusBountyLink = `${charmverseUrl}/nexus?task=bounty`;
-  const nexusForumLink = `${charmverseUrl}/nexus?task=forum`;
+  const nexusDiscussionLink = `${charmverseUrl}/?task=discussion`;
+  const nexusVoteLink = `${charmverseUrl}/?task=vote`;
+  const nexusMultisigLink = `${charmverseUrl}/?task=multisig`;
+  const nexusProposalLink = `${charmverseUrl}/?task=proposal`;
+  const nexusBountyLink = `${charmverseUrl}/?task=bounty`;
+  const nexusForumLink = `${charmverseUrl}/?task=forum`;
 
   const discussionSection =
     totalDiscussionTasks > 0 ? (
@@ -95,12 +95,9 @@ export default function PendingTasks(props: PendingTasksProps) {
             </a>
           </div>
         </MjmlText>
-        {props.discussionTasks
-          .filter((discussion) => discussion.type === 'page')
-          .slice(0, MAX_ITEMS_PER_TASK)
-          .map((discussionTask) => (
-            <DiscussionTask key={discussionTask.mentionId} task={discussionTask} />
-          ))}
+        {props.discussionTasks.slice(0, MAX_ITEMS_PER_TASK).map((discussionTask) => (
+          <DiscussionTask key={discussionTask.mentionId} task={discussionTask} />
+        ))}
         {totalDiscussionTasks > MAX_ITEMS_PER_TASK ? <ViewAllText href={nexusDiscussionLink} /> : null}
         <MjmlDivider />
       </>

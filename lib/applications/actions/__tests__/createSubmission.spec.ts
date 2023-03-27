@@ -39,7 +39,30 @@ describe('createSubmission', () => {
         submissionNodes:
           '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"My submission"}]}]}',
         walletAddress: '0x123456789'
-      }
+      },
+      customReward: false
+    });
+
+    expect(submission.status).toBe('review');
+  });
+
+  it('should create a submission in review status if wallet is not provided but bounty has custom reward', async () => {
+    const bounty = await generateBounty({
+      createdBy: user.id,
+      spaceId: space.id,
+      status: 'open',
+      approveSubmitters: false
+    });
+
+    const submission = await createSubmission({
+      bountyId: bounty.id,
+      userId: user.id,
+      submissionContent: {
+        submission: 'My submission',
+        submissionNodes:
+          '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"My submission"}]}]}'
+      },
+      customReward: true
     });
 
     expect(submission.status).toBe('review');
@@ -69,7 +92,8 @@ describe('createSubmission', () => {
             submissionNodes:
               '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"My submission"}]}]}',
             walletAddress: '0x123456789'
-          }
+          },
+          customReward: false
         });
 
         throw new ExpectedAnError();
@@ -96,7 +120,8 @@ describe('createSubmission', () => {
           submissionNodes:
             '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"My submission"}]}]}',
           walletAddress: '0x123456789'
-        }
+        },
+        customReward: false
       });
       throw new ExpectedAnError();
     } catch (err) {
@@ -114,7 +139,8 @@ describe('createSubmission', () => {
           submissionNodes:
             '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"My submission"}]}]}',
           walletAddress: '0x123456789'
-        }
+        },
+        customReward: false
       });
       throw new ExpectedAnError();
     } catch (err) {
@@ -139,7 +165,8 @@ describe('createSubmission', () => {
           submissionNodes:
             '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"My submission"}]}]}',
           walletAddress: '0x123456789'
-        }
+        },
+        customReward: false
       });
       throw new ExpectedAnError();
     } catch (err) {
@@ -166,7 +193,8 @@ describe('createSubmission', () => {
           submissionNodes:
             '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"My submission"}]}]}',
           walletAddress: '0x123456789'
-        }
+        },
+        customReward: false
       });
       throw new ExpectedAnError();
     } catch (err) {
@@ -190,7 +218,8 @@ describe('createSubmission', () => {
           submission: '',
           submissionNodes: '',
           walletAddress: '0x0'
-        }
+        },
+        customReward: false
       });
       throw new ExpectedAnError();
     } catch (err) {
@@ -215,7 +244,8 @@ describe('createSubmission', () => {
           submissionNodes:
             '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"My submission"}]}]}',
           walletAddress: ''
-        }
+        },
+        customReward: false
       });
       throw new ExpectedAnError();
     } catch (err) {

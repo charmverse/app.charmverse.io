@@ -23,9 +23,9 @@ export type DatabaseSourceProps = {
 };
 
 type ViewSourceOptionsProps = DatabaseSourceProps & {
-  closeSidebar: () => void;
+  closeSidebar?: () => void;
   goBack?: () => void;
-  title: string;
+  title?: string;
   view?: BoardView;
 };
 
@@ -150,9 +150,9 @@ function CharmVerseDatabases(props: DatabaseSourceProps & { activePageId?: strin
       .sort((pageA, pageB) => ((pageA.title || 'Untitled') > (pageB.title || 'Untitled') ? 1 : -1));
   }, [pages, searchTerm]);
 
-  function onSelect(page: PageMeta) {
+  function onSelect(pageId: string) {
     props.onSelect({
-      linkedSourceId: page.id,
+      linkedSourceId: pageId,
       sourceType: 'board_page'
     });
   }

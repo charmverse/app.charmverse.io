@@ -23,19 +23,15 @@ import { ApiSettings } from 'components/settings/api/Api';
 import type { SpaceSettingsTab, UserSettingsTab } from 'components/settings/config';
 import { SETTINGS_TABS, ACCOUNT_TABS } from 'components/settings/config';
 import Invites from 'components/settings/invites/Invites';
-import MemberSettings from 'components/settings/members/MemberSettings';
 import { RoleSettings } from 'components/settings/roles/RoleSettings';
 import SpaceSettings from 'components/settings/workspace/Space';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { CurrentSpaceProvider, useCurrentSpaceId } from 'hooks/useCurrentSpaceId';
-import { useHasMemberLevel } from 'hooks/useHasMemberLevel';
 import { useSmallScreen } from 'hooks/useMediaScreens';
 import { MembersProvider } from 'hooks/useMembers';
 import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useSpaceFromPath } from 'hooks/useSpaceFromPath';
 import { useSpaces } from 'hooks/useSpaces';
-import { useUser } from 'hooks/useUser';
-import members from 'pages/api/spaces/[id]/members';
 
 import { SectionName } from '../PageLayout/components/Sidebar/Sidebar';
 import { SidebarLink } from '../PageLayout/components/Sidebar/SidebarButton';
@@ -59,18 +55,14 @@ function TabView(props: { space?: Space; tab: SpaceSettingsTab | UserSettingsTab
   }
 
   if (tab.path === SETTINGS_TABS[1].path && space) {
-    return <MemberSettings space={space} />;
-  }
-
-  if (tab.path === SETTINGS_TABS[2].path && space) {
     return <RoleSettings space={space} />;
   }
 
-  if (tab.path === SETTINGS_TABS[3].path && space) {
+  if (tab.path === SETTINGS_TABS[2].path && space) {
     return <Invites space={space} />;
   }
 
-  if (tab.path === SETTINGS_TABS[4].path && space) {
+  if (tab.path === SETTINGS_TABS[3].path && space) {
     return <ApiSettings space={space} />;
   }
 
@@ -124,6 +116,7 @@ function SpaceSettingsModalComponent() {
       }
     }
   }, [spaceByPath]);
+
   return (
     <Dialog
       fullWidth

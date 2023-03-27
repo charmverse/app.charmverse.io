@@ -5,24 +5,24 @@ import type { SelectProps } from '@mui/material/Select';
 import Select from '@mui/material/Select';
 import { useEffect, useState } from 'react';
 
-export interface Props extends Omit<SelectProps, 'onChange'> {
-  onChange?: (option: string) => void;
-  defaultValue?: string;
+export type Props<T extends string> = Omit<SelectProps, 'onChange'> & {
+  onChange?: (option: T) => void;
+  defaultValue?: T;
   title?: string;
   keyAndLabel: Record<string | any, string | number>;
-}
+};
 
-export default function InputEnumToOptions({
+export default function InputEnumToOptions<T extends string>({
   onChange = () => {},
   defaultValue,
   title,
   keyAndLabel,
   sx,
   ...props
-}: Props) {
+}: Props<T>) {
   const options = Object.entries(keyAndLabel);
 
-  const [value, setValue] = useState<string | null>('');
+  const [value, setValue] = useState<T | null>(null);
 
   useEffect(() => {
     if (defaultValue && !value) {
@@ -38,9 +38,9 @@ export default function InputEnumToOptions({
         sx={sx}
         value={value}
         onChange={(ev) => {
-          setValue(ev.target.value as string);
+          setValue(ev.target.value as T);
           if (ev.target.value) {
-            onChange(ev.target.value as string);
+            onChange(ev.target.value as T);
           }
         }}
         {...props}
@@ -57,7 +57,7 @@ export default function InputEnumToOptions({
   );
 }
 
-export function SmallSelect({ sx = {}, ...props }: Props) {
+export function SmallSelect<T extends string>({ sx = {}, ...props }: Props<T>) {
   return (
     <InputEnumToOptions
       {...props}

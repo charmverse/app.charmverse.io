@@ -1,7 +1,6 @@
 import { link } from '@bangle.dev/base-components';
-import type { PluginKey } from '@bangle.dev/pm';
+import type { Mark, PluginKey } from '@bangle.dev/pm';
 import { Plugin } from '@bangle.dev/pm';
-import { getMarkAttrs } from '@bangle.dev/utils';
 
 import { createTooltipDOM, tooltipPlacement } from '../@bangle.dev/tooltip';
 import {
@@ -63,7 +62,11 @@ export function plugins({ key }: { key: PluginKey }) {
         handleClick: (view, _pos, event) => {
           const { schema } = view.state;
           const markType = schema.marks.link;
-          const attrs = getMarkAttrs(view.state, markType);
+          let marks: Mark[] = [];
+          view.state.doc.nodesBetween(_pos, _pos, (node) => {
+            marks = [...marks, ...node.marks];
+          });
+          const attrs = marks.find((markItem) => markItem.type.name === markType.name)?.attrs ?? {};
           if (attrs.href) {
             event.stopPropagation();
             window.open(attrs.href, '_blank');

@@ -9,7 +9,8 @@ import { submissionIsEditable } from '../shared';
 
 export async function updateSubmission({
   submissionId,
-  submissionContent
+  submissionContent,
+  customReward
 }: SubmissionUpdateData): Promise<Application> {
   // Undefined is ok, but not null or empty string values
   const isEmpty =
@@ -31,7 +32,7 @@ export async function updateSubmission({
     throw new UnauthorisedActionError();
   }
 
-  if (!submissionContent.walletAddress) {
+  if (!submissionContent.walletAddress && !customReward) {
     throw new MissingDataError('You must provide a wallet address in your submission');
   }
 

@@ -57,6 +57,7 @@ enum NotificationType {
   proposal
   bounty
   post_comment
+  page_comment
   forum
 }
 
@@ -74,6 +75,7 @@ enum BountyOperation {
   lock
   approve_applications
   grant_permissions
+  mark_paid
 }
 
 enum BountyPermissionLevel {
@@ -622,6 +624,7 @@ model Poap {
 model FavoritePage {
   pageId String @db.Uuid
   userId String @db.Uuid
+  index  Int    @default(-1)
   page   Page   @relation(fields: [pageId], references: [id], onDelete: Cascade)
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -1066,6 +1069,7 @@ enum ProposalOperation {
   vote
   comment
   review
+  make_public
 }
 
 enum ProposalCategoryPermissionLevel {

@@ -64,11 +64,52 @@ describe('policyStatusVoteActiveOnlyVotable', () => {
       comment: true,
       create_vote: true,
       review: true,
-      vote: true
+      vote: true,
+      make_public: true
     });
   });
+  it('should allow author to view, vote make the proposal public', async () => {
+    const permissions = await policyStatusVoteActiveOnlyVotable({
+      flags: fullPermissions,
+      isAdmin: false,
+      resource: proposal,
+      userId: proposalAuthor.id
+    });
+
+    expect(permissions).toMatchObject<AvailableProposalPermissionFlags>({
+      view: true,
+      vote: true,
+      make_public: true,
+      create_vote: false,
+      comment: false,
+      delete: false,
+      edit: false,
+      review: false
+    });
+  });
+
+  it('should allow admin users to view, vote, make the proposal public and delete it', async () => {
+    const permissions = await policyStatusVoteActiveOnlyVotable({
+      flags: fullPermissions,
+      isAdmin: true,
+      resource: proposal,
+      userId: adminUser.id
+    });
+
+    expect(permissions).toMatchObject<AvailableProposalPermissionFlags>({
+      view: true,
+      vote: true,
+      make_public: true,
+      delete: true,
+      create_vote: false,
+      comment: false,
+      edit: false,
+      review: false
+    });
+  });
+
   it('should only allow users to view and vote', async () => {
-    const users = [proposalAuthor, adminUser, proposalReviewer, spaceMember];
+    const users = [proposalReviewer, spaceMember];
 
     for (const user of users) {
       const permissions = await policyStatusVoteActiveOnlyVotable({
@@ -81,6 +122,7 @@ describe('policyStatusVoteActiveOnlyVotable', () => {
       expect(permissions).toMatchObject<AvailableProposalPermissionFlags>({
         view: true,
         vote: true,
+        make_public: false,
         create_vote: false,
         comment: false,
         delete: false,

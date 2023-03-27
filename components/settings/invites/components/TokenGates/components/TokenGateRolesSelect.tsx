@@ -78,6 +78,7 @@ export default function TokenGateRolesSelect({ onDelete, selectedRoleIds, onChan
         onChange={selectOption}
         displayEmpty={true}
         disabled={!isAdmin || roles?.length === 0}
+        sx={{ '& .MuiInputBase-input': { pb: 0 } }}
         renderValue={(roleIds) =>
           roleIds.length === 0 ? (
             <Typography color='secondary' fontSize='small'>

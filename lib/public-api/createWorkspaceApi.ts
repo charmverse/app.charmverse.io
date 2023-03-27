@@ -62,7 +62,14 @@ export async function createWorkspaceApi({
     superApiTokenId: superApiToken?.id
   };
 
-  const space = await createWorkspace({ spaceData, userId: adminUserId, webhookUrl, extraAdmins: [botUser.id] });
+  const space = await createWorkspace({
+    spaceData,
+    userId: adminUserId,
+    webhookUrl,
+    extraAdmins: [botUser.id],
+    // Create new spaces with NFT template by default
+    createSpaceOption: 'templateNftCommunity'
+  });
 
   // create roles from discord
   if (discordServerId) {

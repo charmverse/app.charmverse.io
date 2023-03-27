@@ -156,7 +156,6 @@ function ViewHeader(props: Props) {
             </Button>
             <Popover
               {...bindPopover(viewFilterPopup)}
-              disablePortal
               PaperProps={{
                 sx: {
                   overflow: 'visible'
@@ -185,7 +184,6 @@ function ViewHeader(props: Props) {
                 </Button>
                 <Menu
                   {...bindMenu(viewSortPopup)}
-                  disablePortal
                   PaperProps={{
                     sx: {
                       overflow: 'visible'

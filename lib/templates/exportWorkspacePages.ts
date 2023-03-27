@@ -6,21 +6,12 @@ import { validate } from 'uuid';
 
 import { prisma } from 'db';
 import type { PageNodeWithChildren } from 'lib/pages';
+import { isBoardPageType } from 'lib/pages/isBoardPageType';
 import { resolvePageTree } from 'lib/pages/server/resolvePageTree';
 import type { PageContent, TextContent } from 'lib/prosemirror/interfaces';
 import { DataNotFoundError } from 'lib/utilities/errors';
 
 import type { ExportedPage, WorkspaceExport } from './interfaces';
-
-export interface ExportWorkspacePage {
-  sourceSpaceIdOrDomain: string;
-  exportName?: string;
-  rootPageIds?: string[];
-  skipBounties?: boolean;
-  skipProposals?: boolean;
-  skipBountyTemplates?: boolean;
-  skipProposalTemplates?: boolean;
-}
 
 function recurse(node: PageContent, cb: (node: PageContent | TextContent) => void) {
   if (node?.content) {
@@ -33,6 +24,15 @@ function recurse(node: PageContent, cb: (node: PageContent | TextContent) => voi
   }
 }
 
+export interface ExportWorkspacePage {
+  sourceSpaceIdOrDomain: string;
+  exportName?: string;
+  rootPageIds?: string[];
+  skipBounties?: boolean;
+  skipProposals?: boolean;
+  skipBountyTemplates?: boolean;
+  skipProposalTemplates?: boolean;
+}
 export async function exportWorkspacePages({
   sourceSpaceIdOrDomain,
   exportName,
@@ -89,7 +89,7 @@ export async function exportWorkspacePages({
     // eslint-disable-next-line no-console
     // console.log('Processing page ', pageIndexes[node.id], ' / ', totalPages);
 
-    if (node.type.match('board')) {
+    if (isBoardPageType(node.type)) {
       const boardblocks = await prisma.block.findMany({
         where: {
           rootId: node.id as string,
@@ -148,17 +148,12 @@ export async function exportWorkspacePages({
       })
     );
     const pollIds: string[] = [];
-    const inlineDatabasePageIds: string[] = [];
+
     recurse(node.content as PageContent, (_node) => {
       if (_node.type === 'poll') {
         const attrs = _node.attrs as { pollId: string };
         if (attrs.pollId) {
           pollIds.push(attrs.pollId);
-        }
-      } else if (_node.type === 'inlineDatabase') {
-        const attrs = _node.attrs as { pageId: string };
-        if (attrs.pageId) {
-          inlineDatabasePageIds.push(attrs.pageId);
         }
       }
     });
@@ -172,24 +167,6 @@ export async function exportWorkspacePages({
         },
         include: {
           voteOptions: true
-        }
-      });
-    }
-
-    if (inlineDatabasePageIds.length) {
-      const inlineDatabasesData = await exportWorkspacePages({
-        sourceSpaceIdOrDomain,
-        exportName,
-        rootPageIds: inlineDatabasePageIds,
-        skipBounties,
-        skipProposals
-      });
-      // Only store the inline database in this field
-      node.inlineDatabases = inlineDatabasesData.data.pages.filter((page) => inlineDatabasePageIds.includes(page.id));
-      // Rest of the pages will be added to the top level pages array
-      inlineDatabasesData.data.pages.forEach((page) => {
-        if (!inlineDatabasePageIds.includes(page.id)) {
-          exportData.pages.push(page);
         }
       });
     }

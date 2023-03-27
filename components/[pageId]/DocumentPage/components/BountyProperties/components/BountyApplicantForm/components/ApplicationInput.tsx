@@ -1,7 +1,7 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import { Box, Collapse, FormLabel, IconButton, Stack } from '@mui/material';
+import { Box, Collapse, FormLabel, IconButton, Stack, Typography } from '@mui/material';
 import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
@@ -12,12 +12,14 @@ import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
 import charmClient from 'charmClient';
+import Modal from 'components/common/Modal';
 import { useBounties } from 'hooks/useBounties';
 import { useLocalStorage } from 'hooks/useLocalStorage';
 import { useUser } from 'hooks/useUser';
+import type { ReviewDecision, SubmissionReview } from 'lib/applications/interfaces';
 import { MINIMUM_APPLICATION_MESSAGE_CHARACTERS } from 'lib/applications/shared';
+import type { AssignedBountyPermissions } from 'lib/bounties';
 
-import { ApplicationComments } from '../../BountyApplicantsTable/ApplicationComments';
 import BountyApplicantStatus from '../../BountyApplicantStatus';
 
 /**
@@ -27,41 +29,45 @@ interface IApplicationFormProps {
   onSubmit?: (application: Application) => any;
   bountyId: string;
   mode?: 'create' | 'update' | 'suggest';
-  proposal?: Application;
+  application?: Application;
   onCancel?: () => void;
   readOnly?: boolean;
   expandedOnLoad?: boolean;
   alwaysExpanded?: boolean;
+  refreshSubmissions: VoidFunction;
+  permissions: AssignedBountyPermissions;
 }
 
 export const schema = yup.object({
   message: yup
     .string()
-    .required('Please enter a proposal.')
+    .required('Please enter a submission.')
     .min(
       MINIMUM_APPLICATION_MESSAGE_CHARACTERS,
-      `Application proposal must contain at least ${MINIMUM_APPLICATION_MESSAGE_CHARACTERS} characters.`
+      `Application submission must contain at least ${MINIMUM_APPLICATION_MESSAGE_CHARACTERS} characters.`
     )
 });
 
 type FormValues = yup.InferType<typeof schema>;
 
 export default function ApplicationInput({
+  permissions,
   readOnly = false,
   onCancel,
   onSubmit,
   bountyId,
-  proposal,
+  application,
   mode = 'create',
   alwaysExpanded,
-  expandedOnLoad
+  expandedOnLoad,
+  refreshSubmissions
 }: IApplicationFormProps) {
   const { refreshBounty } = useBounties();
   const [isVisible, setIsVisible] = useState(mode === 'create' || expandedOnLoad || alwaysExpanded);
   const { user } = useUser();
 
   const [applicationMessage, setApplicationMessage] = useLocalStorage(`${bountyId}.${user?.id}.application`, '');
-
+  const [reviewDecision, setReviewDecision] = useState<SubmissionReview | null>(null);
   const {
     register,
     handleSubmit,
@@ -71,7 +77,7 @@ export default function ApplicationInput({
     mode: 'onChange',
     defaultValues: {
       // Default to saved message in local storage
-      message: (proposal?.message as string) ?? applicationMessage
+      message: (application?.message as string) ?? applicationMessage
     },
     resolver: yupResolver(schema)
   });
@@ -89,11 +95,29 @@ export default function ApplicationInput({
       refreshBounty(bountyId);
       setApplicationMessage('');
     } else if (mode === 'update') {
-      await charmClient.bounties.updateApplication(proposal?.id as string, proposalToSave);
+      await charmClient.bounties.updateApplication(application?.id as string, proposalToSave);
       if (onSubmit) {
         onSubmit(proposalToSave);
       }
       refreshBounty(bountyId);
+    }
+  }
+
+  function cancel() {
+    setReviewDecision(null);
+  }
+
+  function makeSubmissionDecision(decision: ReviewDecision) {
+    if (application?.id) {
+      charmClient.bounties
+        .reviewSubmission(application.id, decision)
+        .then(() => {
+          // Closes the modal
+          setReviewDecision(null);
+          refreshBounty(bountyId);
+          refreshSubmissions();
+        })
+        .catch((err) => {});
     }
   }
 
@@ -113,7 +137,7 @@ export default function ApplicationInput({
       >
         <Box display='flex' gap={0.5}>
           <FormLabel sx={{ fontWeight: 'bold' }}>
-            {proposal?.createdBy === user?.id ? 'Your application' : 'Application'}
+            {application?.createdBy === user?.id ? 'Your application' : 'Application'}
           </FormLabel>
 
           {!alwaysExpanded && (
@@ -128,8 +152,8 @@ export default function ApplicationInput({
             </IconButton>
           )}
         </Box>
-        {proposal && proposal.status === 'applied' && proposal.createdBy === user?.id && (
-          <BountyApplicantStatus submission={proposal} />
+        {application && application.status === 'applied' && application.createdBy === user?.id && (
+          <BountyApplicantStatus submission={application} />
         )}
       </Box>
       <Collapse in={isVisible} timeout='auto' unmountOnExit>
@@ -150,9 +174,9 @@ export default function ApplicationInput({
                 fullWidth
                 disabled={readOnly}
                 onChange={(ev) => {
-                  // Only store in local storage if no proposal exists yet
+                  // Only store in local storage if no application exists yet
                   const newText = ev.target.value;
-                  if (!proposal) {
+                  if (!application) {
                     setApplicationMessage(newText);
                   }
 
@@ -181,9 +205,54 @@ export default function ApplicationInput({
                 </Button>
               </Grid>
             )}
+
+            {permissions.userPermissions.review && application?.id && application?.status === 'inProgress' && (
+              <Grid item display='flex' gap={1}>
+                <Button
+                  color='error'
+                  variant='outlined'
+                  disabled={!readOnly}
+                  onClick={() =>
+                    setReviewDecision({
+                      submissionId: application?.id,
+                      decision: 'reject',
+                      userId: user?.id as string
+                    })
+                  }
+                >
+                  Reject
+                </Button>
+              </Grid>
+            )}
           </Grid>
         </form>
       </Collapse>
+      <Modal title='Confirm your review' open={reviewDecision !== null} onClose={cancel} size='large'>
+        {reviewDecision?.decision === 'reject' && (
+          <Box>
+            <Typography sx={{ mb: 1, whiteSpace: 'pre' }}>
+              Please confirm you want to <b>reject</b> this application.
+            </Typography>
+            <Typography sx={{ mb: 1, whiteSpace: 'pre' }}>
+              The submitter will be disqualified from making further changes
+            </Typography>
+          </Box>
+        )}
+
+        <Typography>This decision is permanent.</Typography>
+
+        <Box display='flex' gap={2} mt={3}>
+          {reviewDecision?.decision === 'reject' && (
+            <Button color='error' onClick={() => makeSubmissionDecision('reject')}>
+              Reject application
+            </Button>
+          )}
+
+          <Button variant='outlined' color='secondary' onClick={cancel}>
+            Cancel
+          </Button>
+        </Box>
+      </Modal>
     </Stack>
   );
 }

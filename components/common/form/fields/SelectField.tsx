@@ -155,7 +155,7 @@ export const SelectField = forwardRef<HTMLDivElement, Props>(
             />
           )}
           getOptionLabel={(option: SelectOptionType) => {
-            return option.name;
+            return option?.name;
           }}
           filterOptions={(allOptions: SelectOptionType[], params) => {
             const filtered = filter(allOptions, params);

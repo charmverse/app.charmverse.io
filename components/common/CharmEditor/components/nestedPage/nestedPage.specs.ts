@@ -20,6 +20,12 @@ export function nestedPageSpec(): RawSpecs {
           id: {
             default: null
           },
+          type: {
+            default: null
+          },
+          path: {
+            default: null
+          },
           track: {
             default: []
           }

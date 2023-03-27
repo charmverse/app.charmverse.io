@@ -41,11 +41,15 @@ export default function MemberDirectoryPage() {
   const [currentView, setCurrentView] = useState<View>((router.query.view as View) ?? 'gallery');
   const [isPropertiesDrawerVisible, setIsPropertiesDrawerVisible] = useState(false);
 
-  const showDirectory = useHasMemberLevel('member');
+  const { hasAccess: showDirectory, isLoadingAccess } = useHasMemberLevel('member');
 
   const sortedMembers = searchedMembers.sort((mem1, mem2) =>
     memberNamePropertyValue(mem1) > memberNamePropertyValue(mem2) ? 1 : -1
   );
+
+  if (isLoadingAccess) {
+    return null;
+  }
 
   if (!showDirectory) {
     return <ErrorPage message='Guests cannot access the member directory' />;

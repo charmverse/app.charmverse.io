@@ -16,9 +16,16 @@ interface Props {
   submission: ApplicationWithTransactions;
   isExpanded: boolean;
   expandRow: () => void;
+  refreshSubmissions: () => void;
 }
 
-export default function BountyApplicantActions({ bounty, isExpanded, submission, expandRow }: Props) {
+export default function BountyApplicantActions({
+  refreshSubmissions,
+  bounty,
+  isExpanded,
+  submission,
+  expandRow
+}: Props) {
   const { refreshBounty } = useBounties();
   const { showMessage } = useSnackbar();
 
@@ -34,6 +41,12 @@ export default function BountyApplicantActions({ bounty, isExpanded, submission,
     } catch (err: any) {
       showMessage(err.message || err, 'error');
     }
+  }
+
+  async function markSubmissionAsPaid() {
+    await charmClient.bounties.markSubmissionAsPaid(submission.id);
+    await refreshBounty(bounty.id);
+    await refreshSubmissions();
   }
 
   return (
@@ -55,7 +68,7 @@ export default function BountyApplicantActions({ bounty, isExpanded, submission,
         isTruthy(bounty.rewardToken) &&
         isTruthy(bounty.chainId) && (
           <Box>
-            {submission.walletAddress && (
+            {submission.walletAddress ? (
               <BountyPaymentButton
                 onSuccess={recordTransaction}
                 onError={(errorMessage, level) => showMessage(errorMessage, level || 'error')}
@@ -65,8 +78,7 @@ export default function BountyApplicantActions({ bounty, isExpanded, submission,
                 chainIdToUse={bounty.chainId}
                 bounty={bounty}
               />
-            )}
-            {!submission.walletAddress && (
+            ) : (
               <Tooltip title='Applicant must provide a wallet address'>
                 <Button color='primary' disabled={true}>
                   Send Payment
@@ -75,6 +87,12 @@ export default function BountyApplicantActions({ bounty, isExpanded, submission,
             )}
           </Box>
         )}
+
+      {submission.status === 'complete' && isTruthy(bounty.customReward) && (
+        <Button color='primary' size='small' onClick={markSubmissionAsPaid}>
+          Mark paid
+        </Button>
+      )}
     </Box>
   );
 }

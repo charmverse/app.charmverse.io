@@ -1,12 +1,15 @@
+import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import { Box, Menu, Stack } from '@mui/material';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import charmClient from 'charmClient';
+import { MobileDialog } from 'components/common/MobileDialog/MobileDialog';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
+import { useSmallScreen } from 'hooks/useMediaScreens';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
@@ -143,7 +146,11 @@ function CardDetailProperties(props: Props) {
   const [newTemplateId, setNewTemplateId] = useState('');
   const intl = useIntl();
   const addPropertyPopupState = usePopupState({ variant: 'popover', popupId: 'add-property' });
+
   const { showMessage } = useSnackbar();
+  const theme = useTheme();
+  const isSmallScreen = useSmallScreen();
+
   useEffect(() => {
     const newProperty = board.fields.cardProperties.find((property) => property.id === newTemplateId);
     if (newProperty) {
@@ -321,6 +328,27 @@ function CardDetailProperties(props: Props) {
     }
   }
 
+  const propertyTypes = useMemo(
+    () =>
+      activeView && (
+        <PropertyTypes
+          isMobile={isSmallScreen}
+          onClick={async (type) => {
+            const template: IPropertyTemplate = {
+              id: Utils.createGuid(IDType.BlockID),
+              name: typeDisplayName(intl, type),
+              type,
+              options: []
+            };
+            const templateId = await mutator.insertPropertyTemplate(board, activeView, -1, template);
+            setNewTemplateId(templateId);
+            addPropertyPopupState.close();
+          }}
+        />
+      ),
+    [mutator, board, activeView, isSmallScreen]
+  );
+
   return (
     <div className='octo-propertylist'>
       {board.fields.cardProperties.map((propertyTemplate) => {
@@ -355,37 +383,41 @@ function CardDetailProperties(props: Props) {
       )}
 
       {!props.readOnly && activeView && (
-        <div className='octo-propertyname add-property'>
-          <Button {...bindTrigger(addPropertyPopupState)}>
-            <FormattedMessage id='CardDetail.add-property' defaultMessage='+ Add a property' />
-          </Button>
-
-          <Menu
-            {...bindMenu(addPropertyPopupState)}
-            anchorOrigin={{
-              vertical: 'bottom',
-              horizontal: 'right'
-            }}
-            transformOrigin={{
-              vertical: 'center',
-              horizontal: 'left'
-            }}
-          >
-            <PropertyTypes
-              onClick={async (type) => {
-                const template: IPropertyTemplate = {
-                  id: Utils.createGuid(IDType.BlockID),
-                  name: typeDisplayName(intl, type),
-                  type,
-                  options: []
-                };
-                const templateId = await mutator.insertPropertyTemplate(board, activeView, -1, template);
-                setNewTemplateId(templateId);
-                addPropertyPopupState.close();
-              }}
-            />
-          </Menu>
-        </div>
+        <>
+          <div className='octo-propertyname add-property'>
+            <Button {...bindTrigger(addPropertyPopupState)}>
+              <FormattedMessage id='CardDetail.add-property' defaultMessage='+ Add a property' />
+            </Button>
+            {!isSmallScreen && (
+              <Menu
+                {...bindMenu(addPropertyPopupState)}
+                anchorOrigin={{
+                  vertical: 'bottom',
+                  horizontal: 'right'
+                }}
+                transformOrigin={{
+                  vertical: 'center',
+                  horizontal: 'left'
+                }}
+              >
+                {propertyTypes}
+              </Menu>
+            )}
+          </div>
+          {isSmallScreen && (
+            <MobileDialog
+              title={intl.formatMessage({ id: 'PropertyMenu.selectType', defaultMessage: 'Select property type' })}
+              open={addPropertyPopupState.isOpen}
+              onClose={addPropertyPopupState.close}
+              PaperProps={{ sx: { background: theme.palette.background.light } }}
+              contentSx={{ pr: 0, pb: 0, pl: 1 }}
+            >
+              <Box display='flex' gap={1} flexDirection='column' flex={1} height='100%'>
+                {propertyTypes}
+              </Box>
+            </MobileDialog>
+          )}
+        </>
       )}
     </div>
   );

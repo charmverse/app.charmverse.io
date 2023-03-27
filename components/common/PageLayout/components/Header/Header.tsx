@@ -20,7 +20,6 @@ import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import Popover from '@mui/material/Popover';
-import Stack from '@mui/material/Stack';
 import Switch from '@mui/material/Switch';
 import Toolbar from '@mui/material/Toolbar';
 import Tooltip from '@mui/material/Tooltip';
@@ -36,7 +35,7 @@ import { undoEventName } from 'components/common/CharmEditor/utils';
 import { DuplicatePageAction } from 'components/common/DuplicatePageAction';
 import { usePostByPath } from 'components/forum/hooks/usePostByPath';
 import { useProposalCategories } from 'components/proposals/hooks/useProposalCategories';
-import { useDateFormatter } from 'hooks/useDateFormatter';
+import { useBounties } from 'hooks/useBounties';
 import { useMembers } from 'hooks/useMembers';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { usePageFromPath } from 'hooks/usePageFromPath';
@@ -49,6 +48,7 @@ import { useUser } from 'hooks/useUser';
 
 import NotificationsBadge from '../Sidebar/NotificationsBadge';
 
+import { BountyActions } from './components/BountyActions';
 import BountyShareButton from './components/BountyShareButton/BountyShareButton';
 import DatabasePageOptions from './components/DatabasePageOptions';
 import { DocumentHistory } from './components/DocumentHistory';
@@ -251,6 +251,7 @@ function PostHeader({
 function HeaderComponent({ open, openSidebar }: HeaderProps) {
   const router = useRouter();
   const { updatePage, deletePage } = usePages();
+  const { refreshBounty, bounties } = useBounties();
   const { user } = useUser();
   const theme = useTheme();
   const [pageMenuOpen, setPageMenuOpen] = useState(false);
@@ -298,6 +299,7 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
   const proposalCategoriesWithCreateAllowed = getCategoriesWithCreatePermission();
 
   const canCreateProposal = proposalCategoriesWithCreateAllowed.length > 0;
+  const basePageBounty = bounties.find((bounty) => bounty.id === basePage?.id);
 
   function closeMenu() {
     setPageMenuOpen(false);
@@ -460,6 +462,12 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
         />
       )}
       <ExportMarkdownMenuItem disabled={!isExportablePage} onClick={exportMarkdownPage} />
+      {pageType === 'bounty' && basePageBounty && (
+        <>
+          <Divider />
+          <BountyActions bountyId={basePageBounty.id} onClick={closeMenu} />
+        </>
+      )}
       {isLargeScreen && (
         <>
           <Divider />
