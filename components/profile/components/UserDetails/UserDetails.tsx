@@ -2,7 +2,7 @@ import styled from '@emotion/styled';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import EditIcon from '@mui/icons-material/Edit';
 import type { SxProps, Theme } from '@mui/material';
-import { Box, Grid, Stack, Tooltip, Typography } from '@mui/material';
+import { Skeleton, Box, Grid, Stack, Tooltip, Typography } from '@mui/material';
 import type { IconButtonProps } from '@mui/material/IconButton';
 import IconButton from '@mui/material/IconButton';
 import type { IdentityType, UserDetails as UserDetailsType } from '@prisma/client';
@@ -167,13 +167,29 @@ function UserDetails({ readOnly, user, updateUser, sx = {} }: UserDetailsProps) 
             </EditIconContainer>
           </Grid>
         )}
-        <Grid item>
-          <UserDescription currentDescription={userDetails?.description} save={saveDescription} readOnly={disabled} />
-        </Grid>
-        <Grid item>
-          <TimezoneAutocomplete userTimezone={userDetails?.timezone} save={saveTimezone} readOnly={disabled} />
-        </Grid>
-        <SocialInputs social={userDetails?.social as Social} save={saveSocial} readOnly={disabled} />
+
+        {userDetails ? (
+          <>
+            <Grid item>
+              <UserDescription
+                currentDescription={userDetails?.description}
+                save={saveDescription}
+                readOnly={disabled}
+              />
+            </Grid>
+            <Grid item>
+              <TimezoneAutocomplete userTimezone={userDetails?.timezone} save={saveTimezone} readOnly={disabled} />
+            </Grid>
+            <SocialInputs social={userDetails?.social as Social} save={saveSocial} readOnly={disabled} />
+          </>
+        ) : (
+          <Box display='flex' gap={1} flexDirection='column' ml={2} mt={2}>
+            <Skeleton variant='rectangular' width={150} height={16} />
+            <Skeleton variant='rectangular' width='100%' height={55} />
+            <Skeleton variant='rectangular' width={150} height={16} sx={{ mt: 1 }} />
+            <Skeleton variant='rectangular' width='100%' height={35} />
+          </Box>
+        )}
       </Grid>
       {!isPublic && (
         <>
