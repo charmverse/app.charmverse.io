@@ -20,13 +20,15 @@ class TransitionFlags extends BasePermissions<ProposalStatus> {
   }
 }
 
-async function privateDraftProposal({ proposal, userId }: GetFlagsInput): Promise<ProposalFlowFlags> {
+async function draftProposal({ proposal, userId }: GetFlagsInput): Promise<ProposalFlowFlags> {
   const flags = new TransitionFlags();
-  if (
-    isProposalAuthor({ proposal, userId }) ||
-    (await hasAccessToSpace({ spaceId: proposal.spaceId, userId, adminOnly: true })).isAdmin
-  ) {
-    flags.addPermissions(['draft', 'discussion']);
+  const { isAdmin } = await hasAccessToSpace({ spaceId: proposal.spaceId, userId, adminOnly: true });
+
+  if (isProposalAuthor({ proposal, userId }) || isAdmin) {
+    flags.addPermissions(['draft']);
+    if (proposal.reviewers.length > 0) {
+      flags.addPermissions(['discussion']);
+    }
   }
   return flags.operationFlags;
 }
@@ -121,7 +123,7 @@ export async function computeProposalFlowFlags({
 
   switch (proposal.status) {
     case 'draft':
-      return privateDraftProposal({ proposal, userId });
+      return draftProposal({ proposal, userId });
     case 'discussion':
       return discussionProposal({ proposal, userId });
     case 'review':
