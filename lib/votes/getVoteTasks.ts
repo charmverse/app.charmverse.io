@@ -1,4 +1,5 @@
 import { prisma } from 'db';
+import { mapNotificationActor } from 'lib/notifications/mapNotificationActor';
 import { pageMetaSelect } from 'lib/pages/server/getPageMeta';
 
 import { aggregateVoteResult } from './aggregateVoteResult';
@@ -27,7 +28,8 @@ export async function getVoteTasks(userId: string): Promise<VoteTask[]> {
       },
       space: true,
       userVotes: true,
-      voteOptions: true
+      voteOptions: true,
+      author: true
     }
   });
 
@@ -54,7 +56,8 @@ export async function getVoteTasks(userId: string): Promise<VoteTask[]> {
       aggregatedResult,
       userChoice,
       status: voteStatus,
-      totalVotes: userVotes.length
+      totalVotes: userVotes.length,
+      createdBy: mapNotificationActor(vote.author)
     };
   });
 }
