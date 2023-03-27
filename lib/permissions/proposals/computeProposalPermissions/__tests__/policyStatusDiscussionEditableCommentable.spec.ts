@@ -64,11 +64,12 @@ describe('policyStatusDiscussionEditableCommentable', () => {
       comment: true,
       create_vote: true,
       review: true,
-      vote: true
+      vote: true,
+      make_public: true
     });
   });
 
-  it('should allow the author to view, edit, comment, delete', async () => {
+  it('should allow the author to view, edit, comment, delete and make public', async () => {
     const permissions = await policyStatusDiscussionEditableCommentable({
       flags: fullPermissions,
       isAdmin: false,
@@ -81,6 +82,7 @@ describe('policyStatusDiscussionEditableCommentable', () => {
       edit: true,
       delete: true,
       comment: true,
+      make_public: true,
       create_vote: false,
       review: false,
       vote: false
@@ -100,6 +102,7 @@ describe('policyStatusDiscussionEditableCommentable', () => {
       edit: true,
       delete: true,
       comment: true,
+      make_public: true,
       create_vote: false,
       review: false,
       vote: false
@@ -117,6 +120,7 @@ describe('policyStatusDiscussionEditableCommentable', () => {
     expect(permissions).toMatchObject<AvailableProposalPermissionFlags>({
       view: true,
       comment: true,
+      make_public: false,
       edit: false,
       delete: false,
       create_vote: false,
@@ -136,6 +140,7 @@ describe('policyStatusDiscussionEditableCommentable', () => {
     expect(permissions).toMatchObject<AvailableProposalPermissionFlags>({
       view: true,
       comment: true,
+      make_public: false,
       edit: false,
       delete: false,
       create_vote: false,

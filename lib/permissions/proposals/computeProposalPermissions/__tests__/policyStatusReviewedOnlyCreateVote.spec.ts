@@ -64,10 +64,11 @@ describe('policyStatusReviewedOnlyCreateVote', () => {
       comment: true,
       create_vote: true,
       review: true,
-      vote: true
+      vote: true,
+      make_public: true
     });
   });
-  it('should allow the author to view, create_vote and delete_vote', async () => {
+  it('should allow the author to view, create_vote, delete_vote and make public', async () => {
     const permissions = await policyStatusReviewedOnlyCreateVote({
       flags: fullPermissions,
       isAdmin: false,
@@ -78,6 +79,7 @@ describe('policyStatusReviewedOnlyCreateVote', () => {
     expect(permissions).toMatchObject<AvailableProposalPermissionFlags>({
       create_vote: true,
       view: true,
+      make_public: true,
       comment: false,
       delete: true,
       edit: false,
@@ -86,7 +88,7 @@ describe('policyStatusReviewedOnlyCreateVote', () => {
     });
   });
 
-  it('should allow the admin to view, delete, create_vote', async () => {
+  it('should allow the admin to view, delete, create_vote and make public', async () => {
     const permissions = await policyStatusReviewedOnlyCreateVote({
       flags: fullPermissions,
       isAdmin: true,
@@ -98,6 +100,7 @@ describe('policyStatusReviewedOnlyCreateVote', () => {
       view: true,
       delete: true,
       create_vote: true,
+      make_public: true,
       edit: false,
       review: false,
       comment: false,
@@ -115,6 +118,7 @@ describe('policyStatusReviewedOnlyCreateVote', () => {
 
     expect(permissions).toMatchObject<AvailableProposalPermissionFlags>({
       view: true,
+      make_public: false,
       comment: false,
       review: false,
       edit: false,
@@ -134,6 +138,7 @@ describe('policyStatusReviewedOnlyCreateVote', () => {
 
     expect(permissions).toMatchObject<AvailableProposalPermissionFlags>({
       view: true,
+      make_public: false,
       comment: false,
       edit: false,
       delete: false,

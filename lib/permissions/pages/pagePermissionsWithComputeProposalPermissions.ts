@@ -29,7 +29,11 @@ export async function computePagePermissionsUsingProposalPermissions({
   }
 
   if (proposalPermissions.edit) {
-    permissions.addPermissions(['edit_content', 'edit_isPublic', 'edit_position']);
+    permissions.addPermissions(['edit_content', 'edit_position']);
+  }
+
+  if (proposalPermissions.make_public) {
+    permissions.addPermissions(['edit_isPublic']);
   }
 
   if (proposalPermissions.delete) {

@@ -9,9 +9,9 @@ import type { AvailableProposalPermissionFlags } from '../interfaces';
 
 import type { ProposalPolicyInput } from './interfaces';
 
-const allowedAuthorOperations: ProposalOperation[] = ['view', 'comment', 'delete'];
+const allowedAuthorOperations: ProposalOperation[] = ['view', 'comment', 'delete', 'make_public'];
+const allowedAdminOperations: ProposalOperation[] = [...allowedAuthorOperations, 'review', 'edit'];
 const allowedReviewerOperations: ProposalOperation[] = ['view', 'comment', 'review'];
-const allowedAdminOperations: ProposalOperation[] = ['view', 'comment', 'delete', 'review', 'edit'];
 
 export async function policyStatusReviewCommentable({
   resource,

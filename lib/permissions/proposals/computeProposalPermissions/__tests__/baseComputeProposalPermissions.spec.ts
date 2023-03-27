@@ -68,11 +68,19 @@ beforeAll(async () => {
 });
 
 // Defining these here so that the test is more resilient against future changes
-const authorPermissions: ProposalOperation[] = ['view', 'comment', 'vote', 'create_vote', 'edit', 'delete'];
+const authorPermissions: ProposalOperation[] = [
+  'view',
+  'comment',
+  'vote',
+  'create_vote',
+  'edit',
+  'delete',
+  'make_public'
+];
 const reviewerPermissions: ProposalOperation[] = ['view', 'comment', 'review'];
 
 describe('computeProposalPermissions - base', () => {
-  it('should allow the author to view, edit, comment, vote, create_vote and delete the proposal', async () => {
+  it('should allow the author to view, edit, comment, vote, create_vote, delete and make public the proposal', async () => {
     const permissions = await baseComputeProposalPermissions({
       resourceId: proposal.id,
       userId: proposalAuthor.id

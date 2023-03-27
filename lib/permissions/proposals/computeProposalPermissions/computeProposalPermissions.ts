@@ -17,7 +17,6 @@ import { proposalPermissionsMapping } from '../mapping';
 import type { ProposalResource } from './interfaces';
 import { policyStatusDiscussionEditableCommentable } from './policyStatusDiscussionEditableCommentable';
 import { policyStatusDraftNotViewable } from './policyStatusDraftNotViewable';
-import { policyStatusPrivateDraftVisibleOnlyByAuthor } from './policyStatusPrivateDraftVisibleOnlyByAuthor';
 import { policyStatusReviewCommentable } from './policyStatusReviewCommentable';
 import { policyStatusReviewedOnlyCreateVote } from './policyStatusReviewedOnlyCreateVote';
 import { policyStatusVoteActiveOnlyVotable } from './policyStatusVoteActiveOnlyVotable';
@@ -112,7 +111,7 @@ export async function baseComputeProposalPermissions({
     });
 
     if (isProposalAuthor({ proposal, userId })) {
-      permissions.addPermissions(['edit', 'view', 'create_vote', 'delete', 'vote', 'comment']);
+      permissions.addPermissions(['edit', 'view', 'create_vote', 'delete', 'vote', 'comment', 'make_public']);
     }
 
     const isReviewer = await isProposalReviewer({
@@ -149,7 +148,6 @@ export const computeProposalPermissions = buildComputePermissionsWithPermissionF
   resolver: proposalResolver,
   computeFn: baseComputeProposalPermissions,
   policies: [
-    policyStatusPrivateDraftVisibleOnlyByAuthor,
     policyStatusDraftNotViewable,
     policyStatusDiscussionEditableCommentable,
     policyStatusReviewCommentable,
