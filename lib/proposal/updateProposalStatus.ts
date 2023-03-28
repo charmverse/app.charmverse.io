@@ -49,7 +49,7 @@ export async function updateProposalStatus({
   });
 
   if (!statusFlow[newStatus]) {
-    throw new InvalidStateError('Invalid proposal status transition');
+    throw new InvalidStateError(`Invalid transition to proposal status "${newStatus}"`);
   }
 
   await prisma.proposal.update({
