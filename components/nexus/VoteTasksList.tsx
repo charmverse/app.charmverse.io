@@ -17,7 +17,7 @@ import Link from 'components/common/Link';
 import LoadingComponent from 'components/common/LoadingComponent';
 import Modal from 'components/common/Modal';
 import VoteIcon from 'components/votes/components/VoteIcon';
-import type { VoteTask } from 'lib/votes/interfaces';
+import type { ExtendedVote, VoteTask } from 'lib/votes/interfaces';
 import type { GetTasksResponse } from 'pages/api/tasks/list';
 
 import { EmptyTaskState } from './components/EmptyTaskState';
@@ -47,7 +47,6 @@ export function VoteTasksListRow({
     id,
     userChoice
   } = voteTask;
-
   const isDeadlineOverdue = DateTime.now() > DateTime.fromJSDate(new Date(deadline));
   const dueText = DateTime.fromJSDate(new Date(deadline)).toRelative({ base: DateTime.now() });
 
@@ -155,6 +154,7 @@ export function VoteTasksList({ error, tasks, mutateTasks }: VoteTasksListProps)
   }
 
   const voteTask = tasks.votes.find((v) => v.id === selectedVoteId);
+  const voteDetails: ExtendedVote | null = voteTask ? { ...voteTask, createdBy: voteTask.createdBy?.id || '' } : null;
 
   return (
     <Box overflow='auto'>
@@ -177,9 +177,9 @@ export function VoteTasksList({ error, tasks, mutateTasks }: VoteTasksListProps)
         </TableBody>
       </Table>
       <Modal title='Poll details' size='large' open={!!selectedVoteId && !!voteTask} onClose={closeModal}>
-        {voteTask && (
+        {voteDetails && (
           <VoteDetail
-            vote={voteTask}
+            vote={voteDetails}
             detailed
             castVote={castVote}
             deleteVote={deleteVote}
