@@ -2,20 +2,25 @@ import styled from '@emotion/styled';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import LockIcon from '@mui/icons-material/LockOutlined';
 import {
+  Box,
+  Grid,
   Accordion,
   AccordionDetails,
   AccordionSummary,
   Typography,
-  Box,
   Chip,
   Divider,
   Paper,
   Tab,
   Tabs
 } from '@mui/material';
-import { useState, useRef } from 'react';
+import { usePopupState } from 'material-ui-popup-state/hooks';
+import { useState } from 'react';
 import type { ReactNode } from 'react';
 
+import Button from 'components/common/Button';
+import { InputSearchMemberMultiple } from 'components/common/form/InputSearchMember';
+import Modal from 'components/common/Modal';
 import type { Member } from 'lib/members/interfaces';
 
 import { MemberRow } from './MemberRow';
@@ -25,7 +30,8 @@ type RoleRowProps = {
   title: string;
   description?: string | ReactNode;
   members: Member[];
-  addMemberButton?: ReactNode;
+  eligibleMembers: Member[];
+  onAddMembers?: (memberIds: string[]) => Promise<void>;
   permissions?: ReactNode;
   roleActions?: ReactNode;
   memberRoleId?: string;
@@ -40,17 +46,18 @@ const ScrollableBox = styled.div<{ rows: number }>`
 export function RoleRowBase({
   description,
   roleActions,
+  eligibleMembers,
   memberRoleId,
   readOnlyMembers,
   title,
   permissions,
-  addMemberButton,
+  onAddMembers,
   members
 }: RoleRowProps) {
-  const [value, setValue] = useState(0);
+  const [openTab, setOpenTab] = useState(0);
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
-    setValue(newValue);
+    setOpenTab(newValue);
   };
   return (
     <>
@@ -69,11 +76,11 @@ export function RoleRowBase({
             </Box>
           </AccordionSummary>
           <AccordionDetails sx={{ py: 0 }}>
-            <Tabs value={value} onChange={handleChange}>
+            <Tabs value={openTab} onChange={handleChange}>
               <Tab label='Users' />
               <Tab label='Permissions' data-test='role-settings-permissions-tab' />
             </Tabs>
-            <TabPanel value={value} index={0}>
+            <TabPanel value={openTab} index={0}>
               <ScrollableBox rows={members.length}>
                 {members.map((member) => (
                   <MemberRow key={member.id} member={member} readOnly={!!readOnlyMembers} memberRoleId={memberRoleId} />
@@ -84,9 +91,15 @@ export function RoleRowBase({
                   No users
                 </Typography>
               )}
-              {addMemberButton}
+              {onAddMembers && (
+                <AddMembersButton
+                  memberIds={members.map((m) => m.id)}
+                  eligibleMemberIds={eligibleMembers.map((m) => m.id)}
+                  onAddMembers={onAddMembers}
+                />
+              )}
             </TabPanel>
-            <TabPanel value={value} index={1}>
+            <TabPanel value={openTab} index={1}>
               {description && (
                 <Box mb={2} display='flex' gap={1} alignItems='center'>
                   <LockIcon />
@@ -116,5 +129,53 @@ function TabPanel(props: TabPanelProps) {
     <div hidden={value !== index} {...other}>
       {value === index && <Box py={2}>{children}</Box>}
     </div>
+  );
+}
+
+type ButtonProps = {
+  onAddMembers: (memberIds: string[]) => Promise<void>;
+  memberIds: string[];
+  eligibleMemberIds: string[];
+};
+
+function AddMembersButton({ onAddMembers, memberIds, eligibleMemberIds }: ButtonProps) {
+  const [newMembers, setNewMembers] = useState<string[]>([]);
+
+  const userPopupState = usePopupState({ variant: 'popover', popupId: `add-members-input` });
+  function showMembersPopup() {
+    setNewMembers([]);
+    userPopupState.open();
+  }
+
+  function onChangeNewMembers(ids: string[]) {
+    setNewMembers(ids);
+  }
+  async function addMembers() {
+    await onAddMembers(newMembers);
+    userPopupState.close();
+  }
+
+  return (
+    <Box mt={2}>
+      {eligibleMemberIds.length > 0 ? (
+        <Button onClick={showMembersPopup} variant='text' color='secondary'>
+          + Add members
+        </Button>
+      ) : (
+        <Typography variant='caption'>All eligible members have been added to this role</Typography>
+      )}
+      <Modal open={userPopupState.isOpen} onClose={userPopupState.close} title='Add members'>
+        <Grid container direction='column' spacing={3}>
+          <Grid item>
+            <InputSearchMemberMultiple filter={{ mode: 'exclude', userIds: memberIds }} onChange={onChangeNewMembers} />
+          </Grid>
+          <Grid item>
+            <Button disabled={newMembers.length === 0} onClick={addMembers}>
+              Add
+            </Button>
+          </Grid>
+        </Grid>
+      </Modal>
+    </Box>
   );
 }

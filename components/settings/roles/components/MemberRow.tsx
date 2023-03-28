@@ -5,7 +5,6 @@ import { Box, IconButton, ListItemIcon, Menu, MenuItem, Typography } from '@mui/
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import { useState } from 'react';
 
-import charmClient from 'charmClient';
 import Avatar from 'components/common/Avatar';
 import ElementDeleteIcon from 'components/common/form/ElementDeleteIcon';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
@@ -69,7 +68,7 @@ function MemberActions({
 }) {
   const space = useCurrentSpace();
   const { unassignRole } = useRoles();
-  const { members, mutateMembers } = useMembers();
+  const { makeAdmin, makeGuest, makeMember, members, removeFromSpace } = useMembers();
   const popupState = usePopupState({ variant: 'popover', popupId: 'user-role' });
   const deletePopupState = usePopupState({ variant: 'popover', popupId: 'member-list' });
   const [removedMemberId, setRemovedMemberId] = useState<string | null>(null);
@@ -85,6 +84,15 @@ function MemberActions({
   const spaceOwner = space?.createdBy;
   const totalAdmins = members.filter((m) => m.isAdmin).length;
 
+  function removeFromSpaceHandler() {
+    if (!removedMember) {
+      return;
+    }
+
+    removeFromSpace(removedMember.id);
+    deletePopupState.close();
+  }
+
   async function handleMenuItemClick(action: RoleAction) {
     if (!space) {
       throw new Error('Space not found');
@@ -92,33 +100,15 @@ function MemberActions({
 
     switch (action) {
       case 'makeAdmin':
-        await charmClient.updateMemberRole({ spaceId: space.id, userId: member.id, isAdmin: true, isGuest: false });
-        if (members) {
-          mutateMembers(
-            members.map((c) => (c.id === member.id ? { ...c, isAdmin: true } : c)),
-            { revalidate: false }
-          );
-        }
+        await makeAdmin([member.id]);
         break;
 
       case 'makeMember':
-        await charmClient.updateMemberRole({ spaceId: space.id, userId: member.id, isAdmin: false, isGuest: false });
-        if (members) {
-          mutateMembers(
-            members.map((c) => (c.id === member.id ? { ...c, isAdmin: false } : c)),
-            { revalidate: false }
-          );
-        }
+        await makeMember([member.id]);
         break;
 
       case 'makeGuest':
-        await charmClient.updateMemberRole({ spaceId: space.id, userId: member.id, isAdmin: false, isGuest: true });
-        if (members) {
-          mutateMembers(
-            members.map((c) => (c.id === member.id ? { ...c, isAdmin: false } : c)),
-            { revalidate: false }
-          );
-        }
+        await makeGuest([member.id]);
         break;
 
       case 'removeFromSpace':
@@ -146,19 +136,6 @@ function MemberActions({
   });
 
   const activeRoleAction = member.isAdmin ? 'makeAdmin' : 'makeMember';
-  async function removeFromSpace() {
-    if (!space) {
-      throw new Error('Space not found');
-    }
-    await charmClient.removeMember({ spaceId: space.id, userId: removedMemberId as string });
-    if (members) {
-      mutateMembers(
-        members.filter((c) => c.id !== removedMemberId),
-        { revalidate: false }
-      );
-      setRemovedMemberId(null);
-    }
-  }
 
   if (memberRoleId) {
     return (
@@ -169,7 +146,7 @@ function MemberActions({
           onClose={deletePopupState.close}
           open={deletePopupState.isOpen}
           buttonText={`Remove ${removedMember?.isAdmin ? 'admin' : removedMember?.isGuest ? 'guest' : 'member'}`}
-          onConfirm={removeFromSpace}
+          onConfirm={removeFromSpaceHandler}
           question={`Are you sure you want to remove ${removedMember?.username} from space?`}
         />
       </>
@@ -185,7 +162,7 @@ function MemberActions({
         onClose={deletePopupState.close}
         open={deletePopupState.isOpen}
         buttonText={`Remove ${removedMember?.isAdmin ? 'admin' : removedMember?.isGuest ? 'guest' : 'member'}`}
-        onConfirm={removeFromSpace}
+        onConfirm={removeFromSpaceHandler}
         question={`Are you sure you want to remove ${removedMember?.username} from space?`}
       />
       <Menu

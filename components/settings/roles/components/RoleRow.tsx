@@ -1,12 +1,9 @@
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import { Box, Grid, IconButton, ListItemIcon, Menu, MenuItem, Typography } from '@mui/material';
+import { IconButton, ListItemIcon, Menu, MenuItem, Typography } from '@mui/material';
 import { bindMenu, bindTrigger, usePopupState, bindPopover } from 'material-ui-popup-state/hooks';
-import { useState } from 'react';
 
-import Button from 'components/common/Button';
-import { InputSearchMemberMultiple } from 'components/common/form/InputSearchMember';
 import Modal from 'components/common/Modal';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { useMembers } from 'hooks/useMembers';
@@ -38,33 +35,24 @@ const syncedRoleProps = {
 
 export function RoleRow({ readOnly, role, assignRoles, deleteRole, refreshRoles }: RoleRowProps) {
   const menuState = usePopupState({ variant: 'popover', popupId: `role-${role.id}` });
-  const userPopupState = usePopupState({ variant: 'popover', popupId: `role-${role.id}-users` });
   const confirmDeletePopupState = usePopupState({ variant: 'popover', popupId: 'role-delete' });
-  const [newMembers, setNewMembers] = useState<string[]>([]);
   const { members } = useMembers();
   const popupState = usePopupState({ variant: 'popover', popupId: 'add-a-role' });
-
-  function showMembersPopup() {
-    setNewMembers([]);
-    userPopupState.open();
-  }
-
-  function onChangeNewMembers(ids: string[]) {
-    setNewMembers(ids);
-  }
-
-  async function addMembers() {
+  async function addMembers(newMembers: string[]) {
     await assignRoles(role.id, newMembers);
-    userPopupState.close();
   }
 
-  const assignedMembers = members.filter((member) => member.roles.some((r) => r.id === role.id));
-
-  const assignedMemberIds = assignedMembers.map((m) => m.id);
+  const assignedMembers = members.filter(
+    (member) => !member.isBot && !member.isGuest && member.roles.some((r) => r.id === role.id)
+  );
+  const eligibleMembers = members.filter(
+    (member) => !member.isGuest && !member.isBot && assignedMembers.some((m) => m.id === member.id)
+  );
 
   return (
     <RoleRowBase
       members={assignedMembers}
+      eligibleMembers={eligibleMembers}
       readOnlyMembers={!!role.source}
       memberRoleId={role.id}
       title={role.name}
@@ -145,33 +133,7 @@ export function RoleRow({ readOnly, role, assignRoles, deleteRole, refreshRoles 
           </>
         )
       }
-      addMemberButton={
-        !role.source &&
-        !readOnly && (
-          <Box mt={2}>
-            {assignedMembers.length < members.length ? (
-              <Button onClick={showMembersPopup} variant='text' color='secondary'>
-                + Add members
-              </Button>
-            ) : (
-              <Typography variant='caption'>All space members have been added to this role</Typography>
-            )}
-            <Modal open={userPopupState.isOpen} onClose={userPopupState.close} title='Add members'>
-              <Grid container direction='column' spacing={3}>
-                <Grid item>
-                  <InputSearchMemberMultiple
-                    filter={{ mode: 'exclude', userIds: assignedMemberIds }}
-                    onChange={onChangeNewMembers}
-                  />
-                </Grid>
-                <Grid item>
-                  <Button onClick={addMembers}>Add</Button>
-                </Grid>
-              </Grid>
-            </Modal>
-          </Box>
-        )
-      }
+      onAddMembers={!role.source && !readOnly ? addMembers : undefined}
     />
   );
 }
