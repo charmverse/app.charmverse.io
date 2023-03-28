@@ -24,4 +24,5 @@
   "editor.tabSize": 2,
   "jestrunner.configPath": "jest.config-all.ts",
   "typescript.tsdk": "node_modules/typescript/lib",
+  "WillLuke.nextjs.hasPrompted": true,
 }
