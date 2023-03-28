@@ -5,7 +5,7 @@ import { useNotificationPreview } from 'components/common/PageLayout/components/
 import { NotificationPreview } from './NotificationPreview';
 
 export function NotificationPreviewPopover({ onSeeAllClick }: { onSeeAllClick: () => void }) {
-  const { notificationPreviews } = useNotificationPreview();
+  const { notificationPreviews, markAsRead } = useNotificationPreview();
 
   return (
     <Box>
@@ -20,13 +20,14 @@ export function NotificationPreviewPopover({ onSeeAllClick }: { onSeeAllClick: (
           <>
             <NotificationPreview
               key={t.id}
-              id={t.id}
+              taskId={t.id}
               createdAt={t.createdAt}
               spaceName={t.spaceName}
               title={t.title}
               type={t.type}
               groupType={t.groupType}
               createdBy={t.createdBy}
+              markAsRead={markAsRead}
             />
             <Divider />
           </>

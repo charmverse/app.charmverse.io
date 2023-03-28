@@ -138,7 +138,7 @@ const createBountyTask = ({
   status
 }: Omit<
   BountyTask,
-  'id' | 'spaceDomain' | 'pagePath' | 'pageId' | 'eventDate' | 'taskId' | 'createdAt'
+  'id' | 'spaceDomain' | 'pagePath' | 'pageId' | 'eventDate' | 'taskId' | 'createdAt' | 'createdBy'
 >): BountyTask => {
   const id = v4();
   return {
@@ -152,7 +152,8 @@ const createBountyTask = ({
     spaceName,
     pageId: v4(),
     eventDate: new Date(),
-    createdAt: new Date()
+    createdAt: new Date(),
+    createdBy: null
   };
 };
 

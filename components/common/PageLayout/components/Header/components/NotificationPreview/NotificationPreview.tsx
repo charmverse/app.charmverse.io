@@ -11,6 +11,7 @@ import type { NotificationType } from '@prisma/client';
 
 import charmClient from 'charmClient';
 import Avatar from 'components/common/Avatar';
+import type { MarkNotificationAsRead } from 'components/common/PageLayout/components/Header/components/NotificationPreview/useNotificationPreview';
 import useTasks from 'components/nexus/hooks/useTasks';
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import type { TaskUser } from 'lib/discussion/interfaces';
@@ -23,18 +24,26 @@ type Props = {
   createdBy: NotificationActor | TaskUser | null;
   title: string;
   groupType: NotificationGroupType;
-  id: string;
+  taskId: string;
   type: NotificationType;
+  markAsRead: MarkNotificationAsRead;
 };
-export function NotificationPreview({ spaceName, createdAt, title, createdBy, groupType, id, type }: Props) {
+export function NotificationPreview({
+  spaceName,
+  createdAt,
+  title,
+  createdBy,
+  groupType,
+  taskId,
+  type,
+  markAsRead
+}: Props) {
   const theme = useTheme();
   // Task Date calculations:
   // const { formatDate, formatTime } = useDateFormatter();
   // const date = new Date(createdAt);
   // const todaysDate = new Date();
   // const isDateEqual = date.setHours(0, 0, 0, 0) === todaysDate.setHours(0, 0, 0, 0);
-
-  const { mutate: mutateTasks } = useTasks();
 
   // @TODOM - map group type to proper title
   const header = `${spaceName} ${groupType}`;
@@ -59,35 +68,6 @@ export function NotificationPreview({ spaceName, createdAt, title, createdBy, gr
         return <KeyIcon fontSize='small' />;
     }
   };
-
-  async function markTask(taskId: string, taskType: NotificationGroupType) {
-    await charmClient.tasks.markTasks([{ id: taskId, type }]);
-    mutateTasks(
-      (_tasks) => {
-        if (!_tasks) {
-          return;
-        }
-
-        const taskIndex = _tasks?.[taskType].unmarked.findIndex((t) => t.taskId === taskId);
-        if (typeof taskIndex === 'number' && taskIndex > -1) {
-          const marked = [_tasks?.forum.unmarked[taskIndex], ..._tasks.forum.marked];
-          const unmarked = _tasks.forum.unmarked.filter((t) => t.taskId !== taskId);
-          return {
-            ..._tasks,
-            [taskType]: {
-              marked,
-              unmarked
-            }
-          };
-        }
-
-        return _tasks;
-      },
-      {
-        revalidate: false
-      }
-    );
-  }
 
   return (
     <Box
@@ -118,7 +98,7 @@ export function NotificationPreview({ spaceName, createdAt, title, createdBy, gr
           </Box>
         </Box>
         <Box display='flex' alignItems='center'>
-          <IconButton onClick={() => markTask(id, groupType)} size='small'>
+          <IconButton onClick={() => markAsRead({ taskId, groupType, type })} size='small'>
             <CloseIcon fontSize='small' />
           </IconButton>
         </Box>
