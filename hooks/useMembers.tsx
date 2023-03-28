@@ -48,7 +48,7 @@ export function MembersProvider({ children }: { children: ReactNode }) {
 
   async function removeGuest(userId: string) {
     if (space) {
-      await charmClient.members.removeGuest({
+      await charmClient.members.removeMember({
         spaceId: space.id,
         userId
       });
@@ -59,7 +59,7 @@ export function MembersProvider({ children }: { children: ReactNode }) {
   async function makeAdmin(userIds: string[]) {
     if (space) {
       for (const userId of userIds) {
-        await charmClient.updateMemberRole({ spaceId: space.id, userId, isAdmin: true, isGuest: false });
+        await charmClient.members.updateMemberRole({ spaceId: space.id, userId, isAdmin: true, isGuest: false });
       }
       mutateMembers(
         (_members) => _members?.map((c) => (userIds.includes(c.id) ? { ...c, isAdmin: true, isGuest: false } : c)),
@@ -71,7 +71,7 @@ export function MembersProvider({ children }: { children: ReactNode }) {
   async function makeGuest(userIds: string[]) {
     if (space) {
       for (const userId of userIds) {
-        await charmClient.updateMemberRole({ spaceId: space.id, userId, isAdmin: false, isGuest: true });
+        await charmClient.members.updateMemberRole({ spaceId: space.id, userId, isAdmin: false, isGuest: true });
       }
       mutateMembers(
         (_members) => _members?.map((c) => (userIds.includes(c.id) ? { ...c, isAdmin: false, isGuest: true } : c)),
@@ -83,7 +83,7 @@ export function MembersProvider({ children }: { children: ReactNode }) {
   async function makeMember(userIds: string[]) {
     if (space) {
       for (const userId of userIds) {
-        await charmClient.updateMemberRole({ spaceId: space.id, userId, isAdmin: false, isGuest: false });
+        await charmClient.members.updateMemberRole({ spaceId: space.id, userId, isAdmin: false, isGuest: false });
       }
       mutateMembers(
         (_members) => _members?.map((c) => (userIds.includes(c.id) ? { ...c, isAdmin: false, isGuest: false } : c)),
@@ -95,7 +95,7 @@ export function MembersProvider({ children }: { children: ReactNode }) {
     if (!space) {
       throw new Error('Space not found');
     }
-    await charmClient.removeMember({ spaceId: space.id, userId });
+    await charmClient.members.removeMember({ spaceId: space.id, userId });
     mutateMembers((_members) => _members?.filter((c) => c.id !== userId), { revalidate: false });
   }
 

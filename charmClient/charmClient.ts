@@ -16,10 +16,8 @@ import type {
 import type { FiatCurrency, IPairQuote } from 'connectors';
 
 import * as http from 'adapters/http';
-import type { IUser } from 'components/common/BoardEditor/focalboard/src/user';
 import type { AuthSig, ExtendedPoap } from 'lib/blockchain/interfaces';
 import type { Block as FBBlock, BlockPatch } from 'lib/focalboard/block';
-import type { Member } from 'lib/members/interfaces';
 import type { Web3LoginRequest } from 'lib/middleware/requireWalletSignature';
 import type { FailedImportsError } from 'lib/notion/types';
 import type { IPageWithPermissions, ModifyChildPagesResponse, PageLink } from 'lib/pages';
@@ -210,24 +208,6 @@ class CharmClient {
     return http.GET<CheckDomainResponse>('/api/spaces/checkDomain', params);
   }
 
-  updateMemberRole({
-    spaceId,
-    userId,
-    isAdmin,
-    isGuest
-  }: {
-    spaceId: string;
-    userId: string;
-    isAdmin: boolean;
-    isGuest: boolean;
-  }) {
-    return http.PUT<Member[]>(`/api/spaces/${spaceId}/members/${userId}`, { isAdmin, isGuest });
-  }
-
-  removeMember({ spaceId, userId }: { spaceId: string; userId: string }) {
-    return http.DELETE<Member[]>(`/api/spaces/${spaceId}/members/${userId}`);
-  }
-
   getPublicPageByViewId(viewId: string) {
     return http.GET<Page>(`/api/public/view/${viewId}`);
   }
@@ -322,20 +302,6 @@ class CharmClient {
 
   importRolesFromGuild(payload: ImportGuildRolesPayload) {
     return http.POST<{ importedRolesCount: number }>('/api/guild-xyz/importRoles', payload);
-  }
-
-  async getWorkspaceUsers(spaceId: string): Promise<IUser[]> {
-    const members = await this.members.getMembers(spaceId);
-
-    return members.map((member) => ({
-      id: member.id,
-      username: member.username,
-      email: '',
-      props: {},
-      create_at: new Date(member.createdAt).getTime(),
-      update_at: new Date(member.updatedAt).getTime(),
-      is_bot: false
-    }));
   }
 
   async getAllBlocks(spaceId: string): Promise<FBBlock[]> {
