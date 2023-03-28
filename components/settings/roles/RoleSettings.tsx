@@ -1,9 +1,8 @@
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import { Box, CircularProgress, Divider, Menu, Typography, Tooltip } from '@mui/material';
+import { Box, CircularProgress, Divider, Menu, Typography } from '@mui/material';
 import type { Space } from '@prisma/client';
 import { bindPopover, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import { useRef, useState } from 'react';
-import { IoMdInformationCircleOutline } from 'react-icons/io';
 
 import Button from 'components/common/Button';
 import Modal from 'components/common/Modal';
@@ -61,13 +60,8 @@ export function RoleSettings({ space }: { space: Space }) {
           </Box>
         )}
       </Legend>
-      <Typography variant='body2' fontWeight='bold' color='secondary' display='flex' alignItems='center' gap={0.5}>
-        Standard roles
-        <Tooltip title='These roles cannot be changed'>
-          <span>
-            <IoMdInformationCircleOutline color='var(--secondary-text)' />
-          </span>
-        </Tooltip>
+      <Typography variant='caption'>
+        All users are either an Admin, Member or Guest. In addition to that role they can also have Custom Roles.
       </Typography>
       <AdminRoleRow readOnly={!isAdmin} />
       <MemberRoleRow readOnly={!isAdmin} spaceId={space.id} />
