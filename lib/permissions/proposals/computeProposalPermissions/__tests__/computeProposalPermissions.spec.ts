@@ -1,4 +1,4 @@
-import type { ProposalCategory, ProposalOperation, ProposalStatus, Role, Space, User } from '@prisma/client';
+import type { ProposalCategory, ProposalStatus, Role, Space, User } from '@prisma/client';
 import { v4 } from 'uuid';
 
 import { prisma } from 'db';
@@ -7,11 +7,8 @@ import type { ProposalWithUsers } from 'lib/proposal/interface';
 import { InvalidInputError } from 'lib/utilities/errors';
 import { generateRole, generateSpaceUser, generateUserAndSpace } from 'testing/setupDatabase';
 import { generateProposal, generateProposalCategory } from 'testing/utils/proposals';
-import { generateUser } from 'testing/utils/users';
 
 import type { AvailableProposalPermissionFlags } from '../../interfaces';
-import { proposalOperations } from '../../interfaces';
-import { proposalPermissionsMapping } from '../../mapping';
 import { upsertProposalCategoryPermission } from '../../upsertProposalCategoryPermission';
 import { computeProposalPermissions } from '../computeProposalPermissions';
 
@@ -148,7 +145,7 @@ describe('computeProposalPermissions', () => {
     });
   });
 
-  it('should allow the admin to always see proposals, but only edit the proposal during the discussion and review stages', async () => {
+  it('should allow the admin to always see proposals, but only edit the proposal during the discussion, review and reviewed stages', async () => {
     const testedProposal = await generateProposal({
       spaceId: space.id,
       categoryId: proposalCategory.id,
@@ -170,7 +167,7 @@ describe('computeProposalPermissions', () => {
 
     expect(permissions.edit).toBe(false);
 
-    const editableStatuses: ProposalStatus[] = ['discussion', 'review'];
+    const editableStatuses: ProposalStatus[] = ['discussion', 'review', 'reviewed'];
 
     for (const status of editableStatuses) {
       await prisma.proposal.update({ where: { id: testedProposal.id }, data: { status } });
@@ -183,7 +180,7 @@ describe('computeProposalPermissions', () => {
       expect(permissionsAtStage.view).toBe(true);
     }
 
-    const readonlyStatuses: ProposalStatus[] = ['reviewed', 'vote_active', 'vote_closed'];
+    const readonlyStatuses: ProposalStatus[] = ['vote_active', 'vote_closed'];
 
     for (const status of readonlyStatuses) {
       await prisma.proposal.update({ where: { id: testedProposal.id }, data: { status } });
