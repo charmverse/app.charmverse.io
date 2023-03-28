@@ -24,6 +24,14 @@ type IContext = {
   updateDeadline: (voteId: string, deadline: Date) => Promise<void>;
 };
 
+const EMPTY_TASKS: GetTasksResponse = {
+  bounties: { marked: [], unmarked: [] },
+  votes: { marked: [], unmarked: [] },
+  discussions: { marked: [], unmarked: [] },
+  proposals: { marked: [], unmarked: [] },
+  forum: { marked: [], unmarked: [] }
+};
+
 const VotesContext = createContext<Readonly<IContext>>({
   isValidating: true,
   isLoading: true,
@@ -61,16 +69,10 @@ export function VotesProvider({ children }: { children: ReactNode }) {
       });
 
       // Mutate the tasks
-      const mutatedTasks: GetTasksResponse = userTasks ?? {
-        bounties: { marked: [], unmarked: [] },
-        votes: [],
-        discussions: { marked: [], unmarked: [] },
-        proposals: { marked: [], unmarked: [] },
-        forum: { marked: [], unmarked: [] }
-      };
+      const mutatedTasks: GetTasksResponse = userTasks ?? EMPTY_TASKS;
       newVotes.forEach((newVote) => {
-        if (!mutatedTasks.votes.find((vote) => vote.id === newVote.id)) {
-          mutatedTasks.votes.push(newVote);
+        if (!mutatedTasks.votes.unmarked.find((vote) => vote.id === newVote.id)) {
+          mutatedTasks.votes.unmarked.push(newVote);
         }
       });
       mutateTasks(mutatedTasks);
@@ -87,17 +89,14 @@ export function VotesProvider({ children }: { children: ReactNode }) {
       });
 
       // Mutate the tasks
-      const mutatedTasks: GetTasksResponse = userTasks ?? {
-        bounties: { marked: [], unmarked: [] },
-        votes: [],
-        discussions: { marked: [], unmarked: [] },
-        proposals: { marked: [], unmarked: [] },
-        forum: { marked: [], unmarked: [] }
-      };
+      const mutatedTasks: GetTasksResponse = userTasks ?? EMPTY_TASKS;
 
       const deletedVoteIds = deletedVotes.map((vote) => vote.id);
 
-      mutatedTasks.votes = mutatedTasks.votes.filter((taskVote) => !deletedVoteIds.includes(taskVote.id));
+      mutatedTasks.votes = {
+        marked: mutatedTasks.votes.marked.filter((taskVote) => !deletedVoteIds.includes(taskVote.id)),
+        unmarked: mutatedTasks.votes.unmarked.filter((taskVote) => !deletedVoteIds.includes(taskVote.id))
+      };
 
       mutateTasks(mutatedTasks);
     });
@@ -115,17 +114,14 @@ export function VotesProvider({ children }: { children: ReactNode }) {
       });
 
       // Remove cancelled votes from tasks
-      const mutatedTasks: GetTasksResponse = userTasks ?? {
-        bounties: { marked: [], unmarked: [] },
-        votes: [],
-        discussions: { marked: [], unmarked: [] },
-        proposals: { marked: [], unmarked: [] },
-        forum: { marked: [], unmarked: [] }
-      };
+      const mutatedTasks: GetTasksResponse = userTasks ?? EMPTY_TASKS;
 
       const cancelledVoteIds = updatedVotes.filter((v) => v.status === 'Cancelled').map((vote) => vote.id);
 
-      mutatedTasks.votes = mutatedTasks.votes.filter((taskVote) => !cancelledVoteIds.includes(taskVote.id));
+      mutatedTasks.votes = {
+        marked: mutatedTasks.votes.marked.filter((taskVote) => !cancelledVoteIds.includes(taskVote.id)),
+        unmarked: mutatedTasks.votes.unmarked.filter((taskVote) => !cancelledVoteIds.includes(taskVote.id))
+      };
 
       mutateTasks(mutatedTasks);
     });
@@ -153,7 +149,10 @@ export function VotesProvider({ children }: { children: ReactNode }) {
         return tasks
           ? {
               ...tasks,
-              votes: tasks.votes.filter((_vote) => _vote.id !== voteId)
+              votes: {
+                unmarked: tasks.votes.unmarked.filter((_vote) => _vote.id !== voteId),
+                marked: tasks.votes.marked.filter((_vote) => _vote.id !== voteId)
+              }
             }
           : undefined;
       },

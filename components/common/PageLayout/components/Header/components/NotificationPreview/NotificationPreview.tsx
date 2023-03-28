@@ -65,12 +65,7 @@ export function NotificationPreview({ spaceName, createdAt, title, type, created
         if (!_tasks) {
           return;
         }
-        if (taskType === 'votes') {
-          return {
-            ..._tasks,
-            votes: _tasks.votes.filter((t) => t.id === taskId)
-          };
-        }
+
         const taskIndex = _tasks?.[taskType].unmarked.findIndex((t) => t.taskId === taskId);
         if (typeof taskIndex === 'number' && taskIndex > -1) {
           const marked = [_tasks?.forum.unmarked[taskIndex], ..._tasks.forum.marked];

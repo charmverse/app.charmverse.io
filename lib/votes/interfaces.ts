@@ -33,6 +33,7 @@ export type VoteTask = Omit<ExtendedVote, 'createdBy'> & {
   page: PageMeta;
   space: Space;
   createdBy: NotificationActor | null;
+  taskId: string;
 };
 
 export type UserVoteExtendedDTO = UserVote & {

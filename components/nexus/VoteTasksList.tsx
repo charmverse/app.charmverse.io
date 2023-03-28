@@ -106,7 +106,10 @@ export function VoteTasksList({ error, tasks, mutateTasks }: VoteTasksListProps)
         return taskList
           ? {
               ...taskList,
-              votes: taskList.votes.filter((vote) => vote.id !== voteId)
+              votes: {
+                marked: taskList.votes.marked.filter((vote) => vote.id !== voteId),
+                unmarked: taskList.votes.unmarked.filter((vote) => vote.id !== voteId)
+              }
             }
           : undefined;
       },
@@ -147,13 +150,14 @@ export function VoteTasksList({ error, tasks, mutateTasks }: VoteTasksListProps)
     return <LoadingComponent height='200px' isLoading={true} />;
   }
 
-  const totalVotes = tasks?.votes.length ?? 0;
+  const votes = [...tasks.votes.marked, ...tasks.votes.unmarked];
+  const totalVotes = votes.length ?? 0;
 
   if (totalVotes === 0) {
     return <EmptyTaskState taskType='votes' />;
   }
 
-  const voteTask = tasks.votes.find((v) => v.id === selectedVoteId);
+  const voteTask = votes.find((v) => v.id === selectedVoteId);
   const voteDetails: ExtendedVote | null = voteTask ? { ...voteTask, createdBy: voteTask.createdBy?.id || '' } : null;
 
   return (
@@ -171,7 +175,7 @@ export function VoteTasksList({ error, tasks, mutateTasks }: VoteTasksListProps)
           </TableRow>
         </TableHead>
         <TableBody>
-          {tasks.votes.map((vote) => (
+          {votes.map((vote) => (
             <VoteTasksListRow handleVoteId={handleVoteId} key={vote.id} voteTask={vote} />
           ))}
         </TableBody>

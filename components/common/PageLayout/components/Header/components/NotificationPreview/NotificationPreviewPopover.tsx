@@ -49,7 +49,7 @@ export function NotificationPreviewPopover({ onSeeAllClick }: { onSeeAllClick: (
       type: 'proposal' as NotificationType
     })) || [];
   const votes =
-    tasks?.votes.map((v) => ({
+    tasks?.votes.unmarked.map((v) => ({
       id: v.id,
       createdAt: v.createdAt,
       createdBy: v.createdBy,
