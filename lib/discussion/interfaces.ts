@@ -3,6 +3,7 @@ import type { User } from '@prisma/client';
 export type TaskUser = Pick<User, 'id' | 'username' | 'path' | 'avatar' | 'avatarTokenId'>;
 
 export interface DiscussionTask {
+  taskId: string;
   spaceId: string;
   spaceDomain: string;
   spaceName: string;

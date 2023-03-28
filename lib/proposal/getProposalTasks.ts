@@ -19,6 +19,7 @@ export type ProposalTaskAction = 'start_discussion' | 'start_vote' | 'review' | 
 
 export interface ProposalTask {
   id: string; // the id of the workspace event
+  taskId: string;
   action: ProposalTaskAction | null;
   eventDate: Date;
   spaceDomain: string;
@@ -163,7 +164,8 @@ export async function getProposalTasks(userId: string): Promise<{
           spaceName: page.space.name,
           status: proposal.status,
           action,
-          createdBy: mapNotificationActor(workspaceEvent.actor)
+          createdBy: mapNotificationActor(workspaceEvent.actor),
+          taskId: workspaceEvent.id
         };
         if (!userNotificationIds.has(workspaceEvent.id)) {
           proposalsRecord.unmarked.push(proposalTask);
@@ -253,7 +255,8 @@ export function getProposalCommentMentions({
               userId: mention.createdBy,
               text: mention.text,
               commentId: comment.id,
-              type: 'proposal'
+              type: 'proposal',
+              taskId: comment.id
             });
           }
         });

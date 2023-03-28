@@ -16,6 +16,7 @@ export type BountyTaskAction =
 
 export interface BountyTask {
   id: string;
+  taskId: string;
   eventDate: Date;
   spaceDomain: string;
   spaceName: string;
@@ -127,6 +128,7 @@ export async function getBountyTasks(userId: string): Promise<{
 
           const bountyTask = {
             id: bountyTaskId,
+            taskId: bountyTaskId,
             eventDate: application.updatedAt,
             pageId: page.id,
             pagePath: page.path,
