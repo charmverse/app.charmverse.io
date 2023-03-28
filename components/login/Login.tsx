@@ -1,11 +1,14 @@
+import styled from '@emotion/styled';
 import EmailIcon from '@mui/icons-material/Email';
 import Box from '@mui/material/Box';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
+import SvgIcon from '@mui/material/SvgIcon';
 import type { IdentityType } from '@prisma/client';
 import { usePopupState } from 'material-ui-popup-state/hooks';
+import { useRouter } from 'next/router';
 import { useRef, useState } from 'react';
 
 import { WalletSelector } from 'components/_app/Web3ConnectionManager/components/WalletSelectorModal';
@@ -17,6 +20,7 @@ import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import type { AuthSig } from 'lib/blockchain/interfaces';
 import type { SystemError } from 'lib/utilities/errors';
 import type { LoggedInUser } from 'models/User';
+import DiscordIcon from 'public/images/discord_logo.svg';
 
 import { CollectEmail } from './CollectEmail';
 import { LoginErrorModal } from './LoginErrorModal';
@@ -33,10 +37,15 @@ export interface DialogProps {
   onClose: () => void;
 }
 
+const ImageIcon = styled.img`
+  width: 1.5rem;
+  height: 1.5rem;
+`;
+
 function LoginHandler(props: DialogProps) {
   const { onClose, isOpen } = props;
   const { loginFromWeb3Account } = useWeb3AuthSig();
-
+  const router = useRouter();
   // Governs whether we should auto-request a signature. Should only happen on first login.
   const [enableAutosign, setEnableAutoSign] = useState(true);
 
@@ -162,6 +171,22 @@ function LoginHandler(props: DialogProps) {
                 disabled={false}
                 isActive={false}
                 isLoading={false}
+              />
+            </ListItem>
+
+            <ListItem>
+              <ConnectorButton
+                data-test='connect-discord'
+                name='Connect with discord'
+                disabled={false}
+                isActive={false}
+                isLoading={false}
+                onClick={() => router.push(`/api/discord/oauth?type=login`)}
+                icon={
+                  <SvgIcon viewBox='0 -10 70 70' sx={{ color: '#5865F2' }}>
+                    <DiscordIcon />
+                  </SvgIcon>
+                }
               />
             </ListItem>
           </List>
