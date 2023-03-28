@@ -60,59 +60,56 @@ export function RoleRowBase({
     setOpenTab(newValue);
   };
   return (
-    <>
-      <Divider />
-      <Paper sx={{ my: 1 }}>
-        <Accordion style={{ boxShadow: 'none' }} data-test={`role-row-${title}`}>
-          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-            <Box display='flex' justifyContent='space-between' sx={{ width: '100%' }}>
-              <Box display='flex' justifyContent='space-between'>
-                <Typography variant='h6' sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-                  {title}
-                  <Chip size='small' label={members.length} />
-                </Typography>
-              </Box>
-              <div onClick={(e) => e.stopPropagation()}>{roleActions}</div>
+    <Paper sx={{ my: 2 }}>
+      <Accordion style={{ boxShadow: 'none' }} data-test={`role-row-${title}`}>
+        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+          <Box display='flex' justifyContent='space-between' sx={{ width: '100%' }}>
+            <Box display='flex' justifyContent='space-between'>
+              <Typography variant='h6' sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+                {title}
+                <Chip size='small' label={members.length} />
+              </Typography>
             </Box>
-          </AccordionSummary>
-          <AccordionDetails sx={{ py: 0 }}>
-            <Tabs value={openTab} onChange={handleChange}>
-              <Tab label='Users' />
-              <Tab label='Permissions' data-test='role-settings-permissions-tab' />
-            </Tabs>
-            <TabPanel value={openTab} index={0}>
-              <ScrollableBox rows={members.length}>
-                {members.map((member) => (
-                  <MemberRow key={member.id} member={member} readOnly={!!readOnlyMembers} memberRoleId={memberRoleId} />
-                ))}
-              </ScrollableBox>
-              {members.length === 0 && (
-                <Typography variant='caption' color='textSecondary'>
-                  No users
-                </Typography>
-              )}
-              {onAddMembers && (
-                <AddMembersButton
-                  memberIds={members.map((m) => m.id)}
-                  eligibleMemberIds={eligibleMembers.map((m) => m.id)}
-                  onAddMembers={onAddMembers}
-                />
-              )}
-            </TabPanel>
-            <TabPanel value={openTab} index={1}>
-              {description && (
-                <Box mb={2} display='flex' gap={1} alignItems='center'>
-                  <LockIcon />
-                  <Typography variant='caption'>{description}</Typography>
-                </Box>
-              )}
-              {description && permissions && <Divider sx={{ mb: 2 }} />}
-              {permissions}
-            </TabPanel>
-          </AccordionDetails>
-        </Accordion>
-      </Paper>
-    </>
+            <div onClick={(e) => e.stopPropagation()}>{roleActions}</div>
+          </Box>
+        </AccordionSummary>
+        <AccordionDetails sx={{ py: 0 }}>
+          <Tabs value={openTab} onChange={handleChange}>
+            <Tab label='Users' />
+            <Tab label='Permissions' data-test='role-settings-permissions-tab' />
+          </Tabs>
+          <TabPanel value={openTab} index={0}>
+            <ScrollableBox rows={members.length}>
+              {members.map((member) => (
+                <MemberRow key={member.id} member={member} readOnly={!!readOnlyMembers} memberRoleId={memberRoleId} />
+              ))}
+            </ScrollableBox>
+            {members.length === 0 && (
+              <Typography variant='caption' color='textSecondary'>
+                No users
+              </Typography>
+            )}
+            {onAddMembers && (
+              <AddMembersButton
+                memberIds={members.map((m) => m.id)}
+                eligibleMemberIds={eligibleMembers.map((m) => m.id)}
+                onAddMembers={onAddMembers}
+              />
+            )}
+          </TabPanel>
+          <TabPanel value={openTab} index={1}>
+            {description && (
+              <Box mb={2} display='flex' gap={1} alignItems='center'>
+                <LockIcon />
+                <Typography variant='caption'>{description}</Typography>
+              </Box>
+            )}
+            {description && permissions && <Divider sx={{ mb: 2 }} />}
+            {permissions}
+          </TabPanel>
+        </AccordionDetails>
+      </Accordion>
+    </Paper>
   );
 }
 

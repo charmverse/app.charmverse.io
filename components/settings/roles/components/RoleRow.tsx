@@ -70,11 +70,9 @@ export function RoleRow({ readOnly, role, assignRoles, deleteRole, refreshRoles 
         !readOnly &&
         role.source !== 'guild_xyz' && (
           <>
-            <div onClick={(e) => e.stopPropagation()}>
-              <IconButton size='small' {...bindTrigger(menuState)}>
-                <MoreHorizIcon />
-              </IconButton>
-            </div>
+            <IconButton size='small' {...bindTrigger(menuState)}>
+              <MoreHorizIcon />
+            </IconButton>
 
             <Menu
               {...bindMenu(menuState)}
