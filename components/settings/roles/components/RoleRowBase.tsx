@@ -59,6 +59,7 @@ export function RoleRowBase({
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setOpenTab(newValue);
   };
+
   return (
     <Paper sx={{ my: 2 }}>
       <Accordion style={{ boxShadow: 'none' }} data-test={`role-row-${title}`}>
@@ -164,7 +165,10 @@ function AddMembersButton({ onAddMembers, memberIds, eligibleMemberIds }: Button
       <Modal open={userPopupState.isOpen} onClose={userPopupState.close} title='Add members'>
         <Grid container direction='column' spacing={3}>
           <Grid item>
-            <InputSearchMemberMultiple filter={{ mode: 'exclude', userIds: memberIds }} onChange={onChangeNewMembers} />
+            <InputSearchMemberMultiple
+              filter={{ mode: 'include', userIds: eligibleMemberIds }}
+              onChange={onChangeNewMembers}
+            />
           </Grid>
           <Grid item>
             <Button disabled={newMembers.length === 0} onClick={addMembers}>

@@ -125,6 +125,8 @@ function MemberActions({
     switch (action) {
       case 'makeAdmin':
         return !readOnly;
+      case 'makeGuest':
+        return !readOnly;
       case 'makeMember':
         return !readOnly;
       case 'removeFromSpace': {
@@ -135,7 +137,7 @@ function MemberActions({
     }
   });
 
-  const activeRoleAction = member.isAdmin ? 'makeAdmin' : 'makeMember';
+  const activeRoleAction = member.isAdmin ? 'makeAdmin' : member.isGuest ? 'makeGuest' : 'makeMember';
 
   if (memberRoleId) {
     return (
@@ -175,7 +177,7 @@ function MemberActions({
           <MenuItem
             key={action}
             onClick={() => handleMenuItemClick(action)}
-            disabled={action === 'makeMember' && totalAdmins === 1}
+            disabled={(action === 'makeGuest' || action === 'makeMember') && member.isAdmin && totalAdmins === 1}
           >
             {action === 'makeAdmin' && (
               <StyledListItemText
@@ -188,6 +190,9 @@ function MemberActions({
                 primary='Member'
                 secondary='Cannot change space settings or invite new members to the space'
               />
+            )}
+            {action === 'makeGuest' && (
+              <StyledListItemText primary='Guest' secondary='Can only access specific pages' />
             )}
             {action === 'removeFromSpace' && (
               <StyledListItemText

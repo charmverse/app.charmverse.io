@@ -46,7 +46,7 @@ export function RoleRow({ readOnly, role, assignRoles, deleteRole, refreshRoles 
     (member) => !member.isBot && !member.isGuest && member.roles.some((r) => r.id === role.id)
   );
   const eligibleMembers = members.filter(
-    (member) => !member.isGuest && !member.isBot && assignedMembers.some((m) => m.id === member.id)
+    (member) => !member.isGuest && !member.isBot && !assignedMembers.some((m) => m.id === member.id)
   );
 
   return (

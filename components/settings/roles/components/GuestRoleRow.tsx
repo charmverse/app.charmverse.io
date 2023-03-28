@@ -17,6 +17,7 @@ export function GuestRoleRow({ readOnly }: { readOnly: boolean }) {
       }
       readOnlyMembers={readOnly}
       members={guests}
+      eligibleMembers={[]}
     />
   );
 }
