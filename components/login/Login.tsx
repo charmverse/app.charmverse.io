@@ -1,4 +1,3 @@
-import styled from '@emotion/styled';
 import EmailIcon from '@mui/icons-material/Email';
 import Box from '@mui/material/Box';
 import Dialog from '@mui/material/Dialog';
@@ -37,18 +36,13 @@ export interface DialogProps {
   onClose: () => void;
 }
 
-const ImageIcon = styled.img`
-  width: 1.5rem;
-  height: 1.5rem;
-`;
-
 function LoginHandler(props: DialogProps) {
   const { onClose, isOpen } = props;
   const { loginFromWeb3Account } = useWeb3AuthSig();
-  const router = useRouter();
   // Governs whether we should auto-request a signature. Should only happen on first login.
   const [enableAutosign, setEnableAutoSign] = useState(true);
-
+  const returnUrl = new URLSearchParams(decodeURIComponent(window.location.search)).get('returnUrl');
+  const router = useRouter();
   const [loginMethod, setLoginMethod] = useState<'email' | null>(null);
 
   const [showLoginError, setShowLoginError] = useState(false);
@@ -176,12 +170,12 @@ function LoginHandler(props: DialogProps) {
 
             <ListItem>
               <ConnectorButton
+                onClick={() => router.push(`/api/discord/oauth?type=login&redirect=${returnUrl ?? '/'}`)}
                 data-test='connect-discord'
                 name='Connect with discord'
                 disabled={false}
                 isActive={false}
                 isLoading={false}
-                onClick={() => router.push(`/api/discord/oauth?type=login`)}
                 icon={
                   <SvgIcon viewBox='0 -10 70 70' sx={{ color: '#5865F2' }}>
                     <DiscordIcon />

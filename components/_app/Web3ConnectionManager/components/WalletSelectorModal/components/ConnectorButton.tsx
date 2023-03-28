@@ -26,7 +26,7 @@ type Props = {
   isLoading: boolean;
 };
 
-export function ConnectorButton({ name, onClick, iconUrl, icon, disabled, isActive, isLoading }: Props) {
+export function ConnectorButton({ name, onClick, iconUrl, icon, disabled, isActive, isLoading, ...props }: Props) {
   return (
     <Button
       color='secondary'
@@ -42,6 +42,7 @@ export function ConnectorButton({ name, onClick, iconUrl, icon, disabled, isActi
         px: 4,
         py: 1.5
       }}
+      {...props}
     >
       <ButtonContent>
         {`${name} ${isActive ? ' - connected' : ''}`}
