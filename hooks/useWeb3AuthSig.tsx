@@ -1,10 +1,13 @@
 import { verifyMessage } from '@ethersproject/wallet';
+import type { UserWallet } from '@prisma/client';
 import { useWeb3React } from '@web3-react/core';
 import type { Signer } from 'ethers';
 import { getAddress, toUtf8Bytes } from 'ethers/lib/utils';
 import { SiweMessage } from 'lit-siwe';
 import type { ReactNode } from 'react';
-import { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import { useCallback, createContext, useContext, useEffect, useMemo, useState } from 'react';
+import { mutate } from 'swr';
+import useSWRMutation from 'swr/mutation';
 
 import charmClient from 'charmClient';
 import type { AuthSig } from 'lib/blockchain/interfaces';
@@ -28,7 +31,8 @@ type IContext = {
   sign: () => Promise<AuthSig>;
   triedEager: boolean;
   getStoredSignature: () => AuthSig | null;
-  disconnectWallet: () => void;
+  logoutWallet: () => void;
+  disconnectWallet: (address: UserWallet['address']) => Promise<void>;
   // Which tool is providing the web3 connection ie. Metamask∂, WalletConnect, etc.
   connector: any;
   // A wallet is currently connected and can be used to generate signatures. This is different from a user being connected
@@ -49,7 +53,8 @@ export const Web3Context = createContext<Readonly<IContext>>({
   sign: () => Promise.resolve({} as AuthSig),
   triedEager: false,
   getStoredSignature: () => null,
-  disconnectWallet: () => null,
+  logoutWallet: () => null,
+  disconnectWallet: async () => {},
   library: null,
   chainId: null,
   connector: null,
@@ -232,12 +237,34 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
       throw err;
     }
   }
-
-  function disconnectWallet() {
+  const logoutWallet = useCallback(() => {
     if (account) {
       window.localStorage.removeItem(`${PREFIX}.wallet-auth-sig-${account}`);
       setWalletAuthSignature(null);
     }
+  }, [account]);
+
+  const { trigger: triggerDisconnectWallet, isMutating: isDisconnectingWallet } = useSWRMutation(
+    '/profile/remove-wallet',
+    (_url, { arg }: Readonly<{ arg: UserWallet['address'] }>) =>
+      account && user ? charmClient.removeUserWallet({ address: arg }) : null,
+    {
+      async onSuccess(updatedUser) {
+        logoutWallet();
+        setUser(updatedUser);
+        setLitAuthSignature(null);
+        setLitProvider(null);
+        connector?.deactivate();
+        await mutate(`/nfts/${updatedUser?.id}`);
+        await mutate(`/orgs/${updatedUser?.id}`);
+        await mutate(`/poaps/${updatedUser?.id}`);
+        setStoredAccount(null);
+      }
+    }
+  );
+
+  async function disconnectWallet(address: UserWallet['address']) {
+    await triggerDisconnectWallet(address);
   }
 
   function connectWallet() {
@@ -252,13 +279,14 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
       sign,
       getStoredSignature,
       disconnectWallet,
+      logoutWallet,
       library,
       chainId,
       connector,
       verifiableWalletDetected,
       connectWallet,
       connectWalletModalIsOpen: isWalletSelectorModalOpen,
-      isSigning,
+      isSigning: isSigning || isDisconnectingWallet,
       isConnectingIdentity,
       closeWalletSelector: closeWalletSelectorModal,
       resetSigning: () => setIsSigning(false),

@@ -11,7 +11,8 @@ import type {
   TokenGateToRole,
   User,
   UserDetails,
-  UserGnosisSafe
+  UserGnosisSafe,
+  UserWallet
 } from '@prisma/client';
 import type { FiatCurrency, IPairQuote } from 'connectors';
 
@@ -175,6 +176,10 @@ class CharmClient {
 
   addUserWallets(data: AuthSig[]) {
     return http.POST<User>('/api/profile/add-wallets', { addressesToAdd: data });
+  }
+
+  removeUserWallet(address: Pick<UserWallet, 'address'>) {
+    return http.POST<LoggedInUser>('/api/profile/remove-wallet', address);
   }
 
   async createSpace(spaceOptions: Pick<CreateSpaceProps, 'createSpaceOption' | 'spaceData'>) {
