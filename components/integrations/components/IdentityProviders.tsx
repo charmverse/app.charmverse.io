@@ -25,7 +25,6 @@ import Legend from 'components/settings/Legend';
 import { useDiscordConnection } from 'hooks/useDiscordConnection';
 import { useFirebaseAuth } from 'hooks/useFirebaseAuth';
 import { useSnackbar } from 'hooks/useSnackbar';
-import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import type { AuthSig } from 'lib/blockchain/interfaces';
@@ -43,17 +42,9 @@ import { TelegramLoginIframe } from './TelegramLoginIframe';
 import { useIdentityTypes } from './useIdentityTypes';
 
 export function IdentityProviders() {
-  const {
-    account,
-    isConnectingIdentity,
-    sign,
-    isSigning,
-    verifiableWalletDetected,
-    disconnectWallet,
-    getStoredSignature
-  } = useWeb3AuthSig();
-  const { spaces } = useSpaces();
-  const { user, setUser, updateUser, refreshUser } = useUser();
+  const { account, isConnectingIdentity, sign, isSigning, verifiableWalletDetected, disconnectWallet } =
+    useWeb3AuthSig();
+  const { user, setUser, updateUser } = useUser();
   const { showMessage } = useSnackbar();
   const { disconnectGoogleAccount, isConnectingGoogle, disconnectVerifiedEmailAccount } = useFirebaseAuth();
   const identityTypes = useIdentityTypes();
@@ -61,25 +52,6 @@ export function IdentityProviders() {
   const deleteWalletPopupState = usePopupState({ variant: 'popover', popupId: 'deleteWalletModal' });
   const discordAccount = user?.discordUser?.account as Partial<DiscordAccount> | undefined;
   const telegramAccount = user?.telegramUser?.account as Partial<TelegramAccount> | undefined;
-
-  const disconnectAWallet = async (address: string) => {
-    if (user) {
-      await disconnectWallet(address);
-      const authSig = getStoredSignature();
-      if (authSig) {
-        for (const space of spaces) {
-          const newRoles = await charmClient.tokenGates.reevaluateRoles({
-            spaceId: space.id,
-            userId: user?.id || '',
-            authSig
-          });
-          if (newRoles.length) {
-            refreshUser();
-          }
-        }
-      }
-    }
-  };
 
   const { trigger: saveUser, isMutating: isLoadingUserUpdate } = useSWRMutation(
     '/profile',
@@ -230,7 +202,7 @@ export function IdentityProviders() {
                 </>
               }
               buttonText='Disconnect'
-              onConfirm={() => disconnectAWallet(wallet.address)}
+              onConfirm={() => disconnectWallet(wallet.address)}
               onClose={deleteWalletPopupState.close}
               open={deleteWalletPopupState.isOpen}
             />
