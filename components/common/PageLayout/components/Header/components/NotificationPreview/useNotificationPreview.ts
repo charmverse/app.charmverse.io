@@ -34,7 +34,7 @@ function getNotificationPreviewItems(notifications: NotificationPreview[], type:
   return notifications.map((n) => ({
     id: n.taskId,
     createdAt: n.createdAt,
-    createdBy: 'createdBy' in n ? n.createdBy : null,
+    createdBy: n.createdBy,
     spaceName: n.spaceName,
     groupType: type,
     title: getNotificationPreviewTitle(n),

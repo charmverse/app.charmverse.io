@@ -1,6 +1,7 @@
 import type { BountyStatus } from '@prisma/client';
 
 import { prisma } from 'db';
+import type { NotificationActor } from 'lib/notifications/mapNotificationActor';
 
 import { getBountyAction } from './getBountyAction';
 
@@ -26,6 +27,7 @@ export interface BountyTask {
   status: BountyStatus;
   action: BountyTaskAction | null;
   createdAt: Date;
+  createdBy: NotificationActor | null;
 }
 
 export type BountyTasksGroup = {
@@ -123,7 +125,6 @@ export async function getBountyTasks(userId: string): Promise<{
           isApplicant: application.createdBy === userId,
           isReviewer
         });
-
         if (action) {
           const bountyTaskId = `${bounty.id}.${application.id}.${action}`;
 
@@ -138,7 +139,9 @@ export async function getBountyTasks(userId: string): Promise<{
             spaceDomain: page.space.domain,
             spaceName: page.space.name,
             status: bounty.status,
-            action
+            action,
+            // TODO - createdBy computation depending on case
+            createdBy: null
           };
 
           if (!userNotificationIds.has(bountyTaskId)) {
