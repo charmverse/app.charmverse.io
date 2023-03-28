@@ -8,6 +8,7 @@ import { uploadToS3 } from 'lib/aws/uploadToS3Browser';
 import log from 'lib/log';
 
 import { PimpedButton } from '../Button';
+import { selectorPopupSizeConfig } from '../CharmEditor/components/common/selectorPopupSizeConfig';
 
 import ImageSelectorGallery from './ImageSelectorGallery';
 
@@ -35,6 +36,7 @@ export default function ImageSelector({
   return (
     <PopperPopup
       autoOpen={autoOpen}
+      paperSx={selectorPopupSizeConfig}
       popupContent={
         <Box>
           <MultiTabs

@@ -64,10 +64,11 @@ describe('policyStatusReviewCommentable', () => {
       comment: true,
       create_vote: true,
       review: true,
-      vote: true
+      vote: true,
+      make_public: true
     });
   });
-  it('should allow the author to view, comment, delete', async () => {
+  it('should allow the author to view, comment, delete and make public', async () => {
     const permissions = await policyStatusReviewCommentable({
       flags: fullPermissions,
       isAdmin: false,
@@ -79,6 +80,7 @@ describe('policyStatusReviewCommentable', () => {
       view: true,
       comment: true,
       delete: true,
+      make_public: true,
       edit: false,
       create_vote: false,
       review: false,
@@ -86,7 +88,7 @@ describe('policyStatusReviewCommentable', () => {
     });
   });
 
-  it('should allow a user who is author and reviewer to view, comment, delete, review', async () => {
+  it('should allow a user who is author and reviewer to view, comment, delete, review and make public', async () => {
     const proposalWithSameAuthorReviewer = await generateProposal({
       categoryId: proposalCategory.id,
       authors: [proposalAuthor.id],
@@ -113,13 +115,14 @@ describe('policyStatusReviewCommentable', () => {
       delete: true,
       review: true,
       comment: true,
+      make_public: true,
       edit: false,
       create_vote: false,
       vote: false
     });
   });
 
-  it('should allow the admin to view, comment, edit, delete, review', async () => {
+  it('should allow the admin to view, comment, edit, delete, review and make public', async () => {
     const permissions = await policyStatusReviewCommentable({
       flags: fullPermissions,
       isAdmin: true,
@@ -133,6 +136,7 @@ describe('policyStatusReviewCommentable', () => {
       delete: true,
       review: true,
       comment: true,
+      make_public: true,
       create_vote: false,
       vote: false
     });
@@ -150,6 +154,7 @@ describe('policyStatusReviewCommentable', () => {
       view: true,
       comment: true,
       review: true,
+      make_public: false,
       edit: false,
       delete: false,
       create_vote: false,
@@ -167,6 +172,7 @@ describe('policyStatusReviewCommentable', () => {
 
     expect(permissions).toMatchObject<AvailableProposalPermissionFlags>({
       view: true,
+      make_public: false,
       comment: false,
       edit: false,
       delete: false,

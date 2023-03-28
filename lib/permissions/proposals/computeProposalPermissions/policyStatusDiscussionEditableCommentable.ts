@@ -20,7 +20,7 @@ export async function policyStatusDiscussionEditableCommentable({
     return newPermissions;
   }
 
-  const allowedAuthorOperations: ProposalOperation[] = ['view', 'edit', 'delete', 'comment'];
+  const allowedAuthorOperations: ProposalOperation[] = ['view', 'edit', 'delete', 'comment', 'make_public'];
 
   if (isProposalAuthor({ proposal: resource, userId }) || isAdmin) {
     typedKeys(flags).forEach((flag) => {

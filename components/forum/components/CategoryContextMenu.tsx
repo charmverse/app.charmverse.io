@@ -4,6 +4,7 @@ import LockIcon from '@mui/icons-material/Lock';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import TaskIcon from '@mui/icons-material/Task';
 import { IconButton, ListItemIcon, MenuItem, MenuList, Typography } from '@mui/material';
+import Box from '@mui/material/Box';
 import Tooltip from '@mui/material/Tooltip';
 import type { PostCategory } from '@prisma/client';
 import { usePopupState } from 'material-ui-popup-state/hooks';

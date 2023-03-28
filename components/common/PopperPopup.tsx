@@ -1,4 +1,4 @@
-import type { PopoverProps } from '@mui/material';
+import type { PopoverProps, SxProps, Theme } from '@mui/material';
 import { Popover } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import { bindPopover, bindToggle } from 'material-ui-popup-state';
@@ -13,6 +13,7 @@ interface PopperPopupProps {
   onClose?: () => void;
   onOpen?: () => void;
   onClick?: () => void;
+  paperSx?: SxProps<Theme>;
 }
 
 export default function PopperPopup(props: PopperPopupProps) {
@@ -78,7 +79,7 @@ export default function PopperPopup(props: PopperPopupProps) {
         </div>
       )}
       <Popover disableRestoreFocus {...popoverProps}>
-        <Paper sx={{ width: { xs: '90vw', md: 500, lg: 750 } }}>{popupContent}</Paper>
+        <Paper sx={props.paperSx}>{popupContent}</Paper>
       </Popover>
     </div>
   );
