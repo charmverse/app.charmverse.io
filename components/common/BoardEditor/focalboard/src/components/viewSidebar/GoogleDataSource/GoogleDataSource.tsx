@@ -48,7 +48,6 @@ export function GoogleDataSource(props: Props) {
         <ListItem>
           <Typography variant='caption'>Find and embed your Google forms</Typography>
         </ListItem>
-        <GoogleAuthWarning />
       </>
     );
   } else if (selectedCredential) {
@@ -84,17 +83,7 @@ export function GoogleDataSource(props: Props) {
         <Typography variant='caption'>Connect another account</Typography>
       </MenuItem>
       <ConnectButton onClick={() => loginWithGoogle()} />
-      <GoogleAuthWarning />
     </>
-  );
-}
-
-function GoogleAuthWarning() {
-  return (
-    <Alert severity='warning'>
-      <Typography variant='body1'>Unverified Google app</Typography>
-      <Typography variant='body2'>This feature is in beta while our app is under review</Typography>
-    </Alert>
   );
 }
 

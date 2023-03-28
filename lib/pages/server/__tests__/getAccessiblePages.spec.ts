@@ -141,17 +141,6 @@ describe('getAccessiblePages', () => {
     expect(pages.length).toBe(0);
   });
 
-  it('Should return a page based on search', async () => {
-    const { user: adminUser, space } = await generateUserAndSpaceWithApiToken(undefined, true);
-
-    // Page without any permission
-    const pageToFind = await createPage({ createdBy: adminUser.id, spaceId: space.id, title: 'Momma' });
-    await createPage({ createdBy: adminUser.id, spaceId: space.id, title: 'Papa' });
-
-    const pages = await getAccessiblePages({ userId: adminUser.id, spaceId: space.id, search: 'mom' });
-    expect(pages.map((p) => p.id)).toEqual([pageToFind.id]);
-  });
-
   it('should return only pages marked as deletedAt when admin requests archived pages', async () => {
     const { user, space } = await generateUserAndSpace({
       isAdmin: true
@@ -225,5 +214,27 @@ describe('getAccessiblePages', () => {
 
     expect(deletablePages.length).toBe(1);
     expect(deletablePages[0].id).toBe(deletedPageWithPermission.id);
+  });
+});
+
+describe('Page search', () => {
+  it('Should return a page based on a simple match', async () => {
+    const { user, space } = await generateUserAndSpaceWithApiToken(undefined, true);
+
+    // Page without any permission
+    const pageToFind = await createPage({ createdBy: user.id, spaceId: space.id, title: 'Momma' });
+
+    const pages = await getAccessiblePages({ userId: user.id, spaceId: space.id, search: 'mom' });
+    expect(pages.map((p) => p.id)).toEqual([pageToFind.id]);
+  });
+
+  it('Should return a page when keywords are not adjacent', async () => {
+    const { user, space } = await generateUserAndSpaceWithApiToken(undefined, true);
+
+    // Page without any permission
+    const pageToFind = await createPage({ createdBy: user.id, spaceId: space.id, title: 'Some simple truths' });
+
+    const pages = await getAccessiblePages({ userId: user.id, spaceId: space.id, search: 'some truths' });
+    expect(pages.map((p) => p.id)).toEqual([pageToFind.id]);
   });
 });
