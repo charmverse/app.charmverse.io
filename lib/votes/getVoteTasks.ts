@@ -73,7 +73,8 @@ export async function getVoteTasks(userId: string): Promise<VoteTasksGroup> {
       status: voteStatus,
       totalVotes: userVotes.length,
       createdBy: mapNotificationActor(vote.author),
-      taskId: vote.id
+      taskId: vote.id,
+      spaceName: vote.space.name
     };
 
     if (markedNotificationIds.has(task.id)) {

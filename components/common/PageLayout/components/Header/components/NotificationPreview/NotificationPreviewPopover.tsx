@@ -1,71 +1,11 @@
 import { Box, Card, Divider, Typography } from '@mui/material';
-import type { NotificationType } from '@prisma/client';
 
-import useTasks from 'components/nexus/hooks/useTasks';
-import type { NotificationGroupType } from 'lib/notifications/interfaces';
+import { useNotificationPreview } from 'components/common/PageLayout/components/Header/components/NotificationPreview/useNotificationPreview';
 
 import { NotificationPreview } from './NotificationPreview';
 
 export function NotificationPreviewPopover({ onSeeAllClick }: { onSeeAllClick: () => void }) {
-  const { tasks, gnosisTasks } = useTasks();
-
-  // const bounties =
-  //   tasks?.bounties.unmarked.map((b) => ({
-  //     id: b.id,
-  //     createdAt: b.eventDate,
-  //     spaceName: b.spaceName,
-  //     title: b.pageTitle,
-  //     groupType: 'bounties' as NotificationGroupType,
-  //     type: 'bounty' as NotificationType
-  //   })) || [];
-  const discussions =
-    tasks?.discussions.unmarked.map((d) => ({
-      id: d.taskId,
-      createdAt: d.createdAt,
-      createdBy: d.createdBy,
-      spaceName: d.spaceName,
-      title: d.pageTitle,
-      groupType: 'discussions' as NotificationGroupType,
-      type: 'mention' as NotificationType
-    })) || [];
-  const forum =
-    tasks?.forum.unmarked.map((f) => ({
-      id: f.taskId,
-      createdAt: f.createdAt,
-      createdBy: f.createdBy,
-      spaceName: f.spaceName,
-      title: f.postTitle,
-      groupType: 'forum' as NotificationGroupType,
-      type: 'forum' as NotificationType
-    })) || [];
-  const proposals =
-    tasks?.proposals.unmarked.map((p) => ({
-      id: p.id,
-      createdAt: p.eventDate,
-      createdBy: p.createdBy,
-      spaceName: p.spaceName,
-      title: p.pageTitle,
-      groupType: 'proposals' as NotificationGroupType,
-      type: 'proposal' as NotificationType
-    })) || [];
-  const votes =
-    tasks?.votes.unmarked.map((v) => ({
-      id: v.id,
-      createdAt: v.createdAt,
-      createdBy: v.createdBy,
-      spaceName: v.space.name,
-      title: v.title,
-      groupType: 'votes' as NotificationGroupType,
-      type: 'vote' as NotificationType
-    })) || [];
-  // const gnosis = gnosisTasks?.map((g) => ({
-  //   id: g.taskId,
-  //   createdAt: g.marked,
-  //   spaceName: g.safeName,
-  //   title: g.safeName,
-  //   type: 'Multisig'
-  // }));
-  const allTasks = [...discussions, ...forum, ...proposals, ...votes];
+  const { notificationPreviews } = useNotificationPreview();
 
   return (
     <Box>
@@ -76,7 +16,7 @@ export function NotificationPreviewPopover({ onSeeAllClick }: { onSeeAllClick: (
       </Card>
       <Divider />
       <Box height={400} sx={{ overflowY: 'auto', overflowX: 'hidden' }}>
-        {allTasks.map((t) => (
+        {notificationPreviews.map((t) => (
           <>
             <NotificationPreview
               key={t.id}

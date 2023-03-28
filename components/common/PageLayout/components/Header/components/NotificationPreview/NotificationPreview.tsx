@@ -22,11 +22,11 @@ type Props = {
   createdAt: string | Date;
   createdBy: NotificationActor | TaskUser | null;
   title: string;
-  type: NotificationType;
   groupType: NotificationGroupType;
   id: string;
+  type: NotificationType;
 };
-export function NotificationPreview({ spaceName, createdAt, title, type, createdBy, groupType, id }: Props) {
+export function NotificationPreview({ spaceName, createdAt, title, createdBy, groupType, id, type }: Props) {
   const theme = useTheme();
   // Task Date calculations:
   // const { formatDate, formatTime } = useDateFormatter();
@@ -36,7 +36,9 @@ export function NotificationPreview({ spaceName, createdAt, title, type, created
 
   const { mutate: mutateTasks } = useTasks();
 
-  const header = `${spaceName} ${type}`;
+  // @TODOM - map group type to proper title
+  const header = `${spaceName} ${groupType}`;
+  // @TODOM - map title to proper action title (i.e @asd left comment in ${title})
   const description = `${createdBy?.username ? createdBy?.username : 'User'} ${title}`;
 
   const icon = (taskType: string) => {

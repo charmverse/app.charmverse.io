@@ -34,6 +34,7 @@ export type VoteTask = Omit<ExtendedVote, 'createdBy'> & {
   space: Space;
   createdBy: NotificationActor | null;
   taskId: string;
+  spaceName: string;
 };
 
 export type UserVoteExtendedDTO = UserVote & {

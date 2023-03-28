@@ -22,6 +22,7 @@ export interface ProposalTask {
   taskId: string;
   action: ProposalTaskAction | null;
   eventDate: Date;
+  createdAt: Date;
   spaceDomain: string;
   spaceName: string;
   pageId: string;
@@ -165,7 +166,8 @@ export async function getProposalTasks(userId: string): Promise<{
           status: proposal.status,
           action,
           createdBy: mapNotificationActor(workspaceEvent.actor),
-          taskId: workspaceEvent.id
+          taskId: workspaceEvent.id,
+          createdAt: workspaceEvent.createdAt
         };
         if (!userNotificationIds.has(workspaceEvent.id)) {
           proposalsRecord.unmarked.push(proposalTask);

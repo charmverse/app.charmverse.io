@@ -25,6 +25,7 @@ export interface BountyTask {
   pagePath: string;
   status: BountyStatus;
   action: BountyTaskAction | null;
+  createdAt: Date;
 }
 
 export type BountyTasksGroup = {
@@ -130,6 +131,7 @@ export async function getBountyTasks(userId: string): Promise<{
             id: bountyTaskId,
             taskId: bountyTaskId,
             eventDate: application.updatedAt,
+            createdAt: application.updatedAt,
             pageId: page.id,
             pagePath: page.path,
             pageTitle: page.title,

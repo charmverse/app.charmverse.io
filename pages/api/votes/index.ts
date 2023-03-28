@@ -113,7 +113,16 @@ async function createVote(req: NextApiRequest, res: NextApiResponse<ExtendedVote
     relay.broadcast(
       {
         type: 'votes_created',
-        payload: [{ ...vote, page: pageMeta, space, createdBy: mapNotificationActor(voteAuthor), taskId: vote.id }]
+        payload: [
+          {
+            ...vote,
+            page: pageMeta,
+            space,
+            createdBy: mapNotificationActor(voteAuthor),
+            taskId: vote.id,
+            spaceName: space.name
+          }
+        ]
       },
       vote.spaceId
     );
