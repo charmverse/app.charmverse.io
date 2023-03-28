@@ -12,7 +12,6 @@ const esmModules = [
   '@react-dnd/invariant',
   '@react-dnd/asap',
   '@react-dnd/shallowequal',
-  '/@react-dnd/shallowequal',
   'react-pdf',
   '@hookform/resolvers',
   'lit-share-modal-v3',
