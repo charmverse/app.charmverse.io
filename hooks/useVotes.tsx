@@ -6,7 +6,7 @@ import useSWR from 'swr';
 import charmClient from 'charmClient';
 import useTasks from 'components/nexus/hooks/useTasks';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import type { ExtendedVote, VoteDTO, VoteTask } from 'lib/votes/interfaces';
+import type { ExtendedVote, VoteDTO } from 'lib/votes/interfaces';
 import type { GetTasksResponse } from 'pages/api/tasks/list';
 
 import { useCurrentPage } from './useCurrentPage';
@@ -50,10 +50,12 @@ export function VotesProvider({ children }: { children: ReactNode }) {
       setVotes((prev) => {
         const votesToAssign = newVotes.reduce((acc, vote) => {
           // In future, we'll want to check if the vote is linked to current space.
-          // For now we can depend on implicit filtering on the server, as each time we switch space we switch subscriptions.
-          acc[vote.id] = vote;
+          // For now we can depend on implicit filtering on the server, as each time we switch space we switch subscriptions
+          const createdBy = typeof vote.createdBy === 'string' ? vote.createdBy : vote.createdBy?.id || '';
+          acc[vote.id] = { ...vote, createdBy };
+
           return acc;
-        }, {} as Record<string, VoteTask>);
+        }, {} as Record<string, ExtendedVote>);
 
         return { ...prev, ...votesToAssign };
       });
