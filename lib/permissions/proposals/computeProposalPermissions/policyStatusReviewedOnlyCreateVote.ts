@@ -21,10 +21,18 @@ export async function policyStatusReviewedOnlyCreateVote({
   }
 
   const allowedAuthorOperations: ProposalOperation[] = ['view', 'create_vote', 'delete', 'make_public'];
+  const allowedAdminOperations: ProposalOperation[] = [...allowedAuthorOperations, 'edit'];
 
-  if (isProposalAuthor({ proposal: resource, userId }) || isAdmin) {
+  if (isProposalAuthor({ proposal: resource, userId })) {
     typedKeys(flags).forEach((flag) => {
       if (!allowedAuthorOperations.includes(flag)) {
+        newPermissions[flag] = false;
+      }
+    });
+    return newPermissions;
+  } else if (isAdmin) {
+    typedKeys(flags).forEach((flag) => {
+      if (!allowedAdminOperations.includes(flag)) {
         newPermissions[flag] = false;
       }
     });
