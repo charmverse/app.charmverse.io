@@ -9,9 +9,8 @@ function useLitProtocol() {
     () =>
       new LitJsSdk.LitNodeClient({
         alertWhenUnauthorized: false,
-        // This option is documented in Lit docs, but not in their typescript definition
         debug: false
-      } as any),
+      }),
     []
   );
 
