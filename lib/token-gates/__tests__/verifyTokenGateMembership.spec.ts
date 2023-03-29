@@ -85,7 +85,7 @@ describe('verifyTokenGateMembership', () => {
   it('should not verify and remove user connected via deleted token gate', async () => {
     const tokenGate = await generateTokenGate({ userId: user.id, spaceId: space.id });
 
-    mockedLitSDK.verifyJwt.mockResolvedValue(
+    mockedLitSDK.verifyJwt.mockReturnValue(
       verifiedJWTResponse({
         verified: true,
         payload: {
@@ -124,7 +124,7 @@ describe('verifyTokenGateMembership', () => {
     const tokenGate2 = await generateTokenGate({ userId: user.id, spaceId: space.id });
     mockedLitSDK.verifyJwt
       // verify to apply token gate
-      .mockResolvedValueOnce(
+      .mockReturnValueOnce(
         verifiedJWTResponse({
           verified: true,
           payload: {
@@ -134,7 +134,7 @@ describe('verifyTokenGateMembership', () => {
         })
       )
       // verify to apply token gate
-      .mockResolvedValueOnce(
+      .mockReturnValueOnce(
         verifiedJWTResponse({
           verified: true,
           payload: {
@@ -157,7 +157,7 @@ describe('verifyTokenGateMembership', () => {
     const verifyUser = (await getSpaceUser()) as UserToVerifyMembership;
 
     // do not verify token gates anymore
-    mockedLitSDK.verifyJwt.mockResolvedValue(verifiedJWTResponse({ verified: false }));
+    mockedLitSDK.verifyJwt.mockReturnValue(verifiedJWTResponse({ verified: false }));
 
     const res = await verifyTokenGateMembership({
       userTokenGates: verifyUser.user.userTokenGates,
@@ -178,7 +178,7 @@ describe('verifyTokenGateMembership', () => {
 
     mockedLitSDK.verifyJwt
       // verify to apply token gate
-      .mockResolvedValueOnce(
+      .mockReturnValueOnce(
         verifiedJWTResponse({
           verified: true,
           payload: {
@@ -188,7 +188,7 @@ describe('verifyTokenGateMembership', () => {
         })
       )
       // verify to apply token gate
-      .mockResolvedValueOnce(
+      .mockReturnValueOnce(
         verifiedJWTResponse({
           verified: true,
           payload: {
@@ -210,7 +210,7 @@ describe('verifyTokenGateMembership', () => {
 
     const verifyUser = (await getSpaceUser()) as UserToVerifyMembership;
 
-    mockedLitSDK.verifyJwt.mockImplementation(async ({ jwt }) => {
+    mockedLitSDK.verifyJwt.mockImplementation(({ jwt }) => {
       // verify only one of token gates
       if (jwt === 'jwt1') {
         return verifiedJWTResponse({
@@ -249,7 +249,7 @@ describe('verifyTokenGateMembership', () => {
 
     mockedLitSDK.verifyJwt
       // verify to apply token gate
-      .mockResolvedValueOnce(
+      .mockReturnValueOnce(
         verifiedJWTResponse({
           verified: true,
           payload: {
@@ -259,7 +259,7 @@ describe('verifyTokenGateMembership', () => {
         })
       )
       // verify to apply token gate
-      .mockResolvedValueOnce(
+      .mockReturnValueOnce(
         verifiedJWTResponse({
           verified: true,
           payload: {
@@ -281,7 +281,7 @@ describe('verifyTokenGateMembership', () => {
 
     const verifyUser = (await getSpaceUser()) as UserToVerifyMembership;
 
-    mockedLitSDK.verifyJwt.mockResolvedValue(verifiedJWTResponse({ verified: false }));
+    mockedLitSDK.verifyJwt.mockReturnValue(verifiedJWTResponse({ verified: false }));
 
     const res = await verifyTokenGateMembership({
       userTokenGates: verifyUser.user.userTokenGates,
@@ -311,7 +311,7 @@ describe('verifyTokenGateMembership', () => {
 
     mockedLitSDK.verifyJwt
       // verify to apply token gate
-      .mockResolvedValueOnce(
+      .mockReturnValueOnce(
         verifiedJWTResponse({
           verified: true,
           payload: {
@@ -321,7 +321,7 @@ describe('verifyTokenGateMembership', () => {
         })
       )
       // verify to apply token gate
-      .mockResolvedValueOnce(
+      .mockReturnValueOnce(
         verifiedJWTResponse({
           verified: true,
           payload: {
@@ -344,7 +344,7 @@ describe('verifyTokenGateMembership', () => {
 
     const verifyUser = (await getSpaceUser()) as UserToVerifyMembership;
 
-    mockedLitSDK.verifyJwt.mockResolvedValueOnce(
+    mockedLitSDK.verifyJwt.mockReturnValueOnce(
       verifiedJWTResponse({
         verified: true,
         payload: {
@@ -386,7 +386,7 @@ describe('verifyTokenGateMembership', () => {
 
     mockedLitSDK.verifyJwt
       // verify to apply token gate
-      .mockResolvedValueOnce(
+      .mockReturnValueOnce(
         verifiedJWTResponse({
           verified: true,
           payload: {
@@ -396,7 +396,7 @@ describe('verifyTokenGateMembership', () => {
         })
       )
       // verify to apply token gate
-      .mockResolvedValueOnce(
+      .mockReturnValueOnce(
         verifiedJWTResponse({
           verified: true,
           payload: {
@@ -418,7 +418,7 @@ describe('verifyTokenGateMembership', () => {
 
     const verifyUser = (await getSpaceUser()) as UserToVerifyMembership;
 
-    mockedLitSDK.verifyJwt.mockImplementation(async ({ jwt }) => {
+    mockedLitSDK.verifyJwt.mockImplementation(({ jwt }) => {
       // verify only one of token gates
       if (jwt === 'jwt2') {
         return verifiedJWTResponse({

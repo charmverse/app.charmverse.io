@@ -26,6 +26,7 @@ import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import log from 'lib/log';
 import type { TokenGateWithRoles } from 'lib/token-gates/interfaces';
 import { shortenHex } from 'lib/utilities/strings';
+import { isTruthy } from 'lib/utilities/types';
 
 import type { TestResult } from './TestConnectionModal';
 import TestConnectionModal from './TestConnectionModal';
@@ -107,7 +108,7 @@ export default function TokenGatesTable({ isAdmin, onDelete, tokenGates }: Props
           })
         )
       );
-      setDescriptions(results);
+      setDescriptions(results.filter(isTruthy));
     }
     main();
   }, [tokenGates]);

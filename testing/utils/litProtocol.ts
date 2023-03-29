@@ -6,7 +6,7 @@ export function verifiedJWTResponse(
   response: Partial<Omit<LitResponse, 'payload'> & { payload: Partial<LitResponse['payload']> }>
 ): LitResponse {
   return {
-    header: '',
+    header: {},
     verified: true,
     signature: new Uint8Array(),
     ...response,

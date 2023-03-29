@@ -24,7 +24,7 @@ export function TokenGateOption({ tokenGate, isVerified, isVerifying }: Props) {
       ...(tokenGate.conditions as any),
       myWalletAddress: account || ''
     }).then((result) => {
-      setDescription(result);
+      setDescription(result || '');
     });
   }, [tokenGate]);
 

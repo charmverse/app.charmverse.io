@@ -38,8 +38,8 @@ export async function verifyTokenGateMembership({
       return { id: userTokenGate.id, isVerified: false, roleIds: userTokenGate.grantedRoles };
     }
 
-    const result = await lit.verifyJwt({ jwt: userTokenGate.jwt });
-    const isVerified = result.verified && result.payload?.orgId === spaceId;
+    const result = lit.verifyJwt({ jwt: userTokenGate.jwt });
+    const isVerified = result.verified && (result.payload as any)?.orgId === spaceId;
 
     return {
       id: userTokenGate.tokenGateId,

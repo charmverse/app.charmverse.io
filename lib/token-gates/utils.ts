@@ -1,8 +1,8 @@
-import type { AccessControlCondition } from '@lit-protocol/lit-node-client';
+import type { AccsDefaultParams } from '@lit-protocol/types';
 
 import type { TokenGateAccessType } from 'lib/token-gates/interfaces';
 
-export function getAccessType(condition: AccessControlCondition): TokenGateAccessType {
+export function getAccessType(condition: AccsDefaultParams): TokenGateAccessType {
   const { method, parameters } = condition;
 
   if (!method && parameters.includes(':userAddress')) {
@@ -31,6 +31,6 @@ export function getAccessType(condition: AccessControlCondition): TokenGateAcces
   }
 }
 
-export function getAccessTypes(conditions: AccessControlCondition[]): TokenGateAccessType[] {
+export function getAccessTypes(conditions: AccsDefaultParams[]): TokenGateAccessType[] {
   return conditions.map((c) => getAccessType(c));
 }
