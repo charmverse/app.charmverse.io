@@ -1,5 +1,5 @@
+import type { AccessControlCondition } from '@lit-protocol/lit-node-client';
 import type { Space } from '@prisma/client';
-import type { AccessControlCondition } from 'lit-js-sdk';
 import { flatten } from 'lodash';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';

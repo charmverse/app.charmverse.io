@@ -1,7 +1,7 @@
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
+import type { JsonSigningResourceId, JsonStoreSigningRequest } from '@lit-protocol/types';
 import type { TokenGate } from '@prisma/client';
-import type { ResourceId, SigningConditions } from 'lit-js-sdk';
 import LitShareModal from 'lit-share-modal-v3';
 import { debounce } from 'lodash';
 import type { PopupState } from 'material-ui-popup-state/hooks';
@@ -49,7 +49,7 @@ const ShareModalContainer = styled.div`
 // Example: https://github.com/LIT-Protocol/lit-js-sdk/blob/9b956c0f399493ae2d98b20503c5a0825e0b923c/build/manual_tests.html
 // Docs: https://www.npmjs.com/package/lit-share-modal-v3
 
-type ConditionsModalResult = Pick<SigningConditions, 'unifiedAccessControlConditions' | 'permanant'> & {
+type ConditionsModalResult = Pick<JsonStoreSigningRequest, 'unifiedAccessControlConditions' | 'permanant'> & {
   authSigTypes: string[];
   chains: string[];
 };
@@ -97,7 +97,7 @@ export default function TokenGates({ isAdmin, spaceId, popupState }: TokenGatesP
 
   async function saveTokenGate(conditions: ConditionsModalResult) {
     const tokenGateId = uuid();
-    const resourceId: ResourceId = {
+    const resourceId: JsonSigningResourceId = {
       baseUrl: 'https://app.charmverse.io',
       path: `${Math.random()}`,
       orgId: spaceId,
@@ -111,7 +111,7 @@ export default function TokenGates({ isAdmin, spaceId, popupState }: TokenGatesP
 
     const authSig: AuthSig = walletAuthSignature ?? (await sign());
 
-    await litClient!.saveSigningCondition({
+    await litClient?.saveSigningCondition({
       ...conditions,
       chain,
       authSig,

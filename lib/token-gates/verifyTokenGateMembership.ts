@@ -1,5 +1,5 @@
+import * as lit from '@lit-protocol/lit-node-client';
 import type { Role, SpaceRoleToRole, TokenGate, TokenGateToRole, UserTokenGate } from '@prisma/client';
-import * as lit from 'lit-js-sdk';
 
 type TokenGateWithRoles = {
   tokenGate:

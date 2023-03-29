@@ -1,5 +1,5 @@
+import * as litSDK from '@lit-protocol/lit-node-client';
 import type { Space } from '@prisma/client';
-import * as litSDK from 'lit-js-sdk';
 
 import { assignRole } from 'lib/roles';
 import { updateTokenGateRoles } from 'lib/token-gates/updateTokenGateRoles';
@@ -8,7 +8,7 @@ import { generateRole, generateUserAndSpaceWithApiToken } from 'testing/setupDat
 import { verifiedJWTResponse } from 'testing/utils/litProtocol';
 import { generateTokenGate } from 'testing/utils/tokenGates';
 
-jest.mock('lit-js-sdk');
+jest.mock('@lit-protocol/lit-node-client');
 
 // @ts-ignore
 const mockedLitSDK: jest.Mocked<typeof litSDK> = litSDK;

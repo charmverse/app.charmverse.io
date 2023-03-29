@@ -5,7 +5,7 @@ import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 describe('checkDiscordGate', () => {
   afterEach(() => {
-    jest.unmock('lit-js-sdk');
+    jest.unmock('@lit-protocol/lit-node-client');
     jest.resetModules();
   });
 

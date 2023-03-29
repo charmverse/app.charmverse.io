@@ -1,5 +1,5 @@
+import { LitNodeClient } from '@lit-protocol/lit-node-client';
 import type { Role } from '@prisma/client';
-import { LitNodeClient } from 'lit-js-sdk';
 import { validate } from 'uuid';
 
 import { prisma } from 'db';

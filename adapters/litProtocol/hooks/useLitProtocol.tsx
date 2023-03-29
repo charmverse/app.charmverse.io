@@ -1,4 +1,4 @@
-import LitJsSdk from 'lit-js-sdk';
+import LitJsSdk from '@lit-protocol/lit-node-client';
 import { useEffect, useMemo, useState } from 'react';
 
 import log from 'lib/log';

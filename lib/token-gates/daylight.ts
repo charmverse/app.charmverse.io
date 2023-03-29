@@ -1,5 +1,5 @@
+import type { AccessControlCondition } from '@lit-protocol/lit-node-client';
 import type { TokenGate } from '@prisma/client';
-import type { AccessControlCondition } from 'lit-js-sdk';
 import { flatten } from 'lodash';
 
 import fetch from 'adapters/http/fetch.server';

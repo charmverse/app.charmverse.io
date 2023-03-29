@@ -97,6 +97,8 @@
     "@guildxyz/sdk": "^1.1.1",
     "@hookform/resolvers": "^2.8.8",
     "@koa/router": "^10.1.1",
+    "@lit-protocol/constants": "^2.1.96",
+    "@lit-protocol/lit-node-client": "^2.1.96",
     "@material-ui/pickers": "^3.3.10",
     "@metamask/onboarding": "^1.0.1",
     "@mui/icons-material": "^5.11.0",
@@ -238,6 +240,7 @@
   },
   "devDependencies": {
     "@depay/web3-mock": "^13.18.1",
+    "@lit-protocol/types": "^2.1.96",
     "@next/eslint-plugin-next": "^12.0.10",
     "@playwright/test": "^1.26.1",
     "@svgr/webpack": "^6.1.2",

@@ -1,5 +1,5 @@
+import type { JsonAuthSig } from '@lit-protocol/types';
 import type { Role, Space, TokenGate, TokenGateToRole } from '@prisma/client';
-import type { AuthSig } from 'lit-js-sdk';
 
 export type TokenGateJoinType = 'public_bounty_token_gate' | 'token_gate';
 
@@ -16,7 +16,7 @@ export interface TokenGateJwt {
 
 export interface TokenGateEvaluationAttempt {
   userId: string;
-  authSig: AuthSig;
+  authSig: JsonAuthSig;
   spaceIdOrDomain: string;
 }
 

@@ -1,5 +1,5 @@
+import type { JsonAuthSig, JsonSigningResourceId } from '@lit-protocol/types';
 import type { TokenGate } from '@prisma/client';
-import type { AuthSig } from 'lit-js-sdk';
 
 import * as http from 'adapters/http';
 import type {
@@ -19,7 +19,9 @@ export class TokenGatesApi {
     return http.GET<TokenGateWithRoles[]>('/api/token-gates', query);
   }
 
-  saveTokenGate(tokenGate: Partial<TokenGate>): Promise<TokenGate> {
+  saveTokenGate(
+    tokenGate: Partial<Omit<TokenGate, 'resourceId'> & { resourceId: JsonSigningResourceId }>
+  ): Promise<TokenGate> {
     return http.POST<TokenGate>('/api/token-gates', tokenGate);
   }
 
@@ -38,7 +40,7 @@ export class TokenGatesApi {
     return http.POST('/api/token-gates/evaluate', verification);
   }
 
-  reevaluateRoles(verification: { authSig: AuthSig; spaceId: string; userId: string }): Promise<string[]> {
+  reevaluateRoles(verification: { authSig: JsonAuthSig; spaceId: string; userId: string }): Promise<string[]> {
     return http.POST('/api/token-gates/reevaluate', verification);
   }
 }

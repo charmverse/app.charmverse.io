@@ -1,4 +1,4 @@
-import type { AccessControlCondition } from 'lit-js-sdk';
+import type { AccessControlCondition } from '@lit-protocol/lit-node-client';
 
 import type { TokenGateAccessType } from 'lib/token-gates/interfaces';
 

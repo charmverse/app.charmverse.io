@@ -1,4 +1,4 @@
-import type * as litSDK from 'lit-js-sdk';
+import type * as litSDK from '@lit-protocol/lit-node-client';
 
 type LitResponse = Awaited<ReturnType<typeof litSDK.verifyJwt>>;
 

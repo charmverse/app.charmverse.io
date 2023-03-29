@@ -1,5 +1,5 @@
+import { verifyJwt } from '@lit-protocol/lit-node-client';
 import type { Role } from '@prisma/client';
-import { verifyJwt } from 'lit-js-sdk';
 import { v4 } from 'uuid';
 
 import { prisma } from 'db';
@@ -74,15 +74,15 @@ export async function applyTokenGates({
       tokens.map(async (tk) => {
         const result = await verifyJwt({ jwt: tk.signedToken });
         const matchingTokenGate = tokenGates.find((g) => g.id === tk.tokenGateId);
-
+        const payload = result?.payload as any;
         // Only check against existing token gates for this space
         if (
           matchingTokenGate &&
           // Perform additional checks here as per https://github.com/LIT-Protocol/lit-minimal-jwt-example/blob/main/server.js
           result?.verified &&
-          result.payload?.orgId === space.id
+          payload?.orgId === space.id
         ) {
-          const embeddedTokenGateId = JSON.parse(result.payload.extraData).tokenGateId;
+          const embeddedTokenGateId = JSON.parse(payload.extraData).tokenGateId;
 
           if (embeddedTokenGateId === tk.tokenGateId) {
             return {

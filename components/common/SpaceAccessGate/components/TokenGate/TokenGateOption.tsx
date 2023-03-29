@@ -1,7 +1,7 @@
+import { humanizeAccessControlConditions } from '@lit-protocol/lit-node-client';
 import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
 import Typography from '@mui/material/Typography';
-import { humanizeAccessControlConditions } from 'lit-js-sdk';
 import { useEffect, useState } from 'react';
 
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';

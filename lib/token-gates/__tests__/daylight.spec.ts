@@ -1,9 +1,9 @@
-import type { EVMChain } from 'lit-js-sdk';
+import type { Chain } from '@lit-protocol/types';
 
 import { getDaylightRequirements } from '../daylight';
 
 const walletCondition = {
-  chain: 'ethereum' as EVMChain,
+  chain: 'ethereum' as Chain,
   accessType: 'individual_wallet',
   returnValueTest: { value: '0x123', key: '', comparator: '' },
   contractAddress: '',
@@ -13,7 +13,7 @@ const walletCondition = {
 };
 
 const tokenCondition = {
-  chain: 'ethereum' as EVMChain,
+  chain: 'ethereum' as Chain,
   accessType: 'individual_wallet',
   returnValueTest: { value: '1337', key: '', comparator: '' },
   contractAddress: '0x00001',
@@ -23,7 +23,7 @@ const tokenCondition = {
 };
 
 const nftCondition = {
-  chain: 'ethereum' as EVMChain,
+  chain: 'ethereum' as Chain,
   accessType: 'individual_wallet',
   returnValueTest: { value: '', key: '', comparator: '' },
   contractAddress: '0x00002',

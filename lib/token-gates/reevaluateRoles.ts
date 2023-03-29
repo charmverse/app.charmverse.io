@@ -1,4 +1,4 @@
-import type { AuthSig } from 'lit-js-sdk';
+import type { JsonAuthSig } from '@lit-protocol/types';
 
 import log from 'lib/log';
 import { getSpaceMembershipWithRoles } from 'lib/spaces/getSpaceMembershipWithRoles';
@@ -12,7 +12,7 @@ export async function reevaluateRoles({
   spaceId
 }: {
   spaceId: string;
-  authSig: AuthSig;
+  authSig: JsonAuthSig;
   userId: string;
 }) {
   try {
