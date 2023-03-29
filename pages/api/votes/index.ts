@@ -120,7 +120,9 @@ async function createVote(req: NextApiRequest, res: NextApiResponse<ExtendedVote
             space,
             createdBy: mapNotificationActor(voteAuthor),
             taskId: vote.id,
-            spaceName: space.name
+            spaceName: space.name,
+            spaceDomain: space.domain,
+            pagePath: ''
           }
         ]
       },
