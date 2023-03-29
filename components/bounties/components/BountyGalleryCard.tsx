@@ -45,15 +45,7 @@ export function BountyGalleryCard({ page: bountyPage, bounty, readOnly, onClick,
   const { pageDetails } = usePageDetails(bountyPage?.id);
 
   return bountyPage ? (
-    <StyledBox
-      onClick={onClick}
-      className='GalleryCard'
-      sx={{
-        height: 'fit-content',
-        display: 'grid' // make child full height,
-      }}
-      data-test={`bounty-card-${bounty.id}`}
-    >
+    <StyledBox onClick={onClick} className='GalleryCard' data-test={`bounty-card-${bounty.id}`}>
       {!readOnly && (
         <PageActions onDuplicate={onDuplicate} page={bountyPage} onClickDelete={() => onDelete(bounty.id)} />
       )}
