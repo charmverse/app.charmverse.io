@@ -4,21 +4,33 @@ import { useCallback, useMemo } from 'react';
 import charmClient from 'charmClient';
 import useTasks from 'components/nexus/hooks/useTasks';
 import type { BountyTask } from 'lib/bounties/getBountyTasks';
-import type { DiscussionTask } from 'lib/discussion/interfaces';
+import type { DiscussionTask, TaskUser } from 'lib/discussion/interfaces';
 import type { ForumTask } from 'lib/forums/getForumNotifications/getForumNotifications';
 import type { NotificationGroupType } from 'lib/notifications/interfaces';
+import type { NotificationActor } from 'lib/notifications/mapNotificationActor';
 import type { ProposalTask } from 'lib/proposal/getProposalTasks';
 import type { VoteTask } from 'lib/votes/interfaces';
 
 type NotificationPreview = VoteTask | ProposalTask | BountyTask | DiscussionTask | ForumTask;
-
 type MarkAsReadParams = { taskId: string; groupType: NotificationGroupType; type: NotificationType };
 export type MarkNotificationAsRead = (params: MarkAsReadParams) => Promise<void>;
+
+export type NotificationDetails = {
+  spaceName: string;
+  createdAt: string | Date;
+  createdBy: NotificationActor | TaskUser | null;
+  groupType: NotificationGroupType;
+  type: NotificationType;
+  taskId: string;
+  content: string;
+  href: string;
+  title: string;
+};
 
 export function useNotificationPreview() {
   const { tasks, mutate: mutateTasks } = useTasks();
 
-  const notificationPreviews = useMemo(() => {
+  const notificationPreviews: NotificationDetails[] = useMemo(() => {
     if (!tasks) return [];
     return [
       ...getNotificationPreviewItems(tasks.votes.unmarked, 'votes'),
@@ -75,21 +87,17 @@ export function useNotificationPreview() {
   return { notificationPreviews, markAsRead };
 }
 
-function getNotificationPreviewItems(notifications: NotificationPreview[], type: NotificationGroupType) {
+function getNotificationPreviewItems(notifications: NotificationPreview[], groupType: NotificationGroupType) {
   return notifications.map((n) => ({
-    id: n.taskId,
+    taskId: n.taskId,
     createdAt: n.createdAt,
     createdBy: n.createdBy,
     spaceName: n.spaceName,
-    spaceDomain: n.spaceDomain,
-    groupType: type,
-    path: getNotificationPreviewPath(n),
-    title: getNotificationPreviewTitle(n),
-    type: getNotificationPreviewType(type),
-    commentId: getNotificationPreviewCommentId(n),
-    mentionId: getNotificationPreviewMentionId(n),
-    bountyId: getNotificationPreviewBountyId(n),
-    action: getNotificationPreviewAction(n)
+    groupType,
+    type: getNotificationPreviewType(groupType),
+    href: getNotificationHref(n, groupType),
+    content: getNotificationContent(n, groupType),
+    title: getNotificationTitle(groupType)
   }));
 }
 
@@ -105,38 +113,7 @@ function getNotificationPreviewPath(notification: NotificationPreview) {
   return null;
 }
 
-function getNotificationPreviewBountyId(notification: NotificationPreview) {
-  if ('bountyId' in notification) {
-    return notification.bountyId;
-  }
-
-  return null;
-}
-
-function getNotificationPreviewAction(notification: NotificationPreview) {
-  if ('action' in notification) {
-    return notification.action;
-  }
-
-  return null;
-}
-
-function getNotificationPreviewMentionId(notification: NotificationPreview) {
-  if ('mentionId' in notification) {
-    return notification.mentionId;
-  }
-
-  return null;
-}
-
-function getNotificationPreviewCommentId(notification: NotificationPreview) {
-  if ('commentId' in notification) {
-    return notification.commentId;
-  }
-
-  return null;
-}
-function getNotificationPreviewTitle(notification: NotificationPreview) {
+function getNotificationConentTitle(notification: NotificationPreview) {
   if ('postTitle' in notification) {
     return notification.postTitle;
   }
@@ -169,4 +146,94 @@ function getNotificationPreviewType(groupType: NotificationGroupType): Notificat
     return NotificationType.vote;
   }
   return NotificationType.forum;
+}
+
+function getNotificationHref(n: NotificationPreview, groupType: NotificationGroupType) {
+  const { spaceDomain, taskId } = n;
+  const path = getNotificationPreviewPath(n);
+  const commentId = 'commentId' in n ? n.commentId : null;
+  const mentionId = 'mentionId' in n ? n.mentionId : null;
+  const bountyId = 'bountyId' in n ? n.bountyId : null;
+
+  if (groupType === 'discussions') {
+    return `/${spaceDomain}/${path}?${commentId ? `commentId=${commentId}` : `mentionId=${mentionId}`}`;
+  }
+
+  if (groupType === 'bounties') {
+    return `/${spaceDomain}/bounties?bountyId=${bountyId}`;
+  }
+
+  if (groupType === 'votes') {
+    return `/${spaceDomain}/${path}?voteId=${taskId}`;
+  }
+
+  if (groupType === 'proposals') {
+    return `/${spaceDomain}/${path}`;
+  }
+
+  if (groupType === 'forum') {
+    return `${spaceDomain}/forum/post/${path}`;
+  }
+
+  return '';
+}
+
+function getNotificationContent(n: NotificationPreview, groupType: NotificationGroupType) {
+  const action = 'action' in n ? n.action : null;
+  const title = getNotificationConentTitle(n);
+  const commentId = 'commentId' in n ? n.commentId : null;
+  const { createdBy } = n;
+
+  if (action === 'application_pending') {
+    return `You applied for ${title} bounty.`;
+  }
+
+  if (action === 'application_approved') {
+    return `You application for ${title} bounty is approved.`;
+  }
+
+  if (groupType === 'forum') {
+    if (commentId) {
+      return createdBy?.username ? `${createdBy?.username} left a comment on ${title}.` : `New comment on ${title}.`;
+    }
+
+    return createdBy?.username
+      ? `${createdBy?.username} created "${title}" post on forum.`
+      : `New forum post "${title}"`;
+  }
+
+  if (groupType === 'discussions') {
+    return title ? `${createdBy?.username} left a comment in ${title}.` : `${createdBy?.username} left a comment.`;
+  }
+
+  if (groupType === 'bounties') {
+    return createdBy?.username ? `${createdBy?.username} created a bounty.` : 'Bounty created.';
+  }
+
+  if (groupType === 'votes') {
+    return createdBy?.username ? `${createdBy?.username} created a poll "${title}".` : `Poll "${title}" created.`;
+  }
+
+  if (groupType === 'proposals') {
+    return createdBy?.username ? `${createdBy?.username} created a proposal.` : 'Proposal created.';
+  }
+
+  return '';
+}
+
+function getNotificationTitle(groupType: NotificationGroupType) {
+  switch (groupType) {
+    case 'discussions':
+      return 'Discussion';
+    case 'bounties':
+      return 'Bounty';
+    case 'votes':
+      return 'New Voting';
+    case 'forum':
+      return 'Forum Post';
+    case 'proposals':
+      return 'Proposal';
+    default:
+      return '';
+  }
 }
