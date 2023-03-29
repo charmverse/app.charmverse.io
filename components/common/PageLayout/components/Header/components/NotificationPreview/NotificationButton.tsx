@@ -39,7 +39,7 @@ export default function NotificationButton({ onSeeAllClick }: { onSeeAllClick: (
           }
         }}
       >
-        <NotificationPreviewPopover onSeeAllClick={handleSeeAllClick} />
+        <NotificationPreviewPopover onSeeAllClick={handleSeeAllClick} close={popupState.close} />
       </Popover>
     </>
   );

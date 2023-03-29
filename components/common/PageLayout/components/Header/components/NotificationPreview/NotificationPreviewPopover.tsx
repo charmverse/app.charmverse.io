@@ -5,7 +5,13 @@ import { useNotificationPreview } from 'components/common/PageLayout/components/
 
 import { NotificationPreview } from './NotificationPreview';
 
-export function NotificationPreviewPopover({ onSeeAllClick }: { onSeeAllClick: () => void }) {
+export function NotificationPreviewPopover({
+  onSeeAllClick,
+  close
+}: {
+  onSeeAllClick: VoidFunction;
+  close: VoidFunction;
+}) {
   const { notificationPreviews, markAsRead } = useNotificationPreview();
 
   return (
@@ -20,7 +26,12 @@ export function NotificationPreviewPopover({ onSeeAllClick }: { onSeeAllClick: (
         {notificationPreviews.length > 0 ? (
           notificationPreviews.map((notification) => (
             <>
-              <NotificationPreview key={notification.taskId} notification={notification} markAsRead={markAsRead} />
+              <NotificationPreview
+                key={notification.taskId}
+                notification={notification}
+                markAsRead={markAsRead}
+                onClose={close}
+              />
               <Divider />
             </>
           ))

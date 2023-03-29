@@ -20,15 +20,16 @@ import type { NotificationGroupType } from 'lib/notifications/interfaces';
 type Props = {
   notification: NotificationDetails;
   markAsRead: MarkNotificationAsRead;
+  onClose: VoidFunction;
 };
-export function NotificationPreview({ notification, markAsRead }: Props) {
+export function NotificationPreview({ notification, markAsRead, onClose }: Props) {
   const { groupType, type, spaceName, createdBy, taskId, href, content, title } = notification;
   const theme = useTheme();
 
   const icon = useMemo(() => getIcon(groupType), [groupType]);
 
   return (
-    <Link color='inherit' href={href}>
+    <Link color='inherit' href={href} onClick={onClose}>
       <Box
         sx={{
           '&:hover': {
