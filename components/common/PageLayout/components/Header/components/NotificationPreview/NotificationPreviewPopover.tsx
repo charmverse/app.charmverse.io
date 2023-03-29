@@ -1,3 +1,4 @@
+import CelebrationIcon from '@mui/icons-material/Celebration';
 import { Box, Card, Divider, Typography } from '@mui/material';
 
 import { useNotificationPreview } from 'components/common/PageLayout/components/Header/components/NotificationPreview/useNotificationPreview';
@@ -16,12 +17,21 @@ export function NotificationPreviewPopover({ onSeeAllClick }: { onSeeAllClick: (
       </Card>
       <Divider />
       <Box height={400} sx={{ overflowY: 'auto', overflowX: 'hidden' }}>
-        {notificationPreviews.map((task) => (
-          <>
-            <NotificationPreview key={task.id} task={task} markAsRead={markAsRead} />
-            <Divider />
-          </>
-        ))}
+        {notificationPreviews.length > 0 ? (
+          notificationPreviews.map((task) => (
+            <>
+              <NotificationPreview key={task.id} task={task} markAsRead={markAsRead} />
+              <Divider />
+            </>
+          ))
+        ) : (
+          <Box display='flex' justifyContent='center' alignItems='center' flexDirection='column' height='100%'>
+            <Typography variant='h5' color='secondary'>
+              You are up date!
+            </Typography>
+            <CelebrationIcon color='secondary' fontSize='large' />
+          </Box>
+        )}
       </Box>
       <Card>
         <Box
