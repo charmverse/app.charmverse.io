@@ -97,7 +97,7 @@ class CsvExporter {
         if (template.type === 'number') {
           const numericValue = propertyValue ? Number(propertyValue).toString() : '';
           _row.push(numericValue);
-        } else if (template.type === 'multiSelect') {
+        } else if (template.type === 'multiSelect' || template.type === 'person') {
           const multiSelectValue = (((displayValue as unknown) || []) as string[]).join('|');
           _row.push(multiSelectValue);
         } else {
