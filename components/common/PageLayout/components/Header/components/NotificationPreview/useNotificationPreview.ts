@@ -228,7 +228,7 @@ function getNotificationTitle(groupType: NotificationGroupType) {
     case 'bounties':
       return 'Bounty';
     case 'votes':
-      return 'New Voting';
+      return 'New Poll';
     case 'forum':
       return 'Forum Post';
     case 'proposals':
