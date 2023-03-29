@@ -580,6 +580,7 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
             </Box>
           )}
           {/** End of CharmEditor page specific header content */}
+
           {user && <NotificationButton onSeeAllClick={() => clickToOpenSettingsModal('notifications')} />}
         </Box>
       </Box>

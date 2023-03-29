@@ -1,9 +1,10 @@
+import type { BadgeProps } from '@mui/material';
 import { Badge } from '@mui/material';
 
 import useTasks from 'components/nexus/hooks/useTasks';
 import { useUser } from 'hooks/useUser';
 
-export default function NotificationsBadge({ children }: { children: JSX.Element }) {
+export default function NotificationsBadge({ children, ...badgeProps }: BadgeProps & { children: JSX.Element }) {
   const { user } = useUser();
   const { tasks, gnosisTasks } = useTasks();
 
@@ -28,6 +29,8 @@ export default function NotificationsBadge({ children }: { children: JSX.Element
       color='error'
       anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
       max={99}
+      sx={{ cursor: 'pointer' }}
+      {...badgeProps}
     >
       {children}
     </Badge>
