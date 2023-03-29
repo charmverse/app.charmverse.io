@@ -16,36 +16,12 @@ export function NotificationPreviewPopover({ onSeeAllClick }: { onSeeAllClick: (
       </Card>
       <Divider />
       <Box height={400} sx={{ overflowY: 'auto', overflowX: 'hidden' }}>
-        {notificationPreviews.map((t) => (
+        {notificationPreviews.map((task) => (
           <>
-            <NotificationPreview
-              key={t.id}
-              taskId={t.id}
-              createdAt={t.createdAt}
-              spaceName={t.spaceName}
-              title={t.title}
-              type={t.type}
-              groupType={t.groupType}
-              createdBy={t.createdBy}
-              markAsRead={markAsRead}
-            />
+            <NotificationPreview key={task.id} task={task} taskId={task.id} markAsRead={markAsRead} />
             <Divider />
           </>
         ))}
-        {/* {arr.map((index) => (
-          <>
-            <NotificationPreview
-              key={index}
-              id={index.toString()}
-              createdAt='12/12/2012'
-              spaceName='Space Name WWWWWWWWWWW '
-              title='WWWWWW WWWWWssc vbcvdfgd fgdfg gdfggdfgdd bcbbss '
-              type='Multisig'
-              createdBy={null}
-            />
-            <Divider />
-          </>
-        ))} */}
       </Box>
       <Card>
         <Box

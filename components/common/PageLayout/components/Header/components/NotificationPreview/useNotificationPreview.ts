@@ -3,7 +3,6 @@ import { useCallback, useMemo } from 'react';
 
 import charmClient from 'charmClient';
 import useTasks from 'components/nexus/hooks/useTasks';
-import { BountyTaskAction } from 'lib/bounties/getBountyTasks';
 import type { BountyTask } from 'lib/bounties/getBountyTasks';
 import type { DiscussionTask } from 'lib/discussion/interfaces';
 import type { ForumTask } from 'lib/forums/getForumNotifications/getForumNotifications';
@@ -17,12 +16,10 @@ type MarkAsReadParams = { taskId: string; groupType: NotificationGroupType; type
 export type MarkNotificationAsRead = (params: MarkAsReadParams) => Promise<void>;
 
 export function useNotificationPreview() {
-  const { tasks, gnosisTasks, mutate: mutateTasks } = useTasks();
+  const { tasks, mutate: mutateTasks } = useTasks();
 
-  // @TODOM - verify data, add proper titles, add gnosis notifications
   const notificationPreviews = useMemo(() => {
     if (!tasks) return [];
-
     return [
       ...getNotificationPreviewItems(tasks.votes.unmarked, 'votes'),
       ...getNotificationPreviewItems(tasks.proposals.unmarked, 'proposals'),
@@ -31,6 +28,7 @@ export function useNotificationPreview() {
       ...getNotificationPreviewItems(tasks.forum.unmarked, 'forum')
     ].sort((a, b) => (a.createdAt > b.createdAt ? -1 : 1));
   }, [tasks]);
+
   const markAsRead: MarkNotificationAsRead = useCallback(
     async ({
       taskId,
@@ -83,13 +81,61 @@ function getNotificationPreviewItems(notifications: NotificationPreview[], type:
     createdAt: n.createdAt,
     createdBy: n.createdBy,
     spaceName: n.spaceName,
-    // spaceDomain: n.spaceDomain,
+    spaceDomain: n.spaceDomain,
     groupType: type,
+    path: getNotificationPreviewPath(n),
     title: getNotificationPreviewTitle(n),
-    type: getNotificationPreviewType(n)
+    type: getNotificationPreviewType(type),
+    commentId: getNotificationPreviewCommentId(n),
+    mentionId: getNotificationPreviewMentionId(n),
+    bountyId: getNotificationPreviewBountyId(n),
+    action: getNotificationPreviewAction(n)
   }));
 }
 
+function getNotificationPreviewPath(notification: NotificationPreview) {
+  if ('pagePath' in notification) {
+    return notification.pagePath;
+  }
+
+  if ('postPath' in notification) {
+    return notification.postPath;
+  }
+
+  return null;
+}
+
+function getNotificationPreviewBountyId(notification: NotificationPreview) {
+  if ('bountyId' in notification) {
+    return notification.bountyId;
+  }
+
+  return null;
+}
+
+function getNotificationPreviewAction(notification: NotificationPreview) {
+  if ('action' in notification) {
+    return notification.action;
+  }
+
+  return null;
+}
+
+function getNotificationPreviewMentionId(notification: NotificationPreview) {
+  if ('mentionId' in notification) {
+    return notification.mentionId;
+  }
+
+  return null;
+}
+
+function getNotificationPreviewCommentId(notification: NotificationPreview) {
+  if ('commentId' in notification) {
+    return notification.commentId;
+  }
+
+  return null;
+}
 function getNotificationPreviewTitle(notification: NotificationPreview) {
   if ('postTitle' in notification) {
     return notification.postTitle;
@@ -106,15 +152,20 @@ function getNotificationPreviewTitle(notification: NotificationPreview) {
   return '';
 }
 
-function getNotificationPreviewType(notification: NotificationPreview): NotificationType {
-  // @TODOM - map types
-  if ('text' in notification) {
+function getNotificationPreviewType(groupType: NotificationGroupType): NotificationType {
+  if (groupType === 'discussions') {
     return NotificationType.mention;
   }
-  if ('postPath' in notification) {
+  if (groupType === 'forum') {
     return NotificationType.forum;
   }
-  if ('voteOptions' in notification) {
+  if (groupType === 'proposals') {
+    return NotificationType.proposal;
+  }
+  if (groupType === 'bounties') {
+    return NotificationType.bounty;
+  }
+  if (groupType === 'votes') {
     return NotificationType.vote;
   }
   return NotificationType.forum;

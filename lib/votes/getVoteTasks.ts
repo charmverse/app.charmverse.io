@@ -74,7 +74,9 @@ export async function getVoteTasks(userId: string): Promise<VoteTasksGroup> {
       totalVotes: userVotes.length,
       createdBy: mapNotificationActor(vote.author),
       taskId: vote.id,
-      spaceName: vote.space.name
+      spaceName: vote.space.name,
+      spaceDomain: vote.space.domain,
+      pagePath: vote.page.path
     };
 
     if (markedNotificationIds.has(task.id)) {
