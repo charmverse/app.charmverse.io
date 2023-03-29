@@ -583,7 +583,7 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
           )}
           {/** End of CharmEditor page specific header content */}
           {user && (
-            <NotificationsBadge>
+            <NotificationsBadge onClick={() => clickToOpenSettingsModal('notifications')}>
               <IconButton
                 size={isLargeScreen ? 'small' : 'medium'}
                 onClick={() => clickToOpenSettingsModal('notifications')}
