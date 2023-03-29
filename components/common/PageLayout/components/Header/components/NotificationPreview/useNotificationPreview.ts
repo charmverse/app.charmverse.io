@@ -3,6 +3,7 @@ import { useCallback, useMemo } from 'react';
 
 import charmClient from 'charmClient';
 import useTasks from 'components/nexus/hooks/useTasks';
+import { BountyTaskAction } from 'lib/bounties/getBountyTasks';
 import type { BountyTask } from 'lib/bounties/getBountyTasks';
 import type { DiscussionTask } from 'lib/discussion/interfaces';
 import type { ForumTask } from 'lib/forums/getForumNotifications/getForumNotifications';
@@ -30,7 +31,6 @@ export function useNotificationPreview() {
       ...getNotificationPreviewItems(tasks.forum.unmarked, 'forum')
     ].sort((a, b) => (a.createdAt > b.createdAt ? -1 : 1));
   }, [tasks]);
-
   const markAsRead: MarkNotificationAsRead = useCallback(
     async ({
       taskId,
@@ -83,6 +83,7 @@ function getNotificationPreviewItems(notifications: NotificationPreview[], type:
     createdAt: n.createdAt,
     createdBy: n.createdBy,
     spaceName: n.spaceName,
+    // spaceDomain: n.spaceDomain,
     groupType: type,
     title: getNotificationPreviewTitle(n),
     type: getNotificationPreviewType(n)
@@ -107,6 +108,14 @@ function getNotificationPreviewTitle(notification: NotificationPreview) {
 
 function getNotificationPreviewType(notification: NotificationPreview): NotificationType {
   // @TODOM - map types
-
+  if ('text' in notification) {
+    return NotificationType.mention;
+  }
+  if ('postPath' in notification) {
+    return NotificationType.forum;
+  }
+  if ('voteOptions' in notification) {
+    return NotificationType.vote;
+  }
   return NotificationType.forum;
 }
