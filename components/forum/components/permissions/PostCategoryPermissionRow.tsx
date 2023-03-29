@@ -18,6 +18,7 @@ type Props = {
   assignee: TargetPermissionGroup<'role' | 'space'>;
   existingPermissionId?: string;
   defaultPermissionLevel?: PostCategoryPermissionLevel;
+  isInherited?: boolean;
   label?: string;
   postCategoryId: string;
   canEdit: boolean;
@@ -30,6 +31,7 @@ export function PostCategoryRolePermissionRow({
   existingPermissionId,
   postCategoryId,
   defaultPermissionLevel,
+  isInherited,
   label,
   canEdit,
   updatePermission,

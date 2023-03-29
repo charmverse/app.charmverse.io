@@ -16,6 +16,7 @@ import { proposalCategoryPermissionOptions, permissionsWithRemove } from './shar
 type Props = {
   assignee: TargetPermissionGroup<'role' | 'space'>;
   existingPermissionId?: string;
+  isInherited?: boolean;
   label?: string;
   defaultPermissionLevel?: ProposalCategoryPermissionLevel;
   proposalCategoryId: string;
@@ -27,6 +28,7 @@ type Props = {
 export function ProposalCategoryRolePermissionRow({
   assignee,
   existingPermissionId,
+  isInherited,
   proposalCategoryId,
   defaultPermissionLevel,
   canEdit,

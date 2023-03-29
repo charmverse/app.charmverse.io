@@ -13,7 +13,7 @@ import Button from 'components/common/Button';
 import { PostCategoryRolePermissionRow } from 'components/forum/components/permissions/PostCategoryPermissionRow';
 import { ProposalCategoryRolePermissionRow } from 'components/proposals/components/permissions/ProposalCategoryPermissionRow';
 import { useProposalCategories } from 'components/proposals/hooks/useProposalCategories';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useCurrentSpaceId } from 'hooks/useCurrentSpaceId';
 import { useForumCategories } from 'hooks/useForumCategories';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { usePreventReload } from 'hooks/usePreventReload';
@@ -56,11 +56,22 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
     () => charmClient.permissions.proposals.listGroupProposalCategoryPermissions({ group: targetGroup, id })
   );
   const { data: postCategoryPermissions, mutate: mutatePostCategoryPermissions } = useSWR(
-    `/proposals/list-group-post-category-permissions-${id}`,
+    `/posts/list-group-post-category-permissions-${id}`,
     () => charmClient.permissions.forum.listGroupPostCategoryPermissions({ group: targetGroup, id })
   );
+  const { currentSpaceId } = useCurrentSpaceId();
+  // retriee space-level permissions to display as default
+  const { data: spaceProposalCategoryPermissions } = useSWR(
+    currentSpaceId &&
+      targetGroup !== 'space' &&
+      `/proposals/list-group-proposal-category-permissions-${currentSpaceId}`,
+    () => charmClient.permissions.proposals.listGroupProposalCategoryPermissions({ group: 'space', id: currentSpaceId })
+  );
+  const { data: spacePostCategoryPermissions } = useSWR(
+    currentSpaceId && targetGroup !== 'space' && `/posts/list-group-post-category-permissions-${currentSpaceId}`,
+    () => charmClient.permissions.forum.listGroupPostCategoryPermissions({ group: 'space', id: currentSpaceId })
+  );
 
-  const space = useCurrentSpace();
   const { categories: proposalCategories = [] } = useProposalCategories();
   const { categories: forumCategories = [] } = useForumCategories();
 
@@ -74,22 +85,22 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
   });
 
   const { data: memberPermissionFlags } = useSWR(
-    targetGroup !== 'space' && space ? `member-permissions-${space.id}` : null,
+    targetGroup !== 'space' && currentSpaceId ? `member-permissions-${currentSpaceId}` : null,
     () =>
       charmClient.queryGroupSpacePermissions({
         group: 'space',
-        id: space?.id as string,
-        resourceId: space?.id as string
+        id: currentSpaceId,
+        resourceId: currentSpaceId
       })
   );
 
   usePreventReload(touched);
 
   useEffect(() => {
-    if (space) {
-      refreshGroupPermissions(space.id);
+    if (currentSpaceId) {
+      refreshGroupPermissions(currentSpaceId);
     }
-  }, [space]);
+  }, [currentSpaceId]);
 
   async function refreshGroupPermissions(resourceId: string) {
     const permissionFlags = await charmClient.queryGroupSpacePermissions({
@@ -105,7 +116,7 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
 
   async function submitted(formValues: FormValues) {
     // Make sure we have existing permission set to compare against
-    if (assignedPermissions && space) {
+    if (assignedPermissions && currentSpaceId) {
       const permissionsToAdd: SpaceOperation[] = [];
       const permissionsToRemove: SpaceOperation[] = [];
 
@@ -124,7 +135,7 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
 
       if (permissionsToAdd.length > 0) {
         newPermissionState = await charmClient.addSpacePermissions({
-          forSpaceId: space.id,
+          forSpaceId: currentSpaceId,
           operations: permissionsToAdd,
           spaceId: targetGroup === 'space' ? id : undefined,
           roleId: targetGroup === 'role' ? id : undefined
@@ -133,7 +144,7 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
 
       if (permissionsToRemove.length > 0) {
         newPermissionState = await charmClient.removeSpacePermissions({
-          forSpaceId: space.id,
+          forSpaceId: currentSpaceId,
           operations: permissionsToRemove,
           spaceId: targetGroup === 'space' ? id : undefined,
           roleId: targetGroup === 'role' ? id : undefined
@@ -145,7 +156,7 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
       setTouched(false);
       // update the cache of other rows
       if (targetGroup === 'space') {
-        mutate(`member-permissions-${space.id}`);
+        mutate(`member-permissions-${currentSpaceId}`);
       }
     }
   }
@@ -228,6 +239,9 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
               <Box flexGrow={1}>
                 {proposalCategories.map((category) => {
                   const permission = proposalCategoryPermissions?.find((p) => p.proposalCategoryId === category.id);
+                  const memberRolePermission = spaceProposalCategoryPermissions?.find(
+                    (p) => p.proposalCategoryId === category.id
+                  );
                   return (
                     <ProposalCategoryRolePermissionRow
                       key={category.id}
@@ -237,7 +251,8 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
                       updatePermission={updateProposalCategoryPermission}
                       proposalCategoryId={category.id}
                       existingPermissionId={permission?.id}
-                      defaultPermissionLevel={permission?.permissionLevel}
+                      defaultPermissionLevel={memberRolePermission?.permissionLevel || permission?.permissionLevel}
+                      isInherited={memberRolePermission && !permission}
                       assignee={{ group: targetGroup, id }}
                     />
                   );
@@ -268,6 +283,10 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
                   <Box flexGrow={1}>
                     {forumCategories.map((category) => {
                       const permission = postCategoryPermissions?.find((p) => p.postCategoryId === category.id);
+                      const memberRolePermission = spacePostCategoryPermissions?.find(
+                        (p) => p.postCategoryId === category.id
+                      );
+
                       return (
                         <PostCategoryRolePermissionRow
                           key={category.id}
@@ -277,7 +296,8 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
                           updatePermission={updatePostCategoryPermission}
                           postCategoryId={category.id}
                           existingPermissionId={permission?.id}
-                          defaultPermissionLevel={permission?.permissionLevel}
+                          defaultPermissionLevel={memberRolePermission?.permissionLevel || permission?.permissionLevel}
+                          isInherited={memberRolePermission && !permission}
                           assignee={{ group: targetGroup, id }}
                         />
                       );
