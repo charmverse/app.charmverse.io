@@ -156,10 +156,15 @@ export function NotificationPreview({ task, markAsRead, taskId }: Props) {
         p={2}
       >
         <Box display='flex' justifyContent='space-between' width='100%'>
-          <Box>
+          <Box overflow='hidden'>
             <Box display='flex'>
-              <Typography whiteSpace='nowrap' textOverflow='ellipsis'>{`${spaceName}`}</Typography>&nbsp;
-              <Typography whiteSpace='nowrap'>{taskTitle(groupType)}</Typography>
+              <Box minWidth={0}>
+                <Typography whiteSpace='nowrap' overflow='auto' textOverflow='ellipsis'>{`${spaceName}`}</Typography>
+              </Box>
+              &nbsp;
+              <Box whiteSpace='nowrap'>
+                <Typography>{taskTitle(groupType)}</Typography>
+              </Box>
             </Box>
             <Box width='100%' display='flex' alignItems='center' mt={1} justifyContent='space-between'>
               <Box display='flex' alignItems='center' mr={2}>
