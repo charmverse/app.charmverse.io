@@ -28,7 +28,12 @@ describe('getProposalTasksFromWorkspaceEvents', () => {
     const authoredDraftProposal = await generateProposal({
       authors: [user1.id],
       proposalStatus: 'draft',
-      reviewers: [],
+      reviewers: [
+        {
+          group: 'user',
+          id: user1.id
+        }
+      ],
       spaceId: space.id,
       userId: user1.id
     });
@@ -80,7 +85,12 @@ describe('getProposalTasksFromWorkspaceEvents', () => {
     const authoredStartReviewProposal = await generateProposal({
       authors: [user1.id],
       proposalStatus: 'draft',
-      reviewers: [],
+      reviewers: [
+        {
+          group: 'user',
+          id: user1.id
+        }
+      ],
       spaceId: space.id,
       userId: user1.id
     });
@@ -97,7 +107,12 @@ describe('getProposalTasksFromWorkspaceEvents', () => {
     const discussedProposal = await generateProposal({
       authors: [user2.id],
       proposalStatus: 'draft',
-      reviewers: [],
+      reviewers: [
+        {
+          group: 'user',
+          id: user1.id
+        }
+      ],
       spaceId: space.id,
       userId: user2.id
     });

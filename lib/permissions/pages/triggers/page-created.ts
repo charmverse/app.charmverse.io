@@ -12,73 +12,65 @@ import { upsertPermission } from '../actions/upsert-permission';
 export async function setupPermissionsAfterPageCreated(pageId: string): Promise<IPageWithPermissions> {
   // connect to page node from use pages (Removing iPageWithPermissions)
   return prisma.$transaction(async (tx) => {
-    const page = await getPage(pageId, undefined, tx);
-
+    const page = await tx.page.findUnique({
+      where: {
+        id: pageId
+      },
+      select: {
+        id: true,
+        parentId: true,
+        spaceId: true,
+        createdBy: true
+      }
+    });
     if (!page) {
       throw new PageNotFoundError(pageId);
     }
 
     // This is a root page, so we can go ahead
     if (!page.parentId) {
-      // Space id could be null
-      if (page.spaceId) {
-        const space = (await tx.space.findUnique({
-          where: {
-            id: page.spaceId
-          },
-          select: {
-            defaultPagePermissionGroup: true,
-            defaultPublicPages: true
-          }
-        })) as Space;
-        if (space?.defaultPagePermissionGroup) {
-          // Pass tx here for writes
-          await upsertPermission(
-            pageId,
-            {
-              permissionLevel: space.defaultPagePermissionGroup,
-              spaceId: page.spaceId
-            },
-            undefined,
-            tx
-          );
-        } else {
-          await upsertPermission(
-            pageId,
-            {
-              permissionLevel: 'full_access',
-              spaceId: page.spaceId
-            },
-            undefined,
-            tx
-          );
+      const space = await tx.space.findUnique({
+        where: {
+          id: page.spaceId
+        },
+        select: {
+          defaultPagePermissionGroup: true,
+          defaultPublicPages: true
         }
+      });
 
-        if (space.defaultPublicPages) {
-          await upsertPermission(
-            pageId,
-            {
-              permissionLevel: 'view',
-              public: true
-            },
-            undefined,
-            tx
-          );
-        }
-      } else {
+      const permissionLevel = space?.defaultPagePermissionGroup || 'full_access';
+
+      await upsertPermission(
+        pageId,
+        {
+          permissionLevel,
+          spaceId: page.spaceId
+        },
+        undefined,
+        tx
+      );
+
+      if (space?.defaultPublicPages) {
         await upsertPermission(
           pageId,
           {
-            permissionLevel: 'full_access',
-            spaceId: page.spaceId
+            permissionLevel: 'view',
+            public: true
           },
           undefined,
-
           tx
         );
       }
     } else {
-      const parent = (await getPage(page.parentId, undefined, tx)) as IPageWithPermissions;
+      const parent = await prisma.page.findUnique({
+        where: {
+          id: page.parentId
+        },
+        select: {
+          id: true
+        }
+      });
 
       if (!parent) {
         await tx.page.update({
