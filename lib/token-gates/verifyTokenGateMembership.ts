@@ -1,6 +1,8 @@
 import type { Role, SpaceRoleToRole, TokenGate, TokenGateToRole, UserTokenGate } from '@prisma/client';
 import * as lit from 'lit-js-sdk';
 
+import { prisma } from 'db';
+
 type TokenGateWithRoles = {
   tokenGate:
     | (TokenGate & {
@@ -76,15 +78,14 @@ export async function verifyTokenGateMembership({
 
   // All token gates are invalid and user did not join via invite link soo he should be removed from space
   if (invalidTokenGates.length === userTokenGates.length && canBeRemovedFromSpace) {
-    // TEMP - run in test mode
-    // await prisma.spaceRole.delete({
-    //   where: {
-    //     spaceUser: {
-    //       userId,
-    //       spaceId
-    //     }
-    //   }
-    // });
+    await prisma.spaceRole.delete({
+      where: {
+        spaceUser: {
+          userId,
+          spaceId
+        }
+      }
+    });
 
     return { verified: false, removedRoles: 0 };
   }
@@ -93,12 +94,11 @@ export async function verifyTokenGateMembership({
 }
 
 async function removeUserRoles(spaceRoleToRoleIds: string[]) {
-  // TEMP - run in test mode
-  // return prisma.spaceRoleToRole.deleteMany({
-  //   where: {
-  //     id: {
-  //       in: spaceRoleToRoleIds
-  //     }
-  //   }
-  // });
+  return prisma.spaceRoleToRole.deleteMany({
+    where: {
+      id: {
+        in: spaceRoleToRoleIds
+      }
+    }
+  });
 }
