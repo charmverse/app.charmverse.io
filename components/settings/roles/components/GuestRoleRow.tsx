@@ -3,8 +3,13 @@ import { useMembers } from 'hooks/useMembers';
 import { RoleRowBase } from './RoleRowBase';
 
 export function GuestRoleRow({ readOnly }: { readOnly: boolean }) {
-  const { guests } = useMembers();
+  const { guests, members, makeGuest } = useMembers();
 
+  // there must always be at least one admin
+  const includeAdmins = members.filter((member) => !member.isBot && member.isAdmin).length > 1;
+  const eligibleMembers = members.filter(
+    (member) => !member.isBot && (includeAdmins || !member.isAdmin) && !member.isGuest
+  );
   return (
     <RoleRowBase
       title='Guest'
@@ -17,7 +22,8 @@ export function GuestRoleRow({ readOnly }: { readOnly: boolean }) {
       }
       readOnlyMembers={readOnly}
       members={guests}
-      eligibleMembers={[]}
+      eligibleMembers={eligibleMembers}
+      onAddMembers={!readOnly ? makeGuest : undefined}
     />
   );
 }

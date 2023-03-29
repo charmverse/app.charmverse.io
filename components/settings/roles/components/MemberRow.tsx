@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
 import { MoreHoriz } from '@mui/icons-material';
 import CheckIcon from '@mui/icons-material/Check';
-import { Box, IconButton, ListItemIcon, Menu, MenuItem, Typography } from '@mui/material';
+import { Box, IconButton, ListItemIcon, Menu, MenuItem, Tooltip, Typography } from '@mui/material';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import { useState } from 'react';
 
@@ -12,6 +12,8 @@ import { StyledListItemText } from 'components/common/StyledListItemText';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMembers } from 'hooks/useMembers';
 import { useRoles } from 'hooks/useRoles';
+import { useSnackbar } from 'hooks/useSnackbar';
+import log from 'lib/log';
 import type { Member } from 'lib/members/interfaces';
 import { hasNftAvatar } from 'lib/users/hasNftAvatar';
 
@@ -67,6 +69,7 @@ function MemberActions({
   readOnly: boolean;
 }) {
   const space = useCurrentSpace();
+  const { showMessage } = useSnackbar();
   const { unassignRole } = useRoles();
   const { makeAdmin, makeGuest, makeMember, members, removeFromSpace } = useMembers();
   const popupState = usePopupState({ variant: 'popover', popupId: 'user-role' });
@@ -84,42 +87,52 @@ function MemberActions({
   const spaceOwner = space?.createdBy;
   const totalAdmins = members.filter((m) => m.isAdmin).length;
 
-  function removeFromSpaceHandler() {
+  async function removeFromSpaceHandler() {
     if (!removedMember) {
       return;
     }
 
-    removeFromSpace(removedMember.id);
+    try {
+      await removeFromSpace(removedMember.id);
+    } catch (error) {
+      log.warn('Error removing member', { error });
+      showMessage((error as Error).message || 'Something went wrong', 'error');
+    }
     deletePopupState.close();
   }
 
   async function handleMenuItemClick(action: RoleAction) {
-    if (!space) {
-      throw new Error('Space not found');
+    try {
+      if (!space) {
+        throw new Error('Space not found');
+      }
+
+      switch (action) {
+        case 'makeAdmin':
+          await makeAdmin([member.id]);
+          break;
+
+        case 'makeMember':
+          await makeMember([member.id]);
+          break;
+
+        case 'makeGuest':
+          await makeGuest([member.id]);
+          break;
+
+        case 'removeFromSpace':
+          setRemovedMemberId(member.id);
+          deletePopupState.open();
+          break;
+
+        default:
+          throw new Error('Unknown action');
+      }
+      popupState.close();
+    } catch (error) {
+      log.warn('Error updating member role', { error });
+      showMessage((error as Error).message || 'Something went wrong', 'error');
     }
-
-    switch (action) {
-      case 'makeAdmin':
-        await makeAdmin([member.id]);
-        break;
-
-      case 'makeMember':
-        await makeMember([member.id]);
-        break;
-
-      case 'makeGuest':
-        await makeGuest([member.id]);
-        break;
-
-      case 'removeFromSpace':
-        setRemovedMemberId(member.id);
-        deletePopupState.open();
-        break;
-
-      default:
-        throw new Error('Unknown action');
-    }
-    popupState.close();
   }
   const actions = roleActions.filter((action) => {
     switch (action) {
@@ -173,40 +186,49 @@ function MemberActions({
           sx: { width: 300 }
         }}
       >
-        {actions.map((action) => (
-          <MenuItem
-            key={action}
-            onClick={() => handleMenuItemClick(action)}
-            disabled={(action === 'makeGuest' || action === 'makeMember') && member.isAdmin && totalAdmins === 1}
-          >
-            {action === 'makeAdmin' && (
-              <StyledListItemText
-                primary='Admin'
-                secondary='Can access all settings and invite new members to the space'
-              />
-            )}
-            {action === 'makeMember' && (
-              <StyledListItemText
-                primary='Member'
-                secondary='Cannot change space settings or invite new members to the space'
-              />
-            )}
-            {action === 'makeGuest' && (
-              <StyledListItemText primary='Guest' secondary='Can only access specific pages' />
-            )}
-            {action === 'removeFromSpace' && (
-              <StyledListItemText
-                primaryTypographyProps={{ fontWeight: 500, color: 'error' }}
-                primary='Remove from team'
-              />
-            )}
-            {action === activeRoleAction && (
-              <ListItemIcon>
-                <CheckIcon fontSize='small' />
-              </ListItemIcon>
-            )}
-          </MenuItem>
-        ))}
+        {actions.map((action) => {
+          const disabled = action !== 'makeAdmin' && member.isAdmin && totalAdmins === 1;
+          return (
+            <Tooltip
+              key={action}
+              title={disabled ? 'You must add at least one more admin before removing this one' : ''}
+            >
+              <span>
+                <MenuItem
+                  onClick={() => handleMenuItemClick(action)}
+                  disabled={action !== 'makeAdmin' && member.isAdmin && totalAdmins === 1}
+                >
+                  {action === 'makeAdmin' && (
+                    <StyledListItemText
+                      primary='Admin'
+                      secondary='Can access all settings and invite new members to the space'
+                    />
+                  )}
+                  {action === 'makeMember' && (
+                    <StyledListItemText
+                      primary='Member'
+                      secondary='Cannot change space settings or invite new members to the space'
+                    />
+                  )}
+                  {action === 'makeGuest' && (
+                    <StyledListItemText primary='Guest' secondary='Can only access specific pages' />
+                  )}
+                  {action === 'removeFromSpace' && (
+                    <StyledListItemText
+                      primaryTypographyProps={{ fontWeight: 500, color: 'error' }}
+                      primary='Remove from team'
+                    />
+                  )}
+                  {action === activeRoleAction && (
+                    <ListItemIcon>
+                      <CheckIcon fontSize='small' />
+                    </ListItemIcon>
+                  )}
+                </MenuItem>
+              </span>
+            </Tooltip>
+          );
+        })}
       </Menu>
     </>
   );

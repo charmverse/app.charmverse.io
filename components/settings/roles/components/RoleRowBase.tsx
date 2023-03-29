@@ -21,6 +21,8 @@ import type { ReactNode } from 'react';
 import Button from 'components/common/Button';
 import { InputSearchMemberMultiple } from 'components/common/form/InputSearchMember';
 import Modal from 'components/common/Modal';
+import { useSnackbar } from 'hooks/useSnackbar';
+import log from 'lib/log';
 import type { Member } from 'lib/members/interfaces';
 
 import { MemberRow } from './MemberRow';
@@ -91,11 +93,7 @@ export function RoleRowBase({
               </Typography>
             )}
             {onAddMembers && (
-              <AddMembersButton
-                memberIds={members.map((m) => m.id)}
-                eligibleMemberIds={eligibleMembers.map((m) => m.id)}
-                onAddMembers={onAddMembers}
-              />
+              <AddMembersButton eligibleMemberIds={eligibleMembers.map((m) => m.id)} onAddMembers={onAddMembers} />
             )}
           </TabPanel>
           <TabPanel value={openTab} index={1}>
@@ -132,12 +130,12 @@ function TabPanel(props: TabPanelProps) {
 
 type ButtonProps = {
   onAddMembers: (memberIds: string[]) => Promise<void>;
-  memberIds: string[];
   eligibleMemberIds: string[];
 };
 
-function AddMembersButton({ onAddMembers, memberIds, eligibleMemberIds }: ButtonProps) {
+function AddMembersButton({ onAddMembers, eligibleMemberIds }: ButtonProps) {
   const [newMembers, setNewMembers] = useState<string[]>([]);
+  const { showMessage } = useSnackbar();
 
   const userPopupState = usePopupState({ variant: 'popover', popupId: `add-members-input` });
   function showMembersPopup() {
@@ -149,7 +147,12 @@ function AddMembersButton({ onAddMembers, memberIds, eligibleMemberIds }: Button
     setNewMembers(ids);
   }
   async function addMembers() {
-    await onAddMembers(newMembers);
+    try {
+      await onAddMembers(newMembers);
+    } catch (error) {
+      log.warn('Error adding member to role', { error });
+      showMessage((error as Error).message || 'Something went wrong', 'error');
+    }
     userPopupState.close();
   }
 
