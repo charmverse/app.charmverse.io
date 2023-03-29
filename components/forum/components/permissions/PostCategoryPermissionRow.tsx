@@ -18,6 +18,7 @@ type Props = {
   assignee: TargetPermissionGroup<'role' | 'space'>;
   existingPermissionId?: string;
   defaultPermissionLevel?: PostCategoryPermissionLevel;
+  label?: string;
   postCategoryId: string;
   canEdit: boolean;
   updatePermission: (newPermission: PostCategoryPermissionInput) => void;
@@ -29,6 +30,7 @@ export function PostCategoryRolePermissionRow({
   existingPermissionId,
   postCategoryId,
   defaultPermissionLevel,
+  label,
   canEdit,
   updatePermission,
   deletePermission
@@ -52,7 +54,7 @@ export function PostCategoryRolePermissionRow({
 
   return (
     <Box display='flex' justifyContent='space-between' alignItems='center'>
-      <Typography variant='body2'>{assigneeName}</Typography>
+      <Typography variant='body2'>{label || assigneeName}</Typography>
       <div style={{ width: '120px', textAlign: 'left' }}>
         {canEdit ? (
           <SmallSelect
