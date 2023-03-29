@@ -18,7 +18,7 @@ export function NotificationPreviewPopover({ onSeeAllClick }: { onSeeAllClick: (
       <Box height={400} sx={{ overflowY: 'auto', overflowX: 'hidden' }}>
         {notificationPreviews.map((task) => (
           <>
-            <NotificationPreview key={task.id} task={task} taskId={task.id} markAsRead={markAsRead} />
+            <NotificationPreview key={task.id} task={task} markAsRead={markAsRead} />
             <Divider />
           </>
         ))}

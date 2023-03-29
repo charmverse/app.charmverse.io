@@ -29,14 +29,14 @@ type TaskProps = {
   mentionId: string | null;
   bountyId: string | null;
   action: string | null;
+  id: string;
 };
 
 type Props = {
   task: TaskProps;
   markAsRead: MarkNotificationAsRead;
-  taskId: string;
 };
-export function NotificationPreview({ task, markAsRead, taskId }: Props) {
+export function NotificationPreview({ task, markAsRead }: Props) {
   const {
     groupType,
     spaceDomain,
@@ -49,7 +49,8 @@ export function NotificationPreview({ task, markAsRead, taskId }: Props) {
     createdAt,
     createdBy,
     title,
-    action
+    action,
+    id: taskId
   } = task;
 
   const theme = useTheme();
@@ -103,6 +104,9 @@ export function NotificationPreview({ task, markAsRead, taskId }: Props) {
     if (action === 'application_approved') {
       return `You application for ${title} bounty is approved.`;
     }
+    if (groupType === 'forum' && !!commentId) {
+      return createdBy?.username ? `${createdBy?.username} left a comment on ${title}.` : `New comment on ${title}.`;
+    }
     if (groupType === 'discussions') {
       return `${createdBy?.username} left a comment in ${spaceName}.`;
     }
@@ -118,7 +122,7 @@ export function NotificationPreview({ task, markAsRead, taskId }: Props) {
     if (groupType === 'forum') {
       return createdBy?.username
         ? `${createdBy?.username} created "${title}" post on forum.`
-        : `Forum post "${title}" creaed.`;
+        : `New forum post "${title}"`;
     }
   };
   const icon = (taskType: string) => {
