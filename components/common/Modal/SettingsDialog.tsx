@@ -12,7 +12,6 @@ import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import type { Space } from '@prisma/client';
 import type { ReactNode } from 'react';
-import { useEffect } from 'react';
 
 import Button from 'components/common/Button';
 import { StyledTreeItem } from 'components/common/PageLayout/components/PageNavigation/components/PageTreeItem';
@@ -26,12 +25,8 @@ import Invites from 'components/settings/invites/Invites';
 import { RoleSettings } from 'components/settings/roles/RoleSettings';
 import SpaceSettings from 'components/settings/workspace/Space';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { CurrentSpaceProvider, useCurrentSpaceId } from 'hooks/useCurrentSpaceId';
 import { useSmallScreen } from 'hooks/useMediaScreens';
-import { MembersProvider } from 'hooks/useMembers';
 import { useSettingsDialog } from 'hooks/useSettingsDialog';
-import { useSpaceFromPath } from 'hooks/useSpaceFromPath';
-import { useSpaces } from 'hooks/useSpaces';
 
 import { SectionName } from '../PageLayout/components/Sidebar/Sidebar';
 import { SidebarLink } from '../PageLayout/components/Sidebar/SidebarButton';
@@ -97,25 +92,11 @@ function TabPanel(props: TabPanelProps) {
   );
 }
 
-function SpaceSettingsModalComponent() {
-  const { setCurrentSpaceId } = useCurrentSpaceId();
-  const { memberSpaces } = useSpaces();
+export function SpaceSettingsDialog() {
   const currentSpace = useCurrentSpace();
 
   const isMobile = useSmallScreen();
   const { activePath, onClose, onClick, open } = useSettingsDialog();
-
-  // This is only ever used for setting the current space as the target space, on the initial popup of the dialog
-  const spaceByPath = useSpaceFromPath();
-  useEffect(() => {
-    if (spaceByPath) {
-      if (memberSpaces.some((s) => s.id === spaceByPath.id)) {
-        setCurrentSpaceId(spaceByPath.id);
-      } else if (open) {
-        onClick('account');
-      }
-    }
-  }, [spaceByPath]);
 
   return (
     <Dialog
@@ -149,7 +130,7 @@ function SpaceSettingsModalComponent() {
               active={activePath === tab.path}
             />
           ))}
-          {memberSpaces.length > 0 && (
+          {currentSpace && (
             <Box mt={2} py={0.5}>
               <SectionName>Space settings</SectionName>
             </Box>
@@ -167,37 +148,30 @@ function SpaceSettingsModalComponent() {
               '& .MuiTreeItem-root[aria-expanded] > .MuiTreeItem-content': { py: 1 }
             }}
           >
-            {memberSpaces.map((space) => (
+            {currentSpace && (
               <StyledTreeItem
-                data-test={`space-settings-tab-${space.id}`}
-                key={space.id}
-                onClick={() => {
-                  setCurrentSpaceId(space.id);
-                  onClick(`${space.name}-space`);
-                }}
-                nodeId={space.name}
+                data-test={`space-settings-tab-${currentSpace.id}`}
+                key={currentSpace.id}
+                nodeId={currentSpace.name}
                 label={
                   <Box display='flex' alignItems='center' gap={1}>
-                    <WorkspaceAvatar name={space.name} image={space.spaceImage} />
-                    <Typography noWrap>{space.name}</Typography>
+                    <WorkspaceAvatar name={currentSpace.name} image={currentSpace.spaceImage} />
+                    <Typography noWrap>{currentSpace.name}</Typography>
                   </Box>
                 }
               >
                 {SETTINGS_TABS.map((tab) => (
                   <SpaceSettingsLink
-                    data-test={`space-settings-tab-${space.id}-${tab.path}`}
+                    data-test={`space-settings-tab-${currentSpace.id}-${tab.path}`}
                     key={tab.path}
                     label={tab.label}
                     icon={tab.icon}
-                    onClick={() => {
-                      setCurrentSpaceId(space.id);
-                      onClick(`${space.name}-${tab.path}`);
-                    }}
-                    active={activePath === `${space.name}-${tab.path}`}
+                    onClick={() => onClick(`${currentSpace.name}-${tab.path}`)}
+                    active={activePath === `${currentSpace.name}-${tab.path}`}
                   />
                 ))}
               </StyledTreeItem>
-            ))}
+            )}
           </TreeView>
         </Box>
         <Box flex='1 1 auto' position='relative' overflow='auto'>
@@ -218,13 +192,16 @@ function SpaceSettingsModalComponent() {
               </IconButton>
             </Box>
           )}
-          {memberSpaces.map((space) =>
+          {currentSpace &&
             SETTINGS_TABS.map((tab) => (
-              <TabPanel key={`${space.name}-${tab.path}`} value={activePath} index={`${space.name}-${tab.path}`}>
-                <TabView space={space} tab={tab} />
+              <TabPanel
+                key={`${currentSpace.name}-${tab.path}`}
+                value={activePath}
+                index={`${currentSpace.name}-${tab.path}`}
+              >
+                <TabView space={currentSpace} tab={tab} />
               </TabPanel>
-            ))
-          )}
+            ))}
           {ACCOUNT_TABS.map((tab) => (
             <TabPanel key={tab.path} value={activePath} index={tab.path}>
               <TabView tab={tab} />
@@ -262,14 +239,5 @@ function SpaceSettingsModalComponent() {
         )}
       </Box>
     </Dialog>
-  );
-}
-export function SpaceSettingsDialog() {
-  return (
-    <CurrentSpaceProvider>
-      <MembersProvider>
-        <SpaceSettingsModalComponent />
-      </MembersProvider>
-    </CurrentSpaceProvider>
   );
 }
