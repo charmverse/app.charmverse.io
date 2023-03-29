@@ -40,25 +40,34 @@ export function NotificationPreview({ notification, markAsRead }: Props) {
         alignItems='center'
         justifyContent='space-between'
         gap={2}
-        p={2}
+        pl={2}
+        pr={1}
+        py={1}
       >
         <Box display='flex' justifyContent='space-between' width='100%'>
           <Box overflow='hidden'>
             <Box display='flex'>
               <Box minWidth={0}>
-                <Typography whiteSpace='nowrap' overflow='auto' textOverflow='ellipsis'>{`${spaceName}`}</Typography>
+                <Typography
+                  whiteSpace='nowrap'
+                  overflow='auto'
+                  textOverflow='ellipsis'
+                  variant='subtitle2'
+                >{`${spaceName}`}</Typography>
               </Box>
               &nbsp;
               <Box whiteSpace='nowrap'>
-                <Typography>{title}</Typography>
+                <Typography variant='subtitle2' fontWeight='bold'>
+                  {title}
+                </Typography>
               </Box>
             </Box>
-            <Box width='100%' display='flex' alignItems='center' mt={1} justifyContent='space-between'>
+            <Box width='100%' display='flex' alignItems='center' mt={0.5} justifyContent='space-between'>
               <Box display='flex' alignItems='center' mr={2}>
                 {createdBy ? <Avatar size='small' name={createdBy?.username} avatar={createdBy?.avatar} /> : icon}
               </Box>
               <Box width='100%'>
-                <Typography>{content}</Typography>
+                <Typography variant='subtitle1'>{content}</Typography>
               </Box>
             </Box>
           </Box>
