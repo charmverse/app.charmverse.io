@@ -1,20 +1,20 @@
-import type { Prisma } from '@prisma/client';
-
 import { prisma } from 'db';
 import { getAccessibleMemberPropertiesBySpace } from 'lib/members/getAccessibleMemberPropertiesBySpace';
+import { getSpaceMemberSearchParams } from 'lib/members/getSpaceMemberSearchParams';
 import type { Member } from 'lib/members/interfaces';
 import { getPropertiesWithValues } from 'lib/members/utils';
 import { hasNftAvatar } from 'lib/users/hasNftAvatar';
 
 export async function getSpaceMembers({
-  whereOr = [],
   requestingUserId,
-  spaceId
+  spaceId,
+  search
 }: {
-  whereOr?: Prisma.SpaceRoleWhereInput[];
   requestingUserId?: string;
   spaceId: string;
+  search?: string;
 }) {
+  const whereOr = getSpaceMemberSearchParams(search || '');
   const visibleProperties = await getAccessibleMemberPropertiesBySpace({ requestingUserId, spaceId });
 
   const spaceRoles = await prisma.spaceRole.findMany({
