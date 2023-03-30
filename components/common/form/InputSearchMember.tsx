@@ -120,17 +120,17 @@ interface IInputSearchMemberProps {
 }
 
 export function InputSearchMember({ defaultValue, onChange, onClear, openOnFocus, ...props }: IInputSearchMemberProps) {
-  const { members } = useMembers();
+  const { getMemberById, members } = useMembers();
   const [value, setValue] = useState<Member | null>(null);
 
   useEffect(() => {
     if (defaultValue && !value) {
-      const member = members.find((c) => c.id === defaultValue);
+      const member = getMemberById(defaultValue);
       if (member) {
         setValue(member);
       }
     }
-  }, [defaultValue, members]);
+  }, [defaultValue, getMemberById]);
 
   function emitValue(selectedUser: Member) {
     if (selectedUser) {

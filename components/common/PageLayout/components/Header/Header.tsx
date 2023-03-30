@@ -160,7 +160,7 @@ function PostHeader({
   undoEditorChanges: VoidFunction;
 }) {
   const { showMessage } = useSnackbar();
-  const { members } = useMembers();
+  const { getMemberById, members } = useMembers();
 
   const router = useRouter();
 
@@ -169,7 +169,7 @@ function PostHeader({
 
   const canCreateProposal = proposalCategoriesWithCreateAllowed.length > 0;
 
-  const postCreator = members.find((member) => member.id === forumPostInfo.forumPost?.createdBy);
+  const postCreator = getMemberById(forumPostInfo.forumPost?.createdBy);
 
   function deletePost() {
     if (forumPostInfo.forumPost) {

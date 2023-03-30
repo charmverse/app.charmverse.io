@@ -12,12 +12,12 @@ import { useThreads } from './useThreads';
 export function useInlineComment() {
   const view = useEditorViewContext();
   const { pages } = usePages();
-  const { members } = useMembers();
+  const { getMemberById } = useMembers();
   const { threads } = useThreads();
 
   return {
     extractTextFromSelection() {
-      return extractTextFromSelection(view, members, pages);
+      return extractTextFromSelection(view, getMemberById, pages);
     },
     findTotalInlineComments(node: Node, keepResolved?: boolean) {
       return findTotalInlineComments(view.state.schema, node, threads, keepResolved);

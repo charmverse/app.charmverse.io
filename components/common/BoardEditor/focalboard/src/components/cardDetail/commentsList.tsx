@@ -23,7 +23,7 @@ type Props = {
 
 const CommentsList = React.memo((props: Props) => {
   const { user } = useUser();
-  const { members } = useMembers();
+  const { getMemberById } = useMembers();
   const [editorKey, setEditorKey] = useState(0); // a key to allow us to reset charmeditor contents
 
   const onSendClicked = (newComment: CommentBlock['fields']) => {
@@ -64,7 +64,7 @@ const CommentsList = React.memo((props: Props) => {
           <Comment
             key={comment.id}
             comment={comment}
-            member={members.find((_member) => _member.id === comment.createdBy)}
+            member={getMemberById(comment.createdBy)}
             readOnly={props.readOnly}
           />
         ))}

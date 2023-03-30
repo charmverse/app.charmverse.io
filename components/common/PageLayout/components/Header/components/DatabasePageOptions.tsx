@@ -62,7 +62,6 @@ export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: 
 
   const activeBoardId = view?.fields.sourceData?.boardId ?? view?.fields.linkedSourceId ?? view?.rootId;
   const board = boards.find((b) => b.id === activeBoardId);
-  const lastUpdatedBy = members.find((member) => member.id === board?.createdBy);
   const boardPage = pages[pageId];
 
   function undoChanges() {
