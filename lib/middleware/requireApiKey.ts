@@ -8,6 +8,7 @@ import { prisma } from 'db';
 import log from 'lib/log';
 import { ApiError, InvalidApiKeyError } from 'lib/middleware/errors';
 import { getVerifiedSuperApiToken } from 'lib/middleware/requireSuperApiKey';
+import { uid } from 'lib/utilities/strings';
 
 declare module 'http' {
   /**
@@ -68,7 +69,8 @@ export async function getBotUser(spaceId: string): Promise<User> {
       data: {
         username: 'Bot',
         isBot: true,
-        identityType: 'RandomName'
+        identityType: 'RandomName',
+        path: uid()
       }
     });
 
