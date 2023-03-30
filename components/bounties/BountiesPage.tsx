@@ -124,13 +124,12 @@ export default function BountiesPage({ publicMode = false, bounties }: Props) {
               </Grid>
             </Grid>
             {bounties.length !== 0 && (
-              <Stack className='ViewHeader' flexDirection='row' justifyContent='space-between' mb={1}>
+              <Box className='ViewHeader' alignItems='flex-start'>
                 <Tabs
                   textColor='primary'
                   indicatorColor='secondary'
                   value={currentView.view}
-                  sx={{ minHeight: 0, height: 'fit-content' }}
-                  key={currentView.label}
+                  sx={{ minHeight: 0, mb: '-6px' }}
                 >
                   {views.map(({ label, view }) => (
                     <Tab
@@ -163,23 +162,23 @@ export default function BountiesPage({ publicMode = false, bounties }: Props) {
                     />
                   ))}
                 </Tabs>
-              </Stack>
+              </Box>
             )}
           </div>
-          <div className='container-container'>
-            {bounties.length === 0 ||
-            (currentView.view === 'gallery' && bounties.filter((bounty) => bounty.status === 'open').length === 0) ? (
-              <EmptyStateVideo
-                description='Getting started with bounties'
-                videoTitle='Bounties | Getting started with Charmverse'
-                videoUrl='https://tiny.charmverse.io/bounties'
-              />
-            ) : currentView.view === 'gallery' ? (
-              <BountiesGalleryView bounties={bounties} publicMode={publicMode} />
-            ) : (
+          {bounties.length === 0 ||
+          (currentView.view === 'gallery' && bounties.filter((bounty) => bounty.status === 'open').length === 0) ? (
+            <EmptyStateVideo
+              description='Getting started with bounties'
+              videoTitle='Bounties | Getting started with Charmverse'
+              videoUrl='https://tiny.charmverse.io/bounties'
+            />
+          ) : currentView.view === 'gallery' ? (
+            <BountiesGalleryView bounties={bounties} publicMode={publicMode} />
+          ) : (
+            <div className='container-container'>
               <BountiesKanbanView publicMode={publicMode} bounties={bounties} />
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </div>
       <PageDialogGlobalModal />
