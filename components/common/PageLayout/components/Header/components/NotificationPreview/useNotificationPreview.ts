@@ -65,7 +65,7 @@ export function useNotificationPreview() {
 
           const taskIndex = _tasks?.[groupType].unmarked.findIndex((t) => t.taskId === taskId);
           if (typeof taskIndex === 'number' && taskIndex > -1) {
-            const marked = [_tasks?.[groupType].unmarked[taskIndex], ..._tasks.forum.marked];
+            const marked = [_tasks?.[groupType].unmarked[taskIndex], ..._tasks[groupType].marked];
             const unmarkedItems = _tasks[groupType].unmarked;
             const unmarked = [...unmarkedItems.slice(0, taskIndex), ...unmarkedItems.slice(taskIndex + 1)];
 

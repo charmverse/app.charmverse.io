@@ -1,5 +1,6 @@
 import CelebrationIcon from '@mui/icons-material/Celebration';
 import { Box, Card, Divider, Typography } from '@mui/material';
+import { Fragment } from 'react';
 
 import { useNotificationPreview } from 'components/common/PageLayout/components/Header/components/NotificationPreview/useNotificationPreview';
 
@@ -25,15 +26,10 @@ export function NotificationPreviewPopover({
       <Box height={400} sx={{ overflowY: 'auto', overflowX: 'hidden' }}>
         {notificationPreviews.length > 0 ? (
           notificationPreviews.map((notification) => (
-            <>
-              <NotificationPreview
-                key={notification.taskId}
-                notification={notification}
-                markAsRead={markAsRead}
-                onClose={close}
-              />
+            <Fragment key={notification.taskId}>
+              <NotificationPreview notification={notification} markAsRead={markAsRead} onClose={close} />
               <Divider />
-            </>
+            </Fragment>
           ))
         ) : (
           <Box display='flex' justifyContent='center' alignItems='center' flexDirection='column' height='100%'>

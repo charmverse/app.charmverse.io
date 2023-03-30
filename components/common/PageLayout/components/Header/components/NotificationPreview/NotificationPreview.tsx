@@ -1,4 +1,3 @@
-import { useTheme } from '@emotion/react';
 import CloseIcon from '@mui/icons-material/Close';
 import CommentIcon from '@mui/icons-material/Comment';
 import ForumIcon from '@mui/icons-material/Forum';
@@ -24,7 +23,6 @@ type Props = {
 };
 export function NotificationPreview({ notification, markAsRead, onClose }: Props) {
   const { groupType, type, spaceName, createdBy, taskId, href, content, title } = notification;
-  const theme = useTheme();
 
   const icon = useMemo(() => getIcon(groupType), [groupType]);
 
@@ -34,7 +32,7 @@ export function NotificationPreview({ notification, markAsRead, onClose }: Props
         sx={{
           '&:hover': {
             cursor: 'pointer',
-            background: theme.palette.background.light
+            background: (theme) => theme.palette.background.light
           }
         }}
         display='flex'

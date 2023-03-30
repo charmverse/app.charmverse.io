@@ -1,8 +1,9 @@
-import { useTheme } from '@emotion/react';
 import NotificationsIcon from '@mui/icons-material/Notifications';
-import { Box, IconButton, useMediaQuery } from '@mui/material';
+import { IconButton } from '@mui/material';
 import Popover from '@mui/material/Popover';
 import { bindPopover, usePopupState } from 'material-ui-popup-state/hooks';
+
+import { useMdScreen } from 'hooks/useMediaScreens';
 
 import NotificationsBadge from '../../../Sidebar/NotificationsBadge';
 
@@ -10,21 +11,18 @@ import { NotificationPreviewPopover } from './NotificationPreviewPopover';
 
 export function NotificationButton({ onSeeAllClick }: { onSeeAllClick: () => void }) {
   const popupState = usePopupState({ variant: 'popover', popupId: 'share-menu' });
-  const theme = useTheme();
-  const isLargeScreen = useMediaQuery(theme.breakpoints.up('md'));
+  const isMdScreen = useMdScreen();
   const handleSeeAllClick = () => {
     onSeeAllClick();
     popupState.close();
   };
   return (
     <>
-      <Box onClick={popupState.open} sx={{ cursor: 'pointer' }}>
-        <NotificationsBadge>
-          <IconButton size={isLargeScreen ? 'small' : 'medium'}>
-            <NotificationsIcon fontSize='small' color='secondary' />
-          </IconButton>
-        </NotificationsBadge>
-      </Box>
+      <NotificationsBadge onClick={popupState.open} sx={{ cursor: 'pointer' }}>
+        <IconButton size={isMdScreen ? 'small' : 'medium'}>
+          <NotificationsIcon fontSize='small' color='secondary' />
+        </IconButton>
+      </NotificationsBadge>
       <Popover
         {...bindPopover(popupState)}
         anchorOrigin={{
