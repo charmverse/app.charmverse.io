@@ -17,9 +17,6 @@ export const disconnectWallet = async ({ userId, address }: DisconnectWalletRequ
     where: {
       userId,
       address
-    },
-    include: {
-      user: true
     }
   });
 

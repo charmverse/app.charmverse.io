@@ -196,8 +196,8 @@ export function IdentityProviders() {
                     wallet?
                   </Typography>
                   <Typography variant='body2'>
-                    This action will delete your wallet, nfts, poaps and will lose roles and permissions in spaces where
-                    you were granted access through a token gate.
+                    This action will delete your wallet, nfts, poaps, organisations and will lose roles and permissions
+                    in spaces where you were granted access through a token gate.
                   </Typography>
                 </>
               }
