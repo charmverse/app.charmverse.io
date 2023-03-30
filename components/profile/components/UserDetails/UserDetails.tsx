@@ -120,7 +120,7 @@ function UserDetails({ readOnly, user, updateUser, sx = {} }: UserDetailsProps) 
   const disabled = readOnly ?? isLoading ?? isPublic;
 
   const hostname = typeof window !== 'undefined' ? window.location.origin : '';
-  const userPath = user.path || user.id;
+  const userPath = user.path;
   const userLink = `${hostname}/u/${userPath}`;
 
   return (
