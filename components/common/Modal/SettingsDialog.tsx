@@ -1,20 +1,14 @@
-import styled from '@emotion/styled';
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
-import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import CloseIcon from '@mui/icons-material/Close';
 import MenuIcon from '@mui/icons-material/Menu';
-import TreeView from '@mui/lab/TreeView';
 import type { BoxProps } from '@mui/material/Box';
 import Box from '@mui/material/Box';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import IconButton from '@mui/material/IconButton';
-import Typography from '@mui/material/Typography';
 import type { Space } from '@prisma/client';
 import type { ReactNode } from 'react';
 
 import Button from 'components/common/Button';
-import { StyledTreeItem } from 'components/common/PageLayout/components/PageNavigation/components/PageTreeItem';
 import { IntegrationSettings } from 'components/integrations/IntegrationsPage';
 import TasksPage from 'components/nexus/TasksPage';
 import ProfileSettings from 'components/profile/ProfileSettings';
@@ -30,11 +24,6 @@ import { useSettingsDialog } from 'hooks/useSettingsDialog';
 
 import { SectionName } from '../PageLayout/components/Sidebar/Sidebar';
 import { SidebarLink } from '../PageLayout/components/Sidebar/SidebarButton';
-import WorkspaceAvatar from '../PageLayout/components/Sidebar/WorkspaceAvatar';
-
-const SpaceSettingsLink = styled(SidebarLink)`
-  padding-left: 36px;
-`;
 
 interface TabPanelProps extends BoxProps {
   children?: ReactNode;
@@ -135,44 +124,17 @@ export function SpaceSettingsDialog() {
               <SectionName>Space settings</SectionName>
             </Box>
           )}
-          <TreeView
-            aria-label='Profile settings tree view'
-            defaultCollapseIcon={<ArrowDropDownIcon fontSize='large' />}
-            defaultExpandIcon={<ArrowRightIcon fontSize='large' />}
-            defaultExpanded={currentSpace?.name ? [currentSpace?.name] : []}
-            selected={activePath}
-            sx={{
-              '& .MuiTreeItem-content > .MuiTreeItem-label': { pl: 0.5 },
-              '& .MuiTreeItem-content': { py: 0.5 },
-              '& .MuiTreeItem-group .MuiTreeItem-content': { pl: 1 },
-              '& .MuiTreeItem-root[aria-expanded] > .MuiTreeItem-content': { py: 1 }
-            }}
-          >
-            {currentSpace && (
-              <StyledTreeItem
-                data-test={`space-settings-tab-${currentSpace.id}`}
-                key={currentSpace.id}
-                nodeId={currentSpace.name}
-                label={
-                  <Box display='flex' alignItems='center' gap={1}>
-                    <WorkspaceAvatar name={currentSpace.name} image={currentSpace.spaceImage} />
-                    <Typography noWrap>{currentSpace.name}</Typography>
-                  </Box>
-                }
-              >
-                {SETTINGS_TABS.map((tab) => (
-                  <SpaceSettingsLink
-                    data-test={`space-settings-tab-${currentSpace.id}-${tab.path}`}
-                    key={tab.path}
-                    label={tab.label}
-                    icon={tab.icon}
-                    onClick={() => onClick(`${currentSpace.name}-${tab.path}`)}
-                    active={activePath === `${currentSpace.name}-${tab.path}`}
-                  />
-                ))}
-              </StyledTreeItem>
-            )}
-          </TreeView>
+          {currentSpace &&
+            SETTINGS_TABS.map((tab) => (
+              <SidebarLink
+                data-test={`space-settings-tab-${currentSpace.id}-${tab.path}`}
+                key={tab.path}
+                label={tab.label}
+                icon={tab.icon}
+                onClick={() => onClick(`${currentSpace.name}-${tab.path}`)}
+                active={activePath === `${currentSpace.name}-${tab.path}`}
+              />
+            ))}
         </Box>
         <Box flex='1 1 auto' position='relative' overflow='auto'>
           {isMobile && !!activePath && (
