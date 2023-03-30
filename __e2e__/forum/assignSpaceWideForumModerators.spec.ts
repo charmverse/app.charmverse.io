@@ -79,7 +79,7 @@ test.describe.serial('Comment on forum posts', () => {
 
     await permissionSettings.openSettingsModal();
 
-    const spaceSettingsTab = permissionSettings.getSpaceSettingsLocator(space.id);
+    const spaceSettingsTab = permissionSettings.getSpaceSettingsSectionLocator({ spaceId: space.id, section: 'space' });
 
     await expect(spaceSettingsTab).toBeVisible();
 

@@ -54,7 +54,9 @@ test('User has correct access in the space settings', async ({ page, spaceSettin
   // Make sure other user doesn't show up
   const invisibleMemberRow = spaceSettings.getSpaceMemberRowLocator(otherSpaceAdmin.id);
   await expect(invisibleMemberRow).not.toBeVisible();
-  await expect(spaceSettings.getSpaceSettingsLocator(isMemberSpace.id)).not.toBeVisible();
+  await expect(
+    spaceSettings.getSpaceSettingsSectionLocator({ spaceId: isMemberSpace.id, section: 'space' })
+  ).not.toBeVisible();
 
   // Member info should be visible
   await spaceSettings.clickRoleRowByTitle('Member');
