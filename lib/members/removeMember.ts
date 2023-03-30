@@ -3,12 +3,12 @@ import { InvalidStateError } from 'lib/middleware';
 import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
 import { isUUID } from 'lib/utilities/strings';
 
-export type GuestToRemove = {
+export type RemoveMemberInput = {
   userId: string;
   spaceId: string;
 };
 
-export async function removeMember({ spaceId, userId }: GuestToRemove): Promise<true> {
+export async function removeMember({ spaceId, userId }: RemoveMemberInput): Promise<true> {
   if (!isUUID(spaceId) || !isUUID(userId)) {
     throw new InvalidInputError('spaceId and userId must be valid UUIDs');
   }
