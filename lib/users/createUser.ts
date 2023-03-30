@@ -8,7 +8,7 @@ import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { updateTrackUserProfile } from 'lib/metrics/mixpanel/updateTrackUserProfile';
 import { isProfilePathAvailable } from 'lib/profile/isProfilePathAvailable';
 import { sessionUserRelations } from 'lib/session/config';
-import { shortWalletAddress } from 'lib/utilities/strings';
+import { shortWalletAddress, uid } from 'lib/utilities/strings';
 import type { LoggedInUser } from 'models';
 
 import { getUserProfile } from './getUser';
@@ -37,7 +37,7 @@ export async function createUserFromWallet(
         id,
         identityType: 'Wallet',
         username: ens ?? shortWalletAddress(lowercaseAddress),
-        path: isUserPathAvailable ? userPath : null,
+        path: isUserPathAvailable ? userPath : uid(),
         wallets: {
           create: {
             address: lowercaseAddress,
