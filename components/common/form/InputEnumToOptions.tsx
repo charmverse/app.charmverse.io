@@ -39,6 +39,7 @@ export default function InputEnumToOptions<T extends string>({
       <Select
         sx={sx}
         value={defaultValue as any}
+        readOnly
         onChange={(ev) => {
           // setValue(ev.target.value as T);
           onChange(ev.target.value as T);
@@ -65,8 +66,8 @@ export function SmallSelect<T extends string>({ sx = {}, ...props }: Props<T>) {
         ...sx,
         background: 'transparent',
         fontSize: '.8em',
-        borderColor: 'transparent',
-        '& .MuiOutlinedInput-notchedOutline': { borderColor: 'transparent' }
+        borderColor: 'transparent !important',
+        '& .MuiOutlinedInput-notchedOutline': { borderColor: 'transparent !important' }
       }}
     />
   );

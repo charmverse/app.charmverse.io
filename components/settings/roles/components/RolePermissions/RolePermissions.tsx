@@ -288,19 +288,23 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
                       const memberRolePermission = spacePostCategoryPermissions?.find(
                         (p) => p.postCategoryId === category.id
                       );
+                      const canModerateForums =
+                        memberPermissionFlags?.moderateForums || assignedPermissions?.moderateForums;
+                      const permissionLevel = canModerateForums ? 'full_access' : permission?.permissionLevel;
 
                       return (
                         <PostCategoryRolePermissionRow
                           key={category.id}
-                          canEdit={category.permissions.manage_permissions}
+                          canEdit={!canModerateForums && category.permissions.manage_permissions}
                           label={category.name}
                           deletePermission={deletePostCategoryPermission}
                           updatePermission={updatePostCategoryPermission}
                           postCategoryId={category.id}
                           existingPermissionId={permission?.id}
-                          defaultPermissionLevel={permission?.permissionLevel}
+                          defaultPermissionLevel={permissionLevel}
                           emptyValue={memberRolePermission?.permissionLevel}
-                          isInherited={memberRolePermission && !permission}
+                          isInherited={!canModerateForums && memberRolePermission && !permission}
+                          disabledTooltip={canModerateForums && 'This role has full access to all categories'}
                           assignee={{ group: targetGroup, id }}
                         />
                       );

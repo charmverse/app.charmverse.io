@@ -58,39 +58,32 @@ export function ProposalCategoryRolePermissionRow({
     }
   }
 
+  const tooltip = !canEdit
+    ? 'You do not have permission to edit this permission'
+    : isInherited
+    ? 'Inherited from Member role'
+    : defaultPermissionLevel === 'full_access'
+    ? 'Full access allows all assignees to create proposals in this category'
+    : '';
+
   return (
     <Box display='flex' justifyContent='space-between' alignItems='center'>
       <Typography variant='body2'>{assigneeName}</Typography>
       <div style={{ width: '160px', textAlign: 'left' }}>
-        {canEdit ? (
-          <Tooltip
-            title={
-              isInherited
-                ? 'Inherited from Member role'
-                : defaultPermissionLevel === 'full_access'
-                ? 'Full access allows all assignees to create proposals in this category'
-                : ''
-            }
-          >
-            <span>
-              <SmallSelect
-                data-test={assignee.group === 'space' ? 'category-space-permission' : null}
-                sx={{ opacity: isInherited ? 0.5 : 1 }}
-                renderValue={(value) => (value !== '' && proposalCategoryPermissionOptions[value]) || emptyLabel}
-                onChange={handleUpdate as (opt: string) => void}
-                keyAndLabel={permissionsWithRemove}
-                defaultValue={defaultPermissionLevel || ''}
-                displayEmpty
-              />
-            </span>
-          </Tooltip>
-        ) : (
-          <Tooltip title='You cannot edit permissions for this forum category.'>
-            <Typography color='secondary' variant='caption'>
-              {defaultPermissionLevel ? proposalCategoryPermissionLabels[defaultPermissionLevel] : 'No access'}
-            </Typography>
-          </Tooltip>
-        )}
+        <Tooltip title={tooltip}>
+          <span>
+            <SmallSelect
+              disabled={!canEdit}
+              data-test={assignee.group === 'space' ? 'category-space-permission' : null}
+              sx={{ opacity: isInherited ? 0.5 : 1 }}
+              renderValue={(value) => (value !== '' && proposalCategoryPermissionOptions[value]) || emptyLabel}
+              onChange={handleUpdate as (opt: string) => void}
+              keyAndLabel={permissionsWithRemove}
+              defaultValue={defaultPermissionLevel || ''}
+              displayEmpty
+            />
+          </span>
+        </Tooltip>
       </div>
     </Box>
   );

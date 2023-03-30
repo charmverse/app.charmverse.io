@@ -22,6 +22,7 @@ type Props = {
   label?: string;
   postCategoryId: string;
   canEdit: boolean;
+  disabledTooltip?: string;
   updatePermission: (newPermission: PostCategoryPermissionInput) => void;
   deletePermission: (permissionId: string) => void;
 };
@@ -35,6 +36,7 @@ export function PostCategoryRolePermissionRow({
   isInherited,
   label,
   canEdit,
+  disabledTooltip,
   updatePermission,
   deletePermission
 }: Props) {
@@ -56,31 +58,30 @@ export function PostCategoryRolePermissionRow({
     }
   }
 
+  const tooltip = !canEdit
+    ? disabledTooltip || 'You do not have permission to edit this permission'
+    : isInherited
+    ? 'Inherited from Member role'
+    : '';
+
   return (
     <Box display='flex' justifyContent='space-between' alignItems='center'>
       <Typography variant='body2'>{label || assigneeName}</Typography>
       <div style={{ width: '120px', textAlign: 'left' }}>
-        {canEdit ? (
-          <Tooltip title={isInherited ? 'Inherited from Member role' : ''}>
-            <span>
-              <SmallSelect
-                data-test={assignee.group === 'space' ? 'category-space-permission' : null}
-                sx={{ opacity: isInherited ? 0.5 : 1 }}
-                renderValue={(value) => (value !== '' && postCategoryPermissionLabels[value]) || emptyLabel}
-                onChange={handleUpdate as (opt: string) => void}
-                keyAndLabel={permissionsWithRemove}
-                defaultValue={defaultPermissionLevel || ''}
-                displayEmpty
-              />
-            </span>
-          </Tooltip>
-        ) : (
-          <Tooltip title='You cannot edit permissions for this forum category.'>
-            <Typography color='secondary' variant='caption'>
-              {defaultPermissionLevel ? postCategoryPermissionLabels[defaultPermissionLevel] : 'No access'}
-            </Typography>
-          </Tooltip>
-        )}
+        <Tooltip title={tooltip}>
+          <span>
+            <SmallSelect
+              disabled={!canEdit}
+              data-test={assignee.group === 'space' ? 'category-space-permission' : null}
+              sx={{ opacity: isInherited ? 0.5 : 1 }}
+              renderValue={(value) => (value !== '' && postCategoryPermissionLabels[value]) || emptyLabel}
+              onChange={handleUpdate as (opt: string) => void}
+              keyAndLabel={permissionsWithRemove}
+              defaultValue={defaultPermissionLevel || ''}
+              displayEmpty
+            />
+          </span>
+        </Tooltip>
       </div>
     </Box>
   );
