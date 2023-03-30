@@ -24,14 +24,6 @@ export default function InputEnumToOptions<T extends string>({
 }: Props<T>) {
   const options = Object.entries(keyAndLabel) as [T, string][];
 
-  const [value, setValue] = useState<T | ''>('');
-
-  // useEffect(() => {
-  //   if (defaultValue && !value) {
-  //     setValue(defaultValue);
-  //   }
-  // }, [defaultValue]);
-
   return (
     <FormControl fullWidth>
       {title && <InputLabel>{title}</InputLabel>}
@@ -40,7 +32,6 @@ export default function InputEnumToOptions<T extends string>({
         sx={sx}
         value={defaultValue as any}
         onChange={(ev) => {
-          // setValue(ev.target.value as T);
           onChange(ev.target.value as T);
         }}
         {...props}
