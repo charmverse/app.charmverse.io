@@ -14,6 +14,7 @@ const ButtonContent = styled.div`
   align-items: center;
   justify-content: space-between;
   width: 100%;
+  color: ${({ theme }) => theme.palette.text.primary};
 `;
 
 type Props = {

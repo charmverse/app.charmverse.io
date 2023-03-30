@@ -13,6 +13,7 @@ import { useRef, useState } from 'react';
 import { WalletSelector } from 'components/_app/Web3ConnectionManager/components/WalletSelectorModal';
 import { ConnectorButton } from 'components/_app/Web3ConnectionManager/components/WalletSelectorModal/components/ConnectorButton';
 import Button from 'components/common/Button';
+import Link from 'components/common/Link';
 import { useFirebaseAuth } from 'hooks/useFirebaseAuth';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
@@ -144,6 +145,23 @@ function LoginHandler(props: DialogProps) {
               Connect Account
             </DialogTitle>
 
+            <Link data-test='connect-discord' href={`/api/discord/oauth?type=login&redirect=${returnUrl ?? '/'}`}>
+              <ListItem>
+                <ConnectorButton
+                  onClick={() => {}}
+                  name='Connect with Discord'
+                  disabled={false}
+                  isActive={false}
+                  isLoading={false}
+                  icon={
+                    <SvgIcon viewBox='0 -10 70 70' sx={{ color: '#5865F2' }}>
+                      <DiscordIcon />
+                    </SvgIcon>
+                  }
+                />
+              </ListItem>
+            </Link>
+
             {/* Google login method */}
             <ListItem>
               <ConnectorButton
@@ -165,22 +183,6 @@ function LoginHandler(props: DialogProps) {
                 disabled={false}
                 isActive={false}
                 isLoading={false}
-              />
-            </ListItem>
-
-            <ListItem>
-              <ConnectorButton
-                onClick={() => router.push(`/api/discord/oauth?type=login&redirect=${returnUrl ?? '/'}`)}
-                data-test='connect-discord'
-                name='Connect with discord'
-                disabled={false}
-                isActive={false}
-                isLoading={false}
-                icon={
-                  <SvgIcon viewBox='0 -10 70 70' sx={{ color: '#5865F2' }}>
-                    <DiscordIcon />
-                  </SvgIcon>
-                }
               />
             </ListItem>
           </List>
