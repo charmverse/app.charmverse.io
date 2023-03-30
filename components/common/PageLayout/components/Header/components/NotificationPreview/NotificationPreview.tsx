@@ -20,8 +20,9 @@ type Props = {
   notification: NotificationDetails;
   markAsRead: MarkNotificationAsRead;
   onClose: VoidFunction;
+  large?: boolean;
 };
-export function NotificationPreview({ notification, markAsRead, onClose }: Props) {
+export function NotificationPreview({ notification, markAsRead, onClose, large }: Props) {
   const { groupType, type, spaceName, createdBy, taskId, href, content, title } = notification;
 
   const icon = useMemo(() => getIcon(groupType), [groupType]);
@@ -52,7 +53,11 @@ export function NotificationPreview({ notification, markAsRead, onClose }: Props
       >
         <Box display='flex' justifyContent='space-between' width='100%'>
           <Box display='flex' alignItems='flex-start' mr={1.25} pt={0.5}>
-            {createdBy ? <Avatar size='small' name={createdBy?.username} avatar={createdBy?.avatar} /> : icon}
+            {createdBy ? (
+              <Avatar size={large ? 'medium' : 'small'} name={createdBy?.username} avatar={createdBy?.avatar} />
+            ) : (
+              icon
+            )}
           </Box>
 
           <Box overflow='hidden' display='flex' flexDirection='column' flex={1}>
@@ -63,11 +68,12 @@ export function NotificationPreview({ notification, markAsRead, onClose }: Props
                   overflow='hidden'
                   textOverflow='ellipsis'
                   variant='subtitle2'
+                  fontSize={large ? '1rem' : '0.8rem'}
                 >{`${spaceName}`}</Typography>
               </Box>
               &nbsp;
               <Box whiteSpace='nowrap'>
-                <Typography variant='subtitle2' fontWeight='bold'>
+                <Typography variant='subtitle2' fontSize={large ? '1rem' : '0.8rem'} fontWeight='bold'>
                   {title}
                 </Typography>
               </Box>
@@ -75,6 +81,7 @@ export function NotificationPreview({ notification, markAsRead, onClose }: Props
 
             <Typography
               variant='subtitle1'
+              fontSize={large ? '1.1rem' : '0.85rem'}
               sx={{
                 display: '-webkit-box',
                 overflow: 'hidden',
