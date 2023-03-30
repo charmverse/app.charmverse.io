@@ -6,7 +6,6 @@ import { prisma } from 'db';
 import { updateTrackUserProfile } from 'lib/metrics/mixpanel/updateTrackUserProfile';
 import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import { deleteUserTokenGates } from 'lib/token-gates/updateUserTokenGates';
 import type { DisconnectWalletRequest } from 'lib/users/disconnectWallet';
 import { disconnectWallet } from 'lib/users/disconnectWallet';
 import type { LoggedInUser } from 'models';
@@ -23,10 +22,6 @@ async function removeWalletController(req: NextApiRequest, res: NextApiResponse<
   const address = req.body.address as UserWallet['address'];
 
   const loggedInUser = await disconnectWallet({ address, userId });
-
-  await prisma.profileItem.deleteMany({
-    where: { userId }
-  });
 
   await updateTrackUserProfile(loggedInUser);
 

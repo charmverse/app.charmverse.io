@@ -24,12 +24,17 @@ export const disconnectWallet = async ({ userId, address }: DisconnectWalletRequ
     throw new MissingDataError(`Wallet not found for user ${userId} and adress ${address}`);
   }
 
-  await prisma.userWallet.delete({
-    where: {
-      userId,
-      address
-    }
-  });
+  await prisma.$transaction([
+    prisma.userWallet.delete({
+      where: {
+        userId,
+        address
+      }
+    }),
+    prisma.profileItem.deleteMany({
+      where: { userId }
+    })
+  ]);
 
   return updateUsedIdentity(userId);
 };
