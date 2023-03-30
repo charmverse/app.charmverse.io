@@ -42,8 +42,8 @@ function LoginHandler(props: DialogProps) {
   const { loginFromWeb3Account } = useWeb3AuthSig();
   // Governs whether we should auto-request a signature. Should only happen on first login.
   const [enableAutosign, setEnableAutoSign] = useState(true);
-  const returnUrl = new URLSearchParams(decodeURIComponent(window.location.search)).get('returnUrl');
   const router = useRouter();
+  const returnUrl = router.query.returnUrl;
   const [loginMethod, setLoginMethod] = useState<'email' | null>(null);
 
   const [showLoginError, setShowLoginError] = useState(false);
