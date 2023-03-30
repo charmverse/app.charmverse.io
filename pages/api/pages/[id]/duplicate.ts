@@ -28,7 +28,8 @@ async function duplicatePageRoute(req: NextApiRequest, res: NextApiResponse<Dupl
     },
     select: {
       parentId: true,
-      spaceId: true
+      spaceId: true,
+      convertedProposalId: true
     }
   });
 
@@ -41,8 +42,8 @@ async function duplicatePageRoute(req: NextApiRequest, res: NextApiResponse<Dupl
     userId
   });
 
-  if (permissions.edit_content !== true) {
-    throw new ActionNotPermittedError('You are not allowed to edit this page.');
+  if (!permissions.edit_content && !duplicatedPage.convertedProposalId) {
+    throw new ActionNotPermittedError('You are not allowed to duplicate this page.');
   }
 
   const duplicatePageResponse = await duplicatePage({ pageId, parentId: duplicatedPage.parentId });
