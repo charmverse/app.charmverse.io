@@ -177,7 +177,7 @@ export default function PagePermissions({ pageId, pagePermissions, refreshPermis
               <SmallSelect
                 renderValue={(value) => permissionsWithoutCustom[value as string] || 'No access'}
                 onChange={(level) => updateSpacePagePermissionLevel(level as PagePermissionLevelType)}
-                keyAndLabel={permissionsWithRemove}
+                keyAndLabel={permissionsWithRemove as Record<string, string>}
                 defaultValue={spaceLevelPermission?.permissionLevel ?? 'No access'}
               />
             ) : (
@@ -222,7 +222,7 @@ export default function PagePermissions({ pageId, pagePermissions, refreshPermis
                   <SmallSelect
                     renderValue={(value) => permissionsWithoutCustom[value as string]}
                     onChange={(level) => updatePagePermissionLevel(permission, level as PagePermissionLevelType)}
-                    keyAndLabel={permissionsWithRemove}
+                    keyAndLabel={permissionsWithRemove as Record<string, string>}
                     defaultValue={permission.permissionLevel}
                   />
                 ) : (

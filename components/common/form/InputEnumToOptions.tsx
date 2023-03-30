@@ -3,13 +3,15 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import type { SelectProps } from '@mui/material/Select';
 import Select from '@mui/material/Select';
+import type { ReactNode } from 'react';
 import { useEffect, useState } from 'react';
 
-export type Props<T extends string> = Omit<SelectProps, 'onChange'> & {
+export type Props<T extends string> = Omit<SelectProps, 'onChange' | 'renderValue'> & {
   onChange?: (option: T) => void;
+  renderValue?: (option: T) => ReactNode;
   defaultValue?: T;
   title?: string;
-  keyAndLabel: Record<string | any, string | number>;
+  keyAndLabel: Partial<Record<Exclude<T, ''>, string>>;
 };
 
 export default function InputEnumToOptions<T extends string>({
@@ -20,15 +22,15 @@ export default function InputEnumToOptions<T extends string>({
   sx,
   ...props
 }: Props<T>) {
-  const options = Object.entries(keyAndLabel);
+  const options = Object.entries(keyAndLabel) as [T, string][];
 
-  const [value, setValue] = useState<T | null>(null);
+  const [value, setValue] = useState<T | ''>('');
 
-  useEffect(() => {
-    if (defaultValue && !value) {
-      setValue(defaultValue);
-    }
-  }, [defaultValue]);
+  // useEffect(() => {
+  //   if (defaultValue && !value) {
+  //     setValue(defaultValue);
+  //   }
+  // }, [defaultValue]);
 
   return (
     <FormControl fullWidth>
@@ -36,12 +38,10 @@ export default function InputEnumToOptions<T extends string>({
 
       <Select
         sx={sx}
-        value={value}
+        value={defaultValue as any}
         onChange={(ev) => {
-          setValue(ev.target.value as T);
-          if (ev.target.value) {
-            onChange(ev.target.value as T);
-          }
+          // setValue(ev.target.value as T);
+          onChange(ev.target.value as T);
         }}
         {...props}
       >

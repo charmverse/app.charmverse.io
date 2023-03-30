@@ -19,6 +19,7 @@ type Props = {
   isInherited?: boolean;
   label?: string;
   defaultPermissionLevel?: ProposalCategoryPermissionLevel;
+  emptyValue?: ProposalCategoryPermissionLevel;
   proposalCategoryId: string;
   canEdit: boolean;
   updatePermission: (newPermission: ProposalCategoryPermissionInput) => void;
@@ -31,6 +32,7 @@ export function ProposalCategoryRolePermissionRow({
   isInherited,
   proposalCategoryId,
   defaultPermissionLevel,
+  emptyValue,
   canEdit,
   label,
   updatePermission,
@@ -38,6 +40,8 @@ export function ProposalCategoryRolePermissionRow({
 }: Props) {
   const roles = useRoles();
   const space = useCurrentSpace();
+
+  const emptyLabel = (emptyValue && proposalCategoryPermissionOptions[emptyValue]) || 'No access';
 
   const assigneeName = useMemo(() => {
     if (label) return label;
@@ -61,22 +65,24 @@ export function ProposalCategoryRolePermissionRow({
         {canEdit ? (
           <Tooltip
             title={
-              defaultPermissionLevel === 'full_access'
+              isInherited
+                ? 'Inherited from Member role'
+                : defaultPermissionLevel === 'full_access'
                 ? 'Full access allows all assignees to create proposals in this category'
                 : ''
             }
           >
-            <SmallSelect
-              data-test={assignee.group === 'space' ? 'category-space-permission' : null}
-              renderValue={(value) =>
-                (proposalCategoryPermissionOptions[
-                  value as keyof typeof proposalCategoryPermissionOptions
-                ] as string as any) || 'No access'
-              }
-              onChange={handleUpdate as (opt: string) => void}
-              keyAndLabel={permissionsWithRemove}
-              defaultValue={defaultPermissionLevel ?? 'No access'}
-            />
+            <span>
+              <SmallSelect
+                data-test={assignee.group === 'space' ? 'category-space-permission' : null}
+                sx={{ opacity: isInherited ? 0.5 : 1 }}
+                renderValue={(value) => (value !== '' && proposalCategoryPermissionOptions[value]) || emptyLabel}
+                onChange={handleUpdate as (opt: string) => void}
+                keyAndLabel={permissionsWithRemove}
+                defaultValue={defaultPermissionLevel || ''}
+                displayEmpty
+              />
+            </span>
           </Tooltip>
         ) : (
           <Tooltip title='You cannot edit permissions for this forum category.'>

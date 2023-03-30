@@ -1,5 +1,4 @@
 import Box from '@mui/material/Box';
-import Stack from '@mui/material/Stack';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import type { PostCategoryPermissionLevel } from '@prisma/client';
@@ -12,12 +11,13 @@ import { postCategoryPermissionLabels } from 'lib/permissions/forum/mapping';
 import type { PostCategoryPermissionInput } from 'lib/permissions/forum/upsertPostCategoryPermission';
 import type { TargetPermissionGroup } from 'lib/permissions/interfaces';
 
-import { permissionsWithRemove, forumMemberPermissionOptions } from './shared';
+import { permissionsWithRemove } from './shared';
 
 type Props = {
   assignee: TargetPermissionGroup<'role' | 'space'>;
   existingPermissionId?: string;
   defaultPermissionLevel?: PostCategoryPermissionLevel;
+  emptyValue?: PostCategoryPermissionLevel;
   isInherited?: boolean;
   label?: string;
   postCategoryId: string;
@@ -31,6 +31,7 @@ export function PostCategoryRolePermissionRow({
   existingPermissionId,
   postCategoryId,
   defaultPermissionLevel,
+  emptyValue,
   isInherited,
   label,
   canEdit,
@@ -39,6 +40,7 @@ export function PostCategoryRolePermissionRow({
 }: Props) {
   const roles = useRoles();
   const space = useCurrentSpace();
+  const emptyLabel = (emptyValue && postCategoryPermissionLabels[emptyValue]) || 'No access';
 
   const assigneeName = useMemo(() => {
     return assignee.group === 'space'
@@ -59,16 +61,19 @@ export function PostCategoryRolePermissionRow({
       <Typography variant='body2'>{label || assigneeName}</Typography>
       <div style={{ width: '120px', textAlign: 'left' }}>
         {canEdit ? (
-          <SmallSelect
-            data-test={assignee.group === 'space' ? 'category-space-permission' : null}
-            renderValue={(value) =>
-              (forumMemberPermissionOptions[value as keyof typeof forumMemberPermissionOptions] as string as any) ||
-              'No access'
-            }
-            onChange={handleUpdate as (opt: string) => void}
-            keyAndLabel={permissionsWithRemove}
-            defaultValue={defaultPermissionLevel ?? 'No access'}
-          />
+          <Tooltip title={isInherited ? 'Inherited from Member role' : ''}>
+            <span>
+              <SmallSelect
+                data-test={assignee.group === 'space' ? 'category-space-permission' : null}
+                sx={{ opacity: isInherited ? 0.5 : 1 }}
+                renderValue={(value) => (value !== '' && postCategoryPermissionLabels[value]) || emptyLabel}
+                onChange={handleUpdate as (opt: string) => void}
+                keyAndLabel={permissionsWithRemove}
+                defaultValue={defaultPermissionLevel || ''}
+                displayEmpty
+              />
+            </span>
+          </Tooltip>
         ) : (
           <Tooltip title='You cannot edit permissions for this forum category.'>
             <Typography color='secondary' variant='caption'>

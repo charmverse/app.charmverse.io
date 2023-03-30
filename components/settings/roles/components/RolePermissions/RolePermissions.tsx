@@ -4,7 +4,8 @@ import { SpaceOperation } from '@prisma/client';
 import type { ChangeEvent } from 'react';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import useSWR, { mutate } from 'swr';
+import { mutate } from 'swr';
+import useSWR from 'swr/immutable';
 import type { BooleanSchema } from 'yup';
 import * as yup from 'yup';
 
@@ -251,7 +252,8 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
                       updatePermission={updateProposalCategoryPermission}
                       proposalCategoryId={category.id}
                       existingPermissionId={permission?.id}
-                      defaultPermissionLevel={memberRolePermission?.permissionLevel || permission?.permissionLevel}
+                      defaultPermissionLevel={permission?.permissionLevel}
+                      emptyValue={memberRolePermission?.permissionLevel}
                       isInherited={memberRolePermission && !permission}
                       assignee={{ group: targetGroup, id }}
                     />
@@ -296,7 +298,8 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
                           updatePermission={updatePostCategoryPermission}
                           postCategoryId={category.id}
                           existingPermissionId={permission?.id}
-                          defaultPermissionLevel={memberRolePermission?.permissionLevel || permission?.permissionLevel}
+                          defaultPermissionLevel={permission?.permissionLevel}
+                          emptyValue={memberRolePermission?.permissionLevel}
                           isInherited={memberRolePermission && !permission}
                           assignee={{ group: targetGroup, id }}
                         />
