@@ -1,3 +1,4 @@
+import type { BountyStatus, ProposalStatus, VoteStatus } from '@prisma/client';
 import { NotificationType } from '@prisma/client';
 import { useCallback, useMemo } from 'react';
 
@@ -104,7 +105,7 @@ function getNotificationPreviewItems(
     type: getNotificationPreviewType(groupType),
     href: getNotificationHref(n, groupType),
     content: getNotificationContent(n, groupType, currentUserId),
-    title: getNotificationTitle(groupType)
+    title: getNotificationTitle(n, groupType)
   }));
 }
 
@@ -188,6 +189,7 @@ function getNotificationHref(n: NotificationPreview, groupType: NotificationGrou
 function getNotificationContent(n: NotificationPreview, groupType: NotificationGroupType, currentUserId?: string) {
   const action = 'action' in n ? n.action : null;
   const status = 'status' in n ? n.status : null;
+  const pageTitle = 'pageTitle' in n ? n.pageTitle : null;
   const userChoice = 'userChoice' in n ? n.userChoice : null;
   const title = getNotificationConentTitle(n);
   const commentId = 'commentId' in n ? n.commentId : null;
@@ -195,7 +197,7 @@ function getNotificationContent(n: NotificationPreview, groupType: NotificationG
   const isCreator = currentUserId === createdBy?.id;
 
   if (groupType === 'bounties' && action === 'application_pending') {
-    return `You applied for ${title} bounty.`;
+    return `${createdBy?.username} applied for ${title} bounty.`;
   }
 
   if (groupType === 'bounties' && action === 'application_approved') {
@@ -232,36 +234,12 @@ function getNotificationContent(n: NotificationPreview, groupType: NotificationG
       : `Poll "${title}" created.`;
   }
 
-  if (groupType === 'proposals' && status === 'discussion') {
+  if (groupType === 'proposals' && status) {
     return createdBy?.username
       ? isCreator
-        ? `You updated proposal status to "Discussion".`
-        : `${createdBy?.username} updated proposal status to "Discussion".`
-      : 'Proposal status updated to "Discussion".';
-  }
-
-  if (groupType === 'proposals' && status === 'review') {
-    return createdBy?.username
-      ? isCreator
-        ? `You updated proposal status to "Review".`
-        : `${createdBy?.username} updated proposal status to "Review".`
-      : 'Proposal status updated to "Review".';
-  }
-
-  if (groupType === 'proposals' && status === 'reviewed') {
-    return createdBy?.username
-      ? isCreator
-        ? `You updated proposal status to "Reviewed".`
-        : `${createdBy?.username} updated proposal status to "Reviewed".`
-      : 'Proposal status updated to "Reviewed".';
-  }
-
-  if (groupType === 'proposals' && status === 'vote_active') {
-    return createdBy?.username
-      ? isCreator
-        ? `You updated proposal status to "Vote Active".`
-        : `${createdBy?.username} updated proposal status to "Vote Active".`
-      : 'Proposal status updated to "Vote Active".';
+        ? `You updated proposal ${pageTitle}`
+        : `${createdBy?.username} updated proposal ${pageTitle}.`
+      : `Proposal ${pageTitle} updated.`;
   }
 
   if (groupType === 'proposals') {
@@ -275,7 +253,9 @@ function getNotificationContent(n: NotificationPreview, groupType: NotificationG
   return '';
 }
 
-function getNotificationTitle(groupType: NotificationGroupType) {
+function getNotificationTitle(n: NotificationPreview, groupType: NotificationGroupType) {
+  const status = 'status' in n ? n.status : null;
+
   switch (groupType) {
     case 'discussions':
       return 'Discussion';
@@ -286,7 +266,22 @@ function getNotificationTitle(groupType: NotificationGroupType) {
     case 'forum':
       return 'Forum Post';
     case 'proposals':
-      return 'Proposal';
+      return `Proposal status: ${getNotificationStatus(status)}`;
+    default:
+      return '';
+  }
+}
+
+function getNotificationStatus(status: VoteStatus | ProposalStatus | BountyStatus | null) {
+  switch (status) {
+    case 'discussion':
+      return 'Discussion';
+    case 'review':
+      return 'In Review';
+    case 'reviewed':
+      return 'Reviewed';
+    case 'vote_active':
+      return 'Vote Active';
     default:
       return '';
   }
