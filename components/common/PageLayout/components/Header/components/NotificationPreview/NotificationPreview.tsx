@@ -51,7 +51,7 @@ export function NotificationPreview({ notification, markAsRead, onClose }: Props
               <Box minWidth={0}>
                 <Typography
                   whiteSpace='nowrap'
-                  overflow='auto'
+                  overflow='hidden'
                   textOverflow='ellipsis'
                   variant='subtitle2'
                 >{`${spaceName}`}</Typography>

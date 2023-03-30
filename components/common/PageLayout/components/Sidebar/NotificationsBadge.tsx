@@ -10,8 +10,7 @@ export default function NotificationsBadge({ children, ...badgeProps }: BadgePro
 
   const userNotificationState = user?.notificationState;
 
-  const voteTasksCount =
-    tasks?.votes.unmarked.filter((vote) => !vote.userChoice && new Date() < new Date(vote.deadline)).length ?? 0;
+  const voteTasksCount = tasks?.votes.unmarked.filter((vote) => new Date() < new Date(vote.deadline)).length ?? 0;
   const mentionTasksCount = tasks?.discussions.unmarked?.length ?? 0;
   // If the user has snoozed multisig tasks don't count them
   const excludeGnosisTasks =
