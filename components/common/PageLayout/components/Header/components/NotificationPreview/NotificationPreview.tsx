@@ -47,7 +47,7 @@ export function NotificationPreview({ notification, markAsRead, onClose }: Props
       >
         <Box display='flex' justifyContent='space-between' width='100%'>
           <Box overflow='hidden'>
-            <Box display='flex'>
+            <Box display='flex' pl={0.2}>
               <Box minWidth={0}>
                 <Typography
                   whiteSpace='nowrap'
@@ -68,7 +68,17 @@ export function NotificationPreview({ notification, markAsRead, onClose }: Props
                 {createdBy ? <Avatar size='small' name={createdBy?.username} avatar={createdBy?.avatar} /> : icon}
               </Box>
               <Box width='100%'>
-                <Typography variant='subtitle1'>{content}</Typography>
+                <Typography
+                  variant='subtitle1'
+                  sx={{
+                    display: '-webkit-box',
+                    overflow: 'hidden',
+                    WebkitBoxOrient: 'vertical',
+                    WebkitLineClamp: 2
+                  }}
+                >
+                  {content}
+                </Typography>
               </Box>
             </Box>
           </Box>
