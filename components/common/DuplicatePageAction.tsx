@@ -16,12 +16,12 @@ export function DuplicatePageAction({
   redirect = false,
   postDuplication
 }: {
-  page: Pick<Page, 'id' | 'type'> & { convertedProposalId?: string | null; parentId?: string | null };
+  page: Pick<Page, 'id' | 'type'> & { parentId?: string | null };
   pagePermissions?: IPagePermissionFlags;
   redirect?: boolean;
   postDuplication?: (duplicatePageResponse: DuplicatePageResponse) => void;
 }) {
-  const duplicatePageDisabled = !pagePermissions?.edit_content && !page.convertedProposalId;
+  const duplicatePageDisabled = !pagePermissions?.read;
 
   const currentSpace = useCurrentSpace();
   const router = useRouter();

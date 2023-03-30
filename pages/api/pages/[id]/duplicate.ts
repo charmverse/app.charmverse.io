@@ -3,7 +3,6 @@ import nc from 'next-connect';
 
 import { prisma } from 'db';
 import { prismaToBlock } from 'lib/focalboard/block';
-import log from 'lib/log';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { updateTrackPageProfile } from 'lib/metrics/mixpanel/updateTrackPageProfile';
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
@@ -28,8 +27,7 @@ async function duplicatePageRoute(req: NextApiRequest, res: NextApiResponse<Dupl
     },
     select: {
       parentId: true,
-      spaceId: true,
-      convertedProposalId: true
+      spaceId: true
     }
   });
 
@@ -42,7 +40,7 @@ async function duplicatePageRoute(req: NextApiRequest, res: NextApiResponse<Dupl
     userId
   });
 
-  if (!permissions.edit_content && !duplicatedPage.convertedProposalId) {
+  if (!permissions.read) {
     throw new ActionNotPermittedError('You are not allowed to duplicate this page.');
   }
 

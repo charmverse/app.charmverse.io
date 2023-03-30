@@ -44,7 +44,6 @@ export function PageActionsMenu({
     relativePath?: string;
     path: string;
     deletedAt: Date | null;
-    convertedProposalId?: string | null;
   };
   readOnly?: boolean;
 }) {
@@ -111,7 +110,7 @@ export function PageActionsMenu({
       {!hideDuplicateAction && page.type && (
         <DuplicatePageAction
           postDuplication={onDuplicate}
-          page={{ ...page, type: page.type, convertedProposalId: page.convertedProposalId }}
+          page={{ ...page, type: page.type }}
           pagePermissions={pagePermissions}
         />
       )}
