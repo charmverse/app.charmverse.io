@@ -34,8 +34,9 @@ jest.mock('next/router', () => ({
   useRouter: () => ({
     pathname: '/[domain]/',
     query: {
-      domain: 'test'
-    }
+      domain: 'test-space'
+    },
+    isReady: true
   })
 }));
 
