@@ -1,5 +1,6 @@
 import { prisma } from 'db';
 import { getAccessibleMemberPropertiesBySpace } from 'lib/members/getAccessibleMemberPropertiesBySpace';
+import { getMemberSearchValue } from 'lib/members/getMemberSearchValue';
 import { getSpaceMemberSearchParams } from 'lib/members/getSpaceMemberSearchParams';
 import type { Member } from 'lib/members/interfaces';
 import { getPropertiesWithValues } from 'lib/members/utils';
@@ -35,7 +36,11 @@ export async function getSpaceMembers({
             where: {
               spaceId
             }
-          }
+          },
+          wallets: true,
+          googleAccounts: true,
+          telegramUser: true,
+          discordUser: true
         }
       },
       spaceRoleToRole: {
@@ -75,6 +80,7 @@ export async function getSpaceMembers({
           joinDate: spaceRole.createdAt.toISOString(),
           hasNftAvatar: hasNftAvatar(spaceRole.user),
           properties: getPropertiesWithValues(visibleProperties, memberPropertyValues),
+          searchValue: getMemberSearchValue(spaceRole.user),
           roles
         };
       })

@@ -42,7 +42,8 @@ async function getMembers(req: NextApiRequest, res: NextApiResponse<Member[]>) {
       joinDate: new Date().toISOString(),
       properties: [],
       roles: [],
-      username: deterministicRandomName(sr.user.id)
+      username: deterministicRandomName(sr.user.id),
+      searchValue: ''
     }));
 
     return res.status(200).json(mappedUsers);
