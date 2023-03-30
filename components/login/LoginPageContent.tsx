@@ -5,7 +5,6 @@ import Typography from '@mui/material/Typography';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 
-import Button from 'components/common/Button';
 import Image from 'components/common/Image';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { useSnackbar } from 'hooks/useSnackbar';
@@ -28,7 +27,6 @@ type Props = {
 };
 
 export function LoginPageContent({ hideLoginOptions, isLoggingIn }: Props) {
-  const returnUrl = new URLSearchParams(decodeURIComponent(window.location.search)).get('returnUrl');
   const { showMessage } = useSnackbar();
   const router = useRouter();
 
@@ -87,23 +85,7 @@ export function LoginPageContent({ hideLoginOptions, isLoggingIn }: Props) {
             </Typography>
             <Box display={{ sm: 'flex' }} gap={2} alignItems='center'>
               {isLoggingIn && <LoadingComponent label='Logging you in' />}
-              {!hideLoginOptions && (
-                <>
-                  <Login />
-                  <Typography color='secondary' variant='body2' sx={{ lineHeight: '40px' }}>
-                    or
-                  </Typography>
-                  <Button
-                    data-test='connect-discord'
-                    sx={{ width: '100%' }}
-                    variant='outlined'
-                    size='large'
-                    href={`/api/discord/oauth?type=login&redirect=${returnUrl ?? '/'}`}
-                  >
-                    Connect Discord
-                  </Button>
-                </>
-              )}
+              {!hideLoginOptions && <Login />}
             </Box>
           </Box>
         </Grid>
