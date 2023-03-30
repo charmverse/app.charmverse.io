@@ -76,6 +76,7 @@ export function NotificationPreview({ notification, markAsRead, onClose }: Props
             <IconButton
               onClick={(e) => {
                 e.preventDefault();
+                e.stopPropagation();
                 markAsRead({ taskId, groupType, type });
               }}
               size='small'
