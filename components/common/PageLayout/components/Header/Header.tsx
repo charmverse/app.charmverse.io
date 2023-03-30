@@ -420,7 +420,7 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
         </ListItemButton>
       )}
       {basePage && (
-        <DuplicatePageAction postDuplication={closeMenu} page={basePage} pagePermissions={pagePermissions} />
+        <DuplicatePageAction postDuplication={closeMenu} page={basePage} pagePermissions={pagePermissions} redirect />
       )}
       <CopyLinkMenuItem closeMenu={closeMenu} />
 
@@ -583,11 +583,8 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
           )}
           {/** End of CharmEditor page specific header content */}
           {user && (
-            <NotificationsBadge>
-              <IconButton
-                size={isLargeScreen ? 'small' : 'medium'}
-                onClick={() => clickToOpenSettingsModal('notifications')}
-              >
+            <NotificationsBadge onClick={() => clickToOpenSettingsModal('notifications')}>
+              <IconButton size={isLargeScreen ? 'small' : 'medium'}>
                 <NotificationsIcon fontSize='small' color='secondary' />
               </IconButton>
             </NotificationsBadge>

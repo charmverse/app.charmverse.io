@@ -1,5 +1,5 @@
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Box, Divider, FormControlLabel, Grid, Switch, Tooltip, Typography } from '@mui/material';
+import { Box, Divider, FormControlLabel, Grid, Paper, Switch, Tooltip, Typography } from '@mui/material';
 import { SpaceOperation } from '@prisma/client';
 import type { ChangeEvent } from 'react';
 import { useEffect, useState } from 'react';
@@ -50,7 +50,18 @@ interface Props {
 }
 
 export function RolePermissions({ targetGroup, id, callback = () => null }: Props) {
+  const { currentSpaceId } = useCurrentSpaceId();
+  const { categories: proposalCategories = [] } = useProposalCategories();
+  const { categories: forumCategories = [] } = useForumCategories();
+  const isAdmin = useIsAdmin();
   const [assignedPermissions, setAssignedPermissions] = useState<SpacePermissionFlags | null>(null);
+  // custom onChange is used for switches so isDirty from useForm doesn't change it value
+  const [touched, setTouched] = useState<boolean>(false);
+  const { handleSubmit, setValue } = useForm<FormValues>({
+    mode: 'onChange',
+    defaultValues: assignedPermissions ?? new AvailableSpacePermissions().empty,
+    resolver: yupResolver(schema)
+  });
 
   const { data: proposalCategoryPermissions, mutate: mutateProposalCategoryPermissions } = useSWR(
     `/proposals/list-group-proposal-category-permissions-${id}`,
@@ -60,7 +71,6 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
     `/posts/list-group-post-category-permissions-${id}`,
     () => charmClient.permissions.forum.listGroupPostCategoryPermissions({ group: targetGroup, id })
   );
-  const { currentSpaceId } = useCurrentSpaceId();
   // retriee space-level permissions to display as default
   const { data: spaceProposalCategoryPermissions } = useSWR(
     currentSpaceId &&
@@ -72,18 +82,6 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
     currentSpaceId && targetGroup !== 'space' && `/posts/list-group-post-category-permissions-${currentSpaceId}`,
     () => charmClient.permissions.forum.listGroupPostCategoryPermissions({ group: 'space', id: currentSpaceId })
   );
-
-  const { categories: proposalCategories = [] } = useProposalCategories();
-  const { categories: forumCategories = [] } = useForumCategories();
-
-  const isAdmin = useIsAdmin();
-  // custom onChange is used for switches so isDirty from useForm doesn't change it value
-  const [touched, setTouched] = useState<boolean>(false);
-  const { handleSubmit, setValue } = useForm<FormValues>({
-    mode: 'onChange',
-    defaultValues: assignedPermissions ?? new AvailableSpacePermissions().empty,
-    resolver: yupResolver(schema)
-  });
 
   const { data: memberPermissionFlags } = useSWR(
     targetGroup !== 'space' && currentSpaceId ? `member-permissions-${currentSpaceId}` : null,
@@ -304,7 +302,9 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
                           defaultPermissionLevel={permissionLevel}
                           emptyValue={memberRolePermission?.permissionLevel}
                           isInherited={!canModerateForums && memberRolePermission && !permission}
-                          disabledTooltip={canModerateForums && 'This role has full access to all categories'}
+                          disabledTooltip={
+                            canModerateForums ? 'This role has full access to all categories' : undefined
+                          }
                           assignee={{ group: targetGroup, id }}
                         />
                       );
