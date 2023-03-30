@@ -4,6 +4,7 @@ import { v4 } from 'uuid';
 import { prisma } from 'db';
 import { DuplicateDataError, InvalidInputError } from 'lib/utilities/errors';
 import { typedKeys } from 'lib/utilities/objects';
+import { uid } from 'lib/utilities/strings';
 
 import type { UpdateableSpaceFields } from '../updateSpace';
 import { updateSpace } from '../updateSpace';
@@ -16,11 +17,13 @@ let mockedMixpanelFn: jest.Mock;
 beforeAll(async () => {
   firstUser = await prisma.user.create({
     data: {
+      path: uid(),
       username: 'firstUser'
     }
   });
   secondUser = await prisma.user.create({
     data: {
+      path: uid(),
       username: 'secondUser'
     }
   });
