@@ -1,5 +1,3 @@
-import type { ProposalCategory } from '@prisma/client';
-
 import { prisma } from 'db';
 import { generateCategoryIdQuery } from 'lib/proposal/utils';
 import { InvalidInputError } from 'lib/utilities/errors';

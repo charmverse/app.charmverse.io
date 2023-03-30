@@ -5,7 +5,7 @@ import type { AssignablePermissionGroups } from '../interfaces';
 import { AvailableSpacePermissions } from './availableSpacePermissions';
 import { computeGroupSpacePermissions } from './computeGroupSpacePermissions';
 import type { SpacePermissionFlags, SpacePermissionModification } from './interfaces';
-import { generateSpacePermissionQuery } from './utility';
+import { generateSpacePermissionQuery } from './utils';
 
 /**
  * Returns true if the operation had an effect, false if nothing changed
