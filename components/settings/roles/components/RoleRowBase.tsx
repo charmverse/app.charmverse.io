@@ -158,27 +158,27 @@ function AddMembersButton({ onAddMembers, eligibleMemberIds }: ButtonProps) {
 
   return (
     <Box mt={2}>
-      {eligibleMemberIds.length > 0 ? (
-        <Button onClick={showMembersPopup} variant='text' color='secondary'>
-          + Add members
-        </Button>
-      ) : (
-        <Typography variant='caption'>All eligible members have been added to this role</Typography>
-      )}
+      <Button onClick={showMembersPopup} variant='text' color='secondary'>
+        + Add members
+      </Button>
       <Modal open={userPopupState.isOpen} onClose={userPopupState.close} title='Add members'>
-        <Grid container direction='column' spacing={3}>
-          <Grid item>
-            <InputSearchMemberMultiple
-              filter={{ mode: 'include', userIds: eligibleMemberIds }}
-              onChange={onChangeNewMembers}
-            />
+        {eligibleMemberIds.length === 0 ? (
+          <Typography variant='body2'>All eligible members have been added to this role</Typography>
+        ) : (
+          <Grid container direction='column' spacing={3}>
+            <Grid item>
+              <InputSearchMemberMultiple
+                filter={{ mode: 'include', userIds: eligibleMemberIds }}
+                onChange={onChangeNewMembers}
+              />
+            </Grid>
+            <Grid item>
+              <Button disabled={newMembers.length === 0} onClick={addMembers}>
+                Add
+              </Button>
+            </Grid>
           </Grid>
-          <Grid item>
-            <Button disabled={newMembers.length === 0} onClick={addMembers}>
-              Add
-            </Button>
-          </Grid>
-        </Grid>
+        )}
       </Modal>
     </Box>
   );
