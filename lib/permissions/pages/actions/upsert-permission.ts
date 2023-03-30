@@ -176,14 +176,14 @@ async function validatePermissionToCreate(pageId: string, permission: IPagePermi
   }
 
   // Load the page space ID
-  const pageSpaceId = (await tx.page.findUnique({
+  const pageSpaceId = await tx.page.findUnique({
     where: {
       id: pageId
     },
     select: {
       spaceId: true
     }
-  })) as Pick<Page, 'spaceId'>;
+  });
 
   if (permission.spaceId && permission.spaceId !== pageSpaceId?.spaceId) {
     throw new InsecureOperationError(
@@ -249,7 +249,6 @@ export async function upsertPermission(
           flatChildren: flattenTree(tree.targetPage)
         };
       }))) as TargetPageTreeWithFlatChildren<PageNodeWithPermissions>;
-
     // Get the source permission we are inheriting from
     let permissionData: Prisma.PagePermissionUpsertArgs;
 
@@ -340,17 +339,15 @@ export async function upsertPermission(
       permissionBeforeModification &&
       permissionBeforeModification.inheritedFromPermission !== upsertedPermission.inheritedFromPermission
     ) {
-      const childrenIds = resolvedPageTree.flatChildren.map((page) => {
-        return {
-          pageId: page.id
-        };
-      });
+      const childrenIds = resolvedPageTree.flatChildren.map((page) => page.id);
 
       await tx.pagePermission.updateMany({
         where: {
           AND: [
             {
-              OR: childrenIds
+              pageId: {
+                in: childrenIds
+              }
             },
             {
               inheritedFromPermission: permissionBeforeModification.inheritedFromPermission

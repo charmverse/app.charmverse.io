@@ -139,7 +139,7 @@ function MemberProfile({
               <Typography variant='h6'>{member.username}'s profile</Typography>
               <Button
                 onClick={onClose}
-                href={`/u/${user.path}`}
+                href={`/u/${user.path || user.id}`}
                 color='secondary'
                 variant='outlined'
                 sx={{

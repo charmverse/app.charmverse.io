@@ -173,7 +173,7 @@ export async function getAccessiblePages(input: PagesRequest): Promise<IPageWith
     ? `${input.search
         .split(/\s/)
         .filter((s) => s)
-        .join(' <-> ')}:*`
+        .join(' & ')}:*`
     : undefined;
 
   let pages: IPageWithPermissions[];

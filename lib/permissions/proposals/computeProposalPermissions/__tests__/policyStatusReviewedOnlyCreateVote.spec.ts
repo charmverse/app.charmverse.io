@@ -88,7 +88,7 @@ describe('policyStatusReviewedOnlyCreateVote', () => {
     });
   });
 
-  it('should allow the admin to view, delete, create_vote and make public', async () => {
+  it('should allow the admin to view, delete, edit, create_vote and make public', async () => {
     const permissions = await policyStatusReviewedOnlyCreateVote({
       flags: fullPermissions,
       isAdmin: true,
@@ -101,7 +101,7 @@ describe('policyStatusReviewedOnlyCreateVote', () => {
       delete: true,
       create_vote: true,
       make_public: true,
-      edit: false,
+      edit: true,
       review: false,
       comment: false,
       vote: false
