@@ -39,7 +39,6 @@ export default function InputEnumToOptions<T extends string>({
       <Select
         sx={sx}
         value={defaultValue as any}
-        readOnly
         onChange={(ev) => {
           // setValue(ev.target.value as T);
           onChange(ev.target.value as T);
