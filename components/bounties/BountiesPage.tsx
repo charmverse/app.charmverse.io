@@ -180,7 +180,7 @@ export default function BountiesPage({ publicMode = false, bounties }: Props) {
               <Box p={3} textAlign='center'>
                 <Typography color='secondary'>
                   There are no open bounties, click <Link href={`/${space?.domain}/bounties?view=board`}>here</Link> to
-                  see all you existing bounties
+                  see all of your existing bounties
                 </Typography>
               </Box>
             </Card>
