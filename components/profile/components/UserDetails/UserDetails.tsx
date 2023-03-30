@@ -168,7 +168,14 @@ function UserDetails({ readOnly, user, updateUser, sx = {} }: UserDetailsProps) 
           </Grid>
         )}
 
-        {userDetails ? (
+        {!userDetails && isLoading ? (
+          <Box display='flex' gap={1} flexDirection='column' ml={2} mt={2}>
+            <Skeleton variant='rectangular' width={150} height={16} />
+            <Skeleton variant='rectangular' width='100%' height={55} />
+            <Skeleton variant='rectangular' width={150} height={16} sx={{ mt: 1 }} />
+            <Skeleton variant='rectangular' width='100%' height={35} />
+          </Box>
+        ) : (
           <>
             <Grid item>
               <UserDescription
@@ -182,13 +189,6 @@ function UserDetails({ readOnly, user, updateUser, sx = {} }: UserDetailsProps) 
             </Grid>
             <SocialInputs social={userDetails?.social as Social} save={saveSocial} readOnly={disabled} />
           </>
-        ) : (
-          <Box display='flex' gap={1} flexDirection='column' ml={2} mt={2}>
-            <Skeleton variant='rectangular' width={150} height={16} />
-            <Skeleton variant='rectangular' width='100%' height={55} />
-            <Skeleton variant='rectangular' width={150} height={16} sx={{ mt: 1 }} />
-            <Skeleton variant='rectangular' width='100%' height={35} />
-          </Box>
         )}
       </Grid>
       {!isPublic && (
