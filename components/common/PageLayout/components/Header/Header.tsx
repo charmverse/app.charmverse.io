@@ -420,7 +420,7 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
         </ListItemButton>
       )}
       {basePage && (
-        <DuplicatePageAction postDuplication={closeMenu} page={basePage} pagePermissions={pagePermissions} />
+        <DuplicatePageAction postDuplication={closeMenu} page={basePage} pagePermissions={pagePermissions} redirect />
       )}
       <CopyLinkMenuItem closeMenu={closeMenu} />
 
