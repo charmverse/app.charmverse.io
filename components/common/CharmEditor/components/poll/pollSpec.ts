@@ -23,6 +23,7 @@ export function spec(): RawSpecs {
           default: []
         }
       },
+      selectable: false,
       group: 'block',
       inline: false,
       draggable: false,
