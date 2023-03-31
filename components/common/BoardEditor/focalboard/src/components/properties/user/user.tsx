@@ -69,6 +69,11 @@ function UserProperty(props: Props): JSX.Element | null {
   }, {});
 
   const [isOpen, setIsOpen] = useState(false);
+
+  if (props.readOnly && memberIds.length === 0) {
+    return null;
+  }
+
   return (
     <StyledUserPropertyContainer
       onClick={() => {
