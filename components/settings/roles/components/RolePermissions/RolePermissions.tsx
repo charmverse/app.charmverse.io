@@ -259,60 +259,56 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
                 })}
               </Box>
             </Box>
+            <Divider sx={{ mt: 1, mb: 2 }} />
+            <Typography variant='body2' fontWeight='bold'>
+              Forums
+            </Typography>
             {targetGroup !== 'space' && (
-              <>
-                <Divider sx={{ mt: 1, mb: 2 }} />
-                <Typography variant='body2' fontWeight='bold'>
-                  Forums
-                </Typography>
-                <PermissionToggle
-                  data-test='space-operation-moderateForums'
-                  label='Moderate all forum categories'
-                  defaultChecked={assignedPermissions?.moderateForums}
-                  memberChecked={memberPermissionFlags?.moderateForums}
-                  disabled={!isAdmin}
-                  onChange={(ev) => {
-                    const { checked: nowHasAccess } = ev.target;
-                    setValue('moderateForums', nowHasAccess);
-                    setTouched(true);
-                  }}
-                />
-                <Typography sx={{ my: 1 }}>Access to categories</Typography>
-                <Box display='flex' gap={3} mb={2}>
-                  <Divider orientation='vertical' flexItem />
-                  <Box flexGrow={1}>
-                    {forumCategories.map((category) => {
-                      const permission = postCategoryPermissions?.find((p) => p.postCategoryId === category.id);
-                      const memberRolePermission = spacePostCategoryPermissions?.find(
-                        (p) => p.postCategoryId === category.id
-                      );
-                      const canModerateForums =
-                        memberPermissionFlags?.moderateForums || assignedPermissions?.moderateForums;
-                      const permissionLevel = canModerateForums ? 'full_access' : permission?.permissionLevel;
-
-                      return (
-                        <PostCategoryRolePermissionRow
-                          key={category.id}
-                          canEdit={!canModerateForums && category.permissions.manage_permissions}
-                          label={category.name}
-                          deletePermission={deletePostCategoryPermission}
-                          updatePermission={updatePostCategoryPermission}
-                          postCategoryId={category.id}
-                          existingPermissionId={permission?.id}
-                          defaultPermissionLevel={permissionLevel}
-                          emptyValue={memberRolePermission?.permissionLevel}
-                          isInherited={!canModerateForums && memberRolePermission && !permission}
-                          disabledTooltip={
-                            canModerateForums ? 'This role has full access to all categories' : undefined
-                          }
-                          assignee={{ group: targetGroup, id }}
-                        />
-                      );
-                    })}
-                  </Box>
-                </Box>
-              </>
+              <PermissionToggle
+                data-test='space-operation-moderateForums'
+                label='Moderate and access all forum categories'
+                defaultChecked={assignedPermissions?.moderateForums}
+                memberChecked={memberPermissionFlags?.moderateForums}
+                disabled={!isAdmin}
+                onChange={(ev) => {
+                  const { checked: nowHasAccess } = ev.target;
+                  setValue('moderateForums', nowHasAccess);
+                  setTouched(true);
+                }}
+              />
             )}
+            <Typography sx={{ my: 1 }}>Access to categories</Typography>
+            <Box display='flex' gap={3} mb={2}>
+              <Divider orientation='vertical' flexItem />
+              <Box flexGrow={1}>
+                {forumCategories.map((category) => {
+                  const permission = postCategoryPermissions?.find((p) => p.postCategoryId === category.id);
+                  const memberRolePermission = spacePostCategoryPermissions?.find(
+                    (p) => p.postCategoryId === category.id
+                  );
+                  const canModerateForums =
+                    memberPermissionFlags?.moderateForums || assignedPermissions?.moderateForums;
+                  const permissionLevel = canModerateForums ? 'full_access' : permission?.permissionLevel;
+
+                  return (
+                    <PostCategoryRolePermissionRow
+                      key={category.id}
+                      canEdit={!canModerateForums && category.permissions.manage_permissions}
+                      label={category.name}
+                      deletePermission={deletePostCategoryPermission}
+                      updatePermission={updatePostCategoryPermission}
+                      postCategoryId={category.id}
+                      existingPermissionId={permission?.id}
+                      defaultPermissionLevel={permissionLevel}
+                      emptyValue={memberRolePermission?.permissionLevel}
+                      isInherited={!canModerateForums && memberRolePermission && !permission}
+                      disabledTooltip={canModerateForums ? 'This role has full access to all categories' : undefined}
+                      assignee={{ group: targetGroup, id }}
+                    />
+                  );
+                })}
+              </Box>
+            </Box>
 
             {isAdmin && (
               <Box mt={2}>
