@@ -3,6 +3,7 @@ import { v4 } from 'uuid';
 import { prisma } from 'db';
 import { sessionUserRelations } from 'lib/session/config';
 import { InvalidInputError, MissingDataError } from 'lib/utilities/errors';
+import { uid } from 'lib/utilities/strings';
 import type { LoggedInUser } from 'models';
 
 import { getUserProfile } from '../getUser';
@@ -13,6 +14,7 @@ const walletAddress = `0x${v4()}`;
 beforeAll(async () => {
   user = await prisma.user.create({
     data: {
+      path: uid(),
       username: 'userWithOneIdentities',
       wallets: {
         create: {
