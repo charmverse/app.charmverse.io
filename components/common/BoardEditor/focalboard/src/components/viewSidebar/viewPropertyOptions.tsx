@@ -19,6 +19,13 @@ interface LayoutOptionsProps {
   view: BoardView;
 }
 
+const titleProperty: IPropertyTemplate = {
+  id: Constants.titleColumnId,
+  name: 'Title',
+  options: [],
+  type: 'text'
+};
+
 function PropertyMenuItem({
   isVisible,
   property,
@@ -72,6 +79,10 @@ function PropertyOptions(props: LayoutOptionsProps) {
   const visiblePropertyIdsWithTitle =
     titlePropertyIndex === -1 ? [Constants.titleColumnId, ...visiblePropertyIds] : visiblePropertyIds;
 
+  const propertiesWithTitle = properties.find((property) => property.id === Constants.titleColumnId)
+    ? properties
+    : [titleProperty, ...properties];
+
   const { hiddenProperties, visibleProperties } = useMemo(() => {
     const propertyIds = properties.map((property) => property.id);
     const _propertiesRecord = properties.reduce<Record<string, IPropertyTemplate>>((__propertiesRecord, property) => {
@@ -81,12 +92,7 @@ function PropertyOptions(props: LayoutOptionsProps) {
 
     // Manually add __title column as its not present by default
     if (!_propertiesRecord[Constants.titleColumnId]) {
-      _propertiesRecord[Constants.titleColumnId] = {
-        id: Constants.titleColumnId,
-        name: 'Title',
-        options: [],
-        type: 'text'
-      };
+      _propertiesRecord[Constants.titleColumnId] = titleProperty;
     }
 
     const _visibleProperties = visiblePropertyIdsWithTitle.map(
@@ -149,7 +155,7 @@ function PropertyOptions(props: LayoutOptionsProps) {
     mutator.changeViewVisibleProperties(
       view.id,
       visiblePropertyIdsWithTitle,
-      properties.map((property) => property.id)
+      propertiesWithTitle.map((property) => property.id)
     );
   };
 
