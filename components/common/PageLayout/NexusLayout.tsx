@@ -32,12 +32,12 @@ interface NexusLayoutProps {
 
 function NexusLayout({ children }: NexusLayoutProps) {
   const { user, logoutUser, isLoaded } = useUser();
-  const { disconnectWallet } = useWeb3AuthSig();
+  const { logoutWallet } = useWeb3AuthSig();
   const router = useRouter();
   const { onClick } = useSettingsDialog();
 
   async function logoutCurrentUser() {
-    disconnectWallet();
+    logoutWallet();
     await logoutUser();
     router.push('/');
   }
