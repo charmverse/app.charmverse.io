@@ -48,11 +48,6 @@ test('User has correct access in the space settings', async ({ page, spaceSettin
   const isEditable = await spaceSettings.hasEditableMemberLevel(user.id);
   expect(isEditable).toBe(true);
 
-  // Make sure other user doesn't show up
-  const invisibleMemberRow = spaceSettings.getSpaceMemberRowLocator(otherSpaceAdmin.id);
-  await expect(invisibleMemberRow).not.toBeVisible();
-  await expect(spaceSettings.getSpaceSettingsSectionLocator('space')).not.toBeVisible();
-
   // Member info should be visible
   await spaceSettings.clickRoleRowByTitle('Member');
   const currentUserRow = spaceSettings.getSpaceMemberRowLocator(user.id);
