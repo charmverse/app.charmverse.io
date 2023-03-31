@@ -161,26 +161,20 @@ function getNotificationHref(n: NotificationPreview, groupType: NotificationGrou
   const path = getNotificationPreviewPath(n);
   const commentId = 'commentId' in n ? n.commentId : null;
   const mentionId = 'mentionId' in n ? n.mentionId : null;
-  const bountyId = 'bountyId' in n ? n.bountyId : null;
+
+  if (groupType === 'proposals' || groupType === 'bounties' || ('type' in n && n.type === 'proposal')) {
+    return `/${spaceDomain}/${path}`;
+  }
 
   if (groupType === 'discussions') {
     return `/${spaceDomain}/${path}?${commentId ? `commentId=${commentId}` : `mentionId=${mentionId}`}`;
   }
-
-  if (groupType === 'bounties') {
-    return `/${spaceDomain}/bounties?bountyId=${bountyId}`;
-  }
-
   if (groupType === 'votes') {
     return `/${spaceDomain}/${path}?voteId=${taskId}`;
   }
 
-  if (groupType === 'proposals') {
-    return `/${spaceDomain}/${path}`;
-  }
-
   if (groupType === 'forum') {
-    return `${spaceDomain}/forum/post/${path}`;
+    return `/${spaceDomain}/forum/post/${path}`;
   }
 
   return '';
@@ -196,12 +190,42 @@ function getNotificationContent(n: NotificationPreview, groupType: NotificationG
   const { createdBy } = n;
   const isCreator = currentUserId === createdBy?.id;
 
-  if (groupType === 'bounties' && action === 'application_pending') {
-    return `${createdBy?.username} applied for ${title} bounty.`;
-  }
+  if (groupType === 'bounties') {
+    if (action === 'application_pending') {
+      return `${createdBy?.username} applied for ${title} bounty.`;
+    }
 
-  if (groupType === 'bounties' && action === 'application_approved') {
-    return `You application for ${title} bounty is approved.`;
+    if (action === 'work_submitted') {
+      return `${createdBy?.username} submitted work for ${title} bounty.`;
+    }
+
+    if (action === 'application_approved') {
+      return `You application for ${title} bounty was approved.`;
+    }
+
+    if (action === 'application_rejected') {
+      return `You application for ${title} bounty has been rejected.`;
+    }
+
+    if (action === 'work_approved') {
+      return `You submission for ${title} bounty was approved.`;
+    }
+
+    if (action === 'payment_needed') {
+      return `Bounty ${title} is ready for payment.`;
+    }
+
+    if (action === 'payment_complete') {
+      return `Bounty ${title} has been paid.`;
+    }
+
+    if (action === 'suggested_bounty') {
+      return createdBy?.username ? `${createdBy?.username} suggested new ${title} bounty.` : 'New bounty suggestion.';
+    }
+
+    return createdBy?.username
+      ? `${createdBy?.username} updated ${title} bounty status.`
+      : `Bounty status ${title} updated.`;
   }
 
   if (groupType === 'votes' && userChoice) {
@@ -220,10 +244,6 @@ function getNotificationContent(n: NotificationPreview, groupType: NotificationG
 
   if (groupType === 'discussions') {
     return title ? `${createdBy?.username} left a comment in ${title}.` : `${createdBy?.username} left a comment.`;
-  }
-
-  if (groupType === 'bounties') {
-    return createdBy?.username ? `${createdBy?.username} created a bounty.` : 'Bounty created.';
   }
 
   if (groupType === 'votes') {
@@ -245,9 +265,9 @@ function getNotificationContent(n: NotificationPreview, groupType: NotificationG
   if (groupType === 'proposals') {
     return createdBy?.username
       ? isCreator
-        ? `You created new proposal.`
-        : `${createdBy?.username} created a proposal.`
-      : 'Proposal created.';
+        ? `You updated ${title} proposal.`
+        : `${createdBy?.username} updated ${title} proposal.`
+      : `Proposal ${title} updated.`;
   }
 
   return '';
@@ -255,6 +275,10 @@ function getNotificationContent(n: NotificationPreview, groupType: NotificationG
 
 function getNotificationTitle(n: NotificationPreview, groupType: NotificationGroupType) {
   const status = 'status' in n ? n.status : null;
+
+  if (groupType === 'discussions' && 'type' in n && n.type === 'proposal') {
+    return 'Proposal Discussion';
+  }
 
   switch (groupType) {
     case 'discussions':
@@ -266,7 +290,7 @@ function getNotificationTitle(n: NotificationPreview, groupType: NotificationGro
     case 'forum':
       return 'Forum Post';
     case 'proposals':
-      return `Proposal status: ${getNotificationStatus(status)}`;
+      return `Proposal: ${getNotificationStatus(status)}`;
     default:
       return '';
   }
