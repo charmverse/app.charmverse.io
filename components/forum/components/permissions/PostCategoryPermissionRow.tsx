@@ -37,9 +37,7 @@ export function PostCategoryRolePermissionRow({
   const space = useCurrentSpace();
 
   const assigneeName = useMemo(() => {
-    return assignee.group === 'space'
-      ? `Everyone at ${space?.name}`
-      : roles.roles?.find((r) => r.id === assignee.id)?.name;
+    return assignee.group === 'space' ? `Default permisions` : roles.roles?.find((r) => r.id === assignee.id)?.name;
   }, [roles, space]);
 
   function handleUpdate(level: keyof typeof permissionsWithRemove) {
