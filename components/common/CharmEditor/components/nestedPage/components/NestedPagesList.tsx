@@ -40,7 +40,7 @@ function NestedPagesList({ pluginKey }: { pluginKey: PluginKey<NestedPagePluginS
 
   const filteredPages = useMemo(() => {
     if (!triggerText) {
-      return listPages.filter((page) => !page?.parentId && !page.boardId && !page.cardId && !page.proposalId);
+      return listPages.filter((page) => !page?.parentId && !page.bountyId && !page.proposalId);
     }
 
     return listPages.filter((page) =>
