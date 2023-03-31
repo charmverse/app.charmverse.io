@@ -264,7 +264,7 @@ export default function Sidebar({ closeSidebar, navAction }: SidebarProps) {
               />
               {showMemberFeatures && (
                 <SidebarBox
-                  onClick={() => handleModalClick(`${space.name}-invites`)}
+                  onClick={() => handleModalClick('invites')}
                   icon={<GroupAddOutlinedIcon color='secondary' fontSize='small' />}
                   label='Invites'
                 />
