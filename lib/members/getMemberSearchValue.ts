@@ -1,27 +1,17 @@
-import type {
-  DiscordUser,
-  GoogleAccount,
-  MemberPropertyValue,
-  TelegramUser,
-  User,
-  UserDetails,
-  UserWallet
-} from '@prisma/client';
+import type { DiscordUser, MemberPropertyValue, TelegramUser, User, UserDetails, UserWallet } from '@prisma/client';
 
 type UserData = User & {
   memberPropertyValues: MemberPropertyValue[];
   profile: UserDetails | null;
   wallets: UserWallet[];
-  googleAccounts: GoogleAccount[];
   telegramUser: TelegramUser | null;
   discordUser: DiscordUser | null;
 };
 
 export function getMemberSearchValue(userData: UserData): string {
-  const { profile, memberPropertyValues = [], wallets, googleAccounts, telegramUser, discordUser } = userData;
+  const { profile, memberPropertyValues = [], wallets, telegramUser, discordUser } = userData;
   // all account names
   const ensString = wallets.map((wallet) => wallet.ensname || '').join(' ');
-  const googleAccountsString = googleAccounts ? googleAccounts.map((ga) => `${ga.name} ${ga.email}`) : '';
   const discordAccountString =
     discordUser?.account && typeof discordUser?.account === 'object' && 'username' in discordUser.account
       ? discordUser?.account?.username
@@ -46,7 +36,7 @@ export function getMemberSearchValue(userData: UserData): string {
   // all socials
   const socialsString = profile?.social ? Object.values(profile.social).join(' ') : '';
 
-  return `${userDetailsString} ${ensString} ${propertyValuesString} ${socialsString} ${googleAccountsString} ${telegramAccountString} ${discordAccountString}`
+  return `${userDetailsString} ${ensString} ${propertyValuesString} ${socialsString} ${telegramAccountString} ${discordAccountString}`
     .toLowerCase()
     .replace(/\s\s+/g, ' ');
 }
