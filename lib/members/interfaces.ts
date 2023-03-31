@@ -45,6 +45,7 @@ export type Member = Pick<User, 'id' | 'createdAt' | 'updatedAt' | 'username'> &
   properties: PropertyValueWithDetails[];
   roles: Pick<Role, 'name' | 'id'>[];
   onboarded?: boolean;
+  searchValue: string;
 };
 
 export type CreateMemberPropertyPayload = Pick<MemberProperty, 'index' | 'name' | 'options' | 'type'>;

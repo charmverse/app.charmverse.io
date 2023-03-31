@@ -182,8 +182,8 @@ export function MemberMiniProfile({
   onClose: VoidFunction;
   isOnboarding?: boolean;
 }) {
-  const { members } = useMembers();
-  const member = members.find((_member) => _member.id === memberId);
+  const { getMemberById } = useMembers();
+  const member = getMemberById(memberId);
 
   if (!member) {
     return null;
