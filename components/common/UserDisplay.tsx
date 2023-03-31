@@ -105,7 +105,7 @@ function UserDisplay({ showMiniProfile = false, user, linkToProfile = false, ...
 
   // Copied from User Details component
   const hostname = typeof window !== 'undefined' ? window.location.origin : '';
-  const userPath = user.path || user.id;
+  const userPath = user.path;
   const userLink = `${hostname}/u/${userPath}`;
   const isNft = hasNftAvatar(user);
 

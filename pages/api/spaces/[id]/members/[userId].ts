@@ -30,7 +30,7 @@ async function updateMember(req: NextApiRequest, res: NextApiResponse) {
         isAdmin: true,
         spaceId,
         userId: {
-          not: req.session.user.id
+          not: userId
         }
       }
     });
@@ -48,7 +48,8 @@ async function updateMember(req: NextApiRequest, res: NextApiResponse) {
       }
     },
     data: {
-      isAdmin: req.body.isAdmin
+      isAdmin: req.body.isAdmin,
+      isGuest: req.body.isGuest
     }
   });
   res.status(200).json({ ok: true });

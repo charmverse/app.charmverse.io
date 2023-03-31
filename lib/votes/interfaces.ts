@@ -1,5 +1,6 @@
 import type { Space, User, UserVote, Vote, VoteOptions } from '@prisma/client';
 
+import type { NotificationActor } from 'lib/notifications/mapNotificationActor';
 import type { PageMeta } from 'lib/pages';
 
 export const DEFAULT_THRESHOLD = 50;
@@ -28,9 +29,14 @@ export interface ExtendedVote extends Vote {
   totalVotes: number;
 }
 
-export type VoteTask = ExtendedVote & {
+export type VoteTask = Omit<ExtendedVote, 'createdBy'> & {
   page: PageMeta;
   space: Space;
+  createdBy: NotificationActor | null;
+  taskId: string;
+  spaceName: string;
+  spaceDomain: string;
+  pagePath: string;
 };
 
 export type UserVoteExtendedDTO = UserVote & {

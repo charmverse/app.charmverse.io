@@ -46,6 +46,7 @@ export class LoginPage {
 
   // retrieve the Discord URL when clicking 'connect discord' button
   async getDiscordUrl() {
+    await this.universalConnectButton.click();
     const discordButtonHref = await this.connectDiscordButton.evaluate((node) => (node as HTMLAnchorElement).href);
     expect(discordButtonHref).toBeDefined();
     const redirectResponse = await this.page.request.get(discordButtonHref, { maxRedirects: 0 });

@@ -10,8 +10,7 @@ export default function NotificationsBadge({ children, ...badgeProps }: BadgePro
 
   const userNotificationState = user?.notificationState;
 
-  const voteTasksCount =
-    tasks?.votes.filter((vote) => !vote.userChoice && new Date() < new Date(vote.deadline)).length ?? 0;
+  const voteTasksCount = tasks?.votes.unmarked.filter((vote) => new Date() < new Date(vote.deadline)).length ?? 0;
   const mentionTasksCount = tasks?.discussions.unmarked?.length ?? 0;
   // If the user has snoozed multisig tasks don't count them
   const excludeGnosisTasks =
@@ -19,8 +18,10 @@ export default function NotificationsBadge({ children, ...badgeProps }: BadgePro
   const gnosisTasksCount = excludeGnosisTasks ? 0 : gnosisTasks?.filter((gnosisTask) => !gnosisTask.marked).length ?? 0;
   const proposalTasksCount = tasks?.proposals.unmarked.length ?? 0;
   const forumTasksCount = tasks?.forum.unmarked.length ?? 0;
+  const bountyTasksCount = tasks?.bounties.unmarked.length ?? 0;
 
-  const totalTasks = voteTasksCount + mentionTasksCount + gnosisTasksCount + proposalTasksCount + forumTasksCount;
+  const totalTasks =
+    voteTasksCount + mentionTasksCount + gnosisTasksCount + proposalTasksCount + forumTasksCount + bountyTasksCount;
 
   return (
     <Badge

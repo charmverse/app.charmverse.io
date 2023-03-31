@@ -16,11 +16,12 @@ import { proposalCategoryPermissionOptions, permissionsWithRemove } from './shar
 type Props = {
   assignee: TargetPermissionGroup<'role' | 'space'>;
   existingPermissionId?: string;
+  label?: string;
   defaultPermissionLevel?: ProposalCategoryPermissionLevel;
   proposalCategoryId: string;
   canEdit: boolean;
   updatePermission: (newPermission: ProposalCategoryPermissionInput) => void;
-  deletePermission: (permissionId: string) => void;
+  deletePermission?: (permissionId: string) => void;
 };
 
 export function ProposalCategoryRolePermissionRow({
@@ -29,6 +30,7 @@ export function ProposalCategoryRolePermissionRow({
   proposalCategoryId,
   defaultPermissionLevel,
   canEdit,
+  label,
   updatePermission,
   deletePermission
 }: Props) {
@@ -36,13 +38,14 @@ export function ProposalCategoryRolePermissionRow({
   const space = useCurrentSpace();
 
   const assigneeName = useMemo(() => {
+    if (label) return label;
     return assignee.group === 'space'
       ? `Everyone at ${space?.name}`
       : roles.roles?.find((r) => r.id === assignee.id)?.name;
-  }, [roles, space]);
+  }, [label, roles, space]);
 
   function handleUpdate(level: keyof typeof permissionsWithRemove) {
-    if (level === 'delete' && existingPermissionId) {
+    if (level === 'delete' && existingPermissionId && deletePermission) {
       deletePermission(existingPermissionId);
     } else if (level !== 'delete') {
       updatePermission({ permissionLevel: level, proposalCategoryId, assignee });

@@ -225,7 +225,8 @@ async function getCommentBlockMentions({
             createdAt: mention.createdAt,
             userId: mention.createdBy,
             text: mention.text,
-            commentId: comment.id
+            commentId: comment.id,
+            taskId: mention.id
           });
         }
       });
@@ -377,7 +378,8 @@ async function getPageComments({
           commentId: comment.id,
           userId: comment.userId,
           createdAt: new Date(comment.createdAt).toISOString(),
-          mentionId: null
+          mentionId: null,
+          taskId: comment.id
         });
         break;
       }
@@ -436,6 +438,7 @@ async function getPageCommentMentions({
           mentions.push({
             ...getPropertiesFromPage(comment.page, spaceRecord[comment.page.spaceId]),
             mentionId: mention.id,
+            taskId: mention.id,
             createdAt: mention.createdAt,
             userId: mention.createdBy,
             text: mention.text,
@@ -491,6 +494,7 @@ async function getPageMentions({
           mentions.push({
             ...getPropertiesFromPage(page, spaceRecord[page.spaceId]),
             mentionId: mention.id,
+            taskId: mention.id,
             createdAt: mention.createdAt,
             userId: mention.createdBy,
             text: mention.text,

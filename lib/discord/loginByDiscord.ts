@@ -11,6 +11,7 @@ import { updateTrackUserProfile } from 'lib/metrics/mixpanel/updateTrackUserProf
 import { logSignupViaDiscord } from 'lib/metrics/postToDiscord';
 import { sessionUserRelations } from 'lib/session/config';
 import { DisabledAccountError } from 'lib/utilities/errors';
+import { uid } from 'lib/utilities/strings';
 
 type LoginWithDiscord = {
   code: string;
@@ -80,6 +81,7 @@ export async function loginByDiscord({
             discordId: id
           }
         },
+        path: uid(),
         profile: {
           create: {
             social: {

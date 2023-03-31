@@ -1,5 +1,5 @@
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Box, Divider, FormControlLabel, Grid, Switch, Tooltip, Typography } from '@mui/material';
+import { Box, Divider, FormControlLabel, Grid, Paper, Switch, Tooltip, Typography } from '@mui/material';
 import { SpaceOperation } from '@prisma/client';
 import type { ChangeEvent } from 'react';
 import { useEffect, useState } from 'react';
@@ -10,10 +10,13 @@ import * as yup from 'yup';
 
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
+import { ProposalCategoryRolePermissionRow } from 'components/proposals/components/permissions/ProposalCategoryPermissionRow';
+import { useProposalCategories } from 'components/proposals/hooks/useProposalCategories';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { usePreventReload } from 'hooks/usePreventReload';
 import type { AssignablePermissionGroups } from 'lib/permissions/interfaces';
+import type { ProposalCategoryPermissionInput } from 'lib/permissions/proposals/upsertProposalCategoryPermission';
 import type { SpacePermissionFlags } from 'lib/permissions/spaces/client';
 import { AvailableSpacePermissions } from 'lib/permissions/spaces/client';
 
@@ -37,7 +40,7 @@ type FormValues = yup.InferType<typeof schema>;
  * @param callback Used to tell the parent the operation is complete. Useful for triggering refreshes
  */
 interface Props {
-  targetGroup: AssignablePermissionGroups;
+  targetGroup: Extract<AssignablePermissionGroups, 'space' | 'role'>;
   id: string;
   callback?: () => void;
 }
@@ -45,7 +48,13 @@ interface Props {
 export function RolePermissions({ targetGroup, id, callback = () => null }: Props) {
   const [assignedPermissions, setAssignedPermissions] = useState<SpacePermissionFlags | null>(null);
 
+  const { data: categoryPermissions, mutate: mutateCategoryPermissions } = useSWR(
+    `/proposals/list-group-proposal-category-permissions-${id}`,
+    () => charmClient.permissions.proposals.listGroupProposalCategoryPermissions({ group: targetGroup, id })
+  );
+
   const space = useCurrentSpace();
+  const { categories = [] } = useProposalCategories();
 
   const isAdmin = useIsAdmin();
   // custom onChange is used for switches so isDirty from useForm doesn't change it value
@@ -110,8 +119,7 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
           forSpaceId: space.id,
           operations: permissionsToAdd,
           spaceId: targetGroup === 'space' ? id : undefined,
-          roleId: targetGroup === 'role' ? id : undefined,
-          userId: targetGroup === 'user' ? id : undefined
+          roleId: targetGroup === 'role' ? id : undefined
         });
       }
 
@@ -120,8 +128,7 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
           forSpaceId: space.id,
           operations: permissionsToRemove,
           spaceId: targetGroup === 'space' ? id : undefined,
-          roleId: targetGroup === 'role' ? id : undefined,
-          userId: targetGroup === 'user' ? id : undefined
+          roleId: targetGroup === 'role' ? id : undefined
         });
       }
       // Force a refresh of rendered components
@@ -133,6 +140,16 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
         mutate(`member-permissions-${space.id}`);
       }
     }
+  }
+
+  async function deletePermission(permissionId: string) {
+    await charmClient.permissions.proposals.deleteProposalCategoryPermission(permissionId);
+    mutateCategoryPermissions();
+  }
+
+  async function updatePermission(input: ProposalCategoryPermissionInput) {
+    await charmClient.permissions.proposals.upsertProposalCategoryPermission(input);
+    mutateCategoryPermissions();
   }
 
   return (
@@ -187,6 +204,28 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
                 setTouched(true);
               }}
             />
+            <Typography sx={{ my: 1 }}>Access to categories</Typography>
+            <Box display='flex' gap={3} mb={2}>
+              <Divider orientation='vertical' flexItem />
+              <Box flexGrow={1}>
+                {categories.map((category) => {
+                  const permission = categoryPermissions?.find((p) => p.proposalCategoryId === category.id);
+                  return (
+                    <ProposalCategoryRolePermissionRow
+                      key={category.id}
+                      canEdit={category.permissions.manage_permissions}
+                      label={category.title}
+                      deletePermission={deletePermission}
+                      updatePermission={updatePermission}
+                      proposalCategoryId={category.id}
+                      existingPermissionId={permission?.id}
+                      defaultPermissionLevel={permission?.permissionLevel}
+                      assignee={{ group: targetGroup, id }}
+                    />
+                  );
+                })}
+              </Box>
+            </Box>
             {targetGroup !== 'space' && (
               <>
                 <Divider sx={{ mt: 1, mb: 2 }} />

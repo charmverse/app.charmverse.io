@@ -60,9 +60,20 @@ export function RoleSettings({ space }: { space: Space }) {
           </Box>
         )}
       </Legend>
+      <Typography variant='caption'>
+        All users are either an Admin, Member or Guest. In addition to that role they can also have Custom Roles.
+      </Typography>
       <AdminRoleRow readOnly={!isAdmin} />
       <MemberRoleRow readOnly={!isAdmin} spaceId={space.id} />
-
+      <GuestRoleRow readOnly={!isAdmin} />
+      {roles && roles.length > 0 && (
+        <>
+          <Divider sx={{ my: 2 }} />
+          <Typography variant='body2' fontWeight='bold' color='secondary'>
+            Custom roles
+          </Typography>
+        </>
+      )}
       {roles?.map((role) => (
         <RoleRow
           readOnly={!isAdmin}
@@ -73,8 +84,6 @@ export function RoleSettings({ space }: { space: Space }) {
           key={role.id}
         />
       ))}
-
-      <GuestRoleRow readOnly={!isAdmin} />
 
       {isValidating && (
         <Box display='flex' alignItems='center' gap={1}>

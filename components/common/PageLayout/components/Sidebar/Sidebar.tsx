@@ -136,7 +136,7 @@ export default function Sidebar({ closeSidebar, navAction }: SidebarProps) {
   const [userSpacePermissions] = useCurrentSpacePermissions();
   const [isScrolled, setIsScrolled] = useState(false);
   const [showingTrash, setShowingTrash] = useState(false);
-  const { disconnectWallet } = useWeb3AuthSig();
+  const { logoutWallet } = useWeb3AuthSig();
   const isMobile = useSmallScreen();
   const { hasAccess: showMemberFeatures, isLoadingAccess } = useHasMemberLevel('member');
   const { favoritePageIds } = useFavoritePages();
@@ -169,7 +169,7 @@ export default function Sidebar({ closeSidebar, navAction }: SidebarProps) {
   );
 
   async function logoutCurrentUser() {
-    disconnectWallet();
+    logoutWallet();
     await logoutUser();
     router.push('/');
   }

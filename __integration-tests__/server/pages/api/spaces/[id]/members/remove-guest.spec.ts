@@ -25,7 +25,7 @@ beforeAll(async () => {
   });
 });
 
-describe('POST /api/spaces/[id]/members/remove-guest - Remove guest user', () => {
+describe('DELETE /api/spaces/[id]/members/[userId] - Remove guest user', () => {
   it('should remove the user if the requester is admin, responding with 200', async () => {
     const guest = await generateSpaceUser({
       spaceId: space.id,
@@ -34,13 +34,7 @@ describe('POST /api/spaces/[id]/members/remove-guest - Remove guest user', () =>
 
     const userCookie = await loginUser(adminUser.id);
 
-    await request(baseUrl)
-      .post(`/api/spaces/${space.id}/members/remove-guest`)
-      .set('Cookie', userCookie)
-      .send({
-        userId: guest.id
-      })
-      .expect(200);
+    await request(baseUrl).delete(`/api/spaces/${space.id}/members/${guest.id}`).set('Cookie', userCookie).expect(200);
 
     // Make sure it actually did something
     const spaceRoles = await prisma.spaceRole.findMany({
@@ -63,12 +57,6 @@ describe('POST /api/spaces/[id]/members/remove-guest - Remove guest user', () =>
 
     const userCookie = await loginUser(normalUser.id);
 
-    await request(baseUrl)
-      .post(`/api/spaces/${space.id}/members/remove-guest`)
-      .set('Cookie', userCookie)
-      .send({
-        userId: guest.id
-      })
-      .expect(401);
+    await request(baseUrl).delete(`/api/spaces/${space.id}/members/${guest.id}`).set('Cookie', userCookie).expect(401);
   });
 });

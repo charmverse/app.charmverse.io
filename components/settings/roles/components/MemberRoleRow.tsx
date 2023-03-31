@@ -4,7 +4,14 @@ import { RolePermissions } from './RolePermissions/RolePermissions';
 import { RoleRowBase } from './RoleRowBase';
 
 export function MemberRoleRow({ readOnly, spaceId }: { readOnly: boolean; spaceId: string }) {
-  const { members } = useMembers();
+  const { members, makeMember } = useMembers();
+
+  const assignedMembers = members.filter((member) => !member.isBot && !member.isAdmin && !member.isGuest);
+  // there must always be at least one admin
+  const includeAdmins = members.filter((member) => !member.isBot && member.isAdmin).length > 1;
+  const eligibleMembers = members.filter(
+    (member) => !member.isBot && ((includeAdmins && member.isAdmin) || member.isGuest)
+  );
 
   return (
     <RoleRowBase
@@ -17,8 +24,10 @@ export function MemberRoleRow({ readOnly, spaceId }: { readOnly: boolean; spaceI
         </>
       }
       readOnlyMembers={readOnly}
-      members={members.filter((member) => !member.isBot && !member.isAdmin && !member.isGuest)}
+      members={assignedMembers}
+      eligibleMembers={eligibleMembers}
       permissions={<RolePermissions targetGroup='space' id={spaceId} />}
+      onAddMembers={!readOnly ? makeMember : undefined}
     />
   );
 }
