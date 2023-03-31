@@ -1,5 +1,5 @@
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Box, Divider, FormControlLabel, Grid, Paper, Switch, Tooltip, Typography } from '@mui/material';
+import { Box, Divider, FormControlLabel, Grid, Switch, Tooltip, Typography } from '@mui/material';
 import { SpaceOperation } from '@prisma/client';
 import type { ChangeEvent } from 'react';
 import { useEffect, useState } from 'react';
@@ -14,7 +14,7 @@ import Button from 'components/common/Button';
 import { PostCategoryRolePermissionRow } from 'components/forum/components/permissions/PostCategoryPermissionRow';
 import { ProposalCategoryRolePermissionRow } from 'components/proposals/components/permissions/ProposalCategoryPermissionRow';
 import { useProposalCategories } from 'components/proposals/hooks/useProposalCategories';
-import { useCurrentSpaceId } from 'hooks/useCurrentSpaceId';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useForumCategories } from 'hooks/useForumCategories';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { usePreventReload } from 'hooks/usePreventReload';
@@ -50,7 +50,7 @@ interface Props {
 }
 
 export function RolePermissions({ targetGroup, id, callback = () => null }: Props) {
-  const { currentSpaceId } = useCurrentSpaceId();
+  const space = useCurrentSpace();
   const { categories: proposalCategories = [] } = useProposalCategories();
   const { categories: forumCategories = [] } = useForumCategories();
   const isAdmin = useIsAdmin();
@@ -62,6 +62,8 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
     defaultValues: assignedPermissions ?? new AvailableSpacePermissions().empty,
     resolver: yupResolver(schema)
   });
+
+  const currentSpaceId = space?.id;
 
   const { data: proposalCategoryPermissions, mutate: mutateProposalCategoryPermissions } = useSWR(
     `/proposals/list-group-proposal-category-permissions-${id}`,
@@ -76,11 +78,16 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
     currentSpaceId &&
       targetGroup !== 'space' &&
       `/proposals/list-group-proposal-category-permissions-${currentSpaceId}`,
-    () => charmClient.permissions.proposals.listGroupProposalCategoryPermissions({ group: 'space', id: currentSpaceId })
+    () =>
+      charmClient.permissions.proposals.listGroupProposalCategoryPermissions({
+        group: 'space',
+        id: currentSpaceId as string
+      })
   );
   const { data: spacePostCategoryPermissions } = useSWR(
     currentSpaceId && targetGroup !== 'space' && `/posts/list-group-post-category-permissions-${currentSpaceId}`,
-    () => charmClient.permissions.forum.listGroupPostCategoryPermissions({ group: 'space', id: currentSpaceId })
+    () =>
+      charmClient.permissions.forum.listGroupPostCategoryPermissions({ group: 'space', id: currentSpaceId as string })
   );
 
   const { data: memberPermissionFlags } = useSWR(
@@ -88,8 +95,8 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
     () =>
       charmClient.queryGroupSpacePermissions({
         group: 'space',
-        id: currentSpaceId,
-        resourceId: currentSpaceId
+        id: currentSpaceId as string,
+        resourceId: currentSpaceId as string
       })
   );
 
