@@ -21,6 +21,7 @@ import SpaceSettings from 'components/settings/workspace/Space';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSmallScreen } from 'hooks/useMediaScreens';
 import { useSettingsDialog } from 'hooks/useSettingsDialog';
+import { useSpaces } from 'hooks/useSpaces';
 
 import { SectionName } from '../PageLayout/components/Sidebar/Sidebar';
 import { SidebarLink } from '../PageLayout/components/Sidebar/SidebarButton';
@@ -86,6 +87,8 @@ export function SpaceSettingsDialog() {
 
   const isMobile = useSmallScreen();
   const { activePath, onClose, onClick, open } = useSettingsDialog();
+  const { memberSpaces } = useSpaces();
+  const isSpaceSettingsVisible = !!memberSpaces.find((s) => s.name === currentSpace?.name);
 
   return (
     <Dialog
@@ -119,20 +122,21 @@ export function SpaceSettingsDialog() {
               active={activePath === tab.path}
             />
           ))}
-          {currentSpace && (
+          {currentSpace && isSpaceSettingsVisible && (
             <Box mt={2} py={0.5}>
               <SectionName>Space settings</SectionName>
             </Box>
           )}
           {currentSpace &&
+            isSpaceSettingsVisible &&
             SETTINGS_TABS.map((tab) => (
               <SidebarLink
-                data-test={`space-settings-tab-${currentSpace.id}-${tab.path}`}
+                data-test={`space-settings-tab-${tab.path}`}
                 key={tab.path}
                 label={tab.label}
                 icon={tab.icon}
-                onClick={() => onClick(`${currentSpace.name}-${tab.path}`)}
-                active={activePath === `${currentSpace.name}-${tab.path}`}
+                onClick={() => onClick(tab.path)}
+                active={activePath === tab.path}
               />
             ))}
         </Box>
@@ -156,11 +160,7 @@ export function SpaceSettingsDialog() {
           )}
           {currentSpace &&
             SETTINGS_TABS.map((tab) => (
-              <TabPanel
-                key={`${currentSpace.name}-${tab.path}`}
-                value={activePath}
-                index={`${currentSpace.name}-${tab.path}`}
-              >
+              <TabPanel key={tab.path} value={activePath} index={tab.path}>
                 <TabView space={currentSpace} tab={tab} />
               </TabPanel>
             ))}
