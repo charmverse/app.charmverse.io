@@ -17,11 +17,3 @@ export const postPermissionsMapping: Record<PostCategoryPermissionLevel, PostOpe
   view: ['view_post'],
   custom: []
 };
-
-export const postCategoryPermissionLabels: Record<PostCategoryPermissionLevel, string> = {
-  category_admin: 'Category Admin',
-  moderator: 'Moderator',
-  full_access: 'Full Access',
-  view: 'View',
-  custom: 'Custom'
-} as const;

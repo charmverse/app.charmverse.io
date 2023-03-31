@@ -251,7 +251,7 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
                       proposalCategoryId={category.id}
                       existingPermissionId={permission?.id}
                       defaultPermissionLevel={permission?.permissionLevel}
-                      emptyValue={memberRolePermission?.permissionLevel}
+                      inheritedPermissionLevel={memberRolePermission?.permissionLevel}
                       isInherited={memberRolePermission && !permission}
                       assignee={{ group: targetGroup, id }}
                     />

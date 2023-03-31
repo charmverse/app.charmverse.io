@@ -2,16 +2,16 @@ import Box from '@mui/material/Box';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import type { ProposalCategoryPermissionLevel } from '@prisma/client';
+import type { ReactNode } from 'react';
 import { useMemo } from 'react';
 
 import { SmallSelect } from 'components/common/form/InputEnumToOptions';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useRoles } from 'hooks/useRoles';
 import type { TargetPermissionGroup } from 'lib/permissions/interfaces';
-import { proposalCategoryPermissionLabels } from 'lib/permissions/proposals/mapping';
 import type { ProposalCategoryPermissionInput } from 'lib/permissions/proposals/upsertProposalCategoryPermission';
 
-import { proposalCategoryPermissionOptions, permissionsWithRemove } from './shared';
+import { proposalCategoryPermissionLabels } from './shared';
 
 type Props = {
   assignee: TargetPermissionGroup<'role' | 'space'>;
@@ -19,7 +19,7 @@ type Props = {
   isInherited?: boolean;
   label?: string;
   defaultPermissionLevel?: ProposalCategoryPermissionLevel;
-  emptyValue?: ProposalCategoryPermissionLevel;
+  inheritedPermissionLevel?: ProposalCategoryPermissionLevel;
   proposalCategoryId: string;
   canEdit: boolean;
   updatePermission: (newPermission: ProposalCategoryPermissionInput) => void;
@@ -32,7 +32,7 @@ export function ProposalCategoryRolePermissionRow({
   isInherited,
   proposalCategoryId,
   defaultPermissionLevel,
-  emptyValue,
+  inheritedPermissionLevel,
   canEdit,
   label,
   updatePermission,
@@ -41,7 +41,22 @@ export function ProposalCategoryRolePermissionRow({
   const roles = useRoles();
   const space = useCurrentSpace();
 
-  const emptyLabel = (emptyValue && proposalCategoryPermissionOptions[emptyValue]) || 'No access';
+  const friendlyLabels = {
+    ...proposalCategoryPermissionLabels,
+    delete: (inheritedPermissionLevel ? (
+      <>
+        Use default:&nbsp;<em>{proposalCategoryPermissionLabels[inheritedPermissionLevel]}</em>
+      </>
+    ) : (
+      'Remove'
+    )) as string | ReactNode | undefined,
+    '': (inheritedPermissionLevel && proposalCategoryPermissionLabels[inheritedPermissionLevel]) || 'No access'
+  };
+
+  // remove delete option if there is no existing permission
+  if (!existingPermissionId) {
+    delete friendlyLabels.delete;
+  }
 
   const assigneeName = useMemo(() => {
     if (label) return label;
@@ -50,10 +65,10 @@ export function ProposalCategoryRolePermissionRow({
       : roles.roles?.find((r) => r.id === assignee.id)?.name;
   }, [label, roles, space]);
 
-  function handleUpdate(level: keyof typeof permissionsWithRemove) {
+  function handleUpdate(level: keyof typeof friendlyLabels) {
     if (level === 'delete' && existingPermissionId && deletePermission) {
       deletePermission(existingPermissionId);
-    } else if (level !== 'delete') {
+    } else if (level !== 'delete' && level !== '') {
       updatePermission({ permissionLevel: level, proposalCategoryId, assignee });
     }
   }
@@ -70,15 +85,15 @@ export function ProposalCategoryRolePermissionRow({
     <Box display='flex' justifyContent='space-between' alignItems='center'>
       <Typography variant='body2'>{assigneeName}</Typography>
       <div style={{ width: '160px', textAlign: 'left' }}>
-        <Tooltip title={tooltip}>
+        <Tooltip title={tooltip} enterDelay={1000} disableInteractive>
           <span>
             <SmallSelect
               disabled={!canEdit}
               data-test={assignee.group === 'space' ? 'category-space-permission' : null}
               sx={{ opacity: isInherited ? 0.5 : 1 }}
-              renderValue={(value) => (value !== '' && proposalCategoryPermissionOptions[value]) || emptyLabel}
+              renderValue={(value) => friendlyLabels[value]}
               onChange={handleUpdate as (opt: string) => void}
-              keyAndLabel={permissionsWithRemove}
+              keyAndLabel={friendlyLabels}
               defaultValue={defaultPermissionLevel || ''}
               displayEmpty
             />

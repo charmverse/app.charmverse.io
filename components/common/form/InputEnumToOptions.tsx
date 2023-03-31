@@ -37,6 +37,9 @@ export default function InputEnumToOptions<T extends string>({
         {...props}
       >
         {options.map((option) => {
+          if (option[0] === '') {
+            return null;
+          }
           return (
             <MenuItem value={option[0]} key={option[0]}>
               {option[1]}

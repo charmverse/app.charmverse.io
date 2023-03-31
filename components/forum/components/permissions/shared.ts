@@ -1,6 +1,12 @@
 import type { PostCategoryPermissionLevel } from '@prisma/client';
 
-import { postCategoryPermissionLabels } from 'lib/permissions/forum/mapping';
+export const postCategoryPermissionLabels: Record<PostCategoryPermissionLevel, string> = {
+  category_admin: 'Category Admin',
+  moderator: 'Moderator',
+  full_access: 'Full Access',
+  view: 'View',
+  custom: 'Custom'
+} as const;
 
 // eslint-disable-next-line camelcase
 const { category_admin, moderator, custom, ...options } = postCategoryPermissionLabels;
