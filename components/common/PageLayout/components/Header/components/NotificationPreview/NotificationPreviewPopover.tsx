@@ -1,10 +1,10 @@
 import CelebrationIcon from '@mui/icons-material/Celebration';
 import { Box, Card, Divider, Typography } from '@mui/material';
-import { Fragment } from 'react';
+import { Fragment, useState } from 'react';
 
-import { useNotificationPreview } from 'components/common/PageLayout/components/Header/components/NotificationPreview/useNotificationPreview';
-
+import { NotificationModal } from './NotificationModal';
 import { NotificationPreview } from './NotificationPreview';
+import { useNotificationPreview } from './useNotificationPreview';
 
 export function NotificationPreviewPopover({
   onSeeAllClick,
@@ -14,7 +14,7 @@ export function NotificationPreviewPopover({
   close: VoidFunction;
 }) {
   const { notificationPreviews, markAsRead } = useNotificationPreview();
-
+  const [openNotificationsModal, setOpenNotificationsModal] = useState(false);
   return (
     <Box>
       <Card>
@@ -50,7 +50,7 @@ export function NotificationPreviewPopover({
       </Box>
       <Card>
         <Box
-          onClick={onSeeAllClick}
+          onClick={() => setOpenNotificationsModal(true)}
           display='flex'
           alignItems='center'
           justifyContent='center'
@@ -62,6 +62,7 @@ export function NotificationPreviewPopover({
           </Typography>
         </Box>
       </Card>
+      <NotificationModal isOpen={openNotificationsModal} onClose={() => setOpenNotificationsModal(false)} />
     </Box>
   );
 }

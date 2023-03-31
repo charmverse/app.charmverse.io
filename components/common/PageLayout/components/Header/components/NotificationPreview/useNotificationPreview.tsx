@@ -1,3 +1,10 @@
+import CommentIcon from '@mui/icons-material/Comment';
+import ForumIcon from '@mui/icons-material/Forum';
+import HowToVoteIcon from '@mui/icons-material/HowToVote';
+import KeyIcon from '@mui/icons-material/Key';
+import LayersIcon from '@mui/icons-material/Layers';
+import BountyIcon from '@mui/icons-material/RequestPageOutlined';
+import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
 import type { BountyStatus, ProposalStatus, VoteStatus } from '@prisma/client';
 import { NotificationType } from '@prisma/client';
 import { useCallback, useMemo } from 'react';
@@ -314,3 +321,13 @@ function getNotificationStatus(status: VoteStatus | ProposalStatus | BountyStatu
       return '';
   }
 }
+
+export const TASK_TABS = [
+  { icon: <LayersIcon />, label: 'All', type: 'all' },
+  { icon: <KeyIcon />, label: 'Multisig', type: 'multisig' },
+  { icon: <BountyIcon />, label: 'Bounty', type: 'bounty' },
+  { icon: <HowToVoteIcon />, label: 'Poll', type: 'vote' },
+  { icon: <ForumIcon />, label: 'Discussion', type: 'discussion' },
+  { icon: <TaskOutlinedIcon />, label: 'Proposal', type: 'proposal' },
+  { icon: <CommentIcon />, label: 'Forum', type: 'forum' }
+] as const;
