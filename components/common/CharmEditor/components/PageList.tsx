@@ -51,6 +51,7 @@ export default function PagesList({
       type: page.type,
       icon: page.icon
     }));
+
     const memoForumCategories: AllPagesProp[] = (forumCategories || []).map((page) => ({
       id: page.id,
       path: page.path || '',
@@ -69,7 +70,7 @@ export default function PagesList({
       icon: null
     }));
 
-    return memoPage.concat(memoForumCategories).concat(memoStaticPage);
+    return memoStaticPage.concat(memoPage).concat(memoForumCategories);
   }, [pages, staticPages, forumCategories]);
 
   if (allPages.length === 0) {
