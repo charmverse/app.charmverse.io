@@ -1,6 +1,8 @@
 import type { ReactNode } from 'react';
 import { useContext, createContext, useMemo } from 'react';
 
+import { useSpaceGatesReevaluate } from 'components/_app/hooks/useSpaceGatesReevaluate';
+
 import { useCurrentSpace } from './useCurrentSpace';
 import { useUser } from './useUser';
 
@@ -26,6 +28,8 @@ export function IsSpaceMemberProvider({ children }: { children: ReactNode }) {
       isSpaceMember: !!user?.spaceRoles.some((sr) => sr.spaceId === space?.id)
     } as Context;
   }, [user, space]);
+
+  useSpaceGatesReevaluate();
 
   return <IsSpaceMemberContext.Provider value={value}>{children}</IsSpaceMemberContext.Provider>;
 }

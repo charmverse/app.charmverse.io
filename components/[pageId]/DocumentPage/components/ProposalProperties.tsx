@@ -53,7 +53,7 @@ export default function ProposalProperties({
 
   const { permissions: proposalFlowFlags, refresh: refreshProposalFlowFlags } = useProposalFlowFlags({ proposalId });
 
-  const { members } = useMembers();
+  const { getMemberById, members } = useMembers();
   const { roles = [] } = useRoles();
   const { user } = useUser();
   const isAdmin = useIsAdmin();
@@ -67,7 +67,7 @@ export default function ProposalProperties({
   const proposalReviewers = proposal?.reviewers ?? [];
   const proposalReviewerId = proposal?.reviewedBy;
 
-  const proposalReviewer = members?.find((member) => member.id === proposalReviewerId);
+  const proposalReviewer = getMemberById(proposalReviewerId);
 
   const isProposalAuthor = user && proposalAuthors.some((author) => author.userId === user.id);
 

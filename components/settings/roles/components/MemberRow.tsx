@@ -71,12 +71,12 @@ function MemberActions({
   const space = useCurrentSpace();
   const { showMessage } = useSnackbar();
   const { unassignRole } = useRoles();
-  const { makeAdmin, makeGuest, makeMember, members, removeFromSpace } = useMembers();
+  const { makeAdmin, makeGuest, makeMember, members, removeFromSpace, getMemberById } = useMembers();
   const popupState = usePopupState({ variant: 'popover', popupId: 'user-role' });
   const deletePopupState = usePopupState({ variant: 'popover', popupId: 'member-list' });
   const [removedMemberId, setRemovedMemberId] = useState<string | null>(null);
 
-  const removedMember = removedMemberId ? members.find((m) => m.id === removedMemberId) : null;
+  const removedMember = removedMemberId ? getMemberById(removedMemberId) : null;
   const closed = deletePopupState.close;
 
   deletePopupState.close = () => {

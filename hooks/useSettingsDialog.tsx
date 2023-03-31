@@ -5,8 +5,6 @@ import { useEffect, useMemo, createContext, useContext, useState } from 'react';
 
 import type { TasksPageProps } from 'components/nexus/TasksPage';
 
-import { useSpaces } from './useSpaces';
-
 export type PathProps = TasksPageProps;
 
 type IContext = {
@@ -29,21 +27,8 @@ export function SettingsDialogProvider({ children }: { children: ReactNode }) {
   const [activePath, setActivePath] = useState('');
   const [pathProps, setPathProps] = useState<PathProps | undefined>();
   const router = useRouter();
-  const { memberSpaces } = useSpaces();
 
   const onClick = (_path?: string, props?: PathProps) => {
-    // This is a hack to fix a bug where the user can see space settings on popup
-    // We should come back and cleanup how we manage the state of the space dialog in a future PR
-    if (_path && _path.endsWith('-space')) {
-      const spaceName = _path.split('-space')[0];
-      const space = memberSpaces.find((s) => s.name === spaceName);
-      if (!space) {
-        settingsModalState.open();
-        setActivePath('account');
-        return;
-      }
-    }
-
     setActivePath(_path ?? '');
     settingsModalState.open();
     setPathProps(props);
@@ -76,7 +61,7 @@ export function SettingsDialogProvider({ children }: { children: ReactNode }) {
       onClick,
       onClose
     }),
-    [activePath, pathProps, settingsModalState.isOpen, memberSpaces]
+    [activePath, pathProps, settingsModalState.isOpen]
   );
 
   return <SettingsDialogContext.Provider value={value}>{children}</SettingsDialogContext.Provider>;

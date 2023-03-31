@@ -136,7 +136,7 @@ export default function Sidebar({ closeSidebar, navAction }: SidebarProps) {
   const [userSpacePermissions] = useCurrentSpacePermissions();
   const [isScrolled, setIsScrolled] = useState(false);
   const [showingTrash, setShowingTrash] = useState(false);
-  const { disconnectWallet } = useWeb3AuthSig();
+  const { logoutWallet } = useWeb3AuthSig();
   const isMobile = useSmallScreen();
   const { hasAccess: showMemberFeatures, isLoadingAccess } = useHasMemberLevel('member');
   const { favoritePageIds } = useFavoritePages();
@@ -169,7 +169,7 @@ export default function Sidebar({ closeSidebar, navAction }: SidebarProps) {
   );
 
   async function logoutCurrentUser() {
-    disconnectWallet();
+    logoutWallet();
     await logoutUser();
     router.push('/');
   }
@@ -197,7 +197,7 @@ export default function Sidebar({ closeSidebar, navAction }: SidebarProps) {
         </Box>
         <Box mb={2}>
           <SidebarBox
-            onClick={() => handleModalClick(isMobile ? '' : `${space?.name}-space`)}
+            onClick={() => handleModalClick(isMobile ? '' : 'space')}
             icon={<SettingsIcon color='secondary' fontSize='small' />}
             label='Settings'
             data-test='sidebar-settings'
@@ -264,7 +264,7 @@ export default function Sidebar({ closeSidebar, navAction }: SidebarProps) {
               />
               {showMemberFeatures && (
                 <SidebarBox
-                  onClick={() => handleModalClick(`${space.name}-invites`)}
+                  onClick={() => handleModalClick('invites')}
                   icon={<GroupAddOutlinedIcon color='secondary' fontSize='small' />}
                   label='Invites'
                 />

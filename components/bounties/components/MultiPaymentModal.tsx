@@ -42,7 +42,7 @@ export default function MultiPaymentModal({ bounties }: { bounties: BountyWithDe
       return record;
     }, {}) ?? {};
 
-  const { members } = useMembers();
+  const { getMemberById } = useMembers();
 
   useEffect(() => {
     const applicationIds = transactions.map((trans) => trans(gnosisSafeAddress).applicationId);
@@ -117,7 +117,7 @@ export default function MultiPaymentModal({ bounties }: { bounties: BountyWithDe
             <List>
               {transactions.map((getTransaction) => {
                 const { title, chainId: _chainId, rewardAmount, rewardToken, userId, applicationId } = getTransaction();
-                const user = members.find((member) => member.id === userId);
+                const user = getMemberById(userId);
                 const isChecked = selectedApplicationIds.includes(applicationId);
                 if (user) {
                   return (

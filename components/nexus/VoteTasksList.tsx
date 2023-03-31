@@ -17,7 +17,7 @@ import Link from 'components/common/Link';
 import LoadingComponent from 'components/common/LoadingComponent';
 import Modal from 'components/common/Modal';
 import VoteIcon from 'components/votes/components/VoteIcon';
-import type { VoteTask } from 'lib/votes/interfaces';
+import type { ExtendedVote, VoteTask } from 'lib/votes/interfaces';
 import type { GetTasksResponse } from 'pages/api/tasks/list';
 
 import { EmptyTaskState } from './components/EmptyTaskState';
@@ -47,7 +47,6 @@ export function VoteTasksListRow({
     id,
     userChoice
   } = voteTask;
-
   const isDeadlineOverdue = DateTime.now() > DateTime.fromJSDate(new Date(deadline));
   const dueText = DateTime.fromJSDate(new Date(deadline)).toRelative({ base: DateTime.now() });
 
@@ -107,7 +106,10 @@ export function VoteTasksList({ error, tasks, mutateTasks }: VoteTasksListProps)
         return taskList
           ? {
               ...taskList,
-              votes: taskList.votes.filter((vote) => vote.id !== voteId)
+              votes: {
+                marked: taskList.votes.marked.filter((vote) => vote.id !== voteId),
+                unmarked: taskList.votes.unmarked.filter((vote) => vote.id !== voteId)
+              }
             }
           : undefined;
       },
@@ -148,13 +150,15 @@ export function VoteTasksList({ error, tasks, mutateTasks }: VoteTasksListProps)
     return <LoadingComponent height='200px' isLoading={true} />;
   }
 
-  const totalVotes = tasks?.votes.length ?? 0;
+  const votes = [...tasks.votes.marked, ...tasks.votes.unmarked];
+  const totalVotes = votes.length ?? 0;
 
   if (totalVotes === 0) {
     return <EmptyTaskState taskType='votes' />;
   }
 
-  const voteTask = tasks.votes.find((v) => v.id === selectedVoteId);
+  const voteTask = votes.find((v) => v.id === selectedVoteId);
+  const voteDetails: ExtendedVote | null = voteTask ? { ...voteTask, createdBy: voteTask.createdBy?.id || '' } : null;
 
   return (
     <Box overflow='auto'>
@@ -171,15 +175,15 @@ export function VoteTasksList({ error, tasks, mutateTasks }: VoteTasksListProps)
           </TableRow>
         </TableHead>
         <TableBody>
-          {tasks.votes.map((vote) => (
+          {votes.map((vote) => (
             <VoteTasksListRow handleVoteId={handleVoteId} key={vote.id} voteTask={vote} />
           ))}
         </TableBody>
       </Table>
       <Modal title='Poll details' size='large' open={!!selectedVoteId && !!voteTask} onClose={closeModal}>
-        {voteTask && (
+        {voteDetails && (
           <VoteDetail
-            vote={voteTask}
+            vote={voteDetails}
             detailed
             castVote={castVote}
             deleteVote={deleteVote}
