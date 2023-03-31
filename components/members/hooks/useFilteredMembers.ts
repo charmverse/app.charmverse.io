@@ -20,10 +20,6 @@ export function useFilteredMembers(searchQuery: string) {
         return true;
       }
 
-      if (member.roles.some((role) => role.name.toLowerCase().includes(query))) {
-        return true;
-      }
-
       if (member.profile?.description?.toLowerCase().includes(query)) {
         return true;
       }
