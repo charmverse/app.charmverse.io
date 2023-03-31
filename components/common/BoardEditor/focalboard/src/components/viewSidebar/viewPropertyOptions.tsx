@@ -164,7 +164,7 @@ function PropertyOptions(props: LayoutOptionsProps) {
       {Object.keys(visibleProperties).length ? (
         <Stack gap={0.5}>
           <Stack alignItems='center' ml={2} mr={1} justifyContent='space-between' flexDirection='row'>
-            <Typography variant='subtitle2'>Shown in table</Typography>
+            <Typography variant='subtitle2'>Shown in {view.fields.viewType}</Typography>
             <Button size='small' variant='text' onClick={hideAllProperties}>
               <Typography color='primary' variant='subtitle1'>
                 Hide all
@@ -189,7 +189,7 @@ function PropertyOptions(props: LayoutOptionsProps) {
       {Object.keys(hiddenProperties).length ? (
         <Stack gap={0.5}>
           <Stack alignItems='center' ml={2} mr={1} justifyContent='space-between' flexDirection='row'>
-            <Typography variant='subtitle2'>Hidden in table</Typography>
+            <Typography variant='subtitle2'>Hidden in {view.fields.viewType}</Typography>
             <Button size='small' variant='text' onClick={showAllProperties}>
               <Typography color='primary' variant='subtitle1'>
                 Show all
