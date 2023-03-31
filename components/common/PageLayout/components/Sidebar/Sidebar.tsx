@@ -197,7 +197,7 @@ export default function Sidebar({ closeSidebar, navAction }: SidebarProps) {
         </Box>
         <Box mb={2}>
           <SidebarBox
-            onClick={() => handleModalClick(isMobile ? '' : `space`)}
+            onClick={() => handleModalClick(isMobile ? '' : 'space')}
             icon={<SettingsIcon color='secondary' fontSize='small' />}
             label='Settings'
             data-test='sidebar-settings'
