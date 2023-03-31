@@ -48,7 +48,8 @@ export default function NestedPage({ node, currentPageId }: NodeViewProps & { cu
 
   const parentPage = nestedPage?.parentId ? pages[nestedPage.parentId] : null;
 
-  const pageTitle = (nestedPage || nestedStaticPage)?.title || `Forum > ${nestedCategories?.name}`;
+  const pageTitle =
+    (nestedPage || nestedStaticPage)?.title || (nestedCategories ? `Forum > ${nestedCategories?.name}` : 'Untitled');
 
   const pageId = nestedPage?.id || nestedStaticPage?.path || nestedCategories?.id;
 
