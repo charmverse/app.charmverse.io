@@ -16,7 +16,6 @@ import { proposalCategoryPermissionLabels } from './shared';
 type Props = {
   assignee: TargetPermissionGroup<'role' | 'space'>;
   existingPermissionId?: string;
-  isInherited?: boolean;
   label?: string;
   defaultPermissionLevel?: ProposalCategoryPermissionLevel;
   inheritedPermissionLevel?: ProposalCategoryPermissionLevel;
@@ -29,7 +28,6 @@ type Props = {
 export function ProposalCategoryRolePermissionRow({
   assignee,
   existingPermissionId,
-  isInherited,
   proposalCategoryId,
   defaultPermissionLevel,
   inheritedPermissionLevel,
@@ -41,15 +39,11 @@ export function ProposalCategoryRolePermissionRow({
   const roles = useRoles();
   const space = useCurrentSpace();
 
+  const isInherited = inheritedPermissionLevel && !defaultPermissionLevel;
+
   const friendlyLabels = {
     ...proposalCategoryPermissionLabels,
-    delete: (inheritedPermissionLevel ? (
-      <>
-        Use default:&nbsp;<em>{proposalCategoryPermissionLabels[inheritedPermissionLevel]}</em>
-      </>
-    ) : (
-      'Remove'
-    )) as string | ReactNode | undefined,
+    delete: (inheritedPermissionLevel ? <em>Use default</em> : 'Remove') as string | ReactNode | undefined,
     '': (inheritedPermissionLevel && proposalCategoryPermissionLabels[inheritedPermissionLevel]) || 'No access'
   };
 

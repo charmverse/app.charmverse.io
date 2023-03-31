@@ -2,6 +2,7 @@ import Box from '@mui/material/Box';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import type { PostCategoryPermissionLevel } from '@prisma/client';
+import type { ReactNode } from 'react';
 import { useMemo } from 'react';
 
 import { SmallSelect } from 'components/common/form/InputEnumToOptions';
@@ -10,14 +11,13 @@ import { useRoles } from 'hooks/useRoles';
 import type { PostCategoryPermissionInput } from 'lib/permissions/forum/upsertPostCategoryPermission';
 import type { TargetPermissionGroup } from 'lib/permissions/interfaces';
 
-import { permissionsWithRemove, postCategoryPermissionLabels } from './shared';
+import { postCategoryPermissionLabels } from './shared';
 
 type Props = {
   assignee: TargetPermissionGroup<'role' | 'space'>;
   existingPermissionId?: string;
   defaultPermissionLevel?: PostCategoryPermissionLevel;
-  emptyValue?: PostCategoryPermissionLevel;
-  isInherited?: boolean;
+  inheritedPermissionLevel?: PostCategoryPermissionLevel;
   label?: string;
   postCategoryId: string;
   canEdit: boolean;
@@ -31,8 +31,7 @@ export function PostCategoryRolePermissionRow({
   existingPermissionId,
   postCategoryId,
   defaultPermissionLevel,
-  emptyValue,
-  isInherited,
+  inheritedPermissionLevel,
   label,
   canEdit,
   disabledTooltip,
@@ -41,7 +40,18 @@ export function PostCategoryRolePermissionRow({
 }: Props) {
   const roles = useRoles();
   const space = useCurrentSpace();
-  const emptyLabel = (emptyValue && postCategoryPermissionLabels[emptyValue]) || 'No access';
+
+  const isInherited = inheritedPermissionLevel && !defaultPermissionLevel;
+  const friendlyLabels = {
+    ...postCategoryPermissionLabels,
+    delete: (inheritedPermissionLevel ? <em>Use default</em> : 'Remoooove') as string | ReactNode | undefined,
+    '': (inheritedPermissionLevel && postCategoryPermissionLabels[inheritedPermissionLevel]) || 'No access'
+  };
+
+  // remove delete option if there is no existing permission
+  if (!existingPermissionId) {
+    delete friendlyLabels.delete;
+  }
 
   const assigneeName = useMemo(() => {
     return assignee.group === 'space'
@@ -49,10 +59,10 @@ export function PostCategoryRolePermissionRow({
       : roles.roles?.find((r) => r.id === assignee.id)?.name;
   }, [roles, space]);
 
-  function handleUpdate(level: keyof typeof permissionsWithRemove) {
+  function handleUpdate(level: keyof typeof friendlyLabels) {
     if (level === 'delete' && existingPermissionId) {
       deletePermission(existingPermissionId);
-    } else if (level !== 'delete') {
+    } else if (level !== 'delete' && level !== '') {
       updatePermission({ permissionLevel: level, postCategoryId, assignee });
     }
   }
@@ -73,9 +83,9 @@ export function PostCategoryRolePermissionRow({
               disabled={!canEdit}
               data-test={assignee.group === 'space' ? 'category-space-permission' : null}
               sx={{ opacity: isInherited ? 0.5 : 1 }}
-              renderValue={(value) => (value !== '' && postCategoryPermissionLabels[value]) || emptyLabel}
+              renderValue={(value) => friendlyLabels[value]}
               onChange={handleUpdate as (opt: string) => void}
-              keyAndLabel={permissionsWithRemove}
+              keyAndLabel={friendlyLabels}
               defaultValue={defaultPermissionLevel || ''}
               displayEmpty
             />

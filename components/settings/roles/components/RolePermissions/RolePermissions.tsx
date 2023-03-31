@@ -252,7 +252,6 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
                       existingPermissionId={permission?.id}
                       defaultPermissionLevel={permission?.permissionLevel}
                       inheritedPermissionLevel={memberRolePermission?.permissionLevel}
-                      isInherited={memberRolePermission && !permission}
                       assignee={{ group: targetGroup, id }}
                     />
                   );
@@ -300,8 +299,7 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
                       postCategoryId={category.id}
                       existingPermissionId={permission?.id}
                       defaultPermissionLevel={permissionLevel}
-                      emptyValue={memberRolePermission?.permissionLevel}
-                      isInherited={!canModerateForums && memberRolePermission && !permission}
+                      inheritedPermissionLevel={memberRolePermission?.permissionLevel}
                       disabledTooltip={canModerateForums ? 'This role has full access to all categories' : undefined}
                       assignee={{ group: targetGroup, id }}
                     />

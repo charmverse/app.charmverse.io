@@ -4,7 +4,6 @@ import MenuItem from '@mui/material/MenuItem';
 import type { SelectProps } from '@mui/material/Select';
 import Select from '@mui/material/Select';
 import type { ReactNode } from 'react';
-import { useEffect, useState } from 'react';
 
 export type Props<T extends string> = Omit<SelectProps, 'onChange' | 'renderValue'> & {
   onChange?: (option: T) => void;

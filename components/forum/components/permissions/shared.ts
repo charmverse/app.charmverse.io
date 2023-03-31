@@ -10,7 +10,6 @@ export const postCategoryPermissionLabels: Record<PostCategoryPermissionLevel, s
 
 // eslint-disable-next-line camelcase
 const { category_admin, moderator, custom, ...options } = postCategoryPermissionLabels;
-export const permissionsWithRemove = { ...options, delete: 'Remove' };
 
 export const forumMemberPermissionOptions = options;
 
