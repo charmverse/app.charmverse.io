@@ -29,6 +29,8 @@ export type NotificationDetails = {
   title: string;
 };
 
+const MAX_COUNT = 5;
+
 export function useNotificationPreview() {
   const { tasks, mutate: mutateTasks } = useTasks();
   const { user } = useUser();
@@ -42,7 +44,9 @@ export function useNotificationPreview() {
       ...getNotificationPreviewItems(tasks.bounties.unmarked, 'bounties', currentUserId),
       ...getNotificationPreviewItems(tasks.discussions.unmarked, 'discussions', currentUserId),
       ...getNotificationPreviewItems(tasks.forum.unmarked, 'forum', currentUserId)
-    ].sort((a, b) => (a.createdAt > b.createdAt ? -1 : 1));
+    ]
+      .sort((a, b) => (a.createdAt > b.createdAt ? -1 : 1))
+      .slice(0, MAX_COUNT);
   }, [tasks]);
 
   const markAsRead: MarkNotificationAsRead = useCallback(
