@@ -11,7 +11,7 @@ type UserData = User & {
 export function getMemberSearchValue(userData: UserData): string {
   const { profile, memberPropertyValues = [], wallets, telegramUser, discordUser } = userData;
   // all account names
-  const ensString = wallets.map((wallet) => wallet.ensname || '').join(' ');
+  const walletsString = wallets.map((wallet) => `${wallet.ensname || ''} ${wallet.address || ''}`).join(' ');
   const discordAccountString =
     discordUser?.account && typeof discordUser?.account === 'object' && 'username' in discordUser.account
       ? discordUser?.account?.username
@@ -36,7 +36,7 @@ export function getMemberSearchValue(userData: UserData): string {
   // all socials
   const socialsString = profile?.social ? Object.values(profile.social).join(' ') : '';
 
-  return `${userDetailsString} ${ensString} ${propertyValuesString} ${socialsString} ${telegramAccountString} ${discordAccountString}`
+  return `${userDetailsString} ${walletsString} ${propertyValuesString} ${socialsString} ${telegramAccountString} ${discordAccountString}`
     .toLowerCase()
     .replace(/\s\s+/g, ' ');
 }
