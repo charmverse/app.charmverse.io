@@ -47,10 +47,10 @@ export function PageActionsMenu({
   };
   readOnly?: boolean;
 }) {
-  const { members } = useMembers();
+  const { getMemberById } = useMembers();
   const router = useRouter();
   const { showMessage } = useSnackbar();
-  const charmversePage = members.find((member) => member.id === page.createdBy);
+  const member = getMemberById(page.createdBy);
   const open = Boolean(anchorEl);
   const { formatDateTime } = useDateFormatter();
   const { permissions: pagePermissions } = usePagePermissions({ pageIdOrPath: open ? page.id : null });
@@ -124,14 +124,14 @@ export function PageActionsMenu({
       </MenuItem>
       {children}
       <Divider />
-      {charmversePage && (
+      {member && (
         <Stack
           sx={{
             px: 2
           }}
         >
           <Typography variant='caption' color='secondary'>
-            Last edited by <strong>{charmversePage.username}</strong>
+            Last edited by <strong>{member.username}</strong>
           </Typography>
           <Typography variant='caption' color='secondary'>
             at <strong>{formatDateTime(page.updatedAt)}</strong>

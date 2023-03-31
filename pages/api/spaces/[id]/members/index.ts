@@ -1,4 +1,3 @@
-import type { Prisma } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -43,79 +42,15 @@ async function getMembers(req: NextApiRequest, res: NextApiResponse<Member[]>) {
       joinDate: new Date().toISOString(),
       properties: [],
       roles: [],
-      username: deterministicRandomName(sr.user.id)
+      username: deterministicRandomName(sr.user.id),
+      searchValue: ''
     }));
 
     return res.status(200).json(mappedUsers);
   }
+
   // Proceed as normal
-  const search = (req.query.search as string) ?? '';
-
-  const whereOr: Prisma.Enumerable<Prisma.SpaceRoleWhereInput> = [];
-
-  if (search.length !== 0) {
-    whereOr.push({
-      user: {
-        username: {
-          search: `${search
-            .split(/\s/)
-            .filter((s) => s)
-            .join(' & ')}:*`
-        }
-      }
-    });
-
-    whereOr.push({
-      spaceRoleToRole: {
-        some: {
-          role: {
-            name: {
-              search: `${search
-                .split(/\s/)
-                .filter((s) => s)
-                .join(' & ')}:*`
-            }
-          }
-        }
-      }
-    });
-
-    whereOr.push({
-      user: {
-        profile: {
-          description: {
-            search: `${search
-              .split(/\s/)
-              .filter((s) => s)
-              .join(' & ')}:*`
-          }
-        }
-      }
-    });
-
-    whereOr.push({
-      user: {
-        memberPropertyValues: {
-          some: {
-            OR: [
-              {
-                value: {
-                  array_contains: search
-                }
-              },
-              {
-                value: {
-                  string_contains: search
-                }
-              }
-            ]
-          }
-        }
-      }
-    });
-  }
-
-  const members = await getSpaceMembers({ spaceId, requestingUserId: userId, whereOr });
+  const members = await getSpaceMembers({ spaceId, requestingUserId: userId, search: req.query.search as string });
 
   return res.status(200).json(members);
 }

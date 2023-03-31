@@ -1,7 +1,7 @@
 import EmailIcon from '@mui/icons-material/Email';
 import type { AutocompleteChangeReason, AutocompleteProps, PopperProps } from '@mui/material';
 import { Autocomplete, Popper, TextField } from '@mui/material';
-import type { User } from '@prisma/client';
+import { createFilterOptions } from '@mui/material/Autocomplete';
 import { createRef, useCallback, useEffect, useState } from 'react';
 
 import UserDisplay from 'components/common/UserDisplay';
@@ -13,6 +13,8 @@ interface IMembersFilter {
   mode: 'include' | 'exclude';
   userIds: string[];
 }
+
+const filterOptions = createFilterOptions<Member>({ stringify: (option) => option.searchValue || option.username });
 
 function filterMembers(members: Member[], filter: IMembersFilter): Member[] {
   if (filter.mode === 'exclude') {
@@ -47,7 +49,6 @@ export function InputSearchMemberBase({
   const inputRef = createRef<HTMLInputElement>();
 
   const filteredOptions = filter ? filterMembers(options, filter) : options;
-
   const PopperComponent = useCallback((popperProps: PopperProps) => {
     return <Popper {...popperProps} sx={{ ...popperProps.sx, minWidth: 300 }} />;
   }, []);
@@ -104,6 +105,7 @@ export function InputSearchMemberBase({
           inputRef={inputRef}
         />
       )}
+      filterOptions={filterOptions}
       {...props}
     />
   );
@@ -118,17 +120,17 @@ interface IInputSearchMemberProps {
 }
 
 export function InputSearchMember({ defaultValue, onChange, onClear, openOnFocus, ...props }: IInputSearchMemberProps) {
-  const { members } = useMembers();
+  const { getMemberById, members } = useMembers();
   const [value, setValue] = useState<Member | null>(null);
 
   useEffect(() => {
     if (defaultValue && !value) {
-      const member = members.find((c) => c.id === defaultValue);
+      const member = getMemberById(defaultValue);
       if (member) {
         setValue(member);
       }
     }
-  }, [defaultValue, members]);
+  }, [defaultValue, getMemberById]);
 
   function emitValue(selectedUser: Member) {
     if (selectedUser) {
@@ -186,6 +188,7 @@ export function InputSearchMemberMultiple({
       setValue(defaultMembers);
     }
   }, [defaultValue, members]);
+
   return (
     <InputSearchMemberBase
       filterSelectedOptions

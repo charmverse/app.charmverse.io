@@ -83,7 +83,7 @@ export function PostPage({
       }
     })()
   );
-  const { members } = useMembers();
+  const { getMemberById } = useMembers();
   const router = useRouter();
   const {
     data: postComments,
@@ -100,7 +100,7 @@ export function PostPage({
 
   const isLoading = !postComments && isValidating;
 
-  const createdBy = members.find((_member) => _member.id === post?.createdBy);
+  const createdBy = getMemberById(post?.createdBy);
 
   function updateTitle(updates: { title: string; updatedAt: any }) {
     setContentUpdated(true);

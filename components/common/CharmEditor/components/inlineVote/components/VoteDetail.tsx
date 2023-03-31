@@ -75,7 +75,7 @@ export function VoteDetail({
     charmClient.votes.getUserVotes(id)
   );
   const { mutate: refetchTasks } = useTasks();
-  const { members } = useMembers();
+  const { getMemberById } = useMembers();
 
   const voteDetailsPopup = usePopupState({ variant: 'popover', popupId: 'inline-votes-detail' });
 
@@ -241,7 +241,7 @@ export function VoteDetail({
       {detailed && userVotes && (
         <List>
           {userVotes.map((userVote) => {
-            const member = members.find((_member) => _member.id === userVote.user.id);
+            const member = getMemberById(userVote.user.id);
             return (
               <React.Fragment key={userVote.userId}>
                 <ListItem

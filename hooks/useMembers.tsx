@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { createContext, useContext, useMemo } from 'react';
+import { useCallback, createContext, useContext, useMemo } from 'react';
 import type { KeyedMutator } from 'swr';
 import useSWR from 'swr';
 
@@ -10,6 +10,7 @@ import { useCurrentSpace } from './useCurrentSpace';
 
 type Context = {
   members: Member[];
+  membersRecord: Record<string, Member>;
   guests: Member[];
   mutateMembers: KeyedMutator<Member[]>;
   removeGuest: (userId: string) => Promise<void>;
@@ -18,10 +19,12 @@ type Context = {
   makeMember: (userIds: string[]) => Promise<void>;
   removeFromSpace: (userId: string) => Promise<void>;
   isLoading: boolean;
+  getMemberById: (id?: string | null) => Member | undefined;
 };
 
 const MembersContext = createContext<Readonly<Context>>({
   members: [],
+  membersRecord: {},
   guests: [],
   isLoading: false,
   mutateMembers: () => Promise.resolve(undefined),
@@ -29,7 +32,8 @@ const MembersContext = createContext<Readonly<Context>>({
   makeAdmin: () => Promise.resolve(),
   makeGuest: () => Promise.resolve(),
   makeMember: () => Promise.resolve(),
-  removeFromSpace: () => Promise.resolve()
+  removeFromSpace: () => Promise.resolve(),
+  getMemberById: () => undefined
 });
 
 export function MembersProvider({ children }: { children: ReactNode }) {
@@ -45,6 +49,17 @@ export function MembersProvider({ children }: { children: ReactNode }) {
       return charmClient.members.getMembers(space!.id);
     }
   );
+
+  const membersRecord = useMemo(() => {
+    return (
+      members?.reduce<Record<string, Member>>((cur, member) => {
+        cur[member.id] = member;
+        return cur;
+      }, {}) || {}
+    );
+  }, [members]);
+
+  const getMemberById = useCallback((id?: string | null) => (id ? membersRecord[id] : undefined), [membersRecord]);
 
   async function removeGuest(userId: string) {
     if (space) {
@@ -102,6 +117,7 @@ export function MembersProvider({ children }: { children: ReactNode }) {
   const value = useMemo(
     () => ({
       members: members || [],
+      membersRecord,
       guests: members?.filter((member) => member.isGuest) || [],
       mutateMembers,
       makeAdmin,
@@ -109,9 +125,10 @@ export function MembersProvider({ children }: { children: ReactNode }) {
       makeMember,
       removeGuest,
       removeFromSpace,
-      isLoading
+      isLoading,
+      getMemberById
     }),
-    [members]
+    [members, membersRecord, getMemberById]
   );
 
   return <MembersContext.Provider value={value}>{children}</MembersContext.Provider>;
