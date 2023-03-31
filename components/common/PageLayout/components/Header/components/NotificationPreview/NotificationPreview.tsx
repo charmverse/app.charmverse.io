@@ -85,7 +85,7 @@ export function NotificationPreview({ notification, markAsRead, onClose }: Props
               {content}
             </Typography>
           </Box>
-          <Box display='flex' alignItems='flex-start' ml={0.25} mt={-0.25}>
+          <Box display='flex' alignItems='flex-start' ml={0.5} mt={-0.25}>
             <IconButton
               onClick={(e) => {
                 e.preventDefault();
