@@ -197,7 +197,7 @@ export default function Sidebar({ closeSidebar, navAction }: SidebarProps) {
         </Box>
         <Box mb={2}>
           <SidebarBox
-            onClick={() => handleModalClick(isMobile ? '' : `${space?.name}-space`)}
+            onClick={() => handleModalClick(isMobile ? '' : 'space')}
             icon={<SettingsIcon color='secondary' fontSize='small' />}
             label='Settings'
             data-test='sidebar-settings'
@@ -264,7 +264,7 @@ export default function Sidebar({ closeSidebar, navAction }: SidebarProps) {
               />
               {showMemberFeatures && (
                 <SidebarBox
-                  onClick={() => handleModalClick(`${space.name}-invites`)}
+                  onClick={() => handleModalClick('invites')}
                   icon={<GroupAddOutlinedIcon color='secondary' fontSize='small' />}
                   label='Invites'
                 />

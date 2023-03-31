@@ -22,7 +22,7 @@ test('User has correct access in the space settings', async ({ page, spaceSettin
     isAdmin: true,
     onboarded: true
   });
-  const { space: isAdminSpace, user } = await generateUserAndSpace({ spaceName: v4(), isAdmin: true, onboarded: true });
+  const { user } = await generateUserAndSpace({ spaceName: v4(), isAdmin: true, onboarded: true });
   // Make this user a member of the other space
   await generateSpaceRole({
     spaceId: isMemberSpace.id,
@@ -38,10 +38,7 @@ test('User has correct access in the space settings', async ({ page, spaceSettin
 
   await spaceSettings.openSettingsModal();
 
-  await spaceSettings.goToTab({
-    section: 'roles',
-    spaceId: isAdminSpace.id
-  });
+  await spaceSettings.goToTab('roles');
 
   await spaceSettings.clickRoleRowByTitle('Admin');
 
@@ -51,29 +48,12 @@ test('User has correct access in the space settings', async ({ page, spaceSettin
   const isEditable = await spaceSettings.hasEditableMemberLevel(user.id);
   expect(isEditable).toBe(true);
 
-  // Make sure other user doesn't show up
-  const invisibleMemberRow = spaceSettings.getSpaceMemberRowLocator(otherSpaceAdmin.id);
-  await expect(invisibleMemberRow).not.toBeVisible();
-
-  // Go to second space where current user will not be an admin
-  await spaceSettings.getSpaceSettingsLocator(isMemberSpace.id).click();
-
-  await spaceSettings.goToTab({
-    section: 'roles',
-    spaceId: isMemberSpace.id
-  });
+  // Member info should be visible
   await spaceSettings.clickRoleRowByTitle('Member');
-
-  // Verify both members now show up, and user now only has read access
-
   const currentUserRow = spaceSettings.getSpaceMemberRowLocator(user.id);
   await expect(currentUserRow).toBeVisible();
 
+  // Member row is editable
   const isCurrentUserRowEditable = await spaceSettings.hasEditableMemberLevel(user.id);
-  expect(isCurrentUserRowEditable).toBe(false);
-
-  // Make sure other user shows up (we changed current space by selecting a different space, so this should cascade to useMembers)
-  await spaceSettings.clickRoleRowByTitle('Admin');
-  const otherSpaceAdminRow = spaceSettings.getSpaceMemberRowLocator(otherSpaceAdmin.id);
-  await expect(otherSpaceAdminRow).toBeVisible();
+  expect(isCurrentUserRowEditable).toBe(true);
 });

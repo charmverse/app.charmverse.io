@@ -17,7 +17,6 @@ import { useEffect, useMemo, useState } from 'react';
 import { SWRConfig } from 'swr';
 
 import charmClient from 'charmClient';
-import { CurrentSpaceSetter } from 'components/_app/CurrentSpaceSetter';
 import GlobalComponents from 'components/_app/GlobalComponents';
 import { LocalizationProvider } from 'components/_app/LocalizationProvider';
 import { Web3ConnectionManager } from 'components/_app/Web3ConnectionManager';
@@ -32,7 +31,6 @@ import { MemberProfileProvider } from 'components/profile/hooks/useMemberProfile
 import { isDevEnv } from 'config/constants';
 import { ColorModeContext } from 'context/darkMode';
 import { BountiesProvider } from 'hooks/useBounties';
-import { CurrentSpaceProvider } from 'hooks/useCurrentSpaceId';
 import { DiscordProvider } from 'hooks/useDiscordConnection';
 import { PostCategoriesProvider } from 'hooks/useForumCategories';
 import { useInterval } from 'hooks/useInterval';
@@ -271,26 +269,23 @@ function DataProviders({ children }: { children: ReactNode }) {
             <Web3ConnectionManager>
               <Web3AccountProvider>
                 <SpacesProvider>
-                  <CurrentSpaceProvider>
-                    <CurrentSpaceSetter />
-                    <PostCategoriesProvider>
-                      <IsSpaceMemberProvider>
-                        <WebSocketClientProvider>
-                          <MembersProvider>
-                            <BountiesProvider>
-                              <PaymentMethodsProvider>
-                                <PagesProvider>
-                                  <MemberProfileProvider>
-                                    <PageTitleProvider>{children}</PageTitleProvider>
-                                  </MemberProfileProvider>
-                                </PagesProvider>
-                              </PaymentMethodsProvider>
-                            </BountiesProvider>
-                          </MembersProvider>
-                        </WebSocketClientProvider>
-                      </IsSpaceMemberProvider>
-                    </PostCategoriesProvider>
-                  </CurrentSpaceProvider>
+                  <PostCategoriesProvider>
+                    <IsSpaceMemberProvider>
+                      <WebSocketClientProvider>
+                        <MembersProvider>
+                          <BountiesProvider>
+                            <PaymentMethodsProvider>
+                              <PagesProvider>
+                                <MemberProfileProvider>
+                                  <PageTitleProvider>{children}</PageTitleProvider>
+                                </MemberProfileProvider>
+                              </PagesProvider>
+                            </PaymentMethodsProvider>
+                          </BountiesProvider>
+                        </MembersProvider>
+                      </WebSocketClientProvider>
+                    </IsSpaceMemberProvider>
+                  </PostCategoriesProvider>
                 </SpacesProvider>
               </Web3AccountProvider>
             </Web3ConnectionManager>

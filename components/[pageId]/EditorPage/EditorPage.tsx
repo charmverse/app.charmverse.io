@@ -6,7 +6,7 @@ import charmClient from 'charmClient';
 import ErrorPage from 'components/common/errors/ErrorPage';
 import { useCharmEditor } from 'hooks/useCharmEditor';
 import { useCurrentPage } from 'hooks/useCurrentPage';
-import { useCurrentSpaceId } from 'hooks/useCurrentSpaceId';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePagePermissions } from 'hooks/usePagePermissions';
 import { usePages } from 'hooks/usePages';
 import { usePageTitle } from 'hooks/usePageTitle';
@@ -22,7 +22,7 @@ export default function EditorPage({ pageId: pageIdOrPath }: { pageId: string })
   const { editMode, resetPageProps, setPageProps } = useCharmEditor();
   const [, setTitleState] = usePageTitle();
   const [pageNotFound, setPageNotFound] = useState(false);
-  const { currentSpaceId } = useCurrentSpaceId();
+  const currentSpace = useCurrentSpace();
   const [isAccessDenied, setIsAccessDenied] = useState(false);
   const [currentPage, setCurrentPage] = useState<PageMeta | null>(null);
   const { permissions: pagePermissions } = usePagePermissions({ pageIdOrPath: currentPageId });
@@ -36,10 +36,10 @@ export default function EditorPage({ pageId: pageIdOrPath }: { pageId: string })
       setPageNotFound(false);
       setCurrentPage(pageFromContext);
       setCurrentPageId(pageFromContext.id);
-    } else if (!loadingPages && currentSpaceId) {
+    } else if (!loadingPages && currentSpace?.id) {
       // if the page is not in context, fetch it
       charmClient.pages
-        .getPage(pageIdOrPath, currentSpaceId)
+        .getPage(pageIdOrPath, currentSpace.id)
         .then((page) => {
           setPageNotFound(false);
           setCurrentPage(page);
@@ -59,7 +59,7 @@ export default function EditorPage({ pageId: pageIdOrPath }: { pageId: string })
     return () => {
       setCurrentPageId('');
     };
-  }, [pageIdOrPath, pages, currentSpaceId, loadingPages]);
+  }, [pageIdOrPath, pages, currentSpace?.id, loadingPages]);
 
   // set page attributes of the primary charm editor
   useEffect(() => {

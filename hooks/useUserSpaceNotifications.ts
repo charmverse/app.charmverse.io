@@ -2,20 +2,21 @@ import { useMemo } from 'react';
 import useSWRImmutable from 'swr/immutable';
 
 import charmClient from 'charmClient';
-import { useCurrentSpaceId } from 'hooks/useCurrentSpaceId';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 
 function useSpaceNotificationsData() {
   const { user } = useUser();
-  const { currentSpaceId } = useCurrentSpaceId();
+  const currentSpace = useCurrentSpace();
   const { data, error, isLoading, mutate } = useSWRImmutable(
-    user && currentSpaceId ? `/api/profile/space-notifications/${user.id}/${currentSpaceId}` : null,
+    user && currentSpace ? `/api/profile/space-notifications/${user.id}/${currentSpace.id}` : null,
     () => {
-      return charmClient.profile.getSpaceNotifications({ spaceId: currentSpaceId });
+      return charmClient.profile.getSpaceNotifications({ spaceId: currentSpace?.id || '' });
     }
   );
-  return { spaceId: currentSpaceId, settings: data, error, refresh: mutate, isLoading };
+
+  return { spaceId: currentSpace?.id || '', settings: data, error, refresh: mutate, isLoading };
 }
 
 export function useForumCategoryNotification(categoryId: string) {
