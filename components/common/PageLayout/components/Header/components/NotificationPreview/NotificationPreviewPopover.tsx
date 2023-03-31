@@ -42,7 +42,7 @@ export function NotificationPreviewPopover({
             gap={1}
           >
             <Typography variant='h6' color='secondary'>
-              You are up date!
+              You are up to date!
             </Typography>
             <CelebrationIcon color='secondary' fontSize='medium' />
           </Box>
