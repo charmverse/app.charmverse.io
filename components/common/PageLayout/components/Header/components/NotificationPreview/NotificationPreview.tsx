@@ -27,7 +27,14 @@ export function NotificationPreview({ notification, markAsRead, onClose }: Props
   const icon = useMemo(() => getIcon(groupType), [groupType]);
 
   return (
-    <Link color='inherit' href={href} onClick={onClose}>
+    <Link
+      color='inherit'
+      href={href}
+      onClick={() => {
+        markAsRead({ taskId, groupType, type });
+        onClose();
+      }}
+    >
       <Box
         sx={{
           '&:hover': {
