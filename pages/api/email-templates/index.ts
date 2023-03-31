@@ -27,8 +27,10 @@ const createDiscussionTask = ({
   mentionText: string;
   pageTitle: string;
 }): DiscussionTask => {
+  const id = v4();
   return {
-    mentionId: v4(),
+    mentionId: id,
+    taskId: id,
     createdAt: new Date().toISOString(),
     pageId: v4(),
     spaceId: v4(),
@@ -134,9 +136,14 @@ const createBountyTask = ({
   pageTitle,
   spaceName,
   status
-}: Omit<BountyTask, 'id' | 'spaceDomain' | 'pagePath' | 'pageId' | 'eventDate'>): BountyTask => {
+}: Omit<
+  BountyTask,
+  'id' | 'spaceDomain' | 'pagePath' | 'pageId' | 'eventDate' | 'taskId' | 'createdAt' | 'createdBy'
+>): BountyTask => {
+  const id = v4();
   return {
-    id: v4(),
+    id,
+    taskId: id,
     action,
     pagePath: randomName(),
     pageTitle,
@@ -144,7 +151,9 @@ const createBountyTask = ({
     spaceDomain: randomName(),
     spaceName,
     pageId: v4(),
-    eventDate: new Date()
+    eventDate: new Date(),
+    createdAt: new Date(),
+    createdBy: null
   };
 };
 

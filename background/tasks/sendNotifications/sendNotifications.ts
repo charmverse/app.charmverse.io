@@ -72,7 +72,6 @@ export async function getNotifications(): Promise<(PendingTasksProps & { unmarke
         taskId: {
           in: [
             ...gnosisSafeTasks.map(getGnosisSafeTaskId),
-            ...voteTasks.map((voteTask) => voteTask.id),
             ...workspaceEvents.map((workspaceEvent) => workspaceEvent.id)
           ]
         },
@@ -85,7 +84,7 @@ export async function getNotifications(): Promise<(PendingTasksProps & { unmarke
 
     const sentTaskIds = new Set(sentTasks.map((sentTask) => sentTask.taskId));
 
-    const voteTasksNotSent = voteTasks.filter((voteTask) => !sentTaskIds.has(voteTask.id));
+    const voteTasksNotSent = voteTasks.unmarked;
     const gnosisSafeTasksNotSent = gnosisSafeTasks.filter(
       (gnosisSafeTask) => !sentTaskIds.has(getGnosisSafeTaskId(gnosisSafeTask))
     );

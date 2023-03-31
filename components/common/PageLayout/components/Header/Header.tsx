@@ -6,7 +6,6 @@ import GetAppOutlinedIcon from '@mui/icons-material/GetAppOutlined';
 import MenuIcon from '@mui/icons-material/Menu';
 import MessageOutlinedIcon from '@mui/icons-material/MessageOutlined';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import NotificationsIcon from '@mui/icons-material/Notifications';
 import RateReviewOutlinedIcon from '@mui/icons-material/RateReviewOutlined';
 import FavoritedIcon from '@mui/icons-material/Star';
 import NotFavoritedIcon from '@mui/icons-material/StarBorder';
@@ -46,14 +45,13 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import { useToggleFavorite } from 'hooks/useToggleFavorite';
 import { useUser } from 'hooks/useUser';
 
-import NotificationsBadge from '../Sidebar/NotificationsBadge';
-
 import { BountyActions } from './components/BountyActions';
 import BountyShareButton from './components/BountyShareButton/BountyShareButton';
 import DatabasePageOptions from './components/DatabasePageOptions';
 import { DocumentHistory } from './components/DocumentHistory';
 import { DocumentParticipants } from './components/DocumentParticipants';
 import EditingModeToggle from './components/EditingModeToggle';
+import { NotificationButton } from './components/NotificationPreview/NotificationButton';
 import PageTitleWithBreadcrumbs from './components/PageTitleWithBreadcrumbs';
 import ShareButton from './components/ShareButton';
 import PublishToSnapshot from './components/Snapshot/PublishToSnapshot';
@@ -582,13 +580,8 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
             </Box>
           )}
           {/** End of CharmEditor page specific header content */}
-          {user && (
-            <NotificationsBadge onClick={() => clickToOpenSettingsModal('notifications')}>
-              <IconButton size={isLargeScreen ? 'small' : 'medium'}>
-                <NotificationsIcon fontSize='small' color='secondary' />
-              </IconButton>
-            </NotificationsBadge>
-          )}
+
+          {user && <NotificationButton onSeeAllClick={() => clickToOpenSettingsModal('notifications')} />}
         </Box>
       </Box>
     </StyledToolbar>
