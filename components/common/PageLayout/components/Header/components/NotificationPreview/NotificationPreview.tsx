@@ -47,11 +47,15 @@ export function NotificationPreview({ notification, markAsRead, onClose }: Props
         justifyContent='space-between'
         gap={2}
         pl={2}
-        pr={1}
-        py={1}
+        pr={0.5}
+        py={1.5}
       >
         <Box display='flex' justifyContent='space-between' width='100%'>
-          <Box overflow='hidden'>
+          <Box display='flex' alignItems='flex-start' mr={1.25} pt={0.5}>
+            {createdBy ? <Avatar size='small' name={createdBy?.username} avatar={createdBy?.avatar} /> : icon}
+          </Box>
+
+          <Box overflow='hidden' display='flex' flexDirection='column' flex={1}>
             <Box display='flex' pl={0.2}>
               <Box minWidth={0}>
                 <Typography
@@ -68,26 +72,20 @@ export function NotificationPreview({ notification, markAsRead, onClose }: Props
                 </Typography>
               </Box>
             </Box>
-            <Box width='100%' display='flex' alignItems='center' mt={0.5} justifyContent='space-between'>
-              <Box display='flex' alignItems='center' mr={2}>
-                {createdBy ? <Avatar size='small' name={createdBy?.username} avatar={createdBy?.avatar} /> : icon}
-              </Box>
-              <Box width='100%'>
-                <Typography
-                  variant='subtitle1'
-                  sx={{
-                    display: '-webkit-box',
-                    overflow: 'hidden',
-                    WebkitBoxOrient: 'vertical',
-                    WebkitLineClamp: 2
-                  }}
-                >
-                  {content}
-                </Typography>
-              </Box>
-            </Box>
+
+            <Typography
+              variant='subtitle1'
+              sx={{
+                display: '-webkit-box',
+                overflow: 'hidden',
+                WebkitBoxOrient: 'vertical',
+                WebkitLineClamp: 2
+              }}
+            >
+              {content}
+            </Typography>
           </Box>
-          <Box display='flex' alignItems='center'>
+          <Box display='flex' alignItems='flex-start' ml={0.25} mt={-0.25}>
             <IconButton
               onClick={(e) => {
                 e.preventDefault();
