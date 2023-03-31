@@ -188,10 +188,12 @@ export async function getForumNotifications(userId: string): Promise<ForumTasksG
   const uniqueComments = comments.filter((item) => item.commentId && !commentIdsFromMentions.includes(item.commentId));
 
   // Only fetch the users that created the mentions
+  const newPostsUserIds = newPosts.map((item) => item.userId);
+  const userIds = [...new Set([...discussionUserIds, ...newPostsUserIds])];
   const users = await prisma.user.findMany({
     where: {
       id: {
-        in: [...new Set(discussionUserIds)]
+        in: userIds
       }
     }
   });

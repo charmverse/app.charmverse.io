@@ -80,7 +80,7 @@ export default function TasksPage() {
     userNotificationState.snoozedUntil &&
     new Date(userNotificationState.snoozedUntil) > new Date();
 
-  const unvoted = tasks?.votes.filter((vote) => !vote.userChoice && new Date() < new Date(vote.deadline));
+  const unvoted = tasks?.votes.unmarked.filter((vote) => !vote.userChoice && new Date() < new Date(vote.deadline));
 
   const notificationCount: Record<(typeof TASK_TABS)[number]['type'], number> = {
     multisig:

@@ -5,10 +5,10 @@ import nc from 'next-connect';
 import { prisma } from 'db';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
+import { mapNotificationActor } from 'lib/notifications/mapNotificationActor';
 import { getPageMeta } from 'lib/pages/server/getPageMeta';
 import { computeUserPagePermissions } from 'lib/permissions/pages';
 import { computeProposalPermissions } from 'lib/permissions/proposals/computeProposalPermissions';
-import { computeProposalFlowFlags } from 'lib/proposal/computeProposalFlowFlags';
 import { withSessionRoute } from 'lib/session/withSession';
 import { DataNotFoundError, UnauthorisedActionError } from 'lib/utilities/errors';
 import { createVote as createVoteService, getVote as getVoteService } from 'lib/votes';
@@ -86,6 +86,7 @@ async function createVote(req: NextApiRequest, res: NextApiResponse<ExtendedVote
     spaceId: existingPage.spaceId,
     createdBy: userId
   } as VoteDTO);
+  const voteAuthor = await prisma.user.findUnique({ where: { id: userId } });
 
   if (vote.context === 'proposal') {
     trackUserAction('new_vote_created', {
@@ -112,7 +113,18 @@ async function createVote(req: NextApiRequest, res: NextApiResponse<ExtendedVote
     relay.broadcast(
       {
         type: 'votes_created',
-        payload: [{ ...vote, page: pageMeta, space }]
+        payload: [
+          {
+            ...vote,
+            page: pageMeta,
+            space,
+            createdBy: mapNotificationActor(voteAuthor),
+            taskId: vote.id,
+            spaceName: space.name,
+            spaceDomain: space.domain,
+            pagePath: ''
+          }
+        ]
       },
       vote.spaceId
     );
