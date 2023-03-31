@@ -33,12 +33,12 @@ export class SettingsModal extends GlobalPage {
     return this.page.locator(`[data-test-active-path=${activePath}]`);
   }
 
-  getSpaceSettingsSectionLocator({ spaceId, section }: { spaceId: string; section: SpaceSettingsSection }): Locator {
-    return this.page.locator(`data-test=space-settings-tab-${spaceId}-${section}`);
+  getSpaceSettingsSectionLocator(section: SpaceSettingsSection): Locator {
+    return this.page.locator(`data-test=space-settings-tab-${section}`);
   }
 
-  async goToTab({ spaceId, section }: { spaceId: string; section: SpaceSettingsSection }) {
-    const tab = this.getSpaceSettingsSectionLocator({ spaceId, section });
+  async goToTab(section: SpaceSettingsSection) {
+    const tab = this.getSpaceSettingsSectionLocator(section);
     await tab.click();
   }
 

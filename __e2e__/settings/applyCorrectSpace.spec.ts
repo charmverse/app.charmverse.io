@@ -22,7 +22,7 @@ test('User has correct access in the space settings', async ({ page, spaceSettin
     isAdmin: true,
     onboarded: true
   });
-  const { space: isAdminSpace, user } = await generateUserAndSpace({ spaceName: v4(), isAdmin: true, onboarded: true });
+  const { user } = await generateUserAndSpace({ spaceName: v4(), isAdmin: true, onboarded: true });
   // Make this user a member of the other space
   await generateSpaceRole({
     spaceId: isMemberSpace.id,
@@ -38,10 +38,7 @@ test('User has correct access in the space settings', async ({ page, spaceSettin
 
   await spaceSettings.openSettingsModal();
 
-  await spaceSettings.goToTab({
-    section: 'roles',
-    spaceId: isAdminSpace.id
-  });
+  await spaceSettings.goToTab('roles');
 
   await spaceSettings.clickRoleRowByTitle('Admin');
 
@@ -54,9 +51,7 @@ test('User has correct access in the space settings', async ({ page, spaceSettin
   // Make sure other user doesn't show up
   const invisibleMemberRow = spaceSettings.getSpaceMemberRowLocator(otherSpaceAdmin.id);
   await expect(invisibleMemberRow).not.toBeVisible();
-  await expect(
-    spaceSettings.getSpaceSettingsSectionLocator({ spaceId: isMemberSpace.id, section: 'space' })
-  ).not.toBeVisible();
+  await expect(spaceSettings.getSpaceSettingsSectionLocator('space')).not.toBeVisible();
 
   // Member info should be visible
   await spaceSettings.clickRoleRowByTitle('Member');
