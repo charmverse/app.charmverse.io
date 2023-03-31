@@ -5,6 +5,7 @@ import type {
   AvailableProposalCategoryPermissionFlags,
   AvailableProposalPermissionFlags
 } from 'lib/permissions/proposals/interfaces';
+import type { PermissionsGroupQuery } from 'lib/permissions/proposals/listGroupProposalCategoryPermissions';
 import type { ProposalCategoryPermissionInput } from 'lib/permissions/proposals/upsertProposalCategoryPermission';
 
 export class ProposalPermissionsApi {
@@ -37,6 +38,13 @@ export class ProposalPermissionsApi {
       {
         resourceId: proposalCategoryId
       } as PermissionCompute
+    );
+  }
+
+  listGroupProposalCategoryPermissions(query: PermissionsGroupQuery) {
+    return http.GET<AssignedProposalCategoryPermission[]>(
+      '/api/permissions/proposals/list-group-proposal-category-permissions',
+      query
     );
   }
 }

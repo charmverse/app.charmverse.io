@@ -2,18 +2,17 @@ import { prisma } from 'db';
 import { InvalidInputError } from 'lib/utilities/errors';
 
 import type { AssignedPermissionsQuery } from '../interfaces';
-import { PermissionAssigneeId } from '../interfaces';
+import { permissionGroupIsValid } from '../utils';
 
 import { AvailableSpacePermissions } from './availableSpacePermissions';
 import type { SpacePermissionFlags } from './interfaces';
-import { groupIsValid } from './utility';
 
 export async function computeGroupSpacePermissions({
   id,
   group,
   resourceId
 }: AssignedPermissionsQuery): Promise<SpacePermissionFlags> {
-  if (!id || !groupIsValid(group) || !resourceId) {
+  if (!id || !permissionGroupIsValid(group) || !resourceId) {
     throw new InvalidInputError('Please verify your input for requesting computation of space permissions.');
   }
 
