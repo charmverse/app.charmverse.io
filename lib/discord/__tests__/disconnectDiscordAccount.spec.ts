@@ -3,6 +3,7 @@ import { v4 } from 'uuid';
 import { prisma } from 'db';
 import { sessionUserRelations } from 'lib/session/config';
 import { InvalidInputError } from 'lib/utilities/errors';
+import { uid } from 'lib/utilities/strings';
 
 import { disconnectDiscordAccount } from '../disconnectDiscordAccount';
 
@@ -12,6 +13,7 @@ describe('disconnectdiscordAccount', () => {
 
     const user = await prisma.user.create({
       data: {
+        path: uid(),
         username: 'Test user',
         wallets: {
           create: {
@@ -40,6 +42,7 @@ describe('disconnectdiscordAccount', () => {
 
     const user = await prisma.user.create({
       data: {
+        path: uid(),
         username: 'Test user',
         wallets: {
           create: {

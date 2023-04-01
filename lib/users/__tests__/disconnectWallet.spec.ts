@@ -10,6 +10,7 @@ describe('disconnectWallet', () => {
     // create a user with a wallet
     const user = await prisma.user.create({
       data: {
+        path: `${Math.random()}`,
         username: 'userWithOneIdentity',
         wallets: {
           create: {
