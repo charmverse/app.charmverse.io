@@ -1,6 +1,7 @@
 import { prisma } from 'db';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 
+import { filterApplicablePermissions } from '../filterApplicablePermissions';
 import type { PermissionComputeRequest } from '../interfaces';
 
 import { AvailableSpacePermissions } from './availableSpacePermissions';
@@ -39,9 +40,14 @@ export async function computeSpacePermissions({
     }
   });
 
-  for (const permissionSet of spacePermissions) {
-    allowedOperations.addPermissions(permissionSet.operations);
-  }
+  const applicablePermissions = await filterApplicablePermissions({
+    permissions: spacePermissions,
+    resourceSpaceId: resourceId,
+    userId
+  });
 
+  applicablePermissions.forEach((permission) => {
+    allowedOperations.addPermissions(permission.operations);
+  });
   return allowedOperations.operationFlags;
 }

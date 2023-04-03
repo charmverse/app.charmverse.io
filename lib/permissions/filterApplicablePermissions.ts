@@ -1,12 +1,11 @@
 import { prisma } from 'db';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 
-export type AbstractPermission<P extends string = string> = {
+export type AbstractPermission = {
   spaceId?: string | null;
   roleId?: string | null;
   userId?: string | null;
   public?: boolean | null;
-  permissionLevel: P;
 };
 
 type PermissionFilterInput<T extends AbstractPermission> = {

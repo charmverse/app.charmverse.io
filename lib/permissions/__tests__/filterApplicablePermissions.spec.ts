@@ -12,17 +12,16 @@ let nonAssignedRole: Role;
 let space: Space;
 
 type ExamplePermissionLevel = 'minimum' | 'maximum';
-type ExamplePermission = AbstractPermission<ExamplePermissionLevel>;
 
-let userPermission: ExamplePermission;
-let otherUserPermission: ExamplePermission;
-let rolePermission: ExamplePermission;
-let otherRolePermission: ExamplePermission;
-let spacePermission: ExamplePermission;
-let otherSpacePermission: ExamplePermission;
-let publicPermission: ExamplePermission;
+let userPermission: AbstractPermission;
+let otherUserPermission: AbstractPermission;
+let rolePermission: AbstractPermission;
+let otherRolePermission: AbstractPermission;
+let spacePermission: AbstractPermission;
+let otherSpacePermission: AbstractPermission;
+let publicPermission: AbstractPermission;
 
-let permissions: ExamplePermission[];
+let permissions: AbstractPermission[];
 
 beforeAll(async () => {
   const generated = await generateUserAndSpace({
@@ -42,38 +41,31 @@ beforeAll(async () => {
   });
 
   userPermission = {
-    userId: user.id,
-    permissionLevel: 'maximum'
+    userId: user.id
   };
 
   otherUserPermission = {
-    userId: 'other-user-id',
-    permissionLevel: 'minimum'
+    userId: 'other-user-id'
   };
 
   rolePermission = {
-    roleId: role.id,
-    permissionLevel: 'minimum'
+    roleId: role.id
   };
 
   otherRolePermission = {
-    roleId: nonAssignedRole.id,
-    permissionLevel: 'minimum'
+    roleId: nonAssignedRole.id
   };
 
   spacePermission = {
-    spaceId: space.id,
-    permissionLevel: 'minimum'
+    spaceId: space.id
   };
 
   otherSpacePermission = {
-    spaceId: 'other-space-id',
-    permissionLevel: 'minimum'
+    spaceId: 'other-space-id'
   };
 
   publicPermission = {
-    public: true,
-    permissionLevel: 'minimum'
+    public: true
   };
 
   permissions = [

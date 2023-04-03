@@ -1,11 +1,18 @@
-import type { Space } from '@prisma/client';
+import type { Space, SpacePermission } from '@prisma/client';
 import { SpaceOperation } from '@prisma/client';
 
+import { prisma } from 'db';
 import { assignRole } from 'lib/roles';
-import { generateRole, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import {
+  generateRole,
+  generateSpaceUser,
+  generateUserAndSpace,
+  generateUserAndSpaceWithApiToken
+} from 'testing/setupDatabase';
 
 import { addSpaceOperations } from '../addSpaceOperations';
 import { computeSpacePermissions } from '../computeSpacePermissions';
+import type { SpacePermissionFlags } from '../interfaces';
 
 let space: Space;
 
@@ -15,39 +22,86 @@ beforeAll(async () => {
 });
 
 describe('computeSpacePermissions', () => {
-  it('should combine permissions from user, role assignments and space membership', async () => {
-    const { space: otherSpace, user: otherUser } = await generateUserAndSpaceWithApiToken(undefined, false);
+  it('should ignore space permissions if applicable role permissions exist', async () => {
+    const { space: otherSpace, user: otherUser } = await generateUserAndSpace({
+      isAdmin: false
+    });
+
+    const otherSpaceUserWithRole = await generateSpaceUser({
+      spaceId: otherSpace.id,
+      isAdmin: false
+    });
 
     const role = await generateRole({
       spaceId: otherSpace.id,
-      createdBy: otherUser.id
+      createdBy: otherSpace.id,
+      assigneeUserIds: [otherSpaceUserWithRole.id]
     });
 
-    await assignRole({
-      roleId: role.id,
-      userId: otherUser.id
+    await prisma.spacePermission.create({
+      data: {
+        operations: ['createBounty', 'createForumCategory', 'createPage'],
+        forSpace: {
+          connect: {
+            id: otherSpace.id
+          }
+        },
+        space: {
+          connect: {
+            id: otherSpace.id
+          }
+        }
+      }
     });
 
-    await addSpaceOperations<'role'>({
-      forSpaceId: otherSpace.id,
-      operations: ['createPage'],
-      roleId: role.id
+    await prisma.spacePermission.create({
+      data: {
+        operations: [],
+        forSpace: {
+          connect: {
+            id: otherSpace.id
+          }
+        },
+        role: {
+          connect: {
+            id: role.id
+          }
+        }
+      }
     });
-
-    await addSpaceOperations<'space'>({
-      forSpaceId: otherSpace.id,
-      operations: ['createBounty'],
-      spaceId: otherSpace.id
-    });
-
-    const computedPermissions = await computeSpacePermissions({
+    // User should inherit space-wide permissions
+    const userPermissions = await computeSpacePermissions({
       allowAdminBypass: false,
       resourceId: otherSpace.id,
       userId: otherUser.id
     });
 
-    expect(computedPermissions.createPage).toBe(true);
-    expect(computedPermissions.createBounty).toBe(true);
+    expect(userPermissions).toMatchObject(
+      expect.objectContaining<SpacePermissionFlags>({
+        createBounty: true,
+        createForumCategory: true,
+        createPage: true,
+        moderateForums: false,
+        reviewProposals: false
+      })
+    );
+
+    // User permissions should be defaulted to what is available to the role
+    const userWithRolePermissions = await computeSpacePermissions({
+      allowAdminBypass: false,
+      resourceId: otherSpace.id,
+      userId: otherSpaceUserWithRole.id
+    });
+
+    expect(userWithRolePermissions).toMatchObject(
+      expect.objectContaining<SpacePermissionFlags>({
+        createBounty: false,
+        createForumCategory: false,
+        createPage: false,
+        moderateForums: false,
+        reviewProposals: false
+      })
+    );
   });
 
   it('should give user space permissions via their role', async () => {
