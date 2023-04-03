@@ -1,60 +1,141 @@
-import type { PagePermissionLevel, User } from '@prisma/client';
+import type { PagePermissionLevel, Space, User } from '@prisma/client';
 import { PageOperations } from '@prisma/client';
 import { v4 } from 'uuid';
 
 import { PageNotFoundError } from 'lib/pages/server';
 import { computeUserPagePermissions, permissionTemplates, upsertPermission } from 'lib/permissions/pages';
 import { convertPageToProposal } from 'lib/proposal/convertPageToProposal';
-import { createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { typedKeys } from 'lib/utilities/objects';
+import {
+  createPage,
+  generateRole,
+  generateSpaceUser,
+  generateUserAndSpace,
+  generateUserAndSpaceWithApiToken
+} from 'testing/setupDatabase';
 import { generateProposalCategory } from 'testing/utils/proposals';
 
 import type { PageOperationType } from '../page-permission-interfaces';
 
 let user: User;
+let space: Space;
 
 beforeAll(async () => {
-  const generated = await generateUserAndSpaceWithApiToken();
+  const generated = await generateUserAndSpace();
   user = generated.user;
+  space = generated.space;
 });
 
 describe('computeUserPagePermissions', () => {
-  it('should return the correct permissions for a user by combining all permissions they are eligible for', async () => {
-    const { user: adminUser, space: localSpace } = await generateUserAndSpaceWithApiToken(undefined, false);
+  // This test exists so we can apply a certain permission level to the space, but make it higher or lower for a user
+  it('should apply permissions to the user in priority of user, role and space', async () => {
+    const localUser = await generateSpaceUser({
+      spaceId: space.id,
+      isAdmin: false
+    });
 
-    const page = await createPage({
-      createdBy: adminUser.id,
-      spaceId: localSpace.id,
-      title: 'Page without permissions'
+    const otherLocalUser = await generateSpaceUser({
+      spaceId: space.id,
+      isAdmin: false
+    });
+    // Perform the test with a page that has user / role / space / permissions ----------------------------
+    const firstPage = await createPage({
+      createdBy: user.id,
+      spaceId: space.id
+    });
+
+    const role = await generateRole({
+      createdBy: user.id,
+      spaceId: space.id,
+      assigneeUserIds: [localUser.id]
     });
 
     await Promise.all([
-      upsertPermission(page.id, {
-        permissionLevel: 'view',
-        pageId: page.id,
-        spaceId: localSpace.id
+      upsertPermission(firstPage.id, {
+        permissionLevel: 'full_access',
+        spaceId: space.id
       }),
-      upsertPermission(page.id, {
+      upsertPermission(firstPage.id, {
         permissionLevel: 'view_comment',
-        pageId: page.id,
-        userId: adminUser.id
+        roleId: role.id
+      })
+    ]);
+
+    const firstPagePermissions = await computeUserPagePermissions({
+      resourceId: firstPage.id,
+      userId: localUser.id
+    });
+
+    // Check that the level assigned to the role was used in the compute
+    typedKeys(PageOperations).forEach((op) => {
+      if (permissionTemplates.view_comment.includes(op)) {
+        expect(firstPagePermissions[op]).toBe(true);
+      } else {
+        expect(firstPagePermissions[op]).toBe(false);
+      }
+    });
+
+    // Check that other space members not belonging to the role continue to receive the space level permissions
+    const otherFirstPagePermissions = await computeUserPagePermissions({
+      resourceId: firstPage.id,
+      userId: otherLocalUser.id
+    });
+
+    typedKeys(PageOperations).forEach((op) => {
+      expect(otherFirstPagePermissions[op]).toBe(true);
+    });
+
+    // Perform the test with a page that has role / space / permissions ----------------------------
+    const secondPage = await createPage({
+      createdBy: user.id,
+      spaceId: space.id
+    });
+
+    await Promise.all([
+      upsertPermission(secondPage.id, {
+        permissionLevel: 'view_comment',
+        pageId: secondPage.id,
+        spaceId: space.id
+      }),
+      upsertPermission(secondPage.id, {
+        permissionLevel: 'full_access',
+        pageId: secondPage.id,
+        roleId: role.id
+      }),
+      upsertPermission(secondPage.id, {
+        permissionLevel: 'view',
+        pageId: secondPage.id,
+        userId: localUser.id
       })
     ]);
 
     const permissions = await computeUserPagePermissions({
-      resourceId: page.id,
-      userId: adminUser.id
+      resourceId: secondPage.id,
+      userId: localUser.id
     });
 
-    const assignedPermissionLevels: PagePermissionLevel[] = ['view', 'view_comment'];
-
-    assignedPermissionLevels.forEach((group) => {
-      permissionTemplates[group].forEach((op) => {
+    // Check that the level assigned to the role was used in the compute
+    typedKeys(PageOperations).forEach((op) => {
+      if (permissionTemplates.view.includes(op)) {
         expect(permissions[op]).toBe(true);
-      });
+      } else {
+        expect(permissions[op]).toBe(false);
+      }
     });
 
-    // Check a random higher level operation that shouldn't be true
-    expect(permissions.grant_permissions).toBe(false);
+    // Check that other space members are receiving the space level permissions
+    const otherPermissions = await computeUserPagePermissions({
+      resourceId: secondPage.id,
+      userId: otherLocalUser.id
+    });
+
+    typedKeys(PageOperations).forEach((op) => {
+      if (permissionTemplates.view_comment.includes(op)) {
+        expect(otherPermissions[op]).toBe(true);
+      } else {
+        expect(otherPermissions[op]).toBe(false);
+      }
+    });
   });
 
   it('should return full permissions if the user is an admin of the space linked to the page', async () => {
