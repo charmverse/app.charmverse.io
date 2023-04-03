@@ -2,7 +2,7 @@ import CelebrationIcon from '@mui/icons-material/Celebration';
 import CloseIcon from '@mui/icons-material/Close';
 import { Badge, Box, Dialog, DialogContent, Divider, IconButton, Tab, Tabs, Typography } from '@mui/material';
 import router from 'next/router';
-import { Fragment } from 'react';
+import { Fragment, useState } from 'react';
 
 import { tabStyles } from 'components/nexus/TasksPage';
 import Legend from 'components/settings/Legend';
@@ -13,11 +13,52 @@ import { SectionName } from '../../../Sidebar/Sidebar';
 import { SidebarLink } from '../../../Sidebar/SidebarButton';
 
 import { NotificationPreview } from './NotificationPreview';
+import type { NotificationDetails } from './useNotificationPreview';
 import { TASK_TABS, useNotificationPreview } from './useNotificationPreview';
 
-export function NotificationModal({ isOpen, onClose }: { isOpen: boolean; onClose?: () => void }) {
-  const { notificationPreviews, markAsRead } = useNotificationPreview();
+export function NotificationModal({
+  isOpen,
+  onClose,
+  notifications
+}: {
+  isOpen: boolean;
+  onClose?: () => void;
+  notifications: NotificationDetails[];
+}) {
+  const { markAsRead } = useNotificationPreview();
   const isMobile = useSmallScreen();
+
+  type TaskType = (typeof TASK_TABS)[number]['type'];
+
+  const [currentTaskType, setCurrentTaskType] = useState<TaskType>('all');
+
+  function seletedNotifications() {
+    if (currentTaskType === 'all') {
+      return notifications;
+    }
+
+    if (currentTaskType === 'forum') {
+      return notifications.filter((n) => n.type === 'forum');
+    }
+
+    if (currentTaskType === 'bounty') {
+      return notifications.filter((n) => n.type === 'bounty');
+    }
+
+    if (currentTaskType === 'discussion') {
+      return notifications.filter((n) => n.type === 'mention');
+    }
+
+    if (currentTaskType === 'proposal') {
+      return notifications.filter((n) => n.type === 'proposal');
+    }
+
+    if (currentTaskType === 'vote') {
+      return notifications.filter((n) => n.type === 'vote');
+    }
+
+    return [];
+  }
 
   return (
     <Dialog
@@ -45,22 +86,21 @@ export function NotificationModal({ isOpen, onClose }: { isOpen: boolean; onClos
               key={tab.label}
               label={tab.label}
               icon={tab.icon}
-              // onClick={() => onClick(tab.path)}
-              active={tab.label === 'All'}
+              onClick={() => setCurrentTaskType(tab.type)}
+              active={tab.type === currentTaskType}
             />
           ))}
         </Box>
         <Box flex='1 1 auto' position='relative' overflow='auto'>
           <Box role='tabpanel'>
             <DialogContent>
-              <Legend marginTop={0}>Notifications</Legend>
+              <Legend marginTop={0} textTransform='capitalize'>{`${currentTaskType} Notifications`}</Legend>
 
               {isMobile && (
                 <Tabs
                   sx={tabStyles}
                   indicatorColor='primary'
-                  // currentTaskType
-                  value={TASK_TABS.findIndex((taskTab) => taskTab.type === 'all')}
+                  value={TASK_TABS.findIndex((taskTab) => taskTab.type === currentTaskType)}
                 >
                   {TASK_TABS.map((task) => (
                     <Tab
@@ -106,7 +146,7 @@ export function NotificationModal({ isOpen, onClose }: { isOpen: boolean; onClos
                               }
                             }
                           }}
-                          // invisible={notificationCount[task.type] === 0}
+                          invisible
                           color='error'
                           variant='dot'
                         >
@@ -115,15 +155,15 @@ export function NotificationModal({ isOpen, onClose }: { isOpen: boolean; onClos
                       }
                       onClick={() => {
                         setUrlWithoutRerender(router.pathname, { task: task.type });
-                        // setCurrentTaskType(task.type);
+                        setCurrentTaskType(task.type);
                       }}
                     />
                   ))}
                 </Tabs>
               )}
 
-              {notificationPreviews.length > 0 ? (
-                notificationPreviews.map((notification) => (
+              {seletedNotifications().length > 0 ? (
+                seletedNotifications().map((notification) => (
                   <Fragment key={notification.taskId}>
                     <NotificationPreview
                       large

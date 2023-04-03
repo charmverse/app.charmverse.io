@@ -15,6 +15,8 @@ export function NotificationPreviewPopover({
 }) {
   const { notificationPreviews, markAsRead } = useNotificationPreview();
   const [openNotificationsModal, setOpenNotificationsModal] = useState(false);
+  const MAX_COUNT = 5;
+
   return (
     <Box>
       <Card>
@@ -25,7 +27,7 @@ export function NotificationPreviewPopover({
       <Divider />
       <Box maxHeight={500} sx={{ overflowY: 'auto', overflowX: 'hidden' }}>
         {notificationPreviews.length > 0 ? (
-          notificationPreviews.map((notification) => (
+          notificationPreviews.slice(0, MAX_COUNT).map((notification) => (
             <Fragment key={notification.taskId}>
               <NotificationPreview notification={notification} markAsRead={markAsRead} onClose={close} />
               <Divider />
@@ -62,7 +64,11 @@ export function NotificationPreviewPopover({
           </Typography>
         </Box>
       </Card>
-      <NotificationModal isOpen={openNotificationsModal} onClose={() => setOpenNotificationsModal(false)} />
+      <NotificationModal
+        isOpen={openNotificationsModal}
+        onClose={() => setOpenNotificationsModal(false)}
+        notifications={notificationPreviews}
+      />
     </Box>
   );
 }
