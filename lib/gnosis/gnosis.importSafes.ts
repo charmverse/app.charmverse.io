@@ -20,5 +20,8 @@ export async function importSafesFromWallet({ signer, addresses, getWalletName }
     chainId: safe.chainId,
     name: getWalletName?.(safe.address) // get existing name if user gave us one
   }));
+
   await charmClient.setMyGnosisSafes(safesData);
+
+  return safes.length;
 }

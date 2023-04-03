@@ -1,22 +1,11 @@
 /* eslint-disable jsx-a11y/control-has-associated-label */
 import styled from '@emotion/styled';
 import KeyIcon from '@mui/icons-material/Key';
-import {
-  Box,
-  Card,
-  CircularProgress,
-  OutlinedInput,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
-  Typography
-} from '@mui/material';
+import { Box, CircularProgress, OutlinedInput, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
 import Tooltip from '@mui/material/Tooltip';
 import { getChainById, getChainShortname } from 'connectors';
+import log from 'loglevel';
 import { usePopupState } from 'material-ui-popup-state/hooks';
-import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 
@@ -25,9 +14,11 @@ import Button from 'components/common/Button';
 import ElementDeleteIcon from 'components/common/form/ElementDeleteIcon';
 import Link from 'components/common/Link';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
+import { MultiSigConnectCard } from 'components/integrations/components/MultiSigConnectCard';
 import Legend from 'components/settings/Legend';
 import useMultiWalletSigs from 'hooks/useMultiWalletSigs';
 import { useSettingsDialog } from 'hooks/useSettingsDialog';
+import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import useGnosisSigner from 'hooks/useWeb3Signer';
 import { importSafesFromWallet } from 'lib/gnosis/gnosis.importSafes';
@@ -49,8 +40,9 @@ const StyledTableCell = styled(TableCell)`
 const gnosisUrl = (address: string, chainId: number) =>
   `https://app.safe.global/${getChainShortname(chainId)}:${address}/home`;
 
-export default function GnosisSafesList() {
+export function MultiSigList() {
   const { data: safeData, mutate } = useMultiWalletSigs();
+  const { showMessage } = useSnackbar();
 
   const gnosisSigner = useGnosisSigner();
   const { user } = useUser();
@@ -63,12 +55,20 @@ export default function GnosisSafesList() {
     if (gnosisSigner && user) {
       setIsLoadingSafes(true);
       try {
-        await importSafesFromWallet({
+        const safesCount = await importSafesFromWallet({
           signer: gnosisSigner,
           addresses: user.wallets.map((w) => w.address),
           getWalletName
         });
+
+        if (!safesCount) {
+          showMessage('You do not have any gnosis wallets', 'warning');
+        }
         await mutate();
+      } catch (e) {
+        log.error('Error importing safes', e);
+
+        showMessage('We could not import your safes', 'error');
       } finally {
         setIsLoadingSafes(false);
       }
@@ -104,7 +104,7 @@ export default function GnosisSafesList() {
       </Legend>
 
       {sortedSafes.length === 0 && (
-        <GnosisConnectCard
+        <MultiSigConnectCard
           connectable={!!gnosisSigner}
           loading={isLoadingSafes}
           onClick={importSafes}
@@ -130,48 +130,6 @@ export default function GnosisSafesList() {
         </Table>
       )}
     </>
-  );
-}
-
-export function GnosisConnectCard({
-  loading,
-  onClick,
-  connectable,
-  openNotificationsTab
-}: {
-  loading: boolean;
-  onClick: () => void;
-  connectable: boolean;
-  openNotificationsTab: () => void;
-}) {
-  const router = useRouter();
-  const isTasksPage = router.pathname.includes('/tasks');
-
-  return (
-    <Card variant='outlined'>
-      <Box p={3} textAlign='center'>
-        <Typography color='secondary'>
-          Import your Gnosis safes to view your transaction queue
-          {!isTasksPage && (
-            <>
-              {' '}
-              under{' '}
-              <Button variant='text' onClick={openNotificationsTab}>
-                My Tasks
-              </Button>
-            </>
-          )}
-        </Typography>
-        <br />
-        <Tooltip title={!connectable ? 'Please unlock your wallet and ensure it is connected to your account.' : ''}>
-          <Box>
-            <Button disabled={!connectable} loading={loading} onClick={onClick}>
-              Connect Gnosis Safe
-            </Button>
-          </Box>
-        </Tooltip>
-      </Box>
-    </Card>
   );
 }
 
