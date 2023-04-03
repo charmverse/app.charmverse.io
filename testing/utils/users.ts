@@ -2,6 +2,7 @@ import type { User } from '@prisma/client';
 
 import { prisma } from 'db';
 import randomName from 'lib/utilities/randomName';
+import { uid } from 'lib/utilities/strings';
 
 export async function addUserGoogleAccount({
   userId,
@@ -44,6 +45,7 @@ type GenerateUserInput = {
 export function generateUser(input?: GenerateUserInput): Promise<User> {
   return prisma.user.create({
     data: {
+      path: uid(),
       username: randomName(),
       identityType: 'RandomName',
       verifiedEmails: input?.verifiedEmail

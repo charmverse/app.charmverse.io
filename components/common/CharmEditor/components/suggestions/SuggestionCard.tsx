@@ -72,7 +72,7 @@ type Props = TrackedEvent & { readOnly?: boolean; isOwner?: boolean; pageId: str
 
 function SuggestionCardComponent({ readOnly, isOwner, active, data, node, pos, type, pageId, spaceId }: Props) {
   const view = useEditorViewContext();
-  const { members } = useMembers();
+  const { getMemberById } = useMembers();
   // get parentNode for lists
   const parentNode = useMemo(
     () => (pos > 0 && pos < view.state.doc.nodeSize ? view.state.doc.nodeAt(pos - 1) : null),
@@ -97,7 +97,7 @@ function SuggestionCardComponent({ readOnly, isOwner, active, data, node, pos, t
       <Stack gap={1}>
         <Box display='flex' justifyContent='space-between'>
           <Box display='flex' alignItems='center' gap={1}>
-            <SidebarUser user={members.find((member) => member.id === data.user)} />
+            <SidebarUser user={getMemberById(data.user)} />
             <RelativeDate createdAt={data.date} />
           </Box>
           <Box display='flex' gap={1}>

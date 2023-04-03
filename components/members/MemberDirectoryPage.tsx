@@ -8,8 +8,8 @@ import { iconForViewType } from 'components/common/BoardEditor/focalboard/src/co
 import Button from 'components/common/Button';
 import ErrorPage from 'components/common/errors/ErrorPage';
 import { CenteredPageContent } from 'components/common/PageLayout/components/PageContent';
+import { useFilteredMembers } from 'components/members/hooks/useFilteredMembers';
 import { useHasMemberLevel } from 'hooks/useHasMemberLevel';
-import { useMembers } from 'hooks/useMembers';
 import type { Member } from 'lib/members/interfaces';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
@@ -36,14 +36,14 @@ function memberNamePropertyValue(member: Member) {
 
 export default function MemberDirectoryPage() {
   const router = useRouter();
-  const { members } = useMembers();
-  const [searchedMembers, setSearchedMembers] = useState<Member[]>(members);
   const [currentView, setCurrentView] = useState<View>((router.query.view as View) ?? 'gallery');
   const [isPropertiesDrawerVisible, setIsPropertiesDrawerVisible] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const filteredMembers = useFilteredMembers(searchQuery);
 
   const { hasAccess: showDirectory, isLoadingAccess } = useHasMemberLevel('member');
 
-  const sortedMembers = searchedMembers.sort((mem1, mem2) =>
+  const sortedMembers = filteredMembers.sort((mem1, mem2) =>
     memberNamePropertyValue(mem1) > memberNamePropertyValue(mem2) ? 1 : -1
   );
 
@@ -60,7 +60,7 @@ export default function MemberDirectoryPage() {
       <Typography variant='h1' my={2}>
         Member Directory
       </Typography>
-      <MemberDirectorySearchBar onChange={setSearchedMembers} />
+      <MemberDirectorySearchBar onChange={setSearchQuery} />
       <Stack flexDirection='row' justifyContent='space-between' mb={1}>
         <Tabs
           textColor='primary'

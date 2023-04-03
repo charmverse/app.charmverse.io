@@ -207,15 +207,15 @@ function getNotificationContent(n: NotificationPreview, groupType: NotificationG
     }
 
     if (action === 'application_approved') {
-      return `You application for ${title} bounty was approved.`;
+      return `Your application for ${title} bounty was approved.`;
     }
 
     if (action === 'application_rejected') {
-      return `You application for ${title} bounty has been rejected.`;
+      return `Your application for ${title} bounty has been rejected.`;
     }
 
     if (action === 'work_approved') {
-      return `You submission for ${title} bounty was approved.`;
+      return `Your submission for ${title} bounty was approved.`;
     }
 
     if (action === 'payment_needed') {

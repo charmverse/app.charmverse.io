@@ -33,9 +33,9 @@ const StyledTypography = styled(Typography)`
 export default function Mention({ node }: NodeViewProps) {
   const { showMemberProfile } = useMemberProfile();
   const attrs = node.attrs as MentionSpecSchemaAttrs;
-  const { members } = useMembers();
+  const { getMemberById } = useMembers();
   const { pages } = usePages();
-  const member = members.find((_member) => _member.id === attrs.value);
+  const member = getMemberById(attrs.value);
   const space = useCurrentSpace();
   let value: ReactNode = null;
   if (attrs.type === 'page') {

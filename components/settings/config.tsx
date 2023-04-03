@@ -18,7 +18,7 @@ type SettingsTab<T extends string> = {
 export type SpaceSettingsTab = SettingsTab<SpaceSettingsSection>;
 
 export const SETTINGS_TABS: SpaceSettingsTab[] = [
-  { icon: <SettingsIcon fontSize='small' />, path: 'space', label: 'Space' },
+  { icon: <SettingsIcon fontSize='small' />, path: 'space', label: 'Overview' },
   { icon: <UserRoleIcon fontSize='small' />, path: 'roles', label: 'Roles & Permissions' },
   { icon: <GroupAddOutlinedIcon fontSize='small' />, path: 'invites', label: 'Invites' },
   { icon: <CloudSyncOutlinedIcon fontSize='small' />, path: 'api', label: 'API' }

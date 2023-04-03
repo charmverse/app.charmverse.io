@@ -3,6 +3,7 @@ import { v4 } from 'uuid';
 import { prisma } from 'db';
 import { sessionUserRelations } from 'lib/session/config';
 import { InvalidInputError } from 'lib/utilities/errors';
+import { uid } from 'lib/utilities/strings';
 
 import { disconnectVerifiedEmail } from '../disconnectVerifiedEmail';
 
@@ -12,6 +13,7 @@ describe('disconnectVerifiedEmail', () => {
 
     const user = await prisma.user.create({
       data: {
+        path: uid(),
         username: 'Test user',
         wallets: {
           create: {
@@ -42,6 +44,7 @@ describe('disconnectVerifiedEmail', () => {
     const user = await prisma.user.create({
       data: {
         username: 'Test user',
+        path: uid(),
         wallets: {
           create: {
             address: `0x${v4()}`

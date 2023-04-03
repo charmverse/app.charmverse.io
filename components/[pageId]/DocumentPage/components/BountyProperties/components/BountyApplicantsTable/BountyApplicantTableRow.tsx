@@ -38,10 +38,10 @@ export default function BountyApplicantTableRow({
   submissionsCapReached,
   refreshSubmissions
 }: Props) {
-  const { members } = useMembers();
+  const { getMemberById } = useMembers();
   const { user } = useUser();
   const [isExpandedRow, setIsExpandedRow] = useState(false);
-  const member = members.find((c) => c.id === submission.createdBy);
+  const member = getMemberById(submission.createdBy);
   const { refreshBounty } = useBounties();
   const { formatDateTime } = useDateFormatter();
 
