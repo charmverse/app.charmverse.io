@@ -1,4 +1,5 @@
 import type { ProposalCategory, Space, User } from '@prisma/client';
+import { PostOperation } from '@prisma/client';
 import { v4 } from 'uuid';
 
 import { prisma } from 'db';
@@ -6,6 +7,7 @@ import { convertPostToProposal } from 'lib/forums/posts/convertPostToProposal';
 import { PostNotFoundError } from 'lib/forums/posts/errors';
 import { addSpaceOperations } from 'lib/permissions/spaces';
 import { InvalidInputError } from 'lib/utilities/errors';
+import { typedKeys } from 'lib/utilities/objects';
 import { generateRole, generateSpaceUser, generateUserAndSpace } from 'testing/setupDatabase';
 import { generateForumPost, generatePostCategory } from 'testing/utils/forums';
 import { generateProposalCategory } from 'testing/utils/proposals';
@@ -41,6 +43,77 @@ beforeAll(async () => {
 });
 
 describe('computePostPermissions - base', () => {
+  // This test exists so we can apply a certain permission level to the space, but make it higher or lower for a user
+  it('should ignore space permissions if the user has applicable role permissions', async () => {
+    // Perform the test with a page that has user / role / space / permissions ----------------------------
+    const postCategory = await generatePostCategory({
+      spaceId: space.id
+    });
+
+    const userWithRole = await generateSpaceUser({
+      spaceId: space.id,
+      isAdmin: false
+    });
+
+    const post = await generateForumPost({
+      spaceId: space.id,
+      userId: authorUser.id,
+      categoryId: postCategory.id
+    });
+
+    const role = await generateRole({
+      createdBy: adminUser.id,
+      spaceId: space.id,
+      assigneeUserIds: [userWithRole.id]
+    });
+
+    await Promise.all([
+      upsertPostCategoryPermission({
+        postCategoryId: postCategory.id,
+        permissionLevel: 'full_access',
+        assignee: {
+          group: 'space',
+          id: space.id
+        }
+      }),
+      upsertPostCategoryPermission({
+        postCategoryId: postCategory.id,
+        permissionLevel: 'view',
+        assignee: {
+          group: 'role',
+          id: role.id
+        }
+      })
+    ]);
+
+    const userWithRolePermissions = await computePostPermissions({
+      resourceId: post.id,
+      userId: userWithRole.id
+    });
+
+    // Check that the level assigned to the role was used in the compute
+    typedKeys(PostOperation).forEach((op) => {
+      if (postPermissionsMapping.view.includes(op)) {
+        expect(userWithRolePermissions[op]).toBe(true);
+      } else {
+        expect(userWithRolePermissions[op]).toBe(false);
+      }
+    });
+
+    // Check that other space members not belonging to the role continue to receive the space level permissions
+    const spaceMemberPermissions = await computePostPermissions({
+      resourceId: post.id,
+      userId: spaceMemberUser.id
+    });
+
+    typedKeys(PostOperation).forEach((op) => {
+      if (postPermissionsMapping.full_access.includes(op)) {
+        expect(spaceMemberPermissions[op]).toBe(true);
+      } else {
+        expect(spaceMemberPermissions[op]).toBe(false);
+      }
+    });
+  });
   it('should always allow the author to view, edit and delete the post', async () => {
     const postCategory = await generatePostCategory({ spaceId: space.id });
     const post = await generateForumPost({

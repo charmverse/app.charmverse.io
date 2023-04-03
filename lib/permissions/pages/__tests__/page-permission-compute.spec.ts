@@ -38,7 +38,7 @@ describe('computeUserPagePermissions', () => {
       spaceId: space.id,
       isAdmin: false
     });
-    // Perform the test with a page that has user / role / space / permissions ----------------------------
+    // Perform the test with a page that has role / space / permissions ----------------------------
     const firstPage = await createPage({
       createdBy: user.id,
       spaceId: space.id
@@ -85,7 +85,7 @@ describe('computeUserPagePermissions', () => {
       expect(otherFirstPagePermissions[op]).toBe(true);
     });
 
-    // Perform the test with a page that has role / space / permissions ----------------------------
+    // Perform the test with a page that has user/ role / space / permissions ----------------------------
     const secondPage = await createPage({
       createdBy: user.id,
       spaceId: space.id
