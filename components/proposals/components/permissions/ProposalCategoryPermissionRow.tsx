@@ -43,7 +43,11 @@ export function ProposalCategoryRolePermissionRow({
 
   const friendlyLabels = {
     ...proposalCategoryPermissionLabels,
-    delete: (inheritedPermissionLevel ? <em>Use default</em> : 'Remove') as string | ReactNode | undefined,
+    delete: (inheritedPermissionLevel ? (
+      <em>Default: {proposalCategoryPermissionLabels[inheritedPermissionLevel]}</em>
+    ) : (
+      'Remove'
+    )) as string | ReactNode | undefined,
     '': (inheritedPermissionLevel && proposalCategoryPermissionLabels[inheritedPermissionLevel]) || 'No access'
   };
 

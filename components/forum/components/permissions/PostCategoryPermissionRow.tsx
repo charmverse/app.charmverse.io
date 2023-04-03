@@ -44,7 +44,11 @@ export function PostCategoryRolePermissionRow({
   const isInherited = inheritedPermissionLevel && !defaultPermissionLevel;
   const friendlyLabels = {
     ...postCategoryPermissionLabels,
-    delete: (inheritedPermissionLevel ? <em>Use default</em> : 'Remoooove') as string | ReactNode | undefined,
+    delete: (inheritedPermissionLevel ? (
+      <em>Default: {postCategoryPermissionLabels[inheritedPermissionLevel]}</em>
+    ) : (
+      'Remove'
+    )) as string | ReactNode | undefined,
     '': (inheritedPermissionLevel && postCategoryPermissionLabels[inheritedPermissionLevel]) || 'No access'
   };
 
