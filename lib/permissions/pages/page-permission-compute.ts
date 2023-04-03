@@ -155,9 +155,8 @@ async function baseComputeUserPagePermissions({
     });
   }
 
-  const { isAdmin } = await hasAccessToSpace({
+  const { isAdmin, spaceRole } = await hasAccessToSpace({
     spaceId: pageInDb.spaceId,
-    adminOnly: true,
     userId
   });
 
@@ -167,7 +166,11 @@ async function baseComputeUserPagePermissions({
 
   const pagePermissions = await prisma.pagePermission.findMany({
     where: {
-      pageId
+      pageId,
+      // Small optimisation to avoid querying for permissions that are not applicable
+      public: !spaceRole ? true : undefined,
+      // Only pass individual user permissions if they are a guest
+      userId: spaceRole?.isGuest ? userId : undefined
     }
   });
   const applicablePermissions = await filterApplicablePermissions({

@@ -200,6 +200,65 @@ describe('computeUserPagePermissions', () => {
     expect(permissions.edit_content).toBe(false);
   });
 
+  it('should only take into account individually assigned permissions for guest users', async () => {
+    const { user: nonAdminUser, space: localSpace } = await generateUserAndSpace({});
+
+    const guest = await generateSpaceUser({
+      spaceId: localSpace.id,
+      isGuest: true
+    });
+
+    const pageWithoutGuestPermissions = await createPage({
+      createdBy: nonAdminUser.id,
+      spaceId: localSpace.id,
+      title: 'Page without permissions'
+    });
+
+    await Promise.all([
+      upsertPermission(pageWithoutGuestPermissions.id, {
+        spaceId: localSpace.id,
+        permissionLevel: 'full_access'
+      })
+    ]);
+
+    const permissions = await computeUserPagePermissions({
+      resourceId: pageWithoutGuestPermissions.id,
+      userId: guest.id
+    });
+
+    typedKeys(PageOperations).forEach((op) => {
+      expect(permissions[op]).toBe(false);
+    });
+
+    // Now add a permission for the guest user and check that it is taken into account
+    const pageWithGuestPermissions = await createPage({
+      createdBy: nonAdminUser.id,
+      spaceId: localSpace.id,
+      title: 'Page without permissions'
+    });
+
+    // Situation where guest has full access, but space members do not
+    await Promise.all([
+      upsertPermission(pageWithGuestPermissions.id, {
+        spaceId: localSpace.id,
+        permissionLevel: 'view'
+      }),
+      upsertPermission(pageWithGuestPermissions.id, {
+        userId: guest.id,
+        permissionLevel: 'full_access'
+      })
+    ]);
+
+    const guestPermissions = await computeUserPagePermissions({
+      resourceId: pageWithGuestPermissions.id,
+      userId: guest.id
+    });
+
+    permissionTemplates.full_access.forEach((op) => {
+      expect(guestPermissions[op]).toBe(true);
+    });
+  });
+
   it('should return only read permissions if page has been converted to a proposal', async () => {
     const { user: nonAdminUser, space: localSpace } = await generateUserAndSpaceWithApiToken(undefined, true);
 

@@ -1,5 +1,4 @@
 import type { Role, Space, User } from '@prisma/client';
-import { v4 } from 'uuid';
 
 import { generateRole, generateUserAndSpace } from 'testing/setupDatabase';
 
@@ -10,9 +9,6 @@ let user: User;
 let role: Role;
 let nonAssignedRole: Role;
 let space: Space;
-
-type ExamplePermissionLevel = 'minimum' | 'maximum';
-
 let userPermission: AbstractPermission;
 let otherUserPermission: AbstractPermission;
 let rolePermission: AbstractPermission;
