@@ -74,7 +74,7 @@ export async function prepopulateUserProfile(user: User, ens: string | null) {
               break;
             }
           } catch (error) {
-            log.error('Failed to save nft avatar', { error, url: nft.image, userId: user.id });
+            log.warn('Failed to save nft avatar', { error, url: nft.image, userId: user.id });
           }
         }
       }
