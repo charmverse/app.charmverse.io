@@ -1,12 +1,13 @@
 import { prisma } from 'db';
 import { sessionUserRelations } from 'lib/session/config';
+import { randomETHWalletAddress } from 'testing/generateStubs';
 
 import { disconnectWallet } from '../disconnectWallet';
 
 // test to check if the disconnectWallet function works as expected
 describe('disconnectWallet', () => {
   it('should disconnect the wallet from the user', async () => {
-    const walletAddress = '0x1';
+    const walletAddress = randomETHWalletAddress();
     // create a user with a wallet
     const user = await prisma.user.create({
       data: {
