@@ -32,7 +32,7 @@ export async function getNFT({
 
 function mapNftFromAlchemy(nft: alchemyApi.AlchemyNft, chainId: alchemyApi.SupportedChainId, userId: string): NftData {
   return {
-    id: `${nft.contract.address}:${nft.id.tokenId}:${userId}`,
+    id: `${userId}_${nft.contract.address}_${nft.id.tokenId}`,
     tokenId: nft.id.tokenId,
     tokenIdInt: parseInt(nft.id.tokenId, 16) || null,
     contract: nft.contract.address,
