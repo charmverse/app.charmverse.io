@@ -1,40 +1,13 @@
 import { prisma } from 'db';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 
-type AbstractPermission<P extends string = string> = {
+export type AbstractPermission<P extends string = string> = {
   spaceId?: string | null;
   roleId?: string | null;
   userId?: string | null;
   public?: boolean | null;
   permissionLevel: P;
 };
-// /**
-//  * Compare a set of permissions with same specificity to get the highest one
-//  *
-//  * This relies on the paradigm of a permission mapping where higher permission levels always include all operations available to lower permission levels
-//  *
-//  * @abstract When we support custom permissions in future, we should probably refactor this to return an array of permissions
-//  */
-// function findGreatestPermission({ permissions, mapping }: PermissionCompareInput): AbstractPermission | null {
-//   const permissionCount = permissions.length;
-
-//   if (!permissions || permissionCount === 0) {
-//     return null;
-//   } else if (permissionCount === 1) {
-//     return permissions[0];
-//   }
-
-//   let highestPermission = permissions[0];
-
-//   for (let i = 1; i < permissionCount; i++) {
-//     const currentPermission = permissions[i];
-
-//     // Check if this permission provides access to more operations
-//     if (mapping[currentPermission.permissionLevel].length > mapping[highestPermission.permissionLevel].length) {
-//       highestPermission = currentPermission;
-//     }
-//   }
-// }
 
 type PermissionFilterInput<P extends string = string> = {
   permissions: AbstractPermission<P>[];
