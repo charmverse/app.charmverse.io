@@ -1,12 +1,8 @@
 import { SpaceOperation } from '@prisma/client';
 
-import type { UserPermissionFlags } from '../interfaces';
-import { Permissions } from '../permissions.class';
+import { BasePermissions } from '../basePermissions.class';
 
-export class AvailableSpacePermissions
-  extends Permissions<SpaceOperation>
-  implements UserPermissionFlags<SpaceOperation>
-{
+export class AvailableSpacePermissions extends BasePermissions<SpaceOperation> {
   createPage: boolean = false;
 
   createBounty: boolean = false;
