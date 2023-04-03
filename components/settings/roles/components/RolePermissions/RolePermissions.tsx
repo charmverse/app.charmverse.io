@@ -1,20 +1,24 @@
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Box, Divider, FormControlLabel, Grid, Paper, Switch, Tooltip, Typography } from '@mui/material';
+import { Box, Divider, FormControlLabel, Grid, Switch, Tooltip, Typography } from '@mui/material';
 import { SpaceOperation } from '@prisma/client';
 import type { ChangeEvent } from 'react';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import useSWR, { mutate } from 'swr';
+import { mutate } from 'swr';
+import useSWR from 'swr/immutable';
 import type { BooleanSchema } from 'yup';
 import * as yup from 'yup';
 
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
+import { PostCategoryRolePermissionRow } from 'components/forum/components/permissions/PostCategoryPermissionRow';
 import { ProposalCategoryRolePermissionRow } from 'components/proposals/components/permissions/ProposalCategoryPermissionRow';
 import { useProposalCategories } from 'components/proposals/hooks/useProposalCategories';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useForumCategories } from 'hooks/useForumCategories';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { usePreventReload } from 'hooks/usePreventReload';
+import type { PostCategoryPermissionInput } from 'lib/permissions/forum/upsertPostCategoryPermission';
 import type { AssignablePermissionGroups } from 'lib/permissions/interfaces';
 import type { ProposalCategoryPermissionInput } from 'lib/permissions/proposals/upsertProposalCategoryPermission';
 import type { SpacePermissionFlags } from 'lib/permissions/spaces/client';
@@ -46,17 +50,11 @@ interface Props {
 }
 
 export function RolePermissions({ targetGroup, id, callback = () => null }: Props) {
-  const [assignedPermissions, setAssignedPermissions] = useState<SpacePermissionFlags | null>(null);
-
-  const { data: categoryPermissions, mutate: mutateCategoryPermissions } = useSWR(
-    `/proposals/list-group-proposal-category-permissions-${id}`,
-    () => charmClient.permissions.proposals.listGroupProposalCategoryPermissions({ group: targetGroup, id })
-  );
-
   const space = useCurrentSpace();
-  const { categories = [] } = useProposalCategories();
-
+  const { categories: proposalCategories = [] } = useProposalCategories();
+  const { categories: forumCategories = [] } = useForumCategories();
   const isAdmin = useIsAdmin();
+  const [assignedPermissions, setAssignedPermissions] = useState<SpacePermissionFlags | null>(null);
   // custom onChange is used for switches so isDirty from useForm doesn't change it value
   const [touched, setTouched] = useState<boolean>(false);
   const { handleSubmit, setValue } = useForm<FormValues>({
@@ -65,23 +63,50 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
     resolver: yupResolver(schema)
   });
 
+  const currentSpaceId = space?.id;
+
+  const { data: proposalCategoryPermissions, mutate: mutateProposalCategoryPermissions } = useSWR(
+    `/proposals/list-group-proposal-category-permissions-${id}`,
+    () => charmClient.permissions.proposals.listGroupProposalCategoryPermissions({ group: targetGroup, id })
+  );
+  const { data: postCategoryPermissions, mutate: mutatePostCategoryPermissions } = useSWR(
+    `/posts/list-group-post-category-permissions-${id}`,
+    () => charmClient.permissions.forum.listGroupPostCategoryPermissions({ group: targetGroup, id })
+  );
+  // retriee space-level permissions to display as default
+  const { data: spaceProposalCategoryPermissions } = useSWR(
+    currentSpaceId &&
+      targetGroup !== 'space' &&
+      `/proposals/list-group-proposal-category-permissions-${currentSpaceId}`,
+    () =>
+      charmClient.permissions.proposals.listGroupProposalCategoryPermissions({
+        group: 'space',
+        id: currentSpaceId as string
+      })
+  );
+  const { data: spacePostCategoryPermissions } = useSWR(
+    currentSpaceId && targetGroup !== 'space' && `/posts/list-group-post-category-permissions-${currentSpaceId}`,
+    () =>
+      charmClient.permissions.forum.listGroupPostCategoryPermissions({ group: 'space', id: currentSpaceId as string })
+  );
+
   const { data: memberPermissionFlags } = useSWR(
-    targetGroup !== 'space' && space ? `member-permissions-${space.id}` : null,
+    targetGroup !== 'space' && currentSpaceId ? `member-permissions-${currentSpaceId}` : null,
     () =>
       charmClient.queryGroupSpacePermissions({
         group: 'space',
-        id: space?.id as string,
-        resourceId: space?.id as string
+        id: currentSpaceId as string,
+        resourceId: currentSpaceId as string
       })
   );
 
   usePreventReload(touched);
 
   useEffect(() => {
-    if (space) {
-      refreshGroupPermissions(space.id);
+    if (currentSpaceId) {
+      refreshGroupPermissions(currentSpaceId);
     }
-  }, [space]);
+  }, [currentSpaceId]);
 
   async function refreshGroupPermissions(resourceId: string) {
     const permissionFlags = await charmClient.queryGroupSpacePermissions({
@@ -97,7 +122,7 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
 
   async function submitted(formValues: FormValues) {
     // Make sure we have existing permission set to compare against
-    if (assignedPermissions && space) {
+    if (assignedPermissions && currentSpaceId) {
       const permissionsToAdd: SpaceOperation[] = [];
       const permissionsToRemove: SpaceOperation[] = [];
 
@@ -116,7 +141,7 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
 
       if (permissionsToAdd.length > 0) {
         newPermissionState = await charmClient.addSpacePermissions({
-          forSpaceId: space.id,
+          forSpaceId: currentSpaceId,
           operations: permissionsToAdd,
           spaceId: targetGroup === 'space' ? id : undefined,
           roleId: targetGroup === 'role' ? id : undefined
@@ -125,7 +150,7 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
 
       if (permissionsToRemove.length > 0) {
         newPermissionState = await charmClient.removeSpacePermissions({
-          forSpaceId: space.id,
+          forSpaceId: currentSpaceId,
           operations: permissionsToRemove,
           spaceId: targetGroup === 'space' ? id : undefined,
           roleId: targetGroup === 'role' ? id : undefined
@@ -137,19 +162,29 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
       setTouched(false);
       // update the cache of other rows
       if (targetGroup === 'space') {
-        mutate(`member-permissions-${space.id}`);
+        mutate(`member-permissions-${currentSpaceId}`);
       }
     }
   }
 
-  async function deletePermission(permissionId: string) {
+  async function deleteProposalCategoryPermission(permissionId: string) {
     await charmClient.permissions.proposals.deleteProposalCategoryPermission(permissionId);
-    mutateCategoryPermissions();
+    mutateProposalCategoryPermissions();
   }
 
-  async function updatePermission(input: ProposalCategoryPermissionInput) {
+  async function updateProposalCategoryPermission(input: ProposalCategoryPermissionInput) {
     await charmClient.permissions.proposals.upsertProposalCategoryPermission(input);
-    mutateCategoryPermissions();
+    mutateProposalCategoryPermissions();
+  }
+
+  async function deletePostCategoryPermission(permissionId: string) {
+    await charmClient.permissions.forum.deletePostCategoryPermission(permissionId);
+    mutatePostCategoryPermissions();
+  }
+
+  async function updatePostCategoryPermission(input: PostCategoryPermissionInput) {
+    await charmClient.permissions.forum.upsertPostCategoryPermission(input);
+    mutatePostCategoryPermissions();
   }
 
   return (
@@ -208,44 +243,77 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
             <Box display='flex' gap={3} mb={2}>
               <Divider orientation='vertical' flexItem />
               <Box flexGrow={1}>
-                {categories.map((category) => {
-                  const permission = categoryPermissions?.find((p) => p.proposalCategoryId === category.id);
+                {proposalCategories.map((category) => {
+                  const permission = proposalCategoryPermissions?.find((p) => p.proposalCategoryId === category.id);
+                  const memberRolePermission = spaceProposalCategoryPermissions?.find(
+                    (p) => p.proposalCategoryId === category.id
+                  );
                   return (
                     <ProposalCategoryRolePermissionRow
                       key={category.id}
                       canEdit={category.permissions.manage_permissions}
                       label={category.title}
-                      deletePermission={deletePermission}
-                      updatePermission={updatePermission}
+                      deletePermission={deleteProposalCategoryPermission}
+                      updatePermission={updateProposalCategoryPermission}
                       proposalCategoryId={category.id}
                       existingPermissionId={permission?.id}
                       defaultPermissionLevel={permission?.permissionLevel}
+                      inheritedPermissionLevel={memberRolePermission?.permissionLevel}
                       assignee={{ group: targetGroup, id }}
                     />
                   );
                 })}
               </Box>
             </Box>
+            <Divider sx={{ mt: 1, mb: 2 }} />
+            <Typography variant='body2' fontWeight='bold'>
+              Forums
+            </Typography>
             {targetGroup !== 'space' && (
-              <>
-                <Divider sx={{ mt: 1, mb: 2 }} />
-                <Typography variant='body2' fontWeight='bold'>
-                  Forums
-                </Typography>
-                <PermissionToggle
-                  data-test='space-operation-moderateForums'
-                  label='Moderate all forum categories'
-                  defaultChecked={assignedPermissions?.moderateForums}
-                  memberChecked={memberPermissionFlags?.moderateForums}
-                  disabled={!isAdmin}
-                  onChange={(ev) => {
-                    const { checked: nowHasAccess } = ev.target;
-                    setValue('moderateForums', nowHasAccess);
-                    setTouched(true);
-                  }}
-                />
-              </>
+              <PermissionToggle
+                data-test='space-operation-moderateForums'
+                label='Moderate and access all forum categories'
+                defaultChecked={assignedPermissions?.moderateForums}
+                memberChecked={memberPermissionFlags?.moderateForums}
+                disabled={!isAdmin}
+                onChange={(ev) => {
+                  const { checked: nowHasAccess } = ev.target;
+                  setValue('moderateForums', nowHasAccess);
+                  setTouched(true);
+                }}
+              />
             )}
+            <Typography sx={{ my: 1 }}>Access to categories</Typography>
+            <Box display='flex' gap={3} mb={2}>
+              <Divider orientation='vertical' flexItem />
+              <Box flexGrow={1}>
+                {forumCategories.map((category) => {
+                  const permission = postCategoryPermissions?.find((p) => p.postCategoryId === category.id);
+                  const memberRolePermission = spacePostCategoryPermissions?.find(
+                    (p) => p.postCategoryId === category.id
+                  );
+                  const canModerateForums =
+                    memberPermissionFlags?.moderateForums || assignedPermissions?.moderateForums;
+                  const permissionLevel = canModerateForums ? 'full_access' : permission?.permissionLevel;
+
+                  return (
+                    <PostCategoryRolePermissionRow
+                      key={category.id}
+                      canEdit={!canModerateForums && category.permissions.manage_permissions}
+                      label={category.name}
+                      deletePermission={deletePostCategoryPermission}
+                      updatePermission={updatePostCategoryPermission}
+                      postCategoryId={category.id}
+                      existingPermissionId={permission?.id}
+                      defaultPermissionLevel={permissionLevel}
+                      inheritedPermissionLevel={memberRolePermission?.permissionLevel}
+                      disabledTooltip={canModerateForums ? 'This role has full access to all categories' : undefined}
+                      assignee={{ group: targetGroup, id }}
+                    />
+                  );
+                })}
+              </Box>
+            </Box>
 
             {isAdmin && (
               <Box mt={2}>
