@@ -5,7 +5,7 @@ import HowToVoteIcon from '@mui/icons-material/HowToVote';
 import KeyIcon from '@mui/icons-material/Key';
 import BountyIcon from '@mui/icons-material/RequestPageOutlined';
 import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
-import { Badge, Box, IconButton, Typography } from '@mui/material';
+import { Badge, Box, IconButton, Stack, Typography } from '@mui/material';
 import { useMemo } from 'react';
 
 import Avatar from 'components/common/Avatar';
@@ -14,6 +14,8 @@ import type {
   MarkNotificationAsRead,
   NotificationDetails
 } from 'components/common/PageLayout/components/Header/components/NotificationPreview/useNotificationPreview';
+import { useDateFormatter } from 'hooks/useDateFormatter';
+import { useSmallScreen } from 'hooks/useMediaScreens';
 import type { NotificationGroupType } from 'lib/notifications/interfaces';
 
 type Props = {
@@ -24,8 +26,15 @@ type Props = {
   unmarked?: boolean;
 };
 export function NotificationPreview({ notification, markAsRead, onClose, large, unmarked }: Props) {
-  const { groupType, type, spaceName, createdBy, taskId, href, content, title } = notification;
+  const { groupType, type, spaceName, createdBy, taskId, href, content, title, createdAt } = notification;
 
+  const { formatDate, formatTime } = useDateFormatter();
+  const date = new Date(createdAt);
+  const todaysDate = new Date();
+  const isDateEqual = date.setHours(0, 0, 0, 0) === todaysDate.setHours(0, 0, 0, 0);
+  const notificationDate = isDateEqual ? `Today at ${formatTime(createdAt)}` : formatDate(createdAt);
+
+  const isSmallScreen = useSmallScreen();
   const icon = useMemo(() => getIcon(groupType), [groupType]);
 
   return (
@@ -70,25 +79,35 @@ export function NotificationPreview({ notification, markAsRead, onClose, large, 
               )}
             </Badge>
           </Box>
-
           <Box overflow='hidden' display='flex' flexDirection='column' flex={1}>
-            <Box display='flex' pl={0.2}>
-              <Box minWidth={0}>
-                <Typography
-                  whiteSpace='nowrap'
-                  overflow='hidden'
-                  textOverflow='ellipsis'
-                  variant='subtitle2'
-                  fontSize={large ? '1rem' : '0.8rem'}
-                >{`${spaceName}`}</Typography>
+            <Stack direction='row' justifyContent='space-between' width='100%'>
+              <Box display='flex' pl={0.2}>
+                <Box minWidth={0}>
+                  <Typography
+                    whiteSpace='nowrap'
+                    overflow='hidden'
+                    textOverflow='ellipsis'
+                    variant='subtitle2'
+                    fontSize={large ? '1rem' : '0.8rem'}
+                  >{`${spaceName}`}</Typography>
+                </Box>
+                &nbsp;
+                <Box whiteSpace='nowrap'>
+                  <Typography variant='subtitle2' fontSize={large ? '1rem' : '0.8rem'} fontWeight='bold'>
+                    {title}
+                  </Typography>
+                </Box>
               </Box>
-              &nbsp;
-              <Box whiteSpace='nowrap'>
-                <Typography variant='subtitle2' fontSize={large ? '1rem' : '0.8rem'} fontWeight='bold'>
-                  {title}
-                </Typography>
-              </Box>
-            </Box>
+              <Typography
+                whiteSpace='nowrap'
+                overflow='hidden'
+                textOverflow='ellipsis'
+                variant='subtitle2'
+                fontSize={large ? '1rem' : '0.8rem'}
+              >
+                {!isSmallScreen && notificationDate}
+              </Typography>
+            </Stack>
 
             <Typography
               variant='subtitle1'
