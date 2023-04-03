@@ -81,7 +81,7 @@ export function NotificationPreview({ notification, markAsRead, onClose, large, 
           </Box>
           <Box overflow='hidden' display='flex' flexDirection='column' flex={1}>
             <Stack direction='row' justifyContent='space-between' width='100%'>
-              <Box display='flex' pl={0.2}>
+              <Box display='flex' pl={0.2} minWidth={0}>
                 <Box minWidth={0}>
                   <Typography
                     whiteSpace='nowrap'
