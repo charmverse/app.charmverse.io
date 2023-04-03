@@ -38,7 +38,6 @@ async function createPageHandler(req: NextApiRequest, res: NextApiResponse<IPage
   const { id: userId } = req.session.user;
 
   const permissions = await computeSpacePermissions({
-    allowAdminBypass: true,
     resourceId: spaceId,
     userId
   });

@@ -3,6 +3,7 @@ import { SpaceOperation } from '@prisma/client';
 
 import { prisma } from 'db';
 import { assignRole } from 'lib/roles';
+import { typedKeys } from 'lib/utilities/objects';
 import {
   generateRole,
   generateSpaceUser,
@@ -71,7 +72,6 @@ describe('computeSpacePermissions', () => {
     });
     // User should inherit space-wide permissions
     const userPermissions = await computeSpacePermissions({
-      allowAdminBypass: false,
       resourceId: otherSpace.id,
       userId: otherUser.id
     });
@@ -88,7 +88,6 @@ describe('computeSpacePermissions', () => {
 
     // User permissions should be defaulted to what is available to the role
     const userWithRolePermissions = await computeSpacePermissions({
-      allowAdminBypass: false,
       resourceId: otherSpace.id,
       userId: otherSpaceUserWithRole.id
     });
@@ -127,7 +126,6 @@ describe('computeSpacePermissions', () => {
     });
 
     const computedPermissions = await computeSpacePermissions({
-      allowAdminBypass: false,
       resourceId: space.id,
       userId: extraUser.id
     });
@@ -146,7 +144,6 @@ describe('computeSpacePermissions', () => {
     });
 
     const computedPermissions = await computeSpacePermissions({
-      allowAdminBypass: false,
       resourceId: otherSpace.id,
       userId: otherUser.id
     });
@@ -165,7 +162,6 @@ describe('computeSpacePermissions', () => {
     });
 
     const computedPermissions = await computeSpacePermissions({
-      allowAdminBypass: false,
       resourceId: otherSpace.id,
       userId: otherUser.id
     });
@@ -174,11 +170,10 @@ describe('computeSpacePermissions', () => {
     expect(computedPermissions.createBounty).toBe(true);
   });
 
-  it('should return true to all operations if user is a space admin and admin bypass was enabled', async () => {
+  it('should return true to all operations if user is a space admin', async () => {
     const { space: otherSpace, user: otherUser } = await generateUserAndSpaceWithApiToken(undefined, true);
 
     const computedPermissions = await computeSpacePermissions({
-      allowAdminBypass: true,
       resourceId: otherSpace.id,
       userId: otherUser.id
     });
@@ -187,30 +182,31 @@ describe('computeSpacePermissions', () => {
     expect(computedPermissions.createBounty).toBe(true);
   });
 
-  it('should return true only for operations the user has access to if they are a space admin and admin bypass was disabled', async () => {
-    const { space: otherSpace, user: otherUser } = await generateUserAndSpaceWithApiToken(undefined, true);
+  it('should return empty permissions for guest users', async () => {
+    const { space: testSpace, user } = await generateUserAndSpace({
+      isGuest: true
+    });
 
     await addSpaceOperations({
-      forSpaceId: otherSpace.id,
-      operations: ['createBounty'],
-      userId: otherUser.id
+      forSpaceId: testSpace.id,
+      spaceId: testSpace.id,
+      operations: ['createBounty', 'createForumCategory', 'createPage']
     });
 
     const computedPermissions = await computeSpacePermissions({
-      allowAdminBypass: false,
-      resourceId: otherSpace.id,
-      userId: otherUser.id
+      resourceId: testSpace.id,
+      userId: user.id
     });
 
-    expect(computedPermissions.createPage).toBe(false);
-    expect(computedPermissions.createBounty).toBe(true);
+    typedKeys(SpaceOperation).forEach((key) => {
+      expect(computedPermissions[key]).toBe(false);
+    });
   });
 
   it('should contain all Space Operations as keys, with no additional or missing properties', async () => {
     const { space: otherSpace, user: otherUser } = await generateUserAndSpaceWithApiToken(undefined, false);
 
     const computedPermissions = await computeSpacePermissions({
-      allowAdminBypass: false,
       resourceId: otherSpace.id,
       userId: otherUser.id
     });
@@ -230,7 +226,6 @@ describe('computeSpacePermissions', () => {
     const { user: otherUser } = await generateUserAndSpaceWithApiToken(undefined, true);
 
     const computedPermissions = await computeSpacePermissions({
-      allowAdminBypass: true,
       resourceId: space.id,
       userId: otherUser.id
     });

@@ -2,16 +2,15 @@ import { prisma } from 'db';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 
 import { filterApplicablePermissions } from '../filterApplicablePermissions';
-import type { PermissionComputeRequest } from '../interfaces';
+import type { PermissionCompute, PermissionComputeRequest } from '../interfaces';
 
 import { AvailableSpacePermissions } from './availableSpacePermissions';
 import type { SpacePermissionFlags } from './interfaces';
 
 export async function computeSpacePermissions({
-  allowAdminBypass,
   resourceId,
   userId
-}: PermissionComputeRequest): Promise<SpacePermissionFlags> {
+}: PermissionCompute): Promise<SpacePermissionFlags> {
   const allowedOperations = new AvailableSpacePermissions();
 
   if (!userId) {
@@ -21,7 +20,8 @@ export async function computeSpacePermissions({
   const { error, isAdmin } = await hasAccessToSpace({
     userId,
     spaceId: resourceId,
-    adminOnly: false
+    adminOnly: false,
+    disallowGuest: true
   });
 
   if (error) {
@@ -29,7 +29,7 @@ export async function computeSpacePermissions({
     return allowedOperations.empty;
   }
 
-  if (isAdmin && allowAdminBypass) {
+  if (isAdmin) {
     return allowedOperations.full;
   }
 

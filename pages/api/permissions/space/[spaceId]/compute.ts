@@ -16,7 +16,6 @@ async function computeSpacePermissionsController(req: NextApiRequest, res: NextA
   const { id: userId } = req.session.user;
 
   const computedPermissions = await computeSpacePermissions({
-    allowAdminBypass: true,
     resourceId: spaceId,
     userId
   });
