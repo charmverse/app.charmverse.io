@@ -1,4 +1,4 @@
-import type { Prisma } from '@prisma/client';
+import type { PagePermission, Prisma } from '@prisma/client';
 
 import { prisma } from 'db';
 import { PageNotFoundError } from 'lib/pages/server';
@@ -179,7 +179,9 @@ async function baseComputeUserPagePermissions({
   const computedPermissions = new AllowedPagePermissions();
 
   applicablePermissions.forEach((permission) => {
-    computedPermissions.addPermissions(permissionTemplates[permission.permissionLevel]);
+    computedPermissions.addPermissions(
+      permission.permissionLevel === 'custom' ? permission.permissions : permissionTemplates[permission.permissionLevel]
+    );
   });
   return computedPermissions.operationFlags;
 }

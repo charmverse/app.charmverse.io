@@ -3,7 +3,6 @@ import { PageOperations } from '@prisma/client';
 import { typedKeys } from 'lib/utilities/objects';
 
 import { BasePermissions } from '../basePermissions.class';
-import { Permissions } from '../permissions.class';
 
 import type { IPagePermissionFlags, PageOperationType } from './page-permission-interfaces';
 

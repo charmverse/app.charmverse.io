@@ -9,8 +9,8 @@ export type AbstractPermission<P extends string = string> = {
   permissionLevel: P;
 };
 
-type PermissionFilterInput<P extends string = string> = {
-  permissions: AbstractPermission<P>[];
+type PermissionFilterInput<T extends AbstractPermission> = {
+  permissions: T[];
   userId?: string;
   resourceSpaceId: string;
 };
@@ -22,11 +22,11 @@ type PermissionFilterInput<P extends string = string> = {
  *
  * @P - The permission level enum type which groups underlying operations ie. "full_access"
  */
-export async function filterApplicablePermissions<P extends string = string>({
+export async function filterApplicablePermissions<T extends AbstractPermission>({
   permissions,
   userId,
   resourceSpaceId
-}: PermissionFilterInput<P>): Promise<AbstractPermission<P>[]> {
+}: PermissionFilterInput<T>): Promise<T[]> {
   // Iterate once through permissions to group them and avoid duplicate array traversal
   const permissionMap = permissions.reduce(
     (acc, val) => {
@@ -41,10 +41,7 @@ export async function filterApplicablePermissions<P extends string = string>({
       }
       return acc;
     },
-    { role: [], user: [], space: [], public: [] } as Record<
-      'role' | 'user' | 'public' | 'space',
-      AbstractPermission<P>[]
-    >
+    { role: [], user: [], space: [], public: [] } as Record<'role' | 'user' | 'public' | 'space', T[]>
   );
 
   const { spaceRole } = await hasAccessToSpace({
