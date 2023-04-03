@@ -236,6 +236,50 @@ describe('computePostPermissions - base', () => {
     });
   });
 
+  it('should only apply public permissions to space members with a guest level membership', async () => {
+    const postCategory = await generatePostCategory({ spaceId: space.id });
+
+    const post = await generateForumPost({
+      spaceId: space.id,
+      categoryId: postCategory.id,
+      userId: authorUser.id
+    });
+
+    const guestUser = await generateSpaceUser({
+      spaceId: space.id,
+      isGuest: true
+    });
+
+    // This should never usually happen, but if it somehow does, we want the compute operation to act as a failsafe
+    await Promise.all([
+      upsertPostCategoryPermission({
+        assignee: { group: 'space', id: space.id },
+        permissionLevel: 'full_access',
+        postCategoryId: postCategory.id
+      }),
+      upsertPostCategoryPermission({
+        assignee: { group: 'public' },
+        permissionLevel: 'view',
+        postCategoryId: postCategory.id
+      })
+    ]);
+
+    const permissions = await baseComputePostPermissions({
+      resourceId: post.id,
+      userId: guestUser.id
+    });
+
+    const guestOperations = postPermissionsMapping.view;
+
+    postOperations.forEach((op) => {
+      if (guestOperations.includes(op)) {
+        expect(permissions[op]).toBe(true);
+      } else {
+        expect(permissions[op]).toBe(false);
+      }
+    });
+  });
+
   it('should ignore permissions in the database for users who are not members of the space as well as members of the public, and return only post permissions assigned to the public level', async () => {
     const postCategory = await generatePostCategory({ spaceId: space.id });
 

@@ -38,7 +38,7 @@ export async function baseComputePostPermissions({
     throw new PostNotFoundError(`${resourceId}`);
   }
 
-  const { isAdmin } = await hasAccessToSpace({
+  const { isAdmin, spaceRole } = await hasAccessToSpace({
     spaceId: post.spaceId,
     userId
   });
@@ -73,7 +73,8 @@ export async function baseComputePostPermissions({
   const applicablePermissions = await filterApplicablePermissions({
     permissions: postCategoryPermissions,
     resourceSpaceId: post.spaceId,
-    userId
+    // Treat user as a guest if they are not a full member of the space
+    userId: !spaceRole || spaceRole?.isGuest ? undefined : userId
   });
   applicablePermissions.forEach((permission) => {
     permissions.addPermissions(postPermissionsMapping[permission.permissionLevel]);
