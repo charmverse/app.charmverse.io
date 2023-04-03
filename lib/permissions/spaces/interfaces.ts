@@ -1,11 +1,8 @@
 import type { SpaceOperation, SpacePermission } from '@prisma/client';
-import { Role, Space, User } from '@prisma/client';
-
-import { RequiredNotNull } from 'lib/utilities/types';
 
 import type {
-  PermissionAssignee,
   AssignablePermissionGroups,
+  PermissionAssignee,
   PermissionAssigneeId,
   UserPermissionFlags
 } from '../interfaces';
