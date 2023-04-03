@@ -57,7 +57,7 @@ export function ProposalPagePermissions({ proposalId }: Props) {
           </div>
         </Box>
         <Box display='flex' justifyContent='space-between' alignItems='center'>
-          <Typography variant='body2'>Everyone at {space?.name}</Typography>
+          <Typography variant='body2'>Default permissions</Typography>
           <div style={{ width: '160px', textAlign: 'right' }}>
             <Typography color='secondary' variant='caption'>
               {spaceLevelPermission ? userFriendlyPermissionLabels[spaceLevelPermission.permissionLevel] : 'No access'}
