@@ -5,7 +5,7 @@ import HowToVoteIcon from '@mui/icons-material/HowToVote';
 import KeyIcon from '@mui/icons-material/Key';
 import BountyIcon from '@mui/icons-material/RequestPageOutlined';
 import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
-import { Box, IconButton, Typography } from '@mui/material';
+import { Badge, Box, IconButton, Typography } from '@mui/material';
 import { useMemo } from 'react';
 
 import Avatar from 'components/common/Avatar';
@@ -21,8 +21,9 @@ type Props = {
   markAsRead: MarkNotificationAsRead;
   onClose: VoidFunction;
   large?: boolean;
+  unmarked?: boolean;
 };
-export function NotificationPreview({ notification, markAsRead, onClose, large }: Props) {
+export function NotificationPreview({ notification, markAsRead, onClose, large, unmarked }: Props) {
   const { groupType, type, spaceName, createdBy, taskId, href, content, title } = notification;
 
   const icon = useMemo(() => getIcon(groupType), [groupType]);
@@ -53,11 +54,21 @@ export function NotificationPreview({ notification, markAsRead, onClose, large }
       >
         <Box display='flex' justifyContent='space-between' width='100%'>
           <Box display='flex' alignItems='flex-start' mr={1.25} pt={0.5}>
-            {createdBy ? (
-              <Avatar size={large ? 'medium' : 'small'} name={createdBy?.username} avatar={createdBy?.avatar} />
-            ) : (
-              icon
-            )}
+            <Badge
+              anchorOrigin={{
+                vertical: 'top',
+                horizontal: 'left'
+              }}
+              invisible={!unmarked}
+              color='error'
+              variant='dot'
+            >
+              {createdBy ? (
+                <Avatar size={large ? 'medium' : 'small'} name={createdBy?.username} avatar={createdBy?.avatar} />
+              ) : (
+                icon
+              )}
+            </Badge>
           </Box>
 
           <Box overflow='hidden' display='flex' flexDirection='column' flex={1}>

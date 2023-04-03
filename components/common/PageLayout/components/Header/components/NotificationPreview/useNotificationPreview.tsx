@@ -52,6 +52,17 @@ export function useNotificationPreview() {
     ].sort((a, b) => (a.createdAt > b.createdAt ? -1 : 1));
   }, [tasks]);
 
+  const markedNotificationPreviews: NotificationDetails[] = useMemo(() => {
+    if (!tasks) return [];
+    return [
+      ...getNotificationPreviewItems(tasks.votes.marked, 'votes', currentUserId),
+      ...getNotificationPreviewItems(tasks.proposals.marked, 'proposals', currentUserId),
+      ...getNotificationPreviewItems(tasks.bounties.marked, 'bounties', currentUserId),
+      ...getNotificationPreviewItems(tasks.discussions.marked, 'discussions', currentUserId),
+      ...getNotificationPreviewItems(tasks.forum.marked, 'forum', currentUserId)
+    ].sort((a, b) => (a.createdAt > b.createdAt ? -1 : 1));
+  }, [tasks]);
+
   const markAsRead: MarkNotificationAsRead = useCallback(
     async ({
       taskId,
@@ -95,7 +106,7 @@ export function useNotificationPreview() {
     []
   );
 
-  return { notificationPreviews, markAsRead };
+  return { notificationPreviews, markedNotificationPreviews, markAsRead };
 }
 
 function getNotificationPreviewItems(

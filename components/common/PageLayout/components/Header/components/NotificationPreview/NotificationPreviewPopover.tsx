@@ -67,7 +67,7 @@ export function NotificationPreviewPopover({
       <NotificationModal
         isOpen={openNotificationsModal}
         onClose={() => setOpenNotificationsModal(false)}
-        notifications={notificationPreviews}
+        unmarkedNotifications={notificationPreviews}
       />
     </Box>
   );

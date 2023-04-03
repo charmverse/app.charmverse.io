@@ -19,42 +19,79 @@ import { TASK_TABS, useNotificationPreview } from './useNotificationPreview';
 export function NotificationModal({
   isOpen,
   onClose,
-  notifications
+  unmarkedNotifications
 }: {
   isOpen: boolean;
   onClose?: () => void;
-  notifications: NotificationDetails[];
+  unmarkedNotifications: NotificationDetails[];
 }) {
-  const { markAsRead } = useNotificationPreview();
+  const { markAsRead, markedNotificationPreviews } = useNotificationPreview();
   const isMobile = useSmallScreen();
-
   type TaskType = (typeof TASK_TABS)[number]['type'];
 
   const [currentTaskType, setCurrentTaskType] = useState<TaskType>('all');
 
-  function seletedNotifications() {
+  const notificationCount: Record<(typeof TASK_TABS)[number]['type'], boolean> = {
+    vote: !!unmarkedNotifications.find((n) => n.type === 'vote'),
+    discussion: !!unmarkedNotifications.find((n) => n.type === 'mention'),
+    proposal: !!unmarkedNotifications.find((n) => n.type === 'proposal'),
+    bounty: !!unmarkedNotifications.find((n) => n.type === 'bounty'),
+    forum: !!unmarkedNotifications.find((n) => n.type === 'forum'),
+    all: false,
+    multisig: false
+  };
+
+  function seletedUnmarkedNotifications() {
     if (currentTaskType === 'all') {
-      return notifications;
+      return unmarkedNotifications;
     }
 
     if (currentTaskType === 'forum') {
-      return notifications.filter((n) => n.type === 'forum');
+      return unmarkedNotifications?.filter((n) => n.type === 'forum');
     }
 
     if (currentTaskType === 'bounty') {
-      return notifications.filter((n) => n.type === 'bounty');
+      return unmarkedNotifications?.filter((n) => n.type === 'bounty');
     }
 
     if (currentTaskType === 'discussion') {
-      return notifications.filter((n) => n.type === 'mention');
+      return unmarkedNotifications?.filter((n) => n.type === 'mention');
     }
 
     if (currentTaskType === 'proposal') {
-      return notifications.filter((n) => n.type === 'proposal');
+      return unmarkedNotifications?.filter((n) => n.type === 'proposal');
     }
 
     if (currentTaskType === 'vote') {
-      return notifications.filter((n) => n.type === 'vote');
+      return unmarkedNotifications?.filter((n) => n.type === 'vote');
+    }
+
+    return [];
+  }
+
+  function seletedMarkedNotifications() {
+    if (currentTaskType === 'all') {
+      return markedNotificationPreviews;
+    }
+
+    if (currentTaskType === 'forum') {
+      return markedNotificationPreviews?.filter((n) => n.type === 'forum');
+    }
+
+    if (currentTaskType === 'bounty') {
+      return markedNotificationPreviews.filter((n) => n.type === 'bounty');
+    }
+
+    if (currentTaskType === 'discussion') {
+      return markedNotificationPreviews.filter((n) => n.type === 'mention');
+    }
+
+    if (currentTaskType === 'proposal') {
+      return markedNotificationPreviews.filter((n) => n.type === 'proposal');
+    }
+
+    if (currentTaskType === 'vote') {
+      return markedNotificationPreviews.filter((n) => n.type === 'vote');
     }
 
     return [];
@@ -84,7 +121,27 @@ export function NotificationModal({
           {TASK_TABS.map((tab) => (
             <SidebarLink
               key={tab.label}
-              label={tab.label}
+              label={
+                <Badge
+                  sx={{
+                    '& .MuiBadge-badge': {
+                      right: {
+                        md: -3,
+                        xs: 15
+                      },
+                      top: {
+                        md: 0,
+                        xs: -20
+                      }
+                    }
+                  }}
+                  invisible={!notificationCount[tab.type]}
+                  color='error'
+                  variant='dot'
+                >
+                  {tab.label}
+                </Badge>
+              }
               icon={tab.icon}
               onClick={() => setCurrentTaskType(tab.type)}
               active={tab.type === currentTaskType}
@@ -146,7 +203,7 @@ export function NotificationModal({
                               }
                             }
                           }}
-                          invisible
+                          invisible={!notificationCount[task.type]}
                           color='error'
                           variant='dot'
                         >
@@ -161,20 +218,31 @@ export function NotificationModal({
                   ))}
                 </Tabs>
               )}
+              {seletedUnmarkedNotifications().map((notification) => (
+                <Fragment key={notification.taskId}>
+                  <NotificationPreview
+                    large
+                    unmarked
+                    notification={notification}
+                    markAsRead={markAsRead}
+                    onClose={() => onClose}
+                  />
+                  <Divider />
+                </Fragment>
+              ))}
+              {seletedMarkedNotifications().map((notification) => (
+                <Fragment key={notification.taskId}>
+                  <NotificationPreview
+                    large
+                    notification={notification}
+                    markAsRead={markAsRead}
+                    onClose={() => onClose}
+                  />
+                  <Divider />
+                </Fragment>
+              ))}
 
-              {seletedNotifications().length > 0 ? (
-                seletedNotifications().map((notification) => (
-                  <Fragment key={notification.taskId}>
-                    <NotificationPreview
-                      large
-                      notification={notification}
-                      markAsRead={markAsRead}
-                      onClose={() => onClose}
-                    />
-                    <Divider />
-                  </Fragment>
-                ))
-              ) : (
+              {seletedUnmarkedNotifications()?.length < 1 && seletedMarkedNotifications()?.length < 1 && (
                 <Box display='flex' justifyContent='center' alignItems='center' flexDirection='column' height='100%'>
                   <Typography variant='h5' color='secondary'>
                     You are up date!
