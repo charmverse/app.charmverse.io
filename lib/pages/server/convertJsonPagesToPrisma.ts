@@ -65,8 +65,11 @@ async function convertFolderContent({
   const {
     spaceId: droppedSpaceId,
     parentId,
+    createdAt,
     createdBy,
     cardId,
+    updatedAt,
+    updatedBy,
     boardId: boardIdToDrop,
     ...prismaCreateInput
   } = pageContent;
