@@ -35,43 +35,7 @@ export async function computeSpacePermissions({
   // Rollup space permissions
   const spacePermissions = await prisma.spacePermission.findMany({
     where: {
-      AND: [
-        {
-          forSpaceId: resourceId
-        },
-        {
-          OR: [
-            {
-              space: {
-                // Extra protection to only consider space roles from the space this permission gives access to
-                id: resourceId,
-                spaceRoles: {
-                  some: {
-                    userId
-                  }
-                }
-              }
-            },
-            // Roles in the space this user has been assigned to
-            {
-              role: {
-                // Extra protection to only query roles belonging to the space
-                spaceId: resourceId,
-                spaceRolesToRole: {
-                  some: {
-                    spaceRole: {
-                      userId
-                    }
-                  }
-                }
-              }
-            },
-            {
-              userId
-            }
-          ]
-        }
-      ]
+      forSpaceId: resourceId
     }
   });
 
