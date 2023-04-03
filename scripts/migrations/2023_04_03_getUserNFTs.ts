@@ -8,25 +8,24 @@ async function init () {
       type: 'nft'
     }
   })
-  console.log(user.length)
-  // const user2 = await prisma.user.findFirstOrThrow({
-  //   where: {
-  //     id: '04b4ccd8-a7f8-46d2-bbc0-6b5129b0aae2'
-  //   }
-  // })
-  // const nfts = await getUserNFTs(user2.id);
-  // console.log(nfts.map(nft => nft.id))
-  // console.log(nfts.length)
-  // console.log((uniq(nfts.map(nft => nft.id))).length)
-  // console.log('user', user.id)
-  // // const existing = await prisma.profileItem.findMany({
-  // //   where: {
-  // //     id: {
-  // //       in: nfts.map(nft => nft.id)
-  // //     }
-  // //   }
-  // // })
-  // // console.log(existing)
+  console.log('updating profile items:', user.length)
+
+  for (let item of user) {
+    if (!item.id.includes(item.userId)) {
+      await prisma.profileItem.update({
+        where: {
+          id: item.id
+        },
+        data: {
+          id: `${item.userId}:${item.id}`
+        }
+      });
+    }
+    if (user.indexOf(item) % 100 === 0) {
+      console.log(user.indexOf(item))
+    }
+  }
+  console.log('done')
 }
 
 init();
