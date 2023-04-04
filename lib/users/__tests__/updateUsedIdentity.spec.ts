@@ -167,7 +167,7 @@ describe('updateUsedIdentity', () => {
 
     const user = await prisma.user.create({
       data: {
-        path: uid(),
+        path: v4(),
         username: 'random-name',
         identityType: 'RandomName',
         wallets: {

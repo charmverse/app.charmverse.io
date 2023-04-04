@@ -54,8 +54,7 @@ describe('POST /api/permissions - Add page permissions', () => {
 
     await prisma.pagePermission.create({
       data: {
-        permissionLevel: 'custom',
-        permissions: ['edit_isPublic'],
+        permissionLevel: 'full_access',
         user: {
           connect: {
             id: user.id
@@ -258,8 +257,7 @@ describe('DELETE /api/permissions - Delete page permissions', () => {
 
     await prisma.pagePermission.create({
       data: {
-        permissionLevel: 'custom',
-        permissions: ['edit_isPublic'],
+        permissionLevel: 'full_access',
         user: {
           connect: {
             id: user.id

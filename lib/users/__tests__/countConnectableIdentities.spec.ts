@@ -3,6 +3,7 @@ import { v4 } from 'uuid';
 import { prisma } from 'db';
 import { sessionUserRelations } from 'lib/session/config';
 import { uid } from 'lib/utilities/strings';
+import { randomETHWalletAddress } from 'testing/generateStubs';
 
 import { countConnectableIdentities } from '../countConnectableIdentities';
 
@@ -26,7 +27,7 @@ describe('countConnectableIdentities', () => {
         username: 'userWithOneIdentity',
         wallets: {
           create: {
-            address: '0x1'
+            address: randomETHWalletAddress()
           }
         }
       },

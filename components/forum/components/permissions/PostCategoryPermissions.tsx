@@ -120,11 +120,8 @@ function PostCategoryPermissions({ postCategory, permissions }: Props) {
     );
   }
 
-  const allSpaceMembersHaveAccess = mappedPermissions.space?.permissionLevel === 'full_access';
-  const canAddRoles =
-    !allSpaceMembersHaveAccess &&
-    permissions.manage_permissions &&
-    (roles?.length ?? 0) > mappedPermissions.roles.length;
+  const assignableRolesExist = (roles?.length ?? 0) > mappedPermissions.roles.length;
+  const canAddRoles = permissions.manage_permissions && assignableRolesExist;
 
   const publicPermission = mappedPermissions.public;
 
@@ -203,10 +200,10 @@ function PostCategoryPermissions({ postCategory, permissions }: Props) {
           {!addRolesDialog.isOpen ? (
             <Tooltip
               title={
-                allSpaceMembersHaveAccess
-                  ? 'All space members already have full access to this post category.'
+                !assignableRolesExist
+                  ? 'All available roles already have permissions in this post category.'
                   : !canAddRoles
-                  ? 'There are no roles available to add to this post category.'
+                  ? 'You cannot manage permissions for this category'
                   : ''
               }
             >
