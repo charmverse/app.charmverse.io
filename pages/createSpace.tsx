@@ -53,7 +53,7 @@ export default function CreateSpace() {
                   mb: 6
                 }}
               >
-                Create your space to get started
+                Get started by creating a space
               </Typography>
               <Card sx={{ p: 4, pt: 2 }}>
                 <CreateSpaceForm submitText='Get Started' />
