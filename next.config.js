@@ -81,6 +81,12 @@ const config = {
         source: '/createWorkspace',
         destination: '/createSpace',
         permanent: true
+      },
+      // added 4/2023 to redirect /signup to /createSpace
+      {
+        source: '/signup',
+        destination: '/createSpace',
+        permanent: true
       }
     ];
   },

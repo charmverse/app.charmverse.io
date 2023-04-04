@@ -33,7 +33,6 @@ export default function LoginPage() {
   const returnUrl = router.query.returnUrl as string | undefined;
 
   function redirectToDefaultPage() {
-    return;
     // Send the user in priority to the invites page if they logged in looking to join a space
     if (returnUrl?.match('join') || returnUrl?.match('invite')) {
       log.info('Redirect user to given url');
@@ -85,9 +84,9 @@ export default function LoginPage() {
     }
   }, [isDataLoaded, isLoggedIn, user]);
 
-  // if (!showLogin) {
-  //   return <Loader isLoading />;
-  // }
+  if (!showLogin) {
+    return <Loader isLoading />;
+  }
 
   return isLogInWithDiscord
     ? null
