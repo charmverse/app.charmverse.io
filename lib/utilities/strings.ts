@@ -1,5 +1,7 @@
 import type { UserWallet } from '@prisma/client';
 import { utils } from 'ethers';
+import { customAlphabet } from 'nanoid';
+import * as dictionaries from 'nanoid-dictionary';
 import { validate } from 'uuid';
 
 export function fancyTrim(_text: string = '', maxLength: number = 40) {
@@ -114,7 +116,7 @@ export function isUUID(uuid: string) {
 
 // use this to generate smaller unique ids than uuid for storage
 export function uid() {
-  return Math.round(Date.now() + Math.random() * 1000).toString(36);
+  return customAlphabet(dictionaries.lowercase + dictionaries.numbers, 8);
 }
 /**
  * Converts a list of string to human friendly gramatically correct comma list, with an and / or at the end
