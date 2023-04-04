@@ -75,6 +75,12 @@ const config = {
         source: '/share/:path*',
         destination: '/:path*',
         permanent: true
+      },
+      // added 4/2023 to redirect old /createWorkspace to /createSpace
+      {
+        source: '/createWorkspace',
+        destination: '/createSpace',
+        permanent: true
       }
     ];
   },

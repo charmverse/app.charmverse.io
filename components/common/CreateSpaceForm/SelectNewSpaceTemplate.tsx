@@ -22,15 +22,11 @@ const fontSize = 24;
 
 const ScrollContainer = styled.div`
   overflow: auto;
-  max-height: calc(100vh - 250px);
+  max-height: 40vh;
 
-  ${({ theme }) => theme.breakpoints.up('md')} {
-    overflow: auto;
-    max-height: 40vh;
-    // account for padding from the modal container
-    padding: 0 32px;
-    margin: 0 -32px;
-  }
+  // account for padding from the scrollbar
+  padding: 0 32px;
+  margin: 0 -32px;
 `;
 
 const templateIcon: Record<SpaceTemplateType, React.ReactNode> = {
@@ -43,7 +39,7 @@ const templateIcon: Record<SpaceTemplateType, React.ReactNode> = {
 
 export function SelectNewSpaceTemplate({ onSelect }: SelectNewSpaceTemplateProps) {
   return (
-    <ScrollContainer>
+    <ScrollContainer className='space-templates-container'>
       <Grid container spacing={2} flexDirection='column'>
         <Grid item>
           <TemplateOption

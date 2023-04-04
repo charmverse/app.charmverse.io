@@ -6,6 +6,7 @@ import getBaseLayout from 'components/common/BaseLayout/BaseLayout';
 import { CreateSpaceForm } from 'components/common/CreateSpaceForm/CreateSpaceForm';
 import Image from 'components/common/Image';
 import { Container } from 'components/login/components/LoginLayout';
+import Footer from 'components/login/Footer';
 import { useSpaces } from 'hooks/useSpaces';
 import splashImage from 'public/images/artwork/world.png';
 
@@ -26,36 +27,39 @@ export default function CreateSpace() {
   }
 
   return (
-    <Container px={3} data-test='login-page-content'>
-      <Grid container>
-        <Grid
-          item
-          xs={12}
-          md={6}
-          sx={{
-            display: 'flex',
-            justifyContent: 'center',
-            mb: 2
-          }}
-        >
-          <Card sx={{ p: 4 }} variant='outlined'>
-            <CreateSpaceForm submitText='Get Started' />
-          </Card>
+    <>
+      <Container px={3} data-test='login-page-content'>
+        <Grid container>
+          <Grid
+            item
+            xs={12}
+            md={6}
+            sx={{
+              display: 'flex',
+              justifyContent: 'center',
+              mb: 2
+            }}
+          >
+            <Card sx={{ p: 4 }} variant='outlined'>
+              <CreateSpaceForm submitText='Get Started' />
+            </Card>
+          </Grid>
+          <Grid
+            item
+            xs={12}
+            md={6}
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+          >
+            <Image px={3} maxWidth={{ xs: 300, md: 'none' }} src={splashImage} />
+          </Grid>
         </Grid>
-        <Grid
-          item
-          xs={12}
-          md={6}
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center'
-          }}
-        >
-          <Image px={3} maxWidth={{ xs: 300, md: 'none' }} src={splashImage} />
-        </Grid>
-      </Grid>
-    </Container>
+      </Container>
+      <Footer />
+    </>
   );
 }
 
