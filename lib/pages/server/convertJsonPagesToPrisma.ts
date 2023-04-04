@@ -88,6 +88,8 @@ async function convertFolderContent({
     }
   };
 
+  typedPrismaCreateInput.updatedBy = authorId;
+
   typedPrismaCreateInput.parentId = parentPageId;
 
   // Re-add this once we re-create a formal relationship for a page and its children
