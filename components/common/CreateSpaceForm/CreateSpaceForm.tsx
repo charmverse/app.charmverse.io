@@ -197,7 +197,19 @@ export function CreateSpaceForm({ className, defaultValues, onCancel, submitText
         </Box>
       </DialogTitle>
 
-      {step === 'select_template' && <SelectNewSpaceTemplate onSelect={handleNewSpaceTemplate} />}
+      {step === 'select_template' && (
+        <>
+          <SelectNewSpaceTemplate onSelect={handleNewSpaceTemplate} />
+
+          <Divider sx={{ my: 2 }} />
+          <Typography sx={{ mb: 2 }} textAlign='center' fontWeight='bold'>
+            Join an existing space
+          </Typography>
+          <Button size='large' disableElevation fullWidth onClick={() => setStep('join_space')}>
+            Search for space
+          </Button>
+        </>
+      )}
 
       {step === 'create_space' && (
         <form data-test='create-space-form' onSubmit={handleSubmit(onSubmit)}>
