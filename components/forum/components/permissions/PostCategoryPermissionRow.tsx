@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 import Box from '@mui/material/Box';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
@@ -42,8 +43,12 @@ export function PostCategoryRolePermissionRow({
   const space = useCurrentSpace();
 
   const isInherited = inheritedPermissionLevel && !defaultPermissionLevel;
+
+  const { full_access, view } = postCategoryPermissionLabels;
+
   const friendlyLabels = {
-    ...postCategoryPermissionLabels,
+    full_access,
+    view,
     delete: (inheritedPermissionLevel ? (
       <em>Default: {postCategoryPermissionLabels[inheritedPermissionLevel]}</em>
     ) : (
@@ -80,14 +85,14 @@ export function PostCategoryRolePermissionRow({
   return (
     <Box display='flex' justifyContent='space-between' alignItems='center'>
       <Typography variant='body2'>{label || assigneeName}</Typography>
-      <div style={{ width: '120px', textAlign: 'left' }}>
+      <div style={{ width: '150px', textAlign: 'left' }}>
         <Tooltip title={tooltip}>
           <span>
             <SmallSelect
               disabled={!canEdit}
               data-test={assignee.group === 'space' ? 'category-space-permission' : null}
               sx={{ opacity: isInherited ? 0.5 : 1 }}
-              renderValue={(value) => friendlyLabels[value]}
+              renderValue={(value) => friendlyLabels[value as keyof typeof friendlyLabels]}
               onChange={handleUpdate as (opt: string) => void}
               keyAndLabel={friendlyLabels}
               defaultValue={defaultPermissionLevel || ''}
