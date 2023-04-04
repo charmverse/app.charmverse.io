@@ -30,11 +30,11 @@ const ScrollContainer = styled.div`
 `;
 
 const templateIcon: Record<SpaceTemplateType, React.ReactNode> = {
-  templateCreator: <EmojiObjectsIcon htmlColor='var(--secondary-text)' sx={{ fontSize }} />,
-  templateNftCommunity: <SlBadge color='var(--secondary-text)' size={fontSize} />,
-  templateHackathon: <SlTrophy color='var(--secondary-text)' size={fontSize} />,
-  templateNounishDAO: <SvgIcon component={NounsIcon} inheritViewBox />, // <SiHackthebox color='var(--secondary-text)' size={fontSize} />,
-  templateImpactCommunity: <SiHackthebox color='var(--secondary-text)' size={fontSize} />
+  templateCreator: <EmojiObjectsIcon htmlColor='var(--primary-color)' sx={{ fontSize }} />,
+  templateNftCommunity: <SlBadge color='var(--primary-color)' size={fontSize} />,
+  templateHackathon: <SlTrophy color='var(--primary-color)' size={fontSize} />,
+  templateNounishDAO: <SvgIcon component={NounsIcon} sx={{ color: 'var(--primary-color)' }} inheritViewBox />,
+  templateImpactCommunity: <SiHackthebox color='var(--primary-color)' size={fontSize} />
 };
 
 export function SelectNewSpaceTemplate({ onSelect }: SelectNewSpaceTemplateProps) {
@@ -46,7 +46,7 @@ export function SelectNewSpaceTemplate({ onSelect }: SelectNewSpaceTemplateProps
             onClick={() => onSelect('default')}
             label='Create my own'
             data-test='space-template-default'
-            icon={<MdOutlineBuild color='var(--secondary-text)' size={fontSize} />}
+            icon={<MdOutlineBuild color='var(--primary-color)' size={fontSize} />}
           />
         </Grid>
         <Grid item>
@@ -76,7 +76,7 @@ export function SelectNewSpaceTemplate({ onSelect }: SelectNewSpaceTemplateProps
             data-test='space-template-importNotion'
             onClick={() => onSelect('importNotion')}
             label='Import from Notion'
-            icon={<SiNotion color='var(--secondary-text)' size={fontSize} />}
+            icon={<SiNotion color='var(--primary-color)' size={fontSize} />}
           />
         </Grid>
 
@@ -85,7 +85,7 @@ export function SelectNewSpaceTemplate({ onSelect }: SelectNewSpaceTemplateProps
             data-test='space-template-importMarkdown'
             onClick={() => onSelect('importMarkdown')}
             label='Import from Markdown'
-            icon={<DriveFolderUploadIcon color='secondary' sx={{ fontSize }} />}
+            icon={<DriveFolderUploadIcon color='primary' sx={{ fontSize }} />}
           />
         </Grid>
       </Grid>

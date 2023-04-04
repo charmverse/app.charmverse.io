@@ -205,7 +205,7 @@ export function CreateSpaceForm({ className, defaultValues, onCancel, submitText
           <Typography sx={{ mb: 2 }} textAlign='center' fontWeight='bold'>
             Join an existing space
           </Typography>
-          <Button size='large' disableElevation fullWidth onClick={() => setStep('join_space')}>
+          <Button color='secondary' size='large' disableElevation fullWidth onClick={() => setStep('join_space')}>
             Search for space
           </Button>
         </>
