@@ -17,6 +17,10 @@ export function NotificationPreviewPopover({
   const [openNotificationsModal, setOpenNotificationsModal] = useState(false);
   const MAX_COUNT = 5;
 
+  const handleModalClose = () => {
+    setOpenNotificationsModal(false);
+    close();
+  };
   return (
     <Box>
       <Card>
@@ -66,7 +70,7 @@ export function NotificationPreviewPopover({
       </Card>
       <NotificationModal
         isOpen={openNotificationsModal}
-        onClose={() => setOpenNotificationsModal(false)}
+        onClose={handleModalClose}
         unmarkedNotifications={notificationPreviews}
       />
     </Box>

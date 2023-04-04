@@ -22,7 +22,7 @@ export function NotificationModal({
   unmarkedNotifications
 }: {
   isOpen: boolean;
-  onClose?: () => void;
+  onClose: VoidFunction;
   unmarkedNotifications: NotificationDetails[];
 }) {
   const { markAsRead, markedNotificationPreviews } = useNotificationPreview();
@@ -225,19 +225,14 @@ export function NotificationModal({
                     unmarked
                     notification={notification}
                     markAsRead={markAsRead}
-                    onClose={() => onClose}
+                    onClose={onClose}
                   />
                   <Divider />
                 </Fragment>
               ))}
               {seletedMarkedNotifications().map((notification) => (
                 <Fragment key={notification.taskId}>
-                  <NotificationPreview
-                    large
-                    notification={notification}
-                    markAsRead={markAsRead}
-                    onClose={() => onClose}
-                  />
+                  <NotificationPreview large notification={notification} markAsRead={markAsRead} onClose={onClose} />
                   <Divider />
                 </Fragment>
               ))}

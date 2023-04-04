@@ -58,7 +58,7 @@ export function NotificationPreview({ notification, markAsRead, onClose, large, 
         justifyContent='space-between'
         gap={2}
         pl={2}
-        pr={0.5}
+        pr={large ? 2 : 0.5}
         py={1.5}
       >
         <Box display='flex' justifyContent='space-between' width='100%'>
@@ -122,18 +122,20 @@ export function NotificationPreview({ notification, markAsRead, onClose, large, 
               {content}
             </Typography>
           </Box>
-          <Box display='flex' alignItems='flex-start' ml={0.5} mt={-0.25}>
-            <IconButton
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                markAsRead({ taskId, groupType, type });
-              }}
-              size='small'
-            >
-              <CloseIcon fontSize='small' />
-            </IconButton>
-          </Box>
+          {!large && (
+            <Box display='flex' alignItems='flex-start' ml={0.5} mt={-0.25}>
+              <IconButton
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  markAsRead({ taskId, groupType, type });
+                }}
+                size='small'
+              >
+                <CloseIcon fontSize='small' />
+              </IconButton>
+            </Box>
+          )}
         </Box>
       </Box>
     </Link>
