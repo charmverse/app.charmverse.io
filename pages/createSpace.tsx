@@ -1,4 +1,4 @@
-import { Box, Card, Grid } from '@mui/material';
+import { Box, Card, Grid, Typography } from '@mui/material';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 
@@ -36,13 +36,30 @@ export default function CreateSpace() {
             md={6}
             sx={{
               display: 'flex',
-              justifyContent: 'center',
+              justifyContent: {
+                xs: 'center',
+                md: 'flex-start'
+              },
               mb: 2
             }}
           >
-            <Card sx={{ p: 4 }} variant='outlined'>
-              <CreateSpaceForm submitText='Get Started' />
-            </Card>
+            <Box sx={{ textAlign: { xs: 'center', md: 'left' } }}>
+              <Typography
+                sx={{
+                  fontSize: { xs: 30, md: 48 },
+                  fontWeight: 'bold',
+                  lineHeight: '1.1em',
+                  mt: { xs: 3 },
+                  mb: 3
+                }}
+              >
+                Create your space
+                <br /> to get started
+              </Typography>
+              <Card sx={{ px: 4, py: 2 }}>
+                <CreateSpaceForm submitText='Get Started' />
+              </Card>
+            </Box>
           </Grid>
           <Grid
             item
