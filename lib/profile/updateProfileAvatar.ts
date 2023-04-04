@@ -42,7 +42,12 @@ export async function updateProfileAvatar({
       throw new InvalidInputError('You do not own the selected NFT');
     }
 
-    const nft = await getNFT(updatedContract, updatedTokenId, avatarChain);
+    const nft = await getNFT({
+      contractAddress: updatedContract,
+      tokenId: updatedTokenId,
+      chainId: avatarChain,
+      userId
+    });
 
     if (nft.image) {
       const pathInS3 = getUserS3FilePath({ userId, url: getFilenameWithExtension(nft.image) });
