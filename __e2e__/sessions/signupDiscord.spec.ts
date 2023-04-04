@@ -35,5 +35,5 @@ test('signup - allows user to sign up and create a workspace using Discord', asy
   const discordWebsiteUrl = await loginPage.getDiscordUrl();
   await loginPage.gotoDiscordCallback({ discordApiUrl, discordWebsiteUrl });
 
-  await signupPage.waitForURL();
+  await signupPage.waitForCreateSpacePage();
 });

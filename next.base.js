@@ -15,7 +15,8 @@ const esmModules = [
   'data-uri-to-buffer',
   'fetch-blob',
   'formdata-polyfill',
-  'jose'
+  'jose',
+  'nanoid'
 ];
 
 exports.esmModules = esmModules;

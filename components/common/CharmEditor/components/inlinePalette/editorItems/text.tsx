@@ -71,7 +71,6 @@ export function items(props: ItemsProps): PaletteItemTypeNoGroup[] {
           {
             uid: 'insert-page',
             title: 'Insert page',
-            requiredSpacePermission: 'createPage' as SpaceOperation,
             keywords: ['page', 'nested'],
             icon: (
               <DescriptionOutlinedIcon
@@ -473,6 +472,7 @@ export function items(props: ItemsProps): PaletteItemTypeNoGroup[] {
   ];
 
   const allowedDynamicOtherItems = paletteItems.filter((paletteItem) => {
+    // Currently we don't consume this anymore. Leaving it here for future use.
     return (
       !paletteItem.requiredSpacePermission ||
       (paletteItem.requiredSpacePermission && userSpacePermissions?.[paletteItem.requiredSpacePermission])

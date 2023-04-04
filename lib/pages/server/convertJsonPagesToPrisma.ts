@@ -65,8 +65,11 @@ async function convertFolderContent({
   const {
     spaceId: droppedSpaceId,
     parentId,
+    createdAt,
     createdBy,
     cardId,
+    updatedAt,
+    updatedBy,
     boardId: boardIdToDrop,
     ...prismaCreateInput
   } = pageContent;
@@ -84,6 +87,8 @@ async function convertFolderContent({
       id: authorId
     }
   };
+
+  typedPrismaCreateInput.updatedBy = authorId;
 
   typedPrismaCreateInput.parentId = parentPageId;
 
