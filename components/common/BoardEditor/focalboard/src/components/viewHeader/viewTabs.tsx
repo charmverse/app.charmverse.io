@@ -28,6 +28,7 @@ import { injectIntl } from 'react-intl';
 
 import Button from 'components/common/Button';
 import Modal from 'components/common/Modal';
+import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import type { Board } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import { formatViewTitle, createBoardView } from 'lib/focalboard/boardView';
@@ -89,6 +90,7 @@ function ViewTabs(props: ViewTabsProps) {
   const [dropdownView, setDropdownView] = useState<BoardView | null>(null);
   const renameViewPopupState = usePopupState({ variant: 'popover', popupId: 'rename-view-popup' });
   const hiddenViewsPopupState = usePopupState({ variant: 'popover', popupId: 'show-views-popup' });
+  const resetGoogleForms = usePopupState({ variant: 'popover', popupId: 'reset-google-forms' });
   const showViewsTriggerState = bindTrigger(hiddenViewsPopupState);
   const showViewsMenuState = bindMenu(hiddenViewsPopupState);
 
@@ -187,6 +189,7 @@ function ViewTabs(props: ViewTabsProps) {
       newView.fields.sourceData = sourceDataWithoutBoard;
       mutator.updateBlock(newView, dropdownView, 'reset Google view source');
       setViewMenuAnchorEl(null);
+      resetGoogleForms.close();
     }
   }
 
@@ -287,11 +290,11 @@ function ViewTabs(props: ViewTabsProps) {
         </MenuItem>
         {dropdownView?.fields.sourceType === 'google_form' && [
           <Divider key='divider' />,
-          <MenuItem key='duplicate-view' dense onClick={resyncGoogleFormData}>
+          <MenuItem key='duplicate-view' dense onClick={resetGoogleForms.open}>
             <ListItemIcon>
               <RefreshIcon />
             </ListItemIcon>
-            <ListItemText>Reset and sync Google Form responses</ListItemText>
+            <ListItemText>Resync data with Google Forms</ListItemText>
           </MenuItem>,
           <Divider key='divider-2' />
         ]}
@@ -346,6 +349,14 @@ function ViewTabs(props: ViewTabsProps) {
           )}
         </Box>
       </Menu>
+      <ConfirmDeleteModal
+        title='Resync form and responses'
+        onClose={resetGoogleForms.close}
+        open={resetGoogleForms.isOpen}
+        buttonText='Resync cards'
+        question='This action will replace existing cards and properties including custom settings and cannot be undone. Continue?'
+        onConfirm={resyncGoogleFormData}
+      />
 
       {/* Form to rename views */}
       <Modal open={renameViewPopupState.isOpen} onClose={renameViewPopupState.close} title='Rename the view'>
