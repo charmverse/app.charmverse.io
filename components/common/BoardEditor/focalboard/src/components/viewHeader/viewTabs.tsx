@@ -291,7 +291,7 @@ function ViewTabs(props: ViewTabsProps) {
             <ListItemIcon>
               <RefreshIcon />
             </ListItemIcon>
-            <ListItemText>Resync Google Form</ListItemText>
+            <ListItemText>Reset and sync Google Form responses</ListItemText>
           </MenuItem>,
           <Divider key='divider-2' />
         ]}
