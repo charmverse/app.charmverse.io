@@ -1,19 +1,21 @@
 import { useState } from 'react';
 
-import type { ProposalFilter, ProposalSort } from 'components/proposals/components/ProposalsViewOptions';
+import type { ProposalStatusFilter } from 'components/proposals/components/ProposalsViewOptions';
 import { usePages } from 'hooks/usePages';
 import type { ProposalWithUsers } from 'lib/proposal/interface';
 
-export function useProposalSortAndFilters(proposals: ProposalWithUsers[]) {
-  const [proposalSort, setProposalSort] = useState<ProposalSort>('latest_created');
-  const [proposalFilter, setProposalFilter] = useState<ProposalFilter>('all');
+export function useProposals(proposals: ProposalWithUsers[]) {
+  const [statusFilter, setStatusFilter] = useState<ProposalStatusFilter>('all');
   const [categoryIdFilter, setCategoryIdFilter] = useState<string>('all');
   const { pages } = usePages();
 
-  let filteredProposals = proposals;
+  // filter out deleted and templates
+  let filteredProposals = proposals.filter(
+    (proposal) => !pages[proposal.id]?.deletedAt && pages[proposal.id]?.type === 'proposal'
+  );
 
-  if (proposalFilter !== 'all') {
-    filteredProposals = filteredProposals.filter((proposal) => proposal.status === proposalFilter);
+  if (statusFilter !== 'all') {
+    filteredProposals = filteredProposals.filter((proposal) => proposal.status === statusFilter);
   }
 
   if (categoryIdFilter !== 'all') {
@@ -29,11 +31,9 @@ export function useProposalSortAndFilters(proposals: ProposalWithUsers[]) {
 
   return {
     filteredProposals,
-    proposalSort,
-    proposalFilter,
+    statusFilter,
     categoryIdFilter,
-    setProposalFilter,
-    setCategoryIdFilter,
-    setProposalSort
+    setStatusFilter,
+    setCategoryIdFilter
   };
 }
