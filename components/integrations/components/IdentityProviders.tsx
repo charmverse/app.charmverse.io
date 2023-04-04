@@ -192,8 +192,7 @@ export function IdentityProviders() {
               question={
                 <>
                   <Typography mb={1}>
-                    Are you sure you want to Disconnect your {wallet.ensname || shortWalletAddress(wallet.address)}{' '}
-                    wallet?
+                    Are you sure you want to Disconnect your {wallet.ensname || wallet.address} wallet?
                   </Typography>
                   <Typography variant='body2'>
                     This action will delete your wallet, nfts, poaps, organisations and will lose roles and permissions
@@ -224,7 +223,7 @@ export function IdentityProviders() {
             text={telegramAccount?.username}
             type='Telegram'
             loading={isConnectingToTelegram || isDisconnectingTelegram}
-            disabled={cannotDisconnect}
+            disabled={!user}
             connected={true}
             actions={<MenuItem onClick={disconnectFromTelegram}>Disconnect</MenuItem>}
             error={telegramError && <Alert severity='error'>{telegramError}</Alert>}
