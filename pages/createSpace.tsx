@@ -16,11 +16,11 @@ export default function CreateSpace() {
   const { spaces, isLoaded } = useSpaces();
   const router = useRouter();
 
-  // useEffect(() => {
-  //   if (spaces.length > 0) {
-  //     router.push(getDefaultWorkspaceUrl(spaces));
-  //   }
-  // }, [spaces]);
+  useEffect(() => {
+    if (spaces.length > 0) {
+      router.push(getDefaultWorkspaceUrl(spaces));
+    }
+  }, [spaces]);
 
   if (!spaces || !isLoaded) {
     return null;
