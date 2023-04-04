@@ -52,7 +52,7 @@ export function SidebarLink({
   active: boolean;
   href?: string;
   icon: any;
-  label: string | ReactNode;
+  label: string;
   target?: string;
   onClick?: () => void;
   className?: string;

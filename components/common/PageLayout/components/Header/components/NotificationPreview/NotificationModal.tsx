@@ -1,6 +1,14 @@
 import CelebrationIcon from '@mui/icons-material/Celebration';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CloseIcon from '@mui/icons-material/Close';
-import { Badge, Box, Dialog, DialogContent, Divider, IconButton, Tab, Tabs, Typography } from '@mui/material';
+import CommentIcon from '@mui/icons-material/Comment';
+import ForumIcon from '@mui/icons-material/Forum';
+import HowToVoteIcon from '@mui/icons-material/HowToVote';
+import KeyIcon from '@mui/icons-material/Key';
+import LayersIcon from '@mui/icons-material/Layers';
+import BountyIcon from '@mui/icons-material/RequestPageOutlined';
+import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
+import { Badge, Box, Dialog, DialogContent, Divider, IconButton, Tab, Tabs, Tooltip, Typography } from '@mui/material';
 import router from 'next/router';
 import { Fragment, useState } from 'react';
 
@@ -14,7 +22,17 @@ import { SidebarLink } from '../../../Sidebar/SidebarButton';
 
 import { NotificationPreview } from './NotificationPreview';
 import type { NotificationDetails } from './useNotificationPreview';
-import { TASK_TABS, useNotificationPreview } from './useNotificationPreview';
+import { useNotificationPreview } from './useNotificationPreview';
+
+const TASK_TABS = [
+  { icon: <LayersIcon />, label: 'All', type: 'all' },
+  { icon: <KeyIcon />, label: 'Multisig', type: 'multisig' },
+  { icon: <BountyIcon />, label: 'Bounty', type: 'bounty' },
+  { icon: <HowToVoteIcon />, label: 'Poll', type: 'vote' },
+  { icon: <ForumIcon />, label: 'Discussion', type: 'mention' },
+  { icon: <TaskOutlinedIcon />, label: 'Proposal', type: 'proposal' },
+  { icon: <CommentIcon />, label: 'Forum', type: 'forum' }
+] as const;
 
 export function NotificationModal({
   isOpen,
@@ -33,7 +51,7 @@ export function NotificationModal({
 
   const notificationCount: Record<(typeof TASK_TABS)[number]['type'], boolean> = {
     vote: !!unmarkedNotifications.find((n) => n.type === 'vote'),
-    discussion: !!unmarkedNotifications.find((n) => n.type === 'mention'),
+    mention: !!unmarkedNotifications.find((n) => n.type === 'mention'),
     proposal: !!unmarkedNotifications.find((n) => n.type === 'proposal'),
     bounty: !!unmarkedNotifications.find((n) => n.type === 'bounty'),
     forum: !!unmarkedNotifications.find((n) => n.type === 'forum'),
@@ -44,57 +62,17 @@ export function NotificationModal({
   function seletedUnmarkedNotifications() {
     if (currentTaskType === 'all') {
       return unmarkedNotifications;
+    } else {
+      return unmarkedNotifications.filter((n) => n.type === currentTaskType);
     }
-
-    if (currentTaskType === 'forum') {
-      return unmarkedNotifications?.filter((n) => n.type === 'forum');
-    }
-
-    if (currentTaskType === 'bounty') {
-      return unmarkedNotifications?.filter((n) => n.type === 'bounty');
-    }
-
-    if (currentTaskType === 'discussion') {
-      return unmarkedNotifications?.filter((n) => n.type === 'mention');
-    }
-
-    if (currentTaskType === 'proposal') {
-      return unmarkedNotifications?.filter((n) => n.type === 'proposal');
-    }
-
-    if (currentTaskType === 'vote') {
-      return unmarkedNotifications?.filter((n) => n.type === 'vote');
-    }
-
-    return [];
   }
 
   function seletedMarkedNotifications() {
     if (currentTaskType === 'all') {
       return markedNotificationPreviews;
+    } else {
+      return markedNotificationPreviews.filter((n) => n.type === currentTaskType);
     }
-
-    if (currentTaskType === 'forum') {
-      return markedNotificationPreviews?.filter((n) => n.type === 'forum');
-    }
-
-    if (currentTaskType === 'bounty') {
-      return markedNotificationPreviews.filter((n) => n.type === 'bounty');
-    }
-
-    if (currentTaskType === 'discussion') {
-      return markedNotificationPreviews.filter((n) => n.type === 'mention');
-    }
-
-    if (currentTaskType === 'proposal') {
-      return markedNotificationPreviews.filter((n) => n.type === 'proposal');
-    }
-
-    if (currentTaskType === 'vote') {
-      return markedNotificationPreviews.filter((n) => n.type === 'vote');
-    }
-
-    return [];
   }
 
   return (
@@ -121,13 +99,13 @@ export function NotificationModal({
           {TASK_TABS.map((tab) => (
             <SidebarLink
               key={tab.label}
-              label={
+              label={tab.label}
+              icon={
                 <Badge
                   sx={{
                     '& .MuiBadge-badge': {
                       right: {
-                        md: -3,
-                        xs: 15
+                        md: 26
                       },
                       top: {
                         md: 0,
@@ -139,20 +117,37 @@ export function NotificationModal({
                   color='error'
                   variant='dot'
                 >
-                  {tab.label}
+                  {tab.icon}
                 </Badge>
               }
-              icon={tab.icon}
               onClick={() => setCurrentTaskType(tab.type)}
               active={tab.type === currentTaskType}
             />
           ))}
         </Box>
         <Box flex='1 1 auto' position='relative' overflow='auto'>
-          <Box role='tabpanel'>
-            <DialogContent>
-              <Legend marginTop={0} textTransform='capitalize'>{`${currentTaskType} Notifications`}</Legend>
-
+          <Box role='tabpanel' height='100%'>
+            <DialogContent sx={{ height: '100%' }}>
+              <Legend
+                variant='inherit'
+                variantMapping={{ inherit: 'div' }}
+                display='flex'
+                justifyContent='space-between'
+              >
+                <Typography variant='h2' fontSize='inherit' textTransform='capitalize' fontWeight={700}>
+                  {`${currentTaskType} Notifications`}
+                </Typography>
+                <Box display='flex' alignItems='center' gap={{ sm: 2, xs: 1 }}>
+                  <Tooltip title='Mark all as read'>
+                    <IconButton aria-label='close the notifications modal' onClick={() => null}>
+                      <CheckCircleIcon color='secondary' fontSize='small' />
+                    </IconButton>
+                  </Tooltip>
+                  <IconButton aria-label='close the notifications modal' onClick={onClose}>
+                    <CloseIcon color='secondary' fontSize='small' />
+                  </IconButton>
+                </Box>
+              </Legend>
               {isMobile && (
                 <Tabs
                   sx={tabStyles}
@@ -164,7 +159,17 @@ export function NotificationModal({
                       component='div'
                       disableRipple
                       iconPosition='start'
-                      icon={task.icon}
+                      icon={
+                        <>
+                          <Badge
+                            invisible={!notificationCount[task.type]}
+                            sx={{ left: -15, marginTop: 1 }}
+                            color='error'
+                            variant='dot'
+                          />
+                          {task.icon}
+                        </>
+                      }
                       key={task.label}
                       sx={{
                         px: 1.5,
@@ -189,27 +194,7 @@ export function NotificationModal({
                           }
                         }
                       }}
-                      label={
-                        <Badge
-                          sx={{
-                            '& .MuiBadge-badge': {
-                              right: {
-                                md: -3,
-                                xs: 15
-                              },
-                              top: {
-                                md: 0,
-                                xs: -20
-                              }
-                            }
-                          }}
-                          invisible={!notificationCount[task.type]}
-                          color='error'
-                          variant='dot'
-                        >
-                          {task.label}
-                        </Badge>
-                      }
+                      label={task.label}
                       onClick={() => {
                         setUrlWithoutRerender(router.pathname, { task: task.type });
                         setCurrentTaskType(task.type);
@@ -238,9 +223,16 @@ export function NotificationModal({
               ))}
 
               {seletedUnmarkedNotifications()?.length < 1 && seletedMarkedNotifications()?.length < 1 && (
-                <Box display='flex' justifyContent='center' alignItems='center' flexDirection='column' height='100%'>
+                <Box
+                  display='flex'
+                  justifyContent='center'
+                  alignItems='center'
+                  flexDirection='row'
+                  height='calc(100% - 70px)'
+                  gap={1}
+                >
                   <Typography variant='h5' color='secondary'>
-                    You are up date!
+                    You are up to date!
                   </Typography>
                   <CelebrationIcon color='secondary' fontSize='large' />
                 </Box>
@@ -248,19 +240,6 @@ export function NotificationModal({
             </DialogContent>
           </Box>
         </Box>
-        <IconButton
-          data-test='close-settings-modal'
-          aria-label='close the settings modal'
-          onClick={onClose}
-          sx={{
-            position: 'absolute',
-            right: 15,
-            top: 15,
-            zIndex: 1
-          }}
-        >
-          <CloseIcon color='secondary' fontSize='small' />
-        </IconButton>
       </Box>
     </Dialog>
   );
