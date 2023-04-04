@@ -12,14 +12,9 @@ import { setUrlWithoutRerender } from 'lib/utilities/browser';
 import type { ErrorType } from 'lib/utilities/errors';
 import splashImage from 'public/images/artwork/world.png';
 
+import { Container } from './components/LoginLayout';
 import { Login } from './Login';
 import { LoginErrorModal } from './LoginErrorModal';
-
-export const Container = styled(Box)`
-  max-width: 100%;
-  width: 1170px;
-  margin: 0 auto;
-`;
 
 type Props = {
   hideLoginOptions?: boolean;
@@ -31,14 +26,18 @@ export function LoginPageContent({ hideLoginOptions, isLoggingIn }: Props) {
   const router = useRouter();
 
   // We either have disabled account error (handled by our modal) or discord error (handled with snackbar)
-  const [discordLoginError, setDiscordLoginError] = useState(
-    new URLSearchParams(decodeURIComponent(window.location.search)).get('discordError')
-  );
+  const [discordLoginError, setDiscordLoginError] = useState<string | null>(null);
 
   function clearError() {
     setDiscordLoginError(null);
     setUrlWithoutRerender(router.pathname, { discordError: null });
   }
+
+  useEffect(() => {
+    if (router.query.discordError) {
+      setDiscordLoginError(router.query.discordError as string);
+    }
+  }, [router.query]);
 
   useEffect(() => {
     if (discordLoginError && (discordLoginError as ErrorType) !== 'Disabled account') {
@@ -50,22 +49,19 @@ export function LoginPageContent({ hideLoginOptions, isLoggingIn }: Props) {
   return (
     <Container px={3} data-test='login-page-content'>
       <Grid container>
-        <Grid item xs={12} display={{ xs: 'flex', sm: 'none' }} justifyContent='center' py={3} px={6}>
-          <Image sx={{ maxWidth: 300 }} src={splashImage} />
-        </Grid>
         <Grid
           item
           xs={12}
-          sm={6}
+          md={6}
           sx={{
             display: 'flex',
             justifyContent: {
               xs: 'center',
-              sm: 'flex-start'
+              md: 'flex-start'
             }
           }}
         >
-          <Box sx={{ textAlign: { xs: 'center', sm: 'left' } }}>
+          <Box sx={{ textAlign: { xs: 'center', md: 'left' } }}>
             <Typography
               sx={{
                 fontSize: { xs: 30, md: 48 },
@@ -83,14 +79,19 @@ export function LoginPageContent({ hideLoginOptions, isLoggingIn }: Props) {
               <br />
               work together and vote
             </Typography>
-            <Box display={{ sm: 'flex' }} gap={2} alignItems='center'>
+            <Box
+              display={{ sm: 'flex' }}
+              gap={2}
+              alignItems='center'
+              justifyContent={{ xs: 'center', md: 'flex-start' }}
+            >
               {isLoggingIn && <LoadingComponent label='Logging you in' />}
               {!hideLoginOptions && <Login />}
             </Box>
           </Box>
         </Grid>
-        <Grid item display={{ xs: 'none', sm: 'flex' }} sm={6} alignItems='center'>
-          <Image px={3} src={splashImage} />
+        <Grid item md={6} alignItems='center'>
+          <Image maxWidth={{ xs: 300, md: 'none' }} px={3} src={splashImage} />
         </Grid>
       </Grid>
       <LoginErrorModal open={(discordLoginError as ErrorType) === 'Disabled account'} onClose={clearError} />

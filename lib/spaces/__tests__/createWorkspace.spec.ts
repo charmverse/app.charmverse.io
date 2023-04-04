@@ -9,8 +9,8 @@ import { uid } from 'lib/utilities/strings';
 import { gettingStartedPage } from 'seedData/gettingStartedPage';
 
 import { spaceCreateTemplates } from '../config';
-import type { SpaceCreateInput } from '../createWorkspace';
-import { createWorkspace } from '../createWorkspace';
+import type { SpaceCreateInput } from '../createSpace';
+import { createWorkspace } from '../createSpace';
 
 let user: User;
 
