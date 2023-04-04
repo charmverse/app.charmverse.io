@@ -63,7 +63,7 @@ export function PostCategoryRolePermissionRow({
   }
 
   const assigneeName = useMemo(() => {
-    return assignee.group === 'space' ? `Default permisions` : roles.roles?.find((r) => r.id === assignee.id)?.name;
+    return assignee.group === 'space' ? `Default permissions` : roles.roles?.find((r) => r.id === assignee.id)?.name;
   }, [roles, space]);
 
   function handleUpdate(level: keyof typeof friendlyLabels) {
