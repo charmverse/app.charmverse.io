@@ -3,7 +3,7 @@ import { v4 } from 'uuid';
 import { prisma } from 'db';
 import { sessionUserRelations } from 'lib/session/config';
 import { InsecureOperationError, InvalidInputError, MissingDataError } from 'lib/utilities/errors';
-import { shortWalletAddress } from 'lib/utilities/strings';
+import { shortWalletAddress, uid } from 'lib/utilities/strings';
 import { randomETHWalletAddress } from 'testing/generateStubs';
 
 import { updateUsedIdentity } from '../updateUsedIdentity';
@@ -12,6 +12,7 @@ describe('updateUsedIdentity', () => {
   it('should update the user identity type and username to the first connected identity if no identity is provided in this order: [wallet, discord, unstoppable domain, google account]', async () => {
     const userWithWalletAndDiscord = await prisma.user.create({
       data: {
+        path: uid(),
         username: 'random-name',
         identityType: 'RandomName',
         wallets: {
@@ -37,6 +38,7 @@ describe('updateUsedIdentity', () => {
     // --------------
     const userWithDiscordAndUnstoppableDomain = await prisma.user.create({
       data: {
+        path: uid(),
         username: 'random-name',
         identityType: 'RandomName',
         discordUser: {
@@ -68,6 +70,7 @@ describe('updateUsedIdentity', () => {
     // --------------
     const userWithUnstoppableDomainAndGoogle = await prisma.user.create({
       data: {
+        path: uid(),
         username: 'random-name',
         identityType: 'RandomName',
         unstoppableDomains: {
@@ -98,6 +101,7 @@ describe('updateUsedIdentity', () => {
     // --------------
     const userWithGoogle = await prisma.user.create({
       data: {
+        path: uid(),
         username: 'random-name',
         identityType: 'RandomName',
         googleAccounts: {
@@ -122,6 +126,7 @@ describe('updateUsedIdentity', () => {
 
     const user = await prisma.user.create({
       data: {
+        path: uid(),
         username: 'random-name',
         identityType: 'RandomName',
         wallets: {
@@ -162,6 +167,7 @@ describe('updateUsedIdentity', () => {
 
     const user = await prisma.user.create({
       data: {
+        path: uid(),
         username: 'random-name',
         identityType: 'RandomName',
         wallets: {
@@ -186,6 +192,7 @@ describe('updateUsedIdentity', () => {
   it('should update a user identity to their connected Unstoppable Domain', async () => {
     const user = await prisma.user.create({
       data: {
+        path: uid(),
         username: 'random-name',
         identityType: 'RandomName',
         unstoppableDomains: {
@@ -209,6 +216,7 @@ describe('updateUsedIdentity', () => {
   it('should update a user identity to their connected Google Account username', async () => {
     const user = await prisma.user.create({
       data: {
+        path: uid(),
         username: 'random-name',
         identityType: 'RandomName',
         googleAccounts: {
@@ -234,6 +242,7 @@ describe('updateUsedIdentity', () => {
   it('should update a user identity to their connected Telegram username', async () => {
     const user = await prisma.user.create({
       data: {
+        path: uid(),
         username: 'random-name',
         identityType: 'RandomName',
         telegramUser: {
@@ -260,6 +269,7 @@ describe('updateUsedIdentity', () => {
   it('should update a user identity to their Verified Email username', async () => {
     const user = await prisma.user.create({
       data: {
+        path: uid(),
         username: 'random-name',
         identityType: 'RandomName',
         verifiedEmails: {
@@ -288,6 +298,7 @@ describe('updateUsedIdentity', () => {
   it('should throw an error if passing an empty display name', async () => {
     const user = await prisma.user.create({
       data: {
+        path: uid(),
         username: 'random-name'
       }
     });
@@ -299,6 +310,7 @@ describe('updateUsedIdentity', () => {
   it('should throw an error if passing an invalid identity type', async () => {
     const user = await prisma.user.create({
       data: {
+        path: uid(),
         username: 'random-name'
       }
     });
@@ -310,6 +322,7 @@ describe('updateUsedIdentity', () => {
   it('should throw an error if trying to update identity to a non connected identity', async () => {
     const user = await prisma.user.create({
       data: {
+        path: uid(),
         username: 'random-name',
         identityType: 'RandomName'
       },

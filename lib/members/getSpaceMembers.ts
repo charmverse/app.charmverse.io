@@ -37,7 +37,6 @@ export async function getSpaceMembers({
               spaceId
             }
           },
-          wallets: true,
           googleAccounts: true,
           telegramUser: true,
           discordUser: true

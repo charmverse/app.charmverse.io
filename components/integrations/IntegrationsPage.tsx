@@ -4,8 +4,8 @@ import charmClient from 'charmClient';
 import { AccountSettings } from 'components/settings/AccountSettings';
 import Legend from 'components/settings/Legend';
 
-import MultiSigList from './components/GnosisSafes';
 import { IdentityProviders } from './components/IdentityProviders';
+import { MultiSigList } from './components/MultiSigList';
 
 export function IntegrationSettings() {
   useEffect(() => {

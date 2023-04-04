@@ -3,6 +3,7 @@ import { v4 } from 'uuid';
 import { prisma } from 'db';
 import { sessionUserRelations } from 'lib/session/config';
 import { InvalidInputError } from 'lib/utilities/errors';
+import { uid } from 'lib/utilities/strings';
 
 import { disconnectGoogleAccount } from '../disconnectGoogleAccount';
 
@@ -12,6 +13,7 @@ describe('disconnectGoogleAccount', () => {
 
     const user = await prisma.user.create({
       data: {
+        path: uid(),
         username: 'Test user',
         wallets: {
           create: {
@@ -41,6 +43,7 @@ describe('disconnectGoogleAccount', () => {
   it('should update the users username and identity type to another connected identity, after deleting Google account', async () => {
     const user = await prisma.user.create({
       data: {
+        path: uid(),
         username: 'Test user',
         wallets: {
           create: {

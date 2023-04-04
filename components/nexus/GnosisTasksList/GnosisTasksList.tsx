@@ -6,6 +6,7 @@ import type { KeyedMutator } from 'swr';
 
 import charmClient from 'charmClient';
 import LoadingComponent from 'components/common/LoadingComponent';
+import { MultiSigConnectCard } from 'components/integrations/components/MultiSigConnectCard';
 import useMultiWalletSigs from 'hooks/useMultiWalletSigs';
 import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useSnackbar } from 'hooks/useSnackbar';
@@ -15,7 +16,6 @@ import { importSafesFromWallet } from 'lib/gnosis/gnosis.importSafes';
 import type { GnosisSafeTasks } from 'lib/gnosis/gnosis.tasks';
 import { isTruthy } from 'lib/utilities/types';
 
-import { GnosisConnectCard } from '../../integrations/components/GnosisSafes';
 import useTasksState from '../hooks/useTasksState';
 
 import { SafeTasks } from './GnosisTasksTable';
@@ -107,7 +107,7 @@ export function GnosisTasksList({ error, mutateTasks, tasks }: GnosisTasksSectio
   return (
     <>
       {safeData.length === 0 && (
-        <GnosisConnectCard
+        <MultiSigConnectCard
           connectable={!!gnosisSigner}
           loading={isRefreshingSafes}
           onClick={importSafes}
