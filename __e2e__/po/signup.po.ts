@@ -23,12 +23,12 @@ export class SignUpPage {
   }
 
   async waitForWorkspaceForm() {
-    await this.page.waitForURL('**/createWorkspace');
+    await this.page.waitForURL('**/createSpace');
   }
 
   async selectNewSpaceFormTemplate(spaceTemplateOption: SpaceCreateTemplate) {
     await this.page.click(`data-test=space-template-${spaceTemplateOption}`);
-    await this.page.waitForURL('**/createWorkspace');
+    await this.page.waitForURL('**/createSpace');
   }
 
   async waitForWorkspaceLoaded({ domain }: { domain: string }) {
@@ -36,7 +36,7 @@ export class SignUpPage {
     await this.page.locator('text=[Your DAO] Home').first().waitFor();
   }
 
-  async selectCreateWorkspace() {
+  async selectCreateSpace() {
     await this.selectNewWorkspaceButton.click();
   }
 
