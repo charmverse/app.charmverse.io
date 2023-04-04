@@ -45,7 +45,8 @@ async function createSpace(req: NextApiRequest, res: NextApiResponse<CreateWorks
     adminWalletAddress,
     adminAvatar,
     adminUsername,
-    webhookUrl
+    webhookUrl,
+    template
   } = req.body as CreateWorkspaceRequestBody;
 
   if (typeof name !== 'string' || name.length < 3) {
@@ -68,7 +69,8 @@ async function createSpace(req: NextApiRequest, res: NextApiResponse<CreateWorks
     xpsEngineId,
     avatar,
     superApiToken: req.superApiToken,
-    webhookUrl
+    webhookUrl,
+    template
   });
 
   return res.status(201).json(result);
