@@ -46,17 +46,16 @@ export default function CreateSpace() {
             <Box sx={{ textAlign: { xs: 'center', md: 'left' } }}>
               <Typography
                 sx={{
-                  fontSize: { xs: 30, md: 48 },
+                  fontSize: 30,
                   fontWeight: 'bold',
                   lineHeight: '1.1em',
-                  mt: { xs: 3 },
-                  mb: 3
+                  mt: 3,
+                  mb: 6
                 }}
               >
-                Create your space
-                <br /> to get started
+                Create your space to get started
               </Typography>
-              <Card sx={{ px: 4, py: 2 }}>
+              <Card sx={{ p: 4, pt: 2 }}>
                 <CreateSpaceForm submitText='Get Started' />
               </Card>
             </Box>
