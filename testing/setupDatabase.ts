@@ -55,6 +55,7 @@ export async function generateSpaceUser({
 }): Promise<LoggedInUser> {
   return prisma.user.create({
     data: {
+      path: uid(),
       identityType: 'Discord',
       username: 'Username',
       wallets: {

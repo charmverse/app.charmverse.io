@@ -13,6 +13,7 @@ import { getAvailableDomainName } from 'lib/spaces/getAvailableDomainName';
 import { createUserFromWallet } from 'lib/users/createUser';
 import { InvalidInputError } from 'lib/utilities/errors';
 import { isValidUrl } from 'lib/utilities/isValidUrl';
+import { uid } from 'lib/utilities/strings';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 import { publishMemberEvent } from 'lib/webhookPublisher/publishEvent';
 
@@ -44,7 +45,8 @@ export async function createWorkspaceApi({
     data: {
       username: 'Bot',
       isBot: true,
-      identityType: 'RandomName'
+      identityType: 'RandomName',
+      path: uid()
     }
   });
 

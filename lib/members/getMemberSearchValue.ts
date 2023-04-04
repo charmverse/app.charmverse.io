@@ -1,17 +1,15 @@
-import type { DiscordUser, MemberPropertyValue, TelegramUser, User, UserDetails, UserWallet } from '@prisma/client';
+import type { DiscordUser, MemberPropertyValue, TelegramUser, User, UserDetails } from '@prisma/client';
 
 type UserData = User & {
   memberPropertyValues: MemberPropertyValue[];
   profile: UserDetails | null;
-  wallets: UserWallet[];
   telegramUser: TelegramUser | null;
   discordUser: DiscordUser | null;
 };
 
 export function getMemberSearchValue(userData: UserData): string {
-  const { profile, memberPropertyValues = [], wallets, telegramUser, discordUser } = userData;
-  // all account names
-  const walletsString = wallets.map((wallet) => `${wallet.ensname || ''} ${wallet.address || ''}`).join(' ');
+  const { profile, memberPropertyValues = [], telegramUser, discordUser } = userData;
+
   const discordAccountString =
     discordUser?.account && typeof discordUser?.account === 'object' && 'username' in discordUser.account
       ? discordUser?.account?.username
@@ -36,7 +34,7 @@ export function getMemberSearchValue(userData: UserData): string {
   // all socials
   const socialsString = profile?.social ? Object.values(profile.social).join(' ') : '';
 
-  return `${userDetailsString} ${walletsString} ${propertyValuesString} ${socialsString} ${telegramAccountString} ${discordAccountString}`
+  return `${userDetailsString} ${propertyValuesString} ${socialsString} ${telegramAccountString} ${discordAccountString}`
     .toLowerCase()
     .replace(/\s\s+/g, ' ');
 }
