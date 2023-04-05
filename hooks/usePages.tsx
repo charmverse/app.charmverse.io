@@ -1,5 +1,4 @@
-import type { Page, Role } from '@prisma/client';
-import { PageOperations } from '@prisma/client';
+import type { Page } from '@prisma/client';
 import { useRouter } from 'next/router';
 import type { Dispatch, ReactNode, SetStateAction } from 'react';
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef } from 'react';
@@ -11,9 +10,6 @@ import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
 import type { Block } from 'lib/focalboard/block';
 import type { PageMeta, PagesMap, PageUpdates } from 'lib/pages';
 import { untitledPage } from 'lib/pages/untitledPage';
-import type { IPagePermissionFlags, PageOperationType } from 'lib/permissions/pages';
-import { AllowedPagePermissions } from 'lib/permissions/pages/available-page-permissions.class';
-import { permissionTemplates } from 'lib/permissions/pages/page-permission-mapping';
 import type { WebSocketPayload } from 'lib/websockets/interfaces';
 
 import { useCurrentSpace } from './useCurrentSpace';

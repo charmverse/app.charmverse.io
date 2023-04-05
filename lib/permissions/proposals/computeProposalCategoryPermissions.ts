@@ -4,6 +4,7 @@ import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { InvalidInputError } from 'lib/utilities/errors';
 import { isUUID } from 'lib/utilities/strings';
 
+import { filterApplicablePermissions } from '../filterApplicablePermissions';
 import type { PermissionCompute } from '../interfaces';
 
 import { AvailableProposalCategoryPermissions } from './availableProposalCategoryPermissions.class';
@@ -26,7 +27,7 @@ export async function computeProposalCategoryPermissions({
     throw new ProposalCategoryNotFoundError(`${resourceId}`);
   }
 
-  const { error, isAdmin } = await hasAccessToSpace({
+  const { error, isAdmin, spaceRole } = await hasAccessToSpace({
     spaceId: proposalCategory.spaceId,
     userId,
     disallowGuest: true
@@ -37,34 +38,23 @@ export async function computeProposalCategoryPermissions({
   if (isAdmin) {
     return permissions.full;
 
-    // Requester is not a space member
-  } else if (error) {
+    // Requester is not a space member or is a guest
+  } else if (error || spaceRole?.isGuest) {
     return permissions.empty;
   }
 
   const assignedPermissions = await prisma.proposalCategoryPermission.findMany({
     where: {
-      proposalCategoryId: resourceId,
-      OR: [
-        {
-          spaceId: proposalCategory.spaceId
-        },
-        {
-          role: {
-            spaceRolesToRole: {
-              some: {
-                spaceRole: {
-                  userId
-                }
-              }
-            }
-          }
-        }
-      ]
+      proposalCategoryId: resourceId
     }
   });
+  const applicablePermissions = await filterApplicablePermissions({
+    permissions: assignedPermissions,
+    resourceSpaceId: proposalCategory.spaceId,
+    userId
+  });
 
-  assignedPermissions.forEach((permission) => {
+  applicablePermissions.forEach((permission) => {
     permissions.addPermissions(proposalCategoryPermissionsMapping[permission.permissionLevel]);
   });
 

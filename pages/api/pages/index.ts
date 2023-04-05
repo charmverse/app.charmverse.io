@@ -39,16 +39,26 @@ async function createPageHandler(req: NextApiRequest, res: NextApiResponse<IPage
 
   const { id: userId } = req.session.user;
 
-  const permissions = await computeSpacePermissions({
-    allowAdminBypass: true,
-    resourceId: spaceId,
-    userId
-  });
+  // When creating a nested page, check that a user can edit the parent page
+  if (data.parentId) {
+    const permissions = await computeUserPagePermissions({
+      resourceId: data.parentId,
+      userId
+    });
 
-  if (!permissions.createPage) {
-    throw new UnauthorisedActionError('You do not have permissions to create a page.');
+    if (!permissions.edit_content) {
+      throw new UnauthorisedActionError('You do not have permissions to create a page.');
+    }
+  } else {
+    const permissions = await computeSpacePermissions({
+      resourceId: spaceId,
+      userId
+    });
+
+    if (!permissions.createPage) {
+      throw new UnauthorisedActionError('You do not have permissions to create a page.');
+    }
   }
-
   // Remove parent ID and pass it to the creation input
   // This became necessary after adding a formal parentPage relation related to page.parentId
   // We now need to specify this as a ParentPage.connect prisma argument instead of a raw string

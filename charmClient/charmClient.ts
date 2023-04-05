@@ -35,7 +35,7 @@ import type {
 } from 'lib/permissions/pages/page-permission-interfaces';
 import type { SpacePermissionFlags, SpacePermissionModification } from 'lib/permissions/spaces';
 import type { AggregatedProfileData } from 'lib/profile';
-import type { CreateSpaceProps } from 'lib/spaces/createWorkspace';
+import type { CreateSpaceProps } from 'lib/spaces/createSpace';
 import type { ITokenMetadata, ITokenMetadataRequest } from 'lib/tokens/tokenData';
 import { encodeFilename } from 'lib/utilities/encodeFilename';
 import type { SocketAuthReponse } from 'lib/websockets/interfaces';
