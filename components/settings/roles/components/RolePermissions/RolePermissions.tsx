@@ -70,7 +70,7 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
     () => charmClient.permissions.proposals.listProposalCategoryPermissions({ spaceId: currentSpaceId })
   );
   const { data: postCategoryPermissions, mutate: mutatePostCategoryPermissions } = useSWR(
-    currentSpaceId ? `/posts/list-group-post-category-permissions-${currentSpaceId}` : null,
+    currentSpaceId ? `/posts/list-post-category-permissions-${currentSpaceId}` : null,
     () => charmClient.permissions.forum.listPostCategoryPermissions({ spaceId: currentSpaceId })
   );
 
