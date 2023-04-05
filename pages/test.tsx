@@ -1,10 +1,10 @@
 // import { uid } from 'node_modules/common.charmverse.io/packages/utilities-string/src';
 // eslint-disable-next-line import/no-relative-packages, import/no-extraneous-dependencies
-import { randomiser } from 'common.charmverse.io';
+import { randomiser } from '@charmverse/core';
 import { useEffect, useState } from 'react';
 
 export default function TestPage() {
-  const [displayValue, setDisplayValue] = useState('0');
+  const [displayValue, setDisplayValue] = useState(randomiser());
 
   useEffect(() => {
     const interval = setInterval(() => {
