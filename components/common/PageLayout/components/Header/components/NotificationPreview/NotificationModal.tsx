@@ -13,7 +13,6 @@ import { Fragment } from 'react';
 
 import { SectionName } from 'components/common/PageLayout/components/Sidebar/Sidebar';
 import { SidebarLink } from 'components/common/PageLayout/components/Sidebar/SidebarButton';
-import { tabStyles } from 'components/nexus/TasksPage';
 import Legend from 'components/settings/Legend';
 import { useSmallScreen } from 'hooks/useMediaScreens';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
@@ -30,6 +29,25 @@ const NOTIFICATION_TABS = [
   { icon: <TaskOutlinedIcon />, label: 'Proposal', type: 'proposal' },
   { icon: <CommentIcon />, label: 'Forum', type: 'forum' }
 ] as const;
+
+const tabStyles = {
+  mt: 2,
+  minHeight: {
+    xs: '34px',
+    sm: '48px'
+  },
+  '.MuiTab-root': {
+    p: 0,
+    minWidth: {
+      xs: 'fit-content',
+      sm: '90px'
+    },
+    flexGrow: {
+      xs: 1,
+      sm: 'revert'
+    }
+  }
+};
 
 export function NotificationModal({
   isOpen,
@@ -60,7 +78,7 @@ export function NotificationModal({
       fullWidth
       maxWidth='lg'
       fullScreen={isMobile}
-      PaperProps={{ sx: { height: { md: '90vh' }, borderRadius: (theme) => theme.spacing(1) } }}
+      PaperProps={{ sx: { height: { md: '90vh' }, borderRadius: isMobile ? 0 : (theme) => theme.spacing(1) } }}
       onClose={onClose}
       open={isOpen}
     >
@@ -105,16 +123,18 @@ export function NotificationModal({
             />
           ))}
         </Box>
-        <Box flex='1 1 auto' position='relative' overflow='auto'>
-          <Box role='tabpanel' height='100%'>
-            <DialogContent sx={{ height: '100%' }}>
+        <Box flex='1 1 auto' position='relative' overflow='hidden' height='100%'>
+          <Box role='tabpanel' height='100%' overflow='hidden'>
+            <Box>
               <Legend
                 variant='inherit'
                 variantMapping={{ inherit: 'div' }}
                 display='flex'
                 justifyContent='space-between'
+                px={{ xs: 2, md: 3 }}
+                pt={2}
               >
-                <Typography variant='h2' fontSize='inherit' textTransform='capitalize' fontWeight={700}>
+                <Typography variant={isMobile ? 'h6' : 'h5'} textTransform='capitalize' fontWeight={700}>
                   {`${notificationsDisplayType} Notifications`}
                 </Typography>
                 <Box display='flex' alignItems='center' gap={{ sm: 2, xs: 1 }}>
@@ -130,7 +150,6 @@ export function NotificationModal({
                   </IconButton>
                 </Box>
               </Legend>
-
               <Tabs
                 sx={{ ...tabStyles, display: isMobile ? 'block' : 'none' }}
                 indicatorColor='primary'
@@ -155,7 +174,7 @@ export function NotificationModal({
                     key={task.label}
                     sx={{
                       px: 1.5,
-                      fontSize: 14,
+                      fontSize: 12,
                       minHeight: 0,
                       mb: {
                         xs: 1,
@@ -184,7 +203,8 @@ export function NotificationModal({
                   />
                 ))}
               </Tabs>
-
+            </Box>
+            <DialogContent sx={{ height: 'calc(100% - 145px)', px: { xs: 0, md: 3 } }}>
               {unmarkedNotifications.map((notification) => (
                 <Fragment key={notification.taskId}>
                   <NotificationPreview

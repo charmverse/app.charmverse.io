@@ -9,7 +9,6 @@ import { LoginPageContent } from 'components/login';
 import Footer from 'components/login/Footer';
 import { getKey } from 'hooks/useLocalStorage';
 import { usePageTitle } from 'hooks/usePageTitle';
-import type { PathProps } from 'hooks/useSettingsDialog';
 import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
@@ -53,13 +52,9 @@ export default function LoginPage() {
   }
 
   useEffect(() => {
-    const task = router.query.task;
     const account = router.query.account;
 
     if (!isSettingsDialogOpen && router.isReady) {
-      if (task) {
-        openSettingsModal('notifications', { taskType: task } as PathProps);
-      }
       if (account) {
         openSettingsModal('account');
       }
