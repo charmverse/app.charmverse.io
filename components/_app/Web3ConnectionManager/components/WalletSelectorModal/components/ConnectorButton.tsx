@@ -19,7 +19,7 @@ const ButtonContent = styled.div`
 
 type Props = {
   name: string;
-  onClick: () => void;
+  onClick?: () => void;
   iconUrl?: string;
   icon?: ReactNode;
   disabled: boolean;

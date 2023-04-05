@@ -34,11 +34,12 @@ export type AnyIdLogin<I extends IdentityType = IdentityType> = {
 
 export interface DialogProps {
   isOpen: boolean;
+  redirectUrl?: string;
   onClose: () => void;
 }
 
 function LoginHandler(props: DialogProps) {
-  const { onClose, isOpen } = props;
+  const { redirectUrl, onClose, isOpen } = props;
   const { loginFromWeb3Account } = useWeb3AuthSig();
   // Governs whether we should auto-request a signature. Should only happen on first login.
   const [enableAutosign, setEnableAutoSign] = useState(true);
@@ -73,7 +74,7 @@ function LoginHandler(props: DialogProps) {
       sendingMagicLink.current = true;
       // console.log('Handling magic link request');
       try {
-        await requestMagicLinkViaFirebase({ email });
+        await requestMagicLinkViaFirebase({ email, redirectUrl });
         onClose();
         setLoginMethod(null);
       } catch (err) {
@@ -145,16 +146,22 @@ function LoginHandler(props: DialogProps) {
               Connect Account
             </DialogTitle>
 
-            <Link data-test='connect-discord' href={`/api/discord/oauth?type=login&redirect=${returnUrl ?? '/'}`}>
+            <Link
+              data-test='connect-discord'
+              href={
+                typeof window !== 'undefined'
+                  ? `/api/discord/oauth?type=login&redirect=${returnUrl ?? redirectUrl ?? '/'}`
+                  : ''
+              }
+            >
               <ListItem>
                 <ConnectorButton
-                  onClick={() => {}}
                   name='Connect with Discord'
                   disabled={false}
                   isActive={false}
                   isLoading={false}
                   icon={
-                    <SvgIcon viewBox='0 -10 70 70' sx={{ color: '#5865F2' }}>
+                    <SvgIcon viewBox='0 0 70 70' sx={{ color: '#5865F2' }}>
                       <DiscordIcon />
                     </SvgIcon>
                   }
@@ -204,7 +211,9 @@ function LoginHandler(props: DialogProps) {
   );
 }
 
-export function Login() {
+// http://localhost:3000/?returnUrl=%2Fyammering-dao-prawn%2Fpage-5027232419461514%3FviewId%3De276c8a5-4535-4883-ab49-7a80bc635264
+
+export function Login({ redirectUrl }: { redirectUrl?: string }) {
   const loginDialog = usePopupState({ variant: 'popover', popupId: 'login-dialog' });
   const { resetSigning } = useWeb3AuthSig();
 
@@ -228,7 +237,7 @@ export function Login() {
       >
         Connect
       </Button>
-      <LoginHandler isOpen={loginDialog.isOpen} onClose={handleClose} />
+      <LoginHandler redirectUrl={redirectUrl} isOpen={loginDialog.isOpen} onClose={handleClose} />
     </div>
   );
 }
