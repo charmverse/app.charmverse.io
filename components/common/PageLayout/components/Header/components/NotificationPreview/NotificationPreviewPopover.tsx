@@ -6,14 +6,8 @@ import { NotificationModal } from './NotificationModal';
 import { NotificationPreview } from './NotificationPreview';
 import { useNotificationPreview } from './useNotificationPreview';
 
-export function NotificationPreviewPopover({
-  onSeeAllClick,
-  close
-}: {
-  onSeeAllClick: VoidFunction;
-  close: VoidFunction;
-}) {
-  const { notificationPreviews, markAsRead } = useNotificationPreview();
+export function NotificationPreviewPopover({ close }: { close: VoidFunction }) {
+  const { unmarkedNotificationPreviews, markAsRead, markedNotificationPreviews } = useNotificationPreview();
   const [openNotificationsModal, setOpenNotificationsModal] = useState(false);
   const MAX_COUNT = 5;
 
@@ -30,8 +24,8 @@ export function NotificationPreviewPopover({
       </Card>
       <Divider />
       <Box maxHeight={500} sx={{ overflowY: 'auto', overflowX: 'hidden' }}>
-        {notificationPreviews.length > 0 ? (
-          notificationPreviews.slice(0, MAX_COUNT).map((notification) => (
+        {unmarkedNotificationPreviews.length > 0 ? (
+          unmarkedNotificationPreviews.slice(0, MAX_COUNT).map((notification) => (
             <Fragment key={notification.taskId}>
               <NotificationPreview notification={notification} markAsRead={markAsRead} onClose={close} />
               <Divider />
@@ -71,7 +65,9 @@ export function NotificationPreviewPopover({
       <NotificationModal
         isOpen={openNotificationsModal}
         onClose={handleModalClose}
-        unmarkedNotifications={notificationPreviews}
+        unmarkedNotifications={unmarkedNotificationPreviews}
+        markedNotifications={markedNotificationPreviews}
+        markAsRead={markAsRead}
       />
     </Box>
   );

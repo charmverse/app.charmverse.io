@@ -34,7 +34,7 @@ export function useNotificationPreview() {
   const { user } = useUser();
   const currentUserId = user?.id;
 
-  const notificationPreviews: NotificationDetails[] = useMemo(() => {
+  const unmarkedNotificationPreviews: NotificationDetails[] = useMemo(() => {
     if (!tasks) return [];
     return [
       ...getNotificationPreviewItems(tasks.votes.unmarked, 'votes', currentUserId),
@@ -99,7 +99,7 @@ export function useNotificationPreview() {
     []
   );
 
-  return { notificationPreviews, markedNotificationPreviews, markAsRead };
+  return { unmarkedNotificationPreviews, markedNotificationPreviews, markAsRead };
 }
 
 function getNotificationPreviewItems(

@@ -4,7 +4,6 @@ import CloseIcon from '@mui/icons-material/Close';
 import CommentIcon from '@mui/icons-material/Comment';
 import ForumIcon from '@mui/icons-material/Forum';
 import HowToVoteIcon from '@mui/icons-material/HowToVote';
-import KeyIcon from '@mui/icons-material/Key';
 import LayersIcon from '@mui/icons-material/Layers';
 import BountyIcon from '@mui/icons-material/RequestPageOutlined';
 import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
@@ -12,21 +11,18 @@ import { Badge, Box, Dialog, DialogContent, Divider, IconButton, Tab, Tabs, Tool
 import router from 'next/router';
 import { Fragment, useState } from 'react';
 
+import { SectionName } from 'components/common/PageLayout/components/Sidebar/Sidebar';
+import { SidebarLink } from 'components/common/PageLayout/components/Sidebar/SidebarButton';
 import { tabStyles } from 'components/nexus/TasksPage';
 import Legend from 'components/settings/Legend';
 import { useSmallScreen } from 'hooks/useMediaScreens';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
-import { SectionName } from '../../../Sidebar/Sidebar';
-import { SidebarLink } from '../../../Sidebar/SidebarButton';
-
 import { NotificationPreview } from './NotificationPreview';
-import type { NotificationDetails } from './useNotificationPreview';
-import { useNotificationPreview } from './useNotificationPreview';
+import type { MarkNotificationAsRead, NotificationDetails } from './useNotificationPreview';
 
-const TASK_TABS = [
+const NOTIFICATION_TABS = [
   { icon: <LayersIcon />, label: 'All', type: 'all' },
-  { icon: <KeyIcon />, label: 'Multisig', type: 'multisig' },
   { icon: <BountyIcon />, label: 'Bounty', type: 'bounty' },
   { icon: <HowToVoteIcon />, label: 'Poll', type: 'vote' },
   { icon: <ForumIcon />, label: 'Discussion', type: 'mention' },
@@ -34,46 +30,44 @@ const TASK_TABS = [
   { icon: <CommentIcon />, label: 'Forum', type: 'forum' }
 ] as const;
 
+type NotificationDisplayType = (typeof NOTIFICATION_TABS)[number]['type'];
+
 export function NotificationModal({
   isOpen,
   onClose,
-  unmarkedNotifications
+  unmarkedNotifications: unmarked,
+  markedNotifications: marked,
+  markAsRead
 }: {
   isOpen: boolean;
   onClose: VoidFunction;
   unmarkedNotifications: NotificationDetails[];
+  markedNotifications: NotificationDetails[];
+  markAsRead: MarkNotificationAsRead;
 }) {
-  const { markAsRead, markedNotificationPreviews } = useNotificationPreview();
   const isMobile = useSmallScreen();
-  type TaskType = (typeof TASK_TABS)[number]['type'];
 
-  const [currentTaskType, setCurrentTaskType] = useState<TaskType>('all');
+  const [notificationsDisplayType, setNotificationsDisplayType] = useState<NotificationDisplayType>('all');
 
-  const notificationCount: Record<(typeof TASK_TABS)[number]['type'], boolean> = {
-    vote: !!unmarkedNotifications.find((n) => n.type === 'vote'),
-    mention: !!unmarkedNotifications.find((n) => n.type === 'mention'),
-    proposal: !!unmarkedNotifications.find((n) => n.type === 'proposal'),
-    bounty: !!unmarkedNotifications.find((n) => n.type === 'bounty'),
-    forum: !!unmarkedNotifications.find((n) => n.type === 'forum'),
-    all: false,
-    multisig: false
+  function filterNotifications(notifications: NotificationDetails[]) {
+    if (notificationsDisplayType === 'all') {
+      return notifications;
+    } else {
+      return notifications.filter((n) => n.type === notificationsDisplayType);
+    }
+  }
+
+  const hasUnreadNotifications: Record<(typeof NOTIFICATION_TABS)[number]['type'], boolean> = {
+    vote: !!unmarked.find((n) => n.type === 'vote'),
+    mention: !!unmarked.find((n) => n.type === 'mention'),
+    proposal: !!unmarked.find((n) => n.type === 'proposal'),
+    bounty: !!unmarked.find((n) => n.type === 'bounty'),
+    forum: !!unmarked.find((n) => n.type === 'forum'),
+    all: !!unmarked.length
   };
 
-  function seletedUnmarkedNotifications() {
-    if (currentTaskType === 'all') {
-      return unmarkedNotifications;
-    } else {
-      return unmarkedNotifications.filter((n) => n.type === currentTaskType);
-    }
-  }
-
-  function seletedMarkedNotifications() {
-    if (currentTaskType === 'all') {
-      return markedNotificationPreviews;
-    } else {
-      return markedNotificationPreviews.filter((n) => n.type === currentTaskType);
-    }
-  }
+  const markedNotifications = filterNotifications(marked);
+  const unmarkedNotifications = filterNotifications(unmarked);
 
   return (
     <Dialog
@@ -96,7 +90,7 @@ export function NotificationModal({
           <Box mt={2} py={0.5}>
             <SectionName>Notification Type</SectionName>
           </Box>
-          {TASK_TABS.map((tab) => (
+          {NOTIFICATION_TABS.map((tab) => (
             <SidebarLink
               key={tab.label}
               label={tab.label}
@@ -113,15 +107,15 @@ export function NotificationModal({
                       }
                     }
                   }}
-                  invisible={!notificationCount[tab.type]}
+                  invisible={!hasUnreadNotifications[tab.type]}
                   color='error'
                   variant='dot'
                 >
                   {tab.icon}
                 </Badge>
               }
-              onClick={() => setCurrentTaskType(tab.type)}
-              active={tab.type === currentTaskType}
+              onClick={() => setNotificationsDisplayType(tab.type)}
+              active={tab.type === notificationsDisplayType}
             />
           ))}
         </Box>
@@ -135,7 +129,7 @@ export function NotificationModal({
                 justifyContent='space-between'
               >
                 <Typography variant='h2' fontSize='inherit' textTransform='capitalize' fontWeight={700}>
-                  {`${currentTaskType} Notifications`}
+                  {`${notificationsDisplayType} Notifications`}
                 </Typography>
                 <Box display='flex' alignItems='center' gap={{ sm: 2, xs: 1 }}>
                   <Tooltip title='Mark all as read'>
@@ -148,62 +142,62 @@ export function NotificationModal({
                   </IconButton>
                 </Box>
               </Legend>
-              {isMobile && (
-                <Tabs
-                  sx={tabStyles}
-                  indicatorColor='primary'
-                  value={TASK_TABS.findIndex((taskTab) => taskTab.type === currentTaskType)}
-                >
-                  {TASK_TABS.map((task) => (
-                    <Tab
-                      component='div'
-                      disableRipple
-                      iconPosition='start'
-                      icon={
-                        <>
-                          <Badge
-                            invisible={!notificationCount[task.type]}
-                            sx={{ left: -15, marginTop: 1 }}
-                            color='error'
-                            variant='dot'
-                          />
-                          {task.icon}
-                        </>
-                      }
-                      key={task.label}
-                      sx={{
-                        px: 1.5,
-                        fontSize: 14,
-                        minHeight: 0,
-                        mb: {
-                          xs: 1,
-                          md: 0
-                        },
-                        '&.MuiTab-root': {
-                          color: (theme) => theme.palette.secondary.main,
-                          display: 'flex',
-                          flexDirection: {
-                            xs: 'column',
-                            md: 'row'
-                          }
-                        },
-                        '& .MuiSvgIcon-root': {
-                          mr: {
-                            xs: 0,
-                            md: 1
-                          }
+
+              <Tabs
+                sx={{ ...tabStyles, display: isMobile ? 'block' : 'none' }}
+                indicatorColor='primary'
+                value={NOTIFICATION_TABS.findIndex((taskTab) => taskTab.type === notificationsDisplayType)}
+              >
+                {NOTIFICATION_TABS.map((task) => (
+                  <Tab
+                    component='div'
+                    disableRipple
+                    iconPosition='start'
+                    icon={
+                      <>
+                        <Badge
+                          invisible={!hasUnreadNotifications[task.type]}
+                          sx={{ left: -15, marginTop: 1 }}
+                          color='error'
+                          variant='dot'
+                        />
+                        {task.icon}
+                      </>
+                    }
+                    key={task.label}
+                    sx={{
+                      px: 1.5,
+                      fontSize: 14,
+                      minHeight: 0,
+                      mb: {
+                        xs: 1,
+                        md: 0
+                      },
+                      '&.MuiTab-root': {
+                        color: (theme) => theme.palette.secondary.main,
+                        display: 'flex',
+                        flexDirection: {
+                          xs: 'column',
+                          md: 'row'
                         }
-                      }}
-                      label={task.label}
-                      onClick={() => {
-                        setUrlWithoutRerender(router.pathname, { task: task.type });
-                        setCurrentTaskType(task.type);
-                      }}
-                    />
-                  ))}
-                </Tabs>
-              )}
-              {seletedUnmarkedNotifications().map((notification) => (
+                      },
+                      '& .MuiSvgIcon-root': {
+                        mr: {
+                          xs: 0,
+                          md: 1
+                        }
+                      }
+                    }}
+                    label={task.label}
+                    onClick={() => {
+                      setUrlWithoutRerender(router.pathname, { task: task.type });
+                      setNotificationsDisplayType(task.type);
+                    }}
+                  />
+                ))}
+              </Tabs>
+
+              {unmarkedNotifications.map((notification) => (
                 <Fragment key={notification.taskId}>
                   <NotificationPreview
                     large
@@ -215,14 +209,14 @@ export function NotificationModal({
                   <Divider />
                 </Fragment>
               ))}
-              {seletedMarkedNotifications().map((notification) => (
+              {markedNotifications.map((notification) => (
                 <Fragment key={notification.taskId}>
                   <NotificationPreview large notification={notification} markAsRead={markAsRead} onClose={onClose} />
                   <Divider />
                 </Fragment>
               ))}
 
-              {seletedUnmarkedNotifications()?.length < 1 && seletedMarkedNotifications()?.length < 1 && (
+              {unmarkedNotifications.length < 1 && markedNotifications.length < 1 && (
                 <Box
                   display='flex'
                   justifyContent='center'
