@@ -14,7 +14,7 @@ export function MultiSigConnectCard({
   return (
     <Card variant='outlined'>
       <Box p={3} textAlign='center'>
-        <Typography color='secondary'>Import your Gnosis safes.</Typography>
+        <Typography color='secondary'>Click the button below to import your Gnosis safes.</Typography>
         <br />
         <Tooltip title={!connectable ? 'Please unlock your wallet and ensure it is connected to your account.' : ''}>
           <Box>
