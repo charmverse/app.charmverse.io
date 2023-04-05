@@ -29,10 +29,11 @@ export const getUserNFTs = async (userId: string) => {
   const mappedNfts = (
     await Promise.all(
       supportedMainnets.map((mainnetChainId) =>
-        getNFTs(
-          wallets.map((w) => w.address),
-          mainnetChainId
-        )
+        getNFTs({
+          userId,
+          addresses: wallets.map((w) => w.address),
+          chainId: mainnetChainId
+        })
       )
     )
   )

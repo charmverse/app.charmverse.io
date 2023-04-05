@@ -6,7 +6,6 @@ const readOnly: SpacePermissionTemplate = {
   spaceOperations: {
     createBounty: false,
     createPage: false,
-    createVote: false,
     createForumCategory: false,
     moderateForums: false,
     reviewProposals: false
@@ -22,7 +21,6 @@ const collaborative: SpacePermissionTemplate = {
   spaceOperations: {
     createPage: true,
     createBounty: true,
-    createVote: true,
     createForumCategory: false,
     moderateForums: false,
     reviewProposals: true
@@ -38,7 +36,6 @@ const open: SpacePermissionTemplate = {
   spaceOperations: {
     createPage: true,
     createBounty: true,
-    createVote: true,
     createForumCategory: false,
     moderateForums: false,
     reviewProposals: true

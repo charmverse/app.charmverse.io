@@ -58,9 +58,7 @@ export function ProposalCategoryRolePermissionRow({
 
   const assigneeName = useMemo(() => {
     if (label) return label;
-    return assignee.group === 'space'
-      ? `Everyone at ${space?.name}`
-      : roles.roles?.find((r) => r.id === assignee.id)?.name;
+    return assignee.group === 'space' ? `Default permissions` : roles.roles?.find((r) => r.id === assignee.id)?.name;
   }, [label, roles, space]);
 
   function handleUpdate(level: keyof typeof friendlyLabels) {

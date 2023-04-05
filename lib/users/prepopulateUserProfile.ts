@@ -1,4 +1,5 @@
 import type { User, UserWallet } from '@prisma/client';
+import { uniqBy } from 'lodash';
 
 import { prisma } from 'db';
 import { getENSDetails } from 'lib/blockchain';
@@ -76,13 +77,16 @@ export async function prepopulateUserProfile(
               break;
             }
           } catch (error) {
-            log.error('Failed to save nft avatar', { error, url: nft.image, userId: user.id });
+            log.warn('Failed to save nft avatar', { error, url: nft.image, userId: user.id });
           }
         }
       }
     }
 
-    const fiveNFTs = nfts.filter((nft) => !!nft.id).slice(0, 5);
+    const fiveNFTs = uniqBy(
+      nfts.filter((nft) => !!nft.id),
+      'id'
+    ).slice(0, 5);
 
     await Promise.all(
       fiveNFTs.map((nft) =>

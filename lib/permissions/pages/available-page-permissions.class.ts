@@ -1,6 +1,8 @@
 import { PageOperations } from '@prisma/client';
 
-import { Permissions } from '../permissions.class';
+import { typedKeys } from 'lib/utilities/objects';
+
+import { BasePermissions } from '../basePermissions.class';
 
 import type { IPagePermissionFlags, PageOperationType } from './page-permission-interfaces';
 
@@ -9,28 +11,10 @@ import type { IPagePermissionFlags, PageOperationType } from './page-permission-
  *
  * Permissions can be added, but not removed.
  */
-export class AllowedPagePermissions extends Permissions<PageOperationType> {
-  read: boolean = false;
-
-  delete: boolean = false;
-
-  comment: boolean = false;
-
-  create_poll: boolean = false;
-
-  edit_position: boolean = false;
-
-  edit_content: boolean = false;
-
-  edit_isPublic: boolean = false;
-
-  edit_path: boolean = false;
-
-  grant_permissions: boolean = false;
-
+export class AllowedPagePermissions extends BasePermissions<PageOperationType> {
   constructor(initialPermissions: PageOperationType[] | Partial<IPagePermissionFlags> = []) {
     super({
-      allowedOperations: Object.keys(PageOperations) as PageOperationType[]
+      allowedOperations: typedKeys(PageOperations)
     });
 
     this.addPermissions(initialPermissions);
