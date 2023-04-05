@@ -1,12 +1,12 @@
-import type { Space, SpaceOperation, SpacePermissionConfigurationMode } from '@prisma/client';
+import type { CharmversePrismaClient as Prisma } from '@charmverse/core';
 
 export interface SpacePermissionConfigurationUpdate {
   spaceId: string;
-  permissionConfigurationMode: SpacePermissionConfigurationMode;
+  permissionConfigurationMode: Prisma.SpacePermissionConfigurationMode;
 }
-export type SpaceConfigurationPreset = Exclude<SpacePermissionConfigurationMode, 'custom'>;
+export type SpaceConfigurationPreset = Exclude<Prisma.SpacePermissionConfigurationMode, 'custom'>;
 
 export interface SpacePermissionTemplate {
-  spaceOperations: Record<SpaceOperation, boolean>;
-  pagePermissionDefaults: Pick<Space, 'defaultPagePermissionGroup' | 'defaultPublicPages' | 'publicBountyBoard'>;
+  spaceOperations: Record<Prisma.SpaceOperation, boolean>;
+  pagePermissionDefaults: Pick<Prisma.Space, 'defaultPagePermissionGroup' | 'defaultPublicPages' | 'publicBountyBoard'>;
 }
