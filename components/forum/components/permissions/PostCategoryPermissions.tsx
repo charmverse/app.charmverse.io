@@ -36,7 +36,7 @@ type Props = {
 function PostCategoryPermissions({ postCategory, permissions }: Props) {
   const { data, mutate: mutatePermissions } = useSWR(
     `/api/forum/list-post-category-permissions-${postCategory.id}`,
-    () => charmClient.permissions.forum.listPostCategoryPermissions({ categoryId: postCategory.id })
+    () => charmClient.permissions.forum.listPostCategoryPermissions(postCategory.id)
   );
 
   const { roles } = useRoles();

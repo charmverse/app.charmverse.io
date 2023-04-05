@@ -45,7 +45,7 @@ export function DefaultPagePermissions() {
   async function updateSpaceDefaultPagePermission() {
     if (space && selectedPagePermission !== space?.defaultPagePermissionGroup) {
       setIsUpdatingPagePermission(true);
-      const updatedSpace = await charmClient.setDefaultPagePermission({
+      const updatedSpace = await charmClient.permissions.spaces.setDefaultPagePermission({
         spaceId: space.id,
         pagePermissionLevel: selectedPagePermission
       });

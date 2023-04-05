@@ -31,10 +31,10 @@ export class ProposalPermissionsApi {
     return http.DELETE('/api/permissions/proposals', { permissionId } as PermissionToDelete);
   }
 
-  listProposalCategoryPermissions(query: { spaceId?: string; categoryId?: string }) {
+  listProposalCategoryPermissions(resourceId: string) {
     return http.GET<AssignedProposalCategoryPermission[]>(
       '/api/permissions/proposals/list-proposal-category-permissions',
-      query
+      { resourceId }
     );
   }
 }

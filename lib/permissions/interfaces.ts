@@ -61,17 +61,6 @@ export type PermissionCompute = {
   resourceId: string;
   userId?: string;
 };
-
-/**
- * @id The userId, roleId or spaceId
- * @resourceId The resource such as Space or Page we are querying permissions for
- */
-export interface AssignedPermissionsQuery {
-  group: AssignablePermissionGroups;
-  id: string;
-  resourceId: string;
-}
-
 // Version of above interfaces that allows for public to be specified
 export type AssignablePermissionGroupsWithPublic = AssignablePermissionGroups | 'public';
 

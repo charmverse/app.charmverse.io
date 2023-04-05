@@ -24,11 +24,8 @@ export function ProposalPagePermissions({ proposalId }: Props) {
     charmClient.proposals.getProposal(proposalId)
   );
   const { data: proposalCategoryPermissions } = useSWR(
-    !proposal ? null : `/proposals/list-proposal-category-permissions-${proposal!.categoryId}`,
-    () =>
-      charmClient.permissions.proposals.listProposalCategoryPermissions({
-        categoryId: proposal!.categoryId as string
-      })
+    !proposal ? null : `/proposals/list-proposal-category-permissions-${proposal.categoryId}`,
+    () => charmClient.permissions.proposals.listProposalCategoryPermissions(proposal!.categoryId as string)
   );
 
   const { roles } = useRoles();

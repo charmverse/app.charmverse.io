@@ -65,14 +65,13 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
 
   const currentSpaceId = space?.id;
 
-  const { data: proposalCategoryPermissions, mutate: mutateProposalCategoryPermissions } = useSWR(
-    currentSpaceId ? `/proposals/list-proposal-category-permissions-${currentSpaceId}` : null,
-    () => charmClient.permissions.proposals.listProposalCategoryPermissions({ spaceId: currentSpaceId })
+  const { data, mutate: refreshPermissions } = useSWR(
+    currentSpaceId ? `/proposals/list-permissions-${currentSpaceId}` : null,
+    () => charmClient.permissions.spaces.listSpacePermissions(currentSpaceId as string)
   );
-  const { data: postCategoryPermissions, mutate: mutatePostCategoryPermissions } = useSWR(
-    currentSpaceId ? `/posts/list-post-category-permissions-${currentSpaceId}` : null,
-    () => charmClient.permissions.forum.listPostCategoryPermissions({ spaceId: currentSpaceId })
-  );
+
+  const postCategoryPermissions = data?.forumCategories;
+  const proposalCategoryPermissions = data?.proposalCategories;
 
   const defaultProposalCategoryPermissions = proposalCategoryPermissions?.filter((permission) => {
     return permission.assignee.group === 'space' && permission.assignee.id === currentSpaceId;
@@ -82,34 +81,23 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
     return permission.assignee.group === 'space' && permission.assignee.id === currentSpaceId;
   });
 
-  const { data: memberPermissionFlags } = useSWR(
-    targetGroup !== 'space' && currentSpaceId ? `member-permissions-${currentSpaceId}` : null,
-    () =>
-      charmClient.queryGroupSpacePermissions({
-        group: 'space',
-        id: currentSpaceId as string,
-        resourceId: currentSpaceId as string
-      })
-  );
+  const memberPermissionFlags = data?.standard.filter((permission) => permission.spaceId === currentSpaceId);
 
   usePreventReload(touched);
 
-  useEffect(() => {
-    if (currentSpaceId) {
-      refreshGroupPermissions(currentSpaceId);
-    }
-  }, [currentSpaceId]);
+  // useEffect(() => {
+  //   if (currentSpaceId) {
+  //     refreshGroupPermissions(currentSpaceId);
+  //   }
+  // }, [currentSpaceId]);
 
   async function refreshGroupPermissions(resourceId: string) {
-    const permissionFlags = await charmClient.queryGroupSpacePermissions({
-      group: targetGroup,
-      id,
-      resourceId
-    });
-    spaceOperations.forEach((op) => {
-      setValue(op, permissionFlags[op]);
-    });
-    setAssignedPermissions(permissionFlags);
+    await refreshPermissions();
+
+    // spaceOperations.forEach((op) => {
+    //   setValue(op, permissionFlags[op]);
+    // });
+    // setAssignedPermissions(permissionFlags);
   }
 
   async function submitted(formValues: FormValues) {
@@ -132,7 +120,7 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
       let newPermissionState = assignedPermissions;
 
       if (permissionsToAdd.length > 0) {
-        newPermissionState = await charmClient.addSpacePermissions({
+        newPermissionState = await charmClient.permissions.spaces.addSpacePermissions({
           forSpaceId: currentSpaceId,
           operations: permissionsToAdd,
           spaceId: targetGroup === 'space' ? id : undefined,
@@ -141,7 +129,7 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
       }
 
       if (permissionsToRemove.length > 0) {
-        newPermissionState = await charmClient.removeSpacePermissions({
+        newPermissionState = await charmClient.permissions.spaces.removeSpacePermissions({
           forSpaceId: currentSpaceId,
           operations: permissionsToRemove,
           spaceId: targetGroup === 'space' ? id : undefined,
@@ -152,31 +140,27 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
       setAssignedPermissions(newPermissionState);
       callback();
       setTouched(false);
-      // update the cache of other rows
-      if (targetGroup === 'space') {
-        mutate(`member-permissions-${currentSpaceId}`);
-      }
     }
   }
 
   async function deleteProposalCategoryPermission(permissionId: string) {
     await charmClient.permissions.proposals.deleteProposalCategoryPermission(permissionId);
-    mutateProposalCategoryPermissions();
+    refreshPermissions();
   }
 
   async function updateProposalCategoryPermission(input: ProposalCategoryPermissionInput) {
     await charmClient.permissions.proposals.upsertProposalCategoryPermission(input);
-    mutateProposalCategoryPermissions();
+    refreshPermissions();
   }
 
   async function deletePostCategoryPermission(permissionId: string) {
     await charmClient.permissions.forum.deletePostCategoryPermission(permissionId);
-    mutatePostCategoryPermissions();
+    refreshPermissions();
   }
 
   async function updatePostCategoryPermission(input: PostCategoryPermissionInput) {
     await charmClient.permissions.forum.upsertPostCategoryPermission(input);
-    mutatePostCategoryPermissions();
+    refreshPermissions();
   }
 
   return (

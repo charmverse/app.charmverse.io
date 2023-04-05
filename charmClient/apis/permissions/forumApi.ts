@@ -28,7 +28,9 @@ export class ForumPermissionsApi {
     return http.DELETE('/api/permissions/forum', { permissionId } as PermissionToDelete);
   }
 
-  listPostCategoryPermissions(query: { spaceId?: string; categoryId?: string }) {
-    return http.GET<AssignedPostCategoryPermission[]>('/api/permissions/forum/list-post-category-permissions', query);
+  listPostCategoryPermissions(resourceId: string) {
+    return http.GET<AssignedPostCategoryPermission[]>('/api/permissions/forum/list-post-category-permissions', {
+      resourceId
+    });
   }
 }
