@@ -7,7 +7,7 @@
   "scripts": {
     "build": "NODE_OPTIONS=\"--max_old_space_size=4096\" next build",
     "build:win": "npx next build",
-    "build:prisma": "npx prisma generate --schema=node_modules/@charmverse/core/src/prisma/schema.prisma",
+    "build:prisma": "npx prisma generate",
     "build:analyze": "cross-env ANALYZE=true next build",
     "deploy:staging": "npx cdk deploy \"stg-charmverse-${STAGE}\" --outputs-file cdk.out.json",
     "postdeploy:staging": "node --eval \"console.log('env_url=' + require('./cdk.out.json')['stg-charmverse-${STAGE}'].DeploymentUrl)\"  >> $GITHUB_OUTPUT",
@@ -26,7 +26,7 @@
     "migrate:staging": "npx dotenv -e .env.staging -- prisma migrate deploy",
     "debug:e2e": "dotenv -e .env.test.local -- npx playwright test --headed --timeout=0",
     "notifications:debug": "ts-node ./scripts/readNotifications.ts",
-    "postinstall": "patch-package",
+    "postinstall": "patch-package && ln -s -n ./node_modules/@charmverse/core/src/prisma ./prisma",
     "server:dev": "npx react-env --path .env.local -- node node_modules/.bin/next start",
     "server:prod": "node --require dd-trace/init node_modules/.bin/next start",
     "server:prod:win": "node --require dd-trace/init node_modules/next/dist/bin/next start",
