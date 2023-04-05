@@ -11,7 +11,6 @@ import { Badge, Box, Dialog, DialogContent, Divider, IconButton, Tab, Tabs, Tool
 import router from 'next/router';
 import { Fragment } from 'react';
 
-import { useNotificationModal } from 'components/common/PageLayout/components/Header/components/NotificationPreview/useNotificationModal';
 import { SectionName } from 'components/common/PageLayout/components/Sidebar/Sidebar';
 import { SidebarLink } from 'components/common/PageLayout/components/Sidebar/SidebarButton';
 import { tabStyles } from 'components/nexus/TasksPage';
@@ -20,6 +19,7 @@ import { useSmallScreen } from 'hooks/useMediaScreens';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
 import { NotificationPreview } from './NotificationPreview';
+import { useNotificationModal } from './useNotificationModal';
 import type { MarkNotificationAsRead, NotificationDetails } from './useNotificationPreview';
 
 const NOTIFICATION_TABS = [
@@ -51,7 +51,8 @@ export function NotificationModal({
     unmarkedNotifications,
     hasUnreadNotifications,
     notificationsDisplayType,
-    setNotificationsDisplayType
+    setNotificationsDisplayType,
+    markBulkAsRead
   } = useNotificationModal({ marked, unmarked });
 
   return (
@@ -118,7 +119,7 @@ export function NotificationModal({
                 </Typography>
                 <Box display='flex' alignItems='center' gap={{ sm: 2, xs: 1 }}>
                   <Tooltip title='Mark all as read'>
-                    <IconButton aria-label='close the notifications modal' onClick={() => null}>
+                    <IconButton aria-label='close the notifications modal' onClick={markBulkAsRead}>
                       <CheckCircleIcon color='secondary' fontSize='small' />
                     </IconButton>
                   </Tooltip>
