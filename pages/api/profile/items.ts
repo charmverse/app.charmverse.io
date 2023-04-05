@@ -13,6 +13,20 @@ handler.use(requireUser).put(updateUserProfileItems);
 
 async function updateUserProfileItems(req: NextApiRequest, res: NextApiResponse<any | { error: string }>) {
   const { profileItems }: UpdateProfileItemRequest = req.body;
+  const userWallets = await prisma.user.findUniqueOrThrow({
+    where: {
+      id: req.session.user.id
+    },
+    select: {
+      wallets: {
+        select: {
+          address: true
+        }
+      }
+    }
+  });
+
+  const firstWalletAddress = userWallets?.wallets[0].address;
 
   const shownProfileItems: Omit<ProfileItem, 'userId'>[] = [];
   const hiddenProfileItems: Omit<ProfileItem, 'userId'>[] = [];
@@ -54,7 +68,8 @@ async function updateUserProfileItems(req: NextApiRequest, res: NextApiResponse<
             userId: req.session.user.id,
             metadata: profileItem.metadata === null ? undefined : profileItem.metadata,
             isHidden: true,
-            type: profileItem.type
+            type: profileItem.type,
+            address: firstWalletAddress
           }
         })
       )
@@ -76,7 +91,8 @@ async function updateUserProfileItems(req: NextApiRequest, res: NextApiResponse<
           userId: req.session.user.id,
           metadata: profileItem.metadata === null ? undefined : profileItem.metadata,
           isPinned: profileItem.isPinned,
-          type: profileItem.type
+          type: profileItem.type,
+          address: firstWalletAddress
         }
       })
     )
