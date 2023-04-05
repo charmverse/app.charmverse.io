@@ -118,11 +118,13 @@ export function NotificationModal({
                   {`${notificationsDisplayType} Notifications`}
                 </Typography>
                 <Box display='flex' alignItems='center' gap={{ sm: 2, xs: 1 }}>
-                  <Tooltip title='Mark all as read'>
-                    <IconButton aria-label='close the notifications modal' onClick={markBulkAsRead}>
-                      <CheckCircleIcon color='secondary' fontSize='small' />
-                    </IconButton>
-                  </Tooltip>
+                  {hasUnreadNotifications[notificationsDisplayType] && (
+                    <Tooltip title='Mark all as read'>
+                      <IconButton aria-label='mark notifications as read' onClick={markBulkAsRead}>
+                        <CheckCircleIcon color='secondary' fontSize='small' />
+                      </IconButton>
+                    </Tooltip>
+                  )}
                   <IconButton aria-label='close the notifications modal' onClick={onClose}>
                     <CloseIcon color='secondary' fontSize='small' />
                   </IconButton>
