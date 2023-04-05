@@ -26,13 +26,15 @@ describe('disconnectWallet', () => {
                 id: '0x1234',
                 type: 'nft',
                 isHidden: false,
-                isPinned: true
+                isPinned: true,
+                address: walletAddress
               },
               {
                 id: '012345',
                 type: 'community',
                 isHidden: false,
-                isPinned: true
+                isPinned: true,
+                address: walletAddress
               }
             ]
           }

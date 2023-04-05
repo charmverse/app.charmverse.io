@@ -8,7 +8,7 @@ export async function updateProfileItem<Data extends { id: string; isPinned: boo
   type: ProfileItem['type'],
   mutate?: KeyedMutator<Data[]>
 ) {
-  const profileItem: Omit<ProfileItem, 'userId'> = {
+  const profileItem: Omit<ProfileItem, 'userId' | 'address'> = {
     id: data.id,
     isHidden: data.isHidden,
     type,

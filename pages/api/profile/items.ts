@@ -28,8 +28,8 @@ async function updateUserProfileItems(req: NextApiRequest, res: NextApiResponse<
 
   const firstWalletAddress = userWallets?.wallets[0].address;
 
-  const shownProfileItems: Omit<ProfileItem, 'userId'>[] = [];
-  const hiddenProfileItems: Omit<ProfileItem, 'userId'>[] = [];
+  const shownProfileItems: Omit<ProfileItem, 'userId' | 'address'>[] = [];
+  const hiddenProfileItems: Omit<ProfileItem, 'userId' | 'address'>[] = [];
   profileItems.forEach((profileItem) => {
     if (!profileItem.isHidden) {
       shownProfileItems.push(profileItem);
