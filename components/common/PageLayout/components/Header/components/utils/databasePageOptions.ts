@@ -281,7 +281,7 @@ export async function addNewCards({
   const headers = results.meta.fields || [];
 
   // Remove name property because it is not an option
-  const allAvailableProperties = headers.filter((header) => header !== 'Name');
+  const allAvailableProperties = headers.filter((header) => header !== 'Name' && header !== 'Title');
 
   const mappedInitialBoardProperties = mapCardBoardProperties(board.fields.cardProperties);
 

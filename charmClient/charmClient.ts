@@ -241,6 +241,10 @@ class CharmClient {
     return http.DELETE<ModifyChildPagesResponse>(`/api/pages/${pageId}`);
   }
 
+  deletePages(pageIds: string[]) {
+    return http.DELETE<ModifyChildPagesResponse>(`/api/pages`, pageIds);
+  }
+
   favoritePage(pageId: string) {
     return http.POST<Partial<LoggedInUser>>('/api/profile/favorites', { pageId });
   }
@@ -365,6 +369,15 @@ class CharmClient {
     const fbBlock = this.blockToFBBlock(rootBlock);
     fbBlock.deletedAt = new Date().getTime();
     updater([fbBlock]);
+  }
+
+  async deleteBlocks(blockIds: string[], updater: BlockUpdater): Promise<void> {
+    const rootBlocks = await http.DELETE<Block[]>(`/api/blocks`, blockIds);
+    const fbBlocks = rootBlocks.map((rootBlock) => ({
+      ...this.blockToFBBlock(rootBlock),
+      deletedAt: new Date().getTime()
+    }));
+    updater(fbBlocks);
   }
 
   async insertBlocks(fbBlocks: FBBlock[], updater: BlockUpdater): Promise<FBBlock[]> {
