@@ -1,4 +1,4 @@
-import type { User } from '@prisma/client';
+import type { User, UserWallet } from '@prisma/client';
 
 import { prisma } from 'db';
 import { getENSDetails } from 'lib/blockchain';
@@ -17,7 +17,10 @@ const acceptedImageFormats = ['.jpg', '.jpeg', '.png', '.webp'];
  * @param user we need the user id and user avatar to populate many
  * @param ens the ENS name
  */
-export async function prepopulateUserProfile(user: User, ens: string | null) {
+export async function prepopulateUserProfile(
+  user: User & { wallets: Pick<UserWallet, 'address' | 'ensname'>[] },
+  ens: string | null
+) {
   const ensDetails = await getENSDetails(ens);
 
   if (
@@ -89,7 +92,8 @@ export async function prepopulateUserProfile(user: User, ens: string | null) {
             userId: user.id,
             isHidden: true,
             isPinned: true,
-            type: 'nft'
+            type: 'nft',
+            address: user.wallets[0].address
           }
         })
       )

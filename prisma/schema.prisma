@@ -537,10 +537,11 @@ model VerifiedEmail {
 }
 
 model UserWallet {
-  address String  @unique
-  userId  String  @db.Uuid
-  ensname String? @unique
-  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  address      String        @id @unique
+  userId       String        @db.Uuid
+  ensname      String?       @unique
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  profileItems ProfileItem[]
 
   @@index([userId])
 }
@@ -1026,13 +1027,15 @@ model ProposalReviewer {
 }
 
 model ProfileItem {
-  id       String          @id
-  userId   String          @db.Uuid
-  user     User            @relation(fields: [userId], references: [id], onDelete: Cascade)
-  isHidden Boolean?
-  metadata Json?
-  type     ProfileItemType
-  isPinned Boolean?
+  id         String          @id
+  userId     String          @db.Uuid
+  user       User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  isHidden   Boolean?
+  metadata   Json?
+  type       ProfileItemType
+  isPinned   Boolean?
+  address    String?
+  userWallet UserWallet?     @relation(fields: [address], references: [address], onDelete: Cascade)
 
   @@index([userId])
 }
