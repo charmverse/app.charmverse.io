@@ -6,7 +6,6 @@ import type {
 } from 'lib/permissions/forum/interfaces';
 import type { PostCategoryPermissionInput } from 'lib/permissions/forum/upsertPostCategoryPermission';
 import type { PermissionCompute, PermissionToDelete } from 'lib/permissions/interfaces';
-import type { PermissionsGroupQuery } from 'lib/permissions/proposals/listGroupProposalCategoryPermissions';
 
 export class ForumPermissionsApi {
   computePostPermissions({ postIdOrPath, spaceDomain }: { postIdOrPath: string; spaceDomain?: string }) {
@@ -29,16 +28,7 @@ export class ForumPermissionsApi {
     return http.DELETE('/api/permissions/forum', { permissionId } as PermissionToDelete);
   }
 
-  listPostCategoryPermissions(postCategoryId: string) {
-    return http.GET<AssignedPostCategoryPermission[]>('/api/permissions/forum/list-post-category-permissions', {
-      resourceId: postCategoryId
-    } as PermissionCompute);
-  }
-
-  listGroupPostCategoryPermissions(query: PermissionsGroupQuery) {
-    return http.GET<AssignedPostCategoryPermission[]>(
-      '/api/permissions/forum/list-group-post-category-permissions',
-      query
-    );
+  listPostCategoryPermissions(query: { spaceId?: string; categoryId?: string }) {
+    return http.GET<AssignedPostCategoryPermission[]>('/api/permissions/forum/list-post-category-permissions', query);
   }
 }

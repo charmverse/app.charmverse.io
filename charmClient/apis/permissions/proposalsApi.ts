@@ -5,7 +5,6 @@ import type {
   AvailableProposalCategoryPermissionFlags,
   AvailableProposalPermissionFlags
 } from 'lib/permissions/proposals/interfaces';
-import type { PermissionsGroupQuery } from 'lib/permissions/proposals/listGroupProposalCategoryPermissions';
 import type { ProposalCategoryPermissionInput } from 'lib/permissions/proposals/upsertProposalCategoryPermission';
 
 export class ProposalPermissionsApi {
@@ -32,18 +31,9 @@ export class ProposalPermissionsApi {
     return http.DELETE('/api/permissions/proposals', { permissionId } as PermissionToDelete);
   }
 
-  listProposalCategoryPermissions(proposalCategoryId: string) {
+  listProposalCategoryPermissions(query: { spaceId?: string; categoryId?: string }) {
     return http.GET<AssignedProposalCategoryPermission[]>(
       '/api/permissions/proposals/list-proposal-category-permissions',
-      {
-        resourceId: proposalCategoryId
-      } as PermissionCompute
-    );
-  }
-
-  listGroupProposalCategoryPermissions(query: PermissionsGroupQuery) {
-    return http.GET<AssignedProposalCategoryPermission[]>(
-      '/api/permissions/proposals/list-group-proposal-category-permissions',
       query
     );
   }

@@ -57,7 +57,7 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
   const [assignedPermissions, setAssignedPermissions] = useState<SpacePermissionFlags | null>(null);
   // custom onChange is used for switches so isDirty from useForm doesn't change it value
   const [touched, setTouched] = useState<boolean>(false);
-  const { handleSubmit, setValue } = useForm<FormValues>({
+  const { handleSubmit, setValue, formState } = useForm<FormValues>({
     mode: 'onChange',
     defaultValues: assignedPermissions ?? new AvailableSpacePermissions().empty,
     resolver: yupResolver(schema)
@@ -66,29 +66,21 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
   const currentSpaceId = space?.id;
 
   const { data: proposalCategoryPermissions, mutate: mutateProposalCategoryPermissions } = useSWR(
-    `/proposals/list-group-proposal-category-permissions-${id}`,
-    () => charmClient.permissions.proposals.listGroupProposalCategoryPermissions({ group: targetGroup, id })
+    currentSpaceId ? `/proposals/list-proposal-category-permissions-${currentSpaceId}` : null,
+    () => charmClient.permissions.proposals.listProposalCategoryPermissions({ spaceId: currentSpaceId })
   );
   const { data: postCategoryPermissions, mutate: mutatePostCategoryPermissions } = useSWR(
-    `/posts/list-group-post-category-permissions-${id}`,
-    () => charmClient.permissions.forum.listGroupPostCategoryPermissions({ group: targetGroup, id })
+    currentSpaceId ? `/posts/list-group-post-category-permissions-${currentSpaceId}` : null,
+    () => charmClient.permissions.forum.listPostCategoryPermissions({ spaceId: currentSpaceId })
   );
-  // retriee space-level permissions to display as default
-  const { data: spaceProposalCategoryPermissions } = useSWR(
-    currentSpaceId &&
-      targetGroup !== 'space' &&
-      `/proposals/list-group-proposal-category-permissions-${currentSpaceId}`,
-    () =>
-      charmClient.permissions.proposals.listGroupProposalCategoryPermissions({
-        group: 'space',
-        id: currentSpaceId as string
-      })
-  );
-  const { data: spacePostCategoryPermissions } = useSWR(
-    currentSpaceId && targetGroup !== 'space' && `/posts/list-group-post-category-permissions-${currentSpaceId}`,
-    () =>
-      charmClient.permissions.forum.listGroupPostCategoryPermissions({ group: 'space', id: currentSpaceId as string })
-  );
+
+  const defaultProposalCategoryPermissions = proposalCategoryPermissions?.filter((permission) => {
+    return permission.assignee.group === 'space' && permission.assignee.id === currentSpaceId;
+  });
+
+  const defaultPostCategoryPermissions = postCategoryPermissions?.filter((permission) => {
+    return permission.assignee.group === 'space' && permission.assignee.id === currentSpaceId;
+  });
 
   const { data: memberPermissionFlags } = useSWR(
     targetGroup !== 'space' && currentSpaceId ? `member-permissions-${currentSpaceId}` : null,
@@ -245,7 +237,7 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
               <Box flexGrow={1}>
                 {proposalCategories.map((category) => {
                   const permission = proposalCategoryPermissions?.find((p) => p.proposalCategoryId === category.id);
-                  const memberRolePermission = spaceProposalCategoryPermissions?.find(
+                  const memberRolePermission = defaultProposalCategoryPermissions?.find(
                     (p) => p.proposalCategoryId === category.id
                   );
                   return (
@@ -289,7 +281,7 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
               <Box flexGrow={1}>
                 {forumCategories.map((category) => {
                   const permission = postCategoryPermissions?.find((p) => p.postCategoryId === category.id);
-                  const memberRolePermission = spacePostCategoryPermissions?.find(
+                  const memberRolePermission = defaultPostCategoryPermissions?.find(
                     (p) => p.postCategoryId === category.id
                   );
                   const canModerateForums =
@@ -344,7 +336,7 @@ function PermissionToggle(props: {
   ['data-test']?: string;
   onChange: (ev: ChangeEvent<HTMLInputElement>) => void;
 }) {
-  const disabled = props.disabled || props.memberChecked === true;
+  const disabled = props.disabled;
   const defaultChecked = props.memberChecked || props.defaultChecked;
   return (
     <FormControlLabel
@@ -355,17 +347,13 @@ function PermissionToggle(props: {
       }}
       control={
         typeof props.defaultChecked === 'boolean' && typeof props.memberChecked === 'boolean' ? (
-          <Tooltip title={props.memberChecked ? 'Disable this permission from the member role to change it here' : ''}>
-            <span>
-              <Switch
-                key={`${props.label}-${defaultChecked}`}
-                data-test={props['data-test']}
-                disabled={disabled}
-                defaultChecked={defaultChecked}
-                onChange={props.onChange}
-              />
-            </span>
-          </Tooltip>
+          <Switch
+            key={`${props.label}-${defaultChecked}`}
+            data-test={props['data-test']}
+            disabled={disabled}
+            defaultChecked={defaultChecked}
+            onChange={props.onChange}
+          />
         ) : (
           // placeholder element while loading
           <Switch sx={{ visibility: 'hidden' }} disabled={true} />

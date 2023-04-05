@@ -5,7 +5,6 @@ import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 import LoadingComponent from 'components/common/LoadingComponent';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useRoles } from 'hooks/useRoles';
 import type { TargetPermissionGroup } from 'lib/permissions/interfaces';
 
@@ -26,9 +25,12 @@ export function ProposalPagePermissions({ proposalId }: Props) {
   );
   const { data: proposalCategoryPermissions } = useSWR(
     !proposal ? null : `/proposals/list-proposal-category-permissions-${proposal!.categoryId}`,
-    () => charmClient.permissions.proposals.listProposalCategoryPermissions(proposal!.categoryId as string)
+    () =>
+      charmClient.permissions.proposals.listProposalCategoryPermissions({
+        categoryId: proposal!.categoryId as string
+      })
   );
-  const space = useCurrentSpace();
+
   const { roles } = useRoles();
 
   const spaceLevelPermission = proposalCategoryPermissions?.find((permission) => permission.assignee.group === 'space');
