@@ -1,11 +1,10 @@
 import styled from '@emotion/styled';
 import { MoreHoriz } from '@mui/icons-material';
 import CheckIcon from '@mui/icons-material/Check';
-import { Box, IconButton, ListItemIcon, Menu, MenuItem, Typography } from '@mui/material';
+import { Box, IconButton, ListItemIcon, Menu, MenuItem, Tooltip, Typography } from '@mui/material';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import { useState } from 'react';
 
-import charmClient from 'charmClient';
 import Avatar from 'components/common/Avatar';
 import ElementDeleteIcon from 'components/common/form/ElementDeleteIcon';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
@@ -13,6 +12,8 @@ import { StyledListItemText } from 'components/common/StyledListItemText';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMembers } from 'hooks/useMembers';
 import { useRoles } from 'hooks/useRoles';
+import { useSnackbar } from 'hooks/useSnackbar';
+import log from 'lib/log';
 import type { Member } from 'lib/members/interfaces';
 import { hasNftAvatar } from 'lib/users/hasNftAvatar';
 
@@ -68,13 +69,14 @@ function MemberActions({
   readOnly: boolean;
 }) {
   const space = useCurrentSpace();
+  const { showMessage } = useSnackbar();
   const { unassignRole } = useRoles();
-  const { members, mutateMembers } = useMembers();
+  const { makeAdmin, makeGuest, makeMember, members, removeFromSpace, getMemberById } = useMembers();
   const popupState = usePopupState({ variant: 'popover', popupId: 'user-role' });
   const deletePopupState = usePopupState({ variant: 'popover', popupId: 'member-list' });
   const [removedMemberId, setRemovedMemberId] = useState<string | null>(null);
 
-  const removedMember = removedMemberId ? members.find((m) => m.id === removedMemberId) : null;
+  const removedMember = removedMemberId ? getMemberById(removedMemberId) : null;
   const closed = deletePopupState.close;
 
   deletePopupState.close = () => {
@@ -85,55 +87,58 @@ function MemberActions({
   const spaceOwner = space?.createdBy;
   const totalAdmins = members.filter((m) => m.isAdmin).length;
 
+  async function removeFromSpaceHandler() {
+    if (!removedMember) {
+      return;
+    }
+
+    try {
+      await removeFromSpace(removedMember.id);
+    } catch (error) {
+      log.warn('Error removing member', { error });
+      showMessage((error as Error).message || 'Something went wrong', 'error');
+    }
+    deletePopupState.close();
+  }
+
   async function handleMenuItemClick(action: RoleAction) {
-    if (!space) {
-      throw new Error('Space not found');
+    try {
+      if (!space) {
+        throw new Error('Space not found');
+      }
+
+      switch (action) {
+        case 'makeAdmin':
+          await makeAdmin([member.id]);
+          break;
+
+        case 'makeMember':
+          await makeMember([member.id]);
+          break;
+
+        case 'makeGuest':
+          await makeGuest([member.id]);
+          break;
+
+        case 'removeFromSpace':
+          setRemovedMemberId(member.id);
+          deletePopupState.open();
+          break;
+
+        default:
+          throw new Error('Unknown action');
+      }
+      popupState.close();
+    } catch (error) {
+      log.warn('Error updating member role', { error });
+      showMessage((error as Error).message || 'Something went wrong', 'error');
     }
-
-    switch (action) {
-      case 'makeAdmin':
-        await charmClient.updateMemberRole({ spaceId: space.id, userId: member.id, isAdmin: true, isGuest: false });
-        if (members) {
-          mutateMembers(
-            members.map((c) => (c.id === member.id ? { ...c, isAdmin: true } : c)),
-            { revalidate: false }
-          );
-        }
-        break;
-
-      case 'makeMember':
-        await charmClient.updateMemberRole({ spaceId: space.id, userId: member.id, isAdmin: false, isGuest: false });
-        if (members) {
-          mutateMembers(
-            members.map((c) => (c.id === member.id ? { ...c, isAdmin: false } : c)),
-            { revalidate: false }
-          );
-        }
-        break;
-
-      case 'makeGuest':
-        await charmClient.updateMemberRole({ spaceId: space.id, userId: member.id, isAdmin: false, isGuest: true });
-        if (members) {
-          mutateMembers(
-            members.map((c) => (c.id === member.id ? { ...c, isAdmin: false } : c)),
-            { revalidate: false }
-          );
-        }
-        break;
-
-      case 'removeFromSpace':
-        setRemovedMemberId(member.id);
-        deletePopupState.open();
-        break;
-
-      default:
-        throw new Error('Unknown action');
-    }
-    popupState.close();
   }
   const actions = roleActions.filter((action) => {
     switch (action) {
       case 'makeAdmin':
+        return !readOnly;
+      case 'makeGuest':
         return !readOnly;
       case 'makeMember':
         return !readOnly;
@@ -145,20 +150,7 @@ function MemberActions({
     }
   });
 
-  const activeRoleAction = member.isAdmin ? 'makeAdmin' : 'makeMember';
-  async function removeFromSpace() {
-    if (!space) {
-      throw new Error('Space not found');
-    }
-    await charmClient.removeMember({ spaceId: space.id, userId: removedMemberId as string });
-    if (members) {
-      mutateMembers(
-        members.filter((c) => c.id !== removedMemberId),
-        { revalidate: false }
-      );
-      setRemovedMemberId(null);
-    }
-  }
+  const activeRoleAction = member.isAdmin ? 'makeAdmin' : member.isGuest ? 'makeGuest' : 'makeMember';
 
   if (memberRoleId) {
     return (
@@ -169,7 +161,7 @@ function MemberActions({
           onClose={deletePopupState.close}
           open={deletePopupState.isOpen}
           buttonText={`Remove ${removedMember?.isAdmin ? 'admin' : removedMember?.isGuest ? 'guest' : 'member'}`}
-          onConfirm={removeFromSpace}
+          onConfirm={removeFromSpaceHandler}
           question={`Are you sure you want to remove ${removedMember?.username} from space?`}
         />
       </>
@@ -185,7 +177,7 @@ function MemberActions({
         onClose={deletePopupState.close}
         open={deletePopupState.isOpen}
         buttonText={`Remove ${removedMember?.isAdmin ? 'admin' : removedMember?.isGuest ? 'guest' : 'member'}`}
-        onConfirm={removeFromSpace}
+        onConfirm={removeFromSpaceHandler}
         question={`Are you sure you want to remove ${removedMember?.username} from space?`}
       />
       <Menu
@@ -194,37 +186,49 @@ function MemberActions({
           sx: { width: 300 }
         }}
       >
-        {actions.map((action) => (
-          <MenuItem
-            key={action}
-            onClick={() => handleMenuItemClick(action)}
-            disabled={action === 'makeMember' && totalAdmins === 1}
-          >
-            {action === 'makeAdmin' && (
-              <StyledListItemText
-                primary='Admin'
-                secondary='Can access all settings and invite new members to the space'
-              />
-            )}
-            {action === 'makeMember' && (
-              <StyledListItemText
-                primary='Member'
-                secondary='Cannot change space settings or invite new members to the space'
-              />
-            )}
-            {action === 'removeFromSpace' && (
-              <StyledListItemText
-                primaryTypographyProps={{ fontWeight: 500, color: 'error' }}
-                primary='Remove from team'
-              />
-            )}
-            {action === activeRoleAction && (
-              <ListItemIcon>
-                <CheckIcon fontSize='small' />
-              </ListItemIcon>
-            )}
-          </MenuItem>
-        ))}
+        {actions.map((action) => {
+          const disabled = action !== 'makeAdmin' && member.isAdmin && totalAdmins === 1;
+          return (
+            <Tooltip
+              key={action}
+              title={disabled ? 'You must add at least one more admin before removing this one' : ''}
+            >
+              <span>
+                <MenuItem
+                  onClick={() => handleMenuItemClick(action)}
+                  disabled={action !== 'makeAdmin' && member.isAdmin && totalAdmins === 1}
+                >
+                  {action === 'makeAdmin' && (
+                    <StyledListItemText
+                      primary='Admin'
+                      secondary='Can access all settings and invite new members to the space'
+                    />
+                  )}
+                  {action === 'makeMember' && (
+                    <StyledListItemText
+                      primary='Member'
+                      secondary='Cannot change space settings or invite new members to the space'
+                    />
+                  )}
+                  {action === 'makeGuest' && (
+                    <StyledListItemText primary='Guest' secondary='Can only access specific pages' />
+                  )}
+                  {action === 'removeFromSpace' && (
+                    <StyledListItemText
+                      primaryTypographyProps={{ fontWeight: 500, color: 'error' }}
+                      primary='Remove from team'
+                    />
+                  )}
+                  {action === activeRoleAction && (
+                    <ListItemIcon>
+                      <CheckIcon fontSize='small' />
+                    </ListItemIcon>
+                  )}
+                </MenuItem>
+              </span>
+            </Tooltip>
+          );
+        })}
       </Menu>
     </>
   );

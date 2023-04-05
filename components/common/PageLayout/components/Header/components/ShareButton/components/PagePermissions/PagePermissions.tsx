@@ -171,13 +171,13 @@ export default function PagePermissions({ pageId, pagePermissions, refreshPermis
 
       <Box display='block' py={0.5}>
         <Box display='flex' justifyContent='space-between' alignItems='center'>
-          <Typography variant='body2'>Everyone at {space?.name}</Typography>
+          <Typography variant='body2'>Default permissions</Typography>
           <div style={{ width: '160px', textAlign: 'right' }}>
             {canEdit ? (
               <SmallSelect
                 renderValue={(value) => permissionsWithoutCustom[value as string] || 'No access'}
                 onChange={(level) => updateSpacePagePermissionLevel(level as PagePermissionLevelType)}
-                keyAndLabel={permissionsWithRemove}
+                keyAndLabel={permissionsWithRemove as Record<string, string>}
                 defaultValue={spaceLevelPermission?.permissionLevel ?? 'No access'}
               />
             ) : (
@@ -222,7 +222,7 @@ export default function PagePermissions({ pageId, pagePermissions, refreshPermis
                   <SmallSelect
                     renderValue={(value) => permissionsWithoutCustom[value as string]}
                     onChange={(level) => updatePagePermissionLevel(permission, level as PagePermissionLevelType)}
-                    keyAndLabel={permissionsWithRemove}
+                    keyAndLabel={permissionsWithRemove as Record<string, string>}
                     defaultValue={permission.permissionLevel}
                   />
                 ) : (

@@ -9,13 +9,18 @@ import { uid } from 'lib/utilities/strings';
 import { gettingStartedPage } from 'seedData/gettingStartedPage';
 
 import { spaceCreateTemplates } from '../config';
-import type { SpaceCreateInput } from '../createWorkspace';
-import { createWorkspace } from '../createWorkspace';
+import type { SpaceCreateInput } from '../createSpace';
+import { createWorkspace } from '../createSpace';
 
 let user: User;
 
 beforeAll(async () => {
-  user = await prisma.user.create({ data: { username: 'demo-user' } });
+  user = await prisma.user.create({
+    data: {
+      path: uid(),
+      username: 'demo-user'
+    }
+  });
 });
 
 describe('createWorkspace', () => {
@@ -72,7 +77,8 @@ describe('createWorkspace', () => {
     const bot = await prisma.user.create({
       data: {
         username: 'Bot user',
-        isBot: true
+        isBot: true,
+        path: uid()
       }
     });
 

@@ -38,6 +38,7 @@ import { createUserFromWallet } from 'lib/users/createUser';
 import { uniqueValues } from 'lib/utilities/array';
 import { InvalidInputError } from 'lib/utilities/errors';
 import { typedKeys } from 'lib/utilities/objects';
+import { uid } from 'lib/utilities/strings';
 import type { LoggedInUser } from 'models';
 import { getRandomThemeColor } from 'theme/utils/getRandomThemeColor';
 
@@ -54,6 +55,7 @@ export async function generateSpaceUser({
 }): Promise<LoggedInUser> {
   return prisma.user.create({
     data: {
+      path: uid(),
       identityType: 'Discord',
       username: 'Username',
       wallets: {
@@ -182,6 +184,7 @@ export async function generateUserAndSpace({
           }
         }
       },
+      path: uid(),
       ...user
     },
     include: {

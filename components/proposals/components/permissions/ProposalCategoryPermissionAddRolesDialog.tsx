@@ -7,7 +7,7 @@ import { SmallSelect } from 'components/common/form/InputEnumToOptions';
 import { InputSearchRoleMultiple } from 'components/common/form/InputSearchRole';
 
 import type { BulkRoleProposalCategoryPermissionUpsert } from './shared';
-import { permissionsWithRemove } from './shared';
+import { proposalCategoryPermissionLabels } from './shared';
 
 type Props = {
   onClose: () => void;
@@ -29,6 +29,12 @@ export function ProposalCategoryPermissionsAddRoles({ onClose, onSave, roleIdsTo
     onClose();
   }
 
+  const friendlyLabels = {
+    ...proposalCategoryPermissionLabels,
+    delete: 'Remove',
+    '': 'No access'
+  };
+
   return (
     <Grid container direction='column' spacing={3}>
       <Grid container item xs={12} justifyContent='space-between'>
@@ -37,11 +43,9 @@ export function ProposalCategoryPermissionsAddRoles({ onClose, onSave, roleIdsTo
             sx={{
               textAlign: 'left'
             }}
-            renderValue={(value) =>
-              (permissionsWithRemove[value as keyof typeof permissionsWithRemove] as string as any) || 'No access'
-            }
+            renderValue={(value) => friendlyLabels[value]}
             onChange={(newValue) => setNewRolesPermissionLevel(newValue as ProposalCategoryPermissionLevel)}
-            keyAndLabel={permissionsWithRemove}
+            keyAndLabel={friendlyLabels}
             defaultValue={newRolesPermissionLevel}
           />
         </Grid>

@@ -42,6 +42,7 @@ const schema = yup.object({
 type FormValues = yup.InferType<typeof schema>;
 
 interface Props {
+  className?: string;
   defaultValues?: { name: string; domain: string };
   onCancel?: () => void;
   submitText?: string;
@@ -50,7 +51,7 @@ interface Props {
 
 type SpaceFormStep = 'select_template' | 'create_space' | 'join_space';
 
-export function CreateSpaceForm({ defaultValues, onCancel, submitText }: Props) {
+export function CreateSpaceForm({ className, defaultValues, onCancel, submitText }: Props) {
   const { createNewSpace, isCreatingSpace } = useSpaces();
   const { showMessage } = useSnackbar();
 
@@ -184,7 +185,7 @@ export function CreateSpaceForm({ defaultValues, onCancel, submitText }: Props) 
     );
   }
   return (
-    <div>
+    <div className={className}>
       <DialogTitle onClose={onCancel ? onClose : undefined} sx={{ textAlign: 'center' }}>
         <Box display='flex' alignItems='center' gap={1}>
           {step !== 'select_template' && (
@@ -195,20 +196,16 @@ export function CreateSpaceForm({ defaultValues, onCancel, submitText }: Props) 
           Create a space{' '}
         </Box>
       </DialogTitle>
-      <Box mb={2}>
-        <Typography textAlign='center' variant='body2' whiteSpace='nowrap'>
-          A space is where your organization collaborates
-        </Typography>
-      </Box>
 
       {step === 'select_template' && (
         <>
           <SelectNewSpaceTemplate onSelect={handleNewSpaceTemplate} />
+
           <Divider sx={{ my: 2 }} />
           <Typography sx={{ mb: 2 }} textAlign='center' fontWeight='bold'>
             Join an existing space
           </Typography>
-          <Button size='large' disableElevation fullWidth onClick={() => setStep('join_space')}>
+          <Button color='secondary' size='large' disableElevation fullWidth onClick={() => setStep('join_space')}>
             Search for space
           </Button>
         </>

@@ -55,11 +55,13 @@ describe('generateRole', () => {
     const users = await Promise.all([
       prisma.user.create({
         data: {
+          path: uid(),
           username: 'test'
         }
       }),
       prisma.user.create({
         data: {
+          path: uid(),
           username: 'test'
         }
       })
@@ -119,11 +121,13 @@ describe('generateRole', () => {
     const [spaceUser, outsideUser] = await Promise.all([
       prisma.user.create({
         data: {
+          path: uid(),
           username: 'test'
         }
       }),
       prisma.user.create({
         data: {
+          path: uid(),
           username: 'test'
         }
       })

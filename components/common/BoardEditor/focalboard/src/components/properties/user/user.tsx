@@ -8,7 +8,6 @@ import type { PropertyValueDisplayType } from 'components/common/BoardEditor/int
 import { InputSearchMemberMultiple } from 'components/common/form/InputSearchMember';
 import UserDisplay from 'components/common/UserDisplay';
 import { useMembers } from 'hooks/useMembers';
-import type { Member } from 'lib/members/interfaces';
 
 type Props = {
   memberIds: string[];
@@ -57,18 +56,18 @@ function arrayEquals<T>(a: T[], b: T[]) {
 function UserProperty(props: Props): JSX.Element | null {
   const [memberIds, setMemberIds] = useState(props.memberIds);
   const [clicked, setClicked] = useState(false);
-  const { members } = useMembers();
+  const { membersRecord } = useMembers();
 
   useEffect(() => {
     setMemberIds(props.memberIds);
   }, [props.memberIds]);
 
-  const membersRecord = members.reduce<Record<string, Member>>((cur, member) => {
-    cur[member.id] = member;
-    return cur;
-  }, {});
-
   const [isOpen, setIsOpen] = useState(false);
+
+  if (props.readOnly && memberIds.length === 0) {
+    return null;
+  }
+
   return (
     <StyledUserPropertyContainer
       onClick={() => {

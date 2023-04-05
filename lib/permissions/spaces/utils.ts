@@ -2,8 +2,6 @@ import type { Prisma, SpacePermission } from '@prisma/client';
 
 import { MissingDataError } from 'lib/utilities/errors';
 
-import type { AssignablePermissionGroups } from '../interfaces';
-
 export function generateSpacePermissionQuery({
   roleId,
   spaceId,
@@ -37,12 +35,4 @@ export function generateSpacePermissionQuery({
           userId: userId as string
         }
       };
-}
-
-export function groupIsValid(group: AssignablePermissionGroups): boolean {
-  if (group !== 'role' && group !== 'space' && group !== 'user') {
-    return false;
-  }
-
-  return true;
 }

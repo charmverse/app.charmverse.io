@@ -139,7 +139,7 @@ function MemberProfile({
               <Typography variant='h6'>{member.username}'s profile</Typography>
               <Button
                 onClick={onClose}
-                href={`/u/${user.path || user.id}`}
+                href={`/u/${user.path}`}
                 color='secondary'
                 variant='outlined'
                 sx={{
@@ -182,8 +182,8 @@ export function MemberMiniProfile({
   onClose: VoidFunction;
   isOnboarding?: boolean;
 }) {
-  const { members } = useMembers();
-  const member = members.find((_member) => _member.id === memberId);
+  const { getMemberById } = useMembers();
+  const member = getMemberById(memberId);
 
   if (!member) {
     return null;

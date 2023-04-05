@@ -5,6 +5,7 @@ import { updateTrackUserProfile } from 'lib/metrics/mixpanel/updateTrackUserProf
 import { getUserProfile } from 'lib/users/getUser';
 import { updateUserProfile } from 'lib/users/updateUserProfile';
 import { DisabledAccountError, InsecureOperationError, InvalidInputError, SystemError } from 'lib/utilities/errors';
+import { uid } from 'lib/utilities/strings';
 import type { LoggedInUser } from 'models';
 
 import { verifyGoogleToken } from './verifyGoogleToken';
@@ -76,7 +77,8 @@ export async function loginWithGoogle({
           create: {
             identityType: 'Google',
             username: displayName,
-            avatar: avatarUrl
+            avatar: avatarUrl,
+            path: uid()
           }
         }
       }

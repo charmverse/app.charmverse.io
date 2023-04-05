@@ -55,7 +55,7 @@ function UserDetailsMini({ readOnly, user, sx = {} }: UserDetailsMiniProps) {
     socialDetails.linkedinURL?.length === 0;
 
   const hostname = typeof window !== 'undefined' ? window.location.origin : '';
-  const userPath = user.path || user.id;
+  const userPath = user.path;
   const userLink = `${hostname}/u/${userPath}`;
 
   return (

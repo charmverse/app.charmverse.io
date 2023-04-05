@@ -5,8 +5,8 @@ import nc from 'next-connect';
 import { prisma } from 'db';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import type { CreateSpaceProps } from 'lib/spaces/createWorkspace';
-import { createWorkspace } from 'lib/spaces/createWorkspace';
+import type { CreateSpaceProps } from 'lib/spaces/createSpace';
+import { createWorkspace } from 'lib/spaces/createSpace';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

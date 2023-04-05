@@ -50,7 +50,6 @@ async function createBountyController(req: NextApiRequest, res: NextApiResponse<
     }
   } else {
     const userPermissions = await computeSpacePermissions({
-      allowAdminBypass: true,
       resourceId: spaceId as string,
       userId
     });

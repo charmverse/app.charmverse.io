@@ -1,6 +1,7 @@
 import { prisma } from 'db';
 import type { DiscordAccount } from 'lib/discord/getDiscordAccount';
 import randomName from 'lib/utilities/randomName';
+import { uid } from 'lib/utilities/strings';
 
 type UserProps = { discordId: string; avatar?: string; username?: string; account?: Partial<DiscordAccount> };
 
@@ -25,7 +26,7 @@ export async function upsertUserForDiscordId({ discordId, account, username, ava
           avatar,
           identityType: 'Discord',
           username: username || randomName(),
-          path: null
+          path: uid()
         }
       }
     }

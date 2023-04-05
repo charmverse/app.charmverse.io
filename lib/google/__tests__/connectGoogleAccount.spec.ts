@@ -2,6 +2,7 @@ import { v4 } from 'uuid';
 
 import { prisma } from 'db';
 import { getUserProfile } from 'lib/users/getUser';
+import { uid } from 'lib/utilities/strings';
 
 import { connectGoogleAccount } from '../connectGoogleAccount';
 
@@ -24,6 +25,7 @@ describe('addGoogleAccountToUser', () => {
 
     const user = await prisma.user.create({
       data: {
+        path: uid(),
         username: 'Test User'
       }
     });
@@ -46,6 +48,7 @@ describe('addGoogleAccountToUser', () => {
 
     const user = await prisma.user.create({
       data: {
+        path: uid(),
         username: 'Test User',
         identityType: 'Wallet',
         wallets: {
@@ -64,6 +67,7 @@ describe('addGoogleAccountToUser', () => {
 
     const secondUser = await prisma.user.create({
       data: {
+        path: uid(),
         username: 'Test User'
       }
     });
@@ -83,6 +87,7 @@ describe('addGoogleAccountToUser', () => {
     // User has no extra identities
     const user = await prisma.user.create({
       data: {
+        path: uid(),
         username: 'Test User'
       }
     });
@@ -96,6 +101,7 @@ describe('addGoogleAccountToUser', () => {
 
     const secondUser = await prisma.user.create({
       data: {
+        path: uid(),
         username: 'Test User'
       }
     });
@@ -118,6 +124,7 @@ describe('addGoogleAccountToUser', () => {
 
     const user = await prisma.user.create({
       data: {
+        path: `${`${v4()}: Eita desher onk shawapo hoye gese`}`,
         username: 'Test User'
       }
     });

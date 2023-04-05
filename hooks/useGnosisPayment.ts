@@ -3,6 +3,7 @@ import EthersAdapter from '@safe-global/safe-ethers-lib';
 import SafeServiceClient from '@safe-global/safe-service-client';
 import { getChainById } from 'connectors';
 import { ethers, utils } from 'ethers';
+import log from 'loglevel';
 
 import type { MultiPaymentResult } from 'components/bounties/components/MultiPaymentButton';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
@@ -42,22 +43,31 @@ export function useGnosisPayment({ chainId, safeAddress, transactions, onSuccess
         operation: transaction.operation
       }))
     });
-    const txHash = await safe.getTransactionHash(safeTransaction);
-    const signer = await library.getSigner(account);
-    const ethAdapter = new EthersAdapter({
-      ethers,
-      signerOrProvider: signer
-    });
-    const safeService = new SafeServiceClient({ txServiceUrl: network.gnosisUrl, ethAdapter });
-    await safeService.proposeTransaction({
-      safeAddress,
-      safeTransactionData: safeTransaction.data,
-      safeTxHash: txHash,
-      senderAddress: utils.getAddress(account),
-      senderSignature: [...safeTransaction.signatures][0][0],
-      origin
-    });
-    onSuccess({ safeAddress, transactions, txHash });
+
+    try {
+      const txHash = await safe.getTransactionHash(safeTransaction);
+      const senderSignature = await safe.signTransactionHash(txHash);
+      const signer = await library.getSigner(account);
+      const ethAdapter = new EthersAdapter({
+        ethers,
+        signerOrProvider: signer
+      });
+
+      const safeService = new SafeServiceClient({ txServiceUrl: network.gnosisUrl, ethAdapter });
+      await safeService.proposeTransaction({
+        safeAddress,
+        safeTransactionData: safeTransaction.data,
+        safeTxHash: txHash,
+        senderAddress: utils.getAddress(account),
+        senderSignature: senderSignature.data,
+        origin
+      });
+      onSuccess({ safeAddress, transactions, txHash });
+    } catch (e: any) {
+      log.error(e);
+
+      throw new Error(`There was an issue with payment: ${e.message}`);
+    }
   }
 
   return {

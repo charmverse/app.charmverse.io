@@ -1,6 +1,7 @@
 import { validate } from 'uuid';
 import { prisma } from 'db';
 import randomName from 'lib/utilities/randomName';
+import { uid } from 'lib/utilities/strings';
 
 export async function seedUsers({ spaceDomainOrId, amount }: { spaceDomainOrId: string; amount: number }) {
   const query = validate(spaceDomainOrId) ? { id: spaceDomainOrId } : { domain: spaceDomainOrId };
@@ -16,6 +17,7 @@ export async function seedUsers({ spaceDomainOrId, amount }: { spaceDomainOrId: 
       await tx.user.create({
         data: {
           username: randomName(),
+          path: uid(),
           spaceRoles: {
             create: {
               space: {

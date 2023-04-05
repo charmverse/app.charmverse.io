@@ -21,7 +21,7 @@ export function DuplicatePageAction({
   redirect?: boolean;
   postDuplication?: (duplicatePageResponse: DuplicatePageResponse) => void;
 }) {
-  const duplicatePageDisabled = !pagePermissions?.edit_content;
+  const duplicatePageDisabled = !pagePermissions?.read;
 
   const currentSpace = useCurrentSpace();
   const router = useRouter();

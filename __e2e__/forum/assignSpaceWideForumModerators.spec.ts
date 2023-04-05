@@ -79,12 +79,12 @@ test.describe.serial('Comment on forum posts', () => {
 
     await permissionSettings.openSettingsModal();
 
-    const spaceSettingsTab = permissionSettings.getSpaceSettingsLocator(space.id);
+    const spaceSettingsTab = permissionSettings.getSpaceSettingsSectionLocator('space');
 
     await expect(spaceSettingsTab).toBeVisible();
 
     // Go to roles section
-    await permissionSettings.goToTab({ spaceId: space.id, section: 'roles' });
+    await permissionSettings.goToTab('roles');
     await permissionSettings.clickRoleRowByTitle(moderatorRoleName);
 
     await permissionSettings.goToRowTab(moderatorRoleName, 'permissions');

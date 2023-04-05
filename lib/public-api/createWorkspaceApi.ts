@@ -7,12 +7,13 @@ import { upsertUserForDiscordId } from 'lib/discord/upsertUserForDiscordId';
 import { upsertUserRolesFromDiscord } from 'lib/discord/upsertUserRolesFromDiscord';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { updateTrackGroupProfile } from 'lib/metrics/mixpanel/updateTrackGroupProfile';
-import type { SpaceCreateInput } from 'lib/spaces/createWorkspace';
-import { createWorkspace } from 'lib/spaces/createWorkspace';
+import type { SpaceCreateInput } from 'lib/spaces/createSpace';
+import { createWorkspace } from 'lib/spaces/createSpace';
 import { getAvailableDomainName } from 'lib/spaces/getAvailableDomainName';
 import { createUserFromWallet } from 'lib/users/createUser';
 import { InvalidInputError } from 'lib/utilities/errors';
 import { isValidUrl } from 'lib/utilities/isValidUrl';
+import { uid } from 'lib/utilities/strings';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 import { publishMemberEvent } from 'lib/webhookPublisher/publishEvent';
 
@@ -44,7 +45,8 @@ export async function createWorkspaceApi({
     data: {
       username: 'Bot',
       isBot: true,
-      identityType: 'RandomName'
+      identityType: 'RandomName',
+      path: uid()
     }
   });
 

@@ -52,7 +52,8 @@ export function DatabasePage({ page, setPage, readOnly = false, pagePermissions 
 
   const { setFocalboardViewsRecord } = useFocalboardViews();
   const readOnlyBoard = readOnly || !pagePermissions?.edit_content;
-  const readOnlySourceData = activeView?.fields?.sourceType === 'google_form'; // blocks that are synced cannot be edited
+  // TODO: remove this feature entirely after some time has passed and we are sure we dont need it. Disabled on April 4, 2023.
+  const readOnlySourceData = false; // activeView?.fields?.sourceType === 'google_form'; // blocks that are synced cannot be edited
   useEffect(() => {
     if (typeof router.query.cardId === 'string') {
       setShownCardId(router.query.cardId);

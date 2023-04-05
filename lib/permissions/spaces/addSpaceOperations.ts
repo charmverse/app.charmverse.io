@@ -10,7 +10,7 @@ import type { AssignablePermissionGroups } from '../interfaces';
 
 import { computeGroupSpacePermissions } from './computeGroupSpacePermissions';
 import type { SpacePermissionFlags, SpacePermissionModification } from './interfaces';
-import { generateSpacePermissionQuery } from './utility';
+import { generateSpacePermissionQuery } from './utils';
 
 export async function addSpaceOperations<A extends AssignablePermissionGroups = 'any'>({
   forSpaceId,
