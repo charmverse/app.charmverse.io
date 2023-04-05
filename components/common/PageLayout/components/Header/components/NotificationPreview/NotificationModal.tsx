@@ -75,7 +75,7 @@ export function NotificationModal({
   } = useNotificationModal({ marked, unmarked });
 
   return (
-    <Modal onClose={onClose} open={isOpen} mobileDialog={isMobile} size='90%' noPadding>
+    <Modal onClose={onClose} open={isOpen} mobileDialog={isMobile} size='fluid' noPadding>
       <Box display='flex' flexDirection='row' flex='1' overflow='hidden'>
         <Box
           component='aside'
