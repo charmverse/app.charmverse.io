@@ -7,10 +7,11 @@ import HowToVoteIcon from '@mui/icons-material/HowToVote';
 import LayersIcon from '@mui/icons-material/Layers';
 import BountyIcon from '@mui/icons-material/RequestPageOutlined';
 import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
-import { Badge, Box, Dialog, DialogContent, Divider, IconButton, Tab, Tabs, Tooltip, Typography } from '@mui/material';
+import { Badge, Box, DialogContent, Divider, IconButton, Tab, Tabs, Tooltip, Typography } from '@mui/material';
 import router from 'next/router';
 import { Fragment } from 'react';
 
+import Modal from 'components/common/Modal';
 import { SectionName } from 'components/common/PageLayout/components/Sidebar/Sidebar';
 import { SidebarLink } from 'components/common/PageLayout/components/Sidebar/SidebarButton';
 import Legend from 'components/settings/Legend';
@@ -74,21 +75,13 @@ export function NotificationModal({
   } = useNotificationModal({ marked, unmarked });
 
   return (
-    <Dialog
-      fullWidth
-      maxWidth='lg'
-      fullScreen={isMobile}
-      PaperProps={{ sx: { height: { md: '90vh' }, borderRadius: isMobile ? 0 : (theme) => theme.spacing(1) } }}
-      onClose={onClose}
-      open={isOpen}
-    >
+    <Modal onClose={onClose} open={isOpen} mobileDialog={isMobile} size='90%' noPadding>
       <Box display='flex' flexDirection='row' flex='1' overflow='hidden'>
         <Box
           component='aside'
           display={isMobile ? 'none' : 'block'}
           width={{ xs: '100%', md: 250 }}
           minWidth={{ xs: '100%', md: 250 }}
-          overflow='auto'
           sx={{ backgroundColor: (theme) => theme.palette.sidebar.background }}
         >
           <Box mt={2} py={0.5}>
@@ -123,16 +116,22 @@ export function NotificationModal({
             />
           ))}
         </Box>
-        <Box flex='1 1 auto' position='relative' overflow='hidden' height='100%'>
-          <Box role='tabpanel' height='100%' overflow='hidden'>
-            <Box>
+        <Box
+          flex='1 1 auto'
+          position='relative'
+          height={isMobile ? '95vh' : '80vh'}
+          overflow='hidden'
+          sx={{ background: isMobile ? 'none' : (theme) => theme.palette.sidebar.avatarHighlight }}
+        >
+          <Box role='tabpanel' height='100%'>
+            <Box width='100%'>
               <Legend
                 variant='inherit'
                 variantMapping={{ inherit: 'div' }}
                 display='flex'
                 justifyContent='space-between'
-                px={{ xs: 2, md: 3 }}
-                pt={2}
+                px={{ xs: 1, md: 3 }}
+                pt={{ xs: 1, md: 3 }}
               >
                 <Typography variant={isMobile ? 'h6' : 'h5'} textTransform='capitalize' fontWeight={700}>
                   {`${notificationsDisplayType} Notifications`}
@@ -243,6 +242,6 @@ export function NotificationModal({
           </Box>
         </Box>
       </Box>
-    </Dialog>
+    </Modal>
   );
 }
