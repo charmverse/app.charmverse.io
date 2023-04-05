@@ -1,5 +1,5 @@
-import { PrismaClient } from '@charmverse/core';
-import type { Prisma } from '@charmverse/core';
+import type { Prisma } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 
 // @ts-expect-error - dont mutate global for Node.js
 export const prisma: PrismaClient = global.prisma || new PrismaClient({});
