@@ -15,16 +15,7 @@ export default function useTasks() {
     refreshInterval: 1000 * 10 * 60
   });
 
-  const {
-    data: gnosisTasks,
-    error: gnosisTasksServerError,
-    mutate: mutateGnosisTasks
-  } = useSWRImmutable(user ? `/tasks/gnosis/${user.id}` : null, () => charmClient.tasks.getGnosisTasks(), {
-    // 10 minutes
-    refreshInterval: 1000 * 10 * 60
-  });
-
   const error = serverError?.message || serverError;
 
-  return { tasks, gnosisTasks, gnosisTasksServerError, mutateGnosisTasks, mutate, error, isLoading };
+  return { tasks, mutate, error, isLoading };
 }
