@@ -21,6 +21,10 @@ runs:
       if: steps.cache_node_modules.outputs.cache-hit != 'true'
       run: npm ci --no-audit --no-fund
 
+    - name: Link to prisma
+      shell: bash
+      run: npm run link:prisma
+
     # Build prisma types which are cached inside of node_modules
     - name: Build Prisma types
       shell: bash
