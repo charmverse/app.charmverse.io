@@ -1,13 +1,14 @@
-import { useState, memo, useEffect } from 'react';
+import { memo, useEffect, useState } from 'react';
 
 import MultiTabs from 'components/common/MultiTabs';
+import { isPdfEmbedLink } from 'lib/pdf/extractPdfEmbedLink';
 import { isUrl } from 'lib/utilities/strings';
 
 import BlockAligner from '../BlockAligner';
 import { IframeContainer } from '../common/IframeContainer';
 import { MediaSelectionPopup } from '../common/MediaSelectionPopup';
 import { MediaUrlInput } from '../common/MediaUrlInput';
-import { extractIframeProps } from '../iframe/utils';
+import { extractEmbedType, extractIframeProps } from '../iframe/utils';
 import { extractAttrsFromUrl as extractNFTAttrs } from '../nft/nftUtils';
 import type { CharmNodeViewProps } from '../nodeView/nodeView';
 import VerticalResizer from '../Resizable/VerticalResizer';
@@ -15,9 +16,8 @@ import { extractTweetAttrs } from '../tweet/tweetSpec';
 import { extractYoutubeLinkType } from '../video/utils';
 
 import { EmbedIcon } from './components/EmbedIcon';
-import type { IframeNodeAttrs, Embed, EmbedType } from './config';
-import { embeds, MAX_EMBED_WIDTH, MIN_EMBED_WIDTH, MIN_EMBED_HEIGHT, MAX_EMBED_HEIGHT } from './config';
-import { extractEmbedType } from './utils';
+import type { Embed, EmbedType, IframeNodeAttrs } from './config';
+import { embeds, MAX_EMBED_HEIGHT, MAX_EMBED_WIDTH, MIN_EMBED_HEIGHT, MIN_EMBED_WIDTH } from './config';
 
 function IframeComponent({ readOnly, node, getPos, view, deleteNode, selected, updateAttrs }: CharmNodeViewProps) {
   const attrs = node.attrs as IframeNodeAttrs;
@@ -49,9 +49,16 @@ function IframeComponent({ readOnly, node, getPos, view, deleteNode, selected, u
         const nftAttrs = extractNFTAttrs(parsedUrl);
         const tweetAttrs = extractTweetAttrs(parsedUrl);
         const isYoutube = extractYoutubeLinkType(parsedUrl);
+        const isPdf = isPdfEmbedLink(parsedUrl);
         if (isYoutube) {
           const pos = getPos();
           const _node = view.state.schema.nodes.video.createAndFill({ src: parsedUrl });
+          if (_node) {
+            view.dispatch(view.state.tr.replaceWith(pos, pos + node.nodeSize, _node));
+          }
+        } else if (isPdf) {
+          const pos = getPos();
+          const _node = view.state.schema.nodes.pdf.createAndFill({ src: parsedUrl });
           if (_node) {
             view.dispatch(view.state.tr.replaceWith(pos, pos + node.nodeSize, _node));
           }
