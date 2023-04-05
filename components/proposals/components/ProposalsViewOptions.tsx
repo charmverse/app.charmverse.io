@@ -18,24 +18,19 @@ import { useProposalCategories } from '../hooks/useProposalCategories';
 
 import { ProposalCategoryContextMenu } from './ProposalCategoryContextMenu';
 
-export type ProposalSort = 'latest_created';
-export type ProposalFilter = ProposalStatus | 'all';
+export type ProposalStatusFilter = ProposalStatus | 'all';
 
 type Props = {
-  proposalFilter: ProposalFilter;
-  setProposalFilter: (proposalFilter: ProposalFilter) => void;
-  proposalSort: ProposalSort;
-  setProposalSort: (proposalSort: ProposalSort) => void;
+  statusFilter: ProposalStatusFilter;
+  setStatusFilter: (statusFilter: ProposalStatusFilter) => void;
   categoryIdFilter: string | null;
   setCategoryIdFilter: (val: string) => void;
   categories: ProposalCategoryWithPermissions[];
 };
 
 export function ProposalsViewOptions({
-  proposalSort,
-  setProposalSort,
-  proposalFilter,
-  setProposalFilter,
+  statusFilter,
+  setStatusFilter,
   categories,
   categoryIdFilter,
   setCategoryIdFilter
@@ -60,124 +55,111 @@ export function ProposalsViewOptions({
   }
 
   return (
-    <>
-      <ViewOptions label='Sort'>
+    <ViewOptions label='Filter'>
+      <Box display='flex' gap={1}>
         <Select
           variant='outlined'
-          value={proposalSort}
-          onChange={(e) => setProposalSort(e.target.value as ProposalSort)}
-          sx={{ mr: 2 }}
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value as ProposalStatusFilter)}
         >
-          <MenuItem value='latest_created'>Created</MenuItem>
+          <MenuItem value='all'>All statuses</MenuItem>
+          {Object.entries(PROPOSAL_STATUS_LABELS).map(([proposalStatus, proposalStatusLabel]) => (
+            <MenuItem key={proposalStatus} value={proposalStatus}>
+              {proposalStatusLabel}
+            </MenuItem>
+          ))}
         </Select>
-      </ViewOptions>
 
-      <ViewOptions label='Filter'>
-        <Box display='flex' gap={1}>
-          <Select
-            variant='outlined'
-            value={proposalFilter}
-            onChange={(e) => setProposalFilter(e.target.value as ProposalFilter)}
-          >
-            {Object.entries(PROPOSAL_STATUS_LABELS).map(([proposalStatus, proposalStatusLabel]) => (
-              <MenuItem key={proposalStatus} value={proposalStatus}>
-                {proposalStatusLabel}
-              </MenuItem>
-            ))}
-            <MenuItem value='all'>All</MenuItem>
-          </Select>
+        <Select
+          variant='outlined'
+          value={categoryIdFilter || ''}
+          renderValue={(value) => {
+            if (value === 'all') {
+              return 'All categories';
+            }
 
-          <Select
-            variant='outlined'
-            value={categoryIdFilter || ''}
-            renderValue={(value) => {
-              if (value === 'all') {
-                return 'All categories';
-              }
-
-              const category = categories.find((c) => c.id === value);
-              if (category) {
-                return (
-                  <Chip
-                    sx={{ cursor: 'pointer', minWidth: '100px' }}
-                    color={category.color as BrandColor}
-                    label={category.title}
-                  />
-                );
-              }
-            }}
-            onChange={(e) => setCategoryIdFilter(e.target.value)}
-          >
-            <MenuItem value='all'>All categories</MenuItem>
-            {categories.map((category) => (
-              <MenuItem key={category.id} value={category.id} sx={{ justifyContent: 'space-between' }}>
+            const category = categories.find((c) => c.id === value);
+            if (category) {
+              return (
                 <Chip
                   sx={{ cursor: 'pointer', minWidth: '100px' }}
                   color={category.color as BrandColor}
                   label={category.title}
                 />
-                {isAdmin && <ProposalCategoryContextMenu category={category} key={category.id} />}
-              </MenuItem>
-            ))}
-            <MenuItem
-              onClick={(e) => {
-                e.stopPropagation();
-                e.preventDefault();
-              }}
-              value=''
-            >
-              <Button
-                data-test='add-category-button'
-                sx={{
-                  ml: 2
-                }}
-                disabled={!isAdmin}
-                startIcon={<AddIcon />}
-                onClick={addCategoryPopupState.open}
-                variant='outlined'
-                color='secondary'
-                size='small'
-                disabledTooltip="You don't have the permissions to add new forum categories"
-              >
-                Add category
-              </Button>
-            </MenuItem>
-          </Select>
-        </Box>
-
-        <Modal
-          open={addCategoryPopupState.isOpen}
-          onClose={() => {
-            addCategoryPopupState.close();
+              );
+            }
           }}
-          title='Add proposal category'
+          onChange={(e) => setCategoryIdFilter(e.target.value)}
         >
-          <TextField
-            data-test='add-category-input'
-            sx={{
-              mb: 1
+          <MenuItem value='all'>All categories</MenuItem>
+          {categories.map((category) => (
+            <MenuItem key={category.id} value={category.id} sx={{ justifyContent: 'space-between' }}>
+              <Chip
+                sx={{ cursor: 'pointer', minWidth: '100px' }}
+                color={category.color as BrandColor}
+                label={category.title}
+              />
+              {isAdmin && <ProposalCategoryContextMenu category={category} key={category.id} />}
+            </MenuItem>
+          ))}
+          <MenuItem
+            onClick={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
             }}
-            autoFocus
-            fullWidth
-            value={newCategoryName}
-            onChange={(e) => {
-              setNewCategoryName(e.target.value);
-            }}
-            onKeyPress={(e) => {
-              if (e.key === 'Enter') {
-                createCategory();
-              }
-            }}
-          />
-          <Button
-            data-test='confirm-new-category-button'
-            disabled={categories.find((category) => category.title === newCategoryName)}
-            onClick={createCategory}
+            value=''
           >
-            Add
-          </Button>
-        </Modal>
-      </ViewOptions>
-    </>
+            <Button
+              data-test='add-category-button'
+              sx={{
+                ml: 2
+              }}
+              disabled={!isAdmin}
+              startIcon={<AddIcon />}
+              onClick={addCategoryPopupState.open}
+              variant='outlined'
+              color='secondary'
+              size='small'
+              disabledTooltip="You don't have the permissions to add new forum categories"
+            >
+              Add category
+            </Button>
+          </MenuItem>
+        </Select>
+      </Box>
+
+      <Modal
+        open={addCategoryPopupState.isOpen}
+        onClose={() => {
+          addCategoryPopupState.close();
+        }}
+        title='Add proposal category'
+      >
+        <TextField
+          data-test='add-category-input'
+          sx={{
+            mb: 1
+          }}
+          autoFocus
+          fullWidth
+          value={newCategoryName}
+          onChange={(e) => {
+            setNewCategoryName(e.target.value);
+          }}
+          onKeyPress={(e) => {
+            if (e.key === 'Enter') {
+              createCategory();
+            }
+          }}
+        />
+        <Button
+          data-test='confirm-new-category-button'
+          disabled={categories.find((category) => category.title === newCategoryName)}
+          onClick={createCategory}
+        >
+          Add
+        </Button>
+      </Modal>
+    </ViewOptions>
   );
 }

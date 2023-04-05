@@ -16,19 +16,11 @@ async function getProposals(req: NextApiRequest, res: NextApiResponse<ProposalWi
   const { id: userId } = req.session.user;
   const spaceId = req.query.id as string;
 
-  // Dedupe proposals
-  const mapped = (
-    await getAccessibleProposals({
-      categoryIds: body.categoryIds,
-      spaceId,
-      userId
-    })
-  ).reduce((acc, proposal) => {
-    acc[proposal.id] = proposal;
-    return acc;
-  }, {} as Record<string, ProposalWithUsers>);
-
-  const proposals = Object.values(mapped) as ProposalWithUsers[];
+  const proposals = await getAccessibleProposals({
+    categoryIds: body.categoryIds,
+    spaceId,
+    userId
+  });
 
   return res.status(200).json(proposals);
 }
