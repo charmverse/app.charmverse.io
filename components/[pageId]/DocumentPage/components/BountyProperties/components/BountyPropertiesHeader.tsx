@@ -25,6 +25,7 @@ interface Props {
   pagePermissions?: PagePermissionMeta[];
   pageId: string;
   readOnly?: boolean;
+  refreshPermissions: () => void;
 }
 
 export function BountyPropertiesHeader({
@@ -32,7 +33,8 @@ export function BountyPropertiesHeader({
   bounty,
   bountyPermissions,
   pagePermissions,
-  pageId
+  pageId,
+  refreshPermissions
 }: Props) {
   const { members } = useMembers();
   const { mutatePage } = usePages();
@@ -57,9 +59,9 @@ export function BountyPropertiesHeader({
       .restrictPagePermissions({
         pageId
       })
-      .then((page) => {
-        mutatePage(page);
-        showMessage('Page permissions updated', 'success');
+      .then(() => {
+        refreshPermissions();
+        showMessage('Page permissions updated. Only the bounty creator can edit this page.', 'success');
       })
       .finally(() => setUpdatingPermissions(false));
   }
