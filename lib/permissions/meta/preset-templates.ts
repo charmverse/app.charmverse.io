@@ -1,4 +1,4 @@
-import type { CharmversePrismaClient as Prisma } from '@charmverse/core';
+import type { SpacePermissionConfigurationMode } from '@prisma/client';
 
 import type { SpaceConfigurationPreset, SpacePermissionTemplate } from './interfaces';
 
@@ -53,14 +53,14 @@ export const permissionTemplates: Record<SpaceConfigurationPreset, SpacePermissi
   open
 };
 
-export const configurationModeName: Record<Prisma.SpacePermissionConfigurationMode, string> = {
+export const configurationModeName: Record<SpacePermissionConfigurationMode, string> = {
   custom: 'Custom settings',
   readOnly: 'Read-only space',
   collaborative: 'Collaborative space',
   open: 'Public space'
 };
 
-export const configurationModeDescription: Record<Prisma.SpacePermissionConfigurationMode, string> = {
+export const configurationModeDescription: Record<SpacePermissionConfigurationMode, string> = {
   custom: 'Manage settings individually.',
   readOnly: 'Members can only read existing content.',
   collaborative: 'Members can create and edit content.',

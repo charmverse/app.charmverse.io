@@ -1,3 +1,5 @@
+import type { PostCategoryPermission } from '@prisma/client';
+
 import { prisma } from 'db';
 import { PostCategoryNotFoundError } from 'lib/forums/categories/errors';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
@@ -60,7 +62,7 @@ export async function computePostCategoryPermissions({
     }
   });
 
-  const applicablePermissions = await filterApplicablePermissions({
+  const applicablePermissions = await filterApplicablePermissions<PostCategoryPermission>({
     permissions: assignedPermissions,
     resourceSpaceId: postCategory.spaceId,
     userId
