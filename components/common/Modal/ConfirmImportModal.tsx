@@ -32,7 +32,7 @@ export default function ConfirmImportModal({
   const [value, setValue] = useState<ImportAction>('merge');
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setValue((event.target as HTMLInputElement).value as ImportAction);
+    setValue(event.target.value as ImportAction);
   };
 
   function handleImport(event: ChangeEvent<HTMLInputElement>) {
