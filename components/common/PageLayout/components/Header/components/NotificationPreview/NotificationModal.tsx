@@ -9,8 +9,9 @@ import BountyIcon from '@mui/icons-material/RequestPageOutlined';
 import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
 import { Badge, Box, Dialog, DialogContent, Divider, IconButton, Tab, Tabs, Tooltip, Typography } from '@mui/material';
 import router from 'next/router';
-import { Fragment, useState } from 'react';
+import { Fragment } from 'react';
 
+import { useNotificationModal } from 'components/common/PageLayout/components/Header/components/NotificationPreview/useNotificationModal';
 import { SectionName } from 'components/common/PageLayout/components/Sidebar/Sidebar';
 import { SidebarLink } from 'components/common/PageLayout/components/Sidebar/SidebarButton';
 import { tabStyles } from 'components/nexus/TasksPage';
@@ -30,8 +31,6 @@ const NOTIFICATION_TABS = [
   { icon: <CommentIcon />, label: 'Forum', type: 'forum' }
 ] as const;
 
-type NotificationDisplayType = (typeof NOTIFICATION_TABS)[number]['type'];
-
 export function NotificationModal({
   isOpen,
   onClose,
@@ -47,27 +46,13 @@ export function NotificationModal({
 }) {
   const isMobile = useSmallScreen();
 
-  const [notificationsDisplayType, setNotificationsDisplayType] = useState<NotificationDisplayType>('all');
-
-  function filterNotifications(notifications: NotificationDetails[]) {
-    if (notificationsDisplayType === 'all') {
-      return notifications;
-    } else {
-      return notifications.filter((n) => n.type === notificationsDisplayType);
-    }
-  }
-
-  const hasUnreadNotifications: Record<(typeof NOTIFICATION_TABS)[number]['type'], boolean> = {
-    vote: !!unmarked.find((n) => n.type === 'vote'),
-    mention: !!unmarked.find((n) => n.type === 'mention'),
-    proposal: !!unmarked.find((n) => n.type === 'proposal'),
-    bounty: !!unmarked.find((n) => n.type === 'bounty'),
-    forum: !!unmarked.find((n) => n.type === 'forum'),
-    all: !!unmarked.length
-  };
-
-  const markedNotifications = filterNotifications(marked);
-  const unmarkedNotifications = filterNotifications(unmarked);
+  const {
+    markedNotifications,
+    unmarkedNotifications,
+    hasUnreadNotifications,
+    notificationsDisplayType,
+    setNotificationsDisplayType
+  } = useNotificationModal({ marked, unmarked });
 
   return (
     <Dialog
