@@ -1,3 +1,5 @@
+import { uniqBy } from 'lodash';
+
 import { getAccessibleProposalCategories } from 'lib/permissions/proposals/getAccessibleProposalCategories';
 
 import type { ListProposalsRequest } from './getProposalsBySpace';
@@ -34,5 +36,6 @@ export async function getAccessibleProposals({
     includePage
   });
 
-  return [...viewableProposals, ...userProposals];
+  // Dedupe proposals
+  return uniqBy([...viewableProposals, ...userProposals], 'id');
 }

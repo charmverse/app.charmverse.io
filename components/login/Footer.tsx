@@ -12,7 +12,7 @@ import Typography from '@mui/material/Typography';
 import { charmverseDiscordInvite } from 'config/constants';
 import DiscordIcon from 'public/images/discord_logo.svg';
 
-import { Container } from './LoginPageContent';
+import { Container } from './components/LoginLayout';
 
 const Background = styled(Box)`
   background-color: ${({ theme }) => theme.palette.background.dark};

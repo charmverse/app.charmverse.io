@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 import { useCallback, createContext, useContext, useEffect, useMemo, useState } from 'react';
 
 import charmClient from 'charmClient';
-import type { CreateSpaceProps } from 'lib/spaces/createWorkspace';
+import type { CreateSpaceProps } from 'lib/spaces/createSpace';
 
 import { useUser } from './useUser';
 

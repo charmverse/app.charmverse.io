@@ -70,7 +70,25 @@ export async function syncFormResponses({
     permissions: rootBoardPage.permissions,
     spaceId: rootBoardPage.spaceId
   });
-  board.fields.cardProperties = cardProperties;
+
+  cardProperties.forEach((property) => {
+    const existingProperty = board.fields.cardProperties.find((p) => p.id === property.id);
+    if (existingProperty) {
+      if (existingProperty.type === 'select' || existingProperty.type === 'multiSelect') {
+        // merge the options
+        const existingOptions = existingProperty.options ?? [];
+        const newOptions = property.options ?? [];
+        const mergedOptions = [...existingOptions, ...newOptions];
+        const uniqueOptions = mergedOptions.filter((o, i) => mergedOptions.findIndex((oo) => oo.id === o.id) === i);
+        property.options = uniqueOptions;
+      }
+      // update the existing property
+      Object.assign(existingProperty, property);
+    } else {
+      // add the new property
+      board.fields.cardProperties.push(property);
+    }
+  });
 
   const createOrUpdateBoard = prisma.block.upsert({
     where: {
@@ -92,7 +110,7 @@ export async function syncFormResponses({
   if (form.info?.title && sourceData.formName.startsWith('Untitled')) {
     sourceData.formName = form.info.title;
   }
-  fields.visiblePropertyIds = cardProperties.map((p) => p.id);
+  fields.visiblePropertyIds = board.fields.cardProperties.map((p) => p.id);
 
   const updateView = lastUpdated ? [] : [prisma.block.update({ where: { id: viewId }, data: { fields } })];
 

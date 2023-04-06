@@ -1,16 +1,20 @@
 import type { PostCategoryPermissionLevel, Space, User } from '@prisma/client';
+import { PostCategoryOperation, PostOperation } from '@prisma/client';
 import { v4 } from 'uuid';
 
 import { prisma } from 'db';
 import { PostCategoryNotFoundError } from 'lib/forums/categories/errors';
 import { addSpaceOperations } from 'lib/permissions/spaces';
 import { InvalidInputError } from 'lib/utilities/errors';
+import { typedKeys } from 'lib/utilities/objects';
 import { generateRole, generateSpaceUser, generateUserAndSpace } from 'testing/setupDatabase';
-import { generatePostCategory } from 'testing/utils/forums';
+import { generateForumPost, generatePostCategory } from 'testing/utils/forums';
 
 import { computePostCategoryPermissions } from '../computePostCategoryPermissions';
+import { computePostPermissions } from '../computePostPermissions';
 import { postCategoryOperations } from '../interfaces';
-import { postCategoryPermissionsMapping } from '../mapping';
+import { postCategoryPermissionsMapping, postPermissionsMapping } from '../mapping';
+import { upsertPostCategoryPermission } from '../upsertPostCategoryPermission';
 
 let adminUser: User;
 let spaceMemberUser: User;
@@ -31,6 +35,66 @@ beforeAll(async () => {
 });
 
 describe('computePostCategoryPermissions', () => {
+  it('should ignore space permissions if the user has applicable role permissions', async () => {
+    // Perform the test with a page that has user / role / space / permissions ----------------------------
+    const postCategory = await generatePostCategory({
+      spaceId: space.id
+    });
+
+    const userWithRole = await generateSpaceUser({
+      spaceId: space.id,
+      isAdmin: false
+    });
+    const role = await generateRole({
+      createdBy: adminUser.id,
+      spaceId: space.id,
+      assigneeUserIds: [userWithRole.id]
+    });
+
+    await Promise.all([
+      upsertPostCategoryPermission({
+        postCategoryId: postCategory.id,
+        permissionLevel: 'full_access',
+        assignee: {
+          group: 'space',
+          id: space.id
+        }
+      }),
+      upsertPostCategoryPermission({
+        postCategoryId: postCategory.id,
+        permissionLevel: 'view',
+        assignee: {
+          group: 'role',
+          id: role.id
+        }
+      })
+    ]);
+
+    const userWithRolePermissions = await computePostCategoryPermissions({
+      resourceId: postCategory.id,
+      userId: userWithRole.id
+    });
+
+    // Check that the level assigned to the role was used in the compute
+    typedKeys(PostCategoryOperation).forEach((op) => {
+      // View level access should provide no operations at all to the category
+      expect(userWithRolePermissions[op]).toBe(false);
+    });
+
+    // Check that other space members not belonging to the role continue to receive the space level permissions
+    const spaceMemberPermissions = await computePostCategoryPermissions({
+      resourceId: postCategory.id,
+      userId: spaceMemberUser.id
+    });
+
+    typedKeys(PostCategoryOperation).forEach((op) => {
+      if (postCategoryPermissionsMapping.full_access.includes(op)) {
+        expect(spaceMemberPermissions[op]).toBe(true);
+      } else {
+        expect(spaceMemberPermissions[op]).toBe(false);
+      }
+    });
+  });
   it('should return full permissions for a category admin', async () => {
     const role = await generateRole({
       createdBy: adminUser.id,
@@ -151,18 +215,6 @@ describe('computePostCategoryPermissions', () => {
       } else {
         expect(permissions[op]).toBe(false);
       }
-    });
-  });
-
-  it('should always return full permissions for a space administrator', async () => {
-    const postCategory = await generatePostCategory({ spaceId: space.id });
-    const permissions = await computePostCategoryPermissions({
-      resourceId: postCategory.id,
-      userId: adminUser.id
-    });
-
-    postCategoryOperations.forEach((op) => {
-      expect(permissions[op]).toBe(true);
     });
   });
 

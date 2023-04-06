@@ -1,20 +1,17 @@
-import type { Prisma } from '@prisma/client';
+import type { PagePermission, Prisma } from '@prisma/client';
 
 import { prisma } from 'db';
 import { PageNotFoundError } from 'lib/pages/server';
+import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { typedKeys } from 'lib/utilities/objects';
 
 import type { PermissionFilteringPolicyFnInput } from '../buildComputePermissionsWithPermissionFilteringPolicies';
 import { buildComputePermissionsWithPermissionFilteringPolicies } from '../buildComputePermissionsWithPermissionFilteringPolicies';
+import { filterApplicablePermissions } from '../filterApplicablePermissions';
 import type { PermissionCompute } from '../interfaces';
 
 import { AllowedPagePermissions } from './available-page-permissions.class';
-import type {
-  IPagePermissionFlags,
-  IPagePermissionUserRequest,
-  IPageWithNestedSpaceRole,
-  PageOperationType
-} from './page-permission-interfaces';
+import type { IPagePermissionFlags, IPagePermissionUserRequest, PageOperationType } from './page-permission-interfaces';
 import { permissionTemplates } from './page-permission-mapping';
 import { computePagePermissionsUsingProposalPermissions } from './pagePermissionsWithComputeProposalPermissions';
 
@@ -158,33 +155,37 @@ async function baseComputeUserPagePermissions({
     });
   }
 
-  const [foundSpaceRole, permissions] = await Promise.all([
-    // Check if user is a space admin for this page so they gain full rightss
-    (
-      prisma.page.findFirst(pageWithSpaceRoleQuery({ pageId, userId })) as any as Promise<IPageWithNestedSpaceRole>
-    ).then((page) => {
-      return page?.space?.spaceRoles?.find((spaceRole) => spaceRole.userId === userId);
-    }),
-    prisma.pagePermission.findMany(permissionsQuery({ pageId, userId }))
-  ]);
+  const { isAdmin, spaceRole } = await hasAccessToSpace({
+    spaceId: pageInDb.spaceId,
+    userId
+  });
 
-  // TODO DELETE LATER when we remove admin access to workspace
-  if (foundSpaceRole && foundSpaceRole.isAdmin === true) {
+  if (isAdmin) {
     return new AllowedPagePermissions().full;
   }
 
-  const computedPermissions = new AllowedPagePermissions();
-
-  permissions.forEach((permission) => {
-    // Custom permissions are persisted to the database. Other permission groups are evaluated by the current mapping
-    const permissionsToAdd =
-      permission.permissionLevel === 'custom'
-        ? permission.permissions
-        : permissionTemplates[permission.permissionLevel];
-
-    computedPermissions.addPermissions(permissionsToAdd);
+  const pagePermissions = await prisma.pagePermission.findMany({
+    where: {
+      pageId,
+      // Small optimisation to avoid querying for permissions that are not applicable
+      public: !spaceRole ? true : undefined,
+      // Only pass individual user permissions if they are a guest
+      userId: spaceRole?.isGuest ? userId : undefined
+    }
+  });
+  const applicablePermissions = await filterApplicablePermissions({
+    permissions: pagePermissions,
+    resourceSpaceId: pageInDb.spaceId,
+    userId
   });
 
+  const computedPermissions = new AllowedPagePermissions();
+
+  applicablePermissions.forEach((permission) => {
+    computedPermissions.addPermissions(
+      permission.permissionLevel === 'custom' ? permission.permissions : permissionTemplates[permission.permissionLevel]
+    );
+  });
   return computedPermissions.operationFlags;
 }
 

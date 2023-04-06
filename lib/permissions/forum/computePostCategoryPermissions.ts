@@ -4,6 +4,7 @@ import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { InvalidInputError } from 'lib/utilities/errors';
 import { isUUID } from 'lib/utilities/strings';
 
+import { filterApplicablePermissions } from '../filterApplicablePermissions';
 import type { PermissionCompute } from '../interfaces';
 
 import { AvailablePostCategoryPermissions } from './availablePostCategoryPermissions.class';
@@ -50,31 +51,22 @@ export async function computePostCategoryPermissions({
 
   if (hasSpaceWideModerate) {
     permissions.addPermissions(postCategoryPermissionsMapping.moderator);
+    return permissions.operationFlags;
   }
 
   const assignedPermissions = await prisma.postCategoryPermission.findMany({
     where: {
-      postCategoryId: resourceId,
-      OR: [
-        {
-          spaceId: postCategory.spaceId
-        },
-        {
-          role: {
-            spaceRolesToRole: {
-              some: {
-                spaceRole: {
-                  userId
-                }
-              }
-            }
-          }
-        }
-      ]
+      postCategoryId: resourceId
     }
   });
 
-  assignedPermissions.forEach((permission) => {
+  const applicablePermissions = await filterApplicablePermissions({
+    permissions: assignedPermissions,
+    resourceSpaceId: postCategory.spaceId,
+    userId
+  });
+
+  applicablePermissions.forEach((permission) => {
     permissions.addPermissions(postCategoryPermissionsMapping[permission.permissionLevel]);
   });
 

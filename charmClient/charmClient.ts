@@ -35,7 +35,7 @@ import type {
 } from 'lib/permissions/pages/page-permission-interfaces';
 import type { SpacePermissionFlags, SpacePermissionModification } from 'lib/permissions/spaces';
 import type { AggregatedProfileData } from 'lib/profile';
-import type { CreateSpaceProps } from 'lib/spaces/createWorkspace';
+import type { CreateSpaceProps } from 'lib/spaces/createSpace';
 import type { ITokenMetadata, ITokenMetadataRequest } from 'lib/tokens/tokenData';
 import { encodeFilename } from 'lib/utilities/encodeFilename';
 import type { SocketAuthReponse } from 'lib/websockets/interfaces';
@@ -241,6 +241,10 @@ class CharmClient {
     return http.DELETE<ModifyChildPagesResponse>(`/api/pages/${pageId}`);
   }
 
+  deletePages(pageIds: string[]) {
+    return http.DELETE<undefined>(`/api/pages`, pageIds);
+  }
+
   favoritePage(pageId: string) {
     return http.POST<Partial<LoggedInUser>>('/api/profile/favorites', { pageId });
   }
@@ -365,6 +369,15 @@ class CharmClient {
     const fbBlock = this.blockToFBBlock(rootBlock);
     fbBlock.deletedAt = new Date().getTime();
     updater([fbBlock]);
+  }
+
+  async deleteBlocks(blockIds: string[], updater: BlockUpdater): Promise<void> {
+    const rootBlocks = await http.DELETE<Block[]>(`/api/blocks`, blockIds);
+    const fbBlocks = rootBlocks.map((rootBlock) => ({
+      ...this.blockToFBBlock(rootBlock),
+      deletedAt: new Date().getTime()
+    }));
+    updater(fbBlocks);
   }
 
   async insertBlocks(fbBlocks: FBBlock[], updater: BlockUpdater): Promise<FBBlock[]> {

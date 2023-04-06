@@ -3,6 +3,7 @@ import { v4 } from 'uuid';
 
 import { prisma } from 'db';
 import { getENSName } from 'lib/blockchain/getENSName';
+import log from 'lib/log';
 import type { SignupAnalytics } from 'lib/metrics/mixpanel/interfaces/UserEvent';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { updateTrackUserProfile } from 'lib/metrics/mixpanel/updateTrackUserProfile';
@@ -25,7 +26,8 @@ export async function createUserFromWallet(
   try {
     const user = await getUserProfile('addresses', lowercaseAddress);
     return user;
-  } catch (error) {
+  } catch (_) {
+    // ignore error, it just means user was not found
     const ens: string | null = await getENSName(address);
     const userPath = shortWalletAddress(address).replace('…', '-');
     const isUserPathAvailable = await isProfilePathAvailable(userPath);
@@ -48,7 +50,11 @@ export async function createUserFromWallet(
       include: sessionUserRelations
     });
 
-    await prepopulateUserProfile(newUser, ens);
+    try {
+      await prepopulateUserProfile(newUser, ens);
+    } catch (error) {
+      log.error('Error while prepopulating user profile', { error, userId: newUser.id });
+    }
 
     updateTrackUserProfile(newUser, prisma);
     trackUserAction('sign_up', { userId: newUser.id, identityType: 'Wallet', ...signupAnalytics });

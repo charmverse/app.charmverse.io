@@ -10,6 +10,7 @@ import { extractTweetAttrs } from 'components/common/CharmEditor/components/twee
 import { extractYoutubeLinkType } from 'components/common/CharmEditor/components/video/utils';
 import { VIDEO_ASPECT_RATIO } from 'components/common/CharmEditor/components/video/videoSpec';
 import log from 'lib/log';
+import { isPdfEmbedLink } from 'lib/pdf/extractPdfEmbedLink';
 import type {
   TextContent,
   MentionNode,
@@ -346,6 +347,7 @@ export class NotionBlock {
         const tweetAttrs = extractTweetAttrs(url);
         const nftAttrs = extractNFTAttrs(url);
         const isYoutube = extractYoutubeLinkType(url);
+        const isPdf = isPdfEmbedLink(url);
 
         if (tweetAttrs) {
           return {
@@ -355,9 +357,7 @@ export class NotionBlock {
               id: tweetAttrs.id
             }
           };
-        }
-
-        if (nftAttrs) {
+        } else if (nftAttrs) {
           return {
             type: 'nft',
             attrs: {
@@ -366,9 +366,7 @@ export class NotionBlock {
               contract: nftAttrs.contract
             }
           };
-        }
-
-        if (isYoutube) {
+        } else if (isYoutube) {
           return {
             type: 'video',
             attrs: {
@@ -377,11 +375,16 @@ export class NotionBlock {
               height: MAX_EMBED_WIDTH / VIDEO_ASPECT_RATIO
             }
           };
-        }
-
-        if (block.type === 'bookmark') {
+        } else if (block.type === 'bookmark') {
           return {
             type: 'bookmark',
+            attrs: {
+              url
+            }
+          };
+        } else if (isPdf) {
+          return {
+            type: 'pdf',
             attrs: {
               url
             }

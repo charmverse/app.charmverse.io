@@ -1,4 +1,4 @@
-import type { Post, PostOperation, Prisma } from '@prisma/client';
+import type { Post, PostOperation } from '@prisma/client';
 
 import { prisma } from 'db';
 import { PostNotFoundError } from 'lib/forums/posts/errors';
@@ -9,6 +9,7 @@ import { isUUID } from 'lib/utilities/strings';
 
 import type { PermissionFilteringPolicyFnInput } from '../buildComputePermissionsWithPermissionFilteringPolicies';
 import { buildComputePermissionsWithPermissionFilteringPolicies } from '../buildComputePermissionsWithPermissionFilteringPolicies';
+import { filterApplicablePermissions } from '../filterApplicablePermissions';
 import type { PermissionCompute } from '../interfaces';
 
 import { AvailablePostPermissions } from './availablePostPermissions.class';
@@ -37,70 +38,47 @@ export async function baseComputePostPermissions({
     throw new PostNotFoundError(`${resourceId}`);
   }
 
-  const { error, isAdmin } = await hasAccessToSpace({
+  const { isAdmin, spaceRole } = await hasAccessToSpace({
     spaceId: post.spaceId,
-    userId,
-    // Provide guest same permission level as public
-    disallowGuest: true
+    userId
   });
 
   const permissions = new AvailablePostPermissions();
 
-  if (isAdmin) {
-    return permissions.full;
-
-    // Requester does not have category permissions
-  }
-
-  const whereQuery: Prisma.PostCategoryPermissionWhereInput = {
-    postCategoryId: post.categoryId
-  };
-
-  if (error || !userId) {
-    whereQuery.public = true;
-  } else {
-    const hasSpaceWideModerate = await hasSpaceWideModerateForumsPermission({
-      spaceId: post.spaceId,
-      userId
-    });
-
-    if (hasSpaceWideModerate) {
-      permissions.addPermissions(postPermissionsMapping.moderator);
-      return permissions.operationFlags;
-    }
-
-    whereQuery.OR = [
-      {
-        public: true
-      },
-      {
-        spaceId: post.spaceId
-      },
-      {
-        role: {
-          spaceRolesToRole: {
-            some: {
-              spaceRole: {
-                userId
-              }
-            }
-          }
-        }
-      }
-    ];
-  }
-
-  const assignedPermissions = await prisma.postCategoryPermission.findMany({
-    where: whereQuery
-  });
-
-  assignedPermissions.forEach((permission) => {
-    permissions.addPermissions(postPermissionsMapping[permission.permissionLevel]);
-  });
-
   if (post.createdBy === userId) {
     permissions.addPermissions(['edit_post', 'delete_post', 'view_post']);
   }
+
+  if (isAdmin) {
+    return permissions.full;
+  }
+
+  const hasSpaceWideModerate = await hasSpaceWideModerateForumsPermission({
+    spaceId: post.spaceId,
+    userId
+  });
+
+  if (hasSpaceWideModerate) {
+    permissions.addPermissions(postPermissionsMapping.moderator);
+    return permissions.operationFlags;
+  }
+
+  // User doesnt not have admin or space-wide moderator override. Apply normal permissions resolution
+  const postCategoryPermissions = await prisma.postCategoryPermission.findMany({
+    where: {
+      postCategoryId: post.categoryId
+    }
+  });
+
+  const applicablePermissions = await filterApplicablePermissions({
+    permissions: postCategoryPermissions,
+    resourceSpaceId: post.spaceId,
+    // Treat user as a guest if they are not a full member of the space
+    userId: !spaceRole || spaceRole?.isGuest ? undefined : userId
+  });
+  applicablePermissions.forEach((permission) => {
+    permissions.addPermissions(postPermissionsMapping[permission.permissionLevel]);
+  });
 
   return permissions.operationFlags;
 }

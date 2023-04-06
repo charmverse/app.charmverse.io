@@ -120,8 +120,10 @@ export function useFirebaseAuth() {
 
   async function requestMagicLinkViaFirebase({
     email,
-    connectToExistingAccount
+    connectToExistingAccount,
+    redirectUrl
   }: {
+    redirectUrl?: string;
     email: string;
     connectToExistingAccount?: boolean;
   }) {
@@ -129,8 +131,17 @@ export function useFirebaseAuth() {
     const auth = getAuth(firebaseApp);
     auth.languageCode = 'en';
 
+    const url = new URL(`${window.location.origin}/authenticate`);
+    if (connectToExistingAccount) {
+      url.searchParams.set('connectToExistingAccount', 'true');
+    }
+
+    if (redirectUrl) {
+      url.searchParams.set('redirectUrl', redirectUrl);
+    }
+
     const actionCodeSettings = {
-      url: `${window.location.origin}/authenticate${connectToExistingAccount ? '?connectToExistingAccount=true' : ''}`,
+      url: url.toString(),
       handleCodeInApp: true
     };
 
