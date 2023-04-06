@@ -29,7 +29,7 @@ async function updateUserProfileItems(req: NextApiRequest, res: NextApiResponse<
   });
 
   const userWalletIds = userWallets.wallets.map((wallet) => wallet.id);
-  if (profileItems.some((profileItem) => !profileItem.walletId || !userWalletIds.includes(profileItem.walletId))) {
+  if (profileItems.some((profileItem) => profileItem.walletId && !userWalletIds.includes(profileItem.walletId))) {
     throw new UnauthorisedActionError('You can only update profile items that belong to one of your wallets');
   }
 
