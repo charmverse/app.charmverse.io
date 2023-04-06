@@ -8,28 +8,27 @@ import LayersIcon from '@mui/icons-material/Layers';
 import BountyIcon from '@mui/icons-material/RequestPageOutlined';
 import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
 import { Badge, Box, DialogContent, Divider, IconButton, Tab, Tabs, Tooltip, Typography } from '@mui/material';
-import router from 'next/router';
 import { Fragment } from 'react';
 
 import Modal from 'components/common/Modal';
+import type { NotificationDisplayType } from 'components/common/PageLayout/components/Header/components/NotificationPreview/useNotifications';
+import { useNotifications } from 'components/common/PageLayout/components/Header/components/NotificationPreview/useNotifications';
 import { SectionName } from 'components/common/PageLayout/components/Sidebar/Sidebar';
 import { SidebarLink } from 'components/common/PageLayout/components/Sidebar/SidebarButton';
 import Legend from 'components/settings/Legend';
 import { useSmallScreen } from 'hooks/useMediaScreens';
-import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
 import { NotificationPreview } from './NotificationPreview';
 import { useNotificationModal } from './useNotificationModal';
-import type { MarkNotificationAsRead, NotificationDetails } from './useNotificationPreview';
 
-const NOTIFICATION_TABS = [
+const NOTIFICATION_TABS: { icon: JSX.Element; label: string; type: NotificationDisplayType }[] = [
   { icon: <LayersIcon />, label: 'All', type: 'all' },
   { icon: <BountyIcon />, label: 'Bounty', type: 'bounty' },
   { icon: <HowToVoteIcon />, label: 'Poll', type: 'vote' },
   { icon: <ForumIcon />, label: 'Discussion', type: 'mention' },
   { icon: <TaskOutlinedIcon />, label: 'Proposal', type: 'proposal' },
   { icon: <CommentIcon />, label: 'Forum', type: 'forum' }
-] as const;
+];
 
 const tabStyles = {
   mt: 2,
@@ -50,32 +49,32 @@ const tabStyles = {
   }
 };
 
-export function NotificationModal({
-  isOpen,
-  onClose,
-  unmarkedNotifications: unmarked,
-  markedNotifications: marked,
-  markAsRead
-}: {
-  isOpen: boolean;
-  onClose: VoidFunction;
-  unmarkedNotifications: NotificationDetails[];
-  markedNotifications: NotificationDetails[];
-  markAsRead: MarkNotificationAsRead;
-}) {
+export function NotificationModal() {
+  const {
+    notificationDisplayType,
+    markedNotificationPreviews: marked,
+    unmarkedNotificationPreviews: unmarked,
+    closeNotificationsModal,
+    openNotificationsModal,
+    markAsRead
+  } = useNotifications();
   const isMobile = useSmallScreen();
 
-  const {
-    markedNotifications,
-    unmarkedNotifications,
-    hasUnreadNotifications,
-    notificationsDisplayType,
-    setNotificationsDisplayType,
-    markBulkAsRead
-  } = useNotificationModal({ marked, unmarked });
+  const { markedNotifications, unmarkedNotifications, hasUnreadNotifications, markBulkAsRead } = useNotificationModal({
+    marked,
+    unmarked,
+    notificationDisplayType
+  });
 
   return (
-    <Modal noPadding onClose={onClose} open={isOpen} mobileDialog={isMobile} size='1200px' sx={{ mx: 5 }}>
+    <Modal
+      noPadding
+      onClose={closeNotificationsModal}
+      open={!!notificationDisplayType}
+      mobileDialog={isMobile}
+      size='1200px'
+      sx={{ mx: 5 }}
+    >
       <Box display='flex' flexDirection='row' flex='1' overflow='hidden'>
         <Box
           component='aside'
@@ -111,8 +110,8 @@ export function NotificationModal({
                   {tab.icon}
                 </Badge>
               }
-              onClick={() => setNotificationsDisplayType(tab.type)}
-              active={tab.type === notificationsDisplayType}
+              onClick={() => openNotificationsModal(tab.type)}
+              active={tab.type === notificationDisplayType}
             />
           ))}
         </Box>
@@ -134,17 +133,17 @@ export function NotificationModal({
                 pt={{ xs: 1, md: 3 }}
               >
                 <Typography variant={isMobile ? 'h6' : 'h5'} textTransform='capitalize' fontWeight={700}>
-                  {`${notificationsDisplayType} Notifications`}
+                  {`${notificationDisplayType} Notifications`}
                 </Typography>
                 <Box display='flex' alignItems='center' gap={{ sm: 2, xs: 1 }}>
-                  {hasUnreadNotifications[notificationsDisplayType] && (
+                  {notificationDisplayType && hasUnreadNotifications[notificationDisplayType] && (
                     <Tooltip title='Mark all as read'>
                       <IconButton aria-label='mark notifications as read' onClick={markBulkAsRead}>
                         <CheckCircleIcon color='secondary' fontSize='small' />
                       </IconButton>
                     </Tooltip>
                   )}
-                  <IconButton aria-label='close the notifications modal' onClick={onClose}>
+                  <IconButton aria-label='close the notifications modal' onClick={closeNotificationsModal}>
                     <CloseIcon color='secondary' fontSize='small' />
                   </IconButton>
                 </Box>
@@ -152,7 +151,7 @@ export function NotificationModal({
               <Tabs
                 sx={{ ...tabStyles, display: isMobile ? 'block' : 'none' }}
                 indicatorColor='primary'
-                value={NOTIFICATION_TABS.findIndex((taskTab) => taskTab.type === notificationsDisplayType)}
+                value={NOTIFICATION_TABS.findIndex((taskTab) => taskTab.type === notificationDisplayType)}
               >
                 {NOTIFICATION_TABS.map((task) => (
                   <Tab
@@ -196,8 +195,7 @@ export function NotificationModal({
                     }}
                     label={task.label}
                     onClick={() => {
-                      setUrlWithoutRerender(router.pathname, { task: task.type });
-                      setNotificationsDisplayType(task.type);
+                      openNotificationsModal(task.type);
                     }}
                   />
                 ))}
@@ -211,14 +209,19 @@ export function NotificationModal({
                     unmarked
                     notification={notification}
                     markAsRead={markAsRead}
-                    onClose={onClose}
+                    onClose={closeNotificationsModal}
                   />
                   <Divider />
                 </Fragment>
               ))}
               {markedNotifications.map((notification) => (
                 <Fragment key={notification.taskId}>
-                  <NotificationPreview large notification={notification} markAsRead={markAsRead} onClose={onClose} />
+                  <NotificationPreview
+                    large
+                    notification={notification}
+                    markAsRead={markAsRead}
+                    onClose={closeNotificationsModal}
+                  />
                   <Divider />
                 </Fragment>
               ))}

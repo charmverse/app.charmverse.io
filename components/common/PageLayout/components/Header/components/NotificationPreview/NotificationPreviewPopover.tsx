@@ -1,16 +1,16 @@
 import CelebrationIcon from '@mui/icons-material/Celebration';
 import { Box, Card, Divider, Typography } from '@mui/material';
-import { Fragment, useMemo, useState } from 'react';
+import { Fragment, useMemo } from 'react';
 
-import { NotificationModal } from './NotificationModal';
+import { useNotifications } from 'components/common/PageLayout/components/Header/components/NotificationPreview/useNotifications';
+
 import { NotificationPreview } from './NotificationPreview';
-import { useNotificationPreview } from './useNotificationPreview';
 
 const MAX_COUNT = 5;
 
 export function NotificationPreviewPopover({ close }: { close: VoidFunction }) {
-  const { unmarkedNotificationPreviews, markAsRead, markedNotificationPreviews } = useNotificationPreview();
-  const [openNotificationsModal, setOpenNotificationsModal] = useState(false);
+  const { unmarkedNotificationPreviews, markAsRead, markedNotificationPreviews, openNotificationsModal } =
+    useNotifications();
 
   const latestNotifications = useMemo(() => {
     return [...unmarkedNotificationPreviews, ...markedNotificationPreviews]
@@ -18,10 +18,6 @@ export function NotificationPreviewPopover({ close }: { close: VoidFunction }) {
       .slice(0, MAX_COUNT);
   }, [unmarkedNotificationPreviews, markedNotificationPreviews]);
 
-  const handleModalClose = () => {
-    setOpenNotificationsModal(false);
-    close();
-  };
   return (
     <Box>
       <Card>
@@ -57,7 +53,10 @@ export function NotificationPreviewPopover({ close }: { close: VoidFunction }) {
       </Box>
       <Card>
         <Box
-          onClick={() => setOpenNotificationsModal(true)}
+          onClick={() => {
+            close();
+            openNotificationsModal();
+          }}
           display='flex'
           alignItems='center'
           justifyContent='center'
@@ -69,14 +68,6 @@ export function NotificationPreviewPopover({ close }: { close: VoidFunction }) {
           </Typography>
         </Box>
       </Card>
-
-      <NotificationModal
-        isOpen={openNotificationsModal}
-        onClose={handleModalClose}
-        unmarkedNotifications={unmarkedNotificationPreviews}
-        markedNotifications={markedNotificationPreviews}
-        markAsRead={markAsRead}
-      />
     </Box>
   );
 }

@@ -13,7 +13,7 @@ import Link from 'components/common/Link';
 import type {
   MarkNotificationAsRead,
   NotificationDetails
-} from 'components/common/PageLayout/components/Header/components/NotificationPreview/useNotificationPreview';
+} from 'components/common/PageLayout/components/Header/components/NotificationPreview/useNotifications';
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useSmallScreen } from 'hooks/useMediaScreens';
 import type { NotificationGroupType } from 'lib/notifications/interfaces';

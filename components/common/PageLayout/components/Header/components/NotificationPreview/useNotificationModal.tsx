@@ -1,26 +1,27 @@
-import { useCallback, useState } from 'react';
+import { useCallback } from 'react';
 
 import charmClient from 'charmClient';
-import type { NotificationDetails } from 'components/common/PageLayout/components/Header/components/NotificationPreview/useNotificationPreview';
+import type {
+  NotificationDetails,
+  NotificationDisplayType
+} from 'components/common/PageLayout/components/Header/components/NotificationPreview/useNotifications';
 import { useTasks } from 'components/nexus/hooks/useTasks';
-
-type NotificationDisplayType = 'all' | 'bounty' | 'vote' | 'mention' | 'proposal' | 'forum';
 
 export function useNotificationModal({
   marked,
-  unmarked
+  unmarked,
+  notificationDisplayType
 }: {
   marked: NotificationDetails[];
   unmarked: NotificationDetails[];
+  notificationDisplayType: NotificationDisplayType | null;
 }) {
   const { mutate: mutateTasks } = useTasks();
-  const [notificationsDisplayType, setNotificationsDisplayType] = useState<NotificationDisplayType>('all');
-
   function filterNotifications(notifications: NotificationDetails[]) {
-    if (notificationsDisplayType === 'all') {
+    if (notificationDisplayType === 'all') {
       return notifications;
     } else {
-      return notifications.filter((n) => n.type === notificationsDisplayType);
+      return notifications.filter((n) => n.type === notificationDisplayType);
     }
   }
 
@@ -37,7 +38,7 @@ export function useNotificationModal({
   const unmarkedNotifications = filterNotifications(unmarked);
 
   const markBulkAsRead = useCallback(async () => {
-    const groupType = notificationsDisplayType === 'all' ? undefined : unmarkedNotifications[0]?.groupType;
+    const groupType = notificationDisplayType === 'all' ? undefined : unmarkedNotifications[0]?.groupType;
     const tasksToMark = unmarkedNotifications.map((n) => ({ id: n.taskId, type: n.type }));
     await charmClient.tasks.markTasks(tasksToMark);
 
@@ -47,7 +48,7 @@ export function useNotificationModal({
           return;
         }
 
-        if (notificationsDisplayType === 'all') {
+        if (notificationDisplayType === 'all') {
           return {
             votes: { marked: [..._tasks.votes.unmarked, ..._tasks.votes.marked], unmarked: [] },
             discussions: { marked: [..._tasks.discussions.unmarked, ..._tasks.discussions.marked], unmarked: [] },
@@ -73,11 +74,9 @@ export function useNotificationModal({
         revalidate: false
       }
     );
-  }, [mutateTasks, notificationsDisplayType, unmarkedNotifications]);
+  }, [mutateTasks, notificationDisplayType, unmarkedNotifications]);
 
   return {
-    notificationsDisplayType,
-    setNotificationsDisplayType,
     hasUnreadNotifications,
     markedNotifications,
     unmarkedNotifications,
