@@ -1,15 +1,22 @@
 import CelebrationIcon from '@mui/icons-material/Celebration';
 import { Box, Card, Divider, Typography } from '@mui/material';
-import { Fragment, useState } from 'react';
+import { Fragment, useMemo, useState } from 'react';
 
 import { NotificationModal } from './NotificationModal';
 import { NotificationPreview } from './NotificationPreview';
 import { useNotificationPreview } from './useNotificationPreview';
 
+const MAX_COUNT = 5;
+
 export function NotificationPreviewPopover({ close }: { close: VoidFunction }) {
   const { unmarkedNotificationPreviews, markAsRead, markedNotificationPreviews } = useNotificationPreview();
   const [openNotificationsModal, setOpenNotificationsModal] = useState(false);
-  const MAX_COUNT = 5;
+
+  const latestNotifications = useMemo(() => {
+    return [...unmarkedNotificationPreviews, ...markedNotificationPreviews]
+      .sort((a, b) => (a.createdAt > b.createdAt ? -1 : 1))
+      .slice(0, MAX_COUNT);
+  }, [unmarkedNotificationPreviews, markedNotificationPreviews]);
 
   const handleModalClose = () => {
     setOpenNotificationsModal(false);
@@ -24,8 +31,8 @@ export function NotificationPreviewPopover({ close }: { close: VoidFunction }) {
       </Card>
       <Divider />
       <Box maxHeight={500} sx={{ overflowY: 'auto', overflowX: 'hidden' }}>
-        {unmarkedNotificationPreviews.length > 0 ? (
-          unmarkedNotificationPreviews.slice(0, MAX_COUNT).map((notification) => (
+        {latestNotifications.length > 0 ? (
+          latestNotifications.map((notification) => (
             <Fragment key={notification.taskId}>
               <NotificationPreview notification={notification} markAsRead={markAsRead} onClose={close} />
               <Divider />
@@ -62,6 +69,7 @@ export function NotificationPreviewPopover({ close }: { close: VoidFunction }) {
           </Typography>
         </Box>
       </Card>
+
       <NotificationModal
         isOpen={openNotificationsModal}
         onClose={handleModalClose}

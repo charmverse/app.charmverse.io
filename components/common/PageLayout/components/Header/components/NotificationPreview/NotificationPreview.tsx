@@ -87,12 +87,12 @@ export function NotificationPreview({ notification, markAsRead, onClose, large, 
                     whiteSpace='nowrap'
                     overflow='hidden'
                     textOverflow='ellipsis'
-                    variant='body1'
+                    variant='subtitle2'
                   >{`${spaceName}`}</Typography>
                 </Box>
                 &nbsp;
                 <Box whiteSpace='nowrap'>
-                  <Typography variant='body1' fontWeight='bold'>
+                  <Typography variant='subtitle2' fontWeight='bold'>
                     {title}
                   </Typography>
                 </Box>
