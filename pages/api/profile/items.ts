@@ -6,6 +6,7 @@ import type { UpdateProfileItemRequest } from 'charmClient/apis/profileApi';
 import { prisma } from 'db';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
+import { UnauthorisedActionError } from 'lib/utilities/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -13,6 +14,24 @@ handler.use(requireUser).put(updateUserProfileItems);
 
 async function updateUserProfileItems(req: NextApiRequest, res: NextApiResponse<any | { error: string }>) {
   const { profileItems }: UpdateProfileItemRequest = req.body;
+
+  const userWallets = await prisma.user.findUniqueOrThrow({
+    where: {
+      id: req.session.user.id
+    },
+    select: {
+      wallets: {
+        select: {
+          id: true
+        }
+      }
+    }
+  });
+
+  const userWalletIds = userWallets.wallets.map((wallet) => wallet.id);
+  if (profileItems.some((profileItem) => profileItem.walletId && !userWalletIds.includes(profileItem.walletId))) {
+    throw new UnauthorisedActionError('You can only update profile items that belong to one of your wallets');
+  }
 
   const shownProfileItems: Omit<ProfileItem, 'userId'>[] = [];
   const hiddenProfileItems: Omit<ProfileItem, 'userId'>[] = [];
@@ -54,7 +73,8 @@ async function updateUserProfileItems(req: NextApiRequest, res: NextApiResponse<
             userId: req.session.user.id,
             metadata: profileItem.metadata === null ? undefined : profileItem.metadata,
             isHidden: true,
-            type: profileItem.type
+            type: profileItem.type,
+            walletId: profileItem.walletId
           }
         })
       )
@@ -76,7 +96,8 @@ async function updateUserProfileItems(req: NextApiRequest, res: NextApiResponse<
           userId: req.session.user.id,
           metadata: profileItem.metadata === null ? undefined : profileItem.metadata,
           isPinned: profileItem.isPinned,
-          type: profileItem.type
+          type: profileItem.type,
+          walletId: profileItem.walletId
         }
       })
     )
