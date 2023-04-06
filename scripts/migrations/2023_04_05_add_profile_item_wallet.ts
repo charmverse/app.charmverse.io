@@ -1,6 +1,24 @@
+import { uuid } from '@bangle.dev/utils';
 import { prisma } from 'db';
 
 async function init() {
+  const wallets = await prisma.userWallet.findMany({
+    select: {
+      address: true
+    }
+  });
+
+  for (const wallet of wallets) {
+    await prisma.userWallet.update({
+      data: {
+        id: uuid()
+      },
+      where: {
+        address: wallet.address
+      }
+    })
+  }
+
   const profileItems = await prisma.profileItem.findMany({
     select : {
       id: true,
@@ -8,7 +26,7 @@ async function init() {
         select: {
           wallets: {
             select: {
-              address: true
+              id: true
             }
           }
         }
@@ -23,7 +41,7 @@ async function init() {
           id: profileItem.id
         },
         data: {
-          walletAddress: profileItem.user.wallets[0].address,
+          walletId: profileItem.user.wallets[0].id,
         }
       })
     }

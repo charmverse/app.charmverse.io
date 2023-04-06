@@ -22,18 +22,14 @@ async function updateUserProfileItems(req: NextApiRequest, res: NextApiResponse<
     select: {
       wallets: {
         select: {
-          address: true
+          id: true
         }
       }
     }
   });
 
-  const userWalletAddresses = userWallets.wallets.map((wallet) => wallet.address);
-  if (
-    profileItems.some(
-      (profileItem) => !profileItem.walletAddress || !userWalletAddresses.includes(profileItem.walletAddress)
-    )
-  ) {
+  const userWalletIds = userWallets.wallets.map((wallet) => wallet.id);
+  if (profileItems.some((profileItem) => !profileItem.walletId || !userWalletIds.includes(profileItem.walletId))) {
     throw new UnauthorisedActionError('You can only update profile items that belong to one of your wallets');
   }
 
@@ -78,7 +74,7 @@ async function updateUserProfileItems(req: NextApiRequest, res: NextApiResponse<
             metadata: profileItem.metadata === null ? undefined : profileItem.metadata,
             isHidden: true,
             type: profileItem.type,
-            walletAddress: profileItem.walletAddress
+            walletId: profileItem.walletId
           }
         })
       )
@@ -101,7 +97,7 @@ async function updateUserProfileItems(req: NextApiRequest, res: NextApiResponse<
           metadata: profileItem.metadata === null ? undefined : profileItem.metadata,
           isPinned: profileItem.isPinned,
           type: profileItem.type,
-          walletAddress: profileItem.walletAddress
+          walletId: profileItem.walletId
         }
       })
     )

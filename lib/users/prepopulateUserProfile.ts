@@ -19,7 +19,7 @@ const acceptedImageFormats = ['.jpg', '.jpeg', '.png', '.webp'];
  * @param ens the ENS name
  */
 export async function prepopulateUserProfile(
-  user: User & { wallets: Pick<UserWallet, 'address' | 'ensname'>[] },
+  user: User & { wallets: Pick<UserWallet, 'address' | 'ensname' | 'id'>[] },
   ens: string | null
 ) {
   const ensDetails = await getENSDetails(ens);
@@ -97,7 +97,7 @@ export async function prepopulateUserProfile(
             isHidden: true,
             isPinned: true,
             type: 'nft',
-            walletAddress: user.wallets[0]?.address
+            walletId: user.wallets[0]?.id
           }
         })
       )

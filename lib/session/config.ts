@@ -61,7 +61,8 @@ export const sessionUserRelations = {
   wallets: {
     select: {
       address: true,
-      ensname: true
+      ensname: true,
+      id: true
     }
   },
   unstoppableDomains: {

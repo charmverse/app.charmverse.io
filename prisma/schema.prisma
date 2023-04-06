@@ -536,7 +536,8 @@ model VerifiedEmail {
 }
 
 model UserWallet {
-  address      String        @id @unique
+  id           String?       @unique @default(uuid()) @db.Uuid
+  address      String        @unique
   userId       String        @db.Uuid
   ensname      String?       @unique
   user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -1026,18 +1027,18 @@ model ProposalReviewer {
 }
 
 model ProfileItem {
-  id            String          @id
-  userId        String          @db.Uuid
-  user          User            @relation(fields: [userId], references: [id], onDelete: Cascade)
-  isHidden      Boolean?
-  metadata      Json?
-  type          ProfileItemType
-  isPinned      Boolean?
-  walletAddress String?
-  userWallet    UserWallet?     @relation(fields: [walletAddress], references: [address], onDelete: Cascade)
+  id         String          @id
+  userId     String          @db.Uuid
+  user       User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  isHidden   Boolean?
+  metadata   Json?
+  type       ProfileItemType
+  isPinned   Boolean?
+  walletId   String?         @db.Uuid
+  userWallet UserWallet?     @relation(fields: [walletId], references: [id], onDelete: Cascade)
 
   @@index([userId])
-  @@index([walletAddress])
+  @@index([walletId])
 }
 
 model WorkspaceEvent {
