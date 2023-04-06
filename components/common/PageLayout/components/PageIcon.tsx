@@ -7,6 +7,7 @@ import ArrowOutwardIcon from '@mui/icons-material/NorthEast';
 import BountyIcon from '@mui/icons-material/RequestPageOutlined';
 import DatabaseIcon from '@mui/icons-material/TableChart';
 import ProposalIcon from '@mui/icons-material/TaskOutlined';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import { Box } from '@mui/material';
 import type { ComponentProps, ReactNode } from 'react';
 
@@ -63,6 +64,18 @@ type PageIconProps = ComponentProps<typeof StyledPageIcon> & {
   isEditorEmpty?: boolean;
   isLinkedPage?: boolean;
 };
+
+export function NoAccessPageIcon() {
+  return (
+    <StyledPageIcon
+      icon={
+        <LinkedIcon>
+          <VisibilityOffIcon />
+        </LinkedIcon>
+      }
+    />
+  );
+}
 
 export function PageIcon({ icon, isEditorEmpty, isLinkedPage = false, pageType, ...props }: PageIconProps) {
   if (!icon) {

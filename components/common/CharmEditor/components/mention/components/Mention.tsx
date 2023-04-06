@@ -4,7 +4,7 @@ import { Box, Typography } from '@mui/material';
 import type { ReactNode } from 'react';
 
 import Link from 'components/common/Link';
-import { PageIcon } from 'components/common/PageLayout/components/PageIcon';
+import { NoAccessPageIcon, PageIcon } from 'components/common/PageLayout/components/PageIcon';
 import { useMemberProfile } from 'components/profile/hooks/useMemberProfile';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMembers } from 'hooks/useMembers';
@@ -40,11 +40,18 @@ export default function Mention({ node }: NodeViewProps) {
   let value: ReactNode = null;
   if (attrs.type === 'page') {
     const page = pages[attrs.value];
-    value = page && (
+    value = page ? (
       <MentionContainer color='inherit' href={`/${space?.domain}/${page.path}`}>
         <Box display='flex' alignItems='center'>
           <PageIcon isLinkedPage icon={page.icon} isEditorEmpty={!page.hasContent} pageType={page.type} />
           <StyledTypography>{page.title || 'Untitled'}</StyledTypography>
+        </Box>
+      </MentionContainer>
+    ) : (
+      <MentionContainer color='inherit'>
+        <Box display='flex' alignItems='center'>
+          <NoAccessPageIcon />
+          <StyledTypography>No access</StyledTypography>
         </Box>
       </MentionContainer>
     );

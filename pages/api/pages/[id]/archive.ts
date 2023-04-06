@@ -46,12 +46,6 @@ async function togglePageArchiveStatus(req: NextApiRequest, res: NextApiResponse
     throw new ActionNotPermittedError('You are not allowed to delete this page.');
   }
 
-  const rootBlock = await prisma.block.findUnique({
-    where: {
-      id: pageId
-    }
-  });
-
   const modifiedChildPageIds = await modifyChildPages(pageId, userId, archive ? 'archive' : 'restore');
   // If we are restoring page then severe the link with parent, only if its not of type card
   // A card type page can't doesn't have any meaning without its parent, and it gets a lot of metadata from its parent
@@ -109,7 +103,7 @@ async function togglePageArchiveStatus(req: NextApiRequest, res: NextApiResponse
     pageSpaceId.spaceId
   );
 
-  return res.status(200).json({ pageIds: modifiedChildPageIds, rootBlock });
+  return res.status(200).json({ pageIds: modifiedChildPageIds });
 }
 
 export default withSessionRoute(handler);

@@ -167,12 +167,6 @@ async function deletePage(req: NextApiRequest, res: NextApiResponse<ModifyChildP
     throw new ActionNotPermittedError('You are not allowed to delete this page.');
   }
 
-  const rootBlock = await prisma.block.findUnique({
-    where: {
-      id: pageId
-    }
-  });
-
   const modifiedChildPageIds = await modifyChildPages(pageId, userId, 'delete');
 
   updateTrackPageProfile(pageId);
@@ -193,7 +187,7 @@ async function deletePage(req: NextApiRequest, res: NextApiResponse<ModifyChildP
     spaceId: pageToDelete.spaceId
   });
 
-  return res.status(200).json({ pageIds: modifiedChildPageIds, rootBlock });
+  return res.status(200).json({ pageIds: modifiedChildPageIds });
 }
 
 export default withSessionRoute(handler);
