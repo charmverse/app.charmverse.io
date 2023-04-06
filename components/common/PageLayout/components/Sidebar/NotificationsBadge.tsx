@@ -1,7 +1,7 @@
 import type { BadgeProps } from '@mui/material';
 import { Badge } from '@mui/material';
 
-import useTasks from 'components/nexus/hooks/useTasks';
+import { useTasks } from 'components/nexus/hooks/useTasks';
 
 export default function NotificationsBadge({ children, ...badgeProps }: BadgeProps & { children: JSX.Element }) {
   const { tasks } = useTasks();

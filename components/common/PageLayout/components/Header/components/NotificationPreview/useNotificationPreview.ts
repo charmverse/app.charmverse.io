@@ -3,7 +3,7 @@ import { NotificationType } from '@prisma/client';
 import { useCallback, useMemo } from 'react';
 
 import charmClient from 'charmClient';
-import useTasks from 'components/nexus/hooks/useTasks';
+import { useTasks } from 'components/nexus/hooks/useTasks';
 import { useUser } from 'hooks/useUser';
 import type { BountyTask } from 'lib/bounties/getBountyTasks';
 import type { DiscussionTask, TaskUser } from 'lib/discussion/interfaces';

@@ -2,7 +2,7 @@ import { useCallback, useState } from 'react';
 
 import charmClient from 'charmClient';
 import type { NotificationDetails } from 'components/common/PageLayout/components/Header/components/NotificationPreview/useNotificationPreview';
-import useTasks from 'components/nexus/hooks/useTasks';
+import { useTasks } from 'components/nexus/hooks/useTasks';
 
 type NotificationDisplayType = 'all' | 'bounty' | 'vote' | 'mention' | 'proposal' | 'forum';
 

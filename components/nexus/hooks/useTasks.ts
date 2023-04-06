@@ -3,7 +3,7 @@ import useSWRImmutable from 'swr/immutable';
 import charmClient from 'charmClient';
 import { useUser } from 'hooks/useUser';
 
-export default function useTasks() {
+export function useTasks() {
   const { user } = useUser();
   const {
     data: tasks,
