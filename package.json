@@ -7,8 +7,7 @@
   "scripts": {
     "build": "NODE_OPTIONS=\"--max_old_space_size=4096\" next build",
     "build:win": "npx next build",
-    "build:prisma": "npx prisma generate",
-    "link:prisma": "ln -s -n ./node_modules/@charmverse/core/src/prisma ./prisma",
+    "build:prisma": "cp -R ./node_modules/@charmverse/core/src/prisma/ ./prisma/ && npx prisma generate",
     "build:analyze": "cross-env ANALYZE=true next build",
     "deploy:staging": "npx cdk deploy \"stg-charmverse-${STAGE}\" --outputs-file cdk.out.json",
     "postdeploy:staging": "node --eval \"console.log('env_url=' + require('./cdk.out.json')['stg-charmverse-${STAGE}'].DeploymentUrl)\"  >> $GITHUB_OUTPUT",

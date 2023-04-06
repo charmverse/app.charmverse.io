@@ -23,12 +23,7 @@ runs:
 
     - name: Install CharmVerse core
       shell: bash
-      if: steps.cache_node_modules.outputs.cache-hit != 'true'
-      run: npm install github:charmverse/common#ts-lib && cd ./node_modules/@charmverse/core && npm run build
-
-    - name: Link to prisma
-      shell: bash
-      run: npm run link:prisma
+      run: npm install github:charmverse/common#ts-lib
 
     # Build prisma types which are cached inside of node_modules
     - name: Build Prisma types
