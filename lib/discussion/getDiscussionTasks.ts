@@ -494,7 +494,10 @@ async function getBoardPersonPropertyMentions({
         in: Object.keys(boardBlocksPersonPropertyRecord)
       },
       type: 'card',
-      deletedAt: null
+      deletedAt: null,
+      updatedAt: {
+        gt: new Date(Date.now() - 1000 * 60 * 60 * 24)
+      }
     },
     include: {
       page: true,
