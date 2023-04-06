@@ -97,6 +97,7 @@ export async function prepopulateUserProfile(
             isHidden: true,
             isPinned: true,
             type: 'nft',
+            // Use the first wallet id when prepopulating the nft profile items
             walletId: user.wallets[0]?.id
           }
         })

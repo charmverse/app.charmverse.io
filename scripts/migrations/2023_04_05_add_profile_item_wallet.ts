@@ -1,4 +1,3 @@
-import { uuid } from '@bangle.dev/utils';
 import { prisma } from 'db';
 
 async function init() {
