@@ -79,7 +79,7 @@ export function NotificationPreview({ notification, markAsRead, onClose, large, 
               )}
             </Badge>
           </Box>
-          <Box overflow='hidden' display='flex' flexDirection='column' flex={1}>
+          <Box overflow='hidden' display='flex' flexDirection='column' flex={1} gap={large ? 0.5 : 0}>
             <Stack direction='row' justifyContent='space-between' width='100%'>
               <Box display='flex' pl={0.2} minWidth={0}>
                 <Box minWidth={0}>
@@ -87,31 +87,23 @@ export function NotificationPreview({ notification, markAsRead, onClose, large, 
                     whiteSpace='nowrap'
                     overflow='hidden'
                     textOverflow='ellipsis'
-                    variant='subtitle2'
-                    fontSize={large ? '1rem' : '0.8rem'}
+                    variant='body1'
                   >{`${spaceName}`}</Typography>
                 </Box>
                 &nbsp;
                 <Box whiteSpace='nowrap'>
-                  <Typography variant='subtitle2' fontSize={large ? '1rem' : '0.8rem'} fontWeight='bold'>
+                  <Typography variant='body1' fontWeight='bold'>
                     {title}
                   </Typography>
                 </Box>
               </Box>
-              <Typography
-                whiteSpace='nowrap'
-                overflow='hidden'
-                textOverflow='ellipsis'
-                variant='subtitle2'
-                fontSize={large ? '1rem' : '0.8rem'}
-              >
+              <Typography whiteSpace='nowrap' overflow='hidden' textOverflow='ellipsis' variant='subtitle2'>
                 {!isSmallScreen && notificationDate}
               </Typography>
             </Stack>
 
             <Typography
               variant='subtitle1'
-              fontSize={large ? '1.1rem' : '0.85rem'}
               sx={{
                 display: '-webkit-box',
                 overflow: 'hidden',
