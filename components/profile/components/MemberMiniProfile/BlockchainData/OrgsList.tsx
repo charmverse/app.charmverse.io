@@ -35,8 +35,7 @@ export function OrgsList({ memberId, readOnly = false }: Props) {
   const [showingOrgsGallery, setIsShowingOrgsGallery] = useState(false);
 
   async function updateOrg(org: UserCommunity) {
-    const walletId = currentUser?.wallets.find((wallet) => wallet.address === org.walletAddress)?.id ?? null;
-    await updateProfileItem<UserCommunity>(org, 'community', walletId, mutateOrgs);
+    await updateProfileItem<UserCommunity>(org, 'community', org.walletId, mutateOrgs);
     setIsShowingOrgsGallery(false);
   }
 

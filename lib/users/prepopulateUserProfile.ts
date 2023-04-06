@@ -18,10 +18,7 @@ const acceptedImageFormats = ['.jpg', '.jpeg', '.png', '.webp'];
  * @param user we need the user id and user avatar to populate many
  * @param ens the ENS name
  */
-export async function prepopulateUserProfile(
-  user: User & { wallets: Pick<UserWallet, 'address' | 'ensname' | 'id'>[] },
-  ens: string | null
-) {
+export async function prepopulateUserProfile(user: User, ens: string | null) {
   const ensDetails = await getENSDetails(ens);
 
   if (
@@ -98,7 +95,7 @@ export async function prepopulateUserProfile(
             isPinned: true,
             type: 'nft',
             // Use the first wallet id when prepopulating the nft profile items
-            walletId: user.wallets.find((wallet) => wallet.address === nft.walletAddress)?.id
+            walletId: nft.walletId
           }
         })
       )

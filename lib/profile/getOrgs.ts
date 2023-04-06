@@ -75,7 +75,7 @@ export async function getOrgs({ userId, apiToken }: { userId: string; apiToken?:
         name: org.name,
         // sometimes the logo is just a filename, do some basic validation
         logo: daoLogos[org.organizationId]?.includes('http') ? daoLogos[org.organizationId] : null,
-        walletAddress: profile.address
+        walletId: wallets.find((wallet) => wallet.address === profile.address)?.id ?? null
       }))
     )
     .flat();
@@ -94,7 +94,7 @@ export async function getOrgs({ userId, apiToken }: { userId: string; apiToken?:
     joinDate: userWorkspace.spaceRoles.find((spaceRole) => spaceRole.userId === userId)?.createdAt.toISOString(),
     name: userWorkspace.name,
     logo: userWorkspace.spaceImage,
-    walletAddress: null
+    walletId: null
   }));
 
   return {

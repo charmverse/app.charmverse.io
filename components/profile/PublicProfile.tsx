@@ -64,7 +64,6 @@ export function PublicProfile(props: UserDetailsProps) {
   collectables.sort((itemA, itemB) => (new Date(itemB.date) > new Date(itemA.date) ? 1 : -1));
 
   async function toggleCommunityVisibility(community: CommunityDetails) {
-    const walletId = currentUser?.wallets.find((wallet) => wallet.address === community.walletAddress)?.id ?? null;
     if (currentUser) {
       await charmClient.profile.updateProfileItem({
         profileItems: [
@@ -74,7 +73,7 @@ export function PublicProfile(props: UserDetailsProps) {
             type: 'community',
             metadata: null,
             isPinned: false,
-            walletId
+            walletId: community.walletId
           }
         ]
       });
@@ -103,7 +102,6 @@ export function PublicProfile(props: UserDetailsProps) {
   }
 
   async function toggleCollectibleVisibility(item: Collectable) {
-    const walletId = currentUser?.wallets.find((wallet) => wallet.address === item.walletAddress)?.id ?? null;
     if (currentUser) {
       await charmClient.profile.updateProfileItem({
         profileItems: [
@@ -113,7 +111,7 @@ export function PublicProfile(props: UserDetailsProps) {
             type: item.type,
             metadata: null,
             isPinned: false,
-            walletId
+            walletId: item.walletId
           }
         ]
       });

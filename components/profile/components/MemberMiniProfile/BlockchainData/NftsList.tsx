@@ -34,8 +34,7 @@ export function NftsList({ memberId, readOnly = false }: Props) {
   const emptyNftsCount = totalShownNfts - pinnedNfts.length;
 
   async function updateNft(nft: NftData) {
-    const walletId = currentUser?.wallets.find((wallet) => wallet.address === nft.walletAddress)?.id ?? null;
-    await updateProfileItem<NftData>(nft, 'nft', walletId, mutateNfts);
+    await updateProfileItem<NftData>(nft, 'nft', nft.walletId, mutateNfts);
     setIsShowingNftGallery(false);
   }
 

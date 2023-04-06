@@ -4,7 +4,7 @@ export interface UserCommunity {
   isHidden: boolean;
   isPinned: boolean;
   logo: string | null;
-  walletAddress: string | null;
+  walletId: string | null;
 }
 
 export interface ProfileBountyEvent {
