@@ -75,7 +75,13 @@ export function NotificationModal() {
       size='1200px'
       sx={{ mx: 5 }}
     >
-      <Box display='flex' flexDirection='row' flex='1' overflow='hidden'>
+      <Box
+        display='flex'
+        flexDirection='row'
+        flex='1'
+        overflow='hidden'
+        data-test-notification-tab={notificationDisplayType}
+      >
         <Box
           component='aside'
           display={isMobile ? 'none' : 'block'}

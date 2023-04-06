@@ -39,6 +39,7 @@ export function NotificationPreview({ notification, markAsRead, onClose, large, 
 
   return (
     <Link
+      data-test={`goto-${href}`}
       color='inherit'
       href={href}
       onClick={() => {
