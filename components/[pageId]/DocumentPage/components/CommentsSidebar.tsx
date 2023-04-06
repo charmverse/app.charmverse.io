@@ -96,10 +96,16 @@ function CommentsSidebarComponent({ inline }: BoxProps & { inline?: boolean }) {
 
     if (typeof highlightedCommentId === 'string' && highlightedCommentId !== lastHighlightedCommentId.current) {
       setCurrentPageActionDisplay('comments');
-      setThreadFilter('all');
-      // Remove query parameters from url
+      const isHighlightedResolved = resolvedThreads.some((thread) =>
+        thread.comments.some((comment) => comment.id === highlightedCommentId)
+      );
+      if (isHighlightedResolved) {
+        setThreadFilter('resolved');
+      }
 
+      // Remove query parameters from url
       setUrlWithoutRerender(router.pathname, { commentId: null });
+
       requestAnimationFrame(() => {
         const highlightedCommentElement = document.getElementById(`comment.${highlightedCommentId}`);
         if (!highlightedCommentElement) {
