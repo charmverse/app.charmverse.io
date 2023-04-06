@@ -8,7 +8,9 @@ import charmClient from 'charmClient';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 
-const StyledPageDeleteBanner = styled(Box)<{ card?: boolean }>`
+const StyledPageDeleteBanner = styled(Box, {
+  shouldForwardProp: (prop: string) => prop !== 'card'
+})<{ card?: boolean }>`
   width: 100%;
   z-index: var(--z-index-appBar);
   display: flex;
@@ -32,12 +34,12 @@ export default function PageDeleteBanner({ pageId }: { pageId: string }) {
 
   async function deletePage() {
     if (space) {
-      await charmClient.deletePage(pageId);
-      router.push(
+      await router.push(
         `/${router.query.domain}/${
           Object.values(pages).find((page) => page?.type !== 'card' && page?.deletedAt === null)?.path
         }`
       );
+      await charmClient.deletePage(pageId);
     }
   }
 
