@@ -115,7 +115,7 @@ async function createPageHandler(req: NextApiRequest, res: NextApiResponse<IPage
   }
 }
 
-async function deletePages(req: NextApiRequest, res: NextApiResponse<ModifyChildPagesResponse>) {
+async function deletePages(req: NextApiRequest, res: NextApiResponse) {
   const pageIds = (req.body || []) as string[];
   const userId = req.session.user.id;
 
@@ -166,7 +166,7 @@ async function deletePages(req: NextApiRequest, res: NextApiResponse<ModifyChild
     spaceId
   });
 
-  return res.status(200).json({ pageIds: modifiedChildPageIds });
+  return res.status(200).end();
 }
 
 export default withSessionRoute(handler);

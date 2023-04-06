@@ -319,6 +319,8 @@ async function deleteBlocks(req: NextApiRequest, res: NextApiResponse<Block[]>) 
 
     if (permissions.delete !== true) {
       throw new ActionNotPermittedError('You are not allowed to delete this block.');
+    } else if (permissions.delete === true) {
+      break;
     }
   }
 

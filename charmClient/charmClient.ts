@@ -242,7 +242,7 @@ class CharmClient {
   }
 
   deletePages(pageIds: string[]) {
-    return http.DELETE<ModifyChildPagesResponse>(`/api/pages`, pageIds);
+    return http.DELETE<undefined>(`/api/pages`, pageIds);
   }
 
   favoritePage(pageId: string) {
