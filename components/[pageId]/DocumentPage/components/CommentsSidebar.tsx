@@ -96,10 +96,10 @@ function CommentsSidebarComponent({ inline }: BoxProps & { inline?: boolean }) {
 
     if (typeof highlightedCommentId === 'string' && highlightedCommentId !== lastHighlightedCommentId.current) {
       setCurrentPageActionDisplay('comments');
-      setThreadFilter('all');
-      // Remove query parameters from url
 
+      // Remove query parameters from url
       setUrlWithoutRerender(router.pathname, { commentId: null });
+
       requestAnimationFrame(() => {
         const highlightedCommentElement = document.getElementById(`comment.${highlightedCommentId}`);
         if (!highlightedCommentElement) {
