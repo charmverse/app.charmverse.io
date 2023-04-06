@@ -192,7 +192,7 @@ async function sendNotification(
         prisma.userNotification.create({
           data: {
             userId: notification.user.id,
-            taskId: discussionTask.mentionId ?? discussionTask.commentId ?? '',
+            taskId: discussionTask.mentionId ?? discussionTask.commentId ?? discussionTask.taskId ?? '',
             channel: 'email',
             type: 'mention'
           }
