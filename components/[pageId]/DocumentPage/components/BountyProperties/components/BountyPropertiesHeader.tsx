@@ -37,17 +37,17 @@ export function BountyPropertiesHeader({
   refreshPermissions
 }: Props) {
   const { members } = useMembers();
-  const { mutatePage } = usePages();
   const { showMessage } = useSnackbar();
 
   const [updatingPermissions, setUpdatingPermissions] = useState(false);
 
+  // Detect if the page permissions allow potential applicants to edit the page
   const intersection: BountyPagePermissionIntersection =
     !bountyPermissions || !pagePermissions
       ? { hasPermissions: [], missingPermissions: [] }
       : compareBountyPagePermissions({
-          bountyPermissions,
-          pagePermissions,
+          bountyPermissions: { ...bountyPermissions, creator: [] },
+          pagePermissions: pagePermissions.filter((p) => p.userId !== bounty.createdBy),
           bountyOperations: ['work'],
           pageOperations: ['edit_content'],
           members
@@ -103,7 +103,7 @@ export function BountyPropertiesHeader({
             </Tooltip>
           }
         >
-          The current permissions allow applicants to edit the details of this bounty.
+          The current permissions allow some applicants to edit the details of this bounty.
         </Alert>
       )}
     </>

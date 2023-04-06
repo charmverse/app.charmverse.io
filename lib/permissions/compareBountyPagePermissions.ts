@@ -22,13 +22,21 @@ export interface BountyPagePermissionIntersection {
   missingPermissions: TargetPermissionGroup[];
 }
 
-export function compareBountyPagePermissions({
+export function isEditableByApplicants({
   bountyOperations,
   bountyPermissions,
   pageOperations,
   pagePermissions,
   members
 }: BountyPagePermissionIntersectionQuery): BountyPagePermissionIntersection {
+  const submitters = bountyPermissions.submitter ?? [];
+
+  if (submitters.length === 0) {
+    submitters.push({
+      group: 'space'
+    });
+  }
+
   const permissionsMap: Record<
     string,
     {

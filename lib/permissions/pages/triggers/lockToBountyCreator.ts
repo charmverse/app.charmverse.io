@@ -1,4 +1,4 @@
-import type { PagePermission, PagePermissionLevel } from '@prisma/client';
+import type { PagePermission, PagePermissionLevel, Prisma } from '@prisma/client';
 import { v4 } from 'uuid';
 
 import { prisma } from 'db';
@@ -25,25 +25,16 @@ export async function lockToBountyCreator({ pageId }: { pageId: string }): Promi
     throw new DataNotFoundError('This page does not have a linked bounty');
   }
 
-  const toModify: PagePermission[] = [
-    ...page.permissions
-      .filter((p) => p.userId !== page.bounty?.createdBy)
-      .map((p) => {
-        return {
-          ...p,
-          permissionLevel: 'view' as PagePermissionLevel
-        };
-      }),
+  const permissionInputs: Prisma.PagePermissionCreateManyInput[] = [
     {
-      id: v4(),
-      inheritedFromPermission: null,
       pageId,
       permissionLevel: 'full_access',
-      public: null,
-      roleId: null,
-      permissions: [],
-      spaceId: null,
-      userId: page.bounty?.createdBy
+      userId: page.bounty.createdBy
+    },
+    {
+      pageId,
+      permissionLevel: 'view',
+      spaceId: page.bounty.spaceId
     }
   ];
 
@@ -54,9 +45,19 @@ export async function lockToBountyCreator({ pageId }: { pageId: string }): Promi
       tx
     });
 
-    for (const permission of toModify) {
-      await upsertPermission(pageId, permission, pageTree, tx);
-    }
+    // Clear permissions
+    await tx.pagePermission.deleteMany({
+      where: {
+        pageId: {
+          in: [pageId, ...pageTree.flatChildren.map((p) => p.id)]
+        }
+      }
+    });
+
+    await tx.pagePermission.createMany({
+      data: permissionInputs
+    });
+
     await setupPermissionsAfterPageRepositioned(pageId, tx);
   });
 
