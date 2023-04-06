@@ -169,6 +169,7 @@ export class DocumentEventHandler {
     } catch (error) {
       log.error('Error handling socket message', {
         error: (error as any).stack || error,
+        message,
         ...logData
       });
     }
