@@ -6,14 +6,16 @@ import charmClient from 'charmClient';
 export async function updateProfileItem<Data extends { id: string; isPinned: boolean; isHidden: boolean }>(
   data: Data,
   type: ProfileItem['type'],
+  walletAddress: string,
   mutate?: KeyedMutator<Data[]>
 ) {
-  const profileItem: Omit<ProfileItem, 'userId' | 'address'> = {
+  const profileItem: Omit<ProfileItem, 'userId'> = {
     id: data.id,
     isHidden: data.isHidden,
     type,
     metadata: null,
-    isPinned: !data.isPinned
+    isPinned: !data.isPinned,
+    walletAddress
   };
 
   await charmClient.profile.updateProfileItem({

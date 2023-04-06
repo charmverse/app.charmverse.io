@@ -33,10 +33,13 @@ export function OrgsList({ memberId, readOnly = false }: Props) {
   const nonPinnedOrgs = orgs.filter((org) => !org.isPinned);
   const emptyOrgsCount = totalShownOrgs - pinnedOrgs.length;
   const [showingOrgsGallery, setIsShowingOrgsGallery] = useState(false);
+  const firstWalletAddress = currentUser?.wallets[0]?.address;
 
   async function updateOrg(org: UserCommunity) {
-    await updateProfileItem<UserCommunity>(org, 'community', mutateOrgs);
-    setIsShowingOrgsGallery(false);
+    if (firstWalletAddress) {
+      await updateProfileItem<UserCommunity>(org, 'community', firstWalletAddress, mutateOrgs);
+      setIsShowingOrgsGallery(false);
+    }
   }
 
   if (currentUser?.id !== memberId && pinnedOrgs.length === 0) {

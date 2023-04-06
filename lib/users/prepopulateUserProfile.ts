@@ -97,7 +97,7 @@ export async function prepopulateUserProfile(
             isHidden: true,
             isPinned: true,
             type: 'nft',
-            address: user.wallets[0].address
+            walletAddress: user.wallets[0]?.address
           }
         })
       )

@@ -6,6 +6,7 @@ import type { UpdateProfileItemRequest } from 'charmClient/apis/profileApi';
 import { prisma } from 'db';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
+import { UnauthorisedActionError } from 'lib/utilities/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -13,6 +14,7 @@ handler.use(requireUser).put(updateUserProfileItems);
 
 async function updateUserProfileItems(req: NextApiRequest, res: NextApiResponse<any | { error: string }>) {
   const { profileItems }: UpdateProfileItemRequest = req.body;
+
   const userWallets = await prisma.user.findUniqueOrThrow({
     where: {
       id: req.session.user.id
@@ -26,10 +28,17 @@ async function updateUserProfileItems(req: NextApiRequest, res: NextApiResponse<
     }
   });
 
-  const firstWalletAddress = userWallets?.wallets[0].address;
+  const userWalletAddresses = userWallets.wallets.map((wallet) => wallet.address);
+  if (
+    profileItems.some(
+      (profileItem) => !profileItem.walletAddress || !userWalletAddresses.includes(profileItem.walletAddress)
+    )
+  ) {
+    throw new UnauthorisedActionError('You can only update profile items that belong to one of your wallets');
+  }
 
-  const shownProfileItems: Omit<ProfileItem, 'userId' | 'address'>[] = [];
-  const hiddenProfileItems: Omit<ProfileItem, 'userId' | 'address'>[] = [];
+  const shownProfileItems: Omit<ProfileItem, 'userId'>[] = [];
+  const hiddenProfileItems: Omit<ProfileItem, 'userId'>[] = [];
   profileItems.forEach((profileItem) => {
     if (!profileItem.isHidden) {
       shownProfileItems.push(profileItem);
@@ -69,7 +78,7 @@ async function updateUserProfileItems(req: NextApiRequest, res: NextApiResponse<
             metadata: profileItem.metadata === null ? undefined : profileItem.metadata,
             isHidden: true,
             type: profileItem.type,
-            address: firstWalletAddress
+            walletAddress: profileItem.walletAddress
           }
         })
       )
@@ -92,7 +101,7 @@ async function updateUserProfileItems(req: NextApiRequest, res: NextApiResponse<
           metadata: profileItem.metadata === null ? undefined : profileItem.metadata,
           isPinned: profileItem.isPinned,
           type: profileItem.type,
-          address: firstWalletAddress
+          walletAddress: profileItem.walletAddress
         }
       })
     )

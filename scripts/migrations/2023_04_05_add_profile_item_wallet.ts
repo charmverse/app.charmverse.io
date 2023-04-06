@@ -17,14 +17,16 @@ async function init() {
   })
 
   for (const profileItem of profileItems) {
-    await prisma.profileItem.update({
-      where: {
-        id: profileItem.id
-      },
-      data: {
-        address: profileItem.user.wallets[0].address,
-      }
-    })
+    if (profileItem.user.wallets.length === 1) {
+      await prisma.profileItem.update({
+        where: {
+          id: profileItem.id
+        },
+        data: {
+          walletAddress: profileItem.user.wallets[0].address,
+        }
+      })
+    }
   }
 }
 

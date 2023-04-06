@@ -33,9 +33,14 @@ export function NftsList({ memberId, readOnly = false }: Props) {
   const pinnedNfts = nfts.filter((nft) => nft.isPinned);
   const emptyNftsCount = totalShownNfts - pinnedNfts.length;
 
+  // Provide custom wallet address
+  const firstWalletAddress = currentUser?.wallets[0]?.address;
+
   async function updateNft(nft: NftData) {
-    await updateProfileItem<NftData>(nft, 'nft', mutateNfts);
-    setIsShowingNftGallery(false);
+    if (firstWalletAddress) {
+      await updateProfileItem<NftData>(nft, 'nft', firstWalletAddress, mutateNfts);
+      setIsShowingNftGallery(false);
+    }
   }
 
   if (currentUser?.id !== memberId && pinnedNfts.length === 0) {

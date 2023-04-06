@@ -8,7 +8,7 @@ import type { UserAvatar } from 'lib/users/interfaces';
 import type { LoggedInUser } from 'models';
 
 export interface UpdateProfileItemRequest {
-  profileItems: Omit<ProfileItem, 'userId' | 'address'>[];
+  profileItems: Omit<ProfileItem, 'userId'>[];
 }
 
 export class ProfileApi {

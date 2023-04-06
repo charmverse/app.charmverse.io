@@ -1026,17 +1026,18 @@ model ProposalReviewer {
 }
 
 model ProfileItem {
-  id         String          @id
-  userId     String          @db.Uuid
-  user       User            @relation(fields: [userId], references: [id], onDelete: Cascade)
-  isHidden   Boolean?
-  metadata   Json?
-  type       ProfileItemType
-  isPinned   Boolean?
-  address    String?
-  userWallet UserWallet?     @relation(fields: [address], references: [address], onDelete: Cascade)
+  id            String          @id
+  userId        String          @db.Uuid
+  user          User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  isHidden      Boolean?
+  metadata      Json?
+  type          ProfileItemType
+  isPinned      Boolean?
+  walletAddress String?
+  userWallet    UserWallet?     @relation(fields: [walletAddress], references: [address], onDelete: Cascade)
 
   @@index([userId])
+  @@index([walletAddress])
 }
 
 model WorkspaceEvent {
