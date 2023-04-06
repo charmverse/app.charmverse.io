@@ -37,22 +37,22 @@ export function useNotificationPreview() {
   const unmarkedNotificationPreviews: NotificationDetails[] = useMemo(() => {
     if (!tasks) return [];
     return [
-      ...getNotificationPreviewItems(tasks.votes.unmarked, 'votes', currentUserId),
-      ...getNotificationPreviewItems(tasks.proposals.unmarked, 'proposals', currentUserId),
-      ...getNotificationPreviewItems(tasks.bounties.unmarked, 'bounties', currentUserId),
-      ...getNotificationPreviewItems(tasks.discussions.unmarked, 'discussions', currentUserId),
-      ...getNotificationPreviewItems(tasks.forum.unmarked, 'forum', currentUserId)
+      ...getVoteNotificationPreviewItems(tasks.votes.unmarked, currentUserId),
+      ...getProposalsNotificationPreviewItems(tasks.proposals.unmarked, currentUserId),
+      ...getBountiesNotificationPreviewItems(tasks.bounties.unmarked),
+      ...getDiscussionsNotificationPreviewItems(tasks.discussions.unmarked),
+      ...getForumNotificationPreviewItems(tasks.forum.unmarked)
     ].sort((a, b) => (a.createdAt > b.createdAt ? -1 : 1));
   }, [tasks]);
 
   const markedNotificationPreviews: NotificationDetails[] = useMemo(() => {
     if (!tasks) return [];
     return [
-      ...getNotificationPreviewItems(tasks.votes.marked, 'votes', currentUserId),
-      ...getNotificationPreviewItems(tasks.proposals.marked, 'proposals', currentUserId),
-      ...getNotificationPreviewItems(tasks.bounties.marked, 'bounties', currentUserId),
-      ...getNotificationPreviewItems(tasks.discussions.marked, 'discussions', currentUserId),
-      ...getNotificationPreviewItems(tasks.forum.marked, 'forum', currentUserId)
+      ...getVoteNotificationPreviewItems(tasks.votes.marked, currentUserId),
+      ...getProposalsNotificationPreviewItems(tasks.proposals.marked, currentUserId),
+      ...getBountiesNotificationPreviewItems(tasks.bounties.marked),
+      ...getDiscussionsNotificationPreviewItems(tasks.discussions.marked),
+      ...getForumNotificationPreviewItems(tasks.forum.marked)
     ].sort((a, b) => (a.createdAt > b.createdAt ? -1 : 1));
   }, [tasks]);
 
@@ -102,106 +102,68 @@ export function useNotificationPreview() {
   return { unmarkedNotificationPreviews, markedNotificationPreviews, markAsRead };
 }
 
-function getNotificationPreviewItems(
-  notifications: NotificationPreview[],
-  groupType: NotificationGroupType,
-  currentUserId?: string
-) {
+const pagePath = (n: NotificationPreview) => ('pagePath' in n ? n.pagePath : null);
+const postPath = (n: NotificationPreview) => ('postPath' in n ? n.postPath : null);
+
+function getForumNotificationPreviewItems(notifications: NotificationPreview[]) {
+  const forumContent = (n: NotificationPreview) => {
+    const { createdBy } = n;
+    const commentId = 'commentId' in n ? n.commentId : null;
+    const title = getNotificationConentTitle(n);
+
+    if (commentId) {
+      return createdBy?.username ? `${createdBy?.username} left a comment on ${title}.` : `New comment on ${title}.`;
+    }
+    return createdBy?.username
+      ? `${createdBy?.username} created "${title}" post on forum.`
+      : `New forum post "${title}"`;
+  };
+
   return notifications.map((n) => ({
     taskId: n.taskId,
     createdAt: n.createdAt,
     createdBy: n.createdBy,
     spaceName: n.spaceName,
-    groupType,
-    type: getNotificationPreviewType(groupType),
-    href: getNotificationHref(n, groupType),
-    content: getNotificationContent(n, groupType, currentUserId),
-    title: getNotificationTitle(n, groupType)
+    groupType: 'forum' as NotificationGroupType,
+    type: NotificationType.forum,
+    href: `/${n.spaceDomain}/forum/post/${postPath(n)}`,
+    content: forumContent(n),
+    title: 'Forum Post'
   }));
 }
 
-function getNotificationPreviewPath(notification: NotificationPreview) {
-  if ('pagePath' in notification) {
-    return notification.pagePath;
-  }
+function getDiscussionsNotificationPreviewItems(notifications: NotificationPreview[]) {
+  const commentId = (n: NotificationPreview) => ('commentId' in n ? n.commentId : null);
+  const mentionId = (n: NotificationPreview) => ('mentionId' in n ? n.mentionId : null);
 
-  if ('postPath' in notification) {
-    return notification.postPath;
-  }
+  const discussionContent = (n: NotificationPreview) => {
+    const { createdBy } = n;
+    const title = getNotificationConentTitle(n);
 
-  return null;
+    return title ? `${createdBy?.username} left a comment in ${title}.` : `${createdBy?.username} left a comment.`;
+  };
+
+  return notifications.map((n) => ({
+    taskId: n.taskId,
+    createdAt: n.createdAt,
+    createdBy: n.createdBy,
+    spaceName: n.spaceName,
+    groupType: 'discussions' as NotificationGroupType,
+    type: NotificationType.mention,
+    href: `/${n.spaceDomain}/${'pagePath' in n && n.pagePath}?${
+      commentId(n) ? `commentId=${commentId(n)}` : `mentionId=${mentionId(n)}`
+    }`,
+    content: discussionContent(n),
+    title: 'Discussion'
+  }));
 }
 
-function getNotificationConentTitle(notification: NotificationPreview) {
-  if ('postTitle' in notification) {
-    return notification.postTitle;
-  }
+function getBountiesNotificationPreviewItems(notifications: NotificationPreview[]) {
+  const bountyContent = (n: NotificationPreview) => {
+    const action = 'action' in n ? n.action : null;
+    const title = getNotificationConentTitle(n);
+    const { createdBy } = n;
 
-  if ('pageTitle' in notification) {
-    return notification.pageTitle;
-  }
-
-  if ('title' in notification) {
-    return notification.title;
-  }
-
-  return '';
-}
-
-function getNotificationPreviewType(groupType: NotificationGroupType): NotificationType {
-  if (groupType === 'discussions') {
-    return NotificationType.mention;
-  }
-  if (groupType === 'forum') {
-    return NotificationType.forum;
-  }
-  if (groupType === 'proposals') {
-    return NotificationType.proposal;
-  }
-  if (groupType === 'bounties') {
-    return NotificationType.bounty;
-  }
-  if (groupType === 'votes') {
-    return NotificationType.vote;
-  }
-  return NotificationType.forum;
-}
-
-function getNotificationHref(n: NotificationPreview, groupType: NotificationGroupType) {
-  const { spaceDomain, taskId } = n;
-  const path = getNotificationPreviewPath(n);
-  const commentId = 'commentId' in n ? n.commentId : null;
-  const mentionId = 'mentionId' in n ? n.mentionId : null;
-
-  if (groupType === 'proposals' || groupType === 'bounties' || ('type' in n && n.type === 'proposal')) {
-    return `/${spaceDomain}/${path}`;
-  }
-
-  if (groupType === 'discussions') {
-    return `/${spaceDomain}/${path}?${commentId ? `commentId=${commentId}` : `mentionId=${mentionId}`}`;
-  }
-  if (groupType === 'votes') {
-    return `/${spaceDomain}/${path}?voteId=${taskId}`;
-  }
-
-  if (groupType === 'forum') {
-    return `/${spaceDomain}/forum/post/${path}`;
-  }
-
-  return '';
-}
-
-function getNotificationContent(n: NotificationPreview, groupType: NotificationGroupType, currentUserId?: string) {
-  const action = 'action' in n ? n.action : null;
-  const status = 'status' in n ? n.status : null;
-  const pageTitle = 'pageTitle' in n ? n.pageTitle : null;
-  const userChoice = 'userChoice' in n ? n.userChoice : null;
-  const title = getNotificationConentTitle(n);
-  const commentId = 'commentId' in n ? n.commentId : null;
-  const { createdBy } = n;
-  const isCreator = currentUserId === createdBy?.id;
-
-  if (groupType === 'bounties') {
     if (action === 'application_pending') {
       return `${createdBy?.username} applied for ${title} bounty.`;
     }
@@ -237,74 +199,100 @@ function getNotificationContent(n: NotificationPreview, groupType: NotificationG
     return createdBy?.username
       ? `${createdBy?.username} updated ${title} bounty status.`
       : `Bounty status ${title} updated.`;
-  }
+  };
 
-  if (groupType === 'votes' && userChoice) {
-    return createdBy?.username ? `${createdBy?.username} added a vote in "${title}".` : `New vote in "${title}".`;
-  }
+  return notifications.map((n) => ({
+    taskId: n.taskId,
+    createdAt: n.createdAt,
+    createdBy: n.createdBy,
+    spaceName: n.spaceName,
+    groupType: 'bounties' as NotificationGroupType,
+    type: NotificationType.bounty,
+    href: `/${n.spaceDomain}/${pagePath(n)}`,
+    content: bountyContent(n),
+    title: 'Bounty'
+  }));
+}
 
-  if (groupType === 'forum') {
-    if (commentId) {
-      return createdBy?.username ? `${createdBy?.username} left a comment on ${title}.` : `New comment on ${title}.`;
+function getProposalsNotificationPreviewItems(notifications: NotificationPreview[], currentUserId?: string) {
+  const proposalContent = (n: NotificationPreview) => {
+    const status = 'status' in n ? n.status : null;
+    const { createdBy } = n;
+    const isCreator = currentUserId === createdBy?.id;
+    const pageTitle = 'pageTitle' in n ? n.pageTitle : null;
+    const title = getNotificationConentTitle(n);
+
+    if (status) {
+      return createdBy?.username
+        ? isCreator
+          ? `You updated proposal ${pageTitle}`
+          : `${createdBy?.username} updated proposal ${pageTitle}.`
+        : `Proposal ${pageTitle} updated.`;
     }
-
-    return createdBy?.username
-      ? `${createdBy?.username} created "${title}" post on forum.`
-      : `New forum post "${title}"`;
-  }
-
-  if (groupType === 'discussions') {
-    return title ? `${createdBy?.username} left a comment in ${title}.` : `${createdBy?.username} left a comment.`;
-  }
-
-  if (groupType === 'votes') {
-    return createdBy?.username
-      ? isCreator
-        ? `You created new vote "${title}".`
-        : `${createdBy?.username} created a poll "${title}".`
-      : `Poll "${title}" created.`;
-  }
-
-  if (groupType === 'proposals' && status) {
-    return createdBy?.username
-      ? isCreator
-        ? `You updated proposal ${pageTitle}`
-        : `${createdBy?.username} updated proposal ${pageTitle}.`
-      : `Proposal ${pageTitle} updated.`;
-  }
-
-  if (groupType === 'proposals') {
     return createdBy?.username
       ? isCreator
         ? `You updated ${title} proposal.`
         : `${createdBy?.username} updated ${title} proposal.`
       : `Proposal ${title} updated.`;
+  };
+
+  return notifications.map((n) => ({
+    taskId: n.taskId,
+    createdAt: n.createdAt,
+    createdBy: n.createdBy,
+    spaceName: n.spaceName,
+    groupType: 'proposals' as NotificationGroupType,
+    type: NotificationType.proposal,
+    href: `/${n.spaceDomain}/${pagePath(n)}`,
+    content: proposalContent(n),
+    title: `Proposal: ${getNotificationStatus('status' in n ? n.status : null)}`
+  }));
+}
+
+function getVoteNotificationPreviewItems(notifications: NotificationPreview[], currentUserId?: string) {
+  const voteContent = (n: NotificationPreview) => {
+    const { createdBy } = n;
+    const isCreator = currentUserId === createdBy?.id;
+    const title = getNotificationConentTitle(n);
+    const userChoice = 'userChoice' in n ? n.userChoice : null;
+
+    if (userChoice) {
+      return createdBy?.username ? `${createdBy?.username} added a vote in "${title}".` : `New vote in "${title}".`;
+    }
+    return createdBy?.username
+      ? isCreator
+        ? `You created new vote "${title}".`
+        : `${createdBy?.username} created a poll "${title}".`
+      : `Poll "${title}" created.`;
+  };
+
+  return notifications.map((n) => ({
+    taskId: n.taskId,
+    createdAt: n.createdAt,
+    createdBy: n.createdBy,
+    spaceName: n.spaceName,
+    groupType: 'votes' as NotificationGroupType,
+    type: NotificationType.vote,
+    href: `/${n.spaceDomain}/${pagePath(n)}?voteId=${n.taskId}`,
+    content: voteContent(n),
+    title: 'New Poll'
+  }));
+}
+
+function getNotificationConentTitle(notification: NotificationPreview) {
+  if ('postTitle' in notification) {
+    return notification.postTitle;
+  }
+
+  if ('pageTitle' in notification) {
+    return notification.pageTitle;
+  }
+
+  if ('title' in notification) {
+    return notification.title;
   }
 
   return '';
-}
-
-function getNotificationTitle(n: NotificationPreview, groupType: NotificationGroupType) {
-  const status = 'status' in n ? n.status : null;
-
-  if (groupType === 'discussions' && 'type' in n && n.type === 'proposal') {
-    return 'Proposal Discussion';
-  }
-
-  switch (groupType) {
-    case 'discussions':
-      return 'Discussion';
-    case 'bounties':
-      return 'Bounty';
-    case 'votes':
-      return 'New Poll';
-    case 'forum':
-      return 'Forum Post';
-    case 'proposals':
-      return `Proposal: ${getNotificationStatus(status)}`;
-    default:
-      return '';
-  }
 }
 
 function getNotificationStatus(status: VoteStatus | ProposalStatus | BountyStatus | null) {
