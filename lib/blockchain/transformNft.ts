@@ -12,6 +12,7 @@ export function transformNft(nft: NftData): Collectable {
       nft.chainId === 42161
         ? `https://stratosnft.io/assets/${nft.contract}/${tokenId}`
         : `https://opensea.io/assets/${nft.chainId === 1 ? 'ethereum' : 'matic'}/${nft.contract}/${tokenId}`,
-    isHidden: nft.isHidden
+    isHidden: nft.isHidden,
+    walletAddress: nft.walletAddress
   };
 }

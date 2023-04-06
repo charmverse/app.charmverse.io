@@ -14,6 +14,7 @@ export interface NftData {
   timeLastUpdated: string;
   isHidden: boolean;
   isPinned: boolean;
+  walletAddress: string;
 }
 
 export interface ExtendedPoap {
@@ -44,4 +45,5 @@ export interface Collectable {
   type: 'poap' | 'nft';
   link: string;
   isHidden: boolean;
+  walletAddress: string | null;
 }

@@ -44,6 +44,7 @@ function mapNftFromAlchemy(nft: alchemyApi.AlchemyNft, chainId: alchemyApi.Suppo
     chainId,
     timeLastUpdated: nft.timeLastUpdated,
     isHidden: false,
-    isPinned: false
+    isPinned: false,
+    walletAddress: nft.walletAddress
   };
 }

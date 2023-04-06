@@ -98,7 +98,7 @@ export async function prepopulateUserProfile(
             isPinned: true,
             type: 'nft',
             // Use the first wallet id when prepopulating the nft profile items
-            walletId: user.wallets[0]?.id
+            walletId: user.wallets.find((wallet) => wallet.address === nft.walletAddress)?.id
           }
         })
       )

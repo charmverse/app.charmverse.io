@@ -8,6 +8,7 @@ export function transformPoap(poap: ExtendedPoap): Collectable {
     image: poap.imageURL,
     title: poap.name,
     link: `https://app.poap.xyz/token/${poap.tokenId}`,
-    isHidden: poap.isHidden
+    isHidden: poap.isHidden,
+    walletAddress: poap.walletAddress
   };
 }

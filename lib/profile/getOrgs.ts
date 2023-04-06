@@ -15,12 +15,19 @@ export async function getOrgs({ userId, apiToken }: { userId: string; apiToken?:
 
   const profiles = (
     await Promise.all(
-      wallets.map(({ address }) =>
-        getProfile(address, apiToken).catch((error) => {
+      wallets.map(async ({ address }) => {
+        try {
+          const profile = await getProfile(address, apiToken);
+          if (!profile) return null;
+          return {
+            ...profile,
+            address
+          };
+        } catch (error) {
           log.error('Error calling DEEP DAO API', error);
           return null;
-        })
-      )
+        }
+      })
     )
   ).filter(isTruthy);
 
@@ -67,7 +74,8 @@ export async function getOrgs({ userId, apiToken }: { userId: string; apiToken?:
         isPinned: pinnedItems.includes(org.organizationId),
         name: org.name,
         // sometimes the logo is just a filename, do some basic validation
-        logo: daoLogos[org.organizationId]?.includes('http') ? daoLogos[org.organizationId] : null
+        logo: daoLogos[org.organizationId]?.includes('http') ? daoLogos[org.organizationId] : null,
+        walletAddress: profile.address
       }))
     )
     .flat();
@@ -85,7 +93,8 @@ export async function getOrgs({ userId, apiToken }: { userId: string; apiToken?:
     isPinned: pinnedItems.includes(userWorkspace.id),
     joinDate: userWorkspace.spaceRoles.find((spaceRole) => spaceRole.userId === userId)?.createdAt.toISOString(),
     name: userWorkspace.name,
-    logo: userWorkspace.spaceImage
+    logo: userWorkspace.spaceImage,
+    walletAddress: null
   }));
 
   return {
