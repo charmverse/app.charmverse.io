@@ -58,7 +58,7 @@ async function getUserProfile(req: NextApiRequest, res: NextApiResponse<PublicUs
   const allPoaps = await getPOAPs(userById.wallets);
   const allNfts = await getNFTs({
     userId: userById.id,
-    addresses: userById.wallets.map((w) => w.address)
+    wallets: userById.wallets
   });
 
   const visiblePoaps = allPoaps.filter(isVisible);

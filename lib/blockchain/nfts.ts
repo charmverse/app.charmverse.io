@@ -1,27 +1,18 @@
-import { prisma } from 'db';
+import type { UserWallet } from '@prisma/client';
 
 import type { NftData } from './interfaces';
 import * as alchemyApi from './provider/alchemy';
 
 export async function getNFTs({
+  wallets,
   userId,
-  addresses,
   chainId = 1
 }: {
+  wallets: UserWallet[];
   userId: string;
-  addresses: string[];
   chainId?: alchemyApi.SupportedChainId;
 }) {
-  const wallets = await prisma.userWallet.findMany({
-    where: {
-      userId
-    },
-    select: {
-      address: true,
-      id: true
-    }
-  });
-
+  const addresses = wallets.map((w) => w.address);
   const nfts = await alchemyApi.getNFTs(addresses, chainId);
   const mappedNfts = nfts.map((nft) => {
     const walletId = wallets.find((wallet) => wallet.address === nft.walletAddress)?.id ?? null;
