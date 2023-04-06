@@ -1,4 +1,4 @@
-import type { Block, Page, Space, User } from '@prisma/client';
+import type { Space, User } from '@prisma/client';
 
 import { prisma } from 'db';
 import { prismaToBlock } from 'lib/focalboard/block';
@@ -488,7 +488,7 @@ async function getBoardPersonPropertyMentions({
     }
   });
 
-  const cards = (await prisma.block.findMany({
+  const cards = await prisma.block.findMany({
     where: {
       parentId: {
         in: Object.keys(boardBlocksPersonPropertyRecord)
@@ -506,11 +506,7 @@ async function getBoardPersonPropertyMentions({
         }
       }
     }
-  })) as (Block & {
-    space: Space;
-    page: Page;
-    user: User;
-  })[];
+  });
 
   const mentions: GetDiscussionsResponse['mentions'] = [];
   const discussionUserIds: string[] = [];
@@ -519,7 +515,7 @@ async function getBoardPersonPropertyMentions({
     const blockCard = prismaToBlock(card) as Card;
     const personPropertyId = boardBlocksPersonPropertyRecord[card.parentId];
     const personPropertyValue = personPropertyId ? blockCard.fields.properties[personPropertyId] ?? [] : [];
-    if (personPropertyValue.includes(userId) && userId !== card.user.id) {
+    if (card.page && personPropertyValue.includes(userId) && userId !== card.user.id) {
       discussionUserIds.push(personPropertyId);
       // Need to push author of card to fetch information
       discussionUserIds.push(card.user.id);
@@ -538,7 +534,7 @@ async function getBoardPersonPropertyMentions({
         // Fake value
         createdAt: new Date().toString(),
         userId: card.createdBy,
-        text: `${card.user.username} mentioned you in the card ${card.page.title || 'Untitled'}`,
+        text: `${card.user.username} assigned you in the card ${card.page.title || 'Untitled'}`,
         commentId: null
       });
     }
