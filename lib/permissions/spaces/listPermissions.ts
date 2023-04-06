@@ -1,5 +1,3 @@
-import type { SpacePermission } from '@prisma/client';
-
 import { prisma } from 'db';
 
 import type { AssignedPostCategoryPermission } from '../forum/interfaces';
@@ -7,10 +5,11 @@ import { mapPostCategoryPermissionToAssignee } from '../forum/mapPostCategoryPer
 import type { AssignedProposalCategoryPermission } from '../proposals/interfaces';
 import { mapProposalCategoryPermissionToAssignee } from '../proposals/mapProposalCategoryPermissionToAssignee';
 
-import type { SpacePermissionFlags } from './interfaces';
+import type { AssignedSpacePermission } from './mapSpacePermissionToAssignee';
+import { mapSpacePermissionToAssignee } from './mapSpacePermissionToAssignee';
 
 export type SpacePermissions = {
-  standard: SpacePermission[];
+  space: AssignedSpacePermission[];
   proposalCategories: AssignedProposalCategoryPermission[];
   forumCategories: AssignedPostCategoryPermission[];
 };
@@ -35,11 +34,19 @@ export async function listPermissions({ spaceId }: { spaceId: string }): Promise
         }
       })
       .then((permissions) => permissions.map(mapPostCategoryPermissionToAssignee)),
-    prisma.spacePermission.findMany({
-      where: {
-        forSpaceId: spaceId
-      }
-    })
+    prisma.spacePermission
+      .findMany({
+        where: {
+          forSpaceId: spaceId
+        }
+      })
+      .then((permissions) =>
+        permissions.map((permission) => ({
+          id: permission.id,
+          group: permission.forRoleId ? 'role' : 'space',
+          permissionLevel: permission.operations
+        }))
+      )
   ]);
 
   return { proposalCategories, forumCategories, standard };
