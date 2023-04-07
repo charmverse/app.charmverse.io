@@ -1,17 +1,23 @@
+import type { UserWallet } from '@prisma/client';
+
 import type { NftData } from './interfaces';
 import * as alchemyApi from './provider/alchemy';
 
 export async function getNFTs({
+  wallets,
   userId,
-  addresses,
   chainId = 1
 }: {
+  wallets: UserWallet[];
   userId: string;
-  addresses: string[];
   chainId?: alchemyApi.SupportedChainId;
 }) {
+  const addresses = wallets.map((w) => w.address);
   const nfts = await alchemyApi.getNFTs(addresses, chainId);
-  const mappedNfts = nfts.map((nft) => mapNftFromAlchemy(nft, chainId, userId));
+  const mappedNfts = nfts.map((nft) => {
+    const walletId = wallets.find((wallet) => wallet.address === nft.walletAddress)?.id ?? null;
+    return mapNftFromAlchemy(nft, walletId, chainId, userId);
+  });
   return mappedNfts;
 }
 
@@ -27,10 +33,15 @@ export async function getNFT({
   userId: string;
 }) {
   const nft = await alchemyApi.getNFT(contractAddress, tokenId, chainId);
-  return mapNftFromAlchemy(nft, chainId, userId);
+  return mapNftFromAlchemy(nft, null, chainId, userId);
 }
 
-function mapNftFromAlchemy(nft: alchemyApi.AlchemyNft, chainId: alchemyApi.SupportedChainId, userId: string): NftData {
+function mapNftFromAlchemy(
+  nft: alchemyApi.AlchemyNft,
+  walletId: string | null,
+  chainId: alchemyApi.SupportedChainId,
+  userId: string
+): NftData {
   return {
     id: `${userId}:${nft.contract.address}:${nft.id.tokenId}`,
     tokenId: nft.id.tokenId,
@@ -44,6 +55,7 @@ function mapNftFromAlchemy(nft: alchemyApi.AlchemyNft, chainId: alchemyApi.Suppo
     chainId,
     timeLastUpdated: nft.timeLastUpdated,
     isHidden: false,
-    isPinned: false
+    isPinned: false,
+    walletId
   };
 }

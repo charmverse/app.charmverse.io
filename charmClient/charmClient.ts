@@ -176,7 +176,7 @@ class CharmClient {
     return http.POST<LoggedInUser>('/api/profile/remove-wallet', address);
   }
 
-  async createSpace(spaceOptions: Pick<CreateSpaceProps, 'createSpaceOption' | 'spaceData'>) {
+  async createSpace(spaceOptions: Pick<CreateSpaceProps, 'createSpaceTemplate' | 'spaceData'>) {
     const space = await http.POST<Space>('/api/spaces', spaceOptions);
     return space;
   }
