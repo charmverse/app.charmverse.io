@@ -27,18 +27,19 @@ async function listSpacePermissionsController(req: NextApiRequest, res: NextApiR
 
 async function updateSpacePermissionsController(req: NextApiRequest, res: NextApiResponse) {
   const { spaceId } = req.query as { spaceId: string };
-  const permissions = req.body as SpacePermissions & { roleId?: string };
+  const { roleIdToTrack, ...permissions } = req.body as SpacePermissions & { roleIdToTrack?: string };
 
-  await savePermissions(permissions);
+  await savePermissions(spaceId, permissions);
 
   // tracking
-  if (req.body.roleId) {
+  if (roleIdToTrack) {
     const role = await prisma.role.findFirst({
       where: {
-        id: req.body.roleId
+        id: roleIdToTrack
       }
     });
-    const spacePermissions = permissions.space.find((p) => p.assignee.id === req.body.roleId);
+    // TODO: we are not tracking if user removes permissions to rely on defaults
+    const spacePermissions = permissions.space.find((p) => p.assignee.id === roleIdToTrack);
     if (role && spacePermissions) {
       trackUserAction('update_role_permissions', {
         spaceId: spaceId as string,

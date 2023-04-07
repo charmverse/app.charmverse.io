@@ -14,7 +14,7 @@ export class SpacePermissionsApi {
     return http.GET<SpacePermissions>(`/api/permissions/space/${resourceId}/settings`);
   }
 
-  saveSpacePermissions(resourceId: string, permissions: SpacePermissions) {
+  saveSpacePermissions(resourceId: string, permissions: SpacePermissions & { roleIdToTrack?: string }) {
     return http.POST(`/api/permissions/space/${resourceId}/settings`, permissions);
   }
 

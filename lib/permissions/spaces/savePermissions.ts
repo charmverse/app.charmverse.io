@@ -1,40 +1,113 @@
-import { prisma } from 'db';
+import type { SpaceOperation } from '@prisma/client';
 
-import type { AssignedPostCategoryPermission } from '../forum/interfaces';
-import { mapPostCategoryPermissionToAssignee } from '../forum/mapPostCategoryPermissionToAssignee';
-import type { AssignedProposalCategoryPermission } from '../proposals/interfaces';
-import { mapProposalCategoryPermissionToAssignee } from '../proposals/mapProposalCategoryPermissionToAssignee';
+import { prisma } from 'db';
+import { InvalidInputError, MissingDataError } from 'lib/utilities/errors';
 
 import type { SpacePermissions } from './listPermissions';
-import type { AssignedSpacePermission } from './mapSpacePermissionToAssignee';
-import { mapSpacePermissionToAssignee } from './mapSpacePermissionToAssignee';
 
-export async function savePermissions(permissions: SpacePermissions) {
-  // const [proposalCategories, forumCategories, space] = await Promise.all([
-  //   prisma.proposalCategoryPermission
-  //     .findMany({
-  //       where: {
-  //         proposalCategory: {
-  //           spaceId
-  //         }
-  //       }
-  //     })
-  //     .then((permissions) => permissions.map(mapProposalCategoryPermissionToAssignee)),
-  //   prisma.postCategoryPermission
-  //     .findMany({
-  //       where: {
-  //         postCategory: {
-  //           spaceId
-  //         }
-  //       }
-  //     })
-  //     .then((permissions) => permissions.map(mapPostCategoryPermissionToAssignee)),
-  //   prisma.spacePermission
-  //     .findMany({
-  //       where: {
-  //         forSpaceId: spaceId
-  //       }
-  //     })
-  //     .then((permissions) => permissions.map(mapSpacePermissionToAssignee))
-  // ]);
+export async function savePermissions(spaceId: string, permissions: SpacePermissions) {
+  const memberPermissions = permissions.space.filter((p) => p.assignee.group === 'space');
+
+  // make sure we always define member/default permissions
+  if (memberPermissions.length > 1) {
+    throw new InvalidInputError('Only one member level space permission can be set');
+  } else if (memberPermissions.length === 0) {
+    throw new MissingDataError('Member level space permission is required');
+  }
+
+  // clear out existing permissions related to members and role, excluding user and public groups
+  const deleteOps = getDeleteOpsForRoles(spaceId);
+
+  const createOps = [
+    ...permissions.space.map((permission) => {
+      const operations = Object.entries(permission.operations)
+        .filter(([, value]) => value)
+        .map(([key]) => key) as SpaceOperation[];
+      return prisma.spacePermission.create({
+        data: {
+          forSpaceId: spaceId,
+          operations,
+          roleId: permission.assignee.group === 'role' ? permission.assignee.id : undefined,
+          spaceId: permission.assignee.group === 'space' ? permission.assignee.id : undefined
+        },
+        include: {
+          role: true,
+          space: true,
+          user: true
+        }
+      });
+    }),
+    ...permissions.proposalCategories.map((permission) =>
+      prisma.proposalCategoryPermission.create({
+        data: {
+          id: permission.id,
+          proposalCategoryId: permission.proposalCategoryId,
+          permissionLevel: permission.permissionLevel,
+          roleId: permission.assignee.group === 'role' ? permission.assignee.id : undefined,
+          spaceId: permission.assignee.group === 'space' ? permission.assignee.id : undefined
+        }
+      })
+    ),
+    ...permissions.forumCategories.map((permission) =>
+      prisma.postCategoryPermission.create({
+        data: {
+          id: permission.id,
+          postCategoryId: permission.postCategoryId,
+          permissionLevel: permission.permissionLevel,
+          roleId: permission.assignee.group === 'role' ? permission.assignee.id : undefined,
+          spaceId: permission.assignee.group === 'space' ? permission.assignee.id : undefined
+        }
+      })
+    )
+  ];
+
+  return prisma.$transaction([...deleteOps, ...createOps]);
+}
+
+function getDeleteOpsForRoles(spaceId: string) {
+  return [
+    prisma.proposalCategoryPermission.deleteMany({
+      where: {
+        OR: [
+          {
+            roleId: { not: null }
+          },
+          {
+            spaceId: { not: null }
+          }
+        ],
+        proposalCategory: {
+          spaceId
+        }
+      }
+    }),
+    prisma.postCategoryPermission.deleteMany({
+      where: {
+        OR: [
+          {
+            roleId: { not: null }
+          },
+          {
+            spaceId: { not: null }
+          }
+        ],
+        postCategory: {
+          spaceId
+        }
+      }
+    }),
+    prisma.spacePermission.deleteMany({
+      where: {
+        OR: [
+          {
+            roleId: { not: null }
+          },
+          {
+            spaceId: { not: null }
+          }
+        ],
+        forSpaceId: spaceId
+      }
+    })
+  ];
 }

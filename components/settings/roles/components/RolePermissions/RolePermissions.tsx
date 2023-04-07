@@ -2,6 +2,7 @@ import { Box, Divider, FormControlLabel, Grid, Switch, Tooltip, Typography } fro
 import type { SpaceOperation } from '@prisma/client';
 import type { ChangeEvent } from 'react';
 import { useReducer, useEffect, useState } from 'react';
+import { mutate } from 'swr';
 import useSWR from 'swr/immutable';
 import { v4 as uuid } from 'uuid';
 
@@ -151,7 +152,7 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
 
   const currentSpaceId = space?.id;
 
-  const { data: originalPermissions, mutate: refreshPermissions } = useSWR(
+  const { data: originalPermissions } = useSWR(
     currentSpaceId ? `/proposals/list-permissions-${currentSpaceId}` : null,
     () => charmClient.permissions.spaces.listSpacePermissions(currentSpaceId as string)
   );
@@ -178,17 +179,20 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
   async function handleSubmit() {
     const rolePermissions = assignedPermissions || new AvailableSpacePermissions().empty;
     if (rolePermissions && currentSpaceId) {
-      await charmClient.permissions.spaces.saveSpacePermissions(currentSpaceId, formState);
-      // Force a refresh of rendered components
-      // setAssignedPermissions(newPermissionState);
+      const updatedPermissions = { ...formState };
+      if (targetGroup === 'role') {
+        // @ts-ignore - add meta to track update
+        updatedPermissions.roleIdToTrack = id;
+      }
+      await charmClient.permissions.spaces.saveSpacePermissions(currentSpaceId, updatedPermissions);
       callback();
       setTouched(false);
+      // refresh all caches of permissions in case multiple rows are being updated
+      mutate(`/proposals/list-permissions-${currentSpaceId}`);
     }
   }
 
   async function deleteProposalCategoryPermission(permissionId: string) {
-    // await charmClient.permissions.proposals.deleteProposalCategoryPermission(id);
-    // refreshPermissions();
     dispatch({ type: 'delete_proposal_category_permission', id: permissionId });
     setTouched(true);
   }
@@ -196,13 +200,9 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
   async function updateProposalCategoryPermission(permission: ProposalCategoryPermissionInput) {
     dispatch({ type: 'set_proposal_category_permission', permission });
     setTouched(true);
-    // await charmClient.permissions.proposals.upsertProposalCategoryPermission(input);
-    // refreshPermissions();
   }
 
   async function deletePostCategoryPermission(permissionId: string) {
-    // await charmClient.permissions.forum.deletePostCategoryPermission(id);
-    // refreshPermissions();
     dispatch({ type: 'delete_forum_category_permission', id: permissionId });
     setTouched(true);
   }
@@ -210,8 +210,6 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
   async function updatePostCategoryPermission(permission: PostCategoryPermissionInput) {
     dispatch({ type: 'set_forum_category_permission', permission });
     setTouched(true);
-    // await charmClient.permissions.forum.upsertPostCategoryPermission(input);
-    // refreshPermissions();
   }
 
   function setSpacePermission(permission: SpaceOperation, permissionValue: boolean) {
