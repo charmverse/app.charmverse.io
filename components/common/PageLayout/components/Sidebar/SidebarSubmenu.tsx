@@ -63,6 +63,17 @@ const SidebarHeader = styled(Box)(
   }`
 );
 
+const StyledCreateSpaceForm = styled(CreateSpaceForm)`
+  // add styling so that the container takes full height of screen
+  ${({ theme }) => theme.breakpoints.down('md')} {
+    .space-templates-container {
+      max-height: calc(100vh - 250px);
+      padding: 0;
+      margin: 0;
+    }
+  }
+`;
+
 export default function SidebarSubmenu({
   closeSidebar,
   logoutCurrentUser,
@@ -180,7 +191,7 @@ export default function SidebarSubmenu({
         onClose={closeSpaceForm}
         mobileDialog
       >
-        <CreateSpaceForm onCancel={closeSpaceForm} />
+        <StyledCreateSpaceForm onCancel={closeSpaceForm} />
       </Modal>
     </SidebarHeader>
   );

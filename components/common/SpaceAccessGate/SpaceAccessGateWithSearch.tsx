@@ -66,7 +66,7 @@ export function SpaceAccessGateWithSearch({ defaultValue, goBack }: Props) {
   }
 
   return (
-    <Box sx={{ minHeight: '200px' }}>
+    <Box minWidth='300px' maxWidth='100%'>
       <br />
       <FieldLabel sx={{ display: 'flex', alignItems: 'center', gap: 1, pb: 1 }}>
         {goBack && (
@@ -74,7 +74,7 @@ export function SpaceAccessGateWithSearch({ defaultValue, goBack }: Props) {
             <ArrowBackIosNewIcon />
           </IconButton>
         )}
-        Enter a CharmVerse space name
+        Join an existing space
       </FieldLabel>
       <Autocomplete<SpaceWithGates>
         disablePortal

@@ -145,21 +145,23 @@ export default function BountyPaymentButton({
 
   const makePayment = async () => {
     if (!chainIdToUse) {
-      onError('Please provide a chainId');
+      onError('Please set up a chain for this payment.');
       return;
     }
 
     const chainToUse = getChainById(chainIdToUse);
 
     if (!chainToUse) {
-      onError('This chain is not supported');
+      onError('Chain assigned to this payment is not supported.');
       return;
     }
 
     const currentUserChain = chainId ? getChainById(chainId) : undefined;
 
     if (!currentUserChain) {
-      onError('Could not detect your chain');
+      onError(
+        'Could not detect your chain. Please make sure you are connected to a supported network and your wallet is unlocked.'
+      );
       return;
     }
 

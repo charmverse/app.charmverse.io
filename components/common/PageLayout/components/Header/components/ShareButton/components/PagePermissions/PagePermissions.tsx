@@ -171,7 +171,7 @@ export default function PagePermissions({ pageId, pagePermissions, refreshPermis
 
       <Box display='block' py={0.5}>
         <Box display='flex' justifyContent='space-between' alignItems='center'>
-          <Typography variant='body2'>Everyone at {space?.name}</Typography>
+          <Typography variant='body2'>Default permissions</Typography>
           <div style={{ width: '160px', textAlign: 'right' }}>
             {canEdit ? (
               <SmallSelect

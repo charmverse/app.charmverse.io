@@ -192,12 +192,11 @@ export function IdentityProviders() {
               question={
                 <>
                   <Typography mb={1}>
-                    Are you sure you want to Disconnect your {wallet.ensname || shortWalletAddress(wallet.address)}{' '}
-                    wallet?
+                    Are you sure you want to Disconnect your {wallet.ensname || wallet.address} wallet?
                   </Typography>
                   <Typography variant='body2'>
-                    This action will delete your wallet, nfts, poaps, organisations and will lose roles and permissions
-                    in spaces where you were granted access through a token gate.
+                    This action will remove your wallet, NFTs, POAPs, Organizations from CharmVerse. It will also remove
+                    roles and permissions if you joined the Space via a token gate.
                   </Typography>
                 </>
               }
@@ -224,7 +223,7 @@ export function IdentityProviders() {
             text={telegramAccount?.username}
             type='Telegram'
             loading={isConnectingToTelegram || isDisconnectingTelegram}
-            disabled={cannotDisconnect}
+            disabled={!user}
             connected={true}
             actions={<MenuItem onClick={disconnectFromTelegram}>Disconnect</MenuItem>}
             error={telegramError && <Alert severity='error'>{telegramError}</Alert>}

@@ -118,11 +118,8 @@ function ProposalCategoryPermissions({ proposalCategory, permissions }: Props) {
     );
   }
 
-  const allSpaceMembersHaveAccess = mappedPermissions.space?.permissionLevel === 'full_access';
-  const canAddRoles =
-    !allSpaceMembersHaveAccess &&
-    permissions.manage_permissions &&
-    (roles?.length ?? 0) > mappedPermissions.roles.length;
+  const addableRolesExist = (roles?.length ?? 0) > mappedPermissions.roles.length;
+  const canAddRoles = permissions.manage_permissions && addableRolesExist;
 
   const publicPermission = mappedPermissions.public;
 
@@ -206,9 +203,9 @@ function ProposalCategoryPermissions({ proposalCategory, permissions }: Props) {
           {!addRolesDialog.isOpen ? (
             <Tooltip
               title={
-                allSpaceMembersHaveAccess
-                  ? 'All space members already have full access to this proposal category.'
-                  : !canAddRoles
+                !permissions.manage_permissions
+                  ? 'You cannot manage permissions for this proposal category.'
+                  : !addableRolesExist
                   ? 'There are no roles available to add to this proposal category.'
                   : ''
               }

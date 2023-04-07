@@ -538,6 +538,7 @@ export default function BountyProperties(props: {
         pagePermissions={bountyPagePermissions}
         pageId={pageId}
         readOnly={readOnly}
+        refreshPermissions={refreshPermissions}
       />
       <Box justifyContent='space-between' gap={2} alignItems='center'>
         <div

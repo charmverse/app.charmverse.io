@@ -91,6 +91,11 @@ function EmptyPDFContainer({
   );
 }
 
+export type PdfNodeAttrs = {
+  src?: string | null;
+  size: number;
+};
+
 export function pdfSpec() {
   const spec: BaseRawNodeSpec = {
     name: 'pdf',

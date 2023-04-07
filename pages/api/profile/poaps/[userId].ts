@@ -33,7 +33,7 @@ async function getUserPoaps(req: NextApiRequest, res: NextApiResponse<ExtendedPo
     }
   });
 
-  const poaps = await getPOAPs(wallets.map((w) => w.address));
+  const poaps = await getPOAPs(wallets);
   const poapsWithHidden = poaps.map((poap) => ({
     ...poap,
     isHidden: hiddenPoapIDs.includes(poap.id)

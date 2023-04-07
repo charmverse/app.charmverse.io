@@ -174,6 +174,26 @@ class Mutator {
     );
   }
 
+  async deleteBlocks(
+    blockIds: string[],
+    description = 'delete blocks',
+    beforeRedo?: () => Promise<void>,
+    afterUndo?: () => Promise<void>
+  ) {
+    await undoManager.perform(
+      async () => {
+        await beforeRedo?.();
+        await charmClient.deleteBlocks(blockIds, publishIncrementalUpdate);
+      },
+      async () => {
+        // await charmClient.insertBlock(block, publishIncrementalUpdate)
+        await afterUndo?.();
+      },
+      description,
+      this.undoGroupId
+    );
+  }
+
   async changeTitle(blockId: string, oldTitle: string, newTitle: string, description = 'change title') {
     await undoManager.perform(
       async () => {

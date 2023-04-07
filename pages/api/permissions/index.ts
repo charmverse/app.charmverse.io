@@ -7,7 +7,6 @@ import { prisma } from 'db';
 import { sendMagicLink } from 'lib/google/sendMagicLink';
 import { updateTrackPageProfile } from 'lib/metrics/mixpanel/updateTrackPageProfile';
 import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
-import { PageNotFoundError } from 'lib/pages/server';
 import type {
   IPagePermissionRequest,
   IPagePermissionToCreate,
@@ -28,7 +27,7 @@ import { boardPagePermissionUpdated } from 'lib/permissions/pages/triggers';
 import { addGuest } from 'lib/roles/addGuest';
 import { withSessionRoute } from 'lib/session/withSession';
 import { DataNotFoundError } from 'lib/utilities/errors';
-import { isUUID, isValidEmail } from 'lib/utilities/strings';
+import { isValidEmail } from 'lib/utilities/strings';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

@@ -30,6 +30,7 @@ export interface AlchemyNft {
   };
   media: NftMedia[];
   timeLastUpdated: string;
+  walletAddress: string;
 }
 
 interface AlchemyNftResponse {
@@ -72,7 +73,7 @@ export const getAlchemyBaseUrl = (chainId: SupportedChainId = 1, apiSuffix: Alch
 export const getAddressNfts = async (address: string, chainId: SupportedChainId = 1) => {
   const url = `${getAlchemyBaseUrl(chainId, 'nft')}/getNFTs`;
   const res = await GET<AlchemyNftResponse>(url, { owner: address, excludeFilters: ['AIRDROPS', 'SPAM'] });
-  return res.ownedNfts;
+  return { address, nfts: res.ownedNfts };
 };
 
 export const getNFTs = async (addresses: string[], chainId: SupportedChainId = 1) => {
@@ -82,7 +83,7 @@ export const getNFTs = async (addresses: string[], chainId: SupportedChainId = 1
   const nfts = results
     .reduce((acc: AlchemyNft[], res) => {
       if (res.status === 'fulfilled') {
-        return [...acc, ...res.value];
+        return [...acc, ...res.value.nfts.map((nft) => ({ ...nft, walletAddress: res.value.address }))];
       } else {
         return acc;
       }
