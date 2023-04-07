@@ -5,7 +5,7 @@ import { onError, onNoMatch, requireSuperApiKey, requireKeys } from 'lib/middlew
 import { createWorkspaceApi } from 'lib/public-api/createWorkspaceApi';
 import type { CreateWorkspaceResponseBody, CreateWorkspaceRequestBody } from 'lib/public-api/interfaces';
 import { withSessionRoute } from 'lib/session/withSession';
-import { SpaceTemplateMapping } from 'lib/spaces/config';
+import { spaceInternalTemplateMapping } from 'lib/spaces/config';
 import { InvalidInputError } from 'lib/utilities/errors';
 import { isTruthy } from 'lib/utilities/types';
 
@@ -51,7 +51,7 @@ async function createSpace(req: NextApiRequest, res: NextApiResponse<CreateWorks
     template
   } = req.body as CreateWorkspaceRequestBody;
 
-  if (isTruthy(template) && !SpaceTemplateMapping[template]) {
+  if (isTruthy(template) && !spaceInternalTemplateMapping[template]) {
     throw new InvalidInputError('Invalid template provided.');
   }
 

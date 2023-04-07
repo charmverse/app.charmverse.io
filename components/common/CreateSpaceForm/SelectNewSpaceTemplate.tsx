@@ -7,7 +7,7 @@ import { MdOutlineBuild } from 'react-icons/md';
 import { SiHackthebox, SiNotion } from 'react-icons/si';
 import { SlBadge, SlTrophy } from 'react-icons/sl';
 
-import { SpaceTemplateMapping, spaceContentTemplates } from 'lib/spaces/config';
+import { spaceInternalTemplateMapping, spaceTemplateLabelMapping } from 'lib/spaces/config';
 import type { SpaceCreateTemplate, SpaceTemplateType } from 'lib/spaces/config';
 import { typedKeys } from 'lib/utilities/objects';
 import NounsIcon from 'public/images/logos/noggles/noggles.svg';
@@ -59,12 +59,12 @@ export function SelectNewSpaceTemplate({ onSelect }: SelectNewSpaceTemplateProps
           </Typography>
         </Grid>
 
-        {typedKeys(SpaceTemplateMapping).map((template) => (
+        {typedKeys(spaceInternalTemplateMapping).map((template) => (
           <Grid item key={template}>
             <TemplateOption
               data-test={`space-template-${template}`}
               onClick={() => onSelect(template)}
-              label={spaceContentTemplates[SpaceTemplateMapping[template]]}
+              label={spaceTemplateLabelMapping[spaceInternalTemplateMapping[template]]}
               icon={templateIcon[template]}
             />
           </Grid>

@@ -22,7 +22,7 @@ export const DOMAIN_BLACKLIST = [
   'u'
 ];
 
-export const spaceContentTemplates = {
+export const spaceTemplateLabelMapping = {
   templateNftCommunity: 'NFT Community',
   templateCreator: 'Creator',
   templateHackathon: 'Hackathon',
@@ -32,16 +32,17 @@ export const spaceContentTemplates = {
 
 const staticTemplateOptions = ['default', 'importNotion', 'importMarkdown'] as const;
 
-export const SpaceTemplateMapping: Record<keyof typeof SpaceTemplate, keyof typeof spaceContentTemplates> = {
-  creator: 'templateCreator',
-  hackathon: 'templateHackathon',
-  impact_community: 'templateImpactCommunity',
-  nft_community: 'templateNftCommunity',
-  nounish_dao: 'templateNounishDAO'
-};
+export const spaceInternalTemplateMapping: Record<keyof typeof SpaceTemplate, keyof typeof spaceTemplateLabelMapping> =
+  {
+    creator: 'templateCreator',
+    hackathon: 'templateHackathon',
+    impact_community: 'templateImpactCommunity',
+    nft_community: 'templateNftCommunity',
+    nounish_dao: 'templateNounishDAO'
+  };
 
-export type SpaceTemplateType = keyof typeof SpaceTemplateMapping;
+export type SpaceTemplateType = keyof typeof SpaceTemplate;
 
-export const spaceCreateTemplates = [...typedKeys(SpaceTemplateMapping), ...staticTemplateOptions];
+export const spaceCreateTemplates = [...typedKeys(spaceInternalTemplateMapping), ...staticTemplateOptions];
 
 export type SpaceCreateTemplate = (typeof spaceCreateTemplates)[number];
