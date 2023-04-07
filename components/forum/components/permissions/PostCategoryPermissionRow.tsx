@@ -23,7 +23,7 @@ type Props = {
   postCategoryId: string;
   canEdit: boolean;
   disabledTooltip?: string;
-  updatePermission: (newPermission: PostCategoryPermissionInput) => void;
+  updatePermission: (newPermission: PostCategoryPermissionInput & { id?: string }) => void;
   deletePermission: (permissionId: string) => void;
 };
 
@@ -70,7 +70,7 @@ export function PostCategoryRolePermissionRow({
     if (level === 'delete' && existingPermissionId) {
       deletePermission(existingPermissionId);
     } else if (level !== 'delete' && level !== '') {
-      updatePermission({ permissionLevel: level, postCategoryId, assignee });
+      updatePermission({ id: existingPermissionId, permissionLevel: level, postCategoryId, assignee });
     }
   }
 

@@ -15,7 +15,7 @@ export type SpacePermissions = {
 };
 
 export async function listPermissions({ spaceId }: { spaceId: string }): Promise<SpacePermissions> {
-  const [proposalCategories, forumCategories, standard] = await Promise.all([
+  const [proposalCategories, forumCategories, space] = await Promise.all([
     prisma.proposalCategoryPermission
       .findMany({
         where: {
@@ -40,14 +40,8 @@ export async function listPermissions({ spaceId }: { spaceId: string }): Promise
           forSpaceId: spaceId
         }
       })
-      .then((permissions) =>
-        permissions.map((permission) => ({
-          id: permission.id,
-          group: permission.forRoleId ? 'role' : 'space',
-          permissionLevel: permission.operations
-        }))
-      )
+      .then((permissions) => permissions.map(mapSpacePermissionToAssignee))
   ]);
 
-  return { proposalCategories, forumCategories, standard };
+  return { proposalCategories, forumCategories, space };
 }

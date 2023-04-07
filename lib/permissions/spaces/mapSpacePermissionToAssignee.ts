@@ -1,25 +1,27 @@
 import type { SpacePermission } from '@prisma/client';
 
-import log from 'lib/log';
-
+import { InvalidPermissionGranteeError } from '../errors';
 import type { TargetPermissionGroup } from '../interfaces';
 
+import { AvailableSpacePermissions } from './availableSpacePermissions';
 import type { SpacePermissionFlags } from './interfaces';
 
 export type AssignedSpacePermission = {
   assignee: TargetPermissionGroup<'role' | 'space'>;
-  permissions: SpacePermissionFlags;
+  operations: SpacePermissionFlags;
 };
 
 export function mapSpacePermissionToAssignee(spacePermission: SpacePermission): AssignedSpacePermission {
+  const permissions = new AvailableSpacePermissions();
+  permissions.addPermissions(spacePermission.operations);
   return {
-    permissions: spacePermission.permissionLevel,
-    assignee: getPermissionAssignee(spacePermission)
+    assignee: getPermissionAssignee(spacePermission),
+    operations: permissions.operationFlags
   };
 }
 
 export function getPermissionAssignee(permission: SpacePermission): AssignedSpacePermission['assignee'] {
-  if (permission.roleId && !permission.spaceId) {
+  if (permission.roleId) {
     return {
       group: 'role',
       id: permission.roleId
@@ -30,6 +32,6 @@ export function getPermissionAssignee(permission: SpacePermission): AssignedSpac
       id: permission.spaceId
     };
   } else {
-    log.error('Invalid permission assignee', permission);
+    throw new InvalidPermissionGranteeError();
   }
 }

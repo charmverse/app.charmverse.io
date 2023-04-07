@@ -1,13 +1,9 @@
-import { yupResolver } from '@hookform/resolvers/yup';
 import { Box, Divider, FormControlLabel, Grid, Switch, Tooltip, Typography } from '@mui/material';
-import { SpaceOperation } from '@prisma/client';
+import type { SpaceOperation } from '@prisma/client';
 import type { ChangeEvent } from 'react';
-import { useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { mutate } from 'swr';
+import { useReducer, useEffect, useState } from 'react';
 import useSWR from 'swr/immutable';
-import type { BooleanSchema } from 'yup';
-import * as yup from 'yup';
+import { v4 as uuid } from 'uuid';
 
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
@@ -21,24 +17,8 @@ import { usePreventReload } from 'hooks/usePreventReload';
 import type { PostCategoryPermissionInput } from 'lib/permissions/forum/upsertPostCategoryPermission';
 import type { AssignablePermissionGroups } from 'lib/permissions/interfaces';
 import type { ProposalCategoryPermissionInput } from 'lib/permissions/proposals/upsertProposalCategoryPermission';
-import type { SpacePermissionFlags } from 'lib/permissions/spaces/client';
 import { AvailableSpacePermissions } from 'lib/permissions/spaces/client';
-
-const spaceOperations = Object.keys(SpaceOperation).filter(
-  (op) => op !== 'createVote' && op !== 'createForumCategory'
-) as Exclude<SpaceOperation, 'createVote' | 'createForumCategory'>[];
-
-const fields: Record<SpaceOperation, BooleanSchema> = spaceOperations.reduce(
-  (_schema: Record<SpaceOperation, BooleanSchema>, op) => {
-    _schema[op] = yup.boolean();
-    return _schema;
-  },
-  {} as any
-);
-
-export const schema = yup.object(fields);
-
-type FormValues = yup.InferType<typeof schema>;
+import type { SpacePermissions } from 'lib/permissions/spaces/listPermissions';
 
 /**
  * @param callback Used to tell the parent the operation is complete. Useful for triggering refreshes
@@ -49,123 +29,203 @@ interface Props {
   callback?: () => void;
 }
 
+type FormAction =
+  | {
+      type: 'reset_permissions';
+      state?: SpacePermissions;
+    }
+  | {
+      type: 'set_space_permission';
+      permission: SpaceOperation;
+      permissionValue: boolean;
+    }
+  | {
+      type: 'delete_proposal_category_permission';
+      id: string;
+    }
+  | {
+      type: 'set_proposal_category_permission';
+      permission: Omit<SpacePermissions['proposalCategories'][number], 'id'> & { id?: string };
+    }
+  | {
+      type: 'delete_forum_category_permission';
+      id: string;
+    }
+  | {
+      type: 'set_forum_category_permission';
+      permission: Omit<SpacePermissions['forumCategories'][number], 'id'> & { id?: string };
+    };
+
+function reducerWithContext({ id }: { id: string }) {
+  return function reducer(state: SpacePermissions, action: FormAction): SpacePermissions {
+    switch (action.type) {
+      // remove permissions, role will inherit from Member role instead
+      case 'reset_permissions': {
+        if (action.state) {
+          return JSON.parse(JSON.stringify(action.state));
+        }
+        return {
+          space: state.space.filter((perm) => perm.assignee.id !== id),
+          forumCategories: state.forumCategories.filter((perm) => (perm.assignee as { id: string }).id !== id),
+          proposalCategories: state.proposalCategories.filter((perm) => (perm.assignee as { id: string }).id !== id)
+        };
+      }
+      case 'set_space_permission': {
+        const permission = state.space.find((perm) => perm.assignee.id === id);
+        if (permission) {
+          permission.operations[action.permission] = action.permissionValue;
+        } else {
+          const defaults = state.space.find((perm) => perm.assignee.group === 'space');
+          if (defaults) {
+            state.space.push({
+              assignee: { id, group: 'role' },
+              operations: {
+                ...defaults.operations,
+                [action.permission]: action.permissionValue
+              }
+            });
+          }
+        }
+        return {
+          ...state
+        };
+      }
+      case 'delete_forum_category_permission': {
+        return {
+          ...state,
+          forumCategories: state.forumCategories.filter((perm) => perm.id !== action.id)
+        };
+      }
+      case 'set_forum_category_permission': {
+        const perm = action.permission;
+        const category = perm.id && state.forumCategories.find((p) => p.id === perm.id);
+        if (category) {
+          Object.assign(category, perm);
+        } else {
+          state.forumCategories.push({ ...perm, id: uuid() });
+        }
+
+        return {
+          ...state,
+          forumCategories: [...state.forumCategories]
+        };
+      }
+      case 'delete_proposal_category_permission': {
+        return {
+          ...state,
+          proposalCategories: state.proposalCategories.filter((perm) => perm.id !== action.id)
+        };
+      }
+      case 'set_proposal_category_permission': {
+        const perm = action.permission;
+        const category = perm.id && state.proposalCategories.find((p) => p.id === perm.id);
+        if (category) {
+          Object.assign(category, perm);
+        } else {
+          state.proposalCategories.push({ ...perm, id: uuid() });
+        }
+        return {
+          ...state,
+          proposalCategories: [...state.proposalCategories]
+        };
+      }
+      default:
+        throw Error(`Unknown action`);
+    }
+  };
+}
+
 export function RolePermissions({ targetGroup, id, callback = () => null }: Props) {
   const space = useCurrentSpace();
   const { categories: proposalCategories = [] } = useProposalCategories();
   const { categories: forumCategories = [] } = useForumCategories();
   const isAdmin = useIsAdmin();
-  const [assignedPermissions, setAssignedPermissions] = useState<SpacePermissionFlags | null>(null);
-  // custom onChange is used for switches so isDirty from useForm doesn't change it value
+  // const [assignedPermissions, setAssignedPermissions] = useState<SpacePermissionFlags | null>(null);
+  // custom onChange is used for switches so isDirty from useForm doesn't change its value
   const [touched, setTouched] = useState<boolean>(false);
-  const { handleSubmit, setValue, formState } = useForm<FormValues>({
-    mode: 'onChange',
-    defaultValues: assignedPermissions ?? new AvailableSpacePermissions().empty,
-    resolver: yupResolver(schema)
+  const [formState, dispatch] = useReducer(reducerWithContext({ id }), {
+    space: [],
+    forumCategories: [],
+    proposalCategories: []
   });
 
   const currentSpaceId = space?.id;
 
-  const { data, mutate: refreshPermissions } = useSWR(
+  const { data: originalPermissions, mutate: refreshPermissions } = useSWR(
     currentSpaceId ? `/proposals/list-permissions-${currentSpaceId}` : null,
     () => charmClient.permissions.spaces.listSpacePermissions(currentSpaceId as string)
   );
 
-  const postCategoryPermissions = data?.forumCategories;
-  const proposalCategoryPermissions = data?.proposalCategories;
-
-  const defaultProposalCategoryPermissions = proposalCategoryPermissions?.filter((permission) => {
+  const defaultProposalCategoryPermissions = formState.proposalCategories.filter((permission) => {
     return permission.assignee.group === 'space' && permission.assignee.id === currentSpaceId;
   });
 
-  const defaultPostCategoryPermissions = postCategoryPermissions?.filter((permission) => {
+  const defaultForumCategoryPermissions = formState.forumCategories?.filter((permission) => {
     return permission.assignee.group === 'space' && permission.assignee.id === currentSpaceId;
   });
 
-  const memberPermissionFlags = data?.standard.filter((permission) => permission.spaceId === currentSpaceId);
+  const assignedPermissions = formState.space.find((permission) => permission.assignee.id === id)?.operations;
+  const defaultPermissions = formState.space.find((permission) => permission.assignee.group === 'space')?.operations;
+
+  useEffect(() => {
+    if (originalPermissions) {
+      dispatch({ type: 'reset_permissions', state: originalPermissions });
+    }
+  }, [originalPermissions]);
 
   usePreventReload(touched);
 
-  // useEffect(() => {
-  //   if (currentSpaceId) {
-  //     refreshGroupPermissions(currentSpaceId);
-  //   }
-  // }, [currentSpaceId]);
-
-  async function refreshGroupPermissions(resourceId: string) {
-    await refreshPermissions();
-
-    // spaceOperations.forEach((op) => {
-    //   setValue(op, permissionFlags[op]);
-    // });
-    // setAssignedPermissions(permissionFlags);
-  }
-
-  async function submitted(formValues: FormValues) {
-    // Make sure we have existing permission set to compare against
-    if (assignedPermissions && currentSpaceId) {
-      const permissionsToAdd: SpaceOperation[] = [];
-      const permissionsToRemove: SpaceOperation[] = [];
-
-      // Only get new values
-      (Object.entries(formValues) as [SpaceOperation, boolean][]).forEach(([operation, hasAccess]) => {
-        if (assignedPermissions[operation] !== hasAccess) {
-          if (hasAccess === true) {
-            permissionsToAdd.push(operation);
-          } else if (hasAccess === false) {
-            permissionsToRemove.push(operation);
-          }
-        }
-      });
-
-      let newPermissionState = assignedPermissions;
-
-      if (permissionsToAdd.length > 0) {
-        newPermissionState = await charmClient.permissions.spaces.addSpacePermissions({
-          forSpaceId: currentSpaceId,
-          operations: permissionsToAdd,
-          spaceId: targetGroup === 'space' ? id : undefined,
-          roleId: targetGroup === 'role' ? id : undefined
-        });
-      }
-
-      if (permissionsToRemove.length > 0) {
-        newPermissionState = await charmClient.permissions.spaces.removeSpacePermissions({
-          forSpaceId: currentSpaceId,
-          operations: permissionsToRemove,
-          spaceId: targetGroup === 'space' ? id : undefined,
-          roleId: targetGroup === 'role' ? id : undefined
-        });
-      }
+  async function handleSubmit() {
+    const rolePermissions = assignedPermissions || new AvailableSpacePermissions().empty;
+    if (rolePermissions && currentSpaceId) {
+      await charmClient.permissions.spaces.saveSpacePermissions(currentSpaceId, formState);
       // Force a refresh of rendered components
-      setAssignedPermissions(newPermissionState);
+      // setAssignedPermissions(newPermissionState);
       callback();
       setTouched(false);
     }
   }
 
   async function deleteProposalCategoryPermission(permissionId: string) {
-    await charmClient.permissions.proposals.deleteProposalCategoryPermission(permissionId);
-    refreshPermissions();
+    // await charmClient.permissions.proposals.deleteProposalCategoryPermission(id);
+    // refreshPermissions();
+    dispatch({ type: 'delete_proposal_category_permission', id: permissionId });
+    setTouched(true);
   }
 
-  async function updateProposalCategoryPermission(input: ProposalCategoryPermissionInput) {
-    await charmClient.permissions.proposals.upsertProposalCategoryPermission(input);
-    refreshPermissions();
+  async function updateProposalCategoryPermission(permission: ProposalCategoryPermissionInput) {
+    dispatch({ type: 'set_proposal_category_permission', permission });
+    setTouched(true);
+    // await charmClient.permissions.proposals.upsertProposalCategoryPermission(input);
+    // refreshPermissions();
   }
 
   async function deletePostCategoryPermission(permissionId: string) {
-    await charmClient.permissions.forum.deletePostCategoryPermission(permissionId);
-    refreshPermissions();
+    // await charmClient.permissions.forum.deletePostCategoryPermission(id);
+    // refreshPermissions();
+    dispatch({ type: 'delete_forum_category_permission', id: permissionId });
+    setTouched(true);
   }
 
-  async function updatePostCategoryPermission(input: PostCategoryPermissionInput) {
-    await charmClient.permissions.forum.upsertPostCategoryPermission(input);
-    refreshPermissions();
+  async function updatePostCategoryPermission(permission: PostCategoryPermissionInput) {
+    dispatch({ type: 'set_forum_category_permission', permission });
+    setTouched(true);
+    // await charmClient.permissions.forum.upsertPostCategoryPermission(input);
+    // refreshPermissions();
+  }
+
+  function setSpacePermission(permission: SpaceOperation, permissionValue: boolean) {
+    dispatch({
+      type: 'set_space_permission',
+      permission,
+      permissionValue
+    });
+    setTouched(true);
   }
 
   return (
     <div data-test={`space-permissions-form-${targetGroup}`}>
-      <form onSubmit={handleSubmit((formValue) => submitted(formValue))} style={{ margin: 'auto' }}>
+      <form style={{ margin: 'auto' }}>
         <Grid container gap={2}>
           <Grid item xs={12} md={12}>
             <Typography variant='body2' fontWeight='bold'>
@@ -176,11 +236,10 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
               label='Create new pages'
               defaultChecked={assignedPermissions?.createPage}
               disabled={!isAdmin}
-              memberChecked={targetGroup !== 'space' ? memberPermissionFlags?.createPage : false}
+              memberChecked={targetGroup !== 'space' ? defaultPermissions?.createPage : false}
               onChange={(ev) => {
                 const { checked: nowHasAccess } = ev.target;
-                setValue('createPage', nowHasAccess);
-                setTouched(true);
+                setSpacePermission('createPage', nowHasAccess);
               }}
             />
             <Divider sx={{ mt: 1, mb: 2 }} />
@@ -192,11 +251,10 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
               label='Create new bounties'
               defaultChecked={assignedPermissions?.createBounty}
               disabled={!isAdmin}
-              memberChecked={targetGroup !== 'space' ? memberPermissionFlags?.createBounty : false}
+              memberChecked={targetGroup !== 'space' ? defaultPermissions?.createBounty : false}
               onChange={(ev) => {
                 const { checked: nowHasAccess } = ev.target;
-                setValue('createBounty', nowHasAccess);
-                setTouched(true);
+                setSpacePermission('createBounty', nowHasAccess);
               }}
             />
             <Divider sx={{ mt: 1, mb: 2 }} />
@@ -207,12 +265,11 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
               data-test='space-operation-reviewProposals'
               label='Review proposals'
               defaultChecked={assignedPermissions?.reviewProposals}
-              memberChecked={targetGroup !== 'space' ? memberPermissionFlags?.reviewProposals : false}
+              memberChecked={targetGroup !== 'space' ? defaultPermissions?.reviewProposals : false}
               disabled={!isAdmin}
               onChange={(ev) => {
                 const { checked: nowHasAccess } = ev.target;
-                setValue('reviewProposals', nowHasAccess);
-                setTouched(true);
+                setSpacePermission('reviewProposals', nowHasAccess);
               }}
             />
             <Typography sx={{ my: 1 }}>Access to categories</Typography>
@@ -220,7 +277,9 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
               <Divider orientation='vertical' flexItem />
               <Box flexGrow={1}>
                 {proposalCategories.map((category) => {
-                  const permission = proposalCategoryPermissions?.find((p) => p.proposalCategoryId === category.id);
+                  const permission = formState.proposalCategories.find(
+                    (p) => p.proposalCategoryId === category.id && (p.assignee as { id: string }).id === id
+                  );
                   const memberRolePermission = defaultProposalCategoryPermissions?.find(
                     (p) => p.proposalCategoryId === category.id
                   );
@@ -250,12 +309,11 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
                 data-test='space-operation-moderateForums'
                 label='Moderate and access all forum categories'
                 defaultChecked={assignedPermissions?.moderateForums}
-                memberChecked={memberPermissionFlags?.moderateForums}
+                memberChecked={defaultPermissions?.moderateForums}
                 disabled={!isAdmin}
                 onChange={(ev) => {
                   const { checked: nowHasAccess } = ev.target;
-                  setValue('moderateForums', nowHasAccess);
-                  setTouched(true);
+                  setSpacePermission('moderateForums', nowHasAccess);
                 }}
               />
             )}
@@ -264,12 +322,13 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
               <Divider orientation='vertical' flexItem />
               <Box flexGrow={1}>
                 {forumCategories.map((category) => {
-                  const permission = postCategoryPermissions?.find((p) => p.postCategoryId === category.id);
-                  const memberRolePermission = defaultPostCategoryPermissions?.find(
+                  const permission = formState.forumCategories?.find(
+                    (p) => p.postCategoryId === category.id && (p.assignee as { id: string }).id === id
+                  );
+                  const memberRolePermission = defaultForumCategoryPermissions?.find(
                     (p) => p.postCategoryId === category.id
                   );
-                  const canModerateForums =
-                    memberPermissionFlags?.moderateForums || assignedPermissions?.moderateForums;
+                  const canModerateForums = defaultPermissions?.moderateForums || assignedPermissions?.moderateForums;
                   const permissionLevel = canModerateForums ? 'full_access' : permission?.permissionLevel;
 
                   return (
@@ -297,7 +356,7 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
                   size='small'
                   data-test='submit-space-permission-settings'
                   disabled={!touched}
-                  type='submit'
+                  onClick={handleSubmit}
                   variant='contained'
                   color='primary'
                 >
@@ -320,24 +379,30 @@ function PermissionToggle(props: {
   ['data-test']?: string;
   onChange: (ev: ChangeEvent<HTMLInputElement>) => void;
 }) {
-  const disabled = props.disabled;
-  const defaultChecked = props.memberChecked || props.defaultChecked;
+  // const disabled = props.disabled;
+  // const defaultChecked = props.memberChecked || props.defaultChecked;
+  const useDefault = typeof props.defaultChecked !== 'boolean';
   return (
     <FormControlLabel
       sx={{
         display: 'flex',
         justifyContent: 'space-between',
-        margin: 0
+        margin: 0,
+        opacity: useDefault ? 0.5 : 1
       }}
       control={
-        typeof props.defaultChecked === 'boolean' && typeof props.memberChecked === 'boolean' ? (
-          <Switch
-            key={`${props.label}-${defaultChecked}`}
-            data-test={props['data-test']}
-            disabled={disabled}
-            defaultChecked={defaultChecked}
-            onChange={props.onChange}
-          />
+        typeof props.defaultChecked === 'boolean' || typeof props.memberChecked === 'boolean' ? (
+          <Tooltip title={useDefault ? 'Default setting' : ''}>
+            <span>
+              <Switch
+                // key={`${props.label}-${defaultChecked}`}
+                data-test={props['data-test']}
+                disabled={props.disabled}
+                checked={useDefault ? props.memberChecked : props.defaultChecked}
+                onChange={props.onChange}
+              />
+            </span>
+          </Tooltip>
         ) : (
           // placeholder element while loading
           <Switch sx={{ visibility: 'hidden' }} disabled={true} />

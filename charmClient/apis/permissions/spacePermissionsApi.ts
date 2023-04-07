@@ -2,7 +2,7 @@ import type { PagePermissionLevel, Space } from '@prisma/client';
 
 import * as http from 'adapters/http';
 import type { SpacePermissionConfigurationUpdate } from 'lib/permissions/meta/interfaces';
-import type { SpacePermissionFlags, SpacePermissionModification } from 'lib/permissions/spaces';
+import type { SpacePermissionFlags } from 'lib/permissions/spaces';
 import type { SpacePermissions } from 'lib/permissions/spaces/listPermissions';
 
 export class SpacePermissionsApi {
@@ -11,37 +11,11 @@ export class SpacePermissionsApi {
   }
 
   listSpacePermissions(resourceId: string): Promise<SpacePermissions> {
-    return http.GET<SpacePermissions>(`/api/permissions/space/${resourceId}/list`);
+    return http.GET<SpacePermissions>(`/api/permissions/space/${resourceId}/settings`);
   }
 
-  addSpacePermissions({
-    forSpaceId,
-    operations,
-    roleId,
-    spaceId,
-    userId
-  }: SpacePermissionModification): Promise<SpacePermissionFlags> {
-    return http.POST<SpacePermissionFlags>(`/api/permissions/space/${forSpaceId}/add`, {
-      operations,
-      roleId,
-      spaceId,
-      userId
-    } as Omit<SpacePermissionModification, 'forSpaceId'>);
-  }
-
-  removeSpacePermissions({
-    forSpaceId,
-    operations,
-    roleId,
-    spaceId,
-    userId
-  }: SpacePermissionModification): Promise<SpacePermissionFlags> {
-    return http.POST<SpacePermissionFlags>(`/api/permissions/space/${forSpaceId}/remove`, {
-      operations,
-      roleId,
-      spaceId,
-      userId
-    } as Omit<SpacePermissionModification, 'forSpaceId'>);
+  saveSpacePermissions(resourceId: string, permissions: SpacePermissions) {
+    return http.POST(`/api/permissions/space/${resourceId}/settings`, permissions);
   }
 
   setDefaultPagePermission({

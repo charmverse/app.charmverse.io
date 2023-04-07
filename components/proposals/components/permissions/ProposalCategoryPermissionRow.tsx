@@ -21,7 +21,7 @@ type Props = {
   inheritedPermissionLevel?: ProposalCategoryPermissionLevel;
   proposalCategoryId: string;
   canEdit: boolean;
-  updatePermission: (newPermission: ProposalCategoryPermissionInput) => void;
+  updatePermission: (newPermission: ProposalCategoryPermissionInput & { id?: string }) => void;
   deletePermission?: (permissionId: string) => void;
 };
 
@@ -65,7 +65,7 @@ export function ProposalCategoryRolePermissionRow({
     if (level === 'delete' && existingPermissionId && deletePermission) {
       deletePermission(existingPermissionId);
     } else if (level !== 'delete' && level !== '') {
-      updatePermission({ permissionLevel: level, proposalCategoryId, assignee });
+      updatePermission({ id: existingPermissionId, permissionLevel: level, proposalCategoryId, assignee });
     }
   }
 
