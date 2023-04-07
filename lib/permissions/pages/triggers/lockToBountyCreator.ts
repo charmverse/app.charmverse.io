@@ -1,4 +1,5 @@
 import type { Prisma } from '@prisma/client';
+import { v4 } from 'uuid';
 
 import { prisma } from 'db';
 import type { IPageWithPermissions } from 'lib/pages';
@@ -6,8 +7,6 @@ import { getPage, resolvePageTree } from 'lib/pages/server';
 import { DataNotFoundError } from 'lib/utilities/errors';
 
 import { pagePermissionGrantsEditAccess } from '../pagePermissionGrantsEditAccess';
-
-import { setupPermissionsAfterPageRepositioned } from './page-repositioned';
 
 export async function lockToBountyCreator({ pageId }: { pageId: string }): Promise<IPageWithPermissions> {
   const page = await prisma.page.findUnique({
@@ -29,6 +28,7 @@ export async function lockToBountyCreator({ pageId }: { pageId: string }): Promi
     } else if (pagePermissionGrantsEditAccess(p)) {
       p.permissionLevel = 'view';
     }
+    p.id = v4();
     return p;
   });
 
@@ -59,7 +59,20 @@ export async function lockToBountyCreator({ pageId }: { pageId: string }): Promi
       data: permissionsToCreate
     });
 
-    await setupPermissionsAfterPageRepositioned(pageId, tx);
+    const inheritedPermissions = pageTree.flatChildren
+      .map((child) =>
+        permissionsToCreate.slice().map((p) => {
+          p.pageId = child.id;
+          p.inheritedFromPermission = p.id;
+          p.id = v4();
+          return p;
+        })
+      )
+      .flat();
+
+    await tx.pagePermission.createMany({
+      data: inheritedPermissions
+    });
   });
 
   return getPage(pageId) as Promise<IPageWithPermissions>;
