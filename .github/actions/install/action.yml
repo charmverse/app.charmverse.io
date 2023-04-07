@@ -25,9 +25,9 @@ runs:
       shell: bash
       run: npm install github:charmverse/core#ts-lib
 
-    - name: Debug node_modules
+    - name: Copy prisma
       shell: bash
-      run: cd ./node_modules/@charmverse/core/src/prisma && ls -a
+      run: npm run link:prisma
 
     # Build prisma types which are cached inside of node_modules
     - name: Build Prisma types
