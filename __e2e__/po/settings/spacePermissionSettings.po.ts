@@ -28,7 +28,7 @@ export class PermissionSettings extends SettingsModal {
   async submitSpacePermissionSettings(): Promise<SpacePermissionFlags> {
     this.submitSpacePermissionSettingsButton.click();
 
-    const response = await this.page.waitForResponse('**/api/permissions/space/*/add');
+    const response = await this.page.waitForResponse('**/api/permissions/space/*/settings');
 
     const parsedResponse = await response.json();
 
