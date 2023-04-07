@@ -5,7 +5,7 @@ import type { SpacePermissions } from 'lib/permissions/spaces/listPermissions';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
-describe('POST /api/permissions/space/{spaceId}/add - Add space permissions', () => {
+describe('POST /api/permissions/space/{spaceId}/settings - Saving space permissions', () => {
   it('should succeed if the user is a space admin and respond 200', async () => {
     const { space, user: adminUser } = await generateUserAndSpaceWithApiToken(undefined, true);
 
@@ -36,7 +36,7 @@ describe('POST /api/permissions/space/{spaceId}/add - Add space permissions', ()
         .post(`/api/permissions/space/${space.id}/settings`)
         .set('Cookie', adminCookie)
         .send(spacePermissionContent)
-        .expect(201)
+        .expect(200)
     ).body as SpacePermissionFlags;
 
     expect(updatedPermissions.createPage).toBe(true);
@@ -54,7 +54,7 @@ describe('POST /api/permissions/space/{spaceId}/add - Add space permissions', ()
     const nonAdminCookie = await loginUser(nonAdminUser.id);
 
     await request(baseUrl)
-      .post(`/api/permissions/space/${space.id}/add`)
+      .post(`/api/permissions/space/${space.id}/settings`)
       .set('Cookie', nonAdminCookie)
       .send(spacePermissionContent)
       .expect(401);
