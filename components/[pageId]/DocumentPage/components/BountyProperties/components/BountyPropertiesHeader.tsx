@@ -9,12 +9,10 @@ import charmClient from 'charmClient';
 import BountyStatusBadge from 'components/bounties/components/BountyStatusBadge';
 import Button from 'components/common/Button';
 import { useMembers } from 'hooks/useMembers';
-import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
-import type { BountyWithDetails, BountyPermissions } from 'lib/bounties';
-import type { BountyPagePermissionIntersection } from 'lib/permissions/compareBountyPagePermissions';
-import { compareBountyPagePermissions } from 'lib/permissions/compareBountyPagePermissions';
+import type { BountyPermissions, BountyWithDetails } from 'lib/bounties';
 import type { PagePermissionMeta } from 'lib/permissions/interfaces';
+import { isBountyEditableByApplicants } from 'lib/permissions/isBountyEditableByApplicants';
 
 /**
  * Permissions left optional so this component can initialise without them
@@ -42,16 +40,12 @@ export function BountyPropertiesHeader({
   const [updatingPermissions, setUpdatingPermissions] = useState(false);
 
   // Detect if the page permissions allow potential applicants to edit the page
-  const intersection: BountyPagePermissionIntersection =
-    !bountyPermissions || !pagePermissions
-      ? { hasPermissions: [], missingPermissions: [] }
-      : compareBountyPagePermissions({
-          bountyPermissions: { ...bountyPermissions, creator: [] },
-          pagePermissions: pagePermissions.filter((p) => p.userId !== bounty.createdBy),
-          bountyOperations: ['work'],
-          pageOperations: ['edit_content'],
-          members
-        });
+  const editableByCertainApplicants = isBountyEditableByApplicants({
+    bountyPermissions: bountyPermissions ?? {},
+    pagePermissions: pagePermissions ?? [],
+    members,
+    bounty
+  });
 
   function restrictPermissions() {
     setUpdatingPermissions(true);
@@ -91,7 +85,7 @@ export function BountyPropertiesHeader({
       </Grid>
 
       {/* Warning for applicants */}
-      {intersection.hasPermissions.length > 0 && !readOnly && (
+      {editableByCertainApplicants && !readOnly && (
         <Alert
           severity='info'
           sx={{ mb: 2 }}
