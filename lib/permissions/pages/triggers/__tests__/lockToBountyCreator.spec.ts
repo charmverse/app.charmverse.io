@@ -205,6 +205,50 @@ describe('lockToBountyCreator', () => {
     );
   });
 
+  it('should not provide access to the space if the space was not previously authorised', async () => {
+    const role = await generateRole({
+      createdBy: user.id,
+      spaceId: space.id
+    });
+
+    const bounty = await generateBounty({
+      createdBy: user.id,
+      spaceId: space.id,
+      approveSubmitters: false,
+      status: 'open',
+      chainId: 1,
+      rewardToken: 'ETH',
+      bountyPermissions: {
+        creator: [
+          {
+            group: 'user',
+            id: user.id
+          }
+        ],
+        submitter: [
+          {
+            group: 'role',
+            id: role.id
+          }
+        ]
+      },
+      pagePermissions: [
+        {
+          permissionLevel: 'view_comment',
+          roleId: role.id
+        }
+      ]
+    });
+
+    const { permissions } = await lockToBountyCreator({ pageId: bounty.page.id });
+
+    expect(permissions.length).toBe(2);
+    // Unchanged
+    expect(permissions.some((p) => p.roleId === role.id && p.permissionLevel === 'view_comment'));
+    // Auto-set
+    expect(permissions.some((p) => p.userId === user.id && p.permissionLevel === 'full_access'));
+  });
+
   it('should throw an error if targeting a page without a bounty', async () => {
     const page = await createPage({
       createdBy: user.id,
