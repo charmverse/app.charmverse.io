@@ -1,11 +1,21 @@
 import { prisma } from 'db';
 import { InvalidInputError } from 'lib/utilities/errors';
 
-import type { AssignedPermissionsQuery } from '../interfaces';
+import type { AssignablePermissionGroups } from '../interfaces';
 import { permissionGroupIsValid } from '../utils';
 
 import { AvailableSpacePermissions } from './availableSpacePermissions';
 import type { SpacePermissionFlags } from './interfaces';
+
+/**
+ * @id The userId, roleId or spaceId
+ * @resourceId The resource such as Space or Page we are querying permissions for
+ */
+interface AssignedPermissionsQuery {
+  group: AssignablePermissionGroups;
+  id: string;
+  resourceId: string;
+}
 
 export async function computeGroupSpacePermissions({
   id,

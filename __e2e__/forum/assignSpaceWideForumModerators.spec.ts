@@ -101,9 +101,7 @@ test.describe.serial('Comment on forum posts', () => {
 
     expect(isChecked).toBe(true);
 
-    const newRolePermissions = await permissionSettings.submitSpacePermissionSettings();
-
-    expect(newRolePermissions.moderateForums).toBe(true);
+    await permissionSettings.submitSpacePermissionSettings();
   });
 
   // We don't need to test all moderation paths since moderation from post page already handles this

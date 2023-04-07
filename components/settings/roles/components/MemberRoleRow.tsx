@@ -15,12 +15,12 @@ export function MemberRoleRow({ readOnly, spaceId }: { readOnly: boolean; spaceI
 
   return (
     <RoleRowBase
-      title='Member'
+      title='Default'
       description={
         <>
-          Users are added to the Member Role by default
+          Users are automatically added to the Default Role
           <br />
-          Admins can change the default permissions for the Member Role
+          Admins can change the permissions for the Default and Custom roles
         </>
       }
       readOnlyMembers={readOnly}

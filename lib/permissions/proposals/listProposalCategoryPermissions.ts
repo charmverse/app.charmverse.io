@@ -13,10 +13,6 @@ export async function listProposalCategoryPermissions({
   resourceId,
   userId
 }: Required<PermissionCompute>): Promise<AssignedProposalCategoryPermission[]> {
-  if (!userId) {
-    return [];
-  }
-
   if (!isUUID(resourceId)) {
     throw new InvalidInputError('Invalid proposal category ID');
   }

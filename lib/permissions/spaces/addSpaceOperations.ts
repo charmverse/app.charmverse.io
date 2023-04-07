@@ -5,11 +5,10 @@ import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { uniqueValues } from 'lib/utilities/array';
 import { InsecureOperationError, InvalidInputError, MissingDataError } from 'lib/utilities/errors';
 
-import { AssignableToRolesOnlyError, AssignmentNotPermittedError, InvalidPermissionGranteeError } from '../errors';
+import { AssignableToRolesOnlyError, InvalidPermissionGranteeError } from '../errors';
 import type { AssignablePermissionGroups } from '../interfaces';
 
-import { computeGroupSpacePermissions } from './computeGroupSpacePermissions';
-import type { SpacePermissionFlags, SpacePermissionModification } from './interfaces';
+import type { SpacePermissionModification } from './interfaces';
 import { generateSpacePermissionQuery } from './utils';
 
 export async function addSpaceOperations<A extends AssignablePermissionGroups = 'any'>({
@@ -18,7 +17,7 @@ export async function addSpaceOperations<A extends AssignablePermissionGroups = 
   roleId,
   spaceId,
   userId
-}: SpacePermissionModification<A>): Promise<SpacePermissionFlags> {
+}: SpacePermissionModification<A>) {
   // Make sure one group has been assigned, not more, not 0
   if ((roleId && (spaceId || userId)) || (spaceId && userId) || (!roleId && !spaceId && !userId)) {
     throw new InvalidPermissionGranteeError();
@@ -114,12 +113,4 @@ export async function addSpaceOperations<A extends AssignablePermissionGroups = 
       user: true
     }
   });
-
-  const updatedGroupSpacePermissions = await computeGroupSpacePermissions({
-    resourceId: forSpaceId,
-    group,
-    id
-  });
-
-  return updatedGroupSpacePermissions;
 }

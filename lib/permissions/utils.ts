@@ -10,8 +10,9 @@ export function permissionGroupIsValid(group: AssignablePermissionGroups): boole
 
   return true;
 }
+
 export function getPermissionAssignee(
-  permission: Pick<ProposalCategoryPermission, 'public' | 'roleId' | 'spaceId'>
+  permission: Partial<Pick<ProposalCategoryPermission, 'public' | 'roleId' | 'spaceId'>>
 ): TargetPermissionGroup<'public' | 'role' | 'space'> {
   // Make sure we always have a single assignee
   if (permission.public && !permission.roleId && !permission.spaceId) {

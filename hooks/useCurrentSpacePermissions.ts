@@ -15,7 +15,7 @@ export function useCurrentSpacePermissions() {
     () => (space ? `permissions-${space.id}` : null),
     () => {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      return charmClient.computeUserSpacePermissions({ spaceId: space!.id });
+      return charmClient.permissions.spaces.computeUserSpacePermissions({ spaceId: space!.id });
     },
     { revalidateOnFocus: true, focusThrottleInterval: 0 }
   );

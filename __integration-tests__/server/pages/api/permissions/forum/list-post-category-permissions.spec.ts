@@ -7,7 +7,7 @@ import { generateRole, generateUserAndSpace } from 'testing/setupDatabase';
 import { generatePostCategory } from 'testing/utils/forums';
 
 describe('GET /api/permissions/forum/list-post-category-permissions - List available category permissions', () => {
-  it('should return list of post category permissions for a space member, and an empty list for a non-space member, responding 200', async () => {
+  it('should return list of post category permissions for a space member, responding 200', async () => {
     const { space, user } = await generateUserAndSpace({
       isAdmin: false
     });
@@ -38,15 +38,5 @@ describe('GET /api/permissions/forum/list-post-category-permissions - List avail
 
     expect(result.length).toBe(1);
     expect(result[0]).toMatchObject(expect.objectContaining(permission));
-
-    // Non logged in user test case
-    const publicResult = (
-      await request(baseUrl)
-        .get(`/api/permissions/forum/list-post-category-permissions?resourceId=${postCategory.id}`)
-        .send({ resourceId: postCategory.id })
-        .expect(200)
-    ).body as AssignedPostCategoryPermission[];
-
-    expect(publicResult.length).toBe(0);
   });
 });
