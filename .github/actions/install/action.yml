@@ -9,6 +9,26 @@ runs:
       with:
         node-version: 18
 
+    ## Move to bottom after debug-----------
+    - name: Install CharmVerse core
+      shell: bash
+      run: npm install github:charmverse/core#ts-lib
+
+    - name: Copy prisma
+      shell: bash
+      run: npm run link:prisma
+
+    - name: Debug prisma
+      shell: bash
+      run: ls -a && cd ./prisma && echo -e "Prisma content" && ls -a
+
+    # Build prisma types which are cached inside of node_modules
+    - name: Build Prisma types
+      shell: bash
+      run: npm run build:prisma
+
+    ## Move to top after debug-----------
+
     - name: Cache dependencies
       id: cache_node_modules
       uses: actions/cache@v3
@@ -21,15 +41,4 @@ runs:
       if: steps.cache_node_modules.outputs.cache-hit != 'true'
       run: npm ci --no-audit --no-fund
 
-    - name: Install CharmVerse core
-      shell: bash
-      run: npm install github:charmverse/core#ts-lib
 
-    - name: Copy prisma
-      shell: bash
-      run: npm run link:prisma
-
-    # Build prisma types which are cached inside of node_modules
-    - name: Build Prisma types
-      shell: bash
-      run: npm run build:prisma
