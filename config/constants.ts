@@ -32,3 +32,6 @@ export const charmverseDiscordInvite = 'https://discord.gg/ACYCzBGC2M';
 export const googleOAuthClientIdSensitive =
   process.env.GOOGLE_OAUTH_CLIENT_ID_SENSITIVE || process.env.NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_ID_SENSITIVE;
 export const googleOAuthClientSecretSensitive = process.env.GOOGLE_OAUTH_CLIENT_SECRET_SENSITIVE;
+
+// Permissions API
+export const permissionsApiUrl = process.env.PERMISSIONS_API_URL ?? 'http://localhost:3000';

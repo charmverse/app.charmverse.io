@@ -2,6 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import http from 'adapters/http/fetch.server';
+import { permissionsApiUrl } from 'config/constants';
 import { prisma } from 'db';
 import { PostNotFoundError } from 'lib/forums/posts/errors';
 import { onError, onNoMatch, requireKeys } from 'lib/middleware';
@@ -46,19 +47,19 @@ async function computePermissions(req: NextApiRequest, res: NextApiResponse<Avai
     }
   }
 
-  // const delegatedResponse = await http('http://localhost:3000/api/permissions/forum/compute-post-permissions', {
-  //   body: JSON.stringify({
-  //     ...input,
-  //     userId: req.session.user?.id
-  //   }),
-  //   method: 'POST'
-  // });
-
-  const permissions = await computePostPermissions({
-    resourceId,
-    userId: req.session.user?.id
+  const delegatedResponse = await http(`${permissionsApiUrl}/api/permissions/forum/compute-post-permissions`, {
+    body: JSON.stringify({
+      ...input,
+      userId: req.session.user?.id
+    }),
+    method: 'POST'
   });
-  res.status(200).json(permissions as any as AvailablePostPermissionFlags);
+
+  // const permissions = await computePostPermissions({
+  //   resourceId,
+  //   userId: req.session.user?.id
+  // });
+  res.status(200).json(delegatedResponse as any as AvailablePostPermissionFlags);
 }
 
 export default withSessionRoute(handler);
