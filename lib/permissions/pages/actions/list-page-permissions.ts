@@ -10,7 +10,6 @@ export async function listPagePermissions(pageId: string): Promise<IPagePermissi
     include: {
       role: true,
       space: true,
-      user: true,
       sourcePermission: true
     }
   });

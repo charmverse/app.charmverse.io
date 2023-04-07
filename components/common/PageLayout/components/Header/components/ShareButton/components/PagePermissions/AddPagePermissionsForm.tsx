@@ -19,6 +19,7 @@ import type {
   PagePermissionLevelType
 } from 'lib/permissions/pages/page-permission-interfaces';
 import { permissionLevels } from 'lib/permissions/pages/page-permission-mapping';
+import { isTruthy } from 'lib/utilities/types';
 import type { ListSpaceRolesResponse } from 'pages/api/roles';
 
 export const schema = yup.object({
@@ -59,10 +60,10 @@ export default function AddPagePermissionsForm({
   }, [roles]);
 
   const userIdsToHide = existingPermissions
-    .filter((permission) => {
-      return permission.user;
+    .map((permission) => {
+      return permission.userId;
     })
-    .map((permission) => permission.user!.id);
+    .filter(isTruthy);
 
   const roleIdsToHide = existingPermissions
     .filter((permission) => {
