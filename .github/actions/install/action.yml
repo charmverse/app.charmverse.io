@@ -20,7 +20,7 @@ runs:
 
     - name: Debug prisma
       shell: bash
-      run: ls -a && cd ./prisma && echo -e "Prisma content" && ls -a
+      run: ls -a && cd ./prisma && echo -e "\r\n----Prisma content" && ls -a && cd ../
 
     # Build prisma types which are cached inside of node_modules
     - name: Build Prisma types
