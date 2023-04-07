@@ -71,9 +71,8 @@ describe('POST /api/pages/{pageId}/restrict-permissions - Lock down bounty page 
         .expect(200)
     ).body as IPageWithPermissions;
 
-    expect(permissions.length).toBe(3);
+    expect(permissions.length).toBe(2);
     expect(permissions.some((p) => p.userId === user.id && p.permissionLevel === 'full_access'));
-    expect(permissions.some((p) => p.userId === submitterUser.id && p.permissionLevel === 'view'));
     expect(permissions.some((p) => p.spaceId === space.id && p.permissionLevel === 'view'));
   });
 

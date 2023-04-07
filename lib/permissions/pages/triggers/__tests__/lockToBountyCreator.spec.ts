@@ -15,7 +15,7 @@ beforeAll(async () => {
 });
 
 describe('lockToBountyCreator', () => {
-  it('should upsert a full access permission for the bounty creator, and update all other permisssions to view-only', async () => {
+  it('should update the permissions to view-only for the space, and full access for the creator', async () => {
     const submitterUser = await generateSpaceUser({
       isAdmin: false,
       spaceId: space.id
@@ -60,9 +60,8 @@ describe('lockToBountyCreator', () => {
 
     const { permissions } = await lockToBountyCreator({ pageId: bounty.page.id });
 
-    expect(permissions.length).toBe(3);
+    expect(permissions.length).toBe(2);
     expect(permissions.some((p) => p.userId === user.id && p.permissionLevel === 'full_access'));
-    expect(permissions.some((p) => p.userId === submitterUser.id && p.permissionLevel === 'view'));
     expect(permissions.some((p) => p.spaceId === space.id && p.permissionLevel === 'view'));
   });
 
