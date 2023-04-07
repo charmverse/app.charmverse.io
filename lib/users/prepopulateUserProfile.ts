@@ -1,4 +1,4 @@
-import type { User } from '@prisma/client';
+import type { User, UserWallet } from '@prisma/client';
 import { uniqBy } from 'lodash';
 
 import { prisma } from 'db';
@@ -93,7 +93,9 @@ export async function prepopulateUserProfile(user: User, ens: string | null) {
             userId: user.id,
             isHidden: true,
             isPinned: true,
-            type: 'nft'
+            type: 'nft',
+            // Use the first wallet id when prepopulating the nft profile items
+            walletId: nft.walletId
           }
         })
       )

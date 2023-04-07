@@ -1,4 +1,4 @@
-import type { Block, Bounty, Page, PagePermission, Space } from '@prisma/client';
+import type { Block, Page, PagePermission, Space } from '@prisma/client';
 
 import type { BountyWithDetails } from 'lib/bounties';
 import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
@@ -21,7 +21,6 @@ export interface PageWithChildren extends IPageWithPermissions {
 
 export interface ModifyChildPagesResponse {
   pageIds: string[];
-  rootBlock: Block | null;
 }
 
 export interface PageLink {

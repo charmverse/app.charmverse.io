@@ -14,6 +14,7 @@ export interface NftData {
   timeLastUpdated: string;
   isHidden: boolean;
   isPinned: boolean;
+  walletId: string | null;
 }
 
 export interface ExtendedPoap {
@@ -24,6 +25,7 @@ export interface ExtendedPoap {
   tokenId: string;
   created: string;
   name: string;
+  walletId: string | null;
 }
 
 /**
@@ -44,4 +46,5 @@ export interface Collectable {
   type: 'poap' | 'nft';
   link: string;
   isHidden: boolean;
+  walletId: string | null;
 }

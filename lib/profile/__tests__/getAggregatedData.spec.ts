@@ -108,7 +108,8 @@ describe('GET /api/public/profile/[userPath]', () => {
           votes: [vote1, vote2],
           proposals: [proposal1, proposal2],
           bounties: [],
-          latestEventDate: vote2.createdAt
+          latestEventDate: vote2.createdAt,
+          walletId: expect.any(String)
         },
         {
           id: '2',
@@ -120,7 +121,8 @@ describe('GET /api/public/profile/[userPath]', () => {
           votes: [vote3],
           proposals: [],
           bounties: [],
-          latestEventDate: vote3.createdAt
+          latestEventDate: vote3.createdAt,
+          walletId: expect.any(String)
         },
         {
           id: space.id,
@@ -132,6 +134,7 @@ describe('GET /api/public/profile/[userPath]', () => {
           logo: null,
           votes: [],
           proposals: [],
+          walletId: null,
           bounties: [
             {
               bountyId: bounty.id,

@@ -1,3 +1,5 @@
+import { v4 } from 'uuid';
+
 import { prisma } from 'db';
 import { sessionUserRelations } from 'lib/session/config';
 import { randomETHWalletAddress } from 'testing/generateStubs';
@@ -9,12 +11,14 @@ describe('disconnectWallet', () => {
   it('should disconnect the wallet from the user', async () => {
     const walletAddress = randomETHWalletAddress();
     // create a user with a wallet
+    const walletId = v4();
     const user = await prisma.user.create({
       data: {
         path: `${Math.random()}`,
         username: 'userWithOneIdentity',
         wallets: {
           create: {
+            id: walletId,
             address: walletAddress,
             ensname: 'test.eth'
           }
@@ -26,13 +30,15 @@ describe('disconnectWallet', () => {
                 id: '0x1234',
                 type: 'nft',
                 isHidden: false,
-                isPinned: true
+                isPinned: true,
+                walletId
               },
               {
                 id: '012345',
                 type: 'community',
                 isHidden: false,
-                isPinned: true
+                isPinned: true,
+                walletId
               }
             ]
           }
