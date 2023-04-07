@@ -4,7 +4,6 @@ import Popover from '@mui/material/Popover';
 import { bindPopover, usePopupState } from 'material-ui-popup-state/hooks';
 
 import { NotificationModal } from 'components/common/PageLayout/components/Header/components/NotificationPreview/NotificationModal';
-import { NotificationsProvider } from 'components/common/PageLayout/components/Header/components/NotificationPreview/useNotifications';
 import { useMdScreen } from 'hooks/useMediaScreens';
 
 import NotificationsBadge from '../../../Sidebar/NotificationsBadge';
@@ -16,7 +15,7 @@ export function NotificationButton() {
   const isMdScreen = useMdScreen();
 
   return (
-    <NotificationsProvider>
+    <>
       <NotificationsBadge onClick={popupState.open} sx={{ cursor: 'pointer' }}>
         <IconButton size={isMdScreen ? 'small' : 'medium'}>
           <NotificationsIcon fontSize='small' color='secondary' />
@@ -42,6 +41,6 @@ export function NotificationButton() {
       </Popover>
 
       <NotificationModal />
-    </NotificationsProvider>
+    </>
   );
 }

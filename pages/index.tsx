@@ -59,7 +59,14 @@ export default function LoginPage() {
         openSettingsModal('account');
       }
     }
-  }, [isSettingsDialogOpen, router.isReady, router.query.task, router.query.account]);
+  }, [
+    isSettingsDialogOpen,
+    router.isReady,
+    router.query.task,
+    router.query.account,
+    router.query.notifications,
+    openSettingsModal
+  ]);
 
   useEffect(() => {
     setTitleState('Welcome');

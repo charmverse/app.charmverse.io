@@ -1,7 +1,7 @@
 import type { NotificationType } from '@prisma/client';
 import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
-import { useCallback, createContext, useContext, useMemo } from 'react';
+import { useEffect, useState, useCallback, createContext, useContext, useMemo } from 'react';
 
 import charmClient from 'charmClient';
 import {
@@ -60,13 +60,16 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
   const { tasks, mutate: mutateTasks } = useTasks();
   const { user } = useUser();
   const currentUserId = user?.id;
-  const { query, replace, isReady } = useRouter();
+  const { query, isReady } = useRouter();
+  const [notificationDisplayType, setNotificationDisplayType] = useState<NotificationDisplayType | null>(null);
 
-  const notificationQueryParam = typeof query.notifications === 'string' ? query.notifications : null;
-  let notificationDisplayType: NotificationDisplayType | null = null;
-  if (notificationQueryParam && isReady) {
-    notificationDisplayType = isNotificationDisplayType(notificationQueryParam) ? notificationQueryParam : 'all';
-  }
+  useEffect(() => {
+    const notificationQueryParam = typeof query.notifications === 'string' ? query.notifications : null;
+    if (notificationQueryParam && isReady) {
+      const displayType = isNotificationDisplayType(notificationQueryParam) ? notificationQueryParam : 'all';
+      setNotificationDisplayType(displayType);
+    }
+  }, [isReady, query.notifications]);
 
   const unmarkedNotificationPreviews: NotificationDetails[] = useMemo(() => {
     if (!tasks) return [];
@@ -133,20 +136,13 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
     []
   );
 
-  const openNotificationsModal = useCallback(
-    (tab: NotificationDisplayType = 'all') => {
-      replace({ query: { ...query, notifications: tab } });
-    },
-    [query, replace]
-  );
+  const openNotificationsModal = useCallback((tab: NotificationDisplayType = 'all') => {
+    setNotificationDisplayType(tab);
+  }, []);
 
   const closeNotificationsModal = useCallback(() => {
-    // remove notifications query param
-    const { notifications, ...routerQuery } = query;
-    replace({
-      query: { ...routerQuery }
-    });
-  }, [query, replace]);
+    setNotificationDisplayType(null);
+  }, []);
 
   const value = useMemo(
     () => ({
