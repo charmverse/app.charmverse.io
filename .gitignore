@@ -3,7 +3,7 @@
 /node_modules
 jspm_packages
 
-prisma
+/prisma
 
 # Serverless directories
 .serverless
