@@ -1,7 +1,7 @@
 import request from 'supertest';
 
-import { computeSpacePermissions } from 'lib/permissions/computeSpacePermissions';
-import type { SpacePermissionFlags, SpacePermissionModification } from 'lib/permissions/spaces';
+import { computeGroupSpacePermissions } from 'lib/permissions/spaces';
+import type { SpacePermissionModification } from 'lib/permissions/spaces';
 import type { SpacePermissions } from 'lib/permissions/spaces/listPermissions';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
@@ -38,7 +38,7 @@ describe('POST /api/permissions/space/{spaceId}/settings - Saving space permissi
       .send(spacePermissionContent)
       .expect(200);
 
-    const updatedPermissions = await computeSpacePermissions({
+    const updatedPermissions = await computeGroupSpacePermissions({
       forSpaceId: space.id,
       group: 'space',
       spaceId: space.id
