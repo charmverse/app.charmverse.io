@@ -9,11 +9,9 @@ import charmClient from 'charmClient';
 import BountyStatusBadge from 'components/bounties/components/BountyStatusBadge';
 import Button from 'components/common/Button';
 import { useMembers } from 'hooks/useMembers';
-import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
-import type { BountyWithDetails, BountyPermissions } from 'lib/bounties';
-import type { BountyPagePermissionIntersection } from 'lib/permissions/compareBountyPagePermissions';
-import { compareBountyPagePermissions } from 'lib/permissions/compareBountyPagePermissions';
+import type { BountyPermissions, BountyWithDetails } from 'lib/bounties';
+import { isBountyEditableByApplicants } from 'lib/permissions/bounties/isBountyEditableByApplicants';
 import type { PagePermissionMeta } from 'lib/permissions/interfaces';
 
 /**
@@ -37,21 +35,17 @@ export function BountyPropertiesHeader({
   refreshPermissions
 }: Props) {
   const { members } = useMembers();
-  const { mutatePage } = usePages();
   const { showMessage } = useSnackbar();
 
   const [updatingPermissions, setUpdatingPermissions] = useState(false);
 
-  const intersection: BountyPagePermissionIntersection =
-    !bountyPermissions || !pagePermissions
-      ? { hasPermissions: [], missingPermissions: [] }
-      : compareBountyPagePermissions({
-          bountyPermissions,
-          pagePermissions,
-          bountyOperations: ['work'],
-          pageOperations: ['edit_content'],
-          members
-        });
+  // Detect if the page permissions allow potential applicants to edit the page
+  const editableByCertainApplicants = isBountyEditableByApplicants({
+    bountyPermissions: bountyPermissions ?? {},
+    pagePermissions: pagePermissions ?? [],
+    members,
+    bounty
+  });
 
   function restrictPermissions() {
     setUpdatingPermissions(true);
@@ -91,7 +85,7 @@ export function BountyPropertiesHeader({
       </Grid>
 
       {/* Warning for applicants */}
-      {intersection.hasPermissions.length > 0 && !readOnly && (
+      {editableByCertainApplicants && !readOnly && (
         <Alert
           severity='info'
           sx={{ mb: 2 }}
@@ -103,7 +97,7 @@ export function BountyPropertiesHeader({
             </Tooltip>
           }
         >
-          The current permissions allow applicants to edit the details of this bounty.
+          The current permissions allow some applicants to edit the details of this bounty.
         </Alert>
       )}
     </>
