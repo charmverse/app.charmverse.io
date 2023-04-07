@@ -5,7 +5,9 @@ import { onError, onNoMatch, requireSuperApiKey, requireKeys } from 'lib/middlew
 import { createWorkspaceApi } from 'lib/public-api/createWorkspaceApi';
 import type { CreateWorkspaceResponseBody, CreateWorkspaceRequestBody } from 'lib/public-api/interfaces';
 import { withSessionRoute } from 'lib/session/withSession';
+import { spaceInternalTemplateMapping } from 'lib/spaces/config';
 import { InvalidInputError } from 'lib/utilities/errors';
+import { isTruthy } from 'lib/utilities/types';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -45,8 +47,13 @@ async function createSpace(req: NextApiRequest, res: NextApiResponse<CreateWorks
     adminWalletAddress,
     adminAvatar,
     adminUsername,
-    webhookUrl
+    webhookUrl,
+    template
   } = req.body as CreateWorkspaceRequestBody;
+
+  if (isTruthy(template) && !spaceInternalTemplateMapping[template]) {
+    throw new InvalidInputError('Invalid template provided.');
+  }
 
   if (typeof name !== 'string' || name.length < 3) {
     throw new InvalidInputError('Space name must be a string at least 3 characters.');
@@ -68,7 +75,8 @@ async function createSpace(req: NextApiRequest, res: NextApiResponse<CreateWorks
     xpsEngineId,
     avatar,
     superApiToken: req.superApiToken,
-    webhookUrl
+    webhookUrl,
+    template
   });
 
   return res.status(201).json(result);
