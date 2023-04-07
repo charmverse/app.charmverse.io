@@ -1,10 +1,9 @@
 import request from 'supertest';
 
-import { updateSpacePermissionConfigurationMode } from 'lib/permissions/meta';
 import type { SpacePermissionFlags, SpacePermissionModification } from 'lib/permissions/spaces';
 import type { SpacePermissions } from 'lib/permissions/spaces/listPermissions';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
-import { generateRole, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 describe('POST /api/permissions/space/{spaceId}/add - Add space permissions', () => {
   it('should succeed if the user is a space admin and respond 200', async () => {
