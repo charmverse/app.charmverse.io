@@ -242,6 +242,39 @@ describe('compareBountyPagePermissions', () => {
     expect(isBountyEditableByApplicants({ bounty, members, bountyPermissions, pagePermissions })).toBe(true);
   });
 
+  it('should return true if the bounty allows a role to submit work, and there is a role with no members that has edit access', async () => {
+    const bounty = await generateBounty({
+      approveSubmitters: true,
+      createdBy: bountyCreator.id,
+      spaceId: space.id,
+      status: 'open',
+      pagePermissions: [
+        {
+          permissionLevel: 'editor',
+          roleId: unassignedRole.id
+        }
+      ],
+      bountyPermissions: {
+        submitter: [
+          {
+            group: 'role',
+            id: unassignedRole.id
+          }
+        ]
+      }
+    });
+    const [bountyPermissions, pagePermissions] = await Promise.all([
+      queryBountyPermissions({ bountyId: bounty.id }),
+      prisma.pagePermission.findMany({
+        where: {
+          pageId: bounty.id
+        }
+      })
+    ]);
+
+    expect(isBountyEditableByApplicants({ bounty, members, bountyPermissions, pagePermissions })).toBe(true);
+  });
+
   it('should return true if the bounty allows a role to submit work, and there is a role permission granting edit access', async () => {
     const bounty = await generateBounty({
       approveSubmitters: true,

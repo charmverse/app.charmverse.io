@@ -56,6 +56,14 @@ export function isBountyEditableByApplicants({
     return acc;
   }, {} as Record<string, PagePermissionMeta>);
 
+  const entries = Object.entries(mappedPagePermissions);
+
+  for (const [key, value] of entries) {
+    if (pagePermissionGrantsEditAccess(value) && mappedBountyPermissions[key]) {
+      return true;
+    }
+  }
+
   for (const member of members) {
     // Evaluate this for all members except the bounty creator
     if (member.id !== bounty.createdBy) {
