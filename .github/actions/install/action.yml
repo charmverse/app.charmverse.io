@@ -28,4 +28,4 @@ runs:
     # Build prisma types which are cached inside of node_modules
     - name: Build Prisma types
       shell: bash
-      run: npm run build:prisma
+      run: echo -e "Current directory" && pwd && ls -a && npm run build:prisma
