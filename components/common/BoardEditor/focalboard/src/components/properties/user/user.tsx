@@ -80,6 +80,7 @@ function UserProperty(props: Props): JSX.Element | null {
       hideInput={props.readOnly || (props.displayType !== 'details' && !clicked)}
     >
       <InputSearchMemberMultiple
+        disableClearable
         open={isOpen}
         disableCloseOnSelect
         defaultValue={memberIds}
