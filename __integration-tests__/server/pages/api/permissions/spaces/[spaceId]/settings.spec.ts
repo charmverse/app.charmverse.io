@@ -39,9 +39,9 @@ describe('POST /api/permissions/space/{spaceId}/settings - Saving space permissi
       .expect(200);
 
     const updatedPermissions = await computeGroupSpacePermissions({
-      forSpaceId: space.id,
+      id: space.id,
       group: 'space',
-      spaceId: space.id
+      resourceId: space.id
     });
     expect(updatedPermissions.createPage).toBe(true);
     expect(updatedPermissions.createBounty).toBe(false);
