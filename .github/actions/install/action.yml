@@ -9,6 +9,11 @@ runs:
       with:
         node-version: 18
 
+    
+    - name: Create .env.test.local file
+      shell: bash
+      run: cp .env.test.local.example .env.test.local
+
     - name: Cache dependencies
       id: cache_node_modules
       uses: actions/cache@v3
