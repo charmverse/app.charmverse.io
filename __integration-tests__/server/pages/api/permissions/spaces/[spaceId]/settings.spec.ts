@@ -1,5 +1,6 @@
 import request from 'supertest';
 
+import { computeSpacePermissions } from 'lib/permissions/computeSpacePermissions';
 import type { SpacePermissionFlags, SpacePermissionModification } from 'lib/permissions/spaces';
 import type { SpacePermissions } from 'lib/permissions/spaces/listPermissions';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
@@ -31,14 +32,17 @@ describe('POST /api/permissions/space/{spaceId}/settings - Saving space permissi
 
     const adminCookie = await loginUser(adminUser.id);
 
-    const updatedPermissions = (
-      await request(baseUrl)
-        .post(`/api/permissions/space/${space.id}/settings`)
-        .set('Cookie', adminCookie)
-        .send(spacePermissionContent)
-        .expect(200)
-    ).body as SpacePermissionFlags;
+    await request(baseUrl)
+      .post(`/api/permissions/space/${space.id}/settings`)
+      .set('Cookie', adminCookie)
+      .send(spacePermissionContent)
+      .expect(200);
 
+    const updatedPermissions = await computeSpacePermissions({
+      forSpaceId: space.id,
+      group: 'space',
+      spaceId: space.id
+    });
     expect(updatedPermissions.createPage).toBe(true);
     expect(updatedPermissions.createBounty).toBe(false);
   });
