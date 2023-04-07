@@ -27,7 +27,7 @@ runs:
 
     - name: Debug node_modules
       shell: bash
-      run: cd ./node_modules/@charmverse/core/prisma && ls -a
+      run: cd ./node_modules/@charmverse/core/src/prisma && ls -a
 
     # Build prisma types which are cached inside of node_modules
     - name: Build Prisma types
