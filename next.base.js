@@ -16,7 +16,8 @@ const esmModules = [
   'fetch-blob',
   'formdata-polyfill',
   'jose',
-  'nanoid'
+  'nanoid',
+  '@charmverse/core'
 ];
 
 exports.esmModules = esmModules;
