@@ -7,7 +7,7 @@ import { MdOutlineBuild } from 'react-icons/md';
 import { SiHackthebox, SiNotion } from 'react-icons/si';
 import { SlBadge, SlTrophy } from 'react-icons/sl';
 
-import { spaceContentTemplates } from 'lib/spaces/config';
+import { SpaceTemplateMapping, spaceContentTemplates } from 'lib/spaces/config';
 import type { SpaceCreateTemplate, SpaceTemplateType } from 'lib/spaces/config';
 import { typedKeys } from 'lib/utilities/objects';
 import NounsIcon from 'public/images/logos/noggles/noggles.svg';
@@ -34,11 +34,11 @@ const ScrollContainer = styled.div`
 `;
 
 const templateIcon: Record<SpaceTemplateType, React.ReactNode> = {
-  templateCreator: <EmojiObjectsIcon htmlColor='var(--secondary-text)' sx={{ fontSize }} />,
-  templateNftCommunity: <SlBadge color='var(--secondary-text)' size={fontSize} />,
-  templateHackathon: <SlTrophy color='var(--secondary-text)' size={fontSize} />,
-  templateNounishDAO: <SvgIcon component={NounsIcon} inheritViewBox />, // <SiHackthebox color='var(--secondary-text)' size={fontSize} />,
-  templateImpactCommunity: <SiHackthebox color='var(--secondary-text)' size={fontSize} />
+  creator: <EmojiObjectsIcon htmlColor='var(--secondary-text)' sx={{ fontSize }} />,
+  nft_community: <SlBadge color='var(--secondary-text)' size={fontSize} />,
+  hackathon: <SlTrophy color='var(--secondary-text)' size={fontSize} />,
+  nounish_dao: <SvgIcon component={NounsIcon} inheritViewBox />, // <SiHackthebox color='var(--secondary-text)' size={fontSize} />,
+  impact_community: <SiHackthebox color='var(--secondary-text)' size={fontSize} />
 };
 
 export function SelectNewSpaceTemplate({ onSelect }: SelectNewSpaceTemplateProps) {
@@ -59,12 +59,12 @@ export function SelectNewSpaceTemplate({ onSelect }: SelectNewSpaceTemplateProps
           </Typography>
         </Grid>
 
-        {typedKeys(spaceContentTemplates).map((template) => (
+        {typedKeys(SpaceTemplateMapping).map((template) => (
           <Grid item key={template}>
             <TemplateOption
               data-test={`space-template-${template}`}
               onClick={() => onSelect(template)}
-              label={spaceContentTemplates[template]}
+              label={spaceContentTemplates[SpaceTemplateMapping[template]]}
               icon={templateIcon[template]}
             />
           </Grid>

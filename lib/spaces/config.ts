@@ -1,5 +1,13 @@
 import { typedKeys } from 'lib/utilities/objects';
 
+export enum SpaceTemplate {
+  impact_community,
+  hackathon,
+  creator,
+  nft_community,
+  nounish_dao
+}
+
 export const DOMAIN_BLACKLIST = [
   'api',
   'api-docs',
@@ -22,10 +30,18 @@ export const spaceContentTemplates = {
   templateImpactCommunity: 'Impact Community'
 };
 
-export type SpaceTemplateType = keyof typeof spaceContentTemplates;
-
 const staticTemplateOptions = ['default', 'importNotion', 'importMarkdown'] as const;
 
-export const spaceCreateTemplates = [...typedKeys(spaceContentTemplates), ...staticTemplateOptions];
+export const SpaceTemplateMapping: Record<keyof typeof SpaceTemplate, keyof typeof spaceContentTemplates> = {
+  creator: 'templateCreator',
+  hackathon: 'templateHackathon',
+  impact_community: 'templateImpactCommunity',
+  nft_community: 'templateNftCommunity',
+  nounish_dao: 'templateNounishDAO'
+};
+
+export type SpaceTemplateType = keyof typeof SpaceTemplateMapping;
+
+export const spaceCreateTemplates = [...typedKeys(SpaceTemplateMapping), ...staticTemplateOptions];
 
 export type SpaceCreateTemplate = (typeof spaceCreateTemplates)[number];

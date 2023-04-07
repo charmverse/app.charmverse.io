@@ -314,7 +314,8 @@ export interface Workspace {
  *        template:
  *          required: false
  *          type: string
- *          example: templateImpactCommunity
+ *          example: nft_community
+ *          enum: [nft_community, impact_community, hackathon, nounish_dao, creator]
  */
 export interface CreateWorkspaceRequestBody {
   name: string;

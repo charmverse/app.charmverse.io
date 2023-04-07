@@ -71,7 +71,7 @@ export async function createWorkspaceApi({
     webhookUrl,
     extraAdmins: [botUser.id],
     // Create new spaces with NFT template by default
-    createSpaceOption: template
+    createSpaceTemplate: template ?? 'nft_community'
   });
 
   // create roles from discord
@@ -88,7 +88,7 @@ export async function createWorkspaceApi({
   trackUserAction('create_new_workspace', {
     userId: adminUserId,
     spaceId: space.id,
-    template: template ?? 'default',
+    template: template ?? 'nft_community',
     source: superApiToken?.name || 'charmverse_api'
   });
   updateTrackGroupProfile(space, superApiToken?.name);

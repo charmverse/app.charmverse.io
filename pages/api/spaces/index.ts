@@ -61,7 +61,11 @@ async function createSpace(req: NextApiRequest, res: NextApiResponse<Space>) {
   const userId = req.session.user.id;
   const data = req.body as CreateSpaceProps;
 
-  const space = await createWorkspace({ spaceData: data.spaceData, createSpaceOption: data.createSpaceOption, userId });
+  const space = await createWorkspace({
+    spaceData: data.spaceData,
+    createSpaceTemplate: data.createSpaceTemplate,
+    userId
+  });
 
   return res.status(200).json(space);
 }
