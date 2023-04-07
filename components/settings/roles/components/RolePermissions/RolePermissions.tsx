@@ -15,6 +15,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useForumCategories } from 'hooks/useForumCategories';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { usePreventReload } from 'hooks/usePreventReload';
+import { useSnackbar } from 'hooks/useSnackbar';
 import type { PostCategoryPermissionInput } from 'lib/permissions/forum/upsertPostCategoryPermission';
 import type { AssignablePermissionGroups } from 'lib/permissions/interfaces';
 import type { ProposalCategoryPermissionInput } from 'lib/permissions/proposals/upsertProposalCategoryPermission';
@@ -141,6 +142,7 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
   const { categories: proposalCategories = [] } = useProposalCategories();
   const { categories: forumCategories = [] } = useForumCategories();
   const isAdmin = useIsAdmin();
+  const { showMessage } = useSnackbar();
   // const [assignedPermissions, setAssignedPermissions] = useState<SpacePermissionFlags | null>(null);
   // custom onChange is used for switches so isDirty from useForm doesn't change its value
   const [touched, setTouched] = useState<boolean>(false);
@@ -189,6 +191,7 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
       setTouched(false);
       // refresh all caches of permissions in case multiple rows are being updated
       mutate(`/proposals/list-permissions-${currentSpaceId}`);
+      showMessage('Permissions updated');
     }
   }
 
@@ -278,9 +281,9 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
                   const permission = formState.proposalCategories.find(
                     (p) => p.proposalCategoryId === category.id && (p.assignee as { id: string }).id === id
                   );
-                  const memberRolePermission = defaultProposalCategoryPermissions?.find(
-                    (p) => p.proposalCategoryId === category.id
-                  );
+                  const memberRolePermission =
+                    targetGroup !== 'space' &&
+                    defaultProposalCategoryPermissions?.find((p) => p.proposalCategoryId === category.id);
                   return (
                     <ProposalCategoryRolePermissionRow
                       key={category.id}
@@ -323,9 +326,9 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
                   const permission = formState.forumCategories?.find(
                     (p) => p.postCategoryId === category.id && (p.assignee as { id: string }).id === id
                   );
-                  const memberRolePermission = defaultForumCategoryPermissions?.find(
-                    (p) => p.postCategoryId === category.id
-                  );
+                  const memberRolePermission =
+                    targetGroup !== 'space' &&
+                    defaultForumCategoryPermissions?.find((p) => p.postCategoryId === category.id);
                   const canModerateForums = defaultPermissions?.moderateForums || assignedPermissions?.moderateForums;
                   const permissionLevel = canModerateForums ? 'full_access' : permission?.permissionLevel;
 
