@@ -1,7 +1,7 @@
 import request from 'supertest';
 
-import { computeGroupSpacePermissions } from 'lib/permissions/spaces';
 import type { SpacePermissionModification } from 'lib/permissions/spaces';
+import { computeGroupSpacePermissions } from 'lib/permissions/spaces/computeGroupSpacePermissions';
 import type { SpacePermissions } from 'lib/permissions/spaces/listPermissions';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
