@@ -6,6 +6,7 @@ import { generateRole, generateSpaceUser, generateUserAndSpaceWithApiToken } fro
 
 import { AssignableToRolesOnlyError, InvalidPermissionGranteeError } from '../../errors';
 import { addSpaceOperations } from '../addSpaceOperations';
+import { computeGroupSpacePermissions } from '../computeGroupSpacePermissions';
 
 let user: User;
 let space: Space;
@@ -34,10 +35,15 @@ describe('addSpaceOperations', () => {
       spaceId: space.id
     });
 
-    const createdPermission = await addSpaceOperations({
+    await addSpaceOperations({
       forSpaceId: space.id,
       operations: ['createPage'],
       roleId: role.id
+    });
+    const createdPermission = await computeGroupSpacePermissions({
+      resourceId: space.id,
+      group: 'role',
+      id: role.id
     });
 
     expect(createdPermission.createPage).toBe(true);
@@ -45,10 +51,15 @@ describe('addSpaceOperations', () => {
   });
 
   it('should grant abilities for a space to its members', async () => {
-    const createdPermission = await addSpaceOperations({
+    await addSpaceOperations({
       forSpaceId: space.id,
       operations: ['createPage'],
       spaceId: space.id
+    });
+    const createdPermission = await computeGroupSpacePermissions({
+      resourceId: space.id,
+      group: 'space',
+      id: space.id
     });
 
     expect(createdPermission.createPage).toBe(true);
@@ -64,10 +75,15 @@ describe('addSpaceOperations', () => {
       userId: extraUser.id
     });
 
-    const updatedPermission = await addSpaceOperations({
+    await addSpaceOperations({
       forSpaceId: space.id,
       operations: ['createBounty'],
       userId: extraUser.id
+    });
+    const updatedPermission = await computeGroupSpacePermissions({
+      resourceId: space.id,
+      group: 'user',
+      id: extraUser.id
     });
 
     // Ensures we modified existing record instead of creating new one
@@ -78,16 +94,25 @@ describe('addSpaceOperations', () => {
   it('should succeed if the assignee already has this permission', async () => {
     const extraUser = await generateSpaceUser({ spaceId: space.id, isAdmin: false });
 
-    const createdPermission = await addSpaceOperations({
+    await addSpaceOperations({
       forSpaceId: space.id,
       operations: ['createPage'],
       userId: extraUser.id
     });
-
-    const updatedPermission = await addSpaceOperations({
+    const createdPermission = await computeGroupSpacePermissions({
+      resourceId: space.id,
+      group: 'user',
+      id: extraUser.id
+    });
+    await addSpaceOperations({
       forSpaceId: space.id,
       operations: ['createPage'],
       userId: extraUser.id
+    });
+    const updatedPermission = await computeGroupSpacePermissions({
+      resourceId: space.id,
+      group: 'user',
+      id: extraUser.id
     });
 
     // Nothing has changed
@@ -102,10 +127,15 @@ describe('addSpaceOperations', () => {
     });
 
     // Test by adding multiple operations to make sure moderateForums doesn't slip through
-    const createdPermission = await addSpaceOperations({
+    await addSpaceOperations({
       forSpaceId: space.id,
       operations: ['createPage', 'moderateForums'],
       roleId: role.id
+    });
+    const createdPermission = await computeGroupSpacePermissions({
+      resourceId: space.id,
+      group: 'role',
+      id: role.id
     });
 
     expect(createdPermission.moderateForums).toBe(true);
