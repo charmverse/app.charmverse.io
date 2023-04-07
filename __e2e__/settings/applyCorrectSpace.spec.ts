@@ -49,7 +49,7 @@ test('User has correct access in the space settings', async ({ page, spaceSettin
   expect(isEditable).toBe(true);
 
   // Member info should be visible
-  await spaceSettings.clickRoleRowByTitle('Member');
+  await spaceSettings.clickRoleRowByTitle('Default');
   const currentUserRow = spaceSettings.getSpaceMemberRowLocator(user.id);
   await expect(currentUserRow).toBeVisible();
 
