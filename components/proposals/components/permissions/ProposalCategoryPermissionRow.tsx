@@ -72,7 +72,7 @@ export function ProposalCategoryRolePermissionRow({
   const tooltip = !canEdit
     ? 'You do not have permission to edit this permission'
     : usingDefault
-    ? 'Inherited from Member role'
+    ? 'Default setting'
     : permissionLevel === 'full_access'
     ? 'Full access allows all assignees to create proposals in this category'
     : '';

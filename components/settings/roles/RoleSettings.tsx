@@ -61,10 +61,11 @@ export function RoleSettings({ space }: { space: Space }) {
         )}
       </Legend>
       <Typography variant='caption'>
-        All users are either an Admin, Member or Guest. In addition to that role they can also have Custom Roles.
+        All users are assigned to either the Default, Admin, or Guest role. In addition to that role they can also have
+        Custom Roles.
       </Typography>
-      <AdminRoleRow readOnly={!isAdmin} />
       <MemberRoleRow readOnly={!isAdmin} spaceId={space.id} />
+      <AdminRoleRow readOnly={!isAdmin} />
       <GuestRoleRow readOnly={!isAdmin} />
       {roles && roles.length > 0 && (
         <>
