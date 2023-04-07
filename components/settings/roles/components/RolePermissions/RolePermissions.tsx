@@ -387,13 +387,16 @@ function PermissionToggle(props: {
       sx={{
         display: 'flex',
         justifyContent: 'space-between',
-        margin: 0,
-        opacity: useDefault ? 0.5 : 1
+        margin: 0
       }}
       control={
         typeof props.defaultChecked === 'boolean' || typeof props.memberChecked === 'boolean' ? (
           <Tooltip title={useDefault ? 'Default setting' : ''}>
-            <span>
+            <span
+              style={{
+                opacity: useDefault ? 0.5 : 1
+              }}
+            >
               <Switch
                 // key={`${props.label}-${defaultChecked}`}
                 data-test={props['data-test']}
