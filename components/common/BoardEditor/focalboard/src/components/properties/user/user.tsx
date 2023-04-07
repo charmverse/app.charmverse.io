@@ -2,7 +2,7 @@ import styled from '@emotion/styled';
 import CloseIcon from '@mui/icons-material/Close';
 import { IconButton } from '@mui/material';
 import { Box, Stack } from '@mui/system';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import type { PropertyValueDisplayType } from 'components/common/BoardEditor/interfaces';
 import { InputSearchMemberMultiple } from 'components/common/form/InputSearchMember';
@@ -64,8 +64,39 @@ function UserProperty(props: Props): JSX.Element | null {
 
   const [isOpen, setIsOpen] = useState(false);
 
-  if (props.readOnly && memberIds.length === 0) {
-    return null;
+  const membersDisplayComponent = useMemo(() => {
+    return memberIds.length === 0 ? null : (
+      <Stack flexDirection='row' flexWrap='wrap' gap={1}>
+        {memberIds.map((memberId) => {
+          const user = membersRecord[memberId];
+          if (!user) {
+            return null;
+          }
+          return (
+            <Stack alignItems='center' flexDirection='row' key={user.id} gap={0.5}>
+              <UserDisplay fontSize={14} avatarSize='xSmall' user={user} />
+              {!props.readOnly && clicked && (
+                <IconButton size='small'>
+                  <CloseIcon
+                    sx={{
+                      fontSize: 14
+                    }}
+                    cursor='pointer'
+                    fontSize='small'
+                    color='secondary'
+                    onClick={() => setMemberIds(memberIds.filter((_memberId) => _memberId !== user.id))}
+                  />
+                </IconButton>
+              )}
+            </Stack>
+          );
+        })}
+      </Stack>
+    );
+  }, [memberIds, membersRecord, props.readOnly, clicked, setMemberIds]);
+
+  if (props.readOnly) {
+    return membersDisplayComponent;
   }
 
   return (
@@ -104,34 +135,7 @@ function UserProperty(props: Props): JSX.Element | null {
         getOptionLabel={(user) => (typeof user === 'string' ? user : user?.username)}
         readOnly={props.readOnly}
         placeholder={props.showEmptyPlaceholder && memberIds.length === 0 ? 'Empty' : ''}
-        renderTags={() => (
-          <Stack flexDirection='row' flexWrap='wrap' gap={1}>
-            {memberIds.map((memberId) => {
-              const user = membersRecord[memberId];
-              if (!user) {
-                return null;
-              }
-              return (
-                <Stack alignItems='center' flexDirection='row' key={user.id} gap={0.5}>
-                  <UserDisplay fontSize={14} avatarSize='xSmall' user={user} />
-                  {!props.readOnly && clicked && (
-                    <IconButton size='small'>
-                      <CloseIcon
-                        sx={{
-                          fontSize: 14
-                        }}
-                        cursor='pointer'
-                        fontSize='small'
-                        color='secondary'
-                        onClick={() => setMemberIds(memberIds.filter((_memberId) => _memberId !== user.id))}
-                      />
-                    </IconButton>
-                  )}
-                </Stack>
-              );
-            })}
-          </Stack>
-        )}
+        renderTags={() => membersDisplayComponent}
       />
     </StyledUserPropertyContainer>
   );
