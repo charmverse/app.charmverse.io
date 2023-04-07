@@ -19,10 +19,15 @@ beforeAll(async () => {
 
 describe('addSpaceOperations', () => {
   it('should grant abilities to a specific user', async () => {
-    const createdPermission = await addSpaceOperations<'user'>({
+    await addSpaceOperations<'user'>({
       forSpaceId: space.id,
       operations: ['createPage'],
       userId: user.id
+    });
+    const createdPermission = await computeGroupSpacePermissions({
+      resourceId: space.id,
+      group: 'user',
+      id: user.id
     });
 
     expect(createdPermission.createPage).toBe(true);
