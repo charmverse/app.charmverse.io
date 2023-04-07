@@ -70,7 +70,6 @@ export async function createWorkspaceApi({
     userId: adminUserId,
     webhookUrl,
     extraAdmins: [botUser.id],
-    // Create new spaces with NFT template by default
     createSpaceTemplate: template ?? 'nft_community'
   });
 
