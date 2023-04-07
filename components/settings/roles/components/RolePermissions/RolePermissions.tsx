@@ -282,8 +282,9 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
                     (p) => p.proposalCategoryId === category.id && (p.assignee as { id: string }).id === id
                   );
                   const memberRolePermission =
-                    targetGroup !== 'space' &&
-                    defaultProposalCategoryPermissions?.find((p) => p.proposalCategoryId === category.id);
+                    targetGroup !== 'space'
+                      ? defaultProposalCategoryPermissions?.find((p) => p.proposalCategoryId === category.id)
+                      : undefined;
                   return (
                     <ProposalCategoryRolePermissionRow
                       key={category.id}
@@ -293,8 +294,8 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
                       updatePermission={updateProposalCategoryPermission}
                       proposalCategoryId={category.id}
                       existingPermissionId={permission?.id}
-                      defaultPermissionLevel={permission?.permissionLevel}
-                      inheritedPermissionLevel={memberRolePermission?.permissionLevel}
+                      permissionLevel={permission?.permissionLevel}
+                      defaultPermissionLevel={memberRolePermission?.permissionLevel}
                       assignee={{ group: targetGroup, id }}
                     />
                   );
@@ -327,8 +328,9 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
                     (p) => p.postCategoryId === category.id && (p.assignee as { id: string }).id === id
                   );
                   const memberRolePermission =
-                    targetGroup !== 'space' &&
-                    defaultForumCategoryPermissions?.find((p) => p.postCategoryId === category.id);
+                    targetGroup !== 'space'
+                      ? defaultForumCategoryPermissions?.find((p) => p.postCategoryId === category.id)
+                      : undefined;
                   const canModerateForums = defaultPermissions?.moderateForums || assignedPermissions?.moderateForums;
                   const permissionLevel = canModerateForums ? 'full_access' : permission?.permissionLevel;
 
@@ -341,8 +343,8 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
                       updatePermission={updatePostCategoryPermission}
                       postCategoryId={category.id}
                       existingPermissionId={permission?.id}
-                      defaultPermissionLevel={permissionLevel}
-                      inheritedPermissionLevel={memberRolePermission?.permissionLevel}
+                      permissionLevel={permissionLevel}
+                      defaultPermissionLevel={memberRolePermission?.permissionLevel}
                       disabledTooltip={canModerateForums ? 'This role has full access to all categories' : undefined}
                       assignee={{ group: targetGroup, id }}
                     />
