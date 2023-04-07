@@ -11,8 +11,8 @@ import Button from 'components/common/Button';
 import { useMembers } from 'hooks/useMembers';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { BountyPermissions, BountyWithDetails } from 'lib/bounties';
+import { isBountyEditableByApplicants } from 'lib/permissions/bounties/isBountyEditableByApplicants';
 import type { PagePermissionMeta } from 'lib/permissions/interfaces';
-import { isBountyEditableByApplicants } from 'lib/permissions/isBountyEditableByApplicants';
 
 /**
  * Permissions left optional so this component can initialise without them

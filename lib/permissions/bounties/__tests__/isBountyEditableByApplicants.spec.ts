@@ -1,21 +1,11 @@
 import type { Role, Space, User } from '@prisma/client';
 
 import { prisma } from 'db';
-import { getBounty } from 'lib/bounties';
-import type { BountyWithDetails } from 'lib/bounties';
 import { getSpaceMembers } from 'lib/members/getSpaceMembers';
 import type { Member } from 'lib/members/interfaces';
-import { assignRole } from 'lib/roles';
-import {
-  generateBounty,
-  generateRole,
-  generateSpaceUser,
-  generateUserAndSpace,
-  generateUserAndSpaceWithApiToken
-} from 'testing/setupDatabase';
+import { generateBounty, generateRole, generateSpaceUser, generateUserAndSpace } from 'testing/setupDatabase';
 
-import type { BountyPermissionGroup } from '../bounties';
-import { queryBountyPermissions } from '../bounties';
+import { queryBountyPermissions } from '..';
 import { isBountyEditableByApplicants } from '../isBountyEditableByApplicants';
 
 let space: Space;

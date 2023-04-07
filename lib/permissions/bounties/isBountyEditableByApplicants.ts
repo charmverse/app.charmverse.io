@@ -2,18 +2,16 @@ import type { Bounty } from '@prisma/client';
 
 import type { Member } from 'lib/members/interfaces';
 
-import type { BountyPermissions } from './bounties';
-import type { PagePermissionMeta, TargetPermissionGroup } from './interfaces';
-import { permissionTemplates } from './pages/page-permission-mapping';
+import type { PagePermissionMeta, TargetPermissionGroup } from '../interfaces';
+import { pagePermissionGrantsEditAccess } from '../pages/pagePermissionGrantsEditAccess';
+
+import type { BountyPermissions } from './interfaces';
 
 export interface BountyPagePermissionIntersectionQuery {
   bountyPermissions: Partial<BountyPermissions>;
   pagePermissions: PagePermissionMeta[];
   members: Member[];
   bounty: Bounty;
-}
-function pagePermissionGrantsEditAccess(permission: PagePermissionMeta): boolean {
-  return permissionTemplates[permission.permissionLevel].includes('edit_content');
 }
 
 /**
