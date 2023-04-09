@@ -220,7 +220,18 @@ async function sendNotification(
       )
     ]);
   } catch (error) {
-    log.error(`Updating notifications failed for the user ${notification.user.id}`, { error });
+    log.error(`Error trying to save notification for user`, {
+      userId: notification.user.id,
+      error,
+      forumTaskIds: notification.forumTasks.map((forumTask) => forumTask.taskId),
+      proposalTaskIds: notification.proposalTasks.map((proposalTask) => proposalTask.id),
+      unmarkedWorkspaceEventIds: notification.unmarkedWorkspaceEvents,
+      voteTaskIds: notification.voteTasks.map((voteTask) => voteTask.id),
+      discussionTaskIds: notification.discussionTasks.map(
+        (discussionTask) => discussionTask.mentionId ?? discussionTask.commentId ?? discussionTask.taskId ?? ''
+      ),
+      bountyTaskIds: notification.bountyTasks.map((bountyTask) => bountyTask.id)
+    });
     return undefined;
   }
 
