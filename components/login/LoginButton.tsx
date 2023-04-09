@@ -72,7 +72,7 @@ export function LoginButton({ redirectUrl }: { redirectUrl?: string }) {
       <StyledButton size='large' onClick={handleClickOpen} data-test='universal-connect-button' primary>
         Sign up
       </StyledButton>
-      <StyledButton size='large' onClick={handleClickOpen} data-test='universal-connect-button' variant='outlined'>
+      <StyledButton size='large' onClick={handleClickOpen} variant='outlined'>
         Sign in
       </StyledButton>
       <LoginHandler redirectUrl={redirectUrl} isOpen={loginDialog.isOpen} onClose={handleClose} />
