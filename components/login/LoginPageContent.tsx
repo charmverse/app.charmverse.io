@@ -81,7 +81,6 @@ export function LoginPageContent({ hideLoginOptions, isLoggingIn }: Props) {
               gap={2}
               alignItems='center'
               justifyContent={{ xs: 'center', md: 'flex-start' }}
-              mb={2}
             >
               {isLoggingIn && <LoadingComponent label='Logging you in' />}
               {!hideLoginOptions && <LoginButton />}

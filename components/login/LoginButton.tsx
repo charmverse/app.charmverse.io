@@ -40,8 +40,11 @@ export interface DialogProps {
 }
 
 const StyledButton = styled(Button)`
-  width: 200px;
+  width: 100%;
   max-width: 100%;
+  ${({ theme }) => theme.breakpoints.up('sm')} {
+    width: 200px;
+  }
   ${({ theme }) => theme.breakpoints.up('md')} {
     width: auto;
     padding: ${({ theme }) => theme.spacing(1, 8)};
@@ -68,6 +71,7 @@ export function LoginButton({ redirectUrl }: { redirectUrl?: string }) {
       flexDirection={{ xs: 'column', md: 'row' }}
       alignItems={{ xs: 'center', md: 'flex-start' }}
       justifyContent={{ xs: 'center', md: 'flex-start' }}
+      py={{ xs: 2, md: 0 }}
     >
       <StyledButton size='large' onClick={handleClickOpen} data-test='universal-connect-button' primary>
         Sign up
