@@ -1,3 +1,4 @@
+import styled from '@emotion/styled';
 import EmailIcon from '@mui/icons-material/Email';
 import Box from '@mui/material/Box';
 import Dialog from '@mui/material/Dialog';
@@ -36,6 +37,47 @@ export interface DialogProps {
   isOpen: boolean;
   redirectUrl?: string;
   onClose: () => void;
+}
+
+const StyledButton = styled(Button)`
+  width: 200px;
+  max-width: 100%;
+  ${({ theme }) => theme.breakpoints.up('md')} {
+    width: auto;
+    padding: ${({ theme }) => theme.spacing(1, 8)};
+  }
+`;
+
+export function LoginButton({ redirectUrl }: { redirectUrl?: string }) {
+  const loginDialog = usePopupState({ variant: 'popover', popupId: 'login-dialog' });
+  const { resetSigning } = useWeb3AuthSig();
+
+  const handleClickOpen = () => {
+    loginDialog.open();
+  };
+
+  const handleClose = () => {
+    loginDialog.close();
+    resetSigning();
+  };
+
+  return (
+    <Box
+      display='flex'
+      gap={2}
+      flexDirection={{ xs: 'column', md: 'row' }}
+      alignItems={{ xs: 'center', md: 'flex-start' }}
+      justifyContent={{ xs: 'center', md: 'flex-start' }}
+    >
+      <StyledButton size='large' onClick={handleClickOpen} data-test='universal-connect-button' primary>
+        Sign up
+      </StyledButton>
+      <StyledButton size='large' onClick={handleClickOpen} data-test='universal-connect-button' variant='outlined'>
+        Sign in
+      </StyledButton>
+      <LoginHandler redirectUrl={redirectUrl} isOpen={loginDialog.isOpen} onClose={handleClose} />
+    </Box>
+  );
 }
 
 function LoginHandler(props: DialogProps) {
@@ -208,36 +250,5 @@ function LoginHandler(props: DialogProps) {
       </Dialog>
       <LoginErrorModal open={showLoginError} onClose={() => setShowLoginError(false)} />
     </>
-  );
-}
-
-// http://localhost:3000/?returnUrl=%2Fyammering-dao-prawn%2Fpage-5027232419461514%3FviewId%3De276c8a5-4535-4883-ab49-7a80bc635264
-
-export function Login({ redirectUrl }: { redirectUrl?: string }) {
-  const loginDialog = usePopupState({ variant: 'popover', popupId: 'login-dialog' });
-  const { resetSigning } = useWeb3AuthSig();
-
-  const handleClickOpen = () => {
-    loginDialog.open();
-  };
-
-  const handleClose = () => {
-    loginDialog.close();
-    resetSigning();
-  };
-
-  return (
-    <div>
-      <Button
-        sx={{ width: '100%' }}
-        onClick={handleClickOpen}
-        data-test='universal-connect-button'
-        size='large'
-        primary
-      >
-        Connect
-      </Button>
-      <LoginHandler redirectUrl={redirectUrl} isOpen={loginDialog.isOpen} onClose={handleClose} />
-    </div>
   );
 }

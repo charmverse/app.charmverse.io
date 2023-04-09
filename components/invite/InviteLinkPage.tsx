@@ -4,7 +4,7 @@ import Typography from '@mui/material/Typography';
 
 import charmClient from 'charmClient';
 import PrimaryButton from 'components/common/PrimaryButton';
-import { Login } from 'components/login/Login';
+import { LoginButton } from 'components/login/LoginButton';
 import WorkspaceAvatar from 'components/settings/workspace/LargeAvatar';
 import { useUser } from 'hooks/useUser';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
@@ -38,7 +38,7 @@ export default function InvitationPage({ invite }: { invite: InviteLinkPopulated
             Accept Invite
           </PrimaryButton>
         ) : (
-          <Login redirectUrl={typeof window !== 'undefined' ? window.location.pathname : ''} />
+          <LoginButton redirectUrl={typeof window !== 'undefined' ? window.location.pathname : ''} />
         )}
       </Card>
     </CenteredBox>
