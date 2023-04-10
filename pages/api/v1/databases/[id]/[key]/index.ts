@@ -4,7 +4,7 @@ import nc from 'next-connect';
 
 import { prisma } from 'db';
 import { simplifyTypeformResponse } from 'lib/apiPageKey/utilities';
-import { onError, onNoMatch, requireApiKey } from 'lib/middleware';
+import { onError, onNoMatch, requireApiKey, requireKeys } from 'lib/middleware';
 import { createFormResponseCard } from 'lib/pages/createFormResponseCard';
 import { DataNotFoundError } from 'lib/utilities/errors';
 import type { AddFormResponseInput } from 'lib/zapier/interfaces';
@@ -12,7 +12,7 @@ import { validateFormRequestInput } from 'lib/zapier/validateFormRequestInput';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireApiKey).post(createFormResponse);
+handler.use(requireKeys(['id', 'key'], 'query')).post(createFormResponse);
 
 /**
  * @swagger
