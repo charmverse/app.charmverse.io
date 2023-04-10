@@ -1,7 +1,7 @@
 import type { PostCategory } from '@prisma/client';
 import type { ReactNode } from 'react';
 import { useContext, createContext, useMemo } from 'react';
-import useSWR from 'swr';
+import useSWR from 'swr/immutable';
 
 import charmClient from 'charmClient';
 import type { PostCategoryWithPermissions } from 'lib/permissions/forum/interfaces';

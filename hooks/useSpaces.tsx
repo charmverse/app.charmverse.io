@@ -16,7 +16,7 @@ type IContext = {
   setSpace: (spaces: Space) => void;
   setSpaces: (spaces: Space[]) => void;
   isLoaded: boolean;
-  createNewSpace: (data: Pick<CreateSpaceProps, 'createSpaceOption' | 'spaceData'>) => Promise<Space>;
+  createNewSpace: (data: Pick<CreateSpaceProps, 'createSpaceTemplate' | 'spaceData'>) => Promise<Space>;
   isCreatingSpace: boolean;
 };
 
@@ -51,7 +51,7 @@ export function SpacesProvider({ children }: { children: ReactNode }) {
     }
   }, [user?.id, isUserLoaded]);
 
-  const createNewSpace = useCallback(async (newSpace: Pick<CreateSpaceProps, 'createSpaceOption' | 'spaceData'>) => {
+  const createNewSpace = useCallback(async (newSpace: Pick<CreateSpaceProps, 'createSpaceTemplate' | 'spaceData'>) => {
     setIsCreatingSpace(true);
 
     try {

@@ -56,46 +56,6 @@ describe('listPostCategoryPermissions', () => {
       expect(permissions).toContainEqual(expect.objectContaining(foundPermission));
     });
   });
-
-  it('should return an empty list for non-space members', async () => {
-    const postCategory = await generatePostCategory({ spaceId: space.id });
-    await Promise.all([
-      upsertPostCategoryPermission({
-        assignee: { group: 'role', id: role.id },
-        permissionLevel: 'full_access',
-        postCategoryId: postCategory.id
-      }),
-      upsertPostCategoryPermission({
-        assignee: { group: 'space', id: space.id },
-        permissionLevel: 'view',
-        postCategoryId: postCategory.id
-      }),
-      upsertPostCategoryPermission({
-        assignee: { group: 'public' },
-        permissionLevel: 'view',
-        postCategoryId: postCategory.id
-      })
-    ]);
-
-    const { user: otherSpaceUser } = await generateUserAndSpace({
-      isAdmin: true
-    });
-
-    const foundPermissions = await listPostCategoryPermissions({
-      resourceId: postCategory.id,
-      userId: otherSpaceUser.id
-    });
-
-    expect(foundPermissions.length).toBe(0);
-
-    const foundPublicPermissions = await listPostCategoryPermissions({
-      resourceId: postCategory.id,
-      userId: undefined
-    });
-
-    expect(foundPublicPermissions.length).toBe(0);
-  });
-
   it('should throw an error if the post category does not exist or the ID is invalid', async () => {
     await expect(
       listPostCategoryPermissions({

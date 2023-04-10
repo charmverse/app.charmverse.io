@@ -17,11 +17,11 @@ type Props = {
   assignee: TargetPermissionGroup<'role' | 'space'>;
   existingPermissionId?: string;
   label?: string;
+  permissionLevel?: ProposalCategoryPermissionLevel;
   defaultPermissionLevel?: ProposalCategoryPermissionLevel;
-  inheritedPermissionLevel?: ProposalCategoryPermissionLevel;
   proposalCategoryId: string;
   canEdit: boolean;
-  updatePermission: (newPermission: ProposalCategoryPermissionInput) => void;
+  updatePermission: (newPermission: ProposalCategoryPermissionInput & { id?: string }) => void;
   deletePermission?: (permissionId: string) => void;
 };
 
@@ -29,8 +29,8 @@ export function ProposalCategoryRolePermissionRow({
   assignee,
   existingPermissionId,
   proposalCategoryId,
+  permissionLevel,
   defaultPermissionLevel,
-  inheritedPermissionLevel,
   canEdit,
   label,
   updatePermission,
@@ -39,16 +39,16 @@ export function ProposalCategoryRolePermissionRow({
   const roles = useRoles();
   const space = useCurrentSpace();
 
-  const isInherited = inheritedPermissionLevel && !defaultPermissionLevel;
+  const usingDefault = (defaultPermissionLevel && !permissionLevel) || (!defaultPermissionLevel && !permissionLevel);
 
   const friendlyLabels = {
     ...proposalCategoryPermissionLabels,
-    delete: (inheritedPermissionLevel ? (
-      <em>Default: {proposalCategoryPermissionLabels[inheritedPermissionLevel]}</em>
+    delete: (defaultPermissionLevel ? (
+      <em>Default: {proposalCategoryPermissionLabels[defaultPermissionLevel]}</em>
     ) : (
       'Remove'
     )) as string | ReactNode | undefined,
-    '': (inheritedPermissionLevel && proposalCategoryPermissionLabels[inheritedPermissionLevel]) || 'No access'
+    '': (defaultPermissionLevel && proposalCategoryPermissionLabels[defaultPermissionLevel]) || 'No access'
   };
 
   // remove delete option if there is no existing permission
@@ -65,15 +65,15 @@ export function ProposalCategoryRolePermissionRow({
     if (level === 'delete' && existingPermissionId && deletePermission) {
       deletePermission(existingPermissionId);
     } else if (level !== 'delete' && level !== '') {
-      updatePermission({ permissionLevel: level, proposalCategoryId, assignee });
+      updatePermission({ id: existingPermissionId, permissionLevel: level, proposalCategoryId, assignee });
     }
   }
 
   const tooltip = !canEdit
     ? 'You do not have permission to edit this permission'
-    : isInherited
-    ? 'Inherited from Member role'
-    : defaultPermissionLevel === 'full_access'
+    : usingDefault
+    ? 'Default setting'
+    : permissionLevel === 'full_access'
     ? 'Full access allows all assignees to create proposals in this category'
     : '';
 
@@ -86,11 +86,11 @@ export function ProposalCategoryRolePermissionRow({
             <SmallSelect
               disabled={!canEdit}
               data-test={assignee.group === 'space' ? 'category-space-permission' : null}
-              sx={{ opacity: isInherited ? 0.5 : 1 }}
+              sx={{ opacity: usingDefault ? 0.5 : 1 }}
               renderValue={(value) => friendlyLabels[value]}
               onChange={handleUpdate as (opt: string) => void}
               keyAndLabel={friendlyLabels}
-              defaultValue={defaultPermissionLevel || ''}
+              defaultValue={permissionLevel || ''}
               displayEmpty
             />
           </span>

@@ -64,7 +64,6 @@ export interface IPageWithNestedSpaceRole extends Page {
 }
 
 export interface IPagePermissionWithAssignee extends PagePermission, IPagePermissionWithSource {
-  user: User | null;
   role: Role | null;
   space: Space | null;
   public: boolean | null;

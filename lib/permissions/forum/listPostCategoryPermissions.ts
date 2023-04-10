@@ -12,11 +12,7 @@ import { mapPostCategoryPermissionToAssignee } from './mapPostCategoryPermission
 export async function listPostCategoryPermissions({
   resourceId,
   userId
-}: PermissionCompute): Promise<AssignedPostCategoryPermission[]> {
-  if (!userId) {
-    return [];
-  }
-
+}: Required<PermissionCompute>): Promise<AssignedPostCategoryPermission[]> {
   if (!isUUID(resourceId)) {
     throw new InvalidInputError('Invalid post category ID');
   }

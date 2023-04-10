@@ -1,5 +1,7 @@
 import type { Page as PrismaPage } from '@prisma/client';
 
+import type { SpaceTemplateType } from 'lib/spaces/config';
+
 /**
  * @example https://github.com/jellydn/next-swagger-doc/blob/main/example/models/organization.ts
  *
@@ -285,8 +287,6 @@ export interface Workspace {
  *    CreateWorkspaceRequestBody:
  *      required:
  *        - name
- *        - discordServerId
- *        - adminDiscordUserId
  *      type: object
  *      properties:
  *        name:
@@ -311,6 +311,11 @@ export interface Workspace {
  *          required: false
  *          type: url
  *          example: https://s3.amazonaws.com/charm.public/user-content/test/logo.jpg
+ *        template:
+ *          required: false
+ *          type: string
+ *          example: nft_community
+ *          enum: [nft_community, impact_community, hackathon, nounish_dao, creator]
  */
 export interface CreateWorkspaceRequestBody {
   name: string;
@@ -322,6 +327,7 @@ export interface CreateWorkspaceRequestBody {
   adminUsername?: string;
   webhookUrl?: string;
   avatar?: string;
+  template?: SpaceTemplateType;
 }
 
 /**

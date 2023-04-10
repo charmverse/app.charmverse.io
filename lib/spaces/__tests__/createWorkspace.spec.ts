@@ -4,7 +4,6 @@ import { v4 } from 'uuid';
 import { prisma } from 'db';
 import { defaultPostCategories } from 'lib/forums/categories/generateDefaultPostCategories';
 import { defaultProposalCategories } from 'lib/proposal/generateDefaultProposalCategoriesInput';
-import { typedKeys } from 'lib/utilities/objects';
 import { uid } from 'lib/utilities/strings';
 import { gettingStartedPage } from 'seedData/gettingStartedPage';
 
@@ -256,7 +255,7 @@ describe('createWorkspace', () => {
     for (const options of spaceCreateTemplates) {
       const newSpace = await createWorkspace({
         userId: user.id,
-        createSpaceOption: options,
+        createSpaceTemplate: options,
         spaceData: {
           name: `Name-${v4()}`
         }

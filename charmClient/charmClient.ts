@@ -3,7 +3,6 @@ import type {
   FavoritePage,
   InviteLink,
   Page,
-  PagePermissionLevel,
   PaymentMethod,
   Prisma,
   Space,
@@ -23,8 +22,6 @@ import type { Web3LoginRequest } from 'lib/middleware/requireWalletSignature';
 import type { FailedImportsError } from 'lib/notion/types';
 import type { IPageWithPermissions, ModifyChildPagesResponse, PageLink } from 'lib/pages';
 import type { PublicPageResponse } from 'lib/pages/interfaces';
-import type { AssignedPermissionsQuery } from 'lib/permissions/interfaces';
-import type { SpacePermissionConfigurationUpdate } from 'lib/permissions/meta/interfaces';
 import type {
   IPagePermissionFlags,
   IPagePermissionToCreate,
@@ -33,7 +30,6 @@ import type {
   IPagePermissionWithSource,
   SpaceDefaultPublicPageToggle
 } from 'lib/permissions/pages/page-permission-interfaces';
-import type { SpacePermissionFlags, SpacePermissionModification } from 'lib/permissions/spaces';
 import type { AggregatedProfileData } from 'lib/profile';
 import type { CreateSpaceProps } from 'lib/spaces/createSpace';
 import type { ITokenMetadata, ITokenMetadataRequest } from 'lib/tokens/tokenData';
@@ -180,7 +176,7 @@ class CharmClient {
     return http.POST<LoggedInUser>('/api/profile/remove-wallet', address);
   }
 
-  async createSpace(spaceOptions: Pick<CreateSpaceProps, 'createSpaceOption' | 'spaceData'>) {
+  async createSpace(spaceOptions: Pick<CreateSpaceProps, 'createSpaceTemplate' | 'spaceData'>) {
     const space = await http.POST<Space>('/api/spaces', spaceOptions);
     return space;
   }
@@ -494,68 +490,11 @@ class CharmClient {
     return http.POST(`/api/pages/${pageId}/restrict-permissions`, {});
   }
 
-  addSpacePermissions({
-    forSpaceId,
-    operations,
-    roleId,
-    spaceId,
-    userId
-  }: SpacePermissionModification): Promise<SpacePermissionFlags> {
-    return http.POST<SpacePermissionFlags>(`/api/permissions/space/${forSpaceId}/add`, {
-      operations,
-      roleId,
-      spaceId,
-      userId
-    } as Omit<SpacePermissionModification, 'forSpaceId'>);
-  }
-
-  removeSpacePermissions({
-    forSpaceId,
-    operations,
-    roleId,
-    spaceId,
-    userId
-  }: SpacePermissionModification): Promise<SpacePermissionFlags> {
-    return http.POST<SpacePermissionFlags>(`/api/permissions/space/${forSpaceId}/remove`, {
-      operations,
-      roleId,
-      spaceId,
-      userId
-    } as Omit<SpacePermissionModification, 'forSpaceId'>);
-  }
-
-  queryGroupSpacePermissions({ group, id, resourceId }: AssignedPermissionsQuery): Promise<SpacePermissionFlags> {
-    return http.GET<SpacePermissionFlags>(`/api/permissions/space/${resourceId}/query`, {
-      group,
-      id
-    });
-  }
-
-  computeUserSpacePermissions({ spaceId }: { spaceId: string }): Promise<SpacePermissionFlags> {
-    return http.GET<SpacePermissionFlags>(`/api/permissions/space/${spaceId}/compute`);
-  }
-
   updateSnapshotConnection(
     spaceId: string,
     data: Pick<Space, 'snapshotDomain' | 'defaultVotingDuration'>
   ): Promise<Space> {
     return http.PUT(`/api/spaces/${spaceId}/snapshot`, data);
-  }
-
-  setDefaultPagePermission({
-    spaceId,
-    pagePermissionLevel
-  }: {
-    spaceId: string;
-    pagePermissionLevel: PagePermissionLevel | null;
-  }) {
-    return http.POST<Space>(`/api/spaces/${spaceId}/set-default-page-permissions`, {
-      pagePermissionLevel
-    });
-  }
-
-  setSpacePermissionMode({ permissionConfigurationMode, spaceId }: SpacePermissionConfigurationUpdate) {
-    return http.POST<Space>(`/api/spaces/${spaceId}/set-permissions-mode`, { permissionConfigurationMode });
   }
 
   setDefaultPublicPages({ spaceId, defaultPublicPages }: SpaceDefaultPublicPageToggle) {

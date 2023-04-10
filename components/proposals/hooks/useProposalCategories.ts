@@ -1,4 +1,4 @@
-import useSWR from 'swr';
+import useSWR from 'swr/immutable';
 
 import charmClient from 'charmClient';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';

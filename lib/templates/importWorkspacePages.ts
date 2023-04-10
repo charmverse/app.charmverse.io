@@ -174,6 +174,7 @@ export async function generateImportWorkspacePages({
       spaceId,
       cardId,
       proposalId,
+      version,
       parentId,
       bountyId,
       blocks,

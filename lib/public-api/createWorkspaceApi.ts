@@ -29,7 +29,8 @@ export async function createWorkspaceApi({
   xpsEngineId,
   avatar,
   superApiToken,
-  webhookUrl
+  webhookUrl,
+  template
 }: CreateWorkspaceRequestBody & { superApiToken?: SuperApiToken | null }): Promise<CreateWorkspaceResponseBody> {
   // Retrieve an id for the admin user
   const adminUserId = adminDiscordUserId
@@ -69,8 +70,7 @@ export async function createWorkspaceApi({
     userId: adminUserId,
     webhookUrl,
     extraAdmins: [botUser.id],
-    // Create new spaces with NFT template by default
-    createSpaceOption: 'templateNftCommunity'
+    createSpaceTemplate: template ?? 'nft_community'
   });
 
   // create roles from discord
@@ -87,7 +87,7 @@ export async function createWorkspaceApi({
   trackUserAction('create_new_workspace', {
     userId: adminUserId,
     spaceId: space.id,
-    template: 'default',
+    template: template ?? 'nft_community',
     source: superApiToken?.name || 'charmverse_api'
   });
   updateTrackGroupProfile(space, superApiToken?.name);

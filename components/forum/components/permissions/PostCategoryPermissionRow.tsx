@@ -17,13 +17,13 @@ import { postCategoryPermissionLabels } from './shared';
 type Props = {
   assignee: TargetPermissionGroup<'role' | 'space'>;
   existingPermissionId?: string;
+  permissionLevel?: PostCategoryPermissionLevel;
   defaultPermissionLevel?: PostCategoryPermissionLevel;
-  inheritedPermissionLevel?: PostCategoryPermissionLevel;
   label?: string;
   postCategoryId: string;
   canEdit: boolean;
   disabledTooltip?: string;
-  updatePermission: (newPermission: PostCategoryPermissionInput) => void;
+  updatePermission: (newPermission: PostCategoryPermissionInput & { id?: string }) => void;
   deletePermission: (permissionId: string) => void;
 };
 
@@ -31,8 +31,8 @@ export function PostCategoryRolePermissionRow({
   assignee,
   existingPermissionId,
   postCategoryId,
+  permissionLevel,
   defaultPermissionLevel,
-  inheritedPermissionLevel,
   label,
   canEdit,
   disabledTooltip,
@@ -42,19 +42,19 @@ export function PostCategoryRolePermissionRow({
   const roles = useRoles();
   const space = useCurrentSpace();
 
-  const isInherited = inheritedPermissionLevel && !defaultPermissionLevel;
+  const usingDefault = (defaultPermissionLevel && !permissionLevel) || (!defaultPermissionLevel && !permissionLevel);
 
   const { full_access, view } = postCategoryPermissionLabels;
 
   const friendlyLabels = {
     full_access,
     view,
-    delete: (inheritedPermissionLevel ? (
-      <em>Default: {postCategoryPermissionLabels[inheritedPermissionLevel]}</em>
+    delete: (defaultPermissionLevel ? (
+      <em>Default: {postCategoryPermissionLabels[defaultPermissionLevel]}</em>
     ) : (
       'Remove'
     )) as string | ReactNode | undefined,
-    '': (inheritedPermissionLevel && postCategoryPermissionLabels[inheritedPermissionLevel]) || 'No access'
+    '': (defaultPermissionLevel && postCategoryPermissionLabels[defaultPermissionLevel]) || 'No access'
   };
 
   // remove delete option if there is no existing permission
@@ -70,14 +70,14 @@ export function PostCategoryRolePermissionRow({
     if (level === 'delete' && existingPermissionId) {
       deletePermission(existingPermissionId);
     } else if (level !== 'delete' && level !== '') {
-      updatePermission({ permissionLevel: level, postCategoryId, assignee });
+      updatePermission({ id: existingPermissionId, permissionLevel: level, postCategoryId, assignee });
     }
   }
 
   const tooltip = !canEdit
     ? disabledTooltip || 'You do not have permission to edit this permission'
-    : isInherited
-    ? 'Inherited from Member role'
+    : usingDefault
+    ? 'Default setting'
     : '';
 
   return (
@@ -89,11 +89,11 @@ export function PostCategoryRolePermissionRow({
             <SmallSelect
               disabled={!canEdit}
               data-test={assignee.group === 'space' ? 'category-space-permission' : null}
-              sx={{ opacity: isInherited ? 0.5 : 1 }}
+              sx={{ opacity: usingDefault ? 0.5 : 1 }}
               renderValue={(value) => friendlyLabels[value as keyof typeof friendlyLabels]}
               onChange={handleUpdate as (opt: string) => void}
               keyAndLabel={friendlyLabels}
-              defaultValue={defaultPermissionLevel || ''}
+              defaultValue={permissionLevel || ''}
               displayEmpty
             />
           </span>

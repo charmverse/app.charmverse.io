@@ -153,7 +153,12 @@ export class FidusEditor {
           }
           case 'doc_data':
             this.onDocLoaded(); // call this first so that the loading state is up-to-date before transactions occur
-            this.mod.collab.doc.receiveDocument(data);
+            try {
+              this.mod.collab.doc.receiveDocument(data);
+            } catch (error) {
+              log.error('Error loading document from sockets', { error });
+              onError(error as Error);
+            }
             // console.log('received doc');
             break;
           case 'confirm_version':
