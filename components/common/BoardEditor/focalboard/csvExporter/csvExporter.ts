@@ -7,6 +7,8 @@ import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
 
+import { Constants } from '../src/constants';
+
 declare let window: IAppWindow;
 
 class CsvExporter {
@@ -81,7 +83,7 @@ class CsvExporter {
     }
 
     // Header row
-    const row: string[] = ['Title'];
+    const row: string[] = [];
     visibleProperties.forEach((template: IPropertyTemplate) => {
       row.push(template.name);
     });
@@ -89,12 +91,12 @@ class CsvExporter {
 
     cards.forEach((card) => {
       const _row: string[] = [];
-      _row.push(`"${this.encodeText(card.title)}"`);
       visibleProperties.forEach((template: IPropertyTemplate) => {
         const propertyValue = card.fields.properties[template.id];
         const displayValue = (OctoUtils.propertyDisplayValue(card, propertyValue, template, formatter) || '') as string;
-
-        if (template.type === 'number') {
+        if (template.id === Constants.titleColumnId) {
+          _row.push(`"${this.encodeText(card.title)}"`);
+        } else if (template.type === 'number') {
           const numericValue = propertyValue ? Number(propertyValue).toString() : '';
           _row.push(numericValue);
         } else if (template.type === 'multiSelect' || template.type === 'person') {
