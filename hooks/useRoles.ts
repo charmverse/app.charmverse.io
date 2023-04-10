@@ -66,7 +66,6 @@ export function useRoles() {
       mutate(`roles/${space.id}`);
     }
   }
-  const sortedRoles = roles?.sort((a, b) => a.name.localeCompare(b.name));
 
   return {
     createRole,
@@ -75,6 +74,6 @@ export function useRoles() {
     assignRoles,
     unassignRole,
     refreshRoles,
-    roles: sortedRoles
+    roles
   };
 }

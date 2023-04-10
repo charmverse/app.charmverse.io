@@ -53,6 +53,15 @@ export function isTouchDevice() {
   return hasTouchScreen;
 }
 
+export function scrollIntoView(selector: string) {
+  if (typeof document !== 'undefined') {
+    const element = document.querySelector(selector);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  }
+}
+
 export const safeScrollIntoViewIfNeeded = (element: HTMLElement, centerIfNeeded?: boolean) => {
   if (typeof window !== 'undefined') {
     return 'scrollIntoViewIfNeeded' in document.body
