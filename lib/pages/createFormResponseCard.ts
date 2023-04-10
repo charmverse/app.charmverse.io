@@ -1,6 +1,7 @@
 import { v4 } from 'uuid';
 
 import { prisma } from 'db';
+import { prismaToBlock } from 'lib/focalboard/block';
 import { getDatabaseDetails } from 'lib/pages/getDatabaseDetails';
 import type { FormResponseProperty } from 'lib/pages/interfaces';
 import { createDatabaseCardPage } from 'lib/public-api/createDatabaseCardPage';
@@ -41,7 +42,7 @@ export async function createFormResponseCard({
 
   if (newProperties.length) {
     // Save new question properties
-    await prisma.block.update({
+    const updatedBoard = await prisma.block.update({
       where: {
         id: board.id
       },
@@ -52,6 +53,14 @@ export async function createFormResponseCard({
         }
       }
     });
+
+    relay?.broadcast(
+      {
+        type: 'blocks_updated',
+        payload: [prismaToBlock(updatedBoard)]
+      },
+      updatedBoard.spaceId
+    );
   }
 
   // Create card with form response entry
