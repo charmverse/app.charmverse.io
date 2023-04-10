@@ -4,7 +4,7 @@ import nc from 'next-connect';
 
 import { prisma } from 'db';
 import { simplifyTypeformResponse } from 'lib/apiPageKey/utilities';
-import { onError, onNoMatch, requireApiKey, requireKeys } from 'lib/middleware';
+import { onError, onNoMatch, requireKeys } from 'lib/middleware';
 import { createFormResponseCard } from 'lib/pages/createFormResponseCard';
 import { DataNotFoundError } from 'lib/utilities/errors';
 import type { AddFormResponseInput } from 'lib/zapier/interfaces';
@@ -39,9 +39,11 @@ handler.use(requireKeys(['id', 'key'], 'query')).post(createFormResponse);
  *                $ref: '#/components/schemas/Page'
  */
 export async function createFormResponse(req: NextApiRequest, res: NextApiResponse) {
-  const { id: pageId, key } = req.query;
+  const pageId = req.query.id as string;
+  const key = req.query.key as string;
+
   const apiPageKeyWithSpaceId = await prisma.apiPageKeys.findUnique({
-    where: { apiKey: key as string },
+    where: { apiKey: key },
     select: {
       createdAt: true,
       updatedAt: true,
@@ -61,8 +63,8 @@ export async function createFormResponse(req: NextApiRequest, res: NextApiRespon
 
   let body: AddFormResponseInput = [];
 
-  if (apiPageKeyWithSpaceId.type === 'typeform') {
-    const payload = req.body as Typeform.Response;
+  if (apiPageKeyWithSpaceId.type === 'typeform' && req.body.form_response) {
+    const payload = req.body.form_response as Typeform.Response;
     body = simplifyTypeformResponse(payload);
   }
 
@@ -73,10 +75,10 @@ export async function createFormResponse(req: NextApiRequest, res: NextApiRespon
   });
 
   const card = await createFormResponseCard({
-    spaceId: '',
-    databaseIdorPath: pageId as string,
+    spaceId: apiPageKeyWithSpaceId.page.spaceId,
+    databaseIdorPath: pageId,
     data: body,
-    userId: req.botUser.id
+    userId: apiPageKeyWithSpaceId.createdBy
   });
 
   return res.status(201).json(card);

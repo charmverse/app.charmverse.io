@@ -52,7 +52,7 @@ export function simplifyTypeformResponse(payload: Typeform.Response) {
 
   const answers = simplifyTypeformAnswers(payload.answers);
 
-  return answers
+  const mappedQuestionsAndAnswers = answers
     .map((a) => {
       if (questions[a.id]) {
         return {
@@ -63,4 +63,6 @@ export function simplifyTypeformResponse(payload: Typeform.Response) {
       return null;
     })
     .filter(isTruthy);
+
+  return mappedQuestionsAndAnswers;
 }

@@ -12,7 +12,7 @@ import useSWRMutation from 'swr/mutation';
 
 import charmClient from 'charmClient';
 import PagesList from 'components/common/CharmEditor/components/PageList';
-import Modal from 'components/common/Modal';
+import ConfirmApiPageKeyModal from 'components/common/Modal/ConfirmApiPageKeyModal';
 import { useCurrentPage } from 'hooks/useCurrentPage';
 import { usePages } from 'hooks/usePages';
 import type { BoardView, BoardViewFields, ViewSourceType } from 'lib/focalboard/boardView';
@@ -126,15 +126,24 @@ export function ViewSourceOptions(props: ViewSourceOptionsProps) {
           />
         )}
       </Box>
-      <Modal title='Typeform webhook' open={typeformPopup.isOpen} onClose={typeformPopup.close}>
-        <Typography sx={{ wordBreak: 'break-word' }}>
-          Go to your typeform form and click Connect - Webhooks - Add a Webhook
-          <br />
-          Paste the following URL:
-          <br />
-          <i>{`${webhookBaseUrl}/${currentPageId}/${webhookApi?.apiKey}`}</i>
-        </Typography>
-      </Modal>
+      <ConfirmApiPageKeyModal
+        question={
+          <Typography sx={{ wordBreak: 'break-word' }}>
+            Go to your typeform form and click Connect - Webhooks - Add a Webhook
+            <br />
+            Paste the following URL:
+            <br />
+            <i>{`${webhookBaseUrl}/${currentPageId}/${webhookApi?.apiKey}`}</i>
+          </Typography>
+        }
+        title='Typeform webhook'
+        open={typeformPopup.isOpen}
+        onClose={typeformPopup.close}
+        onConfirm={() => {
+          props.onCreate?.();
+          typeformPopup.close();
+        }}
+      />
     </>
   );
 }
