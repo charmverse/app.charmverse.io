@@ -95,8 +95,7 @@ export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: 
   }
 
   async function deleteCards() {
-    const cardIds = cards.map((card) => card.id);
-    await charmClient.deletePages(cardIds);
+    const cardIds = cards.map((card) => card.id).filter((cardId) => pages[cardId] && !pages[cardId]?.deletedAt);
     await mutator.deleteBlocks(cardIds);
     mutatePagesRemove(cardIds);
   }
