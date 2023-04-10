@@ -64,5 +64,10 @@ export function simplifyTypeformResponse(payload: Typeform.Response) {
     })
     .filter(isTruthy);
 
+  mappedQuestionsAndAnswers.unshift({
+    question: 'Created at',
+    answer: payload.submitted_at ? new Date(payload.submitted_at).toString() : new Date().toString()
+  });
+
   return mappedQuestionsAndAnswers;
 }
