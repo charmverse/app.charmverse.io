@@ -1,4 +1,3 @@
-import styled from '@emotion/styled';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
@@ -13,7 +12,7 @@ import type { ErrorType } from 'lib/utilities/errors';
 import splashImage from 'public/images/artwork/world.png';
 
 import { Container } from './components/LoginLayout';
-import { Login } from './Login';
+import { LoginButton } from './LoginButton';
 import { LoginErrorModal } from './LoginErrorModal';
 
 type Props = {
@@ -74,24 +73,22 @@ export function LoginPageContent({ hideLoginOptions, isLoggingIn }: Props) {
               Powering the Future <br />
               of Work through Web3
             </Typography>
-            <Typography sx={{ fontSize: 20, mb: 6 }}>
-              The solution for token communities to build relationships,
-              <br />
-              work together and vote
+            <Typography sx={{ fontSize: 20, mb: 6, maxWidth: '520px' }}>
+              The solution for token communities to build relationships, work together and vote
             </Typography>
             <Box
-              display={{ sm: 'flex' }}
+              display={{ md: 'flex' }}
               gap={2}
               alignItems='center'
               justifyContent={{ xs: 'center', md: 'flex-start' }}
             >
               {isLoggingIn && <LoadingComponent label='Logging you in' />}
-              {!hideLoginOptions && <Login />}
+              {!hideLoginOptions && <LoginButton />}
             </Box>
           </Box>
         </Grid>
         <Grid item md={6} alignItems='center'>
-          <Image maxWidth={{ xs: 300, md: 'none' }} px={3} src={splashImage} />
+          <Image display={{ xs: 'none', md: 'block' }} px={3} src={splashImage} />
         </Grid>
       </Grid>
       <LoginErrorModal open={(discordLoginError as ErrorType) === 'Disabled account'} onClose={clearError} />
