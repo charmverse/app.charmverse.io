@@ -210,7 +210,7 @@ function PropertyValueElement(props: Props) {
   if (props.showTooltip) {
     return (
       <Tooltip title={props.propertyTemplate.name}>
-        <div>{propertyValueElement}</div>
+        <div style={{ width: '100%' }}>{propertyValueElement}</div>
       </Tooltip>
     );
   }

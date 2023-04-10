@@ -2,6 +2,7 @@ import styled from '@emotion/styled';
 import CloseIcon from '@mui/icons-material/Close';
 import { IconButton } from '@mui/material';
 import { Box, Stack } from '@mui/system';
+import type { Dispatch, SetStateAction } from 'react';
 import { useEffect, useState } from 'react';
 
 import type { PropertyValueDisplayType } from 'components/common/BoardEditor/interfaces';
@@ -53,6 +54,48 @@ function arrayEquals<T>(a: T[], b: T[]) {
   return a.length === b.length && a.every((val, index) => val === b[index]);
 }
 
+function MembersDisplay({
+  memberIds,
+  clicked,
+  readOnly,
+  setMemberIds
+}: {
+  readOnly: boolean;
+  clicked: boolean;
+  memberIds: string[];
+  setMemberIds: Dispatch<SetStateAction<string[]>>;
+}) {
+  const { membersRecord } = useMembers();
+  return memberIds.length === 0 ? null : (
+    <Stack flexDirection='row' flexWrap='wrap' gap={1}>
+      {memberIds.map((memberId) => {
+        const user = membersRecord[memberId];
+        if (!user) {
+          return null;
+        }
+        return (
+          <Stack alignItems='center' flexDirection='row' key={user.id} gap={0.5}>
+            <UserDisplay fontSize={14} avatarSize='xSmall' user={user} />
+            {!readOnly && clicked && (
+              <IconButton size='small'>
+                <CloseIcon
+                  sx={{
+                    fontSize: 14
+                  }}
+                  cursor='pointer'
+                  fontSize='small'
+                  color='secondary'
+                  onClick={() => setMemberIds(memberIds.filter((_memberId) => _memberId !== user.id))}
+                />
+              </IconButton>
+            )}
+          </Stack>
+        );
+      })}
+    </Stack>
+  );
+}
+
 function UserProperty(props: Props): JSX.Element | null {
   const [memberIds, setMemberIds] = useState(props.memberIds);
   const [clicked, setClicked] = useState(false);
@@ -64,8 +107,10 @@ function UserProperty(props: Props): JSX.Element | null {
 
   const [isOpen, setIsOpen] = useState(false);
 
-  if (props.readOnly && memberIds.length === 0) {
-    return null;
+  if (props.readOnly) {
+    return (
+      <MembersDisplay readOnly={props.readOnly} clicked={clicked} memberIds={memberIds} setMemberIds={setMemberIds} />
+    );
   }
 
   return (
@@ -80,6 +125,7 @@ function UserProperty(props: Props): JSX.Element | null {
       hideInput={props.readOnly || (props.displayType !== 'details' && !clicked)}
     >
       <InputSearchMemberMultiple
+        disableClearable
         open={isOpen}
         disableCloseOnSelect
         defaultValue={memberIds}
@@ -104,32 +150,12 @@ function UserProperty(props: Props): JSX.Element | null {
         readOnly={props.readOnly}
         placeholder={props.showEmptyPlaceholder && memberIds.length === 0 ? 'Empty' : ''}
         renderTags={() => (
-          <Stack flexDirection='row' flexWrap='wrap' gap={1}>
-            {memberIds.map((memberId) => {
-              const user = membersRecord[memberId];
-              if (!user) {
-                return null;
-              }
-              return (
-                <Stack alignItems='center' flexDirection='row' key={user.id} gap={0.5}>
-                  <UserDisplay fontSize={14} avatarSize='xSmall' user={user} />
-                  {!props.readOnly && clicked && (
-                    <IconButton size='small'>
-                      <CloseIcon
-                        sx={{
-                          fontSize: 14
-                        }}
-                        cursor='pointer'
-                        fontSize='small'
-                        color='secondary'
-                        onClick={() => setMemberIds(memberIds.filter((_memberId) => _memberId !== user.id))}
-                      />
-                    </IconButton>
-                  )}
-                </Stack>
-              );
-            })}
-          </Stack>
+          <MembersDisplay
+            readOnly={props.readOnly}
+            clicked={clicked}
+            memberIds={memberIds}
+            setMemberIds={setMemberIds}
+          />
         )}
       />
     </StyledUserPropertyContainer>
