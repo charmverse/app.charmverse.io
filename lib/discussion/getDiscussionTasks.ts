@@ -586,15 +586,18 @@ async function getPageMentions({
         // Skip mentions not for the user, self mentions and inside user created pages
         if (mention.value === userId && mention.createdBy !== userId) {
           discussionUserIds.push(mention.createdBy);
-          mentions.push({
-            ...getPropertiesFromPage(page, spaceRecord[page.spaceId]),
-            mentionId: mention.id,
-            taskId: mention.id,
-            createdAt: mention.createdAt,
-            userId: mention.createdBy,
-            text: mention.text,
-            commentId: null
-          });
+          // Check if another mention already exists (this is possible if the page was duplicated)
+          if (!mentions.some(({ taskId }) => mention.id === taskId)) {
+            mentions.push({
+              ...getPropertiesFromPage(page, spaceRecord[page.spaceId]),
+              mentionId: mention.id,
+              taskId: mention.id,
+              createdAt: mention.createdAt,
+              userId: mention.createdBy,
+              text: mention.text,
+              commentId: null
+            });
+          }
         }
       });
     }
