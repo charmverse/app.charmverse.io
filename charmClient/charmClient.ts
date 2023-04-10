@@ -11,7 +11,8 @@ import type {
   User,
   UserDetails,
   UserGnosisSafe,
-  UserWallet
+  UserWallet,
+  ApiPageKeys
 } from '@prisma/client';
 import type { FiatCurrency, IPairQuote } from 'connectors';
 
@@ -517,6 +518,14 @@ class CharmClient {
 
   getAggregatedData(userId: string) {
     return http.GET<AggregatedProfileData>(`/api/public/profile/${userId}/aggregate`);
+  }
+
+  getApiPageKeys({ pageId }: { pageId: string }) {
+    return http.GET<ApiPageKeys[]>(`/api/api-page-key?pageId=${pageId}`);
+  }
+
+  createApiPageKey({ pageId, type }: { pageId: string; type: ApiPageKeys['type'] }) {
+    return http.POST<ApiPageKeys>(`/api/api-page-key`, { type, pageId });
   }
 }
 
