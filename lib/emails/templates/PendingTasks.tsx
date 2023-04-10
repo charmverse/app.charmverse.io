@@ -292,7 +292,7 @@ export default function PendingTasks(props: PendingTasksProps) {
 }
 
 function VoteTaskMjml({ task }: { task: VoteTask }) {
-  const pageWorkspaceTitle = `${task.page.title || 'Untitled'} | ${task.space.name}`;
+  const pageWorkspaceTitle = `${task.pageTitle} | ${task.spaceName}`;
   return (
     <MjmlText>
       <div style={{ fontWeight: 'bold', marginBottom: 5 }}>

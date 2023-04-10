@@ -39,14 +39,7 @@ export function VoteTasksListRow({
   voteTask: VoteTask;
   handleVoteId: (voteId: string) => void;
 }) {
-  const {
-    page: { path: pagePath, title: pageTitle },
-    space: { domain: spaceDomain, name: spaceName },
-    deadline,
-    title: voteTitle,
-    id,
-    userChoice
-  } = voteTask;
+  const { pagePath, pageTitle, spaceDomain, spaceName, deadline, title: voteTitle, id, userChoice } = voteTask;
   const isDeadlineOverdue = DateTime.now() > DateTime.fromJSDate(new Date(deadline));
   const dueText = DateTime.fromJSDate(new Date(deadline)).toRelative({ base: DateTime.now() });
 

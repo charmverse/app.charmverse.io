@@ -6,13 +6,12 @@ import { prisma } from 'db';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { mapNotificationActor } from 'lib/notifications/mapNotificationActor';
-import { getPageMeta } from 'lib/pages/server/getPageMeta';
 import { computeUserPagePermissions } from 'lib/permissions/pages';
 import { computeProposalPermissions } from 'lib/permissions/proposals/computeProposalPermissions';
 import { withSessionRoute } from 'lib/session/withSession';
 import { DataNotFoundError, UnauthorisedActionError } from 'lib/utilities/errors';
 import { createVote as createVoteService, getVote as getVoteService } from 'lib/votes';
-import type { ExtendedVote, VoteDTO } from 'lib/votes/interfaces';
+import type { VoteTask, ExtendedVote, VoteDTO } from 'lib/votes/interfaces';
 import { relay } from 'lib/websockets/relay';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -37,31 +36,52 @@ async function createVote(req: NextApiRequest, res: NextApiResponse<ExtendedVote
   const newVote = req.body as VoteDTO;
   const userId = req.session.user.id;
   const pageId = newVote.pageId;
+  const postId = newVote.postId;
 
-  const existingPage = await prisma.page.findUnique({
-    where: {
-      id: pageId
-    },
-    select: {
-      id: true,
-      spaceId: true,
-      type: true,
-      proposal: {
-        include: {
-          authors: true
+  const existingPage = pageId
+    ? await prisma.page.findUnique({
+        where: {
+          id: pageId
+        },
+        select: {
+          id: true,
+          spaceId: true,
+          title: true,
+          path: true,
+          type: true,
+          proposalId: true
         }
-      }
-    }
-  });
+      })
+    : null;
 
-  if (!existingPage) {
+  const existingPost = postId
+    ? await prisma.post.findUnique({
+        where: {
+          id: postId
+        },
+        select: {
+          id: true,
+          spaceId: true,
+          path: true,
+          title: true
+        }
+      })
+    : null;
+
+  const spaceId = existingPage?.spaceId || existingPost?.spaceId;
+
+  if (!spaceId) {
     throw new DataNotFoundError(`Cannot create poll as linked page with id ${pageId} was not found.`);
+  } else if (existingPage && existingPost) {
+    throw new DataNotFoundError(
+      `Cannot create poll as linked page with id ${pageId} and post with id ${postId} were both found.`
+    );
   }
 
   // User must be proposal author or a space admin to create a poll
-  if (existingPage.type === 'proposal' && newVote.context === 'proposal') {
+  if (existingPage?.type === 'proposal' && existingPage.proposalId && newVote.context === 'proposal') {
     const permissions = await computeProposalPermissions({
-      resourceId: existingPage.proposal!.id,
+      resourceId: existingPage.proposalId,
       userId
     });
 
@@ -70,7 +90,7 @@ async function createVote(req: NextApiRequest, res: NextApiResponse<ExtendedVote
         `Cannot create poll as user ${userId} is not an author of the linked proposal.`
       );
     }
-  } else {
+  } else if (pageId) {
     const userPagePermissions = await computeUserPagePermissions({
       resourceId: pageId,
       userId
@@ -83,12 +103,12 @@ async function createVote(req: NextApiRequest, res: NextApiResponse<ExtendedVote
 
   const vote = await createVoteService({
     ...newVote,
-    spaceId: existingPage.spaceId,
+    spaceId,
     createdBy: userId
   } as VoteDTO);
   const voteAuthor = await prisma.user.findUnique({ where: { id: userId } });
 
-  if (vote.context === 'proposal') {
+  if (pageId && vote.context === 'proposal') {
     trackUserAction('new_vote_created', {
       userId,
       pageId,
@@ -96,7 +116,7 @@ async function createVote(req: NextApiRequest, res: NextApiResponse<ExtendedVote
       resourceId: vote.id,
       platform: 'charmverse'
     });
-  } else {
+  } else if (pageId) {
     trackUserAction('poll_created', {
       userId,
       pageId,
@@ -104,31 +124,40 @@ async function createVote(req: NextApiRequest, res: NextApiResponse<ExtendedVote
     });
   }
 
-  const [pageMeta, space] = await Promise.all([
-    getPageMeta(vote.pageId),
-    prisma.space.findUnique({ where: { id: vote.spaceId } })
-  ]);
+  const space = await prisma.space.findUniqueOrThrow({ where: { id: vote.spaceId } });
 
-  if (pageMeta && space) {
-    relay.broadcast(
-      {
-        type: 'votes_created',
-        payload: [
-          {
-            ...vote,
-            page: pageMeta,
-            space,
-            createdBy: mapNotificationActor(voteAuthor),
-            taskId: vote.id,
-            spaceName: space.name,
-            spaceDomain: space.domain,
-            pagePath: ''
-          }
-        ]
-      },
-      vote.spaceId
-    );
+  let voteTask: VoteTask;
+  if (existingPage) {
+    voteTask = {
+      ...vote,
+      createdBy: mapNotificationActor(voteAuthor),
+      taskId: vote.id,
+      spaceName: space.name,
+      spaceDomain: space.domain,
+      pagePath: existingPage.path,
+      pageTitle: existingPage.title
+    };
+  } else if (existingPost) {
+    voteTask = {
+      ...vote,
+      createdBy: mapNotificationActor(voteAuthor),
+      taskId: vote.id,
+      spaceName: space.name,
+      spaceDomain: space.domain,
+      pagePath: `forum/post/${existingPost.path}`,
+      pageTitle: existingPost.title
+    };
+  } else {
+    throw new Error('Cannot create vote task as no page or post was found.');
   }
+
+  relay.broadcast(
+    {
+      type: 'votes_created',
+      payload: [voteTask]
+    },
+    vote.spaceId
+  );
 
   return res.status(201).json(vote);
 }

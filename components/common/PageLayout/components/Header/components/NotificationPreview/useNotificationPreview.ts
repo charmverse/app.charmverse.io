@@ -134,10 +134,6 @@ function getNotificationConentTitle(notification: NotificationPreview) {
     return notification.pageTitle;
   }
 
-  if ('title' in notification) {
-    return notification.title;
-  }
-
   return '';
 }
 

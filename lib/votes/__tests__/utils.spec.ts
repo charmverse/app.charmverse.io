@@ -6,6 +6,7 @@ import { isVotingClosed } from '../utils';
 const vote: Vote = {
   id: '516f10e5-0218-436d-abb0-17eda9d7e2cd',
   pageId: '9d9c4435-dd36-4a46-883e-f164821db41a',
+  postId: null,
   title: 'Vote',
   createdBy: 'a25f79d1-87fc-480b-b8fa-4ea664ea10a2',
   threshold: 50,
