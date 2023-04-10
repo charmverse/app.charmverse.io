@@ -7,10 +7,12 @@ import Button from 'components/common/Button';
 import Legend from 'components/settings/Legend';
 import ImportGuildRolesMenuItem from 'components/settings/roles/components/ImportGuildRolesMenuItem';
 import { useIsAdmin } from 'hooks/useIsAdmin';
+import { useMembers } from 'hooks/useMembers';
 import { useRoles } from 'hooks/useRoles';
 import { scrollIntoView } from 'lib/utilities/browser';
 
 import { AdminRoleRow } from './components/AdminRoleRow';
+import type { CreateRoleInput } from './components/CreateRoleForm';
 import { CreateRoleForm } from './components/CreateRoleForm';
 import { GuestRoleRow } from './components/GuestRoleRow';
 import ImportDiscordRolesMenuItem from './components/ImportDiscordRolesMenuItem';
@@ -26,6 +28,7 @@ export function RoleSettings({ space }: { space: Space }) {
   const isAdmin = useIsAdmin();
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
   const [isCreateFormVisible, setIsCreateFormVisible] = useState(false);
+  const { mutateMembers } = useMembers();
   const open = Boolean(anchorEl);
   const handleClose = () => {
     setAnchorEl(null);
@@ -46,10 +49,12 @@ export function RoleSettings({ space }: { space: Space }) {
     setIsCreateFormVisible(false);
   }
 
-  function createNewRole(role: Partial<Role>) {
+  function createNewRole(role: CreateRoleInput) {
     return createRole(role).then(() => {
       hideCreateRoleForm();
-      refreshRoles();
+      mutateMembers();
+      // scroll to bottom of roles list
+      scrollIntoView(`#${formAnchorId}`);
     });
   }
 

@@ -1,38 +1,46 @@
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Alert, Box, Card, InputLabel, Paper, Stack, TextField, Typography } from '@mui/material';
+import { Alert, Box, InputLabel, Paper, Stack, TextField, Typography } from '@mui/material';
 import type { Role } from '@prisma/client';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
 import Button from 'components/common/Button';
+import { InputSearchMemberMultiple } from 'components/common/form/InputSearchMember';
+import { useMembers } from 'hooks/useMembers';
 import type { ISystemError } from 'lib/utilities/errors';
 
 export const schema = yup.object({
   name: yup.string().required('Please provide a valid role name')
 });
 
-type FormValues = yup.InferType<typeof schema>;
+export type CreateRoleInput = yup.InferType<typeof schema> & { userIds: string[] };
 
 interface Props {
   onCancel: () => void;
-  onSubmit: (value: Partial<Role>) => Promise<void>;
+  onSubmit: (value: CreateRoleInput) => Promise<void>;
 }
 
 export function CreateRoleForm({ onCancel, onSubmit }: Props) {
   const [formError, setFormError] = useState<ISystemError | null>(null);
+  const { guests } = useMembers();
 
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors, isValid }
-  } = useForm<FormValues>({
+  } = useForm<CreateRoleInput>({
     mode: 'onChange',
     resolver: yupResolver(schema)
   });
 
+  function onChangeNewMembers(ids: string[]) {
+    setValue('userIds', ids);
+  }
+
   return (
-    <Paper sx={{ p: 3 }}>
+    <Paper sx={{ p: 2 }}>
       <Box mb={2}>
         <Typography variant='body2' fontWeight='bold' color='secondary'>
           Create a new role
@@ -49,7 +57,7 @@ export function CreateRoleForm({ onCancel, onSubmit }: Props) {
       >
         <Stack spacing={3}>
           <Box>
-            <InputLabel>Role name</InputLabel>
+            <InputLabel>Name</InputLabel>
             <TextField
               {...register('name')}
               autoFocus
@@ -57,6 +65,16 @@ export function CreateRoleForm({ onCancel, onSubmit }: Props) {
               variant='outlined'
               type='text'
               fullWidth
+            />{' '}
+          </Box>
+          <Box>
+            <InputLabel>Members</InputLabel>
+            <InputSearchMemberMultiple
+              onChange={onChangeNewMembers}
+              filter={{
+                mode: 'exclude',
+                userIds: guests.map((g) => g.id)
+              }}
             />
             {errors?.name && <Alert severity='error'>{errors.name.message}</Alert>}
           </Box>

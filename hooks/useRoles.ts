@@ -2,6 +2,7 @@ import type { Role } from '@prisma/client';
 import useSWR, { mutate } from 'swr';
 
 import charmClient from 'charmClient';
+import type { CreateRoleInput } from 'components/settings/roles/components/CreateRoleForm';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMembers } from 'hooks/useMembers';
 
@@ -14,9 +15,14 @@ export function useRoles() {
     () => space && charmClient.roles.listRoles(space.id)
   );
 
-  async function createRole(role: Partial<Role>): Promise<Role> {
-    role.spaceId = space?.id;
-    const createdRole = await charmClient.roles.createRole(role);
+  async function createRole(role: CreateRoleInput): Promise<Role> {
+    if (!space) {
+      throw new Error('Cannot create role without a space');
+    }
+    const createdRole = await charmClient.roles.createRole({
+      spaceId: space.id,
+      ...role
+    });
     refreshRoles();
     return createdRole;
   }
@@ -61,9 +67,9 @@ export function useRoles() {
     }
   }
 
-  function refreshRoles() {
+  async function refreshRoles() {
     if (space) {
-      mutate(`roles/${space.id}`);
+      return mutate(`roles/${space.id}`);
     }
   }
 
