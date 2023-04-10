@@ -136,7 +136,7 @@ export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: 
     closeMenu();
   }
 
-  const importCsv = (event: ChangeEvent<HTMLInputElement>, value?: string): void => {
+  const importCsv = (event: ChangeEvent<HTMLInputElement>, importAction?: 'merge' | 'delete'): void => {
     if (board && event.target.files && event.target.files[0]) {
       Papa.parse(event.target.files[0], {
         header: true,
@@ -160,7 +160,7 @@ export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: 
 
             showMessage('Importing your csv file...', 'info');
 
-            if (value === 'delete') {
+            if (importAction === 'delete') {
               try {
                 await deleteCards();
               } catch (error) {
