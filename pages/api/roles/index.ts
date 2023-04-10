@@ -10,6 +10,12 @@ import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
+export type CreateRoleInput = {
+  spaceId: string;
+  name: string;
+  userIds: string[];
+};
+
 handler
   .get(listSpaceRoles)
   .use(requireUser)
@@ -53,7 +59,7 @@ async function listSpaceRoles(req: NextApiRequest, res: NextApiResponse<ListSpac
 }
 
 async function createRole(req: NextApiRequest, res: NextApiResponse<Role>) {
-  const data = req.body as Role;
+  const data = req.body as CreateRoleInput;
 
   const creationData = {
     name: data.name,
@@ -61,6 +67,18 @@ async function createRole(req: NextApiRequest, res: NextApiResponse<Role>) {
       connect: {
         id: data.spaceId
       }
+    },
+    spaceRolesToRole: {
+      create: data.userIds.map((userId) => ({
+        spaceRole: {
+          connect: {
+            spaceUser: {
+              userId,
+              spaceId: data.spaceId
+            }
+          }
+        }
+      }))
     },
     createdBy: req.session.user?.id
   } as Prisma.RoleCreateInput;

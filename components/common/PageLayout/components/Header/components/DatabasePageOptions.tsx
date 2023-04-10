@@ -95,8 +95,7 @@ export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: 
   }
 
   async function deleteCards() {
-    const cardIds = cards.map((card) => card.id);
-    await charmClient.deletePages(cardIds);
+    const cardIds = cards.map((card) => card.id).filter((cardId) => pages[cardId] && !pages[cardId]?.deletedAt);
     await mutator.deleteBlocks(cardIds);
     mutatePagesRemove(cardIds);
   }
@@ -136,7 +135,7 @@ export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: 
     closeMenu();
   }
 
-  const importCsv = (event: ChangeEvent<HTMLInputElement>, value?: string): void => {
+  const importCsv = (event: ChangeEvent<HTMLInputElement>, importAction?: 'merge' | 'delete'): void => {
     if (board && event.target.files && event.target.files[0]) {
       Papa.parse(event.target.files[0], {
         header: true,
@@ -160,7 +159,7 @@ export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: 
 
             showMessage('Importing your csv file...', 'info');
 
-            if (value === 'delete') {
+            if (importAction === 'delete') {
               try {
                 await deleteCards();
               } catch (error) {

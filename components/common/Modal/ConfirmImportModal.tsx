@@ -8,7 +8,7 @@ import Button from 'components/common/Button';
 import type { ModalProps } from 'components/common/Modal';
 import { Modal } from 'components/common/Modal';
 
-type ImportAction = 'merge' | 'new';
+type ImportAction = 'merge' | 'delete';
 
 type Props = Pick<ModalProps, 'onClose' | 'open' | 'size'> & {
   question: ReactNode;
