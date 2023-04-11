@@ -11,7 +11,7 @@ import { getPostPath } from './getPostPath';
 
 export type CreateForumPostInput = Pick<
   Post,
-  'createdBy' | 'spaceId' | 'content' | 'contentText' | 'title' | 'categoryId'
+  'createdBy' | 'spaceId' | 'content' | 'contentText' | 'title' | 'categoryId' | 'isDraft'
 >;
 
 export async function createForumPost({
@@ -20,7 +20,8 @@ export async function createForumPost({
   createdBy,
   spaceId,
   title,
-  categoryId
+  categoryId,
+  isDraft
 }: CreateForumPostInput): Promise<Post> {
   if (categoryId) {
     const category = await prisma.postCategory.findUnique({
@@ -60,6 +61,7 @@ export async function createForumPost({
           id: spaceId
         }
       },
+      isDraft,
       path: getPostPath(title)
     }
   });

@@ -114,7 +114,7 @@ export function PostPage({
     }
   }, [post]);
 
-  async function publishForumPost() {
+  async function createForumPost(isDraft: boolean) {
     if (checkIsContentEmpty(formInputs.content) || !categoryId) {
       throw new Error('Missing required fields to save forum post');
     }
@@ -133,7 +133,8 @@ export function PostPage({
         content: formInputs.content,
         contentText: formInputs.contentText ?? '',
         spaceId,
-        title: formInputs.title
+        title: formInputs.title,
+        isDraft
       });
       router.push(`/${router.query.domain}/forum/post/${newPost.path}`);
     }
@@ -209,15 +210,30 @@ export function PostPage({
                 </CharmEditor>
               </Box>
               {canEdit && (
-                <Box display='flex' flexDirection='row' justifyContent='right' my={2}>
-                  <Button
-                    disabled={Boolean(disabledTooltip) || !contentUpdated}
-                    disabledTooltip={disabledTooltip}
-                    onClick={publishForumPost}
-                  >
-                    {post ? 'Update' : 'Post'}
-                  </Button>
-                </Box>
+                <Stack flexDirection='row' gap={1} justifyContent='flex-end' my={2}>
+                  {!post && (
+                    <Box display='flex' flexDirection='row' justifyContent='right'>
+                      <Button
+                        disabled={Boolean(disabledTooltip) || !contentUpdated}
+                        disabledTooltip={disabledTooltip}
+                        onClick={() => createForumPost(true)}
+                        color='secondary'
+                        variant='outlined'
+                      >
+                        Save draft
+                      </Button>
+                    </Box>
+                  )}
+                  <Box display='flex' flexDirection='row' justifyContent='right'>
+                    <Button
+                      disabled={Boolean(disabledTooltip) || !contentUpdated}
+                      disabledTooltip={disabledTooltip}
+                      onClick={() => createForumPost(false)}
+                    >
+                      {post ? 'Update' : 'Post'}
+                    </Button>
+                  </Box>
+                </Stack>
               )}
               {post && !!permissions?.add_comment && (
                 <Box my={2} data-test='new-top-level-post-comment'>
