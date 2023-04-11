@@ -55,10 +55,35 @@ export async function createFormResponseCard({
       }
     });
 
+    const views = await prisma.block.findMany({
+      where: {
+        type: 'view',
+        parentId: updatedBoard.id
+      }
+    });
+
+    const updatedViewBlocks = await prisma.$transaction(
+      views.map((block) => {
+        return prisma.block.update({
+          where: { id: block.id },
+          data: {
+            fields: {
+              ...(block.fields as any),
+              visiblePropertyIds: [
+                ...new Set([...(block.fields as any).visiblePropertyIds, ...newProperties.map((p) => p.id)])
+              ]
+            },
+            updatedAt: new Date(),
+            updatedBy: userId
+          }
+        });
+      })
+    );
+
     relay.broadcast(
       {
         type: 'blocks_updated',
-        payload: [prismaToBlock(updatedBoard)]
+        payload: [prismaToBlock(updatedBoard), ...updatedViewBlocks.map(prismaToBlock)]
       },
       updatedBoard.spaceId
     );
