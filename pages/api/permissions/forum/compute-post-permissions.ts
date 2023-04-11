@@ -1,12 +1,10 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import http from 'adapters/http/fetch.server';
-import { permissionsApiUrl } from 'config/constants';
 import { prisma } from 'db';
 import { PostNotFoundError } from 'lib/forums/posts/errors';
 import { onError, onNoMatch, requireKeys } from 'lib/middleware';
-import { computePostPermissions } from 'lib/permissions/forum/computePostPermissions';
+import { getPermissionsClient } from 'lib/permissions/api';
 import type { AvailablePostPermissionFlags } from 'lib/permissions/forum/interfaces';
 import type { PermissionCompute } from 'lib/permissions/interfaces';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -47,19 +45,17 @@ async function computePermissions(req: NextApiRequest, res: NextApiResponse<Avai
     }
   }
 
-  const delegatedResponse = await http(`${permissionsApiUrl}/api/permissions/forum/compute-post-permissions`, {
-    body: JSON.stringify({
-      ...input,
-      userId: req.session.user?.id
-    }),
-    method: 'POST'
+  const client = await getPermissionsClient({
+    resourceId,
+    resourceIdType: 'post'
   });
 
-  // const permissions = await computePostPermissions({
-  //   resourceId,
-  //   userId: req.session.user?.id
-  // });
-  res.status(200).json(delegatedResponse as any as AvailablePostPermissionFlags);
+  const permissions = await client.forum.computePostPermissions({
+    resourceId,
+    userId: req.session.user?.id
+  });
+
+  res.status(200).json(permissions);
 }
 
 export default withSessionRoute(handler);

@@ -34,4 +34,5 @@ export const googleOAuthClientIdSensitive =
 export const googleOAuthClientSecretSensitive = process.env.GOOGLE_OAUTH_CLIENT_SECRET_SENSITIVE;
 
 // Permissions API
-export const permissionsApiUrl = process.env.PERMISSIONS_API_URL ?? 'http://localhost:3000';
+export const permissionsApiUrl = process.env.PERMISSIONS_API_URL ?? 'http://localhost:3001';
+export const permissionsApiAuthKey = process.env.PERMISSIONS_API_AUTH_KEY ?? 'key';

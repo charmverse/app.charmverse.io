@@ -147,6 +147,7 @@ type CreateUserAndSpaceInput = {
   onboarded?: boolean;
   spaceName?: string;
   publicBountyBoard?: boolean;
+  premiumOptin?: boolean;
 };
 
 export async function generateUserAndSpace({
@@ -155,7 +156,8 @@ export async function generateUserAndSpace({
   isGuest,
   onboarded = true,
   spaceName = 'Example Space',
-  publicBountyBoard
+  publicBountyBoard,
+  premiumOptin
 }: CreateUserAndSpaceInput = {}) {
   const userId = v4();
   const newUser = await prisma.user.create({
@@ -175,6 +177,7 @@ export async function generateUserAndSpace({
                   id: userId
                 }
               },
+              premiumOptin,
               updatedBy: userId,
               name: spaceName,
               // Adding prefix avoids this being evaluated as uuid
