@@ -10,7 +10,7 @@ import { computePostPermissions } from 'lib/permissions/forum/computePostPermiss
 import { computeUserPagePermissions } from 'lib/permissions/pages';
 import { computeProposalPermissions } from 'lib/permissions/proposals/computeProposalPermissions';
 import { withSessionRoute } from 'lib/session/withSession';
-import { DataNotFoundError, UnauthorisedActionError } from 'lib/utilities/errors';
+import { UnauthorisedActionError } from 'lib/utilities/errors';
 import { createVote as createVoteService } from 'lib/votes';
 import { getVotesByPage } from 'lib/votes/getVotesByPage';
 import type { VoteTask, ExtendedVote, VoteDTO } from 'lib/votes/interfaces';

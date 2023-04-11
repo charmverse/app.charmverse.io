@@ -21,7 +21,7 @@ export function PollNodeView({
   deleteNode
 }: CharmNodeViewProps) {
   const { pollId } = node.attrs as { pollId: string | null };
-  const { votes, cancelVote, castVote, deleteVote, updateDeadline } = useVotes();
+  const { votes, cancelVote, castVote, deleteVote, isLoading, updateDeadline } = useVotes({ pageId, postId });
 
   const autoOpen = node.marks.some((mark) => mark.type.name === 'tooltip-marker');
 
@@ -41,7 +41,7 @@ export function PollNodeView({
     setShowModal(false);
   }
   if (!pollId || !votes[pollId]) {
-    if (readOnly) {
+    if (readOnly || isLoading) {
       return <div />;
     }
     return (

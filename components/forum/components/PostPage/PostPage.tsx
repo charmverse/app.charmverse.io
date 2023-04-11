@@ -191,7 +191,7 @@ export function PostPage({
                   autoFocus={false}
                   readOnly={!canEdit}
                   pageActionDisplay={null}
-                  pageId={post?.id}
+                  postId={post?.id}
                   disablePageSpecificFeatures
                   enableVoting={true}
                   isContentControlled

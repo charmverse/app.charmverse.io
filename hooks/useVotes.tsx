@@ -4,20 +4,23 @@ import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
-import { usePostDialog } from 'components/forum/components/PostDialog/hooks/usePostDialog';
-import { usePostByPath } from 'components/forum/hooks/usePostByPath';
 import { useTasks } from 'components/nexus/hooks/useTasks';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { ExtendedVote, VoteDTO } from 'lib/votes/interfaces';
 import type { GetTasksResponse } from 'pages/api/tasks/list';
 
-import { useCurrentPage } from './useCurrentPage';
 import { useUser } from './useUser';
 import { useWebSocketClient } from './useWebSocketClient';
+
+type ParentData = {
+  pageId?: string;
+  postId?: string;
+};
 
 type IContext = {
   isValidating: boolean;
   isLoading: boolean;
+  setParent: (parent: ParentData) => void;
   votes: Record<string, ExtendedVote>;
   createVote: (votePayload: Omit<VoteDTO, 'createdBy' | 'spaceId'>) => Promise<ExtendedVote>;
   castVote: (voteId: string, option: string) => Promise<UserVote>;
@@ -38,6 +41,7 @@ const VotesContext = createContext<Readonly<IContext>>({
   isValidating: true,
   isLoading: true,
   votes: {},
+  setParent: () => undefined,
   castVote: () => undefined as any,
   createVote: () => undefined as any,
   deleteVote: () => undefined as any,
@@ -46,17 +50,13 @@ const VotesContext = createContext<Readonly<IContext>>({
 });
 
 export function VotesProvider({ children }: { children: ReactNode }) {
-  const { currentPageId } = useCurrentPage();
-  const { props } = usePostDialog();
-  const forumPostInfo = usePostByPath();
+  const [parent, setParent] = useState<{ pageId?: string; postId?: string } | null>(null);
   const [votes, setVotes] = useState<IContext['votes']>({});
   const { user } = useUser();
   const currentSpace = useCurrentSpace();
   const { mutate: mutateTasks, tasks: userTasks } = useTasks();
 
   const { subscribe } = useWebSocketClient();
-
-  const postId = props?.postId || forumPostInfo?.forumPost?.id;
 
   useEffect(() => {
     const unsubscribeFromCreatedVotes = subscribe('votes_created', (newVotes) => {
@@ -140,8 +140,8 @@ export function VotesProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const { data, isValidating } = useSWR(
-    () => (currentPageId || postId ? `pages/${currentPageId || postId}/votes` : null),
-    async () => charmClient.votes.getVotesByPage({ pageId: currentPageId, postId }),
+    () => (parent ? `pages/${parent.pageId || parent.postId}/votes` : null),
+    async () => charmClient.votes.getVotesByPage(parent!),
     {
       revalidateOnFocus: false
     }
@@ -168,25 +168,23 @@ export function VotesProvider({ children }: { children: ReactNode }) {
 
   async function castVote(voteId: string, choice: string) {
     const userVote = await charmClient.votes.castVote(voteId, choice);
-    if (currentPageId) {
-      setVotes((_votes) => {
-        const vote = _votes[voteId];
-        if (vote && user) {
-          const currentChoice = vote.userChoice;
-          vote.userChoice = choice;
-          if (currentChoice) {
-            vote.aggregatedResult[currentChoice] -= 1;
-          } else {
-            vote.totalVotes += 1;
-          }
-          vote.aggregatedResult[choice] += 1;
-          _votes[voteId] = {
-            ...vote
-          };
+    setVotes((_votes) => {
+      const vote = _votes[voteId];
+      if (vote && user) {
+        const currentChoice = vote.userChoice;
+        vote.userChoice = choice;
+        if (currentChoice) {
+          vote.aggregatedResult[currentChoice] -= 1;
+        } else {
+          vote.totalVotes += 1;
         }
-        return { ..._votes };
-      });
-    }
+        vote.aggregatedResult[choice] += 1;
+        _votes[voteId] = {
+          ...vote
+        };
+      }
+      return { ..._votes };
+    });
     removeVoteFromTask(voteId);
     return userVote;
   }
@@ -213,13 +211,11 @@ export function VotesProvider({ children }: { children: ReactNode }) {
     const vote = votes[voteId];
     if (vote.context === 'inline') {
       await charmClient.votes.deleteVote(voteId);
-      if (currentPageId) {
-        setVotes((prevVotes) => {
-          const _votes = { ...prevVotes };
-          delete _votes[voteId];
-          return _votes;
-        });
-      }
+      setVotes((prevVotes) => {
+        const _votes = { ...prevVotes };
+        delete _votes[voteId];
+        return _votes;
+      });
       removeVoteFromTask(voteId);
     }
   }
@@ -228,18 +224,14 @@ export function VotesProvider({ children }: { children: ReactNode }) {
     const vote = votes[voteId];
     if (vote.context === 'inline') {
       await charmClient.votes.updateVote(voteId, { status: 'Cancelled' });
-      if (currentPageId) {
-        setVotes((prevVotes) => ({ ...prevVotes, [voteId]: { ...prevVotes[voteId], status: 'Cancelled' } }));
-      }
+      setVotes((prevVotes) => ({ ...prevVotes, [voteId]: { ...prevVotes[voteId], status: 'Cancelled' } }));
       removeVoteFromTask(voteId);
     }
   }
 
   async function updateDeadline(voteId: string, deadline: Date) {
     await charmClient.votes.updateVote(voteId, { deadline });
-    if (currentPageId) {
-      setVotes((prevVotes) => ({ ...prevVotes, [voteId]: { ...prevVotes[voteId], deadline } }));
-    }
+    setVotes((prevVotes) => ({ ...prevVotes, [voteId]: { ...prevVotes[voteId], deadline } }));
   }
 
   useEffect(() => {
@@ -255,12 +247,21 @@ export function VotesProvider({ children }: { children: ReactNode }) {
       createVote,
       deleteVote,
       cancelVote,
-      updateDeadline
+      updateDeadline,
+      setParent
     }),
-    [currentPageId, votes, isValidating]
+    [votes, isValidating]
   );
 
   return <VotesContext.Provider value={value}>{children}</VotesContext.Provider>;
 }
 
-export const useVotes = () => useContext(VotesContext);
+export const useVotes = (parent: ParentData) => {
+  const votes = useContext(VotesContext);
+
+  useEffect(() => {
+    votes.setParent(parent);
+  }, [parent.postId, parent.pageId]);
+
+  return votes;
+};

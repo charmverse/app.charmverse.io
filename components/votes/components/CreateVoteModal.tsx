@@ -119,7 +119,7 @@ export function CreateVoteModal({
   const [voteType, setVoteType] = useState<VoteType>(VoteType.Approval);
   const [options, setOptions] = useState<{ name: string }[]>([]);
   const [isDateTimePickerOpen, setIsDateTimePickerOpen] = useState(false);
-  const { createVote } = useVotes();
+  const { createVote } = useVotes({ pageId, postId });
 
   useEffect(() => {
     if (voteType === VoteType.SingleChoice) {

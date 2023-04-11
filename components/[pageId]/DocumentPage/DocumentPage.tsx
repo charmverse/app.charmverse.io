@@ -86,7 +86,7 @@ export interface DocumentPageProps {
 
 function DocumentPage({ page, setPage, insideModal, readOnly = false }: DocumentPageProps) {
   const { pages } = usePages();
-  const { cancelVote, castVote, deleteVote, updateDeadline, votes, isLoading } = useVotes();
+  const { cancelVote, castVote, deleteVote, updateDeadline, votes, isLoading } = useVotes({ pageId: page.id });
   // For post we would artificially construct the permissions
   const { permissions: pagePermissions, refresh: refreshPagePermissions } = usePagePermissions({
     pageIdOrPath: page.id
