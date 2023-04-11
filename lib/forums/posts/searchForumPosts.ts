@@ -53,6 +53,7 @@ export async function searchForumPosts(
     categoryId: categoryId instanceof Array ? { in: categoryId } : categoryId,
     spaceId,
     deletedAt: null,
+    isDraft: false,
     OR: search
       ? [
           {

@@ -86,6 +86,7 @@ export async function getForumNotifications(userId: string): Promise<ForumTasksG
 
     const _posts = await prisma.post.findMany({
       where: {
+        isDraft: false,
         deletedAt: null,
         // only get posts created after a user has joined the space
         createdAt: {
