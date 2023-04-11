@@ -6,6 +6,7 @@ import { prismaToBlock } from 'lib/focalboard/block';
 import { createPage } from 'lib/pages/server/createPage';
 import { getPagePath } from 'lib/pages/utils';
 import { InvalidInputError } from 'lib/utilities/errors';
+import { relay } from 'lib/websockets/relay';
 
 import { DatabasePageNotFoundError } from './errors';
 import type { PageProperty } from './interfaces';
@@ -170,7 +171,7 @@ export async function createDatabaseCardPage(
     }
   });
 
-  relay?.broadcast(
+  relay.broadcast(
     {
       type: 'blocks_created',
       payload: [prismaToBlock(cardBlock)]
@@ -178,7 +179,7 @@ export async function createDatabaseCardPage(
     cardBlock.spaceId
   );
 
-  relay?.broadcast(
+  relay.broadcast(
     {
       type: 'pages_created',
       payload: [page]

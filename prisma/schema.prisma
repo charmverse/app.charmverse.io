@@ -217,7 +217,7 @@ enum Feature {
   bounties
 }
 
-enum ApiPageKeysType {
+enum ApiPageKeyType {
   typeform
 }
 
@@ -347,7 +347,7 @@ model Page {
   convertedProposalId String?          @unique @db.Uuid
   convertedProposal   Proposal?        @relation(fields: [convertedProposalId], references: [id], onDelete: SetNull, onUpdate: Cascade, name: "convertedProposal")
   comments            PageComment[]
-  webhooks            ApiPageKeys[]
+  apiPageKeys         ApiPageKey[]
 
   @@index([bountyId])
   @@index([cardId])
@@ -526,7 +526,7 @@ model User {
   GoogleCredential          GoogleCredential[]
   PageComment               PageComment[]
   verifiedEmails            VerifiedEmail[]
-  webhooks                  ApiPageKeys[]
+  apiPageKeys               ApiPageKey[]
 }
 
 model VerifiedEmail {
@@ -1371,13 +1371,13 @@ model PostCategoryPermission {
   @@index([postCategoryId, public])
 }
 
-model ApiPageKeys {
+model ApiPageKey {
   createdAt DateTime @default(now())
   updatedAt DateTime  @updatedAt
   createdBy String @db.Uuid
   pageId    String @db.Uuid
   apiKey    String
-  type      ApiPageKeysType
+  type      ApiPageKeyType
   page      Page   @relation(fields: [pageId], references: [id], onDelete: Cascade)
   user      User   @relation(fields: [createdBy], references: [id], onDelete: Cascade)
 

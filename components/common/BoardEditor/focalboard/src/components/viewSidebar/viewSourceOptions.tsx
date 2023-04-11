@@ -2,7 +2,7 @@ import styled from '@emotion/styled';
 import AddIcon from '@mui/icons-material/Add';
 import AddCircleIcon from '@mui/icons-material/AddCircleOutline';
 import { Box, Card, Grid, ListItemIcon, MenuItem, TextField, Typography } from '@mui/material';
-import type { ApiPageKeys } from '@prisma/client';
+import type { ApiPageKey } from '@prisma/client';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useMemo, useState } from 'react';
 import { RiGoogleFill } from 'react-icons/ri';
@@ -23,7 +23,7 @@ import { SidebarHeader } from './viewSidebar';
 
 type FormStep = 'select_source' | 'configure_source';
 
-const webhookBaseUrl = 'https://app.charmverse.io/api/v1/databases';
+const webhookBaseUrl = 'https://app.charmverse.io/api/v1/webhooks';
 
 export type DatabaseSourceProps = {
   onCreate?: () => void;
@@ -57,13 +57,13 @@ export function ViewSourceOptions(props: ViewSourceOptionsProps) {
     isMutating: isLoadingWebhookApiKeyCreation
   } = useSWRMutation(
     `/api/pages/${currentPageId}/api-key`,
-    (_url, { arg }: Readonly<{ arg: { pageId: string; type: ApiPageKeys['type'] } }>) =>
+    (_url, { arg }: Readonly<{ arg: { pageId: string; type: ApiPageKey['type'] } }>) =>
       charmClient.createApiPageKey(arg)
   );
 
   const typeformPopup = usePopupState({ variant: 'popover', popupId: 'typeformPopup' });
 
-  const handleApiKeyClick = async (type: ApiPageKeys['type']) => {
+  const handleApiKeyClick = async (type: ApiPageKey['type']) => {
     if (currentPageId) {
       await createWebhookApiKey({ pageId: currentPageId, type });
       typeformPopup.open();
@@ -105,7 +105,10 @@ export function ViewSourceOptions(props: ViewSourceOptionsProps) {
                 New database
               </SourceType>
             )}
-            <SourceType active={false} onClick={() => handleApiKeyClick('typeform')}>
+            <SourceType
+              active={false}
+              onClick={() => (isLoadingWebhookApiKeyCreation ? {} : handleApiKeyClick('typeform'))}
+            >
               <SiTypeform style={{ fontSize: 24 }} />
               Typeform
             </SourceType>
@@ -133,7 +136,7 @@ export function ViewSourceOptions(props: ViewSourceOptionsProps) {
             <br />
             Paste the following URL:
             <br />
-            <i>{`${webhookBaseUrl}/${currentPageId}/${webhookApi?.apiKey}`}</i>
+            <i>{`${webhookBaseUrl}/${webhookApi?.apiKey}`}</i>
           </Typography>
         }
         title='Typeform webhook'

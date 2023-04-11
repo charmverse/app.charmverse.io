@@ -6,6 +6,7 @@ import { getDatabaseDetails } from 'lib/pages/getDatabaseDetails';
 import type { FormResponseProperty } from 'lib/pages/interfaces';
 import { createDatabaseCardPage } from 'lib/public-api/createDatabaseCardPage';
 import { InvalidInputError } from 'lib/utilities/errors';
+import { relay } from 'lib/websockets/relay';
 import type { AddFormResponseInput, FormResponse } from 'lib/zapier/interfaces';
 import { parseFormData } from 'lib/zapier/parseFormData';
 
@@ -54,7 +55,7 @@ export async function createFormResponseCard({
       }
     });
 
-    relay?.broadcast(
+    relay.broadcast(
       {
         type: 'blocks_updated',
         payload: [prismaToBlock(updatedBoard)]

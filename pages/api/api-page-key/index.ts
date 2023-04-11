@@ -1,4 +1,4 @@
-import type { ApiPageKeys, ApiPageKeysType } from '@prisma/client';
+import type { ApiPageKey, ApiPageKeyType } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -17,7 +17,7 @@ handler
   .use(requireKeys(['pageId'], 'query'))
   .get(getApiKeys);
 
-async function getApiKeys(req: NextApiRequest, res: NextApiResponse<ApiPageKeys[]>) {
+async function getApiKeys(req: NextApiRequest, res: NextApiResponse<ApiPageKey[]>) {
   const pageId = req.query.pageId as string;
   const userId = req.session?.user?.id;
 
@@ -30,7 +30,7 @@ async function getApiKeys(req: NextApiRequest, res: NextApiResponse<ApiPageKeys[
     throw new UnauthorisedActionError('You do not have permission to update this page');
   }
 
-  const apiPageKeys = await prisma.apiPageKeys.findMany({
+  const apiPageKeys = await prisma.apiPageKey.findMany({
     where: {
       pageId
     }
@@ -43,9 +43,9 @@ async function getApiKeys(req: NextApiRequest, res: NextApiResponse<ApiPageKeys[
   return res.status(200).json(apiPageKeys);
 }
 
-async function createApiKey(req: NextApiRequest, res: NextApiResponse<ApiPageKeys>) {
+async function createApiKey(req: NextApiRequest, res: NextApiResponse<ApiPageKey>) {
   const pageId = req.body.pageId as string;
-  const type = req.body.type as ApiPageKeysType;
+  const type = req.body.type as ApiPageKeyType;
   const userId = req.session?.user?.id;
 
   const permissions = await computeUserPagePermissions({
@@ -58,7 +58,7 @@ async function createApiKey(req: NextApiRequest, res: NextApiResponse<ApiPageKey
   }
 
   const apiKey = uid();
-  const apiPageKeys = await prisma.apiPageKeys.upsert({
+  const apiPageKeys = await prisma.apiPageKey.upsert({
     where: {
       pageId_type: {
         pageId,

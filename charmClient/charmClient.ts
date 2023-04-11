@@ -12,7 +12,7 @@ import type {
   UserDetails,
   UserGnosisSafe,
   UserWallet,
-  ApiPageKeys
+  ApiPageKey
 } from '@prisma/client';
 import type { FiatCurrency, IPairQuote } from 'connectors';
 
@@ -521,11 +521,11 @@ class CharmClient {
   }
 
   getApiPageKeys({ pageId }: { pageId: string }) {
-    return http.GET<ApiPageKeys[]>(`/api/api-page-key?pageId=${pageId}`);
+    return http.GET<ApiPageKey[]>(`/api/api-page-key?pageId=${pageId}`);
   }
 
-  createApiPageKey({ pageId, type }: { pageId: string; type: ApiPageKeys['type'] }) {
-    return http.POST<ApiPageKeys>(`/api/api-page-key`, { type, pageId });
+  createApiPageKey({ pageId, type }: { pageId: string; type: ApiPageKey['type'] }) {
+    return http.POST<ApiPageKey>(`/api/api-page-key`, { type, pageId });
   }
 }
 

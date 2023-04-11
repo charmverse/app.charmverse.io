@@ -3,16 +3,16 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { prisma } from 'db';
-import { simplifyTypeformResponse } from 'lib/apiPageKey/utilities';
 import { onError, onNoMatch, requireKeys } from 'lib/middleware';
 import { createFormResponseCard } from 'lib/pages/createFormResponseCard';
+import { simplifyTypeformResponse } from 'lib/typeform/simplifyTypeformResponse';
 import { DataNotFoundError } from 'lib/utilities/errors';
 import type { AddFormResponseInput } from 'lib/zapier/interfaces';
 import { validateFormRequestInput } from 'lib/zapier/validateFormRequestInput';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireKeys(['id', 'key'], 'query')).post(createFormResponse);
+handler.use(requireKeys(['key'], 'query')).post(createFormResponse);
 
 /**
  * @swagger
@@ -39,10 +39,9 @@ handler.use(requireKeys(['id', 'key'], 'query')).post(createFormResponse);
  *                $ref: '#/components/schemas/Page'
  */
 export async function createFormResponse(req: NextApiRequest, res: NextApiResponse) {
-  const pageId = req.query.id as string;
   const key = req.query.key as string;
 
-  const apiPageKeyWithSpaceId = await prisma.apiPageKeys.findUnique({
+  const apiPageKeyWithSpaceId = await prisma.apiPageKey.findUnique({
     where: { apiKey: key },
     select: {
       createdAt: true,
@@ -76,7 +75,7 @@ export async function createFormResponse(req: NextApiRequest, res: NextApiRespon
 
   const card = await createFormResponseCard({
     spaceId: apiPageKeyWithSpaceId.page.spaceId,
-    databaseIdorPath: pageId,
+    databaseIdorPath: apiPageKeyWithSpaceId.pageId,
     data: body,
     userId: apiPageKeyWithSpaceId.createdBy
   });
