@@ -43,5 +43,22 @@ export async function listPermissions({ spaceId }: { spaceId: string }): Promise
       .then((permissions) => permissions.map(mapSpacePermissionToAssignee))
   ]);
 
+  // add default member permissions if not defined
+  if (space.filter((s) => s.assignee.group === 'space').length === 0) {
+    space.push({
+      assignee: {
+        group: 'space',
+        id: spaceId
+      },
+      operations: {
+        createPage: false,
+        createBounty: false,
+        createForumCategory: false,
+        moderateForums: false,
+        reviewProposals: false
+      }
+    });
+  }
+
   return { proposalCategories, forumCategories, space };
 }

@@ -13,7 +13,7 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 export type CreateRoleInput = {
   spaceId: string;
   name: string;
-  userIds: string[];
+  userIds?: string[];
 };
 
 handler
@@ -68,18 +68,20 @@ async function createRole(req: NextApiRequest, res: NextApiResponse<Role>) {
         id: data.spaceId
       }
     },
-    spaceRolesToRole: {
-      create: data.userIds.map((userId) => ({
-        spaceRole: {
-          connect: {
-            spaceUser: {
-              userId,
-              spaceId: data.spaceId
+    spaceRolesToRole: data.userIds
+      ? {
+          create: data.userIds.map((userId) => ({
+            spaceRole: {
+              connect: {
+                spaceUser: {
+                  userId,
+                  spaceId: data.spaceId
+                }
+              }
             }
-          }
+          }))
         }
-      }))
-    },
+      : undefined,
     createdBy: req.session.user?.id
   } as Prisma.RoleCreateInput;
 
