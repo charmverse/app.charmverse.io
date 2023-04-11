@@ -23,7 +23,7 @@ import { SidebarHeader } from './viewSidebar';
 
 type FormStep = 'select_source' | 'configure_source';
 
-const webhookBaseUrl = 'https://app.charmverse.io/api/v1/webhooks';
+const webhookBaseUrl = 'https://app.charmverse.io/api/v1/webhooks/addToDatabase';
 
 export type DatabaseSourceProps = {
   onCreate?: () => void;
