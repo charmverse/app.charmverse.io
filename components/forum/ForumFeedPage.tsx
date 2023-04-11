@@ -36,7 +36,6 @@ export function ForumPage() {
   const { categories, isCategoriesLoaded } = useForumCategories();
   const [, setTitle] = usePageTitle();
   const [currentCategory, setCurrentCategory] = useState<PostCategory | null>(null);
-
   useEffect(() => {
     if (currentCategory?.name) {
       setTitle(currentCategory.name);

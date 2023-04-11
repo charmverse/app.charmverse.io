@@ -16,6 +16,7 @@ import { PageActions } from 'components/common/PageActions';
 import { usePostPermissions } from 'components/forum/hooks/usePostPermissions';
 import { useUser } from 'hooks/useUser';
 import type { PostWithVotes } from 'lib/forums/posts/interfaces';
+import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
 import type { FormInputs } from '../interfaces';
 import { DraftPostList } from '../PostList/DraftPostList';
@@ -82,6 +83,10 @@ export function PostDialog({ post, spaceId, onClose, open, newPostCategory }: Pr
     setFormInputs({ title: '', content: null, contentText: '' });
     setContentUpdated(false);
     setShowConfirmDialog(false);
+    setIsDraftPostListOpen(false);
+    showPost({
+      postId: null
+    });
   }
 
   function deletePost() {
@@ -94,9 +99,15 @@ export function PostDialog({ post, spaceId, onClose, open, newPostCategory }: Pr
 
   function showDraftPost(draftPost: Post) {
     setIsDraftPostListOpen(false);
+    popupState.close();
+    onClose();
     showPost({
-      postId: draftPost.id
+      postId: draftPost.id,
+      onClose() {
+        setUrlWithoutRerender(router.pathname, { postId: null });
+      }
     });
+    setUrlWithoutRerender(router.pathname, { postId: draftPost.id });
   }
 
   if (!popupState.isOpen) {
