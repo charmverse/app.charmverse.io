@@ -116,6 +116,21 @@ async function onlyEditableByAuthor({
 
   return newPermissions;
 }
+
+async function draftPostOnlyVisibleAndDeletableByAuthor({
+  resource,
+  flags,
+  userId
+}: PostPolicyInput): Promise<AvailablePostPermissionFlags> {
+  const newPermissions = {
+    ...flags,
+    delete_post: resource.createdBy === userId,
+    view_post: resource.createdBy === userId
+  };
+
+  return newPermissions;
+}
+
 function postResolver({ resourceId }: { resourceId: string }) {
   return prisma.post.findUnique({
     where: { id: resourceId },
@@ -134,5 +149,5 @@ export const computePostPermissions = buildComputePermissionsWithPermissionFilte
 >({
   resolver: postResolver,
   computeFn: baseComputePostPermissions,
-  policies: [onlyEditableByAuthor, convertedToProposalPolicy]
+  policies: [onlyEditableByAuthor, convertedToProposalPolicy, draftPostOnlyVisibleAndDeletableByAuthor]
 });
