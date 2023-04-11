@@ -36,6 +36,7 @@ import type { FormInputs } from '../interfaces';
 import { CategoryPosts } from './components/CategoryPosts';
 import { PostCategoryInput } from './components/PostCategoryInput';
 import { PostComment } from './components/PostComment';
+import { DraftPostBanner } from './DraftPostBanner';
 
 type Props = {
   spaceId: string;
@@ -183,6 +184,7 @@ export function PostPage({
     <>
       {post?.proposalId && <ProposalBanner type='post' proposalId={post.proposalId} />}
       <ScrollableWindow>
+        {post?.isDraft && <DraftPostBanner />}
         <Stack>
           <Stack flexDirection='row'>
             <Container top={50}>

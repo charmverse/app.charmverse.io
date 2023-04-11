@@ -91,6 +91,7 @@ export function PostDialog({ post, spaceId, onClose, open, newPostCategory }: Pr
   }
 
   function showDraftPost(draftPost: Post) {
+    setIsDraftPostListOpen(false);
     showPost({
       postId: draftPost.id
     });
