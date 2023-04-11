@@ -7,10 +7,10 @@ import HowToVoteIcon from '@mui/icons-material/HowToVote';
 import LayersIcon from '@mui/icons-material/Layers';
 import BountyIcon from '@mui/icons-material/RequestPageOutlined';
 import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
-import { Badge, Box, DialogContent, Divider, IconButton, Tab, Tabs, Tooltip, Typography } from '@mui/material';
+import { Badge, Box, Dialog, DialogContent, Divider, IconButton, Tab, Tabs, Tooltip, Typography } from '@mui/material';
 import { Fragment } from 'react';
 
-import Modal from 'components/common/Modal';
+import { MobileDialog } from 'components/common/MobileDialog/MobileDialog';
 import type { NotificationDisplayType } from 'components/common/PageLayout/components/Header/components/NotificationPreview/useNotifications';
 import { useNotifications } from 'components/common/PageLayout/components/Header/components/NotificationPreview/useNotifications';
 import { SectionName } from 'components/common/PageLayout/components/Sidebar/Sidebar';
@@ -59,6 +59,7 @@ export function NotificationModal() {
     markAsRead
   } = useNotifications();
   const isMobile = useSmallScreen();
+  const DialogComponent = isMobile ? MobileDialog : Dialog;
 
   const { markedNotifications, unmarkedNotifications, hasUnreadNotifications, markBulkAsRead } = useNotificationModal({
     marked,
@@ -67,13 +68,12 @@ export function NotificationModal() {
   });
 
   return (
-    <Modal
-      noPadding
+    <DialogComponent
       onClose={closeNotificationsModal}
       open={!!notificationDisplayType}
-      mobileDialog={isMobile}
-      size='1200px'
-      sx={{ mx: 5 }}
+      fullWidth
+      maxWidth='lg'
+      contentSx={{ padding: 0 }}
     >
       <Box
         display='flex'
@@ -121,13 +121,7 @@ export function NotificationModal() {
             />
           ))}
         </Box>
-        <Box
-          flex='1 1 auto'
-          position='relative'
-          height={isMobile ? '95vh' : '80vh'}
-          overflow='hidden'
-          sx={{ background: isMobile ? 'none' : (theme) => theme.palette.background.paper }}
-        >
+        <Box flex='1 1 auto' position='relative' height={isMobile ? '95vh' : '80vh'} overflow='hidden'>
           <Box role='tabpanel' height='100%'>
             <Box width='100%'>
               <Legend
@@ -251,6 +245,6 @@ export function NotificationModal() {
           </Box>
         </Box>
       </Box>
-    </Modal>
+    </DialogComponent>
   );
 }
