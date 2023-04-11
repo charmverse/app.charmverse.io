@@ -128,7 +128,7 @@ export function PostCard({ post, user, category }: ForumPostProps) {
                 <Typography variant='body2'>{totalComments}</Typography>
               </Stack>
             </Stack>
-            <CommentVote permissions={permissions} onVote={voteOnPost} votes={pagePost.votes} />
+            {!post.isDraft && <CommentVote permissions={permissions} onVote={voteOnPost} votes={pagePost.votes} />}
           </Box>
         </CardContent>
       </CardActionArea>

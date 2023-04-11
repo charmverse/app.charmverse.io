@@ -83,7 +83,7 @@ export async function baseComputePostPermissions({
   return permissions.operationFlags;
 }
 
-type PostResource = Pick<Post, 'id' | 'spaceId' | 'createdBy' | 'proposalId'>;
+type PostResource = Pick<Post, 'id' | 'spaceId' | 'createdBy' | 'proposalId' | 'isDraft'>;
 type PostPolicyInput = PermissionFilteringPolicyFnInput<PostResource, AvailablePostPermissionFlags>;
 
 async function convertedToProposalPolicy({ resource, flags }: PostPolicyInput): Promise<AvailablePostPermissionFlags> {
@@ -131,6 +131,28 @@ async function draftPostOnlyVisibleAndDeletableByAuthor({
   return newPermissions;
 }
 
+async function disableUpvoteDownvoteDraftPost({
+  resource,
+  flags
+}: PostPolicyInput): Promise<AvailablePostPermissionFlags> {
+  const newPermissions = {
+    ...flags,
+    upvote: !resource.isDraft,
+    downvote: !resource.isDraft
+  };
+
+  return newPermissions;
+}
+
+async function disableCommentOnDraftPost({ resource, flags }: PostPolicyInput): Promise<AvailablePostPermissionFlags> {
+  const newPermissions = {
+    ...flags,
+    add_comment: !resource.isDraft
+  };
+
+  return newPermissions;
+}
+
 function postResolver({ resourceId }: { resourceId: string }) {
   return prisma.post.findUnique({
     where: { id: resourceId },
@@ -138,7 +160,8 @@ function postResolver({ resourceId }: { resourceId: string }) {
       id: true,
       spaceId: true,
       createdBy: true,
-      proposalId: true
+      proposalId: true,
+      isDraft: true
     }
   }) as Promise<PostResource>;
 }
@@ -149,5 +172,11 @@ export const computePostPermissions = buildComputePermissionsWithPermissionFilte
 >({
   resolver: postResolver,
   computeFn: baseComputePostPermissions,
-  policies: [onlyEditableByAuthor, convertedToProposalPolicy, draftPostOnlyVisibleAndDeletableByAuthor]
+  policies: [
+    onlyEditableByAuthor,
+    convertedToProposalPolicy,
+    disableCommentOnDraftPost,
+    disableUpvoteDownvoteDraftPost,
+    draftPostOnlyVisibleAndDeletableByAuthor
+  ]
 });

@@ -45,10 +45,6 @@ async function createPostCommentHandler(req: NextApiRequest, res: NextApiRespons
     throw new PostNotFoundError(postId);
   }
 
-  if (post.isDraft) {
-    throw new InvalidStateError('Cannot comment on a draft post.');
-  }
-
   await requestOperations({
     resourceType: 'post',
     operations: ['add_comment'],
