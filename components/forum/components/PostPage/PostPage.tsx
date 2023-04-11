@@ -1,6 +1,6 @@
 import CommentIcon from '@mui/icons-material/Comment';
 import { Box, Divider, Stack, Typography } from '@mui/material';
-import type { PostCategory } from '@prisma/client';
+import type { Post, PostCategory } from '@prisma/client';
 import { useRouter } from 'next/router';
 import { useEffect, useMemo, useState } from 'react';
 import useSWR from 'swr';
@@ -63,10 +63,11 @@ export function PostPage({
   showOtherCategoryPosts,
   newPostCategory
 }: Props) {
+  const [isDraft, setIsDraft] = useState(post?.isDraft ?? false);
   const currentSpace = useCurrentSpace();
   const { user } = useUser();
   const { categories, getForumCategoryById } = useForumCategories();
-
+  const [isPublishingDraftPost, setIsPublishingDraftPost] = useState(false);
   // We should only set writeable categories for new post
   const [categoryId, setCategoryId] = useState(
     (() => {
@@ -115,7 +116,7 @@ export function PostPage({
     }
   }, [post]);
 
-  async function createForumPost(isDraft: boolean) {
+  async function createForumPost(_isDraft: boolean) {
     if (checkIsContentEmpty(formInputs.content) || !categoryId) {
       throw new Error('Missing required fields to save forum post');
     }
@@ -135,9 +136,21 @@ export function PostPage({
         contentText: formInputs.contentText ?? '',
         spaceId,
         title: formInputs.title,
-        isDraft
+        isDraft: _isDraft
       });
       router.push(`/${router.query.domain}/forum/post/${newPost.path}`);
+    }
+  }
+
+  async function publishDraftPost(draftPost: Post) {
+    if (!isPublishingDraftPost) {
+      setIsPublishingDraftPost(true);
+      await charmClient.forum.updateForumPost(draftPost.id, {
+        isDraft: false
+      });
+      setIsPublishingDraftPost(false);
+      setIsDraft(false);
+      router.push(`/${router.query.domain}/forum/post/${draftPost.path}`);
     }
   }
 
@@ -160,6 +173,8 @@ export function PostPage({
     disabledTooltip = 'Content is required';
   } else if (!categoryId) {
     disabledTooltip = 'Category is required';
+  } else if (isPublishingDraftPost) {
+    disabledTooltip = 'Publishing draft post';
   }
 
   const topLevelComments: PostCommentWithVoteAndChildren[] = useMemo(() => {
@@ -184,7 +199,7 @@ export function PostPage({
     <>
       {post?.proposalId && <ProposalBanner type='post' proposalId={post.proposalId} />}
       <ScrollableWindow>
-        {post?.isDraft && <DraftPostBanner />}
+        {isDraft && <DraftPostBanner />}
         <Stack>
           <Stack flexDirection='row'>
             <Container top={50}>
@@ -214,30 +229,38 @@ export function PostPage({
               {canEdit && (
                 <Stack flexDirection='row' gap={1} justifyContent='flex-end' my={2}>
                   {!post && (
-                    <Box display='flex' flexDirection='row' justifyContent='right'>
-                      <Button
-                        disabled={Boolean(disabledTooltip) || !contentUpdated}
-                        disabledTooltip={disabledTooltip}
-                        onClick={() => createForumPost(true)}
-                        color='secondary'
-                        variant='outlined'
-                      >
-                        Save draft
-                      </Button>
-                    </Box>
-                  )}
-                  <Box display='flex' flexDirection='row' justifyContent='right'>
                     <Button
                       disabled={Boolean(disabledTooltip) || !contentUpdated}
                       disabledTooltip={disabledTooltip}
-                      onClick={() => createForumPost(false)}
+                      onClick={() => createForumPost(true)}
+                      color='secondary'
+                      variant='outlined'
                     >
-                      {post ? 'Update' : 'Post'}
+                      Save draft
                     </Button>
-                  </Box>
+                  )}
+                  {post && isDraft && (
+                    <Button
+                      disabled={Boolean(disabledTooltip) || isPublishingDraftPost}
+                      disabledTooltip={disabledTooltip}
+                      onClick={() => publishDraftPost(post)}
+                      color='secondary'
+                      variant='outlined'
+                      loading={isPublishingDraftPost}
+                    >
+                      Publish draft
+                    </Button>
+                  )}
+                  <Button
+                    disabled={Boolean(disabledTooltip) || !contentUpdated}
+                    disabledTooltip={disabledTooltip}
+                    onClick={() => createForumPost(false)}
+                  >
+                    {post ? 'Update' : 'Post'}
+                  </Button>
                 </Stack>
               )}
-              {post && !post.isDraft && (
+              {post && !isDraft && (
                 <>
                   {!!permissions?.add_comment && (
                     <Box my={2} data-test='new-top-level-post-comment'>
