@@ -25,7 +25,8 @@ describe('createForumPost', () => {
       createdBy: user.id,
       spaceId: space.id,
       title: 'Test',
-      categoryId: category.id
+      categoryId: category.id,
+      isDraft: false
     });
 
     expect(createdPage).toMatchObject(
@@ -51,7 +52,8 @@ describe('createForumPost', () => {
         createdBy: user.id,
         spaceId: space.id,
         title: 'Test',
-        categoryId: otherSpaceCategory.id
+        categoryId: otherSpaceCategory.id,
+        isDraft: false
       })
     ).rejects.toBeInstanceOf(InsecureOperationError);
   });
