@@ -1,9 +1,11 @@
+import ArticleOutlinedIcon from '@mui/icons-material/ArticleOutlined';
 import OpenInFullIcon from '@mui/icons-material/OpenInFull';
 import { Box } from '@mui/material';
 import type { PostCategory } from '@prisma/client';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
 import { useEffect, useRef, useState } from 'react';
+import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 import Dialog from 'components/common/BoardEditor/focalboard/src/components/dialog';
@@ -11,6 +13,7 @@ import Button from 'components/common/Button';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { PageActions } from 'components/common/PageActions';
 import { usePostPermissions } from 'components/forum/hooks/usePostPermissions';
+import { useUser } from 'hooks/useUser';
 import type { PostWithVotes } from 'lib/forums/posts/interfaces';
 
 import type { FormInputs } from '../interfaces';
@@ -31,6 +34,10 @@ export function PostDialog({ post, spaceId, onClose, open, newPostCategory }: Pr
   const [formInputs, setFormInputs] = useState<FormInputs>(post ?? { title: '', content: null, contentText: '' });
   const [contentUpdated, setContentUpdated] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const { user } = useUser();
+  const { data: draftedPosts = [], isLoading } = useSWR(user ? `/users/${user.id}/drafted-posts` : null, () =>
+    charmClient.forum.listDraftPosts({ spaceId })
+  );
 
   const permissions = usePostPermissions({
     postIdOrPath: post?.id as string,
@@ -85,22 +92,37 @@ export function PostDialog({ post, spaceId, onClose, open, newPostCategory }: Pr
     <Dialog
       fullWidth
       toolbar={
-        post ? (
-          <Box display='flex' justifyContent='space-between'>
-            <Button
-              data-test='open-post-as-page'
-              size='small'
-              color='secondary'
-              href={relativePath}
-              variant='text'
-              startIcon={<OpenInFullIcon fontSize='small' />}
-            >
-              Open as Page
-            </Button>
-          </Box>
-        ) : (
-          <div />
-        )
+        <>
+          {post ? (
+            <Box display='flex' justifyContent='space-between'>
+              <Button
+                data-test='open-post-as-page'
+                size='small'
+                color='secondary'
+                href={relativePath}
+                variant='text'
+                startIcon={<OpenInFullIcon fontSize='small' />}
+              >
+                Open as Page
+              </Button>
+            </Box>
+          ) : (
+            <div />
+          )}
+          {!isLoading && draftedPosts.length ? (
+            <Box display='flex' justifyContent='space-between'>
+              <Button
+                data-test='view-drafted-posts'
+                size='small'
+                color='secondary'
+                variant='text'
+                startIcon={<ArticleOutlinedIcon fontSize='small' />}
+              >
+                View {draftedPosts.length} draft{draftedPosts.length > 1 ? 's' : ''}
+              </Button>
+            </Box>
+          ) : null}
+        </>
       }
       toolsMenu={
         post && (

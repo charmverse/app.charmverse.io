@@ -20,7 +20,6 @@ handler
   .get(requireKeys<ListForumPostsRequest>(['spaceId'], 'query'), getPosts)
   .post(requireUser, requireKeys<CreateForumPostInput>(['categoryId'], 'body'), createForumPostController);
 
-// TODO - Update posts
 async function getPosts(req: NextApiRequest, res: NextApiResponse<PaginatedPostList>) {
   const postQuery = req.query as any as ListForumPostsRequest;
   const userId = req.session.user?.id as string | undefined;
