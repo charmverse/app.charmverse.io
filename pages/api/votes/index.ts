@@ -90,17 +90,6 @@ async function createVote(req: NextApiRequest, res: NextApiResponse<ExtendedVote
         }
       })
     : null;
-
-  const spaceId = existingPage?.spaceId || existingPost?.spaceId;
-
-  // if (!spaceId) {
-  //   throw new DataNotFoundError(`Could not find page or post with id: ${pageId || postId}.`);
-  // } else if (existingPage && existingPost) {
-  //   throw new DataNotFoundError(
-  //     `Cannot create poll as linked page with id ${pageId} and post with id ${postId} were both found.`
-  //   );
-  // }
-
   // User must be proposal author or a space admin to create a poll
   if (existingPage?.type === 'proposal' && existingPage.proposalId && newVote.context === 'proposal') {
     const permissions = await computeProposalPermissions({
