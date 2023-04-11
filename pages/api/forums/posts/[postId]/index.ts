@@ -50,17 +50,20 @@ async function updateForumPostController(req: NextApiRequest, res: NextApiRespon
 
   const post = await updateForumPost(postId, req.body);
 
-  relay.broadcast(
-    {
-      type: 'post_updated',
-      payload: {
-        id: postId,
-        createdBy: post.createdBy,
-        categoryId: post.categoryId
-      }
-    },
-    post.spaceId
-  );
+  if (!post.isDraft) {
+    relay.broadcast(
+      {
+        type: 'post_updated',
+        payload: {
+          id: postId,
+          createdBy: post.createdBy,
+          categoryId: post.categoryId
+        }
+      },
+      post.spaceId
+    );
+  }
+
   res.status(200).end();
 }
 
@@ -77,16 +80,18 @@ async function deleteForumPostController(req: NextApiRequest, res: NextApiRespon
 
   const post = await deleteForumPost(postId);
 
-  relay.broadcast(
-    {
-      type: 'post_deleted',
-      payload: {
-        id: postId,
-        categoryId: post.categoryId
-      }
-    },
-    post.spaceId
-  );
+  if (!post.isDraft) {
+    relay.broadcast(
+      {
+        type: 'post_deleted',
+        payload: {
+          id: postId,
+          categoryId: post.categoryId
+        }
+      },
+      post.spaceId
+    );
+  }
 
   res.status(200).end();
 }
