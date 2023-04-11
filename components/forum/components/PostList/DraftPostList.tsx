@@ -2,16 +2,39 @@ import ArticleOutlinedIcon from '@mui/icons-material/ArticleOutlined';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import { List, ListItemButton, ListItemIcon, ListItemText, Stack, Typography } from '@mui/material';
 import type { Post } from '@prisma/client';
+import type { KeyedMutator } from 'swr';
 
 import charmClient from 'charmClient';
 import { useForumCategories } from 'hooks/useForumCategories';
 import { relativeTime } from 'lib/utilities/dates';
 
-export function DraftPostList({ draftPosts, onClick }: { draftPosts: Post[]; onClick: (post: Post) => void }) {
+import { usePostDialog } from '../PostDialog/hooks/usePostDialog';
+
+export function DraftPostList({
+  draftPosts,
+  onClick,
+  onClose,
+  mutateDraftPosts
+}: {
+  onClose: VoidFunction;
+  draftPosts: Post[];
+  onClick: (post: Post) => void;
+  mutateDraftPosts: KeyedMutator<Post[]>;
+}) {
   const { categories } = useForumCategories();
+  const { showPost } = usePostDialog();
   async function deleteDraftPost(draftPost: Post) {
     try {
       await charmClient.forum.deleteForumPost(draftPost.id);
+      showPost({
+        postId: null
+      });
+      onClose();
+      mutateDraftPosts(
+        (currentDraftPosts) =>
+          currentDraftPosts?.filter((currentDraftPost) => currentDraftPost.id !== draftPost.id) ?? [],
+        { revalidate: false }
+      );
     } catch (err) {
       //
     }
@@ -37,7 +60,14 @@ export function DraftPostList({ draftPosts, onClick }: { draftPosts: Post[]; onC
               </Stack>
             </ListItemText>
             <ListItemIcon>
-              <DeleteOutlinedIcon fontSize='medium' color='error' onClick={() => deleteDraftPost(draftPost)} />
+              <DeleteOutlinedIcon
+                fontSize='medium'
+                color='error'
+                onClick={(e) => {
+                  e.stopPropagation();
+                  deleteDraftPost(draftPost);
+                }}
+              />
             </ListItemIcon>
           </ListItemButton>
         );

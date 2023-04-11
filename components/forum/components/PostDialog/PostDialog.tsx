@@ -39,9 +39,11 @@ export function PostDialog({ post, spaceId, onClose, open, newPostCategory }: Pr
   const [contentUpdated, setContentUpdated] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const { user } = useUser();
-  const { data: draftedPosts = [], isLoading } = useSWR(user ? `/users/${user.id}/drafted-posts` : null, () =>
-    charmClient.forum.listDraftPosts({ spaceId })
-  );
+  const {
+    data: draftedPosts = [],
+    isLoading,
+    mutate: mutateDraftPosts
+  } = useSWR(user ? `/users/${user.id}/drafted-posts` : null, () => charmClient.forum.listDraftPosts({ spaceId }));
 
   const { showPost } = usePostDialog();
 
@@ -182,7 +184,12 @@ export function PostDialog({ post, spaceId, onClose, open, newPostCategory }: Pr
         onConfirm={close}
       />
       <Modal open={isDraftPostListOpen} onClose={() => setIsDraftPostListOpen(false)}>
-        <DraftPostList onClick={showDraftPost} draftPosts={draftedPosts} />
+        <DraftPostList
+          onClose={() => setIsDraftPostListOpen(false)}
+          onClick={showDraftPost}
+          draftPosts={draftedPosts}
+          mutateDraftPosts={mutateDraftPosts}
+        />
       </Modal>
     </Dialog>
   );
