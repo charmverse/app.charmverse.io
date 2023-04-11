@@ -6,7 +6,7 @@ import useSWR from 'swr';
 import charmClient from 'charmClient';
 import { usePostDialog } from 'components/forum/components/PostDialog/hooks/usePostDialog';
 import { usePostByPath } from 'components/forum/hooks/usePostByPath';
-import useTasks from 'components/nexus/hooks/useTasks';
+import { useTasks } from 'components/nexus/hooks/useTasks';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { ExtendedVote, VoteDTO } from 'lib/votes/interfaces';
 import type { GetTasksResponse } from 'pages/api/tasks/list';

@@ -10,7 +10,6 @@ import type { ReactNode } from 'react';
 
 import Button from 'components/common/Button';
 import { IntegrationSettings } from 'components/integrations/IntegrationsPage';
-import TasksPage from 'components/nexus/TasksPage';
 import ProfileSettings from 'components/profile/ProfileSettings';
 import { ApiSettings } from 'components/settings/api/Api';
 import type { SpaceSettingsTab, UserSettingsTab } from 'components/settings/config';
@@ -57,10 +56,6 @@ function TabView(props: { space?: Space; tab: SpaceSettingsTab | UserSettingsTab
 
   if (tab.path === ACCOUNT_TABS[1].path) {
     return <ProfileSettings />;
-  }
-
-  if (tab.path === ACCOUNT_TABS[2].path) {
-    return <TasksPage />;
   }
 
   return null;

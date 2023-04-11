@@ -17,7 +17,6 @@ import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { MultiSigConnectCard } from 'components/integrations/components/MultiSigConnectCard';
 import Legend from 'components/settings/Legend';
 import useMultiWalletSigs from 'hooks/useMultiWalletSigs';
-import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import useGnosisSigner from 'hooks/useWeb3Signer';
@@ -47,9 +46,6 @@ export function MultiSigList() {
   const gnosisSigner = useGnosisSigner();
   const { user } = useUser();
   const [isLoadingSafes, setIsLoadingSafes] = useState(false);
-
-  const { onClick } = useSettingsDialog();
-  const openSettingsModal = () => onClick('notifications');
 
   async function importSafes() {
     if (gnosisSigner && user) {
@@ -104,12 +100,7 @@ export function MultiSigList() {
       </Legend>
 
       {sortedSafes.length === 0 && (
-        <MultiSigConnectCard
-          connectable={!!gnosisSigner}
-          loading={isLoadingSafes}
-          onClick={importSafes}
-          openNotificationsTab={openSettingsModal}
-        />
+        <MultiSigConnectCard connectable={!!gnosisSigner} loading={isLoadingSafes} onClick={importSafes} />
       )}
 
       {sortedSafes.length > 0 && (

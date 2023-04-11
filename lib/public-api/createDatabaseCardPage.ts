@@ -2,9 +2,11 @@ import type { Page } from '@prisma/client';
 import { v4, validate } from 'uuid';
 
 import { prisma } from 'db';
+import { prismaToBlock } from 'lib/focalboard/block';
 import { createPage } from 'lib/pages/server/createPage';
 import { getPagePath } from 'lib/pages/utils';
 import { InvalidInputError } from 'lib/utilities/errors';
+import { relay } from 'lib/websockets/relay';
 
 import { DatabasePageNotFoundError } from './errors';
 import type { PageProperty } from './interfaces';
@@ -130,7 +132,7 @@ export async function createDatabaseCardPage(
     }
   });
 
-  await createPage({
+  const page = await createPage({
     data: {
       author: {
         connect: {
@@ -168,6 +170,22 @@ export async function createDatabaseCardPage(
       }
     }
   });
+
+  relay.broadcast(
+    {
+      type: 'blocks_created',
+      payload: [prismaToBlock(cardBlock)]
+    },
+    cardBlock.spaceId
+  );
+
+  relay.broadcast(
+    {
+      type: 'pages_created',
+      payload: [page]
+    },
+    page.spaceId
+  );
 
   const card = new PageFromBlock(cardBlock, boardSchema);
 

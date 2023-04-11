@@ -1,10 +1,12 @@
 import { v4 } from 'uuid';
 
 import { prisma } from 'db';
+import { prismaToBlock } from 'lib/focalboard/block';
 import { getDatabaseDetails } from 'lib/pages/getDatabaseDetails';
 import type { FormResponseProperty } from 'lib/pages/interfaces';
 import { createDatabaseCardPage } from 'lib/public-api/createDatabaseCardPage';
 import { InvalidInputError } from 'lib/utilities/errors';
+import { relay } from 'lib/websockets/relay';
 import type { AddFormResponseInput, FormResponse } from 'lib/zapier/interfaces';
 import { parseFormData } from 'lib/zapier/parseFormData';
 
@@ -41,7 +43,7 @@ export async function createFormResponseCard({
 
   if (newProperties.length) {
     // Save new question properties
-    await prisma.block.update({
+    const updatedBoard = await prisma.block.update({
       where: {
         id: board.id
       },
@@ -52,6 +54,39 @@ export async function createFormResponseCard({
         }
       }
     });
+
+    const views = await prisma.block.findMany({
+      where: {
+        type: 'view',
+        parentId: updatedBoard.id
+      }
+    });
+
+    const updatedViewBlocks = await prisma.$transaction(
+      views.map((block) => {
+        return prisma.block.update({
+          where: { id: block.id },
+          data: {
+            fields: {
+              ...(block.fields as any),
+              visiblePropertyIds: [
+                ...new Set([...(block.fields as any).visiblePropertyIds, ...newProperties.map((p) => p.id)])
+              ]
+            },
+            updatedAt: new Date(),
+            updatedBy: userId
+          }
+        });
+      })
+    );
+
+    relay.broadcast(
+      {
+        type: 'blocks_updated',
+        payload: [prismaToBlock(updatedBoard), ...updatedViewBlocks.map(prismaToBlock)]
+      },
+      updatedBoard.spaceId
+    );
   }
 
   // Create card with form response entry
@@ -66,10 +101,10 @@ export async function createFormResponseCard({
   return card;
 }
 
-function createNewFormProperty(description: string, index: number = 0): FormResponseProperty {
+function createNewFormProperty(description: string): FormResponseProperty {
   return {
     id: v4(),
-    name: `Question ${index + 1}`,
+    name: description,
     type: 'text',
     options: [],
     description,
@@ -81,11 +116,19 @@ function mapAndCreateProperties(formResponses: FormResponse[], existingResponseP
   const newProperties: FormResponseProperty[] = [];
   const mappedProperties: Record<string, string> = {};
 
+  let index = 0;
   formResponses.forEach((response) => {
     let property = existingResponseProperties.find((p) => p.description === response.question);
+
     if (!property) {
-      const propertyIndex = existingResponseProperties.length + newProperties.length;
-      property = createNewFormProperty(response.question, propertyIndex);
+      property = createNewFormProperty(response.question);
+
+      if (response.question.toLowerCase() === 'created at') {
+        property.name = response.question;
+      } else {
+        index += 1;
+        property.name = `Question ${index}`;
+      }
       newProperties.push(property);
     }
 

@@ -26,7 +26,7 @@ import useSWR from 'swr';
 import charmClient from 'charmClient';
 import Avatar from 'components/common/Avatar';
 import Modal from 'components/common/Modal';
-import useTasks from 'components/nexus/hooks/useTasks';
+import { useTasks } from 'components/nexus/hooks/useTasks';
 import { VoteActionsMenu } from 'components/votes/components/VoteActionsMenu';
 import VoteStatusChip from 'components/votes/components/VoteStatusChip';
 import { useMembers } from 'hooks/useMembers';

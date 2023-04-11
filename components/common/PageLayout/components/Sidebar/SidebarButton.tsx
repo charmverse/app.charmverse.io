@@ -1,6 +1,7 @@
 import type { Theme } from '@emotion/react';
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
+import type { ReactNode } from 'react';
 
 import Link from 'components/common/Link';
 
