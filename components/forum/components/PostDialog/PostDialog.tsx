@@ -124,7 +124,7 @@ export function PostDialog({ post, spaceId, onClose, open, newPostCategory }: Pr
           ) : (
             <div />
           )}
-          {!isLoading && draftedPosts.length ? (
+          {!isLoading && draftedPosts.length && !post ? (
             <Box display='flex' justifyContent='space-between'>
               <Button
                 data-test='view-drafted-posts'
