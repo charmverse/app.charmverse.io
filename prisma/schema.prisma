@@ -217,6 +217,10 @@ enum Feature {
   bounties
 }
 
+enum ApiPageKeyType {
+  typeform
+}
+
 model Space {
   id                          String                            @id @default(uuid()) @db.Uuid
   deletedAt                   DateTime?
@@ -343,6 +347,7 @@ model Page {
   convertedProposalId String?          @unique @db.Uuid
   convertedProposal   Proposal?        @relation(fields: [convertedProposalId], references: [id], onDelete: SetNull, onUpdate: Cascade, name: "convertedProposal")
   comments            PageComment[]
+  apiPageKeys         ApiPageKey[]
 
   @@index([bountyId])
   @@index([cardId])
@@ -521,6 +526,7 @@ model User {
   GoogleCredential          GoogleCredential[]
   PageComment               PageComment[]
   verifiedEmails            VerifiedEmail[]
+  apiPageKeys               ApiPageKey[]
 }
 
 model VerifiedEmail {
@@ -1363,4 +1369,20 @@ model PostCategoryPermission {
   @@index([postCategoryId, roleId])
   @@index([postCategoryId, spaceId])
   @@index([postCategoryId, public])
+}
+
+model ApiPageKey {
+  createdAt DateTime @default(now())
+  updatedAt DateTime  @updatedAt
+  createdBy String @db.Uuid
+  pageId    String @db.Uuid
+  apiKey    String
+  type      ApiPageKeyType
+  page      Page   @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  user      User   @relation(fields: [createdBy], references: [id], onDelete: Cascade)
+
+  @@unique([pageId, type])
+  @@unique([apiKey])
+  @@index([pageId])
+  @@index([apiKey])
 }

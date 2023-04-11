@@ -2,20 +2,28 @@ import styled from '@emotion/styled';
 import AddIcon from '@mui/icons-material/Add';
 import AddCircleIcon from '@mui/icons-material/AddCircleOutline';
 import { Box, Card, Grid, ListItemIcon, MenuItem, TextField, Typography } from '@mui/material';
+import type { ApiPageKey } from '@prisma/client';
+import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useMemo, useState } from 'react';
 import { RiGoogleFill } from 'react-icons/ri';
+import { SiTypeform } from 'react-icons/si';
 import { TbDatabase } from 'react-icons/tb';
+import useSWRMutation from 'swr/mutation';
 
+import charmClient from 'charmClient';
 import PagesList from 'components/common/CharmEditor/components/PageList';
+import ConfirmApiPageKeyModal from 'components/common/Modal/ConfirmApiPageKeyModal';
+import { useCurrentPage } from 'hooks/useCurrentPage';
 import { usePages } from 'hooks/usePages';
 import type { BoardView, BoardViewFields, ViewSourceType } from 'lib/focalboard/boardView';
-import type { PageMeta } from 'lib/pages';
 import { isTruthy } from 'lib/utilities/types';
 
 import { GoogleDataSource } from './GoogleDataSource/GoogleDataSource';
 import { SidebarHeader } from './viewSidebar';
 
 type FormStep = 'select_source' | 'configure_source';
+
+const webhookBaseUrl = 'https://app.charmverse.io/api/v1/webhooks/addToDatabase';
 
 export type DatabaseSourceProps = {
   onCreate?: () => void;
@@ -38,9 +46,29 @@ const SidebarContent = styled.div`
 export function ViewSourceOptions(props: ViewSourceOptionsProps) {
   const activeView = props.view;
   const activeSourceType = activeView?.fields.sourceType;
+  const { currentPageId } = useCurrentPage();
 
   const [sourceType, setSourceType] = useState<ViewSourceType | undefined>();
   const [formStep, setStep] = useState<FormStep>('select_source');
+
+  const {
+    data: webhookApi,
+    trigger: createWebhookApiKey,
+    isMutating: isLoadingWebhookApiKeyCreation
+  } = useSWRMutation(
+    `/api/pages/${currentPageId}/api-key`,
+    (_url, { arg }: Readonly<{ arg: { pageId: string; type: ApiPageKey['type'] } }>) =>
+      charmClient.createApiPageKey(arg)
+  );
+
+  const typeformPopup = usePopupState({ variant: 'popover', popupId: 'typeformPopup' });
+
+  const handleApiKeyClick = async (type: ApiPageKey['type']) => {
+    if (currentPageId) {
+      await createWebhookApiKey({ pageId: currentPageId, type });
+      typeformPopup.open();
+    }
+  };
 
   function selectSourceType(_source: ViewSourceType) {
     return () => {
@@ -77,6 +105,13 @@ export function ViewSourceOptions(props: ViewSourceOptionsProps) {
                 New database
               </SourceType>
             )}
+            <SourceType
+              active={false}
+              onClick={() => (isLoadingWebhookApiKeyCreation ? {} : handleApiKeyClick('typeform'))}
+            >
+              <SiTypeform style={{ fontSize: 24 }} />
+              Typeform
+            </SourceType>
           </Grid>
         )}
         {formStep === 'configure_source' && sourceType === 'board_page' && (
@@ -94,6 +129,24 @@ export function ViewSourceOptions(props: ViewSourceOptionsProps) {
           />
         )}
       </Box>
+      <ConfirmApiPageKeyModal
+        question={
+          <Typography sx={{ wordBreak: 'break-word' }}>
+            Go to your typeform form and click Connect - Webhooks - Add a Webhook
+            <br />
+            Paste the following URL:
+            <br />
+            <i>{`${webhookBaseUrl}/${webhookApi?.apiKey}`}</i>
+          </Typography>
+        }
+        title='Typeform webhook'
+        open={typeformPopup.isOpen}
+        onClose={typeformPopup.close}
+        onConfirm={() => {
+          props.onCreate?.();
+          typeformPopup.close();
+        }}
+      />
     </>
   );
 }
