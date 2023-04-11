@@ -6,7 +6,6 @@ import { uniqueValues } from 'lib/utilities/array';
 import { InvalidInputError } from 'lib/utilities/errors';
 
 import { AvailableProposalCategoryPermissions } from './availableProposalCategoryPermissions.class';
-import { hasSpaceWideProposalReviewerPermission } from './hasSpaceWideProposalReviewerPermission';
 import type { ProposalCategoryWithPermissions } from './interfaces';
 import { proposalCategoryPermissionsMapping } from './mapping';
 
@@ -106,13 +105,6 @@ export async function filterAccessibleProposalCategories({
       acc[permission.proposalCategoryId].push(permission);
       return acc;
     }, {} as Record<string, ProposalCategoryPermission[]>);
-
-    // Optimise the computation to mutate returned values inside the filter operation
-    const hasSpaceWideReviewer = await hasSpaceWideProposalReviewerPermission({
-      spaceId,
-      userId
-    });
-
     const filteredProposalCategory = proposalCategories.filter((category) => {
       const relevantPermissions = mappedProposalCategoryPermissions[category.id];
 
