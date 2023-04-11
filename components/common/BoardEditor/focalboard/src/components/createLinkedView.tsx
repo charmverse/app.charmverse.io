@@ -1,6 +1,7 @@
 import { useTheme } from '@emotion/react';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import { Box, Collapse, Stack, Typography } from '@mui/material';
+import type { ChangeEvent } from 'react';
 import { useState } from 'react';
 
 import Button from 'components/common/Button';
@@ -11,7 +12,10 @@ import { StyledSidebar } from './viewSidebar/viewSidebar';
 import type { DatabaseSourceProps } from './viewSidebar/viewSourceOptions';
 import { ViewSourceOptions } from './viewSidebar/viewSourceOptions';
 
-type CreateLinkedViewProps = DatabaseSourceProps & { readOnly: boolean };
+type CreateLinkedViewProps = DatabaseSourceProps & {
+  readOnly: boolean;
+  onCsvImport?: (event: ChangeEvent<HTMLInputElement>) => void;
+};
 
 type SidebarState = 'select-source' | null;
 
