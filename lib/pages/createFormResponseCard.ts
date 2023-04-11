@@ -76,10 +76,10 @@ export async function createFormResponseCard({
   return card;
 }
 
-function createNewFormProperty(description: string, index: number = 0): FormResponseProperty {
+function createNewFormProperty(description: string): FormResponseProperty {
   return {
     id: v4(),
-    name: `Question ${index + 1}`,
+    name: description,
     type: 'text',
     options: [],
     description,
@@ -91,11 +91,19 @@ function mapAndCreateProperties(formResponses: FormResponse[], existingResponseP
   const newProperties: FormResponseProperty[] = [];
   const mappedProperties: Record<string, string> = {};
 
+  let index = 0;
   formResponses.forEach((response) => {
     let property = existingResponseProperties.find((p) => p.description === response.question);
+
     if (!property) {
-      const propertyIndex = existingResponseProperties.length + newProperties.length;
-      property = createNewFormProperty(response.question, propertyIndex);
+      property = createNewFormProperty(response.question);
+
+      if (response.question.toLowerCase() === 'created at') {
+        property.name = response.question;
+      } else {
+        index += 1;
+        property.name = `Question ${index}`;
+      }
       newProperties.push(property);
     }
 
