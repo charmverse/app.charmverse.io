@@ -54,7 +54,6 @@ export async function listPermissions({ spaceId }: { spaceId: string }): Promise
         createPage: true,
         createBounty: true,
         createForumCategory: true,
-        moderateForums: true,
         reviewProposals: true
       }
     });
