@@ -126,7 +126,7 @@ export function NotificationModal() {
           position='relative'
           height={isMobile ? '95vh' : '80vh'}
           overflow='hidden'
-          sx={{ background: isMobile ? 'none' : (theme) => theme.palette.sidebar.avatarHighlight }}
+          sx={{ background: isMobile ? 'none' : (theme) => theme.palette.background.paper }}
         >
           <Box role='tabpanel' height='100%'>
             <Box width='100%'>
