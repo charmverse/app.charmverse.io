@@ -1,19 +1,22 @@
 import CelebrationIcon from '@mui/icons-material/Celebration';
 import { Box, Card, Divider, Typography } from '@mui/material';
-import { Fragment } from 'react';
+import { Fragment, useMemo } from 'react';
 
-import { useNotificationPreview } from 'components/common/PageLayout/components/Header/components/NotificationPreview/useNotificationPreview';
+import { useNotifications } from 'components/common/PageLayout/components/Header/components/NotificationPreview/useNotifications';
 
 import { NotificationPreview } from './NotificationPreview';
 
-export function NotificationPreviewPopover({
-  onSeeAllClick,
-  close
-}: {
-  onSeeAllClick: VoidFunction;
-  close: VoidFunction;
-}) {
-  const { notificationPreviews, markAsRead } = useNotificationPreview();
+const MAX_COUNT = 5;
+
+export function NotificationPreviewPopover({ close }: { close: VoidFunction }) {
+  const { unmarkedNotificationPreviews, markAsRead, markedNotificationPreviews, openNotificationsModal } =
+    useNotifications();
+
+  const latestNotifications = useMemo(() => {
+    return [...unmarkedNotificationPreviews, ...markedNotificationPreviews]
+      .sort((a, b) => (a.createdAt > b.createdAt ? -1 : 1))
+      .slice(0, MAX_COUNT);
+  }, [unmarkedNotificationPreviews, markedNotificationPreviews]);
 
   return (
     <Box>
@@ -24,8 +27,8 @@ export function NotificationPreviewPopover({
       </Card>
       <Divider />
       <Box maxHeight={500} sx={{ overflowY: 'auto', overflowX: 'hidden' }}>
-        {notificationPreviews.length > 0 ? (
-          notificationPreviews.map((notification) => (
+        {latestNotifications.length > 0 ? (
+          latestNotifications.map((notification) => (
             <Fragment key={notification.taskId}>
               <NotificationPreview notification={notification} markAsRead={markAsRead} onClose={close} />
               <Divider />
@@ -50,7 +53,10 @@ export function NotificationPreviewPopover({
       </Box>
       <Card>
         <Box
-          onClick={onSeeAllClick}
+          onClick={() => {
+            close();
+            openNotificationsModal();
+          }}
           display='flex'
           alignItems='center'
           justifyContent='center'

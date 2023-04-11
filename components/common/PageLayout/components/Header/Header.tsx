@@ -40,7 +40,6 @@ import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { usePageFromPath } from 'hooks/usePageFromPath';
 import { usePagePermissions } from 'hooks/usePagePermissions';
 import { usePages } from 'hooks/usePages';
-import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useToggleFavorite } from 'hooks/useToggleFavorite';
 import { useUser } from 'hooks/useUser';
@@ -263,7 +262,6 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
   const { permissions: pagePermissions } = usePagePermissions({
     pageIdOrPath: basePage ? basePage.id : (null as any)
   });
-  const { onClick: clickToOpenSettingsModal } = useSettingsDialog();
   const isForumPost = router.route === '/[domain]/forum/post/[pagePath]';
 
   const pagePath = isForumPost ? (router.query.pagePath as string) : null;
@@ -581,7 +579,7 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
           )}
           {/** End of CharmEditor page specific header content */}
 
-          {user && <NotificationButton onSeeAllClick={() => clickToOpenSettingsModal('notifications')} />}
+          {user && <NotificationButton />}
         </Box>
       </Box>
     </StyledToolbar>

@@ -8,7 +8,7 @@ import Button from 'components/common/BoardEditor/focalboard/src/widgets/buttons
 import { InputSearchMemberBase } from 'components/common/form/InputSearchMember';
 import { InputSearchReviewers } from 'components/common/form/InputSearchReviewers';
 import UserDisplay from 'components/common/UserDisplay';
-import useTasks from 'components/nexus/hooks/useTasks';
+import { useTasks } from 'components/nexus/hooks/useTasks';
 import ProposalCategoryInput from 'components/proposals/components/ProposalCategoryInput';
 import { ProposalStepper } from 'components/proposals/components/ProposalStepper/ProposalStepper';
 import { ProposalStepSummary } from 'components/proposals/components/ProposalStepSummary';
