@@ -5,6 +5,7 @@ import { mapPostCategoryPermissionToAssignee } from '../forum/mapPostCategoryPer
 import type { AssignedProposalCategoryPermission } from '../proposals/interfaces';
 import { mapProposalCategoryPermissionToAssignee } from '../proposals/mapProposalCategoryPermissionToAssignee';
 
+import { AvailableSpacePermissions } from './availableSpacePermissions';
 import type { AssignedSpacePermission } from './mapSpacePermissionToAssignee';
 import { mapSpacePermissionToAssignee } from './mapSpacePermissionToAssignee';
 
@@ -45,18 +46,13 @@ export async function listPermissions({ spaceId }: { spaceId: string }): Promise
 
   // add default member permissions if not defined
   if (space.filter((s) => s.assignee.group === 'space').length === 0) {
+    const allowedOperations = new AvailableSpacePermissions();
     space.push({
       assignee: {
         group: 'space',
         id: spaceId
       },
-      operations: {
-        createPage: false,
-        createBounty: false,
-        createForumCategory: false,
-        moderateForums: false,
-        reviewProposals: false
-      }
+      operations: allowedOperations.empty
     });
   }
 
