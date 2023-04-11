@@ -4,7 +4,7 @@ import useSWR from 'swr';
 import charmClient from 'charmClient';
 import type { SystemError } from 'lib/utilities/errors';
 
-import { usePostPermissions } from './usePostPermissions';
+import { usePostPermissions } from '../../../hooks/usePostPermissions';
 
 type Props = {
   postPath: string;

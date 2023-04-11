@@ -3,6 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { prisma } from 'db';
+import log from 'lib/log';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { mapNotificationActor } from 'lib/notifications/mapNotificationActor';
@@ -19,7 +20,7 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 handler
   .use(requireUser)
   .get(getVoteById)
-  .use(requireKeys(['deadline', 'pageId', 'voteOptions', 'title', 'type', 'threshold'], 'body'))
+  .use(requireKeys(['deadline', 'voteOptions', 'title', 'type', 'threshold'], 'body'))
   .post(createVote);
 
 async function getVoteById(req: NextApiRequest, res: NextApiResponse<Vote | { error: any }>) {
@@ -70,13 +71,13 @@ async function createVote(req: NextApiRequest, res: NextApiResponse<ExtendedVote
 
   const spaceId = existingPage?.spaceId || existingPost?.spaceId;
 
-  if (!spaceId) {
-    throw new DataNotFoundError(`Cannot create poll as linked page with id ${pageId} was not found.`);
-  } else if (existingPage && existingPost) {
-    throw new DataNotFoundError(
-      `Cannot create poll as linked page with id ${pageId} and post with id ${postId} were both found.`
-    );
-  }
+  // if (!spaceId) {
+  //   throw new DataNotFoundError(`Could not find page or post with id: ${pageId || postId}.`);
+  // } else if (existingPage && existingPost) {
+  //   throw new DataNotFoundError(
+  //     `Cannot create poll as linked page with id ${pageId} and post with id ${postId} were both found.`
+  //   );
+  // }
 
   // User must be proposal author or a space admin to create a poll
   if (existingPage?.type === 'proposal' && existingPage.proposalId && newVote.context === 'proposal') {
@@ -103,7 +104,6 @@ async function createVote(req: NextApiRequest, res: NextApiResponse<ExtendedVote
 
   const vote = await createVoteService({
     ...newVote,
-    spaceId,
     createdBy: userId
   } as VoteDTO);
   const voteAuthor = await prisma.user.findUnique({ where: { id: userId } });
@@ -126,7 +126,7 @@ async function createVote(req: NextApiRequest, res: NextApiResponse<ExtendedVote
 
   const space = await prisma.space.findUniqueOrThrow({ where: { id: vote.spaceId } });
 
-  let voteTask: VoteTask;
+  let voteTask: VoteTask | undefined;
   if (existingPage) {
     voteTask = {
       ...vote,
@@ -148,16 +148,18 @@ async function createVote(req: NextApiRequest, res: NextApiResponse<ExtendedVote
       pageTitle: existingPost.title
     };
   } else {
-    throw new Error('Cannot create vote task as no page or post was found.');
+    log.debug('Cannot create vote task as no page or post was found.');
   }
 
-  relay.broadcast(
-    {
-      type: 'votes_created',
-      payload: [voteTask]
-    },
-    vote.spaceId
-  );
+  if (voteTask) {
+    relay.broadcast(
+      {
+        type: 'votes_created',
+        payload: [voteTask]
+      },
+      vote.spaceId
+    );
+  }
 
   return res.status(201).json(vote);
 }

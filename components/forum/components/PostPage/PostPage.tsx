@@ -20,10 +20,10 @@ import { ScrollableWindow } from 'components/common/PageLayout';
 import { ProposalBanner } from 'components/common/ProposalBanner';
 import UserDisplay from 'components/common/UserDisplay';
 import { PostCommentForm } from 'components/forum/components/PostPage/components/PostCommentForm';
-import { usePostPermissions } from 'components/forum/hooks/usePostPermissions';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useForumCategories } from 'hooks/useForumCategories';
 import { useMembers } from 'hooks/useMembers';
+import { usePostPermissions } from 'hooks/usePostPermissions';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useUser } from 'hooks/useUser';
 import type { PostCommentWithVoteAndChildren } from 'lib/forums/comments/interface';
@@ -193,7 +193,7 @@ export function PostPage({
                   pageActionDisplay={null}
                   pageId={post?.id}
                   disablePageSpecificFeatures
-                  enableVoting={false}
+                  enableVoting={true}
                   isContentControlled
                   key={`${user?.id}.${post?.proposalId}.${canEdit}`}
                   content={formInputs.content as PageContent}

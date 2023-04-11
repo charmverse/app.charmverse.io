@@ -32,9 +32,10 @@ export async function createVote(vote: VoteDTO & { spaceId: string }): Promise<E
     if (post === 0) {
       throw new PageNotFoundError(postId);
     }
-  } else {
-    throw new Error('Either pageId or postId must be provided to create a vote');
   }
+  //  else {
+  //   throw new Error('Either pageId or postId must be provided to create a vote');
+  // }
 
   const dbVote = await prisma.vote.create({
     data: {

@@ -382,7 +382,7 @@ interface CharmEditorProps {
   pageActionDisplay?: IPageActionDisplayContext['currentPageActionDisplay'];
   disablePageSpecificFeatures?: boolean;
   isContentControlled?: boolean; // whether or not the parent component is controlling and updating the content
-  enableVoting?: boolean;
+  enableVoting: boolean;
   pageId?: string;
   containerWidth?: number;
   pageType?: PageType | 'post';
