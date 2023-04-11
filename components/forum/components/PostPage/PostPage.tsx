@@ -86,11 +86,11 @@ export function PostPage({
   const { getMemberById } = useMembers();
   const router = useRouter();
   const {
-    data: postComments,
+    data: postComments = [],
     mutate: setPostComments,
     isValidating
   } = useSWR(post ? `${post.id}/comments` : null, () =>
-    post ? charmClient.forum.listPostComments(post.id) : undefined
+    post && !post.isDraft ? charmClient.forum.listPostComments(post.id) : undefined
   );
 
   const permissions = usePostPermissions({ postIdOrPath: post?.id as string, isNewPost: !post });
@@ -235,50 +235,55 @@ export function PostPage({
                   </Box>
                 </Stack>
               )}
-              {post && !!permissions?.add_comment && (
-                <Box my={2} data-test='new-top-level-post-comment'>
-                  <PostCommentForm setPostComments={setPostComments} postId={post.id} />
-                </Box>
-              )}
-              <Divider
-                sx={{
-                  my: 2
-                }}
-              />
-              {isLoading ? (
-                <Box height={100}>
-                  <LoadingComponent size={24} isLoading label='Fetching comments' />
-                </Box>
-              ) : (
-                post && (
-                  <>
-                    {topLevelComments.length > 0 && (
-                      <Stack gap={1}>
-                        <CommentSort commentSort={commentSort} setCommentSort={setCommentSort} />
-                        {topLevelComments.map((comment) => (
-                          <PostComment
-                            post={post}
-                            permissions={permissions}
-                            setPostComments={setPostComments}
-                            comment={comment}
-                            key={comment.id}
-                          />
-                        ))}
-                      </Stack>
-                    )}
-                    {topLevelComments.length === 0 && (
-                      <Stack gap={1} alignItems='center' my={1}>
-                        <CommentIcon color='secondary' fontSize='large' />
-                        <Typography color='secondary' variant='h6'>
-                          No Comments Yet
-                        </Typography>
-                        {permissions?.add_comment && (
-                          <Typography color='secondary'>Be the first to share what you think!</Typography>
+              {post && !post.isDraft && (
+                <>
+                  {!!permissions?.add_comment && (
+                    <Box my={2} data-test='new-top-level-post-comment'>
+                      <PostCommentForm setPostComments={setPostComments} postId={post.id} />
+                    </Box>
+                  )}
+                  <Divider
+                    sx={{
+                      my: 2
+                    }}
+                  />
+
+                  {isLoading ? (
+                    <Box height={100}>
+                      <LoadingComponent size={24} isLoading label='Fetching comments' />
+                    </Box>
+                  ) : (
+                    post && (
+                      <>
+                        {topLevelComments.length > 0 && (
+                          <Stack gap={1}>
+                            <CommentSort commentSort={commentSort} setCommentSort={setCommentSort} />
+                            {topLevelComments.map((comment) => (
+                              <PostComment
+                                post={post}
+                                permissions={permissions}
+                                setPostComments={setPostComments}
+                                comment={comment}
+                                key={comment.id}
+                              />
+                            ))}
+                          </Stack>
                         )}
-                      </Stack>
-                    )}
-                  </>
-                )
+                        {topLevelComments.length === 0 && (
+                          <Stack gap={1} alignItems='center' my={1}>
+                            <CommentIcon color='secondary' fontSize='large' />
+                            <Typography color='secondary' variant='h6'>
+                              No Comments Yet
+                            </Typography>
+                            {permissions?.add_comment && (
+                              <Typography color='secondary'>Be the first to share what you think!</Typography>
+                            )}
+                          </Stack>
+                        )}
+                      </>
+                    )
+                  )}
+                </>
               )}
             </Container>
             {post && showOtherCategoryPosts && (

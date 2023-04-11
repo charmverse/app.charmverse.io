@@ -6,7 +6,7 @@ import { createPostComment } from 'lib/forums/comments/createPostComment';
 import type { CreatePostCommentInput, PostCommentWithVote } from 'lib/forums/comments/interface';
 import { listPostComments } from 'lib/forums/comments/listPostComments';
 import { PostNotFoundError } from 'lib/forums/posts/errors';
-import { onError, onNoMatch, requireUser } from 'lib/middleware';
+import { InvalidStateError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { requestOperations } from 'lib/permissions/requestOperations';
 import { withSessionRoute } from 'lib/session/withSession';
 
@@ -38,11 +38,15 @@ async function createPostCommentHandler(req: NextApiRequest, res: NextApiRespons
 
   const post = await prisma.post.findUnique({
     where: { id: postId },
-    select: { spaceId: true }
+    select: { spaceId: true, isDraft: true }
   });
 
   if (!post) {
     throw new PostNotFoundError(postId);
+  }
+
+  if (post.isDraft) {
+    throw new InvalidStateError('Cannot comment on a draft post.');
   }
 
   await requestOperations({
