@@ -21,7 +21,13 @@ function getForumContent(n: ForumTask) {
     : `New forum post "${postTitle}"`;
 }
 
-export function getForumNotificationPreviewItems(notifications: ForumTask[]) {
+export function getForumNotificationPreviewItems({
+  notifications,
+  unmarked
+}: {
+  notifications: ForumTask[];
+  unmarked: boolean;
+}) {
   return notifications.map((n) => ({
     taskId: n.taskId,
     createdAt: n.createdAt,
@@ -31,7 +37,8 @@ export function getForumNotificationPreviewItems(notifications: ForumTask[]) {
     type: NotificationType.forum,
     href: `/${n.spaceDomain}/forum/post/${n.postPath}`,
     content: getForumContent(n),
-    title: 'Forum Post'
+    title: 'Forum Post',
+    unmarked
   }));
 }
 
@@ -42,7 +49,13 @@ function getDiscussionContent(n: DiscussionTask) {
     : `${createdBy?.username} left a comment.`;
 }
 
-export function getDiscussionsNotificationPreviewItems(notifications: DiscussionTask[]) {
+export function getDiscussionsNotificationPreviewItems({
+  notifications,
+  unmarked
+}: {
+  notifications: DiscussionTask[];
+  unmarked: boolean;
+}) {
   return notifications.map((n) => ({
     taskId: n.taskId,
     createdAt: n.createdAt,
@@ -54,7 +67,8 @@ export function getDiscussionsNotificationPreviewItems(notifications: Discussion
       n.commentId ? `commentId=${n.commentId}` : `mentionId=${n.mentionId}`
     }`,
     content: getDiscussionContent(n),
-    title: 'Discussion'
+    title: 'Discussion',
+    unmarked
   }));
 }
 
@@ -98,7 +112,13 @@ function getBountyContent(n: BountyTask) {
     : `Bounty status ${title} updated.`;
 }
 
-export function getBountiesNotificationPreviewItems(notifications: BountyTask[]) {
+export function getBountiesNotificationPreviewItems({
+  notifications,
+  unmarked
+}: {
+  notifications: BountyTask[];
+  unmarked: boolean;
+}) {
   return notifications.map((n) => ({
     taskId: n.taskId,
     createdAt: n.createdAt,
@@ -108,7 +128,8 @@ export function getBountiesNotificationPreviewItems(notifications: BountyTask[])
     type: NotificationType.bounty,
     href: `/${n.spaceDomain}/${n.pagePath}`,
     content: getBountyContent(n),
-    title: 'Bounty'
+    title: 'Bounty',
+    unmarked
   }));
 }
 
@@ -145,7 +166,15 @@ function getProposalNotificationStatus(status: ProposalStatus) {
   }
 }
 
-export function getProposalsNotificationPreviewItems(notifications: ProposalTask[], currentUserId?: string) {
+export function getProposalsNotificationPreviewItems({
+  notifications,
+  currentUserId,
+  unmarked
+}: {
+  notifications: ProposalTask[];
+  currentUserId?: string;
+  unmarked: boolean;
+}) {
   return notifications.map((n) => ({
     taskId: n.taskId,
     createdAt: n.createdAt,
@@ -155,7 +184,8 @@ export function getProposalsNotificationPreviewItems(notifications: ProposalTask
     type: NotificationType.proposal,
     href: `/${n.spaceDomain}/${n.pagePath}`,
     content: getProposalContent(n, currentUserId || ''),
-    title: `Proposal: ${getProposalNotificationStatus(n.status)}`
+    title: `Proposal: ${getProposalNotificationStatus(n.status)}`,
+    unmarked
   }));
 }
 
@@ -173,7 +203,15 @@ const getVoteContent = (n: VoteTask, currentUserId: string) => {
     : `Poll "${title}" created.`;
 };
 
-export function getVoteNotificationPreviewItems(notifications: VoteTask[], currentUserId?: string) {
+export function getVoteNotificationPreviewItems({
+  notifications,
+  unmarked,
+  currentUserId
+}: {
+  notifications: VoteTask[];
+  currentUserId?: string;
+  unmarked: boolean;
+}) {
   return notifications.map((n) => ({
     taskId: n.taskId,
     createdAt: n.createdAt,
@@ -183,6 +221,7 @@ export function getVoteNotificationPreviewItems(notifications: VoteTask[], curre
     type: NotificationType.vote,
     href: `/${n.spaceDomain}/${n.pagePath}?voteId=${n.taskId}`,
     content: getVoteContent(n, currentUserId || ''),
-    title: 'New Poll'
+    title: 'New Poll',
+    unmarked
   }));
 }

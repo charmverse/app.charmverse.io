@@ -30,6 +30,7 @@ export type NotificationDetails = {
   content: string;
   href: string;
   title: string;
+  unmarked: boolean;
 };
 
 export type NotificationDisplayType = 'all' | 'bounty' | 'vote' | 'mention' | 'proposal' | 'forum';
@@ -74,22 +75,30 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
   const unmarkedNotificationPreviews: NotificationDetails[] = useMemo(() => {
     if (!tasks) return [];
     return [
-      ...getVoteNotificationPreviewItems(tasks.votes.unmarked, currentUserId),
-      ...getProposalsNotificationPreviewItems(tasks.proposals.unmarked, currentUserId),
-      ...getBountiesNotificationPreviewItems(tasks.bounties.unmarked),
-      ...getDiscussionsNotificationPreviewItems(tasks.discussions.unmarked),
-      ...getForumNotificationPreviewItems(tasks.forum.unmarked)
+      ...getVoteNotificationPreviewItems({ notifications: tasks.votes.unmarked, currentUserId, unmarked: true }),
+      ...getProposalsNotificationPreviewItems({
+        notifications: tasks.proposals.unmarked,
+        currentUserId,
+        unmarked: true
+      }),
+      ...getBountiesNotificationPreviewItems({ notifications: tasks.bounties.unmarked, unmarked: true }),
+      ...getDiscussionsNotificationPreviewItems({ notifications: tasks.discussions.unmarked, unmarked: true }),
+      ...getForumNotificationPreviewItems({ notifications: tasks.forum.unmarked, unmarked: true })
     ].sort((a, b) => (a.createdAt > b.createdAt ? -1 : 1));
   }, [tasks]);
 
   const markedNotificationPreviews: NotificationDetails[] = useMemo(() => {
     if (!tasks) return [];
     return [
-      ...getVoteNotificationPreviewItems(tasks.votes.marked, currentUserId),
-      ...getProposalsNotificationPreviewItems(tasks.proposals.marked, currentUserId),
-      ...getBountiesNotificationPreviewItems(tasks.bounties.marked),
-      ...getDiscussionsNotificationPreviewItems(tasks.discussions.marked),
-      ...getForumNotificationPreviewItems(tasks.forum.marked)
+      ...getVoteNotificationPreviewItems({ notifications: tasks.votes.marked, currentUserId, unmarked: false }),
+      ...getProposalsNotificationPreviewItems({
+        notifications: tasks.proposals.marked,
+        currentUserId,
+        unmarked: false
+      }),
+      ...getBountiesNotificationPreviewItems({ notifications: tasks.bounties.marked, unmarked: false }),
+      ...getDiscussionsNotificationPreviewItems({ notifications: tasks.discussions.marked, unmarked: false }),
+      ...getForumNotificationPreviewItems({ notifications: tasks.forum.marked, unmarked: false })
     ].sort((a, b) => (a.createdAt > b.createdAt ? -1 : 1));
   }, [tasks]);
 
@@ -113,7 +122,8 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
 
           const taskIndex = _tasks?.[groupType].unmarked.findIndex((t) => t.taskId === taskId);
           if (typeof taskIndex === 'number' && taskIndex > -1) {
-            const marked = [_tasks?.[groupType].unmarked[taskIndex], ..._tasks[groupType].marked];
+            const markedTask = { ..._tasks?.[groupType].unmarked[taskIndex], unmarked: false };
+            const marked = [markedTask, ..._tasks[groupType].marked];
             const unmarkedItems = _tasks[groupType].unmarked;
             const unmarked = [...unmarkedItems.slice(0, taskIndex), ...unmarkedItems.slice(taskIndex + 1)];
 
