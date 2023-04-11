@@ -1,4 +1,3 @@
-import type { Vote } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -7,30 +6,53 @@ import log from 'lib/log';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { mapNotificationActor } from 'lib/notifications/mapNotificationActor';
+import { computePostPermissions } from 'lib/permissions/forum/computePostPermissions';
 import { computeUserPagePermissions } from 'lib/permissions/pages';
 import { computeProposalPermissions } from 'lib/permissions/proposals/computeProposalPermissions';
 import { withSessionRoute } from 'lib/session/withSession';
 import { DataNotFoundError, UnauthorisedActionError } from 'lib/utilities/errors';
-import { createVote as createVoteService, getVote as getVoteService } from 'lib/votes';
+import { createVote as createVoteService } from 'lib/votes';
+import { getVotesByPage } from 'lib/votes/getVotesByPage';
 import type { VoteTask, ExtendedVote, VoteDTO } from 'lib/votes/interfaces';
 import { relay } from 'lib/websockets/relay';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
+  .get(getVotes)
   .use(requireUser)
-  .get(getVoteById)
   .use(requireKeys(['deadline', 'voteOptions', 'title', 'type', 'threshold'], 'body'))
   .post(createVote);
 
-async function getVoteById(req: NextApiRequest, res: NextApiResponse<Vote | { error: any }>) {
-  const voteId = req.query.id as string;
-  const userId = req.session.user.id;
-  const vote = await getVoteService(voteId, userId);
-  if (!vote) {
-    return res.status(404).json({ error: 'No vote found' });
+async function getVotes(req: NextApiRequest, res: NextApiResponse<ExtendedVote[]>) {
+  const postId = req.query.postId as string;
+  const pageId = req.query.pageId as string;
+  const userId = req.session?.user?.id;
+
+  if (pageId) {
+    const computed = await computeUserPagePermissions({
+      resourceId: pageId,
+      userId
+    });
+
+    if (computed.read !== true) {
+      throw new UnauthorisedActionError('You do not have access to the page');
+    }
+  } else if (postId) {
+    const computed = await computePostPermissions({
+      resourceId: postId,
+      userId
+    });
+
+    if (computed.view_post !== true) {
+      throw new UnauthorisedActionError('You do not have access to the post');
+    }
+  } else {
+    throw new Error('Must provide either a pageId or postId to get votes');
   }
-  return res.status(200).json(vote);
+
+  const votes = await getVotesByPage({ pageId, postId, userId });
+  return res.status(200).json(votes);
 }
 
 async function createVote(req: NextApiRequest, res: NextApiResponse<ExtendedVote | null | { error: any }>) {

@@ -266,12 +266,8 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
   const { onClick: clickToOpenSettingsModal } = useSettingsDialog();
   const isForumPost = router.route === '/[domain]/forum/post/[pagePath]';
 
-  const pagePath = isForumPost ? (router.query.pagePath as string) : null;
   // Post permissions hook will not make an API call if post ID is null. Since we can't conditionally render hooks, we pass null as the post ID. This is the reason for the 'null as any' statement
-  const forumPostInfo = usePostByPath({
-    postPath: isForumPost ? pagePath : isForumPost ? (pagePath as string) : (null as any),
-    spaceDomain: router.query.domain as string
-  });
+  const forumPostInfo = usePostByPath();
 
   const isLargeScreen = useMediaQuery(theme.breakpoints.up('md'));
 

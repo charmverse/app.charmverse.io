@@ -4,6 +4,8 @@ import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
+import { usePostDialog } from 'components/forum/components/PostDialog/hooks/usePostDialog';
+import { usePostByPath } from 'components/forum/hooks/usePostByPath';
 import useTasks from 'components/nexus/hooks/useTasks';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { ExtendedVote, VoteDTO } from 'lib/votes/interfaces';
@@ -45,12 +47,16 @@ const VotesContext = createContext<Readonly<IContext>>({
 
 export function VotesProvider({ children }: { children: ReactNode }) {
   const { currentPageId } = useCurrentPage();
+  const { props } = usePostDialog();
+  const forumPostInfo = usePostByPath();
   const [votes, setVotes] = useState<IContext['votes']>({});
   const { user } = useUser();
   const currentSpace = useCurrentSpace();
   const { mutate: mutateTasks, tasks: userTasks } = useTasks();
 
   const { subscribe } = useWebSocketClient();
+
+  const postId = props?.postId || forumPostInfo?.forumPost?.id;
 
   useEffect(() => {
     const unsubscribeFromCreatedVotes = subscribe('votes_created', (newVotes) => {
@@ -133,11 +139,9 @@ export function VotesProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  const cardId = typeof window !== 'undefined' ? new URLSearchParams(window.location.href).get('cardId') : null;
-
   const { data, isValidating } = useSWR(
-    () => (currentPageId && !cardId ? `pages/${currentPageId}/votes` : null),
-    async () => charmClient.votes.getVotesByPage(currentPageId),
+    () => (currentPageId || postId ? `pages/${currentPageId || postId}/votes` : null),
+    async () => charmClient.votes.getVotesByPage({ pageId: currentPageId, postId }),
     {
       revalidateOnFocus: false
     }
