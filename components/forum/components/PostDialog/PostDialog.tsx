@@ -1,7 +1,7 @@
 import ArticleOutlinedIcon from '@mui/icons-material/ArticleOutlined';
 import OpenInFullIcon from '@mui/icons-material/OpenInFull';
-import { Box } from '@mui/material';
-import type { PostCategory } from '@prisma/client';
+import { Box, Stack } from '@mui/material';
+import type { Post, PostCategory } from '@prisma/client';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
 import { useEffect, useRef, useState } from 'react';
@@ -10,6 +10,7 @@ import useSWR from 'swr';
 import charmClient from 'charmClient';
 import Dialog from 'components/common/BoardEditor/focalboard/src/components/dialog';
 import Button from 'components/common/Button';
+import Modal from 'components/common/Modal';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { PageActions } from 'components/common/PageActions';
 import { usePostPermissions } from 'components/forum/hooks/usePostPermissions';
@@ -17,7 +18,10 @@ import { useUser } from 'hooks/useUser';
 import type { PostWithVotes } from 'lib/forums/posts/interfaces';
 
 import type { FormInputs } from '../interfaces';
+import { DraftPostList } from '../PostList/DraftPostList';
 import { PostPage } from '../PostPage/PostPage';
+
+import { usePostDialog } from './hooks/usePostDialog';
 
 interface Props {
   post?: PostWithVotes | null;
@@ -38,6 +42,10 @@ export function PostDialog({ post, spaceId, onClose, open, newPostCategory }: Pr
   const { data: draftedPosts = [], isLoading } = useSWR(user ? `/users/${user.id}/drafted-posts` : null, () =>
     charmClient.forum.listDraftPosts({ spaceId })
   );
+
+  const { showPost } = usePostDialog();
+
+  const [isDraftPostListOpen, setIsDraftPostListOpen] = useState(false);
 
   const permissions = usePostPermissions({
     postIdOrPath: post?.id as string,
@@ -82,6 +90,12 @@ export function PostDialog({ post, spaceId, onClose, open, newPostCategory }: Pr
     }
   }
 
+  function showDraftPost(draftPost: Post) {
+    showPost({
+      postId: draftPost.id
+    });
+  }
+
   if (!popupState.isOpen) {
     return null;
   }
@@ -92,7 +106,7 @@ export function PostDialog({ post, spaceId, onClose, open, newPostCategory }: Pr
     <Dialog
       fullWidth
       toolbar={
-        <>
+        <Stack flexDirection='row' gap={1}>
           {post ? (
             <Box display='flex' justifyContent='space-between'>
               <Button
@@ -115,6 +129,7 @@ export function PostDialog({ post, spaceId, onClose, open, newPostCategory }: Pr
                 data-test='view-drafted-posts'
                 size='small'
                 color='secondary'
+                onClick={() => setIsDraftPostListOpen(true)}
                 variant='text'
                 startIcon={<ArticleOutlinedIcon fontSize='small' />}
               >
@@ -122,7 +137,7 @@ export function PostDialog({ post, spaceId, onClose, open, newPostCategory }: Pr
               </Button>
             </Box>
           ) : null}
-        </>
+        </Stack>
       }
       toolsMenu={
         post && (
@@ -165,6 +180,9 @@ export function PostDialog({ post, spaceId, onClose, open, newPostCategory }: Pr
         question='Are you sure you want to close this post? You have unsaved changes'
         onConfirm={close}
       />
+      <Modal open={isDraftPostListOpen} onClose={() => setIsDraftPostListOpen(false)}>
+        <DraftPostList onClick={showDraftPost} draftPosts={draftedPosts} />
+      </Modal>
     </Dialog>
   );
 }
