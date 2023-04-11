@@ -1,6 +1,7 @@
 import { FormatListBulleted } from '@mui/icons-material';
 import { useState } from 'react';
 
+import LoadingComponent from 'components/common/LoadingComponent';
 import { CreateVoteModal } from 'components/votes/components/CreateVoteModal';
 import { usePagePermissions } from 'hooks/usePagePermissions';
 import { usePostPermissions } from 'hooks/usePostPermissions';
@@ -9,6 +10,7 @@ import type { ExtendedVote } from 'lib/votes/interfaces';
 
 import { EmptyEmbed } from '../common/EmptyEmbed';
 import { VoteDetail } from '../inlineVote/components/VoteDetail';
+import { VotesWrapper } from '../inlineVote/components/VotesWrapper';
 import type { CharmNodeViewProps } from '../nodeView/nodeView';
 
 export function PollNodeView({
@@ -41,7 +43,14 @@ export function PollNodeView({
     setShowModal(false);
   }
   if (!pollId || !votes[pollId]) {
-    if (readOnly || isLoading) {
+    if (isLoading) {
+      return (
+        <VotesWrapper>
+          <LoadingComponent />
+        </VotesWrapper>
+      );
+    }
+    if (readOnly) {
       return <div />;
     }
     return (

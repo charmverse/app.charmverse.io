@@ -54,6 +54,7 @@ export function VotesProvider({ children }: { children: ReactNode }) {
   const [votes, setVotes] = useState<IContext['votes']>({});
   const { user } = useUser();
   const currentSpace = useCurrentSpace();
+  const [isLoading, setIsLoading] = useState(true);
   const { mutate: mutateTasks, tasks: userTasks } = useTasks();
 
   const { subscribe } = useWebSocketClient();
@@ -236,13 +237,16 @@ export function VotesProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     setVotes(data?.reduce((acc, voteWithUser) => ({ ...acc, [voteWithUser.id]: voteWithUser }), {}) || {});
+    if (data) {
+      setIsLoading(false);
+    }
   }, [data]);
 
   const value: IContext = useMemo(
     () => ({
       votes,
       isValidating,
-      isLoading: !data,
+      isLoading,
       castVote,
       createVote,
       deleteVote,
