@@ -1,6 +1,6 @@
 import type { Space } from '@prisma/client';
 
-import { generateRole, generateSpaceUser, generateUserAndSpace } from 'testing/setupDatabase';
+import { generateUserAndSpace } from 'testing/setupDatabase';
 
 import { listPermissions } from '../listPermissions';
 

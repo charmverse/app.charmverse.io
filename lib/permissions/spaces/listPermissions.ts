@@ -51,11 +51,11 @@ export async function listPermissions({ spaceId }: { spaceId: string }): Promise
         id: spaceId
       },
       operations: {
-        createPage: true,
-        createBounty: true,
-        createForumCategory: true,
+        createPage: false,
+        createBounty: false,
+        createForumCategory: false,
         moderateForums: false,
-        reviewProposals: true
+        reviewProposals: false
       }
     });
   }
