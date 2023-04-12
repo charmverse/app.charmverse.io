@@ -27,19 +27,24 @@ async function updateForumPostController(req: NextApiRequest, res: NextApiRespon
     userId
   });
 
-  const existingPost = await prisma.post.findUnique({
+  const existingPost = await prisma.post.findUniqueOrThrow({
     where: {
       id: postId
     },
     select: {
-      categoryId: true
+      categoryId: true,
+      isDraft: true
     }
   });
+
+  if (!existingPost.isDraft && req.body.isDraft) {
+    throw new ActionNotPermittedError(`You cannot convert a published post to a draft`);
+  }
 
   const newCategoryId = (req.body as UpdateForumPostInput).categoryId;
 
   // Don't allow an update to a new category ID if the user doesn't have permission to create posts in that category
-  if (typeof newCategoryId === 'string' && existingPost?.categoryId !== newCategoryId) {
+  if (typeof newCategoryId === 'string' && existingPost.categoryId !== newCategoryId) {
     await requestOperations({
       resourceType: 'post_category',
       operations: ['create_post'],
