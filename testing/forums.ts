@@ -28,8 +28,10 @@ export async function generateForumPosts({
   content = { type: 'doc', content: [] },
   contentText = '',
   title,
+  isDraft,
   withImageRatio = 30
 }: {
+  isDraft?: boolean;
   spaceId: string;
   categoryId?: string;
   createdBy: string;
@@ -71,7 +73,8 @@ export async function generateForumPosts({
       createdBy,
       path: `path-${v4()}`,
       createdAt: postDate,
-      updatedAt: postDate
+      updatedAt: postDate,
+      isDraft
     });
 
     // Space posts apart by 30 minutes
