@@ -1219,6 +1219,7 @@ model Post {
   proposalId         String?                 @db.Uuid
   proposal           Proposal?               @relation(fields: [proposalId], references: [id], onDelete: SetNull)
   votes              Vote[]
+  isDraft            Boolean?                @default(false)
 
   @@index([categoryId])
   @@index([path])
@@ -1375,14 +1376,14 @@ model PostCategoryPermission {
 }
 
 model ApiPageKey {
-  createdAt DateTime @default(now())
-  updatedAt DateTime  @updatedAt
-  createdBy String @db.Uuid
-  pageId    String @db.Uuid
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+  createdBy String         @db.Uuid
+  pageId    String         @db.Uuid
   apiKey    String
   type      ApiPageKeyType
-  page      Page   @relation(fields: [pageId], references: [id], onDelete: Cascade)
-  user      User   @relation(fields: [createdBy], references: [id], onDelete: Cascade)
+  page      Page           @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  user      User           @relation(fields: [createdBy], references: [id], onDelete: Cascade)
 
   @@unique([pageId, type])
   @@unique([apiKey])

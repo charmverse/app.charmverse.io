@@ -1,3 +1,4 @@
+import type { Post } from '@prisma/client';
 import type { KeyedMutator } from 'swr';
 
 import charmClient from 'charmClient';
@@ -5,14 +6,13 @@ import { Comment } from 'components/common/comments/Comment';
 import type { UpdateCommentPayload, CreateCommentPayload } from 'components/common/comments/interfaces';
 import { getUpdatedCommentVote } from 'components/common/comments/utils';
 import type { PostCommentWithVote, PostCommentWithVoteAndChildren } from 'lib/forums/comments/interface';
-import type { PostWithVotes } from 'lib/forums/posts/interfaces';
 import type { AvailablePostPermissionFlags } from 'lib/permissions/forum/interfaces';
 
 type Props = {
   comment: PostCommentWithVoteAndChildren;
   setPostComments: KeyedMutator<PostCommentWithVote[] | undefined>;
   permissions?: AvailablePostPermissionFlags;
-  post: PostWithVotes | null;
+  post: Post | null;
 };
 
 export function PostComment({ post, comment, setPostComments, permissions }: Props) {

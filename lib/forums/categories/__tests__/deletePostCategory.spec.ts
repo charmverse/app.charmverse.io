@@ -52,7 +52,8 @@ describe('deletePostCategory', () => {
       categoryId: category.id,
       title: 'Test Post',
       contentText: '',
-      createdBy: user.id
+      createdBy: user.id,
+      isDraft: false
     });
 
     await expect(deletePostCategory(category.id)).rejects.toBeInstanceOf(PostCategoryNotDeleteableError);

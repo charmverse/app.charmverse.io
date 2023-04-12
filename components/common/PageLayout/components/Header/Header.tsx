@@ -214,7 +214,9 @@ function PostHeader({
       <ExportMarkdownMenuItem onClick={exportMarkdownPage} />
       <Tooltip
         title={
-          !canCreateProposal || forumPostInfo.forumPost?.proposalId
+          forumPostInfo.forumPost?.isDraft
+            ? 'Draft post cannot be converted proposal'
+            : !canCreateProposal || forumPostInfo.forumPost?.proposalId
             ? 'You do not have the permission to convert to proposal'
             : ''
         }
@@ -223,7 +225,7 @@ function PostHeader({
           <ListItemButton
             data-test='convert-proposal-action'
             onClick={() => forumPostInfo.forumPost && convertToProposal(forumPostInfo.forumPost.id)}
-            disabled={!canCreateProposal || !!forumPostInfo.forumPost?.proposalId}
+            disabled={!canCreateProposal || !!forumPostInfo.forumPost?.proposalId || !!forumPostInfo.forumPost?.isDraft}
           >
             <TaskOutlinedIcon
               fontSize='small'

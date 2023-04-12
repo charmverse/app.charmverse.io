@@ -22,7 +22,6 @@ import { CategoryMenu } from './components/CategoryMenu';
 import { CategoryNotificationToggle } from './components/CategoryNotificationToggle';
 import { CategorySelect } from './components/CategorySelect';
 import { CreateForumPost } from './components/CreateForumPost';
-import { PostDialog } from './components/PostDialog';
 import { PostSkeleton } from './components/PostList/components/PostSkeleton';
 import { ForumPostList } from './components/PostList/PostList';
 
@@ -31,12 +30,10 @@ export function ForumPage() {
   const router = useRouter();
   const currentSpace = useCurrentSpace();
   const sort = router.query.sort as PostSortOption | undefined;
-  const [showNewPostForm, setShowNewPostForm] = useState(false);
-  const { showPost } = usePostDialog();
+  const { createPost, showPost } = usePostDialog();
   const { categories, isCategoriesLoaded } = useForumCategories();
   const [, setTitle] = usePageTitle();
   const [currentCategory, setCurrentCategory] = useState<PostCategory | null>(null);
-
   useEffect(() => {
     if (currentCategory?.name) {
       setTitle(currentCategory.name);
@@ -96,13 +93,13 @@ export function ForumPage() {
   }
 
   function showNewPostPopup() {
-    setShowNewPostForm(true);
+    if (currentSpace) {
+      createPost({
+        spaceId: currentSpace.id,
+        category: currentCategory
+      });
+    }
   }
-
-  function hideNewPostPopup() {
-    setShowNewPostForm(false);
-  }
-
   useEffect(() => {
     if (typeof router.query.postId === 'string') {
       showPost({
@@ -177,14 +174,6 @@ export function ForumPage() {
             />
           </Box>
           <CreateForumPost onClick={showNewPostPopup} />
-          {currentSpace && (
-            <PostDialog
-              newPostCategory={currentCategory}
-              open={showNewPostForm}
-              onClose={hideNewPostPopup}
-              spaceId={currentSpace.id}
-            />
-          )}
           {!isCategoriesLoaded ? (
             <PostSkeleton />
           ) : (

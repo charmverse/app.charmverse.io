@@ -10,6 +10,8 @@ import { updateForumPost } from 'lib/forums/posts/updateForumPost';
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { requestOperations } from 'lib/permissions/requestOperations';
 import { withSessionRoute } from 'lib/session/withSession';
+import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
+import { publishPostEvent } from 'lib/webhookPublisher/publishEvent';
 import { relay } from 'lib/websockets/relay';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -27,19 +29,24 @@ async function updateForumPostController(req: NextApiRequest, res: NextApiRespon
     userId
   });
 
-  const existingPost = await prisma.post.findUnique({
+  const existingPost = await prisma.post.findUniqueOrThrow({
     where: {
       id: postId
     },
     select: {
-      categoryId: true
+      categoryId: true,
+      isDraft: true
     }
   });
+
+  if (!existingPost.isDraft && req.body.isDraft) {
+    throw new ActionNotPermittedError(`You cannot convert a published post to a draft`);
+  }
 
   const newCategoryId = (req.body as UpdateForumPostInput).categoryId;
 
   // Don't allow an update to a new category ID if the user doesn't have permission to create posts in that category
-  if (typeof newCategoryId === 'string' && existingPost?.categoryId !== newCategoryId) {
+  if (typeof newCategoryId === 'string' && existingPost.categoryId !== newCategoryId) {
     await requestOperations({
       resourceType: 'post_category',
       operations: ['create_post'],
@@ -50,17 +57,40 @@ async function updateForumPostController(req: NextApiRequest, res: NextApiRespon
 
   const post = await updateForumPost(postId, req.body);
 
-  relay.broadcast(
-    {
-      type: 'post_updated',
-      payload: {
-        id: postId,
-        createdBy: post.createdBy,
-        categoryId: post.categoryId
-      }
-    },
-    post.spaceId
-  );
+  // Updating un-drafted posts
+  if (!post.isDraft && !existingPost.isDraft) {
+    relay.broadcast(
+      {
+        type: 'post_updated',
+        payload: {
+          id: postId,
+          createdBy: post.createdBy,
+          categoryId: post.categoryId
+        }
+      },
+      post.spaceId
+    );
+  } else if (!post.isDraft && existingPost.isDraft) {
+    // Publishing an un-drafted post
+    relay.broadcast(
+      {
+        type: 'post_published',
+        payload: {
+          createdBy: post.createdBy,
+          categoryId: post.categoryId
+        }
+      },
+      post.spaceId
+    );
+
+    // Publish webhook event if needed
+    await publishPostEvent({
+      scope: WebhookEventNames.PostCreated,
+      postId: post.id,
+      spaceId: post.spaceId
+    });
+  }
+
   res.status(200).end();
 }
 
@@ -77,16 +107,18 @@ async function deleteForumPostController(req: NextApiRequest, res: NextApiRespon
 
   const post = await deleteForumPost(postId);
 
-  relay.broadcast(
-    {
-      type: 'post_deleted',
-      payload: {
-        id: postId,
-        categoryId: post.categoryId
-      }
-    },
-    post.spaceId
-  );
+  if (!post.isDraft) {
+    relay.broadcast(
+      {
+        type: 'post_deleted',
+        payload: {
+          id: postId,
+          categoryId: post.categoryId
+        }
+      },
+      post.spaceId
+    );
+  }
 
   res.status(200).end();
 }

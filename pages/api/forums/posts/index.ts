@@ -20,7 +20,6 @@ handler
   .get(requireKeys<ListForumPostsRequest>(['spaceId'], 'query'), getPosts)
   .post(requireUser, requireKeys<CreateForumPostInput>(['categoryId'], 'body'), createForumPostController);
 
-// TODO - Update posts
 async function getPosts(req: NextApiRequest, res: NextApiResponse<PaginatedPostList>) {
   const postQuery = req.query as any as ListForumPostsRequest;
   const userId = req.session.user?.id as string | undefined;
@@ -47,27 +46,29 @@ async function createForumPostController(req: NextApiRequest, res: NextApiRespon
 
   const createdPost = await createForumPost({ ...req.body, createdBy: req.session.user.id });
 
-  relay.broadcast(
-    {
-      type: 'post_published',
-      payload: {
-        createdBy: createdPost.createdBy,
-        categoryId: createdPost.categoryId
-      }
-    },
-    createdPost.spaceId
-  );
+  if (!createdPost.isDraft) {
+    relay.broadcast(
+      {
+        type: 'post_published',
+        payload: {
+          createdBy: createdPost.createdBy,
+          categoryId: createdPost.categoryId
+        }
+      },
+      createdPost.spaceId
+    );
+
+    // Publish webhook event if needed
+    await publishPostEvent({
+      scope: WebhookEventNames.PostCreated,
+      postId: createdPost.id,
+      spaceId: createdPost.spaceId
+    });
+  }
 
   await trackCreateForumPostEvent({
     post: createdPost,
     userId: req.session.user.id
-  });
-
-  // Publish webhook event if needed
-  await publishPostEvent({
-    scope: WebhookEventNames.PostCreated,
-    postId: createdPost.id,
-    spaceId: createdPost.spaceId
   });
 
   return res.status(201).json(createdPost);

@@ -32,7 +32,8 @@ async function convertToProposal(req: NextApiRequest, res: NextApiResponse<PageM
       content: true,
       title: true,
       createdBy: true,
-      proposalId: true
+      proposalId: true,
+      isDraft: true
     }
   });
 
@@ -42,6 +43,10 @@ async function convertToProposal(req: NextApiRequest, res: NextApiResponse<PageM
 
   if (post.proposalId) {
     throw new ActionNotPermittedError("Post converted to proposal can't be edited");
+  }
+
+  if (post.isDraft) {
+    throw new ActionNotPermittedError('Draft post cannot be converted to proposal');
   }
 
   const categoryId = req.body.categoryId;

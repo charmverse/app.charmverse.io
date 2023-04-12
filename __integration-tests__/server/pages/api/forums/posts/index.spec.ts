@@ -83,7 +83,8 @@ describe('POST /api/forums/posts - Create a post', () => {
       spaceId: space.id,
       title: 'Test Post',
       createdBy: user.id,
-      categoryId: postCategory.id
+      categoryId: postCategory.id,
+      isDraft: false
     };
 
     const post = (
@@ -116,7 +117,8 @@ describe('POST /api/forums/posts - Create a post', () => {
       spaceId: space.id,
       title: 'Test Post',
       createdBy: user.id,
-      categoryId: postCategory.id
+      categoryId: postCategory.id,
+      isDraft: false
     };
 
     await request(baseUrl).post(`/api/forums/posts`).set('Cookie', userCookie).send(createInput).expect(401);

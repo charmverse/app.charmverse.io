@@ -11,11 +11,7 @@ import { PostDialog } from './PostDialog';
 export default function PostDialogGlobal() {
   const [post, setPost] = useState<PostWithVotes | null>(null);
   const { props, hidePost } = usePostDialog();
-  const { postId } = props;
-
-  function closeDialog() {
-    hidePost();
-  }
+  const { newPost, postId } = props;
 
   useEffect(() => {
     if (postId) {
@@ -32,5 +28,19 @@ export default function PostDialogGlobal() {
     }
   }, [postId]);
 
-  return post ? <PostDialog key={post.id} post={post} onClose={closeDialog} spaceId={post.spaceId} /> : null;
+  // include postId: when creating a draft, the dialog is open due to 'newPost' being set.
+  // once we save it, we need to load it as 'post' but keep the dialog open in the meantime
+  if (newPost || post || postId) {
+    return (
+      <PostDialog
+        key={post?.id}
+        isLoading={!post && !newPost}
+        post={post}
+        newPostCategory={newPost?.category}
+        onClose={hidePost}
+        spaceId={post?.spaceId || (newPost?.spaceId as string)}
+      />
+    );
+  }
+  return null;
 }

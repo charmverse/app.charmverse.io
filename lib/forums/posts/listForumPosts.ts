@@ -77,7 +77,8 @@ export async function listForumPosts(
   };
 
   const postPropsQuery: Prisma.PostWhereInput = {
-    categoryId: categoryId instanceof Array ? { in: categoryId } : categoryId
+    categoryId: categoryId instanceof Array ? { in: categoryId } : categoryId,
+    isDraft: false
   };
 
   const posts = await prisma.post.findMany({
