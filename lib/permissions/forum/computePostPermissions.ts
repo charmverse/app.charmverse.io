@@ -120,11 +120,11 @@ async function onlyEditableByAuthor({
 async function draftPostPolicy({ resource, flags, userId }: PostPolicyInput): Promise<AvailablePostPermissionFlags> {
   const newPermissions = {
     ...flags,
-    add_comment: !resource.isDraft,
-    upvote: !resource.isDraft,
-    downvote: !resource.isDraft,
-    delete_post: userId ? resource.createdBy === userId : false,
-    view_post: userId ? resource.createdBy === userId : false
+    add_comment: resource.isDraft ? !resource.isDraft : flags.add_comment,
+    upvote: resource.isDraft ? !resource.isDraft : flags.upvote,
+    downvote: resource.isDraft ? !resource.isDraft : flags.downvote,
+    delete_post: userId && resource.isDraft ? resource.createdBy === userId : flags.delete_post,
+    view_post: userId && resource.isDraft ? resource.createdBy === userId : flags.view_post
   };
 
   return newPermissions;
