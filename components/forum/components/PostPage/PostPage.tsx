@@ -65,7 +65,7 @@ export function PostPage({
   showOtherCategoryPosts,
   newPostCategory
 }: Props) {
-  const [isDraft, setIsDraft] = useState(post?.isDraft ?? false);
+  const [isDraftPost, setIsDraftPost] = useState(post?.isDraft ?? false);
   const currentSpace = useCurrentSpace();
   const { user } = useUser();
   const { categories, getForumCategoryById } = useForumCategories();
@@ -120,10 +120,10 @@ export function PostPage({
   }, [post]);
 
   useEffect(() => {
-    setIsDraft(post?.isDraft ?? false);
+    setIsDraftPost(post?.isDraft ?? false);
   }, [post]);
 
-  async function createForumPost(_isDraft: boolean) {
+  async function createForumPost(isDraft: boolean) {
     if (checkIsContentEmpty(formInputs.content) || !categoryId) {
       throw new Error('Missing required fields to save forum post');
     }
@@ -143,9 +143,9 @@ export function PostPage({
         contentText: formInputs.contentText ?? '',
         spaceId,
         title: formInputs.title,
-        isDraft: _isDraft
+        isDraft
       });
-      if (!_isDraft) {
+      if (!isDraft) {
         router.push(`/${router.query.domain}/forum/post/${newPost.path}`);
       } else {
         close?.();
@@ -163,7 +163,7 @@ export function PostPage({
         isDraft: false
       });
       setIsPublishingDraftPost(false);
-      setIsDraft(false);
+      setIsDraftPost(false);
       router.push(`/${router.query.domain}/forum/post/${draftPost.path}`);
     }
   }
@@ -213,7 +213,7 @@ export function PostPage({
     <>
       {post?.proposalId && <ProposalBanner type='post' proposalId={post.proposalId} />}
       <ScrollableWindow>
-        {isDraft && <DraftPostBanner />}
+        {isDraftPost && <DraftPostBanner />}
         <Stack>
           <Stack flexDirection='row'>
             <Container top={50}>
@@ -253,7 +253,7 @@ export function PostPage({
                       Save draft
                     </Button>
                   )}
-                  {post && isDraft && (
+                  {post && isDraftPost && (
                     <Button
                       disabled={Boolean(disabledTooltip) || isPublishingDraftPost}
                       disabledTooltip={disabledTooltip}
@@ -274,7 +274,7 @@ export function PostPage({
                   </Button>
                 </Stack>
               )}
-              {post && !isDraft && (
+              {post && !isDraftPost && (
                 <>
                   {!!permissions?.add_comment && (
                     <Box my={2} data-test='new-top-level-post-comment'>
