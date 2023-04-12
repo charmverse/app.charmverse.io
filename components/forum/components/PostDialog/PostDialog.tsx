@@ -3,7 +3,6 @@ import OpenInFullIcon from '@mui/icons-material/OpenInFull';
 import { Box, Card, DialogContent, Stack, Typography } from '@mui/material';
 import MuiDialog from '@mui/material/Dialog';
 import type { Post, PostCategory } from '@prisma/client';
-import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
 import { useEffect, useRef, useState } from 'react';
 import useSWR from 'swr';
@@ -47,7 +46,7 @@ export function PostDialog({ post, isLoading, spaceId, onClose, newPostCategory 
     mutate: mutateDraftPosts
   } = useSWR(user ? `/users/${user.id}/drafted-posts` : null, () => charmClient.forum.listDraftPosts({ spaceId }));
 
-  const { showPost } = usePostDialog();
+  const { showPost, createPost } = usePostDialog();
   const isMobile = useSmallScreen();
 
   const [isDraftPostListOpen, setIsDraftPostListOpen] = useState(false);
@@ -101,6 +100,24 @@ export function PostDialog({ post, isLoading, spaceId, onClose, newPostCategory 
     });
     setUrlWithoutRerender(router.pathname, { postId: draftPost.id });
   }
+
+  function deleteDraftPost(postId: string) {
+    charmClient.forum.deleteForumPost(postId).then(() => {
+      mutateDraftPosts(
+        (_posts) => {
+          if (_posts) {
+            return _posts.filter((_post) => _post.id !== postId);
+          }
+          return [];
+        },
+        { revalidate: false }
+      );
+      if (post?.id === postId) {
+        createPost({ spaceId, category: newPostCategory || null });
+      }
+    });
+  }
+
   const relativePath = `/${router.query.domain}/forum/post/${post?.path}`;
 
   return (
@@ -164,10 +181,6 @@ export function PostDialog({ post, isLoading, spaceId, onClose, newPostCategory 
           }}
           post={post ?? null}
           spaceId={spaceId}
-          onSave={close}
-          // need to pass close in order to close the original dialog
-          // Required when a post is saved as a draft (we don't redirect to the post page)
-          close={close}
           contentUpdated={contentUpdated}
           setContentUpdated={setContentUpdated}
           newPostCategory={newPostCategory}
@@ -202,7 +215,12 @@ export function PostDialog({ post, isLoading, spaceId, onClose, newPostCategory 
               </Box>
             </Card>
           ) : (
-            <DraftPostList onClick={showDraftPost} draftPosts={draftedPosts} mutateDraftPosts={mutateDraftPosts} />
+            <DraftPostList
+              onClick={showDraftPost}
+              openPostId={post?.id}
+              draftPosts={draftedPosts}
+              deletePost={deleteDraftPost}
+            />
           )}
         </DialogContent>
       </MuiDialog>

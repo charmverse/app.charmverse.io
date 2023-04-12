@@ -11,30 +11,19 @@ import { relativeTime } from 'lib/utilities/dates';
 import { usePostDialog } from '../PostDialog/hooks/usePostDialog';
 
 export function DraftPostList({
+  openPostId,
   draftPosts,
   onClick,
-  mutateDraftPosts
+  deletePost
 }: {
+  openPostId?: string;
   draftPosts: Post[];
   onClick: (post: Post) => void;
-  mutateDraftPosts: KeyedMutator<Post[]>;
+  deletePost: (postId: string) => void;
 }) {
   const { categories } = useForumCategories();
-  const { showPost } = usePostDialog();
   async function deleteDraftPost(draftPost: Post) {
-    try {
-      await charmClient.forum.deleteForumPost(draftPost.id);
-      showPost({
-        postId: null
-      });
-      mutateDraftPosts(
-        (currentDraftPosts) =>
-          currentDraftPosts?.filter((currentDraftPost) => currentDraftPost.id !== draftPost.id) ?? [],
-        { revalidate: false }
-      );
-    } catch (err) {
-      //
-    }
+    deletePost(draftPost.id);
   }
   return (
     <List>
@@ -48,6 +37,7 @@ export function DraftPostList({
                 xs: 0
               }
             }}
+            selected={openPostId === draftPost.id}
             key={draftPost.id}
             onClick={() => onClick(draftPost)}
           >
@@ -60,7 +50,10 @@ export function DraftPostList({
                 alignItems={{ xs: 'flex-start', md: 'center' }}
                 gap={{ xs: 0, md: 1 }}
               >
-                <Typography>{draftPost.title}</Typography>
+                <Typography>
+                  {openPostId === draftPost.id && <strong>EDITING: </strong>}
+                  {draftPost.title}
+                </Typography>
                 {postCategory && (
                   <Typography color='secondary' variant='subtitle1' component='div' fontWeight={500}>
                     ({postCategory.name})

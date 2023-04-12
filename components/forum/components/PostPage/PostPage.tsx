@@ -50,11 +50,9 @@ type Props = {
   showOtherCategoryPosts?: boolean;
   newPostCategory?: PostCategory | null;
   onTitleChange?: (newTitle: string) => void;
-  close?: VoidFunction;
 };
 
 export function PostPage({
-  close,
   onTitleChange,
   post,
   spaceId,
@@ -131,7 +129,6 @@ export function PostPage({
         title: formInputs.title
       });
       setContentUpdated(false);
-      onSave?.();
     } else {
       const newPost = await charmClient.forum.createForumPost({
         categoryId,
@@ -144,7 +141,6 @@ export function PostPage({
       if (!isDraft) {
         router.push(`/${router.query.domain}/forum/post/${newPost.path}`);
       } else {
-        close?.();
         showPost({
           postId: newPost.id,
           onClose() {
