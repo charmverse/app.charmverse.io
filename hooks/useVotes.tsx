@@ -20,7 +20,7 @@ type ParentData = {
 type IContext = {
   isValidating: boolean;
   isLoading: boolean;
-  setParent: (parent: ParentData) => void;
+  setParent: (parent: ParentData | null) => void;
   votes: Record<string, ExtendedVote>;
   createVote: (votePayload: Omit<VoteDTO, 'createdBy' | 'spaceId'>) => Promise<ExtendedVote>;
   castVote: (voteId: string, option: string) => Promise<UserVote>;
@@ -264,7 +264,11 @@ export const useVotes = (parent: ParentData) => {
   const votes = useContext(VotesContext);
 
   useEffect(() => {
-    votes.setParent(parent);
+    if (!parent.postId && !parent.pageId) {
+      votes.setParent(null);
+    } else {
+      votes.setParent(parent);
+    }
   }, [parent.postId, parent.pageId]);
 
   return votes;
