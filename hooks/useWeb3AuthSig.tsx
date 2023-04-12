@@ -10,14 +10,13 @@ import { mutate } from 'swr';
 import useSWRMutation from 'swr/mutation';
 
 import charmClient from 'charmClient';
+import { useWeb3ConnectionManager } from 'components/_app/Web3ConnectionManager/Web3ConnectionManager';
 import type { AuthSig } from 'lib/blockchain/interfaces';
 import log from 'lib/log';
 import type { SystemError } from 'lib/utilities/errors';
 import { ExternalServiceError, MissingWeb3AccountError } from 'lib/utilities/errors';
 import { lowerCaseEqual } from 'lib/utilities/strings';
 import type { LoggedInUser } from 'models';
-
-import { Web3Connection } from '../components/_app/Web3ConnectionManager';
 
 import { PREFIX, useLocalStorage } from './useLocalStorage';
 import { useUser } from './useUser';
@@ -45,6 +44,7 @@ type IContext = {
   closeWalletSelector: () => void;
   resetSigning: () => void;
   loginFromWeb3Account: (authSig?: AuthSig) => Promise<LoggedInUser>;
+  setAccountUpdatePaused: (paused: boolean) => void;
 };
 
 export const Web3Context = createContext<Readonly<IContext>>({
@@ -65,7 +65,8 @@ export const Web3Context = createContext<Readonly<IContext>>({
   isConnectingIdentity: false,
   closeWalletSelector: () => null,
   resetSigning: () => null,
-  loginFromWeb3Account: () => Promise.resolve(null as any)
+  loginFromWeb3Account: () => Promise.resolve(null as any),
+  setAccountUpdatePaused: () => null
 });
 
 // a wrapper around account and library from web3react
@@ -78,7 +79,7 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
     closeWalletSelectorModal,
     isWalletSelectorModalOpen,
     isConnectingIdentity
-  } = useContext(Web3Connection);
+  } = useWeb3ConnectionManager();
   const [isSigning, setIsSigning] = useState(false);
   const verifiableWalletDetected = !!account && !isConnectingIdentity;
 
@@ -90,6 +91,7 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
   const { user, setUser, logoutUser, isLoaded } = useUser();
 
   const [walletAuthSignature, setWalletAuthSignature] = useState<AuthSig | null>(null);
+  const [accountUpdatePaused, setAccountUpdatePaused] = useState(false);
 
   function getStoredSignature(): AuthSig | null {
     if (!account) {
@@ -157,7 +159,7 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (isConnectingIdentity) {
       // Don't update new values
-    } else if (account && user?.wallets.some((w) => lowerCaseEqual(w.address, account))) {
+    } else if (account && (user?.wallets.some((w) => lowerCaseEqual(w.address, account)) || accountUpdatePaused)) {
       setStoredAccount(account.toLowerCase());
 
       const storedWalletSignature = getStoredSignature();
@@ -182,7 +184,7 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
         logoutUser();
       }
     }
-  }, [account, user, isConnectingIdentity, isLoaded]);
+  }, [account, user, isConnectingIdentity, isLoaded, accountUpdatePaused]);
 
   async function sign(): Promise<AuthSig> {
     if (!account) {
@@ -290,7 +292,8 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
       isConnectingIdentity,
       closeWalletSelector: closeWalletSelectorModal,
       resetSigning: () => setIsSigning(false),
-      loginFromWeb3Account
+      loginFromWeb3Account,
+      setAccountUpdatePaused
     }),
     [
       account,
@@ -302,7 +305,8 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
       isSigning,
       chainId,
       library,
-      isConnectingIdentity
+      isConnectingIdentity,
+      setAccountUpdatePaused
     ]
   );
 

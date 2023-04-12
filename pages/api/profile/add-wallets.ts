@@ -9,7 +9,7 @@ import { updateTrackUserProfile } from 'lib/metrics/mixpanel/updateTrackUserProf
 import { onError, onNoMatch } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { getUserProfile } from 'lib/users/getUser';
-import { InsecureOperationError } from 'lib/utilities/errors';
+import { InsecureOperationError, InvalidInputError } from 'lib/utilities/errors';
 import type { LoggedInUser } from 'models';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -32,9 +32,16 @@ async function addWalletsController(req: NextApiRequest, res: NextApiResponse<Lo
     }
   }
 
-  await prisma.userWallet.createMany({
-    data: addressesToAdd.map((signature) => ({ userId: req.session.user.id, address: signature.address.toLowerCase() }))
-  });
+  try {
+    await prisma.userWallet.createMany({
+      data: addressesToAdd.map((signature) => ({
+        userId: req.session.user.id,
+        address: signature.address.toLowerCase()
+      }))
+    });
+  } catch (e) {
+    throw new InvalidInputError('Wallet is already connected with another account');
+  }
 
   for (const authSig of addressesToAdd) {
     await refreshENSName({ userId, address: authSig.address });

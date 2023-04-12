@@ -53,7 +53,7 @@ export default function IdentityProviderItem({
       </ListItemIcon>
       <ListItemText
         primaryTypographyProps={{ ml: 1 }}
-        primary={connected ? text || `Connected with ${typeLabel}` : `Connect with ${typeLabel}`}
+        primary={connected ? text || `Connected with ${typeLabel}` : text || `Connect with ${typeLabel}`}
       />
       <LoadingComponent isLoading={loading} size={15} />
       {error}
