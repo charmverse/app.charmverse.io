@@ -27,7 +27,6 @@ import { useMembers } from 'hooks/useMembers';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useUser } from 'hooks/useUser';
 import type { PostCommentWithVoteAndChildren } from 'lib/forums/comments/interface';
-import type { PostWithVotes } from 'lib/forums/posts/interfaces';
 import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
@@ -40,7 +39,7 @@ import { DraftPostBanner } from './DraftPostBanner';
 
 type Props = {
   spaceId: string;
-  post: PostWithVotes | null;
+  post: Post | null;
   onSave?: () => void;
   setFormInputs: (params: Partial<FormInputs>) => void;
   formInputs: FormInputs;
@@ -53,7 +52,7 @@ type Props = {
 
 export function PostPage({
   onTitleChange,
-  post,
+  post: targetPost,
   spaceId,
   onSave,
   setFormInputs,
@@ -63,6 +62,7 @@ export function PostPage({
   showOtherCategoryPosts,
   newPostCategory
 }: Props) {
+  const [post, setPost] = useState(targetPost);
   const [isDraft, setIsDraft] = useState(post?.isDraft ?? false);
   const currentSpace = useCurrentSpace();
   const { user } = useUser();
@@ -116,6 +116,10 @@ export function PostPage({
     }
   }, [post]);
 
+  useEffect(() => {
+    setIsDraft(post?.isDraft ?? false);
+  }, [post]);
+
   async function createForumPost(_isDraft: boolean) {
     if (checkIsContentEmpty(formInputs.content) || !categoryId) {
       throw new Error('Missing required fields to save forum post');
@@ -129,6 +133,13 @@ export function PostPage({
       });
       setContentUpdated(false);
       onSave?.();
+      setPost({
+        ...post,
+        categoryId,
+        content: formInputs.content,
+        contentText: formInputs.contentText ?? '',
+        title: formInputs.title
+      });
     } else {
       const newPost = await charmClient.forum.createForumPost({
         categoryId,
@@ -138,7 +149,10 @@ export function PostPage({
         title: formInputs.title,
         isDraft: _isDraft
       });
-      router.push(`/${router.query.domain}/forum/post/${newPost.path}`);
+      setPost(newPost);
+      if (!_isDraft) {
+        router.push(`/${router.query.domain}/forum/post/${newPost.path}`);
+      }
     }
   }
 

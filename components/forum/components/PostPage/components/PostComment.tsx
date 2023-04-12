@@ -1,3 +1,4 @@
+import type { Post } from '@prisma/client';
 import type { KeyedMutator } from 'swr';
 
 import charmClient from 'charmClient';
@@ -12,7 +13,7 @@ type Props = {
   comment: PostCommentWithVoteAndChildren;
   setPostComments: KeyedMutator<PostCommentWithVote[] | undefined>;
   permissions?: AvailablePostPermissionFlags;
-  post: PostWithVotes | null;
+  post: Post | null;
 };
 
 export function PostComment({ post, comment, setPostComments, permissions }: Props) {
