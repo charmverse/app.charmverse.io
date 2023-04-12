@@ -731,3 +731,47 @@ describe('computePostPermissions - with proposal permission filtering policy', (
     });
   });
 });
+
+describe('computePostPermissions - with draft post permission filtering policy', () => {
+  it('should enable view_post and delete_post only for drafted post author', async () => {
+    const postCategory = await generatePostCategory({ spaceId: space.id });
+    const post = await generateForumPost({
+      spaceId: space.id,
+      categoryId: postCategory.id,
+      userId: authorUser.id,
+      isDraft: true
+    });
+
+    const permissions = await computePostPermissions({
+      resourceId: post.id,
+      userId: authorUser.id
+    });
+
+    postOperationsWithoutEdit.forEach((op) => {
+      if (op === 'view_post' || op === 'delete_post' || op === 'edit_post') {
+        expect(permissions[op]).toBe(true);
+      } else {
+        expect(permissions[op]).toBe(false);
+      }
+    });
+  });
+
+  it('should disable all permissions of drafted post for admin', async () => {
+    const postCategory = await generatePostCategory({ spaceId: space.id });
+    const post = await generateForumPost({
+      spaceId: space.id,
+      categoryId: postCategory.id,
+      userId: authorUser.id,
+      isDraft: true
+    });
+
+    const permissions = await computePostPermissions({
+      resourceId: post.id,
+      userId: adminUser.id
+    });
+
+    postOperationsWithoutEdit.forEach((op) => {
+      expect(permissions[op]).toBe(false);
+    });
+  });
+});

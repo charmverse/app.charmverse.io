@@ -10,4 +10,5 @@ export type ForumPostMeta = Pick<Post, 'createdBy' | 'id' | 'categoryId' | 'titl
   votes: ForumVotes;
   createdAt: string;
   updatedAt: string;
+  isDraft: boolean;
 };

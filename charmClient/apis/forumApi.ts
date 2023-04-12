@@ -10,6 +10,7 @@ import type {
 } from 'lib/forums/comments/interface';
 import type { CreateForumPostInput } from 'lib/forums/posts/createForumPost';
 import type { PostWithVotes } from 'lib/forums/posts/interfaces';
+import type { ListDraftPostsRequest } from 'lib/forums/posts/listDraftPosts';
 import type { ListForumPostsRequest, PaginatedPostList } from 'lib/forums/posts/listForumPosts';
 import type { SearchForumPostsRequest } from 'lib/forums/posts/searchForumPosts';
 import type { UpdateForumPostInput } from 'lib/forums/posts/updateForumPost';
@@ -23,6 +24,10 @@ export class ForumApi {
 
   listForumPosts({ spaceId, count, page, sort, categoryId }: ListForumPostsRequest): Promise<PaginatedPostList> {
     return http.GET('/api/forums/posts', { spaceId, sort, categoryId, count, page });
+  }
+
+  listDraftPosts({ spaceId }: Omit<ListDraftPostsRequest, 'userId'>): Promise<Post[]> {
+    return http.GET('/api/forums/posts/drafts', { spaceId });
   }
 
   searchForumPosts(searchQuery: SearchForumPostsRequest): Promise<PaginatedPostList> {

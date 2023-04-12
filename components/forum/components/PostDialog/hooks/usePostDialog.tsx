@@ -1,19 +1,23 @@
+import type { PostCategory } from '@prisma/client';
 import type { ReactNode } from 'react';
 import { createContext, useContext, useMemo, useState } from 'react';
 
 interface PostDialogContext {
   postId?: string | null;
+  newPost?: { category: PostCategory | null; spaceId: string };
   onClose?: () => void;
 }
 
 interface Context {
   props: PostDialogContext;
+  createPost: (newPost: PostDialogContext['newPost']) => void;
   hidePost: () => void;
   showPost: (context: PostDialogContext) => void;
 }
 
 const ContextElement = createContext<Readonly<Context>>({
   props: {},
+  createPost: () => {},
   hidePost: () => {},
   showPost: () => {}
 });
@@ -32,9 +36,14 @@ export function PostDialogProvider({ children }: { children: ReactNode }) {
     setProps(_context);
   }
 
+  function createPost(newPost: PostDialogContext['newPost']) {
+    setProps({ newPost });
+  }
+
   const value = useMemo(
     () => ({
       props,
+      createPost,
       hidePost,
       showPost
     }),

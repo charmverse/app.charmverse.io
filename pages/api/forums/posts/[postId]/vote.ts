@@ -2,8 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { voteForumPost } from 'lib/forums/posts/voteForumPost';
-import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
-import { computePostPermissions } from 'lib/permissions/forum/computePostPermissions';
+import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { requestOperations } from 'lib/permissions/requestOperations';
 import { withSessionRoute } from 'lib/session/withSession';
 

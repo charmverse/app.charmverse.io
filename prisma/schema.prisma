@@ -1216,6 +1216,7 @@ model Post {
   commentUpDownVotes PostCommentUpDownVote[]
   proposalId         String?                 @db.Uuid
   proposal           Proposal?               @relation(fields: [proposalId], references: [id], onDelete: SetNull)
+  isDraft            Boolean?                @default(false)
 
   @@index([categoryId])
   @@index([path])

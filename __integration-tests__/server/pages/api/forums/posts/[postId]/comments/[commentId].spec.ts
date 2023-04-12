@@ -50,7 +50,8 @@ beforeAll(async () => {
     spaceId: space.id,
     title: 'Test Post',
     createdBy: user.id,
-    categoryId: postCategory.id
+    categoryId: postCategory.id,
+    isDraft: false
   };
 
   extraSpaceUser = await generateSpaceUser({ isAdmin: false, spaceId: space.id });
