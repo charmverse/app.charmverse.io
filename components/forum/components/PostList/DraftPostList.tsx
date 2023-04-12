@@ -6,6 +6,7 @@ import type { KeyedMutator } from 'swr';
 
 import charmClient from 'charmClient';
 import { useForumCategories } from 'hooks/useForumCategories';
+import { useSmallScreen } from 'hooks/useMediaScreens';
 import { relativeTime } from 'lib/utilities/dates';
 
 import { usePostDialog } from '../PostDialog/hooks/usePostDialog';
@@ -36,18 +37,30 @@ export function DraftPostList({
       //
     }
   }
-
   return (
     <List>
       {draftPosts.map((draftPost) => {
         const postCategory = categories.find((cat) => cat.id === draftPost.categoryId);
         return (
-          <ListItemButton key={draftPost.id} onClick={() => onClick(draftPost)}>
-            <ListItemIcon sx={{ mr: 2 }}>
+          <ListItemButton
+            sx={{
+              px: {
+                md: 1,
+                xs: 0
+              }
+            }}
+            key={draftPost.id}
+            onClick={() => onClick(draftPost)}
+          >
+            <ListItemIcon sx={{ mr: 2, display: { xs: 'none', md: 'initial' } }}>
               <ArticleOutlinedIcon fontSize='large' />
             </ListItemIcon>
             <ListItemText secondary={relativeTime(draftPost.updatedAt)}>
-              <Stack flexDirection='row' alignItems='center' gap={1}>
+              <Stack
+                flexDirection={{ xs: 'column', sm: 'row', md: 'row' }}
+                alignItems={{ xs: 'flex-start', md: 'center' }}
+                gap={{ xs: 0, md: 1 }}
+              >
                 <Typography>{draftPost.title}</Typography>
                 {postCategory && (
                   <Typography color='secondary' variant='subtitle1' component='div' fontWeight={500}>
