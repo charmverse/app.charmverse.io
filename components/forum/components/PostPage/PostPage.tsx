@@ -29,6 +29,7 @@ import { useUser } from 'hooks/useUser';
 import type { PostCommentWithVoteAndChildren } from 'lib/forums/comments/interface';
 import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
 import type { PageContent } from 'lib/prosemirror/interfaces';
+import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
 import type { FormInputs } from '../interfaces';
 import { usePostDialog } from '../PostDialog/hooks/usePostDialog';
@@ -150,8 +151,12 @@ export function PostPage({
       } else {
         close?.();
         showPost({
-          postId: newPost.id
+          postId: newPost.id,
+          onClose() {
+            setUrlWithoutRerender(router.pathname, { postId: null });
+          }
         });
+        setUrlWithoutRerender(router.pathname, { postId: newPost.id });
       }
     }
   }
