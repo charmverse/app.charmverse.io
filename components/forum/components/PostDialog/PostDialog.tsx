@@ -1,5 +1,4 @@
-import ArticleOutlinedIcon from '@mui/icons-material/ArticleOutlined';
-import HowToVoteOutlinedIcon from '@mui/icons-material/HowToVoteOutlined';
+import MessageOutlinedIcon from '@mui/icons-material/MessageOutlined';
 import OpenInFullIcon from '@mui/icons-material/OpenInFull';
 import { Box, Card, DialogContent, Stack, Typography } from '@mui/material';
 import MuiDialog from '@mui/material/Dialog';
@@ -151,7 +150,7 @@ export function PostDialog({ post, spaceId, onClose, open, newPostCategory }: Pr
                 color='secondary'
                 onClick={() => setIsDraftPostListOpen(true)}
                 variant='text'
-                startIcon={<ArticleOutlinedIcon fontSize='small' />}
+                startIcon={<MessageOutlinedIcon fontSize='small' />}
               >
                 View {draftedPosts.length > 0 ? `${draftedPosts.length} ` : ''}drafts
               </Button>
@@ -214,7 +213,7 @@ export function PostDialog({ post, spaceId, onClose, open, newPostCategory }: Pr
           {draftedPosts.length === 0 ? (
             <Card variant='outlined'>
               <Box p={3} textAlign='center'>
-                <ArticleOutlinedIcon fontSize='large' color='secondary' />
+                <MessageOutlinedIcon fontSize='large' color='secondary' />
                 <Typography color='secondary'>No drafted posts yet.</Typography>
               </Box>
             </Card>

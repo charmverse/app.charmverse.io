@@ -1,5 +1,5 @@
-import ArticleOutlinedIcon from '@mui/icons-material/ArticleOutlined';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
+import MessageOutlinedIcon from '@mui/icons-material/MessageOutlined';
 import { List, ListItemButton, ListItemIcon, ListItemText, Stack, Typography } from '@mui/material';
 import type { Post } from '@prisma/client';
 import type { KeyedMutator } from 'swr';
@@ -52,7 +52,7 @@ export function DraftPostList({
             onClick={() => onClick(draftPost)}
           >
             <ListItemIcon sx={{ mr: 2, display: { xs: 'none', md: 'initial' } }}>
-              <ArticleOutlinedIcon fontSize='large' />
+              <MessageOutlinedIcon fontSize='large' />
             </ListItemIcon>
             <ListItemText secondary={relativeTime(draftPost.updatedAt)}>
               <Stack
