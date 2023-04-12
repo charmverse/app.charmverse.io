@@ -123,24 +123,26 @@ export function PostDialog({ post, spaceId, onClose, open, newPostCategory }: Pr
     <Dialog
       fullWidth
       toolbar={
+        post ? (
+          <Box display='flex' justifyContent='space-between'>
+            <Button
+              data-test='open-post-as-page'
+              size='small'
+              color='secondary'
+              href={relativePath}
+              variant='text'
+              startIcon={<OpenInFullIcon fontSize='small' />}
+            >
+              Open as Page
+            </Button>
+          </Box>
+        ) : (
+          <div />
+        )
+      }
+      toolsMenu={
         <Stack flexDirection='row' gap={1}>
-          {post ? (
-            <Box display='flex' justifyContent='space-between'>
-              <Button
-                data-test='open-post-as-page'
-                size='small'
-                color='secondary'
-                href={relativePath}
-                variant='text'
-                startIcon={<OpenInFullIcon fontSize='small' />}
-              >
-                Open as Page
-              </Button>
-            </Box>
-          ) : (
-            <div />
-          )}
-          {!isLoading && draftedPosts.length && !post ? (
+          {!isLoading ? (
             <Box display='flex' justifyContent='space-between'>
               <Button
                 data-test='view-drafted-posts'
@@ -150,20 +152,18 @@ export function PostDialog({ post, spaceId, onClose, open, newPostCategory }: Pr
                 variant='text'
                 startIcon={<ArticleOutlinedIcon fontSize='small' />}
               >
-                View {draftedPosts.length} draft{draftedPosts.length > 1 ? 's' : ''}
+                View {draftedPosts.length > 0 ? `${draftedPosts.length} ` : ''}drafts
               </Button>
             </Box>
           ) : null}
+          {post && (
+            <PageActions
+              page={{ ...post, relativePath }}
+              onClickDelete={permissions?.delete_post ? deletePost : undefined}
+              hideDuplicateAction
+            />
+          )}
         </Stack>
-      }
-      toolsMenu={
-        post && (
-          <PageActions
-            page={{ ...post, relativePath }}
-            onClickDelete={permissions?.delete_post ? deletePost : undefined}
-            hideDuplicateAction
-          />
-        )
       }
       onClose={() => {
         if (contentUpdated) {
