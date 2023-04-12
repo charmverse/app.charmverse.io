@@ -10,6 +10,8 @@ import { updateForumPost } from 'lib/forums/posts/updateForumPost';
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { requestOperations } from 'lib/permissions/requestOperations';
 import { withSessionRoute } from 'lib/session/withSession';
+import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
+import { publishPostEvent } from 'lib/webhookPublisher/publishEvent';
 import { relay } from 'lib/websockets/relay';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -55,7 +57,8 @@ async function updateForumPostController(req: NextApiRequest, res: NextApiRespon
 
   const post = await updateForumPost(postId, req.body);
 
-  if (!post.isDraft) {
+  // Updating un-drafted posts
+  if (!post.isDraft && !existingPost.isDraft) {
     relay.broadcast(
       {
         type: 'post_updated',
@@ -67,6 +70,25 @@ async function updateForumPostController(req: NextApiRequest, res: NextApiRespon
       },
       post.spaceId
     );
+  } else if (!post.isDraft && existingPost.isDraft) {
+    // Publishing an un-drafted post
+    relay.broadcast(
+      {
+        type: 'post_published',
+        payload: {
+          createdBy: post.createdBy,
+          categoryId: post.categoryId
+        }
+      },
+      post.spaceId
+    );
+
+    // Publish webhook event if needed
+    await publishPostEvent({
+      scope: WebhookEventNames.PostCreated,
+      postId: post.id,
+      spaceId: post.spaceId
+    });
   }
 
   res.status(200).end();

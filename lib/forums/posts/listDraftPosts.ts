@@ -12,6 +12,9 @@ export async function listDraftPosts({ spaceId, userId }: { spaceId: string; use
       createdBy: userId,
       deletedAt: null,
       isDraft: true
+    },
+    orderBy: {
+      createdAt: 'desc'
     }
   });
 
