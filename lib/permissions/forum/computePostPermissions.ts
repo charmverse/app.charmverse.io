@@ -117,37 +117,14 @@ async function onlyEditableByAuthor({
   return newPermissions;
 }
 
-async function draftPostOnlyVisibleAndDeletableByAuthor({
-  resource,
-  flags,
-  userId
-}: PostPolicyInput): Promise<AvailablePostPermissionFlags> {
+async function draftPostPolicy({ resource, flags, userId }: PostPolicyInput): Promise<AvailablePostPermissionFlags> {
   const newPermissions = {
     ...flags,
-    delete_post: resource.createdBy === userId,
-    view_post: resource.createdBy === userId
-  };
-
-  return newPermissions;
-}
-
-async function disableUpvoteDownvoteDraftPost({
-  resource,
-  flags
-}: PostPolicyInput): Promise<AvailablePostPermissionFlags> {
-  const newPermissions = {
-    ...flags,
+    add_comment: !resource.isDraft,
     upvote: !resource.isDraft,
-    downvote: !resource.isDraft
-  };
-
-  return newPermissions;
-}
-
-async function disableCommentOnDraftPost({ resource, flags }: PostPolicyInput): Promise<AvailablePostPermissionFlags> {
-  const newPermissions = {
-    ...flags,
-    add_comment: !resource.isDraft
+    downvote: !resource.isDraft,
+    delete_post: userId ? resource.createdBy === userId : false,
+    view_post: userId ? resource.createdBy === userId : false
   };
 
   return newPermissions;
@@ -172,11 +149,5 @@ export const computePostPermissions = buildComputePermissionsWithPermissionFilte
 >({
   resolver: postResolver,
   computeFn: baseComputePostPermissions,
-  policies: [
-    onlyEditableByAuthor,
-    convertedToProposalPolicy,
-    disableCommentOnDraftPost,
-    disableUpvoteDownvoteDraftPost,
-    draftPostOnlyVisibleAndDeletableByAuthor
-  ]
+  policies: [onlyEditableByAuthor, convertedToProposalPolicy, draftPostPolicy]
 });
