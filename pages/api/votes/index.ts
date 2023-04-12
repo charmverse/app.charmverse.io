@@ -10,7 +10,7 @@ import { computePostPermissions } from 'lib/permissions/forum/computePostPermiss
 import { computeUserPagePermissions } from 'lib/permissions/pages';
 import { computeProposalPermissions } from 'lib/permissions/proposals/computeProposalPermissions';
 import { withSessionRoute } from 'lib/session/withSession';
-import { UnauthorisedActionError } from 'lib/utilities/errors';
+import { InvalidInputError, UnauthorisedActionError } from 'lib/utilities/errors';
 import { createVote as createVoteService } from 'lib/votes';
 import { getVotesByPage } from 'lib/votes/getVotesByPage';
 import type { VoteTask, ExtendedVote, VoteDTO } from 'lib/votes/interfaces';
@@ -48,7 +48,7 @@ async function getVotes(req: NextApiRequest, res: NextApiResponse<ExtendedVote[]
       throw new UnauthorisedActionError('You do not have access to the post');
     }
   } else {
-    throw new Error('Must provide either a pageId or postId to get votes');
+    throw new InvalidInputError('Must provide either a pageId or postId to get votes');
   }
 
   const votes = await getVotesByPage({ pageId, postId, userId });
