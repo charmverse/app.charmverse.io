@@ -95,6 +95,15 @@ export function PostDialog({ post, spaceId, onClose, open, newPostCategory }: Pr
   function deletePost() {
     if (post) {
       charmClient.forum.deleteForumPost(post.id).then(() => {
+        mutateDraftPosts(
+          (_posts) => {
+            if (_posts) {
+              return _posts.filter((_post) => _post.id !== post.id);
+            }
+            return [];
+          },
+          { revalidate: false }
+        );
         close();
       });
     }
