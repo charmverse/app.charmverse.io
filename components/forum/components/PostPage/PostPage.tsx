@@ -129,7 +129,6 @@ export function PostPage({
         title: formInputs.title
       });
       setContentUpdated(false);
-      onSave?.();
     } else {
       const newPost = await charmClient.forum.createForumPost({
         categoryId,

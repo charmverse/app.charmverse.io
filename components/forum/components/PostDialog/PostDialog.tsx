@@ -181,7 +181,6 @@ export function PostDialog({ post, isLoading, spaceId, onClose, newPostCategory 
           }}
           post={post ?? null}
           spaceId={spaceId}
-          onSave={close}
           contentUpdated={contentUpdated}
           setContentUpdated={setContentUpdated}
           newPostCategory={newPostCategory}
