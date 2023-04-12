@@ -31,6 +31,7 @@ import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import type { FormInputs } from '../interfaces';
+import { usePostDialog } from '../PostDialog/hooks/usePostDialog';
 
 import { CategoryPosts } from './components/CategoryPosts';
 import { PostCategoryInput } from './components/PostCategoryInput';
@@ -48,11 +49,13 @@ type Props = {
   showOtherCategoryPosts?: boolean;
   newPostCategory?: PostCategory | null;
   onTitleChange?: (newTitle: string) => void;
+  close?: VoidFunction;
 };
 
 export function PostPage({
+  close,
   onTitleChange,
-  post: targetPost,
+  post,
   spaceId,
   onSave,
   setFormInputs,
@@ -62,11 +65,11 @@ export function PostPage({
   showOtherCategoryPosts,
   newPostCategory
 }: Props) {
-  const [post, setPost] = useState(targetPost);
   const [isDraft, setIsDraft] = useState(post?.isDraft ?? false);
   const currentSpace = useCurrentSpace();
   const { user } = useUser();
   const { categories, getForumCategoryById } = useForumCategories();
+  const { showPost } = usePostDialog();
   const [isPublishingDraftPost, setIsPublishingDraftPost] = useState(false);
   // We should only set writeable categories for new post
   const [categoryId, setCategoryId] = useState(
@@ -133,13 +136,6 @@ export function PostPage({
       });
       setContentUpdated(false);
       onSave?.();
-      setPost({
-        ...post,
-        categoryId,
-        content: formInputs.content,
-        contentText: formInputs.contentText ?? '',
-        title: formInputs.title
-      });
     } else {
       const newPost = await charmClient.forum.createForumPost({
         categoryId,
@@ -149,9 +145,13 @@ export function PostPage({
         title: formInputs.title,
         isDraft: _isDraft
       });
-      setPost(newPost);
       if (!_isDraft) {
         router.push(`/${router.query.domain}/forum/post/${newPost.path}`);
+      } else {
+        close?.();
+        showPost({
+          postId: newPost.id
+        });
       }
     }
   }

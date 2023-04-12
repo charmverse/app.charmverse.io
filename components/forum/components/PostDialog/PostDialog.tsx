@@ -182,6 +182,9 @@ export function PostDialog({ post, spaceId, onClose, open, newPostCategory }: Pr
         post={post ?? null}
         spaceId={spaceId}
         onSave={close}
+        // need to pass close in order to close the original dialog
+        // Required when a post is saved as a draft (we don't redirect to the post page)
+        close={close}
         contentUpdated={contentUpdated}
         setContentUpdated={setContentUpdated}
         newPostCategory={newPostCategory}
