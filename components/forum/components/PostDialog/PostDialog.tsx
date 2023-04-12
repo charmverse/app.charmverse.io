@@ -1,6 +1,7 @@
 import ArticleOutlinedIcon from '@mui/icons-material/ArticleOutlined';
+import HowToVoteOutlinedIcon from '@mui/icons-material/HowToVoteOutlined';
 import OpenInFullIcon from '@mui/icons-material/OpenInFull';
-import { Box, DialogContent, Stack } from '@mui/material';
+import { Box, Card, DialogContent, Stack, Typography } from '@mui/material';
 import MuiDialog from '@mui/material/Dialog';
 import type { Post, PostCategory } from '@prisma/client';
 import { usePopupState } from 'material-ui-popup-state/hooks';
@@ -210,7 +211,16 @@ export function PostDialog({ post, spaceId, onClose, open, newPostCategory }: Pr
           Drafts ({draftedPosts.length})
         </DialogTitle>
         <DialogContent>
-          <DraftPostList onClick={showDraftPost} draftPosts={draftedPosts} mutateDraftPosts={mutateDraftPosts} />
+          {draftedPosts.length === 0 ? (
+            <Card variant='outlined'>
+              <Box p={3} textAlign='center'>
+                <ArticleOutlinedIcon fontSize='large' color='secondary' />
+                <Typography color='secondary'>No drafted posts yet.</Typography>
+              </Box>
+            </Card>
+          ) : (
+            <DraftPostList onClick={showDraftPost} draftPosts={draftedPosts} mutateDraftPosts={mutateDraftPosts} />
+          )}
         </DialogContent>
       </MuiDialog>
     </Dialog>
