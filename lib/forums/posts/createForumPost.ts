@@ -84,6 +84,7 @@ export async function trackCreateForumPostEvent({ post, userId }: { post: Post; 
       categoryName: category.name,
       resourceId: post.id,
       spaceId: post.spaceId,
+      isDraft: post.isDraft ?? false,
       userId,
       hasImage: post.content
         ? findChildren(getNodeFromJson(post.content), (node) => node.type.name === 'image', true)?.length !== 0
