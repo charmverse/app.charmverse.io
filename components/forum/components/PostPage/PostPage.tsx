@@ -66,7 +66,6 @@ export function PostPage({
   showOtherCategoryPosts,
   newPostCategory
 }: Props) {
-  const [isDraftPost, setIsDraftPost] = useState(post?.isDraft ?? false);
   const currentSpace = useCurrentSpace();
   const { user } = useUser();
   const { categories, getForumCategoryById } = useForumCategories();
@@ -120,10 +119,6 @@ export function PostPage({
     }
   }, [post]);
 
-  useEffect(() => {
-    setIsDraftPost(post?.isDraft ?? false);
-  }, [post]);
-
   async function createForumPost(isDraft: boolean) {
     if (checkIsContentEmpty(formInputs.content) || !categoryId) {
       throw new Error('Missing required fields to save forum post');
@@ -168,7 +163,6 @@ export function PostPage({
         isDraft: false
       });
       setIsPublishingDraftPost(false);
-      setIsDraftPost(false);
       router.push(`/${router.query.domain}/forum/post/${draftPost.path}`);
     }
   }
@@ -218,7 +212,7 @@ export function PostPage({
     <>
       {post?.proposalId && <ProposalBanner type='post' proposalId={post.proposalId} />}
       <ScrollableWindow>
-        {isDraftPost && <DraftPostBanner />}
+        {post?.isDraft && <DraftPostBanner />}
         <Stack>
           <Stack flexDirection='row'>
             <Container top={50}>
@@ -247,7 +241,7 @@ export function PostPage({
               </Box>
               {canEdit && (
                 <Stack flexDirection='row' gap={1} justifyContent='flex-end' my={2}>
-                  {!post && (
+                  {(!post || post.isDraft) && (
                     <Button
                       disabled={Boolean(disabledTooltip) || !contentUpdated}
                       disabledTooltip={disabledTooltip}
@@ -255,31 +249,31 @@ export function PostPage({
                       color='secondary'
                       variant='outlined'
                     >
-                      Save draft
+                      {post ? 'Update draft' : 'Save draft'}
                     </Button>
                   )}
-                  {post && isDraftPost && (
+                  {post?.isDraft && (
                     <Button
                       disabled={Boolean(disabledTooltip) || isPublishingDraftPost}
                       disabledTooltip={disabledTooltip}
                       onClick={() => publishDraftPost(post)}
-                      color='secondary'
-                      variant='outlined'
                       loading={isPublishingDraftPost}
                     >
-                      Publish draft
+                      Post
                     </Button>
                   )}
-                  <Button
-                    disabled={Boolean(disabledTooltip) || !contentUpdated}
-                    disabledTooltip={disabledTooltip}
-                    onClick={() => createForumPost(false)}
-                  >
-                    {post ? 'Update' : 'Post'}
-                  </Button>
+                  {!post?.isDraft && (
+                    <Button
+                      disabled={Boolean(disabledTooltip) || !contentUpdated}
+                      disabledTooltip={disabledTooltip}
+                      onClick={() => createForumPost(false)}
+                    >
+                      {post ? 'Update' : 'Post'}
+                    </Button>
+                  )}
                 </Stack>
               )}
-              {post && !isDraftPost && (
+              {post && !post.isDraft && (
                 <>
                   {!!permissions?.add_comment && (
                     <Box my={2} data-test='new-top-level-post-comment'>

@@ -28,15 +28,14 @@ import { usePostDialog } from './hooks/usePostDialog';
 
 interface Props {
   post?: PostWithVotes | null;
+  isLoading: boolean;
   spaceId: string;
   onClose: () => void;
-  open?: boolean;
   newPostCategory?: PostCategory | null;
 }
 
-export function PostDialog({ post, spaceId, onClose, open, newPostCategory }: Props) {
+export function PostDialog({ post, isLoading, spaceId, onClose, newPostCategory }: Props) {
   const mounted = useRef(false);
-  const popupState = usePopupState({ variant: 'popover', popupId: 'post-dialog' });
   const router = useRouter();
   const [formInputs, setFormInputs] = useState<FormInputs>(post ?? { title: '', content: null, contentText: '' });
   const [contentUpdated, setContentUpdated] = useState(false);
@@ -44,7 +43,7 @@ export function PostDialog({ post, spaceId, onClose, open, newPostCategory }: Pr
   const { user } = useUser();
   const {
     data: draftedPosts = [],
-    isLoading,
+    isLoading: isDraftsLoading,
     mutate: mutateDraftPosts
   } = useSWR(user ? `/users/${user.id}/drafted-posts` : null, () => charmClient.forum.listDraftPosts({ spaceId }));
 
@@ -66,30 +65,12 @@ export function PostDialog({ post, spaceId, onClose, open, newPostCategory }: Pr
     };
   }, []);
 
-  // open modal when page is set
-  useEffect(() => {
-    if (post) {
-      popupState.open();
-    }
-  }, [!!post]);
-
-  // open modal when page is set
-  useEffect(() => {
-    if (open) {
-      popupState.open();
-    }
-  }, [open]);
-
   function close() {
-    popupState.close();
     onClose();
     setFormInputs({ title: '', content: null, contentText: '' });
     setContentUpdated(false);
     setShowConfirmDialog(false);
     setIsDraftPostListOpen(false);
-    showPost({
-      postId: null
-    });
   }
 
   function deletePost() {
@@ -111,7 +92,6 @@ export function PostDialog({ post, spaceId, onClose, open, newPostCategory }: Pr
 
   function showDraftPost(draftPost: Post) {
     setIsDraftPostListOpen(false);
-    popupState.close();
     onClose();
     showPost({
       postId: draftPost.id,
@@ -121,11 +101,6 @@ export function PostDialog({ post, spaceId, onClose, open, newPostCategory }: Pr
     });
     setUrlWithoutRerender(router.pathname, { postId: draftPost.id });
   }
-
-  if (!popupState.isOpen) {
-    return null;
-  }
-
   const relativePath = `/${router.query.domain}/forum/post/${post?.path}`;
 
   return (
@@ -151,19 +126,17 @@ export function PostDialog({ post, spaceId, onClose, open, newPostCategory }: Pr
       }
       toolsMenu={
         <Stack flexDirection='row' gap={1}>
-          {!isLoading ? (
-            <Box display='flex' justifyContent='space-between'>
-              <Button
-                data-test='view-drafted-posts'
-                size='small'
-                color='secondary'
-                onClick={() => setIsDraftPostListOpen(true)}
-                variant='text'
-                startIcon={<MessageOutlinedIcon fontSize='small' />}
-              >
-                View {draftedPosts.length > 0 ? `${draftedPosts.length} ` : ''}drafts
-              </Button>
-            </Box>
+          {!isDraftsLoading && ((!isLoading && !post) || post?.isDraft) ? (
+            <Button
+              data-test='view-drafted-posts'
+              size='small'
+              color='secondary'
+              onClick={() => setIsDraftPostListOpen(true)}
+              variant='text'
+              startIcon={<MessageOutlinedIcon fontSize='small' />}
+            >
+              View {draftedPosts.length > 0 ? `${draftedPosts.length} ` : ''}drafts
+            </Button>
           ) : null}
           {post && (
             <PageActions
@@ -182,22 +155,24 @@ export function PostDialog({ post, spaceId, onClose, open, newPostCategory }: Pr
         }
       }}
     >
-      <PostPage
-        formInputs={formInputs}
-        setFormInputs={(_formInputs) => {
-          setContentUpdated(true);
-          setFormInputs((__formInputs) => ({ ...__formInputs, ..._formInputs }));
-        }}
-        post={post ?? null}
-        spaceId={spaceId}
-        onSave={close}
-        // need to pass close in order to close the original dialog
-        // Required when a post is saved as a draft (we don't redirect to the post page)
-        close={close}
-        contentUpdated={contentUpdated}
-        setContentUpdated={setContentUpdated}
-        newPostCategory={newPostCategory}
-      />
+      {!isLoading && (
+        <PostPage
+          formInputs={formInputs}
+          setFormInputs={(_formInputs) => {
+            setContentUpdated(true);
+            setFormInputs((__formInputs) => ({ ...__formInputs, ..._formInputs }));
+          }}
+          post={post ?? null}
+          spaceId={spaceId}
+          onSave={close}
+          // need to pass close in order to close the original dialog
+          // Required when a post is saved as a draft (we don't redirect to the post page)
+          close={close}
+          contentUpdated={contentUpdated}
+          setContentUpdated={setContentUpdated}
+          newPostCategory={newPostCategory}
+        />
+      )}
       <ConfirmDeleteModal
         onClose={() => {
           setShowConfirmDialog(false);
