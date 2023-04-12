@@ -2,13 +2,13 @@ import styled from '@emotion/styled';
 import CloseIcon from '@mui/icons-material/Close';
 import { IconButton } from '@mui/material';
 import { Box, Stack } from '@mui/system';
-import type { Dispatch, SetStateAction } from 'react';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import type { PropertyValueDisplayType } from 'components/common/BoardEditor/interfaces';
 import { InputSearchMemberMultiple } from 'components/common/form/InputSearchMember';
 import UserDisplay from 'components/common/UserDisplay';
 import { useMembers } from 'hooks/useMembers';
+import type { Member } from 'lib/members/interfaces';
 
 type Props = {
   memberIds: string[];
@@ -63,7 +63,7 @@ function MembersDisplay({
   readOnly: boolean;
   clicked: boolean;
   memberIds: string[];
-  setMemberIds: Dispatch<SetStateAction<string[]>>;
+  setMemberIds: (memberIds: string[]) => void;
 }) {
   const { membersRecord } = useMembers();
   return memberIds.length === 0 ? null : (
@@ -73,6 +73,7 @@ function MembersDisplay({
         if (!user) {
           return null;
         }
+
         return (
           <Stack alignItems='center' flexDirection='row' key={user.id} gap={0.5}>
             <UserDisplay fontSize={14} avatarSize='xSmall' user={user} />
@@ -97,19 +98,35 @@ function MembersDisplay({
 }
 
 function UserProperty(props: Props): JSX.Element | null {
-  const [memberIds, setMemberIds] = useState(props.memberIds);
-  const [clicked, setClicked] = useState(false);
   const { membersRecord } = useMembers();
+  const [memberIds, setMemberIds] = useState(getFilteredMemberIds(props.memberIds, membersRecord));
+  const [clicked, setClicked] = useState(false);
+  const membersValue = useMemo(
+    () => memberIds.map((memberId) => membersRecord[memberId]).filter((member) => member !== undefined),
+    [memberIds, membersRecord]
+  );
+
+  const updateMemberIds = useCallback(
+    (unfilteredIds: string[]) => {
+      setMemberIds(getFilteredMemberIds(unfilteredIds, membersRecord));
+    },
+    [membersRecord]
+  );
 
   useEffect(() => {
-    setMemberIds(props.memberIds);
-  }, [props.memberIds]);
+    updateMemberIds(props.memberIds);
+  }, [props.memberIds, updateMemberIds]);
 
   const [isOpen, setIsOpen] = useState(false);
 
   if (props.readOnly) {
     return (
-      <MembersDisplay readOnly={props.readOnly} clicked={clicked} memberIds={memberIds} setMemberIds={setMemberIds} />
+      <MembersDisplay
+        readOnly={props.readOnly}
+        clicked={clicked}
+        memberIds={memberIds}
+        setMemberIds={updateMemberIds}
+      />
     );
   }
 
@@ -129,12 +146,12 @@ function UserProperty(props: Props): JSX.Element | null {
         open={isOpen}
         disableCloseOnSelect
         defaultValue={memberIds}
-        value={memberIds.map((memberId) => membersRecord[memberId])}
+        value={membersValue}
         onChange={(_memberIds, reason) => {
           if (reason === 'removeOption' && !isOpen) {
             props.onChange(_memberIds);
           }
-          setMemberIds(_memberIds);
+          updateMemberIds(_memberIds);
         }}
         onClose={() => {
           if (isOpen) {
@@ -154,12 +171,16 @@ function UserProperty(props: Props): JSX.Element | null {
             readOnly={props.readOnly}
             clicked={clicked}
             memberIds={memberIds}
-            setMemberIds={setMemberIds}
+            setMemberIds={updateMemberIds}
           />
         )}
       />
     </StyledUserPropertyContainer>
   );
+}
+
+function getFilteredMemberIds(memberIds: string[], membersRecord: Record<string, Member>): string[] {
+  return memberIds.filter((memberId) => membersRecord[memberId] !== undefined);
 }
 
 export default UserProperty;
