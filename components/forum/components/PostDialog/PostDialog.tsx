@@ -210,12 +210,7 @@ export function PostDialog({ post, spaceId, onClose, open, newPostCategory }: Pr
           Drafts ({draftedPosts.length})
         </DialogTitle>
         <DialogContent>
-          <DraftPostList
-            onClose={() => setIsDraftPostListOpen(false)}
-            onClick={showDraftPost}
-            draftPosts={draftedPosts}
-            mutateDraftPosts={mutateDraftPosts}
-          />
+          <DraftPostList onClick={showDraftPost} draftPosts={draftedPosts} mutateDraftPosts={mutateDraftPosts} />
         </DialogContent>
       </MuiDialog>
     </Dialog>

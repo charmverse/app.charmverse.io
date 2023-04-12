@@ -13,10 +13,8 @@ import { usePostDialog } from '../PostDialog/hooks/usePostDialog';
 export function DraftPostList({
   draftPosts,
   onClick,
-  onClose,
   mutateDraftPosts
 }: {
-  onClose: VoidFunction;
   draftPosts: Post[];
   onClick: (post: Post) => void;
   mutateDraftPosts: KeyedMutator<Post[]>;
@@ -29,7 +27,6 @@ export function DraftPostList({
       showPost({
         postId: null
       });
-      onClose();
       mutateDraftPosts(
         (currentDraftPosts) =>
           currentDraftPosts?.filter((currentDraftPost) => currentDraftPost.id !== draftPost.id) ?? [],
