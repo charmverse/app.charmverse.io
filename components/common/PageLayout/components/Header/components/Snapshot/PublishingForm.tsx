@@ -308,8 +308,8 @@ export default function PublishingForm({ onSubmit, page }: Props) {
             <Grid item>
               <FieldLabel>Voting type</FieldLabel>
               <InputEnumToOption
+                defaultValue={snapshotVoteMode}
                 keyAndLabel={SnapshotVotingMode}
-                defaultValue='single-choice'
                 onChange={(voteMode) => setSnapshotVoteMode(voteMode as SnapshotVotingModeType)}
               />
             </Grid>

@@ -1,11 +1,10 @@
-import CloseIcon from '@mui/icons-material/Close';
 import CommentIcon from '@mui/icons-material/Comment';
 import ForumIcon from '@mui/icons-material/Forum';
 import HowToVoteIcon from '@mui/icons-material/HowToVote';
 import KeyIcon from '@mui/icons-material/Key';
 import BountyIcon from '@mui/icons-material/RequestPageOutlined';
 import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
-import { Badge, Box, IconButton, Stack, Typography } from '@mui/material';
+import { Badge, Box, Stack, Typography } from '@mui/material';
 import { useMemo } from 'react';
 
 import Avatar from 'components/common/Avatar';
@@ -59,7 +58,7 @@ export function NotificationPreview({ notification, markAsRead, onClose, large, 
         justifyContent='space-between'
         gap={2}
         pl={2}
-        pr={large ? 2 : 0.5}
+        pr={2}
         py={1.5}
       >
         <Box display='flex' justifyContent='space-between' width='100%'>
@@ -115,20 +114,6 @@ export function NotificationPreview({ notification, markAsRead, onClose, large, 
               {content}
             </Typography>
           </Box>
-          {!large && (
-            <Box display='flex' alignItems='flex-start' ml={0.5} mt={-0.25}>
-              <IconButton
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  markAsRead({ taskId, groupType, type });
-                }}
-                size='small'
-              >
-                <CloseIcon fontSize='small' />
-              </IconButton>
-            </Box>
-          )}
         </Box>
       </Box>
     </Link>
