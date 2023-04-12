@@ -1,6 +1,7 @@
 import ArticleOutlinedIcon from '@mui/icons-material/ArticleOutlined';
 import OpenInFullIcon from '@mui/icons-material/OpenInFull';
-import { Box, Stack } from '@mui/material';
+import { Box, DialogContent, Stack } from '@mui/material';
+import MuiDialog from '@mui/material/Dialog';
 import type { Post, PostCategory } from '@prisma/client';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
@@ -10,10 +11,11 @@ import useSWR from 'swr';
 import charmClient from 'charmClient';
 import Dialog from 'components/common/BoardEditor/focalboard/src/components/dialog';
 import Button from 'components/common/Button';
-import Modal from 'components/common/Modal';
+import { DialogTitle } from 'components/common/Modal';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { PageActions } from 'components/common/PageActions';
 import { usePostPermissions } from 'components/forum/hooks/usePostPermissions';
+import { useSmallScreen } from 'hooks/useMediaScreens';
 import { useUser } from 'hooks/useUser';
 import type { PostWithVotes } from 'lib/forums/posts/interfaces';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
@@ -47,6 +49,7 @@ export function PostDialog({ post, spaceId, onClose, open, newPostCategory }: Pr
   } = useSWR(user ? `/users/${user.id}/drafted-posts` : null, () => charmClient.forum.listDraftPosts({ spaceId }));
 
   const { showPost } = usePostDialog();
+  const isMobile = useSmallScreen();
 
   const [isDraftPostListOpen, setIsDraftPostListOpen] = useState(false);
 
@@ -194,14 +197,24 @@ export function PostDialog({ post, spaceId, onClose, open, newPostCategory }: Pr
         question='Are you sure you want to close this post? You have unsaved changes'
         onConfirm={close}
       />
-      <Modal open={isDraftPostListOpen} onClose={() => setIsDraftPostListOpen(false)}>
-        <DraftPostList
-          onClose={() => setIsDraftPostListOpen(false)}
-          onClick={showDraftPost}
-          draftPosts={draftedPosts}
-          mutateDraftPosts={mutateDraftPosts}
-        />
-      </Modal>
+      <MuiDialog
+        fullWidth
+        fullScreen={isMobile}
+        open={isDraftPostListOpen}
+        onClose={() => setIsDraftPostListOpen(false)}
+      >
+        <DialogTitle sx={{ '&&': { px: 2, py: 2 } }} onClose={() => setIsDraftPostListOpen(false)}>
+          Drafts ({draftedPosts.length})
+        </DialogTitle>
+        <DialogContent>
+          <DraftPostList
+            onClose={() => setIsDraftPostListOpen(false)}
+            onClick={showDraftPost}
+            draftPosts={draftedPosts}
+            mutateDraftPosts={mutateDraftPosts}
+          />
+        </DialogContent>
+      </MuiDialog>
     </Dialog>
   );
 }
