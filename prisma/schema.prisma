@@ -599,7 +599,7 @@ model TelegramUser {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @default(now())
   userId     String   @unique @db.Uuid
-  telegramId Int      @id
+  telegramId BigInt   @id
   account    Json
   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -1373,14 +1373,14 @@ model PostCategoryPermission {
 }
 
 model ApiPageKey {
-  createdAt DateTime @default(now())
-  updatedAt DateTime  @updatedAt
-  createdBy String @db.Uuid
-  pageId    String @db.Uuid
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+  createdBy String         @db.Uuid
+  pageId    String         @db.Uuid
   apiKey    String
   type      ApiPageKeyType
-  page      Page   @relation(fields: [pageId], references: [id], onDelete: Cascade)
-  user      User   @relation(fields: [createdBy], references: [id], onDelete: Cascade)
+  page      Page           @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  user      User           @relation(fields: [createdBy], references: [id], onDelete: Cascade)
 
   @@unique([pageId, type])
   @@unique([apiKey])

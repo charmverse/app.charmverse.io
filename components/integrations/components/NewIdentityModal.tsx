@@ -17,7 +17,7 @@ import type { LoggedInUser } from 'models';
 import type { TelegramAccount } from 'pages/api/telegram/connect';
 
 import IdentityProviderItem from './IdentityProviderItem';
-import { loginWithTelegram } from './TelegramLoginIframe';
+import { loginWithTelegram, TELEGRAM_BOT_ID } from './TelegramLoginIframe';
 
 type Props = {
   isOpen: boolean;
@@ -50,6 +50,9 @@ export function NewIdentityModal({ isOpen, onClose }: Props) {
     {
       onSuccess(data) {
         setUser((_user: LoggedInUser) => ({ ..._user, telegramUser: data }));
+      },
+      onError(err) {
+        showMessage((err as any).message ?? 'Something went wrong', 'error');
       }
     }
   );
@@ -132,12 +135,14 @@ export function NewIdentityModal({ isOpen, onClose }: Props) {
           {!telegramAccount && (
             <IdentityProviderItem type='Telegram'>
               <PrimaryButton
+                disabled={!TELEGRAM_BOT_ID}
+                loading={isConnectingToTelegram}
+                disabledTooltip='Telegram bot is not configured'
                 size='small'
                 onClick={async () => {
                   await connectTelegram();
                   onClose();
                 }}
-                disabled={isConnectingToTelegram}
               >
                 Connect
               </PrimaryButton>
