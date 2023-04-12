@@ -6,6 +6,7 @@ import { v4 } from 'uuid';
 import { removeSpaceOperations } from 'lib/permissions/spaces';
 import { createProposal } from 'lib/proposal/createProposal';
 import { typedKeys } from 'lib/utilities/objects';
+import type { VoteDTO } from 'lib/votes/interfaces';
 import type { LoggedInUser } from 'models';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { createPage, createVote, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
@@ -159,20 +160,20 @@ describe('POST /api/votes - Create a proposal vote', () => {
       categoryId: proposalCategory.id
     });
 
-    await request(baseUrl)
-      .post('/api/votes')
-      .set('Cookie', authorCookie)
-      .send({
-        context: 'proposal',
-        deadline: new Date(),
-        pageId: proposal.id,
-        title: 'new vote',
-        type: 'Approval',
-        threshold: 50,
-        voteOptions: ['1', '2', '3'],
-        createdBy: user.id
-      })
-      .expect(201);
+    const newVote: VoteDTO = {
+      context: 'proposal',
+      deadline: new Date(),
+      description: '',
+      pageId: proposal.id,
+      spaceId: proposal.spaceId,
+      title: 'new vote',
+      type: 'Approval',
+      threshold: 50,
+      voteOptions: ['1', '2', '3'],
+      createdBy: user.id
+    };
+
+    await request(baseUrl).post('/api/votes').set('Cookie', authorCookie).send(newVote).expect(201);
   });
 
   it('should allow the user to create a proposal vote if they are a space admin who did not author the proposal', async () => {
@@ -186,20 +187,19 @@ describe('POST /api/votes - Create a proposal vote', () => {
       proposalStatus: 'reviewed',
       categoryId: proposalCategory.id
     });
-    await request(baseUrl)
-      .post('/api/votes')
-      .set('Cookie', adminCookie)
-      .send({
-        context: 'proposal',
-        deadline: new Date(),
-        pageId: proposal.id,
-        title: 'new vote',
-        type: 'Approval',
-        threshold: 50,
-        voteOptions: ['1', '2', '3'],
-        createdBy: user.id
-      })
-      .expect(201);
+    const newVote: VoteDTO = {
+      context: 'proposal',
+      deadline: new Date(),
+      pageId: proposal.id,
+      description: '',
+      spaceId: proposal.spaceId,
+      title: 'new vote',
+      type: 'Approval',
+      threshold: 50,
+      voteOptions: ['1', '2', '3'],
+      createdBy: user.id
+    };
+    await request(baseUrl).post('/api/votes').set('Cookie', adminCookie).send(newVote).expect(201);
   });
 
   it('should not allow the user to create a proposal vote if they are not a proposal author', async () => {
@@ -218,19 +218,19 @@ describe('POST /api/votes - Create a proposal vote', () => {
       spaceId: authorSpace.id,
       categoryId: proposalCategory.id
     });
+    const newVote: VoteDTO = {
+      deadline: new Date(),
+      pageId: resultPage.id,
+      spaceId: resultPage.spaceId,
+      context: 'inline',
+      description: '',
+      title: 'new vote',
+      type: 'Approval',
+      threshold: 50,
+      voteOptions: ['1', '2', '3'],
+      createdBy: user.id
+    };
 
-    await request(baseUrl)
-      .post('/api/votes')
-      .set('Cookie', otherUserCookie)
-      .send({
-        deadline: new Date(),
-        pageId: resultPage.id,
-        title: 'new vote',
-        type: 'Approval',
-        threshold: 50,
-        voteOptions: ['1', '2', '3'],
-        createdBy: user.id
-      })
-      .expect(401);
+    await request(baseUrl).post('/api/votes').set('Cookie', otherUserCookie).send(newVote).expect(401);
   });
 });
