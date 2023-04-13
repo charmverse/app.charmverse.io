@@ -1,7 +1,10 @@
+import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import { Button, ListItemIcon, Menu, MenuItem, Stack, TextField, Typography } from '@mui/material';
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+import { Button, IconButton, ListItemIcon, Menu, MenuItem, Stack, TextField, Typography } from '@mui/material';
 import { debounce } from 'lodash';
 import PopupState, { bindMenu, bindTrigger } from 'material-ui-popup-state';
+import { usePopupState } from 'material-ui-popup-state/hooks';
 import React, { useEffect, useMemo, useState } from 'react';
 
 import type { IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
@@ -211,6 +214,7 @@ function FilterPropertyValue({
 }
 
 function FilterEntry(props: Props) {
+  const deleteFilterClausePopupState = usePopupState({ variant: 'popover' });
   const { properties: viewProperties, view, filter } = props;
   const containsTitleProperty = viewProperties.find((property) => property.id === Constants.titleColumnId);
   const properties: IPropertyTemplate[] = containsTitleProperty
@@ -239,6 +243,14 @@ function FilterEntry(props: Props) {
       .join(', ');
   } else {
     displayValue = '(empty)';
+  }
+
+  function deleteFilterClause() {
+    const filterGroup = createFilterGroup(view.fields.filter);
+    filterGroup.filters = filterGroup.filters.filter(
+      (_filter) => (_filter as FilterClause).filterId !== filter.filterId
+    );
+    mutator.changeViewFilter(view.id, view.fields.filter, filterGroup);
   }
 
   if (!template) {
@@ -315,6 +327,15 @@ function FilterEntry(props: Props) {
       </PopupState>
       <FilterPropertyValue filter={filter} properties={properties} view={view} />
       <div className='octo-spacer' />
+      <IconButton size='medium' {...bindTrigger(deleteFilterClausePopupState)}>
+        <MoreHorizIcon fontSize='small' />
+      </IconButton>
+      <Menu {...bindMenu(deleteFilterClausePopupState)}>
+        <MenuItem onClick={deleteFilterClause}>
+          <DeleteOutlinedIcon fontSize='small' sx={{ mr: 1 }} />
+          <Typography>Delete</Typography>
+        </MenuItem>
+      </Menu>
       {/* <Button
         onClick={() => {
           const filterGroup = createFilterGroup(view.fields.filter);
