@@ -12,7 +12,7 @@ if (isDevEnv) {
 }
 
 async function register(req: NextApiRequest, res: NextApiResponse) {
-  const userId = req.query.id || (req.query.userId as string);
+  const userId = (req.query.id || req.query.userId) as string | undefined;
   if (!userId) {
     throw new Error('Please provider ?userid=...');
   }
