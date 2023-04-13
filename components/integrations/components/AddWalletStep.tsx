@@ -23,14 +23,16 @@ export function AddWalletStep({ isConnectingWallet, onSignSuccess }: Props) {
   return (
     <Stack gap={2}>
       <Typography>
-        To add anoter wallet to your account, switch to the wallet you want to add. You will be asked to connect and
+        To add another wallet to your account, switch to the wallet you want to add. You will be asked to connect and
         sign a message.
       </Typography>
 
-      <Stack direction='row' gap={1} alignItems='center'>
-        <Stack>
+      <Stack direction={['column', 'row']} gap={1} alignItems='center'>
+        <Stack width='100%'>
           <Typography variant='subtitle2'>Current address</Typography>
-          <Typography color='subtitle1'>{account ? shortenHex(account, 10) : '-'}</Typography>
+          <Typography color='subtitle1' noWrap>
+            {account}
+          </Typography>
         </Stack>
 
         <Stack flex={1} alignItems='flex-end'>
