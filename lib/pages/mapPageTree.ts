@@ -68,6 +68,10 @@ export function reducePagesToPageTree<T extends PageNode = PageNode>({
     else if (node.parentId === null && !rootPageIds && includableNode(node)) {
       roots.push(node);
     }
+    // parent may be undefined if user has no access to it
+    else if (node.parentId && !parentNode) {
+      roots.push(node);
+    }
 
     if (rootPageIds?.includes(node.id)) {
       roots.push(node);
