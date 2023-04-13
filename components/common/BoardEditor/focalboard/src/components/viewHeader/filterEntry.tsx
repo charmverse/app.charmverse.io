@@ -1,15 +1,17 @@
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+import type { SelectChangeEvent } from '@mui/material';
 import {
   Button,
+  Chip,
   ListItemIcon,
   Menu,
   MenuItem,
+  Select,
   Stack,
   Switch,
   TextField,
-  ToggleButton,
   Typography
 } from '@mui/material';
 import { debounce } from 'lodash';
@@ -17,11 +19,14 @@ import PopupState, { bindMenu, bindTrigger } from 'material-ui-popup-state';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import React, { useEffect, useMemo, useState } from 'react';
 
+import UserDisplay from 'components/common/UserDisplay';
+import { useMembers } from 'hooks/useMembers';
 import type { IPropertyTemplate } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { FilterClause, FilterCondition } from 'lib/focalboard/filterClause';
 import { propertyConfigs } from 'lib/focalboard/filterClause';
 import { createFilterGroup } from 'lib/focalboard/filterGroup';
+import { focalboardColorsMap, type SupportedColor } from 'theme/colors';
 
 import { Constants } from '../../constants';
 import mutator from '../../mutator';
@@ -59,6 +64,10 @@ function FilterPropertyValue({
     acc[property.id] = property;
     return acc;
   }, {});
+  const { members } = useMembers();
+  const isPropertyTypePerson = propertyRecord[filter.propertyId].type === 'person';
+  const isPropertyTypeMultiSelect = propertyRecord[filter.propertyId].type === 'multiSelect';
+  const property = propertyRecord[filter.propertyId];
 
   useEffect(() => {
     setFilter(initialFilter);
@@ -93,6 +102,16 @@ function FilterPropertyValue({
     updatePropertyValueDebounced(view, newFilterValue);
   };
 
+  const updateMultiSelectValue = (e: SelectChangeEvent<string[]>) => {
+    const values = e.target.value as string[];
+    const newFilterValue = {
+      ...filter,
+      values
+    };
+    setFilter(newFilterValue);
+    updatePropertyValueDebounced(view, newFilterValue);
+  };
+
   const propertyDataType = propertyConfigs[propertyRecord[filter.propertyId].type].datatype;
 
   if (filter.condition === 'is-empty' || filter.condition === 'is-not-empty') {
@@ -111,6 +130,56 @@ function FilterPropertyValue({
     );
   } else if (propertyDataType === 'boolean') {
     return <Switch checked={filter.values[0] === 'true'} onChange={updateBooleanValue} />;
+  } else if (propertyDataType === 'multi-select') {
+    if (isPropertyTypeMultiSelect) {
+      return (
+        <Select<string[]>
+          multiple
+          value={filter.values}
+          onChange={updateMultiSelectValue}
+          renderValue={(selected) =>
+            selected.map((optionId) => {
+              const foundOption = property.options?.find((o) => o.id === optionId);
+              return foundOption ? (
+                <Chip size='small' label={foundOption.value} color={focalboardColorsMap[foundOption.color]} />
+              ) : null;
+            })
+          }
+        >
+          {property.options?.map((option) => {
+            return (
+              <MenuItem key={option.id} value={option.id}>
+                <Chip size='small' label={option.value} color={focalboardColorsMap[option.color]} />
+              </MenuItem>
+            );
+          })}
+        </Select>
+      );
+    } else if (isPropertyTypePerson) {
+      return (
+        <Select<string[]>
+          multiple
+          value={filter.values}
+          onChange={updateMultiSelectValue}
+          renderValue={(selectedMemberIds) =>
+            selectedMemberIds.map((selectedMemberId) => {
+              const member = members?.find((_member) => _member.id === selectedMemberId);
+              return member ? (
+                <UserDisplay key={selectedMemberId} avatarSize='xSmall' fontSize={12} user={member} />
+              ) : null;
+            })
+          }
+        >
+          {members.map((member) => {
+            return (
+              <MenuItem value={member.id} key={member.id}>
+                <UserDisplay user={member} />
+              </MenuItem>
+            );
+          })}
+        </Select>
+      );
+    }
   }
 
   return null;

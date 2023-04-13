@@ -110,7 +110,7 @@ export const propertyConfigs: Record<PropertyType, DataTypeConfigs> = {
     conditions: NumberDataTypeConditions
   },
   person: {
-    datatype: 'text',
+    datatype: 'multi-select',
     conditions: MultiSelectDataTypeConditions
   },
   phone: {
