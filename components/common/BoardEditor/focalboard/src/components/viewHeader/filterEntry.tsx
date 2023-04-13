@@ -1,7 +1,17 @@
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import { Button, IconButton, ListItemIcon, Menu, MenuItem, Stack, TextField, Typography } from '@mui/material';
+import {
+  Button,
+  ListItemIcon,
+  Menu,
+  MenuItem,
+  Stack,
+  Switch,
+  TextField,
+  ToggleButton,
+  Typography
+} from '@mui/material';
 import { debounce } from 'lodash';
 import PopupState, { bindMenu, bindTrigger } from 'material-ui-popup-state';
 import { usePopupState } from 'material-ui-popup-state/hooks';
@@ -9,8 +19,8 @@ import React, { useEffect, useMemo, useState } from 'react';
 
 import type { IPropertyTemplate } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
+import type { FilterClause, FilterCondition } from 'lib/focalboard/filterClause';
 import { propertyConfigs } from 'lib/focalboard/filterClause';
-import type { FilterCondition, FilterClause } from 'lib/focalboard/filterClause';
 import { createFilterGroup } from 'lib/focalboard/filterGroup';
 
 import { Constants } from '../../constants';
@@ -63,7 +73,31 @@ function FilterPropertyValue({
     }, 1000);
   }, []);
 
+  const updateTextValue = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    const newFilterValue = {
+      ...filter,
+      values: [value]
+    };
+    setFilter(newFilterValue);
+    updatePropertyValueDebounced(view, newFilterValue);
+  };
+
+  const updateBooleanValue = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.checked;
+    const newFilterValue = {
+      ...filter,
+      values: [value ? 'true' : 'false']
+    };
+    setFilter(newFilterValue);
+    updatePropertyValueDebounced(view, newFilterValue);
+  };
+
   const propertyDataType = propertyConfigs[propertyRecord[filter.propertyId].type].datatype;
+
+  if (filter.condition === 'is-empty' || filter.condition === 'is-not-empty') {
+    return null;
+  }
 
   if (propertyDataType === 'text' || propertyDataType === 'number') {
     return (
@@ -71,18 +105,12 @@ function FilterPropertyValue({
         variant='outlined'
         type={propertyDataType === 'number' ? 'number' : 'text'}
         value={filter.values[0]}
-        onChange={(e) => {
-          const value = e.target.value;
-          const newFilterValue = {
-            ...filter,
-            values: [value]
-          };
-          setFilter(newFilterValue);
-          updatePropertyValueDebounced(view, newFilterValue);
-        }}
+        onChange={updateTextValue}
         placeholder='Value'
       />
     );
+  } else if (propertyDataType === 'boolean') {
+    return <Switch checked={filter.values[0] === 'true'} onChange={updateBooleanValue} />;
   }
 
   return null;
@@ -106,8 +134,6 @@ function FilterEntry(props: Props) {
 
   const template = properties.find((o: IPropertyTemplate) => o.id === filter.propertyId);
 
-  const key = `${filter.propertyId}-${filter.condition}-${filter.values.join(',')}`;
-
   function deleteFilterClause() {
     const filterGroup = createFilterGroup(view.fields.filter);
     filterGroup.filters = filterGroup.filters.filter(
@@ -121,82 +147,91 @@ function FilterEntry(props: Props) {
   }
 
   return (
-    <Stack key={key} gap={0.5} flexDirection='row'>
-      <PopupState variant='popover' popupId='view-filter'>
-        {(popupState) => (
-          <>
-            <Button
-              color='secondary'
-              size='small'
-              {...bindTrigger(popupState)}
-              variant='outlined'
-              endIcon={<KeyboardArrowDownIcon fontSize='small' />}
-            >
-              <Stack flexDirection='row' alignItems='center'>
-                <ListItemIcon>{iconForPropertyType(template.type, { color: 'secondary' })}</ListItemIcon>
-                <Typography>{template.name}</Typography>
-              </Stack>
-            </Button>
-            <Menu {...bindMenu(popupState)}>
-              {properties.map((property) => (
-                <MenuItem
-                  key={property.id}
-                  id={property.id}
-                  onClick={() => {
-                    const filterGroup = createFilterGroup(view.fields.filter);
-                    const filterClause = filterGroup.filters.find(
-                      (_filter) => (_filter as FilterClause).filterId === filter.filterId
-                    ) as FilterClause;
-                    if (filterClause) {
-                      if (filterClause.propertyId !== property.id) {
-                        filterClause.propertyId = property.id;
-                        filterClause.values = [];
-                        filterClause.condition = propertyConfigs[property.type].conditions[0];
-                        mutator.changeViewFilter(view.id, view.fields.filter, filterGroup);
+    <Stack flexDirection='row' justifyContent='space-between'>
+      <Stack gap={0.5} flexDirection='row'>
+        <PopupState variant='popover' popupId='view-filter'>
+          {(popupState) => (
+            <>
+              <Button
+                color='secondary'
+                size='small'
+                {...bindTrigger(popupState)}
+                variant='outlined'
+                endIcon={<KeyboardArrowDownIcon fontSize='small' />}
+              >
+                <Stack flexDirection='row' alignItems='center'>
+                  <ListItemIcon>{iconForPropertyType(template.type, { color: 'secondary' })}</ListItemIcon>
+                  <Typography sx={{ whiteSpace: 'nowrap' }}>{template.name}</Typography>
+                </Stack>
+              </Button>
+              <Menu {...bindMenu(popupState)}>
+                {properties.map((property) => (
+                  <MenuItem
+                    key={property.id}
+                    id={property.id}
+                    onClick={() => {
+                      const filterGroup = createFilterGroup(view.fields.filter);
+                      const filterClause = filterGroup.filters.find(
+                        (_filter) => (_filter as FilterClause).filterId === filter.filterId
+                      ) as FilterClause;
+                      if (filterClause) {
+                        if (filterClause.propertyId !== property.id) {
+                          filterClause.propertyId = property.id;
+                          filterClause.values = [];
+                          filterClause.condition = propertyConfigs[property.type].conditions[0];
+                          mutator.changeViewFilter(view.id, view.fields.filter, filterGroup);
+                        }
                       }
-                    }
-                  }}
-                >
-                  <ListItemIcon>{iconForPropertyType(property.type)}</ListItemIcon>
-                  <Typography>{property.name}</Typography>
-                </MenuItem>
-              ))}
-            </Menu>
-          </>
-        )}
-      </PopupState>
-
-      <PopupState variant='popover' popupId='view-filter'>
-        {(popupState) => (
-          <>
-            <Button
-              color='secondary'
-              size='small'
-              {...bindTrigger(popupState)}
-              variant='outlined'
-              endIcon={<KeyboardArrowDownIcon fontSize='small' />}
-            >
-              <Typography variant='subtitle1'>{formatCondition(filter.condition)}</Typography>
-            </Button>
-            <Menu {...bindMenu(popupState)}>
-              {propertyConfigs[template.type].conditions.map((condition) => {
-                return (
-                  <MenuItem key={condition} id='includes' onClick={() => props.conditionClicked(condition, filter)}>
-                    <Typography variant='subtitle1' sx={{ whiteSpace: 'nowrap' }}>
-                      {formatCondition(condition)}
-                    </Typography>
+                    }}
+                  >
+                    <ListItemIcon>{iconForPropertyType(property.type)}</ListItemIcon>
+                    <Typography>{property.name}</Typography>
                   </MenuItem>
-                );
-              })}
-            </Menu>
-          </>
-        )}
-      </PopupState>
-      <FilterPropertyValue filter={filter} properties={properties} view={view} />
-      <div className='octo-spacer' />
-      <IconButton size='medium' {...bindTrigger(deleteFilterClausePopupState)}>
-        <MoreHorizIcon fontSize='small' />
-      </IconButton>
+                ))}
+              </Menu>
+            </>
+          )}
+        </PopupState>
+
+        <PopupState variant='popover' popupId='view-filter'>
+          {(popupState) => (
+            <>
+              <Button
+                color='secondary'
+                size='small'
+                {...bindTrigger(popupState)}
+                variant='outlined'
+                endIcon={<KeyboardArrowDownIcon fontSize='small' />}
+              >
+                <Typography variant='subtitle1' sx={{ whiteSpace: 'nowrap' }}>
+                  {formatCondition(filter.condition)}
+                </Typography>
+              </Button>
+              <Menu {...bindMenu(popupState)}>
+                {propertyConfigs[template.type].conditions.map((condition) => {
+                  return (
+                    <MenuItem key={condition} id='includes' onClick={() => props.conditionClicked(condition, filter)}>
+                      <Typography variant='subtitle1' sx={{ whiteSpace: 'nowrap' }}>
+                        {formatCondition(condition)}
+                      </Typography>
+                    </MenuItem>
+                  );
+                })}
+              </Menu>
+            </>
+          )}
+        </PopupState>
+        <FilterPropertyValue filter={filter} properties={properties} view={view} />
+      </Stack>
+      <MoreHorizIcon
+        sx={{
+          cursor: 'pointer',
+          alignSelf: 'center',
+          mx: 1
+        }}
+        fontSize='small'
+        {...bindTrigger(deleteFilterClausePopupState)}
+      />
       <Menu {...bindMenu(deleteFilterClausePopupState)}>
         <MenuItem onClick={deleteFilterClause}>
           <DeleteOutlinedIcon fontSize='small' sx={{ mr: 1 }} />
