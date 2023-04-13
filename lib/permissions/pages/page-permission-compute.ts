@@ -163,14 +163,29 @@ async function baseComputeUserPagePermissions({
   if (isAdmin) {
     return new AllowedPagePermissions().full;
   }
+  const whereQuery: Prisma.PagePermissionWhereInput = !spaceRole
+    ? {
+        public: true
+      }
+    : spaceRole.isGuest
+    ? {
+        OR: [
+          {
+            public: true
+          },
+          {
+            // Only get individual user permissions if they are a guest
+            userId
+          }
+        ]
+      }
+    : // Don't add any extra filters for default members, load all permissions
+      {};
 
   const pagePermissions = await prisma.pagePermission.findMany({
     where: {
       pageId,
-      // Small optimisation to avoid querying for permissions that are not applicable
-      public: !spaceRole ? true : undefined,
-      // Only pass individual user permissions if they are a guest
-      userId: spaceRole?.isGuest ? userId : undefined
+      ...whereQuery
     }
   });
   const applicablePermissions = await filterApplicablePermissions({
