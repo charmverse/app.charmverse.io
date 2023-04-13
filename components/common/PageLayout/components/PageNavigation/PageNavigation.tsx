@@ -35,7 +35,7 @@ export function filterVisiblePages(pageMap: PagesMap<PageMeta>, rootPageIds: str
             rootPageIds?.includes(page.id)) &&
           !findParentOfType({
             pageId: page.id,
-            pageType: ['card', 'inline_board', 'board'],
+            pageType: 'card',
             pageMap
           })
       )
