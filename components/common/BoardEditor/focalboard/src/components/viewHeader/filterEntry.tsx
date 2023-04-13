@@ -1,21 +1,17 @@
-import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import { Box, Button, ListItemIcon, Menu, MenuItem, Popover, Stack, Typography } from '@mui/material';
-import PopupState, { bindMenu, bindPopover, bindTrigger } from 'material-ui-popup-state';
-import React from 'react';
-import { useIntl } from 'react-intl';
+import { Button, ListItemIcon, Menu, MenuItem, Stack, TextField, Typography } from '@mui/material';
+import { debounce } from 'lodash';
+import PopupState, { bindMenu, bindTrigger } from 'material-ui-popup-state';
+import React, { useEffect, useMemo, useState } from 'react';
 
 import type { IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { FilterClause } from 'lib/focalboard/filterClause';
-import { areEqual as areFilterClausesEqual } from 'lib/focalboard/filterClause';
-import { createFilterGroup, isAFilterGroupInstance } from 'lib/focalboard/filterGroup';
+import { createFilterGroup } from 'lib/focalboard/filterGroup';
 
 import { Constants } from '../../constants';
 import mutator from '../../mutator';
-import { OctoUtils } from '../../octoUtils';
 import { Utils } from '../../utils';
-import SwitchOption from '../../widgets/menu/switchOption';
 
 import { iconForPropertyType } from './viewHeaderPropertiesMenu';
 
@@ -28,7 +24,7 @@ type Props = {
 
 const BooleanDataTypeConditions = ['is', 'is-not'] as const;
 
-const StringDataTypeConditions = [
+const TextDataTypeConditions = [
   'is',
   'is-not',
   'contains',
@@ -67,7 +63,7 @@ const SelectDataTypeConditions = ['is', 'is-not', 'is-empty', 'is-not-empty'] as
 
 const MiscDataTypeConditions = ['is-empty', 'is-not-empty'] as const;
 
-type DataType = 'string' | 'number' | 'boolean' | 'date' | 'multi-select' | 'select' | 'misc';
+type DataType = 'text' | 'number' | 'boolean' | 'date' | 'multi-select' | 'select' | 'misc';
 
 type DataTypeFactory<DT extends DataType, DataTypeDataTypeConditions extends readonly string[]> = {
   datatype: DT;
@@ -75,7 +71,7 @@ type DataTypeFactory<DT extends DataType, DataTypeDataTypeConditions extends rea
 };
 
 type BooleanDataTypeConfig = DataTypeFactory<'boolean', typeof BooleanDataTypeConditions>;
-type StringDataTypeConfig = DataTypeFactory<'string', typeof StringDataTypeConditions>;
+type TextDataTypeConfig = DataTypeFactory<'text', typeof TextDataTypeConditions>;
 type NumberDataTypeConfig = DataTypeFactory<'number', typeof NumberDataTypeConditions>;
 type DateDataTypeConfig = DataTypeFactory<'date', typeof DateDataTypeConditions>;
 type MultiSelectDataTypeConfig = DataTypeFactory<'multi-select', typeof MultiSelectDataTypeConditions>;
@@ -84,7 +80,7 @@ type MiscDataTypeConfig = DataTypeFactory<'misc', typeof MiscDataTypeConditions>
 
 type DataTypeConfigs =
   | BooleanDataTypeConfig
-  | StringDataTypeConfig
+  | TextDataTypeConfig
   | NumberDataTypeConfig
   | DateDataTypeConfig
   | MultiSelectDataTypeConfig
@@ -117,8 +113,8 @@ const propertyConfigs: Record<PropertyType, DataTypeConfigs> = {
     conditions: DateDataTypeConditions
   },
   email: {
-    datatype: 'string',
-    conditions: StringDataTypeConditions
+    datatype: 'text',
+    conditions: TextDataTypeConditions
   },
   file: {
     datatype: 'misc',
@@ -133,24 +129,24 @@ const propertyConfigs: Record<PropertyType, DataTypeConfigs> = {
     conditions: NumberDataTypeConditions
   },
   person: {
-    datatype: 'string',
+    datatype: 'text',
     conditions: MultiSelectDataTypeConditions
   },
   phone: {
-    datatype: 'string',
-    conditions: StringDataTypeConditions
+    datatype: 'text',
+    conditions: TextDataTypeConditions
   },
   select: {
     datatype: 'select',
     conditions: SelectDataTypeConditions
   },
   text: {
-    datatype: 'string',
-    conditions: StringDataTypeConditions
+    datatype: 'text',
+    conditions: TextDataTypeConditions
   },
   url: {
-    datatype: 'string',
-    conditions: StringDataTypeConditions
+    datatype: 'text',
+    conditions: TextDataTypeConditions
   }
 };
 
@@ -164,9 +160,58 @@ function formatCondition(condition: string) {
   );
 }
 
+function FilterPropertyValue({
+  properties,
+  filter: initialFilter,
+  view
+}: {
+  view: BoardView;
+  filter: FilterClause;
+  properties: IPropertyTemplate[];
+}) {
+  const [filter, setFilter] = useState(initialFilter);
+  const propertyRecord = properties.reduce<Record<string, IPropertyTemplate>>((acc, property) => {
+    acc[property.id] = property;
+    return acc;
+  }, {});
+
+  useEffect(() => {
+    setFilter(initialFilter);
+  }, [initialFilter]);
+
+  const updatePropertyValueDebounced = useMemo(() => {
+    return debounce((_view: BoardView, _filter: FilterClause) => {
+      mutator.changeViewFilter(_view.id, _view.fields.filter, {
+        operation: 'and',
+        filters: [_filter]
+      });
+    }, 1000);
+  }, []);
+
+  if (propertyConfigs[propertyRecord[filter.propertyId].type].datatype === 'text') {
+    return (
+      <TextField
+        variant='outlined'
+        value={filter.values[0]}
+        onChange={(e) => {
+          const value = e.target.value;
+          const newFilterValue = {
+            ...filter,
+            values: [value]
+          };
+          setFilter(newFilterValue);
+          updatePropertyValueDebounced(view, newFilterValue);
+        }}
+        placeholder='Value'
+      />
+    );
+  }
+
+  return null;
+}
+
 function FilterEntry(props: Props) {
   const { properties: viewProperties, view, filter } = props;
-  const intl = useIntl();
   const containsTitleProperty = viewProperties.find((property) => property.id === Constants.titleColumnId);
   const properties: IPropertyTemplate[] = containsTitleProperty
     ? viewProperties
@@ -268,64 +313,9 @@ function FilterEntry(props: Props) {
           </>
         )}
       </PopupState>
-
-      {(filter.condition === 'includes' || filter.condition === 'notIncludes') && (
-        <PopupState variant='popover' popupId='view-filter-value'>
-          {(popupState) => (
-            <>
-              <Button {...bindTrigger(popupState)}>{displayValue}</Button>
-              <Popover
-                {...bindPopover(popupState)}
-                PaperProps={{
-                  sx: {
-                    overflow: 'visible'
-                  }
-                }}
-                anchorOrigin={{
-                  vertical: 'bottom',
-                  horizontal: 'left'
-                }}
-              >
-                {template?.options.map((o) => (
-                  <Box
-                    key={o.id}
-                    py={1}
-                    sx={{
-                      background: 'rgb(var(--center-channel-bg-rgb))',
-                      '& > div': { display: 'flex', alignItems: 'center', justifyContent: 'space-between' },
-                      '& .Switch': { mx: 1 },
-                      '& .menu-name': { ml: 1 }
-                    }}
-                  >
-                    <SwitchOption
-                      id={o.id}
-                      name={o.value}
-                      isOn={filter.values.includes(o.id)}
-                      onClick={() => {
-                        const filterIndex = view.fields.filter.filters.indexOf(filter);
-                        Utils.assert(filterIndex >= 0, "Can't find filter");
-
-                        const filterGroup = createFilterGroup(view.fields.filter);
-                        const newFilter = filterGroup.filters[filterIndex] as FilterClause;
-                        Utils.assert(newFilter, `No filter at index ${filterIndex}`);
-                        if (filter.values.includes(o.id)) {
-                          newFilter.values = newFilter.values.filter((id) => id !== o.id);
-                          mutator.changeViewFilter(view.id, view.fields.filter, filterGroup);
-                        } else {
-                          newFilter.values.push(o.id);
-                          mutator.changeViewFilter(view.id, view.fields.filter, filterGroup);
-                        }
-                      }}
-                    />
-                  </Box>
-                ))}
-              </Popover>
-            </>
-          )}
-        </PopupState>
-      )}
+      <FilterPropertyValue filter={filter} properties={properties} view={view} />
       <div className='octo-spacer' />
-      <Button
+      {/* <Button
         onClick={() => {
           const filterGroup = createFilterGroup(view.fields.filter);
           filterGroup.filters = filterGroup.filters.filter(
@@ -335,7 +325,7 @@ function FilterEntry(props: Props) {
         }}
       >
         <DeleteOutlinedIcon fontSize='small' />
-      </Button>
+      </Button> */}
     </Stack>
   );
 }
