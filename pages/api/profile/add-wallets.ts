@@ -5,6 +5,7 @@ import { prisma } from 'db';
 import type { AuthSig } from 'lib/blockchain/interfaces';
 import { refreshENSName } from 'lib/blockchain/refreshENSName';
 import { isValidWalletSignature } from 'lib/blockchain/signAndVerify';
+import log from 'lib/log';
 import { updateTrackUserProfile } from 'lib/metrics/mixpanel/updateTrackUserProfile';
 import { onError, onNoMatch } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -40,6 +41,7 @@ async function addWalletsController(req: NextApiRequest, res: NextApiResponse<Lo
       }))
     });
   } catch (e) {
+    log.error('Error adding wallet', e, { userId, addresses: addressesToAdd.map((s) => s.address) });
     throw new InvalidInputError('Wallet is already connected with another account');
   }
 
