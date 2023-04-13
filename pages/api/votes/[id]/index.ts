@@ -4,6 +4,7 @@ import nc from 'next-connect';
 
 import { prisma } from 'db';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
+import { computePostPermissions } from 'lib/permissions/forum/computePostPermissions';
 import { computeUserPagePermissions } from 'lib/permissions/pages';
 import { withSessionRoute } from 'lib/session/withSession';
 import { DataNotFoundError, UnauthorisedActionError } from 'lib/utilities/errors';
@@ -38,7 +39,8 @@ async function updateVote(req: NextApiRequest, res: NextApiResponse<Vote | { err
       id: true,
       spaceId: true,
       createdBy: true,
-      pageId: true
+      pageId: true,
+      postId: true
     }
   });
 
@@ -46,13 +48,24 @@ async function updateVote(req: NextApiRequest, res: NextApiResponse<Vote | { err
     throw new DataNotFoundError(`Cannot update vote as vote with id ${voteId} was not found.`);
   }
 
-  const pagePermissions = await computeUserPagePermissions({
-    userId,
-    resourceId: vote.pageId
-  });
+  if (vote.pageId) {
+    const pagePermissions = await computeUserPagePermissions({
+      userId,
+      resourceId: vote.pageId
+    });
 
-  if (!pagePermissions.create_poll) {
-    throw new UnauthorisedActionError('You do not have permissions to delete the vote.');
+    if (!pagePermissions.create_poll) {
+      throw new UnauthorisedActionError('You do not have permissions to update the vote.');
+    }
+  } else if (vote.postId) {
+    const postPermissions = await computePostPermissions({
+      resourceId: vote.postId,
+      userId
+    });
+
+    if (!postPermissions.edit_post) {
+      throw new UnauthorisedActionError('You do not have permissions to update the vote.');
+    }
   }
 
   await updateVoteService(voteId, userId, update);
@@ -83,7 +96,8 @@ async function deleteVote(req: NextApiRequest, res: NextApiResponse<Vote | null 
       id: true,
       spaceId: true,
       createdBy: true,
-      pageId: true
+      pageId: true,
+      postId: true
     }
   });
 
@@ -91,15 +105,25 @@ async function deleteVote(req: NextApiRequest, res: NextApiResponse<Vote | null 
     throw new DataNotFoundError(`Cannot delete vote as vote with id ${voteId} was not found.`);
   }
 
-  const pagePermissions = await computeUserPagePermissions({
-    userId,
-    resourceId: vote.pageId
-  });
+  if (vote.pageId) {
+    const pagePermissions = await computeUserPagePermissions({
+      userId,
+      resourceId: vote.pageId
+    });
 
-  if (!pagePermissions.create_poll) {
-    throw new UnauthorisedActionError('You do not have permissions to delete the vote.');
+    if (!pagePermissions.create_poll) {
+      throw new UnauthorisedActionError('You do not have permissions to delete the vote.');
+    }
+  } else if (vote.postId) {
+    const postPermissions = await computePostPermissions({
+      resourceId: vote.postId,
+      userId
+    });
+
+    if (!postPermissions.edit_post) {
+      throw new UnauthorisedActionError('You do not have permissions to delete the vote.');
+    }
   }
-
   const deletedVote = await deleteVoteService(voteId, req.session.user.id);
 
   relay.broadcast(

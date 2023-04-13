@@ -4,13 +4,19 @@ import { aggregateVoteResult } from './aggregateVoteResult';
 import { calculateVoteStatus } from './calculateVoteStatus';
 import type { ExtendedVote } from './interfaces';
 
-export async function getVotesByPage({ pageId, userId }: { pageId: string; userId?: string }): Promise<ExtendedVote[]> {
+export async function getVotesByPage({
+  pageId,
+  postId,
+  userId
+}: {
+  pageId?: string;
+  postId?: string;
+  userId?: string;
+}): Promise<ExtendedVote[]> {
   const pageVotes = await prisma.vote.findMany({
     where: {
       pageId,
-      page: {
-        deletedAt: null
-      }
+      postId
     },
     include: {
       userVotes: {

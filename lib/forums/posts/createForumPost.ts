@@ -4,6 +4,7 @@ import { v4 } from 'uuid';
 
 import { prisma } from 'db';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
+import { extractPollIdsFromDoc } from 'lib/prosemirror/extractPollIdsFromDoc';
 import { getNodeFromJson } from 'lib/prosemirror/getNodeFromJson';
 import { InsecureOperationError } from 'lib/utilities/errors';
 
@@ -40,6 +41,9 @@ export async function createForumPost({
 
   const postId = v4();
 
+  // check for polls that were created before publishing the forum post
+  const pollIds = content ? extractPollIdsFromDoc(content) : [];
+
   const createdPost = await prisma.post.create({
     data: {
       id: postId,
@@ -62,7 +66,10 @@ export async function createForumPost({
         }
       },
       isDraft,
-      path: getPostPath(title)
+      path: getPostPath(title),
+      votes: {
+        connect: pollIds.map((id) => ({ id }))
+      }
     }
   });
 

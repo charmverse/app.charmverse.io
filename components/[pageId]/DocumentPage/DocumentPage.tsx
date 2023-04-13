@@ -86,7 +86,7 @@ export interface DocumentPageProps {
 
 function DocumentPage({ page, setPage, insideModal, readOnly = false }: DocumentPageProps) {
   const { pages } = usePages();
-  const { cancelVote, castVote, deleteVote, updateDeadline, votes, isLoading } = useVotes();
+  const { cancelVote, castVote, deleteVote, updateDeadline, votes, isLoading } = useVotes({ pageId: page.id });
   // For post we would artificially construct the permissions
   const { permissions: pagePermissions, refresh: refreshPagePermissions } = usePagePermissions({
     pageIdOrPath: page.id
@@ -222,7 +222,7 @@ function DocumentPage({ page, setPage, insideModal, readOnly = false }: Document
                   pageId={page.id}
                   disablePageSpecificFeatures={isSharedPage}
                   enableSuggestingMode={enableSuggestingMode}
-                  enableVoting={true}
+                  enableVoting={page.type !== 'proposal'}
                   containerWidth={containerWidth}
                   pageType={page.type}
                   pagePermissions={pagePermissions ?? undefined}
@@ -282,6 +282,7 @@ function DocumentPage({ page, setPage, insideModal, readOnly = false }: Document
                       )}
                       {proposalId && (
                         <ProposalProperties
+                          pageId={page.id}
                           proposalId={proposalId}
                           pagePermissions={pagePermissions}
                           refreshPagePermissions={refreshPagePermissions}

@@ -384,6 +384,7 @@ interface CharmEditorProps {
   isContentControlled?: boolean; // whether or not the parent component is controlling and updating the content
   enableVoting?: boolean;
   pageId?: string;
+  postId?: string;
   containerWidth?: number;
   pageType?: PageType | 'post';
   pagePermissions?: IPagePermissionFlags;
@@ -408,6 +409,7 @@ function CharmEditor({
   isContentControlled = false,
   enableVoting,
   pageId,
+  postId,
   containerWidth,
   pageType,
   pagePermissions,
@@ -578,6 +580,7 @@ function CharmEditor({
         const allProps: CharmNodeViewProps = {
           ...props,
           pageId,
+          postId,
           readOnly,
           deleteNode: () => {
             const view = props.view;

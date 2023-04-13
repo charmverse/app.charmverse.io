@@ -28,9 +28,17 @@ export async function getVoteTasks(userId: string): Promise<VoteTasksGroup> {
     },
     include: {
       page: {
-        select: pageMetaSelect()
+        select: { path: true, title: true }
       },
-      space: true,
+      post: {
+        select: { path: true, title: true }
+      },
+      space: {
+        select: {
+          name: true,
+          domain: true
+        }
+      },
       userVotes: true,
       voteOptions: true,
       author: true
@@ -76,7 +84,8 @@ export async function getVoteTasks(userId: string): Promise<VoteTasksGroup> {
       taskId: vote.id,
       spaceName: vote.space.name,
       spaceDomain: vote.space.domain,
-      pagePath: vote.page.path
+      pagePath: vote.page?.path || `forum/post/${vote.post?.path}`,
+      pageTitle: vote.page?.title || vote.post?.title || 'Untitled'
     };
 
     if (markedNotificationIds.has(task.id)) {
