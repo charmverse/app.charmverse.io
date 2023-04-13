@@ -7,21 +7,21 @@ import PopupState, { bindMenu, bindTrigger } from 'material-ui-popup-state';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import React, { useEffect, useMemo, useState } from 'react';
 
-import type { IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
+import type { IPropertyTemplate } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
-import { propertyConfigs, type FilterClause } from 'lib/focalboard/filterClause';
+import { propertyConfigs } from 'lib/focalboard/filterClause';
+import type { FilterCondition, FilterClause } from 'lib/focalboard/filterClause';
 import { createFilterGroup } from 'lib/focalboard/filterGroup';
 
 import { Constants } from '../../constants';
 import mutator from '../../mutator';
-import { Utils } from '../../utils';
 
 import { iconForPropertyType } from './viewHeaderPropertiesMenu';
 
 type Props = {
   properties: IPropertyTemplate[];
   view: BoardView;
-  conditionClicked: (optionId: string, filter: FilterClause) => void;
+  conditionClicked: (condition: FilterCondition, filter: FilterClause) => void;
   filter: FilterClause;
 };
 
@@ -63,10 +63,13 @@ function FilterPropertyValue({
     }, 1000);
   }, []);
 
-  if (propertyConfigs[propertyRecord[filter.propertyId].type].datatype === 'text') {
+  const propertyDataType = propertyConfigs[propertyRecord[filter.propertyId].type].datatype;
+
+  if (propertyDataType === 'text' || propertyDataType === 'number') {
     return (
       <TextField
         variant='outlined'
+        type={propertyDataType === 'number' ? 'number' : 'text'}
         value={filter.values[0]}
         onChange={(e) => {
           const value = e.target.value;
@@ -105,18 +108,6 @@ function FilterEntry(props: Props) {
 
   const key = `${filter.propertyId}-${filter.condition}-${filter.values.join(',')}`;
 
-  let displayValue: string;
-  if (filter.values.length > 0 && template) {
-    displayValue = filter.values
-      .map((id) => {
-        const option = template.options.find((o) => o.id === id);
-        return option?.value || '(Unknown)';
-      })
-      .join(', ');
-  } else {
-    displayValue = '(empty)';
-  }
-
   function deleteFilterClause() {
     const filterGroup = createFilterGroup(view.fields.filter);
     filterGroup.filters = filterGroup.filters.filter(
@@ -142,7 +133,7 @@ function FilterEntry(props: Props) {
               endIcon={<KeyboardArrowDownIcon fontSize='small' />}
             >
               <Stack flexDirection='row' alignItems='center'>
-                <ListItemIcon>{iconForPropertyType(template.type)}</ListItemIcon>
+                <ListItemIcon>{iconForPropertyType(template.type, { color: 'secondary' })}</ListItemIcon>
                 <Typography>{template.name}</Typography>
               </Stack>
             </Button>
@@ -152,15 +143,17 @@ function FilterEntry(props: Props) {
                   key={property.id}
                   id={property.id}
                   onClick={() => {
-                    const filterIndex = view.fields.filter.filters.indexOf(filter);
-                    Utils.assert(filterIndex >= 0, "Can't find filter");
                     const filterGroup = createFilterGroup(view.fields.filter);
-                    const newFilter = filterGroup.filters[filterIndex] as FilterClause;
-                    Utils.assert(newFilter, `No filter at index ${filterIndex}`);
-                    if (newFilter.propertyId !== property.id) {
-                      newFilter.propertyId = property.id;
-                      newFilter.values = [];
-                      mutator.changeViewFilter(view.id, view.fields.filter, filterGroup);
+                    const filterClause = filterGroup.filters.find(
+                      (_filter) => (_filter as FilterClause).filterId === filter.filterId
+                    ) as FilterClause;
+                    if (filterClause) {
+                      if (filterClause.propertyId !== property.id) {
+                        filterClause.propertyId = property.id;
+                        filterClause.values = [];
+                        filterClause.condition = propertyConfigs[property.type].conditions[0];
+                        mutator.changeViewFilter(view.id, view.fields.filter, filterGroup);
+                      }
                     }
                   }}
                 >
@@ -189,7 +182,9 @@ function FilterEntry(props: Props) {
               {propertyConfigs[template.type].conditions.map((condition) => {
                 return (
                   <MenuItem key={condition} id='includes' onClick={() => props.conditionClicked(condition, filter)}>
-                    <Typography variant='subtitle1'>{formatCondition(condition)}</Typography>
+                    <Typography variant='subtitle1' sx={{ whiteSpace: 'nowrap' }}>
+                      {formatCondition(condition)}
+                    </Typography>
                   </MenuItem>
                 );
               })}

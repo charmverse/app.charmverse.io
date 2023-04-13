@@ -131,9 +131,9 @@ export const propertyConfigs: Record<PropertyType, DataTypeConfigs> = {
   }
 };
 
-type FilterCondition = 'includes' | 'notIncludes' | 'isEmpty' | 'isNotEmpty';
+export type FilterCondition = DataTypeConfigs['conditions'][number];
 
-type FilterClause = {
+export type FilterClause = {
   propertyId: string;
   condition: DataTypeConfigs['conditions'][number];
   values: string[];
@@ -154,4 +154,3 @@ function areEqual(a: FilterClause, b: FilterClause): boolean {
 }
 
 export { createFilterClause, areEqual };
-export type { FilterClause, FilterCondition };

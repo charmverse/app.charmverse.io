@@ -14,7 +14,6 @@ import { createFilterGroup, isAFilterGroupInstance } from 'lib/focalboard/filter
 
 import { Constants } from '../../constants';
 import mutator from '../../mutator';
-import { Utils } from '../../utils';
 
 import FilterEntry from './filterEntry';
 
@@ -36,16 +35,14 @@ const StyledFilterComponent = styled(Box)`
 const FilterComponent = React.memo((props: Props): JSX.Element => {
   const { activeView, properties } = props;
 
-  const conditionClicked = (optionId: string, filter: FilterClause): void => {
-    const filterIndex = activeView.fields.filter.filters.indexOf(filter);
-    Utils.assert(filterIndex >= 0, "Can't find filter");
-
+  const conditionClicked = (condition: FilterCondition, filter: FilterClause): void => {
     const filterGroup = createFilterGroup(activeView.fields.filter);
-    const newFilter = filterGroup.filters[filterIndex] as FilterClause;
+    const filterClause = filterGroup.filters.find(
+      (_filter) => (_filter as FilterClause).filterId === filter.filterId
+    ) as FilterClause;
 
-    Utils.assert(newFilter, `No filter at index ${filterIndex}`);
-    if (newFilter.condition !== optionId) {
-      // newFilter.condition = optionId as FilterCondition;
+    if (filterClause && filterClause.condition !== condition) {
+      filterClause.condition = condition;
       mutator.changeViewFilter(activeView.id, activeView.fields.filter, filterGroup);
     }
   };
@@ -80,17 +77,19 @@ const FilterComponent = React.memo((props: Props): JSX.Element => {
 
   return (
     <StyledFilterComponent>
-      <Stack gap={1} my={1}>
-        {filters.map((filter) => (
-          <FilterEntry
-            key={`${filter.propertyId}-${filter.condition}-${filter.values.join(',')}`}
-            properties={properties}
-            view={activeView}
-            conditionClicked={conditionClicked}
-            filter={filter}
-          />
-        ))}
-      </Stack>
+      {filters.length !== 0 && (
+        <Stack gap={1} my={1}>
+          {filters.map((filter) => (
+            <FilterEntry
+              key={`${filter.propertyId}-${filter.condition}-${filter.values.join(',')}`}
+              properties={properties}
+              view={activeView}
+              conditionClicked={conditionClicked}
+              filter={filter}
+            />
+          ))}
+        </Stack>
+      )}
 
       <Button variant='outlined' color='secondary' size='small' onClick={() => addFilterClicked()}>
         <FormattedMessage id='FilterComponent.add-filter' defaultMessage='+ Add filter' />
