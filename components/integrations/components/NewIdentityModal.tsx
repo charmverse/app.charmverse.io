@@ -125,14 +125,12 @@ export function NewIdentityModal({ isOpen, onClose }: Props) {
         <List disablePadding aria-label='Connect accounts' sx={{ '& .MuiButton-root': { width: '140px' } }}>
           {!user?.wallets || user.wallets.length === 0 ? (
             <IdentityProviderItem type='Wallet' loading={isConnectingWallet}>
-              {account ? null : (
-                <WalletSign
-                  buttonSize='small'
-                  signSuccess={onSignSuccess}
-                  loading={isVerifyingWallet || isSigning || isConnectingIdentity}
-                  enableAutosign={false}
-                />
-              )}
+              <WalletSign
+                buttonSize='small'
+                signSuccess={onSignSuccess}
+                loading={isVerifyingWallet || isSigning || isConnectingIdentity}
+                enableAutosign={false}
+              />
             </IdentityProviderItem>
           ) : (
             <IdentityProviderItem

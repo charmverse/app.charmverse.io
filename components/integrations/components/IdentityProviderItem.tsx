@@ -1,6 +1,6 @@
 import MoreHoriz from '@mui/icons-material/MoreHoriz';
 import type { ListItemProps } from '@mui/material';
-import { Menu, IconButton, ListItem, ListItemIcon, ListItemText } from '@mui/material';
+import { Box, Menu, IconButton, ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import type { IdentityType } from '@prisma/client';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import type { ReactNode } from 'react';
@@ -55,7 +55,9 @@ export default function IdentityProviderItem({
         primaryTypographyProps={{ ml: 1 }}
         primary={connected ? text || `Connected with ${typeLabel}` : text || `Connect with ${typeLabel}`}
       />
-      <LoadingComponent isLoading={loading} size={15} />
+      <Box px={1}>
+        <LoadingComponent isLoading={loading} size={15} />
+      </Box>
       {error}
       {children}
       <Menu
