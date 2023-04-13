@@ -99,7 +99,6 @@ import 'components/common/BoardEditor/focalboard/src/components/table/horizontal
 import 'components/common/BoardEditor/focalboard/src/components/table/table.scss';
 import 'components/common/BoardEditor/focalboard/src/components/table/tableRow.scss';
 import 'components/common/BoardEditor/focalboard/src/components/topBar.scss';
-import 'components/common/BoardEditor/focalboard/src/components/viewHeader/filterEntry.scss';
 import 'components/common/BoardEditor/focalboard/src/components/viewHeader/viewHeader.scss';
 import 'components/common/BoardEditor/focalboard/src/components/viewTitle.scss';
 import 'components/common/BoardEditor/focalboard/src/styles/labels.scss';

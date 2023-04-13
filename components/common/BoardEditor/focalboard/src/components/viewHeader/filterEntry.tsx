@@ -130,7 +130,7 @@ function FilterEntry(props: Props) {
   }
 
   return (
-    <Stack className='FilterEntry' key={key} gap={0.5} flexDirection='row'>
+    <Stack key={key} gap={0.5} flexDirection='row'>
       <PopupState variant='popover' popupId='view-filter'>
         {(popupState) => (
           <>
