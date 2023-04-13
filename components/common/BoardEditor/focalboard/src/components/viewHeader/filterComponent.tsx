@@ -1,5 +1,7 @@
 import styled from '@emotion/styled';
 import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import { Stack } from '@mui/system';
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 
@@ -9,9 +11,9 @@ import type { FilterClause, FilterCondition } from 'lib/focalboard/filterClause'
 import { createFilterClause } from 'lib/focalboard/filterClause';
 import { createFilterGroup, isAFilterGroupInstance } from 'lib/focalboard/filterGroup';
 
+import { Constants } from '../../constants';
 import mutator from '../../mutator';
 import { Utils } from '../../utils';
-import Button from '../../widgets/buttons/button';
 
 import FilterEntry from './filterEntry';
 
@@ -31,9 +33,8 @@ const StyledFilterComponent = styled(Box)`
 `;
 
 const FilterComponent = React.memo((props: Props): JSX.Element => {
+  const { activeView, properties } = props;
   const conditionClicked = (optionId: string, filter: FilterClause): void => {
-    const { activeView } = props;
-
     const filterIndex = activeView.fields.filter.filters.indexOf(filter);
     Utils.assert(filterIndex >= 0, "Can't find filter");
 
@@ -48,12 +49,16 @@ const FilterComponent = React.memo((props: Props): JSX.Element => {
   };
 
   const addFilterClicked = () => {
-    const { properties, activeView } = props;
-
     const filters =
       (activeView.fields.filter?.filters.filter((o) => !isAFilterGroupInstance(o)) as FilterClause[]) || [];
+
     const filterGroup = createFilterGroup(activeView.fields.filter);
-    const filter = createFilterClause();
+
+    const filter = createFilterClause({
+      condition: 'includes',
+      propertyId: Constants.titleColumnId,
+      values: ['']
+    });
 
     // Pick the first select property that isn't already filtered on
     const selectProperty = properties
@@ -67,24 +72,24 @@ const FilterComponent = React.memo((props: Props): JSX.Element => {
     mutator.changeViewFilter(activeView.id, activeView.fields.filter, filterGroup);
   };
 
-  const { activeView, properties } = props;
-
   const filters: FilterClause[] =
     (activeView.fields.filter?.filters.filter((o) => !isAFilterGroupInstance(o)) as FilterClause[]) || [];
 
   return (
     <StyledFilterComponent>
-      {filters.map((filter) => (
-        <FilterEntry
-          key={`${filter.propertyId}-${filter.condition}-${filter.values.join(',')}`}
-          properties={properties}
-          view={activeView}
-          conditionClicked={conditionClicked}
-          filter={filter}
-        />
-      ))}
+      <Stack gap={1} my={1}>
+        {filters.map((filter) => (
+          <FilterEntry
+            key={`${filter.propertyId}-${filter.condition}-${filter.values.join(',')}`}
+            properties={properties}
+            view={activeView}
+            conditionClicked={conditionClicked}
+            filter={filter}
+          />
+        ))}
+      </Stack>
 
-      <Button onClick={() => addFilterClicked()}>
+      <Button variant='outlined' color='secondary' size='small' onClick={() => addFilterClicked()}>
         <FormattedMessage id='FilterComponent.add-filter' defaultMessage='+ Add filter' />
       </Button>
     </StyledFilterComponent>
