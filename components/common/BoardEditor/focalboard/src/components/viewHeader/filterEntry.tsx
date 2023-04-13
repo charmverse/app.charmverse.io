@@ -14,7 +14,9 @@ import {
   TextField,
   Typography
 } from '@mui/material';
+import { DateTimePicker } from '@mui/x-date-pickers';
 import { debounce } from 'lodash';
+import type { DateTime } from 'luxon';
 import PopupState, { bindMenu, bindTrigger } from 'material-ui-popup-state';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import React, { useEffect, useMemo, useState } from 'react';
@@ -65,7 +67,7 @@ function FilterPropertyValue({
     return acc;
   }, {});
   const { members } = useMembers();
-  const isPropertyTypePerson = propertyRecord[filter.propertyId].type === 'person';
+  const isPropertyTypePerson = propertyRecord[filter.propertyId].type.match(/person|createdBy|updatedBy/);
   const isPropertyTypeMultiSelect = propertyRecord[filter.propertyId].type === 'multiSelect';
   const property = propertyRecord[filter.propertyId];
 
@@ -107,6 +109,25 @@ function FilterPropertyValue({
     const newFilterValue = {
       ...filter,
       values
+    };
+    setFilter(newFilterValue);
+    updatePropertyValueDebounced(view, newFilterValue);
+  };
+
+  const updateSelectValue = (e: SelectChangeEvent<string>) => {
+    const value = e.target.value;
+    const newFilterValue = {
+      ...filter,
+      values: [value]
+    };
+    setFilter(newFilterValue);
+    updatePropertyValueDebounced(view, newFilterValue);
+  };
+
+  const updateDateValue = (date: DateTime | null) => {
+    const newFilterValue = {
+      ...filter,
+      values: date ? [date.toJSDate().getTime().toString()] : []
     };
     setFilter(newFilterValue);
     updatePropertyValueDebounced(view, newFilterValue);
@@ -180,6 +201,45 @@ function FilterPropertyValue({
         </Select>
       );
     }
+  } else if (propertyDataType === 'select') {
+    return (
+      <Select<string>
+        value={filter.values[0]}
+        onChange={updateSelectValue}
+        renderValue={(selected) => {
+          const foundOption = property.options?.find((o) => o.id === selected);
+          return foundOption ? (
+            <Chip size='small' label={foundOption.value} color={focalboardColorsMap[foundOption.color]} />
+          ) : null;
+        }}
+      >
+        {property.options?.map((option) => {
+          return (
+            <MenuItem key={option.id} value={option.id}>
+              <Chip size='small' label={option.value} color={focalboardColorsMap[option.color]} />
+            </MenuItem>
+          );
+        })}
+      </Select>
+    );
+  } else if (propertyDataType === 'date') {
+    return (
+      <DateTimePicker
+        value={new Date(Number(filter.values[0]))}
+        onChange={updateDateValue}
+        renderInput={(props) => (
+          <TextField
+            {...props}
+            inputProps={{
+              ...props.inputProps,
+              readOnly: true
+            }}
+            disabled
+            fullWidth
+          />
+        )}
+      />
+    );
   }
 
   return null;
