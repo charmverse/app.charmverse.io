@@ -4,6 +4,7 @@ import Button from '@mui/material/Button';
 import { Stack } from '@mui/system';
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
+import { v4 } from 'uuid';
 
 import type { IPropertyTemplate } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
@@ -34,6 +35,7 @@ const StyledFilterComponent = styled(Box)`
 
 const FilterComponent = React.memo((props: Props): JSX.Element => {
   const { activeView, properties } = props;
+
   const conditionClicked = (optionId: string, filter: FilterClause): void => {
     const filterIndex = activeView.fields.filter.filters.indexOf(filter);
     Utils.assert(filterIndex >= 0, "Can't find filter");
@@ -43,7 +45,7 @@ const FilterComponent = React.memo((props: Props): JSX.Element => {
 
     Utils.assert(newFilter, `No filter at index ${filterIndex}`);
     if (newFilter.condition !== optionId) {
-      newFilter.condition = optionId as FilterCondition;
+      // newFilter.condition = optionId as FilterCondition;
       mutator.changeViewFilter(activeView.id, activeView.fields.filter, filterGroup);
     }
   };
@@ -55,9 +57,10 @@ const FilterComponent = React.memo((props: Props): JSX.Element => {
     const filterGroup = createFilterGroup(activeView.fields.filter);
 
     const filter = createFilterClause({
-      condition: 'includes',
+      condition: 'contains',
       propertyId: Constants.titleColumnId,
-      values: ['']
+      values: [''],
+      filterId: v4()
     });
 
     // Pick the first select property that isn't already filtered on
