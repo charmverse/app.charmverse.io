@@ -86,7 +86,6 @@ export function getCredentials({ aeToken }: { aeToken: string }) {
     log.warn('No API Key provided for collab.land');
     return [];
   }
-
   return fetch<AnyCredentialType[]>(`${COLLABLAND_API_URL}/veramo/vcs`, {
     method: 'GET',
     headers: getHeaders({
