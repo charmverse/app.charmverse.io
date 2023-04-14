@@ -243,7 +243,7 @@ class CardFilter {
   static propertiesThatMeetFilterGroup(
     filterGroup: FilterGroup | undefined,
     templates: readonly IPropertyTemplate[]
-  ): Record<string, string> {
+  ): Record<string, string | string[]> {
     // TODO: Handle filter groups
     if (!filterGroup) {
       return {};
@@ -257,7 +257,7 @@ class CardFilter {
     if (filterGroup.operation === 'or') {
       // Just need to meet the first clause
       const property = this.propertyThatMeetsFilterClause(filters[0] as FilterClause, templates);
-      const result: Record<string, string> = {};
+      const result: Record<string, string | string[]> = {};
       if (property.value) {
         result[property.id] = property.value;
       }
@@ -265,7 +265,7 @@ class CardFilter {
     }
 
     // And: Need to meet all clauses
-    const result: Record<string, string> = {};
+    const result: Record<string, string | string[]> = {};
     filters.forEach((filterClause) => {
       const property = this.propertyThatMeetsFilterClause(filterClause as FilterClause, templates);
       if (property.value) {
@@ -278,7 +278,7 @@ class CardFilter {
   static propertyThatMeetsFilterClause(
     filterClause: FilterClause,
     templates: readonly IPropertyTemplate[]
-  ): { id: string; value?: string } {
+  ): { id: string; value?: string | string[] } {
     const template = templates.find((o) => o.id === filterClause.propertyId);
     if (!template) {
       Utils.assertFailure(`propertyThatMeetsFilterClause. Cannot find template: ${filterClause.propertyId}`);
@@ -331,14 +331,14 @@ class CardFilter {
           case 'is-not-empty': {
             return { id: filterClause.propertyId, value: filterClause.values[0] };
           }
-          case 'greater-than':
-          case 'not-equal': {
+          case 'greater-than': {
             return { id: filterClause.propertyId, value: String(Number(filterClause.values[0]) + 1) };
           }
           case 'less-than': {
             return { id: filterClause.propertyId, value: String(Number(filterClause.values[0]) - 1) };
           }
-          case 'is-empty': {
+          case 'is-empty':
+          case 'not-equal': {
             return { id: filterClause.propertyId };
           }
           default: {
@@ -351,7 +351,7 @@ class CardFilter {
         switch (condition) {
           case 'contains':
           case 'is-not-empty': {
-            return { id: filterClause.propertyId, value: filterClause.values[0] };
+            return { id: filterClause.propertyId, value: [filterClause.values[0]] };
           }
           case 'does-not-contain':
           case 'is-empty': {
@@ -385,18 +385,22 @@ class CardFilter {
           case 'is-not-empty':
           case 'is-on-or-after':
           case 'is-on-or-before': {
-            return { id: filterClause.propertyId, value: filterClause.values[0] };
+            return { id: filterClause.propertyId, value: JSON.stringify({ from: Number(filterClause.values[0]) }) };
           }
           case 'is-before': {
             return {
               id: filterClause.propertyId,
-              value: new Date(new Date(filterClause.values[0]).getTime() - 1).toString()
+              value: JSON.stringify({
+                from: new Date(Number(filterClause.values[0])).getTime() - 86_400_000
+              })
             };
           }
           case 'is-after': {
             return {
               id: filterClause.propertyId,
-              value: new Date(new Date(filterClause.values[0]).getTime() + 1).toString()
+              value: JSON.stringify({
+                from: new Date(Number(filterClause.values[0])).getTime() + 86_400_000
+              })
             };
           }
           case 'is-empty':
