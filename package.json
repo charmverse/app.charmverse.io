@@ -77,7 +77,7 @@
     "@bangle.dev/tooltip": "^0.31.6",
     "@bangle.dev/utils": "^0.31.6",
     "@beam-australia/react-env": "^3.1.1",
-    "@charmverse/core": "github:charmverse/core#ts-lib",
+    "@charmverse/core": "github:charmverse/core#feat/forum-parity",
     "@datadog/browser-logs": "^4.24.0",
     "@datadog/browser-rum": "^4.24.0",
     "@date-io/luxon": "^2.13.1",
