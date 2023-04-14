@@ -115,4 +115,4 @@ type BoardGroup = {
 };
 
 export { createBoard };
-export type { Board, PropertyType, IPropertyOption, IPropertyTemplate, BoardGroup };
+export type { Board, IPropertyOption, IPropertyTemplate, BoardGroup };
