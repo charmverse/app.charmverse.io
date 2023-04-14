@@ -11,7 +11,6 @@ export async function readUserNotifications(): Promise<number> {
     log.info(
       `\nNotifications to user: ${notification.user.email}` +
         `\n--------------------------------------------------------------` +
-        `\ngnosis: ${notification.gnosisSafeTasks.length}` +
         `\ndiscussions: ${notification.discussionTasks.length}` +
         `\nvotes: ${notification.voteTasks.length}` +
         `\nproposals: ${notification.proposalTasks.length}` +

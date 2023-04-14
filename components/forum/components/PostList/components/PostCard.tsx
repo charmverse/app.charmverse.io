@@ -14,8 +14,8 @@ import charmClient from 'charmClient';
 import { CommentVote } from 'components/common/comments/CommentVote';
 import UserDisplay from 'components/common/UserDisplay';
 import { usePostDialog } from 'components/forum/components/PostDialog/hooks/usePostDialog';
-import { usePostPermissions } from 'components/forum/hooks/usePostPermissions';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { usePostPermissions } from 'hooks/usePostPermissions';
 import type { ForumPostMeta, ForumVotes } from 'lib/forums/posts/interfaces';
 import type { Member } from 'lib/members/interfaces';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
@@ -128,7 +128,7 @@ export function PostCard({ post, user, category }: ForumPostProps) {
                 <Typography variant='body2'>{totalComments}</Typography>
               </Stack>
             </Stack>
-            <CommentVote permissions={permissions} onVote={voteOnPost} votes={pagePost.votes} />
+            {!post.isDraft && <CommentVote permissions={permissions} onVote={voteOnPost} votes={pagePost.votes} />}
           </Box>
         </CardContent>
       </CardActionArea>

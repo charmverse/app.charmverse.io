@@ -1,4 +1,3 @@
-import { useRouter } from 'next/router';
 import { useState } from 'react';
 
 import ErrorPage from 'components/common/errors/ErrorPage';
@@ -6,16 +5,11 @@ import getPageLayout from 'components/common/PageLayout/getLayout';
 import type { FormInputs } from 'components/forum/components/interfaces';
 import { PostPage } from 'components/forum/components/PostPage/PostPage';
 import { usePostByPath } from 'components/forum/hooks/usePostByPath';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePageTitle } from 'hooks/usePageTitle';
 import type { PostWithVotes } from 'lib/forums/posts/interfaces';
 
 export default function ForumPostPage() {
-  const router = useRouter();
-  const pagePath = router.query.pagePath as string;
-  const currentSpace = useCurrentSpace();
-
-  const forumPostInfo = usePostByPath({ postPath: pagePath, spaceDomain: currentSpace?.domain as string });
+  const forumPostInfo = usePostByPath();
 
   if (forumPostInfo.error) {
     return <ErrorPage message={forumPostInfo.error.message ?? "Sorry, that page doesn't exist"} />;

@@ -6,7 +6,7 @@ import { floatingMenu } from './floating-menu';
 
 // Components that should not trigger floating menu
 const blacklistedComponents =
-  'video image cryptoPrice iframe page pdf mention tabIndent codeBlock inlineDatabase poll bookmark tableOfContents file';
+  'video image cryptoPrice iframe page pdf mention tabIndent codeBlock inlineDatabase poll bookmark tableOfContents file poll';
 
 export function plugins({
   key,

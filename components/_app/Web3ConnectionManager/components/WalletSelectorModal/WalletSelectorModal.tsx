@@ -15,7 +15,7 @@ import { useMetamaskConnect } from 'components/_app/Web3ConnectionManager/hooks/
 import ErrorComponent from 'components/common/errors/WalletError';
 import Link from 'components/common/Link';
 import { Modal } from 'components/common/Modal';
-import type { AnyIdLogin } from 'components/login/Login';
+import type { AnyIdLogin } from 'components/login/LoginButton';
 import type { UnstoppableDomainsAuthSig } from 'lib/blockchain/unstoppableDomains';
 import { extractDomainFromProof } from 'lib/blockchain/unstoppableDomains/client';
 import log from 'lib/log';

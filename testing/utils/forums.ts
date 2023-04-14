@@ -64,8 +64,10 @@ export async function generateForumPost({
   path = `post-${v4()}`,
   title = 'Test post',
   content,
-  contentText
+  contentText,
+  isDraft
 }: {
+  isDraft?: boolean;
   categoryId?: string;
   userId: string;
   spaceId: string;
@@ -83,6 +85,7 @@ export async function generateForumPost({
       title,
       path,
       contentText: contentText ?? '',
+      isDraft,
       content: content ?? {
         type: 'doc',
         content: []

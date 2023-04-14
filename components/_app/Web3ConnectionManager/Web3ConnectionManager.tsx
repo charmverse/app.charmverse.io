@@ -4,7 +4,7 @@ import { useWeb3React } from '@web3-react/core';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
 import type { Dispatch, PropsWithChildren, SetStateAction } from 'react';
-import { createContext, useEffect, useState } from 'react';
+import { useContext, createContext, useEffect, useState } from 'react';
 
 import NetworkModal from 'components/_app/Web3ConnectionManager/components/NetworkModal/NetworkModal';
 
@@ -80,4 +80,7 @@ function Web3ConnectionManager({ children }: PropsWithChildren<any>) {
     </Web3Connection.Provider>
   );
 }
+
+export const useWeb3ConnectionManager = () => useContext(Web3Connection);
+
 export { Web3Connection, Web3ConnectionManager };

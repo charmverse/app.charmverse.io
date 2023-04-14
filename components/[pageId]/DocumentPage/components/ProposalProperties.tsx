@@ -8,7 +8,7 @@ import Button from 'components/common/BoardEditor/focalboard/src/widgets/buttons
 import { InputSearchMemberBase } from 'components/common/form/InputSearchMember';
 import { InputSearchReviewers } from 'components/common/form/InputSearchReviewers';
 import UserDisplay from 'components/common/UserDisplay';
-import useTasks from 'components/nexus/hooks/useTasks';
+import { useTasks } from 'components/nexus/hooks/useTasks';
 import ProposalCategoryInput from 'components/proposals/components/ProposalCategoryInput';
 import { ProposalStepper } from 'components/proposals/components/ProposalStepper/ProposalStepper';
 import { ProposalStepSummary } from 'components/proposals/components/ProposalStepSummary';
@@ -29,6 +29,7 @@ import type { ListSpaceRolesResponse } from 'pages/api/roles';
 
 interface ProposalPropertiesProps {
   readOnly?: boolean;
+  pageId: string;
   proposalId: string;
   isTemplate: boolean;
   pagePermissions?: IPagePermissionFlags;
@@ -38,6 +39,7 @@ interface ProposalPropertiesProps {
 export default function ProposalProperties({
   pagePermissions,
   refreshPagePermissions = () => null,
+  pageId,
   proposalId,
   readOnly,
   isTemplate
@@ -326,6 +328,7 @@ export default function ProposalProperties({
       <CreateVoteModal
         proposalFlowFlags={proposalFlowFlags}
         proposal={proposal}
+        pageId={pageId}
         open={isVoteModalOpen}
         onCreateVote={() => {
           setIsVoteModalOpen(false);

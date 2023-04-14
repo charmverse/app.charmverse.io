@@ -40,7 +40,6 @@ import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { usePageFromPath } from 'hooks/usePageFromPath';
 import { usePagePermissions } from 'hooks/usePagePermissions';
 import { usePages } from 'hooks/usePages';
-import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useToggleFavorite } from 'hooks/useToggleFavorite';
 import { useUser } from 'hooks/useUser';
@@ -215,7 +214,9 @@ function PostHeader({
       <ExportMarkdownMenuItem onClick={exportMarkdownPage} />
       <Tooltip
         title={
-          !canCreateProposal || forumPostInfo.forumPost?.proposalId
+          forumPostInfo.forumPost?.isDraft
+            ? 'Draft post cannot be converted proposal'
+            : !canCreateProposal || forumPostInfo.forumPost?.proposalId
             ? 'You do not have the permission to convert to proposal'
             : ''
         }
@@ -224,7 +225,7 @@ function PostHeader({
           <ListItemButton
             data-test='convert-proposal-action'
             onClick={() => forumPostInfo.forumPost && convertToProposal(forumPostInfo.forumPost.id)}
-            disabled={!canCreateProposal || !!forumPostInfo.forumPost?.proposalId}
+            disabled={!canCreateProposal || !!forumPostInfo.forumPost?.proposalId || !!forumPostInfo.forumPost?.isDraft}
           >
             <TaskOutlinedIcon
               fontSize='small'
@@ -263,15 +264,10 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
   const { permissions: pagePermissions } = usePagePermissions({
     pageIdOrPath: basePage ? basePage.id : (null as any)
   });
-  const { onClick: clickToOpenSettingsModal } = useSettingsDialog();
   const isForumPost = router.route === '/[domain]/forum/post/[pagePath]';
 
-  const pagePath = isForumPost ? (router.query.pagePath as string) : null;
   // Post permissions hook will not make an API call if post ID is null. Since we can't conditionally render hooks, we pass null as the post ID. This is the reason for the 'null as any' statement
-  const forumPostInfo = usePostByPath({
-    postPath: isForumPost ? pagePath : isForumPost ? (pagePath as string) : (null as any),
-    spaceDomain: router.query.domain as string
-  });
+  const forumPostInfo = usePostByPath();
 
   const isLargeScreen = useMediaQuery(theme.breakpoints.up('md'));
 
@@ -581,7 +577,7 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
           )}
           {/** End of CharmEditor page specific header content */}
 
-          {user && <NotificationButton onSeeAllClick={() => clickToOpenSettingsModal('notifications')} />}
+          {user && <NotificationButton />}
         </Box>
       </Box>
     </StyledToolbar>

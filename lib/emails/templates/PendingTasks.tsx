@@ -7,11 +7,8 @@ import { ProposalStatusColors } from 'components/proposals/components/ProposalSt
 import type { BountyTask } from 'lib/bounties/getBountyTasks';
 import { DiscussionTask } from 'lib/discussion/interfaces';
 import { ForumTask } from 'lib/forums/getForumNotifications/getForumNotifications';
-import type { GnosisSafeTasks } from 'lib/gnosis/gnosis.tasks';
-import log from 'lib/log';
 import type { ProposalTask } from 'lib/proposal/getProposalTasksFromWorkspaceEvents';
 import { PROPOSAL_STATUS_LABELS } from 'lib/proposal/proposalStatusTransition';
-import { shortenHex } from 'lib/utilities/strings';
 import type { VoteTask } from 'lib/votes/interfaces';
 import { colors, greyColor2 } from 'theme/colors';
 
@@ -35,7 +32,6 @@ const h2Style = { lineHeight: '1.2em', fontSize: '24px', fontWeight: 'bold', mar
 const h3Style = { lineHeight: '1em', fontSize: '20px', fontWeight: 'bold', marginTop: '8px', marginBottom: '5px' };
 
 export interface PendingTasksProps {
-  gnosisSafeTasks: GnosisSafeTasks[];
   discussionTasks: DiscussionTask[];
   totalTasks: number;
   voteTasks: VoteTask[];
@@ -59,17 +55,15 @@ function ViewAllText({ href }: { href: string }) {
 export default function PendingTasks(props: PendingTasksProps) {
   const totalDiscussionTasks = props.discussionTasks.length;
   const totalVoteTasks = props.voteTasks.length;
-  const totalGnosisSafeTasks = props.gnosisSafeTasks.length;
   const totalProposalTasks = props.proposalTasks.length;
   const totalBountyTasks = props.bountyTasks.length;
   const totalForumTasks = props.forumTasks.length;
 
-  const nexusDiscussionLink = `${charmverseUrl}/?task=discussion`;
-  const nexusVoteLink = `${charmverseUrl}/?task=vote`;
-  const nexusMultisigLink = `${charmverseUrl}/?task=multisig`;
-  const nexusProposalLink = `${charmverseUrl}/?task=proposal`;
-  const nexusBountyLink = `${charmverseUrl}/?task=bounty`;
-  const nexusForumLink = `${charmverseUrl}/?task=forum`;
+  const nexusDiscussionLink = `${charmverseUrl}/?notifications=discussion`;
+  const nexusVoteLink = `${charmverseUrl}/?notifications=vote`;
+  const nexusProposalLink = `${charmverseUrl}/?notifications=proposal`;
+  const nexusBountyLink = `${charmverseUrl}/?notifications=bounty`;
+  const nexusForumLink = `${charmverseUrl}/?notifications=forum`;
 
   const discussionSection =
     totalDiscussionTasks > 0 ? (
@@ -208,34 +202,6 @@ export default function PendingTasks(props: PendingTasksProps) {
       </>
     ) : null;
 
-  const multisigSection =
-    totalGnosisSafeTasks > 0 ? (
-      <>
-        <MjmlText>
-          <div>
-            <a
-              href={nexusMultisigLink}
-              style={{
-                marginRight: 15
-              }}
-            >
-              <span style={h2Style}>
-                {totalGnosisSafeTasks} Multisig{totalGnosisSafeTasks > 1 ? 's' : ''}
-              </span>
-            </a>
-            <a href={nexusMultisigLink} style={buttonStyle}>
-              Sign
-            </a>
-          </div>
-        </MjmlText>
-        {props.gnosisSafeTasks.slice(0, MAX_ITEMS_PER_TASK).map((gnosisSafeTask) => (
-          <MultisigTask key={gnosisSafeTask.safeAddress} task={gnosisSafeTask} />
-        ))}
-        {totalGnosisSafeTasks > MAX_ITEMS_PER_TASK ? <ViewAllText href={nexusMultisigLink} /> : null}
-        <MjmlDivider />
-      </>
-    ) : null;
-
   const forumSection =
     totalForumTasks > 0 ? (
       <>
@@ -277,7 +243,6 @@ export default function PendingTasks(props: PendingTasksProps) {
           <MjmlText paddingBottom={0} paddingTop={0}>
             <h3>{tasksRequiresYourAttention({ count: props.totalTasks })}.</h3>
           </MjmlText>
-          {multisigSection}
           {proposalSection}
           {voteSection}
           {bountySection}
@@ -292,7 +257,7 @@ export default function PendingTasks(props: PendingTasksProps) {
 }
 
 function VoteTaskMjml({ task }: { task: VoteTask }) {
-  const pageWorkspaceTitle = `${task.page.title || 'Untitled'} | ${task.space.name}`;
+  const pageWorkspaceTitle = `${task.pageTitle} | ${task.spaceName}`;
   return (
     <MjmlText>
       <div style={{ fontWeight: 'bold', marginBottom: 5 }}>
@@ -402,19 +367,6 @@ function DiscussionTask({ task: { text, spaceName, pageTitle } }: { task: Discus
       >
         {pageWorkspaceTitle.length > MAX_CHAR ? `${pageWorkspaceTitle.slice(0, MAX_CHAR)}...` : pageWorkspaceTitle}
       </div>
-    </MjmlText>
-  );
-}
-
-function MultisigTask({ task }: { task: GnosisSafeTasks }) {
-  log.debug('multi sig task', task);
-  return (
-    <MjmlText>
-      <strong>
-        Safe address: {shortenHex(task.safeAddress)}
-        <br />
-        {task.tasks[0].transactions[0].description}
-      </strong>
     </MjmlText>
   );
 }

@@ -3,19 +3,17 @@ import { IconButton } from '@mui/material';
 import Popover from '@mui/material/Popover';
 import { bindPopover, usePopupState } from 'material-ui-popup-state/hooks';
 
+import { NotificationModal } from 'components/common/PageLayout/components/Header/components/NotificationPreview/NotificationModal';
 import { useMdScreen } from 'hooks/useMediaScreens';
 
 import NotificationsBadge from '../../../Sidebar/NotificationsBadge';
 
 import { NotificationPreviewPopover } from './NotificationPreviewPopover';
 
-export function NotificationButton({ onSeeAllClick }: { onSeeAllClick: () => void }) {
+export function NotificationButton() {
   const popupState = usePopupState({ variant: 'popover', popupId: 'share-menu' });
   const isMdScreen = useMdScreen();
-  const handleSeeAllClick = () => {
-    onSeeAllClick();
-    popupState.close();
-  };
+
   return (
     <>
       <NotificationsBadge onClick={popupState.open} sx={{ cursor: 'pointer' }}>
@@ -39,8 +37,10 @@ export function NotificationButton({ onSeeAllClick }: { onSeeAllClick: () => voi
           }
         }}
       >
-        <NotificationPreviewPopover onSeeAllClick={handleSeeAllClick} close={popupState.close} />
+        <NotificationPreviewPopover close={popupState.close} />
       </Popover>
+
+      <NotificationModal />
     </>
   );
 }

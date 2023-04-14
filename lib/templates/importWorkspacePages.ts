@@ -375,7 +375,7 @@ export async function generateImportWorkspacePages({
       extractedPolls.forEach((extractedPoll) => {
         const pageVote = pageVotes.find((_pageVote) => _pageVote.id === extractedPoll.originalId);
 
-        if (pageVote) {
+        if (pageVote && pageVote.pageId) {
           const { voteOptions, ...vote } = pageVote;
           voteArgs.push({
             ...vote,

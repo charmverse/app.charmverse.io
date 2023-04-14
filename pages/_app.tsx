@@ -24,6 +24,7 @@ import { setTheme as setFocalBoardTheme } from 'components/common/BoardEditor/fo
 import FocalBoardProvider from 'components/common/BoardEditor/FocalBoardProvider';
 import ErrorBoundary from 'components/common/errors/ErrorBoundary';
 import IntlProvider from 'components/common/IntlProvider';
+import { NotificationsProvider } from 'components/common/PageLayout/components/Header/components/NotificationPreview/useNotifications';
 import ReactDndProvider from 'components/common/ReactDndProvider';
 import RouteGuard from 'components/common/RouteGuard';
 import Snackbar from 'components/common/Snackbar';
@@ -213,37 +214,39 @@ export default function App({ Component, emotionCache = clientSideEmotionCache, 
             <ReactDndProvider>
               <DataProviders>
                 <SettingsDialogProvider>
-                  <LocalizationProvider>
-                    <OnboardingProvider>
-                      <FocalBoardProvider>
-                        <NotionProvider>
-                          <IntlProvider>
-                            <PageHead />
-                            <CssBaseline enableColorScheme={true} />
-                            <Global styles={cssVariables} />
-                            <RouteGuard>
-                              <ErrorBoundary>
-                                <Snackbar
-                                  isOpen={isOldBuild}
-                                  message='New CharmVerse platform update available. Please refresh.'
-                                  actions={[
-                                    <IconButton key='reload' onClick={() => window.location.reload()} color='inherit'>
-                                      <RefreshIcon fontSize='small' />
-                                    </IconButton>
-                                  ]}
-                                  origin={{ vertical: 'top', horizontal: 'center' }}
-                                  severity='warning'
-                                  handleClose={() => setIsOldBuild(false)}
-                                />
-                                {getLayout(<Component {...pageProps} />)}
-                                <GlobalComponents />
-                              </ErrorBoundary>
-                            </RouteGuard>
-                          </IntlProvider>
-                        </NotionProvider>
-                      </FocalBoardProvider>
-                    </OnboardingProvider>
-                  </LocalizationProvider>
+                  <NotificationsProvider>
+                    <LocalizationProvider>
+                      <OnboardingProvider>
+                        <FocalBoardProvider>
+                          <NotionProvider>
+                            <IntlProvider>
+                              <PageHead />
+                              <CssBaseline enableColorScheme={true} />
+                              <Global styles={cssVariables} />
+                              <RouteGuard>
+                                <ErrorBoundary>
+                                  <Snackbar
+                                    isOpen={isOldBuild}
+                                    message='New CharmVerse platform update available. Please refresh.'
+                                    actions={[
+                                      <IconButton key='reload' onClick={() => window.location.reload()} color='inherit'>
+                                        <RefreshIcon fontSize='small' />
+                                      </IconButton>
+                                    ]}
+                                    origin={{ vertical: 'top', horizontal: 'center' }}
+                                    severity='warning'
+                                    handleClose={() => setIsOldBuild(false)}
+                                  />
+                                  {getLayout(<Component {...pageProps} />)}
+                                  <GlobalComponents />
+                                </ErrorBoundary>
+                              </RouteGuard>
+                            </IntlProvider>
+                          </NotionProvider>
+                        </FocalBoardProvider>
+                      </OnboardingProvider>
+                    </LocalizationProvider>
+                  </NotificationsProvider>
                 </SettingsDialogProvider>
               </DataProviders>
             </ReactDndProvider>

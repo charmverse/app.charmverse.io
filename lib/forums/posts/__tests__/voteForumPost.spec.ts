@@ -26,7 +26,8 @@ describe('voteForumPost', () => {
       createdBy: user.id,
       spaceId: space.id,
       title: 'Test',
-      categoryId: category1.id
+      categoryId: category1.id,
+      isDraft: false
     });
 
     await voteForumPost({
