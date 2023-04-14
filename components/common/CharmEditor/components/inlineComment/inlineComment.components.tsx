@@ -104,7 +104,7 @@ export function InlineCommentSubMenu({ pluginKey }: { pluginKey: PluginKey }) {
     ]
   });
   const { extractTextFromSelection } = useInlineComment();
-  const { setThreads } = useThreads();
+  const { setThreads, refetchThreads } = useThreads();
   const { currentPageId } = useCurrentPage();
   const isEmpty = checkIsContentEmpty(commentContent);
   const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'));
@@ -118,7 +118,9 @@ export function InlineCommentSubMenu({ pluginKey }: { pluginKey: PluginKey }) {
         context: extractTextFromSelection(),
         pageId: cardId || currentPageId
       });
-      setThreads((_threads) => ({ ..._threads, [threadWithComment.id]: threadWithComment }));
+      // jsut refetch threads for now to make sure member is attached properly - optimize later by not needing to append members to output of useThreads
+      refetchThreads();
+      // setThreads((_threads) => ({ ..._threads, [threadWithComment.id]: threadWithComment }));
       updateInlineComment(threadWithComment.id)(view.state, view.dispatch);
       hideSelectionTooltip(pluginKey)(view.state, view.dispatch, view);
       const tr = view.state.tr.setSelection(new TextSelection(view.state.doc.resolve(view.state.selection.$to.pos)));
