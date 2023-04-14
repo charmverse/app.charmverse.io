@@ -184,29 +184,50 @@ class CardFilter {
         }
       } else if (filterPropertyDataType === 'date') {
         const condition = filter.condition as (typeof DateDataTypeConditions)[number];
-        const sourceValue = (Array.isArray(value) ? value[0] : value)?.toLowerCase() ?? '';
-
+        const propertyValue = Array.isArray(value) ? value[0] : value;
+        const sourceValue = propertyValue ? (JSON.parse(propertyValue) as { from: number }) : { from: undefined };
         switch (condition) {
           case 'is': {
-            return new Date(filterValue).getTime() === new Date(sourceValue).getTime();
+            return (
+              sourceValue.from !== undefined &&
+              new Date(Number(filterValue)).getTime() === new Date(sourceValue.from).getTime()
+            );
           }
           case 'is-before': {
-            return new Date(filterValue).getTime() > new Date(sourceValue).getTime();
+            return (
+              sourceValue.from !== undefined &&
+              new Date(Number(filterValue)).getTime() > new Date(sourceValue.from).getTime()
+            );
+          }
+          case 'is-after': {
+            return (
+              sourceValue.from !== undefined &&
+              new Date(Number(filterValue)).getTime() < new Date(sourceValue.from).getTime()
+            );
           }
           case 'is-empty': {
-            return sourceValue === '';
+            return sourceValue.from === undefined;
           }
           case 'is-not': {
-            return new Date(filterValue).getTime() !== new Date(sourceValue).getTime();
+            return (
+              sourceValue.from !== undefined &&
+              new Date(Number(filterValue)).getTime() !== new Date(sourceValue.from).getTime()
+            );
           }
           case 'is-not-empty': {
-            return sourceValue !== '';
+            return sourceValue.from !== undefined;
           }
           case 'is-on-or-after': {
-            return new Date(filterValue).getTime() <= new Date(sourceValue).getTime();
+            return (
+              sourceValue.from !== undefined &&
+              new Date(Number(filterValue)).getTime() <= new Date(sourceValue.from).getTime()
+            );
           }
           case 'is-on-or-before': {
-            return new Date(filterValue).getTime() >= new Date(sourceValue).getTime();
+            return (
+              sourceValue.from !== undefined &&
+              new Date(Number(filterValue)).getTime() >= new Date(sourceValue.from).getTime()
+            );
           }
           default: {
             Utils.assertFailure(`Invalid filter condition ${filter.condition}`);

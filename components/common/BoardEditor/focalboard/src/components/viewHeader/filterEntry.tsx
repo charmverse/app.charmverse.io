@@ -14,7 +14,7 @@ import {
   TextField,
   Typography
 } from '@mui/material';
-import { DateTimePicker } from '@mui/x-date-pickers';
+import { DatePicker } from '@mui/x-date-pickers';
 import { debounce } from 'lodash';
 import type { DateTime } from 'luxon';
 import PopupState, { bindMenu, bindTrigger } from 'material-ui-popup-state';
@@ -231,7 +231,7 @@ function FilterPropertyValue({
     );
   } else if (propertyDataType === 'date') {
     return (
-      <DateTimePicker
+      <DatePicker
         value={new Date(Number(filter.values[0]))}
         onChange={updateDateValue}
         renderInput={(props) => (
@@ -242,7 +242,6 @@ function FilterPropertyValue({
               readOnly: true
             }}
             disabled
-            fullWidth
           />
         )}
       />
