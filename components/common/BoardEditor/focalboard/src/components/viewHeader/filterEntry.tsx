@@ -43,7 +43,7 @@ type Props = {
 };
 
 function formatCondition(condition: string) {
-  const [firstChunk, ...restChunks] = condition.split('-');
+  const [firstChunk, ...restChunks] = condition.split('_');
   return (
     firstChunk.charAt(0).toUpperCase() +
     firstChunk.slice(1) +

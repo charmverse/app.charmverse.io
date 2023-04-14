@@ -128,7 +128,8 @@ function CenterPanel(props: Props) {
   const _cards = useAppSelector(
     getViewCardsSortedFilteredAndGrouped({
       boardId: activeBoard?.id || '',
-      viewId: activeView?.id || ''
+      viewId: activeView?.id || '',
+      pages
     })
   );
 

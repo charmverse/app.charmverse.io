@@ -83,7 +83,8 @@ export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: 
   const cards = useAppSelector(
     getViewCardsSortedFilteredAndGrouped({
       boardId: board?.id ?? '',
-      viewId: view?.id ?? ''
+      viewId: view?.id ?? '',
+      pages
     })
   );
 

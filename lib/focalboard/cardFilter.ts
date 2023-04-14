@@ -56,7 +56,6 @@ class CardFilter {
     const filterValue = filter.values[0]?.toLowerCase() ?? '';
     if (filterProperty) {
       const filterPropertyDataType = propertyConfigs[filterProperty.type].datatype;
-
       if (filterPropertyDataType === 'text') {
         const condition = filter.condition as (typeof TextDataTypeConditions)[number];
         const sourceValue = (Array.isArray(value) ? value[0] : value)?.toLowerCase() ?? '';
