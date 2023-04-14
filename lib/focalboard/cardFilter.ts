@@ -73,16 +73,16 @@ class CardFilter {
             return false;
           }
           case 'ends_with': {
-            return sourceValue.endsWith(filterValue);
+            return sourceValue.length === 0 ? true : sourceValue.endsWith(filterValue);
           }
           case 'starts_with': {
-            return sourceValue.startsWith(filterValue);
+            return sourceValue.length === 0 ? true : sourceValue.startsWith(filterValue);
           }
           case 'is': {
-            return sourceValue === filterValue;
+            return sourceValue.length === 0 ? true : sourceValue === filterValue;
           }
           case 'is_not': {
-            return sourceValue !== filterValue;
+            return sourceValue.length === 0 ? true : sourceValue !== filterValue;
           }
           case 'is_empty': {
             return sourceValue === '';
@@ -111,22 +111,22 @@ class CardFilter {
         }
       } else if (filterPropertyDataType === 'number') {
         const condition = filter.condition as (typeof NumberDataTypeConditions)[number];
-        const sourceValue = (Array.isArray(value) ? value[0] : value)?.toLowerCase() ?? '0';
+        const sourceValue = (Array.isArray(value) ? value[0] : value)?.toLowerCase() ?? '';
         switch (condition) {
           case 'equal': {
-            return Number(sourceValue) === Number(filterValue);
+            return sourceValue.length === 0 ? true : Number(sourceValue) === Number(filterValue);
           }
           case 'greater_than': {
-            return Number(sourceValue) > Number(filterValue);
+            return sourceValue.length === 0 ? true : Number(sourceValue) > Number(filterValue);
           }
           case 'less_than': {
-            return Number(sourceValue) < Number(filterValue);
+            return sourceValue.length === 0 ? true : Number(sourceValue) < Number(filterValue);
           }
           case 'less_than_equal': {
-            return Number(sourceValue) <= Number(filterValue);
+            return sourceValue.length === 0 ? true : Number(sourceValue) <= Number(filterValue);
           }
           case 'greater_than_equal': {
-            return Number(sourceValue) >= Number(filterValue);
+            return sourceValue.length === 0 ? true : Number(sourceValue) >= Number(filterValue);
           }
           case 'is_empty': {
             return sourceValue === '';
@@ -146,10 +146,14 @@ class CardFilter {
         const sourceValues = value as string[];
         switch (condition) {
           case 'contains': {
-            return sourceValues.some((sourceValue) => filter.values.includes(sourceValue));
+            return sourceValues.length === 0
+              ? true
+              : sourceValues.some((sourceValue) => filter.values.includes(sourceValue));
           }
           case 'does_not_contain': {
-            return sourceValues.every((sourceValue) => !filter.values.includes(sourceValue));
+            return sourceValues.length === 0
+              ? true
+              : sourceValues.every((sourceValue) => !filter.values.includes(sourceValue));
           }
           case 'is_empty': {
             return sourceValues.length === 0;
@@ -166,10 +170,10 @@ class CardFilter {
         const sourceValue = (Array.isArray(value) ? value[0] : value)?.toLowerCase() ?? '';
         switch (condition) {
           case 'is': {
-            return filterValue === sourceValue;
+            return sourceValue.length === 0 ? true : filterValue === sourceValue;
           }
           case 'is_not': {
-            return filterValue !== sourceValue;
+            return sourceValue.length === 0 ? true : filterValue !== sourceValue;
           }
           case 'is_empty': {
             return sourceValue === '';
