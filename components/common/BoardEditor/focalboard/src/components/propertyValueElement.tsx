@@ -160,7 +160,7 @@ function PropertyValueElement(props: Props) {
       <Switch
         isOn={propertyValue === 'true'}
         onChanged={(newBool) => {
-          const newValue = newBool ? 'true' : 'false';
+          const newValue = newBool ? 'true' : '';
           mutator.changePropertyValue(card, propertyTemplate.id, newValue);
         }}
         readOnly={readOnly}

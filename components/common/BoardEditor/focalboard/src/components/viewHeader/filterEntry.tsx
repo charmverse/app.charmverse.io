@@ -105,7 +105,7 @@ function FilterPropertyValue({
     const value = e.target.checked;
     const newFilterValue = {
       ...filter,
-      values: [value ? 'true' : 'false']
+      values: [value ? 'true' : '']
     };
     setFilter(newFilterValue);
     updatePropertyValueDebounced(view, newFilterValue);

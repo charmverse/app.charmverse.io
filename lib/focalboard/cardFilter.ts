@@ -54,6 +54,7 @@ class CardFilter {
     const value = card.fields.properties[filter.propertyId] ?? [];
     const filterProperty = templates.find((o) => o.id === filter.propertyId);
     const filterValue = filter.values[0]?.toLowerCase() ?? '';
+
     if (filterProperty) {
       const filterPropertyDataType = propertyConfigs[filterProperty.type].datatype;
       if (filterPropertyDataType === 'text') {
@@ -97,13 +98,12 @@ class CardFilter {
       } else if (filterPropertyDataType === 'boolean') {
         const condition = filter.condition as (typeof BooleanDataTypeConditions)[number];
         const sourceValue = (Array.isArray(value) ? value[0] : value)?.toLowerCase() ?? 'false';
-
         switch (condition) {
           case 'is': {
-            return sourceValue === filterValue;
+            return sourceValue === (filter.values[0] || 'false');
           }
           case 'is_not': {
-            return sourceValue !== filterValue;
+            return sourceValue !== (filter.values[0] || 'false');
           }
           default: {
             Utils.assertFailure(`Invalid filter condition ${filter.condition}`);
