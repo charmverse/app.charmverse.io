@@ -1,5 +1,3 @@
-import type { IntlShape } from 'react-intl';
-
 import { OctoUtils } from 'components/common/BoardEditor/focalboard/src/octoUtils';
 import type { IAppWindow } from 'components/common/BoardEditor/focalboard/src/types';
 import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
