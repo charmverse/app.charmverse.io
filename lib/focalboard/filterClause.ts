@@ -3,9 +3,9 @@ import { v4 } from 'uuid';
 
 import type { PropertyType } from './board';
 
-const BooleanDataTypeConditions = ['is', 'is-not'] as const;
+export const BooleanDataTypeConditions = ['is', 'is-not'] as const;
 
-const TextDataTypeConditions = [
+export const TextDataTypeConditions = [
   'is',
   'is-not',
   'contains',
@@ -16,7 +16,7 @@ const TextDataTypeConditions = [
   'is-not-empty'
 ] as const;
 
-const NumberDataTypeConditions = [
+export const NumberDataTypeConditions = [
   'equal',
   'not-equal',
   'greater-than',
@@ -27,39 +27,39 @@ const NumberDataTypeConditions = [
   'is-not-empty'
 ] as const;
 
-const DateDataTypeConditions = [
+export const DateDataTypeConditions = [
   'is',
   'is-not',
   'is-before',
+  'is-after',
   'is-on-or-before',
   'is-on-or-after',
-  'is-between',
   'is-empty',
   'is-not-empty'
 ] as const;
 
-const MultiSelectDataTypeConditions = ['contains', 'does-not-contain', 'is-empty', 'is-not-empty'] as const;
+export const MultiSelectDataTypeConditions = ['contains', 'does-not-contain', 'is-empty', 'is-not-empty'] as const;
 
-const SelectDataTypeConditions = ['is', 'is-not', 'is-empty', 'is-not-empty'] as const;
+export const SelectDataTypeConditions = ['is', 'is-not', 'is-empty', 'is-not-empty'] as const;
 
-const MiscDataTypeConditions = ['is-empty', 'is-not-empty'] as const;
+export const MiscDataTypeConditions = ['is-empty', 'is-not-empty'] as const;
 
-type DataType = 'text' | 'number' | 'boolean' | 'date' | 'multi-select' | 'select' | 'misc';
+export type DataType = 'text' | 'number' | 'boolean' | 'date' | 'multi-select' | 'select' | 'misc';
 
-type DataTypeFactory<DT extends DataType, DataTypeDataTypeConditions extends readonly string[]> = {
+export type DataTypeFactory<DT extends DataType, DataTypeDataTypeConditions extends readonly string[]> = {
   datatype: DT;
   conditions: readonly DataTypeDataTypeConditions[number][];
 };
 
-type BooleanDataTypeConfig = DataTypeFactory<'boolean', typeof BooleanDataTypeConditions>;
-type TextDataTypeConfig = DataTypeFactory<'text', typeof TextDataTypeConditions>;
-type NumberDataTypeConfig = DataTypeFactory<'number', typeof NumberDataTypeConditions>;
-type DateDataTypeConfig = DataTypeFactory<'date', typeof DateDataTypeConditions>;
-type MultiSelectDataTypeConfig = DataTypeFactory<'multi-select', typeof MultiSelectDataTypeConditions>;
-type SelectDataTypeConfig = DataTypeFactory<'select', typeof SelectDataTypeConditions>;
-type MiscDataTypeConfig = DataTypeFactory<'misc', typeof MiscDataTypeConditions>;
+export type BooleanDataTypeConfig = DataTypeFactory<'boolean', typeof BooleanDataTypeConditions>;
+export type TextDataTypeConfig = DataTypeFactory<'text', typeof TextDataTypeConditions>;
+export type NumberDataTypeConfig = DataTypeFactory<'number', typeof NumberDataTypeConditions>;
+export type DateDataTypeConfig = DataTypeFactory<'date', typeof DateDataTypeConditions>;
+export type MultiSelectDataTypeConfig = DataTypeFactory<'multi-select', typeof MultiSelectDataTypeConditions>;
+export type SelectDataTypeConfig = DataTypeFactory<'select', typeof SelectDataTypeConditions>;
+export type MiscDataTypeConfig = DataTypeFactory<'misc', typeof MiscDataTypeConditions>;
 
-type DataTypeConfigs =
+export type DataTypeConfigs =
   | BooleanDataTypeConfig
   | TextDataTypeConfig
   | NumberDataTypeConfig

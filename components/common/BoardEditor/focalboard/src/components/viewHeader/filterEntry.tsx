@@ -28,7 +28,7 @@ import type { BoardView } from 'lib/focalboard/boardView';
 import type { FilterClause, FilterCondition } from 'lib/focalboard/filterClause';
 import { propertyConfigs } from 'lib/focalboard/filterClause';
 import { createFilterGroup } from 'lib/focalboard/filterGroup';
-import { focalboardColorsMap, type SupportedColor } from 'theme/colors';
+import { focalboardColorsMap } from 'theme/colors';
 
 import { Constants } from '../../constants';
 import mutator from '../../mutator';

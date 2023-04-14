@@ -32,7 +32,7 @@ const StyledFilterComponent = styled(Box)`
   }
 `;
 
-const FilterComponent = React.memo((props: Props): JSX.Element => {
+const FilterComponent = React.memo((props: Props) => {
   const { activeView, properties } = props;
 
   const conditionClicked = (condition: FilterCondition, filter: FilterClause): void => {
@@ -48,9 +48,6 @@ const FilterComponent = React.memo((props: Props): JSX.Element => {
   };
 
   const addFilterClicked = () => {
-    const filters =
-      (activeView.fields.filter?.filters.filter((o) => !isAFilterGroupInstance(o)) as FilterClause[]) || [];
-
     const filterGroup = createFilterGroup(activeView.fields.filter);
 
     const filter = createFilterClause({
@@ -60,15 +57,7 @@ const FilterComponent = React.memo((props: Props): JSX.Element => {
       filterId: v4()
     });
 
-    // Pick the first select property that isn't already filtered on
-    const selectProperty = properties
-      .filter((o: IPropertyTemplate) => !filters.find((f) => f.propertyId === o.id))
-      .find((o: IPropertyTemplate) => o.type === 'select' || o.type === 'multiSelect');
-    if (selectProperty) {
-      filter.propertyId = selectProperty.id;
-    }
     filterGroup.filters.push(filter);
-
     mutator.changeViewFilter(activeView.id, activeView.fields.filter, filterGroup);
   };
 
