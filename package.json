@@ -21,7 +21,7 @@
     "sockets:dev": "PORT=3001 npx dotenv -e .env -e .env.local -- node --watch ./.next/server/websockets.js",
     "sockets:prod": "node ./.next/server/websockets.js",
     "sockets:staging": "npx react-env --path .env.staging -- node ./.next/server/websockets.js",
-    "migrate:reset": "cd node_modules/@charmverse/core && npm run migrate:reset", 
+    "migrate:reset": "cd node_modules/@charmverse/core && npm run migrate:reset",
     "migrate:dev": "cd node_modules/@charmverse/core && npm run migrate:dev",
     "migrate:deploy": "cd node_modules/@charmverse/core && npm run migrate:deploy",
     "debug:e2e": "dotenv -e .env.test.local -- npx playwright test --headed --timeout=0",
