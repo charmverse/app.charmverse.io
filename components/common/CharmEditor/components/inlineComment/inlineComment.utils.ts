@@ -128,6 +128,7 @@ export function scrollToThread(threadId: string) {
 
     if (parentElement) {
       createHighlightDomElement(parentElement);
+      parentElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
   }
 }
