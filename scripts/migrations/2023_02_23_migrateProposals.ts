@@ -1,5 +1,5 @@
 import { Proposal, ProposalCategory } from "@prisma/client";
-import { prisma } from "db";
+import { prisma } from '@charmverse/core';
 import { disconnectProposalChildren } from "lib/proposal/disconnectProposalChildren";
 import { getRandomThemeColor } from "theme/utils/getRandomThemeColor";
 

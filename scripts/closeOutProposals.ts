@@ -1,5 +1,5 @@
 import { Page, Proposal, Space, Vote, VoteStatus } from "@prisma/client";
-import { prisma } from "db";
+import { prisma } from '@charmverse/core';
 import { DataNotFoundError, InvalidInputError } from "lib/utilities/errors";
 import { getVote } from "lib/votes";
 import { ExtendedVote } from "lib/votes/interfaces";

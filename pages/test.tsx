@@ -1,6 +1,6 @@
 // import { uid } from 'node_modules/common.charmverse.io/packages/utilities-string/src';
 // eslint-disable-next-line import/no-relative-packages, import/no-extraneous-dependencies
-import { randomiser } from '@charmverse/core';
+import { randomiser } from '@charmverse/core/dist/shared';
 import { useEffect, useState } from 'react';
 
 export default function TestPage() {
