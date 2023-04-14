@@ -11,6 +11,7 @@ import { onError, onNoMatch } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { getUserProfile } from 'lib/users/getUser';
 import { InsecureOperationError, InvalidInputError } from 'lib/utilities/errors';
+import { shortenHex } from 'lib/utilities/strings';
 import type { LoggedInUser } from 'models';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -41,7 +42,7 @@ async function addWalletsController(req: NextApiRequest, res: NextApiResponse<Lo
       }))
     });
   } catch (e) {
-    log.error('Error adding wallet', e, { userId, addresses: addressesToAdd.map((s) => s.address) });
+    log.error('Error adding wallet', e, { userId, addresses: addressesToAdd.map((s) => shortenHex(s.address)) });
     throw new InvalidInputError('Wallet is already connected with another account');
   }
 
