@@ -27,7 +27,7 @@ export default function RedirectToMainPage() {
       router.push(defaultPage);
     } else if (!loadingPages) {
       // Find the first top-level page that is not card and hasn't been deleted yet.
-      const topLevelPages = filterVisiblePages(Object.values(pages))
+      const topLevelPages = filterVisiblePages(pages)
         // Remove any child pages (eg. that have a parentId)
         .filter((page) => !page?.parentId);
 
