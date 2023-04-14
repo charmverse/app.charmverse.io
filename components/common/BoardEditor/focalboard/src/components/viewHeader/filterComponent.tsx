@@ -1,4 +1,5 @@
 import styled from '@emotion/styled';
+import { MenuItem, Select, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import { Stack } from '@mui/system';
@@ -10,6 +11,7 @@ import type { IPropertyTemplate } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { FilterClause, FilterCondition } from 'lib/focalboard/filterClause';
 import { createFilterClause } from 'lib/focalboard/filterClause';
+import type { FilterGroupOperation } from 'lib/focalboard/filterGroup';
 import { createFilterGroup, isAFilterGroupInstance } from 'lib/focalboard/filterGroup';
 
 import { Constants } from '../../constants';
@@ -64,18 +66,47 @@ const FilterComponent = React.memo((props: Props) => {
   const filters: FilterClause[] =
     (activeView.fields.filter?.filters.filter((o) => !isAFilterGroupInstance(o)) as FilterClause[]) || [];
 
+  function changeFilterGroupOperation(operation: FilterGroupOperation) {
+    const filterGroup = createFilterGroup(activeView.fields.filter);
+    filterGroup.operation = operation;
+    mutator.changeViewFilter(activeView.id, activeView.fields.filter, filterGroup);
+  }
+
   return (
     <StyledFilterComponent>
       {filters.length !== 0 && (
         <Stack gap={1} my={1}>
-          {filters.map((filter) => (
-            <FilterEntry
+          {filters.map((filter, filterIndex) => (
+            <Stack
+              flexDirection='row'
+              gap={0.5}
               key={`${filter.propertyId}-${filter.condition}-${filter.values.join(',')}`}
-              properties={properties}
-              view={activeView}
-              conditionClicked={conditionClicked}
-              filter={filter}
-            />
+            >
+              {filterIndex !== 0 && (
+                <Select<FilterGroupOperation>
+                  disabled={filterIndex !== 1}
+                  value={activeView.fields.filter.operation}
+                  onChange={(e) => changeFilterGroupOperation(e.target.value as FilterGroupOperation)}
+                  renderValue={(selected) => (
+                    <Typography>{selected.charAt(0).toUpperCase() + selected.slice(1)}</Typography>
+                  )}
+                >
+                  {['Or', 'And'].map((option) => {
+                    return (
+                      <MenuItem key={option} value={option.toLowerCase()}>
+                        <Typography>{option}</Typography>
+                      </MenuItem>
+                    );
+                  })}
+                </Select>
+              )}
+              <FilterEntry
+                properties={properties}
+                view={activeView}
+                conditionClicked={conditionClicked}
+                filter={filter}
+              />
+            </Stack>
           ))}
         </Stack>
       )}

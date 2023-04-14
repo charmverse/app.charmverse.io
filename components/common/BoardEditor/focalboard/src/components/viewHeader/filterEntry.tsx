@@ -84,7 +84,7 @@ function FilterPropertyValue({
         const filters = [..._view.fields.filter.filters];
         filters[filterIndex] = _filter;
         mutator.changeViewFilter(_view.id, _view.fields.filter, {
-          operation: 'and',
+          operation: _view.fields.filter.operation,
           filters
         });
       }
