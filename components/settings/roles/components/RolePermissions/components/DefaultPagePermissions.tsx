@@ -81,9 +81,9 @@ export function DefaultPagePermissions() {
   return (
     <>
       <Box mb={2}>
-        <Typography fontWeight='bold'>New page permissions</Typography>
+        <Typography fontWeight='bold'>Default permissions for new pages</Typography>
         <Typography variant='caption'>
-          These apply only to new top-level pages. You can still control access to each page individually.
+          This applies to top-level pages only. Subpages will inherit permissions from their parent.
         </Typography>
       </Box>
       <Box mb={2} display='flex' alignItems='center' justifyContent='space-between'>
