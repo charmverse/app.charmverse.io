@@ -30,8 +30,3 @@ runs:
       shell: bash
       run: npm install github:charmverse/core#ts-lib
 
-    # Build prisma types which are cached inside of node_modules
-    - name: Build Prisma types
-      shell: bash
-      run: npm run build:prisma
-

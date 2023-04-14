@@ -24,7 +24,10 @@
     "jsxImportSource": "@emotion/react",
     "allowJs": true,
     "incremental": true,
-    "isolatedModules": true
+    "isolatedModules": true,
+    "paths": {
+      "@prisma/client": ["./node_modules/@charmverse/core/@prisma/client"],
+    }
   },
   "exclude": ["node_modules", "**/focalboard/src/**/*.spec.ts", "**/focalboard/src/**/*.spec.tsx"],
   "include": ["**/*.ts", "**/*.tsx"]
