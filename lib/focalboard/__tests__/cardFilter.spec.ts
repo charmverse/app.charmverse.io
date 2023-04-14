@@ -25,7 +25,7 @@ describe('src/cardFilter', () => {
     filterId: v4()
   });
   describe('verify isClauseMet method', () => {
-    test('should be true with isNotEmpty clause', () => {
+    test('should be true with is-not-empty clause', () => {
       const filterClauseIsNotEmpty = createFilterClause({
         propertyId: 'propertyId',
         condition: 'is-not-empty',
@@ -35,17 +35,21 @@ describe('src/cardFilter', () => {
       const result = CardFilter.isClauseMet(filterClauseIsNotEmpty, [], card1);
       expect(result).toBeTruthy();
     });
-    test('should be false with isEmpty clause', () => {
+    test('should be false with is-empty clause', () => {
       const filterClauseIsEmpty = createFilterClause({
         propertyId: 'propertyId',
         condition: 'is-empty',
-        values: ['Status'],
+        values: [],
         filterId: v4()
       });
-      const result = CardFilter.isClauseMet(filterClauseIsEmpty, [], card1);
+      const result = CardFilter.isClauseMet(
+        filterClauseIsEmpty,
+        [{ id: 'propertyId', name: 'Property', options: [], type: 'select' }],
+        card1
+      );
       expect(result).toBeFalsy();
     });
-    test('should be true with includes clause', () => {
+    test('should be true with contains clause', () => {
       const filterClauseIncludes = createFilterClause({
         propertyId: 'propertyId',
         condition: 'contains',
@@ -55,7 +59,7 @@ describe('src/cardFilter', () => {
       const result = CardFilter.isClauseMet(filterClauseIncludes, [], card1);
       expect(result).toBeTruthy();
     });
-    test('should be true with includes and no values clauses', () => {
+    test('should be true with contains and no values clauses', () => {
       const filterClauseIncludes = createFilterClause({
         propertyId: 'propertyId',
         condition: 'contains',
@@ -65,7 +69,7 @@ describe('src/cardFilter', () => {
       const result = CardFilter.isClauseMet(filterClauseIncludes, [], card1);
       expect(result).toBeTruthy();
     });
-    test('should be false with notIncludes clause', () => {
+    test('should be false with does not contain clause', () => {
       const filterClauseNotIncludes = createFilterClause({
         propertyId: 'propertyId',
         condition: 'does-not-contain',
@@ -75,7 +79,7 @@ describe('src/cardFilter', () => {
       const result = CardFilter.isClauseMet(filterClauseNotIncludes, [], card1);
       expect(result).toBeFalsy();
     });
-    test('should be true with notIncludes and no values clauses', () => {
+    test('should be true with does not contain and no values clauses', () => {
       const filterClauseNotIncludes = createFilterClause({
         propertyId: 'propertyId',
         condition: 'does-not-contain',
@@ -208,7 +212,7 @@ describe('src/cardFilter', () => {
       expect(mockedUtils.assertFailure).toBeCalledTimes(1);
       expect(result.id).toEqual(filterClauseIsNotEmpty.propertyId);
     });
-    test('should return filterClause propertyId with non-select template and isNotEmpty clause ', () => {
+    test('should return filterClause propertyId with non-select template and is-not-empty clause ', () => {
       const filterClauseIsNotEmpty = createFilterClause({
         propertyId: 'propertyId',
         condition: 'is-not-empty',
@@ -225,7 +229,7 @@ describe('src/cardFilter', () => {
       expect(result.id).toEqual(filterClauseIsNotEmpty.propertyId);
       expect(result.value).toBeFalsy();
     });
-    test('should return filterClause propertyId with select template , an option and isNotEmpty clause ', () => {
+    test('should return filterClause propertyId with select template , an option and is-not-empty clause ', () => {
       const filterClauseIsNotEmpty = createFilterClause({
         propertyId: 'propertyId',
         condition: 'is-not-empty',
@@ -248,7 +252,7 @@ describe('src/cardFilter', () => {
       expect(result.id).toEqual(filterClauseIsNotEmpty.propertyId);
       expect(result.value).toEqual('idOption');
     });
-    test('should return filterClause propertyId with select template , no option and isNotEmpty clause ', () => {
+    test('should return filterClause propertyId with select template , no option and is-not-empty clause ', () => {
       const filterClauseIsNotEmpty = createFilterClause({
         propertyId: 'propertyId',
         condition: 'is-not-empty',
@@ -266,7 +270,7 @@ describe('src/cardFilter', () => {
       expect(result.value).toBeFalsy();
     });
 
-    test('should return filterClause propertyId with template, and includes clause with values', () => {
+    test('should return filterClause propertyId with template, and contains clause with values', () => {
       const filterClauseIncludes = createFilterClause({
         propertyId: 'propertyId',
         condition: 'contains',
@@ -283,7 +287,7 @@ describe('src/cardFilter', () => {
       expect(result.id).toEqual(filterClauseIncludes.propertyId);
       expect(result.value).toEqual(filterClauseIncludes.values[0]);
     });
-    test('should return filterClause propertyId with template, and includes clause with no values', () => {
+    test('should return filterClause propertyId with template, and contains clause with no values', () => {
       const filterClauseIncludes = createFilterClause({
         propertyId: 'propertyId',
         condition: 'contains',
@@ -300,7 +304,7 @@ describe('src/cardFilter', () => {
       expect(result.id).toEqual(filterClauseIncludes.propertyId);
       expect(result.value).toBeFalsy();
     });
-    test('should return filterClause propertyId with template, and notIncludes clause', () => {
+    test('should return filterClause propertyId with template, and does not contain clause', () => {
       const filterClauseNotIncludes = createFilterClause({
         propertyId: 'propertyId',
         condition: 'does-not-contain',
@@ -317,7 +321,7 @@ describe('src/cardFilter', () => {
       expect(result.id).toEqual(filterClauseNotIncludes.propertyId);
       expect(result.value).toBeFalsy();
     });
-    test('should return filterClause propertyId with template, and isEmpty clause', () => {
+    test('should return filterClause propertyId with template, and is-empty clause', () => {
       const filterClauseIsEmpty = createFilterClause({
         propertyId: 'propertyId',
         condition: 'is-empty',
@@ -335,7 +339,7 @@ describe('src/cardFilter', () => {
       expect(result.value).toBeFalsy();
     });
 
-    test('should return a result with filterGroup for isNotEmpty', () => {
+    test('should return a result with filterGroup for is-not-empty', () => {
       const filterClauseIsNotEmpty = createFilterClause({
         propertyId: 'propertyId',
         condition: 'is-not-empty',

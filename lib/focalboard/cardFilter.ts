@@ -67,28 +67,28 @@ class CardFilter {
             }
             return false;
           }
-          case 'does-not-contain': {
+          case 'does_not_contain': {
             if (!sourceValue.includes(filterValue)) {
               return true;
             }
             return false;
           }
-          case 'ends-with': {
+          case 'ends_with': {
             return sourceValue.endsWith(filterValue);
           }
-          case 'starts-with': {
+          case 'starts_with': {
             return sourceValue.startsWith(filterValue);
           }
           case 'is': {
             return sourceValue === filterValue;
           }
-          case 'is-not': {
+          case 'is_not': {
             return sourceValue !== filterValue;
           }
-          case 'is-empty': {
+          case 'is_empty': {
             return sourceValue === '';
           }
-          case 'is-not-empty': {
+          case 'is_not_empty': {
             return sourceValue !== '';
           }
           default: {
@@ -103,7 +103,7 @@ class CardFilter {
           case 'is': {
             return sourceValue === filterValue;
           }
-          case 'is-not': {
+          case 'is_not': {
             return sourceValue !== filterValue;
           }
           default: {
@@ -117,45 +117,45 @@ class CardFilter {
           case 'equal': {
             return Number(sourceValue) === Number(filterValue);
           }
-          case 'greater-than': {
+          case 'greater_than': {
             return Number(sourceValue) > Number(filterValue);
           }
-          case 'less-than': {
+          case 'less_than': {
             return Number(sourceValue) < Number(filterValue);
           }
-          case 'less-than-equal': {
+          case 'less_than_equal': {
             return Number(sourceValue) <= Number(filterValue);
           }
-          case 'greater-than-equal': {
+          case 'greater_than_equal': {
             return Number(sourceValue) >= Number(filterValue);
           }
-          case 'is-empty': {
+          case 'is_empty': {
             return sourceValue === '';
           }
-          case 'is-not-empty': {
+          case 'is_not_empty': {
             return sourceValue !== '';
           }
-          case 'not-equal': {
+          case 'not_equal': {
             return Number(sourceValue) !== Number(filterValue);
           }
           default: {
             Utils.assertFailure(`Invalid filter condition ${filter.condition}`);
           }
         }
-      } else if (filterPropertyDataType === 'multi-select') {
+      } else if (filterPropertyDataType === 'multi_select') {
         const condition = filter.condition as (typeof MultiSelectDataTypeConditions)[number];
         const sourceValues = value as string[];
         switch (condition) {
           case 'contains': {
             return sourceValues.some((sourceValue) => filter.values.includes(sourceValue));
           }
-          case 'does-not-contain': {
+          case 'does_not_contain': {
             return sourceValues.every((sourceValue) => !filter.values.includes(sourceValue));
           }
-          case 'is-empty': {
+          case 'is_empty': {
             return sourceValues.length === 0;
           }
-          case 'is-not-empty': {
+          case 'is_not_empty': {
             return sourceValues.length > 0;
           }
           default: {
@@ -169,13 +169,13 @@ class CardFilter {
           case 'is': {
             return filterValue === sourceValue;
           }
-          case 'is-not': {
+          case 'is_not': {
             return filterValue !== sourceValue;
           }
-          case 'is-empty': {
+          case 'is_empty': {
             return sourceValue === '';
           }
-          case 'is-not-empty': {
+          case 'is_not_empty': {
             return sourceValue !== '';
           }
           default: {
@@ -193,37 +193,37 @@ class CardFilter {
               new Date(Number(filterValue)).getTime() === new Date(sourceValue.from).getTime()
             );
           }
-          case 'is-before': {
+          case 'is_before': {
             return (
               sourceValue.from !== undefined &&
               new Date(Number(filterValue)).getTime() > new Date(sourceValue.from).getTime()
             );
           }
-          case 'is-after': {
+          case 'is_after': {
             return (
               sourceValue.from !== undefined &&
               new Date(Number(filterValue)).getTime() < new Date(sourceValue.from).getTime()
             );
           }
-          case 'is-empty': {
+          case 'is_empty': {
             return sourceValue.from === undefined;
           }
-          case 'is-not': {
+          case 'is_not': {
             return (
               sourceValue.from !== undefined &&
               new Date(Number(filterValue)).getTime() !== new Date(sourceValue.from).getTime()
             );
           }
-          case 'is-not-empty': {
+          case 'is_not_empty': {
             return sourceValue.from !== undefined;
           }
-          case 'is-on-or-after': {
+          case 'is_on_or_after': {
             return (
               sourceValue.from !== undefined &&
               new Date(Number(filterValue)).getTime() <= new Date(sourceValue.from).getTime()
             );
           }
-          case 'is-on-or-before': {
+          case 'is_on_or_before': {
             return (
               sourceValue.from !== undefined &&
               new Date(Number(filterValue)).getTime() >= new Date(sourceValue.from).getTime()
@@ -292,15 +292,15 @@ class CardFilter {
         const condition = filterClause.condition as (typeof TextDataTypeConditions)[number];
         switch (condition) {
           case 'contains':
-          case 'ends-with':
+          case 'ends_with':
           case 'is':
-          case 'starts-with':
-          case 'is-not-empty': {
+          case 'starts_with':
+          case 'is_not_empty': {
             return { id: filterClause.propertyId, value: filterClause.values[0] };
           }
-          case 'does-not-contain':
-          case 'is-not':
-          case 'is-empty': {
+          case 'does_not_contain':
+          case 'is_not':
+          case 'is_empty': {
             return { id: filterClause.propertyId };
           }
           default: {
@@ -314,7 +314,7 @@ class CardFilter {
           case 'is': {
             return { id: filterClause.propertyId, value: filterClause.values[0] };
           }
-          case 'is-not': {
+          case 'is_not': {
             return { id: filterClause.propertyId, value: filterClause.values[0] === 'true' ? 'false' : 'true' };
           }
           default: {
@@ -326,19 +326,19 @@ class CardFilter {
         const condition = filterClause.condition as (typeof NumberDataTypeConditions)[number];
         switch (condition) {
           case 'equal':
-          case 'greater-than-equal':
-          case 'less-than-equal':
-          case 'is-not-empty': {
+          case 'greater_than_equal':
+          case 'less_than_equal':
+          case 'is_not_empty': {
             return { id: filterClause.propertyId, value: filterClause.values[0] };
           }
-          case 'greater-than': {
+          case 'greater_than': {
             return { id: filterClause.propertyId, value: String(Number(filterClause.values[0]) + 1) };
           }
-          case 'less-than': {
+          case 'less_than': {
             return { id: filterClause.propertyId, value: String(Number(filterClause.values[0]) - 1) };
           }
-          case 'is-empty':
-          case 'not-equal': {
+          case 'is_empty':
+          case 'not_equal': {
             return { id: filterClause.propertyId };
           }
           default: {
@@ -346,15 +346,15 @@ class CardFilter {
             return { id: filterClause.propertyId };
           }
         }
-      } else if (filterPropertyDataType === 'multi-select') {
+      } else if (filterPropertyDataType === 'multi_select') {
         const condition = filterClause.condition as (typeof MultiSelectDataTypeConditions)[number];
         switch (condition) {
           case 'contains':
-          case 'is-not-empty': {
+          case 'is_not_empty': {
             return { id: filterClause.propertyId, value: [filterClause.values[0]] };
           }
-          case 'does-not-contain':
-          case 'is-empty': {
+          case 'does_not_contain':
+          case 'is_empty': {
             return { id: filterClause.propertyId };
           }
           default: {
@@ -366,11 +366,11 @@ class CardFilter {
         const condition = filterClause.condition as (typeof SelectDataTypeConditions)[number];
         switch (condition) {
           case 'is':
-          case 'is-not-empty': {
+          case 'is_not_empty': {
             return { id: filterClause.propertyId, value: filterClause.values[0] };
           }
-          case 'is-not':
-          case 'is-empty': {
+          case 'is_not':
+          case 'is_empty': {
             return { id: filterClause.propertyId };
           }
           default: {
@@ -382,12 +382,12 @@ class CardFilter {
         const condition = filterClause.condition as (typeof DateDataTypeConditions)[number];
         switch (condition) {
           case 'is':
-          case 'is-not-empty':
-          case 'is-on-or-after':
-          case 'is-on-or-before': {
+          case 'is_not_empty':
+          case 'is_on_or_after':
+          case 'is_on_or_before': {
             return { id: filterClause.propertyId, value: JSON.stringify({ from: Number(filterClause.values[0]) }) };
           }
-          case 'is-before': {
+          case 'is_before': {
             return {
               id: filterClause.propertyId,
               value: JSON.stringify({
@@ -395,7 +395,7 @@ class CardFilter {
               })
             };
           }
-          case 'is-after': {
+          case 'is_after': {
             return {
               id: filterClause.propertyId,
               value: JSON.stringify({
@@ -403,8 +403,8 @@ class CardFilter {
               })
             };
           }
-          case 'is-empty':
-          case 'is-not': {
+          case 'is_empty':
+          case 'is_not': {
             return { id: filterClause.propertyId };
           }
           default: {

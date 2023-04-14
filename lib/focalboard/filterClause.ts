@@ -3,48 +3,48 @@ import { v4 } from 'uuid';
 
 import type { PropertyType } from './board';
 
-export const BooleanDataTypeConditions = ['is', 'is-not'] as const;
+export const BooleanDataTypeConditions = ['is', 'is_not'] as const;
 
 export const TextDataTypeConditions = [
   'is',
-  'is-not',
+  'is_not',
   'contains',
-  'does-not-contain',
-  'starts-with',
-  'ends-with',
-  'is-empty',
-  'is-not-empty'
+  'does_not_contain',
+  'starts_with',
+  'ends_with',
+  'is_empty',
+  'is_not_empty'
 ] as const;
 
 export const NumberDataTypeConditions = [
   'equal',
-  'not-equal',
-  'greater-than',
-  'less-than',
-  'greater-than-equal',
-  'less-than-equal',
-  'is-empty',
-  'is-not-empty'
+  'not_equal',
+  'greater_than',
+  'less_than',
+  'greater_than_equal',
+  'less_than_equal',
+  'is_empty',
+  'is_not_empty'
 ] as const;
 
 export const DateDataTypeConditions = [
   'is',
-  'is-not',
-  'is-before',
-  'is-after',
-  'is-on-or-before',
-  'is-on-or-after',
-  'is-empty',
-  'is-not-empty'
+  'is_not',
+  'is_before',
+  'is_after',
+  'is_on_or_before',
+  'is_on_or_after',
+  'is_empty',
+  'is_not_empty'
 ] as const;
 
-export const MultiSelectDataTypeConditions = ['contains', 'does-not-contain', 'is-empty', 'is-not-empty'] as const;
+export const MultiSelectDataTypeConditions = ['contains', 'does_not_contain', 'is_empty', 'is_not_empty'] as const;
 
-export const SelectDataTypeConditions = ['is', 'is-not', 'is-empty', 'is-not-empty'] as const;
+export const SelectDataTypeConditions = ['is', 'is_not', 'is_empty', 'is_not_empty'] as const;
 
-export const MiscDataTypeConditions = ['is-empty', 'is-not-empty'] as const;
+export const MiscDataTypeConditions = ['is_empty', 'is_not_empty'] as const;
 
-export type DataType = 'text' | 'number' | 'boolean' | 'date' | 'multi-select' | 'select' | 'misc';
+export type DataType = 'text' | 'number' | 'boolean' | 'date' | 'multi_select' | 'select' | 'misc';
 
 export type DataTypeFactory<DT extends DataType, DataTypeDataTypeConditions extends readonly string[]> = {
   datatype: DT;
@@ -55,7 +55,7 @@ export type BooleanDataTypeConfig = DataTypeFactory<'boolean', typeof BooleanDat
 export type TextDataTypeConfig = DataTypeFactory<'text', typeof TextDataTypeConditions>;
 export type NumberDataTypeConfig = DataTypeFactory<'number', typeof NumberDataTypeConditions>;
 export type DateDataTypeConfig = DataTypeFactory<'date', typeof DateDataTypeConditions>;
-export type MultiSelectDataTypeConfig = DataTypeFactory<'multi-select', typeof MultiSelectDataTypeConditions>;
+export type MultiSelectDataTypeConfig = DataTypeFactory<'multi_select', typeof MultiSelectDataTypeConditions>;
 export type SelectDataTypeConfig = DataTypeFactory<'select', typeof SelectDataTypeConditions>;
 export type MiscDataTypeConfig = DataTypeFactory<'misc', typeof MiscDataTypeConditions>;
 
@@ -70,7 +70,7 @@ export type DataTypeConfigs =
 
 export const propertyConfigs: Record<PropertyType, DataTypeConfigs> = {
   updatedBy: {
-    datatype: 'multi-select',
+    datatype: 'multi_select',
     conditions: MultiSelectDataTypeConditions
   },
   updatedTime: {
@@ -102,7 +102,7 @@ export const propertyConfigs: Record<PropertyType, DataTypeConfigs> = {
     conditions: MiscDataTypeConditions
   },
   multiSelect: {
-    datatype: 'multi-select',
+    datatype: 'multi_select',
     conditions: MultiSelectDataTypeConditions
   },
   number: {
@@ -110,7 +110,7 @@ export const propertyConfigs: Record<PropertyType, DataTypeConfigs> = {
     conditions: NumberDataTypeConditions
   },
   person: {
-    datatype: 'multi-select',
+    datatype: 'multi_select',
     conditions: MultiSelectDataTypeConditions
   },
   phone: {

@@ -142,7 +142,7 @@ function FilterPropertyValue({
 
   const propertyDataType = propertyConfigs[propertyRecord[filter.propertyId].type].datatype;
 
-  if (filter.condition === 'is-empty' || filter.condition === 'is-not-empty') {
+  if (filter.condition === 'is_empty' || filter.condition === 'is_not_empty') {
     return null;
   }
 
@@ -158,7 +158,7 @@ function FilterPropertyValue({
     );
   } else if (propertyDataType === 'boolean') {
     return <Switch checked={filter.values[0] === 'true'} onChange={updateBooleanValue} />;
-  } else if (propertyDataType === 'multi-select') {
+  } else if (propertyDataType === 'multi_select') {
     if (isPropertyTypeMultiSelect) {
       return (
         <Select<string[]>
