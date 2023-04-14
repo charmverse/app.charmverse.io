@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
+import { prisma } from '@charmverse/core';
 import type { PostCategory, Space, User } from '@prisma/client';
 import request from 'supertest';
 import { v4 } from 'uuid';
 
-import { prisma } from 'db';
 import type { PostCommentWithVote } from 'lib/forums/comments/interface';
 import { upsertPostCategoryPermission } from 'lib/permissions/forum/upsertPostCategoryPermission';
 import { baseUrl, loginUser } from 'testing/mockApiCall';

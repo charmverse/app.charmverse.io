@@ -1,8 +1,8 @@
+import { prisma } from '@charmverse/core';
 import type { Role } from '@prisma/client';
 import { LitNodeClient } from 'lit-js-sdk';
 import { validate } from 'uuid';
 
-import { prisma } from 'db';
 import log from 'lib/log';
 import { InvalidStateError } from 'lib/middleware';
 import { DataNotFoundError, MissingDataError } from 'lib/utilities/errors';

@@ -1,6 +1,6 @@
+import { prisma } from '@charmverse/core';
 import type { PagePermission, Prisma } from '@prisma/client';
 
-import { prisma } from 'db';
 import { PageNotFoundError } from 'lib/pages/server';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { typedKeys } from 'lib/utilities/objects';

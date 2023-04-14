@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
+import { prisma } from '@charmverse/core';
 import type { Page } from '@prisma/client';
 import request from 'supertest';
 
-import { prisma } from 'db';
 import type { IPageWithPermissions } from 'lib/pages';
 import { getPagePath } from 'lib/pages';
 import { createProposalTemplate } from 'lib/templates/proposals/createProposalTemplate';

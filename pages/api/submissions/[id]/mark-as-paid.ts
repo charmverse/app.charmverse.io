@@ -1,8 +1,8 @@
+import { prisma } from '@charmverse/core';
 import type { Application } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { prisma } from 'db';
 import { markSubmissionAsPaid } from 'lib/applications/actions/markSubmissionAsPaid';
 import { rollupBountyStatus } from 'lib/bounties/rollupBountyStatus';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';

@@ -1,6 +1,5 @@
+import { prisma } from '@charmverse/core';
 import type { Space } from '@prisma/client';
-
-import { prisma } from 'db';
 
 type Props = {
   spaceId: string;

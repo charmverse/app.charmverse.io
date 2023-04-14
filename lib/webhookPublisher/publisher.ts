@@ -1,6 +1,6 @@
+import { prisma } from '@charmverse/core';
 import type { Space } from '@prisma/client';
 
-import { prisma } from 'db';
 import { addMessageToSQS } from 'lib/aws/SQS';
 import log from 'lib/log';
 import type { WebhookEventNames, WebhookEvent, WebhookPayload } from 'lib/webhookPublisher/interfaces';

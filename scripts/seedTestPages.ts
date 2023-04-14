@@ -1,7 +1,7 @@
 import { generateBoard } from 'testing/setupDatabase';
 import { boardWithCardsArgs } from 'testing/generateBoardStub';
 import { pageStubToCreate } from 'testing/generatePageStub';
-import { prisma } from 'db';
+import { prisma } from '@charmverse/core';
 import { DataNotFoundError } from 'lib/utilities/errors';
 import { Prisma } from '@prisma/client';
 import { createPage } from 'lib/pages/server/createPage';

@@ -1,7 +1,7 @@
+import { prisma } from '@charmverse/core';
 import type { PostCategoryPermission, ProposalCategoryPermission, Space, SpaceRole, User } from '@prisma/client';
 import { v4 } from 'uuid';
 
-import { prisma } from 'db';
 import { defaultPostCategories } from 'lib/forums/categories/generateDefaultPostCategories';
 import { defaultProposalCategories } from 'lib/proposal/generateDefaultProposalCategoriesInput';
 import { uid } from 'lib/utilities/strings';

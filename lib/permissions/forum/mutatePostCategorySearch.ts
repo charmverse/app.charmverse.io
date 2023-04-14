@@ -1,4 +1,5 @@
-import { prisma } from 'db';
+import { prisma } from '@charmverse/core';
+
 import { getPostCategories } from 'lib/forums/categories/getPostCategories';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 

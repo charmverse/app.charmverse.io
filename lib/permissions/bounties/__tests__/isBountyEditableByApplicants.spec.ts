@@ -1,6 +1,6 @@
+import { prisma } from '@charmverse/core';
 import type { Role, Space, User } from '@prisma/client';
 
-import { prisma } from 'db';
 import { getSpaceMembers } from 'lib/members/getSpaceMembers';
 import type { Member } from 'lib/members/interfaces';
 import { generateBounty, generateRole, generateSpaceUser, generateUserAndSpace } from 'testing/setupDatabase';

@@ -1,9 +1,9 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
+import { prisma } from '@charmverse/core';
 import type { Prisma, Space } from '@prisma/client';
 
-import { prisma } from 'db';
 import { generateDefaultPostCategories } from 'lib/forums/categories/generateDefaultPostCategories';
 import { setDefaultPostCategory } from 'lib/forums/categories/setDefaultPostCategory';
 import { generateDefaultPropertiesInput } from 'lib/members/generateDefaultPropertiesInput';

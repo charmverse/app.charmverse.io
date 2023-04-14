@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
+import { prisma } from '@charmverse/core';
 import type { PostCategory, Space, User } from '@prisma/client';
 import request from 'supertest';
 
-import { prisma } from 'db';
 import type { PostCategoryUpdate } from 'lib//forums/categories/updatePostCategory';
 import type { CreatePostCategoryInput } from 'lib/forums/categories/createPostCategory';
 import { baseUrl, loginUser } from 'testing/mockApiCall';

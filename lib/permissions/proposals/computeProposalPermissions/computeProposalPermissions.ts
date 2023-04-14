@@ -1,6 +1,6 @@
+import { prisma } from '@charmverse/core';
 import type { Prisma } from '@prisma/client';
 
-import { prisma } from 'db';
 import { filterApplicablePermissions } from 'lib/permissions/filterApplicablePermissions';
 import { ProposalNotFoundError } from 'lib/proposal/errors';
 import { isProposalReviewer } from 'lib/proposal/isProposalReviewer';

@@ -1,8 +1,8 @@
+import { prisma } from '@charmverse/core';
 import { expect, test as base } from '@playwright/test';
 import type { Space, User } from '@prisma/client';
 import { PermissionSettings } from '__e2e__/po/settings/spacePermissionSettings.po';
 
-import { prisma } from 'db';
 import { randomETHWalletAddress } from 'testing/generateStubs';
 import { generateForumPost, generatePostCategory } from 'testing/utils/forums';
 

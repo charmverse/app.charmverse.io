@@ -1,6 +1,6 @@
+import { prisma } from '@charmverse/core';
 import type { Role, Space, User } from '@prisma/client';
 
-import { prisma } from 'db';
 import { UndesirableOperationError } from 'lib/utilities/errors';
 import { generateRole, generateUserAndSpace } from 'testing/setupDatabase';
 import { generatePostCategory } from 'testing/utils/forums';

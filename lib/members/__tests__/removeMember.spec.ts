@@ -1,6 +1,6 @@
+import { prisma } from '@charmverse/core';
 import { generatePage } from '__e2e__/utils/pages';
 
-import { prisma } from 'db';
 import { InvalidStateError } from 'lib/middleware';
 import { InvalidInputError } from 'lib/utilities/errors';
 import { generateSpaceUser, generateUserAndSpace } from 'testing/setupDatabase';

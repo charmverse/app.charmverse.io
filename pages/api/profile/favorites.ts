@@ -1,8 +1,8 @@
+import { prisma } from '@charmverse/core';
 import type { FavoritePage } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { prisma } from 'db';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { sessionUserRelations } from 'lib/session/config';
 import { withSessionRoute } from 'lib/session/withSession';

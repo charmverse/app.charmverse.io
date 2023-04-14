@@ -1,8 +1,8 @@
+import { prisma } from '@charmverse/core';
 import type { Prisma } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { prisma } from 'db';
 import { onError, onNoMatch } from 'lib/middleware';
 import type { IPageWithPermissions } from 'lib/pages/server';
 import { getAccessiblePages, includePagePermissionsMeta } from 'lib/pages/server';

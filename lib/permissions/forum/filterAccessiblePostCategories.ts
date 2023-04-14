@@ -1,6 +1,6 @@
+import { prisma } from '@charmverse/core';
 import type { PostCategory, PostCategoryPermission, Prisma } from '@prisma/client';
 
-import { prisma } from 'db';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { uniqueValues } from 'lib/utilities/array';
 import { InvalidInputError } from 'lib/utilities/errors';

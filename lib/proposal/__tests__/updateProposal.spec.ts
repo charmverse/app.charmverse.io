@@ -1,6 +1,6 @@
+import { prisma } from '@charmverse/core';
 import type { Space, User } from '@prisma/client';
 
-import { prisma } from 'db';
 import { InvalidStateError } from 'lib/middleware';
 import { createProposalWithUsers, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 

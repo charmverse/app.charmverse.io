@@ -1,10 +1,10 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
+import { prisma } from '@charmverse/core';
 import type { Block } from '@prisma/client';
 import { validate } from 'uuid';
 
-import { prisma } from 'db';
 import type { PageNodeWithChildren } from 'lib/pages';
 import { isBoardPageType } from 'lib/pages/isBoardPageType';
 import { resolvePageTree } from 'lib/pages/server/resolvePageTree';

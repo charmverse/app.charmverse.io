@@ -1,10 +1,10 @@
+import { prisma } from '@charmverse/core';
 import type { Page as BrowserPage } from '@playwright/test';
 import type { Bounty, Page, Prisma, Space } from '@prisma/client';
 import { Wallet } from 'ethers';
 import { v4 } from 'uuid';
 
 import { baseUrl } from 'config/constants';
-import { prisma } from 'db';
 import type { BountyPermissions, BountyWithDetails } from 'lib/bounties';
 import { getBountyOrThrow } from 'lib/bounties/getBounty';
 import type { IPageWithPermissions } from 'lib/pages/interfaces';

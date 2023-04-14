@@ -1,9 +1,9 @@
+import { prisma } from '@charmverse/core';
 import type { Block, Prisma } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import { validate } from 'uuid';
 
-import { prisma } from 'db';
 import { prismaToBlock } from 'lib/focalboard/block';
 import {
   ActionNotPermittedError,

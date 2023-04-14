@@ -1,10 +1,10 @@
 import crypto from 'node:crypto';
 
+import { prisma } from '@charmverse/core';
 import type { Space, SpaceApiToken, User } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import type { NextHandler } from 'next-connect';
 
-import { prisma } from 'db';
 import log from 'lib/log';
 import { ApiError, InvalidApiKeyError } from 'lib/middleware/errors';
 import { getVerifiedSuperApiToken } from 'lib/middleware/requireSuperApiKey';

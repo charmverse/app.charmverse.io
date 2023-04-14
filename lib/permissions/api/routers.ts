@@ -1,5 +1,5 @@
 import type { PermissionsClient } from '@charmverse/core';
-import { PermissionsApiClient } from '@charmverse/core';
+import { PermissionsApiClient, prisma } from '@charmverse/core';
 import {
   stringUtils,
   InvalidInputError,
@@ -8,7 +8,6 @@ import {
 } from '@charmverse/core/dist/shared';
 
 import { permissionsApiAuthKey, permissionsApiUrl } from 'config/constants';
-import { prisma } from 'db';
 import { SpaceNotFoundError } from 'lib/public-api';
 
 import type { Resource } from '../interfaces';

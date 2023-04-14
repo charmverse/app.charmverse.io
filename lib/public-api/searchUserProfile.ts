@@ -1,6 +1,6 @@
+import { prisma } from '@charmverse/core';
 import type { GoogleAccount, User, UserWallet } from '@prisma/client';
 
-import { prisma } from 'db';
 import type { UserProfile } from 'lib/public-api/interfaces';
 import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
 

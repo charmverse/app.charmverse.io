@@ -1,7 +1,7 @@
+import { prisma } from '@charmverse/core';
 import type { Role, Space } from '@prisma/client';
 import request from 'supertest';
 
-import { prisma } from 'db';
 import type { IPagePermissionToCreate } from 'lib/permissions/pages';
 import { upsertPermission } from 'lib/permissions/pages';
 import type { LoggedInUser } from 'models';

@@ -1,9 +1,9 @@
+import { prisma } from '@charmverse/core';
 import type { SuperApiToken } from '@prisma/client';
 import { Wallet } from 'ethers';
 import request from 'supertest';
 import { v4 } from 'uuid';
 
-import { prisma } from 'db';
 import { getSpaceDomainFromName } from 'lib/spaces/utils';
 import { baseUrl } from 'testing/mockApiCall';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';

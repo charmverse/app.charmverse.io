@@ -1,6 +1,6 @@
+import { prisma } from '@charmverse/core';
 import type { PagePermission } from '@prisma/client';
 
-import { prisma } from 'db';
 import { flattenTree } from 'lib/pages/mapPageTree';
 import type { IPageWithPermissions } from 'lib/pages/server';
 import { getPage } from 'lib/pages/server';

@@ -1,4 +1,4 @@
-import { prisma } from 'db';
+import { prisma } from '@charmverse/core';
 
 export async function generateTokenGate({ userId, spaceId }: { spaceId: string; userId: string }) {
   return prisma.tokenGate.create({

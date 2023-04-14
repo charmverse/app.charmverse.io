@@ -1,8 +1,8 @@
+import { prisma } from '@charmverse/core';
 import type { Vote } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { prisma } from 'db';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { computePostPermissions } from 'lib/permissions/forum/computePostPermissions';
 import { computeUserPagePermissions } from 'lib/permissions/pages';

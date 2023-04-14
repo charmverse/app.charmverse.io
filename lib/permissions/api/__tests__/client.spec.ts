@@ -1,7 +1,6 @@
 import type { PostPermissionFlags } from '@charmverse/core';
-import { PermissionsApiClient } from '@charmverse/core';
+import { PermissionsApiClient, prisma } from '@charmverse/core';
 
-import { prisma } from 'db';
 import { AvailablePostPermissions } from 'lib/permissions/forum/availablePostPermissions.class';
 import { postPermissionsMapping } from 'lib/permissions/forum/mapping';
 import { generateSpaceUser, generateUserAndSpace } from 'testing/setupDatabase';

@@ -1,6 +1,6 @@
+import { prisma } from '@charmverse/core';
 import type { ProposalCategory, Role, Space, User } from '@prisma/client';
 
-import { prisma } from 'db';
 import { InvalidStateError } from 'lib/middleware';
 import {
   createProposalWithUsers,

@@ -1,8 +1,8 @@
+import { prisma } from '@charmverse/core';
 import { GaxiosError } from 'gaxios';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { prisma } from 'db';
 import { invalidateCredential } from 'lib/google/authorization/credentials';
 import { syncFormResponses } from 'lib/google/forms/syncFormResponses';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';

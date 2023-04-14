@@ -1,7 +1,7 @@
+import { prisma } from '@charmverse/core';
 import type { PostCategoryPermission } from '@prisma/client';
 import { v4 } from 'uuid';
 
-import { prisma } from 'db';
 import { PostCategoryNotFoundError } from 'lib/forums/categories/errors';
 import { generateUserAndSpace } from 'testing/setupDatabase';
 import { generatePostCategory } from 'testing/utils/forums';

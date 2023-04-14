@@ -1,6 +1,6 @@
+import { prisma } from '@charmverse/core';
 import type { ProposalStatus, User, WorkspaceEvent } from '@prisma/client';
 
-import { prisma } from 'db';
 import type {
   Discussion,
   GetDiscussionsResponse,

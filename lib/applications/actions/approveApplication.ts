@@ -1,6 +1,6 @@
+import { prisma } from '@charmverse/core';
 import type { Application } from '@prisma/client';
 
-import { prisma } from 'db';
 import { getBountyOrThrow } from 'lib/bounties/getBounty';
 import { DataNotFoundError, LimitReachedError, UndesirableOperationError } from 'lib/utilities/errors';
 

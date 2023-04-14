@@ -1,7 +1,7 @@
+import { prisma } from '@charmverse/core';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { prisma } from 'db';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { onError, onNoMatch, requireSpaceMembership } from 'lib/middleware';
 import type { SpacePermissions } from 'lib/permissions/spaces/listPermissions';

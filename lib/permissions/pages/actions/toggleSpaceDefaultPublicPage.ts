@@ -1,6 +1,6 @@
+import { prisma } from '@charmverse/core';
 import type { Space } from '@prisma/client';
 
-import { prisma } from 'db';
 import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
 
 import type { SpaceDefaultPublicPageToggle } from '../page-permission-interfaces';

@@ -1,8 +1,8 @@
+import { prisma } from '@charmverse/core';
 import type { Space, User, Vote } from '@prisma/client';
 import request from 'supertest';
 import { v4 } from 'uuid';
 
-import { prisma } from 'db';
 import type { PageWithProposal } from 'lib/pages';
 import type { PublicApiProposal } from 'pages/api/v1/proposals';
 import { baseUrl } from 'testing/mockApiCall';

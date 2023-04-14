@@ -1,6 +1,6 @@
+import { prisma } from '@charmverse/core';
 import type { PostCategory, PostCategoryPermission, Space } from '@prisma/client';
 
-import { prisma } from 'db';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 import type { CreatePostCategoryInput } from '../createPostCategory';

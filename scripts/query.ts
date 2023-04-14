@@ -1,5 +1,5 @@
 import { getAccessiblePages, includePagePermissionsMeta } from 'lib/pages/server';
-import { prisma } from 'db';
+import { prisma } from '@charmverse/core';
 import { customAlphabet } from 'nanoid';
 
 import * as opts from 'nanoid-dictionary';

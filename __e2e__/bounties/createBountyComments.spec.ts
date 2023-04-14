@@ -1,3 +1,4 @@
+import { prisma } from '@charmverse/core';
 import { test as base, expect } from '@playwright/test';
 import type { Space, User } from '@prisma/client';
 import type { BountyBoardPage } from '__e2e__/po/bountyBoard.po';
@@ -7,7 +8,6 @@ import { createUserAndSpace } from '__e2e__/utils/mocks';
 import { login } from '__e2e__/utils/session';
 
 import { baseUrl } from 'config/constants';
-import { prisma } from 'db';
 import { createApplication } from 'lib/applications/actions';
 import { createBounty } from 'lib/bounties';
 import { generateSpaceUser } from 'testing/setupDatabase';

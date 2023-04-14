@@ -1,9 +1,9 @@
+import { prisma } from '@charmverse/core';
 import type { DiscordUser } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { isProdEnv, isStagingEnv } from 'config/constants';
-import { prisma } from 'db';
 import type { DiscordGuildMember } from 'lib/discord/assignRoles';
 import { assignRolesFromDiscord } from 'lib/discord/assignRoles';
 import type { DiscordAccount } from 'lib/discord/getDiscordAccount';

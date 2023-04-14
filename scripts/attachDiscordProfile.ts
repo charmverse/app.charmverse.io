@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 import { User } from '@prisma/client';
-import { prisma } from 'db';
+import { prisma } from '@charmverse/core';
 import { DataNotFoundError } from 'lib/utilities/errors';
 
 /**

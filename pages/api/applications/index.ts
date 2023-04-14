@@ -1,8 +1,8 @@
+import { prisma } from '@charmverse/core';
 import type { Application } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { prisma } from 'db';
 import type { ApplicationWithTransactions } from 'lib/applications/actions';
 import { createApplication } from 'lib/applications/actions';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';

@@ -1,9 +1,9 @@
+import { prisma } from '@charmverse/core';
 import type { Browser } from '@playwright/test';
 import { chromium, expect, test } from '@playwright/test';
 import type { Page, User } from '@prisma/client';
 
 import { baseUrl } from 'config/constants';
-import { prisma } from 'db';
 import { upsertPermission } from 'lib/permissions/pages';
 import { createVote, generateBoard } from 'testing/setupDatabase';
 

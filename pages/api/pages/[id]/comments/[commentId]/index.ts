@@ -1,8 +1,8 @@
+import { prisma } from '@charmverse/core';
 import type { PageComment } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { prisma } from 'db';
 import type { UpdatePostCommentInput } from 'lib/forums/comments/interface';
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { deletePageComment } from 'lib/pages/comments/deletePageComment';

@@ -1,7 +1,7 @@
+import { prisma } from '@charmverse/core';
 import type { Space, SpaceOperation } from '@prisma/client';
 import { SpacePermissionConfigurationMode } from '@prisma/client';
 
-import { prisma } from 'db';
 import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
 
 import { addSpaceOperations, removeSpaceOperations } from '../spaces';

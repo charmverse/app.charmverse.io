@@ -1,7 +1,7 @@
+import { prisma } from '@charmverse/core';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { prisma } from 'db';
 import { PostNotFoundError } from 'lib/forums/posts/errors';
 import { onError, onNoMatch, requireKeys } from 'lib/middleware';
 import { getPermissionsClient } from 'lib/permissions/api';

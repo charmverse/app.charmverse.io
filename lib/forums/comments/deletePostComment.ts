@@ -1,6 +1,6 @@
+import { prisma } from '@charmverse/core';
 import type { PostComment } from '@prisma/client';
 
-import { prisma } from 'db';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 
 export async function deletePostComment({

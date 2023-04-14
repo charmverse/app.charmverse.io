@@ -1,4 +1,4 @@
-import { prisma } from 'db';
+import { prisma } from '@charmverse/core';
 
 import type { AssignedPostCategoryPermission } from '../forum/interfaces';
 import { mapPostCategoryPermissionToAssignee } from '../forum/mapPostCategoryPermissionToAssignee';

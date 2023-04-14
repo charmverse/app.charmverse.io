@@ -1,7 +1,7 @@
+import { prisma } from '@charmverse/core';
+import type { OptionalTransaction } from '@charmverse/core';
 import type { Prisma } from '@prisma/client';
 
-import type { OptionalTransaction } from 'db';
-import { prisma } from 'db';
 import { InvalidInputError } from 'lib/utilities/errors';
 
 import type {

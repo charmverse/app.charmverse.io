@@ -1,6 +1,6 @@
+import { prisma } from '@charmverse/core';
 import type { Post, PostComment, Space, User } from '@prisma/client';
 
-import { prisma } from 'db';
 import type { TaskUser } from 'lib/discussion/interfaces';
 import { getPostCategories } from 'lib/forums/categories/getPostCategories';
 import { filterAccessiblePostCategories } from 'lib/permissions/forum/filterAccessiblePostCategories';

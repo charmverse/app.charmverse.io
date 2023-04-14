@@ -1,9 +1,9 @@
 /* eslint-disable no-console */
+import { prisma } from '@charmverse/core';
 import type { PagePermission } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { prisma } from 'db';
 import { sendMagicLink } from 'lib/google/sendMagicLink';
 import { updateTrackPageProfile } from 'lib/metrics/mixpanel/updateTrackPageProfile';
 import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';

@@ -1,7 +1,7 @@
+import type { TransactionClient } from '@charmverse/core';
+import { prisma } from '@charmverse/core';
 import type { PostCategory, Prisma } from '@prisma/client';
 
-import type { TransactionClient } from 'db';
-import { prisma } from 'db';
 import { assignDefaultPostCategoryPermissions } from 'lib/permissions/forum/assignDefaultPostCategoryPermission';
 
 import { getPostCategoryPath } from './getPostCategoryPath';

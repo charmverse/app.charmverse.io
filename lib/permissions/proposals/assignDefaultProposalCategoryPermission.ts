@@ -1,6 +1,6 @@
+import { prisma } from '@charmverse/core';
 import type { Prisma } from '@prisma/client';
 
-import { prisma } from 'db';
 import { ProposalCategoryNotFoundError } from 'lib/proposal/errors';
 
 type DefaultCategoryAssignment = {

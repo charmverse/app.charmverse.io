@@ -1,6 +1,5 @@
+import { prisma } from '@charmverse/core';
 import type { Page, ProposalStatus, Space, WorkspaceEvent } from '@prisma/client';
-
-import { prisma } from 'db';
 
 import type { ProposalWithUsers } from './interface';
 

@@ -1,6 +1,6 @@
+import { prisma } from '@charmverse/core';
 import type { Role, RoleSource } from '@prisma/client';
 
-import { prisma } from 'db';
 import type { ExternalRole } from 'lib/roles/interfaces';
 
 type RolesRecord = Record<string, Role | null>;

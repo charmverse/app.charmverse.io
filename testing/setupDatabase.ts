@@ -1,5 +1,6 @@
 import crypto, { randomUUID } from 'node:crypto';
 
+import { prisma } from '@charmverse/core';
 import type {
   ApplicationStatus,
   Block,
@@ -22,7 +23,6 @@ import type {
 import { Wallet } from 'ethers';
 import { v4 } from 'uuid';
 
-import { prisma } from 'db';
 import type { BountyWithDetails } from 'lib/bounties';
 import { getBountyOrThrow } from 'lib/bounties/getBounty';
 import { provisionApiKey } from 'lib/middleware/requireApiKey';

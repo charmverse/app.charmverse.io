@@ -1,7 +1,7 @@
+import { prisma } from '@charmverse/core';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { prisma } from 'db';
 import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { computePostCategoryPermissions } from 'lib/permissions/forum/computePostCategoryPermissions';
 import { deletePostCategoryPermission } from 'lib/permissions/forum/deletePostCategoryPermission';

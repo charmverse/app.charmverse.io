@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
+import { prisma } from '@charmverse/core';
 import type { Post, PostCategory, Space, User } from '@prisma/client';
 import request from 'supertest';
 
-import { prisma } from 'db';
 import type { PostWithVotes } from 'lib/forums/posts/interfaces';
 import type { UpdateForumPostInput } from 'lib/forums/posts/updateForumPost';
 import { upsertPostCategoryPermission } from 'lib/permissions/forum/upsertPostCategoryPermission';

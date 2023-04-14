@@ -1,8 +1,8 @@
+import { prisma } from '@charmverse/core';
 import type { User, UserDetails } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { prisma } from 'db';
 import type { NftData, ExtendedPoap } from 'lib/blockchain/interfaces';
 import { getNFTs } from 'lib/blockchain/nfts';
 import { getPOAPs } from 'lib/blockchain/poaps';

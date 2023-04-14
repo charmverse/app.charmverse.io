@@ -1,6 +1,5 @@
+import { prisma } from '@charmverse/core';
 import type { Page, Space } from '@prisma/client';
-
-import { prisma } from 'db';
 
 import type { PageLink } from '../interfaces';
 

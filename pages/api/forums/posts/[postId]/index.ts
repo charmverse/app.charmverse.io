@@ -1,8 +1,8 @@
+import { prisma } from '@charmverse/core';
 import type { Post } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { prisma } from 'db';
 import { deleteForumPost } from 'lib/forums/posts/deleteForumPost';
 import { getForumPost } from 'lib/forums/posts/getForumPost';
 import type { UpdateForumPostInput } from 'lib/forums/posts/updateForumPost';

@@ -1,6 +1,6 @@
+import { prisma } from '@charmverse/core';
 import type { Role, SpaceRole, SpaceRoleToRole, TokenGate, TokenGateToRole, User, UserTokenGate } from '@prisma/client';
 
-import { prisma } from 'db';
 import { verifyTokenGateMembership } from 'lib/token-gates/verifyTokenGateMembership';
 
 export type UserToVerifyMembership = SpaceRole & {

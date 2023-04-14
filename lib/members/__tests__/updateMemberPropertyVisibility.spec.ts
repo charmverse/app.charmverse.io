@@ -1,6 +1,6 @@
+import { prisma } from '@charmverse/core';
 import type { MemberProperty, Space } from '@prisma/client';
 
-import { prisma } from 'db';
 import { UndesirableOperationError } from 'lib/utilities/errors';
 import type { LoggedInUser } from 'models';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';

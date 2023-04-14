@@ -1,6 +1,6 @@
+import { prisma } from '@charmverse/core';
 import type { Application } from '@prisma/client';
 
-import { prisma } from 'db';
 import { DataNotFoundError, MissingDataError, UnauthorisedActionError } from 'lib/utilities/errors';
 
 import { getApplication } from '../getApplication';

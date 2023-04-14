@@ -1,7 +1,7 @@
+import { prisma } from '@charmverse/core';
 import type { Prisma } from '@prisma/client';
 import { BountyPermissionLevel } from '@prisma/client';
 
-import { prisma } from 'db';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { DataNotFoundError, InsecureOperationError, InvalidInputError } from 'lib/utilities/errors';
 

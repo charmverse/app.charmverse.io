@@ -1,6 +1,6 @@
+import { prisma } from '@charmverse/core';
 import type { Prisma } from '@prisma/client';
 
-import { prisma } from 'db';
 import { assignDefaultProposalCategoryPermissions } from 'lib/permissions/proposals/assignDefaultProposalCategoryPermission';
 import { getRandomThemeColor } from 'theme/utils/getRandomThemeColor';
 

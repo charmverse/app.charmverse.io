@@ -1,8 +1,8 @@
+import { prisma } from '@charmverse/core';
 import type { Space, User } from '@prisma/client';
 import { SpaceOperation } from '@prisma/client';
 import { v4 } from 'uuid';
 
-import { prisma } from 'db';
 import { InvalidInputError } from 'lib/utilities/errors';
 import { ExpectedAnError } from 'testing/errors';
 import { generateRole, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';

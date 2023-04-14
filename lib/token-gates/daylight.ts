@@ -1,10 +1,10 @@
+import { prisma } from '@charmverse/core';
 import type { TokenGate } from '@prisma/client';
 import type { AccessControlCondition } from 'lit-js-sdk';
 import { flatten } from 'lodash';
 
 import fetch from 'adapters/http/fetch.server';
 import { baseUrl } from 'config/constants';
-import { prisma } from 'db';
 
 import { getAccessType } from './utils';
 

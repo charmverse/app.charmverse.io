@@ -1,7 +1,7 @@
+import { prisma } from '@charmverse/core';
 import type { Prisma, Space } from '@prisma/client';
 import { v4, validate } from 'uuid';
 
-import { prisma } from 'db';
 import type { PageNodeWithChildren, PageNodeWithPermissions } from 'lib/pages';
 import { multiResolvePageTree } from 'lib/pages/server/resolvePageTree';
 import { hasSameOrMorePermissions } from 'lib/permissions/pages';

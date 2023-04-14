@@ -1,8 +1,8 @@
+import { prisma } from '@charmverse/core';
 import type { Bounty, Page } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { prisma } from 'db';
 import type { BountyWithDetails } from 'lib/bounties';
 import type { Board } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';

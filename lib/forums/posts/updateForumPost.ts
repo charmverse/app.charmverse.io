@@ -1,6 +1,6 @@
+import { prisma } from '@charmverse/core';
 import type { Post, Prisma } from '@prisma/client';
 
-import { prisma } from 'db';
 import { InsecureOperationError, UndesirableOperationError } from 'lib/utilities/errors';
 
 import { PostNotFoundError } from './errors';

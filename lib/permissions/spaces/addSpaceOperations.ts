@@ -1,6 +1,6 @@
+import { prisma } from '@charmverse/core';
 import { SpaceOperation } from '@prisma/client';
 
-import { prisma } from 'db';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { uniqueValues } from 'lib/utilities/array';
 import { InsecureOperationError, InvalidInputError, MissingDataError } from 'lib/utilities/errors';

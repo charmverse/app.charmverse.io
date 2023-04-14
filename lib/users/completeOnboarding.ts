@@ -1,4 +1,4 @@
-import { prisma } from 'db';
+import { prisma } from '@charmverse/core';
 
 export async function completeOnboarding({ spaceId, userId }: { userId: string; spaceId: string }) {
   await prisma.spaceRole.updateMany({

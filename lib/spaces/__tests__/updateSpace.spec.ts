@@ -1,7 +1,7 @@
+import { prisma } from '@charmverse/core';
 import type { Space, User } from '@prisma/client';
 import { v4 } from 'uuid';
 
-import { prisma } from 'db';
 import { DuplicateDataError, InvalidInputError } from 'lib/utilities/errors';
 import { typedKeys } from 'lib/utilities/objects';
 import { uid } from 'lib/utilities/strings';

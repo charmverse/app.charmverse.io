@@ -1,7 +1,7 @@
+import { prisma } from '@charmverse/core';
 import type { Prisma } from '@prisma/client';
 import { PostCategoryPermissionLevel } from '@prisma/client';
 
-import { prisma } from 'db';
 import {
   DataNotFoundError,
   InsecureOperationError,

@@ -1,6 +1,5 @@
+import { prisma } from '@charmverse/core';
 import type { PageCommentVote } from '@prisma/client';
-
-import { prisma } from 'db';
 
 type CommentVote = {
   commentId: string;

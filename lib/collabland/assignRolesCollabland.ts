@@ -1,4 +1,5 @@
-import { prisma } from 'db';
+import { prisma } from '@charmverse/core';
+
 import { findOrCreateCollablandRoles } from 'lib/collabland/findOrCreateCollablandRoles';
 import { getSpacesAndUserFromDiscord } from 'lib/discord/getSpaceAndUserFromDiscord';
 

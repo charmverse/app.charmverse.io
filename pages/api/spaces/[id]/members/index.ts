@@ -1,7 +1,7 @@
+import { prisma } from '@charmverse/core';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { prisma } from 'db';
 import { getSpaceMembers } from 'lib/members/getSpaceMembers';
 import type { Member } from 'lib/members/interfaces';
 import { onError, onNoMatch } from 'lib/middleware';

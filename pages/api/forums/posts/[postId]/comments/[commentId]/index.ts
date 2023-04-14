@@ -1,8 +1,8 @@
+import { prisma } from '@charmverse/core';
 import type { PostComment } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { prisma } from 'db';
 import { deletePostComment } from 'lib/forums/comments/deletePostComment';
 import { getPostComment } from 'lib/forums/comments/getPostComment';
 import type { UpdatePostCommentInput } from 'lib/forums/comments/interface';

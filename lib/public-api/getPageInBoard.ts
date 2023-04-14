@@ -1,7 +1,7 @@
+import { prisma } from '@charmverse/core';
 import type { Block } from '@prisma/client';
 import { validate } from 'uuid';
 
-import { prisma } from 'db';
 import { generateMarkdown } from 'lib/prosemirror/plugins/markdown/generateMarkdown';
 import { InvalidInputError } from 'lib/utilities/errors';
 import { filterObjectKeys } from 'lib/utilities/objects';

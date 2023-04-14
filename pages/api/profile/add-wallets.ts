@@ -1,7 +1,7 @@
+import { prisma } from '@charmverse/core';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { prisma } from 'db';
 import type { AuthSig } from 'lib/blockchain/interfaces';
 import { refreshENSName } from 'lib/blockchain/refreshENSName';
 import { isValidWalletSignature } from 'lib/blockchain/signAndVerify';

@@ -1,8 +1,8 @@
+import { prisma } from '@charmverse/core';
 import type { Space, SuperApiToken, User } from '@prisma/client';
 import request from 'supertest';
 import { v4 } from 'uuid';
 
-import { prisma } from 'db';
 import { createUserFromWallet } from 'lib/users/createUser';
 import type { PublicApiProposal } from 'pages/api/v1/proposals';
 import { randomETHWalletAddress } from 'testing/generateStubs';

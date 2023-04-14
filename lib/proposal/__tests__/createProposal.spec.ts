@@ -1,6 +1,6 @@
+import { prisma } from '@charmverse/core';
 import type { ProposalCategory, Space, User } from '@prisma/client';
 
-import { prisma } from 'db';
 import { InvalidInputError } from 'lib/utilities/errors';
 import { generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { generateProposalCategory } from 'testing/utils/proposals';

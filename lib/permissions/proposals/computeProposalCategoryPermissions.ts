@@ -1,4 +1,5 @@
-import { prisma } from 'db';
+import { prisma } from '@charmverse/core';
+
 import { ProposalCategoryNotFoundError } from 'lib/proposal/errors';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { InvalidInputError } from 'lib/utilities/errors';

@@ -1,6 +1,5 @@
+import { prisma } from '@charmverse/core';
 import type { NotificationType } from '@prisma/client';
-
-import { prisma } from 'db';
 
 export interface MarkTask {
   id: string;

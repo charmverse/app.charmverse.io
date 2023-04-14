@@ -1,4 +1,4 @@
-import { prisma } from 'db';
+import { prisma } from '@charmverse/core';
 
 export async function isSpaceAdmin({ spaceId, userId }: { spaceId: string; userId: string }) {
   const userSpaceRole = await prisma.spaceRole.findUnique({

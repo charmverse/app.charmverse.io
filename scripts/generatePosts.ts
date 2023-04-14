@@ -1,5 +1,5 @@
 import { generateForumPosts } from 'testing/forums';
-import { prisma } from 'db';
+import { prisma } from '@charmverse/core';
 import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
 import { validate } from 'uuid';
 import { stubPostContent, stubPostContentText } from 'testing/forums.stub';

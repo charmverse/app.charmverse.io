@@ -1,8 +1,8 @@
+import { prisma } from '@charmverse/core';
 import type { UserVote } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { prisma } from 'db';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { computePostPermissions } from 'lib/permissions/forum/computePostPermissions';

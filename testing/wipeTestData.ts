@@ -1,4 +1,4 @@
-import { prisma } from 'db';
+import { prisma } from '@charmverse/core';
 
 export default async function wipeTestData(): Promise<true> {
   if (process.env.NODE_ENV !== 'production') {

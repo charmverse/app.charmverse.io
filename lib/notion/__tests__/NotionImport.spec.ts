@@ -1,8 +1,8 @@
 /* eslint-disable camelcase */
+import { prisma } from '@charmverse/core';
 import type { Space } from '@prisma/client';
 import { v4 } from 'uuid';
 
-import { prisma } from 'db';
 import type { LoggedInUser } from 'models';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 

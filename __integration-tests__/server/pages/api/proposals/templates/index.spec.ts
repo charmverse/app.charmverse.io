@@ -1,7 +1,7 @@
+import { prisma } from '@charmverse/core';
 import type { ProposalCategory, Space } from '@prisma/client';
 import request from 'supertest';
 
-import { prisma } from 'db';
 import type { PageWithProposal } from 'lib/pages';
 import type { LoggedInUser } from 'models';
 import { baseUrl, loginUser } from 'testing/mockApiCall';

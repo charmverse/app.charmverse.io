@@ -1,8 +1,8 @@
+import { prisma } from '@charmverse/core';
 import type { Post, Prisma } from '@prisma/client';
 import { findChildren } from 'prosemirror-utils';
 import { v4 } from 'uuid';
 
-import { prisma } from 'db';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { extractPollIdsFromDoc } from 'lib/prosemirror/extractPollIdsFromDoc';
 import { getNodeFromJson } from 'lib/prosemirror/getNodeFromJson';

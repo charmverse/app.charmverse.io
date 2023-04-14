@@ -1,7 +1,7 @@
+import type { OptionalTransaction } from '@charmverse/core';
+import { prisma } from '@charmverse/core';
 import type { PagePermission, Prisma, PrismaPromise } from '@prisma/client';
 
-import type { OptionalTransaction } from 'db';
-import { prisma } from 'db';
 import { flattenTree } from 'lib/pages/mapPageTree';
 import { resolvePageTree } from 'lib/pages/server/resolvePageTree';
 import { DataNotFoundError } from 'lib/utilities/errors';

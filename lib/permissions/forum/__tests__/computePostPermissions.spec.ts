@@ -1,8 +1,8 @@
+import { prisma } from '@charmverse/core';
 import type { ProposalCategory, Space, User } from '@prisma/client';
 import { PostOperation } from '@prisma/client';
 import { v4 } from 'uuid';
 
-import { prisma } from 'db';
 import { convertPostToProposal } from 'lib/forums/posts/convertPostToProposal';
 import { PostNotFoundError } from 'lib/forums/posts/errors';
 import { addSpaceOperations } from 'lib/permissions/spaces';

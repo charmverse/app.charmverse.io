@@ -1,6 +1,6 @@
+import { prisma } from '@charmverse/core';
 import type { Space } from '@prisma/client';
 
-import { prisma } from 'db';
 import { verifyDiscordGateForSpace } from 'lib/discord/verifyDiscordGateForSpace';
 import { createAndAssignRoles } from 'lib/roles/createAndAssignRoles';
 import { InvalidInputError } from 'lib/utilities/errors';

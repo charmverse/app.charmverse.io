@@ -1,3 +1,4 @@
+import { prisma } from '@charmverse/core';
 import { expect, test as base } from '@playwright/test';
 import type { Post, PostCategory, Space, User } from '@prisma/client';
 import { ForumHomePage } from '__e2e__/po/forumHome.po';
@@ -5,7 +6,6 @@ import { ForumPostPage } from '__e2e__/po/forumPost.po';
 import { PageHeader } from '__e2e__/po/pageHeader.po';
 import { createUserAndSpace, createUser, generateSpaceRole } from '__e2e__/utils/mocks';
 
-import { prisma } from 'db';
 import { upsertPostCategoryPermission } from 'lib/permissions/forum/upsertPostCategoryPermission';
 import { randomETHWalletAddress } from 'testing/generateStubs';
 import { generatePostCategory, generateForumPost } from 'testing/utils/forums';

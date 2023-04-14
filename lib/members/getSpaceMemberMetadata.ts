@@ -1,6 +1,5 @@
+import { prisma } from '@charmverse/core';
 import type { Role } from '@prisma/client';
-
-import { prisma } from 'db';
 
 export async function getSpaceMemberMetadata({
   spaceIds,

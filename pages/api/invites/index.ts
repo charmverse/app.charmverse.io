@@ -1,8 +1,8 @@
+import { prisma } from '@charmverse/core';
 import type { InviteLink, InviteLinkToRole, Role, User } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { prisma } from 'db';
 import { createInviteLink } from 'lib/invites';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { onError, onNoMatch, requireSpaceMembership } from 'lib/middleware';

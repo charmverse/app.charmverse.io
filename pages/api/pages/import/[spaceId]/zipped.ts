@@ -1,10 +1,10 @@
+import { prisma } from '@charmverse/core';
 import type { Prisma, Space } from '@prisma/client';
 import jsZip from 'jszip';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import { v4 } from 'uuid';
 
-import { prisma } from 'db';
 import log from 'lib/log';
 import { onError, onNoMatch, requireSpaceMembership, requireUser } from 'lib/middleware';
 import { getRequestLanguage } from 'lib/middleware/getRequestLanguage';

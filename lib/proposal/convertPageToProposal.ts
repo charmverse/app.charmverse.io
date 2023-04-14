@@ -1,6 +1,6 @@
+import { prisma } from '@charmverse/core';
 import type { Post } from '@prisma/client';
 
-import { prisma } from 'db';
 import { createProposal } from 'lib/proposal/createProposal';
 
 export async function convertPageToProposal({

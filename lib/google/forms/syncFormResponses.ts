@@ -1,6 +1,6 @@
+import { prisma } from '@charmverse/core';
 import type { Block as PrismaBlock } from '@prisma/client';
 
-import { prisma } from 'db';
 import { blockToPrisma, prismaToBlock } from 'lib/focalboard/block';
 import type { Block } from 'lib/focalboard/block';
 import { createBoard } from 'lib/focalboard/board';

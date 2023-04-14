@@ -1,7 +1,7 @@
+import { prisma } from '@charmverse/core';
 import type { Post, Prisma, Space, User } from '@prisma/client';
 import { v4 } from 'uuid';
 
-import { prisma } from 'db';
 import { generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { generateForumPost } from 'testing/utils/forums';
 

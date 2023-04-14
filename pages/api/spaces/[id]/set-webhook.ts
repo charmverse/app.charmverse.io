@@ -1,8 +1,8 @@
+import { prisma } from '@charmverse/core';
 import type { WebhookSubscription } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { prisma } from 'db';
 import { ApiError, onError, onNoMatch, requireSpaceMembership, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { subscribeToEvents, createSigningSecret } from 'lib/webhookPublisher/subscribeToEvents';

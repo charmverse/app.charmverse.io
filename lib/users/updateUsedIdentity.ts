@@ -1,7 +1,7 @@
+import { prisma } from '@charmverse/core';
 import type { Prisma } from '@prisma/client';
 import { IdentityType } from '@prisma/client';
 
-import { prisma } from 'db';
 import { sessionUserRelations } from 'lib/session/config';
 import { InsecureOperationError, InvalidInputError } from 'lib/utilities/errors';
 import { matchWalletAddress, shortWalletAddress } from 'lib/utilities/strings';

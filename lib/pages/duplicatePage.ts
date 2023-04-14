@@ -1,4 +1,5 @@
-import { prisma } from 'db';
+import { prisma } from '@charmverse/core';
+
 import type { BountyWithDetails } from 'lib/bounties';
 import log from 'lib/log';
 import { exportWorkspacePages } from 'lib/templates/exportWorkspacePages';

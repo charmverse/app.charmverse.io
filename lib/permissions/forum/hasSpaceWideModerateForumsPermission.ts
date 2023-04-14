@@ -1,6 +1,6 @@
+import { prisma } from '@charmverse/core';
 import { user } from '@guildxyz/sdk';
 
-import { prisma } from 'db';
 import { InvalidInputError } from 'lib/utilities/errors';
 
 // This method is optimised to perform the least amount of necessary queries with minimal joins

@@ -1,6 +1,6 @@
+import { prisma } from '@charmverse/core';
 import type { Post, PostOperation } from '@prisma/client';
 
-import { prisma } from 'db';
 import { PostNotFoundError } from 'lib/forums/posts/errors';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { InvalidInputError } from 'lib/utilities/errors';

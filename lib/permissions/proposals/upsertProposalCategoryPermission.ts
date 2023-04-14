@@ -1,7 +1,7 @@
+import { prisma } from '@charmverse/core';
 import type { Prisma } from '@prisma/client';
 import { ProposalCategoryPermissionLevel } from '@prisma/client';
 
-import { prisma } from 'db';
 import { ProposalCategoryNotFoundError } from 'lib/proposal/errors';
 import { DataNotFoundError, InsecureOperationError, InvalidInputError } from 'lib/utilities/errors';
 import { isUUID } from 'lib/utilities/strings';
