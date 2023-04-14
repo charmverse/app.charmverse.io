@@ -7,12 +7,6 @@ const prisma = new PrismaClient();
 afterAll(() => {
   prisma.$disconnect();
 });
-
-jest.mock('./db', () => ({
-  __esModule: true,
-  prisma
-}));
-
 jest.mock('lib/blockchain/getENSName', () => ({
   ...jest.requireActual('lib/blockchain/getENSName'),
   __esModule: true,
