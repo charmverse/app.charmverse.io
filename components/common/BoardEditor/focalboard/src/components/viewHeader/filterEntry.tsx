@@ -77,10 +77,17 @@ function FilterPropertyValue({
 
   const updatePropertyValueDebounced = useMemo(() => {
     return debounce((_view: BoardView, _filter: FilterClause) => {
-      mutator.changeViewFilter(_view.id, _view.fields.filter, {
-        operation: 'and',
-        filters: [_filter]
-      });
+      const filterIndex = view.fields.filter.filters.findIndex(
+        (__filter) => (__filter as FilterClause).filterId === filter.filterId
+      );
+      if (filterIndex > -1) {
+        const filters = [..._view.fields.filter.filters];
+        filters[filterIndex] = _filter;
+        mutator.changeViewFilter(_view.id, _view.fields.filter, {
+          operation: 'and',
+          filters
+        });
+      }
     }, 1000);
   }, []);
 

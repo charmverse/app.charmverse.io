@@ -21,7 +21,6 @@ class CardFilter {
 
   static isFilterGroupMet(filterGroup: FilterGroup, templates: readonly IPropertyTemplate[], card: Card): boolean {
     const { filters } = filterGroup;
-
     if (filterGroup.filters.length < 1) {
       return true; // No filters = always met
     }
@@ -52,15 +51,15 @@ class CardFilter {
   }
 
   static isClauseMet(filter: FilterClause, templates: readonly IPropertyTemplate[], card: Card): boolean {
-    const value = card.fields.properties[filter.propertyId];
+    const value = card.fields.properties[filter.propertyId] ?? [];
     const filterProperty = templates.find((o) => o.id === filter.propertyId);
+    const filterValue = filter.values[0]?.toLowerCase() ?? '';
     if (filterProperty) {
       const filterPropertyDataType = propertyConfigs[filterProperty.type].datatype;
-      const filterValue = filter.values[0].toLowerCase();
 
       if (filterPropertyDataType === 'text') {
         const condition = filter.condition as (typeof TextDataTypeConditions)[number];
-        const sourceValue = (Array.isArray(value) ? value[0] : value).toLowerCase();
+        const sourceValue = (Array.isArray(value) ? value[0] : value)?.toLowerCase() ?? '';
         switch (condition) {
           case 'contains': {
             if (sourceValue.includes(filterValue)) {
@@ -98,7 +97,8 @@ class CardFilter {
         }
       } else if (filterPropertyDataType === 'boolean') {
         const condition = filter.condition as (typeof BooleanDataTypeConditions)[number];
-        const sourceValue = (Array.isArray(value) ? value[0] : value).toLowerCase();
+        const sourceValue = (Array.isArray(value) ? value[0] : value)?.toLowerCase() ?? 'false';
+
         switch (condition) {
           case 'is': {
             return sourceValue === filterValue;
@@ -112,7 +112,7 @@ class CardFilter {
         }
       } else if (filterPropertyDataType === 'number') {
         const condition = filter.condition as (typeof NumberDataTypeConditions)[number];
-        const sourceValue = (Array.isArray(value) ? value[0] : value).toLowerCase();
+        const sourceValue = (Array.isArray(value) ? value[0] : value)?.toLowerCase() ?? '0';
         switch (condition) {
           case 'equal': {
             return Number(sourceValue) === Number(filterValue);
@@ -147,14 +147,10 @@ class CardFilter {
         const sourceValues = value as string[];
         switch (condition) {
           case 'contains': {
-            return !!sourceValues.find(
-              (sourceValue) => filter.values.find((_filterValue) => _filterValue === sourceValue) !== undefined
-            );
+            return sourceValues.some((sourceValue) => filter.values.includes(sourceValue));
           }
           case 'does-not-contain': {
-            return !!sourceValues.find(
-              (sourceValue) => filter.values.find((_filterValue) => _filterValue === sourceValue) === undefined
-            );
+            return sourceValues.every((sourceValue) => !filter.values.includes(sourceValue));
           }
           case 'is-empty': {
             return sourceValues.length === 0;
@@ -168,7 +164,7 @@ class CardFilter {
         }
       } else if (filterPropertyDataType === 'select') {
         const condition = filter.condition as (typeof SelectDataTypeConditions)[number];
-        const sourceValue = (Array.isArray(value) ? value[0] : value).toLowerCase();
+        const sourceValue = (Array.isArray(value) ? value[0] : value)?.toLowerCase() ?? '';
         switch (condition) {
           case 'is': {
             return filterValue === sourceValue;
@@ -188,7 +184,7 @@ class CardFilter {
         }
       } else if (filterPropertyDataType === 'date') {
         const condition = filter.condition as (typeof DateDataTypeConditions)[number];
-        const sourceValue = (Array.isArray(value) ? value[0] : value).toLowerCase();
+        const sourceValue = (Array.isArray(value) ? value[0] : value)?.toLowerCase() ?? '';
 
         switch (condition) {
           case 'is': {

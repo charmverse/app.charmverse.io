@@ -53,7 +53,7 @@ const FilterComponent = React.memo((props: Props) => {
     const filter = createFilterClause({
       condition: 'contains',
       propertyId: Constants.titleColumnId,
-      values: [''],
+      values: [],
       filterId: v4()
     });
 
