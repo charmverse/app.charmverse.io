@@ -143,7 +143,7 @@ class CardFilter {
         }
       } else if (filterPropertyDataType === 'multi_select') {
         const condition = filter.condition as (typeof MultiSelectDataTypeConditions)[number];
-        const sourceValues = value as string[];
+        const sourceValues = Array.isArray(value) ? value : [value];
         switch (condition) {
           case 'contains': {
             return sourceValues.length === 0
@@ -354,7 +354,12 @@ class CardFilter {
         switch (condition) {
           case 'contains':
           case 'is_not_empty': {
-            return { id: filterClause.propertyId, value: [filterClause.values[0]] };
+            return {
+              id: filterClause.propertyId,
+              value: filterClause.values.filter((filterValue) =>
+                template.options.find((option) => option.id === filterValue)
+              )
+            };
           }
           case 'does_not_contain':
           case 'is_empty': {
@@ -370,7 +375,12 @@ class CardFilter {
         switch (condition) {
           case 'is':
           case 'is_not_empty': {
-            return { id: filterClause.propertyId, value: filterClause.values[0] };
+            return {
+              id: filterClause.propertyId,
+              value: template.options.find((option) => option.id === filterClause.values[0])
+                ? [filterClause.values[0]]
+                : []
+            };
           }
           case 'is_not':
           case 'is_empty': {
