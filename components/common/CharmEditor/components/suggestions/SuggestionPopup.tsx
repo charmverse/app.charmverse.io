@@ -30,7 +30,7 @@ export function SuggestionsPopup({
   const { currentPageActionDisplay } = usePageActionDisplay();
   const { user } = useUser();
 
-  const isInPageDialog = new URLSearchParams(window.location.href).get('cardId');
+  const isInPageDialog = new URLSearchParams(window.location.search).get('cardId');
   const popupIsVisible = (currentPageActionDisplay !== 'suggestions' || isInPageDialog) && isVisible;
 
   if (popupIsVisible) {

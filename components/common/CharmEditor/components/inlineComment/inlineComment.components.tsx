@@ -48,7 +48,8 @@ export default function InlineCommentThread({ pluginKey }: { pluginKey: PluginKe
   const { tooltipContentDOM, show: isVisible, ids } = usePluginState(pluginKey) as InlineCommentPluginState;
   const { threads } = useThreads();
 
-  const cardId = new URLSearchParams(window.location.href).get('cardId');
+  const urlSearchParams = new URLSearchParams(window.location.search);
+  const cardId = urlSearchParams.get('cardId') || urlSearchParams.get('id') || urlSearchParams.get('bountyId');
 
   const { currentPageActionDisplay } = usePageActionDisplay();
   // Find unresolved threads in the thread ids and sort them based on desc order of createdAt
@@ -111,7 +112,7 @@ export function InlineCommentSubMenu({ pluginKey }: { pluginKey: PluginKey }) {
 
   const handleSubmit = async (e: React.KeyboardEvent<HTMLElement> | React.MouseEvent<HTMLElement, MouseEvent>) => {
     if (!isEmpty) {
-      const cardId = typeof window !== 'undefined' ? new URLSearchParams(window.location.href).get('cardId') : null;
+      const cardId = typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('cardId') : null;
       e.preventDefault();
       const threadWithComment = await charmClient.comments.startThread({
         comment: commentContent,

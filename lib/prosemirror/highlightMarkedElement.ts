@@ -52,7 +52,7 @@ export function highlightElement({
   // Page action list node might not be present
   const isShowingActionList = !!pageActionListNode && pageActionListNode.style.visibility !== 'hidden';
   // Check if we are inside a card page modal
-  const cardId = new URLSearchParams(window.location.href).get('cardId');
+  const cardId = new URLSearchParams(window.location.search).get('cardId');
   if (ids.length > 0) {
     // If we are showing the thread list on the right, then navigate to the appropriate thread and highlight it
     if (isShowingActionList && !cardId) {
