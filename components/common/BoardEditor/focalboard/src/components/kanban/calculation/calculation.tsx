@@ -43,6 +43,7 @@ function KanbanCalculation(props: Props): JSX.Element {
             props.onChange(data);
             props.onMenuClose();
           }}
+          onClose={props.onMenuClose}
           cardProperties={props.cardProperties}
         />
       )}
