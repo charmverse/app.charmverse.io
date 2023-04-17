@@ -45,15 +45,15 @@ async function computePermissions(req: NextApiRequest, res: NextApiResponse<Avai
     }
   }
 
-  const client = await getPermissionsClient({
+  const permissions = await getPermissionsClient({
     resourceId,
     resourceIdType: 'post'
-  });
-
-  const permissions = await client.forum.computePostPermissions({
-    resourceId,
-    userId: req.session.user?.id
-  });
+  }).then((client) =>
+    client.forum.computePostPermissions({
+      resourceId,
+      userId: req.session.user?.id
+    })
+  );
 
   res.status(200).json(permissions);
 }

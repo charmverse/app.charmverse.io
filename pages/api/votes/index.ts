@@ -7,14 +7,13 @@ import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { mapNotificationActor } from 'lib/notifications/mapNotificationActor';
 import { getPermissionsClient } from 'lib/permissions/api/routers';
-import { computePostPermissions } from 'lib/permissions/forum/computePostPermissions';
 import { computeUserPagePermissions } from 'lib/permissions/pages';
 import { computeProposalPermissions } from 'lib/permissions/proposals/computeProposalPermissions';
 import { withSessionRoute } from 'lib/session/withSession';
 import { InvalidInputError, UnauthorisedActionError } from 'lib/utilities/errors';
 import { createVote as createVoteService } from 'lib/votes';
 import { getVotesByPage } from 'lib/votes/getVotesByPage';
-import type { VoteTask, ExtendedVote, VoteDTO } from 'lib/votes/interfaces';
+import type { ExtendedVote, VoteDTO, VoteTask } from 'lib/votes/interfaces';
 import { relay } from 'lib/websockets/relay';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -40,14 +39,15 @@ async function getVotes(req: NextApiRequest, res: NextApiResponse<ExtendedVote[]
       throw new UnauthorisedActionError('You do not have access to the page');
     }
   } else if (postId) {
-    const client = await getPermissionsClient({
+    const computed = await getPermissionsClient({
       resourceId: postId,
       resourceIdType: 'post'
-    });
-    const computed = await client.forum.computePostPermissions({
-      resourceId: postId,
-      userId
-    });
+    }).then((client) =>
+      client.forum.computePostPermissions({
+        resourceId: postId,
+        userId
+      })
+    );
 
     if (computed.view_post !== true) {
       throw new UnauthorisedActionError('You do not have access to the post');

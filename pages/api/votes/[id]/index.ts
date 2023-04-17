@@ -5,7 +5,6 @@ import nc from 'next-connect';
 
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { getPermissionsClient } from 'lib/permissions/api/routers';
-import { computePostPermissions } from 'lib/permissions/forum/computePostPermissions';
 import { computeUserPagePermissions } from 'lib/permissions/pages';
 import { withSessionRoute } from 'lib/session/withSession';
 import { DataNotFoundError, UnauthorisedActionError } from 'lib/utilities/errors';
@@ -59,14 +58,15 @@ async function updateVote(req: NextApiRequest, res: NextApiResponse<Vote | { err
       throw new UnauthorisedActionError('You do not have permissions to update the vote.');
     }
   } else if (vote.postId) {
-    const client = await getPermissionsClient({
+    const postPermissions = await getPermissionsClient({
       resourceId: vote.postId,
       resourceIdType: 'post'
-    });
-    const postPermissions = await client.forum.computePostPermissions({
-      resourceId: vote.postId,
-      userId
-    });
+    }).then((client) =>
+      client.forum.computePostPermissions({
+        resourceId: vote.postId as string,
+        userId
+      })
+    );
 
     if (!postPermissions.edit_post) {
       throw new UnauthorisedActionError('You do not have permissions to update the vote.');
@@ -120,14 +120,15 @@ async function deleteVote(req: NextApiRequest, res: NextApiResponse<Vote | null 
       throw new UnauthorisedActionError('You do not have permissions to delete the vote.');
     }
   } else if (vote.postId) {
-    const client = await getPermissionsClient({
+    const postPermissions = await getPermissionsClient({
       resourceId: vote.postId,
       resourceIdType: 'post'
-    });
-    const postPermissions = await client.forum.computePostPermissions({
-      resourceId: vote.postId,
-      userId
-    });
+    }).then((client) =>
+      client.forum.computePostPermissions({
+        resourceId: vote.postId as string,
+        userId
+      })
+    );
 
     if (!postPermissions.edit_post) {
       throw new UnauthorisedActionError('You do not have permissions to delete the vote.');

@@ -6,7 +6,7 @@ import type { CreatePostCategoryInput } from 'lib/forums/categories/createPostCa
 import { createPostCategory } from 'lib/forums/categories/createPostCategory';
 import { getPostCategories } from 'lib/forums/categories/getPostCategories';
 import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
-import { computePostCategoryPermissions } from 'lib/permissions/forum/computePostCategoryPermissions';
+import { getPermissionsClient } from 'lib/permissions/api';
 import { filterAccessiblePostCategories } from 'lib/permissions/forum/filterAccessiblePostCategories';
 import type { PostCategoryWithPermissions } from 'lib/permissions/forum/interfaces';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -54,10 +54,15 @@ async function createPostCategoryController(req: NextApiRequest, res: NextApiRes
     spaceId: spaceId as string
   });
 
-  const permissions = await computePostCategoryPermissions({
+  const permissions = await getPermissionsClient({
     resourceId: postCategory.id,
-    userId
-  });
+    resourceIdType: 'postCategory'
+  }).then((client) =>
+    client.forum.computePostCategoryPermissions({
+      resourceId: postCategory.id,
+      userId
+    })
+  );
 
   return res.status(201).json({ ...postCategory, permissions });
 }

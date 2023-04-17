@@ -7,8 +7,12 @@ import { createForumPost, trackCreateForumPostEvent } from 'lib/forums/posts/cre
 import type { ListForumPostsRequest, PaginatedPostList } from 'lib/forums/posts/listForumPosts';
 import { listForumPosts } from 'lib/forums/posts/listForumPosts';
 import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
-import { checkSpacePermissionsEngine, premiumPermissionsApiClient } from 'lib/permissions/api/routers';
-import { requestOperations } from 'lib/permissions/requestOperations';
+import {
+  checkSpacePermissionsEngine,
+  getPermissionsClient,
+  premiumPermissionsApiClient
+} from 'lib/permissions/api/routers';
+import { permitOrThrow, requestOperations } from 'lib/permissions/requestOperations';
 import { withSessionRoute } from 'lib/session/withSession';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 import { publishPostEvent } from 'lib/webhookPublisher/publishEvent';
@@ -48,6 +52,21 @@ async function getPosts(req: NextApiRequest, res: NextApiResponse<PaginatedPostL
 
 async function createForumPostController(req: NextApiRequest, res: NextApiResponse<Post>) {
   const userId = req.session.user.id;
+
+  const categoryId = req.body.postCategoryId as string;
+
+  await permitOrThrow({
+    compute: getPermissionsClient({
+      resourceId: req.body.categoryId,
+      resourceIdType: 'post'
+    }).then((client) =>
+      client.forum.computePostCategoryPermissions({
+        resourceId: categoryId,
+        userId
+      })
+    ),
+    operation: ''
+  });
 
   await requestOperations({
     resourceType: 'post_category',

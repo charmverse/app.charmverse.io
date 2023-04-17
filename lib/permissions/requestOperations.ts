@@ -1,3 +1,4 @@
+import type { UserPermissionFlags } from '@charmverse/core';
 import type { PostCategoryOperation, PostOperation } from '@prisma/client';
 
 import { ActionNotPermittedError } from 'lib/middleware';
@@ -54,5 +55,17 @@ export async function requestOperations<R extends Resources = Resources>({
     return true;
   } else {
     throw new InvalidInputError(`Invalid resource type: ${resourceType}`);
+  }
+}
+
+type PermitInput<T extends string = string> = {
+  compute: Promise<UserPermissionFlags<T>>;
+  operation: T;
+};
+
+export async function permitOrThrow({ compute, operation }: PermitInput): Promise<void> {
+  const permissions = await compute;
+  if (!permissions[operation]) {
+    throw new ActionNotPermittedError(`You do not have the permissions to perform this action`);
   }
 }
