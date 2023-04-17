@@ -84,29 +84,16 @@ import 'components/common/BoardEditor/focalboard/src/components/kanban/kanbanCol
 import 'components/common/BoardEditor/focalboard/src/components/properties/createdAt/createdAt.scss';
 import 'components/common/BoardEditor/focalboard/src/components/properties/dateRange/dateRange.scss';
 import 'components/common/BoardEditor/focalboard/src/components/properties/lastModifiedAt/lastModifiedAt.scss';
-import 'components/common/BoardEditor/focalboard/src/components/properties/lastModifiedBy/lastModifiedBy.scss';
 import 'components/common/BoardEditor/focalboard/src/components/properties/link/link.scss';
-import 'components/common/BoardEditor/focalboard/src/components/properties/user/user.scss';
-// import 'components/common/BoardEditor/focalboard/src/components/sidebar/deleteBoardDialog.scss';
-// import 'components/common/BoardEditor/focalboard/src/components/sidebar/registrationLink.scss';
-// import 'components/common/BoardEditor/focalboard/src/components/sidebar/sidebar.scss';
-// import 'components/common/BoardEditor/focalboard/src/components/sidebar/sidebarAddBoardMenu.scss';
-// import 'components/common/BoardEditor/focalboard/src/components/sidebar/sidebarBoardItem.scss';
-// import 'components/common/BoardEditor/focalboard/src/components/sidebar/sidebarSettingsMenu.scss';
-// import 'components/common/BoardEditor/focalboard/src/components/sidebar/sidebarUserMenu.scss';
 import 'components/common/BoardEditor/focalboard/src/components/table/calculation/calculationRow.scss';
 import 'components/common/BoardEditor/focalboard/src/components/table/horizontalGrip.scss';
 import 'components/common/BoardEditor/focalboard/src/components/table/table.scss';
 import 'components/common/BoardEditor/focalboard/src/components/table/tableRow.scss';
-import 'components/common/BoardEditor/focalboard/src/components/topBar.scss';
 import 'components/common/BoardEditor/focalboard/src/components/viewHeader/filterEntry.scss';
 import 'components/common/BoardEditor/focalboard/src/components/viewHeader/viewHeader.scss';
 import 'components/common/BoardEditor/focalboard/src/components/viewTitle.scss';
 import 'components/common/BoardEditor/focalboard/src/styles/labels.scss';
-import 'components/common/BoardEditor/focalboard/src/styles/variables.scss';
 import 'components/common/BoardEditor/focalboard/src/styles/_markdown.scss';
-// import 'components/common/BoardEditor/focalboard/src/widgets/buttons/button.scss';
-import 'components/common/BoardEditor/focalboard/src/widgets/buttons/buttonWithMenu.scss';
 import 'components/common/BoardEditor/focalboard/src/widgets/buttons/iconButton.scss';
 import 'components/common/BoardEditor/focalboard/src/widgets/editable.scss';
 import 'components/common/BoardEditor/focalboard/src/widgets/emojiPicker.scss';
@@ -121,7 +108,6 @@ import 'components/common/BoardEditor/focalboard/src/widgets/propertyMenu.scss';
 import 'components/common/BoardEditor/focalboard/src/widgets/switch.scss';
 import 'theme/focalboard/focalboard.button.scss';
 import 'theme/focalboard/focalboard.main.scss';
-import 'theme/focalboard/focalboard.typography.scss';
 
 // Lit Protocol CSS
 import 'lit-share-modal-v3/dist/ShareModal.css';

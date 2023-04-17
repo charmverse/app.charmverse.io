@@ -1,5 +1,4 @@
 import type { CSSObject } from '@emotion/serialize';
-import color from 'color';
 import isEqual from 'lodash/isEqual';
 
 import * as colors from 'theme/colors';

@@ -60,6 +60,16 @@ const globalCSS = css`
     --fc-event-text-color: var(--text-primary) !important;
 
     --page-layout-pb: 180px;
+
+    /* focalboard */
+    --center-channel-bg-rgb: 255, 255, 255;
+    --center-channel-color-rgb: 63, 67, 80;
+    --sidebar-bg-rgb: 30, 50, 92;
+    --sidebar-text-rgb: 255, 255, 255;
+    --button-color-rgb: 255, 255, 255;
+    --button-bg-rgb: 28, 88, 217;
+    --button-danger-color-rgb: 255, 255, 255;
+    --button-danger-bg-rgb: 210, 75, 78;
   }
 
   /* lit protocol */

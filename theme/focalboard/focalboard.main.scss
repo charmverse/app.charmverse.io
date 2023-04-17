@@ -1,11 +1,3 @@
-html {
-  height: 100%;
-}
-
-.focalboard-plugin-root {
-  height: 100%;
-}
-
 .focalboard-body {
   display: flex;
   flex-direction: column;
@@ -51,37 +43,6 @@ html {
     margin-bottom: 8px;
   }
 
-  #focalboard-app {
-    button {
-      &.style--none {
-        background: transparent;
-        border: 0;
-        padding: 0;
-      }
-    }
-  }
-
-  .page-loading {
-    margin: 50px auto;
-  }
-
-  /* App frame */
-
-  #root {
-    flex: 1 1 auto;
-    display: flex;
-    flex-direction: column;
-    overflow: auto;
-  }
-
-  #frame,
-  #main,
-  .BoardPage {
-    flex: 1 1 auto;
-    display: flex;
-    flex-direction: column;
-    overflow: auto;
-  }
 
   /* Main app */
 
@@ -94,15 +55,6 @@ html {
   }
 
   /* Icons */
-
-  .octo-icon {
-    font-family: 'Apple Color Emoji', 'Segoe UI Emoji', NotoColorEmoji, 'Noto Color Emoji', 'Segoe UI Symbol',
-      'Android Emoji', EmojiSymbols;
-    line-height: 1.2;
-    align-self: baseline;
-    overflow: visible;
-    font-weight: normal;
-  }
 
   .octo-icontitle {
     flex: 0 0 auto;
@@ -144,69 +96,9 @@ html {
     min-width: 100px;
   }
 
-  .octo-placeholder {
-    color: rgba(var(--center-channel-color-rgb), 0.4);
-  }
-
-  [contentEditable='true'] {
-    user-select: text;
-  }
-
-  [contentEditable='true']:empty::before {
-    content: attr(placeholder);
-    display: block;
-    color: rgba(var(--center-channel-color-rgb), 0.4);
-  }
-
   .octo-propertyvalue.Editable.active,
   .octo-table-cell .Editable.active {
     border-radius: 3px;
     box-shadow: rgba(15, 15, 15, 0.05) 0 0 0 1px, rgba(15, 15, 15, 0.1) 0 3px 6px, rgba(15, 15, 15, 0.2) 0 9px 24px;
-  }
-
-  .octo-content {
-    width: 100%;
-  }
-}
-
-.CalendarContainer {
-  /* fullcalendar */
-  --fc-border-color: var(--bg-gray);
-  --fc-today-bg-color: rgba(var(--button-bg-rgb), 0.08);
-
-  a,
-  a:hover {
-    color: rgba(var(--center-channel-color-rgb), 0.64);
-    text-decoration: none;
-  }
-
-  // make cursor a pointer when hovering cards
-  .fc-event {
-    cursor: pointer;
-  }
-
-  // fix extra spacing issues when embedded inline in a page
-  .fc-daygrid-day-frame:before,
-  .fc-daygrid-day-events:before,
-  .fc-daygrid-event-harness:before,
-  .fc-daygrid-day-frame:after,
-  .fc-daygrid-day-events:after,
-  .fc-daygrid-event-harness:after {
-    font-size: 0;
-  }
-
-  // brighten the "Add event" button in dark mode
-  .CalendarContainer .fc-day .dateContainer .addEvent {
-    color: rgba(var(--center-channel-color-rgb), 0.8);
-  }
-
-  td,
-  th {
-    background-color: transparent;
-  }
-
-  // font size of month
-  .fc .fc-toolbar-title {
-    font-size: 1em;
   }
 }
