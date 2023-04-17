@@ -77,9 +77,9 @@ export default function NestedPage({ node, currentPageId }: NodeViewProps & { cu
         ) : nestedPage ? (
           <PageIcon
             isLinkedPage={isLinkedPage}
-            isEditorEmpty={!nestedPage?.hasContent}
-            icon={nestedPage?.icon}
-            pageType={nestedPage?.type}
+            isEditorEmpty={!nestedPage.hasContent}
+            icon={nestedPage.icon}
+            pageType={nestedPage.type}
           />
         ) : (
           <NoAccessPageIcon />
