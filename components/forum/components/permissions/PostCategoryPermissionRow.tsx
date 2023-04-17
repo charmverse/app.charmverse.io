@@ -12,7 +12,7 @@ import { useRoles } from 'hooks/useRoles';
 import type { PostCategoryPermissionInput } from 'lib/permissions/forum/upsertPostCategoryPermission';
 import type { TargetPermissionGroup } from 'lib/permissions/interfaces';
 
-import { postCategoryPermissionLabels } from './shared';
+import { forumMemberPermissionOptions, postCategoryPermissionLabels } from './shared';
 
 type Props = {
   assignee: TargetPermissionGroup<'role' | 'space'>;
@@ -44,11 +44,8 @@ export function PostCategoryRolePermissionRow({
 
   const usingDefault = (defaultPermissionLevel && !permissionLevel) || (!defaultPermissionLevel && !permissionLevel);
 
-  const { full_access, view } = postCategoryPermissionLabels;
-
   const friendlyLabels = {
-    full_access,
-    view,
+    ...forumMemberPermissionOptions,
     delete: (defaultPermissionLevel ? (
       <em>Default: {postCategoryPermissionLabels[defaultPermissionLevel]}</em>
     ) : (
