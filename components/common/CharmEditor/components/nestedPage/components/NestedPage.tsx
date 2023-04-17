@@ -50,7 +50,6 @@ export default function NestedPage({ node, currentPageId }: NodeViewProps & { cu
 
   const pageTitle =
     (nestedPage || nestedStaticPage)?.title || (nestedCategories ? `Forum > ${nestedCategories?.name}` : '');
-
   const pageId = nestedPage?.id || nestedStaticPage?.path || nestedCategories?.id;
 
   const pagePath = nestedPage ? `${space?.domain}/${nestedPage.path}` : '';
@@ -73,17 +72,18 @@ export default function NestedPage({ node, currentPageId }: NodeViewProps & { cu
       data-type={node.attrs.type}
     >
       <div>
-        {nestedPage ? (
+        {nestedStaticPage ? (
+          <PageIcon icon={null} pageType={nestedStaticPage.path} />
+        ) : nestedPage ? (
           <PageIcon
             isLinkedPage={isLinkedPage}
-            isEditorEmpty={!nestedPage.hasContent}
-            icon={nestedPage.icon}
-            pageType={nestedPage.type}
+            isEditorEmpty={!nestedPage?.hasContent}
+            icon={nestedPage?.icon}
+            pageType={nestedPage?.type}
           />
         ) : (
           <NoAccessPageIcon />
         )}
-        {nestedStaticPage && <PageIcon icon={null} pageType={nestedStaticPage.path} />}
         {nestedCategories && <PageIcon icon={null} pageType='forum_category' />}
       </div>
       <StyledTypography>{(pageTitle ? pageTitle || 'Untitled' : null) || 'No access'}</StyledTypography>
