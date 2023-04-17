@@ -1,15 +1,22 @@
+import type { Comment } from '@prisma/client';
+
 import * as http from 'adapters/http';
 import type { CommentCreate, CommentWithUser } from 'lib/comments/interfaces';
 import type { PageContent } from 'lib/prosemirror/interfaces';
-import type { MultipleThreadsInput, ThreadCreate, ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
+import type {
+  MultipleThreadsInput,
+  ThreadCreate,
+  ThreadWithComments,
+  ThreadWithCommentsAndAuthors
+} from 'lib/threads/interfaces';
 import type { ResolveThreadRequest } from 'pages/api/threads/[id]/resolve';
 
 export class CommentsApi {
-  addComment(request: Omit<CommentCreate, 'userId'>): Promise<CommentWithUser> {
+  addComment(request: Omit<CommentCreate, 'userId'>): Promise<Comment | CommentWithUser> {
     return http.POST('/api/comments', request);
   }
 
-  editComment(commentId: string, content: PageContent): Promise<CommentWithUser> {
+  editComment(commentId: string, content: PageContent): Promise<Comment | CommentWithUser> {
     return http.PUT(`/api/comments/${commentId}`, { content });
   }
 
@@ -17,11 +24,11 @@ export class CommentsApi {
     return http.DELETE(`/api/comments/${commentId}`);
   }
 
-  getThreads(pageId: string): Promise<ThreadWithCommentsAndAuthors[]> {
+  getThreads(pageId: string): Promise<ThreadWithComments[] | ThreadWithCommentsAndAuthors[]> {
     return http.GET(`/api/pages/${pageId}/threads`);
   }
 
-  startThread(request: Omit<ThreadCreate, 'userId'>): Promise<ThreadWithCommentsAndAuthors> {
+  startThread(request: Omit<ThreadCreate, 'userId'>): Promise<ThreadWithComments | ThreadWithCommentsAndAuthors> {
     return http.POST('/api/threads', request);
   }
 

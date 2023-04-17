@@ -62,7 +62,7 @@ describe('POST /api/threads - create a thread', () => {
 
     expect(createdThread.comments).toBeDefined();
     expect(createdThread.comments[0].content).toBe(creationContent.comment);
-    expect(createdThread.comments[0].user.id).toBe(nonAdminUser.id);
+    expect(createdThread.comments[0].userId).toBe(nonAdminUser.id);
   });
 
   it('should fail if the user does not have a comment permission, and respond 401', async () => {
