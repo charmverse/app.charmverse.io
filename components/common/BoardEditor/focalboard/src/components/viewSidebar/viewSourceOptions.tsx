@@ -99,16 +99,15 @@ export function ViewSourceOptions(props: ViewSourceOptionsProps) {
               <TbDatabase style={{ fontSize: 24 }} />
               CharmVerse database
             </SourceType>
+            <SourceType active={false} component='label' htmlFor='dbcsvfile'>
+              <input hidden type='file' id='dbcsvfile' name='dbcsvfile' accept='.csv' onChange={props.onCsvImport} />
+              <BsFiletypeCsv style={{ fontSize: 24 }} />
+              Import CSV
+            </SourceType>
             <SourceType active={activeSourceType === 'google_form'} onClick={selectSourceType('google_form')}>
               <RiGoogleFill style={{ fontSize: 24 }} />
               Google Form
             </SourceType>
-            {props.onCreate && (
-              <SourceType onClick={props.onCreate}>
-                <AddCircleIcon style={{ fontSize: 24 }} />
-                New database
-              </SourceType>
-            )}
             <SourceType
               active={false}
               onClick={() => (isLoadingWebhookApiKeyCreation ? {} : handleApiKeyClick('typeform'))}
@@ -116,11 +115,12 @@ export function ViewSourceOptions(props: ViewSourceOptionsProps) {
               <SiTypeform style={{ fontSize: 24 }} />
               Typeform
             </SourceType>
-            <SourceType active={false} component='label' htmlFor='dbcsvfile'>
-              <input hidden type='file' id='dbcsvfile' name='dbcsvfile' accept='.csv' onChange={props.onCsvImport} />
-              <BsFiletypeCsv style={{ fontSize: 24 }} />
-              CSV
-            </SourceType>
+            {props.onCreate && (
+              <SourceType onClick={props.onCreate}>
+                <AddCircleIcon style={{ fontSize: 24 }} />
+                New database
+              </SourceType>
+            )}
           </Grid>
         )}
         {formStep === 'configure_source' && sourceType === 'board_page' && (
