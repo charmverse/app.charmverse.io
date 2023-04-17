@@ -55,6 +55,7 @@ const globalCSS = css`
     --link-underline: ${colors.linkUnderlineColor};
 
     --charmeditor-active: rgba(46, 170, 220, 0.2);
+    --charmeditor-active-hover: rgba(46, 170, 220, 0.1);
 
     /* fullcalendar styles */
     --fc-event-text-color: var(--text-primary) !important;

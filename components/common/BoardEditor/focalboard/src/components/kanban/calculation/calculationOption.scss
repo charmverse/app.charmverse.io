@@ -8,7 +8,7 @@
   position: relative;
 
   &:hover {
-    background: rgba(var(--center-channel-color-rgb), 0.1);
+    background: var(--charmeditor-active-hover);
   }
 
   span {
@@ -21,14 +21,14 @@
 
     &.active,
     &.active:hover {
-      background-color: rgb(var(--sidebar-bg-rgb));
+      background-color: var(--charmeditor-active);
       color: rgb(var(--sidebar-text-rgb));
     }
   }
 
   .customs:hover,
   .drops:hover {
-    background: rgba(var(--center-channel-color-rgb), 0.1);
+    background: var(--charmeditor-active-hover);
   }
 
   .dropdown-submenu {
@@ -47,7 +47,7 @@
   }
 
   &.active {
-    background-color: rgb(var(--sidebar-bg-rgb));
+    background-color: var(--charmeditor-active);
 
     > span {
       color: rgb(var(--sidebar-text-rgb));
