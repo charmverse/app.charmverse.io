@@ -1,3 +1,4 @@
+import type { MutatedPostSearch, PostSearchToMutate } from '@charmverse/core';
 import { prisma } from '@charmverse/core';
 
 import { getPostCategories } from 'lib/forums/categories/getPostCategories';
@@ -5,18 +6,12 @@ import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 
 import { filterAccessiblePostCategories } from './filterAccessiblePostCategories';
 import { hasSpaceWideModerateForumsPermission } from './hasSpaceWideModerateForumsPermission';
-
-type PostCategorySearchToMutate = {
-  categoryId?: string | string[];
-  spaceId: string;
-  userId?: string;
-};
 // Instead of applying permissions to posts, we can use this middleware to check if a user has access to a space's categories
 export async function mutatePostCategorySearch({
   categoryId,
   spaceId,
   userId
-}: PostCategorySearchToMutate): Promise<{ categoryId?: string | string[] }> {
+}: PostSearchToMutate): Promise<MutatedPostSearch> {
   const { isAdmin } = await hasAccessToSpace({
     spaceId,
     userId

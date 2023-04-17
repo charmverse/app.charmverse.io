@@ -14,8 +14,8 @@ import type { Resource } from '../interfaces';
 
 import { PublicPermissionsClient } from './client';
 
-const publicClient = new PublicPermissionsClient();
-const apiClient = new PermissionsApiClient({
+export const publicClient = new PublicPermissionsClient();
+export const premiumPermissionsApiClient = new PermissionsApiClient({
   authKey: permissionsApiAuthKey,
   baseUrl: permissionsApiUrl
 });
@@ -89,22 +89,53 @@ export async function isSpaceOptedIn({ resourceId }: Resource): Promise<Permissi
 
   return space.premiumOptin === true ? 'private' : 'public';
 }
-type GetPermissionClient = {
+
+export async function isPostCategoryPermissionSpaceOptedIn({ resourceId }: Resource): Promise<PermissionsEngine> {
+  if (!stringUtils.isUUID(resourceId)) {
+    throw new InvalidInputError('Invalid resourceId');
+  }
+  const postCategoryPermission = await prisma.postCategoryPermission.findUnique({
+    where: {
+      id: resourceId
+    },
+    select: {
+      postCategory: {
+        select: {
+          space: {
+            select: {
+              premiumOptin: true
+            }
+          }
+        }
+      }
+    }
+  });
+
+  if (!postCategoryPermission) {
+    throw new PostCategoryNotFoundError(resourceId);
+  }
+
+  return postCategoryPermission.postCategory.space.premiumOptin === true ? 'private' : 'public';
+}
+
+export type ResourceIdEntity = 'space' | 'post' | 'postCategory' | 'postCategoryPermission';
+
+export type GetPermissionClient = {
   resourceId: string;
-  resourceIdType?: 'space' | 'post' | 'postCategory';
+  resourceIdType: ResourceIdEntity;
 };
-/**
- * Get correct permissions client for a specific space, even if we have a resourceId for another app
- * */
-export async function getPermissionsClient({
+
+export async function checkSpacePermissionsEngine({
   resourceId,
-  resourceIdType = 'space'
-}: GetPermissionClient): Promise<PermissionsClient> {
+  resourceIdType
+}: GetPermissionClient): Promise<PermissionsEngine> {
   const engineResolver =
     !resourceIdType || resourceIdType === 'space'
       ? isSpaceOptedIn
       : resourceIdType === 'postCategory'
       ? isPostCategorySpaceOptedIn
+      : resourceIdType === 'postCategoryPermission'
+      ? isPostCategoryPermissionSpaceOptedIn
       : resourceIdType === 'post'
       ? isPostSpaceOptedIn
       : null;
@@ -115,8 +146,23 @@ export async function getPermissionsClient({
 
   const engine = await engineResolver({ resourceId });
 
+  return engine;
+}
+
+/**
+ * Get correct permissions client for a specific space, even if we have a resourceId for another app
+ * */
+export async function getPermissionsClient({
+  resourceId,
+  resourceIdType = 'space'
+}: GetPermissionClient): Promise<PermissionsClient> {
+  const engine = await checkSpacePermissionsEngine({
+    resourceId,
+    resourceIdType
+  });
+
   if (engine === 'private') {
-    return apiClient;
+    return premiumPermissionsApiClient;
   } else {
     return publicClient;
   }

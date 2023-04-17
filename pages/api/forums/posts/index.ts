@@ -7,7 +7,7 @@ import { createForumPost, trackCreateForumPostEvent } from 'lib/forums/posts/cre
 import type { ListForumPostsRequest, PaginatedPostList } from 'lib/forums/posts/listForumPosts';
 import { listForumPosts } from 'lib/forums/posts/listForumPosts';
 import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
-import { mutatePostCategorySearch } from 'lib/permissions/forum/mutatePostCategorySearch';
+import { checkSpacePermissionsEngine, premiumPermissionsApiClient } from 'lib/permissions/api/routers';
 import { requestOperations } from 'lib/permissions/requestOperations';
 import { withSessionRoute } from 'lib/session/withSession';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
@@ -24,10 +24,22 @@ async function getPosts(req: NextApiRequest, res: NextApiResponse<PaginatedPostL
   const postQuery = req.query as any as ListForumPostsRequest;
   const userId = req.session.user?.id as string | undefined;
 
-  // Apply permissions to what we are searching for
-  postQuery.categoryId = (
-    await mutatePostCategorySearch({ spaceId: postQuery.spaceId, categoryId: postQuery.categoryId, userId })
-  ).categoryId;
+  const shouldApplyPermissions =
+    (await checkSpacePermissionsEngine({
+      resourceId: postQuery.spaceId,
+      resourceIdType: 'space'
+    })) === 'private';
+
+  if (shouldApplyPermissions) {
+    // Apply permissions to what we are searching for
+    postQuery.categoryId = (
+      await premiumPermissionsApiClient.forum.mutatePostCategorySearch({
+        spaceId: postQuery.spaceId,
+        categoryId: postQuery.categoryId,
+        userId
+      })
+    ).categoryId;
+  }
 
   const posts = await listForumPosts(postQuery, userId);
 
