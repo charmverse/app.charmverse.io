@@ -82,6 +82,7 @@ export function PageTitleInput({ value, updatedAt: updatedAtExternal, onChange, 
         data-test='editor-page-title'
         inputRef={titleInput}
         value={title}
+        multiline
         onChange={_onChange}
         placeholder='Untitled'
         autoFocus={!value && !readOnly && !isTouchScreen()}
