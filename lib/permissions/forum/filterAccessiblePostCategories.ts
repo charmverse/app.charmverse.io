@@ -10,11 +10,6 @@ import { hasSpaceWideModerateForumsPermission } from './hasSpaceWideModerateForu
 import type { PostCategoryWithPermissions } from './interfaces';
 import { postCategoryPermissionsMapping } from './mapping';
 
-type CategoriesToFilter = {
-  postCategories: PostCategory[];
-  userId?: string;
-};
-
 export async function filterAccessiblePostCategories({
   postCategories,
   userId

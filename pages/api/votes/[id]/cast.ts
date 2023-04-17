@@ -5,6 +5,7 @@ import nc from 'next-connect';
 
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
+import { getPermissionsClient } from 'lib/permissions/api/routers';
 import { computePostPermissions } from 'lib/permissions/forum/computePostPermissions';
 import { computeUserPagePermissions } from 'lib/permissions/pages/page-permission-compute';
 import { computeProposalPermissions } from 'lib/permissions/proposals/computeProposalPermissions';
@@ -66,7 +67,12 @@ async function castVote(req: NextApiRequest, res: NextApiResponse<UserVote | { e
       throw new ActionNotPermittedError(`You do not have permission to cast a vote on this page.`);
     }
   } else if (vote.postId) {
-    const postPermissions = await computePostPermissions({
+    const client = await getPermissionsClient({
+      resourceId: vote.postId,
+      resourceIdType: 'post'
+    });
+
+    const postPermissions = await client.forum.computePostPermissions({
       resourceId: vote.postId,
       userId
     });

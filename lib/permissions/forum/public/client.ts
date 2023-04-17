@@ -1,9 +1,9 @@
-import type { ForumPermissionsClient } from '@charmverse/core';
+import type { BaseForumPermissionsClient } from '@charmverse/core';
 
 import { computePostCategoryPermissions } from '../computePostCategoryPermissions';
 import { computePostPermissions } from '../computePostPermissions';
 
-export class PublicForumPermissionsClient implements ForumPermissionsClient {
+export class PublicForumPermissionsClient implements BaseForumPermissionsClient {
   computePostPermissions = computePostPermissions;
 
   computePostCategoryPermissions = computePostCategoryPermissions;

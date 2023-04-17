@@ -6,6 +6,7 @@ import log from 'lib/log';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { mapNotificationActor } from 'lib/notifications/mapNotificationActor';
+import { getPermissionsClient } from 'lib/permissions/api/routers';
 import { computePostPermissions } from 'lib/permissions/forum/computePostPermissions';
 import { computeUserPagePermissions } from 'lib/permissions/pages';
 import { computeProposalPermissions } from 'lib/permissions/proposals/computeProposalPermissions';
@@ -39,7 +40,11 @@ async function getVotes(req: NextApiRequest, res: NextApiResponse<ExtendedVote[]
       throw new UnauthorisedActionError('You do not have access to the page');
     }
   } else if (postId) {
-    const computed = await computePostPermissions({
+    const client = await getPermissionsClient({
+      resourceId: postId,
+      resourceIdType: 'post'
+    });
+    const computed = await client.forum.computePostPermissions({
       resourceId: postId,
       userId
     });

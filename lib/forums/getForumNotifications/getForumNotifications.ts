@@ -1,8 +1,9 @@
 import { prisma } from '@charmverse/core';
-import type { Post, PostComment, Space, User } from '@prisma/client';
+import type { Post, PostComment, Space, User, PostCategory } from '@prisma/client';
 
 import type { TaskUser } from 'lib/discussion/interfaces';
 import { getPostCategories } from 'lib/forums/categories/getPostCategories';
+import { checkSpacePermissionsEngine, premiumPermissionsApiClient } from 'lib/permissions/api/routers';
 import { filterAccessiblePostCategories } from 'lib/permissions/forum/filterAccessiblePostCategories';
 import { getUserSpaceNotifications } from 'lib/userNotifications/spaceNotifications';
 import { timeAgo } from 'lib/utilities/dates';
@@ -79,10 +80,18 @@ export async function getForumNotifications(userId: string): Promise<ForumTasksG
   for (const spaceRole of spaceRoles) {
     const postCategories = await getPostCategories(spaceRole.space.id);
     const spaceNotifications = await getUserSpaceNotifications({ spaceId: spaceRole.space.id, userId });
-    const visiblePostCategories = await filterAccessiblePostCategories({
-      postCategories,
-      userId
+
+    const shouldFilter = await checkSpacePermissionsEngine({
+      resourceId: spaceRole.spaceId,
+      resourceIdType: 'space'
     });
+
+    const visiblePostCategories: PostCategory[] = shouldFilter
+      ? await premiumPermissionsApiClient.forum.filterAccessiblePostCategories({
+          postCategories,
+          userId
+        })
+      : postCategories;
 
     const _posts = await prisma.post.findMany({
       where: {

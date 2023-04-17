@@ -9,6 +9,7 @@ import type { UpdatePostCommentInput } from 'lib/forums/comments/interface';
 import { updatePostComment } from 'lib/forums/comments/updatePostComment';
 import { PostNotFoundError } from 'lib/forums/posts/errors';
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
+import { getPermissionsClient } from 'lib/permissions/api';
 import { computePostPermissions } from 'lib/permissions/forum/computePostPermissions';
 import { withSessionRoute } from 'lib/session/withSession';
 import { UserIsNotSpaceMemberError } from 'lib/users/errors';
@@ -91,7 +92,12 @@ async function deletePostCommentHandler(req: NextApiRequest, res: NextApiRespons
     throw new DataNotFoundError(`Comment with id ${commentId} not found`);
   }
 
-  const permissions = await computePostPermissions({
+  const client = await getPermissionsClient({
+    resourceId: post.id,
+    resourceIdType: 'post'
+  });
+
+  const permissions = await client.forum.computePostPermissions({
     resourceId: postId,
     userId: req.session.user.id
   });

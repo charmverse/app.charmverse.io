@@ -4,6 +4,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
+import { getPermissionsClient } from 'lib/permissions/api/routers';
 import { computePostPermissions } from 'lib/permissions/forum/computePostPermissions';
 import { computeUserPagePermissions } from 'lib/permissions/pages';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -58,7 +59,11 @@ async function updateVote(req: NextApiRequest, res: NextApiResponse<Vote | { err
       throw new UnauthorisedActionError('You do not have permissions to update the vote.');
     }
   } else if (vote.postId) {
-    const postPermissions = await computePostPermissions({
+    const client = await getPermissionsClient({
+      resourceId: vote.postId,
+      resourceIdType: 'post'
+    });
+    const postPermissions = await client.forum.computePostPermissions({
       resourceId: vote.postId,
       userId
     });
@@ -115,7 +120,11 @@ async function deleteVote(req: NextApiRequest, res: NextApiResponse<Vote | null 
       throw new UnauthorisedActionError('You do not have permissions to delete the vote.');
     }
   } else if (vote.postId) {
-    const postPermissions = await computePostPermissions({
+    const client = await getPermissionsClient({
+      resourceId: vote.postId,
+      resourceIdType: 'post'
+    });
+    const postPermissions = await client.forum.computePostPermissions({
       resourceId: vote.postId,
       userId
     });

@@ -1,10 +1,11 @@
+import type { PostCategoryPermissionAssignment } from '@charmverse/core';
+
 import * as http from 'adapters/http';
 import type {
   AssignedPostCategoryPermission,
   AvailablePostCategoryPermissionFlags,
   AvailablePostPermissionFlags
 } from 'lib/permissions/forum/interfaces';
-import type { PostCategoryPermissionInput } from 'lib/permissions/forum/upsertPostCategoryPermission';
 import type { PermissionCompute, PermissionToDelete } from 'lib/permissions/interfaces';
 
 export class ForumPermissionsApi {
@@ -20,7 +21,7 @@ export class ForumPermissionsApi {
     } as PermissionCompute);
   }
 
-  upsertPostCategoryPermission(permissionInput: PostCategoryPermissionInput) {
+  upsertPostCategoryPermission(permissionInput: PostCategoryPermissionAssignment) {
     return http.POST<AssignedPostCategoryPermission>('/api/permissions/forum', permissionInput);
   }
 
