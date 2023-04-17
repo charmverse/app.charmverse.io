@@ -3,8 +3,8 @@ import type { PostCategoryPermissionLevel } from '@prisma/client';
 export const postCategoryPermissionLabels: Record<PostCategoryPermissionLevel, string> = {
   category_admin: 'Category Admin',
   moderator: 'Moderator',
-  full_access: 'Post & Comment',
-  vote_comment: 'Vote & Comment',
+  full_access: 'Post, Vote & Comment',
+  comment_vote: 'Vote & Comment',
   view: 'View',
   custom: 'Custom'
 } as const;

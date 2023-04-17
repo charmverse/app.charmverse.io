@@ -80,7 +80,7 @@ export function PostCategoryRolePermissionRow({
   return (
     <Box display='flex' justifyContent='space-between' alignItems='center'>
       <Typography variant='body2'>{label || assigneeName}</Typography>
-      <div style={{ width: '150px', textAlign: 'left' }}>
+      <div style={{ width: '180px', textAlign: 'left' }}>
         <Tooltip title={tooltip}>
           <span>
             <SmallSelect

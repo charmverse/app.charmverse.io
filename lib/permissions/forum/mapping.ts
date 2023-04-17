@@ -6,7 +6,7 @@ export const postCategoryPermissionsMapping: Record<PostCategoryPermissionLevel,
   category_admin: [...postCategoryOperations],
   moderator: ['create_post'],
   full_access: ['create_post'],
-  vote_comment: [],
+  comment_vote: [],
   view: [],
   custom: []
 };
@@ -15,7 +15,7 @@ export const postPermissionsMapping: Record<PostCategoryPermissionLevel, PostOpe
   category_admin: [...postOperationsWithoutEdit],
   moderator: [...postOperationsWithoutEdit],
   full_access: ['view_post', 'add_comment', 'upvote', 'downvote'],
-  vote_comment: ['view_post', 'add_comment', 'upvote', 'downvote'],
+  comment_vote: ['view_post', 'add_comment', 'upvote', 'downvote'],
   view: ['view_post'],
   custom: []
 };
