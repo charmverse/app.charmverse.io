@@ -7,7 +7,7 @@ import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { updateTrackPageProfile } from 'lib/metrics/mixpanel/updateTrackPageProfile';
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { duplicatePage } from 'lib/pages/duplicatePage';
-import type { DuplicatePageResponse, PageMeta } from 'lib/pages/server';
+import type { DuplicatePageResponse } from 'lib/pages/duplicatePage';
 import { computeUserPagePermissions } from 'lib/permissions/pages';
 import { PageNotFoundError } from 'lib/public-api';
 import { withSessionRoute } from 'lib/session/withSession';

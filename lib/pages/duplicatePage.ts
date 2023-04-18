@@ -1,9 +1,17 @@
+import type { Block } from '@prisma/client';
+
 import { prisma } from 'db';
 import log from 'lib/log';
 import { exportWorkspacePages } from 'lib/templates/exportWorkspacePages';
 import { importWorkspacePages } from 'lib/templates/importWorkspacePages';
 
-import type { DuplicatePageResponse } from './interfaces';
+import type { PageMeta } from './interfaces';
+
+export type DuplicatePageResponse = {
+  pages: PageMeta[];
+  rootPageId: string;
+  blocks: Block[];
+};
 
 export async function duplicatePage({
   pageId,
