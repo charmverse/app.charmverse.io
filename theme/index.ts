@@ -19,7 +19,6 @@ import {
   settingsHeaderBackgroundColor,
   settingsHeaderBackgroundColorDarkMode
 } from './colors';
-import { darkTheme as darkThemeFocalBoard, lightTheme as lightThemeFocalBoard } from './focalboard/theme';
 
 // Re-declare the emotion theme to have the properties of the MaterialUiTheme - https://emotion.sh/docs/typescript#define-a-theme
 declare module '@emotion/react' {
@@ -237,8 +236,7 @@ export const createThemeLightSensitive = (mode: PaletteMode) => {
         text: mode === 'dark' ? '#FFFFFF70' : '#37352FA6',
         highlightedText: mode === 'dark' ? '#FFFFFFCF' : '#37352F',
         fontSize: '14px'
-      },
-      ...(mode === 'dark' ? darkThemeFocalBoard : lightThemeFocalBoard)
+      }
     },
     components: {
       MuiAvatar: {
