@@ -3,7 +3,6 @@ import nc from 'next-connect';
 
 import { onError, onNoMatch, requireKeys } from 'lib/middleware';
 import { getPermissionsClient } from 'lib/permissions/api';
-import { computePostCategoryPermissions } from 'lib/permissions/forum/computePostCategoryPermissions';
 import type { AvailablePostCategoryPermissionFlags } from 'lib/permissions/forum/interfaces';
 import type { PermissionCompute } from 'lib/permissions/interfaces';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -14,16 +13,15 @@ handler.use(requireKeys<PermissionCompute>(['resourceId'], 'body')).post(compute
 
 async function computePermissions(req: NextApiRequest, res: NextApiResponse<AvailablePostCategoryPermissionFlags>) {
   const input = req.body as PermissionCompute;
-
-  const client = await getPermissionsClient({
+  const permissions = await getPermissionsClient({
     resourceId: input.resourceId,
     resourceIdType: 'postCategory'
-  });
-
-  const permissions = await client.forum.computePostCategoryPermissions({
-    resourceId: input.resourceId,
-    userId: req.session.user?.id
-  });
+  }).then((client) =>
+    client.forum.computePostCategoryPermissions({
+      resourceId: input.resourceId,
+      userId: req.session.user?.id
+    })
+  );
   res.status(200).json(permissions);
 }
 

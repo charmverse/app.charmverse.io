@@ -5,7 +5,7 @@ import type { PaginatedPostList } from 'lib/forums/posts/listForumPosts';
 import type { SearchForumPostsRequest } from 'lib/forums/posts/searchForumPosts';
 import { searchForumPosts } from 'lib/forums/posts/searchForumPosts';
 import { onError, onNoMatch, requireKeys } from 'lib/middleware';
-import { mutatePostCategorySearch } from 'lib/permissions/forum/mutatePostCategorySearch';
+import { checkSpacePermissionsEngine, premiumPermissionsApiClient } from 'lib/permissions/api/routers';
 import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -17,10 +17,21 @@ async function searchForumPostsController(req: NextApiRequest, res: NextApiRespo
   const searchQuery = req.body as SearchForumPostsRequest;
   const userId = req.session.user?.id;
 
-  // Apply permissions to what we are searching for
-  searchQuery.categoryId = (
-    await mutatePostCategorySearch({ spaceId: searchQuery.spaceId, categoryId: searchQuery.categoryId, userId })
-  ).categoryId;
+  const shouldFilterCategories = await checkSpacePermissionsEngine({
+    resourceId: searchQuery.spaceId,
+    resourceIdType: 'space'
+  });
+
+  if (shouldFilterCategories) {
+    // Apply permissions to what we are searching for
+    searchQuery.categoryId = (
+      await premiumPermissionsApiClient.forum.mutatePostCategorySearch({
+        spaceId: searchQuery.spaceId,
+        categoryId: searchQuery.categoryId,
+        userId
+      })
+    ).categoryId;
+  }
 
   const searchResult = await searchForumPosts(searchQuery, userId);
   return res.status(200).json(searchResult);

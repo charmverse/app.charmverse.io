@@ -91,15 +91,15 @@ async function deletePostCommentHandler(req: NextApiRequest, res: NextApiRespons
     throw new DataNotFoundError(`Comment with id ${commentId} not found`);
   }
 
-  const client = await getPermissionsClient({
+  const permissions = await getPermissionsClient({
     resourceId: post.id,
     resourceIdType: 'post'
-  });
-
-  const permissions = await client.forum.computePostPermissions({
-    resourceId: postId,
-    userId: req.session.user.id
-  });
+  }).then((client) =>
+    client.forum.computePostPermissions({
+      resourceId: postId,
+      userId: req.session.user.id
+    })
+  );
 
   if (permissions.delete_comments || postComment.createdBy === userId) {
     await deletePostComment({ commentId, userId });

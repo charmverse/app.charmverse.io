@@ -4,7 +4,7 @@ import nc from 'next-connect';
 import { deletePostCategory } from 'lib/forums/categories/deletePostCategory';
 import { updatePostCategory } from 'lib/forums/categories/updatePostCategory';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
-import { computePostCategoryPermissions } from 'lib/permissions/forum/computePostCategoryPermissions';
+import { getPermissionsClient } from 'lib/permissions/api';
 import type { PostCategoryWithPermissions } from 'lib/permissions/forum/interfaces';
 import { requestOperations } from 'lib/permissions/requestOperations';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -27,10 +27,15 @@ async function updatePostCategoryController(req: NextApiRequest, res: NextApiRes
 
   const updatedPostCategory = await updatePostCategory(postCategoryId as string, req.body);
 
-  const permissions = await computePostCategoryPermissions({
+  const permissions = await getPermissionsClient({
     resourceId: postCategoryId,
-    userId
-  });
+    resourceIdType: 'postCategory'
+  }).then((client) =>
+    client.forum.computePostCategoryPermissions({
+      resourceId: postCategoryId,
+      userId
+    })
+  );
 
   return res.status(200).json({ ...updatedPostCategory, permissions });
 }
