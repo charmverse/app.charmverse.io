@@ -12,7 +12,7 @@ import { useMembers } from 'hooks/useMembers';
 import { usePagePermissions } from 'hooks/usePagePermissions';
 import { usePostPermissions } from 'hooks/usePostPermissions';
 import { useSnackbar } from 'hooks/useSnackbar';
-import type { DuplicatePageResponse } from 'lib/pages';
+import type { DuplicatePageResponse } from 'lib/pages/duplicatePage';
 
 import { Utils } from './BoardEditor/focalboard/src/utils';
 import { DuplicatePageAction } from './DuplicatePageAction';

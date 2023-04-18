@@ -1,7 +1,7 @@
 import type { Block, Page, PageType, Prisma } from '@prisma/client';
 import { v4 } from 'uuid';
 
-import type { PageWithBlocks } from 'lib/templates/interfaces';
+import type { PageWithBlocks } from 'lib/templates/exportWorkspacePages';
 import { typedKeys } from 'lib/utilities/objects';
 
 import { pageContentStub } from './generatePageStub';

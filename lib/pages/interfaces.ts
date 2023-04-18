@@ -1,4 +1,4 @@
-import type { Block, Page, PagePermission, Space } from '@prisma/client';
+import type { Page, PagePermission, Space } from '@prisma/client';
 
 import type { BountyWithDetails } from 'lib/bounties';
 import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
@@ -148,10 +148,3 @@ export type FormResponseProperty = IPropertyTemplate & {
 export interface IPageMetaWithPermissions extends PageMeta {
   permissions: (PagePermission & { sourcePermission: PagePermission | null })[];
 }
-
-export type DuplicatePageResponse = {
-  pages: PageMeta[];
-  rootPageId: string;
-  bounties: BountyWithDetails[];
-  blocks: Block[];
-};
