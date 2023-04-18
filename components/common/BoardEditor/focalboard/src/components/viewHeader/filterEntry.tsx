@@ -163,16 +163,32 @@ function FilterPropertyValue({
       return (
         <Select<string[]>
           multiple
+          displayEmpty
           value={filter.values}
           onChange={updateMultiSelectValue}
-          renderValue={(selected) =>
-            selected.map((optionId) => {
-              const foundOption = property.options?.find((o) => o.id === optionId);
-              return foundOption ? (
-                <Chip size='small' label={foundOption.value} color={focalboardColorsMap[foundOption.color]} />
-              ) : null;
-            })
-          }
+          renderValue={(selected) => {
+            return selected.length === 0 ? (
+              <Typography color='secondary'>Select an option</Typography>
+            ) : (
+              <Stack
+                flexDirection='row'
+                gap={1}
+                sx={{ maxWidth: 350, whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}
+              >
+                {selected.map((optionId) => {
+                  const foundOption = property.options?.find((o) => o.id === optionId);
+                  return foundOption ? (
+                    <Chip
+                      key={foundOption.id}
+                      size='small'
+                      label={foundOption.value}
+                      color={focalboardColorsMap[foundOption.color]}
+                    />
+                  ) : null;
+                })}
+              </Stack>
+            );
+          }}
         >
           {property.options?.map((option) => {
             return (
@@ -187,16 +203,27 @@ function FilterPropertyValue({
       return (
         <Select<string[]>
           multiple
+          displayEmpty
           value={filter.values}
           onChange={updateMultiSelectValue}
-          renderValue={(selectedMemberIds) =>
-            selectedMemberIds.map((selectedMemberId) => {
-              const member = members?.find((_member) => _member.id === selectedMemberId);
-              return member ? (
-                <UserDisplay key={selectedMemberId} avatarSize='xSmall' fontSize={12} user={member} />
-              ) : null;
-            })
-          }
+          renderValue={(selectedMemberIds) => {
+            return selectedMemberIds.length === 0 ? (
+              <Typography color='secondary'>Select a person</Typography>
+            ) : (
+              <Stack
+                flexDirection='row'
+                gap={1}
+                sx={{ maxWidth: 350, whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}
+              >
+                {selectedMemberIds.map((selectedMemberId) => {
+                  const member = members?.find((_member) => _member.id === selectedMemberId);
+                  return member ? (
+                    <UserDisplay key={selectedMemberId} avatarSize='xSmall' fontSize={12} user={member} />
+                  ) : null;
+                })}
+              </Stack>
+            );
+          }}
         >
           {members.map((member) => {
             return (
@@ -211,13 +238,16 @@ function FilterPropertyValue({
   } else if (propertyDataType === 'select') {
     return (
       <Select<string>
+        displayEmpty
         value={filter.values[0]}
         onChange={updateSelectValue}
         renderValue={(selected) => {
           const foundOption = property.options?.find((o) => o.id === selected);
           return foundOption ? (
             <Chip size='small' label={foundOption.value} color={focalboardColorsMap[foundOption.color]} />
-          ) : null;
+          ) : (
+            <Typography color='secondary'>Select an option</Typography>
+          );
         }}
       >
         {property.options?.map((option) => {
@@ -239,7 +269,8 @@ function FilterPropertyValue({
             {...props}
             inputProps={{
               ...props.inputProps,
-              readOnly: true
+              readOnly: true,
+              placeholder: 'Select a date'
             }}
             disabled
           />
@@ -315,6 +346,7 @@ function FilterEntry(props: Props) {
                   <MenuItem
                     key={property.id}
                     id={property.id}
+                    selected={property.id === filter.propertyId}
                     onClick={() => {
                       const filterGroup = createFilterGroup(view.fields.filter);
                       const filterClause = filterGroup.filters.find(
