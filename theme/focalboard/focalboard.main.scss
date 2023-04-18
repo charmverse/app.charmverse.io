@@ -19,13 +19,6 @@
   }
 
   input,
-  textarea,
-  select {
-    font-size: 100%;
-    /* Normalize */
-  }
-
-  input,
   textarea {
     background: rgb(var(--center-channel-bg-rgb));
     color: rgb(var(--center-channel-color-rgb));

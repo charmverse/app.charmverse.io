@@ -26,8 +26,15 @@ const CharmEditor = dynamic(() => import('components/common/CharmEditor'), {
   ssr: false
 });
 
-const StyledEditable = styled(Editable)`
-  font-size: 22px !important;
+const BoardTitleEditable = styled(Editable)`
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 32px;
+  margin: 0 0 10px;
+`;
+
+const InlineBoardTitleEditable = styled(BoardTitleEditable)`
+  font-size: 22px;
 `;
 
 type ViewTitleInlineProps = {
@@ -40,6 +47,7 @@ type ViewTitleProps = ViewTitleInlineProps & {
   pageIcon?: string | null;
 };
 
+// NOTE: This is actually the title of the board, not a particular view
 function ViewTitle(props: ViewTitleProps) {
   const { board, pageIcon } = props;
 
@@ -137,10 +145,9 @@ function ViewTitle(props: ViewTitleProps) {
         )}
       </div>
 
-      <div className='title' data-test='board-title'>
+      <div data-test='board-title'>
         <BlockIconSelector readOnly={props.readOnly} pageIcon={pageIcon} setPage={props.setPage} />
-        <Editable
-          className='title'
+        <BoardTitleEditable
           value={title}
           placeholderText={intl.formatMessage({ id: 'ViewTitle.untitled-board', defaultMessage: 'Untitled board' })}
           onChange={(newTitle) => setTitle(newTitle)}
@@ -186,8 +193,7 @@ export function InlineViewTitle(props: ViewTitleInlineProps) {
 
   return (
     <div onKeyDown={cancelEvent}>
-      <StyledEditable
-        className='title'
+      <InlineBoardTitleEditable
         value={title}
         placeholderText='Untitled'
         onChange={(newTitle) => setTitle(newTitle)}
