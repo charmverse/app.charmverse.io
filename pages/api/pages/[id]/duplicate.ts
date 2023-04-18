@@ -7,7 +7,7 @@ import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { updateTrackPageProfile } from 'lib/metrics/mixpanel/updateTrackPageProfile';
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { duplicatePage } from 'lib/pages/duplicatePage';
-import type { DuplicatePageResponse, PageMeta } from 'lib/pages/server';
+import type { DuplicatePageResponse } from 'lib/pages/duplicatePage';
 import { computeUserPagePermissions } from 'lib/permissions/pages';
 import { PageNotFoundError } from 'lib/public-api';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -21,17 +21,19 @@ async function duplicatePageRoute(req: NextApiRequest, res: NextApiResponse<Dupl
   const pageId = req.query.id as string;
   const userId = req.session.user.id;
 
-  const duplicatedPage = await prisma.page.findUnique({
+  const pageToDuplicate = await prisma.page.findUnique({
     where: {
       id: pageId
     },
     select: {
       parentId: true,
-      spaceId: true
+      spaceId: true,
+      type: true,
+      id: true
     }
   });
 
-  if (!duplicatedPage) {
+  if (!pageToDuplicate) {
     throw new PageNotFoundError(pageId);
   }
 
@@ -44,42 +46,38 @@ async function duplicatePageRoute(req: NextApiRequest, res: NextApiResponse<Dupl
     throw new ActionNotPermittedError('You are not allowed to duplicate this page.');
   }
 
-  const duplicatePageResponse = await duplicatePage({ pageId, parentId: duplicatedPage.parentId });
-  const { pages, rootPageId, blocks } = duplicatePageResponse;
-  await Promise.all(pages.map((page) => updateTrackPageProfile(page.id)));
-
-  const pagesMap: Record<string, PageMeta> = {};
-  pages.forEach((page) => {
-    pagesMap[page.id] = page;
+  const result = await duplicatePage({
+    pageId,
+    parentId: pageToDuplicate.parentId,
+    spaceId: pageToDuplicate.spaceId
   });
 
-  const page = pagesMap[rootPageId];
-  if (page) {
-    trackUserAction('duplicate_page', {
-      userId,
-      spaceId: page.spaceId,
-      pageId: page.id,
-      type: page.type
-    });
-  }
+  await Promise.all(result.pages.map((page) => updateTrackPageProfile(page.id)));
+
+  trackUserAction('duplicate_page', {
+    userId,
+    spaceId: pageToDuplicate.spaceId,
+    pageId: pageToDuplicate.id,
+    type: pageToDuplicate.type
+  });
 
   relay.broadcast(
     {
       type: 'pages_created',
-      payload: pages
+      payload: result.pages
     },
-    page.spaceId
+    pageToDuplicate.spaceId
   );
 
   relay.broadcast(
     {
       type: 'blocks_created',
-      payload: blocks.map((block) => prismaToBlock(block))
+      payload: result.blocks.map((block) => prismaToBlock(block))
     },
-    page.spaceId
+    pageToDuplicate.spaceId
   );
 
-  return res.status(200).send(duplicatePageResponse);
+  return res.status(200).send(result);
 }
 
 export default withSessionRoute(handler);

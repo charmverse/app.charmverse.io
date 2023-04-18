@@ -1,35 +1,28 @@
+import type { Block } from '@prisma/client';
+
 import { prisma } from 'db';
-import type { BountyWithDetails } from 'lib/bounties';
 import log from 'lib/log';
 import { exportWorkspacePages } from 'lib/templates/exportWorkspacePages';
 import { importWorkspacePages } from 'lib/templates/importWorkspacePages';
 
-import type { DuplicatePageResponse } from './server';
-import { includePagePermissions, PageNotFoundError } from './server';
+import type { PageMeta } from './interfaces';
+
+export type DuplicatePageResponse = {
+  pages: PageMeta[];
+  rootPageId: string;
+  blocks: Block[];
+};
 
 export async function duplicatePage({
   pageId,
-  parentId
+  parentId,
+  spaceId
 }: {
-  parentId?: string | null;
+  parentId: string | null;
   pageId: string;
+  spaceId: string;
 }): Promise<DuplicatePageResponse> {
-  const page = await prisma.page.findUnique({
-    where: {
-      id: pageId
-    },
-    select: {
-      spaceId: true
-    }
-  });
-
-  if (!page) {
-    throw new PageNotFoundError(pageId);
-  }
-
-  const spaceId = page.spaceId;
-
-  const { data } = await exportWorkspacePages({
+  const data = await exportWorkspacePages({
     sourceSpaceIdOrDomain: spaceId,
     rootPageIds: [pageId]
   });
@@ -49,22 +42,6 @@ export async function duplicatePage({
     });
   }
 
-  const bounties = await prisma.bounty.findMany({
-    where: {
-      id: {
-        in: pages
-          .filter((createdPage) => createdPage.bountyId && createdPage.type === 'bounty')
-          .map((createdPage) => createdPage.bountyId as string)
-      }
-    },
-    include: {
-      applications: true,
-      page: {
-        include: includePagePermissions()
-      }
-    }
-  });
-
   const blocks = await prisma.block.findMany({
     where: {
       id: {
@@ -76,7 +53,6 @@ export async function duplicatePage({
   return {
     pages,
     rootPageId: rootPageIds[0],
-    bounties: bounties as BountyWithDetails[],
     blocks
   };
 }

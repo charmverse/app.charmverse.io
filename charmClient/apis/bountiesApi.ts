@@ -43,10 +43,6 @@ export class BountiesApi {
     return http.GET<BountyWithDetails>(`/api/bounties/${bountyId}`);
   }
 
-  deleteBounty(bountyId: string): Promise<any> {
-    return http.DELETE(`/api/bounties/${bountyId}`);
-  }
-
   updateBounty({ bountyId, updateContent }: BountyUpdate): Promise<BountyWithDetails> {
     return http.PUT<BountyWithDetails>(`/api/bounties/${bountyId}`, updateContent);
   }

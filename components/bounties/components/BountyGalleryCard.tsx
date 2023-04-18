@@ -8,7 +8,8 @@ import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
 import { PageActions } from 'components/common/PageActions';
 import { PageIcon } from 'components/common/PageLayout/components/PageIcon';
 import { usePageDetails } from 'hooks/usePageDetails';
-import type { DuplicatePageResponse, PageMeta } from 'lib/pages';
+import type { PageMeta } from 'lib/pages';
+import type { DuplicatePageResponse } from 'lib/pages/duplicatePage';
 import { fancyTrim } from 'lib/utilities/strings';
 
 import BountyStatusBadge from './BountyStatusBadge';
