@@ -152,6 +152,12 @@ enum WorkspaceEventType {
   proposal_status_change
 }
 
+enum FontFamily {
+  default
+  serif
+  mono
+}
+
 enum PageType {
   board
   board_template
@@ -330,6 +336,8 @@ model Page {
   proposalId          String?          @unique @db.Uuid
   snapshotProposalId  String?
   fullWidth           Boolean?         @default(false)
+  fontFamily          FontFamily?      @default(default)
+  fontSizeSmall       Boolean?         @default(false)
   version             Int              @default(1)
   card                Block?           @relation(fields: [cardId], references: [id], onDelete: Cascade)
   author              User             @relation(fields: [createdBy], references: [id], onDelete: Cascade)
