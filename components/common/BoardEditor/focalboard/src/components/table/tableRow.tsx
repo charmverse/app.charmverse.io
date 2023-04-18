@@ -126,7 +126,6 @@ function TableRow(props: Props) {
   }
 
   const wrapColumn = activeView.fields.columnWrappedIds?.includes(Constants.titleColumnId);
-
   const commonProps = {
     ref: titleRef,
     value: title,
@@ -168,7 +167,7 @@ function TableRow(props: Props) {
                   <DragIndicatorIcon color='secondary' />
                 </IconButton>
               )}
-              <div className='octo-icontitle'>
+              <div className='octo-icontitle' style={{ alignSelf: 'flex-start', alignItems: 'flex-start' }}>
                 <PageIcon isEditorEmpty={!hasContent} pageType='page' icon={pageIcon} />
                 {wrapColumn ? <TextAreaAutoSize {...commonProps} /> : <Editable {...commonProps} />}
               </div>
@@ -186,6 +185,7 @@ function TableRow(props: Props) {
             className='octo-table-cell'
             key={template.id}
             style={{
+              alignItems: 'flex-start',
               width: columnWidth(props.resizingColumn, props.activeView.fields.columnWidths, props.offset, template.id)
             }}
             ref={columnRefs.get(template.id)}
@@ -200,6 +200,7 @@ function TableRow(props: Props) {
               updatedAt={pageUpdatedAt}
               updatedBy={pageUpdatedBy}
               displayType='table'
+              wrapColumn={activeView.fields.columnWrappedIds?.includes(template.id)}
             />
           </div>
         );

@@ -3,8 +3,7 @@ import type { ReactNode } from 'react';
 import React from 'react';
 
 import { Utils } from '../../../utils';
-import Editable from '../../../widgets/editable';
-import { TextInput } from '../../../widgets/TextInput';
+import { TextAreaAutoSize, TextInput } from '../../../widgets/TextInput';
 
 type Props = {
   value: string;
@@ -15,6 +14,7 @@ type Props = {
   onSave: () => void;
   onCancel: () => void;
   validator: (newValue: string) => boolean;
+  wrapColumn?: boolean;
 };
 
 function URLProperty(props: Props): JSX.Element {
@@ -33,22 +33,24 @@ function URLProperty(props: Props): JSX.Element {
       </a>
     );
   }
+
+  const commonProps = {
+    className: 'octo-propertyvalue',
+    placeholderText: props.placeholder,
+    readOnly: props.readOnly,
+    value: props.value,
+    autoExpand: false,
+    onChange: props.onChange,
+    multiline: props.multiline,
+    onSave: props.onSave,
+    onCancel: props.onCancel,
+    validator: props.validator
+  };
+
   return (
     <div className='URLProperty property-link url'>
-      {(hasValue || props.placeholder) && (
-        <TextInput
-          className='octo-propertyvalue'
-          placeholderText={props.placeholder}
-          value={props.value}
-          autoExpand={false}
-          multiline={props.multiline}
-          readOnly={props.readOnly}
-          onChange={props.onChange}
-          onSave={props.onSave}
-          onCancel={props.onCancel}
-          validator={props.validator}
-        />
-      )}
+      {(hasValue || props.placeholder) &&
+        (!props.wrapColumn ? <TextInput {...commonProps} /> : <TextAreaAutoSize {...commonProps} />)}
       {link}
     </div>
   );

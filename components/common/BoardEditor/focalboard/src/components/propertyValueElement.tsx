@@ -12,7 +12,7 @@ import type { Card } from 'lib/focalboard/card';
 import mutator from '../mutator';
 import { OctoUtils } from '../octoUtils';
 import Switch from '../widgets/switch';
-import { TextInput } from '../widgets/TextInput';
+import { TextAreaAutoSize, TextInput } from '../widgets/TextInput';
 
 import CreatedAt from './properties/createdAt/createdAt';
 import CreatedBy from './properties/createdBy/createdBy';
@@ -32,6 +32,7 @@ type Props = {
   showEmptyPlaceholder: boolean;
   displayType?: PropertyValueDisplayType;
   showTooltip?: boolean;
+  wrapColumn?: boolean;
 };
 
 function PropertyValueElement(props: Props) {
@@ -140,21 +141,6 @@ function PropertyValueElement(props: Props) {
         />
       );
     }
-  } else if (propertyTemplate.type === 'url') {
-    propertyValueElement = (
-      <URLProperty
-        value={value.toString()}
-        readOnly={readOnly}
-        placeholder={emptyDisplayValue}
-        onChange={setValue}
-        onSave={() => {
-          mutator.changePropertyValue(card, propertyTemplate.id, value);
-        }}
-        multiline={displayType === 'details'}
-        onCancel={() => setValue(propertyValue || '')}
-        validator={(newValue) => validateProp(propertyTemplate.type, newValue)}
-      />
-    );
   } else if (propertyTemplate.type === 'checkbox') {
     propertyValueElement = (
       <Switch
@@ -179,24 +165,28 @@ function PropertyValueElement(props: Props) {
   }
 
   if (editableFields.includes(propertyTemplate.type)) {
-    propertyValueElement = (
-      <TextInput
-        className='octo-propertyvalue'
-        placeholderText={emptyDisplayValue}
-        readOnly={readOnly}
-        value={value.toString()}
-        autoExpand={false}
-        onChange={setValue}
-        multiline
-        maxRows={displayType === 'details' ? undefined : 1}
-        onSave={() => {
-          mutator.changePropertyValue(card, propertyTemplate.id, value);
-        }}
-        onCancel={() => setValue(propertyValue || '')}
-        validator={(newValue) => validateProp(propertyTemplate.type, newValue)}
-        spellCheck={propertyTemplate.type === 'text'}
-      />
-    );
+    const commonProps = {
+      className: 'octo-propertyvalue',
+      placeholderText: emptyDisplayValue,
+      readOnly,
+      value: value.toString(),
+      autoExpand: true,
+      onChange: setValue,
+      multiline: displayType === 'details',
+      maxRows: displayType === 'details' ? undefined : 1,
+      onSave: () => {
+        mutator.changePropertyValue(card, propertyTemplate.id, value);
+      },
+      onCancel: () => setValue(propertyValue || ''),
+      validator: (newValue: string) => validateProp(propertyTemplate.type, newValue),
+      spellCheck: propertyTemplate.type === 'text'
+    };
+
+    if (propertyTemplate.type === 'url') {
+      propertyValueElement = <URLProperty wrapColumn={props.wrapColumn} {...commonProps} />;
+    } else {
+      propertyValueElement = props.wrapColumn ? <TextAreaAutoSize {...commonProps} /> : <TextInput {...commonProps} />;
+    }
   } else if (propertyValueElement === null) {
     propertyValueElement = <div className='octo-propertyvalue'>{finalDisplayValue}</div>;
   }
