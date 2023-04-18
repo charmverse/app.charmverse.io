@@ -15,7 +15,7 @@ import type { PageContent } from 'lib/prosemirror/interfaces';
 import { publishIncrementalUpdate } from '../../publisher';
 
 import { Constants } from './constants';
-import octoClient, { OctoClient } from './octoClient';
+import octoClient from './octoClient';
 import { OctoUtils } from './octoUtils';
 import undoManager from './undomanager';
 import { IDType, Utils } from './utils';
@@ -869,6 +869,39 @@ class Mutator {
         await charmClient.patchBlock(
           viewId,
           { updatedFields: { kanbanCalculations: oldCalculations } },
+          publishIncrementalUpdate
+        );
+      },
+      description,
+      this.undoGroupId
+    );
+  }
+
+  async toggleColumnWrap(
+    viewId: string,
+    templateId: string,
+    currentColumnWrappedIds: string[],
+    description = 'toggle column wrap'
+  ): Promise<void> {
+    const currentColumnWrap = currentColumnWrappedIds.includes(templateId);
+    await undoManager.perform(
+      async () => {
+        await charmClient.patchBlock(
+          viewId,
+          {
+            updatedFields: {
+              columnWrappedIds: currentColumnWrap
+                ? currentColumnWrappedIds.filter((currentColumnWrappedId) => currentColumnWrappedId !== templateId)
+                : [...currentColumnWrappedIds, templateId]
+            }
+          },
+          publishIncrementalUpdate
+        );
+      },
+      async () => {
+        await charmClient.patchBlock(
+          viewId,
+          { updatedFields: { columnWrappedIds: currentColumnWrappedIds } },
           publishIncrementalUpdate
         );
       },
