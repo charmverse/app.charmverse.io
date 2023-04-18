@@ -156,11 +156,6 @@ function ViewHeader(props: Props) {
             </Button>
             <Popover
               {...bindPopover(viewFilterPopup)}
-              PaperProps={{
-                sx: {
-                  overflow: 'visible'
-                }
-              }}
               anchorOrigin={{
                 vertical: 'bottom',
                 horizontal: 'left'

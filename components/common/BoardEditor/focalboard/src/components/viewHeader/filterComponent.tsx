@@ -27,7 +27,6 @@ type Props = {
 };
 
 const StyledFilterComponent = styled(Box)`
-  color: var(--secondary-text);
   min-width: 430px;
   padding: 10px;
 
@@ -134,7 +133,7 @@ const FilterComponent = React.memo((props: Props) => {
             size='small'
             onClick={deleteFilters}
           >
-            <FormattedMessage id='FilterComponent.delete-filter' defaultMessage='Delete filters' />
+            <FormattedMessage id='FilterComponent.delete-filter' defaultMessage='Delete filter' />
           </Button>
         </>
       )}

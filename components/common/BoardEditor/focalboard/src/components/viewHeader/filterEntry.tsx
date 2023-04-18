@@ -302,7 +302,10 @@ function FilterEntry(props: Props) {
                   sx={{ whiteSpace: 'nowrap', overflow: 'hidden' }}
                 >
                   {iconForPropertyType(template.type, { color: 'secondary' })}
-                  <Typography sx={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  <Typography
+                    sx={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+                    color='text.primary'
+                  >
                     {template.name}
                   </Typography>
                 </Stack>
@@ -346,7 +349,7 @@ function FilterEntry(props: Props) {
                 variant='outlined'
                 endIcon={<KeyboardArrowDownIcon fontSize='small' />}
               >
-                <Typography variant='subtitle1' sx={{ whiteSpace: 'nowrap' }}>
+                <Typography variant='subtitle1' sx={{ whiteSpace: 'nowrap', color: 'text.primary' }}>
                   {formatCondition(filter.condition)}
                 </Typography>
               </Button>
