@@ -1,3 +1,4 @@
+import styled from '@emotion/styled';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
@@ -51,6 +52,22 @@ function formatCondition(condition: string) {
     restChunks.join(' ')
   );
 }
+
+const SelectMenuItemsContainer = styled(Stack)`
+  flex-direction: row;
+  gap: ${({ theme }) => theme.spacing(1)};
+  max-width: 350px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+`;
+
+const EllipsisText = styled(Typography)`
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: ${({ theme }) => theme.palette.text.primary};
+`;
 
 function FilterPropertyValue({
   properties,
@@ -170,11 +187,7 @@ function FilterPropertyValue({
             return selected.length === 0 ? (
               <Typography color='secondary'>Select an option</Typography>
             ) : (
-              <Stack
-                flexDirection='row'
-                gap={1}
-                sx={{ maxWidth: 350, whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}
-              >
+              <SelectMenuItemsContainer>
                 {selected.map((optionId) => {
                   const foundOption = property.options?.find((o) => o.id === optionId);
                   return foundOption ? (
@@ -186,7 +199,7 @@ function FilterPropertyValue({
                     />
                   ) : null;
                 })}
-              </Stack>
+              </SelectMenuItemsContainer>
             );
           }}
         >
@@ -216,18 +229,14 @@ function FilterPropertyValue({
             return selectedMemberIds.length === 0 ? (
               <Typography color='secondary'>Select a person</Typography>
             ) : (
-              <Stack
-                flexDirection='row'
-                gap={1}
-                sx={{ maxWidth: 350, whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}
-              >
+              <SelectMenuItemsContainer>
                 {selectedMemberIds.map((selectedMemberId) => {
                   const member = members?.find((_member) => _member.id === selectedMemberId);
                   return member ? (
                     <UserDisplay key={selectedMemberId} avatarSize='xSmall' fontSize={12} user={member} />
                   ) : null;
                 })}
-              </Stack>
+              </SelectMenuItemsContainer>
             );
           }}
         >
@@ -344,12 +353,7 @@ function FilterEntry(props: Props) {
                   sx={{ whiteSpace: 'nowrap', overflow: 'hidden' }}
                 >
                   {iconForPropertyType(template.type, { color: 'secondary' })}
-                  <Typography
-                    sx={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
-                    color='text.primary'
-                  >
-                    {template.name}
-                  </Typography>
+                  <EllipsisText>{template.name}</EllipsisText>
                 </Stack>
               </Button>
               <Menu {...bindMenu(popupState)} sx={{ maxWidth: 350 }}>
@@ -374,9 +378,7 @@ function FilterEntry(props: Props) {
                     }}
                   >
                     <ListItemIcon>{iconForPropertyType(property.type)}</ListItemIcon>
-                    <Typography sx={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                      {property.name}
-                    </Typography>
+                    <EllipsisText>{property.name}</EllipsisText>
                   </MenuItem>
                 ))}
               </Menu>
@@ -394,17 +396,18 @@ function FilterEntry(props: Props) {
                 variant='outlined'
                 endIcon={<KeyboardArrowDownIcon fontSize='small' />}
               >
-                <Typography variant='subtitle1' sx={{ whiteSpace: 'nowrap', color: 'text.primary' }}>
-                  {formatCondition(filter.condition)}
-                </Typography>
+                <EllipsisText variant='subtitle1'>{formatCondition(filter.condition)}</EllipsisText>
               </Button>
               <Menu {...bindMenu(popupState)}>
                 {propertyConfigs[template.type].conditions.map((condition) => {
                   return (
-                    <MenuItem key={condition} id='includes' onClick={() => props.conditionClicked(condition, filter)}>
-                      <Typography variant='subtitle1' sx={{ whiteSpace: 'nowrap' }}>
-                        {formatCondition(condition)}
-                      </Typography>
+                    <MenuItem
+                      selected={condition === filter.condition}
+                      key={condition}
+                      id='includes'
+                      onClick={() => props.conditionClicked(condition, filter)}
+                    >
+                      <EllipsisText variant='subtitle1'>{formatCondition(condition)}</EllipsisText>
                     </MenuItem>
                   );
                 })}

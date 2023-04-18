@@ -120,7 +120,7 @@ const FilterComponent = React.memo((props: Props) => {
         </Stack>
       )}
 
-      <Button variant='outlined' color='secondary' size='small' onClick={addFilterClicked}>
+      <Button variant='outlined' color='secondary' size='small' onClick={addFilterClicked} sx={{ mt: 1 }}>
         <FormattedMessage id='FilterComponent.add-filter' defaultMessage='+ Add filter' />
       </Button>
       {filters.length !== 0 && (
