@@ -1,7 +1,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
-import type { Page, Prisma } from '@prisma/client';
+import type { Prisma, Page } from '@prisma/client';
 import { v4, validate } from 'uuid';
 
 import { prisma } from 'db';
@@ -15,12 +15,21 @@ import type { PageContent, TextContent, TextMark } from 'lib/prosemirror/interfa
 import { InvalidInputError } from 'lib/utilities/errors';
 import { typedKeys } from 'lib/utilities/objects';
 
-import type { ExportedPage, WorkspaceExport, WorkspaceImport } from './interfaces';
+import type { WorkspaceExport, ExportedPage } from './exportWorkspacePages';
 
-interface UpdateRefs {
+type WorkspaceImportOptions = {
+  exportData?: WorkspaceExport;
+  exportName?: string;
+  targetSpaceIdOrDomain: string;
+  // Parent id of root pages, could be another page or null if space is parent
+  parentId?: string | null;
+  updateTitle?: boolean;
+};
+
+type UpdateRefs = {
   oldNewPageIdHashMap: Record<string, string>;
   pages: Page[];
-}
+};
 
 function recurse(node: PageContent, cb: (node: PageContent | TextContent) => void) {
   if (node?.content) {
@@ -91,14 +100,14 @@ function updateReferences({ oldNewPageIdHashMap, pages }: UpdateRefs) {
   };
 }
 
-interface WorkspaceImportResult {
+type WorkspaceImportResult = {
   pages: PageMeta[];
   totalBlocks: number;
   totalPages: number;
   rootPageIds: string[];
   bounties: BountyWithDetails[];
   blockIds: string[];
-}
+};
 
 export async function generateImportWorkspacePages({
   targetSpaceIdOrDomain,
@@ -106,7 +115,7 @@ export async function generateImportWorkspacePages({
   exportName,
   parentId: rootParentId,
   updateTitle
-}: WorkspaceImport): Promise<{
+}: WorkspaceImportOptions): Promise<{
   pageArgs: Prisma.PageCreateArgs[];
   blockArgs: Prisma.BlockCreateManyArgs;
   voteArgs: Prisma.VoteCreateManyArgs;
@@ -434,7 +443,7 @@ export async function importWorkspacePages({
   exportName,
   parentId,
   updateTitle
-}: WorkspaceImport): Promise<Omit<WorkspaceImportResult, 'bounties'>> {
+}: WorkspaceImportOptions): Promise<Omit<WorkspaceImportResult, 'bounties'>> {
   const {
     pageArgs,
     blockArgs,

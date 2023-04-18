@@ -1,7 +1,17 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
-import type { Block } from '@prisma/client';
+import type {
+  Block,
+  Bounty,
+  BountyPermission,
+  Page,
+  PagePermission,
+  Proposal,
+  ProposalCategory,
+  Vote,
+  VoteOptions
+} from '@prisma/client';
 import { validate } from 'uuid';
 
 import { prisma } from 'db';
@@ -11,8 +21,28 @@ import { resolvePageTree } from 'lib/pages/server/resolvePageTree';
 import type { PageContent, TextContent } from 'lib/prosemirror/interfaces';
 import { DataNotFoundError } from 'lib/utilities/errors';
 
-import type { ExportedPage, WorkspaceExport } from './interfaces';
+export interface PageWithBlocks {
+  blocks: {
+    board?: Block;
+    views?: Block[];
+    card?: Block;
+  };
+  votes?: (Vote & { voteOptions: VoteOptions[] })[];
+  proposal?:
+    | (Proposal & {
+        category: null | ProposalCategory;
+      })
+    | null;
+  bounty?: (Bounty & { permissions: BountyPermission[] }) | null;
+}
 
+export type ExportedPage = PageNodeWithChildren<
+  Page & Partial<PageWithBlocks> & { permissions: (PagePermission & { sourcePermission?: PagePermission | null })[] }
+>;
+
+export interface WorkspaceExport {
+  pages: ExportedPage[];
+}
 function recurse(node: PageContent, cb: (node: PageContent | TextContent) => void) {
   if (node?.content) {
     node?.content.forEach((childNode) => {
@@ -24,14 +54,15 @@ function recurse(node: PageContent, cb: (node: PageContent | TextContent) => voi
   }
 }
 
-export interface ExportWorkspacePage {
+type ExportWorkspaceOptions = {
   sourceSpaceIdOrDomain: string;
   rootPageIds?: string[];
   skipBounties?: boolean;
   skipProposals?: boolean;
   skipBountyTemplates?: boolean;
   skipProposalTemplates?: boolean;
-}
+};
+
 export async function exportWorkspacePages({
   sourceSpaceIdOrDomain,
   rootPageIds,
@@ -39,7 +70,7 @@ export async function exportWorkspacePages({
   skipProposals = false,
   skipBountyTemplates = false,
   skipProposalTemplates = false
-}: ExportWorkspacePage): Promise<WorkspaceExport> {
+}: ExportWorkspaceOptions): Promise<WorkspaceExport> {
   const isUuid = validate(sourceSpaceIdOrDomain);
 
   const space = await prisma.space.findUnique({
@@ -182,7 +213,7 @@ export async function exportWorkspacePages({
 export async function exportWorkspacePagesToDisk({
   exportName,
   ...props
-}: ExportWorkspacePage & { exportName: string }): Promise<{ data: WorkspaceExport; path: string }> {
+}: ExportWorkspaceOptions & { exportName: string }): Promise<{ data: WorkspaceExport; path: string }> {
   const exportData = await exportWorkspacePages(props);
 
   const exportFolder = path.join(__dirname, 'exports');
