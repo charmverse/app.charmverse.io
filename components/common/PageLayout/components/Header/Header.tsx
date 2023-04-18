@@ -385,7 +385,7 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
         <>
           <Box px={2.5} mb={1}>
             <Typography variant='caption'>Style</Typography>
-            <Box display='flex'>
+            <Box display='flex' mt={0.5}>
               <StyledFontButton
                 size='small'
                 color={basePage?.fontFamily === 'default' ? 'primary' : 'secondary'}
