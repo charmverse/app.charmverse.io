@@ -56,3 +56,13 @@ input:-webkit-autofill:active {
 .not-selectable {
   user-select: none;
 }
+
+
+/* used in Charm Editor based on page.familyFont */
+.font-family-serif {
+  font-family: Lyon-Text, Georgia, ui-serif, serif;
+}
+
+.font-family-mono {
+  font-family: iawriter-mono, Nitti, Menlo, Courier, monospace;
+}
