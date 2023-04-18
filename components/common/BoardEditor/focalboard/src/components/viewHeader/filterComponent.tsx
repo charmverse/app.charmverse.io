@@ -4,6 +4,7 @@ import { Divider, MenuItem, Select, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import { Stack } from '@mui/system';
+import { capitalize } from 'lodash';
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 import { v4 } from 'uuid';
@@ -84,27 +85,31 @@ const FilterComponent = React.memo((props: Props) => {
           {filters.map((filter, filterIndex) => (
             <Stack
               flexDirection='row'
-              gap={0.5}
+              gap={1}
               key={`${filter.propertyId}-${filter.condition}-${filter.values.join(',')}`}
+              alignItems='center'
             >
-              {filterIndex !== 0 && (
-                <Select<FilterGroupOperation>
-                  disabled={filterIndex !== 1}
-                  value={activeView.fields.filter.operation}
-                  onChange={(e) => changeFilterGroupOperation(e.target.value as FilterGroupOperation)}
-                  renderValue={(selected) => (
-                    <Typography>{selected.charAt(0).toUpperCase() + selected.slice(1)}</Typography>
-                  )}
-                >
-                  {['Or', 'And'].map((option) => {
-                    return (
-                      <MenuItem key={option} value={option.toLowerCase()}>
-                        <Typography>{option}</Typography>
-                      </MenuItem>
-                    );
-                  })}
-                </Select>
-              )}
+              <Stack sx={{ width: 75 }} flexDirection='row' justifyContent='flex-end'>
+                {filterIndex === 1 ? (
+                  <Select<FilterGroupOperation>
+                    value={activeView.fields.filter.operation}
+                    onChange={(e) => changeFilterGroupOperation(e.target.value as FilterGroupOperation)}
+                    renderValue={(selected) => <Typography>{capitalize(selected)}</Typography>}
+                  >
+                    {['Or', 'And'].map((option) => {
+                      return (
+                        <MenuItem key={option} value={option.toLowerCase()}>
+                          <Typography>{option}</Typography>
+                        </MenuItem>
+                      );
+                    })}
+                  </Select>
+                ) : (
+                  <Typography>
+                    {filterIndex === 0 ? 'Where' : capitalize(activeView.fields.filter.operation)}
+                  </Typography>
+                )}
+              </Stack>
               <FilterEntry
                 properties={properties}
                 view={activeView}

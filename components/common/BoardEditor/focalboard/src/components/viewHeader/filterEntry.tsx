@@ -282,7 +282,7 @@ function FilterEntry(props: Props) {
   }
 
   return (
-    <Stack flexDirection='row' justifyContent='space-between'>
+    <Stack flexDirection='row' justifyContent='space-between' flex={1}>
       <Stack gap={0.5} flexDirection='row'>
         <PopupState variant='popover' popupId='view-filter'>
           {(popupState) => (
@@ -290,13 +290,21 @@ function FilterEntry(props: Props) {
               <Button
                 color='secondary'
                 size='small'
-                {...bindTrigger(popupState)}
                 variant='outlined'
                 endIcon={<KeyboardArrowDownIcon fontSize='small' />}
+                sx={{ minWidth: 125, maxWidth: 125, width: 125, justifyContent: 'space-between' }}
+                {...bindTrigger(popupState)}
               >
-                <Stack flexDirection='row' alignItems='center'>
-                  <ListItemIcon>{iconForPropertyType(template.type, { color: 'secondary' })}</ListItemIcon>
-                  <Typography sx={{ whiteSpace: 'nowrap' }}>{template.name}</Typography>
+                <Stack
+                  flexDirection='row'
+                  gap={0.5}
+                  alignItems='center'
+                  sx={{ whiteSpace: 'nowrap', overflow: 'hidden' }}
+                >
+                  {iconForPropertyType(template.type, { color: 'secondary' })}
+                  <Typography sx={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    {template.name}
+                  </Typography>
                 </Stack>
               </Button>
               <Menu {...bindMenu(popupState)}>
@@ -362,6 +370,7 @@ function FilterEntry(props: Props) {
         sx={{
           cursor: 'pointer',
           alignSelf: 'center',
+          justifySelf: 'flex-end',
           mx: 1
         }}
         fontSize='small'
