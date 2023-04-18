@@ -258,6 +258,15 @@ export const createThemeLightSensitive = (mode: PaletteMode) => {
           }
         }
       },
+      MuiPaper: {
+        styleOverrides: {
+          // Disable the lightening of the background when elevation is applied
+          // source: https://mui.com/material-ui/react-paper/
+          root: {
+            backgroundImage: 'none'
+          }
+        }
+      },
       MuiButtonBase: {
         defaultProps: {
           disableRipple: true

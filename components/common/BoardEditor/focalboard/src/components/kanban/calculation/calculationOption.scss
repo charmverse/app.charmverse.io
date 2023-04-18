@@ -34,7 +34,7 @@
   .dropdown-submenu {
     position: fixed;
     overflow: auto;
-    background: rgb(var(--center-channel-bg-rgb));
+    background: var(--background-paper);
     border: 0;
     box-shadow: 0 0 0 1px hsla(0, 0%, 0%, 0.1), 0 4px 11px hsla(0, 0%, 0%, 0.1);
     z-index: 999;
