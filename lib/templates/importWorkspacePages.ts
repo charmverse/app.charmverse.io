@@ -163,13 +163,15 @@ export async function generateImportWorkspacePages({
     node,
     newParentId,
     rootSpacePermissionId,
-    rootPageId
+    rootPageId,
+    oldNewPermissionMap
   }: {
     // This is required for inline databases
     rootPageId?: string;
     node: ExportedPage;
     newParentId: string | null;
     rootSpacePermissionId?: string;
+    oldNewPermissionMap: Record<string, string>;
   }) {
     const existingNewPageId =
       node.type === 'page' || isBoardPageType(node.type) ? oldNewPageIdHashMap[node.id] : undefined;
@@ -209,10 +211,21 @@ export async function generateImportWorkspacePages({
     rootSpacePermissionId = rootSpacePermissionId ?? newPermissionId;
 
     const pagePermissions = includePermissions
-      ? node.permissions.map(({ sourcePermission, pageId, ...permission }) => ({
-          ...permission,
-          id: v4()
-        }))
+      ? node.permissions.map(({ sourcePermission, pageId, inheritedFromPermission, ...permission }) => {
+          const newPagePermissionId = v4();
+
+          oldNewPermissionMap[permission.id] = newPagePermissionId;
+
+          const newSourcePermissionId = inheritedFromPermission
+            ? oldNewPermissionMap[inheritedFromPermission]
+            : undefined;
+
+          return {
+            ...permission,
+            inheritedFromPermission: newSourcePermissionId,
+            id: newPagePermissionId
+          };
+        })
       : [
           {
             id: newPermissionId,
@@ -296,7 +309,7 @@ export async function generateImportWorkspacePages({
         blockArgs.push(cardBlock as Prisma.BlockCreateManyInput);
 
         node.children?.forEach((child) => {
-          recursivePagePrep({ node: child, newParentId: newId, rootSpacePermissionId });
+          recursivePagePrep({ node: child, newParentId: newId, rootSpacePermissionId, oldNewPermissionMap });
         });
       }
     } else if (isBoardPageType(node.type)) {
@@ -325,13 +338,13 @@ export async function generateImportWorkspacePages({
         pageArgs.push(newPageContent);
 
         node.children?.forEach((child) => {
-          recursivePagePrep({ node: child, newParentId: newId, rootSpacePermissionId });
+          recursivePagePrep({ node: child, newParentId: newId, rootSpacePermissionId, oldNewPermissionMap });
         });
       }
     } else if (node.type === 'page') {
       pageArgs.push(newPageContent);
       node.children?.forEach((child) => {
-        recursivePagePrep({ node: child, newParentId: newId, rootSpacePermissionId });
+        recursivePagePrep({ node: child, newParentId: newId, rootSpacePermissionId, oldNewPermissionMap });
       });
     } else if ((node.type === 'bounty' || node.type === 'bounty_template') && node.bounty) {
       pageArgs.push(newPageContent);
@@ -414,7 +427,7 @@ export async function generateImportWorkspacePages({
   }
 
   dataToImport.pages.forEach((page) => {
-    recursivePagePrep({ node: page, newParentId: null });
+    recursivePagePrep({ node: page, newParentId: null, oldNewPermissionMap: {} });
   });
 
   return {
