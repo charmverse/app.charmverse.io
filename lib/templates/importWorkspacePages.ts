@@ -24,6 +24,7 @@ type WorkspaceImportOptions = {
   // Parent id of root pages, could be another page or null if space is parent
   parentId?: string | null;
   updateTitle?: boolean;
+  includePermissions?: boolean;
 };
 
 type UpdateRefs = {
@@ -114,7 +115,8 @@ export async function generateImportWorkspacePages({
   exportData,
   exportName,
   parentId: rootParentId,
-  updateTitle
+  updateTitle,
+  includePermissions
 }: WorkspaceImportOptions): Promise<{
   pageArgs: Prisma.PageCreateArgs[];
   blockArgs: Prisma.BlockCreateManyArgs;
@@ -206,6 +208,20 @@ export async function generateImportWorkspacePages({
     // Reassigned when creating the root permission
     rootSpacePermissionId = rootSpacePermissionId ?? newPermissionId;
 
+    const pagePermissions = includePermissions
+      ? node.permissions.map(({ sourcePermission, pageId, ...permission }) => ({
+          ...permission,
+          id: v4()
+        }))
+      : [
+          {
+            id: newPermissionId,
+            permissionLevel: space?.defaultPagePermissionGroup ?? 'full_access',
+            spaceId: space.id,
+            inheritedFromPermission: rootSpacePermissionId === newPermissionId ? undefined : rootSpacePermissionId
+          }
+        ];
+
     const newPageContent: Prisma.PageCreateArgs = {
       data: {
         ...pageWithoutJoins,
@@ -251,14 +267,7 @@ export async function generateImportWorkspacePages({
         },
         permissions: {
           createMany: {
-            data: [
-              {
-                id: newPermissionId,
-                permissionLevel: space?.defaultPagePermissionGroup ?? 'full_access',
-                spaceId: space.id,
-                inheritedFromPermission: rootSpacePermissionId === newPermissionId ? undefined : rootSpacePermissionId
-              }
-            ]
+            data: pagePermissions
           }
         },
         updatedBy: space.createdBy,
@@ -442,7 +451,8 @@ export async function importWorkspacePages({
   exportData,
   exportName,
   parentId,
-  updateTitle
+  updateTitle,
+  includePermissions
 }: WorkspaceImportOptions): Promise<Omit<WorkspaceImportResult, 'bounties'>> {
   const {
     pageArgs,
@@ -459,7 +469,8 @@ export async function importWorkspacePages({
     exportData,
     exportName,
     parentId,
-    updateTitle
+    updateTitle,
+    includePermissions
   });
 
   const pagesToCreate = pageArgs.length;
