@@ -4,6 +4,7 @@ import EmojiEmotionsOutlinedIcon from '@mui/icons-material/EmojiEmotionsOutlined
 import ImageIcon from '@mui/icons-material/Image';
 import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined';
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
+import { Box } from '@mui/material';
 import type { Page } from '@prisma/client';
 import dynamic from 'next/dynamic';
 import type { KeyboardEvent } from 'react';
@@ -30,7 +31,8 @@ const BoardTitleEditable = styled(Editable)`
   font-size: 32px;
   font-weight: 700;
   line-height: 32px;
-  margin: 0 0 10px;
+  flex-grow: 1;
+  width: 100%;
 `;
 
 const InlineBoardTitleEditable = styled(BoardTitleEditable)`
@@ -145,7 +147,7 @@ function ViewTitle(props: ViewTitleProps) {
         )}
       </div>
 
-      <div data-test='board-title'>
+      <Box mb={2} data-test='board-title'>
         <BlockIconSelector readOnly={props.readOnly} pageIcon={pageIcon} setPage={props.setPage} />
         <BoardTitleEditable
           value={title}
@@ -157,7 +159,7 @@ function ViewTitle(props: ViewTitleProps) {
           readOnly={props.readOnly}
           spellCheck={true}
         />
-      </div>
+      </Box>
 
       {board.fields.showDescription && (
         <div className='description'>
@@ -192,7 +194,7 @@ export function InlineViewTitle(props: ViewTitleInlineProps) {
   }
 
   return (
-    <div onKeyDown={cancelEvent}>
+    <Box mb={1} onKeyDown={cancelEvent}>
       <InlineBoardTitleEditable
         value={title}
         placeholderText='Untitled'
@@ -202,7 +204,7 @@ export function InlineViewTitle(props: ViewTitleInlineProps) {
         readOnly={props.readOnly}
         spellCheck={true}
       />
-    </div>
+    </Box>
   );
 }
 
