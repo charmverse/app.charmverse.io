@@ -18,8 +18,10 @@ export function SuggestionsPopup({
   pluginKey,
   readOnly,
   pageId,
-  spaceId
+  spaceId,
+  insideModal
 }: {
+  insideModal?: boolean;
   pluginKey: PluginKey<SuggestionPluginState>;
   readOnly: boolean;
   pageId: string;
@@ -30,8 +32,7 @@ export function SuggestionsPopup({
   const { currentPageActionDisplay } = usePageActionDisplay();
   const { user } = useUser();
 
-  const isInPageDialog = new URLSearchParams(window.location.search).get('cardId');
-  const popupIsVisible = (currentPageActionDisplay !== 'suggestions' || isInPageDialog) && isVisible;
+  const popupIsVisible = (currentPageActionDisplay !== 'suggestions' || insideModal) && isVisible;
 
   if (popupIsVisible) {
     const rows = getEventsFromDoc({ state: view.state });

@@ -371,6 +371,7 @@ const defaultContent: PageContent = {
 export type UpdatePageContent = (content: ICharmEditorOutput) => any;
 
 interface CharmEditorProps {
+  insideModal?: boolean;
   colorMode?: 'dark';
   content?: PageContent;
   autoFocus?: boolean;
@@ -402,6 +403,7 @@ function CharmEditor({
   content = defaultContent,
   children,
   autoFocus,
+  insideModal,
   onContentChange,
   style,
   readOnly = false,
@@ -722,6 +724,7 @@ function CharmEditor({
           <InlineCommentThread pluginKey={inlineCommentPluginKey} />
           {currentSpace && pageId && (
             <SuggestionsPopup
+              insideModal={insideModal}
               pageId={pageId}
               spaceId={currentSpace.id}
               pluginKey={suggestionsPluginKey}
