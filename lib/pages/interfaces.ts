@@ -76,7 +76,7 @@ export interface PageTreeResolveInput {
   flattenChildren?: boolean;
   includeDeletedPages?: boolean;
   fullPage?: boolean;
-  pageNodes?: PageNode[];
+  pageNodes?: PageNodeWithPermissions[];
 }
 
 export type TargetPageTree<T extends PageNode = PageNode> = {
