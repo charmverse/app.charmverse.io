@@ -1,8 +1,3 @@
-import type { Theme } from 'components/common/BoardEditor/focalboard/src/theme';
-import {
-  darkTheme as originalDarkTheme,
-  lightTheme as originalLightTheme
-} from 'components/common/BoardEditor/focalboard/src/theme';
 import { colors } from 'theme/colors';
 
 /**
@@ -18,17 +13,6 @@ function renameColorsForFocalboard(colorMode: 'light' | 'dark'): Record<string, 
   }, <any>{});
 }
 
-const darkFocalboardBrandColors = renameColorsForFocalboard('dark');
+export const darkTheme = renameColorsForFocalboard('dark');
 
-export const darkTheme: Theme = {
-  ...originalDarkTheme,
-  mainBg: '25, 25, 25',
-  ...darkFocalboardBrandColors
-};
-
-const lightFocalboardBrandColors = renameColorsForFocalboard('light');
-
-export const lightTheme: Theme = {
-  ...originalLightTheme,
-  ...lightFocalboardBrandColors
-};
+export const lightTheme = renameColorsForFocalboard('light');

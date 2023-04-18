@@ -20,7 +20,6 @@ import charmClient from 'charmClient';
 import GlobalComponents from 'components/_app/GlobalComponents';
 import { LocalizationProvider } from 'components/_app/LocalizationProvider';
 import { Web3ConnectionManager } from 'components/_app/Web3ConnectionManager';
-import { setTheme as setFocalBoardTheme } from 'components/common/BoardEditor/focalboard/src/theme';
 import FocalBoardProvider from 'components/common/BoardEditor/FocalBoardProvider';
 import ErrorBoundary from 'components/common/errors/ErrorBoundary';
 import IntlProvider from 'components/common/IntlProvider';
@@ -54,7 +53,6 @@ import { createThemeLightSensitive } from 'theme';
 import { createEmotionCache } from 'theme/createEmotionCache';
 import cssVariables from 'theme/cssVariables';
 import { setDarkMode } from 'theme/darkMode';
-import { darkTheme, lightTheme } from 'theme/focalboard/theme';
 
 import '@bangle.dev/tooltip/style.css';
 import '@skiff-org/prosemirror-tables/style/table-filters.css';
@@ -160,7 +158,6 @@ export default function App({ Component, emotionCache = clientSideEmotionCache, 
     const muiTheme = createThemeLightSensitive(mode);
 
     if (typeof window !== 'undefined') {
-      setFocalBoardTheme(mode === 'dark' ? darkTheme : lightTheme);
       setSavedDarkMode(mode);
       setDarkMode(mode === 'dark');
     }

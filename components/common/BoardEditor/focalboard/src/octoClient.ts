@@ -4,7 +4,6 @@ import type { ISharing } from './blocks/sharing';
 import type { ClientConfig } from './config/clientConfig';
 import { OctoUtils } from './octoUtils';
 import type { IUser } from './user';
-import { UserSettings } from './userSettings';
 import { Utils } from './utils';
 
 //
@@ -110,7 +109,7 @@ class OctoClient {
   private workspacePath(workspaceId?: string) {
     let workspaceIdToUse = workspaceId;
     if (!workspaceId) {
-      workspaceIdToUse = this.workspaceId === '0' ? UserSettings.lastWorkspaceId || this.workspaceId : this.workspaceId;
+      workspaceIdToUse = this.workspaceId === '0' ? this.workspaceId : this.workspaceId;
     }
 
     return `/api/focalboard/workspaces/${workspaceIdToUse}`;

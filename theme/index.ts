@@ -26,9 +26,7 @@ declare module '@emotion/react' {
   export interface Theme extends MaterialUITheme {}
 }
 
-type FocalBoardColors = typeof darkThemeFocalBoard;
-
-interface CustomColors extends FocalBoardColors, Record<BrandColor, any> {
+interface CustomColors extends Record<BrandColor, any> {
   settingsHeader: {
     background: string;
   };
