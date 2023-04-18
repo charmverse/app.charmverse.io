@@ -190,13 +190,19 @@ function FilterPropertyValue({
             );
           }}
         >
-          {property.options?.map((option) => {
-            return (
-              <MenuItem key={option.id} value={option.id}>
-                <Chip size='small' label={option.value} color={focalboardColorsMap[option.color]} />
-              </MenuItem>
-            );
-          })}
+          {property.options.length === 0 ? (
+            <Typography sx={{ mx: 1, textAlign: 'center' }} color='secondary' variant='subtitle1'>
+              No options available
+            </Typography>
+          ) : (
+            property.options?.map((option) => {
+              return (
+                <MenuItem key={option.id} value={option.id}>
+                  <Chip size='small' label={option.value} color={focalboardColorsMap[option.color]} />
+                </MenuItem>
+              );
+            })
+          )}
         </Select>
       );
     } else if (isPropertyTypePerson) {
@@ -250,13 +256,19 @@ function FilterPropertyValue({
           );
         }}
       >
-        {property.options?.map((option) => {
-          return (
-            <MenuItem key={option.id} value={option.id}>
-              <Chip size='small' label={option.value} color={focalboardColorsMap[option.color]} />
-            </MenuItem>
-          );
-        })}
+        {property.options.length === 0 ? (
+          <Typography sx={{ mx: 1, textAlign: 'center' }} color='secondary' variant='subtitle1'>
+            No options available
+          </Typography>
+        ) : (
+          property.options?.map((option) => {
+            return (
+              <MenuItem key={option.id} value={option.id}>
+                <Chip size='small' label={option.value} color={focalboardColorsMap[option.color]} />
+              </MenuItem>
+            );
+          })
+        )}
       </Select>
     );
   } else if (propertyDataType === 'date') {
@@ -341,7 +353,7 @@ function FilterEntry(props: Props) {
                   </Typography>
                 </Stack>
               </Button>
-              <Menu {...bindMenu(popupState)}>
+              <Menu {...bindMenu(popupState)} sx={{ maxWidth: 350 }}>
                 {properties.map((property) => (
                   <MenuItem
                     key={property.id}
@@ -363,7 +375,9 @@ function FilterEntry(props: Props) {
                     }}
                   >
                     <ListItemIcon>{iconForPropertyType(property.type)}</ListItemIcon>
-                    <Typography>{property.name}</Typography>
+                    <Typography sx={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      {property.name}
+                    </Typography>
                   </MenuItem>
                 ))}
               </Menu>

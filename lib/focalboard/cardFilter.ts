@@ -146,9 +146,7 @@ class CardFilter {
         const sourceValues = Array.isArray(value) ? value : [value];
         switch (condition) {
           case 'contains': {
-            return sourceValues.length === 0
-              ? true
-              : sourceValues.some((sourceValue) => filter.values.includes(sourceValue));
+            return sourceValues.length !== 0 && sourceValues.some((sourceValue) => filter.values.includes(sourceValue));
           }
           case 'does_not_contain': {
             return sourceValues.length === 0
