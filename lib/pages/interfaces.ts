@@ -1,4 +1,4 @@
-import type { Block, Page, PagePermission, Space } from '@prisma/client';
+import type { Page, PagePermission, Space } from '@prisma/client';
 
 import type { BountyWithDetails } from 'lib/bounties';
 import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
