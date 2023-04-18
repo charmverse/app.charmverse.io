@@ -20,7 +20,7 @@ function exportedPage(template: Omit<ExportedPage, StandardFields>): ExportedPag
     updatedAt: new Date(),
     updatedBy: '__replace_me__',
     deletedBy: null,
-    fontFamily: null,
+    fontFamily: 'default',
     fontSizeSmall: null,
     ...template
   };
