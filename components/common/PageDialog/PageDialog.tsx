@@ -36,7 +36,7 @@ export default function PageDialog(props: Props) {
   const mounted = useRef(false);
   const popupState = usePopupState({ variant: 'popover', popupId: 'page-dialog' });
   const router = useRouter();
-  const { setBounties } = useBounties();
+  const { setBounties, refreshBounty } = useBounties();
   const { setCurrentPageId } = useCurrentPage();
 
   const { updatePage, deletePage } = usePages();
@@ -129,7 +129,10 @@ export default function PageDialog(props: Props) {
               onClose();
             }}
             onDuplicate={(pageDuplicateResponse) => {
-              setBounties((_bounties) => [..._bounties, ...pageDuplicateResponse.bounties]);
+              if (bounty) {
+                refreshBounty(pageDuplicateResponse.rootPageId);
+              }
+              // setBounties((_bounties) => [..._bounties, ...pageDuplicateResponse.bounties]);
             }}
           >
             {bounty && <BountyActions bountyId={bounty.id} />}

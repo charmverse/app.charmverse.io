@@ -76,7 +76,7 @@ export interface PageTreeResolveInput {
   flattenChildren?: boolean;
   includeDeletedPages?: boolean;
   fullPage?: boolean;
-  pageNodes?: PageNodeWithPermissions[];
+  pageNodes?: PageNode[];
 }
 
 export type TargetPageTree<T extends PageNode = PageNode> = {
@@ -150,6 +150,5 @@ export interface IPageMetaWithPermissions extends PageMeta {
 export type DuplicatePageResponse = {
   pages: PageMeta[];
   rootPageId: string;
-  bounties: BountyWithDetails[];
   blocks: Block[];
 };

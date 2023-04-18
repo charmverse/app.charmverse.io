@@ -19,7 +19,6 @@ type IContext = {
   currentBounty: BountyWithDetails | null;
   setCurrentBounty: (bounty: BountyWithDetails) => void;
   updateBounty: (bountyId: string, update: Partial<UpdateableBountyFields>) => Promise<BountyWithDetails>;
-  deleteBounty: (bountyId: string) => Promise<true>;
   refreshBounty: (bountyId: string) => Promise<void>;
   loadingBounties: boolean;
 };
@@ -34,7 +33,6 @@ export const BountiesContext = createContext<Readonly<IContext>>({
   currentBounty: null,
   setCurrentBounty: () => undefined,
   updateBounty: () => Promise.resolve({} as any),
-  deleteBounty: () => Promise.resolve(true),
   refreshBounty: () => Promise.resolve(undefined),
   loadingBounties: false
 });
@@ -133,15 +131,6 @@ export function BountiesProvider({ children }: { children: ReactNode }) {
     setDraftBounty(null);
   }
 
-  async function deleteBounty(bountyId: string): Promise<true> {
-    await charmClient.bounties.deleteBounty(bountyId);
-    setBounties((_bounties) => _bounties.filter((bounty) => bounty.id !== bountyId));
-    if (currentBounty?.id === bountyId) {
-      setCurrentBounty(null);
-    }
-    return true;
-  }
-
   async function refreshBounty(bountyId: string) {
     const refreshed = await charmClient.bounties.getBounty(bountyId);
     if (currentBounty?.id === bountyId) {
@@ -171,7 +160,6 @@ export function BountiesProvider({ children }: { children: ReactNode }) {
       currentBounty,
       setCurrentBounty: _setCurrentBounty,
       updateBounty,
-      deleteBounty,
       refreshBounty,
       loadingBounties: isLoading
     }),

@@ -26,7 +26,6 @@ function recurse(node: PageContent, cb: (node: PageContent | TextContent) => voi
 
 export interface ExportWorkspacePage {
   sourceSpaceIdOrDomain: string;
-  exportName?: string;
   rootPageIds?: string[];
   skipBounties?: boolean;
   skipProposals?: boolean;
@@ -35,13 +34,12 @@ export interface ExportWorkspacePage {
 }
 export async function exportWorkspacePages({
   sourceSpaceIdOrDomain,
-  exportName,
   rootPageIds,
   skipBounties = false,
   skipProposals = false,
   skipBountyTemplates = false,
   skipProposalTemplates = false
-}: ExportWorkspacePage): Promise<{ data: WorkspaceExport; path?: string }> {
+}: ExportWorkspacePage): Promise<WorkspaceExport> {
   const isUuid = validate(sourceSpaceIdOrDomain);
 
   const space = await prisma.space.findUnique({
@@ -172,21 +170,20 @@ export async function exportWorkspacePages({
     }
   }
 
-  await Promise.all(
-    mappedTrees.map(async (tree) => {
-      await recursiveResolveBlocks({ node: tree.targetPage });
-    })
-  );
+  await Promise.all(mappedTrees.map((tree) => recursiveResolveBlocks({ node: tree.targetPage })));
 
   mappedTrees.forEach((t) => {
     exportData.pages.push(t.targetPage);
   });
 
-  if (!exportName) {
-    return {
-      data: exportData
-    };
-  }
+  return exportData;
+}
+
+export async function exportWorkspacePagesToDisk({
+  exportName,
+  ...props
+}: ExportWorkspacePage & { exportName: string }): Promise<{ data: WorkspaceExport; path: string }> {
+  const exportData = await exportWorkspacePages(props);
 
   const exportFolder = path.join(__dirname, 'exports');
 

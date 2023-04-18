@@ -224,12 +224,12 @@ export async function multiResolvePageTree<F extends boolean | undefined>({
 
   const spaceId = uniqueSpaceIds[0];
 
-  const pagesInSpace = (await tx.page.findMany(
+  const pagesInSpace = await tx.page.findMany(
     generatePagesQuery({
       includeDeletedPages,
       spaceId
     })
-  )) as PageNodeWithPermissions[] | IPageWithPermissions[];
+  ); // as PageNodeWithPermissions[] | IPageWithPermissions[];
 
   const mappedResults = await Promise.all(
     pageIds.map((id) =>
