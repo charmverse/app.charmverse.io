@@ -95,6 +95,7 @@ function PropertyValueElement(props: Props) {
   if (propertyTemplate.type === 'select' || propertyTemplate.type === 'multiSelect') {
     propertyValueElement = (
       <SelectProperty
+        wrapColumn={props.wrapColumn}
         multiselect={propertyTemplate.type === 'multiSelect'}
         readOnly={readOnly || !board}
         propertyValue={propertyValue as string}
