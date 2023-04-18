@@ -59,10 +59,22 @@ input:-webkit-autofill:active {
 
 
 /* used in Charm Editor based on page.familyFont */
+.font-family-default {
+  font-family: var(--font-family-default);
+}
+
 .font-family-serif {
-  font-family: Lyon-Text, Georgia, ui-serif, serif;
+  font-family: var(--font-family-serif);
+
+  .page-title .MuiInput-input {
+    font-family: var(--font-family-serif);
+  }
 }
 
 .font-family-mono {
-  font-family: iawriter-mono, Nitti, Menlo, Courier, monospace;
+  font-family: var(--font-family-mono);
+
+  .page-title .MuiInput-input {
+    font-family: var(--font-family-mono);
+  }
 }

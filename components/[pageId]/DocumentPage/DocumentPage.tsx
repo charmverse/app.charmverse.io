@@ -170,6 +170,7 @@ function DocumentPage({ page, setPage, insideModal, readOnly = false }: Document
   const showPageActionSidebar = currentPageActionDisplay !== null && !insideModal;
   const router = useRouter();
   const isSharedPage = router.pathname.startsWith('/share');
+  const fontFamilyClassName = `font-family-${page.fontFamily}`;
 
   function onParticipantUpdate(participants: FrontendParticipant[]) {
     setPageProps({ participants });
@@ -203,6 +204,7 @@ function DocumentPage({ page, setPage, insideModal, readOnly = false }: Document
             )}
             <Container
               data-test='page-charmeditor'
+              className={fontFamilyClassName}
               top={pageTop}
               fullWidth={isSmallScreen || (page.fullWidth ?? false)}
             >

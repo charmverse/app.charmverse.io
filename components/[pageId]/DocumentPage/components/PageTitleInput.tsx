@@ -79,6 +79,7 @@ export function PageTitleInput({ value, updatedAt: updatedAtExternal, onChange, 
       }}
     >
       <StyledPageTitle
+        className='page-title'
         data-test='editor-page-title'
         inputRef={titleInput}
         value={title}
