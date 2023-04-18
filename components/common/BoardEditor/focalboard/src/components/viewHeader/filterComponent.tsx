@@ -1,5 +1,6 @@
 import styled from '@emotion/styled';
-import { MenuItem, Select, Typography } from '@mui/material';
+import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
+import { Divider, MenuItem, Select, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import { Stack } from '@mui/system';
@@ -63,6 +64,10 @@ const FilterComponent = React.memo((props: Props) => {
     mutator.changeViewFilter(activeView.id, activeView.fields.filter, filterGroup);
   };
 
+  const deleteFilters = () => {
+    mutator.changeViewFilter(activeView.id, activeView.fields.filter, { filters: [], operation: 'and' });
+  };
+
   const filters: FilterClause[] =
     (activeView.fields.filter?.filters.filter((o) => !isAFilterGroupInstance(o)) as FilterClause[]) || [];
 
@@ -111,9 +116,23 @@ const FilterComponent = React.memo((props: Props) => {
         </Stack>
       )}
 
-      <Button variant='outlined' color='secondary' size='small' onClick={() => addFilterClicked()}>
+      <Button variant='outlined' color='secondary' size='small' onClick={addFilterClicked}>
         <FormattedMessage id='FilterComponent.add-filter' defaultMessage='+ Add filter' />
       </Button>
+      {filters.length !== 0 && (
+        <>
+          <Divider sx={{ my: 2 }} />
+          <Button
+            variant='outlined'
+            color='error'
+            startIcon={<DeleteOutlinedIcon fontSize='small' />}
+            size='small'
+            onClick={deleteFilters}
+          >
+            <FormattedMessage id='FilterComponent.delete-filter' defaultMessage='Delete filters' />
+          </Button>
+        </>
+      )}
     </StyledFilterComponent>
   );
 });
