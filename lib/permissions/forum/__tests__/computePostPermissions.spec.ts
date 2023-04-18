@@ -51,8 +51,14 @@ describe('computePostPermissions - base', () => {
       spaceId: space.id
     });
 
+    const post = await generateForumPost({
+      spaceId: space.id,
+      categoryId: postCategory.id,
+      userId: authorUser.id
+    });
+
     const permissions = await baseComputePostPermissions({
-      resourceId: postCategory.id,
+      resourceId: post.id,
       userId: adminUser.id
     });
 
@@ -189,7 +195,7 @@ describe('computePostPermissions - with editable by author policy', () => {
 
     const authorPermissions = await computePostPermissions({
       resourceId: post.id,
-      userId: adminUser.id
+      userId: authorUser.id
     });
 
     expect(authorPermissions.edit_post).toBe(true);

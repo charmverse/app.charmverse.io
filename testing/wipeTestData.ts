@@ -1,5 +1,7 @@
 import { prisma } from '@charmverse/core';
 
+// require('ts-node/register');
+
 export default async function wipeTestData(): Promise<true> {
   if (process.env.NODE_ENV !== 'production') {
     // We have to delete the space first, as otherwise user-created content (such as bounties) will throw an error on delete
