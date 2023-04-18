@@ -80,7 +80,7 @@ export function ProposalCategoryRolePermissionRow({
   return (
     <Box display='flex' justifyContent='space-between' alignItems='center'>
       <Typography variant='body2'>{assigneeName}</Typography>
-      <div style={{ width: '160px', textAlign: 'left' }}>
+      <div style={{ width: '200px', textAlign: 'left' }}>
         <Tooltip title={tooltip} enterDelay={1000} disableInteractive>
           <span>
             <SmallSelect

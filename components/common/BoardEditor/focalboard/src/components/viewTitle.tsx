@@ -4,6 +4,7 @@ import EmojiEmotionsOutlinedIcon from '@mui/icons-material/EmojiEmotionsOutlined
 import ImageIcon from '@mui/icons-material/Image';
 import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined';
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
+import { Box } from '@mui/material';
 import type { Page } from '@prisma/client';
 import dynamic from 'next/dynamic';
 import type { KeyboardEvent } from 'react';
@@ -26,8 +27,16 @@ const CharmEditor = dynamic(() => import('components/common/CharmEditor'), {
   ssr: false
 });
 
-const StyledEditable = styled(Editable)`
-  font-size: 22px !important;
+const BoardTitleEditable = styled(Editable)`
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 32px;
+  flex-grow: 1;
+  width: 100%;
+`;
+
+const InlineBoardTitleEditable = styled(BoardTitleEditable)`
+  font-size: 22px;
 `;
 
 type ViewTitleInlineProps = {
@@ -40,6 +49,7 @@ type ViewTitleProps = ViewTitleInlineProps & {
   pageIcon?: string | null;
 };
 
+// NOTE: This is actually the title of the board, not a particular view
 function ViewTitle(props: ViewTitleProps) {
   const { board, pageIcon } = props;
 
@@ -137,10 +147,9 @@ function ViewTitle(props: ViewTitleProps) {
         )}
       </div>
 
-      <div className='title' data-test='board-title'>
+      <Box mb={2} data-test='board-title'>
         <BlockIconSelector readOnly={props.readOnly} pageIcon={pageIcon} setPage={props.setPage} />
-        <Editable
-          className='title'
+        <BoardTitleEditable
           value={title}
           placeholderText={intl.formatMessage({ id: 'ViewTitle.untitled-board', defaultMessage: 'Untitled board' })}
           onChange={(newTitle) => setTitle(newTitle)}
@@ -150,7 +159,7 @@ function ViewTitle(props: ViewTitleProps) {
           readOnly={props.readOnly}
           spellCheck={true}
         />
-      </div>
+      </Box>
 
       {board.fields.showDescription && (
         <div className='description'>
@@ -185,9 +194,8 @@ export function InlineViewTitle(props: ViewTitleInlineProps) {
   }
 
   return (
-    <div onKeyDown={cancelEvent}>
-      <StyledEditable
-        className='title'
+    <Box mb={1} onKeyDown={cancelEvent}>
+      <InlineBoardTitleEditable
         value={title}
         placeholderText='Untitled'
         onChange={(newTitle) => setTitle(newTitle)}
@@ -196,7 +204,7 @@ export function InlineViewTitle(props: ViewTitleInlineProps) {
         readOnly={props.readOnly}
         spellCheck={true}
       />
-    </div>
+    </Box>
   );
 }
 

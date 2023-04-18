@@ -19,16 +19,13 @@ import {
   settingsHeaderBackgroundColor,
   settingsHeaderBackgroundColorDarkMode
 } from './colors';
-import { darkTheme as darkThemeFocalBoard, lightTheme as lightThemeFocalBoard } from './focalboard/theme';
 
 // Re-declare the emotion theme to have the properties of the MaterialUiTheme - https://emotion.sh/docs/typescript#define-a-theme
 declare module '@emotion/react' {
   export interface Theme extends MaterialUITheme {}
 }
 
-type FocalBoardColors = typeof darkThemeFocalBoard;
-
-interface CustomColors extends FocalBoardColors, Record<BrandColor, any> {
+interface CustomColors extends Record<BrandColor, any> {
   settingsHeader: {
     background: string;
   };
@@ -240,8 +237,7 @@ export const createThemeLightSensitive = (mode: PaletteMode) => {
         text: mode === 'dark' ? '#FFFFFF70' : '#37352FA6',
         highlightedText: mode === 'dark' ? '#FFFFFFCF' : '#37352F',
         fontSize: '14px'
-      },
-      ...(mode === 'dark' ? darkThemeFocalBoard : lightThemeFocalBoard)
+      }
     },
     components: {
       MuiAvatar: {
@@ -260,6 +256,15 @@ export const createThemeLightSensitive = (mode: PaletteMode) => {
         styleOverrides: {
           popper: {
             zIndex: 'var(--z-index-speedDial)'
+          }
+        }
+      },
+      MuiPaper: {
+        styleOverrides: {
+          // Disable the lightening of the background when elevation is applied
+          // source: https://mui.com/material-ui/react-paper/
+          root: {
+            backgroundImage: 'none'
           }
         }
       },

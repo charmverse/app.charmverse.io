@@ -47,8 +47,7 @@ export default function InlineCommentThread({ pluginKey }: { pluginKey: PluginKe
   const view = useEditorViewContext();
   const { tooltipContentDOM, show: isVisible, ids } = usePluginState(pluginKey) as InlineCommentPluginState;
   const { threads } = useThreads();
-
-  const cardId = new URLSearchParams(window.location.href).get('cardId');
+  const page = useCurrentPage();
 
   const { currentPageActionDisplay } = usePageActionDisplay();
   // Find unresolved threads in the thread ids and sort them based on desc order of createdAt
@@ -60,7 +59,7 @@ export default function InlineCommentThread({ pluginKey }: { pluginKey: PluginKe
       threadA && threadB ? new Date(threadB.createdAt).getTime() - new Date(threadA.createdAt).getTime() : 0
     );
 
-  if ((currentPageActionDisplay !== 'comments' || cardId) && isVisible && unResolvedThreads.length !== 0) {
+  if ((currentPageActionDisplay !== 'comments' || page) && isVisible && unResolvedThreads.length !== 0) {
     // Only show comment thread on inline comment if the page threads list is not active
     return createPortal(
       <ClickAwayListener
@@ -111,7 +110,7 @@ export function InlineCommentSubMenu({ pluginKey }: { pluginKey: PluginKey }) {
 
   const handleSubmit = async (e: React.KeyboardEvent<HTMLElement> | React.MouseEvent<HTMLElement, MouseEvent>) => {
     if (!isEmpty) {
-      const cardId = typeof window !== 'undefined' ? new URLSearchParams(window.location.href).get('cardId') : null;
+      const cardId = typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('cardId') : null;
       e.preventDefault();
       const threadWithComment = await charmClient.comments.startThread({
         comment: commentContent,
