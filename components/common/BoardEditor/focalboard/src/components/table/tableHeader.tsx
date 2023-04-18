@@ -250,20 +250,20 @@ function TableHeader(props: Props): JSX.Element {
               <DeleteOutlinedIcon fontSize='small' />
             </ListItemIcon>
             <Typography variant='subtitle1'>Delete</Typography>
-          </MenuItem>,
-          <Divider key='divider-2' />,
-          <MenuItem
-            key='toggle-wrap-column'
-            onClick={toggleColumnWrap}
-            sx={{ display: 'flex', justifyContent: 'space-between' }}
-          >
-            <Typography variant='subtitle1'>Wrap column</Typography>
-            <Switch
-              checked={(activeView.fields.columnWrappedIds ?? []).includes(templateId)}
-              onChange={toggleColumnWrap}
-            />
           </MenuItem>
         ]}
+        <Divider />
+        <MenuItem
+          key='toggle-wrap-column'
+          onClick={toggleColumnWrap}
+          sx={{ display: 'flex', justifyContent: 'space-between' }}
+        >
+          <Typography variant='subtitle1'>Wrap column</Typography>
+          <Switch
+            checked={(activeView.fields.columnWrappedIds ?? []).includes(templateId)}
+            onChange={toggleColumnWrap}
+          />
+        </MenuItem>
       </MenuList>
     </Stack>
   );

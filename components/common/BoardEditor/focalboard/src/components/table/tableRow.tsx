@@ -21,6 +21,7 @@ import mutator from '../../mutator';
 import { Utils } from '../../utils';
 import Button from '../../widgets/buttons/button';
 import Editable from '../../widgets/editable';
+import { TextAreaAutoSize } from '../../widgets/TextInput';
 import PropertyValueElement from '../propertyValueElement';
 
 type Props = {
@@ -124,6 +125,19 @@ function TableRow(props: Props) {
     }
   }
 
+  const wrapColumn = activeView.fields.columnWrappedIds?.includes(Constants.titleColumnId);
+
+  const commonProps = {
+    ref: titleRef,
+    value: title,
+    placeholderText: 'Untitled',
+    onChange: (newTitle: string) => setTitle(newTitle),
+    onSave: (saveType: string) => saveTitle(saveType, card.id, title, pageTitle),
+    onCancel: () => setTitle(card.title || ''),
+    readOnly: props.readOnly,
+    spellCheck: true
+  };
+
   return (
     <div
       className={className}
@@ -156,17 +170,7 @@ function TableRow(props: Props) {
               )}
               <div className='octo-icontitle'>
                 <PageIcon isEditorEmpty={!hasContent} pageType='page' icon={pageIcon} />
-
-                <Editable
-                  ref={titleRef}
-                  value={title}
-                  placeholderText='Untitled'
-                  onChange={(newTitle: string) => setTitle(newTitle)}
-                  onSave={(saveType) => saveTitle(saveType, card.id, title, pageTitle)}
-                  onCancel={() => setTitle(card.title || '')}
-                  readOnly={props.readOnly}
-                  spellCheck={true}
-                />
+                {wrapColumn ? <TextAreaAutoSize {...commonProps} /> : <Editable {...commonProps} />}
               </div>
 
               <div className='open-button'>

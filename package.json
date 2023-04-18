@@ -99,6 +99,7 @@
     "@koa/router": "^10.1.1",
     "@material-ui/pickers": "^3.3.10",
     "@metamask/onboarding": "^1.0.1",
+    "@mui/base": "^5.0.0-alpha.126",
     "@mui/icons-material": "^5.11.0",
     "@mui/lab": "^5.0.0-alpha.118",
     "@mui/material": "^5.11.7",

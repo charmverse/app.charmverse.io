@@ -67,7 +67,7 @@ function MembersDisplay({
 }) {
   const { membersRecord } = useMembers();
   return memberIds.length === 0 ? null : (
-    <Stack flexDirection='row' flexWrap='wrap' gap={1}>
+    <Stack flexDirection='column' flexWrap='wrap' gap={1}>
       {memberIds.map((memberId) => {
         const user = membersRecord[memberId];
         if (!user) {
@@ -119,14 +119,23 @@ function UserProperty(props: Props): JSX.Element | null {
 
   const [isOpen, setIsOpen] = useState(false);
 
-  if (props.readOnly) {
+  if (props.readOnly || !clicked) {
     return (
-      <MembersDisplay
-        readOnly={props.readOnly}
-        clicked={clicked}
-        memberIds={memberIds}
-        setMemberIds={updateMemberIds}
-      />
+      <Box
+        onClick={() => {
+          if (!props.readOnly) {
+            setIsOpen(true);
+            setClicked(true);
+          }
+        }}
+      >
+        <MembersDisplay
+          readOnly={props.readOnly}
+          clicked={clicked}
+          memberIds={memberIds}
+          setMemberIds={updateMemberIds}
+        />
+      </Box>
     );
   }
 
