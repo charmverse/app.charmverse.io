@@ -25,13 +25,6 @@ type Props = {
 
 function CalculationRow(props: Props): JSX.Element {
   const [showOptions, setShowOptions] = useState<Map<string, boolean>>(new Map<string, boolean>());
-
-  const toggleOptions = (templateId: string, show: boolean) => {
-    const newShowOptions = new Map<string, boolean>(showOptions);
-    newShowOptions.set(templateId, show);
-    setShowOptions(newShowOptions);
-  };
-
   const templates = filterPropertyTemplates(
     props.activeView.fields.visiblePropertyIds,
     props.board.fields.cardProperties
@@ -40,6 +33,14 @@ function CalculationRow(props: Props): JSX.Element {
   const selectedCalculations = props.board.fields.columnCalculations || [];
 
   const [hovered, setHovered] = useState(false);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+
+  const toggleOptions = (templateId: string, _anchorEl?: HTMLElement) => {
+    const newShowOptions = new Map<string, boolean>(showOptions);
+    newShowOptions.set(templateId, !!_anchorEl);
+    setShowOptions(newShowOptions);
+    setAnchorEl(_anchorEl || null);
+  };
 
   return (
     <div
@@ -60,9 +61,9 @@ function CalculationRow(props: Props): JSX.Element {
             style={style}
             class={`octo-table-cell ${props.readOnly ? 'disabled' : ''}`}
             value={value}
-            menuOpen={Boolean(props.readOnly ? false : showOptions.get(template.id))}
-            onMenuClose={() => toggleOptions(template.id, false)}
-            onMenuOpen={() => toggleOptions(template.id, true)}
+            menuOpen={Boolean(props.readOnly ? false : showOptions.get(template.id) && anchorEl)}
+            onMenuClose={() => toggleOptions(template.id)}
+            onMenuOpen={(_anchorEl) => toggleOptions(template.id, _anchorEl)}
             onChange={(v: string) => {
               const calculations = { ...selectedCalculations };
               calculations[template.id] = v;
@@ -75,6 +76,7 @@ function CalculationRow(props: Props): JSX.Element {
             hovered={hovered}
             optionsComponent={TableCalculationOptions}
             property={template}
+            anchorEl={anchorEl}
           />
         );
       })}
