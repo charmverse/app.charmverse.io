@@ -121,11 +121,11 @@ function FilterPropertyValue({
     updatePropertyValueDebounced(view, newFilterValue);
   };
 
-  const updateSelectValue = (e: SelectChangeEvent<string>) => {
-    const value = e.target.value;
+  const updateSelectValue = (value: string) => {
+    const currentValue = filter.values[0];
     const newFilterValue = {
       ...filter,
-      values: [value]
+      values: currentValue === value ? [] : [value]
     };
     setFilter(newFilterValue);
     updatePropertyValueDebounced(view, newFilterValue);
@@ -246,7 +246,6 @@ function FilterPropertyValue({
       <Select<string>
         displayEmpty
         value={filter.values[0]}
-        onChange={updateSelectValue}
         renderValue={(selected) => {
           const foundOption = property.options?.find((o) => o.id === selected);
           return foundOption ? (
@@ -263,7 +262,7 @@ function FilterPropertyValue({
         ) : (
           property.options?.map((option) => {
             return (
-              <MenuItem key={option.id} value={option.id}>
+              <MenuItem key={option.id} onClick={() => updateSelectValue(option.id)}>
                 <Chip size='small' label={option.value} color={focalboardColorsMap[option.color]} />
               </MenuItem>
             );

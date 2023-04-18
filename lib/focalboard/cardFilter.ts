@@ -168,7 +168,7 @@ class CardFilter {
         const sourceValue = (Array.isArray(value) ? value[0] : value)?.toLowerCase() ?? '';
         switch (condition) {
           case 'is': {
-            return sourceValue.length === 0 ? true : filterValue === sourceValue;
+            return sourceValue.length !== 0 && filterValue === sourceValue;
           }
           case 'is_not': {
             return sourceValue.length === 0 ? true : filterValue !== sourceValue;
