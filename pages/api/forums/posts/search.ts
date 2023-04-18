@@ -17,10 +17,11 @@ async function searchForumPostsController(req: NextApiRequest, res: NextApiRespo
   const searchQuery = req.body as SearchForumPostsRequest;
   const userId = req.session.user?.id;
 
-  const shouldFilterCategories = await checkSpacePermissionsEngine({
-    resourceId: searchQuery.spaceId,
-    resourceIdType: 'space'
-  });
+  const shouldFilterCategories =
+    (await checkSpacePermissionsEngine({
+      resourceId: searchQuery.spaceId,
+      resourceIdType: 'space'
+    })) === 'private';
 
   if (shouldFilterCategories) {
     // Apply permissions to what we are searching for
