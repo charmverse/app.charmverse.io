@@ -5,7 +5,7 @@ import { createPage, generateUserAndSpace } from 'testing/setupDatabase';
 
 import { duplicatePage } from '../duplicatePage';
 
-describe('duplicatePage()', () => {
+describe('duplicatePage', () => {
   it('should include permissions from the original page', async () => {
     const { space } = await generateUserAndSpace();
     const pagePermissions = [
@@ -32,15 +32,24 @@ describe('duplicatePage()', () => {
       pagePermissions
     });
 
-    await duplicatePage({ pageId: pageToDuplicate.id, parentId: null, spaceId: space.id });
+    const duplicatedPage = await duplicatePage({ pageId: pageToDuplicate.id, parentId: null, spaceId: space.id });
 
     const result = await prisma.page.findUniqueOrThrow({
-      where: { id: pageToDuplicate.id },
+      where: { id: duplicatedPage.rootPageId },
       include: { permissions: true }
     });
 
+    expect(result.permissions.length).toBe(3);
+
     expect(result.permissions).toEqual(
-      expect.arrayContaining(pagePermissions.map((perm) => expect.objectContaining(perm)))
+      expect.arrayContaining(
+        pagePermissions.map((perm) =>
+          expect.objectContaining({
+            ...perm,
+            id: expect.any(String)
+          })
+        )
+      )
     );
   });
 });
