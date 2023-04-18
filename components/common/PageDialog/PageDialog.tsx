@@ -132,7 +132,6 @@ export default function PageDialog(props: Props) {
               if (bounty) {
                 refreshBounty(pageDuplicateResponse.rootPageId);
               }
-              // setBounties((_bounties) => [..._bounties, ...pageDuplicateResponse.bounties]);
             }}
           >
             {bounty && <BountyActions bountyId={bounty.id} />}
