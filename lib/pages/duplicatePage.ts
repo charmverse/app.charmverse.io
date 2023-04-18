@@ -31,7 +31,8 @@ export async function duplicatePage({
     targetSpaceIdOrDomain: spaceId,
     exportData: data,
     parentId,
-    updateTitle: true
+    updateTitle: true,
+    includePermissions: true
   });
 
   if (rootPageIds.length > 1) {
