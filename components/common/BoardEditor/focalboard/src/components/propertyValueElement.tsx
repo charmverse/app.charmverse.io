@@ -123,6 +123,7 @@ function PropertyValueElement(props: Props) {
         onChange={(newValue) => {
           mutator.changePropertyValue(card, propertyTemplate.id, newValue);
         }}
+        wrapColumn={props.wrapColumn}
         showEmptyPlaceholder={displayType === 'details'}
       />
     );

@@ -16,6 +16,7 @@ type Props = {
   onChange: (memberIds: string[]) => void;
   showEmptyPlaceholder?: boolean;
   displayType?: PropertyValueDisplayType;
+  wrapColumn?: boolean;
 };
 
 const StyledUserPropertyContainer = styled(Box, { shouldForwardProp: (prop) => prop !== 'hideInput' })<{
@@ -58,8 +59,10 @@ function MembersDisplay({
   memberIds,
   clicked,
   readOnly,
-  setMemberIds
+  setMemberIds,
+  wrapColumn
 }: {
+  wrapColumn: boolean;
   readOnly: boolean;
   clicked: boolean;
   memberIds: string[];
@@ -67,7 +70,7 @@ function MembersDisplay({
 }) {
   const { membersRecord } = useMembers();
   return memberIds.length === 0 ? null : (
-    <Stack flexDirection='column' flexWrap='wrap' gap={1}>
+    <Stack flexDirection='row' flexWrap={wrapColumn ? 'wrap' : 'nowrap'} gap={1}>
       {memberIds.map((memberId) => {
         const user = membersRecord[memberId];
         if (!user) {
@@ -119,23 +122,15 @@ function UserProperty(props: Props): JSX.Element | null {
 
   const [isOpen, setIsOpen] = useState(false);
 
-  if (props.readOnly || !clicked) {
+  if (props.readOnly) {
     return (
-      <Box
-        onClick={() => {
-          if (!props.readOnly) {
-            setIsOpen(true);
-            setClicked(true);
-          }
-        }}
-      >
-        <MembersDisplay
-          readOnly={props.readOnly}
-          clicked={clicked}
-          memberIds={memberIds}
-          setMemberIds={updateMemberIds}
-        />
-      </Box>
+      <MembersDisplay
+        wrapColumn={props.wrapColumn ?? false}
+        readOnly={props.readOnly}
+        clicked={clicked}
+        memberIds={memberIds}
+        setMemberIds={updateMemberIds}
+      />
     );
   }
 
@@ -177,6 +172,7 @@ function UserProperty(props: Props): JSX.Element | null {
         placeholder={props.showEmptyPlaceholder && memberIds.length === 0 ? 'Empty' : ''}
         renderTags={() => (
           <MembersDisplay
+            wrapColumn={props.wrapColumn ?? false}
             readOnly={props.readOnly}
             clicked={clicked}
             memberIds={memberIds}
