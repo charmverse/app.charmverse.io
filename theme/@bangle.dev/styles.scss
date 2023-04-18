@@ -4,6 +4,10 @@
 
 .bangle-tooltip {
   z-index: var(--z-index-modal);
+
+  * {
+    font-family: var(--font-family-default) !important; // override custom page font family
+  }
 }
 
 .bangle-editor a:not(.MuiTypography-root) {
@@ -395,7 +399,7 @@ ol li {
 .disclosure-details {
   padding-left: 20px;
 
-  &> :not(:first-child) {
+  & > :not(:first-child) {
     display: none;
   }
 

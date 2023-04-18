@@ -214,7 +214,7 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
   }
   return (
     <EditorViewContext.Provider value={editor?.view as any}>
-      {editor ? children : null}
+      {editor ? <span className='font-family-default'>{children}</span> : null}
       <div
         ref={editorRef}
         className='bangle-editor-core'

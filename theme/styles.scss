@@ -59,10 +59,6 @@ input:-webkit-autofill:active {
 
 
 /* used in Charm Editor based on page.familyFont */
-.font-family-default {
-  font-family: var(--font-family-default);
-}
-
 .font-family-serif {
   font-family: var(--font-family-serif);
 
@@ -77,9 +73,21 @@ input:-webkit-autofill:active {
 .font-family-mono {
   font-family: var(--font-family-mono);
 
+  // override MUI typography
   .MuiInput-input,
   .MuiTypography-root,
   .MuiButton-root {
     font-family: var(--font-family-mono);
+  }
+}
+
+.font-family-default {
+  font-family: var(--font-family-default);
+
+  // override MUI typography
+  .MuiInput-input,
+  .MuiTypography-root,
+  .MuiButton-root {
+    font-family: var(--font-family-default);
   }
 }
