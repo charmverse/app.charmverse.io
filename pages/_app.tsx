@@ -53,6 +53,7 @@ import { createThemeLightSensitive } from 'theme';
 import { createEmotionCache } from 'theme/createEmotionCache';
 import cssVariables from 'theme/cssVariables';
 import { setDarkMode } from 'theme/darkMode';
+import { monoFont, serifFont } from 'theme/fonts';
 
 import '@bangle.dev/tooltip/style.css';
 import '@skiff-org/prosemirror-tables/style/table-filters.css';
@@ -219,7 +220,9 @@ export default function App({ Component, emotionCache = clientSideEmotionCache, 
                                     severity='warning'
                                     handleClose={() => setIsOldBuild(false)}
                                   />
-                                  {getLayout(<Component {...pageProps} />)}
+                                  <span className={`${serifFont.variable} ${monoFont.variable}`}>
+                                    {getLayout(<Component {...pageProps} />)}
+                                  </span>
                                   <GlobalComponents />
                                 </ErrorBoundary>
                               </RouteGuard>

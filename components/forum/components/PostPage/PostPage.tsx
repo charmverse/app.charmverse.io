@@ -213,6 +213,13 @@ export function PostPage({
           <Stack flexDirection='row'>
             <Container top={50}>
               <Box minHeight={300} data-test='post-charmeditor'>
+                <PageTitleInput readOnly={!canEdit} value={formInputs.title} onChange={updateTitle} />
+                {createdBy && (
+                  <UserDisplay showMiniProfile user={createdBy} avatarSize='small' fontSize='medium' mt={2} mb={3} />
+                )}
+                <Box my={2}>
+                  <PostCategoryInput readOnly={!canEdit} setCategoryId={updateCategoryId} categoryId={categoryId} />
+                </Box>
                 <CharmEditor
                   pageType='post'
                   autoFocus={false}
@@ -225,15 +232,7 @@ export function PostPage({
                   key={`${user?.id}.${post?.proposalId}.${canEdit}`}
                   content={formInputs.content as PageContent}
                   onContentChange={updatePostContent}
-                >
-                  <PageTitleInput readOnly={!canEdit} value={formInputs.title} onChange={updateTitle} />
-                  {createdBy && (
-                    <UserDisplay showMiniProfile user={createdBy} avatarSize='small' fontSize='medium' mt={2} mb={3} />
-                  )}
-                  <Box my={2}>
-                    <PostCategoryInput readOnly={!canEdit} setCategoryId={updateCategoryId} categoryId={categoryId} />
-                  </Box>
-                </CharmEditor>
+                />
               </Box>
               {canEdit && (
                 <Stack flexDirection='row' gap={1} justifyContent='flex-end' my={2}>

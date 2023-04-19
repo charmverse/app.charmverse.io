@@ -129,7 +129,7 @@ function ViewHeader(props: Props) {
       <div className='octo-spacer' />
 
       <Box
-        sx={{ opacity: viewSortPopup.isOpen || viewFilterPopup.isOpen ? '1!important' : 'initial!important' }}
+        sx={{ opacity: viewSortPopup.isOpen || viewFilterPopup.isOpen ? '1 !important' : undefined }}
         className='view-actions'
       >
         {!props.readOnly && activeView && (

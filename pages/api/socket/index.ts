@@ -48,7 +48,6 @@ async function socketHandler(req: NextApiRequest, res: NextApiReponseWithSocketS
     res.send({ authToken: sealedUserId });
     return;
   }
-
   const io = new Server(res.socket.server);
   res.socket.server.io = io;
   relay.bindServer(io);

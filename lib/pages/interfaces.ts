@@ -122,6 +122,8 @@ export type PageMeta = Pick<
   | 'hasContent'
   | 'galleryImage'
   | 'convertedProposalId'
+  | 'fontFamily'
+  | 'fontSizeSmall'
 >;
 
 export type PageDetails = {
