@@ -4,7 +4,14 @@ inputs:
   GITHUB_SSH_KEY:
     description: '...'
     required: false
+  API_FOLDER:
+    description: '...'
+    required: false
+    default: "permissions_api"
 
+defaults:
+  run:
+    working-directory: ${{inputs.API_FOLDER}}
 
 runs:
   using: 'composite'
@@ -12,12 +19,9 @@ runs:
     - uses: actions/checkout@v3
       with:
         repository: charmverse/permissions.charmverse.io
-        path: permissions_api
+        path: ${{inputs.API_FOLDER}}
         ssh-key: ${{ inputs.GITHUB_SSH_KEY }}
 
-    - name: Enter permissions api
-      shell: bash
-      run: cd ./permissions_api
 
     - name: Check directory
       shell: bash
@@ -27,13 +31,13 @@ runs:
       id: cache_permissions_node_modules
       uses: actions/cache@v3
       with:
-        path: ./node_modules
+        path: ./${{inputs.API_FOLDER}}/node_modules
         key: nodemodules-permissions-cache-${{ hashFiles('package-lock.json') }}-${{ hashFiles('patches/**.patch', 'prisma/schema.prisma') }}
 
     - name: Install npm dependencies
       shell: bash
       if: steps.cache_permissions_node_modules.outputs.cache-hit != 'true'
-      run: npm ci --no-audit --no-fund
+      run: echo -e "Install path" && pwd && npm ci --no-audit --no-fund
 
     - name: Install CharmVerse core
       shell: bash
@@ -47,7 +51,7 @@ runs:
       uses: actions/cache@v3
       with:
         path: |
-          dist
+          permissionsdist
           .env.test.local
         # including the app_env helps make sure that deploy_staging.yml does not reuse values from test_and_deploy.yml which are meant for production
         key: permissions-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**/*.[jt]s', '**/*.[jt]sx', '**/*.scss', '!node_modules', '!.next', '!dont_cache') }}-${{ inputs.NEXT_PUBLIC_APP_ENV }}
