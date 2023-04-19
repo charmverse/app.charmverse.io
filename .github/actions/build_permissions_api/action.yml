@@ -1,9 +1,9 @@
 name: 'Install dependencies and build the permissions API'
 
-# inputs:
-#   GITHUB_TOKEN:
-#     description: '...',
-#     required: true
+inputs:
+  GITHUB_TOKEN:
+    description: '...',
+    required: false
 
 # defaults
 
@@ -17,8 +17,9 @@ runs:
 
     - uses: actions/checkout@v3
       with:
-        repository: charmverse/permission.charmverse.io
+        repository: git@github.com:charmverse/permissions.charmverse.io
         path: permissions_api
+        # ssh-key: 
 
     # - uses: actions/setup-node@v3
     #   with:
