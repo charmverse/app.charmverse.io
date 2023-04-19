@@ -1,10 +1,11 @@
 import { prisma } from '@charmverse/core';
+import type { Comment } from '@prisma/client';
 
 import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
 
-import type { CommentUpdate, CommentWithUser } from './interfaces';
+import type { CommentUpdate } from './interfaces';
 
-export async function updateComment({ content, id }: CommentUpdate): Promise<CommentWithUser> {
+export async function updateComment({ content, id }: CommentUpdate): Promise<Comment> {
   if (!content) {
     throw new InvalidInputError('Please provide a non empty input to update this comment.');
   }
@@ -29,9 +30,6 @@ export async function updateComment({ content, id }: CommentUpdate): Promise<Com
     data: {
       content,
       updatedAt: new Date()
-    },
-    include: {
-      user: true
     }
   });
 

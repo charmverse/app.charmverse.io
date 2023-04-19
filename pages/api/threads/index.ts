@@ -5,14 +5,14 @@ import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { computeUserPagePermissions } from 'lib/permissions/pages';
 import { withSessionRoute } from 'lib/session/withSession';
-import type { ThreadCreate, ThreadWithCommentsAndAuthors } from 'lib/threads';
+import type { ThreadCreate, ThreadWithComments } from 'lib/threads';
 import { createThread } from 'lib/threads';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.use(requireUser).post(requireKeys<ThreadCreate>(['context', 'pageId', 'comment'], 'body'), startThread);
 
-async function startThread(req: NextApiRequest, res: NextApiResponse<ThreadWithCommentsAndAuthors>) {
+async function startThread(req: NextApiRequest, res: NextApiResponse<ThreadWithComments>) {
   const { comment, context, pageId } = req.body as ThreadCreate;
 
   const userId = req.session.user.id;

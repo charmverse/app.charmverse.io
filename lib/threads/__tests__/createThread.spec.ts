@@ -34,9 +34,7 @@ describe('createThread', () => {
 
     expect(thread.comments).toBeDefined();
     expect(thread.comments[0].content).toBe(firstComment);
-
-    expect(thread.comments[0].user).toBeDefined();
-    expect(thread.comments[0].user.id).toBe(user.id);
+    expect(thread.comments[0].userId).toBe(user.id);
 
     expect(thread.spaceId).toBe(page.spaceId);
   });

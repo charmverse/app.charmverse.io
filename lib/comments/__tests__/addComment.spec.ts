@@ -35,8 +35,7 @@ describe('addComment', () => {
 
     expect(newComment.content).toBe(newCommentMessage);
 
-    expect(newComment.user).toBeDefined();
-    expect(newComment.user.id).toBe(user.id);
+    expect(newComment.userId).toBe(user.id);
   });
 
   it('should fail if the comment content is empty', async () => {

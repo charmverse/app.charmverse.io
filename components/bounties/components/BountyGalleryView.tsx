@@ -17,7 +17,7 @@ interface Props {
 export default function BountiesGalleryView({ bounties, publicMode }: Props) {
   const { deletePage, pages } = usePages();
   const { showPage } = usePageDialog();
-  const { setBounties } = useBounties();
+  const { setBounties, refreshBounty } = useBounties();
   const router = useRouter();
 
   const filteredBounties = bounties
@@ -55,7 +55,7 @@ export default function BountiesGalleryView({ bounties, publicMode }: Props) {
         return (
           <BountyGalleryCard
             onDuplicate={(duplicatePageResponse) => {
-              setBounties((_bounties) => [..._bounties, ...duplicatePageResponse.bounties]);
+              refreshBounty(duplicatePageResponse.rootPageId);
             }}
             key={bounty.id}
             bounty={bounty}

@@ -179,13 +179,16 @@ export function IdentityProviders() {
               loading={isConnectingIdentity || isVerifyingWallet || isSigning}
               disabled={cannotDisconnect}
               connected={true}
-              actions={
+              actions={[
                 verifiableWalletDetected && !account && !isConnectingIdentity ? (
-                  <MenuItem onClick={generateWalletAuth}>Verify Wallet</MenuItem>
-                ) : account ? (
-                  <MenuItem onClick={deleteWalletPopupState.open}>Disconnect Wallet</MenuItem>
-                ) : null
-              }
+                  <MenuItem key='verify' onClick={generateWalletAuth}>
+                    Verify Wallet
+                  </MenuItem>
+                ) : null,
+                <MenuItem key='disconnect' onClick={deleteWalletPopupState.open}>
+                  Disconnect Wallet
+                </MenuItem>
+              ]}
             />
             <ConfirmDeleteModal
               title='Disconnect wallet'

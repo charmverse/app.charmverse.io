@@ -8,7 +8,7 @@
   position: relative;
 
   &:hover {
-    background: rgba(var(--center-channel-color-rgb), 0.1);
+    background: var(--charmeditor-active-hover);
   }
 
   span {
@@ -21,20 +21,20 @@
 
     &.active,
     &.active:hover {
-      background-color: rgb(var(--sidebar-bg-rgb));
+      background-color: var(--charmeditor-active);
       color: rgb(var(--sidebar-text-rgb));
     }
   }
 
   .customs:hover,
   .drops:hover {
-    background: rgba(var(--center-channel-color-rgb), 0.1);
+    background: var(--charmeditor-active-hover);
   }
 
   .dropdown-submenu {
     position: fixed;
     overflow: auto;
-    background: rgb(var(--center-channel-bg-rgb));
+    background: var(--background-paper);
     border: 0;
     box-shadow: 0 0 0 1px hsla(0, 0%, 0%, 0.1), 0 4px 11px hsla(0, 0%, 0%, 0.1);
     z-index: 999;
@@ -47,7 +47,7 @@
   }
 
   &.active {
-    background-color: rgb(var(--sidebar-bg-rgb));
+    background-color: var(--charmeditor-active);
 
     > span {
       color: rgb(var(--sidebar-text-rgb));

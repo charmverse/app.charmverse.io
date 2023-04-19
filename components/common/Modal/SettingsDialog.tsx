@@ -90,7 +90,15 @@ export function SpaceSettingsDialog() {
       fullWidth
       maxWidth='lg'
       fullScreen={isMobile}
-      PaperProps={{ sx: { height: { md: '90vh' }, borderRadius: (theme) => theme.spacing(1) } }}
+      PaperProps={{
+        sx: {
+          maxHeight: 800,
+          height: { md: '90vh' },
+          background: (theme) =>
+            theme.palette.mode === 'dark' ? 'var(--background-dark)' : 'var(--background-default)',
+          borderRadius: (theme) => theme.spacing(1)
+        }
+      }}
       onClose={onClose}
       open={open}
     >
@@ -100,10 +108,10 @@ export function SpaceSettingsDialog() {
           width={{ xs: '100%', md: 300 }}
           minWidth={{ xs: '100%', md: 300 }}
           display={isMobile ? (open && !activePath && 'block') || 'none' : 'block'}
-          borderRight='1px solid'
-          borderColor='divider'
           overflow='auto'
-          sx={{ backgroundColor: (theme) => theme.palette.sidebar.background }}
+          sx={{
+            backgroundColor: (theme) => theme.palette.sidebar.background
+          }}
         >
           <Box mt={2} py={0.5}>
             <SectionName>User settings</SectionName>
@@ -146,7 +154,10 @@ export function SpaceSettingsDialog() {
               top={0}
               right={0}
               zIndex={1}
-              sx={{ backgroundColor: (theme) => theme.palette.background.paper }}
+              sx={{
+                backgroundColor: (theme) =>
+                  theme.palette.mode === 'dark' ? theme.palette.background.paper : theme.palette.background.dark
+              }}
             >
               <IconButton aria-label='open settings dialog menu' onClick={() => onClick()}>
                 <MenuIcon />

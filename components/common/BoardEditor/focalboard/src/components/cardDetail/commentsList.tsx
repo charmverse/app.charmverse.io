@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import Avatar from 'components/common/Avatar';
+import Button from 'components/common/Button';
 import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
 import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
@@ -10,7 +11,6 @@ import type { CommentBlock } from '../../blocks/commentBlock';
 import { createCommentBlock } from '../../blocks/commentBlock';
 import mutator from '../../mutator';
 import { Utils } from '../../utils';
-import Button from '../../widgets/buttons/button';
 
 import Comment from './comment';
 
@@ -105,7 +105,7 @@ export function NewCommentInput({ initialValue = null, $key, username, avatar, o
       />
 
       {newComment && (
-        <Button filled={true} onClick={() => onSubmit(newComment)}>
+        <Button onClick={() => onSubmit(newComment)}>
           <FormattedMessage id='CommentsList.send' defaultMessage='Send' />
         </Button>
       )}

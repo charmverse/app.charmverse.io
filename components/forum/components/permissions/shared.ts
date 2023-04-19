@@ -3,7 +3,8 @@ import type { PostCategoryPermissionLevel } from '@prisma/client';
 export const postCategoryPermissionLabels: Record<PostCategoryPermissionLevel, string> = {
   category_admin: 'Category Admin',
   moderator: 'Moderator',
-  full_access: 'Post & Comment',
+  full_access: 'Post, Vote & Comment',
+  comment_vote: 'Vote & Comment',
   view: 'View',
   custom: 'Custom'
 } as const;
@@ -12,5 +13,4 @@ export const postCategoryPermissionLabels: Record<PostCategoryPermissionLevel, s
 const { category_admin, moderator, custom, ...options } = postCategoryPermissionLabels;
 
 export const forumMemberPermissionOptions = options;
-
 export type BulkRolePostCategoryPermissionUpsert = { permissionLevel: PostCategoryPermissionLevel; roleIds: string[] };

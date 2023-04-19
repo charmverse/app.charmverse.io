@@ -116,19 +116,12 @@ function mapAndCreateProperties(formResponses: FormResponse[], existingResponseP
   const newProperties: FormResponseProperty[] = [];
   const mappedProperties: Record<string, string> = {};
 
-  let index = 0;
   formResponses.forEach((response) => {
-    let property = existingResponseProperties.find((p) => p.description === response.question);
+    const description = response.question.trim();
+    let property = existingResponseProperties.find((p) => p.description === description);
 
     if (!property) {
-      property = createNewFormProperty(response.question);
-
-      if (response.question.toLowerCase() === 'created at') {
-        property.name = response.question;
-      } else {
-        index += 1;
-        property.name = `Question ${index}`;
-      }
+      property = createNewFormProperty(description);
       newProperties.push(property);
     }
 

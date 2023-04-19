@@ -55,11 +55,22 @@ const globalCSS = css`
     --link-underline: ${colors.linkUnderlineColor};
 
     --charmeditor-active: rgba(46, 170, 220, 0.2);
+    --charmeditor-active-hover: rgba(46, 170, 220, 0.1);
 
     /* fullcalendar styles */
     --fc-event-text-color: var(--text-primary) !important;
 
     --page-layout-pb: 180px;
+
+    /* focalboard */
+    --center-channel-bg-rgb: 255, 255, 255;
+    --center-channel-color-rgb: 55, 53, 47;
+    --sidebar-bg-rgb: 247, 246, 243;
+    --sidebar-text-rgb: 55, 53, 47;
+    --button-color-rgb: 255, 255, 255;
+    --button-bg-rgb: 0, 159, 183;
+    --button-danger-color-rgb: 255, 255, 255;
+    --button-danger-bg-rgb: 210, 75, 78;
   }
 
   /* lit protocol */
@@ -87,6 +98,12 @@ const globalCSS = css`
     --background-dark: ${colors.backgroundDarkColorDarkMode};
     --background-light: ${colors.backgroundLightColorDarkMode};
     --link-underline: ${colors.linkUnderlineColorDarkMode};
+
+    /* focalboard dark mode */
+    --center-channel-bg-rgb: 25, 25, 25;
+    --center-channel-color-rgb: 220, 220, 220;
+    --sidebar-text-rgb: 255, 255, 255;
+    --sidebar-bg-rgb: 75, 73, 67;
   }
 `;
 

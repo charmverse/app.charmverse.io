@@ -5,6 +5,7 @@ import type Papa from 'papaparse';
 import { v4 as uuidv4, validate as uuidValidate } from 'uuid';
 
 import charmClient from 'charmClient';
+import { Constants } from 'components/common/BoardEditor/focalboard/src/constants';
 import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import { createCard } from 'lib/focalboard/card';
@@ -279,14 +280,16 @@ export async function addNewCards({
 }) {
   const csvData = results.data;
   const headers = results.meta.fields || [];
-
-  // Remove name property because it is not an option
-  const allAvailableProperties = headers.filter((header) => header !== 'Title');
-
-  const mappedInitialBoardProperties = mapCardBoardProperties(board.fields.cardProperties);
+  const containsTitleProperty = board.fields.cardProperties.find(
+    (cardProperty) => cardProperty.id === Constants.titleColumnId
+  );
+  const boardCardProperties: IPropertyTemplate[] = containsTitleProperty
+    ? board.fields.cardProperties
+    : [...board.fields.cardProperties, { id: Constants.titleColumnId, name: 'Title', type: 'text', options: [] }];
+  const mappedInitialBoardProperties = mapCardBoardProperties(boardCardProperties);
 
   // Create card properties for the board
-  const newBoardProperties = allAvailableProperties.map((prop) =>
+  const newBoardProperties = headers.map((prop) =>
     createNewPropertiesForBoard(csvData, prop, mappedInitialBoardProperties[prop])
   );
 
@@ -294,7 +297,7 @@ export async function addNewCards({
    * Merge the fields of both boards.
    * The order is important here. The old board should be last so it can overwrite the important properties.
    */
-  const mergedFields = deepMergeArrays(newBoardProperties, board.fields.cardProperties);
+  const mergedFields = deepMergeArrays(newBoardProperties, boardCardProperties);
 
   // Create the new board and update the db
   const newBoardBlock: Board = {

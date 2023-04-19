@@ -33,8 +33,7 @@ describe('updateComment', () => {
 
     expect(updated.content).toBe(newCommentMessage);
 
-    expect(updated.user).toBeDefined();
-    expect(updated.user.id).toBe(user.id);
+    expect(updated.userId).toBe(user.id);
   });
 
   it('should fail if the comment does not exist', async () => {
