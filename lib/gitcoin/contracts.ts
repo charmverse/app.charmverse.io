@@ -11,7 +11,7 @@ export function getProjectRegistryContract({
   chainId
 }: {
   providerOrSigner: Provider | Signer;
-  chainId: number | string;
+  chainId: number;
 }): Contract {
   const address = PROJECT_REGISTRY_ADDRESSES[chainId];
 

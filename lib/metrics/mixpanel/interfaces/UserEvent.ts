@@ -14,7 +14,8 @@ export type SignupSource =
   | 'marketing-site'
   | 'direct'
   | 'other'
-  | '';
+  | ''
+  | string;
 
 export type SignupAnalytics = {
   signupLandingUrl: string;
@@ -37,7 +38,7 @@ export type TokenGateVerificationEvent = BaseEvent & {
 };
 
 export type SpaceJoined = BaseEvent & {
-  source: 'invite_link' | TokenGateJoinType | 'charmverse_api';
+  source: 'invite_link' | TokenGateJoinType | 'charmverse_api' | string;
 };
 
 export type CreateNewSpace = BaseEvent & {

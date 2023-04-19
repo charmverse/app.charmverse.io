@@ -1,6 +1,5 @@
 import type { Provider } from '@ethersproject/providers';
 
-import log from 'lib/log';
 import { getSafeContract } from 'lib/safe/contracts';
 
 export async function getSafeOwners({
@@ -16,8 +15,6 @@ export async function getSafeOwners({
 
     return owners;
   } catch (e) {
-    log.warn('[safe] Error while getting safe owners', e);
-
     return null;
   }
 }

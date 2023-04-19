@@ -47,6 +47,7 @@ export type CreateSpaceProps = {
   extraAdmins?: string[];
   createSpaceTemplate?: SpaceCreateTemplate;
   webhookUrl?: string;
+  skipTracking?: boolean;
 };
 
 export async function createWorkspace({
@@ -54,7 +55,8 @@ export async function createWorkspace({
   webhookUrl,
   userId,
   createSpaceTemplate,
-  extraAdmins = []
+  extraAdmins = [],
+  skipTracking
 }: CreateSpaceProps) {
   let domain = spaceData.domain;
 
@@ -234,10 +236,12 @@ export async function createWorkspace({
     await subscribeToAllEvents({ spaceId: space.id, userId });
   }
 
-  logSpaceCreation(space);
-  updateTrackGroupProfile(space);
-  updateTrackUserProfileById(userId);
-  trackUserAction('create_new_workspace', { userId, spaceId: space.id, template: createSpaceTemplate ?? 'default' });
+  if (!skipTracking) {
+    logSpaceCreation(space);
+    updateTrackGroupProfile(space);
+    updateTrackUserProfileById(userId);
+    trackUserAction('create_new_workspace', { userId, spaceId: space.id, template: createSpaceTemplate ?? 'default' });
+  }
 
   return updatedSpace;
 }
