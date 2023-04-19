@@ -40,28 +40,28 @@ const InlineBoardTitleEditable = styled(BoardTitleEditable)`
 `;
 
 type ViewTitleInlineProps = {
-  board: Board;
+  pageTitle: string;
   readOnly: boolean;
   setPage: (page: Partial<Page>) => void;
 };
 
 type ViewTitleProps = ViewTitleInlineProps & {
   pageIcon?: string | null;
+  board: Board;
 };
 
 // NOTE: This is actually the title of the board, not a particular view
 function ViewTitle(props: ViewTitleProps) {
-  const { board, pageIcon } = props;
+  const { board, pageTitle, pageIcon } = props;
 
-  const [title, setTitle] = useState(board.title);
+  const [title, setTitle] = useState(pageTitle);
   const onEditTitleSave = useCallback(() => {
-    mutator.changeTitle(board.id, board.title, title);
     props.setPage({ title });
-  }, [board.id, board.title, title]);
+  }, [pageTitle, title]);
   const onEditTitleCancel = useCallback(() => {
-    setTitle(board.title);
-    props.setPage({ title: board.title });
-  }, [board.title]);
+    setTitle(pageTitle);
+    props.setPage({ title: pageTitle });
+  }, [pageTitle]);
   const onDescriptionChange = useCallback(
     (text: PageContent) => mutator.changeDescription(board.id, board.fields.description, text),
     [board.id, board.fields.description]
@@ -69,7 +69,7 @@ function ViewTitle(props: ViewTitleProps) {
   const onAddRandomIcon = useCallback(() => {
     const newIcon = BlockIcons.shared.randomIcon();
     props.setPage({ icon: newIcon });
-  }, [board.id]);
+  }, []);
   const setRandomHeaderImage = useCallback(
     (headerImage?: string | null) => {
       const newHeaderImage = headerImage ?? randomBannerImage();
@@ -180,13 +180,12 @@ function ViewTitle(props: ViewTitleProps) {
 }
 
 export function InlineViewTitle(props: ViewTitleInlineProps) {
-  const { board } = props;
+  const { pageTitle } = props;
 
-  const [title, setTitle] = useState(board.title);
+  const [title, setTitle] = useState(pageTitle);
   const onEditTitleSave = useCallback(() => {
-    mutator.changeTitle(board.id, board.title, title);
     props.setPage({ title });
-  }, [board.id, board.title, title]);
+  }, [title]);
 
   // cancel key events, such as "Delete" or "Backspace" so that prosemiror doesnt pick them up on inline dbs
   function cancelEvent(e: KeyboardEvent<HTMLDivElement>) {

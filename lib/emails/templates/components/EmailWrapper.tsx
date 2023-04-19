@@ -12,8 +12,8 @@ import {
 } from 'mjml-react';
 import React from 'react';
 
-import { fontFamily } from 'theme';
 import { lightGreyColor, primaryTextColor } from 'theme/colors';
+import { defaultFont } from 'theme/fonts';
 
 import styles from '../theme/styles';
 
@@ -37,7 +37,7 @@ export default function EmailWrapper(props: Props) {
         <MjmlAttributes>
           <MjmlButton cssClass='button' />
           <MjmlDivider cssClass='mjml-divider' />
-          <MjmlText font-family={fontFamily} color={primaryTextColor} font-size='18px' line-height='26px' />
+          <MjmlText font-family={defaultFont} color={primaryTextColor} font-size='18px' line-height='26px' />
         </MjmlAttributes>
       </MjmlHead>
       <MjmlBody width={600} backgroundColor={lightGreyColor} css-class='mjml-root'>

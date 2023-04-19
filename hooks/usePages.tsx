@@ -50,11 +50,10 @@ export const PagesContext = createContext<Readonly<PagesContext>>({
 });
 
 export function PagesProvider({ children }: { children: ReactNode }) {
-  const isAdmin = useIsAdmin();
   const currentSpace = useCurrentSpace();
   const currentSpaceId = useRef<undefined | string>();
   const router = useRouter();
-  const { user, isLoaded: isUserLoaded } = useUser();
+  const { user } = useUser();
   const { subscribe } = useWebSocketClient();
 
   const { data, mutate: mutatePagesList } = useSWR(

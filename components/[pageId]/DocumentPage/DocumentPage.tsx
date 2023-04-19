@@ -170,6 +170,7 @@ function DocumentPage({ page, setPage, insideModal, readOnly = false }: Document
   const showPageActionSidebar = currentPageActionDisplay !== null && !insideModal;
   const router = useRouter();
   const isSharedPage = router.pathname.startsWith('/share');
+  const fontFamilyClassName = `font-family-${page.fontFamily}${page.fontSizeSmall ? ' font-size-small' : ''}`;
 
   function onParticipantUpdate(participants: FrontendParticipant[]) {
     setPageProps({ participants });
@@ -203,6 +204,7 @@ function DocumentPage({ page, setPage, insideModal, readOnly = false }: Document
             )}
             <Container
               data-test='page-charmeditor'
+              className={fontFamilyClassName}
               top={pageTop}
               fullWidth={isSmallScreen || (page.fullWidth ?? false)}
             >
@@ -244,12 +246,12 @@ function DocumentPage({ page, setPage, insideModal, readOnly = false }: Document
                     setPage={setPage}
                   />
                   {page.type === 'proposal' && !isLoading && page.snapshotProposalId && (
-                    <Box my={2}>
+                    <Box my={2} className='font-family-default'>
                       <SnapshotVoteDetails snapshotProposalId={page.snapshotProposalId} />
                     </Box>
                   )}
                   {page.type === 'proposal' && !isLoading && pageVote && (
-                    <Box my={2}>
+                    <Box my={2} className='font-family-default'>
                       <VoteDetail
                         cancelVote={cancelVote}
                         deleteVote={deleteVote}
@@ -262,7 +264,7 @@ function DocumentPage({ page, setPage, insideModal, readOnly = false }: Document
                       />
                     </Box>
                   )}
-                  <div className='focalboard-body'>
+                  <div className='focalboard-body font-family-default'>
                     <div className='CardDetail content'>
                       {/* Property list */}
                       {card && board && (
