@@ -62,6 +62,12 @@ input:-webkit-autofill:active {
 .font-family-serif {
   font-family: var(--font-family-serif);
 
+  font-size: 16px;
+
+  &.font-size-small {
+    font-size: 14px;
+  }
+
   // override MUI typography
   .MuiInput-input,
   .MuiTypography-root,
@@ -72,6 +78,12 @@ input:-webkit-autofill:active {
 
 .font-family-mono {
   font-family: var(--font-family-mono);
+
+  font-size: 17px;
+
+  &.font-size-small {
+    font-size: 15px;
+  }
 
   // override MUI typography
   .MuiInput-input,
@@ -84,10 +96,20 @@ input:-webkit-autofill:active {
 .font-family-default {
   font-family: var(--font-family-default);
 
+  font-size: 15px;
+
+  &.font-size-small {
+    font-size: 14px;
+  }
+
   // override MUI typography
   .MuiInput-input,
   .MuiTypography-root,
   .MuiButton-root {
     font-family: var(--font-family-default);
   }
+}
+
+.font-size-default {
+  font-size: 15px;
 }

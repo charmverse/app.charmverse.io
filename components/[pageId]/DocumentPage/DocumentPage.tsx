@@ -170,7 +170,7 @@ function DocumentPage({ page, setPage, insideModal, readOnly = false }: Document
   const showPageActionSidebar = currentPageActionDisplay !== null && !insideModal;
   const router = useRouter();
   const isSharedPage = router.pathname.startsWith('/share');
-  const fontFamilyClassName = `font-family-${page.fontFamily}`;
+  const fontFamilyClassName = `font-family-${page.fontFamily}${page.fontSizeSmall ? ' font-size-small' : ''}`;
 
   function onParticipantUpdate(participants: FrontendParticipant[]) {
     setPageProps({ participants });
