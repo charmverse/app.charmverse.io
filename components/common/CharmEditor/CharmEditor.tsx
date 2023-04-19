@@ -89,7 +89,6 @@ import * as tweet from './components/tweet/tweet';
 import { TweetNodeView } from './components/tweet/TweetNodeView';
 import { plugins as videoPlugins } from './components/video/video';
 import { VideoNodeView } from './components/video/VideoNodeView';
-import DevTools from './DevTools';
 import { specRegistry } from './specRegistry';
 
 export interface ICharmEditorOutput {
@@ -705,7 +704,7 @@ function CharmEditor({
       />
       {children}
       {!disablePageSpecificFeatures && (
-        <>
+        <span className='font-family-default'>
           <SidebarDrawer
             id='page-action-sidebar'
             title={pageActionDisplay ? SIDEBAR_VIEWS[pageActionDisplay].title : ''}
@@ -732,9 +731,8 @@ function CharmEditor({
             />
           )}
           {currentSpace && pageId && <LinksPopup pluginKey={linksPluginKey} readOnly={readOnly} />}
-        </>
+        </span>
       )}
-      {!readOnly && <DevTools />}
     </StyledReactBangleEditor>
   );
 }
