@@ -1,11 +1,11 @@
 // mock the db file with a prisma client that we can disconnect from the db after tests are run
 // testing git diff
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@charmverse/core';
 
-const prisma = new PrismaClient();
 afterAll(() => {
   prisma.$disconnect();
 });
+
 jest.mock('lib/blockchain/getENSName', () => ({
   ...jest.requireActual('lib/blockchain/getENSName'),
   __esModule: true,
