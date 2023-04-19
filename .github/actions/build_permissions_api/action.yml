@@ -10,7 +10,6 @@ runs:
   using: 'composite'
   steps:
     - uses: actions/checkout@v3
-      working-directory: "."
       with:
         repository: charmverse/permissions.charmverse.io
         path: permissions_api
