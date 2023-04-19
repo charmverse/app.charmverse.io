@@ -19,7 +19,7 @@ export type MappedProperties = {
   type: PropertyType;
 };
 
-export const defaultTitleColumnName = 'Title' as const;
+export const titleColumnName = 'Title' as const;
 
 export const selectColors = Object.keys(focalboardColorsMap);
 
@@ -131,7 +131,7 @@ export function createNewPropertiesForBoard(
     return { ...defaultProps, type: 'checkbox' };
   }
 
-  if (prop === defaultTitleColumnName) {
+  if (prop === titleColumnName) {
     return { ...defaultProps, id: Constants.titleColumnId, type: 'text' };
   }
 
@@ -145,7 +145,7 @@ export function createCardFieldProperties(
 ) {
   return Object.entries(csvRow).reduce<Record<string, string | string[]>>((acc, [key, value]) => {
     // Exclude the name. That prop is used only for the card title
-    if (key === defaultTitleColumnName) {
+    if (key === titleColumnName) {
       return {
         ...acc
       };
@@ -285,12 +285,12 @@ export async function addNewCards({
   // We assume that the first column is the title so we rename it accordingly
   const csvData = results.data.map((csvRow) => {
     const [key, value] = Object.entries(csvRow)[0];
-    csvRow[defaultTitleColumnName] = value;
+    csvRow[titleColumnName] = value;
     delete csvRow[key];
     return csvRow;
   });
   const headers = results.meta.fields || [];
-  headers[0] = defaultTitleColumnName;
+  headers[0] = titleColumnName;
 
   const containsTitleProperty = board.fields.cardProperties.find(
     (cardProperty) => cardProperty.id === Constants.titleColumnId
@@ -300,7 +300,7 @@ export async function addNewCards({
     ? board.fields.cardProperties
     : [
         ...board.fields.cardProperties,
-        { id: Constants.titleColumnId, name: defaultTitleColumnName, type: 'text', options: [] }
+        { id: Constants.titleColumnId, name: titleColumnName, type: 'text', options: [] }
       ];
   const mappedInitialBoardProperties = mapCardBoardProperties(boardCardProperties);
 
@@ -358,7 +358,7 @@ export async function addNewCards({
         createdBy: userId,
         updatedBy: userId,
         spaceId,
-        title: csvRow[defaultTitleColumnName],
+        title: csvRow[titleColumnName],
         fields: {
           properties: fieldProperties
         }
