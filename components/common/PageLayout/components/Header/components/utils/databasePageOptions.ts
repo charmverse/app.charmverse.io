@@ -309,7 +309,10 @@ export async function addNewCards({
     createNewPropertiesForBoard(csvData, prop, mappedInitialBoardProperties[prop])
   );
 
-  // Merge the fields of both boards. The order is not important
+  /**
+   * Merge the fields of both boards.
+   * The order is important here. The old board should be last so it can overwrite the important properties.
+   */
   const mergedFields = deepMergeArrays(newBoardProperties, boardCardProperties);
 
   // Create the new board and update the db
