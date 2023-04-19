@@ -1,4 +1,3 @@
-import { AvailablePostCategoryPermissions } from '@charmverse/core';
 import type { PostCategory } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
@@ -27,15 +26,16 @@ async function getPostCategoriesController(req: NextApiRequest, res: NextApiResp
   const postCategories = await getPostCategories(spaceId as string);
 
   // TODO - Switch for real implementation
-  const basePerms = new AvailablePostCategoryPermissions();
 
-  basePerms.addPermissions(['create_post']);
-
-  const filteredPostCategories = postCategories.map((c) => ({
-    ...c,
-    permissions: basePerms.operationFlags
-  }));
-
+  const filteredPostCategories = await getPermissionsClient({
+    resourceId: spaceId as string,
+    resourceIdType: 'space'
+  }).then((client) =>
+    client.forum.getPermissionedCategories({
+      userId,
+      postCategories
+    })
+  );
   return res.status(200).json(filteredPostCategories);
 }
 
