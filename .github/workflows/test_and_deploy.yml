@@ -13,7 +13,6 @@ jobs:
   build-test-env:
     name: Build test env
     runs-on: ubuntu-latest
-    needs: setup-permissions-api
     steps:
       - uses: actions/checkout@v3
 
