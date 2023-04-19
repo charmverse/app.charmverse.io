@@ -61,6 +61,9 @@ jobs:
         with:
           NEXT_PUBLIC_APP_ENV: 'test'
 
+      - name: Restore permissions API from cache
+        uses: ./.github/actions/build_permissions_api
+
       - name: Run ${{matrix.test_name}}
         run: ${{matrix.test_command}}
 
@@ -93,11 +96,11 @@ jobs:
           - test_name: "Basic tests #2"
             test_command: "npm run test:ci -- --shard 2/2"
           - test_name: "Server integration tests"
-            test_command: "npm run start:test:ci & PORT=3001 npm start:api:permissions:ci &  npm run test:server:ci"
+            test_command: "npm run start:test:ci & PORT=3001 npm run start:api:permissions:ci &  npm run test:server:ci"
           - test_name: "Browser tests"
             test_command: "npm run test:browser:ci"
           - test_name: "Browser e2e test"
-            test_command: "npx playwright install chromium chrome --with-deps; npm run start:test:ci & npm run test:e2e:ci"
+            test_command: "npx playwright install chromium chrome --with-deps; npm run start:test:ci & PORT=3001 npm run start:api:permissions:ci & npm run test:e2e:ci"
     steps:
       - uses: actions/checkout@v3
 

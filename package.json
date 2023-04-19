@@ -10,6 +10,7 @@
     "build:prisma": "rm -rf ./prisma && cp -R ./node_modules/@charmverse/core/src/prisma ./prisma && npx prisma generate --schema=./prisma/schema.prisma",
     "build:analyze": "cross-env ANALYZE=true next build",
     "deploy:staging": "npx cdk deploy \"stg-charmverse-${STAGE}\" --outputs-file cdk.out.json",
+    "start:api:permissions:ci": "cd permissions_api && dotenv -e ../.env.test.local -- npm run start:prod",
     "postdeploy:staging": "node --eval \"console.log('env_url=' + require('./cdk.out.json')['stg-charmverse-${STAGE}'].DeploymentUrl)\"  >> $GITHUB_OUTPUT",
     "destroy:staging": "npx cdk destroy \"stg-charmverse-${STAGE}\" --force",
     "lint": "npx next lint",
