@@ -47,6 +47,7 @@ import { createCard } from 'lib/focalboard/card';
 import type { Card, CardPage } from 'lib/focalboard/card';
 import { CardFilter } from 'lib/focalboard/cardFilter';
 import log from 'lib/log';
+import type { PageMeta } from 'lib/pages';
 import { createNewDataSource } from 'lib/pages/createNewDataSource';
 
 import mutator from '../mutator';
@@ -84,6 +85,7 @@ type Props = WrappedComponentProps &
     disableUpdatingUrl?: boolean;
     maxTabsShown?: number;
     onDeleteView?: (viewId: string) => void;
+    page?: PageMeta;
   };
 
 type State = {
@@ -120,7 +122,7 @@ function CenterPanel(props: Props) {
   }, [activeView?.id, views.length]);
 
   const isEmbedded = !!props.embeddedBoardPath;
-  const boardPage = pages[board.id];
+  const boardPage = pages[board.id] ?? props.page;
   const boardPageType = boardPage?.type;
 
   // for 'linked' boards, each view has its own board which we use to determine the cards to show
@@ -497,9 +499,13 @@ function CenterPanel(props: Props) {
 
   const isLoadingSourceData = !activeBoard && state.showSettings !== 'create-linked-view';
 
+  if (boardPage?.type === 'inline_board' && boardPage.deletedAt) {
+    return null;
+  }
+
   return (
     <>
-      {(!!boardPage?.deletedAt || !!board.deletedAt) && <PageDeleteBanner pageId={boardPage?.id ?? board.id} />}
+      {!!boardPage?.deletedAt && <PageDeleteBanner pageId={boardPage.id} />}
       <div
         // remount components between pages
         className={`BoardComponent ${isEmbedded ? 'embedded-board' : ''}`}
