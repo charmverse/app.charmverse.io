@@ -21,7 +21,7 @@ runs:
 
     - name: Check directory
       shell: bash
-      run: pwd
+      run: ls -a && pwd
 
     - name: Cache dependencies
       id: cache_permissions_node_modules
