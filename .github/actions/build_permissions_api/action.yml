@@ -15,6 +15,7 @@ runs:
     - uses: actions/checkout@v3
       with:
         repository: charmverse/permissions.charmverse.io
+        ref: devops/use-ts
         path: ${{inputs.API_FOLDER}}
         ssh-key: ${{ inputs.GITHUB_SSH_KEY }}
 
