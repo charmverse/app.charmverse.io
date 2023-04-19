@@ -29,8 +29,6 @@ const globalCSS = css`
 
     --font-family-default: ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif,
       'Segoe UI Emoji', 'Segoe UI Symbol';
-    --font-family-serif: Lyon-Text, Georgia, ui-serif, serif;
-    --font-family-mono: iawriter-mono, Nitti, Menlo, Courier, monospace;
 
     /* copied from https://mui.com/material-ui/customization/z-index/#main-content */
     --z-index-mobileStepper: 1000;

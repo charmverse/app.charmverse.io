@@ -12,12 +12,16 @@ const StyledPageTitle = styled(TextField)`
     width: 100%;
   }
 
+  & .MuiInput-root {
+    font-size: inherit;
+  }
+
   & .MuiInput-input {
     background: transparent;
     border: 0 none;
     color: ${({ theme }) => theme.palette.text.primary};
     cursor: text;
-    font-size: 40px;
+    font-size: 2.4em;
     font-weight: 700;
     outline: none;
     line-height: 1.25em;
