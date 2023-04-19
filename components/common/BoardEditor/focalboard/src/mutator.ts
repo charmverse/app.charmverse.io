@@ -194,6 +194,19 @@ class Mutator {
     );
   }
 
+  async changeTitle(blockId: string, oldTitle: string, newTitle: string, description = 'change title') {
+    await undoManager.perform(
+      async () => {
+        await charmClient.patchBlock(blockId, { title: newTitle }, publishIncrementalUpdate);
+      },
+      async () => {
+        await charmClient.patchBlock(blockId, { title: oldTitle }, publishIncrementalUpdate);
+      },
+      description,
+      this.undoGroupId
+    );
+  }
+
   async setDefaultTemplate(
     blockId: string,
     oldTemplateId: string,
