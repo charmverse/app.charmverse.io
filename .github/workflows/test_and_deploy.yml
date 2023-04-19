@@ -13,13 +13,7 @@ jobs:
   setup-permissions-api:
     name: Setup permissions API
     runs-on: ubuntu-latest
-    steps:
-      - name: Setup permissions API directory
-        shell: bash
-        run: mkdir permissions_api
-
-      - name: Build and install API
-        uses: ./.github/actions/build_permissions_api
+   
         #working-directory: ./permissions_api
 
   build-test-env:
@@ -28,6 +22,17 @@ jobs:
     needs: setup-permissions-api
     steps:
       - uses: actions/checkout@v3
+
+      ##### Permissions API
+      - name: Setup permissions API directory
+        shell: bash
+        run: mkdir permissions_api
+
+      - name: Build and install API
+        uses: ./.github/actions/build_permissions_api
+
+
+      ##### Permissions API
       - name: Install dependencies
         uses: ./.github/actions/install
 
