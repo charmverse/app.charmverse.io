@@ -3,7 +3,12 @@ import { PageOperations } from '@prisma/client';
 import { v4 } from 'uuid';
 
 import { PageNotFoundError } from 'lib/pages/server';
-import { computeUserPagePermissions, permissionTemplates, upsertPermission } from 'lib/permissions/pages';
+import {
+  AllowedPagePermissions,
+  computeUserPagePermissions,
+  permissionTemplates,
+  upsertPermission
+} from 'lib/permissions/pages';
 import { convertPageToProposal } from 'lib/proposal/convertPageToProposal';
 import { typedKeys } from 'lib/utilities/objects';
 import {
@@ -303,5 +308,35 @@ describe('computeUserPagePermissions', () => {
 
     expect(permissions.grant_permissions).toBe(false);
     expect(permissions.edit_content).toBe(false);
+  });
+
+  it('should take into account public permissions for a guest user', async () => {
+    const guest = await generateSpaceUser({
+      isGuest: true,
+      spaceId: space.id
+    });
+
+    const page = await createPage({
+      createdBy: user.id,
+      spaceId: space.id,
+      pagePermissions: [
+        {
+          public: true,
+          permissionLevel: 'view'
+        }
+      ]
+    });
+
+    const permissions = await computeUserPagePermissions({
+      resourceId: page.id,
+      userId: guest.id
+    });
+
+    expect(permissions).toMatchObject(
+      expect.objectContaining({
+        ...new AllowedPagePermissions().empty,
+        read: true
+      })
+    );
   });
 });

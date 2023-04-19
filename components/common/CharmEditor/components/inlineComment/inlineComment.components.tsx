@@ -47,8 +47,7 @@ export default function InlineCommentThread({ pluginKey }: { pluginKey: PluginKe
   const view = useEditorViewContext();
   const { tooltipContentDOM, show: isVisible, ids } = usePluginState(pluginKey) as InlineCommentPluginState;
   const { threads } = useThreads();
-
-  const cardId = new URLSearchParams(window.location.href).get('cardId');
+  const page = useCurrentPage();
 
   const { currentPageActionDisplay } = usePageActionDisplay();
   // Find unresolved threads in the thread ids and sort them based on desc order of createdAt
@@ -60,7 +59,7 @@ export default function InlineCommentThread({ pluginKey }: { pluginKey: PluginKe
       threadA && threadB ? new Date(threadB.createdAt).getTime() - new Date(threadA.createdAt).getTime() : 0
     );
 
-  if ((currentPageActionDisplay !== 'comments' || cardId) && isVisible && unResolvedThreads.length !== 0) {
+  if ((currentPageActionDisplay !== 'comments' || page) && isVisible && unResolvedThreads.length !== 0) {
     // Only show comment thread on inline comment if the page threads list is not active
     return createPortal(
       <ClickAwayListener
@@ -104,21 +103,23 @@ export function InlineCommentSubMenu({ pluginKey }: { pluginKey: PluginKey }) {
     ]
   });
   const { extractTextFromSelection } = useInlineComment();
-  const { setThreads } = useThreads();
+  const { setThreads, refetchThreads } = useThreads();
   const { currentPageId } = useCurrentPage();
   const isEmpty = checkIsContentEmpty(commentContent);
   const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'));
 
   const handleSubmit = async (e: React.KeyboardEvent<HTMLElement> | React.MouseEvent<HTMLElement, MouseEvent>) => {
     if (!isEmpty) {
-      const cardId = typeof window !== 'undefined' ? new URLSearchParams(window.location.href).get('cardId') : null;
+      const cardId = typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('cardId') : null;
       e.preventDefault();
       const threadWithComment = await charmClient.comments.startThread({
         comment: commentContent,
         context: extractTextFromSelection(),
         pageId: cardId || currentPageId
       });
-      setThreads((_threads) => ({ ..._threads, [threadWithComment.id]: threadWithComment }));
+      // jsut refetch threads for now to make sure member is attached properly - optimize later by not needing to append members to output of useThreads
+      refetchThreads();
+      // setThreads((_threads) => ({ ..._threads, [threadWithComment.id]: threadWithComment }));
       updateInlineComment(threadWithComment.id)(view.state, view.dispatch);
       hideSelectionTooltip(pluginKey)(view.state, view.dispatch, view);
       const tr = view.state.tr.setSelection(new TextSelection(view.state.doc.resolve(view.state.selection.$to.pos)));

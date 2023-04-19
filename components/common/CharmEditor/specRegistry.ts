@@ -54,7 +54,6 @@ export const specRegistry = new SpecRegistry([
   // MAKE SURE THIS IS ALWAYS AT THE TOP! Or deleting all contents will leave the wrong component in the editor
   paragraph.spec(), // OK
   mentionSpecs(), // NO
-  inlineComment.spec(),
   inlineVote.spec(),
   bold.spec(), // OK
   bulletList.spec(), // OK
@@ -88,6 +87,8 @@ export const specRegistry = new SpecRegistry([
   deletion,
   insertion,
   formatChange,
+  // This should be below text format and track specs
+  inlineComment.spec(),
   video.spec(),
   textColor.spec(),
   nft.spec(),

@@ -4,7 +4,7 @@ import nc from 'next-connect';
 import { NotFoundError, onError, onNoMatch } from 'lib/middleware';
 import { computeUserPagePermissions } from 'lib/permissions/pages';
 import { withSessionRoute } from 'lib/session/withSession';
-import { getVotesByPage } from 'lib/votes';
+import { getVotesByPage } from 'lib/votes/getVotesByPage';
 import type { ExtendedVote } from 'lib/votes/interfaces';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });

@@ -20,7 +20,6 @@ import charmClient from 'charmClient';
 import GlobalComponents from 'components/_app/GlobalComponents';
 import { LocalizationProvider } from 'components/_app/LocalizationProvider';
 import { Web3ConnectionManager } from 'components/_app/Web3ConnectionManager';
-import { setTheme as setFocalBoardTheme } from 'components/common/BoardEditor/focalboard/src/theme';
 import FocalBoardProvider from 'components/common/BoardEditor/FocalBoardProvider';
 import ErrorBoundary from 'components/common/errors/ErrorBoundary';
 import IntlProvider from 'components/common/IntlProvider';
@@ -54,7 +53,6 @@ import { createThemeLightSensitive } from 'theme';
 import { createEmotionCache } from 'theme/createEmotionCache';
 import cssVariables from 'theme/cssVariables';
 import { setDarkMode } from 'theme/darkMode';
-import { darkTheme, lightTheme } from 'theme/focalboard/theme';
 
 import '@bangle.dev/tooltip/style.css';
 import '@skiff-org/prosemirror-tables/style/table-filters.css';
@@ -84,28 +82,17 @@ import 'components/common/BoardEditor/focalboard/src/components/kanban/kanbanCol
 import 'components/common/BoardEditor/focalboard/src/components/properties/createdAt/createdAt.scss';
 import 'components/common/BoardEditor/focalboard/src/components/properties/dateRange/dateRange.scss';
 import 'components/common/BoardEditor/focalboard/src/components/properties/lastModifiedAt/lastModifiedAt.scss';
-import 'components/common/BoardEditor/focalboard/src/components/properties/lastModifiedBy/lastModifiedBy.scss';
 import 'components/common/BoardEditor/focalboard/src/components/properties/link/link.scss';
-import 'components/common/BoardEditor/focalboard/src/components/properties/user/user.scss';
-// import 'components/common/BoardEditor/focalboard/src/components/sidebar/deleteBoardDialog.scss';
-// import 'components/common/BoardEditor/focalboard/src/components/sidebar/registrationLink.scss';
-// import 'components/common/BoardEditor/focalboard/src/components/sidebar/sidebar.scss';
-// import 'components/common/BoardEditor/focalboard/src/components/sidebar/sidebarAddBoardMenu.scss';
-// import 'components/common/BoardEditor/focalboard/src/components/sidebar/sidebarBoardItem.scss';
-// import 'components/common/BoardEditor/focalboard/src/components/sidebar/sidebarSettingsMenu.scss';
-// import 'components/common/BoardEditor/focalboard/src/components/sidebar/sidebarUserMenu.scss';
 import 'components/common/BoardEditor/focalboard/src/components/table/calculation/calculationRow.scss';
 import 'components/common/BoardEditor/focalboard/src/components/table/horizontalGrip.scss';
 import 'components/common/BoardEditor/focalboard/src/components/table/table.scss';
 import 'components/common/BoardEditor/focalboard/src/components/table/tableRow.scss';
 import 'components/common/BoardEditor/focalboard/src/components/topBar.scss';
+import 'components/common/BoardEditor/focalboard/src/components/viewHeader/filterEntry.scss';
 import 'components/common/BoardEditor/focalboard/src/components/viewHeader/viewHeader.scss';
 import 'components/common/BoardEditor/focalboard/src/components/viewTitle.scss';
 import 'components/common/BoardEditor/focalboard/src/styles/labels.scss';
-import 'components/common/BoardEditor/focalboard/src/styles/variables.scss';
 import 'components/common/BoardEditor/focalboard/src/styles/_markdown.scss';
-// import 'components/common/BoardEditor/focalboard/src/widgets/buttons/button.scss';
-import 'components/common/BoardEditor/focalboard/src/widgets/buttons/buttonWithMenu.scss';
 import 'components/common/BoardEditor/focalboard/src/widgets/buttons/iconButton.scss';
 import 'components/common/BoardEditor/focalboard/src/widgets/editable.scss';
 import 'components/common/BoardEditor/focalboard/src/widgets/emojiPicker.scss';
@@ -120,7 +107,6 @@ import 'components/common/BoardEditor/focalboard/src/widgets/propertyMenu.scss';
 import 'components/common/BoardEditor/focalboard/src/widgets/switch.scss';
 import 'theme/focalboard/focalboard.button.scss';
 import 'theme/focalboard/focalboard.main.scss';
-import 'theme/focalboard/focalboard.typography.scss';
 
 // Lit Protocol CSS
 import 'lit-share-modal-v3/dist/ShareModal.css';
@@ -173,7 +159,6 @@ export default function App({ Component, emotionCache = clientSideEmotionCache, 
     const muiTheme = createThemeLightSensitive(mode);
 
     if (typeof window !== 'undefined') {
-      setFocalBoardTheme(mode === 'dark' ? darkTheme : lightTheme);
       setSavedDarkMode(mode);
       setDarkMode(mode === 'dark');
     }

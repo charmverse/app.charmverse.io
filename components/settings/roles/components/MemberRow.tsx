@@ -216,7 +216,7 @@ function MemberActions({
                   {action === 'removeFromSpace' && (
                     <StyledListItemText
                       primaryTypographyProps={{ fontWeight: 500, color: 'error' }}
-                      primary='Remove from team'
+                      primary='Remove from space'
                     />
                   )}
                   {action === activeRoleAction && (

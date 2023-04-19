@@ -7,12 +7,12 @@ import type { PageType } from '@prisma/client';
 import { useRouter } from 'next/router';
 import type { Dispatch, ReactNode, SetStateAction } from 'react';
 
-import { usePostPermissions } from 'components/forum/hooks/usePostPermissions';
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useMembers } from 'hooks/useMembers';
 import { usePagePermissions } from 'hooks/usePagePermissions';
+import { usePostPermissions } from 'hooks/usePostPermissions';
 import { useSnackbar } from 'hooks/useSnackbar';
-import type { DuplicatePageResponse } from 'lib/pages';
+import type { DuplicatePageResponse } from 'lib/pages/duplicatePage';
 
 import { Utils } from './BoardEditor/focalboard/src/utils';
 import { DuplicatePageAction } from './DuplicatePageAction';

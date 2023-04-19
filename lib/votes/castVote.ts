@@ -51,7 +51,7 @@ export async function castVote(
     }
   });
 
-  if (isFirstVote && userVote.vote.context === 'proposal') {
+  if (isFirstVote && userVote.vote.pageId && userVote.vote.context === 'proposal') {
     await publishUserProposalEvent({
       scope: WebhookEventNames.ProposalUserVoted,
       userId,

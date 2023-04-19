@@ -6,7 +6,7 @@ import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { computeUserPagePermissions } from 'lib/permissions/pages/page-permission-compute';
 import { withSessionRoute } from 'lib/session/withSession';
-import type { ThreadWithCommentsAndAuthors } from 'lib/threads';
+import type { ThreadWithComments } from 'lib/threads';
 import { toggleThreadStatus } from 'lib/threads';
 import { DataNotFoundError } from 'lib/utilities/errors';
 
@@ -18,7 +18,7 @@ export interface ResolveThreadRequest {
   resolved: boolean;
 }
 
-async function resolveThread(req: NextApiRequest, res: NextApiResponse<ThreadWithCommentsAndAuthors>) {
+async function resolveThread(req: NextApiRequest, res: NextApiResponse<ThreadWithComments>) {
   const userId = req.session.user.id as string;
   const threadId = req.query.id as string;
   const thread = await prisma.thread.findUnique({

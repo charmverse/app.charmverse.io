@@ -57,9 +57,7 @@ function createBoard({
   const cardProperties: IPropertyTemplate[] =
     block?.fields?.cardProperties?.map((o: IPropertyTemplate) => {
       return {
-        id: o.id,
-        name: o.name,
-        type: o.type,
+        ...o,
         options: o.options ? o.options.map((option) => ({ ...option })) : []
       };
     }) ?? [];

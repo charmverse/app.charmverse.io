@@ -101,7 +101,7 @@ interface Props {
 export default function PagePermissions({ pageId, pagePermissions, refreshPermissions, pageType }: Props) {
   const { pages } = usePages();
   const space = useCurrentSpace();
-  const { members } = useMembers();
+  const { members, mutateMembers } = useMembers();
   const popupState = usePopupState({ variant: 'popover', popupId: 'add-a-permission' });
 
   const spaceLevelPermission = pagePermissions.find((permission) => space && permission.spaceId === space?.id);
@@ -257,6 +257,7 @@ export default function PagePermissions({ pageId, pagePermissions, refreshPermis
           pageId={pageId}
           permissionsAdded={() => {
             refreshPermissions();
+            mutateMembers();
             popupState.close();
           }}
         />

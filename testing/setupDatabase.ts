@@ -647,12 +647,19 @@ export async function createVote({
   spaceId,
   createdBy,
   pageId,
+  postId,
   deadline = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
   status = 'InProgress',
   title = 'Vote Title',
   context = 'inline',
   description = null
-}: Partial<Vote> & Pick<Vote, 'spaceId' | 'createdBy' | 'pageId'> & { voteOptions?: string[]; userVotes?: string[] }) {
+}: Partial<Vote> &
+  Pick<Vote, 'spaceId' | 'createdBy'> & {
+    pageId?: string | null;
+    postId?: string | null;
+    voteOptions?: string[];
+    userVotes?: string[];
+  }) {
   return prisma.vote.create({
     data: {
       deadline,
@@ -665,11 +672,20 @@ export async function createVote({
           id: createdBy
         }
       },
-      page: {
-        connect: {
-          id: pageId
-        }
-      },
+      page: pageId
+        ? {
+            connect: {
+              id: pageId
+            }
+          }
+        : undefined,
+      post: postId
+        ? {
+            connect: {
+              id: postId
+            }
+          }
+        : undefined,
       space: {
         connect: {
           id: spaceId

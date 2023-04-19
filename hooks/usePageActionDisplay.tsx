@@ -27,7 +27,7 @@ export function PageActionDisplayProvider({ children }: { children: ReactNode })
   const isLargeScreen = useLgScreen();
   const { currentPageId } = useCurrentPage();
   const { isValidating: isValidatingInlineComments } = useThreads();
-  const { isValidating: isValidatingInlineVotes } = useVotes();
+  const { isValidating: isValidatingInlineVotes } = useVotes({ pageId: currentPageId });
   const { cache } = useSWRConfig();
   const [currentPageActionDisplay, setCurrentPageActionDisplay] =
     useState<IPageActionDisplayContext['currentPageActionDisplay']>(null);

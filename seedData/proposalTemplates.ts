@@ -1,4 +1,4 @@
-import type { ExportedPage } from 'lib/templates/interfaces';
+import type { ExportedPage } from 'lib/templates/exportWorkspacePages';
 
 export const proposalTemplates: ExportedPage[] = [
   {

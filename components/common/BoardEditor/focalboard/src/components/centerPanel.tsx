@@ -8,6 +8,8 @@ import CircularProgress from '@mui/material/CircularProgress';
 import type { Page } from '@prisma/client';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
+import Papa from 'papaparse';
+import type { ChangeEvent } from 'react';
 import React, { useCallback, useEffect, useState } from 'react';
 import Hotkeys from 'react-hot-keys';
 import type { WrappedComponentProps } from 'react-intl';
@@ -29,15 +31,22 @@ import {
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import Button from 'components/common/Button';
 import LoadingComponent from 'components/common/LoadingComponent';
+import {
+  addNewCards,
+  isValidCsvResult
+} from 'components/common/PageLayout/components/Header/components/utils/databasePageOptions';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMembers } from 'hooks/useMembers';
 import { usePages } from 'hooks/usePages';
+import { useSnackbar } from 'hooks/useSnackbar';
+import { useUser } from 'hooks/useUser';
 import type { Block } from 'lib/focalboard/block';
 import type { Board, BoardGroup, IPropertyOption, IPropertyTemplate } from 'lib/focalboard/board';
 import type { BoardView, BoardViewFields } from 'lib/focalboard/boardView';
 import { createCard } from 'lib/focalboard/card';
 import type { Card, CardPage } from 'lib/focalboard/card';
 import { CardFilter } from 'lib/focalboard/cardFilter';
+import log from 'lib/log';
 import { createNewDataSource } from 'lib/pages/createNewDataSource';
 
 import mutator from '../mutator';
@@ -99,6 +108,8 @@ function CenterPanel(props: Props) {
   const space = useCurrentSpace();
   const { pages, updatePage } = usePages();
   const { members } = useMembers();
+  const { showMessage } = useSnackbar();
+  const { user } = useUser();
 
   useEffect(() => {
     if (views.length === 0 && !activeView) {
@@ -391,6 +402,7 @@ function CenterPanel(props: Props) {
     }
     const { view } = await createNewDataSource({ board, updatePage, currentPageType: boardPageType });
     showView(view.id);
+    return view;
   }
 
   function openSelectSource() {
@@ -432,6 +444,57 @@ function CenterPanel(props: Props) {
       }
     }
   }, [`${activeView?.fields.sourceData?.formId}${activeView?.fields.sourceData?.boardId}`]);
+
+  const onCsvImport = (event: ChangeEvent<HTMLInputElement>): void => {
+    if (board && event.target.files && event.target.files[0]) {
+      Papa.parse(event.target.files[0], {
+        header: true,
+        skipEmptyLines: true,
+        worker: event.target.files[0].size > 100000, // 100kb
+        delimiter: '\n', // fallback for a csv with 1 column
+        complete: async (results) => {
+          if (results.errors && results.errors[0]) {
+            log.warn('CSV import failed', { spaceId: space?.id, pageId: board.id, error: results.errors[0] });
+            showMessage(results.errors[0].message ?? 'There was an error importing your csv file.', 'warning');
+            return;
+          }
+
+          if (isValidCsvResult(results)) {
+            if (!user || !space) {
+              throw new Error(
+                'An error occured while importing. Please verify you have a valid user, space and board.'
+              );
+            }
+
+            const spaceId = space?.id;
+            const pageId = board.id;
+
+            showMessage('Importing your csv file...', 'info');
+
+            try {
+              const view = await createDatabase();
+              await addNewCards({
+                board,
+                members,
+                results,
+                spaceId: space?.id,
+                userId: user.id,
+                views: [view]
+              });
+
+              if (spaceId) {
+                charmClient.track.trackAction('import_page_csv', { pageId, spaceId });
+              }
+              showMessage('Your csv file was imported successfully', 'success');
+            } catch (error) {
+              log.error('CSV import failed', { spaceId, pageId, error });
+              showMessage((error as Error).message || 'Import failed', 'error');
+            }
+          }
+        }
+      });
+    }
+  };
 
   const isLoadingSourceData = !activeBoard && state.showSettings !== 'create-linked-view';
 
@@ -545,6 +608,7 @@ function CenterPanel(props: Props) {
                   readOnly={props.readOnly}
                   onSelect={selectViewSource}
                   onCreate={views.length === 0 ? createDatabase : undefined}
+                  onCsvImport={onCsvImport}
                 />
               )}
               {activeBoard && activeView?.fields.viewType === 'board' && (
