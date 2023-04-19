@@ -130,8 +130,8 @@ function exportDataToCSV(data: ProjectData[]) {
     const {  description, website, projectTwitter } = metadata;
     const { name, domain } = space;
 
-    const spaceUrl = `${baseUrl}/${domain}`;
-    const joinUrl = `${baseUrl}/join?domain=${domain}`
+    const spaceUrl = `https://app.charmverse.io/${domain}`;
+    const joinUrl = `https://app.charmverse.io/join?domain=${domain}`
 
     return [projectId, name, projectTwitter,description, website, owners.join(','), spaceUrl, joinUrl, metadataUrl].join(';');
   });
