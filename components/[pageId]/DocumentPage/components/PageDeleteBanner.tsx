@@ -5,6 +5,8 @@ import { useState } from 'react';
 import { mutate } from 'swr';
 
 import charmClient from 'charmClient';
+import { updateBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
+import { useAppDispatch, useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 
@@ -24,11 +26,27 @@ export default function PageDeleteBanner({ pageId }: { pageId: string }) {
   const space = useCurrentSpace();
   const router = useRouter();
   const { pages } = usePages();
+  const dispatch = useAppDispatch();
+
+  const updatedBoards = useAppSelector((state) => {
+    const board = state.boards.boards[pageId];
+    if (board) {
+      return {
+        ...state.boards.boards,
+        [board.id]: {
+          ...board,
+          deletedAt: null
+        }
+      };
+    }
+    return state.boards.boards;
+  });
 
   async function restorePage() {
     if (space) {
       await charmClient.restorePage(pageId);
       await mutate(`pages/${space.id}`);
+      dispatch(updateBoards(Object.values(updatedBoards)));
     }
   }
 

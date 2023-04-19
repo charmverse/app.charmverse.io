@@ -499,7 +499,7 @@ function CenterPanel(props: Props) {
 
   return (
     <>
-      {!!boardPage?.deletedAt && <PageDeleteBanner pageId={boardPage.id} />}
+      {(!!boardPage?.deletedAt || !!board.deletedAt) && <PageDeleteBanner pageId={boardPage?.id ?? board.id} />}
       <div
         // remount components between pages
         className={`BoardComponent ${isEmbedded ? 'embedded-board' : ''}`}

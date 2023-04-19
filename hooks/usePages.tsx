@@ -13,7 +13,6 @@ import { untitledPage } from 'lib/pages/untitledPage';
 import type { WebSocketPayload } from 'lib/websockets/interfaces';
 
 import { useCurrentSpace } from './useCurrentSpace';
-import { useIsAdmin } from './useIsAdmin';
 import { useUser } from './useUser';
 import { useWebSocketClient } from './useWebSocketClient';
 
@@ -50,11 +49,10 @@ export const PagesContext = createContext<Readonly<PagesContext>>({
 });
 
 export function PagesProvider({ children }: { children: ReactNode }) {
-  const isAdmin = useIsAdmin();
   const currentSpace = useCurrentSpace();
   const currentSpaceId = useRef<undefined | string>();
   const router = useRouter();
-  const { user, isLoaded: isUserLoaded } = useUser();
+  const { user } = useUser();
   const { subscribe } = useWebSocketClient();
 
   const { data, mutate: mutatePagesList } = useSWR(
