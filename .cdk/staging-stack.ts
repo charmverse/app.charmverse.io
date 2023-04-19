@@ -94,6 +94,12 @@ export class CdkDeployStack extends Stack {
         value: 't3.micro'
       },
       {
+        // ALB health check
+        namespace: 'aws:elasticbeanstalk:application',
+        optionName: 'Application Healthcheck URL',
+        value: '/api/health'
+      }
+      {
         namespace: 'aws:elasticbeanstalk:application:environment',
         optionName: 'DOMAIN',
         value: 'https://' + deploymentDomain
