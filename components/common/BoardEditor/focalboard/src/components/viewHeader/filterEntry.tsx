@@ -171,6 +171,11 @@ function FilterPropertyValue({
         value={filter.values[0]}
         onChange={updateTextValue}
         placeholder='Value'
+        inputProps={{
+          sx: {
+            fontSize: 'small'
+          }
+        }}
       />
     );
   } else if (propertyDataType === 'boolean') {
@@ -179,13 +184,16 @@ function FilterPropertyValue({
     if (isPropertyTypeMultiSelect) {
       return (
         <Select<string[]>
+          size='small'
           multiple
           displayEmpty
           value={filter.values}
           onChange={updateMultiSelectValue}
           renderValue={(selected) => {
             return selected.length === 0 ? (
-              <Typography color='secondary'>Select an option</Typography>
+              <Typography fontSize='small' color='secondary'>
+                Select an option
+              </Typography>
             ) : (
               <SelectMenuItemsContainer>
                 {selected.map((optionId) => {
@@ -221,13 +229,16 @@ function FilterPropertyValue({
     } else if (isPropertyTypePerson) {
       return (
         <Select<string[]>
+          size='small'
           multiple
           displayEmpty
           value={filter.values}
           onChange={updateMultiSelectValue}
           renderValue={(selectedMemberIds) => {
             return selectedMemberIds.length === 0 ? (
-              <Typography color='secondary'>Select a person</Typography>
+              <Typography color='secondary' fontSize='small'>
+                Select a person
+              </Typography>
             ) : (
               <SelectMenuItemsContainer>
                 {selectedMemberIds.map((selectedMemberId) => {
@@ -260,7 +271,9 @@ function FilterPropertyValue({
           return foundOption ? (
             <Chip size='small' label={foundOption.value} color={focalboardColorsMap[foundOption.color]} />
           ) : (
-            <Typography color='secondary'>Select an option</Typography>
+            <Typography fontSize='small' color='secondary'>
+              Select an option
+            </Typography>
           );
         }}
       >
@@ -289,6 +302,7 @@ function FilterPropertyValue({
             {...props}
             inputProps={{
               ...props.inputProps,
+              sx: { fontSize: 'small' },
               readOnly: true,
               placeholder: 'Select a date'
             }}
@@ -353,7 +367,7 @@ function FilterEntry(props: Props) {
                   sx={{ whiteSpace: 'nowrap', overflow: 'hidden' }}
                 >
                   {iconForPropertyType(template.type, { color: 'secondary' })}
-                  <EllipsisText>{template.name}</EllipsisText>
+                  <EllipsisText fontSize='small'>{template.name}</EllipsisText>
                 </Stack>
               </Button>
               <Menu {...bindMenu(popupState)} sx={{ maxWidth: 350 }}>
@@ -378,7 +392,7 @@ function FilterEntry(props: Props) {
                     }}
                   >
                     <ListItemIcon>{iconForPropertyType(property.type)}</ListItemIcon>
-                    <EllipsisText>{property.name}</EllipsisText>
+                    <EllipsisText fontSize='small'>{property.name}</EllipsisText>
                   </MenuItem>
                 ))}
               </Menu>
@@ -396,7 +410,9 @@ function FilterEntry(props: Props) {
                 variant='outlined'
                 endIcon={<KeyboardArrowDownIcon fontSize='small' />}
               >
-                <EllipsisText variant='subtitle1'>{formatCondition(filter.condition)}</EllipsisText>
+                <EllipsisText fontSize='small' variant='subtitle1'>
+                  {formatCondition(filter.condition)}
+                </EllipsisText>
               </Button>
               <Menu {...bindMenu(popupState)}>
                 {propertyConfigs[template.type].conditions.map((condition) => {
