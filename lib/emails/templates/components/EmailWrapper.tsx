@@ -12,8 +12,8 @@ import {
 } from 'mjml-react';
 import React from 'react';
 
-import { fontFamily } from 'theme';
 import { lightGreyColor, primaryTextColor } from 'theme/colors';
+import { fontFamily } from 'theme/cssVariables';
 
 import styles from '../theme/styles';
 

@@ -2,6 +2,9 @@ import { css } from '@emotion/react';
 
 import * as colors from './colors';
 
+export const fontFamily =
+  'ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"';
+
 function rgbFromHex(hex: string) {
   return hex
     .replace('#', '')
@@ -27,8 +30,7 @@ const globalCSS = css`
     --secondary-text: ${colors.secondaryTextColor};
     --danger-text: ${colors.dangerColor};
 
-    --font-family-default: ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif,
-      'Segoe UI Emoji', 'Segoe UI Symbol';
+    --font-family-default: ${fontFamily};
 
     /* copied from https://mui.com/material-ui/customization/z-index/#main-content */
     --z-index-mobileStepper: 1000;
