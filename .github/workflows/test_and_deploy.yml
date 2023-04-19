@@ -18,9 +18,9 @@ jobs:
         shell: bash
         run: mkdir permissions_api
 
-      - name: Build and install API
-        uses: ./.github/actions/build_permissions_api
-        working-directory: ./permissions_api
+      # - name: Build and install API
+      #   uses: ./.github/actions/build_permissions_api
+      #   working-directory: ./permissions_api
 
   build-test-env:
     name: Build test env
