@@ -1,7 +1,7 @@
 import { css } from '@emotion/react';
 
 import * as colors from './colors';
-import { fontFamily } from './fonts';
+import { defaultFont } from './fonts';
 
 function rgbFromHex(hex: string) {
   return hex
@@ -28,7 +28,7 @@ const globalCSS = css`
     --secondary-text: ${colors.secondaryTextColor};
     --danger-text: ${colors.dangerColor};
 
-    --font-family-default: ${fontFamily};
+    --font-family-default: ${defaultFont};
 
     /* copied from https://mui.com/material-ui/customization/z-index/#main-content */
     --z-index-mobileStepper: 1000;
