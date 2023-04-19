@@ -1,3 +1,8 @@
+import type {
+  PostCategoryPermissionAssignment,
+  AssignedPostCategoryPermission,
+  PostCategoryPermissionFlags
+} from '@charmverse/core/dist/shared';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import Grid from '@mui/material/Grid';
@@ -14,11 +19,6 @@ import Loader from 'components/common/LoadingComponent';
 import Modal from 'components/common/Modal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useRoles } from 'hooks/useRoles';
-import type {
-  AssignedPostCategoryPermission,
-  AvailablePostCategoryPermissionFlags
-} from 'lib/permissions/forum/interfaces';
-import type { PostCategoryPermissionInput } from 'lib/permissions/forum/upsertPostCategoryPermission';
 
 import { PostCategoryPermissionsAddRoles } from './PostCategoryPermissionAddRolesDialog';
 import { PostCategoryRolePermissionRow } from './PostCategoryPermissionRow';
@@ -31,7 +31,7 @@ import type { BulkRolePostCategoryPermissionUpsert } from './shared';
  */
 type Props = {
   postCategory: PostCategory;
-  permissions: AvailablePostCategoryPermissionFlags;
+  permissions: PostCategoryPermissionFlags;
 };
 function PostCategoryPermissions({ postCategory, permissions }: Props) {
   const { data, mutate: mutatePermissions } = useSWR(
@@ -87,7 +87,7 @@ function PostCategoryPermissions({ postCategory, permissions }: Props) {
     mutatePermissions((list) => getMutatedPermissionsList(newPermissions, list));
   }
 
-  async function updatePermission(input: PostCategoryPermissionInput) {
+  async function updatePermission(input: PostCategoryPermissionAssignment) {
     const newPermission = await charmClient.permissions.forum.upsertPostCategoryPermission(input);
     mutatePermissions((list) => getMutatedPermissionsList([newPermission], list));
   }

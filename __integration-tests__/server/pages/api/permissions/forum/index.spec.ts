@@ -1,9 +1,9 @@
 import { prisma } from '@charmverse/core';
+import type { PostCategoryPermissionAssignment } from '@charmverse/core';
 import type { Space } from '@prisma/client';
 import request from 'supertest';
 
 import type { AssignedPostCategoryPermission } from 'lib/permissions/forum/interfaces';
-import type { PostCategoryPermissionInput } from 'lib/permissions/forum/upsertPostCategoryPermission';
 import { upsertPostCategoryPermission } from 'lib/permissions/forum/upsertPostCategoryPermission';
 import type { LoggedInUser } from 'models';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
@@ -46,7 +46,7 @@ describe('POST /api/permissions/forum - Add post category permissions', () => {
       }
     });
 
-    const permissionToCreate: PostCategoryPermissionInput = {
+    const permissionToCreate: PostCategoryPermissionAssignment = {
       assignee: { group: 'space', id: space.id },
       permissionLevel: 'full_access',
       postCategoryId: postCategory.id
@@ -78,7 +78,7 @@ describe('POST /api/permissions/forum - Add post category permissions', () => {
       spaceId: space.id
     });
 
-    const permissionToCreate: PostCategoryPermissionInput = {
+    const permissionToCreate: PostCategoryPermissionAssignment = {
       assignee: { group: 'space', id: space.id },
       permissionLevel: 'full_access',
       postCategoryId: postCategory.id
@@ -109,7 +109,7 @@ describe('POST /api/permissions/forum - Add post category permissions', () => {
     const postCategory = await generatePostCategory({
       spaceId: space.id
     });
-    const permissionToCreate: PostCategoryPermissionInput = {
+    const permissionToCreate: PostCategoryPermissionAssignment = {
       assignee: { group: 'space', id: space.id },
       permissionLevel: 'full_access',
       postCategoryId: postCategory.id

@@ -4,10 +4,7 @@ import { ActionNotPermittedError } from 'lib/middleware';
 import { generateSpaceUser, generateUserAndSpace } from 'testing/setupDatabase';
 import { generateForumPost, generatePostCategory } from 'testing/utils/forums';
 
-import { AvailablePostPermissions } from '../forum/availablePostPermissions.class';
-import { postOperations } from '../forum/interfaces';
 import { upsertPostCategoryPermission } from '../forum/upsertPostCategoryPermission';
-import { upsertPermission } from '../pages';
 import { requestOperations } from '../requestOperations';
 
 let adminUser: User;

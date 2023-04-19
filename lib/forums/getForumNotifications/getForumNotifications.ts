@@ -1,10 +1,9 @@
 import { prisma } from '@charmverse/core';
-import type { Post, PostComment, Space, User, PostCategory } from '@prisma/client';
+import type { Post, PostCategory, PostComment, Space, User } from '@prisma/client';
 
 import type { TaskUser } from 'lib/discussion/interfaces';
 import { getPostCategories } from 'lib/forums/categories/getPostCategories';
 import { checkSpacePermissionsEngine, premiumPermissionsApiClient } from 'lib/permissions/api/routers';
-import { filterAccessiblePostCategories } from 'lib/permissions/forum/filterAccessiblePostCategories';
 import { getUserSpaceNotifications } from 'lib/userNotifications/spaceNotifications';
 import { timeAgo } from 'lib/utilities/dates';
 import { isTruthy } from 'lib/utilities/types';

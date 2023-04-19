@@ -1,7 +1,7 @@
+import { prisma } from '@charmverse/core';
 import type { Prisma } from '@prisma/client';
 import { v4 as uid } from 'uuid';
 
-import { prisma } from 'db';
 import { createPage, generateUserAndSpace } from 'testing/setupDatabase';
 
 import { duplicatePage } from '../duplicatePage';

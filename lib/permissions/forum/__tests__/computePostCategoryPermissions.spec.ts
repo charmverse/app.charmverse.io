@@ -1,6 +1,6 @@
 import { prisma } from '@charmverse/core';
 import type { PostCategoryPermissionLevel, Space, User } from '@prisma/client';
-import { PostCategoryOperation, PostOperation } from '@prisma/client';
+import { PostCategoryOperation } from '@prisma/client';
 import { v4 } from 'uuid';
 
 import { PostCategoryNotFoundError } from 'lib/forums/categories/errors';
@@ -8,12 +8,11 @@ import { addSpaceOperations } from 'lib/permissions/spaces';
 import { InvalidInputError } from 'lib/utilities/errors';
 import { typedKeys } from 'lib/utilities/objects';
 import { generateRole, generateSpaceUser, generateUserAndSpace } from 'testing/setupDatabase';
-import { generateForumPost, generatePostCategory } from 'testing/utils/forums';
+import { generatePostCategory } from 'testing/utils/forums';
 
 import { computePostCategoryPermissions } from '../computePostCategoryPermissions';
-import { computePostPermissions } from '../computePostPermissions';
 import { postCategoryOperations } from '../interfaces';
-import { postCategoryPermissionsMapping, postPermissionsMapping } from '../mapping';
+import { postCategoryPermissionsMapping } from '../mapping';
 import { upsertPostCategoryPermission } from '../upsertPostCategoryPermission';
 
 let adminUser: User;
