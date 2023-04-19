@@ -19,7 +19,7 @@ import {
   settingsHeaderBackgroundColor,
   settingsHeaderBackgroundColorDarkMode
 } from './colors';
-import { fontFamily } from './cssVariables';
+import { defaultFont } from './fonts';
 
 // Re-declare the emotion theme to have the properties of the MaterialUiTheme - https://emotion.sh/docs/typescript#define-a-theme
 declare module '@emotion/react' {
@@ -114,7 +114,7 @@ export const createThemeLightSensitive = (mode: PaletteMode) => {
       }
     },
     typography: {
-      fontFamily,
+      fontFamily: defaultFont,
       fontSize: 12,
       htmlFontSize: 14,
       h1: {

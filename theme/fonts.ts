@@ -6,6 +6,9 @@ import localFont from '@next/font/local';
 // Serif: Lyon-Text, Georgia, ui-serif, serif;
 // Mono: iawriter-mono, Nitti, Menlo, Courier, monospace;
 
+export const defaultFont =
+  'ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"';
+
 export const serifFont = Source_Serif_4({
   subsets: ['latin'],
   variable: '--font-family-serif',

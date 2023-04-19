@@ -1,9 +1,7 @@
 import { css } from '@emotion/react';
 
 import * as colors from './colors';
-
-export const fontFamily =
-  'ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"';
+import { fontFamily } from './fonts';
 
 function rgbFromHex(hex: string) {
   return hex
