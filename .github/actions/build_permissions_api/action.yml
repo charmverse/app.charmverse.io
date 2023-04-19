@@ -2,7 +2,7 @@ name: 'Install dependencies and build the permissions API'
 
 inputs:
   GITHUB_TOKEN:
-    description: '...',
+    description: '...'
     required: false
 
 # defaults
