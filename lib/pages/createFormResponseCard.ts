@@ -36,7 +36,7 @@ export async function createFormResponseCard({
   const fields = (board.fields as any) || {};
   const cardProperties = fields?.cardProperties || [];
   const existingResponseProperties: FormResponseProperty[] =
-    cardProperties.filter((p: FormResponseProperty) => p.isQuestion) || [];
+    cardProperties.filter((p: FormResponseProperty) => formResponses.some((f) => f.question === p.description)) || [];
 
   // Map properties, create new onses for non-existing questions
   const { newProperties, mappedProperties } = mapAndCreateProperties(formResponses, existingResponseProperties);
@@ -107,8 +107,7 @@ function createNewFormProperty(description: string): FormResponseProperty {
     name: description,
     type: 'text',
     options: [],
-    description,
-    isQuestion: true
+    description
   };
 }
 

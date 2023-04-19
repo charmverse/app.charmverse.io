@@ -10,9 +10,10 @@ import {
   validateAllBlockDates,
   isNumber,
   mapCardBoardProperties,
-  selectColors
+  selectColors,
+  transformCsvResults
 } from '../databasePageOptions';
-import { mockCardProperties, mockCsvRow, mockMappedBoardProperties, mockStatusOptions } from '../mocks';
+import { mockCardProperties, mockCsvResults, mockCsvRow, mockMappedBoardProperties, mockStatusOptions } from '../mocks';
 
 describe('Database options util', () => {
   // @TODO -> Remove this after upgrading jest >29 and jest-environment-jsdom >29
@@ -124,6 +125,13 @@ describe('Database options util', () => {
     const cardProperties = createCardFieldProperties(mockCsvRow, mockMappedBoardProperties, [member]);
 
     expect(cardProperties).toEqual(expectedResult);
+  });
+
+  test('transformCsvResults should overwrite the first property and change it to Title', async () => {
+    const { headers, csvData } = transformCsvResults(mockCsvResults);
+
+    expect(headers).toContain('Title');
+    expect(csvData.every((row) => row.Title)).toBeTruthy();
   });
 
   afterEach(() => {
