@@ -12,9 +12,9 @@ runs:
       shell: bash
       run: echo -e "Current directory" && pwd
 
-    - uses: actions/checkout@v3
-      with:
-        repository: charmverse/permission.charmverse.io
+    # - uses: actions/checkout@v3
+    #   with:
+    #     repository: charmverse/permission.charmverse.io
 
     # - uses: actions/setup-node@v3
     #   with:
