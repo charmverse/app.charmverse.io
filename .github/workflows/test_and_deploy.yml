@@ -114,6 +114,8 @@ jobs:
 
       - name: Restore permissions API from cache
         uses: ./.github/actions/build_permissions_api
+        with:
+          GITHUB_SSH_KEY: ${{ secrets.PERMISSIONS_API_SSH_KEY }}
 
       - name: Run ${{matrix.test_name}}
         run: ${{matrix.test_command}}
