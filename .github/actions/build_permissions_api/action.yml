@@ -9,10 +9,6 @@ inputs:
     required: false
     default: "permissions_api"
 
-defaults:
-  run:
-    working-directory: ${{inputs.API_FOLDER}}
-
 runs:
   using: 'composite'
   steps:
@@ -26,6 +22,7 @@ runs:
     - name: Check directory
       shell: bash
       run: ls -a && pwd
+      working-directory: ./${{inputs.API_FOLDER}}
 
     - name: Cache dependencies
       id: cache_permissions_node_modules
@@ -38,20 +35,24 @@ runs:
       shell: bash
       if: steps.cache_permissions_node_modules.outputs.cache-hit != 'true'
       run: echo -e "Install path" && pwd && npm ci --no-audit --no-fund
+      working-directory: ./${{inputs.API_FOLDER}}
 
     - name: Install CharmVerse core
       shell: bash
       run: npm install github:charmverse/common#feat/forum-parity
+      working-directory: ./${{inputs.API_FOLDER}}
 
     #### ---- Start the build process
     - run: echo '${{ env.GIT_DIFF }}'
       shell: bash
+      working-directory: ./${{inputs.API_FOLDER}}
+
     - name: Cache build
       id: cache_permissions_build
       uses: actions/cache@v3
       with:
         path: |
-          permissionsdist
+          ./${{inputs.API_FOLDER}}/dist
           .env.test.local
         # including the app_env helps make sure that deploy_staging.yml does not reuse values from test_and_deploy.yml which are meant for production
         key: permissions-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**/*.[jt]s', '**/*.[jt]sx', '**/*.scss', '!node_modules', '!.next', '!dont_cache') }}-${{ inputs.NEXT_PUBLIC_APP_ENV }}
@@ -60,6 +61,7 @@ runs:
       shell: bash
       if: steps.cache_permissions_build.outputs.cache-hit != 'true'
       run: npm run build:prod
+      working-directory: ./${{inputs.API_FOLDER}}
       env:
         NEXT_PUBLIC_APP_ENV: ${{ inputs.NEXT_PUBLIC_APP_ENV }}
 
