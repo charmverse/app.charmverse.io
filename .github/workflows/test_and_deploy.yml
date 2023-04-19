@@ -15,16 +15,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+        with:
+          path: main
 
       ##### Permissions API
-      - name: Setup permissions API directory
-        shell: bash
-        run: mkdir ./permissions_api
-
       - name: Build and install API
         uses: ./.github/actions/build_permissions_api
-        working-directory: ./permissions_api
-
 
       ##### Permissions API
       - name: Install dependencies

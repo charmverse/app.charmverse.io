@@ -5,6 +5,9 @@ name: 'Install dependencies and build the permissions API'
 #     description: '...',
 #     required: true
 
+# defaults
+
+
 runs:
   using: 'composite'
   steps:
@@ -12,9 +15,10 @@ runs:
       shell: bash
       run: echo -e "Current directory" && pwd
 
-    # - uses: actions/checkout@v3
-    #   with:
-    #     repository: charmverse/permission.charmverse.io
+    - uses: actions/checkout@v3
+      with:
+        repository: charmverse/permission.charmverse.io
+        path: permissions_api
 
     # - uses: actions/setup-node@v3
     #   with:
