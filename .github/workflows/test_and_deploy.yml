@@ -18,6 +18,10 @@ jobs:
         with:
           path: main
 
+      - name: Debug
+        shell: bash
+        run: echo -e "Debug" && pwd && ls -a
+
       ##### Permissions API
       - name: Build and install API
         uses: ./.github/actions/build_permissions_api
