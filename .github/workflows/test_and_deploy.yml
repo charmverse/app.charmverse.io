@@ -10,12 +10,6 @@ on:
     branches: ['**']
 
 jobs:
-  setup-permissions-api:
-    name: Setup permissions API
-    runs-on: ubuntu-latest
-   
-        #working-directory: ./permissions_api
-
   build-test-env:
     name: Build test env
     runs-on: ubuntu-latest
