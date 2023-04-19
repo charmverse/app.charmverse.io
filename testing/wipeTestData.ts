@@ -1,12 +1,10 @@
-import { prisma } from '@charmverse/core';
+import { execSync } from 'child_process';
 
 // require('ts-node/register');
 
 export default async function wipeTestData(): Promise<true> {
-  if (process.env.NODE_ENV !== 'production') {
-    // We have to delete the space first, as otherwise user-created content (such as bounties) will throw an error on delete
-    await prisma.space.deleteMany({});
-    await prisma.user.deleteMany({});
+  if (process.env.NODE_ENV === 'test') {
+    execSync(`dotenv -e .env.test.local -- npm run migrate:reset`);
   }
 
   return true;
