@@ -496,7 +496,6 @@ function CenterPanel(props: Props) {
   };
 
   const isLoadingSourceData = !activeBoard && state.showSettings !== 'create-linked-view';
-
   return (
     <>
       {!!boardPage?.deletedAt && <PageDeleteBanner pageId={boardPage.id} />}
@@ -520,10 +519,11 @@ function CenterPanel(props: Props) {
           </Box>
         )}
         <div className='top-head'>
-          {board && (boardPageType === 'board' || !isEmbedded) && (
+          {board && boardPage && (boardPageType === 'board' || !isEmbedded) && (
             <ViewTitle
-              key={board.id + board.title}
+              key={boardPage.id + boardPage.title}
               board={board}
+              pageTitle={boardPage.title}
               pageIcon={pageIcon}
               readOnly={props.readOnly}
               setPage={props.setPage}
@@ -562,7 +562,7 @@ function CenterPanel(props: Props) {
               {activeBoard && activePage && isEmbedded && boardPageType === 'inline_board' && (
                 <InlineViewTitle
                   key={activePage.id + activePage.title}
-                  board={activeBoard}
+                  pageTitle={activePage.title}
                   readOnly={props.readOnly}
                   setPage={props.setPage}
                 />
