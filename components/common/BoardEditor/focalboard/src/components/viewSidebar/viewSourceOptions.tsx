@@ -60,7 +60,7 @@ export function ViewSourceOptions(props: ViewSourceOptionsProps) {
     trigger: createWebhookApiKey,
     isMutating: isLoadingWebhookApiKeyCreation
   } = useSWRMutation(
-    `/api/pages/${currentPageId}/api-key`,
+    `/api/api-page-key`,
     (_url, { arg }: Readonly<{ arg: { pageId: string; type: ApiPageKey['type'] } }>) =>
       charmClient.createApiPageKey(arg)
   );

@@ -140,7 +140,6 @@ export type PageDetailsUpdates = Partial<PageDetails> & { id: string };
 
 export type FormResponseProperty = IPropertyTemplate & {
   description: string;
-  isQuestion?: true;
 };
 
 export interface IPageMetaWithPermissions extends PageMeta {
