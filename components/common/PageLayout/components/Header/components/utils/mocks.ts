@@ -30,7 +30,7 @@ export const mockCardProperties: IPropertyTemplate[] = [
 ];
 
 export const mockCsvRow = {
-  Name: 'New name',
+  Title: 'New name',
   Number: '32132131',
   'Multi Select': 'human|dog',
   'Assigned person': '8h5t73b6-1d7d-0j6f-a3c4-ef27e624185b',
