@@ -27,12 +27,9 @@ type Props = {
 };
 
 const StyledFilterComponent = styled(Box)`
-  min-width: 430px;
+  min-width: 560px;
+  max-width: 100%;
   padding: 10px;
-
-  ${({ theme }) => theme.breakpoints.down('sm')} {
-    min-width: 350px;
-  }
 `;
 
 const FilterComponent = React.memo((props: Props) => {
