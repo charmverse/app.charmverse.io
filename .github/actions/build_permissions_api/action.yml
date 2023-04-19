@@ -19,6 +19,10 @@ runs:
       shell: bash
       run: cd ./permissions_api
 
+    - name: Check directory
+      shell: bash
+      run: pwd
+
     - name: Cache dependencies
       id: cache_permissions_node_modules
       uses: actions/cache@v3
