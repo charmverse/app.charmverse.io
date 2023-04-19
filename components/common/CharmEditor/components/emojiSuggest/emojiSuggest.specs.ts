@@ -37,6 +37,10 @@ function emojiSpec({ defaultEmoji = '😃' }: { defaultEmoji?: string } = {}): R
       group: 'inline',
       draggable: false,
       atom: true,
+      // format emoji for plain text
+      leafText: (node) => {
+        return node.attrs.emoji;
+      },
       toDOM: (node) => {
         const twemojiImage = getTwitterEmoji(node.attrs.emoji);
         return twemojiImage
