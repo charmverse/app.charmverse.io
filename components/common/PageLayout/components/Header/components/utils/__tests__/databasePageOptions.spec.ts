@@ -131,7 +131,7 @@ describe('Database options util', () => {
     const { headers, csvData } = transformCsvResults(mockCsvResults);
 
     expect(headers).toContain('Title');
-    expect(csvData.find((row) => row.Title)).toBeTruthy();
+    expect(csvData.every((row) => row.Title)).toBeTruthy();
   });
 
   afterEach(() => {
