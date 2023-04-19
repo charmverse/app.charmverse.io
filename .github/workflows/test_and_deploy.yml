@@ -61,9 +61,6 @@ jobs:
         with:
           NEXT_PUBLIC_APP_ENV: 'test'
 
-      - name: Restore permissions API from cache
-        uses: ./.github/actions/build_permissions_api
-
       - name: Run ${{matrix.test_name}}
         run: ${{matrix.test_command}}
 
@@ -114,6 +111,9 @@ jobs:
         uses: ./.github/actions/build
         with:
           NEXT_PUBLIC_APP_ENV: 'test'
+
+      - name: Restore permissions API from cache
+        uses: ./.github/actions/build_permissions_api
 
       - name: Run ${{matrix.test_name}}
         run: ${{matrix.test_command}}
