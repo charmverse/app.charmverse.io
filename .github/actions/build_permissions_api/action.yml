@@ -1,7 +1,7 @@
 name: 'Install dependencies and build the permissions API'
 
 inputs:
-  GITHUB_TOKEN:
+  GITHUB_SSH_KEY:
     description: '...'
     required: false
 
@@ -19,7 +19,7 @@ runs:
       with:
         repository: git@github.com:charmverse/permissions.charmverse.io
         path: permissions_api
-        # ssh-key: 
+        ssh-key: ${{ inputs.GITHUB_SSH_KEY }}
 
     # - uses: actions/setup-node@v3
     #   with:
