@@ -1,3 +1,5 @@
+import type { ParseResult } from 'papaparse';
+
 import type { IPropertyTemplate } from 'lib/focalboard/board';
 
 import type { MappedProperties } from './databasePageOptions';
@@ -30,7 +32,7 @@ export const mockCardProperties: IPropertyTemplate[] = [
 ];
 
 export const mockCsvRow = {
-  Title: 'New name',
+  Name: 'New name',
   Number: '32132131',
   'Multi Select': 'human|dog',
   'Assigned person': '8h5t73b6-1d7d-0j6f-a3c4-ef27e624185b',
@@ -85,5 +87,18 @@ export const mockMappedBoardProperties: { [key: string]: MappedProperties } = {
     type: 'checkbox',
     name: 'Checkbox',
     options: {}
+  }
+};
+
+export const mockCsvResults: ParseResult<Record<string, string>> = {
+  data: [mockCsvRow],
+  errors: [],
+  meta: {
+    delimiter: ',',
+    linebreak: '\r\n',
+    aborted: false,
+    truncated: false,
+    cursor: 179,
+    fields: Object.keys(mockCsvRow)
   }
 };

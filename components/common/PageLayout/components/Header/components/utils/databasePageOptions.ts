@@ -231,9 +231,10 @@ export function createCardFieldProperties(
     }
 
     if (
-      mappedBoardProperties[key]?.type !== 'select' ||
-      mappedBoardProperties[key]?.type !== 'multiSelect' ||
-      mappedBoardProperties[key]?.type !== 'person'
+      (mappedBoardProperties[key]?.type !== 'select' ||
+        mappedBoardProperties[key]?.type !== 'multiSelect' ||
+        mappedBoardProperties[key]?.type !== 'person') &&
+      propId
     ) {
       return {
         ...acc,
@@ -267,6 +268,18 @@ export function deepMergeArrays(arr1: IPropertyTemplate[], arr2: IPropertyTempla
   ];
 }
 
+export function transformCsvResults(results: Papa.ParseResult<Record<string, string>>) {
+  const csvData = results.data.map((csvRow) => {
+    const [key, value] = Object.entries(csvRow)[0];
+    csvRow[titleColumnName] = value;
+    delete csvRow[key];
+    return csvRow;
+  });
+  const headers = results.meta.fields || [];
+  headers[0] = titleColumnName;
+  return { csvData, headers };
+}
+
 export async function addNewCards({
   board,
   views,
@@ -283,14 +296,7 @@ export async function addNewCards({
   members: Member[];
 }) {
   // We assume that the first column is the title so we rename it accordingly
-  const csvData = results.data.map((csvRow) => {
-    const [key, value] = Object.entries(csvRow)[0];
-    csvRow[titleColumnName] = value;
-    delete csvRow[key];
-    return csvRow;
-  });
-  const headers = results.meta.fields || [];
-  headers[0] = titleColumnName;
+  const { csvData, headers } = transformCsvResults(results);
 
   const containsTitleProperty = board.fields.cardProperties.find(
     (cardProperty) => cardProperty.id === Constants.titleColumnId
