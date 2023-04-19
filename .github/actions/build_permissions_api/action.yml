@@ -1,0 +1,52 @@
+name: 'Install dependencies and build the permissions API'
+
+runs:
+  using: 'composite'
+  steps:
+    - uses: actions/checkout@v3
+      repository: charmverse/permission.charmverse.io
+
+    - uses: actions/setup-node@v3
+      with:
+        node-version: 18
+
+    - name: Create .env.test.local file
+      shell: bash
+      run: cp .env.test.local.example .env.test.local
+
+    - name: Cache dependencies
+      id: cache_node_modules
+      uses: actions/cache@v3
+      with:
+        path: ./node_modules
+        key: nodemodules-cache-${{ hashFiles('package-lock.json') }}-${{ hashFiles('patches/**.patch', 'prisma/schema.prisma') }}
+
+    - name: Install npm dependencies
+      shell: bash
+      if: steps.cache_node_modules.outputs.cache-hit != 'true'
+      run: npm ci --no-audit --no-fund
+
+    - name: Install CharmVerse core
+      shell: bash
+      run: npm install github:charmverse/common#feat/forum-parity
+
+    #### ---- Start the build process
+    - run: echo '${{ env.GIT_DIFF }}'
+      shell: bash
+    - name: Cache build
+      id: cache_build
+      uses: actions/cache@v3
+      with:
+        path: |
+          .next
+          .env.test.local
+        # including the app_env helps make sure that deploy_staging.yml does not reuse values from test_and_deploy.yml which are meant for production
+        key: nextjs-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**/*.[jt]s', '**/*.[jt]sx', '**/*.scss', '!node_modules', '!.next', '!dont_cache') }}-${{ inputs.NEXT_PUBLIC_APP_ENV }}
+
+    - name: Build
+      shell: bash
+      if: steps.cache_build.outputs.cache-hit != 'true'
+      run: npm run build:prod
+      env:
+        NEXT_PUBLIC_APP_ENV: ${{ inputs.NEXT_PUBLIC_APP_ENV }}
+
