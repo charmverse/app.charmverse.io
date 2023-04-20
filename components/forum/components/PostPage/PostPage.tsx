@@ -8,6 +8,7 @@ import useSWR from 'swr';
 import charmClient from 'charmClient';
 import { PageTitleInput } from 'components/[pageId]/DocumentPage/components/PageTitleInput';
 import { Container } from 'components/[pageId]/DocumentPage/DocumentPage';
+import { ProposalBanner } from 'components/common/Banners/ProposalBanner';
 import Button from 'components/common/Button';
 import CharmEditor from 'components/common/CharmEditor';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEditor';
@@ -17,7 +18,6 @@ import { processComments, sortComments } from 'components/common/comments/utils'
 import ErrorPage from 'components/common/errors/ErrorPage';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { ScrollableWindow } from 'components/common/PageLayout';
-import { ProposalBanner } from 'components/common/ProposalBanner';
 import UserDisplay from 'components/common/UserDisplay';
 import { PostCommentForm } from 'components/forum/components/PostPage/components/PostCommentForm';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';

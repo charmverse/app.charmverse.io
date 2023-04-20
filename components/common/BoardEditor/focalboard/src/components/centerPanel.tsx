@@ -22,6 +22,7 @@ import { v4 as uuid } from 'uuid';
 import charmClient from 'charmClient';
 import PageBanner, { randomBannerImage } from 'components/[pageId]/DocumentPage/components/PageBanner';
 import PageDeleteBanner from 'components/[pageId]/DocumentPage/components/PageDeleteBanner';
+import { PageWebhookBanner } from 'components/common/Banners/PageWebhookBanner';
 import { createTableView } from 'components/common/BoardEditor/focalboard/src/components/addViewMenu';
 import { getBoard } from 'components/common/BoardEditor/focalboard/src/store/boards';
 import {
@@ -35,6 +36,8 @@ import {
   addNewCards,
   isValidCsvResult
 } from 'components/common/PageLayout/components/Header/components/utils/databasePageOptions';
+import { webhookBaseUrl } from 'config/constants';
+import { useApiPageKeys } from 'hooks/useApiPageKeys';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMembers } from 'hooks/useMembers';
 import { usePages } from 'hooks/usePages';
@@ -112,6 +115,7 @@ function CenterPanel(props: Props) {
   const { members } = useMembers();
   const { showMessage } = useSnackbar();
   const { user } = useUser();
+  const { keys } = useApiPageKeys();
 
   useEffect(() => {
     if (views.length === 0 && !activeView) {
@@ -502,6 +506,9 @@ function CenterPanel(props: Props) {
   return (
     <>
       {!!boardPage?.deletedAt && <PageDeleteBanner pageId={boardPage.id} />}
+      {keys?.map((key) => (
+        <PageWebhookBanner key={key.apiKey} type={key.type} url={`${webhookBaseUrl}/${key?.apiKey}`} />
+      ))}
       <div
         // remount components between pages
         className={`BoardComponent ${isEmbedded ? 'embedded-board' : ''}`}
