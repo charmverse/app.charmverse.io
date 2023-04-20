@@ -1,3 +1,4 @@
+import type { ApiPageKey } from '@prisma/client';
 import { chunk } from 'lodash';
 import unionBy from 'lodash/unionBy';
 import type { ParseResult } from 'papaparse';
@@ -268,10 +269,10 @@ export function deepMergeArrays(arr1: IPropertyTemplate[], arr2: IPropertyTempla
   ];
 }
 
-export function transformCsvResults(results: Papa.ParseResult<Record<string, string>>) {
+export function transformCsvResults(results: Papa.ParseResult<Record<string, string>>, customTitle?: string) {
   const csvData = results.data.map((csvRow) => {
     const [key, value] = Object.entries(csvRow)[0];
-    csvRow[titleColumnName] = value;
+    csvRow[titleColumnName] = customTitle || value;
     delete csvRow[key];
     return csvRow;
   });
@@ -286,7 +287,8 @@ export async function addNewCards({
   results,
   spaceId,
   userId,
-  members
+  members,
+  apiPageKeys
 }: {
   board: Board;
   views: BoardView[] | null;
@@ -294,9 +296,10 @@ export async function addNewCards({
   spaceId: string;
   userId: string;
   members: Member[];
+  apiPageKeys?: ApiPageKey[];
 }) {
   // We assume that the first column is the title so we rename it accordingly
-  const { csvData, headers } = transformCsvResults(results);
+  const { csvData, headers } = transformCsvResults(results, apiPageKeys ? 'Form Response' : undefined);
 
   const containsTitleProperty = board.fields.cardProperties.find(
     (cardProperty) => cardProperty.id === Constants.titleColumnId

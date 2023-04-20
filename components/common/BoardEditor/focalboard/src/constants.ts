@@ -111,6 +111,8 @@ class Constants {
       displayName: 'Svenska (Beta)'
     }
   ];
+
+  static readonly webhookBaseUrl = 'https://app.charmverse.io/api/v1/webhooks/addToDatabase';
 }
 
 export { Constants };

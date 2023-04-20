@@ -20,13 +20,13 @@ import { usePages } from 'hooks/usePages';
 import type { BoardView, BoardViewFields, ViewSourceType } from 'lib/focalboard/boardView';
 import { isTruthy } from 'lib/utilities/types';
 
+import { Constants } from '../../constants';
+
 import { GoogleDataSource } from './GoogleDataSource/GoogleDataSource';
 import { SidebarHeader } from './viewSidebar';
 import { SourceType } from './viewSourceType';
 
 type FormStep = 'select_source' | 'configure_source';
-
-const webhookBaseUrl = 'https://app.charmverse.io/api/v1/webhooks/addToDatabase';
 
 export type DatabaseSourceProps = {
   onCreate?: () => void;
@@ -145,7 +145,7 @@ export function ViewSourceOptions(props: ViewSourceOptionsProps) {
             <br />
             Paste the following URL:
             <br />
-            <i>{`${webhookBaseUrl}/${webhookApi?.apiKey}`}</i>
+            <i>{`${Constants.webhookBaseUrl}/${webhookApi?.apiKey}`}</i>
           </Typography>
         }
         title='Typeform webhook'
