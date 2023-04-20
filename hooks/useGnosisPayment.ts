@@ -12,7 +12,7 @@ import { switchActiveNetwork } from 'lib/blockchain/switchNetwork';
 import useGnosisSafes from './useGnosisSafes';
 
 export type GnosisPaymentProps = {
-  chainId: number;
+  chainId?: number;
   onSuccess: (result: MultiPaymentResult) => void;
   safeAddress: string;
   transactions: (MetaTransactionData & { applicationId: string })[];
@@ -22,13 +22,13 @@ export function useGnosisPayment({ chainId, safeAddress, transactions, onSuccess
   const { account, chainId: connectedChainId, library } = useWeb3AuthSig();
 
   const [safe] = useGnosisSafes([safeAddress]);
-  const network = getChainById(chainId);
-  if (!network?.gnosisUrl) {
+  const network = chainId ? getChainById(chainId) : null;
+  if (chainId && !network?.gnosisUrl) {
     throw new Error(`Unsupported Gnosis network: ${chainId}`);
   }
 
   async function makePayment() {
-    if (chainId !== connectedChainId) {
+    if (chainId && chainId !== connectedChainId) {
       await switchActiveNetwork(chainId);
     }
 
