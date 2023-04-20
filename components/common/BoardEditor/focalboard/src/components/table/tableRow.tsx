@@ -20,8 +20,7 @@ import { useSortable } from '../../hooks/sortable';
 import mutator from '../../mutator';
 import { Utils } from '../../utils';
 import Button from '../../widgets/buttons/button';
-import Editable from '../../widgets/editable';
-import { TextAreaAutoSize } from '../../widgets/TextInput';
+import { TextInput } from '../../widgets/TextInput';
 import PropertyValueElement from '../propertyValueElement';
 
 type Props = {
@@ -169,7 +168,7 @@ function TableRow(props: Props) {
               )}
               <div className='octo-icontitle' style={{ alignSelf: 'flex-start', alignItems: 'flex-start' }}>
                 <PageIcon isEditorEmpty={!hasContent} pageType='page' icon={pageIcon} />
-                {wrapColumn ? <TextAreaAutoSize {...commonProps} /> : <Editable {...commonProps} />}
+                <TextInput {...commonProps} multiline={wrapColumn} />
               </div>
 
               <div className='open-button'>

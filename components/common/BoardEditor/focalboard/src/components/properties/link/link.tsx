@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 import React from 'react';
 
 import { Utils } from '../../../utils';
-import { TextAreaAutoSize, TextInput } from '../../../widgets/TextInput';
+import { TextInput } from '../../../widgets/TextInput';
 
 type Props = {
   value: string;
@@ -14,7 +14,6 @@ type Props = {
   onSave: () => void;
   onCancel: () => void;
   validator: (newValue: string) => boolean;
-  wrapColumn?: boolean;
 };
 
 function URLProperty(props: Props): JSX.Element {
@@ -49,8 +48,7 @@ function URLProperty(props: Props): JSX.Element {
 
   return (
     <div className='URLProperty property-link url'>
-      {(hasValue || props.placeholder) &&
-        (!props.wrapColumn ? <TextInput {...commonProps} /> : <TextAreaAutoSize {...commonProps} />)}
+      <TextInput {...commonProps} />
       {link}
     </div>
   );

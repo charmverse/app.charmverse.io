@@ -12,7 +12,7 @@ import type { Card } from 'lib/focalboard/card';
 import mutator from '../mutator';
 import { OctoUtils } from '../octoUtils';
 import Switch from '../widgets/switch';
-import { TextAreaAutoSize, TextInput } from '../widgets/TextInput';
+import { TextInput } from '../widgets/TextInput';
 
 import CreatedAt from './properties/createdAt/createdAt';
 import CreatedBy from './properties/createdBy/createdBy';
@@ -95,7 +95,7 @@ function PropertyValueElement(props: Props) {
   if (propertyTemplate.type === 'select' || propertyTemplate.type === 'multiSelect') {
     propertyValueElement = (
       <SelectProperty
-        wrapColumn={props.wrapColumn}
+        wrapColumn={displayType === 'details' ? true : props.wrapColumn ?? false}
         multiselect={propertyTemplate.type === 'multiSelect'}
         readOnly={readOnly || !board}
         propertyValue={propertyValue as string}
@@ -124,7 +124,7 @@ function PropertyValueElement(props: Props) {
         onChange={(newValue) => {
           mutator.changePropertyValue(card, propertyTemplate.id, newValue);
         }}
-        wrapColumn={props.wrapColumn}
+        wrapColumn={displayType === 'details' ? true : props.wrapColumn ?? false}
         showEmptyPlaceholder={displayType === 'details'}
       />
     );
@@ -174,8 +174,7 @@ function PropertyValueElement(props: Props) {
       value: value.toString(),
       autoExpand: true,
       onChange: setValue,
-      multiline: displayType === 'details',
-      maxRows: displayType === 'details' ? undefined : 1,
+      multiline: displayType === 'details' ? true : props.wrapColumn ?? false,
       onSave: () => {
         mutator.changePropertyValue(card, propertyTemplate.id, value);
       },
@@ -185,9 +184,9 @@ function PropertyValueElement(props: Props) {
     };
 
     if (propertyTemplate.type === 'url') {
-      propertyValueElement = <URLProperty wrapColumn={props.wrapColumn} {...commonProps} />;
+      propertyValueElement = <URLProperty {...commonProps} />;
     } else {
-      propertyValueElement = props.wrapColumn ? <TextAreaAutoSize {...commonProps} /> : <TextInput {...commonProps} />;
+      propertyValueElement = <TextInput {...commonProps} />;
     }
   } else if (propertyValueElement === null) {
     propertyValueElement = <div className='octo-propertyvalue'>{finalDisplayValue}</div>;
