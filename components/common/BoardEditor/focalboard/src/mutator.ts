@@ -8,6 +8,7 @@ import type { BoardView, ISortOption, KanbanCalculationFields } from 'lib/focalb
 import { createBoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
 import { createCard } from 'lib/focalboard/card';
+import type { FilterClause } from 'lib/focalboard/filterClause';
 import type { FilterGroup } from 'lib/focalboard/filterGroup';
 import type { PageMeta } from 'lib/pages';
 import type { PageContent } from 'lib/prosemirror/interfaces';
@@ -593,7 +594,8 @@ class Mutator {
     cards: Card[],
     propertyTemplate: IPropertyTemplate,
     newType: PropertyType,
-    newName: string
+    newName: string,
+    views: BoardView[]
   ) {
     const titleProperty: IPropertyTemplate = { id: Constants.titleColumnId, name: 'Title', type: 'text', options: [] };
     if (propertyTemplate.type === newType && propertyTemplate.name === newName) {
@@ -678,6 +680,17 @@ class Mutator {
     }
 
     await this.updateBlocks(newBlocks, oldBlocks, 'change property type and name');
+    for (const view of views) {
+      const affectedFilters = view.fields.filter.filters.filter(
+        (filter) => (filter as FilterClause).propertyId !== propertyTemplate.id
+      );
+      if (affectedFilters.length !== view.fields.filter.filters.length) {
+        await this.changeViewFilter(view.id, view.fields.filter, {
+          operation: 'and',
+          filters: affectedFilters
+        });
+      }
+    }
   }
 
   // Views

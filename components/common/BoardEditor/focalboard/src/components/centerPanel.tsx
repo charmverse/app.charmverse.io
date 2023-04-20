@@ -141,7 +141,8 @@ function CenterPanel(props: Props) {
   const _cards = useAppSelector(
     getViewCardsSortedFilteredAndGrouped({
       boardId: activeBoard?.id || '',
-      viewId: activeView?.id || ''
+      viewId: activeView?.id || '',
+      pages
     })
   );
 
@@ -221,7 +222,7 @@ function CenterPanel(props: Props) {
     isTemplate = false
   ) => {
     if (!activeBoard) {
-      throw new Error('No active view');
+      throw new Error('No active board');
     }
     if (!activeView) {
       throw new Error('No active view');

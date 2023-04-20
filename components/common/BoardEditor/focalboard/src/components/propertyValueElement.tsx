@@ -146,7 +146,7 @@ function PropertyValueElement(props: Props) {
   } else if (propertyTemplate.type === 'checkbox') {
     propertyValueElement = (
       <Switch
-        isOn={Boolean(propertyValue)}
+        isOn={propertyValue === 'true'}
         onChanged={(newBool) => {
           const newValue = newBool ? 'true' : '';
           mutator.changePropertyValue(card, propertyTemplate.id, newValue);

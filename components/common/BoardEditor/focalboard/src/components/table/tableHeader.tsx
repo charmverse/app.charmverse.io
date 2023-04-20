@@ -94,7 +94,7 @@ function TableHeader(props: Props): JSX.Element {
 
   async function renameColumn() {
     if (tempName !== template.name) {
-      mutator.changePropertyTypeAndName(board, cards, template, type, tempName);
+      mutator.changePropertyTypeAndName(board, cards, template, type, tempName, views);
     }
     popupState.close();
   }

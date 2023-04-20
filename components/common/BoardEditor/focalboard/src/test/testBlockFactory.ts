@@ -1,3 +1,5 @@
+import { v4 } from 'uuid';
+
 import type { Block } from 'lib/focalboard/block';
 import type { Board, IPropertyOption, IPropertyTemplate } from 'lib/focalboard/board';
 import { createBoard } from 'lib/focalboard/board';
@@ -82,8 +84,9 @@ class TestBlockFactory {
     const filterGroup = createFilterGroup();
     const filter = createFilterClause();
     filter.propertyId = 'property1';
-    filter.condition = 'includes';
+    filter.condition = 'contains';
     filter.values = ['value1'];
+    filter.filterId = v4();
     filterGroup.filters.push(filter);
     view.fields.filter = filterGroup;
 
@@ -118,8 +121,9 @@ class TestBlockFactory {
     const filterGroup = createFilterGroup();
     const filter = createFilterClause();
     filter.propertyId = 'property1';
-    filter.condition = 'includes';
+    filter.condition = 'contains';
     filter.values = ['value1'];
+    filter.filterId = v4();
     filterGroup.filters.push(filter);
     view.fields.filter = filterGroup;
 
