@@ -499,10 +499,6 @@ function CenterPanel(props: Props) {
 
   const isLoadingSourceData = !activeBoard && state.showSettings !== 'create-linked-view';
 
-  if (boardPage?.type === 'inline_board' && boardPage.deletedAt) {
-    return null;
-  }
-
   return (
     <>
       {!!boardPage?.deletedAt && <PageDeleteBanner pageId={boardPage.id} />}
