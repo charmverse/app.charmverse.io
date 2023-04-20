@@ -3,7 +3,8 @@ import Button from '@mui/material/Button';
 import type { MetaTransactionData } from '@safe-global/safe-core-sdk-types';
 
 import type { GnosisPaymentProps } from 'hooks/useGnosisPayment';
-import { useGnosisPayment } from 'hooks/useGnosisPayment';
+import { getPaymentErrorMessage, useGnosisPayment } from 'hooks/useGnosisPayment';
+import { useSnackbar } from 'hooks/useSnackbar';
 
 export interface MultiPaymentResult {
   safeAddress: string;
@@ -23,12 +24,22 @@ export default function MultiPaymentButton({ isLoading, chainId, safeAddress, tr
     transactions
   });
 
+  const { showMessage } = useSnackbar();
+
+  const makeSafePayment = async () => {
+    try {
+      await makePayment();
+    } catch (error: any) {
+      showMessage(getPaymentErrorMessage(error), 'error');
+    }
+  };
+
   return (
     <Tooltip arrow placement='top' title={!safe ? `Connect your wallet to the Gnosis safe: ${safeAddress}` : ''}>
       <span>
         <Button
           disabled={isLoading || !safe || transactions.length === 0 || !chainId || !safeAddress}
-          onClick={makePayment}
+          onClick={makeSafePayment}
         >
           Make Payment ({transactions.length})
         </Button>
