@@ -92,7 +92,8 @@ function CardDetailProperty({
         // Allow dragging past left border
         paddingLeft: '150px',
         position: 'relative',
-        right: '150px'
+        right: '150px',
+        width: 'calc(100% + 175px)'
       }}
       className='octo-propertyrow'
     >
