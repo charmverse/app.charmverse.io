@@ -14,14 +14,6 @@
     "baseUrl": ".",
     "strict": true,
     "target": "es2019",
-    "paths": {
-      "next/font/google": [
-        "node_modules/next/dist/compiled/@next/font/dist/google"
-      ],
-      "next/font/local": [
-        "node_modules/next/dist/compiled/@next/font/dist/local"
-      ],
-    },
     "lib": [
       "dom",
       "dom.iterable",
