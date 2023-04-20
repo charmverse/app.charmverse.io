@@ -27,12 +27,9 @@ type Props = {
 };
 
 const StyledFilterComponent = styled(Box)`
-  min-width: 430px;
+  min-width: 560px;
+  max-width: 100%;
   padding: 10px;
-
-  ${({ theme }) => theme.breakpoints.down('sm')} {
-    min-width: 350px;
-  }
 `;
 
 const FilterComponent = React.memo((props: Props) => {
@@ -91,9 +88,10 @@ const FilterComponent = React.memo((props: Props) => {
               <Stack sx={{ width: 75 }} flexDirection='row' justifyContent='flex-end'>
                 {filterIndex === 1 ? (
                   <Select<FilterGroupOperation>
+                    size='small'
                     value={activeView.fields.filter.operation}
                     onChange={(e) => changeFilterGroupOperation(e.target.value as FilterGroupOperation)}
-                    renderValue={(selected) => <Typography>{capitalize(selected)}</Typography>}
+                    renderValue={(selected) => <Typography fontSize='small'>{capitalize(selected)}</Typography>}
                   >
                     {['Or', 'And'].map((option) => {
                       return (
@@ -104,7 +102,7 @@ const FilterComponent = React.memo((props: Props) => {
                     })}
                   </Select>
                 ) : (
-                  <Typography>
+                  <Typography fontSize='small'>
                     {filterIndex === 0 ? 'Where' : capitalize(activeView.fields.filter.operation)}
                   </Typography>
                 )}
