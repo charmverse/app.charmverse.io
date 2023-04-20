@@ -47,6 +47,7 @@ import { createCard } from 'lib/focalboard/card';
 import type { Card, CardPage } from 'lib/focalboard/card';
 import { CardFilter } from 'lib/focalboard/cardFilter';
 import log from 'lib/log';
+import type { PageMeta } from 'lib/pages';
 import { createNewDataSource } from 'lib/pages/createNewDataSource';
 
 import mutator from '../mutator';
@@ -84,6 +85,7 @@ type Props = WrappedComponentProps &
     disableUpdatingUrl?: boolean;
     maxTabsShown?: number;
     onDeleteView?: (viewId: string) => void;
+    page?: PageMeta;
   };
 
 type State = {
@@ -120,7 +122,7 @@ function CenterPanel(props: Props) {
   }, [activeView?.id, views.length]);
 
   const isEmbedded = !!props.embeddedBoardPath;
-  const boardPage = pages[board.id];
+  const boardPage = pages[board.id] ?? props.page;
   const boardPageType = boardPage?.type;
 
   // for 'linked' boards, each view has its own board which we use to determine the cards to show

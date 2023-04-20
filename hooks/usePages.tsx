@@ -13,7 +13,6 @@ import { untitledPage } from 'lib/pages/untitledPage';
 import type { WebSocketPayload } from 'lib/websockets/interfaces';
 
 import { useCurrentSpace } from './useCurrentSpace';
-import { useIsAdmin } from './useIsAdmin';
 import { useUser } from './useUser';
 import { useWebSocketClient } from './useWebSocketClient';
 
