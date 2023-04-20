@@ -6,13 +6,12 @@ import type { CreateForumPostInput } from 'lib/forums/posts/createForumPost';
 import { createForumPost, trackCreateForumPostEvent } from 'lib/forums/posts/createForumPost';
 import type { ListForumPostsRequest, PaginatedPostList } from 'lib/forums/posts/listForumPosts';
 import { listForumPosts } from 'lib/forums/posts/listForumPosts';
-import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
+import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import {
   checkSpacePermissionsEngine,
   getPermissionsClient,
   premiumPermissionsApiClient
 } from 'lib/permissions/api/routers';
-import { permitOrThrow, requestOperations } from 'lib/permissions/requestOperations';
 import { withSessionRoute } from 'lib/session/withSession';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 import { publishPostEvent } from 'lib/webhookPublisher/publishEvent';
@@ -54,26 +53,19 @@ async function createForumPostController(req: NextApiRequest, res: NextApiRespon
   const userId = req.session.user.id;
 
   const categoryId = req.body.postCategoryId as string;
+  const permissions = await getPermissionsClient({
+    resourceId: req.body.categoryId,
+    resourceIdType: 'post'
+  }).then((client) =>
+    client.forum.computePostCategoryPermissions({
+      resourceId: categoryId,
+      userId
+    })
+  );
 
-  await permitOrThrow({
-    compute: getPermissionsClient({
-      resourceId: req.body.categoryId,
-      resourceIdType: 'post'
-    }).then((client) =>
-      client.forum.computePostCategoryPermissions({
-        resourceId: categoryId,
-        userId
-      })
-    ),
-    operation: ''
-  });
-
-  await requestOperations({
-    resourceType: 'post_category',
-    resourceId: req.body.categoryId as string,
-    userId,
-    operations: ['create_post']
-  });
+  if (!permissions.create_post) {
+    throw new ActionNotPermittedError(`You do not have permissions to create a post`);
+  }
 
   const createdPost = await createForumPost({ ...req.body, createdBy: req.session.user.id });
 
