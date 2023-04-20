@@ -160,6 +160,9 @@ function ViewHeader(props: Props) {
                 vertical: 'bottom',
                 horizontal: 'left'
               }}
+              sx={{
+                overflow: 'auto'
+              }}
             >
               <FilterComponent properties={activeBoard?.fields.cardProperties ?? []} activeView={activeView} />
             </Popover>
