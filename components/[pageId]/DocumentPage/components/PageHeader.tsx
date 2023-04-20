@@ -83,7 +83,7 @@ function PageHeader({ headerImage, icon, readOnly, setPage, title, updatedAt }: 
 
   return (
     <>
-      <EditorHeader>
+      <EditorHeader className='font-family-default'>
         {icon && (
           <MenuWrapper>
             <EmojiIcon size='large' icon={icon} />

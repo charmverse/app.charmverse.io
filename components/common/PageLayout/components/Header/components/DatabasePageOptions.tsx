@@ -28,6 +28,7 @@ import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/sto
 import { getCurrentBoardViews, getView } from 'components/common/BoardEditor/focalboard/src/store/views';
 import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
 import { DuplicatePageAction } from 'components/common/DuplicatePageAction';
+import type { ImportAction } from 'components/common/Modal/ConfirmImportModal';
 import ConfirmImportModal from 'components/common/Modal/ConfirmImportModal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useDateFormatter } from 'hooks/useDateFormatter';
@@ -135,7 +136,7 @@ export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: 
     closeMenu();
   }
 
-  const importCsv = (event: ChangeEvent<HTMLInputElement>, importAction?: 'merge' | 'delete'): void => {
+  const importCsv = (event: ChangeEvent<HTMLInputElement>, importAction?: ImportAction): void => {
     if (board && event.target.files && event.target.files[0]) {
       Papa.parse(event.target.files[0], {
         header: true,

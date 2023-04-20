@@ -2,8 +2,9 @@ import type { Page, PageComment, ProfileItem } from '@prisma/client';
 
 import * as http from 'adapters/http';
 import type { CreateCommentInput, UpdateCommentInput } from 'lib/comments';
-import type { DuplicatePageResponse, IPageWithPermissions, PageDetails, PageMeta } from 'lib/pages';
+import type { IPageWithPermissions, PageDetails, PageMeta } from 'lib/pages';
 import type { PageCommentWithVote } from 'lib/pages/comments/interface';
+import type { DuplicatePageResponse } from 'lib/pages/duplicatePage';
 
 export interface UpdateProfileItemRequest {
   profileItems: Omit<ProfileItem, 'userId'>[];

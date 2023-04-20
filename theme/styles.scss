@@ -56,3 +56,59 @@ input:-webkit-autofill:active {
 .not-selectable {
   user-select: none;
 }
+
+
+/* used in Charm Editor based on page.familyFont */
+.font-family-serif {
+  font-family: var(--font-family-serif);
+
+  font-size: 17px;
+  line-height: 1.6;
+
+  &.font-size-small {
+    font-size: 15px;
+  }
+
+  // override MUI typography
+  .MuiInput-input,
+  .MuiTypography-root,
+  .MuiButton-root {
+    font-family: var(--font-family-serif);
+  }
+}
+
+.font-family-mono {
+  font-family: var(--font-family-mono);
+
+  font-size: 16px;
+  line-height: 1.6;
+
+  &.font-size-small {
+    font-size: 14px;
+  }
+
+  // override MUI typography
+  .MuiInput-input,
+  .MuiTypography-root,
+  .MuiButton-root {
+    font-family: var(--font-family-mono);
+  }
+}
+
+.font-family-default {
+  font-family: var(--font-family-default);
+
+  font-size: 16px;
+  line-height: 1.5;
+
+  &.font-size-small {
+    font-size: 14px;
+  }
+
+  // override MUI typography
+  .MuiInput-input,
+  .MuiTypography-root,
+  .MuiButton-root {
+    font-family: var(--font-family-default);
+  }
+}

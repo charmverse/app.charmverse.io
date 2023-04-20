@@ -19,16 +19,14 @@ import {
   settingsHeaderBackgroundColor,
   settingsHeaderBackgroundColorDarkMode
 } from './colors';
-import { darkTheme as darkThemeFocalBoard, lightTheme as lightThemeFocalBoard } from './focalboard/theme';
+import { defaultFont } from './fonts';
 
 // Re-declare the emotion theme to have the properties of the MaterialUiTheme - https://emotion.sh/docs/typescript#define-a-theme
 declare module '@emotion/react' {
   export interface Theme extends MaterialUITheme {}
 }
 
-type FocalBoardColors = typeof darkThemeFocalBoard;
-
-interface CustomColors extends FocalBoardColors, Record<BrandColor, any> {
+interface CustomColors extends Record<BrandColor, any> {
   settingsHeader: {
     background: string;
   };
@@ -96,8 +94,6 @@ declare module '@mui/material/SvgIcon' {
   export interface SvgIconPropsColorOverrides extends Record<BrandColor, true> {}
 }
 
-export const fontFamily =
-  'ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"';
 // Explore all theme options: https://material-ui.com/customization/default-theme/
 export const createThemeLightSensitive = (mode: PaletteMode) => {
   const contrastText = mode === 'dark' ? '#fff' : '#000';
@@ -118,7 +114,7 @@ export const createThemeLightSensitive = (mode: PaletteMode) => {
       }
     },
     typography: {
-      fontFamily,
+      fontFamily: defaultFont,
       fontSize: 12,
       htmlFontSize: 14,
       h1: {
@@ -239,8 +235,7 @@ export const createThemeLightSensitive = (mode: PaletteMode) => {
         text: mode === 'dark' ? '#FFFFFF70' : '#37352FA6',
         highlightedText: mode === 'dark' ? '#FFFFFFCF' : '#37352F',
         fontSize: '14px'
-      },
-      ...(mode === 'dark' ? darkThemeFocalBoard : lightThemeFocalBoard)
+      }
     },
     components: {
       MuiAvatar: {
@@ -259,6 +254,15 @@ export const createThemeLightSensitive = (mode: PaletteMode) => {
         styleOverrides: {
           popper: {
             zIndex: 'var(--z-index-speedDial)'
+          }
+        }
+      },
+      MuiPaper: {
+        styleOverrides: {
+          // Disable the lightening of the background when elevation is applied
+          // source: https://mui.com/material-ui/react-paper/
+          root: {
+            backgroundImage: 'none'
           }
         }
       },

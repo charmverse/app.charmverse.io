@@ -113,7 +113,7 @@ export default function DatabaseView({ containerWidth, readOnly: readOnlyOverrid
 
   const { permissions: currentPagePermissions } = usePagePermissions({ pageIdOrPath: pageId });
 
-  const debouncedPageUpdate = useCallback(() => {
+  const debouncedPageUpdate = useMemo(() => {
     return debouncePromise(async (updates: Partial<Page>) => {
       const updatedPage = await updatePage({ id: pageId, ...updates });
 

@@ -6,7 +6,8 @@ import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
 import { PageActions } from 'components/common/PageActions';
 import { usePageDetails } from 'hooks/usePageDetails';
 import type { BountyWithDetails } from 'lib/bounties';
-import type { DuplicatePageResponse, PageMeta } from 'lib/pages';
+import type { PageMeta } from 'lib/pages';
+import type { DuplicatePageResponse } from 'lib/pages/duplicatePage';
 import { fancyTrim } from 'lib/utilities/strings';
 
 import BountyStatusBadge from './BountyStatusBadge';
