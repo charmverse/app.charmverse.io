@@ -1,6 +1,6 @@
 /* eslint-disable camelcase */
-import { Source_Serif_4 } from '@next/font/google';
-import localFont from '@next/font/local';
+import { Source_Serif_4 } from 'next/font/google';
+import localFont from 'next/font/local';
 
 // Fonts from Notion:
 // Serif: Lyon-Text, Georgia, ui-serif, serif;
