@@ -98,7 +98,7 @@ export class CdkDeployStack extends Stack {
         namespace: 'aws:elasticbeanstalk:application',
         optionName: 'Application Healthcheck URL',
         value: '/api/health'
-      }
+      },
       {
         namespace: 'aws:elasticbeanstalk:application:environment',
         optionName: 'DOMAIN',
