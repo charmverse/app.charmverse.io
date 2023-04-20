@@ -36,6 +36,7 @@ import {
   addNewCards,
   isValidCsvResult
 } from 'components/common/PageLayout/components/Header/components/utils/databasePageOptions';
+import { webhookBaseUrl } from 'config/constants';
 import { useApiPageKeys } from 'hooks/useApiPageKeys';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMembers } from 'hooks/useMembers';
@@ -52,7 +53,6 @@ import log from 'lib/log';
 import type { PageMeta } from 'lib/pages';
 import { createNewDataSource } from 'lib/pages/createNewDataSource';
 
-import { Constants } from '../constants';
 import mutator from '../mutator';
 import { addCard as _addCard, addTemplate } from '../store/cards';
 import { updateView } from '../store/views';
@@ -506,7 +506,7 @@ function CenterPanel(props: Props) {
     <>
       {!!boardPage?.deletedAt && <PageDeleteBanner pageId={boardPage.id} />}
       {keys?.map((key) => (
-        <PageWebhookBanner key={key.apiKey} type={key.type} url={`${Constants.webhookBaseUrl}/${key?.apiKey}`} />
+        <PageWebhookBanner key={key.apiKey} type={key.type} url={`${webhookBaseUrl}/${key?.apiKey}`} />
       ))}
       <div
         // remount components between pages

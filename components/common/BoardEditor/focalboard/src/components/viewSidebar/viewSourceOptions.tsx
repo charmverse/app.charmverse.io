@@ -15,12 +15,11 @@ import useSWRMutation from 'swr/mutation';
 import charmClient from 'charmClient';
 import PagesList from 'components/common/CharmEditor/components/PageList';
 import ConfirmApiPageKeyModal from 'components/common/Modal/ConfirmApiPageKeyModal';
+import { webhookBaseUrl } from 'config/constants';
 import { useCurrentPage } from 'hooks/useCurrentPage';
 import { usePages } from 'hooks/usePages';
 import type { BoardView, BoardViewFields, ViewSourceType } from 'lib/focalboard/boardView';
 import { isTruthy } from 'lib/utilities/types';
-
-import { Constants } from '../../constants';
 
 import { GoogleDataSource } from './GoogleDataSource/GoogleDataSource';
 import { SidebarHeader } from './viewSidebar';
@@ -145,7 +144,7 @@ export function ViewSourceOptions(props: ViewSourceOptionsProps) {
             <br />
             Paste the following URL:
             <br />
-            <i>{`${Constants.webhookBaseUrl}/${webhookApi?.apiKey}`}</i>
+            <i>{`${webhookBaseUrl}/${webhookApi?.apiKey}`}</i>
           </Typography>
         }
         title='Typeform webhook'
