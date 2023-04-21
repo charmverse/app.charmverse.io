@@ -1,15 +1,28 @@
 services:
-  webapp:
+  webapp_base:
     image: '310849459438.dkr.ecr.us-east-1.amazonaws.com/charmverse-web3-workspace:${IMGTAG}'
     ports:
       - '80:3000'
-    command: ['npm', 'run', '${NPM_SCRIPT}']
-    labels:
-      com.datadoghq.ad.logs: '[{"source": "nodejs", "service": "${SERVICE_NAME}"}]'
     volumes:
       - $PWD/.env:/app/.env
     env_file:
       - '.env'
+
+  webapp:
+    extends:
+      service: webapp_base
+    labels:
+      com.datadoghq.ad.logs: '[{"source": "nodejs", "service": "webapp"}]'
+    command: ['npm', 'run', '${NPM_SCRIPT}']
+    profiles:
+      - webapp
+
+  cron:
+    extends:
+      service: webapp_base
+    labels:
+      com.datadoghq.ad.logs: '[{"source": "nodejs", "service": "cron"}]'
+    command: ['npm', 'run', '${NPM_SCRIPT}']
     profiles:
       - stg
       - tst
