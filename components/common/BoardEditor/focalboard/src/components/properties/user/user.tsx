@@ -19,12 +19,15 @@ type Props = {
   wrapColumn?: boolean;
 };
 
-const StyledUserPropertyContainer = styled(Box, { shouldForwardProp: (prop) => prop !== 'hideInput' })<{
+const StyledUserPropertyContainer = styled(Box, {
+  shouldForwardProp: (prop) => prop !== 'hideInput'
+})<{
+  hideOverflow: boolean;
   hideInput?: boolean;
 }>`
   width: 100%;
   height: 100%;
-  overflow: hidden;
+  overflow: ${({ hideOverflow }) => (hideOverflow ? 'hidden' : 'initial')};
   & .MuiInputBase-root,
   & input.MuiInputBase-input {
     background: inherit;
@@ -136,6 +139,7 @@ function UserProperty(props: Props): JSX.Element | null {
 
   return (
     <StyledUserPropertyContainer
+      hideOverflow={props.displayType === 'table'}
       onClick={() => {
         // Only register click if display type is details or table
         if (!props.readOnly) {

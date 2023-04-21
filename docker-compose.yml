@@ -6,6 +6,7 @@ services:
     command: ['npm', 'run', '${NPM_SCRIPT}']
     labels:
       com.datadoghq.ad.logs: '[{"source": "nodejs", "service": "${SERVICE_NAME}"}]'
+      com.datadoghq.tags.service: "${SERVICE_NAME}"
     volumes:
       - $PWD/.env:/app/.env
     env_file:
@@ -43,11 +44,14 @@ services:
   datadog-agent:
     image: public.ecr.aws/datadog/agent
     hostname: datadog-agent
+    labels:
+      com.datadoghq.ad.logs: '[{"type":"file", "source": "os", "service": "syslog", "sourcecategory": "${SERVICE_NAME}", "path": "/host/var/log/messages"}]'
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - /proc/:/host/proc/:ro
       - /sys/fs/cgroup/:/host/sys/fs/cgroup:ro
       - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/log:/host/var/log:ro
       - $PWD/.env:/app/.env
     env_file:
       - '.env'
