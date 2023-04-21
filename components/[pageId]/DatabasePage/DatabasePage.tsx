@@ -24,8 +24,6 @@ import type { PageMeta } from 'lib/pages';
 import type { IPagePermissionFlags } from 'lib/permissions/pages';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
-import PageDeleteBanner from '../DocumentPage/components/PageDeleteBanner';
-
 /**
  *
  * For the original version of this file, see src/boardPage.tsx in focalboard
@@ -164,6 +162,7 @@ export function DatabasePage({ page, setPage, readOnly = false, pagePermissions 
             showView={showView}
             activeView={activeView || undefined}
             views={boardViews}
+            page={page}
           />
           {typeof shownCardId === 'string' && shownCardId.length !== 0 && (
             <CardDialog

@@ -15,6 +15,7 @@ import useSWRMutation from 'swr/mutation';
 import charmClient from 'charmClient';
 import PagesList from 'components/common/CharmEditor/components/PageList';
 import ConfirmApiPageKeyModal from 'components/common/Modal/ConfirmApiPageKeyModal';
+import { webhookBaseUrl } from 'config/constants';
 import { useCurrentPage } from 'hooks/useCurrentPage';
 import { usePages } from 'hooks/usePages';
 import type { BoardView, BoardViewFields, ViewSourceType } from 'lib/focalboard/boardView';
@@ -25,8 +26,6 @@ import { SidebarHeader } from './viewSidebar';
 import { SourceType } from './viewSourceType';
 
 type FormStep = 'select_source' | 'configure_source';
-
-const webhookBaseUrl = 'https://app.charmverse.io/api/v1/webhooks/addToDatabase';
 
 export type DatabaseSourceProps = {
   onCreate?: () => void;

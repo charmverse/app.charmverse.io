@@ -19,7 +19,8 @@ import {
   Popover,
   Stack,
   TextField,
-  Typography
+  Typography,
+  Switch
 } from '@mui/material';
 import { bindPopover, bindToggle, usePopupState } from 'material-ui-popup-state/hooks';
 import React, { useMemo, useRef, useState } from 'react';
@@ -60,6 +61,7 @@ function TableHeader(props: Props): JSX.Element {
   const columnWidth = (_templateId: string): number => {
     return Math.max(Constants.minColumnWidth, (activeView.fields.columnWidths[_templateId] || 0) + props.offset);
   };
+
   const [tempName, setTempName] = useState(props.name || '');
 
   const popupState = usePopupState({ variant: 'popper', popupId: 'iframe-selector' });
@@ -92,7 +94,7 @@ function TableHeader(props: Props): JSX.Element {
 
   async function renameColumn() {
     if (tempName !== template.name) {
-      mutator.changePropertyTypeAndName(board, cards, template, type, tempName);
+      mutator.changePropertyTypeAndName(board, cards, template, type, tempName, views);
     }
     popupState.close();
   }
@@ -119,6 +121,15 @@ function TableHeader(props: Props): JSX.Element {
       { propertyId: templateId, reversed: props.sorted === 'up' }
     ]);
     e.stopPropagation();
+  }
+
+  async function toggleColumnWrap(
+    e: React.ChangeEvent<HTMLInputElement> | React.MouseEvent<HTMLLIElement, MouseEvent>
+  ) {
+    e.stopPropagation();
+    e.preventDefault();
+    const columnWrappedIds = activeView.fields.columnWrappedIds ?? [];
+    await mutator.toggleColumnWrap(activeView.id, templateId, columnWrappedIds);
   }
 
   const popupContent = (
@@ -241,6 +252,18 @@ function TableHeader(props: Props): JSX.Element {
             <Typography variant='subtitle1'>Delete</Typography>
           </MenuItem>
         ]}
+        <Divider />
+        <MenuItem
+          key='toggle-wrap-column'
+          onClick={toggleColumnWrap}
+          sx={{ display: 'flex', justifyContent: 'space-between' }}
+        >
+          <Typography variant='subtitle1'>Wrap column</Typography>
+          <Switch
+            checked={(activeView.fields.columnWrappedIds ?? []).includes(templateId)}
+            onChange={toggleColumnWrap}
+          />
+        </MenuItem>
       </MenuList>
     </Stack>
   );
