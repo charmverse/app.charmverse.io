@@ -1,3 +1,5 @@
+import type { JestConfigWithTsJest } from 'ts-jest';
+
 import createJestConfig from 'testing/createJestConfig';
 /*
  * For a detailed explanation regarding each configuration property and type check, visit:
@@ -8,7 +10,7 @@ import createJestConfig from 'testing/createJestConfig';
  * Configuration copied from
  * https://nextjs.org/docs/testing
  * */
-export const jestConfig = {
+export const jestConfig: JestConfigWithTsJest = {
   // Automatically clear mock calls, instances and results before every test
   clearMocks: true,
 
@@ -26,7 +28,12 @@ export const jestConfig = {
   // The test environment that will be used for testing
   testEnvironment: 'jest-environment-node',
 
-  // The glob patterns Jest uses to detect test files
+  moduleNameMapper: {
+    '^@prisma/client$': [
+      '<rootDir>/node_modules/@charmverse/core/node_modules/@prisma/client',
+      '<rootDir>/node_modules/@prisma/client'
+    ]
+  },
   testMatch: ['**/lib/**/*.spec.ts', '**/testing/**/*.spec.ts', '**/background/**/*.spec.ts'],
 
   testTimeout: 30000
