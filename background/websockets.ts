@@ -34,9 +34,9 @@ relay.bindServer(io);
 server.listen(port);
 
 log.info(`[server] Web socket server running in ${appEnv} listening to port: `, port);
-setTimeout(() => {
-  process.kill(process.pid, 'SIGTERM');
-}, 10000);
+// setTimeout(() => {
+//   process.kill(process.pid, 'SIGTERM');
+// }, 10000);
 
 function cleanup() {
   log.info('[server] Closing server connections...');
