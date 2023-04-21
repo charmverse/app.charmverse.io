@@ -12,7 +12,7 @@ import { switchActiveNetwork } from 'lib/blockchain/switchNetwork';
 import useGnosisSafes from './useGnosisSafes';
 
 export type GnosisPaymentProps = {
-  chainId: number;
+  chainId?: number;
   onSuccess: (result: MultiPaymentResult) => void;
   safeAddress: string;
   transactions: (MetaTransactionData & { applicationId: string })[];
@@ -22,13 +22,13 @@ export function useGnosisPayment({ chainId, safeAddress, transactions, onSuccess
   const { account, chainId: connectedChainId, library } = useWeb3AuthSig();
 
   const [safe] = useGnosisSafes([safeAddress]);
-  const network = getChainById(chainId);
-  if (!network?.gnosisUrl) {
+  const network = chainId ? getChainById(chainId) : null;
+  if (chainId && !network?.gnosisUrl) {
     throw new Error(`Unsupported Gnosis network: ${chainId}`);
   }
 
   async function makePayment() {
-    if (chainId !== connectedChainId) {
+    if (chainId && chainId !== connectedChainId) {
       await switchActiveNetwork(chainId);
     }
 
@@ -66,7 +66,7 @@ export function useGnosisPayment({ chainId, safeAddress, transactions, onSuccess
     } catch (e: any) {
       log.error(e);
 
-      throw new Error(`There was an issue with payment: ${e.message}`);
+      throw new Error(e);
     }
   }
 
@@ -74,4 +74,34 @@ export function useGnosisPayment({ chainId, safeAddress, transactions, onSuccess
     safe,
     makePayment
   };
+}
+
+export function getPaymentErrorMessage(error: any) {
+  const errorMessage = extractWalletErrorMessage(error);
+
+  if (errorMessage.toLowerCase().includes('underlying network changed')) {
+    return "You've changed your active network.\r\nRe-select 'Make payment' to complete this transaction";
+  }
+
+  return errorMessage;
+}
+
+function extractWalletErrorMessage(error: any): string {
+  if (error?.code === 'INSUFFICIENT_FUNDS') {
+    return 'You do not have sufficient funds to perform this transaction';
+  } else if (error?.code === 4001) {
+    return 'You rejected the transaction';
+  } else if (error?.code === -32602) {
+    return 'A valid recipient must be provided';
+  } else if (error?.reason) {
+    return error.reason;
+  } else if (error?.message) {
+    return error.message;
+  } else if (typeof error === 'object') {
+    return JSON.stringify(error);
+  } else if (typeof error === 'string') {
+    return error;
+  } else {
+    return 'An unknown error occurred';
+  }
 }

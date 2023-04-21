@@ -381,70 +381,66 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
 
   const documentOptions = (
     <List data-test='header--page-actions' dense>
-      {isLargeScreen && (
-        <>
-          <Box px={2.5} mb={1}>
-            <Typography variant='caption'>Style</Typography>
-            <Box display='flex' mt={0.5}>
-              <StyledFontButton
-                size='small'
-                color={basePage?.fontFamily === 'default' ? 'primary' : 'secondary'}
-                variant='text'
-                onClick={() => setFontFamily('default')}
-              >
-                <FontFamilyExample>Aa</FontFamilyExample>
-                Default
-              </StyledFontButton>
-              <StyledFontButton
-                size='small'
-                color={basePage?.fontFamily === 'serif' ? 'primary' : 'secondary'}
-                variant='text'
-                onClick={() => setFontFamily('serif')}
-              >
-                <FontFamilyExample className='font-family-serif'>Aa</FontFamilyExample>
-                Serif
-              </StyledFontButton>
-              <StyledFontButton
-                size='small'
-                color={basePage?.fontFamily === 'mono' ? 'primary' : 'secondary'}
-                variant='text'
-                onClick={() => setFontFamily('mono')}
-              >
-                <FontFamilyExample className='font-family-mono'>Aa</FontFamilyExample>
-                Mono
-              </StyledFontButton>
-            </Box>
-          </Box>
-          <Divider />
-          <ListItemButton>
-            <FormControlLabel
-              sx={{
-                marginLeft: 0.5,
-                width: '100%',
-                display: 'flex',
-                justifyContent: 'space-between'
-              }}
-              labelPlacement='start'
-              control={<Switch size='small' checked={!!basePage?.fontSizeSmall} onChange={toggleSmallFont} />}
-              label={<Typography variant='body2'>Small text</Typography>}
-            />
-          </ListItemButton>
-          <ListItemButton>
-            <FormControlLabel
-              sx={{
-                marginLeft: 0.5,
-                width: '100%',
-                display: 'flex',
-                justifyContent: 'space-between'
-              }}
-              labelPlacement='start'
-              control={<Switch size='small' checked={!!basePage?.fullWidth} onChange={toggleFullWidth} />}
-              label={<Typography variant='body2'>Full Width</Typography>}
-            />
-          </ListItemButton>
-          <Divider />
-        </>
-      )}
+      <Box px={2.5} mb={1}>
+        <Typography variant='caption'>Style</Typography>
+        <Box display='flex' mt={0.5}>
+          <StyledFontButton
+            size='small'
+            color={basePage?.fontFamily === 'default' ? 'primary' : 'secondary'}
+            variant='text'
+            onClick={() => setFontFamily('default')}
+          >
+            <FontFamilyExample>Aa</FontFamilyExample>
+            Default
+          </StyledFontButton>
+          <StyledFontButton
+            size='small'
+            color={basePage?.fontFamily === 'serif' ? 'primary' : 'secondary'}
+            variant='text'
+            onClick={() => setFontFamily('serif')}
+          >
+            <FontFamilyExample className='font-family-serif'>Aa</FontFamilyExample>
+            Serif
+          </StyledFontButton>
+          <StyledFontButton
+            size='small'
+            color={basePage?.fontFamily === 'mono' ? 'primary' : 'secondary'}
+            variant='text'
+            onClick={() => setFontFamily('mono')}
+          >
+            <FontFamilyExample className='font-family-mono'>Aa</FontFamilyExample>
+            Mono
+          </StyledFontButton>
+        </Box>
+      </Box>
+      <Divider />
+      <ListItemButton>
+        <FormControlLabel
+          sx={{
+            marginLeft: 0.5,
+            width: '100%',
+            display: 'flex',
+            justifyContent: 'space-between'
+          }}
+          labelPlacement='start'
+          control={<Switch size='small' checked={!!basePage?.fontSizeSmall} onChange={toggleSmallFont} />}
+          label={<Typography variant='body2'>Small text</Typography>}
+        />
+      </ListItemButton>
+      <ListItemButton>
+        <FormControlLabel
+          sx={{
+            marginLeft: 0.5,
+            width: '100%',
+            display: 'flex',
+            justifyContent: 'space-between'
+          }}
+          labelPlacement='start'
+          control={<Switch size='small' checked={!!basePage?.fullWidth} onChange={toggleFullWidth} />}
+          label={<Typography variant='body2'>Full Width</Typography>}
+        />
+      </ListItemButton>
+      <Divider />
       <ListItemButton
         onClick={() => {
           setCurrentPageActionDisplay('comments');

@@ -5,14 +5,20 @@
       "module": "commonjs",
       "jsxImportSource": ""
     },
-    "require": ["tsconfig-paths/register"]
+    "require": [
+      "tsconfig-paths/register"
+    ]
   },
   "compilerOptions": {
     "importHelpers": true,
     "baseUrl": ".",
     "strict": true,
     "target": "es2019",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "noEmit": true,
@@ -20,7 +26,7 @@
     "module": "esnext",
     "moduleResolution": "node",
     "resolveJsonModule": true,
-    "jsx": "preserve",
+    "jsx": "react-jsx",
     "jsxImportSource": "@emotion/react",
     "allowJs": true,
     "incremental": true,
@@ -29,6 +35,13 @@
       "@prisma/client": ["./node_modules/@prisma/client", "./node_modules/@charmverse/core/node_modules/@prisma/client"],
     }
   },
-  "exclude": ["node_modules", "**/focalboard/src/**/*.spec.ts", "**/focalboard/src/**/*.spec.tsx"],
-  "include": ["**/*.ts", "**/*.tsx"]
+  "exclude": [
+    "node_modules",
+    "**/focalboard/src/**/*.spec.ts",
+    "**/focalboard/src/**/*.spec.tsx"
+  ],
+  "include": [
+    "**/*.ts",
+    "**/*.tsx"
+  ]
 }

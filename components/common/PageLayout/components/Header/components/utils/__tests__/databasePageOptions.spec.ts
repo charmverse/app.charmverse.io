@@ -127,11 +127,13 @@ describe('Database options util', () => {
     expect(cardProperties).toEqual(expectedResult);
   });
 
-  test('transformCsvResults should overwrite the first property and change it to Title', async () => {
-    const { headers, csvData } = transformCsvResults(mockCsvResults);
+  test('transformCsvResults should overwrite the first property and change it to a Title property', async () => {
+    const customTitle = 'Form Response';
+    const { headers, csvData } = transformCsvResults(mockCsvResults, customTitle);
 
     expect(headers).toContain('Title');
     expect(csvData.every((row) => row.Title)).toBeTruthy();
+    expect(csvData.every((row) => row.Title === customTitle)).toBeTruthy();
   });
 
   afterEach(() => {

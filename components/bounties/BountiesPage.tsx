@@ -20,7 +20,7 @@ import { isTruthy } from 'lib/utilities/types';
 
 import BountiesKanbanView from './components/BountiesKanbanView';
 import BountiesGalleryView from './components/BountyGalleryView';
-import MultiPaymentModal from './components/MultiPaymentModal';
+import { MultiPaymentModal } from './components/MultiPaymentModal';
 import { NewBountyButton } from './components/NewBountyButton';
 
 const bountyStatuses: BountyStatus[] = ['open', 'inProgress', 'complete', 'paid', 'suggestion'];

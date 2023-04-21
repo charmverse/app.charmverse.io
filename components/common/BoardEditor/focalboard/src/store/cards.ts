@@ -1,21 +1,20 @@
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { createSelector, createSlice } from '@reduxjs/toolkit';
 
-import type { Board } from 'lib/focalboard/board';
+import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card, CardPage } from 'lib/focalboard/card';
 import { CardFilter } from 'lib/focalboard/cardFilter';
 import type { Member } from 'lib/members/interfaces';
-import type { PageMeta } from 'lib/pages';
+import type { PageMeta, PagesMap } from 'lib/pages';
 
 import { Constants } from '../constants';
 import { Utils } from '../utils';
 
-import { getCurrentBoard, getBoard } from './boards';
+import { getBoard } from './boards';
 import { initialLoad, initialReadOnlyLoad } from './initialLoad';
-import { getSearchText } from './searchText';
 import { getWorkspaceUsers } from './users';
-import { getCurrentView, getView } from './views';
+import { getView } from './views';
 
 import type { RootState } from './index';
 
@@ -345,29 +344,7 @@ function searchFilterCards(cards: Card[], board: Board, searchTextRaw: string): 
   });
 }
 
-export const getCurrentViewCardsSortedFilteredAndGrouped = createSelector(
-  getCurrentBoardCards,
-  getCurrentBoard,
-  getCurrentView,
-  getSearchText,
-  getWorkspaceUsers,
-  (cards, board, view, searchText, users) => {
-    if (!view || !board || !users || !cards) {
-      return [];
-    }
-    let result = cards;
-    if (view.fields.filter) {
-      result = CardFilter.applyFilterGroup(view.fields.filter, board.fields.cardProperties, result);
-    }
-
-    if (searchText) {
-      result = searchFilterCards(result, board, searchText);
-    }
-    return result;
-  }
-);
-
-export const getViewCardsSortedFilteredAndGrouped = (props: { viewId: string; boardId: string }) =>
+export const getViewCardsSortedFilteredAndGrouped = (props: { viewId: string; boardId: string; pages: PagesMap }) =>
   createSelector(
     getBoardCards(props.boardId),
     getBoard(props.boardId),
@@ -378,8 +355,25 @@ export const getViewCardsSortedFilteredAndGrouped = (props: { viewId: string; bo
         return [];
       }
       let result = cards;
+      const hasTitleProperty = board.fields.cardProperties.find((o) => o.id === Constants.titleColumnId);
+      const cardProperties: IPropertyTemplate[] = hasTitleProperty
+        ? board.fields.cardProperties
+        : [...board.fields.cardProperties, { id: Constants.titleColumnId, name: 'Title', options: [], type: 'text' }];
       if (view.fields.filter) {
-        result = CardFilter.applyFilterGroup(view.fields.filter, board.fields.cardProperties, result);
+        result = CardFilter.applyFilterGroup(
+          view.fields.filter,
+          cardProperties,
+          result.map((card) => ({
+            ...card,
+            fields: {
+              ...card.fields,
+              properties: {
+                ...card.fields.properties,
+                [Constants.titleColumnId]: props.pages[card.id]?.title ?? ''
+              }
+            }
+          }))
+        );
       }
       return result;
     }

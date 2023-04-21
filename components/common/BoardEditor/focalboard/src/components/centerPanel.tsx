@@ -22,6 +22,7 @@ import { v4 as uuid } from 'uuid';
 import charmClient from 'charmClient';
 import PageBanner, { randomBannerImage } from 'components/[pageId]/DocumentPage/components/PageBanner';
 import PageDeleteBanner from 'components/[pageId]/DocumentPage/components/PageDeleteBanner';
+import { PageWebhookBanner } from 'components/common/Banners/PageWebhookBanner';
 import { createTableView } from 'components/common/BoardEditor/focalboard/src/components/addViewMenu';
 import { getBoard } from 'components/common/BoardEditor/focalboard/src/store/boards';
 import {
@@ -35,6 +36,8 @@ import {
   addNewCards,
   isValidCsvResult
 } from 'components/common/PageLayout/components/Header/components/utils/databasePageOptions';
+import { webhookBaseUrl } from 'config/constants';
+import { useApiPageKeys } from 'hooks/useApiPageKeys';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMembers } from 'hooks/useMembers';
 import { usePages } from 'hooks/usePages';
@@ -47,6 +50,7 @@ import { createCard } from 'lib/focalboard/card';
 import type { Card, CardPage } from 'lib/focalboard/card';
 import { CardFilter } from 'lib/focalboard/cardFilter';
 import log from 'lib/log';
+import type { PageMeta } from 'lib/pages';
 import { createNewDataSource } from 'lib/pages/createNewDataSource';
 
 import mutator from '../mutator';
@@ -84,6 +88,7 @@ type Props = WrappedComponentProps &
     disableUpdatingUrl?: boolean;
     maxTabsShown?: number;
     onDeleteView?: (viewId: string) => void;
+    page?: PageMeta;
   };
 
 type State = {
@@ -110,6 +115,7 @@ function CenterPanel(props: Props) {
   const { members } = useMembers();
   const { showMessage } = useSnackbar();
   const { user } = useUser();
+  const { keys } = useApiPageKeys();
 
   useEffect(() => {
     if (views.length === 0 && !activeView) {
@@ -120,7 +126,7 @@ function CenterPanel(props: Props) {
   }, [activeView?.id, views.length]);
 
   const isEmbedded = !!props.embeddedBoardPath;
-  const boardPage = pages[board.id];
+  const boardPage = pages[board.id] ?? props.page;
   const boardPageType = boardPage?.type;
 
   // for 'linked' boards, each view has its own board which we use to determine the cards to show
@@ -139,7 +145,8 @@ function CenterPanel(props: Props) {
   const _cards = useAppSelector(
     getViewCardsSortedFilteredAndGrouped({
       boardId: activeBoard?.id || '',
-      viewId: activeView?.id || ''
+      viewId: activeView?.id || '',
+      pages
     })
   );
 
@@ -219,7 +226,7 @@ function CenterPanel(props: Props) {
     isTemplate = false
   ) => {
     if (!activeBoard) {
-      throw new Error('No active view');
+      throw new Error('No active board');
     }
     if (!activeView) {
       throw new Error('No active view');
@@ -499,6 +506,9 @@ function CenterPanel(props: Props) {
   return (
     <>
       {!!boardPage?.deletedAt && <PageDeleteBanner pageId={boardPage.id} />}
+      {keys?.map((key) => (
+        <PageWebhookBanner key={key.apiKey} type={key.type} url={`${webhookBaseUrl}/${key?.apiKey}`} />
+      ))}
       <div
         // remount components between pages
         className={`BoardComponent ${isEmbedded ? 'embedded-board' : ''}`}

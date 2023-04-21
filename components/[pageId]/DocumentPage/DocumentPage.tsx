@@ -10,6 +10,7 @@ import { useElementSize } from 'usehooks-ts';
 
 import charmClient from 'charmClient';
 import { PageComments } from 'components/[pageId]/Comments/PageComments';
+import { ProposalBanner } from 'components/common/Banners/ProposalBanner';
 import AddBountyButton from 'components/common/BoardEditor/focalboard/src/components/cardDetail/AddBountyButton';
 import CardDetailProperties from 'components/common/BoardEditor/focalboard/src/components/cardDetail/cardDetailProperties';
 import CommentsList from 'components/common/BoardEditor/focalboard/src/components/cardDetail/commentsList';
@@ -19,7 +20,6 @@ import type { FrontendParticipant } from 'components/common/CharmEditor/componen
 import { SnapshotVoteDetails } from 'components/common/CharmEditor/components/inlineVote/components/SnapshotVoteDetails';
 import { VoteDetail } from 'components/common/CharmEditor/components/inlineVote/components/VoteDetail';
 import ScrollableWindow from 'components/common/PageLayout/components/ScrollableWindow';
-import { ProposalBanner } from 'components/common/ProposalBanner';
 import { useProposalPermissions } from 'components/proposals/hooks/useProposalPermissions';
 import { useBounties } from 'hooks/useBounties';
 import { useCharmEditor } from 'hooks/useCharmEditor';
