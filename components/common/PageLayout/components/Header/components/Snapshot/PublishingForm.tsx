@@ -227,20 +227,22 @@ export default function PublishingForm({ onSubmit, page }: Props) {
 
       const client = await getSnapshotClient();
 
+      const start = Math.round(startDate.toSeconds());
       const proposalParams: any = {
         space: space?.snapshotDomain as any,
         type: snapshotVoteMode,
         title: page.title,
         body: content,
         choices: votingOptions,
-        start: Math.round(startDate.toSeconds()),
+        start,
         end: Math.round(endDate.toSeconds()),
         snapshot: snapshotBlockNumber,
         network: snapshotSpace?.network,
         strategies: JSON.stringify(selectedVotingStrategies),
         plugins: JSON.stringify({}),
         metadata: JSON.stringify({}),
-        app: ''
+        app: '',
+        timestamp: start - (snapshotSpace?.voting.delay ?? 0)
       };
 
       const receipt: SnapshotReceipt = (await client.proposal(
