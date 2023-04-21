@@ -2,7 +2,7 @@ import type { Provider } from '@ethersproject/providers';
 import type { BigNumber } from 'ethers';
 
 import { getProjectRegistryContract } from 'lib/gitcoin/contracts';
-import { fetchFileByHash } from 'lib/ipfs/fetchFileByHash';
+import { fetchFileByHash, getIpfsFileUrl } from 'lib/ipfs/fetchFileByHash';
 import log from 'lib/log';
 import { getSafeOwners } from 'lib/safe/getSafeOwners';
 
@@ -23,6 +23,7 @@ type ProjectMetadata = {
   projectTwitter: string;
   userGithub: string;
   logoImg: string;
+  bannerImg: string;
   createdAt: number;
 };
 
@@ -59,7 +60,7 @@ export async function getProjectDetails({
     projectId,
     metadata,
     owners: owners.length ? owners : onchainOwners,
-    metadataUrl: `https://cloudflare-ipfs.com/ipfs/${ipfsHash}`
+    metadataUrl: getIpfsFileUrl(ipfsHash)
   };
 }
 
