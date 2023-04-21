@@ -264,16 +264,6 @@
           {
             "type": "image",
             "attrs": {
-              "alt": "Kokonut Network | Agriculture for Communities",
-              "src": "https://super-static-assets.s3.amazonaws.com/2b58cabf-faf3-4b12-a223-92ec7de5ce57/uploads/cover/31a608fb-889d-496e-92b8-d086774d6936.png",
-              "size": 700,
-              "track": [],
-              "caption": null
-            }
-          },
-          {
-            "type": "image",
-            "attrs": {
               "alt": null,
               "src": null,
               "size": 425,
@@ -313,28 +303,6 @@
                           "track": []
                         },
                         "content": [
-                          {
-                            "type": "mention",
-                            "attrs": {
-                              "id": "de11a821-5c8c-4d9a-8fd0-7893075033ee",
-                              "type": "page",
-                              "track": [],
-                              "value": "1f2598c9-9971-4805-894d-2f364e6029dc",
-                              "createdAt": "2022-10-09T04:19:21.064Z",
-                              "createdBy": "b3f5d420-abe6-4c82-9d70-b5294cfcb890"
-                            },
-                            "marks": [
-                              {
-                                "type": "insertion",
-                                "attrs": {
-                                  "date": "2023-03-09T12:20:00.000Z",
-                                  "user": "e5dba747-be62-49be-a7ba-71cf27b17174",
-                                  "approved": true,
-                                  "username": "Drea | CharmVerse"
-                                }
-                              }
-                            ]
-                          },
                           {
                             "text": "This space encompasses a series of initiatives aimed at guiding",
                             "type": "text",

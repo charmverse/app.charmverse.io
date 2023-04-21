@@ -33,7 +33,7 @@ export const PROJECT_REGISTRY_ADDRESSES: Record<GitcoinChainId, string> = {
   5: '0x832c5391dc7931312CbdBc1046669c9c3A4A28d5'
 };
 
-const START_ID = 702;
+const START_ID = 715;
 const CHAIN_ID = 1;
 
 const provider = new AlchemyProvider(CHAIN_ID, process.env.ALCHEMY_API_KEY);
