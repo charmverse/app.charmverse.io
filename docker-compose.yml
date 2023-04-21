@@ -6,6 +6,7 @@ services:
     command: ['npm', 'run', '${NPM_SCRIPT}']
     labels:
       com.datadoghq.ad.logs: '[{"source": "nodejs", "service": "${SERVICE_NAME}"}]'
+      com.datadoghq.tags.service: "${SERVICE_NAME}"
     volumes:
       - $PWD/.env:/app/.env
     env_file:
