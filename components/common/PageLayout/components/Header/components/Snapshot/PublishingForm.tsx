@@ -228,7 +228,6 @@ export default function PublishingForm({ onSubmit, page }: Props) {
       const client = await getSnapshotClient();
 
       const start = Math.round(startDate.toSeconds());
-      const timestampWithVotingDelay = start - (snapshotSpace?.voting.delay ?? 0);
       const proposalParams: any = {
         space: space?.snapshotDomain as any,
         type: snapshotVoteMode,
@@ -242,9 +241,13 @@ export default function PublishingForm({ onSubmit, page }: Props) {
         strategies: JSON.stringify(selectedVotingStrategies),
         plugins: JSON.stringify({}),
         metadata: JSON.stringify({}),
-        app: '',
-        timestamp: timestampWithVotingDelay
+        app: ''
       };
+
+      if (snapshotSpace?.voting.delay) {
+        const timestampWithVotingDelay = start - snapshotSpace.voting.delay;
+        proposalParams.timestamp = timestampWithVotingDelay;
+      }
 
       const receipt: SnapshotReceipt = (await client.proposal(
         library,
