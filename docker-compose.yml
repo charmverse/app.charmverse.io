@@ -13,9 +13,7 @@ services:
       - '.env'
     profiles:
       - stg
-      - tst
       - prd
-      - webapp
 
   devapp:
     build:
