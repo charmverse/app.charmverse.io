@@ -22,6 +22,7 @@ services:
     ports:
       - '80:3000'
     command: ['node', 'run', './.next/server/websockets.js']
+    ignoreErrors: "true"
     labels:
       com.datadoghq.ad.logs: '[{"source": "nodejs", "service": "${SERVICE_NAME}"}]'
       com.datadoghq.tags.service: "${SERVICE_NAME}"
