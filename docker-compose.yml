@@ -34,7 +34,6 @@ services:
 
   stg-sockets:
     <<: *sockets
-    entrypoint: []
     command: ['sh', '-c', 'npx react-env --path .env.staging -- node ./.next/server/websockets.js']
     profiles:
       - stg-sockets
