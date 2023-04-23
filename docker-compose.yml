@@ -34,7 +34,7 @@ services:
 
   stg-sockets:
     <<: *sockets
-    entrypoint: ['sh', '-c', 'npx', 'react-env', '.env.staging', '&&', 'exec', 'node', 'run', './.next/server/websockets.js']
+    command: ['sh', '-c', 'npx', 'react-env', '.env.staging', '&&', 'exec', 'node', 'run', './.next/server/websockets.js']
     profiles:
       - stg-sockets
 
