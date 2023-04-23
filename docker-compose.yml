@@ -17,6 +17,27 @@ services:
       - prd
       - webapp
 
+  prd-sockets: &sockets
+    image: '310849459438.dkr.ecr.us-east-1.amazonaws.com/charmverse-web3-workspace:${IMGTAG}'
+    ports:
+      - '80:3000'
+    command: ['node', './.next/server/websockets.js']
+    labels:
+      com.datadoghq.ad.logs: '[{"source": "nodejs", "service": "${SERVICE_NAME}"}]'
+      com.datadoghq.tags.service: "${SERVICE_NAME}"
+    volumes:
+      - $PWD/.env:/app/.env
+    env_file:
+      - '.env'
+    profiles:
+      - prd-sockets
+
+  stg-sockets:
+    <<: *sockets
+    command: ['sh', '-c', 'npx react-env --path .env.staging -- node ./.next/server/websockets.js']
+    profiles:
+      - stg-sockets
+
   devapp:
     build:
       context: .
