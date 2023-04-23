@@ -34,7 +34,7 @@ services:
 
   stg-sockets:
     <<: *sockets
-    entrypoint: ['npx', 'react-env', '.env.staging']
+    entrypoint: ['npx', 'react-env', '.env.staging', '&&']
     profiles:
       - stg-sockets
 
