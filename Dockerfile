@@ -10,6 +10,9 @@ WORKDIR /app
 
 COPY /app/.next/standalone ./
 COPY /app/.next/static ./.next/static
+COPY /app/public ./public
+COPY /app/.next/server/websockets.js ./websockets.js
+COPY /app/.next/server/cron.js ./cron.js
 
 ENV PORT 3000
 
