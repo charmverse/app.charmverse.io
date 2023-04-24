@@ -101,7 +101,7 @@ export async function verifyTokenGateMembership({
   }
 
   log.info(
-    `User ${userId} has ${invalidTokenGates.length} invalid token gates and ${invalidRoleIds.length} roles removed`,
+    `User ${userId} was not removed from space, has ${invalidTokenGates.length} invalid token gates and ${invalidRoleIds.length} roles removed`,
     { userId, spaceId, invalidRoleIds }
   );
 
