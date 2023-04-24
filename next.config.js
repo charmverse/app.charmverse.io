@@ -10,7 +10,6 @@ const esmModules = require('./next.base').esmModules;
 const skipCodeChecks = process.env.CI === 'true';
 
 const config = {
-  keepAliveTimeout: 70000, // should be greater than AWS load balancer which is 60s. See: https://nextjs.org/docs/api-reference/cli#keep-alive-timeout
   poweredByHeader: false,
   eslint: {
     // add background and serverless to the default list of pages for eslint
