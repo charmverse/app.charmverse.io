@@ -98,6 +98,20 @@ const config = {
     // Fix for: "Module not found: Can't resolve 'canvas'"
     _config.resolve.alias.canvas = false;
 
+    // const externalDir = path.resolve(__dirname, '..', 'core', 'node_modules');
+
+    // _config.resolve.modules.push(externalDir);
+
+    // // _config.module.rules.push({ include: [path.resolve(__dirname), path.resolve(__dirname, '../core/node_modules')] });
+
+    // _config.resolve.alias['@prisma/client'] = path.resolve(__dirname, '../core/node_modules/@prisma/client');
+
+    // _config.resolve.symlinks = true;
+
+    //   console.log('ALIAS', _config.resolve.alias);
+
+    //    console.log('Module', _config.module);
+
     // _config.resolve.modules = [
     //   ...(_config.resolve.modules ?? []),
     //   path.resolve(__dirname, 'node_modules'),

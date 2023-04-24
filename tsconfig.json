@@ -30,10 +30,7 @@
     "jsxImportSource": "@emotion/react",
     "allowJs": true,
     "incremental": true,
-    "isolatedModules": true,
-    "paths": {
-      "@prisma/client": ["./node_modules/@prisma/client", "./node_modules/@charmverse/core/node_modules/@prisma/client"],
-    }
+    "isolatedModules": true
   },
   "exclude": [
     "node_modules",

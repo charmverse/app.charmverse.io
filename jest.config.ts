@@ -27,13 +27,6 @@ export const jestConfig: JestConfigWithTsJest = {
 
   // The test environment that will be used for testing
   testEnvironment: 'jest-environment-node',
-
-  moduleNameMapper: {
-    '^@prisma/client$': [
-      '<rootDir>/node_modules/@charmverse/core/node_modules/@prisma/client',
-      '<rootDir>/node_modules/@prisma/client'
-    ]
-  },
   testMatch: ['**/lib/**/*.spec.ts', '**/testing/**/*.spec.ts', '**/background/**/*.spec.ts'],
 
   testTimeout: 30000
