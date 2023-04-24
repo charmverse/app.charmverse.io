@@ -1,6 +1,11 @@
 import type { Role, SpaceRoleToRole, TokenGate, TokenGateToRole, UserTokenGate } from '@prisma/client';
 import * as lit from 'lit-js-sdk';
 
+import { prisma } from 'db';
+import { getLogger } from 'lib/log/prefix';
+
+const log = getLogger('tg-verification');
+
 type TokenGateWithRoles = {
   tokenGate:
     | (TokenGate & {
@@ -58,6 +63,8 @@ export async function verifyTokenGateMembership({
   });
 
   const invalidSpaceRoleToRoleIds: string[] = [];
+  const invalidRoleIds: string[] = [];
+
   invalidTokenGates.forEach((tg) => {
     tg.roleIds.forEach((roleId) => {
       // Remove invalid role if it is not granted by other token gate
@@ -65,6 +72,7 @@ export async function verifyTokenGateMembership({
         const spaceRoleToRoleId = userSpaceRoles?.find((sr) => sr.roleId === roleId)?.id;
         if (spaceRoleToRoleId) {
           invalidSpaceRoleToRoleIds.push(spaceRoleToRoleId);
+          invalidRoleIds.push(roleId);
         }
       }
     });
@@ -76,29 +84,36 @@ export async function verifyTokenGateMembership({
 
   // All token gates are invalid and user did not join via invite link soo he should be removed from space
   if (invalidTokenGates.length === userTokenGates.length && canBeRemovedFromSpace) {
-    // TEMP - run in test mode
-    // await prisma.spaceRole.delete({
-    //   where: {
-    //     spaceUser: {
-    //       userId,
-    //       spaceId
-    //     }
-    //   }
-    // });
+    await prisma.spaceRole.delete({
+      where: {
+        spaceUser: {
+          userId,
+          spaceId
+        }
+      }
+    });
+    log.info(
+      `User ${userId} was removed from space ${spaceId} because all ${userTokenGates.length} token gates are invalid`,
+      { userId, spaceId }
+    );
 
     return { verified: false, removedRoles: 0 };
   }
+
+  log.info(
+    `User ${userId} has ${invalidTokenGates.length} invalid token gates and ${invalidRoleIds.length} roles removed`,
+    { userId, spaceId, invalidRoleIds }
+  );
 
   return { verified: true, removedRoles: invalidSpaceRoleToRoleIds.length || 0 };
 }
 
 async function removeUserRoles(spaceRoleToRoleIds: string[]) {
-  // TEMP - run in test mode
-  // return prisma.spaceRoleToRole.deleteMany({
-  //   where: {
-  //     id: {
-  //       in: spaceRoleToRoleIds
-  //     }
-  //   }
-  // });
+  return prisma.spaceRoleToRole.deleteMany({
+    where: {
+      id: {
+        in: spaceRoleToRoleIds
+      }
+    }
+  });
 }
