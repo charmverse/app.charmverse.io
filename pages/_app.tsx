@@ -63,7 +63,6 @@ import '@skiff-org/prosemirror-tables/style/tables.css';
 import 'prosemirror-menu/style/menu.css';
 import 'theme/@bangle.dev/styles.scss';
 import 'theme/prosemirror-tables/prosemirror-tables.scss';
-// init focalboard
 import 'components/common/BoardEditor/focalboard/src/components/blockIconSelector.scss';
 import 'components/common/BoardEditor/focalboard/src/components/calculations/calculation.scss';
 import 'components/common/BoardEditor/focalboard/src/components/calendar/fullcalendar.scss';
@@ -106,8 +105,6 @@ import 'components/common/BoardEditor/focalboard/src/widgets/propertyMenu.scss';
 import 'components/common/BoardEditor/focalboard/src/widgets/switch.scss';
 import 'theme/focalboard/focalboard.button.scss';
 import 'theme/focalboard/focalboard.main.scss';
-
-// Lit Protocol CSS
 import 'lit-share-modal-v3/dist/ShareModal.css';
 import 'react-resizable/css/styles.css';
 import 'theme/lit-protocol/lit-protocol.scss';
