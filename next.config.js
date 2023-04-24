@@ -1,3 +1,4 @@
+/** @type {import('next').NextConfig} */
 /* eslint-disable @typescript-eslint/no-var-requires */
 
 const BundleAnalyzer = require('@next/bundle-analyzer');
@@ -10,6 +11,7 @@ const esmModules = require('./next.base').esmModules;
 const skipCodeChecks = process.env.CI === 'true';
 
 const config = {
+  output: 'standalone',
   poweredByHeader: false,
   eslint: {
     // add background and serverless to the default list of pages for eslint

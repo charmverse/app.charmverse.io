@@ -8,7 +8,8 @@ FROM node:18-slim AS BASE_APP
 
 WORKDIR /app
 
-COPY . .
+COPY /app/.next/standalone ./
+COPY /app/.next/static ./.next/static
 
 ENV PORT 3000
 

@@ -1,9 +1,9 @@
 services:
-  webapp:
+  prd-webapp: &webapp
     image: '310849459438.dkr.ecr.us-east-1.amazonaws.com/charmverse-web3-workspace:${IMGTAG}'
     ports:
       - '80:3000'
-    command: ['npm', 'run', '${NPM_SCRIPT}']
+    command: ['sh', '-c', 'node ./server.js']
     labels:
       com.datadoghq.ad.logs: '[{"source": "nodejs", "service": "${SERVICE_NAME}"}]'
       com.datadoghq.tags.service: "${SERVICE_NAME}"
@@ -14,6 +14,11 @@ services:
     profiles:
       - stg
       - prd
+  stg-webapp:
+    <<: *webapp
+    command: ['sh', '-c', 'npx react-env --path .env.staging -- node ./server.js']
+    profiles:
+      - stg-webapp
 
   prd-sockets: &sockets
     image: '310849459438.dkr.ecr.us-east-1.amazonaws.com/charmverse-web3-workspace:${IMGTAG}'
