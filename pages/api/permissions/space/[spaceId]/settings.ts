@@ -6,7 +6,7 @@ import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { onError, onNoMatch, requireSpaceMembership } from 'lib/middleware';
 import type { SpacePermissions } from 'lib/permissions/spaces/listPermissions';
 import { listPermissions } from 'lib/permissions/spaces/listPermissions';
-import { savePermissions } from 'lib/permissions/spaces/savePermissions';
+import { saveRoleAndSpacePermissions } from 'lib/permissions/spaces/saveRoleAndSpacePermissions';
 import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -29,7 +29,7 @@ async function updateSpacePermissionsController(req: NextApiRequest, res: NextAp
   const { spaceId } = req.query as { spaceId: string };
   const { roleIdToTrack, ...permissions } = req.body as SpacePermissions & { roleIdToTrack?: string };
 
-  await savePermissions(spaceId, permissions);
+  await saveRoleAndSpacePermissions(spaceId, permissions);
 
   // tracking
   if (roleIdToTrack) {

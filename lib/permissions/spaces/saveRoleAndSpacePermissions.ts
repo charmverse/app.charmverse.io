@@ -1,11 +1,12 @@
 import type { SpaceOperation } from '@prisma/client';
+import { v4 as uuid } from 'uuid';
 
 import { prisma } from 'db';
 import { InvalidInputError, MissingDataError } from 'lib/utilities/errors';
 
 import type { SpacePermissions } from './listPermissions';
 
-export async function savePermissions(spaceId: string, permissions: SpacePermissions) {
+export async function saveRoleAndSpacePermissions(spaceId: string, permissions: SpacePermissions) {
   const memberPermissions = permissions.space.filter((p) => p.assignee.group === 'space');
 
   // make sure we always define member/default permissions
@@ -46,7 +47,7 @@ export async function savePermissions(spaceId: string, permissions: SpacePermiss
       .map((permission) =>
         prisma.proposalCategoryPermission.create({
           data: {
-            id: permission.id,
+            id: permission.id ?? uuid,
             proposalCategoryId: permission.proposalCategoryId,
             permissionLevel: permission.permissionLevel,
             roleId: permission.assignee.group === 'role' ? permission.assignee.id : undefined,
@@ -63,7 +64,7 @@ export async function savePermissions(spaceId: string, permissions: SpacePermiss
       .map((permission) =>
         prisma.postCategoryPermission.create({
           data: {
-            id: permission.id,
+            id: permission.id ?? uuid(),
             postCategoryId: permission.postCategoryId,
             permissionLevel: permission.permissionLevel,
             roleId: permission.assignee.group === 'role' ? permission.assignee.id : undefined,
