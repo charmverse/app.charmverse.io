@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core';
-import type { Page } from '@prisma/client';
+import type { Page } from '@charmverse/core/dist/prisma';
 import { v4, validate } from 'uuid';
 
 import { prismaToBlock } from 'lib/focalboard/block';

@@ -1,4 +1,4 @@
-import type { MemberPropertyType } from '@prisma/client';
+import type { MemberPropertyType } from '@charmverse/core/dist/prisma';
 
 export function isSelectType(type: MemberPropertyType | null) {
   return type === 'select' || type === 'multiselect';

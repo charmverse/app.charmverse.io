@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core';
-import type { PageComment } from '@prisma/client';
+import type { PageComment } from '@charmverse/core/dist/prisma';
 
 import { PageCommentNotFoundError } from 'lib/pages/comments/errors';
 

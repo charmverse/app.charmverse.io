@@ -2,7 +2,7 @@
 
 import type { TransactionClient } from '@charmverse/core';
 import { prisma } from '@charmverse/core';
-import type { Prisma } from '@prisma/client';
+import type { Prisma } from '@charmverse/core/dist/prisma';
 
 import type { PageNodeWithChildren, PageNodeWithPermissions } from 'lib/pages/server';
 

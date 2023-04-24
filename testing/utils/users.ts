@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core';
-import type { User } from '@prisma/client';
+import type { User } from '@charmverse/core/dist/prisma';
 
 import randomName from 'lib/utilities/randomName';
 import { uid } from 'lib/utilities/strings';

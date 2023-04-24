@@ -1,4 +1,4 @@
-import type { PostCategory } from '@prisma/client';
+import type { PostCategory } from '@charmverse/core/dist/prisma';
 import type { ReactNode } from 'react';
 import { useContext, createContext, useMemo } from 'react';
 import useSWR from 'swr/immutable';

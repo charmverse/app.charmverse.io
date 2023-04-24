@@ -1,4 +1,4 @@
-import type { PostOperation } from '@prisma/client';
+import type { PostOperation } from '@charmverse/core/dist/prisma';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 

@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 import { prisma } from '@charmverse/core';
-import type { PagePermission } from '@prisma/client';
+import type { PagePermission } from '@charmverse/core/dist/prisma';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 

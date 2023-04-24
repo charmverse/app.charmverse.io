@@ -1,5 +1,5 @@
+import type { Post, PostCategory, Space, User } from '@charmverse/core/dist/prisma';
 import { expect, test as base } from '@playwright/test';
-import type { Post, PostCategory, Space, User } from '@prisma/client';
 
 import { randomETHWalletAddress } from 'testing/generateStubs';
 import { generateForumPost, generatePostCategory } from 'testing/utils/forums';

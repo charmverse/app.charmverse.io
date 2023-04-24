@@ -1,5 +1,5 @@
 import type { AssignedPostCategoryPermission } from '@charmverse/core';
-import type { PostCategoryPermission } from '@prisma/client';
+import type { PostCategoryPermission } from '@charmverse/core/dist/prisma';
 
 import { getPermissionAssignee } from '../utils';
 

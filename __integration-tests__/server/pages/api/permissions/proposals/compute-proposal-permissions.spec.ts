@@ -1,4 +1,4 @@
-import type { ProposalCategoryPermission, Space, User } from '@prisma/client';
+import type { ProposalCategoryPermission, Space, User } from '@charmverse/core/dist/prisma';
 import request from 'supertest';
 
 import { computeProposalPermissions } from 'lib/permissions/proposals/computeProposalPermissions';

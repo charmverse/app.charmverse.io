@@ -1,7 +1,7 @@
+import type { Page } from '@charmverse/core/dist/prisma';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import MenuItem from '@mui/material/MenuItem';
 import Typography from '@mui/material/Typography';
-import type { Page } from '@prisma/client';
 import { useMemo } from 'react';
 
 import { PageIcon } from 'components/common/PageLayout/components/PageIcon';

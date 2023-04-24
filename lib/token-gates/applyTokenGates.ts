@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core';
-import type { Role } from '@prisma/client';
+import type { Role } from '@charmverse/core/dist/prisma';
 import { verifyJwt } from 'lit-js-sdk';
 import { v4 } from 'uuid';
 

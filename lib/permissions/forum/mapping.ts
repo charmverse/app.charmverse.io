@@ -1,4 +1,4 @@
-import type { PostCategoryOperation, PostCategoryPermissionLevel, PostOperation } from '@prisma/client';
+import type { PostCategoryOperation, PostCategoryPermissionLevel, PostOperation } from '@charmverse/core/dist/prisma';
 
 import { postCategoryOperations, postOperationsWithoutEdit } from './interfaces';
 

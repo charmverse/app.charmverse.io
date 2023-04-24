@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core';
-import type { ProposalStatus } from '@prisma/client';
+import type { ProposalStatus } from '@charmverse/core/dist/prisma';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 

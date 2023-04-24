@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core';
-import type { ProposalStatus, Space, User } from '@prisma/client';
+import type { ProposalStatus, Space, User } from '@charmverse/core/dist/prisma';
 
 import { upsertProposalCategoryPermission } from 'lib/permissions/proposals/upsertProposalCategoryPermission';
 import { typedKeys } from 'lib/utilities/objects';

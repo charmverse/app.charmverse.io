@@ -1,6 +1,6 @@
 import { prisma } from '@charmverse/core';
+import type { Post, PostComment, Space, User } from '@charmverse/core/dist/prisma';
 import { expect, test as base } from '@playwright/test';
-import type { Post, PostComment, Space, User } from '@prisma/client';
 
 import { upsertPostCategoryPermission } from 'lib/permissions/forum/upsertPostCategoryPermission';
 import { randomETHWalletAddress } from 'testing/generateStubs';

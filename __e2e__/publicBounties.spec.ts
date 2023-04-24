@@ -1,6 +1,6 @@
+import type { Bounty, User } from '@charmverse/core/dist/prisma';
 import type { Browser } from '@playwright/test';
 import { expect, test, chromium } from '@playwright/test';
-import type { Bounty, User } from '@prisma/client';
 
 import { baseUrl } from 'config/constants';
 import { generateRole } from 'testing/setupDatabase';

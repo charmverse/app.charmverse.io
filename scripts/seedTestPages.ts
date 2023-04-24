@@ -3,7 +3,7 @@ import { boardWithCardsArgs } from 'testing/generateBoardStub';
 import { pageStubToCreate } from 'testing/generatePageStub';
 import { prisma } from '@charmverse/core';
 import { DataNotFoundError } from 'lib/utilities/errors';
-import { Prisma } from '@prisma/client';
+import { Prisma } from '@charmverse/core/dist/prisma';
 import { createPage } from 'lib/pages/server/createPage';
 
 /**

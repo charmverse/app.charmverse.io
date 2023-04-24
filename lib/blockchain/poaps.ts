@@ -1,4 +1,4 @@
-import type { UserWallet } from '@prisma/client';
+import type { UserWallet } from '@charmverse/core/dist/prisma';
 
 import fetch from 'adapters/http/fetch.server';
 import log from 'lib/log';

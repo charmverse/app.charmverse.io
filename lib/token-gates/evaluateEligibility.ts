@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core';
-import type { Role } from '@prisma/client';
+import type { Role } from '@charmverse/core/dist/prisma';
 import { LitNodeClient } from 'lit-js-sdk';
 import { validate } from 'uuid';
 

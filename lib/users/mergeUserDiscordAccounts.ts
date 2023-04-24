@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core';
-import type { DiscordUser } from '@prisma/client';
+import type { DiscordUser } from '@charmverse/core/dist/prisma';
 
 import { softDeleteUserWithoutConnectableIdentities } from 'lib/users/softDeleteUserWithoutConnectableIdentities';
 

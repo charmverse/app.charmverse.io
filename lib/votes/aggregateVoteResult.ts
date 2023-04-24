@@ -1,4 +1,4 @@
-import type { UserVote, VoteOptions } from '@prisma/client';
+import type { UserVote, VoteOptions } from '@charmverse/core/dist/prisma';
 
 import type { ExtendedVote } from './interfaces';
 

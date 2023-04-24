@@ -1,4 +1,4 @@
-import type { Application, ApplicationStatus, Bounty, BountyStatus } from '@prisma/client';
+import type { Application, ApplicationStatus, Bounty, BountyStatus } from '@charmverse/core/dist/prisma';
 
 import type { BountyTask } from './getBountyTasks';
 

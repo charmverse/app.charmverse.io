@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core';
-import type { Space } from '@prisma/client';
+import type { Space } from '@charmverse/core/dist/prisma';
 
 import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
 

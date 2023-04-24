@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core';
-import { Page, Prisma } from '@prisma/client';
+import { Page, Prisma } from '@charmverse/core/dist/prisma';
 
 import { PageWithChildren } from 'lib/pages/server';
 

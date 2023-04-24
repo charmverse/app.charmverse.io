@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core';
-import type { User, UserWallet } from '@prisma/client';
+import type { User, UserWallet } from '@charmverse/core/dist/prisma';
 import { uniqBy } from 'lodash';
 
 import { getENSDetails } from 'lib/blockchain';

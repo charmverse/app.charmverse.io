@@ -1,9 +1,9 @@
 /* eslint-disable camelcase */
+import type { PostCategoryPermissionLevel } from '@charmverse/core/dist/prisma';
 import type { PostCategoryPermissionAssignment } from '@charmverse/core/dist/shared';
 import Box from '@mui/material/Box';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
-import type { PostCategoryPermissionLevel } from '@prisma/client';
 import type { ReactNode } from 'react';
 import { useMemo } from 'react';
 

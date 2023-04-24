@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core';
-import { Prisma } from '@prisma/client';
+import { Prisma } from '@charmverse/core/dist/prisma';
 
 import log from 'lib/log';
 

@@ -1,4 +1,4 @@
-import type { Space } from '@prisma/client';
+import type { Space } from '@charmverse/core/dist/prisma';
 import request from 'supertest';
 import { v4 } from 'uuid';
 

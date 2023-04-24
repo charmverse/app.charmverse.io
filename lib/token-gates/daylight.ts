@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core';
-import type { TokenGate } from '@prisma/client';
+import type { TokenGate } from '@charmverse/core/dist/prisma';
 import type { AccessControlCondition } from 'lit-js-sdk';
 import { flatten } from 'lodash';
 

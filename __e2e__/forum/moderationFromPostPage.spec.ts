@@ -1,6 +1,6 @@
 import { prisma } from '@charmverse/core';
+import type { Post, PostCategory, Space, User } from '@charmverse/core/dist/prisma';
 import { expect, test as base } from '@playwright/test';
-import type { Post, PostCategory, Space, User } from '@prisma/client';
 import { ForumHomePage } from '__e2e__/po/forumHome.po';
 import { ForumPostPage } from '__e2e__/po/forumPost.po';
 import { PageHeader } from '__e2e__/po/pageHeader.po';

@@ -1,6 +1,6 @@
+import type { Page } from '@charmverse/core/dist/prisma';
 import OpenInFullIcon from '@mui/icons-material/OpenInFull';
 import { Box } from '@mui/material';
-import type { Page } from '@prisma/client';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';

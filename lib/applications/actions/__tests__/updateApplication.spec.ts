@@ -1,4 +1,4 @@
-import type { Application, Space, User } from '@prisma/client';
+import type { Application, Space, User } from '@charmverse/core/dist/prisma';
 import { v4 } from 'uuid';
 
 import { createBounty } from 'lib/bounties/createBounty';

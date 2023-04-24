@@ -1,6 +1,6 @@
 import { prisma } from '@charmverse/core';
-import type { PostCategoryPermissionLevel, Space, User } from '@prisma/client';
-import { PostCategoryOperation } from '@prisma/client';
+import type { PostCategoryPermissionLevel, Space, User } from '@charmverse/core/dist/prisma';
+import { PostCategoryOperation } from '@charmverse/core/dist/prisma';
 import { v4 } from 'uuid';
 
 import { PostCategoryNotFoundError } from 'lib/forums/categories/errors';

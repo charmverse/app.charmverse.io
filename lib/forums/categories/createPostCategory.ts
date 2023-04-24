@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core';
-import type { PostCategory } from '@prisma/client';
+import type { PostCategory } from '@charmverse/core/dist/prisma';
 
 import { checkSpacePermissionsEngine, premiumPermissionsApiClient } from 'lib/permissions/api/routers';
 

@@ -1,6 +1,6 @@
 import type { OptionalTransaction, TransactionClient } from '@charmverse/core';
 import { prisma } from '@charmverse/core';
-import type { PagePermission, Prisma } from '@prisma/client';
+import type { PagePermission, Prisma } from '@charmverse/core/dist/prisma';
 
 import log from 'lib/log';
 import type {

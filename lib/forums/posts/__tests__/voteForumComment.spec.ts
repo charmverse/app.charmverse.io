@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core';
-import type { PostCommentUpDownVote, Space, User } from '@prisma/client';
+import type { PostCommentUpDownVote, Space, User } from '@charmverse/core/dist/prisma';
 
 import { createPostComment } from 'lib/forums/comments/createPostComment';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';

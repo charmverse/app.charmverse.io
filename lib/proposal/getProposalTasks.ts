@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core';
-import type { ProposalStatus, User, WorkspaceEvent } from '@prisma/client';
+import type { ProposalStatus, User, WorkspaceEvent } from '@charmverse/core/dist/prisma';
 
 import type {
   Discussion,

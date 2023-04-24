@@ -1,7 +1,7 @@
 import fs from 'node:fs/promises';
 
 import { prisma } from '@charmverse/core';
-import type { Block, Page, Prisma, Space } from '@prisma/client';
+import type { Block, Page, Prisma, Space } from '@charmverse/core/dist/prisma';
 import { v4 } from 'uuid';
 
 import { extractPreviewImage } from 'lib/prosemirror/extractPreviewImage';

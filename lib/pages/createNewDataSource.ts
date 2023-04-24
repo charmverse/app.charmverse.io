@@ -1,4 +1,4 @@
-import type { PageType } from '@prisma/client';
+import type { PageType } from '@charmverse/core/dist/prisma';
 
 import { createTableView } from 'components/common/BoardEditor/focalboard/src/components/addViewMenu';
 import mutator from 'components/common/BoardEditor/focalboard/src/mutator';

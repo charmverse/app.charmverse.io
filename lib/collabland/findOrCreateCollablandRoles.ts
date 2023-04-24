@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core';
-import type { Role } from '@prisma/client';
+import type { Role } from '@charmverse/core/dist/prisma';
 
 import { syncDiscordRoles } from 'lib/discord/syncDiscorRoles';
 

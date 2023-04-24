@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core';
-import type { SpaceRole } from '@prisma/client';
+import type { SpaceRole } from '@charmverse/core/dist/prisma';
 import { v4 } from 'uuid';
 
 import { createUserFromWallet } from 'lib/users/createUser';

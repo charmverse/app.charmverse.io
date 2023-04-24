@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core';
-import type { MemberProperty, MemberPropertyType, MemberPropertyValue, Prisma } from '@prisma/client';
+import type { MemberProperty, MemberPropertyType, MemberPropertyValue, Prisma } from '@charmverse/core/dist/prisma';
 
 import { createMemberProperty } from 'lib/members/createMemberProperty';
 import type { MemberPropertyValueType } from 'lib/members/interfaces';

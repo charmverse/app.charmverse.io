@@ -1,4 +1,4 @@
-import type { PostCategoryPermission } from '@prisma/client';
+import type { PostCategoryPermission } from '@charmverse/core/dist/prisma';
 import { v4 } from 'uuid';
 
 import { InvalidPermissionGranteeError } from 'lib/permissions/errors';

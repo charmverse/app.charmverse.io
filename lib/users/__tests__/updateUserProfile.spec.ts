@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core';
-import type { User } from '@prisma/client';
+import type { User } from '@charmverse/core/dist/prisma';
 import { v4 } from 'uuid';
 
 import { typedKeys } from 'lib/utilities/objects';

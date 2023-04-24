@@ -1,7 +1,7 @@
 import type { PostPermissionFlags } from '@charmverse/core';
 import { AvailablePostPermissions, generateForumPost, generatePostCategory, objectUtils } from '@charmverse/core';
-import type { ProposalCategory, Space, User } from '@prisma/client';
-import { PostOperation } from '@prisma/client';
+import type { ProposalCategory, Space, User } from '@charmverse/core/dist/prisma';
+import { PostOperation } from '@charmverse/core/dist/prisma';
 import { v4 } from 'uuid';
 
 import { convertPostToProposal } from 'lib/forums/posts/convertPostToProposal';

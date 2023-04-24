@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core';
-import type { UserWallet } from '@prisma/client';
+import type { UserWallet } from '@charmverse/core/dist/prisma';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 

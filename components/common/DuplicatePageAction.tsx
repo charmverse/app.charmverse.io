@@ -1,6 +1,6 @@
+import type { Page, PageType } from '@charmverse/core/dist/prisma';
 import FileCopyOutlinedIcon from '@mui/icons-material/FileCopyOutlined';
 import { ListItemButton, ListItemIcon, ListItemText, Tooltip } from '@mui/material';
-import type { Page, PageType } from '@prisma/client';
 import { useRouter } from 'next/router';
 
 import charmClient from 'charmClient';

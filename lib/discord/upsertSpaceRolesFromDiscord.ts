@@ -1,4 +1,4 @@
-import type { Space } from '@prisma/client';
+import type { Space } from '@charmverse/core/dist/prisma';
 
 import { getGuildRoles } from 'lib/collabland/collablandClient';
 import log from 'lib/log';

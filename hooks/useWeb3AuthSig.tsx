@@ -1,5 +1,5 @@
+import type { UserWallet } from '@charmverse/core/dist/prisma';
 import { verifyMessage } from '@ethersproject/wallet';
-import type { UserWallet } from '@prisma/client';
 import { useWeb3React } from '@web3-react/core';
 import type { Signer } from 'ethers';
 import { getAddress, toUtf8Bytes } from 'ethers/lib/utils';

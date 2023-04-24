@@ -1,4 +1,4 @@
-import type { Space, User } from '@prisma/client';
+import type { Space, User } from '@charmverse/core/dist/prisma';
 
 import { createFormResponseCard } from 'lib/pages/createFormResponseCard';
 import { getDatabaseDetails } from 'lib/pages/getDatabaseDetails';

@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core';
-import type { ProposalCategory, ProposalOperation, Role, Space, User } from '@prisma/client';
+import type { ProposalCategory, ProposalOperation, Role, Space, User } from '@charmverse/core/dist/prisma';
 import { v4 } from 'uuid';
 
 import { ProposalNotFoundError } from 'lib/proposal/errors';

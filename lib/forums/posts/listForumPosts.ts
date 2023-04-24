@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core';
-import type { Prisma } from '@prisma/client';
+import type { Prisma } from '@charmverse/core/dist/prisma';
 
 import type { PaginatedResponse } from 'lib/public-api';
 import { InvalidInputError } from 'lib/utilities/errors';

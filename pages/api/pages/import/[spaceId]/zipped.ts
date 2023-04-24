@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core';
-import type { Prisma, Space } from '@prisma/client';
+import type { Prisma, Space } from '@charmverse/core/dist/prisma';
 import jsZip from 'jszip';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';

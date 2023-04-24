@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core';
-import type { PostCommentUpDownVote } from '@prisma/client';
+import type { PostCommentUpDownVote } from '@charmverse/core/dist/prisma';
 
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';

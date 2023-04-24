@@ -1,3 +1,4 @@
+import type { PostCategory } from '@charmverse/core/dist/prisma';
 import { Edit } from '@mui/icons-material';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import LockIcon from '@mui/icons-material/Lock';
@@ -6,7 +7,6 @@ import TaskIcon from '@mui/icons-material/Task';
 import { IconButton, ListItemIcon, MenuItem, MenuList, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
 import Tooltip from '@mui/material/Tooltip';
-import type { PostCategory } from '@prisma/client';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect, useMemo, useState } from 'react';
 import { MdOutlineNotificationsNone, MdOutlineNotificationsOff } from 'react-icons/md';

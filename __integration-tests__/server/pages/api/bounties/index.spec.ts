@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { prisma } from '@charmverse/core';
-import type { Bounty, Space, User } from '@prisma/client';
+import type { Bounty, Space, User } from '@charmverse/core/dist/prisma';
 import request from 'supertest';
 
 import { createBounty } from 'lib/bounties';

@@ -1,4 +1,4 @@
-import type { PostCategory } from '@prisma/client';
+import type { PostCategory } from '@charmverse/core/dist/prisma';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 

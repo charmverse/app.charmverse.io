@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core';
-import type { ProposalCategory, ProposalCategoryPermission, Prisma } from '@prisma/client';
+import type { ProposalCategory, ProposalCategoryPermission, Prisma } from '@charmverse/core/dist/prisma';
 
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { uniqueValues } from 'lib/utilities/array';

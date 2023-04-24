@@ -1,6 +1,6 @@
 import { prisma } from '@charmverse/core';
-import type { Page } from '@prisma/client';
-import { Prisma, Block } from '@prisma/client';
+import type { Page } from '@charmverse/core/dist/prisma';
+import { Prisma, Block } from '@charmverse/core/dist/prisma';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 

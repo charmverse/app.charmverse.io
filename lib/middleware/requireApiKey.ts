@@ -1,7 +1,7 @@
 import crypto from 'node:crypto';
 
 import { prisma } from '@charmverse/core';
-import type { Space, SpaceApiToken, User } from '@prisma/client';
+import type { Space, SpaceApiToken, User } from '@charmverse/core/dist/prisma';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import type { NextHandler } from 'next-connect';
 

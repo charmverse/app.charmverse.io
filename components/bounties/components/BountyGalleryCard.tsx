@@ -1,7 +1,7 @@
+import type { Bounty } from '@charmverse/core/dist/prisma';
 import styled from '@emotion/styled';
 import { Typography } from '@mui/material';
 import { Box } from '@mui/system';
-import type { Bounty } from '@prisma/client';
 import { FormattedMessage } from 'react-intl';
 
 import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';

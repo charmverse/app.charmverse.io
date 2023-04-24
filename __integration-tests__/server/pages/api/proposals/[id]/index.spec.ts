@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core';
-import type { ProposalCategory, Space } from '@prisma/client';
+import type { ProposalCategory, Space } from '@charmverse/core/dist/prisma';
 import request from 'supertest';
 import { v4 } from 'uuid';
 

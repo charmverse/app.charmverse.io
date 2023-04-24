@@ -1,5 +1,5 @@
+import type { VoteStatus } from '@charmverse/core/dist/prisma';
 import { Chip } from '@mui/material';
-import type { VoteStatus } from '@prisma/client';
 import type { ComponentProps } from 'react';
 
 const VoteStatusConfig: Record<

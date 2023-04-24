@@ -1,4 +1,4 @@
-import type { ApiPageKey } from '@prisma/client';
+import type { ApiPageKey } from '@charmverse/core/dist/prisma';
 import { chunk } from 'lodash';
 import unionBy from 'lodash/unionBy';
 import type { ParseResult } from 'papaparse';

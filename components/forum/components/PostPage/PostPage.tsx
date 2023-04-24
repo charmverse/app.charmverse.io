@@ -1,6 +1,6 @@
+import type { Post, PostCategory } from '@charmverse/core/dist/prisma';
 import CommentIcon from '@mui/icons-material/Comment';
 import { Box, Divider, Stack, Typography } from '@mui/material';
-import type { Post, PostCategory } from '@prisma/client';
 import { useRouter } from 'next/router';
 import { useEffect, useMemo, useState } from 'react';
 import useSWR from 'swr';

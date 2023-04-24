@@ -1,6 +1,6 @@
 import { prisma } from '@charmverse/core';
-import type { Role, Space, TokenGate, TokenGateToRole, User } from '@prisma/client';
-import { SpaceRole } from '@prisma/client';
+import type { Role, Space, TokenGate, TokenGateToRole, User } from '@charmverse/core/dist/prisma';
+import { SpaceRole } from '@charmverse/core/dist/prisma';
 import request from 'supertest';
 import { v4 } from 'uuid';
 

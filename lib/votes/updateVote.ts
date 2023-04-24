@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core';
-import type { Vote } from '@prisma/client';
+import type { Vote } from '@charmverse/core/dist/prisma';
 
 import { DataNotFoundError, UndesirableOperationError } from 'lib/utilities/errors';
 

@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 
-import { Block } from '@prisma/client';
+import { Block } from '@charmverse/core/dist/prisma';
 import { prisma } from 'db';
 import { BoardView } from 'lib/focalboard/boardView';
 import { FilterClause, FilterCondition } from 'lib/focalboard/filterClause';

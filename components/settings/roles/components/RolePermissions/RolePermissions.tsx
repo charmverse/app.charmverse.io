@@ -1,6 +1,6 @@
+import type { SpaceOperation } from '@charmverse/core/dist/prisma';
 import type { PostCategoryPermissionAssignment } from '@charmverse/core/dist/shared';
 import { Box, Divider, FormControlLabel, Grid, Switch, Tooltip, Typography } from '@mui/material';
-import type { SpaceOperation } from '@prisma/client';
 import type { ChangeEvent } from 'react';
 import { useReducer, useEffect, useState } from 'react';
 import { mutate } from 'swr';

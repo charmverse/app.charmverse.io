@@ -1,4 +1,4 @@
-import type { Page } from '@prisma/client';
+import type { Page } from '@charmverse/core/dist/prisma';
 import { useCallback, useEffect, useRef } from 'react';
 
 import DocumentPage from 'components/[pageId]/DocumentPage';

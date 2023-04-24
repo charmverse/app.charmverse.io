@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core';
-import type { Block } from '@prisma/client';
+import type { Block } from '@charmverse/core/dist/prisma';
 import { validate } from 'uuid';
 
 import { generateMarkdown } from 'lib/prosemirror/plugins/markdown/generateMarkdown';

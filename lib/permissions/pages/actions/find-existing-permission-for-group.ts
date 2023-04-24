@@ -1,4 +1,4 @@
-import type { PagePermission } from '@prisma/client';
+import type { PagePermission } from '@charmverse/core/dist/prisma';
 
 import type { IPagePermissionToCreate } from '../page-permission-interfaces';
 

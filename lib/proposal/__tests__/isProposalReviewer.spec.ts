@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core';
-import type { ProposalCategory, Role, Space, User } from '@prisma/client';
+import type { ProposalCategory, Role, Space, User } from '@charmverse/core/dist/prisma';
 
 import type { ProposalWithUsers } from 'lib/proposal/interface';
 import { generateUserAndSpace, generateSpaceUser, generateRole } from 'testing/setupDatabase';

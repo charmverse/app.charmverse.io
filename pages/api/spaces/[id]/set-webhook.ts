@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core';
-import type { WebhookSubscription } from '@prisma/client';
+import type { WebhookSubscription } from '@charmverse/core/dist/prisma';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 

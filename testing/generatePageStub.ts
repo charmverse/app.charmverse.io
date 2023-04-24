@@ -1,4 +1,4 @@
-import type { Prisma } from '@prisma/client';
+import type { Prisma } from '@charmverse/core/dist/prisma';
 import { v4 } from 'uuid';
 
 export function pageContentStub(): Pick<Prisma.PageCreateInput, 'content' | 'contentText' | 'hasContent'> {

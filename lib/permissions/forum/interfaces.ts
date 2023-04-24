@@ -1,5 +1,5 @@
-import type { PostCategory, PostCategoryPermissionLevel } from '@prisma/client';
-import { PostCategoryOperation, PostOperation } from '@prisma/client';
+import type { PostCategory, PostCategoryPermissionLevel } from '@charmverse/core/dist/prisma';
+import { PostCategoryOperation, PostOperation } from '@charmverse/core/dist/prisma';
 
 import { typedKeys } from 'lib/utilities/objects';
 

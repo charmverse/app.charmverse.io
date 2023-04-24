@@ -1,6 +1,6 @@
 import { prisma } from '@charmverse/core';
-import type { Space, User } from '@prisma/client';
-import { SpaceRole } from '@prisma/client';
+import type { Space, User } from '@charmverse/core/dist/prisma';
+import { SpaceRole } from '@charmverse/core/dist/prisma';
 import { v4 } from 'uuid';
 
 import { InvalidInputError } from 'lib/utilities/errors';

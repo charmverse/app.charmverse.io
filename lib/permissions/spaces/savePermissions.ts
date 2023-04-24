@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core';
-import type { SpaceOperation } from '@prisma/client';
+import type { SpaceOperation } from '@charmverse/core/dist/prisma';
 
 import { InvalidInputError, MissingDataError } from 'lib/utilities/errors';
 

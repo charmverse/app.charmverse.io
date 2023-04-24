@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core';
-import type { PaymentMethod, Prisma } from '@prisma/client';
+import type { PaymentMethod, Prisma } from '@charmverse/core/dist/prisma';
 import type { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';

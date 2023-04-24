@@ -2,7 +2,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 
 import { prisma } from '@charmverse/core';
-import type { Prisma, Page } from '@prisma/client';
+import type { Prisma, Page } from '@charmverse/core/dist/prisma';
 import { v4, validate } from 'uuid';
 
 import type { BountyWithDetails } from 'lib/bounties';

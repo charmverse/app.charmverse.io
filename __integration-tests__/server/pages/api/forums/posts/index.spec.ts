@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import type { Post, Space, User } from '@prisma/client';
+import type { Post, Space, User } from '@charmverse/core/dist/prisma';
 import request from 'supertest';
 
 import type { CreateForumPostInput } from 'lib/forums/posts/createForumPost';

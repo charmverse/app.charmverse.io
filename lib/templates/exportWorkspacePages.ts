@@ -12,7 +12,7 @@ import type {
   ProposalCategory,
   Vote,
   VoteOptions
-} from '@prisma/client';
+} from '@charmverse/core/dist/prisma';
 import { validate } from 'uuid';
 
 import type { PageNodeWithChildren } from 'lib/pages';

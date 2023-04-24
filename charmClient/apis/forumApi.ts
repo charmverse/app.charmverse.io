@@ -1,4 +1,4 @@
-import type { Post, PostCategory, PostComment, Space } from '@prisma/client';
+import type { Post, PostCategory, PostComment, Space } from '@charmverse/core/dist/prisma';
 
 import * as http from 'adapters/http';
 import type { CreatePostCategoryInput } from 'lib/forums/categories/createPostCategory';

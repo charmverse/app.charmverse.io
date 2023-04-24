@@ -1,4 +1,4 @@
-import type { Post } from '@prisma/client';
+import type { Post } from '@charmverse/core/dist/prisma';
 import type { KeyedMutator } from 'swr';
 
 import charmClient from 'charmClient';

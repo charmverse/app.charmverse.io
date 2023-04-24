@@ -1,3 +1,4 @@
+import type { PostCategory } from '@charmverse/core/dist/prisma';
 import type {
   PostCategoryPermissionAssignment,
   AssignedPostCategoryPermission,
@@ -9,7 +10,6 @@ import Grid from '@mui/material/Grid';
 import Switch from '@mui/material/Switch';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
-import type { PostCategory } from '@prisma/client';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import useSWR from 'swr';
 

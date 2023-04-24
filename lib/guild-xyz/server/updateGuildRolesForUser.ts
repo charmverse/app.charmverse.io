@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core';
-import type { Role, SpaceRole } from '@prisma/client';
+import type { Role, SpaceRole } from '@charmverse/core/dist/prisma';
 
 import log from 'lib/log';
 

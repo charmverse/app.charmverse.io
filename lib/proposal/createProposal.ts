@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core';
-import type { Page, ProposalStatus } from '@prisma/client';
+import type { Page, ProposalStatus } from '@charmverse/core/dist/prisma';
 import { v4 as uuid } from 'uuid';
 
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';

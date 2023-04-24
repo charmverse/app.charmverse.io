@@ -1,4 +1,4 @@
-import type { Page } from '@prisma/client';
+import type { Page } from '@charmverse/core/dist/prisma';
 import log from 'loglevel';
 import { useCallback, useEffect, useState } from 'react';
 

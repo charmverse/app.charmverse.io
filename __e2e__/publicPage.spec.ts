@@ -1,7 +1,7 @@
 import { prisma } from '@charmverse/core';
+import type { Page, User } from '@charmverse/core/dist/prisma';
 import type { Browser } from '@playwright/test';
 import { chromium, expect, test } from '@playwright/test';
-import type { Page, User } from '@prisma/client';
 
 import { baseUrl } from 'config/constants';
 import { upsertPermission } from 'lib/permissions/pages';

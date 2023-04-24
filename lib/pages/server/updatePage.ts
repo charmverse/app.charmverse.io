@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core';
-import type { PageType, Prisma } from '@prisma/client';
+import type { PageType, Prisma } from '@charmverse/core/dist/prisma';
 
 import type { IPageWithPermissions } from 'lib/pages/server';
 

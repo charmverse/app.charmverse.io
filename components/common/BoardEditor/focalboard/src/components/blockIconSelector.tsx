@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-expressions */
+import type { Page } from '@charmverse/core/dist/prisma';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import EmojiEmotionsOutlinedIcon from '@mui/icons-material/EmojiEmotionsOutlined';
-import type { Page } from '@prisma/client';
 import React from 'react';
 import { useIntl } from 'react-intl';
 
