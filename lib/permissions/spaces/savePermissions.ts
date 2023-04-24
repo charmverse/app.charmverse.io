@@ -37,28 +37,40 @@ export async function savePermissions(spaceId: string, permissions: SpacePermiss
         }
       });
     }),
-    ...permissions.proposalCategories.map((permission) =>
-      prisma.proposalCategoryPermission.create({
-        data: {
-          id: permission.id,
-          proposalCategoryId: permission.proposalCategoryId,
-          permissionLevel: permission.permissionLevel,
-          roleId: permission.assignee.group === 'role' ? permission.assignee.id : undefined,
-          spaceId: permission.assignee.group === 'space' ? permission.assignee.id : undefined
-        }
-      })
-    ),
-    ...permissions.forumCategories.map((permission) =>
-      prisma.postCategoryPermission.create({
-        data: {
-          id: permission.id,
-          postCategoryId: permission.postCategoryId,
-          permissionLevel: permission.permissionLevel,
-          roleId: permission.assignee.group === 'role' ? permission.assignee.id : undefined,
-          spaceId: permission.assignee.group === 'space' ? permission.assignee.id : undefined
-        }
-      })
-    )
+    ...permissions.proposalCategories
+      .filter(
+        // Since we delete role and space permissions only, we should also only recreate role and space permissions
+        (categoryPermission) =>
+          categoryPermission.assignee.group === 'role' || categoryPermission.assignee.group === 'space'
+      )
+      .map((permission) =>
+        prisma.proposalCategoryPermission.create({
+          data: {
+            id: permission.id,
+            proposalCategoryId: permission.proposalCategoryId,
+            permissionLevel: permission.permissionLevel,
+            roleId: permission.assignee.group === 'role' ? permission.assignee.id : undefined,
+            spaceId: permission.assignee.group === 'space' ? permission.assignee.id : undefined
+          }
+        })
+      ),
+    ...permissions.forumCategories
+      // Since we delete role and space permissions only, we should also only recreate role and space permissions
+      .filter(
+        (categoryPermission) =>
+          categoryPermission.assignee.group === 'role' || categoryPermission.assignee.group === 'space'
+      )
+      .map((permission) =>
+        prisma.postCategoryPermission.create({
+          data: {
+            id: permission.id,
+            postCategoryId: permission.postCategoryId,
+            permissionLevel: permission.permissionLevel,
+            roleId: permission.assignee.group === 'role' ? permission.assignee.id : undefined,
+            spaceId: permission.assignee.group === 'space' ? permission.assignee.id : undefined
+          }
+        })
+      )
   ];
 
   return prisma.$transaction([...deleteOps, ...createOps]);
