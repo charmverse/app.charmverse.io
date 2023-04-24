@@ -13,9 +13,7 @@ services:
       - '.env'
     profiles:
       - stg
-      - tst
       - prd
-      - webapp
 
   prd-sockets: &sockets
     image: '310849459438.dkr.ecr.us-east-1.amazonaws.com/charmverse-web3-workspace:${IMGTAG}'
