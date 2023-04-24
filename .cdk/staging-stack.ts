@@ -81,7 +81,7 @@ export class CdkDeployStack extends Stack {
       {
         namespace: 'aws:autoscaling:asg',
         optionName: 'MaxSize',
-        value: '2'
+        value: '3'
       },
       {
         namespace: 'aws:autoscaling:asg',
