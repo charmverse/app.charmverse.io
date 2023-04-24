@@ -9,6 +9,7 @@ import type { LoggedInUser } from 'models';
 import { generateRole, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { verifiedJWTResponse } from 'testing/utils/litProtocol';
 import { addRoleToTokenGate, deleteTokenGate, generateTokenGate } from 'testing/utils/tokenGates';
+import wipeTestData from 'testing/wipeTestData';
 
 jest.mock('lit-js-sdk');
 
@@ -60,10 +61,12 @@ describe('verifyTokenGateMembership', () => {
     space = s;
   });
 
-  afterEach(() => {
+  afterEach(async () => {
     mockedLitSDK.verifyJwt.mockClear();
     // jest.unmock('lit-js-sdk');
     jest.resetModules();
+
+    await wipeTestData();
   });
 
   it('should return true if user does not have any token gate connected', async () => {
@@ -116,7 +119,7 @@ describe('verifyTokenGateMembership', () => {
     expect(verifyUser.user.userTokenGates.length).toBe(1);
     expect(verifyUser.user.userTokenGates[0].tokenGate).toBeNull();
     expect(res).toEqual({ removedRoles: 0, verified: false });
-    expect(spaceUser).not.toBeNull();
+    expect(spaceUser).toBeNull();
   });
 
   it('should not verify and remove user with all token gates being not verified', async () => {
@@ -169,7 +172,7 @@ describe('verifyTokenGateMembership', () => {
     const spaceUser = await getSpaceUser();
     expect(verifyUser.user.userTokenGates.length).toBe(2);
     expect(res).toEqual({ removedRoles: 0, verified: false });
-    expect(spaceUser).not.toBeNull();
+    expect(spaceUser).toBeNull();
   });
 
   it('should verify user with at least one valid token gate', async () => {
@@ -296,7 +299,7 @@ describe('verifyTokenGateMembership', () => {
     expect(verifyUser.spaceRoleToRole.length).toBe(2);
     expect(res).toEqual({ removedRoles: 2, verified: true });
     expect(spaceUser).not.toBeNull();
-    expect(spaceUser?.spaceRoleToRole.length).toBe(2);
+    expect(spaceUser?.spaceRoleToRole.length).toBe(0);
   });
 
   it('should remove roles assigned via deleted token gate', async () => {
@@ -367,8 +370,8 @@ describe('verifyTokenGateMembership', () => {
     expect(verifyUser.spaceRoleToRole.length).toBe(2);
     expect(res).toEqual({ removedRoles: 1, verified: true });
     expect(spaceUser).not.toBeNull();
-    expect(spaceUser?.spaceRoleToRole.length).toBe(2);
-    // expect(spaceUser?.spaceRoleToRole[0].roleId).toBe(role2.id);
+    expect(spaceUser?.spaceRoleToRole.length).toBe(1);
+    expect(spaceUser?.spaceRoleToRole[0].roleId).toBe(role2.id);
   });
 
   it('should not remove role assigned via at least one valid token gate', async () => {
@@ -445,17 +448,15 @@ describe('verifyTokenGateMembership', () => {
     expect(verifyUser.spaceRoleToRole.length).toBe(3);
     expect(res).toEqual({ removedRoles: 1, verified: true });
     expect(spaceUser).not.toBeNull();
-    expect(spaceUser?.spaceRoleToRole.length).toBe(3);
-    // expect(spaceUser?.spaceRoleToRole).toEqual(
-    //   expect.arrayContaining([
-    //     expect.objectContaining({ roleId: role2.id }),
-    //     expect.objectContaining({ roleId: role3.id })
-    //   ])
-    // );
-    // expect(spaceUser?.spaceRoleToRole).toEqual(
-    //   expect.not.arrayContaining([
-    //     expect.objectContaining({ roleId: role.id })
-    //   ])
-    // );
+    expect(spaceUser?.spaceRoleToRole.length).toBe(2);
+    expect(spaceUser?.spaceRoleToRole).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ roleId: role2.id }),
+        expect.objectContaining({ roleId: role3.id })
+      ])
+    );
+    expect(spaceUser?.spaceRoleToRole).toEqual(
+      expect.not.arrayContaining([expect.objectContaining({ roleId: role.id })])
+    );
   });
 });
