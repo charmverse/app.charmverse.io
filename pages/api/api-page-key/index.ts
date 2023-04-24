@@ -36,10 +36,6 @@ async function getApiKeys(req: NextApiRequest, res: NextApiResponse<ApiPageKey[]
     }
   });
 
-  if (apiPageKeys.length === 0) {
-    throw new NotFoundError(`No API keys found for the page ${pageId}`);
-  }
-
   return res.status(200).json(apiPageKeys);
 }
 
