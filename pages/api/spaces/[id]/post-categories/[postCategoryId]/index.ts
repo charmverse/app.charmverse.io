@@ -37,6 +37,20 @@ async function updatePostCategoryController(req: NextApiRequest, res: NextApiRes
 async function deletePostCategoryController(req: NextApiRequest, res: NextApiResponse) {
   const { postCategoryId } = req.query;
 
+  const permissions = await getPermissionsClient({
+    resourceId: postCategoryId as string,
+    resourceIdType: 'postCategory'
+  }).then(({ forum }) =>
+    forum.computePostCategoryPermissions({
+      resourceId: postCategoryId as string,
+      userId: req.session.user.id
+    })
+  );
+
+  if (!permissions.delete_category) {
+    throw new ActionNotPermittedError(`You cannot delete this forum category`);
+  }
+
   await deletePostCategory(postCategoryId as string);
 
   return res.status(200).end();

@@ -52,10 +52,11 @@ async function getPosts(req: NextApiRequest, res: NextApiResponse<PaginatedPostL
 async function createForumPostController(req: NextApiRequest, res: NextApiResponse<Post>) {
   const userId = req.session.user.id;
 
-  const categoryId = req.body.postCategoryId as string;
+  const categoryId = (req.body as CreateForumPostInput).categoryId;
+
   const permissions = await getPermissionsClient({
-    resourceId: req.body.categoryId,
-    resourceIdType: 'post'
+    resourceId: categoryId,
+    resourceIdType: 'postCategory'
   }).then((client) =>
     client.forum.computePostCategoryPermissions({
       resourceId: categoryId,
