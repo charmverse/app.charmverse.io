@@ -3,8 +3,6 @@ services:
     image: '310849459438.dkr.ecr.us-east-1.amazonaws.com/charmverse-web3-workspace:${IMGTAG}'
     ports:
       - '80:3000'
-    # Note: npm does not pass SIG* signals to the child process, so we need to use `sh -c` to run the command
-    command: ['npm', 'run', '${NPM_SCRIPT}']
     labels:
       com.datadoghq.ad.logs: '[{"source": "nodejs", "service": "${SERVICE_NAME}"}]'
       com.datadoghq.tags.service: "${SERVICE_NAME}"
@@ -12,8 +10,6 @@ services:
       - $PWD/.env:/app/.env
     env_file:
       - '.env'
-    profiles:
-      - prd
 
   prd-cron: &cron
     <<: *prd
