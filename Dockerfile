@@ -19,4 +19,3 @@ ENV NEXT_TELEMETRY_DISABLED 1
 ENV LOG_LEVEL debug
 
 EXPOSE 3000
-CMD ["npm", "run", "start:test"]

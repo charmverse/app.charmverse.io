@@ -18,7 +18,7 @@ services:
       - prd-cron
 
   stg-cron:
-    <<: *defaults
+    <<: *cron
     command: ['npm', 'run', 'cron:staging']
     profiles:
       - stg-cron
