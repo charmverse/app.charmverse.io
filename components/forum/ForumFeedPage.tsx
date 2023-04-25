@@ -24,6 +24,7 @@ import { CategorySelect } from './components/CategorySelect';
 import { CreateForumPost } from './components/CreateForumPost';
 import { PostSkeleton } from './components/PostList/components/PostSkeleton';
 import { ForumPostList } from './components/PostList/PostList';
+import { usePostCategoryPermissions } from './hooks/usePostCategoryPermissions';
 
 export function ForumPage() {
   const [search, setSearch] = useState('');
@@ -31,9 +32,23 @@ export function ForumPage() {
   const currentSpace = useCurrentSpace();
   const sort = router.query.sort as PostSortOption | undefined;
   const { createPost, showPost } = usePostDialog();
-  const { categories, isCategoriesLoaded } = useForumCategories();
+  const { categories, isCategoriesLoaded, getPostableCategories } = useForumCategories();
   const [, setTitle] = usePageTitle();
   const [currentCategory, setCurrentCategory] = useState<PostCategory | null>(null);
+
+  const { permissions: currentCategoryPermissions } = usePostCategoryPermissions(currentCategory?.id ?? null);
+  // Allow user to create a post either if they are in "All categories and there is at least one category they can post to, OR they are in a specific category and they have permission to post there"
+  let disableCreatePost = false;
+  let disabledCreatePostTooltip = '';
+
+  if (getPostableCategories().length === 0) {
+    disableCreatePost = true;
+    disabledCreatePostTooltip = 'You do not have permission to create posts in any category';
+  } else if (currentCategory && currentCategoryPermissions?.create_post === false) {
+    disableCreatePost = true;
+    disabledCreatePostTooltip = `You do not have permission to create posts in the ${currentCategory.name} category`;
+  }
+
   useEffect(() => {
     if (currentCategory?.name) {
       setTitle(currentCategory.name);
@@ -173,7 +188,11 @@ export function ForumPage() {
               handleSort={handleSortUpdate}
             />
           </Box>
-          <CreateForumPost onClick={showNewPostPopup} />
+          <CreateForumPost
+            disabled={disableCreatePost}
+            disabledTooltip={disabledCreatePostTooltip}
+            onClick={showNewPostPopup}
+          />
           {!isCategoriesLoaded ? (
             <PostSkeleton />
           ) : (
