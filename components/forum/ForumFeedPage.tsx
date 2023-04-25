@@ -44,7 +44,7 @@ export function ForumPage() {
 
   if (getPostableCategories().length === 0) {
     disableCreatePost = true;
-    disabledCreatePostTooltip = 'You do not have permission to create posts in any category';
+    disabledCreatePostTooltip = 'You cannot create posts in this space';
   } else if (currentCategory && currentCategoryPermissions?.create_post === false) {
     disableCreatePost = true;
     disabledCreatePostTooltip = `You do not have permission to create posts in the ${currentCategory.name} category`;
