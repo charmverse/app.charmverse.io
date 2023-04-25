@@ -8,6 +8,8 @@ services:
       - $PWD/.env:/app/.env
     env_file:
       - '.env'
+    profiles:
+      - default_config
 
   prd-cron:
     extends:
@@ -112,5 +114,7 @@ services:
       DD_DOGSTATSD_NON_LOCAL_TRAFFIC: 'true'
       DD_EC2_PREFER_IMDSV2: 'true'
     profiles:
-      - prd
+      - prd-cron
+      - prd-webapp
+      - prd-sockets
       - ddtst
