@@ -1,9 +1,10 @@
 services:
-  prd-webapp: &prd
+  prd: &prd
     image: '310849459438.dkr.ecr.us-east-1.amazonaws.com/charmverse-web3-workspace:${IMGTAG}'
     ports:
       - '80:3000'
-    command: ['sh', '-c', 'prisma migrate deploy && node --require dd-trace/init  ./dist/server.js']
+    # Note: npm does not pass SIG* signals to the child process, so we need to use `sh -c` to run the command
+    command: ['npm', 'run', '${NPM_SCRIPT}']
     labels:
       com.datadoghq.ad.logs: '[{"source": "nodejs", "service": "${SERVICE_NAME}"}]'
       com.datadoghq.tags.service: "${SERVICE_NAME}"
@@ -13,6 +14,18 @@ services:
       - '.env'
     profiles:
       - prd
+
+  prd-cron: &cron
+    <<: *prd
+    command: ['npm', 'run', 'cron:prod']
+    profiles:
+      - prd-cron
+
+  stg-cron:
+    <<: *cron
+    command: ['npm', 'run', 'cron:staging']
+    profiles:
+      - stg-cron
 
   prd-webapp: &webapp
     <<: *prd
