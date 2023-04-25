@@ -1,8 +1,6 @@
 services:
   defaults:
     image: '310849459438.dkr.ecr.us-east-1.amazonaws.com/charmverse-web3-workspace:${IMGTAG}'
-    ports:
-      - '80:3000'
     labels:
       com.datadoghq.ad.logs: '[{"source": "nodejs", "service": "${SERVICE_NAME}"}]'
       com.datadoghq.tags.service: "${SERVICE_NAME}"
@@ -15,6 +13,8 @@ services:
     extends:
       service: defaults
     command: ['npm', 'run', 'cron:prod']
+    ports:
+      - '80:3000'
     profiles:
       - prd-cron
 
@@ -22,13 +22,17 @@ services:
     extends:
       service: prd-cron
     command: ['npm', 'run', 'cron:staging']
+    ports:
+      - '80:3000'
     profiles:
       - stg-cron
 
-  prd-webapp: &webapp
+  prd-webapp:
     extends:
       service: defaults
     command: ['sh', '-c', 'prisma migrate deploy && node --require dd-trace/init ./dist/server.js']
+    ports:
+      - '80:3000'
     profiles:
       - prd-webapp
 
@@ -36,13 +40,17 @@ services:
     extends:
       service: prd-webapp
     command: ['sh', '-c', 'npx react-env --path .env.staging -- node ./dist/server.js']
+    ports:
+      - '80:3000'
     profiles:
       - stg-webapp
 
-  prd-sockets: &sockets
+  prd-sockets:
     extends:
       service: defaults
     command: ['sh', '-c', 'node ./.next/server/websockets.js']
+    ports:
+      - '80:3000'
     profiles:
       - prd-sockets
 
@@ -50,6 +58,8 @@ services:
     extends:
       service: prd-sockets
     command: ['sh', '-c', 'npx react-env --path .env.staging -- node ./.next/server/websockets.js']
+    ports:
+      - '80:3000'
     profiles:
       - stg-sockets
 
