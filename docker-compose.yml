@@ -108,3 +108,4 @@ services:
       - prd-webapp
       - prd-sockets
       - ddtst
+      - stg-webapp

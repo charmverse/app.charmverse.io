@@ -2,7 +2,6 @@ import styled from '@emotion/styled';
 import MenuItem from '@mui/material/MenuItem';
 import Typography from '@mui/material/Typography';
 import type { PostCategory } from '@prisma/client';
-import { useRouter } from 'next/router';
 
 import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
