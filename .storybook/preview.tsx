@@ -1,7 +1,8 @@
 import type { Preview } from '@storybook/react';
 import React from 'react';
-import { CssBaseline, ThemeProvider } from '@mui/material';
+import { Box, CssBaseline, ThemeProvider } from '@mui/material';
 import { createThemeLightSensitive } from '../theme';
+import { monoFont, serifFont } from '../theme/fonts';
 import 'theme/styles.scss';
 
 const preview: Preview = {
@@ -21,7 +22,9 @@ export default preview;
 export const withMuiTheme = (Story) => (
   <ThemeProvider theme={createThemeLightSensitive('light')}>
     <CssBaseline />
-    <Story />
+    <Box className={`${serifFont.variable} ${monoFont.variable}`}>
+      <Story />
+    </Box>
   </ThemeProvider>
 );
 
