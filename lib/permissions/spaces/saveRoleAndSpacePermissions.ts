@@ -1,11 +1,12 @@
 import type { SpaceOperation } from '@prisma/client';
+import { v4 as uuid } from 'uuid';
 
 import { prisma } from 'db';
 import { InvalidInputError, MissingDataError } from 'lib/utilities/errors';
 
 import type { SpacePermissions } from './listPermissions';
 
-export async function savePermissions(spaceId: string, permissions: SpacePermissions) {
+export async function saveRoleAndSpacePermissions(spaceId: string, permissions: SpacePermissions) {
   const memberPermissions = permissions.space.filter((p) => p.assignee.group === 'space');
 
   // make sure we always define member/default permissions
@@ -37,28 +38,40 @@ export async function savePermissions(spaceId: string, permissions: SpacePermiss
         }
       });
     }),
-    ...permissions.proposalCategories.map((permission) =>
-      prisma.proposalCategoryPermission.create({
-        data: {
-          id: permission.id,
-          proposalCategoryId: permission.proposalCategoryId,
-          permissionLevel: permission.permissionLevel,
-          roleId: permission.assignee.group === 'role' ? permission.assignee.id : undefined,
-          spaceId: permission.assignee.group === 'space' ? permission.assignee.id : undefined
-        }
-      })
-    ),
-    ...permissions.forumCategories.map((permission) =>
-      prisma.postCategoryPermission.create({
-        data: {
-          id: permission.id,
-          postCategoryId: permission.postCategoryId,
-          permissionLevel: permission.permissionLevel,
-          roleId: permission.assignee.group === 'role' ? permission.assignee.id : undefined,
-          spaceId: permission.assignee.group === 'space' ? permission.assignee.id : undefined
-        }
-      })
-    )
+    ...permissions.proposalCategories
+      .filter(
+        // Since we delete role and space permissions only, we should also only recreate role and space permissions
+        (categoryPermission) =>
+          categoryPermission.assignee.group === 'role' || categoryPermission.assignee.group === 'space'
+      )
+      .map((permission) =>
+        prisma.proposalCategoryPermission.create({
+          data: {
+            id: permission.id ?? uuid,
+            proposalCategoryId: permission.proposalCategoryId,
+            permissionLevel: permission.permissionLevel,
+            roleId: permission.assignee.group === 'role' ? permission.assignee.id : undefined,
+            spaceId: permission.assignee.group === 'space' ? permission.assignee.id : undefined
+          }
+        })
+      ),
+    ...permissions.forumCategories
+      // Since we delete role and space permissions only, we should also only recreate role and space permissions
+      .filter(
+        (categoryPermission) =>
+          categoryPermission.assignee.group === 'role' || categoryPermission.assignee.group === 'space'
+      )
+      .map((permission) =>
+        prisma.postCategoryPermission.create({
+          data: {
+            id: permission.id ?? uuid(),
+            postCategoryId: permission.postCategoryId,
+            permissionLevel: permission.permissionLevel,
+            roleId: permission.assignee.group === 'role' ? permission.assignee.id : undefined,
+            spaceId: permission.assignee.group === 'space' ? permission.assignee.id : undefined
+          }
+        })
+      )
   ];
 
   return prisma.$transaction([...deleteOps, ...createOps]);

@@ -28,7 +28,7 @@ services:
 
   prd-sockets: &sockets
     <<: *prd
-    command: ['node', './.next/server/websockets.js']
+    command: ['sh', '-c', 'node ./.next/server/websockets.js']
     profiles:
       - prd-sockets
 
