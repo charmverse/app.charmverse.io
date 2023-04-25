@@ -17,6 +17,26 @@ export const backspaceCmd: Command = (state, dispatch) => {
   const summaryNode = findParentNodeOfTypeClosestToPos($cursor, state.schema.nodes.disclosureSummary);
   const disclosureNode = findParentNodeOfTypeClosestToPos($cursor, state.schema.nodes.disclosureDetails);
 
+  const nextNode = tr.doc.resolve($cursor.pos + $cursor.node().nodeSize).node();
+  // If the cursor is at the paragraph (#) node and the next sibling is a disclosureDetails node
+  if (nextNode.type === state.schema.nodes.disclosureDetails) {
+    const paragraphNode = $cursor.parent;
+    const paragraphIsEmpty = paragraphNode.textContent.length === 0;
+
+    // If the paragraph is empty, delete the paragraph node
+    if (paragraphIsEmpty) {
+      const paragraphStart = $cursor.before();
+      const paragraphEnd = $cursor.after();
+      tr.delete(paragraphStart, paragraphEnd);
+
+      if (dispatch) {
+        dispatch(tr);
+      }
+
+      return true;
+    }
+  }
+
   // if we are inside a summary node and at the beginning, delete the disclosure
   if ($cursor.parentOffset === 0 && disclosureNode && summaryNode) {
     const nodes: Node[] = [];
