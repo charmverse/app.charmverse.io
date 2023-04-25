@@ -37,6 +37,9 @@ app.prepare().then(() => {
     .listen(port, () => {
       log.info(`[server] Next.js server running in ${appEnv}: http://${hostname}:${port}`);
     });
+
+  // increase the keep-alive timeout >60s for AWS ALB to avoid 502 errors
+  server.keepAliveTimeout = 61 * 1000;
 });
 
 function cleanup() {

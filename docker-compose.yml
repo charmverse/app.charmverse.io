@@ -1,9 +1,9 @@
 services:
-  prd-webapp: &webapp
+  prd-webapp: &prd
     image: '310849459438.dkr.ecr.us-east-1.amazonaws.com/charmverse-web3-workspace:${IMGTAG}'
     ports:
       - '80:3000'
-    command: ['sh', '-c', 'node ./dist/server.js']
+    command: ['sh', '-c', 'prisma migrate deploy && node --require dd-trace/init  ./dist/server.js']
     labels:
       com.datadoghq.ad.logs: '[{"source": "nodejs", "service": "${SERVICE_NAME}"}]'
       com.datadoghq.tags.service: "${SERVICE_NAME}"
@@ -12,8 +12,12 @@ services:
     env_file:
       - '.env'
     profiles:
-      - stg
       - prd
+
+  prd-webapp: &webapp
+    <<: *prd
+    command: ['sh', '-c', 'prisma migrate deploy && node --require dd-trace/init ./dist/server.js']
+    profiles:
       - prd-webapp
 
   stg-webapp:
@@ -23,17 +27,8 @@ services:
       - stg-webapp
 
   prd-sockets: &sockets
-    image: '310849459438.dkr.ecr.us-east-1.amazonaws.com/charmverse-web3-workspace:${IMGTAG}'
-    ports:
-      - '80:3000'
+    <<: *prd
     command: ['node', './.next/server/websockets.js']
-    labels:
-      com.datadoghq.ad.logs: '[{"source": "nodejs", "service": "${SERVICE_NAME}"}]'
-      com.datadoghq.tags.service: "${SERVICE_NAME}"
-    volumes:
-      - $PWD/.env:/app/.env
-    env_file:
-      - '.env'
     profiles:
       - prd-sockets
 

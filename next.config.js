@@ -126,7 +126,6 @@ const config = {
             ..._entry,
             cron: './background/cron.ts',
             websockets: './background/websockets.ts',
-            // server: './server.ts',
             countSpaceData: './scripts/countSpaceData.ts'
           };
         });
