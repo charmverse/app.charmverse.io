@@ -1,6 +1,5 @@
 import type { Server } from 'http';
 import { createServer } from 'http';
-import { join } from 'path';
 import { parse } from 'url';
 
 import next from 'next';
@@ -9,7 +8,7 @@ import { appEnv } from './config/constants';
 import log from './lib/log';
 
 const port = parseInt(process.env.PORT || '3000', 10);
-const dev = process.env.NODE_ENV !== 'production';
+const dev = appEnv === 'development';
 const hostname = 'localhost';
 // when using middleware `hostname` and `port` must be provided below
 const app = next({ dev, hostname, port, customServer: false });
