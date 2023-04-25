@@ -10,6 +10,9 @@ services:
       - '80:3000'
     env_file:
       - '.env'
+
+    environment:
+      - NODE_ENV=production
     profiles:
       - default_config
 
@@ -24,6 +27,8 @@ services:
     extends:
       service: prd-cron
     command: ['npm', 'run', 'cron:staging']
+    environment:
+      - NEXT_PUBLIC_APP_ENV=staging
     profiles:
       - stg-cron
 
@@ -38,6 +43,8 @@ services:
     extends:
       service: prd-webapp
     command: ['sh', '-c', 'npx react-env --path .env.staging -- node ./dist/server.js']
+    environment:
+      - NEXT_PUBLIC_APP_ENV=staging
     profiles:
       - stg-webapp
 
@@ -52,6 +59,8 @@ services:
     extends:
       service: prd-sockets
     command: ['sh', '-c', 'npx react-env --path .env.staging -- node ./.next/server/websockets.js']
+    environment:
+      - NEXT_PUBLIC_APP_ENV=staging
     profiles:
       - stg-sockets
 
