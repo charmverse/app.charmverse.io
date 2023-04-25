@@ -5,9 +5,10 @@
     "defaults"
   ],
   "scripts": {
-    "build": "NODE_OPTIONS=\"--max_old_space_size=4096\" next build",
+    "build": "NODE_OPTIONS=\"--max_old_space_size=4096\" next build && npm run build:server",
     "build:win": "npx next build",
     "build:prisma": "prisma generate",
+    "build:server": "tsc --project tsconfig.server.json",
     "build:analyze": "cross-env ANALYZE=true next build",
     "deploy:staging": "npx cdk deploy \"stg-charmverse-${STAGE}\" --outputs-file cdk.out.json",
     "postdeploy:staging": "node --eval \"console.log('env_url=' + require('./cdk.out.json')['stg-charmverse-${STAGE}'].DeploymentUrl)\"  >> $GITHUB_OUTPUT",
@@ -32,7 +33,7 @@
     "server:prod:win": "node --require dd-trace/init node_modules/next/dist/bin/next start",
     "server:sockets": "NEXT_PUBLIC_WEBSOCKETS_HOST=http://localhost:3001 next dev",
     "server:staging": "npx react-env --path .env.staging -- node --require dd-trace/init node_modules/.bin/next start --keepAliveTimeout 70000",
-    "start": "next dev",
+    "start": "npx ts-node --project tsconfig.server.json server.ts",
     "start:debug": "NODE_OPTIONS='--inspect' next",
     "start:ssl": "(npx local-ssl-proxy --source 3000 --target 8080) & next dev --port 8080",
     "start:test": "NODE_OPTIONS=\"--max_old_space_size=4096\" dotenv -e .env.test.local -- prisma migrate deploy && dotenv -e .env.test.local -- npm start",

@@ -11,7 +11,7 @@ const esmModules = require('./next.base').esmModules;
 const skipCodeChecks = process.env.CI === 'true';
 
 const config = {
-  output: 'standalone',
+  // output: 'standalone',
   poweredByHeader: false,
   eslint: {
     // add background and serverless to the default list of pages for eslint
@@ -126,6 +126,7 @@ const config = {
             ..._entry,
             cron: './background/cron.ts',
             websockets: './background/websockets.ts',
+            // server: './server.ts',
             countSpaceData: './scripts/countSpaceData.ts'
           };
         });
