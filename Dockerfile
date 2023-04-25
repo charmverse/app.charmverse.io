@@ -8,11 +8,7 @@ FROM node:18-slim AS BASE_APP
 
 WORKDIR /app
 
-COPY /app/.next/standalone ./
-COPY /app/.next/static ./.next/static
-COPY /app/public ./public
-COPY /app/.next/server/websockets.js ./websockets.js
-COPY /app/.next/server/cron.js ./cron.js
+COPY . .
 
 ENV PORT 3000
 
