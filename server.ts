@@ -42,6 +42,10 @@ app.prepare().then(() => {
 });
 
 function cleanup() {
+  if (dev) {
+    // server never closes in dev mode due to HMR
+    process.exit();
+  }
   log.info('[server] Closing Next.js server connections...');
   server?.close(() => {
     log.info('[server] Exiting process...');
