@@ -14,6 +14,7 @@ services:
     environment:
       - NODE_ENV=production
     profiles:
+      # services need at least one profile or else they will be started along with what is in COMPOSE_PROFILES env var
       - default_config
 
   prd-cron:
