@@ -3,7 +3,7 @@ services:
     image: '310849459438.dkr.ecr.us-east-1.amazonaws.com/charmverse-web3-workspace:${IMGTAG}'
     ports:
       - '80:3000'
-    command: ['sh', '-c', 'node ./server.js']
+    command: ['sh', '-c', 'node ./dist/server.js']
     labels:
       com.datadoghq.ad.logs: '[{"source": "nodejs", "service": "${SERVICE_NAME}"}]'
       com.datadoghq.tags.service: "${SERVICE_NAME}"
@@ -18,7 +18,7 @@ services:
 
   stg-webapp:
     <<: *webapp
-    command: ['sh', '-c', 'npx react-env --path .env.staging -- node ./server.js']
+    command: ['sh', '-c', 'npx react-env --path .env.staging -- node ./dist/server.js']
     profiles:
       - stg-webapp
 
