@@ -19,3 +19,5 @@ ENV NEXT_TELEMETRY_DISABLED 1
 ENV LOG_LEVEL debug
 
 EXPOSE 3000
+# need something to keep docker container running until docker-compose runs its command
+CMD ["tail", "-f", "/dev/null"]
