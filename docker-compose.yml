@@ -1,5 +1,5 @@
 services:
-  prd: &prd
+  defaults: &defaults
     image: '310849459438.dkr.ecr.us-east-1.amazonaws.com/charmverse-web3-workspace:${IMGTAG}'
     ports:
       - '80:3000'
@@ -12,19 +12,19 @@ services:
       - '.env'
 
   prd-cron: &cron
-    <<: *prd
+    <<: *defaults
     command: ['npm', 'run', 'cron:prod']
     profiles:
       - prd-cron
 
   stg-cron:
-    <<: *cron
+    <<: *defaults
     command: ['npm', 'run', 'cron:staging']
     profiles:
       - stg-cron
 
   prd-webapp: &webapp
-    <<: *prd
+    <<: *defaults
     command: ['sh', '-c', 'prisma migrate deploy && node --require dd-trace/init ./dist/server.js']
     profiles:
       - prd-webapp
@@ -36,7 +36,7 @@ services:
       - stg-webapp
 
   prd-sockets: &sockets
-    <<: *prd
+    <<: *defaults
     command: ['sh', '-c', 'node ./.next/server/websockets.js']
     profiles:
       - prd-sockets
