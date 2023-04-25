@@ -6,6 +6,8 @@ services:
       com.datadoghq.tags.service: "${SERVICE_NAME}"
     volumes:
       - $PWD/.env:/app/.env
+    ports:
+      - '80:3000'
     env_file:
       - '.env'
     profiles:
@@ -15,8 +17,6 @@ services:
     extends:
       service: defaults
     command: ['npm', 'run', 'cron:prod']
-    ports:
-      - '80:3000'
     profiles:
       - prd-cron
 
@@ -24,8 +24,6 @@ services:
     extends:
       service: prd-cron
     command: ['npm', 'run', 'cron:staging']
-    ports:
-      - '80:3000'
     profiles:
       - stg-cron
 
@@ -33,8 +31,6 @@ services:
     extends:
       service: defaults
     command: ['sh', '-c', 'prisma migrate deploy && node --require dd-trace/init ./dist/server.js']
-    ports:
-      - '80:3000'
     profiles:
       - prd-webapp
 
@@ -42,8 +38,6 @@ services:
     extends:
       service: prd-webapp
     command: ['sh', '-c', 'npx react-env --path .env.staging -- node ./dist/server.js']
-    ports:
-      - '80:3000'
     profiles:
       - stg-webapp
 
@@ -51,8 +45,6 @@ services:
     extends:
       service: defaults
     command: ['sh', '-c', 'node ./.next/server/websockets.js']
-    ports:
-      - '80:3000'
     profiles:
       - prd-sockets
 
@@ -60,8 +52,6 @@ services:
     extends:
       service: prd-sockets
     command: ['sh', '-c', 'npx react-env --path .env.staging -- node ./.next/server/websockets.js']
-    ports:
-      - '80:3000'
     profiles:
       - stg-sockets
 
@@ -70,7 +60,7 @@ services:
       context: .
     ports:
       - '80:3000'
-    command: ['npm', 'run', 'start']
+    command: ['npm', 'start']
     volumes:
       - $PWD:/app
     env_file:
