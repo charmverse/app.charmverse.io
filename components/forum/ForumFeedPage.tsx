@@ -16,6 +16,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useForumCategories } from 'hooks/useForumCategories';
 import { usePageTitle } from 'hooks/usePageTitle';
 import type { PostSortOption } from 'lib/forums/posts/constants';
+import log from 'lib/log';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
 import { CategoryMenu } from './components/CategoryMenu';
@@ -128,9 +129,11 @@ export function ForumPage() {
 
   useEffect(() => {
     if (currentSpace) {
-      charmClient.track.trackAction('main_feed_page_load', {
-        spaceId: currentSpace.id
-      });
+      charmClient.track
+        .trackAction('main_feed_page_load', {
+          spaceId: currentSpace.id
+        })
+        .catch((err) => log.debug(err));
     }
   }, [Boolean(currentSpace)]);
 
