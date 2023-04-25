@@ -10,7 +10,7 @@ jobs:
       (github.event.action == 'unlabeled' && github.event.label.name == ':rocket: deploy') ||
       (github.event.action == 'closed' && contains(github.event.pull_request.labels.*.name, ':rocket: deploy'))
     runs-on: ubuntu-latest
-    # prevent workflows running in parallel
+    # wait until all deploys are complete to destroy the env
     concurrency: deploy-pr-app-${{ github.head_ref }}
     steps:
       - name: configure AWS credentials
