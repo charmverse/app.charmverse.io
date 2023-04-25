@@ -26,7 +26,7 @@ services:
 
   stg-cron:
     extends:
-      service: prd-cron
+      service: defaults
     command: ['npm', 'run', 'cron:staging']
     environment:
       - NEXT_PUBLIC_APP_ENV=staging
@@ -42,7 +42,7 @@ services:
 
   stg-webapp:
     extends:
-      service: prd-webapp
+      service: defaults
     command: ['sh', '-c', 'npm run migrate:deploy && node ./dist/server.js']
     environment:
       - NEXT_PUBLIC_APP_ENV=staging
@@ -58,7 +58,7 @@ services:
 
   stg-sockets:
     extends:
-      service: prd-sockets
+      service: defaults
     command: ['sh', '-c', 'node ./.next/server/websockets.js']
     environment:
       - NEXT_PUBLIC_APP_ENV=staging
