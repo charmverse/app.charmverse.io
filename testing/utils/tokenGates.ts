@@ -23,6 +23,13 @@ export async function deleteTokenGate(id: string) {
   });
 }
 
+export async function clearTokenGateData() {
+  if (process.env.NODE_ENV !== 'production') {
+    await prisma.tokenGate.deleteMany({});
+    await prisma.userTokenGate.deleteMany({});
+  }
+}
+
 export async function addRoleToTokenGate({ tokenGateId, roleId }: { tokenGateId: string; roleId: string }) {
   return prisma.tokenGateToRole.create({
     data: {

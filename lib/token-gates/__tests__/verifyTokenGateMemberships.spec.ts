@@ -7,8 +7,7 @@ import { verifyTokenGateMemberships } from 'lib/token-gates/verifyTokenGateMembe
 import type { LoggedInUser } from 'models';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { verifiedJWTResponse } from 'testing/utils/litProtocol';
-import { deleteTokenGate, generateTokenGate } from 'testing/utils/tokenGates';
-import wipeTestData from 'testing/wipeTestData';
+import { clearTokenGateData, deleteTokenGate, generateTokenGate } from 'testing/utils/tokenGates';
 
 jest.mock('lit-js-sdk');
 
@@ -33,6 +32,7 @@ describe('verifyTokenGateMemberships', () => {
   let space2: Space;
 
   beforeEach(async () => {
+    await clearTokenGateData();
     const { user: u, space: s } = await generateUserAndSpaceWithApiToken(undefined, false);
     const { user: u2, space: s2 } = await generateUserAndSpaceWithApiToken(undefined, false);
     user = u;
@@ -45,8 +45,6 @@ describe('verifyTokenGateMemberships', () => {
     mockedLitSDK.verifyJwt.mockClear();
     // jest.unmock('lit-js-sdk');
     jest.resetModules();
-
-    await wipeTestData();
   });
 
   it('should not remove users without token gates', async () => {

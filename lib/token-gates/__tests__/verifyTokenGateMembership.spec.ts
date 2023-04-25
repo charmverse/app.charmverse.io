@@ -9,7 +9,6 @@ import type { LoggedInUser } from 'models';
 import { generateRole, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { verifiedJWTResponse } from 'testing/utils/litProtocol';
 import { addRoleToTokenGate, deleteTokenGate, generateTokenGate } from 'testing/utils/tokenGates';
-import wipeTestData from 'testing/wipeTestData';
 
 jest.mock('lit-js-sdk');
 
@@ -65,8 +64,6 @@ describe('verifyTokenGateMembership', () => {
     mockedLitSDK.verifyJwt.mockClear();
     // jest.unmock('lit-js-sdk');
     jest.resetModules();
-
-    await wipeTestData();
   });
 
   it('should return true if user does not have any token gate connected', async () => {
