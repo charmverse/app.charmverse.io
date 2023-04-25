@@ -144,7 +144,7 @@ function TableRow(props: Props) {
       style={{ opacity: isDragging ? 0.5 : 1 }}
     >
       {/* Columns, one per property */}
-      {visiblePropertyTemplates.map((template) => {
+      {visiblePropertyTemplates.map((template, templateIndex) => {
         if (template.id === Constants.titleColumnId) {
           return (
             <Box
@@ -161,7 +161,7 @@ function TableRow(props: Props) {
               key={template.id}
               onPaste={(e) => e.stopPropagation()}
             >
-              {!props.readOnly && (
+              {!props.readOnly && templateIndex === 0 && (
                 <IconButton className='icons' onClick={handleClick} size='small'>
                   <DragIndicatorIcon color='secondary' />
                 </IconButton>
@@ -190,6 +190,11 @@ function TableRow(props: Props) {
             ref={columnRefs.get(template.id)}
             onPaste={(e) => e.stopPropagation()}
           >
+            {!props.readOnly && templateIndex === 0 && (
+              <IconButton className='icons' onClick={handleClick} size='small'>
+                <DragIndicatorIcon color='secondary' />
+              </IconButton>
+            )}
             <PropertyValueElement
               readOnly={props.readOnly}
               card={card}
