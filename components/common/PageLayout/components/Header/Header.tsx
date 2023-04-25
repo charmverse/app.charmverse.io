@@ -41,6 +41,7 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import { useToggleFavorite } from 'hooks/useToggleFavorite';
 import { useUser } from 'hooks/useUser';
 import type { PageUpdates } from 'lib/pages';
+import { monoFont, serifFont } from 'theme/fonts';
 
 import { BountyActions } from './components/BountyActions';
 import BountyShareButton from './components/BountyShareButton/BountyShareButton';
@@ -383,7 +384,7 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
     <List data-test='header--page-actions' dense>
       <Box px={2.5} mb={1}>
         <Typography variant='caption'>Style</Typography>
-        <Box display='flex' mt={0.5}>
+        <Box display='flex' mt={0.5} className={`${serifFont.variable} ${monoFont.variable}`}>
           <StyledFontButton
             size='small'
             color={basePage?.fontFamily === 'default' ? 'primary' : 'secondary'}
