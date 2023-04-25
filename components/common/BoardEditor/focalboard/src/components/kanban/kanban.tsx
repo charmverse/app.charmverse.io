@@ -1,5 +1,4 @@
 /* eslint-disable max-lines */
-// import Button from '../../widgets/buttons/button'
 import { Box, Menu, TextField } from '@mui/material';
 import Button from '@mui/material/Button';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
@@ -12,7 +11,6 @@ import type { Board, BoardGroup, IPropertyOption, IPropertyTemplate } from 'lib/
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
 
-import { Constants } from '../../constants';
 import type { BlockChange } from '../../mutator';
 import mutator from '../../mutator';
 import { IDType, Utils } from '../../utils';
