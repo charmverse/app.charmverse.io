@@ -156,7 +156,7 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
   }
 
   // Only expose account if current user and account match up
-  useEffect(() => {
+  const handleSigntures = useCallback(async () => {
     if (isConnectingIdentity) {
       // Don't update new values
     } else if (account && (user?.wallets.some((w) => lowerCaseEqual(w.address, account)) || accountUpdatePaused)) {
@@ -173,28 +173,35 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
       const storedSignature = getStoredSignature();
 
       if (storedSignature && storedSignature.address === account) {
-        loginFromWeb3Account(storedSignature).catch((e) => {
-          setSignature(null);
-          setStoredAccount(null);
-          logoutUser();
-        });
+        await loginFromWeb3Account(storedSignature);
+      } else if (storedSignature?.address !== account) {
+        const otherAccount = user?.wallets.find((w) => w.address !== account)?.address;
+
+        if (otherAccount) {
+          const signit = await sign(otherAccount);
+          await loginFromWeb3Account(signit);
+        }
       } else {
         setSignature(null);
         setStoredAccount(null);
         // We should only logout if there is a user. The logout function triggers a wipe of the SWR cache, and this was having undesirable effects for people with a connected wallet but no user account
         if (user) {
-          logoutUser();
+          await logoutUser();
         }
       }
     }
   }, [account, user, isConnectingIdentity, isLoaded, accountUpdatePaused]);
 
-  async function sign(): Promise<AuthSig> {
+  useEffect(() => {
+    handleSigntures();
+  }, [handleSigntures]);
+
+  async function sign(externalAccount?: string): Promise<AuthSig> {
     if (!account) {
       throw new MissingWeb3AccountError();
     }
 
-    const signer = library.getSigner(account) as Signer;
+    const signer = library.getSigner(externalAccount || account) as Signer;
 
     if (!signer) {
       throw new ExternalServiceError('Missing signer');
@@ -207,7 +214,7 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
 
       const preparedMessage = {
         domain: window.location.host,
-        address: getAddress(account), // convert to EIP-55 format or else SIWE complains
+        address: getAddress(externalAccount || account), // convert to EIP-55 format or else SIWE complains
         uri: globalThis.location.origin,
         version: '1',
         chainId: signerChainId
@@ -222,7 +229,7 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
       const newSignature = await signer.signMessage(messageBytes);
       const signatureAddress = verifyMessage(body, newSignature).toLowerCase();
 
-      if (!lowerCaseEqual(signatureAddress, account)) {
+      if (!lowerCaseEqual(signatureAddress, externalAccount || account)) {
         throw new Error('Signature address does not match account');
       }
 
@@ -255,11 +262,11 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
       account && user ? charmClient.removeUserWallet({ address: arg }) : null,
     {
       async onSuccess(updatedUser) {
+        setUser(updatedUser);
         logoutWallet();
         await mutate(`/nfts/${updatedUser?.id}`);
         await mutate(`/orgs/${updatedUser?.id}`);
         await mutate(`/poaps/${updatedUser?.id}`);
-        setUser(updatedUser);
       }
     }
   );
