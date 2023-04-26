@@ -31,6 +31,9 @@ function emojiSpec({ defaultEmoji = '😃' }: { defaultEmoji?: string } = {}): R
       attrs: {
         emoji: {
           default: defaultEmoji
+        },
+        track: {
+          default: []
         }
       },
       inline: true,

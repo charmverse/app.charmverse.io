@@ -176,7 +176,6 @@ export const insertion: BaseRawMarkSpec = {
         default: true
       }
     },
-    inclusive: false,
     group: 'track',
     parseDOM: [
       {
