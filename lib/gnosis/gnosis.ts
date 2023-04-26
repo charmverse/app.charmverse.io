@@ -17,12 +17,12 @@ function getGnosisRPCUrl(chainId: number) {
 }
 
 interface GetGnosisServiceProps {
-  signer: ethers.Signer;
+  signer: ethers.Signer | ethers.providers.Provider;
   chainId?: number;
   serviceUrl?: string;
 }
 
-function getGnosisService({ signer, chainId, serviceUrl }: GetGnosisServiceProps): SafeServiceClient | null {
+export function getGnosisService({ signer, chainId, serviceUrl }: GetGnosisServiceProps): SafeServiceClient | null {
   const txServiceUrl = serviceUrl || (chainId && getGnosisRPCUrl(chainId));
   if (!txServiceUrl) {
     return null;
