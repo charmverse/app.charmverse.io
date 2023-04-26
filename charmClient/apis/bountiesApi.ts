@@ -124,4 +124,8 @@ export class BountiesApi {
   getApplicationComments(applicationId: string) {
     return http.GET<PageComment[]>(`/api/applications/${applicationId}/comments`);
   }
+
+  refreshApplicationStatus(applicationId: string) {
+    return http.GET<PageComment[]>(`/api/applications/${applicationId}/refresh-status`);
+  }
 }
