@@ -16,7 +16,10 @@ async function register(req: NextApiRequest, res: NextApiResponse) {
   if (!userId) {
     throw new Error('Please provider ?userid=...');
   }
+
   req.session.user = { id: userId };
+  req.session.isRemote = true;
+
   await req.session.save();
 
   res.redirect('/');
