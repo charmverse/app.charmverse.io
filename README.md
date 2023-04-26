@@ -151,7 +151,7 @@ npx prisma migrate dev
 # View the contents of the database
 npx prisma studio
 
-# Generate just the Typescript types from updated schema.prisma (you can import the interfaces from "@prisma/client")
+# Generate just the Typescript types from updated schema.prisma (you can import the interfaces from '@charmverse/core/dist/prisma')
 npx prisma generate
 
 # Format the schema file
