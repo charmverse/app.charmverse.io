@@ -14,6 +14,7 @@ import type {
   ProposalStatus,
   Role,
   RoleSource,
+  SubscriptionTier,
   Thread,
   Transaction,
   User,
@@ -147,7 +148,7 @@ type CreateUserAndSpaceInput = {
   onboarded?: boolean;
   spaceName?: string;
   publicBountyBoard?: boolean;
-  premiumOptin?: boolean;
+  paidTier?: SubscriptionTier;
 };
 
 export async function generateUserAndSpace({
@@ -157,7 +158,7 @@ export async function generateUserAndSpace({
   onboarded = true,
   spaceName = 'Example Space',
   publicBountyBoard,
-  premiumOptin
+  paidTier
 }: CreateUserAndSpaceInput = {}) {
   const userId = v4();
   const newUser = await prisma.user.create({
@@ -177,7 +178,7 @@ export async function generateUserAndSpace({
                   id: userId
                 }
               },
-              premiumOptin,
+              paidTier,
               updatedBy: userId,
               name: spaceName,
               // Adding prefix avoids this being evaluated as uuid

@@ -1,12 +1,11 @@
-import { prisma } from '@charmverse/core';
+import type { PermissionFilteringPolicyFnInput } from '@charmverse/core';
+import { buildComputePermissionsWithPermissionFilteringPolicies, prisma } from '@charmverse/core';
 import type { PagePermission, Prisma } from '@charmverse/core/dist/prisma';
 
 import { PageNotFoundError } from 'lib/pages/server';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { typedKeys } from 'lib/utilities/objects';
 
-import type { PermissionFilteringPolicyFnInput } from '../buildComputePermissionsWithPermissionFilteringPolicies';
-import { buildComputePermissionsWithPermissionFilteringPolicies } from '../buildComputePermissionsWithPermissionFilteringPolicies';
 import { filterApplicablePermissions } from '../filterApplicablePermissions';
 import type { PermissionCompute } from '../interfaces';
 

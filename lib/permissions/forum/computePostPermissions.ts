@@ -4,14 +4,14 @@ import {
   hasAccessToSpace,
   postResolver,
   prisma,
-  AvailablePostPermissions
+  AvailablePostPermissions,
+  buildComputePermissionsWithPermissionFilteringPolicies
 } from '@charmverse/core';
 
 import { PostNotFoundError } from 'lib/forums/posts/errors';
 import { InvalidInputError } from 'lib/utilities/errors';
 import { isUUID } from 'lib/utilities/strings';
 
-import { buildComputePermissionsWithPermissionFilteringPolicies } from '../buildComputePermissionsWithPermissionFilteringPolicies';
 import type { PermissionCompute } from '../interfaces';
 
 import type { AvailablePostPermissionFlags } from './interfaces';

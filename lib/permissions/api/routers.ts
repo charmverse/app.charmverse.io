@@ -1,5 +1,6 @@
 import type { PermissionsClient } from '@charmverse/core';
 import { PermissionsApiClient, prisma } from '@charmverse/core';
+import type { Space } from '@charmverse/core/dist/prisma';
 import {
   stringUtils,
   InvalidInputError,
@@ -22,6 +23,13 @@ export const premiumPermissionsApiClient = new PermissionsApiClient({
 
 export type PermissionsEngine = 'public' | 'private';
 
+function getEngine(input: Pick<Space, 'paidTier'>) {
+  if (input.paidTier === 'pro' || input.paidTier === 'enterprise') {
+    return 'private';
+  }
+  return 'public';
+}
+
 export async function isPostSpaceOptedIn({ resourceId }: Resource): Promise<PermissionsEngine> {
   if (!stringUtils.isUUID(resourceId)) {
     throw new InvalidInputError('Invalid resourceId');
@@ -33,7 +41,7 @@ export async function isPostSpaceOptedIn({ resourceId }: Resource): Promise<Perm
     select: {
       space: {
         select: {
-          premiumOptin: true
+          paidTier: true
         }
       }
     }
@@ -43,7 +51,7 @@ export async function isPostSpaceOptedIn({ resourceId }: Resource): Promise<Perm
     throw new PostNotFoundError(resourceId);
   }
 
-  return post.space.premiumOptin === true ? 'private' : 'public';
+  return getEngine(post.space);
 }
 
 export async function isPostCategorySpaceOptedIn({ resourceId }: Resource): Promise<PermissionsEngine> {
@@ -57,7 +65,7 @@ export async function isPostCategorySpaceOptedIn({ resourceId }: Resource): Prom
     select: {
       space: {
         select: {
-          premiumOptin: true
+          paidTier: true
         }
       }
     }
@@ -67,7 +75,7 @@ export async function isPostCategorySpaceOptedIn({ resourceId }: Resource): Prom
     throw new PostCategoryNotFoundError(resourceId);
   }
 
-  return postCategory.space.premiumOptin === true ? 'private' : 'public';
+  return getEngine(postCategory.space);
 }
 
 export async function isSpaceOptedIn({ resourceId }: Resource): Promise<PermissionsEngine> {
@@ -79,7 +87,7 @@ export async function isSpaceOptedIn({ resourceId }: Resource): Promise<Permissi
       id: resourceId
     },
     select: {
-      premiumOptin: true
+      paidTier: true
     }
   });
 
@@ -87,7 +95,7 @@ export async function isSpaceOptedIn({ resourceId }: Resource): Promise<Permissi
     throw new SpaceNotFoundError(resourceId);
   }
 
-  return space.premiumOptin === true ? 'private' : 'public';
+  return getEngine(space);
 }
 
 export async function isPostCategoryPermissionSpaceOptedIn({ resourceId }: Resource): Promise<PermissionsEngine> {
@@ -103,7 +111,7 @@ export async function isPostCategoryPermissionSpaceOptedIn({ resourceId }: Resou
         select: {
           space: {
             select: {
-              premiumOptin: true
+              paidTier: true
             }
           }
         }
@@ -115,7 +123,7 @@ export async function isPostCategoryPermissionSpaceOptedIn({ resourceId }: Resou
     throw new PostCategoryNotFoundError(resourceId);
   }
 
-  return postCategoryPermission.postCategory.space.premiumOptin === true ? 'private' : 'public';
+  return getEngine(postCategoryPermission.postCategory.space);
 }
 
 export type ResourceIdEntity = 'space' | 'post' | 'postCategory' | 'postCategoryPermission';

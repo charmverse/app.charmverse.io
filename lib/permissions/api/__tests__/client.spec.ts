@@ -14,7 +14,7 @@ describe('permissions client', () => {
   it('should do something', async () => {
     const { space, user } = await generateUserAndSpace({
       isAdmin: false,
-      premiumOptin: true
+      paidTier: 'pro'
     });
 
     const postCategory = await generatePostCategory({
