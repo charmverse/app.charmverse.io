@@ -12,6 +12,7 @@ import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
 import charmClient from 'charmClient';
+import { BountyApplicantStatus } from 'components/[pageId]/DocumentPage/components/BountyProperties/components/BountyApplicantStatus';
 import Modal from 'components/common/Modal';
 import { useBounties } from 'hooks/useBounties';
 import { useLocalStorage } from 'hooks/useLocalStorage';
@@ -19,8 +20,6 @@ import { useUser } from 'hooks/useUser';
 import type { ReviewDecision, SubmissionReview } from 'lib/applications/interfaces';
 import { MINIMUM_APPLICATION_MESSAGE_CHARACTERS } from 'lib/applications/shared';
 import type { AssignedBountyPermissions } from 'lib/bounties';
-
-import BountyApplicantStatus from '../../BountyApplicantStatus';
 
 /**
  * @expandedOnLoad Use this to expand the application initially

@@ -4,6 +4,7 @@ import { Alert, Box, Collapse, IconButton, TableCell, TableRow, Tooltip, Typogra
 import { useState } from 'react';
 
 import charmClient from 'charmClient';
+import { BountyApplicantStatus } from 'components/[pageId]/DocumentPage/components/BountyProperties/components/BountyApplicantStatus';
 import Button from 'components/common/Button';
 import Modal from 'components/common/Modal';
 import UserDisplay from 'components/common/UserDisplay';
@@ -18,7 +19,6 @@ import type { SystemError } from 'lib/utilities/errors';
 
 import ApplicationInput from '../BountyApplicantForm/components/ApplicationInput';
 import SubmissionInput from '../BountyApplicantForm/components/SubmissionInput';
-import BountyApplicantStatus from '../BountyApplicantStatus';
 
 import { ApplicationComments } from './ApplicationComments';
 import BountyApplicantActions from './BountyApplicantActions';

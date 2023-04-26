@@ -11,7 +11,7 @@ interface Props {
   submission: ApplicationWithTransactions | Application;
 }
 
-export default function BountyApplicantActions({ submission }: Props) {
+export function BountyApplicantStatus({ submission }: Props) {
   const transaction = (submission as ApplicationWithTransactions).transactions[0];
 
   return (

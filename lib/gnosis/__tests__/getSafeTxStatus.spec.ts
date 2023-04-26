@@ -68,3 +68,5 @@ describe('getGnosisTransactionQueueUrl', () => {
     expect(status).toBe('paid');
   });
 });
+
+export {};
