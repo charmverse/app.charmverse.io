@@ -26,7 +26,7 @@
     "postinstall": "patch-package",
     "server:dev": "npx react-env --path .env.local -- node node_modules/.bin/next start",
     "server:sockets": "NEXT_PUBLIC_WEBSOCKETS_HOST=http://localhost:3001 npm start",
-    "start": "npx ts-node --transpileOnly --project tsconfig.server.json server.ts",
+    "start": "cross-env NODE_OPTIONS=\"--max_old_space_size=4096\" ts-node --project tsconfig.server.json --transpileOnly  server.ts",
     "start:debug": "NODE_OPTIONS='--inspect' next",
     "start:ssl": "(npx local-ssl-proxy --source 3000 --target 8080) & next dev --port 8080",
     "start:test": "NODE_OPTIONS=\"--max_old_space_size=4096\" dotenv -e .env.test.local -- prisma migrate deploy && dotenv -e .env.test.local -- npm start",

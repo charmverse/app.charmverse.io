@@ -17,6 +17,7 @@ async function register(req: NextApiRequest, res: NextApiResponse) {
     throw new Error('Please provider ?userid=...');
   }
   req.session.user = { id: userId };
+
   await req.session.save();
 
   res.redirect('/');
