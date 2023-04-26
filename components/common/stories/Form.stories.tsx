@@ -5,7 +5,6 @@ import { useState } from 'react';
 import { NumberInputField } from 'components/common/form/fields/NumberInputField';
 import { SelectField } from 'components/common/form/fields/SelectField';
 import { TextInputField } from 'components/common/form/fields/TextInputField';
-import { Typography } from 'components/common/Typography';
 import SocialInputs from 'components/profile/components/SocialInputs';
 import { TimezoneAutocomplete } from 'components/profile/components/TimezoneAutocomplete';
 import UserDescription from 'components/profile/components/UserDescription';
