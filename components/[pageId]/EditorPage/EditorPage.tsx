@@ -11,7 +11,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePagePermissions } from 'hooks/usePagePermissions';
 import { usePages } from 'hooks/usePages';
 import { usePageTitle } from 'hooks/usePageTitle';
-import type { PageMeta, PageUpdates } from 'lib/pages';
+import type { PageMeta } from 'lib/pages';
 import debouncePromise from 'lib/utilities/debouncePromise';
 
 import { DatabasePage } from '../DatabasePage';
@@ -102,7 +102,9 @@ export function EditorPage({ pageId: pageIdOrPath }: { pageId: string }) {
   );
 
   useEffect(() => {
-    setTitleState(currentPage?.title || 'Untitled');
+    if (currentPage) {
+      setTitleState(currentPage.title || 'Untitled');
+    }
   }, [currentPage?.title]);
 
   if (isAccessDenied) {
