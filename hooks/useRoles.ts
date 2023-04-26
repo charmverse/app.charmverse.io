@@ -12,7 +12,7 @@ export function useRoles() {
 
   const { data: roles } = useSWR(
     () => (space ? `roles/${space.id}` : null),
-    () => space && charmClient.roles.listRoles(space.id)
+    () => (space ? charmClient.roles.listRoles(space.id) : null)
   );
 
   async function createRole(role: CreateRoleInput): Promise<Role> {
