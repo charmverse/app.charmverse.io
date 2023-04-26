@@ -45,6 +45,7 @@ describe('Http retry client tests', () => {
 
   it('Should not retry 4xx', async () => {
     mockPool.intercept({ path: '/' }).reply(400);
+    mockPool.intercept({ path: '/' }).reply(200);
 
     const request = fetch(DUMMY_BASE_URL, { retries: 5 });
 
