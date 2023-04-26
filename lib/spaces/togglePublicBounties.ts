@@ -170,7 +170,7 @@ export async function togglePublicBounties({ spaceId, publicBountyBoard }: Publi
 
     return spaceAfterUpdate;
   } catch (error) {
-    if ((error as Prisma.PrismaClientKnownRequestError).code === 'P2025') {
+    if ((error as any).code === 'P2025') {
       throw new DataNotFoundError('Space not found.');
     }
     throw error;

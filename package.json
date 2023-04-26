@@ -34,7 +34,7 @@
     "start": "npx ts-node --transpileOnly --project tsconfig.server.json server.ts",
     "start:debug": "NODE_OPTIONS='--inspect' next",
     "start:ssl": "(npx local-ssl-proxy --source 3000 --target 8080) & next dev --port 8080",
-    "start:test": "NODE_OPTIONS=\"--max_old_space_size=4096\" dotenv -e .env.test.local -- dotenv -e .env.test.local -- npm start",
+    "start:test": "NODE_OPTIONS=\"--max_old_space_size=4096\"  dotenv -e .env.test.local -- npm start",
     "start:test:ci": "NODE_OPTIONS=\"--max_old_space_size=4096\" npx react-env --path .env.test.local -- npx next start",
     "start:remote": "cross-env NODE_ENV=development npx react-env --path .env.production -- npm start",
     "start:staging": "npm run prisma:deploy && node ./dist/server.js",

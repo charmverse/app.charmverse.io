@@ -1,6 +1,5 @@
 import { prisma } from '@charmverse/core';
 import type { PaymentMethod, Prisma } from '@charmverse/core/dist/prisma';
-import type { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -83,7 +82,7 @@ async function createPaymentMethod(req: NextApiRequest, res: NextApiResponse<Pay
     return res.status(200).json(paymentMethod);
   } catch (err) {
     // P2002 is thrown by prisma when a duplicate write fails
-    if ((err as PrismaClientKnownRequestError).code === 'P2002') {
+    if ((err as any).code === 'P2002') {
       throw new InvalidInputError('A payment method with this contract address and chain ID already exists.');
     }
     throw err;

@@ -8,7 +8,7 @@ import { appEnv } from './config/constants';
 import log from './lib/log';
 
 const port = parseInt(process.env.PORT || '3000', 10);
-const dev = appEnv === 'development';
+const dev = (appEnv === 'development' || appEnv === 'test') && !process.env.CI;
 const hostname = 'localhost';
 // when using middleware `hostname` and `port` must be provided below
 const app = next({ dev, hostname, port, customServer: false });
