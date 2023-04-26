@@ -17,13 +17,14 @@ export const jestConfig: JestConfigWithTsJest = {
   // Indicates whether the coverage information should be collected while executing the test
   collectCoverage: false,
 
-  globalTeardown: './testing/wipeTestData.ts',
-
   // An array of directory names to be searched recursively up from the requiring module's location
   moduleDirectories: ['node_modules', '<rootDir>'],
 
   // A list of paths to modules that run some code to configure or set up the testing framework before each test
   setupFilesAfterEnv: ['./jest.setup.ts'],
+
+  // Teardown function after all tests run
+  globalTeardown: '<rootDir>/jest.teardown-init.js',
 
   // The test environment that will be used for testing
   testEnvironment: 'jest-environment-node',

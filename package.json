@@ -300,6 +300,7 @@
     "serverless-esbuild": "^1.37.0",
     "supertest": "^6.3.3",
     "ts-jest": "^29.1.0",
+    "tsx": "^3.12.6",
     "webpack": "^5.76.0"
   },
   "overrides": {
