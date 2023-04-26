@@ -96,19 +96,15 @@ export default function PageDialog(props: Props) {
     };
   }, [page?.id]);
 
-  const debouncedPageUpdate = debouncePromise(async (updates: PageUpdates) => {
-    await updatePage(updates);
-  }, 500);
-
   const setPage = useCallback(
-    async (updates: Partial<Page>) => {
+    debouncePromise(async (updates: Partial<Page>) => {
       if (!page || !mounted.current) {
         return;
       }
-      debouncedPageUpdate({ id: page.id, ...updates } as Partial<Page>).catch((err: any) => {
+      updatePage({ id: page.id, ...updates }).catch((err: any) => {
         log.error('Error saving page', err);
       });
-    },
+    }, 500),
     [page]
   );
 

@@ -1,6 +1,7 @@
 import type { Page } from '@prisma/client';
 import log from 'loglevel';
 import { useCallback, useEffect, useState } from 'react';
+import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 import ErrorPage from 'components/common/errors/ErrorPage';
@@ -16,7 +17,7 @@ import debouncePromise from 'lib/utilities/debouncePromise';
 import { DatabasePage } from '../DatabasePage';
 import DocumentPage from '../DocumentPage';
 
-export default function EditorPage({ pageId: pageIdOrPath }: { pageId: string }) {
+export function EditorPage({ pageId: pageIdOrPath }: { pageId: string }) {
   const { currentPageId, setCurrentPageId } = useCurrentPage();
   const { pages, loadingPages, updatePage } = usePages();
   const { editMode, resetPageProps, setPageProps } = useCharmEditor();
@@ -26,44 +27,42 @@ export default function EditorPage({ pageId: pageIdOrPath }: { pageId: string })
   const [isAccessDenied, setIsAccessDenied] = useState(false);
   const [currentPage, setCurrentPage] = useState<PageMeta | null>(null);
   const { permissions: pagePermissions } = usePagePermissions({ pageIdOrPath: currentPageId });
+  const { data: pageWithContent, error: pageWithContentError } = useSWR(
+    currentSpace && `page-with-content-${currentPageId}`,
+    () => charmClient.pages.getPage(pageIdOrPath, currentSpace!.id)
+  );
 
   const readOnly = (pagePermissions?.edit_content === false && editMode !== 'suggesting') || editMode === 'viewing';
   useEffect(() => {
-    const pageFromContext = Object.values(pages).find(
-      (page) => page?.id === pageIdOrPath || page?.path === pageIdOrPath
-    );
-    if (pageFromContext) {
+    const pageFromContext = pages[pageIdOrPath] || Object.values(pages).find((page) => page?.path === pageIdOrPath);
+    if (pageFromContext && pageFromContext.id !== currentPageId) {
       setPageNotFound(false);
       setCurrentPage(pageFromContext);
       setCurrentPageId(pageFromContext.id);
-    } else if (!loadingPages && currentSpace?.id) {
-      // if the page is not in context, fetch it
-      charmClient.pages
-        .getPage(pageIdOrPath, currentSpace.id)
-        .then((page) => {
-          setPageNotFound(false);
-          setCurrentPage(page);
-          setCurrentPageId(page.id);
-        })
-        .catch((err) => {
-          log.error(err);
-          // An error will be thrown if page doesn't exist or if you dont have read permission for the page
-          if (err.errorType === 'Access denied') {
-            setIsAccessDenied(true);
-          } else {
-            // If the page doesn't exist an error will be thrown
-            setPageNotFound(true);
-          }
-        });
+    } else if (pageWithContent && pageWithContent.id !== currentPageId) {
+      setPageNotFound(false);
+      setCurrentPage(pageWithContent);
+      setCurrentPageId(pageWithContent.id);
+    } else if (pageWithContentError) {
+      // An error will be thrown if page doesn't exist or if you dont have read permission for the page
+      if (pageWithContentError.errorType === 'Access denied') {
+        setIsAccessDenied(true);
+      } else {
+        // If the page doesn't exist an error will be thrown
+        setPageNotFound(true);
+      }
     }
+  }, [pageIdOrPath, pages, currentPageId, pageWithContent, pageWithContentError]);
+
+  // reset page id on unmount
+  useEffect(() => {
     return () => {
       setCurrentPageId('');
     };
-  }, [pageIdOrPath, pages, currentSpace?.id, loadingPages]);
-
+  }, []);
   // set page attributes of the primary charm editor
   useEffect(() => {
-    if (loadingPages || !pagePermissions) {
+    if (!currentPage || !pagePermissions) {
       // wait for pages loaded for permissions to be correct
       return;
     }
@@ -82,28 +81,24 @@ export default function EditorPage({ pageId: pageIdOrPath }: { pageId: string })
     };
   }, [pagePermissions, currentPage, loadingPages]);
 
-  const debouncedPageUpdate = debouncePromise(async (updates: PageUpdates) => {
-    setPageProps({ isSaving: true });
-    const updatedPage = await updatePage(updates);
-    return updatedPage;
-  }, 500);
-
   const setPage = useCallback(
-    async (updates: Partial<Page>) => {
+    debouncePromise(async (updates: Partial<Page>) => {
       if (!currentPage) {
         return;
       }
       if (updates.hasOwnProperty('title')) {
         setTitleState(updates.title || 'Untitled');
       }
-      debouncedPageUpdate({ id: currentPage.id, ...updates } as Partial<Page>)
+      setPageProps({ isSaving: true });
+      updatePage({ id: currentPage.id, ...updates })
+        // debouncedPageUpdate({ id: currentPage.id, ...updates } as Partial<Page>)
         .catch((err: any) => {
           log.error('Error saving page', err);
         })
         .finally(() => {
           setPageProps({ isSaving: false });
         });
-    },
+    }, 500),
     [currentPage]
   );
 
