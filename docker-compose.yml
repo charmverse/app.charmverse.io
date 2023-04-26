@@ -1,38 +1,67 @@
 services:
-  webapp:
+  defaults:
     image: '310849459438.dkr.ecr.us-east-1.amazonaws.com/charmverse-web3-workspace:${IMGTAG}'
-    ports:
-      - '80:3000'
-    command: ['npm', 'run', '${NPM_SCRIPT}']
     labels:
       com.datadoghq.ad.logs: '[{"source": "nodejs", "service": "${SERVICE_NAME}"}]'
       com.datadoghq.tags.service: "${SERVICE_NAME}"
     volumes:
       - $PWD/.env:/app/.env
+    ports:
+      - '80:3000'
     env_file:
       - '.env'
-    profiles:
-      - stg
-      - prd
 
-  prd-sockets: &sockets
-    image: '310849459438.dkr.ecr.us-east-1.amazonaws.com/charmverse-web3-workspace:${IMGTAG}'
-    ports:
-      - '80:3000'
+    environment:
+      - NODE_ENV=production
+    profiles:
+      # services need at least one profile or else they will be started along with what is in COMPOSE_PROFILES env var
+      - default_config
+
+  prd-cron:
+    extends:
+      service: defaults
+    command: ['npm', 'run', 'cron:prod']
+    profiles:
+      - prd-cron
+
+  stg-cron:
+    extends:
+      service: defaults
+    command: ['npm', 'run', 'cron:staging']
+    environment:
+      - NEXT_PUBLIC_APP_ENV=staging
+    profiles:
+      - stg-cron
+
+  prd-webapp:
+    extends:
+      service: defaults
+    command: ['sh', '-c', 'npm run migrate:deploy && node --require dd-trace/init ./dist/server.js']
+    profiles:
+      - prd-webapp
+
+  stg-webapp:
+    extends:
+      service: defaults
+    command: ['sh', '-c', 'npm run prisma:deploy && node ./dist/server.js']
+    environment:
+      - NEXT_PUBLIC_APP_ENV=staging
+    profiles:
+      - stg-webapp
+
+  prd-sockets:
+    extends:
+      service: defaults
     command: ['sh', '-c', 'node ./.next/server/websockets.js']
-    labels:
-      com.datadoghq.ad.logs: '[{"source": "nodejs", "service": "${SERVICE_NAME}"}]'
-      com.datadoghq.tags.service: "${SERVICE_NAME}"
-    volumes:
-      - $PWD/.env:/app/.env
-    env_file:
-      - '.env'
     profiles:
       - prd-sockets
 
   stg-sockets:
-    <<: *sockets
-    command: ['sh', '-c', 'npx react-env --path .env.staging -- node ./.next/server/websockets.js']
+    extends:
+      service: defaults
+    command: ['sh', '-c', 'node ./.next/server/websockets.js']
+    environment:
+      - NEXT_PUBLIC_APP_ENV=staging
     profiles:
       - stg-sockets
 
@@ -41,7 +70,7 @@ services:
       context: .
     ports:
       - '80:3000'
-    command: ['npm', 'run', 'start']
+    command: ['npm', 'start']
     volumes:
       - $PWD:/app
     env_file:
@@ -85,5 +114,7 @@ services:
       DD_DOGSTATSD_NON_LOCAL_TRAFFIC: 'true'
       DD_EC2_PREFER_IMDSV2: 'true'
     profiles:
-      - prd
+      - prd-cron
+      - prd-webapp
+      - prd-sockets
       - ddtst

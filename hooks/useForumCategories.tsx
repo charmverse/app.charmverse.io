@@ -1,6 +1,6 @@
 import type { PostCategory } from '@charmverse/core/dist/prisma';
 import type { ReactNode } from 'react';
-import { useContext, createContext, useMemo } from 'react';
+import { createContext, useContext, useMemo } from 'react';
 import useSWR from 'swr/immutable';
 
 import charmClient from 'charmClient';
@@ -8,13 +8,14 @@ import type { PostCategoryWithPermissions } from 'lib/permissions/forum/interfac
 
 import { useCurrentSpace } from './useCurrentSpace';
 import { useSpaces } from './useSpaces';
+import { useUser } from './useUser';
 
 type IContext = {
   createForumCategory: (categoryName: string) => Promise<void>;
   deleteForumCategory: (option: PostCategory) => Promise<void>;
   updateForumCategory: (option: PostCategory) => Promise<PostCategoryWithPermissions | undefined>;
   setDefaultPostCategory: (option: PostCategory) => Promise<void>;
-  getForumCategoryById: (id: string) => PostCategoryWithPermissions | undefined;
+  getForumCategoryById: (id?: string | null) => PostCategoryWithPermissions | undefined;
   getPostableCategories: () => PostCategoryWithPermissions[];
   isCategoriesLoaded: boolean;
   categories: PostCategoryWithPermissions[];
@@ -39,12 +40,13 @@ export function PostCategoriesProvider({ children }: { children: ReactNode }) {
   const currentSpace = useCurrentSpace();
   const { setSpace } = useSpaces();
 
+  const { user } = useUser();
   const {
     data: categories,
     error,
     isValidating,
     mutate: mutateForumCategories
-  } = useSWR(currentSpace ? `spaces/${currentSpace.id}/post-categories` : null, () =>
+  } = useSWR(currentSpace ? `spaces/${currentSpace.id}/post-categories/${user?.id ?? 'anonymous'}` : null, () =>
     charmClient.forum.listPostCategories(currentSpace!.id).then((_categories) =>
       _categories.sort((catA, catB) => {
         const first = catA.name.toLowerCase();
@@ -119,7 +121,10 @@ export function PostCategoriesProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  function getForumCategoryById(id: string) {
+  function getForumCategoryById(id?: string | null) {
+    if (!id) {
+      return undefined;
+    }
     return categories?.find((category) => category.id === id);
   }
 

@@ -12,6 +12,7 @@ jspm_packages
 # next.js
 /.next/
 /out/
+/dist/
 
 # production
 *.zip
