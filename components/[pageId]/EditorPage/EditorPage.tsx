@@ -19,7 +19,7 @@ import DocumentPage from '../DocumentPage';
 
 export function EditorPage({ pageId: pageIdOrPath }: { pageId: string }) {
   const { currentPageId, setCurrentPageId } = useCurrentPage();
-  const { pages, loadingPages, updatePage } = usePages();
+  const { pages, updatePage } = usePages();
   const { editMode, resetPageProps, setPageProps } = useCharmEditor();
   const [, setTitleState] = usePageTitle();
   const [pageNotFound, setPageNotFound] = useState(false);
@@ -81,7 +81,7 @@ export function EditorPage({ pageId: pageIdOrPath }: { pageId: string }) {
     };
   }, [currentPageId, pagePermissions]);
 
-  const setPage = useCallback(
+  const savePage = useCallback(
     debouncePromise(async (updates: Partial<Page>) => {
       if (!currentPage) {
         return;
@@ -91,7 +91,6 @@ export function EditorPage({ pageId: pageIdOrPath }: { pageId: string }) {
       }
       setPageProps({ isSaving: true });
       updatePage({ id: currentPage.id, ...updates })
-        // debouncedPageUpdate({ id: currentPage.id, ...updates } as Partial<Page>)
         .catch((err: any) => {
           log.error('Error saving page', err);
         })
@@ -120,16 +119,16 @@ export function EditorPage({ pageId: pageIdOrPath }: { pageId: string }) {
     return <ErrorPage message={"Sorry, you don't have access to this page"} />;
   } else if (pagePermissions.read === true) {
     if (
-      currentPage?.type === 'board' ||
-      currentPage?.type === 'inline_board' ||
-      currentPage?.type === 'inline_linked_board' ||
-      currentPage?.type === 'linked_board'
+      currentPage.type === 'board' ||
+      currentPage.type === 'inline_board' ||
+      currentPage.type === 'inline_linked_board' ||
+      currentPage.type === 'linked_board'
     ) {
-      return <DatabasePage page={currentPage} setPage={setPage} pagePermissions={pagePermissions} />;
+      return <DatabasePage page={currentPage} setPage={savePage} pagePermissions={pagePermissions} />;
     } else {
       return (
         // Document page is used in a few places, so it is responsible for retrieving its own permissions
-        <DocumentPage page={currentPage} readOnly={readOnly} setPage={setPage} />
+        <DocumentPage page={currentPage} readOnly={readOnly} setPage={savePage} />
       );
     }
   }

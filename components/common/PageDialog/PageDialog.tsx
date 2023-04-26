@@ -96,7 +96,7 @@ export default function PageDialog(props: Props) {
     };
   }, [page?.id]);
 
-  const setPage = useCallback(
+  const savePage = useCallback(
     debouncePromise(async (updates: Partial<Page>) => {
       if (!page || !mounted.current) {
         return;
@@ -152,7 +152,7 @@ export default function PageDialog(props: Props) {
       }
       onClose={onClose}
     >
-      {page && <DocumentPage insideModal page={page} setPage={setPage} readOnly={readOnlyPage} />}
+      {page && <DocumentPage insideModal page={page} setPage={savePage} readOnly={readOnlyPage} />}
     </Dialog>
   );
 }
