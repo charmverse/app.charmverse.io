@@ -62,7 +62,7 @@ export function EditorPage({ pageId: pageIdOrPath }: { pageId: string }) {
   }, []);
   // set page attributes of the primary charm editor
   useEffect(() => {
-    if (!currentPage || !pagePermissions) {
+    if (!currentPageId || !pagePermissions) {
       // wait for pages loaded for permissions to be correct
       return;
     }
@@ -79,7 +79,7 @@ export function EditorPage({ pageId: pageIdOrPath }: { pageId: string }) {
     return () => {
       resetPageProps();
     };
-  }, [pagePermissions, currentPage, loadingPages]);
+  }, [currentPageId, pagePermissions]);
 
   const setPage = useCallback(
     debouncePromise(async (updates: Partial<Page>) => {
