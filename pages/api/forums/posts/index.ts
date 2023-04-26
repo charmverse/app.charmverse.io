@@ -6,7 +6,7 @@ import type { CreateForumPostInput } from 'lib/forums/posts/createForumPost';
 import { createForumPost, trackCreateForumPostEvent } from 'lib/forums/posts/createForumPost';
 import type { ListForumPostsRequest, PaginatedPostList } from 'lib/forums/posts/listForumPosts';
 import { listForumPosts } from 'lib/forums/posts/listForumPosts';
-import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
+import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { mutatePostCategorySearch } from 'lib/permissions/forum/mutatePostCategorySearch';
 import { requestOperations } from 'lib/permissions/requestOperations';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -41,7 +41,8 @@ async function createForumPostController(req: NextApiRequest, res: NextApiRespon
     resourceType: 'post_category',
     resourceId: req.body.categoryId as string,
     userId,
-    operations: ['create_post']
+    operations: ['create_post'],
+    customError: new ActionNotPermittedError('You are not allowed to create a post in this category')
   });
 
   const createdPost = await createForumPost({ ...req.body, createdBy: req.session.user.id });
