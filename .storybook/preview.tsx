@@ -8,6 +8,7 @@ import { setDarkMode } from '../theme/darkMode';
 import '../theme/styles.scss';
 import { Global } from '@emotion/react';
 import { ColorModeContext } from '../context/darkMode';
+import { AppThemeProvider } from '../theme/AppThemeProvider';
 
 const preview: Preview = {
   parameters: {
@@ -40,49 +41,11 @@ export const globalTypes = {
   }
 };
 
-const THEMES = {
-  light: createThemeLightSensitive('light'),
-  dark: createThemeLightSensitive('dark')
-};
-
 export const withMuiTheme = (Story, context) => {
-  const { theme: themeKey } = context.globals;
-  const [savedDarkMode, setSavedDarkMode] = useState<PaletteMode>('dark');
-  const [mode, setMode] = useState<PaletteMode>('dark');
-  const colorModeContext = useMemo(
-    () => ({
-      toggleColorMode: () => {
-        setMode((prevMode: PaletteMode) => {
-          const newMode = prevMode === 'light' ? 'dark' : 'light';
-          return newMode;
-        });
-      }
-    }),
-    []
-  );
-
-  useEffect(() => {
-    if (savedDarkMode) {
-      setMode(savedDarkMode);
-    }
-  }, [savedDarkMode]);
-  const dupa = useMemo(() => {
-    if (typeof window !== 'undefined') {
-      setSavedDarkMode(mode);
-      setDarkMode(mode === 'dark');
-    }
-    return THEMES[themeKey] || THEMES['light'];
-  }, [mode, themeKey]);
   return (
-    <ColorModeContext.Provider value={colorModeContext}>
-      <ThemeProvider theme={dupa}>
-        <CssBaseline enableColorScheme={true} />
-        <Global styles={cssVariables} />
-        <Box className={`${serifFont.variable} ${monoFont.variable}`}>
-          <Story />
-        </Box>
-      </ThemeProvider>
-    </ColorModeContext.Provider>
+    <AppThemeProvider forceTheme={context.globals.theme}>
+      <Story />
+    </AppThemeProvider>
   );
 };
 
