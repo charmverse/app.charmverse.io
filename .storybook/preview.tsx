@@ -1,14 +1,8 @@
 import type { Preview } from '@storybook/react';
-import React, { useEffect, useMemo, useState } from 'react';
-import { Box, CssBaseline, PaletteMode, ThemeProvider } from '@mui/material';
-import { createThemeLightSensitive } from '../theme';
-import { monoFont, serifFont } from '../theme/fonts';
-import cssVariables from '../theme/cssVariables';
-import { setDarkMode } from '../theme/darkMode';
+import React from 'react';
 import '../theme/styles.scss';
-import { Global } from '@emotion/react';
-import { ColorModeContext } from '../context/darkMode';
 import { AppThemeProvider } from '../theme/AppThemeProvider';
+
 
 const preview: Preview = {
   parameters: {
