@@ -4,7 +4,7 @@ import { execSync } from 'child_process';
 
 export default async function wipeTestData(): Promise<true> {
   if (process.env.NODE_ENV === 'test') {
-    execSync(`dotenv -e .env.test.local -- npm run prisma:reset`);
+    //  execSync(`dotenv -e .env.test.local -- npm run prisma:reset`);
   }
 
   return true;

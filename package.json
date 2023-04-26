@@ -28,7 +28,7 @@
     "prisma:deploy": "cd node_modules/@charmverse/core && npm run prisma:deploy",
     "debug:e2e": "dotenv -e .env.test.local -- npx playwright test --headed --timeout=0",
     "notifications:debug": "ts-node ./scripts/readNotifications.ts",
-    "postinstall": "patch-package",
+    "postinstall": "patch-package && cd node_modules/@charmverse/core && npm run postinstall",
     "server:dev": "npx react-env --path .env.local -- node node_modules/.bin/next start",
     "server:prod": "node --require dd-trace/init node_modules/.bin/next start --keepAliveTimeout 70000",
     "server:prod:win": "node --require dd-trace/init node_modules/next/dist/bin/next start",

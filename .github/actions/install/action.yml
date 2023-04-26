@@ -26,7 +26,3 @@ runs:
       if: steps.cache_node_modules.outputs.cache-hit != 'true'
       run: npm ci --no-audit --no-fund
 
-    - name: Install CharmVerse core
-      shell: bash
-      run: npm install github:charmverse/core#feat/forum-parity
-

@@ -2,12 +2,15 @@ name: 'Install dependencies and build the permissions API'
 
 inputs:
   GITHUB_SSH_KEY:
-    description: '...'
+    description: 'SSH key allowing pulls from private Github repos'
     required: false
   API_FOLDER:
-    description: '...'
+    description: 'Where the permissions API is to be installed'
     required: false
     default: "permissions_api"
+  NODE_ENV:
+    description: 'Set node env for context and build'
+    required: false
 
 runs:
   using: 'composite'
@@ -38,11 +41,6 @@ runs:
       run: echo -e "Install path" && pwd && npm ci --no-audit --no-fund
       working-directory: ./${{inputs.API_FOLDER}}
 
-    - name: Install CharmVerse core
-      shell: bash
-      run: npm install github:charmverse/common#feat/forum-parity
-      working-directory: ./${{inputs.API_FOLDER}}
-
     #### ---- Start the build process
     - run: echo '${{ env.GIT_DIFF }}'
       shell: bash
@@ -57,7 +55,7 @@ runs:
           .env.test.local
         
         # including the app_env helps make sure that deploy_staging.yml does not reuse values from test_and_deploy.yml which are meant for production
-        key: permissions-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**/*.[jt]s', '**/*.[jt]sx', '**/*.scss', '!node_modules', '!.next', '!dont_cache') }}-${{ inputs.NEXT_PUBLIC_APP_ENV }}
+        key: permissions-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**/*.[jt]s', '**/*.[jt]sx', '**/*.scss', '!node_modules', '!.next', '!dont_cache') }}-${{ inputs.NODE_ENV }}
 
     - name: Build
       shell: bash
@@ -65,9 +63,5 @@ runs:
       run: npm run build:prod
       working-directory: ./${{inputs.API_FOLDER}}
       env:
-        NEXT_PUBLIC_APP_ENV: ${{ inputs.NEXT_PUBLIC_APP_ENV }}
-
-    # - name: Exit permissions api
-    #   shell: bash
-    #   run: cd ./permissions_api
+        NODE_ENV: ${{ inputs.NODE_ENV }}
 

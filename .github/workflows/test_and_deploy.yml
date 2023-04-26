@@ -89,9 +89,9 @@ jobs:
       matrix:
         include:
           - test_name: "Basic tests #1"
-            test_command: "npm run test:ci -- --shard 1/2"
+            test_command: "PORT=3001 npm run start:api:permissions:ci & npm run test:ci -- --shard 1/2"
           - test_name: "Basic tests #2"
-            test_command: "npm run test:ci -- --shard 2/2"
+            test_command: "PORT=3001 npm run start:api:permissions:ci & npm run test:ci -- --shard 2/2"
           - test_name: "Server integration tests"
             test_command: "ls -a && npm run start:test:ci & PORT=3001 npm run start:api:permissions:ci &  npm run test:server:ci"
           - test_name: "Browser tests"
