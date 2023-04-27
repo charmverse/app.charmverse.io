@@ -24,8 +24,8 @@ const esmModules = [
   'data-uri-to-buffer',
   'fetch-blob',
   'formdata-polyfill',
-  'jose'
-  // '@charmverse/core'
+  'jose',
+  '@charmverse/core'
 ];
 
 exports.esmModules = esmModules;
