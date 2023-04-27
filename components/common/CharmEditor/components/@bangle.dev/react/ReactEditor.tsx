@@ -115,9 +115,14 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
     [editor]
   );
 
-  function onError(error: Error) {
+  function onError(_editor: CoreBangleEditor, error: Error) {
     showMessage(error.message, 'warning');
     log.error('[ws/ceditor]: Error message displayed to user', { error });
+    if (isLoading) {
+      setIsLoading(false);
+      isLoadingRef.current = false;
+      setEditorContent(_editor, initialContent);
+    }
   }
 
   useEffect(() => {
@@ -175,7 +180,7 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
           },
           onParticipantUpdate
         });
-        fEditor.init(_editor.view, authResponse.authToken, onError);
+        fEditor.init(_editor.view, authResponse.authToken, (error) => onError(_editor, error));
       } else if (authError) {
         log.warn('Loading readonly mode of editor due to web socket failure', { error: authError });
         setIsLoading(false);
