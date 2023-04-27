@@ -1,9 +1,12 @@
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 import type { PageUpdates } from 'lib/pages';
-import type { PageWithContent } from 'lib/pages/interfaces';
+import type { PageWithContent, PageMeta } from 'lib/pages/interfaces';
+import type { WebSocketPayload } from 'lib/websockets/interfaces';
+
+import { useWebSocketClient } from './useWebSocketClient';
 
 type Props = {
   spaceId?: string;
@@ -21,6 +24,7 @@ type PageResult = {
 const noop = () => Promise.resolve(undefined);
 
 export function usePage({ spaceId, pageIdOrPath }: Props): PageResult {
+  const { subscribe } = useWebSocketClient();
   const {
     data: pageWithContent,
     error: pageWithContentError,
@@ -31,6 +35,29 @@ export function usePage({ spaceId, pageIdOrPath }: Props): PageResult {
 
   const updatePage = useCallback((updates: PageUpdates) => {
     return charmClient.pages.updatePage(updates);
+  }, []);
+
+  useEffect(() => {
+    function handleUpdateEvent(value: WebSocketPayload<'pages_meta_updated'>) {
+      mutate((_page): PageWithContent | undefined => {
+        if (_page) {
+          for (let i = 0; i < value.length; i++) {
+            if (value[i].id === pageWithContent?.id) {
+              return {
+                ..._page,
+                ...(value[i] as PageMeta)
+              };
+            }
+          }
+        }
+        return _page;
+      });
+    }
+    const unsubscribeFromPageUpdates = subscribe('pages_meta_updated', handleUpdateEvent);
+
+    return () => {
+      unsubscribeFromPageUpdates();
+    };
   }, []);
 
   if (pageWithContent) {

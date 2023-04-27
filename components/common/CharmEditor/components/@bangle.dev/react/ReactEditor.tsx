@@ -46,6 +46,7 @@ interface BangleEditorProps<PluginMetadata = any> extends CoreBangleEditorProps<
   readOnly?: boolean;
   onParticipantUpdate?: (participants: FrontendParticipant[]) => void;
   isContentControlled?: boolean;
+  initialContent?: any;
   enableComments?: boolean;
 }
 
@@ -57,6 +58,7 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
     state,
     children,
     isContentControlled,
+    initialContent,
     focusOnInit,
     pmViewOpts,
     renderNodeViews,
@@ -175,26 +177,22 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
         fEditor.init(_editor.view, authResponse.authToken, onError);
       }
     } else if (pageId && readOnly) {
-      charmClient.pages.getPage(pageId).then((page) => {
-        if (_editor) {
-          setIsLoading(false);
-          isLoadingRef.current = false;
-          const schema = _editor.view.state.schema;
-          let doc = _editor.view.state.doc;
-          if (page.content) {
-            doc = schema.nodeFromJSON(page.content);
-          }
-          const stateConfig = {
-            schema,
-            doc,
-            plugins: _editor.view.state.plugins
-          };
-          if (_editor.view && !_editor.view.isDestroyed) {
-            // Set document in prosemirror
-            _editor.view.setProps({ state: EditorState.create(stateConfig) });
-          }
-        }
-      });
+      setIsLoading(false);
+      isLoadingRef.current = false;
+      const schema = _editor.view.state.schema;
+      let doc = _editor.view.state.doc;
+      if (initialContent) {
+        doc = schema.nodeFromJSON(initialContent);
+      }
+      const stateConfig = {
+        schema,
+        doc,
+        plugins: _editor.view.state.plugins
+      };
+      if (_editor.view && !_editor.view.isDestroyed) {
+        // Set document in prosemirror
+        _editor.view.setProps({ state: EditorState.create(stateConfig) });
+      }
     }
     (_editor.view as any)._updatePluginWatcher = updatePluginWatcher(_editor);
     setEditor(_editor);
@@ -202,7 +200,7 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
       fEditor?.close();
       _editor.destroy();
     };
-  }, [user?.id, pageId, useSockets, authResponse, authResponse, ref]);
+  }, [user?.id, pageId, useSockets, authResponse, ref]);
 
   useEffect(() => {
     const timer = setTimeout(() => setShowLoader(true), 300);

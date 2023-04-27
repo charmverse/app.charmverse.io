@@ -1,6 +1,27 @@
 {
-    "files.associations": {
-        "*.rsh": "javascript"
+    "[typescriptreact]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.codeActionsOnSave": {
+            "source.fixAll.eslint": true
+        }
     },
-    "javascript.suggest.completeFunctionCalls": true
+    "[typescript]": {
+        "editor.defaultFormatter": "dbaeumer.vscode-eslint",
+        "editor.codeActionsOnSave": {
+            "source.fixAll.eslint": true
+        }
+    },
+    "[javascript]": {
+        "editor.defaultFormatter": "dbaeumer.vscode-eslint",
+        "editor.codeActionsOnSave": {
+            "source.fixAll.eslint": true
+        }
+    },
+    "editor.codeActionsOnSave": {
+        "source.organizeImports": false
+    },
+    "editor.detectIndentation": false,
+    "editor.tabSize": 2,
+    "jestrunner.configPath": "jest.config-all.ts",
+    "typescript.tsdk": "node_modules/typescript/lib",
 }

@@ -401,7 +401,6 @@ function CharmEditor({
   pageActionDisplay = null,
   content = defaultContent,
   children,
-  autoFocus,
   insideModal,
   onContentChange,
   style,
@@ -523,11 +522,12 @@ function CharmEditor({
   const state = useEditorState({
     specRegistry,
     plugins: getPlugins(),
-    initialValue: content ? Node.fromJSON(specRegistry.schema, content) : '',
+    initialValue: isContentControlled && content ? Node.fromJSON(specRegistry.schema, content) : '',
     dropCursorOpts: {
       color: 'var(--charmeditor-active)'
     }
   });
+
   useEffect(() => {
     if (editorRef.current) {
       const highlightedMentionId = router.query.mentionId;
@@ -561,6 +561,7 @@ function CharmEditor({
       disablePageSpecificFeatures={disablePageSpecificFeatures}
       disableRowHandles={disableRowHandles}
       isContentControlled={isContentControlled}
+      initialContent={content}
       enableSuggestions={enableSuggestingMode}
       onParticipantUpdate={onParticipantUpdate}
       trackChanges
