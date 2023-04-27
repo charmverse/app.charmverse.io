@@ -41,7 +41,6 @@ import { InvalidInputError } from 'lib/utilities/errors';
 import { typedKeys } from 'lib/utilities/objects';
 import { uid } from 'lib/utilities/strings';
 import type { LoggedInUser } from 'models';
-import { getRandomThemeColor } from 'theme/utils/getRandomThemeColor';
 
 import { boardWithCardsArgs } from './generateBoardStub';
 
@@ -932,13 +931,17 @@ export async function generateProposal({
 }): Promise<Page & { proposal: ProposalWithUsers; workspaceEvent: WorkspaceEvent }> {
   const proposalId = v4();
 
+  const colors = ['gray', 'orange', 'yellow', 'teal', 'blue', 'turquoise', 'purple', 'pink', 'red'];
+
+  const randomColor = colors[Math.floor(Math.random() * colors.length)];
+
   const categoryIdToLink =
     categoryId ??
     (
       await prisma.proposalCategory.create({
         data: {
           title: `Category - ${v4()}`,
-          color: getRandomThemeColor(),
+          color: randomColor,
           space: { connect: { id: spaceId } }
         }
       })

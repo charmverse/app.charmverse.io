@@ -15,9 +15,7 @@ let browser: Browser;
 
 test.beforeAll(async () => {
   // Set headless to false in chromium.launch to visually debug the test
-  browser = await chromium.launch({
-    headless: false
-  });
+  browser = await chromium.launch({});
 });
 
 test.describe.serial('Make a page public and visit it', async () => {
