@@ -238,6 +238,10 @@ export class WebSocketConnector {
           server: this.messages.server,
           toSend: this.messagesToSend.length
         });
+        // if no messages, then we never made a connection
+        if (this.messages.client === 0 && this.messages.server === 0) {
+          this.onError(new Error('Error connecting to document server'));
+        }
       } else if ((error as any).code === 'parser error') {
         // ignore error - seems to happen on deploy
       } else {
