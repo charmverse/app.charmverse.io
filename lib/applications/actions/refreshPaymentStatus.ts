@@ -6,7 +6,7 @@ import { getSafeTxStatus } from 'lib/gnosis/getSafeTxStatus';
 import { DataNotFoundError } from 'lib/utilities/errors';
 
 export async function refreshPaymentStatus(applicationId: string) {
-  const submission = await prisma.application.findUnique({
+  const application = await prisma.application.findUnique({
     where: {
       id: applicationId
     },
@@ -15,18 +15,18 @@ export async function refreshPaymentStatus(applicationId: string) {
     }
   });
 
-  if (!submission) {
+  if (!application) {
     throw new DataNotFoundError(`Application with id ${applicationId} was not found`);
   }
 
   if (
-    (submission.status !== ApplicationStatus.complete && submission.status !== ApplicationStatus.processing) ||
-    submission.transactions.length === 0
+    (application.status !== ApplicationStatus.complete && application.status !== ApplicationStatus.processing) ||
+    application.transactions.length === 0
   ) {
-    return submission;
+    return { application, updated: false };
   }
 
-  const multisigTxStatuses = submission.transactions.map((tx) =>
+  const multisigTxStatuses = application.transactions.map((tx) =>
     getSafeTxStatus({ txHash: tx.transactionId, chainId: Number(tx.chainId) })
   );
 
@@ -34,10 +34,10 @@ export async function refreshPaymentStatus(applicationId: string) {
     const statuses = await Promise.all(multisigTxStatuses);
     const updatedStatus = getApplicationStatus(statuses);
 
-    if (updatedStatus !== submission.status) {
+    if (updatedStatus !== application.status) {
       const updatedApplication = await prisma.application.update({
         where: {
-          id: submission.id
+          id: application.id
         },
         data: {
           status: updatedStatus
@@ -46,12 +46,12 @@ export async function refreshPaymentStatus(applicationId: string) {
 
       await rollupBountyStatus(updatedApplication.bountyId);
 
-      return updatedApplication;
+      return { application: updatedApplication, updated: true };
     }
 
-    return submission;
+    return { application, updated: false };
   } catch (e) {
-    return submission;
+    return { application, updated: false };
   }
 }
 

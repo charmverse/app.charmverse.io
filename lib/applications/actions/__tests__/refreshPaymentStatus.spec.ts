@@ -33,10 +33,11 @@ describe('refreshPaymentStatus', () => {
       bountyCap: 1
     });
 
-    const application = await refreshPaymentStatus(bountyWithSubmission.applications[0].id);
-    const bounty = await prisma.bounty.findUnique({ where: { id: application.bountyId } });
+    const res = await refreshPaymentStatus(bountyWithSubmission.applications[0].id);
+    const bounty = await prisma.bounty.findUnique({ where: { id: res.application.bountyId } });
 
-    expect(application.status).toBe('complete');
+    expect(res.application.status).toBe('complete');
+    expect(res.updated).toBe(false);
     expect(bounty?.status).toBe('complete');
   });
 
@@ -55,10 +56,11 @@ describe('refreshPaymentStatus', () => {
     const applicationId = bountyWithSubmission.applications[0].id;
     await createTransaction({ applicationId, chainId: '1', transactionId: '0x123' });
 
-    const application = await refreshPaymentStatus(applicationId);
-    const bounty = await prisma.bounty.findUnique({ where: { id: application.bountyId } });
+    const res = await refreshPaymentStatus(applicationId);
+    const bounty = await prisma.bounty.findUnique({ where: { id: res.application.bountyId } });
 
-    expect(application.status).toBe('processing');
+    expect(res.application.status).toBe('processing');
+    expect(res.updated).toBe(true);
     expect(bounty?.status).toBe('complete');
   });
 
@@ -77,10 +79,11 @@ describe('refreshPaymentStatus', () => {
     const applicationId = bountyWithSubmission.applications[0].id;
     await createTransaction({ applicationId, chainId: '1', transactionId: '0x123' });
 
-    const application = await refreshPaymentStatus(applicationId);
-    const bounty = await prisma.bounty.findUnique({ where: { id: application.bountyId } });
+    const res = await refreshPaymentStatus(applicationId);
+    const bounty = await prisma.bounty.findUnique({ where: { id: res.application.bountyId } });
 
-    expect(application.status).toBe('cancelled');
+    expect(res.application.status).toBe('cancelled');
+    expect(res.updated).toBe(true);
     expect(bounty?.status).toBe('complete');
   });
 
@@ -99,10 +102,11 @@ describe('refreshPaymentStatus', () => {
     const applicationId = bountyWithSubmission.applications[0].id;
     await createTransaction({ applicationId, chainId: '1', transactionId: '0x123' });
 
-    const application = await refreshPaymentStatus(applicationId);
-    const bounty = await prisma.bounty.findUnique({ where: { id: application.bountyId } });
+    const res = await refreshPaymentStatus(applicationId);
+    const bounty = await prisma.bounty.findUnique({ where: { id: res.application.bountyId } });
 
-    expect(application.status).toBe('paid');
+    expect(res.application.status).toBe('paid');
+    expect(res.updated).toBe(true);
     expect(bounty?.status).toBe('paid');
   });
 
@@ -121,10 +125,11 @@ describe('refreshPaymentStatus', () => {
     const applicationId = bountyWithSubmission.applications[0].id;
     await createTransaction({ applicationId, chainId: '1', transactionId: '0x123' });
 
-    const application = await refreshPaymentStatus(applicationId);
-    const bounty = await prisma.bounty.findUnique({ where: { id: application.bountyId } });
+    const res = await refreshPaymentStatus(applicationId);
+    const bounty = await prisma.bounty.findUnique({ where: { id: res.application.bountyId } });
 
-    expect(application.status).toBe('paid');
+    expect(res.application.status).toBe('paid');
+    expect(res.updated).toBe(true);
     expect(bounty?.status).toBe('open');
   });
 });
