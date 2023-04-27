@@ -500,7 +500,7 @@ export async function importWorkspacePages({
     prisma.proposal.createMany(proposalArgs),
     ...pageArgs.map((p) => {
       totalCreatedPages += 1;
-      // log.debug(`Creating page ${totalCreatedPages}/${pagesToCreate}: ${p.data.type} // ${p.data.title}`);
+      log.debug(`Creating page ${totalCreatedPages}/${pagesToCreate}: ${p.data.type} // ${p.data.title}`);
       return createPage<PageMeta>(p);
     }),
     prisma.vote.createMany(voteArgs),

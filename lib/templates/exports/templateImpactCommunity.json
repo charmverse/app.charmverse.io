@@ -264,6 +264,16 @@
           {
             "type": "image",
             "attrs": {
+              "alt": "Kokonut Network | Agriculture for Communities",
+              "src": "https://super-static-assets.s3.amazonaws.com/2b58cabf-faf3-4b12-a223-92ec7de5ce57/uploads/cover/31a608fb-889d-496e-92b8-d086774d6936.png",
+              "size": 700,
+              "track": [],
+              "caption": null
+            }
+          },
+          {
+            "type": "image",
+            "attrs": {
               "alt": null,
               "src": null,
               "size": 425,

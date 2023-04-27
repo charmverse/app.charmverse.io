@@ -7,7 +7,6 @@ export const log: logBase.Logger = global.log ?? apply(logBase.getLogger('defaul
 
 // remember this instance of prisma in development to avoid too many clients
 if (process.env.NODE_ENV === 'development') {
-  logBase.setLevel('warn');
   // @ts-expect-error
   global.log = log;
 }
