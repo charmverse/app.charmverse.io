@@ -229,12 +229,21 @@ export class WebSocketConnector {
     this.socket.on('connect_error', (error) => {
       const errorType = (error as any).type as string;
       if (errorType === 'TransportError') {
+        // ..... TODO HERE
         // server is probably restarting
+        log.warn(`[ws${namespace}] Connection error`, {
+          error,
+          errorType,
+          client: this.messages.client,
+          server: this.messages.server,
+          toSend: this.messagesToSend.length
+        });
       } else if ((error as any).code === 'parser error') {
         // ignore error - seems to happen on deploy
       } else {
         log.error(`[ws${namespace}] Connection error`, {
           error,
+          errorType,
           client: this.messages.client,
           server: this.messages.server,
           toSend: this.messagesToSend.length
