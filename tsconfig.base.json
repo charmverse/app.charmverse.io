@@ -1,7 +1,0 @@
-{
-  "extends": "./tsconfig.json",
-  "compilerOptions": {
-    // This is only used here to that Typescript in VSCode can resolve module types correctly
-    "moduleResolution": "node"
-  },
-}
