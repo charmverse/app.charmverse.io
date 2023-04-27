@@ -25,6 +25,7 @@ const esmModules = [
   'fetch-blob',
   'formdata-polyfill',
   'jose',
+  'nanoid',
   '@charmverse/core'
 ];
 
