@@ -6,6 +6,7 @@ import { memo, useMemo } from 'react';
 import charmClient from 'charmClient';
 import UserDisplay from 'components/common/UserDisplay';
 import { useMembers } from 'hooks/useMembers';
+import { usePages } from 'hooks/usePages';
 import type { Member } from 'lib/members/interfaces';
 
 import { accept } from '../fiduswriter/track/accept';
@@ -73,6 +74,19 @@ type Props = TrackedEvent & { readOnly?: boolean; isOwner?: boolean; pageId: str
 function SuggestionCardComponent({ readOnly, isOwner, active, data, node, pos, type, pageId, spaceId }: Props) {
   const view = useEditorViewContext();
   const { getMemberById } = useMembers();
+  const { pages } = usePages();
+  let content = node.textContent;
+
+  if (node.type.name === 'emoji') {
+    content = node.attrs.emoji;
+  } else if (node.type.name === 'mention') {
+    if (node.attrs.type === 'user') {
+      content = getMemberById(node.attrs.id)?.username ?? '';
+    } else {
+      content = pages[node.attrs.id]?.title ?? 'Untitled';
+    }
+  }
+
   // get parentNode for lists
   const parentNode = useMemo(
     () => (pos > 0 && pos < view.state.doc.nodeSize ? view.state.doc.nodeAt(pos - 1) : null),
@@ -138,7 +152,7 @@ function SuggestionCardComponent({ readOnly, isOwner, active, data, node, pos, t
               type={type}
               parentNodeType={parentNode?.type.name}
               nodeType={node.type.name}
-              content={node.textContent}
+              content={content}
             />
           )}
         </Typography>
