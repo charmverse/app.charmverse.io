@@ -29,7 +29,7 @@ export function usePage({ spaceId, pageIdOrPath }: Props): PageResult {
     data: pageWithContent,
     error: pageWithContentError,
     mutate
-  } = useSWR(spaceId && pageIdOrPath && `page-with-content-${pageIdOrPath}-${spaceId}`, () =>
+  } = useSWR(pageIdOrPath && `page-with-content-${pageIdOrPath}-${spaceId}`, () =>
     charmClient.pages.getPage(pageIdOrPath as string, spaceId as string)
   );
 
