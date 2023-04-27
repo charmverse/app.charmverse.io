@@ -98,6 +98,13 @@ const config = {
     // Fix for: "Module not found: Can't resolve 'canvas'"
     _config.resolve.alias.canvas = false;
 
+    // Fix for: "Module not found: Can't resolve X" when using moduleResolution, nodeNext
+    // https://github.com/vercel/next.js/discussions/41189#discussioncomment-4488386
+    // _config.resolve.extensionAlias = {
+    //   '.js': ['.js', '.ts'],
+    //   '.jsx': ['.jsx', '.tsx']
+    // };
+
     // const externalDir = path.resolve(__dirname, '..', 'core', 'node_modules');
 
     // _config.resolve.modules.push(externalDir);
