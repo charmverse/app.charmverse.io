@@ -1,4 +1,4 @@
-import type { Node, EditorView, EditorState } from '@bangle.dev/pm';
+import type { Node, EditorView, EditorState, PluginKey } from '@bangle.dev/pm';
 import { collab, sendableSteps } from 'prosemirror-collab';
 
 import type { FrontendParticipant } from 'components/common/CharmEditor/components/fiduswriter/collab';

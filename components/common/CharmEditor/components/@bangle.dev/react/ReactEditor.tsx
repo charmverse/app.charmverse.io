@@ -2,7 +2,7 @@ import { history } from '@bangle.dev/base-components';
 import type { BangleEditorProps as CoreBangleEditorProps } from '@bangle.dev/core';
 import { BangleEditor as CoreBangleEditor } from '@bangle.dev/core';
 import { EditorState } from '@bangle.dev/pm';
-import type { Plugin } from '@bangle.dev/pm';
+import type { Plugin, PluginKey } from '@bangle.dev/pm';
 import { EditorViewContext } from '@bangle.dev/react';
 import { objectUid } from '@bangle.dev/utils';
 import styled from '@emotion/styled';
