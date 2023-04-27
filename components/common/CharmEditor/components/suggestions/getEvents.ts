@@ -62,7 +62,6 @@ export function getEventsFromDoc({ state }: { state: EditorState }) {
 
 function getEventsFromNode({ node, lastNode, lastNodeTracks }: GetTracksProps) {
   const trackAttr: TrackAttribute[] | undefined = node.attrs.track;
-
   const nodeTracks: TrackAttribute2[] = trackAttr
     ? trackAttr.map((track) => {
         const nodeTrack: TrackAttribute2 = {
@@ -84,7 +83,7 @@ function getEventsFromNode({ node, lastNode, lastNodeTracks }: GetTracksProps) {
 
   // Filter out trackmarks already present in the last node (if it's an inline node).
   const tracks =
-    node.isInline === lastNode.isInline
+    node.isInline === lastNode.isInline && !['emoji', ' mention'].includes(node.type.name)
       ? nodeTracks.filter(
           (track) =>
             !lastNodeTracks.find(
