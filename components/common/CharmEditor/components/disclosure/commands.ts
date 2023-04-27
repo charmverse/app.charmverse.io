@@ -16,10 +16,10 @@ export const backspaceCmd: Command = (state, dispatch) => {
 
   const summaryNode = findParentNodeOfTypeClosestToPos($cursor, state.schema.nodes.disclosureSummary);
   const disclosureNode = findParentNodeOfTypeClosestToPos($cursor, state.schema.nodes.disclosureDetails);
-
-  const nextNode = tr.doc.resolve($cursor.pos + $cursor.node().nodeSize).node();
+  const nextNodePos = $cursor.after();
+  const nextNode = state.doc.nodeAt(nextNodePos);
   // If the cursor is at the paragraph (#) node and the next sibling is a disclosureDetails node
-  if (nextNode.type === state.schema.nodes.disclosureDetails) {
+  if (nextNode && nextNode.type === state.schema.nodes.disclosureDetails) {
     const paragraphNode = $cursor.parent;
     const paragraphIsEmpty = paragraphNode.textContent.length === 0;
 
