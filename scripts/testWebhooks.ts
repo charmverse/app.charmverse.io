@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 import { processMessages } from 'lib/aws/webhookSqs';
-import fetch from 'node-fetch';
+import fetch from 'adapters/http/fetch.server'
 
 // use this file and run against production to generate api keys
 
