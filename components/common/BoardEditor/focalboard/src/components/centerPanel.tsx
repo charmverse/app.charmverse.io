@@ -125,7 +125,15 @@ function CenterPanel(props: Props) {
     ? allViews.filter((view) => view.fields.linkedSourceId && pages[view.fields.linkedSourceId])
     : allViews;
 
+  const linksToDeletedDatabasePages = views.length !== allViews.length;
+
   const activeView = isLinkedBoardType && views.length === 0 ? null : defaultActiveView;
+
+  useEffect(() => {
+    if (linksToDeletedDatabasePages) {
+      showView('');
+    }
+  }, [linksToDeletedDatabasePages]);
 
   useEffect(() => {
     if ((views.length === 0 && !activeView) || (isLinkedBoardType && views.length === 0)) {
@@ -622,8 +630,8 @@ function CenterPanel(props: Props) {
                 <CreateLinkedView
                   readOnly={props.readOnly}
                   onSelect={selectViewSource}
-                  // defaultActiveView indicates that there was a view which was linked to a deleted database page
-                  onCreate={views.length === 0 && !defaultActiveView ? createDatabase : undefined}
+                  // if it links to deleted db page then the board can't be inline_board type
+                  onCreate={views.length === 0 && !linksToDeletedDatabasePages ? createDatabase : undefined}
                   onCsvImport={onCsvImport}
                 />
               )}
