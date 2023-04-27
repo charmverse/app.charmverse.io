@@ -1,7 +1,7 @@
 import type { Provider } from '@ethersproject/providers';
 import type { BigNumber } from 'ethers';
 
-import { getProjectRegistryContract } from 'lib/gitcoin/contracts';
+import { getProjectRegistryContract } from 'lib/gitcoin/getProjectRegistryContract';
 import { fetchFileByHash, getIpfsFileUrl } from 'lib/ipfs/fetchFileByHash';
 import log from 'lib/log';
 import { getSafeOwners } from 'lib/safe/getSafeOwners';
