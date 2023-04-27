@@ -10,6 +10,7 @@ import { updateForumPost } from 'lib/forums/posts/updateForumPost';
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { getPermissionsClient } from 'lib/permissions/api';
 import { withSessionRoute } from 'lib/session/withSession';
+import { isUUID } from 'lib/utilities/strings';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 import { publishPostEvent } from 'lib/webhookPublisher/publishEvent';
 import { relay } from 'lib/websockets/relay';
@@ -143,9 +144,9 @@ async function getForumPostController(req: NextApiRequest, res: NextApiResponse<
 
   const post = await getForumPost({ userId, postId, spaceDomain });
 
-  const permissions = await getPermissionsClient({ resourceId: postId, resourceIdType: 'post' }).then(({ forum }) =>
+  const permissions = await getPermissionsClient({ resourceId: post.id, resourceIdType: 'post' }).then(({ forum }) =>
     forum.computePostPermissions({
-      resourceId: postId,
+      resourceId: post.id,
       userId
     })
   );

@@ -32,7 +32,7 @@ function getEngine(input: Pick<Space, 'paidTier'>) {
 
 export async function isPostSpaceOptedIn({ resourceId }: Resource): Promise<PermissionsEngine> {
   if (!stringUtils.isUUID(resourceId)) {
-    throw new InvalidInputError('Invalid resourceId');
+    throw new InvalidInputError(`Invalid resourceId: ${resourceId}`);
   }
   const post = await prisma.post.findUnique({
     where: {
@@ -56,7 +56,7 @@ export async function isPostSpaceOptedIn({ resourceId }: Resource): Promise<Perm
 
 export async function isPostCategorySpaceOptedIn({ resourceId }: Resource): Promise<PermissionsEngine> {
   if (!stringUtils.isUUID(resourceId)) {
-    throw new InvalidInputError('Invalid resourceId');
+    throw new InvalidInputError(`Invalid resourceId: ${resourceId}`);
   }
   const postCategory = await prisma.postCategory.findUnique({
     where: {
@@ -80,7 +80,7 @@ export async function isPostCategorySpaceOptedIn({ resourceId }: Resource): Prom
 
 export async function isSpaceOptedIn({ resourceId }: Resource): Promise<PermissionsEngine> {
   if (!stringUtils.isUUID(resourceId)) {
-    throw new InvalidInputError('Invalid resourceId');
+    throw new InvalidInputError(`Invalid resourceId: ${resourceId}`);
   }
   const space = await prisma.space.findUnique({
     where: {
@@ -100,7 +100,7 @@ export async function isSpaceOptedIn({ resourceId }: Resource): Promise<Permissi
 
 export async function isPostCategoryPermissionSpaceOptedIn({ resourceId }: Resource): Promise<PermissionsEngine> {
   if (!stringUtils.isUUID(resourceId)) {
-    throw new InvalidInputError('Invalid resourceId');
+    throw new InvalidInputError(`Invalid resourceId: ${resourceId}`);
   }
   const postCategoryPermission = await prisma.postCategoryPermission.findUnique({
     where: {
