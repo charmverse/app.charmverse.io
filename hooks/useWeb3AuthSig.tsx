@@ -172,10 +172,10 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
     ) {
       const storedSignature = getStoredSignature();
 
-      if (storedSignature && storedSignature.address === account) {
+      if (storedSignature && lowerCaseEqual(storedSignature.address, account)) {
         await loginFromWeb3Account(storedSignature);
-      } else if (storedSignature?.address !== account) {
-        const otherAccount = user?.wallets.find((w) => w.address !== account)?.address;
+      } else if (!lowerCaseEqual(storedSignature?.address, account)) {
+        const otherAccount = user?.wallets.find((w) => !lowerCaseEqual(w.address, account))?.address;
 
         if (otherAccount) {
           const signit = await sign(otherAccount);
