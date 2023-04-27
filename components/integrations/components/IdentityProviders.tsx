@@ -200,20 +200,29 @@ export function IdentityProviders() {
             <ConfirmDeleteModal
               title='Disconnect wallet'
               question={
-                <>
-                  <Typography mb={1}>
-                    Are you sure you want to Disconnect your {wallet.ensname || wallet.address} wallet?
-                  </Typography>
-                  <Typography variant='body2'>
-                    This action will remove your wallet, NFTs, POAPs, Organizations from CharmVerse. It will also remove
-                    roles and permissions if you joined the Space via a token gate.
-                  </Typography>
-                </>
+                <Box>
+                  {lowerCaseEqual(wallet.address, account) ? (
+                    <Typography>
+                      You can't disconnect your current active wallet. You need to switch to another wallet first.
+                    </Typography>
+                  ) : (
+                    <>
+                      <Typography mb={1}>
+                        Are you sure you want to Disconnect your {wallet.ensname || wallet.address} wallet?
+                      </Typography>
+                      <Typography variant='body2'>
+                        This action will remove your wallet, NFTs, POAPs, Organizations from CharmVerse. It will also
+                        remove roles and permissions if you joined the Space via a token gate.
+                      </Typography>
+                    </>
+                  )}
+                </Box>
               }
               buttonText='Disconnect'
               onConfirm={() => disconnectWallet(wallet.address)}
               onClose={deleteWalletPopupState.close}
               open={deleteWalletPopupState.isOpen && openAddress === wallet.address}
+              disabled={lowerCaseEqual(wallet.address, account)}
             />
           </Fragment>
         ))}

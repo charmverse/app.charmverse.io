@@ -6,7 +6,7 @@ import PrimaryButton from 'components/common/PrimaryButton';
 import { WalletSign } from 'components/login';
 import { useUser } from 'hooks/useUser';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
-import { shortenHex } from 'lib/utilities/strings';
+import { lowerCaseEqual, shortenHex } from 'lib/utilities/strings';
 
 type Props = {
   isConnectingWallet: boolean;
@@ -26,6 +26,11 @@ export function AddWalletStep({ isConnectingWallet, onSignSuccess }: Props) {
         To add another wallet to your account, switch to the wallet you want to add. You will be asked to connect and
         sign a message.
       </Typography>
+      {!isWalletConnected && (
+        <Typography>
+          <i>Click verify wallet to add your new wallet or change back to an authorised account to close the window.</i>
+        </Typography>
+      )}
 
       <Stack direction={['column', 'row']} gap={1} alignItems='center'>
         <Stack width='100%'>
