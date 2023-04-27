@@ -34,6 +34,18 @@ export function BountyApplicantStatus({ submission }: Props) {
         </Typography>
       )}
 
+      {submission.status === 'processing' && (
+        <Typography color='secondary' variant='body2'>
+          Processing payment
+        </Typography>
+      )}
+
+      {submission.status === 'cancelled' && (
+        <Typography color='error' variant='body2'>
+          Payment cancelled
+        </Typography>
+      )}
+
       {submission.status === 'applied' && (
         <Typography color='secondary' variant='body2'>
           Awaiting assignment

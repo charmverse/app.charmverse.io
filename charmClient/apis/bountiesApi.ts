@@ -99,7 +99,7 @@ export class BountiesApi {
     return http.POST<Application>(`/api/submissions/${submissionId}/mark-as-paid`);
   }
 
-  recordTransaction(data: TransactionCreationData) {
+  recordTransaction(data: TransactionCreationData & { isMultisig?: boolean }) {
     return http.POST('/api/transactions', data);
   }
 

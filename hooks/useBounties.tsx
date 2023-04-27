@@ -1,5 +1,5 @@
 import type { Dispatch, ReactNode, SetStateAction } from 'react';
-import { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import { useCallback, createContext, useContext, useEffect, useMemo, useState } from 'react';
 
 import charmClient from 'charmClient';
 import useRefState from 'hooks/useRefState';
@@ -20,6 +20,7 @@ type IContext = {
   setCurrentBounty: (bounty: BountyWithDetails) => void;
   updateBounty: (bountyId: string, update: Partial<UpdateableBountyFields>) => Promise<BountyWithDetails>;
   refreshBounty: (bountyId: string) => Promise<void>;
+  refreshBounties: () => Promise<void>;
   loadingBounties: boolean;
 };
 
@@ -34,6 +35,7 @@ export const BountiesContext = createContext<Readonly<IContext>>({
   setCurrentBounty: () => undefined,
   updateBounty: () => Promise.resolve({} as any),
   refreshBounty: () => Promise.resolve(undefined),
+  refreshBounties: () => Promise.resolve(undefined),
   loadingBounties: false
 });
 
@@ -45,21 +47,37 @@ export function BountiesProvider({ children }: { children: ReactNode }) {
 
   const [isLoading, setIsLoading] = useState(false);
   const [draftBounty, setDraftBounty] = useState<BountyCreationData | null>(null);
+  const [currentBountyId, setCurrentBountyId] = useState<string | null>(null);
+  const [currentBounty, setCurrentBounty] = useState<BountyWithDetails | null>(null);
+
+  const refreshBounties = useCallback(
+    async (clearCache = false) => {
+      if (!user?.id || !space?.id) {
+        return;
+      }
+
+      if (clearCache) {
+        setIsLoading(true);
+        setBounties([]);
+      }
+
+      const list = await charmClient.bounties.listBounties(space?.id);
+      setBounties(list);
+      setIsLoading(false);
+
+      if (currentBountyId) {
+        const newCurrentBounty = list.find((_bounty) => _bounty.id === currentBountyId);
+        if (newCurrentBounty) {
+          setCurrentBounty({ ...newCurrentBounty });
+        }
+      }
+    },
+    [currentBountyId, space?.id, user?.id]
+  );
 
   useEffect(() => {
-    if (space?.id) {
-      setIsLoading(true);
-      setBounties([]);
-      charmClient.bounties.listBounties(space?.id).then((_bounties) => {
-        setBounties(_bounties);
-        setIsLoading(false);
-      });
-    }
+    refreshBounties(true);
   }, [user?.id, space?.id]);
-
-  const [currentBountyId, setCurrentBountyId] = useState<string | null>(null);
-
-  const [currentBounty, setCurrentBounty] = useState<BountyWithDetails | null>(null);
 
   // Updates the value of a bounty in the bounty list
   function refreshBountyList(bounty: BountyWithDetails) {
@@ -161,9 +179,10 @@ export function BountiesProvider({ children }: { children: ReactNode }) {
       setCurrentBounty: _setCurrentBounty,
       updateBounty,
       refreshBounty,
-      loadingBounties: isLoading
+      loadingBounties: isLoading,
+      refreshBounties
     }),
-    [bounties, currentBountyId, currentBounty, draftBounty, isLoading]
+    [bounties, currentBountyId, currentBounty, draftBounty, isLoading, refreshBounties]
   );
 
   return <BountiesContext.Provider value={value}>{children}</BountiesContext.Provider>;
