@@ -31,7 +31,7 @@ cron.schedule('*/15 * * * *', proposalTask);
 // Verify token gates and remove users who no longer meet the conditions
 cron.schedule('*/30 * * * *', verifyTokenGateMembershipsTask);
 
-// Refresh applications with pending payments once an hour
+// Refresh applications with pending payments
 cron.schedule('*/30 * * * *', refreshBountyApplications);
 
 const port = process.env.PORT || 4000;

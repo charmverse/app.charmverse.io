@@ -15,7 +15,7 @@ async function refreshStatusHandler(req: NextApiRequest, res: NextApiResponse<Ap
 
   const updatedApplication = await refreshPaymentStatus(applicationId as string);
 
-  return res.status(200).json(updatedApplication);
+  return res.status(200).json(updatedApplication.application);
 }
 
 export default withSessionRoute(handler);
