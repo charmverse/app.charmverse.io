@@ -22,8 +22,8 @@ import { subscribeToAllEvents, createSigningSecret } from 'lib/webhookPublisher/
 import { gettingStartedPage } from 'seedData/gettingStartedPage';
 import { proposalTemplates } from 'seedData/proposalTemplates';
 
-import type { SpaceCreateTemplate, SpaceTemplateType } from './config';
-import { spaceInternalTemplateMapping, spaceTemplateLabelMapping } from './config';
+import type { PrivateTemplate, SpaceCreateTemplate, SpaceTemplateType } from './config';
+import { privateTemplateMapping, spaceInternalTemplateMapping, spaceTemplateLabelMapping } from './config';
 import { getAvailableDomainName } from './getAvailableDomainName';
 import { getSpaceByDomain } from './getSpaceByDomain';
 
@@ -45,7 +45,7 @@ export type CreateSpaceProps = {
   spaceData: SpaceCreateInput;
   userId: string;
   extraAdmins?: string[];
-  createSpaceTemplate?: SpaceCreateTemplate;
+  createSpaceTemplate?: SpaceCreateTemplate | PrivateTemplate;
   webhookUrl?: string;
   skipTracking?: boolean;
 };
@@ -159,16 +159,14 @@ export async function createWorkspace({
   } else if (
     (spaceTemplateLabelMapping as Record<string, string>)[
       spaceInternalTemplateMapping[createSpaceTemplate as SpaceTemplateType]
-    ]
+    ] ||
+    privateTemplateMapping[createSpaceTemplate as PrivateTemplate]
   ) {
-    const resolvedPath = path.resolve(
-      path.join(
-        'lib',
-        'templates',
-        'exports',
-        `${spaceInternalTemplateMapping[createSpaceTemplate as SpaceTemplateType]}.json`
-      )
-    );
+    const filename =
+      spaceInternalTemplateMapping[createSpaceTemplate as SpaceTemplateType] ||
+      privateTemplateMapping[createSpaceTemplate as PrivateTemplate];
+
+    const resolvedPath = path.resolve(path.join('lib', 'templates', 'exports', `${filename}.json`));
     const dataToImport: WorkspaceExport = JSON.parse(await fs.readFile(resolvedPath, 'utf-8'));
 
     await importWorkspacePages({

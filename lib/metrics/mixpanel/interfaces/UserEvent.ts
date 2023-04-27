@@ -1,6 +1,6 @@
 import type { IdentityType } from '@prisma/client';
 
-import type { SpaceCreateTemplate } from 'lib/spaces/config';
+import type { PrivateTemplate, SpaceCreateTemplate } from 'lib/spaces/config';
 import type { TokenGateJoinType } from 'lib/token-gates/interfaces';
 
 import type { BaseEvent, BaseEventWithoutGroup } from './BaseEvent';
@@ -42,7 +42,7 @@ export type SpaceJoined = BaseEvent & {
 };
 
 export type CreateNewSpace = BaseEvent & {
-  template: SpaceCreateTemplate;
+  template: SpaceCreateTemplate | PrivateTemplate;
   source?: string;
 };
 
