@@ -57,7 +57,7 @@ async function importGitCoinProjects() {
     const projectDetails = await getProjectDetails({ chainId: CHAIN_ID, projectId: i, provider });
     if (projectDetails !== null) {
       const name = projectDetails.metadata.title;
-      const users = await createSpaceUsers([...projectDetails.owners, '0x464fEcdb86cA7275c74bc65Fe95E72AA549Fa7ba']);
+      const users = await createSpaceUsers([...projectDetails.owners]);
 
       if (users !== null) {
         const { botUser, adminUserId, extraAdmins} = users;
