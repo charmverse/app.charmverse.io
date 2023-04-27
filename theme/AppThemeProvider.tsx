@@ -13,7 +13,7 @@ import { monoFont, serifFont } from 'theme/fonts';
 
 export function AppThemeProvider({ children, forceTheme }: { children: React.ReactNode; forceTheme?: PaletteMode }) {
   // dark mode: https://mui.com/customization/dark-mode/
-  const [savedDarkMode, setSavedDarkMode] = useLocalStorage<PaletteMode | null>('darkMode', null);
+  const [savedDarkMode, setSavedDarkMode] = useLocalStorage<PaletteMode | null>('dark', null);
   const [mode, setMode] = useState<PaletteMode>('dark');
 
   const toggleColorMode = useCallback(() => {

@@ -3,9 +3,15 @@ import React from 'react';
 import '../theme/styles.scss';
 import { AppThemeProvider } from '../theme/AppThemeProvider';
 
-
 const preview: Preview = {
   parameters: {
+    backgrounds: {
+      default: 'dark',
+      values: [
+        { name: 'dark', value: '#262626' },
+        { name: 'light', value: '#fff' }
+      ]
+    },
     actions: { argTypesRegex: '^on[A-Z].*' },
     controls: {
       matchers: {

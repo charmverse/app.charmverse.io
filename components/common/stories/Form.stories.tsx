@@ -1,5 +1,4 @@
-import { Check } from '@mui/icons-material';
-import { Box, Grid } from '@mui/material';
+import { Box, Grid, Paper } from '@mui/material';
 import { useState } from 'react';
 
 import { NumberInputField } from 'components/common/form/fields/NumberInputField';
@@ -37,28 +36,32 @@ export function FormComposition() {
   };
 
   return (
-    <Grid container direction='column' spacing={2} mt={1} maxWidth={700} mx='auto'>
-      <Grid item>
-        <UserDescription currentDescription={description} save={saveDescription} />
+    <Paper sx={{ p: 4 }}>
+      <Grid container direction='column' spacing={2} mt={1} maxWidth={700} mx='auto'>
+        <Grid item>
+          <UserDescription currentDescription={description} save={saveDescription} />
+        </Grid>
+        <Grid item>
+          <TimezoneAutocomplete
+            userTimezone={newTimezone}
+            save={(timezone) => setNewTimezone(timezone || 'America/New_York')}
+          />
+        </Grid>
+        <SocialInputs social={text as Social} save={saveSocial} />
+        <Box display='flex' justifyContent='flex-end' gap={2} mt={4}>
+          <Button color='error'>Cancel</Button>
+          <Button>Save</Button>
+        </Box>
       </Grid>
-      <Grid item>
-        <TimezoneAutocomplete
-          userTimezone={newTimezone}
-          save={(timezone) => setNewTimezone(timezone || 'America/New_York')}
-        />
-      </Grid>
-      <SocialInputs social={text as Social} save={saveSocial} />
-      <Box display='flex' justifyContent='flex-end' gap={2} mt={4}>
-        <Button color='error'>Cancel</Button>
-        <Button>Save</Button>
-      </Box>
-    </Grid>
+    </Paper>
   );
 }
 
 export function InputFields() {
   const [number, setNumber] = useState('');
   const [option, setOption] = useState('');
+  const [optionMultiselect, setOptionMultiselect] = useState('');
+
   const [text, setText] = useState('');
 
   const options = [
@@ -67,24 +70,80 @@ export function InputFields() {
     { id: '3', name: 'three', color: 'red' },
     { id: '4', name: 'four', color: 'yellow' }
   ] as SelectOptionType[];
+
   return (
-    <Box display='flex' flexDirection='column' gap={1} mx='auto' maxWidth={700}>
-      <NumberInputField
-        value={number}
-        onChange={(e) => setNumber(e.target.value)}
-        label='NumberInputField'
-        iconLabel={<Check />}
-      />
+    <Paper sx={{ p: 4 }}>
+      <Box display='flex' flexDirection='column' gap={1} mx='auto' maxWidth={700}>
+        <NumberInputField value={number} onChange={(e) => setNumber(e.target.value)} label='NumberInputField' />
 
-      <SelectField
-        multiselect
-        label='SelectField'
-        options={options}
-        value={option}
-        onChange={(value) => setOption(value)}
-      />
+        <NumberInputField
+          disabled
+          value={number}
+          onChange={(e) => setNumber(e.target.value)}
+          label='NumberInputField - disabled'
+        />
 
-      <TextInputField label='TextInputField' value={text} onChange={(e) => setText(e.target.value)} />
-    </Box>
+        <NumberInputField
+          error='error'
+          // @ts-ignore
+          helperText='error message'
+          value={number}
+          onChange={(e) => setNumber(e.target.value)}
+          label='NumberInputField - error'
+        />
+        <NumberInputField
+          disabled
+          value={number}
+          onChange={(e) => setNumber(e.target.value)}
+          label='NumberInputField - disabled'
+        />
+
+        <SelectField label='SelectField' options={options} value={option} onChange={(value) => setOption(value)} />
+
+        <SelectField
+          multiselect
+          label='SelectField - multiselect'
+          options={options}
+          value={optionMultiselect}
+          onChange={(value) => setOptionMultiselect(value)}
+        />
+
+        <SelectField
+          disabled
+          label='SelectField - disabled'
+          options={options}
+          value={option}
+          onChange={(value) => setOption(value)}
+        />
+
+        <SelectField
+          error='error'
+          // @ts-ignore
+          helperText='error message'
+          label='SelectField - error'
+          options={options}
+          value={optionMultiselect}
+          onChange={(value) => setOptionMultiselect(value)}
+        />
+
+        <TextInputField label='TextInputField' value={text} onChange={(e) => setText(e.target.value)} />
+
+        <TextInputField
+          disabled
+          label='TextInputField - disabled'
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+        />
+
+        <TextInputField
+          error='error'
+          // @ts-ignore
+          helperText='error message'
+          label='TextInputField - error'
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+        />
+      </Box>
+    </Paper>
   );
 }
