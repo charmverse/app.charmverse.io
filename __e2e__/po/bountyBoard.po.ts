@@ -1,5 +1,4 @@
 // playwright-dev-page.ts
-import { prisma } from '@charmverse/core';
 import type { Locator, Page } from '@playwright/test';
 
 import { baseUrl } from 'config/constants';
