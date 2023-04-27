@@ -312,6 +312,38 @@ export async function addNewCards({
       ];
   const mappedInitialBoardProperties = mapCardBoardProperties(boardCardProperties);
 
+  // Data looks like this: [{k1: v1, k2: v2},{k1: v12, k2: v22}]
+  // For every csv row, we check if the value and keys are the same or if the value is empty or we don't have it as an initial prop from the board
+  for (const row of csvData) {
+    for (const [k, v] of Object.entries(row)) {
+      if (csvData.every((_row) => _row[k] === v || !_row[k]) && !mappedInitialBoardProperties[k]) {
+        csvData.forEach((_row) => {
+          delete _row[k];
+        });
+        if (headers.find((h) => h === k)) {
+          headers.splice(headers.indexOf(k), 1);
+        }
+      }
+    }
+  }
+
+  // const mappedRows = csvData.reduce<{ [key: string]: string[] }>((acc, row) => {
+  //   Object.entries(row).forEach(([k, v]) => {
+  //     acc[k] = [...new Set([...(acc[k] || []), v])];
+  //   });
+  //   return acc;
+  // }, {});
+
+  // [...headers].forEach((header, index) => {
+  //   if (mappedRows[header]?.every((str) => str === header || !str) && !mappedInitialBoardProperties[header]) {
+  //     delete mappedRows[header];
+  //     headers.splice(index, 1);
+  //     csvData.forEach((_row) => {
+  //       delete _row[header];
+  //     });
+  //   }
+  // });
+
   // Create card properties for the board
   const newBoardProperties = headers.map((prop) =>
     createNewPropertiesForBoard(csvData, prop, mappedInitialBoardProperties[prop])
