@@ -13,11 +13,10 @@ import Button from 'components/common/Button';
 import { useBounties } from 'hooks/useBounties';
 import { useCurrentPage } from 'hooks/useCurrentPage';
 import { usePage } from 'hooks/usePage';
-import { usePagePermissions } from 'hooks/usePagePermissions';
 import { usePages } from 'hooks/usePages';
 import type { BountyWithDetails } from 'lib/bounties';
 import log from 'lib/log';
-import type { PageWithContent, PageUpdates } from 'lib/pages';
+import { AllowedPagePermissions } from 'lib/permissions/pages/available-page-permissions.class';
 import debouncePromise from 'lib/utilities/debouncePromise';
 
 import { PageActions } from '../PageActions';
@@ -42,10 +41,7 @@ export default function PageDialog(props: Props) {
 
   const { updatePage, deletePage } = usePages();
   const { page, refreshPage } = usePage({ pageIdOrPath: pageId });
-  const { permissions: pagePermissions } = usePagePermissions({
-    pageIdOrPath: page?.id as string,
-    isNewPage: !page?.id
-  });
+  const pagePermissions = page?.permissionFlags || new AllowedPagePermissions().full;
   const domain = router.query.domain as string;
   const fullPageUrl = `/${domain}/${page?.path}`;
 

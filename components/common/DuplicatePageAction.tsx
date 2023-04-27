@@ -12,17 +12,15 @@ const excludedPageTypes: PageType[] = ['bounty_template', 'proposal_template'];
 
 export function DuplicatePageAction({
   page,
-  pagePermissions,
+  disabled,
   redirect = false,
   postDuplication
 }: {
   page: Pick<Page, 'id' | 'type'> & { parentId?: string | null };
-  pagePermissions?: IPagePermissionFlags;
+  disabled?: boolean;
   redirect?: boolean;
   postDuplication?: (duplicatePageResponse: DuplicatePageResponse) => void;
 }) {
-  const duplicatePageDisabled = !pagePermissions?.read;
-
   const currentSpace = useCurrentSpace();
   const router = useRouter();
 
@@ -46,18 +44,14 @@ export function DuplicatePageAction({
       placement='top'
       title={
         excludedPageTypes.includes(page.type)
-          ? "Page can't be duplicated"
-          : duplicatePageDisabled
+          ? 'Page type cannot be duplicated'
+          : disabled
           ? 'You do not have permission to duplicate this page'
           : ''
       }
     >
       <div>
-        <ListItemButton
-          dense
-          disabled={excludedPageTypes.includes(page.type) || duplicatePageDisabled}
-          onClick={duplicatePage}
-        >
+        <ListItemButton dense disabled={excludedPageTypes.includes(page.type) || disabled} onClick={duplicatePage}>
           <ListItemIcon>
             <FileCopyOutlinedIcon fontSize='small' />
           </ListItemIcon>
