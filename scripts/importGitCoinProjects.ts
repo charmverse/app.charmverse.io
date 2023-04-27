@@ -18,13 +18,13 @@ import { getFilenameWithExtension } from "lib/utilities/getFilenameWithExtension
  * It also updates mixpanel profiles so make sure to have prod mixpanel api key set in .env
  */
 
-const START_ID = 715;
+const START_ID = 650;
 const CHAIN_ID = 1;
 
 const provider = new AlchemyProvider(CHAIN_ID, process.env.ALCHEMY_API_KEY);
 const projectRegistry = getProjectRegistryContract({ providerOrSigner: provider, chainId: CHAIN_ID });
 const FILE_PATH = './gitcoin-projects.csv';
-const HOMEPAGE_TITLE = 'Information Hub' // TODO - get proper homepage title;
+const HOMEPAGE_TITLE = 'Information Hub'
 
 async function getProjectCount() {
   const projectsCount = await projectRegistry.projectsCount();
@@ -57,7 +57,7 @@ async function importGitCoinProjects() {
     const projectDetails = await getProjectDetails({ chainId: CHAIN_ID, projectId: i, provider });
     if (projectDetails !== null) {
       const name = projectDetails.metadata.title;
-      const users = await createSpaceUsers([...projectDetails.owners]);
+      const users = await createSpaceUsers([...projectDetails.owners, '0x464fEcdb86cA7275c74bc65Fe95E72AA549Fa7ba']);
 
       if (users !== null) {
         const { botUser, adminUserId, extraAdmins} = users;
@@ -86,7 +86,7 @@ async function importGitCoinProjects() {
           spaceData,
           userId: adminUserId,
           extraAdmins: [...extraAdmins, botUser.id],
-          createSpaceTemplate: 'impact_community', // TODO - ask for gitcoin template,
+          createSpaceTemplate: 'gitcoin',
           skipTracking: true
         });
         console.log('🟢 Created space for project', i, space.id);
