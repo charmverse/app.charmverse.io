@@ -522,7 +522,7 @@ function CharmEditor({
   const state = useEditorState({
     specRegistry,
     plugins: getPlugins(),
-    initialValue: isContentControlled && content ? Node.fromJSON(specRegistry.schema, content) : '',
+    initialValue: isContentControlled && content ? Node.fromJSON(specRegistry.schema, content) : undefined,
     dropCursorOpts: {
       color: 'var(--charmeditor-active)'
     }
