@@ -2,10 +2,16 @@ import type { Application, Bounty, Space, User } from '@prisma/client';
 import { v4 } from 'uuid';
 
 import { createSubmission } from 'lib/applications/actions';
+import { refreshPaymentStatus } from 'lib/applications/actions/refreshPaymentStatus';
 import { createTransaction } from 'lib/transactions/createTransaction';
 import { DataNotFoundError } from 'lib/utilities/errors';
 import { ExpectedAnError } from 'testing/errors';
 import { generateBounty, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+
+jest.mock('lib/applications/actions/refreshPaymentStatus', () => ({
+  refreshPaymentStatus: jest.fn()
+}));
+const mockedRefreshPaymentStatus: jest.Mocked<typeof refreshPaymentStatus> = refreshPaymentStatus;
 
 let user: User;
 let space: Space;
@@ -44,6 +50,7 @@ describe('createTransaction', () => {
     });
 
     expect(transaction).not.toBeNull();
+    expect(mockedRefreshPaymentStatus).not.toHaveBeenCalled();
   });
 
   it("Should throw error if application doesn't exist", async () => {
@@ -57,6 +64,19 @@ describe('createTransaction', () => {
       throw new ExpectedAnError();
     } catch (err: any) {
       expect(err).toBeInstanceOf(DataNotFoundError);
+      expect(mockedRefreshPaymentStatus).not.toHaveBeenCalled();
     }
+  });
+
+  it('Should create transaction for a submission and refresh status if it is a multisig transaction', async () => {
+    const transaction = await createTransaction({
+      applicationId: application.id,
+      chainId: '4',
+      transactionId: '123',
+      isMultisig: true
+    });
+
+    expect(transaction).not.toBeNull();
+    expect(mockedRefreshPaymentStatus).toHaveBeenCalled();
   });
 });

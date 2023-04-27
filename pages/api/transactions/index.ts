@@ -15,7 +15,7 @@ handler
   .post(createTransactionController);
 
 async function createTransactionController(req: NextApiRequest, res: NextApiResponse<Transaction>) {
-  const transaction = await createTransaction(req.body as TransactionCreationData);
+  const transaction = await createTransaction(req.body as TransactionCreationData & { isMultisig?: boolean });
   return res.status(200).json(transaction);
 }
 
