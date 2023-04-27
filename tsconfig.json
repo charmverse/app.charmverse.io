@@ -31,14 +31,49 @@
     "allowJs": true,
     "incremental": true,
     "isolatedModules": true,
-    // "paths": {
-    //   "@charmverse/core/dist/prisma": [
-    //     "node_modules/@charmverse/core/dist/esm/prisma"
-    //   ],
-    //   "@charmverse/core/dist/shared": [
-    //     "node_modules/@charmverse/core/dist/esm/shared"
-    //   ]
-    // }
+    "paths": {
+      "config/*": [
+        "./config/*"
+      ],
+      "lib/*": [
+        "./lib/*",
+      ],
+      "adapters/*": [
+        "./adapters/*"
+      ],
+      "components/*": [
+        "./components/*"
+      ],
+      "hooks/*": [
+        "./hooks/*"
+      ],
+      "abis/*": [
+        "./abis/*"
+      ],
+      "pages/*": [
+        "./pages/*"
+      ],
+      "public/*": [
+        "./public/*"
+      ],
+      "theme/*": [
+        "./theme/*"
+      ],
+      "testing/*": [
+        "./testing/*"
+      ],
+      "__e2e__/*": [
+        "./__e2e__/*"
+      ],
+      "@charmverse/core/dist/prisma": [
+        "node_modules/@charmverse/core/dist/cjs/prisma",
+        //"node_modules/@charmverse/core/dist/esm/prisma"
+      ],
+      "@charmverse/core/dist/shared": [
+        "node_modules/@charmverse/core/dist/cjs/shared",
+        //"node_modules/@charmverse/core/dist/esm/shared"
+      ]
+    }
   },
   "exclude": [
     "node_modules",
