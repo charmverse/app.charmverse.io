@@ -82,7 +82,9 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
   const isLoadingRef = useRef(enableFidusEditor);
   const useSockets = user && pageId && trackChanges && (!readOnly || enableComments) && !isContentControlled;
 
-  const { data: authResponse } = useSWRImmutable(useSockets ? user?.id : null, () => charmClient.socket()); // refresh when user
+  const { data: authResponse, error: authError } = useSWRImmutable(useSockets ? user?.id : null, () =>
+    charmClient.socket()
+  ); // refresh when user
 
   pmViewOpts ||= {};
   pmViewOpts.editable = () => !readOnly && !isLoadingRef.current;
@@ -170,29 +172,20 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
           onDocLoaded: () => {
             setIsLoading(false);
             isLoadingRef.current = false;
-            // console.log('set is loading false');
           },
           onParticipantUpdate
         });
         fEditor.init(_editor.view, authResponse.authToken, onError);
+      } else if (authError) {
+        log.warn('Loading readonly mode of editor due to web socket failure', { error: authError });
+        setIsLoading(false);
+        isLoadingRef.current = false;
+        setEditorContent(_editor, initialContent);
       }
     } else if (pageId && readOnly) {
       setIsLoading(false);
       isLoadingRef.current = false;
-      const schema = _editor.view.state.schema;
-      let doc = _editor.view.state.doc;
-      if (initialContent) {
-        doc = schema.nodeFromJSON(initialContent);
-      }
-      const stateConfig = {
-        schema,
-        doc,
-        plugins: _editor.view.state.plugins
-      };
-      if (_editor.view && !_editor.view.isDestroyed) {
-        // Set document in prosemirror
-        _editor.view.setProps({ state: EditorState.create(stateConfig) });
-      }
+      setEditorContent(_editor, initialContent);
     }
     (_editor.view as any)._updatePluginWatcher = updatePluginWatcher(_editor);
     setEditor(_editor);
@@ -200,7 +193,7 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
       fEditor?.close();
       _editor.destroy();
     };
-  }, [user?.id, pageId, useSockets, authResponse, ref]);
+  }, [user?.id, pageId, useSockets, authResponse, authError, ref]);
 
   useEffect(() => {
     const timer = setTimeout(() => setShowLoader(true), 300);
@@ -256,4 +249,20 @@ function updatePluginWatcher(editor: CoreBangleEditor) {
 
     editor.view.updateState(state);
   };
+}
+
+function setEditorContent(editor: CoreBangleEditor, content?: any) {
+  if (content) {
+    const schema = editor.view.state.schema;
+    const doc = schema.nodeFromJSON(content);
+    const stateConfig = {
+      schema,
+      doc,
+      plugins: editor.view.state.plugins
+    };
+    if (editor.view && !editor.view.isDestroyed) {
+      // Set document in prosemirror
+      editor.view.setProps({ state: EditorState.create(stateConfig) });
+    }
+  }
 }
