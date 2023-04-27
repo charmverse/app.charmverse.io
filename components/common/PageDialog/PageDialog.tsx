@@ -12,18 +12,19 @@ import Dialog from 'components/common/BoardEditor/focalboard/src/components/dial
 import Button from 'components/common/Button';
 import { useBounties } from 'hooks/useBounties';
 import { useCurrentPage } from 'hooks/useCurrentPage';
+import { usePage } from 'hooks/usePage';
 import { usePagePermissions } from 'hooks/usePagePermissions';
 import { usePages } from 'hooks/usePages';
 import type { BountyWithDetails } from 'lib/bounties';
 import log from 'lib/log';
-import type { PageMeta, PageUpdates } from 'lib/pages';
+import type { PageWithContent, PageUpdates } from 'lib/pages';
 import debouncePromise from 'lib/utilities/debouncePromise';
 
 import { PageActions } from '../PageActions';
 import { BountyActions } from '../PageLayout/components/Header/components/BountyActions';
 
 interface Props {
-  page?: PageMeta | null;
+  pageId?: string;
   onClose: () => void;
   readOnly?: boolean;
   bounty?: BountyWithDetails | null;
@@ -32,7 +33,7 @@ interface Props {
 }
 
 export default function PageDialog(props: Props) {
-  const { hideToolsMenu = false, page, bounty, toolbar, readOnly } = props;
+  const { hideToolsMenu = false, pageId, bounty, toolbar, readOnly } = props;
   const mounted = useRef(false);
   const popupState = usePopupState({ variant: 'popover', popupId: 'page-dialog' });
   const router = useRouter();
@@ -40,6 +41,7 @@ export default function PageDialog(props: Props) {
   const { setCurrentPageId } = useCurrentPage();
 
   const { updatePage, deletePage } = usePages();
+  const { page, refreshPage } = usePage({ pageIdOrPath: pageId });
   const { permissions: pagePermissions } = usePagePermissions({
     pageIdOrPath: page?.id as string,
     isNewPage: !page?.id
@@ -73,7 +75,7 @@ export default function PageDialog(props: Props) {
   async function onClickDelete() {
     if (page) {
       if (page.type === 'card') {
-        await charmClient.deleteBlock(page.id, () => {});
+        await charmClient.deleteBlock(page.id, () => null);
       } else if (page.type === 'bounty') {
         setBounties((bounties) => bounties.filter((_bounty) => _bounty.id !== page.id));
       }
@@ -152,7 +154,9 @@ export default function PageDialog(props: Props) {
       }
       onClose={onClose}
     >
-      {page && <DocumentPage insideModal page={page} setPage={savePage} readOnly={readOnlyPage} />}
+      {page && (
+        <DocumentPage insideModal page={page} savePage={savePage} refreshPage={refreshPage} readOnly={readOnlyPage} />
+      )}
     </Dialog>
   );
 }

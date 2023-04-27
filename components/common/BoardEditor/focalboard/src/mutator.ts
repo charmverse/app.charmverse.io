@@ -978,7 +978,7 @@ class Mutator {
     beforeUndo?: () => Promise<void>;
   }): Promise<[Block[], string]> {
     const blocks = await charmClient.getSubtree(cardId, 2);
-    const pageDetails = await charmClient.pages.getPageDetails(cardId);
+    const pageDetails = await charmClient.pages.getPage(cardId);
     const [newBlocks1, newCard] = OctoUtils.duplicateBlockTree(blocks, cardId) as [
       Block[],
       Card,

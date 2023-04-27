@@ -116,9 +116,7 @@ export default function DatabaseView({ containerWidth, readOnly: readOnlyOverrid
 
   const debouncedPageUpdate = useMemo(() => {
     return debouncePromise(async (updates: Partial<Page>) => {
-      const updatedPage = await updatePage({ id: pageId, ...updates });
-
-      return updatedPage;
+      await updatePage({ id: pageId, ...updates });
     }, 500);
   }, [updatePage]);
 

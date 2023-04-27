@@ -1,13 +1,14 @@
-import type { Page } from '@prisma/client';
+import type { Page, Prisma } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
+import { validate } from 'uuid';
 
 import { prisma } from 'db';
 import log from 'lib/log';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { updateTrackPageProfile } from 'lib/metrics/mixpanel/updateTrackPageProfile';
 import { ActionNotPermittedError, NotFoundError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
-import type { IPageWithPermissions, ModifyChildPagesResponse } from 'lib/pages';
+import type { PageWithContent, ModifyChildPagesResponse } from 'lib/pages';
 import { modifyChildPages } from 'lib/pages/modifyChildPages';
 import { resolvePageTree } from 'lib/pages/server';
 import { getPage } from 'lib/pages/server/getPage';
@@ -28,11 +29,22 @@ handler
   .put(updatePageHandler)
   .delete(deletePage);
 
-async function getPageRoute(req: NextApiRequest, res: NextApiResponse<IPageWithPermissions>) {
+async function getPageRoute(req: NextApiRequest, res: NextApiResponse<PageWithContent>) {
   const pageId = req.query.id as string;
   const userId = req.session?.user?.id;
+  const isValidUUid = validate(pageId);
+  const searchQuery: Prisma.PageWhereInput = isValidUUid
+    ? {
+        id: pageId
+      }
+    : {
+        path: pageId,
+        spaceId: req.query.spaceId as string | undefined
+      };
 
-  const page = await getPage(pageId, req.query.spaceId as string | undefined);
+  const page = await prisma.page.findFirst({
+    where: searchQuery
+  });
 
   if (!page) {
     throw new NotFoundError();
@@ -45,13 +57,26 @@ async function getPageRoute(req: NextApiRequest, res: NextApiResponse<IPageWithP
   });
 
   if (permissions.read !== true) {
-    throw new ActionNotPermittedError('You do not have permission to view this page');
+    const publicPagePermission = await prisma.pagePermission.count({
+      where: {
+        pageId: page.id,
+        public: true
+      }
+    });
+    if (!publicPagePermission) {
+      throw new ActionNotPermittedError('You do not have permission to view this page');
+    }
   }
 
-  return res.status(200).json(page);
+  const result: PageWithContent = {
+    ...page,
+    permissionFlags: permissions
+  };
+
+  return res.status(200).json(result);
 }
 
-async function updatePageHandler(req: NextApiRequest, res: NextApiResponse<IPageWithPermissions>) {
+async function updatePageHandler(req: NextApiRequest, res: NextApiResponse) {
   const pageId = req.query.id as string;
   const userId = req.session.user.id;
 
@@ -137,12 +162,7 @@ async function updatePageHandler(req: NextApiRequest, res: NextApiResponse<IPage
     page.spaceId
   );
 
-  if (hasNewParentPage) {
-    const updatedPage = await setupPermissionsAfterPageRepositioned(pageId);
-    return res.status(200).json(updatedPage);
-  }
-
-  return res.status(200).json(pageWithPermission);
+  return res.status(200).end();
 }
 
 async function deletePage(req: NextApiRequest, res: NextApiResponse<ModifyChildPagesResponse>) {

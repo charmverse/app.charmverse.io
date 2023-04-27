@@ -111,7 +111,7 @@ function CenterPanel(props: Props) {
 
   const router = useRouter();
   const space = useCurrentSpace();
-  const { pages, updatePage } = usePages();
+  const { pages, refreshPage, updatePage } = usePages();
   const { members } = useMembers();
   const { showMessage } = useSnackbar();
   const { user } = useUser();
@@ -267,17 +267,7 @@ function CenterPanel(props: Props) {
         'add card',
         async (block: Block) => {
           if (space) {
-            await mutate(
-              `pages/${space.id}`,
-              async (_pages: Record<string, Page> | undefined): Promise<Record<string, Page>> => {
-                const newPage = await charmClient.pages.getPage(block.id);
-
-                return { ..._pages, [newPage.id]: newPage };
-              },
-              {
-                revalidate: false
-              }
-            );
+            await refreshPage(block.id);
           }
 
           if (isTemplate) {

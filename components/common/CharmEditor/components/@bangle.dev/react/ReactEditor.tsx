@@ -175,7 +175,7 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
         fEditor.init(_editor.view, authResponse.authToken, onError);
       }
     } else if (pageId && readOnly) {
-      charmClient.pages.getPageDetails(pageId).then((page) => {
+      charmClient.pages.getPage(pageId).then((page) => {
         if (_editor) {
           setIsLoading(false);
           isLoadingRef.current = false;
