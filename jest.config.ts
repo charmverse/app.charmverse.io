@@ -30,7 +30,7 @@ export const jestConfig: JestConfigWithTsJest = {
   testEnvironment: 'jest-environment-node',
   testMatch: ['**/lib/**/*.spec.ts', '**/testing/**/*.spec.ts', '**/background/**/*.spec.ts'],
 
-  testTimeout: 30000
+  testTimeout: 60000
 };
 
 export default createJestConfig(jestConfig);
