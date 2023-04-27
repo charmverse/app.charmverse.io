@@ -6,7 +6,7 @@ import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import type { Card, CardPage } from './card';
 
-type PropertyType =
+export type PropertyType =
   | 'text'
   | 'number'
   | 'select'
@@ -113,4 +113,4 @@ type BoardGroup = {
 };
 
 export { createBoard };
-export type { Board, PropertyType, IPropertyOption, IPropertyTemplate, BoardGroup };
+export type { Board, IPropertyOption, IPropertyTemplate, BoardGroup };

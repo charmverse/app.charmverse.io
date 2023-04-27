@@ -13,9 +13,12 @@ import {
 import React from 'react';
 
 import { lightGreyColor, primaryTextColor } from 'theme/colors';
-import { defaultFont } from 'theme/fonts';
 
 import styles from '../theme/styles';
+
+// copied from theme/fonts.ts because next/fonts doesnt play well with tsx or ts-node. TODO: maybe remove next/fonts?
+const defaultFont =
+  'ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"';
 
 interface Props {
   children: React.ReactNode;

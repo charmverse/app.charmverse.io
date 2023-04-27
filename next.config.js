@@ -18,7 +18,8 @@ const config = {
   },
   // types are tested separately from the build
   typescript: {
-    ignoreBuildErrors: skipCodeChecks
+    ignoreBuildErrors: skipCodeChecks,
+    tsconfigPath: 'tsconfig.next.json'
   },
   compiler: {
     styledComponents: true

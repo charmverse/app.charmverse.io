@@ -110,6 +110,7 @@ export default function DatabaseView({ containerWidth, readOnly: readOnlyOverrid
 
   const boards = useAppSelector(getSortedBoards);
   const board = boards.find((b) => b.id === pageId);
+  const boardPage = pages[pageId];
 
   const { permissions: currentPagePermissions } = usePagePermissions({ pageIdOrPath: pageId });
 
@@ -136,7 +137,7 @@ export default function DatabaseView({ containerWidth, readOnly: readOnlyOverrid
     [setCurrentViewId, views]
   );
 
-  if (!board) {
+  if (!board || !boardPage || boardPage.deletedAt !== null) {
     return null;
   }
 

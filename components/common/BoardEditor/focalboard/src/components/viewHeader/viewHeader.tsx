@@ -156,14 +156,12 @@ function ViewHeader(props: Props) {
             </Button>
             <Popover
               {...bindPopover(viewFilterPopup)}
-              PaperProps={{
-                sx: {
-                  overflow: 'visible'
-                }
-              }}
               anchorOrigin={{
                 vertical: 'bottom',
                 horizontal: 'left'
+              }}
+              sx={{
+                overflow: 'auto'
               }}
             >
               <FilterComponent properties={activeBoard?.fields.cardProperties ?? []} activeView={activeView} />
