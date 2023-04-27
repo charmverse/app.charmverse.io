@@ -1,6 +1,6 @@
 import type { Provider } from '@ethersproject/providers';
 
-import { getSafeContract } from 'lib/safe/contracts';
+import { getSafeContract } from 'lib/gnosis/safe/getSafeContract';
 
 export async function getSafeOwners({
   address,
