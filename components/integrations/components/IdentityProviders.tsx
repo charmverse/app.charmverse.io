@@ -205,9 +205,8 @@ export function IdentityProviders() {
                     Are you sure you want to Disconnect your {wallet.ensname || wallet.address} wallet?
                   </Typography>
                   <Typography variant='body2'>
-                    This action will {lowerCaseEqual(wallet.address, account) ? 'log you out,' : ''} remove your wallet,
-                    NFTs, POAPs, Organizations from CharmVerse. It will also remove roles and permissions if you joined
-                    the Space via a token gate.
+                    This action will remove your wallet, NFTs, POAPs, Organizations from CharmVerse. It will also remove
+                    roles and permissions if you joined the Space via a token gate.
                   </Typography>
                 </>
               }
