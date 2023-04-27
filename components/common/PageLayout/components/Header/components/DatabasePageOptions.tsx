@@ -66,7 +66,7 @@ export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: 
   const currentSpace = useCurrentSpace();
   const { formatDateTime, formatDate } = useDateFormatter();
   const importConfirmationPopup = usePopupState({ variant: 'popover', popupId: 'import-confirmation-popup' });
-  const { keys } = useApiPageKeys();
+  const { keys } = useApiPageKeys(pageId);
 
   const activeBoardId = view?.fields.sourceData?.boardId ?? view?.fields.linkedSourceId ?? view?.rootId;
   const board = boards.find((b) => b.id === activeBoardId);

@@ -15,7 +15,7 @@ import { DatabasePage } from '../DatabasePage';
 import DocumentPage from '../DocumentPage';
 
 export function EditorPage({ pageId: pageIdOrPath }: { pageId: string }) {
-  const { currentPageId, setCurrentPageId } = useCurrentPage();
+  const { setCurrentPageId } = useCurrentPage();
   const { editMode, resetPageProps, setPageProps } = useCharmEditor();
   const [, setTitleState] = usePageTitle();
   const currentSpace = useCurrentSpace();
@@ -46,7 +46,7 @@ export function EditorPage({ pageId: pageIdOrPath }: { pageId: string }) {
 
   // set page attributes of the primary charm editor
   useEffect(() => {
-    if (!currentPageId || !page) {
+    if (!page) {
       // wait for pages loaded for permissions to be correct
       return;
     }
@@ -63,18 +63,18 @@ export function EditorPage({ pageId: pageIdOrPath }: { pageId: string }) {
     return () => {
       resetPageProps();
     };
-  }, [currentPageId, page?.permissionFlags]);
+  }, [page?.permissionFlags]);
 
   const savePage = useCallback(
     debouncePromise(async (updates: Partial<Page>) => {
-      if (!currentPageId) {
+      if (!page) {
         return;
       }
       if (updates.hasOwnProperty('title')) {
         setTitleState(updates.title || 'Untitled');
       }
       setPageProps({ isSaving: true });
-      updatePage({ id: currentPageId, ...updates })
+      updatePage({ id: page.id, ...updates })
         .catch((err: any) => {
           log.error('Error saving page', err);
         })
@@ -82,7 +82,7 @@ export function EditorPage({ pageId: pageIdOrPath }: { pageId: string }) {
           setPageProps({ isSaving: false });
         });
     }, 500),
-    [currentPageId]
+    [page?.id]
   );
 
   useEffect(() => {

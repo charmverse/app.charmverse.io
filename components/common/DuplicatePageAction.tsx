@@ -12,17 +12,19 @@ const excludedPageTypes: PageType[] = ['bounty_template', 'proposal_template'];
 
 export function DuplicatePageAction({
   page,
-  disabled,
   redirect = false,
-  postDuplication
+  postDuplication,
+  pagePermissions
 }: {
   page: Pick<Page, 'id' | 'type'> & { parentId?: string | null };
-  disabled?: boolean;
   redirect?: boolean;
   postDuplication?: (duplicatePageResponse: DuplicatePageResponse) => void;
+  pagePermissions: IPagePermissionFlags | undefined;
 }) {
   const currentSpace = useCurrentSpace();
   const router = useRouter();
+
+  const disabled = !pagePermissions?.read;
 
   async function duplicatePage() {
     if (currentSpace) {

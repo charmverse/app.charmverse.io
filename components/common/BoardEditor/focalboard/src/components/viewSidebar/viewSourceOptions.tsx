@@ -38,6 +38,7 @@ type ViewSourceOptionsProps = DatabaseSourceProps & {
   goBack?: () => void;
   title?: string;
   view?: BoardView;
+  pageId?: string;
 };
 
 const SidebarContent = styled.div`
@@ -49,7 +50,6 @@ const SidebarContent = styled.div`
 export function ViewSourceOptions(props: ViewSourceOptionsProps) {
   const activeView = props.view;
   const activeSourceType = activeView?.fields.sourceType;
-  const { currentPageId } = useCurrentPage();
 
   const [sourceType, setSourceType] = useState<ViewSourceType | undefined>();
   const [formStep, setStep] = useState<FormStep>('select_source');
@@ -67,8 +67,8 @@ export function ViewSourceOptions(props: ViewSourceOptionsProps) {
   const typeformPopup = usePopupState({ variant: 'popover', popupId: 'typeformPopup' });
 
   const handleApiKeyClick = async (type: ApiPageKey['type']) => {
-    if (currentPageId) {
-      await createWebhookApiKey({ pageId: currentPageId, type });
+    if (props.pageId) {
+      await createWebhookApiKey({ pageId: props.pageId, type });
       typeformPopup.open();
     }
   };

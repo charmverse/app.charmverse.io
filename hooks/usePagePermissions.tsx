@@ -9,14 +9,12 @@ type Props = {
 };
 
 export function usePagePermissions({ pageIdOrPath, spaceDomain }: Props) {
-  const { data, mutate } = useSWR(
-    !pageIdOrPath ? null : `compute-page-permissions-${pageIdOrPath}${spaceDomain ?? ''}`,
-    () =>
-      charmClient.permissions.pages.computePagePermissions({
-        pageIdOrPath: pageIdOrPath as string,
-        spaceDomain
-      })
+  const { data } = useSWR(!pageIdOrPath ? null : `compute-page-permissions-${pageIdOrPath}${spaceDomain ?? ''}`, () =>
+    charmClient.permissions.pages.computePagePermissions({
+      pageIdOrPath: pageIdOrPath as string,
+      spaceDomain
+    })
   );
 
-  return { permissions: data, refresh: mutate };
+  return { permissions: data };
 }

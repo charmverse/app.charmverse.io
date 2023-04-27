@@ -115,7 +115,7 @@ function CenterPanel(props: Props) {
   const { members } = useMembers();
   const { showMessage } = useSnackbar();
   const { user } = useUser();
-  const { keys } = useApiPageKeys();
+  const { keys } = useApiPageKeys(props.page?.id);
 
   useEffect(() => {
     if (views.length === 0 && !activeView) {
@@ -671,6 +671,7 @@ function CenterPanel(props: Props) {
             {activeView && (
               <ViewSidebar
                 board={activeBoard}
+                pageId={activePage?.id}
                 parentBoard={board}
                 view={activeView}
                 isOpen={state.showSettings === 'view-options'}

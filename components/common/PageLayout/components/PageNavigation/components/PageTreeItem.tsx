@@ -388,7 +388,6 @@ function PageActionsMenu({ closeMenu, pageId, pagePath }: { closeMenu: () => voi
   const { permissions: pagePermissions } = usePagePermissions({ pageIdOrPath: pageId });
   const router = useRouter();
   const deletePageDisabled = !pagePermissions?.delete;
-  const duplicatePageDisabled = !pagePermissions?.read;
   const page = pages[pageId];
 
   async function deletePageWithBoard() {
@@ -431,7 +430,7 @@ function PageActionsMenu({ closeMenu, pageId, pagePath }: { closeMenu: () => voi
           </ListItemButton>
         </div>
       </Tooltip>
-      {page && <DuplicatePageAction page={page} disabled={duplicatePageDisabled} />}
+      {page && <DuplicatePageAction page={page} pagePermissions={pagePermissions} />}
       <CopyToClipboard text={getAbsolutePath()} onCopy={() => onCopy()}>
         <ListItemButton dense>
           <ListItemIcon>
