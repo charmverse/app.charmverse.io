@@ -162,6 +162,10 @@ async function updatePageHandler(req: NextApiRequest, res: NextApiResponse) {
     page.spaceId
   );
 
+  if (hasNewParentPage) {
+    await setupPermissionsAfterPageRepositioned(pageId);
+  }
+
   return res.status(200).end();
 }
 
