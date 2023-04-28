@@ -1,4 +1,4 @@
-import GetAppOutlinedIcon from '@mui/icons-material/GetAppOutlined';
+import PrintIcon from '@mui/icons-material/PrintOutlined';
 import { ListItemText, ListItemButton } from '@mui/material';
 import { useReactToPrint } from 'react-to-print';
 
@@ -13,7 +13,7 @@ export function ExportToPDFMarkdown({ pdfTitle }: { pdfTitle?: string }) {
   });
   return (
     <ListItemButton onClick={handlePrint}>
-      <GetAppOutlinedIcon
+      <PrintIcon
         fontSize='small'
         sx={{
           mr: 1
