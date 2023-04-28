@@ -13,6 +13,7 @@ type Props = Pick<ModalProps, 'onClose' | 'open' | 'size'> & {
   onConfirm: () => void;
   secondaryButtonText?: string;
   onClose: () => void;
+  disabled?: boolean;
 };
 
 export default function ConfirmDeleteModal({
@@ -23,7 +24,8 @@ export default function ConfirmDeleteModal({
   title,
   onConfirm,
   size,
-  secondaryButtonText = 'Cancel'
+  secondaryButtonText = 'Cancel',
+  disabled
 }: Props) {
   function _onConfirm() {
     onConfirm();
@@ -45,6 +47,7 @@ export default function ConfirmDeleteModal({
             textOverflow: 'ellipsis'
           }}
           onClick={_onConfirm}
+          disabled={disabled}
         >
           {buttonText}
         </Button>

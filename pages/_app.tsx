@@ -1,19 +1,16 @@
-import { CacheProvider, Global } from '@emotion/react';
+import { CacheProvider } from '@emotion/react';
 import type { EmotionCache } from '@emotion/utils';
 import type { ExternalProvider, JsonRpcFetchFunc } from '@ethersproject/providers';
 import { Web3Provider } from '@ethersproject/providers';
 import RefreshIcon from '@mui/icons-material/Refresh';
-import type { PaletteMode } from '@mui/material';
-import CssBaseline from '@mui/material/CssBaseline';
 import IconButton from '@mui/material/IconButton';
-import { ThemeProvider } from '@mui/material/styles';
 import { Web3ReactProvider } from '@web3-react/core';
 import type { NextPage } from 'next';
 import type { AppProps } from 'next/app';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import type { ReactElement, ReactNode } from 'react';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { SWRConfig } from 'swr';
 
 import charmClient from 'charmClient';
@@ -29,13 +26,11 @@ import RouteGuard from 'components/common/RouteGuard';
 import Snackbar from 'components/common/Snackbar';
 import { MemberProfileProvider } from 'components/profile/hooks/useMemberProfile';
 import { isDevEnv } from 'config/constants';
-import { ColorModeContext } from 'context/darkMode';
 import { BountiesProvider } from 'hooks/useBounties';
 import { DiscordProvider } from 'hooks/useDiscordConnection';
 import { PostCategoriesProvider } from 'hooks/useForumCategories';
 import { useInterval } from 'hooks/useInterval';
 import { IsSpaceMemberProvider } from 'hooks/useIsSpaceMember';
-import { useLocalStorage } from 'hooks/useLocalStorage';
 import { MembersProvider } from 'hooks/useMembers';
 import { NotionProvider } from 'hooks/useNotionImport';
 import { OnboardingProvider } from 'hooks/useOnboarding';
@@ -49,12 +44,8 @@ import { UserProvider } from 'hooks/useUser';
 import { useUserAcquisition } from 'hooks/useUserAcquisition';
 import { Web3AccountProvider } from 'hooks/useWeb3AuthSig';
 import { WebSocketClientProvider } from 'hooks/useWebSocketClient';
-import { createThemeLightSensitive } from 'theme';
+import { AppThemeProvider } from 'theme/AppThemeProvider';
 import { createEmotionCache } from 'theme/createEmotionCache';
-import cssVariables from 'theme/cssVariables';
-import { setDarkMode } from 'theme/darkMode';
-import { monoFont, serifFont } from 'theme/fonts';
-
 import '@bangle.dev/tooltip/style.css';
 import '@skiff-org/prosemirror-tables/style/table-filters.css';
 import '@skiff-org/prosemirror-tables/style/table-headers.css';
@@ -134,38 +125,7 @@ export default function App({ Component, emotionCache = clientSideEmotionCache, 
     }
   }, []);
 
-  // dark mode: https://mui.com/customization/dark-mode/
-  const [savedDarkMode, setSavedDarkMode] = useLocalStorage<PaletteMode | null>('darkMode', null);
-  const [mode, setMode] = useState<PaletteMode>('dark');
   const [isOldBuild, setIsOldBuild] = useState(false);
-  const colorModeContext = useMemo(
-    () => ({
-      toggleColorMode: () => {
-        setMode((prevMode: PaletteMode) => {
-          const newMode = prevMode === 'light' ? 'dark' : 'light';
-          return newMode;
-        });
-      }
-    }),
-    []
-  );
-
-  // Update the theme only if the mode changes
-  const theme = useMemo(() => {
-    const muiTheme = createThemeLightSensitive(mode);
-
-    if (typeof window !== 'undefined') {
-      setSavedDarkMode(mode);
-      setDarkMode(mode === 'dark');
-    }
-    return muiTheme;
-  }, [mode]);
-
-  useEffect(() => {
-    if (savedDarkMode) {
-      setMode(savedDarkMode);
-    }
-  }, [savedDarkMode]);
 
   // Check if a new version of the application is available every 5 minutes.
   useInterval(async () => {
@@ -188,53 +148,50 @@ export default function App({ Component, emotionCache = clientSideEmotionCache, 
   // DO NOT REMOVE CacheProvider - it protects MUI from Tailwind CSS in settings
   return (
     <CacheProvider value={emotionCache}>
-      <ColorModeContext.Provider value={colorModeContext}>
-        <ThemeProvider theme={theme}>
-          <SnackbarProvider>
-            <ReactDndProvider>
-              <DataProviders>
-                <SettingsDialogProvider>
-                  <NotificationsProvider>
-                    <LocalizationProvider>
-                      <OnboardingProvider>
-                        <FocalBoardProvider>
-                          <NotionProvider>
-                            <IntlProvider>
-                              <PageHead />
-                              <CssBaseline enableColorScheme={true} />
-                              <Global styles={cssVariables} />
-                              <RouteGuard>
-                                <ErrorBoundary>
-                                  <Snackbar
-                                    isOpen={isOldBuild}
-                                    message='New CharmVerse platform update available. Please refresh.'
-                                    actions={[
-                                      <IconButton key='reload' onClick={() => window.location.reload()} color='inherit'>
-                                        <RefreshIcon fontSize='small' />
-                                      </IconButton>
-                                    ]}
-                                    origin={{ vertical: 'top', horizontal: 'center' }}
-                                    severity='warning'
-                                    handleClose={() => setIsOldBuild(false)}
-                                  />
-                                  <span className={`${serifFont.variable} ${monoFont.variable}`}>
-                                    {getLayout(<Component {...pageProps} />)}
-                                  </span>
-                                  <GlobalComponents />
-                                </ErrorBoundary>
-                              </RouteGuard>
-                            </IntlProvider>
-                          </NotionProvider>
-                        </FocalBoardProvider>
-                      </OnboardingProvider>
-                    </LocalizationProvider>
-                  </NotificationsProvider>
-                </SettingsDialogProvider>
-              </DataProviders>
-            </ReactDndProvider>
-          </SnackbarProvider>
-        </ThemeProvider>
-      </ColorModeContext.Provider>
+      <AppThemeProvider>
+        <SnackbarProvider>
+          <ReactDndProvider>
+            <DataProviders>
+              <SettingsDialogProvider>
+                <NotificationsProvider>
+                  <LocalizationProvider>
+                    <OnboardingProvider>
+                      <FocalBoardProvider>
+                        <NotionProvider>
+                          <IntlProvider>
+                            <PageHead />
+
+                            <RouteGuard>
+                              <ErrorBoundary>
+                                <Snackbar
+                                  isOpen={isOldBuild}
+                                  message='New CharmVerse platform update available. Please refresh.'
+                                  actions={[
+                                    <IconButton key='reload' onClick={() => window.location.reload()} color='inherit'>
+                                      <RefreshIcon fontSize='small' />
+                                    </IconButton>
+                                  ]}
+                                  origin={{ vertical: 'top', horizontal: 'center' }}
+                                  severity='warning'
+                                  handleClose={() => setIsOldBuild(false)}
+                                />
+
+                                {getLayout(<Component {...pageProps} />)}
+
+                                <GlobalComponents />
+                              </ErrorBoundary>
+                            </RouteGuard>
+                          </IntlProvider>
+                        </NotionProvider>
+                      </FocalBoardProvider>
+                    </OnboardingProvider>
+                  </LocalizationProvider>
+                </NotificationsProvider>
+              </SettingsDialogProvider>
+            </DataProviders>
+          </ReactDndProvider>
+        </SnackbarProvider>
+      </AppThemeProvider>
     </CacheProvider>
   );
 }

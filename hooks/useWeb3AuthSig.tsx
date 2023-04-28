@@ -172,7 +172,7 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
     ) {
       const storedSignature = getStoredSignature();
 
-      if (storedSignature) {
+      if (storedSignature && storedSignature.address === account) {
         loginFromWeb3Account(storedSignature).catch((e) => {
           setSignature(null);
           setStoredAccount(null);
@@ -256,14 +256,15 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
     {
       async onSuccess(updatedUser) {
         logoutWallet();
-        setUser(updatedUser);
+
         setLitAuthSignature(null);
         setLitProvider(null);
+        setStoredAccount(null);
+        setUser(updatedUser);
         connector?.deactivate();
         await mutate(`/nfts/${updatedUser?.id}`);
         await mutate(`/orgs/${updatedUser?.id}`);
         await mutate(`/poaps/${updatedUser?.id}`);
-        setStoredAccount(null);
       }
     }
   );
