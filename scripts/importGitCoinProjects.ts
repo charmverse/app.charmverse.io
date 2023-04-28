@@ -177,7 +177,7 @@ async function createSpaceUsers(owners: string[]) {
 function getImportedProjectsData() {
   try {
     const content = readFileSync(FILE_PATH).toString();
-    const rows = content.split('\n');
+    const [_, ...rows] = content.split('\n');
 
     return rows.map(row => row?.split(';') || []);
  } catch (e) {
