@@ -1,17 +1,21 @@
 import type { Space, User } from '@prisma/client';
 
 import { prisma } from 'db';
+import { refreshPaymentStatus } from 'lib/applications/actions/refreshPaymentStatus';
+import { getSafeTxStatus } from 'lib/gnosis/getSafeTxStatus';
 import { createTransaction } from 'lib/transactions/createTransaction';
 import { generateBountyWithSingleApplication, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+
+jest.mock('lib/gnosis/getSafeTxStatus', () => ({
+  getSafeTxStatus: jest.fn()
+}));
+const getSafeTxStatusMock = getSafeTxStatus as jest.Mock;
 
 describe('refreshPaymentStatus', () => {
   let user: User;
   let space: Space;
-  let getSafeTxStatusMock: jest.Mock;
 
   beforeAll(async () => {
-    getSafeTxStatusMock = jest.fn();
-
     jest.mock('lib/gnosis/getSafeTxStatus', () => ({
       getSafeTxStatus: getSafeTxStatusMock
     }));
@@ -23,7 +27,6 @@ describe('refreshPaymentStatus', () => {
 
   it('should not update status if there are no transactions related to application', async () => {
     getSafeTxStatusMock.mockResolvedValue('processing');
-    const { refreshPaymentStatus } = await import('lib/applications/actions/refreshPaymentStatus');
 
     const bountyWithSubmission = await generateBountyWithSingleApplication({
       userId: user.id,
@@ -43,7 +46,6 @@ describe('refreshPaymentStatus', () => {
 
   it('should update status to processing if tx was found but it was not sent yet', async () => {
     getSafeTxStatusMock.mockResolvedValue('processing');
-    const { refreshPaymentStatus } = await import('lib/applications/actions/refreshPaymentStatus');
 
     const bountyWithSubmission = await generateBountyWithSingleApplication({
       userId: user.id,
@@ -66,7 +68,6 @@ describe('refreshPaymentStatus', () => {
 
   it('should update status to cancelled if tx was found but it was cancelled', async () => {
     getSafeTxStatusMock.mockResolvedValue('cancelled');
-    const { refreshPaymentStatus } = await import('lib/applications/actions/refreshPaymentStatus');
 
     const bountyWithSubmission = await generateBountyWithSingleApplication({
       userId: user.id,
@@ -89,7 +90,6 @@ describe('refreshPaymentStatus', () => {
 
   it('should update application and bounty status to paid when payment was sent', async () => {
     getSafeTxStatusMock.mockResolvedValue('paid');
-    const { refreshPaymentStatus } = await import('lib/applications/actions/refreshPaymentStatus');
 
     const bountyWithSubmission = await generateBountyWithSingleApplication({
       userId: user.id,
@@ -112,7 +112,6 @@ describe('refreshPaymentStatus', () => {
 
   it('should update applciation status to paid and bounty status to open when payment was sent, but cap was not reached', async () => {
     getSafeTxStatusMock.mockResolvedValue('paid');
-    const { refreshPaymentStatus } = await import('lib/applications/actions/refreshPaymentStatus');
 
     const bountyWithSubmission = await generateBountyWithSingleApplication({
       userId: user.id,
