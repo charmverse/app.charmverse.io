@@ -36,7 +36,7 @@ services:
   prd-webapp:
     extends:
       service: defaults
-    command: ['sh', '-c', 'npm run migrate:deploy && node --require dd-trace/init ./dist/server.js']
+    command: ['sh', '-c', 'npm run prisma:deploy && node --require dd-trace/init ./dist/server.js']
     profiles:
       - prd-webapp
 
