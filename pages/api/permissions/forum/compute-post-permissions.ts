@@ -1,11 +1,11 @@
 import { prisma } from '@charmverse/core';
+import type { PostPermissionFlags } from '@charmverse/core';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { PostNotFoundError } from 'lib/forums/posts/errors';
 import { onError, onNoMatch, requireKeys } from 'lib/middleware';
 import { getPermissionsClient } from 'lib/permissions/api';
-import type { AvailablePostPermissionFlags } from 'lib/permissions/forum/interfaces';
 import type { PermissionCompute } from 'lib/permissions/interfaces';
 import { withSessionRoute } from 'lib/session/withSession';
 import { InvalidInputError } from 'lib/utilities/errors';
@@ -15,7 +15,7 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.use(requireKeys<PermissionCompute>(['resourceId'], 'body')).post(computePermissions);
 
-async function computePermissions(req: NextApiRequest, res: NextApiResponse<AvailablePostPermissionFlags>) {
+async function computePermissions(req: NextApiRequest, res: NextApiResponse<PostPermissionFlags>) {
   const input = req.body as PermissionCompute;
 
   let resourceId = input.resourceId;

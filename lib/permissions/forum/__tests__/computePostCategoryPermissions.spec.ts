@@ -1,4 +1,5 @@
 import { AvailablePostCategoryPermissions, generatePostCategory } from '@charmverse/core';
+import type { PostCategoryPermissionFlags } from '@charmverse/core';
 import type { PostCategory, Space, User } from '@charmverse/core/dist/prisma';
 import { v4 } from 'uuid';
 
@@ -7,7 +8,6 @@ import { InvalidInputError } from 'lib/utilities/errors';
 import { generateSpaceUser, generateUserAndSpace } from 'testing/setupDatabase';
 
 import { computePostCategoryPermissions } from '../computePostCategoryPermissions';
-import type { AvailablePostCategoryPermissionFlags } from '../interfaces';
 
 let adminUser: User;
 let spaceMemberUser: User;
@@ -50,7 +50,7 @@ describe('computePostCategoryPermissions - public version', () => {
       userId: spaceMemberUser.id
     });
 
-    const createPermissions: AvailablePostCategoryPermissionFlags = {
+    const createPermissions: PostCategoryPermissionFlags = {
       ...new AvailablePostCategoryPermissions().empty,
       create_post: true
     };
@@ -68,7 +68,7 @@ describe('computePostCategoryPermissions - public version', () => {
       userId: otherSpaceAdminUser.id
     });
 
-    const emptyPermissions: AvailablePostCategoryPermissionFlags = new AvailablePostCategoryPermissions().empty;
+    const emptyPermissions: PostCategoryPermissionFlags = new AvailablePostCategoryPermissions().empty;
 
     expect(publicPermissions).toEqual(emptyPermissions);
 

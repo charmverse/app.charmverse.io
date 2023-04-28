@@ -1,3 +1,4 @@
+import type { PostCategoryWithPermissions } from '@charmverse/core';
 import type { Page } from '@charmverse/core/dist/prisma';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import MenuItem from '@mui/material/MenuItem';
@@ -11,7 +12,6 @@ import type {
   StaticPagesType
 } from 'components/common/PageLayout/components/Sidebar/utils/staticPages';
 import type { PageMeta } from 'lib/pages';
-import type { PostCategoryWithPermissions } from 'lib/permissions/forum/interfaces';
 
 export type AllPagesProp = Pick<Page, 'id' | 'title' | 'path' | 'hasContent' | 'icon'> & {
   type: Page['type'] | StaticPagesType | 'forum_category';

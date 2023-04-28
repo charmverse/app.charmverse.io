@@ -1,3 +1,4 @@
+import type { PostCategoryWithPermissions } from '@charmverse/core';
 import type { PostCategory } from '@charmverse/core/dist/prisma';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
@@ -7,7 +8,6 @@ import { createPostCategory } from 'lib/forums/categories/createPostCategory';
 import { getPostCategories } from 'lib/forums/categories/getPostCategories';
 import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { getPermissionsClient } from 'lib/permissions/api';
-import type { PostCategoryWithPermissions } from 'lib/permissions/forum/interfaces';
 import { withSessionRoute } from 'lib/session/withSession';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 

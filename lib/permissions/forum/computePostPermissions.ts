@@ -1,4 +1,3 @@
-import type { PostResource } from '@charmverse/core';
 import {
   defaultPostPolicies,
   hasAccessToSpace,
@@ -7,19 +6,16 @@ import {
   AvailablePostPermissions,
   buildComputePermissionsWithPermissionFilteringPolicies
 } from '@charmverse/core';
+import type { PostResource, PostPermissionFlags, PermissionCompute } from '@charmverse/core';
 
 import { PostNotFoundError } from 'lib/forums/posts/errors';
 import { InvalidInputError } from 'lib/utilities/errors';
 import { isUUID } from 'lib/utilities/strings';
 
-import type { PermissionCompute } from '../interfaces';
-
-import type { AvailablePostPermissionFlags } from './interfaces';
-
 export async function baseComputePostPermissions({
   resourceId,
   userId
-}: PermissionCompute): Promise<AvailablePostPermissionFlags> {
+}: PermissionCompute): Promise<PostPermissionFlags> {
   if (!isUUID(resourceId)) {
     throw new InvalidInputError(`Invalid post ID: ${resourceId}`);
   }
@@ -62,7 +58,7 @@ export async function baseComputePostPermissions({
 }
 export const computePostPermissions = buildComputePermissionsWithPermissionFilteringPolicies<
   PostResource,
-  AvailablePostPermissionFlags
+  PostPermissionFlags
 >({
   resolver: postResolver,
   computeFn: baseComputePostPermissions,

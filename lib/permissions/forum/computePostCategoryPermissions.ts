@@ -1,4 +1,5 @@
 import { prisma, AvailablePostCategoryPermissions } from '@charmverse/core';
+import type { PostCategoryPermissionFlags } from '@charmverse/core';
 
 import { PostCategoryNotFoundError } from 'lib/forums/categories/errors';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
@@ -7,12 +8,10 @@ import { isUUID } from 'lib/utilities/strings';
 
 import type { PermissionCompute } from '../interfaces';
 
-import type { AvailablePostCategoryPermissionFlags } from './interfaces';
-
 export async function computePostCategoryPermissions({
   resourceId,
   userId
-}: PermissionCompute): Promise<AvailablePostCategoryPermissionFlags> {
+}: PermissionCompute): Promise<PostCategoryPermissionFlags> {
   if (!isUUID(resourceId)) {
     throw new InvalidInputError(`Invalid post category ID: ${resourceId}`);
   }

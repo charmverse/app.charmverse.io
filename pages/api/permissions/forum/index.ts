@@ -1,11 +1,11 @@
 import { prisma } from '@charmverse/core';
+import type { AssignedPostCategoryPermission } from '@charmverse/core';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { requirePaidPermissionsSubscription } from 'lib/middleware/requirePaidPermissionsSubscription';
 import { premiumPermissionsApiClient } from 'lib/permissions/api/routers';
-import type { AssignedPostCategoryPermission } from 'lib/permissions/forum/interfaces';
 import type { PermissionToDelete } from 'lib/permissions/interfaces';
 import { withSessionRoute } from 'lib/session/withSession';
 import { DataNotFoundError } from 'lib/utilities/errors';

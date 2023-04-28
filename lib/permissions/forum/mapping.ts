@@ -1,6 +1,5 @@
+import { postCategoryOperations, postOperationsWithoutEdit } from '@charmverse/core';
 import type { PostCategoryOperation, PostCategoryPermissionLevel, PostOperation } from '@charmverse/core/dist/prisma';
-
-import { postCategoryOperations, postOperationsWithoutEdit } from './interfaces';
 
 export const postCategoryPermissionsMapping: Record<PostCategoryPermissionLevel, PostCategoryOperation[]> = {
   category_admin: [...postCategoryOperations],

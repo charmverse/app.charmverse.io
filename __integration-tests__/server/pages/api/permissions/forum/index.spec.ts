@@ -1,9 +1,8 @@
 import { prisma } from '@charmverse/core';
-import type { PostCategoryPermissionAssignment } from '@charmverse/core';
+import type { PostCategoryPermissionAssignment, AssignedPostCategoryPermission } from '@charmverse/core';
 import type { Space } from '@charmverse/core/dist/prisma';
 import request from 'supertest';
 
-import type { AssignedPostCategoryPermission } from 'lib/permissions/forum/interfaces';
 import { upsertPostCategoryPermission } from 'lib/permissions/forum/upsertPostCategoryPermission';
 import type { LoggedInUser } from 'models';
 import { baseUrl, loginUser } from 'testing/mockApiCall';

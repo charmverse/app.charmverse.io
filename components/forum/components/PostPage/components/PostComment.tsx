@@ -1,3 +1,4 @@
+import type { PostPermissionFlags } from '@charmverse/core';
 import type { Post } from '@charmverse/core/dist/prisma';
 import type { KeyedMutator } from 'swr';
 
@@ -6,12 +7,11 @@ import { Comment } from 'components/common/comments/Comment';
 import type { UpdateCommentPayload, CreateCommentPayload } from 'components/common/comments/interfaces';
 import { getUpdatedCommentVote } from 'components/common/comments/utils';
 import type { PostCommentWithVote, PostCommentWithVoteAndChildren } from 'lib/forums/comments/interface';
-import type { AvailablePostPermissionFlags } from 'lib/permissions/forum/interfaces';
 
 type Props = {
   comment: PostCommentWithVoteAndChildren;
   setPostComments: KeyedMutator<PostCommentWithVote[] | undefined>;
-  permissions?: AvailablePostPermissionFlags;
+  permissions?: PostPermissionFlags;
   post: Post | null;
 };
 

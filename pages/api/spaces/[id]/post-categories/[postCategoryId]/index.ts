@@ -1,3 +1,4 @@
+import type { PostCategoryWithPermissions } from '@charmverse/core';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -5,7 +6,6 @@ import { deletePostCategory } from 'lib/forums/categories/deletePostCategory';
 import { updatePostCategory } from 'lib/forums/categories/updatePostCategory';
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { getPermissionsClient } from 'lib/permissions/api';
-import type { PostCategoryWithPermissions } from 'lib/permissions/forum/interfaces';
 import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
