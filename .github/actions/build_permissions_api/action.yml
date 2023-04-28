@@ -23,17 +23,12 @@ runs:
         ssh-key: ${{ inputs.GITHUB_SSH_KEY }}
 
 
-    - name: Check directory
-      shell: bash
-      run: ls -a && pwd
-      working-directory: ./${{inputs.API_FOLDER}}
-
     - name: Cache dependencies
       id: cache_permissions_node_modules
       uses: actions/cache@v3
       with:
         path: ./${{inputs.API_FOLDER}}/node_modules
-        key: nodemodules-permissions-cache-${{ hashFiles('package-lock.json') }}-${{ hashFiles('patches/**.patch', 'prisma/schema.prisma') }}
+        key: nodemodules-permissions-cache-${{ hashFiles(format('{0}/package-lock.json', inputs.API_FOLDER)) }}
 
     - name: Install npm dependencies
       shell: bash
@@ -55,7 +50,7 @@ runs:
           .env.test.local
         
         # including the app_env helps make sure that deploy_staging.yml does not reuse values from test_and_deploy.yml which are meant for production
-        key: permissions-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**/*.[jt]s', '**/*.[jt]sx', '**/*.scss', '!node_modules', '!.next', '!dont_cache') }}-${{ inputs.NODE_ENV }}
+        key: permissions-${{ runner.os }}-${{ hashFiles(format('{0}/**/*.[jt]s', inputs.API_FOLDER), format('!{0}/node_modules', inputs.API_FOLDER)) }}
 
     - name: Build
       shell: bash
