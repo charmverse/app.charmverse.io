@@ -154,6 +154,7 @@ export function InlineDatabase({ containerWidth, readOnly: readOnlyOverride, nod
           showCard={setShownCardId}
           activeView={currentView}
           views={views}
+          page={boardPage}
           // Show more tabs on shared inline database as the space gets increased
           maxTabsShown={router.pathname.startsWith('/share') ? 5 : 3}
         />
