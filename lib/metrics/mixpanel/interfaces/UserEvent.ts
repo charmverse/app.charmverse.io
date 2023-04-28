@@ -1,6 +1,6 @@
 import type { IdentityType } from '@charmverse/core/dist/prisma';
 
-import type { SpaceCreateTemplate } from 'lib/spaces/config';
+import type { PrivateTemplate, SpaceCreateTemplate } from 'lib/spaces/config';
 import type { TokenGateJoinType } from 'lib/token-gates/interfaces';
 
 import type { BaseEvent, BaseEventWithoutGroup } from './BaseEvent';
@@ -14,7 +14,8 @@ export type SignupSource =
   | 'marketing-site'
   | 'direct'
   | 'other'
-  | '';
+  | ''
+  | string;
 
 export type SignupAnalytics = {
   signupLandingUrl: string;
@@ -37,11 +38,11 @@ export type TokenGateVerificationEvent = BaseEvent & {
 };
 
 export type SpaceJoined = BaseEvent & {
-  source: 'invite_link' | TokenGateJoinType | 'charmverse_api';
+  source: 'invite_link' | TokenGateJoinType | 'charmverse_api' | string;
 };
 
 export type CreateNewSpace = BaseEvent & {
-  template: SpaceCreateTemplate;
+  template: SpaceCreateTemplate | PrivateTemplate;
   source?: string;
 };
 

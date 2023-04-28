@@ -15,6 +15,7 @@ import { ViewSourceOptions } from './viewSidebar/viewSourceOptions';
 type CreateLinkedViewProps = DatabaseSourceProps & {
   readOnly: boolean;
   onCsvImport?: (event: ChangeEvent<HTMLInputElement>) => void;
+  boardId?: string;
 };
 
 type SidebarState = 'select-source' | null;

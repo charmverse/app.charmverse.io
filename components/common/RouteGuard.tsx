@@ -104,7 +104,7 @@ export default function RouteGuard({ children }: { children: ReactNode }) {
         return {
           authorized: false,
           redirect: {
-            pathname: spaces.length !== 0 ? `/${spaces[0].domain}` : '/signup'
+            pathname: spaces.length !== 0 ? `/${spaces[0].domain}` : '/createSpace'
           }
         };
       }
