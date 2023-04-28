@@ -625,7 +625,7 @@ function CenterPanel(props: Props) {
                   // if it links to deleted db page then the board can't be inline_board type
                   onCreate={views.length === 0 && !linksToDeletedDatabasePages ? createDatabase : undefined}
                   onCsvImport={onCsvImport}
-                  boardId={activeBoardId}
+                  pageId={props.page?.id}
                 />
               )}
               {activeBoard && activeView?.fields.viewType === 'board' && (
