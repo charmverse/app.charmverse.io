@@ -1,5 +1,5 @@
 import { AlchemyProvider } from "@ethersproject/providers";
-import { Space } from "@prisma/client";
+import { Space } from "@charmverse/core/dist/prisma";
 import { getProjectRegistryContract } from "lib/gitcoin/getProjectRegistryContract";
 import { getProjectDetails, GitcoinProjectDetails } from "lib/gitcoin/getProjectDetails";
 import { prisma } from '@charmverse/core';
@@ -18,7 +18,7 @@ import { getFilenameWithExtension } from "lib/utilities/getFilenameWithExtension
  * It also updates mixpanel profiles so make sure to have prod mixpanel api key set in .env
  */
 
-const START_ID = 650;
+const START_ID = 600;
 const CHAIN_ID = 1;
 
 const provider = new AlchemyProvider(CHAIN_ID, process.env.ALCHEMY_API_KEY);
@@ -174,26 +174,40 @@ async function createSpaceUsers(owners: string[]) {
 
 }
 
-function getImportedProjcetIds() {
+function getImportedProjectsData() {
   try {
     const content = readFileSync(FILE_PATH).toString();
     const rows = content.split('\n');
 
-
-    const ids = rows.map(row => {
-      const cols = row?.split(';') || [];
-      const projectId = Number(cols[0]) || null;
-      return projectId
-    }).filter(id => id !== null);
-
-    console.log('🔥 imported projects count', ids.length);
-
-    return ids;
+    return rows.map(row => row?.split(';') || []);
  } catch (e) {
 
  }
 
  return [];
+}
+
+function getImportedProjcetIds() {
+    const data = getImportedProjectsData();
+    const ids = data.map(cols => {
+      // col 0 - gitcoin project id
+      const projectId = Number(cols[0]) || null;
+      return projectId
+    }).filter((id): id is number => id !== null);
+
+    console.log('🔥 imported projects count', ids.length);
+
+    return ids;
+}
+
+function getImportedProjcetSpaceIds() {
+  const data = getImportedProjectsData();
+
+  return data.map(cols => {
+    // col 1 - gitcoin project space id
+    const projectId = cols[1] || null;
+    return projectId
+  }).filter((id): id is string => id !== null);
 }
 
 function exportDataToCSV(data: ProjectData[]) {
@@ -226,7 +240,18 @@ function exportDataToCSV(data: ProjectData[]) {
   }
 }
 
+async function updateSpaceOrigins() {
+  const spaceIds = getImportedProjcetSpaceIds();
+  await prisma.space.updateMany({
+    where: { id: { in: spaceIds } },
+    data: { origin: 'gitcoin' }
+  });
+}
+
 // getImportedProjcetIds()
+// getImportedProjcetSpaceIds()
 // getProjectCount();
+
+// updateSpaceOrigins();
 
 // importGitCoinProjects();
