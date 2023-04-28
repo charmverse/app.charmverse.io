@@ -1,4 +1,5 @@
-import { prisma } from 'db';
+import { prisma } from '@charmverse/core';
+
 import { computeProposalPermissions } from 'lib/permissions/proposals/computeProposalPermissions';
 
 import type { PermissionCompute } from '../interfaces';

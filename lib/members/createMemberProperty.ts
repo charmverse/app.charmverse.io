@@ -1,6 +1,6 @@
-import type { Prisma } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { Prisma } from '@charmverse/core/dist/prisma';
 
-import { prisma } from 'db';
 import { InvalidInputError } from 'lib/utilities/errors';
 
 import { DEFAULT_MEMBER_PROPERTIES, READONLY_MEMBER_PROPERTIES } from './constants';

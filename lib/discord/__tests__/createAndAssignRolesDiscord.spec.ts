@@ -1,6 +1,6 @@
+import { prisma } from '@charmverse/core';
 import { v4 } from 'uuid';
 
-import { prisma } from 'db';
 import { createAndAssignRolesDiscord } from 'lib/discord/createAndAssignRolesDiscord';
 import { generateRole, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { createDiscordUser } from 'testing/utils/discord';

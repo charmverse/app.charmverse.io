@@ -1,9 +1,9 @@
+import type { UserGnosisSafe } from '@charmverse/core/dist/prisma';
 import { BigNumber } from '@ethersproject/bignumber';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import { Divider, Menu, MenuItem } from '@mui/material';
 import type { AlertColor } from '@mui/material/Alert';
 import Button from '@mui/material/Button';
-import type { UserGnosisSafe } from '@prisma/client';
 import ERC20ABI from 'abis/ERC20ABI.json';
 import { getChainById } from 'connectors';
 import type { Signer } from 'ethers';

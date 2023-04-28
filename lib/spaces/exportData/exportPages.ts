@@ -1,6 +1,6 @@
-import { Page, Prisma } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import { Page, Prisma } from '@charmverse/core/dist/prisma';
 
-import { prisma } from 'db';
 import { PageWithChildren } from 'lib/pages/server';
 
 // function recursiveInclude ({ level = 0, depth = 10 }: {level?: number, depth?: number}): Prisma.PageInclude {

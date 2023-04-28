@@ -1,10 +1,9 @@
+import type { PostCategory } from '@charmverse/core/dist/prisma';
 import styled from '@emotion/styled';
 import MenuItem from '@mui/material/MenuItem';
 import Typography from '@mui/material/Typography';
-import type { PostCategory } from '@prisma/client';
 
 import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useForumCategories } from 'hooks/useForumCategories';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { PostSortOption } from 'lib/forums/posts/constants';

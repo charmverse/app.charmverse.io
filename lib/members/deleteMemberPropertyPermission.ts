@@ -1,4 +1,4 @@
-import { prisma } from 'db';
+import { prisma } from '@charmverse/core';
 
 export function deleteMemberPropertyPermission(id: string) {
   return prisma.memberPropertyPermission.delete({

@@ -1,6 +1,6 @@
-import type { ApplicationStatus, BountyStatus } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { ApplicationStatus, BountyStatus } from '@charmverse/core/dist/prisma';
 
-import { prisma } from 'db';
 import { submissionsCapReached } from 'lib/applications/shared';
 import type { BountyWithDetails } from 'lib/bounties';
 import { includePagePermissions } from 'lib/pages/server';

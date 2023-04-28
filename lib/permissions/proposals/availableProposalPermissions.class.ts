@@ -1,4 +1,4 @@
-import type { ProposalOperation } from '@prisma/client';
+import type { ProposalOperation } from '@charmverse/core/dist/prisma';
 
 import { BasePermissions } from '../basePermissions.class';
 

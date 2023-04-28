@@ -1,4 +1,5 @@
-import type { PostCategory } from '@prisma/client';
+import type { PostCategoryWithPermissions } from '@charmverse/core';
+import type { PostCategory } from '@charmverse/core/dist/prisma';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -6,9 +7,7 @@ import type { CreatePostCategoryInput } from 'lib/forums/categories/createPostCa
 import { createPostCategory } from 'lib/forums/categories/createPostCategory';
 import { getPostCategories } from 'lib/forums/categories/getPostCategories';
 import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
-import { computePostCategoryPermissions } from 'lib/permissions/forum/computePostCategoryPermissions';
-import { filterAccessiblePostCategories } from 'lib/permissions/forum/filterAccessiblePostCategories';
-import type { PostCategoryWithPermissions } from 'lib/permissions/forum/interfaces';
+import { getPermissionsClient } from 'lib/permissions/api';
 import { withSessionRoute } from 'lib/session/withSession';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 
@@ -26,11 +25,17 @@ async function getPostCategoriesController(req: NextApiRequest, res: NextApiResp
   const { id: spaceId } = req.query;
   const postCategories = await getPostCategories(spaceId as string);
 
-  const filteredPostCategories = await filterAccessiblePostCategories({
-    postCategories,
-    userId
-  });
+  // TODO - Switch for real implementation
 
+  const filteredPostCategories = await getPermissionsClient({
+    resourceId: spaceId as string,
+    resourceIdType: 'space'
+  }).then((client) =>
+    client.forum.getPermissionedCategories({
+      userId,
+      postCategories
+    })
+  );
   return res.status(200).json(filteredPostCategories);
 }
 
@@ -54,10 +59,15 @@ async function createPostCategoryController(req: NextApiRequest, res: NextApiRes
     spaceId: spaceId as string
   });
 
-  const permissions = await computePostCategoryPermissions({
+  const permissions = await getPermissionsClient({
     resourceId: postCategory.id,
-    userId
-  });
+    resourceIdType: 'postCategory'
+  }).then((client) =>
+    client.forum.computePostCategoryPermissions({
+      resourceId: postCategory.id,
+      userId
+    })
+  );
 
   return res.status(201).json({ ...postCategory, permissions });
 }

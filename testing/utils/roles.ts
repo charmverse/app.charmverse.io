@@ -1,7 +1,6 @@
-import type { RoleSource } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { RoleSource } from '@charmverse/core/dist/prisma';
 import { v4 } from 'uuid';
-
-import { prisma } from 'db';
 
 export async function createRole({
   name,

@@ -1,8 +1,8 @@
-import type { ProposalStatus } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { ProposalStatus } from '@charmverse/core/dist/prisma';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { prisma } from 'db';
 import { InvalidStateError, onError, onNoMatch, requireApiKey } from 'lib/middleware';
 import { generateMarkdown } from 'lib/prosemirror/plugins/markdown/generateMarkdown';
 import { withSessionRoute } from 'lib/session/withSession';

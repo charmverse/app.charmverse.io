@@ -1,8 +1,8 @@
 import { AlchemyProvider } from "@ethersproject/providers";
-import { Space } from "@prisma/client";
+import { Space } from "@charmverse/core/dist/prisma";
 import { getProjectRegistryContract } from "lib/gitcoin/getProjectRegistryContract";
 import { getProjectDetails, GitcoinProjectDetails } from "lib/gitcoin/getProjectDetails";
-import { prisma } from 'db';
+import { prisma } from '@charmverse/core';
 import { uid } from 'lib/utilities/strings';
 import { createUserFromWallet } from "lib/users/createUser";
 import { createWorkspace, SpaceCreateInput } from "lib/spaces/createSpace";

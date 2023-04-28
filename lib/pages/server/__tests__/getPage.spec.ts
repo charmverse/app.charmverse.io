@@ -1,7 +1,7 @@
-import type { Page, PagePermission, Space, User } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { Page, PagePermission, Space, User } from '@charmverse/core/dist/prisma';
 import { v4 } from 'uuid';
 
-import { prisma } from 'db';
 import type { IPagePermissionWithSource } from 'lib/permissions/pages';
 import { createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 

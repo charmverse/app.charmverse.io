@@ -1,12 +1,12 @@
+import type { PostCategoryPermissionFlags } from '@charmverse/core';
+import type { PostCategory } from '@charmverse/core/dist/prisma';
 import { Edit } from '@mui/icons-material';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import LockIcon from '@mui/icons-material/Lock';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import TaskIcon from '@mui/icons-material/Task';
 import { IconButton, ListItemIcon, MenuItem, MenuList, Typography } from '@mui/material';
-import Box from '@mui/material/Box';
 import Tooltip from '@mui/material/Tooltip';
-import type { PostCategory } from '@prisma/client';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect, useMemo, useState } from 'react';
 import { MdOutlineNotificationsNone, MdOutlineNotificationsOff } from 'react-icons/md';
@@ -14,24 +14,27 @@ import { MdOutlineNotificationsNone, MdOutlineNotificationsOff } from 'react-ico
 import PopperPopup from 'components/common/PopperPopup';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
+import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
 import { useForumCategoryNotification } from 'hooks/useUserSpaceNotifications';
-import type { AvailablePostCategoryPermissionFlags } from 'lib/permissions/forum/interfaces';
 
 import { EditCategoryDialog } from './EditCategoryDialog';
 import { PostCategoryPermissionsDialog } from './permissions/PostCategoryPermissions';
+import { PostCategoryPermissionsDialogPublic } from './permissions/PostCategoryPermissionsPublic';
 
 type Props = {
   category: PostCategory;
   onChange: (category: PostCategory) => void;
   onDelete: (category: PostCategory) => void;
   onSetNewDefaultCategory: (category: PostCategory) => void;
-  permissions: AvailablePostCategoryPermissionFlags;
+  permissions: PostCategoryPermissionFlags;
 };
 
 export function CategoryContextMenu({ category, onChange, onDelete, onSetNewDefaultCategory, permissions }: Props) {
   const [tempName, setTempName] = useState(category.name || '');
   const space = useCurrentSpace();
   const isAdmin = useIsAdmin();
+
+  const isPublicMode = useIsFreeSpace();
 
   const notifications = useForumCategoryNotification(category.id);
 
@@ -163,12 +166,20 @@ export function CategoryContextMenu({ category, onChange, onDelete, onSetNewDefa
           <MoreHorizIcon fontSize='small' />
         </IconButton>
       </PopperPopup>
-      <PostCategoryPermissionsDialog
-        permissions={permissions}
-        onClose={closeDialog}
-        open={permissionsDialogIsOpen}
-        postCategory={category}
-      />
+      {!isPublicMode ? (
+        <PostCategoryPermissionsDialogPublic
+          postCategory={category}
+          onClose={closeDialog}
+          open={permissionsDialogIsOpen}
+        />
+      ) : (
+        <PostCategoryPermissionsDialog
+          permissions={permissions}
+          onClose={closeDialog}
+          open={permissionsDialogIsOpen}
+          postCategory={category}
+        />
+      )}
       <EditCategoryDialog
         onSave={(newValues) => onChange({ ...category, description: newValues.description, name: newValues.name })}
         category={category}

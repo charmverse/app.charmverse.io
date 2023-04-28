@@ -1,5 +1,5 @@
-import type { ProposalStatus } from '@prisma/client';
-import { NotificationType } from '@prisma/client';
+import type { ProposalStatus } from '@charmverse/core/dist/prisma';
+import { NotificationType } from '@charmverse/core/dist/prisma';
 
 import type { BountyTask } from 'lib/bounties/getBountyTasks';
 import type { DiscussionTask } from 'lib/discussion/interfaces';

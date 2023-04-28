@@ -1,6 +1,6 @@
-import type { Space, User } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { Space, User } from '@charmverse/core/dist/prisma';
 
-import { prisma } from 'db';
 import { DataNotFoundError } from 'lib/utilities/errors';
 import {
   createPage,

@@ -1,7 +1,7 @@
-import type { Role, Space, SpaceRole } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { Role, Space, SpaceRole } from '@charmverse/core/dist/prisma';
 import { v4 } from 'uuid';
 
-import { prisma } from 'db';
 import { createUserFromWallet } from 'lib/users/createUser';
 import type { LoggedInUser } from 'models';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';

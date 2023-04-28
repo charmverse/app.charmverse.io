@@ -1,7 +1,7 @@
-import type { BountyPermission, Prisma } from '@prisma/client';
-import { BountyPermissionLevel } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { BountyPermission, Prisma } from '@charmverse/core/dist/prisma';
+import { BountyPermissionLevel } from '@charmverse/core/dist/prisma';
 
-import { prisma } from 'db';
 import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
 
 import { assigneeGroupIsValid } from '../validateAssigneeGroup';

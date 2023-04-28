@@ -1,4 +1,4 @@
-import type { MemberProperty, MemberPropertyPermission } from '@prisma/client';
+import type { MemberProperty, MemberPropertyPermission } from '@charmverse/core/dist/prisma';
 import type { ReactNode } from 'react';
 import { createContext, useCallback, useContext, useMemo } from 'react';
 import type { KeyedMutator } from 'swr';

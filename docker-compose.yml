@@ -36,14 +36,14 @@ services:
   prd-webapp:
     extends:
       service: defaults
-    command: ['sh', '-c', 'npm run migrate:deploy && node --require dd-trace/init ./dist/server.js']
+    command: ['sh', '-c', 'npm run prisma:deploy && node --require dd-trace/init ./dist/server.js']
     profiles:
       - prd-webapp
 
   stg-webapp:
     extends:
       service: defaults
-    command: ['sh', '-c', 'npm run migrate:deploy && node ./dist/server.js']
+    command: ['sh', '-c', 'npm run prisma:deploy && node ./dist/server.js']
     environment:
       - NEXT_PUBLIC_APP_ENV=staging
     profiles:

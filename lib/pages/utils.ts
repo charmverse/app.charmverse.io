@@ -1,4 +1,4 @@
-import type { PageType } from '@prisma/client';
+import type { PageType } from '@charmverse/core/dist/prisma';
 
 export function getPagePath() {
   return `page-${Math.random().toString().replace('0.', '')}`;

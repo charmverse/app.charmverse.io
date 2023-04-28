@@ -1,10 +1,10 @@
+import type { Page } from '@charmverse/core/dist/prisma';
 import type { Client } from '@notionhq/client';
 import type {
   DatabaseObjectResponse,
   ListBlockChildrenParameters,
   PageObjectResponse
 } from '@notionhq/client/build/src/api-endpoints';
-import type { Page } from '@prisma/client';
 import promiseRetry from 'promise-retry';
 import { v4 } from 'uuid';
 

@@ -1,4 +1,4 @@
-import type { MemberPropertyType } from '@prisma/client';
+import type { MemberPropertyType } from '@charmverse/core/dist/prisma';
 
 type MemberPropertyConfig = {
   label: string;

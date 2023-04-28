@@ -1,6 +1,6 @@
+import { prisma } from '@charmverse/core';
 import { v4 } from 'uuid';
 
-import { prisma } from 'db';
 import { sessionUserRelations } from 'lib/session/config';
 import { uid } from 'lib/utilities/strings';
 import { randomETHWalletAddress } from 'testing/generateStubs';

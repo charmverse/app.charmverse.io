@@ -1,15 +1,15 @@
 /* eslint-disable camelcase */
+import type { PostCategoryPermissionLevel } from '@charmverse/core/dist/prisma';
+import type { PostCategoryPermissionAssignment } from '@charmverse/core/dist/shared';
 import Box from '@mui/material/Box';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
-import type { PostCategoryPermissionLevel } from '@prisma/client';
 import type { ReactNode } from 'react';
 import { useMemo } from 'react';
 
 import { SmallSelect } from 'components/common/form/InputEnumToOptions';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useRoles } from 'hooks/useRoles';
-import type { PostCategoryPermissionInput } from 'lib/permissions/forum/upsertPostCategoryPermission';
 import type { TargetPermissionGroup } from 'lib/permissions/interfaces';
 
 import { forumMemberPermissionOptions, postCategoryPermissionLabels } from './shared';
@@ -23,7 +23,7 @@ type Props = {
   postCategoryId: string;
   canEdit: boolean;
   disabledTooltip?: string;
-  updatePermission: (newPermission: PostCategoryPermissionInput & { id?: string }) => void;
+  updatePermission: (newPermission: PostCategoryPermissionAssignment & { id?: string }) => void;
   deletePermission: (permissionId: string) => void;
 };
 

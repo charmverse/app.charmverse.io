@@ -1,6 +1,6 @@
+import type { Page } from '@charmverse/core/dist/prisma';
 import ExpandMoreIcon from '@mui/icons-material/ArrowDropDown'; // ExpandMore
 import ChevronRightIcon from '@mui/icons-material/ArrowRight'; // ChevronRight
-import type { Page } from '@prisma/client';
 import { useRouter } from 'next/router';
 import type { SyntheticEvent } from 'react';
 import { memo, useCallback, useEffect, useMemo } from 'react';

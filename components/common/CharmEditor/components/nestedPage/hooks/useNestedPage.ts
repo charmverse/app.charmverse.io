@@ -1,6 +1,6 @@
 import { useEditorViewContext } from '@bangle.dev/react';
 import { rafCommandExec } from '@bangle.dev/utils';
-import type { Page } from '@prisma/client';
+import type { Page } from '@charmverse/core/dist/prisma';
 import { useRouter } from 'next/router';
 import { useCallback } from 'react';
 

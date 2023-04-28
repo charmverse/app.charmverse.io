@@ -1,6 +1,6 @@
-import type { Space, User } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { Space, User } from '@charmverse/core/dist/prisma';
 
-import { prisma } from 'db';
 import { prismaToBlock } from 'lib/focalboard/block';
 import type { Board } from 'lib/focalboard/board';
 import type { Card } from 'lib/focalboard/card';

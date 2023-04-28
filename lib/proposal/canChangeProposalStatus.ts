@@ -1,4 +1,4 @@
-import type { ProposalStatus } from '@prisma/client';
+import type { ProposalStatus } from '@charmverse/core/dist/prisma';
 
 import type { ProposalWithUsers } from 'lib/proposal/interface';
 import type { ProposalUserGroup } from 'lib/proposal/proposalStatusTransition';

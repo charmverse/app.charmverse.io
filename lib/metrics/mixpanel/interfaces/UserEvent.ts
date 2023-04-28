@@ -1,4 +1,4 @@
-import type { IdentityType } from '@prisma/client';
+import type { IdentityType } from '@charmverse/core/dist/prisma';
 
 import type { PrivateTemplate, SpaceCreateTemplate } from 'lib/spaces/config';
 import type { TokenGateJoinType } from 'lib/token-gates/interfaces';

@@ -1,4 +1,8 @@
-import type { ProposalCategoryOperation, ProposalCategoryPermissionLevel, ProposalOperation } from '@prisma/client';
+import type {
+  ProposalCategoryOperation,
+  ProposalCategoryPermissionLevel,
+  ProposalOperation
+} from '@charmverse/core/dist/prisma';
 
 export const proposalCategoryPermissionsMapping: Record<ProposalCategoryPermissionLevel, ProposalCategoryOperation[]> =
   {

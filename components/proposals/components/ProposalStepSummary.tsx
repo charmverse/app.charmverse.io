@@ -1,7 +1,7 @@
+import type { ProposalStatus } from '@charmverse/core/dist/prisma';
 import { ArrowBackIos } from '@mui/icons-material';
 import ArrowForwardIos from '@mui/icons-material/ArrowForwardIos';
 import { Button, Stack, Typography } from '@mui/material';
-import type { ProposalStatus } from '@prisma/client';
 
 import type { ProposalFlowFlags } from 'lib/proposal/computeProposalFlowFlags';
 import type { ProposalWithUsers } from 'lib/proposal/interface';

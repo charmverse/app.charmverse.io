@@ -1,4 +1,4 @@
-import type { Page } from '@prisma/client';
+import type { Page } from '@charmverse/core/dist/prisma';
 
 export function getPropertiesFromPage(
   page: Pick<Page, 'bountyId' | 'spaceId' | 'title' | 'id' | 'path'>,
