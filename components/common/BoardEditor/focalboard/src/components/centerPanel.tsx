@@ -98,7 +98,7 @@ type State = {
 };
 
 function CenterPanel(props: Props) {
-  const { activeView, board, pageIcon, showView, views } = props;
+  const { activeView: defaultActiveView, board, pageIcon, showView, views: allViews } = props;
 
   const [state, setState] = useState<State>({
     cardIdToFocusOnRender: '',
@@ -115,19 +115,32 @@ function CenterPanel(props: Props) {
   const { members } = useMembers();
   const { showMessage } = useSnackbar();
   const { user } = useUser();
-  const { keys } = useApiPageKeys(props.page?.id);
-
-  useEffect(() => {
-    if (views.length === 0 && !activeView) {
-      setState((s) => ({ ...s, showSettings: 'create-linked-view' }));
-    } else if (activeView) {
-      setState((s) => ({ ...s, showSettings: null }));
-    }
-  }, [activeView?.id, views.length]);
 
   const isEmbedded = !!props.embeddedBoardPath;
   const boardPage = pages[board.id] ?? props.page;
   const boardPageType = boardPage?.type;
+  const isLinkedBoardType = boardPageType === 'linked_board' || boardPageType === 'inline_linked_board';
+  const views = isLinkedBoardType
+    ? allViews.filter((view) => view.fields.linkedSourceId && pages[view.fields.linkedSourceId])
+    : allViews;
+
+  const linksToDeletedDatabasePages = views.length !== allViews.length;
+
+  const activeView = isLinkedBoardType && views.length === 0 ? null : defaultActiveView;
+
+  useEffect(() => {
+    if (linksToDeletedDatabasePages) {
+      showView('');
+    }
+  }, [linksToDeletedDatabasePages]);
+
+  useEffect(() => {
+    if ((views.length === 0 && !activeView) || (isLinkedBoardType && views.length === 0)) {
+      setState((s) => ({ ...s, showSettings: 'create-linked-view' }));
+    } else if (activeView) {
+      setState((s) => ({ ...s, showSettings: null }));
+    }
+  }, [activeView?.id, views.length, isLinkedBoardType]);
 
   // for 'linked' boards, each view has its own board which we use to determine the cards to show
   let activeBoardId: string | undefined = props.board.id;
@@ -136,6 +149,7 @@ function CenterPanel(props: Props) {
   } else if (activeView?.fields.sourceType === 'google_form') {
     activeBoardId = activeView?.fields.sourceData?.boardId;
   }
+  const { keys } = useApiPageKeys(activeBoardId);
   const activeBoard = useAppSelector(getBoard(activeBoardId ?? ''));
   const activePage = pages[activeBoardId ?? ''];
   const _groupByProperty = activeBoard?.fields.cardProperties.find((o) => o.id === activeView?.fields.groupById);
@@ -496,9 +510,11 @@ function CenterPanel(props: Props) {
   return (
     <>
       {!!boardPage?.deletedAt && <PageDeleteBanner pageId={boardPage.id} />}
-      {keys?.map((key) => (
-        <PageWebhookBanner key={key.apiKey} type={key.type} url={`${webhookBaseUrl}/${key?.apiKey}`} />
-      ))}
+      {keys?.map((key) =>
+        activeBoardId === key.pageId ? (
+          <PageWebhookBanner key={key.apiKey} type={key.type} url={`${webhookBaseUrl}/${key?.apiKey}`} />
+        ) : null
+      )}
       <div
         // remount components between pages
         className={`BoardComponent ${isEmbedded ? 'embedded-board' : ''}`}
@@ -542,7 +558,7 @@ function CenterPanel(props: Props) {
             activeView={props.activeView}
             toggleViewOptions={toggleViewOptions}
             cards={cards}
-            views={props.views}
+            views={views}
             dateDisplayProperty={dateDisplayProperty}
             addCard={() => addCard('', true)}
             showCard={showCard}
@@ -606,8 +622,10 @@ function CenterPanel(props: Props) {
                 <CreateLinkedView
                   readOnly={props.readOnly}
                   onSelect={selectViewSource}
-                  onCreate={views.length === 0 ? createDatabase : undefined}
+                  // if it links to deleted db page then the board can't be inline_board type
+                  onCreate={views.length === 0 && !linksToDeletedDatabasePages ? createDatabase : undefined}
                   onCsvImport={onCsvImport}
+                  boardId={activeBoardId}
                 />
               )}
               {activeBoard && activeView?.fields.viewType === 'board' && (

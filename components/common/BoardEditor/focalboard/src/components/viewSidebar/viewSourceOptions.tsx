@@ -16,7 +16,6 @@ import charmClient from 'charmClient';
 import PagesList from 'components/common/CharmEditor/components/PageList';
 import ConfirmApiPageKeyModal from 'components/common/Modal/ConfirmApiPageKeyModal';
 import { webhookBaseUrl } from 'config/constants';
-import { useCurrentPage } from 'hooks/useCurrentPage';
 import { usePages } from 'hooks/usePages';
 import type { BoardView, BoardViewFields, ViewSourceType } from 'lib/focalboard/boardView';
 import { isTruthy } from 'lib/utilities/types';

@@ -47,7 +47,9 @@
     "test:server": "npm run test:server:ci -- --verbose --watch",
     "test:server:ci": "NODE_OPTIONS=\"--max_old_space_size=4096\" dotenv -e .env.test.local --override -- npx jest --config='./jest.config-server.ts' --maxWorkers=2",
     "test:browser:ci": "npm run test:browser",
-    "test:e2e:ci": "NODE_OPTIONS=\"--max_old_space_size=4096\" dotenv -e .env.test.local -- npx playwright test"
+    "test:e2e:ci": "NODE_OPTIONS=\"--max_old_space_size=4096\" dotenv -e .env.test.local -- npx playwright test",
+    "storybook": "storybook dev -p 6006",
+    "build:storybook": "storybook build"
   },
   "lint-staged": {
     "*.{ts,tsx}": [
@@ -237,6 +239,13 @@
     "@depay/web3-mock": "^13.18.1",
     "@next/eslint-plugin-next": "^12.0.10",
     "@playwright/test": "^1.26.1",
+    "@storybook/addon-essentials": "^7.0.6",
+    "@storybook/addon-interactions": "^7.0.6",
+    "@storybook/addon-links": "^7.0.6",
+    "@storybook/blocks": "^7.0.6",
+    "@storybook/nextjs": "^7.0.6",
+    "@storybook/react": "^7.0.6",
+    "@storybook/testing-library": "^0.0.14-next.2",
     "@svgr/webpack": "^6.1.2",
     "@testing-library/cypress": "^8.0.2",
     "@testing-library/dom": "^8.11.3",
@@ -296,6 +305,7 @@
     "react-redux": "^8.0.5",
     "sass": "^1.49.0",
     "serverless-esbuild": "^1.37.0",
+    "storybook": "^7.0.6",
     "supertest": "^6.3.3",
     "webpack": "^5.76.0"
   },
