@@ -194,7 +194,7 @@ function PropertyValueElement(props: Props) {
 
   const hasValue = !!value && (typeof value === 'string' || Array.isArray(value) ? value.length !== 0 : value);
 
-  if (!hasValue && props.readOnly && displayType !== 'details' && !propertyValueElement) {
+  if (!hasValue && props.readOnly && displayType !== 'details') {
     return null;
   }
 
