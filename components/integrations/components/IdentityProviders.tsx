@@ -186,6 +186,7 @@ export function IdentityProviders() {
               loading={isConnectingIdentity || isVerifyingWallet || isSigning}
               disabled={cannotDisconnect}
               connected={true}
+              active={lowerCaseEqual(wallet.address, account)}
               actions={[
                 verifiableWalletDetected && !account && !isConnectingIdentity ? (
                   <MenuItem key='verify' onClick={generateWalletAuth}>
