@@ -115,7 +115,6 @@ function CenterPanel(props: Props) {
   const { members } = useMembers();
   const { showMessage } = useSnackbar();
   const { user } = useUser();
-  const { keys } = useApiPageKeys();
 
   const isEmbedded = !!props.embeddedBoardPath;
   const boardPage = pages[board.id] ?? props.page;
@@ -150,6 +149,7 @@ function CenterPanel(props: Props) {
   } else if (activeView?.fields.sourceType === 'google_form') {
     activeBoardId = activeView?.fields.sourceData?.boardId;
   }
+  const { keys } = useApiPageKeys(activeBoardId);
   const activeBoard = useAppSelector(getBoard(activeBoardId ?? ''));
   const activePage = pages[activeBoardId ?? ''];
   const _groupByProperty = activeBoard?.fields.cardProperties.find((o) => o.id === activeView?.fields.groupById);
@@ -520,9 +520,11 @@ function CenterPanel(props: Props) {
   return (
     <>
       {!!boardPage?.deletedAt && <PageDeleteBanner pageId={boardPage.id} />}
-      {keys?.map((key) => (
-        <PageWebhookBanner key={key.apiKey} type={key.type} url={`${webhookBaseUrl}/${key?.apiKey}`} />
-      ))}
+      {keys?.map((key) =>
+        activeBoardId === key.pageId ? (
+          <PageWebhookBanner key={key.apiKey} type={key.type} url={`${webhookBaseUrl}/${key?.apiKey}`} />
+        ) : null
+      )}
       <div
         // remount components between pages
         className={`BoardComponent ${isEmbedded ? 'embedded-board' : ''}`}
@@ -633,6 +635,7 @@ function CenterPanel(props: Props) {
                   // if it links to deleted db page then the board can't be inline_board type
                   onCreate={views.length === 0 && !linksToDeletedDatabasePages ? createDatabase : undefined}
                   onCsvImport={onCsvImport}
+                  boardId={activeBoardId}
                 />
               )}
               {activeBoard && activeView?.fields.viewType === 'board' && (
