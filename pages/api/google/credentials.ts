@@ -7,7 +7,7 @@ import { deleteCredential, getCredentialsForUser, saveCredential } from 'lib/goo
 import { validateFormScopes } from 'lib/google/forms/validateFormScopes';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import { InvalidInputError } from 'lib/utilities/errors/errors';
+import { InvalidInputError } from 'lib/utilities/errors';
 
 export type CreateCredentialRequest = {
   code: string;

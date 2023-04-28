@@ -7,7 +7,7 @@ import { createBoard } from 'lib/focalboard/board';
 import type { BoardViewFields } from 'lib/focalboard/boardView';
 import log from 'lib/log';
 import { getPageMetaList } from 'lib/pages/server/getPageMetaList';
-import { WrongStateError } from 'lib/utilities/errors/invalidData';
+import { WrongStateError } from 'lib/utilities/errors';
 import { isTruthy } from 'lib/utilities/types';
 import { relay } from 'lib/websockets/relay';
 

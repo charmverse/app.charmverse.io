@@ -7,8 +7,7 @@ import { invalidateCredential } from 'lib/google/authorization/credentials';
 import { syncFormResponses } from 'lib/google/forms/syncFormResponses';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import { UnauthorisedActionError } from 'lib/utilities/errors';
-import { InvalidInputError } from 'lib/utilities/errors/errors';
+import { UnauthorisedActionError, InvalidInputError } from 'lib/utilities/errors';
 
 export type RefreshFormsRequest = {
   reset?: boolean;

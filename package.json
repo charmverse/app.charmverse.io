@@ -21,6 +21,7 @@
     "sockets:dev": "PORT=3001 npx dotenv -e .env -e .env.local -- node --watch ./.next/server/websockets.js",
     "sockets:prod": "node ./.next/server/websockets.js",
     "sockets:staging": "npx react-env --path .env.staging -- node ./.next/server/websockets.js",
+    "prisma:studio": "cd node_modules/@charmverse/core && npm run prisma:studio",
     "prisma:generate": "cd node_modules/@charmverse/core && npm run prisma:generate",
     "prisma:reset": "cd node_modules/@charmverse/core && npm run prisma:reset",
     "prisma:dev": "cd node_modules/@charmverse/core && npm run prisma:migrate",
