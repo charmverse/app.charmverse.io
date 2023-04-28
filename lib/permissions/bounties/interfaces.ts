@@ -1,4 +1,4 @@
-import type { BountyOperation, BountyPermissionLevel } from '@prisma/client';
+import type { BountyOperation, BountyPermissionLevel } from '@charmverse/core/dist/prisma';
 
 import type {
   UserPermissionFlags,

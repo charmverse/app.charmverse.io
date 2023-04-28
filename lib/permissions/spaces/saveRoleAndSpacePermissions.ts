@@ -1,7 +1,7 @@
-import type { SpaceOperation } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { SpaceOperation } from '@charmverse/core/dist/prisma';
 import { v4 as uuid } from 'uuid';
 
-import { prisma } from 'db';
 import { InvalidInputError, MissingDataError } from 'lib/utilities/errors';
 
 import type { SpacePermissions } from './listPermissions';

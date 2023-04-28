@@ -1,7 +1,7 @@
+import { prisma } from '@charmverse/core';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { prisma } from 'db';
 import { onError, onNoMatch, requireKeys } from 'lib/middleware';
 import type { PermissionCompute } from 'lib/permissions/interfaces';
 import type { IPagePermissionFlags } from 'lib/permissions/pages';

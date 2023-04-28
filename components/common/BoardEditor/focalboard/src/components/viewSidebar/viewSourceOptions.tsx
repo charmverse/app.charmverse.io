@@ -1,8 +1,8 @@
+import type { ApiPageKey } from '@charmverse/core/dist/prisma';
 import styled from '@emotion/styled';
 import AddIcon from '@mui/icons-material/Add';
 import AddCircleIcon from '@mui/icons-material/AddCircleOutline';
 import { Box, Grid, ListItemIcon, MenuItem, TextField, Typography } from '@mui/material';
-import type { ApiPageKey } from '@prisma/client';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import type { ChangeEvent } from 'react';
 import { useMemo, useState } from 'react';

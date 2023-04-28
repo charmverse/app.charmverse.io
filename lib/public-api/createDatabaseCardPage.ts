@@ -1,7 +1,7 @@
-import type { Page } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { Page } from '@charmverse/core/dist/prisma';
 import { v4, validate } from 'uuid';
 
-import { prisma } from 'db';
 import { prismaToBlock } from 'lib/focalboard/block';
 import { createPage } from 'lib/pages/server/createPage';
 import { getPagePath } from 'lib/pages/utils';

@@ -1,7 +1,7 @@
-import type { PostCategoryPermission } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { PostCategoryPermission } from '@charmverse/core/dist/prisma';
 import { v4 as uuid } from 'uuid';
 
-import { prisma } from 'db';
 import { MissingDataError } from 'lib/utilities/errors';
 import { generateRole, generateUserAndSpace } from 'testing/setupDatabase';
 import { generatePostCategory } from 'testing/utils/forums';

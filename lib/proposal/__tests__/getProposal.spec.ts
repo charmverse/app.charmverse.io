@@ -1,7 +1,7 @@
-import type { Page } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { Page } from '@charmverse/core/dist/prisma';
 import { v4 } from 'uuid';
 
-import { prisma } from 'db';
 import type { PageWithProposal } from 'lib/pages';
 import { DataNotFoundError } from 'lib/utilities/errors';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';

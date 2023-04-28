@@ -1,4 +1,4 @@
-import { SpaceOperation } from '@prisma/client';
+import { SpaceOperation } from '@charmverse/core/dist/prisma';
 
 import { BasePermissions } from '../basePermissions.class';
 

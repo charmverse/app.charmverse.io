@@ -1,6 +1,6 @@
-import type { Role, Space, User } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { Role, Space, User } from '@charmverse/core/dist/prisma';
 
-import { prisma } from 'db';
 import { UndesirableOperationError } from 'lib/utilities/errors';
 import { generateRole, generateUserAndSpace } from 'testing/setupDatabase';
 import { generateProposalCategory } from 'testing/utils/proposals';

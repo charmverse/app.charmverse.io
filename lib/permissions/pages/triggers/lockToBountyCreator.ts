@@ -1,7 +1,7 @@
-import type { Prisma } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { Prisma } from '@charmverse/core/dist/prisma';
 import { v4 } from 'uuid';
 
-import { prisma } from 'db';
 import type { IPageWithPermissions } from 'lib/pages';
 import { getPage, resolvePageTree } from 'lib/pages/server';
 import { DataNotFoundError } from 'lib/utilities/errors';

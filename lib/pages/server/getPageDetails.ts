@@ -1,7 +1,6 @@
-import type { Prisma } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { Prisma } from '@charmverse/core/dist/prisma';
 import { validate } from 'uuid';
-
-import { prisma } from 'db';
 
 import type { PageDetails } from '../interfaces';
 

@@ -1,8 +1,8 @@
+import type { Page } from '@charmverse/core/dist/prisma';
 import styled from '@emotion/styled';
 import { useMediaQuery } from '@mui/material';
 import type { Theme } from '@mui/material';
 import Box from '@mui/material/Box';
-import type { Page } from '@prisma/client';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import { memo, useEffect, useRef, useState } from 'react';

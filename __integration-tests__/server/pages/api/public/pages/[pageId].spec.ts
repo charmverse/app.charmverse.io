@@ -1,7 +1,7 @@
-import type { Page, Space, User } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { Page, Space, User } from '@charmverse/core/dist/prisma';
 import request from 'supertest';
 
-import { prisma } from 'db';
 import { upsertPermission } from 'lib/permissions/pages';
 import { baseUrl } from 'testing/mockApiCall';
 import { createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';

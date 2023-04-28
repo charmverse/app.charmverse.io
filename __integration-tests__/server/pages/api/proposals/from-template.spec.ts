@@ -1,7 +1,7 @@
-import type { Page, Role, Space, User } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { Page, Role, Space, User } from '@charmverse/core/dist/prisma';
 import request from 'supertest';
 
-import { prisma } from 'db';
 import { upsertProposalCategoryPermission } from 'lib/permissions/proposals/upsertProposalCategoryPermission';
 import { addSpaceOperations } from 'lib/permissions/spaces';
 import { createProposalTemplate } from 'lib/templates/proposals/createProposalTemplate';

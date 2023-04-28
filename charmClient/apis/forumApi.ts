@@ -1,4 +1,5 @@
-import type { Post, PostCategory, PostComment, Space } from '@prisma/client';
+import type { PostCategoryWithPermissions } from '@charmverse/core';
+import type { Post, PostCategory, PostComment, Space } from '@charmverse/core/dist/prisma';
 
 import * as http from 'adapters/http';
 import type { CreatePostCategoryInput } from 'lib/forums/categories/createPostCategory';
@@ -15,7 +16,6 @@ import type { ListForumPostsRequest, PaginatedPostList } from 'lib/forums/posts/
 import type { SearchForumPostsRequest } from 'lib/forums/posts/searchForumPosts';
 import type { UpdateForumPostInput } from 'lib/forums/posts/updateForumPost';
 import type { PageMeta } from 'lib/pages';
-import type { PostCategoryWithPermissions } from 'lib/permissions/forum/interfaces';
 
 export class ForumApi {
   createForumPost(payload: Omit<CreateForumPostInput, 'createdBy'>) {

@@ -1,6 +1,6 @@
+import type { ProposalStatus } from '@charmverse/core/dist/prisma';
 import AddIcon from '@mui/icons-material/Add';
 import { Box, Chip, MenuItem, Select, TextField } from '@mui/material';
-import type { ProposalStatus } from '@prisma/client';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useState } from 'react';
 

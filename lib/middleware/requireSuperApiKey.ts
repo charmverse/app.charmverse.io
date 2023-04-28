@@ -1,10 +1,10 @@
 import crypto from 'node:crypto';
 
-import type { SuperApiToken } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { SuperApiToken } from '@charmverse/core/dist/prisma';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import type { NextHandler } from 'next-connect';
 
-import { prisma } from 'db';
 import { InvalidApiKeyError } from 'lib/middleware/errors';
 import './requireApiKey'; // import types on http
 

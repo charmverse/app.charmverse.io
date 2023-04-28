@@ -1,7 +1,7 @@
-import type { SuperApiToken } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { SuperApiToken } from '@charmverse/core/dist/prisma';
 
 import { baseUrl } from 'config/constants';
-import { prisma } from 'db';
 import { upsertSpaceRolesFromDiscord } from 'lib/discord/upsertSpaceRolesFromDiscord';
 import { upsertUserForDiscordId } from 'lib/discord/upsertUserForDiscordId';
 import { upsertUserRolesFromDiscord } from 'lib/discord/upsertUserRolesFromDiscord';

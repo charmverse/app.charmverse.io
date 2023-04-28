@@ -1,9 +1,9 @@
-import type { Page, Prisma } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { Page, Prisma } from '@charmverse/core/dist/prisma';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import { validate } from 'uuid';
 
-import { prisma } from 'db';
 import log from 'lib/log';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { updateTrackPageProfile } from 'lib/metrics/mixpanel/updateTrackPageProfile';
@@ -11,7 +11,6 @@ import { ActionNotPermittedError, NotFoundError, onError, onNoMatch, requireKeys
 import type { PageWithContent, ModifyChildPagesResponse } from 'lib/pages';
 import { modifyChildPages } from 'lib/pages/modifyChildPages';
 import { resolvePageTree } from 'lib/pages/server';
-import { getPage } from 'lib/pages/server/getPage';
 import { updatePage } from 'lib/pages/server/updatePage';
 import { computeUserPagePermissions, setupPermissionsAfterPageRepositioned } from 'lib/permissions/pages';
 import { withSessionRoute } from 'lib/session/withSession';

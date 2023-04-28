@@ -1,4 +1,4 @@
-import type { SpacePermissionConfigurationMode } from '@prisma/client';
+import type { SpacePermissionConfigurationMode } from '@charmverse/core/dist/prisma';
 
 import type { SpaceConfigurationPreset, SpacePermissionTemplate } from './interfaces';
 

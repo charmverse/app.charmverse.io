@@ -1,4 +1,4 @@
-import type { User } from '@prisma/client';
+import type { User } from '@charmverse/core/dist/prisma';
 
 export type TaskUser = Pick<User, 'id' | 'username' | 'path' | 'avatar' | 'avatarTokenId'>;
 

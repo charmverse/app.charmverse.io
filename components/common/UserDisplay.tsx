@@ -1,6 +1,6 @@
+import type { User } from '@charmverse/core/dist/prisma';
 import type { BoxProps } from '@mui/material';
 import { Box, Typography } from '@mui/material';
-import type { User } from '@prisma/client';
 import type { ReactNode } from 'react';
 import { memo } from 'react';
 

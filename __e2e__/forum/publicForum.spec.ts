@@ -1,8 +1,8 @@
+import { prisma } from '@charmverse/core';
+import type { Post, PostCategory, PostComment, Space } from '@charmverse/core/dist/prisma';
 import { expect, test as base } from '@playwright/test';
-import type { Post, PostCategory, PostComment, Space } from '@prisma/client';
 import { ForumPostPage } from '__e2e__/po/forumPost.po';
 
-import { prisma } from 'db';
 import { upsertPostCategoryPermission } from 'lib/permissions/forum/upsertPostCategoryPermission';
 import { generateForumPost, generatePostCategory } from 'testing/utils/forums';
 

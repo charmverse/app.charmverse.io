@@ -1,4 +1,5 @@
-import { prisma } from 'db';
+import { prisma } from '@charmverse/core';
+
 import { countBlocks } from 'lib/prosemirror/countBlocks';
 
 // a function that queries the database for the number of blocks, proposals, pages, and bounties in a space

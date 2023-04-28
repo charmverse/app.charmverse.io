@@ -1,5 +1,5 @@
 import { getUserNFTs} from 'lib/profile/getUserNFTs';
-import { prisma } from 'db';
+import { prisma } from '@charmverse/core';
 import { uniq } from 'lodash'
 
 async function init () {

@@ -1,4 +1,4 @@
-import { VoteStatus } from '@prisma/client';
+import { VoteStatus } from '@charmverse/core/dist/prisma';
 
 import { DuplicateDataError } from 'lib/utilities/errors';
 import { createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';

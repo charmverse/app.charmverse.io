@@ -1,6 +1,5 @@
-import type { PostCategory } from '@prisma/client';
-
-import { prisma } from 'db';
+import { prisma } from '@charmverse/core';
+import type { PostCategory } from '@charmverse/core/dist/prisma';
 
 import { getPostCategoryPath } from './getPostCategoryPath';
 

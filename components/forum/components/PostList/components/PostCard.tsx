@@ -1,3 +1,4 @@
+import type { PostCategory } from '@charmverse/core/dist/prisma';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import ModeCommentOutlinedIcon from '@mui/icons-material/ModeCommentOutlined';
 import { Stack } from '@mui/material';
@@ -6,7 +7,6 @@ import Card from '@mui/material/Card';
 import CardActionArea from '@mui/material/CardActionArea';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
-import type { PostCategory } from '@prisma/client';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 

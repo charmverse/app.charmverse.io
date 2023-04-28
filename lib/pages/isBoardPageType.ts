@@ -1,4 +1,4 @@
-import type { PageType } from '@prisma/client';
+import type { PageType } from '@charmverse/core/dist/prisma';
 
 export const boardPageTypes: PageType[] = ['board', 'inline_board', 'linked_board', 'inline_linked_board'];
 

@@ -1,8 +1,8 @@
-import type { ApiPageKey, ApiPageKeyType } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { ApiPageKey, ApiPageKeyType } from '@charmverse/core/dist/prisma';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { prisma } from 'db';
 import { NotFoundError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { computeUserPagePermissions } from 'lib/permissions/pages';
 import { withSessionRoute } from 'lib/session/withSession';
