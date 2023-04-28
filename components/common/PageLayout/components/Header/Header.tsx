@@ -49,6 +49,7 @@ import DatabasePageOptions from './components/DatabasePageOptions';
 import { DocumentHistory } from './components/DocumentHistory';
 import { DocumentParticipants } from './components/DocumentParticipants';
 import EditingModeToggle from './components/EditingModeToggle';
+import { ExportToPDFMarkdown } from './components/ExportToPDFMenuItem';
 import { NotificationButton } from './components/NotificationPreview/NotificationButton';
 import PageTitleWithBreadcrumbs from './components/PageTitleWithBreadcrumbs';
 import ShareButton from './components/ShareButton';
@@ -156,7 +157,6 @@ export function ExportMarkdownMenuItem({ disabled = false, onClick }: { disabled
     </Tooltip>
   );
 }
-
 function PostHeader({
   setPageMenuOpen,
   undoEditorChanges,
@@ -535,6 +535,7 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
         />
       )}
       <ExportMarkdownMenuItem disabled={!isExportablePage} onClick={exportMarkdownPage} />
+      <ExportToPDFMarkdown pdfTitle={basePage?.title} />
       {pageType === 'bounty' && basePageBounty && (
         <>
           <Divider />
