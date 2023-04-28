@@ -46,6 +46,7 @@ type MenuProps = {
   nestedPagePluginKey?: PluginKey<any>;
   disableNestedPage?: boolean;
   palettePluginKey?: PluginKey;
+  pageId?: string;
 };
 
 export default function FloatingMenuComponent(props: MenuProps) {
@@ -62,7 +63,8 @@ function MenuByType(props: MenuProps) {
     pagePermissions,
     enableComments,
     nestedPagePluginKey,
-    disableNestedPage
+    disableNestedPage,
+    pageId
   } = props;
   const { type } = usePluginState(props.pluginKey) as { type: SubMenu };
 
@@ -105,6 +107,7 @@ function MenuByType(props: MenuProps) {
               filterItem={(item) => !!item.showInFloatingMenu}
               isFloatingMenuList={true}
               handleActiveItem={handleActiveItem}
+              pageId={props.pageId}
             />
           </MenuGroup>
         )}
@@ -148,7 +151,7 @@ function MenuByType(props: MenuProps) {
   if (type === 'inlineCommentSubMenu' && !inline) {
     return (
       <Menu type={type} noScroll>
-        <InlineCommentSubMenu pluginKey={pluginKey} />
+        <InlineCommentSubMenu pageId={pageId} pluginKey={pluginKey} />
       </Menu>
     );
   }

@@ -16,7 +16,6 @@ import charmClient from 'charmClient';
 import PagesList from 'components/common/CharmEditor/components/PageList';
 import ConfirmApiPageKeyModal from 'components/common/Modal/ConfirmApiPageKeyModal';
 import { webhookBaseUrl } from 'config/constants';
-import { useCurrentPage } from 'hooks/useCurrentPage';
 import { usePages } from 'hooks/usePages';
 import type { BoardView, BoardViewFields, ViewSourceType } from 'lib/focalboard/boardView';
 import { isTruthy } from 'lib/utilities/types';
@@ -38,7 +37,7 @@ type ViewSourceOptionsProps = DatabaseSourceProps & {
   goBack?: () => void;
   title?: string;
   view?: BoardView;
-  boardId?: string;
+  pageId?: string;
 };
 
 const SidebarContent = styled.div`
@@ -50,7 +49,6 @@ const SidebarContent = styled.div`
 export function ViewSourceOptions(props: ViewSourceOptionsProps) {
   const activeView = props.view;
   const activeSourceType = activeView?.fields.sourceType;
-  const { currentPageId } = useCurrentPage();
 
   const [sourceType, setSourceType] = useState<ViewSourceType | undefined>();
   const [formStep, setStep] = useState<FormStep>('select_source');
@@ -68,9 +66,8 @@ export function ViewSourceOptions(props: ViewSourceOptionsProps) {
   const typeformPopup = usePopupState({ variant: 'popover', popupId: 'typeformPopup' });
 
   const handleApiKeyClick = async (type: ApiPageKey['type']) => {
-    const boardId = props.boardId || currentPageId;
-    if (boardId) {
-      await createWebhookApiKey({ pageId: boardId, type });
+    if (props.pageId) {
+      await createWebhookApiKey({ pageId: props.pageId, type });
       typeformPopup.open();
     }
   };

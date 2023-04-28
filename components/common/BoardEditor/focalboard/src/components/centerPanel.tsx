@@ -111,7 +111,7 @@ function CenterPanel(props: Props) {
 
   const router = useRouter();
   const space = useCurrentSpace();
-  const { pages, updatePage } = usePages();
+  const { pages, refreshPage, updatePage } = usePages();
   const { members } = useMembers();
   const { showMessage } = useSnackbar();
   const { user } = useUser();
@@ -149,7 +149,7 @@ function CenterPanel(props: Props) {
   } else if (activeView?.fields.sourceType === 'google_form') {
     activeBoardId = activeView?.fields.sourceData?.boardId;
   }
-  const { keys } = useApiPageKeys(activeBoardId);
+  const { keys } = useApiPageKeys(props.page?.id);
   const activeBoard = useAppSelector(getBoard(activeBoardId ?? ''));
   const activePage = pages[activeBoardId ?? ''];
   const _groupByProperty = activeBoard?.fields.cardProperties.find((o) => o.id === activeView?.fields.groupById);
@@ -281,17 +281,7 @@ function CenterPanel(props: Props) {
         'add card',
         async (block: Block) => {
           if (space) {
-            await mutate(
-              `pages/${space.id}`,
-              async (_pages: Record<string, Page> | undefined): Promise<Record<string, Page>> => {
-                const newPage = await charmClient.pages.getPage(block.id);
-
-                return { ..._pages, [newPage.id]: newPage };
-              },
-              {
-                revalidate: false
-              }
-            );
+            await refreshPage(block.id);
           }
 
           if (isTemplate) {
@@ -635,7 +625,7 @@ function CenterPanel(props: Props) {
                   // if it links to deleted db page then the board can't be inline_board type
                   onCreate={views.length === 0 && !linksToDeletedDatabasePages ? createDatabase : undefined}
                   onCsvImport={onCsvImport}
-                  boardId={activeBoardId}
+                  pageId={props.page?.id}
                 />
               )}
               {activeBoard && activeView?.fields.viewType === 'board' && (
@@ -699,6 +689,7 @@ function CenterPanel(props: Props) {
             {activeView && (
               <ViewSidebar
                 board={activeBoard}
+                pageId={activePage?.id}
                 parentBoard={board}
                 view={activeView}
                 isOpen={state.showSettings === 'view-options'}
