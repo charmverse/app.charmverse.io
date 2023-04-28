@@ -190,6 +190,7 @@ function MemberDirectoryGalleryCard({ member }: { member: Member }) {
               return memberProperty ? (
                 <SelectPreview
                   size='small'
+                  wrapColumn
                   options={property.options as SelectOptionType[]}
                   value={memberProperty.value as string | string[]}
                   name={property.name}
