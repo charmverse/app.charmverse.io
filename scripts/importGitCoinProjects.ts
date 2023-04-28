@@ -229,4 +229,4 @@ function exportDataToCSV(data: ProjectData[]) {
 // getImportedProjcetIds()
 // getProjectCount();
 
-importGitCoinProjects();
+// importGitCoinProjects();
