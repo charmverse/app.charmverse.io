@@ -20,7 +20,13 @@ jobs:
         shell: bash
         run: echo -e "Debug" && pwd && ls -a
 
-      ##### Permissions API
+      - name: Install dependencies
+        uses: ./.github/actions/install
+
+      - name: Build app
+        uses: ./.github/actions/build
+        with:
+          NEXT_PUBLIC_APP_ENV: 'test'
 
       - name: Provision API key
         run: eval `ssh-agent -s` && ssh-add - <<< '${{ secrets.PERMISSIONS_API_SSH_KEY }}';
@@ -29,15 +35,6 @@ jobs:
         uses: ./.github/actions/build_permissions_api
         with:
           GITHUB_SSH_KEY: ${{ secrets.PERMISSIONS_API_SSH_KEY }}
-
-      ##### Permissions API
-      - name: Install dependencies
-        uses: ./.github/actions/install
-
-      - name: Build app
-        uses: ./.github/actions/build
-        with:
-          NEXT_PUBLIC_APP_ENV: 'test'
 
   test:
     name: Tests
