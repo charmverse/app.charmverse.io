@@ -280,6 +280,7 @@ model Space {
   webhookSubscriptionUrl      String?
   webhookSubscriptions        WebhookSubscription[]
   webhookSigningSecret        String?
+  origin                      String?
 
   hiddenFeatures Feature[]
 
