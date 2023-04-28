@@ -1,4 +1,4 @@
-import EditorPage from 'components/[pageId]/EditorPage/EditorPage';
+import { EditorPage } from 'components/[pageId]/EditorPage/EditorPage';
 import { SharedPage } from 'components/[pageId]/SharedPage/SharedPage';
 import getPageLayout from 'components/common/PageLayout/getLayout';
 import { useIsSpaceMember } from 'hooks/useIsSpaceMember';

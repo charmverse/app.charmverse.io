@@ -4,15 +4,13 @@ import type { Page } from '@charmverse/core/dist/prisma';
 import { useRouter } from 'next/router';
 import { useCallback } from 'react';
 
-import { useCurrentPage } from 'hooks/useCurrentPage';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useUser } from 'hooks/useUser';
 import { addPage } from 'lib/pages';
 
-export default function useNestedPage() {
+export default function useNestedPage(currentPageId?: string) {
   const space = useCurrentSpace();
   const { user } = useUser();
-  const { currentPageId } = useCurrentPage();
   const view = useEditorViewContext();
   const router = useRouter();
   const cardId = new URLSearchParams(window.location.search).get('cardId');

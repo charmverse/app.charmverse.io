@@ -2,13 +2,12 @@ import type { Page } from '@charmverse/core/dist/prisma';
 import { useRouter } from 'next/router';
 import type { Dispatch, ReactNode, SetStateAction } from 'react';
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef } from 'react';
-import type { KeyedMutator } from 'swr';
-import useSWR, { mutate } from 'swr';
+import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
 import type { Block } from 'lib/focalboard/block';
-import type { PageMeta, PagesMap, PageUpdates } from 'lib/pages';
+import type { PageMeta, PagesMap, PageUpdates } from 'lib/pages/interfaces';
 import { untitledPage } from 'lib/pages/untitledPage';
 import type { WebSocketPayload } from 'lib/websockets/interfaces';
 
@@ -18,19 +17,17 @@ import { useWebSocketClient } from './useWebSocketClient';
 
 export type LinkedPage = Page & { children: LinkedPage[]; parent: null | LinkedPage };
 
-export type PageUpdater = (updates: PageUpdates, revalidate?: boolean) => Promise<PageMeta>;
-
 export type PagesContext = {
   loadingPages: boolean;
   pages: PagesMap;
   setPages: Dispatch<SetStateAction<PagesMap>>;
   refreshPage: (pageId: string) => Promise<PageMeta>;
   getPageByPath: (pageId: string) => PageMeta | undefined;
-  updatePage: PageUpdater;
-  mutatePage: (updates: PageUpdates, revalidate?: boolean) => void;
+  updatePage: (updates: PageUpdates, revalidate?: boolean) => Promise<void>;
+  mutatePage: (updates: PageUpdates, revalidate?: boolean) => Promise<any>;
   mutatePagesRemove: (pageIds: string[], revalidate?: boolean) => void;
   deletePage: (data: { pageId: string; board?: Block }) => Promise<PageMeta | null | undefined>;
-  mutatePagesList: KeyedMutator<PagesMap<PageMeta>>;
+  mutatePagesList: (data: PagesMap<PageMeta>) => Promise<any>;
 };
 
 const refreshInterval = 1000 * 30 * 60; // 30 minutes - this is just a fallback in case the websocket fails
@@ -41,11 +38,11 @@ export const PagesContext = createContext<Readonly<PagesContext>>({
   setPages: () => undefined,
   getPageByPath: () => undefined,
   refreshPage: () => Promise.resolve({} as any),
-  updatePage: () => Promise.resolve({} as any),
-  mutatePage: () => {},
-  mutatePagesRemove: () => {},
-  deletePage: () => Promise.resolve({} as any),
-  mutatePagesList: () => Promise.resolve({} as any)
+  updatePage: () => Promise.resolve(),
+  mutatePage: () => Promise.resolve(),
+  mutatePagesRemove: () => null,
+  deletePage: () => Promise.resolve(undefined),
+  mutatePagesList: () => Promise.resolve()
 });
 
 export function PagesProvider({ children }: { children: ReactNode }) {
@@ -143,18 +140,19 @@ export function PagesProvider({ children }: { children: ReactNode }) {
 
   const mutatePage = useCallback(
     (page: PageUpdates, revalidate = false) => {
-      mutatePagesList(
+      return mutatePagesList(
         (pagesData) => {
-          const currentPageData = pagesData?.[page.id];
           if (pagesData) {
+            const currentPageData = pagesData[page.id];
             const updatedData: PageMeta = currentPageData ? { ...currentPageData, ...page } : (page as PageMeta);
             return { ...pagesData, [page.id]: updatedData };
           }
+          return { [page.id]: page as PageMeta };
         },
         { revalidate }
       );
     },
-    [mutate]
+    [mutatePagesList]
   );
 
   const mutatePagesRemove = useCallback(
@@ -170,7 +168,7 @@ export function PagesProvider({ children }: { children: ReactNode }) {
         { revalidate }
       );
     },
-    [mutate]
+    [mutatePagesList]
   );
 
   const updatePage = useCallback((updates: PageUpdates) => {

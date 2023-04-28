@@ -55,7 +55,7 @@ import * as heading from './components/heading';
 import * as horizontalRule from './components/horizontalRule';
 import * as iframe from './components/iframe';
 import InlineCommentThread, * as inlineComment from './components/inlineComment';
-import InlineDatabase from './components/inlineDatabase/components/InlineDatabase';
+import { InlineDatabase } from './components/inlineDatabase/components/InlineDatabase';
 import InlineCommandPalette from './components/inlinePalette/components/InlineCommandPalette';
 import { plugins as inlinePalettePlugins } from './components/inlinePalette/inlinePalette';
 import * as inlineVote from './components/inlineVote';
@@ -401,7 +401,6 @@ function CharmEditor({
   pageActionDisplay = null,
   content = defaultContent,
   children,
-  autoFocus,
   insideModal,
   onContentChange,
   style,
@@ -523,11 +522,12 @@ function CharmEditor({
   const state = useEditorState({
     specRegistry,
     plugins: getPlugins(),
-    initialValue: content ? Node.fromJSON(specRegistry.schema, content) : '',
+    initialValue: isContentControlled && content ? Node.fromJSON(specRegistry.schema, content) : undefined,
     dropCursorOpts: {
       color: 'var(--charmeditor-active)'
     }
   });
+
   useEffect(() => {
     if (editorRef.current) {
       const highlightedMentionId = router.query.mentionId;
@@ -561,6 +561,7 @@ function CharmEditor({
       disablePageSpecificFeatures={disablePageSpecificFeatures}
       disableRowHandles={disableRowHandles}
       isContentControlled={isContentControlled}
+      initialContent={content}
       enableSuggestions={enableSuggestingMode}
       onParticipantUpdate={onParticipantUpdate}
       trackChanges
@@ -581,6 +582,7 @@ function CharmEditor({
         const allProps: CharmNodeViewProps = {
           ...props,
           pageId,
+          pagePermissions,
           postId,
           readOnly,
           deleteNode: () => {
@@ -691,6 +693,7 @@ function CharmEditor({
         pagePermissions={pagePermissions}
         nestedPagePluginKey={nestedPagePluginKey}
         disableNestedPage={disableNestedPage}
+        pageId={pageId}
       />
       <MentionSuggest pluginKey={mentionPluginKey} />
       <NestedPagesList pluginKey={nestedPagePluginKey} />
@@ -701,6 +704,7 @@ function CharmEditor({
         disableNestedPage={disableNestedPage}
         palettePluginKey={inlinePalettePluginKey}
         enableVoting={enableVoting}
+        pageId={pageId}
       />
       {children}
       {!disablePageSpecificFeatures && (
@@ -718,9 +722,9 @@ function CharmEditor({
                 state={suggestionState}
               />
             )}
-            {pageActionDisplay === 'comments' && <CommentsSidebar />}
+            {pageActionDisplay === 'comments' && <CommentsSidebar permissions={pagePermissions} />}
           </SidebarDrawer>
-          <InlineCommentThread pluginKey={inlineCommentPluginKey} />
+          <InlineCommentThread permissions={pagePermissions} pluginKey={inlineCommentPluginKey} />
           {currentSpace && pageId && (
             <SuggestionsPopup
               insideModal={insideModal}
