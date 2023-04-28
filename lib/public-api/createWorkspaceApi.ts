@@ -7,6 +7,7 @@ import { upsertUserForDiscordId } from 'lib/discord/upsertUserForDiscordId';
 import { upsertUserRolesFromDiscord } from 'lib/discord/upsertUserRolesFromDiscord';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { updateTrackGroupProfile } from 'lib/metrics/mixpanel/updateTrackGroupProfile';
+import type { Space } from 'lib/public-api/interfaces';
 import type { SpaceCreateInput } from 'lib/spaces/createSpace';
 import { createWorkspace } from 'lib/spaces/createSpace';
 import { getAvailableDomainName } from 'lib/spaces/getAvailableDomainName';
@@ -99,8 +100,16 @@ export async function createWorkspaceApi({
   });
 
   return {
+    ...mapSpace(space),
+    webhookSigningSecret: space.webhookSigningSecret ?? undefined
+  };
+}
+
+export function mapSpace(space: { createdAt: string | Date; id: string; name: string; domain: string }): Space {
+  return {
     id: space.id,
-    webhookSigningSecret: space.webhookSigningSecret ?? undefined,
+    createdAt: space.createdAt.toString(),
+    name: space.name,
     spaceUrl: `${baseUrl}/${space.domain}`,
     joinUrl: `${baseUrl}/join?domain=${space.domain}`
   };
