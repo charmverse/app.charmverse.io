@@ -395,3 +395,14 @@ Should/when Secrets Manager template variable placeholder becomes supported in E
 
 Normally datadog agent is not deployed in the staging environment. To run datadog agent in staging environment edit
 `.ebextensions/00_env_vars.config` and append `,ddtst` to the `COMPOSE_PROFILES` (Note you'll want to separate the profiles with a comma)
+
+## Running storybook
+Storybook is used to presend base available components to keep consistent design system across the app.
+
+Start storybook locally:
+
+`npm run storybook`
+
+Build sotrybook dist:
+
+`npm run storybook:build`
