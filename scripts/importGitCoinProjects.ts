@@ -202,15 +202,12 @@ function getImportedProjcetIds() {
 
 function getImportedProjcetSpaceIds() {
   const data = getImportedProjectsData();
-  const ids = data.map(cols => {
+
+  return data.map(cols => {
     // col 1 - gitcoin project space id
     const projectId = cols[1] || null;
     return projectId
   }).filter((id): id is string => id !== null);
-
-  console.log('🔥 imported projects space ids', ids);
-
-  return ids;
 }
 
 function exportDataToCSV(data: ProjectData[]) {
