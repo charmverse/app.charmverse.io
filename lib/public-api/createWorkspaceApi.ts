@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core';
-import type { SuperApiToken } from '@charmverse/core/dist/prisma';
+import type { SuperApiToken, Space as PrismaSpace } from '@charmverse/core/dist/prisma';
 
 import { baseUrl } from 'config/constants';
 import { upsertSpaceRolesFromDiscord } from 'lib/discord/upsertSpaceRolesFromDiscord';
@@ -105,10 +105,11 @@ export async function createWorkspaceApi({
   };
 }
 
-export function mapSpace(space: { createdAt: string | Date; id: string; name: string; domain: string }): Space {
+export function mapSpace(space: PrismaSpace): Space {
   return {
     id: space.id,
     createdAt: space.createdAt.toString(),
+    createdBy: space.createdBy,
     name: space.name,
     spaceUrl: `${baseUrl}/${space.domain}`,
     joinUrl: `${baseUrl}/join?domain=${space.domain}`

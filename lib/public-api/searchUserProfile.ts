@@ -44,7 +44,10 @@ export async function searchUserProfile({
   if (wallet) {
     user = await prisma.user.findFirst({
       where: {
-        AND: [{ spaceRoles: { some: { spaceId: { in: spaceIds } } } }, { wallets: { some: { address: wallet } } }]
+        AND: [
+          { spaceRoles: { some: { spaceId: { in: spaceIds } } } },
+          { wallets: { some: { address: wallet.toLowerCase() } } }
+        ]
       },
       include: relationships
     });
