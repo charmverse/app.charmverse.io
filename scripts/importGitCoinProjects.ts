@@ -8,7 +8,7 @@ import { createUserFromWallet } from "lib/users/createUser";
 import { createWorkspace, SpaceCreateInput } from "lib/spaces/createSpace";
 import { updateTrackGroupProfile } from "lib/metrics/mixpanel/updateTrackGroupProfile";
 import { trackUserAction } from "lib/metrics/mixpanel/trackUserAction";
-import { appendFileSync, readFileSync } from 'fs';
+import { appendFileSync, readFileSync, writeFileSync } from 'fs';
 import { getIpfsFileUrl } from "lib/ipfs/fetchFileByHash";
 import { getUserS3FilePath, uploadUrlToS3 } from "lib/aws/uploadToS3Server";
 import { getFilenameWithExtension } from "lib/utilities/getFilenameWithExtension";
@@ -212,6 +212,10 @@ function getImportedProjcetSpaceIds() {
   }).filter((id): id is string => id !== null);
 }
 
+function getCsvHeader() {
+  return ['gitcoin_project_id', 'gitcoin_space_id', 'space_name', 'project_twitter', 'website', 'owners', 'space_url', 'join_url', 'space_image_url', 'banner_url', 'metadata_url', 'created_date'].join(';');
+}
+
 function exportDataToCSV(data: ProjectData[]) {
   let isEmpty = true;
   try {
@@ -227,7 +231,7 @@ function exportDataToCSV(data: ProjectData[]) {
 
     const spaceUrl = `https://app.charmverse.io/${domain}`;
     const joinUrl = `https://app.charmverse.io/join?domain=${domain}`;
-    const createdDate = new Date(createdAt).toLocaleDateString('en-US');
+    const createdDate = new Date(createdAt).toLocaleDateString('en-US') || '??';
 
     const infoRow =  [projectId, id, name, projectTwitter, website, owners.join(','), spaceUrl, joinUrl, spaceImageUrl, bannerUrl, metadataUrl, createdDate].join(';');
     return ('\n').concat(infoRow)
@@ -235,7 +239,7 @@ function exportDataToCSV(data: ProjectData[]) {
 
   // add header if file is empty
   if (isEmpty) {
-    csvData.unshift(['projectId', 'spaceId', 'name', 'twitter', 'website', 'owners', 'spaceUrl', 'joinUrl', 'logoUrl', 'bannerUrl', 'metadataUrl', 'createdDate'].join(';'));
+    csvData.unshift(getCsvHeader());
   }
 
   if (csvData.length) {
@@ -251,10 +255,44 @@ async function updateSpaceOrigins() {
   });
 }
 
+export async function updateCreatedAt() {
+  const data = getImportedProjectsData();
+  let updatedData = [...data];
+
+  for (const [i, row] of data.entries()) {
+    const projectId = Number(row[0]) || null;
+    const createdAt = row[11] || null;
+    if (projectId && !createdAt) {
+      const projectDetails = await getProjectDetails({ chainId: CHAIN_ID, projectId: i, provider });
+      if (!projectDetails) {
+        continue;
+      }
+
+      const { metadata } = projectDetails;
+      const createdDate = new Date(metadata.createdAt).toLocaleDateString('en-US') || '??';
+      updatedData[i][11] = createdDate;
+
+      overrideCsv(updatedData);
+    }
+  }
+}
+
+function overrideCsv(data: string[][]) {
+  const csvData = [getCsvHeader()];
+  data.forEach(row => {
+    csvData.push(row.join(';'));
+  });
+
+  if (csvData.length) {
+    writeFileSync(FILE_PATH, csvData.join('\n'));
+  }
+}
+
 // getImportedProjcetIds()
 // getImportedProjcetSpaceIds()
 // getProjectCount();
 
 // updateSpaceOrigins();
+// updateCreatedAt();
 
-importGitCoinProjects();
+// importGitCoinProjects();
