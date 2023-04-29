@@ -18,7 +18,7 @@ import { getFilenameWithExtension } from "lib/utilities/getFilenameWithExtension
  * It also updates mixpanel profiles so make sure to have prod mixpanel api key set in .env
  */
 
-const START_ID = 600;
+const START_ID = 500;
 const CHAIN_ID = 1;
 
 const provider = new AlchemyProvider(CHAIN_ID, process.env.ALCHEMY_API_KEY);
@@ -55,6 +55,7 @@ async function importGitCoinProjects() {
     }
 
     const projectDetails = await getProjectDetails({ chainId: CHAIN_ID, projectId: i, provider });
+
     if (projectDetails !== null) {
       const name = projectDetails.metadata.title;
       const users = await createSpaceUsers([...projectDetails.owners]);
@@ -80,6 +81,7 @@ async function importGitCoinProjects() {
           name,
           spaceImage,
           updatedBy: botUser.id,
+          origin: 'gitcoin',
         };
 
         const space = await createWorkspace({
@@ -87,7 +89,7 @@ async function importGitCoinProjects() {
           userId: adminUserId,
           extraAdmins: [...extraAdmins, botUser.id],
           createSpaceTemplate: 'gitcoin',
-          skipTracking: true
+          skipTracking: true,
         });
         console.log('🟢 Created space for project', i, space.id);
 
@@ -220,19 +222,20 @@ function exportDataToCSV(data: ProjectData[]) {
 
   const csvData = data.map(({ projectDetails, space, bannerUrl, spaceImageUrl }) => {
     const { metadata, owners, metadataUrl, projectId } = projectDetails;
-    const {  description, website, projectTwitter } = metadata;
+    const {  description, website, projectTwitter, createdAt } = metadata;
     const { name, domain,id } = space;
 
     const spaceUrl = `https://app.charmverse.io/${domain}`;
-    const joinUrl = `https://app.charmverse.io/join?domain=${domain}`
+    const joinUrl = `https://app.charmverse.io/join?domain=${domain}`;
+    const createdDate = new Date(createdAt).toLocaleDateString('en-US');
 
-    const infoRow =  [projectId, id, name, projectTwitter, website, owners.join(','), spaceUrl, joinUrl, spaceImageUrl, bannerUrl, metadataUrl].join(';');
+    const infoRow =  [projectId, id, name, projectTwitter, website, owners.join(','), spaceUrl, joinUrl, spaceImageUrl, bannerUrl, metadataUrl, createdDate].join(';');
     return ('\n').concat(infoRow)
   });
 
   // add header if file is empty
   if (isEmpty) {
-    csvData.unshift(['projectId', 'spaceId', 'name', 'twitter', 'website', 'owners', 'spaceUrl', 'joinUrl', 'logoUrl', 'bannerUrl', 'metadataUrl'].join(';'));
+    csvData.unshift(['projectId', 'spaceId', 'name', 'twitter', 'website', 'owners', 'spaceUrl', 'joinUrl', 'logoUrl', 'bannerUrl', 'metadataUrl', 'createdDate'].join(';'));
   }
 
   if (csvData.length) {
@@ -254,4 +257,4 @@ async function updateSpaceOrigins() {
 
 // updateSpaceOrigins();
 
-// importGitCoinProjects();
+importGitCoinProjects();
