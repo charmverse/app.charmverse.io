@@ -81,7 +81,7 @@ async function importGitCoinProjects() {
           name,
           spaceImage,
           updatedBy: botUser.id,
-          origin: 'gitcoin',
+          origin: 'gitcoin'
         };
 
         const space = await createWorkspace({
@@ -89,7 +89,7 @@ async function importGitCoinProjects() {
           userId: adminUserId,
           extraAdmins: [...extraAdmins, botUser.id],
           createSpaceTemplate: 'gitcoin',
-          skipTracking: true,
+          skipTracking: true
         });
         console.log('🟢 Created space for project', i, space.id);
 
