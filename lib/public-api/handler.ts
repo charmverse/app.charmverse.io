@@ -5,9 +5,18 @@ import log from 'lib/log';
 import { count } from 'lib/metrics';
 import { onError, onNoMatch } from 'lib/middleware';
 import { requireApiKey } from 'lib/middleware/requireApiKey';
+import { requireSuperApiKey } from 'lib/middleware/requireSuperApiKey';
+
+export function defaultHandler() {
+  return nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch }).use(logApiRequest);
+}
 
 export function apiHandler() {
   return nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch }).use(requireApiKey).use(logApiRequest);
+}
+
+export function superApiHandler() {
+  return nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch }).use(requireSuperApiKey).use(logApiRequest);
 }
 
 async function logApiRequest(req: NextApiRequest, res: NextApiResponse, next: VoidFunction) {
