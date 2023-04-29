@@ -16,14 +16,18 @@ export async function searchSpaces({ userWallet: userWalletAddress }: SearchSpac
     include: {
       user: {
         include: {
-          spacesCreated: true
+          spaceRoles: {
+            include: {
+              space: true
+            }
+          }
         }
       }
     }
   });
 
   if (userWallet) {
-    return userWallet.user.spacesCreated.map((space) => mapSpace(space));
+    return userWallet.user.spaceRoles.map(({ space }) => mapSpace(space));
   }
   return [];
 }

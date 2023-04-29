@@ -1,8 +1,10 @@
 import type { SuperApiToken } from '@charmverse/core/dist/prisma';
+import { Wallet } from 'ethers';
 import request from 'supertest';
 import { v4 } from 'uuid';
 
 import { baseUrl } from 'testing/mockApiCall';
+import { generateUserAndSpace } from 'testing/setupDatabase';
 import { generateSuperApiToken } from 'testing/utils/middleware';
 
 let apiToken: SuperApiToken;
@@ -33,10 +35,14 @@ describe('GET /api/v1/spaces', () => {
   });
 
   it('should respond 200 with spaces', async () => {
+    const walletAddress = Wallet.createRandom().address;
+    const data = await generateUserAndSpace({ walletAddress, superApiTokenId: apiToken.id });
     const response = await request(baseUrl)
       .get('/api/v1/spaces/search')
       .set('Authorization', apiToken.token)
-      .send({ userWallet: '0x000000' });
+      .query({ userWallet: walletAddress });
     expect(response.statusCode).toBe(200);
+    expect(response.body.length).toBe(1);
+    expect(response.body[0].id).toBe(data.space.id);
   });
 });

@@ -1,12 +1,12 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { InvalidStateError } from 'lib/middleware';
-import { apiHandler } from 'lib/public-api/handler';
+import { superApiHandler } from 'lib/public-api/handler';
 import type { Space } from 'lib/public-api/interfaces';
 import type { SearchSpacesInput } from 'lib/public-api/searchSpaces';
 import { searchSpaces } from 'lib/public-api/searchSpaces';
 
-export const handler = apiHandler().get(search);
+export const handler = superApiHandler().get(search);
 
 /**
  * @swagger
