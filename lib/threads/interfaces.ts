@@ -1,4 +1,4 @@
-import type { Thread, Comment } from '@prisma/client';
+import type { Thread, Comment } from '@charmverse/core/dist/prisma';
 
 import type { CommentWithUser } from 'lib/comments/interfaces';
 import type { PageContent } from 'lib/prosemirror/interfaces';

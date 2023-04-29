@@ -1,7 +1,7 @@
+import { prisma } from '@charmverse/core';
 import type { DatabaseObjectResponse } from '@notionhq/client/build/src/api-endpoints';
 import { v4 } from 'uuid';
 
-import { prisma } from 'db';
 import { createBoard } from 'lib/focalboard/board';
 import { createBoardView } from 'lib/focalboard/boardView';
 

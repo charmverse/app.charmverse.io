@@ -1,10 +1,10 @@
+import { Feature } from '@charmverse/core/dist/prisma';
 import { yupResolver } from '@hookform/resolvers/yup';
 import Box from '@mui/material/Box';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Stack from '@mui/material/Stack';
 import Switch from '@mui/material/Switch';
 import Typography from '@mui/material/Typography';
-import { Feature } from '@prisma/client';
 import { useForm } from 'react-hook-form';
 import type { BooleanSchema } from 'yup';
 import * as yup from 'yup';

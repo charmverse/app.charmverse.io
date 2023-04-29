@@ -1,12 +1,18 @@
-import type { Space, SpaceRole } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { Space, SpaceRole } from '@charmverse/core/dist/prisma';
 import { Wallet } from 'ethers';
 import fetchMock from 'fetch-mock-jest';
 
-import { prisma } from 'db';
 import { DEEPDAO_BASE_URL } from 'lib/deepdao/client';
 import { getAggregatedData } from 'lib/profile';
 import type { LoggedInUser } from 'models';
 import { generateBountyWithSingleApplication, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+
+const mockSandbox = fetchMock.sandbox();
+
+jest.mock('undici', () => {
+  return { fetch: (...args: any[]) => mockSandbox(...args) };
+});
 
 let user: LoggedInUser;
 let space: Space & { spaceRoles: SpaceRole[] };
@@ -63,7 +69,7 @@ describe('GET /api/public/profile/[userPath]', () => {
       createdAt: new Date().toString()
     };
 
-    fetchMock
+    mockSandbox
       .get(`${DEEPDAO_BASE_URL}/v0.1/people/profile/${walletAddresses[0]}`, {
         data: {
           totalProposals: 1,
@@ -91,7 +97,7 @@ describe('GET /api/public/profile/[userPath]', () => {
 
     const aggregatedData = await getAggregatedData(user.id, 'dummy_key');
 
-    expect(fetchMock).toBeDone();
+    expect(mockSandbox).toBeDone();
 
     expect(aggregatedData).toStrictEqual({
       bounties: 1,

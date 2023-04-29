@@ -1,3 +1,4 @@
+import type { TokenGate } from '@charmverse/core/dist/prisma';
 import styled from '@emotion/styled';
 import DeleteOutlinedIcon from '@mui/icons-material/Close';
 import { TableHead } from '@mui/material';
@@ -8,7 +9,6 @@ import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
-import type { TokenGate } from '@prisma/client';
 import { humanizeAccessControlConditions } from 'lit-js-sdk';
 import { useContext, useEffect, useState } from 'react';
 import CopyToClipboard from 'react-copy-to-clipboard';

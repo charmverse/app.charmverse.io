@@ -1,10 +1,10 @@
+import type { PaymentMethod } from '@charmverse/core/dist/prisma';
 import { yupResolver } from '@hookform/resolvers/yup';
 import Alert from '@mui/material/Alert';
 import Progress from '@mui/material/CircularProgress';
 import Grid from '@mui/material/Grid';
 import InputLabel from '@mui/material/InputLabel';
 import TextField from '@mui/material/TextField';
-import type { PaymentMethod } from '@prisma/client';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';

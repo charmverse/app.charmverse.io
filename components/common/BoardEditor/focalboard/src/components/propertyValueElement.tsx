@@ -91,11 +91,10 @@ function PropertyValueElement(props: Props) {
   };
 
   let propertyValueElement: ReactNode = null;
-
   if (propertyTemplate.type === 'select' || propertyTemplate.type === 'multiSelect') {
     propertyValueElement = (
       <SelectProperty
-        wrapColumn={displayType === 'details' ? true : props.wrapColumn ?? false}
+        wrapColumn={displayType !== 'table' ? true : props.wrapColumn ?? false}
         multiselect={propertyTemplate.type === 'multiSelect'}
         readOnly={readOnly || !board}
         propertyValue={propertyValue as string}
@@ -124,7 +123,7 @@ function PropertyValueElement(props: Props) {
         onChange={(newValue) => {
           mutator.changePropertyValue(card, propertyTemplate.id, newValue);
         }}
-        wrapColumn={displayType === 'details' ? true : props.wrapColumn ?? false}
+        wrapColumn={displayType !== 'table' ? true : props.wrapColumn ?? false}
         showEmptyPlaceholder={displayType === 'details'}
       />
     );
@@ -194,7 +193,7 @@ function PropertyValueElement(props: Props) {
 
   const hasValue = !!value && (typeof value === 'string' || Array.isArray(value) ? value.length !== 0 : value);
 
-  if (!hasValue && props.readOnly && displayType !== 'details' && !propertyValueElement) {
+  if (!hasValue && props.readOnly && displayType !== 'details') {
     return null;
   }
 

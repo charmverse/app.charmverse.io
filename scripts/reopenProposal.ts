@@ -1,4 +1,4 @@
-import { prisma } from 'db';
+import { prisma } from '@charmverse/core';
 import { strict as assert } from 'node:assert';
 
 /**

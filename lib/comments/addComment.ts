@@ -1,6 +1,6 @@
-import type { Comment } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { Comment } from '@charmverse/core/dist/prisma';
 
-import { prisma } from 'db';
 import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
 
 import type { CommentCreate } from './interfaces';

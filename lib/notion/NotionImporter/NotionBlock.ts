@@ -167,7 +167,9 @@ export class NotionBlock {
         }
       } catch (err) {
         if (block) {
-          log.error(`[notion] Failed to convert notion ${block.type}:${block.id} block to charmverse block`);
+          log.warn(`[notion] Failed to convert notion ${block.type}:${block.id} block to charmverse block`, {
+            spaceId: this.notionPage.spaceId
+          });
           const notionPage = this.notionPage.cache.notionPagesRecord[
             this.charmversePage.notionPageId
           ] as PageObjectResponse;

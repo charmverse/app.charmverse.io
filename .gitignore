@@ -3,6 +3,8 @@
 /node_modules
 jspm_packages
 
+/prisma
+
 # Serverless directories
 .serverless
 .build
@@ -11,6 +13,9 @@ jspm_packages
 /.next/
 /out/
 /dist/
+
+# Tests
+/__e2e-dist__/
 
 # production
 *.zip

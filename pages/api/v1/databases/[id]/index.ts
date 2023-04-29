@@ -1,9 +1,9 @@
-import type { Block } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { Block } from '@charmverse/core/dist/prisma';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import { validate } from 'uuid';
 
-import { prisma } from 'db';
 import { onError, onNoMatch, requireApiKey } from 'lib/middleware';
 import type { DatabasePage } from 'lib/public-api';
 import { DatabasePageNotFoundError } from 'lib/public-api';

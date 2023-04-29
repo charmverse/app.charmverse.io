@@ -1,7 +1,7 @@
-import type { BountyStatus, Prisma } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { BountyStatus, Prisma } from '@charmverse/core/dist/prisma';
 import { v4 } from 'uuid';
 
-import { prisma } from 'db';
 import { getBountyPagePermissionSet } from 'lib/bounties/shared';
 import { NotFoundError } from 'lib/middleware';
 import { getPagePath } from 'lib/pages/utils';

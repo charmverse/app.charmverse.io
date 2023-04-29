@@ -1,4 +1,4 @@
-import type { MemberProperty, Role, Space } from '@prisma/client';
+import type { MemberProperty, Role, Space } from '@charmverse/core/dist/prisma';
 import request from 'supertest';
 
 import { createMemberPropertyPermission } from 'lib/members/createMemberPropertyPermission';

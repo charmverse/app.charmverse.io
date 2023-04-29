@@ -11,7 +11,6 @@ import { mutate } from 'swr';
 import charmClient from 'charmClient';
 import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
-import { useCurrentPage } from 'hooks/useCurrentPage';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import log from 'lib/log';
@@ -33,9 +32,7 @@ const menuPosition: Partial<MenuProps> = {
 function Component({ menuState }: { menuState: PluginState }) {
   const popupState = usePopupState({ variant: 'popover', popupId: 'user-role' });
   const view = useEditorViewContext();
-  const { currentPageId } = useCurrentPage();
   const { deletePage, pages } = usePages();
-  const currentPage = pages[currentPageId];
   const currentSpace = useCurrentSpace();
   const boards = useAppSelector(getSortedBoards);
 
@@ -109,7 +106,7 @@ function Component({ menuState }: { menuState: PluginState }) {
   async function duplicateRow() {
     const node = _getNode();
     const tr = view.state.tr;
-    if (node?.node.type.name === 'page' && currentPage) {
+    if (node?.node.type.name === 'page') {
       if (currentSpace && node?.node.attrs.id) {
         const { rootPageId } = await charmClient.pages.duplicatePage({
           pageId: node?.node.attrs.id

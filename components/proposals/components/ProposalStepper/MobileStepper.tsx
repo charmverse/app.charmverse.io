@@ -1,5 +1,5 @@
+import type { ProposalStatus } from '@charmverse/core/dist/prisma';
 import { Box, MenuItem, Select, Stack, Typography } from '@mui/material';
-import type { ProposalStatus } from '@prisma/client';
 
 import Button from 'components/common/BoardEditor/focalboard/src/widgets/buttons/button';
 import {

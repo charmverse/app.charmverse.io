@@ -1,4 +1,4 @@
-import type { PaymentMethod } from '@prisma/client';
+import type { PaymentMethod } from '@charmverse/core/dist/prisma';
 import type { CryptoCurrency, IChainDetails } from 'connectors';
 import { TokenLogoPaths, CryptoCurrencyList, getChainById } from 'connectors';
 

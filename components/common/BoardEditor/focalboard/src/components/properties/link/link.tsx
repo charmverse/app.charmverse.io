@@ -8,7 +8,7 @@ import { TextInput } from '../../../widgets/TextInput';
 type Props = {
   value: string;
   readOnly?: boolean;
-  placeholder?: string;
+  placeholderText?: string;
   multiline?: boolean;
   onChange: (value: string) => void;
   onSave: () => void;
@@ -35,7 +35,7 @@ function URLProperty(props: Props): JSX.Element {
 
   const commonProps = {
     className: 'octo-propertyvalue',
-    placeholderText: props.placeholder,
+    placeholderText: props.placeholderText,
     readOnly: props.readOnly,
     value: props.value,
     autoExpand: false,

@@ -1,4 +1,5 @@
-import { prisma } from 'db';
+import { prisma } from '@charmverse/core';
+
 import { isUUID } from 'lib/utilities/strings';
 
 export async function getDatabaseDetails({ idOrPath, spaceId }: { idOrPath: string; spaceId?: string }) {

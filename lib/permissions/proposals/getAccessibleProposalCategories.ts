@@ -1,4 +1,5 @@
-import { prisma } from 'db';
+import { prisma } from '@charmverse/core';
+
 import { generateCategoryIdQuery } from 'lib/proposal/utils';
 import { InvalidInputError } from 'lib/utilities/errors';
 

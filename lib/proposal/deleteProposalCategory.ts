@@ -1,4 +1,5 @@
-import { prisma } from 'db';
+import { prisma } from '@charmverse/core';
+
 import { UndesirableOperationError } from 'lib/utilities/errors';
 
 export async function deleteProposalCategory(id: string) {

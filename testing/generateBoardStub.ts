@@ -1,4 +1,4 @@
-import type { Block, Page, PageType, Prisma } from '@prisma/client';
+import type { Block, Page, PageType, Prisma } from '@charmverse/core/dist/prisma';
 import { v4 } from 'uuid';
 
 import type { PageWithBlocks } from 'lib/templates/exportWorkspacePages';

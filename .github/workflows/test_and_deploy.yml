@@ -15,17 +15,27 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+
+      - name: Debug
+        shell: bash
+        run: echo -e "Debug" && pwd && ls -a
+
       - name: Install dependencies
         uses: ./.github/actions/install
-
-      - name: Create .env.test.local file
-        run: |
-          cp .env.test.local.example .env.test.local
 
       - name: Build app
         uses: ./.github/actions/build
         with:
           NEXT_PUBLIC_APP_ENV: 'test'
+
+      - name: Build and install API
+        uses: ./.github/actions/build_permissions_api
+        with:
+          GITHUB_SSH_KEY: ${{ secrets.PERMISSIONS_API_SSH_KEY }}
+
+      - name: Provision API key
+        run: eval `ssh-agent -s` && ssh-add - <<< '${{ secrets.PERMISSIONS_API_SSH_KEY }}';
+
 
   test:
     name: Tests
@@ -77,15 +87,15 @@ jobs:
       matrix:
         include:
           - test_name: "Basic tests #1"
-            test_command: "npm run test:ci -- --shard 1/2"
+            test_command: "PORT=3001 npm run start:api:permissions:ci & npm run test:ci -- --shard 1/2"
           - test_name: "Basic tests #2"
-            test_command: "npm run test:ci -- --shard 2/2"
+            test_command: "PORT=3001 npm run start:api:permissions:ci & npm run test:ci -- --shard 2/2"
           - test_name: "Server integration tests"
-            test_command: "npm run start:test:ci & npm run test:server:ci"
+            test_command: "npm run start:test:ci & PORT=3001 npm run start:api:permissions:ci &  npm run test:server:ci"
           - test_name: "Browser tests"
             test_command: "npm run test:browser:ci"
           - test_name: "Browser e2e test"
-            test_command: "npx playwright install chromium chrome --with-deps; npm run start:test:ci & npm run test:e2e:ci"
+            test_command: "npx playwright install chromium chrome --with-deps; npm run start:test:ci & PORT=3001 npm run start:api:permissions:ci & npm run test:e2e:ci"
     steps:
       - uses: actions/checkout@v3
 
@@ -93,12 +103,17 @@ jobs:
         uses: ./.github/actions/install
 
       - name: Setup test database
-        run: bash ./scripts/configure-db.sh
+        run: npx dotenv -e .env.test.local -- npm run prisma:reset
 
       - name: Restore app from cache
         uses: ./.github/actions/build
         with:
           NEXT_PUBLIC_APP_ENV: 'test'
+
+      - name: Restore permissions API from cache
+        uses: ./.github/actions/build_permissions_api
+        with:
+          GITHUB_SSH_KEY: ${{ secrets.PERMISSIONS_API_SSH_KEY }}
 
       - name: Run ${{matrix.test_name}}
         run: ${{matrix.test_command}}
@@ -106,6 +121,7 @@ jobs:
   deploy:
     name: Deploy to production
     runs-on: ubuntu-latest
+    # Re-enable condition before merge
     if: github.ref == 'refs/heads/main'
     needs: [test, integration-test]
     steps:

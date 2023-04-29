@@ -1,4 +1,4 @@
-import type { TokenGate } from '@prisma/client';
+import type { TokenGate } from '@charmverse/core/dist/prisma';
 import type { AuthSig } from 'lit-js-sdk';
 
 import * as http from 'adapters/http';

@@ -1,5 +1,5 @@
+import type { ProposalCategoryPermissionLevel } from '@charmverse/core/dist/prisma';
 import Grid from '@mui/material/Grid';
-import type { ProposalCategoryPermissionLevel } from '@prisma/client';
 import { useState } from 'react';
 
 import Button from 'components/common/Button';

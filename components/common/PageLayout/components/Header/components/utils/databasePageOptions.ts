@@ -1,4 +1,4 @@
-import type { ApiPageKey } from '@prisma/client';
+import type { ApiPageKey } from '@charmverse/core/dist/prisma';
 import { chunk } from 'lodash';
 import unionBy from 'lodash/unionBy';
 import type { ParseResult } from 'papaparse';
@@ -311,6 +311,20 @@ export async function addNewCards({
         { id: Constants.titleColumnId, name: titleColumnName, type: 'text', options: [] }
       ];
   const mappedInitialBoardProperties = mapCardBoardProperties(boardCardProperties);
+
+  // For every csv row, we check if the value and keys are the same or if the value is empty or we don't have it as an initial prop from the board
+  for (const row of csvData) {
+    for (const [k, v] of Object.entries(row)) {
+      if (csvData.every((_row) => _row[k] === v || !_row[k]) && !mappedInitialBoardProperties[k]) {
+        csvData.forEach((_row) => {
+          delete _row[k];
+        });
+        if (headers.find((h) => h === k)) {
+          headers.splice(headers.indexOf(k), 1);
+        }
+      }
+    }
+  }
 
   // Create card properties for the board
   const newBoardProperties = headers.map((prop) =>

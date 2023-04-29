@@ -1,4 +1,5 @@
-import { prisma } from 'db';
+import { prisma } from '@charmverse/core';
+
 import { InvalidInputError } from 'lib/utilities/errors';
 
 export async function getSpacesFromDiscord(discordServerId: string) {

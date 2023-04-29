@@ -1,8 +1,8 @@
+import { prisma } from '@charmverse/core';
 import type { Typeform } from '@typeform/api-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { prisma } from 'db';
 import { onError, onNoMatch, requireKeys } from 'lib/middleware';
 import { createFormResponseCard } from 'lib/pages/createFormResponseCard';
 import { simplifyTypeformResponse } from 'lib/typeform/simplifyTypeformResponse';

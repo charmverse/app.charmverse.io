@@ -1,6 +1,6 @@
+import type { Role } from '@charmverse/core/dist/prisma';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Alert, Box, InputLabel, Paper, Stack, TextField, Typography } from '@mui/material';
-import type { Role } from '@prisma/client';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';

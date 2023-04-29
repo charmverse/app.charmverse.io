@@ -1,10 +1,10 @@
-import type { PostCategoryPermission } from '@prisma/client';
+import type { AssignedPostCategoryPermission } from '@charmverse/core';
+import type { PostCategoryPermission } from '@charmverse/core/dist/prisma';
 import { v4 } from 'uuid';
 
 import { InvalidPermissionGranteeError } from 'lib/permissions/errors';
 import { ExpectedAnError } from 'testing/errors';
 
-import type { AssignedPostCategoryPermission } from '../interfaces';
 import { mapPostCategoryPermissionToAssignee } from '../mapPostCategoryPermissionToAssignee';
 
 describe('mapPostCategoryPermissionToAssignee', () => {

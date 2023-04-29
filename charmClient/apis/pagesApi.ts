@@ -1,10 +1,10 @@
-import type { Page, PageComment, ProfileItem } from '@prisma/client';
+import type { Page, PageComment, ProfileItem } from '@charmverse/core/dist/prisma';
 
 import * as http from 'adapters/http';
 import type { CreateCommentInput, UpdateCommentInput } from 'lib/comments';
-import type { IPageWithPermissions, PageDetails, PageMeta } from 'lib/pages';
 import type { PageCommentWithVote } from 'lib/pages/comments/interface';
 import type { DuplicatePageResponse } from 'lib/pages/duplicatePage';
+import type { PageWithContent, PageMeta } from 'lib/pages/interfaces';
 
 export interface UpdateProfileItemRequest {
   profileItems: Omit<ProfileItem, 'userId'>[];
@@ -23,18 +23,12 @@ export class PagesApi {
     return http.GET<PageMeta[]>(`/api/spaces/${spaceId}/pages`, { search, limit });
   }
 
-  getPage(pageIdOrPath: string, spaceId?: string) {
-    const query = spaceId ? `?spaceId=${spaceId}` : '';
-    return http.GET<IPageWithPermissions>(`/api/pages/${pageIdOrPath}${query}`);
+  getPage(pageId: string, spaceId?: string) {
+    return http.GET<PageWithContent>(`/api/pages/${pageId}`, { spaceId });
   }
 
   updatePage(pageOpts: Partial<Page>) {
-    return http.PUT<IPageWithPermissions>(`/api/pages/${pageOpts.id}`, pageOpts);
-  }
-
-  getPageDetails(pageIdOrPath: string, spaceId?: string) {
-    const query = spaceId ? `?spaceId=${spaceId}` : '';
-    return http.GET<PageDetails>(`/api/pages/${pageIdOrPath}/details${query}`);
+    return http.PUT<void>(`/api/pages/${pageOpts.id}`, pageOpts);
   }
 
   convertToProposal({ pageId, categoryId }: { pageId: string; categoryId: string }) {

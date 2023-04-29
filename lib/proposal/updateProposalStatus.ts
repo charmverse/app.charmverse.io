@@ -1,7 +1,7 @@
-import type { WorkspaceEvent } from '@prisma/client';
-import { ProposalStatus } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { WorkspaceEvent } from '@charmverse/core/dist/prisma';
+import { ProposalStatus } from '@charmverse/core/dist/prisma';
 
-import { prisma } from 'db';
 import { InvalidStateError } from 'lib/middleware';
 import { getSnapshotProposal } from 'lib/snapshot/getProposal';
 import { coerceToMilliseconds } from 'lib/utilities/dates';

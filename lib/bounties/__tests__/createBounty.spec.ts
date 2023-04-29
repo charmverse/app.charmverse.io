@@ -1,13 +1,11 @@
-import type { Bounty, Role, Space, User } from '@prisma/client';
-import { v4 } from 'uuid';
+import { prisma } from '@charmverse/core';
+import type { Bounty, Role, Space, User } from '@charmverse/core/dist/prisma';
 
-import { prisma } from 'db';
-import { InvalidInputError } from 'lib/utilities/errors/errors';
+import { InvalidInputError, PositiveNumbersOnlyError } from 'lib/utilities/errors';
 import { ExpectedAnError } from 'testing/errors';
 import { generateRole, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 import { queryBountyPermissions } from '../../permissions/bounties';
-import { PositiveNumbersOnlyError } from '../../utilities/errors/numbers';
 import { createBounty } from '../createBounty';
 import type { BountyCreationData } from '../interfaces';
 

@@ -1,4 +1,4 @@
-import type { Bounty } from '@prisma/client';
+import type { Bounty } from '@charmverse/core/dist/prisma';
 
 import type { Member } from 'lib/members/interfaces';
 

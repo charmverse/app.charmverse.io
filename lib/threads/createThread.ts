@@ -1,4 +1,5 @@
-import { prisma } from 'db';
+import { prisma } from '@charmverse/core';
+
 import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
 
 import type { ThreadCreate, ThreadWithComments } from './interfaces';
