@@ -81,9 +81,9 @@ function SuggestionCardComponent({ readOnly, isOwner, active, data, node, pos, t
     content = node.attrs.emoji;
   } else if (node.type.name === 'mention') {
     if (node.attrs.type === 'user') {
-      content = getMemberById(node.attrs.id)?.username ?? '';
+      content = getMemberById(node.attrs.value)?.username ?? '';
     } else {
-      content = pages[node.attrs.id]?.title ?? 'Untitled';
+      content = pages[node.attrs.value]?.title ?? 'Untitled';
     }
   }
 

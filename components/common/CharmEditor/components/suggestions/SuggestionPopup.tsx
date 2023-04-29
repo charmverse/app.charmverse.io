@@ -40,7 +40,12 @@ export function SuggestionsPopup({
       .map((row) => row.marks)
       .flat()
       .find((mark) => mark.active);
-    const suggestions = activeSuggestion ? [activeSuggestion] : rows.find((row) => row.pos === rowPos)?.marks ?? [];
+    const suggestions =
+      rowPos !== undefined
+        ? rows.find((row) => row.pos === rowPos)?.marks ?? []
+        : activeSuggestion
+        ? [activeSuggestion]
+        : [];
 
     return createPortal(
       <ClickAwayListener
