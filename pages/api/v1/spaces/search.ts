@@ -33,7 +33,7 @@ export const handler = apiHandler().get(search);
  *                  $ref: '#/components/schemas/Space'
  */
 async function search(req: NextApiRequest, res: NextApiResponse<Space[]>) {
-  const request = req.query as SearchSpacesInput;
+  const request = req.query as Omit<SearchSpacesInput, 'apiKey'>;
 
   if (!request.userWallet) {
     throw new InvalidStateError('userWallet is required');
@@ -41,7 +41,9 @@ async function search(req: NextApiRequest, res: NextApiResponse<Space[]>) {
 
   const result = await searchSpaces(request);
 
-  return res.status(200).json(result);
+  const allowedResult = result.filter((space) => req.spaceIdRange?.includes(space.id));
+
+  return res.status(200).json(allowedResult);
 }
 
 export default handler;
