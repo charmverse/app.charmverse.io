@@ -1,15 +1,12 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
 
-import { InvalidStateError, onError, onNoMatch, requireSuperApiKey } from 'lib/middleware';
+import { InvalidStateError } from 'lib/middleware';
+import { apiHandler } from 'lib/public-api/handler';
 import type { Space } from 'lib/public-api/interfaces';
 import type { SearchSpacesInput } from 'lib/public-api/searchSpaces';
 import { searchSpaces } from 'lib/public-api/searchSpaces';
-import { withSessionRoute } from 'lib/session/withSession';
 
-const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
-
-handler.use(requireSuperApiKey).get(search);
+export const handler = apiHandler().get(search);
 
 /**
  * @swagger
@@ -52,4 +49,4 @@ async function search(req: NextApiRequest, res: NextApiResponse<Space[]>) {
   return res.status(200).json(result);
 }
 
-export default withSessionRoute(handler);
+export default handler;
