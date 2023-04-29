@@ -1,16 +1,16 @@
 import { prisma } from '@charmverse/core';
 import type { Prisma } from '@charmverse/core/dist/prisma';
 import type { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
 
-import { onError, onNoMatch, requireApiKey, SpaceAccessDeniedError } from 'lib/middleware';
+import { SpaceAccessDeniedError } from 'lib/middleware';
 import { generateMarkdown } from 'lib/prosemirror/plugins/markdown/generateMarkdown';
 import type { CardPage, PageProperty } from 'lib/public-api';
 import { getPageInBoard, mapProperties, PageFromBlock, validateUpdateData } from 'lib/public-api';
+import { apiHandler } from 'lib/public-api/handler';
 
-const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
+const handler = apiHandler();
 
-handler.use(requireApiKey).get(getCard).patch(updateCard);
+handler.get(getCard).patch(updateCard);
 
 /**
  * @swagger
