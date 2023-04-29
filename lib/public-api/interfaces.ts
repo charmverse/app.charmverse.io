@@ -362,6 +362,7 @@ export interface CreateWorkspaceRequestBody {
 export interface Space {
   id: string;
   createdAt: string;
+  createdBy: string;
   name: string;
   avatar?: string;
   spaceUrl: string;
@@ -398,4 +399,5 @@ export type UserProfile = {
   wallet: string;
   username: string;
   email: string;
+  spaces: Space[];
 };

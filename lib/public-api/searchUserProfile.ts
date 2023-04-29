@@ -1,8 +1,10 @@
 import { prisma } from '@charmverse/core';
-import type { GoogleAccount, User, UserWallet } from '@charmverse/core/dist/prisma';
+import type { GoogleAccount, Prisma, Space, User, UserWallet } from '@charmverse/core/dist/prisma';
 
 import type { UserProfile } from 'lib/public-api/interfaces';
 import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
+
+import { mapSpace } from './createWorkspaceApi';
 
 export async function searchUserProfile({
   email,
@@ -21,8 +23,15 @@ export async function searchUserProfile({
     | (User & {
         googleAccounts: GoogleAccount[];
         wallets: UserWallet[];
+        spaceRoles: { space: Space }[];
       })
     | null = null;
+
+  const relationships = {
+    wallets: true,
+    googleAccounts: true,
+    spaceRoles: { include: { space: true } }
+  } satisfies Prisma.UserInclude;
 
   if (email) {
     user = await prisma.user.findFirst({
@@ -32,7 +41,7 @@ export async function searchUserProfile({
           { OR: [{ email }, { googleAccounts: { some: { email } } }] }
         ]
       },
-      include: { wallets: true, googleAccounts: true }
+      include: relationships
     });
   }
 
@@ -41,7 +50,7 @@ export async function searchUserProfile({
       where: {
         AND: [{ spaceRoles: { some: { spaceId: { in: spaceIds } } } }, { wallets: { some: { address: wallet } } }]
       },
-      include: { wallets: true, googleAccounts: true }
+      include: relationships
     });
   }
 
@@ -53,12 +62,13 @@ export async function searchUserProfile({
     }
   }
 
-  const profile = {
+  const profile: UserProfile = {
     id: user.id,
     avatar: user.avatar || '',
     wallet: wallet || user.wallets[0]?.address || '',
     email: email || user.email || user.googleAccounts[0]?.email || '',
-    username: user.username
+    username: user.username,
+    spaces: user.spaceRoles.map((role) => mapSpace(role.space))
   };
 
   return profile;
