@@ -16,6 +16,8 @@ async function logApiRequest(req: NextApiRequest, res: NextApiResponse, next: Vo
   log.debug(`[public-api] Request: ${req.method} ${req.url}`, {
     query: req.query,
     body: req.body,
+    spaceId: req.authorizedSpaceId,
+    superApiTokenName: req.superApiToken?.name,
     path
   });
 
