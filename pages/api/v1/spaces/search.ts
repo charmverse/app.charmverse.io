@@ -18,12 +18,7 @@ export const handler = apiHandler().get(search);
  *       - 'Partner API'
  *     parameters:
  *       - in: query
- *         name: email
- *         schema:
- *           type: string
- *         description: User email to search by
- *       - in: query
- *         name: wallet
+ *         name: userWallet
  *         schema:
  *           type: string
  *         description: User wallet address to search by
@@ -40,8 +35,8 @@ export const handler = apiHandler().get(search);
 async function search(req: NextApiRequest, res: NextApiResponse<Space[]>) {
   const request = req.query as SearchSpacesInput;
 
-  if (!request.creatorWalletAddress) {
-    throw new InvalidStateError('creatorWalletAddress is required');
+  if (!request.userWallet) {
+    throw new InvalidStateError('userWallet is required');
   }
 
   const result = await searchSpaces(request);

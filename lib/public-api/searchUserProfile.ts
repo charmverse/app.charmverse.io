@@ -1,10 +1,8 @@
 import { prisma } from '@charmverse/core';
-import type { GoogleAccount, Prisma, Space, User, UserWallet } from '@charmverse/core/dist/prisma';
+import type { GoogleAccount, Prisma, User, UserWallet } from '@charmverse/core/dist/prisma';
 
 import type { UserProfile } from 'lib/public-api/interfaces';
 import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
-
-import { mapSpace } from './createWorkspaceApi';
 
 export async function searchUserProfile({
   email,
@@ -23,14 +21,12 @@ export async function searchUserProfile({
     | (User & {
         googleAccounts: GoogleAccount[];
         wallets: UserWallet[];
-        spaceRoles: { space: Space }[];
       })
     | null = null;
 
   const relationships = {
     wallets: true,
-    googleAccounts: true,
-    spaceRoles: { include: { space: true } }
+    googleAccounts: true
   } satisfies Prisma.UserInclude;
 
   if (email) {
@@ -67,8 +63,7 @@ export async function searchUserProfile({
     avatar: user.avatar || '',
     wallet: wallet || user.wallets[0]?.address || '',
     email: email || user.email || user.googleAccounts[0]?.email || '',
-    username: user.username,
-    spaces: user.spaceRoles.map((role) => mapSpace(role.space))
+    username: user.username
   };
 
   return profile;

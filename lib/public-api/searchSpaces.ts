@@ -5,13 +5,13 @@ import type { Space } from 'lib/public-api/interfaces';
 import { mapSpace } from './createWorkspaceApi';
 
 export type SearchSpacesInput = {
-  creatorWalletAddress: string;
+  userWallet: string;
 };
 
-export async function searchSpaces({ creatorWalletAddress }: SearchSpacesInput): Promise<Space[]> {
+export async function searchSpaces({ userWallet: userWalletAddress }: SearchSpacesInput): Promise<Space[]> {
   const userWallet = await prisma.userWallet.findFirst({
     where: {
-      address: creatorWalletAddress.toLowerCase()
+      address: userWalletAddress.toLowerCase()
     },
     include: {
       user: {

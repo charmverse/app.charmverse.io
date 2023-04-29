@@ -399,5 +399,4 @@ export type UserProfile = {
   wallet: string;
   username: string;
   email: string;
-  spaces: Space[];
 };
