@@ -1,18 +1,15 @@
 import { prisma } from '@charmverse/core';
 import type { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
 
-import { onError, onNoMatch, requireApiKey, requireKeys } from 'lib/middleware';
+import { requireKeys } from 'lib/middleware';
 import { setupPermissionsAfterPageCreated } from 'lib/permissions/pages';
 import type { CardPage } from 'lib/public-api';
 import { validateCreationData, DatabasePageNotFoundError, createDatabaseCardPage } from 'lib/public-api';
+import { apiHandler } from 'lib/public-api/handler';
 
-const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
+const handler = apiHandler();
 
-handler
-  .use(requireApiKey)
-  .use(requireKeys<CardPage>(['title'], 'body'))
-  .post(createCard);
+handler.use(requireKeys<CardPage>(['title'], 'body')).post(createCard);
 
 /**
  * @swagger
