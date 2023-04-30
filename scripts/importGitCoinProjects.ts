@@ -97,8 +97,8 @@ async function importGitCoinProjects() {
 
         // mark space as created from gitcoin in mixpanel
         await updateTrackGroupProfile(space, 'gitcoin');
-        trackUserAction('create_new_workspace', { userId: adminUserId, spaceId: space.id, template: 'default', source: 'gitcoin' });
-        [adminUserId, ...extraAdmins].forEach((userId) => trackUserAction('join_a_workspace', { spaceId: space.id, userId, source: 'gitcoin-growth-hack' }));
+        // trackUserAction('create_new_workspace', { userId: adminUserId, spaceId: space.id, template: 'default', source: 'gitcoin' });
+        // [adminUserId, ...extraAdmins].forEach((userId) => trackUserAction('join_a_workspace', { spaceId: space.id, userId, source: 'gitcoin-growth-hack' }));
 
         const projectInfo = { projectDetails, space, spaceImageUrl: spaceImage, bannerUrl }
         projectsData.push(projectInfo);
@@ -164,7 +164,7 @@ async function createSpaceUsers(owners: string[]) {
     }
   });
 
-  const userPromises = owners.map(async (owner) => createUserFromWallet({ address: owner }, {
+  const userPromises = owners.map(async (owner) => createUserFromWallet({ address: owner, skipTracking: true }, {
     signupSource: 'gitcoin-project',
     signupCampaign: 'gitcoin-growth-hack'
   }));
@@ -173,7 +173,6 @@ async function createSpaceUsers(owners: string[]) {
   const [author, ...users] = userIds;
 
   return { adminUserId: author, extraAdmins: [...users], botUser };
-
 }
 
 function getImportedProjectsData() {
@@ -295,4 +294,4 @@ function overrideCsv(data: string[][]) {
 // updateSpaceOrigins();
 // updateCreatedAt();
 
-// importGitCoinProjects();
+importGitCoinProjects();
