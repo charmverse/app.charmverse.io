@@ -10,7 +10,7 @@ export const handler = superApiHandler().get(search);
 
 /**
  * @swagger
- * /users/search:
+ * /spaces/search:
  *   get:
  *     summary: Search for a user.
  *     description: Search for a user profile either by known email or wallet address.
