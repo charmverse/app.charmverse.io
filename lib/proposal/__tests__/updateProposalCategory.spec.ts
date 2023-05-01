@@ -1,7 +1,13 @@
-import type { Prisma, Proposal, ProposalCategory, ProposalCategoryPermission, Space } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type {
+  Prisma,
+  Proposal,
+  ProposalCategory,
+  ProposalCategoryPermission,
+  Space
+} from '@charmverse/core/dist/prisma';
 import { v4 } from 'uuid';
 
-import { prisma } from 'db';
 import { generateUserAndSpace } from 'testing/setupDatabase';
 import { generateProposalCategory } from 'testing/utils/proposals';
 

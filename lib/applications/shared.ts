@@ -1,4 +1,4 @@
-import type { Application, Bounty } from '@prisma/client';
+import type { Application, Bounty } from '@charmverse/core/dist/prisma';
 
 export const MINIMUM_APPLICATION_MESSAGE_CHARACTERS = 1;
 

@@ -1,6 +1,6 @@
+import type { Space, Role } from '@charmverse/core/dist/prisma';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import { Box, CircularProgress, Divider, Menu, Typography } from '@mui/material';
-import type { Space, Role } from '@prisma/client';
+import { Box, Card, CircularProgress, Divider, Menu, Paper, Typography } from '@mui/material';
 import { useRef, useState } from 'react';
 
 import Button from 'components/common/Button';
@@ -91,14 +91,11 @@ export function RoleSettings({ space }: { space: Space }) {
       <MemberRoleRow readOnly={!isAdmin} spaceId={space.id} />
       <AdminRoleRow readOnly={!isAdmin} />
       <GuestRoleRow readOnly={!isAdmin} />
-      {roles && roles.length > 0 && (
-        <>
-          <Divider sx={{ my: 2 }} />
-          <Typography variant='body2' fontWeight='bold' color='secondary'>
-            Custom roles
-          </Typography>
-        </>
-      )}
+      <Divider sx={{ my: 2 }} />
+      <Typography variant='body2' fontWeight='bold' color='secondary'>
+        Custom roles
+      </Typography>
+      <Typography variant='caption'>Custom role permissions override Default.</Typography>
       {roles?.map((role) => (
         <RoleRow
           readOnly={!isAdmin}
@@ -109,7 +106,21 @@ export function RoleSettings({ space }: { space: Space }) {
           key={role.id}
         />
       ))}
-      {isCreateFormVisible && <CreateRoleForm onCancel={hideCreateRoleForm} onSubmit={createNewRole} />}
+      {roles?.length === 0 && !isCreateFormVisible && (
+        <Box p={3} mt={2} sx={{ border: '1px solid var(--input-border)', textAlign: 'center' }}>
+          <Typography sx={{ mb: 2 }} variant='body2' color='secondary'>
+            No roles have been created yet.
+          </Typography>
+          <Button onClick={showCreateRoleForm} disabled={isValidating} variant='outlined'>
+            Add a role
+          </Button>
+        </Box>
+      )}
+      {isCreateFormVisible && (
+        <Box mt={2}>
+          <CreateRoleForm onCancel={hideCreateRoleForm} onSubmit={createNewRole} />
+        </Box>
+      )}
       <div id={formAnchorId} />
 
       {isValidating && (

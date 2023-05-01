@@ -1,4 +1,4 @@
-import type { Role } from '@prisma/client';
+import type { Role } from '@charmverse/core/dist/prisma';
 import useSWR, { mutate } from 'swr';
 
 import charmClient from 'charmClient';
@@ -12,7 +12,7 @@ export function useRoles() {
 
   const { data: roles } = useSWR(
     () => (space ? `roles/${space.id}` : null),
-    () => space && charmClient.roles.listRoles(space.id)
+    () => (space ? charmClient.roles.listRoles(space.id) : null)
   );
 
   async function createRole(role: CreateRoleInput): Promise<Role> {

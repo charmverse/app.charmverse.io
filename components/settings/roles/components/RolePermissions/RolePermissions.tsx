@@ -1,5 +1,6 @@
+import type { SpaceOperation } from '@charmverse/core/dist/prisma';
+import type { PostCategoryPermissionAssignment } from '@charmverse/core/dist/shared';
 import { Box, Divider, FormControlLabel, Grid, Switch, Tooltip, Typography } from '@mui/material';
-import type { SpaceOperation } from '@prisma/client';
 import type { ChangeEvent } from 'react';
 import { useReducer, useEffect, useState } from 'react';
 import { mutate } from 'swr';
@@ -16,7 +17,6 @@ import { useForumCategories } from 'hooks/useForumCategories';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useSnackbar } from 'hooks/useSnackbar';
-import type { PostCategoryPermissionInput } from 'lib/permissions/forum/upsertPostCategoryPermission';
 import type { AssignablePermissionGroups } from 'lib/permissions/interfaces';
 import type { ProposalCategoryPermissionInput } from 'lib/permissions/proposals/upsertProposalCategoryPermission';
 import { AvailableSpacePermissions } from 'lib/permissions/spaces/client';
@@ -210,7 +210,7 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
     setTouched(true);
   }
 
-  async function updatePostCategoryPermission(permission: PostCategoryPermissionInput) {
+  async function updatePostCategoryPermission(permission: PostCategoryPermissionAssignment) {
     dispatch({ type: 'set_forum_category_permission', permission });
     setTouched(true);
   }

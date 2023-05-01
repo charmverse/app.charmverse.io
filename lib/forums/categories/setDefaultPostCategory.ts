@@ -1,6 +1,5 @@
-import type { PostCategory, Space } from '@prisma/client';
-
-import { prisma } from 'db';
+import { prisma } from '@charmverse/core';
+import type { PostCategory, Space } from '@charmverse/core/dist/prisma';
 
 export type SetDefaultPostCategoryRequest = {
   spaceId: string;

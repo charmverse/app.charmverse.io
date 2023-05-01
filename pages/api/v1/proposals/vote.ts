@@ -1,15 +1,14 @@
-import type { UserVote } from '@prisma/client';
+import type { UserVote } from '@charmverse/core/dist/prisma';
 import type { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
 
-import { onError, onNoMatch, requireKeys, requireApiKey } from 'lib/middleware';
+import { requireKeys } from 'lib/middleware';
 import { castProposalVote } from 'lib/public-api/castProposalVote';
+import { apiHandler } from 'lib/public-api/handler';
 import { withSessionRoute } from 'lib/session/withSession';
 
-const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
+const handler = apiHandler();
 
 handler
-  .use(requireApiKey)
   .use(
     requireKeys(
       [

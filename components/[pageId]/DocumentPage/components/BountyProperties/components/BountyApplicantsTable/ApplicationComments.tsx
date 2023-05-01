@@ -1,6 +1,6 @@
+import type { Application } from '@charmverse/core/dist/prisma';
 import { FormLabel } from '@mui/material';
 import { Box, Stack } from '@mui/system';
-import type { Application } from '@prisma/client';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';

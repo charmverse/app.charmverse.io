@@ -1,9 +1,9 @@
+import type { Space } from '@charmverse/core/dist/prisma';
 import { yupResolver } from '@hookform/resolvers/yup';
 import Box from '@mui/material/Box';
 import FormHelperText from '@mui/material/FormHelperText';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
-import type { Space } from '@prisma/client';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';

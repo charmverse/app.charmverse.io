@@ -1,9 +1,9 @@
 import { IncomingMessage, ServerResponse } from 'http';
 
+import { prisma } from '@charmverse/core';
 import { getIronSession, unsealData } from 'iron-session';
 import type { Socket } from 'socket.io';
 
-import { prisma } from 'db';
 import log from 'lib/log';
 import { ActionNotPermittedError } from 'lib/middleware';
 import { authSecret, ironOptions } from 'lib/session/config';

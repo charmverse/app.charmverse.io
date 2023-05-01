@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import type { Space, User } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { Space, User } from '@charmverse/core/dist/prisma';
 import request from 'supertest';
 
-import { prisma } from 'db';
 import { upsertPermission } from 'lib/permissions/pages';
 import type { LoggedInUser } from 'models';
 import { baseUrl, loginUser } from 'testing/mockApiCall';

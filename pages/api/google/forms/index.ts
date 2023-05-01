@@ -7,8 +7,7 @@ import { getCredentialToken, invalidateCredential } from 'lib/google/authorizati
 import { getForms } from 'lib/google/forms/getForms';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import { UnauthorisedActionError } from 'lib/utilities/errors';
-import { InvalidInputError } from 'lib/utilities/errors/errors';
+import { UnauthorisedActionError, InvalidInputError } from 'lib/utilities/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

@@ -1,6 +1,6 @@
-import { exportWorkspacePages } from 'lib/templates/exportWorkspacePages';
+import { exportWorkspacePagesToDisk } from 'lib/templates/exportWorkspacePages';
 
-exportWorkspacePages({
+exportWorkspacePagesToDisk({
   sourceSpaceIdOrDomain: 'cvt-template-hackathon',
   exportName: 'templateHackathon'
 })

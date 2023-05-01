@@ -1,7 +1,7 @@
+import type { ProposalCategoryPermissionLevel } from '@charmverse/core/dist/prisma';
 import Box from '@mui/material/Box';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
-import type { ProposalCategoryPermissionLevel } from '@prisma/client';
 import type { ReactNode } from 'react';
 import { useMemo } from 'react';
 
@@ -80,7 +80,7 @@ export function ProposalCategoryRolePermissionRow({
   return (
     <Box display='flex' justifyContent='space-between' alignItems='center'>
       <Typography variant='body2'>{assigneeName}</Typography>
-      <div style={{ width: '160px', textAlign: 'left' }}>
+      <div style={{ width: '200px', textAlign: 'left' }}>
         <Tooltip title={tooltip} enterDelay={1000} disableInteractive>
           <span>
             <SmallSelect

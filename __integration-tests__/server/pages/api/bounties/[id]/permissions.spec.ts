@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import type { Space, User } from '@prisma/client';
-import { BountyPermissionLevel } from '@prisma/client';
+import type { Space, User } from '@charmverse/core/dist/prisma';
+import { BountyPermissionLevel } from '@charmverse/core/dist/prisma';
 import request from 'supertest';
 
 import type { AssignedBountyPermissions } from 'lib/bounties';

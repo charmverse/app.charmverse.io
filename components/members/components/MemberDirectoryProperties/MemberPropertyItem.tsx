@@ -1,3 +1,4 @@
+import type { MemberPropertyType } from '@charmverse/core/dist/prisma';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import AlternateEmailIcon from '@mui/icons-material/AlternateEmail';
 import ArrowDropDownCircleIcon from '@mui/icons-material/ArrowDropDownCircle';
@@ -16,7 +17,6 @@ import SubjectIcon from '@mui/icons-material/Subject';
 import TextIcon from '@mui/icons-material/TextFields';
 import TwitterIcon from '@mui/icons-material/Twitter';
 import { ListItemIcon, ListItemText } from '@mui/material';
-import type { MemberPropertyType } from '@prisma/client';
 import type { ReactNode } from 'react';
 
 import { MEMBER_PROPERTY_CONFIG } from 'lib/members/constants';

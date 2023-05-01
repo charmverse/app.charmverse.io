@@ -1,4 +1,5 @@
-import { prisma } from 'db';
+import { prisma } from '@charmverse/core';
+
 import log from 'lib/log';
 
 import { countConnectableIdentities } from './countConnectableIdentities';

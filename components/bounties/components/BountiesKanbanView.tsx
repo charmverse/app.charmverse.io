@@ -1,5 +1,5 @@
+import type { BountyStatus } from '@charmverse/core/dist/prisma';
 import { Box, Typography } from '@mui/material';
-import type { BountyStatus } from '@prisma/client';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 
@@ -22,7 +22,7 @@ interface Props {
 export default function BountiesKanbanView({ bounties, publicMode }: Props) {
   const { deletePage, pages } = usePages();
   const { showPage } = usePageDialog();
-  const { setBounties } = useBounties();
+  const { setBounties, refreshBounty } = useBounties();
   const router = useRouter();
 
   function onClickDelete(bountyId: string) {
@@ -86,7 +86,7 @@ export default function BountiesKanbanView({ bounties, publicMode }: Props) {
               .map((bounty) => (
                 <BountyKanbanCard
                   onDuplicate={(duplicatePageResponse) => {
-                    setBounties((_bounties) => [..._bounties, ...duplicatePageResponse.bounties]);
+                    refreshBounty(duplicatePageResponse.rootPageId);
                   }}
                   onDelete={onClickDelete}
                   readOnly={!!publicMode}

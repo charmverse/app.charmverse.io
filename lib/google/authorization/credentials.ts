@@ -1,6 +1,6 @@
-import { Prisma } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import { Prisma } from '@charmverse/core/dist/prisma';
 
-import { prisma } from 'db';
 import log from 'lib/log';
 
 import { getClient } from './authClient';

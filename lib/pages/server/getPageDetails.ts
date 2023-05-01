@@ -1,28 +1,17 @@
-import type { Prisma } from '@prisma/client';
-import { validate } from 'uuid';
-
-import { prisma } from 'db';
+import { prisma } from '@charmverse/core';
 
 import type { PageDetails } from '../interfaces';
 
-export async function getPageDetails(pageIdOrPath: string, spaceId?: string): Promise<PageDetails | null> {
-  const isValidUUid = validate(pageIdOrPath);
+import { PageNotFoundError } from './errors';
+import { generatePageQuery } from './generatePageQuery';
 
-  // We need a spaceId if looking up by path
-  if (!isValidUUid && !spaceId) {
-    return null;
-  }
+export async function getPageDetails(pageIdOrPath: string, spaceId?: string): Promise<PageDetails> {
+  const searchQuery = generatePageQuery({
+    pageIdOrPath,
+    spaceIdOrDomain: spaceId
+  });
 
-  const searchQuery: Prisma.PageWhereInput = isValidUUid
-    ? {
-        id: pageIdOrPath
-      }
-    : {
-        path: pageIdOrPath,
-        spaceId
-      };
-
-  return prisma.page.findFirst({
+  const page = await prisma.page.findFirst({
     where: searchQuery,
     select: {
       id: true,
@@ -31,4 +20,9 @@ export async function getPageDetails(pageIdOrPath: string, spaceId?: string): Pr
       spaceId: true
     }
   });
+
+  if (!page) {
+    throw new PageNotFoundError(pageIdOrPath);
+  }
+  return page;
 }

@@ -1,6 +1,6 @@
-import type { Page, Prisma, PrismaPromise } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { Page, Prisma, PrismaPromise } from '@charmverse/core/dist/prisma';
 
-import { prisma } from 'db';
 import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
 import { extractPreviewImage } from 'lib/prosemirror/extractPreviewImage';
 import type { PageContent } from 'lib/prosemirror/interfaces';

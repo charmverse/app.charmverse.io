@@ -1,5 +1,5 @@
+import type { UserWallet } from '@charmverse/core/dist/prisma';
 import { verifyMessage } from '@ethersproject/wallet';
-import type { UserWallet } from '@prisma/client';
 import { useWeb3React } from '@web3-react/core';
 import type { Signer } from 'ethers';
 import { getAddress, toUtf8Bytes } from 'ethers/lib/utils';
@@ -172,7 +172,7 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
     ) {
       const storedSignature = getStoredSignature();
 
-      if (storedSignature) {
+      if (storedSignature && storedSignature.address === account) {
         loginFromWeb3Account(storedSignature).catch((e) => {
           setSignature(null);
           setStoredAccount(null);
@@ -181,7 +181,10 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
       } else {
         setSignature(null);
         setStoredAccount(null);
-        logoutUser();
+        // We should only logout if there is a user. The logout function triggers a wipe of the SWR cache, and this was having undesirable effects for people with a connected wallet but no user account
+        if (user) {
+          logoutUser();
+        }
       }
     }
   }, [account, user, isConnectingIdentity, isLoaded, accountUpdatePaused]);
@@ -253,14 +256,15 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
     {
       async onSuccess(updatedUser) {
         logoutWallet();
-        setUser(updatedUser);
+
         setLitAuthSignature(null);
         setLitProvider(null);
+        setStoredAccount(null);
+        setUser(updatedUser);
         connector?.deactivate();
         await mutate(`/nfts/${updatedUser?.id}`);
         await mutate(`/orgs/${updatedUser?.id}`);
         await mutate(`/poaps/${updatedUser?.id}`);
-        setStoredAccount(null);
       }
     }
   );

@@ -1,4 +1,4 @@
-import type { Application, PageComment, Space } from '@prisma/client';
+import type { Application, PageComment, Space } from '@charmverse/core/dist/prisma';
 
 import * as http from 'adapters/http';
 import type {
@@ -41,10 +41,6 @@ export class BountiesApi {
 
   getBounty(bountyId: string): Promise<BountyWithDetails> {
     return http.GET<BountyWithDetails>(`/api/bounties/${bountyId}`);
-  }
-
-  deleteBounty(bountyId: string): Promise<any> {
-    return http.DELETE(`/api/bounties/${bountyId}`);
   }
 
   updateBounty({ bountyId, updateContent }: BountyUpdate): Promise<BountyWithDetails> {

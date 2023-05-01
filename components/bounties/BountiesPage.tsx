@@ -1,8 +1,8 @@
+import { BountyStatus } from '@charmverse/core/dist/prisma';
 import styled from '@emotion/styled';
 import ModeStandbyOutlinedIcon from '@mui/icons-material/ModeStandbyOutlined';
 import BountyIcon from '@mui/icons-material/RequestPageOutlined';
 import { Box, Card, Grid, Tab, Tabs, Typography } from '@mui/material';
-import { BountyStatus } from '@prisma/client';
 import { useRouter } from 'next/router';
 import { useEffect, useMemo, useState } from 'react';
 import { CSVLink } from 'react-csv';
@@ -20,7 +20,7 @@ import { isTruthy } from 'lib/utilities/types';
 
 import BountiesKanbanView from './components/BountiesKanbanView';
 import BountiesGalleryView from './components/BountyGalleryView';
-import MultiPaymentModal from './components/MultiPaymentModal';
+import { MultiPaymentModal } from './components/MultiPaymentModal';
 import { NewBountyButton } from './components/NewBountyButton';
 
 const bountyStatuses: BountyStatus[] = ['open', 'inProgress', 'complete', 'paid', 'suggestion'];

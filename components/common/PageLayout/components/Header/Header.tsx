@@ -11,15 +11,11 @@ import FavoritedIcon from '@mui/icons-material/Star';
 import NotFavoritedIcon from '@mui/icons-material/StarBorder';
 import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
 import UndoIcon from '@mui/icons-material/Undo';
+import { List, Popover, Switch, ListItemText, ListItemButton } from '@mui/material';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import IconButton from '@mui/material/IconButton';
-import List from '@mui/material/List';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemText from '@mui/material/ListItemText';
-import Popover from '@mui/material/Popover';
-import Switch from '@mui/material/Switch';
 import Toolbar from '@mui/material/Toolbar';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
@@ -30,6 +26,7 @@ import { memo, useMemo, useRef, useState } from 'react';
 
 import charmClient from 'charmClient';
 import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
+import Button from 'components/common/Button';
 import { undoEventName } from 'components/common/CharmEditor/utils';
 import { DuplicatePageAction } from 'components/common/DuplicatePageAction';
 import { usePostByPath } from 'components/forum/hooks/usePostByPath';
@@ -43,6 +40,8 @@ import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useToggleFavorite } from 'hooks/useToggleFavorite';
 import { useUser } from 'hooks/useUser';
+import type { PageUpdates } from 'lib/pages';
+import { monoFont, serifFont } from 'theme/fonts';
 
 import { BountyActions } from './components/BountyActions';
 import BountyShareButton from './components/BountyShareButton/BountyShareButton';
@@ -62,6 +61,17 @@ export const StyledToolbar = styled(Toolbar)`
   background-color: ${({ theme }) => theme.palette.background.default};
   height: ${headerHeight}px;
   min-height: ${headerHeight}px;
+`;
+
+const StyledFontButton = styled(Button)`
+  display: block;
+`;
+
+const FontFamilyExample = styled.div`
+  font-size: 24px;
+  height: 24px;
+  line-height: 24px;
+  font-weight: 700;
 `;
 
 interface HeaderProps {
@@ -300,15 +310,24 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
     setPageMenuAnchorElement(null);
   }
 
-  const onSwitchChange = () => {
+  function setPageProperty(prop: Partial<PageUpdates>) {
     if (basePage) {
       updatePage({
         id: basePage.id,
-        fullWidth: !isFullWidth
+        ...prop
       });
     }
-  };
+  }
 
+  function toggleSmallFont() {
+    setPageProperty({ fontSizeSmall: !basePage?.fontSizeSmall });
+  }
+  function toggleFullWidth() {
+    setPageProperty({ fullWidth: !basePage?.fullWidth });
+  }
+  function setFontFamily(fontFamily: 'serif' | 'mono' | 'default') {
+    setPageProperty({ fontFamily });
+  }
   async function onDeletePage() {
     if (basePage) {
       await deletePage({
@@ -363,6 +382,66 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
 
   const documentOptions = (
     <List data-test='header--page-actions' dense>
+      <Box px={2.5} mb={1}>
+        <Typography variant='caption'>Style</Typography>
+        <Box display='flex' mt={0.5} className={`${serifFont.variable} ${monoFont.variable}`}>
+          <StyledFontButton
+            size='small'
+            color={basePage?.fontFamily === 'default' ? 'primary' : 'secondary'}
+            variant='text'
+            onClick={() => setFontFamily('default')}
+          >
+            <FontFamilyExample>Aa</FontFamilyExample>
+            Default
+          </StyledFontButton>
+          <StyledFontButton
+            size='small'
+            color={basePage?.fontFamily === 'serif' ? 'primary' : 'secondary'}
+            variant='text'
+            onClick={() => setFontFamily('serif')}
+          >
+            <FontFamilyExample className='font-family-serif'>Aa</FontFamilyExample>
+            Serif
+          </StyledFontButton>
+          <StyledFontButton
+            size='small'
+            color={basePage?.fontFamily === 'mono' ? 'primary' : 'secondary'}
+            variant='text'
+            onClick={() => setFontFamily('mono')}
+          >
+            <FontFamilyExample className='font-family-mono'>Aa</FontFamilyExample>
+            Mono
+          </StyledFontButton>
+        </Box>
+      </Box>
+      <Divider />
+      <ListItemButton>
+        <FormControlLabel
+          sx={{
+            marginLeft: 0.5,
+            width: '100%',
+            display: 'flex',
+            justifyContent: 'space-between'
+          }}
+          labelPlacement='start'
+          control={<Switch size='small' checked={!!basePage?.fontSizeSmall} onChange={toggleSmallFont} />}
+          label={<Typography variant='body2'>Small text</Typography>}
+        />
+      </ListItemButton>
+      <ListItemButton>
+        <FormControlLabel
+          sx={{
+            marginLeft: 0.5,
+            width: '100%',
+            display: 'flex',
+            justifyContent: 'space-between'
+          }}
+          labelPlacement='start'
+          control={<Switch size='small' checked={!!basePage?.fullWidth} onChange={toggleFullWidth} />}
+          label={<Typography variant='body2'>Full Width</Typography>}
+        />
+      </ListItemButton>
+      <Divider />
       <ListItemButton
         onClick={() => {
           setCurrentPageActionDisplay('comments');
@@ -460,24 +539,6 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
         <>
           <Divider />
           <BountyActions bountyId={basePageBounty.id} onClick={closeMenu} />
-        </>
-      )}
-      {isLargeScreen && (
-        <>
-          <Divider />
-          <ListItemButton>
-            <FormControlLabel
-              sx={{
-                marginLeft: 0.5,
-                width: '100%',
-                display: 'flex',
-                justifyContent: 'space-between'
-              }}
-              labelPlacement='start'
-              control={<Switch size='small' checked={isFullWidth} onChange={onSwitchChange} />}
-              label={<Typography variant='body2'>Full Width</Typography>}
-            />
-          </ListItemButton>
         </>
       )}
       {charmversePage && basePage && (

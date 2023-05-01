@@ -1,5 +1,5 @@
-import type { ApplicationStatus, Space, User } from '@prisma/client';
-import { BountyStatus } from '@prisma/client';
+import type { ApplicationStatus, Space, User } from '@charmverse/core/dist/prisma';
+import { BountyStatus } from '@charmverse/core/dist/prisma';
 
 import {
   generateBounty,

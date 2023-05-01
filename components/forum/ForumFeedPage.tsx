@@ -1,9 +1,9 @@
+import type { PostCategory } from '@charmverse/core/dist/prisma';
 import SearchIcon from '@mui/icons-material/Search';
 import Box from '@mui/material/Box';
 import InputAdornment from '@mui/material/InputAdornment';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
-import type { PostCategory } from '@prisma/client';
 import { debounce } from 'lodash';
 import { useRouter } from 'next/router';
 import type { ChangeEvent } from 'react';
@@ -16,6 +16,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useForumCategories } from 'hooks/useForumCategories';
 import { usePageTitle } from 'hooks/usePageTitle';
 import type { PostSortOption } from 'lib/forums/posts/constants';
+import log from 'lib/log';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
 import { CategoryMenu } from './components/CategoryMenu';
@@ -24,6 +25,7 @@ import { CategorySelect } from './components/CategorySelect';
 import { CreateForumPost } from './components/CreateForumPost';
 import { PostSkeleton } from './components/PostList/components/PostSkeleton';
 import { ForumPostList } from './components/PostList/PostList';
+import { usePostCategoryPermissions } from './hooks/usePostCategoryPermissions';
 
 export function ForumPage() {
   const [search, setSearch] = useState('');
@@ -31,9 +33,23 @@ export function ForumPage() {
   const currentSpace = useCurrentSpace();
   const sort = router.query.sort as PostSortOption | undefined;
   const { createPost, showPost } = usePostDialog();
-  const { categories, isCategoriesLoaded } = useForumCategories();
+  const { categories, isCategoriesLoaded, getPostableCategories } = useForumCategories();
   const [, setTitle] = usePageTitle();
   const [currentCategory, setCurrentCategory] = useState<PostCategory | null>(null);
+
+  const { permissions: currentCategoryPermissions } = usePostCategoryPermissions(currentCategory?.id ?? null);
+  // Allow user to create a post either if they are in "All categories and there is at least one category they can post to, OR they are in a specific category and they have permission to post there"
+  let disableCreatePost = false;
+  let disabledCreatePostTooltip = '';
+
+  if (getPostableCategories().length === 0) {
+    disableCreatePost = true;
+    disabledCreatePostTooltip = 'You cannot create posts in this space';
+  } else if (currentCategory && currentCategoryPermissions?.create_post === false) {
+    disableCreatePost = true;
+    disabledCreatePostTooltip = `You do not have permission to create posts in the ${currentCategory.name} category`;
+  }
+
   useEffect(() => {
     if (currentCategory?.name) {
       setTitle(currentCategory.name);
@@ -113,9 +129,11 @@ export function ForumPage() {
 
   useEffect(() => {
     if (currentSpace) {
-      charmClient.track.trackAction('main_feed_page_load', {
-        spaceId: currentSpace.id
-      });
+      charmClient.track
+        .trackAction('main_feed_page_load', {
+          spaceId: currentSpace.id
+        })
+        .catch((err) => log.debug(err));
     }
   }, [Boolean(currentSpace)]);
 
@@ -173,7 +191,11 @@ export function ForumPage() {
               handleSort={handleSortUpdate}
             />
           </Box>
-          <CreateForumPost onClick={showNewPostPopup} />
+          <CreateForumPost
+            disabled={disableCreatePost}
+            disabledTooltip={disabledCreatePostTooltip}
+            onClick={showNewPostPopup}
+          />
           {!isCategoriesLoaded ? (
             <PostSkeleton />
           ) : (

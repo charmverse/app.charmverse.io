@@ -1,4 +1,5 @@
-import { prisma } from 'db';
+import { prisma } from '@charmverse/core';
+
 import { sessionUserRelations } from 'lib/session/config';
 import { updateUsedIdentity } from 'lib/users/updateUsedIdentity';
 import { InvalidInputError, MissingDataError } from 'lib/utilities/errors';

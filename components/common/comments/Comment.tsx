@@ -128,7 +128,8 @@ export function Comment({
       focusOnInit: true,
       placeholderText: 'What are your thoughts?',
       onContentChange: updateCommentContent,
-      content: commentEditContent.doc
+      content: commentEditContent.doc,
+      isContentControlled: true
     };
 
     if (!inlineCharmEditor) {
@@ -222,6 +223,7 @@ export function Comment({
               readOnly
               key={isEditingComment.toString()}
               content={commentContent.doc}
+              isContentControlled
             />
           )}
           {!comment.deletedAt && !replyingDisabled && (

@@ -1,9 +1,9 @@
+import { prisma } from '@charmverse/core';
 import { createAdapter } from '@socket.io/redis-adapter';
 import type { Socket } from 'socket.io';
 import { Server } from 'socket.io';
 
 import { redisClient } from 'adapters/redis/redisClient';
-import { prisma } from 'db';
 import log from 'lib/log';
 import { SpaceMembershipRequiredError } from 'lib/permissions/errors';
 import { authOnConnect } from 'lib/websockets/authentication';

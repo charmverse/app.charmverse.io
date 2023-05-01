@@ -4,9 +4,9 @@ import { NodeView, Plugin } from '@bangle.dev/core';
 import type { EditorState, EditorView } from '@bangle.dev/pm';
 import { Node, PluginKey } from '@bangle.dev/pm';
 import { useEditorState } from '@bangle.dev/react';
+import type { PageType } from '@charmverse/core/dist/prisma';
 import styled from '@emotion/styled';
 import { Box, Divider } from '@mui/material';
-import type { PageType } from '@prisma/client';
 import type { CryptoCurrency, FiatCurrency } from 'connectors';
 import debounce from 'lodash/debounce';
 import throttle from 'lodash/throttle';
@@ -55,7 +55,7 @@ import * as heading from './components/heading';
 import * as horizontalRule from './components/horizontalRule';
 import * as iframe from './components/iframe';
 import InlineCommentThread, * as inlineComment from './components/inlineComment';
-import InlineDatabase from './components/inlineDatabase/components/InlineDatabase';
+import { InlineDatabase } from './components/inlineDatabase/components/InlineDatabase';
 import InlineCommandPalette from './components/inlinePalette/components/InlineCommandPalette';
 import { plugins as inlinePalettePlugins } from './components/inlinePalette/inlinePalette';
 import * as inlineVote from './components/inlineVote';
@@ -89,7 +89,6 @@ import * as tweet from './components/tweet/tweet';
 import { TweetNodeView } from './components/tweet/TweetNodeView';
 import { plugins as videoPlugins } from './components/video/video';
 import { VideoNodeView } from './components/video/VideoNodeView';
-import DevTools from './DevTools';
 import { specRegistry } from './specRegistry';
 
 export interface ICharmEditorOutput {
@@ -371,6 +370,7 @@ const defaultContent: PageContent = {
 export type UpdatePageContent = (content: ICharmEditorOutput) => any;
 
 interface CharmEditorProps {
+  insideModal?: boolean;
   colorMode?: 'dark';
   content?: PageContent;
   autoFocus?: boolean;
@@ -401,7 +401,7 @@ function CharmEditor({
   pageActionDisplay = null,
   content = defaultContent,
   children,
-  autoFocus,
+  insideModal,
   onContentChange,
   style,
   readOnly = false,
@@ -522,11 +522,12 @@ function CharmEditor({
   const state = useEditorState({
     specRegistry,
     plugins: getPlugins(),
-    initialValue: content ? Node.fromJSON(specRegistry.schema, content) : '',
+    initialValue: isContentControlled && content ? Node.fromJSON(specRegistry.schema, content) : undefined,
     dropCursorOpts: {
       color: 'var(--charmeditor-active)'
     }
   });
+
   useEffect(() => {
     if (editorRef.current) {
       const highlightedMentionId = router.query.mentionId;
@@ -560,6 +561,7 @@ function CharmEditor({
       disablePageSpecificFeatures={disablePageSpecificFeatures}
       disableRowHandles={disableRowHandles}
       isContentControlled={isContentControlled}
+      initialContent={content}
       enableSuggestions={enableSuggestingMode}
       onParticipantUpdate={onParticipantUpdate}
       trackChanges
@@ -580,6 +582,7 @@ function CharmEditor({
         const allProps: CharmNodeViewProps = {
           ...props,
           pageId,
+          pagePermissions,
           postId,
           readOnly,
           deleteNode: () => {
@@ -690,6 +693,7 @@ function CharmEditor({
         pagePermissions={pagePermissions}
         nestedPagePluginKey={nestedPagePluginKey}
         disableNestedPage={disableNestedPage}
+        pageId={pageId}
       />
       <MentionSuggest pluginKey={mentionPluginKey} />
       <NestedPagesList pluginKey={nestedPagePluginKey} />
@@ -700,10 +704,11 @@ function CharmEditor({
         disableNestedPage={disableNestedPage}
         palettePluginKey={inlinePalettePluginKey}
         enableVoting={enableVoting}
+        pageId={pageId}
       />
       {children}
       {!disablePageSpecificFeatures && (
-        <>
+        <span className='font-family-default'>
           <SidebarDrawer
             id='page-action-sidebar'
             title={pageActionDisplay ? SIDEBAR_VIEWS[pageActionDisplay].title : ''}
@@ -717,11 +722,12 @@ function CharmEditor({
                 state={suggestionState}
               />
             )}
-            {pageActionDisplay === 'comments' && <CommentsSidebar />}
+            {pageActionDisplay === 'comments' && <CommentsSidebar permissions={pagePermissions} />}
           </SidebarDrawer>
-          <InlineCommentThread pluginKey={inlineCommentPluginKey} />
+          <InlineCommentThread permissions={pagePermissions} pluginKey={inlineCommentPluginKey} />
           {currentSpace && pageId && (
             <SuggestionsPopup
+              insideModal={insideModal}
               pageId={pageId}
               spaceId={currentSpace.id}
               pluginKey={suggestionsPluginKey}
@@ -729,9 +735,8 @@ function CharmEditor({
             />
           )}
           {currentSpace && pageId && <LinksPopup pluginKey={linksPluginKey} readOnly={readOnly} />}
-        </>
+        </span>
       )}
-      {!readOnly && <DevTools />}
     </StyledReactBangleEditor>
   );
 }

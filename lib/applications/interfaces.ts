@@ -1,4 +1,4 @@
-import type { Application, ApplicationStatus, Bounty, PageComment, Transaction } from '@prisma/client';
+import type { Application, ApplicationStatus, Bounty, PageComment, Transaction } from '@charmverse/core/dist/prisma';
 
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import type { RequiredNotNull } from 'lib/utilities/types';

@@ -28,7 +28,9 @@ import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/sto
 import { getCurrentBoardViews, getView } from 'components/common/BoardEditor/focalboard/src/store/views';
 import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
 import { DuplicatePageAction } from 'components/common/DuplicatePageAction';
+import type { ImportAction } from 'components/common/Modal/ConfirmImportModal';
 import ConfirmImportModal from 'components/common/Modal/ConfirmImportModal';
+import { useApiPageKeys } from 'hooks/useApiPageKeys';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useMembers } from 'hooks/useMembers';
@@ -64,6 +66,7 @@ export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: 
   const currentSpace = useCurrentSpace();
   const { formatDateTime, formatDate } = useDateFormatter();
   const importConfirmationPopup = usePopupState({ variant: 'popover', popupId: 'import-confirmation-popup' });
+  const { keys } = useApiPageKeys(pageId);
 
   const activeBoardId = view?.fields.sourceData?.boardId ?? view?.fields.linkedSourceId ?? view?.rootId;
   const board = boards.find((b) => b.id === activeBoardId);
@@ -83,7 +86,8 @@ export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: 
   const cards = useAppSelector(
     getViewCardsSortedFilteredAndGrouped({
       boardId: board?.id ?? '',
-      viewId: view?.id ?? ''
+      viewId: view?.id ?? '',
+      pages
     })
   );
 
@@ -135,7 +139,7 @@ export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: 
     closeMenu();
   }
 
-  const importCsv = (event: ChangeEvent<HTMLInputElement>, importAction?: 'merge' | 'delete'): void => {
+  const importCsv = (event: ChangeEvent<HTMLInputElement>, importAction?: ImportAction): void => {
     if (board && event.target.files && event.target.files[0]) {
       Papa.parse(event.target.files[0], {
         header: true,
@@ -179,7 +183,8 @@ export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: 
                 results,
                 spaceId: currentSpace.id,
                 userId: user.id,
-                views: boardViews
+                views: boardViews,
+                apiPageKeys: keys
               });
 
               const spaceId = currentSpace?.id;

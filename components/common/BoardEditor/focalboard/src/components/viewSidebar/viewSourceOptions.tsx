@@ -1,8 +1,8 @@
+import type { ApiPageKey } from '@charmverse/core/dist/prisma';
 import styled from '@emotion/styled';
 import AddIcon from '@mui/icons-material/Add';
 import AddCircleIcon from '@mui/icons-material/AddCircleOutline';
 import { Box, Grid, ListItemIcon, MenuItem, TextField, Typography } from '@mui/material';
-import type { ApiPageKey } from '@prisma/client';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import type { ChangeEvent } from 'react';
 import { useMemo, useState } from 'react';
@@ -15,7 +15,7 @@ import useSWRMutation from 'swr/mutation';
 import charmClient from 'charmClient';
 import PagesList from 'components/common/CharmEditor/components/PageList';
 import ConfirmApiPageKeyModal from 'components/common/Modal/ConfirmApiPageKeyModal';
-import { useCurrentPage } from 'hooks/useCurrentPage';
+import { webhookBaseUrl } from 'config/constants';
 import { usePages } from 'hooks/usePages';
 import type { BoardView, BoardViewFields, ViewSourceType } from 'lib/focalboard/boardView';
 import { isTruthy } from 'lib/utilities/types';
@@ -25,8 +25,6 @@ import { SidebarHeader } from './viewSidebar';
 import { SourceType } from './viewSourceType';
 
 type FormStep = 'select_source' | 'configure_source';
-
-const webhookBaseUrl = 'https://app.charmverse.io/api/v1/webhooks/addToDatabase';
 
 export type DatabaseSourceProps = {
   onCreate?: () => void;
@@ -39,6 +37,7 @@ type ViewSourceOptionsProps = DatabaseSourceProps & {
   goBack?: () => void;
   title?: string;
   view?: BoardView;
+  pageId?: string;
 };
 
 const SidebarContent = styled.div`
@@ -50,7 +49,6 @@ const SidebarContent = styled.div`
 export function ViewSourceOptions(props: ViewSourceOptionsProps) {
   const activeView = props.view;
   const activeSourceType = activeView?.fields.sourceType;
-  const { currentPageId } = useCurrentPage();
 
   const [sourceType, setSourceType] = useState<ViewSourceType | undefined>();
   const [formStep, setStep] = useState<FormStep>('select_source');
@@ -60,7 +58,7 @@ export function ViewSourceOptions(props: ViewSourceOptionsProps) {
     trigger: createWebhookApiKey,
     isMutating: isLoadingWebhookApiKeyCreation
   } = useSWRMutation(
-    `/api/pages/${currentPageId}/api-key`,
+    `/api/api-page-key`,
     (_url, { arg }: Readonly<{ arg: { pageId: string; type: ApiPageKey['type'] } }>) =>
       charmClient.createApiPageKey(arg)
   );
@@ -68,8 +66,8 @@ export function ViewSourceOptions(props: ViewSourceOptionsProps) {
   const typeformPopup = usePopupState({ variant: 'popover', popupId: 'typeformPopup' });
 
   const handleApiKeyClick = async (type: ApiPageKey['type']) => {
-    if (currentPageId) {
-      await createWebhookApiKey({ pageId: currentPageId, type });
+    if (props.pageId) {
+      await createWebhookApiKey({ pageId: props.pageId, type });
       typeformPopup.open();
     }
   };
@@ -99,16 +97,15 @@ export function ViewSourceOptions(props: ViewSourceOptionsProps) {
               <TbDatabase style={{ fontSize: 24 }} />
               CharmVerse database
             </SourceType>
+            <SourceType active={false} component='label' htmlFor='dbcsvfile'>
+              <input hidden type='file' id='dbcsvfile' name='dbcsvfile' accept='.csv' onChange={props.onCsvImport} />
+              <BsFiletypeCsv style={{ fontSize: 24 }} />
+              Import CSV
+            </SourceType>
             <SourceType active={activeSourceType === 'google_form'} onClick={selectSourceType('google_form')}>
               <RiGoogleFill style={{ fontSize: 24 }} />
               Google Form
             </SourceType>
-            {props.onCreate && (
-              <SourceType onClick={props.onCreate}>
-                <AddCircleIcon style={{ fontSize: 24 }} />
-                New database
-              </SourceType>
-            )}
             <SourceType
               active={false}
               onClick={() => (isLoadingWebhookApiKeyCreation ? {} : handleApiKeyClick('typeform'))}
@@ -116,11 +113,12 @@ export function ViewSourceOptions(props: ViewSourceOptionsProps) {
               <SiTypeform style={{ fontSize: 24 }} />
               Typeform
             </SourceType>
-            <SourceType active={false} component='label' htmlFor='dbcsvfile'>
-              <input hidden type='file' id='dbcsvfile' name='dbcsvfile' accept='.csv' onChange={props.onCsvImport} />
-              <BsFiletypeCsv style={{ fontSize: 24 }} />
-              CSV
-            </SourceType>
+            {props.onCreate && (
+              <SourceType onClick={props.onCreate}>
+                <AddCircleIcon style={{ fontSize: 24 }} />
+                New database
+              </SourceType>
+            )}
           </Grid>
         )}
         {formStep === 'configure_source' && sourceType === 'board_page' && (

@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import type { Space, User } from '@prisma/client';
+import type { Space, Comment } from '@charmverse/core/dist/prisma';
 import request from 'supertest';
 
-import type { CommentCreate, CommentWithUser } from 'lib/comments';
+import type { CommentCreate } from 'lib/comments';
 import { upsertPermission } from 'lib/permissions/pages';
 import type { LoggedInUser } from 'models';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
@@ -51,17 +51,16 @@ describe('POST /api/comments - create a comment', () => {
 
     const createdComment = (
       await request(baseUrl).post('/api/comments').set('Cookie', nonAdminCookie).send(creationContent).expect(201)
-    ).body as CommentWithUser;
+    ).body as Comment;
 
     expect(createdComment).toEqual(
-      expect.objectContaining<Partial<CommentWithUser>>({
+      expect.objectContaining<Partial<Comment>>({
         content: creationContent.content,
         pageId: page.id
       })
     );
 
-    expect(createdComment.user).toBeDefined();
-    expect(createdComment.user.id).toBe(nonAdminUser.id);
+    expect(createdComment.userId).toBe(nonAdminUser.id);
   });
 
   it('should fail if the user does not have a comment permission, even if they are an admin, and respond 401', async () => {

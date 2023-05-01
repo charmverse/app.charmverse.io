@@ -1,13 +1,12 @@
-import type { Block } from '@prisma/client';
-import { validate } from 'uuid';
+import { prisma } from '@charmverse/core';
+import type { Block } from '@charmverse/core/dist/prisma';
 
-import { prisma } from 'db';
+import { generatePageQuery } from 'lib/pages/server/generatePageQuery';
 import { generateMarkdown } from 'lib/prosemirror/plugins/markdown/generateMarkdown';
-import { InvalidInputError } from 'lib/utilities/errors';
 import { filterObjectKeys } from 'lib/utilities/objects';
 
 import { DatabasePageNotFoundError, PageNotFoundError, SpaceNotFoundError } from './errors';
-import type { DatabasePage, CardPage, PageProperty } from './interfaces';
+import type { CardPage, DatabasePage, PageProperty } from './interfaces';
 import { PageFromBlock } from './pageFromBlock.class';
 
 export async function getPageInBoard(pageId: string): Promise<CardPage> {
@@ -62,25 +61,16 @@ export async function getPageInBoard(pageId: string): Promise<CardPage> {
  * @param spaceId If searching by database path, you must provide the spaceId to avoid conflicts
  */
 export async function getDatabaseRoot(id: string, spaceId?: string): Promise<DatabasePage> {
-  const isValidUuid = validate(id as string);
-
-  if (!isValidUuid && !spaceId) {
-    throw new InvalidInputError('Please provide a spaceID in order to search pages by path');
-  }
-
+  const searchQuery = generatePageQuery({
+    pageIdOrPath: id,
+    spaceIdOrDomain: spaceId
+  });
   // eslint-disable-next-line prefer-const
   const database = await prisma.page.findFirst({
-    where: isValidUuid
-      ? {
-          type: 'board',
-          boardId: id as string,
-          spaceId
-        }
-      : {
-          type: 'board',
-          path: id as string,
-          spaceId
-        }
+    where: {
+      ...searchQuery,
+      type: 'board'
+    }
   });
 
   if (!database) {

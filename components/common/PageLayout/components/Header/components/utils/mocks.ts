@@ -1,3 +1,5 @@
+import type { ParseResult } from 'papaparse';
+
 import type { IPropertyTemplate } from 'lib/focalboard/board';
 
 import type { MappedProperties } from './databasePageOptions';
@@ -85,5 +87,18 @@ export const mockMappedBoardProperties: { [key: string]: MappedProperties } = {
     type: 'checkbox',
     name: 'Checkbox',
     options: {}
+  }
+};
+
+export const mockCsvResults: ParseResult<Record<string, string>> = {
+  data: [mockCsvRow],
+  errors: [],
+  meta: {
+    delimiter: ',',
+    linebreak: '\r\n',
+    aborted: false,
+    truncated: false,
+    cursor: 179,
+    fields: Object.keys(mockCsvRow)
   }
 };

@@ -1,10 +1,10 @@
+import type { PageType } from '@charmverse/core/dist/prisma';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { IconButton } from '@mui/material';
-import type { PageType } from '@prisma/client';
 import type { MouseEvent, ReactNode } from 'react';
 import { useState } from 'react';
 
-import type { DuplicatePageResponse } from 'lib/pages';
+import type { DuplicatePageResponse } from 'lib/pages/duplicatePage';
 
 import { PageActionsMenu } from './PageActionsMenu';
 

@@ -11,6 +11,7 @@ import PageThread from 'components/common/CharmEditor/components/PageThread';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { useThreads } from 'hooks/useThreads';
 import { useUser } from 'hooks/useUser';
+import type { IPagePermissionFlags } from 'lib/permissions/pages';
 import { findTotalInlineComments } from 'lib/prosemirror/plugins/inlineComments/findTotalInlineComments';
 import type { ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
 import { highlightDomElement, setUrlWithoutRerender } from 'lib/utilities/browser';
@@ -44,7 +45,7 @@ const EmptyThreadContainerBox = styled(Box)`
   background-color: ${({ theme }) => theme.palette.background.light};
 `;
 
-function CommentsSidebarComponent({ inline }: BoxProps & { inline?: boolean }) {
+function CommentsSidebarComponent({ inline, permissions }: { inline?: boolean; permissions?: IPagePermissionFlags }) {
   const router = useRouter();
   const { threads } = useThreads();
   const { user } = useUser();
@@ -156,7 +157,13 @@ function CommentsSidebarComponent({ inline }: BoxProps & { inline?: boolean }) {
           sortedThreadList.map(
             (resolvedThread) =>
               resolvedThread && (
-                <PageThread showFindButton inline={inline} key={resolvedThread.id} threadId={resolvedThread?.id} />
+                <PageThread
+                  permissions={permissions}
+                  showFindButton
+                  inline={inline}
+                  key={resolvedThread.id}
+                  threadId={resolvedThread?.id}
+                />
               )
           )
         )}

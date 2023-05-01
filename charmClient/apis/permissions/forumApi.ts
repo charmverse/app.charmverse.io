@@ -1,26 +1,27 @@
-import * as http from 'adapters/http';
 import type {
+  PostCategoryPermissionAssignment,
   AssignedPostCategoryPermission,
-  AvailablePostCategoryPermissionFlags,
-  AvailablePostPermissionFlags
-} from 'lib/permissions/forum/interfaces';
-import type { PostCategoryPermissionInput } from 'lib/permissions/forum/upsertPostCategoryPermission';
+  PostCategoryPermissionFlags,
+  PostPermissionFlags
+} from '@charmverse/core';
+
+import * as http from 'adapters/http';
 import type { PermissionCompute, PermissionToDelete } from 'lib/permissions/interfaces';
 
 export class ForumPermissionsApi {
   computePostPermissions({ postIdOrPath, spaceDomain }: { postIdOrPath: string; spaceDomain?: string }) {
-    return http.POST<AvailablePostPermissionFlags>(`/api/permissions/forum/compute-post-permissions`, {
+    return http.POST<PostPermissionFlags>(`/api/permissions/forum/compute-post-permissions`, {
       resourceId: !spaceDomain ? postIdOrPath : `${spaceDomain}/${postIdOrPath}`
     } as PermissionCompute);
   }
 
   computePostCategoryPermissions(postCategoryId: string) {
-    return http.POST<AvailablePostCategoryPermissionFlags>(`/api/permissions/forum/compute-post-category-permissions`, {
+    return http.POST<PostCategoryPermissionFlags>(`/api/permissions/forum/compute-post-category-permissions`, {
       resourceId: postCategoryId
     } as PermissionCompute);
   }
 
-  upsertPostCategoryPermission(permissionInput: PostCategoryPermissionInput) {
+  upsertPostCategoryPermission(permissionInput: PostCategoryPermissionAssignment) {
     return http.POST<AssignedPostCategoryPermission>('/api/permissions/forum', permissionInput);
   }
 

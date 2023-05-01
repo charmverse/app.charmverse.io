@@ -1,3 +1,4 @@
+import type { PageType } from '@charmverse/core/dist/prisma';
 import styled from '@emotion/styled';
 import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
@@ -8,7 +9,6 @@ import Input from '@mui/material/OutlinedInput';
 import Switch from '@mui/material/Switch';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
-import type { PageType } from '@prisma/client';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';

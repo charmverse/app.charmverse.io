@@ -1,7 +1,6 @@
-import type { Post, Prisma } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { Post, Prisma } from '@charmverse/core/dist/prisma';
 import { v4 } from 'uuid';
-
-import { prisma } from 'db';
 
 import { generatePostCategory } from './utils/forums';
 

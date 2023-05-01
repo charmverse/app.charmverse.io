@@ -1,10 +1,11 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import type { Page } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { Page } from '@charmverse/core/dist/prisma';
 import request from 'supertest';
 
-import { prisma } from 'db';
 import type { IPageWithPermissions } from 'lib/pages';
 import { getPagePath } from 'lib/pages';
+import { getPage } from 'lib/pages/server';
 import { createProposalTemplate } from 'lib/templates/proposals/createProposalTemplate';
 import { generatePageNode } from 'testing/generateStubs';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
@@ -49,11 +50,11 @@ describe('PUT /api/pages/{id} - update page', () => {
       title: 'new title'
     };
 
-    const body = (
-      await request(baseUrl).put(`/api/pages/${page.id}`).set('Cookie', userCookie).send(pageUpdate).expect(200)
-    ).body as IPageWithPermissions;
+    await request(baseUrl).put(`/api/pages/${page.id}`).set('Cookie', userCookie).send(pageUpdate).expect(200);
 
-    expect(body).toMatchObject(expect.objectContaining(pageUpdate));
+    const updatedPage = await getPage(page.id);
+
+    expect(updatedPage).toMatchObject(expect.objectContaining(pageUpdate));
   });
 
   // This is a temporary test, until we get a more fine grained way to evaluate diffs received in content field
@@ -85,10 +86,9 @@ describe('PUT /api/pages/{id} - update page', () => {
       contentText: 'This is a paragraph [commentMark]'
     };
 
-    const body = (
-      await request(baseUrl).put(`/api/pages/${page.id}`).set('Cookie', userCookie).send(commentUpdate).expect(200)
-    ).body as IPageWithPermissions;
-    expect(body).toMatchObject(expect.objectContaining(commentUpdate));
+    await request(baseUrl).put(`/api/pages/${page.id}`).set('Cookie', userCookie).send(commentUpdate).expect(200);
+    const updatedPage = await getPage(page.id);
+    expect(updatedPage).toMatchObject(expect.objectContaining(commentUpdate));
 
     const titleUpdate: Pick<Page, 'title'> = {
       title: 'new title'

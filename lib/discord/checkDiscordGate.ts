@@ -1,4 +1,5 @@
-import { prisma } from 'db';
+import { prisma } from '@charmverse/core';
+
 import type { CheckDiscordGateResult } from 'lib/discord/interface';
 import { verifyDiscordGateForSpace } from 'lib/discord/verifyDiscordGateForSpace';
 import { InvalidInputError } from 'lib/utilities/errors';

@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import type { Application, Space, User } from '@prisma/client';
+import type { Application, Space, User } from '@charmverse/core/dist/prisma';
 import request from 'supertest';
 
 import type { SubmissionReview } from 'lib/applications/interfaces';

@@ -1,6 +1,6 @@
-import type { MemberProperty, PrismaPromise } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { MemberProperty, PrismaPromise } from '@charmverse/core/dist/prisma';
 
-import { prisma } from 'db';
 import { NotFoundError } from 'lib/middleware';
 import { UserIsNotSpaceMemberError } from 'lib/users/errors';
 import { InvalidInputError } from 'lib/utilities/errors';

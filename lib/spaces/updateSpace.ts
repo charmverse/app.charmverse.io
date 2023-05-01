@@ -1,6 +1,6 @@
-import type { Space } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { Space } from '@charmverse/core/dist/prisma';
 
-import { prisma } from 'db';
 import { updateTrackGroupProfile } from 'lib/metrics/mixpanel/updateTrackGroupProfile';
 import { DuplicateDataError, InvalidInputError } from 'lib/utilities/errors';
 

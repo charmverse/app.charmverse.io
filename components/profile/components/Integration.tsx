@@ -1,7 +1,7 @@
+import type { IdentityType } from '@charmverse/core/dist/prisma';
 import styled from '@emotion/styled';
 import CheckIcon from '@mui/icons-material/Check';
 import { Box, Divider, Grid, Tooltip, Typography } from '@mui/material';
-import type { IdentityType } from '@prisma/client';
 import type { ReactNode } from 'react';
 
 import Button from 'components/common/Button';

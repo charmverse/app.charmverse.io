@@ -1,6 +1,6 @@
 import type { NodeViewProps } from '@bangle.dev/core';
+import type { Page } from '@charmverse/core/dist/prisma';
 import styled from '@emotion/styled';
-import type { Page } from '@prisma/client';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import type { KeyboardEvent, MouseEvent, ClipboardEvent } from 'react';
@@ -14,6 +14,8 @@ import FocalBoardPortal from 'components/common/BoardEditor/FocalBoardPortal';
 import { usePagePermissions } from 'hooks/usePagePermissions';
 import { usePages } from 'hooks/usePages';
 import debouncePromise from 'lib/utilities/debouncePromise';
+
+import type { CharmNodeViewProps } from '../../nodeView/nodeView';
 
 // Lazy load focalboard entrypoint (ignoring the redux state stuff for now)
 const CenterPanel = dynamic(() => import('components/common/BoardEditor/focalboard/src/components/centerPanel'), {
@@ -84,19 +86,11 @@ const StylesContainer = styled.div<{ containerWidth?: number }>`
   }
 `;
 
-interface DatabaseViewProps extends NodeViewProps {
+interface DatabaseViewProps extends CharmNodeViewProps {
   containerWidth?: number; // pass in the container width so we can extend full width
-  readOnly?: boolean;
 }
 
-interface DatabaseView {
-  // Not using linkedPageId as the source could be other things
-  // source field would be used to figure out what type of source it actually is
-  pageId: string;
-  source: 'board_page';
-}
-
-export default function DatabaseView({ containerWidth, readOnly: readOnlyOverride, node }: DatabaseViewProps) {
+export function InlineDatabase({ containerWidth, readOnly: readOnlyOverride, node }: DatabaseViewProps) {
   const pageId = node.attrs.pageId as string;
   const allViews = useAppSelector(getSortedViews);
   const router = useRouter();
@@ -110,14 +104,13 @@ export default function DatabaseView({ containerWidth, readOnly: readOnlyOverrid
 
   const boards = useAppSelector(getSortedBoards);
   const board = boards.find((b) => b.id === pageId);
+  const boardPage = pages[pageId];
 
   const { permissions: currentPagePermissions } = usePagePermissions({ pageIdOrPath: pageId });
 
-  const debouncedPageUpdate = useCallback(() => {
+  const debouncedPageUpdate = useMemo(() => {
     return debouncePromise(async (updates: Partial<Page>) => {
-      const updatedPage = await updatePage({ id: pageId, ...updates });
-
-      return updatedPage;
+      await updatePage({ id: pageId, ...updates });
     }, 500);
   }, [updatePage]);
 
@@ -136,7 +129,7 @@ export default function DatabaseView({ containerWidth, readOnly: readOnlyOverrid
     [setCurrentViewId, views]
   );
 
-  if (!board) {
+  if (!board || !boardPage || boardPage.deletedAt !== null) {
     return null;
   }
 
@@ -162,6 +155,7 @@ export default function DatabaseView({ containerWidth, readOnly: readOnlyOverrid
           showCard={setShownCardId}
           activeView={currentView}
           views={views}
+          page={boardPage}
           // Show more tabs on shared inline database as the space gets increased
           maxTabsShown={router.pathname.startsWith('/share') ? 5 : 3}
         />

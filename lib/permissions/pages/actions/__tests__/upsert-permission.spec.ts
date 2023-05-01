@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 
-import type { Role, Space, User } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { Role, Space, User } from '@charmverse/core/dist/prisma';
 import { v4 } from 'uuid';
 
-import { prisma } from 'db';
 import { InvalidPermissionGranteeError } from 'lib/permissions/errors';
 import { InsecureOperationError } from 'lib/utilities/errors';
 import { ExpectedAnError } from 'testing/errors';

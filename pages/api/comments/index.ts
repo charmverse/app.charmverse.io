@@ -1,7 +1,7 @@
+import { prisma } from '@charmverse/core';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { prisma } from 'db';
 import type { CommentCreate } from 'lib/comments';
 import { addComment } from 'lib/comments';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';

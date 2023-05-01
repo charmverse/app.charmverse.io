@@ -1,9 +1,7 @@
-import type { Page as PrismaPage, Prisma } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { Page as PrismaPage, Prisma } from '@charmverse/core/dist/prisma';
 import type { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
 
-import { prisma } from 'db';
-import { onError, onNoMatch, requireApiKey } from 'lib/middleware';
 import type { CardPage, PageProperty, CardPageQuery, PaginatedQuery, PaginatedResponse } from 'lib/public-api';
 import {
   DatabasePageNotFoundError,
@@ -12,10 +10,11 @@ import {
   validatePageQuery,
   validatePaginationQuery
 } from 'lib/public-api';
+import { apiHandler } from 'lib/public-api/handler';
 
-const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
+const handler = apiHandler();
 
-handler.use(requireApiKey).post(searchDatabase);
+handler.post(searchDatabase);
 
 // Limit the maximum size of a search query's results
 const maxRecordsPerQuery = 100;

@@ -1,5 +1,5 @@
+import type { Post, Space } from '@charmverse/core/dist/prisma';
 import { expect, test as base } from '@playwright/test';
-import type { Post, Space } from '@prisma/client';
 import type { LoggedInPage } from '__e2e__/po/loggedIn.po';
 
 import { upsertPostCategoryPermission } from 'lib/permissions/forum/upsertPostCategoryPermission';

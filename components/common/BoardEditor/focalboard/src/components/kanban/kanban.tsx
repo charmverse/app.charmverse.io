@@ -1,5 +1,4 @@
 /* eslint-disable max-lines */
-// import Button from '../../widgets/buttons/button'
 import { Box, Menu, TextField } from '@mui/material';
 import Button from '@mui/material/Button';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
@@ -12,7 +11,6 @@ import type { Board, BoardGroup, IPropertyOption, IPropertyTemplate } from 'lib/
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
 
-import { Constants } from '../../constants';
 import type { BlockChange } from '../../mutator';
 import mutator from '../../mutator';
 import { IDType, Utils } from '../../utils';
@@ -243,10 +241,14 @@ function Kanban(props: Props) {
   );
 
   const [showCalculationsMenu, setShowCalculationsMenu] = useState<Map<string, boolean>>(new Map<string, boolean>());
-  const toggleOptions = (templateId: string, show: boolean) => {
+
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+
+  const toggleOptions = (templateId: string, _anchorEl?: HTMLElement) => {
     const newShowOptions = new Map<string, boolean>(showCalculationsMenu);
-    newShowOptions.set(templateId, show);
+    newShowOptions.set(templateId, !!_anchorEl);
     setShowCalculationsMenu(newShowOptions);
+    setAnchorEl(_anchorEl || null);
   };
 
   const createNewSelectProperty = async () => {
@@ -287,8 +289,9 @@ function Kanban(props: Props) {
             propertyNameChanged={propertyNameChanged}
             onDropToColumn={onDropToColumn}
             calculationMenuOpen={showCalculationsMenu.get(group.option.id) || false}
-            onCalculationMenuOpen={() => toggleOptions(group.option.id, true)}
-            onCalculationMenuClose={() => toggleOptions(group.option.id, false)}
+            onCalculationMenuOpen={(_anchorEl) => toggleOptions(group.option.id, _anchorEl)}
+            onCalculationMenuClose={() => toggleOptions(group.option.id)}
+            anchorEl={anchorEl}
           />
         ))}
 

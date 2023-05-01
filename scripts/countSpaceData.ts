@@ -1,5 +1,5 @@
 import { countData } from 'lib/spaces/countData';
-import { prisma } from 'db';
+import { prisma } from '@charmverse/core';
 import { writeFileSync} from 'fs';
 
 const filename = 'space-data.csv';

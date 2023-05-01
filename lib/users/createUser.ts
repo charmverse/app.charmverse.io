@@ -1,7 +1,7 @@
+import { prisma } from '@charmverse/core';
 import { Wallet } from 'ethers';
 import { v4 } from 'uuid';
 
-import { prisma } from 'db';
 import { getENSName } from 'lib/blockchain/getENSName';
 import log from 'lib/log';
 import type { SignupAnalytics } from 'lib/metrics/mixpanel/interfaces/UserEvent';

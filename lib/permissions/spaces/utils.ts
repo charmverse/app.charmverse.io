@@ -1,4 +1,4 @@
-import type { Prisma, SpacePermission } from '@prisma/client';
+import type { Prisma, SpacePermission } from '@charmverse/core/dist/prisma';
 
 import { MissingDataError } from 'lib/utilities/errors';
 

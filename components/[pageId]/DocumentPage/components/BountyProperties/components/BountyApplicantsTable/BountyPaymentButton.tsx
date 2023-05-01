@@ -1,9 +1,9 @@
+import type { UserGnosisSafe } from '@charmverse/core/dist/prisma';
 import { BigNumber } from '@ethersproject/bignumber';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import { Divider, Menu, MenuItem } from '@mui/material';
 import type { AlertColor } from '@mui/material/Alert';
 import Button from '@mui/material/Button';
-import type { UserGnosisSafe } from '@prisma/client';
 import ERC20ABI from 'abis/ERC20ABI.json';
 import { getChainById } from 'connectors';
 import type { Signer } from 'ethers';
@@ -13,7 +13,7 @@ import { useState } from 'react';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
-import { useGnosisPayment } from 'hooks/useGnosisPayment';
+import { getPaymentErrorMessage, useGnosisPayment } from 'hooks/useGnosisPayment';
 import { useMultiBountyPayment } from 'hooks/useMultiBountyPayment';
 import useMultiWalletSigs from 'hooks/useMultiWalletSigs';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
@@ -36,26 +36,6 @@ interface Props {
   onClick?: () => void;
   onError?: (err: string, severity?: AlertColor) => void;
   bounty: BountyWithDetails;
-}
-
-function extractWalletErrorMessage(error: any): string {
-  if (error?.code === 'INSUFFICIENT_FUNDS') {
-    return 'You do not have sufficient funds to perform this transaction';
-  } else if (error?.code === 4001) {
-    return 'You rejected the transaction';
-  } else if (error?.code === -32602) {
-    return 'A valid recipient must be provided';
-  } else if (error?.reason) {
-    return error.reason;
-  } else if (error?.message) {
-    return error.message;
-  } else if (typeof error === 'object') {
-    return JSON.stringify(error);
-  } else if (typeof error === 'string') {
-    return error;
-  } else {
-    return 'An unknown error occurred';
-  }
 }
 
 function SafeMenuItem({
@@ -87,16 +67,7 @@ function SafeMenuItem({
         try {
           await makePayment();
         } catch (error: any) {
-          const errorMessage = extractWalletErrorMessage(error);
-
-          if (errorMessage === 'underlying network changed') {
-            onError(
-              "You've changed your active network.\r\nRe-select 'Make payment' to complete this transaction",
-              'warning'
-            );
-          } else {
-            onError(errorMessage);
-          }
+          onError(getPaymentErrorMessage(error));
         }
       }}
     >
@@ -219,16 +190,7 @@ export default function BountyPaymentButton({
         onError('Please provide a valid contract address');
       }
     } catch (err: any) {
-      const errorMessage = extractWalletErrorMessage(err);
-
-      if (errorMessage === 'underlying network changed') {
-        onError(
-          "You've changed your active network.\r\nRe-select 'Make payment' to complete this transaction",
-          'warning'
-        );
-      } else {
-        onError(errorMessage);
-      }
+      onError(getPaymentErrorMessage(err));
     }
   };
 

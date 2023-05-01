@@ -10,11 +10,11 @@ import LoadingComponent from 'components/common/LoadingComponent';
 import { useProposalDetails } from 'components/proposals/hooks/useProposalDetails';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import type { CommentPermissions } from 'lib/comments';
-import type { PageMeta } from 'lib/pages';
+import type { PageWithContent } from 'lib/pages';
 import type { IPagePermissionFlags } from 'lib/permissions/pages';
 
 type Props = {
-  page: PageMeta;
+  page: Pick<PageWithContent, 'type' | 'id'>;
   permissions: IPagePermissionFlags;
 };
 

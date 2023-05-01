@@ -1,14 +1,33 @@
-import type { ExportedPage } from 'lib/templates/interfaces';
+import type { ExportedPage } from 'lib/templates/exportWorkspacePages';
 
-export const proposalTemplates: ExportedPage[] = [
-  {
-    id: 'ab2fde3d-2a3c-420a-a460-cd106a0c289f',
+type StandardFields =
+  | 'id'
+  | 'deletedBy'
+  | 'deletedAt'
+  | 'createdAt'
+  | 'createdBy'
+  | 'updatedAt'
+  | 'updatedBy'
+  | 'fontFamily'
+  | 'fontSizeSmall';
+
+function exportedPage(template: Omit<ExportedPage, StandardFields>): ExportedPage {
+  return {
+    id: '__replace_me__',
     deletedAt: null,
-    createdAt: new Date('2022-09-24T12:30:31.978Z'),
-    createdBy: 'dc521ceb-495e-40cc-940e-3b1cafc7a2e1',
-    updatedAt: new Date('2023-01-23T21:24:28.704Z'),
-    updatedBy: 'dc521ceb-495e-40cc-940e-3b1cafc7a2e1',
+    createdAt: new Date(),
+    createdBy: '__replace_me__',
+    updatedAt: new Date(),
+    updatedBy: '__replace_me__',
     deletedBy: null,
+    fontFamily: 'default',
+    fontSizeSmall: null,
+    ...template
+  };
+}
+
+const templates: Omit<ExportedPage, StandardFields>[] = [
+  {
     title: 'Grants',
     content: {
       type: 'doc',
@@ -487,13 +506,6 @@ export const proposalTemplates: ExportedPage[] = [
     }
   },
   {
-    id: '648cd168-771a-40d9-a5c7-44699b8f1337',
-    deletedAt: null,
-    createdAt: new Date('2022-09-29T11:12:44.774Z'),
-    createdBy: 'dc521ceb-495e-40cc-940e-3b1cafc7a2e1',
-    updatedAt: new Date('2023-01-23T21:23:56.289Z'),
-    deletedBy: null,
-    updatedBy: 'dc521ceb-495e-40cc-940e-3b1cafc7a2e1',
     title: 'Budget',
     content: {
       type: 'doc',
@@ -1626,13 +1638,6 @@ export const proposalTemplates: ExportedPage[] = [
     }
   },
   {
-    id: 'e4cad114-c6a4-4516-82a7-6eca8208f31e',
-    deletedAt: null,
-    createdAt: new Date('2023-01-23T21:03:23.337Z'),
-    createdBy: 'dc521ceb-495e-40cc-940e-3b1cafc7a2e1',
-    updatedAt: new Date('2023-01-23T21:23:25.148Z'),
-    deletedBy: null,
-    updatedBy: 'dc521ceb-495e-40cc-940e-3b1cafc7a2e1',
     title: 'Investments',
     content: {
       type: 'doc',
@@ -2050,13 +2055,6 @@ export const proposalTemplates: ExportedPage[] = [
     }
   },
   {
-    id: 'a36b0073-7ebc-4c55-8d22-3918b5226e0a',
-    deletedAt: null,
-    createdAt: new Date('2023-01-24T20:23:50.129Z'),
-    createdBy: 'dc521ceb-495e-40cc-940e-3b1cafc7a2e1',
-    updatedAt: new Date('2023-01-24T20:30:21.872Z'),
-    deletedBy: null,
-    updatedBy: 'dc521ceb-495e-40cc-940e-3b1cafc7a2e1',
     title: 'Protocol Changes',
     content: {
       type: 'doc',
@@ -2400,13 +2398,6 @@ export const proposalTemplates: ExportedPage[] = [
     }
   },
   {
-    id: '17fafdb0-6030-43b3-8a0c-c2f64b240810',
-    deletedAt: null,
-    createdAt: new Date('2023-01-24T22:12:16.694Z'),
-    createdBy: 'dc521ceb-495e-40cc-940e-3b1cafc7a2e1',
-    updatedAt: new Date('2023-01-24T22:34:14.470Z'),
-    deletedBy: null,
-    updatedBy: 'dc521ceb-495e-40cc-940e-3b1cafc7a2e1',
     title: 'Metagov Changes',
     content: {
       type: 'doc',
@@ -3094,13 +3085,6 @@ export const proposalTemplates: ExportedPage[] = [
     }
   },
   {
-    id: 'b61aae93-96a0-4988-8aba-cc70bd968b37',
-    deletedAt: null,
-    createdAt: new Date('2023-01-24T22:49:33.350Z'),
-    createdBy: 'dc521ceb-495e-40cc-940e-3b1cafc7a2e1',
-    updatedAt: new Date('2023-01-24T22:57:45.859Z'),
-    deletedBy: null,
-    updatedBy: 'dc521ceb-495e-40cc-940e-3b1cafc7a2e1',
     title: 'Delegate Governance',
     content: {
       type: 'doc',
@@ -3788,3 +3772,5 @@ export const proposalTemplates: ExportedPage[] = [
     }
   }
 ];
+
+export const proposalTemplates = templates.map(exportedPage);

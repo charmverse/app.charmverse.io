@@ -1,9 +1,9 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
-import type { Prisma, Space } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { Prisma, Space } from '@charmverse/core/dist/prisma';
 
-import { prisma } from 'db';
 import { generateDefaultPostCategories } from 'lib/forums/categories/generateDefaultPostCategories';
 import { setDefaultPostCategory } from 'lib/forums/categories/setDefaultPostCategory';
 import { generateDefaultPropertiesInput } from 'lib/members/generateDefaultPropertiesInput';
@@ -16,14 +16,14 @@ import { createPage } from 'lib/pages/server/createPage';
 import { setupDefaultPaymentMethods } from 'lib/payment-methods/defaultPaymentMethods';
 import { updateSpacePermissionConfigurationMode } from 'lib/permissions/meta';
 import { generateDefaultProposalCategoriesInput } from 'lib/proposal/generateDefaultProposalCategoriesInput';
+import type { WorkspaceExport } from 'lib/templates/exportWorkspacePages';
 import { importWorkspacePages } from 'lib/templates/importWorkspacePages';
-import type { WorkspaceExport } from 'lib/templates/interfaces';
 import { subscribeToAllEvents, createSigningSecret } from 'lib/webhookPublisher/subscribeToEvents';
 import { gettingStartedPage } from 'seedData/gettingStartedPage';
 import { proposalTemplates } from 'seedData/proposalTemplates';
 
-import type { SpaceCreateTemplate, SpaceTemplateType } from './config';
-import { spaceInternalTemplateMapping, spaceTemplateLabelMapping } from './config';
+import type { PrivateTemplate, SpaceCreateTemplate, SpaceTemplateType } from './config';
+import { privateTemplateMapping, spaceInternalTemplateMapping, spaceTemplateLabelMapping } from './config';
 import { getAvailableDomainName } from './getAvailableDomainName';
 import { getSpaceByDomain } from './getSpaceByDomain';
 
@@ -45,8 +45,9 @@ export type CreateSpaceProps = {
   spaceData: SpaceCreateInput;
   userId: string;
   extraAdmins?: string[];
-  createSpaceTemplate?: SpaceCreateTemplate;
+  createSpaceTemplate?: SpaceCreateTemplate | PrivateTemplate;
   webhookUrl?: string;
+  skipTracking?: boolean;
 };
 
 export async function createWorkspace({
@@ -54,7 +55,8 @@ export async function createWorkspace({
   webhookUrl,
   userId,
   createSpaceTemplate,
-  extraAdmins = []
+  extraAdmins = [],
+  skipTracking
 }: CreateSpaceProps) {
   let domain = spaceData.domain;
 
@@ -157,16 +159,14 @@ export async function createWorkspace({
   } else if (
     (spaceTemplateLabelMapping as Record<string, string>)[
       spaceInternalTemplateMapping[createSpaceTemplate as SpaceTemplateType]
-    ]
+    ] ||
+    privateTemplateMapping[createSpaceTemplate as PrivateTemplate]
   ) {
-    const resolvedPath = path.resolve(
-      path.join(
-        'lib',
-        'templates',
-        'exports',
-        `${spaceInternalTemplateMapping[createSpaceTemplate as SpaceTemplateType]}.json`
-      )
-    );
+    const filename =
+      spaceInternalTemplateMapping[createSpaceTemplate as SpaceTemplateType] ||
+      privateTemplateMapping[createSpaceTemplate as PrivateTemplate];
+
+    const resolvedPath = path.resolve(path.join('lib', 'templates', 'exports', `${filename}.json`));
     const dataToImport: WorkspaceExport = JSON.parse(await fs.readFile(resolvedPath, 'utf-8'));
 
     await importWorkspacePages({
@@ -234,10 +234,12 @@ export async function createWorkspace({
     await subscribeToAllEvents({ spaceId: space.id, userId });
   }
 
-  logSpaceCreation(space);
-  updateTrackGroupProfile(space);
-  updateTrackUserProfileById(userId);
-  trackUserAction('create_new_workspace', { userId, spaceId: space.id, template: createSpaceTemplate ?? 'default' });
+  if (!skipTracking) {
+    logSpaceCreation(space);
+    updateTrackGroupProfile(space);
+    updateTrackUserProfileById(userId);
+    trackUserAction('create_new_workspace', { userId, spaceId: space.id, template: createSpaceTemplate ?? 'default' });
+  }
 
   return updatedSpace;
 }

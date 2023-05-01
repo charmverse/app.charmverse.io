@@ -1,6 +1,6 @@
+import type { Post, PostCategory } from '@charmverse/core/dist/prisma';
 import CommentIcon from '@mui/icons-material/Comment';
 import { Box, Divider, Stack, Typography } from '@mui/material';
-import type { Post, PostCategory } from '@prisma/client';
 import { useRouter } from 'next/router';
 import { useEffect, useMemo, useState } from 'react';
 import useSWR from 'swr';
@@ -8,6 +8,7 @@ import useSWR from 'swr';
 import charmClient from 'charmClient';
 import { PageTitleInput } from 'components/[pageId]/DocumentPage/components/PageTitleInput';
 import { Container } from 'components/[pageId]/DocumentPage/DocumentPage';
+import { ProposalBanner } from 'components/common/Banners/ProposalBanner';
 import Button from 'components/common/Button';
 import CharmEditor from 'components/common/CharmEditor';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEditor';
@@ -17,14 +18,15 @@ import { processComments, sortComments } from 'components/common/comments/utils'
 import ErrorPage from 'components/common/errors/ErrorPage';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { ScrollableWindow } from 'components/common/PageLayout';
-import { ProposalBanner } from 'components/common/ProposalBanner';
 import UserDisplay from 'components/common/UserDisplay';
 import { PostCommentForm } from 'components/forum/components/PostPage/components/PostCommentForm';
+import { usePostCategoryPermissions } from 'components/forum/hooks/usePostCategoryPermissions';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useForumCategories } from 'hooks/useForumCategories';
 import { useMembers } from 'hooks/useMembers';
 import { usePostPermissions } from 'hooks/usePostPermissions';
 import { usePreventReload } from 'hooks/usePreventReload';
+import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import type { PostCommentWithVoteAndChildren } from 'lib/forums/comments/interface';
 import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
@@ -67,6 +69,7 @@ export function PostPage({
   const currentSpace = useCurrentSpace();
   const { user } = useUser();
   const { categories, getForumCategoryById } = useForumCategories();
+  const { showMessage } = useSnackbar();
   const { showPost } = usePostDialog();
   const [isPublishingDraftPost, setIsPublishingDraftPost] = useState(false);
   // We should only set writeable categories for new post
@@ -86,6 +89,9 @@ export function PostPage({
       }
     })()
   );
+
+  const { permissions: categoryPermissions } = usePostCategoryPermissions(categoryId as string);
+
   const { getMemberById } = useMembers();
   const router = useRouter();
   const {
@@ -130,14 +136,19 @@ export function PostPage({
       });
       setContentUpdated(false);
     } else {
-      const newPost = await charmClient.forum.createForumPost({
-        categoryId,
-        content: formInputs.content,
-        contentText: formInputs.contentText ?? '',
-        spaceId,
-        title: formInputs.title,
-        isDraft
-      });
+      const newPost = await charmClient.forum
+        .createForumPost({
+          categoryId,
+          content: formInputs.content,
+          contentText: formInputs.contentText ?? '',
+          spaceId,
+          title: formInputs.title,
+          isDraft
+        })
+        .catch((err) => {
+          showMessage(err.message ?? 'Something went wrong', 'error');
+          throw err;
+        });
       if (!isDraft) {
         router.push(`/${router.query.domain}/forum/post/${newPost.path}`);
       } else {
@@ -184,6 +195,8 @@ export function PostPage({
     disabledTooltip = 'Category is required';
   } else if (isPublishingDraftPost) {
     disabledTooltip = 'Publishing draft post';
+  } else if (!post && categoryPermissions?.create_post === false) {
+    disabledTooltip = 'You do not have permission to create posts in this category';
   }
 
   const topLevelComments: PostCommentWithVoteAndChildren[] = useMemo(() => {
@@ -213,6 +226,13 @@ export function PostPage({
           <Stack flexDirection='row'>
             <Container top={50}>
               <Box minHeight={300} data-test='post-charmeditor'>
+                <PageTitleInput readOnly={!canEdit} value={formInputs.title} onChange={updateTitle} />
+                {createdBy && (
+                  <UserDisplay showMiniProfile user={createdBy} avatarSize='small' fontSize='medium' mt={2} mb={3} />
+                )}
+                <Box my={2}>
+                  <PostCategoryInput readOnly={!canEdit} setCategoryId={updateCategoryId} categoryId={categoryId} />
+                </Box>
                 <CharmEditor
                   pageType='post'
                   autoFocus={false}
@@ -225,15 +245,7 @@ export function PostPage({
                   key={`${user?.id}.${post?.proposalId}.${canEdit}`}
                   content={formInputs.content as PageContent}
                   onContentChange={updatePostContent}
-                >
-                  <PageTitleInput readOnly={!canEdit} value={formInputs.title} onChange={updateTitle} />
-                  {createdBy && (
-                    <UserDisplay showMiniProfile user={createdBy} avatarSize='small' fontSize='medium' mt={2} mb={3} />
-                  )}
-                  <Box my={2}>
-                    <PostCategoryInput readOnly={!canEdit} setCategoryId={updateCategoryId} categoryId={categoryId} />
-                  </Box>
-                </CharmEditor>
+                />
               </Box>
               {canEdit && (
                 <Stack flexDirection='row' gap={1} justifyContent='flex-end' my={2}>
@@ -250,7 +262,9 @@ export function PostPage({
                   )}
                   {post?.isDraft && (
                     <Button
-                      disabled={Boolean(disabledTooltip) || isPublishingDraftPost}
+                      disabled={
+                        Boolean(disabledTooltip) || isPublishingDraftPost || categoryPermissions?.create_post === false
+                      }
                       disabledTooltip={disabledTooltip}
                       onClick={() => publishDraftPost(post)}
                       loading={isPublishingDraftPost}
@@ -260,7 +274,11 @@ export function PostPage({
                   )}
                   {!post?.isDraft && (
                     <Button
-                      disabled={Boolean(disabledTooltip) || !contentUpdated}
+                      disabled={
+                        Boolean(disabledTooltip) ||
+                        !contentUpdated ||
+                        (!post && categoryPermissions?.create_post === false)
+                      }
                       disabledTooltip={disabledTooltip}
                       onClick={() => createForumPost(false)}
                     >

@@ -1,6 +1,6 @@
+import { prisma } from '@charmverse/core';
 import { v4 } from 'uuid';
 
-import { prisma } from 'db';
 import { prismaToBlock } from 'lib/focalboard/block';
 import { getDatabaseDetails } from 'lib/pages/getDatabaseDetails';
 import type { FormResponseProperty } from 'lib/pages/interfaces';
@@ -29,14 +29,10 @@ export async function createFormResponseCard({
 
   const board = await getDatabaseDetails({ spaceId, idOrPath: databaseIdorPath });
 
-  if (!board) {
-    throw new InvalidInputError('Database not found');
-  }
-
   const fields = (board.fields as any) || {};
   const cardProperties = fields?.cardProperties || [];
   const existingResponseProperties: FormResponseProperty[] =
-    cardProperties.filter((p: FormResponseProperty) => p.isQuestion) || [];
+    cardProperties.filter((p: FormResponseProperty) => formResponses.some((f) => f.question === p.description)) || [];
 
   // Map properties, create new onses for non-existing questions
   const { newProperties, mappedProperties } = mapAndCreateProperties(formResponses, existingResponseProperties);
@@ -107,8 +103,7 @@ function createNewFormProperty(description: string): FormResponseProperty {
     name: description,
     type: 'text',
     options: [],
-    description,
-    isQuestion: true
+    description
   };
 }
 
@@ -116,19 +111,12 @@ function mapAndCreateProperties(formResponses: FormResponse[], existingResponseP
   const newProperties: FormResponseProperty[] = [];
   const mappedProperties: Record<string, string> = {};
 
-  let index = 0;
   formResponses.forEach((response) => {
-    let property = existingResponseProperties.find((p) => p.description === response.question);
+    const description = response.question.trim();
+    let property = existingResponseProperties.find((p) => p.description === description);
 
     if (!property) {
-      property = createNewFormProperty(response.question);
-
-      if (response.question.toLowerCase() === 'created at') {
-        property.name = response.question;
-      } else {
-        index += 1;
-        property.name = `Question ${index}`;
-      }
+      property = createNewFormProperty(description);
       newProperties.push(property);
     }
 

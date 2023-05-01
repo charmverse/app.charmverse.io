@@ -1,4 +1,4 @@
-import { prisma } from 'db';
+import { prisma } from '@charmverse/core';
 import { BoardFields } from 'lib/focalboard/board';
 import { CardFields } from 'lib/focalboard/card';
 import { IDType, Utils } from 'components/common/BoardEditor/focalboard/src/utils';

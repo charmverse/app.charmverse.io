@@ -2,13 +2,13 @@
 /* eslint-disable camelcase */
 import fs from 'node:fs/promises';
 
-import type { Page, Space, User } from '@prisma/client';
+import type { Page, Space, User } from '@charmverse/core/dist/prisma';
 
 import { createBounty } from 'lib/bounties';
 import type { IPageWithPermissions } from 'lib/pages';
 import { createPage, generateBoard, generateProposal, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
-import { exportWorkspacePages } from '../exportWorkspacePages';
+import { exportWorkspacePages, exportWorkspacePagesToDisk } from '../exportWorkspacePages';
 
 jest.mock('node:fs/promises');
 
@@ -57,7 +57,7 @@ beforeAll(async () => {
 
 describe('exportWorkspacePages', () => {
   it('should export the pages within a workspace to a list of root pages, and their children as a recursive tree structure', async () => {
-    const { data } = await exportWorkspacePages({
+    const data = await exportWorkspacePages({
       sourceSpaceIdOrDomain: space.id
     });
 
@@ -79,7 +79,7 @@ describe('exportWorkspacePages', () => {
   });
 
   it('should support a space domain for the source space', async () => {
-    const { data } = await exportWorkspacePages({
+    const data = await exportWorkspacePages({
       sourceSpaceIdOrDomain: space.domain
     });
 
@@ -102,7 +102,7 @@ describe('exportWorkspacePages', () => {
   });
 
   it('should save the block data for boards and cards inside their respective pages', async () => {
-    const { data } = await exportWorkspacePages({
+    const data = await exportWorkspacePages({
       sourceSpaceIdOrDomain: space.id
     });
 
@@ -139,7 +139,7 @@ describe('exportWorkspacePages', () => {
       spaceId: spaceWithDeletedPage.id
     });
 
-    const { data } = await exportWorkspacePages({
+    const data = await exportWorkspacePages({
       sourceSpaceIdOrDomain: spaceWithDeletedPage.id
     });
 
@@ -163,7 +163,7 @@ describe('exportWorkspacePages', () => {
       spaceId: spaceWithDeletedPage.id
     });
 
-    const { data } = await exportWorkspacePages({
+    const data = await exportWorkspacePages({
       sourceSpaceIdOrDomain: spaceWithDeletedPage.id
     });
 
@@ -193,7 +193,7 @@ describe('exportWorkspacePages', () => {
       spaceId: spaceWithDeletedPage.id
     });
 
-    const { data } = await exportWorkspacePages({
+    const data = await exportWorkspacePages({
       sourceSpaceIdOrDomain: spaceWithDeletedPage.id
     });
 
@@ -206,7 +206,7 @@ describe('exportWorkspacePages', () => {
   it('should write the export to the given filename if provided', async () => {
     const exportName = 'test-export';
 
-    const { data, path: exportedPath } = await exportWorkspacePages({
+    const { data, path: exportedPath } = await exportWorkspacePagesToDisk({
       sourceSpaceIdOrDomain: space.id,
       exportName
     });
