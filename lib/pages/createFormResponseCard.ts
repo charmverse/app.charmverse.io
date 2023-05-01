@@ -29,10 +29,6 @@ export async function createFormResponseCard({
 
   const board = await getDatabaseDetails({ spaceId, idOrPath: databaseIdorPath });
 
-  if (!board) {
-    throw new InvalidInputError('Database not found');
-  }
-
   const fields = (board.fields as any) || {};
   const cardProperties = fields?.cardProperties || [];
   const existingResponseProperties: FormResponseProperty[] =
