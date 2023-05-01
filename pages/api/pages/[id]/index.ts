@@ -11,6 +11,7 @@ import { ActionNotPermittedError, NotFoundError, onError, onNoMatch, requireKeys
 import type { PageWithContent, ModifyChildPagesResponse } from 'lib/pages';
 import { modifyChildPages } from 'lib/pages/modifyChildPages';
 import { resolvePageTree } from 'lib/pages/server';
+import { generatePageQuery } from 'lib/pages/server/generatePageQuery';
 import { updatePage } from 'lib/pages/server/updatePage';
 import { computeUserPagePermissions, setupPermissionsAfterPageRepositioned } from 'lib/permissions/pages';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -29,20 +30,13 @@ handler
   .delete(deletePage);
 
 async function getPageRoute(req: NextApiRequest, res: NextApiResponse<PageWithContent>) {
-  const pageId = req.query.id as string;
+  const { id: pageIdOrPath, spaceId: spaceIdOrDomain } = req.query as { id: string; spaceId: string };
   const userId = req.session?.user?.id;
-  const isValidUUid = validate(pageId);
-  const searchQuery: Prisma.PageWhereInput = isValidUUid
-    ? {
-        id: pageId
-      }
-    : {
-        path: pageId,
-        spaceId: req.query.spaceId as string | undefined
-      };
-
   const page = await prisma.page.findFirst({
-    where: searchQuery
+    where: generatePageQuery({
+      pageIdOrPath,
+      spaceIdOrDomain
+    })
   });
 
   if (!page) {
@@ -54,18 +48,6 @@ async function getPageRoute(req: NextApiRequest, res: NextApiResponse<PageWithCo
     resourceId: page.id,
     userId
   });
-
-  if (permissions.read !== true) {
-    const publicPagePermission = await prisma.pagePermission.count({
-      where: {
-        pageId: page.id,
-        public: true
-      }
-    });
-    if (!publicPagePermission) {
-      throw new ActionNotPermittedError('You do not have permission to view this page');
-    }
-  }
 
   const result: PageWithContent = {
     ...page,
