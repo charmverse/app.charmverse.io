@@ -2,6 +2,7 @@ import { prisma } from '@charmverse/core';
 import type { Page, Prisma, PrismaPromise } from '@charmverse/core/dist/prisma';
 
 import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
+import { emptyDocument } from 'lib/prosemirror/constants';
 import { extractPreviewImage } from 'lib/prosemirror/extractPreviewImage';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
@@ -10,7 +11,14 @@ export function createPage<T>({ data, include }: Prisma.PageCreateArgs): PrismaP
     data: {
       ...data,
       hasContent: data.content ? !checkIsContentEmpty(data.content as PageContent) : false,
-      galleryImage: extractPreviewImage(data.content as PageContent)
+      galleryImage: extractPreviewImage(data.content as PageContent),
+      diffs: {
+        create: {
+          createdBy: (data.createdBy ?? data.author.connect?.id) as string,
+          data: (data.content ?? emptyDocument) as Prisma.InputJsonValue,
+          version: 0
+        }
+      }
     }
   };
 

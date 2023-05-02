@@ -37,7 +37,14 @@ export function generatePage(
         : undefined,
       parentId: options.parentId,
       deletedAt: options.deletedAt ?? null,
-      boardId: options.boardId ?? null
+      boardId: options.boardId ?? null,
+      diffs: {
+        create: {
+          createdBy: options.createdBy,
+          data: options.content as Prisma.InputJsonValue,
+          version: 0
+        }
+      }
     },
     include: {
       permissions: {
