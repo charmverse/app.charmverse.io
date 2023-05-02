@@ -37,7 +37,6 @@ export async function requireSuperApiKey(req: NextApiRequest, res: NextApiRespon
   let superApiToken: SuperApiToken | null = null;
   if (apiKey) {
     const apiTokenData = await getVerifiedSuperApiToken(apiKey);
-
     superApiToken = apiTokenData?.superApiKey || null;
 
     if (apiTokenData) {

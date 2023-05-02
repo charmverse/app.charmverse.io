@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core';
-import type { SuperApiToken } from '@charmverse/core/dist/prisma';
+import type { SuperApiToken, Space as PrismaSpace } from '@charmverse/core/dist/prisma';
 
 import { baseUrl } from 'config/constants';
 import { upsertSpaceRolesFromDiscord } from 'lib/discord/upsertSpaceRolesFromDiscord';
@@ -7,6 +7,7 @@ import { upsertUserForDiscordId } from 'lib/discord/upsertUserForDiscordId';
 import { upsertUserRolesFromDiscord } from 'lib/discord/upsertUserRolesFromDiscord';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { updateTrackGroupProfile } from 'lib/metrics/mixpanel/updateTrackGroupProfile';
+import type { Space } from 'lib/public-api/interfaces';
 import type { SpaceCreateInput } from 'lib/spaces/createSpace';
 import { createWorkspace } from 'lib/spaces/createSpace';
 import { getAvailableDomainName } from 'lib/spaces/getAvailableDomainName';
@@ -99,8 +100,17 @@ export async function createWorkspaceApi({
   });
 
   return {
+    ...mapSpace(space),
+    webhookSigningSecret: space.webhookSigningSecret ?? undefined
+  };
+}
+
+export function mapSpace(space: PrismaSpace): Space {
+  return {
     id: space.id,
-    webhookSigningSecret: space.webhookSigningSecret ?? undefined,
+    createdAt: space.createdAt.toString(),
+    createdBy: space.createdBy,
+    name: space.name,
     spaceUrl: `${baseUrl}/${space.domain}`,
     joinUrl: `${baseUrl}/join?domain=${space.domain}`
   };
