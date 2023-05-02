@@ -38,6 +38,7 @@ export type SpaceCreateInput = Pick<Space, 'name'> &
       | 'xpsEngineId'
       | 'superApiTokenId'
       | 'updatedBy'
+      | 'origin'
     >
   >;
 
@@ -101,7 +102,8 @@ export async function createWorkspace({
             isAdmin: true
           }))
         }
-      }
+      },
+      origin: spaceData.origin
     },
     include: { pages: true }
   });
