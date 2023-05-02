@@ -1,13 +1,13 @@
 import { prisma } from '@charmverse/core';
-import type { Block as PrismaBlock, Prisma } from '@charmverse/core/dist/prisma';
+import type { Block as PrismaBlock } from '@charmverse/core/dist/prisma';
 
-import { blockToPrisma, prismaToBlock } from 'lib/focalboard/block';
 import type { Block } from 'lib/focalboard/block';
+import { blockToPrisma, prismaToBlock } from 'lib/focalboard/block';
 import { createBoard } from 'lib/focalboard/board';
 import type { BoardViewFields } from 'lib/focalboard/boardView';
 import log from 'lib/log';
+import { generateFirstDiff } from 'lib/pages/server/generateFirstDiff';
 import { getPageMetaList } from 'lib/pages/server/getPageMetaList';
-import { emptyDocument } from 'lib/prosemirror/constants';
 import { WrongStateError } from 'lib/utilities/errors';
 import { isTruthy } from 'lib/utilities/types';
 import { relay } from 'lib/websockets/relay';
@@ -120,13 +120,14 @@ export async function syncFormResponses({
     prisma.page.create({
       data: {
         ...data,
-        diffs: {
-          create: {
-            createdBy,
-            data: (data.content ?? emptyDocument) as Prisma.InputJsonValue,
-            version: 0
-          }
-        }
+        diffs: data.content
+          ? {
+              create: generateFirstDiff({
+                createdBy,
+                content: data.content
+              })
+            }
+          : undefined
       }
     })
   );

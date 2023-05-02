@@ -17,7 +17,10 @@ type SyntheticDiffInput = {
 /**
  * When creating a page, we should save the initial content as first diff so that is it replayable
  */
-export function generateFirstDiff({ content, createdBy }: SyntheticDiffInput): Prisma.PageDiffCreateInput {
+export function generateFirstDiff({
+  content,
+  createdBy
+}: SyntheticDiffInput): Pick<Prisma.PageDiffCreateInput, 'createdBy' | 'version' | 'data'> {
   // When initialising the page we expect a root node with "type: doc" Here, we extract the inner content to create an actual prosemirror step
   const firstStep = content?.content ?? emptyDocument.content;
 

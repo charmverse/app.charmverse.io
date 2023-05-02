@@ -3,6 +3,7 @@ import type { Prisma, Page } from '@charmverse/core/dist/prisma';
 import { v4 } from 'uuid';
 
 import type { IPageWithPermissions } from 'lib/pages/interfaces';
+import { generateFirstDiff } from 'lib/pages/server/generateFirstDiff';
 import { getPagePath } from 'lib/pages/utils';
 
 export function generatePage(
@@ -38,13 +39,14 @@ export function generatePage(
       parentId: options.parentId,
       deletedAt: options.deletedAt ?? null,
       boardId: options.boardId ?? null,
-      diffs: {
-        create: {
-          createdBy: options.createdBy,
-          data: options.content as Prisma.InputJsonValue,
-          version: 0
-        }
-      }
+      diffs: options.content
+        ? {
+            create: generateFirstDiff({
+              createdBy: options.createdBy,
+              content: options.content
+            })
+          }
+        : undefined
     },
     include: {
       permissions: {

@@ -13,6 +13,7 @@ import { updateTrackUserProfileById } from 'lib/metrics/mixpanel/updateTrackUser
 import { logSpaceCreation } from 'lib/metrics/postToDiscord';
 import { convertJsonPagesToPrisma } from 'lib/pages/server/convertJsonPagesToPrisma';
 import { createPage } from 'lib/pages/server/createPage';
+import { generateFirstDiff } from 'lib/pages/server/generateFirstDiff';
 import { setupDefaultPaymentMethods } from 'lib/payment-methods/defaultPaymentMethods';
 import { updateSpacePermissionConfigurationMode } from 'lib/permissions/meta';
 import { generateDefaultProposalCategoriesInput } from 'lib/proposal/generateDefaultProposalCategoriesInput';
@@ -210,6 +211,12 @@ export async function createWorkspace({
             }
           ]
         }
+      },
+      diffs: {
+        create: generateFirstDiff({
+          createdBy: userId,
+          content: gettingStartedPage.content
+        })
       }
     }
   });
