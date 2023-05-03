@@ -9,7 +9,7 @@ const StyledColumnLayoutRow = styled.div<{ colCount: number }>`
     height: 100%;
   }
 
-  @media print, ${({ theme }) => theme.breakpoints.up('md')} {
+  ${({ theme }) => theme.breakpoints.up('md')}, print {
     & > .bangle-nv-child-container > .bangle-nv-content {
       display: flex;
       gap: ${({ theme }) => theme.spacing(3)};
