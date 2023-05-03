@@ -120,12 +120,10 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
   // keep a ref in sync for printing
   const printRef = useRef(null);
   useEffect(() => {
-    if (printRef?.current !== _printRef?.current) {
-      setPageProps({
-        printRef
-      });
-    }
-  }, [printRef, _printRef]);
+    setPageProps({
+      printRef
+    });
+  }, [setPageProps]);
 
   const cannotComment = readOnly || !pagePermissions.comment;
 
@@ -197,7 +195,7 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
           }
         }}
       >
-        <div ref={printRef} className='document-print-container'>
+        <div ref={_printRef} className='document-print-container'>
           <ScrollContainer id='document-scroll-container' showPageActionSidebar={showPageActionSidebar}>
             <div ref={containerRef}>
               <PageTemplateBanner parentId={page.parentId} pageType={page.type} />
