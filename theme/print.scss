@@ -31,11 +31,23 @@
     overflow: hidden;
   }
 
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
   .bangle-nv-container,
   p {
     display: block;
     break-before: auto;
     break-inside: avoid;
+
+    &::before {
+      display: block;
+      break-before: auto;
+      break-inside: avoid;
+    }
   }
 
   body.dark-mode * {
@@ -61,11 +73,4 @@
   .print-only-flex {
     display: flex !important;
   }
-}
-
-
-// one-off fixes
-.charm-column-row {
-  break-inside: avoid;
-  page-break-inside: avoid;
 }
