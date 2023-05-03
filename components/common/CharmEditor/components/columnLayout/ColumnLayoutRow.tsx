@@ -4,24 +4,26 @@ import type { ReactNode } from 'react';
 import { memo } from 'react';
 
 // grid-template-columns: repeat(${({ colCount }) => `${colCount}, ${Math.floor(100 / colCount)}`}fr);
-const StyledColumnLayout = styled.div<{ colCount: number }>`
+const StyledColumnLayoutRow = styled.div<{ colCount: number }>`
   & > .bangle-nv-child-container {
     height: 100%;
   }
 
   ${({ theme }) => theme.breakpoints.up('md')} {
     & > .bangle-nv-child-container > .bangle-nv-content {
-      display: grid;
+      display: flex;
       gap: ${({ theme }) => theme.spacing(3)};
-      grid-auto-columns: minmax(0, 1fr);
-      grid-auto-flow: column;
+
+      .charm-column {
+        flex: 1 1 0;
+      }
     }
   }
 `;
 
-function ColumnLayout({ children, node }: { node: Node; children: ReactNode }) {
+function ColumnLayoutRow({ children, node }: { node: Node; children: ReactNode }) {
   const totalChildren = (node.content as any)?.content?.length ?? 3;
-  return <StyledColumnLayout colCount={totalChildren}>{children}</StyledColumnLayout>;
+  return <StyledColumnLayoutRow colCount={totalChildren}>{children}</StyledColumnLayoutRow>;
 }
 
-export default memo(ColumnLayout);
+export default memo(ColumnLayoutRow);

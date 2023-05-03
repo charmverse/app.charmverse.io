@@ -39,8 +39,8 @@ import * as bulletList from './components/bulletList';
 import Callout, * as callout from './components/callout';
 import { userDataPlugin } from './components/charm/charm.plugins';
 import * as columnLayout from './components/columnLayout';
-import LayoutColumn from './components/columnLayout/Column';
-import LayoutRow from './components/columnLayout/Row';
+import ColumnLayoutColumn from './components/columnLayout/Column';
+import ColumnLayoutRow from './components/columnLayout/ColumnLayoutRow';
 import { CryptoPrice } from './components/CryptoPrice';
 import * as disclosure from './components/disclosure';
 import EmojiSuggest, * as emoji from './components/emojiSuggest';
@@ -600,10 +600,10 @@ function CharmEditor({
           case 'quote':
             return <Quote {...allProps}>{_children}</Quote>;
           case 'columnLayout': {
-            return <LayoutRow node={props.node}>{_children}</LayoutRow>;
+            return <ColumnLayoutRow node={props.node}>{_children}</ColumnLayoutRow>;
           }
           case 'columnBlock': {
-            return <LayoutColumn node={props.node}>{_children}</LayoutColumn>;
+            return <ColumnLayoutColumn node={props.node}>{_children}</ColumnLayoutColumn>;
           }
           case 'cryptoPrice': {
             const attrs = props.attrs as { base: null | CryptoCurrency; quote: null | FiatCurrency };
