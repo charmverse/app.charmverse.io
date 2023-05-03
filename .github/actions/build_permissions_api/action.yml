@@ -48,14 +48,14 @@ runs:
         path: |
           ./${{inputs.API_FOLDER}}/dist
           .env.test.local
-        
+
         # including the app_env helps make sure that deploy_staging.yml does not reuse values from test_and_deploy.yml which are meant for production
         key: permissions-${{ runner.os }}-${{ hashFiles(format('{0}/**/*.[jt]s', inputs.API_FOLDER), format('!{0}/node_modules', inputs.API_FOLDER)) }}
 
     - name: Build
       shell: bash
       if: steps.cache_permissions_build.outputs.cache-hit != 'true'
-      run: npm run build:prod
+      run: npm run build
       working-directory: ./${{inputs.API_FOLDER}}
       env:
         NODE_ENV: ${{ inputs.NODE_ENV }}
