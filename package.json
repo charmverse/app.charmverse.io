@@ -5,9 +5,8 @@
     "defaults"
   ],
   "scripts": {
-    "build": "NODE_OPTIONS=\"--max_old_space_size=4096\" next build && npm run build:server",
+    "build": "NODE_OPTIONS=\"--max_old_space_size=4096\" next build",
     "build:win": "npx next build",
-    "build:server": "tsc --project tsconfig.server.json",
     "build:analyze": "cross-env ANALYZE=true next build",
     "deploy:staging": "npx cdk deploy \"stg-charmverse-${STAGE}\" --outputs-file cdk.out.json",
     "start:api:permissions:ci": "cd permissions_api && dotenv -e ../.env.test.local -- npm run start:prod",
