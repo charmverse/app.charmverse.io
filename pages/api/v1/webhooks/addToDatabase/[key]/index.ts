@@ -1,14 +1,16 @@
 import { prisma } from '@charmverse/core';
-import type { Typeform } from '@typeform/api-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { requireKeys } from 'lib/middleware';
-import { createFormResponseCard } from 'lib/pages/createFormResponseCard';
+import type { FormResponseProperty } from 'lib/pages';
+import { transformWebhookBody } from 'lib/pages';
+import { getDatabaseDetails } from 'lib/pages/getDatabaseDetails';
+import { createDatabaseCardPage } from 'lib/public-api';
 import { defaultHandler } from 'lib/public-api/handler';
+import { updateDatabaseBlocks } from 'lib/public-api/updateDatabaseBlocks';
+import type { BodyFormResponse, TypeformResponse } from 'lib/typeform/interfaces';
 import { simplifyTypeformResponse } from 'lib/typeform/simplifyTypeformResponse';
-import { DataNotFoundError } from 'lib/utilities/errors';
-import type { AddFormResponseInput } from 'lib/zapier/interfaces';
-import { validateFormRequestInput } from 'lib/zapier/validateFormRequestInput';
+import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
 
 const handler = defaultHandler();
 
@@ -60,24 +62,42 @@ export async function createFormResponse(req: NextApiRequest, res: NextApiRespon
     throw new DataNotFoundError('Api key could not be found');
   }
 
-  let body: AddFormResponseInput = [];
+  let body: BodyFormResponse = [];
 
   if (apiPageKeyWithSpaceId.type === 'typeform' && req.body.form_response) {
-    const payload = req.body.form_response as Typeform.Response;
+    const payload = req.body.form_response as TypeformResponse;
     body = simplifyTypeformResponse(payload);
   }
 
-  await validateFormRequestInput({
-    spaceId: apiPageKeyWithSpaceId.page.spaceId,
-    databaseIdOrPath: apiPageKeyWithSpaceId.pageId,
-    data: body
-  });
+  const spaceId = apiPageKeyWithSpaceId.page.spaceId;
+  const databaseIdorPath = apiPageKeyWithSpaceId.pageId;
+  const board = await getDatabaseDetails({ spaceId, idOrPath: databaseIdorPath });
 
-  const card = await createFormResponseCard({
-    spaceId: apiPageKeyWithSpaceId.page.spaceId,
-    databaseIdorPath: apiPageKeyWithSpaceId.pageId,
-    data: body,
-    userId: apiPageKeyWithSpaceId.createdBy
+  if (!board) {
+    throw new InvalidInputError('Database not found');
+  }
+
+  const fields = (board.fields as any) || {};
+  const cardProperties: FormResponseProperty[] = fields?.cardProperties || [];
+
+  // Transform body questions and answers into card properties
+  const { updatedBody, allProperties } = transformWebhookBody(body, cardProperties);
+
+  if (allProperties.length !== updatedBody.length) {
+    await updateDatabaseBlocks(board, allProperties);
+  }
+
+  const mappedCardProperties = body.reduce<Record<string, string | string[]>>((acc, val) => {
+    acc[val.question.id] = val.answer || '';
+    return acc;
+  }, {});
+
+  const card = await createDatabaseCardPage({
+    title: 'Form Response',
+    properties: mappedCardProperties,
+    boardId: board.id,
+    spaceId,
+    createdBy: apiPageKeyWithSpaceId.createdBy
   });
 
   return res.status(201).json(card);
