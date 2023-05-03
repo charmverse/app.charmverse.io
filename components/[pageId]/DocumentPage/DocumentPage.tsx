@@ -120,7 +120,7 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
   // keep a ref in sync for printing
   const printRef = useRef(null);
   useEffect(() => {
-    if (printRef !== _printRef) {
+    if (printRef?.current !== _printRef?.current) {
       setPageProps({
         printRef
       });

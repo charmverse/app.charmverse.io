@@ -21,9 +21,14 @@
 
 @media print {
 
+  .bangle-nv-container,
+  p {
+    page-break-before: auto;
+    page-break-inside: avoid;
+  }
+
   body.dark-mode * {
     background-color: #191919;
-    height: 100%;
   }
 
   html,
