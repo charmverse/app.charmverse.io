@@ -39,7 +39,7 @@
     "start:test": "NODE_OPTIONS=\"--max_old_space_size=4096 --experimental-vm-modules\"  dotenv -e .env.test.local -- npm start",
     "start:test:ci": "NODE_OPTIONS=\"--max_old_space_size=4096\" npx react-env --path .env.test.local -- npx next start",
     "start:remote": "cross-env NODE_ENV=development npx react-env --path .env.production -- npm start",
-    "start:staging": "npm run prisma:deploy && node ./dist/server.js",
+    "start:staging": "npm run prisma:deploy && next start",
     "prepare": "husky install",
     "db-tool": "npx prisma studio",
     "db-tool:dev": "dotenv -e .env.local -- npx prisma studio",
