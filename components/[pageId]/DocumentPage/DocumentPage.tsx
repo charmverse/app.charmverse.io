@@ -88,7 +88,7 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
   const { cancelVote, castVote, deleteVote, updateDeadline, votes, isLoading } = useVotes({ pageId: page.id });
   const { draftBounty } = useBounties();
   const { currentPageActionDisplay } = usePageActionDisplay();
-  const { editMode, setPageProps } = useCharmEditor();
+  const { editMode, setPageProps, printRef: _printRef } = useCharmEditor();
   const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'));
 
   // Only populate bounty permission data if this is a bounty page
@@ -117,13 +117,15 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
     }
   }, [page.bountyId]);
 
-  // for printing
+  // keep a ref in sync for printing
   const printRef = useRef(null);
   useEffect(() => {
-    setPageProps({
-      printRef
-    });
-  }, [printRef]);
+    if (printRef !== _printRef) {
+      setPageProps({
+        printRef
+      });
+    }
+  }, [printRef, _printRef]);
 
   const cannotComment = readOnly || !pagePermissions.comment;
 
@@ -195,7 +197,7 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
           }
         }}
       >
-        <div ref={printRef}>
+        <div ref={printRef} className='document-print-container'>
           <ScrollContainer id='document-scroll-container' showPageActionSidebar={showPageActionSidebar}>
             <div ref={containerRef}>
               <PageTemplateBanner parentId={page.parentId} pageType={page.type} />
@@ -212,7 +214,6 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
                 className={fontFamilyClassName}
                 top={pageTop}
                 fullWidth={isSmallScreen || (page.fullWidth ?? false)}
-                ref={printRef}
               >
                 <CharmEditor
                   placeholderText={
