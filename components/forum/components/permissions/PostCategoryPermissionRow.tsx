@@ -42,11 +42,14 @@ export function PostCategoryRolePermissionRow({
   const roles = useRoles();
   const space = useCurrentSpace();
 
-  const usingDefault = (defaultPermissionLevel && !permissionLevel) || (!defaultPermissionLevel && !permissionLevel);
+  const defaultExists = !!defaultPermissionLevel;
+  const usingDefault = defaultExists && defaultPermissionLevel === permissionLevel;
+
+  //  console.log({ assignee, defaultPermissionLevel });
 
   const friendlyLabels = {
     ...forumMemberPermissionOptions,
-    delete: (defaultPermissionLevel ? (
+    delete: (assignee.group !== 'space' && defaultExists ? (
       <em>Default: {postCategoryPermissionLabels[defaultPermissionLevel]}</em>
     ) : (
       'Remove'
@@ -55,7 +58,7 @@ export function PostCategoryRolePermissionRow({
   };
 
   // remove delete option if there is no existing permission
-  if (!existingPermissionId) {
+  if (!existingPermissionId && !defaultExists) {
     delete friendlyLabels.delete;
   }
 
@@ -86,7 +89,7 @@ export function PostCategoryRolePermissionRow({
             <SmallSelect
               disabled={!canEdit}
               data-test={assignee.group === 'space' ? 'category-space-permission' : null}
-              sx={{ opacity: usingDefault ? 0.5 : 1 }}
+              sx={{ opacity: !permissionLevel || usingDefault ? 0.5 : 1 }}
               renderValue={(value) => friendlyLabels[value as keyof typeof friendlyLabels]}
               onChange={handleUpdate as (opt: string) => void}
               keyAndLabel={friendlyLabels}

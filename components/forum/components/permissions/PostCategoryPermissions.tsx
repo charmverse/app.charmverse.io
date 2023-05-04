@@ -168,7 +168,7 @@ function PostCategoryPermissions({ postCategory, permissions }: Props) {
             updatePermission={updatePermission}
             postCategoryId={postCategory.id}
             existingPermissionId={mappedPermissions.space?.id}
-            defaultPermissionLevel={mappedPermissions.space?.permissionLevel}
+            permissionLevel={mappedPermissions?.space?.permissionLevel}
             assignee={{ group: 'space', id: space.id }}
           />
         </Grid>
@@ -180,7 +180,8 @@ function PostCategoryPermissions({ postCategory, permissions }: Props) {
               updatePermission={updatePermission}
               postCategoryId={postCategory.id}
               existingPermissionId={rolePermission.id}
-              defaultPermissionLevel={rolePermission.permissionLevel}
+              permissionLevel={rolePermission.permissionLevel}
+              defaultPermissionLevel={mappedPermissions.space?.permissionLevel}
               assignee={{ group: 'role', id: rolePermission.assignee.id }}
             />
           </Grid>
