@@ -45,8 +45,6 @@ export function PostCategoryRolePermissionRow({
   const defaultExists = !!defaultPermissionLevel;
   const usingDefault = defaultExists && defaultPermissionLevel === permissionLevel;
 
-  //  console.log({ assignee, defaultPermissionLevel });
-
   const friendlyLabels = {
     ...forumMemberPermissionOptions,
     delete: (assignee.group !== 'space' && defaultExists ? (
