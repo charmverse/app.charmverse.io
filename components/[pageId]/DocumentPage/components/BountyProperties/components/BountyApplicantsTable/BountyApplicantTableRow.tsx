@@ -134,18 +134,7 @@ export default function BountyApplicantTableRow({
                     mode='update'
                   />
                   {showAcceptApplication && (
-                    <Box display='flex' gap={1} mb={3}>
-                      <Tooltip title={submissionsCapReached ? 'Submissions cap reached' : ''}>
-                        <Button
-                          disabled={submissionsCapReached}
-                          color='primary'
-                          onClick={() => {
-                            approveApplication(submission.id);
-                          }}
-                        >
-                          Accept application
-                        </Button>
-                      </Tooltip>
+                    <Box display='flex' gap={1} mb={3} justifyContent='flex-end'>
                       <Button
                         color='error'
                         variant='outlined'
@@ -160,6 +149,18 @@ export default function BountyApplicantTableRow({
                       >
                         Reject
                       </Button>
+
+                      <Tooltip title={submissionsCapReached ? 'Submissions cap reached' : ''}>
+                        <Button
+                          disabled={submissionsCapReached}
+                          color='primary'
+                          onClick={() => {
+                            approveApplication(submission.id);
+                          }}
+                        >
+                          Accept application
+                        </Button>
+                      </Tooltip>
                     </Box>
                   )}
                 </Box>

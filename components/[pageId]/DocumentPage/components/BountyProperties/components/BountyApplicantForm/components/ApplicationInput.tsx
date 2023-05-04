@@ -160,7 +160,7 @@ export default function ApplicationInput({
           onSubmit={handleSubmit((formValue) => submitted(formValue as Application))}
           style={{ margin: 'auto', width: '100%' }}
         >
-          <Grid container direction='column' spacing={3}>
+          <Grid container direction='column' spacing={1}>
             <Grid item>
               <TextField
                 {...register('message')}
@@ -188,10 +188,7 @@ export default function ApplicationInput({
             </Grid>
 
             {!readOnly && (
-              <Grid item display='flex' gap={1}>
-                <Button disabled={!isValid} type='submit'>
-                  {mode === 'create' ? ' Submit' : 'Update'}
-                </Button>
+              <Grid item display='flex' gap={1} justifyContent='flex-end'>
                 <Button
                   onClick={() => {
                     onCancel?.();
@@ -201,6 +198,9 @@ export default function ApplicationInput({
                   color='secondary'
                 >
                   Cancel
+                </Button>
+                <Button disabled={!isValid} type='submit'>
+                  {mode === 'create' ? ' Submit' : 'Update'}
                 </Button>
               </Grid>
             )}
