@@ -1,7 +1,7 @@
-import type { PageType, Prisma } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { PageType, Prisma } from '@charmverse/core/dist/prisma';
 import { v4 } from 'uuid';
 
-import { prisma } from 'db';
 import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
 import { createPage, generateBounty, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 

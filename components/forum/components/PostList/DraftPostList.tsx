@@ -1,7 +1,7 @@
+import type { Post } from '@charmverse/core/dist/prisma';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import MessageOutlinedIcon from '@mui/icons-material/MessageOutlined';
 import { List, ListItemButton, ListItemIcon, ListItemText, Stack, Typography } from '@mui/material';
-import type { Post } from '@prisma/client';
 import type { KeyedMutator } from 'swr';
 
 import charmClient from 'charmClient';

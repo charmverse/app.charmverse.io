@@ -1,10 +1,10 @@
-import type { PostCategory } from '@prisma/client';
+import type { PostCategoryWithPermissions } from '@charmverse/core';
+import type { PostCategory } from '@charmverse/core/dist/prisma';
 import type { ReactNode } from 'react';
 import { createContext, useContext, useMemo } from 'react';
 import useSWR from 'swr/immutable';
 
 import charmClient from 'charmClient';
-import type { PostCategoryWithPermissions } from 'lib/permissions/forum/interfaces';
 
 import { useCurrentSpace } from './useCurrentSpace';
 import { useSpaces } from './useSpaces';

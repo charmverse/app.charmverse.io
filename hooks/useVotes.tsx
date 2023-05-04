@@ -1,4 +1,4 @@
-import type { UserVote } from '@prisma/client';
+import type { UserVote } from '@charmverse/core/dist/prisma';
 import type { ReactNode } from 'react';
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import useSWR from 'swr';

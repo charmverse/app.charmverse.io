@@ -1,4 +1,4 @@
-import type { Space } from '@prisma/client';
+import type { Space } from '@charmverse/core/dist/prisma';
 import type { ReactNode } from 'react';
 import { useCallback, createContext, useContext, useEffect, useMemo, useState } from 'react';
 

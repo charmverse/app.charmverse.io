@@ -1,7 +1,7 @@
+import type { IdentityType } from '@charmverse/core/dist/prisma';
 import MoreHoriz from '@mui/icons-material/MoreHoriz';
 import type { ListItemProps } from '@mui/material';
 import { Chip, Box, Menu, IconButton, ListItem, ListItemIcon, ListItemText } from '@mui/material';
-import type { IdentityType } from '@prisma/client';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import type { ReactNode } from 'react';
 

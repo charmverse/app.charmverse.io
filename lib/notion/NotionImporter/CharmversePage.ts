@@ -1,7 +1,7 @@
+import { prisma } from '@charmverse/core';
 import type { PageObjectResponse } from '@notionhq/client/build/src/api-endpoints';
 import { v4 } from 'uuid';
 
-import { prisma } from 'db';
 import { createCard } from 'lib/focalboard/card';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 

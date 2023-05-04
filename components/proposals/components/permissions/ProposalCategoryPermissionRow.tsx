@@ -1,7 +1,7 @@
+import type { ProposalCategoryPermissionLevel } from '@charmverse/core/dist/prisma';
 import Box from '@mui/material/Box';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
-import type { ProposalCategoryPermissionLevel } from '@prisma/client';
 import type { ReactNode } from 'react';
 import { useMemo } from 'react';
 

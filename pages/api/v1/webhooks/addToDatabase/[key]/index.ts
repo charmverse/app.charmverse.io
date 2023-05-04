@@ -1,16 +1,16 @@
+import { prisma } from '@charmverse/core';
 import type { Typeform } from '@typeform/api-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
 
-import { prisma } from 'db';
-import { onError, onNoMatch, requireKeys } from 'lib/middleware';
+import { requireKeys } from 'lib/middleware';
 import { createFormResponseCard } from 'lib/pages/createFormResponseCard';
+import { defaultHandler } from 'lib/public-api/handler';
 import { simplifyTypeformResponse } from 'lib/typeform/simplifyTypeformResponse';
 import { DataNotFoundError } from 'lib/utilities/errors';
 import type { AddFormResponseInput } from 'lib/zapier/interfaces';
 import { validateFormRequestInput } from 'lib/zapier/validateFormRequestInput';
 
-const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
+const handler = defaultHandler();
 
 handler.use(requireKeys(['key'], 'query')).post(createFormResponse);
 

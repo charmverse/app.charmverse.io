@@ -1,3 +1,4 @@
+import type { IdentityType } from '@charmverse/core/dist/prisma';
 import styled from '@emotion/styled';
 import EmailIcon from '@mui/icons-material/Email';
 import Box from '@mui/material/Box';
@@ -6,7 +7,6 @@ import DialogTitle from '@mui/material/DialogTitle';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import SvgIcon from '@mui/material/SvgIcon';
-import type { IdentityType } from '@prisma/client';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
 import { useRef, useState } from 'react';

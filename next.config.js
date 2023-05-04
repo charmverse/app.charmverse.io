@@ -1,4 +1,6 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
+const fs = require('fs');
+const path = require('node:path');
 
 const BundleAnalyzer = require('@next/bundle-analyzer');
 const next = require('next/dist/lib/is-serializable-props');
@@ -26,6 +28,7 @@ const config = {
   },
   experimental: {
     esmExternals: false
+    //    externalDir: true
   },
   transpilePackages: esmModules,
   modularizeImports: {
@@ -94,6 +97,48 @@ const config = {
   webpack(_config, { buildId, nextRuntime }) {
     // Fix for: "Module not found: Can't resolve 'canvas'"
     _config.resolve.alias.canvas = false;
+
+    // Fix for: "Module not found: Can't resolve X" when using moduleResolution, nodeNext
+    // https://github.com/vercel/next.js/discussions/41189#discussioncomment-4488386
+    // _config.resolve.extensionAlias = {
+    //   '.js': ['.js', '.ts'],
+    //   '.jsx': ['.jsx', '.tsx']
+    // };
+
+    // const externalDir = path.resolve(__dirname, '..', 'core', 'node_modules');
+
+    // _config.resolve.modules.push(externalDir);
+
+    // // _config.module.rules.push({ include: [path.resolve(__dirname), path.resolve(__dirname, '../core/node_modules')] });
+
+    // _config.resolve.alias['@prisma/client'] = path.resolve(__dirname, '../core/node_modules/@prisma/client');
+
+    // _config.resolve.symlinks = true;
+
+    //   console.log('ALIAS', _config.resolve.alias);
+
+    //    console.log('Module', _config.module);
+
+    // _config.resolve.modules = [
+    //   ...(_config.resolve.modules ?? []),
+    //   path.resolve(__dirname, 'node_modules'),
+    //   path.resolve(__dirname, '../charmverse-common/node_modules')
+    // ];
+
+    // //    _config.resolve.symlinks = false;
+
+    // const aliasUrl = fs.realpathSync(
+    //   path.resolve(path.join(__dirname, '../charmverse-common/node_modules/@prisma/client'))
+    // );
+
+    // console.log(`Alias URL:`, aliasUrl);
+
+    // _config.resolve.alias['@prisma/client'] = aliasUrl;
+    // );
+    // _config.resolve.modules['@prisma/client'] = path.resolve(
+    //   'node_modules/@charmverse/core/node_modules/@prisma/client'
+    // );
+
     _config.module.rules.push({
       test: /\.svg$/,
       use: [

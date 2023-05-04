@@ -1,4 +1,4 @@
-import type { Post } from '@prisma/client';
+import type { Post } from '@charmverse/core/dist/prisma';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -7,8 +7,11 @@ import { createForumPost, trackCreateForumPostEvent } from 'lib/forums/posts/cre
 import type { ListForumPostsRequest, PaginatedPostList } from 'lib/forums/posts/listForumPosts';
 import { listForumPosts } from 'lib/forums/posts/listForumPosts';
 import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
-import { mutatePostCategorySearch } from 'lib/permissions/forum/mutatePostCategorySearch';
-import { requestOperations } from 'lib/permissions/requestOperations';
+import {
+  checkSpacePermissionsEngine,
+  getPermissionsClient,
+  premiumPermissionsApiClient
+} from 'lib/permissions/api/routers';
 import { withSessionRoute } from 'lib/session/withSession';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 import { publishPostEvent } from 'lib/webhookPublisher/publishEvent';
@@ -24,10 +27,22 @@ async function getPosts(req: NextApiRequest, res: NextApiResponse<PaginatedPostL
   const postQuery = req.query as any as ListForumPostsRequest;
   const userId = req.session.user?.id as string | undefined;
 
-  // Apply permissions to what we are searching for
-  postQuery.categoryId = (
-    await mutatePostCategorySearch({ spaceId: postQuery.spaceId, categoryId: postQuery.categoryId, userId })
-  ).categoryId;
+  const shouldApplyPermissions =
+    (await checkSpacePermissionsEngine({
+      resourceId: postQuery.spaceId,
+      resourceIdType: 'space'
+    })) === 'private';
+
+  if (shouldApplyPermissions) {
+    // Apply permissions to what we are searching for
+    postQuery.categoryId = (
+      await premiumPermissionsApiClient.forum.mutatePostCategorySearch({
+        spaceId: postQuery.spaceId,
+        categoryId: postQuery.categoryId,
+        userId
+      })
+    ).categoryId;
+  }
 
   const posts = await listForumPosts(postQuery, userId);
 
@@ -37,13 +52,21 @@ async function getPosts(req: NextApiRequest, res: NextApiResponse<PaginatedPostL
 async function createForumPostController(req: NextApiRequest, res: NextApiResponse<Post>) {
   const userId = req.session.user.id;
 
-  await requestOperations({
-    resourceType: 'post_category',
-    resourceId: req.body.categoryId as string,
-    userId,
-    operations: ['create_post'],
-    customError: new ActionNotPermittedError('You are not allowed to create a post in this category')
-  });
+  const categoryId = (req.body as CreateForumPostInput).categoryId;
+
+  const permissions = await getPermissionsClient({
+    resourceId: categoryId,
+    resourceIdType: 'postCategory'
+  }).then((client) =>
+    client.forum.computePostCategoryPermissions({
+      resourceId: categoryId,
+      userId
+    })
+  );
+
+  if (!permissions.create_post) {
+    throw new ActionNotPermittedError(`You do not have permissions to create a post`);
+  }
 
   const createdPost = await createForumPost({ ...req.body, createdBy: req.session.user.id });
 

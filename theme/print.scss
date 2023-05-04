@@ -1,0 +1,76 @@
+@media all {
+  .page-break {
+    display: none;
+  }
+
+  .print-only {
+    display: none !important;
+  }
+
+  .print-only-flex {
+    display: none !important;
+  }
+}
+
+// @ref: https://developer.mozilla.org/en-US/docs/Web/CSS/@page
+@page {
+  // margin: 0 10mm;
+  margin: 0;
+  size: letter;
+}
+
+@media print {
+
+  // taken from https://github.com/gregnb/react-to-print#examples
+  html,
+  body {
+    height: 100vh;
+    /* Use 100% here to support printing more than a single page*/
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  .bangle-nv-container,
+  p {
+    display: block;
+    break-before: auto;
+    break-inside: avoid;
+
+    &::before {
+      display: block;
+      break-before: auto;
+      break-inside: avoid;
+    }
+  }
+
+  body.dark-mode * {
+    background-color: #191919;
+  }
+
+
+  .dont-print-me {
+    display: none !important;
+  }
+
+  // read about page breaks: https://github.com/gregnb/react-to-print#page-breaks
+  .page-break {
+    padding-top: 10mm;
+    display: block !important;
+    break-before: page;
+  }
+
+  .print-only {
+    display: initial !important;
+  }
+
+  .print-only-flex {
+    display: flex !important;
+  }
+}

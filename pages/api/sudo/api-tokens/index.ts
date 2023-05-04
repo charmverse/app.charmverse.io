@@ -1,7 +1,7 @@
+import { prisma } from '@charmverse/core';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { prisma } from 'db';
 import { onError, onNoMatch, provisionApiKey, requireKeys } from 'lib/middleware';
 import { requireSudoApiKey } from 'lib/middleware/requireSudoApiKey';
 

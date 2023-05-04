@@ -1,7 +1,7 @@
-import type { Space } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { Space } from '@charmverse/core/dist/prisma';
 import { v4 } from 'uuid';
 
-import { prisma } from 'db';
 import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
 import { ExpectedAnError } from 'testing/errors';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';

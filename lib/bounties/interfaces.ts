@@ -1,4 +1,4 @@
-import type { Bounty, PageType, Application } from '@prisma/client';
+import type { Bounty, PageType, Application } from '@charmverse/core/dist/prisma';
 
 import type { IPageMetaWithPermissions } from 'lib/pages/interfaces';
 import type { BountyPermissions } from 'lib/permissions/bounties';

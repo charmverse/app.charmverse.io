@@ -1,15 +1,14 @@
-import type { UserVote } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { UserVote } from '@charmverse/core/dist/prisma';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { prisma } from 'db';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
-import { computePostPermissions } from 'lib/permissions/forum/computePostPermissions';
+import { getPermissionsClient } from 'lib/permissions/api/routers';
 import { computeUserPagePermissions } from 'lib/permissions/pages/page-permission-compute';
 import { computeProposalPermissions } from 'lib/permissions/proposals/computeProposalPermissions';
 import { withSessionRoute } from 'lib/session/withSession';
-import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
 import { castVote as castVoteService } from 'lib/votes';
 import type { UserVoteDTO } from 'lib/votes/interfaces';
@@ -66,10 +65,15 @@ async function castVote(req: NextApiRequest, res: NextApiResponse<UserVote | { e
       throw new ActionNotPermittedError(`You do not have permission to cast a vote on this page.`);
     }
   } else if (vote.postId) {
-    const postPermissions = await computePostPermissions({
+    const postPermissions = await getPermissionsClient({
       resourceId: vote.postId,
-      userId
-    });
+      resourceIdType: 'post'
+    }).then((client) =>
+      client.forum.computePostPermissions({
+        resourceId: vote.postId as string,
+        userId
+      })
+    );
 
     if (!postPermissions.edit_post) {
       throw new ActionNotPermittedError('You do not have permissions to cast a vote on this post.');

@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import type { Space, Comment } from '@prisma/client';
+import type { Space, Comment } from '@charmverse/core/dist/prisma';
 import request from 'supertest';
 
 import type { CommentCreate } from 'lib/comments';

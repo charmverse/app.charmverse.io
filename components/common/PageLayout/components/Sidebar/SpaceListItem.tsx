@@ -1,7 +1,7 @@
+import type { Space } from '@charmverse/core/dist/prisma';
 import type { MenuItemProps } from '@mui/material/MenuItem';
 import MenuItem from '@mui/material/MenuItem';
 import Typography from '@mui/material/Typography';
-import type { Space } from '@prisma/client';
 import NextLink from 'next/link';
 import { useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';

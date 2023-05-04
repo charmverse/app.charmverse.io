@@ -1,6 +1,6 @@
+import { prisma } from '@charmverse/core';
 import { v4 } from 'uuid';
 
-import { prisma } from 'db';
 import { prismaToBlock } from 'lib/focalboard/block';
 import { getDatabaseDetails } from 'lib/pages/getDatabaseDetails';
 import type { FormResponseProperty } from 'lib/pages/interfaces';
@@ -28,10 +28,6 @@ export async function createFormResponseCard({
   }
 
   const board = await getDatabaseDetails({ spaceId, idOrPath: databaseIdorPath });
-
-  if (!board) {
-    throw new InvalidInputError('Database not found');
-  }
 
   const fields = (board.fields as any) || {};
   const cardProperties = fields?.cardProperties || [];

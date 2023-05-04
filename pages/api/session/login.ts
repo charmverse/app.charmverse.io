@@ -1,7 +1,7 @@
+import { prisma } from '@charmverse/core';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { prisma } from 'db';
 import { updateGuildRolesForUser } from 'lib/guild-xyz/server/updateGuildRolesForUser';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { ActionNotPermittedError, onError, onNoMatch } from 'lib/middleware';

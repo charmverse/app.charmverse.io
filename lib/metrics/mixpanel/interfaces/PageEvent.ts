@@ -1,4 +1,4 @@
-import type { PageType } from '@prisma/client';
+import type { PageType } from '@charmverse/core/dist/prisma';
 
 import type { BaseEventWithoutGroup, BaseEvent } from './BaseEvent';
 

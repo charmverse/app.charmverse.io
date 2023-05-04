@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import type { Space } from '@prisma/client';
+import type { Space } from '@charmverse/core/dist/prisma';
 import type { SQSEvent, SQSRecord } from 'aws-lambda';
 import { webhookWorker } from 'serverless/handler';
 

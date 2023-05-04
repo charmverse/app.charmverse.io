@@ -1,8 +1,8 @@
 // import { PageWithChildren } from 'lib/pages';
 // import { exportSpacePages } from 'lib/spaces/exportData/exportPages';
 // import fs from 'node:fs/promises';
-// import { prisma } from 'db';
-// import { Block, Page } from '@prisma/client';
+// import { prisma } from '@charmverse/core';
+// import { Block, Page } from '@charmverse/core/dist/prisma';
 
 // type PageWithCard = Page & {card: Block}
 

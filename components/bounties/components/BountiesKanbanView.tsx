@@ -1,5 +1,5 @@
+import type { BountyStatus } from '@charmverse/core/dist/prisma';
 import { Box, Typography } from '@mui/material';
-import type { BountyStatus } from '@prisma/client';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 

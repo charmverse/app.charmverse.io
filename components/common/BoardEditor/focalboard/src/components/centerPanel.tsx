@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable max-lines */
 
+import type { Page } from '@charmverse/core/dist/prisma';
 import CallMadeIcon from '@mui/icons-material/CallMade';
 import LaunchIcon from '@mui/icons-material/LaunchOutlined';
 import { Box, Typography, Link } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
-import type { Page } from '@prisma/client';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import Papa from 'papaparse';
@@ -111,7 +111,7 @@ function CenterPanel(props: Props) {
 
   const router = useRouter();
   const space = useCurrentSpace();
-  const { pages, updatePage } = usePages();
+  const { pages, refreshPage, updatePage } = usePages();
   const { members } = useMembers();
   const { showMessage } = useSnackbar();
   const { user } = useUser();
@@ -124,9 +124,9 @@ function CenterPanel(props: Props) {
     ? allViews.filter((view) => view.fields.linkedSourceId && pages[view.fields.linkedSourceId])
     : allViews;
 
-  const linksToDeletedDatabasePages = views.length !== allViews.length;
+  const linksToDeletedDatabasePages = props.views.length !== allViews.length;
 
-  const activeView = isLinkedBoardType && views.length === 0 ? null : defaultActiveView;
+  const activeView = isLinkedBoardType && props.views.length === 0 ? null : defaultActiveView;
 
   useEffect(() => {
     if (linksToDeletedDatabasePages) {
@@ -135,12 +135,12 @@ function CenterPanel(props: Props) {
   }, [linksToDeletedDatabasePages]);
 
   useEffect(() => {
-    if ((views.length === 0 && !activeView) || (isLinkedBoardType && views.length === 0)) {
+    if ((props.views.length === 0 && !activeView) || (isLinkedBoardType && props.views.length === 0)) {
       setState((s) => ({ ...s, showSettings: 'create-linked-view' }));
     } else if (activeView) {
       setState((s) => ({ ...s, showSettings: null }));
     }
-  }, [activeView?.id, views.length, isLinkedBoardType]);
+  }, [activeView?.id, props.views.length, isLinkedBoardType]);
 
   // for 'linked' boards, each view has its own board which we use to determine the cards to show
   let activeBoardId: string | undefined = props.board.id;
@@ -149,7 +149,7 @@ function CenterPanel(props: Props) {
   } else if (activeView?.fields.sourceType === 'google_form') {
     activeBoardId = activeView?.fields.sourceData?.boardId;
   }
-  const { keys } = useApiPageKeys(activeBoardId);
+  const { keys } = useApiPageKeys(props.page?.id);
   const activeBoard = useAppSelector(getBoard(activeBoardId ?? ''));
   const activePage = pages[activeBoardId ?? ''];
   const _groupByProperty = activeBoard?.fields.cardProperties.find((o) => o.id === activeView?.fields.groupById);
@@ -281,17 +281,7 @@ function CenterPanel(props: Props) {
         'add card',
         async (block: Block) => {
           if (space) {
-            await mutate(
-              `pages/${space.id}`,
-              async (_pages: Record<string, Page> | undefined): Promise<Record<string, Page>> => {
-                const newPage = await charmClient.pages.getPage(block.id);
-
-                return { ..._pages, [newPage.id]: newPage };
-              },
-              {
-                revalidate: false
-              }
-            );
+            await refreshPage(block.id);
           }
 
           if (isTemplate) {
@@ -568,7 +558,7 @@ function CenterPanel(props: Props) {
             activeView={props.activeView}
             toggleViewOptions={toggleViewOptions}
             cards={cards}
-            views={views}
+            views={props.views}
             dateDisplayProperty={dateDisplayProperty}
             addCard={() => addCard('', true)}
             showCard={showCard}
@@ -633,9 +623,9 @@ function CenterPanel(props: Props) {
                   readOnly={props.readOnly}
                   onSelect={selectViewSource}
                   // if it links to deleted db page then the board can't be inline_board type
-                  onCreate={views.length === 0 && !linksToDeletedDatabasePages ? createDatabase : undefined}
+                  onCreate={props.views.length === 0 && !linksToDeletedDatabasePages ? createDatabase : undefined}
                   onCsvImport={onCsvImport}
-                  boardId={activeBoardId}
+                  pageId={props.page?.id}
                 />
               )}
               {activeBoard && activeView?.fields.viewType === 'board' && (
@@ -699,6 +689,7 @@ function CenterPanel(props: Props) {
             {activeView && (
               <ViewSidebar
                 board={activeBoard}
+                pageId={activePage?.id}
                 parentBoard={board}
                 view={activeView}
                 isOpen={state.showSettings === 'view-options'}

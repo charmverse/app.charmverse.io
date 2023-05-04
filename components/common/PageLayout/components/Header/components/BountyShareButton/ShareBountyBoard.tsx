@@ -1,3 +1,4 @@
+import type { SpacePermissionConfigurationMode } from '@charmverse/core/dist/prisma';
 import styled from '@emotion/styled';
 import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
@@ -7,7 +8,6 @@ import InputAdornment from '@mui/material/InputAdornment';
 import Input from '@mui/material/OutlinedInput';
 import Switch from '@mui/material/Switch';
 import Typography from '@mui/material/Typography';
-import type { SpacePermissionConfigurationMode } from '@prisma/client';
 import { useEffect, useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 

@@ -1,6 +1,6 @@
-import type { Vote } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { Vote } from '@charmverse/core/dist/prisma';
 
-import { prisma } from 'db';
 import log from 'lib/log';
 import { UndesirableOperationError } from 'lib/utilities/errors';
 

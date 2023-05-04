@@ -1,4 +1,4 @@
-import type { ProfileItem } from '@prisma/client';
+import type { ProfileItem } from '@charmverse/core/dist/prisma';
 import type { KeyedMutator } from 'swr';
 
 import charmClient from 'charmClient';

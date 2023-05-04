@@ -1,4 +1,4 @@
-import type { Space, User } from '@prisma/client';
+import type { Space, User } from '@charmverse/core/dist/prisma';
 
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { generatePageWithComment } from 'testing/utils/pages';
