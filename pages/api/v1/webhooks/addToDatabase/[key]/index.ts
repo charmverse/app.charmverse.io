@@ -83,11 +83,11 @@ export async function createFormResponse(req: NextApiRequest, res: NextApiRespon
   // Transform body questions and answers into card properties
   const { updatedBody, allProperties } = transformWebhookBody(body, cardProperties);
 
-  if (allProperties.length !== updatedBody.length) {
+  if (body.length !== cardProperties.length) {
     await updateDatabaseBlocks(board, allProperties);
   }
 
-  const mappedCardProperties = body.reduce<Record<string, string | string[]>>((acc, val) => {
+  const mappedCardProperties = updatedBody.reduce<Record<string, string | string[]>>((acc, val) => {
     acc[val.question.id] = val.answer || '';
     return acc;
   }, {});
