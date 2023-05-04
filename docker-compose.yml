@@ -36,14 +36,14 @@ services:
   prd-webapp:
     extends:
       service: defaults
-    command: ['sh', '-c', 'npm run prisma:deploy && node --require dd-trace/init ./dist/server.js']
+    command: ['sh', '-c', 'npm run prisma:deploy && node --require dd-trace/init node_modules/.bin/next start --keepAliveTimeout 70000']
     profiles:
       - prd-webapp
 
   stg-webapp:
     extends:
       service: defaults
-    command: ['sh', '-c', 'npm run prisma:deploy && node ./dist/server.js']
+    command: ['sh', '-c', 'npm run prisma:deploy && node --require dd-trace/init node_modules/.bin/next start --keepAliveTimeout 70000']
     environment:
       - NEXT_PUBLIC_APP_ENV=staging
     profiles:
