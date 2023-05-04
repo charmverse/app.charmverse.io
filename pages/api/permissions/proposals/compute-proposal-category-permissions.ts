@@ -1,10 +1,10 @@
+import type { AvailableProposalCategoryPermissionFlags } from '@charmverse/core';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { onError, onNoMatch, requireKeys } from 'lib/middleware';
 import type { PermissionCompute } from 'lib/permissions/interfaces';
 import { computeProposalCategoryPermissions } from 'lib/permissions/proposals/computeProposalCategoryPermissions';
-import type { AvailableProposalCategoryPermissionFlags } from 'lib/permissions/proposals/interfaces';
 import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });

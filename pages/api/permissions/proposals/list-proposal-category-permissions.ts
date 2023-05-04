@@ -1,9 +1,9 @@
+import type { AssignedProposalCategoryPermission } from '@charmverse/core';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import type { PermissionCompute } from 'lib/permissions/interfaces';
-import type { AssignedProposalCategoryPermission } from 'lib/permissions/proposals/interfaces';
 import { listProposalCategoryPermissions } from 'lib/permissions/proposals/listProposalCategoryPermissions';
 import { withSessionRoute } from 'lib/session/withSession';
 import { InvalidInputError } from 'lib/utilities/errors';

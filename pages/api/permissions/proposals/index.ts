@@ -1,4 +1,5 @@
 import { prisma } from '@charmverse/core';
+import type { AssignedProposalCategoryPermission } from '@charmverse/core';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -6,7 +7,6 @@ import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser }
 import type { PermissionToDelete } from 'lib/permissions/interfaces';
 import { computeProposalCategoryPermissions } from 'lib/permissions/proposals/computeProposalCategoryPermissions';
 import { deleteProposalCategoryPermission } from 'lib/permissions/proposals/deleteProposalCategoryPermission';
-import type { AssignedProposalCategoryPermission } from 'lib/permissions/proposals/interfaces';
 import { upsertProposalCategoryPermission } from 'lib/permissions/proposals/upsertProposalCategoryPermission';
 import { withSessionRoute } from 'lib/session/withSession';
 import { DataNotFoundError } from 'lib/utilities/errors';

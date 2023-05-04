@@ -1,4 +1,4 @@
-import { prisma } from '@charmverse/core';
+import { prisma, proposalCategoryOperations } from '@charmverse/core';
 import type { ProposalCategoryPermissionLevel, Space, User } from '@charmverse/core/dist/prisma';
 import { v4 } from 'uuid';
 
@@ -9,7 +9,6 @@ import { generateRole, generateSpaceUser, generateUserAndSpace } from 'testing/s
 import { generateProposalCategory } from 'testing/utils/proposals';
 
 import { computeProposalCategoryPermissions } from '../computeProposalCategoryPermissions';
-import { proposalCategoryOperations } from '../interfaces';
 
 let adminUser: User;
 let spaceMemberUser: User;

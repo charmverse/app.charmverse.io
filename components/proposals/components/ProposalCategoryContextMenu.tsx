@@ -1,3 +1,4 @@
+import type { ProposalCategoryWithPermissions } from '@charmverse/core';
 import { Edit } from '@mui/icons-material';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
@@ -10,7 +11,6 @@ import FieldLabel from 'components/common/form/FieldLabel';
 import PopperPopup from 'components/common/PopperPopup';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
-import type { ProposalCategoryWithPermissions } from 'lib/permissions/proposals/interfaces';
 
 import { useProposalCategories } from '../hooks/useProposalCategories';
 

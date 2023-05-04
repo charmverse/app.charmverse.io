@@ -1,10 +1,11 @@
-import * as http from 'adapters/http';
-import type { PermissionCompute, PermissionToDelete } from 'lib/permissions/interfaces';
 import type {
   AssignedProposalCategoryPermission,
   AvailableProposalCategoryPermissionFlags,
   AvailableProposalPermissionFlags
-} from 'lib/permissions/proposals/interfaces';
+} from '@charmverse/core';
+
+import * as http from 'adapters/http';
+import type { PermissionCompute, PermissionToDelete } from 'lib/permissions/interfaces';
 import type { ProposalCategoryPermissionInput } from 'lib/permissions/proposals/upsertProposalCategoryPermission';
 
 export class ProposalPermissionsApi {

@@ -1,8 +1,7 @@
 import { prisma } from '@charmverse/core';
+import type { PermissionToDelete } from '@charmverse/core';
 
 import log from 'lib/log';
-
-import type { PermissionToDelete } from '../interfaces';
 
 export async function deleteProposalCategoryPermission({ permissionId }: PermissionToDelete) {
   const permission = await prisma.proposalCategoryPermission.findUnique({

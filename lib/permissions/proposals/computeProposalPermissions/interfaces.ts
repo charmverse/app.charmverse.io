@@ -1,8 +1,6 @@
-import type { PermissionFilteringPolicyFnInput } from '@charmverse/core';
+import type { PermissionFilteringPolicyFnInput, AvailableProposalPermissionFlags } from '@charmverse/core';
 
 import type { ProposalWithUsers } from 'lib/proposal/interface';
-
-import type { AvailableProposalPermissionFlags } from '../interfaces';
 
 export type ProposalResource = Pick<
   ProposalWithUsers,

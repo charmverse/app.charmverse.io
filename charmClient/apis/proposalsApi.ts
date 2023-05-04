@@ -1,8 +1,8 @@
+import type { ProposalCategoryWithPermissions } from '@charmverse/core';
 import type { ProposalStatus } from '@charmverse/core/dist/prisma';
 
 import * as http from 'adapters/http';
 import type { IPageWithPermissions, PageWithProposal } from 'lib/pages';
-import type { ProposalCategoryWithPermissions } from 'lib/permissions/proposals/interfaces';
 import type { ProposalFlowFlags } from 'lib/proposal/computeProposalFlowFlags';
 import type { CreateProposalInput } from 'lib/proposal/createProposal';
 import type { CreateProposalFromTemplateInput } from 'lib/proposal/createProposalFromTemplate';

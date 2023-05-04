@@ -1,15 +1,14 @@
-import { prisma } from '@charmverse/core';
+import type { AssignableProposalCategoryPermissionGroups, AssignedProposalCategoryPermission } from '@charmverse/core';
+import { prisma, proposalCategoryPermissionGroups } from '@charmverse/core';
 import type { Prisma } from '@charmverse/core/dist/prisma';
 import { ProposalCategoryPermissionLevel } from '@charmverse/core/dist/prisma';
 
 import { ProposalCategoryNotFoundError } from 'lib/proposal/errors';
-import { DataNotFoundError, InsecureOperationError, InvalidInputError } from 'lib/utilities/errors';
+import { InsecureOperationError, InvalidInputError } from 'lib/utilities/errors';
 import { isUUID } from 'lib/utilities/strings';
 
 import { AssignmentNotPermittedError } from '../errors';
 
-import type { AssignableProposalCategoryPermissionGroups, AssignedProposalCategoryPermission } from './interfaces';
-import { proposalCategoryPermissionGroups } from './interfaces';
 import { mapProposalCategoryPermissionToAssignee } from './mapProposalCategoryPermissionToAssignee';
 
 export type ProposalCategoryPermissionInput<

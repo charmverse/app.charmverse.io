@@ -1,4 +1,5 @@
 import { prisma } from '@charmverse/core';
+import type { ProposalCategoryWithPermissions } from '@charmverse/core';
 import type { ProposalCategory, ProposalCategoryPermission, Prisma } from '@charmverse/core/dist/prisma';
 
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
@@ -7,7 +8,6 @@ import { InvalidInputError } from 'lib/utilities/errors';
 
 import { AvailableProposalCategoryPermissions } from './availableProposalCategoryPermissions.class';
 import { hasSpaceWideProposalReviewerPermission } from './hasSpaceWideProposalReviewerPermission';
-import type { ProposalCategoryWithPermissions } from './interfaces';
 import { proposalCategoryPermissionsMapping } from './mapping';
 
 type CategoriesToFilter = {

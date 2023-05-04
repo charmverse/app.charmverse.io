@@ -1,10 +1,10 @@
 import { prisma } from '@charmverse/core';
+import type { ProposalCategoryWithPermissions } from '@charmverse/core';
 
 import { generateCategoryIdQuery } from 'lib/proposal/utils';
 import { InvalidInputError } from 'lib/utilities/errors';
 
 import { filterAccessibleProposalCategories } from './filterAccessibleProposalCategories';
-import type { ProposalCategoryWithPermissions } from './interfaces';
 
 type ListAccessibleCategoriesRequest = {
   userId?: string;

@@ -1,8 +1,7 @@
 import { prisma } from '@charmverse/core';
-import type { AssignedPostCategoryPermission } from '@charmverse/core';
+import type { AssignedPostCategoryPermission, AssignedProposalCategoryPermission } from '@charmverse/core';
 
 import { mapPostCategoryPermissionToAssignee } from '../forum/mapPostCategoryPermissionToAssignee';
-import type { AssignedProposalCategoryPermission } from '../proposals/interfaces';
 import { mapProposalCategoryPermissionToAssignee } from '../proposals/mapProposalCategoryPermissionToAssignee';
 
 import { AvailableSpacePermissions } from './availableSpacePermissions';

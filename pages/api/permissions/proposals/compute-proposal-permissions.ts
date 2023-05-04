@@ -1,11 +1,11 @@
 import { prisma } from '@charmverse/core';
+import type { AvailableProposalPermissionFlags } from '@charmverse/core';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { onError, onNoMatch, requireKeys } from 'lib/middleware';
 import type { PermissionCompute } from 'lib/permissions/interfaces';
 import { computeProposalPermissions } from 'lib/permissions/proposals/computeProposalPermissions';
-import type { AvailableProposalPermissionFlags } from 'lib/permissions/proposals/interfaces';
 import { ProposalNotFoundError } from 'lib/proposal/errors';
 import { withSessionRoute } from 'lib/session/withSession';
 import { InvalidInputError } from 'lib/utilities/errors';

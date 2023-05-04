@@ -1,4 +1,5 @@
 import { prisma } from '@charmverse/core';
+import type { AvailableProposalCategoryPermissionFlags, PermissionCompute } from '@charmverse/core';
 
 import { ProposalCategoryNotFoundError } from 'lib/proposal/errors';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
@@ -6,10 +7,8 @@ import { InvalidInputError } from 'lib/utilities/errors';
 import { isUUID } from 'lib/utilities/strings';
 
 import { filterApplicablePermissions } from '../filterApplicablePermissions';
-import type { PermissionCompute } from '../interfaces';
 
 import { AvailableProposalCategoryPermissions } from './availableProposalCategoryPermissions.class';
-import type { AvailableProposalCategoryPermissionFlags } from './interfaces';
 import { proposalCategoryPermissionsMapping } from './mapping';
 
 export async function computeProposalCategoryPermissions({

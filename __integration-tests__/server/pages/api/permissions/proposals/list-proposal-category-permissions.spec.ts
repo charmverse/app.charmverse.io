@@ -1,6 +1,6 @@
+import type { AssignedProposalCategoryPermission } from '@charmverse/core';
 import request from 'supertest';
 
-import type { AssignedProposalCategoryPermission } from 'lib/permissions/proposals/interfaces';
 import { upsertProposalCategoryPermission } from 'lib/permissions/proposals/upsertProposalCategoryPermission';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateRole, generateUserAndSpace } from 'testing/setupDatabase';

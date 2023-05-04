@@ -1,3 +1,4 @@
+import type { ProposalCategoryWithPermissions } from '@charmverse/core';
 import type { ProposalStatus } from '@charmverse/core/dist/prisma';
 import AddIcon from '@mui/icons-material/Add';
 import { Box, Chip, MenuItem, Select, TextField } from '@mui/material';
@@ -9,7 +10,6 @@ import Modal from 'components/common/Modal';
 import { ViewOptions } from 'components/common/ViewOptions';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSnackbar } from 'hooks/useSnackbar';
-import type { ProposalCategoryWithPermissions } from 'lib/permissions/proposals/interfaces';
 import { PROPOSAL_STATUS_LABELS } from 'lib/proposal/proposalStatusTransition';
 import type { BrandColor } from 'theme/colors';
 import { getRandomThemeColor } from 'theme/utils/getRandomThemeColor';

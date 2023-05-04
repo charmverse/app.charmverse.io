@@ -1,4 +1,5 @@
 import { buildComputePermissionsWithPermissionFilteringPolicies, prisma } from '@charmverse/core';
+import type { ProposalResource, AvailableProposalPermissionFlags, PermissionCompute } from '@charmverse/core';
 
 import { filterApplicablePermissions } from 'lib/permissions/filterApplicablePermissions';
 import { ProposalNotFoundError } from 'lib/proposal/errors';
@@ -8,18 +9,8 @@ import { InvalidInputError } from 'lib/utilities/errors';
 import { isUUID } from 'lib/utilities/strings';
 
 import { isProposalAuthor } from '../../../proposal/isProposalAuthor';
-import type { PermissionCompute } from '../../interfaces';
 import { AvailableProposalPermissions } from '../availableProposalPermissions.class';
-import type { AvailableProposalPermissionFlags } from '../interfaces';
 import { proposalPermissionsMapping } from '../mapping';
-
-import type { ProposalResource } from './interfaces';
-import { policyStatusDiscussionEditableCommentable } from './policyStatusDiscussionEditableCommentable';
-import { policyStatusDraftNotViewable } from './policyStatusDraftNotViewable';
-import { policyStatusReviewCommentable } from './policyStatusReviewCommentable';
-import { policyStatusReviewedOnlyCreateVote } from './policyStatusReviewedOnlyCreateVote';
-import { policyStatusVoteActiveOnlyVotable } from './policyStatusVoteActiveOnlyVotable';
-import { policyStatusVoteClosedViewOnly } from './policyStatusVoteClosedViewOnly';
 
 export async function baseComputeProposalPermissions({
   resourceId,

@@ -1,9 +1,9 @@
+import type { ProposalCategoryWithPermissions } from '@charmverse/core';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { ActionNotPermittedError, onError, onNoMatch, requireSpaceMembership, requireUser } from 'lib/middleware';
 import { computeProposalCategoryPermissions } from 'lib/permissions/proposals/computeProposalCategoryPermissions';
-import type { ProposalCategoryWithPermissions } from 'lib/permissions/proposals/interfaces';
 import { deleteProposalCategory } from 'lib/proposal/deleteProposalCategory';
 import type { ProposalCategory } from 'lib/proposal/interface';
 import { updateProposalCategory } from 'lib/proposal/updateProposalCategory';

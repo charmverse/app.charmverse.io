@@ -1,4 +1,4 @@
-import { prisma } from '@charmverse/core';
+import { prisma, proposalOperations } from '@charmverse/core';
 import type { ProposalCategory, ProposalOperation, Role, Space, User } from '@charmverse/core/dist/prisma';
 import { v4 } from 'uuid';
 
@@ -8,7 +8,6 @@ import { InvalidInputError } from 'lib/utilities/errors';
 import { generateRole, generateSpaceUser, generateUserAndSpace } from 'testing/setupDatabase';
 import { generateProposal, generateProposalCategory } from 'testing/utils/proposals';
 
-import { proposalOperations } from '../../interfaces';
 import { proposalPermissionsMapping } from '../../mapping';
 import { upsertProposalCategoryPermission } from '../../upsertProposalCategoryPermission';
 import { baseComputeProposalPermissions } from '../computeProposalPermissions';

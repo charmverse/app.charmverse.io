@@ -1,3 +1,4 @@
+import type { AssignedProposalCategoryPermission, AvailableProposalCategoryPermissionFlags } from '@charmverse/core';
 import type { ProposalCategory } from '@charmverse/core/dist/prisma';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
@@ -12,10 +13,6 @@ import Loader from 'components/common/LoadingComponent';
 import Modal from 'components/common/Modal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useRoles } from 'hooks/useRoles';
-import type {
-  AssignedProposalCategoryPermission,
-  AvailableProposalCategoryPermissionFlags
-} from 'lib/permissions/proposals/interfaces';
 import type { ProposalCategoryPermissionInput } from 'lib/permissions/proposals/upsertProposalCategoryPermission';
 
 import { ProposalCategoryPermissionsAddRoles } from './ProposalCategoryPermissionAddRolesDialog';
