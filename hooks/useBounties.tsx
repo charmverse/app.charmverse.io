@@ -52,7 +52,7 @@ export function BountiesProvider({ children }: { children: ReactNode }) {
 
   const refreshBounties = useCallback(
     async (clearCache = false) => {
-      if (!user?.id || !space?.id) {
+      if (!space?.id) {
         return;
       }
 
