@@ -57,7 +57,8 @@
     "test:browser:ci": "npm run test:browser",
     "test:e2e:ci": "NODE_OPTIONS=\"--max_old_space_size=4096\" dotenv -e .env.test.local -- npx playwright test",
     "storybook": "storybook dev -p 6006",
-    "build:storybook": "storybook build"
+    "build:storybook": "storybook build",
+    "update-core": "npm install github:charmverse/core#main"
   },
   "lint-staged": {
     "*.{ts,tsx}": [
@@ -221,6 +222,7 @@
     "react-intl": "^6.3.2",
     "react-pdf": "^5.7.2",
     "react-resizable": "^3.0.4",
+    "react-to-print": "^2.14.12",
     "react-window": "^1.8.7",
     "redis": "^4.3.1",
     "reselect": "^4.0.0",

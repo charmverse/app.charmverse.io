@@ -1,11 +1,12 @@
 import { prisma } from '@charmverse/core';
 import type { Block as PrismaBlock } from '@charmverse/core/dist/prisma';
 
-import { blockToPrisma, prismaToBlock } from 'lib/focalboard/block';
 import type { Block } from 'lib/focalboard/block';
+import { blockToPrisma, prismaToBlock } from 'lib/focalboard/block';
 import { createBoard } from 'lib/focalboard/board';
 import type { BoardViewFields } from 'lib/focalboard/boardView';
 import log from 'lib/log';
+import { generateFirstDiff } from 'lib/pages/server/generateFirstDiff';
 import { getPageMetaList } from 'lib/pages/server/getPageMetaList';
 import { WrongStateError } from 'lib/utilities/errors';
 import { isTruthy } from 'lib/utilities/types';
@@ -115,7 +116,21 @@ export async function syncFormResponses({
   const updateView = lastUpdated ? [] : [prisma.block.update({ where: { id: viewId }, data: { fields } })];
 
   const createCards = prisma.block.createMany({ data: cards });
-  const createPages = pages.map((data) => prisma.page.create({ data }));
+  const createPages = pages.map((data) =>
+    prisma.page.create({
+      data: {
+        ...data,
+        diffs: data.content
+          ? {
+              create: generateFirstDiff({
+                createdBy,
+                content: data.content
+              })
+            }
+          : undefined
+      }
+    })
+  );
 
   // save to db
   await prisma.$transaction([createOrUpdateBoard, ...updateView, createCards, ...createPages]);
