@@ -5,13 +5,19 @@ import { BigNumber } from 'ethers';
 import { getGnosisService } from 'lib/gnosis/gnosis';
 import log from 'lib/log';
 
+export type SafeTxStatusDetails = {
+  status: ApplicationStatus;
+  chainTxHash?: string;
+  safeTxHash: string;
+};
+
 export async function getSafeTxStatus({
-  txHash,
+  safeTxHash,
   chainId
 }: {
-  txHash: string;
+  safeTxHash: string;
   chainId: number;
-}): Promise<ApplicationStatus | null> {
+}): Promise<SafeTxStatusDetails | null> {
   const provider = new AlchemyProvider(chainId, process.env.ALCHEMY_API_KEY);
   const safeService = getGnosisService({ signer: provider, chainId });
 
@@ -20,18 +26,20 @@ export async function getSafeTxStatus({
   }
 
   try {
-    const safeTx = await safeService.getTransaction(txHash);
+    const safeTx = await safeService.getTransaction(safeTxHash);
     const hasValue = BigNumber.from(safeTx.value || '0').gt(0);
-    const { isExecuted, isSuccessful } = safeTx;
+    const { isExecuted, isSuccessful, transactionHash: chainTxHash } = safeTx;
 
     if (isExecuted && isSuccessful) {
       // if safe tx was executed without value, it is considered as cancelled
-      return hasValue ? ApplicationStatus.paid : ApplicationStatus.cancelled;
+      const status = hasValue ? ApplicationStatus.paid : ApplicationStatus.cancelled;
+
+      return { status, chainTxHash, safeTxHash };
     }
 
-    return ApplicationStatus.processing;
+    return { status: ApplicationStatus.processing, chainTxHash, safeTxHash };
   } catch (error) {
-    log.warn('[safe] Failed to load tx', { error, txHash, chainId });
+    log.warn('[safe] Failed to load tx', { error, safeTxHash, chainId });
 
     return null;
   }

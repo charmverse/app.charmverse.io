@@ -5,6 +5,7 @@ import { refreshPaymentStatus } from 'lib/applications/actions/refreshPaymentSta
 import { getSafeTxStatus } from 'lib/gnosis/getSafeTxStatus';
 import { createTransaction } from 'lib/transactions/createTransaction';
 import { generateBountyWithSingleApplication, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { getTransactionById } from 'testing/utils/transactions';
 
 jest.mock('lib/gnosis/getSafeTxStatus', () => ({
   getSafeTxStatus: jest.fn()
@@ -26,7 +27,7 @@ describe('refreshPaymentStatus', () => {
   });
 
   it('should not update status if there are no transactions related to application', async () => {
-    getSafeTxStatusMock.mockResolvedValue('processing');
+    getSafeTxStatusMock.mockResolvedValue({ status: 'processing', safeTxHash: '0x123', chainTxHash: '0x456' });
 
     const bountyWithSubmission = await generateBountyWithSingleApplication({
       userId: user.id,
@@ -45,7 +46,7 @@ describe('refreshPaymentStatus', () => {
   });
 
   it('should update status to processing if tx was found but it was not sent yet', async () => {
-    getSafeTxStatusMock.mockResolvedValue('processing');
+    getSafeTxStatusMock.mockResolvedValue({ status: 'processing', safeTxHash: '0x123', chainTxHash: '0x456' });
 
     const bountyWithSubmission = await generateBountyWithSingleApplication({
       userId: user.id,
@@ -56,18 +57,22 @@ describe('refreshPaymentStatus', () => {
     });
 
     const applicationId = bountyWithSubmission.applications[0].id;
-    await createTransaction({ applicationId, chainId: '1', transactionId: '0x123' });
+    const transaction = await createTransaction({ applicationId, chainId: '1', transactionId: '0x123' });
 
     const res = await refreshPaymentStatus(applicationId);
     const bounty = await prisma.bounty.findUnique({ where: { id: res.application.bountyId } });
+    const updatedTransaction = await getTransactionById(transaction.id);
 
     expect(res.application.status).toBe('processing');
     expect(res.updated).toBe(true);
     expect(bounty?.status).toBe('complete');
+    expect(transaction.transactionId).toBe('0x123');
+    // do not update transactionId if it was not sent yet
+    expect(updatedTransaction?.transactionId).toBe('0x123');
   });
 
   it('should update status to cancelled if tx was found but it was cancelled', async () => {
-    getSafeTxStatusMock.mockResolvedValue('cancelled');
+    getSafeTxStatusMock.mockResolvedValue({ status: 'cancelled', safeTxHash: '0x123', chainTxHash: '0x456' });
 
     const bountyWithSubmission = await generateBountyWithSingleApplication({
       userId: user.id,
@@ -78,18 +83,21 @@ describe('refreshPaymentStatus', () => {
     });
 
     const applicationId = bountyWithSubmission.applications[0].id;
-    await createTransaction({ applicationId, chainId: '1', transactionId: '0x123' });
+    const transaction = await createTransaction({ applicationId, chainId: '1', transactionId: '0x123' });
 
     const res = await refreshPaymentStatus(applicationId);
     const bounty = await prisma.bounty.findUnique({ where: { id: res.application.bountyId } });
+    const updatedTransaction = await getTransactionById(transaction.id);
 
     expect(res.application.status).toBe('cancelled');
     expect(res.updated).toBe(true);
     expect(bounty?.status).toBe('complete');
+    expect(transaction.transactionId).toBe('0x123');
+    expect(updatedTransaction?.transactionId).toBe('0x456');
   });
 
   it('should update application and bounty status to paid when payment was sent', async () => {
-    getSafeTxStatusMock.mockResolvedValue('paid');
+    getSafeTxStatusMock.mockResolvedValue({ status: 'paid', safeTxHash: '0x123', chainTxHash: '0x456' });
 
     const bountyWithSubmission = await generateBountyWithSingleApplication({
       userId: user.id,
@@ -100,18 +108,21 @@ describe('refreshPaymentStatus', () => {
     });
 
     const applicationId = bountyWithSubmission.applications[0].id;
-    await createTransaction({ applicationId, chainId: '1', transactionId: '0x123' });
+    const transaction = await createTransaction({ applicationId, chainId: '1', transactionId: '0x123' });
 
     const res = await refreshPaymentStatus(applicationId);
     const bounty = await prisma.bounty.findUnique({ where: { id: res.application.bountyId } });
+    const updatedTransaction = await getTransactionById(transaction.id);
 
     expect(res.application.status).toBe('paid');
     expect(res.updated).toBe(true);
     expect(bounty?.status).toBe('paid');
+    expect(transaction.transactionId).toBe('0x123');
+    expect(updatedTransaction?.transactionId).toBe('0x456');
   });
 
   it('should update applciation status to paid and bounty status to open when payment was sent, but cap was not reached', async () => {
-    getSafeTxStatusMock.mockResolvedValue('paid');
+    getSafeTxStatusMock.mockResolvedValue({ status: 'paid', safeTxHash: '0x123', chainTxHash: '0x456' });
 
     const bountyWithSubmission = await generateBountyWithSingleApplication({
       userId: user.id,
@@ -122,13 +133,16 @@ describe('refreshPaymentStatus', () => {
     });
 
     const applicationId = bountyWithSubmission.applications[0].id;
-    await createTransaction({ applicationId, chainId: '1', transactionId: '0x123' });
+    const transaction = await createTransaction({ applicationId, chainId: '1', transactionId: '0x123' });
 
     const res = await refreshPaymentStatus(applicationId);
     const bounty = await prisma.bounty.findUnique({ where: { id: res.application.bountyId } });
+    const updatedTransaction = await getTransactionById(transaction.id);
 
     expect(res.application.status).toBe('paid');
     expect(res.updated).toBe(true);
     expect(bounty?.status).toBe('open');
+    expect(transaction.transactionId).toBe('0x123');
+    expect(updatedTransaction?.transactionId).toBe('0x456');
   });
 });
