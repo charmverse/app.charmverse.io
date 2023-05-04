@@ -1,7 +1,7 @@
 import type { IdentityType } from '@charmverse/core/dist/prisma';
 import MoreHoriz from '@mui/icons-material/MoreHoriz';
 import type { ListItemProps } from '@mui/material';
-import { Box, Menu, IconButton, ListItem, ListItemIcon, ListItemText } from '@mui/material';
+import { Chip, Box, Menu, IconButton, ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import type { ReactNode } from 'react';
 
@@ -14,6 +14,7 @@ interface IdentityProviderItemProps extends ListItemProps {
   loading?: boolean;
   disabled?: boolean;
   connected?: boolean;
+  active?: boolean;
   error?: ReactNode;
   actions?: ReactNode;
   children?: ReactNode;
@@ -25,6 +26,7 @@ export default function IdentityProviderItem({
   loading = false,
   disabled = false,
   connected = false,
+  active = false,
   error,
   actions,
   children
@@ -48,13 +50,17 @@ export default function IdentityProviderItem({
         )
       }
     >
-      <ListItemIcon>
-        <IdentityIcon type={type} />
-      </ListItemIcon>
-      <ListItemText
-        primaryTypographyProps={{ ml: 1 }}
-        primary={connected ? text || `Connected with ${typeLabel}` : text || `Connect with ${typeLabel}`}
-      />
+      <Box display='flex' alignItems='center'>
+        <ListItemIcon>
+          <IdentityIcon type={type} />
+        </ListItemIcon>
+        <ListItemText
+          primaryTypographyProps={{ ml: 1 }}
+          primary={connected ? text || `Connected with ${typeLabel}` : text || `Connect with ${typeLabel}`}
+        />
+        {active && <Chip size='small' sx={{ ml: 1 }} label='Active' variant='outlined' />}
+      </Box>
+
       <Box px={1}>
         <LoadingComponent isLoading={loading} size={15} />
       </Box>
