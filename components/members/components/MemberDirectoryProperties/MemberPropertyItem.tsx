@@ -1,4 +1,4 @@
-import type { MemberPropertyType } from '@charmverse/core/dist/prisma';
+import type { MemberPropertyType } from '@charmverse/core/prisma';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import AlternateEmailIcon from '@mui/icons-material/AlternateEmail';
 import ArrowDropDownCircleIcon from '@mui/icons-material/ArrowDropDownCircle';

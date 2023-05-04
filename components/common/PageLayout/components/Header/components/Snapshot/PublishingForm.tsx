@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/log';
 import { Typography } from '@mui/material';
 import type { AlertColor } from '@mui/material/Alert';
 import Alert from '@mui/material/Alert';
@@ -22,7 +23,6 @@ import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useMembers } from 'hooks/useMembers';
 import { usePages } from 'hooks/usePages';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
-import log from 'lib/log';
 import type { PageMeta } from 'lib/pages';
 import { generateMarkdown } from 'lib/prosemirror/plugins/markdown/generateMarkdown';
 import type { SnapshotReceipt, SnapshotSpace, SnapshotVotingModeType, SnapshotVotingStrategy } from 'lib/snapshot';

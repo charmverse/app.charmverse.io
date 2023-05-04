@@ -1,7 +1,7 @@
+import { log } from '@charmverse/core/log';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import log from 'lib/log';
 import { count } from 'lib/metrics';
 import { onError, onNoMatch } from 'lib/middleware';
 import { requireApiKey } from 'lib/middleware/requireApiKey';

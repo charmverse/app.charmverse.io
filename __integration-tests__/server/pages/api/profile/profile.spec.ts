@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core';
-import type { Space } from '@charmverse/core/dist/prisma';
+import type { Space } from '@charmverse/core/prisma';
 import request from 'supertest';
 import { v4 } from 'uuid';
 

@@ -1,4 +1,4 @@
-import type { Space, User, Vote } from '@charmverse/core/dist/prisma';
+import type { Space, User, Vote } from '@charmverse/core/prisma';
 import { v4 } from 'uuid';
 
 import type { PageWithProposal } from 'lib/pages';

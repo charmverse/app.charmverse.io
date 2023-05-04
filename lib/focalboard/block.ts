@@ -1,4 +1,4 @@
-import type { Block as PrismaBlock } from '@charmverse/core/dist/prisma';
+import type { Block as PrismaBlock } from '@charmverse/core/prisma';
 import difference from 'lodash/difference';
 import { v4 } from 'uuid';
 

@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core';
-import type { BountyStatus, Prisma } from '@charmverse/core/dist/prisma';
+import type { BountyStatus, Prisma } from '@charmverse/core/prisma';
 import { v4 } from 'uuid';
 
 import { getBountyPagePermissionSet } from 'lib/bounties/shared';

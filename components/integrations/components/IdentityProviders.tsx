@@ -1,4 +1,5 @@
-import type { User } from '@charmverse/core/dist/prisma';
+import { log } from '@charmverse/core/log';
+import type { User } from '@charmverse/core/prisma';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import type { SelectChangeEvent } from '@mui/material';
 import {
@@ -30,7 +31,6 @@ import { useUser } from 'hooks/useUser';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import type { AuthSig } from 'lib/blockchain/interfaces';
 import type { DiscordAccount } from 'lib/discord/getDiscordAccount';
-import log from 'lib/log';
 import { countConnectableIdentities } from 'lib/users/countConnectableIdentities';
 import randomName from 'lib/utilities/randomName';
 import { lowerCaseEqual, shortWalletAddress } from 'lib/utilities/strings';

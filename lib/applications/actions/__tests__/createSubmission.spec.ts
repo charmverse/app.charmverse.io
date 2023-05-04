@@ -1,5 +1,5 @@
-import type { Space, User } from '@charmverse/core/dist/prisma';
-import { BountyStatus } from '@charmverse/core/dist/prisma';
+import type { Space, User } from '@charmverse/core/prisma';
+import { BountyStatus } from '@charmverse/core/prisma';
 import { v4 } from 'uuid';
 
 import { DataNotFoundError, DuplicateDataError, MissingDataError, UnauthorisedActionError } from 'lib/utilities/errors';

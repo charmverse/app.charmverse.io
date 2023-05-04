@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/log';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
@@ -41,7 +42,6 @@ import { useUser } from 'hooks/useUser';
 import type { Board } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { CardPage } from 'lib/focalboard/card';
-import log from 'lib/log';
 import type { IPagePermissionFlags } from 'lib/permissions/pages';
 
 import { DocumentHistory } from './DocumentHistory';

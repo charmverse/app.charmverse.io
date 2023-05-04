@@ -2,7 +2,7 @@
 // import { exportSpacePages } from 'lib/spaces/exportData/exportPages';
 // import fs from 'node:fs/promises';
 // import { prisma } from '@charmverse/core';
-// import { Block, Page } from '@charmverse/core/dist/prisma';
+// import { Block, Page } from '@charmverse/core/prisma';
 
 // type PageWithCard = Page & {card: Block}
 

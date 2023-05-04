@@ -1,15 +1,12 @@
-import { Page, Proposal, Space, Vote, VoteStatus } from '@charmverse/core/dist/prisma';
+import { Page, Proposal, Space, Vote, VoteStatus } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core';
-import { DataNotFoundError, InvalidInputError } from "lib/utilities/errors";
-import { getVote } from "lib/votes";
-import { ExtendedVote } from "lib/votes/interfaces";
-
-
-
+import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
+import { getVote } from 'lib/votes';
+import { ExtendedVote } from 'lib/votes/interfaces';
 
 type Input = {
-  proposalIds: string[]
-}
+  proposalIds: string[];
+};
 
 type ProposalOutput = {
   proposalId: string;
@@ -18,10 +15,9 @@ type ProposalOutput = {
   // Should receive one or the other
   voteStatus: VoteStatus | null;
   snapshotProposalId: string | null;
-}
+};
 
-export async function closeOutProposals({proposalIds}: Input): Promise<ProposalOutput[]> {
-
+export async function closeOutProposals({ proposalIds }: Input): Promise<ProposalOutput[]> {
   const proposals = await prisma.proposal.findMany({
     where: {
       id: {
@@ -52,14 +48,16 @@ export async function closeOutProposals({proposalIds}: Input): Promise<ProposalO
 
   // Should throw an error also if number of active proposals is lower than proposal IDs
   if (proposals.length < proposalIds.length) {
-    throw new DataNotFoundError(`Missing proposals with ID: ${proposalIds.filter(id => !proposals.find(p => p.id === id)).join(', ')}`);
+    throw new DataNotFoundError(
+      `Missing proposals with ID: ${proposalIds.filter((id) => !proposals.find((p) => p.id === id)).join(', ')}`
+    );
   }
 
-  const finalOutputs: ProposalOutput[] = await prisma.$transaction(async(tx) => {
+  const finalOutputs: ProposalOutput[] = await prisma.$transaction(async (tx) => {
     let outputs: ProposalOutput[] = [];
 
     for (const proposal of proposals) {
-      const { page } = proposal as any as (Proposal & {page: Page & {space: Space, votes: Vote[]}});
+      const { page } = proposal as any as Proposal & { page: Page & { space: Space; votes: Vote[] } };
       const { votes, space, title, snapshotProposalId } = page;
 
       let voteStatus: VoteStatus | null = null;
@@ -76,8 +74,8 @@ export async function closeOutProposals({proposalIds}: Input): Promise<ProposalO
           }
         });
 
-        const voteAfterUpdate = await getVote(votes[0].id) as ExtendedVote;
-        voteStatus = voteAfterUpdate.status
+        const voteAfterUpdate = (await getVote(votes[0].id)) as ExtendedVote;
+        voteStatus = voteAfterUpdate.status;
 
         await tx.vote.update({
           where: {
@@ -86,8 +84,8 @@ export async function closeOutProposals({proposalIds}: Input): Promise<ProposalO
           data: {
             status: voteStatus
           }
-        })
-      } 
+        });
+      }
 
       const updatedProposal = await tx.proposal.update({
         where: {
@@ -107,13 +105,18 @@ export async function closeOutProposals({proposalIds}: Input): Promise<ProposalO
       });
     }
     return outputs;
-  })
+  });
 
   return finalOutputs;
-
 }
 
 closeOutProposals({
   // These IDs can be obtained by opening proposal in popup view from proposals list
-  proposalIds: ['53bf33bd-3227-4bf1-80a0-977049558d4e', '692aaf47-7a38-4279-a0e2-7085883f4edc', 'e63c1826-0a71-4513-b137-9529bee30290']
-}).then(console.log).catch(console.error)
+  proposalIds: [
+    '53bf33bd-3227-4bf1-80a0-977049558d4e',
+    '692aaf47-7a38-4279-a0e2-7085883f4edc',
+    'e63c1826-0a71-4513-b137-9529bee30290'
+  ]
+})
+  .then(console.log)
+  .catch(console.error);

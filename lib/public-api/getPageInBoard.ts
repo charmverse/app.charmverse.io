@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core';
-import type { Block } from '@charmverse/core/dist/prisma';
+import type { Block } from '@charmverse/core/prisma';
 
 import { generatePageQuery } from 'lib/pages/server/generatePageQuery';
 import { generateMarkdown } from 'lib/prosemirror/plugins/markdown/generateMarkdown';

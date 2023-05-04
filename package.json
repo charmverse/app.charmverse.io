@@ -32,7 +32,7 @@
     "notifications:debug": "ts-node --transpileOnly ./scripts/readNotifications.ts",
     "server:dev": "npx react-env --path .env.local -- node node_modules/.bin/next start",
     "server:sockets": "NEXT_PUBLIC_WEBSOCKETS_HOST=http://localhost:3001 npm start",
-    "start": "next dev",
+    "start": "NODE_OPTIONS=\"--max_old_space_size=4096 --experimental-vm-modules\" next dev",
     "start:debug": "NODE_OPTIONS='--inspect' next",
     "start:ssl": "(npx local-ssl-proxy --source 3000 --target 8080) & next dev --port 8080",
     "start:test": "NODE_OPTIONS=\"--max_old_space_size=4096 --experimental-vm-modules\"  dotenv -e .env.test.local -- npm start",

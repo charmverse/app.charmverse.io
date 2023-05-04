@@ -1,4 +1,4 @@
-import type { Post, Space } from '@charmverse/core/dist/prisma';
+import type { Post, Space } from '@charmverse/core/prisma';
 
 export function getPropertiesFromPost(
   post: Pick<Post, 'spaceId' | 'title' | 'id' | 'path'>,

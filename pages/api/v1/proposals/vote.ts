@@ -1,4 +1,4 @@
-import type { UserVote } from '@charmverse/core/dist/prisma';
+import type { UserVote } from '@charmverse/core/prisma';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { requireKeys } from 'lib/middleware';

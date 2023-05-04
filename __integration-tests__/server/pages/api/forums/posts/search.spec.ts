@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import type { Post, PostCategory, Space, User } from '@charmverse/core/dist/prisma';
+import type { Post, PostCategory, Space, User } from '@charmverse/core/prisma';
 import request from 'supertest';
 
 import type { ForumPostMeta } from 'lib/forums/posts/interfaces';

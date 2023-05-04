@@ -1,5 +1,5 @@
 import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
-import type { PageType } from '@charmverse/core/dist/prisma';
+import type { PageType } from '@charmverse/core/prisma';
 import type { PluginKey } from 'prosemirror-state';
 import { useCallback, memo, useEffect, useMemo } from 'react';
 

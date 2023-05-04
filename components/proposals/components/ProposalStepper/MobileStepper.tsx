@@ -1,4 +1,4 @@
-import type { ProposalStatus } from '@charmverse/core/dist/prisma';
+import type { ProposalStatus } from '@charmverse/core/prisma';
 import { Box, MenuItem, Select, Stack, Typography } from '@mui/material';
 
 import Button from 'components/common/BoardEditor/focalboard/src/widgets/buttons/button';

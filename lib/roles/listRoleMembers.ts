@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core';
-import type { Role, User } from '@charmverse/core/dist/prisma';
+import type { Role, User } from '@charmverse/core/prisma';
 
 import { DataNotFoundError } from 'lib/utilities/errors';
 

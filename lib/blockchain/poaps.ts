@@ -1,7 +1,7 @@
-import type { UserWallet } from '@charmverse/core/dist/prisma';
+import { log } from '@charmverse/core/log';
+import type { UserWallet } from '@charmverse/core/prisma';
 
 import fetch from 'adapters/http/fetch.server';
-import log from 'lib/log';
 
 import type { ExtendedPoap } from './interfaces';
 

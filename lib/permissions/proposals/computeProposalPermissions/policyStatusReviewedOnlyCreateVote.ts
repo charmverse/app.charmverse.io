@@ -1,4 +1,4 @@
-import type { ProposalOperation } from '@charmverse/core/dist/prisma';
+import type { ProposalOperation } from '@charmverse/core/prisma';
 
 import { isProposalAuthor } from 'lib/proposal/isProposalAuthor';
 import { typedKeys } from 'lib/utilities/objects';

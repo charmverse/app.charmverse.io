@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import type { Space } from '@charmverse/core/dist/prisma';
+import type { Space } from '@charmverse/core/prisma';
 import request from 'supertest';
 
 import type { SpacePermissionConfigurationUpdate } from 'lib/permissions/meta';

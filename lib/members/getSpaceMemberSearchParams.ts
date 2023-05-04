@@ -1,4 +1,4 @@
-import type { Prisma } from '@charmverse/core/dist/prisma';
+import type { Prisma } from '@charmverse/core/prisma';
 
 export function getSpaceMemberSearchParams(search: string) {
   const searchString = `${search

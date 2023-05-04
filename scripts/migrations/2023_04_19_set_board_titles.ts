@@ -1,9 +1,9 @@
 import { prisma } from '@charmverse/core';
-import { Page } from '@charmverse/core/dist/prisma';
+import { Page } from '@charmverse/core/prisma';
 
 async function init() {
   const inlineBoardPages = await prisma.page.findMany({
-    where : {
+    where: {
       type: 'inline_board',
       boardId: {
         not: null
@@ -14,15 +14,15 @@ async function init() {
       boardId: true,
       title: true
     }
-  })
+  });
   console.log('found inline board pages', inlineBoardPages.length);
-  console.log('found inline board pages with title', inlineBoardPages.filter((p: {title: string}) => p.title).length);
+  console.log('found inline board pages with title', inlineBoardPages.filter((p: { title: string }) => p.title).length);
 
   let blockTitles = 0;
   for (const page of inlineBoardPages) {
     const boardBlock = await prisma.block.findFirst({
       where: {
-        id: page.boardId as string,
+        id: page.boardId as string
       }
     });
     if (boardBlock?.title) {

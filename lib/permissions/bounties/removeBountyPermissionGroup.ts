@@ -1,6 +1,6 @@
 import { prisma } from '@charmverse/core';
-import type { BountyPermission, Prisma } from '@charmverse/core/dist/prisma';
-import { BountyPermissionLevel } from '@charmverse/core/dist/prisma';
+import type { BountyPermission, Prisma } from '@charmverse/core/prisma';
+import { BountyPermissionLevel } from '@charmverse/core/prisma';
 
 import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
 

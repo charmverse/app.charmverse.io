@@ -1,5 +1,5 @@
 import { generateForumPost } from '@charmverse/core';
-import type { Post, Space, User } from '@charmverse/core/dist/prisma';
+import type { Post, Space, User } from '@charmverse/core/prisma';
 import request from 'supertest';
 
 import { baseUrl, loginUser } from 'testing/mockApiCall';

@@ -1,5 +1,5 @@
 import type { PostCategoryWithPermissions } from '@charmverse/core';
-import type { Post, PostCategory, PostComment, Space } from '@charmverse/core/dist/prisma';
+import type { Post, PostCategory, PostComment, Space } from '@charmverse/core/prisma';
 
 import * as http from 'adapters/http';
 import type { CreatePostCategoryInput } from 'lib/forums/categories/createPostCategory';

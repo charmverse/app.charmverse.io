@@ -1,5 +1,5 @@
 /* eslint-disable camelcase */
-import type { Page, Space, User } from '@charmverse/core/dist/prisma';
+import type { Page, Space, User } from '@charmverse/core/prisma';
 import { v4 } from 'uuid';
 
 import { InvalidInputError } from 'lib/utilities/errors';

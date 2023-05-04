@@ -1,4 +1,4 @@
-import type { DiscordUser, MemberPropertyValue, TelegramUser, User, UserDetails } from '@charmverse/core/dist/prisma';
+import type { DiscordUser, MemberPropertyValue, TelegramUser, User, UserDetails } from '@charmverse/core/prisma';
 
 type UserData = User & {
   memberPropertyValues: MemberPropertyValue[];

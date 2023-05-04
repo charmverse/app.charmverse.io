@@ -1,4 +1,4 @@
-import type { Bounty } from '@charmverse/core/dist/prisma';
+import type { Bounty } from '@charmverse/core/prisma';
 import type { MetaTransactionData } from '@safe-global/safe-core-sdk-types';
 import { getChainById } from 'connectors';
 import { ethers } from 'ethers';

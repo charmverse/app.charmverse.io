@@ -1,4 +1,4 @@
-import { BountyOperation } from '@charmverse/core/dist/prisma';
+import { BountyOperation } from '@charmverse/core/prisma';
 
 import { BasePermissions } from '../basePermissions.class';
 

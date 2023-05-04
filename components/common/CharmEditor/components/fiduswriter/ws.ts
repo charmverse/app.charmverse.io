@@ -1,8 +1,8 @@
+import { log } from '@charmverse/core/log';
 import type { Socket } from 'socket.io-client';
 import io from 'socket.io-client';
 
 import { websocketsHost } from 'config/constants';
-import log from 'lib/log';
 import type {
   ClientMessage,
   ClientRestartMessage,

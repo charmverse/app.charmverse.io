@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core';
-import type { ProposalCategory, Role, Space, User } from '@charmverse/core/dist/prisma';
+import type { ProposalCategory, Role, Space, User } from '@charmverse/core/prisma';
 
 import { InvalidStateError } from 'lib/middleware';
 import {

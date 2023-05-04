@@ -1,4 +1,4 @@
-import type { Space, User } from '@charmverse/core/dist/prisma';
+import type { Space, User } from '@charmverse/core/prisma';
 import request from 'supertest';
 
 import type { Member } from 'lib/members/interfaces';

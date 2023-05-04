@@ -1,4 +1,4 @@
-import type { Space, Role } from '@charmverse/core/dist/prisma';
+import type { Space, Role } from '@charmverse/core/prisma';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import { Box, Card, CircularProgress, Divider, Menu, Paper, Typography } from '@mui/material';
 import { useRef, useState } from 'react';

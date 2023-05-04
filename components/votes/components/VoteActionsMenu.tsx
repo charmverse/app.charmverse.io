@@ -1,4 +1,4 @@
-import type { VoteContext, VoteStatus } from '@charmverse/core/dist/prisma';
+import type { VoteContext, VoteStatus } from '@charmverse/core/prisma';
 import DateRangeIcon from '@mui/icons-material/DateRange';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import DoNotDisturbIcon from '@mui/icons-material/DoNotDisturb';

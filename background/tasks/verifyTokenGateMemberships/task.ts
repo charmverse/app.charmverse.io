@@ -1,4 +1,5 @@
-import log from 'lib/log';
+import { log } from '@charmverse/core/log';
+
 import { count } from 'lib/metrics';
 import { verifyTokenGateMemberships } from 'lib/token-gates/verifyTokenGateMemberships';
 

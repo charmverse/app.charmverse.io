@@ -1,9 +1,9 @@
 import { prisma } from '@charmverse/core';
+import { log } from '@charmverse/core/log';
 
 import { getUserS3FilePath, uploadUrlToS3 } from 'lib/aws/uploadToS3Server';
 import { getNFT } from 'lib/blockchain/nfts';
 import * as alchemyApi from 'lib/blockchain/provider/alchemy';
-import log from 'lib/log';
 import { sessionUserRelations } from 'lib/session/config';
 import type { UserAvatar } from 'lib/users/interfaces';
 import { InvalidInputError } from 'lib/utilities/errors';

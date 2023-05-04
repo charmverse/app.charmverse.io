@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core';
-import type { Bounty, Page, Prisma, Space } from '@charmverse/core/dist/prisma';
+import type { Bounty, Page, Prisma, Space } from '@charmverse/core/prisma';
 import type { Page as BrowserPage } from '@playwright/test';
 import { Wallet } from 'ethers';
 import { v4 } from 'uuid';

@@ -1,4 +1,4 @@
-import type { ProposalStatus } from '@charmverse/core/dist/prisma';
+import type { ProposalStatus } from '@charmverse/core/prisma';
 
 import type { PageEvent } from './PageEvent';
 import type { ResourceEvent } from './ResourceEvent';

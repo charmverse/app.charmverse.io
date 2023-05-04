@@ -1,9 +1,9 @@
 import { prisma } from '@charmverse/core';
-import type { TelegramUser } from '@charmverse/core/dist/prisma';
+import { log } from '@charmverse/core/log';
+import type { TelegramUser } from '@charmverse/core/prisma';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import log from 'lib/log';
 import { onError, InvalidStateError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 

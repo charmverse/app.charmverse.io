@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core';
-import type { Role, Space } from '@charmverse/core/dist/prisma';
+import type { Role, Space } from '@charmverse/core/prisma';
 import request from 'supertest';
 
 import type { IPagePermissionToCreate } from 'lib/permissions/pages';

@@ -1,4 +1,4 @@
-import type { Role } from '@charmverse/core/dist/prisma';
+import type { Role } from '@charmverse/core/prisma';
 import { Autocomplete, TextField } from '@mui/material';
 import Alert from '@mui/material/Alert';
 import type { ComponentProps, SyntheticEvent } from 'react';

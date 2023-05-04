@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core';
-import type { Bounty, Role, Space, User } from '@charmverse/core/dist/prisma';
+import type { Bounty, Role, Space, User } from '@charmverse/core/prisma';
 
 import { InvalidInputError, PositiveNumbersOnlyError } from 'lib/utilities/errors';
 import { ExpectedAnError } from 'testing/errors';

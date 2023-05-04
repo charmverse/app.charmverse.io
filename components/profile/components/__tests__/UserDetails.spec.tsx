@@ -1,5 +1,5 @@
 // import { ThemeProvider } from '@mui/material/styles';
-// import type { UserDetails } from '@charmverse/core/dist/prisma';
+// import type { UserDetails } from '@charmverse/core/prisma';
 // import { fireEvent, render, screen } from '@testing-library/react';
 
 // import type { LoggedInUser } from 'models';

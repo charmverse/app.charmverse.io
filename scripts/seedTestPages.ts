@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core';
-import { Prisma } from '@charmverse/core/dist/prisma';
+import { Prisma } from '@charmverse/core/prisma';
 import { createPage } from 'lib/pages/server/createPage';
 import { generateFirstDiff } from 'lib/pages/server/generateFirstDiff';
 import { DataNotFoundError } from 'lib/utilities/errors';
@@ -67,17 +67,17 @@ export async function seedTestPages({
   console.log('Permission inputs', permissionInputs.length);
 
   const pageDiffs: Prisma.PageDiffCreateManyInput[] = pageInputs
-  .filter((p) => !!p.content)
-  .map((p) => {
-    const diff = generateFirstDiff({
-      createdBy: p.createdBy,
-      content: p.content
+    .filter((p) => !!p.content)
+    .map((p) => {
+      const diff = generateFirstDiff({
+        createdBy: p.createdBy,
+        content: p.content
+      });
+      return {
+        ...diff,
+        pageId: p.id
+      } as Prisma.PageDiffCreateManyInput;
     });
-    return {
-      ...diff,
-      pageId: p.id
-    } as Prisma.PageDiffCreateManyInput;
-  });
 
   await prisma.$transaction([
     prisma.page.createMany({

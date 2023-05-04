@@ -1,4 +1,4 @@
-import type { PostCategory } from '@charmverse/core/dist/prisma';
+import type { PostCategory } from '@charmverse/core/prisma';
 import { Autocomplete, Box, Chip, TextField } from '@mui/material';
 import type { HTMLAttributes } from 'react';
 

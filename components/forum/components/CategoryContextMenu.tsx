@@ -1,5 +1,5 @@
 import type { PostCategoryPermissionFlags } from '@charmverse/core';
-import type { PostCategory } from '@charmverse/core/dist/prisma';
+import type { PostCategory } from '@charmverse/core/prisma';
 import { Edit } from '@mui/icons-material';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import LockIcon from '@mui/icons-material/Lock';

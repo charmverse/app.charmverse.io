@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/log';
 import type { FirebaseApp } from 'firebase/app';
 import { initializeApp } from 'firebase/app';
 import {
@@ -15,7 +16,6 @@ import charmClient from 'charmClient';
 import { googleWebClientConfig } from 'config/constants';
 import { useUser } from 'hooks/useUser';
 import type { LoginWithGoogleRequest } from 'lib/google/loginWithGoogle';
-import log from 'lib/log';
 import { ExternalServiceError, InvalidInputError, SystemError } from 'lib/utilities/errors';
 
 import type { AnyIdLogin } from '../components/login/LoginButton';

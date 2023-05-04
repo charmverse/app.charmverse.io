@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core';
-import type { Post, PostCategory, PostComment, Space } from '@charmverse/core/dist/prisma';
+import type { Post, PostCategory, PostComment, Space } from '@charmverse/core/prisma';
 import { expect, test as base } from '@playwright/test';
 import { ForumPostPage } from '__e2e__/po/forumPost.po';
 

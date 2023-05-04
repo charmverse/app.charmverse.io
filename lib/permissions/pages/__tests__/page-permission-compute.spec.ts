@@ -1,5 +1,5 @@
-import type { PagePermissionLevel, Space, User } from '@charmverse/core/dist/prisma';
-import { PageOperations } from '@charmverse/core/dist/prisma';
+import type { PagePermissionLevel, Space, User } from '@charmverse/core/prisma';
+import { PageOperations } from '@charmverse/core/prisma';
 import { v4 } from 'uuid';
 
 import { PageNotFoundError } from 'lib/pages/server';

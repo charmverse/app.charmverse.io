@@ -1,4 +1,4 @@
-import type { Vote } from '@charmverse/core/dist/prisma';
+import type { Vote } from '@charmverse/core/prisma';
 
 import { VOTE_STATUS } from './interfaces';
 

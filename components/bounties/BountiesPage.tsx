@@ -1,4 +1,4 @@
-import { BountyStatus } from '@charmverse/core/dist/prisma';
+import { BountyStatus } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import ModeStandbyOutlinedIcon from '@mui/icons-material/ModeStandbyOutlined';
 import BountyIcon from '@mui/icons-material/RequestPageOutlined';

@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core';
-import type { PaymentMethod, Space } from '@charmverse/core/dist/prisma';
+import type { PaymentMethod, Space } from '@charmverse/core/prisma';
 
 import { DataNotFoundError } from 'lib/utilities/errors';
 

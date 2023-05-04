@@ -1,4 +1,5 @@
-import type { Space } from '@charmverse/core/dist/prisma';
+import { log } from '@charmverse/core/log';
+import type { Space } from '@charmverse/core/prisma';
 import { yupResolver } from '@hookform/resolvers/yup';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import RefreshIcon from '@mui/icons-material/Refresh';
@@ -22,7 +23,6 @@ import PrimaryButton from 'components/common/PrimaryButton';
 import Avatar from 'components/settings/workspace/LargeAvatar';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useSpaces } from 'hooks/useSpaces';
-import log from 'lib/log';
 import { generateNotionImportRedirectUrl } from 'lib/notion/generateNotionImportRedirectUrl';
 import { spaceCreateTemplates } from 'lib/spaces/config';
 import type { SpaceCreateTemplate } from 'lib/spaces/config';

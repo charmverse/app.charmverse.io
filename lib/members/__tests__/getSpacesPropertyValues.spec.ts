@@ -1,4 +1,4 @@
-import type { MemberProperty, Space } from '@charmverse/core/dist/prisma';
+import type { MemberProperty, Space } from '@charmverse/core/prisma';
 import { v4 } from 'uuid';
 
 import { getSpacesPropertyValues } from 'lib/members/getSpacesPropertyValues';
