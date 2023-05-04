@@ -1,4 +1,4 @@
-import type { Transaction } from '@prisma/client';
+import type { Transaction } from '@charmverse/core/dist/prisma';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 

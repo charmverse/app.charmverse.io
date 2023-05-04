@@ -1,6 +1,5 @@
-import type { Prisma } from '@prisma/client';
+import { buildComputePermissionsWithPermissionFilteringPolicies, prisma } from '@charmverse/core';
 
-import { prisma } from 'db';
 import { filterApplicablePermissions } from 'lib/permissions/filterApplicablePermissions';
 import { ProposalNotFoundError } from 'lib/proposal/errors';
 import { isProposalReviewer } from 'lib/proposal/isProposalReviewer';
@@ -9,7 +8,6 @@ import { InvalidInputError } from 'lib/utilities/errors';
 import { isUUID } from 'lib/utilities/strings';
 
 import { isProposalAuthor } from '../../../proposal/isProposalAuthor';
-import { buildComputePermissionsWithPermissionFilteringPolicies } from '../../buildComputePermissionsWithPermissionFilteringPolicies';
 import type { PermissionCompute } from '../../interfaces';
 import { AvailableProposalPermissions } from '../availableProposalPermissions.class';
 import type { AvailableProposalPermissionFlags } from '../interfaces';

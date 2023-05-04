@@ -1,4 +1,5 @@
-import { prisma } from 'db';
+import { prisma } from '@charmverse/core';
+
 import { flattenTree } from 'lib/pages/mapPageTree';
 import { resolvePageTree } from 'lib/pages/server/resolvePageTree';
 import { isTruthy } from 'lib/utilities/types';

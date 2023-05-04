@@ -1,6 +1,5 @@
+import { prisma } from '@charmverse/core';
 import { expect, test as base } from '@playwright/test';
-
-import { prisma } from 'db';
 
 import { ForumHomePage } from '../po/forumHome.po';
 import { createUserAndSpace } from '../utils/mocks';

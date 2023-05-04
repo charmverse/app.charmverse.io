@@ -1,4 +1,4 @@
-import type { Space, User } from '@prisma/client';
+import type { Space, User } from '@charmverse/core/dist/prisma';
 import { v4 } from 'uuid';
 
 import { createDatabase } from 'lib/public-api/createDatabaseCardPage';

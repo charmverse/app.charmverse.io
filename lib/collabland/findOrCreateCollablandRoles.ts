@@ -1,6 +1,6 @@
-import type { Role } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { Role } from '@charmverse/core/dist/prisma';
 
-import { prisma } from 'db';
 import { syncDiscordRoles } from 'lib/discord/syncDiscorRoles';
 
 type RolesRecord = Record<string, Role | null>;

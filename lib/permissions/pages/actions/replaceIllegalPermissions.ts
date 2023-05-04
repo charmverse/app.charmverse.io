@@ -1,7 +1,7 @@
-import type { PagePermission, Prisma } from '@prisma/client';
+import type { OptionalTransaction, TransactionClient } from '@charmverse/core';
+import { prisma } from '@charmverse/core';
+import type { PagePermission, Prisma } from '@charmverse/core/dist/prisma';
 
-import type { OptionalTransaction, TransactionClient } from 'db';
-import { prisma } from 'db';
 import log from 'lib/log';
 import type {
   IPageWithPermissions,

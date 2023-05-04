@@ -1,5 +1,5 @@
 import { validate } from 'uuid';
-import { prisma } from 'db';
+import { prisma } from '@charmverse/core';
 import randomName from 'lib/utilities/randomName';
 import { uid } from 'lib/utilities/strings';
 

@@ -1,5 +1,6 @@
-import { prisma } from 'db';
-import { InvalidInputError } from 'lib/utilities/errors';
+import { prisma } from '@charmverse/core';
+import { Prisma } from '@charmverse/core/dist/prisma';
+import { generateFirstDiff } from 'lib/pages/server/generateFirstDiff';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
@@ -128,6 +129,19 @@ async function saveData(data: RestoreData) {
   // record what we uploaded just in case we need it in the next few days, and since its not quite the same as the backup
   await fs.writeFile(path.join(process.cwd(), 'prod-restoredData.json'), JSON.stringify({ blocks: blocksToRestore, pages: pagesToRestore, permissions: permsToRestore }, null, 2))
 
+  const pageDiffs: Prisma.PageDiffCreateManyInput[] = pagesToRestore
+  .filter((p) => !!p.content)
+  .map((p) => {
+    const diff = generateFirstDiff({
+      createdBy: p.createdBy,
+      content: p.content
+    });
+    return {
+      ...diff,
+      pageId: p.id
+    } as Prisma.PageDiffCreateManyInput;
+  });
+
   await prisma.$transaction([
     prisma.block.createMany({
       // @ts-ignore
@@ -140,6 +154,9 @@ async function saveData(data: RestoreData) {
     prisma.pagePermission.createMany({
       data: permsToRestore
     }),
+    prisma.pageDiff.createMany({
+      data: pageDiffs
+    })
   ]);
 }
 

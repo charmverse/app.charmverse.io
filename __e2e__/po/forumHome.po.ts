@@ -1,9 +1,8 @@
 // playwright-dev-page.ts
+import type { PostCategory } from '@charmverse/core/dist/prisma';
 import type { Locator, Page } from '@playwright/test';
-import type { PostCategory } from '@prisma/client';
 
 import { baseUrl } from 'config/constants';
-import { PostCategoryWithPermissions } from 'lib/permissions/forum/interfaces';
 
 // capture actions on the pages in signup flow
 export class ForumHomePage {

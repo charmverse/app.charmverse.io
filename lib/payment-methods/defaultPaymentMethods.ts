@@ -1,6 +1,6 @@
-import type { PaymentMethod, Space } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { PaymentMethod, Space } from '@charmverse/core/dist/prisma';
 
-import { prisma } from 'db';
 import { DataNotFoundError } from 'lib/utilities/errors';
 
 const defaultPaymentMethods: Pick<

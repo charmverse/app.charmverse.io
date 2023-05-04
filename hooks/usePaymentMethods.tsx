@@ -1,4 +1,4 @@
-import type { PaymentMethod } from '@prisma/client';
+import type { PaymentMethod } from '@charmverse/core/dist/prisma';
 import type { Dispatch, ReactNode, SetStateAction } from 'react';
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 

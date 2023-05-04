@@ -1,4 +1,4 @@
-import type { UserGnosisSafe } from '@prisma/client';
+import type { UserGnosisSafe } from '@charmverse/core/dist/prisma';
 import EthersAdapter from '@safe-global/safe-ethers-lib';
 import type { SafeInfoResponse, SafeMultisigTransactionListResponse } from '@safe-global/safe-service-client';
 import SafeServiceClient from '@safe-global/safe-service-client';

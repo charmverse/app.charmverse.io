@@ -13,7 +13,7 @@ import type {
   UserGnosisSafe,
   UserWallet,
   ApiPageKey
-} from '@prisma/client';
+} from '@charmverse/core/dist/prisma';
 import type { FiatCurrency, IPairQuote } from 'connectors';
 
 import * as http from 'adapters/http';

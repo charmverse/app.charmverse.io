@@ -1,14 +1,14 @@
 import { AlchemyProvider } from "@ethersproject/providers";
-import { Space } from "@prisma/client";
+import { Space } from "@charmverse/core/dist/prisma";
 import { getProjectRegistryContract } from "lib/gitcoin/getProjectRegistryContract";
 import { getProjectDetails, GitcoinProjectDetails } from "lib/gitcoin/getProjectDetails";
-import { prisma } from 'db';
+import { prisma } from '@charmverse/core';
 import { uid } from 'lib/utilities/strings';
 import { createUserFromWallet } from "lib/users/createUser";
 import { createWorkspace, SpaceCreateInput } from "lib/spaces/createSpace";
 import { updateTrackGroupProfile } from "lib/metrics/mixpanel/updateTrackGroupProfile";
 import { trackUserAction } from "lib/metrics/mixpanel/trackUserAction";
-import { appendFileSync, readFileSync } from 'fs';
+import { appendFileSync, readFileSync, writeFileSync } from 'fs';
 import { getIpfsFileUrl } from "lib/ipfs/fetchFileByHash";
 import { getUserS3FilePath, uploadUrlToS3 } from "lib/aws/uploadToS3Server";
 import { getFilenameWithExtension } from "lib/utilities/getFilenameWithExtension";
@@ -18,7 +18,7 @@ import { getFilenameWithExtension } from "lib/utilities/getFilenameWithExtension
  * It also updates mixpanel profiles so make sure to have prod mixpanel api key set in .env
  */
 
-const START_ID = 650;
+const START_ID = 500;
 const CHAIN_ID = 1;
 
 const provider = new AlchemyProvider(CHAIN_ID, process.env.ALCHEMY_API_KEY);
@@ -55,6 +55,7 @@ async function importGitCoinProjects() {
     }
 
     const projectDetails = await getProjectDetails({ chainId: CHAIN_ID, projectId: i, provider });
+
     if (projectDetails !== null) {
       const name = projectDetails.metadata.title;
       const users = await createSpaceUsers([...projectDetails.owners]);
@@ -80,6 +81,7 @@ async function importGitCoinProjects() {
           name,
           spaceImage,
           updatedBy: botUser.id,
+          origin: 'gitcoin'
         };
 
         const space = await createWorkspace({
@@ -95,8 +97,8 @@ async function importGitCoinProjects() {
 
         // mark space as created from gitcoin in mixpanel
         await updateTrackGroupProfile(space, 'gitcoin');
-        trackUserAction('create_new_workspace', { userId: adminUserId, spaceId: space.id, template: 'default', source: 'gitcoin' });
-        [adminUserId, ...extraAdmins].forEach((userId) => trackUserAction('join_a_workspace', { spaceId: space.id, userId, source: 'gitcoin-growth-hack' }));
+        // trackUserAction('create_new_workspace', { userId: adminUserId, spaceId: space.id, template: 'default', source: 'gitcoin' });
+        // [adminUserId, ...extraAdmins].forEach((userId) => trackUserAction('join_a_workspace', { spaceId: space.id, userId, source: 'gitcoin-growth-hack' }));
 
         const projectInfo = { projectDetails, space, spaceImageUrl: spaceImage, bannerUrl }
         projectsData.push(projectInfo);
@@ -162,7 +164,7 @@ async function createSpaceUsers(owners: string[]) {
     }
   });
 
-  const userPromises = owners.map(async (owner) => createUserFromWallet({ address: owner }, {
+  const userPromises = owners.map(async (owner) => createUserFromWallet({ address: owner, skipTracking: true }, {
     signupSource: 'gitcoin-project',
     signupCampaign: 'gitcoin-growth-hack'
   }));
@@ -171,29 +173,46 @@ async function createSpaceUsers(owners: string[]) {
   const [author, ...users] = userIds;
 
   return { adminUserId: author, extraAdmins: [...users], botUser };
-
 }
 
-function getImportedProjcetIds() {
+function getImportedProjectsData() {
   try {
     const content = readFileSync(FILE_PATH).toString();
-    const rows = content.split('\n');
+    const [_, ...rows] = content.split('\n');
 
-
-    const ids = rows.map(row => {
-      const cols = row?.split(';') || [];
-      const projectId = Number(cols[0]) || null;
-      return projectId
-    }).filter(id => id !== null);
-
-    console.log('🔥 imported projects count', ids.length);
-
-    return ids;
+    return rows.map(row => row?.split(';') || []);
  } catch (e) {
 
  }
 
  return [];
+}
+
+function getImportedProjcetIds() {
+    const data = getImportedProjectsData();
+    const ids = data.map(cols => {
+      // col 0 - gitcoin project id
+      const projectId = Number(cols[0]) || null;
+      return projectId
+    }).filter((id): id is number => id !== null);
+
+    console.log('🔥 imported projects count', ids.length);
+
+    return ids;
+}
+
+function getImportedProjcetSpaceIds() {
+  const data = getImportedProjectsData();
+
+  return data.map(cols => {
+    // col 1 - gitcoin project space id
+    const projectId = cols[1] || null;
+    return projectId
+  }).filter((id): id is string => id !== null);
+}
+
+function getCsvHeader() {
+  return ['gitcoin_project_id', 'gitcoin_space_id', 'space_name', 'project_twitter', 'website', 'owners', 'space_url', 'join_url', 'space_image_url', 'banner_url', 'metadata_url', 'created_date'].join(';');
 }
 
 function exportDataToCSV(data: ProjectData[]) {
@@ -206,19 +225,20 @@ function exportDataToCSV(data: ProjectData[]) {
 
   const csvData = data.map(({ projectDetails, space, bannerUrl, spaceImageUrl }) => {
     const { metadata, owners, metadataUrl, projectId } = projectDetails;
-    const {  description, website, projectTwitter } = metadata;
+    const {  description, website, projectTwitter, createdAt } = metadata;
     const { name, domain,id } = space;
 
     const spaceUrl = `https://app.charmverse.io/${domain}`;
-    const joinUrl = `https://app.charmverse.io/join?domain=${domain}`
+    const joinUrl = `https://app.charmverse.io/join?domain=${domain}`;
+    const createdDate = new Date(createdAt).toLocaleDateString('en-US') || '??';
 
-    const infoRow =  [projectId, id, name, projectTwitter, website, owners.join(','), spaceUrl, joinUrl, spaceImageUrl, bannerUrl, metadataUrl].join(';');
+    const infoRow =  [projectId, id, name, projectTwitter, website, owners.join(','), spaceUrl, joinUrl, spaceImageUrl, bannerUrl, metadataUrl, createdDate].join(';');
     return ('\n').concat(infoRow)
   });
 
   // add header if file is empty
   if (isEmpty) {
-    csvData.unshift(['projectId', 'spaceId', 'name', 'twitter', 'website', 'owners', 'spaceUrl', 'joinUrl', 'logoUrl', 'bannerUrl', 'metadataUrl'].join(';'));
+    csvData.unshift(getCsvHeader());
   }
 
   if (csvData.length) {
@@ -226,7 +246,52 @@ function exportDataToCSV(data: ProjectData[]) {
   }
 }
 
+async function updateSpaceOrigins() {
+  const spaceIds = getImportedProjcetSpaceIds();
+  await prisma.space.updateMany({
+    where: { id: { in: spaceIds } },
+    data: { origin: 'gitcoin' }
+  });
+}
+
+export async function updateCreatedAt() {
+  const data = getImportedProjectsData();
+  let updatedData = [...data];
+
+  for (const [i, row] of data.entries()) {
+    const projectId = Number(row[0]) || null;
+    const createdAt = row[11] || null;
+    if (projectId && !createdAt) {
+      const projectDetails = await getProjectDetails({ chainId: CHAIN_ID, projectId: i, provider });
+      if (!projectDetails) {
+        continue;
+      }
+
+      const { metadata } = projectDetails;
+      const createdDate = new Date(metadata.createdAt).toLocaleDateString('en-US') || '??';
+      updatedData[i][11] = createdDate;
+
+      overrideCsv(updatedData);
+    }
+  }
+}
+
+function overrideCsv(data: string[][]) {
+  const csvData = [getCsvHeader()];
+  data.forEach(row => {
+    csvData.push(row.join(';'));
+  });
+
+  if (csvData.length) {
+    writeFileSync(FILE_PATH, csvData.join('\n'));
+  }
+}
+
 // getImportedProjcetIds()
+// getImportedProjcetSpaceIds()
 // getProjectCount();
 
-// importGitCoinProjects();
+// updateSpaceOrigins();
+// updateCreatedAt();
+
+importGitCoinProjects();

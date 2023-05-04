@@ -1,3 +1,4 @@
+import type { User } from '@charmverse/core/dist/prisma';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import type { SelectChangeEvent } from '@mui/material';
 import {
@@ -14,7 +15,6 @@ import {
   Tooltip,
   Typography
 } from '@mui/material';
-import type { User } from '@prisma/client';
 import { bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import type { MouseEvent } from 'react';
 import { Fragment, useState } from 'react';

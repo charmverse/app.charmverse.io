@@ -1,6 +1,6 @@
+import type { Application } from '@charmverse/core/dist/prisma';
 import LaunchIcon from '@mui/icons-material/LaunchOutlined';
 import { Tooltip, Typography } from '@mui/material';
-import type { Application } from '@prisma/client';
 import { getChainExplorerLink } from 'connectors';
 
 import Link from 'components/common/Link';

@@ -1,8 +1,8 @@
+import type { PageType } from '@charmverse/core/dist/prisma';
 import styled from '@emotion/styled';
 import { Box, Button, Chip, Tooltip } from '@mui/material';
 import InputAdornment from '@mui/material/InputAdornment';
 import Input from '@mui/material/OutlinedInput';
-import type { PageType } from '@prisma/client';
 import { bindPopover, usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect } from 'react';
 

@@ -1,3 +1,4 @@
+import type { User } from '@charmverse/core/dist/prisma';
 import { useTheme } from '@emotion/react';
 import { yupResolver } from '@hookform/resolvers/yup';
 import {
@@ -11,7 +12,6 @@ import {
   FormGroup,
   FormControlLabel
 } from '@mui/material';
-import type { User } from '@prisma/client';
 import type { ChangeEvent } from 'react';
 import { useCallback } from 'react';
 import { useForm } from 'react-hook-form';

@@ -1,4 +1,5 @@
-import { prisma } from 'db';
+import { prisma } from '@charmverse/core';
+import { Page } from '@charmverse/core/dist/prisma';
 
 async function init() {
   const inlineBoardPages = await prisma.page.findMany({
@@ -15,7 +16,7 @@ async function init() {
     }
   })
   console.log('found inline board pages', inlineBoardPages.length);
-  console.log('found inline board pages with title', inlineBoardPages.filter(p => p.title).length);
+  console.log('found inline board pages with title', inlineBoardPages.filter((p: {title: string}) => p.title).length);
 
   let blockTitles = 0;
   for (const page of inlineBoardPages) {

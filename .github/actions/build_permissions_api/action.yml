@@ -1,0 +1,62 @@
+name: 'Install dependencies and build the permissions API'
+
+inputs:
+  GITHUB_SSH_KEY:
+    description: 'SSH key allowing pulls from private Github repos'
+    required: false
+  API_FOLDER:
+    description: 'Where the permissions API is to be installed'
+    required: false
+    default: "permissions_api"
+  NODE_ENV:
+    description: 'Set node env for context and build'
+    required: false
+
+runs:
+  using: 'composite'
+  steps:
+    - uses: actions/checkout@v3
+      with:
+        repository: charmverse/permissions.charmverse.io
+        ref: main
+        path: ${{inputs.API_FOLDER}}
+        ssh-key: ${{ inputs.GITHUB_SSH_KEY }}
+
+
+    - name: Cache dependencies
+      id: cache_permissions_node_modules
+      uses: actions/cache@v3
+      with:
+        path: ./${{inputs.API_FOLDER}}/node_modules
+        key: nodemodules-permissions-cache-${{ hashFiles(format('{0}/package-lock.json', inputs.API_FOLDER)) }}
+
+    - name: Install npm dependencies
+      shell: bash
+      if: steps.cache_permissions_node_modules.outputs.cache-hit != 'true'
+      run: echo -e "Install path" && pwd && npm ci --no-audit --no-fund
+      working-directory: ./${{inputs.API_FOLDER}}
+
+    #### ---- Start the build process
+    - run: echo '${{ env.GIT_DIFF }}'
+      shell: bash
+      working-directory: ./${{inputs.API_FOLDER}}
+
+    - name: Cache build
+      id: cache_permissions_build
+      uses: actions/cache@v3
+      with:
+        path: |
+          ./${{inputs.API_FOLDER}}/dist
+          .env.test.local
+
+        # including the app_env helps make sure that deploy_staging.yml does not reuse values from test_and_deploy.yml which are meant for production
+        key: permissions-${{ runner.os }}-${{ hashFiles(format('{0}/**/*.[jt]s', inputs.API_FOLDER), format('!{0}/node_modules', inputs.API_FOLDER)) }}
+
+    - name: Build
+      shell: bash
+      if: steps.cache_permissions_build.outputs.cache-hit != 'true'
+      run: npm run build
+      working-directory: ./${{inputs.API_FOLDER}}
+      env:
+        NODE_ENV: ${{ inputs.NODE_ENV }}
+

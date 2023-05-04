@@ -1,8 +1,17 @@
-import type { GoogleAccount, Page, Proposal, Role, Space, SuperApiToken, User, UserWallet } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type {
+  GoogleAccount,
+  Page,
+  Proposal,
+  Role,
+  Space,
+  SuperApiToken,
+  User,
+  UserWallet
+} from '@charmverse/core/dist/prisma';
 import request from 'supertest';
 import { v4 } from 'uuid';
 
-import { prisma } from 'db';
 import type { PublicApiProposal } from 'pages/api/v1/proposals';
 import { randomETHWalletAddress } from 'testing/generateStubs';
 import { baseUrl } from 'testing/mockApiCall';

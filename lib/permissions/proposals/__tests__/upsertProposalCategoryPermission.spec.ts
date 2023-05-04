@@ -1,4 +1,4 @@
-import type { ProposalCategory, Space, User } from '@prisma/client';
+import type { ProposalCategory, Space, User } from '@charmverse/core/dist/prisma';
 import { v4 } from 'uuid';
 
 import { AssignmentNotPermittedError } from 'lib/permissions/errors';

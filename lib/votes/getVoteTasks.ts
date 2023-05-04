@@ -1,4 +1,5 @@
-import { prisma } from 'db';
+import { prisma } from '@charmverse/core';
+
 import { mapNotificationActor } from 'lib/notifications/mapNotificationActor';
 import { pageMetaSelect } from 'lib/pages/server/getPageMeta';
 

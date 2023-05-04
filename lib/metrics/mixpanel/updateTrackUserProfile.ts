@@ -1,6 +1,6 @@
-import type { Prisma, Space } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { Prisma, Space } from '@charmverse/core/dist/prisma';
 
-import { prisma } from 'db';
 import log from 'lib/log';
 import type { LoggedInUser } from 'models';
 

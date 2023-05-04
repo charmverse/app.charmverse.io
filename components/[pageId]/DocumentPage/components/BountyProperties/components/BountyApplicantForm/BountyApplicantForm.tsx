@@ -1,5 +1,5 @@
+import type { Application, Bounty } from '@charmverse/core/dist/prisma';
 import { Box, Button, Stack, Tooltip } from '@mui/material';
-import type { Application, Bounty } from '@prisma/client';
 import { useState } from 'react';
 
 import { useBounties } from 'hooks/useBounties';

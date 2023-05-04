@@ -1,19 +1,19 @@
+import { prisma } from '@charmverse/core';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { prisma } from 'db';
 import log from 'lib/log';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { mapNotificationActor } from 'lib/notifications/mapNotificationActor';
-import { computePostPermissions } from 'lib/permissions/forum/computePostPermissions';
+import { getPermissionsClient } from 'lib/permissions/api/routers';
 import { computeUserPagePermissions } from 'lib/permissions/pages';
 import { computeProposalPermissions } from 'lib/permissions/proposals/computeProposalPermissions';
 import { withSessionRoute } from 'lib/session/withSession';
 import { InvalidInputError, UnauthorisedActionError } from 'lib/utilities/errors';
 import { createVote as createVoteService } from 'lib/votes';
 import { getVotesByPage } from 'lib/votes/getVotesByPage';
-import type { VoteTask, ExtendedVote, VoteDTO } from 'lib/votes/interfaces';
+import type { ExtendedVote, VoteDTO, VoteTask } from 'lib/votes/interfaces';
 import { relay } from 'lib/websockets/relay';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -39,10 +39,15 @@ async function getVotes(req: NextApiRequest, res: NextApiResponse<ExtendedVote[]
       throw new UnauthorisedActionError('You do not have access to the page');
     }
   } else if (postId) {
-    const computed = await computePostPermissions({
+    const computed = await getPermissionsClient({
       resourceId: postId,
-      userId
-    });
+      resourceIdType: 'post'
+    }).then((client) =>
+      client.forum.computePostPermissions({
+        resourceId: postId,
+        userId
+      })
+    );
 
     if (computed.view_post !== true) {
       throw new UnauthorisedActionError('You do not have access to the post');

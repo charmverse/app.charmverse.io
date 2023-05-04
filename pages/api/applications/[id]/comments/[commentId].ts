@@ -1,9 +1,9 @@
-import type { PageComment } from '@prisma/client';
-import { Prisma } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { PageComment } from '@charmverse/core/dist/prisma';
+import { Prisma } from '@charmverse/core/dist/prisma';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { prisma } from 'db';
 import { getApplicationDetails } from 'lib/applications/getApplicationDetails';
 import type { CreateApplicationCommentPayload } from 'lib/applications/interfaces';
 import { ActionNotPermittedError, NotFoundError, onError, onNoMatch, requireUser } from 'lib/middleware';

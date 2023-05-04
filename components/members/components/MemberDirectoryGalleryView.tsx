@@ -1,7 +1,7 @@
+import type { MemberProperty, MemberPropertyType } from '@charmverse/core/dist/prisma';
 import styled from '@emotion/styled';
 import EditIcon from '@mui/icons-material/Edit';
 import { Box, Card, Chip, Grid, IconButton, Stack, Tooltip, Typography } from '@mui/material';
-import type { MemberProperty, MemberPropertyType } from '@prisma/client';
 import type { MouseEvent } from 'react';
 
 import Avatar from 'components/common/Avatar';
@@ -190,6 +190,7 @@ function MemberDirectoryGalleryCard({ member }: { member: Member }) {
               return memberProperty ? (
                 <SelectPreview
                   size='small'
+                  wrapColumn
                   options={property.options as SelectOptionType[]}
                   value={memberProperty.value as string | string[]}
                   name={property.name}

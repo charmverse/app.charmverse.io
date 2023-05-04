@@ -1,4 +1,4 @@
-import type { MemberProperty } from '@prisma/client';
+import type { MemberProperty } from '@charmverse/core/dist/prisma';
 
 import * as http from 'adapters/http';
 import type { IUser } from 'components/common/BoardEditor/focalboard/src/user';

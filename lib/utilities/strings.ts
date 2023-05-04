@@ -1,4 +1,4 @@
-import type { UserWallet } from '@prisma/client';
+import type { UserWallet } from '@charmverse/core/dist/prisma';
 import { utils } from 'ethers';
 import { customAlphabet } from 'nanoid';
 import * as dictionaries from 'nanoid-dictionary';

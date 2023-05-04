@@ -1,6 +1,6 @@
+import type { UserGnosisSafe } from '@charmverse/core/dist/prisma';
 import { Checkbox, List, ListItem, MenuItem, Select, Tooltip, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
-import type { UserGnosisSafe } from '@prisma/client';
 import { getChainById } from 'connectors';
 import { bindPopover, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect, useState } from 'react';

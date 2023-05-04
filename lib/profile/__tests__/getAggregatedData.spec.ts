@@ -1,8 +1,8 @@
-import type { Space, SpaceRole } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { Space, SpaceRole } from '@charmverse/core/dist/prisma';
 import { Wallet } from 'ethers';
 import fetchMock from 'fetch-mock-jest';
 
-import { prisma } from 'db';
 import { DEEPDAO_BASE_URL } from 'lib/deepdao/client';
 import { getAggregatedData } from 'lib/profile';
 import type { LoggedInUser } from 'models';

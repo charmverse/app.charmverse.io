@@ -1,7 +1,7 @@
+import { prisma } from '@charmverse/core';
 import { v4 } from 'uuid';
 
 import { isProdEnv, isStagingEnv } from 'config/constants';
-import { prisma } from 'db';
 import { getUserS3FilePath, uploadUrlToS3 } from 'lib/aws/uploadToS3Server';
 import { getDiscordAccount } from 'lib/discord/getDiscordAccount';
 import log from 'lib/log';

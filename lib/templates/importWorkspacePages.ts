@@ -1,10 +1,10 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
-import type { Prisma, Page } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { Prisma, Page } from '@charmverse/core/dist/prisma';
 import { v4, validate } from 'uuid';
 
-import { prisma } from 'db';
 import type { BountyWithDetails } from 'lib/bounties';
 import log from 'lib/log';
 import type { PageMeta } from 'lib/pages';
