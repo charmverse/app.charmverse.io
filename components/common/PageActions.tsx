@@ -27,6 +27,7 @@ export function PageActions({
     path: string;
     deletedAt: Date | null;
     parentId?: string | null;
+    title: string | null;
   };
   readOnly?: boolean;
   onClickDelete?: VoidFunction;

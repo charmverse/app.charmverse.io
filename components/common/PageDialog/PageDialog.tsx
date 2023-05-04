@@ -21,6 +21,7 @@ import debouncePromise from 'lib/utilities/debouncePromise';
 
 import { PageActions } from '../PageActions';
 import { BountyActions } from '../PageLayout/components/Header/components/BountyActions';
+import { ExportToPDFMarkdown } from '../PageLayout/components/Header/components/ExportToPDFMenuItem';
 
 interface Props {
   pageId?: string;
@@ -128,6 +129,7 @@ export default function PageDialog(props: Props) {
               }
             }}
           >
+            <ExportToPDFMarkdown pdfTitle={page.title} />
             {bounty && <BountyActions bountyId={bounty.id} />}
           </PageActions>
         )
