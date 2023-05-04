@@ -94,7 +94,18 @@ export default function BountyApplicantTableRow({
           <BountyApplicantStatus submission={submission} />
         </TableCell>
         <TableCell>{formatDateTime(submission.updatedAt)}</TableCell>
-        <TableCell>
+
+        <TableCell align='right'>
+          <BountyApplicantActions
+            bounty={bounty}
+            isExpanded={isExpandedRow}
+            submission={submission}
+            expandRow={() => setIsExpandedRow(true)}
+            refreshSubmissions={refreshSubmissions}
+          />
+        </TableCell>
+
+        <TableCell align='right'>
           <Tooltip title={isExpandedRow ? 'Hide details' : 'View details'}>
             <IconButton
               size='small'
@@ -105,15 +116,6 @@ export default function BountyApplicantTableRow({
               {!isExpandedRow ? <KeyboardArrowDownIcon fontSize='small' /> : <KeyboardArrowUpIcon fontSize='small' />}
             </IconButton>
           </Tooltip>
-        </TableCell>
-        <TableCell align='right'>
-          <BountyApplicantActions
-            bounty={bounty}
-            isExpanded={isExpandedRow}
-            submission={submission}
-            expandRow={() => setIsExpandedRow(true)}
-            refreshSubmissions={refreshSubmissions}
-          />
         </TableCell>
       </TableRow>
       <TableRow>

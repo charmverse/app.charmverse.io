@@ -1,6 +1,6 @@
 import type { Application } from '@charmverse/core/dist/prisma';
 import LaunchIcon from '@mui/icons-material/LaunchOutlined';
-import { Tooltip, Typography } from '@mui/material';
+import { Box, Tooltip, Typography } from '@mui/material';
 import { getChainExplorerLink } from 'connectors';
 
 import Link from 'components/common/Link';
@@ -64,12 +64,15 @@ export function BountyApplicantStatus({ submission }: Props) {
             external
             href={transaction ? getChainExplorerLink(transaction.chainId, transaction.transactionId) : ''}
             target='_blank'
+            display='inline-flex'
           >
             <Tooltip title={transaction ? 'View transaction' : ''} placement='top' arrow>
-              <Typography color='success' variant='body2'>
-                {'Paid '}
+              <Box display='flex' alignItems='center' gap={0.5}>
+                <Typography color='success' variant='body2'>
+                  {'Paid '}
+                </Typography>
                 <LaunchIcon sx={{ fontSize: 14 }} />
-              </Typography>
+              </Box>
             </Tooltip>
           </Link>
         ) : (
