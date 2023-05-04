@@ -42,6 +42,7 @@ function simplifyTypeformQuestions(fields?: TypeformFields[]): FormResponsePrope
             return { ...defaultProperties, type: 'phone' as PropertyType };
           case 'date':
             return { ...defaultProperties, type };
+          case 'ranking':
           case 'picture_choice':
           case 'multiple_choice': {
             const options = createBoardPropertyOptions(choices.map((c) => c.label).filter(isTruthy));
