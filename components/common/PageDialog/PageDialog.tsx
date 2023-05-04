@@ -71,7 +71,7 @@ export default function PageDialog(props: Props) {
 
   async function onClickDelete() {
     if (page) {
-      if (page.type === 'card') {
+      if (page.type === 'card' || page.type === 'card_synced') {
         await charmClient.deleteBlock(page.id, () => null);
       } else if (page.type === 'bounty') {
         setBounties((bounties) => bounties.filter((_bounty) => _bounty.id !== page.id));

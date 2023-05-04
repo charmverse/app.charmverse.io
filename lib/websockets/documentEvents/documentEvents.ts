@@ -532,7 +532,8 @@ export class DocumentEventHandler {
     const contentText = room.node.textContent;
     // check if content is empty only if it got changed
     const hasContent = contentText.length > 0;
-    const galleryImage = room.doc.type === 'card' ? extractPreviewImage(room.doc.content) : null;
+    const galleryImage =
+      room.doc.type === 'card' || room.doc.type === 'card_synced' ? extractPreviewImage(room.doc.content) : null;
 
     const res = await prisma.page.update({
       where: { id: room.doc.id },
