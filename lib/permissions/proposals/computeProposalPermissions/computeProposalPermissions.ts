@@ -1,21 +1,25 @@
-import { buildComputePermissionsWithPermissionFilteringPolicies, prisma } from '@charmverse/core';
-import type { ProposalResource, AvailableProposalPermissionFlags, PermissionCompute } from '@charmverse/core';
+import {
+  buildComputePermissionsWithPermissionFilteringPolicies,
+  prisma,
+  isProposalAuthor,
+  isProposalReviewer,
+  getDefaultProposalPermissionPolicies
+} from '@charmverse/core';
+import type { ProposalResource, ProposalPermissionFlags, PermissionCompute } from '@charmverse/core';
 
 import { filterApplicablePermissions } from 'lib/permissions/filterApplicablePermissions';
 import { ProposalNotFoundError } from 'lib/proposal/errors';
-import { isProposalReviewer } from 'lib/proposal/isProposalReviewer';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { InvalidInputError } from 'lib/utilities/errors';
 import { isUUID } from 'lib/utilities/strings';
 
-import { isProposalAuthor } from '../../../proposal/isProposalAuthor';
 import { AvailableProposalPermissions } from '../availableProposalPermissions.class';
 import { proposalPermissionsMapping } from '../mapping';
 
 export async function baseComputeProposalPermissions({
   resourceId,
   userId
-}: PermissionCompute): Promise<AvailableProposalPermissionFlags> {
+}: PermissionCompute): Promise<ProposalPermissionFlags> {
   if (!isUUID(resourceId)) {
     throw new InvalidInputError(`Invalid proposal ID: ${resourceId}`);
   }
@@ -101,16 +105,13 @@ function proposalResolver({ resourceId }: { resourceId: string }) {
 
 export const computeProposalPermissions = buildComputePermissionsWithPermissionFilteringPolicies<
   ProposalResource,
-  AvailableProposalPermissionFlags
+  ProposalPermissionFlags
 >({
   resolver: proposalResolver,
   computeFn: baseComputeProposalPermissions,
   policies: [
-    policyStatusDraftNotViewable,
-    policyStatusDiscussionEditableCommentable,
-    policyStatusReviewCommentable,
-    policyStatusReviewedOnlyCreateVote,
-    policyStatusVoteActiveOnlyVotable,
-    policyStatusVoteClosedViewOnly
+    ...getDefaultProposalPermissionPolicies({
+      isProposalReviewer
+    })
   ]
 });

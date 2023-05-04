@@ -1,7 +1,7 @@
 import type {
   AssignedProposalCategoryPermission,
-  AvailableProposalCategoryPermissionFlags,
-  AvailableProposalPermissionFlags
+  ProposalCategoryPermissionFlags,
+  ProposalPermissionFlags
 } from '@charmverse/core';
 
 import * as http from 'adapters/http';
@@ -10,13 +10,13 @@ import type { ProposalCategoryPermissionInput } from 'lib/permissions/proposals/
 
 export class ProposalPermissionsApi {
   computeProposalPermissions({ proposalIdOrPath, spaceDomain }: { proposalIdOrPath: string; spaceDomain?: string }) {
-    return http.POST<AvailableProposalPermissionFlags>(`/api/permissions/proposals/compute-proposal-permissions`, {
+    return http.POST<ProposalPermissionFlags>(`/api/permissions/proposals/compute-proposal-permissions`, {
       resourceId: !spaceDomain ? proposalIdOrPath : `${spaceDomain}/${proposalIdOrPath}`
     } as PermissionCompute);
   }
 
   computeProposalCategoryPermissions(proposalCategoryId: string) {
-    return http.POST<AvailableProposalCategoryPermissionFlags>(
+    return http.POST<ProposalCategoryPermissionFlags>(
       `/api/permissions/proposals/compute-proposal-category-permissions`,
       {
         resourceId: proposalCategoryId

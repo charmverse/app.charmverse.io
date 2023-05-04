@@ -1,4 +1,4 @@
-import type { AssignedProposalCategoryPermission, AvailableProposalCategoryPermissionFlags } from '@charmverse/core';
+import type { AssignedProposalCategoryPermission, ProposalCategoryPermissionFlags } from '@charmverse/core';
 import type { ProposalCategory } from '@charmverse/core/dist/prisma';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
@@ -26,7 +26,7 @@ import type { BulkRoleProposalCategoryPermissionUpsert } from './shared';
  */
 type Props = {
   proposalCategory: ProposalCategory;
-  permissions: AvailableProposalCategoryPermissionFlags;
+  permissions: ProposalCategoryPermissionFlags;
 };
 function ProposalCategoryPermissions({ proposalCategory, permissions }: Props) {
   const { data, mutate: mutatePermissions } = useSWR(

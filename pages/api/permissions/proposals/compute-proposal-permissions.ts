@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core';
-import type { AvailableProposalPermissionFlags } from '@charmverse/core';
+import type { ProposalPermissionFlags } from '@charmverse/core';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -15,7 +15,7 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.use(requireKeys<PermissionCompute>(['resourceId'], 'body')).post(computePermissions);
 
-async function computePermissions(req: NextApiRequest, res: NextApiResponse<AvailableProposalPermissionFlags>) {
+async function computePermissions(req: NextApiRequest, res: NextApiResponse<ProposalPermissionFlags>) {
   const input = req.body as PermissionCompute;
 
   let resourceId = input.resourceId;

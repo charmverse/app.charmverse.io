@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core';
-import type { AvailableProposalPermissionFlags } from '@charmverse/core';
+import type { ProposalPermissionFlags } from '@charmverse/core';
 import type { ProposalCategory, ProposalStatus, Role, Space, User } from '@charmverse/core/dist/prisma';
 import { v4 } from 'uuid';
 
@@ -69,7 +69,7 @@ describe('computeProposalPermissions', () => {
       userId: proposalAuthor.id
     });
 
-    expect(permissions).toMatchObject<AvailableProposalPermissionFlags>({
+    expect(permissions).toMatchObject<ProposalPermissionFlags>({
       view: true,
       comment: true,
       delete: true,
@@ -101,7 +101,7 @@ describe('computeProposalPermissions', () => {
       userId: proposalReviewer.id
     });
 
-    expect(permissions).toMatchObject<AvailableProposalPermissionFlags>({
+    expect(permissions).toMatchObject<ProposalPermissionFlags>({
       view: true,
       comment: true,
       review: true,
@@ -133,7 +133,7 @@ describe('computeProposalPermissions', () => {
       userId: proposalReviewerByRole.id
     });
 
-    expect(permissions).toMatchObject<AvailableProposalPermissionFlags>({
+    expect(permissions).toMatchObject<ProposalPermissionFlags>({
       view: true,
       comment: true,
       review: true,
@@ -216,7 +216,7 @@ describe('computeProposalPermissions', () => {
       resourceId: otherProposal.id,
       userId: spaceMemberUser.id
     });
-    expect(memberPermissions).toMatchObject<AvailableProposalPermissionFlags>({
+    expect(memberPermissions).toMatchObject<ProposalPermissionFlags>({
       view: true,
       comment: true,
       review: false,
@@ -259,7 +259,7 @@ describe('computeProposalPermissions', () => {
       userId: memberWithAssignedRole.id
     });
 
-    expect(memberWithRolePermissions).toMatchObject<AvailableProposalPermissionFlags>({
+    expect(memberWithRolePermissions).toMatchObject<ProposalPermissionFlags>({
       view: true,
       comment: true,
       review: false,
@@ -302,7 +302,7 @@ describe('computeProposalPermissions', () => {
       userId: spaceMemberUser.id
     });
 
-    expect(permissions).toMatchObject<AvailableProposalPermissionFlags>({
+    expect(permissions).toMatchObject<ProposalPermissionFlags>({
       view: true,
       // Read-only proposal category
       comment: false,

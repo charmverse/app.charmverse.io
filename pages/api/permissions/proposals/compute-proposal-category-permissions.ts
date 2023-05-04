@@ -1,4 +1,4 @@
-import type { AvailableProposalCategoryPermissionFlags } from '@charmverse/core';
+import type { ProposalCategoryPermissionFlags } from '@charmverse/core';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -11,7 +11,7 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.use(requireKeys<PermissionCompute>(['resourceId'], 'body')).post(computePermissions);
 
-async function computePermissions(req: NextApiRequest, res: NextApiResponse<AvailableProposalCategoryPermissionFlags>) {
+async function computePermissions(req: NextApiRequest, res: NextApiResponse<ProposalCategoryPermissionFlags>) {
   const input = req.body as PermissionCompute;
 
   const permissions = await computeProposalCategoryPermissions({
