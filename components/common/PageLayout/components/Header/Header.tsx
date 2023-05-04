@@ -80,7 +80,16 @@ interface HeaderProps {
   openSidebar: () => void;
 }
 
-const documentTypes = ['page', 'card', 'proposal', 'proposal_template', 'bounty'];
+const documentTypes = [
+  'page',
+  'card',
+  'card_synced',
+  'card_template',
+  'proposal',
+  'proposal_template',
+  'bounty',
+  'bounty_template'
+];
 
 function CopyLinkMenuItem({ closeMenu }: { closeMenu: VoidFunction }) {
   const { showMessage } = useSnackbar();
@@ -222,6 +231,7 @@ function PostHeader({
       <UndoMenuItem onClick={undoEditorChanges} disabled={!forumPostInfo?.permissions?.edit_post} />
       <Divider />
       <ExportMarkdownMenuItem onClick={exportMarkdownPage} />
+      <ExportToPDFMarkdown pdfTitle={forumPostInfo.forumPost?.title} />
       <Tooltip
         title={
           forumPostInfo.forumPost?.isDraft
