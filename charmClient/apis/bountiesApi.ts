@@ -126,6 +126,6 @@ export class BountiesApi {
   }
 
   refreshApplicationStatus(applicationId: string) {
-    return http.GET<PageComment[]>(`/api/applications/${applicationId}/refresh-status`);
+    return http.GET<Application>(`/api/applications/${applicationId}/refresh-status`);
   }
 }

@@ -5,6 +5,7 @@ import { useState } from 'react';
 
 import charmClient from 'charmClient';
 import { BountyApplicantStatus } from 'components/[pageId]/DocumentPage/components/BountyProperties/components/BountyApplicantStatus';
+import { useRefreshApplicationStatus } from 'components/bounties/hooks/useRefreshApplicationStatus';
 import Button from 'components/common/Button';
 import Modal from 'components/common/Modal';
 import UserDisplay from 'components/common/UserDisplay';
@@ -44,6 +45,7 @@ export default function BountyApplicantTableRow({
   const member = getMemberById(submission.createdBy);
   const { refreshBounty } = useBounties();
   const { formatDateTime } = useDateFormatter();
+  useRefreshApplicationStatus({ application: submission, onRefresh: refreshSubmissions });
 
   const [reviewDecision, setReviewDecision] = useState<SubmissionReview | null>(null);
   const [apiError, setApiError] = useState<SystemError | null>();
