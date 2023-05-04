@@ -5,9 +5,7 @@
       "module": "commonjs",
       "jsxImportSource": ""
     },
-    "require": [
-      "tsconfig-paths/register"
-    ],
+    "require": ["tsconfig-paths/register"],
     "transpileOnly": true
   },
   "compilerOptions": {
@@ -15,74 +13,21 @@
     "baseUrl": ".",
     "strict": true,
     "target": "es2019",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "noEmit": true,
     "esModuleInterop": true,
     "module": "esnext",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "jsx": "react-jsx",
     "jsxImportSource": "@emotion/react",
     "allowJs": true,
     "incremental": true,
     "isolatedModules": true,
-    "paths": {
-      "config/*": [
-        "./config/*"
-      ],
-      "lib/*": [
-        "./lib/*",
-      ],
-      "adapters/*": [
-        "./adapters/*"
-      ],
-      "components/*": [
-        "./components/*"
-      ],
-      "hooks/*": [
-        "./hooks/*"
-      ],
-      "abis/*": [
-        "./abis/*"
-      ],
-      "pages/*": [
-        "./pages/*"
-      ],
-      "public/*": [
-        "./public/*"
-      ],
-      "theme/*": [
-        "./theme/*"
-      ],
-      "testing/*": [
-        "./testing/*"
-      ],
-      "__e2e__/*": [
-        "./__e2e__/*"
-      ],
-      "@charmverse/core/dist/prisma": [
-        "node_modules/@charmverse/core/dist/cjs/prisma",
-        //"node_modules/@charmverse/core/dist/esm/prisma"
-      ],
-      "@charmverse/core/dist/shared": [
-        "node_modules/@charmverse/core/dist/cjs/shared",
-        //"node_modules/@charmverse/core/dist/esm/shared"
-      ]
-    }
+    "allowImportingTsExtensions": true,
   },
-  "exclude": [
-    "node_modules",
-    "**/focalboard/src/**/*.spec.ts",
-    "**/focalboard/src/**/*.spec.tsx"
-  ],
-  "include": [
-    "**/*.ts",
-    "**/*.tsx"
-  ]
+  "exclude": ["node_modules", "**/focalboard/src/**/*.spec.ts", "**/focalboard/src/**/*.spec.tsx"],
+  "include": ["**/*.ts", "**/*.tsx"]
 }
