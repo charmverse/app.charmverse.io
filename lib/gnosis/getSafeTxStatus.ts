@@ -1,5 +1,5 @@
+import { ApplicationStatus } from '@charmverse/core/dist/prisma';
 import { AlchemyProvider } from '@ethersproject/providers';
-import { ApplicationStatus } from '@prisma/client';
 import { BigNumber } from 'ethers';
 
 import { getGnosisService } from 'lib/gnosis/gnosis';

@@ -1,6 +1,5 @@
-import { ApplicationStatus } from '@prisma/client';
+import { ApplicationStatus } from '@charmverse/core/dist/prisma';
 
-import { prisma } from 'db';
 import { rollupBountyStatus } from 'lib/bounties/rollupBountyStatus';
 import { getSafeTxStatus } from 'lib/gnosis/getSafeTxStatus';
 import { DataNotFoundError } from 'lib/utilities/errors';
