@@ -230,7 +230,7 @@
     "scroll-into-view-if-needed": "^2.2.29",
     "serverless-lift": "^1.21.0",
     "sharp": "^0.31.3",
-    "socket.io": "^4.5.4",
+    "socket.io": "^4.6.1",
     "socket.io-client": "^4.5.2",
     "swagger-ui-react": "^4.18.1",
     "swr": "^2.0.0",
