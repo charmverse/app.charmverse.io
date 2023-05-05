@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/log';
 import Cookies from 'cookies';
 import nc from 'next-connect';
 
@@ -5,7 +6,6 @@ import { isTestEnv } from 'config/constants';
 import { AUTH_CODE_COOKIE, AUTH_ERROR_COOKIE } from 'lib/discord/constants';
 import { loginByDiscord } from 'lib/discord/loginByDiscord';
 import { updateGuildRolesForUser } from 'lib/guild-xyz/server/updateGuildRolesForUser';
-import log from 'lib/log';
 import { extractSignupAnalytics } from 'lib/metrics/mixpanel/utilsSignup';
 import { onError, onNoMatch } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';

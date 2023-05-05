@@ -1,7 +1,7 @@
 import { prisma } from '@charmverse/core';
-import type { Vote } from '@charmverse/core/dist/prisma';
+import { log } from '@charmverse/core/log';
+import type { Vote } from '@charmverse/core/prisma';
 
-import log from 'lib/log';
 import { UndesirableOperationError } from 'lib/utilities/errors';
 
 import { getVote } from './getVote';

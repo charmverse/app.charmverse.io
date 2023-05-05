@@ -1,4 +1,4 @@
-import type { TokenGate } from '@charmverse/core/dist/prisma';
+import type { TokenGate } from '@charmverse/core/prisma';
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import type { ResourceId, SigningConditions } from 'lit-js-sdk';

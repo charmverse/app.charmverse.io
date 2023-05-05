@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core';
-import type { PostCategoryPermission } from '@charmverse/core/dist/prisma';
+import type { PostCategoryPermission } from '@charmverse/core/prisma';
 import { v4 as uuid } from 'uuid';
 
 import { MissingDataError } from 'lib/utilities/errors';

@@ -7,7 +7,7 @@ import type {
   TokenGateToRole,
   User,
   UserTokenGate
-} from '@charmverse/core/dist/prisma';
+} from '@charmverse/core/prisma';
 
 import { verifyTokenGateMembership } from 'lib/token-gates/verifyTokenGateMembership';
 

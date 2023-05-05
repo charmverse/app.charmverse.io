@@ -1,4 +1,5 @@
-import type { UserGnosisSafe } from '@charmverse/core/dist/prisma';
+import { log } from '@charmverse/core/log';
+import type { UserGnosisSafe } from '@charmverse/core/prisma';
 import EthersAdapter from '@safe-global/safe-ethers-lib';
 import type { SafeInfoResponse, SafeMultisigTransactionListResponse } from '@safe-global/safe-service-client';
 import SafeServiceClient from '@safe-global/safe-service-client';
@@ -7,8 +8,6 @@ import type { Signer } from 'ethers';
 import { ethers } from 'ethers';
 import { getAddress } from 'ethers/lib/utils';
 import uniqBy from 'lodash/uniqBy';
-
-import log from 'lib/log';
 
 export type GnosisTransaction = SafeMultisigTransactionListResponse['results'][number];
 

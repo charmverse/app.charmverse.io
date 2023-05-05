@@ -1,5 +1,5 @@
-import type { Vote, UserVote, VoteOptions } from '@charmverse/core/dist/prisma';
-import { VoteType } from '@charmverse/core/dist/prisma';
+import type { Vote, UserVote, VoteOptions } from '@charmverse/core/prisma';
+import { VoteType } from '@charmverse/core/prisma';
 
 const YES_OPTION = 'Yes';
 

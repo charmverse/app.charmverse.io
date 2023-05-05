@@ -1,4 +1,5 @@
-import type { UserWallet } from '@charmverse/core/dist/prisma';
+import { log } from '@charmverse/core/log';
+import type { UserWallet } from '@charmverse/core/prisma';
 import { verifyMessage } from '@ethersproject/wallet';
 import { useWeb3React } from '@web3-react/core';
 import type { Signer } from 'ethers';
@@ -12,7 +13,6 @@ import useSWRMutation from 'swr/mutation';
 import charmClient from 'charmClient';
 import { useWeb3ConnectionManager } from 'components/_app/Web3ConnectionManager/Web3ConnectionManager';
 import type { AuthSig } from 'lib/blockchain/interfaces';
-import log from 'lib/log';
 import type { SystemError } from 'lib/utilities/errors';
 import { ExternalServiceError, MissingWeb3AccountError } from 'lib/utilities/errors';
 import { lowerCaseEqual } from 'lib/utilities/strings';

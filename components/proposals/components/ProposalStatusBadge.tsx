@@ -1,4 +1,4 @@
-import type { ProposalStatus } from '@charmverse/core/dist/prisma';
+import type { ProposalStatus } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import BarChartOutlinedIcon from '@mui/icons-material/BarChartOutlined';
 import ChatOutlinedIcon from '@mui/icons-material/ChatOutlined';

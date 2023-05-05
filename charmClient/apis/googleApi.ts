@@ -1,4 +1,4 @@
-import type { ProfileItem } from '@charmverse/core/dist/prisma';
+import type { ProfileItem } from '@charmverse/core/prisma';
 
 import * as http from 'adapters/http';
 import type { ConnectGoogleAccountRequest } from 'lib/google/connectGoogleAccount';

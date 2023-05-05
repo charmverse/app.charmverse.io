@@ -1,4 +1,4 @@
-import type { ProposalCategoryPermissionLevel } from '@charmverse/core/dist/prisma';
+import type { ProposalCategoryPermissionLevel } from '@charmverse/core/prisma';
 
 export type BulkRoleProposalCategoryPermissionUpsert = {
   permissionLevel: ProposalCategoryPermissionLevel;

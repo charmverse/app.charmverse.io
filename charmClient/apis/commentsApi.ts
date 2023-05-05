@@ -1,4 +1,4 @@
-import type { Comment } from '@charmverse/core/dist/prisma';
+import type { Comment } from '@charmverse/core/prisma';
 
 import * as http from 'adapters/http';
 import type { CommentCreate, CommentWithUser } from 'lib/comments/interfaces';

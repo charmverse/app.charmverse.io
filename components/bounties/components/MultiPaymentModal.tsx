@@ -1,4 +1,4 @@
-import type { UserGnosisSafe } from '@charmverse/core/dist/prisma';
+import type { UserGnosisSafe } from '@charmverse/core/prisma';
 import { Checkbox, List, ListItem, MenuItem, Select, Tooltip, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
 import { getChainById } from 'connectors';

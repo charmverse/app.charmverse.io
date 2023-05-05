@@ -1,4 +1,4 @@
-import type { Bounty, User } from '@charmverse/core/dist/prisma';
+import type { Bounty, User } from '@charmverse/core/prisma';
 import type { Browser } from '@playwright/test';
 import { expect, test, chromium } from '@playwright/test';
 

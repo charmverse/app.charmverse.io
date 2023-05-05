@@ -1,4 +1,4 @@
-import type { PagePermission, Prisma } from '@charmverse/core/dist/prisma';
+import type { PagePermission, Prisma } from '@charmverse/core/prisma';
 
 import { InvalidPermissionGranteeError } from '../../errors';
 

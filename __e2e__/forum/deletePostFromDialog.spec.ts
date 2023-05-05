@@ -1,4 +1,4 @@
-import type { PostCategory, Space, User } from '@charmverse/core/dist/prisma';
+import type { PostCategory, Space, User } from '@charmverse/core/prisma';
 import { expect, test as base } from '@playwright/test';
 import { ForumHomePage } from '__e2e__/po/forumHome.po';
 import { createUser, createUserAndSpace, generateSpaceRole } from '__e2e__/utils/mocks';

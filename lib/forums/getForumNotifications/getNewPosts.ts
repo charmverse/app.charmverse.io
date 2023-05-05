@@ -1,4 +1,4 @@
-import type { Post } from '@charmverse/core/dist/prisma';
+import type { Post } from '@charmverse/core/prisma';
 
 import type { ClientUserSpaceNotifications } from 'lib/userNotifications/spaceNotifications';
 

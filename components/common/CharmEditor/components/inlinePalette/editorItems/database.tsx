@@ -1,5 +1,5 @@
 import { rafCommandExec } from '@bangle.dev/utils';
-import type { PageType } from '@charmverse/core/dist/prisma';
+import type { PageType } from '@charmverse/core/prisma';
 import DatabaseIcon from '@mui/icons-material/TableChart';
 
 import { addPage } from 'lib/pages';

@@ -1,9 +1,9 @@
-import type { PostCategory } from '@charmverse/core/dist/prisma';
+import type { PostCategory } from '@charmverse/core/prisma';
 import type {
   PostCategoryPermissionAssignment,
   AssignedPostCategoryPermission,
   PostCategoryPermissionFlags
-} from '@charmverse/core/dist/shared';
+} from '@charmverse/core/shared';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import Grid from '@mui/material/Grid';

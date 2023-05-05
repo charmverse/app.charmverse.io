@@ -1,4 +1,4 @@
-import type { UserGnosisSafe } from '@charmverse/core/dist/prisma';
+import type { UserGnosisSafe } from '@charmverse/core/prisma';
 import { BigNumber } from '@ethersproject/bignumber';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import { Divider, Menu, MenuItem } from '@mui/material';

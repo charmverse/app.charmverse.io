@@ -1,4 +1,4 @@
-import type { Space, User } from '@charmverse/core/dist/prisma';
+import type { Space, User } from '@charmverse/core/prisma';
 
 import { InsecureOperationError, InvalidInputError, MissingDataError } from 'lib/utilities/errors';
 import { ExpectedAnError } from 'testing/errors';

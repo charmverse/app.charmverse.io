@@ -1,4 +1,4 @@
-import type { Prisma } from '@charmverse/core/dist/prisma';
+import type { Prisma } from '@charmverse/core/prisma';
 
 import { DataNotFoundError, InsecureOperationError } from 'lib/utilities/errors';
 

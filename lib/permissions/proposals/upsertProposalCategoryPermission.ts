@@ -1,6 +1,6 @@
 import { prisma } from '@charmverse/core';
-import type { Prisma } from '@charmverse/core/dist/prisma';
-import { ProposalCategoryPermissionLevel } from '@charmverse/core/dist/prisma';
+import type { Prisma } from '@charmverse/core/prisma';
+import { ProposalCategoryPermissionLevel } from '@charmverse/core/prisma';
 
 import { ProposalCategoryNotFoundError } from 'lib/proposal/errors';
 import { DataNotFoundError, InsecureOperationError, InvalidInputError } from 'lib/utilities/errors';

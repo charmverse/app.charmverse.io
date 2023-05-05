@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core';
-import type { Page as PrismaPage, Prisma } from '@charmverse/core/dist/prisma';
+import type { Page as PrismaPage, Prisma } from '@charmverse/core/prisma';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import type { CardPage, PageProperty, CardPageQuery, PaginatedQuery, PaginatedResponse } from 'lib/public-api';

@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core';
-import type { ProposalCategoryPermission } from '@charmverse/core/dist/prisma';
+import type { ProposalCategoryPermission } from '@charmverse/core/prisma';
 
 import { generateUserAndSpace } from 'testing/setupDatabase';
 

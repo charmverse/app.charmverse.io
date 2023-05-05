@@ -1,4 +1,4 @@
-import { Feature } from '@charmverse/core/dist/prisma';
+import { Feature } from '@charmverse/core/prisma';
 import { yupResolver } from '@hookform/resolvers/yup';
 import Box from '@mui/material/Box';
 import FormControlLabel from '@mui/material/FormControlLabel';

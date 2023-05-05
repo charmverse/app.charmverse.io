@@ -1,4 +1,4 @@
-import type { IdentityType } from '@charmverse/core/dist/prisma';
+import type { IdentityType } from '@charmverse/core/prisma';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import EmailIcon from '@mui/icons-material/Email';
 import PersonIcon from '@mui/icons-material/Person';

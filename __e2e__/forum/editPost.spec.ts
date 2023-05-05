@@ -1,4 +1,4 @@
-import type { Post, Space } from '@charmverse/core/dist/prisma';
+import type { Post, Space } from '@charmverse/core/prisma';
 import { expect, test as base } from '@playwright/test';
 import type { LoggedInPage } from '__e2e__/po/loggedIn.po';
 

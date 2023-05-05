@@ -1,5 +1,6 @@
 import type { UrlObject } from 'url';
 
+import { log } from '@charmverse/core/log';
 import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
 import { useRef, useEffect, useState } from 'react';
@@ -8,7 +9,6 @@ import { getKey } from 'hooks/useLocalStorage';
 import { useSharedPage } from 'hooks/useSharedPage';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
-import log from 'lib/log';
 import { isSpaceDomain } from 'lib/spaces/utils';
 
 // Pages shared to the public that don't require user login

@@ -1,6 +1,6 @@
 import { prisma } from '@charmverse/core';
-import type { WorkspaceEvent } from '@charmverse/core/dist/prisma';
-import { ProposalStatus } from '@charmverse/core/dist/prisma';
+import type { WorkspaceEvent } from '@charmverse/core/prisma';
+import { ProposalStatus } from '@charmverse/core/prisma';
 
 import { InvalidStateError } from 'lib/middleware';
 import { getSnapshotProposal } from 'lib/snapshot/getProposal';

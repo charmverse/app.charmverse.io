@@ -1,4 +1,4 @@
-import type { IdentityType, UserDetails as UserDetailsType } from '@charmverse/core/dist/prisma';
+import type { IdentityType, UserDetails as UserDetailsType } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import EditIcon from '@mui/icons-material/Edit';

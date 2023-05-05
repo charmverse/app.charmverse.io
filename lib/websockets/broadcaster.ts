@@ -1,10 +1,10 @@
 import { prisma } from '@charmverse/core';
+import { log } from '@charmverse/core/log';
 import { createAdapter } from '@socket.io/redis-adapter';
 import type { Socket } from 'socket.io';
 import { Server } from 'socket.io';
 
 import { redisClient } from 'adapters/redis/redisClient';
-import log from 'lib/log';
 import { SpaceMembershipRequiredError } from 'lib/permissions/errors';
 import { authOnConnect } from 'lib/websockets/authentication';
 import { DocumentEventHandler } from 'lib/websockets/documentEvents';

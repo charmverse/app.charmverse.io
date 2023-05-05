@@ -1,3 +1,3 @@
-import type { Transaction } from '@charmverse/core/dist/prisma';
+import type { Transaction } from '@charmverse/core/prisma';
 
 export type TransactionCreationData = Pick<Transaction, 'transactionId' | 'chainId'> & { applicationId: string };

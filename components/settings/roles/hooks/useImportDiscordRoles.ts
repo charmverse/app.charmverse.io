@@ -1,4 +1,4 @@
-import type { Space } from '@charmverse/core/dist/prisma';
+import type { Space } from '@charmverse/core/prisma';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import useSWRImmutable from 'swr/immutable';
