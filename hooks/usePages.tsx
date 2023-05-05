@@ -6,7 +6,6 @@ import useSWR, { mutate } from 'swr';
 
 import charmClient from 'charmClient';
 import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
-import { publishDeletes } from 'components/common/BoardEditor/publisher';
 import type { Block } from 'lib/focalboard/block';
 import type { PageMeta, PagesMap, PageUpdates } from 'lib/pages/interfaces';
 import { untitledPage } from 'lib/pages/untitledPage';
