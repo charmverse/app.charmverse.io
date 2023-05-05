@@ -76,7 +76,7 @@ export async function createDatabase(
 
 export async function createDatabaseCardPage(
   pageInfo: Record<keyof Pick<Page, 'title' | 'boardId' | 'createdBy' | 'spaceId'>, string> & {
-    properties: Record<string, string>;
+    properties: Record<string, string | string[]>;
   }
 ): Promise<PageFromBlock> {
   const isValidUUid = validate(pageInfo.boardId);

@@ -11,9 +11,17 @@ import {
   isNumber,
   mapCardBoardProperties,
   selectColors,
-  transformCsvResults
+  transformCsvResults,
+  transformApiPageKeysCsvData
 } from '../databasePageOptions';
-import { mockCardProperties, mockCsvResults, mockCsvRow, mockMappedBoardProperties, mockStatusOptions } from '../mocks';
+import {
+  mockCardProperties,
+  mockCsvResults,
+  mockCsvRow,
+  mockCsvRowWithMultiSelectAsHeaders,
+  mockMappedBoardProperties,
+  mockStatusOptions
+} from '../mocks';
 
 describe('Database options util', () => {
   // @TODO -> Remove this after upgrading jest >29 and jest-environment-jsdom >29
@@ -69,6 +77,16 @@ describe('Database options util', () => {
           Completed: '90b55f20-62e2-4812-b417-1831a44da542',
           'In progress': 'a007d7b1-d055-446a-ba18-90a48121305c',
           'Not started': '30f7e52a-41fd-4f50-a217-1d4f40daa873'
+        }
+      },
+      'Multi Select': {
+        id: 'k23m78b6-1d7d-49ed-a3c4-ef27e624470p',
+        type: 'multiSelect',
+        name: 'Multi Select',
+        options: {
+          A: '90b55f20-62e2-4812-b417-1831a44da542',
+          B: 'a007d7b1-d055-446a-ba18-90a48121305c',
+          C: '30f7e52a-41fd-4f50-a217-1d4f40daa873'
         }
       }
     };
@@ -134,6 +152,20 @@ describe('Database options util', () => {
     expect(headers).toContain('Title');
     expect(csvData.every((row) => row.Title)).toBeTruthy();
     expect(csvData.every((row) => row.Title === customTitle)).toBeTruthy();
+  });
+
+  test('transformApiPageKeysCsvData should transform the csv data to the correct format', async () => {
+    const csvData = [{ ...mockCsvRowWithMultiSelectAsHeaders }];
+    const headers = Object.keys(mockCsvRowWithMultiSelectAsHeaders);
+    transformApiPageKeysCsvData(csvData, headers, mockCardProperties);
+    expect(headers.every((title) => title !== 'A')).toBeTruthy();
+    expect(headers.every((title) => title !== 'B')).toBeTruthy();
+    expect(headers.every((title) => title !== 'C')).toBeTruthy();
+    expect(csvData[0].A).toBeUndefined();
+    expect(csvData[0].B).toBeUndefined();
+    expect(csvData[0].C).toBeUndefined();
+    expect(csvData[0]['Multi Select'].includes('A')).toBeTruthy();
+    expect(csvData[0]['Multi Select'].includes('C')).toBeTruthy();
   });
 
   afterEach(() => {
