@@ -16,6 +16,7 @@ import type { WrappedComponentProps } from 'react-intl';
 import { injectIntl } from 'react-intl';
 import type { ConnectedProps } from 'react-redux';
 import { connect } from 'react-redux';
+import useSWR from 'swr';
 import { v4 as uuid } from 'uuid';
 
 import charmClient from 'charmClient';
@@ -49,7 +50,7 @@ import { createCard } from 'lib/focalboard/card';
 import type { Card, CardPage } from 'lib/focalboard/card';
 import { CardFilter } from 'lib/focalboard/cardFilter';
 import log from 'lib/log';
-import type { PageMeta } from 'lib/pages';
+import type { PageMeta, PagesMap } from 'lib/pages';
 import { createNewDataSource } from 'lib/pages/createNewDataSource';
 
 import mutator from '../mutator';
@@ -115,6 +116,15 @@ function CenterPanel(props: Props) {
   const { showMessage } = useSnackbar();
   const { user } = useUser();
 
+  const { data: archivedPages } = useSWR<PagesMap>(!space ? null : `archived-pages-${space?.id}`, () => {
+    return charmClient.pages.getArchivedPages(space?.id as string).then((deletablePages) => {
+      return deletablePages.reduce((pageMap, page) => {
+        pageMap[page.id] = page;
+        return pageMap;
+      }, {} as PagesMap);
+    });
+  });
+
   const isEmbedded = !!props.embeddedBoardPath;
   const boardPage = pages[board.id] ?? props.page;
   const boardPageType = boardPage?.type;
@@ -129,6 +139,7 @@ function CenterPanel(props: Props) {
   const { keys } = useApiPageKeys(props.page?.id);
   const activeBoard = useAppSelector(getBoard(activeBoardId ?? ''));
   const activePage = pages[activeBoardId ?? ''];
+  const deletedPage = (archivedPages || {})[activeBoardId ?? ''];
   const _groupByProperty = activeBoard?.fields.cardProperties.find((o) => o.id === activeView?.fields.groupById);
   const _dateDisplayProperty = activeBoard?.fields.cardProperties.find(
     (o) => o.id === activeView?.fields.dateDisplayPropertyId
@@ -491,7 +502,9 @@ function CenterPanel(props: Props) {
     }
   };
 
-  const isLoadingSourceData = !activeBoard && state.showSettings !== 'create-linked-view';
+  const isLoadingSourceData =
+    !activeBoard && state.showSettings !== 'create-linked-view' && (!views || views.length === 0);
+
   return (
     <>
       {!!boardPage?.deletedAt && <PageDeleteBanner pageId={boardPage.id} />}
@@ -530,30 +543,34 @@ function CenterPanel(props: Props) {
               setPage={props.setPage}
             />
           )}
-          <ViewHeader
-            onDeleteView={props.onDeleteView}
-            maxTabsShown={props.maxTabsShown}
-            disableUpdatingUrl={props.disableUpdatingUrl}
-            showView={props.showView}
-            onClickNewView={
-              boardPageType === 'inline_linked_board' || boardPageType === 'linked_board' ? openSelectSource : undefined
-            }
-            activeBoard={activeBoard}
-            viewsBoard={board}
-            activeView={props.activeView}
-            toggleViewOptions={toggleViewOptions}
-            cards={cards}
-            views={views}
-            dateDisplayProperty={dateDisplayProperty}
-            addCard={() => addCard('', true)}
-            showCard={showCard}
-            // addCardFromTemplate={addCardFromTemplate}
-            addCardTemplate={() => addCard('', true, {}, false, true)}
-            editCardTemplate={editCardTemplate}
-            readOnly={props.readOnly}
-            readOnlySourceData={props.readOnlySourceData}
-            embeddedBoardPath={props.embeddedBoardPath}
-          />
+          {(activePage || deletedPage || activeBoard) && (
+            <ViewHeader
+              onDeleteView={props.onDeleteView}
+              maxTabsShown={props.maxTabsShown}
+              disableUpdatingUrl={props.disableUpdatingUrl}
+              showView={props.showView}
+              onClickNewView={
+                boardPageType === 'inline_linked_board' || boardPageType === 'linked_board'
+                  ? openSelectSource
+                  : undefined
+              }
+              activeBoard={activeBoard}
+              viewsBoard={board}
+              activeView={props.activeView}
+              toggleViewOptions={toggleViewOptions}
+              cards={cards}
+              views={views}
+              dateDisplayProperty={dateDisplayProperty}
+              addCard={() => addCard('', true)}
+              showCard={showCard}
+              // addCardFromTemplate={addCardFromTemplate}
+              addCardTemplate={() => addCard('', true, {}, false, true)}
+              editCardTemplate={editCardTemplate}
+              readOnly={props.readOnly}
+              readOnlySourceData={props.readOnlySourceData}
+              embeddedBoardPath={props.embeddedBoardPath}
+            />
+          )}
         </div>
 
         <div className={`container-container ${state.showSettings ? 'sidebar-visible' : ''}`}>
@@ -587,7 +604,7 @@ function CenterPanel(props: Props) {
                 </Typography>
               )}
               {/* Show page title for linked boards */}
-              {activePage &&
+              {(activePage || deletedPage) &&
                 activeView?.fields?.sourceType === 'board_page' &&
                 boardPageType === 'inline_linked_board' && (
                   <Button
@@ -596,19 +613,12 @@ function CenterPanel(props: Props) {
                     variant='text'
                     size='large'
                     href={`${router.pathname.startsWith('/share') ? '/share' : ''}/${space?.domain}/${
-                      activePage?.path
+                      activePage?.path || deletedPage?.path
                     }`}
                     sx={{ fontSize: 22, fontWeight: 700, py: 0 }}
                   >
-                    {activePage.title || 'Untitled'}
+                    {activePage?.title || deletedPage?.title || 'Untitled'}
                   </Button>
-                )}
-              {!activePage &&
-                boardPageType === 'inline_linked_board' &&
-                activeView?.fields?.sourceType === 'board_page' && (
-                  <Typography p={1} color='error'>
-                    This board has been deleted
-                  </Typography>
                 )}
               {!activeView && state.showSettings === 'create-linked-view' && (
                 <CreateLinkedView
