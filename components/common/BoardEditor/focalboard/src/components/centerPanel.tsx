@@ -16,7 +16,6 @@ import type { WrappedComponentProps } from 'react-intl';
 import { injectIntl } from 'react-intl';
 import type { ConnectedProps } from 'react-redux';
 import { connect } from 'react-redux';
-import { mutate } from 'swr';
 import { v4 as uuid } from 'uuid';
 
 import charmClient from 'charmClient';
@@ -98,7 +97,7 @@ type State = {
 };
 
 function CenterPanel(props: Props) {
-  const { activeView: defaultActiveView, board, pageIcon, showView, views: allViews } = props;
+  const { activeView, board, pageIcon, showView, views } = props;
 
   const [state, setState] = useState<State>({
     cardIdToFocusOnRender: '',
@@ -119,31 +118,9 @@ function CenterPanel(props: Props) {
   const isEmbedded = !!props.embeddedBoardPath;
   const boardPage = pages[board.id] ?? props.page;
   const boardPageType = boardPage?.type;
-  const isLinkedBoardType = boardPageType === 'linked_board' || boardPageType === 'inline_linked_board';
-  const views = isLinkedBoardType
-    ? allViews.filter((view) => view.fields.linkedSourceId && pages[view.fields.linkedSourceId])
-    : allViews;
-
-  const linksToDeletedDatabasePages = props.views.length !== allViews.length;
-
-  const activeView = isLinkedBoardType && props.views.length === 0 ? null : defaultActiveView;
-
-  useEffect(() => {
-    if (linksToDeletedDatabasePages) {
-      showView('');
-    }
-  }, [linksToDeletedDatabasePages]);
-
-  useEffect(() => {
-    if ((props.views.length === 0 && !activeView) || (isLinkedBoardType && props.views.length === 0)) {
-      setState((s) => ({ ...s, showSettings: 'create-linked-view' }));
-    } else if (activeView) {
-      setState((s) => ({ ...s, showSettings: null }));
-    }
-  }, [activeView?.id, props.views.length, isLinkedBoardType]);
 
   // for 'linked' boards, each view has its own board which we use to determine the cards to show
-  let activeBoardId: string | undefined = props.board.id;
+  let activeBoardId: string | undefined = board.id;
   if (activeView?.fields.linkedSourceId) {
     activeBoardId = activeView?.fields.linkedSourceId;
   } else if (activeView?.fields.sourceType === 'google_form') {
@@ -163,6 +140,14 @@ function CenterPanel(props: Props) {
       pages
     })
   );
+
+  useEffect(() => {
+    if (views.length === 0 && !activeView) {
+      setState((s) => ({ ...s, showSettings: 'create-linked-view' }));
+    } else if (activeView) {
+      setState((s) => ({ ...s, showSettings: null }));
+    }
+  }, [activeView?.id, views.length, activePage]);
 
   // filter cards by whats accessible
   const cardPages: CardPage[] = _cards.map((card) => ({ card, page: pages[card.id]! })).filter(({ page }) => !!page);
@@ -558,7 +543,7 @@ function CenterPanel(props: Props) {
             activeView={props.activeView}
             toggleViewOptions={toggleViewOptions}
             cards={cards}
-            views={props.views}
+            views={views}
             dateDisplayProperty={dateDisplayProperty}
             addCard={() => addCard('', true)}
             showCard={showCard}
@@ -618,12 +603,19 @@ function CenterPanel(props: Props) {
                     {activePage.title || 'Untitled'}
                   </Button>
                 )}
+              {!activePage &&
+                boardPageType === 'inline_linked_board' &&
+                activeView?.fields?.sourceType === 'board_page' && (
+                  <Typography p={1} color='error'>
+                    This board has been deleted
+                  </Typography>
+                )}
               {!activeView && state.showSettings === 'create-linked-view' && (
                 <CreateLinkedView
                   readOnly={props.readOnly}
                   onSelect={selectViewSource}
                   // if it links to deleted db page then the board can't be inline_board type
-                  onCreate={props.views.length === 0 && !linksToDeletedDatabasePages ? createDatabase : undefined}
+                  onCreate={views.length === 0 ? createDatabase : undefined}
                   onCsvImport={onCsvImport}
                   pageId={props.page?.id}
                 />
@@ -649,7 +641,7 @@ function CenterPanel(props: Props) {
                   activeView={activeView}
                   cardPages={cardPages}
                   groupByProperty={groupByProperty}
-                  views={props.views}
+                  views={views}
                   visibleGroups={visibleGroups}
                   selectedCardIds={state.selectedCardIds}
                   readOnly={props.readOnly}
