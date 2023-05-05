@@ -6,6 +6,7 @@ import useSWR, { mutate } from 'swr';
 
 import charmClient from 'charmClient';
 import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
+import { publishDeletes } from 'components/common/BoardEditor/publisher';
 import type { Block } from 'lib/focalboard/block';
 import type { PageMeta, PagesMap, PageUpdates } from 'lib/pages/interfaces';
 import { untitledPage } from 'lib/pages/untitledPage';
@@ -131,10 +132,10 @@ export function PagesProvider({ children }: { children: ReactNode }) {
         if (newPage) {
           _pages[newPage.id] = newPage;
         }
-        mutate(`archived-pages-${currentSpace.id}`);
         return { ..._pages };
       });
 
+      mutate(`archived-pages-${currentSpace.id}`);
       return newPage;
     }
   }
