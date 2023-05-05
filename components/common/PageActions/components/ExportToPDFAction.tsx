@@ -21,7 +21,7 @@ function PrintButton() {
   );
 }
 
-export function ExportToPDFMarkdown({ pdfTitle }: { pdfTitle?: string }) {
+export function ExportToPDFAction({ pdfTitle }: { pdfTitle?: string }) {
   const { printRef } = useCharmEditor();
   const theme = useTheme();
   return (

@@ -3,7 +3,7 @@ import { Box, CardHeader, Typography } from '@mui/material';
 import { memo } from 'react';
 
 import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
-import { PageActions } from 'components/common/PageActions/PageActions';
+import { KanbanPageActions } from 'components/common/PageActions/KanbanPageActions';
 import { usePage } from 'hooks/usePage';
 import type { BountyWithDetails } from 'lib/bounties';
 import type { PageMeta } from 'lib/pages';
@@ -57,7 +57,7 @@ function BountyKanbanCard({ onDelete, bounty, page: bountyPage, onDuplicate, onC
         </Box>
       </Box>
       {onDelete && (
-        <PageActions
+        <KanbanPageActions
           page={bountyPage}
           onDuplicate={onDuplicate}
           readOnly={readOnly}

@@ -2,12 +2,10 @@ import type { PageType } from '@charmverse/core/prisma';
 import { EditOutlined } from '@mui/icons-material';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import LaunchIcon from '@mui/icons-material/Launch';
-import LinkIcon from '@mui/icons-material/Link';
 import { Divider, ListItemText, Menu, MenuItem, Stack, Typography } from '@mui/material';
 import { useRouter } from 'next/router';
 import type { Dispatch, ReactNode, SetStateAction } from 'react';
 
-import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useMembers } from 'hooks/useMembers';
 import { usePagePermissions } from 'hooks/usePagePermissions';
@@ -15,7 +13,8 @@ import { usePostPermissions } from 'hooks/usePostPermissions';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { DuplicatePageResponse } from 'lib/pages/duplicatePage';
 
-import { DuplicatePageItem } from './DuplicatePageAction';
+import { CopyPageLinkAction } from './CopyPageLinkAction';
+import { DuplicatePageAction } from './DuplicatePageAction';
 
 export function PageActionsMenu({
   children,
@@ -67,10 +66,6 @@ export function PageActionsMenu({
     }
     return link;
   }
-  function onClickCopyLink() {
-    Utils.copyTextToClipboard(getPageLink());
-    showMessage(`Copied ${page.type} link to clipboard`, 'success');
-  }
 
   function onClickOpenInNewTab() {
     window.open(getPageLink());
@@ -108,16 +103,14 @@ export function PageActionsMenu({
         <ListItemText>Delete</ListItemText>
       </MenuItem>
       {!hideDuplicateAction && page.type && (
-        <DuplicatePageItem
-          postDuplication={onDuplicate}
-          page={{ ...page, type: page.type }}
+        <DuplicatePageAction
+          onComplete={onDuplicate}
+          pageId={page.id}
+          pageType={page.type}
           pagePermissions={pagePermissions}
         />
       )}
-      <MenuItem dense onClick={onClickCopyLink}>
-        <LinkIcon fontSize='small' sx={{ mr: 1 }} />
-        <ListItemText>Copy link</ListItemText>
-      </MenuItem>
+      <CopyPageLinkAction path={getPageLink()} />
       <MenuItem dense onClick={onClickOpenInNewTab}>
         <LaunchIcon fontSize='small' sx={{ mr: 1 }} />
         <ListItemText>Open in new tab</ListItemText>

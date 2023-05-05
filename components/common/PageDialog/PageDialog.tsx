@@ -19,9 +19,9 @@ import type { BountyWithDetails } from 'lib/bounties';
 import { AllowedPagePermissions } from 'lib/permissions/pages/available-page-permissions.class';
 import debouncePromise from 'lib/utilities/debouncePromise';
 
-import { PageActions } from '../PageActions/PageActions';
-import { BountyActions } from '../PageLayout/components/Header/components/BountyActions';
-import { ExportToPDFMarkdown } from '../PageLayout/components/Header/components/ExportToPDFMenuItem';
+import { BountyActions } from '../PageActions/components/BountyActions';
+import { ExportToPDFAction } from '../PageActions/components/ExportToPDFAction';
+import { KanbanPageActions } from '../PageActions/KanbanPageActions';
 
 interface Props {
   pageId?: string;
@@ -117,7 +117,7 @@ export default function PageDialog(props: Props) {
         !hideToolsMenu &&
         !readOnly &&
         page && (
-          <PageActions
+          <KanbanPageActions
             page={page}
             onClickDelete={() => {
               onClickDelete();
@@ -129,9 +129,9 @@ export default function PageDialog(props: Props) {
               }
             }}
           >
-            <ExportToPDFMarkdown pdfTitle={page.title} />
+            <ExportToPDFAction pdfTitle={page.title} />
             {bounty && <BountyActions bountyId={bounty.id} />}
-          </PageActions>
+          </KanbanPageActions>
         )
       }
       toolbar={

@@ -33,10 +33,7 @@ import {
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import Button from 'components/common/Button';
 import LoadingComponent from 'components/common/LoadingComponent';
-import {
-  addNewCards,
-  isValidCsvResult
-} from 'components/common/PageLayout/components/Header/components/utils/databasePageOptions';
+import { addNewCards, isValidCsvResult } from 'components/common/PageActions/utils/databasePageOptions';
 import { webhookBaseUrl } from 'config/constants';
 import { useApiPageKeys } from 'hooks/useApiPageKeys';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';

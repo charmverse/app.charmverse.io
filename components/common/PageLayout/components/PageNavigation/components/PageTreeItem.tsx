@@ -1,6 +1,5 @@
 import type { Page, PageType } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
-import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import type { TreeItemContentProps } from '@mui/lab/TreeItem';
@@ -16,19 +15,19 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import type { ReactNode, SyntheticEvent } from 'react';
 import React, { forwardRef, memo, useCallback, useMemo } from 'react';
-import { CopyToClipboard } from 'react-copy-to-clipboard';
 
 import charmClient from 'charmClient';
 import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import EmojiPicker from 'components/common/BoardEditor/focalboard/src/widgets/emojiPicker';
+import { AddToFavoritesAction } from 'components/common/PageActions/components/AddToFavoritesAction';
+import { CopyPageLinkAction } from 'components/common/PageActions/components/CopyPageLinkAction';
 import { DuplicatePageAction } from 'components/common/PageActions/components/DuplicatePageAction';
 import TreeItemContent from 'components/common/TreeItemContent';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { usePageFromPath } from 'hooks/usePageFromPath';
 import { usePagePermissions } from 'hooks/usePagePermissions';
 import { usePages } from 'hooks/usePages';
-import { useSnackbar } from 'hooks/useSnackbar';
 import { isTouchScreen } from 'lib/utilities/browser';
 import { greyColor2 } from 'theme/colors';
 
@@ -384,7 +383,6 @@ function PageActionsMenu({ closeMenu, pageId, pagePath }: { closeMenu: () => voi
   const boards = useAppSelector(getSortedBoards);
   const currentPage = usePageFromPath();
   const { deletePage, pages } = usePages();
-  const { showMessage } = useSnackbar();
   const { permissions: pagePermissions } = usePagePermissions({ pageIdOrPath: pageId });
   const router = useRouter();
   const deletePageDisabled = !pagePermissions?.delete;
@@ -406,11 +404,6 @@ function PageActionsMenu({ closeMenu, pageId, pagePath }: { closeMenu: () => voi
     }
   }
 
-  function onCopy() {
-    closeMenu();
-    showMessage('Link copied to clipboard');
-  }
-
   function getAbsolutePath() {
     if (typeof window !== 'undefined') {
       return window.location.origin + pagePath;
@@ -430,15 +423,14 @@ function PageActionsMenu({ closeMenu, pageId, pagePath }: { closeMenu: () => voi
           </ListItemButton>
         </div>
       </Tooltip>
-      {page && <DuplicatePageAction page={page} pagePermissions={pagePermissions} />}
-      <CopyToClipboard text={getAbsolutePath()} onCopy={() => onCopy()}>
-        <ListItemButton dense>
-          <ListItemIcon>
-            <ContentCopyIcon fontSize='small' />
-          </ListItemIcon>
-          <ListItemText>Copy link</ListItemText>
-        </ListItemButton>
-      </CopyToClipboard>
+      <AddToFavoritesAction pageId={pageId} onComplete={closeMenu} />
+      <DuplicatePageAction
+        pageId={pageId}
+        pageType={page?.type}
+        pagePermissions={pagePermissions}
+        onComplete={closeMenu}
+      />
+      <CopyPageLinkAction path={getAbsolutePath()} closeMenu={closeMenu} />
     </>
   );
 }

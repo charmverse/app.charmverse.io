@@ -1,4 +1,4 @@
-import { PageActions } from 'components/common/PageActions/PageActions';
+import { KanbanPageActions } from 'components/common/PageActions/KanbanPageActions';
 import { useTasks } from 'components/nexus/hooks/useTasks';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useUser } from 'hooks/useUser';
@@ -23,7 +23,7 @@ export default function ProposalActionsMenu({ page, deleteProposal, editProposal
   }
 
   return (
-    <PageActions
+    <KanbanPageActions
       page={page}
       onClickDelete={() => {
         deleteProposal(proposal.id);

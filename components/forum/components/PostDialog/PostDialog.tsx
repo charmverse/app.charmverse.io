@@ -12,7 +12,7 @@ import Dialog from 'components/common/BoardEditor/focalboard/src/components/dial
 import Button from 'components/common/Button';
 import { DialogTitle } from 'components/common/Modal';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
-import { PageActions } from 'components/common/PageActions/PageActions';
+import { KanbanPageActions } from 'components/common/PageActions/KanbanPageActions';
 import { useSmallScreen } from 'hooks/useMediaScreens';
 import { usePostPermissions } from 'hooks/usePostPermissions';
 import { useUser } from 'hooks/useUser';
@@ -156,7 +156,7 @@ export function PostDialog({ post, isLoading, spaceId, onClose, newPostCategory 
             </Button>
           ) : null}
           {post && (
-            <PageActions
+            <KanbanPageActions
               page={{ ...post, relativePath }}
               onClickDelete={permissions?.delete_post ? deletePost : undefined}
               hideDuplicateAction

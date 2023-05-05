@@ -1,20 +1,19 @@
 import type { PageType } from '@charmverse/core/prisma';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { IconButton } from '@mui/material';
-import type { MouseEvent, ReactNode } from 'react';
+import type { MouseEvent } from 'react';
 import { useState } from 'react';
 
 import type { DuplicatePageResponse } from 'lib/pages/duplicatePage';
 
 import { PageActionsMenu } from './components/PageActionsMenu';
 
-export function PageActions({
+export function KanbanPageActions({
   page,
   onClickDelete,
   hideDuplicateAction,
   onClickEdit,
   readOnly,
-  children,
   onDuplicate
 }: {
   onDuplicate?: (duplicatePageResponse: DuplicatePageResponse) => void;
@@ -33,7 +32,6 @@ export function PageActions({
   onClickDelete?: VoidFunction;
   onClickEdit?: VoidFunction;
   hideDuplicateAction?: boolean;
-  children?: ReactNode;
 }) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
@@ -56,9 +54,7 @@ export function PageActions({
         onClickEdit={onClickEdit}
         readOnly={readOnly}
         onDuplicate={onDuplicate}
-      >
-        {children}
-      </PageActionsMenu>
+      />
     </div>
   );
 }

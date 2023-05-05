@@ -3,7 +3,7 @@ import charmClient from 'charmClient';
 import { useUser } from './useUser';
 
 export function useToggleFavorite({ pageId }: { pageId?: string }) {
-  const { user, setUser } = useUser();
+  const { user, updateUser } = useUser();
   const isFavorite = pageId && user?.favorites.some(({ pageId: _pageId }) => pageId === _pageId);
 
   async function toggleFavorite() {
@@ -11,7 +11,7 @@ export function useToggleFavorite({ pageId }: { pageId?: string }) {
       const updatedFields = isFavorite
         ? await charmClient.unfavoritePage(pageId)
         : await charmClient.favoritePage(pageId);
-      setUser({ ...user, ...updatedFields });
+      updateUser({ favorites: updatedFields.favorites });
     }
   }
 

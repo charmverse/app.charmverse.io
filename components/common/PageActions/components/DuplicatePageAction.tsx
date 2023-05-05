@@ -1,6 +1,6 @@
-import type { Page, PageType } from '@charmverse/core/prisma';
+import type { PageType } from '@charmverse/core/prisma';
 import FileCopyOutlinedIcon from '@mui/icons-material/FileCopyOutlined';
-import { ListItemButton, ListItemIcon, ListItemText, Tooltip } from '@mui/material';
+import { MenuItem, ListItemIcon, ListItemText, Tooltip } from '@mui/material';
 import { useRouter } from 'next/router';
 
 import charmClient from 'charmClient';
@@ -8,17 +8,19 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { DuplicatePageResponse } from 'lib/pages/duplicatePage';
 import type { IPagePermissionFlags } from 'lib/permissions/pages';
 
-const excludedPageTypes: PageType[] = ['bounty_template', 'proposal_template'];
+const excludedPageTypes: (PageType | undefined)[] = ['bounty_template', 'proposal_template'];
 
 export function DuplicatePageAction({
-  page,
+  pageId,
+  pageType,
   redirect = false,
-  postDuplication,
+  onComplete,
   pagePermissions
 }: {
-  page: Pick<Page, 'id' | 'type'> & { parentId?: string | null };
+  pageId: string;
+  pageType?: PageType;
   redirect?: boolean;
-  postDuplication?: (duplicatePageResponse: DuplicatePageResponse) => void;
+  onComplete?: (duplicatePageResponse: DuplicatePageResponse) => void;
   pagePermissions: IPagePermissionFlags | undefined;
 }) {
   const currentSpace = useCurrentSpace();
@@ -29,14 +31,14 @@ export function DuplicatePageAction({
   async function duplicatePage() {
     if (currentSpace) {
       const duplicatePageResponse = await charmClient.pages.duplicatePage({
-        pageId: page.id
+        pageId
       });
       const { pages, rootPageId } = duplicatePageResponse;
       const duplicatedRootPage = pages.find((_page) => _page.id === rootPageId);
       if (duplicatedRootPage && redirect) {
         router.push(`/${router.query.domain}/${duplicatedRootPage.path}`);
       }
-      postDuplication?.(duplicatePageResponse);
+      onComplete?.(duplicatePageResponse);
     }
   }
 
@@ -45,7 +47,7 @@ export function DuplicatePageAction({
       arrow
       placement='top'
       title={
-        excludedPageTypes.includes(page.type)
+        excludedPageTypes.includes(pageType)
           ? 'Page type cannot be duplicated'
           : disabled
           ? 'You do not have permission to duplicate this page'
@@ -53,12 +55,12 @@ export function DuplicatePageAction({
       }
     >
       <div>
-        <ListItemButton dense disabled={excludedPageTypes.includes(page.type) || disabled} onClick={duplicatePage}>
+        <MenuItem dense disabled={excludedPageTypes.includes(pageType) || disabled} onClick={duplicatePage}>
           <ListItemIcon>
             <FileCopyOutlinedIcon fontSize='small' />
           </ListItemIcon>
           <ListItemText>Duplicate</ListItemText>
-        </ListItemButton>
+        </MenuItem>
       </div>
     </Tooltip>
   );

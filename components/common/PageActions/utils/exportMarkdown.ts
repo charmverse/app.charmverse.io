@@ -2,7 +2,6 @@ import type { Prisma } from '@charmverse/core/prisma';
 
 import charmClient from 'charmClient';
 import type { Member } from 'lib/members/interfaces';
-import type { PageContent } from 'lib/prosemirror/interfaces';
 import { generateMarkdown } from 'lib/prosemirror/plugins/markdown/generateMarkdown';
 
 export async function exportMarkdown({
