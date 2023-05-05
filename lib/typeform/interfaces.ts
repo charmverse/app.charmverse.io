@@ -1,6 +1,6 @@
 import type { Typeform } from '@typeform/api-client';
 
-import type { FormResponseProperty } from 'lib/pages';
+import type { IPropertyTemplate } from 'lib/focalboard/board';
 
 export interface TypeformFields {
   id?: string;
@@ -23,6 +23,6 @@ export interface TypeformResponse extends Typeform.Response {
 }
 
 export type BodyFormResponse = {
-  question: FormResponseProperty;
+  question: IPropertyTemplate;
   answer: string | string[];
 }[];

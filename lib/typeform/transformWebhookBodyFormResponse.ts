@@ -1,11 +1,11 @@
 import uniqBy from 'lodash/uniqBy';
 
-import type { FormResponseProperty } from 'lib/pages';
+import type { IPropertyTemplate } from 'lib/focalboard/board';
 import { isTruthy } from 'lib/utilities/types';
 
 import type { BodyFormResponse } from './interfaces';
 
-export function transformWebhookBodyFormResponse(data: BodyFormResponse, properties: FormResponseProperty[]) {
+export function transformWebhookBodyFormResponse(data: BodyFormResponse, properties: IPropertyTemplate[]) {
   const updatedBody = data.map((b) => {
     const cardProperty = properties.find(
       (prop) => prop.description === b.question.description && prop.type === b.question.type

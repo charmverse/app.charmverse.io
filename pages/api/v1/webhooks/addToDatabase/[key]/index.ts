@@ -1,8 +1,8 @@
 import { prisma } from '@charmverse/core';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
+import type { IPropertyTemplate } from 'lib/focalboard/board';
 import { requireKeys } from 'lib/middleware';
-import type { FormResponseProperty } from 'lib/pages';
 import { getDatabaseDetails } from 'lib/pages/getDatabaseDetails';
 import { createDatabaseCardPage } from 'lib/public-api';
 import { defaultHandler } from 'lib/public-api/handler';
@@ -78,7 +78,7 @@ export async function createFormResponse(req: NextApiRequest, res: NextApiRespon
   }
 
   const fields = (board.fields as any) || {};
-  const cardProperties: FormResponseProperty[] = fields?.cardProperties || [];
+  const cardProperties: IPropertyTemplate[] = fields?.cardProperties || [];
 
   // Transform body questions and answers into card properties
   const { updatedBody, allProperties } = transformWebhookBodyFormResponse(body, cardProperties);

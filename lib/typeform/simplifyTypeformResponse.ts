@@ -2,16 +2,15 @@ import type { Typeform } from '@typeform/api-client';
 import { v4 } from 'uuid';
 
 import { createBoardPropertyOptions } from 'components/common/PageLayout/components/Header/components/utils/databasePageOptions';
-import type { PropertyType } from 'lib/focalboard/board';
-import type { FormResponseProperty } from 'lib/pages';
+import type { IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import { isTruthy } from 'lib/utilities/types';
 
 import type { TypeformFields, TypeformResponse } from './interfaces';
 
-function simplifyTypeformQuestions(fields?: TypeformFields[]): FormResponseProperty[] {
+function simplifyTypeformQuestions(fields?: TypeformFields[]): IPropertyTemplate[] {
   return (fields || [])
     .map(({ id = '', title = '', type, choices = [], allow_multiple_selections: allowMultipleSelections }) => {
-      const defaultProperties: FormResponseProperty = {
+      const defaultProperties: IPropertyTemplate = {
         id,
         name: title,
         description: title,

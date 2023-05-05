@@ -2,10 +2,10 @@ import { prisma } from '@charmverse/core';
 import type { Block } from '@prisma/client';
 
 import { prismaToBlock } from 'lib/focalboard/block';
-import type { FormResponseProperty } from 'lib/pages';
+import type { IPropertyTemplate } from 'lib/focalboard/board';
 import { relay } from 'lib/websockets/relay';
 
-export async function updateDatabaseBlocks(board: Block, properties: FormResponseProperty[]) {
+export async function updateDatabaseBlocks(board: Block, properties: IPropertyTemplate[]) {
   const updatedBoard = await prisma.block.update({
     where: {
       id: board.id
