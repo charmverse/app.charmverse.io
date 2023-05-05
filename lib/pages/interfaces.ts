@@ -158,10 +158,6 @@ export type PagesMap<P extends PageMeta | PageNode = PageMeta> = Record<string, 
 export type PageUpdates = Partial<Page> & { id: string };
 export type PageDetailsUpdates = Partial<PageDetails> & { id: string };
 
-export type FormResponseProperty = IPropertyTemplate & {
-  description: string;
-};
-
 export interface IPageMetaWithPermissions extends PageMeta {
   permissions: (PagePermission & { sourcePermission: PagePermission | null })[];
 }
