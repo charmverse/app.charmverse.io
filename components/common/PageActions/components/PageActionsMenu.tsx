@@ -15,7 +15,7 @@ import { usePostPermissions } from 'hooks/usePostPermissions';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { DuplicatePageResponse } from 'lib/pages/duplicatePage';
 
-import { DuplicatePageAction } from './DuplicatePageAction';
+import { DuplicatePageItem } from './DuplicatePageAction';
 
 export function PageActionsMenu({
   children,
@@ -108,7 +108,7 @@ export function PageActionsMenu({
         <ListItemText>Delete</ListItemText>
       </MenuItem>
       {!hideDuplicateAction && page.type && (
-        <DuplicatePageAction
+        <DuplicatePageItem
           postDuplication={onDuplicate}
           page={{ ...page, type: page.type }}
           pagePermissions={pagePermissions}

@@ -8,8 +8,6 @@ import MenuIcon from '@mui/icons-material/Menu';
 import MessageOutlinedIcon from '@mui/icons-material/MessageOutlined';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import RateReviewOutlinedIcon from '@mui/icons-material/RateReviewOutlined';
-import FavoritedIcon from '@mui/icons-material/Star';
-import NotFavoritedIcon from '@mui/icons-material/StarBorder';
 import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
 import UndoIcon from '@mui/icons-material/Undo';
 import { List, Popover, Switch, ListItemText, ListItemButton } from '@mui/material';
@@ -29,6 +27,7 @@ import charmClient from 'charmClient';
 import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
 import Button from 'components/common/Button';
 import { undoEventName } from 'components/common/CharmEditor/utils';
+import { AddToFavoritesAction } from 'components/common/PageActions/components/AddToFavoritesAction';
 import { DuplicatePageAction } from 'components/common/PageActions/components/DuplicatePageAction';
 import { usePostByPath } from 'components/forum/hooks/usePostByPath';
 import { useProposalCategories } from 'components/proposals/hooks/useProposalCategories';
@@ -279,7 +278,6 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
   const pageMenuAnchor = useRef();
   const { showMessage } = useSnackbar();
   const basePage = usePageFromPath();
-  const { isFavorite, toggleFavorite } = useToggleFavorite({ pageId: basePage?.id });
   const { members } = useMembers();
   const { setCurrentPageActionDisplay } = usePageActionDisplay();
   const { permissions: pagePermissions } = usePagePermissions({
@@ -481,25 +479,7 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
       </ListItemButton>
       <Divider />
       {(basePage?.type === 'card' || basePage?.type === 'card_synced' || basePage?.type === 'page') && (
-        <ListItemButton
-          onClick={() => {
-            toggleFavorite();
-            setPageMenuOpen(false);
-          }}
-        >
-          <Box
-            sx={{
-              mr: 0.5,
-              position: 'relative',
-              left: -4,
-              display: 'flex',
-              alignItems: 'center'
-            }}
-          >
-            {isFavorite ? <FavoritedIcon /> : <NotFavoritedIcon />}
-          </Box>
-          <ListItemText primary={isFavorite ? 'Remove from Favorites' : 'Add to Favorites'} />
-        </ListItemButton>
+        <AddToFavoritesAction pageId={basePage.id} onComplete={closeMenu} />
       )}
       {basePage && (
         <DuplicatePageAction postDuplication={closeMenu} page={basePage} pagePermissions={pagePermissions} redirect />
