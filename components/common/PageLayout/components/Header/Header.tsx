@@ -1,3 +1,4 @@
+import type { PageType } from '@charmverse/core/dist/prisma';
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
@@ -80,7 +81,16 @@ interface HeaderProps {
   openSidebar: () => void;
 }
 
-const documentTypes = ['page', 'card', 'proposal', 'proposal_template', 'bounty'];
+const documentTypes: PageType[] = [
+  'page',
+  'card',
+  'card_synced',
+  'card_template',
+  'proposal',
+  'proposal_template',
+  'bounty',
+  'bounty_template'
+];
 
 function CopyLinkMenuItem({ closeMenu }: { closeMenu: VoidFunction }) {
   const { showMessage } = useSnackbar();
@@ -222,6 +232,7 @@ function PostHeader({
       <UndoMenuItem onClick={undoEditorChanges} disabled={!forumPostInfo?.permissions?.edit_post} />
       <Divider />
       <ExportMarkdownMenuItem onClick={exportMarkdownPage} />
+      <ExportToPDFMarkdown pdfTitle={forumPostInfo.forumPost?.title} />
       <Tooltip
         title={
           forumPostInfo.forumPost?.isDraft
@@ -260,7 +271,7 @@ function PostHeader({
 function HeaderComponent({ open, openSidebar }: HeaderProps) {
   const router = useRouter();
   const { updatePage, deletePage } = usePages();
-  const { refreshBounty, bounties } = useBounties();
+  const { bounties } = useBounties();
   const { user } = useUser();
   const theme = useTheme();
   const [pageMenuOpen, setPageMenuOpen] = useState(false);
@@ -282,8 +293,7 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
   const isLargeScreen = useMediaQuery(theme.breakpoints.up('md'));
 
   const pageType = basePage?.type;
-  const isExportablePage =
-    pageType === 'card' || pageType === 'page' || pageType === 'proposal' || pageType === 'bounty';
+  const isExportablePage = documentTypes.includes(pageType as PageType);
 
   const isBountyBoard = router.route === '/[domain]/bounties';
   const currentPageOrPost = basePage ?? forumPostInfo.forumPost;
@@ -295,8 +305,7 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
     return null;
   }, [currentPageOrPost?.id]);
 
-  const isFullWidth = !isLargeScreen || (basePage?.fullWidth ?? false);
-  const isBasePageDocument = documentTypes.includes(basePage?.type ?? '');
+  const isBasePageDocument = documentTypes.includes(basePage?.type as PageType);
   const isBasePageDatabase = /board/.test(basePage?.type ?? '');
 
   const { getCategoriesWithCreatePermission, getDefaultCreateCategory } = useProposalCategories();
@@ -471,7 +480,7 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
         <ListItemText primary='View suggestions' />
       </ListItemButton>
       <Divider />
-      {(basePage?.type === 'card' || basePage?.type === 'page') && (
+      {(basePage?.type === 'card' || basePage?.type === 'card_synced' || basePage?.type === 'page') && (
         <ListItemButton
           onClick={() => {
             toggleFavorite();
@@ -498,7 +507,7 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
       <CopyLinkMenuItem closeMenu={closeMenu} />
 
       <Divider />
-      {(basePage?.type === 'card' || basePage?.type === 'page') && (
+      {(basePage?.type === 'card' || basePage?.type === 'card_synced' || basePage?.type === 'page') && (
         <>
           <Tooltip title={!canCreateProposal ? 'You do not have the permission to convert to proposal' : ''}>
             <div>
