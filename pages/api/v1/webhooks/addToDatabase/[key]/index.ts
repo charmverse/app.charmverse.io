@@ -3,13 +3,13 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { requireKeys } from 'lib/middleware';
 import type { FormResponseProperty } from 'lib/pages';
-import { transformWebhookBody } from 'lib/pages';
 import { getDatabaseDetails } from 'lib/pages/getDatabaseDetails';
 import { createDatabaseCardPage } from 'lib/public-api';
 import { defaultHandler } from 'lib/public-api/handler';
 import { updateDatabaseBlocks } from 'lib/public-api/updateDatabaseBlocks';
 import type { BodyFormResponse, TypeformResponse } from 'lib/typeform/interfaces';
 import { simplifyTypeformResponse } from 'lib/typeform/simplifyTypeformResponse';
+import { transformWebhookBodyFormResponse } from 'lib/typeform/transformWebhookBodyFormResponse';
 import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
 
 const handler = defaultHandler();
@@ -81,7 +81,7 @@ export async function createFormResponse(req: NextApiRequest, res: NextApiRespon
   const cardProperties: FormResponseProperty[] = fields?.cardProperties || [];
 
   // Transform body questions and answers into card properties
-  const { updatedBody, allProperties } = transformWebhookBody(body, cardProperties);
+  const { updatedBody, allProperties } = transformWebhookBodyFormResponse(body, cardProperties);
 
   if (body.length !== cardProperties.length) {
     await updateDatabaseBlocks(board, allProperties);
