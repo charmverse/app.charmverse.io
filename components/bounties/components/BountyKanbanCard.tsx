@@ -3,7 +3,7 @@ import { Box, CardHeader, Typography } from '@mui/material';
 import { memo } from 'react';
 
 import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
-import { PageActions } from 'components/common/PageActions';
+import { PageActions } from 'components/common/PageActions/PageActions';
 import { usePage } from 'hooks/usePage';
 import type { BountyWithDetails } from 'lib/bounties';
 import type { PageMeta } from 'lib/pages';

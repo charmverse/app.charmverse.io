@@ -6,7 +6,7 @@ import { useState } from 'react';
 
 import type { DuplicatePageResponse } from 'lib/pages/duplicatePage';
 
-import { PageActionsMenu } from './PageActionsMenu';
+import { PageActionsMenu } from './components/PageActionsMenu';
 
 export function PageActions({
   page,

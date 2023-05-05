@@ -5,7 +5,7 @@ import { Box } from '@mui/system';
 import { FormattedMessage } from 'react-intl';
 
 import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
-import { PageActions } from 'components/common/PageActions';
+import { PageActions } from 'components/common/PageActions/PageActions';
 import { PageIcon } from 'components/common/PageLayout/components/PageIcon';
 import { usePage } from 'hooks/usePage';
 import type { PageMeta } from 'lib/pages';

@@ -11,7 +11,7 @@ import { mutate } from 'swr';
 import { BountyStatusChip } from 'components/bounties/components/BountyStatusBadge';
 import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
-import { PageActions } from 'components/common/PageActions';
+import { PageActions } from 'components/common/PageActions/PageActions';
 import { PageIcon } from 'components/common/PageLayout/components/PageIcon';
 import { useBounties } from 'hooks/useBounties';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';

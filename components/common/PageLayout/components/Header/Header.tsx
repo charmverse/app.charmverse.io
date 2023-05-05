@@ -29,7 +29,7 @@ import charmClient from 'charmClient';
 import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
 import Button from 'components/common/Button';
 import { undoEventName } from 'components/common/CharmEditor/utils';
-import { DuplicatePageAction } from 'components/common/DuplicatePageAction';
+import { DuplicatePageAction } from 'components/common/PageActions/components/DuplicatePageAction';
 import { usePostByPath } from 'components/forum/hooks/usePostByPath';
 import { useProposalCategories } from 'components/proposals/hooks/useProposalCategories';
 import { useBounties } from 'hooks/useBounties';

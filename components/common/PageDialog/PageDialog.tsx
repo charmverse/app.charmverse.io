@@ -19,7 +19,7 @@ import type { BountyWithDetails } from 'lib/bounties';
 import { AllowedPagePermissions } from 'lib/permissions/pages/available-page-permissions.class';
 import debouncePromise from 'lib/utilities/debouncePromise';
 
-import { PageActions } from '../PageActions';
+import { PageActions } from '../PageActions/PageActions';
 import { BountyActions } from '../PageLayout/components/Header/components/BountyActions';
 import { ExportToPDFMarkdown } from '../PageLayout/components/Header/components/ExportToPDFMenuItem';
 

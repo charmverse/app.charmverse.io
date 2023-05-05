@@ -12,7 +12,7 @@ import Dialog from 'components/common/BoardEditor/focalboard/src/components/dial
 import Button from 'components/common/Button';
 import { DialogTitle } from 'components/common/Modal';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
-import { PageActions } from 'components/common/PageActions';
+import { PageActions } from 'components/common/PageActions/PageActions';
 import { useSmallScreen } from 'hooks/useMediaScreens';
 import { usePostPermissions } from 'hooks/usePostPermissions';
 import { useUser } from 'hooks/useUser';

@@ -7,6 +7,7 @@ import { Divider, ListItemText, Menu, MenuItem, Stack, Typography } from '@mui/m
 import { useRouter } from 'next/router';
 import type { Dispatch, ReactNode, SetStateAction } from 'react';
 
+import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useMembers } from 'hooks/useMembers';
 import { usePagePermissions } from 'hooks/usePagePermissions';
@@ -14,7 +15,6 @@ import { usePostPermissions } from 'hooks/usePostPermissions';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { DuplicatePageResponse } from 'lib/pages/duplicatePage';
 
-import { Utils } from './BoardEditor/focalboard/src/utils';
 import { DuplicatePageAction } from './DuplicatePageAction';
 
 export function PageActionsMenu({
