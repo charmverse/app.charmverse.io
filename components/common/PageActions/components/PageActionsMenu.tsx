@@ -85,7 +85,6 @@ export function PageActionsMenu({
         dense
         onClick={onClickDelete}
         disabled={Boolean(readOnly || (!pagePermissions?.delete && !postPermissions?.delete_post))}
-        data-test='delete-page-from-context'
       >
         <DeleteOutlineIcon fontSize='small' sx={{ mr: 1 }} />
         <ListItemText>Delete</ListItemText>
