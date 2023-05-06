@@ -11,7 +11,7 @@ import { mutate } from 'swr';
 import { BountyStatusChip } from 'components/bounties/components/BountyStatusBadge';
 import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
-import { KanbanPageActions } from 'components/common/PageActions/KanbanPageActions';
+import { KanbanPageActions } from 'components/common/PageActions/KanbanPageActionButton';
 import { PageIcon } from 'components/common/PageLayout/components/PageIcon';
 import { useBounties } from 'hooks/useBounties';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';

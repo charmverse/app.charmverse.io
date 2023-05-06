@@ -1,16 +1,16 @@
+import type { PostPermissionFlags } from '@charmverse/core';
 import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
 import { List, ListItemText, ListItemButton } from '@mui/material';
 import Divider from '@mui/material/Divider';
 import Tooltip from '@mui/material/Tooltip';
 import { useRouter } from 'next/router';
-import type { Dispatch, SetStateAction } from 'react';
 
 import charmClient from 'charmClient';
 import { CopyPageLinkAction } from 'components/common/PageActions/components/CopyPageLinkAction';
-import type { usePostByPath } from 'components/forum/hooks/usePostByPath';
 import { useProposalCategories } from 'components/proposals/hooks/useProposalCategories';
 import { useMembers } from 'hooks/useMembers';
 import { useSnackbar } from 'hooks/useSnackbar';
+import type { PostWithVotes } from 'lib/forums/posts/interfaces';
 
 import { exportMarkdown } from '../utils/exportMarkdown';
 
@@ -21,12 +21,14 @@ import { ExportToPDFAction } from './ExportToPDFAction';
 import { UndoAction } from './UndoAction';
 
 export function ForumPostActionList({
-  closeMenu,
+  onComplete,
   undoEditorChanges,
-  forumPostInfo
+  post,
+  postPermissions
 }: {
-  forumPostInfo: ReturnType<typeof usePostByPath>;
-  closeMenu: VoidFunction;
+  post?: PostWithVotes; // if post is undefined, it is a new post
+  postPermissions?: PostPermissionFlags;
+  onComplete: VoidFunction;
   undoEditorChanges: VoidFunction;
 }) {
   const { showMessage } = useSnackbar();
@@ -39,33 +41,33 @@ export function ForumPostActionList({
 
   const canCreateProposal = proposalCategoriesWithCreateAllowed.length > 0;
 
-  const postCreator = getMemberById(forumPostInfo.forumPost?.createdBy);
+  const postCreator = getMemberById(post?.createdBy);
 
   function deletePost() {
-    if (forumPostInfo.forumPost) {
-      charmClient.forum.deleteForumPost(forumPostInfo.forumPost.id).then(() => {
+    if (post && postPermissions?.delete_post) {
+      charmClient.forum.deleteForumPost(post.id).then(() => {
         router.push(`/${router.query.domain}/forum`);
       });
     }
   }
 
   async function exportMarkdownPage() {
-    if (forumPostInfo.forumPost) {
+    if (post) {
       exportMarkdown({
-        content: forumPostInfo.forumPost.content,
-        id: forumPostInfo.forumPost.id,
+        content: post.content,
+        id: post.id,
         members,
-        spaceId: forumPostInfo.forumPost.spaceId,
-        title: forumPostInfo.forumPost.title
+        spaceId: post.spaceId,
+        title: post.title
       }).catch(() => {
         showMessage('Error exporting markdown', 'error');
       });
-      closeMenu();
+      onComplete();
     }
   }
 
   async function convertToProposal(pageId: string) {
-    closeMenu();
+    onComplete();
     const { path } = await charmClient.forum.convertToProposal({
       postId: pageId,
       categoryId: getDefaultCreateCategory()?.id
@@ -75,18 +77,18 @@ export function ForumPostActionList({
 
   return (
     <List data-test='header--forum-post-actions' dense>
-      <CopyPageLinkAction path={router.asPath} closeMenu={closeMenu} />
+      <CopyPageLinkAction path={router.asPath} onComplete={onComplete} />
       <Divider />
-      <DeletePageAction onClick={deletePost} disabled={!forumPostInfo.permissions?.delete_post} />
-      <UndoAction onClick={undoEditorChanges} disabled={!forumPostInfo?.permissions?.edit_post} />
+      <DeletePageAction onClick={deletePost} disabled={!postPermissions?.delete_post} />
+      <UndoAction onClick={undoEditorChanges} disabled={!postPermissions?.edit_post} />
       <Divider />
       <ExportMarkdownAction onClick={exportMarkdownPage} />
-      <ExportToPDFAction pdfTitle={forumPostInfo.forumPost?.title} />
+      <ExportToPDFAction pdfTitle={post?.title} />
       <Tooltip
         title={
-          forumPostInfo.forumPost?.isDraft
+          post?.isDraft
             ? 'Draft post cannot be converted proposal'
-            : !canCreateProposal || forumPostInfo.forumPost?.proposalId
+            : !canCreateProposal || post?.proposalId
             ? 'You do not have the permission to convert to proposal'
             : ''
         }
@@ -94,8 +96,8 @@ export function ForumPostActionList({
         <div>
           <ListItemButton
             data-test='convert-proposal-action'
-            onClick={() => forumPostInfo.forumPost && convertToProposal(forumPostInfo.forumPost.id)}
-            disabled={!canCreateProposal || !!forumPostInfo.forumPost?.proposalId || !!forumPostInfo.forumPost?.isDraft}
+            onClick={() => post && convertToProposal(post.id)}
+            disabled={!canCreateProposal || !!post?.proposalId || !!post?.isDraft}
           >
             <TaskOutlinedIcon
               fontSize='small'
@@ -107,10 +109,10 @@ export function ForumPostActionList({
           </ListItemButton>
         </div>
       </Tooltip>
-      {forumPostInfo.forumPost && postCreator ? (
+      {post && postCreator ? (
         <>
           <Divider />
-          <DocumentHistory page={{ updatedBy: forumPostInfo.forumPost.createdBy, ...forumPostInfo.forumPost }} />
+          <DocumentHistory page={{ updatedBy: post.createdBy, ...post }} />
         </>
       ) : null}
     </List>

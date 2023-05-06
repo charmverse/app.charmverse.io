@@ -3,7 +3,7 @@ import { Box, CardHeader, Typography } from '@mui/material';
 import { memo } from 'react';
 
 import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
-import { KanbanPageActions } from 'components/common/PageActions/KanbanPageActions';
+import { KanbanPageActions } from 'components/common/PageActions/KanbanPageActionButton';
 import { usePage } from 'hooks/usePage';
 import type { BountyWithDetails } from 'lib/bounties';
 import type { PageMeta } from 'lib/pages';
@@ -18,14 +18,13 @@ interface Props {
   onClick: () => void;
   onDelete: (bountyId: string) => void;
   readOnly: boolean;
-  onDuplicate?: (duplicatePageResponse: DuplicatePageResponse) => void;
 }
 
 const StyledBox = styled(Box)`
   ${hoverIconsStyle({ absolutePositioning: true })}
 `;
 
-function BountyKanbanCard({ onDelete, bounty, page: bountyPage, onDuplicate, onClick, readOnly }: Props) {
+function BountyKanbanCard({ onDelete, bounty, page: bountyPage, onClick, readOnly }: Props) {
   const { page } = usePage({ pageIdOrPath: bountyPage?.id });
   return (
     <StyledBox
@@ -57,12 +56,7 @@ function BountyKanbanCard({ onDelete, bounty, page: bountyPage, onDuplicate, onC
         </Box>
       </Box>
       {onDelete && (
-        <KanbanPageActions
-          page={bountyPage}
-          onDuplicate={onDuplicate}
-          readOnly={readOnly}
-          onClickDelete={() => onDelete(bounty.id)}
-        />
+        <KanbanPageActions page={bountyPage} readOnly={readOnly} onClickDelete={() => onDelete(bounty.id)} />
       )}
     </StyledBox>
   );

@@ -10,8 +10,6 @@ import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useMembers } from 'hooks/useMembers';
 import { usePagePermissions } from 'hooks/usePagePermissions';
 import { usePostPermissions } from 'hooks/usePostPermissions';
-import { useSnackbar } from 'hooks/useSnackbar';
-import type { DuplicatePageResponse } from 'lib/pages/duplicatePage';
 
 import { CopyPageLinkAction } from './CopyPageLinkAction';
 import { DuplicatePageAction } from './DuplicatePageAction';
@@ -24,10 +22,8 @@ export function PageActionsMenu({
   anchorEl,
   page,
   setAnchorEl,
-  readOnly,
-  onDuplicate
+  readOnly
 }: {
-  onDuplicate?: (duplicatePageResponse: DuplicatePageResponse) => void;
   onClickDelete?: VoidFunction;
   onClickEdit?: VoidFunction;
   children?: ReactNode;
@@ -40,7 +36,6 @@ export function PageActionsMenu({
     type?: PageType;
     id: string;
     updatedAt: Date;
-    relativePath?: string;
     path: string;
     deletedAt: Date | null;
   };
@@ -48,7 +43,6 @@ export function PageActionsMenu({
 }) {
   const { getMemberById } = useMembers();
   const router = useRouter();
-  const { showMessage } = useSnackbar();
   const member = getMemberById(page.createdBy);
   const open = Boolean(anchorEl);
   const { formatDateTime } = useDateFormatter();
@@ -56,15 +50,9 @@ export function PageActionsMenu({
   const postPermissions = usePostPermissions({
     postIdOrPath: router.pathname.startsWith('/[domain]/forum') ? page.id : (null as any)
   });
-  function getPageLink() {
-    let link = window.location.href;
 
-    if (page.relativePath) {
-      link = `${window.location.origin}${page.relativePath}`;
-    } else {
-      link = `${window.location.origin}/${router.query.domain}/${page.path}`;
-    }
-    return link;
+  function getPageLink() {
+    return `${window.location.origin}/${router.query.domain}/${page.path}`;
   }
 
   function onClickOpenInNewTab() {
@@ -104,7 +92,7 @@ export function PageActionsMenu({
       </MenuItem>
       {!hideDuplicateAction && page.type && (
         <DuplicatePageAction
-          onComplete={onDuplicate}
+          onComplete={handleClose}
           pageId={page.id}
           pageType={page.type}
           pagePermissions={pagePermissions}

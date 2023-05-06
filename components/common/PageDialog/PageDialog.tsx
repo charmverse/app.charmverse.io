@@ -11,7 +11,6 @@ import charmClient from 'charmClient';
 import DocumentPage from 'components/[pageId]/DocumentPage';
 import Dialog from 'components/common/BoardEditor/focalboard/src/components/dialog';
 import Button from 'components/common/Button';
-import { useBounties } from 'hooks/useBounties';
 import { useCurrentPage } from 'hooks/useCurrentPage';
 import { usePage } from 'hooks/usePage';
 import { usePages } from 'hooks/usePages';
@@ -19,9 +18,7 @@ import type { BountyWithDetails } from 'lib/bounties';
 import { AllowedPagePermissions } from 'lib/permissions/pages/available-page-permissions.class';
 import debouncePromise from 'lib/utilities/debouncePromise';
 
-import { BountyActions } from '../PageActions/components/BountyActions';
-import { ExportToPDFAction } from '../PageActions/components/ExportToPDFAction';
-import { KanbanPageActions } from '../PageActions/KanbanPageActions';
+import { FullPageActionsMenuButton } from '../PageActions/FullPageActionsMenuButton';
 
 interface Props {
   pageId?: string;
@@ -32,12 +29,11 @@ interface Props {
   hideToolsMenu?: boolean;
 }
 
-export default function PageDialog(props: Props) {
+export function PageDialog(props: Props) {
   const { hideToolsMenu = false, pageId, bounty, toolbar, readOnly } = props;
   const mounted = useRef(false);
   const popupState = usePopupState({ variant: 'popover', popupId: 'page-dialog' });
   const router = useRouter();
-  const { setBounties, refreshBounty } = useBounties();
   const { setCurrentPageId } = useCurrentPage();
 
   const { updatePage, deletePage } = usePages();
@@ -68,18 +64,6 @@ export default function PageDialog(props: Props) {
       charmClient.track.trackAction('page_view', { spaceId: page.spaceId, pageId: page.id, type: page.type });
     }
   }, [page?.id]);
-
-  async function onClickDelete() {
-    if (page) {
-      if (page.type === 'card' || page.type === 'card_synced') {
-        await charmClient.deleteBlock(page.id, () => null);
-      } else if (page.type === 'bounty') {
-        setBounties((bounties) => bounties.filter((_bounty) => _bounty.id !== page.id));
-      }
-      await deletePage({ pageId: page.id });
-      onClose();
-    }
-  }
 
   function onClose() {
     popupState.close();
@@ -113,27 +97,7 @@ export default function PageDialog(props: Props) {
 
   return (
     <Dialog
-      toolsMenu={
-        !hideToolsMenu &&
-        !readOnly &&
-        page && (
-          <KanbanPageActions
-            page={page}
-            onClickDelete={() => {
-              onClickDelete();
-              onClose();
-            }}
-            onDuplicate={(pageDuplicateResponse) => {
-              if (bounty) {
-                refreshBounty(pageDuplicateResponse.rootPageId);
-              }
-            }}
-          >
-            <ExportToPDFAction pdfTitle={page.title} />
-            {bounty && <BountyActions bountyId={bounty.id} />}
-          </KanbanPageActions>
-        )
-      }
+      toolsMenu={!hideToolsMenu && !readOnly && page && <FullPageActionsMenuButton page={page} />}
       toolbar={
         <Box display='flex' justifyContent='space-between'>
           <Button

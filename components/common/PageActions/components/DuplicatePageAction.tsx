@@ -4,8 +4,8 @@ import { MenuItem, ListItemIcon, ListItemText, Tooltip } from '@mui/material';
 import { useRouter } from 'next/router';
 
 import charmClient from 'charmClient';
+import { useBounties } from 'hooks/useBounties';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import type { DuplicatePageResponse } from 'lib/pages/duplicatePage';
 import type { IPagePermissionFlags } from 'lib/permissions/pages';
 
 const excludedPageTypes: (PageType | undefined)[] = ['bounty_template', 'proposal_template'];
@@ -20,11 +20,12 @@ export function DuplicatePageAction({
   pageId: string;
   pageType?: PageType;
   redirect?: boolean;
-  onComplete?: (duplicatePageResponse: DuplicatePageResponse) => void;
+  onComplete?: VoidFunction;
   pagePermissions: IPagePermissionFlags | undefined;
 }) {
   const currentSpace = useCurrentSpace();
   const router = useRouter();
+  const { refreshBounty } = useBounties();
 
   const disabled = !pagePermissions?.read;
 
@@ -38,7 +39,10 @@ export function DuplicatePageAction({
       if (duplicatedRootPage && redirect) {
         router.push(`/${router.query.domain}/${duplicatedRootPage.path}`);
       }
-      onComplete?.(duplicatePageResponse);
+      if (pageType === 'bounty' || pageType === 'bounty_template') {
+        refreshBounty(duplicatePageResponse.rootPageId);
+      }
+      onComplete?.();
     }
   }
 

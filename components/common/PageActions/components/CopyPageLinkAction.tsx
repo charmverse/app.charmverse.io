@@ -4,12 +4,12 @@ import { CopyToClipboard } from 'react-copy-to-clipboard';
 
 import { useSnackbar } from 'hooks/useSnackbar';
 
-export function CopyPageLinkAction({ path, closeMenu }: { path: string; closeMenu?: VoidFunction }) {
+export function CopyPageLinkAction({ path, onComplete }: { path: string; onComplete?: VoidFunction }) {
   const { showMessage } = useSnackbar();
 
   function onClick() {
-    closeMenu?.();
     showMessage('Link copied to clipboard');
+    onComplete?.();
   }
 
   return (

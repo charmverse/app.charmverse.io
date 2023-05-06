@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 
 import { DocumentPageProviders } from 'components/[pageId]/DocumentPage/DocumentPageProviders';
-import PageDialog from 'components/common/PageDialog';
+import { PageDialog } from 'components/common/PageDialog';
 import { useBounties } from 'hooks/useBounties';
 
 type Props = {

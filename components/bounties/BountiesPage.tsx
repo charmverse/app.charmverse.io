@@ -18,8 +18,8 @@ import type { BountyWithDetails } from 'lib/bounties';
 import { sortArrayByObjectProperty } from 'lib/utilities/array';
 import { isTruthy } from 'lib/utilities/types';
 
-import BountiesKanbanView from './components/BountiesKanbanView';
-import BountiesGalleryView from './components/BountyGalleryView';
+import { BountiesKanbanView } from './components/BountiesKanbanView';
+import { BountiesGalleryView } from './components/BountyGalleryView';
 import { MultiPaymentModal } from './components/MultiPaymentModal';
 import { NewBountyButton } from './components/NewBountyButton';
 

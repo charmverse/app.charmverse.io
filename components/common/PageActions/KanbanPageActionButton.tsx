@@ -4,25 +4,14 @@ import { IconButton } from '@mui/material';
 import type { MouseEvent } from 'react';
 import { useState } from 'react';
 
-import type { DuplicatePageResponse } from 'lib/pages/duplicatePage';
-
 import { PageActionsMenu } from './components/PageActionsMenu';
 
-export function KanbanPageActions({
-  page,
-  onClickDelete,
-  hideDuplicateAction,
-  onClickEdit,
-  readOnly,
-  onDuplicate
-}: {
-  onDuplicate?: (duplicatePageResponse: DuplicatePageResponse) => void;
+type Props = {
   page: {
     createdBy: string;
     type?: PageType;
     id: string;
     updatedAt: Date;
-    relativePath?: string;
     path: string;
     deletedAt: Date | null;
     parentId?: string | null;
@@ -32,7 +21,9 @@ export function KanbanPageActions({
   onClickDelete?: VoidFunction;
   onClickEdit?: VoidFunction;
   hideDuplicateAction?: boolean;
-}) {
+};
+
+export function KanbanPageActions({ page, onClickDelete, hideDuplicateAction, onClickEdit, readOnly }: Props) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
@@ -53,7 +44,6 @@ export function KanbanPageActions({
         hideDuplicateAction={hideDuplicateAction}
         onClickEdit={onClickEdit}
         readOnly={readOnly}
-        onDuplicate={onDuplicate}
       />
     </div>
   );

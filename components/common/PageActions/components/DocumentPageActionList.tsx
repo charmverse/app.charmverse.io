@@ -36,6 +36,24 @@ import { ExportToPDFAction } from './ExportToPDFAction';
 import { PublishToSnapshot } from './SnapshotAction/PublishToSnapshot';
 import { UndoAction } from './UndoAction';
 
+export type PageActionMeta = Pick<
+  PageMeta,
+  | 'convertedProposalId'
+  | 'createdAt'
+  | 'createdBy'
+  | 'deletedAt'
+  | 'fontSizeSmall'
+  | 'fontFamily'
+  | 'fullWidth'
+  | 'id'
+  | 'parentId'
+  | 'path'
+  | 'title'
+  | 'type'
+  | 'updatedAt'
+  | 'updatedBy'
+>;
+
 export const documentTypes: PageType[] = [
   'page',
   'card',
@@ -77,19 +95,20 @@ function DeleteMenuItem({ disabled = false, onClick }: { disabled?: boolean; onC
 }
 
 type Props = {
-  closeMenu: VoidFunction;
-  page: PageMeta;
+  onComplete: VoidFunction;
+  page: PageActionMeta;
   pagePermissions?: IPagePermissionFlags;
   undoEditorChanges?: VoidFunction;
 };
 
-export function DocumentPageActionList({ page, closeMenu, pagePermissions, undoEditorChanges }: Props) {
+export function DocumentPageActionList({ page, onComplete, pagePermissions, undoEditorChanges }: Props) {
   const pageId = page.id;
   const router = useRouter();
   const { updatePage, deletePage } = usePages();
   const { bounties } = useBounties();
   const { showMessage } = useSnackbar();
   const { members } = useMembers();
+  const { setBounties } = useBounties();
   const { setCurrentPageActionDisplay } = usePageActionDisplay();
   const pageType = page.type;
   const isExportablePage = documentTypes.includes(pageType as PageType);
@@ -107,23 +126,25 @@ export function DocumentPageActionList({ page, closeMenu, pagePermissions, undoE
   function toggleSmallFont() {
     setPageProperty({ fontSizeSmall: !page.fontSizeSmall });
   }
+
   function toggleFullWidth() {
     setPageProperty({ fullWidth: !page.fullWidth });
   }
+
   function setFontFamily(fontFamily: 'serif' | 'mono' | 'default') {
     setPageProperty({ fontFamily });
   }
+
   async function onDeletePage() {
-    if (page) {
-      await deletePage({
-        pageId
-      });
-      closeMenu();
-      if (page.type === 'board') {
-        await charmClient.deleteBlock(pageId, () => {});
-      }
+    await deletePage({
+      pageId
+    });
+    if (page?.type === 'bounty') {
+      setBounties((_bounties) => _bounties.filter((_bounty) => _bounty.id !== page.id));
     }
+    onComplete();
   }
+
   async function exportMarkdownPage() {
     const _page = await charmClient.pages.getPage(pageId);
     exportMarkdown({
@@ -135,7 +156,7 @@ export function DocumentPageActionList({ page, closeMenu, pagePermissions, undoE
     }).catch(() => {
       showMessage('Error exporting markdown', 'error');
     });
-    closeMenu();
+    onComplete();
   }
 
   const charmversePage = members.find((member) => member.id === page.createdBy);
@@ -145,7 +166,7 @@ export function DocumentPageActionList({ page, closeMenu, pagePermissions, undoE
       categoryId: getDefaultCreateCategory().id,
       pageId
     });
-    closeMenu();
+    onComplete();
     router.push(`/${router.query.domain}/${convertedProposal.path}`);
   }
 
@@ -214,7 +235,7 @@ export function DocumentPageActionList({ page, closeMenu, pagePermissions, undoE
       <ListItemButton
         onClick={() => {
           setCurrentPageActionDisplay('comments');
-          closeMenu();
+          onComplete();
         }}
       >
         <MessageOutlinedIcon
@@ -228,7 +249,7 @@ export function DocumentPageActionList({ page, closeMenu, pagePermissions, undoE
       <ListItemButton
         onClick={() => {
           setCurrentPageActionDisplay('suggestions');
-          closeMenu();
+          onComplete();
         }}
       >
         <RateReviewOutlinedIcon
@@ -241,18 +262,18 @@ export function DocumentPageActionList({ page, closeMenu, pagePermissions, undoE
       </ListItemButton>
       <Divider />
       {(page.type === 'card' || page.type === 'card_synced' || page.type === 'page') && (
-        <AddToFavoritesAction pageId={pageId} onComplete={closeMenu} />
+        <AddToFavoritesAction pageId={pageId} onComplete={onComplete} />
       )}
       {page && (
         <DuplicatePageAction
-          onComplete={closeMenu}
+          onComplete={onComplete}
           pageId={pageId}
           pageType={page.type}
           pagePermissions={pagePermissions}
           redirect
         />
       )}
-      <CopyPageLinkAction path={router.asPath} closeMenu={closeMenu} />
+      <CopyPageLinkAction path={router.asPath} onComplete={onComplete} />
 
       <Divider />
       {(page.type === 'card' || page.type === 'card_synced' || page.type === 'page') && (
@@ -294,7 +315,7 @@ export function DocumentPageActionList({ page, closeMenu, pagePermissions, undoE
       {pageType === 'bounty' && basePageBounty && (
         <>
           <Divider />
-          <BountyActions bountyId={basePageBounty.id} onClick={closeMenu} />
+          <BountyActions bountyId={basePageBounty.id} onClick={onComplete} />
         </>
       )}
       {charmversePage && (

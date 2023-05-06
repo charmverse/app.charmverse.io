@@ -1,4 +1,4 @@
-import { KanbanPageActions } from 'components/common/PageActions/KanbanPageActions';
+import { KanbanPageActions } from 'components/common/PageActions/KanbanPageActionButton';
 import { useTasks } from 'components/nexus/hooks/useTasks';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useUser } from 'hooks/useUser';

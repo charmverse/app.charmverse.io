@@ -37,20 +37,20 @@ import { useUser } from 'hooks/useUser';
 import type { Board } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { CardPage } from 'lib/focalboard/card';
-import type { PageMeta } from 'lib/pages/interfaces';
 import type { IPagePermissionFlags } from 'lib/permissions/pages';
 
 import { isValidCsvResult, addNewCards } from '../utils/databasePageOptions';
 
 import { DocumentHistory } from './DocumentHistory';
+import type { PageActionMeta } from './DocumentPageActionList';
 
 type Props = {
-  closeMenu: VoidFunction;
-  page: PageMeta;
+  onComplete: VoidFunction;
+  page: PageActionMeta;
   pagePermissions?: IPagePermissionFlags;
 };
 
-export function DatabasePageActionList({ pagePermissions, closeMenu, page }: Props) {
+export function DatabasePageActionList({ pagePermissions, onComplete, page }: Props) {
   const pageId = page.id;
   const router = useRouter();
   const { pages, deletePage, mutatePagesRemove } = usePages();
@@ -92,7 +92,7 @@ export function DatabasePageActionList({ pagePermissions, closeMenu, page }: Pro
     await deletePage({
       pageId
     });
-    closeMenu();
+    onComplete();
   }
 
   async function deleteCards() {
@@ -124,7 +124,7 @@ export function DatabasePageActionList({ pagePermissions, closeMenu, page }: Pro
       log.error('CSV export failed', error);
       showMessage('Export failed', 'error');
     }
-    closeMenu();
+    onComplete();
     const spaceId = pages[pageId]?.spaceId;
     if (spaceId) {
       charmClient.track.trackAction('export_page_csv', { pageId, spaceId });
@@ -139,7 +139,7 @@ export function DatabasePageActionList({ pagePermissions, closeMenu, page }: Pro
         worker: event.target.files[0].size > 100000, // 100kb
         delimiter: '\n', // fallback for a csv with 1 column
         complete: async (results) => {
-          closeMenu();
+          onComplete();
           if (results.errors && results.errors[0]) {
             log.warn('CSV import failed', { spaceId: currentSpace?.id, pageId, error: results.errors[0] });
             showMessage(results.errors[0].message ?? 'There was an error importing your csv file.', 'warning');
@@ -200,14 +200,14 @@ export function DatabasePageActionList({ pagePermissions, closeMenu, page }: Pro
 
   return (
     <List dense>
-      <AddToFavoritesAction pageId={pageId} onComplete={closeMenu} />
+      <AddToFavoritesAction pageId={pageId} onComplete={onComplete} />
       <DuplicatePageAction
-        onComplete={closeMenu}
+        onComplete={onComplete}
         pageId={pageId}
         pageType={boardPage?.type}
         pagePermissions={pagePermissions}
       />
-      <CopyPageLinkAction path={window.location.href} closeMenu={closeMenu} />
+      <CopyPageLinkAction path={window.location.href} onComplete={onComplete} />
       <Divider />
       <Tooltip title={!pagePermissions?.delete ? "You don't have permission to delete this page" : ''}>
         <div>

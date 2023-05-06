@@ -5,7 +5,7 @@ import { Box } from '@mui/system';
 import { FormattedMessage } from 'react-intl';
 
 import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
-import { KanbanPageActions } from 'components/common/PageActions/KanbanPageActions';
+import { KanbanPageActions } from 'components/common/PageActions/KanbanPageActionButton';
 import { PageIcon } from 'components/common/PageLayout/components/PageIcon';
 import { usePage } from 'hooks/usePage';
 import type { PageMeta } from 'lib/pages';
@@ -39,17 +39,14 @@ interface Props {
   readOnly?: boolean;
   bounty: Bounty;
   page: PageMeta;
-  onDuplicate?: (duplicatePageResponse: DuplicatePageResponse) => void;
 }
 
-export function BountyGalleryCard({ page: bountyPage, bounty, readOnly, onClick, onDelete, onDuplicate }: Props) {
+export function BountyGalleryCard({ page: bountyPage, bounty, readOnly, onClick, onDelete }: Props) {
   const { page } = usePage({ pageIdOrPath: bountyPage?.id });
 
   return bountyPage ? (
     <StyledBox onClick={onClick} className='GalleryCard' data-test={`bounty-card-${bounty.id}`}>
-      {!readOnly && (
-        <KanbanPageActions onDuplicate={onDuplicate} page={bountyPage} onClickDelete={() => onDelete(bounty.id)} />
-      )}
+      {!readOnly && <KanbanPageActions page={bountyPage} onClickDelete={() => onDelete(bounty.id)} />}
       <div className='gallery-title'>
         {bountyPage?.icon ? (
           <PageIcon isEditorEmpty={!bountyPage?.hasContent} pageType='card' icon={bountyPage.icon} />
