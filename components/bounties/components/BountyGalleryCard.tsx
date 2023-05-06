@@ -9,7 +9,6 @@ import { KanbanPageActionsMenuButton } from 'components/common/PageActions/Kanba
 import { PageIcon } from 'components/common/PageLayout/components/PageIcon';
 import { usePage } from 'hooks/usePage';
 import type { PageMeta } from 'lib/pages';
-import type { DuplicatePageResponse } from 'lib/pages/duplicatePage';
 import { fancyTrim } from 'lib/utilities/strings';
 
 import BountyStatusBadge from './BountyStatusBadge';
