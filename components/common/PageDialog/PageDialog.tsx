@@ -63,7 +63,7 @@ export function PageDialog(props: Props) {
     }
   }, [page?.id]);
 
-  function onClose() {
+  function close() {
     popupState.close();
     props.onClose();
   }
@@ -95,7 +95,9 @@ export function PageDialog(props: Props) {
 
   return (
     <Dialog
-      toolsMenu={!hideToolsMenu && !readOnly && page && <FullPageActionsMenuButton insideModal page={page} />}
+      toolsMenu={
+        !hideToolsMenu && !readOnly && page && <FullPageActionsMenuButton insideModal page={page} onDelete={close} />
+      }
       toolbar={
         <Box display='flex' justifyContent='space-between'>
           <Button
@@ -103,7 +105,7 @@ export function PageDialog(props: Props) {
             size='small'
             color='secondary'
             href={fullPageUrl}
-            onClick={onClose}
+            onClick={close}
             variant='text'
             startIcon={<OpenInFullIcon fontSize='small' />}
           >
@@ -112,7 +114,7 @@ export function PageDialog(props: Props) {
           {toolbar}
         </Box>
       }
-      onClose={onClose}
+      onClose={close}
     >
       {page && (
         <DocumentPage insideModal page={page} savePage={savePage} refreshPage={refreshPage} readOnly={readOnlyPage} />

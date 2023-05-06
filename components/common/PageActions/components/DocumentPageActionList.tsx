@@ -100,9 +100,17 @@ type Props = {
   page: PageActionMeta;
   pagePermissions?: IPagePermissionFlags;
   undoEditorChanges?: VoidFunction;
+  onDelete?: VoidFunction;
 };
 
-export function DocumentPageActionList({ insideModal, page, onComplete, pagePermissions, undoEditorChanges }: Props) {
+export function DocumentPageActionList({
+  insideModal,
+  page,
+  onComplete,
+  onDelete,
+  pagePermissions,
+  undoEditorChanges
+}: Props) {
   const pageId = page.id;
   const router = useRouter();
   const { updatePage, deletePage } = usePages();
@@ -144,6 +152,7 @@ export function DocumentPageActionList({ insideModal, page, onComplete, pagePerm
       setBounties((_bounties) => _bounties.filter((_bounty) => _bounty.id !== page.id));
     }
     onComplete();
+    onDelete?.();
   }
 
   async function exportMarkdownPage() {

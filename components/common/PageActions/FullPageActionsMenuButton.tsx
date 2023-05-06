@@ -20,9 +20,10 @@ type Props = {
   page?: PageActionMeta | null;
   post?: PostWithVotes | null;
   insideModal?: boolean;
+  onDelete?: VoidFunction;
 };
 
-export function FullPageActionsMenuButton({ page, post, insideModal }: Props) {
+export function FullPageActionsMenuButton({ page, post, insideModal, onDelete }: Props) {
   let pageOptionsList: ReactNode = null;
   const router = useRouter();
   const pageMenuAnchor = useRef();
@@ -68,7 +69,13 @@ export function FullPageActionsMenuButton({ page, post, insideModal }: Props) {
 
   if (isBasePageDocument && page) {
     pageOptionsList = (
-      <DocumentPageActionList insideModal page={page} pagePermissions={pagePermissions} onComplete={closeMenu} />
+      <DocumentPageActionList
+        insideModal={insideModal}
+        page={page}
+        pagePermissions={pagePermissions}
+        onComplete={closeMenu}
+        onDelete={onDelete}
+      />
     );
   } else if (isBasePageDatabase && page) {
     pageOptionsList = <DatabasePageActionList page={page} pagePermissions={pagePermissions} onComplete={closeMenu} />;
@@ -76,6 +83,7 @@ export function FullPageActionsMenuButton({ page, post, insideModal }: Props) {
     pageOptionsList = (
       <ForumPostActionList
         post={post}
+        onDelete={onDelete}
         postPermissions={postPermissions}
         onComplete={closeMenu}
         undoEditorChanges={undoEditorChanges}

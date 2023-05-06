@@ -24,12 +24,14 @@ export function ForumPostActionList({
   onComplete,
   undoEditorChanges,
   post,
-  postPermissions
+  postPermissions,
+  onDelete
 }: {
   post?: PostWithVotes; // if post is undefined, it is a new post
   postPermissions?: PostPermissionFlags;
   onComplete: VoidFunction;
   undoEditorChanges: VoidFunction;
+  onDelete?: VoidFunction;
 }) {
   const { showMessage } = useSnackbar();
   const { getMemberById, members } = useMembers();
@@ -49,6 +51,7 @@ export function ForumPostActionList({
         router.push(`/${router.query.domain}/forum`);
       });
       onComplete();
+      onDelete?.();
     }
   }
 
