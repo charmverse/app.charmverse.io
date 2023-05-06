@@ -47,7 +47,7 @@ export class ForumHomePage {
     this.closeModalButton = page.locator('data-test=close-modal');
     this.postDialog = page.locator('data-test=dialog');
     this.postDialogCloseButton = page.locator('data-test=close-dialog');
-    this.postDialogContextMenu = page.locator('data-test=page-actions-context-menu');
+    this.postDialogContextMenu = page.locator('data-test=header--forum-post-actions');
     this.postDialogDeleteButton = page.locator('data-test=delete-page-from-context');
     this.categoryDescriptionInput = page.locator('data-test=category-description-input').locator('textarea').first();
     this.saveCategoryDescription = page.locator('data-test=save-category-description');

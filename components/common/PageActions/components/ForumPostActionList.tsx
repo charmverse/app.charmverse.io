@@ -84,7 +84,7 @@ export function ForumPostActionList({
       <UndoAction onClick={undoEditorChanges} disabled={!postPermissions?.edit_post} />
       <Divider />
       <ExportMarkdownAction onClick={exportMarkdownPage} />
-      <ExportToPDFAction pdfTitle={post?.title} />
+      <ExportToPDFAction pdfTitle={post?.title} onComplete={onComplete} />
       <Tooltip
         title={
           post?.isDraft

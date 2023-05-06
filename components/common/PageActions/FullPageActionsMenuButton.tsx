@@ -25,10 +25,9 @@ export function FullPageActionsMenuButton({ page, post }: Props) {
   let pageOptionsList: ReactNode = null;
   const router = useRouter();
   const pageMenuAnchor = useRef();
-  const isForumPost = router.route === '/[domain]/forum/post/[pagePath]';
+  const isForumPost = !!post || router.route === '/[domain]/forum/post/[pagePath]';
   const theme = useTheme();
   const isLargeScreen = useMediaQuery(theme.breakpoints.up('md'));
-  const [pageMenuOpen, setPageMenuOpen] = useState(false);
   const [pageMenuAnchorElement, setPageMenuAnchorElement] = useState<null | Element>(null);
   const { permissions: pagePermissions } = usePagePermissions({
     pageIdOrPath: page ? page.id : (null as any)
@@ -50,7 +49,6 @@ export function FullPageActionsMenuButton({ page, post }: Props) {
   }, [currentPageOrPostId]);
 
   function closeMenu() {
-    setPageMenuOpen(false);
     setPageMenuAnchorElement(null);
   }
 
@@ -90,7 +88,6 @@ export function FullPageActionsMenuButton({ page, post }: Props) {
             <IconButton
               size={isLargeScreen ? 'small' : 'medium'}
               onClick={() => {
-                setPageMenuOpen(!pageMenuOpen);
                 setPageMenuAnchorElement(pageMenuAnchor.current || null);
               }}
             >
@@ -100,8 +97,8 @@ export function FullPageActionsMenuButton({ page, post }: Props) {
         </div>
         <Popover
           anchorEl={pageMenuAnchorElement}
-          open={pageMenuOpen}
-          onClose={() => setPageMenuOpen(false)}
+          open={!!pageMenuAnchorElement}
+          onClose={closeMenu}
           anchorOrigin={{
             vertical: 'bottom',
             horizontal: 'left'

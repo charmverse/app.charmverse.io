@@ -311,7 +311,7 @@ export function DocumentPageActionList({ page, onComplete, pagePermissions, undo
         )}
       />
       <ExportMarkdownAction disabled={!isExportablePage} onClick={exportMarkdownPage} />
-      <ExportToPDFAction pdfTitle={page.title} />
+      <ExportToPDFAction pdfTitle={page.title} onComplete={onComplete} />
       {pageType === 'bounty' && basePageBounty && (
         <>
           <Divider />

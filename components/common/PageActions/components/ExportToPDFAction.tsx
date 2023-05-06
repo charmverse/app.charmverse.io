@@ -21,11 +21,12 @@ function PrintButton() {
   );
 }
 
-export function ExportToPDFAction({ pdfTitle }: { pdfTitle?: string }) {
+export function ExportToPDFAction({ pdfTitle, onComplete }: { pdfTitle?: string; onComplete: VoidFunction }) {
   const { printRef } = useCharmEditor();
   const theme = useTheme();
   return (
     <ReactToPrint
+      onAfterPrint={onComplete}
       trigger={PrintButton}
       content={() => printRef?.current}
       bodyClass={theme.palette.mode === 'dark' ? 'dark-mode' : ''}

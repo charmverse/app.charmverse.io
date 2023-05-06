@@ -2,7 +2,7 @@ import type { Post, PostCategory } from '@charmverse/core/prisma';
 import CommentIcon from '@mui/icons-material/Comment';
 import { Box, Divider, Stack, Typography } from '@mui/material';
 import { useRouter } from 'next/router';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
@@ -21,6 +21,7 @@ import { ScrollableWindow } from 'components/common/PageLayout';
 import UserDisplay from 'components/common/UserDisplay';
 import { PostCommentForm } from 'components/forum/components/PostPage/components/PostCommentForm';
 import { usePostCategoryPermissions } from 'components/forum/hooks/usePostCategoryPermissions';
+import { useCharmEditor } from 'hooks/useCharmEditor';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useForumCategories } from 'hooks/useForumCategories';
 import { useMembers } from 'hooks/useMembers';
@@ -32,6 +33,7 @@ import type { PostCommentWithVoteAndChildren } from 'lib/forums/comments/interfa
 import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
+import { fontClassName } from 'theme/fonts';
 
 import type { FormInputs } from '../interfaces';
 import { usePostDialog } from '../PostDialog/hooks/usePostDialog';
@@ -44,7 +46,6 @@ import { DraftPostBanner } from './DraftPostBanner';
 type Props = {
   spaceId: string;
   post: Post | null;
-  onSave?: () => void;
   setFormInputs: (params: Partial<FormInputs>) => void;
   formInputs: FormInputs;
   contentUpdated: boolean;
@@ -58,7 +59,6 @@ export function PostPage({
   onTitleChange,
   post,
   spaceId,
-  onSave,
   setFormInputs,
   formInputs,
   contentUpdated,
@@ -71,6 +71,7 @@ export function PostPage({
   const { categories, getForumCategoryById } = useForumCategories();
   const { showMessage } = useSnackbar();
   const { showPost } = usePostDialog();
+  const { setPageProps, printRef: _printRef } = useCharmEditor();
   const [isPublishingDraftPost, setIsPublishingDraftPost] = useState(false);
   // We should only set writeable categories for new post
   const [categoryId, setCategoryId] = useState(
@@ -122,6 +123,16 @@ export function PostPage({
       onTitleChange(post.title);
     }
   }, [post]);
+
+  // keep a ref in sync for printing
+  const printRef = useRef(null);
+  useEffect(() => {
+    if (printRef?.current !== _printRef?.current) {
+      setPageProps({
+        printRef
+      });
+    }
+  }, [printRef, _printRef]);
 
   async function createForumPost(isDraft: boolean) {
     if (checkIsContentEmpty(formInputs.content) || !categoryId) {
@@ -222,7 +233,7 @@ export function PostPage({
       {post?.proposalId && <ProposalBanner type='post' proposalId={post.proposalId} />}
       <ScrollableWindow>
         {post?.isDraft && <DraftPostBanner />}
-        <Stack>
+        <div ref={printRef} className={`document-print-container ${fontClassName}`}>
           <Stack flexDirection='row'>
             <Container top={50}>
               <Box minHeight={300} data-test='post-charmeditor'>
@@ -351,7 +362,7 @@ export function PostPage({
               </Box>
             )}
           </Stack>
-        </Stack>
+        </div>
       </ScrollableWindow>
     </>
   );
