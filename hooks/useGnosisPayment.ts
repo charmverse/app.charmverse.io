@@ -76,14 +76,17 @@ export function useGnosisPayment({ chainId, safeAddress, transactions, onSuccess
   };
 }
 
-export function getPaymentErrorMessage(error: any) {
+export function getPaymentErrorMessage(error: any): { message: string; level: 'error' | 'warning' } {
   const errorMessage = extractWalletErrorMessage(error);
 
   if (errorMessage.toLowerCase().includes('underlying network changed')) {
-    return "You've changed your active network.\r\nRe-select 'Make payment' to complete this transaction";
+    return {
+      message: "You've changed your active network.\r\nRe-select 'Send payment' to complete this transaction",
+      level: 'warning'
+    };
   }
 
-  return errorMessage;
+  return { message: errorMessage, level: 'error' };
 }
 
 function extractWalletErrorMessage(error: any): string {
@@ -95,6 +98,8 @@ function extractWalletErrorMessage(error: any): string {
     return 'A valid recipient must be provided';
   } else if (error?.reason) {
     return error.reason;
+  } else if (error?.data?.message) {
+    return error.data.message;
   } else if (error?.message) {
     return error.message;
   } else if (typeof error === 'object') {

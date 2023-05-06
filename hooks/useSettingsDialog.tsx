@@ -3,11 +3,15 @@ import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
 import { useEffect, useMemo, createContext, useContext, useState } from 'react';
 
+import type { SETTINGS_TABS, ACCOUNT_TABS } from 'components/settings/config';
+
+type SettingsPath = (typeof SETTINGS_TABS)[number]['path'] | (typeof ACCOUNT_TABS)[number]['path'];
+
 type IContext = {
   open: boolean;
   activePath: string;
   onClose: () => any;
-  onClick: (path?: string) => void;
+  onClick: (path?: SettingsPath) => void;
 };
 
 export const SettingsDialogContext = createContext<Readonly<IContext>>({

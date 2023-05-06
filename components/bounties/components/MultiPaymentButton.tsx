@@ -30,7 +30,8 @@ export default function MultiPaymentButton({ isLoading, chainId, safeAddress, tr
     try {
       await makePayment();
     } catch (error: any) {
-      showMessage(getPaymentErrorMessage(error), 'error');
+      const { message, level } = getPaymentErrorMessage(error);
+      showMessage(message, level);
     }
   };
 
@@ -41,7 +42,7 @@ export default function MultiPaymentButton({ isLoading, chainId, safeAddress, tr
           disabled={isLoading || !safe || transactions.length === 0 || !chainId || !safeAddress}
           onClick={makeSafePayment}
         >
-          Make Payment ({transactions.length})
+          Send Payment ({transactions.length})
         </Button>
       </span>
     </Tooltip>
