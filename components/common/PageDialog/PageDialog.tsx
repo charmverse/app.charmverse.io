@@ -14,7 +14,6 @@ import Button from 'components/common/Button';
 import { useCurrentPage } from 'hooks/useCurrentPage';
 import { usePage } from 'hooks/usePage';
 import { usePages } from 'hooks/usePages';
-import type { BountyWithDetails } from 'lib/bounties';
 import { AllowedPagePermissions } from 'lib/permissions/pages/available-page-permissions.class';
 import debouncePromise from 'lib/utilities/debouncePromise';
 
@@ -24,19 +23,18 @@ interface Props {
   pageId?: string;
   onClose: () => void;
   readOnly?: boolean;
-  bounty?: BountyWithDetails | null;
   toolbar?: ReactNode;
   hideToolsMenu?: boolean;
 }
 
 export function PageDialog(props: Props) {
-  const { hideToolsMenu = false, pageId, bounty, toolbar, readOnly } = props;
+  const { hideToolsMenu = false, pageId, toolbar, readOnly } = props;
   const mounted = useRef(false);
   const popupState = usePopupState({ variant: 'popover', popupId: 'page-dialog' });
   const router = useRouter();
   const { setCurrentPageId } = useCurrentPage();
 
-  const { updatePage, deletePage } = usePages();
+  const { updatePage } = usePages();
   const { page, refreshPage } = usePage({ pageIdOrPath: pageId });
   const pagePermissions = page?.permissionFlags || new AllowedPagePermissions().full;
   const domain = router.query.domain as string;

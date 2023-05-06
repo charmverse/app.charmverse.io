@@ -22,7 +22,7 @@ import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { PageMeta, PageUpdates } from 'lib/pages';
 import type { IPagePermissionFlags } from 'lib/permissions/pages';
-import { monoFont, serifFont } from 'theme/fonts';
+import { fontClassName } from 'theme/fonts';
 
 import { exportMarkdown } from '../utils/exportMarkdown';
 
@@ -174,7 +174,7 @@ export function DocumentPageActionList({ page, onComplete, pagePermissions, undo
     <List data-test='header--page-actions' dense>
       <Box px={2.5} mb={1}>
         <Typography variant='caption'>Style</Typography>
-        <Box display='flex' mt={0.5} className={`${serifFont.variable} ${monoFont.variable}`}>
+        <Box display='flex' mt={0.5} className={fontClassName}>
           <StyledFontButton
             size='small'
             color={page.fontFamily === 'default' ? 'primary' : 'secondary'}

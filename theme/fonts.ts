@@ -43,3 +43,5 @@ export const monoFont = localFont({
     }
   ]
 });
+
+export const fontClassName = `${serifFont.variable} ${monoFont.variable}`;
