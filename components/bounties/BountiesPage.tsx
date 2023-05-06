@@ -12,7 +12,7 @@ import Button from 'components/common/Button';
 import { EmptyStateVideo } from 'components/common/EmptyStateVideo';
 import Link from 'components/common/Link';
 import { PageDialogProvider } from 'components/common/PageDialog/hooks/usePageDialog';
-import PageDialogGlobalModal from 'components/common/PageDialog/PageDialogGlobal';
+import { PageDialogGlobal } from 'components/common/PageDialog/PageDialogGlobal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { BountyWithDetails } from 'lib/bounties';
 import { sortArrayByObjectProperty } from 'lib/utilities/array';
@@ -193,7 +193,7 @@ export default function BountiesPage({ publicMode = false, bounties }: Props) {
           )}
         </div>
       </div>
-      <PageDialogGlobalModal />
+      <PageDialogGlobal />
     </PageDialogProvider>
   );
 }

@@ -4,7 +4,7 @@ import { usePageDialog } from './hooks/usePageDialog';
 import { PageDialog } from './PageDialog';
 
 // a wrapper of page dialog that uses usePageDialogHook
-export default function PageDialogGlobal() {
+export function PageDialogGlobal() {
   const { bounties } = useBounties();
   const { props, hidePage } = usePageDialog();
   const { bountyId, hideToolsMenu, pageId, readOnly, toolbar } = props;
