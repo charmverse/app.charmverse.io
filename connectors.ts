@@ -242,11 +242,6 @@ const RPC = {
       decimals: 18,
       address: '0x0000000000000000000000000000000000000000',
       logoURI: 'https://assets.coingecko.com/coins/images/279/small/ethereum.png?1595348880'
-      // name: 'Optimism',
-      // symbol: 'OP',
-      // decimals: 18,
-      // address: '0x0000000000000000000000000000000000000000',
-      // logoURI: 'https://assets.coingecko.com/coins/images/4713/small/matic-token-icon.png?1624446912'
     },
     rpcUrls: ['https://mainnet.optimism.io'],
     gnosisUrl: 'https://safe-transaction.optimism.gnosis.io',
