@@ -5,10 +5,12 @@ import { useSWRConfig } from 'swr';
 
 import charmClient from 'charmClient';
 import { useBounties } from 'hooks/useBounties';
+import { useSnackbar } from 'hooks/useSnackbar';
 
 export function BountyActions({ bountyId, onClick }: { bountyId: string; onClick?: VoidFunction }) {
   const { refreshBounty, bounties } = useBounties();
   const { mutate } = useSWRConfig();
+  const { showMessage } = useSnackbar();
   const bounty = bounties.find((_bounty) => _bounty.id === bountyId);
 
   if (!bounty) {
@@ -27,27 +29,35 @@ export function BountyActions({ bountyId, onClick }: { bountyId: string; onClick
     (bounty?.status === 'complete' || (bounty?.status !== 'inProgress' && bounty?.status !== 'open')) ?? true;
 
   async function markBountyAsPaid() {
-    await charmClient.bounties.markBountyAsPaid(bountyId);
-    if (refreshBounty) {
-      refreshBounty(bountyId);
+    try {
+      await charmClient.bounties.markBountyAsPaid(bountyId);
+      if (refreshBounty) {
+        refreshBounty(bountyId);
+      }
+      await mutate(`/bounties/${bountyId}/applications`);
+      onClick?.();
+    } catch (error) {
+      showMessage((error as Error)?.message || (error as any), 'error');
     }
-    await mutate(`/bounties/${bountyId}/applications`);
-    onClick?.();
   }
 
   async function closeBounty() {
-    await charmClient.bounties.closeBounty(bountyId);
-    if (refreshBounty) {
-      refreshBounty(bountyId);
+    try {
+      await charmClient.bounties.closeBounty(bountyId);
+      if (refreshBounty) {
+        refreshBounty(bountyId);
+      }
+      onClick?.();
+    } catch (error) {
+      showMessage((error as Error)?.message || (error as any), 'error');
     }
-    onClick?.();
   }
 
   return (
     <>
       <Tooltip title={isMarkBountyPaidButtonDisabled ? `You don't have permission to mark this bounty as paid` : ''}>
         <div>
-          <MenuItem dense onClick={() => markBountyAsPaid()} disabled={isMarkBountyPaidButtonDisabled}>
+          <MenuItem dense onClick={markBountyAsPaid} disabled={isMarkBountyPaidButtonDisabled}>
             <PaidIcon
               sx={{
                 mr: 1
@@ -62,7 +72,7 @@ export function BountyActions({ bountyId, onClick }: { bountyId: string; onClick
         title={isMarkBountyCompletedButtonDisabled ? `You don't have permission to mark this bounty as complete` : ''}
       >
         <div>
-          <MenuItem dense onClick={() => closeBounty()} disabled={isMarkBountyCompletedButtonDisabled}>
+          <MenuItem dense onClick={closeBounty} disabled={isMarkBountyCompletedButtonDisabled}>
             <CheckCircleOutlinedIcon
               sx={{
                 mr: 1
