@@ -13,7 +13,6 @@ import Button from 'components/common/Button';
 import { DialogTitle } from 'components/common/Modal';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { FullPageActionsMenuButton } from 'components/common/PageActions/FullPageActionsMenuButton';
-import { KanbanPageActions } from 'components/common/PageActions/KanbanPageActionButton';
 import { useSmallScreen } from 'hooks/useMediaScreens';
 import { useUser } from 'hooks/useUser';
 import type { PostWithVotes } from 'lib/forums/posts/interfaces';
@@ -64,23 +63,6 @@ export function PostDialog({ post, isLoading, spaceId, onClose, newPostCategory 
     setContentUpdated(false);
     setShowConfirmDialog(false);
     setIsDraftPostListOpen(false);
-  }
-
-  function deletePost() {
-    if (post) {
-      charmClient.forum.deleteForumPost(post.id).then(() => {
-        mutateDraftPosts(
-          (_posts) => {
-            if (_posts) {
-              return _posts.filter((_post) => _post.id !== post.id);
-            }
-            return [];
-          },
-          { revalidate: false }
-        );
-        close();
-      });
-    }
   }
 
   function showDraftPost(draftPost: Post) {

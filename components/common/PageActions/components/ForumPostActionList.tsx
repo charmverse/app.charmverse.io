@@ -48,6 +48,7 @@ export function ForumPostActionList({
       charmClient.forum.deleteForumPost(post.id).then(() => {
         router.push(`/${router.query.domain}/forum`);
       });
+      onComplete();
     }
   }
 
