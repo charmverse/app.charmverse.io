@@ -145,6 +145,9 @@ export function DocumentPageActionList({
   }
 
   async function onDeletePage() {
+    if (page.type === 'card' || page.type === 'card_synced') {
+      await charmClient.deleteBlock(page.id, () => null);
+    }
     await deletePage({
       pageId
     });
