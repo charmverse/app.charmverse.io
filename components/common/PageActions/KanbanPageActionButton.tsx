@@ -7,7 +7,7 @@ import { useState } from 'react';
 import { PageActionsMenu } from './components/PageActionsMenu';
 
 type Props = {
-  page: {
+  page?: {
     createdBy: string;
     type?: PageType;
     id: string;
@@ -23,7 +23,13 @@ type Props = {
   hideDuplicateAction?: boolean;
 };
 
-export function KanbanPageActions({ page, onClickDelete, hideDuplicateAction, onClickEdit, readOnly }: Props) {
+export function KanbanPageActionsMenuButton({
+  page,
+  onClickDelete,
+  hideDuplicateAction,
+  onClickEdit,
+  readOnly
+}: Props) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
@@ -36,15 +42,17 @@ export function KanbanPageActions({ page, onClickDelete, hideDuplicateAction, on
       <IconButton size='small' className='icons' onClick={handleClick}>
         <MoreHorizIcon color='secondary' fontSize='small' />
       </IconButton>
-      <PageActionsMenu
-        anchorEl={anchorEl}
-        setAnchorEl={setAnchorEl}
-        page={page}
-        onClickDelete={onClickDelete}
-        hideDuplicateAction={hideDuplicateAction}
-        onClickEdit={onClickEdit}
-        readOnly={readOnly}
-      />
+      {page && (
+        <PageActionsMenu
+          anchorEl={anchorEl}
+          setAnchorEl={setAnchorEl}
+          page={page}
+          onClickDelete={onClickDelete}
+          hideDuplicateAction={hideDuplicateAction}
+          onClickEdit={onClickEdit}
+          readOnly={readOnly}
+        />
+      )}
     </div>
   );
 }

@@ -5,7 +5,7 @@ import { Box } from '@mui/system';
 import { FormattedMessage } from 'react-intl';
 
 import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
-import { KanbanPageActions } from 'components/common/PageActions/KanbanPageActionButton';
+import { KanbanPageActionsMenuButton } from 'components/common/PageActions/KanbanPageActionButton';
 import { PageIcon } from 'components/common/PageLayout/components/PageIcon';
 import { usePage } from 'hooks/usePage';
 import type { PageMeta } from 'lib/pages';
@@ -46,7 +46,7 @@ export function BountyGalleryCard({ page: bountyPage, bounty, readOnly, onClick,
 
   return bountyPage ? (
     <StyledBox onClick={onClick} className='GalleryCard' data-test={`bounty-card-${bounty.id}`}>
-      {!readOnly && <KanbanPageActions page={bountyPage} onClickDelete={() => onDelete(bounty.id)} />}
+      {!readOnly && <KanbanPageActionsMenuButton page={bountyPage} onClickDelete={() => onDelete(bounty.id)} />}
       <div className='gallery-title'>
         {bountyPage?.icon ? (
           <PageIcon isEditorEmpty={!bountyPage?.hasContent} pageType='card' icon={bountyPage.icon} />

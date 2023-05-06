@@ -1,7 +1,7 @@
 import { useBounties } from 'hooks/useBounties';
 
 import { usePageDialog } from './hooks/usePageDialog';
-import PageDialog from './PageDialog';
+import { PageDialog } from './PageDialog';
 
 // a wrapper of page dialog that uses usePageDialogHook
 export default function PageDialogGlobal() {
