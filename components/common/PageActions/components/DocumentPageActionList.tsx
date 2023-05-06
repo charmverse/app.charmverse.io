@@ -95,13 +95,14 @@ function DeleteMenuItem({ disabled = false, onClick }: { disabled?: boolean; onC
 }
 
 type Props = {
+  insideModal?: boolean;
   onComplete: VoidFunction;
   page: PageActionMeta;
   pagePermissions?: IPagePermissionFlags;
   undoEditorChanges?: VoidFunction;
 };
 
-export function DocumentPageActionList({ page, onComplete, pagePermissions, undoEditorChanges }: Props) {
+export function DocumentPageActionList({ insideModal, page, onComplete, pagePermissions, undoEditorChanges }: Props) {
   const pageId = page.id;
   const router = useRouter();
   const { updatePage, deletePage } = usePages();
@@ -231,35 +232,39 @@ export function DocumentPageActionList({ page, onComplete, pagePermissions, undo
           label={<Typography variant='body2'>Full width</Typography>}
         />
       </ListItemButton>
-      <Divider />
-      <ListItemButton
-        onClick={() => {
-          setCurrentPageActionDisplay('comments');
-          onComplete();
-        }}
-      >
-        <MessageOutlinedIcon
-          fontSize='small'
-          sx={{
-            mr: 1
-          }}
-        />
-        <ListItemText primary='View comments' />
-      </ListItemButton>
-      <ListItemButton
-        onClick={() => {
-          setCurrentPageActionDisplay('suggestions');
-          onComplete();
-        }}
-      >
-        <RateReviewOutlinedIcon
-          fontSize='small'
-          sx={{
-            mr: 1
-          }}
-        />
-        <ListItemText primary='View suggestions' />
-      </ListItemButton>
+      {!insideModal && (
+        <>
+          <Divider />
+          <ListItemButton
+            onClick={() => {
+              setCurrentPageActionDisplay('comments');
+              onComplete();
+            }}
+          >
+            <MessageOutlinedIcon
+              fontSize='small'
+              sx={{
+                mr: 1
+              }}
+            />
+            <ListItemText primary='View comments' />
+          </ListItemButton>
+          <ListItemButton
+            onClick={() => {
+              setCurrentPageActionDisplay('suggestions');
+              onComplete();
+            }}
+          >
+            <RateReviewOutlinedIcon
+              fontSize='small'
+              sx={{
+                mr: 1
+              }}
+            />
+            <ListItemText primary='View suggestions' />
+          </ListItemButton>
+        </>
+      )}
       <Divider />
       {(page.type === 'card' || page.type === 'card_synced' || page.type === 'page') && (
         <AddToFavoritesAction pageId={pageId} onComplete={onComplete} />
@@ -275,7 +280,7 @@ export function DocumentPageActionList({ page, onComplete, pagePermissions, undo
       )}
       <CopyPageLinkAction path={router.asPath} onComplete={onComplete} />
 
-      <Divider />
+      <Divider sx={{ my: '0 !important' }} />
       {(page.type === 'card' || page.type === 'card_synced' || page.type === 'page') && (
         <>
           <Tooltip title={!canCreateProposal ? 'You do not have the permission to convert to proposal' : ''}>

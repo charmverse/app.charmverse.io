@@ -95,7 +95,7 @@ export function PageDialog(props: Props) {
 
   return (
     <Dialog
-      toolsMenu={!hideToolsMenu && !readOnly && page && <FullPageActionsMenuButton page={page} />}
+      toolsMenu={!hideToolsMenu && !readOnly && page && <FullPageActionsMenuButton insideModal page={page} />}
       toolbar={
         <Box display='flex' justifyContent='space-between'>
           <Button

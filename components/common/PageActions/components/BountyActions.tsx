@@ -1,6 +1,6 @@
 import CheckCircleOutlinedIcon from '@mui/icons-material/CheckCircleOutlined';
 import PaidIcon from '@mui/icons-material/Paid';
-import { ListItemButton, ListItemText, Tooltip } from '@mui/material';
+import { MenuItem, ListItemText, Tooltip } from '@mui/material';
 import { useSWRConfig } from 'swr';
 
 import charmClient from 'charmClient';
@@ -47,7 +47,7 @@ export function BountyActions({ bountyId, onClick }: { bountyId: string; onClick
     <>
       <Tooltip title={isMarkBountyPaidButtonDisabled ? `You don't have permission to mark this bounty as paid` : ''}>
         <div>
-          <ListItemButton dense onClick={() => markBountyAsPaid()} disabled={isMarkBountyPaidButtonDisabled}>
+          <MenuItem dense onClick={() => markBountyAsPaid()} disabled={isMarkBountyPaidButtonDisabled}>
             <PaidIcon
               sx={{
                 mr: 1
@@ -55,14 +55,14 @@ export function BountyActions({ bountyId, onClick }: { bountyId: string; onClick
               fontSize='small'
             />
             <ListItemText primary='Mark paid' />
-          </ListItemButton>
+          </MenuItem>
         </div>
       </Tooltip>
       <Tooltip
         title={isMarkBountyCompletedButtonDisabled ? `You don't have permission to mark this bounty as complete` : ''}
       >
         <div>
-          <ListItemButton dense onClick={() => closeBounty()} disabled={isMarkBountyCompletedButtonDisabled}>
+          <MenuItem dense onClick={() => closeBounty()} disabled={isMarkBountyCompletedButtonDisabled}>
             <CheckCircleOutlinedIcon
               sx={{
                 mr: 1
@@ -70,7 +70,7 @@ export function BountyActions({ bountyId, onClick }: { bountyId: string; onClick
               fontSize='small'
             />
             <ListItemText primary='Mark complete' />
-          </ListItemButton>
+          </MenuItem>
         </div>
       </Tooltip>
     </>

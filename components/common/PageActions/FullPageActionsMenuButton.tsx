@@ -19,9 +19,10 @@ import type { PostWithVotes } from 'lib/forums/posts/interfaces';
 type Props = {
   page?: PageActionMeta | null;
   post?: PostWithVotes | null;
+  insideModal?: boolean;
 };
 
-export function FullPageActionsMenuButton({ page, post }: Props) {
+export function FullPageActionsMenuButton({ page, post, insideModal }: Props) {
   let pageOptionsList: ReactNode = null;
   const router = useRouter();
   const pageMenuAnchor = useRef();
@@ -66,7 +67,9 @@ export function FullPageActionsMenuButton({ page, post }: Props) {
   }
 
   if (isBasePageDocument && page) {
-    pageOptionsList = <DocumentPageActionList page={page} pagePermissions={pagePermissions} onComplete={closeMenu} />;
+    pageOptionsList = (
+      <DocumentPageActionList insideModal page={page} pagePermissions={pagePermissions} onComplete={closeMenu} />
+    );
   } else if (isBasePageDatabase && page) {
     pageOptionsList = <DatabasePageActionList page={page} pagePermissions={pagePermissions} onComplete={closeMenu} />;
   } else if (isForumPost && post) {
