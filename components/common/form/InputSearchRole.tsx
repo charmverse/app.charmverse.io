@@ -1,9 +1,8 @@
 import type { Role } from '@charmverse/core/prisma';
-import { Autocomplete, TextField } from '@mui/material';
-import Alert from '@mui/material/Alert';
+import { Alert, Autocomplete, TextField } from '@mui/material';
 import type { ComponentProps } from 'react';
 
-import Button from 'components/common/Button';
+import Link from 'components/common/Link';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useRoles } from 'hooks/useRoles';
 import { useSettingsDialog } from 'hooks/useSettingsDialog';
@@ -56,11 +55,11 @@ function InputSearchRoleBase({
 
   if (roles?.length === 0 && showWarningOnNoRoles && !readOnly) {
     return (
-      <Alert severity='warning'>
-        There are no roles in this space. Space admins can create roles in the{' '}
-        <Button variant='text' sx={{ fontWeight: 'bold' }} onClick={() => onClick(`${space?.name}-roles`)}>
-          space settings page
-        </Button>
+      <Alert severity='info'>
+        There are no roles in this space. Space admins can create roles in{' '}
+        <Link href='#' onClick={() => onClick(`roles`)}>
+          Space Settings
+        </Link>
         .
       </Alert>
     );

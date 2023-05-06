@@ -45,7 +45,7 @@ export default function BountiesKanbanView({ bounties, publicMode }: Props) {
   );
 
   function onClose() {
-    router.push({ pathname: router.pathname, query: { domain: router.query.domain } });
+    router.push({ pathname: router.pathname, query: { ...router.query, bountyId: undefined } });
   }
 
   function openPage(bountyId: string) {

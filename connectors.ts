@@ -237,16 +237,16 @@ const RPC = {
     chainId: 10,
     chainName: 'Optimism',
     nativeCurrency: {
-      name: 'Optimism',
-      symbol: 'OP',
+      name: 'Ether',
+      symbol: 'ETH',
       decimals: 18,
       address: '0x0000000000000000000000000000000000000000',
-      logoURI: 'https://assets.coingecko.com/coins/images/4713/small/matic-token-icon.png?1624446912'
+      logoURI: 'https://assets.coingecko.com/coins/images/279/small/ethereum.png?1595348880'
     },
     rpcUrls: ['https://mainnet.optimism.io'],
     gnosisUrl: 'https://safe-transaction.optimism.gnosis.io',
     blockExplorerUrls: ['https://optimistic.etherscan.io/'],
-    iconUrl: '/images/cryptoLogos/optimism.svg',
+    iconUrl: '/images/cryptoLogos/eth-diamond-purple.png',
     testnet: true,
     shortName: 'oeth'
   }

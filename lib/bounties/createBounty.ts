@@ -20,7 +20,7 @@ export async function createBounty({
   status = 'suggestion',
   chainId = 1,
   linkedPageId,
-  approveSubmitters = true,
+  approveSubmitters = false,
   maxSubmissions,
   rewardAmount = 0,
   rewardToken = 'ETH',

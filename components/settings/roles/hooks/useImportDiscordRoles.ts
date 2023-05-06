@@ -26,7 +26,7 @@ export function useImportDiscordRoles() {
   const { data, isValidating, error } = useSWRImmutable(
     importDiscordRoles ? 'discord-roles-import' : null,
     async () => {
-      onClick(`${space?.name}-roles`);
+      onClick(`roles`);
       return charmClient.discord
         .importRolesFromDiscordServer({
           guildId,

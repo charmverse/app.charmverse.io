@@ -67,7 +67,8 @@ function SafeMenuItem({
         try {
           await makePayment();
         } catch (error: any) {
-          onError(getPaymentErrorMessage(error));
+          const { message, level } = getPaymentErrorMessage(error);
+          onError(message, level);
         }
       }}
     >
@@ -82,7 +83,7 @@ export default function BountyPaymentButton({
   amount,
   chainIdToUse,
   tokenSymbolOrAddress,
-  onSuccess = (tx: string, chainId: number) => {},
+  onSuccess = () => {},
   onClick = () => null,
   onError = () => {}
 }: Props) {
@@ -189,8 +190,9 @@ export default function BountyPaymentButton({
       } else {
         onError('Please provide a valid contract address');
       }
-    } catch (err: any) {
-      onError(getPaymentErrorMessage(err));
+    } catch (error: any) {
+      const { message, level } = getPaymentErrorMessage(error);
+      onError(message, level);
     }
   };
 
