@@ -244,6 +244,7 @@ const RPC = {
       logoURI: 'https://assets.coingecko.com/coins/images/4713/small/matic-token-icon.png?1624446912'
     },
     rpcUrls: ['https://mainnet.optimism.io'],
+    gnosisUrl: 'https://safe-transaction.optimism.gnosis.io',
     blockExplorerUrls: ['https://optimistic.etherscan.io/'],
     iconUrl: '/images/cryptoLogos/optimism.svg',
     testnet: true,
