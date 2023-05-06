@@ -5,7 +5,7 @@ import { useEffect, useMemo, createContext, useContext, useState } from 'react';
 
 import type { SETTINGS_TABS, ACCOUNT_TABS } from 'components/settings/config';
 
-type SettingsPath = (typeof SETTINGS_TABS)[number]['path'] | (typeof ACCOUNT_TABS)[number]['path'];
+export type SettingsPath = (typeof SETTINGS_TABS)[number]['path'] | (typeof ACCOUNT_TABS)[number]['path'];
 
 type IContext = {
   open: boolean;

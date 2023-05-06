@@ -33,6 +33,16 @@ const defaultPaymentMethods: Pick<
     tokenName: 'USD Coin',
     tokenSymbol: 'USDC',
     tokenLogo: 'https://cryptologos.cc/logos/usd-coin-usdc-logo.png'
+  },
+  // optimism
+  {
+    chainId: 10,
+    contractAddress: '0x4200000000000000000000000000000000000042',
+    tokenDecimals: 18,
+    tokenName: 'Optimism',
+    tokenSymbol: 'OP',
+    // tokenLogo: '/images/cryptoLogos/optimism.svg',
+    tokenLogo: 'https://optimistic.etherscan.io/token/images/optimism_32.png'
   }
 ];
 

@@ -251,7 +251,7 @@ const RPC = {
     rpcUrls: ['https://mainnet.optimism.io'],
     gnosisUrl: 'https://safe-transaction.optimism.gnosis.io',
     blockExplorerUrls: ['https://optimistic.etherscan.io/'],
-    iconUrl: '/images/cryptoLogos/optimism.svg',
+    iconUrl: '/images/cryptoLogos/eth-diamond-purple.png',
     testnet: true,
     shortName: 'oeth'
   }
