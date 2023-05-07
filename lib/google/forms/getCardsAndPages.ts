@@ -1,4 +1,4 @@
-import type { PagePermission, Prisma } from '@charmverse/core/dist/prisma';
+import type { PagePermission, Prisma } from '@charmverse/core/prisma';
 import type * as googlForms from '@googleapis/forms';
 import { v4 as uuid } from 'uuid';
 

@@ -1,5 +1,6 @@
 // upload form src by mux: https://github.com/vercel/next.js/blob/canary/examples/with-mux-video/components/upload-form.js
 
+import { log } from '@charmverse/core/log';
 import { Alert, CircularProgress, Stack, Typography } from '@mui/material';
 import * as UpChunk from '@mux/upchunk';
 import { useEffect, useState } from 'react';
@@ -8,7 +9,6 @@ import useSwr from 'swr';
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import log from 'lib/log';
 
 type Props = {
   onComplete: (upload: { assetId: string; playbackId: string }) => void;

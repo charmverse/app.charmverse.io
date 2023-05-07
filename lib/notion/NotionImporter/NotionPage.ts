@@ -1,4 +1,5 @@
-import type { Page } from '@charmverse/core/dist/prisma';
+import { log } from '@charmverse/core/log';
+import type { Page } from '@charmverse/core/prisma';
 import type { Client } from '@notionhq/client';
 import type {
   DatabaseObjectResponse,
@@ -9,7 +10,6 @@ import promiseRetry from 'promise-retry';
 import { v4 } from 'uuid';
 
 import type { IPropertyTemplate } from 'lib/focalboard/board';
-import log from 'lib/log';
 import { isTruthy } from 'lib/utilities/types';
 
 import { convertPropertyType } from '../convertPropertyType';

@@ -1,7 +1,6 @@
 import type { RawSpecs } from '@bangle.dev/core';
 import type { DOMOutputSpec } from '@bangle.dev/pm';
-
-import log from 'lib/log';
+import { log } from '@charmverse/core/log';
 
 import * as suggestTooltip from '../@bangle.dev/tooltip/suggest-tooltip';
 

@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core';
-import type { Role, Space, User } from '@charmverse/core/dist/prisma';
+import type { Role, Space, User } from '@charmverse/core/prisma';
 
 import { getSpaceMembers } from 'lib/members/getSpaceMembers';
 import type { Member } from 'lib/members/interfaces';

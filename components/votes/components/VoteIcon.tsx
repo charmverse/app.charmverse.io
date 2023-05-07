@@ -1,4 +1,4 @@
-import type { Vote } from '@charmverse/core/dist/prisma';
+import type { Vote } from '@charmverse/core/prisma';
 import MuiVoteIcon from '@mui/icons-material/HowToVoteOutlined';
 import TaskIcon from '@mui/icons-material/TaskOutlined';
 import Box from '@mui/material/Box';

@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core';
-import type { Space } from '@charmverse/core/dist/prisma';
+import type { Space } from '@charmverse/core/prisma';
 import type { Page } from '@playwright/test';
 
 import { generateTokenGate } from 'testing/utils/tokenGates';

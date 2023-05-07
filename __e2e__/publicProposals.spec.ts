@@ -1,4 +1,4 @@
-import type { Page, WorkspaceEvent } from '@charmverse/core/dist/prisma';
+import type { Page, WorkspaceEvent } from '@charmverse/core/prisma';
 import type { Browser } from '@playwright/test';
 import { chromium, expect, test } from '@playwright/test';
 import { v4 } from 'uuid';

@@ -1,4 +1,4 @@
-import type { Role, SpaceRoleToRole, TokenGate, TokenGateToRole, UserTokenGate } from '@charmverse/core/dist/prisma';
+import type { Role, SpaceRoleToRole, TokenGate, TokenGateToRole, UserTokenGate } from '@charmverse/core/prisma';
 import * as lit from 'lit-js-sdk';
 
 type TokenGateWithRoles = {

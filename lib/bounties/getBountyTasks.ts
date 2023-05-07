@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core';
-import type { BountyStatus } from '@charmverse/core/dist/prisma';
+import type { BountyStatus } from '@charmverse/core/prisma';
 
 import type { NotificationActor } from 'lib/notifications/mapNotificationActor';
 import { mapNotificationActor } from 'lib/notifications/mapNotificationActor';

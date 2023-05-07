@@ -1,7 +1,7 @@
 import { prisma } from '@charmverse/core';
+import { log } from '@charmverse/core/log';
 
 import { getAllOrganizations, getProfile } from 'lib/deepdao/client';
-import log from 'lib/log';
 import { getSpacesOfUser } from 'lib/spaces/getSpacesOfUser';
 import { isTruthy } from 'lib/utilities/types';
 

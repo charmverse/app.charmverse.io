@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core';
-import type { Page } from '@charmverse/core/dist/prisma';
+import type { Page } from '@charmverse/core/prisma';
 import { v4, validate } from 'uuid';
 
 import { prismaToBlock } from 'lib/focalboard/block';
@@ -76,7 +76,7 @@ export async function createDatabase(
 
 export async function createDatabaseCardPage(
   pageInfo: Record<keyof Pick<Page, 'title' | 'boardId' | 'createdBy' | 'spaceId'>, string> & {
-    properties: Record<string, string>;
+    properties: Record<string, string | string[]>;
   }
 ): Promise<PageFromBlock> {
   const isValidUUid = validate(pageInfo.boardId);

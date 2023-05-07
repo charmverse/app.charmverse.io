@@ -1,6 +1,6 @@
+import { log } from '@charmverse/core/log';
 import request from 'supertest';
 
-import log from 'lib/log';
 import type { TestLoginRequest } from 'pages/api/session/login-testenv';
 
 export const baseUrl = process.env.DOMAIN as string;

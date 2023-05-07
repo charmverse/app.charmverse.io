@@ -1,4 +1,4 @@
-import { VoteStatus } from '@charmverse/core/dist/prisma';
+import { VoteStatus } from '@charmverse/core/prisma';
 
 import { calculateVoteStatus } from '../calculateVoteStatus';
 

@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core';
-import type { PageOperations, Prisma, SpaceRole, SpaceRoleToRole } from '@charmverse/core/dist/prisma';
+import type { PageOperations, Prisma, SpaceRole, SpaceRoleToRole } from '@charmverse/core/prisma';
 
 import type { PagePermissionMeta } from 'lib/permissions/interfaces';
 import { permissionTemplates } from 'lib/permissions/pages';

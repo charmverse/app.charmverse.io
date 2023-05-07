@@ -1,8 +1,8 @@
 import type { Node } from '@bangle.dev/pm';
 import { Step } from '@bangle.dev/pm';
+import { log } from '@charmverse/core/log';
 
 import { specRegistry } from 'components/common/CharmEditor/specRegistry';
-import log from 'lib/log';
 import type { ProsemirrorJSONStep } from 'lib/websockets/documentEvents/interfaces';
 
 export function applyStepsToNode(steps: ProsemirrorJSONStep[], node: Node): Node {

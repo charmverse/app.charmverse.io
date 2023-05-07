@@ -5,7 +5,7 @@ import type {
   Space,
   SpaceRole,
   User
-} from '@charmverse/core/dist/prisma';
+} from '@charmverse/core/prisma';
 import { v4 } from 'uuid';
 
 import { defaultPostCategories } from 'lib/forums/categories/generateDefaultPostCategories';

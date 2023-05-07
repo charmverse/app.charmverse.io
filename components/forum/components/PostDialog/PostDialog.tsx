@@ -1,4 +1,4 @@
-import type { Post, PostCategory } from '@charmverse/core/dist/prisma';
+import type { Post, PostCategory } from '@charmverse/core/prisma';
 import MessageOutlinedIcon from '@mui/icons-material/MessageOutlined';
 import OpenInFullIcon from '@mui/icons-material/OpenInFull';
 import { Box, Card, DialogContent, Stack, Typography } from '@mui/material';

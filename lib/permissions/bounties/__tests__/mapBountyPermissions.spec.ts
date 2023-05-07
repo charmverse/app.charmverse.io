@@ -1,4 +1,4 @@
-import type { BountyPermission } from '@charmverse/core/dist/prisma';
+import type { BountyPermission } from '@charmverse/core/prisma';
 import { v4 } from 'uuid';
 
 import { mapBountyPermissions } from '../mapBountyPermissions';

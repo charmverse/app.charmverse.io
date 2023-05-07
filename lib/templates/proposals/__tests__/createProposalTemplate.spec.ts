@@ -1,4 +1,4 @@
-import type { Space, User } from '@charmverse/core/dist/prisma';
+import type { Space, User } from '@charmverse/core/prisma';
 
 import { InvalidInputError } from 'lib/utilities/errors';
 import { generateRole, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';

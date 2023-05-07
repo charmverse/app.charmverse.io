@@ -66,13 +66,14 @@
       "__e2e__/*": [
         "./__e2e__/*"
       ],
-      "@charmverse/core/dist/prisma": [
+      "@charmverse/core/prisma": [
         "node_modules/@charmverse/core/dist/cjs/prisma",
-        //"node_modules/@charmverse/core/dist/esm/prisma"
       ],
-      "@charmverse/core/dist/shared": [
+      "@charmverse/core/shared": [
         "node_modules/@charmverse/core/dist/cjs/shared",
-        //"node_modules/@charmverse/core/dist/esm/shared"
+      ],
+      "@charmverse/core/log": [
+        "node_modules/@charmverse/core/dist/cjs/lib/log",
       ]
     }
   },

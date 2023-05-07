@@ -1,4 +1,4 @@
-import type { Prisma } from '@charmverse/core/dist/prisma';
+import type { Prisma } from '@charmverse/core/prisma';
 
 import { emptyDocument } from 'lib/prosemirror/constants';
 import type { PageContent } from 'lib/prosemirror/interfaces';

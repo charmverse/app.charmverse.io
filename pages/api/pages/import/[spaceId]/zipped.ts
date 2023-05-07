@@ -1,11 +1,11 @@
 import { prisma } from '@charmverse/core';
-import type { Prisma, Space } from '@charmverse/core/dist/prisma';
+import { log } from '@charmverse/core/log';
+import type { Prisma, Space } from '@charmverse/core/prisma';
 import jsZip from 'jszip';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import { v4 } from 'uuid';
 
-import log from 'lib/log';
 import { onError, onNoMatch, requireSpaceMembership, requireUser } from 'lib/middleware';
 import { getRequestLanguage } from 'lib/middleware/getRequestLanguage';
 import { getPagePath } from 'lib/pages';

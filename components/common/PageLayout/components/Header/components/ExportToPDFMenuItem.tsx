@@ -9,7 +9,7 @@ const ReactToPrint = dynamic(() => import('react-to-print'), { loading: PrintBut
 
 function PrintButton() {
   return (
-    <ListItemButton>
+    <ListItemButton dense>
       <PrintIcon
         fontSize='small'
         sx={{

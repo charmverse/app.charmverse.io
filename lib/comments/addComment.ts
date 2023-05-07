@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core';
-import type { Comment } from '@charmverse/core/dist/prisma';
+import type { Comment } from '@charmverse/core/prisma';
 
 import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
 

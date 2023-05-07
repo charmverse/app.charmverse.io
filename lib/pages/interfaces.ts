@@ -1,4 +1,4 @@
-import type { Page, PagePermission, Space } from '@charmverse/core/dist/prisma';
+import type { Page, PagePermission, Space } from '@charmverse/core/prisma';
 
 import type { BountyWithDetails } from 'lib/bounties';
 import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
@@ -157,10 +157,6 @@ export type PagesMap<P extends PageMeta | PageNode = PageMeta> = Record<string, 
 
 export type PageUpdates = Partial<Page> & { id: string };
 export type PageDetailsUpdates = Partial<PageDetails> & { id: string };
-
-export type FormResponseProperty = IPropertyTemplate & {
-  description: string;
-};
 
 export interface IPageMetaWithPermissions extends PageMeta {
   permissions: (PagePermission & { sourcePermission: PagePermission | null })[];

@@ -1,7 +1,7 @@
+import { log } from '@charmverse/core/log';
 import * as googlForms from '@googleapis/forms';
 
 import type { GoogleFormSourceData } from 'lib/focalboard/boardView';
-import log from 'lib/log';
 
 import { getClient } from '../authorization/authClient';
 import { getCredentialToken } from '../authorization/credentials';

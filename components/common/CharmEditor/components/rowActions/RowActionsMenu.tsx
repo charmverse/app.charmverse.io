@@ -1,6 +1,7 @@
 import type { PluginKey } from '@bangle.dev/core';
 import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
 import { safeInsert } from '@bangle.dev/utils';
+import { log } from '@charmverse/core/log';
 import { ContentCopy as DuplicateIcon, DragIndicator as DragIndicatorIcon, DeleteOutlined } from '@mui/icons-material';
 import type { MenuProps } from '@mui/material';
 import { ListItemIcon, ListItemText, Menu, ListItemButton } from '@mui/material';
@@ -13,7 +14,6 @@ import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/st
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
-import log from 'lib/log';
 import type { PagesMap } from 'lib/pages';
 
 import type { PluginState } from './rowActions';

@@ -1,11 +1,11 @@
 import { prisma } from '@charmverse/core';
-import type { Block as PrismaBlock } from '@charmverse/core/dist/prisma';
+import { log } from '@charmverse/core/log';
+import type { Block as PrismaBlock } from '@charmverse/core/prisma';
 
 import type { Block } from 'lib/focalboard/block';
 import { blockToPrisma, prismaToBlock } from 'lib/focalboard/block';
 import { createBoard } from 'lib/focalboard/board';
 import type { BoardViewFields } from 'lib/focalboard/boardView';
-import log from 'lib/log';
 import { generateFirstDiff } from 'lib/pages/server/generateFirstDiff';
 import { getPageMetaList } from 'lib/pages/server/getPageMetaList';
 import { WrongStateError } from 'lib/utilities/errors';

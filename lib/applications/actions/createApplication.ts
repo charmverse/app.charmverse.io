@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core';
-import type { Application } from '@charmverse/core/dist/prisma';
+import type { Application } from '@charmverse/core/prisma';
 
 import { getBountyOrThrow } from 'lib/bounties';
 import { DuplicateDataError, LimitReachedError, StringTooShortError } from 'lib/utilities/errors';

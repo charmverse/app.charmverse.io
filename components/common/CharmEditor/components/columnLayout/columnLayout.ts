@@ -3,11 +3,10 @@ import { NodeView } from '@bangle.dev/core';
 import { chainCommands, createParagraphNear, keymap, newlineInCode, splitBlock } from '@bangle.dev/pm';
 import { parentHasDirectParentOfType } from '@bangle.dev/pm-commands';
 import { createObject, filter, insertEmpty } from '@bangle.dev/utils';
+import { log } from '@charmverse/core/log';
 import type { DOMOutputSpec } from 'prosemirror-model';
 import type { EditorState, Transaction } from 'prosemirror-state';
 import type { EditorView } from 'prosemirror-view';
-
-import log from 'lib/log';
 
 export function rowSpec(): RawSpecs {
   return {

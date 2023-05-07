@@ -1,9 +1,8 @@
 import type { Server } from 'http';
 
+import { log } from '@charmverse/core/log';
 import Router from '@koa/router';
 import Koa from 'koa';
-
-import log from 'lib/log';
 
 export function createServer() {
   const app = new Koa();

@@ -1,4 +1,4 @@
-import type { Page } from '@charmverse/core/dist/prisma';
+import type { Page } from '@charmverse/core/prisma';
 import type { NextRouter } from 'next/router';
 import { mutate } from 'swr';
 import { v4 } from 'uuid';

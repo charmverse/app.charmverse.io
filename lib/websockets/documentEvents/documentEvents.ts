@@ -1,9 +1,9 @@
 import type { Node } from '@bangle.dev/pm';
 import { prisma } from '@charmverse/core';
+import { getLogger } from '@charmverse/core/log';
 import type { Socket } from 'socket.io';
 import { validate } from 'uuid';
 
-import { getLogger } from 'lib/log/prefix';
 import type { IPagePermissionFlags } from 'lib/permissions/pages';
 import { computeUserPagePermissions } from 'lib/permissions/pages/page-permission-compute';
 import { applyStepsToNode } from 'lib/prosemirror/applyStepsToNode';
@@ -532,7 +532,8 @@ export class DocumentEventHandler {
     const contentText = room.node.textContent;
     // check if content is empty only if it got changed
     const hasContent = contentText.length > 0;
-    const galleryImage = room.doc.type === 'card' ? extractPreviewImage(room.doc.content) : null;
+    const galleryImage =
+      room.doc.type === 'card' || room.doc.type === 'card_synced' ? extractPreviewImage(room.doc.content) : null;
 
     const res = await prisma.page.update({
       where: { id: room.doc.id },

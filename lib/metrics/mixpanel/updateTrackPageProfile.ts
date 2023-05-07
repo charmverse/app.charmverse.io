@@ -1,4 +1,5 @@
-import log from 'lib/log';
+import { log } from '@charmverse/core/log';
+
 import type { IPageWithPermissions } from 'lib/pages/interfaces';
 import { getPage } from 'lib/pages/server';
 

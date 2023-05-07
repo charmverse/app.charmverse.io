@@ -1,4 +1,4 @@
-import type { Page } from '@charmverse/core/dist/prisma';
+import type { Page } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import AddIcon from '@mui/icons-material/Add';
 import ArticleIcon from '@mui/icons-material/InsertDriveFileOutlined';

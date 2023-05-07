@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core';
-import type { InviteLink, InviteLinkToRole, Role, User } from '@charmverse/core/dist/prisma';
+import type { InviteLink, InviteLinkToRole, Role, User } from '@charmverse/core/prisma';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 

@@ -1,4 +1,4 @@
-import type { UserGnosisSafe } from '@charmverse/core/dist/prisma';
+import type { UserGnosisSafe } from '@charmverse/core/prisma';
 import { Checkbox, List, ListItem, MenuItem, Select, Tooltip, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
 import { getChainById } from 'connectors';
@@ -23,7 +23,7 @@ export function MultiPaymentModal({ bounties }: { bounties: BountyWithDetails[] 
   const modalProps = bindPopover(popupState);
   const { data: userGnosisSafes } = useMultiWalletSigs();
 
-  const { isDisabled, onPaymentSuccess, transactions, gnosisSafes, gnosisSafeData, isLoading, setGnosisSafeData } =
+  const { isDisabled, onPaymentSuccess, getTransactions, gnosisSafes, gnosisSafeData, isLoading, setGnosisSafeData } =
     useMultiBountyPayment({
       bounties,
       postPaymentSuccess() {
@@ -34,6 +34,7 @@ export function MultiPaymentModal({ bounties }: { bounties: BountyWithDetails[] 
 
   const gnosisSafeAddress = gnosisSafeData?.address;
   const gnosisSafeChainId = gnosisSafeData?.chainId;
+  const transactions = getTransactions(gnosisSafeAddress);
 
   const userGnosisSafeRecord =
     userGnosisSafes?.reduce<Record<string, UserGnosisSafe>>((record, userGnosisSafe) => {
@@ -44,14 +45,13 @@ export function MultiPaymentModal({ bounties }: { bounties: BountyWithDetails[] 
   const { getMemberById } = useMembers();
 
   useEffect(() => {
-    const applicationIds = transactions.map((trans) => trans(gnosisSafeAddress).applicationId);
+    const applicationIds = transactions.map((trans) => trans.applicationId);
     setSelectedApplicationIds(applicationIds);
-  }, [transactions]);
+  }, [transactions.length]);
 
   const selectedTransactions = selectedApplicationIds
     .map((applicationId) => {
-      const transaction = transactions.find((trans) => trans(gnosisSafeAddress).applicationId === applicationId);
-      return transaction?.(gnosisSafeAddress);
+      return transactions.find((trans) => trans.applicationId === applicationId);
     })
     .filter(isTruthy);
 
@@ -114,8 +114,8 @@ export function MultiPaymentModal({ bounties }: { bounties: BountyWithDetails[] 
           </Box>
           <Box pb={2}>
             <List>
-              {transactions.map((getTransaction) => {
-                const { title, chainId: _chainId, rewardAmount, rewardToken, userId, applicationId } = getTransaction();
+              {transactions.map((transaction) => {
+                const { title, chainId: _chainId, rewardAmount, rewardToken, userId, applicationId } = transaction;
                 const user = getMemberById(userId);
                 const isChecked = selectedApplicationIds.includes(applicationId);
                 if (user) {

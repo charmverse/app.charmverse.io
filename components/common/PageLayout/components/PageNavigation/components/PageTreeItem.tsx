@@ -1,4 +1,4 @@
-import type { Page, PageType } from '@charmverse/core/dist/prisma';
+import type { Page, PageType } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';

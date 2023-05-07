@@ -1,4 +1,4 @@
-import type { ApiPageKey } from '@charmverse/core/dist/prisma';
+import type { ApiPageKey } from '@charmverse/core/prisma';
 import { chunk } from 'lodash';
 import unionBy from 'lodash/unionBy';
 import type { ParseResult } from 'papaparse';
@@ -268,6 +268,44 @@ export function deepMergeArrays(arr1: IPropertyTemplate[], arr2: IPropertyTempla
   ];
 }
 
+export function transformApiPageKeysCsvData(
+  csvData: Record<string, string>[],
+  headers: string[],
+  boardCardProperties: IPropertyTemplate[]
+) {
+  const toBeDeleted: string[] = [];
+
+  for (const row of csvData) {
+    for (const [k, v] of Object.entries(row)) {
+      const cardPropertyOptionSameWithValue = boardCardProperties.find(
+        (prop) => prop.type === 'multiSelect' && !!prop.options.find((o) => o.value === k)
+      );
+      if (
+        csvData.every((_row) => _row[k] === v || !_row[k]) &&
+        !boardCardProperties.find((b) => (b.description || b.name) === k) &&
+        cardPropertyOptionSameWithValue
+      ) {
+        if (v) {
+          // Add the option in the question where it belongs to
+          const questionName = cardPropertyOptionSameWithValue.description || cardPropertyOptionSameWithValue.name;
+          row[questionName] = row[questionName] && !row[questionName].includes(v) ? `${row[questionName]}|${v}` : v;
+        }
+        toBeDeleted.push(k);
+      }
+    }
+  }
+
+  const uniqueOrfanProps = [...new Set(toBeDeleted)];
+  for (const _prop of uniqueOrfanProps) {
+    csvData.forEach((_row) => {
+      delete _row[_prop];
+    });
+    if (headers.find((h) => h === _prop)) {
+      headers.splice(headers.indexOf(_prop), 1);
+    }
+  }
+}
+
 export function transformCsvResults(results: ParseResult<Record<string, string>>, customTitle?: string) {
   const csvData = results.data.map((csvRow) => {
     const [key, value] = Object.entries(csvRow)[0];
@@ -312,18 +350,10 @@ export async function addNewCards({
       ];
   const mappedInitialBoardProperties = mapCardBoardProperties(boardCardProperties);
 
-  // For every csv row, we check if the value and keys are the same or if the value is empty or we don't have it as an initial prop from the board
-  for (const row of csvData) {
-    for (const [k, v] of Object.entries(row)) {
-      if (csvData.every((_row) => _row[k] === v || !_row[k]) && !mappedInitialBoardProperties[k]) {
-        csvData.forEach((_row) => {
-          delete _row[k];
-        });
-        if (headers.find((h) => h === k)) {
-          headers.splice(headers.indexOf(k), 1);
-        }
-      }
-    }
+  if (apiPageKeys && apiPageKeys.length > 0) {
+    // For every csv row, we check if the value and keys are the same, if the value is empty, we don't have it as an initial prop from the board and if the value is an option of an existing board property with the type multiSelect
+    // If true -> Add the value and create the property
+    transformApiPageKeysCsvData(csvData, headers, boardCardProperties);
   }
 
   // Create card properties for the board

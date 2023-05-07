@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-expressions */
-import type { Page } from '@charmverse/core/dist/prisma';
+import type { Page } from '@charmverse/core/prisma';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import EmojiEmotionsOutlinedIcon from '@mui/icons-material/EmojiEmotionsOutlined';
 import React from 'react';
