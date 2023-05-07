@@ -1,13 +1,13 @@
-import { Proposal, ProposalCategory } from "@prisma/client";
-import { prisma } from "db";
-import { disconnectProposalChildren } from "lib/proposal/disconnectProposalChildren";
-import { getRandomThemeColor } from "theme/utils/getRandomThemeColor";
+import { Proposal, ProposalCategory } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core';
+import { disconnectProposalChildren } from 'lib/proposal/disconnectProposalChildren';
+import { getRandomThemeColor } from 'theme/utils/getRandomThemeColor';
 
 // Comment
 const concurrent = 5;
 
 async function disconnectProposalsFromChildren() {
-  console.log('--- START --- Disconnecting proposals from children')
+  console.log('--- START --- Disconnecting proposals from children');
   const proposals = await prisma.proposal.findMany({
     select: {
       page: {
@@ -19,19 +19,19 @@ async function disconnectProposalsFromChildren() {
   });
 
   let count = 0;
-  let total = proposals.length
+  let total = proposals.length;
 
   for (const proposal of proposals) {
     count += 1;
-    console.log('Processing proposal', count, '/', total, '...')
+    console.log('Processing proposal', count, '/', total, '...');
     if (proposal.page?.id) {
-      await disconnectProposalChildren({pageId: proposal.page.id})
+      await disconnectProposalChildren({ pageId: proposal.page.id });
     }
   }
 }
 
 async function detectSpacesWithDuplicateCategories() {
-  console.log('--- START --- Duplicate Detection')
+  console.log('--- START --- Duplicate Detection');
   const spaces = await prisma.space.findMany({
     select: {
       id: true,
@@ -45,34 +45,35 @@ async function detectSpacesWithDuplicateCategories() {
     }
   });
 
-  console.log('Total spaces: ', spaces.length)
+  console.log('Total spaces: ', spaces.length);
 
-  const spacesWithDuplicates: {spaceId: string, domain: string, duplicates: Pick<ProposalCategory, 'id' | 'title'>[]}[] = [];
+  const spacesWithDuplicates: {
+    spaceId: string;
+    domain: string;
+    duplicates: Pick<ProposalCategory, 'id' | 'title'>[];
+  }[] = [];
 
   for (const space of spaces) {
     space.proposalCategories.forEach((category) => {
-      const duplicates = space.proposalCategories.filter(c => c.title === category.title);
+      const duplicates = space.proposalCategories.filter((c) => c.title === category.title);
       if (duplicates.length > 1) {
-        spacesWithDuplicates.push({spaceId: space.id, domain: space.domain, duplicates});
+        spacesWithDuplicates.push({ spaceId: space.id, domain: space.domain, duplicates });
       }
-    })
+    });
   }
 
-
-  console.log('Detected duplicates: ', spacesWithDuplicates.length, spacesWithDuplicates)
-
+  console.log('Detected duplicates: ', spacesWithDuplicates.length, spacesWithDuplicates);
 }
 
-
 async function provisionGeneralProposalCategory() {
-  console.log('--- START --- Provision general categories')
+  console.log('--- START --- Provision general categories');
   const spacesWithoutGeneral = await prisma.space.findMany({
     where: {
       proposalCategories: {
         none: {
           title: 'General'
         }
-      },
+      }
     },
     select: {
       id: true
@@ -81,14 +82,14 @@ async function provisionGeneralProposalCategory() {
 
   const totalSpaces = spacesWithoutGeneral.length;
 
-  console.log('Total spaces without general category: ', totalSpaces)
+  console.log('Total spaces without general category: ', totalSpaces);
 
-  for (let i = 0; i < totalSpaces; i+= concurrent) {
-    console.log('Creating general categories for spaces', i + 1, '-', i + 1 + concurrent, ' / ', totalSpaces, '...')
+  for (let i = 0; i < totalSpaces; i += concurrent) {
+    console.log('Creating general categories for spaces', i + 1, '-', i + 1 + concurrent, ' / ', totalSpaces, '...');
 
-    await Promise.all(spacesWithoutGeneral
-        .slice(i, i + concurrent)
-        .map(space => prisma.proposalCategory.upsert({
+    await Promise.all(
+      spacesWithoutGeneral.slice(i, i + concurrent).map((space) =>
+        prisma.proposalCategory.upsert({
           where: {
             spaceId_title: {
               spaceId: space.id,
@@ -98,18 +99,19 @@ async function provisionGeneralProposalCategory() {
           create: {
             color: getRandomThemeColor(),
             title: 'General',
-            space: {connect: {id: spacesWithoutGeneral[i].id}}
+            space: { connect: { id: spacesWithoutGeneral[i].id } }
           },
           update: {
             title: 'General'
           }
-        })));
-
+        })
+      )
+    );
   }
 }
 
 async function assignProposalsToDefaultCategory() {
-  console.log('--- START --- Assigning proposals to default category')
+  console.log('--- START --- Assigning proposals to default category');
   const uncategorised = await prisma.proposal.findMany({
     where: {
       categoryId: null
@@ -121,7 +123,6 @@ async function assignProposalsToDefaultCategory() {
   });
 
   const bySpace = uncategorised.reduce((acc, proposal) => {
-
     if (!acc[proposal.spaceId]) {
       acc[proposal.spaceId] = [];
     }
@@ -129,12 +130,11 @@ async function assignProposalsToDefaultCategory() {
     acc[proposal.spaceId].push(proposal);
 
     return acc;
-
-  }, {} as Record<string, Pick<Proposal, 'id' | 'spaceId'>[]>)
+  }, {} as Record<string, Pick<Proposal, 'id' | 'spaceId'>[]>);
 
   const uniqueSpaces = Object.keys(bySpace);
 
-  for (let i = 0; i < uniqueSpaces.length; i+= concurrent) {
+  for (let i = 0; i < uniqueSpaces.length; i += concurrent) {
     const generalCategory = await prisma.proposalCategory.findFirst({
       where: {
         spaceId: uniqueSpaces[i],
@@ -146,27 +146,27 @@ async function assignProposalsToDefaultCategory() {
       continue;
     }
 
-    const proposalsToProcess = bySpace[uniqueSpaces[i]]
+    const proposalsToProcess = bySpace[uniqueSpaces[i]];
 
     await prisma.proposal.updateMany({
       where: {
         // Add this as a safeguard
         spaceId: uniqueSpaces[i],
         id: {
-          in: proposalsToProcess.map(proposal => proposal.id)
+          in: proposalsToProcess.map((proposal) => proposal.id)
         }
       },
       data: {
         categoryId: generalCategory.id
       }
-    })
+    });
 
     console.log('Processed: ', proposalsToProcess.length, 'proposals in space', i + 1, '/', uniqueSpaces.length);
   }
 }
 
 async function assignSpaceDefaultPermissions() {
-  console.log('--- START --- Assigning default permissions to spaces')
+  console.log('--- START --- Assigning default permissions to spaces');
   const spacesWithoutPermission = await prisma.space.findMany({
     where: {
       spacePermissions: {
@@ -192,7 +192,7 @@ async function assignSpaceDefaultPermissions() {
   await prisma.spacePermission.updateMany({
     where: {
       spaceId: {
-        in: spacesWithoutPermission.map(space => space.id)
+        in: spacesWithoutPermission.map((space) => space.id)
       }
     },
     data: {
@@ -200,9 +200,8 @@ async function assignSpaceDefaultPermissions() {
         push: 'reviewProposals'
       }
     }
-  })
+  });
 }
-
 
 export function migrateProposals() {
   // Ran this once, no duplicates detected

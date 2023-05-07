@@ -45,6 +45,7 @@ export function MemberPropertiesRenderer({ properties }: { properties: PropertyV
             }
             return (
               <SelectPreview
+                wrapColumn
                 key={property.memberPropertyId}
                 value={propertyValue}
                 name={property.name}

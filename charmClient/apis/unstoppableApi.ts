@@ -1,4 +1,4 @@
-import type { ProfileItem } from '@prisma/client';
+import type { ProfileItem } from '@charmverse/core/prisma';
 
 import * as http from 'adapters/http';
 import type { UnstoppableDomainsLoginRequest } from 'lib/blockchain/unstoppableDomains/loginWithUnstoppableDomain';

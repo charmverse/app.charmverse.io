@@ -1,5 +1,5 @@
+import type { Page, Prisma } from '@charmverse/core/prisma';
 import type { BlockObjectResponse } from '@notionhq/client/build/src/api-endpoints';
-import type { Page, Prisma } from '@prisma/client';
 
 export type BaseApiColor = 'gray' | 'turquoise' | 'orange' | 'yellow' | 'teal' | 'blue' | 'purple' | 'pink' | 'red';
 export type ApiColor = 'default' & BaseApiColor & `${BaseApiColor}_background`;

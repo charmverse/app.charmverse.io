@@ -1,6 +1,6 @@
+import type { TokenGate } from '@charmverse/core/prisma';
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
-import type { TokenGate } from '@prisma/client';
 import type { ResourceId, SigningConditions } from 'lit-js-sdk';
 import LitShareModal from 'lit-share-modal-v3';
 import { debounce } from 'lodash';

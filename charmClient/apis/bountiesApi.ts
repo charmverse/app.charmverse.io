@@ -1,4 +1,4 @@
-import type { Application, PageComment, Space } from '@prisma/client';
+import type { Application, PageComment, Space } from '@charmverse/core/prisma';
 
 import * as http from 'adapters/http';
 import type {

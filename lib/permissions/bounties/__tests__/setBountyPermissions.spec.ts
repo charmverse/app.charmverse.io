@@ -1,4 +1,4 @@
-import type { Role, Space, User } from '@prisma/client';
+import type { Role, Space, User } from '@charmverse/core/prisma';
 import { v4 } from 'uuid';
 
 import { DataNotFoundError } from 'lib/utilities/errors';

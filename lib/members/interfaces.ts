@@ -8,7 +8,7 @@ import type {
   User,
   UserDetails,
   VisibilityView
-} from '@prisma/client';
+} from '@charmverse/core/prisma';
 
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
 

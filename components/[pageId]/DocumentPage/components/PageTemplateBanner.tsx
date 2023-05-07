@@ -7,6 +7,7 @@ import { BackIcon } from 'components/common/Icons/BackIcon';
 import { DocumentPageIcon } from 'components/common/Icons/DocumentPageIcon';
 import Link from 'components/common/Link';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { usePages } from 'hooks/usePages';
 import type { PageMeta } from 'lib/pages';
 
 const StyledPageTemplateBanner = styled(Box)<{ card?: boolean }>`
@@ -20,16 +21,23 @@ const StyledPageTemplateBanner = styled(Box)<{ card?: boolean }>`
   padding: ${({ theme }) => theme.spacing(1.4)};
 `;
 
-export function PageTemplateBanner({ page, parentPage }: { parentPage?: PageMeta | null; page: PageMeta }) {
+type Props = {
+  parentId?: string | null;
+  pageType: PageMeta['type'];
+};
+
+export function PageTemplateBanner({ pageType, parentId }: Props) {
   const space = useCurrentSpace();
   const theme = useTheme();
+  const { pages } = usePages();
+  const parentPage = parentId ? pages[parentId] : undefined;
 
-  const isShowingCard = page.type.match('card') !== null;
+  const isShowingCard = pageType.match('card') !== null;
   const board = isShowingCard ? parentPage : undefined;
 
   const boardPath = board ? `/${space?.domain}/${board?.path}` : undefined;
 
-  if (!page.type.match('template')) {
+  if (!pageType.match('template')) {
     return null;
   }
 
@@ -45,7 +53,7 @@ export function PageTemplateBanner({ page, parentPage }: { parentPage?: PageMeta
         </Grid>
         <Grid item xs={8} display='flex' justifyContent='center'>
           {!isShowingCard ? (
-            <span>You're editing a {page.type.split('_template')[0]} template</span>
+            <span>You're editing a {pageType.split('_template')[0]} template</span>
           ) : (
             <>
               <span>You're editing a template in</span>

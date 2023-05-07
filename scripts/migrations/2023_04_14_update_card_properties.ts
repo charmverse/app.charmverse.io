@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 
-import { Block } from '@prisma/client';
-import { prisma } from 'db';
+import { Block } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core';
 import { BoardView } from 'lib/focalboard/boardView';
 import { FilterClause, FilterCondition } from 'lib/focalboard/filterClause';
 import { v4 } from 'uuid';
@@ -11,31 +11,33 @@ import { v4 } from 'uuid';
 (async () => {
   const viewBlocks = (await prisma.block.findMany({
     where: {
-      type: "view",
+      type: 'view'
     },
     select: {
       fields: true,
       id: true
     }
-  }) as Block[])
+  })) as Block[];
 
-  const viewsWithFilter = viewBlocks.filter(block => (block.fields as any)?.filter?.filters.length > 0) as unknown as BoardView[]
-  
+  const viewsWithFilter = viewBlocks.filter(
+    (block) => (block.fields as any)?.filter?.filters.length > 0
+  ) as unknown as BoardView[];
+
   for (const viewWithFilter of viewsWithFilter) {
-    const updatedFilters = viewWithFilter.fields.filter.filters.map(filter => {
+    const updatedFilters = viewWithFilter.fields.filter.filters.map((filter) => {
       const condition = (filter as FilterClause).condition as string;
       let transformedCondition: FilterCondition = 'contains';
-      if (condition === "includes") {
-        transformedCondition = "contains"
-      } else if (condition === "notIncludes") {
-        transformedCondition = "does_not_contain"
-      } else if (condition === "isNotEmpty") {
-        transformedCondition = "is_not_empty"
-      } else if (condition === "isEmpty") {
-        transformedCondition = "is_empty"
+      if (condition === 'includes') {
+        transformedCondition = 'contains';
+      } else if (condition === 'notIncludes') {
+        transformedCondition = 'does_not_contain';
+      } else if (condition === 'isNotEmpty') {
+        transformedCondition = 'is_not_empty';
+      } else if (condition === 'isEmpty') {
+        transformedCondition = 'is_empty';
       }
-      return {...filter, condition: transformedCondition, filterId: v4()}
-    })
+      return { ...filter, condition: transformedCondition, filterId: v4() };
+    });
     await prisma.block.update({
       where: {
         id: viewWithFilter.id
@@ -49,6 +51,6 @@ import { v4 } from 'uuid';
           }
         }
       }
-    })
+    });
   }
 })();

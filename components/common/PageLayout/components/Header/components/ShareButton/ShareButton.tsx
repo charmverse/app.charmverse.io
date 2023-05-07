@@ -1,7 +1,7 @@
+import type { PageType } from '@charmverse/core/prisma';
 import { IosShare } from '@mui/icons-material';
 import type { Theme } from '@mui/material';
 import { Box, Divider, IconButton, Popover, Tooltip, useMediaQuery } from '@mui/material';
-import type { PageType } from '@prisma/client';
 import { bindPopover, usePopupState } from 'material-ui-popup-state/hooks';
 import { memo, useEffect } from 'react';
 import useSWRImmutable from 'swr/immutable';

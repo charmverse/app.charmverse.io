@@ -2,10 +2,10 @@
 /* eslint-disable camelcase */
 import fs from 'node:fs/promises';
 
-import type { Page, Space, User } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { Page, Space, User } from '@charmverse/core/prisma';
 import { v4 } from 'uuid';
 
-import { prisma } from 'db';
 import type { IPageWithPermissions } from 'lib/pages';
 import { createPage, generateBoard, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 

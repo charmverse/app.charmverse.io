@@ -1,4 +1,4 @@
-import type { Role, SpaceRoleToRole, TokenGate, TokenGateToRole, UserTokenGate } from '@prisma/client';
+import type { Role, SpaceRoleToRole, TokenGate, TokenGateToRole, UserTokenGate } from '@charmverse/core/prisma';
 import * as lit from 'lit-js-sdk';
 
 import { prisma } from 'db';

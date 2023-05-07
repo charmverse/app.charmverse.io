@@ -1,4 +1,4 @@
-import type { Role } from '@prisma/client';
+import type { Role } from '@charmverse/core/prisma';
 
 import * as http from 'adapters/http';
 import type { ListSpaceRolesResponse } from 'pages/api/roles';

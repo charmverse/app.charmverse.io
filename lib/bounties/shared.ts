@@ -1,5 +1,5 @@
 /* Any method here can be used across client and server */
-import type { BountyStatus, Prisma } from '@prisma/client';
+import type { BountyStatus, Prisma } from '@charmverse/core/prisma';
 
 import type { BountyWithDetails, BountyPagePermissionSetRequest } from 'lib/bounties';
 import { isTruthy } from 'lib/utilities/types';

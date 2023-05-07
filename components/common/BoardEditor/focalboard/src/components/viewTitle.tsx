@@ -1,11 +1,11 @@
 /* eslint-disable max-len */
+import type { Page } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import EmojiEmotionsOutlinedIcon from '@mui/icons-material/EmojiEmotionsOutlined';
 import ImageIcon from '@mui/icons-material/Image';
 import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined';
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import { Box } from '@mui/material';
-import type { Page } from '@prisma/client';
 import dynamic from 'next/dynamic';
 import type { KeyboardEvent } from 'react';
 import React, { useCallback, useState } from 'react';
@@ -165,7 +165,7 @@ function ViewTitle(props: ViewTitleProps) {
         <div className='description'>
           <CharmEditor
             disablePageSpecificFeatures
-            isContentControlled={true}
+            isContentControlled
             content={board.fields.description}
             onContentChange={(content: ICharmEditorOutput) => {
               onDescriptionChange(content.doc);

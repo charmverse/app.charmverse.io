@@ -1,7 +1,7 @@
-import type { PostCategory } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { PostCategory } from '@charmverse/core/prisma';
 import { v4 } from 'uuid';
 
-import { prisma } from 'db';
 import { getPostCategoryPath } from 'lib/forums/categories/getPostCategoryPath';
 import { createPostComment } from 'lib/forums/comments/createPostComment';
 import type { CreatePostCommentInput } from 'lib/forums/comments/interface';

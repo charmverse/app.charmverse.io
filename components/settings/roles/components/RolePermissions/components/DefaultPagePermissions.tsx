@@ -1,6 +1,6 @@
+import type { PagePermissionLevel } from '@charmverse/core/prisma';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import { Box, FormControlLabel, Grid, Switch, Typography, Menu, MenuItem } from '@mui/material';
-import type { PagePermissionLevel } from '@prisma/client';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import { useState } from 'react';
 

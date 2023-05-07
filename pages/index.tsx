@@ -1,4 +1,5 @@
-import type { Space } from '@prisma/client';
+import { log } from '@charmverse/core/log';
+import type { Space } from '@charmverse/core/prisma';
 import { useRouter } from 'next/router';
 import { useContext, useEffect, useState } from 'react';
 
@@ -13,7 +14,6 @@ import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
 import { AUTH_CODE_COOKIE } from 'lib/discord/constants';
-import log from 'lib/log';
 import { isSpaceDomain } from 'lib/spaces/utils';
 import { deleteCookie, getCookie } from 'lib/utilities/browser';
 

@@ -1,8 +1,8 @@
-import type { Space, User } from '@prisma/client';
-import { SpaceRole } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { Space, User } from '@charmverse/core/prisma';
+import { SpaceRole } from '@charmverse/core/prisma';
 import { v4 } from 'uuid';
 
-import { prisma } from 'db';
 import { InvalidInputError } from 'lib/utilities/errors';
 import { uid } from 'lib/utilities/strings';
 import { generateUserAndSpace, generateSpaceUser } from 'testing/setupDatabase';

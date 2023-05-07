@@ -1,12 +1,12 @@
+import { prisma } from '@charmverse/core';
+import type { Bounty, Space, User } from '@charmverse/core/prisma';
 import { test as base, expect } from '@playwright/test';
-import type { Bounty, Space, User } from '@prisma/client';
 import { BountyBoardPage } from '__e2e__/po/bountyBoard.po';
 import { BountyPage } from '__e2e__/po/bountyPage.po';
 import type { PageHeader } from '__e2e__/po/pageHeader.po';
 import { createUser, createUserAndSpace, generateSpaceRole } from '__e2e__/utils/mocks';
 import { login } from '__e2e__/utils/session';
 
-import { prisma } from 'db';
 import { randomETHWalletAddress } from 'testing/generateStubs';
 
 type Fixtures = {

@@ -1,8 +1,8 @@
+import type { Post, PostCategory } from '@charmverse/core/prisma';
 import MessageOutlinedIcon from '@mui/icons-material/MessageOutlined';
 import OpenInFullIcon from '@mui/icons-material/OpenInFull';
 import { Box, Card, DialogContent, Stack, Typography } from '@mui/material';
 import MuiDialog from '@mui/material/Dialog';
-import type { Post, PostCategory } from '@prisma/client';
 import { useRouter } from 'next/router';
 import { useEffect, useRef, useState } from 'react';
 import useSWR from 'swr';

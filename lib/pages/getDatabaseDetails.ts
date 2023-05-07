@@ -1,21 +1,29 @@
-import { prisma } from 'db';
+import { prisma } from '@charmverse/core';
+import type { Block } from '@charmverse/core/prisma';
+
+import { DatabasePageNotFoundError } from 'lib/public-api';
 import { isUUID } from 'lib/utilities/strings';
 
-export async function getDatabaseDetails({ idOrPath, spaceId }: { idOrPath: string; spaceId?: string }) {
+import { generatePageQuery } from './server/generatePageQuery';
+
+export async function getDatabaseDetails({
+  idOrPath,
+  spaceId
+}: {
+  idOrPath: string;
+  spaceId?: string;
+}): Promise<Block> {
   let dbId: string | null | undefined = isUUID(idOrPath) ? idOrPath : null;
 
-  // We need a spaceId if looking up by path
-  if (!dbId && !spaceId) {
-    return null;
-  }
+  const searchQuery = generatePageQuery({
+    pageIdOrPath: idOrPath,
+    spaceIdOrDomain: spaceId
+  });
 
   if (!dbId) {
     // Get the database ID from the page
     const page = await prisma.page.findFirst({
-      where: {
-        path: idOrPath,
-        spaceId
-      },
+      where: searchQuery,
       select: {
         boardId: true
       }
@@ -25,13 +33,19 @@ export async function getDatabaseDetails({ idOrPath, spaceId }: { idOrPath: stri
   }
 
   if (!dbId) {
-    return null;
+    throw new DatabasePageNotFoundError(idOrPath);
   }
-  return prisma.block.findFirst({
+  const block = await prisma.block.findFirst({
     where: {
       type: 'board',
       id: dbId,
       spaceId
     }
   });
+
+  if (!block) {
+    throw new DatabasePageNotFoundError(idOrPath);
+  }
+
+  return block;
 }

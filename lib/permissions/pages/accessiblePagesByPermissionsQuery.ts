@@ -1,4 +1,4 @@
-import type { Prisma } from '@prisma/client';
+import type { Prisma } from '@charmverse/core/prisma';
 
 export function accessiblePagesByPermissionsQuery({
   spaceId,

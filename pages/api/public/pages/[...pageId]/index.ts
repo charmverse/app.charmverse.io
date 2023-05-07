@@ -1,15 +1,14 @@
-import type { Bounty, Page } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { Bounty, Page } from '@charmverse/core/prisma';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { prisma } from 'db';
-import type { BountyWithDetails } from 'lib/bounties';
 import type { Board } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
 import { onError, onNoMatch } from 'lib/middleware';
 import { NotFoundError } from 'lib/middleware/errors';
-import type { PublicPageResponse } from 'lib/pages';
+import type { PublicPageResponse } from 'lib/pages/interfaces';
 import { computeUserPagePermissions } from 'lib/permissions/pages';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -195,7 +194,7 @@ async function getPublicPage(req: NextApiRequest, res: NextApiResponse<PublicPag
   let views: BoardView[] = [];
   let bounty: Bounty | null = null;
 
-  if (page.type === 'card' && page.parentId) {
+  if (page.cardId && page.parentId) {
     const boardPage = await prisma.page.findFirst({
       where: {
         deletedAt: null,
@@ -209,23 +208,23 @@ async function getPublicPage(req: NextApiRequest, res: NextApiResponse<PublicPag
     const card = (await prisma.block.findFirst({
       where: {
         deletedAt: null,
-        id: page.id
+        id: page.cardId
       }
     })) as unknown as Card;
 
     if (card) {
       cards.push(card);
-    }
+      // google synced cards have a board that is attached to another board, we need both boards
+      const _boards = (await prisma.block.findMany({
+        where: {
+          deletedAt: null,
+          id: {
+            in: [card.parentId, card.rootId].filter(Boolean)
+          }
+        }
+      })) as unknown as Board[];
 
-    const board = (await prisma.block.findFirst({
-      where: {
-        deletedAt: null,
-        id: page.parentId
-      }
-    })) as unknown as Board;
-
-    if (board) {
-      boards.push(board);
+      boards.push(..._boards);
     }
   } else if (page.type === 'page') {
     const linkedPageIds: string[] = [];
@@ -267,7 +266,10 @@ async function getPublicPage(req: NextApiRequest, res: NextApiResponse<PublicPag
           applications: []
         }
       : null,
-    page,
+    page: {
+      ...page,
+      permissionFlags: computed
+    },
     boardPages,
     cards,
     boards,

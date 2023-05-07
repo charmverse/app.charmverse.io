@@ -63,7 +63,8 @@ export function CommentForm({
       focusOnInit: true,
       placeholderText: 'What are your thoughts?',
       onContentChange: updatePostContent,
-      content: postContent.doc
+      content: postContent.doc,
+      isContentControlled: true
     };
 
     if (!inlineCharmEditor) {

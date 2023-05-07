@@ -1,9 +1,9 @@
 import type { Transaction } from '@bangle.dev/pm';
 import { Step, EditorState } from '@bangle.dev/pm';
+import { log } from '@charmverse/core/log';
 import { sendableSteps, receiveTransaction } from 'prosemirror-collab';
 import type { EditorStateConfig } from 'prosemirror-state';
 
-import log from 'lib/log';
 import type {
   ServerDocDataMessage,
   ClientDiffMessage,

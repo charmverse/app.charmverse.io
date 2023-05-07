@@ -1,7 +1,7 @@
+import { prisma } from '@charmverse/core';
+import type { Space } from '@charmverse/core/prisma';
 import type { Page } from '@playwright/test';
-import type { Space } from '@prisma/client';
 
-import { prisma } from 'db';
 import { generateTokenGate } from 'testing/utils/tokenGates';
 
 export async function generateAndMockTokenGateRequests({

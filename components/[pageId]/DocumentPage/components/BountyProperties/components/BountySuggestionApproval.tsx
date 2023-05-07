@@ -1,8 +1,8 @@
+import type { Bounty } from '@charmverse/core/prisma';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
-import type { Bounty } from '@prisma/client';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 
 import charmClient from 'charmClient';

@@ -1,8 +1,8 @@
+import type { ProposalCategory } from '@charmverse/core/prisma';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import Grid from '@mui/material/Grid';
 import Tooltip from '@mui/material/Tooltip';
-import type { ProposalCategory } from '@prisma/client';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import useSWR from 'swr';
 

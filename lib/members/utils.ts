@@ -1,4 +1,4 @@
-import type { MemberProperty, MemberPropertyValue, Space } from '@prisma/client';
+import type { MemberProperty, MemberPropertyValue, Space } from '@charmverse/core/prisma';
 
 import type {
   MemberPropertyValuesBySpace,

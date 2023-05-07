@@ -1,4 +1,4 @@
-import type { SpaceOperation, SpacePermission } from '@prisma/client';
+import type { SpaceOperation, SpacePermission } from '@charmverse/core/prisma';
 
 import type {
   AssignablePermissionGroups,

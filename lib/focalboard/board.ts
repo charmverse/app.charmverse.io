@@ -35,6 +35,7 @@ interface IPropertyTemplate {
   name: string;
   type: PropertyType;
   options: IPropertyOption[];
+  description?: string;
 }
 
 export type BoardFields = {

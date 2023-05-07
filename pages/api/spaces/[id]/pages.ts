@@ -1,9 +1,9 @@
-import type { Prisma } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import { log } from '@charmverse/core/log';
+import type { Prisma } from '@charmverse/core/prisma';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { prisma } from 'db';
-import log from 'lib/log';
 import { onError, onNoMatch } from 'lib/middleware';
 import type { PageMeta } from 'lib/pages/server';
 import { getAccessiblePages } from 'lib/pages/server';

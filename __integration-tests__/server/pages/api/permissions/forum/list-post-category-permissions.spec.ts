@@ -1,6 +1,6 @@
+import type { AssignedPostCategoryPermission } from '@charmverse/core';
 import request from 'supertest';
 
-import type { AssignedPostCategoryPermission } from 'lib/permissions/forum/interfaces';
 import { upsertPostCategoryPermission } from 'lib/permissions/forum/upsertPostCategoryPermission';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateRole, generateUserAndSpace } from 'testing/setupDatabase';

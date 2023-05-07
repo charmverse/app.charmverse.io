@@ -1,8 +1,8 @@
+import type { IdentityType } from '@charmverse/core/prisma';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import EmailIcon from '@mui/icons-material/Email';
 import PersonIcon from '@mui/icons-material/Person';
 import TelegramIcon from '@mui/icons-material/Telegram';
-import type { IdentityType } from '@prisma/client';
 import { SiDiscord } from 'react-icons/si';
 
 export function IdentityIcon({ type }: { type: IdentityType | null }) {

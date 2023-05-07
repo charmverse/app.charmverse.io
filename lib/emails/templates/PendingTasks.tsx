@@ -1,4 +1,4 @@
-import type { User } from '@prisma/client';
+import type { User } from '@charmverse/core/prisma';
 import { DateTime } from 'luxon';
 import { MjmlColumn, MjmlDivider, MjmlSection, MjmlText } from 'mjml-react';
 

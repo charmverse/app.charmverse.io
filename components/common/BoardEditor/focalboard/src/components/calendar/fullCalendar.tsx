@@ -158,6 +158,7 @@ function CalendarFullView(props: Props): JSX.Element | null {
             propertyTemplate={template}
             showEmptyPlaceholder={true}
             showTooltip
+            displayType='calendar'
           />
         ))}
       </div>

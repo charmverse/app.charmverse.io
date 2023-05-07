@@ -1,6 +1,5 @@
+import { log } from '@charmverse/core/log';
 import type Koa from 'koa';
-
-import log from 'lib/log';
 
 export async function healthCheck(ctx: Koa.Context) {
   ctx.body = 'hello world';

@@ -1,4 +1,5 @@
-import { prisma } from 'db';
+import { prisma } from '@charmverse/core';
+
 import type { MixpanelEventName } from 'lib/metrics/mixpanel/interfaces';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 

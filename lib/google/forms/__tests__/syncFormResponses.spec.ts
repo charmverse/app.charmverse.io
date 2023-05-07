@@ -1,7 +1,7 @@
+import { prisma } from '@charmverse/core';
+import type { Block, Prisma } from '@charmverse/core/prisma';
 import type * as googlForms from '@googleapis/forms';
-import type { Block, Prisma } from '@prisma/client';
 
-import { prisma } from 'db';
 import type { BoardViewFields } from 'lib/focalboard/boardView';
 import { boardWithCardsArgs } from 'testing/generateBoardStub';
 import { generateUserAndSpace } from 'testing/setupDatabase';

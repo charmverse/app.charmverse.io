@@ -1,5 +1,6 @@
 import crypto, { randomUUID } from 'node:crypto';
 
+import { prisma } from '@charmverse/core';
 import type {
   ApplicationStatus,
   Block,
@@ -13,16 +14,16 @@ import type {
   ProposalStatus,
   Role,
   RoleSource,
+  SubscriptionTier,
   Thread,
   Transaction,
   User,
   Vote,
   WorkspaceEvent
-} from '@prisma/client';
+} from '@charmverse/core/prisma';
 import { Wallet } from 'ethers';
 import { v4 } from 'uuid';
 
-import { prisma } from 'db';
 import type { BountyWithDetails } from 'lib/bounties';
 import { getBountyOrThrow } from 'lib/bounties/getBounty';
 import { provisionApiKey } from 'lib/middleware/requireApiKey';
@@ -40,7 +41,6 @@ import { InvalidInputError } from 'lib/utilities/errors';
 import { typedKeys } from 'lib/utilities/objects';
 import { uid } from 'lib/utilities/strings';
 import type { LoggedInUser } from 'models';
-import { getRandomThemeColor } from 'theme/utils/getRandomThemeColor';
 
 import { boardWithCardsArgs } from './generateBoardStub';
 
@@ -147,6 +147,9 @@ type CreateUserAndSpaceInput = {
   onboarded?: boolean;
   spaceName?: string;
   publicBountyBoard?: boolean;
+  paidTier?: SubscriptionTier;
+  superApiTokenId?: string;
+  walletAddress?: string;
 };
 
 export async function generateUserAndSpace({
@@ -155,7 +158,10 @@ export async function generateUserAndSpace({
   isGuest,
   onboarded = true,
   spaceName = 'Example Space',
-  publicBountyBoard
+  publicBountyBoard,
+  superApiTokenId,
+  walletAddress,
+  paidTier
 }: CreateUserAndSpaceInput = {}) {
   const userId = v4();
   const newUser = await prisma.user.create({
@@ -175,16 +181,27 @@ export async function generateUserAndSpace({
                   id: userId
                 }
               },
+              paidTier,
               updatedBy: userId,
               name: spaceName,
               // Adding prefix avoids this being evaluated as uuid
               domain: `domain-${v4()}`,
-              publicBountyBoard
+              publicBountyBoard,
+              ...(superApiTokenId ? { superApiToken: { connect: { id: superApiTokenId } } } : undefined)
             }
           }
         }
       },
       path: uid(),
+      ...(walletAddress
+        ? {
+            wallets: {
+              create: {
+                address: walletAddress.toLowerCase()
+              }
+            }
+          }
+        : undefined),
       ...user
     },
     include: {
@@ -928,13 +945,17 @@ export async function generateProposal({
 }): Promise<Page & { proposal: ProposalWithUsers; workspaceEvent: WorkspaceEvent }> {
   const proposalId = v4();
 
+  const colors = ['gray', 'orange', 'yellow', 'teal', 'blue', 'turquoise', 'purple', 'pink', 'red'];
+
+  const randomColor = colors[Math.floor(Math.random() * colors.length)];
+
   const categoryIdToLink =
     categoryId ??
     (
       await prisma.proposalCategory.create({
         data: {
           title: `Category - ${v4()}`,
-          color: getRandomThemeColor(),
+          color: randomColor,
           space: { connect: { id: spaceId } }
         }
       })

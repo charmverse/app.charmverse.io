@@ -1,10 +1,10 @@
-import type { PaymentMethod } from '@prisma/client';
+import { log } from '@charmverse/core/log';
+import type { PaymentMethod } from '@charmverse/core/prisma';
 import type { CryptoCurrency, IChainDetails } from 'connectors';
 import { TokenLogoPaths, CryptoCurrencyList, getChainById } from 'connectors';
 
 import * as http from 'adapters/http';
 import { getAlchemyBaseUrl } from 'lib/blockchain/provider/alchemy';
-import log from 'lib/log';
 
 import type { SupportedChainId } from '../blockchain/provider/alchemy';
 

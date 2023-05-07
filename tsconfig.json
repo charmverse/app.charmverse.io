@@ -7,7 +7,8 @@
     },
     "require": [
       "tsconfig-paths/register"
-    ]
+    ],
+    "transpileOnly": true
   },
   "compilerOptions": {
     "importHelpers": true,
@@ -30,7 +31,51 @@
     "jsxImportSource": "@emotion/react",
     "allowJs": true,
     "incremental": true,
-    "isolatedModules": true
+    "isolatedModules": true,
+    "paths": {
+      "config/*": [
+        "./config/*"
+      ],
+      "lib/*": [
+        "./lib/*",
+      ],
+      "adapters/*": [
+        "./adapters/*"
+      ],
+      "components/*": [
+        "./components/*"
+      ],
+      "hooks/*": [
+        "./hooks/*"
+      ],
+      "abis/*": [
+        "./abis/*"
+      ],
+      "pages/*": [
+        "./pages/*"
+      ],
+      "public/*": [
+        "./public/*"
+      ],
+      "theme/*": [
+        "./theme/*"
+      ],
+      "testing/*": [
+        "./testing/*"
+      ],
+      "__e2e__/*": [
+        "./__e2e__/*"
+      ],
+      "@charmverse/core/prisma": [
+        "node_modules/@charmverse/core/dist/cjs/prisma",
+      ],
+      "@charmverse/core/shared": [
+        "node_modules/@charmverse/core/dist/cjs/shared",
+      ],
+      "@charmverse/core/log": [
+        "node_modules/@charmverse/core/dist/cjs/lib/log",
+      ]
+    }
   },
   "exclude": [
     "node_modules",

@@ -1,6 +1,5 @@
+import { log } from '@charmverse/core/log';
 import { useEffect, useRef } from 'react';
-
-import log from 'lib/log';
 
 export function MountTracker({
   name,

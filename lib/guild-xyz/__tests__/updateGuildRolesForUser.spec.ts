@@ -1,7 +1,7 @@
-import type { Role, Space, SpaceRole, User } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { Role, Space, SpaceRole, User } from '@charmverse/core/prisma';
 import { v4 } from 'uuid';
 
-import { prisma } from 'db';
 import { createUserFromWallet } from 'lib/users/createUser';
 
 let user: User;

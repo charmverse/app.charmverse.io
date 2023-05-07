@@ -1,3 +1,4 @@
+import type { PageType } from '@charmverse/core/prisma';
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
@@ -41,6 +42,7 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import { useToggleFavorite } from 'hooks/useToggleFavorite';
 import { useUser } from 'hooks/useUser';
 import type { PageUpdates } from 'lib/pages';
+import { monoFont, serifFont } from 'theme/fonts';
 
 import { BountyActions } from './components/BountyActions';
 import BountyShareButton from './components/BountyShareButton/BountyShareButton';
@@ -48,6 +50,7 @@ import DatabasePageOptions from './components/DatabasePageOptions';
 import { DocumentHistory } from './components/DocumentHistory';
 import { DocumentParticipants } from './components/DocumentParticipants';
 import EditingModeToggle from './components/EditingModeToggle';
+import { ExportToPDFMarkdown } from './components/ExportToPDFMenuItem';
 import { NotificationButton } from './components/NotificationPreview/NotificationButton';
 import PageTitleWithBreadcrumbs from './components/PageTitleWithBreadcrumbs';
 import ShareButton from './components/ShareButton';
@@ -78,7 +81,16 @@ interface HeaderProps {
   openSidebar: () => void;
 }
 
-const documentTypes = ['page', 'card', 'proposal', 'proposal_template', 'bounty'];
+const documentTypes: PageType[] = [
+  'page',
+  'card',
+  'card_synced',
+  'card_template',
+  'proposal',
+  'proposal_template',
+  'bounty',
+  'bounty_template'
+];
 
 function CopyLinkMenuItem({ closeMenu }: { closeMenu: VoidFunction }) {
   const { showMessage } = useSnackbar();
@@ -155,7 +167,6 @@ export function ExportMarkdownMenuItem({ disabled = false, onClick }: { disabled
     </Tooltip>
   );
 }
-
 function PostHeader({
   setPageMenuOpen,
   undoEditorChanges,
@@ -221,6 +232,7 @@ function PostHeader({
       <UndoMenuItem onClick={undoEditorChanges} disabled={!forumPostInfo?.permissions?.edit_post} />
       <Divider />
       <ExportMarkdownMenuItem onClick={exportMarkdownPage} />
+      <ExportToPDFMarkdown pdfTitle={forumPostInfo.forumPost?.title} />
       <Tooltip
         title={
           forumPostInfo.forumPost?.isDraft
@@ -259,7 +271,7 @@ function PostHeader({
 function HeaderComponent({ open, openSidebar }: HeaderProps) {
   const router = useRouter();
   const { updatePage, deletePage } = usePages();
-  const { refreshBounty, bounties } = useBounties();
+  const { bounties } = useBounties();
   const { user } = useUser();
   const theme = useTheme();
   const [pageMenuOpen, setPageMenuOpen] = useState(false);
@@ -281,8 +293,7 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
   const isLargeScreen = useMediaQuery(theme.breakpoints.up('md'));
 
   const pageType = basePage?.type;
-  const isExportablePage =
-    pageType === 'card' || pageType === 'page' || pageType === 'proposal' || pageType === 'bounty';
+  const isExportablePage = documentTypes.includes(pageType as PageType);
 
   const isBountyBoard = router.route === '/[domain]/bounties';
   const currentPageOrPost = basePage ?? forumPostInfo.forumPost;
@@ -294,8 +305,7 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
     return null;
   }, [currentPageOrPost?.id]);
 
-  const isFullWidth = !isLargeScreen || (basePage?.fullWidth ?? false);
-  const isBasePageDocument = documentTypes.includes(basePage?.type ?? '');
+  const isBasePageDocument = documentTypes.includes(basePage?.type as PageType);
   const isBasePageDatabase = /board/.test(basePage?.type ?? '');
 
   const { getCategoriesWithCreatePermission, getDefaultCreateCategory } = useProposalCategories();
@@ -383,7 +393,7 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
     <List data-test='header--page-actions' dense>
       <Box px={2.5} mb={1}>
         <Typography variant='caption'>Style</Typography>
-        <Box display='flex' mt={0.5}>
+        <Box display='flex' mt={0.5} className={`${serifFont.variable} ${monoFont.variable}`}>
           <StyledFontButton
             size='small'
             color={basePage?.fontFamily === 'default' ? 'primary' : 'secondary'}
@@ -470,7 +480,7 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
         <ListItemText primary='View suggestions' />
       </ListItemButton>
       <Divider />
-      {(basePage?.type === 'card' || basePage?.type === 'page') && (
+      {(basePage?.type === 'card' || basePage?.type === 'card_synced' || basePage?.type === 'page') && (
         <ListItemButton
           onClick={() => {
             toggleFavorite();
@@ -497,7 +507,7 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
       <CopyLinkMenuItem closeMenu={closeMenu} />
 
       <Divider />
-      {(basePage?.type === 'card' || basePage?.type === 'page') && (
+      {(basePage?.type === 'card' || basePage?.type === 'card_synced' || basePage?.type === 'page') && (
         <>
           <Tooltip title={!canCreateProposal ? 'You do not have the permission to convert to proposal' : ''}>
             <div>
@@ -534,6 +544,7 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
         />
       )}
       <ExportMarkdownMenuItem disabled={!isExportablePage} onClick={exportMarkdownPage} />
+      <ExportToPDFMarkdown pdfTitle={basePage?.title} />
       {pageType === 'bounty' && basePageBounty && (
         <>
           <Divider />

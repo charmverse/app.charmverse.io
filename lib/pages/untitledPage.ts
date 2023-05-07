@@ -1,4 +1,4 @@
-import type { Page } from '@prisma/client';
+import type { Page } from '@charmverse/core/prisma';
 import { v4 as uuid } from 'uuid';
 
 export function untitledPage({ userId, spaceId }: { userId: string; spaceId: string }): Partial<Page> {

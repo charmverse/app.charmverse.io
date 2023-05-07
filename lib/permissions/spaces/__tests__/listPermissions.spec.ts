@@ -1,4 +1,4 @@
-import type { Space } from '@prisma/client';
+import type { Space } from '@charmverse/core/prisma';
 
 import { generateUserAndSpace } from 'testing/setupDatabase';
 

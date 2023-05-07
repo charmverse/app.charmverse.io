@@ -1,4 +1,4 @@
-import type { ProposalCategoryPermission } from '@prisma/client';
+import type { ProposalCategoryPermission } from '@charmverse/core/prisma';
 
 import { InvalidPermissionGranteeError } from './errors';
 import type { AssignablePermissionGroups, TargetPermissionGroup } from './interfaces';

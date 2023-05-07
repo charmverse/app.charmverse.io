@@ -2,7 +2,7 @@
 /* eslint-disable camelcase */
 import fs from 'node:fs/promises';
 
-import type { Page, Space, User } from '@prisma/client';
+import type { Page, Space, User } from '@charmverse/core/prisma';
 
 import { createBounty } from 'lib/bounties';
 import type { IPageWithPermissions } from 'lib/pages';

@@ -1,8 +1,8 @@
-import type { Application } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { Application } from '@charmverse/core/prisma';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { prisma } from 'db';
 import type { SubmissionContent } from 'lib/applications/actions';
 import { updateSubmission } from 'lib/applications/actions';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';

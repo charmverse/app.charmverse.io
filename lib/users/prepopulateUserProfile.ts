@@ -1,9 +1,9 @@
-import type { User, UserWallet } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import { log } from '@charmverse/core/log';
+import type { User, UserWallet } from '@charmverse/core/prisma';
 import { uniqBy } from 'lodash';
 
-import { prisma } from 'db';
 import { getENSDetails } from 'lib/blockchain';
-import log from 'lib/log';
 import { getUserNFTs } from 'lib/profile/getUserNFTs';
 import { updateProfileAvatar } from 'lib/profile/updateProfileAvatar';
 

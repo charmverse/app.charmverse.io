@@ -1,3 +1,4 @@
+import type { Space } from '@charmverse/core/prisma';
 import CloseIcon from '@mui/icons-material/Close';
 import MenuIcon from '@mui/icons-material/Menu';
 import type { BoxProps } from '@mui/material/Box';
@@ -5,7 +6,6 @@ import Box from '@mui/material/Box';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import IconButton from '@mui/material/IconButton';
-import type { Space } from '@prisma/client';
 import type { ReactNode } from 'react';
 
 import Button from 'components/common/Button';

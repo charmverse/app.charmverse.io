@@ -1,8 +1,8 @@
+import type { ApiPageKey } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import AddIcon from '@mui/icons-material/Add';
 import AddCircleIcon from '@mui/icons-material/AddCircleOutline';
 import { Box, Grid, ListItemIcon, MenuItem, TextField, Typography } from '@mui/material';
-import type { ApiPageKey } from '@prisma/client';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import type { ChangeEvent } from 'react';
 import { useMemo, useState } from 'react';
@@ -16,7 +16,6 @@ import charmClient from 'charmClient';
 import PagesList from 'components/common/CharmEditor/components/PageList';
 import ConfirmApiPageKeyModal from 'components/common/Modal/ConfirmApiPageKeyModal';
 import { webhookBaseUrl } from 'config/constants';
-import { useCurrentPage } from 'hooks/useCurrentPage';
 import { usePages } from 'hooks/usePages';
 import type { BoardView, BoardViewFields, ViewSourceType } from 'lib/focalboard/boardView';
 import { isTruthy } from 'lib/utilities/types';
@@ -38,6 +37,7 @@ type ViewSourceOptionsProps = DatabaseSourceProps & {
   goBack?: () => void;
   title?: string;
   view?: BoardView;
+  pageId?: string;
 };
 
 const SidebarContent = styled.div`
@@ -49,7 +49,6 @@ const SidebarContent = styled.div`
 export function ViewSourceOptions(props: ViewSourceOptionsProps) {
   const activeView = props.view;
   const activeSourceType = activeView?.fields.sourceType;
-  const { currentPageId } = useCurrentPage();
 
   const [sourceType, setSourceType] = useState<ViewSourceType | undefined>();
   const [formStep, setStep] = useState<FormStep>('select_source');
@@ -67,8 +66,8 @@ export function ViewSourceOptions(props: ViewSourceOptionsProps) {
   const typeformPopup = usePopupState({ variant: 'popover', popupId: 'typeformPopup' });
 
   const handleApiKeyClick = async (type: ApiPageKey['type']) => {
-    if (currentPageId) {
-      await createWebhookApiKey({ pageId: currentPageId, type });
+    if (props.pageId) {
+      await createWebhookApiKey({ pageId: props.pageId, type });
       typeformPopup.open();
     }
   };

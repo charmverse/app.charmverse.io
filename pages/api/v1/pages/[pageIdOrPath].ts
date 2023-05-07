@@ -1,13 +1,12 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
 
-import { onError, onNoMatch, requireApiKey } from 'lib/middleware';
 import type { PublicApiPage } from 'lib/public-api/getPageApi';
 import { getPageApi } from 'lib/public-api/getPageApi';
+import { apiHandler } from 'lib/public-api/handler';
 
-const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
+const handler = apiHandler();
 
-handler.use(requireApiKey).get(getPageHandler);
+handler.get(getPageHandler);
 
 /**
  * @swagger

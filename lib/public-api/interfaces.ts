@@ -1,4 +1,4 @@
-import type { Page as PrismaPage } from '@prisma/client';
+import type { Page as PrismaPage } from '@charmverse/core/prisma';
 
 import type { SpaceTemplateType } from 'lib/spaces/config';
 
@@ -336,6 +336,45 @@ export interface CreateWorkspaceRequestBody {
  * @swagger
  * components:
  *  schemas:
+ *    Space:
+ *      type: object
+ *      properties:
+ *        id:
+ *          type: string
+ *          format: uuid
+ *          example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+ *        avatar:
+ *          type: string
+ *          example: https://google.com/image.png
+ *        createdAt:
+ *          type: string
+ *          example: 2023-04-28T21:43:41.388Z
+ *        name:
+ *          type: string
+ *          example: Test DAO Space
+ *        spaceUrl:
+ *          type: url
+ *          example: https://app.charmverse.io/test-dao-space
+ *        joinUrl:
+ *          type: url
+ *          example: https://app.charmverse.io/join?domain=test-dao-space
+ */
+export interface Space {
+  id: string;
+  createdAt: string;
+  createdBy: string;
+  name: string;
+  avatar?: string;
+  spaceUrl: string;
+  joinUrl: string;
+}
+
+/**
+ * @example https://github.com/jellydn/next-swagger-doc/blob/main/example/models/organization.ts
+ *
+ * @swagger
+ * components:
+ *  schemas:
  *    CreateWorkspaceResponseBody:
  *      type: object
  *      properties:
@@ -350,10 +389,7 @@ export interface CreateWorkspaceRequestBody {
  *          type: url
  *          example: https://app.charmverse.io/join?domain=test-dao-space
  */
-export interface CreateWorkspaceResponseBody {
-  id: string;
-  spaceUrl: string;
-  joinUrl: string;
+export interface CreateWorkspaceResponseBody extends Space {
   webhookSigningSecret?: string;
 }
 

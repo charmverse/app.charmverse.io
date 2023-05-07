@@ -1,9 +1,9 @@
+import { prisma } from '@charmverse/core';
+import { log } from '@charmverse/core/log';
 import { Wallet } from 'ethers';
 import { v4 } from 'uuid';
 
-import { prisma } from 'db';
 import { getENSName } from 'lib/blockchain/getENSName';
-import log from 'lib/log';
 import type { SignupAnalytics } from 'lib/metrics/mixpanel/interfaces/UserEvent';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { updateTrackUserProfile } from 'lib/metrics/mixpanel/updateTrackUserProfile';
@@ -15,10 +15,10 @@ import type { LoggedInUser } from 'models';
 import { getUserProfile } from './getUser';
 import { prepopulateUserProfile } from './prepopulateUserProfile';
 
-type UserProps = { address?: string; email?: string; id?: string; avatar?: string };
+type UserProps = { address?: string; email?: string; id?: string; avatar?: string; skipTracking?: boolean };
 
 export async function createUserFromWallet(
-  { id = v4(), address = Wallet.createRandom().address, email, avatar }: UserProps = {},
+  { id = v4(), address = Wallet.createRandom().address, email, avatar, skipTracking }: UserProps = {},
   signupAnalytics: Partial<SignupAnalytics> = {}
 ): Promise<LoggedInUser> {
   const lowercaseAddress = address.toLowerCase();
@@ -56,8 +56,10 @@ export async function createUserFromWallet(
       log.error('Error while prepopulating user profile', { error, userId: newUser.id });
     }
 
-    updateTrackUserProfile(newUser, prisma);
-    trackUserAction('sign_up', { userId: newUser.id, identityType: 'Wallet', ...signupAnalytics });
+    if (!skipTracking) {
+      updateTrackUserProfile(newUser, prisma);
+      trackUserAction('sign_up', { userId: newUser.id, identityType: 'Wallet', ...signupAnalytics });
+    }
 
     return newUser;
   }

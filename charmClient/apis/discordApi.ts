@@ -1,4 +1,4 @@
-import type { Space, User } from '@prisma/client';
+import type { Space, User } from '@charmverse/core/prisma';
 
 import * as http from 'adapters/http';
 import type { CheckDiscordGateResult } from 'lib/discord/interface';

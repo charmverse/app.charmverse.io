@@ -1,7 +1,7 @@
-import type { PagePermission, PagePermissionLevel, Space, User } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { PagePermission, PagePermissionLevel, Space, User } from '@charmverse/core/prisma';
 import { v4 } from 'uuid';
 
-import { prisma } from 'db';
 import type { IPageWithPermissions } from 'lib/pages/server';
 import { PageNotFoundError } from 'lib/pages/server';
 import { upsertPermission } from 'lib/permissions/pages/actions/upsert-permission';

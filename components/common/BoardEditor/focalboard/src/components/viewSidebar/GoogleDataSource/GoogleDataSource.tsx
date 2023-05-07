@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/log';
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import ReportProblemIcon from '@mui/icons-material/ReportProblemOutlined';
 import { Alert, Box, MenuItem, ListItemIcon, ListItem, ListItemText, Tooltip, Typography, Link } from '@mui/material';
@@ -10,7 +11,6 @@ import useSwr from 'swr';
 import charmClient from 'charmClient';
 import LoadingComponent from 'components/common/LoadingComponent';
 import type { BoardViewFields } from 'lib/focalboard/boardView';
-import log from 'lib/log';
 import type { CredentialItem } from 'pages/api/google/credentials';
 import type { GoogleFormItem } from 'pages/api/google/forms';
 

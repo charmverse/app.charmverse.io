@@ -1,9 +1,9 @@
-import type { Role, Space, TokenGate, TokenGateToRole, User } from '@prisma/client';
-import { SpaceRole } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { Role, Space, TokenGate, TokenGateToRole, User } from '@charmverse/core/prisma';
+import { SpaceRole } from '@charmverse/core/prisma';
 import request from 'supertest';
 import { v4 } from 'uuid';
 
-import { prisma } from 'db';
 import { createUserFromWallet } from 'lib/users/createUser';
 import type { LoggedInUser } from 'models';
 import { baseUrl, loginUser } from 'testing/mockApiCall';

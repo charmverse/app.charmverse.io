@@ -1,7 +1,7 @@
+import { AvailablePostPermissions } from '@charmverse/core/shared';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
-import { AvailablePostPermissions } from 'lib/permissions/forum/availablePostPermissions.class';
 
 type Props = {
   postIdOrPath: string;

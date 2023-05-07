@@ -1,4 +1,4 @@
-import type { VoteContext, VoteStatus } from '@prisma/client';
+import type { VoteContext, VoteStatus } from '@charmverse/core/prisma';
 import { v4 } from 'uuid';
 
 import { addSpaceOperations } from 'lib/permissions/spaces';

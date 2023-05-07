@@ -1,7 +1,7 @@
-import type { Space } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { Space } from '@charmverse/core/prisma';
 import * as litSDK from 'lit-js-sdk';
 
-import { prisma } from 'db';
 import { applyTokenGates } from 'lib/token-gates/applyTokenGates';
 import { verifyTokenGateMembership } from 'lib/token-gates/verifyTokenGateMembership';
 import type { UserToVerifyMembership } from 'lib/token-gates/verifyTokenGateMemberships';

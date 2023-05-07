@@ -1,4 +1,4 @@
-// import type { Block } from '@prisma/client';
+// import type { Block } from '@charmverse/core/prisma';
 
 import type { Block } from 'lib/focalboard/block';
 import type { PageMeta } from 'lib/pages';

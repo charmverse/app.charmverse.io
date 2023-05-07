@@ -1,8 +1,9 @@
+import { log } from '@charmverse/core/log';
+import type { IdentityType } from '@charmverse/core/prisma';
 import ArrowSquareOut from '@mui/icons-material/Launch';
 import { Grid, IconButton, Typography } from '@mui/material';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import Alert from '@mui/material/Alert';
-import type { IdentityType } from '@prisma/client';
 import UAuth from '@uauth/js';
 import type { AbstractConnector } from '@web3-react/abstract-connector';
 import { UnsupportedChainIdError, useWeb3React } from '@web3-react/core';
@@ -18,7 +19,6 @@ import { Modal } from 'components/common/Modal';
 import type { AnyIdLogin } from 'components/login/LoginButton';
 import type { UnstoppableDomainsAuthSig } from 'lib/blockchain/unstoppableDomains';
 import { extractDomainFromProof } from 'lib/blockchain/unstoppableDomains/client';
-import log from 'lib/log';
 import type { DisabledAccountError } from 'lib/utilities/errors';
 import { BrowserPopupError } from 'lib/utilities/errors';
 
