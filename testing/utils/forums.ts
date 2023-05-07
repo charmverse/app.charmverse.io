@@ -1,7 +1,7 @@
-import type { PostCategory } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { PostCategory } from '@charmverse/core/prisma';
 import { v4 } from 'uuid';
 
-import { prisma } from 'db';
 import { getPostCategoryPath } from 'lib/forums/categories/getPostCategoryPath';
 import { createPostComment } from 'lib/forums/comments/createPostComment';
 import type { CreatePostCommentInput } from 'lib/forums/comments/interface';
@@ -64,8 +64,10 @@ export async function generateForumPost({
   path = `post-${v4()}`,
   title = 'Test post',
   content,
-  contentText
+  contentText,
+  isDraft
 }: {
+  isDraft?: boolean;
   categoryId?: string;
   userId: string;
   spaceId: string;
@@ -83,6 +85,7 @@ export async function generateForumPost({
       title,
       path,
       contentText: contentText ?? '',
+      isDraft,
       content: content ?? {
         type: 'doc',
         content: []

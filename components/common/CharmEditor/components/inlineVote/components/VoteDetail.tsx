@@ -1,4 +1,5 @@
 import { useEditorViewContext } from '@bangle.dev/react';
+import type { UserVote } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import HowToVoteOutlinedIcon from '@mui/icons-material/HowToVoteOutlined';
 import {
@@ -17,7 +18,6 @@ import {
   Typography
 } from '@mui/material';
 import Tooltip from '@mui/material/Tooltip';
-import type { UserVote } from '@prisma/client';
 import { DateTime } from 'luxon';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import React from 'react';
@@ -26,7 +26,7 @@ import useSWR from 'swr';
 import charmClient from 'charmClient';
 import Avatar from 'components/common/Avatar';
 import Modal from 'components/common/Modal';
-import useTasks from 'components/nexus/hooks/useTasks';
+import { useTasks } from 'components/nexus/hooks/useTasks';
 import { VoteActionsMenu } from 'components/votes/components/VoteActionsMenu';
 import VoteStatusChip from 'components/votes/components/VoteStatusChip';
 import { useMembers } from 'hooks/useMembers';
@@ -75,7 +75,7 @@ export function VoteDetail({
     charmClient.votes.getUserVotes(id)
   );
   const { mutate: refetchTasks } = useTasks();
-  const { members } = useMembers();
+  const { getMemberById } = useMembers();
 
   const voteDetailsPopup = usePopupState({ variant: 'popover', popupId: 'inline-votes-detail' });
 
@@ -241,7 +241,7 @@ export function VoteDetail({
       {detailed && userVotes && (
         <List>
           {userVotes.map((userVote) => {
-            const member = members.find((_member) => _member.id === userVote.user.id);
+            const member = getMemberById(userVote.user.id);
             return (
               <React.Fragment key={userVote.userId}>
                 <ListItem

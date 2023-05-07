@@ -1,6 +1,6 @@
-import type { Space, User } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { Space, User } from '@charmverse/core/prisma';
 
-import { prisma } from 'db';
 import { createForumPost } from 'lib/forums/posts/createForumPost';
 import { InvalidInputError } from 'lib/utilities/errors';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
@@ -52,7 +52,8 @@ describe('deletePostCategory', () => {
       categoryId: category.id,
       title: 'Test Post',
       contentText: '',
-      createdBy: user.id
+      createdBy: user.id,
+      isDraft: false
     });
 
     await expect(deletePostCategory(category.id)).rejects.toBeInstanceOf(PostCategoryNotDeleteableError);

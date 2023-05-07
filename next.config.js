@@ -1,4 +1,6 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
+const fs = require('fs');
+const path = require('node:path');
 
 const BundleAnalyzer = require('@next/bundle-analyzer');
 const next = require('next/dist/lib/is-serializable-props');
@@ -18,13 +20,15 @@ const config = {
   },
   // types are tested separately from the build
   typescript: {
-    ignoreBuildErrors: skipCodeChecks
+    ignoreBuildErrors: skipCodeChecks,
+    tsconfigPath: 'tsconfig.next.json'
   },
   compiler: {
     styledComponents: true
   },
   experimental: {
     esmExternals: false
+    //    externalDir: true
   },
   transpilePackages: esmModules,
   modularizeImports: {
@@ -75,12 +79,66 @@ const config = {
         source: '/share/:path*',
         destination: '/:path*',
         permanent: true
+      },
+      // added 4/2023 to redirect old /createWorkspace to /createSpace
+      {
+        source: '/createWorkspace',
+        destination: '/createSpace',
+        permanent: true
+      },
+      // added 4/2023 to redirect /signup to /createSpace
+      {
+        source: '/signup',
+        destination: '/createSpace',
+        permanent: true
       }
     ];
   },
   webpack(_config, { buildId, nextRuntime }) {
     // Fix for: "Module not found: Can't resolve 'canvas'"
     _config.resolve.alias.canvas = false;
+
+    // Fix for: "Module not found: Can't resolve X" when using moduleResolution, nodeNext
+    // https://github.com/vercel/next.js/discussions/41189#discussioncomment-4488386
+    // _config.resolve.extensionAlias = {
+    //   '.js': ['.js', '.ts'],
+    //   '.jsx': ['.jsx', '.tsx']
+    // };
+
+    // const externalDir = path.resolve(__dirname, '..', 'core', 'node_modules');
+
+    // _config.resolve.modules.push(externalDir);
+
+    // // _config.module.rules.push({ include: [path.resolve(__dirname), path.resolve(__dirname, '../core/node_modules')] });
+
+    // _config.resolve.alias['@prisma/client'] = path.resolve(__dirname, '../core/node_modules/@prisma/client');
+
+    // _config.resolve.symlinks = true;
+
+    //   console.log('ALIAS', _config.resolve.alias);
+
+    //    console.log('Module', _config.module);
+
+    // _config.resolve.modules = [
+    //   ...(_config.resolve.modules ?? []),
+    //   path.resolve(__dirname, 'node_modules'),
+    //   path.resolve(__dirname, '../charmverse-common/node_modules')
+    // ];
+
+    // //    _config.resolve.symlinks = false;
+
+    // const aliasUrl = fs.realpathSync(
+    //   path.resolve(path.join(__dirname, '../charmverse-common/node_modules/@prisma/client'))
+    // );
+
+    // console.log(`Alias URL:`, aliasUrl);
+
+    // _config.resolve.alias['@prisma/client'] = aliasUrl;
+    // );
+    // _config.resolve.modules['@prisma/client'] = path.resolve(
+    //   'node_modules/@charmverse/core/node_modules/@prisma/client'
+    // );
+
     _config.module.rules.push({
       test: /\.svg$/,
       use: [
@@ -110,7 +168,8 @@ const config = {
           return {
             ..._entry,
             cron: './background/cron.ts',
-            websockets: './background/websockets.ts'
+            websockets: './background/websockets.ts',
+            countSpaceData: './scripts/countSpaceData.ts'
           };
         });
       };

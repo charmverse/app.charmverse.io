@@ -1,6 +1,8 @@
-import type { ProposalCategoryOperation, ProposalCategoryPermissionLevel, ProposalOperation } from '@prisma/client';
-
-import { proposalOperations } from './interfaces';
+import type {
+  ProposalCategoryOperation,
+  ProposalCategoryPermissionLevel,
+  ProposalOperation
+} from '@charmverse/core/prisma';
 
 export const proposalCategoryPermissionsMapping: Record<ProposalCategoryPermissionLevel, ProposalCategoryOperation[]> =
   {
@@ -15,11 +17,4 @@ export const proposalPermissionsMapping: Record<ProposalCategoryPermissionLevel,
   view_comment_vote: ['view', 'comment', 'vote'],
   view_comment: ['view', 'comment'],
   view: ['view']
-} as const;
-
-export const proposalCategoryPermissionLabels: Record<ProposalCategoryPermissionLevel, string> = {
-  full_access: 'Full Access',
-  view_comment_vote: 'Comment & vote',
-  view_comment: 'Comment',
-  view: 'View only'
 } as const;

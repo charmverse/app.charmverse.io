@@ -1,4 +1,4 @@
-import type { Post, Space, User } from '@prisma/client';
+import type { Post, Space, User } from '@charmverse/core/prisma';
 import { v4 } from 'uuid';
 
 import { generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';

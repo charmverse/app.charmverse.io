@@ -12,10 +12,13 @@ import {
 } from 'mjml-react';
 import React from 'react';
 
-import { fontFamily } from 'theme';
 import { lightGreyColor, primaryTextColor } from 'theme/colors';
 
 import styles from '../theme/styles';
+
+// copied from theme/fonts.ts because next/fonts doesnt play well with tsx or ts-node. TODO: maybe remove next/fonts?
+const defaultFont =
+  'ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"';
 
 interface Props {
   children: React.ReactNode;
@@ -37,7 +40,7 @@ export default function EmailWrapper(props: Props) {
         <MjmlAttributes>
           <MjmlButton cssClass='button' />
           <MjmlDivider cssClass='mjml-divider' />
-          <MjmlText font-family={fontFamily} color={primaryTextColor} font-size='18px' line-height='26px' />
+          <MjmlText font-family={defaultFont} color={primaryTextColor} font-size='18px' line-height='26px' />
         </MjmlAttributes>
       </MjmlHead>
       <MjmlBody width={600} backgroundColor={lightGreyColor} css-class='mjml-root'>

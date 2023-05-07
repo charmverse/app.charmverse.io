@@ -1,3 +1,5 @@
+import type { ParseResult } from 'papaparse';
+
 import type { IPropertyTemplate } from 'lib/focalboard/board';
 
 import type { MappedProperties } from './databasePageOptions';
@@ -26,6 +28,28 @@ export const mockCardProperties: IPropertyTemplate[] = [
         value: 'Not started'
       }
     ]
+  },
+  {
+    id: 'k23m78b6-1d7d-49ed-a3c4-ef27e624470p',
+    name: 'Multi Select',
+    type: 'multiSelect',
+    options: [
+      {
+        color: 'propColorTeal',
+        id: '90b55f20-62e2-4812-b417-1831a44da542',
+        value: 'A'
+      },
+      {
+        color: 'propColorYellow',
+        id: 'a007d7b1-d055-446a-ba18-90a48121305c',
+        value: 'B'
+      },
+      {
+        color: 'propColorRed',
+        id: '30f7e52a-41fd-4f50-a217-1d4f40daa873',
+        value: 'C'
+      }
+    ]
   }
 ];
 
@@ -38,6 +62,20 @@ export const mockCsvRow = {
   Url: 'www.charmverse.io',
   Email: 'test@charmversetest.io',
   Checkbox: 'true'
+};
+
+export const mockCsvRowWithMultiSelectAsHeaders = {
+  Name: 'New name',
+  Number: '32132131',
+  'Multi Select': 'human|dog',
+  'Assigned person': '8h5t73b6-1d7d-0j6f-a3c4-ef27e624185b',
+  Date: 'December 17 2021',
+  Url: 'www.charmverse.io',
+  Email: 'test@charmversetest.io',
+  Checkbox: 'true',
+  A: 'A',
+  B: '',
+  C: 'C'
 };
 
 export const mockMappedBoardProperties: { [key: string]: MappedProperties } = {
@@ -85,5 +123,18 @@ export const mockMappedBoardProperties: { [key: string]: MappedProperties } = {
     type: 'checkbox',
     name: 'Checkbox',
     options: {}
+  }
+};
+
+export const mockCsvResults: ParseResult<Record<string, string>> = {
+  data: [mockCsvRow],
+  errors: [],
+  meta: {
+    delimiter: ',',
+    linebreak: '\r\n',
+    aborted: false,
+    truncated: false,
+    cursor: 179,
+    fields: Object.keys(mockCsvRow)
   }
 };

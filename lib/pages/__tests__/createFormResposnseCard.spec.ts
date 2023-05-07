@@ -1,4 +1,4 @@
-import type { Space, User } from '@prisma/client';
+import type { Space, User } from '@charmverse/core/prisma';
 
 import { createFormResponseCard } from 'lib/pages/createFormResponseCard';
 import { getDatabaseDetails } from 'lib/pages/getDatabaseDetails';
@@ -56,7 +56,7 @@ describe('createFormResposnseCard', () => {
     expect(Object.keys(res2.properties).length).toBe(2);
 
     const mockResponse3 = [
-      { question: 'Test q 1', answer: 'answer 3' },
+      { question: 'Test q 2', answer: 'answer 3' },
       { question: 'Test q 3', answer: 'answer 4' }
     ];
 

@@ -1,4 +1,5 @@
-import { prisma } from 'db';
+import { prisma } from '@charmverse/core';
+
 import { upsertPermission } from 'lib/permissions/pages';
 import {
   createPage,

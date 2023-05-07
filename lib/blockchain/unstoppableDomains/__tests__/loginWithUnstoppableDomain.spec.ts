@@ -1,4 +1,5 @@
-import { prisma } from 'db';
+import { prisma } from '@charmverse/core';
+
 import { createUserFromWallet } from 'lib/users/createUser';
 import { DisabledAccountError } from 'lib/utilities/errors';
 import { shortWalletAddress } from 'lib/utilities/strings';

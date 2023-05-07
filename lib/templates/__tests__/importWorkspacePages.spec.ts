@@ -2,14 +2,14 @@
 /* eslint-disable camelcase */
 import fs from 'node:fs/promises';
 
-import type { Page, Space, User } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { Page, Space, User } from '@charmverse/core/prisma';
 import { v4 } from 'uuid';
 
-import { prisma } from 'db';
 import type { IPageWithPermissions } from 'lib/pages';
 import { createPage, generateBoard, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
-import { exportWorkspacePages } from '../exportWorkspacePages';
+import { exportWorkspacePages, exportWorkspacePagesToDisk } from '../exportWorkspacePages';
 import { importWorkspacePages } from '../importWorkspacePages';
 
 jest.mock('node:fs/promises');
@@ -75,7 +75,7 @@ describe('importWorkspacePages', () => {
   it('should import data from the export function into the target workspace', async () => {
     const { space: targetSpace } = await generateUserAndSpaceWithApiToken();
 
-    const { data } = await exportWorkspacePages({
+    const data = await exportWorkspacePages({
       sourceSpaceIdOrDomain: space.domain
     });
 
@@ -105,7 +105,7 @@ describe('importWorkspacePages', () => {
 
     const exportName = `test-${v4()}`;
 
-    const { data, path } = await exportWorkspacePages({
+    const { data, path } = await exportWorkspacePagesToDisk({
       sourceSpaceIdOrDomain: space.domain,
       exportName
     });

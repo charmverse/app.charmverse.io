@@ -1,14 +1,15 @@
-import type { Prisma, Space } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import { log } from '@charmverse/core/log';
+import type { Prisma, Space } from '@charmverse/core/prisma';
 import jsZip from 'jszip';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import { v4 } from 'uuid';
 
-import { prisma } from 'db';
-import log from 'lib/log';
 import { onError, onNoMatch, requireSpaceMembership, requireUser } from 'lib/middleware';
 import { getRequestLanguage } from 'lib/middleware/getRequestLanguage';
 import { getPagePath } from 'lib/pages';
+import { generateFirstDiff } from 'lib/pages/server/generateFirstDiff';
 import { pageMetaSelect } from 'lib/pages/server/getPageMeta';
 import { parseMarkdown } from 'lib/prosemirror/plugins/markdown/parseMarkdown';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -122,9 +123,27 @@ async function importZippedController(req: NextApiRequest, res: NextApiResponse)
             }
           });
 
-          await prisma.page.createMany({
-            data: pagesToCreate
-          });
+          const pageDiffs: Prisma.PageDiffCreateManyInput[] = pagesToCreate
+            .filter((p) => !!p.content)
+            .map((p) => {
+              const diff = generateFirstDiff({
+                createdBy: p.createdBy,
+                content: p.content
+              });
+              return {
+                ...diff,
+                pageId: p.id
+              } as Prisma.PageDiffCreateManyInput;
+            });
+
+          await prisma.$transaction([
+            prisma.page.createMany({
+              data: pagesToCreate
+            }),
+            prisma.pageDiff.createMany({
+              data: pageDiffs
+            })
+          ]);
           const pageIds = [parentPageId as string, ...pagesToCreate.map((page) => page.id as string)];
 
           const space = (await prisma.space.findUnique({

@@ -13,11 +13,12 @@ type Props = {
   cardProperties: IPropertyTemplate[];
   menuOpen: boolean;
   onMenuClose: () => void;
-  onMenuOpen: () => void;
+  onMenuOpen: (anchorEl: HTMLElement) => void;
   onChange: (data: { calculation: string; propertyId: string }) => void;
   value: string;
   property: IPropertyTemplate;
   readOnly: boolean;
+  anchorEl: HTMLElement | null;
 };
 
 function KanbanCalculation(props: Props): JSX.Element {
@@ -26,22 +27,23 @@ function KanbanCalculation(props: Props): JSX.Element {
   return (
     <div className='KanbanCalculation'>
       <Button
-        onClick={() => (props.menuOpen ? props.onMenuClose : props.onMenuOpen)()}
-        onBlur={props.onMenuClose}
+        onClick={(e) => (props.menuOpen ? props.onMenuClose : props.onMenuOpen)(e.currentTarget)}
         title={Calculations[props.value] ? Calculations[props.value](props.cards, props.property, intl) : ''}
       >
         {Calculations[props.value] ? Calculations[props.value](props.cards, props.property, intl) : ''}
       </Button>
 
-      {!props.readOnly && props.menuOpen && (
+      {!props.readOnly && (
         <KanbanCalculationOptions
           value={props.value}
+          anchorEl={props.anchorEl}
           property={props.property}
           menuOpen={props.menuOpen}
           onChange={(data: { calculation: string; propertyId: string }) => {
             props.onChange(data);
             props.onMenuClose();
           }}
+          onClose={props.onMenuClose}
           cardProperties={props.cardProperties}
         />
       )}

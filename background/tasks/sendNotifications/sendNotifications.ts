@@ -1,12 +1,11 @@
-import { prisma } from 'db';
+import { prisma } from '@charmverse/core';
+import { log } from '@charmverse/core/log';
+
 import { getBountyTasks } from 'lib/bounties/getBountyTasks';
 import { getDiscussionTasks } from 'lib/discussion/getDiscussionTasks';
 import * as emails from 'lib/emails';
 import type { PendingTasksProps } from 'lib/emails/templates/PendingTasks';
 import { getForumNotifications } from 'lib/forums/getForumNotifications/getForumNotifications';
-import type { GnosisSafeTasks } from 'lib/gnosis/gnosis.tasks';
-import { getPendingGnosisTasks } from 'lib/gnosis/gnosis.tasks';
-import log from 'lib/log';
 import * as mailer from 'lib/mailer';
 import { getProposalTasksFromWorkspaceEvents } from 'lib/proposal/getProposalTasksFromWorkspaceEvents';
 import { getVoteTasks } from 'lib/votes/getVoteTasks';
@@ -21,9 +20,6 @@ export async function sendUserNotifications(): Promise<number> {
 
   return notificationsToSend.length;
 }
-
-// note: the email only notifies the first task of each safe
-const getGnosisSafeTaskId = (task: GnosisSafeTasks) => task.tasks[0].transactions[0].id;
 
 export async function getNotifications(): Promise<(PendingTasksProps & { unmarkedWorkspaceEvents: string[] })[]> {
   // Get all the workspace events within the past day
@@ -61,7 +57,6 @@ export async function getNotifications(): Promise<(PendingTasksProps & { unmarke
   // Because we have a large number of queries in parallel we need to avoid Promise.all and chain them one by one
   const notifications = await activeUsersWithSafes.reduce(async (acc, user) => {
     const accPromise = await acc;
-    const gnosisSafeTasks = user.gnosisSafes.length > 0 ? await getPendingGnosisTasks(user.id) : [];
     const discussionTasks = await getDiscussionTasks(user.id);
     const voteTasks = await getVoteTasks(user.id);
     const bountyTasks = await getBountyTasks(user.id);
@@ -70,11 +65,7 @@ export async function getNotifications(): Promise<(PendingTasksProps & { unmarke
     const sentTasks = await prisma.userNotification.findMany({
       where: {
         taskId: {
-          in: [
-            ...gnosisSafeTasks.map(getGnosisSafeTaskId),
-            ...voteTasks.map((voteTask) => voteTask.id),
-            ...workspaceEvents.map((workspaceEvent) => workspaceEvent.id)
-          ]
+          in: [...workspaceEvents.map((workspaceEvent) => workspaceEvent.id)]
         },
         userId: user.id
       },
@@ -85,13 +76,7 @@ export async function getNotifications(): Promise<(PendingTasksProps & { unmarke
 
     const sentTaskIds = new Set(sentTasks.map((sentTask) => sentTask.taskId));
 
-    const voteTasksNotSent = voteTasks.filter((voteTask) => !sentTaskIds.has(voteTask.id));
-    const gnosisSafeTasksNotSent = gnosisSafeTasks.filter(
-      (gnosisSafeTask) => !sentTaskIds.has(getGnosisSafeTaskId(gnosisSafeTask))
-    );
-    const myGnosisTasksNotSent = gnosisSafeTasksNotSent.filter((gnosisSafeTask) =>
-      Boolean(gnosisSafeTask.tasks[0].transactions[0].myAction)
-    );
+    const voteTasksNotSent = voteTasks.unmarked;
     const workspaceEventsNotSent = workspaceEvents.filter((workspaceEvent) => !sentTaskIds.has(workspaceEvent.id));
     const { proposalTasks = [], unmarkedWorkspaceEvents = [] } =
       workspaceEventsNotSent.length !== 0
@@ -99,7 +84,6 @@ export async function getNotifications(): Promise<(PendingTasksProps & { unmarke
         : {};
 
     const totalTasks =
-      myGnosisTasksNotSent.length +
       discussionTasks.unmarked.length +
       voteTasksNotSent.length +
       proposalTasks.length +
@@ -108,21 +92,17 @@ export async function getNotifications(): Promise<(PendingTasksProps & { unmarke
 
     log.debug('Found tasks for notification', {
       notSent:
-        myGnosisTasksNotSent.length +
         voteTasksNotSent.length +
         discussionTasks.unmarked.length +
         proposalTasks.length +
         bountyTasks.unmarked.length +
-        forumTasks.unmarked.length,
-      gnosisSafeTasks: gnosisSafeTasks.length,
-      myGnosisTasks: myGnosisTasksNotSent.length
+        forumTasks.unmarked.length
     });
 
     return [
       ...accPromise,
       {
         user: user as PendingTasksProps['user'],
-        gnosisSafeTasks: myGnosisTasksNotSent,
         totalTasks,
         // Get only the unmarked discussion tasks
         discussionTasks: discussionTasks.unmarked,
@@ -149,16 +129,6 @@ async function sendNotification(
   try {
     // remember that we sent these tasks
     await prisma.$transaction([
-      ...notification.gnosisSafeTasks.map((task) =>
-        prisma.userNotification.create({
-          data: {
-            userId: notification.user.id,
-            taskId: getGnosisSafeTaskId(task),
-            channel: 'email',
-            type: 'multisig'
-          }
-        })
-      ),
       ...notification.proposalTasks.map((proposalTask) =>
         prisma.userNotification.create({
           data: {
@@ -193,7 +163,7 @@ async function sendNotification(
         prisma.userNotification.create({
           data: {
             userId: notification.user.id,
-            taskId: discussionTask.mentionId ?? discussionTask.commentId ?? '',
+            taskId: discussionTask.mentionId ?? discussionTask.commentId ?? discussionTask.taskId ?? '',
             channel: 'email',
             type: 'mention'
           }
@@ -221,7 +191,18 @@ async function sendNotification(
       )
     ]);
   } catch (error) {
-    log.error(`Updating notifications failed for the user ${notification.user.id}`, { error });
+    log.error(`Error trying to save notification for user`, {
+      userId: notification.user.id,
+      error,
+      forumTaskIds: notification.forumTasks.map((forumTask) => forumTask.taskId),
+      proposalTaskIds: notification.proposalTasks.map((proposalTask) => proposalTask.id),
+      unmarkedWorkspaceEventIds: notification.unmarkedWorkspaceEvents,
+      voteTaskIds: notification.voteTasks.map((voteTask) => voteTask.id),
+      discussionTaskIds: notification.discussionTasks.map(
+        (discussionTask) => discussionTask.mentionId ?? discussionTask.commentId ?? discussionTask.taskId ?? ''
+      ),
+      bountyTaskIds: notification.bountyTasks.map((bountyTask) => bountyTask.id)
+    });
     return undefined;
   }
 

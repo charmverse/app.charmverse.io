@@ -92,6 +92,31 @@ describe('POST /api/forums/posts/[postId]/convert-to-proposal - Convert post to 
       .expect(401);
   });
 
+  it('should fail if its a draft post, and respond 401', async () => {
+    const { space, user: nonAdminUser1 } = await generateUserAndSpaceWithApiToken(undefined, false);
+
+    const nonAdminCookie = await loginUser(nonAdminUser1.id);
+
+    const posts = await generateForumPosts({
+      spaceId: space.id,
+      createdBy: nonAdminUser1.id,
+      count: 1,
+      isDraft: true
+    });
+
+    const proposalCategory = await generateProposalCategory({
+      spaceId: space.id
+    });
+
+    await request(baseUrl)
+      .post(`/api/forums/posts/${posts[0].id}/convert-to-proposal`)
+      .set('Cookie', nonAdminCookie)
+      .send({
+        categoryId: proposalCategory.id
+      })
+      .expect(401);
+  });
+
   it('should fail if the user does not have permission to create proposals in this category, and respond 401', async () => {
     const { space, user: nonAdminUser1 } = await generateUserAndSpaceWithApiToken(undefined, false);
 

@@ -1,7 +1,7 @@
+import { prisma } from '@charmverse/core';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { prisma } from 'db';
 import { removeMember } from 'lib/members/removeMember';
 import { onError, onNoMatch, requireKeys, requireSpaceMembership } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -30,7 +30,7 @@ async function updateMember(req: NextApiRequest, res: NextApiResponse) {
         isAdmin: true,
         spaceId,
         userId: {
-          not: req.session.user.id
+          not: userId
         }
       }
     });
@@ -48,7 +48,8 @@ async function updateMember(req: NextApiRequest, res: NextApiResponse) {
       }
     },
     data: {
-      isAdmin: req.body.isAdmin
+      isAdmin: req.body.isAdmin,
+      isGuest: req.body.isGuest
     }
   });
   res.status(200).json({ ok: true });

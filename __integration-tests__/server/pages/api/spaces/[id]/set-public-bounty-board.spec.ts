@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import type { Space, User } from '@prisma/client';
+import type { Space, User } from '@charmverse/core/prisma';
 import request from 'supertest';
 
 import type { PublicBountyToggle } from 'lib/spaces/interfaces';

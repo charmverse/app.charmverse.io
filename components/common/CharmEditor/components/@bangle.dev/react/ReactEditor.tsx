@@ -5,6 +5,7 @@ import { EditorState } from '@bangle.dev/pm';
 import type { Plugin } from '@bangle.dev/pm';
 import { EditorViewContext } from '@bangle.dev/react';
 import { objectUid } from '@bangle.dev/utils';
+import { log } from '@charmverse/core/log';
 import styled from '@emotion/styled';
 import type { RefObject } from 'react';
 import React, { useEffect, useImperativeHandle, useRef, useState } from 'react';
@@ -17,7 +18,6 @@ import { undoEventName } from 'components/common/CharmEditor/utils';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
-import log from 'lib/log';
 import { isTouchScreen } from 'lib/utilities/browser';
 
 import { FidusEditor } from '../../fiduswriter/fiduseditor';
@@ -46,6 +46,7 @@ interface BangleEditorProps<PluginMetadata = any> extends CoreBangleEditorProps<
   readOnly?: boolean;
   onParticipantUpdate?: (participants: FrontendParticipant[]) => void;
   isContentControlled?: boolean;
+  initialContent?: any;
   enableComments?: boolean;
 }
 
@@ -57,6 +58,7 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
     state,
     children,
     isContentControlled,
+    initialContent,
     focusOnInit,
     pmViewOpts,
     renderNodeViews,
@@ -80,7 +82,9 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
   const isLoadingRef = useRef(enableFidusEditor);
   const useSockets = user && pageId && trackChanges && (!readOnly || enableComments) && !isContentControlled;
 
-  const { data: authResponse } = useSWRImmutable(useSockets ? user?.id : null, () => charmClient.socket()); // refresh when user
+  const { data: authResponse, error: authError } = useSWRImmutable(useSockets ? user?.id : null, () =>
+    charmClient.socket()
+  ); // refresh when user
 
   pmViewOpts ||= {};
   pmViewOpts.editable = () => !readOnly && !isLoadingRef.current;
@@ -111,9 +115,14 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
     [editor]
   );
 
-  function onError(error: Error) {
+  function onError(_editor: CoreBangleEditor, error: Error) {
     showMessage(error.message, 'warning');
     log.error('[ws/ceditor]: Error message displayed to user', { error });
+    if (isLoading) {
+      setIsLoading(false);
+      isLoadingRef.current = false;
+      setEditorContent(_editor, initialContent);
+    }
   }
 
   useEffect(() => {
@@ -168,33 +177,20 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
           onDocLoaded: () => {
             setIsLoading(false);
             isLoadingRef.current = false;
-            // console.log('set is loading false');
           },
           onParticipantUpdate
         });
-        fEditor.init(_editor.view, authResponse.authToken, onError);
+        fEditor.init(_editor.view, authResponse.authToken, (error) => onError(_editor, error));
+      } else if (authError) {
+        log.warn('Loading readonly mode of editor due to web socket failure', { error: authError });
+        setIsLoading(false);
+        isLoadingRef.current = false;
+        setEditorContent(_editor, initialContent);
       }
     } else if (pageId && readOnly) {
-      charmClient.pages.getPageDetails(pageId).then((page) => {
-        if (_editor) {
-          setIsLoading(false);
-          isLoadingRef.current = false;
-          const schema = _editor.view.state.schema;
-          let doc = _editor.view.state.doc;
-          if (page.content) {
-            doc = schema.nodeFromJSON(page.content);
-          }
-          const stateConfig = {
-            schema,
-            doc,
-            plugins: _editor.view.state.plugins
-          };
-          if (_editor.view && !_editor.view.isDestroyed) {
-            // Set document in prosemirror
-            _editor.view.setProps({ state: EditorState.create(stateConfig) });
-          }
-        }
-      });
+      setIsLoading(false);
+      isLoadingRef.current = false;
+      setEditorContent(_editor, initialContent);
     }
     (_editor.view as any)._updatePluginWatcher = updatePluginWatcher(_editor);
     setEditor(_editor);
@@ -202,7 +198,7 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
       fEditor?.close();
       _editor.destroy();
     };
-  }, [user?.id, pageId, useSockets, authResponse, authResponse, ref]);
+  }, [user?.id, pageId, useSockets, authResponse, authError, ref]);
 
   useEffect(() => {
     const timer = setTimeout(() => setShowLoader(true), 300);
@@ -258,4 +254,20 @@ function updatePluginWatcher(editor: CoreBangleEditor) {
 
     editor.view.updateState(state);
   };
+}
+
+function setEditorContent(editor: CoreBangleEditor, content?: any) {
+  if (content) {
+    const schema = editor.view.state.schema;
+    const doc = schema.nodeFromJSON(content);
+    const stateConfig = {
+      schema,
+      doc,
+      plugins: editor.view.state.plugins
+    };
+    if (editor.view && !editor.view.isDestroyed) {
+      // Set document in prosemirror
+      editor.view.setProps({ state: EditorState.create(stateConfig) });
+    }
+  }
 }

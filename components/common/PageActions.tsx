@@ -1,10 +1,10 @@
+import type { PageType } from '@charmverse/core/prisma';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { IconButton } from '@mui/material';
-import type { PageType } from '@prisma/client';
 import type { MouseEvent, ReactNode } from 'react';
 import { useState } from 'react';
 
-import type { DuplicatePageResponse } from 'lib/pages';
+import type { DuplicatePageResponse } from 'lib/pages/duplicatePage';
 
 import { PageActionsMenu } from './PageActionsMenu';
 
@@ -27,6 +27,7 @@ export function PageActions({
     path: string;
     deletedAt: Date | null;
     parentId?: string | null;
+    title: string | null;
   };
   readOnly?: boolean;
   onClickDelete?: VoidFunction;

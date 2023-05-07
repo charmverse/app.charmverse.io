@@ -1,9 +1,9 @@
 import type { SQSClientConfig } from '@aws-sdk/client-sqs';
 import { SQSClient, ReceiveMessageCommand, DeleteMessageCommand } from '@aws-sdk/client-sqs';
+import { getLogger } from '@charmverse/core/log';
 
 import { AWS_REGION } from 'lib/aws/config';
 import { SQS_WEBHOOK_COLLABLAND_QUEUE_NAME } from 'lib/collabland/config';
-import { getLogger } from 'lib/log/prefix';
 import type { WebhookMessage, WebhookMessageProcessResult } from 'lib/webhookConsumer/interfaces';
 
 const log = getLogger('sqs');

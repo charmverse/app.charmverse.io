@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import type { Post, PostCategory, Space, User } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { Post, PostCategory, Space, User } from '@charmverse/core/prisma';
 import request from 'supertest';
 
-import { prisma } from 'db';
 import type { PostWithVotes } from 'lib/forums/posts/interfaces';
 import type { UpdateForumPostInput } from 'lib/forums/posts/updateForumPost';
 import { upsertPostCategoryPermission } from 'lib/permissions/forum/upsertPostCategoryPermission';
@@ -221,5 +221,18 @@ describe('GET /api/forums/posts/[postId] - Get a post', () => {
     const post = await generateForumPost(createInput);
 
     await request(baseUrl).get(`/api/forums/posts/${post.id}`).set('Cookie', externalUserCookie).send().expect(401);
+  });
+
+  it('should fail if a non-drafted post is converted to a drafted post, responding with 401', async () => {
+    const { user: externalUser } = await generateUserAndSpaceWithApiToken();
+    const externalUserCookie = await loginUser(externalUser.id);
+
+    const post = await generateForumPost({ ...createInput, isDraft: false });
+
+    await request(baseUrl)
+      .get(`/api/forums/posts/${post.id}`)
+      .set('Cookie', externalUserCookie)
+      .send({ isDraft: true })
+      .expect(401);
   });
 });

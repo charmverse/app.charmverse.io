@@ -1,3 +1,4 @@
+import type { TokenGate } from '@charmverse/core/prisma';
 import type { JsonAuthSig, JsonSigningResourceId } from '@lit-protocol/types';
 import type { TokenGate } from '@prisma/client';
 

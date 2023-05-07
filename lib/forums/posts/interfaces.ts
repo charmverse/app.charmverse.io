@@ -1,4 +1,4 @@
-import type { Post } from '@prisma/client';
+import type { Post } from '@charmverse/core/prisma';
 
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
@@ -10,4 +10,5 @@ export type ForumPostMeta = Pick<Post, 'createdBy' | 'id' | 'categoryId' | 'titl
   votes: ForumVotes;
   createdAt: string;
   updatedAt: string;
+  isDraft: boolean;
 };

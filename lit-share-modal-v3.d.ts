@@ -22,6 +22,7 @@ declare module 'lit-share-modal-v3' {
     injectCSS?: boolean;
     permanentDefault?: boolean;
     onUnifiedAccessControlConditionsSelected(result: ConditionsModalResult): void;
+    chainsAllowed?: string[];
   }
 
   declare const ShareModal: React.FC<ShareModalProps>;

@@ -1,6 +1,6 @@
-import type { Prisma } from '@prisma/client';
+import { buildComputePermissionsWithPermissionFilteringPolicies, prisma } from '@charmverse/core';
 
-import { prisma } from 'db';
+import { filterApplicablePermissions } from 'lib/permissions/filterApplicablePermissions';
 import { ProposalNotFoundError } from 'lib/proposal/errors';
 import { isProposalReviewer } from 'lib/proposal/isProposalReviewer';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
@@ -8,7 +8,6 @@ import { InvalidInputError } from 'lib/utilities/errors';
 import { isUUID } from 'lib/utilities/strings';
 
 import { isProposalAuthor } from '../../../proposal/isProposalAuthor';
-import { buildComputePermissionsWithPermissionFilteringPolicies } from '../../buildComputePermissionsWithPermissionFilteringPolicies';
 import type { PermissionCompute } from '../../interfaces';
 import { AvailableProposalPermissions } from '../availableProposalPermissions.class';
 import type { AvailableProposalPermissionFlags } from '../interfaces';
@@ -47,7 +46,7 @@ export async function baseComputeProposalPermissions({
     throw new ProposalNotFoundError(`${resourceId}`);
   }
 
-  const { error, isAdmin } = await hasAccessToSpace({
+  const { spaceRole, isAdmin } = await hasAccessToSpace({
     spaceId: proposal.spaceId,
     userId,
     disallowGuest: true
@@ -63,67 +62,35 @@ export async function baseComputeProposalPermissions({
     throw new InvalidInputError(`Cannot compute permissions for proposal ${resourceId} without category`);
   }
 
-  if (error || !userId) {
-    const assignedPermissions = await prisma.proposalCategoryPermission.findMany({
-      where: {
-        proposalCategoryId: proposal.categoryId,
-        public: true
-      }
-    });
-
-    assignedPermissions.forEach((perm) => {
-      if (perm.permissionLevel === 'view') {
-        permissions.addPermissions(proposalPermissionsMapping.view.slice());
-      }
-    });
-
-    return permissions.operationFlags;
-  } else {
-    const whereQuery: Prisma.ProposalCategoryPermissionWhereInput = {
-      proposalCategoryId: proposal.categoryId,
-      OR: [
-        {
-          public: true
-        },
-        {
-          spaceId: proposal.spaceId
-        },
-        {
-          role: {
-            spaceRolesToRole: {
-              some: {
-                spaceRole: {
-                  userId
-                }
-              }
-            }
-          }
-        }
-      ]
-    };
-
-    const assignedPermissions = await prisma.proposalCategoryPermission.findMany({
-      where: whereQuery
-    });
-
-    assignedPermissions.forEach((permission) => {
-      permissions.addPermissions(proposalPermissionsMapping[permission.permissionLevel].slice());
-    });
-
-    if (isProposalAuthor({ proposal, userId })) {
-      permissions.addPermissions(['edit', 'view', 'create_vote', 'delete', 'vote', 'comment', 'make_public']);
+  const assignedPermissions = await prisma.proposalCategoryPermission.findMany({
+    where: {
+      proposalCategoryId: proposal.categoryId
     }
+  });
 
-    const isReviewer = await isProposalReviewer({
-      proposal,
-      userId
-    });
-    if (isReviewer) {
-      permissions.addPermissions(['view', 'comment', 'review']);
-    }
-
-    return permissions.operationFlags;
+  if (isProposalAuthor({ proposal, userId })) {
+    permissions.addPermissions(['edit', 'view', 'create_vote', 'delete', 'vote', 'comment', 'make_public']);
   }
+
+  const isReviewer = await isProposalReviewer({
+    proposal,
+    userId
+  });
+  if (isReviewer) {
+    permissions.addPermissions(['view', 'comment', 'review']);
+  }
+
+  const applicablePermissions = await filterApplicablePermissions({
+    permissions: assignedPermissions,
+    resourceSpaceId: proposal.spaceId,
+    // Treat user as a guest if they are not a full member of the space
+    userId: !spaceRole || spaceRole?.isGuest ? undefined : userId
+  });
+
+  applicablePermissions.forEach((permission) => {
+    permissions.addPermissions(proposalPermissionsMapping[permission.permissionLevel].slice());
+  });
+  return permissions.operationFlags;
 }
 
 function proposalResolver({ resourceId }: { resourceId: string }) {

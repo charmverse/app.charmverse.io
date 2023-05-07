@@ -1,4 +1,5 @@
-import { prisma } from 'db';
+import { prisma } from '@charmverse/core';
+
 import { getNFTs } from 'lib/blockchain/nfts';
 
 export const supportedMainnets = [1, 137, 42161] as const;
@@ -29,10 +30,11 @@ export const getUserNFTs = async (userId: string) => {
   const mappedNfts = (
     await Promise.all(
       supportedMainnets.map((mainnetChainId) =>
-        getNFTs(
-          wallets.map((w) => w.address),
-          mainnetChainId
-        )
+        getNFTs({
+          userId,
+          wallets,
+          chainId: mainnetChainId
+        })
       )
     )
   )

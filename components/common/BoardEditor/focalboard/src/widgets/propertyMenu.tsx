@@ -5,6 +5,7 @@ import { Stack } from '@mui/system';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import React, { useRef, useState } from 'react';
 import type { IntlShape } from 'react-intl';
+import { useIntl } from 'react-intl';
 
 import type { IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 
@@ -82,6 +83,8 @@ const PropertyMenu = React.memo((props: Props) => {
   const propertyName = props.property.name;
   const [name, setName] = useState(propertyName);
   const changePropertyTypePopupState = usePopupState({ variant: 'popover', popupId: 'card-property-type' });
+  const intl = useIntl();
+
   return (
     <Stack gap={1}>
       <TextField
@@ -123,7 +126,7 @@ const PropertyMenu = React.memo((props: Props) => {
           justifyContent: 'space-between'
         }}
       >
-        <Typography variant='subtitle1'>Type: {propertyName}</Typography>
+        <Typography variant='subtitle1'>Type: {typeDisplayName(intl, propertyType)}</Typography>
         <ArrowRightIcon fontSize='small' />
       </MenuItem>
       <Menu

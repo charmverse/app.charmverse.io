@@ -8,7 +8,7 @@ import GridContainer from 'components/common/Grid/GridContainer';
 import GridHeader from 'components/common/Grid/GridHeader';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { usePageDialog } from 'components/common/PageDialog/hooks/usePageDialog';
-import useTasks from 'components/nexus/hooks/useTasks';
+import { useTasks } from 'components/nexus/hooks/useTasks';
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import { usePages } from 'hooks/usePages';
 import type { ProposalWithUsers } from 'lib/proposal/interface';
@@ -18,13 +18,13 @@ import NoProposalsMessage from './NoProposalsMessage';
 import ProposalActionsMenu from './ProposalActionsMenu';
 import { ProposalStatusChip } from './ProposalStatusBadge';
 
-export default function ProposalsTable({
+export function ProposalsTable({
   proposals,
   mutateProposals,
   isLoading
 }: {
   isLoading?: boolean;
-  proposals?: ProposalWithUsers[];
+  proposals: ProposalWithUsers[];
   mutateProposals: () => void;
 }) {
   const { pages, deletePage } = usePages();
@@ -60,12 +60,6 @@ export default function ProposalsTable({
       });
     }
   }, [router.query.id]);
-
-  // Make sure not to show templates here
-  const filteredProposals = proposals?.filter(
-    (p) => !!pages[p.id] && pages[p.id]?.type === 'proposal' && !pages[p.id]?.deletedAt
-  );
-
   return (
     <>
       <GridHeader>
@@ -83,13 +77,13 @@ export default function ProposalsTable({
         </Grid>
         <Grid item xs={1} display='flex' justifyContent='center'></Grid>
       </GridHeader>
-      {(!proposals || isLoading) && <LoadingComponent height='250px' isLoading />}
-      {filteredProposals?.length === 0 && (
+      {isLoading && <LoadingComponent height='250px' isLoading />}
+      {proposals.length === 0 && (
         <Box height='250px' mt={2}>
           <NoProposalsMessage message='There are no proposals yet. Create a proposal page to get started!' />
         </Box>
       )}
-      {filteredProposals?.map((proposal) => {
+      {proposals.map((proposal) => {
         const { category } = proposal;
         const proposalPage = pages[proposal.id];
         return proposalPage ? (

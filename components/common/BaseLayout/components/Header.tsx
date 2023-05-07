@@ -9,7 +9,7 @@ const HeaderBox = styled.div`
   margin: ${({ theme }) => theme.spacing(3)};
   display: flex;
   justify-content: center;
-  ${(props) => props.theme.breakpoints.up('sm')} {
+  ${(props) => props.theme.breakpoints.up('md')} {
     display: block;
   }
 `;

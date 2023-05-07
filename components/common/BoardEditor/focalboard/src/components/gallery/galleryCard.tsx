@@ -93,6 +93,7 @@ const GalleryCard = React.memo((props: Props) => {
               propertyTemplate={template}
               showEmptyPlaceholder={false}
               showTooltip
+              displayType='gallery'
             />
           ))}
         </div>

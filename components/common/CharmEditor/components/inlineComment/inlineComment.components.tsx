@@ -15,6 +15,7 @@ import { useCurrentPage } from 'hooks/useCurrentPage';
 import { useInlineComment } from 'hooks/useInlineComment';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { useThreads } from 'hooks/useThreads';
+import type { IPagePermissionFlags } from 'lib/permissions/pages';
 import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { isTruthy } from 'lib/utilities/types';
@@ -43,12 +44,16 @@ export const ThreadContainer = styled(Paper)`
   }
 `;
 
-export default function InlineCommentThread({ pluginKey }: { pluginKey: PluginKey<InlineCommentPluginState> }) {
+export default function InlineCommentThread({
+  pluginKey,
+  permissions
+}: {
+  pluginKey: PluginKey<InlineCommentPluginState>;
+  permissions?: IPagePermissionFlags;
+}) {
   const view = useEditorViewContext();
   const { tooltipContentDOM, show: isVisible, ids } = usePluginState(pluginKey) as InlineCommentPluginState;
   const { threads } = useThreads();
-
-  const cardId = new URLSearchParams(window.location.href).get('cardId');
 
   const { currentPageActionDisplay } = usePageActionDisplay();
   // Find unresolved threads in the thread ids and sort them based on desc order of createdAt
@@ -60,7 +65,7 @@ export default function InlineCommentThread({ pluginKey }: { pluginKey: PluginKe
       threadA && threadB ? new Date(threadB.createdAt).getTime() - new Date(threadA.createdAt).getTime() : 0
     );
 
-  if ((currentPageActionDisplay !== 'comments' || cardId) && isVisible && unResolvedThreads.length !== 0) {
+  if ((currentPageActionDisplay !== 'comments' || permissions) && isVisible && unResolvedThreads.length !== 0) {
     // Only show comment thread on inline comment if the page threads list is not active
     return createPortal(
       <ClickAwayListener
@@ -81,7 +86,12 @@ export default function InlineCommentThread({ pluginKey }: { pluginKey: PluginKe
           <Box display='flex' flexDirection='column' gap={1}>
             {unResolvedThreads.map((resolvedThread) => (
               <ThreadContainer key={resolvedThread.id} elevation={4}>
-                <PageThread inline={ids.length === 1} key={resolvedThread.id} threadId={resolvedThread?.id} />
+                <PageThread
+                  permissions={permissions}
+                  inline={ids.length === 1}
+                  key={resolvedThread.id}
+                  threadId={resolvedThread?.id}
+                />
               </ThreadContainer>
             ))}
           </Box>
@@ -93,7 +103,7 @@ export default function InlineCommentThread({ pluginKey }: { pluginKey: PluginKe
   return null;
 }
 
-export function InlineCommentSubMenu({ pluginKey }: { pluginKey: PluginKey }) {
+export function InlineCommentSubMenu({ pluginKey, pageId }: { pluginKey: PluginKey; pageId: string | undefined }) {
   const view = useEditorViewContext();
   const [commentContent, setCommentContent] = useState<PageContent>({
     type: 'doc',
@@ -104,21 +114,21 @@ export function InlineCommentSubMenu({ pluginKey }: { pluginKey: PluginKey }) {
     ]
   });
   const { extractTextFromSelection } = useInlineComment();
-  const { setThreads } = useThreads();
-  const { currentPageId } = useCurrentPage();
+  const { refetchThreads } = useThreads();
   const isEmpty = checkIsContentEmpty(commentContent);
   const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'));
 
   const handleSubmit = async (e: React.KeyboardEvent<HTMLElement> | React.MouseEvent<HTMLElement, MouseEvent>) => {
-    if (!isEmpty) {
-      const cardId = typeof window !== 'undefined' ? new URLSearchParams(window.location.href).get('cardId') : null;
+    if (!isEmpty && pageId) {
       e.preventDefault();
       const threadWithComment = await charmClient.comments.startThread({
         comment: commentContent,
         context: extractTextFromSelection(),
-        pageId: cardId || currentPageId
+        pageId
       });
-      setThreads((_threads) => ({ ..._threads, [threadWithComment.id]: threadWithComment }));
+      // jsut refetch threads for now to make sure member is attached properly - optimize later by not needing to append members to output of useThreads
+      refetchThreads();
+      // setThreads((_threads) => ({ ..._threads, [threadWithComment.id]: threadWithComment }));
       updateInlineComment(threadWithComment.id)(view.state, view.dispatch);
       hideSelectionTooltip(pluginKey)(view.state, view.dispatch, view);
       const tr = view.state.tr.setSelection(new TextSelection(view.state.doc.resolve(view.state.selection.$to.pos)));

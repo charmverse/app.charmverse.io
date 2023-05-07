@@ -1,8 +1,10 @@
-import type { BountyStatus } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { BountyStatus } from '@charmverse/core/prisma';
 
-import { prisma } from 'db';
+import type { NotificationActor } from 'lib/notifications/mapNotificationActor';
+import { mapNotificationActor } from 'lib/notifications/mapNotificationActor';
 
-import { getBountyAction } from './getBountyAction';
+import { getBountyAction, getBountyActor } from './getBountyAction';
 
 export type BountyTaskAction =
   | 'application_pending'
@@ -16,6 +18,7 @@ export type BountyTaskAction =
 
 export interface BountyTask {
   id: string;
+  taskId: string;
   eventDate: Date;
   spaceDomain: string;
   spaceName: string;
@@ -24,6 +27,8 @@ export interface BountyTask {
   pagePath: string;
   status: BountyStatus;
   action: BountyTaskAction | null;
+  createdAt: Date;
+  createdBy: NotificationActor | null;
 }
 
 export type BountyTasksGroup = {
@@ -102,10 +107,11 @@ export async function getBountyTasks(userId: string): Promise<{
     marked: [],
     unmarked: []
   };
+  const bountiesWithActorIds: (Omit<BountyTask, 'createdBy'> & { actorId: string | null })[] = [];
 
   pagesWithBounties.forEach(({ bounty, ...page }) => {
     if (bounty) {
-      const isSpaceAdmin = spaceRoles.find((space) => space.isAdmin && space.spaceId === bounty.spaceId);
+      const isSpaceAdmin = !!spaceRoles.find((space) => space.isAdmin && space.spaceId === bounty.spaceId);
       const isReviewer = bounty.permissions.some((perm) =>
         perm.roleId ? roleIds.includes(perm.roleId) : perm.userId === userId
       );
@@ -114,36 +120,52 @@ export async function getBountyTasks(userId: string): Promise<{
         : bounty.applications.filter((app) => app.createdBy === userId);
 
       applications.forEach((application) => {
+        const isApplicant = application.createdBy === userId;
         const action = getBountyAction({
-          isSpaceAdmin: !!isSpaceAdmin,
+          isSpaceAdmin,
           bountyStatus: bounty.status,
           applicationStatus: application.status,
-          isApplicant: application.createdBy === userId,
+          isApplicant,
           isReviewer
         });
 
         if (action) {
           const bountyTaskId = `${bounty.id}.${application.id}.${action}`;
 
-          const bountyTask = {
+          bountiesWithActorIds.push({
             id: bountyTaskId,
+            taskId: bountyTaskId,
             eventDate: application.updatedAt,
+            createdAt: application.updatedAt,
             pageId: page.id,
             pagePath: page.path,
             pageTitle: page.title,
             spaceDomain: page.space.domain,
             spaceName: page.space.name,
             status: bounty.status,
-            action
-          };
-
-          if (!userNotificationIds.has(bountyTaskId)) {
-            bountyRecord.unmarked.push(bountyTask);
-          } else {
-            bountyRecord.marked.push(bountyTask);
-          }
+            action,
+            actorId: getBountyActor({ bounty, application, isApplicant, isReviewer, isSpaceAdmin })
+          });
         }
       });
+    }
+  });
+
+  // gather and query all actors with a single query
+  const actorIds = bountiesWithActorIds.map((b) => b.actorId).filter((id): id is string => id !== null);
+  const actors = await prisma.user.findMany({ where: { id: { in: actorIds } } });
+
+  bountiesWithActorIds.forEach(({ actorId, ...bountyWithActorId }) => {
+    const actorUser = actors.find((actor) => actor.id === actorId) || null;
+    const bountyTask: BountyTask = {
+      ...bountyWithActorId,
+      createdBy: mapNotificationActor(actorUser)
+    };
+
+    if (!userNotificationIds.has(bountyTask.taskId)) {
+      bountyRecord.unmarked.push(bountyTask);
+    } else {
+      bountyRecord.marked.push(bountyTask);
     }
   });
 

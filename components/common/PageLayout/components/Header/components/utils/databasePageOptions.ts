@@ -1,10 +1,11 @@
+import type { ApiPageKey } from '@charmverse/core/prisma';
 import { chunk } from 'lodash';
 import unionBy from 'lodash/unionBy';
 import type { ParseResult } from 'papaparse';
-import type Papa from 'papaparse';
 import { v4 as uuidv4, validate as uuidValidate } from 'uuid';
 
 import charmClient from 'charmClient';
+import { Constants } from 'components/common/BoardEditor/focalboard/src/constants';
 import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import { createCard } from 'lib/focalboard/card';
@@ -17,6 +18,8 @@ export type MappedProperties = {
   name: string;
   type: PropertyType;
 };
+
+export const titleColumnName = 'Title' as const;
 
 export const selectColors = Object.keys(focalboardColorsMap);
 
@@ -68,9 +71,7 @@ export function mapCardBoardProperties(cardProperties: IPropertyTemplate[]) {
     (acc, b) => ({
       ...acc,
       [b.name]: {
-        id: b.id,
-        type: b.type,
-        name: b.name,
+        ...b,
         options: b.options.reduce<Record<string, string>>(
           (_acc, option) => ({ ..._acc, ...{ [option.value]: option.id } }),
           {}
@@ -87,7 +88,7 @@ export function createNewPropertiesForBoard(
   existingBoardProp?: MappedProperties
 ): IPropertyTemplate {
   const propValues = csvData.map((result) => result[prop]).filter((result) => !!result);
-  const defaultProps = { id: uuidv4(), name: prop, options: [] };
+  const defaultProps = { id: uuidv4(), name: prop, options: [], description: prop };
   const emailReg = /^([A-Za-z0-9_\-.])+@([A-Za-z0-9_\-.])+\.([A-Za-z]{2,4})$/;
 
   // If we already have a select or multiselect with the same property name, filter the duplicates out. The new values and the old values will be merged later.
@@ -130,6 +131,10 @@ export function createNewPropertiesForBoard(
     return { ...defaultProps, type: 'checkbox' };
   }
 
+  if (prop === titleColumnName) {
+    return { ...defaultProps, id: Constants.titleColumnId, type: 'text' };
+  }
+
   return { ...defaultProps, type: 'text' };
 }
 
@@ -140,7 +145,7 @@ export function createCardFieldProperties(
 ) {
   return Object.entries(csvRow).reduce<Record<string, string | string[]>>((acc, [key, value]) => {
     // Exclude the name. That prop is used only for the card title
-    if (key === 'Name') {
+    if (key === titleColumnName) {
       return {
         ...acc
       };
@@ -226,9 +231,10 @@ export function createCardFieldProperties(
     }
 
     if (
-      mappedBoardProperties[key]?.type !== 'select' ||
-      mappedBoardProperties[key]?.type !== 'multiSelect' ||
-      mappedBoardProperties[key]?.type !== 'person'
+      (mappedBoardProperties[key]?.type !== 'select' ||
+        mappedBoardProperties[key]?.type !== 'multiSelect' ||
+        mappedBoardProperties[key]?.type !== 'person') &&
+      propId
     ) {
       return {
         ...acc,
@@ -262,31 +268,96 @@ export function deepMergeArrays(arr1: IPropertyTemplate[], arr2: IPropertyTempla
   ];
 }
 
+export function transformApiPageKeysCsvData(
+  csvData: Record<string, string>[],
+  headers: string[],
+  boardCardProperties: IPropertyTemplate[]
+) {
+  const toBeDeleted: string[] = [];
+
+  for (const row of csvData) {
+    for (const [k, v] of Object.entries(row)) {
+      const cardPropertyOptionSameWithValue = boardCardProperties.find(
+        (prop) => prop.type === 'multiSelect' && !!prop.options.find((o) => o.value === k)
+      );
+      if (
+        csvData.every((_row) => _row[k] === v || !_row[k]) &&
+        !boardCardProperties.find((b) => (b.description || b.name) === k) &&
+        cardPropertyOptionSameWithValue
+      ) {
+        if (v) {
+          // Add the option in the question where it belongs to
+          const questionName = cardPropertyOptionSameWithValue.description || cardPropertyOptionSameWithValue.name;
+          row[questionName] = row[questionName] && !row[questionName].includes(v) ? `${row[questionName]}|${v}` : v;
+        }
+        toBeDeleted.push(k);
+      }
+    }
+  }
+
+  const uniqueOrfanProps = [...new Set(toBeDeleted)];
+  for (const _prop of uniqueOrfanProps) {
+    csvData.forEach((_row) => {
+      delete _row[_prop];
+    });
+    if (headers.find((h) => h === _prop)) {
+      headers.splice(headers.indexOf(_prop), 1);
+    }
+  }
+}
+
+export function transformCsvResults(results: ParseResult<Record<string, string>>, customTitle?: string) {
+  const csvData = results.data.map((csvRow) => {
+    const [key, value] = Object.entries(csvRow)[0];
+    csvRow[titleColumnName] = customTitle || value;
+    delete csvRow[key];
+    return csvRow;
+  });
+  const headers = results.meta.fields || [];
+  headers[0] = titleColumnName;
+  return { csvData, headers };
+}
+
 export async function addNewCards({
   board,
   views,
   results,
   spaceId,
   userId,
-  members
+  members,
+  apiPageKeys
 }: {
   board: Board;
   views: BoardView[] | null;
-  results: Papa.ParseResult<Record<string, string>>;
+  results: ParseResult<Record<string, string>>;
   spaceId: string;
   userId: string;
   members: Member[];
+  apiPageKeys?: ApiPageKey[];
 }) {
-  const csvData = results.data;
-  const headers = results.meta.fields || [];
+  // We assume that the first column is the title so we rename it accordingly
+  const { csvData, headers } = transformCsvResults(results, apiPageKeys ? 'Form Response' : undefined);
 
-  // Remove name property because it is not an option
-  const allAvailableProperties = headers.filter((header) => header !== 'Name');
+  const containsTitleProperty = board.fields.cardProperties.find(
+    (cardProperty) => cardProperty.id === Constants.titleColumnId
+  );
 
-  const mappedInitialBoardProperties = mapCardBoardProperties(board.fields.cardProperties);
+  const boardCardProperties: IPropertyTemplate[] = containsTitleProperty
+    ? board.fields.cardProperties
+    : [
+        ...board.fields.cardProperties,
+        { id: Constants.titleColumnId, name: titleColumnName, type: 'text', options: [] }
+      ];
+  const mappedInitialBoardProperties = mapCardBoardProperties(boardCardProperties);
+
+  if (apiPageKeys && apiPageKeys.length > 0) {
+    // For every csv row, we check if the value and keys are the same, if the value is empty, we don't have it as an initial prop from the board and if the value is an option of an existing board property with the type multiSelect
+    // If true -> Add the value and create the property
+    transformApiPageKeysCsvData(csvData, headers, boardCardProperties);
+  }
 
   // Create card properties for the board
-  const newBoardProperties = allAvailableProperties.map((prop) =>
+  const newBoardProperties = headers.map((prop) =>
     createNewPropertiesForBoard(csvData, prop, mappedInitialBoardProperties[prop])
   );
 
@@ -294,7 +365,7 @@ export async function addNewCards({
    * Merge the fields of both boards.
    * The order is important here. The old board should be last so it can overwrite the important properties.
    */
-  const mergedFields = deepMergeArrays(newBoardProperties, board.fields.cardProperties);
+  const mergedFields = deepMergeArrays(newBoardProperties, boardCardProperties);
 
   // Create the new board and update the db
   const newBoardBlock: Board = {
@@ -331,11 +402,7 @@ export async function addNewCards({
   // Create the new card blocks from the csv data
   const blocks = csvData
     .map((csvRow) => {
-      // Show the first text column as a title if no Name column is in the csv
-      const firstTextId = newBoardBlock.fields.cardProperties.find((prop) => prop.type === 'text')?.id;
       const fieldProperties = createCardFieldProperties(csvRow, mappedBoardProperties, members);
-      const text = firstTextId ? fieldProperties[firstTextId] : undefined;
-      const textName = text && typeof text === 'string' ? text : '';
 
       const card = createCard({
         parentId: board.id,
@@ -343,7 +410,7 @@ export async function addNewCards({
         createdBy: userId,
         updatedBy: userId,
         spaceId,
-        title: csvRow.Name || textName,
+        title: csvRow[titleColumnName],
         fields: {
           properties: fieldProperties
         }

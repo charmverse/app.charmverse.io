@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import type { PostCategory, Space, User } from '@prisma/client';
+import type { PostCategory, Space, User } from '@charmverse/core/prisma';
 import request from 'supertest';
 
 import type { UpdatePostCommentInput } from 'lib/forums/comments/interface';
@@ -50,7 +50,8 @@ beforeAll(async () => {
     spaceId: space.id,
     title: 'Test Post',
     createdBy: user.id,
-    categoryId: postCategory.id
+    categoryId: postCategory.id,
+    isDraft: false
   };
 
   extraSpaceUser = await generateSpaceUser({ isAdmin: false, spaceId: space.id });

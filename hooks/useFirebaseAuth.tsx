@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/log';
 import type { FirebaseApp } from 'firebase/app';
 import { initializeApp } from 'firebase/app';
 import {
@@ -15,10 +16,9 @@ import charmClient from 'charmClient';
 import { googleWebClientConfig } from 'config/constants';
 import { useUser } from 'hooks/useUser';
 import type { LoginWithGoogleRequest } from 'lib/google/loginWithGoogle';
-import log from 'lib/log';
 import { ExternalServiceError, InvalidInputError, SystemError } from 'lib/utilities/errors';
 
-import type { AnyIdLogin } from '../components/login/Login';
+import type { AnyIdLogin } from '../components/login/LoginButton';
 
 import { useLocalStorage } from './useLocalStorage';
 import { useSnackbar } from './useSnackbar';
@@ -120,8 +120,10 @@ export function useFirebaseAuth() {
 
   async function requestMagicLinkViaFirebase({
     email,
-    connectToExistingAccount
+    connectToExistingAccount,
+    redirectUrl
   }: {
+    redirectUrl?: string;
     email: string;
     connectToExistingAccount?: boolean;
   }) {
@@ -129,8 +131,17 @@ export function useFirebaseAuth() {
     const auth = getAuth(firebaseApp);
     auth.languageCode = 'en';
 
+    const url = new URL(`${window.location.origin}/authenticate`);
+    if (connectToExistingAccount) {
+      url.searchParams.set('connectToExistingAccount', 'true');
+    }
+
+    if (redirectUrl) {
+      url.searchParams.set('redirectUrl', redirectUrl);
+    }
+
     const actionCodeSettings = {
-      url: `${window.location.origin}/authenticate${connectToExistingAccount ? '?connectToExistingAccount=true' : ''}`,
+      url: url.toString(),
       handleCodeInApp: true
     };
 

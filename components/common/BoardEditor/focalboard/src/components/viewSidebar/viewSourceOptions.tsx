@@ -1,19 +1,28 @@
+import type { ApiPageKey } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import AddIcon from '@mui/icons-material/Add';
 import AddCircleIcon from '@mui/icons-material/AddCircleOutline';
-import { Box, Card, Grid, ListItemIcon, MenuItem, TextField, Typography } from '@mui/material';
+import { Box, Grid, ListItemIcon, MenuItem, TextField, Typography } from '@mui/material';
+import { usePopupState } from 'material-ui-popup-state/hooks';
+import type { ChangeEvent } from 'react';
 import { useMemo, useState } from 'react';
+import { BsFiletypeCsv } from 'react-icons/bs';
 import { RiGoogleFill } from 'react-icons/ri';
+import { SiTypeform } from 'react-icons/si';
 import { TbDatabase } from 'react-icons/tb';
+import useSWRMutation from 'swr/mutation';
 
+import charmClient from 'charmClient';
 import PagesList from 'components/common/CharmEditor/components/PageList';
+import ConfirmApiPageKeyModal from 'components/common/Modal/ConfirmApiPageKeyModal';
+import { webhookBaseUrl } from 'config/constants';
 import { usePages } from 'hooks/usePages';
 import type { BoardView, BoardViewFields, ViewSourceType } from 'lib/focalboard/boardView';
-import type { PageMeta } from 'lib/pages';
 import { isTruthy } from 'lib/utilities/types';
 
 import { GoogleDataSource } from './GoogleDataSource/GoogleDataSource';
 import { SidebarHeader } from './viewSidebar';
+import { SourceType } from './viewSourceType';
 
 type FormStep = 'select_source' | 'configure_source';
 
@@ -24,9 +33,11 @@ export type DatabaseSourceProps = {
 
 type ViewSourceOptionsProps = DatabaseSourceProps & {
   closeSidebar?: () => void;
+  onCsvImport?: (event: ChangeEvent<HTMLInputElement>) => void;
   goBack?: () => void;
   title?: string;
   view?: BoardView;
+  pageId?: string;
 };
 
 const SidebarContent = styled.div`
@@ -41,6 +52,25 @@ export function ViewSourceOptions(props: ViewSourceOptionsProps) {
 
   const [sourceType, setSourceType] = useState<ViewSourceType | undefined>();
   const [formStep, setStep] = useState<FormStep>('select_source');
+
+  const {
+    data: webhookApi,
+    trigger: createWebhookApiKey,
+    isMutating: isLoadingWebhookApiKeyCreation
+  } = useSWRMutation(
+    `/api/api-page-key`,
+    (_url, { arg }: Readonly<{ arg: { pageId: string; type: ApiPageKey['type'] } }>) =>
+      charmClient.createApiPageKey(arg)
+  );
+
+  const typeformPopup = usePopupState({ variant: 'popover', popupId: 'typeformPopup' });
+
+  const handleApiKeyClick = async (type: ApiPageKey['type']) => {
+    if (props.pageId) {
+      await createWebhookApiKey({ pageId: props.pageId, type });
+      typeformPopup.open();
+    }
+  };
 
   function selectSourceType(_source: ViewSourceType) {
     return () => {
@@ -67,9 +97,21 @@ export function ViewSourceOptions(props: ViewSourceOptionsProps) {
               <TbDatabase style={{ fontSize: 24 }} />
               CharmVerse database
             </SourceType>
+            <SourceType active={false} component='label' htmlFor='dbcsvfile'>
+              <input hidden type='file' id='dbcsvfile' name='dbcsvfile' accept='.csv' onChange={props.onCsvImport} />
+              <BsFiletypeCsv style={{ fontSize: 24 }} />
+              Import CSV
+            </SourceType>
             <SourceType active={activeSourceType === 'google_form'} onClick={selectSourceType('google_form')}>
               <RiGoogleFill style={{ fontSize: 24 }} />
               Google Form
+            </SourceType>
+            <SourceType
+              active={false}
+              onClick={() => (isLoadingWebhookApiKeyCreation ? {} : handleApiKeyClick('typeform'))}
+            >
+              <SiTypeform style={{ fontSize: 24 }} />
+              Typeform
             </SourceType>
             {props.onCreate && (
               <SourceType onClick={props.onCreate}>
@@ -94,45 +136,25 @@ export function ViewSourceOptions(props: ViewSourceOptionsProps) {
           />
         )}
       </Box>
-    </>
-  );
-}
-
-function SourceType({
-  active,
-  onClick,
-  children
-}: {
-  active?: boolean;
-  onClick: () => void;
-  children: React.ReactNode;
-}) {
-  return (
-    <Grid item xs={6} onClick={onClick}>
-      <Card
-        variant='outlined'
-        sx={{
-          height: '80px',
-          cursor: 'pointer',
-          borderColor: active ? 'var(--primary-color)' : '',
-          '&:hover': { bgcolor: !active ? 'sidebar.background' : '' }
+      <ConfirmApiPageKeyModal
+        question={
+          <Typography sx={{ wordBreak: 'break-word' }}>
+            Go to your typeform form and click Connect - Webhooks - Add a Webhook
+            <br />
+            Paste the following URL:
+            <br />
+            <i>{`${webhookBaseUrl}/${webhookApi?.apiKey}`}</i>
+          </Typography>
+        }
+        title='Typeform webhook'
+        open={typeformPopup.isOpen}
+        onClose={typeformPopup.close}
+        onConfirm={() => {
+          props.onCreate?.();
+          typeformPopup.close();
         }}
-      >
-        <Typography align='center' height='100%' variant='body2' color={active ? 'primary' : 'secondary'}>
-          <Box
-            component='span'
-            height='100%'
-            display='flex'
-            p={1}
-            alignItems='center'
-            flexDirection='column'
-            justifyContent='center'
-          >
-            {children}
-          </Box>
-        </Typography>
-      </Card>
-    </Grid>
+      />
+    </>
   );
 }
 

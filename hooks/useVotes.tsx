@@ -1,21 +1,26 @@
-import type { UserVote } from '@prisma/client';
+import type { UserVote } from '@charmverse/core/prisma';
 import type { ReactNode } from 'react';
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
-import useTasks from 'components/nexus/hooks/useTasks';
+import { useTasks } from 'components/nexus/hooks/useTasks';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import type { ExtendedVote, VoteDTO, VoteTask } from 'lib/votes/interfaces';
+import type { ExtendedVote, VoteDTO } from 'lib/votes/interfaces';
 import type { GetTasksResponse } from 'pages/api/tasks/list';
 
-import { useCurrentPage } from './useCurrentPage';
 import { useUser } from './useUser';
 import { useWebSocketClient } from './useWebSocketClient';
+
+type ParentData = {
+  pageId?: string;
+  postId?: string;
+};
 
 type IContext = {
   isValidating: boolean;
   isLoading: boolean;
+  setParent: (parent: ParentData | null) => void;
   votes: Record<string, ExtendedVote>;
   createVote: (votePayload: Omit<VoteDTO, 'createdBy' | 'spaceId'>) => Promise<ExtendedVote>;
   castVote: (voteId: string, option: string) => Promise<UserVote>;
@@ -24,10 +29,19 @@ type IContext = {
   updateDeadline: (voteId: string, deadline: Date) => Promise<void>;
 };
 
+const EMPTY_TASKS: GetTasksResponse = {
+  bounties: { marked: [], unmarked: [] },
+  votes: { marked: [], unmarked: [] },
+  discussions: { marked: [], unmarked: [] },
+  proposals: { marked: [], unmarked: [] },
+  forum: { marked: [], unmarked: [] }
+};
+
 const VotesContext = createContext<Readonly<IContext>>({
   isValidating: true,
   isLoading: true,
   votes: {},
+  setParent: () => undefined,
   castVote: () => undefined as any,
   createVote: () => undefined as any,
   deleteVote: () => undefined as any,
@@ -36,10 +50,11 @@ const VotesContext = createContext<Readonly<IContext>>({
 });
 
 export function VotesProvider({ children }: { children: ReactNode }) {
-  const { currentPageId } = useCurrentPage();
+  const [parent, setParent] = useState<{ pageId?: string; postId?: string } | null>(null);
   const [votes, setVotes] = useState<IContext['votes']>({});
   const { user } = useUser();
   const currentSpace = useCurrentSpace();
+  const [isLoading, setIsLoading] = useState(true);
   const { mutate: mutateTasks, tasks: userTasks } = useTasks();
 
   const { subscribe } = useWebSocketClient();
@@ -50,25 +65,21 @@ export function VotesProvider({ children }: { children: ReactNode }) {
       setVotes((prev) => {
         const votesToAssign = newVotes.reduce((acc, vote) => {
           // In future, we'll want to check if the vote is linked to current space.
-          // For now we can depend on implicit filtering on the server, as each time we switch space we switch subscriptions.
-          acc[vote.id] = vote;
+          // For now we can depend on implicit filtering on the server, as each time we switch space we switch subscriptions
+          const createdBy = typeof vote.createdBy === 'string' ? vote.createdBy : vote.createdBy?.id || '';
+          acc[vote.id] = { ...vote, createdBy };
+
           return acc;
-        }, {} as Record<string, VoteTask>);
+        }, {} as Record<string, ExtendedVote>);
 
         return { ...prev, ...votesToAssign };
       });
 
       // Mutate the tasks
-      const mutatedTasks: GetTasksResponse = userTasks ?? {
-        bounties: { marked: [], unmarked: [] },
-        votes: [],
-        discussions: { marked: [], unmarked: [] },
-        proposals: { marked: [], unmarked: [] },
-        forum: { marked: [], unmarked: [] }
-      };
+      const mutatedTasks: GetTasksResponse = userTasks ?? EMPTY_TASKS;
       newVotes.forEach((newVote) => {
-        if (!mutatedTasks.votes.find((vote) => vote.id === newVote.id)) {
-          mutatedTasks.votes.push(newVote);
+        if (!mutatedTasks.votes.unmarked.find((vote) => vote.id === newVote.id)) {
+          mutatedTasks.votes.unmarked.push(newVote);
         }
       });
       mutateTasks(mutatedTasks);
@@ -85,17 +96,14 @@ export function VotesProvider({ children }: { children: ReactNode }) {
       });
 
       // Mutate the tasks
-      const mutatedTasks: GetTasksResponse = userTasks ?? {
-        bounties: { marked: [], unmarked: [] },
-        votes: [],
-        discussions: { marked: [], unmarked: [] },
-        proposals: { marked: [], unmarked: [] },
-        forum: { marked: [], unmarked: [] }
-      };
+      const mutatedTasks: GetTasksResponse = userTasks ?? EMPTY_TASKS;
 
       const deletedVoteIds = deletedVotes.map((vote) => vote.id);
 
-      mutatedTasks.votes = mutatedTasks.votes.filter((taskVote) => !deletedVoteIds.includes(taskVote.id));
+      mutatedTasks.votes = {
+        marked: mutatedTasks.votes.marked.filter((taskVote) => !deletedVoteIds.includes(taskVote.id)),
+        unmarked: mutatedTasks.votes.unmarked.filter((taskVote) => !deletedVoteIds.includes(taskVote.id))
+      };
 
       mutateTasks(mutatedTasks);
     });
@@ -113,17 +121,14 @@ export function VotesProvider({ children }: { children: ReactNode }) {
       });
 
       // Remove cancelled votes from tasks
-      const mutatedTasks: GetTasksResponse = userTasks ?? {
-        bounties: { marked: [], unmarked: [] },
-        votes: [],
-        discussions: { marked: [], unmarked: [] },
-        proposals: { marked: [], unmarked: [] },
-        forum: { marked: [], unmarked: [] }
-      };
+      const mutatedTasks: GetTasksResponse = userTasks ?? EMPTY_TASKS;
 
       const cancelledVoteIds = updatedVotes.filter((v) => v.status === 'Cancelled').map((vote) => vote.id);
 
-      mutatedTasks.votes = mutatedTasks.votes.filter((taskVote) => !cancelledVoteIds.includes(taskVote.id));
+      mutatedTasks.votes = {
+        marked: mutatedTasks.votes.marked.filter((taskVote) => !cancelledVoteIds.includes(taskVote.id)),
+        unmarked: mutatedTasks.votes.unmarked.filter((taskVote) => !cancelledVoteIds.includes(taskVote.id))
+      };
 
       mutateTasks(mutatedTasks);
     });
@@ -135,11 +140,9 @@ export function VotesProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  const cardId = typeof window !== 'undefined' ? new URLSearchParams(window.location.href).get('cardId') : null;
-
   const { data, isValidating } = useSWR(
-    () => (currentPageId && !cardId ? `pages/${currentPageId}/votes` : null),
-    async () => charmClient.votes.getVotesByPage(currentPageId),
+    () => (parent ? `pages/${parent.pageId || parent.postId}/votes` : null),
+    async () => charmClient.votes.getVotesByPage(parent!),
     {
       revalidateOnFocus: false
     }
@@ -151,7 +154,10 @@ export function VotesProvider({ children }: { children: ReactNode }) {
         return tasks
           ? {
               ...tasks,
-              votes: tasks.votes.filter((_vote) => _vote.id !== voteId)
+              votes: {
+                unmarked: tasks.votes.unmarked.filter((_vote) => _vote.id !== voteId),
+                marked: tasks.votes.marked.filter((_vote) => _vote.id !== voteId)
+              }
             }
           : undefined;
       },
@@ -163,25 +169,23 @@ export function VotesProvider({ children }: { children: ReactNode }) {
 
   async function castVote(voteId: string, choice: string) {
     const userVote = await charmClient.votes.castVote(voteId, choice);
-    if (currentPageId) {
-      setVotes((_votes) => {
-        const vote = _votes[voteId];
-        if (vote && user) {
-          const currentChoice = vote.userChoice;
-          vote.userChoice = choice;
-          if (currentChoice) {
-            vote.aggregatedResult[currentChoice] -= 1;
-          } else {
-            vote.totalVotes += 1;
-          }
-          vote.aggregatedResult[choice] += 1;
-          _votes[voteId] = {
-            ...vote
-          };
+    setVotes((_votes) => {
+      const vote = _votes[voteId];
+      if (vote && user) {
+        const currentChoice = vote.userChoice;
+        vote.userChoice = choice;
+        if (currentChoice) {
+          vote.aggregatedResult[currentChoice] -= 1;
+        } else {
+          vote.totalVotes += 1;
         }
-        return { ..._votes };
-      });
-    }
+        vote.aggregatedResult[choice] += 1;
+        _votes[voteId] = {
+          ...vote
+        };
+      }
+      return { ..._votes };
+    });
     removeVoteFromTask(voteId);
     return userVote;
   }
@@ -208,13 +212,11 @@ export function VotesProvider({ children }: { children: ReactNode }) {
     const vote = votes[voteId];
     if (vote.context === 'inline') {
       await charmClient.votes.deleteVote(voteId);
-      if (currentPageId) {
-        setVotes((prevVotes) => {
-          const _votes = { ...prevVotes };
-          delete _votes[voteId];
-          return _votes;
-        });
-      }
+      setVotes((prevVotes) => {
+        const _votes = { ...prevVotes };
+        delete _votes[voteId];
+        return _votes;
+      });
       removeVoteFromTask(voteId);
     }
   }
@@ -223,39 +225,51 @@ export function VotesProvider({ children }: { children: ReactNode }) {
     const vote = votes[voteId];
     if (vote.context === 'inline') {
       await charmClient.votes.updateVote(voteId, { status: 'Cancelled' });
-      if (currentPageId) {
-        setVotes((prevVotes) => ({ ...prevVotes, [voteId]: { ...prevVotes[voteId], status: 'Cancelled' } }));
-      }
+      setVotes((prevVotes) => ({ ...prevVotes, [voteId]: { ...prevVotes[voteId], status: 'Cancelled' } }));
       removeVoteFromTask(voteId);
     }
   }
 
   async function updateDeadline(voteId: string, deadline: Date) {
     await charmClient.votes.updateVote(voteId, { deadline });
-    if (currentPageId) {
-      setVotes((prevVotes) => ({ ...prevVotes, [voteId]: { ...prevVotes[voteId], deadline } }));
-    }
+    setVotes((prevVotes) => ({ ...prevVotes, [voteId]: { ...prevVotes[voteId], deadline } }));
   }
 
   useEffect(() => {
     setVotes(data?.reduce((acc, voteWithUser) => ({ ...acc, [voteWithUser.id]: voteWithUser }), {}) || {});
+    if (data) {
+      setIsLoading(false);
+    }
   }, [data]);
 
   const value: IContext = useMemo(
     () => ({
       votes,
       isValidating,
-      isLoading: !data,
+      isLoading,
       castVote,
       createVote,
       deleteVote,
       cancelVote,
-      updateDeadline
+      updateDeadline,
+      setParent
     }),
-    [currentPageId, votes, isValidating]
+    [votes, isValidating]
   );
 
   return <VotesContext.Provider value={value}>{children}</VotesContext.Provider>;
 }
 
-export const useVotes = () => useContext(VotesContext);
+export const useVotes = (parent: ParentData) => {
+  const votes = useContext(VotesContext);
+
+  useEffect(() => {
+    if (!parent.postId && !parent.pageId) {
+      votes.setParent(null);
+    } else {
+      votes.setParent(parent);
+    }
+  }, [parent.postId, parent.pageId]);
+
+  return votes;
+};

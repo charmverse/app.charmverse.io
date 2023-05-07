@@ -1,4 +1,4 @@
-import type { PostCategory, Space } from '@prisma/client';
+import type { PostCategory, Space } from '@charmverse/core/prisma';
 
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { generatePostCategory } from 'testing/utils/forums';

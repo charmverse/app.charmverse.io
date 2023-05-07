@@ -1,4 +1,4 @@
-import type { PagePermission, Role, Space, User } from '@prisma/client';
+import type { PagePermission, Role, Space, User } from '@charmverse/core/prisma';
 
 export type Resource = {
   resourceId: string;
@@ -61,17 +61,6 @@ export type PermissionCompute = {
   resourceId: string;
   userId?: string;
 };
-
-/**
- * @id The userId, roleId or spaceId
- * @resourceId The resource such as Space or Page we are querying permissions for
- */
-export interface AssignedPermissionsQuery {
-  group: AssignablePermissionGroups;
-  id: string;
-  resourceId: string;
-}
-
 // Version of above interfaces that allows for public to be specified
 export type AssignablePermissionGroupsWithPublic = AssignablePermissionGroups | 'public';
 

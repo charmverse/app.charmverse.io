@@ -1,7 +1,9 @@
+import { prisma } from '@charmverse/core';
 import { v4 } from 'uuid';
 
-import { prisma } from 'db';
 import { sessionUserRelations } from 'lib/session/config';
+import { uid } from 'lib/utilities/strings';
+import { randomETHWalletAddress } from 'testing/generateStubs';
 
 import { countConnectableIdentities } from '../countConnectableIdentities';
 
@@ -10,7 +12,8 @@ describe('countConnectableIdentities', () => {
     // 0 ID
     const userWithNoIdentities = await prisma.user.create({
       data: {
-        username: 'userWithNoIdentities'
+        username: 'userWithNoIdentities',
+        path: uid()
       },
       include: sessionUserRelations
     });
@@ -20,10 +23,11 @@ describe('countConnectableIdentities', () => {
     // 1 ID
     const userWithOneIdentity = await prisma.user.create({
       data: {
+        path: uid(),
         username: 'userWithOneIdentity',
         wallets: {
           create: {
-            address: '0x1'
+            address: randomETHWalletAddress()
           }
         }
       },
@@ -35,6 +39,7 @@ describe('countConnectableIdentities', () => {
     // 2 ID
     const userWithTwoIdentities = await prisma.user.create({
       data: {
+        path: uid(),
         username: 'userWithNoIdentities',
         wallets: {
           create: {
@@ -58,6 +63,7 @@ describe('countConnectableIdentities', () => {
     // 4 ID
     const userWithFourIdentities = await prisma.user.create({
       data: {
+        path: uid(),
         username: 'userWithOneIdentities',
         wallets: {
           create: {
@@ -92,6 +98,7 @@ describe('countConnectableIdentities', () => {
     // 5 ID
     const userWithFiveIdentities = await prisma.user.create({
       data: {
+        path: uid(),
         username: 'userWithOneIdentities',
         wallets: {
           create: {
@@ -131,6 +138,7 @@ describe('countConnectableIdentities', () => {
     // 6 ID
     const userWithSixIdentities = await prisma.user.create({
       data: {
+        path: uid(),
         username: 'userWithSixIdentities',
         wallets: {
           create: {
@@ -179,6 +187,7 @@ describe('countConnectableIdentities', () => {
   it('should ignore Telegram as we cannot login with this identity', async () => {
     const userWithTelegramIdentity = await prisma.user.create({
       data: {
+        path: uid(),
         username: 'userWithOneIdentity',
         identityType: 'Telegram',
         telegramUser: {

@@ -1,7 +1,7 @@
+import type { TokenGate } from '@charmverse/core/prisma';
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import type { JsonSigningResourceId, JsonStoreSigningRequest } from '@lit-protocol/types';
-import type { TokenGate } from '@prisma/client';
 import LitShareModal from 'lit-share-modal-v3';
 import { debounce } from 'lodash';
 import type { PopupState } from 'material-ui-popup-state/hooks';

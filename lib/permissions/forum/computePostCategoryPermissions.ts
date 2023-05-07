@@ -1,4 +1,6 @@
-import { prisma } from 'db';
+import { prisma, AvailablePostCategoryPermissions } from '@charmverse/core';
+import type { PostCategoryPermissionFlags } from '@charmverse/core';
+
 import { PostCategoryNotFoundError } from 'lib/forums/categories/errors';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { InvalidInputError } from 'lib/utilities/errors';
@@ -6,15 +8,10 @@ import { isUUID } from 'lib/utilities/strings';
 
 import type { PermissionCompute } from '../interfaces';
 
-import { AvailablePostCategoryPermissions } from './availablePostCategoryPermissions.class';
-import { hasSpaceWideModerateForumsPermission } from './hasSpaceWideModerateForumsPermission';
-import type { AvailablePostCategoryPermissionFlags } from './interfaces';
-import { postCategoryPermissionsMapping } from './mapping';
-
 export async function computePostCategoryPermissions({
   resourceId,
   userId
-}: PermissionCompute): Promise<AvailablePostCategoryPermissionFlags> {
+}: PermissionCompute): Promise<PostCategoryPermissionFlags> {
   if (!isUUID(resourceId)) {
     throw new InvalidInputError(`Invalid post category ID: ${resourceId}`);
   }
@@ -27,7 +24,7 @@ export async function computePostCategoryPermissions({
     throw new PostCategoryNotFoundError(`${resourceId}`);
   }
 
-  const { error, isAdmin } = await hasAccessToSpace({
+  const { isAdmin, spaceRole } = await hasAccessToSpace({
     spaceId: postCategory.spaceId,
     userId,
     disallowGuest: true
@@ -39,44 +36,10 @@ export async function computePostCategoryPermissions({
     return permissions.full;
 
     // Requester is not a space member
-  } else if (error) {
-    return permissions.empty;
+  } else if (spaceRole) {
+    permissions.addPermissions(['create_post']);
   }
 
-  const hasSpaceWideModerate = await hasSpaceWideModerateForumsPermission({
-    spaceId: postCategory.spaceId,
-    userId
-  });
-
-  if (hasSpaceWideModerate) {
-    permissions.addPermissions(postCategoryPermissionsMapping.moderator);
-  }
-
-  const assignedPermissions = await prisma.postCategoryPermission.findMany({
-    where: {
-      postCategoryId: resourceId,
-      OR: [
-        {
-          spaceId: postCategory.spaceId
-        },
-        {
-          role: {
-            spaceRolesToRole: {
-              some: {
-                spaceRole: {
-                  userId
-                }
-              }
-            }
-          }
-        }
-      ]
-    }
-  });
-
-  assignedPermissions.forEach((permission) => {
-    permissions.addPermissions(postCategoryPermissionsMapping[permission.permissionLevel]);
-  });
-
+  // Space members can post, people outside the space cannot perform any actions
   return permissions.operationFlags;
 }

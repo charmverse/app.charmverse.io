@@ -1,13 +1,12 @@
 /* eslint-disable no-console */
-import type { PagePermission } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { PagePermission } from '@charmverse/core/prisma';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { prisma } from 'db';
 import { sendMagicLink } from 'lib/google/sendMagicLink';
 import { updateTrackPageProfile } from 'lib/metrics/mixpanel/updateTrackPageProfile';
 import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
-import { PageNotFoundError } from 'lib/pages/server';
 import type {
   IPagePermissionRequest,
   IPagePermissionToCreate,
@@ -28,7 +27,7 @@ import { boardPagePermissionUpdated } from 'lib/permissions/pages/triggers';
 import { addGuest } from 'lib/roles/addGuest';
 import { withSessionRoute } from 'lib/session/withSession';
 import { DataNotFoundError } from 'lib/utilities/errors';
-import { isUUID, isValidEmail } from 'lib/utilities/strings';
+import { isValidEmail } from 'lib/utilities/strings';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -102,18 +101,19 @@ async function addPagePermission(req: NextApiRequest, res: NextApiResponse<IPage
     permissionData.userId = addGuestResult.user.id;
   }
 
+  if (page.type === 'proposal' && typeof req.body.public !== 'boolean') {
+    throw new ActionNotPermittedError('You cannot manually update permissions for proposals.');
+  }
+
+  // Count before and after permissions so we don't trigger the event unless necessary
+  const permissionsBefore = await prisma.pagePermission.count({
+    where: {
+      pageId
+    }
+  });
+
   const createdPermission = await prisma.$transaction(
     async (tx) => {
-      if (page.type === 'proposal' && typeof req.body.public !== 'boolean') {
-        throw new ActionNotPermittedError('You cannot manually update permissions for proposals.');
-      }
-
-      // Count before and after permissions so we don't trigger the event unless necessary
-      const permissionsBefore = await tx.pagePermission.count({
-        where: {
-          pageId
-        }
-      });
       const newPermission = await upsertPermission(pageId, permissionData, undefined, tx);
 
       // Override behaviour, we always cascade board permissions downwards
@@ -133,14 +133,14 @@ async function addPagePermission(req: NextApiRequest, res: NextApiResponse<IPage
         }
       }
 
-      updateTrackPageProfile(pageId);
-
       return newPermission;
     },
     {
       timeout: 20000
     }
   );
+
+  updateTrackPageProfile(pageId);
 
   if (isNewSpaceMember) {
     await sendMagicLink({ email: userIdAsEmail, redirectUrl: `/${spaceDomain}/${page.path}` });

@@ -1,9 +1,9 @@
+import type { PaymentMethod } from '@charmverse/core/prisma';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { Box, Collapse, Divider, IconButton, Stack, TextField, Tooltip } from '@mui/material';
 import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
-import type { PaymentMethod } from '@prisma/client';
 import type { CryptoCurrency } from 'connectors';
 import { getChainById } from 'connectors';
 import debounce from 'lodash/debounce';
@@ -538,6 +538,7 @@ export default function BountyProperties(props: {
         pagePermissions={bountyPagePermissions}
         pageId={pageId}
         readOnly={readOnly}
+        refreshPermissions={refreshPermissions}
       />
       <Box justifyContent='space-between' gap={2} alignItems='center'>
         <div

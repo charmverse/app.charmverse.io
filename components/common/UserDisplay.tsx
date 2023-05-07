@@ -1,6 +1,6 @@
+import type { User } from '@charmverse/core/prisma';
 import type { BoxProps } from '@mui/material';
 import { Box, Typography } from '@mui/material';
-import type { User } from '@prisma/client';
 import type { ReactNode } from 'react';
 import { memo } from 'react';
 
@@ -105,7 +105,7 @@ function UserDisplay({ showMiniProfile = false, user, linkToProfile = false, ...
 
   // Copied from User Details component
   const hostname = typeof window !== 'undefined' ? window.location.origin : '';
-  const userPath = user.path || user.id;
+  const userPath = user.path;
   const userLink = `${hostname}/u/${userPath}`;
   const isNft = hasNftAvatar(user);
 

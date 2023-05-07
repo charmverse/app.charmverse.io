@@ -1,14 +1,13 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
 
-import { onError, onNoMatch, requireApiKey } from 'lib/middleware';
 import { createFormResponseCard } from 'lib/pages/createFormResponseCard';
+import { apiHandler } from 'lib/public-api/handler';
 import type { AddFormResponseInput } from 'lib/zapier/interfaces';
 import { validateFormRequestInput } from 'lib/zapier/validateFormRequestInput';
 
-const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
+const handler = apiHandler();
 
-handler.use(requireApiKey).post(createFormResponse);
+handler.post(createFormResponse);
 
 /**
  * @swagger

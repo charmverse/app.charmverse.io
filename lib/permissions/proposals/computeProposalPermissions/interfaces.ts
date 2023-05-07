@@ -1,4 +1,5 @@
-import type { PermissionFilteringPolicyFnInput } from 'lib/permissions/buildComputePermissionsWithPermissionFilteringPolicies';
+import type { PermissionFilteringPolicyFnInput } from '@charmverse/core';
+
 import type { ProposalWithUsers } from 'lib/proposal/interface';
 
 import type { AvailableProposalPermissionFlags } from '../interfaces';

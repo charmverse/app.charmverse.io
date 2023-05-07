@@ -1,7 +1,8 @@
+import type { PostCategoryWithPermissions } from '@charmverse/core';
+import type { Page } from '@charmverse/core/prisma';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import MenuItem from '@mui/material/MenuItem';
 import Typography from '@mui/material/Typography';
-import type { Page } from '@prisma/client';
 import { useMemo } from 'react';
 
 import { PageIcon } from 'components/common/PageLayout/components/PageIcon';
@@ -11,7 +12,6 @@ import type {
   StaticPagesType
 } from 'components/common/PageLayout/components/Sidebar/utils/staticPages';
 import type { PageMeta } from 'lib/pages';
-import type { PostCategoryWithPermissions } from 'lib/permissions/forum/interfaces';
 
 export type AllPagesProp = Pick<Page, 'id' | 'title' | 'path' | 'hasContent' | 'icon'> & {
   type: Page['type'] | StaticPagesType | 'forum_category';
@@ -51,6 +51,7 @@ export default function PagesList({
       type: page.type,
       icon: page.icon
     }));
+
     const memoForumCategories: AllPagesProp[] = (forumCategories || []).map((page) => ({
       id: page.id,
       path: page.path || '',
@@ -69,7 +70,7 @@ export default function PagesList({
       icon: null
     }));
 
-    return memoPage.concat(memoForumCategories).concat(memoStaticPage);
+    return memoStaticPage.concat(memoPage).concat(memoForumCategories);
   }, [pages, staticPages, forumCategories]);
 
   if (allPages.length === 0) {

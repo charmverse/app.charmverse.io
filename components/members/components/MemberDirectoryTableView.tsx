@@ -215,6 +215,7 @@ function MemberDirectoryTableRow({ member }: { member: Member }) {
                 >
                   {memberProperty.value ? (
                     <SelectPreview
+                      wrapColumn
                       size='small'
                       options={property.options as SelectOptionType[]}
                       value={memberProperty.value as string | string[]}

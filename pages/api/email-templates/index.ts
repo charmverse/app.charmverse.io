@@ -27,8 +27,10 @@ const createDiscussionTask = ({
   mentionText: string;
   pageTitle: string;
 }): DiscussionTask => {
+  const id = v4();
   return {
-    mentionId: v4(),
+    mentionId: id,
+    taskId: id,
     createdAt: new Date().toISOString(),
     pageId: v4(),
     spaceId: v4(),
@@ -134,9 +136,14 @@ const createBountyTask = ({
   pageTitle,
   spaceName,
   status
-}: Omit<BountyTask, 'id' | 'spaceDomain' | 'pagePath' | 'pageId' | 'eventDate'>): BountyTask => {
+}: Omit<
+  BountyTask,
+  'id' | 'spaceDomain' | 'pagePath' | 'pageId' | 'eventDate' | 'taskId' | 'createdAt' | 'createdBy'
+>): BountyTask => {
+  const id = v4();
   return {
-    id: v4(),
+    id,
+    taskId: id,
     action,
     pagePath: randomName(),
     pageTitle,
@@ -144,7 +151,9 @@ const createBountyTask = ({
     spaceDomain: randomName(),
     spaceName,
     pageId: v4(),
-    eventDate: new Date()
+    eventDate: new Date(),
+    createdAt: new Date(),
+    createdBy: null
   };
 };
 
@@ -239,70 +248,6 @@ const templates = {
           spaceName: 'CharmVerse Demo',
           voteTitle: 'We should all vote on this'
         })
-      ],
-      gnosisSafeTasks: [
-        {
-          marked: true,
-          tasks: [
-            {
-              nonce: 3,
-              transactions: [
-                {
-                  id: '123',
-                  actions: [],
-                  date: new Date().toISOString(),
-                  confirmations: [],
-                  isExecuted: false,
-                  description: 'Send .02 ETH',
-                  gnosisUrl: 'https://gnosis.com',
-                  myAction: 'Sign',
-                  myActionUrl: 'https://gnosis.com',
-                  nonce: 3,
-                  safeAddress: '0x66525057AC951a0DB5C9fa7fAC6E056D6b8997E2',
-                  safeName: 'My Personal Safe',
-                  threshold: 2,
-                  snoozedUsers: [],
-                  safeChainId: 1
-                }
-              ]
-            }
-          ],
-          safeAddress: '0x123',
-          safeName: 'My Personal Safe',
-          safeUrl: 'https://app.charmverse.io',
-          taskId: '1'
-        },
-        {
-          marked: false,
-          tasks: [
-            {
-              nonce: 7,
-              transactions: [
-                {
-                  id: '123',
-                  actions: [],
-                  date: new Date().toISOString(),
-                  confirmations: [],
-                  isExecuted: false,
-                  description: 'Send 10 ETH',
-                  gnosisUrl: 'https://gnosis.com',
-                  myAction: 'Sign',
-                  myActionUrl: 'https://gnosis.com',
-                  nonce: 7,
-                  safeAddress: '0x66525057AC951a0DB5C9fa7fAC6E056D6b8997E2',
-                  safeName: 'Work Safe',
-                  threshold: 2,
-                  snoozedUsers: [],
-                  safeChainId: 1
-                }
-              ]
-            }
-          ],
-          safeAddress: '0x456',
-          safeName: 'Work Safe',
-          safeUrl: 'https://app.charmverse.io',
-          taskId: '2'
-        }
       ],
       forumTasks: [
         createForumTask({

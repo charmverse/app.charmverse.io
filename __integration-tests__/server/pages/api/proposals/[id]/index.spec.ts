@@ -1,8 +1,8 @@
-import type { ProposalCategory, Space } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { ProposalCategory, Space } from '@charmverse/core/prisma';
 import request from 'supertest';
 import { v4 } from 'uuid';
 
-import { prisma } from 'db';
 import type { PageWithProposal } from 'lib/pages';
 import { upsertPermission } from 'lib/permissions/pages';
 import { createProposal } from 'lib/proposal/createProposal';

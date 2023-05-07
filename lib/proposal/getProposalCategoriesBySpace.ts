@@ -1,4 +1,4 @@
-import { prisma } from 'db';
+import { prisma } from '@charmverse/core';
 
 export function getProposalCategoriesBySpace(spaceId: string) {
   return prisma.proposalCategory.findMany({

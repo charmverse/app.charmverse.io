@@ -17,7 +17,7 @@ test.describe.serial('Add a new space from sidebar and load it', async () => {
     const targetPage = `${baseUrl}/${domain}`;
 
     await page.goto(targetPage);
-    await page.waitForNavigation({ waitUntil: 'networkidle' });
+    await page.waitForURL(targetPage);
 
     const memberProfileNftList = page.locator('data-test=member-profile-nft-list');
     const memberProfileOrgList = page.locator('data-test=member-profile-org-list');

@@ -1,8 +1,9 @@
-import { prisma } from 'db';
+import { prisma } from '@charmverse/core';
+import { log } from '@charmverse/core/log';
+
 import { getUserS3FilePath, uploadUrlToS3 } from 'lib/aws/uploadToS3Server';
 import { getNFT } from 'lib/blockchain/nfts';
 import * as alchemyApi from 'lib/blockchain/provider/alchemy';
-import log from 'lib/log';
 import { sessionUserRelations } from 'lib/session/config';
 import type { UserAvatar } from 'lib/users/interfaces';
 import { InvalidInputError } from 'lib/utilities/errors';
@@ -42,7 +43,12 @@ export async function updateProfileAvatar({
       throw new InvalidInputError('You do not own the selected NFT');
     }
 
-    const nft = await getNFT(updatedContract, updatedTokenId, avatarChain);
+    const nft = await getNFT({
+      contractAddress: updatedContract,
+      tokenId: updatedTokenId,
+      chainId: avatarChain,
+      userId
+    });
 
     if (nft.image) {
       const pathInS3 = getUserS3FilePath({ userId, url: getFilenameWithExtension(nft.image) });

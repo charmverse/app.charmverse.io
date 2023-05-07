@@ -1,7 +1,7 @@
-import type { Page, ProposalStatus } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { Page, ProposalStatus } from '@charmverse/core/prisma';
 import { v4 as uuid } from 'uuid';
 
-import { prisma } from 'db';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { createPage } from 'lib/pages/server/createPage';
 import type { TargetPermissionGroup } from 'lib/permissions/interfaces';

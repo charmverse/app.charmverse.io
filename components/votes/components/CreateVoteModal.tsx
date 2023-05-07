@@ -1,3 +1,4 @@
+import { VoteType } from '@charmverse/core/prisma';
 import AddCircle from '@mui/icons-material/AddCircle';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import {
@@ -13,7 +14,6 @@ import {
   Box
 } from '@mui/material';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
-import { VoteType } from '@prisma/client';
 import { DateTime } from 'luxon';
 import type { Dispatch, SetStateAction } from 'react';
 import { useEffect, useState } from 'react';
@@ -97,6 +97,8 @@ interface CreateVoteModalProps {
   onCreateVote?: (vote: ExtendedVote) => void;
   onPublishToSnapshot?: () => void;
   open?: boolean;
+  pageId?: string;
+  postId?: string;
   proposal?: ProposalWithUsers;
   proposalFlowFlags?: ProposalFlowFlags;
 }
@@ -106,6 +108,8 @@ export function CreateVoteModal({
   onClose = () => null,
   onCreateVote = () => null,
   onPublishToSnapshot = () => null,
+  pageId,
+  postId,
   proposal,
   proposalFlowFlags
 }: CreateVoteModalProps) {
@@ -115,8 +119,7 @@ export function CreateVoteModal({
   const [voteType, setVoteType] = useState<VoteType>(VoteType.Approval);
   const [options, setOptions] = useState<{ name: string }[]>([]);
   const [isDateTimePickerOpen, setIsDateTimePickerOpen] = useState(false);
-  const { user } = useUser();
-  const { createVote } = useVotes();
+  const { createVote } = useVotes({ pageId, postId });
 
   useEffect(() => {
     if (voteType === VoteType.SingleChoice) {
@@ -147,16 +150,15 @@ export function CreateVoteModal({
   }, [voteType]);
 
   const [deadline, setDeadline] = useState(DateTime.fromMillis(Date.now()).plus({ hour: 12 }));
-  const { currentPageId } = useCurrentPage();
   const handleSubmit = async (e: React.KeyboardEvent<HTMLElement> | React.MouseEvent<HTMLElement, MouseEvent>) => {
-    const cardId = typeof window !== 'undefined' ? new URLSearchParams(window.location.href).get('cardId') : null;
     e.preventDefault();
     const vote = await createVote({
       deadline: deadline.toJSDate(),
       voteOptions: options.map((option) => option.name),
       title: voteTitle,
       description: voteDescription,
-      pageId: cardId ?? currentPageId,
+      pageId,
+      postId,
       threshold: +passThreshold,
       type: voteType,
       context: proposal ? 'proposal' : 'inline'

@@ -1,7 +1,6 @@
-import type { Post, Prisma } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { Post, Prisma } from '@charmverse/core/prisma';
 import { v4 } from 'uuid';
-
-import { prisma } from 'db';
 
 import { generatePostCategory } from './utils/forums';
 
@@ -28,8 +27,10 @@ export async function generateForumPosts({
   content = { type: 'doc', content: [] },
   contentText = '',
   title,
+  isDraft,
   withImageRatio = 30
 }: {
+  isDraft?: boolean;
   spaceId: string;
   categoryId?: string;
   createdBy: string;
@@ -71,7 +72,8 @@ export async function generateForumPosts({
       createdBy,
       path: `path-${v4()}`,
       createdAt: postDate,
-      updatedAt: postDate
+      updatedAt: postDate,
+      isDraft
     });
 
     // Space posts apart by 30 minutes

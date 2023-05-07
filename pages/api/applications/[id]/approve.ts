@@ -1,11 +1,11 @@
-import type { Application } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import { log } from '@charmverse/core/log';
+import type { Application } from '@charmverse/core/prisma';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { prisma } from 'db';
 import { approveApplication } from 'lib/applications/actions';
 import { rollupBountyStatus } from 'lib/bounties/rollupBountyStatus';
-import log from 'lib/log';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { computeBountyPermissions } from 'lib/permissions/bounties';

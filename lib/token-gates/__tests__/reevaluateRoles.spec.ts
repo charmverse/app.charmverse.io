@@ -1,5 +1,5 @@
+import type { Space } from '@charmverse/core/prisma';
 import * as litSDK from '@lit-protocol/lit-node-client';
-import type { Space } from '@prisma/client';
 
 import { assignRole } from 'lib/roles';
 import { updateTokenGateRoles } from 'lib/token-gates/updateTokenGateRoles';

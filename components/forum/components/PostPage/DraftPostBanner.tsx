@@ -1,0 +1,23 @@
+import styled from '@emotion/styled';
+import { Box } from '@mui/system';
+
+const StyledPageTemplateBanner = styled(Box)`
+  top: 55px;
+  width: '100%';
+  z-index: var(--z-index-appBar);
+  display: flex;
+  justify-content: center;
+  color: ${({ theme }) => theme.palette.templateBanner.text};
+  background-color: ${({ theme }) => theme.palette.templateBanner.background};
+  padding: ${({ theme }) => theme.spacing(1.4)};
+`;
+
+export function DraftPostBanner() {
+  return (
+    <StyledPageTemplateBanner>
+      <Box>
+        <span>You're viewing a draft post</span>
+      </Box>
+    </StyledPageTemplateBanner>
+  );
+}

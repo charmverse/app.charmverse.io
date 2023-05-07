@@ -1,18 +1,18 @@
+import type { PageType } from '@charmverse/core/prisma';
 import { EditOutlined } from '@mui/icons-material';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import LaunchIcon from '@mui/icons-material/Launch';
 import LinkIcon from '@mui/icons-material/Link';
 import { Divider, ListItemText, Menu, MenuItem, Stack, Typography } from '@mui/material';
-import type { PageType } from '@prisma/client';
 import { useRouter } from 'next/router';
 import type { Dispatch, ReactNode, SetStateAction } from 'react';
 
-import { usePostPermissions } from 'components/forum/hooks/usePostPermissions';
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useMembers } from 'hooks/useMembers';
 import { usePagePermissions } from 'hooks/usePagePermissions';
+import { usePostPermissions } from 'hooks/usePostPermissions';
 import { useSnackbar } from 'hooks/useSnackbar';
-import type { DuplicatePageResponse } from 'lib/pages';
+import type { DuplicatePageResponse } from 'lib/pages/duplicatePage';
 
 import { Utils } from './BoardEditor/focalboard/src/utils';
 import { DuplicatePageAction } from './DuplicatePageAction';
@@ -47,10 +47,10 @@ export function PageActionsMenu({
   };
   readOnly?: boolean;
 }) {
-  const { members } = useMembers();
+  const { getMemberById } = useMembers();
   const router = useRouter();
   const { showMessage } = useSnackbar();
-  const charmversePage = members.find((member) => member.id === page.createdBy);
+  const member = getMemberById(page.createdBy);
   const open = Boolean(anchorEl);
   const { formatDateTime } = useDateFormatter();
   const { permissions: pagePermissions } = usePagePermissions({ pageIdOrPath: open ? page.id : null });
@@ -124,14 +124,14 @@ export function PageActionsMenu({
       </MenuItem>
       {children}
       <Divider />
-      {charmversePage && (
+      {member && (
         <Stack
           sx={{
             px: 2
           }}
         >
           <Typography variant='caption' color='secondary'>
-            Last edited by <strong>{charmversePage.username}</strong>
+            Last edited by <strong>{member.username}</strong>
           </Typography>
           <Typography variant='caption' color='secondary'>
             at <strong>{formatDateTime(page.updatedAt)}</strong>

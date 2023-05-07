@@ -1,4 +1,4 @@
-import type { Space, User } from '@prisma/client';
+import type { Space, User } from '@charmverse/core/prisma';
 import { v4 } from 'uuid';
 
 import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
@@ -33,8 +33,7 @@ describe('updateComment', () => {
 
     expect(updated.content).toBe(newCommentMessage);
 
-    expect(updated.user).toBeDefined();
-    expect(updated.user.id).toBe(user.id);
+    expect(updated.userId).toBe(user.id);
   });
 
   it('should fail if the comment does not exist', async () => {

@@ -1,3 +1,5 @@
+import { log } from '@charmverse/core/log';
+import type { User } from '@charmverse/core/prisma';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import type { SelectChangeEvent } from '@mui/material';
 import {
@@ -14,11 +16,13 @@ import {
   Tooltip,
   Typography
 } from '@mui/material';
-import type { User } from '@prisma/client';
 import { bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
+import type { MouseEvent } from 'react';
+import { Fragment, useState } from 'react';
 import useSWRMutation from 'swr/mutation';
 
 import charmClient from 'charmClient';
+import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import Legend from 'components/settings/Legend';
 import { useDiscordConnection } from 'hooks/useDiscordConnection';
 import { useFirebaseAuth } from 'hooks/useFirebaseAuth';
@@ -27,10 +31,9 @@ import { useUser } from 'hooks/useUser';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import type { AuthSig } from 'lib/blockchain/interfaces';
 import type { DiscordAccount } from 'lib/discord/getDiscordAccount';
-import log from 'lib/log';
 import { countConnectableIdentities } from 'lib/users/countConnectableIdentities';
 import randomName from 'lib/utilities/randomName';
-import { shortWalletAddress } from 'lib/utilities/strings';
+import { lowerCaseEqual, shortWalletAddress } from 'lib/utilities/strings';
 import type { LoggedInUser } from 'models';
 import type { TelegramAccount } from 'pages/api/telegram/connect';
 
@@ -40,14 +43,22 @@ import { TelegramLoginIframe } from './TelegramLoginIframe';
 import { useIdentityTypes } from './useIdentityTypes';
 
 export function IdentityProviders() {
-  const { account, isConnectingIdentity, sign, isSigning, verifiableWalletDetected } = useWeb3AuthSig();
+  const { account, isConnectingIdentity, sign, isSigning, verifiableWalletDetected, disconnectWallet } =
+    useWeb3AuthSig();
   const { user, setUser, updateUser } = useUser();
   const { showMessage } = useSnackbar();
   const { disconnectGoogleAccount, isConnectingGoogle, disconnectVerifiedEmailAccount } = useFirebaseAuth();
   const identityTypes = useIdentityTypes();
   const accountsPopupState = usePopupState({ variant: 'popover', popupId: 'accountsModal' });
+  const deleteWalletPopupState = usePopupState({ variant: 'popover', popupId: 'deleteWalletModal' });
   const discordAccount = user?.discordUser?.account as Partial<DiscordAccount> | undefined;
   const telegramAccount = user?.telegramUser?.account as Partial<TelegramAccount> | undefined;
+  const [openAddress, setOpenAddress] = useState<string | null>(null);
+
+  const handleOpenDeleteModal = (address: string) => (event: MouseEvent<HTMLElement>) => {
+    setOpenAddress(address);
+    deleteWalletPopupState.open(event);
+  };
 
   const { trigger: saveUser, isMutating: isLoadingUserUpdate } = useSWRMutation(
     '/profile',
@@ -107,6 +118,7 @@ export function IdentityProviders() {
     disconnectTelegramError?.message ||
     connectTelegramError?.error ||
     disconnectTelegramError?.error;
+
   const onIdentityChange = async (event: SelectChangeEvent<string>) => {
     const val = identityTypes.find((t) => t.username === event.target.value);
 
@@ -167,19 +179,53 @@ export function IdentityProviders() {
       <TelegramLoginIframe />
       <List disablePadding aria-label='Connected accounts' sx={{ mb: 2 }}>
         {user?.wallets?.map((wallet) => (
-          <IdentityProviderItem
-            key={wallet.address}
-            text={wallet.ensname || shortWalletAddress(wallet.address)}
-            type='Wallet'
-            loading={isConnectingIdentity || isVerifyingWallet || isSigning}
-            disabled={cannotDisconnect}
-            connected={true}
-            actions={
-              verifiableWalletDetected &&
-              !account &&
-              !isConnectingIdentity && <MenuItem onClick={generateWalletAuth}>Verify Wallet</MenuItem>
-            }
-          />
+          <Fragment key={wallet.address}>
+            <IdentityProviderItem
+              text={wallet.ensname || shortWalletAddress(wallet.address)}
+              type='Wallet'
+              loading={isConnectingIdentity || isVerifyingWallet || isSigning}
+              disabled={cannotDisconnect}
+              connected={true}
+              active={lowerCaseEqual(wallet.address, account)}
+              actions={[
+                verifiableWalletDetected && !account && !isConnectingIdentity ? (
+                  <MenuItem key='verify' onClick={generateWalletAuth}>
+                    Verify Wallet
+                  </MenuItem>
+                ) : null,
+                <MenuItem key='disconnect' onClick={handleOpenDeleteModal(wallet.address)}>
+                  Disconnect Wallet
+                </MenuItem>
+              ]}
+            />
+            <ConfirmDeleteModal
+              title='Disconnect wallet'
+              question={
+                <Box>
+                  {lowerCaseEqual(wallet.address, account) ? (
+                    <Typography>
+                      You can't disconnect your current active wallet. You need to switch to another wallet first.
+                    </Typography>
+                  ) : (
+                    <>
+                      <Typography mb={1}>
+                        Are you sure you want to Disconnect your {wallet.ensname || wallet.address} wallet?
+                      </Typography>
+                      <Typography variant='body2'>
+                        This action will remove your wallet, NFTs, POAPs, Organizations from CharmVerse. It will also
+                        remove roles and permissions if you joined the Space via a token gate.
+                      </Typography>
+                    </>
+                  )}
+                </Box>
+              }
+              buttonText='Disconnect'
+              onConfirm={() => disconnectWallet(wallet.address)}
+              onClose={deleteWalletPopupState.close}
+              open={deleteWalletPopupState.isOpen && openAddress === wallet.address}
+              disabled={lowerCaseEqual(wallet.address, account)}
+            />
+          </Fragment>
         ))}
         {isConnected && (
           <IdentityProviderItem
@@ -197,7 +243,7 @@ export function IdentityProviders() {
             text={telegramAccount?.username}
             type='Telegram'
             loading={isConnectingToTelegram || isDisconnectingTelegram}
-            disabled={cannotDisconnect}
+            disabled={!user}
             connected={true}
             actions={<MenuItem onClick={disconnectFromTelegram}>Disconnect</MenuItem>}
             error={telegramError && <Alert severity='error'>{telegramError}</Alert>}

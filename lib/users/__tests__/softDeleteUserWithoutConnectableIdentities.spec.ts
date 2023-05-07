@@ -1,7 +1,8 @@
+import { prisma } from '@charmverse/core';
 import { v4 } from 'uuid';
 
-import { prisma } from 'db';
 import { sessionUserRelations } from 'lib/session/config';
+import { uid } from 'lib/utilities/strings';
 
 import { softDeleteUserWithoutConnectableIdentities } from '../softDeleteUserWithoutConnectableIdentities';
 
@@ -9,6 +10,7 @@ describe('softDeleteUserWithoutConnectableIdentities', () => {
   it('should mark the user as deleted if they have 0 connectable identities', async () => {
     const user = await prisma.user.create({
       data: {
+        path: uid(),
         username: 'Test user'
       },
       include: sessionUserRelations
@@ -25,6 +27,7 @@ describe('softDeleteUserWithoutConnectableIdentities', () => {
   it('should leave the user unchanged if they have at least 1 connectable identity', async () => {
     const user = await prisma.user.create({
       data: {
+        path: uid(),
         username: 'Test user',
         wallets: {
           create: {

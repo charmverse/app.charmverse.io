@@ -1,6 +1,9 @@
-import type { Space, User } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { Space, User } from '@charmverse/core/prisma';
 
-import { prisma } from 'db';
+import { prismaToBlock } from 'lib/focalboard/block';
+import type { Board } from 'lib/focalboard/board';
+import type { Card } from 'lib/focalboard/card';
 import { getAccessibleProposalCategories } from 'lib/permissions/proposals/getAccessibleProposalCategories';
 import { getUserProposalsBySpace } from 'lib/proposal/getProposalsBySpace';
 import { getProposalCommentMentions, getProposalComments } from 'lib/proposal/getProposalTasks';
@@ -100,7 +103,8 @@ export async function getDiscussionTasks(userId: string): Promise<DiscussionTask
     getPageCommentMentions(context),
     getPageMentions(context),
     getCommentBlockMentions(context),
-    getProposalDiscussionTasks(context)
+    getProposalDiscussionTasks(context),
+    getBoardPersonPropertyMentions(context)
   ]).then((results) => {
     // aggregate the results
     return results.reduce(
@@ -142,7 +146,9 @@ export async function getDiscussionTasks(userId: string): Promise<DiscussionTask
         createdBy: usersRecord[mentionedTaskWithoutUser.userId]
       } as DiscussionTask;
 
-      const taskList = notifiedTaskIds.has(mentionedTask.mentionId ?? '') ? acc.marked : acc.unmarked;
+      const taskList = notifiedTaskIds.has(mentionedTask.mentionId ?? mentionedTask.taskId ?? '')
+        ? acc.marked
+        : acc.unmarked;
       taskList.push(mentionedTask);
 
       return acc;
@@ -158,7 +164,9 @@ export async function getDiscussionTasks(userId: string): Promise<DiscussionTask
         createdBy: usersRecord[commentTaskWithoutUser.userId]
       } as DiscussionTask;
 
-      const taskList = notifiedTaskIds.has(commentTask.commentId ?? '') ? acc.marked : acc.unmarked;
+      const taskList = notifiedTaskIds.has(commentTask.commentId ?? commentTask.taskId ?? '')
+        ? acc.marked
+        : acc.unmarked;
       taskList.push(commentTask);
 
       return acc;
@@ -225,7 +233,8 @@ async function getCommentBlockMentions({
             createdAt: mention.createdAt,
             userId: mention.createdBy,
             text: mention.text,
-            commentId: comment.id
+            commentId: comment.id,
+            taskId: mention.id
           });
         }
       });
@@ -377,7 +386,8 @@ async function getPageComments({
           commentId: comment.id,
           userId: comment.userId,
           createdAt: new Date(comment.createdAt).toISOString(),
-          mentionId: null
+          mentionId: null,
+          taskId: comment.id
         });
         break;
       }
@@ -436,6 +446,7 @@ async function getPageCommentMentions({
           mentions.push({
             ...getPropertiesFromPage(comment.page, spaceRecord[comment.page.spaceId]),
             mentionId: mention.id,
+            taskId: mention.id,
             createdAt: mention.createdAt,
             userId: mention.createdBy,
             text: mention.text,
@@ -445,6 +456,93 @@ async function getPageCommentMentions({
       });
     }
   }
+  return {
+    mentions,
+    discussionUserIds,
+    comments: []
+  };
+}
+
+async function getBoardPersonPropertyMentions({
+  userId,
+  spaceIds
+}: GetDiscussionsInput): Promise<GetDiscussionsResponse> {
+  const boards = (
+    await prisma.block.findMany({
+      where: {
+        spaceId: {
+          in: spaceIds
+        },
+        type: 'board',
+        deletedAt: null
+      }
+    })
+  ).map(prismaToBlock) as Board[];
+
+  const boardBlocksPersonPropertyRecord: Record<string, string> = {};
+
+  boards.forEach((board) => {
+    const personProperty = board.fields.cardProperties.find((cardProperty) => cardProperty.type === 'person');
+    if (personProperty) {
+      boardBlocksPersonPropertyRecord[board.id] = personProperty.id;
+    }
+  });
+
+  const cards = await prisma.block.findMany({
+    where: {
+      parentId: {
+        in: Object.keys(boardBlocksPersonPropertyRecord)
+      },
+      type: 'card',
+      deletedAt: null,
+      createdAt: {
+        gt: new Date(Date.now() - 1000 * 60 * 60 * 24)
+      }
+    },
+    include: {
+      page: true,
+      space: true,
+      user: {
+        select: {
+          username: true,
+          id: true
+        }
+      }
+    }
+  });
+
+  const mentions: GetDiscussionsResponse['mentions'] = [];
+  const discussionUserIds: string[] = [];
+
+  for (const card of cards) {
+    const blockCard = prismaToBlock(card) as Card;
+    const personPropertyId = boardBlocksPersonPropertyRecord[card.parentId];
+    const personPropertyValue = personPropertyId ? blockCard.fields.properties[personPropertyId] ?? [] : [];
+    if (card.page && personPropertyValue.includes(userId) && userId !== card.user.id) {
+      discussionUserIds.push(personPropertyId);
+      // Need to push author of card to fetch information
+      discussionUserIds.push(card.user.id);
+      mentions.push({
+        pageId: card.id,
+        spaceId: card.spaceId,
+        spaceDomain: card.space.domain,
+        pagePath: card.page.path,
+        spaceName: card.space.name,
+        pageTitle: card.page.title || 'Untitled',
+        bountyId: card.page.bountyId,
+        bountyTitle: card.page.title,
+        type: card.page.bountyId ? 'bounty' : 'page',
+        mentionId: null,
+        taskId: `${card.id}.${personPropertyId}`,
+        // Fake value
+        createdAt: new Date().toString(),
+        userId: card.createdBy,
+        text: `${card.user.username} assigned you in the card ${card.page.title || 'Untitled'}`,
+        commentId: null
+      });
+    }
+  }
+
   return {
     mentions,
     discussionUserIds,
@@ -488,14 +586,18 @@ async function getPageMentions({
         // Skip mentions not for the user, self mentions and inside user created pages
         if (mention.value === userId && mention.createdBy !== userId) {
           discussionUserIds.push(mention.createdBy);
-          mentions.push({
-            ...getPropertiesFromPage(page, spaceRecord[page.spaceId]),
-            mentionId: mention.id,
-            createdAt: mention.createdAt,
-            userId: mention.createdBy,
-            text: mention.text,
-            commentId: null
-          });
+          // Check if another mention already exists (this is possible if the page was duplicated)
+          if (!mentions.some(({ taskId }) => mention.id === taskId)) {
+            mentions.push({
+              ...getPropertiesFromPage(page, spaceRecord[page.spaceId]),
+              mentionId: mention.id,
+              taskId: mention.id,
+              createdAt: mention.createdAt,
+              userId: mention.createdBy,
+              text: mention.text,
+              commentId: null
+            });
+          }
         }
       });
     }

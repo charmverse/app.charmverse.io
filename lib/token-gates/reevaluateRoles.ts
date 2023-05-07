@@ -1,6 +1,6 @@
+import { log } from '@charmverse/core/log';
 import type { JsonAuthSig } from '@lit-protocol/types';
 
-import log from 'lib/log';
 import { getSpaceMembershipWithRoles } from 'lib/spaces/getSpaceMembershipWithRoles';
 import { applyTokenGates } from 'lib/token-gates/applyTokenGates';
 import { evalueTokenGateEligibility } from 'lib/token-gates/evaluateEligibility';

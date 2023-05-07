@@ -1,5 +1,5 @@
+import type { Role, SpaceRoleToRole, TokenGate, TokenGateToRole, UserTokenGate } from '@charmverse/core/prisma';
 import * as lit from '@lit-protocol/lit-node-client';
-import type { Role, SpaceRoleToRole, TokenGate, TokenGateToRole, UserTokenGate } from '@prisma/client';
 
 type TokenGateWithRoles = {
   tokenGate:

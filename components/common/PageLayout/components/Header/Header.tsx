@@ -1,3 +1,4 @@
+import type { PageType } from '@charmverse/core/prisma';
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
@@ -6,21 +7,16 @@ import GetAppOutlinedIcon from '@mui/icons-material/GetAppOutlined';
 import MenuIcon from '@mui/icons-material/Menu';
 import MessageOutlinedIcon from '@mui/icons-material/MessageOutlined';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import NotificationsIcon from '@mui/icons-material/Notifications';
 import RateReviewOutlinedIcon from '@mui/icons-material/RateReviewOutlined';
 import FavoritedIcon from '@mui/icons-material/Star';
 import NotFavoritedIcon from '@mui/icons-material/StarBorder';
 import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
 import UndoIcon from '@mui/icons-material/Undo';
+import { List, Popover, Switch, ListItemText, ListItemButton } from '@mui/material';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import IconButton from '@mui/material/IconButton';
-import List from '@mui/material/List';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemText from '@mui/material/ListItemText';
-import Popover from '@mui/material/Popover';
-import Switch from '@mui/material/Switch';
 import Toolbar from '@mui/material/Toolbar';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
@@ -31,6 +27,7 @@ import { memo, useMemo, useRef, useState } from 'react';
 
 import charmClient from 'charmClient';
 import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
+import Button from 'components/common/Button';
 import { undoEventName } from 'components/common/CharmEditor/utils';
 import { DuplicatePageAction } from 'components/common/DuplicatePageAction';
 import { usePostByPath } from 'components/forum/hooks/usePostByPath';
@@ -41,12 +38,11 @@ import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { usePageFromPath } from 'hooks/usePageFromPath';
 import { usePagePermissions } from 'hooks/usePagePermissions';
 import { usePages } from 'hooks/usePages';
-import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useToggleFavorite } from 'hooks/useToggleFavorite';
 import { useUser } from 'hooks/useUser';
-
-import NotificationsBadge from '../Sidebar/NotificationsBadge';
+import type { PageUpdates } from 'lib/pages';
+import { monoFont, serifFont } from 'theme/fonts';
 
 import { BountyActions } from './components/BountyActions';
 import BountyShareButton from './components/BountyShareButton/BountyShareButton';
@@ -54,6 +50,8 @@ import DatabasePageOptions from './components/DatabasePageOptions';
 import { DocumentHistory } from './components/DocumentHistory';
 import { DocumentParticipants } from './components/DocumentParticipants';
 import EditingModeToggle from './components/EditingModeToggle';
+import { ExportToPDFMarkdown } from './components/ExportToPDFMenuItem';
+import { NotificationButton } from './components/NotificationPreview/NotificationButton';
 import PageTitleWithBreadcrumbs from './components/PageTitleWithBreadcrumbs';
 import ShareButton from './components/ShareButton';
 import PublishToSnapshot from './components/Snapshot/PublishToSnapshot';
@@ -67,12 +65,32 @@ export const StyledToolbar = styled(Toolbar)`
   min-height: ${headerHeight}px;
 `;
 
+const StyledFontButton = styled(Button)`
+  display: block;
+`;
+
+const FontFamilyExample = styled.div`
+  font-size: 24px;
+  height: 24px;
+  line-height: 24px;
+  font-weight: 700;
+`;
+
 interface HeaderProps {
   open: boolean;
   openSidebar: () => void;
 }
 
-const documentTypes = ['page', 'card', 'proposal', 'proposal_template', 'bounty'];
+const documentTypes: PageType[] = [
+  'page',
+  'card',
+  'card_synced',
+  'card_template',
+  'proposal',
+  'proposal_template',
+  'bounty',
+  'bounty_template'
+];
 
 function CopyLinkMenuItem({ closeMenu }: { closeMenu: VoidFunction }) {
   const { showMessage } = useSnackbar();
@@ -149,7 +167,6 @@ export function ExportMarkdownMenuItem({ disabled = false, onClick }: { disabled
     </Tooltip>
   );
 }
-
 function PostHeader({
   setPageMenuOpen,
   undoEditorChanges,
@@ -160,7 +177,7 @@ function PostHeader({
   undoEditorChanges: VoidFunction;
 }) {
   const { showMessage } = useSnackbar();
-  const { members } = useMembers();
+  const { getMemberById, members } = useMembers();
 
   const router = useRouter();
 
@@ -169,7 +186,7 @@ function PostHeader({
 
   const canCreateProposal = proposalCategoriesWithCreateAllowed.length > 0;
 
-  const postCreator = members.find((member) => member.id === forumPostInfo.forumPost?.createdBy);
+  const postCreator = getMemberById(forumPostInfo.forumPost?.createdBy);
 
   function deletePost() {
     if (forumPostInfo.forumPost) {
@@ -215,9 +232,12 @@ function PostHeader({
       <UndoMenuItem onClick={undoEditorChanges} disabled={!forumPostInfo?.permissions?.edit_post} />
       <Divider />
       <ExportMarkdownMenuItem onClick={exportMarkdownPage} />
+      <ExportToPDFMarkdown pdfTitle={forumPostInfo.forumPost?.title} />
       <Tooltip
         title={
-          !canCreateProposal || forumPostInfo.forumPost?.proposalId
+          forumPostInfo.forumPost?.isDraft
+            ? 'Draft post cannot be converted proposal'
+            : !canCreateProposal || forumPostInfo.forumPost?.proposalId
             ? 'You do not have the permission to convert to proposal'
             : ''
         }
@@ -226,7 +246,7 @@ function PostHeader({
           <ListItemButton
             data-test='convert-proposal-action'
             onClick={() => forumPostInfo.forumPost && convertToProposal(forumPostInfo.forumPost.id)}
-            disabled={!canCreateProposal || !!forumPostInfo.forumPost?.proposalId}
+            disabled={!canCreateProposal || !!forumPostInfo.forumPost?.proposalId || !!forumPostInfo.forumPost?.isDraft}
           >
             <TaskOutlinedIcon
               fontSize='small'
@@ -251,7 +271,7 @@ function PostHeader({
 function HeaderComponent({ open, openSidebar }: HeaderProps) {
   const router = useRouter();
   const { updatePage, deletePage } = usePages();
-  const { refreshBounty, bounties } = useBounties();
+  const { bounties } = useBounties();
   const { user } = useUser();
   const theme = useTheme();
   const [pageMenuOpen, setPageMenuOpen] = useState(false);
@@ -265,21 +285,15 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
   const { permissions: pagePermissions } = usePagePermissions({
     pageIdOrPath: basePage ? basePage.id : (null as any)
   });
-  const { onClick: clickToOpenSettingsModal } = useSettingsDialog();
   const isForumPost = router.route === '/[domain]/forum/post/[pagePath]';
 
-  const pagePath = isForumPost ? (router.query.pagePath as string) : null;
   // Post permissions hook will not make an API call if post ID is null. Since we can't conditionally render hooks, we pass null as the post ID. This is the reason for the 'null as any' statement
-  const forumPostInfo = usePostByPath({
-    postPath: isForumPost ? pagePath : isForumPost ? (pagePath as string) : (null as any),
-    spaceDomain: router.query.domain as string
-  });
+  const forumPostInfo = usePostByPath();
 
   const isLargeScreen = useMediaQuery(theme.breakpoints.up('md'));
 
   const pageType = basePage?.type;
-  const isExportablePage =
-    pageType === 'card' || pageType === 'page' || pageType === 'proposal' || pageType === 'bounty';
+  const isExportablePage = documentTypes.includes(pageType as PageType);
 
   const isBountyBoard = router.route === '/[domain]/bounties';
   const currentPageOrPost = basePage ?? forumPostInfo.forumPost;
@@ -291,8 +305,7 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
     return null;
   }, [currentPageOrPost?.id]);
 
-  const isFullWidth = !isLargeScreen || (basePage?.fullWidth ?? false);
-  const isBasePageDocument = documentTypes.includes(basePage?.type ?? '');
+  const isBasePageDocument = documentTypes.includes(basePage?.type as PageType);
   const isBasePageDatabase = /board/.test(basePage?.type ?? '');
 
   const { getCategoriesWithCreatePermission, getDefaultCreateCategory } = useProposalCategories();
@@ -306,15 +319,24 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
     setPageMenuAnchorElement(null);
   }
 
-  const onSwitchChange = () => {
+  function setPageProperty(prop: Partial<PageUpdates>) {
     if (basePage) {
       updatePage({
         id: basePage.id,
-        fullWidth: !isFullWidth
+        ...prop
       });
     }
-  };
+  }
 
+  function toggleSmallFont() {
+    setPageProperty({ fontSizeSmall: !basePage?.fontSizeSmall });
+  }
+  function toggleFullWidth() {
+    setPageProperty({ fullWidth: !basePage?.fullWidth });
+  }
+  function setFontFamily(fontFamily: 'serif' | 'mono' | 'default') {
+    setPageProperty({ fontFamily });
+  }
   async function onDeletePage() {
     if (basePage) {
       await deletePage({
@@ -369,6 +391,66 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
 
   const documentOptions = (
     <List data-test='header--page-actions' dense>
+      <Box px={2.5} mb={1}>
+        <Typography variant='caption'>Style</Typography>
+        <Box display='flex' mt={0.5} className={`${serifFont.variable} ${monoFont.variable}`}>
+          <StyledFontButton
+            size='small'
+            color={basePage?.fontFamily === 'default' ? 'primary' : 'secondary'}
+            variant='text'
+            onClick={() => setFontFamily('default')}
+          >
+            <FontFamilyExample>Aa</FontFamilyExample>
+            Default
+          </StyledFontButton>
+          <StyledFontButton
+            size='small'
+            color={basePage?.fontFamily === 'serif' ? 'primary' : 'secondary'}
+            variant='text'
+            onClick={() => setFontFamily('serif')}
+          >
+            <FontFamilyExample className='font-family-serif'>Aa</FontFamilyExample>
+            Serif
+          </StyledFontButton>
+          <StyledFontButton
+            size='small'
+            color={basePage?.fontFamily === 'mono' ? 'primary' : 'secondary'}
+            variant='text'
+            onClick={() => setFontFamily('mono')}
+          >
+            <FontFamilyExample className='font-family-mono'>Aa</FontFamilyExample>
+            Mono
+          </StyledFontButton>
+        </Box>
+      </Box>
+      <Divider />
+      <ListItemButton>
+        <FormControlLabel
+          sx={{
+            marginLeft: 0.5,
+            width: '100%',
+            display: 'flex',
+            justifyContent: 'space-between'
+          }}
+          labelPlacement='start'
+          control={<Switch size='small' checked={!!basePage?.fontSizeSmall} onChange={toggleSmallFont} />}
+          label={<Typography variant='body2'>Small text</Typography>}
+        />
+      </ListItemButton>
+      <ListItemButton>
+        <FormControlLabel
+          sx={{
+            marginLeft: 0.5,
+            width: '100%',
+            display: 'flex',
+            justifyContent: 'space-between'
+          }}
+          labelPlacement='start'
+          control={<Switch size='small' checked={!!basePage?.fullWidth} onChange={toggleFullWidth} />}
+          label={<Typography variant='body2'>Full Width</Typography>}
+        />
+      </ListItemButton>
+      <Divider />
       <ListItemButton
         onClick={() => {
           setCurrentPageActionDisplay('comments');
@@ -398,7 +480,7 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
         <ListItemText primary='View suggestions' />
       </ListItemButton>
       <Divider />
-      {(basePage?.type === 'card' || basePage?.type === 'page') && (
+      {(basePage?.type === 'card' || basePage?.type === 'card_synced' || basePage?.type === 'page') && (
         <ListItemButton
           onClick={() => {
             toggleFavorite();
@@ -420,12 +502,12 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
         </ListItemButton>
       )}
       {basePage && (
-        <DuplicatePageAction postDuplication={closeMenu} page={basePage} pagePermissions={pagePermissions} />
+        <DuplicatePageAction postDuplication={closeMenu} page={basePage} pagePermissions={pagePermissions} redirect />
       )}
       <CopyLinkMenuItem closeMenu={closeMenu} />
 
       <Divider />
-      {(basePage?.type === 'card' || basePage?.type === 'page') && (
+      {(basePage?.type === 'card' || basePage?.type === 'card_synced' || basePage?.type === 'page') && (
         <>
           <Tooltip title={!canCreateProposal ? 'You do not have the permission to convert to proposal' : ''}>
             <div>
@@ -462,28 +544,11 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
         />
       )}
       <ExportMarkdownMenuItem disabled={!isExportablePage} onClick={exportMarkdownPage} />
+      <ExportToPDFMarkdown pdfTitle={basePage?.title} />
       {pageType === 'bounty' && basePageBounty && (
         <>
           <Divider />
           <BountyActions bountyId={basePageBounty.id} onClick={closeMenu} />
-        </>
-      )}
-      {isLargeScreen && (
-        <>
-          <Divider />
-          <ListItemButton>
-            <FormControlLabel
-              sx={{
-                marginLeft: 0.5,
-                width: '100%',
-                display: 'flex',
-                justifyContent: 'space-between'
-              }}
-              labelPlacement='start'
-              control={<Switch size='small' checked={isFullWidth} onChange={onSwitchChange} />}
-              label={<Typography variant='body2'>Full Width</Typography>}
-            />
-          </ListItemButton>
         </>
       )}
       {charmversePage && basePage && (
@@ -582,13 +647,8 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
             </Box>
           )}
           {/** End of CharmEditor page specific header content */}
-          {user && (
-            <NotificationsBadge onClick={() => clickToOpenSettingsModal('notifications')}>
-              <IconButton size={isLargeScreen ? 'small' : 'medium'}>
-                <NotificationsIcon fontSize='small' color='secondary' />
-              </IconButton>
-            </NotificationsBadge>
-          )}
+
+          {user && <NotificationButton />}
         </Box>
       </Box>
     </StyledToolbar>

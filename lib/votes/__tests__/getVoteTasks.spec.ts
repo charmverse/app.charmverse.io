@@ -52,7 +52,7 @@ describe('getVoteTasks', () => {
 
     const votes = await getVoteTasks(user.id);
 
-    expect(votes[1].id).toBe(createdVote.id);
-    expect(votes.length).toBe(3);
+    expect(votes.unmarked[1].id).toBe(createdVote.id);
+    expect(votes.unmarked.length).toBe(3);
   });
 });

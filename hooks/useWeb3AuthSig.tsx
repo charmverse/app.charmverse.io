@@ -1,20 +1,22 @@
+import { log } from '@charmverse/core/log';
+import type { UserWallet } from '@charmverse/core/prisma';
 import { verifyMessage } from '@ethersproject/wallet';
 import { useWeb3React } from '@web3-react/core';
 import type { Signer } from 'ethers';
 import { getAddress, toUtf8Bytes } from 'ethers/lib/utils';
 import { SiweMessage } from 'lit-siwe';
 import type { ReactNode } from 'react';
-import { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import { useCallback, createContext, useContext, useEffect, useMemo, useState } from 'react';
+import { mutate } from 'swr';
+import useSWRMutation from 'swr/mutation';
 
 import charmClient from 'charmClient';
+import { useWeb3ConnectionManager } from 'components/_app/Web3ConnectionManager/Web3ConnectionManager';
 import type { AuthSig } from 'lib/blockchain/interfaces';
-import log from 'lib/log';
 import type { SystemError } from 'lib/utilities/errors';
 import { ExternalServiceError, MissingWeb3AccountError } from 'lib/utilities/errors';
 import { lowerCaseEqual } from 'lib/utilities/strings';
 import type { LoggedInUser } from 'models';
-
-import { Web3Connection } from '../components/_app/Web3ConnectionManager';
 
 import { PREFIX, useLocalStorage } from './useLocalStorage';
 import { useUser } from './useUser';
@@ -28,7 +30,8 @@ type IContext = {
   sign: () => Promise<AuthSig>;
   triedEager: boolean;
   getStoredSignature: () => AuthSig | null;
-  disconnectWallet: () => void;
+  logoutWallet: () => void;
+  disconnectWallet: (address: UserWallet['address']) => Promise<void>;
   // Which tool is providing the web3 connection ie. Metamask∂, WalletConnect, etc.
   connector: any;
   // A wallet is currently connected and can be used to generate signatures. This is different from a user being connected
@@ -41,6 +44,7 @@ type IContext = {
   closeWalletSelector: () => void;
   resetSigning: () => void;
   loginFromWeb3Account: (authSig?: AuthSig) => Promise<LoggedInUser>;
+  setAccountUpdatePaused: (paused: boolean) => void;
 };
 
 export const Web3Context = createContext<Readonly<IContext>>({
@@ -49,7 +53,8 @@ export const Web3Context = createContext<Readonly<IContext>>({
   sign: () => Promise.resolve({} as AuthSig),
   triedEager: false,
   getStoredSignature: () => null,
-  disconnectWallet: () => null,
+  logoutWallet: () => null,
+  disconnectWallet: async () => {},
   library: null,
   chainId: null,
   connector: null,
@@ -60,7 +65,8 @@ export const Web3Context = createContext<Readonly<IContext>>({
   isConnectingIdentity: false,
   closeWalletSelector: () => null,
   resetSigning: () => null,
-  loginFromWeb3Account: () => Promise.resolve(null as any)
+  loginFromWeb3Account: () => Promise.resolve(null as any),
+  setAccountUpdatePaused: () => null
 });
 
 // a wrapper around account and library from web3react
@@ -73,7 +79,7 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
     closeWalletSelectorModal,
     isWalletSelectorModalOpen,
     isConnectingIdentity
-  } = useContext(Web3Connection);
+  } = useWeb3ConnectionManager();
   const [isSigning, setIsSigning] = useState(false);
   const verifiableWalletDetected = !!account && !isConnectingIdentity;
 
@@ -85,6 +91,7 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
   const { user, setUser, logoutUser, isLoaded } = useUser();
 
   const [walletAuthSignature, setWalletAuthSignature] = useState<AuthSig | null>(null);
+  const [accountUpdatePaused, setAccountUpdatePaused] = useState(false);
 
   function getStoredSignature(): AuthSig | null {
     if (!account) {
@@ -152,7 +159,7 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (isConnectingIdentity) {
       // Don't update new values
-    } else if (account && user?.wallets.some((w) => lowerCaseEqual(w.address, account))) {
+    } else if (account && (user?.wallets.some((w) => lowerCaseEqual(w.address, account)) || accountUpdatePaused)) {
       setStoredAccount(account.toLowerCase());
 
       const storedWalletSignature = getStoredSignature();
@@ -165,7 +172,7 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
     ) {
       const storedSignature = getStoredSignature();
 
-      if (storedSignature) {
+      if (storedSignature && storedSignature.address === account) {
         loginFromWeb3Account(storedSignature).catch((e) => {
           setSignature(null);
           setStoredAccount(null);
@@ -174,10 +181,13 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
       } else {
         setSignature(null);
         setStoredAccount(null);
-        logoutUser();
+        // We should only logout if there is a user. The logout function triggers a wipe of the SWR cache, and this was having undesirable effects for people with a connected wallet but no user account
+        if (user) {
+          logoutUser();
+        }
       }
     }
-  }, [account, user, isConnectingIdentity, isLoaded]);
+  }, [account, user, isConnectingIdentity, isLoaded, accountUpdatePaused]);
 
   async function sign(): Promise<AuthSig> {
     if (!account) {
@@ -232,12 +242,35 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
       throw err;
     }
   }
-
-  function disconnectWallet() {
+  const logoutWallet = useCallback(() => {
     if (account) {
       window.localStorage.removeItem(`${PREFIX}.wallet-auth-sig-${account}`);
       setWalletAuthSignature(null);
     }
+  }, [account]);
+
+  const { trigger: triggerDisconnectWallet, isMutating: isDisconnectingWallet } = useSWRMutation(
+    '/profile/remove-wallet',
+    (_url, { arg }: Readonly<{ arg: UserWallet['address'] }>) =>
+      account && user ? charmClient.removeUserWallet({ address: arg }) : null,
+    {
+      async onSuccess(updatedUser) {
+        logoutWallet();
+
+        setLitAuthSignature(null);
+        setLitProvider(null);
+        setStoredAccount(null);
+        setUser(updatedUser);
+        connector?.deactivate();
+        await mutate(`/nfts/${updatedUser?.id}`);
+        await mutate(`/orgs/${updatedUser?.id}`);
+        await mutate(`/poaps/${updatedUser?.id}`);
+      }
+    }
+  );
+
+  async function disconnectWallet(address: UserWallet['address']) {
+    await triggerDisconnectWallet(address);
   }
 
   function connectWallet() {
@@ -252,17 +285,19 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
       sign,
       getStoredSignature,
       disconnectWallet,
+      logoutWallet,
       library,
       chainId,
       connector,
       verifiableWalletDetected,
       connectWallet,
       connectWalletModalIsOpen: isWalletSelectorModalOpen,
-      isSigning,
+      isSigning: isSigning || isDisconnectingWallet,
       isConnectingIdentity,
       closeWalletSelector: closeWalletSelectorModal,
       resetSigning: () => setIsSigning(false),
-      loginFromWeb3Account
+      loginFromWeb3Account,
+      setAccountUpdatePaused
     }),
     [
       account,
@@ -274,7 +309,8 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
       isSigning,
       chainId,
       library,
-      isConnectingIdentity
+      isConnectingIdentity,
+      setAccountUpdatePaused
     ]
   );
 

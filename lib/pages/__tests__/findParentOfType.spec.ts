@@ -64,13 +64,46 @@ describe('findParentOfType', () => {
     expect(result).toBe(page_1_1.id);
   });
 
-  it('should return the id of the closest parent node matching the given type, when given a pages map', () => {
+  it('should support array as an option to lookup parents type', () => {
+    const rootBoard: PageNode = {
+      ...root_1,
+      type: 'board'
+    };
+
+    const childPage: PageNode = {
+      ...page_1_1,
+      parentId: rootBoard.id,
+      type: 'card'
+    };
+
+    const nestedChildPage: PageNode = {
+      ...page_1_1_1,
+      parentId: childPage.id,
+      type: 'page'
+    };
+
+    const pageMap = {
+      [rootBoard.id]: rootBoard,
+      [childPage.id]: childPage,
+      [nestedChildPage.id]: nestedChildPage
+    };
+
+    const result = findParentOfType({ pageType: ['board'], pageId: nestedChildPage.id, pageMap });
+
+    expect(result).toBe(rootBoard.id);
+
+    const secondResult = findParentOfType({ pageType: ['proposal', 'bounty'], pageId: nestedChildPage.id, pageMap });
+
+    expect(secondResult).toBe(null);
+  });
+
+  it('should return null when no parent node matches the given type, when given a pages map', () => {
     const result = findParentOfType({ pageType: 'board', pageId: page_1_1_1.id, pageMap: pagesMap });
 
     expect(result).toBe(null);
   });
 
-  it('should return the id of the closest parent node matching the given type, when given a resolved page tree', () => {
+  it('should return null when ni parent node matches the given type, when given a resolved page tree', () => {
     const result = findParentOfType({ pageType: 'board', targetPageTree: page_1_1_1_Tree });
 
     expect(result).toBe(null);

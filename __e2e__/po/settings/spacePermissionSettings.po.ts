@@ -1,6 +1,6 @@
 // playwright-dev-page.ts
+import type { SpaceOperation } from '@charmverse/core/prisma';
 import type { Locator, Page } from '@playwright/test';
-import type { SpaceOperation } from '@prisma/client';
 
 import type { SpacePermissionFlags } from 'lib/permissions/spaces';
 
@@ -25,18 +25,12 @@ export class PermissionSettings extends SettingsModal {
     return this.page.locator(`data-test=space-operation-${operation} >> input`);
   }
 
-  async submitSpacePermissionSettings(): Promise<SpacePermissionFlags> {
+  async submitSpacePermissionSettings() {
     this.submitSpacePermissionSettingsButton.click();
 
-    const response = await this.page.waitForResponse('**/api/permissions/space/*/add');
+    const response = await this.page.waitForResponse('**/api/permissions/space/*/settings');
 
-    const parsedResponse = await response.json();
-
-    if (response.status() >= 400) {
-      throw parsedResponse;
-    }
-
-    return parsedResponse as SpacePermissionFlags;
+    return response;
   }
 
   async isOperationChecked(operation: Exclude<SpaceOperation, 'createForumCategory'>): Promise<boolean> {

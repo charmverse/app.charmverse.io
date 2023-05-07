@@ -9,14 +9,14 @@ import LoadingComponent from 'components/common/LoadingComponent';
 import { PageDialogProvider } from 'components/common/PageDialog/hooks/usePageDialog';
 import PageDialogGlobalModal from 'components/common/PageDialog/PageDialogGlobal';
 import { CenteredPageContent } from 'components/common/PageLayout/components/PageContent';
-import { useProposalCategories } from 'components/proposals/hooks/useProposalCategories';
-import { useProposalSortAndFilters } from 'components/proposals/hooks/useProposalSortAndFilters';
 import { NewProposalButton } from 'components/votes/components/NewProposalButton';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useHasMemberLevel } from 'hooks/useHasMemberLevel';
 
-import ProposalsTable from './components/ProposalsTable';
+import { ProposalsTable } from './components/ProposalsTable';
 import { ProposalsViewOptions } from './components/ProposalsViewOptions';
+import { useProposalCategories } from './hooks/useProposalCategories';
+import { useProposals } from './hooks/useProposals';
 
 export function ProposalsPage() {
   const { categories = [] } = useProposalCategories();
@@ -29,15 +29,9 @@ export function ProposalsPage() {
     () => (currentSpace ? `proposals/${currentSpace.id}` : null),
     () => charmClient.proposals.getProposalsBySpace({ spaceId: currentSpace!.id })
   );
-  const {
-    filteredProposals,
-    proposalFilter,
-    proposalSort,
-    setProposalFilter,
-    setProposalSort,
-    categoryIdFilter,
-    setCategoryIdFilter
-  } = useProposalSortAndFilters(data ?? []);
+  const { filteredProposals, statusFilter, setStatusFilter, categoryIdFilter, setCategoryIdFilter } = useProposals(
+    data ?? []
+  );
 
   useEffect(() => {
     charmClient.track.trackAction('page_view', { spaceId: currentSpace?.id, type: 'proposals_list' });
@@ -79,10 +73,8 @@ export function ProposalsPage() {
 
                   <Box sx={{ display: { xs: 'none', lg: 'flex' } }}>
                     <ProposalsViewOptions
-                      proposalFilter={proposalFilter}
-                      setProposalFilter={setProposalFilter}
-                      proposalSort={proposalSort}
-                      setProposalSort={setProposalSort}
+                      statusFilter={statusFilter}
+                      setStatusFilter={setStatusFilter}
                       categoryIdFilter={categoryIdFilter}
                       setCategoryIdFilter={setCategoryIdFilter}
                       categories={categories}
@@ -94,10 +86,8 @@ export function ProposalsPage() {
 
             <Box sx={{ display: { xs: 'flex', lg: 'none' }, justifyContent: 'flex-end' }}>
               <ProposalsViewOptions
-                proposalFilter={proposalFilter}
-                setProposalFilter={setProposalFilter}
-                proposalSort={proposalSort}
-                setProposalSort={setProposalSort}
+                statusFilter={statusFilter}
+                setStatusFilter={setStatusFilter}
                 categoryIdFilter={categoryIdFilter}
                 setCategoryIdFilter={setCategoryIdFilter}
                 categories={categories}

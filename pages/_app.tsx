@@ -1,43 +1,36 @@
-import { CacheProvider, Global } from '@emotion/react';
+import { CacheProvider } from '@emotion/react';
 import type { EmotionCache } from '@emotion/utils';
 import type { ExternalProvider, JsonRpcFetchFunc } from '@ethersproject/providers';
 import { Web3Provider } from '@ethersproject/providers';
 import RefreshIcon from '@mui/icons-material/Refresh';
-import type { PaletteMode } from '@mui/material';
-import CssBaseline from '@mui/material/CssBaseline';
 import IconButton from '@mui/material/IconButton';
-import { ThemeProvider } from '@mui/material/styles';
 import { Web3ReactProvider } from '@web3-react/core';
 import type { NextPage } from 'next';
 import type { AppProps } from 'next/app';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import type { ReactElement, ReactNode } from 'react';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { SWRConfig } from 'swr';
 
 import charmClient from 'charmClient';
-import { CurrentSpaceSetter } from 'components/_app/CurrentSpaceSetter';
 import GlobalComponents from 'components/_app/GlobalComponents';
 import { LocalizationProvider } from 'components/_app/LocalizationProvider';
 import { Web3ConnectionManager } from 'components/_app/Web3ConnectionManager';
-import { setTheme as setFocalBoardTheme } from 'components/common/BoardEditor/focalboard/src/theme';
 import FocalBoardProvider from 'components/common/BoardEditor/FocalBoardProvider';
 import ErrorBoundary from 'components/common/errors/ErrorBoundary';
 import IntlProvider from 'components/common/IntlProvider';
+import { NotificationsProvider } from 'components/common/PageLayout/components/Header/components/NotificationPreview/useNotifications';
 import ReactDndProvider from 'components/common/ReactDndProvider';
 import RouteGuard from 'components/common/RouteGuard';
 import Snackbar from 'components/common/Snackbar';
 import { MemberProfileProvider } from 'components/profile/hooks/useMemberProfile';
 import { isDevEnv } from 'config/constants';
-import { ColorModeContext } from 'context/darkMode';
 import { BountiesProvider } from 'hooks/useBounties';
-import { CurrentSpaceProvider } from 'hooks/useCurrentSpaceId';
 import { DiscordProvider } from 'hooks/useDiscordConnection';
 import { PostCategoriesProvider } from 'hooks/useForumCategories';
 import { useInterval } from 'hooks/useInterval';
 import { IsSpaceMemberProvider } from 'hooks/useIsSpaceMember';
-import { useLocalStorage } from 'hooks/useLocalStorage';
 import { MembersProvider } from 'hooks/useMembers';
 import { NotionProvider } from 'hooks/useNotionImport';
 import { OnboardingProvider } from 'hooks/useOnboarding';
@@ -51,12 +44,8 @@ import { UserProvider } from 'hooks/useUser';
 import { useUserAcquisition } from 'hooks/useUserAcquisition';
 import { Web3AccountProvider } from 'hooks/useWeb3AuthSig';
 import { WebSocketClientProvider } from 'hooks/useWebSocketClient';
-import { createThemeLightSensitive } from 'theme';
+import { AppThemeProvider } from 'theme/AppThemeProvider';
 import { createEmotionCache } from 'theme/createEmotionCache';
-import cssVariables from 'theme/cssVariables';
-import { setDarkMode } from 'theme/darkMode';
-import { darkTheme, lightTheme } from 'theme/focalboard/theme';
-
 import '@bangle.dev/tooltip/style.css';
 import '@skiff-org/prosemirror-tables/style/table-filters.css';
 import '@skiff-org/prosemirror-tables/style/table-headers.css';
@@ -65,7 +54,7 @@ import '@skiff-org/prosemirror-tables/style/tables.css';
 import 'prosemirror-menu/style/menu.css';
 import 'theme/@bangle.dev/styles.scss';
 import 'theme/prosemirror-tables/prosemirror-tables.scss';
-// init focalboard
+import 'theme/print.scss';
 import 'components/common/BoardEditor/focalboard/src/components/blockIconSelector.scss';
 import 'components/common/BoardEditor/focalboard/src/components/calculations/calculation.scss';
 import 'components/common/BoardEditor/focalboard/src/components/calendar/fullcalendar.scss';
@@ -85,29 +74,15 @@ import 'components/common/BoardEditor/focalboard/src/components/kanban/kanbanCol
 import 'components/common/BoardEditor/focalboard/src/components/properties/createdAt/createdAt.scss';
 import 'components/common/BoardEditor/focalboard/src/components/properties/dateRange/dateRange.scss';
 import 'components/common/BoardEditor/focalboard/src/components/properties/lastModifiedAt/lastModifiedAt.scss';
-import 'components/common/BoardEditor/focalboard/src/components/properties/lastModifiedBy/lastModifiedBy.scss';
 import 'components/common/BoardEditor/focalboard/src/components/properties/link/link.scss';
-import 'components/common/BoardEditor/focalboard/src/components/properties/user/user.scss';
-// import 'components/common/BoardEditor/focalboard/src/components/sidebar/deleteBoardDialog.scss';
-// import 'components/common/BoardEditor/focalboard/src/components/sidebar/registrationLink.scss';
-// import 'components/common/BoardEditor/focalboard/src/components/sidebar/sidebar.scss';
-// import 'components/common/BoardEditor/focalboard/src/components/sidebar/sidebarAddBoardMenu.scss';
-// import 'components/common/BoardEditor/focalboard/src/components/sidebar/sidebarBoardItem.scss';
-// import 'components/common/BoardEditor/focalboard/src/components/sidebar/sidebarSettingsMenu.scss';
-// import 'components/common/BoardEditor/focalboard/src/components/sidebar/sidebarUserMenu.scss';
 import 'components/common/BoardEditor/focalboard/src/components/table/calculation/calculationRow.scss';
 import 'components/common/BoardEditor/focalboard/src/components/table/horizontalGrip.scss';
 import 'components/common/BoardEditor/focalboard/src/components/table/table.scss';
 import 'components/common/BoardEditor/focalboard/src/components/table/tableRow.scss';
-import 'components/common/BoardEditor/focalboard/src/components/topBar.scss';
-import 'components/common/BoardEditor/focalboard/src/components/viewHeader/filterEntry.scss';
 import 'components/common/BoardEditor/focalboard/src/components/viewHeader/viewHeader.scss';
 import 'components/common/BoardEditor/focalboard/src/components/viewTitle.scss';
 import 'components/common/BoardEditor/focalboard/src/styles/labels.scss';
-import 'components/common/BoardEditor/focalboard/src/styles/variables.scss';
 import 'components/common/BoardEditor/focalboard/src/styles/_markdown.scss';
-// import 'components/common/BoardEditor/focalboard/src/widgets/buttons/button.scss';
-import 'components/common/BoardEditor/focalboard/src/widgets/buttons/buttonWithMenu.scss';
 import 'components/common/BoardEditor/focalboard/src/widgets/buttons/iconButton.scss';
 import 'components/common/BoardEditor/focalboard/src/widgets/editable.scss';
 import 'components/common/BoardEditor/focalboard/src/widgets/emojiPicker.scss';
@@ -122,9 +97,6 @@ import 'components/common/BoardEditor/focalboard/src/widgets/propertyMenu.scss';
 import 'components/common/BoardEditor/focalboard/src/widgets/switch.scss';
 import 'theme/focalboard/focalboard.button.scss';
 import 'theme/focalboard/focalboard.main.scss';
-import 'theme/focalboard/focalboard.typography.scss';
-
-// Lit Protocol CSS
 import 'lit-share-modal-v3/dist/ShareModal.css';
 import 'react-resizable/css/styles.css';
 import 'theme/lit-protocol/lit-protocol.scss';
@@ -154,39 +126,7 @@ export default function App({ Component, emotionCache = clientSideEmotionCache, 
     }
   }, []);
 
-  // dark mode: https://mui.com/customization/dark-mode/
-  const [savedDarkMode, setSavedDarkMode] = useLocalStorage<PaletteMode | null>('darkMode', null);
-  const [mode, setMode] = useState<PaletteMode>('dark');
   const [isOldBuild, setIsOldBuild] = useState(false);
-  const colorModeContext = useMemo(
-    () => ({
-      toggleColorMode: () => {
-        setMode((prevMode: PaletteMode) => {
-          const newMode = prevMode === 'light' ? 'dark' : 'light';
-          return newMode;
-        });
-      }
-    }),
-    []
-  );
-
-  // Update the theme only if the mode changes
-  const theme = useMemo(() => {
-    const muiTheme = createThemeLightSensitive(mode);
-
-    if (typeof window !== 'undefined') {
-      setFocalBoardTheme(mode === 'dark' ? darkTheme : lightTheme);
-      setSavedDarkMode(mode);
-      setDarkMode(mode === 'dark');
-    }
-    return muiTheme;
-  }, [mode]);
-
-  useEffect(() => {
-    if (savedDarkMode) {
-      setMode(savedDarkMode);
-    }
-  }, [savedDarkMode]);
 
   // Check if a new version of the application is available every 5 minutes.
   useInterval(async () => {
@@ -209,20 +149,19 @@ export default function App({ Component, emotionCache = clientSideEmotionCache, 
   // DO NOT REMOVE CacheProvider - it protects MUI from Tailwind CSS in settings
   return (
     <CacheProvider value={emotionCache}>
-      <ColorModeContext.Provider value={colorModeContext}>
-        <ThemeProvider theme={theme}>
-          <SnackbarProvider>
-            <ReactDndProvider>
-              <DataProviders>
-                <SettingsDialogProvider>
+      <AppThemeProvider>
+        <SnackbarProvider>
+          <ReactDndProvider>
+            <DataProviders>
+              <SettingsDialogProvider>
+                <NotificationsProvider>
                   <LocalizationProvider>
                     <OnboardingProvider>
                       <FocalBoardProvider>
                         <NotionProvider>
                           <IntlProvider>
                             <PageHead />
-                            <CssBaseline enableColorScheme={true} />
-                            <Global styles={cssVariables} />
+
                             <RouteGuard>
                               <ErrorBoundary>
                                 <Snackbar
@@ -237,7 +176,9 @@ export default function App({ Component, emotionCache = clientSideEmotionCache, 
                                   severity='warning'
                                   handleClose={() => setIsOldBuild(false)}
                                 />
+
                                 {getLayout(<Component {...pageProps} />)}
+
                                 <GlobalComponents />
                               </ErrorBoundary>
                             </RouteGuard>
@@ -246,12 +187,12 @@ export default function App({ Component, emotionCache = clientSideEmotionCache, 
                       </FocalBoardProvider>
                     </OnboardingProvider>
                   </LocalizationProvider>
-                </SettingsDialogProvider>
-              </DataProviders>
-            </ReactDndProvider>
-          </SnackbarProvider>
-        </ThemeProvider>
-      </ColorModeContext.Provider>
+                </NotificationsProvider>
+              </SettingsDialogProvider>
+            </DataProviders>
+          </ReactDndProvider>
+        </SnackbarProvider>
+      </AppThemeProvider>
     </CacheProvider>
   );
 }
@@ -271,26 +212,23 @@ function DataProviders({ children }: { children: ReactNode }) {
             <Web3ConnectionManager>
               <Web3AccountProvider>
                 <SpacesProvider>
-                  <CurrentSpaceProvider>
-                    <CurrentSpaceSetter />
-                    <PostCategoriesProvider>
-                      <IsSpaceMemberProvider>
-                        <WebSocketClientProvider>
-                          <MembersProvider>
-                            <BountiesProvider>
-                              <PaymentMethodsProvider>
-                                <PagesProvider>
-                                  <MemberProfileProvider>
-                                    <PageTitleProvider>{children}</PageTitleProvider>
-                                  </MemberProfileProvider>
-                                </PagesProvider>
-                              </PaymentMethodsProvider>
-                            </BountiesProvider>
-                          </MembersProvider>
-                        </WebSocketClientProvider>
-                      </IsSpaceMemberProvider>
-                    </PostCategoriesProvider>
-                  </CurrentSpaceProvider>
+                  <PostCategoriesProvider>
+                    <IsSpaceMemberProvider>
+                      <WebSocketClientProvider>
+                        <MembersProvider>
+                          <BountiesProvider>
+                            <PaymentMethodsProvider>
+                              <PagesProvider>
+                                <MemberProfileProvider>
+                                  <PageTitleProvider>{children}</PageTitleProvider>
+                                </MemberProfileProvider>
+                              </PagesProvider>
+                            </PaymentMethodsProvider>
+                          </BountiesProvider>
+                        </MembersProvider>
+                      </WebSocketClientProvider>
+                    </IsSpaceMemberProvider>
+                  </PostCategoriesProvider>
                 </SpacesProvider>
               </Web3AccountProvider>
             </Web3ConnectionManager>

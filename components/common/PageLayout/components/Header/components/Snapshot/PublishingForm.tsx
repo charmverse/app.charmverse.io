@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/log';
 import { Typography } from '@mui/material';
 import type { AlertColor } from '@mui/material/Alert';
 import Alert from '@mui/material/Alert';
@@ -22,7 +23,6 @@ import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useMembers } from 'hooks/useMembers';
 import { usePages } from 'hooks/usePages';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
-import log from 'lib/log';
 import type { PageMeta } from 'lib/pages';
 import { generateMarkdown } from 'lib/prosemirror/plugins/markdown/generateMarkdown';
 import type { SnapshotReceipt, SnapshotSpace, SnapshotVotingModeType, SnapshotVotingStrategy } from 'lib/snapshot';
@@ -227,13 +227,14 @@ export default function PublishingForm({ onSubmit, page }: Props) {
 
       const client = await getSnapshotClient();
 
+      const start = Math.round(startDate.toSeconds());
       const proposalParams: any = {
         space: space?.snapshotDomain as any,
         type: snapshotVoteMode,
         title: page.title,
         body: content,
         choices: votingOptions,
-        start: Math.round(startDate.toSeconds()),
+        start,
         end: Math.round(endDate.toSeconds()),
         snapshot: snapshotBlockNumber,
         network: snapshotSpace?.network,
@@ -242,6 +243,11 @@ export default function PublishingForm({ onSubmit, page }: Props) {
         metadata: JSON.stringify({}),
         app: ''
       };
+
+      if (snapshotSpace?.voting.delay) {
+        const timestampWithVotingDelay = start - snapshotSpace.voting.delay;
+        proposalParams.timestamp = timestampWithVotingDelay;
+      }
 
       const receipt: SnapshotReceipt = (await client.proposal(
         library,
@@ -308,8 +314,8 @@ export default function PublishingForm({ onSubmit, page }: Props) {
             <Grid item>
               <FieldLabel>Voting type</FieldLabel>
               <InputEnumToOption
+                defaultValue={snapshotVoteMode}
                 keyAndLabel={SnapshotVotingMode}
-                defaultValue='single-choice'
                 onChange={(voteMode) => setSnapshotVoteMode(voteMode as SnapshotVotingModeType)}
               />
             </Grid>

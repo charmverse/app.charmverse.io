@@ -1,12 +1,12 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
-import type { Page, Prisma } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import { log } from '@charmverse/core/log';
+import type { Prisma, Page } from '@charmverse/core/prisma';
 import { v4, validate } from 'uuid';
 
-import { prisma } from 'db';
 import type { BountyWithDetails } from 'lib/bounties';
-import log from 'lib/log';
 import type { PageMeta } from 'lib/pages';
 import { isBoardPageType } from 'lib/pages/isBoardPageType';
 import { createPage } from 'lib/pages/server/createPage';
@@ -15,12 +15,22 @@ import type { PageContent, TextContent, TextMark } from 'lib/prosemirror/interfa
 import { InvalidInputError } from 'lib/utilities/errors';
 import { typedKeys } from 'lib/utilities/objects';
 
-import type { ExportedPage, WorkspaceExport, WorkspaceImport } from './interfaces';
+import type { WorkspaceExport, ExportedPage } from './exportWorkspacePages';
 
-interface UpdateRefs {
+type WorkspaceImportOptions = {
+  exportData?: WorkspaceExport;
+  exportName?: string;
+  targetSpaceIdOrDomain: string;
+  // Parent id of root pages, could be another page or null if space is parent
+  parentId?: string | null;
+  updateTitle?: boolean;
+  includePermissions?: boolean;
+};
+
+type UpdateRefs = {
   oldNewPageIdHashMap: Record<string, string>;
   pages: Page[];
-}
+};
 
 function recurse(node: PageContent, cb: (node: PageContent | TextContent) => void) {
   if (node?.content) {
@@ -91,22 +101,23 @@ function updateReferences({ oldNewPageIdHashMap, pages }: UpdateRefs) {
   };
 }
 
-interface WorkspaceImportResult {
+type WorkspaceImportResult = {
   pages: PageMeta[];
   totalBlocks: number;
   totalPages: number;
   rootPageIds: string[];
   bounties: BountyWithDetails[];
   blockIds: string[];
-}
+};
 
 export async function generateImportWorkspacePages({
   targetSpaceIdOrDomain,
   exportData,
   exportName,
   parentId: rootParentId,
-  updateTitle
-}: WorkspaceImport): Promise<{
+  updateTitle,
+  includePermissions
+}: WorkspaceImportOptions): Promise<{
   pageArgs: Prisma.PageCreateArgs[];
   blockArgs: Prisma.BlockCreateManyArgs;
   voteArgs: Prisma.VoteCreateManyArgs;
@@ -152,13 +163,15 @@ export async function generateImportWorkspacePages({
     node,
     newParentId,
     rootSpacePermissionId,
-    rootPageId
+    rootPageId,
+    oldNewPermissionMap
   }: {
     // This is required for inline databases
     rootPageId?: string;
     node: ExportedPage;
     newParentId: string | null;
     rootSpacePermissionId?: string;
+    oldNewPermissionMap: Record<string, string>;
   }) {
     const existingNewPageId =
       node.type === 'page' || isBoardPageType(node.type) ? oldNewPageIdHashMap[node.id] : undefined;
@@ -174,6 +187,7 @@ export async function generateImportWorkspacePages({
       spaceId,
       cardId,
       proposalId,
+      version,
       parentId,
       bountyId,
       blocks,
@@ -195,6 +209,31 @@ export async function generateImportWorkspacePages({
 
     // Reassigned when creating the root permission
     rootSpacePermissionId = rootSpacePermissionId ?? newPermissionId;
+
+    const pagePermissions = includePermissions
+      ? node.permissions.map(({ sourcePermission, pageId, inheritedFromPermission, ...permission }) => {
+          const newPagePermissionId = v4();
+
+          oldNewPermissionMap[permission.id] = newPagePermissionId;
+
+          const newSourcePermissionId = inheritedFromPermission
+            ? oldNewPermissionMap[inheritedFromPermission]
+            : undefined;
+
+          return {
+            ...permission,
+            inheritedFromPermission: newSourcePermissionId,
+            id: newPagePermissionId
+          };
+        })
+      : [
+          {
+            id: newPermissionId,
+            permissionLevel: space?.defaultPagePermissionGroup ?? 'full_access',
+            spaceId: space.id,
+            inheritedFromPermission: rootSpacePermissionId === newPermissionId ? undefined : rootSpacePermissionId
+          }
+        ];
 
     const newPageContent: Prisma.PageCreateArgs = {
       data: {
@@ -241,14 +280,7 @@ export async function generateImportWorkspacePages({
         },
         permissions: {
           createMany: {
-            data: [
-              {
-                id: newPermissionId,
-                permissionLevel: space?.defaultPagePermissionGroup ?? 'full_access',
-                spaceId: space.id,
-                inheritedFromPermission: rootSpacePermissionId === newPermissionId ? undefined : rootSpacePermissionId
-              }
-            ]
+            data: pagePermissions
           }
         },
         updatedBy: space.createdBy,
@@ -277,7 +309,7 @@ export async function generateImportWorkspacePages({
         blockArgs.push(cardBlock as Prisma.BlockCreateManyInput);
 
         node.children?.forEach((child) => {
-          recursivePagePrep({ node: child, newParentId: newId, rootSpacePermissionId });
+          recursivePagePrep({ node: child, newParentId: newId, rootSpacePermissionId, oldNewPermissionMap });
         });
       }
     } else if (isBoardPageType(node.type)) {
@@ -306,13 +338,13 @@ export async function generateImportWorkspacePages({
         pageArgs.push(newPageContent);
 
         node.children?.forEach((child) => {
-          recursivePagePrep({ node: child, newParentId: newId, rootSpacePermissionId });
+          recursivePagePrep({ node: child, newParentId: newId, rootSpacePermissionId, oldNewPermissionMap });
         });
       }
     } else if (node.type === 'page') {
       pageArgs.push(newPageContent);
       node.children?.forEach((child) => {
-        recursivePagePrep({ node: child, newParentId: newId, rootSpacePermissionId });
+        recursivePagePrep({ node: child, newParentId: newId, rootSpacePermissionId, oldNewPermissionMap });
       });
     } else if ((node.type === 'bounty' || node.type === 'bounty_template') && node.bounty) {
       pageArgs.push(newPageContent);
@@ -374,7 +406,7 @@ export async function generateImportWorkspacePages({
       extractedPolls.forEach((extractedPoll) => {
         const pageVote = pageVotes.find((_pageVote) => _pageVote.id === extractedPoll.originalId);
 
-        if (pageVote) {
+        if (pageVote && pageVote.pageId) {
           const { voteOptions, ...vote } = pageVote;
           voteArgs.push({
             ...vote,
@@ -395,7 +427,7 @@ export async function generateImportWorkspacePages({
   }
 
   dataToImport.pages.forEach((page) => {
-    recursivePagePrep({ node: page, newParentId: null });
+    recursivePagePrep({ node: page, newParentId: null, oldNewPermissionMap: {} });
   });
 
   return {
@@ -432,8 +464,9 @@ export async function importWorkspacePages({
   exportData,
   exportName,
   parentId,
-  updateTitle
-}: WorkspaceImport): Promise<Omit<WorkspaceImportResult, 'bounties'>> {
+  updateTitle,
+  includePermissions
+}: WorkspaceImportOptions): Promise<Omit<WorkspaceImportResult, 'bounties'>> {
   const {
     pageArgs,
     blockArgs,
@@ -449,7 +482,8 @@ export async function importWorkspacePages({
     exportData,
     exportName,
     parentId,
-    updateTitle
+    updateTitle,
+    includePermissions
   });
 
   const pagesToCreate = pageArgs.length;

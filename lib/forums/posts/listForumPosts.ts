@@ -1,6 +1,6 @@
-import type { Prisma } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { Prisma } from '@charmverse/core/prisma';
 
-import { prisma } from 'db';
 import type { PaginatedResponse } from 'lib/public-api';
 import { InvalidInputError } from 'lib/utilities/errors';
 
@@ -77,7 +77,8 @@ export async function listForumPosts(
   };
 
   const postPropsQuery: Prisma.PostWhereInput = {
-    categoryId: categoryId instanceof Array ? { in: categoryId } : categoryId
+    categoryId: categoryId instanceof Array ? { in: categoryId } : categoryId,
+    isDraft: false
   };
 
   const posts = await prisma.post.findMany({

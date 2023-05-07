@@ -1,5 +1,5 @@
 import { PageActions } from 'components/common/PageActions';
-import useTasks from 'components/nexus/hooks/useTasks';
+import { useTasks } from 'components/nexus/hooks/useTasks';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useUser } from 'hooks/useUser';
 import type { PageMeta } from 'lib/pages';

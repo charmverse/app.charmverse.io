@@ -64,86 +64,92 @@ export function PublicProfile(props: UserDetailsProps) {
   collectables.sort((itemA, itemB) => (new Date(itemB.date) > new Date(itemA.date) ? 1 : -1));
 
   async function toggleCommunityVisibility(community: CommunityDetails) {
-    await charmClient.profile.updateProfileItem({
-      profileItems: [
+    if (currentUser) {
+      await charmClient.profile.updateProfileItem({
+        profileItems: [
+          {
+            id: community.id,
+            isHidden: !community.isHidden,
+            type: 'community',
+            metadata: null,
+            isPinned: false,
+            walletId: community.walletId
+          }
+        ]
+      });
+      mutate(
+        (aggregateData) => {
+          return aggregateData
+            ? {
+                ...aggregateData,
+                communities: aggregateData.communities.map((comm) => {
+                  if (comm.id === community.id) {
+                    return {
+                      ...comm,
+                      isHidden: !community.isHidden
+                    };
+                  }
+                  return comm;
+                })
+              }
+            : undefined;
+        },
         {
-          id: community.id,
-          isHidden: !community.isHidden,
-          type: 'community',
-          metadata: null,
-          isPinned: false
+          revalidate: false
         }
-      ]
-    });
-    mutate(
-      (aggregateData) => {
-        return aggregateData
-          ? {
-              ...aggregateData,
-              communities: aggregateData.communities.map((comm) => {
-                if (comm.id === community.id) {
-                  return {
-                    ...comm,
-                    isHidden: !community.isHidden
-                  };
-                }
-                return comm;
-              })
-            }
-          : undefined;
-      },
-      {
-        revalidate: false
-      }
-    );
+      );
+    }
   }
 
   async function toggleCollectibleVisibility(item: Collectable) {
-    await charmClient.profile.updateProfileItem({
-      profileItems: [
-        {
-          id: item.id,
-          isHidden: !item.isHidden,
-          type: item.type,
-          metadata: null,
-          isPinned: false
-        }
-      ]
-    });
-    if (item.type === 'nft') {
-      mutateNfts(
-        (_nftData) => {
-          return _nftData?.map((nft) => {
-            if (nft.id === item.id) {
-              return {
-                ...nft,
-                isHidden: !item.isHidden
-              };
-            }
-            return nft;
-          });
-        },
-        {
-          revalidate: false
-        }
-      );
-    } else {
-      mutatePoaps(
-        (_poapData) => {
-          return _poapData?.map((poap) => {
-            if (poap.id === item.id) {
-              return {
-                ...poap,
-                isHidden: !item.isHidden
-              };
-            }
-            return poap;
-          });
-        },
-        {
-          revalidate: false
-        }
-      );
+    if (currentUser) {
+      await charmClient.profile.updateProfileItem({
+        profileItems: [
+          {
+            id: item.id,
+            isHidden: !item.isHidden,
+            type: item.type,
+            metadata: null,
+            isPinned: false,
+            walletId: item.walletId
+          }
+        ]
+      });
+      if (item.type === 'nft') {
+        mutateNfts(
+          (_nftData) => {
+            return _nftData?.map((nft) => {
+              if (nft.id === item.id) {
+                return {
+                  ...nft,
+                  isHidden: !item.isHidden
+                };
+              }
+              return nft;
+            });
+          },
+          {
+            revalidate: false
+          }
+        );
+      } else {
+        mutatePoaps(
+          (_poapData) => {
+            return _poapData?.map((poap) => {
+              if (poap.id === item.id) {
+                return {
+                  ...poap,
+                  isHidden: !item.isHidden
+                };
+              }
+              return poap;
+            });
+          },
+          {
+            revalidate: false
+          }
+        );
+      }
     }
   }
   const communities = (data?.communities ?? []).filter((community) => (isPublic ? !community.isHidden : true));

@@ -1,4 +1,4 @@
-import { prisma } from 'db';
+import { prisma } from '@charmverse/core';
 
 import type { PageMeta } from '../interfaces';
 
@@ -19,6 +19,8 @@ export function getPageMetaList(pageIds: string[]): Promise<PageMeta[]> {
       createdBy: true,
       deletedAt: true,
       deletedBy: true,
+      fontFamily: true,
+      fontSizeSmall: true,
       fullWidth: true,
       galleryImage: true,
       hasContent: true,

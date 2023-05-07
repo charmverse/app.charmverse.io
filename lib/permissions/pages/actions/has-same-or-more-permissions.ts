@@ -1,4 +1,4 @@
-import type { PagePermission, PagePermissionLevel } from '@prisma/client';
+import type { PagePermission, PagePermissionLevel } from '@charmverse/core/prisma';
 
 import { AllowedPagePermissions } from '../available-page-permissions.class';
 import type { PageOperationType } from '../page-permission-interfaces';

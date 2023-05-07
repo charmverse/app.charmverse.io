@@ -60,8 +60,8 @@ export function Comment({
   const [showCommentReply, setShowCommentReply] = useState(false);
   const theme = useTheme();
   const { user } = useUser();
-  const { members } = useMembers();
-  const commentUser = members.find((member) => member.id === comment.createdBy);
+  const { getMemberById } = useMembers();
+  const commentUser = getMemberById(comment.createdBy);
   const [isEditingComment, setIsEditingComment] = useState(false);
   const [commentContent, setCommentContent] = useState<ICharmEditorOutput>({
     doc: comment.content as PageContent,
@@ -128,7 +128,8 @@ export function Comment({
       focusOnInit: true,
       placeholderText: 'What are your thoughts?',
       onContentChange: updateCommentContent,
-      content: commentEditContent.doc
+      content: commentEditContent.doc,
+      isContentControlled: true
     };
 
     if (!inlineCharmEditor) {
@@ -222,6 +223,7 @@ export function Comment({
               readOnly
               key={isEditingComment.toString()}
               content={commentContent.doc}
+              isContentControlled
             />
           )}
           {!comment.deletedAt && !replyingDisabled && (

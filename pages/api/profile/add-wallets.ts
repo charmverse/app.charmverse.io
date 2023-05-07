@@ -1,20 +1,22 @@
+import { prisma } from '@charmverse/core';
+import { log } from '@charmverse/core/log';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { prisma } from 'db';
 import type { AuthSig } from 'lib/blockchain/interfaces';
 import { refreshENSName } from 'lib/blockchain/refreshENSName';
 import { isValidWalletSignature } from 'lib/blockchain/signAndVerify';
 import { updateTrackUserProfile } from 'lib/metrics/mixpanel/updateTrackUserProfile';
-import { onError, onNoMatch } from 'lib/middleware';
+import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { getUserProfile } from 'lib/users/getUser';
-import { InsecureOperationError } from 'lib/utilities/errors';
+import { InsecureOperationError, InvalidInputError } from 'lib/utilities/errors';
+import { shortenHex } from 'lib/utilities/strings';
 import type { LoggedInUser } from 'models';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.post(addWalletsController);
+handler.use(requireUser).post(addWalletsController);
 
 async function addWalletsController(req: NextApiRequest, res: NextApiResponse<LoggedInUser | { error: string }>) {
   const userId = req.session.user.id;
@@ -32,9 +34,17 @@ async function addWalletsController(req: NextApiRequest, res: NextApiResponse<Lo
     }
   }
 
-  await prisma.userWallet.createMany({
-    data: addressesToAdd.map((signature) => ({ userId: req.session.user.id, address: signature.address.toLowerCase() }))
-  });
+  try {
+    await prisma.userWallet.createMany({
+      data: addressesToAdd.map((signature) => ({
+        userId: req.session.user.id,
+        address: signature.address.toLowerCase()
+      }))
+    });
+  } catch (e) {
+    log.error('Error adding wallet', e, { userId, addresses: addressesToAdd.map((s) => shortenHex(s.address)) });
+    throw new InvalidInputError('Wallet is already connected with another account');
+  }
 
   for (const authSig of addressesToAdd) {
     await refreshENSName({ userId, address: authSig.address });

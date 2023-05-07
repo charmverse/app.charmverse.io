@@ -1,10 +1,10 @@
+import { prisma } from '@charmverse/core';
+import type { Page, User } from '@charmverse/core/prisma';
 import type { Browser } from '@playwright/test';
 import { chromium, expect, test } from '@playwright/test';
-import type { Page, User } from '@prisma/client';
 
 import { baseUrl } from 'config/constants';
-import { prisma } from 'db';
-import { upsertPermission } from 'lib/permissions/pages';
+import { upsertPermission } from 'lib/permissions/pages/actions/upsert-permission';
 import { createVote, generateBoard } from 'testing/setupDatabase';
 
 import { generateUserAndSpace } from './utils/mocks';
@@ -15,7 +15,7 @@ let browser: Browser;
 
 test.beforeAll(async () => {
   // Set headless to false in chromium.launch to visually debug the test
-  browser = await chromium.launch();
+  browser = await chromium.launch({});
 });
 
 test.describe.serial('Make a page public and visit it', async () => {

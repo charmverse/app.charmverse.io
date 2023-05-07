@@ -60,7 +60,7 @@ export default function JoinWorkspace() {
         {domain && spaceFromPath && <SpaceAccessGate space={spaceFromPath} />}
         {router.isReady && (spaceFromPathNotFound || !domain) && <SpaceAccessGateWithSearch defaultValue={domain} />}
       </Card>
-      <AlternateRouteButton href='/createWorkspace'>Create a space</AlternateRouteButton>
+      <AlternateRouteButton href='/createSpace'>Create a space</AlternateRouteButton>
     </Box>
   );
 }

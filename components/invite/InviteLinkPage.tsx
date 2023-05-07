@@ -1,11 +1,10 @@
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import Typography from '@mui/material/Typography';
-import { useRouter } from 'next/router';
 
 import charmClient from 'charmClient';
 import PrimaryButton from 'components/common/PrimaryButton';
-import { WalletSign } from 'components/login/WalletSign';
+import { LoginButton } from 'components/login/LoginButton';
 import WorkspaceAvatar from 'components/settings/workspace/LargeAvatar';
 import { useUser } from 'hooks/useUser';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
@@ -15,8 +14,7 @@ import { CenteredBox } from './components/CenteredBox';
 
 export default function InvitationPage({ invite }: { invite: InviteLinkPopulated }) {
   const { user } = useUser();
-  const { walletAuthSignature, verifiableWalletDetected, loginFromWeb3Account } = useWeb3AuthSig();
-  const router = useRouter();
+  const { walletAuthSignature, verifiableWalletDetected } = useWeb3AuthSig();
 
   async function joinSpace() {
     if (!user && verifiableWalletDetected && walletAuthSignature) {
@@ -25,7 +23,6 @@ export default function InvitationPage({ invite }: { invite: InviteLinkPopulated
     await charmClient.acceptInvite({ id: invite.id });
     window.location.href = `/${invite.space.domain}`;
   }
-
   return (
     <CenteredBox>
       <Card sx={{ p: 3, display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
@@ -41,16 +38,7 @@ export default function InvitationPage({ invite }: { invite: InviteLinkPopulated
             Accept Invite
           </PrimaryButton>
         ) : (
-          <Box display='flex' gap={2}>
-            <WalletSign signSuccess={loginFromWeb3Account} />
-            <PrimaryButton
-              size='large'
-              variant='outlined'
-              href={`/api/discord/oauth?redirect=${encodeURIComponent(router.asPath.split('?')[0])}&type=login`}
-            >
-              Connect Discord
-            </PrimaryButton>
-          </Box>
+          <LoginButton redirectUrl={typeof window !== 'undefined' ? window.location.pathname : ''} />
         )}
       </Card>
     </CenteredBox>

@@ -23,12 +23,12 @@ export function DocumentHistory({
     deletedBy?: string | null;
   };
 }) {
-  const { members } = useMembers();
+  const { getMemberById } = useMembers();
   const { formatDateTime } = useDateFormatter();
 
-  const createdBy = members.find((member) => member.id === page.createdBy)?.username ?? 'Unknown user';
-  const updatedBy = members.find((member) => member.id === page.updatedBy)?.username ?? createdBy;
-  const deletedBy = members.find((member) => member.id === page.deletedBy)?.username ?? null;
+  const createdBy = getMemberById(page.createdBy)?.username ?? 'Unknown user';
+  const updatedBy = getMemberById(page.updatedBy)?.username ?? createdBy;
+  const deletedBy = getMemberById(page.deletedBy)?.username ?? null;
 
   const tooltipCreatedAt = getRelativeTimeInThePast(new Date(page.createdAt));
   const tooltipUpdatedAt = getRelativeTimeInThePast(new Date(page.updatedAt));

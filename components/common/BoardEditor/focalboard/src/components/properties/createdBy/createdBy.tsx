@@ -6,11 +6,11 @@ type Props = {
 };
 
 function CreatedBy(props: Props) {
-  const { members } = useMembers();
-  const member = members.find((_member) => _member.id === props.userId);
+  const { getMemberById } = useMembers();
+  const member = getMemberById(props.userId);
 
   return member ? (
-    <div style={{ width: 'fit-content' }} className='UserProperty readonly octo-propertyvalue'>
+    <div style={{ width: 'fit-content' }} className=' readonly octo-propertyvalue'>
       <UserDisplay user={member} avatarSize='xSmall' fontSize='small' />
     </div>
   ) : null;

@@ -1,10 +1,11 @@
-import { prisma } from 'db';
+import { prisma } from '@charmverse/core';
+
 import { InvalidInputError } from 'lib/utilities/errors';
 
-import type { ThreadStatusUpdate, ThreadWithCommentsAndAuthors } from './interfaces';
+import type { ThreadStatusUpdate, ThreadWithComments } from './interfaces';
 import { ThreadStatus } from './interfaces';
 
-export async function toggleThreadStatus({ id, status }: ThreadStatusUpdate): Promise<ThreadWithCommentsAndAuthors> {
+export async function toggleThreadStatus({ id, status }: ThreadStatusUpdate): Promise<ThreadWithComments> {
   if (Object.keys(ThreadStatus).indexOf(status) === -1) {
     throw new InvalidInputError('Provide a valid status for the thread');
   }
@@ -29,11 +30,7 @@ export async function toggleThreadStatus({ id, status }: ThreadStatusUpdate): Pr
       resolved: resolvedStatus
     },
     include: {
-      comments: {
-        include: {
-          user: true
-        }
-      }
+      comments: true
     }
   });
 

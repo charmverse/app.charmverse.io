@@ -6,11 +6,11 @@ type Props = {
 };
 
 function LastModifiedBy(props: Props) {
-  const { members } = useMembers();
-  const member = members.find((user) => user.id === props.updatedBy);
+  const { getMemberById } = useMembers();
+  const member = getMemberById(props.updatedBy);
 
   return member ? (
-    <div style={{ width: 'fit-content' }} className='LastModifiedBy readonly octo-propertyvalue'>
+    <div style={{ width: 'fit-content' }} className='readonly octo-propertyvalue'>
       <UserDisplay user={member} avatarSize='xSmall' fontSize='small' />
     </div>
   ) : null;

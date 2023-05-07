@@ -1,8 +1,9 @@
+import { log } from '@charmverse/core/log';
+import type { Space } from '@charmverse/core/prisma';
 import { yupResolver } from '@hookform/resolvers/yup';
 import LaunchIcon from '@mui/icons-material/LaunchOutlined';
 import { Alert, Button, FormControlLabel, FormGroup, Grid, InputLabel, Switch, TextField } from '@mui/material';
 import Typography from '@mui/material/Typography';
-import type { Space } from '@prisma/client';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
@@ -11,7 +12,6 @@ import Link from 'components/common/Link';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSnackbar } from 'hooks/useSnackbar';
 import useWebhookSubscription from 'hooks/useSpaceWebhook';
-import log from 'lib/log';
 
 import Legend from '../Legend';
 

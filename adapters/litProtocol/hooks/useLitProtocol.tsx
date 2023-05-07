@@ -1,7 +1,6 @@
+import { log } from '@charmverse/core/log';
 import LitJsSdk from '@lit-protocol/lit-node-client';
 import { useEffect, useMemo, useState } from 'react';
-
-import log from 'lib/log';
 
 function useLitProtocol() {
   const [litClient, setClient] = useState<LitJsSdk.LitNodeClient | null>(null);

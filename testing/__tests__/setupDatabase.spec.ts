@@ -1,4 +1,5 @@
-import { prisma } from 'db';
+import { prisma } from '@charmverse/core';
+
 import { InvalidInputError } from 'lib/utilities/errors';
 import { uid } from 'lib/utilities/strings';
 
@@ -55,11 +56,13 @@ describe('generateRole', () => {
     const users = await Promise.all([
       prisma.user.create({
         data: {
+          path: uid(),
           username: 'test'
         }
       }),
       prisma.user.create({
         data: {
+          path: uid(),
           username: 'test'
         }
       })
@@ -119,11 +122,13 @@ describe('generateRole', () => {
     const [spaceUser, outsideUser] = await Promise.all([
       prisma.user.create({
         data: {
+          path: uid(),
           username: 'test'
         }
       }),
       prisma.user.create({
         data: {
+          path: uid(),
           username: 'test'
         }
       })

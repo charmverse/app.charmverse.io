@@ -1,5 +1,5 @@
-import type { MemberProperty } from '@prisma/client';
-import { Prisma } from '@prisma/client';
+import type { MemberProperty } from '@charmverse/core/prisma';
+import { Prisma } from '@charmverse/core/prisma';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 

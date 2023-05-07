@@ -1,15 +1,15 @@
-import type { PostComment } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { PostComment } from '@charmverse/core/prisma';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { prisma } from 'db';
 import { deletePostComment } from 'lib/forums/comments/deletePostComment';
 import { getPostComment } from 'lib/forums/comments/getPostComment';
 import type { UpdatePostCommentInput } from 'lib/forums/comments/interface';
 import { updatePostComment } from 'lib/forums/comments/updatePostComment';
 import { PostNotFoundError } from 'lib/forums/posts/errors';
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
-import { computePostPermissions } from 'lib/permissions/forum/computePostPermissions';
+import { getPermissionsClient } from 'lib/permissions/api';
 import { withSessionRoute } from 'lib/session/withSession';
 import { UserIsNotSpaceMemberError } from 'lib/users/errors';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
@@ -91,10 +91,15 @@ async function deletePostCommentHandler(req: NextApiRequest, res: NextApiRespons
     throw new DataNotFoundError(`Comment with id ${commentId} not found`);
   }
 
-  const permissions = await computePostPermissions({
-    resourceId: postId,
-    userId: req.session.user.id
-  });
+  const permissions = await getPermissionsClient({
+    resourceId: post.id,
+    resourceIdType: 'post'
+  }).then((client) =>
+    client.forum.computePostPermissions({
+      resourceId: postId,
+      userId: req.session.user.id
+    })
+  );
 
   if (permissions.delete_comments || postComment.createdBy === userId) {
     await deletePostComment({ commentId, userId });

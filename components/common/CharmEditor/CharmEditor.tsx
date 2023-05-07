@@ -4,9 +4,10 @@ import { NodeView, Plugin } from '@bangle.dev/core';
 import type { EditorState, EditorView } from '@bangle.dev/pm';
 import { Node, PluginKey } from '@bangle.dev/pm';
 import { useEditorState } from '@bangle.dev/react';
+import { log } from '@charmverse/core/log';
+import type { PageType } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import { Box, Divider } from '@mui/material';
-import type { PageType } from '@prisma/client';
 import type { CryptoCurrency, FiatCurrency } from 'connectors';
 import debounce from 'lodash/debounce';
 import throttle from 'lodash/throttle';
@@ -24,7 +25,6 @@ import type { IPageActionDisplayContext } from 'hooks/usePageActionDisplay';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
-import log from 'lib/log';
 import type { IPagePermissionFlags } from 'lib/permissions/pages/page-permission-interfaces';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { extractDeletedThreadIds } from 'lib/prosemirror/plugins/inlineComments/extractDeletedThreadIds';
@@ -39,8 +39,8 @@ import * as bulletList from './components/bulletList';
 import Callout, * as callout from './components/callout';
 import { userDataPlugin } from './components/charm/charm.plugins';
 import * as columnLayout from './components/columnLayout';
-import LayoutColumn from './components/columnLayout/Column';
-import LayoutRow from './components/columnLayout/Row';
+import ColumnLayoutColumn from './components/columnLayout/Column';
+import ColumnLayoutRow from './components/columnLayout/ColumnLayoutRow';
 import { CryptoPrice } from './components/CryptoPrice';
 import * as disclosure from './components/disclosure';
 import EmojiSuggest, * as emoji from './components/emojiSuggest';
@@ -55,7 +55,7 @@ import * as heading from './components/heading';
 import * as horizontalRule from './components/horizontalRule';
 import * as iframe from './components/iframe';
 import InlineCommentThread, * as inlineComment from './components/inlineComment';
-import InlineDatabase from './components/inlineDatabase/components/InlineDatabase';
+import { InlineDatabase } from './components/inlineDatabase/components/InlineDatabase';
 import InlineCommandPalette from './components/inlinePalette/components/InlineCommandPalette';
 import { plugins as inlinePalettePlugins } from './components/inlinePalette/inlinePalette';
 import * as inlineVote from './components/inlineVote';
@@ -89,7 +89,6 @@ import * as tweet from './components/tweet/tweet';
 import { TweetNodeView } from './components/tweet/TweetNodeView';
 import { plugins as videoPlugins } from './components/video/video';
 import { VideoNodeView } from './components/video/VideoNodeView';
-import DevTools from './DevTools';
 import { specRegistry } from './specRegistry';
 
 export interface ICharmEditorOutput {
@@ -371,6 +370,7 @@ const defaultContent: PageContent = {
 export type UpdatePageContent = (content: ICharmEditorOutput) => any;
 
 interface CharmEditorProps {
+  insideModal?: boolean;
   colorMode?: 'dark';
   content?: PageContent;
   autoFocus?: boolean;
@@ -384,6 +384,7 @@ interface CharmEditorProps {
   isContentControlled?: boolean; // whether or not the parent component is controlling and updating the content
   enableVoting?: boolean;
   pageId?: string;
+  postId?: string;
   containerWidth?: number;
   pageType?: PageType | 'post';
   pagePermissions?: IPagePermissionFlags;
@@ -400,7 +401,7 @@ function CharmEditor({
   pageActionDisplay = null,
   content = defaultContent,
   children,
-  autoFocus,
+  insideModal,
   onContentChange,
   style,
   readOnly = false,
@@ -408,6 +409,7 @@ function CharmEditor({
   isContentControlled = false,
   enableVoting,
   pageId,
+  postId,
   containerWidth,
   pageType,
   pagePermissions,
@@ -520,11 +522,12 @@ function CharmEditor({
   const state = useEditorState({
     specRegistry,
     plugins: getPlugins(),
-    initialValue: content ? Node.fromJSON(specRegistry.schema, content) : '',
+    initialValue: isContentControlled && content ? Node.fromJSON(specRegistry.schema, content) : undefined,
     dropCursorOpts: {
       color: 'var(--charmeditor-active)'
     }
   });
+
   useEffect(() => {
     if (editorRef.current) {
       const highlightedMentionId = router.query.mentionId;
@@ -558,6 +561,7 @@ function CharmEditor({
       disablePageSpecificFeatures={disablePageSpecificFeatures}
       disableRowHandles={disableRowHandles}
       isContentControlled={isContentControlled}
+      initialContent={content}
       enableSuggestions={enableSuggestingMode}
       onParticipantUpdate={onParticipantUpdate}
       trackChanges
@@ -578,6 +582,8 @@ function CharmEditor({
         const allProps: CharmNodeViewProps = {
           ...props,
           pageId,
+          pagePermissions,
+          postId,
           readOnly,
           deleteNode: () => {
             const view = props.view;
@@ -594,10 +600,10 @@ function CharmEditor({
           case 'quote':
             return <Quote {...allProps}>{_children}</Quote>;
           case 'columnLayout': {
-            return <LayoutRow node={props.node}>{_children}</LayoutRow>;
+            return <ColumnLayoutRow node={props.node}>{_children}</ColumnLayoutRow>;
           }
           case 'columnBlock': {
-            return <LayoutColumn node={props.node}>{_children}</LayoutColumn>;
+            return <ColumnLayoutColumn node={props.node}>{_children}</ColumnLayoutColumn>;
           }
           case 'cryptoPrice': {
             const attrs = props.attrs as { base: null | CryptoCurrency; quote: null | FiatCurrency };
@@ -687,6 +693,7 @@ function CharmEditor({
         pagePermissions={pagePermissions}
         nestedPagePluginKey={nestedPagePluginKey}
         disableNestedPage={disableNestedPage}
+        pageId={pageId}
       />
       <MentionSuggest pluginKey={mentionPluginKey} />
       <NestedPagesList pluginKey={nestedPagePluginKey} />
@@ -697,10 +704,11 @@ function CharmEditor({
         disableNestedPage={disableNestedPage}
         palettePluginKey={inlinePalettePluginKey}
         enableVoting={enableVoting}
+        pageId={pageId}
       />
       {children}
       {!disablePageSpecificFeatures && (
-        <>
+        <span className='font-family-default'>
           <SidebarDrawer
             id='page-action-sidebar'
             title={pageActionDisplay ? SIDEBAR_VIEWS[pageActionDisplay].title : ''}
@@ -714,11 +722,12 @@ function CharmEditor({
                 state={suggestionState}
               />
             )}
-            {pageActionDisplay === 'comments' && <CommentsSidebar />}
+            {pageActionDisplay === 'comments' && <CommentsSidebar permissions={pagePermissions} />}
           </SidebarDrawer>
-          <InlineCommentThread pluginKey={inlineCommentPluginKey} />
+          <InlineCommentThread permissions={pagePermissions} pluginKey={inlineCommentPluginKey} />
           {currentSpace && pageId && (
             <SuggestionsPopup
+              insideModal={insideModal}
               pageId={pageId}
               spaceId={currentSpace.id}
               pluginKey={suggestionsPluginKey}
@@ -726,9 +735,8 @@ function CharmEditor({
             />
           )}
           {currentSpace && pageId && <LinksPopup pluginKey={linksPluginKey} readOnly={readOnly} />}
-        </>
+        </span>
       )}
-      {!readOnly && <DevTools />}
     </StyledReactBangleEditor>
   );
 }

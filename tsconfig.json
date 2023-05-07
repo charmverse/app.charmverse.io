@@ -5,14 +5,21 @@
       "module": "commonjs",
       "jsxImportSource": ""
     },
-    "require": ["tsconfig-paths/register"]
+    "require": [
+      "tsconfig-paths/register"
+    ],
+    "transpileOnly": true
   },
   "compilerOptions": {
     "importHelpers": true,
     "baseUrl": ".",
     "strict": true,
     "target": "es2019",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "noEmit": true,
@@ -20,12 +27,63 @@
     "module": "esnext",
     "moduleResolution": "node",
     "resolveJsonModule": true,
-    "jsx": "preserve",
+    "jsx": "react-jsx",
     "jsxImportSource": "@emotion/react",
     "allowJs": true,
     "incremental": true,
-    "isolatedModules": true
+    "isolatedModules": true,
+    "paths": {
+      "config/*": [
+        "./config/*"
+      ],
+      "lib/*": [
+        "./lib/*",
+      ],
+      "adapters/*": [
+        "./adapters/*"
+      ],
+      "components/*": [
+        "./components/*"
+      ],
+      "hooks/*": [
+        "./hooks/*"
+      ],
+      "abis/*": [
+        "./abis/*"
+      ],
+      "pages/*": [
+        "./pages/*"
+      ],
+      "public/*": [
+        "./public/*"
+      ],
+      "theme/*": [
+        "./theme/*"
+      ],
+      "testing/*": [
+        "./testing/*"
+      ],
+      "__e2e__/*": [
+        "./__e2e__/*"
+      ],
+      "@charmverse/core/prisma": [
+        "node_modules/@charmverse/core/dist/cjs/prisma",
+      ],
+      "@charmverse/core/shared": [
+        "node_modules/@charmverse/core/dist/cjs/shared",
+      ],
+      "@charmverse/core/log": [
+        "node_modules/@charmverse/core/dist/cjs/lib/log",
+      ]
+    }
   },
-  "exclude": ["node_modules", "**/focalboard/src/**/*.spec.ts", "**/focalboard/src/**/*.spec.tsx"],
-  "include": ["**/*.ts", "**/*.tsx"]
+  "exclude": [
+    "node_modules",
+    "**/focalboard/src/**/*.spec.ts",
+    "**/focalboard/src/**/*.spec.tsx"
+  ],
+  "include": [
+    "**/*.ts",
+    "**/*.tsx"
+  ]
 }

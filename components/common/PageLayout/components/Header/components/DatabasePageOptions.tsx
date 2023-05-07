@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/log';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
@@ -5,13 +6,16 @@ import FavoritedIcon from '@mui/icons-material/Star';
 import NotFavoritedIcon from '@mui/icons-material/StarBorder';
 import UndoIcon from '@mui/icons-material/Undo';
 import VerticalAlignBottomOutlinedIcon from '@mui/icons-material/VerticalAlignBottomOutlined';
-import { Box, Divider, Stack, Tooltip, Typography } from '@mui/material';
+import Box from '@mui/material/Box';
+import Divider from '@mui/material/Divider';
 import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
+import Tooltip from '@mui/material/Tooltip';
+import { bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
 import Papa from 'papaparse';
-import type { ChangeEventHandler } from 'react';
+import type { ChangeEvent } from 'react';
 
 import charmClient from 'charmClient';
 import { CsvExporter } from 'components/common/BoardEditor/focalboard/csvExporter/csvExporter';
@@ -25,6 +29,9 @@ import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/sto
 import { getCurrentBoardViews, getView } from 'components/common/BoardEditor/focalboard/src/store/views';
 import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
 import { DuplicatePageAction } from 'components/common/DuplicatePageAction';
+import type { ImportAction } from 'components/common/Modal/ConfirmImportModal';
+import ConfirmImportModal from 'components/common/Modal/ConfirmImportModal';
+import { useApiPageKeys } from 'hooks/useApiPageKeys';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useMembers } from 'hooks/useMembers';
@@ -35,7 +42,6 @@ import { useUser } from 'hooks/useUser';
 import type { Board } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { CardPage } from 'lib/focalboard/card';
-import log from 'lib/log';
 import type { IPagePermissionFlags } from 'lib/permissions/pages';
 
 import { DocumentHistory } from './DocumentHistory';
@@ -49,7 +55,7 @@ interface Props {
 
 export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: Props) {
   const router = useRouter();
-  const { pages, deletePage } = usePages();
+  const { pages, deletePage, mutatePagesRemove } = usePages();
   const view = useAppSelector(getView(router.query.viewId as string));
   const boards = useAppSelector(getSortedBoards);
   const boardViews = useAppSelector(getCurrentBoardViews);
@@ -59,10 +65,11 @@ export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: 
   const { user } = useUser();
   const currentSpace = useCurrentSpace();
   const { formatDateTime, formatDate } = useDateFormatter();
+  const importConfirmationPopup = usePopupState({ variant: 'popover', popupId: 'import-confirmation-popup' });
+  const { keys } = useApiPageKeys(pageId);
 
   const activeBoardId = view?.fields.sourceData?.boardId ?? view?.fields.linkedSourceId ?? view?.rootId;
   const board = boards.find((b) => b.id === activeBoardId);
-  const lastUpdatedBy = members.find((member) => member.id === board?.createdBy);
   const boardPage = pages[pageId];
 
   function undoChanges() {
@@ -79,7 +86,8 @@ export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: 
   const cards = useAppSelector(
     getViewCardsSortedFilteredAndGrouped({
       boardId: board?.id ?? '',
-      viewId: view?.id ?? ''
+      viewId: view?.id ?? '',
+      pages
     })
   );
 
@@ -88,6 +96,12 @@ export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: 
       pageId
     });
     closeMenu();
+  }
+
+  async function deleteCards() {
+    const cardIds = cards.map((card) => card.id).filter((cardId) => pages[cardId] && !pages[cardId]?.deletedAt);
+    await mutator.deleteBlocks(cardIds);
+    mutatePagesRemove(cardIds);
   }
 
   const exportCsv = (_board: Board, _view: BoardView) => {
@@ -125,7 +139,7 @@ export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: 
     closeMenu();
   }
 
-  const importCsv: ChangeEventHandler<HTMLInputElement> = (event) => {
+  const importCsv = (event: ChangeEvent<HTMLInputElement>, importAction?: ImportAction): void => {
     if (board && event.target.files && event.target.files[0]) {
       Papa.parse(event.target.files[0], {
         header: true,
@@ -139,21 +153,38 @@ export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: 
             showMessage(results.errors[0].message ?? 'There was an error importing your csv file.', 'warning');
             return;
           }
+
           if (isValidCsvResult(results)) {
-            try {
-              if (!user || !currentSpace) {
-                throw new Error(
-                  'An error occured while importing. Please verify you have a valid user, space and board.'
-                );
+            if (!user || !currentSpace) {
+              throw new Error(
+                'An error occured while importing. Please verify you have a valid user, space and board.'
+              );
+            }
+
+            showMessage('Importing your csv file...', 'info');
+
+            if (importAction === 'delete') {
+              try {
+                await deleteCards();
+              } catch (error) {
+                log.error('CSV Import - Deleting all the cards before importing failed', {
+                  spaceId: currentSpace?.id,
+                  pageId,
+                  error
+                });
+                showMessage((error as Error).message || 'Failed to delete the old cards', 'error');
               }
-              showMessage('Importing your csv file...', 'info');
+            }
+
+            try {
               await addNewCards({
                 board,
                 members,
                 results,
                 spaceId: currentSpace.id,
                 userId: user.id,
-                views: boardViews
+                views: boardViews,
+                apiPageKeys: keys
               });
 
               const spaceId = currentSpace?.id;
@@ -252,8 +283,11 @@ export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: 
         />
         <ListItemText primary='Export to CSV' />
       </ListItemButton>
-      <ListItemButton component='label'>
-        <input hidden type='file' name='csvfile' accept='.csv' onChange={importCsv} />
+      <ListItemButton
+        component='label'
+        {...(cards.length > 0 && bindTrigger(importConfirmationPopup))}
+        htmlFor='csvfile'
+      >
         <VerticalAlignBottomOutlinedIcon
           fontSize='small'
           sx={{
@@ -261,6 +295,9 @@ export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: 
           }}
         />
         <ListItemText primary='Import CSV' />
+        {cards.length === 0 && (
+          <input hidden type='file' id='csvfile' name='csvfile' accept='.csv' onChange={importCsv} />
+        )}
       </ListItemButton>
       <Divider />
       <DocumentHistory
@@ -270,6 +307,13 @@ export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: 
           updatedAt: new Date(board.updatedAt),
           updatedBy: board.updatedBy
         }}
+      />
+      <ConfirmImportModal
+        open={importConfirmationPopup.isOpen}
+        onClose={importConfirmationPopup.close}
+        onConfirm={importCsv}
+        buttonText='Import'
+        question='Choose how to manage your current data. Merge duplicate records or delete them entirely.'
       />
     </List>
   );

@@ -1,140 +1,121 @@
-import type { Page } from '@prisma/client';
+import type { Page } from '@charmverse/core/prisma';
 import log from 'loglevel';
 import { useCallback, useEffect, useState } from 'react';
 
-import charmClient from 'charmClient';
 import ErrorPage from 'components/common/errors/ErrorPage';
 import { useCharmEditor } from 'hooks/useCharmEditor';
 import { useCurrentPage } from 'hooks/useCurrentPage';
-import { useCurrentSpaceId } from 'hooks/useCurrentSpaceId';
-import { usePagePermissions } from 'hooks/usePagePermissions';
-import { usePages } from 'hooks/usePages';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { usePage } from 'hooks/usePage';
 import { usePageTitle } from 'hooks/usePageTitle';
-import type { PageMeta, PageUpdates } from 'lib/pages';
+import type { PageMeta } from 'lib/pages';
 import debouncePromise from 'lib/utilities/debouncePromise';
 
 import { DatabasePage } from '../DatabasePage';
 import DocumentPage from '../DocumentPage';
 
-export default function EditorPage({ pageId: pageIdOrPath }: { pageId: string }) {
-  const { currentPageId, setCurrentPageId } = useCurrentPage();
-  const { pages, loadingPages, updatePage } = usePages();
+export function EditorPage({ pageId: pageIdOrPath }: { pageId: string }) {
+  const { setCurrentPageId } = useCurrentPage();
   const { editMode, resetPageProps, setPageProps } = useCharmEditor();
   const [, setTitleState] = usePageTitle();
-  const [pageNotFound, setPageNotFound] = useState(false);
-  const { currentSpaceId } = useCurrentSpaceId();
-  const [isAccessDenied, setIsAccessDenied] = useState(false);
-  const [currentPage, setCurrentPage] = useState<PageMeta | null>(null);
-  const { permissions: pagePermissions } = usePagePermissions({ pageIdOrPath: currentPageId });
+  const currentSpace = useCurrentSpace();
+  const [currentPage] = useState<PageMeta | null>(null);
 
-  const readOnly = (pagePermissions?.edit_content === false && editMode !== 'suggesting') || editMode === 'viewing';
+  const {
+    error: pageWithContentError,
+    page,
+    refreshPage,
+    updatePage
+  } = usePage({ pageIdOrPath, spaceId: currentSpace?.id });
+
+  const readOnly =
+    (page?.permissionFlags.edit_content === false && editMode !== 'suggesting') || editMode === 'viewing';
+
   useEffect(() => {
-    const pageFromContext = Object.values(pages).find(
-      (page) => page?.id === pageIdOrPath || page?.path === pageIdOrPath
-    );
-    if (pageFromContext) {
-      setPageNotFound(false);
-      setCurrentPage(pageFromContext);
-      setCurrentPageId(pageFromContext.id);
-    } else if (!loadingPages && currentSpaceId) {
-      // if the page is not in context, fetch it
-      charmClient.pages
-        .getPage(pageIdOrPath, currentSpaceId)
-        .then((page) => {
-          setPageNotFound(false);
-          setCurrentPage(page);
-          setCurrentPageId(page.id);
-        })
-        .catch((err) => {
-          log.error(err);
-          // An error will be thrown if page doesn't exist or if you dont have read permission for the page
-          if (err.errorType === 'Access denied') {
-            setIsAccessDenied(true);
-          } else {
-            // If the page doesn't exist an error will be thrown
-            setPageNotFound(true);
-          }
-        });
+    if (page) {
+      setCurrentPageId(page.id);
     }
+  }, [page?.id]);
+
+  // reset page id on unmount
+  useEffect(() => {
     return () => {
       setCurrentPageId('');
     };
-  }, [pageIdOrPath, pages, currentSpaceId, loadingPages]);
+  }, []);
 
   // set page attributes of the primary charm editor
   useEffect(() => {
-    if (loadingPages || !pagePermissions) {
+    if (!page) {
       // wait for pages loaded for permissions to be correct
       return;
     }
     if (!editMode) {
-      if (pagePermissions.edit_content) {
-        setPageProps({ permissions: pagePermissions, editMode: 'editing' });
+      if (page.permissionFlags.edit_content) {
+        setPageProps({ permissions: page.permissionFlags, editMode: 'editing' });
       } else {
-        setPageProps({ permissions: pagePermissions, editMode: 'viewing' });
+        setPageProps({ permissions: page.permissionFlags, editMode: 'viewing' });
       }
     } else {
       // pass editMode thru to fix hot-reloading which resets the prop
-      setPageProps({ permissions: pagePermissions, editMode });
+      setPageProps({ permissions: page.permissionFlags, editMode });
     }
     return () => {
       resetPageProps();
     };
-  }, [pagePermissions, currentPage, loadingPages]);
+  }, [page?.permissionFlags]);
 
-  const debouncedPageUpdate = debouncePromise(async (updates: PageUpdates) => {
-    setPageProps({ isSaving: true });
-    const updatedPage = await updatePage(updates);
-    return updatedPage;
-  }, 500);
-
-  const setPage = useCallback(
-    async (updates: Partial<Page>) => {
-      if (!currentPage) {
+  const savePage = useCallback(
+    debouncePromise(async (updates: Partial<Page>) => {
+      if (!page) {
         return;
       }
       if (updates.hasOwnProperty('title')) {
         setTitleState(updates.title || 'Untitled');
       }
-      debouncedPageUpdate({ id: currentPage.id, ...updates } as Partial<Page>)
+      setPageProps({ isSaving: true });
+      updatePage({ id: page.id, ...updates })
         .catch((err: any) => {
           log.error('Error saving page', err);
         })
         .finally(() => {
           setPageProps({ isSaving: false });
         });
-    },
-    [currentPage]
+    }, 500),
+    [page?.id]
   );
 
   useEffect(() => {
-    setTitleState(currentPage?.title || 'Untitled');
+    // make sure current page is loaded
+    if (currentPage) {
+      setTitleState(currentPage.title || 'Untitled');
+    }
   }, [currentPage?.title]);
 
-  if (isAccessDenied) {
+  if (pageWithContentError === 'access_denied') {
     return <ErrorPage message={"Sorry, you don't have access to this page"} />;
-  } else if (pageNotFound) {
+  } else if (pageWithContentError === 'page_not_found') {
     return <ErrorPage message={"Sorry, that page doesn't exist"} />;
   }
   // Wait for permission load
-  else if (!currentPage || !pagePermissions) {
+  else if (!page) {
     return null;
   }
   // Interpret page permission
-  else if (pagePermissions.read === false) {
+  else if (page.permissionFlags.read === false) {
     return <ErrorPage message={"Sorry, you don't have access to this page"} />;
-  } else if (pagePermissions.read === true) {
+  } else if (page.permissionFlags.read === true) {
     if (
-      currentPage?.type === 'board' ||
-      currentPage?.type === 'inline_board' ||
-      currentPage?.type === 'inline_linked_board' ||
-      currentPage?.type === 'linked_board'
+      page.type === 'board' ||
+      page.type === 'inline_board' ||
+      page.type === 'inline_linked_board' ||
+      page.type === 'linked_board'
     ) {
-      return <DatabasePage page={currentPage} setPage={setPage} pagePermissions={pagePermissions} />;
+      return <DatabasePage page={page} setPage={savePage} pagePermissions={page.permissionFlags} />;
     } else {
       return (
         // Document page is used in a few places, so it is responsible for retrieving its own permissions
-        <DocumentPage page={currentPage} readOnly={readOnly} setPage={setPage} />
+        <DocumentPage page={page} refreshPage={refreshPage} readOnly={readOnly} savePage={savePage} />
       );
     }
   }

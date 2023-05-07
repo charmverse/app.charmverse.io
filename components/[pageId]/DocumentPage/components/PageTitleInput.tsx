@@ -12,12 +12,16 @@ const StyledPageTitle = styled(TextField)`
     width: 100%;
   }
 
+  & .MuiInput-root {
+    font-size: inherit;
+  }
+
   & .MuiInput-input {
     background: transparent;
     border: 0 none;
     color: ${({ theme }) => theme.palette.text.primary};
     cursor: text;
-    font-size: 40px;
+    font-size: 2.4em;
     font-weight: 700;
     outline: none;
     line-height: 1.25em;
@@ -72,23 +76,23 @@ export function PageTitleInput({ value, updatedAt: updatedAtExternal, onChange, 
     return <StyledReadOnlyTitle data-test='editor-page-title'>{value || 'Untitled'}</StyledReadOnlyTitle>;
   }
   return (
-    <StyledPageTitle
-      data-test='editor-page-title'
-      inputRef={titleInput}
-      value={title}
-      onChange={_onChange}
-      placeholder='Untitled'
-      autoFocus={!value && !readOnly && !isTouchScreen()}
-      multiline
-      variant='standard'
-      onKeyDown={(e) => {
-        if (e.code === 'Enter') {
-          // prevent inserting a new line in title input
-          e.preventDefault();
-
-          insertAndFocusFirstLine(view);
-        }
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        insertAndFocusFirstLine(view);
       }}
-    />
+    >
+      <StyledPageTitle
+        className='page-title'
+        data-test='editor-page-title'
+        inputRef={titleInput}
+        value={title}
+        multiline
+        onChange={_onChange}
+        placeholder='Untitled'
+        autoFocus={!value && !readOnly && !isTouchScreen()}
+        variant='standard'
+      />
+    </form>
   );
 }

@@ -1,12 +1,30 @@
-import type { PageType } from '@prisma/client';
+import type { PageType } from '@charmverse/core/prisma';
 
 import type { PageNode, PagesMap, TargetPageTree } from './interfaces';
 
 export interface FindParentOfTypeOptions<P extends PageNode> {
-  pageType: PageType;
+  pageType: PageType | PageType[];
   pageId?: string;
   pageMap?: PagesMap<P>;
   targetPageTree?: TargetPageTree<P>;
+}
+
+function matcher({
+  evaluatedPageType,
+  searchPageType
+}: {
+  evaluatedPageType?: PageType;
+  searchPageType: PageType | PageType[];
+}) {
+  if (!evaluatedPageType) {
+    return false;
+  }
+
+  if (typeof searchPageType === 'object') {
+    return searchPageType.includes(evaluatedPageType);
+  }
+
+  return searchPageType === evaluatedPageType;
 }
 
 /**
@@ -41,8 +59,8 @@ export function findParentOfType<P extends PageNode = PageNode>({
 
       currentNode = pageMap[parentId];
 
-      if (currentNode?.type === pageType) {
-        return currentNode.id;
+      if (matcher({ evaluatedPageType: currentNode?.type, searchPageType: pageType })) {
+        return currentNode?.id as string;
       }
     }
   } else if (targetPageTree) {
@@ -51,7 +69,7 @@ export function findParentOfType<P extends PageNode = PageNode>({
     for (let i = 0; i < length; i++) {
       const parent = targetPageTree.parents[i];
 
-      if (parent?.type === pageType) {
+      if (matcher({ evaluatedPageType: parent?.type, searchPageType: pageType })) {
         return parent.id;
       }
     }
