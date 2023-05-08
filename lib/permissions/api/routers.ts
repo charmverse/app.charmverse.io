@@ -1,6 +1,7 @@
 import type { PermissionsClient } from '@charmverse/core';
 import { PermissionsApiClient, prisma } from '@charmverse/core';
-import type { Space } from '@charmverse/core/prisma';
+import type { Space, SubscriptionTier } from '@charmverse/core/prisma';
+import type { PremiumPermissionsClient } from '@charmverse/core/shared';
 import {
   stringUtils,
   InvalidInputError,
@@ -23,16 +24,21 @@ export const premiumPermissionsApiClient = new PermissionsApiClient({
   baseUrl: permissionsApiUrl
 });
 
-export type PermissionsEngine = 'public' | 'private';
+export type PermissionsEngine = 'free' | 'premium';
 
-function getEngine(input: Pick<Space, 'paidTier'>) {
-  if (input.paidTier === 'pro' || input.paidTier === 'enterprise') {
-    return 'private';
-  }
-  return 'public';
+export type SpaceSubscriptionInfo = {
+  spaceId: string;
+  tier: SubscriptionTier;
+};
+
+function getEngine(input: Pick<Space, 'paidTier' | 'id'>): SpaceSubscriptionInfo {
+  return {
+    spaceId: input.id,
+    tier: input.paidTier ?? 'pro'
+  };
 }
 
-export async function isPostSpaceOptedIn({ resourceId }: Resource): Promise<PermissionsEngine> {
+export async function isPostSpaceOptedIn({ resourceId }: Resource): Promise<SpaceSubscriptionInfo> {
   if (!stringUtils.isUUID(resourceId)) {
     throw new InvalidInputError(`Invalid resourceId: ${resourceId}`);
   }
@@ -43,6 +49,7 @@ export async function isPostSpaceOptedIn({ resourceId }: Resource): Promise<Perm
     select: {
       space: {
         select: {
+          id: true,
           paidTier: true
         }
       }
@@ -56,7 +63,7 @@ export async function isPostSpaceOptedIn({ resourceId }: Resource): Promise<Perm
   return getEngine(post.space);
 }
 
-export async function isPostCategorySpaceOptedIn({ resourceId }: Resource): Promise<PermissionsEngine> {
+export async function isPostCategorySpaceOptedIn({ resourceId }: Resource): Promise<SpaceSubscriptionInfo> {
   if (!stringUtils.isUUID(resourceId)) {
     throw new InvalidInputError(`Invalid resourceId: ${resourceId}`);
   }
@@ -67,6 +74,7 @@ export async function isPostCategorySpaceOptedIn({ resourceId }: Resource): Prom
     select: {
       space: {
         select: {
+          id: true,
           paidTier: true
         }
       }
@@ -80,7 +88,7 @@ export async function isPostCategorySpaceOptedIn({ resourceId }: Resource): Prom
   return getEngine(postCategory.space);
 }
 
-export async function isSpaceOptedIn({ resourceId }: Resource): Promise<PermissionsEngine> {
+export async function isSpaceOptedIn({ resourceId }: Resource): Promise<SpaceSubscriptionInfo> {
   if (!stringUtils.isUUID(resourceId)) {
     throw new InvalidInputError(`Invalid resourceId: ${resourceId}`);
   }
@@ -89,6 +97,7 @@ export async function isSpaceOptedIn({ resourceId }: Resource): Promise<Permissi
       id: resourceId
     },
     select: {
+      id: true,
       paidTier: true
     }
   });
@@ -100,7 +109,7 @@ export async function isSpaceOptedIn({ resourceId }: Resource): Promise<Permissi
   return getEngine(space);
 }
 
-export async function isPostCategoryPermissionSpaceOptedIn({ resourceId }: Resource): Promise<PermissionsEngine> {
+export async function isPostCategoryPermissionSpaceOptedIn({ resourceId }: Resource): Promise<SpaceSubscriptionInfo> {
   if (!stringUtils.isUUID(resourceId)) {
     throw new InvalidInputError(`Invalid resourceId: ${resourceId}`);
   }
@@ -113,6 +122,7 @@ export async function isPostCategoryPermissionSpaceOptedIn({ resourceId }: Resou
         select: {
           space: {
             select: {
+              id: true,
               paidTier: true
             }
           }
@@ -128,7 +138,7 @@ export async function isPostCategoryPermissionSpaceOptedIn({ resourceId }: Resou
   return getEngine(postCategoryPermission.postCategory.space);
 }
 
-export async function isProposalSpaceOptedIn({ resourceId }: Resource): Promise<PermissionsEngine> {
+export async function isProposalSpaceOptedIn({ resourceId }: Resource): Promise<SpaceSubscriptionInfo> {
   if (!stringUtils.isUUID(resourceId)) {
     throw new InvalidInputError(`Invalid resourceId: ${resourceId}`);
   }
@@ -139,6 +149,7 @@ export async function isProposalSpaceOptedIn({ resourceId }: Resource): Promise<
     select: {
       space: {
         select: {
+          id: true,
           paidTier: true
         }
       }
@@ -151,7 +162,7 @@ export async function isProposalSpaceOptedIn({ resourceId }: Resource): Promise<
 
   return getEngine(proposal.space);
 }
-export async function isProposalCategorySpaceOptedIn({ resourceId }: Resource): Promise<PermissionsEngine> {
+export async function isProposalCategorySpaceOptedIn({ resourceId }: Resource): Promise<SpaceSubscriptionInfo> {
   if (!stringUtils.isUUID(resourceId)) {
     throw new InvalidInputError(`Invalid resourceId: ${resourceId}`);
   }
@@ -162,6 +173,7 @@ export async function isProposalCategorySpaceOptedIn({ resourceId }: Resource): 
     select: {
       space: {
         select: {
+          id: true,
           paidTier: true
         }
       }
@@ -175,7 +187,9 @@ export async function isProposalCategorySpaceOptedIn({ resourceId }: Resource): 
   return getEngine(proposalCategory.space);
 }
 
-export async function isProposalCategoryPermissionSpaceOptedIn({ resourceId }: Resource): Promise<PermissionsEngine> {
+export async function isProposalCategoryPermissionSpaceOptedIn({
+  resourceId
+}: Resource): Promise<SpaceSubscriptionInfo> {
   if (!stringUtils.isUUID(resourceId)) {
     throw new InvalidInputError(`Invalid resourceId: ${resourceId}`);
   }
@@ -188,6 +202,7 @@ export async function isProposalCategoryPermissionSpaceOptedIn({ resourceId }: R
         select: {
           space: {
             select: {
+              id: true,
               paidTier: true
             }
           }
@@ -209,17 +224,18 @@ export type ResourceIdEntity =
   | 'postCategory'
   | 'postCategoryPermission'
   | 'proposal'
-  | 'proposalCategory';
+  | 'proposalCategory'
+  | 'proposalCategoryPermission';
 
 export type GetPermissionClient = {
   resourceId: string;
   resourceIdType: ResourceIdEntity;
 };
 
-export async function checkSpacePermissionsEngine({
+export async function checkSpaceSpaceSubscriptionInfo({
   resourceId,
   resourceIdType
-}: GetPermissionClient): Promise<PermissionsEngine> {
+}: GetPermissionClient): Promise<SpaceSubscriptionInfo> {
   const engineResolver =
     !resourceIdType || resourceIdType === 'space'
       ? isSpaceOptedIn
@@ -247,20 +263,23 @@ export async function checkSpacePermissionsEngine({
 }
 
 /**
- * Get correct permissions client for a specific space, even if we have a resourceId for another app
+ * Get correct permissions client for a specific space, return premium client if space is paid subscriber
  * */
+export async function getPermissionsClient(
+  request: GetPermissionClient
+): Promise<{ type: 'free' | 'premium'; client: PermissionsClient | PremiumPermissionsClient }>;
 export async function getPermissionsClient({
   resourceId,
   resourceIdType = 'space'
-}: GetPermissionClient): Promise<PermissionsClient> {
-  const engine = await checkSpacePermissionsEngine({
+}: GetPermissionClient): Promise<{ type: PermissionsEngine; client: PermissionsClient | PremiumPermissionsClient }> {
+  const spaceInfo = await checkSpaceSpaceSubscriptionInfo({
     resourceId,
     resourceIdType
   });
 
-  if (engine === 'private') {
-    return premiumPermissionsApiClient;
+  if (spaceInfo.tier !== 'free') {
+    return { type: 'premium', client: premiumPermissionsApiClient };
   } else {
-    return publicClient;
+    return { type: 'free', client: publicClient };
   }
 }

@@ -73,7 +73,7 @@
         "node_modules/@charmverse/core/dist/cjs/shared",
       ],
       "@charmverse/core/log": [
-        "node_modules/,@charmverse/core/dist/cjs/lib/log",
+        "node_modules/@charmverse/core/dist/cjs/lib/log",
       ],
       "@charmverse/core/test": [
         "node_modules/@charmverse/core/dist/cjs/lib/testing/index"
