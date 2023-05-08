@@ -324,7 +324,6 @@
   "overrides": {
     "@types/react": "^18.0.26",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "typescript": "$typescript"
+    "react-dom": "^18.2.0"
   }
 }
