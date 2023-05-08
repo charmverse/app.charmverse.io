@@ -58,9 +58,9 @@ export default function BountyProperties(props: {
   const [availableCryptos, setAvailableCryptos] = useState<(string | CryptoCurrency)[]>(['ETH']);
   const [isShowingAdvancedSettings, setIsShowingAdvancedSettings] = useState(false);
   const bountyFromContext = bounties.find((b) => b.id === bountyId);
-  const [currentBounty, setCurrentBounty] = useState<(BountyCreationData & BountyWithDetails) | null>(null);
+  const [currentBounty, setCurrentBounty] = useState<(BountyCreationData & BountyWithDetails) | null>();
   const [isAmountInputEmpty, setIsAmountInputEmpty] = useState<boolean>(false);
-  const [capSubmissions, setCapSubmissions] = useState(currentBounty?.maxSubmissions !== null);
+  const [capSubmissions, setCapSubmissions] = useState(false);
   const space = useCurrentSpace();
   const { user } = useUser();
   const { mutatePage, pages } = usePages();
@@ -74,7 +74,7 @@ export default function BountyProperties(props: {
     pageId
   });
 
-  const [rewardType, setRewardType] = useState<RewardType>(isTruthy(currentBounty?.customReward) ? 'Custom' : 'Token');
+  const [rewardType, setRewardType] = useState<RewardType>('Token');
   // Using ref to make sure we don't keep redirecting to custom reward tab
   const { isSpaceMember } = useIsSpaceMember();
 
@@ -86,6 +86,12 @@ export default function BountyProperties(props: {
       }
     }
   }, [currentBounty?.customReward, rewardType, autoTabSwitchDone]);
+
+  useEffect(() => {
+    if (currentBounty) {
+      setCapSubmissions(currentBounty.maxSubmissions !== null);
+    }
+  }, [!!currentBounty]);
 
   const readOnly = parentReadOnly || !isSpaceMember;
 
