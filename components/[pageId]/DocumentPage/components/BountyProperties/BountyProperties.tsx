@@ -1,4 +1,4 @@
-import type { PaymentMethod } from '@charmverse/core/dist/prisma';
+import type { PaymentMethod } from '@charmverse/core/prisma';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { Box, Collapse, Divider, IconButton, Stack, TextField, Tooltip } from '@mui/material';

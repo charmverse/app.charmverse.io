@@ -1,4 +1,4 @@
-import type { PageType } from '@charmverse/core/dist/prisma';
+import type { PageType } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
@@ -98,7 +98,12 @@ export default function ShareToWeb({ pageId, pagePermissions, refreshPermissions
   async function updateShareLink() {
     if (!publicPermission) {
       setShareLink(null);
-    } else if (currentPage?.type === 'page' || currentPage?.type === 'card' || currentPage?.type === 'proposal') {
+    } else if (
+      currentPage?.type === 'page' ||
+      currentPage?.type === 'card' ||
+      currentPage?.type === 'card_synced' ||
+      currentPage?.type === 'proposal'
+    ) {
       const shareLinkToSet =
         typeof window !== 'undefined' ? `${window.location.origin}/${space?.domain}/${currentPage.path}` : '';
       setShareLink(shareLinkToSet);

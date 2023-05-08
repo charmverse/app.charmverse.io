@@ -1,4 +1,4 @@
-import type { Comment, User, Prisma } from '@charmverse/core/dist/prisma';
+import type { Comment, User, Prisma } from '@charmverse/core/prisma';
 
 import type { UserPermissionFlags } from 'lib/permissions/interfaces';
 import type { PageContent } from 'lib/prosemirror/interfaces';

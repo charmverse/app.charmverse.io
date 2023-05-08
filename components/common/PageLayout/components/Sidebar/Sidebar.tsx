@@ -1,4 +1,4 @@
-import type { Page } from '@charmverse/core/dist/prisma';
+import type { Page } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import GroupAddOutlinedIcon from '@mui/icons-material/GroupAddOutlined';
@@ -23,6 +23,7 @@ import { useForumCategories } from 'hooks/useForumCategories';
 import { useHasMemberLevel } from 'hooks/useHasMemberLevel';
 import useKeydownPress from 'hooks/useKeydownPress';
 import { useSmallScreen } from 'hooks/useMediaScreens';
+import type { SettingsPath } from 'hooks/useSettingsDialog';
 import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useUser } from 'hooks/useUser';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
@@ -142,7 +143,7 @@ export default function Sidebar({ closeSidebar, navAction }: SidebarProps) {
   const { favoritePageIds } = useFavoritePages();
 
   const { onClick } = useSettingsDialog();
-  const handleModalClick = (path?: string) => {
+  const handleModalClick = (path?: SettingsPath) => {
     onClick(path);
     navAction?.();
   };
@@ -197,7 +198,7 @@ export default function Sidebar({ closeSidebar, navAction }: SidebarProps) {
         </Box>
         <Box mb={2}>
           <SidebarBox
-            onClick={() => handleModalClick(isMobile ? '' : 'space')}
+            onClick={() => handleModalClick(isMobile ? undefined : 'space')}
             icon={<SettingsIcon color='secondary' fontSize='small' />}
             label='Settings'
             data-test='sidebar-settings'

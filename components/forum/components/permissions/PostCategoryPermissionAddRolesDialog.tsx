@@ -1,4 +1,4 @@
-import type { PostCategoryPermissionLevel } from '@charmverse/core/dist/prisma';
+import type { PostCategoryPermissionLevel } from '@charmverse/core/prisma';
 import Grid from '@mui/material/Grid';
 import { useState } from 'react';
 

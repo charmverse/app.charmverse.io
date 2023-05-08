@@ -1,4 +1,5 @@
-import type { PostCategory } from '@charmverse/core/dist/prisma';
+import { log } from '@charmverse/core/log';
+import type { PostCategory } from '@charmverse/core/prisma';
 import SearchIcon from '@mui/icons-material/Search';
 import Box from '@mui/material/Box';
 import InputAdornment from '@mui/material/InputAdornment';
@@ -16,7 +17,6 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useForumCategories } from 'hooks/useForumCategories';
 import { usePageTitle } from 'hooks/usePageTitle';
 import type { PostSortOption } from 'lib/forums/posts/constants';
-import log from 'lib/log';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
 import { CategoryMenu } from './components/CategoryMenu';

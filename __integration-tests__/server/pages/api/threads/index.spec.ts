@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import type { Space, Thread, User } from '@charmverse/core/dist/prisma';
+import type { Space, Thread, User } from '@charmverse/core/prisma';
 import request from 'supertest';
 
 import { upsertPermission } from 'lib/permissions/pages';

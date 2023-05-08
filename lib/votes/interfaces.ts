@@ -1,4 +1,4 @@
-import type { User, UserVote, Vote, VoteOptions } from '@charmverse/core/dist/prisma';
+import type { User, UserVote, Vote, VoteOptions } from '@charmverse/core/prisma';
 
 import type { NotificationActor } from 'lib/notifications/mapNotificationActor';
 

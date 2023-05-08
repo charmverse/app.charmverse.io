@@ -2,8 +2,8 @@ import { prisma } from '@charmverse/core';
 import { v4 } from 'uuid';
 
 import { prismaToBlock } from 'lib/focalboard/block';
+import type { IPropertyTemplate } from 'lib/focalboard/board';
 import { getDatabaseDetails } from 'lib/pages/getDatabaseDetails';
-import type { FormResponseProperty } from 'lib/pages/interfaces';
 import { createDatabaseCardPage } from 'lib/public-api/createDatabaseCardPage';
 import { InvalidInputError } from 'lib/utilities/errors';
 import { relay } from 'lib/websockets/relay';
@@ -29,14 +29,10 @@ export async function createFormResponseCard({
 
   const board = await getDatabaseDetails({ spaceId, idOrPath: databaseIdorPath });
 
-  if (!board) {
-    throw new InvalidInputError('Database not found');
-  }
-
   const fields = (board.fields as any) || {};
   const cardProperties = fields?.cardProperties || [];
-  const existingResponseProperties: FormResponseProperty[] =
-    cardProperties.filter((p: FormResponseProperty) => formResponses.some((f) => f.question === p.description)) || [];
+  const existingResponseProperties: IPropertyTemplate[] =
+    cardProperties.filter((p: IPropertyTemplate) => formResponses.some((f) => f.question === p.description)) || [];
 
   // Map properties, create new onses for non-existing questions
   const { newProperties, mappedProperties } = mapAndCreateProperties(formResponses, existingResponseProperties);
@@ -101,7 +97,7 @@ export async function createFormResponseCard({
   return card;
 }
 
-function createNewFormProperty(description: string): FormResponseProperty {
+function createNewFormProperty(description: string): IPropertyTemplate {
   return {
     id: v4(),
     name: description,
@@ -111,8 +107,8 @@ function createNewFormProperty(description: string): FormResponseProperty {
   };
 }
 
-function mapAndCreateProperties(formResponses: FormResponse[], existingResponseProperties: FormResponseProperty[]) {
-  const newProperties: FormResponseProperty[] = [];
+function mapAndCreateProperties(formResponses: FormResponse[], existingResponseProperties: IPropertyTemplate[]) {
+  const newProperties: IPropertyTemplate[] = [];
   const mappedProperties: Record<string, string> = {};
 
   formResponses.forEach((response) => {

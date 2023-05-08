@@ -1,10 +1,10 @@
-import { BountyStatus } from '@charmverse/core/dist/prisma';
+import { BountyStatus } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import ModeStandbyOutlinedIcon from '@mui/icons-material/ModeStandbyOutlined';
 import BountyIcon from '@mui/icons-material/RequestPageOutlined';
 import { Box, Card, Grid, Tab, Tabs, Typography } from '@mui/material';
 import { useRouter } from 'next/router';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo } from 'react';
 import { CSVLink } from 'react-csv';
 
 import charmClient from 'charmClient';
@@ -47,13 +47,8 @@ const views: { label: string; view: 'gallery' | 'board' }[] = [
 export default function BountiesPage({ publicMode = false, bounties }: Props) {
   const space = useCurrentSpace();
   const router = useRouter();
-  const [currentView, setCurrentView] = useState<(typeof views)[0]>(
-    views.find((view) => view.view === router.query.view) ?? views[0]
-  );
 
-  useEffect(() => {
-    setCurrentView(views.find((view) => view.view === router.query.view) ?? views[0]);
-  }, [router.query.view]);
+  const currentView = views.find((view) => view.view === router.query.view) ?? views[0];
 
   useEffect(() => {
     charmClient.track.trackAction('page_view', { spaceId: space?.id, type: 'bounties_list' });
@@ -150,7 +145,6 @@ export default function BountiesPage({ publicMode = false, bounties }: Props) {
                             )
                           }
                           onClick={() => {
-                            setCurrentView({ label, view });
                             router.push(`/${space?.domain}/bounties?view=${view}`);
                           }}
                           variant='text'

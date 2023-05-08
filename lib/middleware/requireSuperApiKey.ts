@@ -1,7 +1,7 @@
 import crypto from 'node:crypto';
 
 import { prisma } from '@charmverse/core';
-import type { SuperApiToken } from '@charmverse/core/dist/prisma';
+import type { SuperApiToken } from '@charmverse/core/prisma';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import type { NextHandler } from 'next-connect';
 
@@ -37,7 +37,6 @@ export async function requireSuperApiKey(req: NextApiRequest, res: NextApiRespon
   let superApiToken: SuperApiToken | null = null;
   if (apiKey) {
     const apiTokenData = await getVerifiedSuperApiToken(apiKey);
-
     superApiToken = apiTokenData?.superApiKey || null;
 
     if (apiTokenData) {

@@ -1,4 +1,4 @@
-import type { ProposalStatus } from '@charmverse/core/dist/prisma';
+import type { ProposalStatus } from '@charmverse/core/prisma';
 import CheckIcon from '@mui/icons-material/Check';
 import { Divider, Grid, Stack, Tooltip, Typography } from '@mui/material';
 import { Fragment } from 'react';

@@ -1,5 +1,5 @@
 import { useEditorViewContext } from '@bangle.dev/react';
-import type { UserVote } from '@charmverse/core/dist/prisma';
+import type { UserVote } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import HowToVoteOutlinedIcon from '@mui/icons-material/HowToVoteOutlined';
 import {

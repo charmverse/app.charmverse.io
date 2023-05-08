@@ -1,8 +1,8 @@
 import { prisma } from '@charmverse/core';
-import type { Space } from '@charmverse/core/dist/prisma';
+import { log } from '@charmverse/core/log';
+import type { Space } from '@charmverse/core/prisma';
 
 import { addMessageToSQS } from 'lib/aws/SQS';
-import log from 'lib/log';
 import type { WebhookEventNames, WebhookEvent, WebhookPayload } from 'lib/webhookPublisher/interfaces';
 
 const SQS_QUEUE_NAME = process.env.SQS_WEBHOOK_PUBLISHER_QUEUE_NAME;

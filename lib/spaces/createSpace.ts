@@ -2,7 +2,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 
 import { prisma } from '@charmverse/core';
-import type { Prisma, Space } from '@charmverse/core/dist/prisma';
+import type { Prisma, Space } from '@charmverse/core/prisma';
 
 import { generateDefaultPostCategories } from 'lib/forums/categories/generateDefaultPostCategories';
 import { setDefaultPostCategory } from 'lib/forums/categories/setDefaultPostCategory';
@@ -13,6 +13,7 @@ import { updateTrackUserProfileById } from 'lib/metrics/mixpanel/updateTrackUser
 import { logSpaceCreation } from 'lib/metrics/postToDiscord';
 import { convertJsonPagesToPrisma } from 'lib/pages/server/convertJsonPagesToPrisma';
 import { createPage } from 'lib/pages/server/createPage';
+import { generateFirstDiff } from 'lib/pages/server/generateFirstDiff';
 import { setupDefaultPaymentMethods } from 'lib/payment-methods/defaultPaymentMethods';
 import { updateSpacePermissionConfigurationMode } from 'lib/permissions/meta';
 import { generateDefaultProposalCategoriesInput } from 'lib/proposal/generateDefaultProposalCategoriesInput';
@@ -38,6 +39,7 @@ export type SpaceCreateInput = Pick<Space, 'name'> &
       | 'xpsEngineId'
       | 'superApiTokenId'
       | 'updatedBy'
+      | 'origin'
     >
   >;
 
@@ -101,7 +103,8 @@ export async function createWorkspace({
             isAdmin: true
           }))
         }
-      }
+      },
+      origin: spaceData.origin
     },
     include: { pages: true }
   });
@@ -208,6 +211,12 @@ export async function createWorkspace({
             }
           ]
         }
+      },
+      diffs: {
+        create: generateFirstDiff({
+          createdBy: userId,
+          content: gettingStartedPage.content
+        })
       }
     }
   });

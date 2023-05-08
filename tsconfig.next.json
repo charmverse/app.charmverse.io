@@ -7,11 +7,14 @@
   "compilerOptions": {
     "jsx": "preserve",
     "paths": {
-      "@charmverse/core/dist/prisma": [
+      "@charmverse/core/prisma": [
         "node_modules/@charmverse/core/dist/esm/prisma"
       ],
-      "@charmverse/core/dist/shared": [
+      "@charmverse/core/shared": [
         "node_modules/@charmverse/core/dist/esm/shared"
+      ],
+      "@charmverse/core/log": [
+        "node_modules/@charmverse/core/dist/esm/lib/log",
       ]
     }
   }

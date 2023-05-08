@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core';
-import type { SpaceRole } from '@charmverse/core/dist/prisma';
+import type { SpaceRole } from '@charmverse/core/prisma';
 
 import { InvalidInputError, UndesirableOperationError } from 'lib/utilities/errors';
 

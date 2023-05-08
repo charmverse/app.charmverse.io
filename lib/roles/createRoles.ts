@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core';
-import type { Role, RoleSource } from '@charmverse/core/dist/prisma';
+import type { Role, RoleSource } from '@charmverse/core/prisma';
 
 import type { ExternalRole } from 'lib/roles/interfaces';
 

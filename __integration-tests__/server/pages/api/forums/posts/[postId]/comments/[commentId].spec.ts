@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import type { PostCategory, Space, User } from '@charmverse/core/dist/prisma';
+import type { PostCategory, Space, User } from '@charmverse/core/prisma';
 import request from 'supertest';
 
 import type { UpdatePostCommentInput } from 'lib/forums/comments/interface';

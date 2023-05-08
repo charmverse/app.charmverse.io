@@ -4,7 +4,8 @@ import { NodeView, Plugin } from '@bangle.dev/core';
 import type { EditorState, EditorView } from '@bangle.dev/pm';
 import { Node, PluginKey } from '@bangle.dev/pm';
 import { useEditorState } from '@bangle.dev/react';
-import type { PageType } from '@charmverse/core/dist/prisma';
+import { log } from '@charmverse/core/log';
+import type { PageType } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import { Box, Divider } from '@mui/material';
 import type { CryptoCurrency, FiatCurrency } from 'connectors';
@@ -24,7 +25,6 @@ import type { IPageActionDisplayContext } from 'hooks/usePageActionDisplay';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
-import log from 'lib/log';
 import type { IPagePermissionFlags } from 'lib/permissions/pages/page-permission-interfaces';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { extractDeletedThreadIds } from 'lib/prosemirror/plugins/inlineComments/extractDeletedThreadIds';
@@ -39,8 +39,8 @@ import * as bulletList from './components/bulletList';
 import Callout, * as callout from './components/callout';
 import { userDataPlugin } from './components/charm/charm.plugins';
 import * as columnLayout from './components/columnLayout';
-import LayoutColumn from './components/columnLayout/Column';
-import LayoutRow from './components/columnLayout/Row';
+import ColumnLayoutColumn from './components/columnLayout/Column';
+import ColumnLayoutRow from './components/columnLayout/ColumnLayoutRow';
 import { CryptoPrice } from './components/CryptoPrice';
 import * as disclosure from './components/disclosure';
 import EmojiSuggest, * as emoji from './components/emojiSuggest';
@@ -600,10 +600,10 @@ function CharmEditor({
           case 'quote':
             return <Quote {...allProps}>{_children}</Quote>;
           case 'columnLayout': {
-            return <LayoutRow node={props.node}>{_children}</LayoutRow>;
+            return <ColumnLayoutRow node={props.node}>{_children}</ColumnLayoutRow>;
           }
           case 'columnBlock': {
-            return <LayoutColumn node={props.node}>{_children}</LayoutColumn>;
+            return <ColumnLayoutColumn node={props.node}>{_children}</ColumnLayoutColumn>;
           }
           case 'cryptoPrice': {
             const attrs = props.attrs as { base: null | CryptoCurrency; quote: null | FiatCurrency };

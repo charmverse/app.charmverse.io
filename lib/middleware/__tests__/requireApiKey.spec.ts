@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core';
-import type { Space, SpaceApiToken, SuperApiToken, User } from '@charmverse/core/dist/prisma';
+import type { Space, SpaceApiToken, SuperApiToken, User } from '@charmverse/core/prisma';
 import type { NextApiRequest } from 'next';
 import { v4 } from 'uuid';
 

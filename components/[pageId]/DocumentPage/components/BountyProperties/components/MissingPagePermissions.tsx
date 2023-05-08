@@ -1,4 +1,4 @@
-import type { BountyPermissionLevel } from '@charmverse/core/dist/prisma';
+import type { BountyPermissionLevel } from '@charmverse/core/prisma';
 import Alert from '@mui/material/Alert';
 import Typography from '@mui/material/Typography';
 

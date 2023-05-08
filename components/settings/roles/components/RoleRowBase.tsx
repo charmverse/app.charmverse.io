@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/log';
 import styled from '@emotion/styled';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import LockIcon from '@mui/icons-material/LockOutlined';
@@ -22,7 +23,6 @@ import Button from 'components/common/Button';
 import { InputSearchMemberMultiple } from 'components/common/form/InputSearchMember';
 import Modal from 'components/common/Modal';
 import { useSnackbar } from 'hooks/useSnackbar';
-import log from 'lib/log';
 import type { Member } from 'lib/members/interfaces';
 
 import { MemberRow } from './MemberRow';

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { prisma } from '@charmverse/core';
-import type { Space, SpaceApiToken, User } from '@charmverse/core/dist/prisma';
+import type { Space, SpaceApiToken, User } from '@charmverse/core/prisma';
 import { v4 } from 'uuid';
 
 import { createPage } from 'lib/pages/server/createPage';

@@ -1,5 +1,5 @@
 import type { PostCategoryPermissionFlags } from '@charmverse/core';
-import type { PostCategory } from '@charmverse/core/dist/prisma';
+import type { PostCategory } from '@charmverse/core/prisma';
 import { Edit } from '@mui/icons-material';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import LockIcon from '@mui/icons-material/Lock';
@@ -14,7 +14,7 @@ import { MdOutlineNotificationsNone, MdOutlineNotificationsOff } from 'react-ico
 import PopperPopup from 'components/common/PopperPopup';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
-import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
+import { useIsPublicSpace } from 'hooks/useIsPublicSpace';
 import { useForumCategoryNotification } from 'hooks/useUserSpaceNotifications';
 
 import { EditCategoryDialog } from './EditCategoryDialog';
@@ -34,7 +34,7 @@ export function CategoryContextMenu({ category, onChange, onDelete, onSetNewDefa
   const space = useCurrentSpace();
   const isAdmin = useIsAdmin();
 
-  const isPublicMode = useIsFreeSpace();
+  const { isPublicSpace } = useIsPublicSpace();
 
   const notifications = useForumCategoryNotification(category.id);
 
@@ -166,7 +166,7 @@ export function CategoryContextMenu({ category, onChange, onDelete, onSetNewDefa
           <MoreHorizIcon fontSize='small' />
         </IconButton>
       </PopperPopup>
-      {!isPublicMode ? (
+      {isPublicSpace ? (
         <PostCategoryPermissionsDialogPublic
           postCategory={category}
           onClose={closeDialog}

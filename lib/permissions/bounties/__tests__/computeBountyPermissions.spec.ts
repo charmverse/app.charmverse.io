@@ -1,4 +1,4 @@
-import { BountyOperation } from '@charmverse/core/dist/prisma';
+import { BountyOperation } from '@charmverse/core/prisma';
 import { v4 } from 'uuid';
 
 import { assignRole } from 'lib/roles';

@@ -1,10 +1,10 @@
+import { log } from '@charmverse/core/log';
 import Safe from '@safe-global/safe-core-sdk';
 import EthersAdapter from '@safe-global/safe-ethers-lib';
 import { ethers } from 'ethers';
 import { useEffect, useState } from 'react';
 
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
-import log from 'lib/log';
 import { isTruthy } from 'lib/utilities/types';
 
 export default function useSafes(safeAddresses: string[]) {

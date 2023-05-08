@@ -2,8 +2,7 @@ import type { UpdateAttrsFunction } from '@bangle.dev/core';
 import { NodeView } from '@bangle.dev/core';
 import type { EditorState, Node } from '@bangle.dev/pm';
 import { createElement } from '@bangle.dev/utils';
-
-import log from 'lib/log';
+import { log } from '@charmverse/core/log';
 
 export function listItemNodeViewPlugin(name: string, readOnly?: boolean) {
   const checkParentBulletList = (state: EditorState, pos: number) => {

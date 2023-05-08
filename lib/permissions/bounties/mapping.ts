@@ -1,5 +1,5 @@
-import type { BountyOperation } from '@charmverse/core/dist/prisma';
-import { BountyPermissionLevel } from '@charmverse/core/dist/prisma';
+import type { BountyOperation } from '@charmverse/core/prisma';
+import { BountyPermissionLevel } from '@charmverse/core/prisma';
 
 import type { OperationGroupMapping } from '../interfaces';
 

@@ -27,11 +27,8 @@ export async function validateFormRequestInput({
     throw new InvalidInputError(`Invalid input data`);
   }
 
-  const board = await getDatabaseDetails({ spaceId, idOrPath: databaseIdOrPath });
-
-  if (!board) {
-    throw new DatabasePageNotFoundError(databaseIdOrPath);
-  }
+  // Check if database exists
+  await getDatabaseDetails({ spaceId, idOrPath: databaseIdOrPath });
 
   return true;
 }

@@ -1,5 +1,5 @@
-import type { Page, ProposalCategory, Space, Vote } from '@charmverse/core/dist/prisma';
-import { SpaceOperation } from '@charmverse/core/dist/prisma';
+import type { Page, ProposalCategory, Space, Vote } from '@charmverse/core/prisma';
+import { SpaceOperation } from '@charmverse/core/prisma';
 import request from 'supertest';
 import { v4 } from 'uuid';
 

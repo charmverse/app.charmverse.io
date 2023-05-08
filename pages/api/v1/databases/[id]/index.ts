@@ -1,17 +1,16 @@
 import { prisma } from '@charmverse/core';
-import type { Block } from '@charmverse/core/dist/prisma';
+import type { Block } from '@charmverse/core/prisma';
 import type { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
 import { validate } from 'uuid';
 
-import { onError, onNoMatch, requireApiKey } from 'lib/middleware';
 import type { DatabasePage } from 'lib/public-api';
 import { DatabasePageNotFoundError } from 'lib/public-api';
+import { apiHandler } from 'lib/public-api/handler';
 import { filterObjectKeys } from 'lib/utilities/objects';
 
-const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
+const handler = apiHandler();
 
-handler.use(requireApiKey).get(getDatabase);
+handler.get(getDatabase);
 
 /**
  * @swagger

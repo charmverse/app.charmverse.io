@@ -1,5 +1,5 @@
-import type { ProposalCategory, ProposalCategoryPermissionLevel } from '@charmverse/core/dist/prisma';
-import { ProposalCategoryOperation, ProposalOperation } from '@charmverse/core/dist/prisma';
+import type { ProposalCategory, ProposalCategoryPermissionLevel } from '@charmverse/core/prisma';
+import { ProposalCategoryOperation, ProposalOperation } from '@charmverse/core/prisma';
 
 import { typedKeys } from 'lib/utilities/objects';
 

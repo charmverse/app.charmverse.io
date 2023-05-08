@@ -1,4 +1,4 @@
-import type { Space } from '@charmverse/core/dist/prisma';
+import type { Space } from '@charmverse/core/prisma';
 import * as litSDK from 'lit-js-sdk';
 
 import { assignRole } from 'lib/roles';

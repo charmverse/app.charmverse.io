@@ -1,6 +1,6 @@
+import { log } from '@charmverse/core/log';
 import type { Node } from 'prosemirror-model';
 
-import log from 'lib/log';
 import { getNodeFromJson } from 'lib/prosemirror/getNodeFromJson';
 
 export function extractPollIdsFromDoc(pageContent: any | null) {

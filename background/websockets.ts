@@ -1,9 +1,9 @@
 import { createServer } from 'http';
 
+import { log } from '@charmverse/core/log';
 import { Server } from 'socket.io';
 
 import { appEnv, isDevEnv } from 'config/constants';
-import log from 'lib/log';
 import { relay } from 'lib/websockets/relay';
 
 import app from './server/app';

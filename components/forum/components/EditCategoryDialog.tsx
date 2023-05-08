@@ -1,4 +1,4 @@
-import type { PostCategory } from '@charmverse/core/dist/prisma';
+import type { PostCategory } from '@charmverse/core/prisma';
 import { yupResolver } from '@hookform/resolvers/yup';
 import InputLabel from '@mui/material/InputLabel';
 import Stack from '@mui/material/Stack';

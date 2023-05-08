@@ -64,14 +64,12 @@ Start the app from the dotenv CLI, which you can download [here](https://www.npm
 
 For further information about environment variables in Next.js, see the [docs](https://nextjs.org/docs/basic-features/environment-variables).
 
-
 ### Useful Plugins
 
 Chrome / Prosemirror Dev Tools
 [Prosemirror Dev Tools](https://chrome.google.com/webstore/detail/prosemirror-developer-too/gkgbmhfgcpfnogoeclbaiencdjkefonj)
 
 Get access to the document structure of all our editor content
-
 
 Chrome / SWR DevTools
 [SWR DevTools](https://chrome.google.com/webstore/detail/swr-devtools/liidbicegefhheghhjbomajjaehnjned)
@@ -151,7 +149,7 @@ npx prisma migrate dev
 # View the contents of the database
 npx prisma studio
 
-# Generate just the Typescript types from updated schema.prisma (you can import the interfaces from '@charmverse/core/dist/prisma')
+# Generate just the Typescript types from updated schema.prisma (you can import the interfaces from '@charmverse/core/prisma')
 npx prisma generate
 
 # Format the schema file
@@ -397,6 +395,7 @@ Normally datadog agent is not deployed in the staging environment. To run datado
 `.ebextensions/00_env_vars.config` and append `,ddtst` to the `COMPOSE_PROFILES` (Note you'll want to separate the profiles with a comma)
 
 ## Running storybook
+
 Storybook is used to presend base available components to keep consistent design system across the app.
 
 Start storybook locally:

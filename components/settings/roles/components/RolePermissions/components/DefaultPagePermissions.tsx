@@ -1,4 +1,4 @@
-import type { PagePermissionLevel } from '@charmverse/core/dist/prisma';
+import type { PagePermissionLevel } from '@charmverse/core/prisma';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import { Box, FormControlLabel, Grid, Switch, Typography, Menu, MenuItem } from '@mui/material';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';

@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core';
-import { SpaceOperation } from '@charmverse/core/dist/prisma';
+import { SpaceOperation } from '@charmverse/core/prisma';
 
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { uniqueValues } from 'lib/utilities/array';

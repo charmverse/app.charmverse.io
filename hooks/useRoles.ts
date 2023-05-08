@@ -1,4 +1,4 @@
-import type { Role } from '@charmverse/core/dist/prisma';
+import type { Role } from '@charmverse/core/prisma';
 import useSWR, { mutate } from 'swr';
 
 import charmClient from 'charmClient';

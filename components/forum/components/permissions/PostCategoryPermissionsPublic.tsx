@@ -1,16 +1,13 @@
-import type { PostCategory } from '@charmverse/core/dist/prisma';
+import type { PostCategory } from '@charmverse/core/prisma';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import Grid from '@mui/material/Grid';
 import Switch from '@mui/material/Switch';
 import Typography from '@mui/material/Typography';
-import { usePopupState } from 'material-ui-popup-state/hooks';
 
 import Loader from 'components/common/LoadingComponent';
 import Modal from 'components/common/Modal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
-import { useRoles } from 'hooks/useRoles';
 
 import { PostCategoryRolePermissionRow } from './PostCategoryPermissionRow';
 

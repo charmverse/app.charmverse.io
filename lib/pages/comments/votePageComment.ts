@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core';
-import type { PageCommentVote } from '@charmverse/core/dist/prisma';
+import type { PageCommentVote } from '@charmverse/core/prisma';
 
 type CommentVote = {
   commentId: string;

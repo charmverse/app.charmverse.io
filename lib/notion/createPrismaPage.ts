@@ -1,4 +1,4 @@
-import type { Prisma } from '@charmverse/core/dist/prisma';
+import type { Prisma } from '@charmverse/core/prisma';
 
 import { getPagePath } from 'lib/pages';
 import { createPage } from 'lib/pages/server/createPage';

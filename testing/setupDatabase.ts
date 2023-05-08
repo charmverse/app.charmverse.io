@@ -20,7 +20,7 @@ import type {
   User,
   Vote,
   WorkspaceEvent
-} from '@charmverse/core/dist/prisma';
+} from '@charmverse/core/prisma';
 import { Wallet } from 'ethers';
 import { v4 } from 'uuid';
 
@@ -148,6 +148,8 @@ type CreateUserAndSpaceInput = {
   spaceName?: string;
   publicBountyBoard?: boolean;
   paidTier?: SubscriptionTier;
+  superApiTokenId?: string;
+  walletAddress?: string;
 };
 
 export async function generateUserAndSpace({
@@ -157,6 +159,8 @@ export async function generateUserAndSpace({
   onboarded = true,
   spaceName = 'Example Space',
   publicBountyBoard,
+  superApiTokenId,
+  walletAddress,
   paidTier
 }: CreateUserAndSpaceInput = {}) {
   const userId = v4();
@@ -182,12 +186,22 @@ export async function generateUserAndSpace({
               name: spaceName,
               // Adding prefix avoids this being evaluated as uuid
               domain: `domain-${v4()}`,
-              publicBountyBoard
+              publicBountyBoard,
+              ...(superApiTokenId ? { superApiToken: { connect: { id: superApiTokenId } } } : undefined)
             }
           }
         }
       },
       path: uid(),
+      ...(walletAddress
+        ? {
+            wallets: {
+              create: {
+                address: walletAddress.toLowerCase()
+              }
+            }
+          }
+        : undefined),
       ...user
     },
     include: {

@@ -1,4 +1,4 @@
-import type { Post } from '@charmverse/core/dist/prisma';
+import type { Post } from '@charmverse/core/prisma';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import MessageOutlinedIcon from '@mui/icons-material/MessageOutlined';
 import { List, ListItemButton, ListItemIcon, ListItemText, Stack, Typography } from '@mui/material';

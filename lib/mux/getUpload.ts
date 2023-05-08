@@ -1,6 +1,5 @@
+import { log } from '@charmverse/core/log';
 import type { Upload as MuxUpload } from '@mux/mux-node';
-
-import log from 'lib/log';
 
 import { mux } from './muxClient';
 

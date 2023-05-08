@@ -1,12 +1,12 @@
 import { prisma } from '@charmverse/core';
-import type { SuperApiToken } from '@charmverse/core/dist/prisma';
+import type { SuperApiToken } from '@charmverse/core/prisma';
 import { Wallet } from 'ethers';
 import request from 'supertest';
 import { v4 } from 'uuid';
 
 import { getSpaceDomainFromName } from 'lib/spaces/utils';
 import { baseUrl } from 'testing/mockApiCall';
-import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { generateUserAndSpace } from 'testing/setupDatabase';
 import { generateSuperApiToken } from 'testing/utils/middleware';
 
 let apiToken: SuperApiToken;
@@ -17,8 +17,7 @@ const defaultSpaceData = {
 };
 
 beforeAll(async () => {
-  const superToken = await generateSuperApiToken({ name: `test 1-${v4()}` });
-  apiToken = superToken;
+  apiToken = await generateSuperApiToken({ name: `test 1-${v4()}` });
 });
 
 describe('GET /api/v1/spaces', () => {
@@ -108,7 +107,7 @@ describe('GET /api/v1/spaces', () => {
   it('should respond 201 and generate unique domain', async () => {
     const {
       space: { domain: existingDomain }
-    } = await generateUserAndSpaceWithApiToken();
+    } = await generateUserAndSpace();
 
     const response = await request(baseUrl)
       .post('/api/v1/spaces')
