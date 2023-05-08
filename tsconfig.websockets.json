@@ -1,0 +1,17 @@
+// ref: https://github.com/charmverse/app.charmverse.io/commit/f8d0aa22bf519647f3922398a872fd4097c42ffd#diff-d05d2334e626d21bbaf67cd144a636360fb36d9ee0f7009cac555289b19c519d
+{
+  "extends": "./tsconfig.next.json",
+  "compilerOptions": {
+    "module": "commonjs",
+    "outDir": "dist",
+    "lib": [
+      "es2021"
+    ],
+    "target": "es2019",
+    "isolatedModules": false,
+    "noEmit": false
+  },
+  "include": [
+    "background/websockets.ts"
+  ]
+}

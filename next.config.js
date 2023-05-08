@@ -139,6 +139,9 @@ const config = {
     //   'node_modules/@charmverse/core/node_modules/@prisma/client'
     // );
 
+    // display entrpoints info
+    _config.stats = { ..._config.stats, entrypoints: true };
+
     _config.module.rules.push({
       test: /\.svg$/,
       use: [

@@ -83,7 +83,11 @@
     "**/focalboard/src/**/*.spec.tsx"
   ],
   "include": [
-    "**/*.ts",
-    "**/*.tsx"
+    "theme/index.ts",
+    "background/cron.ts"
   ]
+  // "include": [
+  //   "**/*.ts",
+  //   "**/*.tsx"
+  // ]
 }
