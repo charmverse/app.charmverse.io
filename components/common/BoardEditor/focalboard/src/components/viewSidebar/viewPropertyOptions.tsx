@@ -85,19 +85,21 @@ function PropertyOptions(props: LayoutOptionsProps) {
 
   const { hiddenProperties, visibleProperties } = useMemo(() => {
     const propertyIds = properties.map((property) => property.id);
-    const _propertiesRecord = properties.reduce<Record<string, IPropertyTemplate>>((__propertiesRecord, property) => {
-      __propertiesRecord[property.id] = property;
-      return __propertiesRecord;
-    }, {});
-
-    // Manually add __title column as its not present by default
-    if (!_propertiesRecord[Constants.titleColumnId]) {
-      _propertiesRecord[Constants.titleColumnId] = titleProperty;
-    }
-
-    const _visibleProperties = visiblePropertyIdsWithTitle.map(
-      (visiblePropertyId) => _propertiesRecord[visiblePropertyId]
+    const _propertiesRecord = properties.reduce<Record<string, IPropertyTemplate>>(
+      (__propertiesRecord, property) => {
+        __propertiesRecord[property.id] = property;
+        return __propertiesRecord;
+      },
+      {
+        // Always include __title column as its not present by default
+        [Constants.titleColumnId]: titleProperty
+      }
     );
+
+    const _visibleProperties = visiblePropertyIdsWithTitle
+      .map((visiblePropertyId) => _propertiesRecord[visiblePropertyId])
+      // Hot fix - not sure why these dont always exist, maybe the property was deleted?
+      .filter(Boolean);
 
     const _hiddenProperties = propertyIds
       .filter((propertyId) => !visiblePropertyIdsWithTitle.includes(propertyId))
