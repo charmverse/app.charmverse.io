@@ -1,4 +1,4 @@
-import type { PostCategory } from '@charmverse/core/dist/prisma';
+import type { PostCategory } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import MenuItem from '@mui/material/MenuItem';
 import Typography from '@mui/material/Typography';

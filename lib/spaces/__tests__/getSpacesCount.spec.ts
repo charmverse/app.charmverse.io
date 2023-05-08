@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core';
-import type { User } from '@charmverse/core/dist/prisma';
+import type { User } from '@charmverse/core/prisma';
 
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 

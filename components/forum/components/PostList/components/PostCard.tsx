@@ -1,4 +1,4 @@
-import type { PostCategory } from '@charmverse/core/dist/prisma';
+import type { PostCategory } from '@charmverse/core/prisma';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import ModeCommentOutlinedIcon from '@mui/icons-material/ModeCommentOutlined';
 import { Stack } from '@mui/material';

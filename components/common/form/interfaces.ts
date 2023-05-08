@@ -1,4 +1,4 @@
-import type { MemberPropertyType } from '@charmverse/core/dist/prisma';
+import type { MemberPropertyType } from '@charmverse/core/prisma';
 import type { ReactNode } from 'react';
 
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';

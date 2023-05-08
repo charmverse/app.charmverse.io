@@ -1,10 +1,9 @@
 // @ref: https://github.com/chanzuckerberg/czi-prosemirror/blob/master/src/TextColorMarkSpec.js
 
 import type { BaseRawMarkSpec } from '@bangle.dev/core';
+import { log } from '@charmverse/core/log';
 import type { MarkdownSerializerState } from 'prosemirror-markdown';
 import type { Mark } from 'prosemirror-model';
-
-import log from 'lib/log';
 
 import type { TextColorAttrs } from './config';
 import { markName } from './config';

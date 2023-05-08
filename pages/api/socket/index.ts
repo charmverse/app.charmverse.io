@@ -1,10 +1,10 @@
+import { log } from '@charmverse/core/log';
 import { sealData } from 'iron-session';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import type { ServerOptions } from 'socket.io';
 import { Server } from 'socket.io';
 
-import log from 'lib/log';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { authSecret } from 'lib/session/config';
 import { withSessionRoute } from 'lib/session/withSession';

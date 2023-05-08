@@ -1,6 +1,6 @@
 import { AvailablePostCategoryPermissions, generatePostCategory } from '@charmverse/core';
 import type { PostCategoryPermissionFlags } from '@charmverse/core';
-import type { PostCategory, Space, User } from '@charmverse/core/dist/prisma';
+import type { PostCategory, Space, User } from '@charmverse/core/prisma';
 import { v4 } from 'uuid';
 
 import { PostCategoryNotFoundError } from 'lib/forums/categories/errors';

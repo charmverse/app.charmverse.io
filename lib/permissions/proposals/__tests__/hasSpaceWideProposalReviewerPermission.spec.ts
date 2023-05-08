@@ -1,4 +1,4 @@
-import type { Space, User } from '@charmverse/core/dist/prisma';
+import type { Space, User } from '@charmverse/core/prisma';
 
 import { addSpaceOperations } from 'lib/permissions/spaces';
 import { InvalidInputError } from 'lib/utilities/errors';

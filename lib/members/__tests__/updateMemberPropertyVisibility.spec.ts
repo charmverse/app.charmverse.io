@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core';
-import type { MemberProperty, Space } from '@charmverse/core/dist/prisma';
+import type { MemberProperty, Space } from '@charmverse/core/prisma';
 
 import { UndesirableOperationError } from 'lib/utilities/errors';
 import type { LoggedInUser } from 'models';

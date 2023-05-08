@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core';
-import type { Page, Post, Space, User } from '@charmverse/core/dist/prisma';
+import type { Page, Post, Space, User } from '@charmverse/core/prisma';
 import { v4 } from 'uuid';
 
 import { InsecureOperationError, UndesirableOperationError } from 'lib/utilities/errors';

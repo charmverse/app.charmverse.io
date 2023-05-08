@@ -1,4 +1,4 @@
-import type { Page, Space, Vote } from '@charmverse/core/dist/prisma';
+import type { Page, Space, Vote } from '@charmverse/core/prisma';
 import request from 'supertest';
 
 import { baseUrl, loginUser } from 'testing/mockApiCall';

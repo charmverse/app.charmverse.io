@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { prisma } from '@charmverse/core';
-import type { PagePermission, Role, Space, User } from '@charmverse/core/dist/prisma';
+import type { PagePermission, Role, Space, User } from '@charmverse/core/prisma';
 import { v4 } from 'uuid';
 
 import type { IPageWithPermissions } from 'lib/pages/server';

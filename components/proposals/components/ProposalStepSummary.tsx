@@ -1,4 +1,4 @@
-import type { ProposalStatus } from '@charmverse/core/dist/prisma';
+import type { ProposalStatus } from '@charmverse/core/prisma';
 import { ArrowBackIos } from '@mui/icons-material';
 import ArrowForwardIos from '@mui/icons-material/ArrowForwardIos';
 import { Button, Stack, Typography } from '@mui/material';

@@ -5,6 +5,7 @@ import { EditorState } from '@bangle.dev/pm';
 import type { Plugin } from '@bangle.dev/pm';
 import { EditorViewContext } from '@bangle.dev/react';
 import { objectUid } from '@bangle.dev/utils';
+import { log } from '@charmverse/core/log';
 import styled from '@emotion/styled';
 import type { RefObject } from 'react';
 import React, { useEffect, useImperativeHandle, useRef, useState } from 'react';
@@ -17,7 +18,6 @@ import { undoEventName } from 'components/common/CharmEditor/utils';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
-import log from 'lib/log';
 import { isTouchScreen } from 'lib/utilities/browser';
 
 import { FidusEditor } from '../../fiduswriter/fiduseditor';

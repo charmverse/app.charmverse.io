@@ -1,4 +1,5 @@
-import type { Page } from '@charmverse/core/dist/prisma';
+import { log } from '@charmverse/core/log';
+import type { Page } from '@charmverse/core/prisma';
 import OpenInFullIcon from '@mui/icons-material/OpenInFull';
 import { Box } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
@@ -15,12 +16,12 @@ import { useCurrentPage } from 'hooks/useCurrentPage';
 import { usePage } from 'hooks/usePage';
 import { usePages } from 'hooks/usePages';
 import type { BountyWithDetails } from 'lib/bounties';
-import log from 'lib/log';
 import { AllowedPagePermissions } from 'lib/permissions/pages/available-page-permissions.class';
 import debouncePromise from 'lib/utilities/debouncePromise';
 
 import { PageActions } from '../PageActions';
 import { BountyActions } from '../PageLayout/components/Header/components/BountyActions';
+import { ExportToPDFMarkdown } from '../PageLayout/components/Header/components/ExportToPDFMenuItem';
 
 interface Props {
   pageId?: string;
@@ -70,7 +71,7 @@ export default function PageDialog(props: Props) {
 
   async function onClickDelete() {
     if (page) {
-      if (page.type === 'card') {
+      if (page.type === 'card' || page.type === 'card_synced') {
         await charmClient.deleteBlock(page.id, () => null);
       } else if (page.type === 'bounty') {
         setBounties((bounties) => bounties.filter((_bounty) => _bounty.id !== page.id));
@@ -128,6 +129,7 @@ export default function PageDialog(props: Props) {
               }
             }}
           >
+            <ExportToPDFMarkdown pdfTitle={page.title} />
             {bounty && <BountyActions bountyId={bounty.id} />}
           </PageActions>
         )

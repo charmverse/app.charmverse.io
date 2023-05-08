@@ -1,7 +1,6 @@
+import { log } from '@charmverse/core/log';
 import type { ErrorInfo, ReactNode } from 'react';
 import { Component } from 'react';
-
-import log from 'lib/log';
 
 import ErrorPage from './ErrorPage';
 

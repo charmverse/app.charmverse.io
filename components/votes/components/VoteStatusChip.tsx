@@ -1,4 +1,4 @@
-import type { VoteStatus } from '@charmverse/core/dist/prisma';
+import type { VoteStatus } from '@charmverse/core/prisma';
 import { Chip } from '@mui/material';
 import type { ComponentProps } from 'react';
 

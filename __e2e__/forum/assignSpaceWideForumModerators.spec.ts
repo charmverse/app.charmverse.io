@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core';
-import type { Space, User } from '@charmverse/core/dist/prisma';
+import type { Space, User } from '@charmverse/core/prisma';
 import { expect, test as base } from '@playwright/test';
 import { PermissionSettings } from '__e2e__/po/settings/spacePermissionSettings.po';
 

@@ -1,4 +1,4 @@
-import type { MemberProperty, Space } from '@charmverse/core/dist/prisma';
+import type { MemberProperty, Space } from '@charmverse/core/prisma';
 import request from 'supertest';
 
 import type { PropertyValue } from 'lib/members/interfaces';

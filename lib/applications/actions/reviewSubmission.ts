@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core';
-import type { Application, ApplicationStatus } from '@charmverse/core/dist/prisma';
+import type { Application, ApplicationStatus } from '@charmverse/core/prisma';
 
 import { DataNotFoundError, InvalidInputError, UndesirableOperationError, WrongStateError } from 'lib/utilities/errors';
 

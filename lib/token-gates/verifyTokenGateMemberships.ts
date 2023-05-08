@@ -7,7 +7,7 @@ import type {
   TokenGateToRole,
   User,
   UserTokenGate
-} from '@charmverse/core/dist/prisma';
+} from '@charmverse/core/prisma';
 
 import { verifyTokenGateMembership } from 'lib/token-gates/verifyTokenGateMembership';
 
@@ -29,15 +29,33 @@ export type UserToVerifyMembership = SpaceRole & {
 };
 
 export async function verifyTokenGateMemberships() {
+  const userTokenGates = await prisma.userTokenGate.findMany({
+    include: {
+      tokenGate: {
+        include: {
+          tokenGateToRoles: {
+            include: {
+              role: true
+            }
+          }
+        }
+      },
+      space: true,
+      user: true
+    }
+  });
+
+  const spaceRoleQuery = userTokenGates.map((userTokenGate) => ({
+    userId: userTokenGate.userId,
+    spaceId: userTokenGate.spaceId
+  }));
+
   const usersWithTokenGates = await prisma.spaceRole.findMany({
     where: {
       // We do not want to delete admins
       isAdmin: false,
-      user: {
-        userTokenGates: {
-          some: {}
-        }
-      }
+      // match userId / spaceId pairs
+      OR: spaceRoleQuery
     },
     include: {
       user: {
@@ -69,8 +87,11 @@ export async function verifyTokenGateMemberships() {
   let removedRoles = 0;
 
   for (const spaceRole of usersWithTokenGates) {
+    // filter token gates related to the space
+    const spaceUserTokenGates = spaceRole.user.userTokenGates.filter((utg) => utg.spaceId === spaceRole.spaceId);
+
     const res = await verifyTokenGateMembership({
-      userTokenGates: spaceRole.user.userTokenGates,
+      userTokenGates: spaceUserTokenGates,
       userId: spaceRole.user.id,
       spaceId: spaceRole.spaceId,
       userSpaceRoles: spaceRole.spaceRoleToRole,

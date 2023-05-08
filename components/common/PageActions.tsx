@@ -1,4 +1,4 @@
-import type { PageType } from '@charmverse/core/dist/prisma';
+import type { PageType } from '@charmverse/core/prisma';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { IconButton } from '@mui/material';
 import type { MouseEvent, ReactNode } from 'react';
@@ -27,6 +27,7 @@ export function PageActions({
     path: string;
     deletedAt: Date | null;
     parentId?: string | null;
+    title: string | null;
   };
   readOnly?: boolean;
   onClickDelete?: VoidFunction;

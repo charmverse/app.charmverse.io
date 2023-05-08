@@ -1,5 +1,5 @@
 import type { ProposalCategoryWithPermissions } from '@charmverse/core';
-import type { ProposalStatus } from '@charmverse/core/dist/prisma';
+import type { ProposalStatus } from '@charmverse/core/prisma';
 
 import * as http from 'adapters/http';
 import type { IPageWithPermissions, PageWithProposal } from 'lib/pages';

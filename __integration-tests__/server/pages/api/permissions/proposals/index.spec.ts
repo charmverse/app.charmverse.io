@@ -1,5 +1,5 @@
 import type { AssignedProposalCategoryPermission } from '@charmverse/core';
-import type { Space } from '@charmverse/core/dist/prisma';
+import type { Space } from '@charmverse/core/prisma';
 import request from 'supertest';
 
 import type { ProposalCategoryPermissionInput } from 'lib/permissions/proposals/upsertProposalCategoryPermission';

@@ -1,5 +1,5 @@
 import type { PostCategoryWithPermissions } from '@charmverse/core';
-import type { PostCategory } from '@charmverse/core/dist/prisma';
+import type { PostCategory } from '@charmverse/core/prisma';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 

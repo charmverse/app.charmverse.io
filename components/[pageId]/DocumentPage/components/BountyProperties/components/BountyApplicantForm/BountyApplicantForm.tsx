@@ -1,4 +1,4 @@
-import type { Application, Bounty } from '@charmverse/core/dist/prisma';
+import type { Application, Bounty } from '@charmverse/core/prisma';
 import { Box, Button, Stack, Tooltip } from '@mui/material';
 import { useState } from 'react';
 

@@ -1,4 +1,4 @@
-import type { Space } from '@charmverse/core/dist/prisma';
+import type { Space } from '@charmverse/core/prisma';
 import type { MenuItemProps } from '@mui/material/MenuItem';
 import MenuItem from '@mui/material/MenuItem';
 import Typography from '@mui/material/Typography';

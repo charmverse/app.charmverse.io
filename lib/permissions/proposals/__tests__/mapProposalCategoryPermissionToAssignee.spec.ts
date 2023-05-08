@@ -1,5 +1,5 @@
 import type { AssignedProposalCategoryPermission } from '@charmverse/core';
-import type { ProposalCategoryPermission } from '@charmverse/core/dist/prisma';
+import type { ProposalCategoryPermission } from '@charmverse/core/prisma';
 import { v4 } from 'uuid';
 
 import { InvalidPermissionGranteeError } from 'lib/permissions/errors';

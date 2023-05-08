@@ -9,7 +9,7 @@ import type { BountyWithDetails } from 'lib/bounties';
 import { eToNumber } from 'lib/utilities/numbers';
 import { isTruthy } from 'lib/utilities/types';
 
-import BountyPaymentButton from './BountyPaymentButton';
+import { BountyPaymentButton } from './BountyPaymentButton';
 
 interface Props {
   bounty: BountyWithDetails;

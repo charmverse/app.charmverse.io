@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core';
-import type { User, UserDetails } from '@charmverse/core/dist/prisma';
+import type { User, UserDetails } from '@charmverse/core/prisma';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 

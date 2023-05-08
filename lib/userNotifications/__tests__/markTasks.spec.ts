@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core';
-import type { User, UserNotification } from '@charmverse/core/dist/prisma';
+import type { User, UserNotification } from '@charmverse/core/prisma';
 import { v4 } from 'uuid';
 
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';

@@ -1,4 +1,4 @@
-import type { InviteLinkToRole } from '@charmverse/core/dist/prisma';
+import type { InviteLinkToRole } from '@charmverse/core/prisma';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 

@@ -1,6 +1,6 @@
 import { prisma } from '@charmverse/core';
 import type { OptionalTransaction } from '@charmverse/core';
-import type { Prisma } from '@charmverse/core/dist/prisma';
+import type { Prisma } from '@charmverse/core/prisma';
 
 import { InvalidInputError } from 'lib/utilities/errors';
 

@@ -10,7 +10,7 @@ import type {
   UserNotificationState,
   UserWallet,
   VerifiedEmail
-} from '@charmverse/core/dist/prisma';
+} from '@charmverse/core/prisma';
 
 interface NestedMemberships {
   spaceRoleToRole: (SpaceRoleToRole & { role: RoleMembership })[];

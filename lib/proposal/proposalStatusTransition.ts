@@ -1,4 +1,4 @@
-import type { ProposalStatus } from '@charmverse/core/dist/prisma';
+import type { ProposalStatus } from '@charmverse/core/prisma';
 
 export const proposalStatusTransitionRecord: Record<ProposalStatus, ProposalStatus[]> = {
   draft: ['discussion'],

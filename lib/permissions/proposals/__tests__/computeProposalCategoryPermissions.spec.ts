@@ -1,5 +1,5 @@
 import { prisma, proposalCategoryOperations } from '@charmverse/core';
-import type { ProposalCategoryPermissionLevel, Space, User } from '@charmverse/core/dist/prisma';
+import type { ProposalCategoryPermissionLevel, Space, User } from '@charmverse/core/prisma';
 import { v4 } from 'uuid';
 
 import { addSpaceOperations } from 'lib/permissions/spaces';

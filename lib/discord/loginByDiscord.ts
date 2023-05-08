@@ -1,10 +1,10 @@
 import { prisma } from '@charmverse/core';
+import { log } from '@charmverse/core/log';
 import { v4 } from 'uuid';
 
 import { isProdEnv, isStagingEnv } from 'config/constants';
 import { getUserS3FilePath, uploadUrlToS3 } from 'lib/aws/uploadToS3Server';
 import { getDiscordAccount } from 'lib/discord/getDiscordAccount';
-import log from 'lib/log';
 import type { SignupAnalytics } from 'lib/metrics/mixpanel/interfaces/UserEvent';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { updateTrackUserProfile } from 'lib/metrics/mixpanel/updateTrackUserProfile';

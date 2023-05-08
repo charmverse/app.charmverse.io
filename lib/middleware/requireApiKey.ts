@@ -1,11 +1,11 @@
 import crypto from 'node:crypto';
 
 import { prisma } from '@charmverse/core';
-import type { Space, SpaceApiToken, User } from '@charmverse/core/dist/prisma';
+import { log } from '@charmverse/core/log';
+import type { Space, SpaceApiToken, User } from '@charmverse/core/prisma';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import type { NextHandler } from 'next-connect';
 
-import log from 'lib/log';
 import { ApiError, InvalidApiKeyError } from 'lib/middleware/errors';
 import { getVerifiedSuperApiToken } from 'lib/middleware/requireSuperApiKey';
 import { uid } from 'lib/utilities/strings';

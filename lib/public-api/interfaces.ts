@@ -1,4 +1,4 @@
-import type { Page as PrismaPage } from '@charmverse/core/dist/prisma';
+import type { Page as PrismaPage } from '@charmverse/core/prisma';
 
 import type { SpaceTemplateType } from 'lib/spaces/config';
 

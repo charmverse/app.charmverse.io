@@ -1,6 +1,6 @@
-import { prisma } from '@charmverse/core';
 import type { ProposalPermissionFlags } from '@charmverse/core';
-import type { ProposalCategory, ProposalStatus, Role, Space, User } from '@charmverse/core/dist/prisma';
+import { prisma } from '@charmverse/core';
+import type { ProposalCategory, ProposalStatus, Role, Space, User } from '@charmverse/core/prisma';
 import { v4 } from 'uuid';
 
 import { ProposalNotFoundError } from 'lib/proposal/errors';

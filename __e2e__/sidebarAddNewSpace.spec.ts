@@ -1,4 +1,4 @@
-import type { Space } from '@charmverse/core/dist/prisma';
+import type { Space } from '@charmverse/core/prisma';
 import { expect, test } from '@playwright/test';
 
 import { baseUrl } from 'config/constants';

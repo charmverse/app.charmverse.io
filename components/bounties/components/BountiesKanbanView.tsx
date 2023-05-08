@@ -1,4 +1,4 @@
-import type { BountyStatus } from '@charmverse/core/dist/prisma';
+import type { BountyStatus } from '@charmverse/core/prisma';
 import { Box, Typography } from '@mui/material';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
@@ -45,7 +45,7 @@ export default function BountiesKanbanView({ bounties, publicMode }: Props) {
   );
 
   function onClose() {
-    router.push({ pathname: router.pathname, query: { domain: router.query.domain } });
+    router.push({ pathname: router.pathname, query: { ...router.query, bountyId: undefined } });
   }
 
   function openPage(bountyId: string) {

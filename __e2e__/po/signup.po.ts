@@ -1,5 +1,5 @@
 // playwright-dev-page.ts
-import type { Space } from '@charmverse/core/dist/prisma';
+import type { Space } from '@charmverse/core/prisma';
 import type { Locator, Page } from '@playwright/test';
 
 import type { SpaceCreateTemplate } from 'lib/spaces/config';

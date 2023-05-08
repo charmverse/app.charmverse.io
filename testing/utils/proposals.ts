@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core';
-import type { Page, ProposalCategory, ProposalStatus } from '@charmverse/core/dist/prisma';
+import type { Page, ProposalCategory, ProposalStatus } from '@charmverse/core/prisma';
 import { v4 } from 'uuid';
 
 import { createPage as createPageDb } from 'lib/pages/server/createPage';
