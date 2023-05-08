@@ -1,15 +1,10 @@
-import { prisma } from '@charmverse/core';
-import type { ProposalCategoryPermissionFlags, PermissionCompute } from '@charmverse/core';
+import type { PermissionCompute, ProposalCategoryPermissionFlags } from '@charmverse/core';
+import { AvailableProposalCategoryPermissions, prisma } from '@charmverse/core';
 
 import { ProposalCategoryNotFoundError } from 'lib/proposal/errors';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { InvalidInputError } from 'lib/utilities/errors';
 import { isUUID } from 'lib/utilities/strings';
-
-import { filterApplicablePermissions } from '../filterApplicablePermissions';
-
-import { AvailableProposalCategoryPermissions } from './availableProposalCategoryPermissions.class';
-import { proposalCategoryPermissionsMapping } from './mapping';
 
 export async function computeProposalCategoryPermissions({
   resourceId,
@@ -20,43 +15,31 @@ export async function computeProposalCategoryPermissions({
   }
 
   const proposalCategory = await prisma.proposalCategory.findUnique({
-    where: { id: resourceId }
+    where: { id: resourceId },
+    select: {
+      id: true,
+      spaceId: true
+    }
   });
 
   if (!proposalCategory) {
     throw new ProposalCategoryNotFoundError(`${resourceId}`);
   }
 
-  const { error, isAdmin, spaceRole } = await hasAccessToSpace({
+  const { isAdmin, spaceRole } = await hasAccessToSpace({
     spaceId: proposalCategory.spaceId,
-    userId,
-    disallowGuest: true
+    userId
   });
 
   const permissions = new AvailableProposalCategoryPermissions();
 
   if (isAdmin) {
-    return permissions.full;
+    return { ...permissions.full, manage_permissions: false };
 
     // Requester is not a space member or is a guest
-  } else if (error || spaceRole?.isGuest) {
-    return permissions.empty;
+  } else if (spaceRole) {
+    permissions.addPermissions(['create_proposal']);
   }
-
-  const assignedPermissions = await prisma.proposalCategoryPermission.findMany({
-    where: {
-      proposalCategoryId: resourceId
-    }
-  });
-  const applicablePermissions = await filterApplicablePermissions({
-    permissions: assignedPermissions,
-    resourceSpaceId: proposalCategory.spaceId,
-    userId
-  });
-
-  applicablePermissions.forEach((permission) => {
-    permissions.addPermissions(proposalCategoryPermissionsMapping[permission.permissionLevel]);
-  });
 
   return permissions.operationFlags;
 }
