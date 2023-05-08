@@ -5,7 +5,7 @@ import { refreshPaymentStatus } from 'lib/applications/actions/refreshPaymentSta
 import { getSafeTxStatus } from 'lib/gnosis/getSafeTxStatus';
 import { createTransaction } from 'lib/transactions/createTransaction';
 import { generateBountyWithSingleApplication, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { getTransactionById } from 'testing/utils/transactions';
+import { getPaymentTxById } from 'testing/utils/paymentTxs';
 
 jest.mock('lib/gnosis/getSafeTxStatus', () => ({
   getSafeTxStatus: jest.fn()
@@ -61,7 +61,7 @@ describe('refreshPaymentStatus', () => {
 
     const res = await refreshPaymentStatus(applicationId);
     const bounty = await prisma.bounty.findUnique({ where: { id: res.application.bountyId } });
-    const updatedTransaction = await getTransactionById(transaction.id);
+    const updatedTransaction = await getPaymentTxById(transaction.id);
 
     expect(res.application.status).toBe('processing');
     expect(res.updated).toBe(true);
@@ -87,7 +87,7 @@ describe('refreshPaymentStatus', () => {
 
     const res = await refreshPaymentStatus(applicationId);
     const bounty = await prisma.bounty.findUnique({ where: { id: res.application.bountyId } });
-    const updatedTransaction = await getTransactionById(transaction.id);
+    const updatedTransaction = await getPaymentTxById(transaction.id);
 
     expect(res.application.status).toBe('cancelled');
     expect(res.updated).toBe(true);
@@ -112,7 +112,7 @@ describe('refreshPaymentStatus', () => {
 
     const res = await refreshPaymentStatus(applicationId);
     const bounty = await prisma.bounty.findUnique({ where: { id: res.application.bountyId } });
-    const updatedTransaction = await getTransactionById(transaction.id);
+    const updatedTransaction = await getPaymentTxById(transaction.id);
 
     expect(res.application.status).toBe('paid');
     expect(res.updated).toBe(true);
@@ -137,7 +137,7 @@ describe('refreshPaymentStatus', () => {
 
     const res = await refreshPaymentStatus(applicationId);
     const bounty = await prisma.bounty.findUnique({ where: { id: res.application.bountyId } });
-    const updatedTransaction = await getTransactionById(transaction.id);
+    const updatedTransaction = await getPaymentTxById(transaction.id);
 
     expect(res.application.status).toBe('paid');
     expect(res.updated).toBe(true);

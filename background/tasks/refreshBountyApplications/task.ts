@@ -12,7 +12,7 @@ export async function refreshBountyApplications() {
     log.debug('Number of udpated applications', updatedApplicationsCount);
 
     count('cron.token-gate-verification.total-applications-to-refresh', totalCount);
-    count('cron.token-gate-verification.total-udpated-applications', updatedApplicationsCount);
+    count('cron.token-gate-verification.total-udpated-payment-statuses', updatedApplicationsCount);
   } catch (error: any) {
     log.error(`Error expiring proposals: ${error.stack || error.message || error}`, { error });
   }

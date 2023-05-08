@@ -10,6 +10,8 @@ type Props = {
   onRefresh: () => void;
 };
 
+// This hook is used to refresh the application status when the user loads bounty application for the first time.
+// If status is updated, it calls onRefresh callback and refreshes the bounty.
 export const useRefreshApplicationStatus = ({ application, onRefresh }: Props) => {
   const { refreshBounty } = useBounties();
   const { data } = useSWRImmutable(
