@@ -67,12 +67,13 @@
         "./__e2e__/*"
       ],
       "@charmverse/core/dist/prisma": [
-        "node_modules/@charmverse/core/dist/cjs/prisma",
-        //"node_modules/@charmverse/core/dist/esm/prisma"
+        "node_modules/@charmverse/core/dist/cjs/prisma"
       ],
       "@charmverse/core/dist/shared": [
-        "node_modules/@charmverse/core/dist/cjs/shared",
-        //"node_modules/@charmverse/core/dist/esm/shared"
+        "node_modules/@charmverse/core/dist/cjs/shared"
+      ],
+      "@charmverse/core/test": [
+        "node_modules/@charmverse/core/dist/cjs/lib/testing/index"
       ]
     }
   },

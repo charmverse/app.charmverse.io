@@ -57,35 +57,20 @@ export async function baseComputeProposalPermissions({
     throw new InvalidInputError(`Cannot compute permissions for proposal ${resourceId} without category`);
   }
 
-  const assignedPermissions = await prisma.proposalCategoryPermission.findMany({
-    where: {
-      proposalCategoryId: proposal.categoryId
-    }
-  });
-
   if (isProposalAuthor({ proposal, userId })) {
     permissions.addPermissions(['edit', 'view', 'create_vote', 'delete', 'vote', 'comment', 'make_public']);
   }
 
-  const isReviewer = await isProposalReviewer({
+  const isReviewer = isProposalReviewer({
     proposal,
     userId
   });
+
   if (isReviewer) {
     permissions.addPermissions(['view', 'comment', 'review']);
   }
 
-  const applicablePermissions = await filterApplicablePermissions({
-    permissions: assignedPermissions,
-    resourceSpaceId: proposal.spaceId,
-    // Treat user as a guest if they are not a full member of the space
-    userId: !spaceRole || spaceRole?.isGuest ? undefined : userId
-  });
-
-  applicablePermissions.forEach((permission) => {
-    permissions.addPermissions(proposalPermissionsMapping[permission.permissionLevel].slice());
-  });
-  return permissions.operationFlags;
+  return {} as any;
 }
 
 function proposalResolver({ resourceId }: { resourceId: string }) {

@@ -1,5 +1,7 @@
+import type { ProposalPermissionFlags } from '@charmverse/core';
 import { prisma, proposalOperations } from '@charmverse/core';
 import type { ProposalCategory, ProposalOperation, Role, Space, User } from '@charmverse/core/dist/prisma';
+import { testUtilsUser, testUtilsProposals } from '@charmverse/core/test';
 import { v4 } from 'uuid';
 
 import { ProposalNotFoundError } from 'lib/proposal/errors';
@@ -106,6 +108,40 @@ describe('computeProposalPermissions - base', () => {
       } else {
         expect(permissions[op]).toBe(false);
       }
+    });
+  });
+
+  it('should not provide any permissions to an author / reviewer if this person is no longer a space member', async () => {
+    const removedMember = await testUtilsUser.generateSpaceUser({ spaceId: space.id, isAdmin: false });
+
+    const removedMemberProposal = await testUtilsProposals.generateProposal({
+      categoryId: proposalCategory.id,
+      spaceId: space.id,
+      userId: removedMember.id
+    });
+
+    // Member leaves the space
+    await prisma.spaceRole.deleteMany({
+      where: {
+        spaceId: space.id,
+        userId: removedMember.id
+      }
+    });
+
+    const permissions = await baseComputeProposalPermissions({
+      resourceId: removedMemberProposal.id,
+      userId: removedMember.id
+    });
+
+    expect(permissions).toMatchObject<ProposalPermissionFlags>({
+      comment: false,
+      create_vote: false,
+      delete: false,
+      edit: false,
+      make_public: false,
+      review: false,
+      view: false,
+      vote: false
     });
   });
 
