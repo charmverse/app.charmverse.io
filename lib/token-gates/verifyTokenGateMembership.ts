@@ -91,6 +91,7 @@ export async function verifyTokenGateMembership({
         }
       }
     });
+
     log.info(
       `User ${userId} was removed from space ${spaceId} because all ${userTokenGates.length} token gates are invalid`,
       { userId, spaceId }
@@ -99,10 +100,12 @@ export async function verifyTokenGateMembership({
     return { verified: false, removedRoles: 0 };
   }
 
-  log.info(
-    `User ${userId} was not removed from space, has ${invalidTokenGates.length} invalid token gates and ${invalidRoleIds.length} roles removed`,
-    { userId, spaceId, invalidRoleIds }
-  );
+  if (invalidTokenGates.length) {
+    log.info(
+      `User ${userId} was not removed from space, has ${invalidTokenGates.length} invalid token gates and ${invalidRoleIds.length} roles removed`,
+      { userId, spaceId, invalidRoleIds }
+    );
+  }
 
   return { verified: true, removedRoles: invalidSpaceRoleToRoleIds.length || 0 };
 }
