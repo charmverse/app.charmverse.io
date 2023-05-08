@@ -1,14 +1,9 @@
 import { log } from '@charmverse/core/log';
-import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
-import FavoritedIcon from '@mui/icons-material/Star';
-import NotFavoritedIcon from '@mui/icons-material/StarBorder';
 import UndoIcon from '@mui/icons-material/Undo';
 import VerticalAlignBottomOutlinedIcon from '@mui/icons-material/VerticalAlignBottomOutlined';
-import Box from '@mui/material/Box';
-import Divider from '@mui/material/Divider';
-import List from '@mui/material/List';
+import { List, Divider } from '@mui/material';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import Tooltip from '@mui/material/Tooltip';
@@ -27,39 +22,41 @@ import {
 } from 'components/common/BoardEditor/focalboard/src/store/cards';
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { getCurrentBoardViews, getView } from 'components/common/BoardEditor/focalboard/src/store/views';
-import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
-import { DuplicatePageAction } from 'components/common/DuplicatePageAction';
 import type { ImportAction } from 'components/common/Modal/ConfirmImportModal';
 import ConfirmImportModal from 'components/common/Modal/ConfirmImportModal';
+import { AddToFavoritesAction } from 'components/common/PageActions/components/AddToFavoritesAction';
+import { CopyPageLinkAction } from 'components/common/PageActions/components/CopyPageLinkAction';
+import { DuplicatePageAction } from 'components/common/PageActions/components/DuplicatePageAction';
 import { useApiPageKeys } from 'hooks/useApiPageKeys';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useMembers } from 'hooks/useMembers';
 import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
-import { useToggleFavorite } from 'hooks/useToggleFavorite';
 import { useUser } from 'hooks/useUser';
 import type { Board } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { CardPage } from 'lib/focalboard/card';
 import type { IPagePermissionFlags } from 'lib/permissions/pages';
 
+import { isValidCsvResult, addNewCards } from '../utils/databasePageOptions';
+
 import { DocumentHistory } from './DocumentHistory';
-import { isValidCsvResult, addNewCards } from './utils/databasePageOptions';
+import type { PageActionMeta } from './DocumentPageActionList';
 
-interface Props {
-  closeMenu: () => void;
-  pageId: string;
+type Props = {
+  onComplete: VoidFunction;
+  page: PageActionMeta;
   pagePermissions?: IPagePermissionFlags;
-}
+};
 
-export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: Props) {
+export function DatabasePageActionList({ pagePermissions, onComplete, page }: Props) {
+  const pageId = page.id;
   const router = useRouter();
   const { pages, deletePage, mutatePagesRemove } = usePages();
   const view = useAppSelector(getView(router.query.viewId as string));
   const boards = useAppSelector(getSortedBoards);
   const boardViews = useAppSelector(getCurrentBoardViews);
-  const { isFavorite, toggleFavorite } = useToggleFavorite({ pageId });
   const { showMessage } = useSnackbar();
   const { members } = useMembers();
   const { user } = useUser();
@@ -95,7 +92,7 @@ export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: 
     await deletePage({
       pageId
     });
-    closeMenu();
+    onComplete();
   }
 
   async function deleteCards() {
@@ -110,11 +107,11 @@ export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: 
       .filter((item): item is CardPage => !!item.page);
 
     const sortedCardPages = sortCards(cardPages, _board, _view, members);
-    const _cards = sortedCardPages.map(({ card, page }) => {
+    const _cards = sortedCardPages.map(({ card, page: { title } }) => {
       return {
         ...card,
         // update the title from correct model
-        title: page.title
+        title
       };
     });
     try {
@@ -127,17 +124,12 @@ export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: 
       log.error('CSV export failed', error);
       showMessage('Export failed', 'error');
     }
-    closeMenu();
+    onComplete();
     const spaceId = pages[pageId]?.spaceId;
     if (spaceId) {
       charmClient.track.trackAction('export_page_csv', { pageId, spaceId });
     }
   };
-  function onCopyLink() {
-    Utils.copyTextToClipboard(window.location.href);
-    showMessage('Copied link to clipboard', 'success');
-    closeMenu();
-  }
 
   const importCsv = (event: ChangeEvent<HTMLInputElement>, importAction?: ImportAction): void => {
     if (board && event.target.files && event.target.files[0]) {
@@ -147,7 +139,7 @@ export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: 
         worker: event.target.files[0].size > 100000, // 100kb
         delimiter: '\n', // fallback for a csv with 1 column
         complete: async (results) => {
-          closeMenu();
+          onComplete();
           if (results.errors && results.errors[0]) {
             log.warn('CSV import failed', { spaceId: currentSpace?.id, pageId, error: results.errors[0] });
             showMessage(results.errors[0].message ?? 'There was an error importing your csv file.', 'warning');
@@ -208,37 +200,14 @@ export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: 
 
   return (
     <List dense>
-      <ListItemButton
-        onClick={() => {
-          toggleFavorite();
-          closeMenu();
-        }}
-      >
-        <Box
-          sx={{
-            mr: 0.5,
-            position: 'relative',
-            left: -4,
-            display: 'flex',
-            alignItems: 'center'
-          }}
-        >
-          {isFavorite ? <FavoritedIcon /> : <NotFavoritedIcon />}
-        </Box>
-        <ListItemText primary={isFavorite ? 'Remove from Favorites' : 'Add to Favorites'} />
-      </ListItemButton>
-      {boardPage && (
-        <DuplicatePageAction postDuplication={closeMenu} page={boardPage} pagePermissions={pagePermissions} />
-      )}
-      <ListItemButton onClick={onCopyLink}>
-        <ContentCopyIcon
-          fontSize='small'
-          sx={{
-            mr: 1
-          }}
-        />
-        <ListItemText primary='Copy link' />
-      </ListItemButton>
+      <AddToFavoritesAction pageId={pageId} onComplete={onComplete} />
+      <DuplicatePageAction
+        onComplete={onComplete}
+        pageId={pageId}
+        pageType={boardPage?.type}
+        pagePermissions={pagePermissions}
+      />
+      <CopyPageLinkAction path={window.location.href} onComplete={onComplete} />
       <Divider />
       <Tooltip title={!pagePermissions?.delete ? "You don't have permission to delete this page" : ''}>
         <div>

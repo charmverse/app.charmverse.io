@@ -11,36 +11,30 @@ import charmClient from 'charmClient';
 import DocumentPage from 'components/[pageId]/DocumentPage';
 import Dialog from 'components/common/BoardEditor/focalboard/src/components/dialog';
 import Button from 'components/common/Button';
-import { useBounties } from 'hooks/useBounties';
 import { useCurrentPage } from 'hooks/useCurrentPage';
 import { usePage } from 'hooks/usePage';
 import { usePages } from 'hooks/usePages';
-import type { BountyWithDetails } from 'lib/bounties';
 import { AllowedPagePermissions } from 'lib/permissions/pages/available-page-permissions.class';
 import debouncePromise from 'lib/utilities/debouncePromise';
 
-import { PageActions } from '../PageActions';
-import { BountyActions } from '../PageLayout/components/Header/components/BountyActions';
-import { ExportToPDFMarkdown } from '../PageLayout/components/Header/components/ExportToPDFMenuItem';
+import { FullPageActionsMenuButton } from '../PageActions/FullPageActionsMenuButton';
 
 interface Props {
   pageId?: string;
   onClose: () => void;
   readOnly?: boolean;
-  bounty?: BountyWithDetails | null;
   toolbar?: ReactNode;
   hideToolsMenu?: boolean;
 }
 
-export default function PageDialog(props: Props) {
-  const { hideToolsMenu = false, pageId, bounty, toolbar, readOnly } = props;
+export function PageDialog(props: Props) {
+  const { hideToolsMenu = false, pageId, toolbar, readOnly } = props;
   const mounted = useRef(false);
   const popupState = usePopupState({ variant: 'popover', popupId: 'page-dialog' });
   const router = useRouter();
-  const { setBounties, refreshBounty } = useBounties();
   const { setCurrentPageId } = useCurrentPage();
 
-  const { updatePage, deletePage } = usePages();
+  const { updatePage } = usePages();
   const { page, refreshPage } = usePage({ pageIdOrPath: pageId });
   const pagePermissions = page?.permissionFlags || new AllowedPagePermissions().full;
   const domain = router.query.domain as string;
@@ -69,19 +63,7 @@ export default function PageDialog(props: Props) {
     }
   }, [page?.id]);
 
-  async function onClickDelete() {
-    if (page) {
-      if (page.type === 'card' || page.type === 'card_synced') {
-        await charmClient.deleteBlock(page.id, () => null);
-      } else if (page.type === 'bounty') {
-        setBounties((bounties) => bounties.filter((_bounty) => _bounty.id !== page.id));
-      }
-      await deletePage({ pageId: page.id });
-      onClose();
-    }
-  }
-
-  function onClose() {
+  function close() {
     popupState.close();
     props.onClose();
   }
@@ -114,25 +96,7 @@ export default function PageDialog(props: Props) {
   return (
     <Dialog
       toolsMenu={
-        !hideToolsMenu &&
-        !readOnly &&
-        page && (
-          <PageActions
-            page={page}
-            onClickDelete={() => {
-              onClickDelete();
-              onClose();
-            }}
-            onDuplicate={(pageDuplicateResponse) => {
-              if (bounty) {
-                refreshBounty(pageDuplicateResponse.rootPageId);
-              }
-            }}
-          >
-            <ExportToPDFMarkdown pdfTitle={page.title} />
-            {bounty && <BountyActions bountyId={bounty.id} />}
-          </PageActions>
-        )
+        !hideToolsMenu && !readOnly && page && <FullPageActionsMenuButton insideModal page={page} onDelete={close} />
       }
       toolbar={
         <Box display='flex' justifyContent='space-between'>
@@ -141,7 +105,7 @@ export default function PageDialog(props: Props) {
             size='small'
             color='secondary'
             href={fullPageUrl}
-            onClick={onClose}
+            onClick={close}
             variant='text'
             startIcon={<OpenInFullIcon fontSize='small' />}
           >
@@ -150,7 +114,7 @@ export default function PageDialog(props: Props) {
           {toolbar}
         </Box>
       }
-      onClose={onClose}
+      onClose={close}
     >
       {page && (
         <DocumentPage insideModal page={page} savePage={savePage} refreshPage={refreshPage} readOnly={readOnlyPage} />

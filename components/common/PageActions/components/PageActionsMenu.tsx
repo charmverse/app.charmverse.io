@@ -2,7 +2,6 @@ import type { PageType } from '@charmverse/core/prisma';
 import { EditOutlined } from '@mui/icons-material';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import LaunchIcon from '@mui/icons-material/Launch';
-import LinkIcon from '@mui/icons-material/Link';
 import { Divider, ListItemText, Menu, MenuItem, Stack, Typography } from '@mui/material';
 import { useRouter } from 'next/router';
 import type { Dispatch, ReactNode, SetStateAction } from 'react';
@@ -11,10 +10,8 @@ import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useMembers } from 'hooks/useMembers';
 import { usePagePermissions } from 'hooks/usePagePermissions';
 import { usePostPermissions } from 'hooks/usePostPermissions';
-import { useSnackbar } from 'hooks/useSnackbar';
-import type { DuplicatePageResponse } from 'lib/pages/duplicatePage';
 
-import { Utils } from './BoardEditor/focalboard/src/utils';
+import { CopyPageLinkAction } from './CopyPageLinkAction';
 import { DuplicatePageAction } from './DuplicatePageAction';
 
 export function PageActionsMenu({
@@ -25,10 +22,8 @@ export function PageActionsMenu({
   anchorEl,
   page,
   setAnchorEl,
-  readOnly,
-  onDuplicate
+  readOnly
 }: {
-  onDuplicate?: (duplicatePageResponse: DuplicatePageResponse) => void;
   onClickDelete?: VoidFunction;
   onClickEdit?: VoidFunction;
   children?: ReactNode;
@@ -41,7 +36,6 @@ export function PageActionsMenu({
     type?: PageType;
     id: string;
     updatedAt: Date;
-    relativePath?: string;
     path: string;
     deletedAt: Date | null;
   };
@@ -49,7 +43,6 @@ export function PageActionsMenu({
 }) {
   const { getMemberById } = useMembers();
   const router = useRouter();
-  const { showMessage } = useSnackbar();
   const member = getMemberById(page.createdBy);
   const open = Boolean(anchorEl);
   const { formatDateTime } = useDateFormatter();
@@ -57,19 +50,9 @@ export function PageActionsMenu({
   const postPermissions = usePostPermissions({
     postIdOrPath: router.pathname.startsWith('/[domain]/forum') ? page.id : (null as any)
   });
-  function getPageLink() {
-    let link = window.location.href;
 
-    if (page.relativePath) {
-      link = `${window.location.origin}${page.relativePath}`;
-    } else {
-      link = `${window.location.origin}/${router.query.domain}/${page.path}`;
-    }
-    return link;
-  }
-  function onClickCopyLink() {
-    Utils.copyTextToClipboard(getPageLink());
-    showMessage(`Copied ${page.type} link to clipboard`, 'success');
+  function getPageLink() {
+    return `${window.location.origin}/${router.query.domain}/${page.path}`;
   }
 
   function onClickOpenInNewTab() {
@@ -102,22 +85,19 @@ export function PageActionsMenu({
         dense
         onClick={onClickDelete}
         disabled={Boolean(readOnly || (!pagePermissions?.delete && !postPermissions?.delete_post))}
-        data-test='delete-page-from-context'
       >
         <DeleteOutlineIcon fontSize='small' sx={{ mr: 1 }} />
         <ListItemText>Delete</ListItemText>
       </MenuItem>
       {!hideDuplicateAction && page.type && (
         <DuplicatePageAction
-          postDuplication={onDuplicate}
-          page={{ ...page, type: page.type }}
+          onComplete={handleClose}
+          pageId={page.id}
+          pageType={page.type}
           pagePermissions={pagePermissions}
         />
       )}
-      <MenuItem dense onClick={onClickCopyLink}>
-        <LinkIcon fontSize='small' sx={{ mr: 1 }} />
-        <ListItemText>Copy link</ListItemText>
-      </MenuItem>
+      <CopyPageLinkAction path={getPageLink()} />
       <MenuItem dense onClick={onClickOpenInNewTab}>
         <LaunchIcon fontSize='small' sx={{ mr: 1 }} />
         <ListItemText>Open in new tab</ListItemText>

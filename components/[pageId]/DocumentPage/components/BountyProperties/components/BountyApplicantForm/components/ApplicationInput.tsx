@@ -12,6 +12,7 @@ import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
 import charmClient from 'charmClient';
+import { BountyApplicantStatus } from 'components/[pageId]/DocumentPage/components/BountyProperties/components/BountyApplicantStatus';
 import Modal from 'components/common/Modal';
 import { useBounties } from 'hooks/useBounties';
 import { useLocalStorage } from 'hooks/useLocalStorage';
@@ -19,8 +20,6 @@ import { useUser } from 'hooks/useUser';
 import type { ReviewDecision, SubmissionReview } from 'lib/applications/interfaces';
 import { MINIMUM_APPLICATION_MESSAGE_CHARACTERS } from 'lib/applications/shared';
 import type { AssignedBountyPermissions } from 'lib/bounties';
-
-import BountyApplicantStatus from '../../BountyApplicantStatus';
 
 /**
  * @expandedOnLoad Use this to expand the application initially
@@ -161,7 +160,7 @@ export default function ApplicationInput({
           onSubmit={handleSubmit((formValue) => submitted(formValue as Application))}
           style={{ margin: 'auto', width: '100%' }}
         >
-          <Grid container direction='column' spacing={3}>
+          <Grid container direction='column' spacing={1}>
             <Grid item>
               <TextField
                 {...register('message')}
@@ -189,10 +188,7 @@ export default function ApplicationInput({
             </Grid>
 
             {!readOnly && (
-              <Grid item display='flex' gap={1}>
-                <Button disabled={!isValid} type='submit'>
-                  {mode === 'create' ? ' Submit' : 'Update'}
-                </Button>
+              <Grid item display='flex' gap={1} justifyContent='flex-end'>
                 <Button
                   onClick={() => {
                     onCancel?.();
@@ -202,6 +198,9 @@ export default function ApplicationInput({
                   color='secondary'
                 >
                   Cancel
+                </Button>
+                <Button disabled={!isValid} type='submit'>
+                  {mode === 'create' ? ' Submit' : 'Update'}
                 </Button>
               </Grid>
             )}

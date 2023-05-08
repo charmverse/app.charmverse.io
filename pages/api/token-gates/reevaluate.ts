@@ -11,10 +11,11 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 handler.use(requireUser).post(reevaluateTokenGatesHandler);
 
 async function reevaluateTokenGatesHandler(req: NextApiRequest, res: NextApiResponse<string[]>) {
-  const user = req.session.user;
+  const { user, isRemote } = req.session;
+
   const { spaceId, authSig } = req.body as { spaceId: string; authSig: AuthSig };
 
-  const newRoles = await reevaluateRoles({ authSig, userId: user.id, spaceId });
+  const newRoles = !isRemote ? await reevaluateRoles({ authSig, userId: user.id, spaceId }) : [];
   res.status(200).send(newRoles);
 }
 

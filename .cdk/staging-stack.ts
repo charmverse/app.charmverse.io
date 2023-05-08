@@ -33,7 +33,7 @@ export class CdkDeployStack extends Stack {
     });
 
     // Make sure that Elastic Beanstalk app exists before creating an app version
-    appVersionProps.addDependsOn(ebApp);
+    appVersionProps.addDependency(ebApp);
 
     // list of all options: https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/command-options-general.html
     const optionSettingProperties: elasticbeanstalk.CfnEnvironment.OptionSettingProperty[] = [
