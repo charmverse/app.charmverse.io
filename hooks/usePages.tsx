@@ -2,7 +2,7 @@ import type { Page } from '@charmverse/core/prisma';
 import { useRouter } from 'next/router';
 import type { Dispatch, ReactNode, SetStateAction } from 'react';
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef } from 'react';
-import useSWR, { mutate } from 'swr';
+import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
@@ -134,7 +134,6 @@ export function PagesProvider({ children }: { children: ReactNode }) {
         return { ..._pages };
       });
 
-      mutate(`archived-pages-${currentSpace.id}`);
       return newPage;
     }
   }
