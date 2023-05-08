@@ -1,5 +1,6 @@
 import { prisma } from '@charmverse/core';
-import type { DiscordUser } from '@charmverse/core/dist/prisma';
+import { log } from '@charmverse/core/log';
+import type { DiscordUser } from '@charmverse/core/prisma';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -10,7 +11,6 @@ import type { DiscordAccount } from 'lib/discord/getDiscordAccount';
 import { getDiscordAccount } from 'lib/discord/getDiscordAccount';
 import { authenticatedRequest } from 'lib/discord/handleDiscordResponse';
 import type { DiscordServerRole } from 'lib/discord/interface';
-import log from 'lib/log';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { findOrCreateRoles } from 'lib/roles/createRoles';
 import { withSessionRoute } from 'lib/session/withSession';

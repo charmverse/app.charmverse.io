@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core';
-import type { Bounty, Page } from '@charmverse/core/dist/prisma';
+import type { Bounty, Page } from '@charmverse/core/prisma';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -194,7 +194,7 @@ async function getPublicPage(req: NextApiRequest, res: NextApiResponse<PublicPag
   let views: BoardView[] = [];
   let bounty: Bounty | null = null;
 
-  if (page.type === 'card' && page.parentId) {
+  if (page.cardId && page.parentId) {
     const boardPage = await prisma.page.findFirst({
       where: {
         deletedAt: null,
@@ -208,23 +208,23 @@ async function getPublicPage(req: NextApiRequest, res: NextApiResponse<PublicPag
     const card = (await prisma.block.findFirst({
       where: {
         deletedAt: null,
-        id: page.id
+        id: page.cardId
       }
     })) as unknown as Card;
 
     if (card) {
       cards.push(card);
-    }
+      // google synced cards have a board that is attached to another board, we need both boards
+      const _boards = (await prisma.block.findMany({
+        where: {
+          deletedAt: null,
+          id: {
+            in: [card.parentId, card.rootId].filter(Boolean)
+          }
+        }
+      })) as unknown as Board[];
 
-    const board = (await prisma.block.findFirst({
-      where: {
-        deletedAt: null,
-        id: page.parentId
-      }
-    })) as unknown as Board;
-
-    if (board) {
-      boards.push(board);
+      boards.push(..._boards);
     }
   } else if (page.type === 'page') {
     const linkedPageIds: string[] = [];

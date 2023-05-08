@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/log';
 import type { PageObjectResponse, RichTextItemResponse } from '@notionhq/client/build/src/api-endpoints';
 
 import {
@@ -9,7 +10,6 @@ import { extractAttrsFromUrl as extractNFTAttrs } from 'components/common/CharmE
 import { extractTweetAttrs } from 'components/common/CharmEditor/components/tweet/tweetSpec';
 import { extractYoutubeLinkType } from 'components/common/CharmEditor/components/video/utils';
 import { VIDEO_ASPECT_RATIO } from 'components/common/CharmEditor/components/video/videoSpec';
-import log from 'lib/log';
 import { isPdfEmbedLink } from 'lib/pdf/extractPdfEmbedLink';
 import type {
   TextContent,

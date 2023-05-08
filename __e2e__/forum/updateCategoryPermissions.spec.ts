@@ -1,4 +1,4 @@
-import type { Post, PostCategory, Space, User } from '@charmverse/core/dist/prisma';
+import type { Post, PostCategory, Space, User } from '@charmverse/core/prisma';
 import { expect, test as base } from '@playwright/test';
 
 import { randomETHWalletAddress } from 'testing/generateStubs';

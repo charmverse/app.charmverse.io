@@ -1,4 +1,4 @@
-import type { Role, Space, User } from '@charmverse/core/dist/prisma';
+import type { Role, Space, User } from '@charmverse/core/prisma';
 
 import { generateRole, generateUserAndSpace } from 'testing/setupDatabase';
 

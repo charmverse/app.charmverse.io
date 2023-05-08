@@ -1,10 +1,10 @@
+import { log } from '@charmverse/core/log';
 import type { Provider } from '@ethersproject/providers';
 import type { BigNumber } from 'ethers';
 
 import { getProjectRegistryContract } from 'lib/gitcoin/getProjectRegistryContract';
 import { getSafeOwners } from 'lib/gnosis/safe/getSafeOwners';
 import { fetchFileByHash, getIpfsFileUrl } from 'lib/ipfs/fetchFileByHash';
-import log from 'lib/log';
 
 type MetadataOnchainDetails = {
   pointer: string;

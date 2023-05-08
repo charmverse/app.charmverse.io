@@ -36,14 +36,14 @@ services:
   prd-webapp:
     extends:
       service: defaults
-    command: ['sh', '-c', 'npm run prisma:deploy && node --require dd-trace/init ./dist/server.js']
+    command: ['sh', '-c', 'npm run prisma:deploy && node --require dd-trace/init node_modules/.bin/next start --keepAliveTimeout 70000']
     profiles:
       - prd-webapp
 
   stg-webapp:
     extends:
       service: defaults
-    command: ['sh', '-c', 'npm run prisma:deploy && node ./dist/server.js']
+    command: ['sh', '-c', 'npm run prisma:deploy && node --require dd-trace/init node_modules/.bin/next start --keepAliveTimeout 70000']
     environment:
       - NEXT_PUBLIC_APP_ENV=staging
     profiles:
@@ -92,8 +92,6 @@ services:
   datadog-agent:
     image: public.ecr.aws/datadog/agent
     hostname: datadog-agent
-    labels:
-      com.datadoghq.ad.logs: '[{"type":"file", "source": "os", "service": "syslog", "sourcecategory": "${SERVICE_NAME}", "path": "/host/var/log/messages"}]'
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - /proc/:/host/proc/:ro

@@ -1,8 +1,7 @@
+import { getLogger } from '@charmverse/core/log';
 import { Client } from '@notionhq/client';
 import type { DatabaseObjectResponse, PageObjectResponse } from '@notionhq/client/build/src/api-endpoints';
 import { v4 } from 'uuid';
-
-import { getLogger } from 'lib/log/prefix';
 
 import { createPrismaPage } from '../createPrismaPage';
 

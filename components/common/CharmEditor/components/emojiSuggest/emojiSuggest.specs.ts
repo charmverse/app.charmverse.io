@@ -1,8 +1,8 @@
 import type { RawSpecs, BaseRawMarkSpec } from '@bangle.dev/core';
 import { domSerializationHelpers } from '@bangle.dev/core';
+import { log } from '@charmverse/core/log';
 
 import { getTwitterEmoji } from 'components/common/Emoji';
-import log from 'lib/log';
 
 import * as suggestTooltip from '../@bangle.dev/tooltip/suggest-tooltip';
 

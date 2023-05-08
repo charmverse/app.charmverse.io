@@ -1,12 +1,7 @@
 import type { PermissionsClient } from '@charmverse/core';
 import { PermissionsApiClient, prisma } from '@charmverse/core';
-import type { Space } from '@charmverse/core/dist/prisma';
-import {
-  stringUtils,
-  InvalidInputError,
-  PostCategoryNotFoundError,
-  PostNotFoundError
-} from '@charmverse/core/dist/shared';
+import type { Space } from '@charmverse/core/prisma';
+import { stringUtils, InvalidInputError, PostCategoryNotFoundError, PostNotFoundError } from '@charmverse/core/shared';
 
 import { permissionsApiAuthKey, permissionsApiUrl } from 'config/constants';
 import { SpaceNotFoundError } from 'lib/public-api';

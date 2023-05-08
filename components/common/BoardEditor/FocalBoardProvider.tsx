@@ -1,10 +1,10 @@
+import { log } from '@charmverse/core/log';
 import { useCallback, useEffect } from 'react';
 import { Provider as ReduxProvider } from 'react-redux';
 
 import { publishDeletes, publishIncrementalUpdate } from 'components/common/BoardEditor/publisher';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useWebSocketClient } from 'hooks/useWebSocketClient';
-import log from 'lib/log';
 import type { WebSocketPayload } from 'lib/websockets/interfaces';
 
 import store from './focalboard/src/store';

@@ -1,7 +1,7 @@
 import type { EditorState, Transaction } from '@bangle.dev/pm';
 import { Fragment, setBlockType } from '@bangle.dev/pm';
 import { rafCommandExec } from '@bangle.dev/utils';
-import type { PageType, SpaceOperation } from '@charmverse/core/dist/prisma';
+import type { PageType, SpaceOperation } from '@charmverse/core/prisma';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForwardIos';
 import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
 import ChatOutlinedIcon from '@mui/icons-material/ChatOutlined';

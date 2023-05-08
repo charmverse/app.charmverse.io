@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core';
-import type { Block } from '@charmverse/core/dist/prisma';
+import type { Block } from '@charmverse/core/prisma';
 
 import { DatabasePageNotFoundError } from 'lib/public-api';
 import { isUUID } from 'lib/utilities/strings';

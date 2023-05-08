@@ -1,4 +1,4 @@
-import type { SpacePermissionConfigurationMode } from '@charmverse/core/dist/prisma';
+import type { SpacePermissionConfigurationMode } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';

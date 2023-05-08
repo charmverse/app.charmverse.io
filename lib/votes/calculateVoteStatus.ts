@@ -1,5 +1,5 @@
-import type { UserVote, Vote } from '@charmverse/core/dist/prisma';
-import { VoteStatus, VoteType } from '@charmverse/core/dist/prisma';
+import type { UserVote, Vote } from '@charmverse/core/prisma';
+import { VoteStatus, VoteType } from '@charmverse/core/prisma';
 
 export function calculateVoteStatus({
   deadline,

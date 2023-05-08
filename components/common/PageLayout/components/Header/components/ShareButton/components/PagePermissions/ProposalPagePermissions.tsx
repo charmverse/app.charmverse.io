@@ -1,4 +1,4 @@
-import type { ProposalCategoryPermissionLevel } from '@charmverse/core/dist/prisma';
+import type { ProposalCategoryPermissionLevel } from '@charmverse/core/prisma';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import useSWR from 'swr';

@@ -1,4 +1,4 @@
-import type { PageComment, Space, User } from '@charmverse/core/dist/prisma';
+import type { PageComment, Space, User } from '@charmverse/core/prisma';
 import { v4 } from 'uuid';
 
 import type { CreateCommentInput } from 'lib/comments';

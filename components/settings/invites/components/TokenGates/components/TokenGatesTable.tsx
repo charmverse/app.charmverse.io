@@ -1,4 +1,5 @@
-import type { TokenGate } from '@charmverse/core/dist/prisma';
+import { log } from '@charmverse/core/log';
+import type { TokenGate } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import DeleteOutlinedIcon from '@mui/icons-material/Close';
 import { TableHead } from '@mui/material';
@@ -23,7 +24,6 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSmallScreen } from 'hooks/useMediaScreens';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
-import log from 'lib/log';
 import type { TokenGateWithRoles } from 'lib/token-gates/interfaces';
 import { shortenHex } from 'lib/utilities/strings';
 

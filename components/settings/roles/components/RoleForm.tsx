@@ -1,4 +1,4 @@
-import type { Role } from '@charmverse/core/dist/prisma';
+import type { Role } from '@charmverse/core/prisma';
 import { yupResolver } from '@hookform/resolvers/yup';
 import Alert from '@mui/material/Alert';
 import Grid from '@mui/material/Grid';

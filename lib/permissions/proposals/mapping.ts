@@ -2,7 +2,7 @@ import type {
   ProposalCategoryOperation,
   ProposalCategoryPermissionLevel,
   ProposalOperation
-} from '@charmverse/core/dist/prisma';
+} from '@charmverse/core/prisma';
 
 export const proposalCategoryPermissionsMapping: Record<ProposalCategoryPermissionLevel, ProposalCategoryOperation[]> =
   {

@@ -1,4 +1,4 @@
-import type { IdentityType } from '@charmverse/core/dist/prisma';
+import type { IdentityType } from '@charmverse/core/prisma';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import { Box, Tooltip, Typography } from '@mui/material';

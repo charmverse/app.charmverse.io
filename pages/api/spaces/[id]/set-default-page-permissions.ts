@@ -1,4 +1,4 @@
-import type { PagePermissionLevel, Space } from '@charmverse/core/dist/prisma';
+import type { PagePermissionLevel, Space } from '@charmverse/core/prisma';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 

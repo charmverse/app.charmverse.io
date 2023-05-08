@@ -1,4 +1,4 @@
-import type { ApiPageKey } from '@charmverse/core/dist/prisma';
+import type { ApiPageKey } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import AddIcon from '@mui/icons-material/Add';
 import AddCircleIcon from '@mui/icons-material/AddCircleOutline';

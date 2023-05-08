@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core';
-import type { Block, Prisma } from '@charmverse/core/dist/prisma';
+import type { Block, Prisma } from '@charmverse/core/prisma';
 import type * as googlForms from '@googleapis/forms';
 
 import type { BoardViewFields } from 'lib/focalboard/boardView';

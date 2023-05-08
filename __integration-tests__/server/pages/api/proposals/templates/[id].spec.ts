@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core';
-import type { ProposalCategory, Space } from '@charmverse/core/dist/prisma';
+import type { ProposalCategory, Space } from '@charmverse/core/prisma';
 import request from 'supertest';
 
 import { createProposalTemplate } from 'lib/templates/proposals/createProposalTemplate';

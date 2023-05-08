@@ -1,4 +1,4 @@
-import type { Application, Bounty, Space, User } from '@charmverse/core/dist/prisma';
+import type { Application, Bounty, Space, User } from '@charmverse/core/prisma';
 import { v4 } from 'uuid';
 
 import { createSubmission } from 'lib/applications/actions';

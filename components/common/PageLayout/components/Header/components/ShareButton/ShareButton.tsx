@@ -1,4 +1,4 @@
-import type { PageType } from '@charmverse/core/dist/prisma';
+import type { PageType } from '@charmverse/core/prisma';
 import { IosShare } from '@mui/icons-material';
 import type { Theme } from '@mui/material';
 import { Box, Divider, IconButton, Popover, Tooltip, useMediaQuery } from '@mui/material';

@@ -13,8 +13,8 @@ import {
   UndesirableOperationError,
   stringUtils
 } from '@charmverse/core';
-import type { Prisma } from '@charmverse/core/dist/prisma';
-import { PostCategoryPermissionLevel } from '@charmverse/core/dist/prisma';
+import type { Prisma } from '@charmverse/core/prisma';
+import { PostCategoryPermissionLevel } from '@charmverse/core/prisma';
 
 import { mapPostCategoryPermissionToAssignee } from './mapPostCategoryPermissionToAssignee';
 

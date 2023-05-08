@@ -1,4 +1,4 @@
-import type { Page } from '@charmverse/core/dist/prisma';
+import type { Page } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import { useMediaQuery } from '@mui/material';
 import type { Theme } from '@mui/material';
@@ -306,7 +306,7 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
                           refreshBountyPermissions={refreshBountyPermissions}
                         />
                       )}
-                      {page.type === 'card' && (
+                      {(page.type === 'card' || page.type === 'card_synced') && (
                         <CommentsList
                           comments={comments}
                           rootId={card?.rootId ?? page.id}

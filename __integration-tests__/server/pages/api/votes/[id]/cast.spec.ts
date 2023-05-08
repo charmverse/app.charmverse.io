@@ -1,4 +1,4 @@
-import type { Page, Space, User, Vote } from '@charmverse/core/dist/prisma';
+import type { Page, Space, User, Vote } from '@charmverse/core/prisma';
 import request from 'supertest';
 import { v4 } from 'uuid';
 

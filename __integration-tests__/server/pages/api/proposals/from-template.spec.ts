@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core';
-import type { Page, Role, Space, User } from '@charmverse/core/dist/prisma';
+import type { Page, Role, Space, User } from '@charmverse/core/prisma';
 import request from 'supertest';
 
 import { upsertProposalCategoryPermission } from 'lib/permissions/proposals/upsertProposalCategoryPermission';

@@ -1,4 +1,4 @@
-import type { MemberProperty } from '@charmverse/core/dist/prisma';
+import type { MemberProperty } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';

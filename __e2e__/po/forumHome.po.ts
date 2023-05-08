@@ -1,5 +1,5 @@
 // playwright-dev-page.ts
-import type { PostCategory } from '@charmverse/core/dist/prisma';
+import type { PostCategory } from '@charmverse/core/prisma';
 import type { Locator, Page } from '@playwright/test';
 
 import { baseUrl } from 'config/constants';

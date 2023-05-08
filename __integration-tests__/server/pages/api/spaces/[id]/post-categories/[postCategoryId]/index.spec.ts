@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { prisma } from '@charmverse/core';
-import type { PostCategory, Space, User } from '@charmverse/core/dist/prisma';
+import type { PostCategory, Space, User } from '@charmverse/core/prisma';
 import request from 'supertest';
 
 import type { PostCategoryUpdate } from 'lib//forums/categories/updatePostCategory';

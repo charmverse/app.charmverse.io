@@ -1,4 +1,4 @@
-import type { MemberProperty, MemberPropertyType } from '@charmverse/core/dist/prisma';
+import type { MemberProperty, MemberPropertyType } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import EditIcon from '@mui/icons-material/Edit';
 import { Box, Card, Chip, Grid, IconButton, Stack, Tooltip, Typography } from '@mui/material';

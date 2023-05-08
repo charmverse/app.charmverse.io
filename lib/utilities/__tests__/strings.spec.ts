@@ -1,4 +1,4 @@
-import type { UserWallet } from '@charmverse/core/dist/prisma';
+import type { UserWallet } from '@charmverse/core/prisma';
 import { utils, Wallet } from 'ethers';
 
 import { randomETHWalletAddress } from 'testing/generateStubs';

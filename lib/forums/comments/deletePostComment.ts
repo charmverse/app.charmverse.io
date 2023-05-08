@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core';
-import type { PostComment } from '@charmverse/core/dist/prisma';
+import type { PostComment } from '@charmverse/core/prisma';
 
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 

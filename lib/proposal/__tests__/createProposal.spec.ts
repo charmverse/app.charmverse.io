@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core';
-import type { ProposalCategory, Space, User } from '@charmverse/core/dist/prisma';
+import type { ProposalCategory, Space, User } from '@charmverse/core/prisma';
 
 import { InvalidInputError } from 'lib/utilities/errors';
 import { generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
