@@ -1,7 +1,14 @@
 import type { PermissionsClient } from '@charmverse/core';
 import { PermissionsApiClient, prisma } from '@charmverse/core';
 import type { Space } from '@charmverse/core/prisma';
-import { stringUtils, InvalidInputError, PostCategoryNotFoundError, PostNotFoundError } from '@charmverse/core/shared';
+import {
+  stringUtils,
+  InvalidInputError,
+  PostCategoryNotFoundError,
+  PostNotFoundError,
+  ProposalNotFoundError,
+  ProposalCategoryNotFoundError
+} from '@charmverse/core/shared';
 
 import { permissionsApiAuthKey, permissionsApiUrl } from 'config/constants';
 import { SpaceNotFoundError } from 'lib/public-api';
@@ -121,7 +128,88 @@ export async function isPostCategoryPermissionSpaceOptedIn({ resourceId }: Resou
   return getEngine(postCategoryPermission.postCategory.space);
 }
 
-export type ResourceIdEntity = 'space' | 'post' | 'postCategory' | 'postCategoryPermission';
+export async function isProposalSpaceOptedIn({ resourceId }: Resource): Promise<PermissionsEngine> {
+  if (!stringUtils.isUUID(resourceId)) {
+    throw new InvalidInputError(`Invalid resourceId: ${resourceId}`);
+  }
+  const proposal = await prisma.proposal.findUnique({
+    where: {
+      id: resourceId
+    },
+    select: {
+      space: {
+        select: {
+          paidTier: true
+        }
+      }
+    }
+  });
+
+  if (!proposal) {
+    throw new ProposalNotFoundError(resourceId);
+  }
+
+  return getEngine(proposal.space);
+}
+export async function isProposalCategorySpaceOptedIn({ resourceId }: Resource): Promise<PermissionsEngine> {
+  if (!stringUtils.isUUID(resourceId)) {
+    throw new InvalidInputError(`Invalid resourceId: ${resourceId}`);
+  }
+  const proposalCategory = await prisma.proposalCategory.findUnique({
+    where: {
+      id: resourceId
+    },
+    select: {
+      space: {
+        select: {
+          paidTier: true
+        }
+      }
+    }
+  });
+
+  if (!proposalCategory) {
+    throw new ProposalCategoryNotFoundError(resourceId);
+  }
+
+  return getEngine(proposalCategory.space);
+}
+
+export async function isProposalCategoryPermissionSpaceOptedIn({ resourceId }: Resource): Promise<PermissionsEngine> {
+  if (!stringUtils.isUUID(resourceId)) {
+    throw new InvalidInputError(`Invalid resourceId: ${resourceId}`);
+  }
+  const proposalCategoryPermission = await prisma.proposalCategoryPermission.findUnique({
+    where: {
+      id: resourceId
+    },
+    select: {
+      proposalCategory: {
+        select: {
+          space: {
+            select: {
+              paidTier: true
+            }
+          }
+        }
+      }
+    }
+  });
+
+  if (!proposalCategoryPermission) {
+    throw new PostCategoryNotFoundError(resourceId);
+  }
+
+  return getEngine(proposalCategoryPermission.proposalCategory.space);
+}
+
+export type ResourceIdEntity =
+  | 'space'
+  | 'post'
+  | 'postCategory'
+  | 'postCategoryPermission'
+  | 'proposal'
+  | 'proposalCategory';
 
 export type GetPermissionClient = {
   resourceId: string;
@@ -141,6 +229,12 @@ export async function checkSpacePermissionsEngine({
       ? isPostCategoryPermissionSpaceOptedIn
       : resourceIdType === 'post'
       ? isPostSpaceOptedIn
+      : resourceIdType === 'proposal'
+      ? isProposalSpaceOptedIn
+      : resourceIdType === 'proposalCategory'
+      ? isProposalCategorySpaceOptedIn
+      : resourceIdType === 'proposalCategoryPermission'
+      ? isProposalCategoryPermissionSpaceOptedIn
       : null;
 
   if (!engineResolver) {
