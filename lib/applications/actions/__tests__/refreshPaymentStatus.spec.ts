@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core';
-import type { User, Space } from '@charmverse/core/dist/prisma';
+import type { User, Space } from '@charmverse/core/prisma';
 
 import { refreshPaymentStatus } from 'lib/applications/actions/refreshPaymentStatus';
 import { getSafeTxStatus } from 'lib/gnosis/getSafeTxStatus';

@@ -1,9 +1,9 @@
-import { ApplicationStatus } from '@charmverse/core/dist/prisma';
+import { log } from '@charmverse/core/log';
+import { ApplicationStatus } from '@charmverse/core/prisma';
 import { AlchemyProvider } from '@ethersproject/providers';
 import { BigNumber } from 'ethers';
 
 import { getGnosisService } from 'lib/gnosis/gnosis';
-import log from 'lib/log';
 
 export type SafeTxStatusDetails = {
   status: ApplicationStatus;

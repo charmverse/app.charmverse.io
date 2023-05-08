@@ -1,4 +1,4 @@
-import type { Application } from '@charmverse/core/dist/prisma';
+import type { Application } from '@charmverse/core/prisma';
 import { useEffect } from 'react';
 import useSWRImmutable from 'swr/immutable';
 

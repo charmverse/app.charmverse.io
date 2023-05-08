@@ -1,7 +1,7 @@
 import { prisma } from '@charmverse/core';
+import { log } from '@charmverse/core/log';
 
 import { refreshPaymentStatus } from 'lib/applications/actions/refreshPaymentStatus';
-import log from 'lib/log';
 
 export async function refreshUnpaidApplications() {
   const applications = await prisma.application.findMany({
