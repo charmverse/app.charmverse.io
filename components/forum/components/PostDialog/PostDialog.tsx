@@ -12,9 +12,8 @@ import Dialog from 'components/common/BoardEditor/focalboard/src/components/dial
 import Button from 'components/common/Button';
 import { DialogTitle } from 'components/common/Modal';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
-import { PageActions } from 'components/common/PageActions';
+import { FullPageActionsMenuButton } from 'components/common/PageActions/FullPageActionsMenuButton';
 import { useSmallScreen } from 'hooks/useMediaScreens';
-import { usePostPermissions } from 'hooks/usePostPermissions';
 import { useUser } from 'hooks/useUser';
 import type { PostWithVotes } from 'lib/forums/posts/interfaces';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
@@ -50,12 +49,6 @@ export function PostDialog({ post, isLoading, spaceId, onClose, newPostCategory 
   const isMobile = useSmallScreen();
 
   const [isDraftPostListOpen, setIsDraftPostListOpen] = useState(false);
-
-  const permissions = usePostPermissions({
-    postIdOrPath: post?.id as string,
-    isNewPost: !post
-  });
-
   // keep track if charmeditor is mounted. There is a bug that it calls the update method on closing the modal, but content is empty
   useEffect(() => {
     mounted.current = true;
@@ -70,23 +63,6 @@ export function PostDialog({ post, isLoading, spaceId, onClose, newPostCategory 
     setContentUpdated(false);
     setShowConfirmDialog(false);
     setIsDraftPostListOpen(false);
-  }
-
-  function deletePost() {
-    if (post) {
-      charmClient.forum.deleteForumPost(post.id).then(() => {
-        mutateDraftPosts(
-          (_posts) => {
-            if (_posts) {
-              return _posts.filter((_post) => _post.id !== post.id);
-            }
-            return [];
-          },
-          { revalidate: false }
-        );
-        close();
-      });
-    }
   }
 
   function showDraftPost(draftPost: Post) {
@@ -155,13 +131,7 @@ export function PostDialog({ post, isLoading, spaceId, onClose, newPostCategory 
               View {draftedPosts.length > 0 ? `${draftedPosts.length} ` : ''}drafts
             </Button>
           ) : null}
-          {post && (
-            <PageActions
-              page={{ ...post, relativePath }}
-              onClickDelete={permissions?.delete_post ? deletePost : undefined}
-              hideDuplicateAction
-            />
-          )}
+          <FullPageActionsMenuButton post={post} onDelete={close} />
         </Stack>
       }
       onClose={() => {

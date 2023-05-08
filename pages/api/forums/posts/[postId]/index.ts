@@ -10,11 +10,9 @@ import { updateForumPost } from 'lib/forums/posts/updateForumPost';
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { getPermissionsClient } from 'lib/permissions/api';
 import { withSessionRoute } from 'lib/session/withSession';
-import { isUUID } from 'lib/utilities/strings';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 import { publishPostEvent } from 'lib/webhookPublisher/publishEvent';
 import { relay } from 'lib/websockets/relay';
-import computePostPermissions from 'pages/api/permissions/forum/compute-post-permissions';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

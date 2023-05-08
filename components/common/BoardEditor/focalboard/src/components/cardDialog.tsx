@@ -1,8 +1,5 @@
-import { useMemo } from 'react';
-
 import { DocumentPageProviders } from 'components/[pageId]/DocumentPage/DocumentPageProviders';
-import PageDialog from 'components/common/PageDialog';
-import { useBounties } from 'hooks/useBounties';
+import { PageDialog } from 'components/common/PageDialog/PageDialog';
 
 type Props = {
   cardId: string;
@@ -12,14 +9,10 @@ type Props = {
 
 function CardDialog(props: Props): JSX.Element | null {
   const { cardId, readOnly, onClose } = props;
-  const { bounties } = useBounties();
-  const bounty = useMemo(() => {
-    return bounties.find((b) => b.page?.id === cardId) ?? null;
-  }, [cardId, bounties.length]);
 
   return (
     <DocumentPageProviders>
-      <PageDialog onClose={onClose} readOnly={readOnly} bounty={bounty} pageId={cardId} />
+      <PageDialog onClose={onClose} readOnly={readOnly} pageId={cardId} />
     </DocumentPageProviders>
   );
 }

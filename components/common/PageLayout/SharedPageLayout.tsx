@@ -1,15 +1,12 @@
-import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
-import MoonIcon from '@mui/icons-material/DarkMode';
-import SunIcon from '@mui/icons-material/WbSunny';
-import { Box, IconButton, Tooltip } from '@mui/material';
+import { Box } from '@mui/material';
 import Head from 'next/head';
 import Image from 'next/legacy/image';
 
 import { DocumentPageProviders } from 'components/[pageId]/DocumentPage/DocumentPageProviders';
 import Button from 'components/common/Button';
 import { PageDialogProvider } from 'components/common/PageDialog/hooks/usePageDialog';
-import PageDialogGlobalModal from 'components/common/PageDialog/PageDialogGlobal';
+import { PageDialogGlobal } from 'components/common/PageDialog/PageDialogGlobal';
 import CurrentPageFavicon from 'components/common/PageLayout/components/CurrentPageFavicon';
 import PageTitleWithBreadcrumbs from 'components/common/PageLayout/components/Header/components/PageTitleWithBreadcrumbs';
 import { StyledToolbar } from 'components/common/PageLayout/components/Header/Header';
@@ -69,7 +66,7 @@ export function SharedPageLayout({ children, basePageId }: Props) {
           <PageContainer>
             <HeaderSpacer />
             {children}
-            <PageDialogGlobalModal />
+            <PageDialogGlobal />
           </PageContainer>
         </PageDialogProvider>
       </LayoutContainer>

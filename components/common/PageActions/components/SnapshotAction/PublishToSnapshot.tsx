@@ -21,11 +21,11 @@ interface Props {
   onPublish?: () => void;
 }
 
-export default function PublishToSnapshot({ pageId, renderContent, onPublish = () => null }: Props) {
+export function PublishToSnapshot({ pageId, renderContent, onPublish = () => null }: Props) {
   const { pages, mutatePage } = usePages();
-  const page = pages[pageId]!;
+  const page = pages[pageId];
 
-  const [checkingProposal, setCheckingProposal] = useState(!!page.snapshotProposalId);
+  const [checkingProposal, setCheckingProposal] = useState(!!page?.snapshotProposalId);
   const [proposal, setProposal] = useState<SnapshotProposal | null>(null);
   const currentSpace = useCurrentSpace();
 
@@ -35,7 +35,7 @@ export default function PublishToSnapshot({ pageId, renderContent, onPublish = (
     const snapshotProposal = await getSnapshotProposal(proposalId);
 
     if (!snapshotProposal) {
-      const pageWithoutSnapshotId = await charmClient.updatePageSnapshotData(page.id, { snapshotProposalId: null });
+      const pageWithoutSnapshotId = await charmClient.updatePageSnapshotData(pageId, { snapshotProposalId: null });
       mutatePage(pageWithoutSnapshotId);
     }
 
@@ -70,7 +70,7 @@ export default function PublishToSnapshot({ pageId, renderContent, onPublish = (
           })}
           <Modal
             size='large'
-            open={isOpen}
+            open={isOpen && !!page}
             onClose={close}
             title={`Publish to Snapshot ${currentSpace?.snapshotDomain ? `(${currentSpace.snapshotDomain})` : ''}`}
           >
@@ -79,7 +79,7 @@ export default function PublishToSnapshot({ pageId, renderContent, onPublish = (
                 close();
                 onPublish();
               }}
-              page={page}
+              page={page!}
             />
           </Modal>
         </>
