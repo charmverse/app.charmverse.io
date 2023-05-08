@@ -1,20 +1,17 @@
+import type { PermissionCompute, ProposalPermissionFlags, ProposalResource } from '@charmverse/core';
 import {
+  AvailableProposalPermissions,
   buildComputePermissionsWithPermissionFilteringPolicies,
-  prisma,
+  getDefaultProposalPermissionPolicies,
   isProposalAuthor,
   isProposalReviewer,
-  getDefaultProposalPermissionPolicies
+  prisma
 } from '@charmverse/core';
-import type { ProposalResource, ProposalPermissionFlags, PermissionCompute } from '@charmverse/core';
 
-import { filterApplicablePermissions } from 'lib/permissions/filterApplicablePermissions';
 import { ProposalNotFoundError } from 'lib/proposal/errors';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { InvalidInputError } from 'lib/utilities/errors';
 import { isUUID } from 'lib/utilities/strings';
-
-import { AvailableProposalPermissions } from '../availableProposalPermissions.class';
-import { proposalPermissionsMapping } from '../mapping';
 
 export async function baseComputeProposalPermissions({
   resourceId,
@@ -40,7 +37,6 @@ export async function baseComputeProposalPermissions({
   if (!proposal) {
     throw new ProposalNotFoundError(`${resourceId}`);
   }
-
   const { spaceRole, isAdmin } = await hasAccessToSpace({
     spaceId: proposal.spaceId,
     userId,
@@ -50,27 +46,30 @@ export async function baseComputeProposalPermissions({
   const permissions = new AvailableProposalPermissions();
 
   if (isAdmin) {
-    return permissions.full;
+    return { ...permissions.full, make_public: false };
   }
 
-  if (!proposal.categoryId) {
-    throw new InvalidInputError(`Cannot compute permissions for proposal ${resourceId} without category`);
+  if (spaceRole) {
+    if (isProposalAuthor({ proposal, userId })) {
+      permissions.addPermissions(['edit', 'view', 'create_vote', 'delete', 'vote', 'comment']);
+    }
+
+    const isReviewer = isProposalReviewer({
+      proposal,
+      userId
+    });
+
+    if (isReviewer) {
+      permissions.addPermissions(['view', 'comment', 'review']);
+    }
+
+    // Add default space member permissions
+    permissions.addPermissions(['view', 'comment', 'vote']);
   }
 
-  if (isProposalAuthor({ proposal, userId })) {
-    permissions.addPermissions(['edit', 'view', 'create_vote', 'delete', 'vote', 'comment', 'make_public']);
-  }
+  permissions.addPermissions(['view']);
 
-  const isReviewer = isProposalReviewer({
-    proposal,
-    userId
-  });
-
-  if (isReviewer) {
-    permissions.addPermissions(['view', 'comment', 'review']);
-  }
-
-  return {} as any;
+  return permissions.operationFlags;
 }
 
 function proposalResolver({ resourceId }: { resourceId: string }) {

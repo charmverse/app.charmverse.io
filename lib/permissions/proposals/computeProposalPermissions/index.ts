@@ -1,1 +1,0 @@
-export { computeProposalPermissions } from './computeProposalPermissions';

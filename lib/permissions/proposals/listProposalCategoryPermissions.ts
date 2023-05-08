@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core';
-import type { AssignedProposalCategoryPermission, PermissionCompute } from '@charmverse/core';
+import type { AssignedProposalCategoryPermission, PermissionCompute, SpaceResourcesRequest } from '@charmverse/core';
 
 import { ProposalCategoryNotFoundError } from 'lib/proposal/errors';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
@@ -11,7 +11,7 @@ import { mapProposalCategoryPermissionToAssignee } from './mapProposalCategoryPe
 export async function listProposalCategoryPermissions({
   resourceId,
   userId
-}: Required<PermissionCompute>): Promise<AssignedProposalCategoryPermission[]> {
+}: SpaceResourcesRequest): Promise<AssignedProposalCategoryPermission[]> {
   if (!isUUID(resourceId)) {
     throw new InvalidInputError('Invalid proposal category ID');
   }
