@@ -1,5 +1,5 @@
 import { log } from '@charmverse/core/log';
-import type { JsonAuthSig } from '@lit-protocol/types';
+import type { AuthSig } from '@lit-protocol/types';
 
 import { getSpaceMembershipWithRoles } from 'lib/spaces/getSpaceMembershipWithRoles';
 import { applyTokenGates } from 'lib/token-gates/applyTokenGates';
@@ -12,7 +12,7 @@ export async function reevaluateRoles({
   spaceId
 }: {
   spaceId: string;
-  authSig: JsonAuthSig;
+  authSig: AuthSig;
   userId: string;
 }) {
   try {

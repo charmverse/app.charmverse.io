@@ -1,6 +1,5 @@
 import type { TokenGate } from '@charmverse/core/prisma';
-import type { JsonAuthSig, JsonSigningResourceId } from '@lit-protocol/types';
-import type { TokenGate } from '@prisma/client';
+import type { AuthSig, JsonSigningResourceId } from '@lit-protocol/types';
 
 import * as http from 'adapters/http';
 import type {
@@ -41,7 +40,7 @@ export class TokenGatesApi {
     return http.POST('/api/token-gates/evaluate', verification);
   }
 
-  reevaluateRoles(verification: { authSig: JsonAuthSig; spaceId: string; userId: string }): Promise<string[]> {
+  reevaluateRoles(verification: { authSig: AuthSig; spaceId: string; userId: string }): Promise<string[]> {
     return http.POST('/api/token-gates/reevaluate', verification);
   }
 }

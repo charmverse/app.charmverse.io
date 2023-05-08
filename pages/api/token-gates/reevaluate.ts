@@ -1,4 +1,4 @@
-import type { JsonAuthSig } from '@lit-protocol/types';
+import type { AuthSig } from '@lit-protocol/types';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -12,7 +12,7 @@ handler.use(requireUser).post(reevaluateTokenGatesHandler);
 
 async function reevaluateTokenGatesHandler(req: NextApiRequest, res: NextApiResponse<string[]>) {
   const user = req.session.user;
-  const { spaceId, authSig } = req.body as { spaceId: string; authSig: JsonAuthSig };
+  const { spaceId, authSig } = req.body as { spaceId: string; authSig: AuthSig };
 
   const newRoles = await reevaluateRoles({ authSig, userId: user.id, spaceId });
   res.status(200).send(newRoles);
