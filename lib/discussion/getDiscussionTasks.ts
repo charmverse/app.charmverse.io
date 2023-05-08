@@ -4,7 +4,7 @@ import type { Space, User } from '@charmverse/core/prisma';
 import { prismaToBlock } from 'lib/focalboard/block';
 import type { Board } from 'lib/focalboard/board';
 import type { Card } from 'lib/focalboard/card';
-import { getAccessibleProposalCategories } from 'lib/permissions/proposals/getAccessibleProposalCategories';
+import { getAccessibleProposalCategories } from 'lib/permissions/proposals/getProposalCategories';
 import { getUserProposalsBySpace } from 'lib/proposal/getProposalsBySpace';
 import { getProposalCommentMentions, getProposalComments } from 'lib/proposal/getProposalTasks';
 import type { ProposalWithCommentsAndUsers } from 'lib/proposal/interface';

@@ -4,7 +4,7 @@ import nc from 'next-connect';
 
 import { onError, onNoMatch, requireSpaceMembership } from 'lib/middleware';
 import { computeProposalCategoryPermissions } from 'lib/permissions/proposals/computeProposalCategoryPermissions';
-import { getAccessibleProposalCategories } from 'lib/permissions/proposals/getAccessibleProposalCategories';
+import { getAccessibleProposalCategories } from 'lib/permissions/proposals/getProposalCategories';
 import { createProposalCategory } from 'lib/proposal/createProposalCategory';
 import type { ProposalCategory } from 'lib/proposal/interface';
 import { withSessionRoute } from 'lib/session/withSession';

@@ -1,6 +1,6 @@
 import { uniqBy } from 'lodash';
 
-import { getAccessibleProposalCategories } from 'lib/permissions/proposals/getAccessibleProposalCategories';
+import { getAccessibleProposalCategories } from 'lib/permissions/proposals/getProposalCategories';
 
 import type { ListProposalsRequest } from './getProposalsBySpace';
 import { getProposalsBySpace, getUserProposalsBySpace } from './getProposalsBySpace';
