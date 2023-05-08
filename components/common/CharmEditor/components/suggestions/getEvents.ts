@@ -82,6 +82,7 @@ function getEventsFromNode({ node, lastNode, lastNodeTracks }: GetTracksProps) {
         .map((mark): TrackAttribute2 => ({ type: mark.type.name as TrackType, data: mark.attrs as any }));
 
   // Filter out trackmarks already present in the last node (if it's an inline node).
+  // Without skipping over the emoji and mention nodes they are inserted in the document rather than as suggestion
   const tracks =
     node.isInline === lastNode.isInline && !['emoji', ' mention'].includes(node.type.name)
       ? nodeTracks.filter(
