@@ -1,17 +1,17 @@
-import { AlchemyProvider } from "@ethersproject/providers";
-import { Space } from "@charmverse/core/dist/prisma";
-import { getProjectRegistryContract } from "lib/gitcoin/getProjectRegistryContract";
-import { getProjectDetails, GitcoinProjectDetails } from "lib/gitcoin/getProjectDetails";
+import { AlchemyProvider } from '@ethersproject/providers';
+import { Space } from '@charmverse/core/prisma';
+import { getProjectRegistryContract } from 'lib/gitcoin/getProjectRegistryContract';
+import { getProjectDetails, GitcoinProjectDetails } from 'lib/gitcoin/getProjectDetails';
 import { prisma } from '@charmverse/core';
 import { uid } from 'lib/utilities/strings';
-import { createUserFromWallet } from "lib/users/createUser";
-import { createWorkspace, SpaceCreateInput } from "lib/spaces/createSpace";
-import { updateTrackGroupProfile } from "lib/metrics/mixpanel/updateTrackGroupProfile";
-import { trackUserAction } from "lib/metrics/mixpanel/trackUserAction";
+import { createUserFromWallet } from 'lib/users/createUser';
+import { createWorkspace, SpaceCreateInput } from 'lib/spaces/createSpace';
+import { updateTrackGroupProfile } from 'lib/metrics/mixpanel/updateTrackGroupProfile';
+import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { appendFileSync, readFileSync, writeFileSync } from 'fs';
-import { getIpfsFileUrl } from "lib/ipfs/fetchFileByHash";
-import { getUserS3FilePath, uploadUrlToS3 } from "lib/aws/uploadToS3Server";
-import { getFilenameWithExtension } from "lib/utilities/getFilenameWithExtension";
+import { getIpfsFileUrl } from 'lib/ipfs/fetchFileByHash';
+import { getUserS3FilePath, uploadUrlToS3 } from 'lib/aws/uploadToS3Server';
+import { getFilenameWithExtension } from 'lib/utilities/getFilenameWithExtension';
 
 /*****
  * NOTE: This script creates new users and spaces for Gitcoin projects.
@@ -24,7 +24,7 @@ const CHAIN_ID = 1;
 const provider = new AlchemyProvider(CHAIN_ID, process.env.ALCHEMY_API_KEY);
 const projectRegistry = getProjectRegistryContract({ providerOrSigner: provider, chainId: CHAIN_ID });
 const FILE_PATH = './gitcoin-projects.csv';
-const HOMEPAGE_TITLE = 'Information Hub'
+const HOMEPAGE_TITLE = 'Information Hub';
 
 async function getProjectCount() {
   const projectsCount = await projectRegistry.projectsCount();
@@ -38,7 +38,7 @@ type ProjectData = {
   space: Space;
   spaceImageUrl: string | null;
   bannerUrl: string | null;
-}
+};
 
 async function importGitCoinProjects() {
   const importedIds = getImportedProjcetIds();
@@ -61,9 +61,9 @@ async function importGitCoinProjects() {
       const users = await createSpaceUsers([...projectDetails.owners]);
 
       if (users !== null) {
-        const { botUser, adminUserId, extraAdmins} = users;
+        const { botUser, adminUserId, extraAdmins } = users;
 
-        let spaceImage: string | null = null
+        let spaceImage: string | null = null;
         // upload space image from ipfs to s3
         if (projectDetails.metadata.logoImg) {
           const spaceImageUrl = getIpfsFileUrl(projectDetails.metadata.logoImg);
@@ -93,14 +93,18 @@ async function importGitCoinProjects() {
         });
         console.log('🟢 Created space for project', i, space.id);
 
-        const bannerUrl = await updateHomepageBanner({ space, bannerIpfsHash: projectDetails.metadata.bannerImg, projectId: projectDetails.projectId });
+        const bannerUrl = await updateHomepageBanner({
+          space,
+          bannerIpfsHash: projectDetails.metadata.bannerImg,
+          projectId: projectDetails.projectId
+        });
 
         // mark space as created from gitcoin in mixpanel
         await updateTrackGroupProfile(space, 'gitcoin');
         // trackUserAction('create_new_workspace', { userId: adminUserId, spaceId: space.id, template: 'default', source: 'gitcoin' });
         // [adminUserId, ...extraAdmins].forEach((userId) => trackUserAction('join_a_workspace', { spaceId: space.id, userId, source: 'gitcoin-growth-hack' }));
 
-        const projectInfo = { projectDetails, space, spaceImageUrl: spaceImage, bannerUrl }
+        const projectInfo = { projectDetails, space, spaceImageUrl: spaceImage, bannerUrl };
         projectsData.push(projectInfo);
 
         exportDataToCSV([projectInfo]);
@@ -114,40 +118,46 @@ async function importGitCoinProjects() {
   }
 
   console.log('🔥 imported projects count:', projectsData.length);
-
 }
 
-async function updateHomepageBanner({ space, bannerIpfsHash, projectId }: { space: Space, bannerIpfsHash: string | null, projectId: number}) {
-    if (!bannerIpfsHash) {
-      return null;
-    }
+async function updateHomepageBanner({
+  space,
+  bannerIpfsHash,
+  projectId
+}: {
+  space: Space;
+  bannerIpfsHash: string | null;
+  projectId: number;
+}) {
+  if (!bannerIpfsHash) {
+    return null;
+  }
 
-    const bannerUrl = getIpfsFileUrl(bannerIpfsHash);
-    const pathInS3 = getUserS3FilePath({ userId: space.createdBy, url: getFilenameWithExtension(bannerUrl) });
+  const bannerUrl = getIpfsFileUrl(bannerIpfsHash);
+  const pathInS3 = getUserS3FilePath({ userId: space.createdBy, url: getFilenameWithExtension(bannerUrl) });
 
-    try {
-      const { url } = await uploadUrlToS3({ pathInS3, url: bannerUrl });
-      // find page by title and update banner
-      const page = await prisma.page.findFirst({
-        where: {
-          title: HOMEPAGE_TITLE,
-          spaceId: space.id
-        }
-      });
-
-      if (page) {
-        await prisma.page.update({
-          where: { id: page.id },
-          data: { headerImage: url }
-        });
+  try {
+    const { url } = await uploadUrlToS3({ pathInS3, url: bannerUrl });
+    // find page by title and update banner
+    const page = await prisma.page.findFirst({
+      where: {
+        title: HOMEPAGE_TITLE,
+        spaceId: space.id
       }
+    });
 
-      return url;
-    } catch (error) {
-      console.log('🔥', `error uploading page banner image ${projectId}`, error);
-      return null;
+    if (page) {
+      await prisma.page.update({
+        where: { id: page.id },
+        data: { headerImage: url }
+      });
     }
 
+    return url;
+  } catch (error) {
+    console.log('🔥', `error uploading page banner image ${projectId}`, error);
+    return null;
+  }
 }
 
 async function createSpaceUsers(owners: string[]) {
@@ -164,12 +174,17 @@ async function createSpaceUsers(owners: string[]) {
     }
   });
 
-  const userPromises = owners.map(async (owner) => createUserFromWallet({ address: owner, skipTracking: true }, {
-    signupSource: 'gitcoin-project',
-    signupCampaign: 'gitcoin-growth-hack'
-  }));
+  const userPromises = owners.map(async (owner) =>
+    createUserFromWallet(
+      { address: owner, skipTracking: true },
+      {
+        signupSource: 'gitcoin-project',
+        signupCampaign: 'gitcoin-growth-hack'
+      }
+    )
+  );
 
-  const userIds =  (await Promise.all(userPromises)).map((user) => user.id);
+  const userIds = (await Promise.all(userPromises)).map((user) => user.id);
   const [author, ...users] = userIds;
 
   return { adminUserId: author, extraAdmins: [...users], botUser };
@@ -180,60 +195,86 @@ function getImportedProjectsData() {
     const content = readFileSync(FILE_PATH).toString();
     const [_, ...rows] = content.split('\n');
 
-    return rows.map(row => row?.split(';') || []);
- } catch (e) {
+    return rows.map((row) => row?.split(';') || []);
+  } catch (e) {}
 
- }
-
- return [];
+  return [];
 }
 
 function getImportedProjcetIds() {
-    const data = getImportedProjectsData();
-    const ids = data.map(cols => {
+  const data = getImportedProjectsData();
+  const ids = data
+    .map((cols) => {
       // col 0 - gitcoin project id
       const projectId = Number(cols[0]) || null;
-      return projectId
-    }).filter((id): id is number => id !== null);
+      return projectId;
+    })
+    .filter((id): id is number => id !== null);
 
-    console.log('🔥 imported projects count', ids.length);
+  console.log('🔥 imported projects count', ids.length);
 
-    return ids;
+  return ids;
 }
 
 function getImportedProjcetSpaceIds() {
   const data = getImportedProjectsData();
 
-  return data.map(cols => {
-    // col 1 - gitcoin project space id
-    const projectId = cols[1] || null;
-    return projectId
-  }).filter((id): id is string => id !== null);
+  return data
+    .map((cols) => {
+      // col 1 - gitcoin project space id
+      const projectId = cols[1] || null;
+      return projectId;
+    })
+    .filter((id): id is string => id !== null);
 }
 
 function getCsvHeader() {
-  return ['gitcoin_project_id', 'gitcoin_space_id', 'space_name', 'project_twitter', 'website', 'owners', 'space_url', 'join_url', 'space_image_url', 'banner_url', 'metadata_url', 'created_date'].join(';');
+  return [
+    'gitcoin_project_id',
+    'gitcoin_space_id',
+    'space_name',
+    'project_twitter',
+    'website',
+    'owners',
+    'space_url',
+    'join_url',
+    'space_image_url',
+    'banner_url',
+    'metadata_url',
+    'created_date'
+  ].join(';');
 }
 
 function exportDataToCSV(data: ProjectData[]) {
   let isEmpty = true;
   try {
-     isEmpty = !readFileSync(FILE_PATH).length;
-  } catch (e) {
-
-  }
+    isEmpty = !readFileSync(FILE_PATH).length;
+  } catch (e) {}
 
   const csvData = data.map(({ projectDetails, space, bannerUrl, spaceImageUrl }) => {
     const { metadata, owners, metadataUrl, projectId } = projectDetails;
-    const {  description, website, projectTwitter, createdAt } = metadata;
-    const { name, domain,id } = space;
+    const { description, website, projectTwitter, createdAt } = metadata;
+    const { name, domain, id } = space;
 
     const spaceUrl = `https://app.charmverse.io/${domain}`;
     const joinUrl = `https://app.charmverse.io/join?domain=${domain}`;
     const createdDate = new Date(createdAt).toLocaleDateString('en-US') || '??';
 
-    const infoRow =  [projectId, id, name, projectTwitter, website, owners.join(','), spaceUrl, joinUrl, spaceImageUrl, bannerUrl, metadataUrl, createdDate].join(';');
-    return ('\n').concat(infoRow)
+    const infoRow = [
+      projectId,
+      id,
+      name,
+      projectTwitter,
+      website,
+      owners.join(','),
+      spaceUrl,
+      joinUrl,
+      spaceImageUrl,
+      bannerUrl,
+      metadataUrl,
+      createdDate
+    ].join(';');
+    return '\n'.concat(infoRow);
   });
 
   // add header if file is empty
@@ -278,7 +319,7 @@ export async function updateCreatedAt() {
 
 function overrideCsv(data: string[][]) {
   const csvData = [getCsvHeader()];
-  data.forEach(row => {
+  data.forEach((row) => {
     csvData.push(row.join(';'));
   });
 

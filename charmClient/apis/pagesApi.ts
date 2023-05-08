@@ -1,4 +1,4 @@
-import type { Page, PageComment, ProfileItem } from '@charmverse/core/dist/prisma';
+import type { Page, PageComment, ProfileItem } from '@charmverse/core/prisma';
 
 import * as http from 'adapters/http';
 import type { CreateCommentInput, UpdateCommentInput } from 'lib/comments';

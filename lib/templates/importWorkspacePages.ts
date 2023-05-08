@@ -2,11 +2,11 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 
 import { prisma } from '@charmverse/core';
-import type { Prisma, Page } from '@charmverse/core/dist/prisma';
+import { log } from '@charmverse/core/log';
+import type { Prisma, Page } from '@charmverse/core/prisma';
 import { v4, validate } from 'uuid';
 
 import type { BountyWithDetails } from 'lib/bounties';
-import log from 'lib/log';
 import type { PageMeta } from 'lib/pages';
 import { isBoardPageType } from 'lib/pages/isBoardPageType';
 import { createPage } from 'lib/pages/server/createPage';

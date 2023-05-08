@@ -3,7 +3,7 @@
 import fs from 'node:fs/promises';
 
 import { prisma } from '@charmverse/core';
-import type { Page, Space, User } from '@charmverse/core/dist/prisma';
+import type { Page, Space, User } from '@charmverse/core/prisma';
 import { v4 } from 'uuid';
 
 import type { IPageWithPermissions } from 'lib/pages';

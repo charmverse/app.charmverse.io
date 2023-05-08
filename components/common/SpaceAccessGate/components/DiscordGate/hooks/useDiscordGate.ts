@@ -1,4 +1,4 @@
-import type { Space } from '@charmverse/core/dist/prisma';
+import type { Space } from '@charmverse/core/prisma';
 import { useState } from 'react';
 import useSWR from 'swr';
 

@@ -1,4 +1,4 @@
-import type { Block } from '@charmverse/core/dist/prisma';
+import type { Block } from '@charmverse/core/prisma';
 
 import type { CardPage, PageContentFormats, PageProperty } from './interfaces';
 

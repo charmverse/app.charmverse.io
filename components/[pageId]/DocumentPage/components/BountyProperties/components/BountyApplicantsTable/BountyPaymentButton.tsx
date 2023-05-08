@@ -1,4 +1,4 @@
-import type { UserGnosisSafe } from '@charmverse/core/dist/prisma';
+import type { UserGnosisSafe } from '@charmverse/core/prisma';
 import { BigNumber } from '@ethersproject/bignumber';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import { Divider, Menu, MenuItem } from '@mui/material';
@@ -33,7 +33,6 @@ interface Props {
   tokenSymbolOrAddress: string;
   chainIdToUse: number;
   onSuccess?: (txId: string, chainId: number) => void;
-  onClick?: () => void;
   onError?: (err: string, severity?: AlertColor) => void;
   bounty: BountyWithDetails;
 }
@@ -51,12 +50,13 @@ function SafeMenuItem({
   onClick: () => void;
   onError: (err: string, severity?: AlertColor) => void;
 }) {
-  const { onPaymentSuccess, transactions } = useMultiBountyPayment({ bounties: [bounty] });
+  const { onPaymentSuccess, getTransactions } = useMultiBountyPayment({ bounties: [bounty] });
+
   const { makePayment } = useGnosisPayment({
     chainId: safeInfo.chainId,
     onSuccess: onPaymentSuccess,
     safeAddress: safeInfo.address,
-    transactions: transactions.map((getTransaction) => getTransaction(safeInfo.address))
+    transactions: getTransactions(safeInfo.address)
   });
 
   return (
@@ -67,7 +67,8 @@ function SafeMenuItem({
         try {
           await makePayment();
         } catch (error: any) {
-          onError(getPaymentErrorMessage(error));
+          const { message, level } = getPaymentErrorMessage(error);
+          onError(message, level);
         }
       }}
     >
@@ -76,14 +77,13 @@ function SafeMenuItem({
   );
 }
 
-export default function BountyPaymentButton({
+export function BountyPaymentButton({
   receiver,
   bounty,
   amount,
   chainIdToUse,
   tokenSymbolOrAddress,
-  onSuccess = (tx: string, chainId: number) => {},
-  onClick = () => null,
+  onSuccess = () => {},
   onError = () => {}
 }: Props) {
   const { data: safesData } = useMultiWalletSigs();
@@ -189,8 +189,9 @@ export default function BountyPaymentButton({
       } else {
         onError('Please provide a valid contract address');
       }
-    } catch (err: any) {
-      onError(getPaymentErrorMessage(err));
+    } catch (error: any) {
+      const { message, level } = getPaymentErrorMessage(error);
+      onError(message, level);
     }
   };
 
@@ -204,7 +205,6 @@ export default function BountyPaymentButton({
         size='small'
         onClick={(e) => {
           if (!hasSafes) {
-            onClick();
             makePayment();
           } else {
             handleClick(e);
@@ -220,9 +220,8 @@ export default function BountyPaymentButton({
           </MenuItem>
           <MenuItem
             dense
-            onClick={() => {
-              onClick();
-              makePayment();
+            onClick={async () => {
+              await makePayment();
               handleClose();
             }}
           >
@@ -238,7 +237,6 @@ export default function BountyPaymentButton({
               bounty={bounty}
               label={safeDataRecord[safeInfo.address]?.name ?? shortenHex(safeInfo.address)}
               onClick={() => {
-                onClick();
                 handleClose();
               }}
               onError={onError}

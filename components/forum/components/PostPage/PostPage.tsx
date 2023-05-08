@@ -1,4 +1,4 @@
-import type { Post, PostCategory } from '@charmverse/core/dist/prisma';
+import type { Post, PostCategory } from '@charmverse/core/prisma';
 import CommentIcon from '@mui/icons-material/Comment';
 import { Box, Divider, Stack, Typography } from '@mui/material';
 import { useRouter } from 'next/router';

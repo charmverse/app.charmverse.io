@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core';
-import type { Post, Prisma, Space, User } from '@charmverse/core/dist/prisma';
+import type { Post, Prisma, Space, User } from '@charmverse/core/prisma';
 import { v4 } from 'uuid';
 
 import { generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';

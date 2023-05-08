@@ -1,4 +1,4 @@
-import type { Page } from '@charmverse/core/dist/prisma';
+import type { Page } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import { useMediaQuery } from '@mui/material';
 import type { Theme } from '@mui/material';

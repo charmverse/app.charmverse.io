@@ -1,4 +1,4 @@
-import type { User } from '@charmverse/core/dist/prisma';
+import type { User } from '@charmverse/core/prisma';
 
 export type NotificationActor = Pick<
   User,

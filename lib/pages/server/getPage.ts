@@ -1,6 +1,6 @@
 import { prisma } from '@charmverse/core';
 import type { TransactionClient } from '@charmverse/core';
-import type { Prisma } from '@charmverse/core/dist/prisma';
+import type { Prisma } from '@charmverse/core/prisma';
 import { validate } from 'uuid';
 
 import type { IPageWithPermissions } from '../interfaces';

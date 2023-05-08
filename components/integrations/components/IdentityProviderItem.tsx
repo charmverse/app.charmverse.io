@@ -1,4 +1,4 @@
-import type { IdentityType } from '@charmverse/core/dist/prisma';
+import type { IdentityType } from '@charmverse/core/prisma';
 import MoreHoriz from '@mui/icons-material/MoreHoriz';
 import type { ListItemProps } from '@mui/material';
 import { Chip, Box, Menu, IconButton, ListItem, ListItemIcon, ListItemText } from '@mui/material';

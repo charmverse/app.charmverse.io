@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core';
-import type { PageComment } from '@charmverse/core/dist/prisma';
+import type { PageComment } from '@charmverse/core/prisma';
 
 export async function deletePageComment({
   commentId,

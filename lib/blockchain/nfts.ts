@@ -1,4 +1,4 @@
-import type { UserWallet } from '@charmverse/core/dist/prisma';
+import type { UserWallet } from '@charmverse/core/prisma';
 
 import type { NftData } from './interfaces';
 import * as alchemyApi from './provider/alchemy';

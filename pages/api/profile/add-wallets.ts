@@ -1,11 +1,11 @@
 import { prisma } from '@charmverse/core';
+import { log } from '@charmverse/core/log';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import type { AuthSig } from 'lib/blockchain/interfaces';
 import { refreshENSName } from 'lib/blockchain/refreshENSName';
 import { isValidWalletSignature } from 'lib/blockchain/signAndVerify';
-import log from 'lib/log';
 import { updateTrackUserProfile } from 'lib/metrics/mixpanel/updateTrackUserProfile';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';

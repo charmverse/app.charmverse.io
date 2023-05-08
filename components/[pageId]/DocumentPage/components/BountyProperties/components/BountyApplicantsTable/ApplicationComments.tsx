@@ -1,4 +1,4 @@
-import type { Application } from '@charmverse/core/dist/prisma';
+import type { Application } from '@charmverse/core/prisma';
 import { FormLabel } from '@mui/material';
 import { Box, Stack } from '@mui/system';
 import useSWR from 'swr';

@@ -1,4 +1,4 @@
-import type { VisibilityView } from '@charmverse/core/dist/prisma';
+import type { VisibilityView } from '@charmverse/core/prisma';
 import PersonIcon from '@mui/icons-material/Person';
 import { Stack, Tooltip, Typography } from '@mui/material';
 

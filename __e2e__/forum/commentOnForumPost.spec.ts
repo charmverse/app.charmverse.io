@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core';
-import type { Post, PostComment, Space, User } from '@charmverse/core/dist/prisma';
+import type { Post, PostComment, Space, User } from '@charmverse/core/prisma';
 import { expect, test as base } from '@playwright/test';
 
 import { upsertPostCategoryPermission } from 'lib/permissions/forum/upsertPostCategoryPermission';

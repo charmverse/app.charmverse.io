@@ -8,7 +8,7 @@ import type {
   SuperApiToken,
   User,
   UserWallet
-} from '@charmverse/core/dist/prisma';
+} from '@charmverse/core/prisma';
 import request from 'supertest';
 import { v4 } from 'uuid';
 

@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core';
-import { ProposalStatus } from '@charmverse/core/dist/prisma';
+import { ProposalStatus } from '@charmverse/core/prisma';
 
 import { BasePermissions } from 'lib/permissions/basePermissions.class';
 import { computeProposalPermissions } from 'lib/permissions/proposals/computeProposalPermissions';

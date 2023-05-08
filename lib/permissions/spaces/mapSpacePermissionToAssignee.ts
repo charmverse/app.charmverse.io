@@ -1,4 +1,4 @@
-import type { SpacePermission } from '@charmverse/core/dist/prisma';
+import type { SpacePermission } from '@charmverse/core/prisma';
 
 import { InvalidPermissionGranteeError } from '../errors';
 import type { TargetPermissionGroup } from '../interfaces';

@@ -1,4 +1,4 @@
-import type { Page, PagePermission, Space } from '@charmverse/core/dist/prisma';
+import type { Page, PagePermission, Space } from '@charmverse/core/prisma';
 
 import type { BountyWithDetails } from 'lib/bounties';
 import type { Board, IPropertyTemplate } from 'lib/focalboard/board';

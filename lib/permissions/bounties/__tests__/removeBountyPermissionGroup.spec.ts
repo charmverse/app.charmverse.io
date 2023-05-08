@@ -1,5 +1,5 @@
-import type { Space, User } from '@charmverse/core/dist/prisma';
-import { BountyPermissionLevel } from '@charmverse/core/dist/prisma';
+import type { Space, User } from '@charmverse/core/prisma';
+import { BountyPermissionLevel } from '@charmverse/core/prisma';
 import { v4 } from 'uuid';
 
 import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';

@@ -1,4 +1,4 @@
-import type { Post, PostUpDownVote } from '@charmverse/core/dist/prisma';
+import type { Post, PostUpDownVote } from '@charmverse/core/prisma';
 
 import { extractSummary } from 'lib/prosemirror/extractSummary';
 import type { PageContent } from 'lib/prosemirror/interfaces';

@@ -1,6 +1,5 @@
 import { prisma } from '@charmverse/core';
-
-import log from 'lib/log';
+import { log } from '@charmverse/core/log';
 
 import { getGuildRoleIds } from '../getGuildRoleIds';
 

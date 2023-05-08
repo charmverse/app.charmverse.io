@@ -1,6 +1,6 @@
+import { log } from '@charmverse/core/log';
 import type { SQSBatchItemFailure, SQSBatchResponse, SQSEvent, SQSRecord } from 'aws-lambda';
 
-import log from 'lib/log';
 import { signJwt } from 'lib/webhookPublisher/authentication';
 import type { WebhookPayload } from 'lib/webhookPublisher/interfaces';
 

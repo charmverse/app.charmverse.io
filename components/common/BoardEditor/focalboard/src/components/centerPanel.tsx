@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable max-lines */
 
-import type { Page } from '@charmverse/core/dist/prisma';
+import { log } from '@charmverse/core/log';
+import type { Page } from '@charmverse/core/prisma';
 import CallMadeIcon from '@mui/icons-material/CallMade';
 import LaunchIcon from '@mui/icons-material/LaunchOutlined';
 import { Box, Typography, Link } from '@mui/material';
@@ -49,7 +50,6 @@ import type { BoardView, BoardViewFields } from 'lib/focalboard/boardView';
 import { createCard } from 'lib/focalboard/card';
 import type { Card, CardPage } from 'lib/focalboard/card';
 import { CardFilter } from 'lib/focalboard/cardFilter';
-import log from 'lib/log';
 import type { PageMeta, PagesMap } from 'lib/pages';
 import { createNewDataSource } from 'lib/pages/createNewDataSource';
 

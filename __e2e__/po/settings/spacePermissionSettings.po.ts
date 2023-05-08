@@ -1,5 +1,5 @@
 // playwright-dev-page.ts
-import type { SpaceOperation } from '@charmverse/core/dist/prisma';
+import type { SpaceOperation } from '@charmverse/core/prisma';
 import type { Locator, Page } from '@playwright/test';
 
 import type { SpacePermissionFlags } from 'lib/permissions/spaces';

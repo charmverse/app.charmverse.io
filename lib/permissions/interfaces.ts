@@ -1,4 +1,4 @@
-import type { PagePermission, Role, Space, User } from '@charmverse/core/dist/prisma';
+import type { PagePermission, Role, Space, User } from '@charmverse/core/prisma';
 
 export type Resource = {
   resourceId: string;

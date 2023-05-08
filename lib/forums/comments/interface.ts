@@ -1,4 +1,4 @@
-import type { PostComment } from '@charmverse/core/dist/prisma';
+import type { PostComment } from '@charmverse/core/prisma';
 
 import type { PageContent } from 'lib/prosemirror/interfaces';
 

@@ -1,7 +1,6 @@
 import { Plugin } from '@bangle.dev/core';
 import type { EditorView, Slice } from '@bangle.dev/pm';
-
-import log from 'lib/log';
+import { log } from '@charmverse/core/log';
 
 const maxByteSize = 1000000; // 1MB
 

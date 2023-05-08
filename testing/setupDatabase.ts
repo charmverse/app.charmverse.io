@@ -20,7 +20,7 @@ import type {
   User,
   Vote,
   WorkspaceEvent
-} from '@charmverse/core/dist/prisma';
+} from '@charmverse/core/prisma';
 import { Wallet } from 'ethers';
 import { v4 } from 'uuid';
 

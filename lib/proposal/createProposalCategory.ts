@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core';
-import type { Prisma } from '@charmverse/core/dist/prisma';
+import type { Prisma } from '@charmverse/core/prisma';
 
 import { assignDefaultProposalCategoryPermissions } from 'lib/permissions/proposals/assignDefaultProposalCategoryPermission';
 import { getRandomThemeColor } from 'theme/utils/getRandomThemeColor';

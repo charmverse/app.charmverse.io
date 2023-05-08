@@ -1,4 +1,4 @@
-import type { Bounty, BountyStatus } from '@charmverse/core/dist/prisma';
+import type { Bounty, BountyStatus } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';

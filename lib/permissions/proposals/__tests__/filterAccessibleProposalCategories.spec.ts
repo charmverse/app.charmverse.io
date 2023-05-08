@@ -1,4 +1,4 @@
-import type { ProposalCategory, ProposalCategoryPermissionLevel, Space, User } from '@charmverse/core/dist/prisma';
+import type { ProposalCategory, ProposalCategoryPermissionLevel, Space, User } from '@charmverse/core/prisma';
 
 import { addSpaceOperations } from 'lib/permissions/spaces';
 import { generateRole, generateSpaceUser, generateUserAndSpace } from 'testing/setupDatabase';

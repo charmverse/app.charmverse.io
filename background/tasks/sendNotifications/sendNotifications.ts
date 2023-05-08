@@ -1,11 +1,11 @@
 import { prisma } from '@charmverse/core';
+import { log } from '@charmverse/core/log';
 
 import { getBountyTasks } from 'lib/bounties/getBountyTasks';
 import { getDiscussionTasks } from 'lib/discussion/getDiscussionTasks';
 import * as emails from 'lib/emails';
 import type { PendingTasksProps } from 'lib/emails/templates/PendingTasks';
 import { getForumNotifications } from 'lib/forums/getForumNotifications/getForumNotifications';
-import log from 'lib/log';
 import * as mailer from 'lib/mailer';
 import { getProposalTasksFromWorkspaceEvents } from 'lib/proposal/getProposalTasksFromWorkspaceEvents';
 import { getVoteTasks } from 'lib/votes/getVoteTasks';

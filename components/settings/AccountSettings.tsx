@@ -1,4 +1,4 @@
-import type { User } from '@charmverse/core/dist/prisma';
+import type { User } from '@charmverse/core/prisma';
 import { useTheme } from '@emotion/react';
 import { yupResolver } from '@hookform/resolvers/yup';
 import {

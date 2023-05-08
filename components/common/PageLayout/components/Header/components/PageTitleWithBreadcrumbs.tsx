@@ -1,4 +1,4 @@
-import type { PageType } from '@charmverse/core/dist/prisma';
+import type { PageType } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import { Box, Typography, CircularProgress } from '@mui/material';
 import { useRouter } from 'next/router';

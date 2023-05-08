@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core';
-import type { Prisma, SpaceRole, User, VerifiedEmail } from '@charmverse/core/dist/prisma';
+import type { Prisma, SpaceRole, User, VerifiedEmail } from '@charmverse/core/prisma';
 
 import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
 import { isUUID, isValidEmail, uid } from 'lib/utilities/strings';

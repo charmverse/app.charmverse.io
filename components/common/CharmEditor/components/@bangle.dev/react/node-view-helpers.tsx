@@ -1,11 +1,10 @@
 import type { NodeView, RenderHandlers } from '@bangle.dev/core';
 import { saveRenderHandlers } from '@bangle.dev/core';
 import { objectUid } from '@bangle.dev/utils';
+import { log } from '@charmverse/core/log';
 import { useEffect, useState } from 'react';
 import type { RefObject } from 'react';
 import { flushSync } from 'react-dom';
-
-import log from 'lib/log';
 
 export const nodeViewUpdateStore = new WeakMap();
 

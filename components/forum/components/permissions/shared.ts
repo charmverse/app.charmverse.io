@@ -1,4 +1,4 @@
-import type { PostCategoryPermissionLevel } from '@charmverse/core/dist/prisma';
+import type { PostCategoryPermissionLevel } from '@charmverse/core/prisma';
 
 export const postCategoryPermissionLabels: Record<PostCategoryPermissionLevel, string> = {
   category_admin: 'Category Admin',

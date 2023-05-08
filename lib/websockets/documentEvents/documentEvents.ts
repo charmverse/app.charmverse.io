@@ -1,9 +1,9 @@
 import type { Node } from '@bangle.dev/pm';
 import { prisma } from '@charmverse/core';
+import { getLogger } from '@charmverse/core/log';
 import type { Socket } from 'socket.io';
 import { validate } from 'uuid';
 
-import { getLogger } from 'lib/log/prefix';
 import type { IPagePermissionFlags } from 'lib/permissions/pages';
 import { computeUserPagePermissions } from 'lib/permissions/pages/page-permission-compute';
 import { applyStepsToNode } from 'lib/prosemirror/applyStepsToNode';

@@ -1,5 +1,5 @@
 import type { AssignedPostCategoryPermission } from '@charmverse/core';
-import type { PostCategoryPermission } from '@charmverse/core/dist/prisma';
+import type { PostCategoryPermission } from '@charmverse/core/prisma';
 import { v4 } from 'uuid';
 
 import { InvalidPermissionGranteeError } from 'lib/permissions/errors';

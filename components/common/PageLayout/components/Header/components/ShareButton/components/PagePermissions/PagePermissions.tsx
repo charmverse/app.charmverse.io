@@ -1,4 +1,4 @@
-import type { PageType } from '@charmverse/core/dist/prisma';
+import type { PageType } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import { Box, Button, Chip, Tooltip } from '@mui/material';
 import InputAdornment from '@mui/material/InputAdornment';

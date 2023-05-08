@@ -1,4 +1,4 @@
-import type { NotificationType } from '@charmverse/core/dist/prisma';
+import type { NotificationType } from '@charmverse/core/prisma';
 import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
 import { useEffect, useState, useCallback, createContext, useContext, useMemo } from 'react';
