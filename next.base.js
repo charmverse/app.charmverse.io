@@ -20,6 +20,7 @@ const esmModules = [
   'react-dnd-preview',
   '@hookform/resolvers',
   'lit-share-modal-v3',
+  '@lit-protocol/lit-node-client',
   'uuid',
   'data-uri-to-buffer',
   'fetch-blob',
