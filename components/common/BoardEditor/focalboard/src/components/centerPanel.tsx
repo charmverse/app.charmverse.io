@@ -17,7 +17,6 @@ import type { WrappedComponentProps } from 'react-intl';
 import { injectIntl } from 'react-intl';
 import type { ConnectedProps } from 'react-redux';
 import { connect } from 'react-redux';
-import useSWR from 'swr';
 import { v4 as uuid } from 'uuid';
 
 import charmClient from 'charmClient';
@@ -41,6 +40,7 @@ import { webhookBaseUrl } from 'config/constants';
 import { useApiPageKeys } from 'hooks/useApiPageKeys';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMembers } from 'hooks/useMembers';
+import { usePage } from 'hooks/usePage';
 import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
@@ -50,7 +50,7 @@ import type { BoardView, BoardViewFields } from 'lib/focalboard/boardView';
 import { createCard } from 'lib/focalboard/card';
 import type { Card, CardPage } from 'lib/focalboard/card';
 import { CardFilter } from 'lib/focalboard/cardFilter';
-import type { PageMeta, PagesMap } from 'lib/pages';
+import type { PageMeta } from 'lib/pages';
 import { createNewDataSource } from 'lib/pages/createNewDataSource';
 
 import mutator from '../mutator';
@@ -98,7 +98,7 @@ type State = {
 };
 
 function CenterPanel(props: Props) {
-  const { activeView, board, pageIcon, showView, views } = props;
+  const { activeView, board, pageIcon, showView, views, page: boardPage } = props;
 
   const [state, setState] = useState<State>({
     cardIdToFocusOnRender: '',
@@ -116,17 +116,7 @@ function CenterPanel(props: Props) {
   const { showMessage } = useSnackbar();
   const { user } = useUser();
 
-  const { data: archivedPages } = useSWR<PagesMap>(!space ? null : `archived-pages-${space?.id}`, () => {
-    return charmClient.pages.getArchivedPages(space?.id as string).then((deletablePages) => {
-      return deletablePages.reduce((pageMap, page) => {
-        pageMap[page.id] = page;
-        return pageMap;
-      }, {} as PagesMap);
-    });
-  });
-
   const isEmbedded = !!props.embeddedBoardPath;
-  const boardPage = pages[board.id] ?? props.page;
   const boardPageType = boardPage?.type;
 
   // for 'linked' boards, each view has its own board which we use to determine the cards to show
@@ -136,10 +126,10 @@ function CenterPanel(props: Props) {
   } else if (activeView?.fields.sourceType === 'google_form') {
     activeBoardId = activeView?.fields.sourceData?.boardId;
   }
+  const { page: activePage } = usePage({ pageIdOrPath: activeBoardId, spaceId: space?.id });
+
   const { keys } = useApiPageKeys(props.page?.id);
   const activeBoard = useAppSelector(getBoard(activeBoardId ?? ''));
-  const activePage = pages[activeBoardId ?? ''];
-  const deletedPage = (archivedPages || {})[activeBoardId ?? ''];
   const _groupByProperty = activeBoard?.fields.cardProperties.find((o) => o.id === activeView?.fields.groupById);
   const _dateDisplayProperty = activeBoard?.fields.cardProperties.find(
     (o) => o.id === activeView?.fields.dateDisplayPropertyId
@@ -543,7 +533,7 @@ function CenterPanel(props: Props) {
               setPage={props.setPage}
             />
           )}
-          {(activePage || deletedPage || activeBoard) && (
+          {(activePage || activeBoard) && (
             <ViewHeader
               onDeleteView={props.onDeleteView}
               maxTabsShown={props.maxTabsShown}
@@ -604,7 +594,7 @@ function CenterPanel(props: Props) {
                 </Typography>
               )}
               {/* Show page title for linked boards */}
-              {(activePage || deletedPage) &&
+              {activePage &&
                 activeView?.fields?.sourceType === 'board_page' &&
                 boardPageType === 'inline_linked_board' && (
                   <Button
@@ -613,11 +603,11 @@ function CenterPanel(props: Props) {
                     variant='text'
                     size='large'
                     href={`${router.pathname.startsWith('/share') ? '/share' : ''}/${space?.domain}/${
-                      activePage?.path || deletedPage?.path
+                      activePage?.path
                     }`}
                     sx={{ fontSize: 22, fontWeight: 700, py: 0 }}
                   >
-                    {activePage?.title || deletedPage?.title || 'Untitled'}
+                    {activePage?.title || 'Untitled'}
                   </Button>
                 )}
               {!activeView && state.showSettings === 'create-linked-view' && (
