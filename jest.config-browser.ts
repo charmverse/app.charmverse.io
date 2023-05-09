@@ -8,7 +8,7 @@ import createJestConfig from 'testing/createJestConfig';
  * Configuration copied from
  * https://nextjs.org/docs/testing
  * */
-export const jestConfig = {
+const jestConfig = {
   // Automatically clear mock calls, instances and results before every test
   clearMocks: true,
 
