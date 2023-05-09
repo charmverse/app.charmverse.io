@@ -10,8 +10,8 @@ import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/st
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { getSortedViews, getView } from 'components/common/BoardEditor/focalboard/src/store/views';
 import FocalBoardPortal from 'components/common/BoardEditor/FocalBoardPortal';
+import { usePage } from 'hooks/usePage';
 import { usePagePermissions } from 'hooks/usePagePermissions';
-import { usePages } from 'hooks/usePages';
 import debouncePromise from 'lib/utilities/debouncePromise';
 
 import type { CharmNodeViewProps } from '../../nodeView/nodeView';
@@ -97,13 +97,12 @@ export function InlineDatabase({ containerWidth, readOnly: readOnlyOverride, nod
   const views = useMemo(() => allViews.filter((view) => view.parentId === pageId), [pageId, allViews]);
   const [currentViewId, setCurrentViewId] = useState<string | null>(views[0]?.id || null);
   const currentView = useAppSelector(getView(currentViewId || '')) ?? undefined;
-  const { pages, updatePage } = usePages();
+  const { page: boardPage, updatePage } = usePage({ pageIdOrPath: pageId });
 
   const [shownCardId, setShownCardId] = useState<string | null>(null);
 
   const boards = useAppSelector(getSortedBoards);
   const board = boards.find((b) => b.id === pageId);
-  const boardPage = pages[pageId];
 
   const { permissions: currentPagePermissions } = usePagePermissions({ pageIdOrPath: pageId });
 
@@ -149,7 +148,7 @@ export function InlineDatabase({ containerWidth, readOnly: readOnlyOverride, nod
           readOnly={readOnly}
           readOnlySourceData={readOnlySourceData}
           board={board}
-          embeddedBoardPath={pages[pageId]?.path}
+          embeddedBoardPath={boardPage.path}
           setPage={debouncedPageUpdate}
           showCard={setShownCardId}
           activeView={currentView}
