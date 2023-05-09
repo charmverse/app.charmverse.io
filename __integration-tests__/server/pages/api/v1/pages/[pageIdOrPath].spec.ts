@@ -1,4 +1,4 @@
-import type { Page, Space, SpaceApiToken, User } from '@prisma/client';
+import type { Page, Space, SpaceApiToken, User } from '@charmverse/core/prisma';
 import request from 'supertest';
 
 import type { PublicApiPage } from 'lib/public-api/getPageApi';

@@ -1,5 +1,5 @@
+import type { PostCategoryPermissionLevel } from '@charmverse/core/prisma';
 import Grid from '@mui/material/Grid';
-import type { PostCategoryPermissionLevel } from '@prisma/client';
 import { useState } from 'react';
 
 import Button from 'components/common/Button';

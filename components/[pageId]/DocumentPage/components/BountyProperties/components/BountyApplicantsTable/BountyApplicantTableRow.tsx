@@ -4,6 +4,8 @@ import { Alert, Box, Collapse, IconButton, TableCell, TableRow, Tooltip, Typogra
 import { useState } from 'react';
 
 import charmClient from 'charmClient';
+import { BountyApplicantStatus } from 'components/[pageId]/DocumentPage/components/BountyProperties/components/BountyApplicantStatus';
+import { useRefreshApplicationStatus } from 'components/bounties/hooks/useRefreshApplicationStatus';
 import Button from 'components/common/Button';
 import Modal from 'components/common/Modal';
 import UserDisplay from 'components/common/UserDisplay';
@@ -18,7 +20,6 @@ import type { SystemError } from 'lib/utilities/errors';
 
 import ApplicationInput from '../BountyApplicantForm/components/ApplicationInput';
 import SubmissionInput from '../BountyApplicantForm/components/SubmissionInput';
-import BountyApplicantStatus from '../BountyApplicantStatus';
 
 import { ApplicationComments } from './ApplicationComments';
 import BountyApplicantActions from './BountyApplicantActions';
@@ -38,12 +39,13 @@ export default function BountyApplicantTableRow({
   submissionsCapReached,
   refreshSubmissions
 }: Props) {
-  const { members } = useMembers();
+  const { getMemberById } = useMembers();
   const { user } = useUser();
   const [isExpandedRow, setIsExpandedRow] = useState(false);
-  const member = members.find((c) => c.id === submission.createdBy);
+  const member = getMemberById(submission.createdBy);
   const { refreshBounty } = useBounties();
   const { formatDateTime } = useDateFormatter();
+  useRefreshApplicationStatus({ application: submission, onRefresh: refreshSubmissions });
 
   const [reviewDecision, setReviewDecision] = useState<SubmissionReview | null>(null);
   const [apiError, setApiError] = useState<SystemError | null>();
@@ -92,7 +94,18 @@ export default function BountyApplicantTableRow({
           <BountyApplicantStatus submission={submission} />
         </TableCell>
         <TableCell>{formatDateTime(submission.updatedAt)}</TableCell>
-        <TableCell>
+
+        <TableCell align='right'>
+          <BountyApplicantActions
+            bounty={bounty}
+            isExpanded={isExpandedRow}
+            submission={submission}
+            expandRow={() => setIsExpandedRow(true)}
+            refreshSubmissions={refreshSubmissions}
+          />
+        </TableCell>
+
+        <TableCell align='right'>
           <Tooltip title={isExpandedRow ? 'Hide details' : 'View details'}>
             <IconButton
               size='small'
@@ -103,15 +116,6 @@ export default function BountyApplicantTableRow({
               {!isExpandedRow ? <KeyboardArrowDownIcon fontSize='small' /> : <KeyboardArrowUpIcon fontSize='small' />}
             </IconButton>
           </Tooltip>
-        </TableCell>
-        <TableCell align='right'>
-          <BountyApplicantActions
-            bounty={bounty}
-            isExpanded={isExpandedRow}
-            submission={submission}
-            expandRow={() => setIsExpandedRow(true)}
-            refreshSubmissions={refreshSubmissions}
-          />
         </TableCell>
       </TableRow>
       <TableRow>
@@ -130,18 +134,7 @@ export default function BountyApplicantTableRow({
                     mode='update'
                   />
                   {showAcceptApplication && (
-                    <Box display='flex' gap={1} mb={3}>
-                      <Tooltip title={submissionsCapReached ? 'Submissions cap reached' : ''}>
-                        <Button
-                          disabled={submissionsCapReached}
-                          color='primary'
-                          onClick={() => {
-                            approveApplication(submission.id);
-                          }}
-                        >
-                          Accept application
-                        </Button>
-                      </Tooltip>
+                    <Box display='flex' gap={1} mb={3} justifyContent='flex-end'>
                       <Button
                         color='error'
                         variant='outlined'
@@ -156,6 +149,18 @@ export default function BountyApplicantTableRow({
                       >
                         Reject
                       </Button>
+
+                      <Tooltip title={submissionsCapReached ? 'Submissions cap reached' : ''}>
+                        <Button
+                          disabled={submissionsCapReached}
+                          color='primary'
+                          onClick={() => {
+                            approveApplication(submission.id);
+                          }}
+                        >
+                          Accept application
+                        </Button>
+                      </Tooltip>
                     </Box>
                   )}
                 </Box>

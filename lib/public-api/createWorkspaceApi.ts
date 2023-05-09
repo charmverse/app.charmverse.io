@@ -1,18 +1,20 @@
-import type { SuperApiToken } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { SuperApiToken, Space as PrismaSpace } from '@charmverse/core/prisma';
 
 import { baseUrl } from 'config/constants';
-import { prisma } from 'db';
 import { upsertSpaceRolesFromDiscord } from 'lib/discord/upsertSpaceRolesFromDiscord';
 import { upsertUserForDiscordId } from 'lib/discord/upsertUserForDiscordId';
 import { upsertUserRolesFromDiscord } from 'lib/discord/upsertUserRolesFromDiscord';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { updateTrackGroupProfile } from 'lib/metrics/mixpanel/updateTrackGroupProfile';
-import type { SpaceCreateInput } from 'lib/spaces/createWorkspace';
-import { createWorkspace } from 'lib/spaces/createWorkspace';
+import type { Space } from 'lib/public-api/interfaces';
+import type { SpaceCreateInput } from 'lib/spaces/createSpace';
+import { createWorkspace } from 'lib/spaces/createSpace';
 import { getAvailableDomainName } from 'lib/spaces/getAvailableDomainName';
 import { createUserFromWallet } from 'lib/users/createUser';
 import { InvalidInputError } from 'lib/utilities/errors';
 import { isValidUrl } from 'lib/utilities/isValidUrl';
+import { uid } from 'lib/utilities/strings';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 import { publishMemberEvent } from 'lib/webhookPublisher/publishEvent';
 
@@ -28,7 +30,8 @@ export async function createWorkspaceApi({
   xpsEngineId,
   avatar,
   superApiToken,
-  webhookUrl
+  webhookUrl,
+  template
 }: CreateWorkspaceRequestBody & { superApiToken?: SuperApiToken | null }): Promise<CreateWorkspaceResponseBody> {
   // Retrieve an id for the admin user
   const adminUserId = adminDiscordUserId
@@ -44,7 +47,8 @@ export async function createWorkspaceApi({
     data: {
       username: 'Bot',
       isBot: true,
-      identityType: 'RandomName'
+      identityType: 'RandomName',
+      path: uid()
     }
   });
 
@@ -67,8 +71,7 @@ export async function createWorkspaceApi({
     userId: adminUserId,
     webhookUrl,
     extraAdmins: [botUser.id],
-    // Create new spaces with NFT template by default
-    createSpaceOption: 'templateNftCommunity'
+    createSpaceTemplate: template ?? 'nft_community'
   });
 
   // create roles from discord
@@ -85,7 +88,7 @@ export async function createWorkspaceApi({
   trackUserAction('create_new_workspace', {
     userId: adminUserId,
     spaceId: space.id,
-    template: 'default',
+    template: template ?? 'nft_community',
     source: superApiToken?.name || 'charmverse_api'
   });
   updateTrackGroupProfile(space, superApiToken?.name);
@@ -97,8 +100,17 @@ export async function createWorkspaceApi({
   });
 
   return {
+    ...mapSpace(space),
+    webhookSigningSecret: space.webhookSigningSecret ?? undefined
+  };
+}
+
+export function mapSpace(space: PrismaSpace): Space {
+  return {
     id: space.id,
-    webhookSigningSecret: space.webhookSigningSecret ?? undefined,
+    createdAt: space.createdAt.toString(),
+    createdBy: space.createdBy,
+    name: space.name,
     spaceUrl: `${baseUrl}/${space.domain}`,
     joinUrl: `${baseUrl}/join?domain=${space.domain}`
   };

@@ -1,10 +1,15 @@
+import type { PostCategory } from '@charmverse/core/prisma';
+import type {
+  PostCategoryPermissionAssignment,
+  AssignedPostCategoryPermission,
+  PostCategoryPermissionFlags
+} from '@charmverse/core/shared';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import Grid from '@mui/material/Grid';
 import Switch from '@mui/material/Switch';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
-import type { PostCategory } from '@prisma/client';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import useSWR from 'swr';
 
@@ -14,11 +19,6 @@ import Loader from 'components/common/LoadingComponent';
 import Modal from 'components/common/Modal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useRoles } from 'hooks/useRoles';
-import type {
-  AssignedPostCategoryPermission,
-  AvailablePostCategoryPermissionFlags
-} from 'lib/permissions/forum/interfaces';
-import type { PostCategoryPermissionInput } from 'lib/permissions/forum/upsertPostCategoryPermission';
 
 import { PostCategoryPermissionsAddRoles } from './PostCategoryPermissionAddRolesDialog';
 import { PostCategoryRolePermissionRow } from './PostCategoryPermissionRow';
@@ -31,7 +31,7 @@ import type { BulkRolePostCategoryPermissionUpsert } from './shared';
  */
 type Props = {
   postCategory: PostCategory;
-  permissions: AvailablePostCategoryPermissionFlags;
+  permissions: PostCategoryPermissionFlags;
 };
 function PostCategoryPermissions({ postCategory, permissions }: Props) {
   const { data, mutate: mutatePermissions } = useSWR(
@@ -87,7 +87,7 @@ function PostCategoryPermissions({ postCategory, permissions }: Props) {
     mutatePermissions((list) => getMutatedPermissionsList(newPermissions, list));
   }
 
-  async function updatePermission(input: PostCategoryPermissionInput) {
+  async function updatePermission(input: PostCategoryPermissionAssignment) {
     const newPermission = await charmClient.permissions.forum.upsertPostCategoryPermission(input);
     mutatePermissions((list) => getMutatedPermissionsList([newPermission], list));
   }
@@ -120,11 +120,8 @@ function PostCategoryPermissions({ postCategory, permissions }: Props) {
     );
   }
 
-  const allSpaceMembersHaveAccess = mappedPermissions.space?.permissionLevel === 'full_access';
-  const canAddRoles =
-    !allSpaceMembersHaveAccess &&
-    permissions.manage_permissions &&
-    (roles?.length ?? 0) > mappedPermissions.roles.length;
+  const assignableRolesExist = (roles?.length ?? 0) > mappedPermissions.roles.length;
+  const canAddRoles = permissions.manage_permissions && assignableRolesExist;
 
   const publicPermission = mappedPermissions.public;
 
@@ -171,7 +168,7 @@ function PostCategoryPermissions({ postCategory, permissions }: Props) {
             updatePermission={updatePermission}
             postCategoryId={postCategory.id}
             existingPermissionId={mappedPermissions.space?.id}
-            defaultPermissionLevel={mappedPermissions.space?.permissionLevel}
+            permissionLevel={mappedPermissions?.space?.permissionLevel}
             assignee={{ group: 'space', id: space.id }}
           />
         </Grid>
@@ -183,7 +180,8 @@ function PostCategoryPermissions({ postCategory, permissions }: Props) {
               updatePermission={updatePermission}
               postCategoryId={postCategory.id}
               existingPermissionId={rolePermission.id}
-              defaultPermissionLevel={rolePermission.permissionLevel}
+              permissionLevel={rolePermission.permissionLevel}
+              defaultPermissionLevel={mappedPermissions.space?.permissionLevel}
               assignee={{ group: 'role', id: rolePermission.assignee.id }}
             />
           </Grid>
@@ -203,10 +201,10 @@ function PostCategoryPermissions({ postCategory, permissions }: Props) {
           {!addRolesDialog.isOpen ? (
             <Tooltip
               title={
-                allSpaceMembersHaveAccess
-                  ? 'All space members already have full access to this post category.'
+                !assignableRolesExist
+                  ? 'All available roles already have permissions in this post category.'
                   : !canAddRoles
-                  ? 'There are no roles available to add to this post category.'
+                  ? 'You cannot manage permissions for this category'
                   : ''
               }
             >

@@ -1,9 +1,9 @@
+import type { UserGnosisSafe } from '@charmverse/core/prisma';
 import { BigNumber } from '@ethersproject/bignumber';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import { Divider, Menu, MenuItem } from '@mui/material';
 import type { AlertColor } from '@mui/material/Alert';
 import Button from '@mui/material/Button';
-import type { UserGnosisSafe } from '@prisma/client';
 import ERC20ABI from 'abis/ERC20ABI.json';
 import { getChainById } from 'connectors';
 import type { Signer } from 'ethers';
@@ -13,7 +13,7 @@ import { useState } from 'react';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
-import { useGnosisPayment } from 'hooks/useGnosisPayment';
+import { getPaymentErrorMessage, useGnosisPayment } from 'hooks/useGnosisPayment';
 import { useMultiBountyPayment } from 'hooks/useMultiBountyPayment';
 import useMultiWalletSigs from 'hooks/useMultiWalletSigs';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
@@ -33,29 +33,8 @@ interface Props {
   tokenSymbolOrAddress: string;
   chainIdToUse: number;
   onSuccess?: (txId: string, chainId: number) => void;
-  onClick?: () => void;
   onError?: (err: string, severity?: AlertColor) => void;
   bounty: BountyWithDetails;
-}
-
-function extractWalletErrorMessage(error: any): string {
-  if (error?.code === 'INSUFFICIENT_FUNDS') {
-    return 'You do not have sufficient funds to perform this transaction';
-  } else if (error?.code === 4001) {
-    return 'You rejected the transaction';
-  } else if (error?.code === -32602) {
-    return 'A valid recipient must be provided';
-  } else if (error?.reason) {
-    return error.reason;
-  } else if (error?.message) {
-    return error.message;
-  } else if (typeof error === 'object') {
-    return JSON.stringify(error);
-  } else if (typeof error === 'string') {
-    return error;
-  } else {
-    return 'An unknown error occurred';
-  }
 }
 
 function SafeMenuItem({
@@ -71,12 +50,13 @@ function SafeMenuItem({
   onClick: () => void;
   onError: (err: string, severity?: AlertColor) => void;
 }) {
-  const { onPaymentSuccess, transactions } = useMultiBountyPayment({ bounties: [bounty] });
+  const { onPaymentSuccess, getTransactions } = useMultiBountyPayment({ bounties: [bounty] });
+
   const { makePayment } = useGnosisPayment({
     chainId: safeInfo.chainId,
     onSuccess: onPaymentSuccess,
     safeAddress: safeInfo.address,
-    transactions: transactions.map((getTransaction) => getTransaction(safeInfo.address))
+    transactions: getTransactions(safeInfo.address)
   });
 
   return (
@@ -87,16 +67,8 @@ function SafeMenuItem({
         try {
           await makePayment();
         } catch (error: any) {
-          const errorMessage = extractWalletErrorMessage(error);
-
-          if (errorMessage === 'underlying network changed') {
-            onError(
-              "You've changed your active network.\r\nRe-select 'Make payment' to complete this transaction",
-              'warning'
-            );
-          } else {
-            onError(errorMessage);
-          }
+          const { message, level } = getPaymentErrorMessage(error);
+          onError(message, level);
         }
       }}
     >
@@ -105,14 +77,13 @@ function SafeMenuItem({
   );
 }
 
-export default function BountyPaymentButton({
+export function BountyPaymentButton({
   receiver,
   bounty,
   amount,
   chainIdToUse,
   tokenSymbolOrAddress,
-  onSuccess = (tx: string, chainId: number) => {},
-  onClick = () => null,
+  onSuccess = () => {},
   onError = () => {}
 }: Props) {
   const { data: safesData } = useMultiWalletSigs();
@@ -145,21 +116,23 @@ export default function BountyPaymentButton({
 
   const makePayment = async () => {
     if (!chainIdToUse) {
-      onError('Please provide a chainId');
+      onError('Please set up a chain for this payment.');
       return;
     }
 
     const chainToUse = getChainById(chainIdToUse);
 
     if (!chainToUse) {
-      onError('This chain is not supported');
+      onError('Chain assigned to this payment is not supported.');
       return;
     }
 
     const currentUserChain = chainId ? getChainById(chainId) : undefined;
 
     if (!currentUserChain) {
-      onError('Could not detect your chain');
+      onError(
+        'Could not detect your chain. Please make sure you are connected to a supported network and your wallet is unlocked.'
+      );
       return;
     }
 
@@ -216,17 +189,9 @@ export default function BountyPaymentButton({
       } else {
         onError('Please provide a valid contract address');
       }
-    } catch (err: any) {
-      const errorMessage = extractWalletErrorMessage(err);
-
-      if (errorMessage === 'underlying network changed') {
-        onError(
-          "You've changed your active network.\r\nRe-select 'Make payment' to complete this transaction",
-          'warning'
-        );
-      } else {
-        onError(errorMessage);
-      }
+    } catch (error: any) {
+      const { message, level } = getPaymentErrorMessage(error);
+      onError(message, level);
     }
   };
 
@@ -240,7 +205,6 @@ export default function BountyPaymentButton({
         size='small'
         onClick={(e) => {
           if (!hasSafes) {
-            onClick();
             makePayment();
           } else {
             handleClick(e);
@@ -256,9 +220,8 @@ export default function BountyPaymentButton({
           </MenuItem>
           <MenuItem
             dense
-            onClick={() => {
-              onClick();
-              makePayment();
+            onClick={async () => {
+              await makePayment();
               handleClose();
             }}
           >
@@ -274,7 +237,6 @@ export default function BountyPaymentButton({
               bounty={bounty}
               label={safeDataRecord[safeInfo.address]?.name ?? shortenHex(safeInfo.address)}
               onClick={() => {
-                onClick();
                 handleClose();
               }}
               onError={onError}

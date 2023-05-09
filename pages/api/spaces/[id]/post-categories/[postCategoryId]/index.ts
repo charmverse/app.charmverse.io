@@ -1,12 +1,11 @@
+import type { PostCategoryWithPermissions } from '@charmverse/core';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { deletePostCategory } from 'lib/forums/categories/deletePostCategory';
 import { updatePostCategory } from 'lib/forums/categories/updatePostCategory';
-import { onError, onNoMatch, requireUser } from 'lib/middleware';
-import { computePostCategoryPermissions } from 'lib/permissions/forum/computePostCategoryPermissions';
-import type { PostCategoryWithPermissions } from 'lib/permissions/forum/interfaces';
-import { requestOperations } from 'lib/permissions/requestOperations';
+import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
+import { getPermissionsClient } from 'lib/permissions/api';
 import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -18,31 +17,39 @@ async function updatePostCategoryController(req: NextApiRequest, res: NextApiRes
 
   const userId = req.session.user.id;
 
-  await requestOperations({
-    resourceType: 'post_category',
-    operations: ['edit_category'],
-    resourceId: postCategoryId as string,
-    userId
-  });
-
-  const updatedPostCategory = await updatePostCategory(postCategoryId as string, req.body);
-
-  const permissions = await computePostCategoryPermissions({
+  const permissions = await getPermissionsClient({
     resourceId: postCategoryId,
-    userId
-  });
+    resourceIdType: 'postCategory'
+  }).then(({ forum }) =>
+    forum.computePostCategoryPermissions({
+      resourceId: postCategoryId,
+      userId
+    })
+  );
+
+  if (!permissions.edit_category) {
+    throw new ActionNotPermittedError(`You cannot edit this category`);
+  }
+  const updatedPostCategory = await updatePostCategory(postCategoryId as string, req.body);
 
   return res.status(200).json({ ...updatedPostCategory, permissions });
 }
 async function deletePostCategoryController(req: NextApiRequest, res: NextApiResponse) {
   const { postCategoryId } = req.query;
 
-  await requestOperations({
-    resourceType: 'post_category',
-    operations: ['delete_category'],
+  const permissions = await getPermissionsClient({
     resourceId: postCategoryId as string,
-    userId: req.session.user.id
-  });
+    resourceIdType: 'postCategory'
+  }).then(({ forum }) =>
+    forum.computePostCategoryPermissions({
+      resourceId: postCategoryId as string,
+      userId: req.session.user.id
+    })
+  );
+
+  if (!permissions.delete_category) {
+    throw new ActionNotPermittedError(`You cannot delete this forum category`);
+  }
 
   await deletePostCategory(postCategoryId as string);
 

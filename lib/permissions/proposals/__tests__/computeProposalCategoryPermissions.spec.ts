@@ -1,7 +1,7 @@
-import type { ProposalCategoryPermissionLevel, Space, User } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { ProposalCategoryPermissionLevel, Space, User } from '@charmverse/core/prisma';
 import { v4 } from 'uuid';
 
-import { prisma } from 'db';
 import { addSpaceOperations } from 'lib/permissions/spaces';
 import { ProposalCategoryNotFoundError } from 'lib/proposal/errors';
 import { InvalidInputError } from 'lib/utilities/errors';

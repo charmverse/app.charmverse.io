@@ -1,4 +1,4 @@
-import { SpaceOperation } from '@prisma/client';
+import { SpaceOperation } from '@charmverse/core/prisma';
 import request from 'supertest';
 
 import type { SpacePermissionFlags, SpacePermissionModification } from 'lib/permissions/spaces';

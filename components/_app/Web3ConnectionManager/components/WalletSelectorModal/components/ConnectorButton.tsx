@@ -14,11 +14,12 @@ const ButtonContent = styled.div`
   align-items: center;
   justify-content: space-between;
   width: 100%;
+  color: ${({ theme }) => theme.palette.text.primary};
 `;
 
 type Props = {
   name: string;
-  onClick: () => void;
+  onClick?: () => void;
   iconUrl?: string;
   icon?: ReactNode;
   disabled: boolean;
@@ -26,7 +27,7 @@ type Props = {
   isLoading: boolean;
 };
 
-export function ConnectorButton({ name, onClick, iconUrl, icon, disabled, isActive, isLoading }: Props) {
+export function ConnectorButton({ name, onClick, iconUrl, icon, disabled, isActive, isLoading, ...props }: Props) {
   return (
     <Button
       color='secondary'
@@ -42,6 +43,7 @@ export function ConnectorButton({ name, onClick, iconUrl, icon, disabled, isActi
         px: 4,
         py: 1.5
       }}
+      {...props}
     >
       <ButtonContent>
         {`${name} ${isActive ? ' - connected' : ''}`}

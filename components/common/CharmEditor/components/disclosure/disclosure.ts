@@ -3,7 +3,7 @@ import { createElement } from '@bangle.dev/core';
 import type { DOMOutputSpec } from '@bangle.dev/pm';
 import { Plugin, PluginKey, keymap } from '@bangle.dev/pm';
 
-import { backspaceCmd } from './commands';
+import { backspaceCmd, moveDownCmd } from './commands';
 
 export function spec() {
   return [summarySpec(), detailsSpec()];
@@ -50,8 +50,8 @@ export function plugins(): RawPlugins {
   return () => {
     return [
       keymap({
-        Backspace: backspaceCmd
-        // Enter: moveDownCmd
+        Backspace: backspaceCmd,
+        Enter: moveDownCmd
       }),
       ContainerPlugin({ type: 'disclosureSummary', contentDOM: ['summary'] }),
       ContainerPlugin({ type: 'disclosureDetails', contentDOM: ['div', { class: 'disclosure-details' }] })

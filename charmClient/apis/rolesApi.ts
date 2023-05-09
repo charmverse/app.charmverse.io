@@ -1,10 +1,11 @@
-import type { Role } from '@prisma/client';
+import type { Role } from '@charmverse/core/prisma';
 
 import * as http from 'adapters/http';
 import type { ListSpaceRolesResponse } from 'pages/api/roles';
+import type { CreateRoleInput } from 'pages/api/roles/index';
 
 export class RolesApi {
-  createRole(role: Partial<Role>): Promise<Role> {
+  createRole(role: CreateRoleInput): Promise<Role> {
     return http.POST('/api/roles', role);
   }
 

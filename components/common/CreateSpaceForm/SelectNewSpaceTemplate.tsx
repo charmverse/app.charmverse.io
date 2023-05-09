@@ -7,7 +7,7 @@ import { MdOutlineBuild } from 'react-icons/md';
 import { SiHackthebox, SiNotion } from 'react-icons/si';
 import { SlBadge, SlTrophy } from 'react-icons/sl';
 
-import { spaceContentTemplates } from 'lib/spaces/config';
+import { spaceInternalTemplateMapping, spaceTemplateLabelMapping } from 'lib/spaces/config';
 import type { SpaceCreateTemplate, SpaceTemplateType } from 'lib/spaces/config';
 import { typedKeys } from 'lib/utilities/objects';
 import NounsIcon from 'public/images/logos/noggles/noggles.svg';
@@ -22,35 +22,31 @@ const fontSize = 24;
 
 const ScrollContainer = styled.div`
   overflow: auto;
-  max-height: calc(100vh - 250px);
+  max-height: 40vh;
 
-  ${({ theme }) => theme.breakpoints.up('md')} {
-    overflow: auto;
-    max-height: 40vh;
-    // account for padding from the modal container
-    padding: 0 32px;
-    margin: 0 -32px;
-  }
+  // account for padding from the scrollbar
+  padding: 0 32px;
+  margin: 0 -32px;
 `;
 
 const templateIcon: Record<SpaceTemplateType, React.ReactNode> = {
-  templateCreator: <EmojiObjectsIcon htmlColor='var(--secondary-text)' sx={{ fontSize }} />,
-  templateNftCommunity: <SlBadge color='var(--secondary-text)' size={fontSize} />,
-  templateHackathon: <SlTrophy color='var(--secondary-text)' size={fontSize} />,
-  templateNounishDAO: <SvgIcon component={NounsIcon} inheritViewBox />, // <SiHackthebox color='var(--secondary-text)' size={fontSize} />,
-  templateImpactCommunity: <SiHackthebox color='var(--secondary-text)' size={fontSize} />
+  creator: <EmojiObjectsIcon htmlColor='var(--primary-color)' sx={{ fontSize }} />,
+  nft_community: <SlBadge color='var(--primary-color)' size={fontSize} />,
+  hackathon: <SlTrophy color='var(--primary-color)' size={fontSize} />,
+  nounish_dao: <SvgIcon component={NounsIcon} sx={{ color: 'var(--primary-color)' }} inheritViewBox />,
+  impact_community: <SiHackthebox color='var(--primary-color)' size={fontSize} />
 };
 
 export function SelectNewSpaceTemplate({ onSelect }: SelectNewSpaceTemplateProps) {
   return (
-    <ScrollContainer>
+    <ScrollContainer className='space-templates-container'>
       <Grid container spacing={2} flexDirection='column'>
         <Grid item>
           <TemplateOption
             onClick={() => onSelect('default')}
             label='Create my own'
             data-test='space-template-default'
-            icon={<MdOutlineBuild color='var(--secondary-text)' size={fontSize} />}
+            icon={<MdOutlineBuild color='var(--primary-color)' size={fontSize} />}
           />
         </Grid>
         <Grid item>
@@ -59,12 +55,12 @@ export function SelectNewSpaceTemplate({ onSelect }: SelectNewSpaceTemplateProps
           </Typography>
         </Grid>
 
-        {typedKeys(spaceContentTemplates).map((template) => (
+        {typedKeys(spaceInternalTemplateMapping).map((template) => (
           <Grid item key={template}>
             <TemplateOption
               data-test={`space-template-${template}`}
               onClick={() => onSelect(template)}
-              label={spaceContentTemplates[template]}
+              label={spaceTemplateLabelMapping[spaceInternalTemplateMapping[template]]}
               icon={templateIcon[template]}
             />
           </Grid>
@@ -80,7 +76,7 @@ export function SelectNewSpaceTemplate({ onSelect }: SelectNewSpaceTemplateProps
             data-test='space-template-importNotion'
             onClick={() => onSelect('importNotion')}
             label='Import from Notion'
-            icon={<SiNotion color='var(--secondary-text)' size={fontSize} />}
+            icon={<SiNotion color='var(--primary-color)' size={fontSize} />}
           />
         </Grid>
 
@@ -89,7 +85,7 @@ export function SelectNewSpaceTemplate({ onSelect }: SelectNewSpaceTemplateProps
             data-test='space-template-importMarkdown'
             onClick={() => onSelect('importMarkdown')}
             label='Import from Markdown'
-            icon={<DriveFolderUploadIcon color='secondary' sx={{ fontSize }} />}
+            icon={<DriveFolderUploadIcon color='primary' sx={{ fontSize }} />}
           />
         </Grid>
       </Grid>

@@ -8,6 +8,7 @@ import type { BoardView, ISortOption, KanbanCalculationFields } from 'lib/focalb
 import { createBoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
 import { createCard } from 'lib/focalboard/card';
+import type { FilterClause } from 'lib/focalboard/filterClause';
 import type { FilterGroup } from 'lib/focalboard/filterGroup';
 import type { PageMeta } from 'lib/pages';
 import type { PageContent } from 'lib/prosemirror/interfaces';
@@ -15,7 +16,7 @@ import type { PageContent } from 'lib/prosemirror/interfaces';
 import { publishIncrementalUpdate } from '../../publisher';
 
 import { Constants } from './constants';
-import octoClient, { OctoClient } from './octoClient';
+import octoClient from './octoClient';
 import { OctoUtils } from './octoUtils';
 import undoManager from './undomanager';
 import { IDType, Utils } from './utils';
@@ -170,6 +171,26 @@ class Mutator {
         await afterUndo?.();
       },
       actualDescription,
+      this.undoGroupId
+    );
+  }
+
+  async deleteBlocks(
+    blockIds: string[],
+    description = 'delete blocks',
+    beforeRedo?: () => Promise<void>,
+    afterUndo?: () => Promise<void>
+  ) {
+    await undoManager.perform(
+      async () => {
+        await beforeRedo?.();
+        await charmClient.deleteBlocks(blockIds, publishIncrementalUpdate);
+      },
+      async () => {
+        // await charmClient.insertBlock(block, publishIncrementalUpdate)
+        await afterUndo?.();
+      },
+      description,
       this.undoGroupId
     );
   }
@@ -573,7 +594,8 @@ class Mutator {
     cards: Card[],
     propertyTemplate: IPropertyTemplate,
     newType: PropertyType,
-    newName: string
+    newName: string,
+    views: BoardView[]
   ) {
     const titleProperty: IPropertyTemplate = { id: Constants.titleColumnId, name: 'Title', type: 'text', options: [] };
     if (propertyTemplate.type === newType && propertyTemplate.name === newName) {
@@ -658,6 +680,17 @@ class Mutator {
     }
 
     await this.updateBlocks(newBlocks, oldBlocks, 'change property type and name');
+    for (const view of views) {
+      const affectedFilters = view.fields.filter.filters.filter(
+        (filter) => (filter as FilterClause).propertyId !== propertyTemplate.id
+      );
+      if (affectedFilters.length !== view.fields.filter.filters.length) {
+        await this.changeViewFilter(view.id, view.fields.filter, {
+          operation: 'and',
+          filters: affectedFilters
+        });
+      }
+    }
   }
 
   // Views
@@ -857,6 +890,39 @@ class Mutator {
     );
   }
 
+  async toggleColumnWrap(
+    viewId: string,
+    templateId: string,
+    currentColumnWrappedIds: string[],
+    description = 'toggle column wrap'
+  ): Promise<void> {
+    const currentColumnWrap = currentColumnWrappedIds.includes(templateId);
+    await undoManager.perform(
+      async () => {
+        await charmClient.patchBlock(
+          viewId,
+          {
+            updatedFields: {
+              columnWrappedIds: currentColumnWrap
+                ? currentColumnWrappedIds.filter((currentColumnWrappedId) => currentColumnWrappedId !== templateId)
+                : [...currentColumnWrappedIds, templateId]
+            }
+          },
+          publishIncrementalUpdate
+        );
+      },
+      async () => {
+        await charmClient.patchBlock(
+          viewId,
+          { updatedFields: { columnWrappedIds: currentColumnWrappedIds } },
+          publishIncrementalUpdate
+        );
+      },
+      description,
+      this.undoGroupId
+    );
+  }
+
   async hideViewColumn(view: BoardView, columnOptionId: string): Promise<void> {
     if (view.fields.hiddenOptionIds.includes(columnOptionId)) {
       return;
@@ -912,7 +978,7 @@ class Mutator {
     beforeUndo?: () => Promise<void>;
   }): Promise<[Block[], string]> {
     const blocks = await charmClient.getSubtree(cardId, 2);
-    const pageDetails = await charmClient.pages.getPageDetails(cardId);
+    const pageDetails = await charmClient.pages.getPage(cardId);
     const [newBlocks1, newCard] = OctoUtils.duplicateBlockTree(blocks, cardId) as [
       Block[],
       Card,

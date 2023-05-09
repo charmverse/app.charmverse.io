@@ -1,11 +1,10 @@
+import type { ProposalCategoryPermissionLevel } from '@charmverse/core/prisma';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import type { ProposalCategoryPermissionLevel } from '@prisma/client';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 import LoadingComponent from 'components/common/LoadingComponent';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useRoles } from 'hooks/useRoles';
 import type { TargetPermissionGroup } from 'lib/permissions/interfaces';
 
@@ -25,10 +24,10 @@ export function ProposalPagePermissions({ proposalId }: Props) {
     charmClient.proposals.getProposal(proposalId)
   );
   const { data: proposalCategoryPermissions } = useSWR(
-    !proposal ? null : `/proposals/list-proposal-category-permissions-${proposal!.categoryId}`,
+    !proposal ? null : `/proposals/list-proposal-category-permissions-${proposal.categoryId}`,
     () => charmClient.permissions.proposals.listProposalCategoryPermissions(proposal!.categoryId as string)
   );
-  const space = useCurrentSpace();
+
   const { roles } = useRoles();
 
   const spaceLevelPermission = proposalCategoryPermissions?.find((permission) => permission.assignee.group === 'space');
@@ -57,7 +56,7 @@ export function ProposalPagePermissions({ proposalId }: Props) {
           </div>
         </Box>
         <Box display='flex' justifyContent='space-between' alignItems='center'>
-          <Typography variant='body2'>Everyone at {space?.name}</Typography>
+          <Typography variant='body2'>Default permissions</Typography>
           <div style={{ width: '160px', textAlign: 'right' }}>
             <Typography color='secondary' variant='caption'>
               {spaceLevelPermission ? userFriendlyPermissionLabels[spaceLevelPermission.permissionLevel] : 'No access'}

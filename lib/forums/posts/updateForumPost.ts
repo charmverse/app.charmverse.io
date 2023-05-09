@@ -1,15 +1,15 @@
-import type { Post, Prisma } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { Post, Prisma } from '@charmverse/core/prisma';
 
-import { prisma } from 'db';
 import { InsecureOperationError, UndesirableOperationError } from 'lib/utilities/errors';
 
 import { PostNotFoundError } from './errors';
 
-export type UpdateForumPostInput = Partial<Pick<Post, 'content' | 'contentText' | 'title' | 'categoryId'>>;
+export type UpdateForumPostInput = Partial<Pick<Post, 'content' | 'contentText' | 'title' | 'categoryId' | 'isDraft'>>;
 
 export async function updateForumPost(
   postId: string,
-  { content, contentText, categoryId, title }: UpdateForumPostInput
+  { content, contentText, categoryId, title, isDraft }: UpdateForumPostInput
 ): Promise<Post> {
   const post = await prisma.post.findUnique({
     where: {
@@ -52,6 +52,7 @@ export async function updateForumPost(
       title,
       content: content as Prisma.InputJsonObject,
       contentText,
+      isDraft,
       category: !categoryId
         ? undefined
         : {

@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import type { Page, Space, SpaceApiToken, User } from '@prisma/client';
+import type { Page, Space, SpaceApiToken, User } from '@charmverse/core/prisma';
 import request from 'supertest';
 import { v4 } from 'uuid';
 

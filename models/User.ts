@@ -10,7 +10,7 @@ import type {
   UserNotificationState,
   UserWallet,
   VerifiedEmail
-} from '@prisma/client';
+} from '@charmverse/core/prisma';
 
 interface NestedMemberships {
   spaceRoleToRole: (SpaceRoleToRole & { role: RoleMembership })[];
@@ -19,7 +19,7 @@ interface NestedMemberships {
 export interface LoggedInUser extends User {
   favorites: { pageId: string; index?: number }[];
   spaceRoles: (SpaceRole & NestedMemberships)[];
-  wallets: Pick<UserWallet, 'address' | 'ensname'>[];
+  wallets: Pick<UserWallet, 'address' | 'ensname' | 'id'>[];
   unstoppableDomains: Pick<UnstoppableDomain, 'domain'>[];
   googleAccounts: Pick<GoogleAccount, 'email' | 'name'>[];
   verifiedEmails: Pick<VerifiedEmail, 'email' | 'name'>[];

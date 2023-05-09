@@ -1,6 +1,6 @@
+import type { Page } from '@charmverse/core/prisma';
 import ExpandMoreIcon from '@mui/icons-material/ArrowDropDown'; // ExpandMore
 import ChevronRightIcon from '@mui/icons-material/ArrowRight'; // ChevronRight
-import type { Page } from '@prisma/client';
 import { useRouter } from 'next/router';
 import type { SyntheticEvent } from 'react';
 import { memo, useCallback, useEffect, useMemo } from 'react';
@@ -15,24 +15,48 @@ import { usePageFromPath } from 'hooks/usePageFromPath';
 import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
-import type { IPageWithPermissions, NewPageInput, PageMeta, PageNodeWithChildren } from 'lib/pages';
+import type { IPageWithPermissions, NewPageInput, PageMeta, PageNodeWithChildren, PagesMap } from 'lib/pages';
 import { addPageAndRedirect } from 'lib/pages';
+import { findParentOfType } from 'lib/pages/findParentOfType';
 import { isParentNode, mapPageTree, sortNodes } from 'lib/pages/mapPageTree';
 import { isTruthy } from 'lib/utilities/types';
 
 import type { MenuNode, ParentMenuNode } from './components/TreeNode';
 import TreeNode from './components/TreeNode';
 
-export function filterVisiblePages(pages: (PageMeta | undefined)[], rootPageIds: string[] = []) {
-  return pages.filter((page): page is IPageWithPermissions =>
-    isTruthy(
-      page &&
-        (page.type === 'board' ||
-          page.type === 'page' ||
-          page.type === 'linked_board' ||
-          rootPageIds?.includes(page.id))
+function mapPageToMenuNode(page: IPageWithPermissions): MenuNode {
+  return {
+    id: page.id,
+    title: page.title,
+    icon: page.icon,
+    index: page.index,
+    isEmptyContent: !page.hasContent,
+    parentId: page.parentId,
+    path: page.path,
+    type: page.type,
+    createdAt: page.createdAt,
+    deletedAt: page.deletedAt,
+    spaceId: page.spaceId
+  };
+}
+
+export function filterVisiblePages(pageMap: PagesMap<PageMeta>, rootPageIds: string[] = []): MenuNode[] {
+  return Object.values(pageMap)
+    .filter((page): page is IPageWithPermissions =>
+      isTruthy(
+        page &&
+          (page.type === 'board' ||
+            page.type === 'page' ||
+            page.type === 'linked_board' ||
+            rootPageIds?.includes(page.id)) &&
+          !findParentOfType({
+            pageId: page.id,
+            pageType: 'card',
+            pageMap
+          })
+      )
     )
-  );
+    .map(mapPageToMenuNode);
 }
 
 type PageNavigationProps = {
@@ -53,21 +77,11 @@ function PageNavigation({ deletePage, isFavorites, rootPageIds, onClick }: PageN
   const { showMessage } = useSnackbar();
   const { reorderFavorites } = useFavoritePages();
 
-  const pagesArray: MenuNode[] = filterVisiblePages(Object.values(pages)).map(
-    (page): MenuNode => ({
-      id: page.id,
-      title: page.title,
-      icon: page.icon,
-      index: page.index,
-      isEmptyContent: !page.hasContent,
-      parentId: page.parentId,
-      path: page.path,
-      type: page.type,
-      createdAt: page.createdAt,
-      deletedAt: page.deletedAt,
-      spaceId: page.spaceId
-    })
-  );
+  const pagesArray: MenuNode[] = isFavorites
+    ? Object.values(pages)
+        .filter((page): page is IPageWithPermissions => isTruthy(page))
+        .map(mapPageToMenuNode)
+    : filterVisiblePages(pages);
 
   const currentPageId = currentPage?.id ?? '';
 

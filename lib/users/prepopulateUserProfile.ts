@@ -1,8 +1,9 @@
-import type { User } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import { log } from '@charmverse/core/log';
+import type { User, UserWallet } from '@charmverse/core/prisma';
+import { uniqBy } from 'lodash';
 
-import { prisma } from 'db';
 import { getENSDetails } from 'lib/blockchain';
-import log from 'lib/log';
 import { getUserNFTs } from 'lib/profile/getUserNFTs';
 import { updateProfileAvatar } from 'lib/profile/updateProfileAvatar';
 
@@ -73,13 +74,16 @@ export async function prepopulateUserProfile(user: User, ens: string | null) {
               break;
             }
           } catch (error) {
-            log.error('Failed to save nft avatar', { error, url: nft.image, userId: user.id });
+            log.warn('Failed to save nft avatar', { error, url: nft.image, userId: user.id });
           }
         }
       }
     }
 
-    const fiveNFTs = nfts.filter((nft) => !!nft.id).slice(0, 5);
+    const fiveNFTs = uniqBy(
+      nfts.filter((nft) => !!nft.id),
+      'id'
+    ).slice(0, 5);
 
     await Promise.all(
       fiveNFTs.map((nft) =>
@@ -89,7 +93,9 @@ export async function prepopulateUserProfile(user: User, ens: string | null) {
             userId: user.id,
             isHidden: true,
             isPinned: true,
-            type: 'nft'
+            type: 'nft',
+            // Use the first wallet id when prepopulating the nft profile items
+            walletId: nft.walletId
           }
         })
       )

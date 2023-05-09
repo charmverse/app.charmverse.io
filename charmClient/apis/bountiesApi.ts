@@ -1,4 +1,4 @@
-import type { Application, PageComment, Space } from '@prisma/client';
+import type { Application, PageComment, Space } from '@charmverse/core/prisma';
 
 import * as http from 'adapters/http';
 import type {
@@ -41,10 +41,6 @@ export class BountiesApi {
 
   getBounty(bountyId: string): Promise<BountyWithDetails> {
     return http.GET<BountyWithDetails>(`/api/bounties/${bountyId}`);
-  }
-
-  deleteBounty(bountyId: string): Promise<any> {
-    return http.DELETE(`/api/bounties/${bountyId}`);
   }
 
   updateBounty({ bountyId, updateContent }: BountyUpdate): Promise<BountyWithDetails> {
@@ -103,7 +99,7 @@ export class BountiesApi {
     return http.POST<Application>(`/api/submissions/${submissionId}/mark-as-paid`);
   }
 
-  recordTransaction(data: TransactionCreationData) {
+  recordTransaction(data: TransactionCreationData & { isMultisig?: boolean }) {
     return http.POST('/api/transactions', data);
   }
 
@@ -127,5 +123,9 @@ export class BountiesApi {
 
   getApplicationComments(applicationId: string) {
     return http.GET<PageComment[]>(`/api/applications/${applicationId}/comments`);
+  }
+
+  refreshApplicationStatus(applicationId: string) {
+    return http.GET<Application>(`/api/applications/${applicationId}/refresh-status`);
   }
 }

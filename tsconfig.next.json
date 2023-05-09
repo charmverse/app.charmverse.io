@@ -1,0 +1,21 @@
+{
+  "extends": "./tsconfig.json",
+  "exclude": [
+    "node_modules",
+    "__e2e__"
+  ],
+  "compilerOptions": {
+    "jsx": "preserve",
+    "paths": {
+      "@charmverse/core/prisma": [
+        "node_modules/@charmverse/core/dist/esm/prisma"
+      ],
+      "@charmverse/core/shared": [
+        "node_modules/@charmverse/core/dist/esm/shared"
+      ],
+      "@charmverse/core/log": [
+        "node_modules/@charmverse/core/dist/esm/lib/log",
+      ]
+    }
+  }
+}

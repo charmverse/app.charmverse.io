@@ -1,9 +1,16 @@
-import { prisma } from 'db';
+import { prisma } from '@charmverse/core';
+
+import { refreshPaymentStatus } from 'lib/applications/actions/refreshPaymentStatus';
 import { DataNotFoundError } from 'lib/utilities/errors';
 
 import type { TransactionCreationData } from './interface';
 
-export async function createTransaction({ applicationId, chainId, transactionId }: TransactionCreationData) {
+export async function createTransaction({
+  applicationId,
+  chainId,
+  transactionId,
+  isMultisig
+}: TransactionCreationData & { isMultisig?: boolean }) {
   const application = await prisma.application.findUnique({
     where: {
       id: applicationId
@@ -14,7 +21,7 @@ export async function createTransaction({ applicationId, chainId, transactionId 
     throw new DataNotFoundError(`Application with id ${applicationId} not found`);
   }
 
-  return prisma.transaction.create({
+  const tx = await prisma.transaction.create({
     data: {
       chainId,
       transactionId,
@@ -25,4 +32,10 @@ export async function createTransaction({ applicationId, chainId, transactionId 
       }
     }
   });
+
+  if (isMultisig) {
+    await refreshPaymentStatus(applicationId);
+  }
+
+  return tx;
 }

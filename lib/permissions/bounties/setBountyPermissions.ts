@@ -1,6 +1,9 @@
-import { BountyPermissionLevel } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { Prisma } from '@charmverse/core/prisma';
+import { BountyPermissionLevel } from '@charmverse/core/prisma';
 
 import { getBountyOrThrow } from 'lib/bounties/getBounty';
+import { InvalidInputError } from 'lib/utilities/errors';
 
 import { typedKeys } from '../../utilities/objects';
 import type { TargetPermissionGroup } from '../interfaces';
@@ -26,7 +29,11 @@ export async function setBountyPermissions({
   bountyId,
   permissionsToAssign
 }: BulkBountyPermissionAssignment): Promise<BountyPermissions> {
-  await getBountyOrThrow(bountyId);
+  if (!bountyId) {
+    throw new InvalidInputError(`Please provide a valid bounty id`);
+  }
+
+  const bounty = await getBountyOrThrow(bountyId);
 
   const toAssign: Omit<BountyPermissionAssignment, 'resourceId'>[] =
     permissionsToAssign instanceof Array
@@ -45,65 +52,37 @@ export async function setBountyPermissions({
           return generatedAssignments;
         }, [] as Omit<BountyPermissionAssignment, 'resourceId'>[]);
 
-  const permissions = await queryBountyPermissions({ bountyId });
+  // If there are no submitters (which means we didn't select roles to submit) then the space should be allowed to submit
+  if (!toAssign.some((assignment) => assignment.level === 'submitter')) {
+    toAssign.push({
+      level: 'submitter',
+      assignee: {
+        group: 'space',
+        id: bounty.spaceId
+      }
+    });
+  }
 
-  const toDelete: BountyPermissionAssignment[] = [];
-
-  const toAdd: BountyPermissionAssignment[] = [];
-
-  typedKeys(BountyPermissionLevel).forEach((permissionLevel) => {
-    const oldAssignees = permissions?.[permissionLevel] ?? [];
-    const currentAssignees = toAssign.filter((assignment) => assignment.level === permissionLevel);
-
-    const assigneesToRemove = oldAssignees
-      .filter((assignee) => {
-        return (
-          currentAssignees.find(
-            (a) =>
-              a.assignee.group === assignee.group &&
-              (a.assignee as BountyPermissionGroup).id === (assignee as BountyPermissionGroup).id
-          ) === undefined
-        );
+  await prisma.$transaction(async (tx) => {
+    await tx.bountyPermission.deleteMany({
+      where: {
+        bountyId
+      }
+    });
+    await tx.bountyPermission.createMany({
+      data: toAssign.map((assignment) => {
+        const input: Prisma.BountyPermissionCreateManyInput = {
+          permissionLevel: assignment.level,
+          bountyId,
+          public: assignment.assignee.group === 'public' ? true : undefined,
+          userId: assignment.assignee.group === 'user' ? assignment.assignee.id : undefined,
+          roleId: assignment.assignee.group === 'role' ? assignment.assignee.id : undefined,
+          spaceId: assignment.assignee.group === 'space' ? assignment.assignee.id : undefined
+        };
+        return input;
       })
-      .map((a) => {
-        return {
-          assignee: a,
-          level: permissionLevel,
-          resourceId: bountyId
-        } as BountyPermissionAssignment;
-      });
-
-    toDelete.push(...assigneesToRemove);
+    });
   });
-
-  toAssign.forEach((perm) => {
-    const existingSamePermissionsGroups = permissions[perm.level];
-    if (
-      existingSamePermissionsGroups.find(
-        (p) =>
-          p.group === perm.assignee.group &&
-          (perm.assignee as BountyPermissionGroup).id === (p as BountyPermissionGroup).id
-      ) === undefined
-    ) {
-      toAdd.push({
-        assignee: perm.assignee,
-        level: perm.level,
-        resourceId: bountyId
-      });
-    }
-  });
-
-  await Promise.all(
-    toAdd.map((assignment) => {
-      return addBountyPermissionGroup(assignment);
-    })
-  );
-
-  await Promise.all(
-    toDelete.map((assignment) => {
-      return removeBountyPermissionGroup(assignment);
-    })
-  );
 
   return queryBountyPermissions({ bountyId });
 }

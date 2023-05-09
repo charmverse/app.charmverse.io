@@ -38,12 +38,6 @@ function UserDescription(props: UserDescriptionProps) {
     resolver: yupResolver(schema)
   });
 
-  useEffect(() => {
-    if (currentDescription && currentDescription !== watch('description')) {
-      setValue('description', currentDescription || '');
-    }
-  }, [currentDescription]);
-
   const onSave = useCallback(
     debounce(async (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
       if (!readOnly) {

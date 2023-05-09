@@ -1,4 +1,5 @@
-import type { Space } from '@prisma/client';
+import { log } from '@charmverse/core/log';
+import type { Space } from '@charmverse/core/prisma';
 import { useRouter } from 'next/router';
 import { useContext, useEffect, useState } from 'react';
 
@@ -9,12 +10,10 @@ import { LoginPageContent } from 'components/login';
 import Footer from 'components/login/Footer';
 import { getKey } from 'hooks/useLocalStorage';
 import { usePageTitle } from 'hooks/usePageTitle';
-import type { PathProps } from 'hooks/useSettingsDialog';
 import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
 import { AUTH_CODE_COOKIE } from 'lib/discord/constants';
-import log from 'lib/log';
 import { isSpaceDomain } from 'lib/spaces/utils';
 import { deleteCookie, getCookie } from 'lib/utilities/browser';
 
@@ -39,8 +38,8 @@ export default function LoginPage() {
       router.push(returnUrl);
     } else if (spaces.length === 0 && !isSpaceDomain(returnUrl?.replaceAll('/', ''))) {
       // Note that a user logging in will be redirected to /signup, because the 'user' and 'spaces' are loaded async after the wallet address appears.
-      log.info('Redirect user to signup');
-      router.push('/signup');
+      log.info('Redirect user to create a space');
+      router.push('/createSpace');
       // send to signup for users without a workspace unless they are being redirected to an existing workspace
     } else if (returnUrl) {
       log.info('Redirect user to given url');
@@ -53,18 +52,21 @@ export default function LoginPage() {
   }
 
   useEffect(() => {
-    const task = router.query.task;
     const account = router.query.account;
 
     if (!isSettingsDialogOpen && router.isReady) {
-      if (task) {
-        openSettingsModal('notifications', { taskType: task } as PathProps);
-      }
       if (account) {
         openSettingsModal('account');
       }
     }
-  }, [isSettingsDialogOpen, router.isReady, router.query.task, router.query.account]);
+  }, [
+    isSettingsDialogOpen,
+    router.isReady,
+    router.query.task,
+    router.query.account,
+    router.query.notifications,
+    openSettingsModal
+  ]);
 
   useEffect(() => {
     setTitleState('Welcome');

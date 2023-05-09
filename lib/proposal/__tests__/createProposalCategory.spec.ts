@@ -1,6 +1,6 @@
-import type { ProposalCategoryPermission } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { ProposalCategoryPermission } from '@charmverse/core/prisma';
 
-import { prisma } from 'db';
 import { generateUserAndSpace } from 'testing/setupDatabase';
 
 import type { CreateProposalCategoryInput } from '../createProposalCategory';

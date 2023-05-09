@@ -1,10 +1,10 @@
+import { log } from '@charmverse/core/log';
 import cron from 'node-cron';
-
-import log from 'lib/log';
 
 import app from './server/app';
 import { task as archiveTask } from './tasks/deleteArchivedPages';
 import { task as processWebhookMessages } from './tasks/processWebhookMessages';
+import { refreshBountyApplications } from './tasks/refreshBountyApplications/task';
 import { task as notificationTask } from './tasks/sendNotifications';
 import { task as proposalTask } from './tasks/updateProposalStatus';
 import { task as voteTask } from './tasks/updateVotesStatus';
@@ -29,6 +29,9 @@ cron.schedule('*/15 * * * *', proposalTask);
 
 // Verify token gates and remove users who no longer meet the conditions
 cron.schedule('*/30 * * * *', verifyTokenGateMembershipsTask);
+
+// Refresh applications with pending payments
+cron.schedule('*/30 * * * *', refreshBountyApplications);
 
 const port = process.env.PORT || 4000;
 

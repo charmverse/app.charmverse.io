@@ -1,7 +1,7 @@
-import type { Prisma, Space } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { Prisma, Space } from '@charmverse/core/prisma';
 import { v4, validate } from 'uuid';
 
-import { prisma } from 'db';
 import type { PageNodeWithChildren, PageNodeWithPermissions } from 'lib/pages';
 import { multiResolvePageTree } from 'lib/pages/server/resolvePageTree';
 import { hasSameOrMorePermissions } from 'lib/permissions/pages';
@@ -170,7 +170,7 @@ export async function togglePublicBounties({ spaceId, publicBountyBoard }: Publi
 
     return spaceAfterUpdate;
   } catch (error) {
-    if ((error as Prisma.PrismaClientKnownRequestError).code === 'P2025') {
+    if ((error as any).code === 'P2025') {
       throw new DataNotFoundError('Space not found.');
     }
     throw error;

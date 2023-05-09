@@ -4,7 +4,7 @@ import charmClient from 'charmClient';
 
 export const initialLoad = createAsyncThunk('initialLoad', async ({ spaceId }: { spaceId: string }) => {
   const [workspaceUsers, blocks] = await Promise.all([
-    charmClient.getWorkspaceUsers(spaceId),
+    charmClient.members.getWorkspaceUsers(spaceId),
     charmClient.getAllBlocks(spaceId)
   ]);
 

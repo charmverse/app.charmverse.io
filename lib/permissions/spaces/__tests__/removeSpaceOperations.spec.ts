@@ -1,10 +1,11 @@
-import type { Space, SpaceOperation, SpacePermission } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { Space, SpaceOperation, SpacePermission } from '@charmverse/core/prisma';
 import { v4 } from 'uuid';
 
-import { prisma } from 'db';
 import { generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 import { addSpaceOperations } from '../addSpaceOperations';
+import { computeGroupSpacePermissions } from '../computeGroupSpacePermissions';
 import { removeSpaceOperations } from '../removeSpaceOperations';
 
 let space: Space;
@@ -88,10 +89,15 @@ describe('removeSpaceOperations', () => {
       userId: extraUser.id
     });
 
-    const result = await removeSpaceOperations({
+    await removeSpaceOperations({
       forSpaceId: space.id,
       operations: ['createPage'],
       userId: extraUser.id
+    });
+    const result = await computeGroupSpacePermissions({
+      resourceId: space.id,
+      group: 'user',
+      id: extraUser.id
     });
 
     expect(result.createPage).toBe(false);
@@ -109,16 +115,26 @@ describe('removeSpaceOperations', () => {
       userId: extraUser.id
     });
 
-    const initialResult = await removeSpaceOperations({
+    await removeSpaceOperations({
       forSpaceId: space.id,
       operations: ['createPage'],
       userId: extraUser.id
     });
+    const initialResult = await computeGroupSpacePermissions({
+      resourceId: space.id,
+      group: 'user',
+      id: extraUser.id
+    });
 
-    const duplicateDeleteResult = await removeSpaceOperations({
+    await removeSpaceOperations({
       forSpaceId: space.id,
       operations: ['createPage'],
       userId: extraUser.id
+    });
+    const duplicateDeleteResult = await computeGroupSpacePermissions({
+      resourceId: space.id,
+      group: 'user',
+      id: extraUser.id
     });
 
     (Object.keys(initialResult) as SpaceOperation[]).forEach((op) => {

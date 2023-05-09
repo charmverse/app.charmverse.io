@@ -4,21 +4,30 @@ import { RolePermissions } from './RolePermissions/RolePermissions';
 import { RoleRowBase } from './RoleRowBase';
 
 export function MemberRoleRow({ readOnly, spaceId }: { readOnly: boolean; spaceId: string }) {
-  const { members } = useMembers();
+  const { members, makeMember } = useMembers();
+
+  const assignedMembers = members.filter((member) => !member.isBot && !member.isAdmin && !member.isGuest);
+  // there must always be at least one admin
+  const includeAdmins = members.filter((member) => !member.isBot && member.isAdmin).length > 1;
+  const eligibleMembers = members.filter(
+    (member) => !member.isBot && ((includeAdmins && member.isAdmin) || member.isGuest)
+  );
 
   return (
     <RoleRowBase
-      title='Member'
+      title='Default'
       description={
         <>
-          Users are added to the Member Role by default
+          Users are automatically added to the Default Role
           <br />
-          Admins can change the default permissions for the Member Role
+          Admins can change the permissions for the Default and Custom roles
         </>
       }
       readOnlyMembers={readOnly}
-      members={members.filter((member) => !member.isBot && !member.isAdmin && !member.isGuest)}
+      members={assignedMembers}
+      eligibleMembers={eligibleMembers}
       permissions={<RolePermissions targetGroup='space' id={spaceId} />}
+      onAddMembers={!readOnly ? makeMember : undefined}
     />
   );
 }

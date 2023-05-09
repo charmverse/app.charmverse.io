@@ -1,9 +1,10 @@
+import { log } from '@charmverse/core/log';
+import type { PostCategory } from '@charmverse/core/prisma';
 import SearchIcon from '@mui/icons-material/Search';
 import Box from '@mui/material/Box';
 import InputAdornment from '@mui/material/InputAdornment';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
-import type { PostCategory } from '@prisma/client';
 import { debounce } from 'lodash';
 import { useRouter } from 'next/router';
 import type { ChangeEvent } from 'react';
@@ -22,20 +23,32 @@ import { CategoryMenu } from './components/CategoryMenu';
 import { CategoryNotificationToggle } from './components/CategoryNotificationToggle';
 import { CategorySelect } from './components/CategorySelect';
 import { CreateForumPost } from './components/CreateForumPost';
-import { PostDialog } from './components/PostDialog';
 import { PostSkeleton } from './components/PostList/components/PostSkeleton';
 import { ForumPostList } from './components/PostList/PostList';
+import { usePostCategoryPermissions } from './hooks/usePostCategoryPermissions';
 
 export function ForumPage() {
   const [search, setSearch] = useState('');
   const router = useRouter();
   const currentSpace = useCurrentSpace();
   const sort = router.query.sort as PostSortOption | undefined;
-  const [showNewPostForm, setShowNewPostForm] = useState(false);
-  const { showPost } = usePostDialog();
-  const { categories, isCategoriesLoaded } = useForumCategories();
+  const { createPost, showPost } = usePostDialog();
+  const { categories, isCategoriesLoaded, getPostableCategories } = useForumCategories();
   const [, setTitle] = usePageTitle();
   const [currentCategory, setCurrentCategory] = useState<PostCategory | null>(null);
+
+  const { permissions: currentCategoryPermissions } = usePostCategoryPermissions(currentCategory?.id ?? null);
+  // Allow user to create a post either if they are in "All categories and there is at least one category they can post to, OR they are in a specific category and they have permission to post there"
+  let disableCreatePost = false;
+  let disabledCreatePostTooltip = '';
+
+  if (getPostableCategories().length === 0) {
+    disableCreatePost = true;
+    disabledCreatePostTooltip = 'You cannot create posts in this space';
+  } else if (currentCategory && currentCategoryPermissions?.create_post === false) {
+    disableCreatePost = true;
+    disabledCreatePostTooltip = `You do not have permission to create posts in the ${currentCategory.name} category`;
+  }
 
   useEffect(() => {
     if (currentCategory?.name) {
@@ -96,13 +109,13 @@ export function ForumPage() {
   }
 
   function showNewPostPopup() {
-    setShowNewPostForm(true);
+    if (currentSpace) {
+      createPost({
+        spaceId: currentSpace.id,
+        category: currentCategory
+      });
+    }
   }
-
-  function hideNewPostPopup() {
-    setShowNewPostForm(false);
-  }
-
   useEffect(() => {
     if (typeof router.query.postId === 'string') {
       showPost({
@@ -116,9 +129,11 @@ export function ForumPage() {
 
   useEffect(() => {
     if (currentSpace) {
-      charmClient.track.trackAction('main_feed_page_load', {
-        spaceId: currentSpace.id
-      });
+      charmClient.track
+        .trackAction('main_feed_page_load', {
+          spaceId: currentSpace.id
+        })
+        .catch((err) => log.debug(err));
     }
   }, [Boolean(currentSpace)]);
 
@@ -176,15 +191,11 @@ export function ForumPage() {
               handleSort={handleSortUpdate}
             />
           </Box>
-          <CreateForumPost onClick={showNewPostPopup} />
-          {currentSpace && (
-            <PostDialog
-              newPostCategory={currentCategory}
-              open={showNewPostForm}
-              onClose={hideNewPostPopup}
-              spaceId={currentSpace.id}
-            />
-          )}
+          <CreateForumPost
+            disabled={disableCreatePost}
+            disabledTooltip={disabledCreatePostTooltip}
+            onClick={showNewPostPopup}
+          />
           {!isCategoriesLoaded ? (
             <PostSkeleton />
           ) : (

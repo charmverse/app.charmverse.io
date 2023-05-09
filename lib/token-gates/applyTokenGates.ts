@@ -1,8 +1,8 @@
-import type { Role } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { Role } from '@charmverse/core/prisma';
 import { verifyJwt } from 'lit-js-sdk';
 import { v4 } from 'uuid';
 
-import { prisma } from 'db';
 import { applyDiscordGate } from 'lib/discord/applyDiscordGate';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { updateTrackUserProfileById } from 'lib/metrics/mixpanel/updateTrackUserProfileById';

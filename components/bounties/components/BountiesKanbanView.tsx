@@ -1,5 +1,5 @@
+import type { BountyStatus } from '@charmverse/core/prisma';
 import { Box, Typography } from '@mui/material';
-import type { BountyStatus } from '@prisma/client';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 
@@ -19,10 +19,10 @@ interface Props {
   publicMode?: boolean;
 }
 
-export default function BountiesKanbanView({ bounties, publicMode }: Props) {
+export function BountiesKanbanView({ bounties, publicMode }: Props) {
   const { deletePage, pages } = usePages();
   const { showPage } = usePageDialog();
-  const { setBounties } = useBounties();
+  const { setBounties, refreshBounty } = useBounties();
   const router = useRouter();
 
   function onClickDelete(bountyId: string) {
@@ -45,7 +45,7 @@ export default function BountiesKanbanView({ bounties, publicMode }: Props) {
   );
 
   function onClose() {
-    router.push({ pathname: router.pathname, query: { domain: router.query.domain } });
+    router.push({ pathname: router.pathname, query: { ...router.query, bountyId: undefined } });
   }
 
   function openPage(bountyId: string) {
@@ -85,9 +85,6 @@ export default function BountiesKanbanView({ bounties, publicMode }: Props) {
               .filter((bounty) => Boolean(pages[bounty.page?.id]) && pages[bounty.page.id]?.deletedAt === null)
               .map((bounty) => (
                 <BountyKanbanCard
-                  onDuplicate={(duplicatePageResponse) => {
-                    setBounties((_bounties) => [..._bounties, ...duplicatePageResponse.bounties]);
-                  }}
                   onDelete={onClickDelete}
                   readOnly={!!publicMode}
                   key={bounty.id}

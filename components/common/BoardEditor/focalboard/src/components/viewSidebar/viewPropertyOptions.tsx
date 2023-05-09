@@ -19,6 +19,13 @@ interface LayoutOptionsProps {
   view: BoardView;
 }
 
+const titleProperty: IPropertyTemplate = {
+  id: Constants.titleColumnId,
+  name: 'Title',
+  options: [],
+  type: 'text'
+};
+
 function PropertyMenuItem({
   isVisible,
   property,
@@ -72,26 +79,27 @@ function PropertyOptions(props: LayoutOptionsProps) {
   const visiblePropertyIdsWithTitle =
     titlePropertyIndex === -1 ? [Constants.titleColumnId, ...visiblePropertyIds] : visiblePropertyIds;
 
+  const propertiesWithTitle = properties.find((property) => property.id === Constants.titleColumnId)
+    ? properties
+    : [titleProperty, ...properties];
+
   const { hiddenProperties, visibleProperties } = useMemo(() => {
     const propertyIds = properties.map((property) => property.id);
-    const _propertiesRecord = properties.reduce<Record<string, IPropertyTemplate>>((__propertiesRecord, property) => {
-      __propertiesRecord[property.id] = property;
-      return __propertiesRecord;
-    }, {});
-
-    // Manually add __title column as its not present by default
-    if (!_propertiesRecord[Constants.titleColumnId]) {
-      _propertiesRecord[Constants.titleColumnId] = {
-        id: Constants.titleColumnId,
-        name: 'Title',
-        options: [],
-        type: 'text'
-      };
-    }
-
-    const _visibleProperties = visiblePropertyIdsWithTitle.map(
-      (visiblePropertyId) => _propertiesRecord[visiblePropertyId]
+    const _propertiesRecord = properties.reduce<Record<string, IPropertyTemplate>>(
+      (__propertiesRecord, property) => {
+        __propertiesRecord[property.id] = property;
+        return __propertiesRecord;
+      },
+      {
+        // Always include __title column as its not present by default
+        [Constants.titleColumnId]: titleProperty
+      }
     );
+
+    const _visibleProperties = visiblePropertyIdsWithTitle
+      .map((visiblePropertyId) => _propertiesRecord[visiblePropertyId])
+      // Hot fix - not sure why these dont always exist, maybe the property was deleted?
+      .filter(Boolean);
 
     const _hiddenProperties = propertyIds
       .filter((propertyId) => !visiblePropertyIdsWithTitle.includes(propertyId))
@@ -149,7 +157,7 @@ function PropertyOptions(props: LayoutOptionsProps) {
     mutator.changeViewVisibleProperties(
       view.id,
       visiblePropertyIdsWithTitle,
-      properties.map((property) => property.id)
+      propertiesWithTitle.map((property) => property.id)
     );
   };
 
@@ -158,7 +166,7 @@ function PropertyOptions(props: LayoutOptionsProps) {
       {Object.keys(visibleProperties).length ? (
         <Stack gap={0.5}>
           <Stack alignItems='center' ml={2} mr={1} justifyContent='space-between' flexDirection='row'>
-            <Typography variant='subtitle2'>Shown in table</Typography>
+            <Typography variant='subtitle2'>Shown in {view.fields.viewType}</Typography>
             <Button size='small' variant='text' onClick={hideAllProperties}>
               <Typography color='primary' variant='subtitle1'>
                 Hide all
@@ -183,7 +191,7 @@ function PropertyOptions(props: LayoutOptionsProps) {
       {Object.keys(hiddenProperties).length ? (
         <Stack gap={0.5}>
           <Stack alignItems='center' ml={2} mr={1} justifyContent='space-between' flexDirection='row'>
-            <Typography variant='subtitle2'>Hidden in table</Typography>
+            <Typography variant='subtitle2'>Hidden in {view.fields.viewType}</Typography>
             <Button size='small' variant='text' onClick={showAllProperties}>
               <Typography color='primary' variant='subtitle1'>
                 Show all

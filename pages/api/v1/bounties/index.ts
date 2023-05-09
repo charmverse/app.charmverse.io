@@ -1,14 +1,13 @@
-import type { BountyStatus } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { BountyStatus } from '@charmverse/core/prisma';
 import type { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
 
-import { prisma } from 'db';
-import { onError, onNoMatch, requireApiKey } from 'lib/middleware';
 import { generateMarkdown } from 'lib/prosemirror/plugins/markdown/generateMarkdown';
+import { apiHandler } from 'lib/public-api/handler';
 
-const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
+const handler = apiHandler();
 
-handler.use(requireApiKey).get(getBounties);
+handler.get(getBounties);
 
 /**
  * @swagger

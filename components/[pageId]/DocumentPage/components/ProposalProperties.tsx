@@ -1,6 +1,6 @@
+import type { ProposalStatus } from '@charmverse/core/prisma';
 import { KeyboardArrowDown } from '@mui/icons-material';
 import { Box, Collapse, Divider, Grid, IconButton, Stack, Typography } from '@mui/material';
-import type { ProposalStatus } from '@prisma/client';
 import { useEffect, useRef, useState } from 'react';
 
 import charmClient from 'charmClient';
@@ -8,7 +8,7 @@ import Button from 'components/common/BoardEditor/focalboard/src/widgets/buttons
 import { InputSearchMemberBase } from 'components/common/form/InputSearchMember';
 import { InputSearchReviewers } from 'components/common/form/InputSearchReviewers';
 import UserDisplay from 'components/common/UserDisplay';
-import useTasks from 'components/nexus/hooks/useTasks';
+import { useTasks } from 'components/nexus/hooks/useTasks';
 import ProposalCategoryInput from 'components/proposals/components/ProposalCategoryInput';
 import { ProposalStepper } from 'components/proposals/components/ProposalStepper/ProposalStepper';
 import { ProposalStepSummary } from 'components/proposals/components/ProposalStepSummary';
@@ -29,6 +29,7 @@ import type { ListSpaceRolesResponse } from 'pages/api/roles';
 
 interface ProposalPropertiesProps {
   readOnly?: boolean;
+  pageId: string;
   proposalId: string;
   isTemplate: boolean;
   pagePermissions?: IPagePermissionFlags;
@@ -38,6 +39,7 @@ interface ProposalPropertiesProps {
 export default function ProposalProperties({
   pagePermissions,
   refreshPagePermissions = () => null,
+  pageId,
   proposalId,
   readOnly,
   isTemplate
@@ -53,7 +55,7 @@ export default function ProposalProperties({
 
   const { permissions: proposalFlowFlags, refresh: refreshProposalFlowFlags } = useProposalFlowFlags({ proposalId });
 
-  const { members } = useMembers();
+  const { getMemberById, members } = useMembers();
   const { roles = [] } = useRoles();
   const { user } = useUser();
   const isAdmin = useIsAdmin();
@@ -67,7 +69,7 @@ export default function ProposalProperties({
   const proposalReviewers = proposal?.reviewers ?? [];
   const proposalReviewerId = proposal?.reviewedBy;
 
-  const proposalReviewer = members?.find((member) => member.id === proposalReviewerId);
+  const proposalReviewer = getMemberById(proposalReviewerId);
 
   const isProposalAuthor = user && proposalAuthors.some((author) => author.userId === user.id);
 
@@ -326,6 +328,7 @@ export default function ProposalProperties({
       <CreateVoteModal
         proposalFlowFlags={proposalFlowFlags}
         proposal={proposal}
+        pageId={pageId}
         open={isVoteModalOpen}
         onCreateVote={() => {
           setIsVoteModalOpen(false);

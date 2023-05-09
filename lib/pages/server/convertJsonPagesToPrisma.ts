@@ -1,9 +1,9 @@
 import fs from 'node:fs/promises';
 
-import type { Block, Page, Prisma, Space } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { Block, Page, Prisma, Space } from '@charmverse/core/prisma';
 import { v4 } from 'uuid';
 
-import { prisma } from 'db';
 import { extractPreviewImage } from 'lib/prosemirror/extractPreviewImage';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
@@ -65,8 +65,11 @@ async function convertFolderContent({
   const {
     spaceId: droppedSpaceId,
     parentId,
+    createdAt,
     createdBy,
     cardId,
+    updatedAt,
+    updatedBy,
     boardId: boardIdToDrop,
     ...prismaCreateInput
   } = pageContent;
@@ -84,6 +87,8 @@ async function convertFolderContent({
       id: authorId
     }
   };
+
+  typedPrismaCreateInput.updatedBy = authorId;
 
   typedPrismaCreateInput.parentId = parentPageId;
 

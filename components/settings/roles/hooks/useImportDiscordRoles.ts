@@ -1,4 +1,4 @@
-import type { Space } from '@prisma/client';
+import type { Space } from '@charmverse/core/prisma';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import useSWRImmutable from 'swr/immutable';
@@ -26,7 +26,7 @@ export function useImportDiscordRoles() {
   const { data, isValidating, error } = useSWRImmutable(
     importDiscordRoles ? 'discord-roles-import' : null,
     async () => {
-      onClick(`${space?.name}-roles`);
+      onClick(`roles`);
       return charmClient.discord
         .importRolesFromDiscordServer({
           guildId,

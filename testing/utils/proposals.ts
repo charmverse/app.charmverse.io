@@ -1,7 +1,7 @@
-import type { Page, ProposalCategory, ProposalStatus } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { Page, ProposalCategory, ProposalStatus } from '@charmverse/core/prisma';
 import { v4 } from 'uuid';
 
-import { prisma } from 'db';
 import { createPage as createPageDb } from 'lib/pages/server/createPage';
 import type { ProposalReviewerInput, ProposalWithUsers } from 'lib/proposal/interface';
 import { stringToColor } from 'lib/utilities/strings';

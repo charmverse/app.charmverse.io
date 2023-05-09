@@ -1,19 +1,16 @@
-import type { Space, User, UserVote, Vote, VoteOptions } from '@prisma/client';
+import type { User, UserVote, Vote, VoteOptions } from '@charmverse/core/prisma';
 
-import type { PageMeta } from 'lib/pages';
+import type { NotificationActor } from 'lib/notifications/mapNotificationActor';
 
 export const DEFAULT_THRESHOLD = 50;
 
 export const VOTE_STATUS = ['InProgress', 'Passed', 'Rejected', 'Cancelled'] as const;
-export type VoteStatusType = (typeof VOTE_STATUS)[number];
 
-export interface VoteOptionsDTO {
-  name: string;
-  threshold?: number;
-}
-
-export interface VoteDTO extends Omit<Vote, 'id' | 'status' | 'createdAt'> {
+export interface VoteDTO extends Omit<Vote, 'id' | 'status' | 'createdAt' | 'postId' | 'pageId'> {
+  pageId?: string | null;
+  postId?: string | null;
   voteOptions: string[];
+  spaceId: string;
 }
 
 export type UpdateVoteDTO = Pick<Vote, 'status' | 'deadline'>;
@@ -28,9 +25,15 @@ export interface ExtendedVote extends Vote {
   totalVotes: number;
 }
 
-export type VoteTask = ExtendedVote & {
-  page: PageMeta;
-  space: Space;
+export type VoteTask = Omit<ExtendedVote, 'createdBy'> & {
+  // page?: PageMeta;
+  // space: Space;
+  createdBy: NotificationActor | null;
+  taskId: string;
+  spaceName: string;
+  spaceDomain: string;
+  pagePath: string;
+  pageTitle: string;
 };
 
 export type UserVoteExtendedDTO = UserVote & {

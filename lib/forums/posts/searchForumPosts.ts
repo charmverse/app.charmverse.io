@@ -1,6 +1,5 @@
-import type { Prisma } from '@prisma/client';
-
-import { prisma } from 'db';
+import { prisma } from '@charmverse/core';
+import type { Prisma } from '@charmverse/core/prisma';
 
 import { defaultPostsPerResult } from './constants';
 import type { PostWithRelations } from './getPostMeta';
@@ -53,6 +52,7 @@ export async function searchForumPosts(
     categoryId: categoryId instanceof Array ? { in: categoryId } : categoryId,
     spaceId,
     deletedAt: null,
+    isDraft: false,
     OR: search
       ? [
           {

@@ -1,6 +1,6 @@
+import type { VisibilityView } from '@charmverse/core/prisma';
 import PersonIcon from '@mui/icons-material/Person';
 import { Stack, Tooltip, Typography } from '@mui/material';
-import type { VisibilityView } from '@prisma/client';
 
 import GalleryIcon from 'components/common/BoardEditor/focalboard/src/widgets/icons/gallery';
 import TableIcon from 'components/common/BoardEditor/focalboard/src/widgets/icons/table';

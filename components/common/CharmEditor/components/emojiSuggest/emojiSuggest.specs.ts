@@ -1,8 +1,8 @@
 import type { RawSpecs, BaseRawMarkSpec } from '@bangle.dev/core';
 import { domSerializationHelpers } from '@bangle.dev/core';
+import { log } from '@charmverse/core/log';
 
 import { getTwitterEmoji } from 'components/common/Emoji';
-import log from 'lib/log';
 
 import * as suggestTooltip from '../@bangle.dev/tooltip/suggest-tooltip';
 
@@ -37,6 +37,10 @@ function emojiSpec({ defaultEmoji = '😃' }: { defaultEmoji?: string } = {}): R
       group: 'inline',
       draggable: false,
       atom: true,
+      // format emoji for plain text
+      leafText: (node) => {
+        return node.attrs.emoji;
+      },
       toDOM: (node) => {
         const twemojiImage = getTwitterEmoji(node.attrs.emoji);
         return twemojiImage

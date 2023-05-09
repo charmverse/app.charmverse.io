@@ -1,4 +1,5 @@
-import type { UserGnosisSafe } from '@prisma/client';
+import { log } from '@charmverse/core/log';
+import type { UserGnosisSafe } from '@charmverse/core/prisma';
 import EthersAdapter from '@safe-global/safe-ethers-lib';
 import type { SafeInfoResponse, SafeMultisigTransactionListResponse } from '@safe-global/safe-service-client';
 import SafeServiceClient from '@safe-global/safe-service-client';
@@ -8,8 +9,6 @@ import { ethers } from 'ethers';
 import { getAddress } from 'ethers/lib/utils';
 import uniqBy from 'lodash/uniqBy';
 
-import log from 'lib/log';
-
 export type GnosisTransaction = SafeMultisigTransactionListResponse['results'][number];
 
 function getGnosisRPCUrl(chainId: number) {
@@ -17,12 +16,12 @@ function getGnosisRPCUrl(chainId: number) {
 }
 
 interface GetGnosisServiceProps {
-  signer: ethers.Signer;
+  signer: ethers.Signer | ethers.providers.Provider;
   chainId?: number;
   serviceUrl?: string;
 }
 
-function getGnosisService({ signer, chainId, serviceUrl }: GetGnosisServiceProps): SafeServiceClient | null {
+export function getGnosisService({ signer, chainId, serviceUrl }: GetGnosisServiceProps): SafeServiceClient | null {
   const txServiceUrl = serviceUrl || (chainId && getGnosisRPCUrl(chainId));
   if (!txServiceUrl) {
     return null;

@@ -3,7 +3,6 @@ import type {
   FavoritePage,
   InviteLink,
   Page,
-  PagePermissionLevel,
   PaymentMethod,
   Prisma,
   Space,
@@ -11,21 +10,19 @@ import type {
   TokenGateToRole,
   User,
   UserDetails,
-  UserGnosisSafe
-} from '@prisma/client';
+  UserGnosisSafe,
+  UserWallet,
+  ApiPageKey
+} from '@charmverse/core/prisma';
 import type { FiatCurrency, IPairQuote } from 'connectors';
 
 import * as http from 'adapters/http';
-import type { IUser } from 'components/common/BoardEditor/focalboard/src/user';
 import type { AuthSig, ExtendedPoap } from 'lib/blockchain/interfaces';
 import type { Block as FBBlock, BlockPatch } from 'lib/focalboard/block';
-import type { Member } from 'lib/members/interfaces';
 import type { Web3LoginRequest } from 'lib/middleware/requireWalletSignature';
 import type { FailedImportsError } from 'lib/notion/types';
 import type { IPageWithPermissions, ModifyChildPagesResponse, PageLink } from 'lib/pages';
 import type { PublicPageResponse } from 'lib/pages/interfaces';
-import type { AssignedPermissionsQuery } from 'lib/permissions/interfaces';
-import type { SpacePermissionConfigurationUpdate } from 'lib/permissions/meta/interfaces';
 import type {
   IPagePermissionFlags,
   IPagePermissionToCreate,
@@ -34,9 +31,8 @@ import type {
   IPagePermissionWithSource,
   SpaceDefaultPublicPageToggle
 } from 'lib/permissions/pages/page-permission-interfaces';
-import type { SpacePermissionFlags, SpacePermissionModification } from 'lib/permissions/spaces';
 import type { AggregatedProfileData } from 'lib/profile';
-import type { CreateSpaceProps } from 'lib/spaces/createWorkspace';
+import type { CreateSpaceProps } from 'lib/spaces/createSpace';
 import type { ITokenMetadata, ITokenMetadataRequest } from 'lib/tokens/tokenData';
 import { encodeFilename } from 'lib/utilities/encodeFilename';
 import type { SocketAuthReponse } from 'lib/websockets/interfaces';
@@ -177,7 +173,11 @@ class CharmClient {
     return http.POST<User>('/api/profile/add-wallets', { addressesToAdd: data });
   }
 
-  async createSpace(spaceOptions: Pick<CreateSpaceProps, 'createSpaceOption' | 'spaceData'>) {
+  removeUserWallet(address: Pick<UserWallet, 'address'>) {
+    return http.POST<LoggedInUser>('/api/profile/remove-wallet', address);
+  }
+
+  async createSpace(spaceOptions: Pick<CreateSpaceProps, 'createSpaceTemplate' | 'spaceData'>) {
     const space = await http.POST<Space>('/api/spaces', spaceOptions);
     return space;
   }
@@ -210,24 +210,6 @@ class CharmClient {
     return http.GET<CheckDomainResponse>('/api/spaces/checkDomain', params);
   }
 
-  updateMemberRole({
-    spaceId,
-    userId,
-    isAdmin,
-    isGuest
-  }: {
-    spaceId: string;
-    userId: string;
-    isAdmin: boolean;
-    isGuest: boolean;
-  }) {
-    return http.PUT<Member[]>(`/api/spaces/${spaceId}/members/${userId}`, { isAdmin, isGuest });
-  }
-
-  removeMember({ spaceId, userId }: { spaceId: string; userId: string }) {
-    return http.DELETE<Member[]>(`/api/spaces/${spaceId}/members/${userId}`);
-  }
-
   getPublicPageByViewId(viewId: string) {
     return http.GET<Page>(`/api/public/view/${viewId}`);
   }
@@ -254,6 +236,10 @@ class CharmClient {
 
   deletePage(pageId: string) {
     return http.DELETE<ModifyChildPagesResponse>(`/api/pages/${pageId}`);
+  }
+
+  deletePages(pageIds: string[]) {
+    return http.DELETE<undefined>(`/api/pages`, pageIds);
   }
 
   favoritePage(pageId: string) {
@@ -324,20 +310,6 @@ class CharmClient {
     return http.POST<{ importedRolesCount: number }>('/api/guild-xyz/importRoles', payload);
   }
 
-  async getWorkspaceUsers(spaceId: string): Promise<IUser[]> {
-    const members = await this.members.getMembers(spaceId);
-
-    return members.map((member) => ({
-      id: member.id,
-      username: member.username,
-      email: '',
-      props: {},
-      create_at: new Date(member.createdAt).getTime(),
-      update_at: new Date(member.updatedAt).getTime(),
-      is_bot: false
-    }));
-  }
-
   async getAllBlocks(spaceId: string): Promise<FBBlock[]> {
     return http
       .GET<Block[]>('/api/blocks', { spaceId })
@@ -394,6 +366,15 @@ class CharmClient {
     const fbBlock = this.blockToFBBlock(rootBlock);
     fbBlock.deletedAt = new Date().getTime();
     updater([fbBlock]);
+  }
+
+  async deleteBlocks(blockIds: string[], updater: BlockUpdater): Promise<void> {
+    const rootBlocks = await http.DELETE<Block[]>(`/api/blocks`, blockIds);
+    const fbBlocks = rootBlocks.map((rootBlock) => ({
+      ...this.blockToFBBlock(rootBlock),
+      deletedAt: new Date().getTime()
+    }));
+    updater(fbBlocks);
   }
 
   async insertBlocks(fbBlocks: FBBlock[], updater: BlockUpdater): Promise<FBBlock[]> {
@@ -510,68 +491,11 @@ class CharmClient {
     return http.POST(`/api/pages/${pageId}/restrict-permissions`, {});
   }
 
-  addSpacePermissions({
-    forSpaceId,
-    operations,
-    roleId,
-    spaceId,
-    userId
-  }: SpacePermissionModification): Promise<SpacePermissionFlags> {
-    return http.POST<SpacePermissionFlags>(`/api/permissions/space/${forSpaceId}/add`, {
-      operations,
-      roleId,
-      spaceId,
-      userId
-    } as Omit<SpacePermissionModification, 'forSpaceId'>);
-  }
-
-  removeSpacePermissions({
-    forSpaceId,
-    operations,
-    roleId,
-    spaceId,
-    userId
-  }: SpacePermissionModification): Promise<SpacePermissionFlags> {
-    return http.POST<SpacePermissionFlags>(`/api/permissions/space/${forSpaceId}/remove`, {
-      operations,
-      roleId,
-      spaceId,
-      userId
-    } as Omit<SpacePermissionModification, 'forSpaceId'>);
-  }
-
-  queryGroupSpacePermissions({ group, id, resourceId }: AssignedPermissionsQuery): Promise<SpacePermissionFlags> {
-    return http.GET<SpacePermissionFlags>(`/api/permissions/space/${resourceId}/query`, {
-      group,
-      id
-    });
-  }
-
-  computeUserSpacePermissions({ spaceId }: { spaceId: string }): Promise<SpacePermissionFlags> {
-    return http.GET<SpacePermissionFlags>(`/api/permissions/space/${spaceId}/compute`);
-  }
-
   updateSnapshotConnection(
     spaceId: string,
     data: Pick<Space, 'snapshotDomain' | 'defaultVotingDuration'>
   ): Promise<Space> {
     return http.PUT(`/api/spaces/${spaceId}/snapshot`, data);
-  }
-
-  setDefaultPagePermission({
-    spaceId,
-    pagePermissionLevel
-  }: {
-    spaceId: string;
-    pagePermissionLevel: PagePermissionLevel | null;
-  }) {
-    return http.POST<Space>(`/api/spaces/${spaceId}/set-default-page-permissions`, {
-      pagePermissionLevel
-    });
-  }
-
-  setSpacePermissionMode({ permissionConfigurationMode, spaceId }: SpacePermissionConfigurationUpdate) {
-    return http.POST<Space>(`/api/spaces/${spaceId}/set-permissions-mode`, { permissionConfigurationMode });
   }
 
   setDefaultPublicPages({ spaceId, defaultPublicPages }: SpaceDefaultPublicPageToggle) {
@@ -594,6 +518,14 @@ class CharmClient {
 
   getAggregatedData(userId: string) {
     return http.GET<AggregatedProfileData>(`/api/public/profile/${userId}/aggregate`);
+  }
+
+  getApiPageKeys({ pageId }: { pageId: string }) {
+    return http.GET<ApiPageKey[]>(`/api/api-page-key?pageId=${pageId}`);
+  }
+
+  createApiPageKey({ pageId, type }: { pageId: string; type: ApiPageKey['type'] }) {
+    return http.POST<ApiPageKey>(`/api/api-page-key`, { type, pageId });
   }
 }
 

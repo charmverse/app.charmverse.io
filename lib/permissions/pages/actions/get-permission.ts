@@ -1,5 +1,5 @@
-import type { TransactionClient } from 'db';
-import { prisma } from 'db';
+import { prisma } from '@charmverse/core';
+import type { TransactionClient } from '@charmverse/core';
 
 import type { IPagePermissionWithSource } from '../page-permission-interfaces';
 

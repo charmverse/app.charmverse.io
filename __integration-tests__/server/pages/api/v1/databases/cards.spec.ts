@@ -1,9 +1,9 @@
-import type { Space, User, Page, SpaceApiToken } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { Space, User, Page, SpaceApiToken } from '@charmverse/core/prisma';
 import type { Response } from 'supertest';
 import request from 'supertest';
 import { v4 } from 'uuid';
 
-import { prisma } from 'db';
 import type { CardPage as ApiPage, UnsupportedKeyDetails, UnsupportedKeysError } from 'lib/public-api';
 import { createDatabase } from 'lib/public-api/createDatabaseCardPage';
 import { baseUrl } from 'testing/mockApiCall';

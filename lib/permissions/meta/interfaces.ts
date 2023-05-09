@@ -1,4 +1,4 @@
-import type { Space, SpaceOperation, SpacePermissionConfigurationMode } from '@prisma/client';
+import type { Space, SpaceOperation, SpacePermissionConfigurationMode } from '@charmverse/core/prisma';
 
 export interface SpacePermissionConfigurationUpdate {
   spaceId: string;

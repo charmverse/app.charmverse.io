@@ -1,8 +1,8 @@
-import type { Prisma, Space, SpaceRole, User, VerifiedEmail } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { Prisma, SpaceRole, User, VerifiedEmail } from '@charmverse/core/prisma';
 
-import { prisma } from 'db';
 import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
-import { isUUID, isValidEmail } from 'lib/utilities/strings';
+import { isUUID, isValidEmail, uid } from 'lib/utilities/strings';
 
 type GuestToAdd = {
   userIdOrEmail: string;
@@ -81,6 +81,7 @@ export async function addGuest({ userIdOrEmail, spaceId }: GuestToAdd) {
     user = await prisma.user.create({
       data: {
         username: userIdOrEmail,
+        path: uid(),
         identityType: 'VerifiedEmail',
         verifiedEmails: {
           create: {

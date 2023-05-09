@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { mutate } from 'swr';
 
 import charmClient from 'charmClient';
 import type { LoggedInUser } from 'models';
@@ -31,6 +32,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
   async function logoutUser() {
     await charmClient.logout();
     setUser(null);
+    clearSWRCache();
   }
 
   /**
@@ -78,6 +80,11 @@ export function UserProvider({ children }: { children: ReactNode }) {
   }, [user, isLoaded]);
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
+}
+
+// clear cache from SWR - https://swr.vercel.app/docs/mutation
+function clearSWRCache() {
+  return mutate(() => true, undefined, { revalidate: false });
 }
 
 export const useUser = () => useContext(UserContext);

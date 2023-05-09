@@ -1,4 +1,4 @@
-import { prisma } from 'db';
+import { prisma } from '@charmverse/core';
 
 export async function generateTokenGate({ userId, spaceId }: { spaceId: string; userId: string }) {
   return prisma.tokenGate.create({
@@ -21,6 +21,13 @@ export async function deleteTokenGate(id: string) {
       id
     }
   });
+}
+
+export async function clearTokenGateData() {
+  if (process.env.NODE_ENV !== 'production') {
+    await prisma.tokenGate.deleteMany({});
+    await prisma.userTokenGate.deleteMany({});
+  }
 }
 
 export async function addRoleToTokenGate({ tokenGateId, roleId }: { tokenGateId: string; roleId: string }) {

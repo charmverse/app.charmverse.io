@@ -1,5 +1,4 @@
-import type { Thread } from '@prisma/client';
-import { Comment } from '@prisma/client';
+import type { Thread, Comment } from '@charmverse/core/prisma';
 
 import type { CommentWithUser } from 'lib/comments/interfaces';
 import type { PageContent } from 'lib/prosemirror/interfaces';
@@ -24,6 +23,10 @@ export interface ThreadCreate {
   pageId: string;
   userId: string;
   context: string;
+}
+
+export interface ThreadWithComments extends Thread {
+  comments: Comment[];
 }
 
 export interface ThreadWithCommentsAndAuthors extends Thread {

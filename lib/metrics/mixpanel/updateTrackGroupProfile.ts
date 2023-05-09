@@ -1,6 +1,5 @@
-import type { Space } from '@prisma/client';
-
-import log from 'lib/log';
+import { log } from '@charmverse/core/log';
+import type { Space } from '@charmverse/core/prisma';
 
 import { mixpanel } from './mixpanel';
 

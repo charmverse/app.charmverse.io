@@ -1,4 +1,4 @@
-import { PageType } from '@prisma/client';
+import { PageType } from '@charmverse/core/prisma';
 
 import { typedKeys } from 'lib/utilities/objects';
 

@@ -1,8 +1,9 @@
-import type { User } from '@prisma/client';
+import type { User } from '@charmverse/core/prisma';
 
 export type TaskUser = Pick<User, 'id' | 'username' | 'path' | 'avatar' | 'avatarTokenId'>;
 
 export interface DiscussionTask {
+  taskId: string;
   spaceId: string;
   spaceDomain: string;
   spaceName: string;

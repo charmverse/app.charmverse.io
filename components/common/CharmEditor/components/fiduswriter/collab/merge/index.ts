@@ -1,9 +1,9 @@
+import { log } from '@charmverse/core/log';
 import { sendableSteps, receiveTransaction } from 'prosemirror-collab';
 import type { Node } from 'prosemirror-model';
 import { EditorState } from 'prosemirror-state';
 import { Mapping, Step, Transform } from 'prosemirror-transform';
 
-import log from 'lib/log';
 import type { ServerDocDataMessage } from 'lib/websockets/documentEvents/interfaces';
 
 import { getSettings } from '../../schema/convert';

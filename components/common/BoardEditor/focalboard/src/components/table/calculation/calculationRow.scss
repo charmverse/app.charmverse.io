@@ -11,7 +11,7 @@
     background-color: rgb(var(--center-channel-bg-rgb));
     align-items: center;
     justify-content: flex-end;
-    border: 0;
+    border: 0 none !important;
   }
 
   .title {

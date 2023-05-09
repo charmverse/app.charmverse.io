@@ -1,12 +1,13 @@
+import { prisma } from '@charmverse/core';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { prisma } from 'db';
 import { onError, onNoMatch, requireKeys } from 'lib/middleware';
+import { PageNotFoundError } from 'lib/pages/server';
+import { generatePageQuery } from 'lib/pages/server/generatePageQuery';
 import type { PermissionCompute } from 'lib/permissions/interfaces';
 import type { IPagePermissionFlags } from 'lib/permissions/pages';
 import { computeUserPagePermissions } from 'lib/permissions/pages';
-import { ProposalNotFoundError } from 'lib/proposal/errors';
 import { withSessionRoute } from 'lib/session/withSession';
 import { InvalidInputError } from 'lib/utilities/errors';
 import { isUUID } from 'lib/utilities/strings';
@@ -20,28 +21,28 @@ async function computePagePermissions(req: NextApiRequest, res: NextApiResponse<
 
   let resourceId = input.resourceId;
 
-  if (!isUUID(input.resourceId)) {
-    const [spaceDomain, proposalPath] = resourceId.split('/');
-    if (!spaceDomain || !proposalPath) {
-      throw new InvalidInputError(`Invalid proposal path and space domain`);
+  if (!isUUID(resourceId)) {
+    const [spaceDomain, pagePath] = resourceId.split('/');
+    if (!spaceDomain || !pagePath) {
+      throw new InvalidInputError(`Invalid page path and space domain`);
     }
 
-    const proposal = await prisma.page.findFirst({
-      where: {
-        path: proposalPath,
-        space: {
-          domain: spaceDomain
-        }
-      },
+    const searchQuery = generatePageQuery({
+      pageIdOrPath: pagePath,
+      spaceIdOrDomain: spaceDomain
+    });
+
+    const page = await prisma.page.findFirst({
+      where: searchQuery,
       select: {
         id: true
       }
     });
 
-    if (!proposal) {
-      throw new ProposalNotFoundError(resourceId);
+    if (!page) {
+      throw new PageNotFoundError(resourceId);
     } else {
-      resourceId = proposal.id;
+      resourceId = page.id;
     }
   }
 

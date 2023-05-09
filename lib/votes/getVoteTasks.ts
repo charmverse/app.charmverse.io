@@ -1,11 +1,17 @@
-import { prisma } from 'db';
+import { prisma } from '@charmverse/core';
+
+import { mapNotificationActor } from 'lib/notifications/mapNotificationActor';
 import { pageMetaSelect } from 'lib/pages/server/getPageMeta';
 
 import { aggregateVoteResult } from './aggregateVoteResult';
 import { calculateVoteStatus } from './calculateVoteStatus';
 import type { VoteTask } from './interfaces';
 
-export async function getVoteTasks(userId: string): Promise<VoteTask[]> {
+export interface VoteTasksGroup {
+  marked: VoteTask[];
+  unmarked: VoteTask[];
+}
+export async function getVoteTasks(userId: string): Promise<VoteTasksGroup> {
   const votes = await prisma.vote.findMany({
     where: {
       space: {
@@ -23,11 +29,20 @@ export async function getVoteTasks(userId: string): Promise<VoteTask[]> {
     },
     include: {
       page: {
-        select: pageMetaSelect()
+        select: { path: true, title: true }
       },
-      space: true,
+      post: {
+        select: { path: true, title: true }
+      },
+      space: {
+        select: {
+          name: true,
+          domain: true
+        }
+      },
       userVotes: true,
-      voteOptions: true
+      voteOptions: true,
+      author: true
     }
   });
 
@@ -38,7 +53,18 @@ export async function getVoteTasks(userId: string): Promise<VoteTask[]> {
   const pastVotes = votes.filter((item) => item.deadline <= now);
   const sortedVotes = [...futureVotes, ...pastVotes];
 
-  return sortedVotes.map((vote) => {
+  const userNotifications = await prisma.userNotification.findMany({
+    where: {
+      userId,
+      type: 'vote'
+    }
+  });
+  const markedNotificationIds = new Set(userNotifications.map((userNotification) => userNotification.taskId));
+
+  const marked: VoteTask[] = [];
+  const unmarked: VoteTask[] = [];
+
+  sortedVotes.forEach((vote) => {
     const voteStatus = calculateVoteStatus(vote);
     const userVotes = vote.userVotes;
     const { aggregatedResult, userChoice } = aggregateVoteResult({
@@ -49,12 +75,26 @@ export async function getVoteTasks(userId: string): Promise<VoteTask[]> {
 
     delete (vote as any).userVotes;
 
-    return {
+    const task: VoteTask = {
       ...vote,
       aggregatedResult,
       userChoice,
       status: voteStatus,
-      totalVotes: userVotes.length
+      totalVotes: userVotes.length,
+      createdBy: mapNotificationActor(vote.author),
+      taskId: vote.id,
+      spaceName: vote.space.name,
+      spaceDomain: vote.space.domain,
+      pagePath: vote.page?.path || `forum/post/${vote.post?.path}`,
+      pageTitle: vote.page?.title || vote.post?.title || 'Untitled'
     };
+
+    if (markedNotificationIds.has(task.id)) {
+      marked.push(task);
+    } else {
+      unmarked.push(task);
+    }
   });
+
+  return { marked, unmarked };
 }

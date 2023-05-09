@@ -1,4 +1,4 @@
-import type { Comment, User, Prisma } from '@prisma/client';
+import type { Comment, User, Prisma } from '@charmverse/core/prisma';
 
 import type { UserPermissionFlags } from 'lib/permissions/interfaces';
 import type { PageContent } from 'lib/prosemirror/interfaces';
@@ -8,7 +8,7 @@ export type CommentCreate = Pick<Comment, 'content' | 'threadId' | 'userId'>;
 export type CommentUpdate = Pick<Comment, 'content' | 'id'>;
 
 export interface CommentWithUser extends Comment {
-  user: User;
+  user: { id: string; username: string; avatar: string };
 }
 
 export type GenericCommentVote = {

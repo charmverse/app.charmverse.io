@@ -1,7 +1,7 @@
+import { prisma } from '@charmverse/core';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { prisma } from 'db';
 import { firebaseApp } from 'lib/google/firebaseApp';
 import type { LoginWithGoogleRequest } from 'lib/google/loginWithGoogle';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
@@ -12,6 +12,7 @@ import { onError, onNoMatch } from 'lib/middleware';
 import { sessionUserRelations } from 'lib/session/config';
 import { withSessionRoute } from 'lib/session/withSession';
 import { InvalidInputError } from 'lib/utilities/errors';
+import { uid } from 'lib/utilities/strings';
 import type { LoggedInUser } from 'models';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -44,6 +45,7 @@ async function verifyMagicLink(req: NextApiRequest, res: NextApiResponse<LoggedI
         username: verificationResult.email,
         identityType: 'VerifiedEmail',
         email: verificationResult.email,
+        path: uid(),
         verifiedEmails: {
           create: {
             email: verificationResult.email,

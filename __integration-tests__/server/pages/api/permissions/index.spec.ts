@@ -1,7 +1,7 @@
-import type { Role, Space } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { Role, Space } from '@charmverse/core/prisma';
 import request from 'supertest';
 
-import { prisma } from 'db';
 import type { IPagePermissionToCreate } from 'lib/permissions/pages';
 import { upsertPermission } from 'lib/permissions/pages';
 import type { LoggedInUser } from 'models';
@@ -54,8 +54,7 @@ describe('POST /api/permissions - Add page permissions', () => {
 
     await prisma.pagePermission.create({
       data: {
-        permissionLevel: 'custom',
-        permissions: ['edit_isPublic'],
+        permissionLevel: 'full_access',
         user: {
           connect: {
             id: user.id
@@ -258,8 +257,7 @@ describe('DELETE /api/permissions - Delete page permissions', () => {
 
     await prisma.pagePermission.create({
       data: {
-        permissionLevel: 'custom',
-        permissions: ['edit_isPublic'],
+        permissionLevel: 'full_access',
         user: {
           connect: {
             id: user.id

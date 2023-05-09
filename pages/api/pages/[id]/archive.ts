@@ -1,8 +1,8 @@
+import { prisma } from '@charmverse/core';
+import { log } from '@charmverse/core/log';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { prisma } from 'db';
-import log from 'lib/log';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import type { ModifyChildPagesResponse } from 'lib/pages';
@@ -45,12 +45,6 @@ async function togglePageArchiveStatus(req: NextApiRequest, res: NextApiResponse
   if (permissions.delete !== true) {
     throw new ActionNotPermittedError('You are not allowed to delete this page.');
   }
-
-  const rootBlock = await prisma.block.findUnique({
-    where: {
-      id: pageId
-    }
-  });
 
   const modifiedChildPageIds = await modifyChildPages(pageId, userId, archive ? 'archive' : 'restore');
   // If we are restoring page then severe the link with parent, only if its not of type card
@@ -109,7 +103,7 @@ async function togglePageArchiveStatus(req: NextApiRequest, res: NextApiResponse
     pageSpaceId.spaceId
   );
 
-  return res.status(200).json({ pageIds: modifiedChildPageIds, rootBlock });
+  return res.status(200).json({ pageIds: modifiedChildPageIds });
 }
 
 export default withSessionRoute(handler);

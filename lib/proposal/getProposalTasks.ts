@@ -1,12 +1,14 @@
-import type { ProposalStatus, WorkspaceEvent } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { ProposalStatus, User, WorkspaceEvent } from '@charmverse/core/prisma';
 
-import { prisma } from 'db';
 import type {
   Discussion,
   GetDiscussionsResponse,
   ProposalDiscussionNotificationsContext
 } from 'lib/discussion/getDiscussionTasks';
 import { getPropertiesFromPage } from 'lib/discussion/getPropertiesFromPage';
+import type { NotificationActor } from 'lib/notifications/mapNotificationActor';
+import { mapNotificationActor } from 'lib/notifications/mapNotificationActor';
 import { extractMentions } from 'lib/prosemirror/extractMentions';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
@@ -17,14 +19,17 @@ export type ProposalTaskAction = 'start_discussion' | 'start_vote' | 'review' | 
 
 export interface ProposalTask {
   id: string; // the id of the workspace event
+  taskId: string;
   action: ProposalTaskAction | null;
   eventDate: Date;
+  createdAt: Date;
   spaceDomain: string;
   spaceName: string;
   pageId: string;
   pageTitle: string;
   pagePath: string;
   status: ProposalStatus;
+  createdBy: NotificationActor | null;
 }
 
 export interface ProposalTasksGroup {
@@ -32,7 +37,8 @@ export interface ProposalTasksGroup {
   unmarked: ProposalTask[];
 }
 
-type WorkspaceEventRecord = Record<string, Pick<WorkspaceEvent, 'id' | 'pageId' | 'createdAt' | 'meta'> | null>;
+type WorkspaceNotificationEvent = { actor: User | null } & Pick<WorkspaceEvent, 'id' | 'pageId' | 'createdAt' | 'meta'>;
+type WorkspaceEventRecord = Record<string, WorkspaceNotificationEvent | null>;
 
 function sortProposals(proposals: ProposalTask[]) {
   proposals.sort((proposalA, proposalB) => {
@@ -58,7 +64,8 @@ export async function getProposalTasks(userId: string): Promise<{
       pageId: true,
       createdAt: true,
       meta: true,
-      id: true
+      id: true,
+      actor: true
     },
     orderBy: {
       createdAt: 'desc'
@@ -157,7 +164,10 @@ export async function getProposalTasks(userId: string): Promise<{
           spaceDomain: page.space.domain,
           spaceName: page.space.name,
           status: proposal.status,
-          action
+          action,
+          createdBy: mapNotificationActor(workspaceEvent.actor),
+          taskId: workspaceEvent.id,
+          createdAt: workspaceEvent.createdAt
         };
         if (!userNotificationIds.has(workspaceEvent.id)) {
           proposalsRecord.unmarked.push(proposalTask);
@@ -247,7 +257,8 @@ export function getProposalCommentMentions({
               userId: mention.createdBy,
               text: mention.text,
               commentId: comment.id,
-              type: 'proposal'
+              type: 'proposal',
+              taskId: comment.id
             });
           }
         });

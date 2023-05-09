@@ -1,6 +1,6 @@
-import type { Space } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { Space } from '@charmverse/core/prisma';
 
-import { prisma } from 'db';
 import { verifyDiscordGateForSpace } from 'lib/discord/verifyDiscordGateForSpace';
 import { createAndAssignRoles } from 'lib/roles/createAndAssignRoles';
 

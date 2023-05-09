@@ -1,11 +1,16 @@
-import type { PostCategoryPermissionLevel } from '@prisma/client';
+import type { PostCategoryPermissionLevel } from '@charmverse/core/prisma';
 
-import { postCategoryPermissionLabels } from 'lib/permissions/forum/mapping';
+export const postCategoryPermissionLabels: Record<PostCategoryPermissionLevel, string> = {
+  category_admin: 'Category Admin',
+  moderator: 'Moderator',
+  full_access: 'Post, Vote & Comment',
+  comment_vote: 'Vote & Comment',
+  view: 'View',
+  custom: 'Custom'
+} as const;
 
 // eslint-disable-next-line camelcase
 const { category_admin, moderator, custom, ...options } = postCategoryPermissionLabels;
-export const permissionsWithRemove = { ...options, delete: 'Remove' };
 
 export const forumMemberPermissionOptions = options;
-
 export type BulkRolePostCategoryPermissionUpsert = { permissionLevel: PostCategoryPermissionLevel; roleIds: string[] };

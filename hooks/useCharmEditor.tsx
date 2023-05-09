@@ -1,6 +1,6 @@
 import { EditOutlined, RateReviewOutlined, VisibilityOutlined } from '@mui/icons-material';
-import type { Dispatch, ReactNode, SetStateAction } from 'react';
 import { createContext, useContext, useMemo, useState } from 'react';
+import type { Dispatch, ReactNode, SetStateAction, MutableRefObject } from 'react';
 
 import type { FrontendParticipant } from 'components/common/CharmEditor/components/fiduswriter/collab';
 import type { IPagePermissionFlags } from 'lib/permissions/pages';
@@ -29,6 +29,7 @@ interface CharmEditorContext {
   editMode: EditMode | null;
   permissions: IPagePermissionFlags | null;
   participants: FrontendParticipant[];
+  printRef: MutableRefObject<any> | null;
 }
 
 interface CharmEditorContextWithSetter extends CharmEditorContext {
@@ -41,7 +42,8 @@ const defaultProps = {
   availableEditModes: [],
   editMode: null,
   permissions: null,
-  participants: []
+  participants: [],
+  printRef: null
 };
 
 const CharmEditorContext = createContext<Readonly<CharmEditorContextWithSetter>>({

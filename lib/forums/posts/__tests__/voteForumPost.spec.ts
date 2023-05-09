@@ -1,4 +1,4 @@
-import type { Space, User } from '@prisma/client';
+import type { Space, User } from '@charmverse/core/prisma';
 
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { generatePostCategory, generateForumPost } from 'testing/utils/forums';
@@ -26,7 +26,8 @@ describe('voteForumPost', () => {
       createdBy: user.id,
       spaceId: space.id,
       title: 'Test',
-      categoryId: category1.id
+      categoryId: category1.id,
+      isDraft: false
     });
 
     await voteForumPost({

@@ -1,4 +1,5 @@
-import { prisma } from 'db';
+import { prisma } from '@charmverse/core';
+
 import { generateUserAndSpace } from 'testing/setupDatabase';
 
 import { setHiddenFeatures } from '../setHiddenFeatures';

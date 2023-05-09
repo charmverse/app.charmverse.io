@@ -14,7 +14,7 @@ interface Props {
   publicMode?: boolean;
 }
 
-export default function BountiesGalleryView({ bounties, publicMode }: Props) {
+export function BountiesGalleryView({ bounties, publicMode }: Props) {
   const { deletePage, pages } = usePages();
   const { showPage } = usePageDialog();
   const { setBounties } = useBounties();
@@ -29,7 +29,7 @@ export default function BountiesGalleryView({ bounties, publicMode }: Props) {
   }
 
   function onClose() {
-    router.push({ pathname: router.pathname, query: { domain: router.query.domain } });
+    router.push({ pathname: router.pathname, query: { ...router.query, bountyId: undefined } });
   }
 
   function openPage(bountyId: string) {
@@ -54,9 +54,6 @@ export default function BountiesGalleryView({ bounties, publicMode }: Props) {
       {filteredBounties.map((bounty) => {
         return (
           <BountyGalleryCard
-            onDuplicate={(duplicatePageResponse) => {
-              setBounties((_bounties) => [..._bounties, ...duplicatePageResponse.bounties]);
-            }}
             key={bounty.id}
             bounty={bounty}
             onClick={() => {

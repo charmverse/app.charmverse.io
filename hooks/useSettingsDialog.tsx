@@ -3,18 +3,15 @@ import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
 import { useEffect, useMemo, createContext, useContext, useState } from 'react';
 
-import type { TasksPageProps } from 'components/nexus/TasksPage';
+import type { SETTINGS_TABS, ACCOUNT_TABS } from 'components/settings/config';
 
-import { useSpaces } from './useSpaces';
-
-export type PathProps = TasksPageProps;
+export type SettingsPath = (typeof SETTINGS_TABS)[number]['path'] | (typeof ACCOUNT_TABS)[number]['path'];
 
 type IContext = {
   open: boolean;
   activePath: string;
-  pathProps?: PathProps | null;
   onClose: () => any;
-  onClick: (path?: string, props?: PathProps) => void;
+  onClick: (path?: SettingsPath) => void;
 };
 
 export const SettingsDialogContext = createContext<Readonly<IContext>>({
@@ -27,26 +24,11 @@ export const SettingsDialogContext = createContext<Readonly<IContext>>({
 export function SettingsDialogProvider({ children }: { children: ReactNode }) {
   const settingsModalState = usePopupState({ variant: 'dialog', popupId: 'settings-dialog' });
   const [activePath, setActivePath] = useState('');
-  const [pathProps, setPathProps] = useState<PathProps | undefined>();
   const router = useRouter();
-  const { memberSpaces } = useSpaces();
 
-  const onClick = (_path?: string, props?: PathProps) => {
-    // This is a hack to fix a bug where the user can see space settings on popup
-    // We should come back and cleanup how we manage the state of the space dialog in a future PR
-    if (_path && _path.endsWith('-space')) {
-      const spaceName = _path.split('-space')[0];
-      const space = memberSpaces.find((s) => s.name === spaceName);
-      if (!space) {
-        settingsModalState.open();
-        setActivePath('account');
-        return;
-      }
-    }
-
+  const onClick = (_path?: string) => {
     setActivePath(_path ?? '');
     settingsModalState.open();
-    setPathProps(props);
   };
 
   const onClose = () => {
@@ -72,11 +54,10 @@ export function SettingsDialogProvider({ children }: { children: ReactNode }) {
     () => ({
       open: settingsModalState.isOpen,
       activePath,
-      pathProps,
       onClick,
       onClose
     }),
-    [activePath, pathProps, settingsModalState.isOpen, memberSpaces]
+    [activePath, settingsModalState.isOpen]
   );
 
   return <SettingsDialogContext.Provider value={value}>{children}</SettingsDialogContext.Provider>;

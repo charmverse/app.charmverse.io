@@ -1,4 +1,4 @@
-import type { InviteLink } from '@prisma/client';
+import type { InviteLink } from '@charmverse/core/prisma';
 import type { PopupState } from 'material-ui-popup-state/hooks';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useState } from 'react';

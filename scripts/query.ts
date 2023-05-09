@@ -1,36 +1,35 @@
-import { getAccessiblePages, includePagePermissionsMeta } from 'lib/pages/server';
-import { prisma } from 'db';
+import { prisma } from '@charmverse/core';
+import { customAlphabet } from 'nanoid';
+import fs from 'node:fs/promises';
 
+import * as opts from 'nanoid-dictionary';
+console.log(opts)
+function uid( ) {
+  return Math.round(Date.now() + Math.random() * 1000).toString(36)
+}
+function uid2 () {
+  return customAlphabet(opts.lowercase + opts.numbers, 8)();
+}
 /**
  * Use this script to perform database searches.
  */
 
 async function search() {
-  const user = await prisma.user.findFirst({
+  const page = await prisma.page.findFirst({
     where: {
-      spaceRoles: {
-        some: {
-          spaceId: 'bc9e8464-4166-4f7c-8a14-bb293cc30d2a',
-          isAdmin: true
+      path: `page-12890905063646585`
+    },
+    include: {
+      author: true,
+      diffs: {
+        orderBy: {
+          version: 'asc'
         }
       }
     }
-  });
-  if (!user) {
-    throw new Error('No user found');
-  }
+  })
 
-  getAccessiblePages({
-    search: 'forum',
-    spaceId: 'bc9e8464-4166-4f7c-8a14-bb293cc30d2a',
-    userId: user.id
-  }).then((record) => {
-    // eslint-disable-next-line no-console
-    console.log(
-      record.length,
-      record.slice(0, 10).map((r) => r.title)
-    );
-  });
+  await fs.writeFile(`${__dirname}/out.json`, JSON.stringify(page, null, 2))
 }
 
-search();
+search().then(() => console.log('Done'));

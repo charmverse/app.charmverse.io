@@ -1,9 +1,8 @@
 // playwright-dev-page.ts
+import type { PostCategory } from '@charmverse/core/prisma';
 import type { Locator, Page } from '@playwright/test';
-import type { PostCategory } from '@prisma/client';
 
 import { baseUrl } from 'config/constants';
-import { PostCategoryWithPermissions } from 'lib/permissions/forum/interfaces';
 
 // capture actions on the pages in signup flow
 export class ForumHomePage {
@@ -48,8 +47,8 @@ export class ForumHomePage {
     this.closeModalButton = page.locator('data-test=close-modal');
     this.postDialog = page.locator('data-test=dialog');
     this.postDialogCloseButton = page.locator('data-test=close-dialog');
-    this.postDialogContextMenu = page.locator('data-test=page-actions-context-menu');
-    this.postDialogDeleteButton = page.locator('data-test=delete-page-from-context');
+    this.postDialogContextMenu = page.locator('data-test=header--show-page-actions');
+    this.postDialogDeleteButton = page.locator('data-test=header--delete-current-page');
     this.categoryDescriptionInput = page.locator('data-test=category-description-input').locator('textarea').first();
     this.saveCategoryDescription = page.locator('data-test=save-category-description');
     this.currentCategoryDescription = page.locator('data-test=current-category-description');

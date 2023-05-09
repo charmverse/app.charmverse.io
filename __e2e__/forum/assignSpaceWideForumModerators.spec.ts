@@ -1,8 +1,8 @@
+import { prisma } from '@charmverse/core';
+import type { Space, User } from '@charmverse/core/prisma';
 import { expect, test as base } from '@playwright/test';
-import type { Space, User } from '@prisma/client';
 import { PermissionSettings } from '__e2e__/po/settings/spacePermissionSettings.po';
 
-import { prisma } from 'db';
 import { randomETHWalletAddress } from 'testing/generateStubs';
 import { generateForumPost, generatePostCategory } from 'testing/utils/forums';
 
@@ -79,12 +79,12 @@ test.describe.serial('Comment on forum posts', () => {
 
     await permissionSettings.openSettingsModal();
 
-    const spaceSettingsTab = permissionSettings.getSpaceSettingsLocator(space.id);
+    const spaceSettingsTab = permissionSettings.getSpaceSettingsSectionLocator('space');
 
     await expect(spaceSettingsTab).toBeVisible();
 
     // Go to roles section
-    await permissionSettings.goToTab({ spaceId: space.id, section: 'roles' });
+    await permissionSettings.goToTab('roles');
     await permissionSettings.clickRoleRowByTitle(moderatorRoleName);
 
     await permissionSettings.goToRowTab(moderatorRoleName, 'permissions');
@@ -101,9 +101,7 @@ test.describe.serial('Comment on forum posts', () => {
 
     expect(isChecked).toBe(true);
 
-    const newRolePermissions = await permissionSettings.submitSpacePermissionSettings();
-
-    expect(newRolePermissions.moderateForums).toBe(true);
+    await permissionSettings.submitSpacePermissionSettings();
   });
 
   // We don't need to test all moderation paths since moderation from post page already handles this

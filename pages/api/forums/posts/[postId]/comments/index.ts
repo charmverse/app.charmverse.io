@@ -1,13 +1,13 @@
+import { prisma } from '@charmverse/core';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { prisma } from 'db';
 import { createPostComment } from 'lib/forums/comments/createPostComment';
 import type { CreatePostCommentInput, PostCommentWithVote } from 'lib/forums/comments/interface';
 import { listPostComments } from 'lib/forums/comments/listPostComments';
 import { PostNotFoundError } from 'lib/forums/posts/errors';
-import { onError, onNoMatch, requireUser } from 'lib/middleware';
-import { requestOperations } from 'lib/permissions/requestOperations';
+import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
+import { getPermissionsClient } from 'lib/permissions/api/routers';
 import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -19,12 +19,19 @@ async function listPostCommentsHandler(req: NextApiRequest, res: NextApiResponse
 
   const userId = req.session.user?.id;
 
-  await requestOperations({
-    resourceType: 'post',
-    operations: ['view_post'],
+  const permissions = await getPermissionsClient({
     resourceId: postId,
-    userId
-  });
+    resourceIdType: 'post'
+  }).then(({ forum }) =>
+    forum.computePostPermissions({
+      resourceId: postId,
+      userId
+    })
+  );
+
+  if (!permissions.view_post) {
+    throw new ActionNotPermittedError(`You cannot view this post`);
+  }
 
   const postCommentsWithVotes = await listPostComments({ postId, userId });
 
@@ -38,19 +45,26 @@ async function createPostCommentHandler(req: NextApiRequest, res: NextApiRespons
 
   const post = await prisma.post.findUnique({
     where: { id: postId },
-    select: { spaceId: true }
+    select: { spaceId: true, isDraft: true }
   });
 
   if (!post) {
     throw new PostNotFoundError(postId);
   }
 
-  await requestOperations({
-    resourceType: 'post',
-    operations: ['add_comment'],
+  const permissions = await getPermissionsClient({
     resourceId: postId,
-    userId
-  });
+    resourceIdType: 'post'
+  }).then(({ forum }) =>
+    forum.computePostPermissions({
+      resourceId: postId,
+      userId
+    })
+  );
+
+  if (!permissions.add_comment) {
+    throw new ActionNotPermittedError(`You cannot view this post`);
+  }
 
   const postComment = await createPostComment({ postId, userId, ...body });
 

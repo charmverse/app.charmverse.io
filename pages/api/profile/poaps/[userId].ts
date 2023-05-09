@@ -1,7 +1,7 @@
+import { prisma } from '@charmverse/core';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { prisma } from 'db';
 import type { ExtendedPoap } from 'lib/blockchain/interfaces';
 import { getPOAPs } from 'lib/blockchain/poaps';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
@@ -33,7 +33,7 @@ async function getUserPoaps(req: NextApiRequest, res: NextApiResponse<ExtendedPo
     }
   });
 
-  const poaps = await getPOAPs(wallets.map((w) => w.address));
+  const poaps = await getPOAPs(wallets);
   const poapsWithHidden = poaps.map((poap) => ({
     ...poap,
     isHidden: hiddenPoapIDs.includes(poap.id)

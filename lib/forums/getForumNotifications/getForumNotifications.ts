@@ -1,9 +1,9 @@
-import type { Post, PostComment, Space, User } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { Post, PostComment, Space, User } from '@charmverse/core/prisma';
 
-import { prisma } from 'db';
 import type { TaskUser } from 'lib/discussion/interfaces';
 import { getPostCategories } from 'lib/forums/categories/getPostCategories';
-import { filterAccessiblePostCategories } from 'lib/permissions/forum/filterAccessiblePostCategories';
+import { getPermissionsClient } from 'lib/permissions/api/routers';
 import { getUserSpaceNotifications } from 'lib/userNotifications/spaceNotifications';
 import { timeAgo } from 'lib/utilities/dates';
 import { isTruthy } from 'lib/utilities/types';
@@ -79,13 +79,20 @@ export async function getForumNotifications(userId: string): Promise<ForumTasksG
   for (const spaceRole of spaceRoles) {
     const postCategories = await getPostCategories(spaceRole.space.id);
     const spaceNotifications = await getUserSpaceNotifications({ spaceId: spaceRole.space.id, userId });
-    const visiblePostCategories = await filterAccessiblePostCategories({
-      postCategories,
-      userId
-    });
+
+    const visiblePostCategories = await getPermissionsClient({
+      resourceId: spaceRole.spaceId,
+      resourceIdType: 'space'
+    }).then((client) =>
+      client.forum.getPermissionedCategories({
+        postCategories,
+        userId
+      })
+    );
 
     const _posts = await prisma.post.findMany({
       where: {
+        isDraft: false,
         deletedAt: null,
         // only get posts created after a user has joined the space
         createdAt: {
@@ -188,10 +195,12 @@ export async function getForumNotifications(userId: string): Promise<ForumTasksG
   const uniqueComments = comments.filter((item) => item.commentId && !commentIdsFromMentions.includes(item.commentId));
 
   // Only fetch the users that created the mentions
+  const newPostsUserIds = newPosts.map((item) => item.userId);
+  const userIds = [...new Set([...discussionUserIds, ...newPostsUserIds])];
   const users = await prisma.user.findMany({
     where: {
       id: {
-        in: [...new Set(discussionUserIds)]
+        in: userIds
       }
     }
   });

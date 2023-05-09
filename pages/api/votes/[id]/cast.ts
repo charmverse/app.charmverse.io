@@ -1,14 +1,14 @@
-import type { UserVote } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { UserVote } from '@charmverse/core/prisma';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { prisma } from 'db';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
+import { getPermissionsClient } from 'lib/permissions/api/routers';
 import { computeUserPagePermissions } from 'lib/permissions/pages/page-permission-compute';
 import { computeProposalPermissions } from 'lib/permissions/proposals/computeProposalPermissions';
 import { withSessionRoute } from 'lib/session/withSession';
-import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
 import { castVote as castVoteService } from 'lib/votes';
 import type { UserVoteDTO } from 'lib/votes/interfaces';
@@ -38,7 +38,7 @@ async function castVote(req: NextApiRequest, res: NextApiResponse<UserVote | { e
     throw new DataNotFoundError(`A vote with id ${voteId} was not found.`);
   }
 
-  if (vote.context === 'proposal') {
+  if (vote.pageId && vote.context === 'proposal') {
     const pageData = await prisma.page.findUnique({
       where: {
         id: vote.pageId
@@ -56,7 +56,7 @@ async function castVote(req: NextApiRequest, res: NextApiResponse<UserVote | { e
     if (!permissions.vote) {
       throw new ActionNotPermittedError(`You do not have permission to cast a vote on this proposal.`);
     }
-  } else {
+  } else if (vote.pageId) {
     const permissions = await computeUserPagePermissions({
       resourceId: vote.pageId,
       userId
@@ -64,10 +64,24 @@ async function castVote(req: NextApiRequest, res: NextApiResponse<UserVote | { e
     if (!permissions.comment) {
       throw new ActionNotPermittedError(`You do not have permission to cast a vote on this page.`);
     }
+  } else if (vote.postId) {
+    const postPermissions = await getPermissionsClient({
+      resourceId: vote.postId,
+      resourceIdType: 'post'
+    }).then((client) =>
+      client.forum.computePostPermissions({
+        resourceId: vote.postId as string,
+        userId
+      })
+    );
+
+    if (!postPermissions.edit_post) {
+      throw new ActionNotPermittedError('You do not have permissions to cast a vote on this post.');
+    }
   }
   const newUserVote: UserVote = await castVoteService(choice, vote, userId);
 
-  if (vote.context === 'proposal') {
+  if (vote.pageId && vote.context === 'proposal') {
     trackUserAction('user_cast_a_vote', {
       userId,
       spaceId: vote.spaceId,

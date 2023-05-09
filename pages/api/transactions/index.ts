@@ -1,4 +1,4 @@
-import type { Transaction } from '@prisma/client';
+import type { Transaction } from '@charmverse/core/prisma';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -15,7 +15,7 @@ handler
   .post(createTransactionController);
 
 async function createTransactionController(req: NextApiRequest, res: NextApiResponse<Transaction>) {
-  const transaction = await createTransaction(req.body as TransactionCreationData);
+  const transaction = await createTransaction(req.body as TransactionCreationData & { isMultisig?: boolean });
   return res.status(200).json(transaction);
 }
 

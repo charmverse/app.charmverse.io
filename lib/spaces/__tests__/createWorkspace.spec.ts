@@ -1,21 +1,31 @@
-import type { PostCategoryPermission, ProposalCategoryPermission, Space, SpaceRole, User } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type {
+  PostCategoryPermission,
+  ProposalCategoryPermission,
+  Space,
+  SpaceRole,
+  User
+} from '@charmverse/core/prisma';
 import { v4 } from 'uuid';
 
-import { prisma } from 'db';
 import { defaultPostCategories } from 'lib/forums/categories/generateDefaultPostCategories';
 import { defaultProposalCategories } from 'lib/proposal/generateDefaultProposalCategoriesInput';
-import { typedKeys } from 'lib/utilities/objects';
 import { uid } from 'lib/utilities/strings';
 import { gettingStartedPage } from 'seedData/gettingStartedPage';
 
 import { spaceCreateTemplates } from '../config';
-import type { SpaceCreateInput } from '../createWorkspace';
-import { createWorkspace } from '../createWorkspace';
+import type { SpaceCreateInput } from '../createSpace';
+import { createWorkspace } from '../createSpace';
 
 let user: User;
 
 beforeAll(async () => {
-  user = await prisma.user.create({ data: { username: 'demo-user' } });
+  user = await prisma.user.create({
+    data: {
+      path: uid(),
+      username: 'demo-user'
+    }
+  });
 });
 
 describe('createWorkspace', () => {
@@ -72,7 +82,8 @@ describe('createWorkspace', () => {
     const bot = await prisma.user.create({
       data: {
         username: 'Bot user',
-        isBot: true
+        isBot: true,
+        path: uid()
       }
     });
 
@@ -250,7 +261,7 @@ describe('createWorkspace', () => {
     for (const options of spaceCreateTemplates) {
       const newSpace = await createWorkspace({
         userId: user.id,
-        createSpaceOption: options,
+        createSpaceTemplate: options,
         spaceData: {
           name: `Name-${v4()}`
         }

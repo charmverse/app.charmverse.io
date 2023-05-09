@@ -1,6 +1,6 @@
-import type { SpaceRole } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { SpaceRole } from '@charmverse/core/prisma';
 
-import { prisma } from 'db';
 import { InvalidStateError } from 'lib/middleware';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { DataNotFoundError, InsecureOperationError } from 'lib/utilities/errors';

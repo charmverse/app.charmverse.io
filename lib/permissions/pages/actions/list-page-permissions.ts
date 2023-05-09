@@ -1,4 +1,4 @@
-import { prisma } from 'db';
+import { prisma } from '@charmverse/core';
 
 import type { IPagePermissionWithAssignee } from '../page-permission-interfaces';
 
@@ -10,7 +10,6 @@ export async function listPagePermissions(pageId: string): Promise<IPagePermissi
     include: {
       role: true,
       space: true,
-      user: true,
       sourcePermission: true
     }
   });

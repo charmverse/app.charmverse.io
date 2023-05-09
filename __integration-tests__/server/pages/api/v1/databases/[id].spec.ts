@@ -1,4 +1,4 @@
-import type { SpaceApiToken, User, Space } from '@prisma/client';
+import type { SpaceApiToken, User, Space } from '@charmverse/core/prisma';
 import request from 'supertest';
 import { v4 } from 'uuid';
 

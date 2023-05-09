@@ -1,5 +1,7 @@
+import { log } from '@charmverse/core/log';
+import type { UserWallet } from '@charmverse/core/prisma';
+
 import fetch from 'adapters/http/fetch.server';
-import log from 'lib/log';
 
 import type { ExtendedPoap } from './interfaces';
 
@@ -7,12 +9,13 @@ type PoapInResponse = { tokenId: string; owner: string; event?: any; created: st
 
 const getPOAPsURL = (address: string) => `https://api.poap.tech/actions/scan/${address}`;
 
-export async function getPOAPs(addresses: string[]): Promise<ExtendedPoap[]> {
+export async function getPOAPs(wallets: UserWallet[]): Promise<ExtendedPoap[]> {
   const apiKey = process.env.POAP_API_KEY;
   if (typeof apiKey !== 'string') {
     log.debug('No API key for POAPs');
     return [];
   }
+  const addresses = wallets.map((w) => w.address);
 
   const requests = addresses.map((address) => {
     return fetch<PoapInResponse[]>(getPOAPsURL(address), {
@@ -25,7 +28,7 @@ export async function getPOAPs(addresses: string[]): Promise<ExtendedPoap[]> {
 
   const data = await Promise.all(requests);
 
-  const rawPoapInformation = data.flat(1);
+  const rawPoapInformation = data.flat(1).map((_data, i) => ({ ..._data, walletAddress: addresses[i] }));
 
   const poaps = rawPoapInformation.map((rawPoap) => ({
     id: `poap_${rawPoap.tokenId}`,
@@ -34,7 +37,8 @@ export async function getPOAPs(addresses: string[]): Promise<ExtendedPoap[]> {
     imageURL: rawPoap.event?.image_url,
     created: rawPoap.created,
     name: rawPoap.event?.name,
-    isHidden: false
+    isHidden: false,
+    walletId: wallets.find((wallet) => wallet.address === rawPoap.walletAddress)?.id ?? null
   }));
 
   return poaps;

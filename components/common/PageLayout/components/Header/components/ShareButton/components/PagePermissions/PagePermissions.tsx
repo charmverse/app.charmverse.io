@@ -1,10 +1,8 @@
+import type { PageType } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
-import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
+import { Box, Button, Chip, Tooltip } from '@mui/material';
 import InputAdornment from '@mui/material/InputAdornment';
 import Input from '@mui/material/OutlinedInput';
-import Tooltip from '@mui/material/Tooltip';
-import type { PageType } from '@prisma/client';
 import { bindPopover, usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect } from 'react';
 
@@ -14,8 +12,10 @@ import Link from 'components/common/Link';
 import Modal from 'components/common/Modal';
 import { Typography } from 'components/common/Typography';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useMembers } from 'hooks/useMembers';
 import { usePagePermissions } from 'hooks/usePagePermissions';
 import { usePages } from 'hooks/usePages';
+import type { Member } from 'lib/members/interfaces';
 import { canReceiveManualPermissionUpdates } from 'lib/pages';
 import type {
   IPagePermissionWithAssignee,
@@ -54,21 +54,24 @@ const StyledInput = styled(Input)`
  * @param pagePermissions
  */
 function sortPagePermissions(
-  pagePermissions: IPagePermissionWithAssignee[]
-): (IPagePermissionWithAssignee & { displayName: string })[] {
+  pagePermissions: IPagePermissionWithAssignee[],
+  members: Pick<Member, 'id' | 'isGuest' | 'username'>[]
+): (IPagePermissionWithAssignee & { displayName: string; isGuest?: boolean })[] {
   const sortedPermissions = pagePermissions
     .filter((permission) => {
       return !permission.spaceId && !permission.public;
     })
     .map((permission) => {
-      const permissionSource = permission.user ? 'user' : 'role';
+      const permissionSource = permission.userId ? 'user' : 'role';
+      const member = members.find((m) => m.id === permission.userId);
 
-      const permissionDisplayName = permissionSource === 'user' ? permission.user!.username : permission.role!.name;
+      const permissionDisplayName = (permissionSource === 'user' ? member?.username : permission.role?.name) || '';
 
       return {
         ...permission,
         permissionSource,
-        displayName: permissionDisplayName as string
+        displayName: permissionDisplayName,
+        isGuest: member?.isGuest
       };
     })
     .sort((a, b) => {
@@ -98,6 +101,7 @@ interface Props {
 export default function PagePermissions({ pageId, pagePermissions, refreshPermissions, pageType }: Props) {
   const { pages } = usePages();
   const space = useCurrentSpace();
+  const { members, mutateMembers } = useMembers();
   const popupState = usePopupState({ variant: 'popover', popupId: 'add-a-permission' });
 
   const spaceLevelPermission = pagePermissions.find((permission) => space && permission.spaceId === space?.id);
@@ -143,7 +147,7 @@ export default function PagePermissions({ pageId, pagePermissions, refreshPermis
     await refreshPermissions();
   }
 
-  const sortedPermissions = sortPagePermissions(pagePermissions);
+  const sortedPermissions = sortPagePermissions(pagePermissions, members);
 
   // Remove proposal editor as it is not selectable
   // eslint-disable-next-line camelcase
@@ -171,13 +175,13 @@ export default function PagePermissions({ pageId, pagePermissions, refreshPermis
 
       <Box display='block' py={0.5}>
         <Box display='flex' justifyContent='space-between' alignItems='center'>
-          <Typography variant='body2'>Everyone at {space?.name}</Typography>
+          <Typography variant='body2'>Default permissions</Typography>
           <div style={{ width: '160px', textAlign: 'right' }}>
             {canEdit ? (
               <SmallSelect
                 renderValue={(value) => permissionsWithoutCustom[value as string] || 'No access'}
                 onChange={(level) => updateSpacePagePermissionLevel(level as PagePermissionLevelType)}
-                keyAndLabel={permissionsWithRemove}
+                keyAndLabel={permissionsWithRemove as Record<string, string>}
                 defaultValue={spaceLevelPermission?.permissionLevel ?? 'No access'}
               />
             ) : (
@@ -217,12 +221,13 @@ export default function PagePermissions({ pageId, pagePermissions, refreshPermis
               <Typography overflowEllipsis variant='body2'>
                 {permission.displayName}
               </Typography>
+              {permission.isGuest && <Chip size='small' color='warning' variant='outlined' label='Guest' />}
               <div style={{ width: '160px', textAlign: 'right' }}>
                 {canEdit ? (
                   <SmallSelect
                     renderValue={(value) => permissionsWithoutCustom[value as string]}
                     onChange={(level) => updatePagePermissionLevel(permission, level as PagePermissionLevelType)}
-                    keyAndLabel={permissionsWithRemove}
+                    keyAndLabel={permissionsWithRemove as Record<string, string>}
                     defaultValue={permission.permissionLevel}
                   />
                 ) : (
@@ -252,6 +257,7 @@ export default function PagePermissions({ pageId, pagePermissions, refreshPermis
           pageId={pageId}
           permissionsAdded={() => {
             refreshPermissions();
+            mutateMembers();
             popupState.close();
           }}
         />

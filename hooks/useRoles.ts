@@ -1,7 +1,8 @@
-import type { Role } from '@prisma/client';
+import type { Role } from '@charmverse/core/prisma';
 import useSWR, { mutate } from 'swr';
 
 import charmClient from 'charmClient';
+import type { CreateRoleInput } from 'components/settings/roles/components/CreateRoleForm';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMembers } from 'hooks/useMembers';
 
@@ -11,12 +12,17 @@ export function useRoles() {
 
   const { data: roles } = useSWR(
     () => (space ? `roles/${space.id}` : null),
-    () => space && charmClient.roles.listRoles(space.id)
+    () => (space ? charmClient.roles.listRoles(space.id) : null)
   );
 
-  async function createRole(role: Partial<Role>): Promise<Role> {
-    role.spaceId = space?.id;
-    const createdRole = await charmClient.roles.createRole(role);
+  async function createRole(role: CreateRoleInput): Promise<Role> {
+    if (!space) {
+      throw new Error('Cannot create role without a space');
+    }
+    const createdRole = await charmClient.roles.createRole({
+      spaceId: space.id,
+      ...role
+    });
     refreshRoles();
     return createdRole;
   }
@@ -61,12 +67,11 @@ export function useRoles() {
     }
   }
 
-  function refreshRoles() {
+  async function refreshRoles() {
     if (space) {
-      mutate(`roles/${space.id}`);
+      return mutate(`roles/${space.id}`);
     }
   }
-  const sortedRoles = roles?.sort((a, b) => a.name.localeCompare(b.name));
 
   return {
     createRole,
@@ -75,6 +80,6 @@ export function useRoles() {
     assignRoles,
     unassignRole,
     refreshRoles,
-    roles: sortedRoles
+    roles
   };
 }

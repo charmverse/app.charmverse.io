@@ -21,29 +21,30 @@ import type { PaletteItemTypeNoGroup } from './paletteItem';
 export function useEditorItems({
   disableNestedPage,
   nestedPagePluginKey,
-  enableVoting
+  enableVoting,
+  pageId
 }: {
   disableNestedPage: boolean;
   // Defaults to true
   enableVoting?: boolean;
   nestedPagePluginKey?: PluginKey<NestedPagePluginState>;
+  pageId?: string;
 }) {
-  const { addNestedPage } = useNestedPage();
+  const { addNestedPage } = useNestedPage(pageId);
   const space = useCurrentSpace();
   const { user } = useUser();
-  const { currentPageId } = useCurrentPage();
   const { pages } = usePages();
   const [userSpacePermissions] = useCurrentSpacePermissions();
 
-  const pageType = currentPageId ? pages[currentPageId]?.type : undefined;
+  const pageType = pageId ? pages[pageId]?.type : undefined;
 
   const paletteItems = useMemo(() => {
     const itemGroups: [string, PaletteItemTypeNoGroup[]][] = [
       ['text', textItems({ addNestedPage, disableNestedPage, nestedPagePluginKey, userSpacePermissions, pageType })],
       [
         'database',
-        user && space && !disableNestedPage
-          ? databaseItems({ addNestedPage, currentPageId, userId: user.id, space, pageType })
+        user && space && !disableNestedPage && pageId
+          ? databaseItems({ addNestedPage, currentPageId: pageId, userId: user.id, space, pageType })
           : []
       ],
       ['media', mediaItems()],
@@ -63,7 +64,7 @@ export function useEditorItems({
       .flat();
 
     return itemList;
-  }, [addNestedPage, currentPageId, user, space]);
+  }, [addNestedPage, pageId, user, space]);
 
   return paletteItems;
 }

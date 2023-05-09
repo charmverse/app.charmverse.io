@@ -1,16 +1,17 @@
+import { prisma } from '@charmverse/core';
+import { log } from '@charmverse/core/log';
 import { v4 } from 'uuid';
 
 import { isProdEnv, isStagingEnv } from 'config/constants';
-import { prisma } from 'db';
 import { getUserS3FilePath, uploadUrlToS3 } from 'lib/aws/uploadToS3Server';
 import { getDiscordAccount } from 'lib/discord/getDiscordAccount';
-import log from 'lib/log';
 import type { SignupAnalytics } from 'lib/metrics/mixpanel/interfaces/UserEvent';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { updateTrackUserProfile } from 'lib/metrics/mixpanel/updateTrackUserProfile';
 import { logSignupViaDiscord } from 'lib/metrics/postToDiscord';
 import { sessionUserRelations } from 'lib/session/config';
 import { DisabledAccountError } from 'lib/utilities/errors';
+import { uid } from 'lib/utilities/strings';
 
 type LoginWithDiscord = {
   code: string;
@@ -80,6 +81,7 @@ export async function loginByDiscord({
             discordId: id
           }
         },
+        path: uid(),
         profile: {
           create: {
             social: {

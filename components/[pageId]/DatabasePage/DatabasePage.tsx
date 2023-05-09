@@ -1,4 +1,4 @@
-import type { Page } from '@prisma/client';
+import type { Page } from '@charmverse/core/prisma';
 import { useRouter } from 'next/router';
 import { useCallback, useEffect, useState } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
@@ -23,8 +23,6 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import type { PageMeta } from 'lib/pages';
 import type { IPagePermissionFlags } from 'lib/permissions/pages';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
-
-import PageDeleteBanner from '../DocumentPage/components/PageDeleteBanner';
 
 /**
  *
@@ -52,7 +50,8 @@ export function DatabasePage({ page, setPage, readOnly = false, pagePermissions 
 
   const { setFocalboardViewsRecord } = useFocalboardViews();
   const readOnlyBoard = readOnly || !pagePermissions?.edit_content;
-  const readOnlySourceData = activeView?.fields?.sourceType === 'google_form'; // blocks that are synced cannot be edited
+  // TODO: remove this feature entirely after some time has passed and we are sure we dont need it. Disabled on April 4, 2023.
+  const readOnlySourceData = false; // activeView?.fields?.sourceType === 'google_form'; // blocks that are synced cannot be edited
   useEffect(() => {
     if (typeof router.query.cardId === 'string') {
       setShownCardId(router.query.cardId);
@@ -163,6 +162,7 @@ export function DatabasePage({ page, setPage, readOnly = false, pagePermissions 
             showView={showView}
             activeView={activeView || undefined}
             views={boardViews}
+            page={page}
           />
           {typeof shownCardId === 'string' && shownCardId.length !== 0 && (
             <CardDialog

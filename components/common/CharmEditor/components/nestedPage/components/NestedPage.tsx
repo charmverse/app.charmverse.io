@@ -3,7 +3,7 @@ import styled from '@emotion/styled';
 import { Typography } from '@mui/material';
 
 import Link from 'components/common/Link';
-import { PageIcon } from 'components/common/PageLayout/components/PageIcon';
+import { NoAccessPageIcon, PageIcon } from 'components/common/PageLayout/components/PageIcon';
 import { STATIC_PAGES } from 'components/common/PageLayout/components/Sidebar/utils/staticPages';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useForumCategories } from 'hooks/useForumCategories';
@@ -48,8 +48,8 @@ export default function NestedPage({ node, currentPageId }: NodeViewProps & { cu
 
   const parentPage = nestedPage?.parentId ? pages[nestedPage.parentId] : null;
 
-  const pageTitle = (nestedPage || nestedStaticPage)?.title || `Forum > ${nestedCategories?.name}`;
-
+  const pageTitle =
+    (nestedPage || nestedStaticPage)?.title || (nestedCategories ? `Forum > ${nestedCategories?.name}` : '');
   const pageId = nestedPage?.id || nestedStaticPage?.path || nestedCategories?.id;
 
   const pagePath = nestedPage ? `${space?.domain}/${nestedPage.path}` : '';
@@ -64,7 +64,7 @@ export default function NestedPage({ node, currentPageId }: NodeViewProps & { cu
   return (
     <NestedPageContainer
       data-test={`nested-page-${pageId}`}
-      href={`/${appPath}`}
+      href={appPath ? `/${appPath}` : undefined}
       color='inherit'
       data-id={`page-${pageId}`}
       data-title={pageTitle}
@@ -72,18 +72,21 @@ export default function NestedPage({ node, currentPageId }: NodeViewProps & { cu
       data-type={node.attrs.type}
     >
       <div>
-        {nestedPage && (
+        {nestedStaticPage ? (
+          <PageIcon icon={null} pageType={nestedStaticPage.path} />
+        ) : nestedPage ? (
           <PageIcon
             isLinkedPage={isLinkedPage}
             isEditorEmpty={!nestedPage.hasContent}
             icon={nestedPage.icon}
             pageType={nestedPage.type}
           />
+        ) : (
+          <NoAccessPageIcon />
         )}
-        {nestedStaticPage && <PageIcon icon={null} pageType={nestedStaticPage.path} />}
         {nestedCategories && <PageIcon icon={null} pageType='forum_category' />}
       </div>
-      <StyledTypography>{(pageTitle ? pageTitle || 'Untitled' : null) || 'Page not found'}</StyledTypography>
+      <StyledTypography>{(pageTitle ? pageTitle || 'Untitled' : null) || 'No access'}</StyledTypography>
     </NestedPageContainer>
   );
 }

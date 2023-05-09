@@ -232,6 +232,23 @@ const RPC = {
     iconUrl: '/images/cryptoLogos/polygon-matic-logo.svg',
     testnet: true,
     shortName: 'maticmum'
+  },
+  OPTIMISM: {
+    chainId: 10,
+    chainName: 'Optimism',
+    nativeCurrency: {
+      name: 'Ether',
+      symbol: 'ETH',
+      decimals: 18,
+      address: '0x0000000000000000000000000000000000000000',
+      logoURI: 'https://assets.coingecko.com/coins/images/279/small/ethereum.png?1595348880'
+    },
+    rpcUrls: ['https://mainnet.optimism.io'],
+    gnosisUrl: 'https://safe-transaction.optimism.gnosis.io',
+    blockExplorerUrls: ['https://optimistic.etherscan.io/'],
+    iconUrl: '/images/cryptoLogos/eth-diamond-purple.png',
+    testnet: true,
+    shortName: 'oeth'
   }
 } as const;
 
@@ -300,6 +317,7 @@ const supportedChains: Blockchain[] = [
   'HARMONY_DEVNET',
   'BSC',
   'GOERLI',
+  'OPTIMISM',
   'SEPOLIA',
   'MUMBAI'
 ];

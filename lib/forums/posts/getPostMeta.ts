@@ -1,4 +1,4 @@
-import type { Post, PostUpDownVote } from '@prisma/client';
+import type { Post, PostUpDownVote } from '@charmverse/core/prisma';
 
 import { extractSummary } from 'lib/prosemirror/extractSummary';
 import type { PageContent } from 'lib/prosemirror/interfaces';
@@ -29,6 +29,7 @@ export function getPostMeta({ post, userId }: PostMetaToGet): ForumPostMeta {
   const { upDownVotes } = post;
   return {
     ...post,
+    isDraft: post.isDraft ?? false,
     summary: extractSummary(post.content as PageContent),
     updatedAt: post.updatedAt.toString(),
     createdAt: post.createdAt.toString(),

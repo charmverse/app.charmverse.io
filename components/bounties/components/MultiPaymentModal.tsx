@@ -1,6 +1,6 @@
+import type { UserGnosisSafe } from '@charmverse/core/prisma';
 import { Checkbox, List, ListItem, MenuItem, Select, Tooltip, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
-import type { UserGnosisSafe } from '@prisma/client';
 import { getChainById } from 'connectors';
 import { bindPopover, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect, useState } from 'react';
@@ -17,13 +17,13 @@ import { isTruthy } from 'lib/utilities/types';
 import { BountyAmount } from './BountyStatusBadge';
 import MultiPaymentButton from './MultiPaymentButton';
 
-export default function MultiPaymentModal({ bounties }: { bounties: BountyWithDetails[] }) {
+export function MultiPaymentModal({ bounties }: { bounties: BountyWithDetails[] }) {
   const [selectedApplicationIds, setSelectedApplicationIds] = useState<string[]>([]);
   const popupState = usePopupState({ variant: 'popover', popupId: 'multi-payment-modal' });
   const modalProps = bindPopover(popupState);
   const { data: userGnosisSafes } = useMultiWalletSigs();
 
-  const { isDisabled, onPaymentSuccess, transactions, gnosisSafes, gnosisSafeData, isLoading, setGnosisSafeData } =
+  const { isDisabled, onPaymentSuccess, getTransactions, gnosisSafes, gnosisSafeData, isLoading, setGnosisSafeData } =
     useMultiBountyPayment({
       bounties,
       postPaymentSuccess() {
@@ -32,9 +32,9 @@ export default function MultiPaymentModal({ bounties }: { bounties: BountyWithDe
       }
     });
 
-  const firstGnosisSafe = gnosisSafes?.[0];
-  const gnosisSafeAddress = firstGnosisSafe?.address;
-  const gnosisSafeChainId = firstGnosisSafe?.chainId;
+  const gnosisSafeAddress = gnosisSafeData?.address;
+  const gnosisSafeChainId = gnosisSafeData?.chainId;
+  const transactions = getTransactions(gnosisSafeAddress);
 
   const userGnosisSafeRecord =
     userGnosisSafes?.reduce<Record<string, UserGnosisSafe>>((record, userGnosisSafe) => {
@@ -42,17 +42,16 @@ export default function MultiPaymentModal({ bounties }: { bounties: BountyWithDe
       return record;
     }, {}) ?? {};
 
-  const { members } = useMembers();
+  const { getMemberById } = useMembers();
 
   useEffect(() => {
-    const applicationIds = transactions.map((trans) => trans(gnosisSafeAddress).applicationId);
+    const applicationIds = transactions.map((trans) => trans.applicationId);
     setSelectedApplicationIds(applicationIds);
-  }, [transactions]);
+  }, [transactions.length]);
 
   const selectedTransactions = selectedApplicationIds
     .map((applicationId) => {
-      const transaction = transactions.find((trans) => trans(gnosisSafeAddress).applicationId === applicationId);
-      return transaction?.(gnosisSafeAddress);
+      return transactions.find((trans) => trans.applicationId === applicationId);
     })
     .filter(isTruthy);
 
@@ -115,9 +114,9 @@ export default function MultiPaymentModal({ bounties }: { bounties: BountyWithDe
           </Box>
           <Box pb={2}>
             <List>
-              {transactions.map((getTransaction) => {
-                const { title, chainId: _chainId, rewardAmount, rewardToken, userId, applicationId } = getTransaction();
-                const user = members.find((member) => member.id === userId);
+              {transactions.map((transaction) => {
+                const { title, chainId: _chainId, rewardAmount, rewardToken, userId, applicationId } = transaction;
+                const user = getMemberById(userId);
                 const isChecked = selectedApplicationIds.includes(applicationId);
                 if (user) {
                   return (
@@ -167,15 +166,13 @@ export default function MultiPaymentModal({ bounties }: { bounties: BountyWithDe
             </List>
           </Box>
           <Box display='flex' gap={2} alignItems='center'>
-            {gnosisSafeChainId && gnosisSafeAddress && (
-              <MultiPaymentButton
-                chainId={gnosisSafeChainId}
-                safeAddress={gnosisSafeAddress}
-                transactions={selectedTransactions}
-                onSuccess={onPaymentSuccess}
-                isLoading={isLoading}
-              />
-            )}
+            <MultiPaymentButton
+              chainId={gnosisSafeChainId}
+              safeAddress={gnosisSafeAddress || ''}
+              transactions={selectedTransactions}
+              onSuccess={onPaymentSuccess}
+              isLoading={isLoading}
+            />
           </Box>
         </Modal>
       )}
