@@ -245,7 +245,7 @@ export function IdentityProviders() {
             loading={isConnectingToTelegram || isDisconnectingTelegram}
             disabled={!user}
             connected={true}
-            actions={<MenuItem onClick={disconnectFromTelegram}>Disconnect</MenuItem>}
+            actions={<MenuItem onClick={() => disconnectFromTelegram()}>Disconnect</MenuItem>}
             error={telegramError && <Alert severity='error'>{telegramError}</Alert>}
           />
         )}
