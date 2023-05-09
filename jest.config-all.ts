@@ -7,7 +7,11 @@ import { jestConfig } from './jest.config';
 const integrationConfig: JestConfigWithTsJest = {
   ...jestConfig,
   testEnvironment: 'jest-environment-node',
-  testMatch: ['**/*.spec.ts']
+  testMatch: ['**/*.spec.ts'],
+  transform: {
+    ...jestConfig.transform,
+    '^.+\\.(ts|js|html|svg)$': 'ts-jest'
+  }
 };
 
 export default createJestConfig(integrationConfig);

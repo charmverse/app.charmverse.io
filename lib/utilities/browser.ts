@@ -181,7 +181,7 @@ export function createHighlightDomElement(parentElement: HTMLElement | null) {
       const boundingRect = parentElement.getBoundingClientRect();
       // Need to create a custom element as adding styling to prosemirror-node isn't possible
       const highlightElement = document.createElement('span');
-      document.body.appendChild(highlightElement);
+      document.body?.appendChild(highlightElement);
       // console.log('boundingRect', boundingRect, parentElement);
       highlightElement.style.display = 'block';
       highlightElement.style.position = 'absolute';

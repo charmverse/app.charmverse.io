@@ -42,10 +42,8 @@ jest.mock('next/router', () => ({
 
 describe('<CommentForm />', () => {
   test('NameConsumer shows value from provider', () => {
-    const { getByText, getByPlaceholderText } = customRenderWithContext(
-      <CommentForm handleCreateComment={async (comment: CommentContent) => {}} />,
-      {}
-    );
-    expect(getByPlaceholderText(/^What are your thoughts?/)).toHaveTextContent('My Name Is: C3P0');
+    const { container } = customRenderWithContext(<CommentForm handleCreateComment={async () => {}} />, {});
+    const placeholder = container.querySelector('[data-placeholder="What are your thoughts?');
+    expect(placeholder).toBeInTheDocument();
   });
 });
