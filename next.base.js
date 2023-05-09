@@ -28,7 +28,7 @@ const esmModules = [
   'uuid',
   'data-uri-to-buffer',
   'fetch-blob',
-  '@babel/runtime',
+  // '@babel/runtime',
   'formdata-polyfill',
   'jose',
   'nanoid',
