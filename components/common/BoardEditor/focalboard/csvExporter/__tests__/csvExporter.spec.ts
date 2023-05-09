@@ -1,4 +1,4 @@
-import type { Block } from '@prisma/client';
+import type { Block } from '@charmverse/core/prisma';
 import { v4 as uuid } from 'uuid';
 
 import { prismaToBlock } from 'lib/focalboard/block';

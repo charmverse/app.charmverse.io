@@ -1,4 +1,4 @@
-import type { Space } from '@prisma/client';
+import type { Space } from '@charmverse/core/prisma';
 import { v4 as uuid } from 'uuid';
 
 import type { LoggedInUser } from 'models';

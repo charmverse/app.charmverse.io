@@ -46,7 +46,7 @@ export class ModCollabColors {
     const styleContainers = document.createElement('temp');
     styleContainers.innerHTML = '<style type="text/css" id="user-colors"></style>';
     while (styleContainers.firstElementChild) {
-      document.body?.appendChild(styleContainers.firstElementChild);
+      document.body.appendChild(styleContainers.firstElementChild);
     }
     this.userColorStyle = document.getElementById('user-colors');
   }
