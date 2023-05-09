@@ -50,6 +50,8 @@ describe('createTransaction', () => {
     });
 
     expect(transaction).not.toBeNull();
+    expect(transaction.transactionId).toBe('123');
+    expect(transaction.safeTxHash).toBeNull();
     expect(mockedRefreshPaymentStatus).not.toHaveBeenCalled();
   });
 
@@ -68,15 +70,17 @@ describe('createTransaction', () => {
     }
   });
 
-  it('Should create transaction for a submission and refresh status if it is a multisig transaction', async () => {
+  it('Should create transaction for a submission and refresh status if it is a multisig transaction (safeHashTx is present)', async () => {
     const transaction = await createTransaction({
       applicationId: application.id,
       chainId: '4',
       transactionId: '123',
-      isMultisig: true
+      safeTxHash: '0x1234'
     });
 
     expect(transaction).not.toBeNull();
+    expect(transaction.transactionId).toBe('123');
+    expect(transaction.safeTxHash).toBe('0x1234');
     expect(mockedRefreshPaymentStatus).toHaveBeenCalled();
   });
 });

@@ -29,7 +29,8 @@ export async function refreshPaymentStatus(applicationId: string) {
   }
 
   const multisigTxStatuses = application.transactions.map((tx) =>
-    getSafeTxStatus({ safeTxHash: tx.transactionId, chainId: Number(tx.chainId) })
+    // is safeTxHash is not presemt, use transactionId as fallback and it will get filled
+    getSafeTxStatus({ safeTxHash: tx.safeTxHash || tx.transactionId, chainId: Number(tx.chainId) })
   );
 
   try {
@@ -81,27 +82,27 @@ async function updateTransactions({
     .map((tx, index) => {
       const details = statuses[index];
 
-      if (!details || !details.chainTxHash || details.chainTxHash === tx.transactionId) {
+      if (
+        !details ||
+        !details.chainTxHash ||
+        (details.chainTxHash === tx.transactionId && details.safeTxHash === tx.safeTxHash)
+      ) {
         return null;
       }
 
-      // update tx hash only when transaction finished
-      if (details.status !== ApplicationStatus.cancelled && details.status !== ApplicationStatus.paid) {
-        return null;
-      }
-
-      return { id: tx.id, transactionId: details.chainTxHash };
+      return { id: tx.id, transactionId: details.chainTxHash, safeTxHash: details.safeTxHash };
     })
-    .filter((x): x is { id: string; transactionId: string } => x !== null);
+    .filter((x): x is { id: string; transactionId: string; safeTxHash: string } => x !== null);
 
   return prisma.$transaction(
-    transactionUpdates.map(({ id, transactionId }) => {
+    transactionUpdates.map(({ id, transactionId, safeTxHash }) => {
       return prisma.transaction.update({
         where: {
           id
         },
         data: {
-          transactionId
+          transactionId,
+          safeTxHash
         }
       });
     })

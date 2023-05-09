@@ -9,8 +9,8 @@ export async function createTransaction({
   applicationId,
   chainId,
   transactionId,
-  isMultisig
-}: TransactionCreationData & { isMultisig?: boolean }) {
+  safeTxHash
+}: TransactionCreationData) {
   const application = await prisma.application.findUnique({
     where: {
       id: applicationId
@@ -25,6 +25,7 @@ export async function createTransaction({
     data: {
       chainId,
       transactionId,
+      safeTxHash,
       application: {
         connect: {
           id: applicationId
@@ -33,7 +34,8 @@ export async function createTransaction({
     }
   });
 
-  if (isMultisig) {
+  // multisig tx
+  if (safeTxHash) {
     await refreshPaymentStatus(applicationId);
   }
 
