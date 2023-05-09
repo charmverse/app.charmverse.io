@@ -25,7 +25,8 @@ export function createMockUser(user?: Partial<LoggedInUser>): LoggedInUser {
     wallets: [
       {
         ensname: null,
-        address: '0x0000000000000000000000000000000000000000'
+        address: '0x0000000000000000000000000000000000000000',
+        id: uuid()
       }
     ],
     spaceRoles: [],
@@ -50,6 +51,8 @@ export const createMockSpace = (space?: Partial<Space>): Space => {
     domain: 'test-space',
     discordServerId: null,
     defaultVotingDuration: null,
+    origin: null,
+    paidTier: 'free',
     snapshotDomain: null,
     spaceImage: null,
     defaultPostCategoryId: null,

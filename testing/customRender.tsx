@@ -3,7 +3,6 @@ import { render } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { SWRConfig } from 'swr';
 
-import { CurrentSpaceContext } from 'hooks/useCurrentSpaceId';
 import { PageActionDisplayContext } from 'hooks/usePageActionDisplay';
 import { SnackbarContext } from 'hooks/useSnackbar';
 import { SpacesContext } from 'hooks/useSpaces';
@@ -49,32 +48,30 @@ export const customRenderWithContext = (ui: ReactNode, { value, ...renderOptions
               isCreatingSpace: false
             }}
           >
-            <CurrentSpaceContext.Provider value={{ setCurrentSpaceId: () => {}, currentSpaceId: space.id }}>
-              <SnackbarContext.Provider
-                value={{
-                  isOpen: false,
-                  handleClose: () => {},
-                  showMessage: () => {},
-                  actions: [],
-                  message: null,
-                  origin: {
-                    vertical: 'bottom',
-                    horizontal: 'left'
-                  },
-                  severity: 'info',
-                  setActions: () => {},
-                  setSeverity: () => {},
-                  setIsOpen: () => {},
-                  setMessage: () => {}
-                }}
+            <SnackbarContext.Provider
+              value={{
+                isOpen: false,
+                handleClose: () => {},
+                showMessage: () => {},
+                actions: [],
+                message: null,
+                origin: {
+                  vertical: 'bottom',
+                  horizontal: 'left'
+                },
+                severity: 'info',
+                setActions: () => {},
+                setSeverity: () => {},
+                setIsOpen: () => {},
+                setMessage: () => {}
+              }}
+            >
+              <PageActionDisplayContext.Provider
+                value={{ currentPageActionDisplay: null, setCurrentPageActionDisplay: () => {} }}
               >
-                <PageActionDisplayContext.Provider
-                  value={{ currentPageActionDisplay: null, setCurrentPageActionDisplay: () => {} }}
-                >
-                  {ui}
-                </PageActionDisplayContext.Provider>
-              </SnackbarContext.Provider>
-            </CurrentSpaceContext.Provider>
+                {ui}
+              </PageActionDisplayContext.Provider>
+            </SnackbarContext.Provider>
           </SpacesContext.Provider>
         </UserContext.Provider>
       </ThemeProvider>
