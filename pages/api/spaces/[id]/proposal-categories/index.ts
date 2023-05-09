@@ -20,7 +20,7 @@ async function getCategories(req: NextApiRequest, res: NextApiResponse<ProposalC
 
   const userId = req.session.user?.id;
 
-  const categories = await req.basePermissionsClient.proposals.getProposalCategories({
+  const categories = await req.basePermissionsClient.proposals.getAccessibleProposalCategories({
     spaceId,
     userId
   });

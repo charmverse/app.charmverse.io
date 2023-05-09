@@ -2,12 +2,15 @@ import type { BaseProposalPermissionsClient } from '@charmverse/core';
 
 import { computeProposalCategoryPermissions } from './computeProposalCategoryPermissions';
 import { computeProposalPermissions } from './computeProposalPermissions';
-import { getProposalCategories } from './getProposalCategories';
+import { getAccessibleProposalCategories } from './getAccessibleProposalCategories';
+import { getAccessibleProposals } from './getAccessibleProposals';
 
 export class PublicProposalsPermissionsClient implements BaseProposalPermissionsClient {
   computeProposalPermissions = computeProposalPermissions;
 
   computeProposalCategoryPermissions = computeProposalCategoryPermissions;
 
-  getProposalCategories = getProposalCategories;
+  getAccessibleProposalCategories = getAccessibleProposalCategories;
+
+  getAccessibleProposals = getAccessibleProposals;
 }

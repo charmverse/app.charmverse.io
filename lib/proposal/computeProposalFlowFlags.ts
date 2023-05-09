@@ -1,9 +1,8 @@
-import { prisma } from '@charmverse/core';
+import { prisma, isProposalAuthor } from '@charmverse/core';
 import { ProposalStatus } from '@charmverse/core/prisma';
 
 import { BasePermissions } from 'lib/permissions/basePermissions.class';
 import { computeProposalPermissions } from 'lib/permissions/proposals/computeProposalPermissions';
-import { isProposalAuthor } from 'lib/proposal/isProposalAuthor';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { typedKeys } from 'lib/utilities/objects';
 

@@ -68,7 +68,7 @@ async function castVote(req: NextApiRequest, res: NextApiResponse<UserVote | { e
     const postPermissions = await getPermissionsClient({
       resourceId: vote.postId,
       resourceIdType: 'post'
-    }).then((client) =>
+    }).then(({ client }) =>
       client.forum.computePostPermissions({
         resourceId: vote.postId as string,
         userId

@@ -22,6 +22,11 @@ type MiddlewareConfig = {
   location: 'body' | 'query';
 };
 
+/**
+ * Determine if the space linked to a resource should use public or private permissions
+ * Provides basePermissionsClient and spacePermissionsEngine to the request.
+ * Also provides premiumPermissionsClient if the space is paid space.
+ */
 export function providePermissionClients({ key, location, resourceIdType }: MiddlewareConfig) {
   // eslint-disable-next-line func-names
   return async function (req: NextApiRequest, res: NextApiResponse, next?: NextHandler) {

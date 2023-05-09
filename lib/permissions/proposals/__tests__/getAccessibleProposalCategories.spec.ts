@@ -1,21 +1,10 @@
-import type { ProposalCategoryWithPermissions, ProposalPermissionFlags } from '@charmverse/core';
-import {
-  AvailableProposalCategoryPermissions,
-  testUtilsMembers,
-  prisma,
-  proposalOperations,
-  testUtilsProposals,
-  testUtilsUser
-} from '@charmverse/core';
-import type { ProposalCategory, ProposalOperation, Role, Space, User } from '@charmverse/core/prisma';
-import { v4 } from 'uuid';
+import type { ProposalCategoryWithPermissions } from '@charmverse/core';
+import { AvailableProposalCategoryPermissions, testUtilsProposals, testUtilsUser } from '@charmverse/core';
+import type { ProposalCategory, Space, User } from '@charmverse/core/prisma';
 
-import { ProposalNotFoundError } from 'lib/proposal/errors';
-import type { ProposalWithUsers } from 'lib/proposal/interface';
 import { InvalidInputError } from 'lib/utilities/errors';
 
-import { baseComputeProposalPermissions } from '../computeProposalPermissions';
-import { getProposalCategories } from '../getProposalCategories';
+import { getAccessibleProposalCategories } from '../getAccessibleProposalCategories';
 
 let space: Space;
 let adminUser: User;
@@ -35,9 +24,9 @@ beforeAll(async () => {
   secondProposalCategory = await testUtilsProposals.generateProposalCategory({ spaceId: space.id });
 });
 
-describe('getProposalCategories', () => {
+describe('getAccessibleProposalCategories', () => {
   it('should return all categories for a space member, with the ability to create a post', async () => {
-    const categories = await getProposalCategories({
+    const categories = await getAccessibleProposalCategories({
       spaceId: space.id,
       userId: spaceMemberUser.id
     });
@@ -63,7 +52,7 @@ describe('getProposalCategories', () => {
   });
 
   it('should return all categories for a space admin, with all permissions except manage_permissions', async () => {
-    const categories = await getProposalCategories({
+    const categories = await getAccessibleProposalCategories({
       spaceId: space.id,
       userId: adminUser.id
     });
@@ -92,7 +81,7 @@ describe('getProposalCategories', () => {
   });
 
   it('should return all categories for a public user, with empty permissions', async () => {
-    const categories = await getProposalCategories({
+    const categories = await getAccessibleProposalCategories({
       spaceId: space.id,
       userId: undefined
     });
@@ -116,13 +105,13 @@ describe('getProposalCategories', () => {
   });
   it('should throw an error if the spaceID is undefined or invalid', async () => {
     await expect(
-      getProposalCategories({
+      getAccessibleProposalCategories({
         spaceId: undefined as any
       })
     ).rejects.toBeInstanceOf(InvalidInputError);
 
     await expect(
-      getProposalCategories({
+      getAccessibleProposalCategories({
         spaceId: 'invalid-uuid'
       })
     ).rejects.toBeInstanceOf(InvalidInputError);

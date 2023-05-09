@@ -1,4 +1,4 @@
-import type { PostCategoryWithPermissions } from '@charmverse/core';
+import type { PostCategoryWithPermissions, PremiumPermissionsClient } from '@charmverse/core';
 import type { PostCategory } from '@charmverse/core/prisma';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
@@ -8,12 +8,20 @@ import { createPostCategory } from 'lib/forums/categories/createPostCategory';
 import { getPostCategories } from 'lib/forums/categories/getPostCategories';
 import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { getPermissionsClient } from 'lib/permissions/api';
+import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
+  .use(
+    providePermissionClients({
+      key: 'id',
+      location: 'query',
+      resourceIdType: 'space'
+    })
+  )
   .get(getPostCategoriesController)
   .use(requireUser)
   .use(requireKeys<CreatePostCategoryInput>(['name'], 'body'))
@@ -27,15 +35,11 @@ async function getPostCategoriesController(req: NextApiRequest, res: NextApiResp
 
   // TODO - Switch for real implementation
 
-  const filteredPostCategories = await getPermissionsClient({
-    resourceId: spaceId as string,
-    resourceIdType: 'space'
-  }).then((client) =>
-    client.forum.getPermissionedCategories({
-      userId,
-      postCategories
-    })
-  );
+  const filteredPostCategories = await req.basePermissionsClient.forum.getPermissionedCategories({
+    userId,
+    postCategories
+  });
+
   return res.status(200).json(filteredPostCategories);
 }
 
@@ -59,15 +63,21 @@ async function createPostCategoryController(req: NextApiRequest, res: NextApiRes
     spaceId: spaceId as string
   });
 
-  const permissions = await getPermissionsClient({
+  const { client, type } = await getPermissionsClient({
     resourceId: postCategory.id,
     resourceIdType: 'postCategory'
-  }).then((client) =>
-    client.forum.computePostCategoryPermissions({
-      resourceId: postCategory.id,
-      userId
-    })
-  );
+  });
+
+  if (type === 'premium') {
+    await (client as PremiumPermissionsClient).forum.assignDefaultPostCategoryPermissions({
+      resourceId: postCategory.id
+    });
+  }
+
+  const permissions = await req.basePermissionsClient.forum.computePostCategoryPermissions({
+    resourceId: postCategory.id,
+    userId
+  });
 
   return res.status(201).json({ ...postCategory, permissions });
 }

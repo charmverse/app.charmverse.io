@@ -5,7 +5,7 @@ import { InvalidInputError } from 'lib/utilities/errors';
 
 import { buildProposalCategoryPermissions } from './computeProposalCategoryPermissions';
 
-export async function getProposalCategories({
+export async function getAccessibleProposalCategories({
   spaceId,
   userId
 }: SpaceResourcesRequest): Promise<ProposalCategoryWithPermissions[]> {
