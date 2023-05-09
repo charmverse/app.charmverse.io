@@ -28,11 +28,16 @@ const esmModules = [
   'uuid',
   'data-uri-to-buffer',
   'fetch-blob',
-  '@babel/runtime',
+  // '@babel/runtime',
   'formdata-polyfill',
   'jose',
   'nanoid',
   '@charmverse/core'
 ];
+
+// this breaks the dev environment with an error when importing MUI icons: Cannot use 'import.meta' outside a module
+if (process.env.NODE_ENV === 'test') {
+  esmModules.push('@babel/runtime');
+}
 
 exports.esmModules = esmModules;
