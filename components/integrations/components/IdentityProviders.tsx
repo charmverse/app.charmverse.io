@@ -1,6 +1,6 @@
 import { log } from '@charmverse/core/log';
 import type { User } from '@charmverse/core/prisma';
-import RefreshIcon from '@mui/icons-material/Refresh';
+import { Refresh as RefreshIcon } from '@mui/icons-material';
 import type { SelectChangeEvent } from '@mui/material';
 import {
   Alert,
