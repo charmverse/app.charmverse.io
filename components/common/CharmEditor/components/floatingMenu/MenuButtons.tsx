@@ -265,7 +265,7 @@ export function UndoButton({ hints = ['Undo', historyKeys.undo], children = <Und
 
 export function CodeButton({
   hints = ['Code', codeKeys.toggleCode],
-  children = <CodeIcon fontSize={16} />
+  children = <CodeIcon fontSize={{ xs: 20, md: 16 }} />
 }: ButtonProps) {
   const view = useEditorViewContext();
   const onSelect = useCallback(
