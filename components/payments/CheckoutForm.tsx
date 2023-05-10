@@ -1,4 +1,4 @@
-import { useStripe, useElements } from '@stripe/react-stripe-js';
+import { useStripe, useElements, PaymentElement } from '@stripe/react-stripe-js';
 import type { FormEvent } from 'react';
 import { useState } from 'react';
 
@@ -65,6 +65,7 @@ export function CheckoutForm() {
 
   return (
     <form id='payment-form' onSubmit={createSubscription}>
+      <PaymentElement id='payment-element' />
       <Button type='submit' disabled={isProcessing || !stripe || !elements || !space}>
         {isProcessing ? 'Processing ... ' : 'Purchase'}
       </Button>
