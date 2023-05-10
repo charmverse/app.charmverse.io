@@ -2,8 +2,8 @@ import { prisma } from '@charmverse/core';
 import type { SubscriptionTier } from '@charmverse/core/prisma';
 import Stripe from 'stripe';
 
-import type { Usage } from './utils';
-import { UsageRecord } from './utils';
+import type { SubscriptionPeriod, SubscriptionUsage } from './utils';
+import { SubscriptionUsageRecord } from './utils';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
   apiVersion: '2022-11-15'
@@ -13,15 +13,15 @@ export async function createSubscription({
   paymentMethodId,
   spaceId,
   spaceDomain,
-  monthly,
+  period,
   usage,
   tier = 'pro'
 }: {
-  usage: Usage;
+  usage: SubscriptionUsage;
   paymentMethodId: string;
   spaceId: string;
   spaceDomain: string;
-  monthly: boolean;
+  period: SubscriptionPeriod;
   tier?: Exclude<SubscriptionTier, 'free'>;
 }) {
   // Create a customer
@@ -31,7 +31,7 @@ export async function createSubscription({
     invoice_settings: { default_payment_method: paymentMethodId }
   });
 
-  const product = await stripe.products.retrieve(`${tier}-${monthly ? 'monthly' : 'annual'}-${usage}`);
+  const product = await stripe.products.retrieve(`${tier}-${period}-${usage}`);
 
   // Create a subscription
   const subscription = await stripe.subscriptions.create({
@@ -41,9 +41,9 @@ export async function createSubscription({
         price_data: {
           currency: 'USD',
           product: product.id,
-          unit_amount: UsageRecord[usage].pricing,
+          unit_amount: SubscriptionUsageRecord[usage].pricing[period] * (period === 'monthly' ? 1 : 12),
           recurring: {
-            interval: monthly ? 'month' : 'year'
+            interval: period === 'monthly' ? 'month' : 'year'
           }
         }
       }

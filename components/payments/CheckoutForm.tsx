@@ -37,10 +37,12 @@ export function CheckoutForm() {
       });
 
       if (paymentMethod.paymentMethod) {
+        // TODO: Handle period/usage for subscriptions
         const subscriptionResponse = await charmClient.payment.createSubscription({
           spaceId: space.id,
           paymentMethodId: paymentMethod.paymentMethod.id,
-          monthly: false
+          period: 'monthly',
+          usage: '1'
         });
 
         if (subscriptionResponse.clientSecret) {

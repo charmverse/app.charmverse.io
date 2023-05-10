@@ -4,12 +4,14 @@ import nc from 'next-connect';
 
 import { NotFoundError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { createSubscription } from 'lib/payment/createSubscription';
+import type { SubscriptionPeriod, SubscriptionUsage } from 'lib/payment/utils';
 import { withSessionRoute } from 'lib/session/withSession';
 
 export type CreatePaymentSubscriptionRequest = {
   spaceId: string;
   paymentMethodId: string;
-  monthly: boolean;
+  usage: SubscriptionUsage;
+  period: SubscriptionPeriod;
 };
 
 export type CreatePaymentSubscriptionResponse = {
@@ -21,7 +23,7 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 handler.use(requireUser).post(createPaymentSubscription);
 
 async function createPaymentSubscription(req: NextApiRequest, res: NextApiResponse<CreatePaymentSubscriptionResponse>) {
-  const { paymentMethodId, spaceId, monthly } = req.body as CreatePaymentSubscriptionRequest;
+  const { period, usage, paymentMethodId, spaceId } = req.body as CreatePaymentSubscriptionRequest;
   const userId = req.session.user.id;
   const spaceAccess = await hasAccessToSpace({ spaceId, userId, disallowGuest: true, adminOnly: true });
   const space = await prisma.space.findUnique({
@@ -43,7 +45,8 @@ async function createPaymentSubscription(req: NextApiRequest, res: NextApiRespon
     paymentMethodId,
     spaceId,
     spaceDomain: space.domain,
-    monthly
+    period,
+    usage
   });
 
   res.status(200).json({
