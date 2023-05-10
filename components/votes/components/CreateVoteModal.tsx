@@ -97,6 +97,7 @@ interface CreateVoteModalProps {
   open?: boolean;
   pageId?: string;
   postId?: string;
+  snapshotProposalId?: string;
   proposal?: ProposalWithUsers;
   proposalFlowFlags?: ProposalFlowFlags;
 }
@@ -108,6 +109,7 @@ export function CreateVoteModal({
   onPublishToSnapshot = () => null,
   pageId,
   postId,
+  snapshotProposalId,
   proposal,
   proposalFlowFlags
 }: CreateVoteModalProps) {
@@ -307,6 +309,7 @@ export function CreateVoteModal({
                     )}
                     onPublish={onPublishToSnapshot}
                     pageId={proposal.id}
+                    snapshotProposalId={snapshotProposalId}
                   />
                 </div>
               </Tooltip>

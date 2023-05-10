@@ -36,7 +36,7 @@ interface ProposalPropertiesProps {
   refreshPagePermissions?: () => void;
 }
 
-export default function ProposalProperties({
+export function ProposalProperties({
   pagePermissions,
   refreshPagePermissions = () => null,
   pageId,
