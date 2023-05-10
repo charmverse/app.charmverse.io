@@ -3,6 +3,7 @@ import { PermissionsApiClient, prisma } from '@charmverse/core';
 import type { Space, SubscriptionTier } from '@charmverse/core/prisma';
 import type { PremiumPermissionsClient } from '@charmverse/core/shared';
 import {
+  ProposalCategoryPermissionNotFoundError,
   stringUtils,
   InvalidInputError,
   PostCategoryNotFoundError,
@@ -212,7 +213,7 @@ export async function isProposalCategoryPermissionSpaceOptedIn({
   });
 
   if (!proposalCategoryPermission) {
-    throw new PostCategoryNotFoundError(resourceId);
+    throw new ProposalCategoryPermissionNotFoundError(resourceId);
   }
 
   return getEngine(proposalCategoryPermission.proposalCategory.space);

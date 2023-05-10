@@ -12,12 +12,11 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
   .use(requireUser)
-  .use(requirePaidPermissionsSubscription({ key: 'resourceId', location: 'query', resourceIdType: 'proposal' }))
+  .use(requirePaidPermissionsSubscription({ key: 'resourceId', location: 'query', resourceIdType: 'proposalCategory' }))
   .get(listPermissions);
 
 async function listPermissions(req: NextApiRequest, res: NextApiResponse<AssignedProposalCategoryPermission[]>) {
   const input = req.query as PermissionCompute;
-
   if (!input.resourceId) {
     throw new InvalidInputError('Please provide a category Id or a space Id');
   }

@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { onError, onNoMatch, requireSpaceMembership } from 'lib/middleware';
+import { onError, onNoMatch } from 'lib/middleware';
 import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
 import type { ListProposalsRequest } from 'lib/proposal/getProposalsBySpace';
 import type { ProposalWithUsers } from 'lib/proposal/interface';
@@ -17,7 +17,6 @@ handler
       resourceIdType: 'space'
     })
   )
-  .use(requireSpaceMembership({ adminOnly: false, spaceIdKey: 'id' }))
   .post(getProposals);
 
 async function getProposals(req: NextApiRequest, res: NextApiResponse<ProposalWithUsers[]>) {
