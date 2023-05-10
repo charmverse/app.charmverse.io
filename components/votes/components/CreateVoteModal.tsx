@@ -97,7 +97,7 @@ interface CreateVoteModalProps {
   open?: boolean;
   pageId?: string;
   postId?: string;
-  snapshotProposalId?: string;
+  snapshotProposalId: string | null;
   proposal?: ProposalWithUsers;
   proposalFlowFlags?: ProposalFlowFlags;
 }

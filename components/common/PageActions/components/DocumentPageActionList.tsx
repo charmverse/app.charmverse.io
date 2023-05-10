@@ -48,6 +48,7 @@ export type PageActionMeta = Pick<
   | 'id'
   | 'parentId'
   | 'path'
+  | 'snapshotProposalId'
   | 'title'
   | 'type'
   | 'updatedAt'
@@ -317,6 +318,7 @@ export function DocumentPageActionList({
       <Divider />
       <PublishToSnapshot
         pageId={pageId}
+        snapshotProposalId={page.snapshotProposalId}
         renderContent={({ label, onClick, icon }) => (
           <ListItemButton onClick={onClick}>
             {icon}

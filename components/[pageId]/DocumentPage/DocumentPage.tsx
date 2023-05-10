@@ -234,6 +234,7 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
                   containerWidth={containerWidth}
                   pageType={page.type}
                   pagePermissions={pagePermissions ?? undefined}
+                  snapshotProposalId={page.snapshotProposalId}
                   onParticipantUpdate={onParticipantUpdate}
                   style={{
                     minHeight: proposalId ? '100px' : 'unset'
@@ -293,6 +294,7 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
                           pageId={page.id}
                           proposalId={proposalId}
                           pagePermissions={pagePermissions}
+                          snapshotProposalId={page.snapshotProposalId}
                           refreshPagePermissions={refreshPage}
                           readOnly={readonlyProposalProperties}
                           isTemplate={page.type === 'proposal_template'}
