@@ -2,7 +2,7 @@ import { CacheProvider } from '@emotion/react';
 import type { EmotionCache } from '@emotion/utils';
 import type { ExternalProvider, JsonRpcFetchFunc } from '@ethersproject/providers';
 import { Web3Provider } from '@ethersproject/providers';
-import RefreshIcon from '@mui/icons-material/Refresh';
+import { Refresh as RefreshIcon } from '@mui/icons-material';
 import IconButton from '@mui/material/IconButton';
 import { Web3ReactProvider } from '@web3-react/core';
 import type { NextPage } from 'next';

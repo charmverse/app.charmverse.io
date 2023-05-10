@@ -99,7 +99,7 @@ export class BountiesApi {
     return http.POST<Application>(`/api/submissions/${submissionId}/mark-as-paid`);
   }
 
-  recordTransaction(data: TransactionCreationData) {
+  recordTransaction(data: TransactionCreationData & { isMultisig?: boolean }) {
     return http.POST('/api/transactions', data);
   }
 
@@ -123,5 +123,9 @@ export class BountiesApi {
 
   getApplicationComments(applicationId: string) {
     return http.GET<PageComment[]>(`/api/applications/${applicationId}/comments`);
+  }
+
+  refreshApplicationStatus(applicationId: string) {
+    return http.GET<Application>(`/api/applications/${applicationId}/refresh-status`);
   }
 }

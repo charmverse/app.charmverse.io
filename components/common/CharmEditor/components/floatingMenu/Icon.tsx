@@ -27,6 +27,12 @@ const StyledMenuButton = styled(ListItemButton, { shouldForwardProp: (prop) => p
     width: 1.25em;
     fill: currentcolor;
   }
+
+  ${(props) => props.theme.breakpoints.down('md')} {
+    min-width: 38px;
+    min-height: 40px;
+    justify-content: center;
+  }
 `;
 
 export function MenuButton({ children, isActive = false, isDisabled, hints, onClick }: MenuButtonProps) {
@@ -59,10 +65,12 @@ export function MenuButton({ children, isActive = false, isDisabled, hints, onCl
       <ListItem disablePadding component='div'>
         <StyledMenuButton
           disabled={isDisabled}
-          sx={{ pointerEvents: isDisabled ? 'none' : 'initial' }}
+          sx={{
+            pointerEvents: isDisabled ? 'none' : 'initial'
+          }}
           aria-label={hints.join('\n')}
           active={isActive}
-          onMouseDown={onClick}
+          onClick={onClick}
         >
           {children}
         </StyledMenuButton>

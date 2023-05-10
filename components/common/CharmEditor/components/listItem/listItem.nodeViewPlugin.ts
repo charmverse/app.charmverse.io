@@ -92,7 +92,7 @@ export function listItemNodeViewPlugin(name: string, readOnly?: boolean) {
         }
 
         // Connect the two contentDOM and containerDOM for pm to write to
-        instance.containerDOM!.appendChild(instance.contentDOM!);
+        instance.containerDOM?.appendChild(instance.contentDOM!);
       },
 
       // We need to achieve a two way binding of the todoChecked state.

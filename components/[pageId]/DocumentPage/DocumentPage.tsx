@@ -28,6 +28,7 @@ import { useVotes } from 'hooks/useVotes';
 import type { AssignedBountyPermissions } from 'lib/bounties';
 import type { PageWithContent } from 'lib/pages/interfaces';
 import type { PageContent } from 'lib/prosemirror/interfaces';
+import { fontClassName } from 'theme/fonts';
 
 import BountyProperties from './components/BountyProperties';
 import PageBanner from './components/PageBanner';
@@ -197,7 +198,7 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
           }
         }}
       >
-        <div ref={printRef} className='document-print-container'>
+        <div ref={printRef} className={`document-print-container ${fontClassName}`}>
           <ScrollContainer id='document-scroll-container' showPageActionSidebar={showPageActionSidebar}>
             <div ref={containerRef}>
               <PageTemplateBanner parentId={page.parentId} pageType={page.type} />

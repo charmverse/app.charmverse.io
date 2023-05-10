@@ -22,7 +22,7 @@ import type { AssignedBountyPermissions } from 'lib/bounties';
 import { isValidChainAddress } from 'lib/tokens/validation';
 import type { SystemError } from 'lib/utilities/errors';
 
-import BountyApplicantStatus from '../../BountyApplicantStatus';
+import { BountyApplicantStatus } from '../../BountyApplicantStatus';
 
 const schema = (customReward?: boolean) => {
   return yup.object({

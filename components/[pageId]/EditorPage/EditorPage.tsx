@@ -1,6 +1,6 @@
 import type { Page } from '@charmverse/core/prisma';
 import log from 'loglevel';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect } from 'react';
 
 import ErrorPage from 'components/common/errors/ErrorPage';
 import { useCharmEditor } from 'hooks/useCharmEditor';
@@ -8,7 +8,6 @@ import { useCurrentPage } from 'hooks/useCurrentPage';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePage } from 'hooks/usePage';
 import { usePageTitle } from 'hooks/usePageTitle';
-import type { PageMeta } from 'lib/pages';
 import debouncePromise from 'lib/utilities/debouncePromise';
 
 import { DatabasePage } from '../DatabasePage';
@@ -19,7 +18,6 @@ export function EditorPage({ pageId: pageIdOrPath }: { pageId: string }) {
   const { editMode, resetPageProps, setPageProps } = useCharmEditor();
   const [, setTitleState] = usePageTitle();
   const currentSpace = useCurrentSpace();
-  const [currentPage] = useState<PageMeta | null>(null);
 
   const {
     error: pageWithContentError,
@@ -87,10 +85,10 @@ export function EditorPage({ pageId: pageIdOrPath }: { pageId: string }) {
 
   useEffect(() => {
     // make sure current page is loaded
-    if (currentPage) {
-      setTitleState(currentPage.title || 'Untitled');
+    if (page?.title) {
+      setTitleState(page.title || 'Untitled');
     }
-  }, [currentPage?.title]);
+  }, [page?.title]);
 
   if (pageWithContentError === 'access_denied') {
     return <ErrorPage message={"Sorry, you don't have access to this page"} />;

@@ -17,7 +17,6 @@ import { eToNumber } from 'lib/utilities/numbers';
 import { isTruthy } from 'lib/utilities/types';
 
 import { useBounties } from './useBounties';
-import { useCurrentSpace } from './useCurrentSpace';
 
 const ERC20_ABI = ['function transfer(address to, uint256 value)'];
 
@@ -39,9 +38,8 @@ export function useMultiBountyPayment({
 }) {
   const [isLoading, setIsLoading] = useState(false);
   const [gnosisSafeData, setGnosisSafeData] = useState<SafeData | null>(null);
-  const { setBounties, setCurrentBounty, currentBountyId } = useBounties();
+  const { refreshBounties } = useBounties();
   const { account, chainId } = useWeb3AuthSig();
-  const currentSpace = useCurrentSpace();
   const [paymentMethods] = usePaymentMethods();
   const signer = useGnosisSigner();
   const { data: gnosisSafes } = useSWR(
@@ -106,6 +104,7 @@ export function useMultiBountyPayment({
 
   async function onPaymentSuccess(result: MultiPaymentResult) {
     const safeData = gnosisSafes?.find((safe) => safe.address === result.safeAddress);
+
     if (safeData) {
       setIsLoading(true);
       await Promise.all(
@@ -113,21 +112,13 @@ export function useMultiBountyPayment({
           await charmClient.bounties.recordTransaction({
             applicationId: transaction.applicationId,
             transactionId: result.txHash,
-            chainId: safeData.chainId.toString()
+            chainId: safeData.chainId.toString(),
+            isMultisig: true
           });
-          await charmClient.bounties.markSubmissionAsPaid(transaction.applicationId);
         })
       );
 
-      if (currentSpace) {
-        charmClient.bounties.listBounties(currentSpace.id).then((_bounties) => {
-          setBounties(_bounties);
-          const newCurrentBounty = _bounties.find((_bounty) => _bounty.id === currentBountyId);
-          if (newCurrentBounty) {
-            setCurrentBounty({ ...newCurrentBounty });
-          }
-        });
-      }
+      refreshBounties();
       setIsLoading(false);
       postPaymentSuccess?.();
     }

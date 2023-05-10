@@ -129,7 +129,7 @@ export function VideoNodeView({
             playbackId={playbackIdWithToken} // asset.playbackId includes signed token
             // for analytics
             metadata={{
-              page_id: pageId
+              custom_1: pageId
               // video_id: 'video-id-123456'
               // video_title: 'Super Interesting Video',
               // viewer_user_id: 'user-id-bc-789'

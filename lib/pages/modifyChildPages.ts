@@ -46,7 +46,9 @@ export async function modifyChildPages(parentId: string, userId: string, action:
             {
               id: {
                 in: modifiedChildPageIds
-              },
+              }
+            },
+            {
               parentId: {
                 in: modifiedChildPageIds
               }

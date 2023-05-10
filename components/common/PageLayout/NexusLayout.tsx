@@ -7,7 +7,7 @@ import type { ReactNode } from 'react';
 import Button from 'components/common/Button';
 import { SpaceSettingsDialog } from 'components/common/Modal/SettingsDialog';
 import { PageDialogProvider } from 'components/common/PageDialog/hooks/usePageDialog';
-import PageDialogGlobalModal from 'components/common/PageDialog/PageDialogGlobal';
+import { PageDialogGlobal } from 'components/common/PageDialog/PageDialogGlobal';
 import { PageActionDisplayProvider } from 'hooks/usePageActionDisplay';
 import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useUser } from 'hooks/useUser';
@@ -67,7 +67,7 @@ function NexusLayout({ children }: NexusLayoutProps) {
             {children}
             <SpaceSettingsDialog />
           </PageContainer>
-          <PageDialogGlobalModal />
+          <PageDialogGlobal />
         </PageActionDisplayProvider>
       </PageDialogProvider>
     </Box>
