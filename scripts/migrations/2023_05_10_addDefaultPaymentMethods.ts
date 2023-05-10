@@ -27,6 +27,8 @@ async function init() {
 
   let newTokens = 0;
 
+  console.log('found', spaces.length, spaces);
+
   for (let space of spaces) {
     const methods = paymentMethods.filter((method) => method.spaceId === space.id);
     const transactions: any = [];
@@ -57,6 +59,9 @@ async function init() {
     if (transactions.length) {
       await prisma.$transaction(transactions);
       newTokens += transactions.length;
+    }
+    if ((newTokens / 2) % 100 === 0) {
+      console.log('added tokens', newTokens);
     }
   }
   console.log('added tokens', newTokens);
