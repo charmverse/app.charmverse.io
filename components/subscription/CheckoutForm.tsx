@@ -6,6 +6,7 @@ import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
+import type { SubscriptionPeriod, SubscriptionUsage } from 'lib/subscription/utils';
 
 export function CheckoutForm() {
   const stripe = useStripe();
@@ -14,6 +15,8 @@ export function CheckoutForm() {
   const space = useCurrentSpace();
   const [isProcessing, setIsProcessing] = useState(false);
   const { showMessage } = useSnackbar();
+  const [period, setPeriod] = useState<SubscriptionPeriod>('monthly');
+  const [usage, setUsage] = useState<SubscriptionUsage>('1');
 
   const createSubscription = async (e: FormEvent) => {
     e.preventDefault();

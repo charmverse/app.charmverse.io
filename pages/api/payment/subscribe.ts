@@ -2,10 +2,10 @@ import { UnauthorisedActionError, hasAccessToSpace } from '@charmverse/core';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { NotFoundError, onError, onNoMatch, requireUser } from 'lib/middleware';
-import { createSubscription } from 'lib/payment/createSubscription';
-import type { SubscriptionPeriod, SubscriptionUsage } from 'lib/payment/utils';
+import { InvalidStateError, NotFoundError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
+import { createSubscription } from 'lib/subscription/createSubscription';
+import type { SubscriptionPeriod, SubscriptionUsage } from 'lib/subscription/utils';
 
 export type CreatePaymentSubscriptionRequest = {
   spaceId: string;
@@ -29,6 +29,7 @@ async function createPaymentSubscription(req: NextApiRequest, res: NextApiRespon
   const space = await prisma.space.findUnique({
     where: { id: spaceId },
     select: {
+      subscriptionId: true,
       domain: true
     }
   });
@@ -39,6 +40,10 @@ async function createPaymentSubscription(req: NextApiRequest, res: NextApiRespon
 
   if (!space) {
     throw new NotFoundError('Space not found');
+  }
+
+  if (space.subscriptionId) {
+    throw new InvalidStateError('Space already has a subscription');
   }
 
   const { clientSecret } = await createSubscription({

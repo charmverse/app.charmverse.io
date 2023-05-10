@@ -31,10 +31,15 @@ export async function createSubscription({
     invoice_settings: { default_payment_method: paymentMethodId }
   });
 
-  const product = await stripe.products.retrieve(`${tier}-${period}-${usage}`);
+  const product = await stripe.products.retrieve(`${tier}-${usage}-${period}`);
 
   // Create a subscription
   const subscription = await stripe.subscriptions.create({
+    metadata: {
+      usage,
+      period,
+      tier
+    },
     customer: customer.id,
     items: [
       {

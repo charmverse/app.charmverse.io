@@ -17,6 +17,7 @@ import { SETTINGS_TABS, ACCOUNT_TABS } from 'components/settings/config';
 import Invites from 'components/settings/invites/Invites';
 import { RoleSettings } from 'components/settings/roles/RoleSettings';
 import SpaceSettings from 'components/settings/workspace/Space';
+import { SubscriptionSettings } from 'components/subscription/SubscriptionSettings';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSmallScreen } from 'hooks/useMediaScreens';
 import { useSettingsDialog } from 'hooks/useSettingsDialog';
@@ -48,6 +49,10 @@ function TabView(props: { space?: Space; tab: SpaceSettingsTab | UserSettingsTab
 
   if (tab.path === SETTINGS_TABS[3].path && space) {
     return <ApiSettings space={space} />;
+  }
+
+  if (tab.path === SETTINGS_TABS[4].path && space) {
+    return <SubscriptionSettings space={space} />;
   }
 
   if (tab.path === ACCOUNT_TABS[0].path) {
