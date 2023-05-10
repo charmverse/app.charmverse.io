@@ -27,7 +27,7 @@ async function init() {
 
   let newTokens = 0;
 
-  console.log('found', spaces.length, spaces);
+  console.log('found', spaces.length, 'spaces and', paymentMethods.length, 'payment methods');
 
   for (let space of spaces) {
     const methods = paymentMethods.filter((method) => method.spaceId === space.id);
