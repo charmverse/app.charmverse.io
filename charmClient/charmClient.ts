@@ -1,4 +1,5 @@
 import type {
+  ApiPageKey,
   Block,
   FavoritePage,
   InviteLink,
@@ -11,14 +12,13 @@ import type {
   User,
   UserDetails,
   UserGnosisSafe,
-  UserWallet,
-  ApiPageKey
+  UserWallet
 } from '@charmverse/core/prisma';
 import type { FiatCurrency, IPairQuote } from 'connectors';
 
 import * as http from 'adapters/http';
 import type { AuthSig, ExtendedPoap } from 'lib/blockchain/interfaces';
-import type { Block as FBBlock, BlockPatch } from 'lib/focalboard/block';
+import type { BlockPatch, Block as FBBlock } from 'lib/focalboard/block';
 import type { Web3LoginRequest } from 'lib/middleware/requireWalletSignature';
 import type { FailedImportsError } from 'lib/notion/types';
 import type { IPageWithPermissions, ModifyChildPagesResponse, PageLink } from 'lib/pages';
@@ -56,12 +56,12 @@ import { IframelyApi } from './apis/iframelyApi';
 import { MembersApi } from './apis/membersApi';
 import { MuxApi } from './apis/muxApi';
 import { PagesApi } from './apis/pagesApi';
-import { PaymentApi } from './apis/paymentApi';
 import { PermissionsApi } from './apis/permissions';
 import { ProfileApi } from './apis/profileApi';
 import { ProposalsApi } from './apis/proposalsApi';
 import { RolesApi } from './apis/rolesApi';
 import { SpacesApi } from './apis/spacesApi';
+import { SubscriptionApi } from './apis/subscriptionApi';
 import { SummonApi } from './apis/summonApi';
 import { TasksApi } from './apis/tasksApi';
 import { TokenGatesApi } from './apis/tokenGates';
@@ -119,7 +119,7 @@ class CharmClient {
 
   tokenGates = new TokenGatesApi();
 
-  payment = new PaymentApi();
+  subscription = new SubscriptionApi();
 
   async socket() {
     return http.GET<SocketAuthReponse>('/api/socket');

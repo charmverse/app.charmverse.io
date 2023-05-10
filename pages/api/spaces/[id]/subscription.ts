@@ -12,10 +12,10 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 handler.use(requireUser).get(getSpaceSubscriptionController);
 
 async function getSpaceSubscriptionController(req: NextApiRequest, res: NextApiResponse<SpaceSubscription | null>) {
-  const { spaceId } = req.query as { spaceId: string };
+  const { id: spaceId } = req.query as { id: string };
   const userId = req.session.user.id;
 
-  const spaceAccess = await hasAccessToSpace({ spaceId, userId });
+  const spaceAccess = await hasAccessToSpace({ spaceId, userId, adminOnly: false });
 
   if (spaceAccess.error) {
     throw new UnauthorisedActionError();

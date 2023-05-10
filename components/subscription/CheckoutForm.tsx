@@ -1,4 +1,5 @@
-import { useStripe, useElements, PaymentElement } from '@stripe/react-stripe-js';
+import { CardElement, useElements, useStripe } from '@stripe/react-stripe-js';
+import type { StripeCardElementChangeEvent } from '@stripe/stripe-js';
 import type { FormEvent } from 'react';
 import { useState } from 'react';
 
@@ -17,6 +18,12 @@ export function CheckoutForm() {
   const { showMessage } = useSnackbar();
   const [period, setPeriod] = useState<SubscriptionPeriod>('monthly');
   const [usage, setUsage] = useState<SubscriptionUsage>('1');
+  const [cardEvent, setCardEvent] = useState<StripeCardElementChangeEvent | null>(null);
+  const cardElement = elements?.getElement('card');
+
+  const onCardChange = (event: StripeCardElementChangeEvent) => {
+    setCardEvent(event);
+  };
 
   const createSubscription = async (e: FormEvent) => {
     e.preventDefault();
@@ -25,8 +32,6 @@ export function CheckoutForm() {
       // Make sure to disable form submission until Stripe.js has loaded.
       return;
     }
-
-    const cardElement = elements.getElement('card');
 
     if (!cardElement) {
       return;
@@ -41,7 +46,7 @@ export function CheckoutForm() {
 
       if (paymentMethod.paymentMethod) {
         // TODO: Handle period/usage for subscriptions
-        const subscriptionResponse = await charmClient.payment.createSubscription({
+        const subscriptionResponse = await charmClient.subscription.createSubscription({
           spaceId: space.id,
           paymentMethodId: paymentMethod.paymentMethod.id,
           period: 'monthly',
@@ -70,8 +75,19 @@ export function CheckoutForm() {
 
   return (
     <form id='payment-form' onSubmit={createSubscription}>
-      <PaymentElement id='payment-element' />
-      <Button type='submit' disabled={isProcessing || !stripe || !elements || !space}>
+      <CardElement
+        id='card-element'
+        onChange={onCardChange}
+        options={{
+          style: {}
+        }}
+      />
+      <Button
+        type='submit'
+        disabled={
+          cardEvent?.error || !cardEvent?.complete || cardEvent?.empty || isProcessing || !stripe || !elements || !space
+        }
+      >
         {isProcessing ? 'Processing ... ' : 'Purchase'}
       </Button>
     </form>

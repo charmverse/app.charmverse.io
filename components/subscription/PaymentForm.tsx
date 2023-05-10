@@ -12,7 +12,7 @@ export function PaymentForm() {
 
   useEffect(() => {
     async function fetchStripePublicKey() {
-      const { publicKey } = await charmClient.payment.getStripePublicKey();
+      const { publicKey } = await charmClient.subscription.getStripePublicKey();
       setStripePromise(loadStripe(publicKey));
     }
 

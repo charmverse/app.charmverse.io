@@ -6,7 +6,7 @@ import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireUser).post(getStripePublicKey);
+handler.use(requireUser).get(getStripePublicKey);
 
 async function getStripePublicKey(req: NextApiRequest, res: NextApiResponse<{ publicKey: string }>) {
   res.status(200).json({

@@ -1,3 +1,4 @@
+import { prisma } from '@charmverse/core';
 import Stripe from 'stripe';
 
 import { NotFoundError } from 'lib/middleware';
