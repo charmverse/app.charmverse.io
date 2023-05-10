@@ -56,6 +56,7 @@ import { IframelyApi } from './apis/iframelyApi';
 import { MembersApi } from './apis/membersApi';
 import { MuxApi } from './apis/muxApi';
 import { PagesApi } from './apis/pagesApi';
+import { PaymentApi } from './apis/paymentApi';
 import { PermissionsApi } from './apis/permissions';
 import { ProfileApi } from './apis/profileApi';
 import { ProposalsApi } from './apis/proposalsApi';
@@ -117,6 +118,8 @@ class CharmClient {
   votes = new VotesApi();
 
   tokenGates = new TokenGatesApi();
+
+  payment = new PaymentApi();
 
   async socket() {
     return http.GET<SocketAuthReponse>('/api/socket');
