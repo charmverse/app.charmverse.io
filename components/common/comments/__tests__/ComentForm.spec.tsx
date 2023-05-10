@@ -1,7 +1,5 @@
-import '@testing-library/jest-dom/extend-expect';
 import type { ClientOptions } from '@uauth/js';
 
-import type { CommentContent } from 'lib/comments';
 import { customRenderWithContext } from 'testing/customRender';
 
 import { CommentForm } from '../CommentForm';
@@ -15,7 +13,7 @@ jest.mock('lit-js-sdk', () => ({
 }));
 
 jest.mock('@uauth/js', () => ({
-  UAuth: (options: ClientOptions) => {}
+  UAuth: () => {}
 }));
 
 jest.mock('lib/snapshot/getProposal', () => ({
