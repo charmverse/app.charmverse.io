@@ -1,6 +1,6 @@
 import type { IdentityType } from '@charmverse/core/prisma';
+import { Refresh as RefreshIcon } from '@mui/icons-material';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
-import RefreshIcon from '@mui/icons-material/Refresh';
 import { Box, Tooltip, Typography } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 import { utils } from 'ethers';

@@ -17,7 +17,6 @@ import type { WrappedComponentProps } from 'react-intl';
 import { injectIntl } from 'react-intl';
 import type { ConnectedProps } from 'react-redux';
 import { connect } from 'react-redux';
-import { mutate } from 'swr';
 import { v4 as uuid } from 'uuid';
 
 import charmClient from 'charmClient';
@@ -38,6 +37,7 @@ import { webhookBaseUrl } from 'config/constants';
 import { useApiPageKeys } from 'hooks/useApiPageKeys';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMembers } from 'hooks/useMembers';
+import { usePage } from 'hooks/usePage';
 import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
@@ -95,7 +95,7 @@ type State = {
 };
 
 function CenterPanel(props: Props) {
-  const { activeView: defaultActiveView, board, pageIcon, showView, views: allViews } = props;
+  const { activeView, board, pageIcon, showView, views, page: boardPage } = props;
 
   const [state, setState] = useState<State>({
     cardIdToFocusOnRender: '',
@@ -114,41 +114,19 @@ function CenterPanel(props: Props) {
   const { user } = useUser();
 
   const isEmbedded = !!props.embeddedBoardPath;
-  const boardPage = pages[board.id] ?? props.page;
   const boardPageType = boardPage?.type;
-  const isLinkedBoardType = boardPageType === 'linked_board' || boardPageType === 'inline_linked_board';
-  const views = isLinkedBoardType
-    ? allViews.filter((view) => view.fields.linkedSourceId && pages[view.fields.linkedSourceId])
-    : allViews;
-
-  const linksToDeletedDatabasePages = props.views.length !== allViews.length;
-
-  const activeView = isLinkedBoardType && props.views.length === 0 ? null : defaultActiveView;
-
-  useEffect(() => {
-    if (linksToDeletedDatabasePages) {
-      showView('');
-    }
-  }, [linksToDeletedDatabasePages]);
-
-  useEffect(() => {
-    if ((props.views.length === 0 && !activeView) || (isLinkedBoardType && props.views.length === 0)) {
-      setState((s) => ({ ...s, showSettings: 'create-linked-view' }));
-    } else if (activeView) {
-      setState((s) => ({ ...s, showSettings: null }));
-    }
-  }, [activeView?.id, props.views.length, isLinkedBoardType]);
 
   // for 'linked' boards, each view has its own board which we use to determine the cards to show
-  let activeBoardId: string | undefined = props.board.id;
+  let activeBoardId: string | undefined = board.id;
   if (activeView?.fields.linkedSourceId) {
     activeBoardId = activeView?.fields.linkedSourceId;
   } else if (activeView?.fields.sourceType === 'google_form') {
     activeBoardId = activeView?.fields.sourceData?.boardId;
   }
+  const { page: activePage } = usePage({ pageIdOrPath: activeBoardId, spaceId: space?.id });
+
   const { keys } = useApiPageKeys(props.page?.id);
   const activeBoard = useAppSelector(getBoard(activeBoardId ?? ''));
-  const activePage = pages[activeBoardId ?? ''];
   const _groupByProperty = activeBoard?.fields.cardProperties.find((o) => o.id === activeView?.fields.groupById);
   const _dateDisplayProperty = activeBoard?.fields.cardProperties.find(
     (o) => o.id === activeView?.fields.dateDisplayPropertyId
@@ -160,6 +138,14 @@ function CenterPanel(props: Props) {
       pages
     })
   );
+
+  useEffect(() => {
+    if (views.length === 0 && !activeView) {
+      setState((s) => ({ ...s, showSettings: 'create-linked-view' }));
+    } else if (activeView) {
+      setState((s) => ({ ...s, showSettings: null }));
+    }
+  }, [activeView?.id, views.length, activePage]);
 
   // filter cards by whats accessible
   const cardPages: CardPage[] = _cards
@@ -505,7 +491,9 @@ function CenterPanel(props: Props) {
     }
   };
 
-  const isLoadingSourceData = !activeBoard && state.showSettings !== 'create-linked-view';
+  const isLoadingSourceData =
+    !activeBoard && state.showSettings !== 'create-linked-view' && (!views || views.length === 0);
+
   return (
     <>
       {!!boardPage?.deletedAt && <PageDeleteBanner pageId={boardPage.id} />}
@@ -544,30 +532,34 @@ function CenterPanel(props: Props) {
               setPage={props.setPage}
             />
           )}
-          <ViewHeader
-            onDeleteView={props.onDeleteView}
-            maxTabsShown={props.maxTabsShown}
-            disableUpdatingUrl={props.disableUpdatingUrl}
-            showView={props.showView}
-            onClickNewView={
-              boardPageType === 'inline_linked_board' || boardPageType === 'linked_board' ? openSelectSource : undefined
-            }
-            activeBoard={activeBoard}
-            viewsBoard={board}
-            activeView={props.activeView}
-            toggleViewOptions={toggleViewOptions}
-            cards={cards}
-            views={props.views}
-            dateDisplayProperty={dateDisplayProperty}
-            addCard={() => addCard('', true)}
-            showCard={showCard}
-            // addCardFromTemplate={addCardFromTemplate}
-            addCardTemplate={() => addCard('', true, {}, false, true)}
-            editCardTemplate={editCardTemplate}
-            readOnly={props.readOnly}
-            readOnlySourceData={props.readOnlySourceData}
-            embeddedBoardPath={props.embeddedBoardPath}
-          />
+          {(activePage || activeBoard) && (
+            <ViewHeader
+              onDeleteView={props.onDeleteView}
+              maxTabsShown={props.maxTabsShown}
+              disableUpdatingUrl={props.disableUpdatingUrl}
+              showView={props.showView}
+              onClickNewView={
+                boardPageType === 'inline_linked_board' || boardPageType === 'linked_board'
+                  ? openSelectSource
+                  : undefined
+              }
+              activeBoard={activeBoard}
+              viewsBoard={board}
+              activeView={props.activeView}
+              toggleViewOptions={toggleViewOptions}
+              cards={cards}
+              views={views}
+              dateDisplayProperty={dateDisplayProperty}
+              addCard={() => addCard('', true)}
+              showCard={showCard}
+              // addCardFromTemplate={addCardFromTemplate}
+              addCardTemplate={() => addCard('', true, {}, false, true)}
+              editCardTemplate={editCardTemplate}
+              readOnly={props.readOnly}
+              readOnlySourceData={props.readOnlySourceData}
+              embeddedBoardPath={props.embeddedBoardPath}
+            />
+          )}
         </div>
 
         <div className={`container-container ${state.showSettings ? 'sidebar-visible' : ''}`}>
@@ -614,7 +606,7 @@ function CenterPanel(props: Props) {
                     }`}
                     sx={{ fontSize: 22, fontWeight: 700, py: 0 }}
                   >
-                    {activePage.title || 'Untitled'}
+                    {activePage?.title || 'Untitled'}
                   </Button>
                 )}
               {!activeView && state.showSettings === 'create-linked-view' && (
@@ -622,7 +614,7 @@ function CenterPanel(props: Props) {
                   readOnly={props.readOnly}
                   onSelect={selectViewSource}
                   // if it links to deleted db page then the board can't be inline_board type
-                  onCreate={props.views.length === 0 && !linksToDeletedDatabasePages ? createDatabase : undefined}
+                  onCreate={views.length === 0 ? createDatabase : undefined}
                   onCsvImport={onCsvImport}
                   pageId={props.page?.id}
                 />
@@ -648,7 +640,7 @@ function CenterPanel(props: Props) {
                   activeView={activeView}
                   cardPages={cardPages}
                   groupByProperty={groupByProperty}
-                  views={props.views}
+                  views={views}
                   visibleGroups={visibleGroups}
                   selectedCardIds={state.selectedCardIds}
                   readOnly={props.readOnly}

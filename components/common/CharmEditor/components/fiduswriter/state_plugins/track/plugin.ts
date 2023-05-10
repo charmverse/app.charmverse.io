@@ -5,7 +5,6 @@ import type { FidusEditor } from '../../fiduseditor';
 import type { TrackAttribute } from '../../track/interfaces';
 
 import { findSelectedChanges } from './findSelectedChanges';
-import { deactivateAllSelectedChanges } from './helpers';
 
 export const key = new PluginKey('track');
 export const selectedInsertionSpec = {};

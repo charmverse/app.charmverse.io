@@ -45,7 +45,6 @@ function specFactory({
     type: 'mark',
     schema: {
       inclusive: true,
-      excludes: '_',
       group: 'suggestTriggerMarks',
       parseDOM: [{ tag: `span[data-${markName}]` }],
       toDOM: (mark) => {
