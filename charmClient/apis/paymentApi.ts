@@ -5,4 +5,8 @@ export class PaymentApi {
   createSubscription(payload: CreatePaymentSubscriptionRequest) {
     return http.POST<CreatePaymentSubscriptionResponse>('/api/payment/subscribe', payload);
   }
+
+  getStripePublicKey() {
+    return http.GET<{ publicKey: string }>('/api/payment/publicKey');
+  }
 }

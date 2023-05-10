@@ -6,7 +6,6 @@ import { useEffect, useState } from 'react';
 import getLayout from 'components/common/BaseLayout/BaseLayout';
 import ErrorPage from 'components/common/errors/ErrorPage';
 import Link from 'components/common/Link';
-import LoadingComponent from 'components/common/LoadingComponent';
 import { LoginPageContent } from 'components/login';
 import { CollectEmailDialog } from 'components/login/CollectEmail';
 import { useFirebaseAuth } from 'hooks/useFirebaseAuth';
