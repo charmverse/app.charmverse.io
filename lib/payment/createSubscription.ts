@@ -1,4 +1,5 @@
-import type { SubscriptionTier } from '@charmverse/core/dist/cjs/prisma';
+import { prisma } from '@charmverse/core';
+import type { SubscriptionTier } from '@charmverse/core/prisma';
 import Stripe from 'stripe';
 
 import type { Usage } from './utils';
@@ -52,6 +53,15 @@ export async function createSubscription({
       save_default_payment_method: 'on_subscription'
     },
     expand: ['latest_invoice.payment_intent']
+  });
+
+  await prisma.space.update({
+    where: {
+      id: spaceId
+    },
+    data: {
+      subscriptionId: subscription.id
+    }
   });
 
   return {
