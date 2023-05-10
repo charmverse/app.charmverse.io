@@ -43,7 +43,7 @@ async function createCategory(req: NextApiRequest, res: NextApiResponse<Proposal
     userId: req.session.user?.id
   });
 
-  return res.status(200).json({ ...category, permissions });
+  return res.status(201).json({ ...category, permissions });
 }
 
 export default withSessionRoute(handler);

@@ -89,7 +89,7 @@ async function updateProposalController(req: NextApiRequest, res: NextApiRespons
     throw new AdministratorOnlyError();
   }
   // A proposal can only be updated when its in draft or discussion status and only the proposal author can update it
-  const proposalPermissions = await computeProposalPermissions({
+  const proposalPermissions = await req.basePermissionsClient.proposals.computeProposalPermissions({
     resourceId: proposal.id,
     userId
   });
