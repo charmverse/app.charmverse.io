@@ -7,7 +7,8 @@ import { getSnapshotProposal } from 'lib/snapshot/getProposal';
 import { coerceToMilliseconds } from 'lib/utilities/dates';
 import { InvalidInputError } from 'lib/utilities/errors';
 
-import { computeProposalFlowFlags } from './computeProposalFlowFlags';
+import { computeProposalFlowPermissions } from '../permissions/proposals/computeProposalFlowPermissions';
+
 import type { ProposalWithUsers } from './interface';
 
 export async function updateProposalStatus({
@@ -43,7 +44,7 @@ export async function updateProposalStatus({
   //   }
   // })) as ProposalWithUsers & { page: { snapshotProposalId?: string } };
 
-  const statusFlow = await computeProposalFlowFlags({
+  const statusFlow = await computeProposalFlowPermissions({
     proposalId,
     userId
   });

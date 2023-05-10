@@ -1,9 +1,8 @@
-import type { ProposalCategoryWithPermissions } from '@charmverse/core';
+import type { ProposalCategoryWithPermissions, ProposalFlowPermissionFlags } from '@charmverse/core';
 import type { ProposalStatus } from '@charmverse/core/prisma';
 
 import * as http from 'adapters/http';
 import type { IPageWithPermissions, PageWithProposal } from 'lib/pages';
-import type { ProposalFlowFlags } from 'lib/proposal/computeProposalFlowFlags';
 import type { CreateProposalInput } from 'lib/proposal/createProposal';
 import type { CreateProposalFromTemplateInput } from 'lib/proposal/createProposalFromTemplate';
 import type { ProposalReviewerPool } from 'lib/proposal/getProposalReviewerPool';
@@ -71,8 +70,8 @@ export class ProposalsApi {
     return http.DELETE<{ ok: true }>(`/api/spaces/${spaceId}/proposal-categories/${categoryId}`);
   }
 
-  computeProposalFlowFlags(proposalId: string) {
-    return http.GET<ProposalFlowFlags>(`/api/proposals/${proposalId}/compute-flow-flags`);
+  computeProposalFlowPermissions(proposalId: string) {
+    return http.GET<ProposalFlowPermissionFlags>(`/api/proposals/${proposalId}/compute-flow-flags`);
   }
 
   getReviewerPool(spaceId: string) {

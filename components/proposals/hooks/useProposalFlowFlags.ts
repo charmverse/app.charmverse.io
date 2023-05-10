@@ -9,7 +9,7 @@ type Props = {
 
 export function useProposalFlowFlags({ proposalId }: Props) {
   const { data, mutate } = useSWR(!proposalId ? null : `compute-flow-flags-${proposalId}`, () =>
-    charmClient.proposals.computeProposalFlowFlags(proposalId as string)
+    charmClient.proposals.computeProposalFlowPermissions(proposalId as string)
   );
 
   return { permissions: data, refresh: mutate };
