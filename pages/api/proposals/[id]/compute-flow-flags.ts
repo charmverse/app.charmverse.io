@@ -21,6 +21,7 @@ async function getFlowFlagsController(req: NextApiRequest, res: NextApiResponse<
     resourceId: proposalId,
     userId
   });
+
   return res.status(200).send(flowFlags);
 }
 

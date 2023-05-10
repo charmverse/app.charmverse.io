@@ -1,4 +1,4 @@
-import { AvailableProposalPermissions } from '@charmverse/core';
+import { AvailableProposalPermissions } from '@charmverse/core/shared';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
