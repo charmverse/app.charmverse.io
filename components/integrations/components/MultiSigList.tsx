@@ -17,7 +17,7 @@ import {
 import Tooltip from '@mui/material/Tooltip';
 import { getChainById, getChainShortname } from 'connectors';
 import log from 'loglevel';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import useSWRMutation from 'swr/mutation';
 
@@ -71,6 +71,11 @@ export function MultiSigList() {
       }
     }
   }, [gnosisSigner, user]);
+
+  useEffect(() => {
+    // We need this to run every time a user opens the account section in the settings modal
+    importSafes();
+  }, []);
 
   function getWalletName(address: string) {
     return safeData?.find((wallet) => wallet.address === address)?.name;
