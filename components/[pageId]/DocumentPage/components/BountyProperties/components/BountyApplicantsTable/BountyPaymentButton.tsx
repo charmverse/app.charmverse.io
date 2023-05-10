@@ -44,7 +44,7 @@ function SafeMenuItem({
   onClick,
   onError = () => {}
 }: {
-  safeInfo: SafeData;
+  safeInfo: UserGnosisSafe;
   label: string;
   bounty: BountyWithDetails;
   onClick: () => void;
@@ -231,18 +231,20 @@ export function BountyPaymentButton({
           <MenuItem dense sx={{ pointerEvents: 'none', color: 'secondary.main' }}>
             Gnosis wallets
           </MenuItem>
-          {safeInfos?.map((safeInfo) => (
-            <SafeMenuItem
-              key={safeInfo.address}
-              bounty={bounty}
-              label={safeDataRecord[safeInfo.address]?.name ?? shortenHex(safeInfo.address)}
-              onClick={() => {
-                handleClose();
-              }}
-              onError={onError}
-              safeInfo={safeInfo}
-            />
-          ))}
+          {safesData
+            ?.filter((s) => !s.isHidden)
+            .map((safeInfo) => (
+              <SafeMenuItem
+                key={safeInfo.address}
+                bounty={bounty}
+                label={safeDataRecord[safeInfo.address]?.name || shortenHex(safeInfo.address)}
+                onClick={() => {
+                  handleClose();
+                }}
+                onError={onError}
+                safeInfo={safeInfo}
+              />
+            ))}
         </Menu>
       )}
     </>

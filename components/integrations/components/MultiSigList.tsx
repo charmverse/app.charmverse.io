@@ -1,19 +1,28 @@
-/* eslint-disable jsx-a11y/control-has-associated-label */
+import type { UserGnosisSafe } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import KeyIcon from '@mui/icons-material/Key';
-import { Box, CircularProgress, OutlinedInput, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
+import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined';
+import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
+import {
+  Box,
+  CircularProgress,
+  IconButton,
+  OutlinedInput,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow
+} from '@mui/material';
 import Tooltip from '@mui/material/Tooltip';
 import { getChainById, getChainShortname } from 'connectors';
 import log from 'loglevel';
-import { usePopupState } from 'material-ui-popup-state/hooks';
-import { useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
+import useSWRMutation from 'swr/mutation';
 
 import charmClient from 'charmClient';
-import Button from 'components/common/Button';
-import ElementDeleteIcon from 'components/common/form/ElementDeleteIcon';
 import Link from 'components/common/Link';
-import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { MultiSigConnectCard } from 'components/integrations/components/MultiSigConnectCard';
 import Legend from 'components/settings/Legend';
 import useMultiWalletSigs from 'hooks/useMultiWalletSigs';
@@ -22,14 +31,6 @@ import { useUser } from 'hooks/useUser';
 import useGnosisSigner from 'hooks/useWeb3Signer';
 import { importSafesFromWallet } from 'lib/gnosis/gnosis.importSafes';
 import { shortenHex } from 'lib/utilities/strings';
-
-interface Safe {
-  id: string;
-  name: string | null;
-  workspace?: string | null;
-  chainId: number;
-  address: string;
-}
 
 const StyledTableCell = styled(TableCell)`
   font-weight: 700;
@@ -47,7 +48,7 @@ export function MultiSigList() {
   const { user } = useUser();
   const [isLoadingSafes, setIsLoadingSafes] = useState(false);
 
-  async function importSafes() {
+  const importSafes = useCallback(async () => {
     if (gnosisSigner && user) {
       setIsLoadingSafes(true);
       try {
@@ -69,7 +70,7 @@ export function MultiSigList() {
         setIsLoadingSafes(false);
       }
     }
-  }
+  }, [gnosisSigner, user]);
 
   function getWalletName(address: string) {
     return safeData?.find((wallet) => wallet.address === address)?.name;
@@ -87,16 +88,11 @@ export function MultiSigList() {
       <Legend
         sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
         marginTop={(theme) => theme.spacing(4)}
+        id='multisig-section'
       >
         <Box component='span' display='flex' alignItems='center' gap={1}>
           <KeyIcon fontSize='large' /> Multisig
         </Box>
-
-        {sortedSafes.length > 0 && (
-          <Button loading={isLoadingSafes} onClick={importSafes} variant='outlined' sx={{ float: 'right' }}>
-            Sync Gnosis Safes
-          </Button>
-        )}
       </Legend>
 
       {sortedSafes.length === 0 && (
@@ -104,7 +100,7 @@ export function MultiSigList() {
       )}
 
       {sortedSafes.length > 0 && (
-        <Table size='small' aria-label='simple table'>
+        <Table size='small' aria-label='multisig table'>
           <TableHead>
             <TableRow>
               <StyledTableCell sx={{ pl: 0 }}>Wallet Name</StyledTableCell>
@@ -124,38 +120,37 @@ export function MultiSigList() {
   );
 }
 
-function SafeRow({ safe, updateWallets }: { safe: Safe; updateWallets: () => void }) {
-  const deleteConfirmation = usePopupState({ variant: 'popover', popupId: 'delete-confirmation' });
-
+function SafeRow({ safe, updateWallets }: { safe: UserGnosisSafe; updateWallets: () => void }) {
   const {
     control,
-    formState: { isDirty, isSubmitting },
+    formState: { isSubmitting },
     handleSubmit,
-    reset,
-    setValue
+    setValue,
+    formState: { errors }
   } = useForm<{ name: string }>({
     mode: 'onChange',
     defaultValues: { name: safe.name || '' }
   });
 
-  useEffect(() => {
-    setValue('name', safe.name || '');
-  }, [safe.name]);
-
-  async function deleteSafe(_safe: Safe) {
-    await charmClient.deleteMyGnosisSafe(_safe.id);
-    updateWallets();
-    deleteConfirmation.close();
-  }
-
-  async function saveSafeName({ name }: { name: string }) {
-    if (isDirty) {
-      const sanitized = name.trim();
-      await charmClient.updateMyGnosisSafe({ id: safe.id, name: sanitized });
-      await updateWallets();
-      reset(); // reset form
+  const { trigger: updateSafeWallet, isMutating: isLoadingUpdateSafeWallet } = useSWRMutation(
+    '/profile/add-wallets',
+    (_url, { arg }: Readonly<{ arg: { id: string; name?: string; isHidden?: boolean } }>) =>
+      charmClient.updateMyGnosisSafe(arg),
+    {
+      onSuccess() {
+        updateWallets();
+      }
     }
-  }
+  );
+
+  const saveSafeName = useCallback(
+    async ({ name }: { name: string }) => {
+      const sanitized = name.trim();
+      setValue('name', sanitized.length > 500 ? sanitized.substring(0, 500) : sanitized);
+      await updateSafeWallet({ id: safe.id, name: sanitized });
+    },
+    [safe.id]
+  );
 
   return (
     <TableRow key={safe.id}>
@@ -167,14 +162,15 @@ function SafeRow({ safe, updateWallets }: { safe: Safe; updateWallets: () => voi
             <OutlinedInput
               value={value}
               onChange={onChange}
-              placeholder='Untitled'
+              placeholder='Untitled wallet'
               onBlur={handleSubmit(saveSafeName)}
               endAdornment={<CircularProgress size={14} sx={{ opacity: isSubmitting ? 1 : 0 }} />}
+              error={!!errors.name}
             />
           )}
         />
       </TableCell>
-      <TableCell>{getChainById(safe.chainId)?.chainName}</TableCell>
+      <TableCell sx={{ color: 'gray', backgroundColor: 'red' }}>{getChainById(safe.chainId)?.chainName}</TableCell>
       <TableCell>
         <Tooltip placement='top' title={safe.address}>
           <span>
@@ -185,16 +181,13 @@ function SafeRow({ safe, updateWallets }: { safe: Safe; updateWallets: () => voi
         </Tooltip>
       </TableCell>
       <TableCell sx={{ pr: 0 }} align='right'>
-        <ElementDeleteIcon onClick={deleteConfirmation.open} />
-
-        <ConfirmDeleteModal
-          key={safe.id}
-          title='Delete Wallet'
-          question='Are you sure you want to delete this wallet?'
-          onConfirm={() => deleteSafe(safe)}
-          onClose={deleteConfirmation.close}
-          open={deleteConfirmation.isOpen}
-        />
+        <IconButton
+          disabled={isLoadingUpdateSafeWallet}
+          size='small'
+          onClick={() => updateSafeWallet({ id: safe.id, isHidden: !safe.isHidden })}
+        >
+          {safe.isHidden ? <VisibilityOffOutlinedIcon /> : <VisibilityOutlinedIcon />}
+        </IconButton>
       </TableCell>
     </TableRow>
   );
