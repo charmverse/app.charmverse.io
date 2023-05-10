@@ -282,8 +282,8 @@ If you are using VSCode, install the (Jest Runner plugin)[https://marketplace.vi
 
 In .vscode/settings.json, add:
 
-- for running server side tests: "jestrunner.configPath": "jest.config-server.ts"
-- for running client side tests: "jestrunner.configPath": "jest.config-browser.ts"
+- for running server side tests: "jestrunner.configPath": "jest.config.server.ts"
+- for running client side tests: "jestrunner.configPath": "jest.config.browser.ts"
 
 This will display a small "Run" button above each test suite and assertion.
 
