@@ -41,7 +41,6 @@ const defaultPaymentMethods: Pick<
     tokenDecimals: 18,
     tokenName: 'Optimism',
     tokenSymbol: 'OP',
-    // tokenLogo: '/images/cryptoLogos/optimism.svg',
     tokenLogo: 'https://optimistic.etherscan.io/token/images/optimism_32.png'
   },
   // arbitrum
@@ -51,7 +50,6 @@ const defaultPaymentMethods: Pick<
     tokenDecimals: 18,
     tokenName: 'Arbitrum',
     tokenSymbol: 'ARB',
-    // tokenLogo: '/images/cryptoLogos/optimism.svg',
     tokenLogo: 'https://static.alchemyapi.io/images/assets/11841.png'
   }
 ];
